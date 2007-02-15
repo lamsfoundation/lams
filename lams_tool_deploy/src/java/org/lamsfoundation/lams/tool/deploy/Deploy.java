@@ -107,7 +107,14 @@ public class Deploy
             		// updates the lams_tool table with the lams_version
             		dbUpdater.execute();
             		
-            		// TODO update scripts
+            		// Run update scripts if present           		
+            		ToolDBDeployTask dbDeployTask = new ToolDBDeployTask();
+                    dbDeployTask.setDbUsername(config.getDbUsername());
+                    dbDeployTask.setDbPassword(config.getDbPassword());
+                    dbDeployTask.setDbDriverClass(config.getDbDriverClass());
+                    dbDeployTask.setDbDriverUrl(config.getDbDriverUrl());
+                    dbDeployTask.setToolUpdateScriptPath(config.getToolUpdateScriptPath());
+                    dbDeployTask.runToolUpdateScript(config.getToolUpdateScriptPath());
             		
             		// deploy the jar and war files
             		System.out.println("Deploying files to ear");

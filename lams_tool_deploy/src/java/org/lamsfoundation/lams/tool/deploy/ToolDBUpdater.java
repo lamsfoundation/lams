@@ -45,15 +45,14 @@ public class ToolDBUpdater extends DBTask
     // Holds value of property toolCompatibleversion
     private String toolCompatibleVersion;
     
-    // Holds value property toolExists
+    // Holds value of property toolExists
     private boolean toolExists;
     
-    // Holds value property toolNewer
+    // Holds value of property toolNewer
     private boolean toolNewer;
     
-    // Holds value property compatibleVersion
+    // Holds value of property compatibleVersion
     private boolean compatibleVersion;
-    
     
     /**
      * Creates instance of ToolDBUpdater
@@ -225,7 +224,7 @@ public class ToolDBUpdater extends DBTask
     public boolean getToolNewer() {return this.toolNewer;}
     
     /**
-     * @return returns the toolCompatibleVersion
+     * @return Returns the toolCompatibleVersion
      */
     public String getToolCompatibleVersion() {return this.toolCompatibleVersion;}
     
@@ -238,4 +237,5 @@ public class ToolDBUpdater extends DBTask
      * @return True if tool is compatible with the server version in the db
      */
     public boolean getToolCompatible() {return this.compatibleVersion;}
+    
  }

@@ -57,6 +57,11 @@ public class ToolDBDeployTask extends DBTask
     private String toolTablesScriptPath;
     
     /**
+     * Holds value of property toolUpdateScriptPath
+     */
+    private String toolUpdateScriptPath;
+    
+    /**
      * Holds value of property toolId.
      */
     private long toolId;
@@ -76,6 +81,15 @@ public class ToolDBDeployTask extends DBTask
     /** Creates a new instance of ToolDBActivateTask */
     public ToolDBDeployTask()
     {
+    }
+    
+    /**
+     * Setter for property toolUpdateFile.
+     * @param toolUpdateFile New value of property toolUpdateFile.
+     */
+    public void setToolUpdateScriptPath(String toolUpdateScriptPath)
+    {
+        this.toolUpdateScriptPath = toolUpdateScriptPath;
     }
     
     /**
@@ -370,6 +384,30 @@ public class ToolDBDeployTask extends DBTask
             DbUtils.closeQuietly(results);
         }
         
+    }
+    
+    public void runToolUpdateScript (final String scriptSQL)
+    {
+        try
+        {
+	        File updateScript = new File(scriptSQL);
+	        if (updateScript.exists())
+	        {
+	        	System.out.println("Updating database with script: " + scriptSQL);
+	        	Connection conn = this.getConnection();    	
+	        	runScript(readFile(updateScript), conn);
+	        	conn.close();
+	        	System.out.println("Database updated");
+	        }
+	        else
+	        {
+	        	System.out.println("No update file found at " +scriptSQL+ ", continuing install without database update script.");
+	        }
+        }
+        catch (SQLException se)
+        {
+        	throw new DeployException("Failed to execute update script: " + scriptSQL);
+        }
     }
 
     /**
