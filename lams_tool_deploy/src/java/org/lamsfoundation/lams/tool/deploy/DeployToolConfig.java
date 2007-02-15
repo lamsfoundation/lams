@@ -57,7 +57,9 @@ public class DeployToolConfig extends DeployConfig {
     private static final String TOOL_APP_CONTEXT_FILE_PATH = "toolApplicationContextPath";
     private static final String TOOL_JAR_FILE_NAME = "toolJarFileName";
     private static final String DEPLOY_FILES= "deployFiles";
+    private static final String MIN_SERVER_VERSION_NUMBER= "minServerVersionNumber";
     protected static final String LANGUAGE_FILES= "languageFiles";
+    
    
   
     /**
@@ -124,6 +126,11 @@ public class DeployToolConfig extends DeployConfig {
      * Holds the value of property toolJarFileName.
      */
     private String toolJarFileName;
+    
+    /** 
+     * Holds the value of property minServerVersionNumber.
+     */
+    private String minServerVersionNumber;
     
     /**
      * Holds value of property deployFiles.
@@ -235,6 +242,10 @@ public class DeployToolConfig extends DeployConfig {
     	   toolJarFileName = value;
        }
        
+       if ( key.equalsIgnoreCase(MIN_SERVER_VERSION_NUMBER) ) {
+    	   minServerVersionNumber = value;
+       }
+       
        if ( key.equalsIgnoreCase(DEPLOY_FILES) ) {
            deployFiles = convertList(value);
        }
@@ -286,6 +297,7 @@ public class DeployToolConfig extends DeployConfig {
        valid = valid && validateStringProperty(toolWebUri, TOOL_TABLES_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolApplicationContextPath, TOOL_APP_CONTEXT_FILE_PATH);
        valid = valid && validateStringProperty(toolJarFileName,TOOL_JAR_FILE_NAME);
+       valid = valid && validateStringProperty(minServerVersionNumber,MIN_SERVER_VERSION_NUMBER);
        valid = valid && validateStringProperty(getDbUsername(), DB_USERNAME);
        valid = valid && validateStringProperty(getDbPassword(), DB_PASSWORD);
        valid = valid && validateStringProperty(getDbDriverClass(), DB_PASSWORD);
@@ -330,6 +342,8 @@ public class DeployToolConfig extends DeployConfig {
 	       this.toolApplicationContextPath = config.getToolApplicationContextPath();
        if ( config.getToolJarFileName() != null )
     	   this.toolJarFileName = config.getToolJarFileName();
+       if ( config.getMinServerVersionNumber() != null )
+    	   this.minServerVersionNumber = config.getMinServerVersionNumber();
        if (config.getDeployFiles() != null)
 	       this.deployFiles = config.getDeployFiles();
        if (config.getLanguageFiles() != null)
@@ -354,6 +368,8 @@ public class DeployToolConfig extends DeployConfig {
        System.out.println("ToolTableDeleteScriptPath: " + this.toolTablesDeleteScriptPath);
        System.out.println("ToolApplicationContextPath: " + this.toolApplicationContextPath);
        System.out.println("ToolJarFileName: "+this.toolJarFileName);
+       System.out.println("MinServerVersionNumber: "+this.minServerVersionNumber);
+       
        ArrayList list = this.deployFiles;
        for(int i=0; i<list.size(); i++)
        {
@@ -541,7 +557,15 @@ public class DeployToolConfig extends DeployConfig {
 	public void setToolApplicationContextPath(String applicationContextPath) {
 		this.toolApplicationContextPath = applicationContextPath;
 	}
+	
+	public String getMinServerVersionNumber() {
+		return minServerVersionNumber;
+	}
 
+	public void setMinServerVersionNumber(String minServerVersionNumber) {
+		this.minServerVersionNumber = minServerVersionNumber;
+	}
+	
 	public String getToolJarFileName() {
 		return toolJarFileName;
 	}
