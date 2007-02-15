@@ -48,7 +48,7 @@ import mx.controls.*;
 * Reflects changes in the MonitorModel
 */
 
-class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends AbstractView{
+class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends CommonCanvasView{
 	public static var _tabID:Number = 1;
 	private var _className = "MonitorTabView";
 	//constants:
@@ -301,28 +301,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		//var mcontroller = getController();
 		mm.broadcastViewUpdate("EXPORTSHOWHIDE", true)
 	}
-	
-	private function highlightActivity(mm:MonitorModel){
-		Debugger.log('running..',Debugger.CRITICAL,'highlightActivity','MonitorTabView');
-		//deselect everything else
-		var CAsArray:Array = mm.activitiesDisplayed.values();
-		Debugger.log('CAsArray:'+CAsArray.length,Debugger.CRITICAL,'highlightActivity','MonitorTabView');
-		for(var i=0; i < CAsArray.length; i++){
-			CAsArray[i].setSelected(false);
-		}
-		//try to cast the selected item to see what we have (instance of des not seem to work)
-		if(CanvasActivity(mm.selectedItem) != null){
-			Debugger.log('Its a canvas activity',4,'highlightActivity','MonitorTabView');
-			var ca = CanvasActivity(mm.selectedItem);
-			var a:Activity = ca.activity;			
-			ca.setSelected(true);
-					
-		}else{
-			Debugger.log('Its a something we dont know',Debugger.CRITICAL,'updateItemProperties','MonitorTabView');
-		
-		}
-	}
-	
+
 	/**
 	 * Reloads the learner Progress and 
 	 * @Param isChanged Boolean Value to pass it to setIsProgressChanged in monitor model so 		that it sets it to true if refresh button is clicked and sets it to fasle as soon as latest data is loaded and design is redrawn.

@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.authoring.cv.*
 import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
+import org.lamsfoundation.lams.common.CommonCanvasView
 import com.polymercode.Draw;
 import mx.controls.*
 import mx.managers.*
@@ -41,7 +42,7 @@ import mx.utils.*
 * Relects changes in the CanvasModel
 */
 
-class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
+class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	//constants:
 	private var GRID_HEIGHT:Number;
 	private var GRID_WIDTH:Number;
@@ -412,42 +413,6 @@ public function viewUpdate(event:Object):Void{
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;
 		return s;
-	}
-	
-	private function highlightActivity(cm:CanvasModel){
-		Debugger.log('running..',Debugger.CRITICAL,'highlightActivity','CanvasView');
-		var ca = CanvasActivity(cm.selectedItem);
-		var a:Activity = ca.activity;	
-		
-		// deselect previously selected item
-		if(cm.prevSelectedItem != null) {
-			// if child of an complex activity is previously selected, it is easiest to clear all the children
-			if(cm.prevSelectedItem.activity.parentUIID != null) {
-				var caComplex = cm.activitiesDisplayed.get(cm.prevSelectedItem.activity.parentUIID);
-				caComplex.refreshChildren();
-			} else {
-				var dca:CanvasActivity = cm.activitiesDisplayed.get(cm.prevSelectedItem.activity.activityUIID);
-				dca.setSelected(false);
-			}
-		}
-		
-		
-		//try to cast the selected item to see what we have (instance of des not seem to work)
-		if(CanvasActivity(cm.selectedItem) != null){
-			Debugger.log('Its a canvas activity',4,'highlightActivity','CanvasView');
-			ca.setSelected(true);
-			
-		}else if(CanvasTransition(cm.selectedItem) != null){
-			var ct = CanvasTransition(cm.selectedItem);
-			var t:Transition = ct.transition;
-			Debugger.log('Its a canvas transition',4,'highlightActivity','CanvasView');
-			
-		
-			
-		}else{
-			Debugger.log('Its a something we dont know',Debugger.CRITICAL,'updateItemProperties','PropertyInspector');
-		
-		}
 	}
 	
 		
