@@ -361,6 +361,12 @@ Ant build file.
 				<filter token="tool_version" value="${tool.version}" />
 			</filterset>
 		</copy>
+		
+		<copy overwrite="yes" todir="${build.deploy}/sql/updatescripts" failonerror="false">
+			<fileset dir="${db.scripts}/updatescripts/">
+				<include name="*.sql" />
+			</fileset>
+		</copy>
 
 		<copy overwrite="yes" todir="${build.deploy}/">
 			<fileset dir="${deploy.tool.dir}">

@@ -331,12 +331,18 @@
 			</copy>
 			
 			<copy overwrite="yes" todir="${build.deploy}/sql">
-								<fileset dir="${db.scripts}/">
-									<include name="tool_insert.sql" />
-								</fileset>	
-								<filterset>
-									<filter token="tool_version" value="${tool.version}" />
-								</filterset>
+				<fileset dir="${db.scripts}/">
+					<include name="tool_insert.sql" />
+				</fileset>	
+				<filterset>
+					<filter token="tool_version" value="${tool.version}" />
+				</filterset>
+			</copy>
+			
+			<copy overwrite="yes" todir="${build.deploy}/sql/updatescripts" failonerror="false">
+				<fileset dir="${db.scripts}/updatescripts/">
+					<include name="*.sql" />
+				</fileset>
 			</copy>
 
 			<copy overwrite="yes" todir="${build.deploy}/">
@@ -382,7 +388,7 @@
 				toolVersion="${tool.version}"
 				hideTool="${hideTool}"
 				minServerVersionNumber="${min.server.version.number}"
-				toolUpdateScriptPath="${build.deploy}/sql/updateTo${tool.version}.sql"
+				toolUpdateScriptPath="${build.deploy}/sql/updatescripts/updateTo${tool.version}.sql"
 				toolTablesScriptPath="${build.deploy}/sql/create_lams_tool_mc.sql" 
 				toolTablesDeleteScriptPath="${build.deploy}/sql/drop_lams_tool_mc.sql" 
 				toolActivityInsertScriptPath="${build.deploy}/sql/activity_insert.sql" 
