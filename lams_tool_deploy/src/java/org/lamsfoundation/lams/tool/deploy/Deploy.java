@@ -92,6 +92,7 @@ public class Deploy
             dbUpdater.setDbDriverUrl(config.getDbDriverUrl());
             dbUpdater.setToolSignature(config.getToolSignature());
             dbUpdater.setToolVersion(config.getToolVersion());
+            dbUpdater.setToolCompatibleVersion(config.getMinServerVersionNumber());
             dbUpdater.checkInstalledVersion();
             if (dbUpdater.getToolExists() && forceDB==false)
             {
@@ -216,15 +217,6 @@ public class Deploy
             {
             	System.out.println("Activating Tool: " + config.getToolSignature());
                 dbUpdater.activateTool(config.getToolSignature(), 1);
-            	
-            	/*ToolDBActivateTask dbActivateTask = new ToolDBActivateTask();
-                dbActivateTask.setDbUsername(config.getDbUsername());
-                dbActivateTask.setDbPassword(config.getDbPassword());
-                dbActivateTask.setDbDriverClass(config.getDbDriverClass());
-                dbActivateTask.setDbDriverUrl(config.getDbDriverUrl());
-                dbActivateTask.setLearningLibraryId(dbDeployTask.getLearningLibraryId());
-                dbActivateTask.setToolId(dbDeployTask.getToolId());
-                dbActivateTask.execute();*/
             }
             else
             {

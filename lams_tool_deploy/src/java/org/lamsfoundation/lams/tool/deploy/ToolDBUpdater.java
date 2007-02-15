@@ -27,7 +27,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import org.apache.commons.dbutils.DbUtils;
 
 /**
@@ -43,11 +42,17 @@ public class ToolDBUpdater extends DBTask
     // Holds value of property toolVersion
     private String toolVersion;
     
-    // Holds the value of property toolExists
+    // Holds value of property toolCompatibleversion
+    private String toolCompatibleVersion;
+    
+    // Holds value property toolExists
     private boolean toolExists;
     
-    // Holds the value of property toolNewer
+    // Holds value property toolNewer
     private boolean toolNewer;
+    
+    // Holds value property compatibleVersion
+    private boolean compatibleVersion;
     
     
     /**
@@ -84,6 +89,7 @@ public class ToolDBUpdater extends DBTask
     /**
      * Checks the tool is installed in the db, sets property toolExists
      * Checks the tool version in the db, sets the property toolNewer
+     * Checks the database Sever version is higher than the install one
      */
     public void checkInstalledVersion()
     {
@@ -92,7 +98,8 @@ public class ToolDBUpdater extends DBTask
         ResultSet results = null;
         try
         {
-            stmt = conn.prepareStatement("SELECT tool_version FROM lams_tool WHERE tool_signature=\""+toolSignature+"\"");
+            
+        	stmt = conn.prepareStatement("SELECT tool_version FROM lams_tool WHERE tool_signature=\""+toolSignature+"\"");
             results = stmt.executeQuery();
             if (results.first())
             {
@@ -114,11 +121,40 @@ public class ToolDBUpdater extends DBTask
             	toolExists = false;
             } 
             
+            // Checking the server version, uses the date section of the version for accuracy
+            // eg 2.0.200612051427 becomes 200612051427
+            stmt = conn.prepareStatement("SELECT config_value FROM lams_configuration WHERE config_key=\"ServerVersionNumber\"");
+            results = stmt.executeQuery(); 
+            if (results.first())
+            {
+            	
+            	String dbVersionStr = results.getString("config_value");
+            	double dbVersion = java.lang.Double.parseDouble(dbVersionStr.substring(dbVersionStr.lastIndexOf('.')));
+            	double instVersion = java.lang.Double.parseDouble(toolCompatibleVersion.substring(toolCompatibleVersion.lastIndexOf('.')));
+            	
+            	if (dbVersion < instVersion)
+            	{
+            		System.out.println("The minimum ServerVersionNumber \"" +toolCompatibleVersion+ "\" for install tool " 
+            								+this.toolSignature+ " " +this.toolVersion+ 
+            								" is higher than the current installed \"" +dbVersionStr+ "\"");
+            		System.out.println("BUILD FAILED");
+            		System.exit(0);
+            	}
+            	else
+            	{
+            		this.compatibleVersion = true;
+            	}
+            }
+            else
+            {
+            	throw new DeployException("Could not get the ServerVersionNumber from the database.");
+            }
+            
             conn.close();
         }
         catch (SQLException sqlex)
         {
-            throw new DeployException("Could not get tool version", sqlex);
+            throw new DeployException("Problem checking tool version compatibility", sqlex);
         }
         finally
         {
@@ -187,4 +223,19 @@ public class ToolDBUpdater extends DBTask
      * @return True if the tool to be installed is a newer version than the version in the datbase
      */
     public boolean getToolNewer() {return this.toolNewer;}
+    
+    /**
+     * @return returns the toolCompatibleVersion
+     */
+    public String getToolCompatibleVersion() {return this.toolCompatibleVersion;}
+    
+    /**
+     * @param ver sets toolCompatibleVersion
+     */
+    public void setToolCompatibleVersion(String ver) {this.toolCompatibleVersion = ver;}
+    
+    /**
+     * @return True if tool is compatible with the server version in the db
+     */
+    public boolean getToolCompatible() {return this.compatibleVersion;}
  }
