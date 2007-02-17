@@ -35,7 +35,7 @@
 			</copy>
 
 			<copy overwrite="yes" todir="${assembly.activity}/language">
-				<fileset dir="${package.cfg}/language">
+				<fileset dir="${package.cfg}/language/${conf.language.application}">
 					<include name="*.*"/>
 				</fileset>
 			</copy>
