@@ -81,9 +81,11 @@ Ant build file.
 		<delete dir="${build.classes.java}" />
 		<delete dir="${build.classes.test}" />
 		<delete dir="${build.lib}" />
+		<delete dir="${build.deploy}"/>
 		<mkdir dir="${build.classes.java}" />
 		<mkdir dir="${build.classes.test}" />
 		<mkdir dir="${build.lib}" />
+		<mkdir dir="${build.deploy}"/>
 	</target>
 
 	<!-- ================================================================ -->

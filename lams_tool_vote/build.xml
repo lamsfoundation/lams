@@ -146,9 +146,11 @@
 			<delete>
 				<fileset dir="${build.classes.java}"/>
 				<fileset dir="${build.classes.test}"/>
+				<fileset dir="${build.deploy}"/>
 			</delete>
 			<mkdir dir="${build.classes.java}"/>
 			<mkdir dir="${build.classes.test}"/>
+			<mkdir dir="${build.deploy}"/>
 		</target>
 
 		<target name="compile" depends="clean" description="compile java sources">

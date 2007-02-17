@@ -61,6 +61,7 @@
 		<delete>
 			<fileset dir="${build.classes.java}"/>
 			<fileset dir="${build.classes.test}"/>
+			<fileset dir="${build.lib}/language"/>
 			<fileset dir="${build.lib}"/>
 		</delete>
 	</target>
