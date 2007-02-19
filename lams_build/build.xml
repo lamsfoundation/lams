@@ -197,29 +197,25 @@
 	<!-- ============================================================================== -->
 
 	<target name="deploy-ear" 
-		description="Deploys previously assembled ear to jboss">
+		description="Delete any old versions of the ear directory">
+		<delete dir="${jboss.deploy}"/>
 		<copy todir="${jboss.ear.deploy}" overwrite="true"
 			failonerror="true">
 			<fileset dir="${assembly}">
 				<include name="${lams.ear}/**/*.*" />
 			</fileset>
-
 		</copy>
 	</target>
 
 	<!-- ============================================================================== -->
-	<!-- Deploy IMS Content Package tool to the depoloyed ear 							-->
+	<!-- Deploy the LAMS or RAMS set of tools to the deployed ear 				               			-->
 	<!--  Relies on the tools using the parameter jboss.deploy							-->						
 	<!-- ============================================================================== -->
-	<target name="deploy-tools" description="Deploy the tools, including any special parallel activities">
- 		<ant antfile="../${tool_forum_dir}/build.xml" target="deploy-tool"
+	<target name="deploy-common-tools" description="Deploy the tools shared between LAMS and RAMS. Called by deploy-lams-tools and deploy-rams-tools">
+		<ant antfile="../${tool_forum_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant>
-		<ant antfile="../${tool_lamc_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-		</ant> 
 		<ant antfile="../${tool_lanb_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
@@ -256,9 +252,40 @@
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant>
-		<ant target="deploy-learning-libraries"/>
+	</target>
+
+	<target name="deploy-lams-tools" depends="test-application, deploy-common-tools" if="isLAMS"
+			description="Deploy the LAMS tools. Called by deploy-tools.">
+		<echo>Building the LAMS set of tools.</echo>
+		<ant antfile="../${tool_lamc_dir}/build.xml" target="deploy-tool"
+				inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+		</ant> 
+	</target>
+			
+	<target name="deploy-rams-tools" depends="test-application, deploy-common-tools" if="isRAMS"
+			description="Deploys the RAMS tools. Called by deploy-tools.">
+		<echo>Building the RAMS set of tools.</echo>
+		<!-- No RAMS specific tools yet -->
 	</target>
 	
+	<target name="test-application">
+		  <condition property="isLAMS">
+		  	<equals arg1="${conf.application}" arg2="lams" />
+		  </condition>
+		  <condition property="isRAMS">
+		  	<equals arg1="${conf.application}" arg2="rams" />
+		  </condition>
+		  <echo>isLAMS ${isLAMS}</echo>
+		  <echo>isRAMS ${isRAMS}</echo>
+	</target>
+	
+	<target name="deploy-tools" depends="deploy-lams-tools,deploy-rams-tools" 
+		description="Deploys the desired tools, working out automatically whether they should be the LAMS or RAMS set of tools. Includes any special parallel activities">
+		<ant target="deploy-learning-libraries"/>
+	</target>
+
+
 	<!-- ============================================================================== -->
 	<!--  Rebuild the LAMS Database														-->						
 	<!-- ============================================================================== -->
