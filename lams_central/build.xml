@@ -100,20 +100,23 @@
 		</javac>
 	</target>
 	
-	<target name="copyContext">
-		<copy overwrite="yes" todir="${build.web}">
-			<fileset dir="${conf.web.dir}">
-				<include name="**/*.xml"/>
-				<include name="**/*.tld"/>
-				<include name="**/*.tag"/>
-			</fileset>
-		</copy>
-	</target>
-	
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<!-- Make the war archive  for deployment             -->
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
-	<target name="build-war" depends="webdoclet,build-jar" description="creates war file">
+	<target name="copyConfFlashFiles" description="Copy the Flash files from the conf directory to the web directory">
+		<!-- Clean out any old ones first so we don't get rams/lams confused -->
+		<delete>
+			<fileset dir="web/flashxml"/>
+		</delete>
+		<mkdir dir="web/flashxml"/>
+		<copy overwrite="yes" todir="web/flashxml">
+			<fileset dir="${conf.dir}/flashxml/${conf.application}">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="build-war" depends="webdoclet,build-jar,copyConfFlashFiles" description="creates war file">
 		<delete file="${build.lib}/${product}.war"/>
 		<war warfile="${build.lib}/${product}.war" manifest="${conf.dir}/war/META-INF/MANIFEST.MF"
   				webxml="${conf.webinf.dir}/web.xml">
@@ -149,7 +152,7 @@
 	<!-- ================================================================ -->
 	<!-- Make jar archive for deployment        		    	          -->
 	<!-- ================================================================ -->
-	<target name="build-jar" depends="compile,copyContext" description="creates jar file">
+	<target name="build-jar" depends="compile" description="creates jar file">
 		<delete file="${build.lib}/${product}.jar"/>
 		<jar jarfile="${build.lib}/${product}.jar"  manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 			<fileset dir="${build.classes.java}"/>

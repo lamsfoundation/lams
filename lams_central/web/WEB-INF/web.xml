@@ -149,18 +149,18 @@
 </listener>
 
    <servlet>
-      <servlet-name>storeLD</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.authoring.web.StoreLDServlet</servlet-class>
-
-   </servlet>
-   <servlet>
       <servlet-name>storeTheme</servlet-name>
       <servlet-class>org.lamsfoundation.lams.themes.web.StoreThemeServlet</servlet-class>
 
    </servlet>
    <servlet>
-      <servlet-name>dumpWDDX</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.web.ReportWddxStructureServlet</servlet-class>
+      <servlet-name>flashCrashDump</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.web.FlashCrashDumpServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>storeLD</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.authoring.web.StoreLDServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -208,11 +208,6 @@
 
    </servlet>
    <servlet>
-      <servlet-name>storeNotebookEntry</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.notebook.web.StoreNBEntryServlet</servlet-class>
-
-   </servlet>
-   <servlet>
       <servlet-name>Connector</servlet-name>
       <servlet-class>org.lamsfoundation.lams.web.LAMSConnectorServlet</servlet-class>
 
@@ -229,8 +224,13 @@
 
    </servlet>
    <servlet>
-      <servlet-name>flashCrashDump</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.web.FlashCrashDumpServlet</servlet-class>
+      <servlet-name>dumpWDDX</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.web.ReportWddxStructureServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>storeNotebookEntry</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.notebook.web.StoreNBEntryServlet</servlet-class>
 
    </servlet>
 
@@ -328,32 +328,32 @@
 </servlet-mapping>
 
    <servlet-mapping>
-      <servlet-name>storeLD</servlet-name>
-      <url-pattern>/servlet/authoring/storeLearningDesignDetails</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
       <servlet-name>storeTheme</servlet-name>
       <url-pattern>/themes/servlet/storeTheme</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>dumpWDDX</servlet-name>
-      <url-pattern>/servlet/dumpWDDX</url-pattern>
+      <servlet-name>flashCrashDump</servlet-name>
+      <url-pattern>/servlet/flashCrashDump</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>storeLD</servlet-name>
+      <url-pattern>/servlet/authoring/storeLearningDesignDetails</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>SimpleUploader</servlet-name>
       <url-pattern>/fckeditor/editor/filemanager/upload/simpleuploader</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>storeNotebookEntry</servlet-name>
-      <url-pattern>/servlet/notebook/storeNotebookEntry</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
       <servlet-name>Connector</servlet-name>
       <url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>flashCrashDump</servlet-name>
-      <url-pattern>/servlet/flashCrashDump</url-pattern>
+      <servlet-name>dumpWDDX</servlet-name>
+      <url-pattern>/servlet/dumpWDDX</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>storeNotebookEntry</servlet-name>
+      <url-pattern>/servlet/notebook/storeNotebookEntry</url-pattern>
    </servlet-mapping>
 
    <session-config>
@@ -467,9 +467,10 @@
     		<role-name>LEARNER</role-name>
     		<role-name>MONITOR</role-name>
     		<role-name>AUTHOR</role-name>
-    	    <role-name>COURSE MANAGER</role-name>
-    		<role-name>COURSE ADMIN</role-name>
+    	    <role-name>GROUP MANAGER</role-name>
+    		<role-name>GROUP ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
+    		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 
@@ -480,6 +481,7 @@
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
+    		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
@@ -501,9 +503,10 @@
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
     		<role-name>MONITOR</role-name>
-    	    <role-name>COURSE MANAGER</role-name>
-    		<role-name>COURSE ADMIN</role-name>
+    	    <role-name>GROUP MANAGER</role-name>
+    		<role-name>GROUP ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
+    		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 
@@ -535,15 +538,19 @@
 	</security-role>
 
     <security-role>
-		<role-name>COURSE MANAGER</role-name>
+		<role-name>GROUP MANAGER</role-name>
 	</security-role>
    	<security-role>
-		<role-name>COURSE ADMIN</role-name>
+		<role-name>GROUP ADMIN</role-name>
 	</security-role>
 
 	<security-role>
 		<description>Can add/remove users to the system, set up classes of users for sessions</description>
 		<role-name>SYSADMIN</role-name>
+	</security-role>
+
+	<security-role>
+		<role-name>AUTHOR ADMIN</role-name>
 	</security-role>
 
 </web-app>
