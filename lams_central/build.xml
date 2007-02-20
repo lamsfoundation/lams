@@ -105,9 +105,7 @@
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<target name="copyConfFlashFiles" description="Copy the Flash files from the conf directory to the web directory">
 		<!-- Clean out any old ones first so we don't get rams/lams confused -->
-		<delete>
-			<fileset dir="web/flashxml"/>
-		</delete>
+		<delete dir="web/flashxml"/>
 		<mkdir dir="web/flashxml"/>
 		<copy overwrite="yes" todir="web/flashxml">
 			<fileset dir="${conf.dir}/flashxml/${conf.application}">
