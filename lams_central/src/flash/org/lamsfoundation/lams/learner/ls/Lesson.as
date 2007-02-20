@@ -258,6 +258,10 @@ class Lesson {
 	}
 	
 	private function saveProgressData(progressDTO:Object):Void{
+		if(progressDTO instanceof LFError) {
+			return;
+		}
+		
 		var p:Progress = new Progress();
 		p.populateFromDTO(progressDTO);
 		lessonModel.setProgressData(p);
@@ -326,6 +330,10 @@ class Lesson {
 			
 			// set lesson as active
 			lessonModel.setActive();
+			
+			// get flash progress data
+			getFlashProgress();
+			
 		}
 		
 	}
