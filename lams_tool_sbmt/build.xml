@@ -102,7 +102,7 @@
 	
 		<target name="generate-hbm" 
 				description="Generates Hibernate class descriptor files."
-			depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present,preparedirs">
+			depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present">
 			    <!-- Define the hibernatedoclet task -->
 			    <taskdef name="hibernatedoclet"
 			        classname="xdoclet.modules.hibernate.HibernateDocletTask"
@@ -156,23 +156,14 @@
 		<!-- Preparations									                  -->
 		<!-- ================================================================ -->
 		
-		<target name="preparedirs">
+		<target name="clean" description="removes all class files">
+			<delete dir="${build}"/>
 			<mkdir dir="${build}"/>
 			<mkdir dir="${build.classes.java}"/>
 			<mkdir dir="${build.classes.test}"/>
+			<mkdir dir="${build.deploy}"/>
 			<mkdir dir="${build.report}"/>
 			<mkdir dir="${build.lib}"/>
-		</target>
-	
-		<target name="clean" depends="preparedirs" description="removes all class files">
-			<delete>
-				<fileset dir="${build.classes.java}"/>
-				<fileset dir="${build.classes.test}"/>
-				<fileset dir="${build.deploy}"/>
-			</delete>
-			<mkdir dir="${build.classes.java}"/>
-			<mkdir dir="${build.classes.test}"/>
-			<mkdir dir="${build.deploy}"/>
 		</target>
 
 		<target name="compile" depends="clean" description="compile java sources">
@@ -229,7 +220,7 @@
 		    <classpath refid="all-libs"/>
 		</taskdef>
 		
-		<target name="webdoclet" depends="preparedirs">
+		<target name="webdoclet">
 			<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
 
 	         <fileset dir="${src.java.dir}">
