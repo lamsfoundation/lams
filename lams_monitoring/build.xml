@@ -49,18 +49,15 @@
 	<!-- ================================================================ -->
 	<!-- Preparations									                  -->
 	<!-- ================================================================ -->
-	<target name="preparedirs">
+	<target name="clean" description="removes all class files">
+		<delete dir="${build.classes.java}"/>
+		<delete dir="${build.classes.test}"/>
+		<delete dir="${build.lib}"/>
+		
 		<mkdir dir="${build}"/>
 		<mkdir dir="${build.classes.java}"/>
 		<mkdir dir="${build.classes.test}"/>
 		<mkdir dir="${build.lib}"/>
-	</target>
-
-
-	<target name="clean" depends="preparedirs" description="removes all class files">
-		<delete dir="${build.classes.java}"/>
-		<delete dir="${build.classes.test}"/>
-		<delete dir="${build.lib}"/>
 	</target>
 
 	<target name="compile.java" depends="clean" description="compile java sources">
@@ -205,7 +202,7 @@
 	</taskdef>
 
 
-	<target name="webdoclet" depends="preparedirs">
+	<target name="webdoclet" depends="clean">
 		<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
 
          <fileset dir="${src.java.dir}">
