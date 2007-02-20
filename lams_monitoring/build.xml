@@ -58,12 +58,9 @@
 
 
 	<target name="clean" depends="preparedirs" description="removes all class files">
-		<delete>
-			<fileset dir="${build.classes.java}"/>
-			<fileset dir="${build.classes.test}"/>
-			<fileset dir="${build.lib}/language"/>
-			<fileset dir="${build.lib}"/>
-		</delete>
+		<delete dir="${build.classes.java}"/>
+		<delete dir="${build.classes.test}"/>
+		<delete dir="${build.lib}"/>
 	</target>
 
 	<target name="compile.java" depends="clean" description="compile java sources">
