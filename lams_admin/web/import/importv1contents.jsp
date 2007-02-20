@@ -29,7 +29,7 @@ function loading(){
 
 <div id="loading" style="display:none">
 	<h3>Please wait while creating new users and groups...</h3>
-	<p align="center"><img src="<lams:LAMSURL/>/images/loading.gif"/></p>
+	<p align="center"><img src="<lams:LAMSURL/>/images/loading.gif" alt="loading..." /></p>
 </div>
 
 <div id="list">
@@ -39,7 +39,6 @@ function loading(){
 <h3><fmt:message key="heading.importv1.users" /></h3>
 <c:out value="${msgNumUsers}"/>
 
-<p>
 <h3><fmt:message key="heading.importv1.account.organisations" /></h3>
 <table class="alternative-color" width=100% cellspacing="0">
 	<tr>
@@ -75,11 +74,10 @@ function loading(){
 		</logic:equal>
 	</logic:iterate>
 </table>
-</p>
 
 <p>
 <html:checkbox property="onlyMembers">&nbsp;Only import users that are members of organisations/session classes to be imported</html:checkbox>
-<p>
+</p>
 
 <p>
 	<!--<input type="submit" class="button" value="Ok"

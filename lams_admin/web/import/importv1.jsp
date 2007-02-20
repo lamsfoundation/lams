@@ -19,23 +19,22 @@ function loading(){
 
 <div id="loading" style="display:none">
 	<h3>Please wait while importing...</h3>
-	<p align="center"><img src="<lams:LAMSURL/>/images/loading.gif"/></p>
+	<p align="center"><img src="<lams:LAMSURL/>/images/loading.gif" alt="loading..." /></p>
 </div>
 
 <div id="instructions">
 
-<p>
 <ul>
-	<li><fmt:message key="msg.importv1.1"/></li>
+	<li><fmt:message key="msg.importv1.1"/>
 		<ul><li><p><a href="file/lams1_user_org_export.sql">lams1_user_org_export.sql</a></p></li></ul>
+	</li>
 	<li><fmt:message key="msg.importv1.2"/>:
 		<ul><li><p>shell> mysql lamsone < lams1_user_org_export.sql -u root -p > lams1_users_orgs.txt</p></li></ul>
 	</li>
-	<li><fmt:message key="msg.importv1.3a"/> lams1_users_orgs.txt <fmt:message key="msg.importv1.3b"/>&nbsp;&nbsp;
-	<fmt:message key="msg.importv1.4"/></li>
-	<li><fmt:message key="msg.importv1.5"/></li>
+	<li><p><fmt:message key="msg.importv1.3a"/> lams1_users_orgs.txt <fmt:message key="msg.importv1.3b"/>&nbsp;&nbsp;
+	<fmt:message key="msg.importv1.4"/></p></li>
+	<li><p><fmt:message key="msg.importv1.5"/></p></li>
 </ul>
-</p>
 
 <p>&nbsp;</p>
 
