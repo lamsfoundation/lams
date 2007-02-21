@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -149,6 +150,7 @@ public class OrgManageAction extends Action {
 				orgManageBeans.add(orgManageBean);
 			}
 		}
+		Collections.sort(orgManageBeans);
 		orgManageForm.setOrgManageBeans(orgManageBeans);
 		request.setAttribute("OrgManageForm",orgManageForm);
 		// let the jsp know whether to display links

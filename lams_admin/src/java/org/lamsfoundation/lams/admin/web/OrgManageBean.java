@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.admin.web;
 
 import java.util.Date;
 
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 
 /**
@@ -37,7 +38,7 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
  *
  * Created at 22:55:01 on 2006-6-6
  */
-public class OrgManageBean {
+public class OrgManageBean implements Comparable {
 
 	/**
 	 * OrgManageBean Constructor
@@ -105,6 +106,9 @@ public class OrgManageBean {
 	}
 	public void setEditable(boolean editable) {
 		this.editable = editable;
+	}
+	public int compareTo(Object o) {
+		return name.compareToIgnoreCase(((OrgManageBean)o).getName());
 	}
 
 }
