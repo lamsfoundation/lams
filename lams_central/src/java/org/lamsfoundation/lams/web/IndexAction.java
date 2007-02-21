@@ -130,7 +130,6 @@ public class IndexAction extends Action {
 				organisations.addAll(getService().getOrganisationsByTypeAndStatus(OrganisationType.COURSE_TYPE,OrganisationState.ACTIVE));
 			}
 			for (Organisation org:organisations) {
-				log.debug("archived date: "+org.getArchivedDate());
 				List<Integer> roles = new ArrayList<Integer>();
 				roles.add(Role.ROLE_SYSADMIN);
 				List<UserOrganisationRole> userOrganisationRoles = getService().getUserOrganisationRoles(org.getOrganisationId(),request.getRemoteUser());
@@ -153,7 +152,6 @@ public class IndexAction extends Action {
 				userOrganisations.addAll(getService().getUserOrganisationsForUserByTypeAndStatus(request.getRemoteUser(),OrganisationType.COURSE_TYPE,OrganisationState.ACTIVE));
 			}
 			for (UserOrganisation userOrganisation: userOrganisations) {
-				log.debug("archived date: "+userOrganisation.getOrganisation().getArchivedDate());
 				List<Integer> roles = new ArrayList<Integer>();
 				for(Object userOrganisationRole:userOrganisation.getUserOrganisationRoles()){
 					roles.add(((UserOrganisationRole)userOrganisationRole).getRole().getRoleId());
@@ -283,6 +281,14 @@ public class IndexAction extends Action {
 				if(organisation.getOrganisationState().getOrganisationStateId().equals(state)){
 					List<Integer> classRoles = new ArrayList<Integer>();
 					List<UserOrganisationRole> userOrganisationRoles = getService().getUserOrganisationRoles(organisation.getOrganisationId(),username);
+					// don't list the subgroup if user is not a member, and not a group admin/manager
+					if (userOrganisationRoles==null || userOrganisationRoles.isEmpty()) {
+						if (!contains(roles,Role.ROLE_GROUP_ADMIN) && 
+								!contains(roles,Role.ROLE_GROUP_MANAGER) &&
+								!contains(roles,Role.ROLE_SYSADMIN)) {
+							continue;
+						}
+					}
 					for(UserOrganisationRole userOrganisationRole:userOrganisationRoles){
 						classRoles.add(userOrganisationRole.getRole().getRoleId());
 					}
