@@ -1194,7 +1194,7 @@ class WizardView extends AbstractView {
 			var user:User = User(users[i]);
 			
 			_learnerList[i] = this._learner_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._learner_mc.getNextHighestDepth());
-			_learnerList[i].fullName.text = user.getFirstName();
+			_learnerList[i].fullName.text = user.getFullName();
 			_learnerList[i]._x = USERS_X;
 			_learnerList[i]._y = USER_OFFSET * i;
 			_learnerList[i].data = user.getDTO();
@@ -1225,7 +1225,7 @@ class WizardView extends AbstractView {
 			var user:User = User(users[i]);
 			
 			_staffList[i] = this._staff_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._staff_mc.getNextHighestDepth());
-			_staffList[i].fullName.text = user.getFirstName();
+			_staffList[i].fullName.text = user.getFullName();
 			_staffList[i]._x = USERS_X;
 			_staffList[i]._y = USER_OFFSET * i;
 			_staffList[i].data = user.getDTO();

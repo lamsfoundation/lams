@@ -82,6 +82,10 @@ class User {
 		return _userId;
 	}
 	
+	public function getFullName():String {
+		return _firstName + " " + _lastName;
+	}
+	
 	public function getFirstName():String{
 		return _firstName;
 	}
