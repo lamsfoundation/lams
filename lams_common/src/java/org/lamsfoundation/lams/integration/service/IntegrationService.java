@@ -111,7 +111,7 @@ public class IntegrationService implements IIntegrationService{
 	private void addMemberships(User user, Organisation org){
 		UserOrganisation uo = new UserOrganisation(user,org);
 		service.save(uo);
-		Integer[] roles = new Integer[]{Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_GROUP_MANAGER, Role.ROLE_LEARNER};
+		Integer[] roles = new Integer[]{Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_LEARNER};
 		for(Integer roleId:roles){
 			UserOrganisationRole uor = new UserOrganisationRole(uo,(Role)service.findById(Role.class,roleId));
 			service.save(uor);
@@ -138,7 +138,7 @@ public class IntegrationService implements IIntegrationService{
 		org.setName(buildName(serverMap.getPrefix(), extCourseId));
 		org.setCode(extCourseId);
 		org.setParentOrganisation(serverMap.getOrganisation());
-		org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.COURSE_TYPE));
+		org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.CLASS_TYPE));
 		org.setOrganisationState((OrganisationState)service.findById(OrganisationState.class,OrganisationState.ACTIVE));
 		org.setLocale(getLocale(countryIsoCode, langIsoCode));
 		service.saveOrganisation(org, user.getUserId());
@@ -212,6 +212,7 @@ public class IntegrationService implements IIntegrationService{
 		map.setExtUsername(extUsername);
 		map.setUser(user);
 		service.save(map);
+		addMemberships(user, serverMap.getOrganisation());
 		return map;
 	}
 

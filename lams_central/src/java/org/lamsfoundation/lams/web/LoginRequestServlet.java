@@ -142,8 +142,8 @@ public class LoginRequestServlet extends HttpServlet {
 			Organisation org = orgMap.getOrganisation();
 			IUserManagementService userManagementService = integrationService.getService();
 			UserOrganisation uo = userManagementService.getUserOrganisation(user.getUserId(), org.getOrganisationId());
-			//GROUP_MANAGER role is to enable user to see the course's workspace folder
-			Integer[] roleIds = new Integer[]{Role.ROLE_AUTHOR,Role.ROLE_GROUP_MANAGER,Role.ROLE_LEARNER};
+			// make sure external user has minimal set of roles, i.e. learner
+			Integer[] roleIds = new Integer[]{Role.ROLE_LEARNER};
 			//we have to assign all the roles to the external user here, because once the user logged in, the roles
 			//are cached in JBoss, all the calls of request.isUserInRole() will be based on the cached roles
 			Map<String, Object> properties = new HashMap<String, Object>();
