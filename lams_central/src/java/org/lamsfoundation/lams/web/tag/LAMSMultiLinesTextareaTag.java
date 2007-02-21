@@ -85,6 +85,10 @@ public class LAMSMultiLinesTextareaTag  extends BodyTagSupport implements Dynami
 
 		keys.clear();
 		values.clear();
+		// reset id and onChange as these are optional, and if they aren't included and there is more than one
+		// instance of this tag on the page, then the same values are used for all tags.
+		this.setId(null);
+		this.setOnchange(null);
 		
 		return super.doEndTag();
 	}
