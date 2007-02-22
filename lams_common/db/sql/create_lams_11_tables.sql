@@ -449,6 +449,9 @@ CREATE TABLE lams_tool (
      , help_url TEXT
      , create_date_time DATETIME NOT NULL
      , language_file VARCHAR(255)
+     , modified_date_time DATETIME
+     , classpath_addition VARCHAR(255)
+     , context_file VARCHAR(255)
      , UNIQUE UQ_lams_tool_sig (tool_signature)
      , UNIQUE UQ_lams_tool_class_name (service_name)
      , PRIMARY KEY (tool_id)

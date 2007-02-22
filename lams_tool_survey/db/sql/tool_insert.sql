@@ -27,7 +27,10 @@ contribute_url,
 moderation_url,
 help_url,
 language_file,
-create_date_time
+classpath_addition,
+context_file,
+create_date_time,
+modified_date_time
 )
 VALUES
 (
@@ -54,5 +57,8 @@ NULL,
 'tool/lasurv11/moderate.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lasurv11',
 'org.lamsfoundation.lams.tool.survey.ApplicationResources',
-NOW()
+'./lams-tool-lasurv11.jar',
+'/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml',
+NOW(),
+NOW(),
 )
