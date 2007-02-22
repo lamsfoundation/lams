@@ -16,4 +16,32 @@ public interface Register extends java.rmi.Remote {
     		String serverId, 
     		String datetime, 
     		String hash) throws java.rmi.RemoteException;
+    
+    public boolean addUserToGroup(
+			String username, 
+			String serverId, 
+			String datetime, 
+			String hash,
+			Boolean isTeacher) throws java.rmi.RemoteException;
+    
+    public boolean addUserToGroupLessons(
+			String username, 
+			String serverId, 
+			String datetime, 
+			String hash) throws java.rmi.RemoteException;
+    
+    public boolean addUserToSubgroup(
+			String username,
+			String orgid,
+			String serverId, 
+			String datetime, 
+			String hash,
+			Boolean isTeacher) throws java.rmi.RemoteException;
+    
+    public boolean addUserToSubgroupLessons(
+			String username,
+			String orgId,
+			String serverId, 
+			String datetime, 
+			String hash) throws java.rmi.RemoteException;
 }

@@ -7,6 +7,7 @@
 
 package org.lamsfoundation.lams.webservice;
 
+
 public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.lams.webservice.Register, org.apache.axis.wsdl.Skeleton {
     private org.lamsfoundation.lams.webservice.Register impl;
     private static java.util.Map _myOperations = new java.util.Hashtable();
@@ -27,7 +28,15 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
     }
 
     static {
-        org.apache.axis.description.OperationDesc _oper;
+        addCreateUser();
+        addAddUserToGroup();
+        addAddUserToGroupLessons();
+        addAddUserToSubgroup();
+        addAddUserToSubgroupLessons();
+    }
+    
+    private static void addCreateUser() {
+    	org.apache.axis.description.OperationDesc _oper;
         org.apache.axis.description.FaultDesc _fault;
         org.apache.axis.description.ParameterDesc [] _params;
         _params = new org.apache.axis.description.ParameterDesc [] {
@@ -50,6 +59,94 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
         }
         ((java.util.List)_myOperations.get("createUser")).add(_oper);
     }
+    
+    private static void addAddUserToGroup() {
+    	org.apache.axis.description.OperationDesc _oper;
+        org.apache.axis.description.FaultDesc _fault;
+        org.apache.axis.description.ParameterDesc [] _params;
+        _params = new org.apache.axis.description.ParameterDesc [] {
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "serverId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "datetime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "isTeacher"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "boolean"), java.lang.Boolean.class, false, false),
+        };
+        _oper = new org.apache.axis.description.OperationDesc("addUserToGroup", _params, new javax.xml.namespace.QName("", "addUserToGroupReturn"));
+        _oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        _oper.setElementQName(new javax.xml.namespace.QName("", "addUserToGroup"));
+        _oper.setSoapAction("");
+        _myOperationsList.add(_oper);
+        if (_myOperations.get("addUserToGroup") == null) {
+            _myOperations.put("addUserToGroup", new java.util.ArrayList());
+        }
+        ((java.util.List)_myOperations.get("addUserToGroup")).add(_oper);
+    }
+    
+    private static void addAddUserToGroupLessons() {
+    	org.apache.axis.description.OperationDesc _oper;
+        org.apache.axis.description.FaultDesc _fault;
+        org.apache.axis.description.ParameterDesc [] _params;
+        _params = new org.apache.axis.description.ParameterDesc [] {
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "serverId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "datetime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+        };
+        _oper = new org.apache.axis.description.OperationDesc("addUserToGroupLessons", _params, new javax.xml.namespace.QName("", "addUserToGroupLessonsReturn"));
+        _oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        _oper.setElementQName(new javax.xml.namespace.QName("", "addUserToGroupLessons"));
+        _oper.setSoapAction("");
+        _myOperationsList.add(_oper);
+        if (_myOperations.get("addUserToGroupLessons") == null) {
+            _myOperations.put("addUserToGroupLessons", new java.util.ArrayList());
+        }
+        ((java.util.List)_myOperations.get("addUserToGroupLessons")).add(_oper);
+    }
+    
+    private static void addAddUserToSubgroup() {
+    	org.apache.axis.description.OperationDesc _oper;
+        org.apache.axis.description.FaultDesc _fault;
+        org.apache.axis.description.ParameterDesc [] _params;
+        _params = new org.apache.axis.description.ParameterDesc [] {
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "orgId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "serverId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "datetime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "isTeacher"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "boolean"), java.lang.Boolean.class, false, false),
+        };
+        _oper = new org.apache.axis.description.OperationDesc("addUserToSubgroup", _params, new javax.xml.namespace.QName("", "addUserToSubgroupReturn"));
+        _oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        _oper.setElementQName(new javax.xml.namespace.QName("", "addUserToSubgroup"));
+        _oper.setSoapAction("");
+        _myOperationsList.add(_oper);
+        if (_myOperations.get("addUserToSubgroup") == null) {
+            _myOperations.put("addUserToSubgroup", new java.util.ArrayList());
+        }
+        ((java.util.List)_myOperations.get("addUserToSubgroup")).add(_oper);
+    }
+    
+    private static void addAddUserToSubgroupLessons() {
+    	org.apache.axis.description.OperationDesc _oper;
+        org.apache.axis.description.FaultDesc _fault;
+        org.apache.axis.description.ParameterDesc [] _params;
+        _params = new org.apache.axis.description.ParameterDesc [] {
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "orgId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "serverId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "datetime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+        };
+        _oper = new org.apache.axis.description.OperationDesc("addUserToSubgroupLessons", _params, new javax.xml.namespace.QName("", "addUserToSubgroupLessonsReturn"));
+        _oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        _oper.setElementQName(new javax.xml.namespace.QName("", "addUserToSubgroupLessons"));
+        _oper.setSoapAction("");
+        _myOperationsList.add(_oper);
+        if (_myOperations.get("addUserToSubgroupLessons") == null) {
+            _myOperations.put("addUserToSubgroupLessons", new java.util.ArrayList());
+        }
+        ((java.util.List)_myOperations.get("addUserToSubgroupLessons")).add(_oper);
+    }
 
     public RegisterServiceSoapBindingSkeleton() {
         this.impl = new org.lamsfoundation.lams.webservice.RegisterServiceSoapBindingImpl();
@@ -58,10 +155,30 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
     public RegisterServiceSoapBindingSkeleton(org.lamsfoundation.lams.webservice.Register impl) {
         this.impl = impl;
     }
+    
     public boolean createUser(String username, String password, String firstName, String lastName, String email, String serverId, String datetime, String hash) throws java.rmi.RemoteException
     {
         boolean ret = impl.createUser(username, password, firstName, lastName, email, serverId, datetime, hash);
         return ret;
     }
+    
+    public boolean addUserToGroup(String username, String serverId, String datetime, String hash, Boolean isTeacher) throws java.rmi.RemoteException {
+		boolean ret = impl.addUserToGroup(username, serverId, datetime, hash, isTeacher);
+		return ret;
+	}
+	
+	public boolean addUserToGroupLessons(String username, String serverId, String datetime, String hash) throws java.rmi.RemoteException {
+		boolean ret = impl.addUserToGroupLessons(username, serverId, datetime, hash);
+		return ret;
+	}
 
+	public boolean addUserToSubgroup(String username, String orgId, String serverId, String datetime, String hash, Boolean isTeacher) throws java.rmi.RemoteException {
+		boolean ret = impl.addUserToSubgroup(username, orgId, serverId, datetime, hash, isTeacher);
+		return ret;
+	}
+	
+	public boolean addUserToSubgroupLessons(String username, String orgId, String serverId, String datetime, String hash) throws java.rmi.RemoteException {
+		boolean ret = impl.addUserToSubgroupLessons(username, orgId, serverId, datetime, hash);
+		return ret;
+	}
 }

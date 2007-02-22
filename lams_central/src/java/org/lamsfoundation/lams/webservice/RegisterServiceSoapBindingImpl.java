@@ -10,6 +10,7 @@ package org.lamsfoundation.lams.webservice;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServlet;
 
@@ -55,8 +56,15 @@ public class RegisterServiceSoapBindingImpl implements Register {
 			((HttpServlet) context.getProperty(HTTPConstants.MC_HTTP_SERVLET))
 					.getServletContext()).getBean("integrationService");
 	
-	public boolean createUser(String username, String password, String firstName, String lastName,
-			String email, String serverId, String datetime, String hash) throws java.rmi.RemoteException {
+	public boolean createUser(
+			String username,
+			String password,
+			String firstName,
+			String lastName,
+			String email,
+			String serverId,
+			String datetime,
+			String hash) throws java.rmi.RemoteException {
 		try {
 			ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
 			Authenticator.authenticate(extServer, datetime,	hash);
@@ -86,9 +94,6 @@ public class RegisterServiceSoapBindingImpl implements Register {
 				user.setHtmlTheme(htmlTheme);
 			}
 			service.save(user);
-			Organisation org = extServer.getOrganisation();
-			addMemberships(user, org);
-			addUserToLessons(user, org);
 			return true;
 		} catch (Exception e) {
 			log.debug(e.getMessage(), e);
@@ -96,6 +101,101 @@ public class RegisterServiceSoapBindingImpl implements Register {
 		}
 	}
 
+	public boolean addUserToGroup(
+			String username, 
+			String serverId, 
+			String datetime, 
+			String hash,
+			Boolean isTeacher) throws java.rmi.RemoteException {
+		try {
+			ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
+			Authenticator.authenticate(extServer, datetime,	hash);
+			User user = service.getUserByLogin(username);
+			Organisation org = extServer.getOrganisation();
+			addMemberships(user, org, isTeacher);
+			return true;
+		} catch (Exception e) {
+			log.debug(e.getMessage(), e);
+			throw new java.rmi.RemoteException(e.getMessage());
+		}
+	}
+	
+	public boolean addUserToSubgroup(
+			String username,
+			String orgId,
+			String serverId, 
+			String datetime, 
+			String hash,
+			Boolean isTeacher) throws java.rmi.RemoteException {
+		try {
+			ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
+			Authenticator.authenticate(extServer, datetime,	hash);
+			User user = service.getUserByLogin(username);
+			Organisation group = extServer.getOrganisation();
+			Organisation subgroup = (Organisation)service.findById(Organisation.class, new Integer(orgId));
+			Set children = group.getChildOrganisations();
+			Iterator iter = children.iterator();
+			while (iter.hasNext()) {
+				Organisation child = (Organisation)iter.next();
+				if (child.getOrganisationId().equals(subgroup.getOrganisationId())) {
+					addMemberships(user, subgroup, isTeacher);
+					return true;
+				}
+			}
+			return false;
+		} catch (Exception e) {
+			log.debug(e.getMessage(), e);
+			throw new java.rmi.RemoteException(e.getMessage());
+		}
+	}
+	
+	public boolean addUserToGroupLessons(
+			String username, 
+			String serverId, 
+			String datetime, 
+			String hash) throws java.rmi.RemoteException {
+		try {
+			ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
+			Authenticator.authenticate(extServer, datetime,	hash);
+			User user = service.getUserByLogin(username);
+			Organisation org = extServer.getOrganisation();
+			addUserToLessons(user, org);
+			return true;
+		} catch (Exception e) {
+			log.debug(e.getMessage(), e);
+			throw new java.rmi.RemoteException(e.getMessage());
+		}
+	}
+	
+	public boolean addUserToSubgroupLessons(
+			String username,
+			String orgId,
+			String serverId, 
+			String datetime, 
+			String hash) throws java.rmi.RemoteException {
+		try {
+			ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
+			Authenticator.authenticate(extServer, datetime,	hash);
+			User user = service.getUserByLogin(username);
+			Organisation group = extServer.getOrganisation();
+			
+			Organisation subgroup = (Organisation)service.findById(Organisation.class, new Integer(orgId));
+			Set children = group.getChildOrganisations();
+			Iterator iter = children.iterator();
+			while (iter.hasNext()) {
+				Organisation child = (Organisation)iter.next();
+				if (child.getOrganisationId().equals(subgroup.getOrganisationId())) {
+					addUserToLessons(user, subgroup);
+					return true;
+				}
+			}
+			return false;
+		} catch (Exception e) {
+			log.debug(e.getMessage(), e);
+			throw new java.rmi.RemoteException(e.getMessage());
+		}
+	}
+	
 	private SupportedLocale getLocale() {
 		String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 		return service
@@ -103,12 +203,16 @@ public class RegisterServiceSoapBindingImpl implements Register {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void addMemberships(User user, Organisation org) {
+	private void addMemberships(User user, Organisation org, Boolean isTeacher) {
 		log.debug("adding memberships for user " + user.getUserId() + " in " + org.getName());
 		UserOrganisation uo = new UserOrganisation(user, org);
 		service.save(uo);
-		Integer[] roles = new Integer[] { Role.ROLE_AUTHOR, Role.ROLE_MONITOR,
-				Role.ROLE_GROUP_MANAGER, Role.ROLE_LEARNER };
+		Integer[] roles;
+		if (isTeacher) {
+			roles = new Integer[] { Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_LEARNER };
+		} else {
+			roles = new Integer[] { Role.ROLE_LEARNER };
+		}
 		for (Integer roleId : roles) {
 			UserOrganisationRole uor = new UserOrganisationRole(uo, (Role) service.findById(
 					Role.class, roleId));
