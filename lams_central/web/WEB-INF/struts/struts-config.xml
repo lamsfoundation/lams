@@ -14,12 +14,12 @@
   <form-beans>
 
     <form-bean
-      name="PasswordChangeActionForm"
-      type="org.lamsfoundation.lams.web.PasswordChangeActionForm"
-    />
-    <form-bean
       name="PortraitActionForm"
       type="org.lamsfoundation.lams.web.PortraitActionForm"
+    />
+    <form-bean
+      name="PasswordChangeActionForm"
+      type="org.lamsfoundation.lams.web.PasswordChangeActionForm"
     />
 
    <form-bean name="UserForm" type="org.apache.struts.action.DynaActionForm">
@@ -71,25 +71,180 @@
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
-      path="/launchlearner"
-      type="org.lamsfoundation.lams.web.LaunchLearnerAction"
-      parameter="mod"
+      path="/passwordChanged"
+      type="org.lamsfoundation.lams.web.PasswordChangeAction"
+      name="PasswordChangeActionForm"
+      scope="request"
+      input=".passwordChange"
       unknown="false"
       validate="false"
     >
       <forward
-        name="learner"
-        path="/launchlearner.jsp"
+        name="okay"
+        path="/index.do?state=active&amp;tab=passwordChanged"
         redirect="false"
       />
       <forward
-        name="error"
-        path=".error"
+        name="cancelled"
+        path="/index.do?state=active&amp;tab=profile"
         redirect="false"
       />
       <forward
-        name="message"
-        path=".message"
+        name="errors"
+        path="/index.do?state=active&amp;tab=password"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/authoring/importToolContent"
+      type="org.lamsfoundation.lams.authoring.web.ImportToolContentAction"
+      name="ImportAction"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="upload"
+        path="/toolcontent/import.jsp"
+        redirect="false"
+      />
+      <forward
+        name="success"
+        path="/toolcontent/importresult.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/profile"
+      type="org.lamsfoundation.lams.web.ProfileAction"
+      name="UserForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="view"
+        path=".profile"
+        redirect="false"
+      />
+      <forward
+        name="edit"
+        path=".editprofile"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/workspace"
+      type="org.lamsfoundation.lams.workspace.web.WorkspaceAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/index.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/index"
+      type="org.lamsfoundation.lams.web.IndexAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="main"
+        path="/main.jsp"
+        redirect="false"
+      />
+      <forward
+        name="community"
+        path=".community"
+        redirect="false"
+      />
+      <forward
+        name="profile"
+        path="/profile.do?method=view"
+        redirect="false"
+      />
+      <forward
+        name="editprofile"
+        path="/profile.do?method=edit"
+        redirect="false"
+      />
+      <forward
+        name="password"
+        path="/password.do"
+        redirect="false"
+      />
+      <forward
+        name="passwordChanged"
+        path=".passwordChangeOk"
+        redirect="false"
+      />
+      <forward
+        name="portrait"
+        path="/portrait.do"
+        redirect="false"
+      />
+      <forward
+        name="content"
+        path="/indexContent.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/saveprofile"
+      type="org.lamsfoundation.lams.web.ProfileSaveAction"
+      name="UserForm"
+      scope="request"
+      input=".editprofile"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="profile"
+        path="/index.do?state=active&amp;tab=profile"
+        redirect="false"
+      />
+      <forward
+        name="editprofile"
+        path="/index.do?state=active&amp;tab=editprofile"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/password"
+      type="org.lamsfoundation.lams.web.PasswordAction"
+      name="PasswordChangeActionForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="passwordChange"
+        path=".passwordChange"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/saveportrait"
+      type="org.lamsfoundation.lams.web.PortraitSaveAction"
+      name="PortraitActionForm"
+      scope="request"
+      input=".portrait"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="profile"
+        path="/index.do?state=active&amp;tab=profile"
+        redirect="false"
+      />
+      <forward
+        name="errors"
+        path="/index.do?state=active&amp;tab=portrait"
         redirect="false"
       />
     </action>
@@ -142,46 +297,7 @@
       />
       <forward
         name="index"
-        path="/login.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/saveprofile"
-      type="org.lamsfoundation.lams.web.ProfileSaveAction"
-      name="UserForm"
-      scope="request"
-      input=".editprofile"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="profile"
-        path="/index.do?state=active&amp;tab=profile"
-        redirect="false"
-      />
-      <forward
-        name="editprofile"
-        path="/index.do?state=active&amp;tab=editprofile"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/authoring/importToolContent"
-      type="org.lamsfoundation.lams.authoring.web.ImportToolContentAction"
-      name="ImportAction"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="upload"
-        path="/toolcontent/import.jsp"
-        redirect="false"
-      />
-      <forward
-        name="success"
-        path="/toolcontent/importresult.jsp"
+        path="/index.jspp"
         redirect="false"
       />
     </action>
@@ -189,16 +305,6 @@
       path="/theme"
       type="org.lamsfoundation.lams.themes.web.ThemeAction"
       name="ThemeAction"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-    </action>
-    <action
-      path="/authoring/author"
-      type="org.lamsfoundation.lams.authoring.web.AuthoringAction"
-      name="AuthoringAction"
       scope="request"
       parameter="method"
       unknown="false"
@@ -230,6 +336,16 @@
       />
     </action>
     <action
+      path="/authoring/author"
+      type="org.lamsfoundation.lams.authoring.web.AuthoringAction"
+      name="AuthoringAction"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
       path="/portrait"
       type="org.lamsfoundation.lams.web.PortraitAction"
       name="PortraitActionForm"
@@ -244,141 +360,25 @@
       />
     </action>
     <action
-      path="/profile"
-      type="org.lamsfoundation.lams.web.ProfileAction"
-      name="UserForm"
-      scope="request"
-      parameter="method"
+      path="/launchlearner"
+      type="org.lamsfoundation.lams.web.LaunchLearnerAction"
+      parameter="mod"
       unknown="false"
       validate="false"
     >
       <forward
-        name="view"
-        path=".profile"
+        name="learner"
+        path="/launchlearner.jsp"
         redirect="false"
       />
       <forward
-        name="edit"
-        path=".editprofile"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/passwordChanged"
-      type="org.lamsfoundation.lams.web.PasswordChangeAction"
-      name="PasswordChangeActionForm"
-      scope="request"
-      input=".passwordChange"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="okay"
-        path="/index.do?state=active&amp;tab=passwordChanged"
+        name="error"
+        path=".error"
         redirect="false"
       />
       <forward
-        name="cancelled"
-        path="/index.do?state=active&amp;tab=profile"
-        redirect="false"
-      />
-      <forward
-        name="errors"
-        path="/index.do?state=active&amp;tab=password"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/password"
-      type="org.lamsfoundation.lams.web.PasswordAction"
-      name="PasswordChangeActionForm"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="passwordChange"
-        path=".passwordChange"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/saveportrait"
-      type="org.lamsfoundation.lams.web.PortraitSaveAction"
-      name="PortraitActionForm"
-      scope="request"
-      input=".portrait"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="profile"
-        path="/index.do?state=active&amp;tab=profile"
-        redirect="false"
-      />
-      <forward
-        name="errors"
-        path="/index.do?state=active&amp;tab=portrait"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/index"
-      type="org.lamsfoundation.lams.web.IndexAction"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="main"
-        path="/main.jsp"
-        redirect="false"
-      />
-      <forward
-        name="community"
-        path=".community"
-        redirect="false"
-      />
-      <forward
-        name="profile"
-        path="/profile.do?method=view"
-        redirect="false"
-      />
-      <forward
-        name="editprofile"
-        path="/profile.do?method=edit"
-        redirect="false"
-      />
-      <forward
-        name="password"
-        path="/password.do"
-        redirect="false"
-      />
-      <forward
-        name="passwordChanged"
-        path=".passwordChangeOk"
-        redirect="false"
-      />
-      <forward
-        name="portrait"
-        path="/portrait.do"
-        redirect="false"
-      />
-      <forward
-        name="content"
-        path="/indexContent.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/workspace"
-      type="org.lamsfoundation.lams.workspace.web.WorkspaceAction"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="/index.jsp"
+        name="message"
+        path=".message"
         redirect="false"
       />
     </action>

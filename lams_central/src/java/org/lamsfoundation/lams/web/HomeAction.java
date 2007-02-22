@@ -65,7 +65,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action-forward name="error" path=".error"
  * @struts:action-forward name="message" path=".message"
  * @struts:action-forward name="passwordChange" path=".passwordChange"
- * @struts:action-forward name="index" path="/login.jsp"
+ * @struts:action-forward name="index" path="/index.jsp"
  *
  */
 public class HomeAction extends DispatchAction {

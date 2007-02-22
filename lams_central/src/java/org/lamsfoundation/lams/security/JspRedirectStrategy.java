@@ -75,15 +75,10 @@ public class JspRedirectStrategy {
 		String checkStatus = (String) session.getAttribute(AUTH_OBJECT_NAME);
 		String id = session.getId();
 
-		if (checkStatus == null) {
-			log.debug("===>LOGIN PAGE: there is no auth obj in session, auth obj created. session id: " + id);
+		if (checkStatus == null || checkStatus.equals(SECURITY_CHECK_NOT_PASSED)) {
+			log.debug("===>LOGIN PAGE: there is no auth obj in session or accessing login page before login succeed, auth obj created. session id: " + id);
 			session.setAttribute(AUTH_OBJECT_NAME, SECURITY_CHECK_NOT_PASSED);
 		
-			response.sendRedirect(WELCOME_PAGE);
-			return true;
-		} else if (checkStatus.equals(SECURITY_CHECK_NOT_PASSED)) {
-			log.debug("===>LOGIN PAGE: accessing login page before login succeed, display login page. session id: "+ id);
-			//set local information for login page. Because login.jsp does not pass thru any filters.
 			try {
 				LocaleFilter filter = new LocaleFilter();
 				filter.doFilter(request, response, null);
