@@ -42,6 +42,7 @@
 </logic:equal>
 <table class=alternative-color width=100%>
 <tr>
+	<th>id</th>
 	<th><fmt:message key="admin.organisation.name"/></th>
 	<th><fmt:message key="admin.organisation.code"/></th>
 	<th><fmt:message key="admin.organisation.description"/></th>
@@ -50,6 +51,7 @@
 </tr>
 <logic:iterate id="orgManageBean" name="OrgManageForm" property="orgManageBeans" indexId="idx">
 	<tr>
+		<td><bean:write name="orgManageBean" property="organisationId" /></td>
 		<td>
 			<logic:equal name="OrgManageForm" property="type" value="1">
 				<a href="orgmanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>"><bean:write name="orgManageBean" property="name" /></a>
