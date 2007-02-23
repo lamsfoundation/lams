@@ -128,9 +128,8 @@ public class ToolDBUpdater extends DBTask
             {
             	
             	String dbVersionStr = results.getString("config_value");
-            	double dbVersion = java.lang.Double.parseDouble(dbVersionStr.substring(dbVersionStr.lastIndexOf('.')));
-            	double instVersion = java.lang.Double.parseDouble(toolCompatibleVersion.substring(toolCompatibleVersion.lastIndexOf('.')));
-            	
+            	double dbVersion = java.lang.Double.parseDouble(dbVersionStr.substring(dbVersionStr.lastIndexOf('.')+1));
+            	double instVersion = java.lang.Double.parseDouble(toolCompatibleVersion.substring(toolCompatibleVersion.lastIndexOf('.')+1));
             	if (dbVersion < instVersion)
             	{
             		System.out.println("The minimum ServerVersionNumber \"" +toolCompatibleVersion+ "\" for install tool " 
