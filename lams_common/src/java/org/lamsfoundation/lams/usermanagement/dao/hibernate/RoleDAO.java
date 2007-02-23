@@ -23,20 +23,14 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
-import java.util.List;
-
-import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Expression;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
-import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
+import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 /**
@@ -45,9 +39,15 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
  */
 public class RoleDAO extends BaseDAO implements IRoleDAO
 {
-	 private final static String LOAD_USER_BY_ORG_AND_ROLE = 
-	        "from User u where u.id = :userId and u.userOrganisations.organisation = :org and u.userOrganisations.userOrganisationRoles.role.roleId = :roleId";
-
+	 private final static String LOAD_USER_BY_ORG_AND_ROLE =
+		 	"select u "
+		 	+"from User u, UserOrganisation uo, UserOrganisationRole uor "
+		 	+"where u.id = :userId and "
+		 	+"u.id = uo.user.id and "
+		 	+"uo.organisation = :org and "
+		 	+"uor.userOrganisation.id = uo.id and "
+		 	+"uor.role.id = :roleId";
+	 
 	 private final static String COUNT_ROLE = "select count(distinct userOrganisationRole.userOrganisation.user)"
 			+ " from "+UserOrganisationRole.class.getName()+" userOrganisationRole"
 			+ " where userOrganisationRole.role.roleId = :roleId";
