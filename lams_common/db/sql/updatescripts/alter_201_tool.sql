@@ -5,7 +5,7 @@
 ALTER TABLE lams_tool
 ADD COLUMN modified_date_time DATETIME
 , ADD COLUMN classpath_addition VARCHAR(255)
-, ADD COLUMN context_file VARCHAR(255)
+, ADD COLUMN context_file VARCHAR(255);
 
 UPDATE lams_tool
 SET modified_date_time  = create_date_time
