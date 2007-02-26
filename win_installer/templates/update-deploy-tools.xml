@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="update-deploy-tools" >
+	<!-- begin properties *******************************************************************************************-->
+	<!-- import properties from the specified file -->
+	
+	<property file="${prop.path}/build.properties" />
+	<property file="tools.properties"/>
+	
+
+
+	<!-- =================================================================== -->
+	<!-- Generate the deploy package                                         -->
+	<!-- =================================================================== -->
+	<target name="create-deploy-package" description="Generate the deployment package.">
+		<echo>+------------------------------------------+</echo>
+		<echo>| Generate the deployment package.         |</echo>
+		<echo>+------------------------------------------+</echo>
+		<echo>Generating deploy.xml for ${signature}</echo>
+	
+		<path id="deploy.lib.classpath">
+			<fileset dir="${deploy.tool.dir}">
+				<include name="lib/*.jar"/>
+			</fileset>
+		</path> 
+
+		<taskdef name="generateDeployProperties" 
+			classname="org.lamsfoundation.lams.tool.deploy.CreateToolPackageTask">
+		    <classpath refid="deploy.lib.classpath"/>
+		</taskdef>
+
+		<generateDeployProperties depends="compile" 
+			mode="production" 
+			outputPath="${build.deploy}"
+			dbPassword="${db.password}"
+			dbUsername="${db.username}"
+			dbDriverUrl="${db.url}"
+			dbDriverClass="com.mysql.jdbc.Driver"
+			deployFiles="${build.deploy}/${product}.war,${build.deploy}/${product}.jar"
+			toolJarFileName="${product}.jar"
+			toolSignature="${signature}"
+			toolVersion="${tool.version}"
+			hideTool="${hideTool}"
+			minServerVersionNumber="${min.server.version.number}"
+			toolUpdateScriptPath="${build.deploy}/sql/updatescripts/updateTo${tool.version}.sql"
+			toolTablesScriptPath="${build.deploy}/sql/create_lams_tool_forum.sql" 
+			toolTablesDeleteScriptPath="${build.deploy}/sql/drop_lams_tool_forum.sql" 
+			toolActivityInsertScriptPath="${build.deploy}/sql/activity_insert.sql" 
+			toolLibraryInsertScriptPath="${build.deploy}/sql/library_insert.sql" 
+			toolInsertScriptPath="${build.deploy}/sql/tool_insert.sql" 
+			toolApplicationContextPath="/org/lamsfoundation/lams/tool/forum/forumApplicationContext.xml"
+			lamsEarPath="${jboss.deploy}"
+			toolContext="${toolContext}"
+			toolWebUri="${product}.war"
+			languageFilesPackage="${language.files.package}">
+
+			<!-- language files go as a fileset. Not nice but can't work out how to embed them in a tag. -->
+			<fileset dir="${build.deploy}/language">
+				<include name="**/*.properties"/>
+				<include name="**/*.txt"/>
+			</fileset>
+				
+		</generateDeployProperties>
+		
+	</target>
+	
+	<target name="deploy-tool" description="runs the tool deployer for a given tool">
+		<path id="deploy.lib.classpath">
+			<fileset dir="${deploy.tool.dir}">
+				<include name="lib/*.jar"/>
+			</fileset>
+		</path> 
+		
+		<echo>Deploying the ${signature} Tool</echo>
+
+		<java classname="org.lamsfoundation.lams.tool.deploy.Deploy" classpathref="deploy.lib.classpath" fork="true">
+			<arg file="${build.deploy}/deploy.xml" />
+			<arg value="False" />
+		</java>
+	</target>
+	
+	<target name="update-core-database" description="Runs some update scripts found in lams_common\db\sql\updatscripts" >
+		<sql driver="com.mysql.jdbc.Driver" 
+			classpath="${jboss.deploy}/mysql-connector-java-3.1.12-bin.jar" 
+			url="jdbc:mysql://localhost/${db.name}?characterEncoding=UTF-8" 
+			userid="${db.username}" 
+			password="${db.password}"
+			encoding="utf8">
+			<transaction src="${temp}/lams/sql/alter_201_locale_id.sql" />
+			<transaction src="${temp}/lams/sql/alter_201_system_tool_user_workspace.sql" />
+			<transaction src="${temp}/lams/sql/alter_201_theme.sql" />
+			<transaction src="${temp}/lams/sql/alter_201_tool.sql" />
+		</sql>
+	</target>
+	
+</project>

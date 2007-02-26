@@ -120,8 +120,7 @@ Section "LAMS Language Pack ${VERSION}" LanguagePack
     SectionIn RO
     
     
-    # write this language pack version to registry
-    WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
+    
     Detailprint 'Writing Language pack version ${VERSION} to registry: "${REG_HEAD}"'
     
     setoutpath "$INSTDIR\zip"
@@ -143,6 +142,9 @@ Section "LAMS Language Pack ${VERSION}" LanguagePack
     
     ; Finally, add rows in the database (lams_supported_locale) for all new language files
     call updateDatabase
+    
+    # write this language pack version to registry
+    WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
     
     DetailPrint "LAMS Language Pack ${VERSION} install successfull"
 SectionEnd
