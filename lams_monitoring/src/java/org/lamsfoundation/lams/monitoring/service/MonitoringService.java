@@ -454,7 +454,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	        // create the lesson class - add all the users in this organisation to the lesson class
 	        // add user as staff
 	    	List<User> learnerList = new LinkedList<User>();
-	    	learnerList.add(creator);
 	        Iterator iter = learners.iterator();
 	        while (iter.hasNext()) {
 	        	try {
