@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.tool.sbmt.web;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,7 +36,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -49,9 +49,9 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
+import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.filter.LocaleFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -299,13 +300,14 @@ public class LearnerAction extends DispatchAction {
 	//validate uploaded form
 	private boolean validateUploadForm(LearnerForm learnerForm, HttpServletRequest request) {
 		ActionMessages errors = new ActionMessages();
+		Locale preferredLocale = (Locale) request.getSession().getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
 		if(learnerForm.getFile() == null || StringUtils.isBlank(learnerForm.getFile().getFileName())){
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.required",
-					this.getResources(request).getMessage("learner.form.filepath.displayname")));
+					this.getResources(request).getMessage(preferredLocale,"learner.form.filepath.displayname")));
 		}
 		if(StringUtils.isBlank(learnerForm.getDescription())){
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.required",
-					this.getResources(request).getMessage("label.learner.fileDescription")));
+					this.getResources(request).getMessage(preferredLocale,"label.learner.fileDescription")));
 		}
 		
 		FileValidatorUtil.validateFileSize(learnerForm.getFile(),false,errors);
