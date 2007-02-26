@@ -4,16 +4,16 @@
 -- not only more locales but also to make it a standard datatype
 
 ALTER TABLE lams_organisation
-CHANGE COLUMN locale_id locale_id SMALLINT;
+MODIFY COLUMN locale_id SMALLINT;
 
 ALTER TABLE lams_user	
 DROP FOREIGN KEY FK_lams_user_6;
 
 ALTER TABLE lams_user	
-CHANGE COLUMN locale_id locale_id SMALLINT;
+MODIFY COLUMN locale_id SMALLINT;
 
 ALTER TABLE lams_supported_locale
-CHANGE COLUMN locale_id locale_id SMALLINT NOT NULL  AUTO_INCREMENT;
+MODIFY COLUMN locale_id SMALLINT NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE lams_user 
 ADD CONSTRAINT FK_lams_user_6 FOREIGN KEY (locale_id)
