@@ -25,7 +25,10 @@ contribute_url,
 moderation_url,
 help_url,
 language_file,
-create_date_time
+classpath_addition,
+context_file,
+create_date_time,
+modified_date_time
 )
 VALUES
 (
@@ -52,6 +55,9 @@ NULL,
 'tool/lasbmt11/moderation.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lasbmt11',
 'org.lamsfoundation.lams.tool.sbmt.ApplicationResources',
+'./lams-tool-lasbmt11.jar',
+'/org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml',
+NOW(),
 NOW()
 );
 

@@ -46,7 +46,10 @@ contribute_url,
 moderation_url,
 help_url,
 language_file,
-create_date_time
+classpath_addition,
+context_file,
+create_date_time,
+modified_date_time
 )
 VALUES
 (
@@ -73,6 +76,9 @@ NULL,
 'tool/lavote11/monitoringStarter.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lavote11',
 'org.lamsfoundation.lams.tool.vote.ApplicationResources',
+'./lams-tool-lavote11.jar',
+'/org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml',
+NOW(),
 NOW()
 )
 

@@ -60,5 +60,5 @@ NULL,
 './lams-tool-lasurv11.jar',
 '/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml',
 NOW(),
-NOW(),
+NOW()
 )

@@ -25,7 +25,10 @@ contribute_url,
 moderation_url,
 help_url,
 language_file,
-create_date_time
+classpath_addition,
+context_file,
+create_date_time,
+modified_date_time
 )
 VALUES
 (
@@ -52,5 +55,8 @@ NULL,
 'tool/lantbk11/moderate.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lantbk11',
 'org.lamsfoundation.lams.tool.notebook.ApplicationResources',
+'./lams-tool-lantbk11.jar',
+'/org/lamsfoundation/lams/tool/notebook/notebookApplicationContext.xml',
+NOW(),
 NOW()
 )

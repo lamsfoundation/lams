@@ -27,7 +27,10 @@ contribute_url,
 moderation_url,
 help_url,
 language_file,
-create_date_time
+classpath_addition,
+context_file,
+create_date_time,
+modified_date_time
 )
 VALUES
 (
@@ -54,5 +57,8 @@ NULL,
 'tool/larsrc11/moderate.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/larsrc11',
 'org.lamsfoundation.lams.tool.rsrc.ApplicationResources',
+'./lams-tool-larsrc11.jar',
+'/org/lamsfoundation/lams/tool/rsrc/rsrcApplicationContext.xml',
+NOW(),
 NOW()
 )
