@@ -198,6 +198,36 @@ public class ToolDBUpdater extends DBTask
         }
     }
     
+    public String queryTool(String toolSig, String column)
+    {
+    	Connection conn = getConnection();
+    	PreparedStatement stmt = null;
+    	ResultSet results = null;
+    	try
+        {
+            stmt = conn.prepareStatement("select " +column+ " from lams_tool where tool_signature= \""+toolSig+"\"");
+            System.out.println("SQL stmt: " + stmt );
+            results = stmt.executeQuery();
+            
+            if (results.first())
+            {
+	            return results.getString(column);
+
+            }
+        }
+        catch (SQLException se)
+        {
+        	
+        	throw new DeployException("Could not get entry from lams_tool: " + column + "\n" + se.getMessage());
+        	
+        }
+        finally
+        {
+            DbUtils.closeQuietly(stmt);
+        }
+        return "ERROR";
+    }
+    
     /**
      * set method for toolSignature
      * @param sig The toolSignature to be set 
