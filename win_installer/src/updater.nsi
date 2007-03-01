@@ -153,6 +153,7 @@ Var RETAIN_FILES
 Var IS_UPDATE
 Var INCLUDE_JSMATH
 Var TOOL_SIG
+Var TIMESTAMP
 
 
 #LANGUAGE PACK VARIABLES #####
@@ -173,6 +174,9 @@ SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
     Section !lamsCore
         ${if} $IS_UPDATE == "1"
             Detailprint "Installing LAMS ${VERSION} core"
+            # extract support files to write configuration
+            SetOutPath $INSTDIR
+            File /r "..\apache-ant-1.6.5"
             
             ; Backing up existing lams installation
             call backupLams
@@ -186,8 +190,6 @@ SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
             ; Updating lams-www.war
             call updateLamswww
             
-            ; Updating application.xml
-            call updateApplicationXML
         
             ; Updating the database to support version
             call updateCoreDatabase
@@ -225,6 +227,18 @@ SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
                 WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
                 
                 DetailPrint "LAMS Language Pack ${LANGUAGE_PACK_VERSION} install successfull"
+                
+                
+                Call WriteRegEntries
+            
+                SetOutPath $INSTDIR
+                File /a "..\build\lams-start.exe"
+                File /a "..\build\lams-stop.exe"
+                File /a "..\license.txt"
+                File /a "..\license-wrapper.txt"
+                File /a "..\readme.txt"
+                Call SetupStartMenu
+                WriteUninstaller "$INSTDIR\lams-uninstall.exe"
             ${endif}
             ################################################
         ${endif}
@@ -238,11 +252,11 @@ SectionGroup "LAMS 2.0.1 Full Install" fullInstall
         ${if} $IS_UPDATE == "0"
             DetailPrint "Setting up JBoss 4.0.2"
             SetOutPath $INSTDIR
-            File /a /r /x all /x minimal /x robyn /x log /x tmp /x work /x jsMath.war ${SOURCE_JBOSS_HOME}
+            File /a /r /x all /x minimal /x robyn /x log /x tmp /x work /x jsMath.war /x *.bak ${SOURCE_JBOSS_HOME}
             ; Configuring jboss.jar
-; Copy jboss-cache.jar, jgroups.jar from server/all/lib to server/default/lib
-copyfiles "$INSTDIR\jboss-4.0.2\server\all\lib\jboss-cache.jar" "$INSTDIR\jboss-4.0.2\server\default\lib"
-copyfiles "$INSTDIR\jboss-4.0.2\server\all\lib\jgroups.jar" "$INSTDIR\jboss-4.0.2\server\default\lib"
+            ; Copy jboss-cache.jar, jgroups.jar from server/all/lib to server/default/lib
+            copyfiles "$INSTDIR\jboss-4.0.2\server\all\lib\jboss-cache.jar" "$INSTDIR\jboss-4.0.2\server\default\lib"
+            copyfiles "$INSTDIR\jboss-4.0.2\server\all\lib\jgroups.jar" "$INSTDIR\jboss-4.0.2\server\default\lib"
         ${endif}
     SectionEnd
 
@@ -461,7 +475,7 @@ Function PreComponents
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 1" "Text" "- JBoss 4.0.2"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 2" "Text" "- LAMS ${VERSION} Core"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 3" "Text" "- Install LAMS as a service"
-        !insertmacro MUI_HEADER_TEXT "LAMS 2.0.1 Components" "No installation of LAMS 2.0 was found on your computer. A full 2.0.1 installation required to run LAMS"
+        !insertmacro MUI_HEADER_TEXT "LAMS 2.0.1 Components" "Lams 2.0 is installed. You may update to 2.0.1"
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams_components.ini"
     ${else}
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 4" "Text" "LAMS ${VERSION} Update"
@@ -718,6 +732,20 @@ FunctionEnd
 Function PostFinal
     ; Checking to see if lams2.0 exists
     call checkRegistry
+    
+    # ${StrTok} "ResultVar" "String" "Separators" "ResultPart" "SkipEmptyParts"
+    ${StrTok} $0 ${__DATE__} "/" 2 1
+    ${StrTok} $1 ${__DATE__} "/" 1 1
+    ${StrTok} $2 ${__DATE__} "/" 0 1
+    
+    ${StrTok} $3 "${__TIME__}" ":" 0 1
+    ${StrTok} $4 "${__TIME__}" ":" 1 1
+    
+    strcpy $TIMESTAMP "$0$1$2-$3$4"
+    MessageBox MB_OKCANCEL|MB_ICONQUESTION "Your installation of LAMS will be backed up at $INSTDIR-$TIMESTAMP.bak" IDOK continue IDCANCEL cancel
+            cancel:
+                Abort
+            continue:
 FunctionEnd
 
 ################################################################################
@@ -734,6 +762,11 @@ FunctionEnd
 ; Backs up existing lams installation
 Function backupLams
     #copyfiles /r $INSTDIR "$INSTDIR 
+    
+    
+    DetailPrint "Backing up lams installation at: $INSTDIR-$TIMESTAMP.bak. This may take several minutes"
+    copyfiles /SILENT $INSTDIR  $INSTDIR-$TIMESTAMP.bak 95000
+    
 FunctionEnd
 
 
@@ -742,8 +775,7 @@ FunctionEnd
 Function updateCoreJarsWars
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear"
     File "..\assembly\lams.ear\*.*"
-    
-    createdirectory "$INSTDIR\update-logs"
+    createdirectory "$INSTDIR\update-logs" 
 FunctionEnd
 
 ; Updating lams-central.war
@@ -761,17 +793,11 @@ Function updateLamswww
     File "..\templates\news.html" 
 FunctionEnd
 
-; Updating application.xml
-Function updateApplicationXML
-FunctionEnd
+
 
 ; Updating the database to support version
 Function updateCoreDatabase
 
-    # extract support files to write configuration
-    SetOutPath $INSTDIR
-    File /r "..\apache-ant-1.6.5"
-    
     StrCpy $0 '"$MYSQL_DIR\bin\mysql" -v $DB_NAME -e "update lams_configuration set config_value=$\'${SERVER_VERSION_NUMBER}$\' where config_key=$\'LearnerClientVersion$\' OR config_key=$\'ServerVersionNumber$\' OR config_key=$\'MonitorClientVersion$\' OR config_key=$\'AuthoringClientVersion$\'" -u$DB_USER -p$DB_PASS'
     DetailPrint $0
     nsExec::ExecToStack $0
@@ -819,6 +845,34 @@ Function updateCoreDatabase
     done:
     
 FunctionEnd 
+
+; Updating application.xml
+Function updateApplicationXML
+    iffileexists "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\ehcache-1.1.jar" fileExists continue
+    fileExists:
+        delete "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\ehcache-1.1.jar"
+    continue:  
+    
+    
+    # Running the ant scripts to update web.xmls and manifests
+    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\ant.bat" -logfile "$INSTDIR\update-logs\ant-update-application-xml.log" -buildfile "$TEMP\lams\update-deploy-tools.xml" -D"prop.path=$TOOL_SIG" update-application-xml'
+    DetailPrint $0
+    nsExec::ExecToStack $0
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    ${if} $0 == "error"
+    ${orif} $0 == 1
+        goto error
+    ${endif}
+    DetailPrint "Result: $1"
+    
+    goto done
+    error:
+        DetailPrint "Application.xml update failed"
+        MessageBox MB_OK|MB_ICONSTOP "Application.xml update failed $\r$\nError:$\r$\n$\r$\n$1"
+        Abort "Application.xml update failed"
+    done:
+FunctionEnd
         
 ; Updating the deploy.xml of the tools to support this version using the tool deployer, called by create-deploy-package ant task
 ; Then deploys the tools using the tool deployer. Called by ant task deploy-tool
@@ -840,6 +894,23 @@ Function createAndDeployTools
     # Extract the ant scripts to create the tools
     SetOutPath "$TEMP\lams"
     File "..\templates\update-deploy-tools.xml"
+    
+    ; Updating application.xml
+    call updateApplicationXML
+    
+    
+    /*# Exploding the lams-learning.war and lams-monitoring.war
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\ant.bat -logfile $INSTDIR\update-logs\ant-explode-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG explode-wars'
+    DetailPrint $0
+    nsExec::ExecToStack $0
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    ${if} $0 == "error"
+    ${orif} $0 == 1
+        goto error
+    ${endif}
+    DetailPrint "Result: $1"
+    */
     
     # Creating all the tools, then deploying them
     strcpy $TOOL_SIG "lachat11"
@@ -886,7 +957,13 @@ Function createAndDeployTools
     call runCreateDeployPackage
     call deployTool
     
-    rmdir /r "$INSTDIR\apache-ant-1.6.5"
+    goto done
+    error:
+        DetailPrint "Problem compressing/expanding lams-monitoring.war and lams-learning.war"
+        MessageBox MB_OK|MB_ICONSTOP "Problem compressing/expanding lams-monitoring.war and lams-learning.war $\r$\nError:$\r$\n$\r$\n$1"
+        Abort "Problem compressing/expanding lams-monitoring.war and lams-learning.war"
+    done:
+    
 FunctionEnd
 
 # Running the ant scripts to create deploy.xml for the normal tools 
@@ -911,6 +988,7 @@ Function runCreateDeployPackage
         Abort "LAMS configuration failed."
     done:
 FunctionEnd
+
 
 # generates a properties file for all tools
 Function generateToolProperties
@@ -1004,7 +1082,7 @@ Function extractToolJars
     File "..\..\lams_tool_chat\build\lib\*.jar"
     File "..\..\lams_tool_chat\build\lib\*.war"
     SetoutPath "$TEMP\lams\lachat11\build\deploy\sql"
-    File "..\..\lams_tool_chat\build\deploy\sql\*.sql"
+    File /r "..\..\lams_tool_chat\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lachat11\build\deploy\language"
     File "..\..\lams_tool_chat\build\deploy\language\*.properties"
     
@@ -1012,7 +1090,7 @@ Function extractToolJars
     File "..\..\lams_tool_forum\build\lib\*.jar"
     File "..\..\lams_tool_forum\build\lib\*.war"
     SetoutPath "$TEMP\lams\lafrum11\build\deploy\sql"
-    File "..\..\lams_tool_forum\build\deploy\sql\*.sql"
+    File /r "..\..\lams_tool_forum\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lafrum11\build\deploy\language"
     File "..\..\lams_tool_forum\build\deploy\language\*.properties"
     
@@ -1020,7 +1098,7 @@ Function extractToolJars
     File "..\..\lams_tool_lamc\build\lib\*.jar"
     File "..\..\lams_tool_lamc\build\lib\*.war"
     SetoutPath "$TEMP\lams\lamc11\build\deploy\sql"
-    File "..\..\lams_tool_lamc\build\deploy\sql\*.sql"
+    File /r  "..\..\lams_tool_lamc\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lamc11\build\deploy\language"
     File "..\..\lams_tool_lamc\build\deploy\language\*.properties"
     
@@ -1028,7 +1106,7 @@ Function extractToolJars
     File "..\..\lams_tool_laqa\build\lib\*.jar"
     File "..\..\lams_tool_laqa\build\lib\*.war"
     SetoutPath "$TEMP\lams\laqa11\build\deploy\sql"
-    File "..\..\lams_tool_laqa\build\deploy\sql\*.sql"
+    File /r  "..\..\lams_tool_laqa\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\laqa11\build\deploy\language"
     File "..\..\lams_tool_laqa\build\deploy\language\*.properties"
     
@@ -1036,7 +1114,7 @@ Function extractToolJars
     File "..\..\lams_tool_larsrc\build\lib\*.jar"
     File "..\..\lams_tool_larsrc\build\lib\*.war"
     SetoutPath "$TEMP\lams\larsrc11\build\deploy\sql"
-    File "..\..\lams_tool_larsrc\build\deploy\sql\*.sql"
+    File /r  "..\..\lams_tool_larsrc\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\larsrc11\build\deploy\language"
     File "..\..\lams_tool_larsrc\build\deploy\language\*.properties"
     
@@ -1044,7 +1122,7 @@ Function extractToolJars
     File "..\..\lams_tool_nb\build\lib\*.jar"
     File "..\..\lams_tool_nb\build\lib\*.war" 
     SetoutPath "$TEMP\lams\lanb11\build\deploy\sql"
-    File "..\..\lams_tool_nb\build\deploy\sql\*.sql"
+    File /r  "..\..\lams_tool_nb\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lanb11\build\deploy\language"
     File "..\..\lams_tool_nb\build\deploy\language\*.properties"   
 
@@ -1052,7 +1130,7 @@ Function extractToolJars
     File "..\..\lams_tool_notebook\build\lib\*.jar"
     File "..\..\lams_tool_notebook\build\lib\*.war"
     SetoutPath "$TEMP\lams\lantbk11\build\deploy\sql"
-    File "..\..\lams_tool_notebook\build\deploy\sql\*.sql"
+    File /r  "..\..\lams_tool_notebook\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lantbk11\build\deploy\language"
     File "..\..\lams_tool_notebook\build\deploy\language\*.properties"
     
@@ -1060,7 +1138,7 @@ Function extractToolJars
     File "..\..\lams_tool_sbmt\build\lib\*.jar"
     File "..\..\lams_tool_sbmt\build\lib\*.war"
     SetoutPath "$TEMP\lams\lasbmt11\build\deploy\sql"
-    File "..\..\lams_tool_sbmt\build\deploy\sql\*.sql"
+    File /r "..\..\lams_tool_sbmt\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lasbmt11\build\deploy\language"
     File "..\..\lams_tool_sbmt\build\deploy\language\*.properties"
     
@@ -1068,7 +1146,7 @@ Function extractToolJars
     File "..\..\lams_tool_scribe\build\lib\*.jar"
     File "..\..\lams_tool_scribe\build\lib\*.war"
     SetoutPath "$TEMP\lams\lascrb11\build\deploy\sql"
-    File "..\..\lams_tool_scribe\build\deploy\sql\*.sql"
+    File /r "..\..\lams_tool_scribe\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lascrb11\build\deploy\language"
     File "..\..\lams_tool_scribe\build\deploy\language\*.properties"
     
@@ -1076,7 +1154,7 @@ Function extractToolJars
     File "..\..\lams_tool_survey\build\lib\*.jar"
     File "..\..\lams_tool_survey\build\lib\*.war"
     SetoutPath "$TEMP\lams\lasurv11\build\deploy\sql"
-    File "..\..\lams_tool_survey\build\deploy\sql\*.sql"
+    File /r "..\..\lams_tool_survey\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lasurv11\build\deploy\language"
     File "..\..\lams_tool_survey\build\deploy\language\*.properties"
     
@@ -1084,11 +1162,11 @@ Function extractToolJars
     File "..\..\lams_tool_vote\build\lib\*.jar"
     File "..\..\lams_tool_vote\build\lib\*.war"
     SetoutPath "$TEMP\lams\lavote11\build\deploy\sql"
-    File "..\..\lams_tool_vote\build\deploy\sql\*.sql"
+    File /r "..\..\lams_tool_vote\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lavote11\build\deploy\language"
     File "..\..\lams_tool_vote\build\deploy\language\*.properties"
     
-
+    
 FunctionEnd
 
 # Deploying the updated tools
@@ -1116,6 +1194,9 @@ FunctionEnd
 ################################################################################
 # END CODE USED FOR UPDATER                                                    #
 ################################################################################
+
+
+
 
 
 ################################################################################
@@ -1257,7 +1338,7 @@ Function WriteMyINI
 FunctionEnd
 
 Function readRegistry
-    ;ReadRegStr $INSTDIR HKLM "${REG_HEAD}" "dir_inst"
+    ReadRegStr $INSTDIR HKLM "${REG_HEAD}" "dir_inst"
     ReadRegStr $DB_NAME HKLM "${REG_HEAD}" "db_name"
     ReadRegStr $DB_PASS HKLM "${REG_HEAD}" "db_pass"
     ReadRegStr $DB_USER HKLM "${REG_HEAD}" "db_user"
@@ -1441,6 +1522,7 @@ Function WriteRegEntries
     WriteRegStr HKLM "${REG_HEAD}" "lams_domain" $LAMS_DOMAIN
     WriteRegStr HKLM "${REG_HEAD}" "lams_port" $LAMS_PORT
     WriteRegStr HKLM "${REG_HEAD}" "lams_locale" $LAMS_LOCALE
+    WriteRegStr HKLM "${REG_HEAD}" "language_pack" ${LANGUAGE_PACK_VERSION}
     WriteRegStr HKLM "${REG_HEAD}" "wildfire_domain" $WILDFIRE_DOMAIN
     WriteRegStr HKLM "${REG_HEAD}" "wildfire_user" $WILDFIRE_USER
     WriteRegStr HKLM "${REG_HEAD}" "wildfire_pass" $WILDFIRE_PASS
@@ -1538,6 +1620,16 @@ Function .onInstFailed
         DeleteRegKey HKLM "${REG_HEAD}"
      ${else}
         ; Do cleanup for failed update
+        rmdir /r "$INSTDIR\apache-ant-1.6.5"
+        RMDir /r "$INSTDIR\zip"
+        RMDir /r "$EXEDIR\zip"
+        RMDir /r "$EXEDIR\build"
+        rmdir /r "$TEMP\installer.properties"
+        rmdir /r "$TEMP\lams"
+        WriteRegStr HKLM "${REG_HEAD}" "language_pack" $OLD_VERSION
+        delete "$INSTDIR\updateLocales.sql"
+        delete "$INSTDIR\LanguagePack.xml"
+
      ${endif}
 FunctionEnd
 
@@ -1554,6 +1646,12 @@ Function .onInstSuccess
     ${else}
         ;cleanup for update successfull install
         #rmdir /r "$TEMP\lams\"
+        rmdir /r "$INSTDIR\apache-ant-1.6.5"
+        RMDir /r "$INSTDIR\zip"
+        RMDir /r "$EXEDIR\zip"
+        RMDir /r "$EXEDIR\build"
+        rmdir /r "$TEMP\installer.properties"
+        rmdir /r "$TEMP\lams"
     ${endif}
 FunctionEnd
 
@@ -1651,32 +1749,32 @@ Function copyProjects
     ;copying COMMON project language files
     setoutpath "$INSTDIR"
     detailprint "Extracting language files for lams_common"
-    file /a "..\..\lams_common\conf\language\*"
+    file /a "..\..\lams_common\conf\language\lams\*"
     
     ;copying ADMIN project language files
     setoutpath "$INSTDIR\admin"
     detailprint "Extracting language files for lams_admin"
-    file /a "..\..\lams_admin\conf\language\*"
+    file /a "..\..\lams_admin\conf\language\lams\*"
     
     ;copying CENTRAL project language files
     setoutpath "$INSTDIR\central"
     detailprint "Extracting language files for lams_central"
-    file /a "..\..\lams_central\conf\language\*"
+    file /a "..\..\lams_central\conf\language\lams\*"
     
     ;copying CONTENTREPOSITORY project language files
     setoutpath "$INSTDIR\contentrepository"
     detailprint "Extracting language files for lams_contentrepository"
-    file /a  "..\..\lams_contentrepository\conf\language\*"
+    file /a  "..\..\lams_contentrepository\conf\language\lams\*"
     
     ;copying LEARNING project language files
     setoutpath "$INSTDIR\learning"
     detailprint "Extracting language files for lams_learning"
-    file /a "..\..\lams_learning\conf\language\*"
+    file /a "..\..\lams_learning\conf\language\lams\*"
      
     ;copying MONITORING project language files
     setoutpath "$INSTDIR\monitoring"
     detailprint "Extracting language files for lams_monitoring"
-    file /a  "..\..\lams_monitoring\conf\language\*"
+    file /a  "..\..\lams_monitoring\conf\language\lams\*"
     
 FunctionEnd
 
@@ -1722,7 +1820,7 @@ Function copyllid
         
         setoutpath "$INSTDIR\library\llid$R1"
         detailprint "Copying language files for chat and scribe"
-        file /a "..\..\lams_build\librarypackages\chatscribe\language\*"
+        file /a "..\..\lams_build\librarypackages\chatscribe\language\lams\*"
         
     ${loopuntil} $R0 == "0"
     
@@ -1736,7 +1834,7 @@ Function copyllid
     
         setoutpath "$INSTDIR\library\llid$R1"
         detailprint "Copying language files for forum and scribe"
-        file /a "..\..\lams_build\librarypackages\forumscribe\language\*"
+        file /a "..\..\lams_build\librarypackages\forumscribe\language\lams\*"
     ${loopuntil} $R0 == "0"
     
     ; copy all the folders for llid Resource and Forum
@@ -1750,7 +1848,7 @@ Function copyllid
         #MessageBox MB_OK|MB_ICONEXCLAMATION "Resource and Forum: $R1 $\nElements $R0"
         setoutpath "$INSTDIR\library\llid$R1"
         detailprint "Copying language files for resource and forum"
-        file /a "..\..\lams_build\librarypackages\shareresourcesforum\language\*"
+        file /a "..\..\lams_build\librarypackages\shareresourcesforum\language\lams\*"
     ${loopuntil} $R0 == "0"
 
 FunctionEnd

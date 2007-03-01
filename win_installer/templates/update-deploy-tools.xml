@@ -28,7 +28,7 @@
 		    <classpath refid="deploy.lib.classpath"/>
 		</taskdef>
 
-		<generateDeployProperties depends="compile" 
+		<generateDeployProperties 
 			mode="production" 
 			outputPath="${build.deploy}"
 			dbPassword="${db.password}"
@@ -61,6 +61,40 @@
 				
 		</generateDeployProperties>
 		
+		<echo>Deploy packaqe for ${signature} created.</echo>
+			
+		<echo>Updating web.xml and MANIFEST.MF for lams-central.war, lams-monitor.war and lams-learning.war.</echo>
+		<java classname="org.lamsfoundation.lams.tool.deploy.UpdateToolContextPath" classpathref="deploy.lib.classpath" fork="true">
+						<arg file="${build.deploy}/deploy.xml" />
+		</java>	
+		
+	</target>
+	
+	<target name="update-application-xml" description="Removes unneccessary modules from application.xml">
+		<path id="deploy.lib.classpath">
+			<fileset dir="${deploy.tool.dir}">
+				<include name="lib/*.jar"/>
+			</fileset>
+		</path>
+		
+		<echo>Updating application.xml</echo>
+		
+		<java classname="org.lamsfoundation.lams.tool.deploy.RemoveModuleFromApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+			<arg value="${jboss.deploy}" />
+		</java>
+		
+	</target>
+	
+	
+	<target name="explode-wars" description="explodes lams_learning.war and lams-monitoring.war">
+		<rename src="${jboss.deploy}/lams-learning.war" dest= "${jboss.deploy}/lams-learning.war.bak" />
+		<rename src="${jboss.deploy}/lams-monitoring.war" dest= "${jboss.deploy}/lams-monitoring.war.bak" />
+		
+		<mkdir dir="${jboss.deploy}/lams-learning.war/"/>
+		<mkdir dir="${jboss.deploy}/lams-monitoring.war/"/>
+		
+		<unwar src="${jboss.deploy}/lams-learning.war" dest="${jboss.deploy}/lams-learning.war" />
+		<unwar src="${jboss.deploy}/lams-monitoring.war" dest="${jboss.deploy}/lams-monitoring.war" />
 	</target>
 	
 	<target name="deploy-tool" description="runs the tool deployer for a given tool">
@@ -89,6 +123,7 @@
 			<transaction src="${temp}/lams/sql/alter_201_system_tool_user_workspace.sql" />
 			<transaction src="${temp}/lams/sql/alter_201_theme.sql" />
 			<transaction src="${temp}/lams/sql/alter_201_tool.sql" />
+			<transaction src="${temp}/lams/sql/alter_201_ext.sql" />
 		</sql>
 	</target>
 	
