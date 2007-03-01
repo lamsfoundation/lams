@@ -103,9 +103,14 @@ class org.lamsfoundation.lams.authoring.cv.ValidationIssuesDialog extends MovieC
 		//set the 1st colum a bit smaller
 		validationIssues_dgd.dataProvider = _validationIssues;
 		validationIssues_dgd.removeAllColumns();
-		validationIssues_dgd.columnNames = [Dictionary.getValue("ld_val_activity_column"), Dictionary.getValue("ld_val_issue_column")];
+		
+		validationIssues_dgd.columnNames = ["Activity", "Issue"];
+		
+		validationIssues_dgd.getColumnAt(0).headerText = Dictionary.getValue("ld_val_activity_column");
 		validationIssues_dgd.getColumnAt(0).width = 110;
-		Debugger.log('_validationIssues.messages:'+_validationIssues.messages.length,Debugger.GEN,'init','ValidationIssuesDialog');
+		
+		validationIssues_dgd.getColumnAt(1).headerText = Dictionary.getValue("ld_val_issue_column");
+		
 		//fire event to say we have loaded
 		_container.contentLoaded();
 	}
