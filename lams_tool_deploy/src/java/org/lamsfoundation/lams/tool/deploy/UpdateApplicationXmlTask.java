@@ -62,6 +62,11 @@ public abstract class UpdateApplicationXmlTask implements Task
     protected String webUri;
     
     /**
+     * The value of the module element
+     */
+    protected String module;
+    
+    /**
      * The value of the context root element.
      */
     protected String contextRoot;
@@ -92,6 +97,15 @@ public abstract class UpdateApplicationXmlTask implements Task
     public void setWebUri(final java.lang.String webUri)
     { 
         this.webUri = webUri;
+    }
+    
+    /**
+     * Sets the value of the module to be added
+     * @param module New value of the property module
+     */
+    public void setModule(final java.lang.String module)
+    {
+    	this.module = module;
     }
     
     /**
@@ -243,6 +257,17 @@ public abstract class UpdateApplicationXmlTask implements Task
         Element matchingWebUriElement = findElementWithMatchingText(webUri, webUriNodeList);
         if ( matchingWebUriElement != null ) {
             return (Element) matchingWebUriElement.getParentNode().getParentNode();
+        } else {
+            return null;
+        }
+    }
+    
+    /** Find a matching web element - useful for updating or deleting an existing element */
+    protected Element findElementWithModule(Document doc) {
+        NodeList moduleNodeList = doc.getElementsByTagName("java");
+        Element matchingModuleElement = findElementWithMatchingText(module, moduleNodeList);
+        if ( matchingModuleElement != null ) {
+            return (Element) matchingModuleElement.getParentNode();
         } else {
             return null;
         }

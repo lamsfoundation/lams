@@ -30,12 +30,11 @@ import org.w3c.dom.Element;
  * Removes a web app entry from the LAMS Application XML. Throws an exception
  * if the element is not found.
  * 
- * @author Chris Perfect, with modifications by Fiona Malikoff
+ * @author Chris Perfect, with modifications by Fiona Malikoff, Luke Foxton
  */
 public class RemoveWebAppFromApplicationXmlTask extends UpdateApplicationXmlTask
 {
-    
-    
+
     /** Creates a new instance of RemoveWebAppFromApplicationXmlTask */
     public RemoveWebAppFromApplicationXmlTask()
     {

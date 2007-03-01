@@ -61,7 +61,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Base class of ant tasks that changes a jar file or a war file
- * @author Fiona Malikoff
+ * @author Fiona Malikoff modified by Luke Foxton
  */
 public abstract class UpdateWarTask implements Task {
 
