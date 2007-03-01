@@ -42,7 +42,7 @@
 </logic:equal>
 <table class=alternative-color width=100%>
 <tr>
-	<th>id</th>
+	<th>Id</th>
 	<th><fmt:message key="admin.organisation.name"/></th>
 	<th><fmt:message key="admin.organisation.code"/></th>
 	<th><fmt:message key="admin.organisation.description"/></th>
