@@ -227,7 +227,9 @@ SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
                 WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
                 
                 DetailPrint "LAMS Language Pack ${LANGUAGE_PACK_VERSION} install successfull"
-                
+
+                # changing the instdir back to the original inst dir
+                ReadRegStr $INSTDIR HKLM "${REG_HEAD}" "dir_inst"
                 
                 Call WriteRegEntries
             
@@ -742,10 +744,12 @@ Function PostFinal
     ${StrTok} $4 "${__TIME__}" ":" 1 1
     
     strcpy $TIMESTAMP "$0$1$2-$3$4"
-    MessageBox MB_OKCANCEL|MB_ICONQUESTION "Your installation of LAMS will be backed up at $INSTDIR-$TIMESTAMP.bak" IDOK continue IDCANCEL cancel
-            cancel:
-                Abort
-            continue:
+    ${if} $IS_UPDATE == "0"
+        MessageBox MB_OKCANCEL|MB_ICONQUESTION "Your installation of LAMS will be backed up at $INSTDIR-$TIMESTAMP.bak" IDOK continue IDCANCEL cancel
+                cancel:
+                    Abort
+                continue:
+    ${endif} 
 FunctionEnd
 
 ################################################################################
