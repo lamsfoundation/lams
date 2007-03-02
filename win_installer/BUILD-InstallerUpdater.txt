@@ -13,10 +13,9 @@ Steps to build installer
    to comply with the new updater
 2. Do a build of LAMS, an extra ant task is needed for the updater. If using an 
    alternate location for JBOSS_HOME, specify at the top of language-pack.nsi.
-   You will need to follow this order of ant tasks: 
+   YOU WILL NEED TO FOLLOW THIS ORDER OF TASKS INSTEAD OF THE NORMAL BUILD: 
    
    rebuild-db
-   assemble-ear
    deploy-ear-updater
    deploy-ear
    deploy-tools

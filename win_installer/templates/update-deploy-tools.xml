@@ -112,13 +112,14 @@
 		</java>
 	</target>
 	
-	<target name="update-core-database" description="Runs some update scripts found in lams_common\db\sql\updatscripts" >
+	<target name="update-core-database"  description="Runs some update scripts found in lams_common\db\sql\updatscripts" >
 		<sql driver="com.mysql.jdbc.Driver" 
 			classpath="${jboss.deploy}/mysql-connector-java-3.1.12-bin.jar" 
 			url="jdbc:mysql://localhost/${db.name}?characterEncoding=UTF-8" 
 			userid="${db.username}" 
 			password="${db.password}"
-			encoding="utf8">
+			encoding="utf8"
+			failonerror="false">
 			<transaction src="${temp}/lams/sql/alter_201_locale_id.sql" />
 			<transaction src="${temp}/lams/sql/alter_201_system_tool_user_workspace.sql" />
 			<transaction src="${temp}/lams/sql/alter_201_theme.sql" />
