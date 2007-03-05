@@ -12,7 +12,7 @@
 	<tr>
 		<th><fmt:message key="sysadmin.library.activity.title" /></th>
 		<th><fmt:message key="sysadmin.library.activity.description" /></th>
-		<th><fmt:message key="sysadmin.library.createtime" /></th>
+		<th><fmt:message key="sysadmin.library.createtim" /></th>
 		<th><fmt:message key="sysadmin.function" /></th>
 	</tr>
 	<c:forEach items="${libraries}" var="library">
