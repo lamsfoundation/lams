@@ -236,7 +236,6 @@
 				<include name="lams.tld"/>
 				<exclude name="web.xml"/>
 			</webinf>
-			<lib dir="${conf.webinf.dir}/lib"/>
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
 				<include name="css/*"/>
