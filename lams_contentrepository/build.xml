@@ -8,9 +8,6 @@
 	<property file="../lams_build/${osPropertiesName}.properties" />
 
 	<path id="all-libs">
-		<fileset dir="${lib}">
-			<include name="**/*.jar"/>
-		</fileset>
 		<fileset dir="${sharedlib}">
 			<include name="**/*.jar"/>
 		</fileset>
