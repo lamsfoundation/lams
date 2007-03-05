@@ -8,3 +8,21 @@ You may include the source code or modified source code within your own projects
 
 
 For more detail, http://www.softcomplex.com/products/tigra_tree_menu/docs/
+
+Library/Package				License
+
+Used for the IMSCP functionality (Reload Project)
+castor-0.9.5.3-xml.jar		Castor License
+jdom.jar					Jdom Jar License
+moonunitsrc.jar				Reload License
+reload-diva.jar				Reload License
+reload-editor.jar			Reload License
+reload-jdom.jar				Reload License
+reload-moonunit.jar			Reload License
+xercesImpl.jar				Apache Software License 1.1
+xml-apis.jar				Apache Software License 1.1
+
+Other libraries
+jaxen-full.jar				Jaxen Jar License (The Werken Company)
+sax.jar						Public Domain
+saxpath.jar					Jaxen Jar License (The Werken Company)
