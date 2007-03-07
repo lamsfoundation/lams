@@ -7,6 +7,6 @@ CHANGE COLUMN fullname fullname VARCHAR(255);
 
 UPDATE lams_tool
 set modified_date_time = now()
-, classpath_addition = './lams-tool-lamc11.jar'
+, classpath_addition = 'lams-tool-lamc11.jar'
 , context_file = '/org/lamsfoundation/lams/tool/mc/mcApplicationContext.xml'
 where tool_signature = 'lamc11';

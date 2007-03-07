@@ -3,6 +3,6 @@
 
 UPDATE lams_tool
 set modified_date_time = now()
-, classpath_addition = './lams-tool-larsrc11.jar'
+, classpath_addition = 'lams-tool-larsrc11.jar'
 , context_file = '/org/lamsfoundation/lams/tool/rsrc/rsrcApplicationContext.xml'
 where tool_signature = 'larsrc11';

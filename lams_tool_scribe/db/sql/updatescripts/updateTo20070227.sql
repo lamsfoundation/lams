@@ -3,6 +3,6 @@
 
 UPDATE lams_tool
 set modified_date_time = now()
-, classpath_addition = './lams-tool-lascrb11.jar'
+, classpath_addition = 'lams-tool-lascrb11.jar'
 , context_file = '/org/lamsfoundation/lams/tool/scribe/scribeApplicationContext.xml'
 where tool_signature = 'lascrb11';

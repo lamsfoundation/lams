@@ -3,6 +3,6 @@
 
 UPDATE lams_tool
 set modified_date_time = now()
-, classpath_addition = './lams-tool-lantbk11.jar'
+, classpath_addition = 'lams-tool-lantbk11.jar'
 , context_file = '/org/lamsfoundation/lams/tool/notebook/notebookApplicationContext.xml'
 where tool_signature = 'lantbk11';

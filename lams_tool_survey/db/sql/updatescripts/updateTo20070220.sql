@@ -6,6 +6,6 @@ CHANGE COLUMN answer_text answer_text text;
 
 UPDATE lams_tool
 set modified_date_time = now()
-, classpath_addition = './lams-tool-lasurv11.jar'
+, classpath_addition = 'lams-tool-lasurv11.jar'
 , context_file = '/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml'
 where tool_signature = 'lasurv11';
