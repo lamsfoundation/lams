@@ -49,8 +49,8 @@
 
 # constants
 !define VERSION "2.0.1"
-!define LANGUAGE_PACK_VERSION "2007-03-02"
-!define DATE_TIME_STAMP "200703021200"
+!define LANGUAGE_PACK_VERSION "2007-03-07"
+!define DATE_TIME_STAMP "200703071200"
 !define SERVER_VERSION_NUMBER "${VERSION}.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
@@ -62,7 +62,7 @@
 Name "LAMS ${VERSION}"
 ;BrandingText "LAMS ${VERSION} -- built on ${__TIMESTAMP__}"
 BrandingText "LAMS ${VERSION} -- built on ${__DATE__} ${__TIME__}"
-OutFile "..\build\LAMS-updater-${VERSION}.exe"
+OutFile "..\build\LAMS-${VERSION}.exe"
 InstallDir "C:\lams"
 InstallDirRegKey HKLM "${REG_HEAD}" ""
 LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree" 
@@ -171,15 +171,15 @@ ${Array} FS_FOLDERS
 # installer sections
 SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
     
-    Section !lamsCore
+    Section "!lamsCore" lamsCore
         ${if} $IS_UPDATE == "1"
             Detailprint "Installing LAMS ${VERSION} core"
-            # extract support files to write configuration
-            SetOutPath $INSTDIR
-            File /r "..\apache-ant-1.6.5"
             
             ; Backing up existing lams installation
             call backupLams
+            
+            ; setting up ant
+            call setupant
             
             ; Updating the the core lams jars/wars
             call updateCoreJarsWars
@@ -190,13 +190,12 @@ SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
             ; Updating lams-www.war
             call updateLamswww
             
-        
             ; Updating the database to support version
             call updateCoreDatabase
         ${endif}
     SectionEnd
     
-    Section !lamsTools
+    Section "!lamsTools" lamsTools
         
         ${if} $IS_UPDATE == "1"           
             Detailprint "Installing LAMS ${VERSION} tools"
@@ -205,44 +204,47 @@ SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
             ; Then Calls deploy tools 
             call createAndDeployTools
             
+            ; removing temporary jboss files
+            Detailprint "Removing jboss temp directories"
+            rmdir /r "$INSTDIR\server\default\tmp"
+            rmdir /r "$INSTDIR\server\default\work\jboss.web\localhost"
+            
             
             # RUNNING THE LANGUAGE PACK ##################
-            
-            
             call languagePackInit
+            ; copy language files from LAMS projects to a folder in $INSTDIR
+            call copyProjects
             
-            ${if} $UPDATE_LANGUAGES == 1
-                ; copy language files from LAMS projects to a folder in $INSTDIR
-                call copyProjects
-                
-                ; get the language files locations specific to this server from the database
-                ; unpack to $INSTDIR\library\llidx
-                call copyllid
-                                
-                ; Finally, add rows in the database (lams_supported_locale) for all new language files
-                call updateDatabase
-                
-                # write this language pack version to registry
-                Detailprint 'Writing Language pack version ${LANGUAGE_PACK_VERSION} to registry: "${LANGUAGE_PACK_VERSION}"'
-                WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
-                
-                DetailPrint "LAMS Language Pack ${LANGUAGE_PACK_VERSION} install successfull"
+            ; get the language files locations specific to this server from the database
+            ; unpack to $INSTDIR\library\llidx
+            call copyllid
+                            
+            ; Finally, add rows in the database (lams_supported_locale) for all new language files
+            call updateDatabase
+            
+            # write this language pack version to registry
+            Detailprint 'Writing Language pack version ${LANGUAGE_PACK_VERSION} to registry: "${LANGUAGE_PACK_VERSION}"'
+            WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
+            
+            DetailPrint "LAMS Language Pack ${LANGUAGE_PACK_VERSION} install successfull"
 
-                # changing the instdir back to the original inst dir
-                ReadRegStr $INSTDIR HKLM "${REG_HEAD}" "dir_inst"
-                
-                Call WriteRegEntries
-            
-                SetOutPath $INSTDIR
-                File /a "..\build\lams-start.exe"
-                File /a "..\build\lams-stop.exe"
-                File /a "..\license.txt"
-                File /a "..\license-wrapper.txt"
-                File /a "..\readme.txt"
-                Call SetupStartMenu
-                WriteUninstaller "$INSTDIR\lams-uninstall.exe"
-            ${endif}
             ################################################
+
+            # changing the instdir back to the original inst dir
+            ReadRegStr $INSTDIR HKLM "${REG_HEAD}" "dir_inst"
+            
+            Call WriteRegEntries
+        
+            SetOutPath $INSTDIR
+            File /a "..\build\lams-start.exe"
+            File /a "..\build\lams-stop.exe"
+            File /a "..\license.txt"
+            File /a "..\license-wrapper.txt"
+            File /a "..\readme.txt"
+            Call SetupStartMenu
+            WriteUninstaller "$INSTDIR\lams-uninstall.exe"
+            
+            
         ${endif}
     SectionEnd
 
@@ -414,6 +416,13 @@ Function .onInit
         # Reading the registry values
         call readRegistry
         
+        
+        SectionSetSize ${jboss} 0
+        SectionSetSize ${lams} 0
+        SectionSetSize ${service} 0
+     ${else}
+        SectionSetSize ${lamsCore} 0
+        SectionSetSize ${lamsTools} 0
      ${endif}
     
     
@@ -426,7 +435,7 @@ Function .onInit
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "final.ini"
     
     # set jsmath exploded size (assumes 4KB cluster size on destination hdd)
-    SectionSetSize ${jsmathe} 81816
+    ;SectionSetSize ${jsmathe} 81816
     
 FunctionEnd
 
@@ -477,19 +486,25 @@ Function PreComponents
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 1" "Text" "- JBoss 4.0.2"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 2" "Text" "- LAMS ${VERSION} Core"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 3" "Text" "- Install LAMS as a service"
-        !insertmacro MUI_HEADER_TEXT "LAMS 2.0.1 Components" "Lams 2.0 is installed. You may update to 2.0.1"
+        !insertmacro MUI_HEADER_TEXT "LAMS 2.0.1 Components" "No installation of LAMS 2.0 was found on your computer. A full 2.0.1 installation required to run LAMS"
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams_components.ini"
     ${else}
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 4" "Text" "LAMS ${VERSION} Update"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 1" "Text" "- LAMS ${VERSION} Core"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 2" "Text" "- LAMS ${VERSION} Tools"
-        !insertmacro MUI_HEADER_TEXT "LAMS 2.0.1 Components" "No installation of LAMS 2.0 was found on your computer. A full 2.0.1 installation required to run LAMS"
+        !insertmacro MUI_HEADER_TEXT "LAMS 2.0.1 Components" "Lams 2.0 is installed. Proceeding with update to 2.0.1"
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams_components.ini"
     ${endif}
 FunctionEnd 
 
 Function PostComponents
         !insertmacro MUI_INSTALLOPTIONS_READ $INCLUDE_JSMATH "lams_components.ini" "Field 5" "State"
+        ${if} $INCLUDE_JSMATH == "1"
+            SectionSetSize ${jsmathe} 81816
+        ${else}
+            SectionSetSize ${jsmathe} 0
+        ${endif}
+
 FunctionEnd
 
 
@@ -736,20 +751,61 @@ Function PostFinal
     call checkRegistry
     
     # ${StrTok} "ResultVar" "String" "Separators" "ResultPart" "SkipEmptyParts"
-    ${StrTok} $0 ${__DATE__} "/" 2 1
-    ${StrTok} $1 ${__DATE__} "/" 1 1
-    ${StrTok} $2 ${__DATE__} "/" 0 1
     
-    ${StrTok} $3 "${__TIME__}" ":" 0 1
-    ${StrTok} $4 "${__TIME__}" ":" 1 1
+    nsExec::ExecToStack "date /T"
+    Pop $0
+    Pop $1
+    /*${If} $0 == 1
+        ${orif} $0 == 'error'
+        goto error
+    ${EndIf}
+    MessageBox MB_OK|MB_ICONSTOP $1
+    */
+    strcpy $8 $1
     
-    strcpy $TIMESTAMP "$0$1$2-$3$4"
-    ${if} $IS_UPDATE == "0"
+    nsExec::ExecToStack "time /T"
+    Pop $0
+    Pop $1
+    /*
+    ${If} $0 == 1
+        ${orif} $0 == 'error'
+        goto error
+    ${EndIf}
+    */
+ 
+    
+    strcpy $9 $1
+    
+    ${StrTok} $0 $8 "/" 3 0
+    ${StrTok} $1 $8 "/" 2 0
+    ${StrTok} $2 $8 "/" 1 0
+    
+    ${StrTok} $3 $9 ":" 0 0
+    ${StrTok} $4 $9 ":" 1 0
+    ${StrTok} $5 $9 ":" 2 0
+    
+    
+    
+    ${if} $5 == "PM"
+        intop $3 $3 + 12    
+    ${endif}
+    
+
+    strcpy $TIMESTAMP "2.0"
+
+    ${if} $IS_UPDATE == "1"
         MessageBox MB_OKCANCEL|MB_ICONQUESTION "Your installation of LAMS will be backed up at $INSTDIR-$TIMESTAMP.bak" IDOK continue IDCANCEL cancel
                 cancel:
                     Abort
                 continue:
-    ${endif} 
+    ${endif}
+    
+     goto done
+    error:
+        DetailPrint "Error getting system time"
+        MessageBox MB_OK|MB_ICONSTOP "Error getting system time $\r$\nError:$\r$\n$\r$\n$1 $\r$\n$\r$\n$0"
+        Abort "Error getting system time"
+    done: 
 FunctionEnd
 
 ################################################################################
@@ -763,14 +819,64 @@ FunctionEnd
 # CODE USED FOR UPDATER                                                        #
 ################################################################################
 
+Function setupant
+    
+    ; setting the first tool sig for properties files
+    strcpy $TOOL_SIG "lachat11"
+    
+    # extract support files to write configuration
+    SetOutPath $INSTDIR
+    File /r "..\apache-ant-1.6.5"
+    
+    # Extract the ant scripts 
+    SetOutPath "$TEMP\lams"
+    File "..\templates\update-deploy-tools.xml"
+    
+    # use Ant to write config to files
+    FileOpen $0 "$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" w
+    IfErrors 0 +2
+        goto error
+    FileWrite $0 "@echo off$\r$\nset JAVACMD=$JDK_DIR\bin\java$\r$\n"
+    FileClose $0
+    ${FileJoin} "$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" "$INSTDIR\apache-ant-1.6.5\bin\ant.bat" ""
+
+    goto done
+    error:
+        DetailPrint "Error setting up ant"
+        MessageBox MB_OK|MB_ICONSTOP "Error setting up ant "
+        Abort "Error setting up ant"
+    done:
+Functionend
+
+
+
 ; Backs up existing lams installation
 Function backupLams
     #copyfiles /r $INSTDIR "$INSTDIR 
     
-    
-    DetailPrint "Backing up lams installation at: $INSTDIR-$TIMESTAMP.bak. This may take several minutes"
+    DetailPrint "Backing up lams at: $INSTDIR-$TIMESTAMP.bak. This may take a few minutes"
+    SetDetailsPrint listonly
     copyfiles /SILENT $INSTDIR  $INSTDIR-$TIMESTAMP.bak 95000
+    SetDetailsPrint both
     
+    
+    DetailPrint 'Dumping database to: $INSTDIR-$TIMESTAMP.bak'
+    setoutpath "$INSTDIR-$TIMESTAMP.bak"
+    Strcpy $4 '"$MYSQL_DIR\bin\mysqldump" -r "$INSTDIR-$TIMESTAMP.bak\dump.sql" $DB_NAME -u $DB_USER -p$DB_PASS'
+    DetailPrint $4
+    nsExec::ExecToStack $4
+    Pop $0
+    Pop $1
+    ${If} $0 == "yes"
+        goto error
+    ${EndIf}
+    
+    goto done
+    error:
+        DetailPrint "Database dump failed"
+        MessageBox MB_OK|MB_ICONSTOP "Database dump failed $\r$\nError:$\r$\n$\r$\n$1"
+        Abort "Database dump failed"
+    done:
 FunctionEnd
 
 
@@ -785,7 +891,7 @@ FunctionEnd
 ; Updating lams-central.war
 Function updateLamsCentral
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-central.war"
-    File /r "..\assembly\lams.ear\lams-central.war"
+    File /r "..\assembly\lams.ear\lams-central.war\*"
 FunctionEnd
 
 ; Updating lams-www.war
@@ -824,13 +930,47 @@ Function updateCoreDatabase
     DetailPrint $1
     
     
-    # Copying the core sql update scriptes to $TEMOP/lams/sql
+     # generate a properties file 
+    ClearErrors
+    FileOpen $0 $TEMP\lams\core.properties w
+    IfErrors 0 +2
+        goto error
+    
+    # convert '\' to '/' for Ant's benefit
+    Push $TEMP
+    Push "\"
+    Call StrSlash
+    Pop $2
+    FileWrite $0 "temp=$2/$\r$\n"
+            
+    Push $INSTDIR
+    Push "\"
+    Call StrSlash
+    Pop $2
+    
+    FileWrite $0 "instdir=$2/$\r$\n"
+    FileWrite $0 "db.name=$DB_NAME$\r$\n"
+    FileWrite $0 "db.username=$DB_USER$\r$\n"
+    FileWrite $0 "db.password=$DB_PASS$\r$\n"
+    FileWrite $0 "db.Driver=com.mysql.jdbc.Driver$\r$\n"
+    FileWrite $0 "db.url=jdbc:mysql://localhost/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
+    FileWrite $0 "jboss.deploy=$${instdir}/jboss-4.0.2/server/default/deploy/lams.ear/$\r$\n"
+
+    Fileclose $0
+    IfErrors 0 +2
+        goto error
+    
+
+    # Copying the core sql update scriptes to $TEMP/lams/sql
     setoutpath "$TEMP\lams\sql"
     file "..\..\lams_common\db\sql\updatescripts\*.sql" 
     
+    setoutpath "$TEMP\lams\"
+    file "..\templates\update-core-database.xml"
     
+
     # Running the ant scripts to create deploy.xml for the normal tools 
-    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\ant.bat" -logfile "$INSTDIR\update-logs\ant-update-core-database.log" -buildfile "$TEMP\lams\update-deploy-tools.xml" -D"prop.path=$TOOL_SIG" update-core-database'
+    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-core-database.log" -buildfile "$TEMP\lams\update-core-database.xml" update-core-database'
     DetailPrint $0
     nsExec::ExecToStack $0
     Pop $0 ; return code, 0=success, error=fail
@@ -841,13 +981,23 @@ Function updateCoreDatabase
     ${endif}
     DetailPrint "Result: $1"
     
+    push "$INSTDIR\update-logs\ant-update-core-database.log"
+    push "Failed"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    intcmp $0 0 +2 +2 0
+        goto error
+   
+    
+
     goto done
     error:
         DetailPrint "LAMS core database updates failed"
-        MessageBox MB_OK|MB_ICONSTOP "LAMS core database updates failed $\r$\nError:$\r$\n$\r$\n$1"
-        Abort "LAMS core database updates failed"
+        MessageBox MB_OK|MB_ICONSTOP "LAMS core database updates failed, check update logs in the installation directory for details $\r$\nError:$\r$\n$\r$\n$1"
+        Abort "LAMS configuration failed"
     done:
-    
 FunctionEnd 
 
 ; Updating application.xml
@@ -859,7 +1009,7 @@ Function updateApplicationXML
     
     
     # Running the ant scripts to update web.xmls and manifests
-    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\ant.bat" -logfile "$INSTDIR\update-logs\ant-update-application-xml.log" -buildfile "$TEMP\lams\update-deploy-tools.xml" -D"prop.path=$TOOL_SIG" update-application-xml'
+    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-application-xml.log" -buildfile "$TEMP\lams\update-deploy-tools.xml" -D"prop.path=$TOOL_SIG" update-application-xml'
     DetailPrint $0
     nsExec::ExecToStack $0
     Pop $0 ; return code, 0=success, error=fail
@@ -870,11 +1020,20 @@ Function updateApplicationXML
     ${endif}
     DetailPrint "Result: $1"
     
+    push "$INSTDIR\update-logs\ant-update-application-xml.log"
+    push "FAILED"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    intcmp $0 0 +2 +2 0
+        goto error
+    
     goto done
     error:
         DetailPrint "Application.xml update failed"
-        MessageBox MB_OK|MB_ICONSTOP "Application.xml update failed $\r$\nError:$\r$\n$\r$\n$1"
-        Abort "Application.xml update failed"
+        MessageBox MB_OK|MB_ICONSTOP "Application.xml update failed, check update logs in the installation directory for details $\r$\nError:$\r$\n$\r$\n$1"
+        Abort "LAMS configuration failed"
     done:
 FunctionEnd
         
@@ -895,16 +1054,12 @@ Function createAndDeployTools
     SetOutPath "$TEMP\lams\lib"
     File "..\..\lams_build\deploy-tool\lib\*.jar"
 
-    # Extract the ant scripts to create the tools
-    SetOutPath "$TEMP\lams"
-    File "..\templates\update-deploy-tools.xml"
-    
     ; Updating application.xml
     call updateApplicationXML
     
     
-    /*# Exploding the lams-learning.war and lams-monitoring.war
-    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\ant.bat -logfile $INSTDIR\update-logs\ant-explode-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG explode-wars'
+    # Exploding the lams-learning.war and lams-monitoring.war
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-explode-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG explode-wars'
     DetailPrint $0
     nsExec::ExecToStack $0
     Pop $0 ; return code, 0=success, error=fail
@@ -914,58 +1069,97 @@ Function createAndDeployTools
         goto error
     ${endif}
     DetailPrint "Result: $1"
-    */
+    push "$INSTDIR\update-logs\ant-explode-wars.log"
+    push "FAILED"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    intcmp $0 0 +2 +2 0
+        goto error
+    
     
     # Creating all the tools, then deploying them
     strcpy $TOOL_SIG "lachat11"
     call runCreateDeployPackage
     call deployTool
+    call runUpdateToolContext
     
     strcpy $TOOL_SIG "lafrum11"
     call runCreateDeployPackage
     call deployTool
+    call runUpdateToolContext
     
     strcpy $TOOL_SIG "lamc11"
     call runCreateDeployPackage
     call deployTool
+    call runUpdateToolContext
     
     strcpy $TOOL_SIG "laqa11"
     call runCreateDeployPackage
     call deployTool
+    call runUpdateToolContext
     
     strcpy $TOOL_SIG "larsrc11"
     call runCreateDeployPackage
     call deployTool
+    call runUpdateToolContext
     
     strcpy $TOOL_SIG "lanb11"
     call runCreateDeployPackage
     call deployTool
+    call runUpdateToolContext
     
     strcpy $TOOL_SIG "lantbk"
     call runCreateDeployPackage
     call deployTool
+    call runUpdateToolContext
     
     strcpy $TOOL_SIG "lasbmt11"
     call runCreateDeployPackage
     call deployTool
+    call runUpdateToolContext
     
     strcpy $TOOL_SIG "lascrb11"
     call runCreateDeployPackage
     call deployTool
+    call runUpdateToolContext
     
     strcpy $TOOL_SIG "lasurv11"
     call runCreateDeployPackage
     call deployTool
+    call runUpdateToolContext
     
     strcpy $TOOL_SIG "lavote11"
     call runCreateDeployPackage
     call deployTool
+    call runUpdateToolContext
+    
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-compress-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG compress-wars'
+    DetailPrint $0
+    nsExec::ExecToStack $0
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    ${if} $0 == "error"
+    ${orif} $0 == 1
+        goto error
+    ${endif}
+    DetailPrint "Result: $1"
+    push "$INSTDIR\update-logs\ant-compress-wars.log"
+    push "FAILED"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    intcmp $0 0 +2 +2 0
+        goto error
+    
     
     goto done
     error:
         DetailPrint "Problem compressing/expanding lams-monitoring.war and lams-learning.war"
         MessageBox MB_OK|MB_ICONSTOP "Problem compressing/expanding lams-monitoring.war and lams-learning.war $\r$\nError:$\r$\n$\r$\n$1"
-        Abort "Problem compressing/expanding lams-monitoring.war and lams-learning.war"
+        Abort "LAMS configuration failed"
     done:
     
 FunctionEnd
@@ -974,7 +1168,7 @@ FunctionEnd
 # Tool created depends on the value of $TOOL_SIG
 Function runCreateDeployPackage
     # Running the ant scripts to create deploy.xml for the normal tools 
-    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\ant.bat -logfile $INSTDIR\update-logs\ant-create-deploy-package-$TOOL_SIG.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG create-deploy-package'
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-create-deploy-package-$TOOL_SIG.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG create-deploy-package'
     DetailPrint $0
     nsExec::ExecToStack $0
     Pop $0 ; return code, 0=success, error=fail
@@ -984,11 +1178,82 @@ Function runCreateDeployPackage
         goto error
     ${endif}
     DetailPrint "Result: $1"
+    push "$INSTDIR\update-logs\ant-create-deploy-package-$TOOL_SIG.log"
+    push "FAILED"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    intcmp $0 0 +2 +2 0
+        goto error
     
+
     goto done
     error:
         DetailPrint "Ant create-tools-package failed, check update-logs for details"
         MessageBox MB_OK|MB_ICONSTOP "Ant create-tools-package failed, check update-logs for details$\r$\nError:$\r$\n$\r$\n$1"
+        Abort "LAMS configuration failed."
+    done:
+FunctionEnd
+
+# Running the ant scripts to create update the tool context paths
+# Tool created depends on the value of $TOOL_SIG
+Function runUpdateToolContext
+    # Running the ant scripts to create deploy.xml for the normal tools 
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-update-tool-context-$TOOL_SIG.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG update-tool-context'
+    DetailPrint $0
+    nsExec::ExecToStack $0
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    ${if} $0 == "error"
+    ${orif} $0 == 1
+        goto error
+    ${endif}
+    DetailPrint "Result: $1"
+    push "$INSTDIR\update-logs\ant-update-tool-context-$TOOL_SIG.log"
+    push "FAILED"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    intcmp $0 0 +2 +2 0
+        goto error
+
+    goto done
+    error:
+        DetailPrint "Ant update-tool-context failed, check update-logs for details"
+        MessageBox MB_OK|MB_ICONSTOP "Ant update-tool-context failed, check update-logs for details$\r$\nError:$\r$\n$\r$\n$1"
+        Abort "LAMS configuration failed."
+    done:
+FunctionEnd
+
+# Deploying the updated tools
+Function deployTool
+    # Running the ant scripts to create deploy.xml for the normal tools 
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-deploy-tool-$TOOL_SIG.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG deploy-tool'
+    DetailPrint $0
+    nsExec::ExecToStack $0
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    DetailPrint "Result: $1"
+    ${if} $0 == "fail"
+    ${orif} $0 == 1
+        goto error
+    ${endif}
+    push "$INSTDIR\update-logs\ant-deploy-tool--$TOOL_SIG.log"
+    push "FAILED"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    intcmp $0 0 +2 +2 0
+        goto error
+    
+
+    goto done
+    error:
+        DetailPrint "Ant deploy-tool failed, check update-logs for details"
+        MessageBox MB_OK|MB_ICONSTOP "Ant deploy-tool failed, check update-logs for details$\r$\nError:$\r$\n$\r$\n$1"
         Abort "LAMS configuration failed."
     done:
 FunctionEnd
@@ -1173,27 +1438,7 @@ Function extractToolJars
     
 FunctionEnd
 
-# Deploying the updated tools
-Function deployTool
-    # Running the ant scripts to create deploy.xml for the normal tools 
-    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\ant.bat -verbose -logfile $INSTDIR\update-logs\ant-deploy-tool-$TOOL_SIG.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG deploy-tool'
-    DetailPrint $0
-    nsExec::ExecToStack $0
-    Pop $0 ; return code, 0=success, error=fail
-    Pop $1 ; console output
-    ${if} $0 == "fail"
-    ${orif} $0 == 1
-        goto error
-    ${endif}
-    DetailPrint "Result: $1"
-    
-    goto done
-    error:
-        DetailPrint "Ant deploy-tool failed, check update-logs for details"
-        MessageBox MB_OK|MB_ICONSTOP "Ant create-tools-package failed, check update-logs for details$\r$\nError:$\r$\n$\r$\n$1"
-        Abort "LAMS configuration failed."
-    done:
-FunctionEnd
+
 
 ################################################################################
 # END CODE USED FOR UPDATER                                                    #
@@ -1451,7 +1696,7 @@ Function ImportDatabase
         RMdir /r  "$INSTDIR\backup\repository"
         delete  "$INSTDIR\backup\lamsDump.sql"
         
-        Detailprint  "FINISHED COPYTING lamsdump.sql"
+        Detailprint  "finished copying lamsdump.sql"
      ${endif}
     
     
@@ -1467,11 +1712,7 @@ Function ImportDatabase
     
     FileWrite $R0 $1
     FileClose $R0
-    
-    ${StrStr} $0 $1 "BUILD SUCCESSFUL"
-    ${If} $0 == ""
-        goto error
-    ${EndIf}
+
     
     /*${if} $RETAIN_FILES == '1'
         #replace the install dump with the retained dump
@@ -1631,6 +1872,7 @@ Function .onInstFailed
         rmdir /r "$TEMP\installer.properties"
         rmdir /r "$TEMP\lams"
         WriteRegStr HKLM "${REG_HEAD}" "language_pack" $OLD_VERSION
+        WriteRegStr HKLM "${REG_HEAD}" "version" ${BASE_VERSION}
         delete "$INSTDIR\updateLocales.sql"
         delete "$INSTDIR\LanguagePack.xml"
 
@@ -1990,10 +2232,14 @@ Function updateDatabase
     SetOutPath $INSTDIR
     File /a "LanguagePack.xml"
 
+    
+   ReadRegStr $0 HKLM "${REG_HEAD}" "dir_inst"
+    
+    
     ; update locals must be stored as a procedure first
     ; use ANT to store procedures
-    DetailPrint '$INSTDIR\apache-ant-1.6.5\bin\ant.bat insertLocale-db'
-    nsExec::ExecToStack '$INSTDIR\apache-ant-1.6.5\bin\ant.bat -buildfile $INSTDIR\LanguagePack.xml insertLocale-db'
+    DetailPrint '$0\apache-ant-1.6.5\bin\newAnt.bat insertLocale-db'
+    nsExec::ExecToStack '$0\apache-ant-1.6.5\bin\newAnt.bat -buildfile $INSTDIR\LanguagePack.xml insertLocale-db'
     Pop $0 ; return code, 0=success, error=fail
     Pop $1 ; console output
     DetailPrint "Database insert status: $0"

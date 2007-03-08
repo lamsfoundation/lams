@@ -351,3 +351,73 @@ Function StrTok
   Pop $2
   Exch $3
 FunctionEnd
+
+;This function will search in a file for the specified string, and return some values.
+/*
+USAGE
+Push C:\temp1.txt
+Push hello
+ Call FileSearch
+Pop $0 #Number of times found throughout
+Pop $1 #Found at all? yes/no
+Pop $2 #Number of lines found in
+ 
+StrCmp $1 yes 0 +2
+MessageBox MB_OK "$\"hello$\" was found in the file $0 times on $2 lines."
+*/
+Function FileSearch
+Exch $0 ;search for
+Exch
+Exch $1 ;input file
+Push $2
+Push $3
+Push $4
+Push $5
+Push $6
+Push $7
+Push $8
+Push $9
+Push $R0
+  FileOpen $2 $1 r
+  StrLen $4 $0
+  StrCpy $5 0
+  StrCpy $7 no
+  StrCpy $8 0
+  StrCpy $9 0
+  ClearErrors
+loop_main:
+  FileRead $2 $3
+  IfErrors done
+ IntOp $R0 $R0 + $9
+  StrCpy $9 0
+  StrCpy $5 0
+filter_top:
+ IntOp $5 $5 - 1
+  StrCpy $6 $3 $4 $5
+  StrCmp $6 "" loop_main
+  StrCmp $6 $0 0 filter_top
+  StrCpy $3 $3 $5
+  StrCpy $5 0
+ StrCpy $7 yes
+ StrCpy $9 1
+ IntOp $8 $8 + 1
+Goto filter_top
+done:
+  FileClose $2
+  StrCpy $0 $8
+  StrCpy $1 $7
+  StrCpy $2 $R0
+Pop $R0
+Pop $9
+Pop $8
+Pop $7
+Pop $6
+Pop $5
+Pop $4
+Pop $3
+Exch $2 ;output number of lines
+Exch
+Exch $1 ;output yes/no
+Exch 2
+Exch $0 ;output count found
+FunctionEnd
