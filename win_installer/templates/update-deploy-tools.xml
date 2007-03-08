@@ -63,12 +63,11 @@
 		
 		<echo>Deploy packaqe for ${signature} created.</echo>
 			
-		<echo>Updating web.xml and MANIFEST.MF for lams-central.war, lams-monitor.war and lams-learning.war.</echo>
-		<java classname="org.lamsfoundation.lams.tool.deploy.UpdateToolContextPath" classpathref="deploy.lib.classpath" fork="true">
-						<arg file="${build.deploy}/deploy.xml" />
-		</java>	
+		
 		
 	</target>
+	
+	
 	
 	<target name="update-application-xml" description="Removes unneccessary modules from application.xml">
 		<path id="deploy.lib.classpath">
@@ -87,16 +86,69 @@
 	
 	
 	<target name="explode-wars" description="explodes lams_learning.war and lams-monitoring.war">
-		<rename src="${jboss.deploy}/lams-learning.war" dest= "${jboss.deploy}/lams-learning.war.bak" />
-		<rename src="${jboss.deploy}/lams-monitoring.war" dest= "${jboss.deploy}/lams-monitoring.war.bak" />
-		
-		<mkdir dir="${jboss.deploy}/lams-learning.war/"/>
-		<mkdir dir="${jboss.deploy}/lams-monitoring.war/"/>
-		
-		<unwar src="${jboss.deploy}/lams-learning.war" dest="${jboss.deploy}/lams-learning.war" />
-		<unwar src="${jboss.deploy}/lams-monitoring.war" dest="${jboss.deploy}/lams-monitoring.war" />
+		<move file="${jboss.deploy}/lams-learning.war" tofile= "${jboss.deploy}/lams-learning.war.bak" />
+		<move file="${jboss.deploy}/lams-monitoring.war" tofile= "${jboss.deploy}/lams-monitoring.war.bak" />
+		<unwar src="${jboss.deploy}/lams-learning.war.bak" dest="${jboss.deploy}/lams-learning.war" />
+		<unwar src="${jboss.deploy}/lams-monitoring.war.bak" dest="${jboss.deploy}/lams-monitoring.war" />
+				
 	</target>
-	
+		
+	<target name="compress-wars" description="compresses lams_learning.war and lams-monitoring.war">
+			
+		<move file="${jboss.deploy}/lams-learning.war" tofile= "${jboss.deploy}/lams-learning.war.tmp" failonerror="false"/>
+		<move file="${jboss.deploy}/lams-monitoring.war" tofile= "${jboss.deploy}/lams-monitoring.war.tmp" failonerror="false"/>
+		
+		<war warfile="${jboss.deploy}/lams-monitoring.war" manifest="${jboss.deploy}/lams-monitoring.war.tmp/META-INF/MANIFEST.MF" 
+		  				webxml="${jboss.deploy}/lams-monitoring.war.tmp/WEB-INF/web.xml">
+			
+			<webinf dir="${jboss.deploy}/lams-monitoring.war.tmp/WEB-INF">
+				<include name="**/*.xml"/>
+				<include name="**/*.tld"/>
+				<include name="struts/*"/>
+				<include name="jstl/*"/>
+				<include name="tags/*"/>
+				<exclude name="web.xml"/>
+			</webinf>
+			<fileset dir="${jboss.deploy}/lams-monitoring.war.tmp">
+				<include name="*"/>
+				<include name="css/*"/>
+				<include name="gate/*"/>
+				<include name="grouping/*"/>
+				<include name="images/*"/>
+				<include name="template/*"/>
+			</fileset>
+		</war>
+		
+		<war warfile="${jboss.deploy}/lams-learning.war" manifest="${jboss.deploy}/lams-learning.war.tmp/META-INF/MANIFEST.MF" 
+				  				webxml="${jboss.deploy}/lams-learning.war.tmp/WEB-INF/web.xml">
+					
+			<webinf dir="${jboss.deploy}/lams-learning.war.tmp/WEB-INF">
+				<include name="*.xml"/>
+				<include name="struts/*"/>
+				<include name="struts/tlds/*"/>
+				<include name="jstl/*"/>
+				<include name="jstl/tlds/*"/>
+				<include name="tags/*"/>
+				<include name="lams.tld"/>
+				<exclude name="web.xml"/>
+			</webinf>
+			<fileset dir="${jboss.deploy}/lams-learning.war.tmp">
+				<include name="*"/>
+				<include name="css/*"/>
+				<include name="exportPortfolio/*"/>
+				<include name="notebook/*"/>
+				<include name="gate/*"/>
+				<include name="grouping/*"/>
+				<include name="images/*"/>
+				<include name="layout/*"/>
+				<include name="test/*"/>
+			</fileset>
+		</war>
+		
+		<delete dir="${jboss.deploy}/lams-learning.war.tmp" failonerror="false" />
+		<delete dir="${jboss.deploy}/lams-monitoring.war.tmp" failonerror="false" />
+	</target>
+			
 	<target name="deploy-tool" description="runs the tool deployer for a given tool">
 		<path id="deploy.lib.classpath">
 			<fileset dir="${deploy.tool.dir}">
@@ -112,20 +164,19 @@
 		</java>
 	</target>
 	
-	<target name="update-core-database"  description="Runs some update scripts found in lams_common\db\sql\updatscripts" >
-		<sql driver="com.mysql.jdbc.Driver" 
-			classpath="${jboss.deploy}/mysql-connector-java-3.1.12-bin.jar" 
-			url="jdbc:mysql://localhost/${db.name}?characterEncoding=UTF-8" 
-			userid="${db.username}" 
-			password="${db.password}"
-			encoding="utf8"
-			failonerror="false">
-			<transaction src="${temp}/lams/sql/alter_201_locale_id.sql" />
-			<transaction src="${temp}/lams/sql/alter_201_system_tool_user_workspace.sql" />
-			<transaction src="${temp}/lams/sql/alter_201_theme.sql" />
-			<transaction src="${temp}/lams/sql/alter_201_tool.sql" />
-			<transaction src="${temp}/lams/sql/alter_201_ext.sql" />
-		</sql>
+	<target name="update-tool-context">
+			<echo>Updating web.xml and MANIFEST.MF for lams-central.war, lams-monitor.war and lams-learning.war. using config from ${build.deploy}/deploy.xml</echo>
+			
+			<path id="deploy.lib.classpath">
+				<fileset dir="${deploy.tool.dir}">
+					<include name="lib/*.jar"/>
+				</fileset>
+			</path> 
+			
+			<java classname="org.lamsfoundation.lams.tool.deploy.UpdateToolContextPath" classpathref="deploy.lib.classpath" fork="true">
+					<arg file="${build.deploy}/deploy.xml" />
+			</java>	
 	</target>
+	
 	
 </project>

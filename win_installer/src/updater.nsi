@@ -49,8 +49,8 @@
 
 # constants
 !define VERSION "2.0.1"
-!define LANGUAGE_PACK_VERSION "2007-03-07"
-!define DATE_TIME_STAMP "200703071200"
+!define LANGUAGE_PACK_VERSION "2007-03-08"
+!define DATE_TIME_STAMP "200703081600"
 !define SERVER_VERSION_NUMBER "${VERSION}.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
@@ -178,6 +178,12 @@ SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
             ; Backing up existing lams installation
             call backupLams
             
+            ; removing temporary jboss files
+            Detailprint "Removing $INSTDIR\jboss-4.0.2\server\default\tmp "
+            rmdir /r "$INSTDIR\jboss-4.0.2\server\default\tmp"
+            Detailprint "Removing $INSTDIR\jboss-4.0.2\server\default\work\jboss.web\localhost"
+            rmdir /r "$INSTDIR\jboss-4.0.2\server\default\work\jboss.web\localhost"
+            
             ; setting up ant
             call setupant
             
@@ -204,12 +210,7 @@ SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
             ; Then Calls deploy tools 
             call createAndDeployTools
             
-            ; removing temporary jboss files
-            Detailprint "Removing jboss temp directories"
-            rmdir /r "$INSTDIR\server\default\tmp"
-            rmdir /r "$INSTDIR\server\default\work\jboss.web\localhost"
-            
-            
+
             # RUNNING THE LANGUAGE PACK ##################
             call languagePackInit
             ; copy language files from LAMS projects to a folder in $INSTDIR
@@ -223,7 +224,7 @@ SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
             call updateDatabase
             
             # write this language pack version to registry
-            Detailprint 'Writing Language pack version ${LANGUAGE_PACK_VERSION} to registry: "${LANGUAGE_PACK_VERSION}"'
+            Detailprint 'Writing Language pack version ${LANGUAGE_PACK_VERSION} to registry: "$VERSION_INT"'
             WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
             
             DetailPrint "LAMS Language Pack ${LANGUAGE_PACK_VERSION} install successfull"
@@ -339,7 +340,7 @@ SectionGroup "jsMath (optional)"
             File /a  "..\..\jsmath\build\lib\jsMath.war"
             CreateDirectory "$INSTDIR\jboss-4.0.2\server\default\deploy\jsMath.war"
             SetOutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\jsMath.war"
-            DetailPrint "$JDK_DIR\bin\jar xf $TEMP\jsMath.war"
+            DetailPrint "$JDK_DIR\bin\jar xvf $TEMP\jsMath.war"
             DetailPrint "Expanding jsMath.war... This may take several minutes"
             nsExec::ExecToStack "$JDK_DIR\bin\jar xf $TEMP\jsMath.war"
             Pop $0
@@ -750,48 +751,37 @@ Function PostFinal
     ; Checking to see if lams2.0 exists
     call checkRegistry
     
-    # ${StrTok} "ResultVar" "String" "Separators" "ResultPart" "SkipEmptyParts"
+    Call GetLocalTime
+    Pop "$0" ;Variable (for day)
+    Pop "$1" ;Variable (for month)
+    Pop "$2" ;Variable (for year)
+    Pop "$3" ;Variable (for day of week name)
+    Pop "$4" ;Variable (for hour)
+    Pop "$5" ;Variable (for minute)
+    Pop "$6" ;Variable (for second)
     
-    nsExec::ExecToStack "date /T"
-    Pop $0
-    Pop $1
-    /*${If} $0 == 1
-        ${orif} $0 == 'error'
-        goto error
-    ${EndIf}
-    MessageBox MB_OK|MB_ICONSTOP $1
-    */
-    strcpy $8 $1
-    
-    nsExec::ExecToStack "time /T"
-    Pop $0
-    Pop $1
-    /*
-    ${If} $0 == 1
-        ${orif} $0 == 'error'
-        goto error
-    ${EndIf}
-    */
- 
-    
-    strcpy $9 $1
-    
-    ${StrTok} $0 $8 "/" 3 0
-    ${StrTok} $1 $8 "/" 2 0
-    ${StrTok} $2 $8 "/" 1 0
-    
-    ${StrTok} $3 $9 ":" 0 0
-    ${StrTok} $4 $9 ":" 1 0
-    ${StrTok} $5 $9 ":" 2 0
-    
-    
-    
-    ${if} $5 == "PM"
-        intop $3 $3 + 12    
+    strlen $7 $0
+    ${if} $7 == 1
+        strcpy $0 "0$0"
     ${endif}
     
-
-    strcpy $TIMESTAMP "2.0"
+    strlen $7 $1
+    ${if} $7 == 1
+        strcpy $1 "0$1"
+    ${endif}
+    
+    strlen $7 $4
+    ${if} $7 == 1
+        strcpy $4 "0$4"
+    ${endif}
+    
+    strlen $7 $5
+    ${if} $7 == 1
+        strcpy $1 "0$5"
+    ${endif}
+    
+    
+    strcpy $TIMESTAMP "$2$1$0$4$5"
 
     ${if} $IS_UPDATE == "1"
         MessageBox MB_OKCANCEL|MB_ICONQUESTION "Your installation of LAMS will be backed up at $INSTDIR-$TIMESTAMP.bak" IDOK continue IDCANCEL cancel
@@ -852,7 +842,13 @@ Functionend
 
 ; Backs up existing lams installation
 Function backupLams
-    #copyfiles /r $INSTDIR "$INSTDIR 
+    
+    iffileexists "$INSTDIR-$TIMESTAMP.bak\*.*" backupExists continue
+    backupExists:
+        DetailPrint "Lams backup failed"
+        MessageBox MB_OK|MB_ICONSTOP "Lams backup failed, please delete or change the name of the backup file before continuing with the update$\r$\n$INSTDIR-$TIMESTAMP.bak"
+        Abort "LAMS configuration failed"
+    continue:
     
     DetailPrint "Backing up lams at: $INSTDIR-$TIMESTAMP.bak. This may take a few minutes"
     SetDetailsPrint listonly
@@ -928,6 +924,8 @@ Function updateCoreDatabase
         goto error
     ${EndIf}
     DetailPrint $1
+    
+    ;StrCpy $0 '"$MYSQL_DIR\bin\mysql" -v $DB_NAME -e "update lams_user set password= (select passord from lams_user where user_id=1) where login='test1' or login='test2' or login='test3' or login='test4'"
     
     
      # generate a properties file 
