@@ -50,6 +50,7 @@
 # constants
 !define VERSION "2.0.1"
 !define LANGUAGE_PACK_VERSION "2007-03-08"
+!define LANGUAGE_PACK_VERSION_INT "20070308"
 !define DATE_TIME_STAMP "200703081600"
 !define SERVER_VERSION_NUMBER "${VERSION}.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
@@ -225,8 +226,7 @@ SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
             
             # write this language pack version to registry
             Detailprint 'Writing Language pack version ${LANGUAGE_PACK_VERSION} to registry: "$VERSION_INT"'
-            WriteRegStr HKLM "${REG_HEAD}" "language_pack" $VERSION_INT
-            
+           
             DetailPrint "LAMS Language Pack ${LANGUAGE_PACK_VERSION} install successfull"
 
             ################################################
@@ -1765,7 +1765,7 @@ Function WriteRegEntries
     WriteRegStr HKLM "${REG_HEAD}" "lams_domain" $LAMS_DOMAIN
     WriteRegStr HKLM "${REG_HEAD}" "lams_port" $LAMS_PORT
     WriteRegStr HKLM "${REG_HEAD}" "lams_locale" $LAMS_LOCALE
-    WriteRegStr HKLM "${REG_HEAD}" "language_pack" ${LANGUAGE_PACK_VERSION}
+    WriteRegStr HKLM "${REG_HEAD}" "language_pack" ${LANGUAGE_PACK_VERSION_INT}
     WriteRegStr HKLM "${REG_HEAD}" "wildfire_domain" $WILDFIRE_DOMAIN
     WriteRegStr HKLM "${REG_HEAD}" "wildfire_user" $WILDFIRE_USER
     WriteRegStr HKLM "${REG_HEAD}" "wildfire_pass" $WILDFIRE_PASS
