@@ -1,0 +1,115 @@
+<%@ page contentType="text/html; charset=utf-8" language="java" %>
+
+<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+
+<html:form action="/saveprofile.do" method="post">
+<html:hidden property="userId" />
+<html:hidden property="login" />
+<html:hidden property="password" />
+
+<logic:messagesPresent> 
+	<p class="warning"><html:errors/></p>
+</logic:messagesPresent>
+
+<div style="clear:both;"></div>
+
+<h2 class="small-space-top"><fmt:message key="title.profile.edit.screen"/></h2>
+
+<div class="shading-bg">
+
+<table>
+	
+    <tr>
+		<td class="align-right"><fmt:message key="label.username"/>:</td>
+		<td><bean:write name="UserForm" property="login" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.title"/>:</td>
+		<td><html:text property="title" size="32" maxlength="32" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.first_name"/> *:</td>
+		<td><html:text property="firstName" size="50" maxlength="128" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.last_name"/> *:</td>
+		<td><html:text property="lastName" size="50" maxlength="128" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.email"/> *:</td>
+		<td><html:text property="email" size="50" maxlength="128" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.address_line_1"/>:</td>
+		<td><html:text property="addressLine1" size="50" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.address_line_2"/>:</td>
+		<td><html:text property="addressLine2" size="50" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.address_line_3"/>:</td>
+		<td><html:text property="addressLine3" size="50" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.city"/>:</td>
+		<td><html:text property="city" size="50" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.state"/>:</td>
+		<td><html:text property="state" size="50" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.postcode"/>:</td>
+		<td><html:text property="postcode" size="10" maxlength="10" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.country"/>:</td>
+		<td><html:text property="country" size="50" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.day_phone"/>:</td>
+		<td><html:text property="dayPhone" size="50" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.evening_phone"/>:</td>
+		<td><html:text property="eveningPhone" size="50" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.mobile_phone"/>:</td>
+		<td><html:text property="mobilePhone" size="50" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.fax"/>:</td>
+		<td><html:text property="fax" size="50" maxlength="64" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.language"/>:</td>
+		<td>
+			<html:select property="localeId">
+				<c:forEach items="${locales}" var="locale">
+					<html:option value="${locale.localeId}">
+						<c:out value="${locale.description}" />
+					</html:option>
+				</c:forEach>	
+			</html:select>
+		</td>
+	</tr>
+	</table>
+			</div>
+			
+			
+			<div class="space-top" align="center">
+			<html:submit styleClass="button"><fmt:message key="button.save"/></html:submit>
+			<html:reset styleClass="button"><fmt:message key="button.reset"/></html:reset>
+			<html:cancel styleClass="button"><fmt:message key="button.cancel"/></html:cancel>
+			</div>
+
+
+
+
+</html:form>
