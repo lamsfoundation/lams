@@ -206,6 +206,24 @@
 			</fileset>
 		</copy>
 	</target>
+	
+	
+	<!-- ============================================================================== -->
+	<!-- Deploy the ear file to the win_installer directory                                             -->
+	<!-- ============================================================================== -->
+
+	<target name="deploy-ear-updater" depends="assemble-ear"
+		description="Delete any old versions of the ear directory">
+		<delete dir="../win_installer/assembly"/>
+		<copy todir="../win_installer/assembly" overwrite="true"
+			failonerror="true">
+			<fileset dir="${assembly}">
+				<include name="${lams.ear}/**/*.*" />
+			</fileset>
+		</copy>
+	</target>
+	
+	
 
 	<!-- ============================================================================== -->
 	<!-- Deploy the LAMS or RAMS set of tools to the deployed ear 				               			-->
