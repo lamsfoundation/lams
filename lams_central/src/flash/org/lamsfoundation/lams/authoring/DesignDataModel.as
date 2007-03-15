@@ -413,6 +413,61 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	}
 	
 	/**
+	 * Returns a data object to send in a WDDX packet to the initialise a Lesson for a Normal Session
+	 * Static call because DDM doesn't exist in the Wizard model
+	 * 
+	 * @param   title            
+	 * @param   description      
+	 * @param   designID         
+	 * @param   orgID            
+	 * @param   lExportPortfolio 
+	 * 
+	 * @return  data obj
+	 */
+	
+	public static function getDataForInitializing(title:String, description:String, designID:Number, orgID:Number, lExportPortfolio:Boolean):Object{
+		var data:Object = new Object();
+	
+		if(title) { data.lessonName = title; }
+		if(description) { data.lessonDescription = description; }
+		
+		if(designID) {data.learningDesignID = designID; }
+		if(orgID) { data.organisationID = orgID; } 
+		else { data.organisationID = Config.NUMERIC_NULL_VALUE; }
+		
+		if(lExportPortfolio != null) { data.learnerExportPortfolio = lExportPortfolio }
+		else { data.learnerExportPortfolio = false }
+		
+		data.copyType = COPY_TYPE_ID_RUN;
+		
+		return data;
+	}
+		/**
+	 * Returns a data object to send in a WDDX packet to the initialise a Lesson for a Preview Session
+	 * DDM exists in 
+	 * 
+	 * @param   title       
+	 * @param   description
+	 * 
+	 * @return  data obj
+	 */
+	
+	public function getDataForPreview(title:String, description:String):Object{
+		var data:Object = new Object();
+	
+		if(title) { data.lessonName = title; }
+		if(description) { data.lessonDescription = description; }
+		
+		if(_learningDesignID) { data.learningDesignID = _learningDesignID; }
+		data.organisationID = Config.NUMERIC_NULL_VALUE;
+		
+		data.learnerExportPortfolio = false;
+		data.copyType = COPY_TYPE_ID_PREVIEW;
+		
+		return data;
+	}
+	
+	/**
 	 * Get details of currently saved design for use in workspace 
 	 *  
 	 * @return Design details used in Workspace

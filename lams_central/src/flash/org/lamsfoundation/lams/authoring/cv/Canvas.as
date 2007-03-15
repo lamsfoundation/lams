@@ -993,16 +993,25 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function launchPreviewWindow():Void{
 		if(_ddm.validDesign){
 			 
-			var designID = _ddm.learningDesignID
-			var uID = Config.getInstance().userID;
-			var previewTitle = Dictionary.getValue('preview_btn');
-			Debugger.log('Launching Preview Window',Debugger.GEN,'launchPreviewWindow','Canvas');
+			
+			Debugger.log('Launching Preview Window (initialising)',Debugger.GEN,'launchPreviewWindow','Canvas');
+			var callback:Function = Proxy.create(this,onInitPreviewResponse); 
+			Application.getInstance().getComms().sendAndReceive(_ddm.getDataForPreview(Dictionary.getValue('preview_btn'),"started%20automatically"),"monitoring/initializeLesson",callback,false)
+			
+			//Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startPreviewLesson&userID='+uID+'&learningDesignID='+designID+'&title=' + previewTitle.toLowerCase() + '&description=started%20automatically ',callback, false);
+			
+		}
+	}
+
+	public function onInitPreviewResponse(r):Void{
+		if(r instanceof LFError) {
+			r.showMessageConfirm();
+		} else {
+			Debugger.log('Launching Preview Window (starting lesson ' + r + ')',Debugger.GEN,'onInitPreviewResponse','Canvas');
 			var callback:Function = Proxy.create(this,onLaunchPreviewResponse); 
-			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startPreviewLesson&userID='+uID+'&learningDesignID='+designID+'&title=' + previewTitle.toLowerCase() + '&description=started%20automatically ',callback, false);
+			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startPreviewLesson&lessonID='+r,callback, false);
 			
-			
-		}//Cursor.showCursor(Application.C_GATE);
-		//canvasModel.activeTool = null;    //CanvasModel.GATE_TOOL;
+		}
 	}
 
 	/**
@@ -1017,6 +1026,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		if(r instanceof LFError){
 			r.showMessageConfirm();
 		}else{
+			
+			//Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startPreviewLesson&userID='+uID+'&learningDesignID='+designID+'&title=' + previewTitle.toLowerCase() + '&description=started%20automatically ',callback, false);
+			
 			//LFMessage.showMessageAlert('calling javascript from Austhor.jsp');
 			var uID = Config.getInstance().userID;
 			var serverUrl = Config.getInstance().serverUrl;

@@ -23,6 +23,7 @@
 import org.lamsfoundation.lams.wizard.Application;
 import org.lamsfoundation.lams.monitoring.Organisation;
 import org.lamsfoundation.lams.monitoring.User;
+import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.wizard.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.util.*;
@@ -248,17 +249,28 @@ class Wizard {
 	
 	}
 	
+	/**
+	 * Initialize lesson for normal session
+	 * 
+	 * @usage   
+	 * @param   resultDTO 
+	 * @param   callback  
+	 */
+	
 	public function initializeLesson(resultDTO:Object, callback:Function){
+		
 		var designId:Number = resultDTO.selectedResourceID;
 		var lessonName:String = resultDTO.resourceTitle;
 		var lessonDesc:String = resultDTO.resourceDescription;
 		var orgId:Number = resultDTO.organisationID;
 		var learnerExpPortfolio:Boolean = resultDTO.learnerExpPortfolio;
-		if(lessonDesc == undefined){
-			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=initializeLesson&learningDesignID='+designId+'&userID='+_root.userID+'&lessonName='+lessonName+'&organisationID='+orgId+'&learnerExportPortfolio='+learnerExpPortfolio ,callback, false);
-		} else {
-			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=initializeLesson&learningDesignID='+designId+'&userID='+_root.userID+'&lessonName='+lessonName+'&lessonDescription='+lessonDesc+'&organisationID='+orgId+'&learnerExportPortfolio='+learnerExpPortfolio, callback, false);
-		}
+		
+		// get data object to send to servlet
+		var data = DesignDataModel.getDataForInitializing(lessonName, lessonDesc, designId, orgId, learnerExpPortfolio);
+		
+		// servlet call
+		Application.getInstance().getComms().sendAndReceive(data, 'monitoring/initializeLesson', callback, false);
+
 	}
 	
 	public function startLesson(isScheduled:Boolean, lessonID:Number, datetime:String){

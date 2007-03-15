@@ -30,6 +30,7 @@ public class MonitoringConstants {
 
 	public static final String MONITORING_SERVICE_BEAN_NAME = "monitoringService";
 	public static final String CREATE_LESSON_MESSAGE_KEY = "createLessonClass";
+	public static final String INIT_LESSON_MESSAGE_KEY = "initializeLesson";
 	public static final String PERFORM_CHOSEN_GROUPING_KEY = "performChosenGrouping";
 	public static final String KEY_ORGANISATION_ID = "organisationID";
 	public static final String KEY_LESSON_ID = "lessonID";

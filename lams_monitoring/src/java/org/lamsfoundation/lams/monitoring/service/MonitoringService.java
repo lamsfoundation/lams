@@ -82,6 +82,7 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
@@ -419,6 +420,51 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         Lesson lesson = createNewLesson(lessonName,lessonDescription,user,learnerExportAvailable,copiedLearningDesign);
         auditAction(AUDIT_LESSON_CREATED_KEY, new Object[] {lessonName, copiedLearningDesign.getTitle(), learnerExportAvailable});
         return lesson;
+    }
+    
+    /**
+     *  @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#initializeLesson(java.util.Integer, java.lang.String)
+     */
+    public String initializeLesson(Integer creatorUserId, String lessonPacket)  throws Exception {
+    	FlashMessage flashMessage = null;
+    	
+    	try{
+	    	Hashtable table = (Hashtable)WDDXProcessor.deserialize(lessonPacket);
+	    	
+	    	// parse WDDX values
+	    	
+	    	String title = WDDXProcessor.convertToString("lessonName", table.get("lessonName"));
+	    	if ( title == null ) title = "lesson"; // TODO Use getMessage 
+	    	
+    		String desc = WDDXProcessor.convertToString("lessonDescription", table.get("lessonDescription"));
+    		if ( desc == null ) desc = "description";  // TODO Use getMessage 
+    		
+    		int copyType = WDDXProcessor.convertToInt("copyType", table.get("copyType"));
+    			
+    		Integer organisationId = WDDXProcessor.convertToInteger("organisationID", table.get("organisationID"));
+    		long ldId = WDDXProcessor.convertToLong(AttributeNames.PARAM_LEARNINGDESIGN_ID, table.get(AttributeNames.PARAM_LEARNINGDESIGN_ID));
+    		
+    		boolean learnerExportAvailable = WDDXProcessor.convertToBoolean("learnerExportPortfolio", table.get("learnerExportPortfolio"));
+	    	
+    		// initialize lesson
+    		
+    		Lesson newLesson = null;
+    		
+    		if(copyType == LearningDesign.COPY_TYPE_PREVIEW)
+    			newLesson = initializeLessonForPreview(title, desc, ldId, creatorUserId);
+    		else
+    			newLesson = initializeLesson(title, desc, learnerExportAvailable, ldId, organisationId, creatorUserId);
+    		
+    		if(newLesson != null)
+    			flashMessage = new FlashMessage("initializeLesson",newLesson.getLessonId());
+    		
+    		return flashMessage.serializeMessage();
+    		
+    	} catch (Exception e) {
+			log.error("Exception occured trying to create a lesson class ",e);
+			throw new Exception(e);
+		}
+    	
     }
     
     /**

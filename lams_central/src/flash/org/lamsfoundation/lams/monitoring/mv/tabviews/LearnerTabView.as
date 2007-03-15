@@ -461,19 +461,25 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
 		trace("scp width: "+mm.getMonitor().getMV().getMonitorLearnerScp()._width)
+		
 		var scpWidth:Number = mm.getMonitor().getMV().getMonitorLearnerScp()._width
+		
 		var newWidth:Number
+		
 		if (_activityLayer_mc._width < scpWidth){
 			newWidth = scpWidth - 6
 		}else {
 			newWidth = _activityLayer_mc._width
 		}
+		
 		for (var i=0; i<learnerListArr.length; i++){
 			trace("button is: "+learnerListArr[i].learnerButton)
 			learnerListArr[i].learnerName._width = newWidth;
 			learnerListArr[i].learnerButton._x = newWidth-110;
-			//learnerListArr[i][1].
+			
 		}
+		
+		//this._height = ((learnerListArr.length)*80)+35;
 		
 		mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
 	}

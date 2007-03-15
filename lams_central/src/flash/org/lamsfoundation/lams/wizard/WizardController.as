@@ -200,10 +200,13 @@ class WizardController extends AbstractController {
 	 * @return  
 	 */
 	
-	public function saveLessonClass(lessonID:Number){
-		trace('saving lesson class after lesson initialized');
-		_wizardModel.lessonID = lessonID;
-		_wizardModel.getWizard().createLessonClass();
+	public function saveLessonClass(r){
+		if(r instanceof LFError) {
+			r.showMessageConfirm();
+		} else {
+			_wizardModel.lessonID = r;
+			_wizardModel.getWizard().createLessonClass();
+		}
 	}
 	
 	private function getView():WizardView{

@@ -288,7 +288,12 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		}
 		
 		// do not populate folder if already contains contents
-		if(nodeToUpdate.hasChildNodes()) { return; }
+		if(nodeToUpdate.hasChildNodes()) { 
+			
+			//return; 
+			broadcastViewUpdate('UPDATE_CHILD_FOLDER_NOOPEN',nodeToUpdate);
+			
+		}
 		
 		// sort contents for content folders
 		if(nodeToUpdate.attributes.data.resourceID >= 0) { 

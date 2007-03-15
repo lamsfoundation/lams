@@ -155,6 +155,7 @@ public class MonitoringAction extends LamsDispatchAction
      *         the user is to go next.
      * @throws IOException
      * @throws ServletException
+     * @deprecated
      */
     public ActionForward initializeLesson(ActionMapping mapping,
                                      ActionForm form,
@@ -803,15 +804,12 @@ public class MonitoringAction extends LamsDispatchAction
 		try {
 		
 			Integer userID = getUserId(); 
-			long learningDesignID = WebUtil.readLongParam(request,AttributeNames.PARAM_LEARNINGDESIGN_ID);
-			String title = WebUtil.readStrParam(request,"title");
-			String desc = WebUtil.readStrParam(request,"description"); 
+			long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 			
-	        // initialize the lesson
-	        Lesson previewLesson = monitoringService.initializeLessonForPreview(title,desc,learningDesignID,userID);
-	        if ( previewLesson != null ) {
-
-	        	long lessonID = previewLesson.getLessonId().longValue();
+			/** InitializeLessonServlet handles the Lesson initialisation process.
+			 *  Create Lesson Class and start Lesson Preview. */
+			
+			if(new Long(lessonID) != null) {
 				
 	        	monitoringService.createPreviewClassForLesson(userID, lessonID);
 		        monitoringService.startLesson(lessonID, getUserId());

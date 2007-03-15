@@ -67,13 +67,26 @@ public interface IMonitoringService
      * @return the lesson initialized.
      */
     public Lesson initializeLesson(String lessonName, String lessonDescription,Boolean learnerExportAvailable,long learningDesignId,Integer organisationId,Integer userID);
+    
+    /**
+     * Initialize a new lesson so as to start the learning process for a normal or preview learning session. 
+     * It needs to notify lams which learning design it belongs to. The initialize process
+     * doesn't involve the setup of lesson class and organization.
+     * 
+     * @param creatorUserId the user who want to create this lesson.
+     * @param lessonPacket The WDDX packet containing the required initialisation paramaters
+     * @return WDDX message packet containing the Lesson ID
+     * @throws Exception
+     */
+    public String initializeLesson(Integer creatorUserId, String lessonPacket)  throws Exception;
+    
     /**
      * Create new lesson according to the learning design specified by the 
      * user, but for a preview session rather than a normal learning session.
      * The design is not assigned to any workspace folder.
      */
     public Lesson initializeLessonForPreview(String lessonName,String lessonDescription,long learningDesignId,Integer userID); 
-
+    
     /**
      * Create a lession according to the input lession WDDX package. The sample package is following:
      * <code>
