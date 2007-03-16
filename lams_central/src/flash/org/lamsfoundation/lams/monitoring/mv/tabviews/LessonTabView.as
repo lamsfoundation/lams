@@ -98,10 +98,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var schedule_date_lbl:Label;
 	private var btnLabel:String;
 	private var learner_expp_cb:CheckBox;
+	private var learner_expp_cb_lbl:Label;
 	
-	//Text Items
-    private var LSTitle_txt:TextField;
-	private var LSDescription_txt:TextField;
+	private var LSTitle_lbl:Label;
+	private var LSDescription_lbl:Label;
+	
 	private var sessionStatus_txt:Label;
 	private var numLearners_txt:Label;
 	private var class_txt:Label;
@@ -110,6 +111,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	
 	private var lessonManager:TextField;
 	private var taskManager:TextField;
+	private var lessonManager_lbl:Label;
+	private var taskManager_lbl:Label;
 	
 	//Button
 	private var viewLearners_btn:Button;
@@ -381,27 +384,39 @@ public function update (o:Observable,infoObj:Object):Void{
 	private function rearrangeAll():Void{
 		learnerURL_lbl.visible = false;
 		learnerURL_txt.visible = false;
+		
 		class_lbl._y = class_lbl._y - 30
 		class_txt._y = class_txt._y - 30
+		
 		lessonManager._y = lessonManager._y - 30
 		taskManager._y = taskManager._y - 30
+		
+		lessonManager_lbl._x = lessonManager._x + 2
+		lessonManager_lbl._y = lessonManager._y
+		taskManager_lbl._x = taskManager._x + 2
+		taskManager_lbl._y = taskManager._y
+		
 		manageClass_lbl._y = manageClass_lbl._y - 30
 		manageStatus_lbl._y = manageStatus_lbl._y - 30
 		manageStart_lbl._y = manageStart_lbl._y - 30
 		manageDate_lbl._y = manageDate_lbl._y - 30
 		manageTime_lbl._y = manageTime_lbl._y - 30
+		
 		start_date_lbl._y = start_date_lbl._y - 30
 		schedule_date_lbl._y = schedule_date_lbl._y - 30
 		scheduleDate_dt._y = scheduleDate_dt._y - 30
 		scheduleTime._y = scheduleTime._y - 30
+		
 		viewLearners_btn._y = viewLearners_btn._y - 30
 		editClass_btn._y = editClass_btn._y - 30
 		changeStatus_cmb._y = changeStatus_cmb._y - 30
 		statusApply_btn._y = statusApply_btn._y - 30
 		schedule_btn._y = schedule_btn._y - 30
 		start_btn._y = start_btn._y - 30
+		
 		reqTasks_scp._y = reqTasks_scp._y - 30
 		learner_expp_cb._y = learner_expp_cb._y - 30
+		learner_expp_cb_lbl._y = learner_expp_cb_lbl._y - 30
 		
 	}
 	/**
@@ -410,9 +425,13 @@ public function update (o:Observable,infoObj:Object):Void{
 	private function populateLessonDetails():Void{
 		
 		var s:Object = mm.getSequence();
+		var limit:Number = 120;
 		
-		LSTitle_txt.text = s.name;
-		LSDescription_txt.text = s.description;
+		LSTitle_lbl.text = "<b>" + s.name + "</b>";
+		LSDescription_lbl.text = String(s.description).substr(0, limit);
+		
+		if(s.description.length > limit) { LSDescription_lbl.text += "..."; }
+		
 		sessionStatus_txt.text = showStatus(s.state);
 		numLearners_txt.text = String(s.noStartedLearners) + " "  + Dictionary.getValue('ls_of_text')+" "+String(s.noPossibleLearners);
 		trace("current logged in learners are: "+mm.allLearnersProgress.length)
@@ -755,8 +774,6 @@ public function update (o:Observable,infoObj:Object):Void{
 	}
 	public function setupLabels(){
 		
-		//max_lbl.text = Dictionary.getValue('pi_max_act');
-		
 		//populate the synch type combo:
 		status_lbl.text = "<b>"+Dictionary.getValue('ls_status_lbl')+"</b>";
 		learner_lbl.text = "<b>"+Dictionary.getValue('ls_learners_lbl')+"</b>";
@@ -768,7 +785,8 @@ public function update (o:Observable,infoObj:Object):Void{
 		manageStart_lbl.text = "<b>"+Dictionary.getValue('ls_manage_start_lbl')+"</b>";
 		manageDate_lbl.text = Dictionary.getValue('ls_manage_date_lbl');
 		manageTime_lbl.text = Dictionary.getValue('ls_manage_time_lbl');
-		learner_expp_cb.label = Dictionary.getValue('ls_manage_learnerExpp_lbl');
+		learner_expp_cb_lbl.text = Dictionary.getValue('ls_manage_learnerExpp_lbl');
+		
 		//Button
 		viewLearners_btn.label = Dictionary.getValue('ls_manage_learners_btn');
 		editClass_btn.label = Dictionary.getValue('ls_manage_editclass_btn');
@@ -776,19 +794,23 @@ public function update (o:Observable,infoObj:Object):Void{
 		schedule_btn.label = Dictionary.getValue('ls_manage_schedule_btn');
 		start_btn.label = Dictionary.getValue('ls_manage_start_btn');
 		
-		//_lessonStateArr = ["CREATED", "NOT_STARTED", "STARTED", "SUSPENDED", "FINISHED", "ARCHIVED", "DISABLED"];
-		
-		taskManager.border = true
+		taskManager.border = true;
 		taskManager.borderColor = 0x003366;
-		taskManager.text = Dictionary.getValue('ls_tasks_txt');
 		
-		lessonManager.border = true
+		taskManager_lbl.text = Dictionary.getValue('ls_tasks_txt');
+		taskManager_lbl._x = taskManager._x + 2;
+		taskManager_lbl._y = taskManager._y;
+		
+		lessonManager.border = true;
 		lessonManager.borderColor = 0x003366;
-		lessonManager.text = Dictionary.getValue('ls_manage_txt');
 		
-		taskManager.background = true
+		lessonManager_lbl.text = Dictionary.getValue('ls_manage_txt');
+		lessonManager_lbl._x = lessonManager._x + 2;
+		lessonManager_lbl._y = lessonManager._y;
+		
+		taskManager.background = true;
 		taskManager.backgroundColor = 0xEAEAEA;
-		lessonManager.background = true
+		lessonManager.background = true;
 		lessonManager.backgroundColor = 0xEAEAEA;
 		
 		delete this.onEnterFrame; 
@@ -839,12 +861,17 @@ public function update (o:Observable,infoObj:Object):Void{
 		manageClass_lbl.setStyle('styleName',styleObj);
 		manageStatus_lbl.setStyle('styleName',styleObj);
 		manageStart_lbl.setStyle('styleName',styleObj);
-		learner_expp_cb.setStyle('styleName',styleObj);
+		//learner_expp_cb.setStyle('styleName',styleObj);
 		
 		schedule_date_lbl.setStyle('styleName', styleObj);
 		sessionStatus_txt.setStyle('styleName', styleObj);
 		numLearners_txt.setStyle('styleName', styleObj);
 		class_txt.setStyle('styleName', styleObj);
+		lessonManager_lbl.setStyle('styleName', styleObj);
+		taskManager_lbl.setStyle('styleName', styleObj);
+		
+		// Check box label
+		learner_expp_cb_lbl.setStyle('styleName', styleObj);
 		
 		//SMALL LABELS
 		styleObj = _tm.getStyleObject('PIlabel');

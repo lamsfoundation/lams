@@ -111,7 +111,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','CanvasController');
 	    if (_canvasModel.isTransitionToolActive()){
 			_canvasModel.getCanvas().stopTransitionTool();
-			//_canvasModel.getCanvas().view.removeTempTrans();	
+			_canvasModel.getCanvas().view.removeTempTrans();	
 			app.controlKeyPressed = "";
 		}
 	    _canvasModel.getCanvas().stopActiveTool();
