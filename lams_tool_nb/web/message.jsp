@@ -30,7 +30,7 @@
 		<html:form action="/learner" target="_self" onsubmit="disableFinishButton();">
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="mode" />
-			<html:hidden property="method" value="Finish"/>
+			<html:hidden property="method" value="finish"/>
 			<c:choose>
 				<c:when test="${reflectOnActivity}">
 					<html:submit property="method" styleClass="button">
