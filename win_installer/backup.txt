@@ -1,0 +1,3 @@
+Please go to:
+http://wiki.lamsfoundation.org/display/lamsdocs/Revert+To+Windows+Updater+Backup
+For instructions on how to revert to an older version from a backup

@@ -48,10 +48,11 @@
 !insertmacro LineFind
 
 # constants
-!define VERSION "2.0.1"
-!define LANGUAGE_PACK_VERSION "2007-03-08"
-!define LANGUAGE_PACK_VERSION_INT "20070308"
-!define DATE_TIME_STAMP "200703081600"
+!define VERSION "2.0.2"
+!define PREVIOUS_VERSION "2.0.1"
+!define LANGUAGE_PACK_VERSION "2007-03-21"
+!define LANGUAGE_PACK_VERSION_INT "20070321"
+!define DATE_TIME_STAMP "200703211600"
 !define SERVER_VERSION_NUMBER "${VERSION}.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
@@ -170,7 +171,7 @@ ${Array} FS_FOLDERS
 ##############################
 
 # installer sections
-SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
+SectionGroup "LAMS ${VERSION} Update (Requires LAMS 2.0)" update
     
     Section "!lamsCore" lamsCore
         ${if} $IS_UPDATE == "1"
@@ -180,10 +181,17 @@ SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
             call backupLams
             
             ; removing temporary jboss files
+            clearerrors
             Detailprint "Removing $INSTDIR\jboss-4.0.2\server\default\tmp "
             rmdir /r "$INSTDIR\jboss-4.0.2\server\default\tmp"
             Detailprint "Removing $INSTDIR\jboss-4.0.2\server\default\work\jboss.web\localhost"
             rmdir /r "$INSTDIR\jboss-4.0.2\server\default\work\jboss.web\localhost"
+            iferrors error continue
+            error:
+                MessageBox MB_OKCANCEL|MB_ICONQUESTION "Could not remove all of LAMS temporary files. Check all other programs are closed and LAMS is not running $\r$\n$\r$\n If you have just shutdown LAMS then LAMS may still be shutting down - please cancel the installation and then wait for a minute and try to run the installer again. If this problem reoccurs, please delete the following directories manually:$\r$\n$INSTDIR\jboss-4.0.2\server\default\work\jboss.web\localhost $\r$\n$INSTDIR\jboss-4.0.2\server\default\tmp $\r$\n$\r$\nClick ok to continue or cancel to stop installation" IDOK continue IDCANCEL cancel
+                cancel:
+                Abort
+            continue: 
             
             ; setting up ant
             call setupant
@@ -252,7 +260,7 @@ SectionGroup "LAMS 2.0.1 Update (Requires LAMS 2.0)" update
 SectionGroupEnd
 
 
-SectionGroup "LAMS 2.0.1 Full Install" fullInstall
+SectionGroup "LAMS ${VERSION} Full Install" fullInstall
     Section "JBoss 4.0.2" jboss
         ${if} $IS_UPDATE == "0"
             DetailPrint "Setting up JBoss 4.0.2"
@@ -375,9 +383,15 @@ Function .onInit
         ${orif} $1 == 1
             MessageBox MB_OK|MB_ICONSTOP "You already have LAMS $0 Installed on your computer."
             Abort
+        ${elseif} $0 == ${PREVIOUS_VERSION}
+            # This is the correct version to update to
+            strcpy $IS_UPDATE "1" 
+        ${elseif} $0 == "2.0"
+            # !!!!!!!!!!!!!THIS BLOCK IS ONLY FOR 2.0.2 UPDATER !!!!!!!!!!!!!!!!
+            strcpy $IS_UPDATE "1" 
         ${else}
-            # Version to be installed is newer than the current
-            strcpy $IS_UPDATE "1"  
+            MessageBox MB_OK|MB_ICONSTOP "Your existing version of LAMS ($0) is not compatible with this update. $\r$\n$\r$\nPlease update to LAMS-${PREVIOUS_VERSION} before running this update."
+            Abort 
         ${endif}
     ${endif}
     
@@ -415,7 +429,14 @@ Function .onInit
             Delete "$TEMP\LocalPortScanner.class"
             
         # Reading the registry values
+        Detailprint "Reading existing LAMS data from registry"
         call readRegistry
+        
+        
+        # clearing the update-logs directory
+        Detailprint "Removing existing update logs"
+        rmdir /r "$INSTDIR\update-logs"
+        
         
         
         SectionSetSize ${jboss} 0
@@ -460,11 +481,30 @@ FunctionEnd
 
 Function CheckJava
     # check for JDK
-    ReadRegStr $JDK_DIR HKLM "SOFTWARE\JavaSoft\Java Development Kit\1.6" "JavaHome"
     ${If} $JDK_DIR == ""
-        ReadRegStr $JDK_DIR HKLM "SOFTWARE\JavaSoft\Java Development Kit\1.5" "JavaHome"
-        ${if} $JDK_DIR == ""
-            MessageBox MB_OK|MB_ICONSTOP "Could not find a Java JDK 1.5 or 1.6 installation.  Please ensure you have JDK 1.5 or 1.6 installed."
+        ReadRegStr $JDK_DIR HKLM "SOFTWARE\JavaSoft\Java Development Kit\1.6" "JavaHome"
+        ${If} $JDK_DIR == ""
+            ReadRegStr $JDK_DIR HKLM "SOFTWARE\JavaSoft\Java Development Kit\1.5" "JavaHome"
+            ${if} $JDK_DIR == ""
+                MessageBox MB_OK|MB_ICONSTOP "Could not find a Java JDK 1.5 or 1.6 installation.  Please ensure you have JDK 1.5 or 1.6 installed."
+            ${EndIf}
+        ${EndIf}
+    ${endif}
+    
+    # check java version using given dir
+    nsExec::ExecToStack '$JDK_DIR\bin\javac -version'
+    Pop $0
+    Pop $1
+    ${StrStr} $0 $1 "1.6"
+    ${If} $0 == ""
+        ${StrStr} $0 $1 "1.5"
+        ${If} $0 == ""
+            MessageBox MB_OK|MB_ICONEXCLAMATION "Could not verify Java JDK 1.5, or JDK 1.6. Please check your JDK directory."
+            ${if} $IS_UPDATE == "0"
+                Abort
+            ${else}
+                quit
+            ${endif}
         ${EndIf}
     ${EndIf}
 FunctionEnd
@@ -472,13 +512,45 @@ FunctionEnd
 
 Function CheckMySQL    
     # check for MySQL
-    ReadRegStr $MYSQL_DIR HKLM "SOFTWARE\MySQL AB\MySQL Server 5.0" "Location"
+    ;ReadRegStr $MYSQL_DIR HKLM "SOFTWARE\MySQL AB\MySQL Server 5.0" "Location"
     ${If} $MYSQL_DIR == ""
         ReadRegStr $MYSQL_DIR HKLM "SOFTWARE\MySQL AB\MySQL Server 5.1" "Location"
         ${If} $MYSQL_DIR == ""
-            MessageBox MB_OK|MB_ICONSTOP "Could not find a MySQL installation.  Please ensure you have MySQL 5.0 or 5.1 installed."
+            ReadRegStr $MYSQL_DIR HKLM "SOFTWARE\MySQL AB\MySQL Server 5.0" "Location"
+            ${If} $MYSQL_DIR == ""
+                MessageBox MB_OK|MB_ICONSTOP "Could not find a MySQL installation.  Please ensure you have MySQL 5.0 or 5.1 installed."
+   
+            ${EndIf}
+        ${endif}
+    ${else}
+        # check mysql version is 5.0.x
+        nsExec::ExecToStack '$MYSQL_DIR\bin\mysqladmin --version'
+        Pop $0
+        Pop $1
+        ${If} $1 == "" ; if mySQL install directory field is empty, do not continue
+            MessageBox MB_OK|MB_ICONSTOP "Your MySQL directory does not appear to be valid, please enter a valid MySQL directory before continuing.$\r$\n$\r$\n$1"
+            ${if} $IS_UPDATE == "0"
+                Abort
+            ${else}
+                quit
+            ${endif}
         ${EndIf}
+        ${StrStr} $0 $1 "5.0"
+        ${If} $0 == "" ; if not 5.0.x, check 5.1.x
+            ${StrStr} $0 $1 "5.1"
+            ${If} $0 == ""
+                MessageBox MB_OK|MB_ICONSTOP "Your MySQL version does not appear to be compatible with LAMS (5.0.x or 5.1.x): $\r$\n$\r$\n$1"
+                MessageBox MB_OK|MB_ICONSTOP "Your MySQL directory does not appear to be valid, please enter a valid MySQL directory before continuing.$\r$\n$\r$\n$1"
+                ${if} $IS_UPDATE == "0"
+                    Abort
+                ${else}
+                    quit
+                ${endif}
+            ${EndIf}
+        ${EndIf}
+
     ${EndIf}
+    
 FunctionEnd
 
 Function PreComponents
@@ -487,13 +559,13 @@ Function PreComponents
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 1" "Text" "- JBoss 4.0.2"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 2" "Text" "- LAMS ${VERSION} Core"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 3" "Text" "- Install LAMS as a service"
-        !insertmacro MUI_HEADER_TEXT "LAMS 2.0.1 Components" "No installation of LAMS 2.0 was found on your computer. A full 2.0.1 installation required to run LAMS"
+        !insertmacro MUI_HEADER_TEXT "LAMS ${VERSION} Components" "No installation of LAMS 2.0 was found on your computer. A full ${VERSION} installation required to run LAMS"
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams_components.ini"
     ${else}
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 4" "Text" "LAMS ${VERSION} Update"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 1" "Text" "- LAMS ${VERSION} Core"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 2" "Text" "- LAMS ${VERSION} Tools"
-        !insertmacro MUI_HEADER_TEXT "LAMS 2.0.1 Components" "Lams 2.0 is installed. Proceeding with update to 2.0.1"
+        !insertmacro MUI_HEADER_TEXT "LAMS ${VERSION} Components" "Lams 2.0 is installed. Proceeding with update to ${VERSION}"
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams_components.ini"
     ${endif}
 FunctionEnd 
@@ -579,7 +651,7 @@ Function PostMySQLConfig
         continue1:
     ${else}
         # Checking if the given database name already exists in the mysql database list
-        ifFileExists "$MYSQL_DIRdata\$DB_NAME\*.*" continue NoDatabaseNameExists
+        ifFileExists "$MYSQL_DIR\data\$DB_NAME\*.*" continue NoDatabaseNameExists
         NoDatabaseNameExists:
             MessageBox MB_OK|MB_ICONSTOP "Could not find database $DB_NAME. Please check your database settings and try again"
             quit   
@@ -643,7 +715,6 @@ Function PostMySQLConfig
             quit
         ${endif}
     ${EndIf}
-  
 FunctionEnd
 
 
@@ -820,9 +891,11 @@ Function setupant
     
     # Extract the ant scripts 
     SetOutPath "$TEMP\lams"
+    
     File "..\templates\update-deploy-tools.xml"
     
     # use Ant to write config to files
+    clearerrors
     FileOpen $0 "$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" w
     IfErrors 0 +2
         goto error
@@ -834,7 +907,7 @@ Function setupant
     error:
         DetailPrint "Error setting up ant"
         MessageBox MB_OK|MB_ICONSTOP "Error setting up ant "
-        Abort "Error setting up ant"
+        Abort "Lams configuration failed"
     done:
 Functionend
 
@@ -843,6 +916,7 @@ Functionend
 ; Backs up existing lams installation
 Function backupLams
     
+    clearerrors
     iffileexists "$INSTDIR-$TIMESTAMP.bak\*.*" backupExists continue
     backupExists:
         DetailPrint "Lams backup failed"
@@ -852,9 +926,14 @@ Function backupLams
     
     DetailPrint "Backing up lams at: $INSTDIR-$TIMESTAMP.bak. This may take a few minutes"
     SetDetailsPrint listonly
-    copyfiles /SILENT $INSTDIR  $INSTDIR-$TIMESTAMP.bak 95000
+    copyfiles /SILENT $INSTDIR  $INSTDIR-$TIMESTAMP.bak 86000
     SetDetailsPrint both
-    
+    iferrors error1 continue1
+    error1:
+        DetailPrint "Backup failed"
+        MessageBox MB_OK|MB_ICONSTOP "LAMS backup to $INSTDIR-$TIMESTAMP.bak failed. Check that all other applications are closed and LAMS is not running." 
+        Abort
+    continue1: 
     
     DetailPrint 'Dumping database to: $INSTDIR-$TIMESTAMP.bak'
     setoutpath "$INSTDIR-$TIMESTAMP.bak"
@@ -866,12 +945,13 @@ Function backupLams
     ${If} $0 == "yes"
         goto error
     ${EndIf}
-    
+      
     goto done
     error:
         DetailPrint "Database dump failed"
         MessageBox MB_OK|MB_ICONSTOP "Database dump failed $\r$\nError:$\r$\n$\r$\n$1"
         Abort "Database dump failed"
+        
     done:
 FunctionEnd
 
@@ -886,8 +966,100 @@ FunctionEnd
 
 ; Updating lams-central.war
 Function updateLamsCentral
-    SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-central.war"
+    strcpy $0 "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-central.war"
+    SetoutPath $0
     File /r "..\assembly\lams.ear\lams-central.war\*"
+    
+    ;removing all the unwanted cvs diorectories from the mistake in 2.0.1 updater
+    Detailprint "Removing CVS folders from lams-central.war"
+    rmdir /r "$0\CVS"
+    rmdir /r "$0\css\CVS"
+    rmdir /r "$0\development\CVS"
+    rmdir /r "$0\errorpages\CVS"
+    rmdir /r "$0\fckeditor\CVS"
+    rmdir /r "$0\fckeditor\editor\CVS"
+    rmdir /r "$0\fckeditor\editor\_source\CVS"
+    rmdir /r "$0\fckeditor\editor\_source\classes\CVS"
+    rmdir /r "$0\fckeditor\editor\_source\commandclasses\CVS"
+    rmdir /r "$0\fckeditor\editor\_source\internals\CVS"
+    rmdir /r "$0\fckeditor\editor\css\CVS"
+    rmdir /r "$0\fckeditor\editor\css\behaviors\CVS"
+    rmdir /r "$0\fckeditor\editor\css\images\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\common\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\common\images\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\fck_about\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\fck_docprops\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\fck_flash\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\fck_image\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\fck_link\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\fck_select\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\fck_spellerpages\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\fck_spellerpages\spellerpages\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\fck_spellerpages\spellerpages\server-scripts\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\fck_template\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\fck_template\images\CVS"
+    rmdir /r "$0\fckeditor\editor\dialog\fck_universalkey\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\asp\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\aspx\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\cfm\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\lasso\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\perl\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\php\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\py\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\images\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\images\icons\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\images\icons\32\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\js\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\upload\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\upload\asp\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\upload\aspx\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\upload\cfm\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\upload\lasso\CVS"
+    rmdir /r "$0\fckeditor\editor\filemanager\upload\php\CVS"
+    rmdir /r "$0\fckeditor\editor\images\CVS"
+    rmdir /r "$0\fckeditor\editor\images\smiley\CVS"  
+    rmdir /r "$0\fckeditor\editor\images\smiley\msn\CVS"  
+    rmdir /r "$0\fckeditor\editor\js\CVS"
+    rmdir /r "$0\fckeditor\editor\lang\CVS"
+    rmdir /r "$0\fckeditor\editor\plugins\CVS"
+    rmdir /r "$0\fckeditor\editor\plugins\autogrow\CVS"
+    rmdir /r "$0\fckeditor\editor\plugins\placeholder\CVS"
+    rmdir /r "$0\fckeditor\editor\plugins\placeholder\lang\CVS"
+    rmdir /r "$0\fckeditor\editor\plugins\simplecommands\CVS"
+    rmdir /r "$0\fckeditor\editor\plugins\tablecommands\CVS"
+    rmdir /r "$0\fckeditor\editor\skins\CVS"
+    rmdir /r "$0\fckeditor\editor\skins\default\CVS"
+    rmdir /r "$0\fckeditor\editor\skins\default\images\CVS"
+    rmdir /r "$0\fckeditor\editor\skins\office2003\CVS"
+    rmdir /r "$0\fckeditor\editor\skins\office2003\images\CVS"
+    rmdir /r "$0\fckeditor\editor\skins\silver\CVS"
+    rmdir /r "$0\fckeditor\editor\skins\silver\images\CVS"
+    rmdir /r "$0\flashxml\CVS"
+    rmdir /r "$0\flashxml\authoring\CVS"
+    rmdir /r "$0\flashxml\learner\CVS"
+    rmdir /r "$0\flashxml\monitoring\CVS"
+    rmdir /r "$0\flashxml\wizard\CVS"
+    rmdir /r "$0\images\CVS"
+    rmdir /r "$0\images\css\CVS"
+    rmdir /r "$0\images\license\CVS"
+    rmdir /r "$0\includes\CVS"
+    rmdir /r "$0\includes\javascript\CVS"
+    rmdir /r "$0\META-INF\CVS"
+    rmdir /r "$0\toolcontent\CVS"
+    rmdir /r "$0\WEB-INF\CVS"
+    rmdir /r "$0\WEB-INF\attachments\CVS"
+    rmdir /r "$0\WEB-INF\jstl\CVS"
+    rmdir /r "$0\WEB-INF\jstl\tlds\CVS"
+    rmdir /r "$0\WEB-INF\struts\CVS"
+    rmdir /r "$0\WEB-INF\struts\tlds\CVS"
+    rmdir /r "$0\WEB-INF\tags\CVS"
+    rmdir /r "$0\WEB-INF\tiles\CVS"
+    
 FunctionEnd
 
 ; Updating lams-www.war
@@ -896,7 +1068,7 @@ Function updateLamswww
     File "..\assembly\lams.ear\lams-www.war\images\learner.logo.swf"
     
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
-    File "..\templates\news.html" 
+    File "..\..\lams_www\web\news.html" 
 FunctionEnd
 
 
@@ -925,70 +1097,72 @@ Function updateCoreDatabase
     ${EndIf}
     DetailPrint $1
     
-    ;StrCpy $0 '"$MYSQL_DIR\bin\mysql" -v $DB_NAME -e "update lams_user set password= (select passord from lams_user where user_id=1) where login='test1' or login='test2' or login='test3' or login='test4'"
-    
-    
-     # generate a properties file 
-    ClearErrors
-    FileOpen $0 $TEMP\lams\core.properties w
-    IfErrors 0 +2
-        goto error
-    
-    # convert '\' to '/' for Ant's benefit
-    Push $TEMP
-    Push "\"
-    Call StrSlash
-    Pop $2
-    FileWrite $0 "temp=$2/$\r$\n"
-            
-    Push $INSTDIR
-    Push "\"
-    Call StrSlash
-    Pop $2
-    
-    FileWrite $0 "instdir=$2/$\r$\n"
-    FileWrite $0 "db.name=$DB_NAME$\r$\n"
-    FileWrite $0 "db.username=$DB_USER$\r$\n"
-    FileWrite $0 "db.password=$DB_PASS$\r$\n"
-    FileWrite $0 "db.Driver=com.mysql.jdbc.Driver$\r$\n"
-    FileWrite $0 "db.url=jdbc:mysql://localhost/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
-    FileWrite $0 "jboss.deploy=$${instdir}/jboss-4.0.2/server/default/deploy/lams.ear/$\r$\n"
 
-    Fileclose $0
-    IfErrors 0 +2
-        goto error
     
-
-    # Copying the core sql update scriptes to $TEMP/lams/sql
-    setoutpath "$TEMP\lams\sql"
-    file "..\..\lams_common\db\sql\updatescripts\*.sql" 
+    ReadRegStr $0 HKLM "${REG_HEAD}" "version"
     
-    setoutpath "$TEMP\lams\"
-    file "..\templates\update-core-database.xml"
+    ${if} $0 == "2.0"
+        # generate a properties file 
+        ClearErrors
+        FileOpen $0 $TEMP\lams\core.properties w
+        IfErrors 0 +2
+            goto error
+        
+        # convert '\' to '/' for Ant's benefit
+        Push $TEMP
+        Push "\"
+        Call StrSlash
+        Pop $2
+        FileWrite $0 "temp=$2/$\r$\n"
+                
+        Push $INSTDIR
+        Push "\"
+        Call StrSlash
+        Pop $2
+        
+        FileWrite $0 "instdir=$2/$\r$\n"
+        FileWrite $0 "db.name=$DB_NAME$\r$\n"
+        FileWrite $0 "db.username=$DB_USER$\r$\n"
+        FileWrite $0 "db.password=$DB_PASS$\r$\n"
+        FileWrite $0 "db.Driver=com.mysql.jdbc.Driver$\r$\n"
+        FileWrite $0 "db.url=jdbc:mysql://localhost/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
+        FileWrite $0 "jboss.deploy=$${instdir}/jboss-4.0.2/server/default/deploy/lams.ear/$\r$\n"
     
-
-    # Running the ant scripts to create deploy.xml for the normal tools 
-    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-core-database.log" -buildfile "$TEMP\lams\update-core-database.xml" update-core-database'
-    DetailPrint $0
-    nsExec::ExecToStack $0
-    Pop $0 ; return code, 0=success, error=fail
-    Pop $1 ; console output
-    ${if} $0 == "error"
-    ${orif} $0 == 1
-        goto error
-    ${endif}
-    DetailPrint "Result: $1"
+        Fileclose $0
+        IfErrors 0 +2
+            goto error
+        
     
-    push "$INSTDIR\update-logs\ant-update-core-database.log"
-    push "Failed"
-    Call FileSearch
-    Pop $0 #Number of times found throughout
-    Pop $3 #Found at all? yes/no
-    Pop $2 #Number of lines found in
-    intcmp $0 0 +2 +2 0
-        goto error
-   
+        # Copying the core sql update scriptes to $TEMP/lams/sql
+        setoutpath "$TEMP\lams\sql"
+        ;file "..\..\lams_common\db\sql\updatescripts\alter_${VERSION}*.sql" 
+        file "..\..\lams_common\db\sql\updatescripts\*.sql" 
+        
+        setoutpath "$TEMP\lams\"
+        file "..\templates\update-core-database.xml"
+        
     
+        # Running the ant scripts to create deploy.xml for the normal tools 
+        strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-core-database.log" -buildfile "$TEMP\lams\update-core-database.xml" update-core-database'
+        DetailPrint $0
+        nsExec::ExecToStack $0
+        Pop $0 ; return code, 0=success, error=fail
+        Pop $1 ; console output
+        ${if} $0 == "error"
+        ${orif} $0 == 1
+            goto error
+        ${endif}
+        DetailPrint "Result: $1"
+        
+        push "$INSTDIR\update-logs\ant-update-core-database.log"
+        push "Failed"
+        Call FileSearch
+        Pop $0 #Number of times found throughout
+        Pop $3 #Found at all? yes/no
+        Pop $2 #Number of lines found in
+        intcmp $0 0 +2 +2 0
+            goto error
+   ${endif}
 
     goto done
     error:
