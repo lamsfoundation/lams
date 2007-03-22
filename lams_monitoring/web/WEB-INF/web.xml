@@ -68,6 +68,11 @@
 </listener>	
 
    <servlet>
+      <servlet-name>initializeLesson</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.InitializeLessonServlet</servlet-class>
+
+   </servlet>
+   <servlet>
       <servlet-name>performChosenGrouping</servlet-name>
       <servlet-class>org.lamsfoundation.lams.monitoring.web.PerformChosenGroupingServlet</servlet-class>
 
@@ -110,6 +115,10 @@
     <url-pattern>*.do</url-pattern>
 </servlet-mapping>
 
+   <servlet-mapping>
+      <servlet-name>initializeLesson</servlet-name>
+      <url-pattern>/initializeLesson</url-pattern>
+   </servlet-mapping>
    <servlet-mapping>
       <servlet-name>performChosenGrouping</servlet-name>
       <url-pattern>/monitoring/performChosenGrouping</url-pattern>
@@ -215,6 +224,7 @@
     		<role-name>AUTHOR</role-name>
     		<role-name>ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
+			<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 
