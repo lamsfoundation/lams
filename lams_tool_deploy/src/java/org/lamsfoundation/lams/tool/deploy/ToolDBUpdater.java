@@ -198,6 +198,42 @@ public class ToolDBUpdater extends DBTask
         }
     }
     
+    /**
+     * Hides tool in db based on the flag 
+     * @param toolSig The signature of the tool to activate/de-activate
+     * @throws SQLException
+     */
+    public void hideTool(String toolSig) throws SQLException
+    {
+        Connection conn = getConnection();
+    	PreparedStatement stmt = null;
+    	ResultSet results = null;
+        try
+        {
+            stmt = conn.prepareStatement("UPDATE lams_tool SET valid_flag = 1 WHERE tool_signature  = \"" +toolSig+ "\"");
+            stmt.execute();
+            
+            stmt = conn.prepareStatement("SELECT learning_library_id FROM lams_tool WHERE tool_signature=\""+toolSignature+"\"");
+            results = stmt.executeQuery();
+            
+            if (results.first())
+            {
+	            double llid = results.getDouble("learning_library_id");
+            	
+            	stmt = conn.prepareStatement("UPDATE lams_learning_library SET valid_flag = 0 WHERE learning_library_id  = \"" +llid+ "\"");
+	            stmt.execute();
+            }
+        }
+        catch (SQLException se)
+        {
+        	throw new DeployException("Error hiding tool: " + toolSig);
+        }
+        finally
+        {
+            DbUtils.closeQuietly(stmt);
+        }
+    }
+    
     public String queryTool(String toolSig, String column)
     {
     	Connection conn = getConnection();

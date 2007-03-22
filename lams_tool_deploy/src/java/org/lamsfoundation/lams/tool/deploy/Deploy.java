@@ -142,7 +142,7 @@ public class Deploy
                     else
                     {
                     	System.out.println("Hiding Tool, valid flags set to 0");
-                    	dbUpdater.activateTool(toolSignature, 0);
+                    	dbUpdater.hideTool(toolSignature);
                     }
                     	
                     System.out.println("Tool update completed");
@@ -228,7 +228,7 @@ public class Deploy
             else
             {
             	System.out.println("Hiding tool: " + config.getToolSignature());
-            	dbUpdater.activateTool(config.getToolSignature(), 0);
+            	dbUpdater.hideTool(config.getToolSignature());
             }
             
             System.out.println("Tool Deployed");
