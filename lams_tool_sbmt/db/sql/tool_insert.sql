@@ -55,7 +55,7 @@ NULL,
 'tool/lasbmt11/moderation.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lasbmt11',
 'org.lamsfoundation.lams.tool.sbmt.ApplicationResources',
-'./lams-tool-lasbmt11.jar',
+'lams-tool-lasbmt11.jar',
 '/org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml',
 NOW(),
 NOW()

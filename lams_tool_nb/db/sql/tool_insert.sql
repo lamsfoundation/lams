@@ -55,7 +55,7 @@ NULL,
 NULL,
 'http://wiki.lamsfoundation.org/display/lamsdocs/lanb11',
 'org.lamsfoundation.lams.tool.noticeboard.ApplicationResources',
-'./lams-tool-lanb11.jar',
+'lams-tool-lanb11.jar',
 '/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml',
 NOW(),
 NOW()

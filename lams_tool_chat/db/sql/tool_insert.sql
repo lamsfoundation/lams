@@ -55,7 +55,7 @@ NULL,
 'tool/lachat11/moderate.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lachat11',
 'org.lamsfoundation.lams.tool.chat.ApplicationResources',
-'./lams-tool-lachat11.jar',
+'lams-tool-lachat11.jar',
 '/org/lamsfoundation/lams/tool/chat/chatApplicationContext.xml',
 NOW(),
 NOW()

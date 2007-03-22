@@ -76,7 +76,7 @@ NULL,
 'tool/lavote11/monitoringStarter.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lavote11',
 'org.lamsfoundation.lams.tool.vote.ApplicationResources',
-'./lams-tool-lavote11.jar',
+'lams-tool-lavote11.jar',
 '/org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml',
 NOW(),
 NOW()

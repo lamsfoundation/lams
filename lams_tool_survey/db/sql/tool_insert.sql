@@ -57,7 +57,7 @@ NULL,
 'tool/lasurv11/moderate.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lasurv11',
 'org.lamsfoundation.lams.tool.survey.ApplicationResources',
-'./lams-tool-lasurv11.jar',
+'lams-tool-lasurv11.jar',
 '/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml',
 NOW(),
 NOW()

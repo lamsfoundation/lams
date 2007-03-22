@@ -55,7 +55,7 @@ NULL,
 'tool/lantbk11/moderate.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lantbk11',
 'org.lamsfoundation.lams.tool.notebook.ApplicationResources',
-'./lams-tool-lantbk11.jar',
+'lams-tool-lantbk11.jar',
 '/org/lamsfoundation/lams/tool/notebook/notebookApplicationContext.xml',
 NOW(),
 NOW()

@@ -55,7 +55,7 @@ NULL,
 'tool/lafrum11/moderate.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lafrum11',
 'org.lamsfoundation.lams.tool.forum.ApplicationResources',
-'./lams-tool-lafrum11.jar',
+'lams-tool-lafrum11.jar',
 '/org/lamsfoundation/lams/tool/forum/forumApplicationContext.xml',
 NOW(),
 NOW()

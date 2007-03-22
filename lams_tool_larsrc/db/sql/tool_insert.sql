@@ -57,7 +57,7 @@ NULL,
 'tool/larsrc11/moderate.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/larsrc11',
 'org.lamsfoundation.lams.tool.rsrc.ApplicationResources',
-'./lams-tool-larsrc11.jar',
+'lams-tool-larsrc11.jar',
 '/org/lamsfoundation/lams/tool/rsrc/rsrcApplicationContext.xml',
 NOW(),
 NOW()

@@ -76,7 +76,7 @@ NULL,
 'tool/laqa11/monitoringStarter.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/laqa11',
 'org.lamsfoundation.lams.tool.qa.ApplicationResources',
-'./lams-tool-laqa11.jar',
+'lams-tool-laqa11.jar',
 '/org/lamsfoundation/lams/tool/qa/qaApplicationContext.xml',
 NOW(),
 NOW()

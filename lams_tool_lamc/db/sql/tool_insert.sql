@@ -55,7 +55,7 @@ NULL,
 'tool/lamc11/monitoringStarter.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lamc11',
 'org.lamsfoundation.lams.tool.mc.ApplicationResources',
-'./lams-tool-lamc11.jar',
+'lams-tool-lamc11.jar',
 '/org/lamsfoundation/lams/tool/mc/mcApplicationContext.xml',
 NOW(),
 NOW())
