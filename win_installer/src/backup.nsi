@@ -46,13 +46,19 @@ VIAddVersionKey FileVersion ""
 VIAddVersionKey FileDescription ""
 VIAddVersionKey LegalCopyright ""
 
-!define MUI_FINISHPAGE_TEXT "LAMS has been successfully backed up on your computer" 
+
 
 # set warning when cancelling install
 !define MUI_ABORTWARNING
 Page custom PreBackupDir PostBackupDir
+!define MUI_INSTFILESPAGE_FINISHHEADER_TEXT "LAMS backup complete"
+!define MUI_INSTFILESPAGE_FINISHHEADER_SUBTEXT ""
 !insertmacro MUI_PAGE_INSTFILES
-!insertmacro MUI_PAGE_FINISH
+Page custom PreFinish PostFinish
+
+;!define MUI_FINISHPAGE_TEXT "LAMS has been successfully backed up on your computer" 
+;!insertmacro MUI_PAGE_FINISH
+
 !insertmacro MUI_LANGUAGE "English"
 
 
@@ -66,6 +72,7 @@ Var BACKUP_DIR
 
 
 ReserveFile "backup.ini"
+ReserveFile "backup-finish.ini"
 
 
 Section backup
@@ -77,7 +84,7 @@ Section backup
     DetailPrint "Backing up lams at: $BACKUP_DIR. This may take a few minutes"
     SetDetailsPrint listonly
     createdirectory $BACKUP_DIR
-    copyfiles /SILENT $INSTDIR $BACKUP_DIR
+    copyfiles /SILENT "$INSTDIR\*" $BACKUP_DIR
     SetDetailsPrint both
     iferrors error1 continue1
     error1:
@@ -109,6 +116,12 @@ SectionEnd
 
 Function .onInit
     ReadRegStr $INSTDIR HKLM "${REG_HEAD}" "dir_inst"
+    
+    ${if} $INSTDIR == ""
+        MessageBox MB_OK|MB_ICONEXCLAMATION "You do not have LAMS 2 installed"
+        Abort
+    ${endif}
+    
     ReadRegStr $DB_NAME HKLM "${REG_HEAD}" "db_name"
     ReadRegStr $DB_USER HKLM "${REG_HEAD}" "db_user"
     ReadRegStr $DB_PASS HKLM "${REG_HEAD}" "db_pass"
@@ -148,11 +161,12 @@ Function .onInit
     strcpy $BACKUP_DIR "$INSTDIR-$2$1$0$4$5.bak"
    
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "backup.ini"
+    !insertmacro MUI_INSTALLOPTIONS_EXTRACT "backup-finish.ini"
 FunctionEnd
 
 Function PreBackupDir
     !insertmacro MUI_INSTALLOPTIONS_WRITE "backup.ini" "Field 1" "State" "$BACKUP_DIR"
-    !insertmacro MUI_HEADER_TEXT "LAMS Backup Dir" "Enter a directory in the space provided"
+    !insertmacro MUI_HEADER_TEXT "LAMS Backup Utility" "Enter a directory in the space provided to back up your LAMS installation"
     !insertmacro MUI_INSTALLOPTIONS_DISPLAY "backup.ini"
 FunctionEnd
 
@@ -170,6 +184,16 @@ Function PostBackupDir
     exists:
           MessageBox MB_OK|MB_ICONEXCLAMATION "The file name for the directory entered is already in use: $\r$\n$BACKUP_DIR"
     continue:
+FunctionEnd
+
+Function PreFinish
+    !insertmacro MUI_INSTALLOPTIONS_WRITE "backup-finish.ini" "Field 1" "Text" "Congratulations! \r\n\r\nLAMS has backed successfully backed up to: $BACKUP_DIR \r\n\r\n\r\n\r\nTo revert to the backup, follow the instructions listed at: \r\n\r\nhttp://wiki.lamsfoundation.org/display/lamsdocs/Revert+To+Windows+Updater+Backup"
+    !insertmacro MUI_HEADER_TEXT "LAMS Backup Utility" "Your LAMS backup is complete"
+    !insertmacro MUI_INSTALLOPTIONS_DISPLAY "backup-finish.ini"
+FunctionEnd
+
+Function PostFinish
+    ; DO NOTHING!
 FunctionEnd
 
 Function CheckMySQL    
