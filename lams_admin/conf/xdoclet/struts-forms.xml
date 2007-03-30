@@ -108,3 +108,7 @@
 	<form-property name="userno" type="java.lang.Integer" />
 	<form-property name="public" type="java.lang.Boolean" initial="true" />
 </form-bean>
+
+<form-bean name="CleanupForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="numDays" type="java.lang.Integer" />
+</form-bean>

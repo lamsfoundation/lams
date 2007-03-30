@@ -58,38 +58,26 @@ public class SysAdminStartAction extends Action {
 		if (request.isUserInRole(Role.SYSADMIN)) {
 			LinkBean linkBean = new LinkBean("cache.do", "cache.title");
 			links.add(linkBean);
-			linkBean = new LinkBean("config.do", "sysadmin.config.settings.edit");
-			links.add(linkBean);
-			linkBean = new LinkBean("toolcontentlist.do", "sysadmin.edit.default.tool.content");
-			links.add(linkBean);
-			linkBean = new LinkBean("usersearch.do", "admin.user.find");
-			links.add(linkBean);
-			linkBean = new LinkBean("importexcel.do", "admin.user.import");
-			links.add(linkBean);
-			linkBean = new LinkBean("importv1.do", "admin.importv1.title");
-			links.add(linkBean);
-			linkBean = new LinkBean("disabledmanage.do", "admin.list.disabled.users");
-			links.add(linkBean);
-			linkBean = new LinkBean("loginmaintain.do", "sysadmin.maintain.loginpage");
-			links.add(linkBean);
-			linkBean = new LinkBean("serverlist.do", "sysadmin.maintain.external.servers");
-			links.add(linkBean);
-			linkBean = new LinkBean("register.do", "sysadmin.register.server");
-			links.add(linkBean);
-			linkBean = new LinkBean("libraryManage.do", "sysadmin.library.management");
-			links.add(linkBean);
+			links.add(new LinkBean("cleanup.do", "sysadmin.batch.temp.file.delete"));
+			links.add(new LinkBean("config.do", "sysadmin.config.settings.edit"));
+			links.add(new LinkBean("toolcontentlist.do", "sysadmin.edit.default.tool.content"));
+			links.add(new LinkBean("usersearch.do", "admin.user.find"));
+			links.add(new LinkBean("importexcel.do", "admin.user.import"));
+			links.add(new LinkBean("importv1.do", "admin.importv1.title"));
+			links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
+			links.add(new LinkBean("loginmaintain.do", "sysadmin.maintain.loginpage"));
+			links.add(new LinkBean("serverlist.do", "sysadmin.maintain.external.servers"));
+			links.add(new LinkBean("register.do", "sysadmin.register.server"));
+			links.add(new LinkBean("libraryManage.do", "sysadmin.library.management"));
 		} else if (request.isUserInRole(Role.AUTHOR_ADMIN)) {
 			LinkBean linkBean = new LinkBean("toolcontentlist.do", "sysadmin.edit.default.tool.content");
 			links.add(linkBean);
 		} else if (service.isUserGlobalGroupAdmin()) {
 			LinkBean linkBean = new LinkBean("usersearch.do", "admin.user.find");
 			links.add(linkBean);
-			linkBean = new LinkBean("importexcel.do", "admin.user.import");
-			links.add(linkBean);
-			linkBean = new LinkBean("importv1.do", "admin.importv1.title");
-			links.add(linkBean);
-			linkBean = new LinkBean("disabledmanage.do", "admin.list.disabled.users");
-			links.add(linkBean);
+			links.add(new LinkBean("importexcel.do", "admin.user.import"));
+			links.add(new LinkBean("importv1.do", "admin.importv1.title"));
+			links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
 		} else {
 			request.setAttribute("errorName", "SysAdminStartAction");
 			request.setAttribute("errorMessage", AdminServiceProxy
