@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
+import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -43,6 +44,7 @@ public class FileUtil {
 	
 	public static final String LAMS_WWW_SECURE_DIR = "secure";
 	public static final String LAMS_WWW_DIR = "lams-www.war";
+	private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
 	
 	protected static final String prefix = "lamstmp_"; // protected rather than private to suit junit test
 	public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
@@ -427,4 +429,82 @@ public class FileUtil {
 		  
 		  return executable;
 	  }
+	  
+	  /** Clean up any old directories in the java tmp directory, where the 
+		 * directory name starts with lamszip_ or lamstmp_ and is <numdays> days old 
+		 * or older. This has the potential to be a heavy call - it has to
+		 * do  complete directory listing and then recursively delete the 
+		 * files and directories as needed.
+		 * 
+		 * Note: this method has not been tested as it is rather hard to write
+		 * a junit test for!
+		 * 
+		 * @param directories 
+		 * @return number of directories deleted
+		 */
+		public static int cleanupOldFiles(File[] directories) {
+			int numDeleted = 0;
+			if ( directories != null ) {
+			    for ( int i=0; i < directories.length; i++) {
+		    	    if ( FileUtil.deleteDirectory(directories[i]) ) {
+		    	        log.info("Directory "+directories[i].getPath()+" deleted.");
+		    	    } else {
+		    	        log.info("Directory "+directories[i].getPath()+" partially deleted - some directories/files could not be deleted.");
+		    	    }
+		    	    numDeleted++;
+			    }
+			}
+			return numDeleted;
+		}
+		
+		/**
+		 * List files in temp directory older than numDays.
+		 * @param numDays Number of days old that the directory should be to be 
+		 * deleted. Must be greater than 0
+		 * @return array of files older than input date
+		 * @throws FileUtilException if numDays <= 0
+		 */
+		public static File[] getOldTempFiles(int numDays) throws FileUtilException {
+			// Contract checking 
+		    if ( numDays < 0 ) {
+		        throw new FileUtilException("Invalid getOldTempFiles call - the parameter numDays is "+
+		                numDays+". Must not be less than 0.");
+		    }
+			
+			// calculate comparison date
+			long newestDateToKeep = System.currentTimeMillis() - ( numDays * numMilliSecondsInADay);
+			Date date = new Date(newestDateToKeep);
+		    log.info("Getting all temp zipfile expanded directories before "+date.toString()+" (server time) ("+newestDateToKeep+")");
+		    
+			File tempSysDir = new File(TEMP_DIR);
+			File candidates[] = tempSysDir.listFiles(new TempDirectoryFilter(newestDateToKeep, log));
+			return candidates;
+		}
+		
+		/**
+		 * Recursively calculates size in bytes of given file or directory.
+		 * @param file
+		 * @return Size in bytes.
+		 */
+		public static long calculateFileSize(File file) {
+			if (file != null) {
+				if (file.isFile()) {
+					return file.length();
+				} else if (file.isDirectory()) {
+					File[] fileList = file.listFiles();
+					long totalSize = 0;
+					if (fileList != null) {
+						for (int i=0; i<fileList.length; i++) {
+							totalSize += calculateFileSize(fileList[i]);
+						}
+						return totalSize;
+					} else {
+						return 0;
+					}
+				}
+			} else {
+				return 0;
+			}
+			return 0;
+		}
 }

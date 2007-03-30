@@ -30,7 +30,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -49,8 +48,7 @@ import org.lamsfoundation.lams.util.FileUtilException;
 public class ZipFileUtil {
 
 	private static Logger log = Logger.getLogger(ZipFileUtil.class);
-	protected static final String prefix = "lamszip_"; // protected rather than private to suit junit test
-	private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
+	public static final String prefix = "lamszip_"; // public to use in TempDirectoryFilter
 	private static int BUFFER_SIZE = 8192;
 
 	/**
@@ -217,51 +215,6 @@ public class ZipFileUtil {
 			return FileUtil.deleteDirectory(new File(directoryName));
 		}
 		return false;
-	}
-	    
-
-	/** Clean up any old directories in the java tmp directory, where the 
-	 * directory name starts with lamszip_ and is older <numdays> days old 
-	 * or older. This has the potential to be a heavy call - it has to
-	 * do  complete directory listing and then recursively delete the 
-	 * files and directories as needed.
-	 * 
-	 * Note: this method has not been tested as it is rather hard to write
-	 * a junit test for!
-	 * 
-	 * @param numdays Number of days old that the directory should be to be 
-	 * deleted. Must be greater than 0
-	 * @return number of directories deleted
-	 * @throws ZipFileUtilException if numDays <= 0
-	 */
-	public static int cleanupOldFiles(int numDays) throws ZipFileUtilException {
-
-	    // Contract checking 
-	    if ( numDays <= 0 ) {
-	        throw new ZipFileUtilException("Invalid cleanupOldFiles call - the parameter numDays is "+
-	                numDays+". Must be greater than 0. No files have been deleted.");
-	    }
-	   
-	    // calculate comparison date
-	    long newestDateToKeep = System.currentTimeMillis() - ( numDays * numMilliSecondsInADay);
-	    Date date = new Date(newestDateToKeep);
-	    log.info("Deleting all temp zipfile expanded directories before "+date.toString()+" (server time) ("+newestDateToKeep+")");
-	    
-		String tempSysDirName = System.getProperty( "java.io.tmpdir" );
-		File tempSysDir = new File(tempSysDirName);
-		File candidates[] = tempSysDir.listFiles(new OldZipDirectoryFilter(newestDateToKeep, log));
-		int numDeleted = 0;
-		if ( candidates != null ) {
-		    for ( int i=0; i < candidates.length; i++) {
-	    	    if ( FileUtil.deleteDirectory(candidates[i]) ) {
-	    	        log.info("Directory "+candidates[i].getPath()+" deleted.");
-	    	    } else {
-	    	        log.info("Directory "+candidates[i].getPath()+" partially deleted - some directories/files could not be deleted.");
-	    	    }
-	    	    numDeleted++;
-		    }
-		}
-		return numDeleted;
 	}
 	
     private static String appendToString(String origString, String newMessage) {

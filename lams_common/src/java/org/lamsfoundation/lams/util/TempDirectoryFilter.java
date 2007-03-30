@@ -21,23 +21,26 @@
  * ****************************************************************
  */
 /* $$Id$$ */
-package org.lamsfoundation.lams.util.zipfile;
+package org.lamsfoundation.lams.util;
 
 import java.io.File;
 import java.io.FileFilter;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 
 /**
- * Filename / date filter used by ZipFileUtil, to find old expanded
- * directories. Used by ZipFileUtil.cleanupOldFiles()
+ * Filename / date filter used by FileUtil, to find old expanded
+ * directories. Used by FileUtil.cleanupOldFiles()
  */
-class OldZipDirectoryFilter implements FileFilter {
+public class TempDirectoryFilter implements FileFilter {
 
     private long newestDateToKeep = 0;
+    public static final String zip_prefix = ZipFileUtil.prefix;
+    public static final String tmp_prefix = FileUtil.prefix;
     private Logger log = null;
     
-    public OldZipDirectoryFilter(long newestDateToKeep, Logger log ) {
+    public TempDirectoryFilter(long newestDateToKeep, Logger log ) {
         this.newestDateToKeep = newestDateToKeep;
         this.log = log;
     }
@@ -48,7 +51,8 @@ class OldZipDirectoryFilter implements FileFilter {
         if ( log != null && log.isDebugEnabled() ) {
             log.debug("Checking file "+candidate+" date modified "+candidate.lastModified());
         }
-        if ( candidate.getName().startsWith(ZipFileUtil.prefix) ) {
+        if ( candidate.getName().startsWith(zip_prefix) 
+        		|| candidate.getName().startsWith(tmp_prefix)) {
 	        if ( ! candidate.isDirectory() ) {
 	            log.debug("Candidate file is not is named as we expected, but it is not a directory. Skipping file.");
 	            return false;
