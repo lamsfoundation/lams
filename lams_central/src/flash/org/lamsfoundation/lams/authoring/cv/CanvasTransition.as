@@ -47,6 +47,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 	private var _startPoint:Point;
 	private var _midPoint:Point;
 	private var _endPoint:Point;
+	private var _fromAct_edgePoint:Point;
+	private var _toAct_edgePoint:Point;
 	private var xPos:Number;
 	
 	
@@ -85,7 +87,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 		return _midPoint;
 	}
 	
+	public function get toAct_edgePoint():Point{
+		return _toAct_edgePoint;
+	}
 	
+	public function get fromAct_edgePoint():Point{
+		return _fromAct_edgePoint;
+	}
 	
 	/**
 	 * Renders the transition to stage
@@ -99,8 +107,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 		//var fromAct = cv.ddm.getActivityByUIID(_transition.fromUIID);
 		//var toAct = cv.ddm.getActivityByUIID(_transition.toUIID);
 		
-		var fromAct_mc = cv.model.getActivityMCByUIID(_transition.fromUIID);
-		var toAct_mc = cv.model.getActivityMCByUIID(_transition.toUIID);
+		var fromAct_mc;
+		var toAct_mc;
+		
+		fromAct_mc = cv.model.getActivityMCByUIID(_transition.fromUIID);
+		toAct_mc = cv.model.getActivityMCByUIID(_transition.toUIID);
+		
 		//var startPoint:Point = MovieClipUtils.getCenterOfMC(fromAct_mc);
 		//var endPoint:Point = MovieClipUtils.getCenterOfMC(toAct_mc);
 		
@@ -121,30 +133,62 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 		
 		_endPoint = new Point(toAct_mc.getActivity().xCoord+toOTC_x,toAct_mc.getActivity().yCoord+toOTC_y);
 		
-		
 		Debugger.log('fromAct_mc:'+fromAct_mc,4,'draw','CanvasTransition');
 		Debugger.log('toAct_mc:'+toAct_mc,4,'draw','CanvasTransition');
+		
 		this.lineStyle(2, _drawnLineStyle);
 		this.moveTo(_startPoint.x, _startPoint.y);
 		
 		//this.dashTo(startX, startY, endX, endY, 8, 4);
 		this.lineTo(_endPoint.x, _endPoint.y);
 		Debugger.log('drawn line from:'+_startPoint.x+','+_startPoint.y+'to:'+_endPoint.x+','+_endPoint.y,4,'draw','CanvasTransition');
-		// calculate the position and angle for the arrow_mc
-		arrow_mc._x = (_startPoint.x + _endPoint.x)/2;
-		arrow_mc._y = (_startPoint.y + _endPoint.y)/2;
 		
-		_midPoint = new Point(arrow_mc._x,arrow_mc._y);
+		// calc activity root angles
+		var fromAct_Angle:Number = Math.atan2(offsetToCentre_y, offsetToCentre_x);
+		var toAct_Angle:Number = Math.atan2(toOTC_y,toOTC_x);
 		
+		var fromAct_Deg:Number = convertToDegrees(fromAct_Angle);
+		var toAct_Deg:Number = convertToDegrees(toAct_Angle);
 		
+		Debugger.log("fromAct root angle: " + fromAct_Deg, Debugger.CRITICAL, "draw", "CanvasTransition");
+		Debugger.log("toAct root angle: " + toAct_Deg, Debugger.CRITICAL, "draw", "CanvasTransition");
 		
 		// gradient
 		var angle:Number = Math.atan2((_endPoint.y- _startPoint.y),(_endPoint.x- _startPoint.x));
-		var degs:Number = Math.round(angle*180/Math.PI);
+		var degs:Number = convertToDegrees(angle);
+		
+		Debugger.log("angle: " + angle, Debugger.CRITICAL, "draw", "CanvasTransition");
+		Debugger.log("degs: " + degs, Debugger.CRITICAL, "draw", "CanvasTransition");
+		
+		// get edgepoint for connected activities 
+		_fromAct_edgePoint = calcEdgePoint(degs, offsetToCentre_x, offsetToCentre_y, fromAct_Deg,  _startPoint);
+		_toAct_edgePoint = (degs >= 0) ? calcEdgePoint(degs - 180, toOTC_x, toOTC_y, toAct_Deg, _endPoint)
+										: calcEdgePoint(degs + 180, toOTC_x, toOTC_y, toAct_Deg, _endPoint);
+		
+		// calc midpoint
+		if(_fromAct_edgePoint != null & _toAct_edgePoint != null) {
+			arrow_mc._x = (_fromAct_edgePoint.x + _toAct_edgePoint.x)/2;
+			arrow_mc._y = (_fromAct_edgePoint.y + _toAct_edgePoint.y)/2;
+		} else {
+			arrow_mc._x = (_startPoint.x + _endPoint.x)/2;
+			arrow_mc._y = (_startPoint.y + _endPoint.y)/2;
+		}
+		
+		Debugger.log("startPoint: (" + _startPoint.x + ", " + _startPoint.y + ")", Debugger.CRITICAL, "draw", "CanvasTransition");
+		Debugger.log("fromAct edge point: (" + _fromAct_edgePoint.x + ", " + _fromAct_edgePoint.y + ")", Debugger.CRITICAL, "draw", "CanvasTransition");
+		Debugger.log("toAct edge point: (" + _toAct_edgePoint.x + ", " + _toAct_edgePoint.y + ")", Debugger.CRITICAL, "draw", "CanvasTransition");
+		Debugger.log("endPoint: (" + _endPoint.x + ", " + _endPoint.y + ")", Debugger.CRITICAL, "draw", "CanvasTransition");
+		
+		Debugger.log("mid point: (" + _midPoint.x + ", " + _midPoint.y + ")", Debugger.CRITICAL, "draw", "CanvasTransition");
+		
 		arrow_mc._rotation = degs;
 		arrow_mc._visible = true;
+		
+		_midPoint = new Point(arrow_mc._x,arrow_mc._y);
+		
 		xPos = this._x
 		trace("x position of start point: "+xPos)
+		
 		/*
 		stopArrow_mc._rotation = degs;
 			
@@ -173,6 +217,74 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 	public function get xPosition():Number{
 		return xPos;
 	}
+	
+	private static function convertToDegrees(angle:Number):Number {
+		return Math.round(angle*180/Math.PI);
+	}
+	
+	private static function convertToRadians(degrees:Number):Number {
+		return degrees/180*Math.PI;
+	}
+	
+	private function getQuadrant(d:Number) {
+		if(d >= 0 && d < 90) {
+			return "q3";
+		} else if(d < 0 && d >= - 90) {
+			return "q2";
+		} else if(d < -90 && d >= -180) {
+			return  "q1";
+		} else {
+			return "q4";
+		}
+	}
+	
+	private function calcEdgePoint(_d:Number, x_offset:Number, y_offset:Number, _act_d:Number, point:Point):Point {
+		var _edgePoint:Point = new Point();
+		var d:Number = _d;
+		var quad:String = getQuadrant(d);
+	
+		switch(quad) {
+			case "q1":
+				d = 180 + d;
+				
+				_edgePoint.y = (d >= _act_d) ? point.y - y_offset : point.y - (x_offset * calcTangent(d, false));
+				_edgePoint.x = (d >= _act_d) ? point.x - (y_offset * calcTangent(d, true)) : point.x - x_offset;;
+				
+				break;
+			case "q2":
+				d = Math.abs(d);
+				
+				_edgePoint.y = (d >= _act_d) ? point.y - y_offset : point.y - (x_offset * calcTangent(d, false));
+				_edgePoint.x = (d >= _act_d) ? point.x + (y_offset * calcTangent(d, true)) : point.x + x_offset;;
+				
+				break;
+			case "q3":
+			
+				_edgePoint.y = (d >= _act_d) ? point.y + y_offset : point.y + (x_offset * calcTangent(d, false));
+				_edgePoint.x = (d >= _act_d) ? point.x + (y_offset * calcTangent(d, true)) : point.x + x_offset;
+			
+					
+				break;
+			case "q4":
+				d = 180 - d;
+			
+				_edgePoint.y = (d >= _act_d) ? point.y + y_offset : point.y + (x_offset * calcTangent(d, false));
+				_edgePoint.x = (d >= _act_d) ? point.x - (y_offset * calcTangent(d, true)) : point.x - x_offset;;
+				
+				break;
+			default:
+				// ERR: No Quadrant found
+				break;
+		}
+		
+		return _edgePoint;
+	}
+	
+	private function calcTangent(_d:Number, _use_adj_angle:Boolean) {
+		var d:Number = (_use_adj_angle) ? 90 - _d: _d;
+		return Math.tan(convertToRadians(d));
+	}
+	
 	private function onPress():Void{
 			// check double-click
 			var now:Number = new Date().getTime();

@@ -39,7 +39,7 @@ class Point  {
     * Constructor
     */
     function Point(x:Number,y:Number){
-        this.x = x;
-        this.y = y;
+        this.x = (x != null) ? x : null;
+        this.y = (y != null) ? y : null;
     }
 }
