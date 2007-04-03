@@ -23,8 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.util.zipfile;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,8 +32,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.zip.ZipOutputStream;
-import java.util.zip.ZipEntry;
+
 import junit.framework.TestCase;
 
 import org.lamsfoundation.lams.util.FileUtil;
@@ -152,7 +149,7 @@ public class TestZipFileUtil extends TestCase {
 
         try {
             // clean up any old directories so they don't interfere with test.
-            ZipFileUtil.cleanupOldFiles(5);
+        	FileUtil.cleanupOldFiles(FileUtil.getOldTempFiles(5));
             
     		Calendar foureDaysAgo = new GregorianCalendar();
     		foureDaysAgo.add(Calendar.DAY_OF_MONTH,-4);
@@ -187,7 +184,7 @@ public class TestZipFileUtil extends TestCase {
 
             // now sleep (so that the 4 days ago test works) and then delete...
             Thread.sleep(5);
-            int numDeleted = ZipFileUtil.cleanupOldFiles(4);
+            int numDeleted = FileUtil.cleanupOldFiles(FileUtil.getOldTempFiles(4));
             
             // only the "todelete" directory should be deleted
             // as the test almost done, be nice and clean up our test files.
