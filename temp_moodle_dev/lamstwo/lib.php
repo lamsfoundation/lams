@@ -185,7 +185,7 @@ function lamstwo_get_sequences($username,$courseid,$country,$lang) {
     }
     $rawstring = trim($datetime).trim($username).trim($CFG->lamstwo_serverid).trim($CFG->lamstwo_serverkey);
     $hashvalue = sha1(strtolower($rawstring));
-	$mode = 2; //monitor mode
+	$mode = 2; //monitor mode.  This will only retrieve valid learning designs.
     $parameters = array($CFG->lamstwo_serverid,$datetime,$hashvalue,$username,$courseid,$mode,$country,$lang);
     $result = $s->call('getLearningDesigns',$parameters);//Array of simpleLearningDesign objects
     if($s->getError()){//if some exception happened
