@@ -136,7 +136,7 @@ public class IntegrationService implements IIntegrationService{
 	private ExtCourseClassMap createExtCourseClassMap(ExtServerOrgMap serverMap, User user, String extCourseId, String countryIsoCode, String langIsoCode) {
 		Organisation org = new Organisation();
 		org.setName(buildName(serverMap.getPrefix(), extCourseId));
-		org.setCode(extCourseId);
+		org.setDescription(extCourseId);
 		org.setParentOrganisation(serverMap.getOrganisation());
 		org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.CLASS_TYPE));
 		org.setOrganisationState((OrganisationState)service.findById(OrganisationState.class,OrganisationState.ACTIVE));
