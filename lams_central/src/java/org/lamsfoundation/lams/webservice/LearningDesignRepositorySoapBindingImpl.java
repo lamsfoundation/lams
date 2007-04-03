@@ -160,7 +160,7 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 			Authenticator.authenticate(serverMap, datetime, username, hashValue);
 			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
 			integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang);
-			return buildContentTree(userMap.getUser().getUserId()).toString();
+			return buildContentTree(userMap.getUser().getUserId(), mode).toString();
 		} catch (Exception e) {
 			log.debug(e.getMessage(),e);
 			throw new RemoteException(e.getMessage(), e);
@@ -168,7 +168,7 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 
 	}
 
-	private ContentTreeNode buildContentTree(Integer userId) throws IOException,
+	private ContentTreeNode buildContentTree(Integer userId, Integer mode) throws IOException,
 			UserAccessDeniedException, RepositoryCheckedException {
 		log.debug("User Id - "+userId);
 		FolderContentDTO rootFolder = new FolderContentDTO(msgService
@@ -177,7 +177,7 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 				WorkspaceFolder.READ_ACCESS, null);
 		ContentTreeNode root = new ContentTreeNode(rootFolder);
 		FolderContentDTO userFolder = service.getUserWorkspaceFolder(userId);
-		root.addChild(buildContentTreeNode(userFolder, userId));
+		root.addChild(buildContentTreeNode(userFolder, userId, mode));
 		FolderContentDTO dummyOrgFolder = new FolderContentDTO(msgService
 				.getMessage("organisations"), msgService.getMessage("folder"), null, null,
 				FolderContentDTO.FOLDER, new Long(WorkspaceAction.ORG_FOLDER_ID.longValue()),
@@ -189,13 +189,13 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 		Vector orgFolders = service.getAccessibleOrganisationWorkspaceFolders(userId);
 		for (int i = 0; i < orgFolders.size(); i++) {
 			FolderContentDTO orgFolder = (FolderContentDTO) orgFolders.get(i);
-			dummyOrgNode.addChild(buildContentTreeNode(orgFolder, userId));
+			dummyOrgNode.addChild(buildContentTreeNode(orgFolder, userId, mode));
 		}
 		root.addChild(dummyOrgNode);
 		return root;
 	}
 
-	private ContentTreeNode buildContentTreeNode(FolderContentDTO folder, Integer userId)
+	private ContentTreeNode buildContentTreeNode(FolderContentDTO folder, Integer userId, Integer mode)
 			throws UserAccessDeniedException, RepositoryCheckedException {
 		log.debug("build content tree node for folder - "+folder.getName());
 		ContentTreeNode node = new ContentTreeNode(folder);
@@ -203,11 +203,10 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 			log.debug(folder.getName()+" is a folder");
 			WorkspaceFolder wsfolder = service
 					.getWorkspaceFolder(folder.getResourceID().intValue());
-			Vector items = service.getFolderContentsExcludeHome(userId, wsfolder,
-					WorkspaceManagementService.MONITORING);
+			Vector items = service.getFolderContentsExcludeHome(userId, wsfolder, mode);
 			for (int i = 0; i < items.size(); i++) {
 				FolderContentDTO content = (FolderContentDTO) items.get(i);
-				node.addChild(buildContentTreeNode(content, userId));
+				node.addChild(buildContentTreeNode(content, userId, mode));
 			}
 		}
 		return node;
