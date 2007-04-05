@@ -306,9 +306,11 @@ Ant build file.
 		<copy overwrite="yes" todir="${build}">
 			<fileset dir="${db.scripts}/">
 				<include name="${lamsconf.table.sql}" />
+                                <include name="create_lams_11_db.sql" />
 			</fileset>
 	        <filterset>
 	            <filter token="datetimestamp" value="${DSTAMP}${TSTAMP}"/>
+                    <filter token="dbname" value="${db.name}"/>
 	        </filterset>
 		</copy>
 
@@ -317,7 +319,7 @@ Ant build file.
 			<classpath>
 				<pathelement location="${db.driver.jar}"/>
 			</classpath>
-			<transaction src="${db.scripts}/create_lams_11_db.sql"/>
+			<transaction src="${build}/create_lams_11_db.sql"/>
 			<transaction src="${db.scripts}/drop_lams_11_tables.sql"/>
 			<transaction src="${db.scripts}/create_lams_11_tables.sql"/>
 			<!-- Create tables for LAMS and other application's integration -->
@@ -334,6 +336,7 @@ Ant build file.
 		</sql>
 		
 		<delete dir="${contentrepository.directory}"/>
+                <delete file="${build}/create_lams_11_db.sql"/>
 	</target>
 
 	<!-- =================================================================== -->
