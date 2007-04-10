@@ -67,7 +67,6 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
     private static var X_KEY:Number = 88;
     private static var C_KEY:Number = 67;
 	private static var D_KEY:Number = 68;
-	//private static var T_KEY:Number = 84;
     private static var V_KEY:Number = 86;
     private static var Z_KEY:Number = 90; 
     private static var Y_KEY:Number = 89;

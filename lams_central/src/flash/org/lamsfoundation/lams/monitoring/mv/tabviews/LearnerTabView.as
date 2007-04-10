@@ -66,6 +66,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private var learnersDrawn:Number;
 	private var learnerListArr:Array = new Array();
 	
+	private var bkg_pnl:MovieClip;
+	
 	private var _tm:ThemeManager;
 	private var _tip:ToolTip;
 	private var mm:MonitorModel;
@@ -119,6 +121,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
 		mm.getMonitor().getMV().getMonitorLearnerScp()._visible = false;
+		
     }    
 	
 	/**
@@ -431,7 +434,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	 */
 	private function setStyles():Void{
 		var styleObj = _tm.getStyleObject('BGPanel');
-		//bkg_pnl.setStyle('styleName',styleObj);
+		bkg_pnl.setStyle('styleName',styleObj);
 	}
 
 	private function gateTitle(a:Activity):String{
@@ -459,27 +462,22 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
 		
-		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
-		trace("scp width: "+mm.getMonitor().getMV().getMonitorLearnerScp()._width)
+		var scpWidth:Number = mm.getMonitor().getMV().getMonitorLearnerScp()._width;
+		var scpHeight:Number = mm.getMonitor().getMV().getMonitorLearnerScp()._height;
 		
-		var scpWidth:Number = mm.getMonitor().getMV().getMonitorLearnerScp()._width
+		var newWidth:Number;
 		
-		var newWidth:Number
-		
-		if (_activityLayer_mc._width < scpWidth){
-			newWidth = scpWidth - 6
-		}else {
-			newWidth = _activityLayer_mc._width
-		}
-		
+		newWidth = (_activityLayer_mc._width < scpWidth) ? scpWidth - 6 : _activityLayer_mc._width;
+
 		for (var i=0; i<learnerListArr.length; i++){
-			trace("button is: "+learnerListArr[i].learnerButton)
 			learnerListArr[i].learnerName._width = newWidth;
 			learnerListArr[i].learnerButton._x = newWidth-110;
-			
 		}
 		
-		//this._height = ((learnerListArr.length)*80)+35;
+		var learnerListHeight:Number = ((learnerListArr.length)*80)+35;
+		
+		bkg_pnl._visible = false;
+		bkg_pnl.setSize(_activityLayer_mc._width, learnerListHeight);
 		
 		mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
 	}
