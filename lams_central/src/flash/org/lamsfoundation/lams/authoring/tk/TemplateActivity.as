@@ -292,28 +292,25 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 
 	public function setState(selected:Boolean):Void{
 		if(selected){
-			
-			bkg_pnl.setStyle("backgroundColor",0x1B6BA7);
-						
+			var _taSelectedPanelStyle = _tm.getStyleObject("TAPanelSelected");
+			bkg_pnl.setStyle("styleName", _taSelectedPanelStyle);
 		}else{
-			rollOut()
-			
+			rollOut();
 		}	}
 	
 	private function select():Void{
-		//Debugger.log('btn: '+this,4,'select','TemplateActivity');
-		//Debugger.log('_toolkitView:'+_toolkitView.className(),4,'select','TemplateActivity');
 		_toolkitView.hideToolTip();
 		var toolkitController = _toolkitView.getController();
 		toolkitController.selectTemplateActivity(this);			
 	}
 	
 	private function rollOver():Void{
-		bkg_pnl.setStyle("backgroundColor",0xFFFFFF);
-		bkg_pnl.setStyle("borderStyle","outset");
+		
+		var _taRolloverPanelStyle = _tm.getStyleObject("TAPanelRollover");
+		
+		bkg_pnl.setStyle("styleName", _taRolloverPanelStyle);
+		
 		var ttMessage:String = "<b>"+_mainActivity.title+"</b> \n"+_mainActivity.description;
-		//var ttHolder = Application.tooltip;
-		//Tip.DisplayToolTip(ttHolder, ttMessage);
 		var ttypos = yPos + select_btn._height
 		var ttxpos = 2
 		_toolkitView.showToolTip(ttMessage, ttxpos, ttypos);

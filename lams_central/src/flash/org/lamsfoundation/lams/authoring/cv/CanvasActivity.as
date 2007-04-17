@@ -205,10 +205,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 					_selected_mc.removeMovieClip();
 				}
 				_selected_mc = _base_mc.createEmptyMovieClip('_selected_mc',_base_mc.getNextHighestDepth());
-				Draw.dashTo(_selected_mc,tl_x,tl_y,tr_x,tr_y,2,3,2,0x266DEE);
-				Draw.dashTo(_selected_mc,tr_x,tr_y,br_x,br_y,2,3,2,0x266DEE);
-				Draw.dashTo(_selected_mc,br_x,br_y,bl_x,bl_y,2,3,2,0x266DEE);
-				Draw.dashTo(_selected_mc,bl_x,bl_y,tl_x,tl_y,2,3,2,0x266DEE);
+				
+				var dashStyle:mx.styles.CSSStyleDeclaration = _tm.getStyleObject("CAHighlightBorder");
+				var color:Number = dashStyle.getStyle("color");
+				
+				Draw.dashTo(_selected_mc,tl_x,tl_y,tr_x,tr_y,2,3,2,color);
+				Draw.dashTo(_selected_mc,tr_x,tr_y,br_x,br_y,2,3,2,color);
+				Draw.dashTo(_selected_mc,br_x,br_y,bl_x,bl_y,2,3,2,color);
+				Draw.dashTo(_selected_mc,bl_x,bl_y,tl_x,tl_y,2,3,2,color);
 						
 				_isSelected = isSelected;
 					

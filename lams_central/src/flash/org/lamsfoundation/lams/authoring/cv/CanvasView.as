@@ -197,8 +197,10 @@ public function viewUpdate(event:Object):Void{
 			Application.getInstance().getCanvas().getCanvasView().getController().canvasRelease(this);
 		}
 		bkg_pnl.useHandCursor = false;
-		setDesignTitle()
 		
+		setDesignTitle();
+		
+		styleTitleBar();
 		setStyles();
 		
         //Debugger.log('canvas view dispatching load event'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
@@ -247,7 +249,6 @@ public function viewUpdate(event:Object):Void{
 		titleBar.rightCurve._x = bgWidth+27;
 		titleBar.rightCurveShadow._x = titleBar.rightCurve._x+2
 		
-		
 	}
 	
 	
@@ -255,6 +256,26 @@ public function viewUpdate(event:Object):Void{
 		titleBar._y = canvas_scp._y;
 		titleBar._x = (canvas_scp.width/2)-(titleBar._width/2)
 		read_only._x = titleBar._x + 5;
+		
+	}
+	
+	private function styleTitleBar():Void {
+		
+		var titleBarBg:mx.styles.CSSStyleDeclaration = _tm.getStyleObject("BGPanel");
+		var titleBarBgShadow:mx.styles.CSSStyleDeclaration = _tm.getStyleObject("BGPanelShadow");
+		
+		var nameBGColor:Color = new Color(titleBar.nameBG);
+		var nameBGShadowColor:Color = new Color(titleBar.nameBGShadow);
+		var rightCurveColor:Color = new Color(titleBar.rightCurve);
+		var rightCurveShadowColor:Color = new Color(titleBar.rightCurveShadow);
+		
+		var bgColor:Number = titleBarBg.getStyle("backgroundColor");
+		var bgShadowColor:Number = titleBarBgShadow.getStyle("backgroundColor");
+		
+		nameBGColor.setRGB(bgColor);
+		nameBGShadowColor.setRGB(bgShadowColor);
+		rightCurveColor.setRGB(bgColor);
+		rightCurveShadowColor.setRGB(bgShadowColor);
 		
 	}
    
