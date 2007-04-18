@@ -13,6 +13,7 @@ import org.lamsfoundation.lams.monitoring.Orgnanisation;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.ws.*
+import org.lamsfoundation.lams.common.Config
 
 import it.sephiroth.TreeDnd
 
@@ -45,6 +46,7 @@ class WizardView extends AbstractView {
 	private static var X_BUTTON_OFFSET:Number = 10;
 	private static var Y_BUTTON_OFFSET:Number = 15;
 	
+	public static var LOGO_PATH:String = "www/images/monitor.logo.swf";
 
 	private var _wizardView:WizardView;
 	private var _tm:ThemeManager;
@@ -158,6 +160,8 @@ class WizardView extends AbstractView {
 	public function init(m:Observable,c:Controller){
 		super (m, c);
 		
+		loadLogo();
+		
 		xNextOffset = panel._width - next_btn._x;
         yNextOffset = panel._height - next_btn._y;
 		xPrevOffset = panel._width - prev_btn._x;
@@ -171,6 +175,12 @@ class WizardView extends AbstractView {
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
 		
     }    
+	
+	private function loadLogo():Void{
+		logo = this.createEmptyMovieClip("logo", this.getNextHighestDepth());
+		var ml = new MovieLoader(Config.getInstance().serverUrl+WizardView.LOGO_PATH,null,this,logo);	
+	}
+	
 	
 	/**
  * Recieved update events from the WizardModel. Dispatches to relevent handler depending on update.Type
