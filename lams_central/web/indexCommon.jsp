@@ -33,8 +33,9 @@
 					</c:if>
 					<c:forEach var="lessonlink" items="${lesson.links}">
 						<a href="<c:out value='${lessonlink.url}'/>" class="sequence-action-link"> 
-							<img src="images/css/mycourses_monitor.jpg" alt="monitor" width="20" height="22" class="align-middle" /> 
-							<fmt:message key="${lessonlink.name}" /> 
+							<span class="mycourses-monitor-img"> 
+								<fmt:message key="${lessonlink.name}" /> 
+							</span>
 						</a>
 					</c:forEach>
 				</p>
@@ -49,8 +50,9 @@
 				</c:if>
 				<c:forEach var="childlink" items="${childOrg.links}">
 					<a href="<c:out value='${childlink.url}'/>" class="sequence-action-link"> 
-						<img src="images/css/mycourses_addlesson.jpg" alt="add lesson" width="20" height="18" class="align-middle"> 
-						<fmt:message key="${childlink.name}" /> 
+						<span class="mycourses-addlesson-img">
+							<fmt:message key="${childlink.name}" />
+						</span>
 					</a>
 				</c:forEach>
 			</p>
@@ -67,8 +69,9 @@
 					</c:if>
 					<c:forEach var="childlessonlink" items="${childLesson.links}">
 					<a href="<c:out value='${childlessonlink.url}'/>" class="sequence-action-link"> 
-						<img src="images/css/mycourses_monitor.jpg" alt="monitor" width="20" height="22" border="0" class="align-middle"> 
-						<fmt:message key="${childlessonlink.name}" /> 
+						<span class="mycourses-monitor-img"> 
+							<fmt:message key="${childlessonlink.name}" /> 
+						</span>
 					</a>
 					</c:forEach>
 				</p>

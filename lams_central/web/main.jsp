@@ -98,9 +98,9 @@
 						<td>
 							<div class="welcome">
 								<div class="float-left">
-									<img src="images/css/user.jpg" alt="" width="20" height="22" class="align-middle"/> 
+									<span class="user-img">
 									<fmt:message key="index.welcome" /> 
-									<lams:user property="firstName" />
+									<lams:user property="firstName" /></span>
 								</div>
 								<div class="float-right">
 									<c:if test="${not empty adminLinks}">
