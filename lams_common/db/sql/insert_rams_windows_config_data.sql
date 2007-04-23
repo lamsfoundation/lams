@@ -20,7 +20,7 @@ insert into lams_configuration (config_key, config_value) values ('LearnerClient
 insert into lams_configuration (config_key, config_value) values ('ServerVersionNumber','1.0.@datetimestamp@');
 insert into lams_configuration (config_key, config_value) values ('ServerLanguage','en_AU');
 insert into lams_configuration (config_key, config_value) values ('ServerPageDirection','LTR');
-insert into lams_configuration (config_key, config_value) values ('DictionaryDateCreated','2007-03-19');
+insert into lams_configuration (config_key, config_value) values ('DictionaryDateCreated','2007-04-23');
 insert into lams_configuration (config_key, config_value) values ('HelpURL','http://wiki.lamsfoundation.org/display/lamsdocs/');
 insert into lams_configuration (config_key, config_value) values ('XmppDomain','shaun.melcoe.mq.edu.au');
 insert into lams_configuration (config_key, config_value) values ('XmppConference','conference.shaun.melcoe.mq.edu.au');

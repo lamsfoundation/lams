@@ -1,8 +1,8 @@
-insert into lams_configuration (config_key, config_value) values ('ServerURL','http://localhost:8080/lams/');
+insert into lams_configuration (config_key, config_value) values ('ServerURL','http://shaun.melcoe.mq.edu.au/lams/');
 insert into lams_configuration (config_key, config_value) values ('Version','1.0');
 insert into lams_configuration (config_key, config_value) values ('TempDir','/var/opt/lams/temp');
 insert into lams_configuration (config_key, config_value) values ('DumpDir','/var/opt/lams/dump');
-insert into lams_configuration (config_key, config_value) values ('EARDir','/Users/fiona/development/jboss-4.0.2/server/default/deploy/lams.ear/');
+insert into lams_configuration (config_key, config_value) values ('EARDir','/usr/local/jboss-4.0.2/server/default/deploy/lams.ear');
 insert into lams_configuration (config_key, config_value) values ('SMTPServer','');
 insert into lams_configuration (config_key, config_value) values ('LamsSupportEmail','lams_support@melcoe.mq.edu.au');
 insert into lams_configuration (config_key, config_value) values ('ContentRepositoryPath','/var/opt/lams/repository');
