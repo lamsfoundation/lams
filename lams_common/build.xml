@@ -301,12 +301,12 @@ Ant build file.
 	<!-- Clean and rebuild the database. Also cleans out content repository  -->
 	<!-- =================================================================== -->
 	<target name="rebuild-db" depends="preparedirs"
-		description="rebuild LAMS database and clean out content repository. Mysql has to be running first">
+		description="rebuild LAMS/RAMS database and clean out content repository. Mysql has to be running first">
 		<tstamp/>
 		<copy overwrite="yes" todir="${build}">
 			<fileset dir="${db.scripts}/">
 				<include name="${lamsconf.table.sql}" />
-                                <include name="create_lams_11_db.sql" />
+                <include name="create_lams_11_db.sql" />
 			</fileset>
 	        <filterset>
 	            <filter token="datetimestamp" value="${DSTAMP}${TSTAMP}"/>
@@ -324,7 +324,7 @@ Ant build file.
 			<transaction src="${db.scripts}/create_lams_11_tables.sql"/>
 			<!-- Create tables for LAMS and other application's integration -->
 			<transaction src="${db.scripts}/create_integration_tables.sql"/>
-			<transaction src="${db.scripts}/insert_users.sql"/> 
+			<transaction src="${db.scripts}/insert_${conf.application}_users.sql"/> 
 			<transaction src="${db.scripts}/insert_types_data.sql"/>
 			<transaction src="${build}/${lamsconf.table.sql}"/>
 			<!-- Create Quartz table --> 
@@ -336,7 +336,8 @@ Ant build file.
 		</sql>
 		
 		<delete dir="${contentrepository.directory}"/>
-                <delete file="${build}/create_lams_11_db.sql"/>
+		
+        <delete file="${build}/create_lams_11_db.sql"/>
 	</target>
 
 	<!-- =================================================================== -->
