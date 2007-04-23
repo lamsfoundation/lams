@@ -36,25 +36,6 @@ if (!isset($form->create_sequence_url)) {
 
 <link type="text/css" rel="stylesheet" href="../mod/lamstwo/calendar.css">
 
-<script language="javascript" type="text/javascript">
-<!--
-
-      function expand_all () {
-            for (var i = 1; i < trees[0].a_index.length; i++) {
-              var o_item = trees[0].a_index[i];
-              if (!o_item.b_opened) o_item.open();
-               }
-      }
-
-      function collapse_all () {
-         for (var i = 1; i < trees[0].a_index.length; i++) {
-           var o_item = trees[0].a_index[i];
-           if (o_item.b_opened) o_item.open(1);
-        }
-     }
-
-//-->	
-</script>
 <form name="form" method="post" action="mod.php">
 <!-- The following line for Moodle 1.5 prints the visibility setting form element -->
 <!-- <?php print_visible_setting($form); ?> -->
@@ -81,7 +62,7 @@ if (!isset($form->create_sequence_url)) {
 			<tr>
 				<td align="left"> 
 					<script type="text/javascript" src="../mod/lamstwo/tree.js"></script>
-					<script type="text/javascript" src="../mod/lamstwo/tree_tpl.js" onload="collapse_all()"></script>
+					<script type="text/javascript" src="../mod/lamstwo/tree_tpl.js"></script>
 					<script language="javascript">
 						<!--
 							<?php $lds = lamstwo_get_sequences($USER->username,$form->course,$USER->country,$USER->lang);
