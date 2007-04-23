@@ -112,10 +112,37 @@
 				<include name="**/*.xml"/>
 			</fileset>
 		</copy>
+		<copy overwrite="yes" todir="web/flashxml">
+			<fileset dir="${conf.dir}/flashxml/${conf.application}">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="test-application">
+		  <condition property="isLAMS">
+		  	<equals arg1="${conf.application}" arg2="lams" />
+		  </condition>
+		  <condition property="isRAMS">
+		  	<equals arg1="${conf.application}" arg2="rams" />
+		  </condition>
+		  <echo>isLAMS ${isLAMS}</echo>
+		  <echo>isRAMS ${isRAMS}</echo>
+	</target>
+
+	<target name="update-logo-for-RAMS" depends="test-application" if="isRAMS" description="Overwrite the LAMS logo with the RAMS logo">
+		<echo>Setting login logo to RAMS</echo>
+		<copy overwrite="yes" todir="${build.lib}/${product}.war/images/css/">
+			<fileset dir="${build.lib}/${product}.war/images/ramsthemecss/">
+				<include name="rams_login.gif"/>
+			</fileset>
+		</copy>
+		<move overwrite="yes" tofile="${build.lib}/${product}.war/images/css/lams_login.gif"
+			file="${build.lib}/${product}.war/images/css/rams_login.gif" verbose="true"/>
 	</target>
 
 	<target name="build-war" depends="webdoclet,build-jar,copyConfFlashFiles" description="creates war file">
-		<delete file="${build.lib}/${product}.war"/>
+		<delete dir="${build.lib}/${product}.war"/>
 		<war warfile="${build.lib}/${product}.war" manifest="${conf.dir}/war/META-INF/MANIFEST.MF"
   				webxml="${conf.webinf.dir}/web.xml">
 			<webinf dir="${conf.webinf.dir}">
@@ -145,7 +172,11 @@
 				<exclude name="classes"/>
 			</fileset>
 		</war>
+		<move file="${build.lib}/lams-central.war" tofile="${build.lib}/temp.war"/>
+		<unjar src="${build.lib}/temp.war" dest="${build.lib}/lams-central.war"/>
+		<antcall target="update-logo-for-RAMS"/>
 	</target>
+
 
 	<!-- ================================================================ -->
 	<!-- Make jar archive for deployment        		    	          -->

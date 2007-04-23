@@ -57,7 +57,7 @@
 
 
 	<!-- build sub-projects -->
-	<target name="build-subprojects"
+	<target name="build-subprojects" 
 		description="builds sub porjects">
 		<copy overwrite="yes" todir="${shareddtd}">
 			<fileset dir="${conf.auth}">
@@ -68,8 +68,7 @@
 			inheritAll="false" />
 		<ant antfile="../${lams_contentrepository}/build.xml"
 			target="build-jar" inheritAll="false" />
-		<ant antfile="../${lams_central}/build.xml" target="build-war"
-			inheritAll="false" />
+		<ant antfile="../${lams_central}/build.xml" target="build-war" inheritAll="false"/>
 		<ant antfile="../${lams_learning}/build.xml" target="build-war" inheritAll="false"/>
 		<ant antfile="../${lams_monitoring}/build.xml"  target="build-war" inheritAll="false"/>
 		<ant antfile="../${lams_admin}/build.xml" target="build-war" inheritAll="false"/>
@@ -153,7 +152,6 @@
 			<fileset dir="..">
 				<include name="${lams_common}/${sub.build.lib}/*.jar" />
 				<include name="${lams_contentrepository}/${sub.build.lib}/*.jar" />
-				<include name="${lams_central}/${sub.build.lib}/*.war" />
 				<include name="${lams_central}/${sub.build.lib}/*.jar" />
 				<include name="${lams_monitoring}/${sub.build.lib}/*.jar"/>
 				<include name="${lams_monitoring}/${sub.build.lib}/*.war"/>
@@ -164,6 +162,12 @@
 				<include name="${lams_www}/${sub.build.lib}/*.war"/>
 			</fileset>
 		</copy> 
+		<!-- lams-central.war is already expanded -->
+		<copy todir="${assembly}/temp/" failonerror="true">
+			<fileset dir="../${lams_central}/${sub.build.lib}/">
+				<include name="lams-central.war/**/*.*" />
+			</fileset>
+		</copy>		
 		<!-- Pull out all the language files -->
 		<mkdir dir="${assembly}/temp/lams-dictionary.jar" />
 		<copy todir="${assembly}/temp/lams-dictionary.jar" failonerror="true">
@@ -182,9 +186,8 @@
 		<!-- remove temp lib -->
 <!--		<delete dir="${assembly}/temp" includeEmptyDirs="true" /> -->
 		<!-- explode the ear (Why doesn't the EAR task support exploded format?) -->
+		<!-- lams-central.war is already exploded when copied -->
 		<unjar src="${assembly.temp.ear}" dest="${assembly.lams.ear}" />
-		<move file="${assembly.lams.ear}/lams-central.war" tofile="${assembly.lams.ear}/temp.war"/>
-		<unjar src="${assembly.lams.ear}/temp.war" dest="${assembly.lams.ear}/lams-central.war"/>
 		<move file="${assembly.lams.ear}/lams-www.war" tofile="${assembly.lams.ear}/temp.war"/>
 		<unjar src="${assembly.lams.ear}/temp.war" dest="${assembly.lams.ear}/lams-www.war"/>
 		<delete file="${assembly.lams.ear}/temp.war"/>
