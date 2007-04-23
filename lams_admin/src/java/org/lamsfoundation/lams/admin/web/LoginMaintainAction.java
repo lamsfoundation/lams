@@ -59,12 +59,8 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
  */
 public class LoginMaintainAction extends Action {
 
-	private static final String NEWS_PAGE_PATH = Configuration
-			.get(ConfigurationKeys.LAMS_EAR_DIR)
-			+ File.separatorChar
-			+ "lams-www.war"
-			+ File.separatorChar
-			+ "news.html";
+	private static final String NEWS_PAGE_PATH_SUFFIX = File.separatorChar
+			+ "lams-www.war" + File.separatorChar + "news.html";
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -78,7 +74,9 @@ public class LoginMaintainAction extends Action {
 	private String loadNews() throws IOException {
 		BufferedReader bReader = null;
 		try {
-			InputStreamReader ir = new InputStreamReader(new FileInputStream(NEWS_PAGE_PATH),Charset.forName("UTF-8"));
+			InputStreamReader ir = new InputStreamReader(new FileInputStream(
+					Configuration.get(ConfigurationKeys.LAMS_EAR_DIR)+NEWS_PAGE_PATH_SUFFIX),
+					Charset.forName("UTF-8"));
 			bReader = new BufferedReader(ir);
 			StringBuilder news = new StringBuilder();
 			String line = bReader.readLine();

@@ -75,26 +75,14 @@ public class LoginSaveAction extends LamsDispatchAction {
 
 	private static final String ALPHABET = "ABCDEFGHIJKLMOPQRSTUWVXYZabcdefghijklmnopqrstuvwxyz_1234567890";
 
-	private static final String IMAGE_FOLDER = Configuration
-			.get(ConfigurationKeys.LAMS_EAR_DIR)
-			+ File.separatorChar
-			+ "lams-www.war"
-			+ File.separatorChar
-			+ "images";
+	private static final String IMAGE_FOLDER_SUFFIX = File.separatorChar 
+			+ "lams-www.war" + File.separatorChar + "images";
 
-	private static final String LOGIN_PAGE_PATH = Configuration
-			.get(ConfigurationKeys.LAMS_EAR_DIR)
-			+ File.separatorChar
-			+ "lams-central.war"
-			+ File.separatorChar
-			+ "login.jsp";
+	private static final String LOGIN_PAGE_PATH_SUFFIX = File.separatorChar
+			+ "lams-central.war" + File.separatorChar + "login.jsp";
 
-	private static final String NEWS_PAGE_PATH = Configuration
-			.get(ConfigurationKeys.LAMS_EAR_DIR)
-			+ File.separatorChar
-			+ "lams-www.war"
-			+ File.separatorChar
-			+ "news.html";
+	private static final String NEWS_PAGE_PATH_SUFFIX = File.separatorChar
+			+ "lams-www.war" + File.separatorChar + "news.html";
 
 	public ActionForward save(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -127,7 +115,8 @@ public class LoginSaveAction extends LamsDispatchAction {
 	private String fixBuggyFileName(String fileName) {
 		fileName = generateRandomFileName() + fileName.substring(fileName.lastIndexOf('.'));
 		int i=0;
-		while(new File(IMAGE_FOLDER + File.separatorChar + fileName).exists()){
+		while(new File(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) 
+				+ IMAGE_FOLDER_SUFFIX + File.separatorChar + fileName).exists()){
 			fileName = fileName.replace(".", new Integer(i).toString());
 			i++;
 		}
@@ -148,7 +137,9 @@ public class LoginSaveAction extends LamsDispatchAction {
 	private void updateNewsPage(String news) throws IOException {
 		BufferedWriter bWriter = null;
 		try {
-			OutputStreamWriter ow = new OutputStreamWriter(new FileOutputStream(NEWS_PAGE_PATH),Charset.forName("UTF-8"));
+			OutputStreamWriter ow = new OutputStreamWriter(new FileOutputStream(
+					Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + NEWS_PAGE_PATH_SUFFIX), 
+					Charset.forName("UTF-8"));
 			bWriter = new BufferedWriter(ow);
 			bWriter.write(news);
 			bWriter.flush();
@@ -162,7 +153,8 @@ public class LoginSaveAction extends LamsDispatchAction {
 		BufferedReader bReader = null;
 		BufferedWriter bWriter = null;
 		try {
-			bReader = new BufferedReader(new FileReader(LOGIN_PAGE_PATH));
+			bReader = new BufferedReader(new FileReader(
+					Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + LOGIN_PAGE_PATH_SUFFIX));
 			StringBuilder source = new StringBuilder();
 			String line = bReader.readLine();
 			while (line != null) {
@@ -174,7 +166,8 @@ public class LoginSaveAction extends LamsDispatchAction {
 				int startIndex = index + LOGO_TAG.length();
 				int endIndex = source.indexOf("\"", startIndex);
 				source.replace(startIndex, endIndex, url);
-				bWriter = new BufferedWriter(new FileWriter(LOGIN_PAGE_PATH));
+				bWriter = new BufferedWriter(new FileWriter(
+						Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + LOGIN_PAGE_PATH_SUFFIX));
 				bWriter.write(source.toString());
 				bWriter.flush();
 			}
@@ -193,11 +186,13 @@ public class LoginSaveAction extends LamsDispatchAction {
 
 	private void createImageFile(FormFile file, String fileName)
 			throws IOException {
-		File imagesFolder = new File(IMAGE_FOLDER);
+		File imagesFolder = new File(
+				Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + IMAGE_FOLDER_SUFFIX);
 		if (!imagesFolder.exists()) {
 			imagesFolder.mkdir();
 		}
-		String imageFilePath = IMAGE_FOLDER + File.separatorChar + fileName;
+		String imageFilePath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) 
+			+ IMAGE_FOLDER_SUFFIX + File.separatorChar + fileName;
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(imageFilePath);
