@@ -141,6 +141,9 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
     	logger.debug("final exportPortfolioDTO: " + exportPortfolioDTO);
     	logger.debug("final exportPortfolioDTO userExceptionNoToolSessions: " + exportPortfolioDTO.getUserExceptionNoToolSessions() );
     	request.getSession().setAttribute(EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
+    	// VoteChartGenerator.create{Pie|Bar}Chart expects these to be session attributes
+    	request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, exportPortfolioDTO.getMapStandardNominationsHTMLedContent());
+    	request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, exportPortfolioDTO.getMapStandardRatesContent());
     	
     	//	voteMonitoringAction.prepareReflectionData(request, content, voteService, userID.toString(),true);
 
