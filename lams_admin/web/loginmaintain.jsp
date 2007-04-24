@@ -17,12 +17,12 @@
 <div align="center">
 <fck:editor id="news" basePath="/lams/fckeditor/"
     width = "95%"
-	imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"
-	linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
-	flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector"
-	imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
-	linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
-	flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
+	imageBrowserURL="/lams/fckeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector&amp;CurrentFolder=/-1/"
+	linkBrowserURL="/lams/fckeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&amp;CurrentFolder=/-1/"
+	flashBrowserURL="/lams/fckeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector&amp;CurrentFolder=/-1/"
+	imageUploadURL="/lams/fckeditor/editor/filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/-1/"
+	linkUploadURL="/lams/fckeditor/editor/filemanager/upload/simpleuploader?Type=File&CurrentFolder=/-1/"
+	flashUploadURL="/lams/fckeditor/editor/filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/-1/"
 	defaultLanguage="${language}" 
 	autoDetectLanguage="false"
 	> 
