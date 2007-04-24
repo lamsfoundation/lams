@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <tiles-definitions>
+	<definition name=".cleanup" path="/template.jsp">
+		<put name="title" value="sysadmin.batch.temp.file.delete"/>
+		<put name="content" value="cleanup.jsp" />	
+	</definition>
+	
 	<definition name=".importv1result" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
 		<put name="content" value="import/importv1result.jsp" />	
