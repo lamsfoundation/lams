@@ -157,7 +157,7 @@ public class LearnerAction extends DispatchAction {
 		sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER,content.getLimitUploadNumber());
 		sessionMap.put(SbmtConstants.ATTR_USER_FINISHED, learner.isFinished());
 		
-		setLearnerDTO(request, sessionMap, learner, filesUploaded);
+		setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
 		
 		//if content in use, return special page.
 		if(content.isDefineLater()){
@@ -211,7 +211,8 @@ public class LearnerAction extends DispatchAction {
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 
 			SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
-			setLearnerDTO(request,sessionMap, learner, filesUploaded);
+			ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+			setLearnerDTO(request,sessionMap, learner, filesUploaded, mode);
 			
 			return mapping.getInputForward();
 		}
@@ -233,8 +234,8 @@ public class LearnerAction extends DispatchAction {
 		submitFilesService.uploadFileToSession(sessionID,uploadedFile,fileDescription,userID);
 		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 		SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
-		
-		setLearnerDTO(request,sessionMap, learner, filesUploaded);
+		ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+		setLearnerDTO(request,sessionMap, learner, filesUploaded, mode);
 		return mapping.getInputForward();			
 	}
 
@@ -339,7 +340,7 @@ public class LearnerAction extends DispatchAction {
 	 * @param content
 	 * @param filesUploaded 
 	 */
-	private void setLearnerDTO(HttpServletRequest request, SessionMap sessionMap, SubmitUser currUser, List filesUploaded) {
+	private void setLearnerDTO(HttpServletRequest request, SessionMap sessionMap, SubmitUser currUser, List filesUploaded, ToolAccessMode mode) {
 		
 		SubmitUserDTO dto = new SubmitUserDTO(currUser);
 		if(currUser != null){
@@ -348,7 +349,7 @@ public class LearnerAction extends DispatchAction {
 				Iterator iter = filesUploaded.iterator();
 				while(iter.hasNext()){
 					FileDetailsDTO filedto = (FileDetailsDTO) iter.next();
-					if(currUser.getUid().equals(filedto.getOwner().getUserUid()))
+					if(mode.isTeacher() ||  currUser.getUid().equals(filedto.getOwner().getUserUid()))
 						filedto.setCurrentLearner(true);
 					else
 						filedto.setCurrentLearner(false);
