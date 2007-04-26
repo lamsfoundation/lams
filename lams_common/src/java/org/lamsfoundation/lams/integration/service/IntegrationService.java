@@ -31,6 +31,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
@@ -225,8 +226,10 @@ public class IntegrationService implements IIntegrationService{
 			String timestamp = Long.toString(new Date().getTime());
 			String hash = hash(serverMap, extUsername, timestamp);
 			
+			String encodedExtUsername = URLEncoder.encode(extUsername, "UTF8");
+			
 			//set the values for the parameters
-			userDataCallbackUrl = userDataCallbackUrl.replaceAll("%username%", extUsername).replaceAll("%timestamp%", timestamp).replaceAll("%hash%", hash);
+			userDataCallbackUrl = userDataCallbackUrl.replaceAll("%username%", encodedExtUsername).replaceAll("%timestamp%", timestamp).replaceAll("%hash%", hash);
 			log.debug(userDataCallbackUrl);
 			URL url = new URL(userDataCallbackUrl);
 			URLConnection conn = url.openConnection();
