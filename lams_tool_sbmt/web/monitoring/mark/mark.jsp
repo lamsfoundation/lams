@@ -7,6 +7,10 @@
 	<title><fmt:message key="activity.title" /></title>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
+	<c:set var="lams">
+		<lams:LAMSURL />
+	</c:set>
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript">
 		function updateMark(detailId,reportId,sessionId,userId){
 			var act = "<c:url value="/monitoring.do"/>";
