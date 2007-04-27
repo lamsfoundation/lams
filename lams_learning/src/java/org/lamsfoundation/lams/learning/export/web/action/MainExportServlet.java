@@ -98,6 +98,7 @@ public class MainExportServlet extends HttpServlet {
 		Long lessonID = null;
 		String role = null;
 		ToolAccessMode accessMode = null;
+		String exportFilename = "";
 		
 	    /** Get the cookies that were sent along with this request, then pass it onto export service */
 		Cookie[] cookies = request.getCookies();	
@@ -116,12 +117,14 @@ public class MainExportServlet extends HttpServlet {
 		    }
 		    
 		    portfolios = exportService.exportPortfolioForStudent(userId, lessonID, true, accessMode, cookies);
+		    exportFilename = ExportPortfolioConstants.EXPORT_LEARNER_PREFIX + " " + portfolios.getLessonName() + ".zip";
 		}
 		else if(mode.equals(ToolAccessMode.TEACHER.toString()))
 		{
 			//done in the monitoring environment
 			lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));			
 			portfolios = exportService.exportPortfolioForTeacher(lessonID, cookies);
+			exportFilename = ExportPortfolioConstants.EXPORT_TEACHER_PREFIX + " " + portfolios.getLessonName() + ".zip";
 		}
 		
 		if (portfolios!= null)
@@ -141,8 +144,7 @@ public class MainExportServlet extends HttpServlet {
 			bundler.bundleStylesheet();
 			
 			// zip up the contents of the temp export folder 
-			String zipFilename = exportService.zipPortfolio(ExportPortfolioConstants.ZIP_FILENAME, exportTmpDir);
-			
+			String zipFilename = exportService.zipPortfolio(exportFilename, exportTmpDir);
 /*			-- Used for testing timeout  change the export url in exportWaitingPage to  
 			-- String exportUrl = learning_root + "portfolioExport?" + request.getQueryString()+"&sleep=1800000";
 			-- to pause for 30 mins. 

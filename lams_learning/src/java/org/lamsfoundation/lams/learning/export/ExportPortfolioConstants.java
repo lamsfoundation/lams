@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.learning.export;
 
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.FileUtil;
 
 /**
  * @author mtruong
@@ -41,7 +40,8 @@ public class ExportPortfolioConstants {
 	public static final String DIR_SUFFIX_ZIP = "exportZipFile"; //suffix for the tmp directory. For eg. lamstmp_1129615396387_exportZipFile
 	public static final String MAIN_EXPORT_FILENAME = "export_main.html";
 	public static final String MAIN_NOTEBOOK_FILENAME = "notebook_main.html";
-	public static final String ZIP_FILENAME = "export.zip";
+	public static final String EXPORT_LEARNER_PREFIX = "Portfolio";
+	public static final String EXPORT_TEACHER_PREFIX = "Class Portfolio";
 	public static final String HOST = getServerURL();
 	public static final String SUBDIRECTORY_BASENAME = "Activity"; //subdirectory for each activity is ActivityXX where XX is the activity Id
 	public static final String SUBDIRECTORY_NOTEBOOK_BASENAME = "Notebook";
