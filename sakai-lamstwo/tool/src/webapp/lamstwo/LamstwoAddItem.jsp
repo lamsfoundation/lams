@@ -141,7 +141,12 @@
   		
   		<script type="text/javascript">
 			//<![CDATA[
-			var sequenceId = document.getElementById("addUpdateItem:itemSequenceId").value;
+			var sequenceIdElem = document.getElementById("addUpdateItem:itemSequenceId");
+			
+			var sequenceId = null;			
+			if (sequenceIdElem != null) {
+				sequenceId = sequenceIdElem.value;
+			}
 			
   			if (!lessonCreated && (sequenceId == "0")) {
   				document.getElementById("stage1").style.display = 'block';
