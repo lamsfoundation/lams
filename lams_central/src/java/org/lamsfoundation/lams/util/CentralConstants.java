@@ -28,4 +28,54 @@ public class CentralConstants {
 
 	public static final String MODULE_NAME = "central";
 	
+	// Constants used by web services.
+	public static final String PARAM_SERVER_ID = "serverId";
+
+	public static final String PARAM_DATE_TIME = "datetime";
+
+	public static final String PARAM_HASH_VALUE = "hashValue";
+
+	public static final String PARAM_USERNAME = "username";
+
+	public static final String PARAM_COURSE_ID = "courseId";
+
+	public static final String PARAM_LEARNING_DESIGN_ID = "ldId";
+
+	public static final String PARAM_LESSON_ID = "lsId";
+
+	public static final String PARAM_TITLE = "title";
+
+	public static final String PARAM_DESC = "desc";
+
+	public static final String PARAM_STARTDATE = "startdate";
+
+	public static final String PARAM_COUNTRY = "country";
+
+	public static final String PARAM_LANG = "lang";
+
+	public static final String PARAM_METHOD = "method";
+
+	public static final String METHOD_START = "start";
+
+	public static final String METHOD_SCHEDULE = "schedule";
+
+	public static final String METHOD_DELETE = "delete";	
+	
+	public static final String PARAM_MODE = "mode";
+	
+	
+	public static final String ELEM_LESSON = "Lesson";
+	
+	public static final String ATTR_LESSON_ID = "lessonId";
+	
+	public static final String ATTR_DELETED = "deleted";
+	
+	
+	public static final String ELEM_FOLDER = "Folder";
+	
+	public static final String ELEM_LEARNING_DESIGN = "LearningDesign";
+	
+	public static final String ATTR_NAME = "name";
+	
+	public static final String ATTR_RESOURCE_ID = "resourceId";
 }

@@ -27,3 +27,13 @@
 	<servlet-name>LoginRequest</servlet-name>
 	<url-pattern>/LoginRequest</url-pattern>
 </servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>LearningDesignRepository</servlet-name>
+	<url-pattern>/services/xml/LearningDesignRepository/*</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>LessonManager</servlet-name>
+	<url-pattern>/services/xml/LessonManager/*</url-pattern>
+</servlet-mapping>

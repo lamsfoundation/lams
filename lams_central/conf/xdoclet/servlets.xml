@@ -60,3 +60,19 @@
 		org.lamsfoundation.lams.web.LoginRequestServlet
 	</servlet-class>
 </servlet>
+
+<servlet>
+	<servlet-name>LearningDesignRepository</servlet-name>
+	<display-name>LearningDesignRepository Servlet</display-name>
+	<servlet-class>
+		org.lamsfoundation.lams.webservice.xml.LearningDesignRepositoryServlet
+	</servlet-class>
+</servlet>
+
+<servlet>
+	<servlet-name>LessonManager</servlet-name>
+	<display-name>LessonManager Servlet</display-name>
+	<servlet-class>
+		org.lamsfoundation.lams.webservice.xml.LessonManagerServlet
+	</servlet-class>
+</servlet>
