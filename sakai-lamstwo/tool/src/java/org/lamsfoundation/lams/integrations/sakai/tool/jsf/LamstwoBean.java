@@ -307,6 +307,13 @@ public class LamstwoBean {
 		return "openMonitor";
 	}
 	
+	public String processActionRefreshWorkspace() {
+		log.debug("in process refresh workspace");
+		learningDesigns = logic.getLearningDesigns(MONITORING_MODE);
+		itemSequenceId = 0L;  // reset sequenceId since tree may have changed.
+		return "newItem";
+	}
+	
 	public Boolean getCanCreateItem() {
 		return logic.canCreateItem();
 	}

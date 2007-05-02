@@ -56,6 +56,11 @@
 		    	
 		    	document.getElementById("addUpdateItem:tree:nextButton").disabled = false;
 		    }
+		    
+		    function clearSequence() {
+		    	var itemSequenceId = document.getElementById('addUpdateItem:itemSequenceId');
+		    	itemSequenceId.value = 0;	    
+		    }
 
 			function openAuthor() {
 				//url = url + "&notifyCloseURL=" + escape(window.location.href);
@@ -93,12 +98,13 @@
 						
 						<sakai:button_bar>
 							<h:commandButton value="#{msgs.lamstwo_open_author}" onclick="openAuthor(); return false;" />
+							<h:commandButton value="#{msgs.lamstwo_refresh_workspace}" action="#{LamstwoBean.processActionRefreshWorkspace}" onclick="clearSequence()" immediate="true"/>
 							<h:commandButton id="nextButton" value="#{msgs.lamstwo_next}" onclick="nextStage(); return false;" disabled="true"/>
 		                </sakai:button_bar>
 					</div>
 				</f:subview>
 				
-				<h:inputHidden id="itemSequenceId" value="#{LamstwoBean.itemSequenceId}" rendered="#{not LamstwoBean.lessonCreated}">
+				<h:inputHidden id="itemSequenceId" value="#{LamstwoBean.itemSequenceId}" rendered="#{not LamstwoBean.lessonCreated}" >
 					<f:validateLongRange minimum="1"/>
 				</h:inputHidden>
 				
