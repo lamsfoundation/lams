@@ -44,6 +44,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 	private var okClickedCallback:Function;
 	private var _workspaceController:WorkspaceController;
 	private var dialog:MovieClip;
+	private var cursorContainer:MovieClip;
 	/*
 	* Constructor
 	*/
@@ -108,8 +109,10 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
         }
 		
 		Debugger.log('_workspaceController:'+_workspaceController,4,'createWorkspaceDialogOpen','WorkspaceView');
-        //Assign dialog load handler
-        dialog.addEventListener('contentLoaded',Delegate.create(_workspaceController,_workspaceController.openDialogLoaded));
+        cursorContainer = dialog.createEmptyMovieClip('_cursorContainer_mc', dialog.getNextHighestDepth());
+		
+		//Assign dialog load handler
+		dialog.addEventListener('contentLoaded',Delegate.create(_workspaceController,_workspaceController.openDialogLoaded));
 		
     }
 	
@@ -131,7 +134,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 	 * @return  
 	 */
 	public function set workspaceDialog (newworkspaceDialog:MovieClip):Void {
-		_workspaceDialog = newworkspaceDialog;
+		dialog = newworkspaceDialog;
 	}
 	/**
 	 * 
@@ -139,9 +142,12 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 	 * @return  
 	 */
 	public function get workspaceDialog ():MovieClip {
-		return _workspaceDialog;
+		return dialog;
 	}
 
+	public function get workspaceCursor():MovieClip {
+		return cursorContainer;
+	}
 	
 	public function clearDialog():Void {
 		dialog.deletePopUp();

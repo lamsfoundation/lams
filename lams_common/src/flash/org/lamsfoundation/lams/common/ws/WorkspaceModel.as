@@ -21,8 +21,11 @@
  * ************************************************************************
  */
 import org.lamsfoundation.lams.common.ws.*;
-import org.lamsfoundation.lams.common.util.*
-import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.dict.*;
+import org.lamsfoundation.lams.common.ui.Cursor;
+import org.lamsfoundation.lams.common.ApplicationParent;
+
 //import mx.utils.ObjectCopy;
 import mx.events.*
 import mx.utils.*
@@ -225,6 +228,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 * @return  
 	 */
 	public function openFolderInTree(resourceToOpen:Number, forced:Boolean):Void{
+		
+		Cursor.showCursor(ApplicationParent.C_HOURGLASS, _workspace.getWV().workspaceCursor);
+		
 		Debugger.log('resourceToOpen :'+resourceToOpen ,Debugger.GEN,'openFolderInTree','org.lamsfoundation.lams.WorkspaceModel');
 		//lets see if its in the hash table already (prob not)
 		//if(_workspaceResources.get(resourceToOpen).attributes.data.contents == undefined){
@@ -335,6 +341,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		//dispatch an update to the view
 		if(openFolder) { broadcastViewUpdate('UPDATE_CHILD_FOLDER',nodeToUpdate); } 
 		else { broadcastViewUpdate('UPDATE_CHILD_FOLDER_NOOPEN',nodeToUpdate);  }
+		
+		Cursor.showCursor(ApplicationParent.C_DEFAULT);
+		
 		
 	}
 	

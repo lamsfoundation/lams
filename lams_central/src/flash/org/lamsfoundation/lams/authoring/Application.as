@@ -72,7 +72,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private static var DIALOGUE_DEPTH:Number = 20;	//depth of the dialogue box
     private static var TOOLTIP_DEPTH:Number = 60;	//depth of the tooltip
     private static var CURSOR_DEPTH:Number = 70;   //depth of the cursors
-	private static var CCURSOR_DEPTH:Number = 101;
+	private static var CCURSOR_DEPTH:Number = 201;
     private static var MENU_DEPTH:Number = 25;   //depth of the menu
 	private static var PI_DEPTH:Number = 35;   //depth of the menu
     private static var TOOLBAR_DEPTH:Number = 50;   //depth of the menu

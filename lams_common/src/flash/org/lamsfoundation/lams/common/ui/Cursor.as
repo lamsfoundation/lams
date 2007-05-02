@@ -33,8 +33,9 @@ import mx.managers.DepthManager;
 * Used to set alternitive cursors to the UI
 */  
 class Cursor {  
-	private static var _cursors:Array = new Array();;
-	private static var _current:String = new String();;
+	private static var _cursors:Array = new Array();
+	private static var _bk_cursors:Array = new Array();
+	private static var _current:String = new String();
     //Declarations  
     //Constructor  
   function Cursor() {  
@@ -49,12 +50,15 @@ class Cursor {
 		//var _cursor = _root.attachMovie(id,id+'_mc',DepthManager.kCursor);
 		//Debugger.log('Test cursor id:' + id + '(' + _cursor + ')',Debugger.GEN,'addCursor','Cursor');
 		
-		var cursor_mc:MovieClip = ApplicationParent.ccursor.createChildAtDepth(id, DepthManager.kCursor);
+		//var cursor_mc:MovieClip = ApplicationParent.ccursor.createChildAtDepth(id, DepthManager.kCursor);
 		
 		//var cursor_mc:MovieClip = DepthManager.createObjectAtDepth(id, DepthManager.kCursor);
-		cursor_mc._visible = false;
-		_cursors[id]=cursor_mc;
-		Debugger.log('Adding cursor ID:'+id+'('+cursor_mc+')',Debugger.GEN,'addCursor','Cursor');
+		//cursor_mc._visible = false;
+		//_cursors[id]=cursor_mc;
+		
+		updateOrCreateCursorRef(id, ApplicationParent.ccursor, DepthManager.kCursor);
+		
+		Debugger.log('Adding cursor ID:'+id+'('+_cursors[id]+')',Debugger.GEN,'addCursor','Cursor');
 	}
 	
 	public static function removeCursor(id:String):Void{
@@ -70,7 +74,7 @@ class Cursor {
 	 * 			Stored as static constants E.g: Aplication.C_HOURGLASS
 	 * @return  
 	 */
-	public static function showCursor(id:String):Void{
+	public static function showCursor(id:String, target:MovieClip):Void{
 		Debugger.log('ID:'+id,Debugger.GEN,'showCursor','Cursor');
 		//TODO: Disable the UI when wait cursor is shown
 		
@@ -81,12 +85,38 @@ class Cursor {
 		}else{
 			Mouse.hide();
 			_cursors[_current]._visible = false;
-			_cursors[id]._visible = true;
+			
+			if(_current != id) {
+			
+				if(target != null || target != undefined) {
+					updateOrCreateCursorRef(id, target, target._parent.getNextHighestDepth());
+				} else {
+					updateOrCreateCursorRef(id, ApplicationParent.ccursor, DepthManager.kCursor);
+				}
+			}
+			
 			startDrag(_cursors[id], true);
+			_cursors[id]._visible = true;
 		}
 		_current = id;
 	}
 	
+	public static function updateOrCreateCursorRef(cursor_id:String, target:MovieClip, depth:Number) {
+		Debugger.log('cursor_id:'+cursor_id + " target: " + target + " depth: " + depth,Debugger.GEN,'updateOrCreateCursorRef','Cursor');
+		if(target != ApplicationParent.ccursor) {
+			_bk_cursors[cursor_id] = _cursors[cursor_id];
+		}
+		
+		var cursor_mc = target.createChildAtDepth(cursor_id, depth);
+		
+		cursor_mc._visible = false;
+		_cursors[cursor_id] = cursor_mc;
+		
+		Debugger.log('cursor_mc: '+ cursor_mc,Debugger.GEN,'updateOrCreateCursorRef','Cursor');
+		
+	
+	}
+		
 	/**
 	 * Returns current cursor
 	 * @usage   

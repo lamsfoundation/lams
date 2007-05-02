@@ -73,8 +73,6 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 			
 	}
 	
-
-	
 	/**
 	 * Retrieves the workspace details for the current user from the server.
 	 * DEPRICATED ! - we dontthink we have a use for this anymore

@@ -109,10 +109,10 @@ class org.lamsfoundation.lams.common.comms.Communication {
   	* @param isFullURL:Boolean  Inicates if the requestURL is fully qualified, if false serverURL will be prepended
     * @returns Void
     */
-    public function getRequest(requestURL:String,handler:Function,isFullURL:Boolean):Void{
-		//if(Application != null){
-			Cursor.showCursor(ApplicationParent.C_HOURGLASS);
-		//}
+    public function getRequest(requestURL:String,handler:Function,isFullURL:Boolean):Void{	
+		
+		Cursor.showCursor(ApplicationParent.C_HOURGLASS);
+
 		//Create XML response object 
         var responseXML = new XML();
 		responseXML.ignoreWhite = ignoreWhite;

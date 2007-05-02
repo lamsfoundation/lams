@@ -141,7 +141,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		//if this ndoe has children then the 
 		//data has already been got, nothing to do
 		
+		
 		if(!nodeToOpen.hasChildNodes() && !_isBusy){
+			
 			setBusy();
 			// DC24-01-06 this resource ID must refer to a folder as its been marked as a branch
 			var resourceToOpen = nodeToOpen.attributes.data.resourceID;
@@ -438,12 +440,14 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 	
 	public function setBusy(){
 		_isBusy = true;
-		getView().workspaceDialogue.showHideBtn(false);
+		
+		getView().workspaceDialog.showHideBtn(false);
 	}
 	
 	public function clearBusy(){
 		_isBusy = false;
-		getView().workspaceDialogue.showHideBtn(true);
+		
+		getView().workspaceDialog.showHideBtn(true);
 	}
 	
 	public function getWSModel():WorkspaceModel{
