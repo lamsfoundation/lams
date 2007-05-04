@@ -78,7 +78,7 @@ public class FileDAO implements IFileDAO {
 	// TODO can the writing out of the file be made more efficient
 	// with a larger buffer
 	/** 
-	 * Write out a file to the repository. Closes the stream.
+	 * Write out a file to the repository. Closes the stream. Overwrites any existing files.
 	 * @return the path to which the file was written
 	 */ 
 	public String writeFile(Long uuid, Long versionId, InputStream is) 
@@ -86,36 +86,11 @@ public class FileDAO implements IFileDAO {
 		
 		String paths[] = generateFilePath(uuid, versionId);
 		
-		boolean writeErrorOccured = false;
-
-		// check that the file doesn't already exist
-		File file = new File(paths[1]);
-		if ( file.exists() ) {
-
-			String msg = "File for uuid "+uuid+" versionId "+versionId
-				+" already exists. Generated path was "+paths[1];
-			  
-			log.error(msg
-				+". If this occurs again, it could be that there is a file on"
-				+" disk but there is no record in the database. To check"
-				+" if a record exists in the database, run the sql\n"
-				+" \"select * from lams_cr_node node, lams_cr_node_version nv"
-				+" where node.node_id = "+uuid
-				+" and node.node_id = nv.node_id"
-				+" and nv.version_id = "+versionId
-				+"\". \nIf no rows are found, then move the problem file over to "
-				+" a storage area (just in case it needs to be restored later)."
-				+" If this problem re-occurs, then a bug report to LAMS should be submitted.");
-
-			throw new FileException("File for uuid "+uuid+" versionId "+versionId
-				+" already exists. Generated path was "+paths[1]
-				+". See log file for more help with this problem.");
-		}
-		
 		// check that the directory path exists and create if necessary
 		File dir  = new File(paths[0]); 
 		dir.mkdirs(); 
 		
+		File file = new File(paths[1]);
 		OutputStream os = null;
 		try {
 			

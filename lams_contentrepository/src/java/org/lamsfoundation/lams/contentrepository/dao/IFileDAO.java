@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.contentrepository.FileException;
 public interface IFileDAO {
 
 	/** 
-	 * Write out a file to the repository. Closes the stream.
+	 * Write out a file to the repository. Closes the stream. Overwrites any existing files.
 	 * @return the path to which the file was written
 	 */ 
 	public String writeFile(Long uuid, Long versionId, InputStream is) 
