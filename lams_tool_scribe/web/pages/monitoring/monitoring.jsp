@@ -10,9 +10,9 @@
 	</lams:Tabs>
 </div>
 
-<lams:help toolSignature="<%= ScribeConstants.TOOL_SIGNATURE %>" module="monitoring"/>
-
 <div id="content">
+	<lams:help toolSignature="<%= ScribeConstants.TOOL_SIGNATURE %>" module="monitoring"/>
+
 	<lams:TabBody id="1" titleKey="button.summary" page="summary.jsp" />
 	<lams:TabBody id="2" titleKey="button.instructions" page="instructions.jsp" />
 	<lams:TabBody id="3" titleKey="button.editActivity" page="editActivity.jsp" />
