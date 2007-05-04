@@ -244,6 +244,63 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		icon_mc._y = (CanvasActivity.TOOL_ACTIVITY_HEIGHT / 2) - (icon_mc._height / 2) - 6;
 	}
 	
+	private function drawLearners():Void {
+		mm = MonitorModel(_monitorController.getModel());
+		
+		var learner_X = _activity.xCoord + learnerOffset_X;
+		var learner_Y = _activity.yCoord + learnerOffset_Y;
+		var parentAct:Activity = mm.getMonitor().ddm.getActivityByUIID(_activity.parentUIID)
+		
+		// get the length of learners from the Monitor Model and run a for loop.
+		for (var j=0; j<mm.allLearnersProgress.length; j++){
+				
+			var learner:Object = new Object();
+			learner = mm.allLearnersProgress[j]
+					
+			//Gets a true if learner's currect activityID matches this activityID else false.
+			var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
+			var hasPlus:Boolean = false;
+			
+			if (isLearnerCurrentAct){
+				var ref = this._parent;
+				
+				if (_activity.parentUIID != null) {
+					ref = this._parent._parent;
+					if(parentAct.activityTypeID != Activity.PARALLEL_ACTIVITY_TYPE){
+						learner_X = (learner_X != null) ? learner_X + this._parent._x : null;
+						learner_Y = learner_Y + this._parent._y
+					} 
+				}
+					
+				
+				// Add + icon to indicate that more users are currently at the Activity. 
+				// We are unable to display all the users across the Activity's panel.
+				if(learner_X > (_activity.xCoord + 112)) {
+					hasPlus = true;
+					ref.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), ref.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
+					return;
+				}
+					
+				// attach icon
+				ref.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), ref.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
+						
+				//  space icons
+				learner_X = learner_X+10
+			}
+		}
+	}
+	
+	/**
+	 * Add + icon to indicate that more users are currently at the Activity. 
+	 * We are unable to display all the users across the Activity's panel.
+	 * 
+	 * @usage   
+	 * @param   target  The target reference, this class OR a parent
+	 * @param   x_pos  	The X position of the icon
+	 * @return  
+	 */
+
+	
 	/**
 	 * Does the work of laying out the screen assets.
 	 * Depending on type of Activity different bits will be shown
@@ -252,53 +309,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	 */
 	private function draw(){
 		
-		//Code for Drawing learner on the activty. 
-		trace("Activity type ID : "+_activity.activityTypeID)
-		trace("Activity has parent UI ID : "+_activity.parentUIID)
-		trace("value of _Module in Canvas Activity: "+_module)
-		trace("Monitor Model is: "+_monitorController.getModel())
-		if (_module == "monitoring"){
-			var ref = this._parent;
-			mm = MonitorModel(_monitorController.getModel());
-			trace("all learner progress length in Canvas activity: "+mm.allLearnersProgress.length);
-			var learner_X = _activity.xCoord + learnerOffset_X;
-			var learner_Y = _activity.yCoord + learnerOffset_Y;
-			var parentAct:Activity = mm.getMonitor().ddm.getActivityByUIID(_activity.parentUIID)
-			// get the length of learners from the Monitor Model and run a for loop.
-			for (var j=0; j<mm.allLearnersProgress.length; j++){
-				var learner:Object = new Object();
-				learner = mm.allLearnersProgress[j]
-				
-				//Gets a true if learner's currect activityID matches this activityID else false.
-				
-				var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
-				if (isLearnerCurrentAct){
-					
-					if (learner_X > (_activity.xCoord + 112)){
-						learner_X = _activity.xCoord + learnerOffset_X 
-						learner_Y = 27
-					}
-					
-					trace(_activity.title+": is the learner's current Activity.")
-					trace("this._parent is "+this._parent)
-					
-					if (_activity.parentUIID != null && parentAct.activityTypeID != Activity.PARALLEL_ACTIVITY_TYPE){
-						ref = this._parent._parent;
-						learner_X = learner_X + this._parent._x
-						learner_Y = learner_Y + this._parent._y
-					}else if (_activity.parentUIID != null && parentAct.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
-						ref = this._parent._parent;
-						
-					}
-					
-					ref.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), ref.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y});
-					learner_X = learner_X+10
-				}else {
-					trace(_activity.title+": is not the learner's current Activity.")
-				}
-			}
-		}
-			
+		// Drawing learner on the activty. 
+		if(_module == "monitoring")
+			drawLearners();
 		
 		Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
 		setStyles();
@@ -314,7 +327,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			stopSign_mc._y = 0;
 			
 			
-		}else{
+		} else {
+			
 			//chose the icon:
 			if(_activity.isGroupActivity()){
 				groupIcon_mc._visible = true;
@@ -325,6 +339,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				icon_mc._visible = true;
 				theIcon_mc = icon_mc;
 			}
+			
 			/*
 			* some bug here - size always reported as 0x0 and wehn set to ICON_WIDTH it stays at 0, so maybe icon is still loading...
 			trace(theIcon_mc._width+'x'+theIcon_mc._height );
@@ -334,9 +349,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			trace('ICON_HEIGHT:'+ICON_HEIGHT);
 			trace(theIcon_mc._width+'x'+theIcon_mc._height );
 			*/
+			
 			theIcon_mc._visible = true;
-			
-			
 			
 			//chose the background mc
 			if(_activity.groupingUIID > 0){
@@ -358,13 +372,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			clickTarget_mc._height= TOOL_ACTIVITY_HEIGHT;
 			
 		}
-	
 
 		//position
 		_x = _activity.xCoord //- (clickTarget_mc._width/2);
 		_y = _activity.yCoord //- (clickTarget_mc._height/2);
-		
-
 		
 		Debugger.log('canvasActivity_mc._visible'+canvasActivity_mc._visible,4,'draw','CanvasActivity');
 		_visible = true;

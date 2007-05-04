@@ -41,8 +41,8 @@ import mx.utils.*
 class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {  
 //class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip{  
   
-	public static var ICON_WIDTH:Number = 7;
-	public static var ICON_HEIGHT:Number = 19;
+	public static var ICON_WIDTH:Number = 8;
+	public static var ICON_HEIGHT:Number = 20;
 	
 	//this is set by the init object
 	private var _monitorController:MonitorController;
@@ -66,6 +66,8 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	private var _visibleHeight:Number;
 	private var _selected_mc:MovieClip;
 	
+	private var smallCross:MovieClip;
+	private var _hasPlus:Boolean;
 	
 	
 	function LearnerIcon(){
@@ -82,6 +84,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 			init();
 		}
 		
+		
 	}
 	
 	public function init(initObj):Void{
@@ -92,11 +95,14 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 			learner = initObj.learner;
 			learnerOffset_X = initObj._x
 			learnerOffset_Y = initObj._y
+			_hasPlus = initObj._hasPlus;
 		}
 		learnerOffset_X = _x
 		learnerOffset_Y = _y
 		Debugger.log('Learner x pos and y pos : '+learnerOffset_X+ " and "+learnerOffset_Y ,4,'draw','LearnerIcon');
+		
 		showAssets(false);
+		
 		//Click, Rollover and rollout Events for Learner Icon;
 		click_mc.onRollOver = Proxy.create (this, localOnRollOver);
 		click_mc.onRollOut = Proxy.create (this, localOnRollOut);
@@ -112,11 +118,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	}
 	
 	private function showAssets(isVisible:Boolean){
-		
-		//canvasActivity_mc._visible = isVisible;
 		toolTip._visible = isVisible;
-		//click_mc._visible = isVisible;
-		
 	}
 	
 	/**
@@ -133,8 +135,9 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 		setStyles();
 		toolTip.text = learner.getFullName();
 
+		Debugger.log('hasPlus: '+ _hasPlus,Debugger.CRITICAL,'draw','CanvasActivity');
+		smallCross._visible = _hasPlus;
 		
-		//Debugger.log('canvasActivity_mc._visible'+canvasActivity_mc._visible,4,'draw','CanvasActivity');
 		_visible = true;
 	}
 	
