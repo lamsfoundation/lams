@@ -357,29 +357,21 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		
 	}
 	
-	private void processNotes(List portfolios, String tempDirectoryName, Portfolio portfolio) {
-		// create a subdirectory with the name Notebook
-		String subDirectoryName = ExportPortfolioConstants.SUBDIRECTORY_NOTEBOOK_BASENAME;
-		
-		if(!createSubDirectory(tempDirectoryName, subDirectoryName))
-		{
-		    throw new ExportPortfolioException("The subdirectory " + subDirectoryName + " could not be created.");
-		} else {
-			File dir = new File(tempDirectoryName, subDirectoryName);
-			portfolio.setNotebookDir(dir.getAbsolutePath());
-		}
-		
-		if(portfolios.size() > 0) {
-		
-			Iterator i = portfolios.iterator();
+	private void processNotes(List notes, String tempDirectoryName, Portfolio portfolio) {
+
+		if(notes.size() > 0) {
 			
-			//iterate through the list of portfolios
-			while(i.hasNext())
+			// create a subdirectory with the name Notebook
+			String subDirectoryName = ExportPortfolioConstants.SUBDIRECTORY_NOTEBOOK_BASENAME;
+			
+			if(!createSubDirectory(tempDirectoryName, subDirectoryName))
 			{
-				NotebookPortfolio notebookPortfolio = (NotebookPortfolio)i.next();
-							
+			    throw new ExportPortfolioException("The subdirectory " + subDirectoryName + " could not be created.");
+			} else {
+				File dir = new File(tempDirectoryName, subDirectoryName);
+				portfolio.setNotebookDir(dir.getAbsolutePath());
 			}
-			
+		
 			String mainFileName = ExportPortfolioConstants.MAIN_NOTEBOOK_FILENAME;
 			
 			//notebookLink is used in main page, so that it can link with the tools export pages.
