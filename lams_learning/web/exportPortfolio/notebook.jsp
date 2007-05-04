@@ -71,7 +71,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</p>
 			<p>
 			<c:set var="entryTxt"><c:out value="${entry.entry}" escapeXml="false"/></c:set>
-			<lams:out value="entryTxt"/>
+			<lams:out value="${entryTxt}"/>
 			</p>
 			<hr>
 			</c:forEach>
