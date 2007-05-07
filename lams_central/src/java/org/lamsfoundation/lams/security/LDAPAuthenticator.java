@@ -70,7 +70,6 @@ public class LDAPAuthenticator {
 		// Load all authentication method parameters into env
 		env.setProperty(Context.INITIAL_CONTEXT_FACTORY, method.getParameterByName(Context.INITIAL_CONTEXT_FACTORY).getValue());
 		env.setProperty(Context.SECURITY_AUTHENTICATION, method.getParameterByName(Context.SECURITY_AUTHENTICATION).getValue());
-		env.setProperty(Context.SECURITY_PROTOCOL, method.getParameterByName(Context.SECURITY_PROTOCOL).getValue());
 
 		String principalDNPrefix = method.getParameterByName(PRINCIPAL_DN_PREFIX_OPT).getValue();
 		String principalDNSuffix = method.getParameterByName(PRINCIPAL_DN_SUFFIX_OPT).getValue();
@@ -79,19 +78,26 @@ public class LDAPAuthenticator {
 
 		env.setProperty(Context.PROVIDER_URL, method.getParameterByName(Context.PROVIDER_URL).getValue());
 		env.put(Context.SECURITY_CREDENTIALS, credential);
-
+		
 		Object originalTrustStore = System.getProperty("javax.net.ssl.trustStore");
 		Object originalTrustPass = System.getProperty("javax.net.ssl.trustStorePassword");
-		//FIXME: synchronization issue: dynamically load certificate into
-		// system instead of overwritting it.
-		System.setProperty("javax.net.ssl.trustStore", method.getParameterByName("truststore.path").getValue());
-		System.setProperty("javax.net.ssl.trustStorePassword", method.getParameterByName("truststore.password").getValue());
+		
+		// optional parameters
+		try {
+			env.setProperty(Context.SECURITY_PROTOCOL, method.getParameterByName(Context.SECURITY_PROTOCOL).getValue());
+			log.debug("security.protocol: "+method.getParameterByName(Context.SECURITY_PROTOCOL).getValue());
+			// FIXME: synchronization issue: dynamically load certificate into
+			// system instead of overwritting it.
+			System.setProperty("javax.net.ssl.trustStore", method.getParameterByName("truststore.path").getValue());
+			System.setProperty("javax.net.ssl.trustStorePassword", method.getParameterByName("truststore.password").getValue());
+		} catch(NullPointerException e) {
+		}
 
 		log.debug("===> LDAP authenticator: " + env);
 
 		InitialLdapContext ctx = null;
 		try {
-			ctx = new InitialLdapContext(env, null);
+			ctx = new InitialLdapContext(env, null);System.out.println(ctx);
 			log.debug("===> ldap context created: "+ctx);
 			return true;
 		} catch (Exception e) {
