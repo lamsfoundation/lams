@@ -109,7 +109,8 @@ public class UserSaveAction extends Action {
 		}
 
 		// (dyna)form validation
-		if ((userForm.get("login") == null) || (userForm.getString("login").trim().length() == 0)) {
+		userForm.set("login", userForm.getString("login").trim());
+		if ((userForm.get("login") == null) || (userForm.getString("login").length() == 0)) {
 			errors.add("login", new ActionMessage("error.login.required"));
 		}
 		if (service.getUserByLogin(userForm.getString("login")) != null) {
@@ -118,7 +119,7 @@ public class UserSaveAction extends Action {
 			} else {
 				errors.add("login", new ActionMessage("error.login.unique", "("+userForm.getString("login")+")"));
 			}
-		}
+		}		
 		if (!StringUtils.equals((String)userForm.get("password"),((String)userForm.get("password2")))) {
 			errors.add("password", new ActionMessage("error.newpassword.mismatch"));
 		}
