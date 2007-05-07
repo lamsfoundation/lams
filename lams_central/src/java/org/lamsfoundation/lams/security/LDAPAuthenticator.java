@@ -85,7 +85,6 @@ public class LDAPAuthenticator {
 		// optional parameters
 		try {
 			env.setProperty(Context.SECURITY_PROTOCOL, method.getParameterByName(Context.SECURITY_PROTOCOL).getValue());
-			log.debug("security.protocol: "+method.getParameterByName(Context.SECURITY_PROTOCOL).getValue());
 			// FIXME: synchronization issue: dynamically load certificate into
 			// system instead of overwritting it.
 			System.setProperty("javax.net.ssl.trustStore", method.getParameterByName("truststore.path").getValue());
