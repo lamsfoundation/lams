@@ -23,14 +23,17 @@
 
 //import org.lamsfoundation.lams.monitoring.*
 import org.lamsfoundation.lams.monitoring.ls.*      //Lessons
-import org.lamsfoundation.lams.authoring.cv.CanvasActivity;      //Canvas Activity Used in Monitor Tab View 
-import org.lamsfoundation.lams.monitoring.mv.* 	 //Monitor
+import org.lamsfoundation.lams.authoring.cv.CanvasActivity    //Canvas Activity Used in Monitor Tab View 
+import org.lamsfoundation.lams.authoring.DesignDataModel
+import org.lamsfoundation.lams.monitoring.mv.* 	 //Monitor 
+import org.lamsfoundation.lams.monitoring.layout.DefaultLayoutManager 	 //Monitor Layouts
 import org.lamsfoundation.lams.common.ws.*          //Workspace
 import org.lamsfoundation.lams.common.comms.*       //communications
 import org.lamsfoundation.lams.common.util.*        //Utils
 import org.lamsfoundation.lams.common.dict.*        //Dictionary
 import org.lamsfoundation.lams.common.ui.*          //User interface
 import org.lamsfoundation.lams.common.style.*       //Themes/Styles
+import org.lamsfoundation.lams.common.layout.*		// Layouts
 import org.lamsfoundation.lams.common.*             
 import mx.managers.*
 import mx.utils.*
@@ -118,33 +121,42 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     
 	private var _DataLoadCheckIntervalID:Number;
 	
+    // Data Elements
+    private var _sequenceLoaded:Boolean;             //Sequence(+Design) loaded flag
+	
     //UI Elements
-    //private var _toolbarLoaded:Boolean;                //These are flags set to true when respective element is 'loaded'
     private var _monitorLoaded:Boolean;
     private var _lessonsLoaded:Boolean;
     private var _menuLoaded:Boolean;
 	private var _showCMItem:Boolean;
 	
+	// Layout Manager
+	private var _layout:LFLayout;
+	
 	//clipboard
 	private var _clipboardData:Object;
-	// set up Key Listener
-	//private var keyListener:Object;
     
+	private var _sequence:Sequence;
+	
     //Application instance is stored as a static in the application class
     private static var _instance:Application = null;     
-
+	private var dispatchEvent:Function;
+	
     /**
     * Application - Constructor
     */
     private function Application(){
 		super(this);
-        _menuLoaded = false;
+		_sequence = null;
+		_sequenceLoaded = false;
+		_menuLoaded = false;
         _lessonsLoaded = false;
 		_monitorLoaded = false;
 		_module = Application.MODULE;
 		_ccm = CustomContextMenu.getInstance();
-		//_toolbarLoaded = false;
-		//Mouse.addListener(someListener);
+		
+		mx.events.EventDispatcher.initialize(this);
+		
     }
     
     /**
@@ -164,18 +176,13 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         _container_mc = container_mc;
         _UILoaded = false;
         
-		loader.start(COMPONENT_NO);
+		loader.start(DefaultLayoutManager.COMPONENT_NO);
 		
 		_customCursor_mc = _container_mc.createEmptyMovieClip('_customCursor_mc', CCURSOR_DEPTH);			
 		
 		//add the cursors:
 		Cursor.addCursor(C_HOURGLASS);
 		Cursor.addCursor(C_LICON);
-		//Cursor.addCursor(C_OPTIONAL);
-		//Cursor.addCursor(C_TRANSITION);
-		//Cursor.addCursor(C_GATE);
-		//Cursor.addCursor(C_GROUP);
-		
 		
 		//Comms object - do this before any objects are created that require it for server communication
         _comms = new Communication();
@@ -189,11 +196,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         //Set up Key handler 
         //TODO take out after testing and uncomment same key handler in ready();
         Key.addListener(this);
-		//setupUI();
-		//setupData();
-		//checkDataLoaded();
     }
-    
+	
     /**
     * Called when the config class has loaded
     */
@@ -227,31 +231,58 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		Debugger.getInstance().crashDumpSeverityLevel = Number(_config.getItem('crashDumpSeverityLevelLog'));
 		Debugger.getInstance().severityLevel = Number(_config.getItem('severityLevelLog')); 
 		
+		// Load lesson sequence
+		requestSequence(_root.lessonID);
     }
-    
-    /**
-    * Called when Dictionary loaded
-	* @param evt:Object	the event object
-    */
-    private function onDictionaryLoad(evt:Object){
-        if(evt.type=='load'){
-            _dictionaryLoaded = true;
-			Debugger.log('Dictionary loaded :',Debugger.CRITICAL,'onDictionaryLoad','Application');			
-        } else {
-            Debugger.log('event type not recognised :'+evt.type,Debugger.CRITICAL,'onDictionaryLoad','Application');
-        }
-    }
-    
-    /**
+	
+	private function requestSequence(seqID:Number){
+		var callback:Function = Proxy.create(this, saveSequence);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonDetails&lessonID=' + String(seqID) + '&userID=' + _root.userID,callback, false);
+	}
+	
+	private function saveSequence(seqDTO:Object){
+		// create new Sequence from DTO
+		_sequence = new Sequence(seqDTO);
+		_sequence.addEventListener('load',Delegate.create(this,onSequenceLoad));
+		
+		// load Sequence design
+		openLearningDesign(_sequence);
+
+	}
+	
+	/**
+	 * server call for Learning Deign and sent it to the save it in DataDesignModel
+	 * 
+	 * @usage   
+	 * @param   		seq type Sequence;
+	 * @return  		Void
+	 */
+	private function openLearningDesign(seq:Sequence){
+		var designID:Number  = seq.learningDesignID;
+        var callback:Function = Proxy.create(this,saveDataDesignModel);
+           
+		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designID,callback, false);
+		
+	}
+	
+	private function saveDataDesignModel(learningDesignDTO:Object){
+		var _ddm:DesignDataModel = new DesignDataModel();	
+		_ddm.setDesign(learningDesignDTO);
+		
+		_sequence.setLearningDesignModel(_ddm);
+		
+	}
+	
+	/**
     * Called when the current selected theme has been loaded
 	* @param evt:Object	the event object
     */
-    private function onThemeLoad(evt:Object) {
+    private function onSequenceLoad(evt:Object) {
         if(evt.type=='load'){
-            _themeLoaded = true; 
-			Debugger.log('!Theme loaded :',Debugger.CRITICAL,'onThemeLoad','Application');		
+            _sequenceLoaded = true;
+			Debugger.log('!Sequence (+Design) loaded :',Debugger.CRITICAL,'onSequenceLoad','Application');		
         } else {
-            Debugger.log('event type not recognised :'+evt.type,Debugger.CRITICAL,'onThemeLoad','Application');
+            Debugger.log('event type not recognised :'+evt.type,Debugger.CRITICAL,'onSequenceLoad','Application');
         }
 		
     }
@@ -266,7 +297,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		} else {
 			_dataLoadCheckCount++;
 			// if dictionary and theme data loaded setup UI
-			if(_dictionaryLoaded && _themeLoaded) {
+			if(_dictionaryLoaded && _themeLoaded && _sequenceLoaded) {
 				clearInterval(_DataLoadCheckIntervalID);
 				
 				setupUI();
@@ -292,7 +323,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         } else {
 			_uiLoadCheckCount++;
             //If all events dispatched clear interval and call start()
-            if(_dictionaryEventDispatched && _themeEventDispatched){
+            if(_UILoaded && _dictionaryEventDispatched && _themeEventDispatched){
 				//Debugger.log('Clearing Interval and calling start :',Debugger.CRITICAL,'checkUILoaded','Application');	
                 clearInterval(_UILoadCheckIntervalID);
 				start();
@@ -344,35 +375,30 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         //Debugger.log('UIElementLoaded: ' + evt.target.className,Debugger.GEN,'UIElementLoaded','Application');
         if(evt.type=='load'){
             //Which item has loaded
-            switch (evt.target.className) {
+            /**switch (evt.target.className) {
 				case 'LFMenuBar' :
                     _menuLoaded = true;
                     break;
-                //case 'Toolbar' :
-                //  _toolbarLoaded = true;
-				//	break;
-				//case 'Lesson' :
-				//	_lessonsLoaded = true;
-                //    break;
                 case 'Monitor' :
                     _monitorLoaded = true;
                     break;
                 default:
-            }
+            }*/
+			
+			_layout.manager.addLayoutItem(new LFLayoutItem(evt.target.className, evt.target));
 			
 			loader.complete();
             
             //If all of them are loaded set UILoad accordingly
-			if(_menuLoaded && _monitorLoaded){
+			if(_layout.manager.completedLayout){
                 _UILoaded=true;                
-            } 
-            //if(_toolkitLoaded && _canvasLoaded && _menuLoaded && _toolbarLoaded){
-              //  _UILoaded=true;                
-            //} 
+            } else {
+				_UILoaded = false;            
+			}
             
         }   
     }
-    
+	
 	/**
     * Create all UI Elements
     */
@@ -387,31 +413,9 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		
 		_tooltipContainer_mc = _container_mc.createEmptyMovieClip('_tooltipContainer_mc',TOOLTIP_DEPTH);
 
-		
-
-        //MENU
-        _menu_mc = _container_mc.attachMovie('LFMenuBar','_menu_mc',MENU_DEPTH, {env:'Monitoring',_x:0,_y:0});
-        _menu_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
-
-		
-
-        //TOOLBAR
-        var depth:Number = _appRoot_mc.getNextHighestDepth();
-        //_toolbar = new Toolbar(_appRoot_mc,TOOLBAR_X,TOOLBAR_Y);
-        //_toolbar.addEventListener('load',Proxy.create(this,UIElementLoaded));
-		
-		//LESSONS  
-		//_lessons = new Lesson(_appRoot_mc,LESSONS_X,LESSONS_Y);
-        //_lessons.addEventListener('load',Proxy.create(this,UIElementLoaded));
-       
-	   //MONITOR
-        _monitor = new Monitor(_appRoot_mc,depth++,MONITOR_X,MONITOR_Y,MONITOR_W,MONITOR_H);
-        _monitor.addEventListener('load',Proxy.create(this,UIElementLoaded));
-        
-        //WORKSPACE
-        _workspace = new Workspace();
-        //_workspace.addEventListener('load',Proxy.create(this,UIElementLoaded));
-		
+        var manager = ILayoutManager(new DefaultLayoutManager('default'));
+		_layout = new LFLayout(this, manager);
+		_layout.init();
 		
     }
 	
@@ -454,21 +458,6 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     }
     
     /**
-    * Opens the preferences dialog
-    
-    public function showPrefsDialog() {
-        PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue("prefs_dlg_title"),closeButton:true,scrollContentPath:'preferencesDialog'});
-    }
-	*/
-	
-	/**
-    * Opens the lesson manager dialog
-    */
-    //public function showLessonManagerDialog() {
-    //    PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue("lesson_dlg_title"),closeButton:true,scrollContentPath:'selectClass'});
-    //}
-    
-    /**
     * Receives events from the Stage resizing
     */
     public function onResize(){
@@ -478,19 +467,15 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         var w:Number = Stage.width;
         var h:Number = Stage.height;
 		
+		_layout.manager.resize(w, h);
+		
 		var someListener:Object = new Object();
 		someListener.onMouseUp = function () {
 			
-		//Menu - only need to worry about width
-        _menu_mc.setSize(w,_menu_mc.height);
-		//MONITOR
-		_monitor.setSize(w-15,h-_menu_mc._height);
+			_layout.manager.resize(w, h);
         
 		}
-       _menu_mc.setSize(w,_menu_mc.height);
-       //MONITOR
-       _monitor.setSize(w,h-MONITOR_Y);
-	   trace("Stage Width "+w+" and height "+h)
+		
     }
 	
 	/**
@@ -517,7 +502,6 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	 */
 	public function setClipboardData(obj:Object):Void{
 		_clipboardData = obj;
-		trace("clipBoard data id"+_clipboardData);
 	}
 	
 	/**
@@ -536,38 +520,12 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	}
 	
 	public function copy():Void{
-		trace("testing copy");
 		 //setClipboardData(_canvas.model.selectedItem);
 	}
 	
 	public function paste():Void{
-		trace("testing paste");
 		//_canvas.setPastedItem(getClipboardData());
 	}
-	
-
-    
-	/**
-	* get the ddm from the canvas.. this method is here as the ddm used to be stored inthe application.
-    * returns the the Design Data Model
-    
-    public function getDesignDataModel():DesignDataModel{
-        return  _canvas.ddm;
-    }
-	*/
-    /**
-    * returns the the toolkit instance
-    */
-    //public function getToolkit():Toolkit{
-     //   return _toolkit;
-   // }
-
-    /**
-    * returns the the toolbar instance
-    */
-   // public function getToolbar():Toolbar{
-    //    return _toolbar;
-    //}
 
     /**
     * returns the the canvas instance
@@ -585,6 +543,42 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	*/
 	public function getLesson():Lesson{
 		return _lessons;
+	}
+	
+	public function set menubar(a:MovieClip) {
+		_menu_mc = a;
+	}
+	
+	public function get menubar():MovieClip {
+		return _menu_mc;
+	}
+	
+	public function set monitor(a:Monitor) {
+		_monitor = a;
+	}
+	
+	public function get monitor():Monitor {
+		return _monitor;
+	}
+	
+	public function get layout():LFLayout {
+		return _layout;
+	}
+	
+	public function set workspace(a:Workspace) {
+		_workspace = a;
+	}
+	
+	public function get workspace():Workspace {
+		return _workspace;
+	}
+	
+	public function get sequence():Sequence {
+		return _sequence;
+	}
+	
+	public function set sequence(s:Sequence) {
+		_sequence = s;
 	}
 
     /**
@@ -616,8 +610,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	* 
     */
     static function get tooltip():MovieClip {
-		trace("tooltip called")
-        //Return root if valid otherwise raise a big system error as app. will not work without it
+		//Return root if valid otherwise raise a big system error as app. will not work without it
         if(_instance._tooltipContainer_mc != undefined) {
             return _instance._tooltipContainer_mc;
         } else {
@@ -656,6 +649,23 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         } else {
             //TODO DI 11/05/05 Raise error if _appRoot hasn't been created
 			
+        }
+    }
+	
+	/**
+    * Returns the Application root, use as _root would be used
+    * 
+    * @usage    Import authoring package and then use as root e.g.
+    * 
+    *           import org.lamsfoundation.lams.authoring;
+    *           Application.root.attachMovie('myLinkageId','myInstanceName',depth);
+    */
+    static function get containermc():MovieClip {
+        //Return root if valid otherwise raise a big system error as app. will not work without it
+        if(_instance._container_mc != undefined) {
+            return _instance._container_mc;
+        } else {
+            
         }
     }
 	

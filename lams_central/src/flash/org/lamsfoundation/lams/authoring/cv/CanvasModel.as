@@ -58,6 +58,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	private var _transitionActivities:Array;
 	private var _isDragging:Boolean;
 	private var _importing:Boolean;
+	private var _editing:Boolean;
 	private var _autoSaveWait:Boolean;
 
 	
@@ -220,11 +221,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	
 	public function findOptionalActivities():Array{
-		//_activitiesDisplayed
-		//var _ddm.getActivityByUIID(Activity.OPTIONAL_ACTIVITY_TYPE)
 		var actOptional:Array = new Array();
 		var k:Array = _activitiesDisplayed.values();
-		//trace("findOptionalActivities Called "+k.length )
 		for (var i=0; i<k.length; i++){
 			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
 				actOptional.push(k[i]);
@@ -239,7 +237,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 		var actParallel:Array = new Array();
 		var k:Array = _activitiesDisplayed.values();
-		//trace("findOptionalActivities Called "+k.length )
 		for (var i=0; i<k.length; i++){
 			if (k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 				actParallel.push(k[i]);
@@ -250,14 +247,24 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		return actParallel
 	}
 	
+	public function findTopLevelActivities():Array{
+		var actParent:Array = new Array();
+		var k:Array = _activitiesDisplayed.values();
+		for (var i=0; i<k.length; i++){
+			if (k[i].activity.parentUIID == null){
+				actParent.push(k[i]);
+			}
+			
+		}
+		return actParent
+	}
+	
 	public function lockAllComplexActivities():Void{
 		Debugger.log("Locking all Complex Activities", Debugger.GEN, "lockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
-		//trace("findOptionalActivities Called "+k.length )
 		for (var i=0; i<k.length; i++){
 			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 				k[i].locked = true;
-				trace("complex activity with id:"+k[i].activity.activityUIID )
 			}
 		}
 	}
@@ -266,11 +273,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function unlockAllComplexActivities():Void{
 		Debugger.log("Unlocking all Complex Activities", Debugger.GEN, "unlockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
-		//trace("findOptionalActivities Called "+k.length )
 		for (var i=0; i<k.length; i++){
 			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
-				k[i].locked = false;
-				trace("complex activity with id:"+k[i].activity.activityUIID )
+				k[i].locked = (k[i].activity.readOnly) ? true : false;
 			}
 		}
 	}
@@ -294,8 +299,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		var gateAct = new GateActivity(_cv.ddm.newUIID(),gateTypeID);
 		gateAct.learningDesignID = _cv.ddm.learningDesignID;
 		
-		//gateAct.yCoord = (toAct.yCoord + fromAct.yCoord) / 2;
-		//gateAct.xCoord = (toAct.xCoord + fromAct.xCoord) / 2;
 		gateAct.title = Dictionary.getValue('gate_btn');
 		gateAct.yCoord = editedCanvasTrans.midPoint.y - (CanvasActivity.GATE_ACTIVITY_WIDTH / 2);
 		gateAct.xCoord = editedCanvasTrans.midPoint.x - (CanvasActivity.GATE_ACTIVITY_HEIGHT / 2);
@@ -375,7 +378,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log('groupingActivity.createGroupingUIID :'+groupingActivity.createGroupingUIID ,Debugger.GEN,'createNewGroupActivity','CanvasModel');
 		Debugger.log('groupingActivity.yCoord:'+groupingActivity.yCoord,Debugger.GEN,'createNewGroupActivity','CanvasModel');
 		Debugger.log('groupingActivity.xCoord:'+groupingActivity.xCoord,Debugger.GEN,'createNewGroupActivity','CanvasModel');
-
 
 		_cv.ddm.addActivity(groupingActivity);
 		
@@ -792,7 +794,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 				//NOTE!: we are passing in a ref to the activity in the ddm so if we change any props of this, we are changing the ddm
 				
 				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity);
-				
+
 			}else if(r_activity == "DELETE"){
 				//remove this activity
 				if(cm_activity.parentUIID == null){
@@ -836,7 +838,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			
 			if(r_transition == "NEW"){
 				//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
+				
 				broadcastViewUpdate("DRAW_TRANSITION",ddmTransition);
+				
 			}else if(r_transition == "DELETE"){
 				broadcastViewUpdate("REMOVE_TRANSITION",cmTransition);
 			}
@@ -849,6 +853,137 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 	}
 	
+	public function getModTransitionsForActivityUIID(UIID:Number):Object {
+		var ts:Array = _transitionsDisplayed.keys();
+		var transObj = new Object();
+		var modTransitions:Array = new Array();
+		var into = null;
+		var out = null;
+		var hasTrans:Boolean = false;
+		
+		for(var i=0; i<ts.length;i++){
+			
+			var cmTransition:Transition = _transitionsDisplayed.get(ts[i]).transition;
+			
+			if(cmTransition.mod_toUIID == UIID || cmTransition.mod_fromUIID == UIID){
+				modTransitions.push(cmTransition);
+				hasTrans = true;
+			}
+			if(into != null && out != null){
+					break;
+			}else{
+				if(cmTransition.mod_fromUIID == UIID){
+					out = ts[i];
+				}
+				if(cmTransition.mod_toUIID == UIID){
+					into = ts[i];
+				}
+			}
+		}
+		
+		transObj.modTransitions = modTransitions;
+		transObj.out = out;
+		transObj.into = into;
+		transObj.hasTrans = hasTrans;
+		
+		return transObj;
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////       VALIDATE DESIGN               ////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public function validateDesign():Array {
+		var errorMap:Array = new Array();
+		
+		validateActivityTransitionRules(findTopLevelActivities(), _transitionsDisplayed, errorMap);
+		
+		return errorMap;
+	}
+	
+	private function validateActivityTransitionRules(parentActivities:Array, transitions:Hashtable, errorMap:Array):Void {
+		var noTopLevelActivities:Number = parentActivities.length;
+		var noInputTransition:Array = new Array();
+		var noOutputTransition:Array = new Array();
+		
+		validateTransitions(transitions, errorMap);
+		
+		for(var i=0; i<parentActivities.length; i++) {
+			
+			var cmActivity:Activity = Activity(parentActivities[i].activity);
+			var actTransitions:Object = _cv.ddm.getTransitionsForActivityUIID(cmActivity.activityUIID);
+		
+			checkActivityForTransition(cmActivity, actTransitions, noTopLevelActivities, errorMap);
+		
+			if(actTransitions.into == null) {
+				noInputTransition.push(cmActivity);
+			}
+			
+			if(actTransitions.out == null) {
+				noOutputTransition.push(cmActivity);
+			}
+		
+		}
+		
+		if(noTopLevelActivities > 0) {
+			if (noInputTransition.length == 0) {
+				errorMap.push(new ValidationIssue(ValidationIssue.INPUT_TRANSITION_ERROR_CODE, Dictionary.getValue(ValidationIssue.INPUT_TRANSITION_ERROR_TYPE2_KEY)));
+			} else if (noInputTransition.length > 1) {
+				//there is more than one activity with no input transitions
+				for(var i=0; i<noInputTransition.length; i++) {
+					var a:Activity = Activity(noInputTransition[i]);
+					errorMap.push(new ValidationIssue(ValidationIssue.INPUT_TRANSITION_ERROR_CODE, Dictionary.getValue(ValidationIssue.INPUT_TRANSITION_ERROR_TYPE1_KEY), a.activityUIID));
+				}
+			}
+			
+			if (noOutputTransition.length == 0) {
+				errorMap.push(new ValidationIssue(ValidationIssue.OUTPUT_TRANSITION_ERROR_CODE, Dictionary.getValue(ValidationIssue.OUTPUT_TRANSITION_ERROR_TYPE2_KEY)));
+			} else if (noOutputTransition.length > 1) {
+				//there is more than one activity with no output transitions
+				for(var i=0; i<noOutputTransition.length; i++) {
+					var a:Activity = Activity(noOutputTransition[i]);
+					errorMap.push(new ValidationIssue(ValidationIssue.OUTPUT_TRANSITION_ERROR_CODE, Dictionary.getValue(ValidationIssue.OUTPUT_TRANSITION_ERROR_TYPE1_KEY), a.activityUIID));					
+				}
+			}
+		}
+		
+		
+	}
+	
+	private function validateTransitions(transitions:Hashtable, errorMap:Array):Void {
+		
+		var cmTransition_keys:Array = transitions.keys();
+		
+		for(var i=0; i<cmTransition_keys.length; i++) {
+		
+			var cmTransition:Transition = Transition(transitions.get(cmTransition_keys[i]).transition);
+			
+			
+			var fromActivity:Activity = _cv.ddm.getActivityByUIID(cmTransition.fromUIID);
+			var toActivity:Activity = _cv.ddm.getActivityByUIID(cmTransition.toUIID);
+			
+			
+			if(fromActivity == null) {
+				errorMap.push(new ValidationIssue(ValidationIssue.TRANSITION_ERROR_CODE, Dictionary.getValue(ValidationIssue.TRANSITION_ERROR_KEY), cmTransition.transitionUIID));
+			} else if (toActivity == null) {
+				errorMap.push(new ValidationIssue(ValidationIssue.TRANSITION_ERROR_CODE, Dictionary.getValue(ValidationIssue.TRANSITION_ERROR_KEY), cmTransition.transitionUIID));
+			}
+		}
+	}
+	
+	private function checkActivityForTransition(activity:Activity, actTransitions:Object, noOfActivities:Number, errorMap:Array):Void {
+		
+		if(noOfActivities > 1) {
+			if(actTransitions.into == null && actTransitions.out == null)
+				errorMap.push(new ValidationIssue(ValidationIssue.ACTIVITY_TRANSITION_ERROR_CODE, Dictionary.getValue(ValidationIssue.ACTIVITY_TRANSITION_ERROR_KEY), activity.activityUIID));
+			
+		} else if(noOfActivities == 1) {	
+			if(actTransitions.into != null || actTransitions.out != null)				
+				errorMap.push(new ValidationIssue(ValidationIssue.ACTIVITY_TRANSITION_ERROR_CODE, Dictionary.getValue(ValidationIssue.ACTIVITY_TRANSITION_ERROR_KEY), activity.activityUIID));
+		}
+		
+		
+	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////       EDITING ACTIVITIES               /////////////////////////////
@@ -1062,6 +1197,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	public function set importing(importing:Boolean):Void {
 		_importing = importing;
+	}
+	
+	public function get editing():Boolean {
+		return _editing;
+	}
+	
+	public function set editing(editing:Boolean):Void {
+		_editing = editing;
 	}
 	
 	public function get autoSaveWait():Boolean {

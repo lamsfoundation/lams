@@ -38,12 +38,14 @@ class ToolbarModel extends Observable {
 	private var _isDirty:Boolean;
 	private var infoObj:Object;
 	private var _btnState:Boolean = false;
+	private var _mode:Number;
     
 	/**
 	* Constructor.
 	*/
-	public function ToolbarModel (tv:Toolbar){
+	public function ToolbarModel (tv:Toolbar, mode:Number){
 		_tv = tv;
+		_mode = mode;
 	}
     
     /**
@@ -54,7 +56,6 @@ class ToolbarModel extends Observable {
     public function setSize(width:Number,height:Number) {
 		__width = width;
 		__height = height;
-		
 		setChanged();
 		//send an update
 		infoObj = {};
@@ -66,21 +67,38 @@ class ToolbarModel extends Observable {
 	public function toolbarButtons(){
 		var buttonArr:Array = new Array();
 		
-		buttonArr[0] 	= ["new_btn", "icon_newDesign"];
-		buttonArr[1] 	= ["open_btn", "icon_openDesign"];
-		buttonArr[2] 	= ["save_btn", "icon_saveDesign"];
-		buttonArr[3] 	= ["copy_btn", "icon_copy"];
-		buttonArr[4] 	= ["paste_btn", "icon_paste"];
-		buttonArr[5] 	= ["trans_btn", "icon_pen"];
-		buttonArr[6] 	= ["optional_btn", "icon_optional"];
-		buttonArr[7] 	= ["flow_btn", "icon_flow"];
-		buttonArr[8] 	= ["group_btn", "icon_group"];
-		buttonArr[9] 	= ["preview_btn", "icon_preview"];
-		buttonArr[10] 	= ["gate_btn", "icon_gate"];
-		buttonArr[11] 	= ["branch_btn", "icon_branch"];
+		if(mode != Toolbar.EDIT_MODE) {
 		
+			buttonArr[0] 	= ["new_btn", "icon_newDesign"];
+			buttonArr[1] 	= ["open_btn", "icon_openDesign"];
+			buttonArr[2] 	= ["save_btn", "icon_saveDesign"];
+			buttonArr[3] 	= ["copy_btn", "icon_copy"];
+			buttonArr[4] 	= ["paste_btn", "icon_paste"];
+			buttonArr[5] 	= ["trans_btn", "icon_pen"];
+			buttonArr[6] 	= ["optional_btn", "icon_optional"];
+			buttonArr[7] 	= ["flow_btn", "icon_flow"];
+			buttonArr[8] 	= ["group_btn", "icon_group"];
+			buttonArr[9] 	= ["preview_btn", "icon_preview"];
+			buttonArr[10] 	= ["gate_btn", "icon_gate"];
+			buttonArr[11] 	= ["branch_btn", "icon_branch"];
+			
+		} else {
+			buttonArr[0] 	= ["apply_changes_btn", "icon_saveDesign"];
+			buttonArr[1] 	= ["cancel_btn", "icon_cancel"];
+			buttonArr[2] 	= ["spacer", null];
+			buttonArr[3] 	= ["copy_btn", "icon_copy"];
+			buttonArr[4] 	= ["paste_btn", "icon_paste"];
+			buttonArr[5] 	= ["trans_btn", "icon_pen"];
+			buttonArr[6] 	= ["optional_btn", "icon_optional"];
+			buttonArr[7] 	= ["flow_btn", "icon_flow"];
+			buttonArr[8] 	= ["group_btn", "icon_group"];
+			buttonArr[9] 	= ["gate_btn", "icon_gate"];
+			buttonArr[10] 	= ["branch_btn", "icon_branch"];
+		
+		}
 		
 		setChanged();
+		
 		//send an update
 		infoObj = {};
 		infoObj.updateType = "SETMENU";
@@ -175,15 +193,24 @@ class ToolbarModel extends Observable {
         return __y;
     }
 
-    //Acessors for x + y coordinates
+    //Acessors for w + h
     public function get width():Number{
         return __width;
+    }
+    
+    public function get mode():Number{
+        return _mode;
+    }    
+    
+    public function set mode(a:Number){
+        _mode = a;
     }
     
     public function get height():Number{
         return __height;
     }    
     
+	
 	public function getToolbar():Toolbar{
 		return _tv;
 	}

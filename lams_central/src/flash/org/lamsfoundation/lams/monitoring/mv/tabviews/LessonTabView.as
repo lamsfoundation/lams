@@ -100,6 +100,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var learner_expp_cb:CheckBox;
 	private var learner_expp_cb_lbl:Label;
 	
+	//Text Items
 	private var LSTitle_lbl:Label;
 	private var LSDescription_lbl:Label;
 	
@@ -108,6 +109,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var class_txt:Label;
 	private var duration_txt:TextField;
 	private var startMsg_txt:TextField;
+	private var editLockMessage_txt:TextField;
 	
 	private var lessonManager:TextField;
 	private var taskManager:TextField;
@@ -184,7 +186,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				populateContributeActivities();
                 break;
 			case 'TABCHANGE' :
-				if (infoObj.tabID == _tabID){
+				if (infoObj.tabID == _tabID && !mm.locked){
 				trace("TabID for Selected tab is (LessonTab TABCHANGE): "+infoObj.tabID)
 					//this._visible = true;
 					mm.getMonitor().getMV().getMonitorLessonScp()._visible = true;
@@ -208,24 +210,19 @@ public function update (o:Observable,infoObj:Object):Void{
 				}
 				break;
 			case 'SEQUENCE' :
-				if (infoObj.tabID == _tabID){
-				trace("TabID for Selected tab is (LessonTab): "+infoObj.tabID)
-					//this._visible = true;
-					trace("ContentPath: "+this)
-					mm.getMonitor().getMV().getMonitorLessonScp()._visible = true;
-					hideMainExp(mm);
-					mm.broadcastViewUpdate("JOURNALSSHOWHIDE", false);
-					
-					MovieClipUtils.doLater(Proxy.create(this,draw));
-					
+				if (infoObj.tabID == _tabID && !mm.locked){
+						mm.getMonitor().getMV().getMonitorLessonScp()._visible = true;
+						hideMainExp(mm);
+						mm.broadcastViewUpdate("JOURNALSSHOWHIDE", false);
+						
+						MovieClipUtils.doLater(Proxy.create(this,draw));
 					
 				}else {
 					mm.getMonitor().getMV().getMonitorLessonScp()._visible = false;
-					//this._visible = false;
 				}
 				break;
 			case 'RELOADPROGRESS' :	
-					if (infoObj.tabID == _tabID){
+					if (infoObj.tabID == _tabID && !mm.locked){
 						trace("called Reload progress")
 						reloadProgress(true);
 					}
@@ -245,7 +242,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				_dialog.checkStaff(mm.organisation);
 				break;
 			case 'DRAW_DESIGN' :
-				if (infoObj.tabID == _tabID){
+				if (infoObj.tabID == _tabID && !mm.locked){
 					//drawDesignCalled = "called";
 					trace("TabID for Selected tab is (LessonTab): "+infoObj.tabID)
 					populateLessonDetails();
@@ -288,6 +285,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		setScheduleDateRange();
 
+		dispatchEvent({type:'load',target:this});
 	}
 
 
@@ -305,6 +303,7 @@ public function update (o:Observable,infoObj:Object):Void{
 	private function hideMainExp(mm:MonitorModel):Void{
 		//var mcontroller = getController();
 		mm.broadcastViewUpdate("EXPORTSHOWHIDE", false)
+		mm.broadcastViewUpdate("EDITFLYSHOWHIDE", false);
 	}
 	
 
@@ -318,9 +317,6 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 			trace("reloading Progress data for Learners")
 			//mm.getMonitor().reloadLessonToMonitor();
-			
-		
-			
 			
 			if (isChanged == false){
 				mm.setIsProgressChangedLesson(false);
@@ -350,6 +346,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		trace("Loaded LessonTabView Data"+ this)
 	
 		startMsg_txt.visible = false;
+		editLockMessage_txt.visible = false;
 	
 		var seq:Sequence = mm.getSequence();
 		if (_root.lessonLaunch == "false" && isLessonLaunchChecked){
@@ -378,19 +375,18 @@ public function update (o:Observable,infoObj:Object):Void{
 		setMenu();
 		setStyles();
 		mm.getMonitor().getMV().getMonitorLessonScp().redraw(true);
-		dispatchEvent({type:'load',target:this});
+		
+		
 	}
 	
 	private function rearrangeAll():Void{
 		learnerURL_lbl.visible = false;
 		learnerURL_txt.visible = false;
-		
 		class_lbl._y = class_lbl._y - 30
 		class_txt._y = class_txt._y - 30
-		
 		lessonManager._y = lessonManager._y - 30
 		taskManager._y = taskManager._y - 30
-		
+
 		lessonManager_lbl._x = lessonManager._x + 2
 		lessonManager_lbl._y = lessonManager._y
 		taskManager_lbl._x = taskManager._x + 2
@@ -401,22 +397,20 @@ public function update (o:Observable,infoObj:Object):Void{
 		manageStart_lbl._y = manageStart_lbl._y - 30
 		manageDate_lbl._y = manageDate_lbl._y - 30
 		manageTime_lbl._y = manageTime_lbl._y - 30
-		
 		start_date_lbl._y = start_date_lbl._y - 30
 		schedule_date_lbl._y = schedule_date_lbl._y - 30
 		scheduleDate_dt._y = scheduleDate_dt._y - 30
 		scheduleTime._y = scheduleTime._y - 30
-		
 		viewLearners_btn._y = viewLearners_btn._y - 30
 		editClass_btn._y = editClass_btn._y - 30
 		changeStatus_cmb._y = changeStatus_cmb._y - 30
 		statusApply_btn._y = statusApply_btn._y - 30
 		schedule_btn._y = schedule_btn._y - 30
 		start_btn._y = start_btn._y - 30
-		
 		reqTasks_scp._y = reqTasks_scp._y - 30
 		learner_expp_cb._y = learner_expp_cb._y - 30
 		learner_expp_cb_lbl._y = learner_expp_cb_lbl._y - 30
+		
 		
 	}
 	/**
@@ -774,6 +768,8 @@ public function update (o:Observable,infoObj:Object):Void{
 	}
 	public function setupLabels(){
 		
+		//max_lbl.text = Dictionary.getValue('pi_max_act');
+		
 		//populate the synch type combo:
 		status_lbl.text = "<b>"+Dictionary.getValue('ls_status_lbl')+"</b>";
 		learner_lbl.text = "<b>"+Dictionary.getValue('ls_learners_lbl')+"</b>";
@@ -794,23 +790,23 @@ public function update (o:Observable,infoObj:Object):Void{
 		schedule_btn.label = Dictionary.getValue('ls_manage_schedule_btn');
 		start_btn.label = Dictionary.getValue('ls_manage_start_btn');
 		
-		taskManager.border = true;
-		taskManager.borderColor = 0x003366;
+		//_lessonStateArr = ["CREATED", "NOT_STARTED", "STARTED", "SUSPENDED", "FINISHED", "ARCHIVED", "DISABLED"];
 		
+		taskManager.border = true
+		taskManager.borderColor = 0x003366;
 		taskManager_lbl.text = Dictionary.getValue('ls_tasks_txt');
 		taskManager_lbl._x = taskManager._x + 2;
 		taskManager_lbl._y = taskManager._y;
 		
-		lessonManager.border = true;
+		lessonManager.border = true
 		lessonManager.borderColor = 0x003366;
-		
 		lessonManager_lbl.text = Dictionary.getValue('ls_manage_txt');
 		lessonManager_lbl._x = lessonManager._x + 2;
 		lessonManager_lbl._y = lessonManager._y;
 		
-		taskManager.background = true;
+		taskManager.background = true
 		taskManager.backgroundColor = 0xEAEAEA;
-		lessonManager.background = true;
+		lessonManager.background = true
 		lessonManager.backgroundColor = 0xEAEAEA;
 		
 		delete this.onEnterFrame; 
@@ -873,6 +869,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		// Check box label
 		learner_expp_cb_lbl.setStyle('styleName', styleObj);
 		
+		
 		//SMALL LABELS
 		styleObj = _tm.getStyleObject('PIlabel');
 		manageDate_lbl.setStyle('styleName',styleObj);
@@ -908,7 +905,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		
     }
 	
-	private function setMenu():Void{
+	private function setMenu(b:Boolean):Void{
 		var fm:Menu = LFMenuBar.getInstance().fileMenu;
 		fm.setMenuItemEnabled(fm.getMenuItemAt(1), editClass_btn.enabled);
 		fm.setMenuItemEnabled(fm.getMenuItemAt(2), start_btn.visible);

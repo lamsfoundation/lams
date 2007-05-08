@@ -25,12 +25,14 @@ import org.lamsfoundation.lams.authoring.*       	//Design Data model n stuffimp
 import org.lamsfoundation.lams.authoring.tk.*       //Toolkit
 import org.lamsfoundation.lams.authoring.tb.*       //Toolbar
 import org.lamsfoundation.lams.authoring.cv.*       //Canvas
+import org.lamsfoundation.lams.authoring.layout.*       //Authoring Layout Managers
 import org.lamsfoundation.lams.common.ws.*          //Workspace
 import org.lamsfoundation.lams.common.comms.*       //communications
 import org.lamsfoundation.lams.common.util.*        //Utils
 import org.lamsfoundation.lams.common.dict.*        //Dictionary
 import org.lamsfoundation.lams.common.ui.*          //User interface
 import org.lamsfoundation.lams.common.style.*       //Themes/Styles
+import org.lamsfoundation.lams.common.layout.*		// Layouts
 import org.lamsfoundation.lams.common.*             
 import mx.managers.*
 import mx.utils.*
@@ -72,10 +74,10 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private static var DIALOGUE_DEPTH:Number = 20;	//depth of the dialogue box
     private static var TOOLTIP_DEPTH:Number = 60;	//depth of the tooltip
     private static var CURSOR_DEPTH:Number = 70;   //depth of the cursors
-	private static var CCURSOR_DEPTH:Number = 201;
-    private static var MENU_DEPTH:Number = 25;   //depth of the menu
-	private static var PI_DEPTH:Number = 35;   //depth of the menu
-    private static var TOOLBAR_DEPTH:Number = 50;   //depth of the menu
+	private static var CCURSOR_DEPTH:Number = 101;
+    public static var MENU_DEPTH:Number = 25;   //depth of the menu
+	public static var PI_DEPTH:Number = 35;   //depth of the menu
+    public static var TOOLBAR_DEPTH:Number = 50;   //depth of the menu
     private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
 	private static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
 	private static var DATA_LOAD_CHECK_INTERVAL:Number = 50;
@@ -94,7 +96,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	public static var CUT_TYPE:Number = 0;
 	public static var COPY_TYPE:Number = 1;
 	
-	private static var COMPONENT_NO = 9;
+	private static var COMMON_COMPONENT_NO = 4;
 
 	private var _uiLoadCheckCount = 0;				// instance counter for number of times we have checked to see if theme and dict are loaded
 	private var _dataLoadCheckCount = 0;			
@@ -103,8 +105,9 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private var _toolbar:Toolbar;
     private var _toolkit:Toolkit;
     private var _canvas:Canvas;
-    private var _workspace:Workspace;
-	private var _PI:PropertyInspectorNew;
+    private var _PI:PropertyInspectorNew;
+	
+	private var _workspace:Workspace;
 	private var _ccm:CustomContextMenu;
 	private var _debugDialog:MovieClip;                //Reference to the debug dialog
     
@@ -127,6 +130,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private var _menuLoaded:Boolean;
 	private var _showCMItem:Boolean;
 	private var _piLoaded:Boolean;
+	
 	//clipboard
 	private var _clipboardData:Object;
 	private var _clipboardPasteCount:Number;
@@ -134,9 +138,14 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	// set up Key Listener
 	//private var keyListener:Object;
     
+	// operation modes
+	private var _isEditMode:Boolean;
+	private var _root_layout:String;
+	private var _layout:LFLayout;
+	
     //Application instance is stored as a static in the application class
     private static var _instance:Application = null;     
-
+	
     /**
     * Application - Constructor
     */
@@ -145,11 +154,13 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		_toolkitLoaded = false;
         _canvasLoaded  = false;
         _menuLoaded = false;
-        _toolbarLoaded = false;  
+        _toolbarLoaded = false;
 		_piLoaded = false;
 		_module = Application.MODULE;
 		_PI = new PropertyInspectorNew();
 		_ccm = CustomContextMenu.getInstance();
+		_root_layout = (_root.layout != undefined || _root.layout != null) ? _root.layout : null;
+		
 		//Mouse.addListener(someListener);
     }
     
@@ -167,10 +178,18 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     * Main entry point to the application
     */
     public function main(container_mc:MovieClip){
-        _container_mc = container_mc;
+        
+		if(_root_layout == ApplicationParent.EDIT_MODE)
+			_isEditMode = true;
+		else
+			_isEditMode = false;
+		
+		
+		_container_mc = container_mc;
         _UILoaded = false;
 
-		loader.start(COMPONENT_NO);
+		var layout_component_no = (_isEditMode) ? EditOnFlyLayoutManager.COMPONENT_NO : DefaultLayoutManager.COMPONENT_NO;
+		loader.start(COMMON_COMPONENT_NO + layout_component_no);
 		
 		_customCursor_mc = _container_mc.createEmptyMovieClip('_customCursor_mc', CCURSOR_DEPTH);			
 		
@@ -266,7 +285,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         } else {
 			_uiLoadCheckCount++;
             //If all events dispatched clear interval and call start()
-            if(_dictionaryEventDispatched && _themeEventDispatched){
+            if(_UILoaded && _dictionaryEventDispatched && _themeEventDispatched){
 				//Debugger.log('Clearing Interval and calling start :',Debugger.CRITICAL,'checkUILoaded','Application');	
                 clearInterval(_UILoadCheckIntervalID);
 				start();
@@ -315,7 +334,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     * @param UIElementID:String - Identifier for the Element that was loaded
     */
     public function UIElementLoaded(evt:Object) {
-        //Debugger.log('UIElementLoaded: ' + evt.target.className,Debugger.GEN,'UIElementLoaded','Application');
+        Debugger.log('UIElementLoaded: ' + evt.target.className,Debugger.GEN,'UIElementLoaded','Application');
         if(evt.type=='load'){
             //Which item has loaded
             switch (evt.target.className) {
@@ -337,13 +356,15 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
                 default:
             }
 			
+			_layout.manager.addLayoutItem(evt.target.className, evt.target);
+			
 			loader.complete();
-            
-            //If all of them are loaded set UILoad accordingly
-            if(_toolkitLoaded && _canvasLoaded && _menuLoaded && _toolbarLoaded){
-                _UILoaded=true;                
-            } 
-            
+			
+			if(_layout.manager.completedLayout) {
+				_UILoaded =  true;
+			} else {
+				_UILoaded = false;            
+			}
         }   
     }
     
@@ -355,44 +376,31 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		//Make the base context menu hide built in items so we don't have zoom in etc 
 		_ccm.showCustomCM(_ccm.loadMenu("application", "authoring"))
 		
-        //Create the application root
+		//Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
-        //Create screen elements
+        
+		//Create screen elements
         _dialogueContainer_mc = _container_mc.createEmptyMovieClip('_dialogueContainer_mc',DIALOGUE_DEPTH);
         _cursorContainer_mc = _container_mc.createEmptyMovieClip('_cursorContainer_mc',CURSOR_DEPTH);			
- 		_toolbarContainer_mc = _container_mc.createEmptyMovieClip('_toolbarContainer_mc',TOOLBAR_DEPTH);
+		_toolbarContainer_mc = _container_mc.createEmptyMovieClip('_toolbarContainer_mc',TOOLBAR_DEPTH);
 		_pi_mc = _container_mc.createEmptyMovieClip('_pi_mc',PI_DEPTH);
 		
+		// Tooltip
 		_tooltipContainer_mc = _container_mc.createEmptyMovieClip('_tooltipContainer_mc',TOOLTIP_DEPTH);
-
-        //MENU
-        _menu_mc = _container_mc.attachMovie('LFMenuBar','_menu_mc',MENU_DEPTH, {_x:0,_y:0});
-        _menu_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
-
-        
-        var depth:Number = _appRoot_mc.getNextHighestDepth();
 		
-		//TOOLBAR
-        _toolbar = new Toolbar(_toolbarContainer_mc,_toolbarContainer_mc.getNextHighestDepth(),TOOLBAR_X,TOOLBAR_Y);
-        _toolbar.addEventListener('load',Proxy.create(this,UIElementLoaded));
-		
-		//CANVAS
-        _canvas = new Canvas(_appRoot_mc,depth++,CANVAS_X,CANVAS_Y,CANVAS_W,495);
-        _canvas.addEventListener('load',Proxy.create(this,UIElementLoaded));
-        
-		//WORKSPACE
+		// Workspace
         _workspace = new Workspace();
-        //_workspace.addEventListener('load',Proxy.create(this,UIElementLoaded));
 
-		//TOOLKIT  
-		_toolkit = new Toolkit(_appRoot_mc,depth++,TOOLKIT_X,TOOLKIT_Y);
-        _toolkit.addEventListener('load',Proxy.create(this,UIElementLoaded));
-		
-		_pi_mc = _pi_mc.attachMovie('PropertyInspectorNew','_pi_mc',PI_DEPTH, {_x:PI_X,_y:PI_Y, _canvasModel:_canvas.model, _canvasController:_canvas.view.getController()});
-		_pi_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
+		setupLayout();
 		
 		setTabIndex();
     }
+	
+	private function setupLayout():Void {
+		var manager = (_isEditMode) ? ILayoutManager(new EditOnFlyLayoutManager('editonfly')) : ILayoutManager(new DefaultLayoutManager('default'));
+		_layout = new LFLayout(this, manager);
+		_layout.init();
+	}
     
 	private function setTabIndex(selectedTab:String){
 		
@@ -424,6 +432,14 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 			LFMenuBar.getInstance().enableRecover(true);
 		}
 		
+		if(_isEditMode) {
+			Debugger.log("Authoring started in Edit-On-The-Fly Mode", Debugger.CRITICAL, "start", "Application");
+			var ldID = Number(_root.learningDesignID);
+			canvas.openDesignForEditOnFly(ldID);
+		} else {
+			Debugger.log("Authoring started in Author Mode", Debugger.CRITICAL, "start", "Application");
+		}
+		
     }
     
     /**
@@ -437,62 +453,20 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     * Receives events from the Stage resizing
     */
     public function onResize(){
-        //Debugger.log('onResize',Debugger.GEN,'main','org.lamsfoundation.lams.Application');
-
+        
         //Get the stage width and height and call onResize for stage based objects
         var w:Number = Stage.width;
         var h:Number = Stage.height;
 		
 		var someListener:Object = new Object();
-		trace("onResize called")
+		
 		someListener.onMouseUp = function () {
 			
-			//Menu - only need to worry about width
-			_menu_mc.setSize(w,_menu_mc._height);
+			_layout.manager.resize(w, h);
 
-			//Canvas
-			_canvas.setSize(w-_toolkit.width,h-(CANVAS_Y+_canvas.model.getPIHeight()));
-			_toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
-			
-			//Toolbar
-			_toolbar.setSize(w, TOOLBAR_HEIGHT);
-			
-			//Property Inspector
-			_pi_mc.setSize(w-_toolkit.width,_pi_mc._height)
-			_pi_mc._y = h - _canvas.model.getPIHeight();
-			_pi_mc.showExpand(false);
-			
-			//var pi = _canvas.getPropertyInspector();
-			//pi._y = h;//- pi._height;
-			//pi._y = h - 210;
-			
 		}
-		//Mouse.addListener(someListener);
 
-
-        
-        //Menu - only need to worry about width
-        _menu_mc.setSize(w,_menu_mc._height);
-
-        //Canvas
-        _toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
-		_canvas.setSize(w-_toolkit.width,h-(CANVAS_Y+_canvas.model.getPIHeight()));
-       //Toolbar
-        _toolbar.setSize(w, TOOLBAR_HEIGHT);
-		//Property Inspector
-		_pi_mc.setSize(w-_toolkit.width,_pi_mc._height)
-		_pi_mc._y = h - _canvas.model.getPIHeight();
-		var piHeight:Number = _canvas.model.getPIHeight();
-		_pi_mc.showExpand(false)
-		if (piHeight != _pi_mc.piFullHeight()){
-			_pi_mc.showExpand(true);
-		}
-		
-		//var pi = _canvas.getPropertyInspector();
-		//pi._y = h;//- pi._height;
-		//pi._y = h - 210;
-		
-		
+		_layout.manager.resize(w, h);
 		
 		
 		
@@ -685,6 +659,38 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     public function getToolbar():Toolbar{
         return _toolbar;
     }
+	
+	public function set toolbar(a:Toolbar) {
+		_toolbar = a;
+	}
+	
+	public function get toolbar():Toolbar {
+		return _toolbar;
+	}
+	
+	public function set toolkit(a:Toolkit) {
+		_toolkit = a;
+	}
+	
+	public function get toolkit():Toolkit {
+		return _toolkit;
+	}
+	
+	public function set menubar(a:MovieClip) {
+		_menu_mc = a;
+	}
+	
+	public function get menubar():MovieClip {
+		return _menu_mc;
+	}
+	
+	public function set pi(a:MovieClip) {
+		_pi_mc = a;
+	}
+	
+	public function get pi():MovieClip {
+		return _pi_mc;
+	}
 
     /**
     * returns the the canvas instance
@@ -692,6 +698,15 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     public function getCanvas():Canvas{
         return _canvas;
     }
+	
+	public function set canvas(a:Canvas) {
+		_canvas = a;
+	}
+	
+	public function get canvas():Canvas {
+		return _canvas;
+	}
+	
 	public function get controlKeyPressed():String{
         return _controlKeyPressed;
     }
@@ -699,6 +714,11 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	public function set controlKeyPressed(key:String){
         _controlKeyPressed = key;
     }
+	
+	public function set root_layout(a:String){
+		_root_layout = a;
+	}
+	
     /**
     * returns the the workspace instance
     */
@@ -763,6 +783,19 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         }
     }
 	
+	 /**
+    * Returns true if in Edit Mode (for Edit-On-The-Fly) otherwise false
+	* 
+    */
+    static function get isEditMode():Boolean {
+        //Return root if valid otherwise raise a big system error as app. will not work without it
+        if(_instance._isEditMode != undefined) {
+            return _instance._isEditMode;
+        } else {
+			
+        }
+    }
+	
 	/**
     * Returns the Application root, use as _root would be used
     * 
@@ -781,4 +814,37 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         }
     }
 	
+	/**
+    * Returns the Application root, use as _root would be used
+    * 
+    * @usage    Import authoring package and then use as root e.g.
+    * 
+    *           import org.lamsfoundation.lams.authoring;
+    *           Application.root.attachMovie('myLinkageId','myInstanceName',depth);
+    */
+    static function get containermc():MovieClip {
+        //Return root if valid otherwise raise a big system error as app. will not work without it
+        if(_instance._container_mc != undefined) {
+            return _instance._container_mc;
+        } else {
+            
+        }
+    }
+	
+	/**
+    * Returns the Application root, use as _root would be used
+    * 
+    * @usage    Import authoring package and then use as root e.g.
+    * 
+    *           import org.lamsfoundation.lams.authoring;
+    *           Application.root.attachMovie('myLinkageId','myInstanceName',depth);
+    */
+    static function get toolbarContainer():MovieClip {
+        //Return root if valid otherwise raise a big system error as app. will not work without it
+        if(_instance._toolbarContainer_mc != undefined) {
+            return _instance._toolbarContainer_mc;
+        } else {
+            
+        }
+    }
 }

@@ -56,6 +56,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	private var canvas_scp:ScrollPane;
     private var bkg_pnl:Panel;
 	private var isRread_only:Boolean = false;
+	private var isRedit_on_fly:Boolean = false;
 	private var read_only:MovieClip;
 	private var titleBar:MovieClip;
 	private var leftCurve:MovieClip;
@@ -135,11 +136,17 @@ public function viewUpdate(event:Object):Void{
             case 'DRAW_ACTIVITY':
                 drawActivity(event.data,cm);
                 break;
+			case 'HIDE_ACTIVITY':
+                hideActivity(event.data,cm);
+                break;
             case 'REMOVE_ACTIVITY':
                 removeActivity(event.data,cm);
                 break;
             case 'DRAW_TRANSITION':
                 drawTransition(event.data,cm);
+				break;
+			case 'HIDE_TRANSITION':
+                hideTransition(event.data,cm);
 				break;
 			case 'REMOVE_TRANSITION':
 				removeTransition(event.data,cm);
@@ -197,7 +204,6 @@ public function viewUpdate(event:Object):Void{
 			Application.getInstance().getCanvas().getCanvasView().getController().canvasRelease(this);
 		}
 		bkg_pnl.useHandCursor = false;
-		
 		setDesignTitle();
 		
 		styleTitleBar();
@@ -215,6 +221,9 @@ public function viewUpdate(event:Object):Void{
 		if (isRread_only){
 			dTitle = cm.getCanvas().ddm.title + " (<font color='#FF0000'>"+Dictionary.getValue('cv_readonly_lbl')+"</font>)"
 			titleToCheck = cm.getCanvas().ddm.title + Dictionary.getValue('cv_readonly_lbl')
+		} else if(isRedit_on_fly) {
+			dTitle = cm.getCanvas().ddm.title + " (<font color='#036D00'>"+Dictionary.getValue('cv_edit_on_fly_lbl')+"</font>)"
+			titleToCheck = cm.getCanvas().ddm.title + Dictionary.getValue('cv_edit_on_fly_lbl')
 		}else {
 			dTitle = cm.getCanvas().ddm.title
 			titleToCheck = dTitle
@@ -258,8 +267,8 @@ public function viewUpdate(event:Object):Void{
 		read_only._x = titleBar._x + 5;
 		
 	}
-	
-	private function styleTitleBar():Void {
+
+    private function styleTitleBar():Void {
 		
 		var titleBarBg:mx.styles.CSSStyleDeclaration = _tm.getStyleObject("BGPanel");
 		var titleBarBgShadow:mx.styles.CSSStyleDeclaration = _tm.getStyleObject("BGPanelShadow");
@@ -356,14 +365,14 @@ public function viewUpdate(event:Object):Void{
 			//get the children
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
 			//var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv});
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv});
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv, _locked:a.isReadOnly()});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Parallel activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 		}
 		if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
 			//var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv});
-			var newActivity_mc = _activityLayerComplex_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv});
+			var newActivity_mc = _activityLayerComplex_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv,_locked:a.isReadOnly()});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 			
@@ -384,6 +393,31 @@ public function viewUpdate(event:Object):Void{
 		s = true;
 		
 		return s;
+	}
+	
+	/**
+	 * Add to canvas stage but keep hidden from view.
+	 * 
+	 * @usage   
+	 * @param   a  
+	 * @param   cm 
+	 * @return  true if successful
+	 */
+	
+	private function hideActivity(a:Activity, cm:CanvasModel):Boolean {
+		var cvv = CanvasView(this);
+		var cvc = getController();
+		
+		if (a.isSystemGateActivity()){
+			var newActivityObj = new Object();
+			newActivityObj.activity = a;
+			
+			cm.activitiesDisplayed.put(a.activityUIID,newActivityObj);
+			
+			Debugger.log('Gate activity a.title:'+a.title+','+a.activityUIID+' added (hidden) to the cm.activitiesDisplayed hashtable:'+newActivityObj,4,'hideActivity','CanvasView');
+		}
+		
+		return true;
 	}
 	
 	/**
@@ -419,6 +453,27 @@ public function viewUpdate(event:Object):Void{
 		Debugger.log('drawn a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'drawTransition','CanvasView');
 		return s;
 		
+	}
+	
+	/**
+	 * Hides a transition on the canvas.
+	 * 
+	 * @usage   
+	 * @param   t  The transition to hide
+	 * @param   cm  The canvas model
+	 * @return  true if successful
+	 */
+	
+	private function hideTransition(t:Transition, cm:CanvasModel):Boolean{
+		var cvv = CanvasView(this);
+		var cvc = getController();
+		var newTransition_mc:MovieClip = _transitionLayer_mc.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_canvasController:cvc,_canvasView:cvv, _visible:false});
+		
+		cm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
+		Debugger.log('drawn (hidden) a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'hideTransition','CanvasView');
+		
+		
+		return true;
 	}
 	
 	/**
@@ -556,6 +611,10 @@ public function viewUpdate(event:Object):Void{
 	
 	public function showReadOnly(b:Boolean){
 		isRread_only = b;
+	}
+	
+	public function showEditOnFly(b:Boolean){
+		isRedit_on_fly = b;
 	}
 	
 	/**

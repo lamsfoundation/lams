@@ -66,6 +66,8 @@ class GateActivity extends Activity{
 	public function populateFromDTO(dto:Object){
 		super.populateFromDTO(dto);
 		_gateActivityLevelID = dto.gateActivityLevelID;
+		_gateOpen = dto.gateOpen;
+		
 		if(_activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE){
 			_gateStartTimeOffset = dto.gateStartTimeOffset;
 			_gateEndTimeOffset = dto.gateEndTimeOffset;
@@ -84,6 +86,7 @@ class GateActivity extends Activity{
 		if(_gateActivityLevelID){	dto.gateActivityLevelID = _gateActivityLevelID;	}
 		if(_gateStartTimeOffset){	dto.gateStartTimeOffset = _gateStartTimeOffset;	}
 		if(_gateEndTimeOffset)	{	dto.gateEndTimeOffset= _gateEndTimeOffset;		}
+		if(_gateOpen) { dto.gateOpen = _gateOpen; }
 		return dto;
 	}
 	

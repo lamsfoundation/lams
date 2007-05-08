@@ -170,6 +170,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				}
 				setInterval(Proxy.create(this,autoSave), autosave_config_interval);
 			}
+			
 			clearCanvas(true);
 			
             dispatchEvent({type:'load',target:this});
@@ -247,6 +248,23 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+learningDesignID,callback, false);
 		
 	}
+	
+	/**
+	 * Request runtime-sequence design from server to be editted.
+	 * 
+	 * @usage   
+	 * @param   learningDesignID 
+	 * @return  
+	 */
+	
+	public function openDesignForEditOnFly(learningDesignID:Number){
+		var callback:Function = Proxy.create(this,setDesign, true);
+        canvasModel.editing = true;
+		
+		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+learningDesignID,callback, false);
+		
+	}
+	
 	/**
 	 * Auto-saves current DDM (Learning Design on Canvas) to SharedObject
 	 * 
@@ -320,6 +338,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	public function saveDesign(){
 		if((_ddm.learningDesignID == undefined || _ddm.learningDesignID == "" || _ddm.learningDesignID == null || _ddm.learningDesignID =="undefined") || _ddm.learningDesignID == Config.NUMERIC_NULL_VALUE && (_ddm.title == "" || _ddm.title == undefined || _ddm.title == null)){
+			
 			// raise alert if design is empty
 			if (canvasModel.activitiesDisplayed.size() < 1){
 				Cursor.showCursor(Application.C_DEFAULT);
@@ -328,14 +347,30 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			}else {
 				saveDesignToServerAs(Workspace.MODE_SAVE);
 			}
-		}else if(_ddm.readOnly){
+		
+		}else if(_ddm.readOnly && !_ddm.editOverrideLock){
 			saveDesignToServerAs(Workspace.MODE_SAVEAS);
-		}else{
+		}else if(_ddm.editOverrideLock){
+			var errors:Array = canvasModel.validateDesign();
 			
+			if(errors.length > 0) {
+				var errorPacket = new Object();
+				errorPacket.messages = errors;
+				
+				var msg:String = Dictionary.getValue('cv_invalid_design_on_apply_changes');
+				//public static function howMessageConfirm(msg, okHandler:Function, cancelHandler:Function,okLabel:String,cancelLabel:String){
+				var okHandler = Proxy.create(this,showDesignValidationIssues, errorPacket);
+				LFMessage.showMessageConfirm(msg,okHandler,null,Dictionary.getValue('cv_show_validation'));
+				Cursor.showCursor(Application.C_DEFAULT);
+			} else {
+				saveDesignToServer();	// design is valid, save normal
+			}
+		
+		}else{
 			saveDesignToServer();
 		}
 	}
-    
+ 
 	/**
 	 * Launch workspace browser dialog and set the design metat data for saving
 	 * E.g. Title, Desc, Folder etc... also license if required?
@@ -441,14 +476,14 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				Debugger.log('updating activities.... ',Debugger.GEN,'onStoreDesignResponse','Canvas');		
 			
 				updateToolActivities(r);
+				
+				_ddm.readOnly = false;
+				_ddm.copyTypeID = DesignDataModel.COPY_TYPE_ID_AUTHORING;
+			
 			} else {
 				Debugger.log('save mode: ' +_ddm.saveMode,Debugger.GEN,'onStoreDesignResponse','Canvas');		
 			
 			}
-			
-			// ??
-			_ddm.readOnly = r.readOnly;
-			_ddm.copyTypeID = r.copyTypeID;
 			
 			_ddm.modified = false;
 			
@@ -470,6 +505,10 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 					//var extHandler = Proxy.create(this,closeReturnExt);
 					//LFMessage.showMessageConfirm(msg, null, extHandler, null, Dictionary.getValue('cv_close_return_to_ext_src', [_requestSrc]));
+				} else if(_ddm.editOverrideLock) {
+					var finishEditHandler = Proxy.create(this,finishEditOnFly);
+					msg = Dictionary.getValue('cv_eof_changes_applied');
+					LFMessage.showMessageAlert(msg, finishEditHandler);
 				} else {
 					LFMessage.showMessageAlert(msg);
 				}
@@ -501,8 +540,62 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		var validationIssuesDialog = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:Dictionary.getValue('ld_val_title'),closeButton:true,scrollContentPath:"ValidationIssuesDialog",validationIssues:dp, canvasModel:canvasModel,canvasController:cc});
 	}
 	
+	/**
+	 * Close Window
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	
 	public function closeReturnExt() {
 		ApplicationParent.extCall("closeWindow", null);
+	}
+	
+	/**
+	 * Reopen Monitor client
+	 * 
+	 * @usage   
+	 * @param   lessonID 	Lesson to load in Monitor
+	 * @return  
+	 */
+	
+	public function reopenMonitor(lessonID) {
+		Debugger.log('finishing and closing Edit On The Fly',Debugger.CRITICAL,'finishEditOnFly','Canvas');
+		
+		ApplicationParent.extCall("openMonitorLesson", lessonID);
+	}
+	
+	/**
+	 * Finish Edit-On-The-Fly
+	 * 
+	 * @usage   
+	 * @param   forced 
+	 * @return  
+	 */
+	
+	public function finishEditOnFly(forced:Boolean) {
+		Debugger.log('finishing and closing Edit On The Fly',Debugger.CRITICAL,'finishEditOnFly','Canvas');
+		
+		Debugger.log('valid design: ' + _ddm.validDesign,Debugger.CRITICAL,'finishEditOnFly','Canvas');
+		Debugger.log('modified: ' + _ddm.modified,Debugger.CRITICAL,'finishEditOnFly','Canvas');
+		
+		var callback:Function = Proxy.create(this,reopenMonitor);
+        canvasModel.editing = false;
+		
+		if(forced) {
+			ApplicationParent.extCall("setSaved", "true");
+			finishLearningDesignCall(callback);
+			return;
+		}
+		
+		if(!_ddm.modified) {
+			if(_ddm.validDesign) finishLearningDesignCall(callback);
+			else LFMessage.showMessageAlert(Dictionary.getValue("cv_eof_finish_invalid_msg"));
+		} else LFMessage.showMessageConfirm(Dictionary.getValue("cv_eof_finish_modified_msg"), Proxy.create(this,finishEditOnFly, true), null);
+	}
+	
+	private function finishLearningDesignCall(callback:Function) {
+		Application.getInstance().getComms().getRequest('authoring/author.do?method=finishLearningDesignEdit&learningDesignID='+_ddm.learningDesignID,callback, false);
 	}
 	
 	/**
@@ -518,6 +611,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		for(var i=0; i<responsePacket.activities.length; i++){
 			var ta:ToolActivity = ToolActivity(_ddm.getActivityByUIID(responsePacket.activities[i].activityUIID));
 			ta.toolContentID = responsePacket.activities[i].toolContentID;
+			ta.readOnly = responsePacket.activities[i].readOnly;
 			Debugger.log('setting new tool content ID for activity ' + ta.activityID + ' (toolContentID:' + ta.toolContentID + ')',Debugger.GEN,'updateToolActivities','Canvas');
 		
 		}
@@ -538,8 +632,13 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	public function checkReadOnlyDesign(){
 		if(_ddm.readOnly){
-			LFMenuBar.getInstance().enableSave(false);
-			canvasView.showReadOnly(true);
+			if(!_ddm.editOverrideLock) {
+				LFMenuBar.getInstance().enableSave(false);
+				canvasView.showReadOnly(true);
+			} else {
+				canvasView.showEditOnFly(true);
+			}
+			
 		} else {
 			LFMenuBar.getInstance().enableSave(true);
 			canvasView.showReadOnly(false);
@@ -713,16 +812,23 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		Debugger.log('designData.title:'+designData.title+':'+designData.learningDesignID,4,'setDesign','Canvas');
 		
 		if(clearCanvas(true)){
+			
 			_ddm.setDesign(designData);
+			
 			if(canvasModel.importing){ 
 				Application.getInstance().getWorkspace().getWorkspaceModel().clearWorkspaceCache(_ddm.workspaceFolderID);
 				canvasModel.importing = false;
+			} else if(canvasModel.editing){
+				// TODO: stuff to do before design is displayed
+				// do we need editing flag in CanvasModel?
 			}
+			
 			checkValidDesign();
 			checkReadOnlyDesign();
 			canvasModel.setDesignTitle();
 			canvasModel.setDirty();
 			LFMenuBar.getInstance().enableExport(!canvasModel.autoSaveWait);
+		
 		}else{
 			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
 		}
@@ -764,6 +870,24 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		
 	}
 	
+	/**
+	 * Revert canvas back to last saved design
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	
+	public function revertCanvas():Boolean {
+		// can only revert canvas if design is saved
+		if(_ddm.learningDesignID != null) {
+			
+			openDesignForEditOnFly(_ddm.learningDesignID);
+			
+		} else {
+			// throw error alert
+			return false;
+		}
+	}
 	
 	
 	/**
@@ -987,7 +1111,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		canvasModel.stopTransitionTool();
 	}
 	
-	/**
+		/**
 	 * Method to open Preview popup window.
 	 */
 	public function launchPreviewWindow():Void{

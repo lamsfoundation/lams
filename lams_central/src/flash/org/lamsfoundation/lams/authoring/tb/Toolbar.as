@@ -35,6 +35,9 @@ class Toolbar {
 	private var toolbarView:ToolbarView;
 	private var toolbarView_mc:MovieClip;
     
+	public static var NORMAL_MODE:Number = 0;
+	public static var EDIT_MODE:Number = 1;
+	
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -45,10 +48,10 @@ class Toolbar {
 	*
 	* @param   target_mc	Target clip for attaching view
 	*/
-	function Toolbar (target_mc:MovieClip,depth:Number,x:Number,y:Number){
+	function Toolbar (target_mc:MovieClip,depth:Number,x:Number,y:Number, mode:Number){
         mx.events.EventDispatcher.initialize(this);
 		//Create the model
-		toolbarModel = new ToolbarModel(this);
+		toolbarModel = new ToolbarModel(this, mode);
         
 		//Create the view
 		toolbarView_mc = target_mc.createChildAtDepth("toolbarView",DepthManager.kTop);		
@@ -113,7 +116,6 @@ class Toolbar {
 		return getToolbarView();
 	}
 		
-	
 	public function getToolbarView():MovieClip{
 		return toolbarView;
 	}

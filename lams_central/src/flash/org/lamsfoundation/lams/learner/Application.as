@@ -332,18 +332,25 @@ class Application extends ApplicationParent {
 	 * @param   current 
 	 */
 	
-	public function refreshProgress(attempted:String, completed:String, current:String, lessonID:String){
+	public function refreshProgress(attempted:String, completed:String, current:String, lessonID:String, version:Number){
 		Debugger.log('attempted: ' + attempted,Debugger.CRITICAL,'refreshProgress','Application');
 		Debugger.log('completed: ' + completed,Debugger.CRITICAL,'refreshProgress','Application');
 		Debugger.log('current: ' + current,Debugger.CRITICAL,'refreshProgress','Application');
+		Debugger.log('version: ' + version,Debugger.CRITICAL,'refreshProgress','Application');
         Debugger.log('_root lesson ID: ' + _root.lessonID + ' passed in lesson ID: ' + lessonID,Debugger.CRITICAL,'refreshProgress','Application');
         //Debugger.log('_root unique ID: ' + _root.uniqueID + ' passed in unique ID: ' + uniqueID,Debugger.CRITICAL,'refreshProgress','Application');
         
 		if(_root.lessonID == lessonID){
 			var attemptedArray:Array = attempted.split("_");
 			var completedArray:Array = completed.split("_");
-			
-			_lesson.updateProgressData(attemptedArray, completedArray, Number(current));
+			if(_lesson.model.learningDesignModel != null) {
+				if(version != null && version != _lesson.model.learningDesignModel.designVersion) {
+					// TODO apply progress data arrays after design is reloaded instead of re-getting the flash progress data
+					_lesson.reloadLearningDesign();
+				} else {
+					_lesson.updateProgressData(attemptedArray, completedArray, Number(current));
+				}
+			}
 		}
 	}
      

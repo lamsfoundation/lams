@@ -22,6 +22,16 @@ if(StringUtils.isEmpty(mode)){
 	Debugger.log('Mode is not defined, using defualt:'+_root.mode,Debugger.CRITICAL,'main','ROOT');			
 }
 
+if(StringUtils.isEmpty(layout)){
+	_root.layout = "normal";
+	Debugger.log('Mode is not defined, using defualt:'+_root.mode,Debugger.CRITICAL,'main','ROOT');			
+}
+
+if(StringUtils.isEmpty(learningDesignID)){
+	_root.learningDesignID = null;
+	Debugger.log('LearningDesignID is not defined, using default:'+_root.learningDesignID,Debugger.CRITICAL,'main','ROOT');			
+}
+
 if(StringUtils.isEmpty(lang)){
 	_root.lang = "en";
 }

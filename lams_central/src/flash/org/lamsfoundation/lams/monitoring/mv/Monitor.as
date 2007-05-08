@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.Progress;
+import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.* ;
 
 import mx.utils.*;
@@ -51,9 +52,14 @@ class Monitor {
 	private var monitorModel:MonitorModel;
 	// View
 	private var monitorView:MonitorView;
+	private var monitorLockView:MonitorLockView;
 	private var monitorView_mc:MovieClip;
+	private var monitorLockView_mc:MovieClip;
+
+	private var locked:Boolean;
 
 	private var app:Application;
+	private var _sequence:Sequence;
 	private var _ddm:DesignDataModel;
 	private var _dictionary:Dictionary;
 
@@ -67,49 +73,70 @@ class Monitor {
 	
 	private var _onOKCallBack:Function;
 	
-	
-	
 	/**
 	 * Monitor Constructor Function
 	 * 
 	 * @usage   
 	 * @return  target_mc		//Target clip for attaching view
 	 */
-	public function Monitor(target_mc:MovieClip,depth:Number,x:Number,y:Number,w:Number,h:Number){
+	public function Monitor(target_mc:MovieClip,depth:Number,x:Number,y:Number,w:Number,h:Number, locked:Boolean, isEditingUser:Boolean){
 		mx.events.EventDispatcher.initialize(this);
 		
 		// Set root movieclip
 		_root_mc = target_mc;
+		this.locked = locked;
 		app = Application.getInstance();
+		
 		//Create the model
 		monitorModel = new MonitorModel(this);
-		_ddm = new DesignDataModel();
+		monitorModel.locked = locked;
+		
 		_dictionary = Dictionary.getInstance();
-
-		//Create the view
-		monitorView_mc = target_mc.createChildAtDepth("monitorView",DepthManager.kTop);	
 		
-		trace(monitorView_mc);
+		if(monitorView_mc == null || monitorView_mc == undefined) {
+			createNormalViewModel(x, y, w, h);
+		}
 		
-		monitorView = MonitorView(monitorView_mc);
-		
-		
-		monitorView.init(monitorModel,undefined,x,y,w,h);
-		
-        monitorView.addEventListener('load',Proxy.create(this,viewLoaded));
-
-		//Register view with model to receive update events
-		monitorModel.addObserver(monitorView);
-		monitorModel.addEventListener('learnersLoad',Proxy.create(this,onUserLoad));
-		monitorModel.addEventListener('staffLoad',Proxy.create(this,onUserLoad));
+		if(monitorModel.locked) {
+			createLockedViewModel(x, y, w, h, isEditingUser);
+			monitorView_mc._visible = false;
+		} 
 		
         //Set the position by setting the model which will call update on the view
         monitorModel.setPosition(x,y);
 		monitorModel.setSize(w,h);
 		monitorModel.initOrganisationTree();
 		
-		// load lesson from query parameter
-		loadLessonToMonitor(_root.lessonID);
+	}
+	
+	private function createNormalViewModel(x:Number,y:Number,w:Number,h:Number) {
+		//Create the view
+		monitorView_mc = _root_mc.createChildAtDepth("monitorView",DepthManager.kTop);	
+		
+		monitorView = MonitorView(monitorView_mc);
+		
+		//Register view with model to receive update events
+		monitorModel.addObserver(monitorView);
+		
+		monitorView.init(monitorModel,undefined,x,y,w,h);
+		
+		monitorView.addEventListener('load',Proxy.create(this,viewLoaded));
+		monitorView.addEventListener('tload',Proxy.create(this,tabsLoaded));
+		
+		monitorModel.addEventListener('learnersLoad',Proxy.create(this,onUserLoad));
+		monitorModel.addEventListener('staffLoad',Proxy.create(this,onUserLoad));
+		
+	}
+	
+	private function createLockedViewModel(x:Number,y:Number,w:Number,h:Number, isEditingUser:Boolean) {
+		monitorLockView_mc = _root_mc.createChildAtDepth("monitorLockView",DepthManager.kTop);	
+		monitorLockView = MonitorLockView(monitorLockView_mc);
+		
+		//Register view with model to receive update events
+		monitorModel.addObserver(monitorLockView);
+		
+		monitorLockView.init(monitorModel,undefined,x,y,w,h,isEditingUser);
+        monitorLockView.addEventListener('load',Proxy.create(this,viewLoaded));
 		
 	}
 	
@@ -125,10 +152,19 @@ class Monitor {
         Debugger.log('viewLoaded called',Debugger.GEN,'viewLoaded','Monitor');
 		
 		if(evt.type=='load') {
-            dispatchEvent({type:'load',target:this});
+            if((monitorLockView != null || !locked) && monitorView != null)
+				dispatchEvent({type:'load',target:this});
         }else {
             //Raise error for unrecognized event
         }
+    }
+	
+	private function tabsLoaded(evt:Object){
+        Debugger.log('tabsLoaded called',Debugger.GEN,'viewLoaded','Monitor');
+		
+		monitorModel.setSequence(app.sequence);
+		saveDataDesignModel(null);
+		
     }
 	
 	/**
@@ -191,7 +227,11 @@ class Monitor {
 	
 	private function loadLessonToMonitor(lessonID:Number){
 		var callback:Function = Proxy.create(monitorModel,monitorModel.loadSequence);
-		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonDetails&lessonID=' + String(lessonID) + '&userID=' + _root.userID,callback, false);
+		if(_sequence != null) {
+			monitorModel.setSequence(_sequence);
+		} else {
+			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonDetails&lessonID=' + String(lessonID) + '&userID=' + _root.userID,callback, false);
+		}
 	}
 	
 	public function closeAndRefresh() {
@@ -199,6 +239,7 @@ class Monitor {
 	}
 	
 	public function reloadLessonToMonitor(){
+		_sequence = null;
 		loadLessonToMonitor(_root.lessonID);
 	}
 	
@@ -279,26 +320,31 @@ class Monitor {
 	 * @return  		Void
 	 */
 	public function openLearningDesign(seq:Sequence){
-		trace('opening learning design...'+ seq.getLearningDesignID());
-		var designID:Number  = seq.getLearningDesignID();
+		trace('opening learning design...'+ seq.learningDesignID);
+		var designID:Number  = seq.learningDesignID;
         var callback:Function = Proxy.create(this,saveDataDesignModel);
            
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designID,callback, false);
 		
 	}
-
+	
 	private function saveDataDesignModel(learningDesignDTO:Object){
 		trace('returning learning design...');
 		trace('saving model data...');
 		var seq:Sequence = Sequence(monitorModel.getSequence());
+		_ddm = new DesignDataModel();
 		
 		//  clear canvas
 		clearCanvas(true);
 			
-		_ddm.setDesign(learningDesignDTO);
-		seq.setLearningDesignModel(_ddm);
-		monitorModel.setIsSequenceSet (true)
+		if(learningDesignDTO != null) { _ddm.setDesign(learningDesignDTO); seq.setLearningDesignModel(_ddm); }
+		else if(seq.getLearningDesignModel() != null){ _ddm = seq.getLearningDesignModel(); }
+		else { openLearningDesign(seq); }
+		
+		monitorModel.setSequence(seq);
+		//monitorModel.setIsSequenceSet(true);
 		monitorModel.broadcastViewUpdate('PROGRESS', null, monitorModel.getSelectedTab());
+	
 	}
 
 	public function getContributeActivities(seqID:Number):Void{
@@ -432,6 +478,36 @@ class Monitor {
 		var locale:String = _root.lang + _root.country;
 		var target:String = actToolSignature + app.module + '#' + actToolSignature + app.module + '-' + locale;
 		getURL(url + target, '_blank');
+	}
+
+	public function setupEditOnFly(learningDesignID:Number) {
+		Debugger.log("Checking for permission to edit and setting up design with ID: " + learningDesignID,Debugger.GEN,'setupEditOnFly','Monitor');
+			
+		var callback:Function = Proxy.create(this,readyEditOnFly, true);
+        
+		Application.getInstance().getComms().getRequest('eof/authoring/editLearningDesign?learningDesignID=' + learningDesignID,callback, false);
+		
+	}
+
+	public function readyEditOnFly(r:Object) {
+		if(r instanceof LFError) { 
+			r.showErrorAlert();
+			return;
+		}
+		
+		Debugger.log("Check OK. Proceed with opening design.",Debugger.GEN,'setupEditOnFly','Monitor');
+		
+		//var loader_url = Config.getInstance().serverUrl + "lams_preloader.swf?loadFile=lams_authoring.swf&loadLibrary=lams_authoring_library.swf&serverURL=" + Config.getInstance().serverUrl + "&userID=" + _root.userID  + "&build=" + _root.build + "&lang=" + _root.lang + "&country=" + _root.country + "&langDate=" + _root.langDate + "&theme=" + _root.theme + "&uniqueID=undefined" + "&layout=" + ApplicationParent.EDIT_MODE + "&learningDesignID=" + monitorModel.getSequence().learningDesignID;
+		//Debugger.log("url: " + loader_url, Debugger.CRITICAL, 'openEditOnFly', 'MonitorView');
+		
+		//JsPopup.getInstance().launchPopupWindow(loader_url , 'AuthoringWindow', 570, 796, true, true, false, false, false);
+		
+		var designID:Number = monitorModel.getSequence().learningDesignID;
+		if(designID != null)
+			ApplicationParent.extCall("openAuthorForEditOnFly", String(designID));
+		else
+			ApplicationParent.extCall("openAuthorForEditOnFly", String(App.sequence.learningDesignID));
+		
 	}
 
 	/**

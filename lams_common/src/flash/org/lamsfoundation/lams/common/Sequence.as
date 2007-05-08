@@ -79,13 +79,15 @@ class Sequence {
 	private var _licenseText:String;
 	
 	private var _learningDesignModel:DesignDataModel;
-	
 	private var _progress:Progress;
-	
 	private var _active:Boolean;
+	private var _learnerExportAvailable:Boolean;	
+	private var _locked_for_edit:Boolean;
 	
-	private var _learnerExportAvailable:Boolean;
-	
+	//Defined so compiler can 'see' events added at runtime by EventDispatcher
+    private var dispatchEvent:Function;     
+    public var addEventListener:Function;
+    public var removeEventListener:Function;
 	
 	/**
 	* Constructor.
@@ -98,6 +100,15 @@ class Sequence {
 		if(dto != null){
 			populateFromDTO(dto);
 		}
+		
+		mx.events.EventDispatcher.initialize(this);
+	}
+	
+	/**
+	* event broadcast when a new language is loaded 
+	*/ 
+	public function broadcastLoad(){
+		dispatchEvent({type:'load',target:this});		
 	}
 	
 	/**
@@ -115,6 +126,8 @@ class Sequence {
 		trace('populating seq object for start date:' + dto.scheduleStartDate);
 		Debugger.log('populating seq schedule date:'+dto.scheduleStartDate,Debugger.CRITICAL,'populateFromDTO','Sequence');
 		Debugger.log('populating seq start date:'+dto.startDateTime,Debugger.CRITICAL,'populateFromDTO','Sequence');
+		Debugger.log('populating seq locked for eidt:'+dto.lockedForEdit,Debugger.CRITICAL,'populateFromDTO','Sequence');
+		
 		_seqID = dto.lessonID;
 		_seqName = dto.lessonName;
 		_seqDescription = dto.lessonDescription;
@@ -143,6 +156,8 @@ class Sequence {
 		_licenseText = dto.licenseText;
 		
 		_learnerExportAvailable = dto.learnerExportAvailable;
+		
+		_locked_for_edit = dto.lockedForEdit;
 	}
 	
 	
@@ -257,9 +272,9 @@ class Sequence {
 		
 	}
 	
-	public function getLearningDesignID():Number{
-		return _learningDesignID;
-	}
+	//public function getLearningDesignID():Number{
+	//	return _learningDesignID;
+	//}
 	
 	public function get learningDesignID():Number{
 		return _learningDesignID;
@@ -268,6 +283,7 @@ class Sequence {
 	public function setLearningDesignModel(learningDesignModel:DesignDataModel){
 		_learningDesignModel = learningDesignModel;
 		
+        broadcastLoad();
 	}
 	
 	public function getLearningDesignModel():DesignDataModel{
@@ -469,6 +485,14 @@ class Sequence {
 	
 	public function get learnerExportAvailable():Boolean {
 		return _learnerExportAvailable;
+	}
+	
+	public function set locked_for_edit(b:Boolean) {
+		_locked_for_edit = b;
+	}
+	
+	public function get locked_for_edit():Boolean {
+		return _locked_for_edit;
 	}
 	
 	function get className():String{

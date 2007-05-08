@@ -81,7 +81,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var todo_mc:MovieClip;
 	//---------------------------//
 	private var child_mc : MovieClip;
-	private var _locked : Boolean;
+	private var _locked : Boolean = false;
 	private var _visibleHeight : Number;
 	private var _visibleWidth : Number;
 	private var _tm : ThemeManager;
@@ -116,7 +116,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		trace("MinOptions :"+actMinOptions)
 		trace("MaxOptions :"+actMaxOptions)
 		_ddm.getComplexActivityChildren(_activity.activityUIID);
-		_locked = false;
 		showStatus(false);
 		
 		CHILD_OFFSET_X = 8;
@@ -265,9 +264,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			Debugger.log ('DoubleClicking:' + this, Debugger.GEN, 'localOnPress', 'CanvasOptionalActivity');
 			_doubleClicking = true;
 			//if we double click on the glass mask - then open the container to allow the usr to see the activities inside.
-			if (_locked) {
+			if (_locked && !_activity.isReadOnly()) {
 				_locked = false;
 			}else {
+				if(_activity.isReadOnly()) { /** TODO: Change label warning */ LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_dbclick_readonly')); }
 				_locked = true;
 			}
 			draw();

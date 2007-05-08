@@ -59,12 +59,16 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private var _description:String;
 	private var _helpText:String;
 	private var _version:String;
+	private var _designVersion:Number;
 	private var _userID:Number;
+	private var _editOverrideUserID:Number;
+	private var _editOverrideUserFullName:String;
 	private var _duration:Number;
 	private var _readOnly:Boolean;
+	private var _editOverrideLock:Boolean
 	private var _autoSaved:Boolean
 	private var _saveMode:Number;
-	private var _validDesign:Boolean;
+	private var _validDesign:Boolean;	
 	private var _modified:Boolean;
 	private var _maxID:Number;
 	private var _firstActivityID:Number;
@@ -102,6 +106,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_copyTypeID = COPY_TYPE_ID_AUTHORING;
 		_version = null;
 		_readOnly = false;
+		_editOverrideLock = false;
 		_validDesign = false;
 		_autoSaved = false;
 		
@@ -286,11 +291,15 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_description = design.description;
 		_helpText = design.helpText;
 		_version = design.version;
+		_designVersion = design.designVersion;
 	
 		_userID = design.userID;
+		_editOverrideUserID = design.editOverrideUserID;
+		_editOverrideUserFullName = design.editOverrideUserFullName;
 		_workspaceFolderID = design.workspaceFolderID;
 		_createDateTime = design.createDateTime;
 		_readOnly = design.readOnly;
+		_editOverrideLock = design.editOverrideLock;
 		_validDesign = design.validDesign;
 		
 		_maxID = design.maxID;
@@ -313,24 +322,35 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			Debugger.log('Adding activity dto.activityTypeID:'+dto.activityTypeID,Debugger.GEN,'setDesign','DesignDataModel');	
 			
 			//if(dto.objectType = "ToolActivity"){
-			if(dto.activityTypeID == Activity.TOOL_ACTIVITY_TYPE || dto.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || dto.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || dto.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE){
-				trace("this activity is gateActivity with UIID: "+dto.activityUIID)
+			if(dto.activityTypeID == Activity.TOOL_ACTIVITY_TYPE){
+			
 				var newToolActivity:ToolActivity = new ToolActivity(dto.activityUIID);
 				newToolActivity.populateFromDTO(dto);				
 				_activities.put(newToolActivity.activityUIID,newToolActivity);
+				
+			} else if(dto.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || 
+			   dto.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || 
+			   dto.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE ||
+			   dto.activityTypeID == Activity.SYSTEM_GATE_ACTIVITY_TYPE ) {
+				
+				var newGateActivity:GateActivity = new GateActivity(dto.activityUIID);
+				newGateActivity.populateFromDTO(dto);				
+				_activities.put(newGateActivity.activityUIID,newGateActivity);
 			
-			//}else if(dto.objectType == "ComplexActivity"){
-			}else if(dto.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || dto.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+			} else if(dto.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || dto.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+				
 				//TODO: Test this!
 				var cAct:ComplexActivity= new ComplexActivity(dto.activityUIID);
 				cAct.populateFromDTO(dto);				
 				_activities.put(cAct.activityUIID,cAct);
 					
-			}else if(dto.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
+			} else if(dto.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
+				
 				//TODO: Test this code when we are able to save and then open a design with grouping
 				var newGroupActiviy:GroupingActivity = new GroupingActivity(dto.activityUIID);
 				newGroupActiviy.populateFromDTO(dto);
 				_activities.put(newGroupActiviy.activityUIID,newGroupActiviy);
+			
 			}
 		}
 		
@@ -359,11 +379,6 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		}
 		
-		
-		
-		
-		
-		
 		return success;
 	}
 	
@@ -379,13 +394,12 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private function prepareDesignForSaving():Void{
 		
 		//set create date time to now
-		_createDateTime = new Date();
+		_createDateTime = (_editOverrideLock) ? _createDateTime : new Date();
+		_lastModifiedDateTime = (_editOverrideLock) ? new Date() : _lastModifiedDateTime;
 
 		if(_learningDesignID == null){
 			_learningDesignID = Config.NUMERIC_NULL_VALUE;
 		}
-		
-
 	}
 	
 	private function prepareDesignForAutoSaving():Void{
@@ -442,7 +456,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		return data;
 	}
-		/**
+	
+	/**
 	 * Returns a data object to send in a WDDX packet to the initialise a Lesson for a Preview Session
 	 * DDM exists in 
 	 * 
@@ -466,7 +481,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		return data;
 	}
-	
+
 	/**
 	 * Get details of currently saved design for use in workspace 
 	 *  
@@ -527,22 +542,30 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		*/
 		
 		//if the value is null, it is not included in the DTO
-		if(_copyTypeID == COPY_TYPE_ID_RUN){
+		if(_copyTypeID == COPY_TYPE_ID_RUN && !_editOverrideLock){
 			design.copyTypeID = COPY_TYPE_ID_AUTHORING;
 		}else if(_copyTypeID){	design.copyTypeID 	= _copyTypeID;		}
+		
 		if(_learningDesignID){	design.learningDesignID	= _learningDesignID;	}
 		if(_title){				design.title			= _title;				}
 		if(_description){		design.description		= _description;			}
 		if(_helpText){			design.helpText			= _helpText;			}
 		if(_version){			design.version			= _version;				}
+		if(_designVersion){		design.designVersion 	= _designVersion;		}
 		if(_userID){			design.userID			= _userID;				}
+		if(_editOverrideUserID){	design.editOverrideUserID = _editOverrideUserID;	}
 		if(_duration){			design.duration			= _duration;			}
 		//readOnly must be in the DTO, so if its null, then give a false
 		
-		if(_copyTypeID == COPY_TYPE_ID_RUN){
+		if(_copyTypeID == COPY_TYPE_ID_RUN && !_editOverrideLock){
 			design.readOnly = false;
 		} else {
 			design.readOnly = (_readOnly==null) ? false : _readOnly;
+		}
+		
+		if(_editOverrideLock){		design.editOverrideLock = _editOverrideLock;	}
+		else {
+			_editOverrideLock = false;
 		}
 		
 		//valid design must be in the DTO, so if its null, then give a false
@@ -808,6 +831,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_version = a;
 	}
 	
+	public function get designVersion():Number{
+		return _designVersion;
+	}
+	
+	public function set designVersion(a:Number):Void{
+		_designVersion = a;
+	}
+	
 	public function get userID():Number{
 		return _userID;
 	}
@@ -815,6 +846,24 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function set userID(a:Number):Void{
 		_userID = a;
 	}
+	
+	public function get editOverrideUserID():Number{
+		return _editOverrideUserID;
+	}
+	
+	public function set editOverrideUserID(a:Number):Void{
+		_editOverrideUserID = a;
+	}
+	
+	
+	public function get editOverrideUserFullName():String{
+		return _editOverrideUserFullName;
+	}
+	
+	public function set editOverrideUserFullName(a:String):Void{
+		_editOverrideUserFullName = a;
+	}
+	
 	
 	public function get workspaceFolderID():Number{
 		return _workspaceFolderID;
@@ -838,6 +887,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public function set readOnly(a:Boolean):Void{
 		_readOnly = a;
+	}
+	
+	public function get editOverrideLock():Boolean{
+		return _editOverrideLock;
+	}
+	
+	public function set editOverrideLock(a:Boolean):Void{
+		_editOverrideLock = a;
 	}
 	
 	public function get validDesign():Boolean{
@@ -1047,7 +1104,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		return _contentFolderID;
 	}
 	
-		/**
+	/**
 	 * 
 	 * @usage   
 	 * @param 

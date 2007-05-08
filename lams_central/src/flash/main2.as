@@ -47,9 +47,9 @@ app.main(this);
 //------------------------------Local connection to JSPs for progress data ------------------------------
 var receive_lc = new LocalConnection();
 //-------------------------------------- Functions to setProgress data, called by the LocalConnection object in learner JSPs
-receive_lc.setProgressData = function(attempted, completed, current, lessonID, refresh) {
+receive_lc.setProgressData = function(attempted, completed, current, lessonID, version, refresh) {
 	Debugger.log(arguments.toString(), 'learnerProgress_lc.setProgressData');
-	app.refreshProgress(attempted, completed, current, lessonID);
+	app.refreshProgress(attempted, completed, current, lessonID, version);
 	myRoot.refresh = refresh;
 };
 

@@ -110,8 +110,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 		var fromAct_mc;
 		var toAct_mc;
 		
-		fromAct_mc = cv.model.getActivityMCByUIID(_transition.fromUIID);
-		toAct_mc = cv.model.getActivityMCByUIID(_transition.toUIID);
+		if(_transition.mod_fromUIID != null) fromAct_mc = cv.model.getActivityMCByUIID(_transition.mod_fromUIID);
+		else fromAct_mc = cv.model.getActivityMCByUIID(_transition.fromUIID);
+		
+		if(_transition.mod_toUIID != null) toAct_mc = cv.model.getActivityMCByUIID(_transition.mod_toUIID);
+		else toAct_mc = cv.model.getActivityMCByUIID(_transition.toUIID);
 		
 		//var startPoint:Point = MovieClipUtils.getCenterOfMC(fromAct_mc);
 		//var endPoint:Point = MovieClipUtils.getCenterOfMC(toAct_mc);

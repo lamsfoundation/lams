@@ -23,6 +23,8 @@
 
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.mvc.*;
+import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.authoring.Activity;
 
 /**
  * Provides basic services for the "view" of
@@ -92,6 +94,8 @@ class org.lamsfoundation.lams.common.mvc.AbstractView extends MovieClip implemen
    * update() method. Subclasses of AbstractView will provide
    * a concrete implementation for this method.
    */
-  public function update(o:Observable, infoObj:Object):Void {
-  }
+	public function update(o:Observable, infoObj:Object):Void {
+	}
+	
+	
 }

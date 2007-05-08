@@ -67,7 +67,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private var learnerListArr:Array = new Array();
 	
 	private var bkg_pnl:MovieClip;
-	
+
 	private var _tm:ThemeManager;
 	private var _tip:ToolTip;
 	private var mm:MonitorModel;
@@ -121,7 +121,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
 		mm.getMonitor().getMV().getMonitorLearnerScp()._visible = false;
-		
     }    
 	
 	/**
@@ -141,11 +140,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					setSize(mm);
 					break;
 				case 'TABCHANGE' :
-					if (infoObj.tabID == _tabID){
+					if (infoObj.tabID == _tabID && !mm.locked){
 						//this._visible = true;
 						mm.getMonitor().getMV().getMonitorLearnerScp()._visible = true;
 						hideMainExp(mm);
-						mm.broadcastViewUpdate("JOURNALSSHOWHIDE", true)
+						mm.broadcastViewUpdate("JOURNALSSHOWHIDE", true);
+
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
 						
 						if (mm.activitiesDisplayed.isEmpty()){
@@ -169,25 +169,25 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					}
 					break;
 				case 'PROGRESS' :
-					if (infoObj.tabID == _tabID){
+					if (infoObj.tabID == _tabID && !mm.locked){
 						mm.getMonitor().getProgressData(mm.getSequence())
 					}
 					break;	
 					
 				case 'RELOADPROGRESS' :	
-					if (infoObj.tabID == _tabID){
+					if (infoObj.tabID == _tabID && !mm.locked){
 						reloadProgress(true)
 					}
 					break;	
 				case 'DRAW_ACTIVITY' :
-					if (infoObj.tabID == _tabID){
+					if (infoObj.tabID == _tabID && !mm.locked){
 						trace("DRAWING_ACTIVITY")
 						drawActivity(infoObj.data, mm, infoObj.learner)
 						//MovieClipUtils.doLater(Proxy.create(this,draw));
 					}
 					break;
 				case 'REMOVE_ACTIVITY' :
-					if (infoObj.tabID == _tabID){
+					if (infoObj.tabID == _tabID && !mm.locked){
 						trace("REMOVE_ACTIVITY")
 						removeActivity(infoObj.data, mm)
 						//MovieClipUtils.doLater(Proxy.create(this,draw));
@@ -195,7 +195,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					break;
 				
 				case 'DRAW_DESIGN' :
-					if (infoObj.tabID == _tabID){
+					if (infoObj.tabID == _tabID && !mm.locked){
 						trace("TabID for Selected tab is (LearnerTab): "+infoObj.tabID)
 						drawAllLearnersDesign(mm, infoObj.tabID)
 					}
@@ -230,7 +230,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	
 	private function hideMainExp(mm:MonitorModel):Void{
 		//var mcontroller = getController();
-		mm.broadcastViewUpdate("EXPORTSHOWHIDE", false)
+		mm.broadcastViewUpdate("EXPORTSHOWHIDE", false);
+		mm.broadcastViewUpdate("EDITFLYSHOWHIDE", false);
 	}
 	
 	/**
@@ -292,7 +293,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	}
 	private function drawAllLearnersDesign(mm:MonitorModel, tabID:Number){
 		//learnerListArr = clearLearnersData(learnerListArr)
-		trace("activity layer height: "+_activityLayer_mc._height)
 		for (var j=0; j<mm.allLearnersProgress.length; j++){
 			learnersDrawn = j+1
 			ACT_X = 0;
@@ -311,7 +311,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	 */
 	private function removeActivity(a:Activity,mm:MonitorModel){
 		//dispatch an event to show the design  has changed
-		trace("in removeActivity")
 		var r = mm.activitiesDisplayed.remove(a.activityUIID);
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;
@@ -323,9 +322,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		var z:Object = mm.getSize();
 		var styleObj = _tm.getStyleObject('button');
 		var EP_btn_label:String = Dictionary.getValue('learner_exportPortfolio_btn')
+		
 		var nameTextFormat = new TextFormat();
+		
 		var exp_url = _root.serverURL+"learning/exportWaitingPage.jsp?mode=learner&role=teacher&lessonID="+_root.lessonID+"&userID="+learner.getLearnerId();
-		trace("Monitor Tab Grid Width: "+z.w+" Monitor Tab Grid Height: "+z.h);
 		
 		_activityLayer_mc.createTextField("learnerName"+learner.getLearnerId(), _activityLayer_mc.getNextHighestDepth(), ACT_X+2, ACT_Y, z.w-22, 20);
 		_activityLayer_mc.attachMovie("Button", "learnerName"+learner.getLearnerId()+"_btn", _activityLayer_mc.getNextHighestDepth(),{label:EP_btn_label, _x:z.w-110, _y:ACT_Y+2, styleName:styleObj} )
@@ -334,29 +334,31 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		var learnerExp_btn = _activityLayer_mc["learnerName"+learner.getLearnerId()+"_btn"];
 		learnerExp_btn.setSize(90, 17);
 		learnerExp_btn.onRelease = function (){
-			//trace("Contribute Type is: "+o.taskURL);
 			JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 410, 640, true, true, false, false, false);
 		}
+		
 		learnerExp_btn.onRollOver = Proxy.create(this,this['showToolTip'], learnerExp_btn, "learner_exportPortfolio_btn_tooltip");
 		learnerExp_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
-			
-		nameTextFormat.bold = true;
-		nameTextFormat.font = "Verdana";
-		nameTextFormat.size = 11;
-		learnerName_txt.border = true;
-		learnerName_txt.selectable = false;
-		learnerName_txt.background = true;
-		learnerName_txt.backgroundColor = 0xE7EEFE;
-		learnerName_txt.textColor = 0x555555;
-		learnerName_txt.setNewTextFormat(nameTextFormat);
-		learnerName_txt.text = "\t"+learner.getLearnerFirstName() + " "+learner.getLearnerLastName()
-		trace("Ypos for name field is: "+ACT_Y)
-		var tempObj = new Object()
-		tempObj.learnerName = learnerName_txt
-		tempObj.learnerButton = learnerExp_btn
-		learnerListArr.push(tempObj)
 		
-		count++
+		var sLearner:mx.styles.CSSStyleDeclaration = _tm.getStyleObject("LTVLearnerText");
+		
+		nameTextFormat.bold = (sLearner.getStyle("fontWeight")=="bold") ? true : false;
+		nameTextFormat.font = sLearner.getStyle("fontFamily");
+		nameTextFormat.size = sLearner.getStyle("fontSize");
+		learnerName_txt.border = (sLearner.getStyle("borderStyle") != "none") ? true : false;
+		learnerName_txt.background = true;
+		learnerName_txt.backgroundColor = sLearner.getStyle("backgroundColor");
+		learnerName_txt.textColor = sLearner.getStyle("color");
+		learnerName_txt.setNewTextFormat(nameTextFormat);
+		learnerName_txt.selectable = false;
+		learnerName_txt.text = "\t"+learner.getLearnerFirstName() + " "+learner.getLearnerLastName();
+		
+		var tempObj = new Object();
+		tempObj.learnerName = learnerName_txt;
+		tempObj.learnerButton = learnerExp_btn;
+		learnerListArr.push(tempObj);
+		
+		count++;
 	}
 
 	public function showToolTip(btnObj, btnTT:String):Void{
@@ -480,7 +482,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		bkg_pnl.setSize(_activityLayer_mc._width, learnerListHeight);
 		
 		mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
-	}
+}
 	
 	 /**
     * Sets the position of the canvas on stage, called from update

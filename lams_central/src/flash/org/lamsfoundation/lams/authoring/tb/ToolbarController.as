@@ -62,29 +62,27 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 		Debugger.log('click evt.target.label:'+evt.target.label,Debugger.GEN,'click','ToolbarController');
 		var tgt:String = new String(evt.target);
 		
+		hideFlow();
+		
 		if(tgt.indexOf("new") != -1){
-			hideFlow();
 			_app.getCanvas().clearCanvas(false);
 		
 		}else if(tgt.indexOf("open") != -1){
-			hideFlow();
 			_app.getCanvas().openDesignBySelection();
 		}else if(tgt.indexOf("save") != -1){
 			Cursor.showCursor(Application.C_HOURGLASS);
-			hideFlow();
+			_app.getCanvas().saveDesign();
+		}else if(tgt.indexOf("apply_changes") != -1){
+			Cursor.showCursor(Application.C_HOURGLASS);
 			_app.getCanvas().saveDesign();
 		}else if(tgt.indexOf("copy") != -1){
-			hideFlow();
 			_app.copy();
 		}else if(tgt.indexOf("paste") != -1){
-			hideFlow();
 			_app.paste();
 		}else if(tgt.indexOf("trans") != -1){	
-			hideFlow();
 			_app.getCanvas().toggleTransitionTool();
 					
 		}else if(tgt.indexOf("optional") != -1){
-			hideFlow();
 			_app.getCanvas().toggleOptionalActivity();
 						
 		}else if(tgt.indexOf("flow") != -1){
@@ -95,21 +93,18 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 				}
 				isflowActive = true;
 				_toolbarModel.getToolbar().view.showHideAssets(true);
-			}else {
-				hideFlow();
 			}
 						
 		}else if(tgt.indexOf("gate") != -1){
-			hideFlow();
 			_app.getCanvas().toggleGateTool();
 						
 		}else if(tgt.indexOf("group") != -1){
-			hideFlow();
 			_app.getCanvas().toggleGroupTool();
 			
 		}else if(tgt.indexOf("preview") != -1){
-			hideFlow();
 			_app.getCanvas().launchPreviewWindow();
+		}else if(tgt.indexOf("cancel") != -1){
+			_app.getCanvas().finishEditOnFly();
 		}
 	}
      

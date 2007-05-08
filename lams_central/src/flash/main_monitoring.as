@@ -19,6 +19,10 @@ if (StringUtils.isEmpty(lessonLaunch)){
 	_root.lessonLaunch = false;
 	Debugger.log('lesson launch is set as:'+_root.lessonLaunch ,Debugger.CRITICAL,'mainin if condition','ROOT');
 }
+if (StringUtils.isEmpty(editOnFly)){
+	_root.editOnFly = false;
+	Debugger.log('editOnFly is set as:'+_root.editOnFly ,Debugger.CRITICAL,'mainin if condition','ROOT');
+}
 if(StringUtils.isEmpty(mode)){
 	_root.mode = 1;
 	Debugger.log('Mode is not defined, using defualt:'+_root.mode,Debugger.CRITICAL,'main','ROOT');			

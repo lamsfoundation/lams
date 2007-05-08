@@ -38,8 +38,12 @@ class org.lamsfoundation.lams.authoring.Transition {
 	private var _transitionUIID:Number;
 	private var _fromActivityID:Number;
 	private var _fromUIID:Number;
+	private var _mod_fromActivityID:Number;
+	private var _mod_fromUIID:Number;
 	private var _toActivityID:Number;
 	private var _toUIID:Number;
+	private var _mod_toActivityID:Number;
+	private var _mod_toUIID:Number;
 	
 	private var _title:String;
 	private var _description:String;
@@ -57,6 +61,11 @@ class org.lamsfoundation.lams.authoring.Transition {
 		_fromUIID = fromUIID;
 		_toUIID = toUIID;
 		_learningDesignID = learningDesignID;
+		
+		_mod_fromActivityID = null
+		_mod_fromUIID = null;
+		_mod_toActivityID = null;
+		_mod_toUIID = null;
 		
 		Debugger.log('Created a new transition, transitionUIID:'+transitionUIID,Debugger.GEN,'Constructor','Transition');
 		
@@ -104,6 +113,13 @@ class org.lamsfoundation.lams.authoring.Transition {
 		return _fromActivityID;
 	}
 	
+	public function set mod_fromActivityID(a:Number):Void{
+		_mod_fromActivityID = a;
+	}
+	public function get mod_fromActivityID():Number{
+		return _mod_fromActivityID;
+	}
+	
 	public function set fromUIID(a:Number):Void{
 		_fromUIID = a;
 	}
@@ -111,16 +127,37 @@ class org.lamsfoundation.lams.authoring.Transition {
 		return _fromUIID;
 	}
 	
+	public function set mod_fromUIID(a:Number):Void{
+		_mod_fromUIID = a;
+	}
+	public function get mod_fromUIID():Number{
+		return _mod_fromUIID;
+	}
+	
 	public function set toActivityID(a:Number):Void{
 		_toActivityID = a;
 	}
 	public function get toActivityID():Number{
 		return _toActivityID;
+	}
+	
+	public function set mod_toActivityID(a:Number):Void{
+		_mod_toActivityID = a;
+	}
+	public function get mod_toActivityID():Number{
+		return _mod_toActivityID;
 	}	public function set toUIID(a:Number):Void{
 		_toUIID = a;
 	}
 	public function get toUIID():Number{
 		return _toUIID;
+	}
+	
+	public function set mod_toUIID(a:Number):Void{
+		_mod_toUIID = a;
+	}
+	public function get mod_toUIID():Number{
+		return _mod_toUIID;
 	}
 	public function set title(a:String):Void{
 		_title = a;

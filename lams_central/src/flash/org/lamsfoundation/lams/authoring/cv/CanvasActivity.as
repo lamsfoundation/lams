@@ -83,6 +83,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _visibleHeight:Number;
 	private var _base_mc:MovieClip;
 	private var _selected_mc:MovieClip;
+	private var fade_mc:MovieClip;
 	private var bgNegative:String = "original";
 	private var authorMenu:ContextMenu
 	
@@ -159,6 +160,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		canvasActivity_mc._visible = isVisible;
 		clickTarget_mc._visible = isVisible;
 		canvasActivityGrouped_mc._visible = isVisible;
+		fade_mc._visible = isVisible;
 	}
 	
 	/**
@@ -232,6 +234,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		//icon_mc = MovieLoader.movieCache[Config.getInstance().serverUrl+_activity.libraryActivityUIImage];
 		//Debugger.log('icon_mc:'+icon_mc,4,'loadIcon','CanvasActivity');
 		//setUpActIcon(icon_mc);
+
+		// swap depths if transparent layer visible
+		if(fade_mc._visible) {
+			icon_mc.swapDepths(fade_mc);
+		}
 	}
 	
 	
@@ -325,7 +332,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		title_lbl._visible = true;
 		//act_pnl.__visible = true;
 		clickTarget_mc._visible = true;
+		fade_mc._visible = false;
 		
+		Debugger.log("Edit lock: " + app.canvas.ddm.editOverrideLock, Debugger.CRITICAL, 'draw', 'CanvasActivity');
+		Debugger.log("Read only: " + _activity.isReadOnly(), Debugger.CRITICAL, 'draw', 'CanvasActivity');
+			
+		if(_activity.isReadOnly() && app.canvas.ddm.editOverrideLock == 1){
+			Debugger.log("Making transparent layer visible. ", Debugger.CRITICAL, 'draw', 'CanvasActivity');
+			fade_mc._visible = true;
+		}
+
 		if(_activity.isGateActivity()){
 			stopSign_mc._visible = true;
 			stopSign_mc._x = 0;

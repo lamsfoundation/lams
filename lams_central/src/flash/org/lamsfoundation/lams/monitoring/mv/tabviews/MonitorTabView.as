@@ -48,7 +48,7 @@ import mx.controls.*;
 * Reflects changes in the MonitorModel
 */
 
-class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends CommonCanvasView{
+class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends CommonCanvasView {
 	public static var _tabID:Number = 1;
 	private var _className = "MonitorTabView";
 	//constants:
@@ -140,13 +140,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 					highlightActivity(mm);
 					break;
 				case 'TABCHANGE' :
-					//trace("isChanged value in monitorModel is: "+mm.getIsProgressChanged())
-					if (infoObj.tabID == _tabID){
+					if (infoObj.tabID == _tabID && !mm.locked){
 						setStyles();
 						//this._visible = true;
 						mm.getMonitor().getMV().getMonitorSequenceScp()._visible = true;
 						hideMainExp(mm);
 						mm.broadcastViewUpdate("JOURNALSSHOWHIDE", false);
+
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
 						if (mm.activitiesDisplayed.isEmpty() || mm.transitionsDisplayed.isEmpty()){
 							mm.getMonitor().openLearningDesign(mm.getSequence());
@@ -163,8 +163,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 							}
 						}
 						
-						
-						
 						LFMenuBar.getInstance().setDefaults();
 						
 					}else {
@@ -173,47 +171,45 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 					}
 					break;
 				case 'PROGRESS' :
-					if (infoObj.tabID == _tabID){
+					if (infoObj.tabID == _tabID && !mm.locked){
 						mm.getMonitor().getProgressData(mm.getSequence())
 					}
 					break;
 				case 'RELOADPROGRESS' :	
-					if (infoObj.tabID == _tabID){
-						trace("called Reload progress")
+					if (infoObj.tabID == _tabID && !mm.locked){
 						reloadProgress(true)
 					}
 					break;	
 				case 'DRAW_ACTIVITY' :
-					if (infoObj.tabID == _tabID){
-						trace("DRAWING_ACTIVITY")
+					if (infoObj.tabID == _tabID && !mm.locked){
 						drawActivity(infoObj.data, mm)
-						//MovieClipUtils.doLater(Proxy.create(this,draw));
+					}
+					break;
+				case 'HIDE_ACTIVITY' :
+					if (infoObj.tabID == _tabID && !mm.locked){
+						hideActivity(infoObj.data, mm)
+						
 					}
 					break;
 				case 'DRAW_TRANSITION' :
-					if (infoObj.tabID == _tabID){
-						trace("DRAWING_Transition")
+					if (infoObj.tabID == _tabID && !mm.locked){
 						drawTransition(infoObj.data, mm)
 					}
+					break;
+				case 'HIDE_TRANSITION' :
+					if (infoObj.tabID == _tabID && !mm.locked){
+						hideTransition(infoObj.data, mm)
+					}
+					break;
 					
 				case 'REMOVE_ACTIVITY' :
-					//if (infoObj.tabID == _tabID){
-						trace("REMOVE_ACTIVITY")
 						removeActivity(infoObj.data, mm)
-						//MovieClipUtils.doLater(Proxy.create(this,draw));
-					//}
 					break;
-				
 				case 'REMOVE_TRANSITION' :
-					//if (infoObj.tabID == _tabID){
-						trace("REMOVE_ACTIVITY")
 						removeTransition(infoObj.data, mm)
-						//MovieClipUtils.doLater(Proxy.create(this,draw));
-					//}
 					break;
-				
 				case 'DRAW_DESIGN' :
-					if (infoObj.tabID == _tabID){
+					if (infoObj.tabID == _tabID && !mm.locked){
 						setStyles();
 						setSize(mm);
 						drawDesignCalled = "called";
@@ -270,7 +266,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 				var learner:Object = new Object();
 				learner = mm.allLearnersProgress[i]
 				trace("Learner passed is: "+learner.getFullName())
-				var temp_mc = _activityLayer_mc.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), _activityLayer_mc.getNextHighestDepth(),{learner:learner, _monitorController:mc, _x:learner_X+(finishedLearners*10), _y:(endGate_mc._y+learner_Y), _hasPlus: false});
+				var temp_mc = _activityLayer_mc.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), _activityLayer_mc.getNextHighestDepth(),{learner:learner, _monitorController:mc, _x:learner_X+(finishedLearners*10), _y:(endGate_mc._y+learner_Y)});
 				finishedLearnersList.push(temp_mc);
 				var learnerIcon_mc = _activityLayer_mc["learnerIcon"+learner.getUserName()]
 				learnerIcon_mc.init();
@@ -299,9 +295,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	
 	private function hideMainExp(mm:MonitorModel):Void{
 		//var mcontroller = getController();
-		mm.broadcastViewUpdate("EXPORTSHOWHIDE", true)
+		mm.broadcastViewUpdate("EXPORTSHOWHIDE", true);
+		mm.broadcastViewUpdate("EDITFLYSHOWHIDE", true);
 	}
-
+	
 	/**
 	 * Reloads the learner Progress and 
 	 * @Param isChanged Boolean Value to pass it to setIsProgressChanged in monitor model so 		that it sets it to true if refresh button is clicked and sets it to fasle as soon as latest data is loaded and design is redrawn.
@@ -375,45 +372,65 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	 * @return  Boolean - successfullit
 	 */
 	private function drawActivity(a:Activity,mm:MonitorModel):Boolean{
-		Debugger.log('The activity:'+a.title+','+a.activityID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
+		
 		var s:Boolean = false;
-		
 		var mtv = MonitorTabView(this);
-		
 		var mc = getController();
+		var newActivity_mc = null;
+		
+		Debugger.log("activityTypeID: " + a.activityTypeID,Debugger.CRITICAL,'drawActivity','MonitorTabView');
 		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity() ){
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring"});
-		}
-		if (a.isGateActivity()){
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasGateActivity",DepthManager.kTop,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring"});
-		}
-		
-		if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
-			//get the children
+			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring"});
+		} else if (a.isGateActivity()){
+			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasGateActivity",DepthManager.kTop,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring"});
+		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab"});
-		}
-		if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab"});
+		} else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab"});	
-		}else{
-			//Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
+			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab"});	
+		} else{
+			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
 		}
 		
 		var actItems:Number = mm.activitiesDisplayed.size()
-		if (actItems < mm.getActivityKeys().length){
-			trace("total activities: "+mm.getActivityKeys().length)
+		
+		if (actItems < mm.getActivityKeys().length && newActivity_mc != null){
 			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 		}
+		
 		if (actItems == mm.getActivityKeys().length){
 			//setSize(mm);
 		} 
+		
 		mm.getMonitor().getMV().getMonitorSequenceScp().redraw(true);
 		s = true;
 		
 		return s;
+	}
+	
+	/**
+	 * Add to canvas stage but keep hidden from view.
+	 * 
+	 * @usage   
+	 * @param   a  
+	 * @param   cm 
+	 * @return  true if successful
+	 */
+	
+	private function hideActivity(a:Activity, mm:MonitorModel):Boolean {
+		if (a.isSystemGateActivity()){
+			var newActivityObj = new Object();
+			newActivityObj.activity = a;
+			
+			mm.activitiesDisplayed.put(a.activityUIID,newActivityObj);
+			
+			Debugger.log('Gate activity a.title:'+a.title+','+a.activityUIID+' added (hidden) to the cm.activitiesDisplayed hashtable:'+newActivityObj,4,'hideActivity','CanvasView');
+		}
+		
+		return true;
 	}
 	
 	/**
@@ -441,6 +458,28 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		return s;
 		
 	}
+	
+	/**
+	 * Hides a transition on the canvas.
+	 * 
+	 * @usage   
+	 * @param   t  The transition to hide
+	 * @param   cm  The canvas model
+	 * @return  true if successful
+	 */
+	
+	private function hideTransition(t:Transition, mm:MonitorModel):Boolean{
+		var mtv = MonitorTabView(this);
+		var mc = getController();
+		
+		var newTransition_mc:MovieClip = _transitionLayer_mc.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_monitorController:mc,_monitorTabView:mtv, _visible:false});
+	
+		mm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
+		Debugger.log('drawn (hidden) a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'hideTransition','CanvasView');
+		
+		return true;
+	}
+	
 	
 	/**
 	 * Get the CSSStyleDeclaration objects for each component and apply them

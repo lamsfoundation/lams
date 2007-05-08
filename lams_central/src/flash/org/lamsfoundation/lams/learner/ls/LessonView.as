@@ -256,12 +256,10 @@ class LessonView extends AbstractView {
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity() ){
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivity", "LearnerActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, actLabel:activityTitle, learner:lm.progressData, _complex:false});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
-			//_activityList.push(newActivity_mc);
 			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is tool/gate/group activity',Debugger.CRITICAL,'drawActivity','LessonView');
 		} else if(a.isGateActivity()){
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerGateActivity", "LearnerGateActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, actLabel:activityTitle, learner:lm.progressData, _complex:false});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
-			//_activityList.push(newActivity_mc);
 		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = lm.learningDesignModel.getComplexActivityChildren(a.activityUIID);
@@ -269,11 +267,14 @@ class LessonView extends AbstractView {
 		
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerComplexActivity", "LearnerComplexActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_children:children,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, learner:lm.progressData});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
-			//_activityList.push(newActivity_mc);
-		}else{
-			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','LessonView');
+		}else if(a != null){
+			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, drawing default icon',Debugger.CRITICAL,'drawActivity','LessonView');
+			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivity", "LearnerActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, actLabel:activityTitle, learner:lm.progressData, _complex:false});
+			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
 		}
+		
 		_activityList.push(newActivity_mc);
+		
 		var actItems:Number = lm.activitiesDisplayed.size()
 		if (actItems < lm.getActivityKeys().length){
 			lm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);

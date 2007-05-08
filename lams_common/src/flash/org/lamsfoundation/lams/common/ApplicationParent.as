@@ -49,6 +49,9 @@ class ApplicationParent {
 	public static var FLASH_TOOLSIGNATURE_GATE:String = "lagat11";
 	public static var FLASH_TOOLSIGNATURE_GROUP:String = "lagrp11";
 	
+	public static var NORMAL_MODE:String = "author";		// Normal Operation Mode
+	public static var EDIT_MODE:String = "editonfly";		// Edit-On-The-Fly Mode
+
     private var _comms:Communication;
     private var _themeManager:ThemeManager;
     private var _dictionary:Dictionary;
@@ -98,12 +101,10 @@ class ApplicationParent {
 	
 	public static function extCall(method:String, param:String):Void {
 		var isMac:Boolean = (_root.isMac == "true")?true:false;
-		var versionSplit = getVersion().split(",", 2);
-		var v:Number = Number(versionSplit[0].substr(versionSplit[0].length - 1, 1));
+		var versionNo:Number = _root.getSWFVersion();
+		Debugger.log("ExtCall:: method: " + method + " :: isMac: " + isMac, Debugger.GEN, "extCall", "ApplicationParent");
 		
-		Debugger.log("ExtCall:: method: " + method + " :: isMac: " + isMac + " :: version: " + getVersion() + ":: v: " + v.toString() , Debugger.GEN, "extCall", "ApplicationParent");
-		
-		if((v <= 8) && (isMac)) {
+		if((versionNo <= 8) && (isMac)) {
 			Debugger.log("using Javascript method", Debugger.GEN, "extCall", "ApplicationParent");
 			getURL("javascript: " + method + "(" + param + ")");
 		} else {

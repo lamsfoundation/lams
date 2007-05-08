@@ -24,7 +24,8 @@
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.authoring.Activity;
-import org.lamsfoundation.lams.authoring.Transition;
+import org.lamsfoundation.lams.authoring.Transition
+import org.lamsfoundation.lams.authoring.GateActivity;;
 import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.util.*;
@@ -62,6 +63,7 @@ class MonitorModel extends Observable{
 	private var _isLearnerProgressChanged:Boolean;
 	private var _isSequenceSet:Boolean = false;
 	private var _isDragging:Boolean;
+	private var _isLocked:Boolean;
 	private var monitor_y:Number;
 	private var monitor_x:Number;
 	private var ttHolder:MovieClip;
@@ -133,32 +135,30 @@ class MonitorModel extends Observable{
 	// add get/set methods
 	
 	public function setSequence(activeSeq:Sequence){
-		
-		//if(_activeSeq == null){ 
-			//setLastSelectedSequence(activeSeq);
-		//} else {
-			//setLastSelectedSequence(_activeSeq);
-		//}
-
+		Debugger.log("Active seq: " + activeSeq.ID + " ddm: " + activeSeq.getLearningDesignModel(), Debugger.CRITICAL, "setSequence", "MonitorModel");
 		_activeSeq = activeSeq;
-		trace("value of isSetSequence (outside if): "+getIsSequenceSet())
-		if (!getIsSequenceSet()){
-			trace("value of isSetSequence (inside if): "+getIsSequenceSet())
-			_monitor.openLearningDesign(_activeSeq)
-		}
+		
 		var seq:Sequence = Sequence(_activeSeq);
-		if (seq.getLearningDesignModel() == null){
-			seq.setLearningDesignModel(getMonitor().ddm);
+		if (seq.getLearningDesignModel() != null){
+			setIsSequenceSet(true);
+			
+			var obj:Object = app.layout.manager.checkAvailability(_activeSeq);
+			locked = obj.locked;
+		} else {
+			getMonitor().openLearningDesign(_activeSeq);
 		}
 		
-		//_monitor.getContributeActivities(_activeSeq.getSequenceID());
+		
+		
 		setChanged();
 		
+		// if seq locked for edit TODO
 		//send an update
 		infoObj = {};
 		infoObj.updateType = "SEQUENCE";
 		infoObj.tabID = getSelectedTab();
 		notifyObservers(infoObj);
+	
 	}
 	
 	public function getSequence():Sequence{
@@ -172,9 +172,10 @@ class MonitorModel extends Observable{
 	private function getIsSequenceSet():Boolean{
 		return _isSequenceSet;
 	}
-	public function loadSequence(seqDTO:Object):Boolean{
+	
+	public function loadSequence(_seq:Object):Boolean{
 		// create new Sequence from DTO
-		var seq:Sequence = new Sequence(seqDTO);
+		var seq:Sequence = new Sequence(_seq);
 		setSequence(seq);
 		
 		return true;
@@ -209,13 +210,13 @@ class MonitorModel extends Observable{
 		//clear the old lot of Learner Progress data
 		_learnersProgress.clear();
 		learnerTabActArr = new Array();
-		trace('adding learning seq for length' + learnerProg.length);
 		learnerTabActArr = learnerProg;
 		for(var i=0; i<learnerProg.length;i++){
-			trace('adding learning seq with ID: ' + learnerProg[i].getLearnerId());
 			_learnersProgress.put(learnerProg[i].getLearnerId(),learnerProg[i]);
 		}
+		
 		Debugger.log('Added '+learnerProg.length+' Sequences to _lessonSequences',4,'setLessonSequences','LessonModel');
+		
 		setChanged();
 		
 		//send an update
@@ -459,27 +460,18 @@ class MonitorModel extends Observable{
 		}
 		
 		//go through the design and get the activities and transitions 
-		
 		var dataObj:Object;
 		ddmActivity_keys = _activeSeq.getLearningDesignModel().activities.keys();
 		
-		//indexArray = ddmActivity_keys;
-		trace("Length of Activities in DDM: "+indexArray.length)
-		
 		//loop through 
 		for(var i=0;i<indexArray.length;i++){
-					
 			var keyToCheck:Number = indexArray[i].activityUIID;
-			
 			var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(keyToCheck);
-			trace("Activity type ID: "+ddm_activity.activityTypeID)
-			if (ddm_activity.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
-				trace("Activity is an optional activity "+ddm_activity.activityID)
-			}
+			
 			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
 				trace("this is Child")
-			}else {
-				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity, tabID, drawLearner);
+			} else {
+				broadcastViewUpdate("DRAW_ACTIVITY", ddm_activity, tabID, drawLearner);
 			}
 		}
 		//now check the transitions:
@@ -491,12 +483,9 @@ class MonitorModel extends Observable{
 		
 		//loop through 
 		for(var i=0;i<trIndexArray.length;i++){
-			
 			var transitionKeyToCheck:Number = trIndexArray[i];
-
 			var ddmTransition:Transition = _activeSeq.getLearningDesignModel().transitions.get(transitionKeyToCheck);
-			
-			broadcastViewUpdate("DRAW_TRANSITION",ddmTransition, tabID);	
+			broadcastViewUpdate("DRAW_TRANSITION", ddmTransition, tabID);
 		}		
 	}
 	
@@ -518,7 +507,6 @@ class MonitorModel extends Observable{
 		notifyObservers(infoObj);
 		
 	}
-	
 	
 	public function changeTab(tabID:Number){
 		//getMonitor().getMV().clearView();
@@ -873,7 +861,6 @@ class MonitorModel extends Observable{
 	public function setSelectedTab(tabID:Number){
 		selectedTab = tabID;
 	}
-	
 	public function getSelectedTab():Number{
 		return selectedTab;
 	}
@@ -885,7 +872,6 @@ class MonitorModel extends Observable{
 	public function get prevSelectedItem():Object {
 		return _prevSelectedItem;
 	}
-	
 	
 	public function get learnersLoaded():Boolean{
 		return _learnersLoaded;
@@ -939,6 +925,14 @@ class MonitorModel extends Observable{
 	
 	public function get endGate():MovieClip{
 		return _endGate;
+	}
+
+	public function set locked(a:Boolean){
+		_isLocked = a;
+	}
+	
+	public function get locked():Boolean{
+		return _isLocked;
 	}
 
 	/**

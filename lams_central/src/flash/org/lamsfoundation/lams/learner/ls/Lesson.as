@@ -306,6 +306,10 @@ class Lesson {
 		getURL(_root.serverURL + 'learning'+String(pkt), 'contentFrame');
 	}
 	
+	public function reloadLearningDesign() {
+		openLearningDesign();
+	}
+
 	private function openLearningDesign(){
 		trace('opening learning design...');
 		finishedDesign = false;

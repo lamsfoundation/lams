@@ -84,6 +84,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public static var PARALLEL_ACTIVITY_TYPE:Number = 6;
 	public static var OPTIONAL_ACTIVITY_TYPE:Number = 7;
 	public static var SEQUENCE_ACTIVITY_TYPE:Number = 8;
+	public static var SYSTEM_GATE_ACTIVITY_TYPE:Number = 9;
 	/******************************************************************/
 	
 	/**
@@ -156,6 +157,8 @@ class org.lamsfoundation.lams.authoring.Activity {
 
 	private var _groupingSupportType:Number; //*
 	
+	private var _readOnly:Boolean;
+	
 	
      
     //Constructor
@@ -179,6 +182,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 		_applyGrouping = false;
 		_runOffline = false;
 		_defineLater = false;
+		_readOnly = false;
 		_createDateTime = new Date();
 		
 	}
@@ -212,11 +216,17 @@ class org.lamsfoundation.lams.authoring.Activity {
 			return true
 		}else if (_activityTypeID == PERMISSION_GATE_ACTIVITY_TYPE){
 			return true;
+		}else if (_activityTypeID == SYSTEM_GATE_ACTIVITY_TYPE){
+			return true;
 		}else{
 			return false;
 		}
 	}
-	
+
+	public function isSystemGateActivity():Boolean{
+		return _activityTypeID == SYSTEM_GATE_ACTIVITY_TYPE;
+	}
+
 	public function isGroupActivity():Boolean{
 		if (_activityTypeID == GROUPING_ACTIVITY_TYPE){
 			return true;
@@ -303,6 +313,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 			_defineLater = dto.defineLater;
 			_createDateTime = dto.createDateTime;
 			_groupingSupportType = dto.groupingSupportType;
+			_readOnly = dto.readOnly;
 			
 	
 	
@@ -342,6 +353,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 		dto.defineLater = (_defineLater==null) ? false : _defineLater;
 		if(_createDateTime){		dto.createDateTime		= _createDateTime;			}
 		if(_groupingSupportType){	dto.groupingSupportType = _groupingSupportType;		}
+		if(_readOnly){	dto.readOnly = _readOnly;	 }
 		
 		
 		
@@ -715,6 +727,27 @@ class org.lamsfoundation.lams.authoring.Activity {
 		return _groupingSupportType;
 	}
 
+	/**
+	 * 
+	 * @usage   
+	 * @param   newgroupingSupportType 
+	 * @return  
+	 */
+	public function set readOnly (readOnly:Boolean):Void {
+		_readOnly = readOnly;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get readOnly ():Boolean {
+		return _readOnly;
+	}
+	
+	public function isReadOnly():Boolean {
+		return _readOnly;
+	}
 	
 	
 

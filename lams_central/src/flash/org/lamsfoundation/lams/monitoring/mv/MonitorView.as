@@ -29,7 +29,9 @@ import org.lamsfoundation.lams.monitoring.mv.tabviews.*
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
+import org.lamsfoundation.lams.common.Config;
 import org.lamsfoundation.lams.common.ToolTip;
+import org.lamsfoundation.lams.common.ApplicationParent;
 import mx.managers.*
 import mx.containers.*
 import mx.events.*
@@ -75,10 +77,12 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private var _monitorTabLayer_mc:MovieClip;
 	private var _learnerTabLayer_mc:MovieClip;
 	private var _todoTabLayer_mc:MovieClip;
+	private var _editOnFlyLayer_mc:MovieClip;
 	private var refresh_btn:Button;
 	private var help_btn:Button;
 	private var exportPortfolio_btn:Button;
 	private var viewJournals_btn:Button;
+	private var editFly_btn:Button;
 	//private var _activityLayerComplex_mc:MovieClip;
 	//private var _activityLayer_mc:MovieClip;
 	
@@ -100,9 +104,11 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private var learnerTabView:LearnerTabView;
 	private var learnerTabView_mc:MovieClip;
 	
-
-	
 	private var _monitorController:MonitorController;
+	
+	private var lessonTabLoaded;
+	private var monitorTabLoaded;
+	private var learnerTabLoaded;
 	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -117,6 +123,11 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		_monitorView = this;
 		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
+		
+		lessonTabLoaded = false;
+		monitorTabLoaded = false;
+		learnerTabLoaded = false;
+		
 		//Init for event delegation
         mx.events.EventDispatcher.initialize(this);
 	}
@@ -136,10 +147,17 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     }    
 	
 	private function tabLoaded(evt:Object){
-        Debugger.log('viewLoaded called',Debugger.GEN,'tabLoaded','MonitorView');
+        Debugger.log('tabLoaded called: ' + evt.target,Debugger.GEN,'tabLoaded','MonitorView');
 		
 		if(evt.type=='load') {
-            //dispatchEvent({type:'load',target:this});
+			var tgt:String = new String(evt.target);
+            if(tgt.indexOf('lessonTabView_mc') != -1) { lessonTabLoaded = true; }
+			else if(tgt.indexOf('monitorTabView_mc') != -1) { monitorTabLoaded = true; }
+			else if(tgt.indexOf('learnerTabView_mc') != -1) { learnerTabLoaded = true; }
+			else Debugger.log('not recognised instance ' + evt.target,Debugger.GEN,'tabLoaded','MonitorView');
+		
+			if(lessonTabLoaded && monitorTabLoaded && learnerTabLoaded) { dispatchEvent({type:'tload',target:this}); }
+			
         }else {
             //Raise error for unrecognized event
         }
@@ -171,6 +189,9 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 			case 'JOURNALSSHOWHIDE' :
 				journalsShowHide(infoObj.data);
 				break;
+			case 'EDITFLYSHOWHIDE' :
+				editFlyShowHide(infoObj.data);
+				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
 		}
@@ -192,6 +213,14 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	
 	private function journalsShowHide(v:Boolean):Void{
 		viewJournals_btn.visible = v;
+	}
+	
+	private function editFlyShowHide(v:Boolean):Void{
+		Debugger.log("test root val: " + _root.editOnFly, Debugger.CRITICAL, "editFlyShowHide", "MonitorView");
+		
+		editFly_btn.visible = (v && _root.editOnFly == 'true') ? true : false;
+
+		Debugger.log("visible: " + editFly_btn.visible, Debugger.CRITICAL, "editFlyShowHide", "MonitorView");
 	}
 	
 	/**
@@ -226,6 +255,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		help_btn.addEventListener("click",mcontroller);
 		exportPortfolio_btn.addEventListener("click", mcontroller);
 		viewJournals_btn.addEventListener("click", mcontroller);
+		editFly_btn.addEventListener("click", mcontroller);
 		
 		refresh_btn.onRollOver = Proxy.create(this,this['showToolTip'], refresh_btn, "refresh_btn_tooltip");
 		refresh_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
@@ -239,11 +269,14 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		viewJournals_btn.onRollOver = Proxy.create(this,this['showToolTip'], viewJournals_btn, "learner_viewJournals_btn_tooltip");
 		viewJournals_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
+		editFly_btn.onRollOver = Proxy.create(this,this['showToolTip'], editFly_btn, "ls_sequence_live_edit_btn_tooltip");
+		editFly_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
 		monitorTabs_tb.addEventListener("change",mcontroller);
 		
 		setLabels();
 		setStyles();
-		setupTabInit()
+		setupTabInit();
 	    dispatchEvent({type:'load',target:this});
 		
 	}
@@ -270,22 +303,10 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		learnerTabView.init(mm, undefined);
 		learnerTabView.addEventListener('load',Proxy.create(this,tabLoaded));
 		
-		// Inititialsation for Todo Tab View 
-		/*todoTabView_mc = _todoTabLayer_mc.attachMovie("TodoTabView", "todoTabView_mc",DepthManager.kTop)
-		todoTabView_mc._visible = false;
-		todoTabView = TodoTabView(todoTabView_mc);
-		todoTabView.init(mm, undefined);
-		todoTabView.addEventListener('load',Proxy.create(this,tabLoaded));
-		
-		//Observers for All the Tab Views
-		mm.addObserver(todoTabView);
-		*/
 		mm.addObserver(lessonTabView);
 		mm.addObserver(monitorTabView);
 		mm.addObserver(learnerTabView);
-		
-		
-		
+
 	}
 	
 	public function showToolTip(btnObj, btnTT:String):Void{
@@ -329,6 +350,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		exportPortfolio_btn.setStyle('styleName',styleObj);
 		help_btn.setStyle('styleName',styleObj);
 		viewJournals_btn.setStyle('styleName', styleObj);
+		editFly_btn.setStyle('styleName', styleObj);
 		
 	}
 	
@@ -337,6 +359,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		help_btn.label = Dictionary.getValue('help_btn');
 		exportPortfolio_btn.label = Dictionary.getValue('learner_exportPortfolio_btn');
 		viewJournals_btn.label = Dictionary.getValue('learner_viewJournals_btn');
+		editFly_btn.label = Dictionary.getValue('ls_sequence_live_edit_btn');
 	}
 		
 	/**
@@ -354,6 +377,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		monitorLearner_scp.setSize(s.w-monitorLearner_scp._x,s.h-monitorLearner_scp._y);
 		viewJournals_btn._x = s.w - 260;
 		exportPortfolio_btn._x = s.w - 260;
+		editFly_btn._x = s.w - 360;
 		refresh_btn._x = s.w - 160
 		help_btn._x = s.w - 80
 				
@@ -400,7 +424,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		trace("Called getMonitorScp")
 		return monitorLearner_scp;
 	}
-	
+
 	/*
     * Returns the default controller for this view.
     */

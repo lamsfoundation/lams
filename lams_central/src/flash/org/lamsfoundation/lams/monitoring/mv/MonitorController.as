@@ -251,6 +251,17 @@ class MonitorController extends AbstractController {
 		JsPopup.getInstance().launchPopupWindow(journals_url, 'JournalEntries', 570, 796, true, true, false, false, false);
 	
 	}
+	
+	private function openEditOnFly():Void{
+		var fnOk:Function = Proxy.create(this, setupEditOnFly);
+		LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_live_edit'), fnOk, null);
+	}
+	
+	private function setupEditOnFly() {
+		Debugger.log('!opening edit on fly!',Debugger.CRITICAL,'openEditOnFly','org.lamsfoundation.lams.MonitorController');
+		
+		_monitorModel.getMonitor().setupEditOnFly(_monitorModel.getSequence().learningDesignID);
+	}
 
 	public function click(evt):Void{
 		trace(evt.target);
@@ -275,6 +286,10 @@ class MonitorController extends AbstractController {
 		}else if(tgt.indexOf("viewJournals_btn") != -1){
 			trace('you clicked journal entries button..');
 			openJournalEntries();
+		}else if(tgt.indexOf("editFly_btn") != -1){
+			openEditOnFly();
+		}else if(tgt.indexOf("action_btn") != -1){
+			_monitorModel.broadcastViewUpdate("TRIGGER_ACTION", null);
 		}
 	}
 

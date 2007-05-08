@@ -386,7 +386,7 @@ class PropertyInspectorNew extends MovieClip{
 				showToolActivityControls(false);
 				showGeneralInfo(false);
 				showOptionalControls(false);
-				showGateControls(true);
+				showGateControls(true, !a.readOnly);
 				showAppliedGroupingControls(false);
 				//showGeneralProperties(a)
 				checkEnableGateControls();
@@ -396,13 +396,14 @@ class PropertyInspectorNew extends MovieClip{
 				//show the title
 				title_txt.text = StringUtils.cleanNull(a.title);
 				desc_txt.text = StringUtils.cleanNull(a.description);
-				showGeneralControls(true);
+				showGeneralControls(true, !a.readOnly);
+				
 				//PI_sp.refreshPane();
 			}else if(a.isGroupActivity()){
 				//its a grouping activity
 				delimitLine._visible = true;
-				showGroupingControls(true);
-				showGeneralControls(true);
+				showGroupingControls(true, !a.readOnly);
+				showGeneralControls(true, !a.readOnly);
 				showOptionalControls(false);
 				showGeneralInfo(false);
 				showRelevantGroupOptions();
@@ -421,14 +422,14 @@ class PropertyInspectorNew extends MovieClip{
 				//its a grouping activity
 				delimitLine._visible = true;
 				
-				showGeneralControls(true);
+				showGeneralControls(true, !a.readOnly);
 				showGroupingControls(false);
 				//showRelevantGroupOptions();
 				showToolActivityControls(false);
 				showGateControls(false);
 				showGeneralInfo(false);
 				showAppliedGroupingControls(false);
-				showOptionalControls(true);
+				showOptionalControls(true, !a.readOnly);
 				//showGeneralProperties(cca)
 				populateGroupingProperties(GroupingActivity(caco));
 				showAppliedGroupingProperties(caco);
@@ -442,13 +443,13 @@ class PropertyInspectorNew extends MovieClip{
 				delimitLine._visible = true;
 				//its an parallel activity
 				showOptionalControls(false);
-				showGeneralControls(true);
+				showGeneralControls(true, !a.readOnly);
 				showGeneralInfo(false);
 				showGroupingControls(false);
 				//showRelevantGroupOptions();
 				showToolActivityControls(false);
 				showGateControls(false);
-				showAppliedGroupingControls(true);
+				showAppliedGroupingControls(true, !a.readOnly);
 				//showGeneralProperties(cca)
 				populateGroupingProperties(GroupingActivity(cacp));
 				showAppliedGroupingProperties(cacp);
@@ -460,11 +461,11 @@ class PropertyInspectorNew extends MovieClip{
 				//its a tool activity
 				delimitLine._visible = true;	
 				showOptionalControls(false);
-				showGeneralControls(true);
+				showGeneralControls(true, !a.readOnly);
 				showGroupingControls(false);
 				showGeneralInfo(false);
-				showAppliedGroupingControls(true);
-				showToolActivityControls(true);
+				showAppliedGroupingControls(true, !a.readOnly);
+				showToolActivityControls(true, !a.readOnly);
 				showGateControls(false);
 				//showAppliedGroupingControls(true);
 				showToolActivityProperties(ToolActivity(a));
@@ -484,14 +485,14 @@ class PropertyInspectorNew extends MovieClip{
 				//its an optional activity
 				delimitLine._visible = true;
 				
-				showGeneralControls(true);
+				showGeneralControls(true, !co.activity.readOnly);
 				showGroupingControls(false);
 				//showRelevantGroupOptions();
 				showToolActivityControls(false);
 				showGateControls(false);
 				showGeneralInfo(false);
 				showAppliedGroupingControls(false);
-				showOptionalControls(true);
+				showOptionalControls(true, !co.activity.readOnly);
 				//showGeneralProperties(cca)
 				populateGroupingProperties(GroupingActivity(cca));
 				showAppliedGroupingProperties(cca);
@@ -507,13 +508,13 @@ class PropertyInspectorNew extends MovieClip{
 				delimitLine._visible = true;
 				//its an parallel activity
 				showOptionalControls(false);
-				showGeneralControls(true);
+				showGeneralControls(true, !co.activity.readOnly);
 				showGeneralInfo(false);
 				showGroupingControls(false);
 				//showRelevantGroupOptions();
 				showToolActivityControls(false);
 				showGateControls(false);
-				showAppliedGroupingControls(true);
+				showAppliedGroupingControls(true, !co.activity.readOnly);
 				//showGeneralProperties(cca)
 				populateGroupingProperties(GroupingActivity(cca));
 				showAppliedGroupingProperties(cca);
@@ -556,7 +557,7 @@ class PropertyInspectorNew extends MovieClip{
 		}
 	}
 	
-	private function showToolActivityControls(v:Boolean){
+	private function showToolActivityControls(v:Boolean, e:Boolean){
 		
 			
 		//desc_lbl.visible = v;
@@ -567,9 +568,14 @@ class PropertyInspectorNew extends MovieClip{
 			applied_grouping_lbl.visible = v
 			appliedGroupingActivity_cmb.visible = false;
 			
+			applied_grouping_lbl.enabled = e;
+			
 		}else {
 			applied_grouping_lbl.visible = false
 			appliedGroupingActivity_cmb.visible = v;
+			
+			appliedGroupingActivity_cmb.enabled = e;
+			
 		}
 		
 		
@@ -578,21 +584,34 @@ class PropertyInspectorNew extends MovieClip{
 		runOffline_chk.visible = v;
 		defineLater_chk.visible = v;
 		editGrouping_btn.visible = v;
+		
+		if(e != null) {
+			grouping_lbl.enabled = e;
+			currentGrouping_lbl.enabled = e;
+			runOffline_chk.enabled = e;
+			defineLater_chk.enabled = e;
+			editGrouping_btn.enabled = e;
+		}
 	}
 	
 	
-	private function showGeneralInfo(v:Boolean){
-
+	private function showGeneralInfo(v:Boolean, e:Boolean){
 		total_num_activities_lbl.visible = v;
+		total_num_activities_lbl.enabled = (e != null) ? e : true;
 	} 
 	
-	private function showGeneralControls(v:Boolean){
+	private function showGeneralControls(v:Boolean, e:Boolean){
 
 		title_lbl.visible = v;
 		title_txt.visible = v;
+		
+		if(e != null) {
+			title_lbl.enabled = e;
+			title_txt.enabled = e;
+		}
 	} 
 	
-	private function showOptionalControls(v:Boolean){
+	private function showOptionalControls(v:Boolean, e:Boolean){
 		
 		min_lbl.visible = v;	
 		max_lbl.visible = v;
@@ -600,15 +619,22 @@ class PropertyInspectorNew extends MovieClip{
 		maxAct_stp.visible = v;
 		desc_lbl.visible = v;
 		desc_txt.visible = v;
-		//grouping_opt_lbl.visible = v; 
-		//appliedGroupingActivity_opt_cmb.visible = v;
+		
+		if(e != null) {
+			min_lbl.enabled = e;	
+			max_lbl.enabled = e;
+			minAct_stp.enabled = e;
+			maxAct_stp.enabled = e;
+			desc_lbl.enabled = e;
+			desc_txt.enabled = e;
+		}
+		
 		grouping_lbl.visible = false;
 		
 		
 	}
 	
-	private function showGateControls(v:Boolean){
-		trace('showGateControls....'+v);
+	private function showGateControls(v:Boolean, e:Boolean){
 		days_lbl.visible = v;
 		hours_lbl.visible = v;
 		mins_lbl.visible = v;
@@ -617,12 +643,23 @@ class PropertyInspectorNew extends MovieClip{
 		days_stp.visible = v;
 		hours_stp.visible = v;
 		mins_stp.visible = v;
-		//endHours_stp.visible = v;
-		//endMins_stp.visible = v;
 		gateType_lbl.visible = v;
 		gateType_cmb.visible = v;
 		startOffset_lbl.visible = v;
-		//endOffset_lbl.visible = v;
+		
+		if(e != null) {
+			days_lbl.enabled = e;
+			hours_lbl.enabled = e;
+			mins_lbl.enabled = e;
+			hoursEnd_lbl.enabled = e;
+			minsEnd_lbl.enabled = e;
+			days_stp.enabled = e;
+			hours_stp.enabled = e;
+			mins_stp.enabled = e;
+			gateType_lbl.enabled = e;
+			gateType_cmb.enabled = e;
+			startOffset_lbl.enabled = e;
+		}
 		
 	}
 	
@@ -633,11 +670,14 @@ class PropertyInspectorNew extends MovieClip{
 	 * @param   v 
 	 * @return  
 	 */
-	private function showAppliedGroupingControls(v:Boolean){
-		//trace('show grp controls.....'+v);
+	private function showAppliedGroupingControls(v:Boolean, e:Boolean){
 		grouping_lbl.visible = v;
 		appliedGroupingActivity_cmb.visible = v;
-		//checkEnabledGroupControl()
+		
+		if(e != null) {
+			grouping_lbl.enabled = e;
+			appliedGroupingActivity_cmb.enabled = e;
+		}
 	
 	}
 	
@@ -651,7 +691,7 @@ class PropertyInspectorNew extends MovieClip{
 		}
 	}
 	
-	private function showGroupingControls(v:Boolean){
+	private function showGroupingControls(v:Boolean, e:Boolean){
 		//grouping 
 		groupType_lbl.visible = v;
 		groupType_cmb.visible = v;
@@ -818,7 +858,7 @@ class PropertyInspectorNew extends MovieClip{
 	}
 
 		
-	private function showRelevantGroupOptions(){
+	private function showRelevantGroupOptions(e:Boolean){
 		
 		var ga = _canvasModel.selectedItem.activity;
 		var g = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
@@ -849,37 +889,49 @@ class PropertyInspectorNew extends MovieClip{
 			numLearners_rdo.visible = true;
 			numGroups_rdo.visible = true;
 			
-			
+			if(e != null) {
+				numGroups_lbl.enabled = e;
+				numLearners_lbl.enabled = e;
+				numGroups_stp.enabled = e;
+				numRandomGroups_stp.enabled = e;
+				numLearners_stp.enabled = e;
+				numLearners_rdo.enabled = e;
+				numGroups_rdo.enabled = e;
+			}
 			
 			checkEnableGroupsOptions();
 		}else{
 			//error dont understand the grouping type
 		}
-		trace('numLearners_stp.visible:'+numLearners_stp.visible);
 		
 	}
 	
-	private function reDrawTroublesomeSteppers(){
+	private function reDrawTroublesomeSteppers(e:Boolean){
 		numLearners_stp.visible = true;
 		numRandomGroups_stp.visible = true;
 		
+		
 	}
 	
-	private function checkEnableGateControls(){
-		//Debugger.log('Activity.SCHEDULE_GATE_ACTIVITY_TYPE:'+Activity.SCHEDULE_GATE_ACTIVITY_TYPE,Debugger.GEN,'checkEnableGateControls','PropertyInspector');
-		//Debugger.log('_canvasModel.selectedItem.activity.activityTypeID:'+_canvasModel.selectedItem.activity.activityTypeID,Debugger.GEN,'checkEnableGateControls','PropertyInspector');
+	private function checkEnableGateControls(e:Boolean){
 		if(_canvasModel.selectedItem.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE){
-			trace('enabling....');
-			days_stp.enabled = true;
-			hours_stp.enabled = true;
-			mins_stp.enabled = true;
-			endHours_stp.enabled = true;
-			endMins_stp.enabled = true;
+			if(e != null) {
+				days_stp.enabled = e;
+				hours_stp.enabled = e;
+				mins_stp.enabled = e;
+				endHours_stp.enabled = e;
+				endMins_stp.enabled = e;
+			} else {
+				days_stp.enabled = true;
+				hours_stp.enabled = true;
+				mins_stp.enabled = true;
+				endHours_stp.enabled = true;
+				endMins_stp.enabled = true;
+			}
 					
 		}
 		/**/
 		else{
-			trace('disabling....');
 			days_stp.enabled = false;
 			hours_stp.enabled = false;
 			mins_stp.enabled = false;
@@ -901,15 +953,15 @@ class PropertyInspectorNew extends MovieClip{
 	 * @usage   
 	 * @return  
 	 */
-	private function checkEnableGroupsOptions(){
+	private function checkEnableGroupsOptions(e:Boolean){
 		var groupingBy = rndGroup_radio.selection.data;
 		Debugger.log('groupingBy:'+groupingBy,Debugger.GEN,'checkEnableGroupsOptions','PropertyInspector');
 		if(groupingBy == 'num_learners'){
 			numRandomGroups_stp.value = 0;
 			numRandomGroups_stp.enabled = false;
-			numLearners_stp.enabled = true;
+			numLearners_stp.enabled = (e != null) ? e :true;
 		}else{
-			numRandomGroups_stp.enabled = true;
+			numRandomGroups_stp.enabled = (e != null) ? e : true;
 			numLearners_stp.value = 0;
 			numLearners_stp.enabled = false;
 		}
@@ -1076,7 +1128,7 @@ class PropertyInspectorNew extends MovieClip{
 	private function onGateTypeChange(evt:Object){
 		_canvasModel.selectedItem.activity.activityTypeID = evt.target.value;
 		Debugger.log('Set gate type to: _canvasModel.selectedItem.activity.activityTypeID:'+_canvasModel.selectedItem.activity.activityTypeID,Debugger.GEN,'onGateTypeChange','PropertyInspector');
-		checkEnableGateControls();
+		checkEnableGateControls(!_canvasModel.selectedItem.activity.readOnly);
 		
 		setModified();
 	}
@@ -1092,7 +1144,7 @@ class PropertyInspectorNew extends MovieClip{
 		var g = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
 		g.groupingTypeID = evt.target.value;
 		Debugger.log('Set group type to: '+g.groupingTypeID,Debugger.GEN,'onGroupTypeChange','PropertyInspector');
-		showRelevantGroupOptions();
+		showRelevantGroupOptions(!ga.readOnly);
 		
 		setModified();
 	}
@@ -1128,7 +1180,7 @@ class PropertyInspectorNew extends MovieClip{
 	 * @return  
 	 */
 	private function onGroupingMethodChange(evt:Object){
-		checkEnableGroupsOptions();
+		checkEnableGroupsOptions(!_canvasModel.selectedItem.activity.readOnly);
 		setModified();
 	}
 	

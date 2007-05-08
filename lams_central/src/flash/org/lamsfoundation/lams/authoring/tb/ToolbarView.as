@@ -43,6 +43,7 @@ class ToolbarView extends AbstractView {
 	private var new_btn:Button;
 	private var open_btn:Button;
 	private var save_btn:Button;
+	private var apply_changes_btn:Button;
 	private var copy_btn:Button;
 	private var paste_btn:Button;
 	private var trans_btn:Button;
@@ -52,11 +53,15 @@ class ToolbarView extends AbstractView {
 	private var branch_btn:Button;
 	private var group_btn:Button;
 	private var preview_btn:Button;
+	private var cancel_btn:Button;
 	private var _toolbarMenu:Array;
-	//private var btn_text:TextField;
+	
 	private var bkg_pnl:Panel;
 	private var flow_bkg_pnl:Panel;
 	private var _dictionary:Dictionary;
+	
+	private static var SPACER_DEPTH:Number = 30;
+	private static var SPACER_WIDTH:Number = 20;
 	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -137,6 +142,8 @@ class ToolbarView extends AbstractView {
 		gate_btn.addEventListener("click",controller);
 		group_btn.addEventListener("click",controller);
 		preview_btn.addEventListener("click",controller);
+		apply_changes_btn.addEventListener("click", controller);
+		cancel_btn.addEventListener("click",controller);
 		
 		// Button handler for rollover and rollout.
 		
@@ -176,6 +183,12 @@ class ToolbarView extends AbstractView {
 		preview_btn.onRollOver = Proxy.create(this,this['showToolTip'], preview_btn, "preview_btn_tooltip");
 		preview_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
+		apply_changes_btn.onRollOver = Proxy.create(this,this['showToolTip'], apply_changes_btn, "apply_changes_btn_tooltip");
+		apply_changes_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		cancel_btn.onRollOver = Proxy.create(this,this['showToolTip'], cancel_btn, "cancel_btn_tooltip");
+		cancel_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
 		showHideAssets(false);
 		Debugger.log('dispatch it',Debugger.GEN,'createToolbar','ToolbarView');
         //Now that view is setup dispatch loaded event
@@ -196,6 +209,8 @@ class ToolbarView extends AbstractView {
 		flow_btn.label = Dictionary.getValue('flow_btn');
 		group_btn.label = Dictionary.getValue('group_btn');
 		preview_btn.label = Dictionary.getValue('preview_btn');
+		apply_changes_btn.label = Dictionary.getValue('apply_changes_btn');
+		cancel_btn.label = Dictionary.getValue('cancel_btn');
 			}
 	
 	private function setTabIndex(selectedTab:String){
@@ -204,54 +219,85 @@ class ToolbarView extends AbstractView {
 		new_btn.tabIndex = 201
 		open_btn.tabIndex = 202
 		save_btn.tabIndex = 203
-		copy_btn.tabIndex = 204
-		paste_btn.tabIndex = 205
-		trans_btn.tabIndex = 206
-		optional_btn.tabIndex = 207
-		flow_btn.tabIndex = 208
-		gate_btn.tabIndex = 209
-		branch_btn.tabIndex = 210
-		group_btn.tabIndex = 211
-		preview_btn.tabIndex = 212		
+		apply_changes_btn.tabIndex = 204
+		copy_btn.tabIndex = 205
+		paste_btn.tabIndex = 206
+		trans_btn.tabIndex = 207
+		optional_btn.tabIndex = 208
+		flow_btn.tabIndex = 209
+		gate_btn.tabIndex = 210
+		branch_btn.tabIndex = 211
+		group_btn.tabIndex = 212
+		preview_btn.tabIndex = 213	
+		cancel_btn.tabIndex = 214
 	}
 	
 	public function setupButtons(tm:ToolbarModel, menuList:Array){
-		trace("setupButtons Called")
+		
 		_toolbarMenu = new Array();
-		this.createTextField("btn_text", this.getNextHighestDepth(), btnOffset_X, -100, 10, 18); 
+		
 		for (var i=0; i<menuList.length; i++){
-			trace("button label is: "+Dictionary.getValue(menuList[i][0]))
-			var btnLabel:String = Dictionary.getValue(menuList[i][0])
-			var btn_text = this["btn_text"]
-			btn_text.autoSize = true;
-			btn_text.html = true;
-			btn_text.htmlText = btnLabel
 			
-			var btnWidth:Number = btn_text.textWidth+37
-			trace("textwidth for button "+menuList[i][0]+" is: "+btnWidth)
-			_toolbarMenu[i] = this.attachMovie("Button", menuList[i][0], this.getNextHighestDepth(), {label:btnLabel, icon:menuList[i][1] })
-			_toolbarMenu[i].setSize(btnWidth, 25)
-			if (i == 0){
-				_toolbarMenu[i]._x  = btnOffset_X
-			}else {
-				_toolbarMenu[i]._x = (_toolbarMenu[i-1]._x+_toolbarMenu[i-1].width)+btnOffset_X
-			}
-			_toolbarMenu[i]._y = btnOffset_Y;
-			
-			if (i >= menuList.length-2){
-				_toolbarMenu[i]._x = this.flow_btn._x;
-				_toolbarMenu[i]._y = (_toolbarMenu[i-1]._y+_toolbarMenu[i-1].height)+btnOffset_Y
-			}
-			if (i == menuList.length){
-				btn_text.removeTextField();
-			}
-			//_toolbarMenu[i].onRollOver = function(){
+			if(menuList[i][0] != "spacer" && menuList[i][1] != null) {
 				
-			//}
-			//_toolbarMenu[i].onRollOut = Proxy.create (this, localOnRollOut); 
+				this.createTextField("btn_text", this.getNextHighestDepth(), btnOffset_X, -100, 10, 18); 
+				
+				var btnLabel:String = Dictionary.getValue(menuList[i][0])
+				var btn_text = this["btn_text"]
+				btn_text.autoSize = true;
+				btn_text.html = true;
+				btn_text.htmlText = btnLabel
+				
+				var btnWidth:Number = btn_text.textWidth+37
+				
+				_toolbarMenu[i] = this.attachMovie("Button", menuList[i][0], this.getNextHighestDepth(), {label:btnLabel, icon:menuList[i][1] })
+				_toolbarMenu[i].setSize(btnWidth, 25)
+			
+			} else {
+				_toolbarMenu[i] = null;
+			}
+			
+			if(_toolbarMenu[i] != null) {
+				
+				if (i == 0){
+					_toolbarMenu[i]._x  = btnOffset_X
+					
+				} else {
+					_toolbarMenu[i]._x = getToolbarButtonXPos(_toolbarMenu, i-1, 1); //(_toolbarMenu[i-1]._x+_toolbarMenu[i-1].width)+btnOffset_X
+				}
+				
+				_toolbarMenu[i]._y = btnOffset_Y;
+			
+				if (i >= menuList.length-2){
+					_toolbarMenu[i]._x = this.flow_btn._x;
+					_toolbarMenu[i]._y = (_toolbarMenu[i-1]._y+_toolbarMenu[i-1].height)+btnOffset_Y
+				}
+				
+				if (i == menuList.length){
+					btn_text.removeTextField();
+				}
+				
+			}
+			
+			
 		}
 		
 	}
+	
+	private function getToolbarButtonXPos(toolbarMenu:Array, i:Number, count:Number):Number {
+		var _count:Number = count;
+		
+		if(toolbarMenu[i] == null && i >= 0) {
+			_count++;
+			return getToolbarButtonXPos(toolbarMenu, i-1, _count);
+		} else if(toolbarMenu[i] != null) {
+			return (_count > 1) ? (toolbarMenu[i]._x+toolbarMenu[i].width)+btnOffset_X+(_count*SPACER_WIDTH) : (toolbarMenu[i]._x+toolbarMenu[i].width)+btnOffset_X;
+		} else {
+			return btnOffset_X;
+		}
+		
+	}
+	
 	/*
 	* Updates state of the Toolbar, called by Toolbar Model
 	*
@@ -296,7 +342,6 @@ class ToolbarView extends AbstractView {
 		var Xpos = Application.TOOLBAR_X+ btnObj._x;
 		var Ypos = (Application.TOOLBAR_Y+ btnObj._y+btnObj.height)+5;
 		var ttHolder = Application.tooltip;
-		//var ttMessage = btnObj.label;
 		var ttMessage = Dictionary.getValue(btnTT);
 		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos);
 		
@@ -336,6 +381,7 @@ class ToolbarView extends AbstractView {
 		new_btn.setStyle('styleName',styleObj);
 		open_btn.setStyle('styleName',styleObj);
 		save_btn.setStyle('styleName',styleObj);
+		apply_changes_btn.setStyle('styleName', styleObj);
 		copy_btn.setStyle('styleName',styleObj);
 		paste_btn.setStyle('styleName',styleObj);
 		trans_btn.setStyle('styleName',styleObj);
@@ -345,20 +391,12 @@ class ToolbarView extends AbstractView {
 		branch_btn.setStyle('styleName',styleObj);
 		group_btn.setStyle('styleName', styleObj);
 		preview_btn.setStyle('styleName',styleObj);
+		cancel_btn.setStyle('styleName',styleObj);
 		styleObj = _tm.getStyleObject('BGPanel');
 		bkg_pnl.setStyle('styleName',styleObj);
 		styleObj = _tm.getStyleObject('FlowPanel');
 		flow_bkg_pnl.setStyle('styleName',styleObj);
-		/*
-		_toolbar_mc.open_btn.addEventListener("click",controller);
-		_toolbar_mc.save_btn.addEventListener("click",controller);
-		_toolbar_mc.copy_btn.addEventListener("click",controller);
-		_toolbar_mc.paste_btn.addEventListener("click",controller);
-		_toolbar_mc.trans_btn.addEventListener("click",controller);
-		_toolbar_mc.optional_btn.addEventListener("click",controller);
-		_toolbar_mc.gate_btn.addEventListener("click",controller);
-		_toolbar_mc.preview_btn.addEventListener("click",controller);
-        */
+
     }
 	
 	/**

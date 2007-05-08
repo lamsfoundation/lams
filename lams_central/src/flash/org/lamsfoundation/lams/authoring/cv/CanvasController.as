@@ -64,7 +64,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	   //if transition tool active
 	    if(_canvasModel.isTransitionToolActive()){
 		   
-			var transitionTarget = createValidTransitionTarget(ca);
+			var transitionTarget = createValidTransitionTarget(ca, true);
 		    if(transitionTarget instanceof LFError){
 				transitionTarget.showErrorAlert(null); 
 		   }else{
@@ -197,7 +197,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			//refresh the transitions
 			//TODO: refresh the transitions as you drag...
 			var myTransitions = _canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(ca.activity.activityUIID);
-			myTransitions = myTransitions.myTransitions
+			myTransitions = myTransitions.myTransitions;
 			//run in a loop to support branches, maybe more then 2 transitions.
 			for (var i=0; i<myTransitions.length;i++){
 				Debugger.log('removing transition for redraw:'+myTransitions[i].transitionUIID,Debugger.GEN,'activityRelease','CanvasController');
@@ -205,6 +205,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				t.removeMovieClip();
 				
 			}
+			
+			// check for modified transition connected to activity
+			var modTransitions = _canvasModel.getModTransitionsForActivityUIID(ca.activity.activityUIID);
+			modTransitions = modTransitions.modTransitions;
+			for (var i=0; i<modTransitions.length;i++){
+				Debugger.log('removing transition for redraw:'+modTransitions[i].transitionUIID,Debugger.GEN,'activityRelease','CanvasController');
+				var t = _canvasModel.transitionsDisplayed.remove(modTransitions[i].transitionUIID);
+				t.removeMovieClip();
+			}
+			
 			clearAllSelections(optionalOnCanvas, parallelOnCanvas)		
 			_canvasModel.setDirty();
 			_canvasModel.selectedItem = ca;
@@ -242,28 +252,30 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	    var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID)
 		_canvasModel.getCanvas().stopActiveTool();
 		_canvasModel.getCanvas().stopTransitionTool();	
-		if(_canvasModel.getCanvas().ddm.readOnly){
-			// throw alert warning
-			LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_dbclick_readonly'));
-		}else{
-			_canvasModel.selectedItem = ca;
-			if(ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
-				if (!_pi.isPIExpanded()){
-					_canvasModel.setPIHeight(_pi.piFullHeight());
-					//_pi.showExpand(false);
-				}
-			}else if (ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE && (ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE)){
-				if (!_pi.isPIExpanded()){
-					_canvasModel.setPIHeight(_pi.piFullHeight());
-					
-				}
+		if(!isActivityReadOnly(ca, Dictionary.getValue("cv_element_readOnly_action_mod"))) {
+			if(_canvasModel.getCanvas().ddm.readOnly && !_canvasModel.getCanvas().ddm.editOverrideLock){
+				// throw alert warning
+				LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_dbclick_readonly'));
 			}else{
-				Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick to open Content','CanvasController');
-				_canvasModel.openToolActivityContent(ca.activity);
-				
-				// invalidate design after opening tool content window
-				_canvasModel.getCanvas().ddm.validDesign = false;
-				_canvasModel.getCanvas().checkValidDesign();
+				_canvasModel.selectedItem = ca;
+				if(ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+					if (!_pi.isPIExpanded()){
+						_canvasModel.setPIHeight(_pi.piFullHeight());
+						//_pi.showExpand(false);
+					}
+				}else if (ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE && (ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE)){
+					if (!_pi.isPIExpanded()){
+						_canvasModel.setPIHeight(_pi.piFullHeight());
+						
+					}
+				}else{
+					Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick to open Content','CanvasController');
+					_canvasModel.openToolActivityContent(ca.activity);
+					
+					// invalidate design after opening tool content window
+					_canvasModel.getCanvas().ddm.validDesign = false;
+					_canvasModel.getCanvas().checkValidDesign();
+				}
 			}
 		}
     }
@@ -309,7 +321,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			if(transitionTarget instanceof LFError){
 				_canvasModel.resetTransitionTool();
 				_canvasModel.getCanvas().stopTransitionTool();
-				LFMessage.showMessageAlert(transitionTarget);
+				LFError(transitionTarget).showErrorAlert(null);
+				//LFMessage.showMessageAlert(transitionTarget);
 			}else{
 				var td = _canvasModel.addActivityToTransition(transitionTarget);
 				
@@ -318,7 +331,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				if(td instanceof LFError){
 					_canvasModel.resetTransitionTool();
 					_canvasModel.getCanvas().stopTransitionTool();
-					LFMessage.showMessageAlert(td);
+					LFError(td).showErrorAlert(null);
+					//LFMessage.showMessageAlert(td);
 				}
 			}
 			_canvasModel.resetTransitionTool();
@@ -345,13 +359,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    
 	private function isActivityOnBin(ca:Object):Void{
 				
-		if (ca.hitTest(_canvasModel.getCanvas().bin)){
-			trace("Activity "+ca.activity.title+" has hit the bin")
-			if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
-				trace("Complex Activity has hit the bin")
-				_canvasModel.removeComplexActivity(ca);
-			}else {
-				_canvasModel.removeActivityOnBin(ca.activity.activityUIID);
+		if (ca.hitTest(_canvasModel.getCanvas().bin)) {
+			if(!isActivityReadOnly(ca, Dictionary.getValue("cv_element_readOnly_action_del"))){
+				if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+					_canvasModel.removeComplexActivity(ca);
+				}else {
+					_canvasModel.removeActivityOnBin(ca.activity.activityUIID);
+				}
+			} else {
+				activitySnapBack(ca);
 			}
 		}
 	}
@@ -367,15 +383,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
    
     public function transitionDoubleClick(ct:CanvasTransition):Void{
-	   Debugger.log('transitionDoubleClick CanvasTransition:'+ct.transition.transitionUIID,Debugger.GEN,'transitionDoubleClick','CanvasController');
+		Debugger.log('transitionDoubleClick CanvasTransition:'+ct.transition.transitionUIID,Debugger.GEN,'transitionDoubleClick','CanvasController');
 	   
-	   _canvasModel.getCanvas().stopActiveTool();
+		_canvasModel.getCanvas().stopActiveTool();
 	   
-	   //TODO: fix this, its null
-	   _canvasView =  CanvasView(getView());
-	   Debugger.log('_canvasView:'+_canvasView,Debugger.GEN,'transitionDoubleClick','CanvasController');
-	   _canvasView.createTransitionPropertiesDialog("centre",Delegate.create(this, transitionPropertiesOK));
-	  
+		//TODO: fix this, its null
+		_canvasView =  CanvasView(getView());
+		Debugger.log('_canvasView:'+_canvasView,Debugger.GEN,'transitionDoubleClick','CanvasController');
+	   
+		if(!isTransitionTargetReadOnly(ct, Dictionary.getValue("cv_element_readOnly_action_mod"))) _canvasView.createTransitionPropertiesDialog("centre",Delegate.create(this, transitionPropertiesOK));
 		
 	    _canvasModel.selectedItem = ct;
     }
@@ -385,11 +401,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		if(_canvasModel.isDragging){
 			ct.stopDrag();
 			
-			if (ct.hitTest(_canvasModel.getCanvas().bin)){
-				_canvasModel.getCanvas().removeTransition(ct.transition.transitionUIID);
-			}
-			else {
-				trace("transitions x position:"+ct._x)
+			if (ct.hitTest(_canvasModel.getCanvas().bin) && !isTransitionTargetReadOnly(ct, Dictionary.getValue("cv_element_readOnly_action_del"))){
+				_canvasModel.getCanvas().removeTransition(ct.transition.transitionUIID); 
+			} else {
 				if (ct._x != ct.xPosition){
 					
 					var t = _canvasModel.transitionsDisplayed.remove(ct.transition.transitionUIID);
@@ -439,8 +453,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		//flags dirty to refresh view
 		_canvasModel.createGateTransition(_canvasModel.selectedItem.transition.transitionUIID,evt.gate);
 		
-		
-		
+
 	}
 		
 	/**
@@ -482,23 +495,48 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 	}
 	
-	private function createValidTransitionTarget(transitionTargetObj:Object):Object{
+	private function createValidTransitionTarget(transitionTargetObj:Object, isInitTarget:Boolean):Object{
 			var targetCA:Object;
 			Debugger.log("My transitionTargetObj is :"+transitionTargetObj.activity.activityUIID, Debugger.GEN,'createValidTransitionTarget','CanvasController');
 			//see what we can cast to
 			if(CanvasActivity(transitionTargetObj)!=null){
 				Debugger.log("Casting to CanvasActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
 				targetCA = CanvasActivity(transitionTargetObj);
-				return targetCA;
+				
+				return (isValidTransitionTarget(targetCA) || isInitTarget) ? targetCA : new LFError();
 			}else if(CanvasParallelActivity(transitionTargetObj)!=null){
 				Debugger.log("Casting to CanvasParallelActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
 				targetCA = CanvasParallelActivity(transitionTargetObj);
-				return targetCA;
+				return (isValidTransitionTarget(targetCA) || isInitTarget) ? targetCA : new LFError();
 			}else if(CanvasOptionalActivity(transitionTargetObj)!=null){
 				Debugger.log("Casting to CanvasOptionalActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
 				targetCA = CanvasOptionalActivity(transitionTargetObj);
-				return targetCA;
+				return (isValidTransitionTarget(targetCA) || isInitTarget) ? targetCA : new LFError();
 			}
+	}
+	
+	private function isValidTransitionTarget(target:Object):Boolean {
+		return !Activity(target.activity).isReadOnly();
+	}
+ 
+	private function isTransitionTargetReadOnly(ct:CanvasTransition, action:String):Boolean {
+		if(_canvasModel.getActivityMCByUIID(ct.transition.toUIID).activity.isReadOnly()) {
+			LFMessage.showMessageAlert(Dictionary.getValue('cv_trans_readOnly', [action]));
+			
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	private function isActivityReadOnly(ca:Object, action:String):Boolean {
+		if(Activity(ca.activity).isReadOnly()) {
+			LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_readOnly', [action]));
+			
+			return true;
+		} else {
+			return false; 
+		}
 	}
  
 }

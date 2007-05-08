@@ -305,6 +305,10 @@ class Toolkit {
 		return toolkitModel.y;
 	}
 
+	public function get view():MovieClip{
+		return toolkitView;
+	}
+
     function get className():String { 
         return 'Toolkit';
     }

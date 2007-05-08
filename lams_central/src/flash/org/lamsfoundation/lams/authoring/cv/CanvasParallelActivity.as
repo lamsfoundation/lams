@@ -73,7 +73,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private var _doubleClicking:Boolean;
 	private var child1_mc:MovieClip;
 	private var child2_mc:MovieClip;
-	private var _locked:Boolean;
+	private var _locked:Boolean = false;
 	private var _visibleHeight:Number;
 	private var _visibleWidth:Number;
 	
@@ -107,7 +107,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		clickTarget_mc.onReleaseOutside = Proxy.create(this,localOnReleaseOutside);
 
 		_ddm.getComplexActivityChildren(_activity.activityUIID);
-		_locked = false;
 		
 		showStatus(false);
 		
@@ -296,9 +295,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 				_doubleClicking = true;
 				
 				//if we double click on the glass mask - then open the container to allow the usr to see the activities inside.
-				if(_locked){
+				if(_locked && !_activity.isReadOnly()){
 					_locked = false;
 				}else{
+					if(_activity.isReadOnly()) { /** TODO: Change label warning */ LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_dbclick_readonly')); }
 					_locked = true;
 				}
 				draw();
