@@ -1,5 +1,5 @@
 /******************************************************************************
- * LamstwoConfigurationException.java
+ * LessonManagerServiceSoapBindingStub.java
  * 
  * Copyright (c) 2007 LAMS Foundation
  * Licensed under the Educational Community License version 1.0
