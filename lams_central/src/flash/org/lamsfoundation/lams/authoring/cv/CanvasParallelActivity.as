@@ -207,44 +207,43 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		return styleObj;
 	}
 	
+	private function drawLearners():Void {
+		var mm:MonitorModel = MonitorModel(_monitorController.getModel());
+		var learner_X = _activity.xCoord + learnerOffset_X;
+		var learner_Y = _activity.yCoord + learnerOffset_Y;
+			
+		// get the length of learners from the Monitor Model and run a for loop.
+		for (var j=0; j<mm.allLearnersProgress.length; j++){
+			var learner:Object = new Object();
+			learner = mm.allLearnersProgress[j]
+				
+			//Gets a true if learner's currect activityID matches this activityID else false.
+			var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
+			var hasPlus:Boolean = false;
+			
+			if (isLearnerCurrentAct){
+					
+				if (learner_X > (_activity.xCoord + 112)){
+					learner_X = _activity.xCoord + learnerOffset_X 
+					learner_Y = 27
+					hasPlus = true;
+					this._parent.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this._parent.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
+					return;
+				}
+					
+				this._parent.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this._parent.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus});
+				learner_X = learner_X+10
+			}
+		}
+	}
 	
 	private function draw(){			
 		//write text
 		title_lbl.text = _activity.title;
-		//actCount_lbl.text = _children.length+ Dictionary.getValue('lbl_num_activities'); //" activities";
-		
-//			_global.breakpoint();
-		
-		//header_pnl.borderType='outset';
 			
-		if(fromModuleTab == "monitorMonitorTab"){
-			var mm:MonitorModel = MonitorModel(_monitorController.getModel());
-		trace("all learner progress length in Canvas activity: "+mm.allLearnersProgress.length);
-			var learner_X = _activity.xCoord + learnerOffset_X;
-			var learner_Y = _activity.yCoord + learnerOffset_Y;
-		// get the length of learners from the Monitor Model and run a for loop.
-			for (var j=0; j<mm.allLearnersProgress.length; j++){
-				var learner:Object = new Object();
-				learner = mm.allLearnersProgress[j]
-				
-				//Gets a true if learner's currect activityID matches this activityID else false.
-				
-				var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
-				if (isLearnerCurrentAct){
-					if (learner_X > (_activity.xCoord + 112)){
-						learner_X = _activity.xCoord + learnerOffset_X 
-						learner_Y = 27
-					}
-					
-					trace("this._parent is "+this._parent)
-					trace(_activity.title+": is the learner's current Activity.")
-					this._parent.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this._parent.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y});
-					learner_X = learner_X+10
-				}else {
-					trace(_activity.title+": is not the learner's current Activity.")
-				}
-			}
-		}
+		if(fromModuleTab == "monitorMonitorTab")
+			drawLearners()
+			
 		//position the container (this)
 		_x = _activity.xCoord //- newContainerXCoord;
 		_y = _activity.yCoord
@@ -252,7 +251,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		setLocking()
 		setStyles()
 		_visible = true;
-		//child1_mc._visible = true;
 					
 	}
 	

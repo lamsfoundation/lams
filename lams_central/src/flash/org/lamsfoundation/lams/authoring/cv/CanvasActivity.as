@@ -263,19 +263,24 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			
 			if (isLearnerCurrentAct){
 				var ref = this._parent;
+				var xCoord = _activity.xCoord;
 				
 				if (_activity.parentUIID != null) {
 					ref = this._parent._parent;
+					xCoord = parentAct.xCoord;
+					
 					if(parentAct.activityTypeID != Activity.PARALLEL_ACTIVITY_TYPE){
+						xCoord = _activity.xCoord;
 						learner_X = (learner_X != null) ? learner_X + this._parent._x : null;
 						learner_Y = learner_Y + this._parent._y
 					} 
-				}
 					
+				}
 				
 				// Add + icon to indicate that more users are currently at the Activity. 
 				// We are unable to display all the users across the Activity's panel.
-				if(learner_X > (_activity.xCoord + 112)) {
+				Debugger.log("learner_X: " + learner_X + " ref: " + ref + " xcoord: " + xCoord, Debugger.CRITICAL, "drawLearners", "CanvasActivity");
+				if(learner_X > (xCoord + 112)) {
 					hasPlus = true;
 					ref.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), ref.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
 					return;
@@ -285,7 +290,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				ref.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), ref.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
 						
 				//  space icons
-				learner_X = learner_X+10
+				learner_X = learner_X+10;
 			}
 		}
 	}
