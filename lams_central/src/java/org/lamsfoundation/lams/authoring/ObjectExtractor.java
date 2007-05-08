@@ -417,7 +417,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	            Hashtable groupingDetails = (Hashtable)iterator.next();
 	            if( groupingDetails != null )
 	            {
-	    			Grouping grouping = extractGroupingObject(groupingDetails);	
+	    			Grouping grouping = extractGroupingObject(groupingDetails);
 	    			groupingDAO.insertOrUpdate(grouping);	
 	    			groupings.put(grouping.getGroupingUIID(),grouping);
 	            }
@@ -443,15 +443,14 @@ public class ObjectExtractor implements IObjectExtractor {
 	    if ( grouping != null && ! grouping.getGroupingTypeId().equals(groupingTypeID) ) {
 	    	groupings.remove(grouping.getGroupingUIID());
 	    	groupingsToDelete.add(grouping);
-			grouping = null;
+	    	
+	    	grouping = null;
 	    }
 	
 	    if (grouping == null) {
 	        Object object = Grouping.getGroupingInstance(groupingTypeID);
 			grouping = (Grouping)object;				
 			
-			if(keyExists(groupingDetails, WDDXTAGS.GROUPING_ID))
-				    grouping.setGroupingId(WDDXProcessor.convertToLong(groupingDetails,WDDXTAGS.GROUPING_ID));
 			if (keyExists(groupingDetails, WDDXTAGS.GROUPING_UIID))
 				    grouping.setGroupingUIID(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.GROUPING_UIID));
 	    } 
