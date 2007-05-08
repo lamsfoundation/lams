@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE application PUBLIC '-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN' 'http://java.sun.com/dtd/application_1_3.dtd'>
 <application>
-    <display-name>LAMS</display-name>
+    <display-name>RAMS</display-name>
     <description>
-    Learning Activty Management System
+    Research Activity Management System
     </description>
     <!-- ======================================================== -->
 	<!--  Security Roles -->
@@ -43,25 +43,25 @@
     <module>
         <web>
             <web-uri>lams-central.war</web-uri>
-            <context-root>/lams</context-root>
+            <context-root>/rams</context-root>
 	</web>
     </module>
     <module>
         <web>
             <web-uri>lams-admin.war</web-uri>
-            <context-root>/lams/admin</context-root>
+            <context-root>/rams/admin</context-root>
 	</web>
     </module>
     <module>
         <web>
             <web-uri>lams-monitoring.war</web-uri>
-            <context-root>/lams/monitoring</context-root>
+            <context-root>/rams/monitoring</context-root>
 	</web>
     </module>
     <module>
         <web>
             <web-uri>lams-learning.war</web-uri>
-            <context-root>/lams/learning</context-root>
+            <context-root>/rams/learning</context-root>
 	</web>
     </module> 
 	<module>
@@ -70,7 +70,7 @@
     <module>
         <web>
             <web-uri>lams-www.war</web-uri>
-            <context-root>/lams/www</context-root>
+            <context-root>/rams/www</context-root>
 		</web>
     </module>
 
@@ -224,15 +224,4 @@
     <!--  End Third Party JAR Files -->
     
     <!--  Tools -->
-   <!--    
-   
-   <module>
-        <web>
-            <web-uri>lams-tool-survey.war</web-uri>
-            <context-root>/lams/tool/survey</context-root>
-		</web>
-    </module>
-
-
-    -->
  </application>
