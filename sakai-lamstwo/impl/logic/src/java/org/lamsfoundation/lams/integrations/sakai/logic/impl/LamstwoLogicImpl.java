@@ -11,15 +11,22 @@
 
 package org.lamsfoundation.lams.integrations.sakai.logic.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.rpc.ServiceException;
 
 import org.apache.commons.logging.Log;
@@ -27,9 +34,6 @@ import org.apache.commons.logging.LogFactory;
 import org.lamsfoundation.lams.integrations.sakai.dao.LamstwoDao;
 import org.lamsfoundation.lams.integrations.sakai.logic.LamstwoLogic;
 import org.lamsfoundation.lams.integrations.sakai.model.LamstwoItem;
-import org.lamsfoundation.lams.webservice.LearningDesignRepository;
-import org.lamsfoundation.lams.webservice.LearningDesignRepositoryService;
-import org.lamsfoundation.lams.webservice.LearningDesignRepositoryServiceLocator;
 import org.lamsfoundation.lams.webservice.LessonManager;
 import org.lamsfoundation.lams.webservice.LessonManagerService;
 import org.lamsfoundation.lams.webservice.LessonManagerServiceLocator;
@@ -43,7 +47,6 @@ import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.thread_local.cover.ThreadLocalManager;
-import org.sakaiproject.tool.api.Placement;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.ToolManager;
@@ -51,6 +54,10 @@ import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.util.ResourceLoader;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * This is the implementation of the business logic interface
@@ -332,49 +339,70 @@ public class LamstwoLogicImpl implements LamstwoLogic {
 	 * @see org.lamsfoundation.lams.integrations.sakai.logic.LamstwoLogic#getLearningDesigns()
 	 */
 	public String getLearningDesigns(Integer mode) {
-		
-		
-		String serverID = getServerID();
 		String serverAddress = getServerAddress();
+		String serverID = getServerID();
 		String serverKey = getServerKey();
-		
+		String datetime = new Long(System.currentTimeMillis()).toString();
 		String username = getCurrentUserId();
-		String siteId = getCurrentContext();
-		
-		if (serverID == null || serverAddress == null || serverKey == null ) {
-			log.error("Unable to retrieve learning designs from LAMS, one or more lams configuration properties is null");
-			return null;
-		}
-		
+		String hashValue = LamstwoUtils.generateAuthenticationHash(serverID, serverKey, username, datetime);
+		String courseId = getCurrentContext();
+		String country = getCountryCode();
+		String lang = getLanguageCode();
+
+		String learningDesigns = "[]"; // empty javascript array
 		try {
-			String datetime = new Date().toString();
-			String hashValue = LamstwoUtils.generateAuthenticationHash(serverID, serverKey, username, datetime);
-	
-			LearningDesignRepositoryService service = new LearningDesignRepositoryServiceLocator();
-			LearningDesignRepository ldr = service.getLearningDesignRepository(new URL(serverAddress + "/services/LearningDesignRepositoryService"));
-			String result = ldr.getLearningDesigns(serverID, datetime, hashValue, username, siteId, mode, getCountryCode(), getLanguageCode()); 
+			String serviceURL = serverAddress + "/services/xml/LearningDesignRepository?" 
+				+ "datetime=" 	+ datetime
+				+ "&username="	+ URLEncoder.encode(username, "utf8")
+				+ "&serverId=" 	+ URLEncoder.encode(serverID, "utf8")
+				+ "&serverKey="	+ URLEncoder.encode(serverKey, "utf8")
+				+ "&hashValue=" + hashValue
+				+ "&courseId=" 	+ courseId
+				+ "&country="	+ country
+				+ "&lang=" 		+ lang
+				+ "&mode="		+ mode;	
 			
-			// TODO check if result is valid ??
+			URL url = new URL(serviceURL);
+			URLConnection conn = url.openConnection();
+			if (!(conn instanceof HttpURLConnection)) {
+				log.error("Unable to open connection to: " + serviceURL); 
+			}
 			
+			HttpURLConnection httpConn = (HttpURLConnection)conn;
+			
+			if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+				log.error("HTTP Response Code: " + httpConn.getResponseCode() 
+						+ ", HTTP Response Message: " + httpConn.getResponseMessage());
+			}
+			
+			InputStream is = url.openConnection().getInputStream();
+			
+			// parse xml response
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document document = db.parse(is);			
+			
+			learningDesigns = "[" + convertToTigraFormat(document.getDocumentElement()) + "]";
+			
+			// replace sequence id with javascript method
 			String pattern = "'(\\d+)'";
 			String replacement = "'javascript:selectSequence($1)'";
+			learningDesigns = learningDesigns.replaceAll(pattern, replacement);	
 			
-			result = result.replaceAll(pattern, replacement);
-			
-			return result;
-		
+			// TODO better error handling
 		} catch (MalformedURLException e) {
-			log.error("Unable to retrieve learning designs from LAMS, bad URL: '"
-					+ serverAddress
-					+ "', please check sakai.properties");
-		} catch (ServiceException e) {
-			log.error("Unable to retrieve learning designs from LAMS, RPC Service Exception");
 			e.printStackTrace();
-		} catch (RemoteException e) {
-			log.error("Unable to retrieve learning designs from LAMS, RMI Remote Exception");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
 			e.printStackTrace();
 		}
-		return null;
+		
+		return learningDesigns;
 	}
 
 	/* (non-Javadoc)
@@ -614,5 +642,44 @@ public class LamstwoLogicImpl implements LamstwoLogic {
 			return true;
 		}
 		return false;
+	}
+	
+	
+	
+	private String convertToTigraFormat(Node node) {
+
+		StringBuilder sb = new StringBuilder();
+
+		if (node.getNodeName().equals(LamstwoConstants.ELEM_FOLDER)) {
+			sb.append("['");
+			sb.append(
+					node.getAttributes().getNamedItem(
+							LamstwoConstants.ATTR_NAME).getNodeValue()).append(
+					"',").append("null").append(',');
+
+			NodeList children = node.getChildNodes();
+			if (children.getLength() == 0) {
+				sb.append("['',null]");
+			} else {
+				sb.append(convertToTigraFormat(children.item(0)));
+				for (int i = 1; i < children.getLength(); i++) {
+					sb.append(',').append(
+							convertToTigraFormat(children.item(i)));
+				}
+			}
+			sb.append(']');
+		} else if (node.getNodeName().equals(
+				LamstwoConstants.ELEM_LEARNING_DESIGN)) {
+			sb.append('[');
+			sb.append('\'').append(
+					node.getAttributes().getNamedItem(
+							LamstwoConstants.ATTR_NAME).getNodeValue()).append(
+					'\'').append(',').append('\'').append(
+					node.getAttributes().getNamedItem(
+							LamstwoConstants.ATTR_RESOURCE_ID).getNodeValue())
+					.append('\'');
+			sb.append(']');
+		}
+		return sb.toString();
 	}
 }

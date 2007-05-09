@@ -12,10 +12,17 @@
 package org.lamsfoundation.lams.integrations.sakai.logic.impl;
 
 public class LamstwoConstants {
-
+	
+	// Conf file constants
 	public static final String CONF_SERVER_ADDRRESS = "lamstwo.serverAddr";
 	public static final String CONF_SERVER_ID		= "lamstwo.serverId";
 	public static final String CONF_SERVER_KEY		= "lamstwo.serverKey";
 	public static final String CONF_REQUEST_SOURCE	= "lamstwo.requestSrc";
+	
+	// XML format constnats
+	public static final String ELEM_FOLDER 			= "Folder";
+	public static final String ELEM_LEARNING_DESIGN = "LearningDesign";
+	public static final String ATTR_NAME			= "name";
+	public static final String ATTR_RESOURCE_ID		= "resourceId";
 	
 }
