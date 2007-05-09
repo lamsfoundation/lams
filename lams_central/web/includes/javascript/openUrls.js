@@ -71,6 +71,26 @@
 			}
 		}
 
+		function openAuthorForEditOnFly( learningDesignID )
+		{
+			if(isMac)
+			{
+				monitorLessonWin = window.open('../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID,'mWindow','width=796,height=570,resizable');
+			}
+			else
+			{
+				if(monitorLessonWin && !monitorLessonWin.closed)
+				{
+					monitorLessonWin.location = '../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID;
+				}
+				else
+				{
+					monitorLessonWin = window.open('../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID,'mWindow','width=796,height=570,resizable');
+					monitorLessonWin.focus();
+				}
+			}
+		}
+
 		function openMonitorLesson( lessonID )
 		{
 			if(isMac)

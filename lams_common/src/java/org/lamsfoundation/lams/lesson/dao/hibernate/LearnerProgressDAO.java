@@ -23,8 +23,13 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
+import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
@@ -37,8 +42,17 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerProgressDAO
 {
-    private final static String LOAD_PROGRESS_BY_LEARNER = 
+
+	protected Logger log = Logger.getLogger(LearnerProgressDAO.class);	
+
+	private final static String LOAD_PROGRESS_BY_LEARNER = 
         "from LearnerProgress p where p.user.id = :learnerId and p.lesson.id = :lessonId";
+    private final static String LOAD_PROGRESS_BY_ACTIVITY = 
+        "from LearnerProgress p where p.previousActivity = :activity or p.currentActivity = :activity or p.nextActivity = :activity ";
+   // +
+   // 	"or activity in elements(p.previousActivity) or activity in elements(p.completedActivities)";
+	private final static String LOAD_COMPLETED_PROGRESS_BY_LESSON = 
+        "from LearnerProgress p where p.lessonComplete = true and p.lesson.id = :lessonId";
 
     /**
      * Retrieves the Lesson
@@ -96,4 +110,50 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     {
         this.getHibernateTemplate().update(learnerProgress);
     }
+    
+    /**
+     * Get all the learner progress records where the current, previous or next activity is the given activity.
+     * @param activity
+     * @return List<LearnerProgress>
+     */
+    public List getLearnerProgressReferringToActivity(final Activity activity) 
+    {
+        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+
+        return (List)hibernateTemplate.execute(
+             new HibernateCallback() 
+             {
+                 public Object doInHibernate(Session session) throws HibernateException 
+                 {
+                     return session.createQuery(LOAD_PROGRESS_BY_ACTIVITY)
+                     	.setEntity("activity",activity)
+                     	.list();
+                 }
+             }
+       );     
+    }
+
+    /**
+     * Get all the learner progress records for a lesson where the progress is marked as completed.
+     * @param lessonId
+     * @return List<LearnerProgress>
+     */
+    public List getCompletedLearnerProgressForLesson(final Long lessonId) 
+    {
+        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+        log.debug("Hibernate template is "+hibernateTemplate);
+
+        return (List)hibernateTemplate.execute(
+             new HibernateCallback() 
+             {
+                 public Object doInHibernate(Session session) throws HibernateException 
+                 {
+                     return session.createQuery(LOAD_COMPLETED_PROGRESS_BY_LESSON)
+                     	.setLong("lessonId",lessonId)
+                     	.list();
+                 }
+            }
+       );     
+    }
+
 }

@@ -66,6 +66,14 @@ public interface IToolSessionDAO
 	 */
 	public List getToolSessionsByLesson(final Lesson lesson);
 
+	/**
+	 * Get the tool session by activity. A class-grouped activity should have only one tool session,
+	 * per activity but a proper grouped activity or an individial activity may have more
+	 * than one tool sesssion.
+	 * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#getToolSessionByActivity(org.lamsfoundation.lams.learningdesign.Activity)
+	 * @returns List of toolSessions, may be of subclass NonGroupedToolSession or GroupedToolSession
+	 */
+	public List getToolSessionByActivity(final Activity activity);
 	
 	public void updateToolSession(ToolSession toolSession);
 }

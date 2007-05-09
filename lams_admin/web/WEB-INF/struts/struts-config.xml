@@ -22,6 +22,14 @@
       type="org.lamsfoundation.lams.admin.web.CacheActionForm"
     />
     <form-bean
+      name="ImportV1ContentsForm"
+      type="org.lamsfoundation.lams.admin.web.form.ImportV1ContentsForm"
+    />
+    <form-bean
+      name="ImportV1Form"
+      type="org.lamsfoundation.lams.admin.web.form.ImportV1Form"
+    />
+    <form-bean
       name="ImportExcelForm"
       type="org.lamsfoundation.lams.admin.web.ImportExcelForm"
     />
@@ -136,6 +144,10 @@
 	<form-property name="userno" type="java.lang.Integer" />
 	<form-property name="public" type="java.lang.Boolean" initial="true" />
 </form-bean>
+
+<form-bean name="CleanupForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="numDays" type="java.lang.Integer" />
+</form-bean>
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -208,6 +220,26 @@
       />
     </action>
     <action
+      path="/importv1contentssave"
+      type="org.lamsfoundation.lams.admin.web.action.ImportV1ContentsSaveAction"
+      name="ImportV1ContentsForm"
+      scope="session"
+      input=".importv1contents"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="importv1result"
+        path=".importv1result"
+        redirect="false"
+      />
+      <forward
+        name="sysadmin"
+        path="/sysadminstart.do"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/libraryManage"
       type="org.lamsfoundation.lams.admin.web.LibraryManageAction"
       unknown="false"
@@ -248,6 +280,25 @@
       <forward
         name="sysadmin"
         path="/sysadminstart.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/cleanup"
+      type="org.lamsfoundation.lams.admin.web.action.CleanupTempFilesAction"
+      name="CleanupForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="cleanup"
+        path=".cleanup"
+        redirect="false"
+      />
+      <forward
+        name="sysadmin"
+        path=".sysadmin"
         redirect="false"
       />
     </action>
@@ -305,6 +356,26 @@
       <forward
         name="sysadmin"
         path=".sysadmin"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/importv1save"
+      type="org.lamsfoundation.lams.admin.web.action.ImportV1SaveAction"
+      name="ImportV1Form"
+      scope="request"
+      input=".importv1"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="importv1contents"
+        path="/importv1contents.do"
+        redirect="false"
+      />
+      <forward
+        name="sysadmin"
+        path="/sysadminstart.do"
         redirect="false"
       />
     </action>
@@ -405,6 +476,25 @@
       />
     </action>
     <action
+      path="/importv1contents"
+      type="org.lamsfoundation.lams.admin.web.action.ImportV1ContentsAction"
+      name="ImportV1ContentsForm"
+      scope="session"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="importv1contents"
+        path=".importv1contents"
+        redirect="false"
+      />
+      <forward
+        name="sysadmin"
+        path="/sysadminstart.do"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/loginsave"
       type="org.lamsfoundation.lams.admin.web.LoginSaveAction"
       name="LoginMaintainForm"
@@ -422,6 +512,20 @@
       <forward
         name="loginmaintain"
         path=".loginmaintain"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/importv1"
+      type="org.lamsfoundation.lams.admin.web.action.ImportV1Action"
+      name="ImportV1Form"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="importv1"
+        path=".importv1"
         redirect="false"
       />
     </action>

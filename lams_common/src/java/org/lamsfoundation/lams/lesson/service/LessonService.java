@@ -26,19 +26,23 @@ package org.lamsfoundation.lams.lesson.service;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouper;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.exception.GroupingException;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
+import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
@@ -76,6 +80,7 @@ public class LessonService implements ILessonService
 	private IGroupingDAO groupingDAO;
 	private MessageService messageService;
 	private IBaseDAO baseDAO;
+	private ILearnerProgressDAO learnerProgressDAO;
 
     /* ******* Spring injection methods ***************************************/
 	public void setLessonDAO(ILessonDAO lessonDAO) {
@@ -90,6 +95,9 @@ public class LessonService implements ILessonService
 		this.groupingDAO = groupingDAO;
 	}
 
+	public void setLearnerProgressDAO(ILearnerProgressDAO learnerProgressDAO) {
+		this.learnerProgressDAO = learnerProgressDAO;
+	}
 
 	public void setMessageService(MessageService messageService) {
 		this.messageService = messageService;
@@ -488,4 +496,91 @@ public class LessonService implements ILessonService
 			}
 	    }
 	    
+		 /** 
+		  * Remove references to an activity from all learner progress entries.
+		  * Used by Live Edit, to remove any references to the system gates
+		  * @param activity The activity for which learner progress references should be removed.
+		  */
+		 public void removeProgressReferencesToActivity(Activity activity) throws LessonServiceException {
+			 if ( activity != null ) {
+				 log.debug("Processing learner progress for activity "+activity.getActivityId());
+
+				 List progresses = learnerProgressDAO.getLearnerProgressReferringToActivity(activity);
+				 if ( progresses != null && progresses.size()>0) {
+					 Iterator iter = progresses.iterator();
+					 while ( iter.hasNext() ) {
+						 LearnerProgress progress = (LearnerProgress) iter.next();
+						 if ( removeActivityReference(activity, progress) );
+						 	learnerProgressDAO.updateLearnerProgress(progress);
+					 }
+				 }
+			 }
+		 }
+
+		 private boolean removeActivityReference(Activity activity, LearnerProgress progress) {
+			 
+			 if ( log.isDebugEnabled() ) {
+				 log.debug("Processing learner progress learner "+progress.getUser().getUserId());
+			 }
+	
+			 boolean recordUpdated = false;
+			 
+			 boolean removed = progress.getAttemptedActivities().remove(activity);
+			 if ( removed ) {
+				 recordUpdated = true;
+				 log.debug("Removed activity from attempted activities");
+			 }
+	
+			 removed = progress.getCompletedActivities().remove(activity);
+			 if ( removed ) {
+				 recordUpdated = true;
+				 log.debug("Removed activity from completed activities");
+			 } 
+				 
+			 if ( progress.getCurrentActivity() != null && progress.getCurrentActivity().equals(activity) ) {
+				 progress.setCurrentActivity(null);
+				 recordUpdated = true;
+				 log.debug("Removed activity as current activity");
+			 }
+	
+			 if ( progress.getNextActivity() != null && progress.getNextActivity().equals(activity) ) {
+				 progress.setNextActivity(null);
+				 recordUpdated = true;
+				 log.debug("Removed activity as next activity");
+			 }
+			 
+			 if ( progress.getPreviousActivity() != null && progress.getPreviousActivity().equals(activity) ) {
+				progress.setPreviousActivity(null);
+				 recordUpdated = true;
+			 	log.debug("Removed activity as previous activity");
+			 }
+			 
+			 return recordUpdated;
+		 }
+
+		 /** 
+		  * Mark any learner progresses for this lesson as not completed. Called when Live Edit
+		  * ends, to ensure that if there were any completed progress records, and the design
+		  * was extended, then they are no longer marked as completed. 
+		  * @param lessonId The lesson for which learner progress entries should be updated.
+		  */
+		 public void performMarkLessonUncompleted(Long lessonId) throws LessonServiceException {
+			 int count = 0;
+			 if ( lessonId != null ) {
+				 log.debug("Setting learner progress to uncompleted for lesson "+lessonId);
+
+				 List progresses = learnerProgressDAO.getCompletedLearnerProgressForLesson(lessonId);
+				 if ( progresses != null && progresses.size()>0) {
+					 Iterator iter = progresses.iterator();
+					 while ( iter.hasNext() ) {
+						 LearnerProgress progress = (LearnerProgress) iter.next();
+						 progress.setLessonComplete(false);
+						 count++;
+					 }
+				 }
+			 }
+			 if ( log.isDebugEnabled() )
+				 log.debug("Reset completed flag for "+count+" learners for lesson "+lessonId);
+		 }
+		 
 }

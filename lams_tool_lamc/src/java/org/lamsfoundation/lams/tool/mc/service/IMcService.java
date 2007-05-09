@@ -201,11 +201,9 @@ public interface IMcService
 
     public void setAsForceComplete(Long userId) throws McApplicationException;
     
-    public void unsetAsDefineLater(Long toolContentId) throws McApplicationException;
+    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException;
     
-    public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException;
-    
-    public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException;
+    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException;
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException;
 	

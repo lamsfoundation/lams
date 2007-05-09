@@ -24,18 +24,27 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.action;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author daveg
@@ -52,52 +61,44 @@ public class CompleteActivityAction extends ActivityAction {
 	
 	/**
 	 * Sets the current activity as complete and uses the progress engine to find
-	 * the next activity (may be null). Note that the activity being completed may be
-	 * part of a parallel activity.
-	 * Forwards onto the required display action (displayToolActivity,
-	 * displayParallelActivity, etc.).
+	 * the next activity (may be null).  
+	 * 
+	 * Called when completing an optional activity, or triggered by completeToolSession (via a tool call).
+	 * The activity to be marked as complete must 
+	 * @throws IOException 
+	 * @throws ServletException 
 	 */
 	public ActionForward execute(
 			ActionMapping mapping,
 			ActionForm actionForm,
 			HttpServletRequest request,
-			HttpServletResponse response) {
+			HttpServletResponse response) throws IOException, ServletException {
 		ActivityMapping actionMappings = getActivityMapping();
-		
-		// check token
-		if (!this.isTokenValid(request, true)) {
-			// didn't come here from options page
-		    log.info(className+": No valid token in request");
-			return mapping.findForward(ActivityMapping.DOUBLE_SUBMIT_ERROR);
-		}
 		
 		ICoreLearnerService learnerService = getLearnerService();
 
 		Integer learnerId = LearningWebUtil.getUserId();
-		LearnerProgress progress = LearningWebUtil.getLearnerProgress(request, learnerService);
 		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 		
-		if (activity == null) {
-		    log.error(className+": No activity in request or session");
-			return mapping.findForward(ActivityMapping.ERROR);
-		}
+		// This must get the learner progress from the progress id, not cached from the request,
+		// otherwise we may be using an old version of a lesson while a teacher is starting a 
+		// live edit, and then the lock flag can't be checked correctly.
+	    LearnerProgress progress = learnerService.getProgressById(WebUtil.readLongParam(request,LearningWebUtil.PARAM_PROGRESS_ID, true));
 
+		ActionForward forward = null;
 		// Set activity as complete
 		try {
-			progress = learnerService.calculateProgress(activity, learnerId);
+			forward = LearningWebUtil.completeActivity(request, response,
+		    		actionMappings, progress, activity, 
+		    			learnerId, learnerService, false);
 		}
 		catch (LearnerServiceException e) {
 			return mapping.findForward("error");
 		}
-		LearningWebUtil.putActivityInRequest(request, progress.getNextActivity(), learnerService);
-		LearningWebUtil.putLearnerProgressInRequest(request,progress);
-		
-		// need to do the calculateProgress first as the chooseActivity changes the progress details 
-		setupProgressString(actionForm, request);
 
-		ActionForward forward = actionMappings.getProgressForward(progress,true,request, learnerService);
-		
+		setupProgressString(actionForm, request);
 		return forward;
 	}
 
+	
 }

@@ -236,7 +236,7 @@ public class GateAction extends LamsDispatchAction
 	            return viewSynchGate(mapping,gateForm,(SynchGateActivity)gate);
 	        else if(gate.isScheduleGate())
 	            return viewScheduleGate(mapping,gateForm,(ScheduleGateActivity)gate);
-	        else if(gate.isPermissionGate())
+	        else if(gate.isPermissionGate() || gate.isSystemGate())
 	            return viewPermissionGate(mapping,gateForm,(PermissionGateActivity)gate);
 	        else
 	            throw new MonitoringServiceException("Invalid gate activity. " +

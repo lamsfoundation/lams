@@ -1698,9 +1698,8 @@ public class VoteServicePOJO implements
      * @return 
      * @throws ToolException
      */
-    public void setAsDefineLater(Long toolContentID) throws DataMissingException, ToolException
+    public void setAsDefineLater(Long toolContentID, boolean value) throws DataMissingException, ToolException
     {
-    	logger.debug("request for setAsDefineLater with toolContentID: " + toolContentID);
     	if  (toolContentID == null)
     	{
     		logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
@@ -1713,9 +1712,8 @@ public class VoteServicePOJO implements
     		logger.error("throwing DataMissingException: WARNING!: retrieved voteContent is null.");
             throw new DataMissingException("voteContent is missing");
     	}
-    	voteContent.setDefineLater(true);
+    	voteContent.setDefineLater(value);
     	saveVoteContent(voteContent);
-    	logger.debug("success: end of setAsDefineLater on toolContentID:" + toolContentID);
     }
     
 
@@ -1727,9 +1725,8 @@ public class VoteServicePOJO implements
      * return 
      * @throws ToolException 
      */
-    public void setAsRunOffline(Long toolContentID) throws DataMissingException, ToolException
+    public void setAsRunOffline(Long toolContentID, boolean value) throws DataMissingException, ToolException
     {
-    	logger.debug("request for setAsRunOffline with toolContentID:" + toolContentID);
     	if  (toolContentID == null)
     	{
     		logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
@@ -1741,9 +1738,8 @@ public class VoteServicePOJO implements
     		logger.error("throwing DataMissingException: WARNING!: retrieved voteContent is null.");
             throw new DataMissingException("voteContent is missing");
     	}
-    	voteContent.setRunOffline(true);
+    	voteContent.setRunOffline(value);
     	saveVoteContent(voteContent);
-    	logger.debug("success: end of setAsRunOffline on toolContentID:" + toolContentID);
     }
     
     

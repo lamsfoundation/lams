@@ -112,9 +112,12 @@
 				<include name="**/*.xml"/>
 			</fileset>
 		</copy>
-		<copy overwrite="yes" todir="web/flashxml">
-			<fileset dir="${conf.dir}/flashxml/${conf.application}">
-				<include name="**/*.xml"/>
+	</target>
+	
+	<target name="copyConfFaviconFile" description="Copy the Favicon ISO file from the conf directory to the web directory">
+		<copy overwrite="yes" todir="web">
+			<fileset dir="${conf.dir}/favicon/${conf.application}">
+				<include name="**/*.ico"/>
 			</fileset>
 		</copy>
 	</target>
@@ -141,7 +144,7 @@
 			file="${build.lib}/${product}.war/images/css/rams_login.gif" verbose="true"/>
 	</target>
 
-	<target name="build-war" depends="webdoclet,build-jar,copyConfFlashFiles" description="creates war file">
+	<target name="build-war" depends="webdoclet,build-jar,copyConfFlashFiles,copyConfFaviconFile" description="creates war file">
 		<delete dir="${build.lib}/${product}.war"/>
 		<war warfile="${build.lib}/${product}.war" manifest="${conf.dir}/war/META-INF/MANIFEST.MF"
   				webxml="${conf.webinf.dir}/web.xml">

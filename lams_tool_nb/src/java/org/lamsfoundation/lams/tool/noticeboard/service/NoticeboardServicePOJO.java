@@ -829,22 +829,22 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	}
 	
 	/** @see org.lamsfoundation.lams.tool.ToolContentManager#setAsDefineLater(java.lang.Long)*/
-	public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException
+	public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException
 	{
 	    NoticeboardContent nbContent = getAndCheckIDandObject(toolContentId);
 		
-	    nbContent.setDefineLater(true);
+	    nbContent.setDefineLater(value);
 	    //nbContent.setContentInUse(false); //if define later is set to true, then contentInUse flag should be false
 	    saveNoticeboard(nbContent);
 		
 	}
 	
 	/** @see org.lamsfoundation.lams.tool.ToolContentManager#setAsRunOffline(java.lang.Long)*/
-	public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException
+	public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException
 	{
 	    NoticeboardContent nbContent = getAndCheckIDandObject(toolContentId);
 	    
-		nbContent.setForceOffline(true);
+		nbContent.setForceOffline(value);
 		saveNoticeboard(nbContent);
 	}
 	   

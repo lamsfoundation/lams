@@ -171,7 +171,7 @@ public class SubmitFilesService implements ToolContentManager,
     /**
      * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsRunOffline(java.lang.Long)
      */
-    public void setAsRunOffline(Long toolContentId)
+    public void setAsRunOffline(Long toolContentId, boolean value)
     {
         //pre-condition validation
         if (toolContentId == null)
@@ -183,7 +183,7 @@ public class SubmitFilesService implements ToolContentManager,
             if ( content == null || !toolContentId.equals(content.getContentID())) {
                 content = duplicateDefaultToolContent(toolContentId);
             }
-            content.setRunOffline(true);
+            content.setRunOffline(value);
             submitFilesContentDAO.saveOrUpdate(content);
         }
         catch (DataAccessException e)
@@ -211,7 +211,7 @@ public class SubmitFilesService implements ToolContentManager,
 	/**
      * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsDefineLater(java.lang.Long)
      */
-    public void setAsDefineLater(Long toolContentId) {
+    public void setAsDefineLater(Long toolContentId, boolean value) {
         //pre-condition validation
         if (toolContentId == null)
             throw new SubmitFilesException("Fail to set tool content to define later - "
@@ -222,7 +222,7 @@ public class SubmitFilesService implements ToolContentManager,
             if ( content == null || !toolContentId.equals(content.getContentID())) {
                 content = duplicateDefaultToolContent(toolContentId);
             }
-            content.setDefineLater(true);
+            content.setDefineLater(value);
             submitFilesContentDAO.saveOrUpdate(content);
         }
         catch (DataAccessException e)
@@ -234,7 +234,6 @@ public class SubmitFilesService implements ToolContentManager,
     }
 
 	/**
-	 * (non-Javadoc)
 	 * @throws SessionDataExistsException 
 	 * 
 	 * @see org.lamsfoundation.lams.tool.ToolContentManager#removeToolContent(java.lang.Long)

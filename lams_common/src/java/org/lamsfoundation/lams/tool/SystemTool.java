@@ -45,6 +45,7 @@ public class SystemTool implements Serializable {
 	public static final Long SYNC_GATE = new Long(2);
 	public static final Long SCHEDULE_GATE = new Long(3);
 	public static final Long PERMISSION_GATE = new Long(4);
+	public static final Long SYSTEM_GATE = new Long(5);
 	
     /** identifier field */
     private Long systemToolId;

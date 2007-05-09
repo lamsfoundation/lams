@@ -224,6 +224,7 @@
     		<role-name>AUTHOR</role-name>
     		<role-name>ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
+			<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 

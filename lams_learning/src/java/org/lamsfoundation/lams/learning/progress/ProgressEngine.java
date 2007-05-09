@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -48,7 +49,8 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public class ProgressEngine
 {
-	
+	protected Logger log = Logger.getLogger(ProgressEngine.class);	
+
     private IActivityDAO activityDAO;
 
     /**
@@ -92,31 +94,94 @@ public class ProgressEngine
 
     /**
      * Method determines the start point for a learner when they begin a Lesson.
-     * @param learner the <CODE>User</CODE> who is starting the <CODE>Lesson</CODE>.
-     * @param lesson the <CODE>Lesson</CODE> the learner is starting.
+     * 
+     * It is also reused to calculate where the learner should be should the progress
+     * "go wrong". For example, the teacher does live edit and the learner moves to 
+     * the stop gate created for the live edit. When the edit is completed, the stop 
+     * gate is removed. But now there is no current activity for the learner.
+     * 
+     * @param LearnerProgress The user's progress details for the <CODE>User</CODE> who is starting the <CODE>Lesson</CODE>.
+     * @return LearnerProgress The updated user's progress details.
      * @throws ProgressException if the start point cannot be calculated successfully.
      */
-    public void setUpStartPoint(User learner, Lesson lesson,
-                                LearnerProgress progress) throws ProgressException
+    public LearnerProgress setUpStartPoint(LearnerProgress progress) throws ProgressException
     {
         
-        LearningDesign ld = lesson.getLearningDesign();
+        LearningDesign ld = progress.getLesson().getLearningDesign();
         
-        if(ld.getFirstActivity()==null)
+        if (progress.getLesson().getLockedForEdit()) {
+        	// special case - currently setting up the stop gates for live edit.
+        	return clearProgressNowhereToGoNotCompleted(progress,"setUpStartPoint");
+        } else if(ld.getFirstActivity()==null) {
             throw new ProgressException("Could not find first activity for " 
                                         +"learning design ["+ld.getTitle()+"], id["
                                         +ld.getLearningDesignId().longValue()
                                         +"]");
-        
-        progress.setCurrentActivity(ld.getFirstActivity());
-        progress.setNextActivity(ld.getFirstActivity());
-        setActivityAttempted(progress, ld.getFirstActivity());
+        } else if ( progress.getCompletedActivities().contains(ld.getFirstActivity())  ) {
+        	// special case - recalculating the appropriate current activity.
+        	return calculateProgress(progress.getUser(), ld.getFirstActivity(), progress);
+        } else if ( canDoActivity(progress.getLesson(), ld.getFirstActivity()) ) {
+        	// normal case
+ 	        progress.setCurrentActivity(ld.getFirstActivity());
+	        progress.setNextActivity(ld.getFirstActivity());
+	        setActivityAttempted(progress, ld.getFirstActivity());
+	        return progress;
+        } else {
+        	// special case - trying to get to a whole new activity (past the stop gate)
+        	// during a live edit
+        	return clearProgressNowhereToGoNotCompleted(progress,"setUpStartPoint");
+        }
+    }
+    
+    /** Is it okay for me to do this activity? Most of the time yes - but you can do it 
+     * if the learning design is marked for edit (due to live edit) and the activity isn't read
+     * only. This case should only occur if you have snuck past the stop gates while live edit
+     * was being set up. Hopefully never!
+     * 
+     * See the live edit documentation on the wiki for more details on the Lesson.lockedForEdit
+     * and LearningDesign.activityReadOnly flags. These are set up in AuthoringService.setupEditOnFlyLock()
+     * 
+     * @param design
+     * @param activity
+     * @return
+     */
+    private boolean canDoActivity(Lesson lesson, Activity activity) {
+    	LearningDesign design = lesson.getLearningDesign();
+    	return ! lesson.getLockedForEdit() && ( ! design.getEditOverrideLock() || activity.isActivityReadOnly() ) ;
+    }
+
+    /**  
+     * Oh, dear - nowhere to go. Probably because the sequence is being edited 
+     * while I'm trying to move to an untouched activity, or it is in the process
+     * of setting up the stop gates for live edit.
+     * 
+     * Set the current activity and next activity to null, and the progress
+     * engine should then show the "Sequence Broken" screen. 
+     * 
+     * Writes a warning to the log if callingMethod is not null. If it is null, we assume
+     * the calling code has written out a warning/error already.
+     */
+    private LearnerProgress clearProgressNowhereToGoNotCompleted(LearnerProgress progress, String callingMethod) {
+    	if ( callingMethod != null ) {
+    		log.warn("Learner "+progress.getUser().getFullName()+"("+progress.getUser().getUserId()
+    			+") has a problem with the progress for lesson "
+    			+progress.getLesson().getLessonName()+"("+progress.getLesson().getLessonId()
+    			+"). Completed activities so far was "+progress.getCurrentCompletedActivitiesList()
+    			+". Setting current and next activity to null. Problem detected in method "+callingMethod+".");
+    	  }
+    	  
+    	progress.setCurrentActivity(null);
+    	progress.setNextActivity(null);
+    	progress.setLessonComplete(false);
+    	return progress;
     }
     
     /** Set the current activity as attempted. If it is a parallel activity, mark its children as attempted too. */
     private void setActivityAttempted(LearnerProgress progress, Activity activity) {
         progress.setProgressState(activity,LearnerProgress.ACTIVITY_ATTEMPTED);
-    	if ( activity.isParallelActivity() ) {
+    	activity.setReadOnly(true);
+        
+        if ( activity.isParallelActivity() ) {
     		ParallelActivity parallel = (ParallelActivity) activityDAO.getActivityByActivityId(activity.getActivityId(), ParallelActivity.class);
     		Iterator iter = parallel.getActivities().iterator();
     		while (iter.hasNext()) {
@@ -124,6 +189,9 @@ public class ProgressEngine
 				setActivityAttempted(progress,element);
 			}
     	}
+        
+        // update activity 
+        activityDAO.insertOrUpdate(activity);
     }
     /**
      * We setup the progress data for a completed activity. This happens when
@@ -154,21 +222,28 @@ public class ProgressEngine
 	        
 	        populateCurrentCompletedActivityList(learnerProgress);
 	        
-	        learnerProgress.setCurrentActivity(nextActivity);
-	                
-	        //we set the next activity to be the first child activity if it
-	        //is a sequence activity.
-	        if(nextActivity.isSequenceActivity())
-	        {
-	            Activity firstActivityInSequence = 
-	                ((SequenceActivity)nextActivity).getFirstActivityInSequenceActivity();
-	            learnerProgress.setNextActivity(firstActivityInSequence);
+	        if ( canDoActivity(learnerProgress.getLesson(), nextActivity) ) {
+	        	
+		        learnerProgress.setCurrentActivity(nextActivity);
+		                
+		        //we set the next activity to be the first child activity if it
+		        //is a sequence activity.
+		        if(nextActivity.isSequenceActivity())
+		        {
+		            Activity firstActivityInSequence = 
+		                ((SequenceActivity)nextActivity).getFirstActivityInSequenceActivity();
+		            learnerProgress.setNextActivity(firstActivityInSequence);
+		        }
+		        //set next activity as the activity follows the transition.
+		        else
+		            learnerProgress.setNextActivity(nextActivity);
+		        setActivityAttempted(learnerProgress, nextActivity);
+		        learnerProgress.setParallelWaiting(false);
+		        
+	        } else {
+	        	return clearProgressNowhereToGoNotCompleted(learnerProgress,"progressCompletedActivity");
 	        }
-	        //set next activity as the activity follows the transition.
-	        else
-	            learnerProgress.setNextActivity(nextActivity);
-	        setActivityAttempted(learnerProgress, nextActivity);
-	        learnerProgress.setParallelWaiting(false);
+	        
 	        return learnerProgress;
 	        
 	     } else {
@@ -217,26 +292,30 @@ public class ProgressEngine
                 Activity nextActivity = complexParent.getNextActivityByParent(completedActivity);
                 
                 
-                if (!isNextActivityValid(nextActivity))
-                    throw new ProgressException("Error occurred in progress engine."
+                if (!isNextActivityValid(nextActivity)) {
+                    log.error("Error occurred in progress engine."
                             + " Unexpected Null activity received when progressing"
                             + " to the next activity within a incomplete parent activity:"
                             + " Parent activity id ["
                             + parent.getActivityId()
                             + "]");
-                
-                if(isParallelWaitActivity(nextActivity))
+                	learnerProgress = clearProgressNowhereToGoNotCompleted(learnerProgress,null); 
+                }
+                else if(isParallelWaitActivity(nextActivity))
                 {
                     learnerProgress.setParallelWaiting(true);
                     // learnerProgress.setNextActivity(null);
                     populateCurrentCompletedActivityList(learnerProgress);
                 }
-                else
+                else if ( canDoActivity(learnerProgress.getLesson(), nextActivity) ) 
                 {
                     learnerProgress.setParallelWaiting(false);
                     learnerProgress.setNextActivity(nextActivity);
                     setActivityAttempted(learnerProgress, nextActivity);
                     populateCurrentCompletedActivityList(learnerProgress);
+                } 
+                else {
+                	learnerProgress = clearProgressNowhereToGoNotCompleted(learnerProgress, "progressParentActivity"); 
                 }
             }
             //recurvisely call back to calculateProgress to calculate completed

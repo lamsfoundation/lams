@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
+import org.lamsfoundation.lams.learningdesign.SystemGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -96,6 +97,8 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 							return getActivityByActivityId(activityId,OptionsActivity.class);
 					case Activity.SEQUENCE_ACTIVITY_TYPE: 
 							return getActivityByActivityId(activityId,SequenceActivity.class);
+					case Activity.SYSTEM_GATE_ACTIVITY_TYPE: 
+						return getActivityByActivityId(activityId,SystemGateActivity.class);
 					default: break; 
 				}
 			}

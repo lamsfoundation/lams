@@ -189,11 +189,9 @@ public interface IQaService
      */
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
     
-    public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException;
+    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException;
     
-    public void unsetAsDefineLater(Long toolContentId) throws QaApplicationException;
-    
-    public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException;
+    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException;
     
     public void setAsForceComplete(Long userId) throws QaApplicationException;
     

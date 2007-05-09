@@ -24,11 +24,16 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.util;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionForward;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.action.ActivityAction;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -172,8 +177,38 @@ public class LearningWebUtil
     public static void putActivityInRequest(HttpServletRequest request, Activity activity,
                                                   ICoreLearnerService learnerService)
     {
-        Activity realActivity = learnerService.getActivity(activity.getActivityId());
-        request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, realActivity);
+    	if ( activity != null ) {
+    		Activity realActivity = learnerService.getActivity(activity.getActivityId());
+    		request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, realActivity);
+    	} else {
+    		request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, null);
+    	}
     }
 
+    /** "Complete" an activity from the web layer's perspective. Used for CompleteActivityAction and the Gate and Grouping actions.
+     * Calls the learningService to actually complete the activity and progress.
+     * @param redirect Should this call redirect to the next screen (true) or use a forward (false)
+     * @throws UnsupportedEncodingException 
+     *
+     */
+    public static ActionForward completeActivity(HttpServletRequest request, HttpServletResponse response,
+    		ActivityMapping actionMappings, LearnerProgress currentProgress, Activity currentActivity, 
+    			Integer learnerId, ICoreLearnerService learnerService, boolean redirect) throws LearnerServiceException, UnsupportedEncodingException {
+    	
+    	LearnerProgress newProgress=null;
+    	Lesson lesson = currentProgress.getLesson();
+    	
+		if ( currentActivity == null ) {
+			newProgress = learnerService.joinLesson(learnerId, lesson.getLessonId());
+		} else if ( currentProgress.getCompletedActivities().contains(currentActivity) ){
+			return actionMappings.getCloseForward();
+		} else {
+			// Set activity as complete
+			newProgress = learnerService.completeActivity(learnerId, currentActivity,currentProgress);
+		}
+	
+		LearningWebUtil.putActivityInRequest(request, newProgress.getNextActivity(), learnerService);
+		LearningWebUtil.putLearnerProgressInRequest(request,newProgress);
+		return actionMappings.getProgressForward(newProgress, redirect, false, request, learnerService);
+    }
 }

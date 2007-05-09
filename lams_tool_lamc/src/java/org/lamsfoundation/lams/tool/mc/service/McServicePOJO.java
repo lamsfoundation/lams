@@ -1728,29 +1728,6 @@ public class McServicePOJO implements
     	}
     }
     
-    
-    public void unsetAsDefineLater(Long toolContentId) throws McApplicationException
-    {
-    	logger.debug("request for unsetAsDefineLater with toolContentId: " + toolContentId);
-    	if  (toolContentId == null)
-    	{
-    		logger.error("WARNING!: retrieved toolContentId is null.");
-            throw new McApplicationException("Fail to setAsDefineLater"
-                    + " based on null toolContentId.");
-    	}
-    	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
-    	if (mcContent == null)
-    	{
-    		logger.error("WARNING!!!: retrieved mcContent is null.");
-            throw new McApplicationException("Fail to unsetAsDefineLater"
-                    + " based on null mcContent.");
-    	}
-    	mcContent.setDefineLater(false);
-    	createMc(mcContent);
-    	logger.debug("mcContent has been updated for unsetAsDefineLater: " + mcContent);
-    }
-    
-    
     /**
      * Implemented as part of the tool contract. Sets the defineLater to true on this content.
      * setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException
@@ -1758,9 +1735,8 @@ public class McServicePOJO implements
      * @return 
      * @throws ToolException
      */
-    public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException
+    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException
     {
-    	logger.debug("request for setAsDefineLater with toolContentId: " + toolContentId);
     	if  (toolContentId == null)
     	{
     		logger.error("throwing DataMissingException: WARNING!: retrieved toolContentId is null.");
@@ -1773,12 +1749,10 @@ public class McServicePOJO implements
     		logger.error("throwing DataMissingException: WARNING!: retrieved mcContent is null.");
             throw new DataMissingException("mcContent is missing");
     	}
-    	mcContent.setDefineLater(true);
+    	mcContent.setDefineLater(value);
     	saveMcContent(mcContent);
-    	logger.debug("success: end of setAsDefineLater on toolContentId:" + toolContentId);
     }
     
-
     /**
      * Implemented as part of the tool contract. Sets the runOffline to true on this content.
      * setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException
@@ -1787,9 +1761,8 @@ public class McServicePOJO implements
      * return 
      * @throws ToolException 
      */
-    public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException
+    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException
     {
-    	logger.debug("request for setAsRunOffline with toolContentId:" + toolContentId);
     	if  (toolContentId == null)
     	{
     		logger.error("throwing DataMissingException: WARNING!: retrieved toolContentId is null.");
@@ -1801,9 +1774,8 @@ public class McServicePOJO implements
     		logger.error("throwing DataMissingException: WARNING!: retrieved mcContent is null.");
             throw new DataMissingException("mcContent is missing");
     	}
-    	mcContent.setRunOffline(true);
+    	mcContent.setRunOffline(value);
     	saveMcContent(mcContent);
-    	logger.debug("success: end of setAsRunOffline on toolContentId:" + toolContentId);
     }
     
     

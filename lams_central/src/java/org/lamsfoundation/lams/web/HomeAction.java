@@ -186,11 +186,29 @@ public class HomeAction extends DispatchAction {
 				log.error("admin: User missing from session. ");
 				return mapping.findForward("error");
 			} else {
+				Long learningDesignID = null;
+				String layout = null;
 				String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 				req.setAttribute("serverUrl", serverUrl);
 				
 				String requestSrc = req.getParameter("requestSrc");
 				String notifyCloseURL = req.getParameter("notifyCloseURL");
+				
+				if(req.getParameter("learningDesignID") != null)
+					learningDesignID = WebUtil.readLongParam(req, "learningDesignID");
+				
+				if(req.getParameter("layout") != null)
+					layout = WebUtil.readStrParam(req, "layout");
+				
+				if(layout != null)
+					req.setAttribute("layout", layout);
+				
+				if(req.getParameter("learningDesignID") != null)
+					learningDesignID = WebUtil.readLongParam(req, "learningDesignID");
+				
+				if(learningDesignID != null)
+					req.setAttribute("learningDesignID", learningDesignID);
+				
 				req.setAttribute("requestSrc", requestSrc);
 				req.setAttribute("notifyCloseURL", notifyCloseURL);
 				

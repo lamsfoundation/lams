@@ -30,16 +30,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
-import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -53,7 +50,6 @@ import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
-import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -176,6 +172,7 @@ public class LearnerService implements ICoreLearnerService
 		this.lessonService = lessonService;
 	}
 
+	
     //---------------------------------------------------------------------
     // Service Methods
     //---------------------------------------------------------------------
@@ -243,7 +240,7 @@ public class LearnerService implements ICoreLearnerService
             
             try
             {
-                progressEngine.setUpStartPoint(learner, lesson,learnerProgress);
+                progressEngine.setUpStartPoint(learnerProgress);
             }
             catch (ProgressException e)
             {
@@ -253,14 +250,30 @@ public class LearnerService implements ICoreLearnerService
         	//Use TimeStamp rather than Date directly to keep consistent with Hibnerate persiste object.
         	learnerProgress.setStartDate(new Timestamp(new Date().getTime()));
             learnerProgressDAO.saveLearnerProgress(learnerProgress);
-        }
-        //The restarting flag should be setup when the learner hit the exit
-        //button. But it is possible that user exit by closing the browser,
-        //In this case, we set the restarting flag again.
-        else if(!learnerProgress.isRestarting())
-        {
-            learnerProgress.setRestarting(true);
-            learnerProgressDAO.updateLearnerProgress(learnerProgress);
+        } else {
+        	
+        	Activity currentActivity = learnerProgress.getCurrentActivity();
+        	if ( currentActivity == null ) {
+               	// something may have gone wrong and we need to recalculate the current activity
+        		try
+                {
+                    progressEngine.setUpStartPoint(learnerProgress);
+                }
+                catch (ProgressException e)
+                {
+                    log.error("error occurred in 'setUpStartPoint':"+e.getMessage());
+            		throw new LearnerServiceException(e.getMessage());
+                }
+        	}
+        	
+	        //The restarting flag should be setup when the learner hit the exit
+	        //button. But it is possible that user exit by closing the browser,
+	        //In this case, we set the restarting flag again.
+	        if(!learnerProgress.isRestarting())
+	        {
+	            learnerProgress.setRestarting(true);
+	            learnerProgressDAO.updateLearnerProgress(learnerProgress);
+	        }
         }
         
         return learnerProgress;
@@ -335,10 +348,15 @@ public class LearnerService implements ICoreLearnerService
     public LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity) 
     {
     	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
+    	
+    	activity.setReadOnly(true);
+    	activityDAO.insertOrUpdate(activity);
+    	
     	progress.setProgressState(activity, LearnerProgress.ACTIVITY_ATTEMPTED);
     	progress.setCurrentActivity(activity);
     	progress.setNextActivity(activity);
     	learnerProgressDAO.saveLearnerProgress(progress);
+    	
     	return progress;
     }
     
@@ -397,13 +415,26 @@ public class LearnerService implements ICoreLearnerService
     	// being available in the context. Hence it is defined in the ILearnerService interface, not the IFullLearnerService
     	// interface. If it calls any other methods then it mustn't use anything on the ICoreLearnerService interface.
     	
+    	String returnURL = null;
+    	
         ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);	
-        // in the future, we might want to see if the entire tool session is completed at this point. 
-       
-        String returnURL = completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity(), toolSession.getLesson().getLessonId());
+        if ( toolSession == null ) {
+        	// something has gone wrong - maybe due to Live Edit. The tool session supplied by the tool doesn't exist.
+        	// have to go to a "can't do anything" screen and the user will have to hit resume.
+        	returnURL = activityMapping.getProgressBrokenURL();
 
+        } else {
+        	Long lessonId = toolSession.getLesson().getLessonId();
+            LearnerProgress currentProgress = getProgress(new Integer(learnerId.intValue()), lessonId);
+            // TODO Cache the learner progress in the session, but mark it with the progress id. Then get the progress out of the session
+            // for ActivityAction.java.completeActivity(). Update LearningWebUtil to look under the progress id, so we don't get
+            // a conflict in Preview & Learner.
+	        returnURL = activityMapping.getCompleteActivityURL(toolSession.getToolActivity().getActivityId(), currentProgress.getLearnerProgressId());
+        	
+        }
+        
         if ( log.isDebugEnabled() ) { 
-        	log.debug("Moving onto next activity after tool session id "+toolSessionId+" learnerId "+learnerId+" url is "+returnURL);
+        	log.debug("CompleteToolSession() for tool session id "+toolSessionId+" learnerId "+learnerId+" url is "+returnURL);
         }
         
         return returnURL;
@@ -411,19 +442,20 @@ public class LearnerService implements ICoreLearnerService
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#completeActivity(java.lang.Integer, java.lang.Long, java.lang.Long)
+     * Complete the activity in the progress engine and delegate to the progress 
+     * engine to calculate the next activity in the learning design. 
+     * It is currently triggered by various progress engine related action classes,
+     * which then calculate the url to go to next, based on the ActivityMapping
+     * class.
+     * 
+     * @param learnerId the learner who are running this activity in the design.
+     * @param activity the activity is being run.
+     * @param lessonId lesson id
+     * @return the updated learner progress
      */
-    public String completeActivity(Integer learnerId,Long activityId,Long lessonId) {
-    	Activity activity = getActivity(activityId);
-    	return completeActivity(learnerId, activity,lessonId);
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#completeActivity(java.lang.Integer, org.lamsfoundation.lams.learningdesign.Activity, java.lang.Long )
-     */
-    public String completeActivity(Integer learnerId,Activity activity,Long lessonId)
+    public LearnerProgress completeActivity(Integer learnerId,Activity activity,LearnerProgress progress) 
     {
-        LearnerProgress currentProgress = getProgress(new Integer(learnerId.intValue()), lessonId);
+        LearnerProgress nextLearnerProgress = null;
         
         // Need to synchronise the next bit of code so that if the tool calls
         // this twice in quick succession, with the same parameters, it won't update
@@ -432,28 +464,33 @@ public class LearnerService implements ICoreLearnerService
         // but if its not synchronised, we get db errors if the same tool session is completed twice
         // (invalid index). I can'tfind another object on which to synchronise - Hibernate does not give me the 
         // same object for tool session or current progress and user is cached via login, not userid.
-        String returnURL = null;
+
         //  bottleneck synchronized (this) {
-        	if (currentProgress.getCompletedActivities().contains(activity)) {
-        		// return close window url
-        		returnURL = ActivityMapping.getCloseURL();
+        	if (activity==null ) {
+		    	try {
+	        		nextLearnerProgress = progressEngine.setUpStartPoint(progress);
+				} catch (ProgressException e) {
+		            log.error("error occurred in 'setUpStartPoint':"+e.getMessage(),e);
+		    		throw new LearnerServiceException(e);
+				}
         		
         	} else {
         		
-		    	try 
-		    	{
-			    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learnerId);
-			    	returnURL = activityMapping.getProgressURL(nextLearnerProgress);
-		    	}
-		        catch (UnsupportedEncodingException e)
-		        {
-		            log.error("error occurred in 'getProgressURL':"+e.getMessage());
-		    		throw new LearnerServiceException(e.getMessage());
-		        }
+		    	nextLearnerProgress = calculateProgress(activity, learnerId);
         	}
         //}
-       	return returnURL;
+       	return nextLearnerProgress;
     }
+    
+   /**
+     * @throws  
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#completeActivity(java.lang.Integer, org.lamsfoundation.lams.learningdesign.Activity, java.lang.Long )
+     */
+    public LearnerProgress completeActivity(Integer learnerId,Activity activity,Long lessonId) 
+    {
+        LearnerProgress currentProgress = getProgress(new Integer(learnerId.intValue()), lessonId);
+        return completeActivity(learnerId, activity, currentProgress);
+    }    
     
     /**
      * Exit a lesson.
@@ -658,6 +695,5 @@ public class LearnerService implements ICoreLearnerService
         }
         return (LessonDTO[])lessonDTOList.toArray(new LessonDTO[lessonDTOList.size()]);   
     }
-    
 
 }

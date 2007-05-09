@@ -120,23 +120,38 @@ public interface ILamsCoreToolService
     	throws ToolException;
     
     /**
-     * Notify a tool to make a copy of its own content. Lams needs to dynamically
-     * load tool's service by request and invoke the copy method from tool
-     * content manager. 
-     * 
+     * Calls the tool to copy the content for an activity. Used when copying a learning design.
      * If it is a preview lesson, we don't want to set define later - we will sidestep this in the progress engine.
-     * @param toolActivity the requested tool activity.
-     * @param setDefineLater do we tell the tool to set its define later flag?
-     * @return new tool content id.
+     * 
+     * @param toolActivity the tool activity defined in the design.
+     * @param setDefineLater whether or not to set the define later flag.
+     * @throws DataMissingException, ToolException
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
-    public Long notifyToolToCopyContent(ToolActivity toolActivity, boolean setDefineLater)
-    	throws DataMissingException, ToolException;
+    public Long notifyToolToCopyContent(ToolActivity toolActivity, boolean setDefineLater) 
+    		throws DataMissingException, ToolException;
     
+    /**
+     * Calls the tool to set up the define later and run offline flags.
+     * 
+     * This method is a subset of the functionality of notifyToolToCopyContent(ToolActivity toolActivity, boolean setDefineLater);
+     * so if you call notifyToolToCopyContent then you don't need to call this method. It is a separate method used by Live Edit.
+     * 
+     * @param toolActivity the tool activity defined in the design.
+     * @throws DataMissingException, ToolException
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
+     */
+    public Long notifyToolOfStatusFlags(ToolActivity toolActivity) 
+    		throws DataMissingException, ToolException;
+
     /**
      * Calls the tool to copy the content for an activity. Used when copying an activity in authoring. Can't
      * use the notifyToolToCopyContent(ToolActivity, boolean) version in authoring as the tool activity won't
      * exist if the user hasn't saved the sequence yet. But the tool content (as that is saved by the 
      * tool) may already exist.
+     * 
+     * This doesn't set the define later and run offline flags from the design - it only copies the content
+     * stored in the tool.
      * 
      * @param toolContentId the content to be copied.
      * @throws DataMissingException, ToolException

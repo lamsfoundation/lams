@@ -81,10 +81,16 @@
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<target name="build-war" depends="clean, copyContext" description="creates war file">
    		<delete file="${conf.web.dir}/images/learner.logo.swf"/>
-			<delete file="${conf.web.dir}/images/monitor.logo.swf"/>
+		<delete file="${conf.web.dir}/images/monitor.logo.swf"/>
 		<copy todir="${conf.web.dir}/images" overwrite="yes">
 			<fileset dir="${conf.dir}/${conf.application}">
 				<include name="*.swf" />
+			</fileset>
+		</copy>
+		<delete file="${conf.web.dir}"/>
+		<copy todir="${conf.web.dir}" overwrite="yes">
+			<fileset dir="${conf.dir}/${conf.application}">
+				<include name="news.html" />
 			</fileset>
 		</copy>
 

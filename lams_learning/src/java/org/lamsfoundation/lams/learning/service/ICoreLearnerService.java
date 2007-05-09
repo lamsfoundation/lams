@@ -26,6 +26,8 @@ package org.lamsfoundation.lams.learning.service;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.learning.progress.ProgressEngine;
+import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -128,30 +130,31 @@ public interface ICoreLearnerService extends ILearnerService
 
     /**
      * Complete the activity in the progress engine and delegate to the progress 
-     * engine to calculate the next activity in the learning design. This 
-     * process might be triggerred by system controlled the activity, such as
-     * grouping and gate. This method should be used when we don't have an activity
-     * or a lesson that is already part of the Hibernate session. 
+     * engine to calculate the next activity in the learning design. 
+     * It is currently triggered by various progress engine related action classes,
+     * which then calculate the url to go to next, based on the ActivityMapping
+     * class.
      * 
      * @param learnerId the learner who are running this activity in the design.
      * @param activity the activity is being run.
      * @param lessonId lesson id
-     * @return the url for next activity.
+     * @return the updated learner progress
      */
-    public String completeActivity(Integer learnerId,Long activityId,Long lessonId);
-  
+    public LearnerProgress completeActivity(Integer learnerId,Activity activity,LearnerProgress progress);
+
     /**
-     * Complete the activity in the progress engine and delegate to the progress 
-     * engine to calculate the next activity in the learning design. This method should 
-     * be used when we t have an activity that is already part of the Hibernate session. 
-     * It is currently triggered by complete tool session progress from tool.
+     * Same as LearnerProgress completeActivity(Integer learnerId,Activity activity,LearnerProgress progress)
+     * except that the it works out the current learner's progress from the given lesson id.
+     * 
+     * Use the other method if you already have the learner progress, as this method looks up the learner
+     * progress.
      * 
      * @param learnerId the learner who are running this activity in the design.
      * @param activity the activity is being run.
      * @param lessonId lesson id
-     * @return the url for next activity.
+     * @return the updated learner progress
      */
-    public String completeActivity(Integer learnerId,Activity activity,Long lessonId);
+    public LearnerProgress completeActivity(Integer learnerId,Activity activity,Long lessonId);
 
     /**
      * Retrieve all lessons that has been started, suspended or finished. All

@@ -38,7 +38,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 
 %>
 
-<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}" redirect="true"/>
+<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}" version="${activityForm.version}" redirect="true"/>
 
 <div id="content">
 

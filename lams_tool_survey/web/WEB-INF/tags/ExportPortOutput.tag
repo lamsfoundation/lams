@@ -38,7 +38,7 @@
 <LI>
 	<c:choose>
 	<c:when test="${not empty actport.toolLink}">
-		<a href="<c:out value="${actport.toolLink}"/>"/><c:out value="${actport.activityName}"/></a>
+		<a href="<c:out value="${actport.toolLink}"/>" target="_blank"/><c:out value="${actport.activityName}"/></a>
 	</c:when>
 	<c:otherwise>
 		<c:out value="${actport.activityName}"/>		

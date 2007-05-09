@@ -39,12 +39,15 @@ public class DesignDetailDTO extends BaseDTO {
 	private String title;	
 	private Long firstActivityID;		
 	private Boolean validDesign;
-	private Boolean readOnly;	
+	private Boolean readOnly;
+	private Boolean editOverrideLock;
 	private Date dateReadOnly;
 	private Integer userID;
+	private Integer editOverrideUserID;
 	private String helpText;
 	private Integer copyTypeID;	
-	private String version;	
+	private String version;
+	private Integer designVersion;
 	private Long parentLearningDesignID;
 	private Integer workspaceFolderID;
 	private String contentFolderID;
@@ -54,9 +57,9 @@ public class DesignDetailDTO extends BaseDTO {
 	}
 	public DesignDetailDTO(Long learningDesignID, Integer learningDesignUIID,
 			String description, String title, Long firstActivityID,
-			Boolean validDesign, Boolean readOnly,
-			Date dateReadOnly, Integer userID, String helpText,
-			Integer copyTypeID, String version, Long parentLearningDesignID,
+			Boolean validDesign, Boolean readOnly, Boolean editLock,
+			Date dateReadOnly, Integer userID, Integer editOverrideUserID, String helpText,
+			Integer copyTypeID, String version, Integer designVersion, Long parentLearningDesignID,
 			Integer workspaceFolderID) {		
 		this.learningDesignID = learningDesignID;
 		this.learningDesignUIID = learningDesignUIID;
@@ -67,9 +70,11 @@ public class DesignDetailDTO extends BaseDTO {
 		this.readOnly = readOnly;
 		this.dateReadOnly = dateReadOnly;
 		this.userID = userID;
+		this.editOverrideUserID = editOverrideUserID;
 		this.helpText = helpText;
 		this.copyTypeID = copyTypeID;
 		this.version = version;
+		this.designVersion = designVersion;
 		this.parentLearningDesignID = parentLearningDesignID;
 		this.workspaceFolderID = workspaceFolderID;
 	}
@@ -83,11 +88,14 @@ public class DesignDetailDTO extends BaseDTO {
 							   null;
 		this.validDesign = learningDesign.getValidDesign();
 		this.readOnly = learningDesign.getReadOnly();
+		this.editOverrideLock = learningDesign.getEditOverrideLock();
 		this.dateReadOnly = learningDesign.getDateReadOnly();
 		this.userID = learningDesign.getUser().getUserId();
+		this.editOverrideUserID = learningDesign.getEditOverrideUser().getUserId();
 		this.helpText = learningDesign.getHelpText();
 		this.copyTypeID = learningDesign.getCopyTypeID();
 		this.version = learningDesign.getVersion();
+		this.designVersion = learningDesign.getDesignVersion();
 		this.parentLearningDesignID = learningDesign.getOriginalLearningDesign()!=null?
 									  learningDesign.getOriginalLearningDesign().getLearningDesignId():
 									  null;
@@ -149,6 +157,12 @@ public class DesignDetailDTO extends BaseDTO {
 		return readOnly;
 	}
 	/**
+	 * @return Returns the editLock.
+	 */
+	public Boolean getEditOverrideLock() {
+		return editOverrideLock;
+	}
+	/**
 	 * @return Returns the title.
 	 */
 	public String getTitle() {
@@ -161,6 +175,12 @@ public class DesignDetailDTO extends BaseDTO {
 		return userID;
 	}
 	/**
+	 * @return Returns the editOnFlyUserID.
+	 */
+	public Integer geteditOverrideUserID() {
+		return editOverrideUserID;
+	}
+	/**
 	 * @return Returns the validDesign.
 	 */
 	public Boolean getValidDesign() {
@@ -171,6 +191,13 @@ public class DesignDetailDTO extends BaseDTO {
 	 */
 	public String getVersion() {
 		return version;
+	}
+	/**
+	 * 
+	 * @return Returns the design version.
+	 */
+	public Integer getDesignVersion() {
+		return designVersion;
 	}
 	/**
 	 * @return Returns the workspaceFolderID.

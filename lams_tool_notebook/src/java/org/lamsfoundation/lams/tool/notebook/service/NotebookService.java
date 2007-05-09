@@ -185,25 +185,25 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 		notebookDAO.saveOrUpdate(toContent);
 	}
 
-	public void setAsDefineLater(Long toolContentId)
+	public void setAsDefineLater(Long toolContentId, boolean value)
 			throws DataMissingException, ToolException {
 		Notebook notebook = notebookDAO.getByContentId(toolContentId);
 		if (notebook == null) {
 			throw new ToolException("Could not find tool with toolContentID: "
 					+ toolContentId);
 		}
-		notebook.setDefineLater(true);
+		notebook.setDefineLater(value);
 		notebookDAO.saveOrUpdate(notebook);
 	}
 
-	public void setAsRunOffline(Long toolContentId)
+	public void setAsRunOffline(Long toolContentId, boolean value)
 			throws DataMissingException, ToolException {
 		Notebook notebook = notebookDAO.getByContentId(toolContentId);
 		if (notebook == null) {
 			throw new ToolException("Could not find tool with toolContentID: "
 					+ toolContentId);
 		}
-		notebook.setRunOffline(true);
+		notebook.setRunOffline(value);
 		notebookDAO.saveOrUpdate(notebook);
 	}
 

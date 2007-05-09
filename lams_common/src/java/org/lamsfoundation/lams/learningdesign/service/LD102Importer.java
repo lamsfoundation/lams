@@ -523,6 +523,7 @@ public class LD102Importer implements ApplicationContextAware{
 		
 		ld.setValidDesign(Boolean.FALSE);
 		ld.setReadOnly(Boolean.FALSE);
+		ld.setEditOverrideLock(Boolean.FALSE);
 		ld.setDateReadOnly(null);
 		ld.setOfflineInstructions(null);	
 		ld.setOnlineInstructions(null);

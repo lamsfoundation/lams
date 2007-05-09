@@ -33,7 +33,8 @@
 
 <form-bean name="GateForm"  type="org.apache.struts.action.DynaActionForm">
 	<form-property name="gate" type="org.lamsfoundation.lams.learningdesign.GateActivity" />
-	<form-property name="activityId" type="java.lang.Long" />
+	<form-property name="activityID" type="java.lang.Long" />
+	<form-property name="lessonID" type="java.lang.Long" />
 	<form-property name="waitingLearners" type="java.lang.Integer"/>
 	<form-property name="totalLearners" type="java.lang.Integer" />
 	<form-property name="startingTime" type="java.util.Date" />
@@ -145,6 +146,11 @@
         redirect="false"
       />
       <forward
+        name="viewJournals"
+        path=".notebookViewJournals"
+        redirect="false"
+      />
+      <forward
         name="addNew"
         path=".notebookAddNew"
         redirect="false"
@@ -233,24 +239,6 @@
       />
     </action>
     <action
-      path="/dummylearner"
-      type="org.lamsfoundation.lams.learning.web.action.DummyLearnerAction"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="controlActivity"
-        path="/dummyControlFrame.jsp"
-        redirect="false"
-      />
-      <forward
-        name="displayActivity"
-        path="/DisplayActivity.do"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/LoadToolActivity"
       type="org.lamsfoundation.lams.learning.web.action.LoadToolActivityAction"
       name="activityForm"
@@ -324,6 +312,9 @@
 <action path="/close"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter=".close" />
+<action path="/progressBroken"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter=".progressBroken" />
 <action path="/content"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter=".welcome" />

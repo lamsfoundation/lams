@@ -56,6 +56,9 @@ public class ActivityForm extends ActionForm {
 	/** Lesson to which this activity belongs. Id comes from the learner progress */
 	private Long lessonID;
 	
+	/** Version no for the design. Increments after every major modification */
+	private Integer version;
+	
 	/** 
 	 * Method reset
 	 * @param mapping
@@ -101,4 +104,11 @@ public class ActivityForm extends ActionForm {
 		this.lessonID = lessonID;
 	}
 	
+	public Integer getVersion() {
+		return version;
+	}
+	
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
 }

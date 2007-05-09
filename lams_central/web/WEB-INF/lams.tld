@@ -13,37 +13,6 @@
 
    <tag>
 
-      <description>Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/</description>
-      <display-name>Base URL for the current web app</display-name>
-      <icon>    
-      </icon>
-      <name>WebAppURL</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.WebAppURLTag</tag-class>
-      <body-content>empty</body-content>
-
-   </tag>
-   <tag>
-
-      <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
-      <display-name>generate unique ID</display-name>
-      <icon>    
-      </icon>
-      <name>generateID</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.GenerateIDTag</tag-class>
-      <body-content>empty</body-content>
-
-      <attribute>
-         <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
-         <name>id</name>
-         <required>false</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
-
-   </tag>
-   <tag>
-
       <description>Converts role name into form usable as message resources key</description>
       <display-name>Converts role name into form usable as message resources key</display-name>
       <icon>    
@@ -56,6 +25,65 @@
          <description>Converts role name into form usable as message resources key</description>
          <name>role</name>
          <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Output the Server URL as defined in the lams.xml configuration file.</description>
+      <display-name>LAMS URL</display-name>
+      <icon>    
+      </icon>
+      <name>LAMSURL</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.LAMSURLTag</tag-class>
+      <body-content>empty</body-content>
+
+   </tag>
+   <tag>
+
+      <description>converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+      <display-name>converts text from \n or \r\n to &lt;BR&gt; before rendering</display-name>
+      <icon>    
+      </icon>
+      <name>out</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.MultiLinesOutputTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+         <name>value</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+         <name>escapeXml</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Render html tag with direction and language</description>
+      <display-name>Render html tag with direction and language</display-name>
+      <icon>    
+      </icon>
+      <name>html</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.HtmlTag</tag-class>
+      <body-content>JSP</body-content>
+
+      <attribute>
+         <description>Render html tag with direction and language</description>
+         <name>xhtml</name>
+         <required>false</required>
 
            <rtexprvalue>true</rtexprvalue>
 
@@ -100,36 +128,17 @@
    </tag>
    <tag>
 
-      <description>Output the Server URL as defined in the lams.xml configuration file.</description>
-      <display-name>LAMS URL</display-name>
+      <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
+      <display-name>generate unique ID</display-name>
       <icon>    
       </icon>
-      <name>LAMSURL</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.LAMSURLTag</tag-class>
-      <body-content>empty</body-content>
-
-   </tag>
-   <tag>
-
-      <description>Output stylesheet based on the user preferences.</description>
-      <display-name>User's chosen stylesheet</display-name>
-      <icon>    
-      </icon>
-      <name>css</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.CssTag</tag-class>
+      <name>generateID</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.GenerateIDTag</tag-class>
       <body-content>empty</body-content>
 
       <attribute>
-         <description>Output stylesheet based on the user preferences.</description>
-         <name>localLinkPath</name>
-         <required>false</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
-      <attribute>
-         <description>Output stylesheet based on the user preferences.</description>
-         <name>style</name>
+         <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
+         <name>id</name>
          <required>false</required>
 
            <rtexprvalue>true</rtexprvalue>
@@ -159,45 +168,36 @@
    </tag>
    <tag>
 
-      <description>Render html tag with direction and language</description>
-      <display-name>Render html tag with direction and language</display-name>
+      <description>Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/</description>
+      <display-name>Base URL for the current web app</display-name>
       <icon>    
       </icon>
-      <name>html</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.HtmlTag</tag-class>
-      <body-content>JSP</body-content>
+      <name>WebAppURL</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.WebAppURLTag</tag-class>
+      <body-content>empty</body-content>
+
+   </tag>
+   <tag>
+
+      <description>Output stylesheet based on the user preferences.</description>
+      <display-name>User's chosen stylesheet</display-name>
+      <icon>    
+      </icon>
+      <name>css</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.CssTag</tag-class>
+      <body-content>empty</body-content>
 
       <attribute>
-         <description>Render html tag with direction and language</description>
-         <name>xhtml</name>
+         <description>Output stylesheet based on the user preferences.</description>
+         <name>localLinkPath</name>
          <required>false</required>
 
            <rtexprvalue>true</rtexprvalue>
 
       </attribute>
-
-   </tag>
-   <tag>
-
-      <description>converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
-      <display-name>converts text from \n or \r\n to &lt;BR&gt; before rendering</display-name>
-      <icon>    
-      </icon>
-      <name>out</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.MultiLinesOutputTag</tag-class>
-      <body-content>empty</body-content>
-
       <attribute>
-         <description>converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
-         <name>value</name>
-         <required>true</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
-      <attribute>
-         <description>converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
-         <name>escapeXml</name>
+         <description>Output stylesheet based on the user preferences.</description>
+         <name>style</name>
          <required>false</required>
 
            <rtexprvalue>true</rtexprvalue>

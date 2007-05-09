@@ -32,6 +32,7 @@ import java.util.SortedSet;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
@@ -132,6 +133,25 @@ public interface IMonitoringService
      * 									lesson.
      */
     public void startLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+    
+    /**
+     * <p>Runs the system scheduler to start the scheduling for opening gate and
+     * closing gate. It invlovs a couple of steps to start the scheduler:</p>
+     * <li>1. Initialize the resource needed by scheduling job by setting 
+     * 		  them into the job data map.
+     * </li>
+     * <li>2. Create customized triggers for the scheduling.</li>
+     * <li>3. start the scheduling job</li> 
+     * 
+     * @param scheduleGate the gate that needs to be scheduled.
+     * @param schedulingStartTime the time on which the gate open should be based if an offset is used. For starting 
+     * a lesson, this is the lessonStartTime. For live edit, it is now.
+     * @param lessonName the name lesson incorporating this gate - used for the description of the Quartz job. Optional.
+     * @returns An updated gate, that should be saved by the calling code.
+     */
+    public ScheduleGateActivity runGateScheduler(ScheduleGateActivity scheduleGate,
+                                  Date schedulingStartTime, String lessonName);
+
     /**
      * Start a lesson on schedule datetime.
      * @param lessonId

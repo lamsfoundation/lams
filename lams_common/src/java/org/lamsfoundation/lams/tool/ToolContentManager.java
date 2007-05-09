@@ -55,22 +55,24 @@ public interface ToolContentManager
      * should already exist in the tool. This method will normally be
      * called after copyToolContent.
      * @param toolContentId the tool content id of the tool content to be changed.
+     * @param value whether to set or unset define later.
      * @throws DataMissingException if no tool content matches the toolContentId 
      * @throws ToolException if any other error occurs
       */
-    public void setAsDefineLater(Long toolContentId)
+    public void setAsDefineLater(Long toolContentId, boolean value)
     	throws DataMissingException, ToolException;
 
 
-    /** This tool content should be setup to run offline, that is, the 
+   /** This tool content should be setup to run offline, that is, the 
      * activity will be done offline. The toolContentId
      * should already exist in the tool. This method will normally be
      * called after copyToolContent.
      * @param toolContentId the tool content id of the tool content to be changed.
+     * @param value whether to set or unset run offline.
      * @throws DataMissingException if no tool content matches the toolContentId 
      * @throws ToolException if any other error occurs
      */
-    public void setAsRunOffline(Long toolContentId)
+    public void setAsRunOffline(Long toolContentId, boolean value)
     	throws DataMissingException, ToolException;
 
     /**

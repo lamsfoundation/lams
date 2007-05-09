@@ -52,6 +52,8 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -104,6 +106,13 @@ public class GroupingAction extends LamsDispatchAction
 	public static final String WAIT_GROUP = "waitGroup";
 	public static final String SHOW_GROUP = "showGroup";
 	
+	/**
+	 * Get the ActionMappings.
+	 */
+	protected ActivityMapping getActivityMapping() {
+        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
+        return (ActivityMapping)wac.getBean("activityMapping");
+	}
     
     //---------------------------------------------------------------------
     // Struts Dispatch Method
@@ -256,14 +265,14 @@ public class GroupingAction extends LamsDispatchAction
     {
         //initialize service object
         ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,learnerService);
+		LearnerProgress progress = LearningWebUtil.getLearnerProgress(request, learnerService);
         Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request,learnerService);
-        Lesson lesson = learnerService.getLessonByActivity(groupingActivity);
-        
-        String nextActivityUrl = learnerService.completeActivity(learnerProgress.getUser().getUserId(),
-                                                                  groupingActivity, lesson.getLessonId());
-		response.sendRedirect(nextActivityUrl);
-        return null;
+		Integer learnerId = LearningWebUtil.getUserId();
+
+       	// so manually resume the progress. The completeActivity code can cope with a missing activity.
+		return LearningWebUtil.completeActivity(request, response,
+					getActivityMapping(), progress, groupingActivity, 
+	    			learnerId, learnerService, true);
     }
  
 }

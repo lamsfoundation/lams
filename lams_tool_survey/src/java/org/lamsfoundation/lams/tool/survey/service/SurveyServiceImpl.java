@@ -732,21 +732,21 @@ public class SurveyServiceImpl implements
 	}
 
 
-	public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 		Survey survey = surveyDao.getByContentId(toolContentId);
 		if(survey == null){
 			throw new ToolException("No found tool content by given content ID:" + toolContentId);
 		}
-		survey.setDefineLater(true);
+		survey.setDefineLater(value);
 	}
 
 
-	public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException {
+	public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 		Survey survey = surveyDao.getByContentId(toolContentId);
 		if(survey == null){
 			throw new ToolException("No found tool content by given content ID:" + toolContentId);
 		}
-		survey.setRunOffline(true);		
+		survey.setRunOffline(value);		
 	}
 
 

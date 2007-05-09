@@ -69,6 +69,7 @@ public abstract class Activity implements Serializable,Nullable {
 	public static final int PARALLEL_ACTIVITY_TYPE = 6;
 	public static final int OPTIONS_ACTIVITY_TYPE = 7;
 	public static final int SEQUENCE_ACTIVITY_TYPE = 8;
+	public static final int SYSTEM_GATE_ACTIVITY_TYPE = 9;
 	/******************************************************************/
 	
 	/**
@@ -197,7 +198,15 @@ public abstract class Activity implements Serializable,Nullable {
 	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
 	private String languageFile;
 
-    //---------------------------------------------------------------------
+	/** An activity is readOnly when a learner starts doing the activity.
+	 * Used in editOnFly. */
+	private Boolean readOnly;
+
+	/** An activity is initialised if it is ready to be used in lesson ie the tool content
+	 * is set up, schedule gates are scheduled, etc. Used to detect which activities
+	 * need to be initialised for live edit. */
+	private Boolean initialised;
+   //---------------------------------------------------------------------
     // Object constructors
     //---------------------------------------------------------------------
 	
@@ -245,11 +254,15 @@ public abstract class Activity implements Serializable,Nullable {
 		this.transitionTo = transitionTo;
 		this.transitionFrom = transitionFrom;
 		this.languageFile = languageFile;
+		this.readOnly = false;
+		this.initialised = false;
 	}	
 	/** default constructor */
 	public Activity() {
 		this.grouping = null;	
 		this.createDateTime = new Date(); //default value is set to when the object is created
+		this.readOnly = false;
+		this.initialised = false;
 	}
 
 	/** minimal constructor */
@@ -274,6 +287,7 @@ public abstract class Activity implements Serializable,Nullable {
 		this.activityTypeId = activityTypeId;
 		this.transitionTo = transitionTo;
 		this.transitionFrom = transitionFrom;
+		this.readOnly = false;
 	}
 	
 	public static Activity getActivityInstance(int activityType)
@@ -309,6 +323,10 @@ public abstract class Activity implements Serializable,Nullable {
 				break;
 			case PERMISSION_GATE_ACTIVITY_TYPE:
 				activity = new PermissionGateActivity();
+				activity.setActivityCategoryID(CATEGORY_SYSTEM);
+				break;
+			case SYSTEM_GATE_ACTIVITY_TYPE:
+				activity = new SystemGateActivity();
 				activity.setActivityCategoryID(CATEGORY_SYSTEM);
 				break;
 			default:
@@ -517,6 +535,32 @@ public abstract class Activity implements Serializable,Nullable {
 		this.groupingSupportType = groupingSupportType;
 	}	
 	
+	/**
+	 * @return Returns the readOnly.
+	 */
+	public Boolean getReadOnly() {
+		return readOnly;
+	}
+	/**
+	 * @param readOnly The readOnly to set.
+	 */
+	public void setReadOnly(Boolean readOnly) {
+		this.readOnly = readOnly;
+	}	
+
+	/**
+	 * @return Returns the initialised.
+	 */
+	public Boolean isInitialised() {
+		return initialised;
+	}
+	/**
+	 * @param readOnly The readOnly to set.
+	 */
+	public void setInitialised(Boolean initialised) {
+		this.initialised = initialised;
+	}	
+
 	public String toString() {
 		return new ToStringBuilder(this)
 			.append("activityId", activityId)
@@ -761,7 +805,8 @@ public abstract class Activity implements Serializable,Nullable {
 	{
 		return getActivityTypeId().intValue()== SCHEDULE_GATE_ACTIVITY_TYPE ||
 			   getActivityTypeId().intValue()== PERMISSION_GATE_ACTIVITY_TYPE ||
-			   getActivityTypeId().intValue()== SYNCH_GATE_ACTIVITY_TYPE;
+			   getActivityTypeId().intValue()== SYNCH_GATE_ACTIVITY_TYPE ||
+			   getActivityTypeId().intValue() == SYSTEM_GATE_ACTIVITY_TYPE;
 	}
 	
 	/**
@@ -791,11 +836,25 @@ public abstract class Activity implements Serializable,Nullable {
 	    return getActivityTypeId().intValue() == SCHEDULE_GATE_ACTIVITY_TYPE;
 	}
 	
+	/**
+	 * Check up whether an activity is schedule gate activity or not.
+	 * @return is this activity a schedule gate activity.
+	 */
+	public boolean isSystemGate()
+	{
+	    return getActivityTypeId().intValue() == SYSTEM_GATE_ACTIVITY_TYPE;
+	}
+	
 	public boolean isGroupingActivity()
 	{
 		return getActivityTypeId().intValue()== GROUPING_ACTIVITY_TYPE;
 	}
 
+	public boolean isActivityReadOnly()
+	{
+		return readOnly.equals(Boolean.TRUE);
+	}
+	
     //---------------------------------------------------------------------
     // Data Transfer object creation methods
     //---------------------------------------------------------------------
@@ -860,6 +919,7 @@ public abstract class Activity implements Serializable,Nullable {
 	   	newActivity.setLanguageFile(this.getLanguageFile());
 			
 	   	newActivity.setOrderId(this.getOrderId());
+	   	newActivity.setReadOnly(this.getReadOnly());
    }
 	
 	

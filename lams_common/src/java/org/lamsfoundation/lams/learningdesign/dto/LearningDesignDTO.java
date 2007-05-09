@@ -53,13 +53,17 @@ public class LearningDesignDTO extends BaseDTO{
 	private Integer firstActivityUIID;
 	private Integer maxID;	
 	private Boolean validDesign;
-	private Boolean readOnly;	
+	private Boolean readOnly;
+	private Boolean editOverrideLock;
 	private Date dateReadOnly;
 	private Integer userID;
+	private Integer editOverrideUserID;
+	private String editOverrideUserFullName;
 	private String helpText;
 	private Integer copyTypeID;
 	private Date createDateTime;
 	private String version;	
+	private Integer designVersion;
 	private Long originalLearningDesignID;
 	private Integer workspaceFolderID;
 	private Long duration;
@@ -88,12 +92,16 @@ public class LearningDesignDTO extends BaseDTO{
 							 Integer maxId,
 							 Boolean validDesign, 
 							 Boolean readOnly,
+							 Boolean editOverrideLock,
 							 Date dateReadOnly,
 							 Integer userID,
+							 Integer editOverrideUserID,
+							 String editOverrideUserFullName,
 							 String helpText,
 							 Integer copyTypeID,
 							 Date createDateTime,
 							 String version,
+							 Integer designVersion,
 							 Long originalLearningDesignID,
 							 Integer workspaceFolderID,
 							 Long duration, 
@@ -112,14 +120,18 @@ public class LearningDesignDTO extends BaseDTO{
 		this.maxID = maxId;
 		this.validDesign = validDesign;
 		this.readOnly = readOnly;
+		this.editOverrideLock = editOverrideLock;
 		this.dateReadOnly = dateReadOnly;
 		this.offlineInstructions = offlineInstructions;
 		this.onlineInstructions = onlineInstructions;
 		this.userID = userID;
+		this.editOverrideUserID = editOverrideUserID;
+		this.editOverrideUserFullName = editOverrideUserFullName;
 		this.helpText = helpText;
 		this.copyTypeID = copyTypeID;
 		this.createDateTime = createDateTime;
 		this.version = version;
+		this.designVersion = designVersion;
 		this.originalLearningDesignID = originalLearningDesignID;
 		this.workspaceFolderID = workspaceFolderID;
 		this.duration = duration;
@@ -143,7 +155,9 @@ public class LearningDesignDTO extends BaseDTO{
 								 null;
 		this.maxID = learningDesign.getMaxID();
 		this.validDesign = learningDesign.getValidDesign();
+		this.designVersion = learningDesign.getDesignVersion();
 		this.readOnly = learningDesign.getReadOnly();
+		this.editOverrideLock = learningDesign.getEditOverrideLock();
 		this.dateReadOnly = learningDesign.getDateReadOnly();
 		
 		this.offlineInstructions = learningDesign.getOfflineInstructions();	
@@ -152,6 +166,13 @@ public class LearningDesignDTO extends BaseDTO{
 		this.userID = learningDesign.getUser()!=null?
 					  learningDesign.getUser().getUserId():
 					  null;
+					  
+		this.editOverrideUserID = learningDesign.getEditOverrideUser()!=null?
+							   learningDesign.getEditOverrideUser().getUserId():
+							   null;
+		this.editOverrideUserFullName = learningDesign.getEditOverrideUser()!=null?
+				   learningDesign.getEditOverrideUser().getFullName():
+					   null;
 		
 					  this.helpText = learningDesign.getHelpText();
 		this.copyTypeID = learningDesign.getCopyTypeID();
@@ -291,9 +312,16 @@ public class LearningDesignDTO extends BaseDTO{
 	 * @return Returns the readOnly.
 	 */
 	public Boolean getReadOnly() {
-		//return readOnly!=null?readOnly:WDDXTAGS.BOOLEAN_NULL_VALUE;
+		//return readOnly!=null?readOnly:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	    return readOnly;
 	}
+	/**
+	 * @return Returns the editLock.
+	 */
+	public Boolean getEditOverrideLock() {
+	    return editOverrideLock;
+	}
+	
 	/**
 	 * @return Returns the title.
 	 */
@@ -309,6 +337,19 @@ public class LearningDesignDTO extends BaseDTO{
 	    return userID;
 	}
 	/**
+	 * @return Returns the editOnFlyUserID.
+	 */
+	public Integer getEditOverrideUserID() {
+		//return userID!=null?userID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	    return editOverrideUserID;
+	}
+	/**
+	 * @return Returns the editOnFlyUserFullName.
+	 */
+	public String getEditOverrideUserFullName() {
+	    return editOverrideUserFullName;
+	}
+	/**
 	 * @return Returns the validDesign.
 	 */
 	public Boolean getValidDesign() {
@@ -321,6 +362,12 @@ public class LearningDesignDTO extends BaseDTO{
 	public String getVersion() {
 		//return version!=null?version:WDDXTAGS.STRING_NULL_VALUE;
 	    return version;
+	}
+	/**
+	 * @return Returns the design version.
+	 */
+	public Integer getDesignVersion() {
+	    return designVersion;
 	}
 	/**
 	 * @return Returns the workspaceFolderID.
@@ -530,6 +577,20 @@ public class LearningDesignDTO extends BaseDTO{
 			this.userID = userID;
 	}
 	/**
+	 * @param userID The userID to set.
+	 */
+	public void setEditOverrideUserID(Integer editOverrideUserID) {
+		if(!editOverrideUserID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
+			this.editOverrideUserID = editOverrideUserID;
+	}
+	/**
+	 * @param userID The userID to set.
+	 */
+	public void setEditOverrideUserFullName(String editOverrideUserFullName) {
+		if(!editOverrideUserFullName.equals(WDDXTAGS.STRING_NULL_VALUE))
+			this.editOverrideUserFullName = editOverrideUserFullName;
+	}
+	/**
 	 * @param validDesign The validDesign to set.
 	 */
 	public void setValidDesign(Boolean validDesign) {
@@ -541,6 +602,13 @@ public class LearningDesignDTO extends BaseDTO{
 	public void setVersion(String version) {
 		if(!version.equals(WDDXTAGS.STRING_NULL_VALUE))
 			this.version = version;
+	}
+	/**
+	 * @param designVersion The design version to set.
+	 */
+	public void setVersion(Integer designVersion) {
+		if(!designVersion.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
+			this.designVersion = designVersion;
 	}
 	/**
 	 * @param workspaceFolderID The workspaceFolderID to set.

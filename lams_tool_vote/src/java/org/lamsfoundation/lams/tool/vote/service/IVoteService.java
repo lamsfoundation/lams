@@ -218,9 +218,9 @@ public interface IVoteService
 	
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
     
-    public void setAsDefineLater(Long toolContentID) throws DataMissingException, ToolException;
+    public void setAsDefineLater(Long toolContentID, boolean value) throws DataMissingException, ToolException;
     
-    public void setAsRunOffline(Long toolContentID) throws DataMissingException, ToolException;
+    public void setAsRunOffline(Long toolContentID, boolean value) throws DataMissingException, ToolException;
 
     public void removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException, ToolException;
 	

@@ -5,7 +5,7 @@
 <head>
 	<html:base/>
 	<c:set var="title" scope="session"><tiles:getAsString name="title"/></c:set>
-	<title>LAMS :: <bean-el:message key="${title}"/></title>
+	<title><fmt:message key="${title}"/></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="pragma" content="no-cache">
 	<meta http-equiv="cache-control" content="no-cache">

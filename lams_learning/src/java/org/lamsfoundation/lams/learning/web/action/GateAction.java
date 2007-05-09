@@ -37,16 +37,20 @@ import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -98,7 +102,15 @@ public class GateAction extends LamsDispatchAction
     /** Input parameter. Boolean value */
     public static final String PARAM_FORCE_GATE_OPEN  = "force";
 
-    //---------------------------------------------------------------------
+	/**
+	 * Get the ActionMappings.
+	 */
+	protected ActivityMapping getActivityMapping() {
+        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
+        return (ActivityMapping)wac.getBean("activityMapping");
+	}
+
+	//---------------------------------------------------------------------
     // Struts Dispatch Method
     //---------------------------------------------------------------------    
 	/**
@@ -119,30 +131,38 @@ public class GateAction extends LamsDispatchAction
     {
         boolean forceGate = WebUtil.readBooleanParam(request,PARAM_FORCE_GATE_OPEN,false);
         Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+        Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
         
         //initialize service object
         ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
         Activity activity = learnerService.getActivity(activityId);
-        Lesson lesson = learnerService.getLessonByActivity(activity);
-        User learner = LearningWebUtil.getUser(learnerService);
-        
-        Integer totalNumActiveLearners =  learnerService.getCountActiveLearnersByLesson(lesson.getLessonId());
-        //knock the gate
-        boolean gateOpen = learnerService.knockGate(activityId,learner,forceGate);
-        
-        // if the gate is open, let the learner go to the next activity ( updating the cached learner progress on the way )
-        // pass only the ids in to completeActivity, so that the service level looks up the objects.
-        // if we reuse our cached entries, hibernate may throw session errors (if the objects are CGLIB entities).
-        if(gateOpen)
-        {
-            String nextActivityUrl = learnerService.completeActivity(learner.getUserId(),activityId,lesson.getLessonId());
-            response.sendRedirect(nextActivityUrl);
-            return null;
+		ActivityMapping actionMappings = getActivityMapping();
+
+		User learner = LearningWebUtil.getUser(learnerService);
+        Lesson lesson = learnerService.getLesson(lessonId);
+
+         if ( activity != null ) {
+	        
+            Integer totalNumActiveLearners =  learnerService.getCountActiveLearnersByLesson(lesson.getLessonId());
+	        //knock the gate
+	        boolean gateOpen = learnerService.knockGate(activityId,learner,forceGate);
+
+	        //if the gate is closed, ask the learner to wait ( updating the cached learner progress on the way )
+	        if ( ! gateOpen)  {
+	            return findViewByGateType(mapping, (DynaActionForm)form, activity, totalNumActiveLearners, lesson);
+	        }
         }
-        //if the gate is closed, ask the learner to wait ( updating the cached learner progress on the way )
-        else {
-            return findViewByGateType(mapping, (DynaActionForm)form, activity, totalNumActiveLearners, lesson.isPreviewLesson());
+        
+        // gate is open, so let the learner go to the next activity ( updating the cached learner progress on the way )
+        // don't use LearningWebUtil.getLearnerProgress(request, learnerService) as it may try to get the lesson 
+       //  from the activity and the activity may be null (if this was a system stop gate).
+ 		LearnerProgress learnerProgress = (LearnerProgress)request.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+        if ( learnerProgress == null ) {
+        	learnerProgress = learnerService.getProgress(learner.getUserId(), lessonId);
         }
+        return LearningWebUtil.completeActivity(request, response,
+		    		actionMappings, learnerProgress, activity, 
+		    			learner.getUserId(), learnerService, true);
     }
 	
     //---------------------------------------------------------------------
@@ -164,18 +184,19 @@ public class GateAction extends LamsDispatchAction
                                              DynaActionForm gateForm, 
                                              Activity gate,
                                              Integer totalNumActiveLearners,
-                                             boolean isPreviewLesson)
+                                             Lesson lesson)
     {
         //dispatch the view according to the type of the gate.
        	if ( gate != null ) {
        		gateForm.set("totalLearners",totalNumActiveLearners);
-       		gateForm.set("previewLesson",isPreviewLesson);
-       		gateForm.set("activityId",gate.getActivityId());
+       		gateForm.set("previewLesson",lesson.isPreviewLesson());
+       		gateForm.set(AttributeNames.PARAM_ACTIVITY_ID,gate.getActivityId());
+       		gateForm.set(AttributeNames.PARAM_LESSON_ID, lesson.getLessonId());
 	        if(gate.isSynchGate())
 	            return viewSynchGate(mapping,gateForm,(SynchGateActivity)gate);
 	        else if(gate.isScheduleGate())
 	            return viewScheduleGate(mapping,gateForm,(ScheduleGateActivity)gate);
-	        else if(gate.isPermissionGate())
+	        else if(gate.isPermissionGate() || gate.isSystemGate())
 	            return viewPermissionGate(mapping,gateForm,(PermissionGateActivity)gate);
 	        else
 	            throw new LearnerServiceException("Invalid gate activity. " +

@@ -29,6 +29,11 @@
    </filter-mapping>
    
    <filter-mapping>
+    <filter-name>SystemSessionFilter</filter-name>
+     <url-pattern>/eof/*</url-pattern> 
+   </filter-mapping>
+   
+   <filter-mapping>
     <filter-name>hibernateFilter</filter-name>
      <url-pattern>*.do</url-pattern>
    </filter-mapping>

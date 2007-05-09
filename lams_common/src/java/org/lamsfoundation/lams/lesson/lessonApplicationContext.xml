@@ -28,6 +28,7 @@
 		<property name="lessonClassDAO"><ref bean="lessonClassDAO"/></property>
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
+		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
 		<property name="messageService"><ref bean="commonMessageService"/></property>
 	</bean>
 	

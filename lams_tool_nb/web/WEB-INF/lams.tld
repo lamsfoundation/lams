@@ -434,5 +434,35 @@
 	    <name>ImgButtonWrapper</name>
 		<path>/WEB-INF/tags/ImgButtonWrapper.tag</path>
    	</tag-file>  
+   	<tag>
+    <name>textarea</name>
+    <tag-class>org.lamsfoundation.lams.web.tag.LAMSMultiLinesTextareaTag</tag-class>
+    <body-content>JSP</body-content>
+    <dynamic-attributes>true</dynamic-attributes>
+    <description>
+    	Render text exactly same as  original input, which even won't escape the input HTML tag.
+    </description>    
+    <attribute>
+        <description>
+        </description>
+        <name>name</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>
+        </description>
+        <name>id</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>
+        </description>
+        <name>onchange</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
 
 </taglib>

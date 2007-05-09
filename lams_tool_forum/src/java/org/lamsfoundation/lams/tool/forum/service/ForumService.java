@@ -647,21 +647,21 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 	}
 
-	public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 		Forum forum = forumDao.getByContentId(toolContentId);
 		if(forum == null){
 			throw new ToolException("No found tool content by given content ID:" + toolContentId);
 		}
-		forum.setDefineLater(true);
+		forum.setDefineLater(value);
 		forum.setContentInUse(false);
 	}
 
-	public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException {
+	public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 		Forum forum = forumDao.getByContentId(toolContentId);
 		if(forum == null){
 			throw new ToolException("No found tool content by given content ID:" + toolContentId);
 		}
-		forum.setRunOffline(true);
+		forum.setRunOffline(value);
 		
 	}
 

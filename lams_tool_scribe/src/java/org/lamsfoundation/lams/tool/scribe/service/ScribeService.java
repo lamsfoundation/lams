@@ -195,23 +195,23 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 		scribeDAO.saveOrUpdate(toContent);
 	}
 
-	public void setAsDefineLater(Long toolContentId)
+	public void setAsDefineLater(Long toolContentId, boolean value)
 			throws DataMissingException, ToolException {
 		Scribe scribe = scribeDAO.getByContentId(toolContentId);
 		if(scribe == null){
 			throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
 		}
-		scribe.setDefineLater(true);
+		scribe.setDefineLater(value);
 		scribeDAO.saveOrUpdate(scribe);
 	}
 
-	public void setAsRunOffline(Long toolContentId)
+	public void setAsRunOffline(Long toolContentId, boolean value)
 			throws DataMissingException, ToolException {
 		Scribe scribe = scribeDAO.getByContentId(toolContentId);
 		if(scribe == null){
 			throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
 		}
-		scribe.setRunOffline(true);
+		scribe.setRunOffline(value);
 		scribeDAO.saveOrUpdate(scribe);
 	}
 

@@ -742,8 +742,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             //if it is schedule gate, we need to initialize the sheduler for it.
             if(activity.getActivityTypeId().intValue() == Activity.SCHEDULE_GATE_ACTIVITY_TYPE) {
             	ScheduleGateActivity gateActivity = (ScheduleGateActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
-                runGateScheduler(gateActivity,lessonStartTime,requestedLesson.getLessonName()); 
+                activity = runGateScheduler(gateActivity,lessonStartTime,requestedLesson.getLessonName()); 
             }
+            activity.setInitialised(Boolean.TRUE);
+            activityDAO.update(activity);
+            
         //update lesson status
         }
         requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
@@ -753,6 +756,73 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         if(log.isDebugEnabled())
             log.debug("=============Lesson "+lessonId+" started===============");
     }
+    
+    /**
+     * <p>Runs the system scheduler to start the scheduling for opening gate and
+     * closing gate. It invlovs a couple of steps to start the scheduler:</p>
+     * <li>1. Initialize the resource needed by scheduling job by setting 
+     * 		  them into the job data map.
+     * </li>
+     * <li>2. Create customized triggers for the scheduling.</li>
+     * <li>3. start the scheduling job</li> 
+     * 
+     * @param scheduleGate the gate that needs to be scheduled.
+     * @param schedulingStartTime the time on which the gate open should be based if an offset is used. For starting 
+     * a lesson, this is the lessonStartTime. For live edit, it is now.
+     * @param lessonName the name lesson incorporating this gate - used for the description of the Quartz job. Optional.
+     * @returns An updated gate, that should be saved by the calling code.
+     */
+    public ScheduleGateActivity runGateScheduler(ScheduleGateActivity scheduleGate,
+                                  Date schedulingStartTime, String lessonName)
+    {
+    	
+        if(log.isDebugEnabled())
+            log.debug("Running scheduler for gate "+scheduleGate.getActivityId()+"...");
+        JobDetail openScheduleGateJob = getOpenScheduleGateJob();
+        JobDetail closeScheduleGateJob = getCloseScheduleGateJob();
+        //setup the message for scheduling job
+        openScheduleGateJob.setName("openGate:" + scheduleGate.getActivityId());
+        openScheduleGateJob.setDescription(scheduleGate.getTitle()+":"+lessonName);
+        openScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
+        closeScheduleGateJob.setName("closeGate:" + scheduleGate.getActivityId());
+        closeScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
+        closeScheduleGateJob.setDescription(scheduleGate.getTitle()+":"+lessonName);
+
+        
+        //create customized triggers
+        Trigger openGateTrigger = new SimpleTrigger("openGateTrigger:" + scheduleGate.getActivityId(),
+                                                    Scheduler.DEFAULT_GROUP, 
+                                                    scheduleGate.getLessonGateOpenTime(schedulingStartTime));
+        
+        
+        Trigger closeGateTrigger = new SimpleTrigger("closeGateTrigger:" + scheduleGate.getActivityId(),
+                                                    Scheduler.DEFAULT_GROUP,
+                                                    scheduleGate.getLessonGateCloseTime(schedulingStartTime));
+
+        //start the scheduling job
+        try
+        {
+        	if((scheduleGate.getGateStartTimeOffset() == null && scheduleGate.getGateEndTimeOffset() == null) || 
+        	   (scheduleGate.getGateStartTimeOffset() != null && scheduleGate.getGateEndTimeOffset() == null))
+        		scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
+        	else if(openGateTrigger.getStartTime().before(closeGateTrigger.getStartTime())) {
+        		scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
+        		scheduler.scheduleJob(closeScheduleGateJob, closeGateTrigger);
+        	}
+
+        }
+        catch (SchedulerException e)
+        {
+            throw new MonitoringServiceException("Error occurred at " +
+            		"[runGateScheduler]- fail to start scheduling",e);
+        }
+        
+        if(log.isDebugEnabled())
+            log.debug("Scheduler for Gate "+scheduleGate.getActivityId()+" started...");
+        
+        return scheduleGate;
+    }
+
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#finishLesson(long)
      */
@@ -1005,7 +1075,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         		}
         	}else{
         		//if group already exist
-        		learnerService.completeActivity(learner.getUserId(),activity,lessonId);
+    			learnerService.completeActivity(learner.getUserId(),activity,lessonId);
        			if ( log.isDebugEnabled()) {
        				log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
        			}
@@ -1037,6 +1107,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 						toolSession = lamsCoreToolService.getToolSessionByActivity(learner,toolActivity);
 					}
 					learnerService.completeToolSession(toolSession.getToolSessionId(),new Long(learner.getUserId().longValue()));
+	    			learnerService.completeActivity(learner.getUserId(),activity,lessonId);
 	       			if ( log.isDebugEnabled()) {
 	       				log.debug("Tool activity [" + activity.getActivityId() + "] is completed.");
 	       			}
@@ -1583,67 +1654,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	//---------------------------------------------------------------------
     // Helper Methods - scheduling
     //---------------------------------------------------------------------
-    /**
-     * <p>Runs the system scheduler to start the scheduling for opening gate and
-     * closing gate. It invlovs a couple of steps to start the scheduler:</p>
-     * <li>1. Initialize the resource needed by scheduling job by setting 
-     * 		  them into the job data map.
-     * </li>
-     * <li>2. Create customized triggers for the scheduling.</li>
-     * <li>3. start the scheduling job</li> 
-     * 
-     * @param scheduleGate the gate that needs to be scheduled.
-     */
-    private void runGateScheduler(ScheduleGateActivity scheduleGate,
-                                  Date lessonStartTime, String lessonName)
-    {
-    	
-        if(log.isDebugEnabled())
-            log.debug("Running scheduler for gate "+scheduleGate.getActivityId()+"...");
-        JobDetail openScheduleGateJob = getOpenScheduleGateJob();
-        JobDetail closeScheduleGateJob = getCloseScheduleGateJob();
-        //setup the message for scheduling job
-        openScheduleGateJob.setName("openGate:" + scheduleGate.getActivityId());
-        openScheduleGateJob.setDescription(scheduleGate.getTitle()+":"+lessonName);
-        openScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
-        closeScheduleGateJob.setName("closeGate:" + scheduleGate.getActivityId());
-        closeScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
-        closeScheduleGateJob.setDescription(scheduleGate.getTitle()+":"+lessonName);
-
-        
-        //create customized triggers
-        Trigger openGateTrigger = new SimpleTrigger("openGateTrigger:" + scheduleGate.getActivityId(),
-                                                    Scheduler.DEFAULT_GROUP, 
-                                                    scheduleGate.getLessonGateOpenTime(lessonStartTime));
-        
-        
-        Trigger closeGateTrigger = new SimpleTrigger("closeGateTrigger:" + scheduleGate.getActivityId(),
-                                                    Scheduler.DEFAULT_GROUP,
-                                                    scheduleGate.getLessonGateCloseTime(lessonStartTime));
-
-        //start the scheduling job
-        try
-        {
-        	if((scheduleGate.getGateStartTimeOffset() == null && scheduleGate.getGateEndTimeOffset() == null) || 
-        	   (scheduleGate.getGateStartTimeOffset() != null && scheduleGate.getGateEndTimeOffset() == null))
-        		scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
-        	else if(openGateTrigger.getStartTime().before(closeGateTrigger.getStartTime())) {
-        		scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
-        		scheduler.scheduleJob(closeScheduleGateJob, closeGateTrigger);
-        	}
-
-        }
-        catch (SchedulerException e)
-        {
-            throw new MonitoringServiceException("Error occurred at " +
-            		"[runGateScheduler]- fail to start scheduling",e);
-        }
-        //update the gate because the start time might be setup 
-        activityDAO.update(scheduleGate);
-        
-        if(log.isDebugEnabled())
-            log.debug("Scheduler for Gate "+scheduleGate.getActivityId()+" started...");
-    }
 
     /**
      * Returns the bean that defines the open schedule gate job.

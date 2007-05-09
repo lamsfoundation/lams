@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
  */
 public class ActivityMappingStrategy implements Serializable {
 	
+	private static final String PROGRESS_BROKEN_ACTION = "/progressBroken.do";
 	/**
 	 * Returns the struts action used to display the specified activity.
 	 * @param activity, Activity to be displayed
@@ -43,7 +44,11 @@ public class ActivityMappingStrategy implements Serializable {
 	 */
 	protected String getActivityAction(Activity activity) {
 		String strutsAction = null;
-		if ( activity.isComplexActivity() ) {
+		if ( activity == null ) {
+			strutsAction = PROGRESS_BROKEN_ACTION;
+		}
+		else if ( activity.isComplexActivity() ) 
+		{
 			if ( activity.isParallelActivity() )
 		        strutsAction = "/DisplayParallelActivity.do";
 		    else if (activity.isOptionsActivity()) 
@@ -70,4 +75,25 @@ public class ActivityMappingStrategy implements Serializable {
 		return "/LessonComplete.do";
 	}
 	
+	/**
+	 * Returns the struts action for triggering the window to close.
+	 */
+	protected String getCloseWindowAction() {
+		return "/close.do";
+	}
+
+	/**
+	 * Returns the struts action for the error message that appears when the learner progress is broken, say be live edit.
+	 */
+	protected String getProgressBrokenAction() {
+		return PROGRESS_BROKEN_ACTION;
+	}
+
+	/**
+	 * Returns the struts action for the "Complete Activity" call. This calls the complete activity action class, which may go
+	 * to a waiting screen (if currently setting up lock gates for live edit) or the next activity. 
+	 */
+	protected String getCompleteActivityAction() {
+		return "/CompleteActivity.do";
+	}
 }

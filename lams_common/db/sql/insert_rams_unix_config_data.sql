@@ -1,11 +1,12 @@
-insert into lams_configuration (config_key, config_value) values ('ServerURL','http://shaun.melcoe.mq.edu.au/lams/');
+insert into lams_configuration (config_key, config_value) values ('ServerURL','http://shaun.melcoe.mq.edu.au/rams/');
+insert into lams_configuration (config_key, config_value) values ('ServerURLContextPath','rams/');
 insert into lams_configuration (config_key, config_value) values ('Version','1.0');
-insert into lams_configuration (config_key, config_value) values ('TempDir','/var/opt/lams/temp');
-insert into lams_configuration (config_key, config_value) values ('DumpDir','/var/opt/lams/dump');
-insert into lams_configuration (config_key, config_value) values ('EARDir','/usr/local/jboss-4.0.2/server/default/deploy/lams.ear');
+insert into lams_configuration (config_key, config_value) values ('TempDir','/var/opt/rams/temp');
+insert into lams_configuration (config_key, config_value) values ('DumpDir','/var/opt/rams/dump');
+insert into lams_configuration (config_key, config_value) values ('EARDir','/usr/local/jboss-4.0.2/server/default/deploy/rams.ear');
 insert into lams_configuration (config_key, config_value) values ('SMTPServer','');
 insert into lams_configuration (config_key, config_value) values ('LamsSupportEmail','lams_support@melcoe.mq.edu.au');
-insert into lams_configuration (config_key, config_value) values ('ContentRepositoryPath','/var/opt/lams/repository');
+insert into lams_configuration (config_key, config_value) values ('ContentRepositoryPath','/var/opt/rams/repository');
 insert into lams_configuration (config_key, config_value) values ('UploadFileMaxSize','1048576');
 insert into lams_configuration (config_key, config_value) values ('UploadLargeFileMaxSize','10485760');
 insert into lams_configuration (config_key, config_value) values ('UploadFileMaxMemorySize','4096');
@@ -14,10 +15,10 @@ insert into lams_configuration (config_key, config_value) values ('UserInactiveT
 insert into lams_configuration (config_key, config_value) values ('UseCacheDebugListener','false');
 insert into lams_configuration (config_key, config_value) values ('CleanupPreviewOlderThanDays','7');
 insert into lams_configuration (config_key, config_value) values ('AuthoringActivitiesColour', 'true');
-insert into lams_configuration (config_key, config_value) values ('AuthoringClientVersion','1.0.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('MonitorClientVersion','1.0.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('LearnerClientVersion','1.0.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('ServerVersionNumber','1.0.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('AuthoringClientVersion','0.8.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('MonitorClientVersion','0.8.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('LearnerClientVersion','0.8.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('ServerVersionNumber','0.8.@datetimestamp@');
 insert into lams_configuration (config_key, config_value) values ('ServerLanguage','en_AU');
 insert into lams_configuration (config_key, config_value) values ('ServerPageDirection','LTR');
 insert into lams_configuration (config_key, config_value) values ('DictionaryDateCreated','2007-04-23');
@@ -30,3 +31,4 @@ insert into lams_configuration (config_key, config_value) values ('DefaultFlashT
 insert into lams_configuration (config_key, config_value) values ('DefaultHTMLTheme','ramsthemeHTML');
 insert into lams_configuration (config_key, config_value) values ('AllowDirectLessonLaunch','false');
 insert into lams_configuration (config_key, config_value) values ('LAMS_Community_enable','false');
+insert into lams_configuration (config_key, config_value) values ('AllowLiveEdit','true');

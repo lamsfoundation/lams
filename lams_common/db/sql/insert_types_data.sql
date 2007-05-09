@@ -75,6 +75,7 @@ INSERT INTO lams_learning_activity_type VALUES (5, 'GATE_PERMISSION');
 INSERT INTO lams_learning_activity_type VALUES (6, 'PARALLEL');
 INSERT INTO lams_learning_activity_type VALUES (7, 'OPTIONS');
 INSERT INTO lams_learning_activity_type VALUES (8, 'SEQUENCE');
+INSERT INTO lams_learning_activity_type VALUES (9, 'GATE_SYSTEM');
 
 INSERT INTO lams_gate_activity_level VALUES (1, 'LEARNER');
 INSERT INTO lams_gate_activity_level VALUES (2, 'GROUP');
@@ -161,6 +162,14 @@ INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_di
 	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
 	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
 VALUES (4, 5, 'Permission Gate', 'Gate: Opens under teacher or staff control.', 
+	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, null, 
+	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
+	'monitoring/gate.do?method=viewGate', now()	);
+
+INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
+	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
+	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+VALUES (5, 9, 'System Gate', 'Gate: Opens under system control.', 
 	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, null, 
 	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
 	'monitoring/gate.do?method=viewGate', now()	);

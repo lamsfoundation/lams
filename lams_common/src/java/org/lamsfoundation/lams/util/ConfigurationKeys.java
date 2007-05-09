@@ -34,6 +34,7 @@ public class ConfigurationKeys {
 	public static String ROOT = "Lams";
 
 	public static String SERVER_URL = "ServerURL";
+	public static String SERVER_URL_CONTEXT_PATH = "ServerURLContextPath";
 
 	public static String VERSION = "Version";
 
@@ -131,4 +132,6 @@ public class ConfigurationKeys {
 	public static String ALLOW_DIRECT_LESSON_LAUNCH = "AllowDirectLessonLaunch";
 	
 	public static String LAMS_COMMUNITY_ENABLE = "LAMS_Community_enable";
+
+	public static String ALLOW_EDIT_ON_FLY = "AllowLiveEdit";
 }

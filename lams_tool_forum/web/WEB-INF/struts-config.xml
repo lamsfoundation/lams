@@ -260,7 +260,7 @@
 		<action path="/learning/submitReflection"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			name="reflectionForm" 
-			validate="true" 
+			validate="false" 
 			input="tiles:/learning/reflection"
 			parameter="submitReflection" 
 			scope="request">

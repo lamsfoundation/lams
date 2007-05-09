@@ -64,6 +64,7 @@
 				<prop key="unsuspendLesson">PROPAGATION_REQUIRED</prop>
 				<prop key="removeLesson">PROPAGATION_REQUIRED</prop>
 				<prop key="openGate">PROPAGATION_REQUIRED</prop>
+				<prop key="runGateScheduler">PROPAGATION_REQUIRED</prop>
 				<prop key="closeGate">PROPAGATION_REQUIRED</prop>
 				<prop key="createPreviewClassForLesson">PROPAGATION_REQUIRED</prop>
 				<prop key="deletePreviewLesson">PROPAGATION_REQUIRES_NEW</prop>

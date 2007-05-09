@@ -32,6 +32,7 @@
  %>
 <%@ tag body-content="empty" %>
 <%@ attribute name="progress" required="true" rtexprvalue="true" type="java.lang.String" %>
+<%@ attribute name="version" required="false" rtexprvalue="true" %>
 <%@ attribute name="id" required="true" rtexprvalue="true" %>
 <%@ attribute name="redirect" required="false" rtexprvalue="true" %>
 <%@ taglib uri="tags-core" prefix="c" %>
@@ -43,6 +44,9 @@
 			<c:set var="passonurl_params" value="${progress}&lessonID=${id}&uniqueID=${randomID}"/>
 			<c:if test="${redirect}">
 				<c:set var="passonurl_params" value="redirect=true&${passonurl_params}"/>
+			</c:if>
+			<c:if test="${!empty version}">
+				<c:set var="passonurl_params" value="version=${version}&${passonurl_params}"/>
 			</c:if>
 			
 			<c:set var="passonurl_nojs" value="passon.swf?${passonurl_params}"/>

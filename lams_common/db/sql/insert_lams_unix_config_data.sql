@@ -1,4 +1,5 @@
 insert into lams_configuration (config_key, config_value) values ('ServerURL','http://shaun.melcoe.mq.edu.au/lams/');
+insert into lams_configuration (config_key, config_value) values ('ServerURLContextPath','lams/');
 insert into lams_configuration (config_key, config_value) values ('Version','2.0.2');
 insert into lams_configuration (config_key, config_value) values ('TempDir','/var/opt/lams/temp');
 insert into lams_configuration (config_key, config_value) values ('DumpDir','/var/opt/lams/dump');
@@ -30,4 +31,4 @@ insert into lams_configuration (config_key, config_value) values ('DefaultFlashT
 insert into lams_configuration (config_key, config_value) values ('DefaultHTMLTheme','defaultHTML');
 insert into lams_configuration (config_key, config_value) values ('AllowDirectLessonLaunch','false');
 insert into lams_configuration (config_key, config_value) values ('LAMS_Community_enable','false');
-insert into lams_configuration (config_key, config_value) values ('AllowEditOnFly','true');
+insert into lams_configuration (config_key, config_value) values ('AllowLiveEdit','true');

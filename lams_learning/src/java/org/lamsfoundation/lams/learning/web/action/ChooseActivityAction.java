@@ -71,25 +71,27 @@ public class ChooseActivityAction extends ActivityAction {
 		ICoreLearnerService learnerService = getLearnerService();
 
 		// Get learner and lesson details.
-		Integer learner = LearningWebUtil.getUserId();
+		Integer learnerId = LearningWebUtil.getUserId();
 		LearnerProgress progress = LearningWebUtil.getLearnerProgress(request,learnerService);
 		Lesson lesson = progress.getLesson();
 		
 		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
-		
-		if (activity == null) {
-		    log.error(className+": No activity in request or session");
-			return mapping.findForward(ActivityMapping.ERROR);
-		}
 
-		progress = learnerService.chooseActivity(learner, lesson.getLessonId(), activity);
+		if (activity != null) {
+			progress = learnerService.chooseActivity(learnerId, lesson.getLessonId(), activity);
+		} else {
+			// Something has gone wrong - maybe due to Live Edit. Need to recalculate their current location.
+			progress = learnerService.joinLesson(learnerId, lesson.getLessonId());
+  		}
+
 		LearningWebUtil.putLearnerProgressInRequest(request,progress);
 
-		// need to do the choose first as the chooseActivity changes the progress details 
+		// need to do the choose first as the chooseActivity / joinLesson changes the progress details 
 		setupProgressString(actionForm, request);
 
 		ActionForward forward = actionMappings.getActivityForward(activity, progress, true);
 		return forward;
+
 	}
 
 }

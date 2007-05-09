@@ -56,6 +56,7 @@ public class LessonDetailsDTO {
 	private Integer numberPossibleLearners;
 	private Integer numberStartedLearners;
 	private Boolean learnerExportAvailable;
+	private Boolean locked_for_edit;
 	
 	/** Create the DTO based on the lesson. Sets up all the fields except numberStartedLearners */
 	public LessonDetailsDTO(Lesson lesson){
@@ -113,6 +114,8 @@ public class LessonDetailsDTO {
 		this.numberStartedLearners = new Integer(0);
 	
 		this.learnerExportAvailable = lesson.getLearnerExportAvailable();
+		
+		this.locked_for_edit = lesson.getLockedForEdit();
 	}	
 	public Date getScheduleEndDate() {
 		return scheduleEndDate;
@@ -232,5 +235,8 @@ public class LessonDetailsDTO {
 	}
 	public Boolean getLearnerExportAvailable() {
 		return learnerExportAvailable;
+	}
+	public Boolean getLockedForEdit() {
+		return locked_for_edit;
 	}
 }

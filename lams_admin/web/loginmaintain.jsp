@@ -1,4 +1,5 @@
 <%@ include file="/taglibs.jsp"%>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="fck-editor" prefix="fck"%>
 
 <h2>
@@ -14,15 +15,17 @@
 <br />
 <c:set var="language"><lams:user property="localeLanguage"/></c:set>
 <p><fmt:message key="sysadmin.login.text"/></p>
-<div align="center">
-<fck:editor id="news" basePath="/lams/fckeditor/"
+
+<div align="center"> 
+<c:set var="basePath"><lams:LAMSURL/>/fckeditor/</c:set>
+<fck:editor id="news" basePath="${basePath}"
     width = "95%"
-	imageBrowserURL="/lams/fckeditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/-1/"
-	linkBrowserURL="/lams/fckeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/-1/"
-	flashBrowserURL="/lams/fckeditor/editor/filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/-1/"
-	imageUploadURL="/lams/fckeditor/editor/filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/-1/"
-	linkUploadURL="/lams/fckeditor/editor/filemanager/upload/simpleuploader?Type=File&CurrentFolder=/-1/"
-	flashUploadURL="/lams/fckeditor/editor/filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/-1/"
+	imageBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/-1/"
+	linkBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/-1/"
+	flashBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/-1/"
+	imageUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/-1/"
+	linkUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=File&CurrentFolder=/-1/"
+	flashUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/-1/"
 	defaultLanguage="${language}" 
 	autoDetectLanguage="false"
 	> 

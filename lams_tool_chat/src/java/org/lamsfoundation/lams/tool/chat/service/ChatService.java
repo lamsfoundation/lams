@@ -254,23 +254,23 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 		chatDAO.saveOrUpdate(toContent);
 	}
 
-	public void setAsDefineLater(Long toolContentId)
+	public void setAsDefineLater(Long toolContentId, boolean value)
 			throws DataMissingException, ToolException {
 		Chat chat = chatDAO.getByContentId(toolContentId);
 		if(chat == null){
 			throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
 		}
-		chat.setDefineLater(true);
+		chat.setDefineLater(value);
 		chatDAO.saveOrUpdate(chat);
 	}
 
-	public void setAsRunOffline(Long toolContentId)
+	public void setAsRunOffline(Long toolContentId, boolean value)
 			throws DataMissingException, ToolException {
 		Chat chat = chatDAO.getByContentId(toolContentId);
 		if(chat == null){
 			throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
 		}
-		chat.setRunOffline(true);
+		chat.setRunOffline(value);
 		chatDAO.saveOrUpdate(chat);
 	}
 

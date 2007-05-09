@@ -32,6 +32,7 @@
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="groupDAO"><ref bean="groupDAO"/></property>
 		<property name="licenseDAO"><ref bean="licenseDAO"/></property>
+		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
    	</bean>
 
 	<bean id="authoringServiceTarget" class="org.lamsfoundation.lams.authoring.service.AuthoringService">
@@ -41,6 +42,7 @@
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="transitionDAO"><ref bean="transitionDAO"/></property>
 		<property name="toolDAO"><ref bean="toolDAO"/></property>
+		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="groupDAO"><ref bean="groupDAO"/></property>
 		<property name="licenseDAO"><ref bean="licenseDAO"/></property>
@@ -48,6 +50,8 @@
 		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>
 		<property name="messageService"><ref bean="authoringMessageService"/></property>
 		<property name="learningDesignService"><ref bean="learningDesignService"/></property>
+		<property name="lessonService"><ref bean="lessonService"/></property>
+		<property name="monitoringService"><ref bean="monitoringService"/></property>
 	</bean>
 	
 	<bean id="authoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -66,6 +70,9 @@
 				<prop key="copy*">PROPAGATION_REQUIRED</prop>
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
 				<prop key="validate*">PROPAGATION_REQUIRED</prop>
+				<prop key="setup*">PROPAGATION_REQUIRED</prop>
+				<prop key="finish*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>

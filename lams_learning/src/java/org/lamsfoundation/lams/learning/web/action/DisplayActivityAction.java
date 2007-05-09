@@ -24,6 +24,8 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.action;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -72,11 +74,12 @@ public class DisplayActivityAction extends ActivityAction {
 	 * Gets an activity from the request (attribute) and forwards onto a
 	 * display action using the ActionMappings class. If no activity is
 	 * in request then use the current activity in learnerProgress.
+	 * @throws UnsupportedEncodingException 
 	 */
 	public ActionForward execute(ActionMapping mapping,
 	                             ActionForm actionForm,
 	                             HttpServletRequest request,
-	                             HttpServletResponse response) 
+	                             HttpServletResponse response) throws UnsupportedEncodingException 
 	{
 		ICoreLearnerService learnerService = getLearnerService();
 
@@ -92,7 +95,7 @@ public class DisplayActivityAction extends ActivityAction {
 	    LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
 		
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(getServlet().getServletContext());
-		ActionForward forward =actionMappings.getProgressForward(learnerProgress,false,request,learnerService);
+		ActionForward forward =actionMappings.getProgressForward(learnerProgress,false,true,request,learnerService);
 		setupProgressString(actionForm, request);
 	
 		if(log.isDebugEnabled())

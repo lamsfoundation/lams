@@ -14,6 +14,11 @@
 		<id name="lessonId" type="java.lang.Long" column="lesson_id">
 			<generator class="native" />
 		</id>
+         <version
+            name="version"
+            column="version"
+            type="java.lang.Integer">
+         </version>
     	<property name="lessonDescription" type="java.lang.String" 
     			 column="description" length="65535">
 	    </property>
@@ -43,6 +48,9 @@
 		</property>
 		<property name="learnerExportAvailable" type="java.lang.Boolean"
         	column="learner_exportport_avail" length="1">
+    </property>
+		<property name="lockedForEdit" type="java.lang.Boolean"
+        	column="locked_for_edit" length="1">
     </property>
 		
 		<!-- Associations -->

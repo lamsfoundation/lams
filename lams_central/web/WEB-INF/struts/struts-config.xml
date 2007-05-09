@@ -297,7 +297,7 @@
       />
       <forward
         name="index"
-        path="/index.jspp"
+        path="/index.jsp"
         redirect="false"
       />
     </action>

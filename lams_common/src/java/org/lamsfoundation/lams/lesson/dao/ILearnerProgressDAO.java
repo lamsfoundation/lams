@@ -23,6 +23,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson.dao;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /**
@@ -64,4 +67,19 @@ public interface ILearnerProgressDAO
      * @param learnerProgress
      */
     public void updateLearnerProgress(LearnerProgress learnerProgress);
-}
+
+    /**
+     * Get all the learner progress records where the current, previous or next activity is the given activity.
+     * @param activity
+     * @return List<LearnerProgress>
+     */
+    public List getLearnerProgressReferringToActivity(final Activity activity);
+    
+    /**
+     * Get all the learner progress records for a lesson where the progress is marked as completed.
+     * @param lessonId
+     * @return List<LearnerProgress>
+     */
+    public List getCompletedLearnerProgressForLesson(final Long lessonId);
+ 
+ }

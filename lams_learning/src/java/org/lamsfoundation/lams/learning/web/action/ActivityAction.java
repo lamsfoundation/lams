@@ -24,21 +24,28 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.action;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -77,14 +84,19 @@ public abstract class ActivityAction extends LamsAction {
 		Lesson currentLesson = learnerProgress.getLesson();
 		if(currentLesson != null){
 			activityForm.setLessonID(currentLesson.getLessonId());
+			
+			LearningDesign currentDesign = currentLesson.getLearningDesign();
+			if(currentDesign != null)
+				activityForm.setVersion(currentDesign.getDesignVersion());
 		}
+		
 		
 		if(log.isDebugEnabled())
 		    log.debug("Entering activity: progress summary is "+activityForm.getProgressSummary());
 		
 		return null;
 	}
-	
+	       	
 	/**
 	 * Get the ActionMappings.
 	 */
@@ -136,6 +148,6 @@ public abstract class ActivityAction extends LamsAction {
 		}
 		return progressSummary.toString();
 	}
-	
 
+	
 }

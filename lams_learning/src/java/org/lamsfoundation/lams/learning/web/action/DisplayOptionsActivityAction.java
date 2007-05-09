@@ -112,6 +112,7 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		form.setMaximum(optionsActivity.getMaxNumberOfOptionsNotNull().intValue());
 		form.setDescription(optionsActivity.getDescription());
 		form.setTitle(optionsActivity.getTitle());
+		form.setLessonID(learnerProgress.getLesson().getLessonId());
 		
 		this.saveToken(request);
 		

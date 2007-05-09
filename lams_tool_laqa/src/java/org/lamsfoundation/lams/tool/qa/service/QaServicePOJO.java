@@ -1214,35 +1214,13 @@ public class QaServicePOJO
     }
     
     
-    public void unsetAsDefineLater(Long toolContentID) throws QaApplicationException
-    {
-    	logger.debug("request for unsetAsDefineLater with toolContentID: " + toolContentID);
-    	if  (toolContentID == null)
-    	{
-    		logger.debug("WARNING!: retrieved toolContentID is null.");
-            throw new QaApplicationException("Fail to setAsDefineLater"
-                    + " based on null toolContentID.");
-    	}
-    	QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
-    	if (qaContent == null)
-    	{
-    		logger.debug("WARNING!!!: retrieved qaContent is null.");
-            throw new QaApplicationException("Fail to unsetAsDefineLater"
-                    + " based on null qaContent.");
-    	}
-    	qaContent.setDefineLater(false);
-    	updateQa(qaContent);
-    	logger.debug("qaContent has been updated for unsetAsDefineLater: " + qaContent);
-    }
-    
-
     /**
      * setAsDefineLater(Long toolContentID) throws DataMissingException, ToolException
      * 
      * @param toolContentID
      * return void
      */
-    public void setAsDefineLater(Long toolContentID) throws DataMissingException, ToolException
+    public void setAsDefineLater(Long toolContentID, boolean value) throws DataMissingException, ToolException
     {
     	logger.debug("request for setAsDefineLater with toolContentID: " + toolContentID);
     	if  (toolContentID == null)
@@ -1256,7 +1234,7 @@ public class QaServicePOJO
     		logger.debug("throwing DataMissingException: WARNING!: retrieved qaContent is null.");
             throw new DataMissingException("qaContent is missing");
     	}
-    	qaContent.setDefineLater(true);
+    	qaContent.setDefineLater(value);
     	updateQa(qaContent);
     	logger.debug("qaContent has been updated for defineLater: " + qaContent);
     }
@@ -1268,7 +1246,7 @@ public class QaServicePOJO
      * @param toolContentID
      * return void
      */
-    public void setAsRunOffline(Long toolContentID) throws DataMissingException, ToolException
+    public void setAsRunOffline(Long toolContentID, boolean value) throws DataMissingException, ToolException
     {
     	logger.debug("request for setAsRunOffline with toolContentID:" + toolContentID);
     	if  (toolContentID == null)
@@ -1282,7 +1260,7 @@ public class QaServicePOJO
     		logger.debug("throwing DataMissingException: WARNING!: retrieved qaContent is null.");
             throw new DataMissingException("qaContent is missing");
     	}
-    	qaContent.setRunOffline(true);
+    	qaContent.setRunOffline(value);
     	updateQa(qaContent);
     	logger.debug("qaContent has been updated for runOffline: " + qaContent);
     }

@@ -85,6 +85,8 @@
     <property name="applyGrouping" type="java.lang.Boolean" column="apply_grouping_flag" not-null="true" length="4"/>
     <property name="groupingSupportType" type="java.lang.Integer" column="grouping_support_type_id" length="11"/>
     <property name="languageFile" type="java.lang.String" column="language_file" length="255"/>
+    <property name="readOnly" type="java.lang.Boolean" column="read_only"/>
+    <property name="initialised" type="java.lang.Boolean" column="initialised"/>
 
     <!-- Associations -->
     
@@ -212,6 +214,9 @@
 						<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 					</subclass>
 					<subclass name="org.lamsfoundation.lams.learningdesign.PermissionGateActivity" discriminator-value="5">
+						<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+					</subclass>
+					<subclass name="org.lamsfoundation.lams.learningdesign.SystemGateActivity" discriminator-value="9">
 						<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 					</subclass>
 				</subclass>			

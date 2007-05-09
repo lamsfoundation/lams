@@ -150,8 +150,10 @@ public interface WDDXTAGS {
 	public static final String MAX_ID ="maxID";
 	public static final String VALID_DESIGN ="validDesign";
 	public static final String READ_ONLY ="readOnly";
+	public static final String EDIT_OVERRIDE_LOCK ="editOverrideLock";
 	public static final String DATE_READ_ONLY ="dateReadOnly";
 	public static final String USER_ID="userID";
+	public static final String EDIT_OVERRIDE_USER_ID="editOverrideUserID";
 	
 	public static final String COPY_TYPE="copyTypeID";
 	public static final String CREATION_DATE ="createDateTime";

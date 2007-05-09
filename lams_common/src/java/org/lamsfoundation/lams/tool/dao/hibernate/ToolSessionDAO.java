@@ -49,6 +49,8 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
     protected static final String LOAD_GROUPED_TOOL_SESSION_BY_GROUP2 = 
         "select s from GroupedToolSession as s inner join s.sessionGroup as sg inner join sg.users as u "
     	+" where :learner = u and s.toolActivity = :activity";
+    protected static final String LOAD_TOOL_SESSION_BY_ACTIVITY = 
+        "from ToolSession s where s.toolActivity = :activity";
     protected static final String LOAD_TOOL_SESSION_BY_LESSON =  
         "from ToolSession s where s.lesson = :lesson";
 
@@ -88,6 +90,21 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
 		
 	}
 
+	/**
+	 * Get the tool session by activity. A class-grouped activity should have only one tool session,
+	 * per activity but a proper grouped activity or an individial activity may have more
+	 * than one tool sesssion.
+	 * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#getToolSessionByActivity(org.lamsfoundation.lams.learningdesign.Activity)
+	 * @returns List of toolSessions, may be of subclass NonGroupedToolSession or GroupedToolSession
+	 */
+	public List getToolSessionByActivity(final Activity activity)
+	{
+		Query query = this.getSession().createQuery(LOAD_TOOL_SESSION_BY_ACTIVITY);
+		query.setParameter("activity",activity);
+		return (List) query.list();
+	}
+	
+		
     public void saveToolSession(ToolSession toolSession)
     {
         getHibernateTemplate().save(toolSession);

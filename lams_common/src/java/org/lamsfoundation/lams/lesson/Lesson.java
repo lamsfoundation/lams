@@ -75,6 +75,9 @@ public class Lesson implements Serializable {
     /** identifier field */
     private Long lessonId;
     
+	/** Hibernate managed version field */
+	private Integer version;
+
     /** persistent field */
     private String lessonName;
     
@@ -120,6 +123,9 @@ public class Lesson implements Serializable {
     /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
     private Boolean learnerExportAvailable;
     
+    /** Persistent field. Defaults to FALSE - is not included in the constructor anywhere. */
+    private Boolean lockedForEdit;
+
     //---------------------------------------------------------------------
     // constructors
     //---------------------------------------------------------------------
@@ -137,7 +143,7 @@ public class Lesson implements Serializable {
     		LearningDesign learningDesign,Set learnerProgresses) 
     {
         this(null,name,description,createDateTime,null,null,user,lessonStateId,previousLessonStateId,
-        		learnerExportAvailable,learningDesign,null,null,learnerProgresses);
+        		learnerExportAvailable,false, learningDesign,null,null,learnerProgresses);
     }     
     
     /** 
@@ -150,12 +156,12 @@ public class Lesson implements Serializable {
     		Organisation organisation, Set learnerProgresses) 
     {
         this(null,name,description,createDateTime,null,null,user,lessonStateId,previousLessonStateId,
-        		learnerExportAvailable, learningDesign,lessonClass,organisation,learnerProgresses);
+        		learnerExportAvailable, false, learningDesign,lessonClass,organisation,learnerProgresses);
     }    
     
     /** full constructor */
     public Lesson(Long lessonId,String name,String description, Date createDateTime, Date startDateTime, Date endDateTime, User user, 
-    		Integer lessonStateId, Integer previousLessonStateId, Boolean learnerExportAvailable, 
+    		Integer lessonStateId, Integer previousLessonStateId, Boolean learnerExportAvailable,  Boolean lockedForEdit,
     		LearningDesign learningDesign, LessonClass lessonClass, 
     		Organisation organisation, Set learnerProgresses) 
     {
@@ -169,6 +175,7 @@ public class Lesson implements Serializable {
         this.lessonStateId = lessonStateId;
         this.previousLessonStateId = previousLessonStateId;
         this.learnerExportAvailable = learnerExportAvailable != null ? learnerExportAvailable : Boolean.FALSE;
+        this.lockedForEdit = false;
         this.learningDesign = learningDesign;
         this.lessonClass = lessonClass;
         this.organisation = organisation;
@@ -249,7 +256,20 @@ public class Lesson implements Serializable {
         this.lessonId = lessonId;
     }
 
-    /**
+    /** 
+     * Hibernate version column - updated automatically
+     * 
+     * @hibernate.version  type="java.lang.Integer"
+     *                column="version"
+     */
+	public Integer getVersion() {
+		return this.version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+   /**
 	 * @hibernate.property column="name" length="255" not-null="true"
      * @return Returns the lessonName.
      */
@@ -396,6 +416,18 @@ public class Lesson implements Serializable {
 
 	public void setLearnerExportAvailable(Boolean learnerExportAvailable) {
 		this.learnerExportAvailable = learnerExportAvailable;
+	}
+
+	/** 
+     * @hibernate.property type="java.lang.Boolean"  column="locked_for_edit"
+     *            	       length="1"
+     */
+ 	public Boolean getLockedForEdit() {
+		return lockedForEdit;
+	}
+
+	public void setLockedForEdit(Boolean lockedForEdit) {
+		this.lockedForEdit = lockedForEdit;
 	}
 
 	/** 

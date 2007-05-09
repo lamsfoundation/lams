@@ -356,6 +356,9 @@ CREATE TABLE lams_learning_design (
      , license_text TEXT
      , last_modified_date_time DATETIME
      , content_folder_id VARCHAR(32)
+     , edit_override_lock TINYINT DEFAULT 0
+     , edit_override_user_id BIGINT(20)
+     , design_version INTEGER DEFAULT 1
      , PRIMARY KEY (learning_design_id)
      , INDEX (user_id)
      , CONSTRAINT FK_lams_learning_design_3 FOREIGN KEY (user_id)
@@ -369,6 +372,9 @@ CREATE TABLE lams_learning_design (
      , INDEX (copy_type_id)
      , CONSTRAINT FK_lams_learning_design_6 FOREIGN KEY (copy_type_id)
                   REFERENCES lams_copy_type (copy_type_id)
+     , INDEX (edit_override_user_id)
+     , CONSTRAINT FK_lams_learning_design_7 FOREIGN KEY (edit_override_user_id)
+                  REFERENCES lams_user (user_id)
 )TYPE=InnoDB;
 CREATE INDEX idx_design_parent_id ON lams_learning_design (original_learning_design_id ASC);
 CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
@@ -506,6 +512,8 @@ CREATE TABLE lams_learning_activity (
      , library_activity_id BIGINT(20)
      , language_file VARCHAR(255)
      , system_tool_id BIGINT(20)
+     , read_only TINYINT DEFAULT 0
+     , initialised TINYINT DEFAULT 0
      , PRIMARY KEY (activity_id)
      , INDEX (learning_library_id)
      , CONSTRAINT FK_lams_learning_activity_7 FOREIGN KEY (learning_library_id)
@@ -560,7 +568,9 @@ CREATE TABLE lams_lesson (
      , end_date_time DATETIME
      , schedule_end_date_time DATETIME
      , previous_state_id INT(3)
-     , learner_exportport_avail TINYINT(1)
+     , learner_exportport_avail TINYINT(1) DEFAULT 1
+     , locked_for_edit TINYINT DEFAULT 0
+     , version INTEGER DEFAULT 1
      , PRIMARY KEY (lesson_id)
      , INDEX (learning_design_id)
      , CONSTRAINT FK_lams_lesson_1_1 FOREIGN KEY (learning_design_id)

@@ -91,6 +91,8 @@ function authoring_DoFSCommand(command, args) {
 		closeWindow();
 	}else if(command == "openURL"){
 		openURL(args, "_blank");
+	}else if(command == "openMonitorLesson") {
+		openMonitorLesson(args);
 	}
 
 }
@@ -235,17 +237,22 @@ function myOnBeforeUnload(){
 	}
 }
 
+function openMonitorLesson(lessonID) {
+	window.opener.openMonitorLesson(lessonID);
+}
+		
+
 if(window.attachEvent) { window.attachEvent("onbeforeunload", myOnBeforeUnload); }
 else { window.onbeforeunload = myOnBeforeUnload; }
 	
 //-->
 </script>
 
-<TITLE>Author :: LAMS</TITLE>
+<TITLE><fmt:message key="title.author.window"/></TITLE>
 </HEAD>
 <body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
-<c:set var="authorurl_params">?loadFile=lams_authoring.swf&loadLibrary=lams_authoring_library.swf&userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&actColour=<%= actColour %><c:if test="${not empty requestSrc}">&requestSrc=${requestSrc}</c:if>&uniqueID=<lams:generateID/></c:set>
+<c:set var="authorurl_params">?loadFile=lams_authoring.swf&loadLibrary=lams_authoring_library.swf&userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&actColour=<%= actColour %><c:if test="${not empty requestSrc}">&requestSrc=${requestSrc}</c:if><c:if test="${not empty learningDesignID}">&learningDesignID=${learningDesignID}</c:if><c:if test="${not empty layout}">&layout=${layout}</c:if>&uniqueID=<lams:generateID/></c:set>
 <c:set var="authorurl_nojs">lams_preloader.swf<c:out value="${authorurl_params}"/></c:set>
 <c:set var="authorurl_js">lams_preloader<c:out value="${authorurl_params}"/></c:set>
 

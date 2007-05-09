@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
+import org.lamsfoundation.lams.learningdesign.SystemGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 /**
@@ -181,6 +182,13 @@ public class AuthoringActivityDTO extends BaseDTO{
 	
 	private Integer createGroupingUIID;
 	
+	private Boolean readOnly;
+
+	/** An activity is initialised if it is ready to be used in lesson ie the tool content
+	 * is set up, schedule gates are scheduled, etc. Used to detect which activities
+	 * need to be initialised for live edit. */
+	private Boolean initialised;
+
 	/* Server will send Grouping objects as an array (in the Groupings array)
 	 * rather than being part of the GroupingActivity. For the groupings array
 	 * see LearningDesignDTO.
@@ -215,7 +223,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 			String libraryActivityUiImage, Long createGroupingID,
 			Integer createGroupingUIID, Long libraryActivityID,
 			Boolean applyGrouping,Integer groupingSupportType,
-			Integer groupingType,GroupingDTO groupingDTO) {
+			Integer groupingType,GroupingDTO groupingDTO, 
+			Boolean readOnly, Boolean initialised) {
 		super();
 		this.activityID = activityID;
 		this.activityUIID = activityUIID;
@@ -257,6 +266,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.groupingSupportType = groupingSupportType;
 		this.groupingType = groupingType;
 		//this.groupingDTO = groupingDTO;
+		this.readOnly = readOnly;
+		this.initialised = initialised;
 	}
 	public AuthoringActivityDTO(ToolActivity toolActivity){
 		super();
@@ -302,6 +313,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 								 null;	
 		this.applyGrouping = activity.getApplyGrouping();
 		this.groupingSupportType = activity.getGroupingSupportType();
+		this.readOnly = activity.getReadOnly();
+		this.initialised = activity.isInitialised();
 	}
 	
 	
@@ -360,6 +373,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 			addSynchGateActivityAttributes((SynchGateActivity)activity);
 		else if (activity instanceof PermissionGateActivity)
 			addPermissionGateActivityAttributes((PermissionGateActivity)activity);
+		else if(activity instanceof SystemGateActivity)
+			addSystemGateActivityAttributes((SystemGateActivity)activity);
 		else
 			addScheduleGateActivityAttributes((ScheduleGateActivity)activity);
 		GateActivity gateActivity = (GateActivity)activity ;
@@ -370,6 +385,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 	private void addSynchGateActivityAttributes(SynchGateActivity activity){	
 	}
 	private void addPermissionGateActivityAttributes(PermissionGateActivity activity){		
+	}
+	private void addSystemGateActivityAttributes(SystemGateActivity activity){	
 	}
 	private void addScheduleGateActivityAttributes(ScheduleGateActivity activity){
 		this.gateStartDateTime = activity.getGateStartDateTime();
@@ -873,6 +890,21 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.groupingDTO = groupingDTO;
 	}	 */
 	
+	/**
+	 * @return Returns the readOnly.
+	 */
+	public Boolean getReadOnly() {
+		return readOnly;
+	}
+	/**
+	 * 
+	 * @param readOnly The readOnly to set.
+	 */
+	public void setReadOnly(Boolean readOnly) {
+		if(!readOnly.equals(WDDXTAGS.BOOLEAN_NULL_VALUE))
+			this.readOnly = readOnly;
+	}
+	
 	/** Get the authoring url related to this tool */
 	public String getAuthoringURL() {
 		return authoringURL;
@@ -934,5 +966,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 	}
 	public void setToolVersion(String toolVersion) {
 		this.toolVersion = toolVersion;
+	}
+	public Boolean getInitialised() {
+		return initialised;
+	}
+	public void setInitialised(Boolean initialised) {
+		this.initialised = initialised;
 	}
 }

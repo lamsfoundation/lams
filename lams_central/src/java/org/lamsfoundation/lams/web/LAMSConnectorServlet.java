@@ -80,6 +80,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 	
 	private static String baseDir;
 	private String realBaseDir;
+	private String lamsContextPath;
 	private static boolean debug=false;
 	
 	/**
@@ -96,6 +97,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 			baseDir="secure";
 		
 		realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + baseDir;
+		lamsContextPath = "/" + Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH) +"/";
 		
 		File baseFile=new File(realBaseDir);
 		if(!baseFile.exists()){
@@ -127,7 +129,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 		String currentDirPath=realBaseDir + currentFolderStr;
 		String validCurrentDirPath = currentDirPath.replace('/', File.separatorChar);
 		
-		String currentWebPath= "/" + AuthoringConstants.LAMS_LAMS_FOLDER + AuthoringConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR + currentFolderStr + typeStr + "/";
+		String currentWebPath= lamsContextPath + AuthoringConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR + currentFolderStr + typeStr + "/";
 		
 		File currentContentDir=new File(validCurrentDirPath);
 		if(!currentContentDir.exists()){

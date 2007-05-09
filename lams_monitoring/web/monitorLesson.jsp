@@ -51,6 +51,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				openURL(args);
 			}else if(command == "closeWindowRefresh") {
 				closeWindowRefresh();
+			}else if(command == "openAuthorForEditOnFly") {
+				openAuthorForEditOnFly(args);
 			}
 			
 		}
@@ -108,6 +110,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			closeWindow();
 		}
 		
+		function openAuthorForEditOnFly(learningDesignID) {
+			window.opener.openAuthorForEditOnFly(learningDesignID);
+		}
+		
 		function openURL(args){
 			window.open(args, "_blank");
 		}
@@ -124,10 +130,11 @@ String serverLanguage = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 String languageDate = Configuration.get(ConfigurationKeys.DICTIONARY_DATE_CREATED);
 String actColour = Configuration.get(ConfigurationKeys.AUTHORING_ACTS_COLOUR);
 String allowDirectLessonLaunch = Configuration.get(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH);
+String allowEditOnFly = Configuration.get(ConfigurationKeys.ALLOW_EDIT_ON_FLY);
 %>
 
 	<%-- lessonID is passed in as request parameters by addLesson.jsp in lams_central. --%>
-	<c:set var="monitorurl_params">?loadFile=monitoring/lams_monitoring.swf&loadLibrary=monitoring/lams_monitoring_library.swf&userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&actColour=<%= actColour %>&lessonLaunch=<%=allowDirectLessonLaunch%></c:set>
+	<c:set var="monitorurl_params">?loadFile=monitoring/lams_monitoring.swf&loadLibrary=monitoring/lams_monitoring_library.swf&userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&actColour=<%= actColour %>&lessonLaunch=<%=allowDirectLessonLaunch%>&editOnFly=<%=allowEditOnFly%></c:set>
 	<c:set var="monitorurl_js">../lams_preloader<c:out value="${monitorurl_params}"/></c:set>
 	<c:set var="monitorurl_nojs">../lams_preloader.swf<c:out value="${monitorurl_params}"/></c:set>
 

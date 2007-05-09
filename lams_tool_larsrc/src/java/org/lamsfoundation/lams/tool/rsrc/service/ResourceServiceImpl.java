@@ -928,21 +928,21 @@ public class ResourceServiceImpl implements
 	}
 
 
-	public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 		Resource resource = resourceDao.getByContentId(toolContentId);
 		if(resource == null){
 			throw new ToolException("No found tool content by given content ID:" + toolContentId);
 		}
-		resource.setDefineLater(true);
+		resource.setDefineLater(value);
 	}
 
 
-	public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException {
+	public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 		Resource resource = resourceDao.getByContentId(toolContentId);
 		if(resource == null){
 			throw new ToolException("No found tool content by given content ID:" + toolContentId);
 		}
-		resource.setRunOffline(true);		
+		resource.setRunOffline(value);		
 	}
 
 

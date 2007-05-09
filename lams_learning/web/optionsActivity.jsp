@@ -114,8 +114,8 @@
 
 	<html:form action="/CompleteActivity" method="POST">
 		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
-		<input type="hidden" name="activityID" value="<c:out value="${optionsActivityForm.activityID}" />" />
-		
+		<input type="hidden" name="activityID" value="<c:out value='${optionsActivityForm.activityID}' />" />
+		<input type="hidden" name="lessonID" value="<c:out value='${optionsActivityForm.lessonID}' />" /> 
 	</html:form>
 
 	</div>  <!--closes content-->

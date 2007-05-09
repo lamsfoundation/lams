@@ -92,6 +92,13 @@ public class LearningDesign implements Serializable {
 	/** nullable persistent field */
 	private Date dateReadOnly;
 
+	 /** Override the read only field. When set to true, the user
+	  * specified in editOverrideUser can edit the learning design. Used by edit
+	  * on the fly. */
+   private Boolean editOverrideLock;
+   private User editOverrideUser;
+   private Integer designVersion;
+   
 	/** nullable persistent field */
 	private String helpText;
 
@@ -146,7 +153,6 @@ public class LearningDesign implements Serializable {
 	 /** Online Instructions for this activity*/
     private String onlineInstructions;
 	
-
     /* If the values for createDateTime and/or lastModifiedDateTime
      * are null, then it will default to the current datetime.
      */
@@ -175,7 +181,10 @@ public class LearningDesign implements Serializable {
 			License license,
 			String offlineInstructions,
 			String onlineInstructions,
-			String contentFolderID
+			String contentFolderID,
+			Boolean editOverrideLock,
+			User editOverrideUser,
+			Integer designVersion
 			) {
 		this.learningDesignId = learningDesignId;
 		this.learningDesignUIID = ui_id;
@@ -203,6 +212,9 @@ public class LearningDesign implements Serializable {
 		this.onlineInstructions = onlineInstructions;
 		this.contentFolderID = contentFolderID;
 		this.lastModifiedDateTime = new Date();
+		this.editOverrideLock = editOverrideLock;
+		this.editOverrideUser = editOverrideUser;
+		this.designVersion = designVersion;
 	}
 
 	/** default constructor */
@@ -210,6 +222,8 @@ public class LearningDesign implements Serializable {
 	    //set the default values to the current datetime
 	    this.createDateTime = new Date();
 	    this.lastModifiedDateTime = new Date();
+	    this.editOverrideLock = false;
+	    this.designVersion = new Integer(1);
 	}
 
 	/** minimal constructor */
@@ -237,6 +251,8 @@ public class LearningDesign implements Serializable {
 		this.transitions = transitions;
 		this.activities = activities;
 		this.lastModifiedDateTime = new Date();
+		this.editOverrideLock = false;
+		this.designVersion = new Integer(1);
 	}
 	/** Create a new learning design based on an existing learning design. If setOriginalDesign is true, then set the input design
 	 * as the original design in the copied design - this is used when runtime copies of a design are created. It is not used
@@ -251,7 +267,8 @@ public class LearningDesign implements Serializable {
 		newDesign.setDescription(design.getDescription());
 		newDesign.setTitle(design.getTitle());		
 		newDesign.setMaxID(design.getMaxID());
-		newDesign.setValidDesign(design.getValidDesign());		
+		newDesign.setValidDesign(design.getValidDesign());
+		newDesign.setDesignVersion(design.getDesignVersion());
 		newDesign.setDateReadOnly(design.getDateReadOnly());
 		newDesign.setHelpText(design.getHelpText());
 		newDesign.setVersion(design.getVersion());
@@ -271,6 +288,8 @@ public class LearningDesign implements Serializable {
 		
 		newDesign.setCopyTypeID(designCopyType);
 		newDesign.setContentFolderID(design.getContentFolderID());
+		newDesign.setEditOverrideLock(design.getEditOverrideLock());
+		newDesign.setEditOverrideUser(design.getEditOverrideUser());
 		return newDesign;
 	}	
 
@@ -328,6 +347,27 @@ public class LearningDesign implements Serializable {
 	}
 	public void setDateReadOnly(Date dateReadOnly) {
 		this.dateReadOnly = dateReadOnly;
+	}
+	 /** Override the read only field. When set to true, the user
+	  * specified in editOverrideUser can edit the learning design. 
+	  * Used by edit on the fly. */
+	public Boolean getEditOverrideLock() {
+		return editOverrideLock;
+	}
+	public void setEditOverrideLock(Boolean editOverrideLock) {
+		this.editOverrideLock = editOverrideLock;
+	}
+	public User getEditOverrideUser() {
+		return editOverrideUser;
+	}
+	public void setEditOverrideUser(User editOverrideUser) {
+		this.editOverrideUser = editOverrideUser;
+	}
+	public void setDesignVersion(Integer designVersion) {
+		this.designVersion = designVersion;
+	}
+	public Integer getDesignVersion() {
+		return designVersion;
 	}
 	public String getHelpText() {
 		return helpText;

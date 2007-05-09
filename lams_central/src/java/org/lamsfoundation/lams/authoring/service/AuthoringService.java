@@ -35,6 +35,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -45,10 +46,12 @@ import org.lamsfoundation.lams.authoring.IObjectExtractor;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.License;
+import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
@@ -64,8 +67,14 @@ import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
+import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
+import org.lamsfoundation.lams.tool.dao.hibernate.SystemToolDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -82,7 +91,6 @@ import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-
 
 /**
  * @author Manpreet Minhas 
@@ -101,9 +109,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	protected LicenseDAO licenseDAO;
 	protected GroupingDAO groupingDAO;
 	protected GroupDAO groupDAO;
+	protected SystemToolDAO systemToolDAO;
 	protected ILamsCoreToolService lamsCoreToolService;
 	protected ILearningDesignService learningDesignService;
 	protected MessageService messageService;
+	protected ILessonService lessonService;
+	protected IMonitoringService monitoringService;
 	
 	protected ToolContentIDGenerator contentIDGenerator;
 	
@@ -171,6 +182,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		this.toolDAO = toolDAO;
 	}
 	/**
+	 * @param toolDAO The toolDAO to set 
+	 */
+	public void setSystemToolDAO(SystemToolDAO systemToolDAO) {
+		this.systemToolDAO = systemToolDAO;
+	}
+	/**
 	 * @param licenseDAO The licenseDAO to set
 	 */
 	public void setLicenseDAO(LicenseDAO licenseDAO) {
@@ -195,6 +212,23 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	public void setLearningDesignService(ILearningDesignService learningDesignService) {
 		this.learningDesignService = learningDesignService;
 	}	
+
+	public MessageService getMessageService() {
+		return messageService;
+	}
+
+	public ILessonService getLessonService() {
+		return lessonService;
+	}
+
+	public void setLessonService(ILessonService lessonService) {
+		this.lessonService = lessonService;
+	}
+
+	public void setMonitoringService(IMonitoringService monitoringService) {
+		this.monitoringService = monitoringService;
+	}
+
 
     /**
      * @param contentIDGenerator The contentIDGenerator to set.
@@ -248,14 +282,385 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	 */
 	public String getLearningDesignDetails(Long learningDesignID)throws IOException{
 		FlashMessage flashMessage= null;
+
 		LearningDesignDTO learningDesignDTO = learningDesignService.getLearningDesignDTO(learningDesignID);
+		
 		if(learningDesignDTO==null)
 			flashMessage = FlashMessage.getNoSuchLearningDesignExists("getLearningDesignDetails",learningDesignID);
 		else{
 			flashMessage = new FlashMessage("getLearningDesignDetails",learningDesignDTO);
 		}
 		return flashMessage.serializeMessage();
-	}	
+	}
+
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#isLearningDesignAvailable(LearningDesign, java.lang.Integer)
+	 */
+	public boolean isLearningDesignAvailable(LearningDesign design, Integer userID) throws LearningDesignException, IOException {
+		if(design == null)
+			throw new LearningDesignException(FlashMessage.getNoSuchLearningDesignExists("getLearningDesignDetails",design.getLearningDesignId()).serializeMessage());
+		
+		if(design.getEditOverrideUser() != null && design.getEditOverrideLock() != null)
+			return (design.getEditOverrideUser().getUserId().equals(userID)) ? true : !design.getEditOverrideLock();
+		else
+			return true;
+	}
+	
+	private void setLessonLock(LearningDesign design, boolean lock) {
+		Lesson lesson = null;
+		
+		// lock active lesson
+		Set lessons = design.getLessons();
+		Iterator it = lessons.iterator();
+		
+		while(it.hasNext()) {
+			lesson = (Lesson) it.next();
+			lesson.setLockedForEdit(lock);
+		}
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#setupEditOnFlyLock(LearningDesign, java.lang.Integer)
+	 */
+	public boolean setupEditOnFlyLock(Long learningDesignID, Integer userID) throws LearningDesignException, UserException, IOException {
+		User user = (User)baseDAO.find(User.class,userID);
+		
+		LearningDesign design = learningDesignID!=null ? getLearningDesign(learningDesignID) : null;
+		
+		if(isLearningDesignAvailable(design, userID)) {
+		
+			if(design.getLessons().isEmpty())
+				throw new LearningDesignException("There are no lessons attached to the design."); // TODO: add error msg
+			else if(user==null)
+				throw new UserException(messageService.getMessage("no.such.user.exist",new Object[]{userID}));
+			
+			setLessonLock(design, true);
+				
+			// lock Learning Design
+			design.setEditOverrideLock(true);
+			design.setEditOverrideUser(user);
+				
+			learningDesignDAO.update(design);
+			
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#setupEditOnFlyGate(java.lang.Long, java.lang.Integer)
+	 */
+	public String setupEditOnFlyGate(Long learningDesignID, Integer userID) throws UserException, IOException {
+		User user = (User)baseDAO.find(User.class,userID);
+		LearningDesign design = learningDesignID!=null ? getLearningDesign(learningDesignID) : null;
+		
+		if(user==null)
+			throw new UserException(messageService.getMessage("no.such.user.exist",new Object[]{userID}));
+		
+		EditOnFlyProcessor processor = new EditOnFlyProcessor(design, activityDAO);			/* parse Learning Design to find last read-only Activity */
+	   	processor.parseLearningDesign();
+			
+	   	ArrayList<Activity> activities = processor.getLastReadOnlyActivity();
+		addSystemGateAfterActivity(activities, design);										/* add new System Gate after last read-only Activity */
+		
+		setLessonLock(design, false);
+		
+		learningDesignDAO.update(design);
+		
+		return new FlashMessage("setupEditOnFlyGate", true).serializeMessage();
+	}
+	
+	
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#finishEditOnFly(java.lang.Long, java.lang.Integer)
+	 */
+	public String finishEditOnFly(Long learningDesignID, Integer userID) throws IOException {
+		FlashMessage flashMessage= null;
+		Lesson lesson = null;
+		
+		LearningDesign design = learningDesignID!=null ? learningDesignDAO.getLearningDesignById(learningDesignID) : null;
+		
+		User user = (User)baseDAO.find(User.class,userID);
+		if(user==null)
+			flashMessage = FlashMessage.getNoSuchUserExists("finishEditOnFly", userID);
+		
+		if(design != null) {											/* only the user who is editing the design may unlock it */
+			if(design.getEditOverrideUser().equals(user)) {
+				design.setEditOverrideLock(false);
+				design.setEditOverrideUser(null);
+				
+				Set lessons = design.getLessons();						/* unlock lesson */
+				
+				Iterator it = lessons.iterator();
+				while(it.hasNext()) {
+					lesson = (Lesson) it.next();
+					lesson.setLockedForEdit(false);
+				}
+				
+				EditOnFlyProcessor processor = new EditOnFlyProcessor(design, activityDAO);		/* parse Learning Design to find last read-only Activity (hopefully the system gate in this case) */
+		   		processor.parseLearningDesign();
+				
+		   		ArrayList<Activity> activities = processor.getLastReadOnlyActivity();
+		   		
+		   		GateActivity gate = null;														/* open and release waiting list on system gate */
+				
+		   		if(activities != null)
+					if(!activities.isEmpty() && activities.get(0).isGateActivity())
+						gate = (GateActivity) activities.get(0);
+					
+				if(gate != null)
+					design = removeTempSystemGate(gate, design);								/* remove inputted system gate */
+				
+				lessonService.performMarkLessonUncompleted(lesson.getLessonId());				/* the lesson may now have additional activities on the end, so clear any completed flags */
+
+				initialiseToolActivityForRuntime(design, lesson);
+				learningDesignDAO.insertOrUpdate(design);
+			
+				flashMessage = new FlashMessage("finishEditOnFly", lesson.getLessonId());
+				
+			} else {
+				flashMessage = FlashMessage.getNoSuchUserExists("finishEditOnFly", userID);
+			}
+		} else {
+			
+			flashMessage = FlashMessage.getNoSuchLearningDesignExists("finishEditOnFly", learningDesignID);
+		}
+		
+		return flashMessage.serializeMessage();
+		
+	}
+	
+	/** 
+	 * Remove a temp. System Gate from the design. Requires removing the gate from any learner progress entries  - should only
+	 * be a current activity but remove it from previous and next, just in case.
+	 * 
+	 * This will leave a "hole" in the learner progress, but the progress engine can take care of that.
+	 * @param gate
+	 * @param design
+	 * @return Learning Design with removed System Gate
+	 */
+	public LearningDesign removeTempSystemGate(GateActivity gate, LearningDesign design) {
+		Transition toTransition = gate.getTransitionTo();								/* get transitions */
+		Transition fromTransition = gate.getTransitionFrom();
+
+		if(toTransition != null && fromTransition != null) {							/* rearrange to-transition and/or delete redundant transition */	
+			toTransition.setToActivity(fromTransition.getToActivity());
+			toTransition.setToUIID(toTransition.getToActivity().getActivityUIID());
+			
+			design.getTransitions().remove(fromTransition);
+			transitionDAO.update(toTransition);
+			
+		} else if(toTransition != null && fromTransition == null) {
+			design.getTransitions().remove(toTransition);
+		} else if(toTransition == null && fromTransition != null) {
+			design.setFirstActivity(fromTransition.getToActivity());
+			design.getTransitions().remove(fromTransition);
+		}
+		
+		design.getActivities().remove(gate);											/* remove temp system gate */
+		
+		design.setDesignVersion(design.getDesignVersion() + 1);							/* increment design version field */
+		
+		lessonService.removeProgressReferencesToActivity(gate);							/* need to remove it from any learner progress entries */
+
+		return design;
+	}
+	
+	/**
+	 * Add a temp. System Gate. to the design.
+	 * 
+	 * @param activities
+	 * @param design
+	 */
+	public void addSystemGateAfterActivity(ArrayList<Activity> activities, LearningDesign design) {
+		GateActivity gate = null;
+		
+		Integer syncType = new Integer(Activity.SYSTEM_GATE_ACTIVITY_TYPE); 
+		Integer activityType = new Integer(Activity.SYSTEM_GATE_ACTIVITY_TYPE);
+		Integer maxId = design.getMaxID();
+		String title = "System Gate"; 														/* messageService.getMessage(MSG_KEY_SYNC_GATE); */
+
+		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.SYSTEM_GATE);		
+		Activity activity = (activities.isEmpty()) ? null : (Activity) activities.get(0);
+		
+		try {																					/* create new System Gate Activity */
+			gate = (GateActivity) Activity.getActivityInstance(syncType.intValue());
+			gate.setActivityTypeId(activityType.intValue());
+			gate.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+			gate.setSystemTool(systemTool);
+			gate.setActivityUIID(++maxId);
+			gate.setTitle(title!=null?title:"Gate");
+			gate.setGateOpen(false);
+			gate.setWaitingLearners(null);
+			gate.setGateActivityLevelId(GateActivity.LEARNER_GATE_LEVEL);
+			gate.setApplyGrouping(false); // not nullable so default to false
+			gate.setGroupingSupportType(Activity.GROUPING_SUPPORT_OPTIONAL);
+			gate.setOrderId(null); 
+			gate.setDefineLater(Boolean.FALSE);
+			gate.setCreateDateTime(new Date());
+			gate.setRunOffline(Boolean.FALSE);
+			gate.setReadOnly(Boolean.TRUE);
+			gate.setLearningDesign(design);
+				
+			design.getActivities().add(gate);
+			baseDAO.insert(gate);
+			
+			Transition fromTransition;
+			Transition newTransition = new Transition();
+			Activity toActivity = null;
+			
+			if(activity != null) {
+				fromTransition = activity.getTransitionFrom();				/* update transitions */
+				
+				if(fromTransition != null) {
+					toActivity = fromTransition.getToActivity();
+					
+					fromTransition.setToActivity(gate);
+					fromTransition.setToUIID(gate.getActivityUIID());
+				
+					newTransition.setTransitionUIID(++maxId);
+					newTransition.setFromActivity(gate);
+					newTransition.setFromUIID(gate.getActivityUIID());
+					newTransition.setToActivity(toActivity);
+					newTransition.setToUIID(toActivity.getActivityUIID());
+					newTransition.setLearningDesign(design);
+					
+					gate.setTransitionFrom(newTransition);
+					
+					toActivity.setTransitionTo(newTransition);
+	
+					Integer x1 = (activity.getXcoord() != null) ? activity.getXcoord() : 0;				/* set x/y position for Gate */
+			    	Integer x2 = (toActivity.getXcoord() != null) ? toActivity.getXcoord() : 0;
+			    	
+			    	gate.setXcoord(new Integer(((x1.intValue() + 123 + x2.intValue()) / 2) - 13));
+			    	
+			    	Integer y1 = (activity.getYcoord() != null) ? activity.getYcoord() : 0;
+			    	Integer y2 = (toActivity.getYcoord() != null) ? toActivity.getYcoord() : 0;
+			    	
+			    	gate.setYcoord(new Integer((y1.intValue() + 50 + y2.intValue()) / 2));
+					
+				} else {
+					//fromTransition = newTransition;
+					
+					newTransition.setTransitionUIID(++maxId);
+					newTransition.setFromActivity(activity);
+					newTransition.setFromUIID(activity.getActivityUIID());
+					newTransition.setToActivity(gate);
+					newTransition.setToUIID(gate.getActivityUIID());
+					newTransition.setLearningDesign(design);
+					
+					activity.setTransitionFrom(fromTransition);
+					gate.setTransitionTo(fromTransition);
+					
+					Integer	x1 = (activity.getTransitionTo() != null) ? activity.getTransitionTo().getFromActivity().getXcoord() : 0;		/* set x/y position for Gate */
+					Integer x2 = (activity.getXcoord() != null) ? activity.getXcoord() : 0;
+			    	
+					if(x1 != null && x2 != null) gate.setXcoord(x2>=x1 ? new Integer(x2.intValue()+123+13+20) : new Integer(x2.intValue()-13-20));
+					else gate.setXcoord(new Integer(x2.intValue()+123+13+20));
+					
+					gate.setYcoord(activity.getYcoord() + 25);
+				}
+				
+			} else {
+				fromTransition = newTransition;								/* no read-only activities insert gate at start of sequence */
+				toActivity = design.getFirstActivity();
+				
+				newTransition.setTransitionUIID(++maxId);
+				newTransition.setToActivity(toActivity);
+				newTransition.setToUIID(toActivity.getActivityUIID());
+				newTransition.setFromActivity(gate);
+				newTransition.setFromUIID(gate.getActivityUIID());
+				newTransition.setLearningDesign(design);
+				
+				gate.setTransitionFrom(fromTransition);
+				toActivity.setTransitionTo(fromTransition);
+				
+				gate.setGateOpen(false);									/* keep gate door closed to stop learner's from going past this point */
+				
+				design.setFirstActivity(gate);								/* set gate as first activity in sequence */
+				
+				Integer x1 = (toActivity.getXcoord() != null) ? toActivity.getXcoord() : 0;														/* set x/y position for Gate */
+				Integer	x2 = (toActivity.getTransitionFrom() != null) ? toActivity.getTransitionFrom().getToActivity().getXcoord() : null;
+				
+				if(x1 != null && x2 != null) gate.setXcoord(x2>=x1 ? new Integer(x1.intValue()-13-20) : new Integer(x1.intValue()+123+13+20));
+				else gate.setXcoord(new Integer(x1.intValue()-13-20));
+				
+				gate.setYcoord(toActivity.getYcoord() + 25);
+			}
+			
+			design.getTransitions().add(newTransition);
+			design.setMaxID(maxId);
+			
+			design.setDesignVersion(design.getDesignVersion() + 1);					/* increment design version field */
+			
+			if(gate != null) activityDAO.update(gate);
+			if(activity != null) activityDAO.update(activity);
+			if(toActivity != null) activityDAO.update(toActivity);
+			
+			if(fromTransition != null && !fromTransition.equals(newTransition)) baseDAO.update(fromTransition);
+			if(newTransition != null) baseDAO.insert(newTransition);
+			if(design != null) learningDesignDAO.insertOrUpdate(design);
+			
+		} catch(NullPointerException npe) {
+			log.error(npe.getMessage(), npe);
+		}
+		
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getFirstUnattemptedActivity(org.lamsfoundation.lams.learningdesign.LearningDesign)
+	 */
+	public Activity getFirstUnattemptedActivity(LearningDesign design) throws LearningDesignException {
+		Activity activity = design.getFirstActivity();
+		
+		while(activity.getReadOnly() && activity.getTransitionFrom() != null) {
+				activity = activity.getTransitionFrom().getToActivity();
+		}
+		
+		return activity;
+	}
+	
+	private void initialiseToolActivityForRuntime(LearningDesign design, Lesson lesson) throws MonitoringServiceException {
+		Date now = new Date();
+
+		Set activities = design.getActivities();
+        for (Iterator i = activities.iterator(); i.hasNext();) {
+            Activity activity = (Activity) i.next();
+            
+            if ( activity.isInitialised() ) {
+            	if ( ! activity.isActivityReadOnly() && activity.isToolActivity() ) {
+            		// Activity is initialised so it was set up previously. So its tool content will be okay
+            		// but the run offline flags and define later flags might have been changed, so they need to be updated
+            		// Content ID shouldn't change, but we update it in case it does change while we update the status flags.
+	            	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
+	            	Long newContentId = lamsCoreToolService.notifyToolOfStatusFlags(toolActivity);
+                    toolActivity.setToolContentId(newContentId);
+            	}
+            	
+            } else {
+            	// this is a new activity - need to set up the content, do any scheduling, etc
+            	// always have to copy the tool content, even though it may point to unique content - that way if the 
+            	// teacher has double clicked on the tool icon (and hence set up a tool content id) but not saved any content
+            	// the code in copyToolContent will ensure that there is content for this activity. So we end up with a few 
+            	// unused records - we are trading database space for reliability. If we don't ensure that there is always
+            	// a content record, then shortcomings in the createToolSession code may throw exceptions.
+            	if ( activity.isToolActivity() ) {
+	            	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
+	            	Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, true);
+                    toolActivity.setToolContentId(newContentId);
+ 
+            	} else if ( activity.isScheduleGate() ) {
+		            //if it is schedule gate, we need to initialize the sheduler for it.
+	            	ScheduleGateActivity gateActivity = (ScheduleGateActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
+	            	monitoringService.runGateScheduler(gateActivity,now,lesson.getLessonName()); 
+	            }
+	            activity.setInitialised(Boolean.TRUE);
+	            activityDAO.update(activity);
+            }
+        }
+	}
+	
 	public LearningDesign copyLearningDesign(Long originalDesignID,Integer copyType,
 									Integer userID, Integer workspaceFolderID, boolean setOriginalDesign) 
 																	throws UserException, LearningDesignException, 
@@ -315,6 +720,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
                 	// copy the content, but don't set the define later flags if it is preview
                     Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, copyType.intValue() != LearningDesign.COPY_TYPE_PREVIEW);
                     toolActivity.setToolContentId(newContentId);
+                    
+                    // clear read only field
+                    toolActivity.setReadOnly(false);
                     
                 } catch (DataMissingException e) {
                     String error = "Unable to initialise the lesson. Data is missing for activity "+currentActivity.getActivityUIID()
@@ -693,10 +1101,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		return flashMessage.serializeMessage();
 	}
 	
-
-	public MessageService getMessageService() {
-		return messageService;
-	}
 
 
 }

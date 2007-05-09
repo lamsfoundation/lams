@@ -205,36 +205,59 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     }
     /**
      * Calls the tool to copy the content for an activity. Used when copying a learning design.
-     * If it is a preview lesson, we don't want to set define later - we will sidestep this in the progress engine.
+     * If it is a preview lesson, we don't want to set define later to true - we will sidestep this in the progress engine.
      * 
      * @param toolActivity the tool activity defined in the design.
+     * @param setDefineLater whether or not to set the define later flag based on the activity in the design. If set to true
+     * then will take the value fro the activity. If set to false, then define later will always be set to false.
      * @throws DataMissingException, ToolException
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
     public Long notifyToolToCopyContent(ToolActivity toolActivity, boolean setDefineLater) 
     		throws DataMissingException, ToolException
     {
-        Long newToolcontentID = contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool());
+    	return notifyToToolAboutContent(toolActivity, setDefineLater, true);
+    }
+    	
+    private Long notifyToToolAboutContent(ToolActivity toolActivity, boolean setDefineLater, boolean copyToolContent) {
+        Long toolcontentID = toolActivity.getToolContentId();
         try {
 			ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity.getTool());
-            contentManager.copyToolContent(toolActivity.getToolContentId(),
-                                           newToolcontentID);
-            
-            if ( setDefineLater && toolActivity.getDefineLater() != null &&
-                    toolActivity.getDefineLater().booleanValue() ) {
-                contentManager.setAsDefineLater(newToolcontentID);
-            }
-            if ( toolActivity.getRunOffline() != null &&
-                    toolActivity.getRunOffline().booleanValue() ) {
-            	contentManager.setAsRunOffline(newToolcontentID);
+			
+			if ( copyToolContent ) {
+				toolcontentID = contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool());
+				contentManager.copyToolContent(toolActivity.getToolContentId(), toolcontentID);
 			}
+            
+			contentManager.setAsDefineLater(toolcontentID, 
+				setDefineLater && toolActivity.getDefineLater() != null && toolActivity.getDefineLater().booleanValue());
+            
+           	contentManager.setAsRunOffline(toolcontentID, 
+           			toolActivity.getRunOffline() != null && toolActivity.getRunOffline().booleanValue());
+           	
 		} catch ( NoSuchBeanDefinitionException e ) {
-			String message = "A tool which is defined in the database appears to missing from the classpath. Unable to copy the tool content. ToolActivity "+toolActivity;
+			String message = "A tool which is defined in the database appears to missing from the classpath. Unable to copy/update the tool content. ToolActivity "+toolActivity;
 			log.error(message,e);
 			throw new ToolException(message,e);
 		}
 
-        return newToolcontentID;
+        return toolcontentID;
+    }
+    
+    /**
+     * Calls the tool to set up the define later and run offline flags.
+     * 
+     * This method is a subset of the functionality of notifyToolToCopyContent(ToolActivity toolActivity, boolean setDefineLater);
+     * so if you call notifyToolToCopyContent then you don't need to call this method. It is a separate method used by Live Edit.
+     * 
+     * @param toolActivity the tool activity defined in the design.
+     * @throws DataMissingException, ToolException
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
+     */
+    public Long notifyToolOfStatusFlags(ToolActivity toolActivity) 
+    		throws DataMissingException, ToolException
+    {
+    	return notifyToToolAboutContent(toolActivity, true, false);
     }
     
     /**

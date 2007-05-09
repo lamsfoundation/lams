@@ -60,6 +60,11 @@
         redirect="false"
       />
       <forward
+        name="scribe"
+        path="tiles:/learning/scribe"
+        redirect="false"
+      />
+      <forward
         name="runOffline"
         path="tiles:/learning/runOffline"
         redirect="false"
@@ -72,6 +77,21 @@
       <forward
         name="notebook"
         path="tiles:/learning/notebook"
+        redirect="false"
+      />
+      <forward
+        name="voteDisplay"
+        path="/pages/parts/voteDisplay.jsp"
+        redirect="false"
+      />
+      <forward
+        name="report"
+        path="tiles:/learning/report"
+        redirect="false"
+      />
+      <forward
+        name="instructions"
+        path="tiles:/learning/instructions"
         redirect="false"
       />
     </action>
@@ -117,16 +137,6 @@
       <forward
         name="success"
         path="tiles:/monitoring/main"
-        redirect="false"
-      />
-      <forward
-        name="scribe_client"
-        path="tiles:/monitoring/scribe_client"
-        redirect="false"
-      />
-      <forward
-        name="scribe_history"
-        path="tiles:/monitoring/scribe_history"
         redirect="false"
       />
       <forward

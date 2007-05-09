@@ -45,9 +45,6 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
-import org.lamsfoundation.lams.monitoring.MonitoringConstants;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -155,7 +152,6 @@ public class LearnerAction extends LamsDispatchAction
         //initialize service object
         ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
-        FlashMessage message = null;
     	try {
 	
 	        //get user and lesson based on request.

@@ -311,4 +311,5 @@ public class ToolActivity extends SimpleActivity implements Serializable
 	protected void getToolActivitiesInActivity(SortedSet toolActivities) {
         toolActivities.add(this);
 	}
+	
 }

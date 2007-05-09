@@ -34,7 +34,7 @@ import java.util.Vector;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -52,20 +52,23 @@ import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
+import org.lamsfoundation.lams.learningdesign.SystemGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
-import org.lamsfoundation.lams.tool.dao.hibernate.SystemToolDAO;
-import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
+import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.dao.ISystemToolDAO;
+import org.lamsfoundation.lams.tool.dao.IToolDAO;
+import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -98,29 +101,38 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class ObjectExtractor implements IObjectExtractor {
 	
-	protected BaseDAO baseDAO = null;
-	protected LearningDesignDAO learningDesignDAO = null;
-	protected ActivityDAO activityDAO =null;
-	protected TransitionDAO transitionDAO =null;
-	protected LearningLibraryDAO learningLibraryDAO = null;
-	protected LicenseDAO licenseDAO = null;
-	protected GroupingDAO groupingDAO = null;
-	protected ToolDAO toolDAO = null;
-	protected SystemToolDAO systemToolDAO = null;
-	protected GroupDAO groupDAO = null;
+	protected IBaseDAO baseDAO = null;
+	protected ILearningDesignDAO learningDesignDAO = null;
+	protected IActivityDAO activityDAO =null;
+	protected ITransitionDAO transitionDAO =null;
+	protected ILearningLibraryDAO learningLibraryDAO = null;
+	protected ILicenseDAO licenseDAO = null;
+	protected IGroupingDAO groupingDAO = null;
+	protected IToolDAO toolDAO = null;
+	protected ISystemToolDAO systemToolDAO = null;
+	protected IGroupDAO groupDAO = null;
+	protected IToolSessionDAO toolSessionDAO = null;
 
 	private Integer mode = null;
 	
-	/** The newActivityMap is a local copy of all the current activities. This will include
+	/* The newActivityMap is a local copy of all the current activities. This will include
 	 * the "top level" activities and subactivities. It is used to "crossreference" activities
 	 * as we go, without having to repull them from the database. The keys are the UIIDs
 	 * of the activities, not the IDs. It is important that the values in this map are the Activity
 	 * objects related to the Hibernate session as they are updated by the parseTransitions code.
 	 */ 
 	protected HashMap<Integer,Activity> newActivityMap = new HashMap<Integer,Activity>();
-	// cache of groupings - too hard to get them from the db
+	/* 
+	 * Record the tool sessions and activities as we go for edit on fly. This is needed in case we delete any.
+	 * Cannot get them at the end as Hibernate tries to store the activities before getting the 
+	 * tool sessions, and this fails due to a foriegn key error. Its the foriegn key error
+	 * that we are trying to avoid!
+	 */
+	protected HashMap<Integer, List<ToolSession>> toolSessionMap = new HashMap<Integer,List<ToolSession>>(); // Activity UIID -> ToolSession
+	protected HashMap<Integer, Activity> oldActivityMap = new HashMap<Integer,Activity>(); // Activity UIID -> Activity
+	/* cache of groupings - too hard to get them from the db */
 	protected HashMap<Integer,Grouping> groupings = new HashMap<Integer,Grouping>();
-	// can't delete as we go as they are linked to other items - keep a list and delete at the end.
+	/* can't delete as we go as they are linked to other items - keep a list and delete at the end. */
 	protected Set<Grouping> groupingsToDelete = new HashSet<Grouping>();
 	protected LearningDesign learningDesign = null;
 	
@@ -131,11 +143,11 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 
 	/** Constructor to be used if Spring method injection is not used */
-	public ObjectExtractor(BaseDAO baseDAO,
-			LearningDesignDAO learningDesignDAO, ActivityDAO activityDAO,
-			LearningLibraryDAO learningLibraryDAO, LicenseDAO licenseDAO,
-			GroupingDAO groupingDAO, ToolDAO toolDAO, SystemToolDAO systemToolDAO,
-			GroupDAO groupDAO,TransitionDAO transitionDAO) {		
+	public ObjectExtractor(IBaseDAO baseDAO,
+			ILearningDesignDAO learningDesignDAO, IActivityDAO activityDAO,
+			ILearningLibraryDAO learningLibraryDAO, ILicenseDAO licenseDAO,
+			IGroupingDAO groupingDAO, IToolDAO toolDAO, ISystemToolDAO systemToolDAO,
+			IGroupDAO groupDAO, ITransitionDAO transitionDAO, IToolSessionDAO toolSessionDAO) {		
 		this.baseDAO = baseDAO;
 		this.learningDesignDAO = learningDesignDAO;
 		this.activityDAO = activityDAO;
@@ -146,55 +158,64 @@ public class ObjectExtractor implements IObjectExtractor {
 		this.systemToolDAO = systemToolDAO;
 		this.groupDAO = groupDAO;
 		this.transitionDAO = transitionDAO;
+		this.toolSessionDAO = toolSessionDAO;
 	}
 	
 	/** Spring injection methods */
-	public ActivityDAO getActivityDAO() {
+	public IActivityDAO getActivityDAO() {
 		return activityDAO;
 	}
 
-	public void setActivityDAO(ActivityDAO activityDAO) {
+	public void setActivityDAO(IActivityDAO activityDAO) {
 		this.activityDAO = activityDAO;
 	}
 
-	public GroupDAO getGroupDAO() {
+	public IGroupDAO getGroupDAO() {
 		return groupDAO;
 	}
 
-	public void setGroupDAO(GroupDAO groupDAO) {
+	public void setGroupDAO(IGroupDAO groupDAO) {
 		this.groupDAO = groupDAO;
 	}
 
-	public GroupingDAO getGroupingDAO() {
+	public IGroupingDAO getGroupingDAO() {
 		return groupingDAO;
 	}
 
-	public void setGroupingDAO(GroupingDAO groupingDAO) {
+	public void setGroupingDAO(IGroupingDAO groupingDAO) {
 		this.groupingDAO = groupingDAO;
 	}
 
-	public LearningDesignDAO getLearningDesignDAO() {
+	public ILearningDesignDAO getLearningDesignDAO() {
 		return learningDesignDAO;
 	}
 
-	public void setLearningDesignDAO(LearningDesignDAO learningDesignDAO) {
+	public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
 		this.learningDesignDAO = learningDesignDAO;
 	}
 
-	public LearningLibraryDAO getLearningLibraryDAO() {
+	public ILearningLibraryDAO getLearningLibraryDAO() {
 		return learningLibraryDAO;
 	}
 
-	public void setLearningLibraryDAO(LearningLibraryDAO learningLibraryDAO) {
+	public void setLearningLibraryDAO(ILearningLibraryDAO learningLibraryDAO) {
 		this.learningLibraryDAO = learningLibraryDAO;
 	}
 
-	public LicenseDAO getLicenseDAO() {
+	public ILicenseDAO getLicenseDAO() {
 		return licenseDAO;
 	}
 
-	public void setLicenseDAO(LicenseDAO licenseDAO) {
+	public void setLicenseDAO(ILicenseDAO licenseDAO) {
 		this.licenseDAO = licenseDAO;
+	}
+
+	public IToolSessionDAO getToolSessionDAODAO() {
+		return toolSessionDAO;
+	}
+
+	public void setToolSessionDAO(IToolSessionDAO toolSessionDAO) {
+		this.toolSessionDAO = toolSessionDAO;
 	}
 
 	public HashMap<Integer, Activity> getNewActivityMap() {
@@ -205,36 +226,36 @@ public class ObjectExtractor implements IObjectExtractor {
 		this.newActivityMap = newActivityMap;
 	}
 
-	public ToolDAO getToolDAO() {
+	public IToolDAO getToolDAO() {
 		return toolDAO;
 	}
 
-	public void setToolDAO(ToolDAO toolDAO) {
+	public void setToolDAO(IToolDAO toolDAO) {
 		this.toolDAO = toolDAO;
 	}
 
 	
-	public SystemToolDAO getSystemToolDAO() {
+	public ISystemToolDAO getSystemToolDAO() {
 		return systemToolDAO;
 	}
 
-	public void setSystemToolDAO(SystemToolDAO systemToolDAO) {
+	public void setSystemToolDAO(ISystemToolDAO systemToolDAO) {
 		this.systemToolDAO = systemToolDAO;
 	}
 
-	public TransitionDAO getTransitionDAO() {
+	public ITransitionDAO getTransitionDAO() {
 		return transitionDAO;
 	}
 
-	public void setTransitionDAO(TransitionDAO transitionDAO) {
+	public void setTransitionDAO(ITransitionDAO transitionDAO) {
 		this.transitionDAO = transitionDAO;
 	}
 
-	public BaseDAO getBaseDAO() {
+	public IBaseDAO getBaseDAO() {
 		return baseDAO;
 	}
 
-	public void setBaseDAO(BaseDAO baseDAO) {
+	public void setBaseDAO(IBaseDAO baseDAO) {
 		this.baseDAO = baseDAO;
 	}
 
@@ -255,10 +276,10 @@ public class ObjectExtractor implements IObjectExtractor {
 			copyTypeID = LearningDesign.COPY_TYPE_NONE;
 		}
 		if ( learningDesign != null && learningDesign.getCopyTypeID() != null && 
-				! learningDesign.getCopyTypeID().equals(copyTypeID) ) {
+				! learningDesign.getCopyTypeID().equals(copyTypeID) && !learningDesign.getEditOverrideLock()) {
 			throw new ObjectExtractorException("Unable to save learning design.  Cannot change copy type on existing design.");
 		}
-		if ( ! copyTypeID.equals(LearningDesign.COPY_TYPE_NONE) ) {
+		if ( ! copyTypeID.equals(LearningDesign.COPY_TYPE_NONE) && !learningDesign.getEditOverrideLock()) {
 			throw new ObjectExtractorException("Unable to save learning design.  Learning design is read-only");
 		}
 		learningDesign.setCopyTypeID(copyTypeID);
@@ -267,6 +288,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		// three objects (learning design -> grouping activity -> grouping) so put both the existing ones and the new ones
 		// here for reference later.
 		initialiseGroupings();
+		
+		// get a mapping of all the existing activities and their tool sessions, in case we need to delete some tool sessions later.
+		initialiseToolSessionMap(learningDesign);
 		
 		//get the core learning design stuff - default to invalid
 		learningDesign.setValidDesign(Boolean.FALSE);
@@ -282,6 +306,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		    learningDesign.setValidDesign(WDDXProcessor.convertToBoolean(table,WDDXTAGS.VALID_DESIGN));
 		if (keyExists(table, WDDXTAGS.READ_ONLY))	
 		    learningDesign.setReadOnly(WDDXProcessor.convertToBoolean(table,WDDXTAGS.READ_ONLY));
+		if (keyExists(table, WDDXTAGS.EDIT_OVERRIDE_LOCK))
+			learningDesign.setEditOverrideLock(WDDXProcessor.convertToBoolean(table, WDDXTAGS.EDIT_OVERRIDE_LOCK));
 		if (keyExists(table, WDDXTAGS.DATE_READ_ONLY)) 	
 		    learningDesign.setDateReadOnly(WDDXProcessor.convertToDate(table, WDDXTAGS.DATE_READ_ONLY));
 		if (keyExists(table, WDDXTAGS.OFFLINE_INSTRUCTIONS))	
@@ -372,6 +398,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		learningDesign.setFirstActivity(learningDesign.calculateFirstActivity());
 		learningDesignDAO.insertOrUpdate(learningDesign);
 		deleteUnwantedGroupings();
+		deleteUnwantedToolSessions(learningDesign);
 		
 		return learningDesign;	
 		}
@@ -389,12 +416,64 @@ public class ObjectExtractor implements IObjectExtractor {
 		}
 	}
 
+	/** Initialise the map of tool sessions already in the database. Used to work out what will be deleted
+	 * by Hibernate later - useful to clean up any unwanted tool sessions for edit on the fly.
+	 */
+	private void initialiseToolSessionMap(LearningDesign learningDesign) {
+		if (learningDesign.getEditOverrideLock() && learningDesign.getEditOverrideUser() != null) {
+			Iterator iter = learningDesign.getActivities().iterator();
+			while ( iter.hasNext() ) {
+				Activity activity = (Activity) iter.next();
+				oldActivityMap.put(activity.getActivityUIID(), activity);
+				List toolSessions = toolSessionDAO.getToolSessionByActivity(activity);
+				if ( toolSessions != null && toolSessions.size() > 0 )
+					toolSessionMap.put(activity.getActivityUIID(),toolSessions);
+			}
+		}
+	}
+
 	/** Delete the old unneeded groupings. Won't be done via a cascase */
 	private void deleteUnwantedGroupings() {
 		for ( Grouping grouping: groupingsToDelete) {
 			groupingDAO.delete(grouping);	
 		}
 	}
+
+	/** Delete the old tool session. Won't be done via Hibernate cascades as we only want to do it 
+	 * for edit on fly. The progress engine pre-generates the tool sessions for class level activities,
+	 * so if we edit the design, we need to delete the tool sessions. If we encounter evidence that this
+	 * is a grouped activity - either more than one tool session exists or the activity is grouped, then abort. */
+	private void deleteUnwantedToolSessions(LearningDesign learningDesign) throws ObjectExtractorException {
+		if (learningDesign.getEditOverrideLock() && learningDesign.getEditOverrideUser() != null) {
+
+			for ( Integer uiid : toolSessionMap.keySet() ) {
+				if ( ! newActivityMap.containsKey(uiid) ) {
+					List toolSessions = toolSessionMap.get(uiid);
+					if ( toolSessions != null ) {
+						
+						Activity activity = oldActivityMap.get(uiid);
+						if ( toolSessions.size() > 1 ) {
+							throw new ObjectExtractorException("More than one tool session exists for activity "+activity.getTitle()+" ("+uiid+") but this shouldn't be possible. Cannot delete this tool session so editing is not allowed!");
+						} else if (toolSessions.size() == 1) { 
+
+							ToolSession toolSession = (ToolSession) toolSessions.get(0);
+							if ( activity.isGroupingActivity() ) {
+								throw new ObjectExtractorException("Activity "+activity.getTitle()+" ("+activity.getActivityUIID()+") has a tool session but it is grouped. Cannot delete this tool session so editing is not allowed!");
+							}
+						
+							// all okay, do ahead and delete the tool session
+							if ( log.isDebugEnabled())
+								log.debug("Removing tool session for activity "+activity.getTitle()+" ("+activity.getActivityUIID()+")");
+							
+							toolSessionDAO.removeToolSession(toolSession);
+						}
+					}
+				}
+			}
+
+		}
+	}
+
 	/**
 	 * Parses the groupings array sent from the WDDX packet. It will create
 	 * the groupings object (ChosenGrouping, RandomGrouping) so that when the
@@ -417,7 +496,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	            Hashtable groupingDetails = (Hashtable)iterator.next();
 	            if( groupingDetails != null )
 	            {
-	    			Grouping grouping = extractGroupingObject(groupingDetails);
+	    			Grouping grouping = extractGroupingObject(groupingDetails);	
 	    			groupingDAO.insertOrUpdate(grouping);	
 	    			groupings.put(grouping.getGroupingUIID(),grouping);
 	            }
@@ -443,8 +522,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    if ( grouping != null && ! grouping.getGroupingTypeId().equals(groupingTypeID) ) {
 	    	groupings.remove(grouping.getGroupingUIID());
 	    	groupingsToDelete.add(grouping);
-	    	
-	    	grouping = null;
+			grouping = null;
 	    }
 	
 	    if (grouping == null) {
@@ -506,7 +584,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		// this means we don't have to manually remove the transition object.
 	    // Note: This will leave orphan content in the tool tables. It can be removed by the tool content cleaning job, 
         // which may be run from the admin screen or via a cron job. 
-
+		
 		learningDesign.getActivities().clear();
 		learningDesign.getActivities().addAll(newActivityMap.values());
 		
@@ -800,6 +878,8 @@ public class ObjectExtractor implements IObjectExtractor {
 			buildSynchGateActivity((SynchGateActivity)activity,activityDetails);
 		else if (activity instanceof PermissionGateActivity)
 			buildPermissionGateActivity((PermissionGateActivity)activity,activityDetails);
+		else if (activity instanceof SystemGateActivity)
+			buildSystemGateActivity((SystemGateActivity)activity,activityDetails);
 		else
 			buildScheduleGateActivity((ScheduleGateActivity)activity,activityDetails);
 		GateActivity gateActivity = (GateActivity)activity ;
@@ -813,6 +893,10 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 	private void buildPermissionGateActivity(PermissionGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
 		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE);
+		activity.setSystemTool(systemTool);
+	}
+	private void buildSystemGateActivity(SystemGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
+		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.SYSTEM_GATE);
 		activity.setSystemTool(systemTool);
 	}
 	private void buildScheduleGateActivity(ScheduleGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{

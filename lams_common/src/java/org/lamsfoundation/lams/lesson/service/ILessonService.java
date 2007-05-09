@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.lesson.service;
 import java.util.Collection;
 import java.util.List;
 
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
@@ -199,4 +200,20 @@ public interface ILessonService {
 	     * @param users the users to add as learners
 	     */ 
 	    public void addStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException;
+	    
+	 /** 
+	  * Remove references to an activity from all learner progress entries.
+	  * Used by Live Edit, to remove any references to the system gates
+	  * @param activity The activity for which learner progress references should be removed.
+	  */
+	 public void removeProgressReferencesToActivity(Activity activity) throws LessonServiceException;
+	 
+	 /** 
+	  * Mark any learner progresses for this lesson as not completed. Called when Live Edit
+	  * ends, to ensure that if there were any completed progress records, and the design
+	  * was extended, then they are no longer marked as completed. 
+	  * @param lessonId The lesson for which learner progress entries should be updated.
+	  */
+	 public void performMarkLessonUncompleted(Long lessonId) throws LessonServiceException;
+
 }

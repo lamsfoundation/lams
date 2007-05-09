@@ -186,5 +186,9 @@ public class FlashMessage implements Serializable {
     	
         return new FlashMessage(methodName, str, FlashMessage.ERROR);
     }
-
+    public static  FlashMessage getUnavailableLearningDesign(String methodName, Long designID, Integer userID){
+    	return new FlashMessage(methodName,
+    							"The design  with learning_design_id: " + designID + " is unavailable for edit by User with user_id of :" + userID,
+								ERROR);    	
+    }
 }

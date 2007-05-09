@@ -15,7 +15,7 @@
 	<c:set var="toolbarSet" value="Default" />
 </c:if>
 
-<c:set var="basePath" value="/lams/fckeditor/" />
+<c:set var="basePath"><lams:LAMSURL/>/fckeditor/</c:set>
 
 <!-- 
 <script type="text/javascript">

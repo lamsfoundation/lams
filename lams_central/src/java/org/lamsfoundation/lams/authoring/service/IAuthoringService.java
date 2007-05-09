@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
@@ -45,6 +47,7 @@ public interface IAuthoringService {
 	
 	/** Message key returned by the storeLearningDesignDetails() method */
 	public static final String STORE_LD_MESSAGE_KEY = "storeLearningDesignDetails";
+	public static final String START_EDIT_ON_FLY_MESSAGE_KEY = "startEditOnFly";
 
 	/**
 	 * Returns a populated LearningDesign object corresponding to the given learningDesignID
@@ -240,6 +243,53 @@ public interface IAuthoringService {
 	 */
 	public String generateUniqueContentFolder()  throws FileUtilException, IOException;
 		
+	/**
+	 * Prepares a LearningDesign to be ready for Edit-On-The-Fly (Editing).
+	 * Return a string representing the updated learning design in WDDX format.
+	 * 
+	 * @param design The learning design whose WDDX packet is requested 
+	 * @param userID  user_id of the User who will be editing the design.
+	 * @throws UserException
+	 * @throws LearningDesignException
+	 * @throws IOException
+	 */
+	public String setupEditOnFlyGate(Long learningDesignID, Integer userID) throws UserException, LearningDesignException, IOException;
+	public boolean setupEditOnFlyLock(Long learningDesignID, Integer userID) throws LearningDesignException, UserException, IOException;
+	
+	/**
+	 * 
+	 * 
+	 * @param learningDesignID The learning_design_id of the design for which editing has finished.
+	 * @param userID user_id of the User who has finished editing the design.
+	 * @return wddx packet.
+	 * @throws IOException
+	 */
+	public String finishEditOnFly(Long learningDesignID, Integer userID) throws IOException;
+	
+	/**
+	 * 
+	 * @param gate
+	 */
+	public LearningDesign removeTempSystemGate(GateActivity gate, LearningDesign design);
+	
+	/**
+	 * 
+	 * @param design
+	 * @return
+	 * @throws LearningDesignException
+	 */
+	public Activity getFirstUnattemptedActivity(LearningDesign design) throws LearningDesignException;
+	
+	/**
+	 * 
+	 * @param design
+	 * @param userID
+	 * @return
+	 * @throws LearningDesignException
+	 * @throws IOException
+	 */
+	public boolean isLearningDesignAvailable(LearningDesign design, Integer userID) throws LearningDesignException, IOException;
+	
 	/**
 	 * Returns the generic help url from configuration
 	 * 
