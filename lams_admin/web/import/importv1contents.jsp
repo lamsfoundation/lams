@@ -28,7 +28,7 @@ function loading(){
 <p>&nbsp;</p>
 
 <div id="loading" style="display:none">
-	<h3>Please wait while creating new users and groups...</h3>
+	<h3><fmt:message key="msg.importv1.please.wait"/></h3>
 	<p align="center"><img src="<lams:LAMSURL/>/images/loading.gif" alt="loading..." /></p>
 </div>
 
@@ -76,7 +76,7 @@ function loading(){
 </table>
 
 <p>
-<html:checkbox property="onlyMembers">&nbsp;Only import users that are members of organisations/session classes to be imported</html:checkbox>
+<html:checkbox property="onlyMembers">&nbsp;<fmt:message key="msg.importv1.only.members"/></html:checkbox>
 </p>
 
 <p>
