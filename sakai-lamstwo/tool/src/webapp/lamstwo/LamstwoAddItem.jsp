@@ -90,7 +90,7 @@
 							<script type="text/javascript">
 							    //<![CDATA[
 								var TREE_ITEMS =
-							</f:verbatim><h:outputText value="#{LamstwoBean.learningDesigns}"></h:outputText><f:verbatim>
+							</f:verbatim><h:outputText value="#{LamstwoBean.learningDesigns}"></h:outputText><f:verbatim>;
 								var tree = new tree(TREE_ITEMS, TREE_TPL);
 								//]]>
 							</script>
