@@ -38,8 +38,9 @@
 				<H2><fmt:message key="msg.export.choose.format.instruction" /></H2>
 				<table><tr><td>
 				<input type="radio" name="format" id="lams" value="1" checked="checked" class="noBorder"><fmt:message key="msg.export.choose.format.lams" />
-				<BR><BR>
+				<BR/><BR/>
 				<input type="radio" name="format" id="ims" value="2" class="noBorder"><fmt:message key="msg.export.choose.format.ims" />
+				<BR/><BR/>
 				<div class="right-buttons">
 					<a href="#" onclick="goDownload();" class="button"><fmt:message key="button.export" /></a>
 					<a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a>

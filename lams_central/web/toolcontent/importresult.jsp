@@ -32,7 +32,8 @@
 						<h2><fmt:message key="msg.import.success"/></h2>
 					</c:when>
 					<c:otherwise>
-						<h2><fmt:message key="msg.import.ld.success" /> <fmt:message key="msg.import.tool.error.prefix" /></h2>
+						<h2><fmt:message key="msg.import.ld.success" /></h2>
+						<h2><fmt:message key="msg.import.tool.error.prefix" /></h2>
 						<c:forEach var="toolError" items="${toolsErrorMessages}">
 							<p class="warning">${toolError}</p>
 						</c:forEach>
@@ -43,8 +44,11 @@
 			</c:when>
 			<c:otherwise>
 					<h2><fmt:message key="msg.import.failed" /></h2>
-					<div/>
-						<p class="warning"><fmt:message key="msg.reason.is" /> ${ldErrorMessages}</p>
+					<h2> <fmt:message key="msg.reason.is" /></h2>
+					<div>
+						<c:forEach var="ldError" items="${ldErrorMessages}">
+							<p class="warning"> ${ldError}</p>
+						</c:forEach>
 					</div>
 			</c:otherwise>
 		</c:choose>

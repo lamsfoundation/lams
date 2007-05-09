@@ -158,26 +158,26 @@ public class ImportToolContentAction extends LamsAction {
 	            if ( extension.equalsIgnoreCase(".las") ) {
 	            	// process 1.0.x file.
 	            	String wddxPacket = getPacket(file.getInputStream());
-		            IExportToolContentService service = getExportService();
-		            ldId = service.importLearningDesign102(wddxPacket,user,workspaceFolderUid,toolsErrorMsgs);
+	            	if ( wddxPacket == null || ! ( wddxPacket.startsWith("<wddx") || wddxPacket.startsWith("<?xml")) ) {
+		            	badFileType(ldErrorMsgs, filename,"Not a valid wddx/xml file");
+	            	} else {
+	            		IExportToolContentService service = getExportService();
+	            		ldId = service.importLearningDesign102(wddxPacket,user,workspaceFolderUid,toolsErrorMsgs);
+	            	}
 	            } else if ( extension.equalsIgnoreCase(".zip") ){
 		            // write the file
 		            String ldPath = ZipFileUtil.expandZip(file.getInputStream(),filename);
 		            IExportToolContentService service = getExportService();
 		            ldId = service.importLearningDesign(ldPath,user,workspaceFolderUid,toolsErrorMsgs);
 	            } else {
-	            	log.error("Uploaded file not an expected type. Filename was "+filename);
-	            	MessageService msgService = getMessageService(); 
-	            	String msg = msgService.getMessage(KEY_MSG_IMPORT_FILE_FORMAT);
-	            	ldErrorMsgs.add(msg != null ? msg : "Uploaded file not an expected type.");
+	            	badFileType(ldErrorMsgs, filename,"Unexpected extension");
 	            }
 
             }
             
         } catch (Exception e) {
-        	String msg = e.getMessage();
         	log.error("Error occured during import",e);
-        	ldErrorMsgs.add(e.getClass().getName());
+        	ldErrorMsgs.add(e.getClass().getName()+" "+e.getMessage());
 		}
         
         request.setAttribute(ATTR_LD_ID,ldId);
@@ -193,6 +193,14 @@ public class ImportToolContentAction extends LamsAction {
         }
 
 
+	}
+
+
+	private void badFileType(List<String> ldErrorMsgs, String filename, String errDescription) {
+		log.error("Uploaded file not an expected type. Filename was "+filename+" "+errDescription);
+		MessageService msgService = getMessageService(); 
+		String msg = msgService.getMessage(KEY_MSG_IMPORT_FILE_FORMAT);
+		ldErrorMsgs.add(msg != null ? msg : "Uploaded file not an expected type.");
 	}
 	
 	//***************************************************************************************
