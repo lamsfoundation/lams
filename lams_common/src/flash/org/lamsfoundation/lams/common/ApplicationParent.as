@@ -101,10 +101,12 @@ class ApplicationParent {
 	
 	public static function extCall(method:String, param:String):Void {
 		var isMac:Boolean = (_root.isMac == "true")?true:false;
-		var versionNo:Number = _root.getSWFVersion();
-		Debugger.log("ExtCall:: method: " + method + " :: isMac: " + isMac, Debugger.GEN, "extCall", "ApplicationParent");
+		var versionSplit = getVersion().split(",", 2);
+		var v:Number = Number(versionSplit[0].substr(versionSplit[0].length - 1, 1));
 		
-		if((versionNo <= 8) && (isMac)) {
+		Debugger.log("ExtCall:: method: " + method + " :: isMac: " + isMac + " :: version: " + getVersion() + ":: v: " + v.toString() , Debugger.GEN, "extCall", "ApplicationParent");
+		
+		if((v <= 8) && (isMac)) {
 			Debugger.log("using Javascript method", Debugger.GEN, "extCall", "ApplicationParent");
 			getURL("javascript: " + method + "(" + param + ")");
 		} else {
