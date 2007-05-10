@@ -117,8 +117,8 @@ public class LessonManagerServlet extends HttpServlet {
 				Long lessonId = startLesson(serverId, datetime, hashValue,
 						username, ldId, courseId, title, desc, country, lang);
 
-				element = document.createElement("Lesson");
-				element.setAttribute("lessonId", lessonId.toString());
+				element = document.createElement(CentralConstants.ELEM_LESSON);
+				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
 
 			} else if (method.equals(CentralConstants.METHOD_SCHEDULE)) {
 				ldId = new Long(ldIdStr);
@@ -126,17 +126,17 @@ public class LessonManagerServlet extends HttpServlet {
 						username, ldId, courseId, title, desc, startDate,
 						country, lang);
 
-				element = document.createElement("Lesson");
-				element.setAttribute("lessonId", lessonId.toString());
+				element = document.createElement(CentralConstants.ELEM_LESSON);
+				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
 
 			} else if (method.equals(CentralConstants.METHOD_DELETE)) {
 				lsId = new Long(lsIdStr);				
 				Boolean deleted = deleteLesson(serverId, datetime, hashValue,
 						username, lsId);
 
-				element = document.createElement("Lesson");
-				element.setAttribute("lessonId", lsId.toString());
-				element.setAttribute("deleted", deleted.toString());
+				element = document.createElement(CentralConstants.ELEM_LESSON);
+				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lsId.toString());
+				element.setAttribute(CentralConstants.ATTR_DELETED, deleted.toString());
 
 			} else {
 				String msg = "Method :" + method + " is not recognised"; 
