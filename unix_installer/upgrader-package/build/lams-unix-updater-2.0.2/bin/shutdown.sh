@@ -1,0 +1,1 @@
+/usr/local/jboss-4.0.2/bin/shutdown.sh -S

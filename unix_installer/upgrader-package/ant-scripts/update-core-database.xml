@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="update-deploy-tools" >
+	<!-- begin properties *******************************************************************************************-->
+	<!-- import properties from the specified file -->
+	
+	<property file="../lams.properties"/>
+	
+	<target name="update-core-database"  description="Runs some update scripts found in lams_common\db\sql\updatscripts">
+		<sql driver="com.mysql.jdbc.Driver" 
+			classpath="${DEPLOY_DIR}/lams.ear/mysql-connector-java-3.1.12-bin.jar" 
+			url="jdbc:mysql://localhost/${DB_NAME}?characterEncoding=UTF-8" 
+			userid="${DB_USER}" 
+			password="${DB_PASS}"
+			encoding="utf8"
+			onerror="continue"
+			>
+			<transaction src="../sql-scripts/alter_201_locale_id.sql" />
+			<transaction src="../sql-scripts/alter_201_system_tool_user_workspace.sql" />
+			<transaction src="../sql-scripts/alter_201_theme.sql" />
+			<transaction src="../sql-scripts/alter_201_tool.sql" />
+			<transaction src="../sql-scripts/alter_201_ext.sql" />
+		</sql>
+	</target>
+</project>

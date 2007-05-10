@@ -1,0 +1,6 @@
+<!ELEMENT Authentication (Method+)>
+<!ELEMENT Method (Param*)>
+<!ATTLIST Method Name CDATA #REQUIRED>
+<!ATTLIST Method Enabled CDATA "true">
+<!ELEMENT Param (#PCDATA)>
+<!ATTLIST Param Name CDATA #REQUIRED>

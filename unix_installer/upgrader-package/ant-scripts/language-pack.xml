@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="language-pack" basedir="." >
+	<property file="../lams.properties"/>
+	<property file="lang.properties"/>
+
+	<target name="update-languages" description="Runs the entire language pack process">
+		<antcall target="copy-languages"/>
+		<antcall target="copy-flash-xml"/>
+		<antcall target="copy-llid"/>
+		<antcall target="update-database"/>
+		<echo>LAMS language-pack ${version} updated</echo>
+	</target>
+	
+	<target name="copy-languages" description="Copies the language files for all the core LAMS projects">
+		<copy todir="${lams.dictionary.dir}" overwrite="true">
+			<fileset dir="../language-pack/lams-dictionary.jar/"/>
+		</copy>
+	</target>
+
+	<target name="copy-flash-xml" description="Copies the language files for flash">
+		<copy todir="${flashxml.deploy.dir}" overwrite="true">
+			<fileset dir="../language-pack/flashxml/"/>
+		</copy>
+	</target>
+
+	<target name="copy-llid" description="Copies the language files for combined tasks based on the llid values found in the database table lams-learning-library">
+		<java classname="copyllid" failonerror="true" fork="true">
+			<classpath>
+				<pathelement path=".;${sql.classpath}"/>
+			</classpath>
+		</java>
+	</target>
+
+	<target name="update-database" description="Updates the database to record the current language pack">
+		<sql driver="com.mysql.jdbc.Driver" 
+			classpath="${sql.classpath}" 
+			url="${db.url}" 
+			userid="${DB_USER}" 
+			password="${DB_PASS}"
+			encoding="utf8"
+			onerror="abort"
+			>
+			<transaction src="updateLocales.sql" />
+		</sql>
+	</target>
+
+
+</project>

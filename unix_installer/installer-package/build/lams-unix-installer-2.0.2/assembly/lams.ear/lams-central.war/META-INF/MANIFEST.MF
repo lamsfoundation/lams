@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)
+Ant-Version: Apache Ant 1.6.5
+Implementation-Title: LAMS - Central
+Implementation-Version: 2.0 RC1
+Class-Path: ./lams.jar ./lams-contentrepository.jar  ./lams-tool-lafru
+ m11.jar ./lams-tool-lanb11.jar ./lams-tool-laqa11.jar ./lams-tool-las
+ bmt11.jar ./lams-tool-lachat11.jar ./lams-tool-larsrc11.jar ./lams-to
+ ol-lavote11.jar ./lams-tool-lantbk11.jar ./lams-tool-lasurv11.jar ./l
+ ams-tool-lascrb11.jar ./lams-tool-lamc11.jar
+Created-By: 1.6.0_01-b06 (Sun Microsystems Inc.)
+
