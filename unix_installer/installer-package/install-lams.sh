@@ -314,7 +314,7 @@ configureWrapper()
 		then
 			rm /etc/init.d/lams2
 		fi
-		link "$JBOSS_DIR/bin/lams2" /etc/init.d/lams2
+		ln -s "$JBOSS_DIR/bin/lams2" /etc/init.d/lams2
 		printf "Done.\n\n"
 	fi
 }
@@ -409,10 +409,10 @@ fi
 printf "Copying lams.properties to /etc.\n"
 if [ -f /etc/lams2 ]
 then	
-	mkdir /etc/lams2
-	cp lams.properties /etc/lams2
+	cp lams.properties /etc/lams2/
 else
-	cp lams.properties /etc/lams2
+	mkdir -p /etc/lams2
+	cp lams.properties /etc/lams2/
 fi
 
 printf "\n\nLAMS 2.0.2 Configuration completed!\n"
