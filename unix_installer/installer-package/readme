@@ -1,7 +1,7 @@
-LAMS 2.0.2 - Learning Activity Management System Upgrader
+LAMS 2.0.2 - Learning Activity Management System Installer
 --------------------------------------------------------------------------------
 
-This is an installer package for LAMS 2.0 to LAMS 2.0.2. Please read this 
+This is an installer package for LAMS 2.0.2. Please read this 
 document carefully before installing. Please also ensure that you have read
 and understood the terms of the license agreement.
 
@@ -15,7 +15,7 @@ CONTENTS
 5) Startup and Shutdown
 6) Using the Java Service Wrapper
 7) Backing up LAMS
-8) Web Resources
+8) Web Resources and further help
 
 
 1. Required Software
@@ -63,7 +63,7 @@ to set up lams as a service, this will make lams start automatically each time
 you boot your machine. The installer will attempt to detect the wrapper jar 
 that is suitable for you, if it cannot you can choose the wrapper that is the 
 closest to suiting your architecture, or follow the instructions at: 
-wiki.lamsfoundation.org/display/lamsdocs/Setup+Java+Service+Wrapper+for+LAMS
+http://wiki.lamsfoundation.org/display/lamsdocs/Setup+Java+Service+Wrapper+for+LAMS
 to set up the wrapper manually.
 
 You can find out your architecture types by typing
@@ -219,7 +219,7 @@ Educational and technical forums for help and discussion
 
 LAMS 2.0 bug tracker			
 
-	https://bugs.lamsfoundation.org
+	http://bugs.lamsfoundation.org
 
 LAMS Foundation					
 	
