@@ -53,7 +53,7 @@ import org.lamsfoundation.lams.util.WebUtil;
  * 				validate="false"
  * 
  * @struts:action-forward name="cleanup" path=".cleanup"
- * @struts:action-forward name="sysadmin" path=".sysadmin"
+ * @struts:action-forward name="sysadmin" path="/sysadminstart.do"
  */
 public class CleanupTempFilesAction extends Action {
 	
