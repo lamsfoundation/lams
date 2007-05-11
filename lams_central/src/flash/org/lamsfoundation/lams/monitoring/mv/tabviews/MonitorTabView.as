@@ -266,7 +266,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 				var learner:Object = new Object();
 				learner = mm.allLearnersProgress[i]
 				trace("Learner passed is: "+learner.getFullName())
-				var temp_mc = _activityLayer_mc.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), _activityLayer_mc.getNextHighestDepth(),{learner:learner, _monitorController:mc, _x:learner_X+(finishedLearners*10), _y:(endGate_mc._y+learner_Y)});
+				var temp_mc = _activityLayer_mc.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), _activityLayer_mc.getNextHighestDepth(),{learner:learner, _monitorController:mc, _x:learner_X+(finishedLearners*10), _y:(endGate_mc._y+learner_Y), _hasPlus:false});
 				finishedLearnersList.push(temp_mc);
 				var learnerIcon_mc = _activityLayer_mc["learnerIcon"+learner.getUserName()]
 				learnerIcon_mc.init();
