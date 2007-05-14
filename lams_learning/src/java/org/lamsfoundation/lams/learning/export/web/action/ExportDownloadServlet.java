@@ -64,7 +64,7 @@ public class ExportDownloadServlet extends HttpServlet {
 	    
 	    /* Extract taken from org.lamsfoundation.lams.contentrepository.client.Download servlet */
 		response.setContentType("application/zip");
-		response.setHeader("Content-Disposition","attachment;filename=" + getFilename(zipFilename));
+		response.setHeader("Content-Disposition","attachment;filename=\""+getFilename(zipFilename)+"\"");
 		
 		InputStream in = new BufferedInputStream(new FileInputStream(new File(constructAbsolutePath(zipFilename)))); 
 		OutputStream out = response.getOutputStream();
@@ -104,11 +104,7 @@ public class ExportDownloadServlet extends HttpServlet {
 	private String getFilename(String path)
 	{
 		int index = path.lastIndexOf(File.separator);
-		if (index > 0) {
-			return path.substring(index+1);
-		} else {
-			return path;
-		}
+		return (index>0 ? path.substring(index+1) : path);
 	}
 	
 }
