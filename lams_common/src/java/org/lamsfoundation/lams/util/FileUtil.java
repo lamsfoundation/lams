@@ -98,17 +98,38 @@ public class FileUtil {
 	
 	}
 	
-	public static boolean isEmptyDirectory(String directoryName) throws FileUtilException {
+	/** Check if this directory is empty. If checkSubdirectories = true, then it also checks its subdirectories to make sure they aren't empty.
+	 * If checkSubdirectories = true and the directory contains empty subdirectories it will return true.
+	 * If checkSubdirectories = false and the directory contains empty subdirectories it will return false. */
+	public static boolean isEmptyDirectory(String directoryName, boolean checkSubdirectories) throws FileUtilException {
 		
 		if(directoryName == null || directoryName.length() == 0)
 			throw new FileUtilException("A directory name must be specified");
 		
-		File dir = new File(directoryName);
-		if(dir.exists()) {
-			if(dir.listFiles().length > 0)
-				return false;
-			else 
+		return isEmptyDirectory(new File(directoryName), checkSubdirectories);
+
+	}
+	
+	private static boolean isEmptyDirectory(File directory, boolean checkSubdirectories) throws FileUtilException {
+			
+		if(directory.exists()) {
+			File files[] = directory.listFiles();
+	
+			if(files.length > 0) {
+				if ( ! checkSubdirectories ) {
+					return false;
+				} else {
+					boolean isEmpty = true;
+					for ( int i=0; i<files.length && isEmpty; i++) {
+						File file = files[i];
+						isEmpty = file.isDirectory() ? isEmptyDirectory(file, true) : false;
+					}
+					return isEmpty;
+				}
+				
+			} else {
 				return true;
+			}
 		}
 		
 		return true;
