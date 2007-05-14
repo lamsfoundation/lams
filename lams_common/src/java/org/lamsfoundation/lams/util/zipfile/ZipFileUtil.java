@@ -255,7 +255,7 @@ public class ZipFileUtil {
 		}
 		catch (IOException e1)
 		{
-			throw new ZipFileUtilException("An error has occurred while trying to zip the files. Error message is: ", e1);
+			throw new ZipFileUtilException("An error has occurred while trying to zip the files. Error message is: "+e1.getMessage(), e1);
 		}
         
     	return fileNameOfZipToCreate;
@@ -283,7 +283,7 @@ public class ZipFileUtil {
             }
             catch(FileUtilException e)
             {
-                throw new ZipFileUtilException("The temporary directory to place the zip file could be not created: ", e);
+                throw new ZipFileUtilException("The temporary directory to place the zip file could be not created: "+e.getMessage(), e);
             }
         }
         
@@ -309,7 +309,7 @@ public class ZipFileUtil {
 		}
 		catch (IOException e1)
 		{
-			throw new ZipFileUtilException("An error has occurred while trying to zip the files. Error message is: ", e1);
+			throw new ZipFileUtilException("An error has occurred while trying to zip the files. Error message is: "+e1.getMessage(), e1);
 		}
       
     	return fileNameOfZipToCreate;
@@ -363,7 +363,7 @@ public class ZipFileUtil {
 		}
 		catch(IOException e)
 		{
-			throw new ZipFileUtilException("An error has occurred while trying to zip the files. Error message is: ", e);
+			throw new ZipFileUtilException("An error has occurred while trying to zip the files. Error message is: "+e.getMessage(), e);
 		}
     }
     
