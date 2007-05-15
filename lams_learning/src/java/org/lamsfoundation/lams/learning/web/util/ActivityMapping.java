@@ -137,14 +137,12 @@ public class ActivityMapping implements Serializable
             String strutsAction = this.getActivityMappingStrategy()
                                       .getLessonCompleteAction();
             strutsAction = WebUtil.appendParameterToURL(strutsAction, LearningWebUtil.PARAM_PROGRESS_ID, progress.getLearnerProgressId().toString());
-            actionForward = this.strutsActionToForward(strutsAction,
-                                                       null,
-                                                       redirect);
+            strutsAction = strutsActionToURL(strutsAction, null, true);
+            actionForward = this.getClearFramesForward(strutsAction, progress.getLearnerProgressId().toString());
         }
         else
         {
-
-            if (! displayParallelFrames && progress.isParallelWaiting())
+            if (! displayParallelFrames && progress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING)
             {
             	// processing the screen WITHIN parallel activity frames.
                 // progress is waiting, goto waiting page
@@ -157,11 +155,12 @@ public class ActivityMapping implements Serializable
             else
             {
                 // display next activity
-                if (progress.getPreviousActivity()!=null && progress.getPreviousActivity().isParallelActivity())
+                if (progress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING_COMPLETE)
                 {
                     // if previous activity was a parallel activity then we need to
                     // clear frames.
-                	actionForward = this.getRedirectForward(progress, redirect);
+                   	String activityURL = this.getActivityURL(progress.getNextActivity());
+                	actionForward = this.getClearFramesForward(activityURL, progress.getLearnerProgressId().toString());
                 }
                 else
                 {
@@ -183,20 +182,28 @@ public class ActivityMapping implements Serializable
         return actionForward;
     }
     
-    public ActionForward getRedirectForward(LearnerProgress progress, boolean redirect) throws UnsupportedEncodingException {
-    	ActionForward actionForward = null;
+    /** Call the requestDisplay.do action to break out of any frames.
+     * Doesn't need to redirect this forward, as the requestDisplay.do does a redirect
+     * 
+     * @param activityURL URL to which we will be redirected. Does not need to be encoded as this method will encode it.
+     * @param progressId
+     * @return actionForward to which to forward
+     * @throws UnsupportedEncodingException
+     */
+    private ActionForward getClearFramesForward(String activityURL, String progressId) throws UnsupportedEncodingException {
+
+        String encodedURL = URLEncoder.encode(activityURL, "UTF-8");
+
+        ActionForward actionForward = null;
     	
-        String activityURL = this.getActivityURL(progress.getNextActivity());
-        activityURL = URLEncoder.encode(activityURL, "UTF-8");
-        
-        String strutsAction = "/requestDisplay.do?url=" + activityURL;
+        String strutsAction = "/requestDisplay.do?url=" + encodedURL;
         strutsAction = WebUtil.appendParameterToURL(strutsAction,
                 LearningWebUtil.PARAM_PROGRESS_ID,
-                progress.getLearnerProgressId().toString());
+                progressId);
 
     	actionForward = strutsActionToForward(strutsAction,
     											null,
-    											redirect);
+    											false);
     	return actionForward;
     	
     }

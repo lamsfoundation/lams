@@ -64,6 +64,13 @@ public class LearnerProgress implements Serializable
     public static final byte ACTIVITY_ATTEMPTED = 2;
     /** Indicates activity has not been attempted yet */
     public static final byte ACTIVITY_NOT_ATTEMPTED = 3;
+    
+    /** Parallel waiting state: Not waiting in any way */
+    public static final byte PARALLEL_NO_WAIT = 0;
+    /** Parallel waiting state: One activity complete, the others still to be completed */
+    public static final byte PARALLEL_WAITING = 1;
+    /** Parallel waiting state: All activities completed, break out of parallel frames */
+    public static final byte PARALLEL_WAITING_COMPLETE = 2;
     //---------------------------------------------------------------------
     // attributes
     //---------------------------------------------------------------------
@@ -119,7 +126,7 @@ public class LearnerProgress implements Serializable
      * Indicates the learner progress is in a incomplete parallel activity
      * or not.
      */
-    private boolean parallelWaiting;
+    private byte parallelWaiting;
     
     /**
      * A list of completed activities ids before move on to next activity
@@ -380,14 +387,14 @@ public class LearnerProgress implements Serializable
     /**
      * @return Returns the isParallelWaiting.
      */
-    public boolean isParallelWaiting()
+    public byte getParallelWaiting()
     {
         return parallelWaiting;
     }
     /**
      * @param isParallelWaiting The isParallelWaiting to set.
      */
-    public void setParallelWaiting(boolean parallelWaiting)
+    public void setParallelWaiting(byte parallelWaiting)
     {
         this.parallelWaiting = parallelWaiting;
     }

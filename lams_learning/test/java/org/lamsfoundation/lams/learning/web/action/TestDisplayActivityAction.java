@@ -103,6 +103,7 @@ public class TestDisplayActivityAction extends AbstractTestAction
         //LearnerProgress progress = testBean.getLearnerProgress();
         ParallelActivity parallelActivity= new ParallelActivity();
         learnerProgress.setPreviousActivity(parallelActivity);
+        learnerProgress.setParallelWaiting(LearnerProgress.PARALLEL_WAITING_COMPLETE);
         //testBean.setLearnerProgress(progress);
         httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
         
@@ -152,7 +153,7 @@ public class TestDisplayActivityAction extends AbstractTestAction
     {
         //setup the session bean to display parallel waiting.
         //LearnerProgress progress = testBean.getLearnerProgress();
-        learnerProgress.setParallelWaiting(true);
+        learnerProgress.setParallelWaiting(LearnerProgress.PARALLEL_WAITING);
         //testBean.setLearnerProgress(progress);
         //httpSession.setAttribute(SessionBean.NAME,testBean);
         httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);

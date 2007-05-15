@@ -37,7 +37,8 @@ public class OptionsActivityForm extends ActivityForm {
 	private int minimum;
 	private int maximum;
 	private boolean finished;
-
+	private Long progressID;
+	
 	public String getTitle() {
 		return title;
 	}
@@ -67,5 +68,11 @@ public class OptionsActivityForm extends ActivityForm {
 	}
 	public void setFinished(boolean finished) {
 		this.finished = finished;
+	}
+	public Long getProgressID() {
+		return progressID;
+	}
+	public void setProgressID(Long progressID) {
+		this.progressID = progressID;
 	}
 }

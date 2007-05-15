@@ -24,7 +24,6 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.service;
 
-import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -382,28 +381,26 @@ public class LearnerService implements ICoreLearnerService
     /**
      * Calculates learner progress and returns the data required to be displayed 
      * to the learner.
-     * @param completedActivityID identifies the activity just completed
+     * @param completedActivity the activity just completed
      * @param learner the Learner
+     * @param learnerProgress the current progress
      * @return the bean containing the display data for the Learner
      * @throws LamsToolServiceException
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress calculateProgress(Activity completedActivity,Integer learnerId) 
+    public LearnerProgress calculateProgress(Activity completedActivity,Integer learnerId, LearnerProgress currentLearnerProgress) 
     {
-    	Lesson lesson = getLessonByActivity(completedActivity);
-        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learnerId,lesson.getLessonId());
-
         try
         {
-            learnerProgress = progressEngine.calculateProgress(learnerProgress.getUser(), completedActivity,learnerProgress);
+        	LearnerProgress learnerProgress = progressEngine.calculateProgress(currentLearnerProgress.getUser(), completedActivity,currentLearnerProgress);
             learnerProgressDAO.updateLearnerProgress(learnerProgress);
+            return learnerProgress;
         }
         catch (ProgressException e)
         {
             throw new LearnerServiceException(e.getMessage());
         }
 
-        return learnerProgress;
     }
     
     /**
@@ -476,7 +473,7 @@ public class LearnerService implements ICoreLearnerService
         		
         	} else {
         		
-		    	nextLearnerProgress = calculateProgress(activity, learnerId);
+		    	nextLearnerProgress = calculateProgress(activity, learnerId, progress);
         	}
         //}
        	return nextLearnerProgress;

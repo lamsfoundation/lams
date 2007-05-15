@@ -113,6 +113,7 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		form.setDescription(optionsActivity.getDescription());
 		form.setTitle(optionsActivity.getTitle());
 		form.setLessonID(learnerProgress.getLesson().getLessonId());
+		form.setProgressID(learnerProgress.getLearnerProgressId());
 		
 		this.saveToken(request);
 		

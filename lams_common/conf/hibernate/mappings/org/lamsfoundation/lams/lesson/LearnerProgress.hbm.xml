@@ -22,7 +22,7 @@
 		<property name="lessonComplete" type="java.lang.Boolean"
 			column="lesson_completed_flag" />
 
-		<property name="parallelWaiting" type="java.lang.Boolean"
+		<property name="parallelWaiting" type="java.lang.Byte"
 			column="waiting_flag" />
 		<!-- Associations -->
 

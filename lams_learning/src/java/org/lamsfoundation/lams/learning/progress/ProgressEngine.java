@@ -63,7 +63,7 @@ public class ProgressEngine
     private List completedActivityList = new LinkedList();
     /**
      * Method determines next step for a learner based on the activity
-     * they have just completed.
+     * they have just completed. Will clear the Parallel Waiting Complete value if it is currently set.
      * @param learner The <CODE>User</CODE> who is progressing through the <CODE>Lesson</CODE>.
      * @param completedActivity The <CODE>Activity</CODE> the learner has just completed.
      * @param lesson The <CODE>Lesson</CODE> the learner needs progress for.
@@ -75,6 +75,17 @@ public class ProgressEngine
     public LearnerProgress calculateProgress(User learner,
                                              Activity completedActivity,
                                              LearnerProgress learnerProgress) throws ProgressException
+    {
+    	if ( learnerProgress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING_COMPLETE ) {
+    		learnerProgress.setParallelWaiting(LearnerProgress.PARALLEL_NO_WAIT);
+    	}
+    	return doCalculateProgress(learner, completedActivity, learnerProgress);
+    }
+    
+    /** Internal method used for recursion. Does the actual "work" of calculateProgress. */
+    private LearnerProgress doCalculateProgress(User learner,
+                                             Activity completedActivity,
+                                             LearnerProgress learnerProgress) throws ProgressException 
     {
         learnerProgress.setProgressState(completedActivity,
                                          LearnerProgress.ACTIVITY_COMPLETED);
@@ -119,7 +130,7 @@ public class ProgressEngine
                                         +"]");
         } else if ( progress.getCompletedActivities().contains(ld.getFirstActivity())  ) {
         	// special case - recalculating the appropriate current activity.
-        	return calculateProgress(progress.getUser(), ld.getFirstActivity(), progress);
+        	return doCalculateProgress(progress.getUser(), ld.getFirstActivity(), progress);
         } else if ( canDoActivity(progress.getLesson(), ld.getFirstActivity()) ) {
         	// normal case
  	        progress.setCurrentActivity(ld.getFirstActivity());
@@ -238,7 +249,8 @@ public class ProgressEngine
 		        else
 		            learnerProgress.setNextActivity(nextActivity);
 		        setActivityAttempted(learnerProgress, nextActivity);
-		        learnerProgress.setParallelWaiting(false);
+		        if ( learnerProgress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING )
+		        	learnerProgress.setParallelWaiting(LearnerProgress.PARALLEL_WAITING_COMPLETE );
 		        
 	        } else {
 	        	return clearProgressNowhereToGoNotCompleted(learnerProgress,"progressCompletedActivity");
@@ -250,7 +262,7 @@ public class ProgressEngine
 	    	 // abnormal case: next activity already done. Must have jumped back to an earlier
 	    	 // optional activity, done another activity and then kept going
 	    	 
-	    	 return calculateProgress(learner,nextActivity,learnerProgress);
+	    	 return doCalculateProgress(learner,nextActivity,learnerProgress);
 	     }
     	
     }
@@ -303,13 +315,12 @@ public class ProgressEngine
                 }
                 else if(isParallelWaitActivity(nextActivity))
                 {
-                    learnerProgress.setParallelWaiting(true);
+                    learnerProgress.setParallelWaiting(LearnerProgress.PARALLEL_WAITING);
                     // learnerProgress.setNextActivity(null);
                     populateCurrentCompletedActivityList(learnerProgress);
                 }
                 else if ( canDoActivity(learnerProgress.getLesson(), nextActivity) ) 
                 {
-                    learnerProgress.setParallelWaiting(false);
                     learnerProgress.setNextActivity(nextActivity);
                     setActivityAttempted(learnerProgress, nextActivity);
                     populateCurrentCompletedActivityList(learnerProgress);
@@ -322,7 +333,9 @@ public class ProgressEngine
             //parent activity.
             else {
     	        learnerProgress.setPreviousActivity(complexParent);
-                calculateProgress(learner, parent, learnerProgress);
+    	        doCalculateProgress(learner, parent, learnerProgress);
+		        if ( learnerProgress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING )
+		        	learnerProgress.setParallelWaiting(LearnerProgress.PARALLEL_WAITING_COMPLETE );
             }
         }
         //lesson is meant to be completed if there is no transition and no parent.

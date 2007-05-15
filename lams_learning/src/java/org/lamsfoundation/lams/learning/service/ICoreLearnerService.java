@@ -121,12 +121,14 @@ public interface ICoreLearnerService extends ILearnerService
     
     /**
      * Calculates learner progress and returns the data required to be displayed to the learner (including URL(s)).
+     * This method is included in the interface for testing purposes.
+     * 
      * @param completedActivityID identifies the activity just completed
      * @param learner the Learner
      * @return the bean containing the display data for the Learner
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress calculateProgress(Activity completedActivity, Integer learnerId); 
+    public LearnerProgress calculateProgress(Activity completedActivity, Integer learnerId, LearnerProgress currentLearnerProgress); 
 
     /**
      * Complete the activity in the progress engine and delegate to the progress 
