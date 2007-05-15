@@ -71,7 +71,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<c:if test="${!empty portfolio.notebookPortfolios}">
 			<p>
-				<a href="${portfolio.notebookLink}">
+				<a href="${portfolio.notebookLink}" target="_blank">
 					<fmt:message key="export.portfolio.notebook.link.label"/>
 				</a>
 			</p>
