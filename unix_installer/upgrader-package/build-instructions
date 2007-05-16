@@ -1,0 +1,10 @@
+BUILD INSTRUCTIONS FOR LAMS 2.0.x UPDATER
+=========================================
+
+1) Get the stable source code for the version of the updater
+2) Build lams as usual using ant lams-cruise
+3) Make sure docs/lams.properties contains all the default settings for the updater
+4) Run build.xml
+5) Go to the build directory
+6) Compress lams-unix-updater-x to lams-unix-updater-x.tar.gzip
+cp 
