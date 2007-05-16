@@ -488,11 +488,14 @@ Function CheckJava
         ${If} $JDK_DIR == ""
             ReadRegStr $JDK_DIR HKLM "SOFTWARE\JavaSoft\Java Development Kit\1.5" "JavaHome"
             ${if} $JDK_DIR == ""
-                MessageBox MB_OK|MB_ICONSTOP "Could not find a Java JDK 1.5 or 1.6 installation.  Please ensure you have JDK 1.5 or 1.6 installed."
+                MessageBox MB_OK|MB_ICONSTOP "Could not find a Java JDK 1.5 or 1.6 installation.  Please enter where you have java 5 or 6 installed."
             ${EndIf}
         ${EndIf}
     ${endif}
-    
+
+FunctionEnd
+
+Function Checkjava2    
     # check java version using given dir
     nsExec::ExecToStack '$JDK_DIR\bin\javac -version'
     Pop $0
@@ -501,7 +504,7 @@ Function CheckJava
     ${If} $0 == ""
         ${StrStr} $0 $1 "1.5"
         ${If} $0 == ""
-            MessageBox MB_OK|MB_ICONEXCLAMATION "Could not verify Java JDK 1.5, or JDK 1.6. Please check your JDK directory."
+            MessageBox MB_OK|MB_ICONEXCLAMATION "Could not find a Java 5 or Java 6 installation in the given directory. $\r$\nPlease check your Java installation and try again.$\r$\n$\r$\n$JDK_DIR"
             ${if} $IS_UPDATE == "0"
                 Abort
             ${else}
@@ -541,7 +544,7 @@ Function CheckMySQL
         ${If} $0 == "" ; if not 5.0.x, check 5.1.x
             ${StrStr} $0 $1 "5.1"
             ${If} $0 == ""
-                MessageBox MB_OK|MB_ICONSTOP "Your MySQL version does not appear to be compatible with LAMS (5.0.x or 5.1.x): $\r$\n$\r$\n$1"
+                MessageBox MB_OK|MB_ICONSTOP "Your MySQL version does not appear to be compatible with LAMS (5.0.x or 5.1.x): $\r$\n$1"
                 MessageBox MB_OK|MB_ICONSTOP "Your MySQL directory does not appear to be valid, please enter a valid MySQL directory before continuing.$\r$\n$\r$\n$1"
                 ${if} $IS_UPDATE == "0"
                     Abort
@@ -721,14 +724,14 @@ FunctionEnd
 
 
 Function PreLAMSConfig
+    Call CheckJava
     ${if} $IS_UPDATE == "0"
-        Call CheckJava
+        
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 2" "State" "$JDK_DIR"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 4" "State" "$INSTDIR\repository"
         !insertmacro MUI_HEADER_TEXT "Setting Up LAMS (2/4)" "Configure the LAMS Server.  If unsure, use the defaults."
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams.ini"
     ${else}
-        Call CheckJava
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 2" "State" "$JDK_DIR"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 4" "State" "$INSTDIR\repository"
         !insertmacro MUI_HEADER_TEXT "Java setup" "If you have changed your java installation since installing LAMS 2.0, please enter the new details."
@@ -738,27 +741,13 @@ FunctionEnd
 
 
 Function PostLAMSConfig
+    
     ${if} $IS_UPDATE == "0"
         !insertmacro MUI_INSTALLOPTIONS_READ $JDK_DIR "lams.ini" "Field 2" "State"
         !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_REPOSITORY "lams.ini" "Field 4" "State"
     ${endif}
     # check java version using given dir
-    nsExec::ExecToStack '$JDK_DIR\bin\javac -version'
-    Pop $0
-    Pop $1
-    ${StrStr} $0 $1 "1.6"
-    ${If} $0 == ""
-        ${StrStr} $0 $1 "1.5"
-        ${If} $0 == ""
-            MessageBox MB_OK|MB_ICONEXCLAMATION "Could not verify Java JDK 1.5, or JDK 1.6. Please check your JDK directory."
-            ${if} $IS_UPDATE == "0"
-                Abort
-            ${else}
-                quit
-            ${endif}
-        ${EndIf}
-    ${EndIf}
-    
+    Call Checkjava2
 FunctionEnd
 
 
@@ -822,7 +811,7 @@ FunctionEnd
 
 Function PostFinal
     ; Checking to see if lams2.0 exists
-    call checkRegistry
+    #call checkRegistry
     
     Call GetLocalTime
     Pop "$0" ;Variable (for day)
