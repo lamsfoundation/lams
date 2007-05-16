@@ -299,17 +299,17 @@ Function copyProjects
     ;copying COMMON project language files
     setoutpath "$INSTDIR"
     detailprint "Extracting language files for lams_common"
-    file /a "..\..\lams_common\conf\language\*"
+    file /a "..\..\lams_common\build\lib\language\org\lamsfoundation\lams\*"
     
     ;copying ADMIN project language files
     setoutpath "$INSTDIR\admin"
     detailprint "Extracting language files for lams_admin"
-    file /a "..\..\lams_admin\conf\language\*"
+    file /a "..\..\lams_admin\build\lib\language\org\lamsfoundation\lams\admin\*"
     
     ;copying CENTRAL project language files
     setoutpath "$INSTDIR\central"
     detailprint "Extracting language files for lams_central"
-    file /a "..\..\lams_central\conf\language\*"
+    file /a "..\..\lams_central\build\lib\language\org\lamsfoundation\lams\central\*"
     
     ;copying CONTENTREPOSITORY project language files
     setoutpath "$INSTDIR\contentrepository"
@@ -319,67 +319,67 @@ Function copyProjects
     ;copying LEARNING project language files
     setoutpath "$INSTDIR\learning"
     detailprint "Extracting language files for lams_learning"
-    file /a "..\..\lams_learning\conf\language\*"
+    file /a "..\..\lams_learning\build\lib\language\org\lamsfoundation\lams\learning\*"
      
     ;copying MONITORING project language files
     setoutpath "$INSTDIR\monitoring"
     detailprint "Extracting language files for lams_monitoring"
-    file /a  "..\..\lams_monitoring\conf\language\*"
+    file /a  "..\..\lams_monitoring\build\lib\language\org\lamsfoundation\lams\monitoring\*"
     
     ;copying TOOL_CHAT project language files
     setoutpath "$INSTDIR\tool\chat"
     detailprint "Extracting language files for lams_tool_chat"
-    file /a "..\..\lams_tool_chat\conf\language\*"
+    file /a "..\..\lams_tool_chat\build\deploy\language\*"
     
     ;copying TOOL_FORUM project language files
     setoutpath "$INSTDIR\tool\forum"
     detailprint "Extracting language files for lams_tool_forum"
-    file /a "..\..\lams_tool_forum\conf\language\*"
+    file /a "..\..\lams_tool_forum\build\deploy\language\*"
     
     ;copying TOOL_LAMC project language files
     setoutpath "$INSTDIR\tool\mc"
     detailprint "Extracting language files for lams_tool_lamc"
-    file /a "..\..\lams_tool_lamc\conf\language\*"
+    file /a "..\..\lams_tool_lamc\build\deploy\language\*"
     
     ;copying TOOL_LAQA project language files
     setoutpath "$INSTDIR\tool\qa"
     detailprint "Extracting language files for lams_tool_laqa"
-    file /a "..\..\lams_tool_laqa\conf\language\*"
+    file /a "..\..\lams_tool_laqa\build\deploy\language\*"
     
     ;copying TOOL_NOTEBOOK project language files
     setoutpath "$INSTDIR\tool\notebook"
     detailprint "Extracting language files for lams_tool_notebook"
-    file /a "..\..\lams_tool_notebook\conf\language\*"
+    file /a "..\..\lams_tool_notebook\build\deploy\language\*"
     
     ;copying TOOL_NB project language files
     setoutpath "$INSTDIR\tool\noticeboard"
     detailprint "Extracting language files for lams_tool_nb"
-    file /a "..\..\lams_tool_nb\conf\language\*"
+    file /a "..\..\lams_tool_nb\build\deploy\language\*"
     
     ;copying TOOL_LARSRC project language files
     setoutpath "$INSTDIR\tool\rsrc"
     detailprint "Extracting language files for lams_tool_larsrc"
-    file /a "..\..\lams_tool_larsrc\conf\language\*"
+    file /a "..\..\lams_tool_larsrc\build\deploy\language\*"
     
     ;copying TOOL_SBMT project language files
     setoutpath "$INSTDIR\tool\sbmt"
     detailprint "Extracting language files for lams_tool_sbmt"
-    file /a "..\..\lams_tool_sbmt\conf\language\*"
+    file /a "..\..\lams_tool_sbmt\build\deploy\language\*"
     
     ;copying TOOL_SCRIBE project language files
     setoutpath "$INSTDIR\tool\scribe"
     detailprint "Extracting language files for lams_tool_scribe"
-    file /a "..\..\lams_tool_scribe\conf\language\*"
+    file /a "..\..\lams_tool_scribe\build\deploy\language\*"
     
     ;copying TOOL_SURVEY project language files
     setoutpath "$INSTDIR\tool\survey"
     detailprint "Extracting language files for lams_tool_survey"
-    file /a "..\..\lams_tool_survey\conf\language\*"
+    file /a "..\..\lams_tool_survey\build\deploy\language\*"
     
     ;copying TOOL_VOTE project language files
     setoutpath "$INSTDIR\tool\vote"
     detailprint "Extracting language files for lams_tool_vote"
-    file /a "..\..\lams_tool_vote\conf\language\*" 
+    file /a "..\..\lams_tool_vote\build\deploy\language\*" 
 FunctionEnd
 
 ; copys the files from lams_central/web/flashxml to:
@@ -435,7 +435,7 @@ Function copyllid
         
         setoutpath "$INSTDIR\library\llid$R1"
         detailprint "Copying language files for chat and scribe"
-        file /a "..\..\lams_build\librarypackages\chatscribe\language\*"
+        file /a "..\..\lams_build\librarypackages\chatscribe\language\lams\*"
         
     ${loopuntil} $R0 == "0"
     
@@ -449,7 +449,7 @@ Function copyllid
     
         setoutpath "$INSTDIR\library\llid$R1"
         detailprint "Copying language files for forum and scribe"
-        file /a "..\..\lams_build\librarypackages\forumscribe\language\*"
+        file /a "..\..\lams_build\librarypackages\forumscribe\language\lams\*"
     ${loopuntil} $R0 == "0"
     
     ; copy all the folders for llid Resource and Forum
@@ -463,7 +463,7 @@ Function copyllid
         #MessageBox MB_OK|MB_ICONEXCLAMATION "Resource and Forum: $R1 $\nElements $R0"
         setoutpath "$INSTDIR\library\llid$R1"
         detailprint "Copying language files for resource and forum"
-        file /a "..\..\lams_build\librarypackages\shareresourcesforum\language\*"
+        file /a "..\..\lams_build\librarypackages\shareresourcesforum\language\lams\*"
     ${loopuntil} $R0 == "0"
 
 FunctionEnd
