@@ -1746,8 +1746,8 @@ Function DeployConfig
         intcmp $0 0 0 done done
             clearerrors
             ${LineFind} "$MYSQL_DIR\my.ini" "" "1" "WriteMyINI"
-            IfErrors 0 myini
-            goto nomyini
+            IfErrors nomyini myini
+             
     difini:
     iffileexists "$WINDIR\my.ini" 0 nomyini
         push "$WINDIR\my.ini"
@@ -1759,8 +1759,7 @@ Function DeployConfig
         intcmp $0 0 0 done done
             clearerrors
             ${LineFind} "$WINDIR\my.ini" "" "1" "WriteMyINI"
-            IfErrors 0 myini
-            goto nomyini
+            IfErrors nomyini myini
     
     /*
     ${LineFind} "$MYSQL_DIR\my.ini" "" "1" "WriteMyINI"
