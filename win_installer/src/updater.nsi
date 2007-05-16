@@ -27,6 +27,8 @@
  * possibilites:
  * 1) If LAMS 2.x is installed and this is a newer version, the updater will be 
  *    run
+ 
+ 
  * 2) If there is no LAMS 2.x installation, a full install will take place
  *
  * Builds to win_installer\build\LAMS-updater-$VERSION.exe
@@ -1731,19 +1733,49 @@ Function DeployConfig
         goto error
     ${EndIf}
     
-    # write my.ini if exists
-    # TODO doesn't check if tx_isolation is already READ-COMMITTED
+    # write my.ini if exists, doesnt write READ-COMMITTED if its already written
     # TODO doesn't take effect until mysql server is restarted
     DetailPrint "Setting MySQL transaction-isolation to READ-COMMITTED"
+    iffileexists "$MYSQL_DIR\my.ini" 0 difini
+        push "$MYSQL_DIR\my.ini"
+        push "transaction-isolation=READ-COMMITTED"
+        Call FileSearch
+        Pop $0 #Number of times found throughout
+        Pop $3 #Found at all? yes/no
+        Pop $2 #Number of lines found in
+        intcmp $0 0 0 done done
+            clearerrors
+            ${LineFind} "$MYSQL_DIR\my.ini" "" "1" "WriteMyINI"
+            IfErrors 0 myini
+            goto nomyini
+    difini:
+    iffileexists "$WINDIR\my.ini" 0 nomyini
+        push "$WINDIR\my.ini"
+        push "transaction-isolation=READ-COMMITTED"
+        Call FileSearch
+        Pop $0 #Number of times found throughout
+        Pop $3 #Found at all? yes/no
+        Pop $2 #Number of lines found in
+        intcmp $0 0 0 done done
+            clearerrors
+            ${LineFind} "$WINDIR\my.ini" "" "1" "WriteMyINI"
+            IfErrors 0 myini
+            goto nomyini
+    
+    /*
     ${LineFind} "$MYSQL_DIR\my.ini" "" "1" "WriteMyINI"
     IfErrors 0 myini
         clearerrors
         ${LineFind} "$WINDIR\my.ini" "" "1" "WriteMyINI"    
             IfErrors 0 myini
             MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't write to $MYSQL_DIR\my.ini.  Please write this text into your MySQL configuration file and restart MySQL:$\r$\n$\r$\n[mysqld]$\r$\ntransaction-isolation=READ-COMMITTED"
+    */
+    nomyini:
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't write to $MYSQL_DIR\my.ini.  Please write this text into your MySQL configuration file and restart MySQL:$\r$\n$\r$\n[mysqld]$\r$\ntransaction-isolation=READ-COMMITTED"       
+        goto done
     myini:
-    DetailPrint "MySQL will need to be restarted for this to take effect."
-    goto done
+        DetailPrint "MySQL will need to be restarted for this to take effect."
+        goto done
     error:
         DetailPrint "Ant configure-deploy failed."
         MessageBox MB_OK|MB_ICONSTOP "LAMS configuration failed.  Please check your LAMS configuration and try again.$\r$\nError:$\r$\n$\r$\n$1"
@@ -2167,33 +2199,87 @@ Function copyProjects
     ;copying COMMON project language files
     setoutpath "$INSTDIR"
     detailprint "Extracting language files for lams_common"
-    file /a "..\..\lams_common\conf\language\lams\*"
+    file /a "..\..\lams_common\build\lib\language\org\lamsfoundation\lams\*"
     
     ;copying ADMIN project language files
     setoutpath "$INSTDIR\admin"
     detailprint "Extracting language files for lams_admin"
-    file /a "..\..\lams_admin\conf\language\lams\*"
+    file /a "..\..\lams_admin\build\lib\language\org\lamsfoundation\lams\admin\*"
     
     ;copying CENTRAL project language files
     setoutpath "$INSTDIR\central"
     detailprint "Extracting language files for lams_central"
-    file /a "..\..\lams_central\conf\language\lams\*"
+    file /a "..\..\lams_central\build\lib\language\org\lamsfoundation\lams\central\*"
     
     ;copying CONTENTREPOSITORY project language files
     setoutpath "$INSTDIR\contentrepository"
     detailprint "Extracting language files for lams_contentrepository"
-    file /a  "..\..\lams_contentrepository\conf\language\lams\*"
+    file /a  "..\..\lams_contentrepository\conf\language\*"
     
     ;copying LEARNING project language files
     setoutpath "$INSTDIR\learning"
     detailprint "Extracting language files for lams_learning"
-    file /a "..\..\lams_learning\conf\language\lams\*"
+    file /a "..\..\lams_learning\build\lib\language\org\lamsfoundation\lams\learning\*"
      
     ;copying MONITORING project language files
     setoutpath "$INSTDIR\monitoring"
     detailprint "Extracting language files for lams_monitoring"
-    file /a  "..\..\lams_monitoring\conf\language\lams\*"
+    file /a  "..\..\lams_monitoring\build\lib\language\org\lamsfoundation\lams\monitoring\*"
     
+    ;copying TOOL_CHAT project language files
+    setoutpath "$INSTDIR\tool\chat"
+    detailprint "Extracting language files for lams_tool_chat"
+    file /a "..\..\lams_tool_chat\build\deploy\language\*"
+    
+    ;copying TOOL_FORUM project language files
+    setoutpath "$INSTDIR\tool\forum"
+    detailprint "Extracting language files for lams_tool_forum"
+    file /a "..\..\lams_tool_forum\build\deploy\language\*"
+    
+    ;copying TOOL_LAMC project language files
+    setoutpath "$INSTDIR\tool\mc"
+    detailprint "Extracting language files for lams_tool_lamc"
+    file /a "..\..\lams_tool_lamc\build\deploy\language\*"
+    
+    ;copying TOOL_LAQA project language files
+    setoutpath "$INSTDIR\tool\qa"
+    detailprint "Extracting language files for lams_tool_laqa"
+    file /a "..\..\lams_tool_laqa\build\deploy\language\*"
+    
+    ;copying TOOL_NOTEBOOK project language files
+    setoutpath "$INSTDIR\tool\notebook"
+    detailprint "Extracting language files for lams_tool_notebook"
+    file /a "..\..\lams_tool_notebook\build\deploy\language\*"
+    
+    ;copying TOOL_NB project language files
+    setoutpath "$INSTDIR\tool\noticeboard"
+    detailprint "Extracting language files for lams_tool_nb"
+    file /a "..\..\lams_tool_nb\build\deploy\language\*"
+    
+    ;copying TOOL_LARSRC project language files
+    setoutpath "$INSTDIR\tool\rsrc"
+    detailprint "Extracting language files for lams_tool_larsrc"
+    file /a "..\..\lams_tool_larsrc\build\deploy\language\*"
+    
+    ;copying TOOL_SBMT project language files
+    setoutpath "$INSTDIR\tool\sbmt"
+    detailprint "Extracting language files for lams_tool_sbmt"
+    file /a "..\..\lams_tool_sbmt\build\deploy\language\*"
+    
+    ;copying TOOL_SCRIBE project language files
+    setoutpath "$INSTDIR\tool\scribe"
+    detailprint "Extracting language files for lams_tool_scribe"
+    file /a "..\..\lams_tool_scribe\build\deploy\language\*"
+    
+    ;copying TOOL_SURVEY project language files
+    setoutpath "$INSTDIR\tool\survey"
+    detailprint "Extracting language files for lams_tool_survey"
+    file /a "..\..\lams_tool_survey\build\deploy\language\*"
+    
+    ;copying TOOL_VOTE project language files
+    setoutpath "$INSTDIR\tool\vote"
+    detailprint "Extracting language files for lams_tool_vote"
+    file /a "..\..\lams_tool_vote\build\deploy\language\*" 
 FunctionEnd
 
 ; first, finds the location of the language files in the database
