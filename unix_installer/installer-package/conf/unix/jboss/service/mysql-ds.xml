@@ -53,7 +53,7 @@ http://www.mysql.com/downloads/api-jdbc-stable.html
     <driver-class>com.mysql.jdbc.Driver</driver-class>
     <!-- Set transaction isolation level to match db -->
     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>	
-    <user-name>@DB_NAME@</user-name>
+    <user-name>@DB_USER@</user-name>
     <password>@DB_PASS@</password>
     <!-- Set minimum adn maximum size of pool -->
     <max-pool-size>32</max-pool-size>
