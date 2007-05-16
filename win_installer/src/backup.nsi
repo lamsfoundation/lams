@@ -115,6 +115,48 @@ Section backup
 SectionEnd
 
 Function .onInit
+    # check if LAMS is stopped
+    
+    SetOutPath $TEMP
+    File "..\build\LocalPortScanner.class"
+    ReadRegStr $0 HKLM "${REG_HEAD}" "lams_port"
+    ReadRegStr $1 HKLM "${REG_HEAD}" "dir_jdk"
+    Goto checklams
+    
+    
+    
+    checklams:
+        nsExec::ExecToStack "$1\bin\java LocalPortScanner $0"
+        Pop $2
+        ${If} $2 == 2
+            MessageBox MB_YESNOCANCEL|MB_ICONQUESTION "LAMS appears to be running. Do you wish to continue with lams running? $\r$\n$\r$\nClick yes to continue or no to stop lams (will take a few seconds)" \
+                IDNO stoplams \
+                IDCANCEL quitbackup
+        ${EndIf}
+        goto continue
+    stoplams:
+        nsExec::ExecToStack 'sc stop LAMSv2'
+        Pop $0
+        Pop $1
+        DetailPrint "Sent stop command to LAMS service."
+        # sleep for 10s to ensure that JBoss closes properly
+        sleep 10000
+        Goto checklams
+    quitbackup:
+        Delete "$TEMP\LocalPortScanner.class"
+        Abort
+    continue:
+        Delete "$TEMP\LocalPortScanner.class"
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     ReadRegStr $INSTDIR HKLM "${REG_HEAD}" "dir_inst"
     
     ${if} $INSTDIR == ""
@@ -187,7 +229,7 @@ Function PostBackupDir
 FunctionEnd
 
 Function PreFinish
-    !insertmacro MUI_INSTALLOPTIONS_WRITE "backup-finish.ini" "Field 1" "Text" "Congratulations! \r\n\r\nLAMS has backed successfully backed up to: $BACKUP_DIR \r\n\r\n\r\n\r\nTo revert to the backup, follow the instructions listed at: \r\n\r\nhttp://wiki.lamsfoundation.org/display/lamsdocs/Revert+To+Windows+Updater+Backup"
+    !insertmacro MUI_INSTALLOPTIONS_WRITE "backup-finish.ini" "Field 1" "Text" "Congratulations! \r\n\r\nLAMS has backed successfully backed up to: $BACKUP_DIR"
     !insertmacro MUI_HEADER_TEXT "LAMS Backup Utility" "Your LAMS backup is complete"
     !insertmacro MUI_INSTALLOPTIONS_DISPLAY "backup-finish.ini"
 FunctionEnd
