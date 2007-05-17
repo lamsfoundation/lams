@@ -5,6 +5,7 @@ ADD COLUMN read_only TINYINT DEFAULT 0
 alter table lams_learning_design
 ADD COLUMN edit_override_lock TINYINT DEFAULT 0
 ,ADD COLUMN edit_override_user_id BIGINT(20)
+,ADD COLUMN design_version INTEGER DEFAULT 1
 ,ADD CONSTRAINT FK_lams_learning_design_7 FOREIGN KEY (edit_override_user_id)
   	                   REFERENCES lams_user (user_id);
 
