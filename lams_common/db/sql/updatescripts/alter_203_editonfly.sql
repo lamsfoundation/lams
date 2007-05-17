@@ -14,7 +14,7 @@ ADD COLUMN locked_for_edit TINYINT DEFAULT 0
 
 UPDATE lams_learning_activity
 SET read_only = 1
-WHERE learning_design_id IN (SELECT learning_design_id FROM lams_learning_design WHERE copy_type_id IN (2,3))
+WHERE learning_design_id IN (SELECT learning_design_id FROM lams_learning_design WHERE copy_type_id IN (2,3));
 
 insert into lams_configuration (config_key, config_value) values ('AllowLiveEdit','true');
 insert into lams_configuration (config_key, config_value) values ('ServerURLContextPath','lams/');
