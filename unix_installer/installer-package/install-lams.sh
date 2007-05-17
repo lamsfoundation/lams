@@ -189,15 +189,15 @@ then
 chooseWrapper()
 {
         isMac=`uname -a | grep Mac`
-        if [ $isMac ]
+        if [ "$isMac" ]
         then
-                printf "\nIt looks like you have a Macintosh. We can't install the wrapper automatically for Macs. If you want to use the wrapper, you will need to install it manually. \nSee http://wiki.lamsfoundation.org/display/lamsdocs/Setup+Java+Service+Wrapper+for+LAMS.\n"
+                printf "\nIt looks like you have a Macintosh. We can't install the wrapper automatically for Macs. If you want to use the wrapper, you will need to install it manually. \nSee http://wiki.lamsfoundation.org/display/lamsdocs/Setup+Java+Service+Wrapper+for+LAMS.\n\nPress enter to continue with installation."
                 read temp
         else
                 isMac=`uname -a | grep Darwin`
-                if [ $isMac ]
+                if [ "$isMac" ]
                 then
-                        printf "\nIt looks like you have a Macintosh. We can't install the wrapper automatically for Macs. If you want to use the wrapper, you will need to install it manually. \nSee http://wiki.lamsfoundation.org/display/lamsdocs/Setup+Java+Service+Wrapper+for+LAMS.\n"
+                        printf "\nIt looks like you have a Macintosh. We can't install the wrapper automatically for Macs. If you want to use the wrapper, you will need to install it manually. \nSee http://wiki.lamsfoundation.org/display/lamsdocs/Setup+Java+Service+Wrapper+for+LAMS.\n\nPress enter to continue with installation."
                         read temp
                 else
                         arch=`uname -m`
@@ -406,14 +406,10 @@ if [  "$?" -ne  "0" ]
 fi
 
 
-printf "Copying lams.properties to /etc.\n"
-if [ -f /etc/lams2 ]
-then	
-	cp lams.properties /etc/lams2/
-else
-	mkdir -p /etc/lams2
-	cp lams.properties /etc/lams2/
-fi
+printf "Copying lams.properties to /etc.\n"	
+mkdir -p  /etc/lams2
+cp lams.properties /etc/lams2/
+
 
 printf "\n\nLAMS 2.0.2 Configuration completed!\n"
 printf "Please view the README for instructions on how to run LAMS.\n\n"
