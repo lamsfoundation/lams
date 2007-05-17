@@ -115,12 +115,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
     }    
     
-/**
- * Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
- * @usage   
- * @param   event
- */
-public function viewUpdate(event:Object):Void{
+	/**
+	 * Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
+	 * @usage   
+	 * @param   event
+	 */
+	public function viewUpdate(event:Object):Void{
 		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','CanvasView');
 		 //Update view from info object
         //Debugger.log('Recived an UPDATE!, updateType:'+infoObj.updateType,4,'update','CanvasView');

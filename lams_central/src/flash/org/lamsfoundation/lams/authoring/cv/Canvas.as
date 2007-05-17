@@ -24,6 +24,7 @@
 import org.lamsfoundation.lams.authoring.cv.*
 import org.lamsfoundation.lams.authoring.tk.*
 import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.comms.*
 import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.dict.*
@@ -52,12 +53,14 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
     
 	// CookieMonster (SharedObjects)
     private var _cm:CookieMonster;
+    private var _comms:Communication;
 	
 	private var _canvasView_mc:MovieClip;
 	private var app:Application;
 	private var _ddm:DesignDataModel;
 	private var _dictionary:Dictionary;
 	private var _config:Config;
+	private var doc;
 	private var _newToolContentID:Number;
 	private var _newChildToolContentID:Number;
 	private var _undoStack:Array;	
@@ -110,6 +113,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		
         //Get a ref to the cookie monster 
         _cm = CookieMonster.getInstance();
+        _comms = ApplicationParent.getInstance().getComms();
 		
 		_undoStack = new Array();
 		_redoStack = new Array();
@@ -185,14 +189,14 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
     */
     public function openAboutLams() {
 		
-		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"About - LAMS",closeButton:true,scrollContentPath:'AboutLams', sNumber:ApplicationParent.SERIAL_NO});
-		var lo = new Object();
-		lo.click = function(){
-		  dialog.deletePopUp();
-		}
-		dialog.addEventListener("click", lo);
+		var controller:CanvasController = canvasView.getController();
+		
+		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('about_popup_title_lbl', [Dictionary.getValue('stream_reference_lbl')]),closeButton:true,scrollContentPath:'AboutLams'});
+		dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openDialogLoaded));
+		
 	}
 
+	
 	
 	/**
 	* Opens a design using workspace and user to select design ID

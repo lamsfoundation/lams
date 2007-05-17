@@ -17,6 +17,11 @@ if(StringUtils.isEmpty(userID)){
 	Debugger.log('userID is not defined, using defualt:'+_root.userID ,Debugger.CRITICAL,'main','ROOT');			
 }
 
+if(StringUtils.isEmpty(version)){
+	_root.version = "undefined";
+	Debugger.log('version is not defined.', Debugger.CRITICAL,'main','ROOT');
+}
+
 if(StringUtils.isEmpty(mode)){
 	_root.mode = 1;
 	Debugger.log('Mode is not defined, using defualt:'+_root.mode,Debugger.CRITICAL,'main','ROOT');			

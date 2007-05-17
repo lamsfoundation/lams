@@ -38,7 +38,7 @@ class Header extends MovieClip {
 	
 	private var _header_mc:MovieClip;
 	private var _container:MovieClip;		// Holding Container
-	private var logo:MovieClip; 			// LAMS logo
+	private var logo:MovieClip; 			// LAMS/RAMS logo
 	
 	public static var LOGO_WIDTH:Number = 67;
 	public static var LOGO_HEIGHT:Number = 25;
