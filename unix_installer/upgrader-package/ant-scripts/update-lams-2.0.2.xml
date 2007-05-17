@@ -155,6 +155,14 @@
 				<exclude name="*.tmp"/>
 			</fileset>
 		</copy>
+		
+		<copy todir="${JBOSS_DIR}/server/default/lib" overwrite="true">
+			<fileset dir="../assembly" >
+				<include name="lams-valve.jar"/>
+				<include name="lams-session.jar"/>
+			</fileset>
+		</copy>
+		
 		<echo message="lams.ear successfully updated"/>
 	</target>
 
