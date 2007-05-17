@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Unix-Updater-Build" basedir=".">
+
+	<property file="../../lams_build/common.properties" />
+	<property file="../../lams_build/unix.properties" />
+	<property name="package-root" value="build/lams-unix-updater-2.0.2"/>
+	
+	<target name="clean" description="Create build dir.">
+		<delete dir="build" />
+		<mkdir dir="build" />
+		<mkdir dir="${package-root}" />
+		<mkdir dir="${package-root}/assembly" />
+		<mkdir dir="${package-root}/assembly/lams.ear" />
+		<mkdir dir="${package-root}/sql-scripts" />
+		<mkdir dir="${package-root}/log" />
+		<mkdir dir="${package-root}/database" />
+		<mkdir dir="${package-root}/bin" />
+		<mkdir dir="${package-root}/doc" />
+		<mkdir dir="${package-root}/ant" />
+		<mkdir dir="${package-root}/ant-scripts" />
+		<mkdir dir="${package-root}/language-pack" />
+		<mkdir dir="${package-root}/tools" />
+	</target>
+	
+	
+	<target name="compile-java" description="Compile custom java class">
+		<javac srcdir="bin" destdir="bin" />
+	</target>
+	
+	<target name="copy-assembly">
+		<copy todir="${package-root}/assembly">
+			<fileset dir="${j2eelibs}">
+				<include name="lams-session.jar"/>
+				<include name="lams-valve.jar"/>
+			</fileset>
+		</copy>
+		
+		<copy todir="${package-root}/assembly/lams.ear">
+			<fileset dir="${jboss.deploy}"/>
+		</copy>	
+	</target>
+	
+	
+	<target name="copy-files" depends="copy-assembly" description="Copies the files to the build dir">
+		<copy todir="${package-root}">
+			<fileset file="docs/lams.properties"/>
+			<fileset dir="${basedir}">
+				<include name="readme"/>
+				<include name="license"/>
+				<include name="update-lams.sh"/>
+			</fileset>
+		</copy>
+		
+			
+		<copy todir="${package-root}/ant">
+			<fileset dir="ant"/>
+		</copy>
+		<copy todir="${package-root}/ant-scripts">
+			<fileset dir="ant-scripts"/>
+		</copy>
+		<copy todir="${package-root}/bin">
+			<fileset dir="bin">
+				<include name="*.class"/>	
+				<include name="*.sh"/>
+			</fileset>
+		</copy>
+		<copy todir="${package-root}/language-pack">
+			<fileset dir="language-pack"/>
+		</copy>	
+		<copy todir="${package-root}/tools">
+			<fileset dir="tools"/>
+		</copy>	
+	</target>
+	
+	<target name="create-package">
+		<delete failonerror="false" file="${package-root}.tar.gz" />
+		
+		<tar destfile="${package-root}.tar" basedir="${package-root}" excludes="CVS"/>
+		<gzip zipfile="${package-root}.tar.gz" src="${package-root}.tar" />
+		
+		<delete failonerror="false" file="${package-root}.tar" />
+	</target>
+	
+	<target name="build-package" depends="clean, compile-java, copy-files, create-package"> 
+		<echo>Build Successful</echo>
+	</target>
+	
+</project>

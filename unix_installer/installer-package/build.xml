@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Unix-Installer-Build" basedir=".">
+	<property file="../../lams_build/common.properties" />
+	<property file="../../lams_build/unix.properties" />
+	<property name="package-root" value="build/lams-unix-installer-2.0.2"/>
+	
+	<target name="clean" description="Create build dir.">
+		<delete dir="build" />
+		<mkdir dir="build" />
+		<mkdir dir="${package-root}" />
+		<mkdir dir="${package-root}/assembly" />
+		<mkdir dir="${package-root}/assembly/lams.ear" />
+		<mkdir dir="${package-root}/sql-scripts" />
+		<mkdir dir="${package-root}/log" />
+		<mkdir dir="${package-root}/database" />
+		<mkdir dir="${package-root}/bin" />
+		<mkdir dir="${package-root}/conf" />
+		<mkdir dir="${package-root}/doc" />
+		<mkdir dir="${package-root}/wrapper" />
+		<mkdir dir="${package-root}/ant" />
+		<mkdir dir="${package-root}/ant-scripts" />
+	</target>
+	
+	<target name="dump-db" description="Dump full LAMS database contents.">
+	    <exec dir="" executable="C:\Program Files\MySQL\MySQL Server 5.0\bin\mysqldump.exe" 
+	     output="${package-root}/database/lams.dump" failonerror="true">
+	      <arg line="-u${db.username}" />
+	      <arg line="--password=${db.password}" />
+	      <arg line="${db.name}" />
+	    </exec>
+	</target>
+	
+	<target name="compile-java" description="Compile custom java class">
+		<javac srcdir="bin" destdir="bin" />
+	</target>
+	
+	<target name="copy-assembly">
+		<copy todir="${package-root}/assembly">
+			<fileset dir="${j2eelibs}">
+				<include name="lams-session.jar"/>
+				<include name="lams-valve.jar"/>
+			</fileset>
+		</copy>
+		
+		<copy todir="${package-root}/assembly/lams.ear">
+			<fileset dir="${jboss.deploy}"/>
+		</copy>	
+	</target>
+	
+	
+	<target name="copy-files" depends="copy-assembly" description="Copies the files to the build dir">
+		<copy todir="${package-root}">
+			<fileset file="doc/lams.properties"/>
+			<fileset dir="${basedir}">
+				<include name="readme"/>
+				<include name="license"/>
+				<include name="install-lams.sh"/>
+			</fileset>
+		</copy>
+		
+		<copy tofile="${package-root}/doc/setLamsConfiguration.sql" file="doc/setLamsConfiguration.sql"/>
+			
+		<copy todir="${package-root}/ant">
+			<fileset dir="ant"/>
+		</copy>
+		<copy todir="${package-root}/ant-scripts">
+			<fileset dir="ant-scripts"/>
+		</copy>
+		<copy todir="${package-root}/bin">
+			<fileset dir="bin">
+				<include name="*.class"/>	
+				<include name="*.sh"/>
+			</fileset>
+		</copy>
+		<copy todir="${package-root}/conf">
+			<fileset dir="conf"/>
+		</copy>
+		<copy todir="${package-root}/wrapper">
+			<fileset dir="wrapper"/>
+		</copy>	
+	</target>
+	
+	<target name="create-package">
+		<delete failonerror="false" file="${package-root}.tar.gz" />
+		
+		<tar destfile="${package-root}.tar" basedir="${package-root}" excludes="CVS"/>
+		<gzip zipfile="${package-root}.tar.gz" src="${package-root}.tar" />
+		
+		<delete failonerror="false" file="${package-root}.tar" />
+	</target>
+	
+	<target name="build-package" depends="clean, compile-java, dump-db, copy-files, create-package"> 
+		<echo>Build Successful</echo>
+	</target>
+	
+	<target name="rebuild-package" depends="clean, copy-files, create-package"> 
+			<echo>Rebuild Successful</echo>
+	</target>
+	
+</project>
