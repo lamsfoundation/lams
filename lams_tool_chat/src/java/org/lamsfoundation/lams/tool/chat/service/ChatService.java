@@ -32,6 +32,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -44,6 +45,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
+import org.hibernate.Hibernate;
+import org.hibernate.id.Configurable;
+import org.hibernate.id.IdentifierGenerator;
+import org.hibernate.id.UUIDHexGenerator;
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -112,8 +117,8 @@ import org.w3c.dom.Text;
  * ToolContentManager and ToolSessionManager.
  */
 
-public class ChatService implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager,
-		IChatService {
+public class ChatService implements ToolSessionManager, ToolContentManager,
+		ToolContentImport102Manager, IChatService {
 
 	static Logger logger = Logger.getLogger(ChatService.class.getName());
 
@@ -140,10 +145,17 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	private IExportToolContentService exportContentService;
 
 	private ICoreNotebookService coreNotebookService;
-	
+
+	//
+	private IdentifierGenerator idGenerator;
+
 	public ChatService() {
 		super();
-		// TODO Auto-generated constructor stub
+
+		// configure the indentifier generator
+		idGenerator = new UUIDHexGenerator();
+		((Configurable) idGenerator).configure(Hibernate.STRING,
+				new Properties(), null);
 	}
 
 	/* ************ Methods from ToolSessionManager ************* */
@@ -159,9 +171,14 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 		ChatSession session = new ChatSession();
 		session.setSessionId(toolSessionId);
 		session.setSessionName(toolSessionName);
-		session.setJabberRoom(null); // we will create this when the first
-		// learner starts
-		// TODO need to also set other fields.
+
+		String jabberRoom = (String) idGenerator.generate(null, null) + "@"
+				+ Configuration.get(ConfigurationKeys.XMPP_CONFERENCE);
+		session.setJabberRoom(jabberRoom);
+
+		// the jabber room is created when the first learner starts
+		session.setRoomCreated(false);
+
 		Chat chat = chatDAO.getByContentId(toolContentId);
 		session.setChat(chat);
 		chatSessionDAO.saveOrUpdate(session);
@@ -222,7 +239,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	public void removeToolSession(Long toolSessionId)
 			throws DataMissingException, ToolException {
 		chatSessionDAO.deleteBySessionID(toolSessionId);
-		//TODO check if cascade worked
+		// TODO check if cascade worked
 		// do we need to remove room on jabber server ?
 	}
 
@@ -242,7 +259,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 		}
 
 		Chat fromContent = null;
-		if ( fromContentId != null ) {
+		if (fromContentId != null) {
 			fromContent = chatDAO.getByContentId(fromContentId);
 		}
 		if (fromContent == null) {
@@ -257,8 +274,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	public void setAsDefineLater(Long toolContentId, boolean value)
 			throws DataMissingException, ToolException {
 		Chat chat = chatDAO.getByContentId(toolContentId);
-		if(chat == null){
-			throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+		if (chat == null) {
+			throw new ToolException("Could not find tool with toolContentID: "+ toolContentId);
 		}
 		chat.setDefineLater(value);
 		chatDAO.saveOrUpdate(chat);
@@ -294,8 +311,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 		Chat chat = chatDAO.getByContentId(toolContentId);
 		if (chat == null)
 			chat = getDefaultContent();
-		if (chat ==null )
- 			throw new DataMissingException("Unable to find default content for the chat tool");
+		if (chat == null)
+			throw new DataMissingException(
+					"Unable to find default content for the chat tool");
 
 		// set ResourceToolContentHandler as null to avoid copy file node in
 		// repository again.
@@ -310,8 +328,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 			exportContentService
 					.registerFileClassForExport(ChatAttachment.class.getName(),
 							"fileUuid", "fileVersionId");
-			exportContentService.exportToolContent(toolContentId,
-					chat, chatToolContentHandler, rootPath);
+			exportContentService.exportToolContent(toolContentId, chat,
+					chatToolContentHandler, rootPath);
 		} catch (ExportToolContentException e) {
 			throw new ToolException(e);
 		}
@@ -325,14 +343,16 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	 *             if any other error occurs
 	 */
 	public void importToolContent(Long toolContentId, Integer newUserUid,
-			String toolContentPath ,String fromVersion,String toVersion) throws ToolException {
+			String toolContentPath, String fromVersion, String toVersion)
+			throws ToolException {
 		try {
 			exportContentService.registerFileClassForImport(
 					ChatAttachment.class.getName(), "fileUuid",
 					"fileVersionId", "fileName", "fileType", null, null);
 
 			Object toolPOJO = exportContentService.importToolContent(
-					toolContentPath, chatToolContentHandler,fromVersion,toVersion);
+					toolContentPath, chatToolContentHandler, fromVersion,
+					toVersion);
 			if (!(toolPOJO instanceof Chat))
 				throw new ImportToolContentException(
 						"Import Chat tool content failed. Deserialized object is "
@@ -532,16 +552,20 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	public void createJabberRoom(ChatSession chatSession) {
 		try {
 			XMPPConnection.DEBUG_ENABLED = false;
-			XMPPConnection con = new XMPPConnection(Configuration.get(ConfigurationKeys.XMPP_DOMAIN));
-
+			XMPPConnection con = new XMPPConnection(Configuration
+					.get(ConfigurationKeys.XMPP_DOMAIN));
+			
+			
 			con.login(Configuration.get(ConfigurationKeys.XMPP_ADMIN),
 					Configuration.get(ConfigurationKeys.XMPP_PASSWORD));
 
 			// Create a MultiUserChat using an XMPPConnection for a room
-			String jabberRoom = new Long(System.currentTimeMillis()).toString()
-					+ "@" + Configuration.get(ConfigurationKeys.XMPP_CONFERENCE);
+//			String jabberRoom = new Long(System.currentTimeMillis()).toString()
+//					+ "@"
+//					+ Configuration.get(ConfigurationKeys.XMPP_CONFERENCE);
 
-			MultiUserChat muc = new MultiUserChat(con, jabberRoom);
+
+			MultiUserChat muc = new MultiUserChat(con, chatSession.getJabberRoom());
 
 			// Create the room
 			muc.create("nick");
@@ -567,17 +591,19 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 			// Send the completed form (with default values) to the server to
 			// configure the room
 			muc.sendConfigurationForm(submitForm);
-
-			chatSession.setJabberRoom(jabberRoom);
+			
+			chatSession.setRoomCreated(true);
 			con.close();
 
 		} catch (XMPPException e) {
 			logger.error(e);
+			logger.error(e.getXMPPError());
+			// TODO should we continue ?
 		}
 	}
 
 	public void processIncomingMessages(NodeList messageElems) {
-	
+
 		for (int i = 0; i < messageElems.getLength(); i++) {
 			// extract message attributes
 			Node message = messageElems.item(i);
@@ -720,7 +746,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 				Element xElement = document.createElement("x");
 				xElement.setAttribute("xmlns", "jabber:x:delay");
 				xElement.setAttribute("stamp", "TODO"); // TODO generate the
-														// stamp attribute
+				// stamp attribute
 				xElement.setAttribute("from", jabberRoom + "/"
 						+ message.getFromUser().getJabberNickname());
 
@@ -761,9 +787,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	public void filterMessage(Node message, Chat chat) {
 		Pattern pattern = getFilterPattern(chat);
 		if (pattern == null) {
-			return;			
+			return;
 		}
-		
+
 		// get the message body node
 		Node body = getBodyElement(message);
 		if (body == null) {
@@ -780,7 +806,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 
 		// filter the message.
 		Matcher matcher = pattern.matcher(bodyText.getNodeValue());
-		bodyText.setNodeValue(matcher.replaceAll(ChatConstants.FILTER_REPLACE_TEXT));
+		bodyText.setNodeValue(matcher
+				.replaceAll(ChatConstants.FILTER_REPLACE_TEXT));
 	}
 
 	public void filterMessage(Node message) {
@@ -800,23 +827,24 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 		Chat chat = getSessionByJabberRoom(jabberRoom).getChat();
 		filterMessage(message, chat);
 	}
-	
+
 	public void filterMessage(ChatMessageDTO messageDTO, Chat chat) {
 		Pattern pattern = getFilterPattern(chat);
-		
-		if (pattern == null) {	
+
+		if (pattern == null) {
 			return;
 		}
-		
+
 		Matcher matcher = pattern.matcher(messageDTO.getBody());
-		messageDTO.setBody(matcher.replaceAll(ChatConstants.FILTER_REPLACE_TEXT));
+		messageDTO.setBody(matcher
+				.replaceAll(ChatConstants.FILTER_REPLACE_TEXT));
 	}
-	
+
 	private Pattern getFilterPattern(Chat chat) {
 		if (!chat.isFilteringEnabled()) {
 			return null;
 		}
-		
+
 		// get the filter
 		ChatMessageFilter filter = messageFilters.get(chat.getToolContentId());
 		if (filter == null) {
@@ -907,7 +935,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	 */
 	private String createJabberId(UserDTO user) {
 		try {
-			XMPPConnection con = new XMPPConnection(Configuration.get(ConfigurationKeys.XMPP_DOMAIN));
+			XMPPConnection con = new XMPPConnection(Configuration
+					.get(ConfigurationKeys.XMPP_DOMAIN));
 
 			AccountManager manager = con.getAccountManager();
 			if (manager.supportsAccountCreation()) {
@@ -920,7 +949,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 			logger.error(e);
 			// TODO handle exception
 		}
-		return user.getUserID() + "@" + Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
+		return user.getUserID() + "@"
+				+ Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
 	}
 
 	private NodeKey processFile(FormFile file, String type) {
@@ -1061,11 +1091,11 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	public Map<Long, Integer> getMessageCountBySession(Long chatUID) {
 		return chatMessageDAO.getCountBySession(chatUID);
 	}
-	
+
 	public Map<Long, Integer> getMessageCountByFromUser(Long sessionUID) {
 		return chatMessageDAO.getCountByFromUser(sessionUID);
 	}
-	
+
 	public ICoreNotebookService getCoreNotebookService() {
 		return coreNotebookService;
 	}
@@ -1076,83 +1106,98 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 
 	public Long createNotebookEntry(Long id, Integer idType, String signature,
 			Integer userID, String entry) {
-		return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
+		return coreNotebookService.createNotebookEntry(id, idType, signature,
+				userID, "", entry);
 	}
 
 	public NotebookEntry getEntry(Long id, Integer idType, String signature,
 			Integer userID) {
-		
-		List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
+
+		List<NotebookEntry> list = coreNotebookService.getEntry(id, idType,
+				signature, userID);
 		if (list == null || list.isEmpty()) {
 			return null;
 		} else {
 			return list.get(0);
 		}
 	}
-	
+
 	/**
 	 * @param notebookEntry
 	 */
 	public void updateEntry(NotebookEntry notebookEntry) {
 		coreNotebookService.updateEntry(notebookEntry);
 	}
-	
-	/* ===============Methods implemented from ToolContentImport102Manager =============== */
-	
 
-    /**
-     * Import the data for a 1.0.2 Chat
-     */
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
-    {
-    	Date now = new Date();
-    	Chat chat = new Chat();
-    	chat.setContentInUse(Boolean.FALSE);
-    	chat.setCreateBy(new Long(user.getUserID().longValue()));
-    	chat.setCreateDate(now);
-    	chat.setDefineLater(Boolean.FALSE);
-    	chat.setFilterKeywords(null);
-    	chat.setFilteringEnabled(Boolean.FALSE);
-    	chat.setInstructions(WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-    	chat.setLockOnFinished(Boolean.FALSE);
-    	chat.setOfflineInstructions(null);
-    	chat.setOnlineInstructions(null);
-    	chat.setReflectInstructions(null);
-    	chat.setReflectOnActivity(Boolean.FALSE);
-    	chat.setRunOffline(Boolean.FALSE);
-    	chat.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-    	chat.setToolContentId(toolContentId);
-    	chat.setUpdateDate(now);
-    	
-    	try {
-    		Boolean isReusable = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_REUSABLE);
-    		chat.setLockOnFinished(isReusable != null ? ! isReusable.booleanValue() : true);
+	/*
+	 * ===============Methods implemented from ToolContentImport102Manager
+	 * ===============
+	 */
+
+	/**
+	 * Import the data for a 1.0.2 Chat
+	 */
+	public void import102ToolContent(Long toolContentId, UserDTO user,
+			Hashtable importValues) {
+		Date now = new Date();
+		Chat chat = new Chat();
+		chat.setContentInUse(Boolean.FALSE);
+		chat.setCreateBy(new Long(user.getUserID().longValue()));
+		chat.setCreateDate(now);
+		chat.setDefineLater(Boolean.FALSE);
+		chat.setFilterKeywords(null);
+		chat.setFilteringEnabled(Boolean.FALSE);
+		chat.setInstructions(WebUtil.convertNewlines((String) importValues
+				.get(ToolContentImport102Manager.CONTENT_BODY)));
+		chat.setLockOnFinished(Boolean.FALSE);
+		chat.setOfflineInstructions(null);
+		chat.setOnlineInstructions(null);
+		chat.setReflectInstructions(null);
+		chat.setReflectOnActivity(Boolean.FALSE);
+		chat.setRunOffline(Boolean.FALSE);
+		chat.setTitle((String) importValues
+				.get(ToolContentImport102Manager.CONTENT_TITLE));
+		chat.setToolContentId(toolContentId);
+		chat.setUpdateDate(now);
+
+		try {
+			Boolean isReusable = WDDXProcessor.convertToBoolean(importValues,
+					ToolContentImport102Manager.CONTENT_REUSABLE);
+			chat.setLockOnFinished(isReusable != null ? !isReusable
+					.booleanValue() : true);
 		} catch (WDDXProcessorConversionException e) {
-			logger.error("Unable to content for activity "+chat.getTitle()+"properly due to a WDDXProcessorConversionException.",e);
-			throw new ToolException("Invalid import data format for activity "+chat.getTitle()+"- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+			logger.error("Unable to content for activity " + chat.getTitle()
+					+ "properly due to a WDDXProcessorConversionException.", e);
+			throw new ToolException(
+					"Invalid import data format for activity "
+							+ chat.getTitle()
+							+ "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
 		}
 
+		// leave as empty, no need to set them to anything.
+		// setChatAttachments(Set chatAttachments);
+		// setChatSessions(Set chatSessions);
+		chatDAO.saveOrUpdate(chat);
+	}
 
-    	// leave as empty, no need to set them to anything.
-    	//setChatAttachments(Set chatAttachments);
-    	//setChatSessions(Set chatSessions);
-    	chatDAO.saveOrUpdate(chat);
-    }
+	/**
+	 * Set the description, throws away the title value as this is not supported
+	 * in 2.0
+	 */
+	public void setReflectiveData(Long toolContentId, String title,
+			String description) throws ToolException, DataMissingException {
 
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) 
-    		throws ToolException, DataMissingException {
-    	
-    	Chat chat = getChatByContentId(toolContentId);
-    	if ( chat == null ) {
-    		throw new DataMissingException("Unable to set reflective data titled "+title
-	       			+" on activity toolContentId "+toolContentId
-	       			+" as the tool content does not exist.");
-    	}
-    	
-    	chat.setReflectOnActivity(Boolean.TRUE);
-    	chat.setReflectInstructions(description);
-    }
-    
-    //=========================================================================================
+		Chat chat = getChatByContentId(toolContentId);
+		if (chat == null) {
+			throw new DataMissingException(
+					"Unable to set reflective data titled " + title
+							+ " on activity toolContentId " + toolContentId
+							+ " as the tool content does not exist.");
+		}
+
+		chat.setReflectOnActivity(Boolean.TRUE);
+		chat.setReflectInstructions(description);
+	}
+
+	// =========================================================================================
 }

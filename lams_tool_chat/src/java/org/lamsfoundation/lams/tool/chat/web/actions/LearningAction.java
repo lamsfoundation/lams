@@ -115,7 +115,8 @@ public class LearningAction extends LamsDispatchAction {
 		request.setAttribute("MODE", mode);
 
 		// Create the room if it doesnt exist
-		if (chatSession.getJabberRoom() == null) {
+		log.debug(chatSession.isRoomCreated());
+		if (!chatSession.isRoomCreated()) {
 			chatService.createJabberRoom(chatSession);
 			chatService.saveOrUpdateChatSession(chatSession);
 		}
