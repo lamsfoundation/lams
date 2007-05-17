@@ -36,7 +36,7 @@
         header("HTTP/1.1 401 Unauthenticated");//which status code is appropriate?
         exit(1);
     }
-    $array = array('',$user->firstname,$user->lastname,$user->address,$user->city,'','',$user->country,$user->phone1,'','',$user->email,$user->country,$user->lang);
+    $array = array('',$user->firstname,$user->lastname,$user->address,$user->city,'','',$user->country,$user->phone1,'','',$user->email,$user->country,substr($user->lang,0,2));
     $comma_separated = implode(",", $array);//need more sophiscated algorithm to generate CSV formatted string
     echo $comma_separated;
 ?>
