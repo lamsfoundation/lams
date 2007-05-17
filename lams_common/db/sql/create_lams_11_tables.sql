@@ -845,6 +845,7 @@ CREATE TABLE lams_learning_transition (
      , create_date_time DATETIME NOT NULL
      , to_ui_id INT(11)
      , from_ui_id INT(11)
+     , UNIQUE UQ_transition_activities (from_activity_id, to_activity_id)
      , PRIMARY KEY (transition_id)
      , INDEX (from_activity_id)
      , CONSTRAINT FK_learning_transition_3 FOREIGN KEY (from_activity_id)

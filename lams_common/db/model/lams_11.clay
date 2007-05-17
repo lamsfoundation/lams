@@ -1519,7 +1519,13 @@
 <primary-key-description></primary-key-description>
 <primary-key-column name="transition_id"/>
 </primary-key>
-<unique-key-list/>
+<unique-key-list>
+<unique-key alias="" name="UQ_transition_activities" remarks="">
+<unique-key-description></unique-key-description>
+<unique-key-column name="from_activity_id"/>
+<unique-key-column name="to_activity_id"/>
+</unique-key>
+</unique-key-list>
 <foreign-key-list>
 <foreign-key alias="" name="FK_learning_transition_3" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="lams_learning_activity" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
 <foreign-key-description></foreign-key-description>
