@@ -542,12 +542,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	public function openDialogLoaded(evt:Object) {
         
 		if(evt.type == 'contentLoaded'){
-			//set a ref to the view
-			//evt.target.scrollContent.canvasView = canvasView;
-			
-			//set a ref to the dia in the view
-			//LessonTabView(getView()).dialog = evt.target.scrollContent;
-			
 			//set up UI
 			//note this function registers the dialog to recieve view updates
 			evt.target.scrollContent.setUpContent();		

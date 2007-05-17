@@ -149,7 +149,7 @@ class AboutDialog extends MovieClip implements Dialog {
 	
 	public function getList():Void {
 		var callBack = Proxy.create(this,loadData);
-        _comms.getRequest('flashxml/contributorData.xml',callBack)
+        _comms.getRequest('flashxml/contributorData.xml',callBack);
 	}
 	
 	public function loadData(data:Object) {

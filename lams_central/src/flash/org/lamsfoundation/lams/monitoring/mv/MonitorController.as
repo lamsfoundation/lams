@@ -454,4 +454,17 @@ class MonitorController extends AbstractController {
 	private function removalAlert(msg:String, okHandler:Function, cancelHandler:Function) {
 		LFMessage.showMessageConfirm(msg,okHandler,cancelHandler,Dictionary.getValue('al_yes'),Dictionary.getValue('al_no'));
 	}
+	
+	public function openAboutDialogLoaded(evt:Object) {
+        
+		if(evt.type == 'contentLoaded'){
+			//set up UI
+			//note this function registers the dialog to recieve view updates
+			evt.target.scrollContent.setUpContent();		
+			
+        } else {
+            //TODO DI 25/05/05 raise wrong event type error 
+        }
+		
+    }
 }

@@ -172,13 +172,13 @@ class Monitor {
     */
     public function openAboutLams() {
 		
-		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"About - LAMS",closeButton:true,scrollContentPath:'AboutLams', sNumber:ApplicationParent.SERIAL_NO});
-		var lo = new Object();
-		lo.click = function(){
-		  dialog.deletePopUp();
-		}
-		dialog.addEventListener("click", lo);
+		var controller:MonitorController = monitorView.getController();
+		
+		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('about_popup_title_lbl', [Dictionary.getValue('stream_reference_lbl')]),closeButton:true,scrollContentPath:'AboutLams'});
+		dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openAboutDialogLoaded));
+		
 	}
+
 
 	/**
     * Called when Users loaded for role type
