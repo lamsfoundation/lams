@@ -92,8 +92,7 @@ public class LearnerAction extends LamsDispatchAction
     //---------------------------------------------------------------------
     // Class level constants - Struts forward
     //---------------------------------------------------------------------
-    private static final String DISPLAY_ACTIVITY = "displayActivity";
-	
+ 	
 	private static IAuditService auditService;
 	
 	private ActionForward redirectToURL(ActionMapping mapping, HttpServletResponse response, String url) throws IOException, ServletException {
@@ -171,7 +170,8 @@ public class LearnerAction extends LamsDispatchAction
 	        
 			LearningWebUtil.putLearnerProgressInRequest(request,learnerProgress);
 			
-			String url = "learning/" +  mapping.findForward(DISPLAY_ACTIVITY).getPath() + "?lessonID=" + lessonID;
+			ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+			String url = "learning/" +  activityMapping.getDisplayActivityAction(lessonID);
 			
 			redirectToURL(mapping, response, url);
 	
@@ -234,7 +234,8 @@ public class LearnerAction extends LamsDispatchAction
 	        //serialize a acknowledgement flash message with the path of display next
 	        //activity
 	        
-			message = new FlashMessage("joinLesson", mapping.findForward(DISPLAY_ACTIVITY).getPath());
+			ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+			message = new FlashMessage("joinLesson", activityMapping.getDisplayActivityAction(null));
 	
     	} catch (Exception e ) {
     		message = handleException(e, "joinLesson", learnerService);
@@ -528,7 +529,6 @@ public class LearnerAction extends LamsDispatchAction
 
 		//getting requested object according to coming parameters
 		Integer learnerId = LearningWebUtil.getUserId();
-		User learner = (User)LearnerServiceProxy.getUserManagementService(getServlet().getServletContext()).findById(User.class,learnerId);
 
 		//get parameters
     	Long fromActivityId = null;
@@ -568,7 +568,7 @@ public class LearnerAction extends LamsDispatchAction
     		if ( log.isDebugEnabled() ) {
     			log.debug("Force move for learner "+learnerId+" lesson "+lessonId+". ");
     		}
-    		flashMessage = new FlashMessage("forceMove", mapping.findForward(DISPLAY_ACTIVITY).getPath());
+    		flashMessage = new FlashMessage("forceMove", activityMapping.getDisplayActivityAction(null));
 		} catch (Exception e) {
 			flashMessage = handleException(e, "forceMove", learnerService);
 		}

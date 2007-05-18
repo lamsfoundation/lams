@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.learning.web.util;
 import java.io.Serializable;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /**
  * @author daveg
@@ -95,5 +94,13 @@ public class ActivityMappingStrategy implements Serializable {
 	 */
 	protected String getCompleteActivityAction() {
 		return "/CompleteActivity.do";
+	}
+
+	/**
+	 * Get the "bootstrap" activity action. This is the action called when the user first joins a lesson, and sets up 
+	 * the necessary request details based on the user's progress details.
+	 */
+	protected String getDisplayActivityAction() {
+		return "/DisplayActivity.do";
 	}
 }

@@ -20,9 +20,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-	<script language="JavaScript">
-			window.close();
-	</script>
+<%@ taglib uri="tags-core" prefix="c" %>
+
+ 	<script language="JavaScript" type="text/Javascript"><!--
+    function doCloseRedirect() {
+        if ( window.name == "LearnerActivity" ) {
+        	<%-- In popup window (ie have revisited a completed activity. Just the one activity in the window so close --%>
+            window.close();
+        <%-- } else if ( window.parent.name == "LearnerActivity" ) {
+             In a parallel activity in the popup window, so won't actually close the window (btw you would need to 
+              close the parent if you want to close the window. Live with two "close" messages for now. Eventually we 
+	      want to display the wait for the first one, and then close on the second. For that we will need
+              location.href = "<c:out value="${param.waitURL}" escapeXml="false"/>"; --%>
+        } else if ( window.parent.name != "LearnerActivity" ) {
+        	<%-- In the main learner window, so want to continue with the main progress --%>
+            location.href = "<c:out value="${param.nextURL}" escapeXml="false"/>";
+        }
+    }
+    window.onload = doCloseRedirect;
+    //-->
+    </script>
 
 	<div id="content">
 
@@ -33,5 +50,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div id="footer">
 	</div><!--closes footer-->
-
 

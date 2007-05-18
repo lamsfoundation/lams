@@ -60,6 +60,8 @@ public class LearningWebUtil
     // Class level constants - session attributes
     //---------------------------------------------------------------------
 	public static final String PARAM_PROGRESS_ID = "progressID";
+//	public static final String POPUP_WINDOW_NAME = "LearnerActivity";
+//	public static final String LEARNER_WINDOW_NAME = "lWindow";
     
     /**
      * Helper method to retrieve the user data. Gets the id from the user details
@@ -188,6 +190,7 @@ public class LearningWebUtil
     /** "Complete" an activity from the web layer's perspective. Used for CompleteActivityAction and the Gate and Grouping actions.
      * Calls the learningService to actually complete the activity and progress.
      * @param redirect Should this call redirect to the next screen (true) or use a forward (false)
+     * @param windowName Name of the window that triggered this code. Normally LearnerActivity (the popup window) or lWindow (normal learner window)
      * @throws UnsupportedEncodingException 
      *
      */
@@ -195,20 +198,21 @@ public class LearningWebUtil
     		ActivityMapping actionMappings, LearnerProgress currentProgress, Activity currentActivity, 
     			Integer learnerId, ICoreLearnerService learnerService, boolean redirect) throws LearnerServiceException, UnsupportedEncodingException {
     	
-    	LearnerProgress newProgress=null;
-    	Lesson lesson = currentProgress.getLesson();
+    	LearnerProgress progress=currentProgress;
+    	Lesson lesson = progress.getLesson();
     	
 		if ( currentActivity == null ) {
-			newProgress = learnerService.joinLesson(learnerId, lesson.getLessonId());
-		} else if ( currentProgress.getCompletedActivities().contains(currentActivity) ){
-			return actionMappings.getCloseForward();
+			progress = learnerService.joinLesson(learnerId, lesson.getLessonId());
+		} else if ( progress.getCompletedActivities().contains(currentActivity) ) {
+			return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
 		} else {
 			// Set activity as complete
-			newProgress = learnerService.completeActivity(learnerId, currentActivity,currentProgress);
+			progress = learnerService.completeActivity(learnerId, currentActivity,progress);
 		}
 	
-		LearningWebUtil.putActivityInRequest(request, newProgress.getNextActivity(), learnerService);
-		LearningWebUtil.putLearnerProgressInRequest(request,newProgress);
-		return actionMappings.getProgressForward(newProgress, redirect, false, request, learnerService);
+		LearningWebUtil.putActivityInRequest(request, progress.getNextActivity(), learnerService);
+		LearningWebUtil.putLearnerProgressInRequest(request,progress);
+		return actionMappings.getProgressForward(progress, redirect, false, request, learnerService);
     }
+    
 }

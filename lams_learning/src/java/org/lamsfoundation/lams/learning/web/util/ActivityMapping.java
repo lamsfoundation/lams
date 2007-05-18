@@ -36,6 +36,7 @@ import org.apache.struts.action.RedirectingActionForward;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.action.ActivityAction;
+import org.lamsfoundation.lams.learning.web.action.DisplayActivityAction;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -300,6 +301,10 @@ public class ActivityMapping implements Serializable
         return actionForward;
     }
 
+    /** Takes a Struts forward containing the path such as /DisplayRequest.do and turns it into a full URL including servername */
+    protected String strutsForwardToURL(ActionForward forward) {
+    	return Configuration.get(ConfigurationKeys.SERVER_URL) + LEARNING + forward.getPath();
+    }
     /**
      * Calculate the activity url for progress view at learner side.
      * @param learner the learner who owns the progress data
@@ -334,8 +339,37 @@ public class ActivityMapping implements Serializable
         this.activityMappingStrategy = activityMappingStrategy;
     }
     
-    public ActionForward getCloseForward() {
-    	return strutsActionToForward(this.activityMappingStrategy.getCloseWindowAction(), null, false);    
+	/** If the activity is already completed it could be one of five cases:
+	 *  (1) the user has opened just the one activity in in a popup window from the progress bar, in which case we want to close the window
+	 *	(2) the user has opened up a parallel activity in a popup window from the progress bar, and the completed activity
+	 *      is one of the contained activities. In this case we want to display the "wait" message or close depending on the activity
+	 *      in the other frame.
+	 *	(3) the activity was force completed while the user was doing the activity. This case includes "standalone" activities + activities in a parallel frameset
+	 *	(4) the activity is part of a parallel activity and the other activity isn't completed.
+	 * In cases (3) and (4) we want to do whatever we would normally do, apart from completing the activity, but we 
+	 * know whether it is (1),(2) or (3),(4) until we get back to a jsp and can check the window name.
+	 * so prepare the urls for (2), (3) and (4) then call the close window screen and it will sort it out. 
+	 */
+    public ActionForward getCloseForward(Activity justCompletedActivity, Long lessonId) throws UnsupportedEncodingException {
+
+    	String closeWindowURLAction =  activityMappingStrategy.getCloseWindowAction();    
+
+		// Always calculate the url for the "normal" next case as we won't know till we reach the close window if we need it.
+		String action = getDisplayActivityAction(lessonId);
+		action = strutsActionToURL(action,null,true);
+		action = WebUtil.appendParameterToURL(action, DisplayActivityAction.PARAM_INITIAL_DISPLAY, "false");
+		action = URLEncoder.encode(action, "UTF-8");
+    	closeWindowURLAction = WebUtil.appendParameterToURL(closeWindowURLAction, "nextURL", action);
+    	
+  		// If we are in the parallel frameset then we might need the nextURL, or we might need the "waiting" url.
+    	if ( justCompletedActivity.getParentActivity() != null && justCompletedActivity.getParentActivity().isParallelActivity() ) {
+    		action = getActivityMappingStrategy().getWaitingAction();
+    		action = strutsActionToURL(action,null,true);
+    		action = URLEncoder.encode(action, "UTF-8");
+        	closeWindowURLAction = WebUtil.appendParameterToURL(closeWindowURLAction, "waitURL", action);
+    	}
+
+    	return strutsActionToForward(closeWindowURLAction, null, false);
     }
 
     public String getProgressBrokenURL() {
@@ -352,5 +386,17 @@ public class ActivityMapping implements Serializable
     	}
     	return url;
     }
-    
+ 
+	/**
+	 * Get the "bootstrap" activity action. This is the action called when the user first joins a lesson, and sets up 
+	 * the necessary request details based on the user's progress details. If lessonID is not null then it is appended onto the string.
+	 * If this is for a JSP call then the lessonID is needed, if it is for Flash then it is not needed as Flash will add the id.
+	 */
+	public String getDisplayActivityAction(Long lessonID) {
+		if ( lessonID != null) {
+			return WebUtil.appendParameterToURL("/DisplayActivity.do",AttributeNames.PARAM_LESSON_ID,lessonID.toString());
+		} else {
+			return "/DisplayActivity.do";
+		}
+	}
 }

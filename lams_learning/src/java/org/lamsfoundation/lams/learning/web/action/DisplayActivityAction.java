@@ -49,6 +49,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * on which LoadToolActivityAction relies. If you try to go straight to LoadToolActivityAction
  * then the data won't be in the request.
  * 
+ * Request values: lessonID (mandatory), InitialDisplay (optional - Set to "true" for normal
+ * display, set to "false" when you want it to assume it is inside parallel frameset. Defaults to true).
+ * 
  * XDoclet definition:
  * 
  * ----------------XDoclet Tags-------------------- 
@@ -70,6 +73,7 @@ public class DisplayActivityAction extends ActivityAction {
     //---------------------------------------------------------------------
 	private static Logger log = Logger.getLogger(DisplayActivityAction.class);
 	
+	public static final String PARAM_INITIAL_DISPLAY = "initialDisplay";
 	/** 
 	 * Gets an activity from the request (attribute) and forwards onto a
 	 * display action using the ActionMappings class. If no activity is
@@ -91,11 +95,14 @@ public class DisplayActivityAction extends ActivityAction {
 	    	lessonId = WebUtil.readLongParam(request,"progressId");
 	    }
 	    LearnerProgress learnerProgress = learnerService.getProgress(learnerId, lessonId);
-	    
 	    LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
+	    
+	    // Normally this is used to display the initial page, so initialDisplay=true. But if called from the 
+	    // special handling for completed activities (ie close window) then we need to set it to false.
+	    boolean displayParallelFrames = WebUtil.readBooleanParam(request, PARAM_INITIAL_DISPLAY, true);
 		
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(getServlet().getServletContext());
-		ActionForward forward =actionMappings.getProgressForward(learnerProgress,false,true,request,learnerService);
+		ActionForward forward =actionMappings.getProgressForward(learnerProgress,false,displayParallelFrames,request,learnerService);
 		setupProgressString(actionForm, request);
 	
 		if(log.isDebugEnabled())
