@@ -456,8 +456,7 @@ class MonitorController extends AbstractController {
 	}
 	
 	public function openAboutDialogLoaded(evt:Object) {
-        
-		if(evt.type == 'contentLoaded'){
+        if(evt.type == 'contentLoaded'){
 			//set up UI
 			//note this function registers the dialog to recieve view updates
 			evt.target.scrollContent.setUpContent();		
