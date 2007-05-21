@@ -995,6 +995,7 @@ public class LD102Importer implements ApplicationContextAware{
 		groupingActivity.setActivityUIID(parentActivityId);
 		groupingActivity.setCreateGrouping(grouping);
 		groupingActivity.setCreateGroupingUIID(grouping.getGroupingUIID());
+		groupingActivity.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUPING));
 
 		Hashtable groupingContent = contentMap.get(contentId);
 		if ( groupingContent == null ) {
