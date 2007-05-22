@@ -123,7 +123,7 @@ class LearnerActivity extends MovieClip {
 			
 				_view = initObj._view;
 				_controller = initObj._controller;
-				_activity = initObj.activity;
+				_activity = initObj._activity;
 				learner = initObj.learner;
 		}
 		
@@ -152,7 +152,6 @@ class LearnerActivity extends MovieClip {
 		
 		Debugger.log('initialising activity : ' + _activity.activityID ,Debugger.CRITICAL,'init','org.lamsfoundation.lams.LearnerActivity');
 		
-		trace("Data for sentFrom: "+sentFrom)
 		MovieClipUtils.doLater(Proxy.create(this,draw));
 
 	}
@@ -207,9 +206,7 @@ class LearnerActivity extends MovieClip {
 			    attempted_mc._visible = true;
                 break;
 			default :
-				//actStatus = "todo_mc";
 				todo_mc._visible = true;
-                //Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
 		}
 			
 		//write text
@@ -228,11 +225,8 @@ class LearnerActivity extends MovieClip {
 			
 		}
 		title_lbl.text = toolTitle;
-		//this.completed_mc.onRollOver = Proxy.create(this,this['showToolTip'], this.completed_mc, "completed_act_tooltip");
-		//this.completed_mc.onRollOut = Proxy.create(this,this['hideToolTip']);
-		//this.current_mc.onRollOver = Proxy.create(this,this['showToolTip'], this.current_mc, "current_act_tooltip");
-		//this.current_mc.onRollOut = Proxy.create(this,this['hideToolTip']);							//Debugger.log('canvasActivity_mc._visible'+canvasActivity_mc._visible,4,'draw','CanvasActivity');
-		//_visible = true;
+		
+		
 	}
 	
 	public function showToolTip(btnObj, btnTT:String):Void{

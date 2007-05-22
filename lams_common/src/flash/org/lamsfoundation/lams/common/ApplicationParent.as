@@ -236,6 +236,13 @@ class ApplicationParent {
 		return _module;
 	}
 	
-	
+	public static function cloneMovieClip(
+		target:MovieClip, newName:String,
+		depth:Number, initObject:Object):MovieClip {
+		
+		target.duplicateMovieClip(newName, depth, initObject);
+		
+		return target._parent[newName];
+	}
 	
 }

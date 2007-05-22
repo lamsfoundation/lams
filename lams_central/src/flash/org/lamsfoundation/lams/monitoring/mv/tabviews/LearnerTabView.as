@@ -21,24 +21,25 @@
  * ************************************************************************
  */
 
-import org.lamsfoundation.lams.common.util.*
-import org.lamsfoundation.lams.common.ui.*
-import org.lamsfoundation.lams.common.style.*
-import org.lamsfoundation.lams.monitoring.mv.*
+import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.ui.*;
+import org.lamsfoundation.lams.common.style.*;
+import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.monitoring.*;
-import org.lamsfoundation.lams.common.dict.*
-import org.lamsfoundation.lams.common.mvc.*
+import org.lamsfoundation.lams.common.dict.*;
+import org.lamsfoundation.lams.common.mvc.*;
+import org.lamsfoundation.lams.common.ApplicationParent;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.ComplexActivity;
 import org.lamsfoundation.lams.authoring.cv.CanvasActivity;
 import org.lamsfoundation.lams.common.ToolTip;
 import org.lamsfoundation.lams.authoring.Transition;
-//import org.lamsfoundation.lams.authoring.cv.*;
-import mx.managers.*
+
+import mx.managers.*;
 import mx.containers.*;
-import mx.events.*
-import mx.utils.*
+import mx.events.*;
+import mx.utils.*;
 import mx.controls.*;
 
 
@@ -48,8 +49,10 @@ import mx.controls.*;
 */
 
 class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends AbstractView{
+	
 	public static var _tabID:Number = 2;
 	private var _className = "LearnerTabView";
+	
 	//constants:
 	private var GRID_HEIGHT:Number;
 	private var GRID_WIDTH:Number;
@@ -65,37 +68,30 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private var prevLearner:Number;
 	private var learnersDrawn:Number;
 	private var learnerListArr:Array = new Array();
-	
-	private var bkg_pnl:MovieClip;
 
 	private var _tm:ThemeManager;
 	private var _tip:ToolTip;
+	
 	private var mm:MonitorModel;
 	private var _learnerTabView:LearnerTabView;
-
-	
-	//Canvas clip
-	
-	private var _learnerTabViewContainer_mc:MovieClip
-	
+	private var _learnerTabViewContainer_mc:MovieClip;
 	private var learnerMenuBar:MovieClip;
-	//private var _helpLayer_mc:MovieClip;
-	private var _gridLayer_mc:MovieClip;
-	private var _learnersLayer_mc:MovieClip;
-	private var _activityLayerComplex_mc:MovieClip;
+	
 	private var _activityLayer_mc:MovieClip;
+	private var _activityLayer_mc_clones:Array;
+	private var _nameLayer_mc:MovieClip;
+	
+	private var bkg_pnl:MovieClip;
 	private var completed_mc:MovieClip;
+	
 	private var refresh_btn:Button;
 	private var help_btn:Button;
 	
-	//private var _transitionPropertiesOK:Function;
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
     public var removeEventListener:Function;
-	//public var menu:ContextMenu;
 
-	
 	/**
 	* Constructor
 	*/
@@ -104,6 +100,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		_learnerTabViewContainer_mc = this;
 		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
+		
         //Init for event delegation
         mx.events.EventDispatcher.initialize(this);
 	}
@@ -115,6 +112,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		//Invoke superconstructor, which sets up MVC relationships.
 		super (m, c);
 		mm = MonitorModel(model)
+		
         //Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
@@ -141,63 +139,53 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					break;
 				case 'TABCHANGE' :
 					if (infoObj.tabID == _tabID && !mm.locked){
-						//this._visible = true;
-						mm.getMonitor().getMV().getMonitorLearnerScp()._visible = true;
 						hideMainExp(mm);
 						mm.broadcastViewUpdate("JOURNALSSHOWHIDE", true);
 
-						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
-						
 						if (mm.activitiesDisplayed.isEmpty()){
 							mm.getMonitor().openLearningDesign(mm.getSequence());
-							
-						}else {
-									
-							if (learnersDrawn != mm.allLearnersProgress.length){
-								drawAllLearnersDesign(mm, infoObj.tabID)
-							}
-							
-							if(mm.getIsProgressChangedLearner()){
-								reloadProgress(false);
-							}
+						} else if(mm.getIsProgressChangedLearner()) {
+							reloadProgress(false);
+						} else if(learnersDrawn != mm.allLearnersProgress.length){
+							reloadProgress(true);
 						}
+						
+						mm.getMonitor().getMV().getMonitorLearnerScp()._visible = true;
 						LFMenuBar.getInstance().setDefaults();
 						
-					}else {
+					} else {
 						mm.getMonitor().getMV().getMonitorLearnerScp()._visible = false;
-						//this._visible = false;
 					}
 					break;
 				case 'PROGRESS' :
 					if (infoObj.tabID == _tabID && !mm.locked){
-						mm.getMonitor().getProgressData(mm.getSequence())
+						mm.getMonitor().getProgressData(mm.getSequence());
 					}
 					break;	
 					
 				case 'RELOADPROGRESS' :	
 					if (infoObj.tabID == _tabID && !mm.locked){
-						reloadProgress(true)
+						reloadProgress(true);
 					}
 					break;	
 				case 'DRAW_ACTIVITY' :
 					if (infoObj.tabID == _tabID && !mm.locked){
-						trace("DRAWING_ACTIVITY")
-						drawActivity(infoObj.data, mm, infoObj.learner)
-						//MovieClipUtils.doLater(Proxy.create(this,draw));
+						drawActivity(infoObj.data, mm, infoObj.learner);
+					}
+					break;
+				case 'CLONE_ACTIVITY' :
+					if (infoObj.tabID == _tabID && !mm.locked){
+						cloneActivity(infoObj.data, mm, infoObj.learner);
 					}
 					break;
 				case 'REMOVE_ACTIVITY' :
 					if (infoObj.tabID == _tabID && !mm.locked){
-						trace("REMOVE_ACTIVITY")
-						removeActivity(infoObj.data, mm)
-						//MovieClipUtils.doLater(Proxy.create(this,draw));
+						removeActivity(infoObj.data, mm);
 					}
 					break;
-				
 				case 'DRAW_DESIGN' :
 					if (infoObj.tabID == _tabID && !mm.locked){
-						trace("TabID for Selected tab is (LearnerTab): "+infoObj.tabID)
-						drawAllLearnersDesign(mm, infoObj.tabID)
+						drawAllLearnersDesign(mm, infoObj.tabID);
 					}
 					break;
 				default :
@@ -211,17 +199,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     */
 	private function draw(){
 		//set up the Movie Clips to load relevant  
-
-		_learnersLayer_mc = this.createEmptyMovieClip("_learnersLayer_mc", this.getNextHighestDepth());
-		_gridLayer_mc = this.createEmptyMovieClip("_gridLayer_mc", this.getNextHighestDepth());
 		
-		_activityLayerComplex_mc = this.createEmptyMovieClip("_activityLayerComplex_mc", this.getNextHighestDepth());
-		_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
-		
-		//learnerMenuBar.refresh_btn.onRelease = Proxy.create (this, reloadProgress);
-		trace("Help layer path: "+ learnerMenuBar.refresh_btn.label)
-		//setSize (mm)
-		
+		this._activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
+		this._nameLayer_mc = this.createEmptyMovieClip("_nameLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 		
 		setStyles();
 		
@@ -229,7 +209,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	}
 	
 	private function hideMainExp(mm:MonitorModel):Void{
-		//var mcontroller = getController();
 		mm.broadcastViewUpdate("EXPORTSHOWHIDE", false);
 		mm.broadcastViewUpdate("EDITFLYSHOWHIDE", false);
 	}
@@ -258,8 +237,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 				array[i].removeMovieClip();
 			}
 		}
+		
 		array = new Array();
-	return array;
+		return array;
 	}
 	
 	/**
@@ -270,36 +250,50 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	 */
 	private function reloadProgress(isChanged:Boolean){
 		
-		//if (learnersDrawn != mm.allLearnersProgress.length){
-			trace("reloading Progress data for Learners")
 			learnersDrawn = 0;
+			learnerListArr = new Array();
+			
 			ACT_X = 0;
 			ACT_Y = 35;
-			//for(var i=0; i<_activityLayer_mc.children.length;i++){
-				_activityLayer_mc.removeMovieClip();
-				_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
-			//}
+			
+			this._activityLayer_mc.removeMovieClip();
+			this._nameLayer_mc.removeMovieClip();
+			
+			this._activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
+			this._nameLayer_mc = this.createEmptyMovieClip("_nameLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
+		
+
 			if (isChanged == false){
 				mm.setIsProgressChangedLearner(false);
-				mm.setIsProgressChangedSequence(true)
-			}else {
+				mm.setIsProgressChangedSequence(true);
+			} else {
 				mm.setIsProgressChangedLesson(true);
-				mm.setIsProgressChangedSequence(true)
+				mm.setIsProgressChangedSequence(true);
 			}
-			mm.getMonitor().getProgressData(mm.getSequence());
 			
-		//}
+			mm.transitionsDisplayed.clear();
+			mm.activitiesDisplayed.clear();
+			
+			mm.getMonitor().getProgressData(mm.getSequence());
 		
 	}
+	
 	private function drawAllLearnersDesign(mm:MonitorModel, tabID:Number){
-		//learnerListArr = clearLearnersData(learnerListArr)
-		for (var j=0; j<mm.allLearnersProgress.length; j++){
-			learnersDrawn = j+1
+		mm.isDesignDrawn = false;
+		
+		for(var i=0; i<mm.allLearnersProgress.length; i++){
+			
+			learnersDrawn = i+1;
 			ACT_X = 0;
-			ACT_Y = (j*80)+35;
-			mm.drawDesign(tabID, mm.allLearnersProgress[j]);
+			ACT_Y = (i*80)+35;
+			
+			mm.drawDesign(tabID, mm.allLearnersProgress[i]);
+			
 			setSize(mm);
 		}
+		
+		mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
+		
 	}
 	
 	/**
@@ -317,7 +311,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 	}
 	
-	private function printLearner(a:Activity,mm:MonitorModel, learner:Object){
+	private function printLearner(mm:MonitorModel, learner:Object){
 		
 		var z:Object = mm.getSize();
 		var styleObj = _tm.getStyleObject('button');
@@ -327,11 +321,21 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		var exp_url = _root.serverURL+"learning/exportWaitingPage.jsp?mode=learner&role=teacher&lessonID="+_root.lessonID+"&userID="+learner.getLearnerId();
 		
-		_activityLayer_mc.createTextField("learnerName"+learner.getLearnerId(), _activityLayer_mc.getNextHighestDepth(), ACT_X+2, ACT_Y, z.w-22, 20);
-		_activityLayer_mc.attachMovie("Button", "learnerName"+learner.getLearnerId()+"_btn", _activityLayer_mc.getNextHighestDepth(),{label:EP_btn_label, _x:z.w-110, _y:ACT_Y+2, styleName:styleObj} )
-		var learnerName_txt = _activityLayer_mc["learnerName"+learner.getLearnerId()];
+		if(_nameLayer_mc["learnerName"+learner.getLearnerId()] != undefined) {
+			_nameLayer_mc["learnerName"+learner.getLearnerId()+"_btn"].removeTextField();
+		}
 		
-		var learnerExp_btn = _activityLayer_mc["learnerName"+learner.getLearnerId()+"_btn"];
+		_nameLayer_mc.createTextField("learnerName"+learner.getLearnerId(), _nameLayer_mc.getNextHighestDepth(), ACT_X+2, ACT_Y, z.w-22, 20);
+		
+		if(_nameLayer_mc["learnerName"+learner.getLearnerId()+"_btn"] != undefined) {
+			_nameLayer_mc["learnerName"+learner.getLearnerId()+"_btn"].removeMovieClip();
+		}
+		
+		_nameLayer_mc.attachMovie("Button", "learnerName"+learner.getLearnerId()+"_btn", _nameLayer_mc.getNextHighestDepth(),{label:EP_btn_label, _x:z.w-110, _y:ACT_Y+2, styleName:styleObj} )
+		
+		var learnerName_txt = _nameLayer_mc["learnerName"+learner.getLearnerId()];
+		var learnerExp_btn = _nameLayer_mc["learnerName"+learner.getLearnerId()+"_btn"];
+		
 		learnerExp_btn.setSize(90, 17);
 		learnerExp_btn.onRelease = function (){
 			JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 410, 640, true, true, false, false, false);
@@ -362,10 +366,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	}
 
 	public function showToolTip(btnObj, btnTT:String):Void{
-		var scpWidth:Number = mm.getMonitor().getMV().getMonitorLearnerScp().width
-		trace("xlocation for tooltip: "+scpWidth)
+		var scpWidth:Number = mm.getMonitor().getMV().getMonitorLearnerScp().width;
 		var btnLabel = btnObj.label;
-		var xpos:Number = scpWidth - 190
+		var xpos:Number = scpWidth - 190;
 		var Xpos = xpos;
 		var Ypos = (Application.MONITOR_Y+ btnObj._y+btnObj.height)+5;
 		var ttHolder = Application.tooltip;
@@ -385,49 +388,83 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	 * @param   cm - Refernce to the model
 	 * @return  Boolean - successfullit
 	 */
-	private function drawActivity(a:Activity,mm:MonitorModel, learner:Object):Boolean{
-		
-		Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is now be drawn',Debugger.CRITICAL,'drawActivity','LearnerTabView');
-		if (ACT_X == 0){
-			printLearner(a, mm, learner)
-		}
-		var s:Boolean = false;
+	private function drawActivity(a:Activity, mm:MonitorModel, learner:Object):Boolean{
 		
 		var ltv = LearnerTabView(this);
-		
 		var mc = getController();
+		var newActivity_mc = null;
+		
+		Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is now be drawn',Debugger.CRITICAL,'drawActivity','LearnerTabView');
+		
+		if (ACT_X == 0) {
+			printLearner(mm, learner);
+		}
 		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity()){
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerActivity", DepthManager.kTop,{_activity:a,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
+			newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerActivity", _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
+			
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
-		}else if(a.isGateActivity()){
+			
+		} else if(a.isGateActivity()){
 			var actLabel:String = gateTitle(a);
-			trace("Title to pass for Gate Activity: "+actLabel)
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerGateActivity", DepthManager.kTop,{_activity:a,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, actLabel:actLabel, learner:learner});
+			newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerGateActivity", _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, actLabel:actLabel, learner:learner});
+			
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
-		}else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+			
+		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
+			newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerComplexActivity", _activityLayer_mc.getNextHighestDepth(),{_activity:a,_children:children,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
 			
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerComplexActivity",DepthManager.kTop,{_activity:a,_children:children,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
-		}else{
+			
+		} else{
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','LearnerTabView');
 		}
 		
-		var actItems:Number = mm.activitiesDisplayed.size()
+		var actItems:Number = mm.activitiesDisplayed.size();
 		
-		if (actItems < mm.getActivityKeys().length){
-			trace("total: "+mm.getActivityKeys().length)
+		if (actItems < mm.getActivityKeys().length) 
 			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
+		
+		return true;
+	}
+	
+	/**
+	 * Create a clone of the Learning Design with the learner progress data applied to the cloned instance.
+	 * 
+	 * @usage   
+	 * @param   learner 	Learner's progress data
+	 * @return  
+	 */
+	
+	private function cloneActivity(a:Activity, mm:MonitorModel, learner:Object) {
+		var ltv = LearnerTabView(this);
+		var mc = getController();
+		
+		var mc:MovieClip = MovieClip(mm.activitiesDisplayed.get(a.activityUIID));
+		var _activityLayer_mc_clone:MovieClip = null;
+		
+		if (ACT_X == 0) {
+			printLearner(mm, learner);
 		}
-		s = true;
-		//actLenght++;
-		trace("total activities: "+mm.getActivityKeys().length-1)
-		//setSize(mm);
-		mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
-		return s;
+		
+		//take action depending on act type
+		if(a.isGateActivity()){
+			var actLabel:String = gateTitle(a);
+			_activityLayer_mc_clone = ApplicationParent.cloneMovieClip(mc, "_activityLayer_mc_clone_" + learner.getLearnerId() + "_" + a.activityUIID, _activityLayer_mc.getNextHighestDepth(), {_activity:a, _controller:mc, _view:ltv, _x:ACT_X, _y:ACT_Y+40, actLabel:actLabel, learner:learner});
+		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
+			_activityLayer_mc_clone = ApplicationParent.cloneMovieClip(mc, "_activityLayer_mc_clone_" + learner.getLearnerId() + "_" + a.activityUIID, _activityLayer_mc.getNextHighestDepth(), {_activity:a, _children:children, _controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
+		} else {
+			_activityLayer_mc_clone = ApplicationParent.cloneMovieClip(mc, "_activityLayer_mc_clone_" + learner.getLearnerId() + "_" + a.activityUIID, _activityLayer_mc.getNextHighestDepth(), {_activity:a, _controller:mc, _view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
+		}
+		
+		ACT_X = (_activityLayer_mc_clone != null) ? _activityLayer_mc_clone._x + _activityLayer_mc_clone._width : 0;
+			
+		Debugger.log("_clone:" + _activityLayer_mc_clone + " xPOS=" + mc._x + " yPOS=" + mc._y + " _x=" + _activityLayer_mc_clone._x + " _y=" + _activityLayer_mc_clone._y, Debugger.CRITICAL, "cloneDesign", "LTV");
+
 	}
 
 	/**
@@ -490,7 +527,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     */
 	private function setPosition(mm:MonitorModel):Void{
         var p:Object = mm.getPosition();
-		trace("X pos set in Model is: "+p.x+" and Y pos set in Model is "+p.y)
         this._x = p.x;
         this._y = p.y;
 	}
@@ -512,5 +548,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     public function defaultController (model:Observable):Controller {
         return new MonitorController(model);
     }
+	
 	
 }

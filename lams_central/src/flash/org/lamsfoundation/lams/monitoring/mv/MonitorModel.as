@@ -78,9 +78,12 @@ class MonitorModel extends Observable{
 	
 	private var _org:Organisation;
 	private var _todos:Array;  // Array of ToDo ContributeActivity(s)
+	
 	// state data
+	private var _isDesignDrawn:Boolean;
 	private var _showLearners:Boolean;
 	private var _endGate:MovieClip;
+	
 	//these are hashtables of mc refs MOVIECLIPS (like CanvasActivity or CanvasTransition)
 	//each on contains a reference to the emelment in the ddm (activity or transition)
 	private var _activitiesDisplayed:Hashtable;
@@ -112,7 +115,12 @@ class MonitorModel extends Observable{
 	*/
 	public function MonitorModel (monitor:Monitor){
 		_monitor = monitor;
+		
 		_showLearners = true;
+		isDesignDrawn = true;
+		_staffLoaded = false;
+		_learnersLoaded = false;
+		
 		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
 		_transitionsDisplayed = new Hashtable("_transitionsDisplayed");
 		_learnersProgress = new Hashtable("_learnersProgress")
@@ -121,13 +129,12 @@ class MonitorModel extends Observable{
 		learnerTabActArr = new Array();
 		ddmActivity_keys = new Array();
 		ddmTransition_keys = new Array();
-		_staffLoaded = false;
-		_learnersLoaded = false;
-
+		
 		_resultDTO = new Object();
 		ttHolder = Application.tooltip;
 		monitor_y = Application.MONITOR_Y;
 		monitor_x = Application.MONITOR_X;
+		
 		mx.events.EventDispatcher.initialize(this);
 		app = Application.getInstance();
 	}
@@ -135,6 +142,7 @@ class MonitorModel extends Observable{
 	// add get/set methods
 	
 	public function setSequence(activeSeq:Sequence){
+		
 		Debugger.log("Active seq: " + activeSeq.ID + " ddm: " + activeSeq.getLearningDesignModel(), Debugger.CRITICAL, "setSequence", "MonitorModel");
 		_activeSeq = activeSeq;
 		
@@ -147,8 +155,6 @@ class MonitorModel extends Observable{
 		} else {
 			getMonitor().openLearningDesign(_activeSeq);
 		}
-		
-		
 		
 		setChanged();
 		
@@ -211,6 +217,7 @@ class MonitorModel extends Observable{
 		_learnersProgress.clear();
 		learnerTabActArr = new Array();
 		learnerTabActArr = learnerProg;
+		
 		for(var i=0; i<learnerProg.length;i++){
 			_learnersProgress.put(learnerProg[i].getLearnerId(),learnerProg[i]);
 		}
@@ -221,7 +228,6 @@ class MonitorModel extends Observable{
 		
 		//send an update
 		infoObj = {};
-		//infoObj.data = learnerProg[i].getLearnerId()
 		infoObj.updateType = "DRAW_DESIGN";
 		infoObj.tabID = getSelectedTab();
 		notifyObservers(infoObj);
@@ -285,7 +291,6 @@ class MonitorModel extends Observable{
 	}
 	
 	public function setToDos(todos:Array){
-		trace('saving contrib activities...');
 		_todos = new Array();
 		
 		for(var i=0; i< todos.length; i++){
@@ -335,16 +340,13 @@ class MonitorModel extends Observable{
 
 
 	public function activitiesOnCanvas():Array{
-		//_activitiesDisplayed
-		//var _ddm.getActivityByUIID(Activity.OPTIONAL_ACTIVITY_TYPE)
 		var actAll:Array = new Array();
 		var k:Array = _activitiesDisplayed.values();
-		//trace("findOptionalActivities Called "+k.length )
 		for (var i=0; i<k.length; i++){
-			actAll.push(k[i]);
-				trace("find the activity with id:"+k[i].activity.activityUIID )			
+			actAll.push(k[i]);		
 		}
-		return actAll
+		
+		return actAll;
 	}
 	/**
 	 * Compares the design in the CanvasModel (what is displayed on the screen) 
@@ -365,11 +367,11 @@ class MonitorModel extends Observable{
 		Debugger.log('Running',Debugger.GEN,'refreshDesign','MonitorModel');
 		var mmActivity_keys:Array = _activitiesDisplayed.keys();
 		var longest = mmActivity_keys.length;
+		
 		//set index array with activity keyys length
 		var indexArray:Array;
 		indexArray = mmActivity_keys;
-	
-		trace("Longest: "+longest)
+
 		//loop through and remove activities
 		for(var i=0;i<longest;i++){
 			var keyToCheck:Number = indexArray[i];
@@ -385,13 +387,13 @@ class MonitorModel extends Observable{
 		var transIndexArray:Array;
 		transIndexArray = mmTransition_keys;
 		
-		trace("Longest: "+transLongest)
 		//loop through and remove transitions
 		for(var i=0;i<transLongest;i++){
 			var transkeyToCheck:Number = transIndexArray[i];
 			var mm_transition:Transition = _transitionsDisplayed.get(transkeyToCheck).transition;
 			broadcastViewUpdate("REMOVE_TRANSITION",mm_transition, getSelectedTab());
 		}
+
 	}
 	
 	public function getlearnerTabActArr():Array{
@@ -400,14 +402,11 @@ class MonitorModel extends Observable{
 	
 	
 	private function orderDesign(activity:Activity, order:Array):Void{
-		trace("==> "+activity.activityID);
 		order.push(activity);
-		trace("transition keys length: "+ddmTransition_keys.length);
+		
 		for(var i=0;i<ddmTransition_keys.length;i++){
 			var transitionKeyToCheck:Number = ddmTransition_keys[i];
 			var ddmTransition:Transition = _activeSeq.getLearningDesignModel().transitions.get(transitionKeyToCheck);
-			trace("transition value is: "+ ddmTransition.transitionUIID);
-			trace("transition from activity id: "+ ddmTransition.fromActivityID);
 			
 				if (ddmTransition.fromUIID == activity.activityUIID){
 					var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(ddmTransition.toUIID);
@@ -419,7 +418,6 @@ class MonitorModel extends Observable{
 	}
 	
 	public function setDesignOrder():Array{
-		trace("set Design order called")
 		ddmActivity_keys = _activeSeq.getLearningDesignModel().activities.keys();
 		ddmTransition_keys = _activeSeq.getLearningDesignModel().transitions.keys();
 		
@@ -428,21 +426,13 @@ class MonitorModel extends Observable{
 		var dataObj:Object;
 		var ddmfirstActivity_key:Number = _activeSeq.getLearningDesignModel().firstActivityID;
 		var learnerFirstActivity:Activity = _activeSeq.getLearningDesignModel().activities.get(ddmfirstActivity_key);
-		trace("first activity in desgn: "+ddmfirstActivity_key);
 		
-		//trace("==> "+learnerFirstActivity.title);
 		// recursive method to order design
 		orderDesign(learnerFirstActivity, orderedActivityArr);
 		
-		for(var i=0; i<orderedActivityArr.length; i++){
-			trace("--> "+orderedActivityArr[i].title);
-			
-		}
 		return orderedActivityArr;
-		trace("New Ordered Activities has length: "+orderedActivityArr.length)
 		
 	}
-	
 	
 	/**
 	 * get the design in the DesignDataModel and update the Monitor Model accordingly.
@@ -468,12 +458,13 @@ class MonitorModel extends Observable{
 			var keyToCheck:Number = indexArray[i].activityUIID;
 			var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(keyToCheck);
 			
-			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
-				trace("this is Child")
-			} else {
+			if(!(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0) && !isDesignDrawn){
 				broadcastViewUpdate("DRAW_ACTIVITY", ddm_activity, tabID, drawLearner);
+			} else {
+				broadcastViewUpdate("CLONE_ACTIVITY", ddm_activity, tabID, drawLearner);
 			}
 		}
+		
 		//now check the transitions:
 		ddmTransition_keys = _activeSeq.getLearningDesignModel().transitions.keys();
 				
@@ -486,7 +477,9 @@ class MonitorModel extends Observable{
 			var transitionKeyToCheck:Number = trIndexArray[i];
 			var ddmTransition:Transition = _activeSeq.getLearningDesignModel().transitions.get(transitionKeyToCheck);
 			broadcastViewUpdate("DRAW_TRANSITION", ddmTransition, tabID);
-		}		
+		}
+		
+		isDesignDrawn = true;
 	}
 	
 	public function setDialogOpen(dialogOpen:String){
@@ -495,7 +488,6 @@ class MonitorModel extends Observable{
 	}
 	
 	public function broadcastViewUpdate(updateType, data, tabID, learner){
-		//getMonitor().getMV().clearView();
 		setChanged();
 		
 		//send an update
@@ -509,7 +501,6 @@ class MonitorModel extends Observable{
 	}
 	
 	public function changeTab(tabID:Number){
-		//getMonitor().getMV().clearView();
 		selectedTab = tabID;
 		setChanged();
 		
@@ -522,7 +513,6 @@ class MonitorModel extends Observable{
 	}
 	
 	public function refreshAllData(){
-		//getMonitor().getMV().clearView();
 		selectedTab = getSelectedTab();
 		setChanged();
 		
@@ -536,7 +526,6 @@ class MonitorModel extends Observable{
 	
 	public function tabHelp(){
 		var callback:Function = Proxy.create(this, openTabHelp);
-		//selectedTab = getSelectedTab();
 		app.getHelpURL(callback)
 	}
 	
@@ -554,7 +543,6 @@ class MonitorModel extends Observable{
 				tabName = "learners"
 				break;
             default :
-                //styleObj = _tm.getStyleObject('ACTPanel0')
 		}
 		return tabName;
 		
@@ -602,35 +590,24 @@ class MonitorModel extends Observable{
 	
 	public function requestLearners(data:Object, callback:Function){
 		
-		trace('requesting learners...');
-		//var callback:Function = Proxy.create(this,saveLearners);
 		_monitor.requestUsers(LEARNER_ROLE, data.organisationID, callback);
 	}
 
 	
 	public function requestStaff(data:Object, callback:Function){
 		
-		trace('requesting staff members...');
-		//var callback:Function = Proxy.create(this,saveStaff);
-		
 		_monitor.requestUsers(MONITOR_ROLE, data.organisationID, callback);
 	}
 	
 	public function saveLearners(users:Array){
-		trace('retrieving back users for org by role: ' + MonitorModel.LEARNER_ROLE);
-		
 		saveUsers(users, LEARNER_ROLE);
 		
-		//dispatchEvent({type:'learnersLoad',target:this});
 		broadcastViewUpdate("LEARNERS_LOADED", null, null);
 	}
 	
 	public function saveStaff(users:Array){
-		trace('retrieving back users for org by role: ' + MONITOR_ROLE);
-		
 		saveUsers(users, MONITOR_ROLE);
 		
-		//dispatchEvent({type:'staffLoad',target:this});
 		broadcastViewUpdate("STAFF_LOADED", null, null);
 	}
 
@@ -698,7 +675,6 @@ class MonitorModel extends Observable{
 
 	public function setDirty(){
 		_isDirty = true;
-		trace("In setDirty")
 		clearDesign();
 	}
 
@@ -934,6 +910,14 @@ class MonitorModel extends Observable{
 	public function get locked():Boolean{
 		return _isLocked;
 	}
+	
+	public function set isDesignDrawn(a:Boolean){
+		_isDesignDrawn = a;
+	}
+	
+	public function get isDesignDrawn():Boolean{
+		return _isDesignDrawn;
+	}
 
 	/**
 	 * Returns a reference to the Activity Movieclip for the UIID passed in.  Gets from _activitiesDisplayed Hashable
@@ -958,7 +942,7 @@ class MonitorModel extends Observable{
 	
 	public function get allLearnersProgress():Array{
 		return learnerTabActArr;
-	}	
+	}
 	
 	public function getActivityKeys():Array{
 		trace("ddmActivity_keys length: "+ ddmActivity_keys.length)
