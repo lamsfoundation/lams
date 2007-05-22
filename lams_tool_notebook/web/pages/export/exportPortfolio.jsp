@@ -50,31 +50,33 @@
 										${user.firstName} ${user.lastName }
 									</th>
 								</tr>
-								<tr>
-									<td class="field-name" width="20%">
-										<fmt:message key="label.created" />
-									</td>
-									<td>
-										<lams:Date value="${user.entryDTO.createDate }"></lams:Date>
-									</td>
-								</tr>
-								<tr>
-									<td class="field-name" width="20%">
-										<fmt:message key="label.lastModified" />
-									</td>
-									<td>
-										<lams:Date value="${user.entryDTO.lastModified }"></lams:Date>
-									</td>
-								</tr>
-
-								<tr>
-									<td class="field-name">
-										<fmt:message key="label.notebookEntry" />
-									</td>
-									<td>
-										<c:out value="${user.entryDTO.entry}" escapeXml="false"></c:out>
-									</td>
-								</tr>
+								<c:if test="${not empty user.entryDTO}">
+									<tr>
+										<td class="field-name" width="20%">
+											<fmt:message key="label.created" />
+										</td>
+										<td>
+											<lams:Date value="${user.entryDTO.createDate }"></lams:Date>
+										</td>
+									</tr>
+									<tr>
+										<td class="field-name" width="20%">
+											<fmt:message key="label.lastModified" />
+										</td>
+										<td>
+											<lams:Date value="${user.entryDTO.lastModified }"></lams:Date>
+										</td>
+									</tr>
+	
+									<tr>
+										<td class="field-name">
+											<fmt:message key="label.notebookEntry" />
+										</td>
+										<td>
+											<c:out value="${user.entryDTO.entry}" escapeXml="false"></c:out>
+										</td>
+									</tr>
+								</c:if>
 							</table>
 						</c:forEach>
 					</div>

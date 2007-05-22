@@ -126,8 +126,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		sessionDTO.setSessionName(notebookSession.getSessionName());
 		sessionDTO.setSessionID(notebookSession.getSessionId());
 
-		NotebookUserDTO userDTO = new NotebookUserDTO(notebookUser,
-				notebookEntry);
+		// If the user hasn't put in their entry yet, notebookEntry will be null;
+		NotebookUserDTO userDTO = notebookEntry != null 
+			? new NotebookUserDTO(notebookUser,notebookEntry) 
+			: new NotebookUserDTO(notebookUser);
 
 		sessionDTO.getUserDTOs().add(userDTO);
 		notebookDTO.getSessionDTOs().add(sessionDTO);
