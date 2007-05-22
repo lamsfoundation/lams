@@ -435,7 +435,9 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	    String filename = null;
 	    try
 	    {
-	        filename =  HttpUrlConnectionUtil.connectToToolExportURL(exportURL, cookies);
+	        if ( exportURL != null ) {
+	        	filename =  HttpUrlConnectionUtil.connectToToolExportURL(exportURL, cookies);
+	        }
 	        if (filename == null)
 	        {
 	           filename = ExportPortfolioConstants.EXPORT_ERROR_FILENAME;

@@ -46,7 +46,6 @@ public class ExportPortfolioConstants {
 	public static final String SUBDIRECTORY_BASENAME = "Activity"; //subdirectory for each activity is ActivityXX where XX is the activity Id
 	public static final String SUBDIRECTORY_NOTEBOOK_BASENAME = "Notebook";
 	public static final String PARAM_FILE_LOCATION = "fileLocation";
-	public static final String URL_FOR_UNSUPPORTED_EXPORT = "learning/exportPortfolio/notSupported.jsp";
 	public static final String EXPORT_ERROR_FILENAME = "export_error.html";
 	public static final String EXPORT_ACTIVITY_ERROR_KEY = "error.export.portfolio.not.supported";
     

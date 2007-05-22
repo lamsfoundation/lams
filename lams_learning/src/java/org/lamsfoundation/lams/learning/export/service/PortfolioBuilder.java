@@ -205,11 +205,6 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 			}
 		} 
 		
-		if ( exportUrlForTool == null ) {
-			exportUrlForTool = ExportPortfolioConstants.URL_FOR_UNSUPPORTED_EXPORT;
-			exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, "activityTitle", activity.getTitle());
-			exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, "lessonName", lesson.getLessonName());
-		}
 		p.setExportUrl(exportUrlForTool);
 		
 		currentPortfolioList.add(p);
