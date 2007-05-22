@@ -105,15 +105,10 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
         
         McSession mcSession=mcService.retrieveMcSession(toolSessionID);
         
+        // If the learner hasn't selected any options yet, then they won't exist in the session.
+        // Yet we might be asked for their page, as the activity has been commenced. So need to do a "blank" page in that case
         McQueUsr learner = mcService.getMcUserBySession(userID,mcSession.getUid());
         logger.debug("learner: " + learner);
-        
-        if (learner == null)
-        {
-            String error="The user with user id " + userID + " does not exist in this session or session may not exist.";
-            logger.error(error);
-            throw new McApplicationException(error);
-        }
         
         McContent content=mcSession.getMcContent();
         logger.debug("content: " + content);
@@ -125,22 +120,20 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
             logger.error(error);
             throw new McApplicationException(error);
         }
-        
-    
 
         McMonitoringAction mcMonitoringAction= new McMonitoringAction();
         List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionDataForExportLearner(request, content, mcService, mcSession, learner );
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    
+	    if ( learner != null ) {
+		    String intTotalMark=viewAnswers(request, content, learner, mcSession,  mcService);
+		    logger.debug("intTotalMark: " + intTotalMark);
+		    request.getSession().setAttribute(LEARNER_MARK,intTotalMark);
+		    request.getSession().setAttribute(LEARNER_NAME,learner.getFullname() );
+	    }
 	    
-	    	    String intTotalMark=viewAnswers(request, content, learner, mcSession,  mcService);
-	    logger.debug("intTotalMark: " + intTotalMark);
-	    
-	    request.getSession().setAttribute(LEARNER_MARK,intTotalMark);
-	    request.getSession().setAttribute(LEARNER_NAME,learner.getFullname() );
 	    request.getSession().setAttribute(PASSMARK,content.getPassMark().toString());
-	    
 	    request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
 	    mcMonitoringAction.prepareReflectionData(request, content, mcService, userID.toString(), true);
     	logger.debug("ending learner mode: ");
