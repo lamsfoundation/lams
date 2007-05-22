@@ -1637,6 +1637,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				newGrouping = groupingList.get(actDto.getCreateGroupingID());
 				((GroupingActivity)act).setCreateGrouping(newGrouping);
 				((GroupingActivity)act).setCreateGroupingUIID(newGrouping.getGroupingUIID());
+				((GroupingActivity)act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUPING));
 				break;
 			case Activity.SYNCH_GATE_ACTIVITY_TYPE:
 				act = new SynchGateActivity();
