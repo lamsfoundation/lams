@@ -87,16 +87,6 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
         
         QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionID.longValue());
         
-        QaQueUsr learner = qaService.getQaUserBySession(userID,qaSession.getUid());
-        logger.debug("learner: " + learner);
-        
-        if (learner == null)
-        {
-            String error="The user with user id " + userID + " does not exist in this session or session may not exist.";
-            logger.error(error);
-            throw new QaApplicationException(error);
-        }
-        
         QaContent content=qaSession.getQaContent();
         logger.debug("content: " + content);
         logger.debug("content id: " + content.getQaContentId());
