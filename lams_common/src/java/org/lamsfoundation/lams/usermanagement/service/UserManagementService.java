@@ -707,23 +707,23 @@ public class UserManagementService implements IUserManagementService {
 		}
 		uo.setUserOrganisationRoles(uors);
 		save(user);
-		// make sure group managers have monitor in each subgroup
+		// make sure group managers have monitor and learner in each subgroup
 		checkGroupManager(user, org);
 	}
 	
 	private void checkGroupManager(User user, Organisation org) {
 		if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
 			if (hasRoleInOrganisation(user, Role.ROLE_GROUP_MANAGER, org)) {
-				setMonitorForGroupManager(user, org.getChildOrganisations());
+				setRolesForGroupManager(user, org.getChildOrganisations());
 			}
 		} else if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
 			if (hasRoleInOrganisation(user, Role.ROLE_GROUP_MANAGER, org.getParentOrganisation())) {
-				setMonitorForGroupManager(user, org.getParentOrganisation().getChildOrganisations());
+				setRolesForGroupManager(user, org.getParentOrganisation().getChildOrganisations());
 			}
 		}
 	}
 	
-	private void setMonitorForGroupManager(User user, Set childOrgs) {
+	private void setRolesForGroupManager(User user, Set childOrgs) {
 		for (Object o : childOrgs) {
 			Organisation org = (Organisation)o;
 			
@@ -735,27 +735,44 @@ public class UserManagementService implements IUserManagementService {
 				Set uos = org.getUserOrganisations();
 				uos.add(uo);
 				log.debug("added "+user.getLogin()+" to "+org.getName());
+				uo = setRoleForUserOrganisation(uo, (Role)findById(Role.class, Role.ROLE_MONITOR));
+				uo = setRoleForUserOrganisation(uo, (Role)findById(Role.class, Role.ROLE_LEARNER));
+				save(uo);
+				return;
 			}
 			
+			// iterate through roles and add monitor and learner if don't already exist
 			Set<UserOrganisationRole> uors = uo.getUserOrganisationRoles();
 			if (uors!=null && !uors.isEmpty()) {
 				boolean isMonitor = false;
+				boolean isLearner = false;
 				for (UserOrganisationRole uor : uors) {
 					if (uor.getRole().getName().equals(Role.MONITOR)) {
 						isMonitor = true;
+					} else if (uor.getRole().getName().equals(Role.LEARNER)) {
+						isLearner = true;
+					}
+					if (isMonitor && isLearner) {
 						break;
 					}
 				}
-				if (isMonitor) {
-					continue;
+				if (!isMonitor) {
+					uo = setRoleForUserOrganisation(uo, (Role)findById(Role.class, Role.ROLE_MONITOR));
 				}
+				if (!isLearner) {
+					uo = setRoleForUserOrganisation(uo, (Role)findById(Role.class, Role.ROLE_LEARNER));
+				}
+				save(uo);
 			}
-			UserOrganisationRole monitor = new UserOrganisationRole(uo, 
-					(Role)findById(Role.class, Role.ROLE_MONITOR));
-			uo.addUserOrganisationRole(monitor);
-			log.debug("setting role: "+monitor.getRole().getName()+" in organisation: "+org.getName());
-			save(uo);
 		}
+	}
+	
+	private UserOrganisation setRoleForUserOrganisation(UserOrganisation uo, Role role) {
+		UserOrganisationRole uor = new UserOrganisationRole(uo, role);
+		save(uor);
+		uo.addUserOrganisationRole(uor);
+		log.debug("setting role: "+uor.getRole().getName()+" in organisation: "+uor.getUserOrganisation().getOrganisation().getName());
+		return uo;
 	}
 
 	public List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType) {
