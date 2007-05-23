@@ -17,7 +17,15 @@
 <logic:notEqual name="isSysadmin" value="false">
 <html-el:form action="/usersearch.do" method="post">
 <html-el:hidden property="searched" />
-<div align="center">&nbsp;<html-el:errors /><html-el:messages id="results" message="true"><bean:write name="results" /></html-el:messages></div>
+<div align="center">
+	<html-el:errors />
+	<html-el:messages id="results" message="true">
+		<bean:write name="results" />
+	</html-el:messages>
+	<p align="right">
+		<input class="button" type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit' />
+	</p>
+</div>
 <table class="alternative-color" cellspacing="0">
 <tr>
 	<th><fmt:message key="admin.user.userid"/></th>
