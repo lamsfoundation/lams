@@ -20,8 +20,8 @@
 				</div>	
 			</c:forEach>
 		</div>
-		<c:forEach var="lesson" items="${orgBean.lessons}">
-			<div class="sequence-name">
+		<div class="sequence-name">
+			<c:forEach var="lesson" items="${orgBean.lessons}">
 				<p>
 					<c:if test="${empty lesson.url}">
 						<a class="disabled-sequence-name-link"> <c:out value="${lesson.name}" /></a> 
@@ -39,8 +39,8 @@
 						</a>
 					</c:forEach>
 				</p>
-			</div>
-		</c:forEach>
+			</c:forEach>
+		</div>
 		<c:forEach var="childOrg" items="${orgBean.childIndexOrgBeans}">
 		<div class="group-name">
 			<p>
@@ -57,25 +57,27 @@
 				</c:forEach>
 			</p>
 			
-			<c:forEach var="childLesson" items="${childOrg.lessons}">
-				<p>
-					<c:if test="${empty childLesson.url}">
-						<a class="disabled-sequence-name-link"> <c:out value="${childLesson.name}" /></a>
-						<c:if test="${childLesson.state eq 4}">&nbsp;(<fmt:message key="label.disabled"/>)</c:if>
-						<c:if test="${childLesson.state eq 6}">&nbsp;(<fmt:message key="label.archived"/>)</c:if>
-					</c:if>
-					<c:if test="${not empty childLesson.url}">
-						<a href="<c:out value='${childLesson.url}'/>" class="sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
-					</c:if>
-					<c:forEach var="childlessonlink" items="${childLesson.links}">
-					<a href="<c:out value='${childlessonlink.url}'/>" class="sequence-action-link"> 
-						<span class="mycourses-monitor-img"> 
-							<fmt:message key="${childlessonlink.name}" /> 
-						</span>
-					</a>
-					</c:forEach>
-				</p>
-			</c:forEach>
+			<div class="sequence-name">
+				<c:forEach var="childLesson" items="${childOrg.lessons}">
+					<p>
+						<c:if test="${empty childLesson.url}">
+							<a class="disabled-sequence-name-link"> <c:out value="${childLesson.name}" /></a>
+							<c:if test="${childLesson.state eq 4}">&nbsp;(<fmt:message key="label.disabled"/>)</c:if>
+							<c:if test="${childLesson.state eq 6}">&nbsp;(<fmt:message key="label.archived"/>)</c:if>
+						</c:if>
+						<c:if test="${not empty childLesson.url}">
+							<a href="<c:out value='${childLesson.url}'/>" class="sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
+						</c:if>
+						<c:forEach var="childlessonlink" items="${childLesson.links}">
+						<a href="<c:out value='${childlessonlink.url}'/>" class="sequence-action-link"> 
+							<span class="mycourses-monitor-img"> 
+								<fmt:message key="${childlessonlink.name}" /> 
+							</span>
+						</a>
+						</c:forEach>
+					</p>
+				</c:forEach>
+			</div>
 		</div>
 	</c:forEach>
 </div>
