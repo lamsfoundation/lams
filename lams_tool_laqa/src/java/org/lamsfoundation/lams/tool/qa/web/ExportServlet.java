@@ -87,6 +87,12 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
         
         QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionID.longValue());
         
+        // If the learner hasn't answered yet, then they won't exist in the session.
+        // Yet we might be asked for their page, as the activity has been commenced. 
+        // So need to do a "blank" page in that case
+        QaQueUsr learner = qaService.getQaUserBySession(userID,qaSession.getUid());
+        logger.debug("learner: " + learner);
+        
         QaContent content=qaSession.getQaContent();
         logger.debug("content: " + content);
         logger.debug("content id: " + content.getQaContentId());
@@ -104,18 +110,22 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
 
     	GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(content);
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
-    	qaMonitoringAction.refreshSummaryData(request, content, qaService, content.isUsernameVisible(), true, toolSessionID.toString(), 
-    	        userID.toString(), generalLearnerFlowDTO, false, toolSessionID.toString());
-    	logger.debug("end refreshSummaryData for learner mode.");
-    	
+
+	    // if learner is null, don't want to show other people's answers
+        if ( learner != null ) {
+        	qaMonitoringAction.refreshSummaryData(request, content, qaService, content.isUsernameVisible(), true, toolSessionID.toString(), 
+	    	        userID.toString(), generalLearnerFlowDTO, false, toolSessionID.toString());
+	    	logger.debug("end refreshSummaryData for learner mode.");
+	    	qaMonitoringAction.prepareReflectionData(request, content, qaService, userID.toString(), true, toolSessionID.toString());
+        }
+        
     	generalLearnerFlowDTO =(GeneralLearnerFlowDTO)request.getAttribute(GENERAL_LEARNER_FLOW_DTO);
     	logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 
     	logger.debug("for the special case of export portfolio we place generalLearnerFlowDTO into session scope");
     	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+
     	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
-    	
-    	qaMonitoringAction.prepareReflectionData(request, content, qaService, userID.toString(), true, toolSessionID.toString());
     	logger.debug("ending learner mode: ");
     }
     

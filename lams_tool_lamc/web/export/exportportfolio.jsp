@@ -41,14 +41,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<div id="content">
 		
 			<h1>
-			<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
-				<c:if test="${(portfolioExportMode == 'learner')}"><fmt:message key="label.export.learner"/></c:if>			
-				<c:if test="${(portfolioExportMode != 'learner')}"><fmt:message key="label.export.teacher"/> </h1></c:if>			
-			</c:if>
+			<c:if test="${(portfolioExportMode == 'learner')}"><fmt:message key="label.export.learner"/></c:if>			
+			<c:if test="${(portfolioExportMode != 'learner')}"><fmt:message key="label.export.teacher"/></c:if>			
 	        </h1>
 
 				<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
+				<c:if test="${(portfolioExportMode != 'learner')}">
 						<h2> <fmt:message key="error.noLearnerActivity"/> </h2>
+				</c:if>			
 				</c:if>			
 		
 				<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
@@ -167,6 +167,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:if>										
 					
 					<c:if test="${(portfolioExportMode == 'learner')}">
+					<c:if test="${not empty  listMonitoredAnswersContainerDto}"> 
+						
 						<table width="80%" cellspacing="8" align="center">
 				  	 		<c:set var="mainQueIndex" scope="request" value="0"/>
 							<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
@@ -312,6 +314,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				
 				
+			</c:if>						
 			</c:if>						
 		
 			</div>  <!--closes content-->

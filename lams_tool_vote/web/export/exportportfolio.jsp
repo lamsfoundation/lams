@@ -39,13 +39,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<div id="content">
 	
 		<h1>
-		<c:if test="${(exportPortfolioDto.userExceptionNoToolSessions != 'true') }"> 	
-			<c:if test="${(exportPortfolioDto.portfolioExportMode == 'learner')}"><fmt:message key="label.export.learner"/></c:if>			
-			<c:if test="${(exportPortfolioDto.portfolioExportMode != 'learner')}"><fmt:message key="label.export.teacher"/> </h1></c:if>			
-		</c:if>
+		<c:if test="${(exportPortfolioDto.portfolioExportMode == 'learner')}"><fmt:message key="label.export.learner"/></c:if>			
+		<c:if test="${(exportPortfolioDto.portfolioExportMode != 'learner')}"><fmt:message key="label.export.teacher"/> </h1></c:if>			
         </h1>
 	
 		<c:if test="${(exportPortfolioDto.userExceptionNoToolSessions == 'true')}"> 	
+		<c:if test="${(exportPortfolioDto.portfolioExportMode != 'learner')}"> 	
 				<table align="center">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
@@ -53,6 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</td> 
 					<tr>
 				</table>
+		</c:if>			
 		</c:if>			
 
 

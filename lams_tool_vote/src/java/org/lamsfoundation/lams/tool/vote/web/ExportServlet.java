@@ -66,23 +66,29 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 	    logger.debug("dispathcing doExport");
 	    String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
 
+	    boolean generateCharts = false;
+	    
 		if (StringUtils.equals(mode,ToolAccessMode.LEARNER.toString())){
-		    learner(request,response,directoryName,cookies);
+			generateCharts = learner(request,response,directoryName,cookies);
 		}else if (StringUtils.equals(mode,ToolAccessMode.TEACHER.toString())){
-			teacher(request,response,directoryName,cookies);
+			generateCharts = teacher(request,response,directoryName,cookies);
 		}
-
-		logger.debug("writing out chart to directoryName: " + directoryName);
-		writeOutChart(request, "pie",  directoryName);
-		writeOutChart(request, "bar",  directoryName);
-		logger.debug("basePath: " + basePath);
+		
+		if ( generateCharts ) {
+			logger.debug("writing out chart to directoryName: " + directoryName);
+			writeOutChart(request, "pie",  directoryName);
+			writeOutChart(request, "bar",  directoryName);
+			logger.debug("basePath: " + basePath);
+		}
+		
 		writeResponseToFile(basePath+"/export/exportportfolio.jsp",directoryName,FILENAME,cookies);
 		
 		return FILENAME;
 	}
     
-	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
+	public boolean learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
+		boolean generateCharts = false;
 	    ExportPortfolioDTO exportPortfolioDTO= new ExportPortfolioDTO();
 	    
 	    logger.debug("starting learner mode...");
@@ -105,52 +111,58 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         logger.debug("retrieving voteSession: " + voteSession);
         logger.debug("voteSession uid: " + voteSession.getUid());
         
+        // If the learner hasn't voted yet, then they won't exist in the session.
+        // Yet we might be asked for their page, as the activity has been commenced. 
+        // So need to do a "blank" page in that case
         VoteQueUsr learner = voteService.getVoteUserBySession(userID,voteSession.getUid());
         logger.debug("learner: " + learner);
         
-        if (learner == null)
-        {
-            String error="The user with user id " + userID + " does not exist in this session or session may not exist.";
-            logger.error(error);
-            throw new VoteApplicationException(error);
-        }
+        if ( learner != null && learner.isFinalScreenRequested() ) {
+        	generateCharts = true;
+        	
+        	VoteContent content=voteSession.getVoteContent();
+	        logger.debug("content: " + content);
+	        logger.debug("content id: " + content.getVoteContentId());
+	        
+	        if (content == null)
+	        {
+	            String error="The content for this activity has not been defined yet.";
+	            logger.error(error);
+	            throw new VoteApplicationException(error);
+	        }
+	
+	        VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
+	        logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
+	        
+	    	VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
+	    	voteMonitoringAction.refreshSummaryData(request, content, voteService, true, true, 
+	    	        toolSessionID.toString(), userID.toString() , true, null, voteGeneralMonitoringDTO, exportPortfolioDTO);
+	    	logger.debug("post refreshSummaryData, exportPortfolioDTO now: " + exportPortfolioDTO);
+	    	
+	    	
+	    	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), 
+	    	        voteSession.getUid(), exportPortfolioDTO);
+	    	    	
+	    	// VoteChartGenerator.create{Pie|Bar}Chart expects these to be session attributes
+	    	request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, exportPortfolioDTO.getMapStandardNominationsHTMLedContent());
+	    	request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, exportPortfolioDTO.getMapStandardRatesContent());
+	    	
+	    	//	voteMonitoringAction.prepareReflectionData(request, content, voteService, userID.toString(),true);
+	     } else {
+	    	 // thise field is needed for the jsp.
+	    	 exportPortfolioDTO.setUserExceptionNoToolSessions("false");
+	     }
         
-        VoteContent content=voteSession.getVoteContent();
-        logger.debug("content: " + content);
-        logger.debug("content id: " + content.getVoteContentId());
-        
-        if (content == null)
-        {
-            String error="The content for this activity has not been defined yet.";
-            logger.error(error);
-            throw new VoteApplicationException(error);
-        }
-
-        VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
-        logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
-        
-    	VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
-    	voteMonitoringAction.refreshSummaryData(request, content, voteService, true, true, 
-    	        toolSessionID.toString(), userID.toString() , true, null, voteGeneralMonitoringDTO, exportPortfolioDTO);
-    	logger.debug("post refreshSummaryData, exportPortfolioDTO now: " + exportPortfolioDTO);
-    	
-    	
-    	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), 
-    	        voteSession.getUid(), exportPortfolioDTO);
-    	    	
     	logger.debug("final exportPortfolioDTO: " + exportPortfolioDTO);
     	logger.debug("final exportPortfolioDTO userExceptionNoToolSessions: " + exportPortfolioDTO.getUserExceptionNoToolSessions() );
     	request.getSession().setAttribute(EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
-    	// VoteChartGenerator.create{Pie|Bar}Chart expects these to be session attributes
-    	request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, exportPortfolioDTO.getMapStandardNominationsHTMLedContent());
-    	request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, exportPortfolioDTO.getMapStandardRatesContent());
-    	
-    	//	voteMonitoringAction.prepareReflectionData(request, content, voteService, userID.toString(),true);
 
     	logger.debug("ending learner mode: ");
+
+    	return generateCharts;
     }
     
-    public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
+    public boolean teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
         logger.debug("starting teacher mode...");
 	    ExportPortfolioDTO exportPortfolioDTO= new ExportPortfolioDTO();
@@ -194,6 +206,9 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         
         voteMonitoringAction.prepareReflectionData(request, content, voteService, null, true, "All");
         logger.debug("ending teacher mode: ");
+
+        // always generate the charts
+        return true;
     }
     
     /**

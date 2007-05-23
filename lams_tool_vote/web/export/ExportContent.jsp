@@ -179,6 +179,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 
 
+						<c:if test="${not empty exportPortfolioDto.mapStandardNominationsHTMLedContent}">
 						 <tr> 
 					       <td NOWRAP valign=top class="align-left" >
 					        <IMG SRC="pie.png" ALT="Pie Chart"/>
@@ -190,7 +191,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					        <IMG SRC="bar.png" ALT="Bar Chart"/>
 					       </td>
 					      </tr>						
-						
+						</c:if>						
 
 
 							<tr>

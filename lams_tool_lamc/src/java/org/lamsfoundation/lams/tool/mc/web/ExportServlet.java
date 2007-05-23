@@ -121,21 +121,23 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
             throw new McApplicationException(error);
         }
 
-        McMonitoringAction mcMonitoringAction= new McMonitoringAction();
-        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionDataForExportLearner(request, content, mcService, mcSession, learner );
-	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
-	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
-	    
+	    request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
+
 	    if ( learner != null ) {
+	        McMonitoringAction mcMonitoringAction= new McMonitoringAction();
+	        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionDataForExportLearner(request, content, mcService, mcSession, learner );
+		    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
+		    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
+		    
 		    String intTotalMark=viewAnswers(request, content, learner, mcSession,  mcService);
 		    logger.debug("intTotalMark: " + intTotalMark);
 		    request.getSession().setAttribute(LEARNER_MARK,intTotalMark);
 		    request.getSession().setAttribute(LEARNER_NAME,learner.getFullname() );
+
+		    request.getSession().setAttribute(PASSMARK,content.getPassMark().toString());
+		    mcMonitoringAction.prepareReflectionData(request, content, mcService, userID.toString(), true);
 	    }
 	    
-	    request.getSession().setAttribute(PASSMARK,content.getPassMark().toString());
-	    request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
-	    mcMonitoringAction.prepareReflectionData(request, content, mcService, userID.toString(), true);
     	logger.debug("ending learner mode: ");
     }
 
