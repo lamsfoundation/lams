@@ -238,10 +238,6 @@ public class CSSBundler {
 		OutputStream os = null;
 		try {
 			
-			if ( log.isDebugEnabled() ) {
-				log.debug("Writing out file to "+filePath);
-			}
-			
 			int bufLen = 1024; // 1 Kbyte
 			byte[] buf = new byte[1024]; // output buffer
 			os = new FileOutputStream(filePath);
