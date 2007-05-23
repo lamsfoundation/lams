@@ -77,7 +77,6 @@ Section Revert
     ; getting the required settings to revert from the register
     call readRegister
     
-    detailprint "Starting Reverting from $VERSION"
     call revertFiles
     
     detailprint "Reverting back to old database"
