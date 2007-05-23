@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.admin.web.form.ImportV1Form;
  * 
  * @struts:action-forward name="importv1contents" path="/importv1contents.do"
  * @struts:action-forward name="sysadmin" path="/sysadminstart.do"
+ * @struts:action-forward name="importv1" path="/importv1.do"
  */
 public class ImportV1SaveAction extends Action {
 	
@@ -71,6 +72,11 @@ public class ImportV1SaveAction extends Action {
 		ImportV1Form importV1Form = (ImportV1Form)form;
 		FormFile file = importV1Form.getFile();
 		boolean includeIntegrated = importV1Form.getIntegrated();
+		
+		// validation
+		if (file==null || file.getFileSize()<=0) {
+			return mapping.findForward("importv1");
+		}
 		
 		List<List> results = importService.parseV1UsersFile(file, includeIntegrated);
 		List<V1UserDTO> users = results.get(0);

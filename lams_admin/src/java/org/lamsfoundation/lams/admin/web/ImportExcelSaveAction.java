@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.util.MessageService;
  * 
  * @struts:action-forward name="importresult" path=".importresult"
  * @struts:action-forward name="sysadmin" path="/sysadminstart.do"
+ * @struts:action-forward name="import" path="/importexcel.do"
  */
 public class ImportExcelSaveAction extends Action {
 	
@@ -66,6 +67,11 @@ public class ImportExcelSaveAction extends Action {
 		IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
 		ImportExcelForm importExcelForm = (ImportExcelForm)form;
 		FormFile file = importExcelForm.getFile();
+		
+		// validation
+		if (file==null || file.getFileSize()<=0) {
+			return mapping.findForward("import");
+		}
 		
 		List results = importService.parseSpreadsheet(file);
 		String successMessageKey = (importService.isUserSpreadsheet(file) ? "msg.users.created" : "msg.users.added");
