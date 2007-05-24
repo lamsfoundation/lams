@@ -15,13 +15,13 @@ insert into lams_configuration (config_key, config_value) values ('UserInactiveT
 insert into lams_configuration (config_key, config_value) values ('UseCacheDebugListener','false');
 insert into lams_configuration (config_key, config_value) values ('CleanupPreviewOlderThanDays','7');
 insert into lams_configuration (config_key, config_value) values ('AuthoringActivitiesColour', 'true');
-insert into lams_configuration (config_key, config_value) values ('AuthoringClientVersion','0.8.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('MonitorClientVersion','0.8.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('LearnerClientVersion','0.8.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('ServerVersionNumber','0.8.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('AuthoringClientVersion','0.8.1.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('MonitorClientVersion','0.8.1.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('LearnerClientVersion','0.8.1.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('ServerVersionNumber','0.8.1.@datetimestamp@');
 insert into lams_configuration (config_key, config_value) values ('ServerLanguage','en_AU');
 insert into lams_configuration (config_key, config_value) values ('ServerPageDirection','LTR');
-insert into lams_configuration (config_key, config_value) values ('DictionaryDateCreated','2007-04-23');
+insert into lams_configuration (config_key, config_value) values ('DictionaryDateCreated','2007-05-24');
 insert into lams_configuration (config_key, config_value) values ('HelpURL','http://wiki.lamsfoundation.org/display/lamsdocs/');
 insert into lams_configuration (config_key, config_value) values ('XmppDomain','shaun.melcoe.mq.edu.au');
 insert into lams_configuration (config_key, config_value) values ('XmppConference','conference.shaun.melcoe.mq.edu.au');
