@@ -84,7 +84,7 @@
 				&nbsp;
 				<a href="user.do?method=remove&userId=<c:out value="${user.userId}"/>"><fmt:message key="admin.user.delete"/></a>
 				&nbsp;
-				<a href="<lams:LAMSURL/>/loginas.do?login=<c:out value="${user.login}"/>">Login as</a>
+				<a href="<lams:LAMSURL/>/loginas.do?login=<c:out value="${user.login}"/>"><fmt:message key="label.login.as"/></a>
 			</td>
 		</tr>
 	</c:forEach>
