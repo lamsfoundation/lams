@@ -198,9 +198,12 @@ public class LearningAction extends Action {
 		}
 		
 		//set some option flag to HttpSession
+		// if allowRichEditor = true then don't restrict the number of chars
+		// if isLimitedInput = false then don't restrict the number of chars
+		// Indicate don't restrict number of chars by allowNumber = 0
 		Long forumId = forum.getUid();
 		Boolean allowRichEditor = new Boolean(forum.isAllowRichEditor());
-		int allowNumber = forum.getLimitedChar();
+		int allowNumber = forum.isLimitedInput() || forum.isAllowRichEditor() ? forum.getLimitedChar() : 0;
 		
 		// get notebook entry
 		String entryText = new String();

@@ -12,10 +12,12 @@
 		<%-- Does not user general tag becuase this field need keep compatible with FCKEditor's content --%>
 		<lams:STRUTS-textarea rows="10" cols="40" tabindex="2" property="message.body" styleId="messageBody" />
 		<BR>
-		<fmt:message key="lable.char.left" />:  
-		<span id="charleftDiv"></span>
-		<input type="hidden" name="limitCount" id="limitCount" />
-		<script type="text/javascript">
+		<%-- If limitChars == 0, then we don't want to limit the characters at all. --%>
+		<c:if test="${sessionMap.limitedChars > 0}">
+			<fmt:message key="lable.char.left" />:  
+			<span id="charleftDiv"></span>
+			<input type="hidden" name="limitCount" id="limitCount" />
+			<script type="text/javascript">
 					<!--
 					var limit = <c:out value="${sessionMap.limitedChars}"/>;
 					var bodyTxt = document.getElementById("messageBody");
@@ -39,7 +41,8 @@
 					bodyTxt.onkeydown = calculateLeft;
 					bodyTxt.onkeyup = calculateLeft;
 					-->
-				</script>
+			</script>
+		</c:if>
 	</c:otherwise>
 </c:choose>
 <BR>
