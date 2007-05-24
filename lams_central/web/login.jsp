@@ -16,6 +16,15 @@
 	{
 		response.sendRedirect("j_security_check?j_username=" + webAuthUser + "&j_password=Dummy");	
 	}*/
+	
+	// for sysadmin to be able to login as someone else
+	String login = (String)session.getAttribute("login");
+	String pass = (String)session.getAttribute("pass");
+	if (login!=null && pass!=null) { 
+		session.removeAttribute("login");
+		session.removeAttribute("pass");
+		response.sendRedirect("j_security_check?j_username="+login+"&j_password="+pass);
+	} 
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <lams:html>
