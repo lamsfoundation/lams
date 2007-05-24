@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
@@ -42,6 +43,8 @@ import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -113,6 +116,11 @@ public class ProfileSaveAction extends Action {
 		requestor.setLocale(locale);
 		getService().save(requestor);
 		log.debug("profile edited: "+requestor);
+		
+		// replace UserDTO in the shared session
+		HttpSession ss = SessionManager.getSession();
+		ss.removeAttribute(AttributeNames.USER);
+		ss.setAttribute(AttributeNames.USER, requestor.getUserDTO());
 		
 		return mapping.findForward("profile");
 	}
