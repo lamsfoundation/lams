@@ -33,6 +33,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -159,11 +160,13 @@ public class IntegrationService implements IIntegrationService{
 		}else if(langIsoCode.trim().length()>0){
 			List list = service.findByProperty(SupportedLocale.class, "languageIsoCode", langIsoCode);
 			if(list!=null && list.size()>0){
+				Collections.sort(list);
 				locale = (SupportedLocale)list.get(0);
 			}
 		}else if(countryIsoCode.trim().length()>0){
 			List list = service.findByProperty(SupportedLocale.class, "countryIsoCode", countryIsoCode);
 			if(list!=null && list.size()>0){
+				Collections.sort(list);
 				locale = (SupportedLocale)list.get(0);
 			}
 		}
