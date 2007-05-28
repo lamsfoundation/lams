@@ -259,9 +259,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			this._activityLayer_mc.removeMovieClip();
 			this._nameLayer_mc.removeMovieClip();
 			
-			this._activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 			this._nameLayer_mc = this.createEmptyMovieClip("_nameLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
-		
+			this._activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 
 			if (isChanged == false){
 				mm.setIsProgressChangedLearner(false);
