@@ -200,8 +200,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private function draw(){
 		//set up the Movie Clips to load relevant  
 		
-		this._activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 		this._nameLayer_mc = this.createEmptyMovieClip("_nameLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
+		this._activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 		
 		setStyles();
 		
@@ -443,7 +443,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		var ltv = LearnerTabView(this);
 		var mc = getController();
 		
-		var mc:MovieClip = MovieClip(mm.activitiesDisplayed.get(a.activityUIID));
+		var mc_to_clone:MovieClip = MovieClip(mm.activitiesDisplayed.get(a.activityUIID));
 		var _activityLayer_mc_clone:MovieClip = null;
 		
 		if (ACT_X == 0) {
@@ -453,17 +453,17 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		//take action depending on act type
 		if(a.isGateActivity()){
 			var actLabel:String = gateTitle(a);
-			_activityLayer_mc_clone = ApplicationParent.cloneMovieClip(mc, "_activityLayer_mc_clone_" + learner.getLearnerId() + "_" + a.activityUIID, _activityLayer_mc.getNextHighestDepth(), {_activity:a, _controller:mc, _view:ltv, _x:ACT_X, _y:ACT_Y+40, actLabel:actLabel, learner:learner});
+			_activityLayer_mc_clone = ApplicationParent.cloneMovieClip(mc_to_clone, "_activityLayer_mc_clone_" + learner.getLearnerId() + "_" + a.activityUIID, _activityLayer_mc.getNextHighestDepth(), {_activity:a, _controller:mc, _view:ltv, _x:ACT_X, _y:ACT_Y+40, actLabel:actLabel, learner:learner});
 		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			_activityLayer_mc_clone = ApplicationParent.cloneMovieClip(mc, "_activityLayer_mc_clone_" + learner.getLearnerId() + "_" + a.activityUIID, _activityLayer_mc.getNextHighestDepth(), {_activity:a, _children:children, _controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
+			_activityLayer_mc_clone = ApplicationParent.cloneMovieClip(mc_to_clone, "_activityLayer_mc_clone_" + learner.getLearnerId() + "_" + a.activityUIID, _activityLayer_mc.getNextHighestDepth(), {_activity:a, _children:children, _controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
 		} else {
-			_activityLayer_mc_clone = ApplicationParent.cloneMovieClip(mc, "_activityLayer_mc_clone_" + learner.getLearnerId() + "_" + a.activityUIID, _activityLayer_mc.getNextHighestDepth(), {_activity:a, _controller:mc, _view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
+			_activityLayer_mc_clone = ApplicationParent.cloneMovieClip(mc_to_clone, "_activityLayer_mc_clone_" + learner.getLearnerId() + "_" + a.activityUIID, _activityLayer_mc.getNextHighestDepth(), {_activity:a, _controller:mc, _view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
 		}
 		
 		ACT_X = (_activityLayer_mc_clone != null) ? _activityLayer_mc_clone._x + _activityLayer_mc_clone._width : 0;
 			
-		Debugger.log("_clone:" + _activityLayer_mc_clone + " xPOS=" + mc._x + " yPOS=" + mc._y + " _x=" + _activityLayer_mc_clone._x + " _y=" + _activityLayer_mc_clone._y, Debugger.CRITICAL, "cloneDesign", "LTV");
+		Debugger.log("_clone:" + _activityLayer_mc_clone + " xPOS=" + mc_to_clone._x + " yPOS=" + mc_to_clone._y + " _x=" + _activityLayer_mc_clone._x + " _y=" + _activityLayer_mc_clone._y, Debugger.CRITICAL, "cloneDesign", "LTV");
 
 	}
 

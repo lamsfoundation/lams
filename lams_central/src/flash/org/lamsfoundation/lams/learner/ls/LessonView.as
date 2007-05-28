@@ -281,6 +281,7 @@ class LessonView extends AbstractView {
 		}
 		
 		progress_scp.redraw(true);
+		getAndScrollToTargetPos(a, newActivity_mc, lm.progressData);
 		
 		return true;
 	}
@@ -296,34 +297,13 @@ class LessonView extends AbstractView {
 	private function updateActivity(a:Activity,lm:LessonModel):Boolean{
 		
 		
-		var targetPos;
-		
 		if(lm.activitiesDisplayed.containsKey(a.activityUIID)){
 			var activityMC:Object = lm.activitiesDisplayed.get(a.activityUIID);
 			activityMC.refresh();
 			
 			Debugger.log('progess data:'+lm.progressData.getCurrentActivityId()+' a.activityID:'+a.activityID,Debugger.CRITICAL,'updateActivity','LessonView');
 			
-			if(lm.progressData.getCurrentActivityId() == a.activityID){
-					//progress_scp.vPosition = activityMC._x;
-				var scrollBarPosition = activityMC._y - (ACTIVITY_OFFSET*1.5);
-				Debugger.log('|| sb pos: ' + scrollBarPosition + ' || max pos: ' + progress_scp.vScroller.maxPos+ ' || activity Y:'+activityMC._y+' || progress_scp.content._height:'+progress_scp.content._height,Debugger.CRITICAL,'updateActivity','LessonView');
-				
-				if((scrollBarPosition >= 0) && (scrollBarPosition <= progress_scp.vScroller.maxPos)){
-					targetPos = scrollBarPosition;
-				} else if(scrollBarPosition >= progress_scp.vScroller.maxPos){
-					targetPos = progress_scp.vScroller.maxPos;
-				} else {
-					targetPos = progress_scp.vScroller.minPos;
-				}
-				
-				if(progress_scp.vScroller._visible) {
-					Debugger.log('adjusting scrollbar position to target: ' + targetPos,Debugger.CRITICAL,'updateActivity','LessonView');
-					if(ScrollCheckIntervalID == null) {
-						ScrollCheckIntervalID = setInterval(Proxy.create(this,adjustScrollBar,targetPos),SCROLL_CHECK_INTERVAL);
-					}
-				}
-			}
+			getAndScrollToTargetPos(a, activityMC, lm.progressData);
 		
 		} else {
 			drawActivity(a, lm);
@@ -333,6 +313,31 @@ class LessonView extends AbstractView {
 		
 		
 		return true;
+	}
+	
+	private function getAndScrollToTargetPos(a:Activity, activityMC:Object, data:Progress):Void {
+		var targetPos;
+		
+		if(data.getCurrentActivityId() == a.activityID){
+			//progress_scp.vPosition = activityMC._x;
+			var scrollBarPosition = activityMC._y - (ACTIVITY_OFFSET*1.5);
+			Debugger.log('|| sb pos: ' + scrollBarPosition + ' || max pos: ' + progress_scp.vScroller.maxPos+ ' || activity Y:'+activityMC._y+' || progress_scp.content._height:'+progress_scp.content._height,Debugger.CRITICAL,'getAndScrollToTargetPos','LessonView');
+			
+			if((scrollBarPosition >= 0) && (scrollBarPosition <= progress_scp.vScroller.maxPos)){
+				targetPos = scrollBarPosition;
+			} else if(scrollBarPosition >= progress_scp.vScroller.maxPos){
+				targetPos = progress_scp.vScroller.maxPos;
+			} else {
+				targetPos = progress_scp.vScroller.minPos;
+			}
+				
+			if(progress_scp.vScroller._visible) {
+				Debugger.log('adjusting scrollbar position to target: ' + targetPos,Debugger.CRITICAL,'getAndScrollToTargetPos','LessonView');
+				if(ScrollCheckIntervalID == null) {
+					ScrollCheckIntervalID = setInterval(Proxy.create(this,adjustScrollBar,targetPos),SCROLL_CHECK_INTERVAL);
+				}
+			}
+		}
 	}
 	
 	private function adjustScrollBar(targetVal:Number) {
