@@ -485,13 +485,16 @@ class Monitor {
 			
 		var callback:Function = Proxy.create(this,readyEditOnFly, true);
         
-		Application.getInstance().getComms().getRequest('eof/authoring/editLearningDesign?learningDesignID=' + learningDesignID + '&userID=' + _root.userID,callback, false);
+		Application.getInstance().getComms().getRequest('eof/authoring/editLearningDesign?learningDesignID=' + learningDesignID + '&userID=' + _root.userID + '&p=' + Math.random() ,callback, false);
 		
 	}
 
 	public function readyEditOnFly(r:Object) {
 		if(r instanceof LFError) { 
 			r.showErrorAlert();
+			return;
+		} else if(!Boolean(r)) {
+			ApplicationParent.extCall("reloadWindow", null);
 			return;
 		}
 		

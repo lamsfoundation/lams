@@ -110,7 +110,7 @@ public class EditOnFlyServlet extends HttpServlet {
 			if(service.setupEditOnFlyLock(learningDesignID, userID))
 					packet = service.setupEditOnFlyGate(learningDesignID, userID);
 			else
-				packet = FlashMessage.getUnavailableLearningDesign("setupEditOnFlyLock", learningDesignID, userID).serializeMessage();
+				packet = new FlashMessage("setupEditOnFlyLock", false, FlashMessage.OBJECT_MESSAGE).serializeMessage();
 		} catch(Exception e) {
 			packet = FlashMessage.getExceptionOccured("doSetup", e.getMessage()).serializeMessage();
 		}
