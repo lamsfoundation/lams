@@ -42,6 +42,7 @@ public class ExportPortfolioConstants {
 	public static final String MAIN_NOTEBOOK_FILENAME = "notebook_main.html";
 	public static final String EXPORT_LEARNER_PREFIX = "Portfolio";
 	public static final String EXPORT_TEACHER_PREFIX = "Class Portfolio";
+	public static final String EXPORT_TEMP_FILENAME = "export.zip";
 	public static final String HOST = getServerURL();
 	public static final String SUBDIRECTORY_BASENAME = "Activity"; //subdirectory for each activity is ActivityXX where XX is the activity Id
 	public static final String SUBDIRECTORY_NOTEBOOK_BASENAME = "Notebook";

@@ -281,7 +281,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		{
 		    throw new ExportPortfolioException("An error has occurred while zipping up the directory ", e);
 		}
-		return zipfileName;
+		int index = dirToPutZip.lastIndexOf(File.separator);
+		return (index > -1 ? dirToPutZip.substring(index+1) : dirToPutZip);
 	}
 	
 	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#doExport(Vector, Cookie[]) */

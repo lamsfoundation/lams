@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.util.Date;
 
@@ -527,5 +528,26 @@ public class FileUtil {
 				return 0;
 			}
 			return 0;
+		}
+
+		/**
+		 * Remove chars from a file name that may be invalid on a file system.
+		 * @param name
+		 * @return a filename that can be saved to a file system.
+		 */
+		public static String stripInvalidChars(String name) {
+			name = name.replaceAll("\\\\", "");
+			name = name.replaceAll("\\/", "");
+			name = name.replaceAll("\\:", "");
+			name = name.replaceAll("\\*", "");
+			name = name.replaceAll("\\?", "");
+			name = name.replaceAll("\\>", "");
+			name = name.replaceAll("\\<", "");
+			name = name.replaceAll("\\|", "");
+			name = name.replaceAll("\\#", "");
+			name = name.replaceAll("\\%", "");
+			name = name.replaceAll("\\$", "");
+			name = name.replaceAll("\\;", "");
+			return name;
 		}
 }

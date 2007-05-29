@@ -102,7 +102,7 @@ public interface IExportPortfolioService {
 	 * 
 	 * @param filename
 	 * @param directoryToZip
-	 * @return
+	 * @return name of directory containing zipped up portfolio.
 	 */
 	public String zipPortfolio(String filename, String directoryToZip);
 	

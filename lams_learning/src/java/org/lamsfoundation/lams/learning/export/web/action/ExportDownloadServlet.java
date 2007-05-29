@@ -98,7 +98,15 @@ public class ExportDownloadServlet extends HttpServlet {
 	
 	private String constructAbsolutePath(String relativePath)
 	{
-	    return FileUtil.TEMP_DIR + File.separator + relativePath;
+		return FileUtil.TEMP_DIR + File.separator
+			+ getDirname(relativePath) + File.separator 
+			+ ExportPortfolioConstants.EXPORT_TEMP_FILENAME;
+	}
+	
+	private String getDirname(String path) 
+	{
+		int index = path.indexOf(File.separator);
+		return (index>0 ? path.substring(0, index) : path);
 	}
 	
 	private String getFilename(String path)

@@ -24,8 +24,10 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.export.web.action;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -129,7 +131,7 @@ public class MainExportServlet extends HttpServlet {
 		
 		if (portfolios!= null)
 		{
-			
+			exportFilename = FileUtil.stripInvalidChars(exportFilename);
 			exportTmpDir = portfolios.getExportTmpDir();
 				
 			exportService.generateMainPage(request, portfolios, cookies);	
@@ -143,8 +145,8 @@ public class MainExportServlet extends HttpServlet {
 			CSSBundler bundler = new CSSBundler(request, cookies, exportTmpDir, exportService.getUserThemes());
 			bundler.bundleStylesheet();
 			
-			// zip up the contents of the temp export folder 
-			String zipFilename = exportService.zipPortfolio(exportFilename, exportTmpDir);
+			// zip up the contents of the temp export folder using a constant name
+			String exportZipDir = exportService.zipPortfolio(ExportPortfolioConstants.EXPORT_TEMP_FILENAME, exportTmpDir);
 /*			-- Used for testing timeout  change the export url in exportWaitingPage to  
 			-- String exportUrl = learning_root + "portfolioExport?" + request.getQueryString()+"&sleep=1800000";
 			-- to pause for 30 mins. 
@@ -158,9 +160,10 @@ public class MainExportServlet extends HttpServlet {
 				}
 			}
 */			
-			//return the relative filelocation of the zip file so that it can be picked up in exportWaitingPage.jsp
+			// return the relative (to server's temp dir) filelocation of the 
+			// zip file so that it can be picked up in exportWaitingPage.jsp
 			PrintWriter out = response.getWriter();
-			out.println(returnRelativeExportTmpDir(zipFilename)); 
+			out.println(URLEncoder.encode(exportZipDir + File.separator + exportFilename, "UTF-8"));
 		}
 		else
 		{
@@ -168,13 +171,5 @@ public class MainExportServlet extends HttpServlet {
 		}
 		
 	}
-	
-
-	private String returnRelativeExportTmpDir(String absolutePath)
-	{
-	    String tempSysDirName = FileUtil.TEMP_DIR;
-	    return absolutePath.substring(tempSysDirName.length()+1, absolutePath.length());
-	}
-	
 
 }
