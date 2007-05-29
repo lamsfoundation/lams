@@ -351,7 +351,7 @@ public class LearnerService implements ICoreLearnerService
     	activity.setReadOnly(true);
     	activityDAO.insertOrUpdate(activity);
     	
-    	progress.setProgressState(activity, LearnerProgress.ACTIVITY_ATTEMPTED);
+    	progress.setProgressState(activity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
     	progress.setCurrentActivity(activity);
     	progress.setNextActivity(activity);
     	learnerProgressDAO.saveLearnerProgress(progress);
@@ -366,10 +366,10 @@ public class LearnerService implements ICoreLearnerService
     	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
     	
     	if(fromActivity != null)
-    		progress.setProgressState(fromActivity, LearnerProgress.ACTIVITY_ATTEMPTED);
+    		progress.setProgressState(fromActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
     	
     	if(toActivity != null) { 
-	    	progress.setProgressState(toActivity, LearnerProgress.ACTIVITY_ATTEMPTED);
+	    	progress.setProgressState(toActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
 	    	progress.setCurrentActivity(toActivity);
 	    	progress.setNextActivity(toActivity);
     	}

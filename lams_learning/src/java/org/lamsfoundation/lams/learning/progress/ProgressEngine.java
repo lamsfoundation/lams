@@ -60,7 +60,7 @@ public class ProgressEngine
      * result in the completion of A. Therefore, <code>completedActivityList</code>
      * will hold B and C.
      */
-    private List completedActivityList = new LinkedList();
+    private List<Long> completedActivityList = new LinkedList<Long>();
     /**
      * Method determines next step for a learner based on the activity
      * they have just completed. Will clear the Parallel Waiting Complete value if it is currently set.
@@ -88,7 +88,8 @@ public class ProgressEngine
                                              LearnerProgress learnerProgress) throws ProgressException 
     {
         learnerProgress.setProgressState(completedActivity,
-                                         LearnerProgress.ACTIVITY_COMPLETED);
+                                         LearnerProgress.ACTIVITY_COMPLETED,
+                                         activityDAO);
         completedActivityList.add(completedActivity.getActivityId());
         Transition transition = completedActivity.getTransitionFrom();
 
@@ -189,7 +190,7 @@ public class ProgressEngine
     
     /** Set the current activity as attempted. If it is a parallel activity, mark its children as attempted too. */
     private void setActivityAttempted(LearnerProgress progress, Activity activity) {
-        progress.setProgressState(activity,LearnerProgress.ACTIVITY_ATTEMPTED);
+        progress.setProgressState(activity,LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
     	activity.setReadOnly(true);
         
         if ( activity.isParallelActivity() ) {
@@ -383,4 +384,8 @@ public class ProgressEngine
 	public void setActivityDAO(IActivityDAO activityDAO) {
 		this.activityDAO = activityDAO;
 	}
+	
+
+
+
 }
