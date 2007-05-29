@@ -80,8 +80,8 @@ public class TestComplexActivityStrategy extends TestLearnerProgressDAO
         testSubParallelActivityQA = activityDAO.getActivityByActivityId(TEST_QA_ACTIVITY_ID);
         testSubParallelActivityMB = activityDAO.getActivityByActivityId(TEST_MB_ACTIVITY_ID);
         
-        super.testLearnerProgress.setProgressState(testSubParallelActivityQA,LearnerProgress.ACTIVITY_COMPLETED);
-        super.testLearnerProgress.setProgressState(testSubParallelActivityMB,LearnerProgress.ACTIVITY_COMPLETED);
+        super.testLearnerProgress.setProgressState(testSubParallelActivityQA,LearnerProgress.ACTIVITY_COMPLETED, activityDAO);
+        super.testLearnerProgress.setProgressState(testSubParallelActivityMB,LearnerProgress.ACTIVITY_COMPLETED, activityDAO);
         
         assertTrue("should be completed",((ComplexActivity)testParallelActivity).areChildrenCompleted(super.testLearnerProgress));
     }
@@ -90,7 +90,7 @@ public class TestComplexActivityStrategy extends TestLearnerProgressDAO
     {
         testSubParallelActivityQA = activityDAO.getActivityByActivityId(TEST_QA_ACTIVITY_ID);
        
-        super.testLearnerProgress.setProgressState(testSubParallelActivityQA,LearnerProgress.ACTIVITY_COMPLETED);
+        super.testLearnerProgress.setProgressState(testSubParallelActivityQA,LearnerProgress.ACTIVITY_COMPLETED, activityDAO);
 
         assertTrue("should not be completed",!((ComplexActivity)testParallelActivity).areChildrenCompleted(super.testLearnerProgress));
     }
@@ -101,8 +101,8 @@ public class TestComplexActivityStrategy extends TestLearnerProgressDAO
         testSubSeuqenceActivityQNA = activityDAO.getActivityByActivityId(TEST_QNA_ACTIVITY_ID);
 
         
-        super.testLearnerProgress.setProgressState(testSubSeuquencActivitySR,LearnerProgress.ACTIVITY_COMPLETED);
-        super.testLearnerProgress.setProgressState(testSubSeuqenceActivityQNA,LearnerProgress.ACTIVITY_COMPLETED);
+        super.testLearnerProgress.setProgressState(testSubSeuquencActivitySR,LearnerProgress.ACTIVITY_COMPLETED, activityDAO);
+        super.testLearnerProgress.setProgressState(testSubSeuqenceActivityQNA,LearnerProgress.ACTIVITY_COMPLETED, activityDAO);
         assertTrue("should be completed",((ComplexActivity)testSequenceActivity).areChildrenCompleted(super.testLearnerProgress));
     }
     
@@ -110,7 +110,7 @@ public class TestComplexActivityStrategy extends TestLearnerProgressDAO
     {
         testSubSeuquencActivitySR = activityDAO.getActivityByActivityId(TEST_SR_ACTIVITY_ID);
         
-        super.testLearnerProgress.setProgressState(testSubSeuquencActivitySR,LearnerProgress.ACTIVITY_COMPLETED);
+        super.testLearnerProgress.setProgressState(testSubSeuquencActivitySR,LearnerProgress.ACTIVITY_COMPLETED, activityDAO);
         assertTrue("should not be completed",!((ComplexActivity)testSequenceActivity).areChildrenCompleted(super.testLearnerProgress));
     }
     
@@ -119,7 +119,7 @@ public class TestComplexActivityStrategy extends TestLearnerProgressDAO
         testSubOptionsActivityNB = activityDAO.getActivityByActivityId(TEST_NB_ACTIVITY_ID);
         testSubOptionsActivityMC = activityDAO.getActivityByActivityId(TEST_MC_ACTIVITY_ID);
         
-        super.testLearnerProgress.setProgressState(testSubOptionsActivityNB,LearnerProgress.ACTIVITY_COMPLETED);
+        super.testLearnerProgress.setProgressState(testSubOptionsActivityNB,LearnerProgress.ACTIVITY_COMPLETED, activityDAO);
         assertTrue("should be completed",((ComplexActivity)testOptionsActivity).areChildrenCompleted(super.testLearnerProgress));
     }
     

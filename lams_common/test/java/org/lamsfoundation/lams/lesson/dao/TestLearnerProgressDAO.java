@@ -149,9 +149,9 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
 
         Activity firstActivity = this.testLesson.getLearningDesign().getFirstActivity();
         
-        progress.setProgressState(firstActivity,LearnerProgress.ACTIVITY_COMPLETED);
-        progress.setProgressState(testParallelActivity,LearnerProgress.ACTIVITY_COMPLETED);
-        progress.setProgressState(testToolActivity,LearnerProgress.ACTIVITY_ATTEMPTED);
+        progress.setProgressState(firstActivity,LearnerProgress.ACTIVITY_COMPLETED, activityDAO);
+        progress.setProgressState(testParallelActivity,LearnerProgress.ACTIVITY_COMPLETED, activityDAO);
+        progress.setProgressState(testToolActivity,LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
         progress.setRestarting(true);
         
         super.learnerProgressDao.updateLearnerProgress(progress);
