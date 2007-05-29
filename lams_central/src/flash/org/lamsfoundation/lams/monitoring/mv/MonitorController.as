@@ -267,21 +267,16 @@ class MonitorController extends AbstractController {
 		trace(evt.target);
 		var tgt:String = new String(evt.target);
 		if(tgt.indexOf("editClass_btn") != -1){
-			trace('you clicked edit class button..');
 			_monitorModel.setDialogOpen("LM_DIALOG");
 		} else if(tgt.indexOf("viewLearners_btn") != -1){
 			_monitorModel.setDialogOpen("VM_DIALOG");
 		} else if(tgt.indexOf("start_btn") != -1){
-			trace('you clicked start class button..');
 			_monitorModel.getMonitor().startLesson(false, _root.lessonID);
 		} else if(tgt.indexOf("exportPortfolio_btn") != -1){
-			trace('you clicked exportPortfolio button..');
 			exportClassPortfolio();
 		}else if(tgt.indexOf("refresh_btn") != -1){
-			trace('you clicked refresh button..');
-			_monitorModel.refreshAllData();
+			_app.reloadLearningDesign(_monitorModel.getSequence(), Proxy.create(_monitorModel, _monitorModel.refreshAllData));
 		}else if(tgt.indexOf("help_btn") != -1){
-			trace('you clicked help button..');
 			_monitorModel.tabHelp();
 		}else if(tgt.indexOf("viewJournals_btn") != -1){
 			trace('you clicked journal entries button..');
@@ -293,6 +288,8 @@ class MonitorController extends AbstractController {
 		}
 	}
 
+	
+	
 	
 	/**
 	 * called when the dialog is loaded, calles methods to set up content in dialogue

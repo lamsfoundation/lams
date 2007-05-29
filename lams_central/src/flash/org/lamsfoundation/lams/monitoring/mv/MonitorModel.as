@@ -25,7 +25,8 @@ import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.Transition
-import org.lamsfoundation.lams.authoring.GateActivity;;
+import org.lamsfoundation.lams.authoring.GateActivity;
+import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.util.*;
@@ -512,15 +513,22 @@ class MonitorModel extends Observable{
 		
 	}
 	
-	public function refreshAllData(){
-		selectedTab = getSelectedTab();
-		setChanged();
+	public function refreshAllData(learningDesignDTO:Object){
+		var ddm:DesignDataModel = new DesignDataModel();
+		ddm.setDesign(learningDesignDTO);
+		if(!app.layout.manager.checkAvailabilityOnDDM(ddm).locked) {
 		
-		//send an update
-		infoObj = {};
-		infoObj.updateType = "RELOADPROGRESS";
-		infoObj.tabID = selectedTab;
-		notifyObservers(infoObj);
+			selectedTab = getSelectedTab();
+			setChanged();
+			
+			//send an update
+			infoObj = {};
+			infoObj.updateType = "RELOADPROGRESS";
+			infoObj.tabID = selectedTab;
+			notifyObservers(infoObj);
+		} else {
+			ApplicationParent.extCall("reloadWindow", null);
+		}
 		
 	}
 	

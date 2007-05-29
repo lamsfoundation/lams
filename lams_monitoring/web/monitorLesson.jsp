@@ -53,6 +53,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				closeWindowRefresh();
 			}else if(command == "openAuthorForEditOnFly") {
 				openAuthorForEditOnFly(args);
+			}else if(command == "reloadWindow") {
+				reloadWindow();
 			}
 			
 		}
@@ -82,6 +84,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			var toolbar = params[8];
 			
 			openPopUp(url, title, h, w, resize, status, scrollbar, menubar, toolbar);
+		}
+		
+		function reloadWindow() {
+			window.location.reload(true);
 		}
 	
 		function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolbar){

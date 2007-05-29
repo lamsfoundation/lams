@@ -93,14 +93,18 @@ class DefaultLayoutManager extends LFLayoutManager {
 	
 	public function checkAvailability(_sequence:Sequence):Object {
 			var _ddm:DesignDataModel = null;
-			var _obj:Object = new Object();
-			
 			_ddm = (_sequence.getLearningDesignModel() != null) ? _sequence.getLearningDesignModel() : _ddm;
 			
-			_obj.locked = _ddm.editOverrideLock;
-			_obj.isEditingUser = (_ddm.editOverrideUserID == _root.userID) ? true : false;
+			return checkAvailabilityOnDDM(_ddm);
+	}
+	
+	public function checkAvailabilityOnDDM(_ddm:DesignDataModel):Object {
+		var _obj:Object = new Object();
 			
-			return _obj;
+		_obj.locked = _ddm.editOverrideLock;
+		_obj.isEditingUser = (_ddm.editOverrideUserID == _root.userID) ? true : false;
+			
+		return _obj;
 	}
 	
 	public function doMonitor(isLocked:Boolean, isEditingUser:Boolean) {

@@ -235,8 +235,12 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		requestSequence(_root.lessonID);
     }
 	
-	private function requestSequence(seqID:Number){
-		var callback:Function = Proxy.create(this, saveSequence);
+	public function reloadSequence(seqID:Number, target:Function){
+		requestSequence(seqID, target);
+	}
+	
+	private function requestSequence(seqID:Number, target:Function){
+		var callback:Function = (target == null) ? Proxy.create(this, saveSequence) : target;
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonDetails&lessonID=' + String(seqID) + '&userID=' + _root.userID,callback, false);
 	}
 	
@@ -250,6 +254,10 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 
 	}
 	
+	public function reloadLearningDesign(seq:Sequence, target:Function) {
+		openLearningDesign(seq, target);
+	}
+	
 	/**
 	 * server call for Learning Deign and sent it to the save it in DataDesignModel
 	 * 
@@ -257,9 +265,9 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	 * @param   		seq type Sequence;
 	 * @return  		Void
 	 */
-	private function openLearningDesign(seq:Sequence){
+	private function openLearningDesign(seq:Sequence, target:Function){
 		var designID:Number  = seq.learningDesignID;
-        var callback:Function = Proxy.create(this,saveDataDesignModel);
+        var callback:Function = (target == null) ? Proxy.create(this,saveDataDesignModel) : target;
            
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designID,callback, false);
 		

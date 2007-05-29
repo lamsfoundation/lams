@@ -485,7 +485,7 @@ class Monitor {
 			
 		var callback:Function = Proxy.create(this,readyEditOnFly, true);
         
-		Application.getInstance().getComms().getRequest('eof/authoring/editLearningDesign?learningDesignID=' + learningDesignID,callback, false);
+		Application.getInstance().getComms().getRequest('eof/authoring/editLearningDesign?learningDesignID=' + learningDesignID + '&userID=' + _root.userID,callback, false);
 		
 	}
 
