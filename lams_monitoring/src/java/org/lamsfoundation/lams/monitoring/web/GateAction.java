@@ -230,6 +230,13 @@ public class GateAction extends LamsDispatchAction
                                              DynaActionForm gateForm, 
                                              Activity gate)
     {
+    	// reset all the other fields, so that the following code only has to set up its own values (LDEV-1237)
+    	gateForm.set(READ_ONLY, Boolean.FALSE);
+        gateForm.set("gate",null);
+        gateForm.set("waitingLearners",null);
+        gateForm.set("startingTime",null);
+        gateForm.set("endingTime",null);
+
         //dispatch the view according to the type of the gate.
     	if ( gate != null ) {
 	        if(gate.isSynchGate())
