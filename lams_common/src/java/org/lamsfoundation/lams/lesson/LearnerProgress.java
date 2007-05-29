@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 
 import java.io.Serializable;
@@ -55,7 +57,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class LearnerProgress implements Serializable
 {
-    //---------------------------------------------------------------------
+ 	private static final long serialVersionUID = -7866830317967062822L;
+ 	
+	//---------------------------------------------------------------------
     // Class level constants
     //---------------------------------------------------------------------
     /** Indicates activity has been completed */
@@ -304,23 +308,46 @@ public class LearnerProgress implements Serializable
     }
     
     /**
-     * Sets the progress state for an activity.
+     * Sets the progress state for an activity. 
+     * 
+     * If the activity is moving from completed to not completed, then the call is recursive - 
+     * it will reset all contained completed activities to the input state.
+     * 
+     * Only want to "take action" ie add/remove if the state has really changed. Otherwise
+     * the recursive call to remove the completed flag will cause unexpected side effects 
+     * when a Completed activity is reset to Completed
+     *
      * @param activity whose progress is to be set
      * @param state one of <code>ACTIVITY_COMPLETED</code>, <code>ACTIVITY_ATTEMPTED</code> or <code>ACTIVITY_NOT_ATTEMPTED</code>.
+     * @param activityDAO needed to get any child activities correctly from Hibernate (grr - shouldn't be required)
      */
-    public void setProgressState(Activity activity, byte state) {
+    public void setProgressState(Activity activity, byte state, IActivityDAO activityDAO) {
     	// remove activity from current set
     	byte oldState = getProgressState(activity);
+    	if ( oldState == state) {
+    		// no real change, forget the rest of the method
+    		return;
+    	}
+    	
     	if (oldState == LearnerProgress.ACTIVITY_NOT_ATTEMPTED);
-    	else if (oldState == LearnerProgress.ACTIVITY_ATTEMPTED) {
+    	else if (oldState == LearnerProgress.ACTIVITY_ATTEMPTED ) {
     		this.attemptedActivities.remove(activity);
     	}
-    	else if (oldState == LearnerProgress.ACTIVITY_COMPLETED) {
-    		this.completedActivities.remove(activity);
+    	else if (oldState == LearnerProgress.ACTIVITY_COMPLETED ) {
+       		this.completedActivities.remove(activity);
+	    	if ( activity.isComplexActivity() ) {
+	    		ComplexActivity complex = (ComplexActivity) activityDAO.getActivityByActivityId(activity.getActivityId(), ComplexActivity.class);
+	    		Iterator iter = complex.getActivities().iterator();
+	    		while ( iter.hasNext() ) {
+	    			Activity child = (Activity) iter.next();
+	    			setProgressState(child, state, activityDAO);
+	    		}
+       		}
     	}
+    	
     	// add activity to new set
     	if (state == LearnerProgress.ACTIVITY_NOT_ATTEMPTED);
-    	else if (state == LearnerProgress.ACTIVITY_ATTEMPTED) {
+    	else if (state == LearnerProgress.ACTIVITY_ATTEMPTED ) {
     		this.attemptedActivities.add(activity);
     	}
     	else if (state == LearnerProgress.ACTIVITY_COMPLETED) {
@@ -462,7 +489,7 @@ public class LearnerProgress implements Serializable
             throw new IllegalArgumentException("Fail to create id array" +
             		" from null activity set");
         
-        ArrayList activitiesIds = new ArrayList();
+        ArrayList<Long> activitiesIds = new ArrayList<Long>();
         for(Iterator i= activities.iterator();i.hasNext();)
         {
             Activity activity = (Activity)i.next();
