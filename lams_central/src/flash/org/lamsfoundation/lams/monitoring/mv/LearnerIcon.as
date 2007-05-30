@@ -185,8 +185,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	private function localOnRelease():Void{
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
-			//	trace("Activity ID is: "+this.activity.activityUIID);
-				_monitorController.activityRelease(this, "LearnerIcon");
+			_monitorController.activityRelease(this, "LearnerIcon");
 		}
 	}
 	

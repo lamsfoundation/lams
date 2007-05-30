@@ -63,9 +63,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	private var _isSelected:Boolean;
 	private var app:Application;
-	//locals
-	private var learnerOffset_X:Number = 4
-	private var learnerOffset_Y:Number = 3
+	
+	private var learnerOffset_X:Number = 4;
+	private var learnerOffset_Y:Number = 3;
+	private var learnerContainer:MovieClip;
+	
 	private var _module:String;
 	private var icon_mc:MovieClip;
 	private var icon_mcl:MovieClipLoader;
@@ -127,6 +129,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			if (_module == "monitoring"){
 				_monitorView = initObj._monitorView;
 				_monitorController = initObj._monitorController;
+				learnerContainer = initObj.learnerContainer;
 			}else {
 				_canvasView = initObj._canvasView;
 				_canvasController = initObj._canvasController;
@@ -154,7 +157,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function showAssets(isVisible:Boolean){
 		groupIcon_mc._visible = isVisible;
 		title_lbl._visible = isVisible;
-		//act_pnl._visible = isVisible;
 		icon_mc._visible = isVisible;
 		stopSign_mc._visible = isVisible;
 		canvasActivity_mc._visible = isVisible;
@@ -178,7 +180,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	public function setSelected(isSelected){
 		Debugger.log(_activity.title+" isSelected:"+isSelected,4,'setSelected','CanvasActivity');
-		//Debugger.log(_activity.title+" has StartTimeOffset:"+_activity.gateStartTimeOffset(),4,'setSelected','CanvasActivity');
 		var MARGIN = 5;
 		if(isSelected){
 			//draw a selected border
@@ -201,8 +202,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				var bl_x = tl_x;														//biottom left x															
 				var bl_y = br_y;														//bottom left y
 				
-				
-				//dashTo(target:MovieClip, x1:Number, y1:Number,x2:Number, y2:Number, dashLength:Number, spaceLength:Number )
 				if(_selected_mc){
 					_selected_mc.removeMovieClip();
 				}
@@ -227,24 +226,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	
 	private function loadIcon():Void{
-		//Debugger.log('Running, _activity.libraryActivityUIImage:'+_activity.libraryActivityUIImage,4,'loadIcon','CanvasActivity');
-		trace("Icon_MC is: "+Config.getInstance().serverUrl+_activity.libraryActivityUIImage)
 		icon_mc = this.createEmptyMovieClip("icon_mc", this.getNextHighestDepth());
 		var ml = new MovieLoader(Config.getInstance().serverUrl+_activity.libraryActivityUIImage,setUpActIcon,this,icon_mc);	
-		//icon_mc = MovieLoader.movieCache[Config.getInstance().serverUrl+_activity.libraryActivityUIImage];
-		//Debugger.log('icon_mc:'+icon_mc,4,'loadIcon','CanvasActivity');
-		//setUpActIcon(icon_mc);
-
+		
 		// swap depths if transparent layer visible
 		if(fade_mc._visible) {
 			icon_mc.swapDepths(fade_mc);
 		}
 	}
-	
-	
-	
-	
-	
 	
 	private function setUpActIcon(icon_mc):Void{
 		icon_mc._x = (CanvasActivity.TOOL_ACTIVITY_WIDTH / 2) - (icon_mc._width / 2);
@@ -258,6 +247,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		var learner_Y = _activity.yCoord + learnerOffset_Y;
 		var parentAct:Activity = mm.getMonitor().ddm.getActivityByUIID(_activity.parentUIID)
 		
+		var xCoord = _activity.xCoord;
+				
+		if (_activity.parentUIID != null) {
+			xCoord = parentAct.xCoord;
+
+			if(parentAct.activityTypeID != Activity.PARALLEL_ACTIVITY_TYPE){
+				xCoord = parentAct.xCoord + _activity.xCoord;
+				learner_X = (learner_X != null) ? learner_X + parentAct.xCoord : null;
+				learner_Y = learner_Y + parentAct.yCoord;
+			} 
+					
+		}
+		
 		// get the length of learners from the Monitor Model and run a for loop.
 		for (var j=0; j<mm.allLearnersProgress.length; j++){
 				
@@ -266,38 +268,22 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 					
 			//Gets a true if learner's currect activityID matches this activityID else false.
 			var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
-			var hasPlus:Boolean = false;
 			
 			if (isLearnerCurrentAct){
-				var ref = this._parent;
-				var xCoord = _activity.xCoord;
-				
-				if (_activity.parentUIID != null) {
-					ref = this._parent._parent;
-					xCoord = parentAct.xCoord;
-					
-					if(parentAct.activityTypeID != Activity.PARALLEL_ACTIVITY_TYPE){
-						xCoord = _activity.xCoord;
-						learner_X = (learner_X != null) ? learner_X + this._parent._x : null;
-						learner_Y = learner_Y + this._parent._y
-					} 
-					
-				}
 				
 				// Add + icon to indicate that more users are currently at the Activity. 
 				// We are unable to display all the users across the Activity's panel.
-				Debugger.log("learner_X: " + learner_X + " ref: " + ref + " xcoord: " + xCoord, Debugger.CRITICAL, "drawLearners", "CanvasActivity");
+				Debugger.log("learner_X: " + learner_X + " ref: " + learnerContainer + " xcoord: " + xCoord, Debugger.CRITICAL, "drawLearners", "CanvasActivity");
 				if(learner_X > (xCoord + 112)) {
-					hasPlus = true;
-					ref.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), ref.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
+					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:true });
 					return;
 				}
 					
 				// attach icon
-				ref.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), ref.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
+				learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:false });
 						
 				//  space icons
-				learner_X = learner_X+10;
+				learner_X += 10;
 			}
 		}
 	}
@@ -330,7 +316,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		var theIcon_mc:MovieClip;
 		title_lbl._visible = true;
-		//act_pnl.__visible = true;
 		clickTarget_mc._visible = true;
 		fade_mc._visible = false;
 		

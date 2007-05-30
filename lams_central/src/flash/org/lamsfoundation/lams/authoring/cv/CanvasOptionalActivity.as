@@ -37,14 +37,18 @@ import mx.managers. *
 * This is the UI / view representation of a complex (Optional) activity
 */
 class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieClip implements ICanvasActivity{
-	//class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieClip {
+	
 	private var CHILD_OFFSET_X : Number = 8;
 	private var CHILD_OFFSET_Y : Number = 57;
+	private var CHILD_INCRE : Number = 60;
+	
 	private var newContainerXCoord:Number; 
 	private var newContainerYCoord:Number;
-	private var CHILD_INCRE : Number = 60;
-	private var learnerOffset_X:Number = 4
-	private var learnerOffset_Y:Number = 3
+	
+	private var learnerOffset_X:Number = 4;
+	private var learnerOffset_Y:Number = 3;
+	private var learnerContainer:MovieClip;
+	
 	//this is set by the init object
 	private var _canvasController : CanvasController;
 	private var _canvasView : CanvasView;
@@ -98,9 +102,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
 		_ca = new ComplexActivity(_activity.activityUIID)
-		_activity.activityCategoryID = Activity.CATEGORY_SYSTEM
-		//_activity.title = Dictionary.getValue('opt_activity_title')
-		//init();
+		_activity.activityCategoryID = Activity.CATEGORY_SYSTEM;
+		
 		MovieClipUtils.doLater (Proxy.create (this, init));
 	}
 	
@@ -109,12 +112,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
 		
-		trace("complex MinOptions :"+_ca.minOptions)
 		actMinOptions = _ca.minOptions;
 		actMaxOptions = _ca.maxOptions;
 		
-		trace("MinOptions :"+actMinOptions)
-		trace("MaxOptions :"+actMaxOptions)
 		_ddm.getComplexActivityChildren(_activity.activityUIID);
 		showStatus(false);
 		
@@ -124,19 +124,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		for (var j=0; j<children_mc.length; j++){
 			children_mc[j].removeMovieClip();
 		}
+		
 		children_mc = new Array();
 		
 		for (var i = 0; i < _children.length; i ++)		{
+			
 			if (fromModuleTab == "monitorMonitorTab"){
-				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children [i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring"});
+				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children [i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
 			}else {
 				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children [i] , _canvasController:_canvasController, _canvasView:_canvasView});
 				
 			}
+			
 			//set the positioning co-ords
 			children_mc [i].activity.xCoord = CHILD_OFFSET_X;
 			children_mc [i].activity.yCoord = CHILD_OFFSET_Y + (i * CHILD_INCRE);
-			
 			children_mc [i]._visible = true;
 
 		}
@@ -193,11 +195,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 					learner_X = _activity.xCoord + learnerOffset_X 
 					learner_Y = 27
 					hasPlus = true;
-					this._parent.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this._parent.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
+					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
 					return;
 				}
 					
-				this._parent.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this._parent.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus});
+				learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus});
 				learner_X = learner_X+10
 			}
 		}

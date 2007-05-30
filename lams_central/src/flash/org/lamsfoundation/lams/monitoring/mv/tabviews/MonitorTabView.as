@@ -82,6 +82,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	private var _transitionLayer_mc:MovieClip;
 	private var _activityLayerComplex_mc:MovieClip;
 	private var _activityLayer_mc:MovieClip;
+	private var _learnerContainer_mc:MovieClip;
 	private var endGate_mc:MovieClip;
 	
 	//private var _transitionPropertiesOK:Function;
@@ -246,6 +247,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		_activityLayerComplex_mc = this.createEmptyMovieClip("_activityLayerComplex_mc", this.getNextHighestDepth());
 		_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 		
+		_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", this.getNextHighestDepth());
+			
 		var s:Object = mm.getSize();
 		endGate_mc = _activityLayer_mc.createChildAtDepth("endGate",DepthManager.kTop, {_x:0, _y:s.h-endGateOffset});
 		mm.endGate(endGate_mc);
@@ -265,14 +268,18 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		var totalLearners:Number = mm.allLearnersProgress.length;
 		for (var i=0; i<mm.allLearnersProgress.length; i++){
 			if (mm.allLearnersProgress[i].isLessonComplete()){
+				
 				var learner:Object = new Object();
 				learner = mm.allLearnersProgress[i]
-				trace("Learner passed is: "+learner.getFullName())
-				var temp_mc = _activityLayer_mc.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), _activityLayer_mc.getNextHighestDepth(),{learner:learner, _monitorController:mc, _x:learner_X+(finishedLearners*10), _y:(endGate_mc._y+learner_Y), _hasPlus:false});
+				
+				var temp_mc = _learnerContainer_mc.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), _learnerContainer_mc.getNextHighestDepth(),{learner:learner, _monitorController:mc, _x:learner_X+(finishedLearners*10), _y:(endGate_mc._y+learner_Y), _hasPlus:false});
 				finishedLearnersList.push(temp_mc);
-				var learnerIcon_mc = _activityLayer_mc["learnerIcon"+learner.getUserName()]
-				learnerIcon_mc.init();
 				finishedLearners++;
+				
+				var learnerIcon_mc = _learnerContainer_mc["learnerIcon"+learner.getUserName()];
+				learnerIcon_mc.init();
+				
+				
 			}
 		}
 		endGate_mc.lessonEnd_lbl.text = "<b>"+Dictionary.getValue('title_sequencetab_endGate')+"</b> "+finishedLearners+" of "+ totalLearners;
@@ -313,6 +320,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			
 			//Remove all the movies drawn on the transition and activity movieclip holder
 			
+			this._learnerContainer_mc.removeMovieClip();
 			this._transitionLayer_mc.removeMovieClip();
 			this._activityLayer_mc.removeMovieClip();
 			this.endGate_mc.removeMovieClip();
@@ -320,7 +328,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			//Recreate both Transition holder and Activity holder Movieclips
 			_transitionLayer_mc = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
 			_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
-			
+			_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", this.getNextHighestDepth());
 			endGate_mc = _activityLayer_mc.createChildAtDepth("endGate",DepthManager.kTop, {_x:0, _y:s.h-endGateOffset});
 			
 			if (isChanged == false){
@@ -385,15 +393,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity() ){
-			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring"});
+			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring", learnerContainer:_learnerContainer_mc});
 		} else if (a.isGateActivity()){
-			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasGateActivity",DepthManager.kTop,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring"});
+			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasGateActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring"});
 		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab"});
+			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kBottom,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});
 		} else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab"});	
+			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kBottom,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});	
 		} else{
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
 		}

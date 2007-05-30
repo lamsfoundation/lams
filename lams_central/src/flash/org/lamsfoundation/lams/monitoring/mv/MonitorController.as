@@ -66,7 +66,7 @@ class MonitorController extends AbstractController {
 		if (forObj == "LearnerIcon"){
 			_monitorModel.isDragging = true;
 			act.startDrag(false);
-			//Cursor.showCursor(Application.C_WHITEARROW);
+			
 			Debugger.log('activityClick CanvasActivity:'+act.Learner.getUserName(),Debugger.GEN,'activityClick','MonitorController');
 		}else {
 			_monitorModel.selectedItem = act;
@@ -76,25 +76,27 @@ class MonitorController extends AbstractController {
 	public function activityRelease(act:Object, forObj:String):Void{
 		Debugger.log('activityRelease CanvasActivity:'+act.activity.activityID,Debugger.GEN,'activityRelease','MonitorController');
 		if (forObj == "LearnerIcon"){
+			
 			if(_monitorModel.isDragging){
 				act.stopDrag();
 			}
+			
 			var hasHit:Boolean = false;
 			var actUIIDToCompare = act.activity.activityUIID;
+			
 			if (act.activity.parentUIID != null){
 				var parentAct:Activity = _monitorModel.getMonitor().ddm.getActivityByUIID(act.activity.parentUIID)
 				actUIIDToCompare = parentAct.activityUIID;
-				
 			}
+			
 			var indexArray:Array = _monitorModel.activitiesOnCanvas()	//setDesignOrder();
 			var currentActOrder:Number = checkLearnerCurrentActivity(indexArray, actUIIDToCompare)
 			
-			trace("current activity order: "+currentActOrder)
 			//run a loop to check which activity has been hitted by the learner.
 			for (var i=0; i<indexArray.length; i++){ 
-				trace("acitity "+i+" in loop is: "+indexArray[i].activity.title)
 				if (act.hitTest(indexArray[i])){
 					var actHitOrder:Number = checkLearnerCurrentActivity(indexArray, indexArray[i].activity.activityUIID)
+					
 					//if learner is on the next activity - get new progress data.
 					if (actHitOrder > currentActOrder){
 						
@@ -111,11 +113,13 @@ class MonitorController extends AbstractController {
 						var msg:String = Dictionary.getValue('al_error_forcecomplete_invalidactivity',[act.Learner.getFullName(), indexArray[i].activity.title]) ;
 						LFMessage.showMessageAlert(msg);
 					}
-				hasHit = true;
+					
+					hasHit = true;
 				
 				}
 				
 			}
+			
 			if (act.hitTest(_monitorModel.endGate)){
 				_monitorModel.endGate.doorClosed._visible = false;
 				_monitorModel.endGate.doorOpen._visible = true;
@@ -126,11 +130,13 @@ class MonitorController extends AbstractController {
 				LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_forcecomplete_tofinish',[act.Learner.getFullName(), indexArray[i].activity.title]), fnOk,fnCancel);
 				hasHit = true;
 			}
+			
 			if (!hasHit){
 				activitySnapBack(act)
 				var msg:String = Dictionary.getValue('al_error_forcecomplete_notarget',[act.Learner.getFullName()]) ;
 				LFMessage.showMessageAlert(msg);
 			}
+
 		}
 		
 	}
