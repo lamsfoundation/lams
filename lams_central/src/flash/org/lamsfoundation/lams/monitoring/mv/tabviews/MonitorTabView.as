@@ -168,9 +168,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 					}
 					break;
 				case 'PROGRESS' :
-					if (infoObj.tabID == _tabID && !mm.locked){
-						mm.getMonitor().getProgressData(mm.getSequence())
-					}
+					if (infoObj.tabID == _tabID){
+						if(!mm.locked){
+							mm.getMonitor().getProgressData(mm.getSequence());
+						} else {
+							ApplicationParent.extCall("reloadWindow", null);
+						}
+					} 
 					break;
 				case 'RELOADPROGRESS' :	
 					if (infoObj.tabID == _tabID && !mm.locked){

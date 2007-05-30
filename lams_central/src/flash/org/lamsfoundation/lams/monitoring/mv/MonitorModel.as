@@ -153,6 +153,7 @@ class MonitorModel extends Observable{
 			
 			var obj:Object = app.layout.manager.checkAvailability(_activeSeq);
 			locked = obj.locked;
+			
 		} else {
 			getMonitor().openLearningDesign(_activeSeq);
 		}

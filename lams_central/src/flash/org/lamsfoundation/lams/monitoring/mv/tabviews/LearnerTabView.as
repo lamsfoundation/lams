@@ -158,8 +158,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					}
 					break;
 				case 'PROGRESS' :
-					if (infoObj.tabID == _tabID && !mm.locked){
-						mm.getMonitor().getProgressData(mm.getSequence());
+					if (infoObj.tabID == _tabID){
+						if(!mm.locked){
+							mm.getMonitor().getProgressData(mm.getSequence());
+						} else {
+							ApplicationParent.extCall("reloadWindow", null);
+						}
 					}
 					break;	
 					
