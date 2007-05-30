@@ -97,7 +97,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		_ddm = new DesignDataModel()
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
-		//init();
+		
 		MovieClipUtils.doLater(Proxy.create(this,init));
 	}
 	
@@ -299,10 +299,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 				_doubleClicking = true;
 				
 				//if we double click on the glass mask - then open the container to allow the usr to see the activities inside.
-				if(_locked && !_activity.isReadOnly()){
+				if(_locked && !(_activity.isReadOnly() && (fromModuleTab == null || fromModuleTab == undefined))){
 					_locked = false;
-				}else{
-					if(_activity.isReadOnly()) { /** TODO: Change label warning */ LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_dbclick_readonly')); }
+				}else {
+					if(_activity.isReadOnly() && (fromModuleTab == null || fromModuleTab == undefined)) { 
+						/** TODO: Change label warning */ 
+						LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_dbclick_readonly')); 
+					}
+					
 					_locked = true;
 				}
 				draw();

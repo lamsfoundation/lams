@@ -266,10 +266,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			Debugger.log ('DoubleClicking:' + this, Debugger.GEN, 'localOnPress', 'CanvasOptionalActivity');
 			_doubleClicking = true;
 			//if we double click on the glass mask - then open the container to allow the usr to see the activities inside.
-			if (_locked && !_activity.isReadOnly()) {
+			if (_locked && !(_activity.isReadOnly() && (fromModuleTab == null || fromModuleTab == undefined))) {
 				_locked = false;
 			}else {
-				if(_activity.isReadOnly()) { /** TODO: Change label warning */ LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_dbclick_readonly')); }
+				if(_activity.isReadOnly() && (fromModuleTab == null || fromModuleTab == undefined)) { 
+					/** TODO: Change label warning */ 
+					LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_dbclick_readonly')); 
+				}
 				_locked = true;
 			}
 			draw();
