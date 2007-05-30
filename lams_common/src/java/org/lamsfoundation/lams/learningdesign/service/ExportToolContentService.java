@@ -122,6 +122,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.springframework.beans.BeansException;
@@ -970,6 +971,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			} catch (Exception e) {
 				throw new ImportToolContentException(e);
 			}
+			
+			// if the design was read only (e.g. exported a runtime sequence), clear the read only flag
+			ldDto.setDateReadOnly(null);
+			ldDto.setReadOnly(false);
 			
 			//save learning design
 			WorkspaceFolder folder = getWorkspaceFolderForDesign(importer, workspaceFolderUid);

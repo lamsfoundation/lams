@@ -470,7 +470,7 @@ public class LearningDesignDTO extends BaseDTO{
 	 * @param dateReadOnly The dateReadOnly to set.
 	 */
 	public void setDateReadOnly(Date dateReadOnly) {
-		if(!dateReadOnly.equals(WDDXTAGS.DATE_NULL_VALUE))
+		if(!WDDXTAGS.DATE_NULL_VALUE.equals(dateReadOnly) )
 			this.dateReadOnly = dateReadOnly;
 	}
 	/**
