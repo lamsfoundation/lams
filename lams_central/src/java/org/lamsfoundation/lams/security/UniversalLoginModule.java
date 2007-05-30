@@ -245,13 +245,12 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 
 				try {
 					Principal p;
-					if (name!=null) {
-						p = super.createIdentity(name);
-					} else {
-						p = super.createIdentity(Role.LEARNER);
+					// Assign minimal role if user has none
+					if (name==null) {
+						name = Role.LEARNER;
 						log.info("Found no roles");
 					}
-					//if (!group.isMember(p)) {
+					p = super.createIdentity(name);
 					if (!groupMembers.contains(name)) {
 						log.info("Assign user to role " + p.getName());
 						group.addMember(p);
@@ -260,7 +259,6 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 					if (name.equals(Role.SYSADMIN) || name.equals(Role.AUTHOR_ADMIN)) {
 						p = super.createIdentity(Role.AUTHOR);
 						log.info("Found "+name);
-						//if (!group.isMember(p)) {
 						if (!groupMembers.contains(Role.AUTHOR)) {
 							log.info("Assign user to role "+Role.AUTHOR);
 							group.addMember(p);
