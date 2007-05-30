@@ -47,7 +47,7 @@
 						<c:forEach var="message" items="${session.messageDTOs}">
 							<div class="message">
 								<div class="messageFrom"> ${message.from} </div>
-								<lams:out value="${message.body}"></lams:out>
+								<lams:out value="${message.body}" escapeXml="true"></lams:out>
 							</div>
 						</c:forEach>
 

@@ -48,7 +48,7 @@ function closeEditPane() {
 					<div class="messageFrom">
 						${message.from}
 					</div>
-					<lams:out value="${message.body}"></lams:out>
+					<lams:out value="${message.body}" escapeXml="true"></lams:out>
 					<img src="images/edit.gif" alt="edit" />
 				</div>
 
