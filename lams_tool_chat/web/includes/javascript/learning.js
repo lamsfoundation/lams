@@ -83,7 +83,13 @@ function UpdateRosterDisplay() {
 		}
 	}
 	
-	rosterDiv.parentNode.innerHTML = rosterDiv.parentNode.innerHTML;
+	// IE hack to ensure onclick event work when rosterDiv is updated.  Only being used when in moderator mode.
+	if (navigator.appName == "Microsoft Internet Explorer" && MODE == "moderator") {
+		rosterDiv.parentNode.innerHTML = rosterDiv.parentNode.innerHTML;
+		// following commands are ignored by IE unless we use a delay
+		var t1 = setTimeout("scrollMessageDisplay()", 5);
+		var t2 = setTimeout("setFocusOnTextarea()", 5);
+	}
 }
 function Roster() {
 	this.users = [];
@@ -108,6 +114,13 @@ function selectUser(userDiv) {
 	}
 }
 /* ******* Chat functions ******* */
+function setFocusOnTextarea() {
+	document.forms[0].msg.focus();
+}
+function scrollMessageDisplay() {
+	var iRespDiv = document.getElementById("iResp");
+	iRespDiv.scrollTop = iRespDiv.scrollHeight;
+}
 function generateMessageHTML(nick, message, type) {
 	var colour = getColour(nick);
 	var fromElem = createElem("div", {attrClass:"messageFrom"}, null, nick);
@@ -210,7 +223,7 @@ function handlePresence(presence) {
 	roster.updateDisplay();
 }
 function handleConnected() {
-	if (MODE == "teacher" || (LEARNER_FINISHED == "true" && LOCK_ON_FINISHED == "true")) {
+	if (LEARNER_FINISHED == "true" && LOCK_ON_FINISHED == "true") {
 		// disable sending messages.
 		document.getElementById("msgArea").disabled = "disabled";
 		var sendButton = document.getElementById("sendButton");
