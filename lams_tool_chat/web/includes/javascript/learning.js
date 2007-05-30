@@ -259,7 +259,7 @@ function doLogin() {
 	try {
 
 		// setup args for contructor
-		var oArgs = {httpbase:HTTPBASE, timerval:10000};
+		var oArgs = {httpbase:HTTPBASE, timerval:6000};
 		if (typeof (oDbg) != "undefined") {
 			oArgs.oDbg = oDbg;
 		}
