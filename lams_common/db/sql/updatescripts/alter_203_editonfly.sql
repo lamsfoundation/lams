@@ -19,3 +19,4 @@ WHERE learning_design_id IN (SELECT learning_design_id FROM lams_learning_design
 
 insert into lams_configuration (config_key, config_value) values ('AllowLiveEdit','true');
 insert into lams_configuration (config_key, config_value) values ('ServerURLContextPath','lams/');
+insert into lams_learning_activity_type values (9, 'GATE_SYSTEM');
