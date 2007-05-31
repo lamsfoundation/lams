@@ -109,6 +109,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
     	logger.debug("start refreshSummaryData for learner mode.");
 
     	GeneralLearnerFlowDTO generalLearnerFlowDTO= LearningUtil.buildGeneralLearnerFlowDTO(content);
+	    generalLearnerFlowDTO.setUserUid(learner != null?learner.getUid().toString():null);
 	    logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 
 	    // if learner is null, don't want to show other people's answers

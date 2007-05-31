@@ -143,8 +143,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													</c:if>																						
 												</p>
 												<p>
-													<c:out value="${userData.responsePresentable}"
-														escapeXml="false" />
+													<c:choose>
+													<c:when test="${userData.visible == 'true'}">
+														<c:out value="${userData.responsePresentable}"
+															escapeXml="false" />
+													</c:when>
+													<c:otherwise>
+														<i><fmt:message key="label.hidden"/></i>
+													</c:otherwise>
+													</c:choose>
 													<hr size=1> 												
 												</p>
 											</c:if>
@@ -282,8 +289,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													</c:if>																						
 												</p>
 												<p>
-													<c:out value="${userData.responsePresentable}"
-														escapeXml="false" />
+													<c:choose>
+													<c:when test="${userData.visible == 'true'}">
+														<c:out value="${userData.responsePresentable}"
+															escapeXml="false" />
+													</c:when>
+													<c:otherwise>
+														<i><fmt:message key="label.hidden"/></i>
+													</c:otherwise>
+													</c:choose>
 													<hr size=1> 												
 												</p>
 											</c:if>

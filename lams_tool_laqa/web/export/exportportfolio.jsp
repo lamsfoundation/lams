@@ -81,7 +81,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<td NOWRAP valign=top> <b>  <fmt:message key="label.response"/>        </b></td> 	 
 						</tr>
 			
-			
 						  <c:forEach var="questionAttemptData"items="${currentDto.questionAttempts}">
 							  <c:forEach var="sData" items="${questionAttemptData.value}">
 							    <c:set var="userData" scope="request" value="${sData.value}"/>
@@ -94,7 +93,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<td NOWRAP valign=top> 
 											<lams:Date value="${userData.attemptTime}"/>  </td>
 										<td NOWRAP valign=top>
-											<c:out value="${userData.responsePresentable}" escapeXml="false"/>  </td>
+											<c:choose>
+											<c:when test="${generalLearnerFlowDTO.userUid == userData.queUsrId or userData.visible == 'true'}">
+												<c:out value="${userData.responsePresentable}" escapeXml="false"/>
+										     </c:when>
+											 <c:otherwise>
+												<i><fmt:message key="label.hidden"/></i>
+											 </c:otherwise>
+											 </c:choose>
+										 </td>
 									     </tr>
 									 </c:if>
 							</c:forEach>
@@ -151,7 +158,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 															
 															<tr>
 																 <td colspan=2  valign=top>   
-																	 <c:out value="${userData.responsePresentable}" escapeXml="false"/> 
+																 <c:if test="${not userData.visible == 'true'}">
+																	 <i><fmt:message key="label.hidden"/></i>
+																 </c:if>
+																 <c:out value="${userData.responsePresentable}" escapeXml="false"/> 
 																 </td>
 															</tr>
 												</c:if>														  					 									  													  			
