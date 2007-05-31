@@ -30,6 +30,9 @@ import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.authoring.Activity;
+import org.lamsfoundation.lams.authoring.cv.ICanvasActivity;
+import org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity;
+
 import mx.utils.*
 import mx.controls.*
 import mx.behaviors.*
@@ -41,11 +44,11 @@ import mx.effects.*
 * Controller for the sequence library
 */
 class MonitorController extends AbstractController {
+	
 	private var _monitorModel:MonitorModel;
 	private var _monitorController:MonitorController;
 	private var _app:Application;
 	private var _isBusy:Boolean;
-	
 	
 	/**
 	* Constructor
@@ -62,7 +65,6 @@ class MonitorController extends AbstractController {
 	}
 	
 	public function activityClick(act:Object, forObj:String):Void{
-		//if (ca.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 		if (forObj == "LearnerIcon"){
 			_monitorModel.isDragging = true;
 			act.startDrag(false);
@@ -71,51 +73,153 @@ class MonitorController extends AbstractController {
 		}else {
 			_monitorModel.selectedItem = act;
 		}
-   }
+    }
    
+	/**
+	 * Returns the parent that is an member activity of the canvas (ICanvasActivity)
+	 * 
+	 * @usage   
+	 * @param   path 	dropTarget path
+	 * @return  path to activity movieclip
+	 */
+	
+    private function findParentActivity(path:Object):Object {
+		if(path instanceof ICanvasActivity)
+			return path;
+		else if(path == ApplicationParent.root)
+			return null;
+		else
+			return findParentActivity(path._parent);
+    }
+	
+	/**
+	 * Returns the child of a complex activity that matches with the dropTarget
+	 * 
+	 * @usage   
+	 * @param   children 	array of children movieclips
+	 * @param   target   	dropTarget path
+	 * @return  the matching activity object or null if not found
+	 */
+	private function matchChildActivity(children:Array, target:Object):Object {
+		for(var i=0; i<children.length; i++) {
+			if(target == children[i]) {
+				return children[i];
+			} else {
+				Debugger.log("no match found: " + target , Debugger.CRITICAL, "matchChildActivity", "MonitorController");
+			}
+		}
+		
+		return null;
+	}
+	
+	
+	/**
+	 * Check the force complete order for validity
+	 * 
+	 * @usage   
+	 * @param   indexArray 	Top-level canvas member activities on the canvas
+	 * @param   index      	index position 
+	 * @param   isChild    
+	 * @return  
+	 */
+	
+	private function checkHit(cActivity:Object, learnerObj:Object, indexArray:Array):Boolean {
+		
+		var actUIIDToCompare = learnerObj.activity.activityUIID;
+		var parentUIIDToCompare = learnerObj.activity.parentUIID;
+		
+		//if learner is on the next or further activity - get new progress data.
+		if(checkifActivityNotComplete(learnerObj.Learner, cActivity.activity.activityID)) {
+			if(actUIIDToCompare == cActivity.activity.activityUIID)
+				activitySnapBack(learnerObj);
+			else {
+				forceCompleteTransfer(learnerObj, cActivity, indexArray);
+			}
+				
+		} else {
+			activitySnapBack(learnerObj);
+			var msg:String = Dictionary.getValue('al_error_forcecomplete_invalidactivity',[learnerObj.Learner.getFullName(), cActivity.activity.title]) ;
+			LFMessage.showMessageAlert(msg);
+		}
+		
+		return true;
+	}
+   
+	/**
+	 * Force complete up to target activity
+	 * 
+	 * @usage   
+	 * @param   learnerObj 
+	 * @param   cActivity  
+	 * @param   indexArray 
+	 * @return  
+	 */
+	
+	private function forceCompleteTransfer(learnerObj:Object, cActivity:Object, indexArray:Array):Void {
+		var activityUIIDToCheck:Number = (cActivity.activity.parentUIID != null) ? cActivity.activity.parentUIID : cActivity.activity.activityUIID;
+		var prevActivityID:Number = indexArray[checkLearnerCurrentActivity(indexArray,activityUIIDToCheck) - 1].activity.activityID;
+		var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+learnerObj.Learner.getLearnerId()+"&activityID="+prevActivityID;
+		
+		var fnOk:Function = Proxy.create(this, this.reloadProgress, this, URLToSend);
+		var fnCancel:Function = Proxy.create(this, this.activitySnapBack, learnerObj);
+		
+		LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_forcecomplete_toactivity',[learnerObj.Learner.getFullName(), cActivity.activity.title]), fnOk,fnCancel);
+		
+	}
+	
+	/**
+	 * Check learner's progress data if activity has been completed
+	 * 
+	 * @usage   
+	 * @param   learnerProgress 
+	 * @param   activityID      
+	 * @return  
+	 */
+	
+	private function checkifActivityNotComplete(learnerProgress:Progress, activityID:Number):Boolean {
+		return (Progress.compareProgressData(learnerProgress, activityID) != "completed_mc") ? true : false;
+	}
+	
+	/**
+	 * Return activity index
+	 * 
+	 * @usage   
+	 * @param   arr     
+	 * @param   actUIID 
+	 * @return  index 
+	 */
+	
+	private function checkLearnerCurrentActivity(arr:Array, actUIID:Number):Number{
+		for (var i=0; i<arr.length; i++){
+			if (arr[i].activity.activityUIID == actUIID){
+				return i;
+			}
+		}
+	}
+	
 	public function activityRelease(act:Object, forObj:String):Void{
+		
 		Debugger.log('activityRelease CanvasActivity:'+act.activity.activityID,Debugger.GEN,'activityRelease','MonitorController');
+		
 		if (forObj == "LearnerIcon"){
+			
+			var hasHit:Boolean = false;
+			var indexArray:Array = _monitorModel.activitiesOnCanvas();
 			
 			if(_monitorModel.isDragging){
 				act.stopDrag();
 			}
 			
-			var hasHit:Boolean = false;
-			var actUIIDToCompare = act.activity.activityUIID;
-			
-			if (act.activity.parentUIID != null){
-				var parentAct:Activity = _monitorModel.getMonitor().ddm.getActivityByUIID(act.activity.parentUIID)
-				actUIIDToCompare = parentAct.activityUIID;
-			}
-			
-			var indexArray:Array = _monitorModel.activitiesOnCanvas()	//setDesignOrder();
-			var currentActOrder:Number = checkLearnerCurrentActivity(indexArray, actUIIDToCompare)
-			
 			//run a loop to check which activity has been hitted by the learner.
 			for (var i=0; i<indexArray.length; i++){ 
-				if (act.hitTest(indexArray[i])){
-					var actHitOrder:Number = checkLearnerCurrentActivity(indexArray, indexArray[i].activity.activityUIID)
-					
-					//if learner is on the next activity - get new progress data.
-					if (actHitOrder > currentActOrder){
-						
-						var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+act.Learner.getLearnerId()+"&activityID="+indexArray[i-1].activity.activityID
-						var ref = this;
-						var fnOk:Function = Proxy.create(ref,reloadProgress, ref, URLToSend);
-						var fnCancel:Function = Proxy.create(ref,activitySnapBack, act);
-						LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_forcecomplete_toactivity',[act.Learner.getFullName(), indexArray[i].activity.title]), fnOk,fnCancel);
-						
-					}else if (actHitOrder == currentActOrder ){
-						activitySnapBack(act)
-					}else if (actHitOrder < currentActOrder){
-						activitySnapBack(act)
-						var msg:String = Dictionary.getValue('al_error_forcecomplete_invalidactivity',[act.Learner.getFullName(), indexArray[i].activity.title]) ;
-						LFMessage.showMessageAlert(msg);
-					}
-					
-					hasHit = true;
+				var dropTarget:Object = findParentActivity(eval(act._droptarget));
+				var cActivity = indexArray[i];
 				
+				if(dropTarget != null) {
+					if(dropTarget.activity.parentUIID != null && cActivity.children != null)
+						cActivity = matchChildActivity(cActivity.children, dropTarget);
+					
+					hasHit = (cActivity == dropTarget) ? checkHit(cActivity, act, indexArray) : hasHit;
 				}
 				
 			}
@@ -164,15 +268,6 @@ class MonitorController extends AbstractController {
 		}
 	}
 	
-	private function checkLearnerCurrentActivity(arr:Array, actUIID:Number):Number{
-		for (var i=0; i<arr.length; i++){
-			//trace("activity "+ i +" is "+arr[i].activity.title)
-			if (arr[i].activity.activityUIID == actUIID){
-				return i
-			}
-		}
-	}
-	
 	public function activityReleaseOutside(ca:Object):Void{
 	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityReleaseOutside','MonitorController');
 	}
@@ -183,18 +278,12 @@ class MonitorController extends AbstractController {
 		setBusy()
 		
 	   if (forTabView == "MonitorTabView"){
-			//getActivityMonitorURL&activityID=31&lessonID=4
-			//Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
 			URLToSend = _root.serverURL+_root.monitoringURL+'getActivityMonitorURL&activityID='+ca.activity.activityID+'&lessonID='+_root.lessonID;
 			URLToSend += '&contentFolderID='+MonitorModel(getModel()).getSequence().contentFolderID
-			//Debugger.log('activityDoubleClick URL:'+URLToSend,Debugger.CRITICAL,'activityDoubleClick','MonitorController');
-			
 		}else {
 			if (learnerID != null){
 				_learnerID = learnerID;
-				trace("learnerId if passed is: "+_learnerID)
 			}else {
-				trace("learnerId if not passed is: "+ca.learnerID)
 				_learnerID = ca.learnerID;
 			}
 			if (forTabView == "MonitorTabViewLearner"){
