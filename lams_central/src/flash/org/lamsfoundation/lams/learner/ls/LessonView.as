@@ -281,7 +281,7 @@ class LessonView extends AbstractView {
 		}
 		
 		progress_scp.redraw(true);
-		getAndScrollToTargetPos(a, newActivity_mc, lm.progressData);
+		getAndScrollToTargetPos(a, newActivity_mc, lm.progressData, true);
 		
 		return true;
 	}
@@ -303,7 +303,7 @@ class LessonView extends AbstractView {
 			
 			Debugger.log('progess data:'+lm.progressData.getCurrentActivityId()+' a.activityID:'+a.activityID,Debugger.CRITICAL,'updateActivity','LessonView');
 			
-			getAndScrollToTargetPos(a, activityMC, lm.progressData);
+			getAndScrollToTargetPos(a, activityMC, lm.progressData, false);
 		
 		} else {
 			drawActivity(a, lm);
@@ -314,8 +314,8 @@ class LessonView extends AbstractView {
 		
 		return true;
 	}
-	
-	private function getAndScrollToTargetPos(a:Activity, activityMC:Object, data:Progress):Void {
+
+	private function getAndScrollToTargetPos(a:Activity, activityMC:Object, data:Progress, override:Boolean):Void {
 		var targetPos;
 		
 		if(data.getCurrentActivityId() == a.activityID){
@@ -333,8 +333,10 @@ class LessonView extends AbstractView {
 				
 			if(progress_scp.vScroller._visible) {
 				Debugger.log('adjusting scrollbar position to target: ' + targetPos,Debugger.CRITICAL,'getAndScrollToTargetPos','LessonView');
-				if(ScrollCheckIntervalID == null) {
+				if(ScrollCheckIntervalID == null && !override) {
 					ScrollCheckIntervalID = setInterval(Proxy.create(this,adjustScrollBar,targetPos),SCROLL_CHECK_INTERVAL);
+				} else {
+					progress_scp.vPosition = Math.round(targetPos);
 				}
 			}
 		}
