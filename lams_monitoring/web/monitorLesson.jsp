@@ -33,8 +33,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store">
+	<meta http-equiv="Expires" content="0" />
 	<lams:css style="core"/>
 	<title><fmt:message key="monitor.title"/></title>
+	
 	<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 	<script language="JavaScript" type="text/JavaScript">
 	<!--
