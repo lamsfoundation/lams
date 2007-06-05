@@ -351,6 +351,10 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				newGroupActiviy.populateFromDTO(dto);
 				_activities.put(newGroupActiviy.activityUIID,newGroupActiviy);
 			
+			} else if(dto.activityTypeID == Activity.BRANCHING_ACTIVITY_TYPE){
+				var newBranchActiviy:BranchingActivity = new BranchingActivity(dto.activityUIID);
+				newBranchActiviy.populateFromDTO(dto);
+				_activities.put(newBranchActiviy.activityUIID,newBranchActiviy);
 			}
 		}
 		

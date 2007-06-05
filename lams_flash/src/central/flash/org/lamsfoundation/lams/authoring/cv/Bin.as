@@ -32,13 +32,13 @@ import org.lamsfoundation.lams.authoring.cv.*;
 /**  
 * CanvasActivity - 
 */  
-class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{  
-  
+class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{
 	
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
-	private var _tip:ToolTip;	
+	private var _tip:ToolTip;
+	
 	//locals
 	private var tooltipXoffset:Number = 100;
 	private var up_mc:MovieClip;
@@ -51,7 +51,6 @@ class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{
 	
 	
 	function Bin(){
-		Debugger.log('hello',4,'Constructor','Bin');
 		//let it wait one frame to set up the components.
 		MovieClipUtils.doLater(Proxy.create(this,init));
 	}
@@ -79,8 +78,8 @@ class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{
 		var Xpos = (Application.CANVAS_X+ this._x)-tooltipXoffset;
 		var Ypos = (Application.CANVAS_Y+ this._y);
 		var ttHolder = Application.tooltip;
-		//var ttMessage = btnObj.label;
 		var ttMessage = Dictionary.getValue("bin_tooltip");
+		
 		//param "true" is to specify that tooltip needs to be shown above the component 
 		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos, true);
 	}

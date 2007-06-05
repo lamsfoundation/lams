@@ -418,7 +418,7 @@ class PropertyInspectorNew extends MovieClip{
 				desc_txt.text = StringUtils.cleanNull(a.description);
 				//PI_sp.refreshPane();
 			
-			}else if(a.isOptionalActivity()){
+			} else if(a.isOptionalActivity()){
 				//its a grouping activity
 				delimitLine._visible = true;
 				

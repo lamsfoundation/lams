@@ -141,6 +141,7 @@ class ToolbarView extends AbstractView {
 		flow_btn.addEventListener("click",controller);
 		gate_btn.addEventListener("click",controller);
 		group_btn.addEventListener("click",controller);
+		branch_btn.addEventListener("click",controller);
 		preview_btn.addEventListener("click",controller);
 		apply_changes_btn.addEventListener("click", controller);
 		cancel_btn.addEventListener("click",controller);

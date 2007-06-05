@@ -22,6 +22,7 @@
  */
 
 import org.lamsfoundation.lams.authoring.cv.*
+import org.lamsfoundation.lams.authoring.br.*
 import org.lamsfoundation.lams.authoring.tk.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.comms.*
@@ -42,20 +43,19 @@ import mx.utils.*
  */
 class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
-	//Constants
-	//public static var USE_PROPERTY_INSPECTOR = true;
-	
 	//Model
 	private var canvasModel:CanvasModel;
 
-	//View
+	//Views
 	private var canvasView:CanvasView;
-    
+	private var canvasBranchView:CanvasBranchView;
+	private var _canvasView_mc:MovieClip;
+	private var _canvasBranchView_mc:MovieClip;
+	
 	// CookieMonster (SharedObjects)
     private var _cm:CookieMonster;
     private var _comms:Communication;
 	
-	private var _canvasView_mc:MovieClip;
 	private var app:Application;
 	private var _ddm:DesignDataModel;
 	private var _dictionary:Dictionary;
@@ -69,12 +69,11 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	private var toolActHeight:Number = 50;
 	private var complexActWidth:Number = 143;
 	private var _isBusy:Boolean;
-	// auto-save interval
-	//private static var AUTOSAVE_DEFAULT_CHECK_INTERVAL:Number = 10000;
 	private static var AUTOSAVE_CONFIG:String = "autosave";
 	private static var AUTOSAVE_TAG:String = "cv.ddm.autosave.user.";
-    //private var _pi:MovieClip; //Property inspector
-    private var _bin:MovieClip;//bin
+    private var _bin:MovieClip;	//bin
+	
+	private var _target_mc:MovieClip;
 	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -90,6 +89,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function Canvas (target_mc:MovieClip,depth:Number,x:Number,y:Number,w:Number,h:Number){
         mx.events.EventDispatcher.initialize(this);
         
+		_target_mc = target_mc;
+		
 		//Design Data Model.
 		_ddm = new DesignDataModel();
 		
@@ -100,7 +101,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		_dictionary = Dictionary.getInstance();
 		
 		//Create the view
-		_canvasView_mc = target_mc.createChildAtDepth("canvasView",DepthManager.kTop);		
+		_canvasView_mc = _target_mc.createChildAtDepth("canvasView",DepthManager.kTop);		
 
         //Cast toolkit view clip as ToolkitView and initialise passing in model
 		canvasView = CanvasView(_canvasView_mc);
@@ -127,45 +128,24 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		_ddm.addEventListener('ddmUpdate',Proxy.create(this,onDDMUpdated));
 		_ddm.addEventListener('ddmBeforeUpdate',Proxy.create(this,onDDMBeforeUpdate));
 		
-		
-
         //Register view with model to receive update events
 		canvasModel.addObserver(canvasView);
-        
 
         //Set the position by setting the model which will call update on the view
         canvasModel.setPosition(x,y);
         //Initialise size to the designed size
         canvasModel.setSize(w,h);
 		
-		//muist comne after the canvasView as we use the defaultController method to get a controller ref.
-		//_dictionary.addEventListener('init',Proxy.create(this,setupPI));
-		
 		//if in monitor, dont do it!
 		initBin();
 		
 		
 	}
-	
-	
-	/**
-	 * Method used to open a Property Inspector on popup window. Not used any more
-	 * 
-	 * @usage   
-	 * @return  
-
-    public function setupPI(){
-		if(USE_PROPERTY_INSPECTOR){
-			initPropertyInspector();
-		}
-	}
-	*/
 
     /**
     * Event dispatched from the view once it's loaded
     */
     public function viewLoaded(evt:Object) {
-        //Debugger.log('Canvas view loaded: ' + evt.type,Debugger.GEN,'viewLoaded','Canvas');
         if(evt.type=='load') {
 			var autosave_config_interval = Config.getInstance().getItem(AUTOSAVE_CONFIG);
 			if(autosave_config_interval > 0) {
@@ -185,6 +165,18 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
     }
 	
 	/**
+    * Event dispatched from the view once it's loaded
+    */
+    public function branchViewLoaded(evt:Object) {
+        if(evt.type=='load') {
+			Debugger.log('Successful load: ' + evt.type,Debugger.CRITICAL,'branchViewLoaded','Canvas');
+        }else {
+            Debugger.log('Event type not recognised : ' + evt.type,Debugger.CRITICAL,'viewLoaded','Canvas');
+        }
+    }
+	
+	
+	/**
     * Opens the help->about dialog
     */
     public function openAboutLams() {
@@ -195,8 +187,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openDialogLoaded));
 		
 	}
-
-	
 	
 	/**
 	* Opens a design using workspace and user to select design ID
@@ -224,25 +214,20 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
     public function openDesignById(workspaceResultDTO:Object){
-		//Application.getInstance().getWorkspace().getWV().workspaceDialog.closeThisDialogue();
 		Application.getInstance().getWorkspace().getWV().clearDialog();
 		ObjectUtils.toString(workspaceResultDTO);
 		var designId:Number = workspaceResultDTO.selectedResourceID;
 
         var callback:Function = Proxy.create(this,setDesign);
-           
-		//Application.getInstance().getComms().getRequest('flashxml/learning_design.xml',callback, false);
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designId,callback, false);
-		//var designObject:Object = Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesign&learningDesignID='+designId,callback);
-        
-        
+	
     }
 	
 	/**
 	 * Request imported design from server
 	 * 
 	 * @usage   
-	 * @param   learningDesignID 
+b	 * @param   learningDesignID 
 	 * @return  
 	 */
 	
@@ -267,6 +252,26 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+learningDesignID,callback, false);
 		
+	}
+	
+	public function openBranchView(ba:BranchingActivity){
+		
+		//Create the view
+		_canvasBranchView_mc = _target_mc.createChildAtDepth("canvasBranchView",DepthManager.kTop);		
+
+        //Cast toolkit view clip as ToolkitView and initialise passing in model
+		canvasBranchView = CanvasBranchView(_canvasBranchView_mc);
+		canvasBranchView.init(canvasModel,undefined);
+		
+		//Add listener to view so that we know when it's loaded
+        canvasBranchView.addEventListener('load',Proxy.create(this,branchViewLoaded));
+		
+		Application.getInstance().onResize();
+		
+	}
+	
+	public function closeBranchView(ba:BranchingActivity){
+		canvasBranchView.closeView();
 	}
 	
 	/**
@@ -315,9 +320,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function showRecoverMessage() {
 		var recData:Object = CookieMonster.open(AUTOSAVE_TAG + _root.userID,true);
 		
-		//var timeDiff:Number = new Date().getTime() - recData.lastModifiedDateTime.getTime();
-		//var saveDelay:Number = timeDiff/1000/60;
-		
 		LFMessage.showMessageConfirm(Dictionary.getValue('cv_autosave_rec_msg'), Proxy.create(this, recoverDesign, recData), Proxy.create(this, discardAutoSaveDesign), null, null, Dictionary.getValue('cv_autosave_rec_title'));
 	}
 	
@@ -362,7 +364,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				errorPacket.messages = errors;
 				
 				var msg:String = Dictionary.getValue('cv_invalid_design_on_apply_changes');
-				//public static function howMessageConfirm(msg, okHandler:Function, cancelHandler:Function,okLabel:String,cancelLabel:String){
 				var okHandler = Proxy.create(this,showDesignValidationIssues, errorPacket);
 				LFMessage.showMessageConfirm(msg,okHandler,null,Dictionary.getValue('cv_show_validation'));
 				Cursor.showCursor(Application.C_DEFAULT);
@@ -441,11 +442,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		var callback:Function = Proxy.create(this,onStoreDesignResponse);
 		
 		Application.getInstance().getComms().sendAndReceive(dto,"servlet/authoring/storeLearningDesignDetails",callback,false);
-		//Application.getInstance().getComms().sendAndReceive(dto,"http://dolly.uklams.net:8080/lams/authoring/authorServlet",onStoreDesignResponse,true);
-		//Application.getInstance().getComms().sendAndReceive(dto,"http://geo.uklams.net/testing/printPost.php",onStoreDesignResponse,true);
 		
 		return true;
-			//public function sendAndReceive(dto:Object, requestURL:String,handler:Function,isFullURL){
 	}
 	
 	/**
@@ -456,7 +454,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
 	public function onStoreDesignResponse(r):Void{
-		//Debugger.log('Response:'+ObjectUtils.printObject(response),Debugger.GEN,'onStoreDesignResponse','Canvas');
 		Application.getInstance().getWorkspace().getWV().clearDialog();
 		
 		if(r instanceof LFError){
@@ -468,8 +465,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			Cursor.showCursor(Application.C_DEFAULT);
 			r.showErrorAlert();
 		}else{
-			//_global.breakpoint();
-			//Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'setDroppedTemplateActivity','Canvas');		
 			discardAutoSaveDesign();
 
 			_ddm.learningDesignID = r.learningDesignID;
@@ -498,8 +493,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			
 			
 			if(_ddm.validDesign){
-				//var msg:String = "Congratulations! - Your design is valid has been saved"+r.learningDesignID;
-				//TODO take this from the dictionary
 				var msg:String = Dictionary.getValue('cv_valid_design_saved');
 				var _requestSrc = _root.requestSrc;
 				if(_requestSrc != null) {
@@ -507,8 +500,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 					var cc:CanvasController = canvasView.getController();
 					var saveConfirmDialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('al_alert'),closeButton:false,scrollContentPath:"SaveConfirmDialog",msg:msg, requestSrc:_requestSrc, canvasModel:canvasModel,canvasController:cc});
 	
-					//var extHandler = Proxy.create(this,closeReturnExt);
-					//LFMessage.showMessageConfirm(msg, null, extHandler, null, Dictionary.getValue('cv_close_return_to_ext_src', [_requestSrc]));
 				} else if(_ddm.editOverrideLock) {
 					var finishEditHandler = Proxy.create(this,finishEditOnFly);
 					msg = Dictionary.getValue('cv_eof_changes_applied');
@@ -518,7 +509,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				}
 			} else {
 				var msg:String = Dictionary.getValue('cv_invalid_design_saved');
-				//public static function howMessageConfirm(msg, okHandler:Function, cancelHandler:Function,okLabel:String,cancelLabel:String){
 				var okHandler = Proxy.create(this,showDesignValidationIssues,r);
 				LFMessage.showMessageConfirm(msg,okHandler,null,Dictionary.getValue('cv_show_validation'));
 			}
@@ -687,12 +677,10 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				
 			Debugger.log('parallel activity given new UIID of:'+actToAdd.activityUIID ,Debugger.GEN,'setDroppedTemplateActivity','Canvas');			
 			//now get this acts children and add them to the design (WHINEY VOICE:"will somebody pleeeease think of the children.....")
-				for(var i=0;i<ta.childActivities.length;i++){
+			for(var i=0;i<ta.childActivities.length;i++){
 					
-					trace("child's old toolContentID: "+ta.childActivities[i].toolContentID)
-					
-				//Note: The next few line os code is now execute in the setNewChildContentID method
-				//Find out if other types of activity can be held by complex acts 
+					//Note: The next few line os code is now execute in the setNewChildContentID method
+					//Find out if other types of activity can be held by complex acts 
 					
 					var child:Activity = ToolActivity(ta.childActivities[i].clone());
 					child.activityUIID = _ddm.newUIID();
@@ -705,9 +693,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 					_ddm.addActivity(child);
 					var callback:Function = Proxy.create(this,setNewChildContentID, child);
 					var passChildToolID = ta.childActivities[i].toolID;
-					trace("Child: "+ta.childActivities[i].toolDisplayName+" has Tool Content ID: "+passChildToolID)
-			Application.getInstance().getComms().getRequest('authoring/author.do?method=getToolContentID&toolID='+passChildToolID,callback, false);
-				}				 
+					Application.getInstance().getComms().getRequest('authoring/author.do?method=getToolContentID&toolID='+passChildToolID,callback, false);
+			}				 
 			break;
 			
 			
@@ -738,12 +725,12 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		//refresh the design
 		canvasModel.setDirty();
 		canvasModel.selectedItem = (canvasModel.activitiesDisplayed.get(actToAdd.activityUIID));
+		
 		//select the new thing
 		if (taParent != undefined || taParent != null){
 			actToAdd.parentUIID = taParent;
 			canvasModel.removeActivity(actToAdd.activityUIID);
 			canvasModel.removeActivity(taParent);
-			trace("actToAdd.parentUIID: "+actToAdd.parentUIID)
 		}
 		canvasModel.setDirty();
 		
@@ -753,10 +740,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		if(r instanceof LFError){
 			r.showMessageConfirm();
 		}else{
-			//var actToAdd:Activity;
-			trace("new Content ID is: "+r)
-			_newChildToolContentID = r
-			trace("new child ToolContentID is: "+_newChildToolContentID)
+			_newChildToolContentID = r;
 			ta.toolContentID = _newChildToolContentID;
 		}
 		
@@ -774,16 +758,12 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
 	public function removeActivity(activityUIID:Number){
-		Debugger.log('activityUIID:'+activityUIID,4,'removeActivity','Canvas');		
-	
+		Debugger.log('activityUIID:'+activityUIID,4,'removeActivity','Canvas');
 		
 		// remove transitions connected to this activity being removed
-			
 		_ddm.removeTransitionByConnection(activityUIID);
-		//canvasModel.setDirty();	
 		_ddm.removeActivity(activityUIID);
-		canvasModel.setDirty();	
-		//select the new thing
+		canvasModel.setDirty();
 		canvasModel.selectedItem = null;
 	}
 	
@@ -794,11 +774,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @param   transitionUIID 
 	 * @return  
 	 */
-	public function removeTransition(transitionUIID:Number){
-		//Debugger.log('transitionUIID:'+transitionUIID,4,'removeTransition','Canvas');		
+	public function removeTransition(transitionUIID:Number){	
 		_ddm.removeTransition(transitionUIID);
-		canvasModel.setDirty();		
-		//select the new thing
+		canvasModel.setDirty();	
 		canvasModel.selectedItem = null;
 	}
 	
@@ -845,7 +823,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
 	public function clearCanvas(noWarn:Boolean):Boolean{
-		//_global.breakpoint();
 		var s = false;
 		var ref = this;
 		Debugger.log('noWarn:'+noWarn,4,'clearCanvas','Canvas');
@@ -947,9 +924,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		if(r instanceof LFError){
 			r.showMessageConfirm();
 		}else{
-			trace("new Content ID is: "+r)
-			_newToolContentID = r
-			trace("new _newToolContentID is: "+_newToolContentID)
+			_newToolContentID = r;
 			if (o.data instanceof CanvasActivity){
 				return pasteItem(o.data.activity, o, _newToolContentID);
 			}else if(o.data instanceof ToolActivity){
@@ -961,7 +936,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	private function pasteItem(toolToCopy:ToolActivity, o:Object, newToolContentID:Number):Object{
 		//clone the activity
-		trace("New Content Id passed is: "+newToolContentID )
 		var newToolActivity:ToolActivity = toolToCopy.clone();
 		newToolActivity.activityUIID = _ddm.newUIID();
 		if (newToolContentID != null || newToolContentID != undefined){
@@ -996,6 +970,15 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			stopGroupTool();
 		}else{
 			startGroupTool();
+		}
+	}
+	
+	public function toggleBranchTool():Void{
+		var c:String = Cursor.getCurrentCursor();
+		if(c==ApplicationParent.C_BRANCH){
+			stopBranchTool();
+		}else{
+			startBranchTool();
 		}
 	}
 	
@@ -1045,6 +1028,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			case CanvasModel.TRANSITION_TOOL :
 				stopTransitionTool();
 				break;
+			case CanvasModel.BRANCH_TOOL :
+				stopBranchTool();
+				break;
 			default :
 				Debugger.log('No tool active. Setting Default.', Debugger.GEN,'stopActiveTool','Canvas');
 				Cursor.showCursor(ApplicationParent.C_DEFAULT);
@@ -1089,6 +1075,17 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		canvasModel.activeTool = "none";
 	}
 	
+	public function startBranchTool(){
+		Debugger.log('Starting branch tool',Debugger.GEN,'startGateTool','Canvas');
+		Cursor.showCursor(ApplicationParent.C_BRANCH);
+		canvasModel.activeTool = CanvasModel.BRANCH_TOOL;
+	}
+	
+	public function stopBranchTool(){
+		Debugger.log('Stopping branch tool',Debugger.GEN,'startBranchTool','Canvas');
+		Cursor.showCursor(ApplicationParent.C_DEFAULT);
+		canvasModel.activeTool = "none";
+	}
 	
 	/**
 	 * Called by the top menu bar and the tool bar to start the transition tool, switches cursor.
@@ -1120,14 +1117,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 */
 	public function launchPreviewWindow():Void{
 		if(_ddm.validDesign){
-			 
-			
 			Debugger.log('Launching Preview Window (initialising)',Debugger.GEN,'launchPreviewWindow','Canvas');
 			var callback:Function = Proxy.create(this,onInitPreviewResponse); 
 			Application.getInstance().getComms().sendAndReceive(_ddm.getDataForPreview(Dictionary.getValue('preview_btn'),"started%20automatically"),"monitoring/initializeLesson",callback,false)
-			
-			//Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startPreviewLesson&userID='+uID+'&learningDesignID='+designID+'&title=' + previewTitle.toLowerCase() + '&description=started%20automatically ',callback, false);
-			
 		}
 	}
 
@@ -1138,7 +1130,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			Debugger.log('Launching Preview Window (starting lesson ' + r + ')',Debugger.GEN,'onInitPreviewResponse','Canvas');
 			var callback:Function = Proxy.create(this,onLaunchPreviewResponse); 
 			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startPreviewLesson&lessonID='+r,callback, false);
-			
 		}
 	}
 
@@ -1150,27 +1141,15 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
 	public function onLaunchPreviewResponse(r):Void{
-		//Debugger.log('Response:'+ObjectUtils.printObject(response),Debugger.GEN,'onStoreDesignResponse','Canvas');
 		if(r instanceof LFError){
 			r.showMessageConfirm();
 		}else{
-			
-			//Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startPreviewLesson&userID='+uID+'&learningDesignID='+designID+'&title=' + previewTitle.toLowerCase() + '&description=started%20automatically ',callback, false);
-			
-			//LFMessage.showMessageAlert('calling javascript from Austhor.jsp');
 			var uID = Config.getInstance().userID;
 			var serverUrl = Config.getInstance().serverUrl;
-			//Create an instance of JsPopup to access launchPopupWindow method.
-			//JsPopup.getInstance().launchPopupWindow(serverUrl+'learning/main.jsp?userID='+uID+'&lessonID='+r+'&mode=preview', 'lWindow', 570, 796, true, true, false, false, false);
-			
+
 			// open preview in new window
 			ApplicationParent.extCall("openPreview", r);
-			
 			Debugger.log('Recieved Lesson ID: '+r ,Debugger.GEN,'onLaunchPreviewResponse','Canvas');
-			//_global.breakpoint();
-			//Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
-			
-			//var msg:String = "Congratulations! - Your design is valid has been saved with ID:"+r.learningDesignID;
 		}
 	}
 	
@@ -1243,11 +1222,13 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
 	public function initBin():Void{
-		//Debugger.log('Running',Debugger.GEN,'initBin','Canvas');
 		var cc:CanvasController = canvasView.getController();
 		_bin = _canvasView_mc.attachMovie("Bin", "Bin", _canvasView_mc.getNextHighestDepth(),{_canvasController:cc,_canvasView:canvasView});
-		//Debugger.log('_bin:'+_bin,Debugger.GEN,'initBin','Canvas');
-
+	}
+	
+	public function addBin():Void{
+		// var cc:CanvasController = canvasView.getController();
+		// return view.attachMovie("Bin", "Bin", view.getNextHighestDepth(),{_controller:cc,_view:cv}
 	}
 	
 	/**
@@ -1283,10 +1264,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		//take a snapshot of the design and save it in the undoStack
 		var snapshot:Object = _ddm.toData();
 		_undoStack.push(snapshot);
-		
 		_redoStack = new Array();
-		
-		
 	}
 	
 	
@@ -1449,12 +1427,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function get taHeight():Number{
 		return toolActHeight
 	}
-	
-	/*
-	public function getPropertyInspector():MovieClip{
-		return _pi;
-	}
-	*/
 
 	/**
 	 * 

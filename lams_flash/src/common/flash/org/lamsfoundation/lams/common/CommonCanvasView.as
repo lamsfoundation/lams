@@ -59,23 +59,22 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 					var caComplex = m.activitiesDisplayed.get(m.prevSelectedItem.activity.parentUIID);
 					caComplex.refreshChildren();
 				} else {
-					var dca:CanvasActivity = m.activitiesDisplayed.get(m.prevSelectedItem.activity.activityUIID);
+					var dca:ICanvasActivity = m.activitiesDisplayed.get(m.prevSelectedItem.activity.activityUIID);
 					dca.setSelected(false);
 				}
 			}
 			
 			
 			//try to cast the selected item to see what we have (instance of des not seem to work)
-			if(CanvasActivity(m.selectedItem) != null){
+			if(ICanvasActivity(m.selectedItem) != null){
 				Debugger.log('Its a canvas activity',4,'highlightActivity','CommonCanvasView');
 				ca.setSelected(true);
-				
-			}else if(CanvasTransition(m.selectedItem) != null){
+			} else if(CanvasTransition(m.selectedItem) != null) {
 				var ct = CanvasTransition(m.selectedItem);
 				var t:Transition = ct.transition;
 				Debugger.log('Its a canvas transition',4,'highlightActivity','CommonCanvasView');
 				
-			}else{
+			} else {
 				Debugger.log('Its a something we dont know',Debugger.CRITICAL,'highlightActivity','CommonCanvasView');
 			
 			}

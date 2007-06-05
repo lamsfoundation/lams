@@ -58,16 +58,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _canvasModel:CanvasModel;
 	private var _tm:ThemeManager;
 	private var _ccm:CustomContextMenu;
+	
 	//TODO:This should be ToolActivity
 	private var _activity:Activity;
 	
 	private var _isSelected:Boolean;
 	private var app:Application;
-	
+	//locals
 	private var learnerOffset_X:Number = 4;
 	private var learnerOffset_Y:Number = 3;
 	private var learnerContainer:MovieClip;
-	
 	private var _module:String;
 	private var icon_mc:MovieClip;
 	private var icon_mcl:MovieClipLoader;
@@ -75,6 +75,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var act_pnl:MovieClip;
 	private var title_lbl:MovieClip;
 	private var groupIcon_mc:MovieClip;
+	private var branchIcon_mc:MovieClip;
 	private var stopSign_mc:MovieClip;	
 	private var clickTarget_mc:MovieClip;
 	private var canvasActivity_mc:MovieClip;
@@ -87,7 +88,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _selected_mc:MovieClip;
 	private var fade_mc:MovieClip;
 	private var bgNegative:String = "original";
-	private var authorMenu:ContextMenu
+	private var authorMenu:ContextMenu;
 	
 	
 	function CanvasActivity(){
@@ -108,6 +109,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			_visibleHeight = CanvasActivity.TOOL_ACTIVITY_HEIGHT;
 			_visibleWidth = CanvasActivity.TOOL_ACTIVITY_WIDTH;
 		}
+		
 		_base_mc = this;
 		//call init if we have passed in the _activity as an initObj in the attach movie,
 		//otherwise wait as the class outside will call it
@@ -118,12 +120,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 	
 	public function init(initObj):Void{
-		//clickTarget_mc.onRollOver = Proxy.create (this, localOnRollOver);
-		//clickTarget_mc.onRollOut = Proxy.create (this, localOnRollOut);
-		//clickTarget_mc.onPress = Proxy.create (this, localOnPress);
-		//clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
-		//clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
-		
 		if(initObj){
 			_module = initObj._module;
 			if (_module == "monitoring"){
@@ -146,7 +142,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 
 		
-		if(!_activity.isGateActivity() && !_activity.isGroupActivity()){
+		if(!_activity.isGateActivity() && !_activity.isGroupActivity() && !_activity.isBranchingActivity()){
 			loadIcon();
 		}
 		setStyles();
@@ -156,6 +152,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	private function showAssets(isVisible:Boolean){
 		groupIcon_mc._visible = isVisible;
+		branchIcon_mc._visible = isVisible;
 		title_lbl._visible = isVisible;
 		icon_mc._visible = isVisible;
 		stopSign_mc._visible = isVisible;
@@ -202,6 +199,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				var bl_x = tl_x;														//biottom left x															
 				var bl_y = br_y;														//bottom left y
 				
+				
 				if(_selected_mc){
 					_selected_mc.removeMovieClip();
 				}
@@ -228,7 +226,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function loadIcon():Void{
 		icon_mc = this.createEmptyMovieClip("icon_mc", this.getNextHighestDepth());
 		var ml = new MovieLoader(Config.getInstance().serverUrl+_activity.libraryActivityUIImage,setUpActIcon,this,icon_mc);	
-		
+
 		// swap depths if transparent layer visible
 		if(fade_mc._visible) {
 			icon_mc.swapDepths(fade_mc);
@@ -288,6 +286,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 	}
 	
+	
 	/**
 	 * Add + icon to indicate that more users are currently at the Activity. 
 	 * We are unable to display all the users across the Activity's panel.
@@ -316,6 +315,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		var theIcon_mc:MovieClip;
 		title_lbl._visible = true;
+		//act_pnl.__visible = true;
 		clickTarget_mc._visible = true;
 		fade_mc._visible = false;
 		
@@ -340,24 +340,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				groupIcon_mc._visible = true;
 				icon_mc._visible = false;
 				theIcon_mc = groupIcon_mc;
-			}else{
+			} else if(_activity.isBranchingActivity()) {
+				branchIcon_mc._visible = true;
+				icon_mc._visible = false;
+				theIcon_mc = branchIcon_mc;
+			} else{
 				groupIcon_mc._visible = false;
 				icon_mc._visible = true;
 				theIcon_mc = icon_mc;
 			}
 			
-			/*
-			* some bug here - size always reported as 0x0 and wehn set to ICON_WIDTH it stays at 0, so maybe icon is still loading...
-			trace(theIcon_mc._width+'x'+theIcon_mc._height );
-			theIcon_mc._width = CanvasActivity.ICON_WIDTH;
-			theIcon_mc._height = CanvasActivity.ICON_HEIGHT;
-			trace('CanvasActivity.ICON_HEIGHT:'+CanvasActivity.ICON_HEIGHT);
-			trace('ICON_HEIGHT:'+ICON_HEIGHT);
-			trace(theIcon_mc._width+'x'+theIcon_mc._height );
-			*/
-			
+			setUpActIcon(theIcon_mc);
 			theIcon_mc._visible = true;
-			
+		
 			//chose the background mc
 			if(_activity.groupingUIID > 0){
 				canvasActivityGrouped_mc._visible = true;
@@ -368,7 +363,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			}
 			
 			title_lbl.visible=true;
-			//clickTarget_mc._visible=true;
 			stopSign_mc._visible = false;
 			
 			//write text

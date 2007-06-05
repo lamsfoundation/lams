@@ -31,29 +31,26 @@ import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.common.style.*;
 import mx.controls.*;
-import mx.managers.*
+import mx.managers.*;
 
 
 /**  
 * CanvasParallelActivity
 * This is the UI / view representation of a complex (parralel) activity
 */  
-class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieClip implements ICanvasActivity{
-  
+class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieClip implements ICanvasActivity{  
+	
 	private var CHILD_OFFSET_X:Number = 8;
 	private var CHILD1_OFFSET_Y:Number = 45 //67.5;
 	private var CHILD2_OFFSET_Y:Number = 108 //130.5;
-	
 	private var newContainerXCoord:Number; 
 	private var newContainerYCoord:Number;
-	
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
 	private var _monitorController:MonitorController;
 	private var _monitorTabView : MonitorTabView;
 	private var _tm:ThemeManager;
-	
 	//Set by the init obj
 	private var _activity:Activity;
 	private var _children:Array;
@@ -71,7 +68,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private var learnerOffset_X:Number = 4;
 	private var learnerOffset_Y:Number = 3;
 	private var learnerContainer:MovieClip;
-	
 	private var _ddm:DesignDataModel;
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
@@ -155,6 +151,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		child2_mc.setSelected(false);
 	}
 	
+	public function setSelected(isSelected){}
+	
 	private function showStatus(isVisible:Boolean){
 		completed_mc._visible = isVisible;
 		current_mc._visible = isVisible;
@@ -230,11 +228,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 					learner_X = _activity.xCoord + learnerOffset_X 
 					learner_Y = 27
 					hasPlus = true;
-					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
+					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this._parent.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
 					return;
 				}
 					
-				learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus});
+				learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this._parent.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus});
 				learner_X = learner_X+10
 			}
 		}

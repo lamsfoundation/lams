@@ -85,6 +85,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public static var OPTIONAL_ACTIVITY_TYPE:Number = 7;
 	public static var SEQUENCE_ACTIVITY_TYPE:Number = 8;
 	public static var SYSTEM_GATE_ACTIVITY_TYPE:Number = 9;
+	public static var BRANCHING_ACTIVITY_TYPE:Number = 10;
 	/******************************************************************/
 	
 	/**
@@ -245,6 +246,12 @@ class org.lamsfoundation.lams.authoring.Activity {
 			return true;
 		}
 	}
+	
+	public function isBranchingActivity():Boolean{
+		if (_activityTypeID == BRANCHING_ACTIVITY_TYPE){
+			return true;
+		}
+	}
 	/**
 	 * Populates all the fields in this activity from a dto object contaning the following fields
 	 * NB: This is not very clever, if the field in the dto is blank then the value is overwritten in the class...
@@ -361,34 +368,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 	}
 	
 	public function clone():Activity{
-		/*
-		var n = new Activity(null);
-		//objectType is in the constructor
-		n.activityTypeID = _activityTypeID;
-		n.activityID = _activityID;
-		n.activityCategoryID = _activityCategoryID;
-		n.activityUIID = _activityUIID;
-		n.learningLibraryID = _learningLibraryID;
-		n.learningDesignID = _learningDesignID;
-		n.libraryActivityID = _libraryActivityID;
-		n.parentActivityID = _parentActivityID;
-		n.parentUIID = _parentUIID
-		n.orderID = _orderID
-		n.groupingID = _groupingID;
-		n.groupingUIID = _groupingUIID
-		n.title = _title;
-		n.description = _description;
-		n.helpText =  _helpText;
-		n.yCoord = _yCoord;
-		n.xCoord = _xCoord;
-		n.libraryActivityUIImage = _libraryActivityUIImage;
-		n.applyGrouping = _applyGrouping;
-		n.runOffline = _runOffline;
-		//n.offlineInstructions = _offlineInstructions;
-		n.defineLater = _defineLater;
-		n.createDateTime = _createDateTime;
-		n.groupingSupportType = _groupingSupportType;
-		*/
 		var dto:Object = toData();
 		var n = new Activity(null);
 		n.populateFromDTO(dto);

@@ -37,6 +37,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public static var OPTIONAL_TOOL:String = "OPTIONAL";
 	public static var GATE_TOOL:String = "GATE";
 	public static var GROUP_TOOL:String = "GROUP";
+	public static var BRANCH_TOOL:String = "BRANCH";
 	private var _defaultGroupingTypeID;
 	private var __width:Number;
 	private var __height:Number;
@@ -49,6 +50,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	private var _cv:Canvas;
 	private var _ddm:DesignDataModel;
 	private var optionalCA:CanvasOptionalActivity;
+	
 	//UI State variabls
 	private var _isDirty:Boolean;
 	private var _activeTool:String;
@@ -84,10 +86,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
 		_transitionsDisplayed = new Hashtable("_transitionsDisplayed");
 		
-		
-		
-				
-	
 		_activeTool = "none";
 		_autoSaveWait = false;
 		_transitionActivities = new Array();
@@ -202,7 +200,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log('Starting transition tool',Debugger.GEN,'startTransitionTool','CanvasModel');			
 		resetTransitionTool();
 		_activeTool = TRANSITION_TOOL;
-		//broadcastViewUpdate("START_TRANSITION_TOOL");
 	}
 	
 	/**
@@ -215,7 +212,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log('Stopping transition tool',Debugger.GEN,'stopTransitionTool','CanvasModel');
 		resetTransitionTool();
 		_activeTool = "none";
-		//broadcastViewUpdate("STOP_TRANSITION_TOOL");
 	}
 	
 	
@@ -263,7 +259,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log("Locking all Complex Activities", Debugger.GEN, "lockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
 		for (var i=0; i<k.length; i++){
-			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.BRANCHING_ACTIVITY_TYPE){
 				k[i].locked = true;
 			}
 		}
@@ -274,7 +270,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log("Unlocking all Complex Activities", Debugger.GEN, "unlockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
 		for (var i=0; i<k.length; i++){
-			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.BRANCHING_ACTIVITY_TYPE){
 				k[i].locked = (k[i].activity.readOnly) ? true : false;
 			}
 		}
@@ -351,13 +347,50 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		setSelectedItem(_activitiesDisplayed.get(gateAct.activityUIID));
 		
 	}
+	
+	/**
+	 * Creates a new branch activity at the specified location
+	 * @usage   
+	 * @param   pos 
+	 * @return  
+	 */
+	public function createNewBranchActivity(pos:Point){
+		Debugger.log('Running...',Debugger.GEN,'createNewBranchActivity','CanvasModel');
+		
+		//first create the grouping object
+		
+		//var newBranching = new Branching(_cv.ddm.newUIID());
+		//_cv.ddm.addBranching(newBranching);
+		
+		var branchingActivity = new BranchingActivity(_cv.ddm.newUIID());
+		branchingActivity.title = Dictionary.getValue('branching_act_title');
+		branchingActivity.learningDesignID = _cv.ddm.learningDesignID;
+		branchingActivity.activityCategoryID = Activity.CATEGORY_SYSTEM;
+		branchingActivity.groupingSupportType = Activity.GROUPING_SUPPORT_OPTIONAL;
+		//branchingActivity.createBranchingUIID = newBranching.branchingUIID;
+		
+		branchingActivity.yCoord = pos.y;
+		branchingActivity.xCoord = pos.x;
+		
+		Debugger.log('branchingActivity.yCoord:'+branchingActivity.yCoord,Debugger.GEN,'createNewBranchActivity','CanvasModel');
+		Debugger.log('branchingActivity.xCoord:'+branchingActivity.xCoord,Debugger.GEN,'createNewBranchActivity','CanvasModel');
+
+		_cv.ddm.addActivity(branchingActivity);
+		
+		//tell the canvas to go refresh
+		setDirty();
+		
+		//select the new thing
+		setSelectedItem(_activitiesDisplayed.get(branchingActivity.activityUIID));
+	}
+	
 	/**
 	 * Creates a new group activity at the specified location
 	 * @usage   
 	 * @param   pos 
 	 * @return  
 	 */
-	public function createNewGroupActivity(pos){
+	public function createNewGroupActivity(pos:Point){
 		Debugger.log('Running...',Debugger.GEN,'createNewGroupActivity','CanvasModel');
 		
 		//first create the grouping object
@@ -386,6 +419,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		//select the new thing
 		setSelectedItem(_activitiesDisplayed.get(groupingActivity.activityUIID));
 	}
+	
 	/**
 	 * Creates a new gate activity at the specified location
 	 * @usage   
@@ -394,7 +428,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @return  
 	 */
 	public function createNewOptionalActivity(ActivityTypeID, pos:Point){
-		//Debugger.log('gateTypeID:'+gateTypeID,Debugger.GEN,'createNewGate','CanvasModel');
 		var optAct = new ComplexActivity(_cv.ddm.newUIID());
 		
 		optAct.learningDesignID = _cv.ddm.learningDesignID;
@@ -405,10 +438,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		optAct.yCoord = pos.y;
 		optAct.xCoord = pos.x;
 		
-		
 		Debugger.log('Optional Activitys Y Coord is :'+optAct.yCoord,Debugger.GEN,'createNewOptionalActivity','CanvasModel');
-		//Debugger.log('gateAct.xCoord:'+gateAct.xCoord,Debugger.GEN,'createGateTransition','CanvasModel');
-
+		
 		_cv.ddm.addActivity(optAct);
 		
 		setDirty();
@@ -431,8 +462,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		removeActivity(ca.activity.activityUIID);
 		removeActivity(parentID);
 		setDirty();
-		//var lengthOfChildren:Array = _cv.ddm.getComplexActivityChildren(parentID);
-		//trace("No. of Chlidren in Optional Activity "+parentID+" is: "+lengthOfChildren.length)
 	}
 	
 	/**
@@ -453,9 +482,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		ca.activity.orderID = null;
 		ca.activity.parentActivityID = null;
 		removeActivity(ca.activity.activityUIID);
-		//_cv.ddm.removeActivity(ca.activity.activityUIID);
 		removeActivity(parentID);
-		//_cv.ddm.addActivity(ToolActivity(ca));
 		setDirty();
 		
 	}
@@ -474,8 +501,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	}
 	
 	public function removeComplexActivityChildren(children){
-		trace("Number of children to be removed are: " + children.length)
-		
 		for (var k=0; k<children.length; k++){
 			trace("Child has UIID : " + children[k].activityUIID);
 			Debugger.log('Removing Child ' + children[k].activity.activityUIID+ 'from : '+ children[k].activity.parentUIID,Debugger.GEN,'removeComplexActivityChildren','CanvasModel');
@@ -504,10 +529,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			return new LFError("Removing activity failed:"+activityUIID,"removeActivity",this,null);
 		}else{
 			Debugger.log('Removed:'+r.activityUIID,Debugger.GEN,'removeActivity','DesignDataModel');
-				//dispatchEvent({type:'ddmUpdate',target:this});
-			
 			r.removeMovieClip();
-			//_cv.ddm.removeActivity(activityUIID);
 		}
 	}
 	
@@ -519,7 +541,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			return new LFError("Removing activity failed:"+activityUIID,"removeActivity",this,null);
 		}else{
 			Debugger.log('Removed:'+r.activityUIID,Debugger.GEN,'removeActivity','DesignDataModel');
-				//dispatchEvent({type:'ddmUpdate',target:this});
 			
 			r.removeMovieClip();
 			_cv.removeActivity(activityUIID);
@@ -528,12 +549,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	
 	private function isLoopingLD(fromAct, toAct):Boolean{
-		trace("fromAct is: "+fromAct+" and toAct is: "+toAct)
 		var toTransitions = _cv.ddm.getTransitionsForActivityUIID(toAct)
-		trace("toTransitions.out"+toTransitions.out)
 		if (toTransitions.out != null){
 			var nextAct = toTransitions.out.toUIID;
-			trace("next activity is: "+nextAct)
 			if (nextAct == fromAct){
 				return true;
 			}else {
@@ -607,16 +625,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			}
 			
 			Debugger.log('No validation errors, creating transition.......',Debugger.GEN,'addActivityToTransition','CanvasModel');
+			
 			//lets make the transition
 			var t:Transition = createTransition(_transitionActivities);
-			//add it to the DDM
 			
+			//add it to the DDM
 			var success:Object = _cv.ddm.addTransition(t);
+			
 			//flag the model as dirty and trigger a refresh
 			_cv.stopTransitionTool();
 			setDirty();
-			
-			//setSelectedItem(_transitionsDisplayed.get(t.transitionUIID));
 			
 			
 		}
@@ -995,7 +1013,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @return  
 	 */
 	public function openToolActivityContent(ta:ToolActivity):Void{
-		trace("tool content Id for "+ta.title+" is: "+ta.toolContentID)
 		Debugger.log('ta:'+ta.title+'toolContentID:'+ta.toolContentID+" and learningLibraryID: "+ta.learningLibraryID,Debugger.GEN,'openToolActivityContent','CanvasModel');
 		//check if we have a toolContentID
 		
@@ -1011,11 +1028,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 				var cfg = Config.getInstance();
 				var ddm = _cv.ddm;
 				if(ta.authoringURL.indexOf("?") != -1){
-					//09-11-05 Change to toolContentID and remove userID.
-					//url = cfg.serverUrl+ta.authoringURL + '&toolContentId='+ta.toolContentID+'&userID='+cfg.userID;
 					url = cfg.serverUrl+ta.authoringURL + '&toolContentID='+ta.toolContentID+'&contentFolderID='+ddm.contentFolderID;
 				}else{
-					//url = cfg.serverUrl+ta.authoringURL + '?toolContentId='+ta.toolContentID+'&userID='+cfg.userID;
 					url = cfg.serverUrl+ta.authoringURL + '?toolContentID='+ta.toolContentID+'&contentFolderID='+ddm.contentFolderID;
 				}
 			
@@ -1031,10 +1045,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			}
 		
 		}
-		
-		
-		
-		
 	}
 	
 	public function getNewToolContentID(ta:ToolActivity):Void{
@@ -1055,14 +1065,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log('ta:'+ta.title+',toolContentID:'+ta.toolContentID+', activityUIID:'+ta.activityUIID,Debugger.GEN,'setDefaultToolContentID','CanvasModel');
 	}
 	
-	
+	public function openBranchActivityContent(ba:BranchingActivity):Void {
+		//broadcastViewUpdate("BRANCHING_OPEN", ba);
+		_cv.openBranchView(ba);
+	}
 	
 	/**
     * Notify registered listeners that a data model change has happened
     */
     public function broadcastViewUpdate(_updateType,_data){
         dispatchEvent({type:'viewUpdate',target:this,updateType:_updateType,data:_data});
-        trace('broadcast');
     }
 	
 	
@@ -1076,7 +1088,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function getActivityMCByUIID(UIID:Number):MovieClip{
 		
 		var a_mc:MovieClip = _activitiesDisplayed.get(UIID);
-		//Debugger.log('UIID:'+UIID+'='+a_mc,Debugger.GEN,'getActivityMCByUIID','CanvasModel');
 		return a_mc;
 	}
 	/*

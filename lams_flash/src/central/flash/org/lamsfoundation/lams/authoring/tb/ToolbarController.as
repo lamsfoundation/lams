@@ -101,6 +101,9 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 		}else if(tgt.indexOf("group") != -1){
 			_app.getCanvas().toggleGroupTool();
 			
+		}else if(tgt.indexOf("branch") != -1){
+			_app.getCanvas().toggleBranchTool();
+			
 		}else if(tgt.indexOf("preview") != -1){
 			_app.getCanvas().launchPreviewWindow();
 		}else if(tgt.indexOf("cancel") != -1){

@@ -258,17 +258,28 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_dbclick_readonly'));
 			}else{
 				_canvasModel.selectedItem = ca;
-				if(ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+				if(ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE || 
+				   ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || 
+				   ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || 
+				   ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE || 
+				   ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 					if (!_pi.isPIExpanded()){
 						_canvasModel.setPIHeight(_pi.piFullHeight());
-						//_pi.showExpand(false);
 					}
-				}else if (ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE && (ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE)){
+				} else if (ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE && (ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE)){
 					if (!_pi.isPIExpanded()){
 						_canvasModel.setPIHeight(_pi.piFullHeight());
 						
 					}
-				}else{
+				} else if(ca.activity.activityTypeID == Activity.BRANCHING_ACTIVITY_TYPE) {
+					Debugger.log('activityDoubleClick CanvasBranchActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick','CanvasController');
+	   
+					_canvasModel.openBranchActivityContent(ca.activity);
+					
+					// invalidate design after opening tool content window
+					_canvasModel.getCanvas().ddm.validDesign = false;
+					_canvasModel.getCanvas().checkValidDesign();
+				} else {
 					Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick to open Content','CanvasController');
 					_canvasModel.openToolActivityContent(ca.activity);
 					
@@ -469,10 +480,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	public function canvasRelease(canvas_mc:MovieClip){
 		var toolActWidth:Number = _canvasModel.getCanvas().toolActivityWidth;
 		var toolActHeight:Number = _canvasModel.getCanvas().toolActivityHeight;
+		
 		var complexActWidth:Number = _canvasModel.getCanvas().complexActivityWidth;
+		
 		Debugger.log(canvas_mc,Debugger.GEN,'canvasRelease','CanvasController');
 		Debugger.log('_canvasModel.activeTool:'+_canvasModel.activeTool,Debugger.GEN,'canvasRelease','CanvasController');
+		
 		_canvasModel.selectedItem = null;
+		
 		if(_canvasModel.activeTool == CanvasModel.GATE_TOOL){
 			var p = new Point(canvas_mc._xmouse, canvas_mc._ymouse); 
 			_canvasModel.createNewGate(Activity.PERMISSION_GATE_ACTIVITY_TYPE,p);
@@ -482,15 +497,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		if(_canvasModel.activeTool == CanvasModel.OPTIONAL_TOOL){
 			var p = new Point(canvas_mc._xmouse-(complexActWidth/2), canvas_mc._ymouse); 
 			_canvasModel.createNewOptionalActivity(Activity.OPTIONAL_ACTIVITY_TYPE,p);
-			//_canvasModel.createNewOptionalActivity(p);
 			_canvasModel.getCanvas().stopOptionalActivity();
 			
 		}
+		
 		if(_canvasModel.activeTool == CanvasModel.GROUP_TOOL){
 			var p = new Point(canvas_mc._xmouse-(toolActWidth/2), canvas_mc._ymouse-(toolActHeight/2)); 
 			_canvasModel.createNewGroupActivity(p);
 			_canvasModel.getCanvas().stopGroupTool();
 			
+		}
+		
+		if(_canvasModel.activeTool == CanvasModel.BRANCH_TOOL){
+			var p = new Point(canvas_mc._xmouse-(toolActWidth/2), canvas_mc._ymouse-(toolActHeight/2)); 
+			_canvasModel.createNewBranchActivity(p);
+			_canvasModel.getCanvas().stopBranchTool();
 		}
 		
 	}

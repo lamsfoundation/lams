@@ -40,6 +40,7 @@ class ApplicationParent {
 	public static var C_OPTIONAL:String = "c_optionalBoxPen";
 	public static var C_GATE:String = "c_gate";
 	public static var C_GROUP:String = "c_group";
+	public static var C_BRANCH:String = "c_branch";
 	public static var C_DEFAULT:String = "default";
 	public static var C_LICON:String = "c_licon";
 	
