@@ -36,8 +36,7 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 /**
  * Progress calculation strategy for sequence activity.
  * 
- * @author Jacky Fang 2005-2-24
- * @version 1.1
+ * @author Jacky Fang, Fiona Malikoff
  */
 public class SequenceActivityStrategy extends ComplexActivityStrategy
 {
@@ -48,29 +47,41 @@ public class SequenceActivityStrategy extends ComplexActivityStrategy
 	}
 
     /**
-     * <p>Return the next activity for a incomplete options activity. 
+     * <p>Return the next activity for a incomplete sequence activity. 
      * 
-     * <p>For a sequence activity, the activity should be the next activity in the
-     * children activity set ordered by activity id.</p>
+     * <p>Normally all the activities in a sequence activity will be linked
+     * via transitions, so we are only interested in child activities that
+     * start a series of linked activities.
      * 
-     * Pre-condition: the parent must have some incomplete children
+     * <p>This will return the next such activity (ie one that doesn't 
+     * have in input transition) with the order id greater the 
+     * currentChild. If the currentChild is the NullActivity then 
+     * it will return the first (and normally the only) such child.</p>
      * 
      * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
-    public Activity getNextActivityByParent(ComplexActivity parent, Activity currentChild)
+	public Activity getNextActivityByParent(ComplexActivity parent, Activity currentChild)
     {
         Set children = new TreeSet(new ActivityOrderComparator());
         children.addAll(parent.getActivities());
         
+        Activity inputChild = currentChild;
+        if ( inputChild != null ) {
+        	if ( inputChild.isNull() ) {
+        		inputChild = null;
+        	} else if ( inputChild.getOrderId() == null ) {
+        		inputChild = null;
+        	}
+        }
+        
         for(Iterator i=children.iterator();i.hasNext();)
         {
             Activity curChild = (Activity)i.next();
-            //if no current child, we should return the first one.
-            if(currentChild==null || currentChild.isNull())
-                return curChild;
-            
-            if(curChild.getActivityId().longValue()==currentChild.getActivityId().longValue())
-                return (Activity)i.next();
+            if(  ( inputChild==null || curChild.getOrderId().longValue() > currentChild.getOrderId().longValue() ) ) {
+            	// we are past the 'currentChild' so look for an activity with no input transition
+            	if ( curChild.getTransitionTo() == null ) 
+            		return curChild;
+            }
         }
         return new NullActivity();
     }
