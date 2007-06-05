@@ -1,0 +1,64 @@
+From: Alessandro Crugnola [info@sephiroth.it]
+Sent: 26 January 2006 07:59
+To: Dave Caygill
+Subject: Re: Drag and Drop tree - license?
+
+Yes, don't worry about the license.. you can use it wherever you want. :) alex
+
+Dave Caygill wrote:
+> Actually – if you are not bothered about the LGPL license etc.. then 
+> are you just happy that I use if for my own purposes to incorporate 
+> into an application?
+> 
+>  
+> 
+> Thanks,
+> 
+>  
+> 
+> Dave
+> 
+>  
+> 
+> ----------------------------------------------------------------------
+> --
+> 
+> *From:* Dave Caygill
+> *Sent:* 25 January 2006 16:35
+> *To:* 'info@sephiroth.it'
+> *Subject:* Drag and Drop tree - license?
+> 
+>  
+> 
+> Hi,
+> 
+>  
+> 
+> I’ve just seen your tree component – looks great and does exactly what 
+> I need it to.  I’m working on an OpenSource application and would like 
+> to use your tree component, can you please advise if this is possible 
+> – is it released under LGPL or similar?
+> 
+>  
+> 
+> Thanks,
+> 
+>  
+> 
+> Dave Caygill
+> 
+
+
+
+
+--
+Alessandro Crugnola
+Flash | PHP | Python Developer
+
+http://www.blumerstudio.com
+http://www.sephiroth.it
+
++39 3939402645
++39 0236522445
+--
+

@@ -1,0 +1,86 @@
+
+		<HTML>
+		<HEAD>
+		<TITLE>it.sephiroth.XML2Object  Documentation</TITLE>
+		
+		<STYLE><!--
+		HR.small{height:1px; width:100%; background:#E7BFA3; border: 0px;}
+		HR.big{height:4px; width:100%; background:#E7BFA3; border: 0px;}
+		A:hover{text-decoration: underline}
+		A{text-decoration: none; color: #993333}
+		code{font-family:monospace; font-size: 12px; color: #666666;}
+		.methodAttributesTitle{font-size: 12px; font-weight: bold; color: #7B779C}
+		.ToC{font-size: 12px; font-weight: bold; color: #993333}
+		.methodTitle{font-size: 14px; font-weight: bold; color: #993333}
+		.groupTitle{font-size: 18px; font-weight: bold; color: #993333}
+		.sectionTitle{font-size: 22px; font-weight: bold; color: #993333}
+		.majorTitle{font-size: 32px; font-weight: bold; color: #993333; padding-bottom:100px;}
+		.methodsDiv{margin-left:40px;}
+		.footer{font-size: 11px; color: #666666;}
+		body{font-family: arial,sans-serif; font-size: 12px;}
+		//--></STYLE>
+		
+		</HEAD>
+		<BODY bgColor='white'>
+		<P class='majorTitle'>it.sephiroth.XML2Object Documentation</P>
+		
+
+		<P><B>Author:</B> Alessandro Crugnola<BR>
+		<B>Last Modified:</B> 01/20/04 12:51:09<HR class='big'>
+
+		<P class='sectionTitle'>Summary</P>
+		<P class='ToC'>it.sephiroth.XML2Object Class:</P>
+		<div class='methodsDiv'><a href='#classinfo'>- description</a></div>
+<P class='ToC'>it.sephiroth.XML2Object Methods:</P><div class='methodsDiv'>
+<a href='#public parseXML'>- public parseXML</a><br>
+<a href='#private translateXML'>- private translateXML</a><br>
+</div><br>
+
+		<HR class='big'>
+		<P class='sectionTitle'><A name='classinfo'></A>it.sephiroth.XML2Object <I>class</I></P>
+		<P> <span class='methodTitle'>version:</span> 1.0</P>
+		<P class="methodTitle">description:</P>
+		<P>return an object with the content of the XML translated
+If a node has more than 1 child with the same name, an array is created with the children contents
+The object created will have this structure:<br/>
+	- obj {<br/>
+		nodeName : {<br/>
+			attributes : an object containing the node attributes<br/>
+			data : an object containing the node contents<br/>
+	}<br/>
+</P> 
+		<P class="methodTitle">usage:</P> data = new XML2Object().parseXML( anXML);
+
+
+			<HR class='small'>
+			<P class='groupTitle'><A name='methods'></A>it.sephiroth.XML2Object Methods:</P>
+			<div class='methodsDiv' >
+			
+
+				<P class='methodTitle'><A name='public parseXML'></A><u> public parseXML</u></P>
+				<P><span class='methodAttributesTitle'>description: </span>
+				return the parsed Object
+	</P>
+				<P><span class='methodAttributesTitle'>usage:</span> XML2Object.parseXML( theXMLtoParse );
+	</P>
+<P> <span class='methodAttributesTitle'>parameters:</span><ul>
+<li>sFile XML</li>
+</ul></P>
+<P><span class='methodAttributesTitle'>returns:</span> an Object with the contents of the passed XML
+	</P>
+
+				<P class='methodTitle'><A name='private translateXML'></A><u> private translateXML</u></P>
+				<P><span class='methodAttributesTitle'>description: </span>
+				core of the XML2Object class
+	</P>
+				<P><span class='methodAttributesTitle'>usage:</span> Documentation not provided.</P>
+<P><span class='methodAttributesTitle'>returns:</span> Void.</P>
+</div>
+
+			<BR>
+			<BR>
+			<HR class='big'>
+			<span class="footer">generated with <A href='http://blog.klaustrofobik.org/' target='_blank'>AS2docGenerator beta 0.5</A></span>
+			</BODY>
+			</HTML>
+			

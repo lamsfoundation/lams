@@ -1,0 +1,1456 @@
+﻿
+import mx.controls.*
+import mx.utils.*
+import mx.managers.*
+import mx.events.*
+
+import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.style.*
+import org.lamsfoundation.lams.wizard.*
+import org.lamsfoundation.lams.monitoring.User;
+import org.lamsfoundation.lams.monitoring.Orgnanisation;
+import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.common.mvc.*
+import org.lamsfoundation.lams.common.ws.*
+import org.lamsfoundation.lams.common.Config
+
+import it.sephiroth.TreeDnd
+
+
+/**
+* Wizard view
+* Relects changes in the WizardModel
+*/
+
+class WizardView extends AbstractView {
+	
+	private var _className = "WizardView";
+	
+	//constants
+	public var RT_ORG:String = "Organisation";
+	public var STRING_NULL:String = "string_null_value"
+	public static var USERS_X:Number = 10;
+	public static var USER_OFFSET:Number = 20;
+	public static var SUMMERY_X:Number = 11;
+	public static var SUMMERY_Y:Number = 140;
+	public static var SUMMERY_W:Number = 500;
+	public static var SUMMERY_H:Number = 20;
+	public static var SUMMERY_OFFSET:Number = 2;
+	
+	// submission modes
+	public static var FINISH_MODE:Number = 0;
+	public static var START_MODE:Number = 1;
+	public static var START_SCH_MODE:Number = 2;
+	
+	private static var X_BUTTON_OFFSET:Number = 10;
+	private static var Y_BUTTON_OFFSET:Number = 15;
+	
+	public static var LOGO_PATH:String = "www/images/monitor.logo.swf";
+
+	private var _wizardView:WizardView;
+	private var _tm:ThemeManager;
+	private var _dictionary:Dictionary;
+	//private var _workspace:Workspace;
+	
+	private var _wizardView_mc:MovieClip;
+    private var logo:MovieClip;
+
+	private var org_treeview:Tree;              //Treeview for navigation through workspace folder structure
+	
+	// step 1 UI elements
+	private var location_treeview:Tree;
+
+	// step 2 UI elements
+	private var title_lbl:Label;
+	private var resourceTitle_txi:TextInput;
+	private var desc_lbl:Label;
+    private var resourceDesc_txa:TextArea;
+	
+	// step 3 UI elements
+	private var _staffList:Array;
+	private var _learnerList:Array;
+	private var _learner_mc:MovieClip;
+	private var _staff_mc:MovieClip;
+	private var staff_scp:MovieClip;		// staff/teachers container
+	private var staff_lbl:Label;
+	private var learner_scp:MovieClip;		// learners container
+	private var learner_lbl:Label;
+	private var staff_selAll_cb:CheckBox;
+	private var learner_selAll_cb:CheckBox;
+	
+	// step 4 UI elements
+	private var schedule_cb:CheckBox;
+	private var learner_expp_cb:CheckBox;
+	private var start_btn:Button;
+	private var schedule_btn:Button;
+	private var schedule_time:MovieClip;
+	private var summery_lbl:Label;
+	private var date_lbl:Label;
+	private var time_lbl:Label;
+	private var summery_scp:MovieClip;
+	private var _summery_mc:MovieClip;
+	private var _summeryList:Array;
+	private var scheduleDate_dt:DateField;
+	private var summery_lbl_arr:Array;
+		
+	// conclusion UI elements
+	private var confirmMsg_txt:TextField;
+
+	//Dimensions for resizing
+    private var xNextOffset:Number;
+    private var yNextOffset:Number;
+    private var xPrevOffset:Number;
+    private var yPrevOffset:Number;
+    private var xCancelOffset:Number;
+    private var yCancelOffset:Number;
+	private var xLogoOffset:Number;
+	
+	private var lastStageHeight:Number;
+	private var header_pnl:MovieClip;		  // top panel base
+	private var footer_pnl:MovieClip;
+	
+	private var panel:MovieClip;       //The underlaying panel base
+	
+	// common elements
+	private var wizTitle_lbl:Label;
+	private var wizDesc_txt:TextField;
+	private var finish_btn:Button;
+	private var cancel_btn:Button;
+	private var next_btn:Button;
+	private var prev_btn:Button;
+	private var close_btn:Button;
+	
+	private var desc_txa:TextArea;
+	private var desc_scr:MovieClip;
+	
+	private var _resultDTO:Object;
+
+	private var _wizardController:WizardController;
+	
+	private var _workspaceModel:WorkspaceModel;
+	private var _workspaceView:WorkspaceView;
+	private var _workspaceController:WorkspaceController;
+
+    //Defined so compiler can 'see' events added at runtime by EventDispatcher
+    private var dispatchEvent:Function;     
+    public var addEventListener:Function;
+    public var removeEventListener:Function;
+	//public var menu:ContextMenu;
+
+	
+	/**
+	* Constructor
+	*/
+	function WizardView(){
+		_wizardView = this;
+		_wizardView_mc = this;
+        mx.events.EventDispatcher.initialize(this);
+		
+		_tm = ThemeManager.getInstance();
+		_dictionary = Dictionary.getInstance();
+		_dictionary.addEventListener('init',Proxy.create(this,setUpLabels));
+		
+		_resultDTO = new Object();
+	}
+	
+	/**
+	* Called to initialise Canvas  . CAlled by the Canvas container
+	*/
+	public function init(m:Observable,c:Controller){
+		super (m, c);
+		
+		loadLogo();
+		
+		xNextOffset = panel._width - next_btn._x;
+        yNextOffset = panel._height - next_btn._y;
+		xPrevOffset = panel._width - prev_btn._x;
+        yPrevOffset = panel._height - prev_btn._y;
+        xCancelOffset = panel._width - cancel_btn._x;
+        yCancelOffset = panel._height - cancel_btn._y;
+		xLogoOffset = header_pnl._width - logo._x;
+
+		lastStageHeight = Stage.height;
+
+		MovieClipUtils.doLater(Proxy.create(this,draw)); 
+		
+    }    
+	
+	private function loadLogo():Void{
+		logo = this.createEmptyMovieClip("logo", this.getNextHighestDepth());
+		var ml = new MovieLoader(Config.getInstance().serverUrl+WizardView.LOGO_PATH,null,this,logo);	
+	}
+	
+	
+	/**
+ * Recieved update events from the WizardModel. Dispatches to relevent handler depending on update.Type
+ * @usage   
+ * @param   event
+ */
+	public function update (o:Observable,infoObj:Object):Void{
+		
+       var wm:WizardModel = WizardModel(o);
+	   
+	   _wizardController = getController();
+
+	   switch (infoObj.updateType){
+			case 'STEP_CHANGED' :
+				updateScreen(infoObj.data.lastStep, infoObj.data.currentStep);
+                break;
+			case 'USERS_LOADED' :
+				loadLearners(wm.organisation.getLearners(), true);
+				loadStaff(wm.organisation.getMonitors(), true);
+				_wizardController.clearBusy();
+				break;
+			case 'STAFF_RELOAD' :
+				loadStaff(wm.organisation.getMonitors(), true);
+				break;
+			case 'LEARNER_RELOAD' :
+				loadLearners(wm.organisation.getLearners(), true);
+				break;
+			case 'SAVED_LC' :
+				conclusionStep(infoObj.data, wm);
+				break;
+			case 'LESSON_STARTED' :
+				conclusionStep(infoObj.data, wm);
+				break;
+            case 'POSITION' :
+				setPosition(wm);
+                break;
+            case 'SIZE' :
+			    setSize(wm);
+				break;
+            default :
+                Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.WizardView');
+		}
+
+	}
+	
+	/**
+	 * Recieved update events from the WorkspaceModel. Dispatches to relevent handler depending on update.Type
+	 * @usage   
+	 * @param   event
+	 */
+	public function viewUpdate(event:Object):Void{
+		trace('receiving view update event...');
+		var wm:WorkspaceModel = event.target;
+	   //set a permenent ref to the model for ease (sorry mvc guru)
+		
+	   
+		switch (event.updateType){
+			case 'REFRESH_TREE' :
+                refreshTree(wm);
+                break;
+			case 'UPDATE_CHILD_FOLDER' :
+				updateChildFolderBranches(event.data,wm);
+				openFolder(event.data, wm);
+			case 'UPDATE_CHILD_FOLDER_NOOPEN' :
+				updateChildFolderBranches(event.data,wm);
+				break;
+			case 'ITEM_SELECTED' :
+				itemSelected(event.data,wm);
+				break;
+			case 'OPEN_FOLDER' :
+				openFolder(event.data, wm);
+				break;
+			case 'CLOSE_FOLDER' :
+				closeFolder(event.data, wm);
+				break;
+			case 'REFRESH_FOLDER' :
+				refreshFolder(event.data, wm);
+				break;
+			case 'SET_UP_BRANCHES_INIT' :
+				setUpBranchesInit();
+				break;
+            default :
+                Debugger.log('unknown update type :' + event.updateType,Debugger.GEN,'viewUpdate','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		
+		}
+	}
+	
+	/**
+    * layout visual elements on the canvas on initialisation
+    */
+	private function draw(){
+		setStyles();
+		setScheduleDateRange();
+		showStep1();
+	    dispatchEvent({type:'load',target:this});
+		
+	}
+	
+	/**
+	 * Called by the wizardController after the workspace has loaded 
+	 */
+	public function setUpContent():Void{
+		trace('setting up content');
+		//register to recive updates form the model
+		WorkspaceModel(workspaceView.getModel()).addEventListener('viewUpdate',this);
+		var controller = getController();
+		this.addEventListener('okClicked',Delegate.create(controller,controller.okClicked));
+		next_btn.addEventListener("click",controller);
+		prev_btn.addEventListener("click",controller);
+		finish_btn.addEventListener("click",controller);
+		cancel_btn.addEventListener("click",controller);
+		close_btn.addEventListener("click",controller);
+		start_btn.addEventListener("click",controller);
+		schedule_btn.addEventListener('click', Delegate.create(this, scheduleNow));
+		schedule_cb.addEventListener("click", Delegate.create(this, scheduleChange));
+		staff_selAll_cb.addEventListener("click", Delegate.create(this, toogleStaffSelection));
+		learner_expp_cb.addEventListener("click", Delegate.create(this, toogleExpPortfolio));
+		learner_selAll_cb.addEventListener("click", Delegate.create(this, toogleLearnerSelection));
+		
+		//Set up the treeview
+        setUpTreeview();
+		//itemSelected(location_treeview.selectedNode, WorkspaceModel(workspaceView.getModel()));
+	
+	}
+	
+	/**
+	 * Sets i8n labels for UI elements 
+	 * 
+	 */
+	public function setUpLabels():Void{
+		//buttons
+		next_btn.label = Dictionary.getValue('next_btn');
+		prev_btn.label = Dictionary.getValue('prev_btn');
+		cancel_btn.label = Dictionary.getValue('cancel_btn');
+		finish_btn.label = Dictionary.getValue('finish_btn');
+		close_btn.label = Dictionary.getValue('close_btn');
+		start_btn.label = Dictionary.getValue('start_btn');
+		schedule_btn.label = Dictionary.getValue('schedule_cb_lbl');
+		
+		//labels
+		setTitle(Dictionary.getValue('wizardTitle_1_lbl'));
+		setDescription(Dictionary.getValue('wizardDesc_1_lbl'));
+		title_lbl.text = Dictionary.getValue('title_lbl');
+		desc_lbl.text = Dictionary.getValue('desc_lbl');
+		staff_lbl.text = Dictionary.getValue('staff_lbl');
+		learner_lbl.text = Dictionary.getValue('learner_lbl');
+		summery_lbl.text = Dictionary.getValue('summery_lbl');
+		
+		schedule_cb.label = Dictionary.getValue('schedule_cb_lbl');
+		date_lbl.text = Dictionary.getValue('date_lbl');
+		time_lbl.text = Dictionary.getValue('time_lbl');
+		
+		// checkboxes
+		staff_selAll_cb.label = Dictionary.getValue('wizard_selAll_cb_lbl');
+		learner_selAll_cb.label = Dictionary.getValue('wizard_selAll_cb_lbl');
+		learner_expp_cb.label = Dictionary.getValue('wizard_learner_expp_cb_lbl');
+		resizeButtons([cancel_btn, prev_btn, next_btn, close_btn, finish_btn, start_btn, schedule_btn]);
+		positionButtons();
+	}
+	
+	/** Resize the buttons according to the label length */
+	private function resizeButtons(btns:Array) {
+		this.createTextField("dummylabel", this.getNextHighestDepth(), -1000, -1000, 0, 0); 
+		Debugger.log('//////////////////// Resizing Buttons ////////////////////',Debugger.CRITICAL,'resizeButtons','org.lamsfoundation.lams.WizardView');
+        
+		for(var i=0; i<btns.length; i++) {
+			var btn:Button = btns[i];
+			var btnLabel:String = btn.label;
+			var btn_text = this["dummylabel"];
+			
+			btn_text.autoSize = true;
+			btn_text.text = btnLabel;
+			
+			var btnWidth:Number = btn_text._width;
+			Debugger.log('item: ' + i + ' width: ' + btnWidth + ' label: ' + btnLabel,Debugger.CRITICAL,'resizeButtons','org.lamsfoundation.lams.WizardView');
+        
+			btn.setSize(btnWidth + 37, 20);
+		}
+		
+		btn_text.removeTextField();
+	}
+	
+	/** Align the buttons correctly on the screen  */
+	private function positionButtons(a:Boolean) {
+			// set button x position
+			next_btn._x = panel._width - next_btn._width - X_BUTTON_OFFSET;
+			start_btn._x = panel._width - start_btn._width - X_BUTTON_OFFSET;
+			close_btn._x = panel._width - close_btn._width - X_BUTTON_OFFSET;
+			finish_btn._x = panel._width - finish_btn._width - X_BUTTON_OFFSET;
+			schedule_btn._x = panel._width - schedule_btn._width - X_BUTTON_OFFSET;
+			
+			if(a){ prev_btn._x = start_btn._x - prev_btn._width - X_BUTTON_OFFSET; }
+			else { prev_btn._x = next_btn._x - prev_btn._width - X_BUTTON_OFFSET; }
+			cancel_btn._x = prev_btn._x - cancel_btn._width - (2*X_BUTTON_OFFSET);
+			
+			// set button y position
+			//next_btn._y = panel._y + panel._height - next_btn._height - Y_BUTTON_OFFSET;
+			//prev_btn._y = next_btn._y;
+			//close_btn._y = next_btn._y;
+			//start_btn._y = next_btn._y;
+			//cancel_btn._y = next_btn._y;
+			//schedule_btn._y = next_btn._y;
+			
+			//finish_btn._y = next_btn._y - finish_btn._height - Y_BUTTON_OFFSET;
+	}
+	
+	/**
+    * Set the styles for the Wizard called from init. and themeChanged event handler
+    */
+    private function setStyles() {
+		var styleObj = _tm.getStyleObject('button');
+		next_btn.setStyle('styleName',styleObj);
+		prev_btn.setStyle('styleName',styleObj);
+		finish_btn.setStyle('styleName',styleObj);
+		cancel_btn.setStyle('styleName',styleObj);
+		close_btn.setStyle('styleName',styleObj);
+		start_btn.setStyle('styleName',styleObj);
+		schedule_btn.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('BGPanel');
+		header_pnl.setStyle('styleName',styleObj);
+		footer_pnl.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('WZPanel');
+		panel.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('label');
+		wizTitle_lbl.setStyle('styleName',styleObj);
+		title_lbl.setStyle('styleName',styleObj);
+		desc_lbl.setStyle('styleName',styleObj);
+		staff_lbl.setStyle('styleName',styleObj);
+		learner_lbl.setStyle('styleName',styleObj);
+		summery_lbl.setStyle('styleName',styleObj);
+		staff_lbl.setStyle('styleName',styleObj);
+		schedule_cb.setStyle('styleName', styleObj);
+		learner_expp_cb.setStyle('styleName', styleObj);
+		date_lbl.setStyle('styleName', styleObj);
+		time_lbl.setStyle('styleName', styleObj);
+		
+		//styleObj = _tm.getStyleObject('treeview');
+        //org_treeview.setStyle('styleName',styleObj);
+        //location_treeview.setStyle('styleName',styleObj);
+		
+		
+		styleObj = _tm.getStyleObject('textarea');
+		resourceDesc_txa.setStyle('styleName',styleObj);
+		resourceTitle_txi.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('scrollpane');
+		staff_scp.setStyle('styleName',styleObj);
+		learner_scp.setStyle('styleName',styleObj);
+		summery_scp.setStyle('styleName',styleObj);
+	}
+	
+	/**
+    * Event fired by StyleManager class to notify listeners that Theme has changed
+    * it is up to listeners to then query Style Manager for relevant style info
+    */
+    public function themeChanged(event:Object){
+        if(event.type=='themeChanged') {
+            //Theme has changed so update objects to reflect new styles
+            setStyles();
+        }else {
+            Debugger.log('themeChanged event broadcast with an object.type not equal to "themeChanged"',Debugger.CRITICAL,'themeChanged','org.lamsfoundation.lams.WorkspaceDialog');
+        }
+    }
+	
+	private function itemSelected(newSelectedNode:XMLNode, wm:WorkspaceModel){
+		//update the UI with the new info
+		var nodeData = newSelectedNode.attributes.data;
+		trace('selected node data: ' + nodeData);
+		if(nodeData.resourceType == wm.RT_FOLDER){
+			resourceTitle_txi.text = "";
+			resourceDesc_txa.text = "";
+		}else{
+			if(nodeData.name == null){
+				resourceTitle_txi.text = "";
+			} else {
+				resourceTitle_txi.text = nodeData.name;
+			}
+			
+			if(nodeData.description == null){
+				resourceDesc_txa.text = "";
+			} else {
+				resourceDesc_txa.text = nodeData.description;
+			}
+		}
+		
+	}
+	
+		/**
+	 * Recursive function to set any folder with children to be a branch
+	 * TODO: Might / will have to change this behaviour once designs are being returned into the mix
+	 * @usage   
+	 * @param   node 
+	 * @return  
+	 */
+    private function setBranches(treeview:Tree, node:XMLNode, isOpen:Boolean){
+		if(node.hasChildNodes() || node.attributes.isBranch){
+			treeview.setIsBranch(node, true);
+			if(isOpen){ treeview.setIsOpen(node, true);}
+			for (var i = 0; i<node.childNodes.length; i++) {
+				var cNode = node.getTreeNodeAt(i);
+				setBranches(cNode);				
+			}
+		}
+	}
+	
+
+	/**
+	 * Sets up the inital branch detials
+	 * @usage   
+	 * @return  
+	 */
+	private function setUpBranchesInit(treeview:Tree, data:XML, hideRoot:Boolean, isOpen:Boolean){
+		Debugger.log('Running...',Debugger.GEN,'setUpBranchesInit','org.lamsfoundation.lams.wizard.WizardView');
+		//get the 1st child
+		
+		trace('data value:' + data);
+		trace('hide root:' + hideRoot);
+		// clear tree
+		treeview.removeAll();
+		
+		if(hideRoot){
+			treeview.dataProvider = data.firstChild;
+		} else {
+			treeview.dataProvider = data;
+		}
+		var fNode = treeview.dataProvider.firstChild;
+		trace(fNode);
+		setBranches(treeview, fNode, isOpen);
+		treeview.refresh();
+	}
+	
+	
+	/**
+	 * Sets up the treeview with whatever datya is in the treeDP
+	 * TODO - extend this to make it recurse all the way down the tree
+	 * @usage   
+	 * @return  
+	 */
+	private function setUpTreeview(){
+			
+		setUpBranchesInit(location_treeview, WorkspaceModel(workspaceView.getModel()).treeDP, false, false);
+		_workspaceController = _workspaceView.getController();
+		location_treeview.addEventListener("nodeOpen", Delegate.create(_workspaceController, _workspaceController.onTreeNodeOpen));
+		location_treeview.addEventListener("nodeClose", Delegate.create(_workspaceController, _workspaceController.onTreeNodeClose));
+		location_treeview.addEventListener("change", Delegate.create(_workspaceController, _workspaceController.onTreeNodeChange));
+		
+		var wsNode:XMLNode = location_treeview.firstVisibleNode;
+		
+		location_treeview.setIsOpen(wsNode, true);
+		_workspaceController.forceNodeOpen(wsNode);
+		
+		//location_treeview.selectedNode = wsNode.firstChild;
+		//dispatchEvent({type:'change', target: location_treeview});
+		
+    }
+	
+	/**
+	 * Sets up the treeview with whatever data is in the treeDP
+	 * TODO - extend this to make it recurse all the way down the tree
+	 * @usage   
+	 * @return  
+	 */
+	public function setUpOrgTree(hideRoot:Boolean){
+			
+		//Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		
+		setUpBranchesInit(org_treeview, WizardModel(getModel()).treeDP, hideRoot, true);
+		
+		org_treeview.addEventListener("nodeOpen", Delegate.create(_wizardController, _wizardController.onTreeNodeOpen));
+		org_treeview.addEventListener("nodeClose", Delegate.create(_wizardController, _wizardController.onTreeNodeClose));
+		org_treeview.addEventListener("change", Delegate.create(_wizardController, _wizardController.onTreeNodeChange));
+
+		org_treeview.selectedNode = org_treeview.firstVisibleNode;
+		getController().selectTreeNode(org_treeview.selectedNode);
+
+		//org_dnd.addEventListener("drag_complete", Delegate.create(_lessonManagerController, _lessonManagerController.onDragComplete));
+		
+    }
+	
+	/**
+	 * called witht he result when a child folder is opened..
+	 * updates the tree branch satus, then refreshes.
+	 * @usage   
+	 * @param   changedNode 
+	 * @param   wm          
+	 * @return  
+	 */
+	private function updateChildFolderBranches(changedNode:XMLNode,wm:WorkspaceModel){
+		 Debugger.log('updateChildFolder....:' ,Debugger.GEN,'updateChildFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		 //we have to set the new nodes to be branches, if they are branches
+		if(changedNode.attributes.isBranch){
+			location_treeview.setIsBranch(changedNode,true);
+			//do its kids
+			for(var i=0; i<changedNode.childNodes.length; i++){
+				var cNode:XMLNode = changedNode.getTreeNodeAt(i);
+				if(cNode.attributes.isBranch){
+					location_treeview.setIsBranch(cNode,true);
+				}
+			}
+		}
+	}
+	
+	private function refreshTree(){
+		 Debugger.log('Refreshing tree....:' ,Debugger.GEN,'refreshTree','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		 location_treeview.refresh();
+
+	}
+	
+	/**
+	 * Just opens the fodler node - DOES NOT FIRE EVENT - so is used after updatting the child folder
+	 * @usage   
+	 * @param   nodeToOpen 
+	 * @param   wm  
+	 * @param 	isForced
+	 * @return  
+	 */
+	private function openFolder(nodeToOpen:XMLNode, wm:WorkspaceModel){
+		Debugger.log('openFolder:'+nodeToOpen ,Debugger.GEN,'openFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		//open the node
+		nodeToOpen.attributes.isOpen = true;
+		location_treeview.setIsOpen(nodeToOpen,true);
+		
+		if(wm.isForced() && nodeToOpen.attributes.data.resourceID == WorkspaceModel.ROOT_VFOLDER){
+			// select users root workspace folder
+			location_treeview.selectedNode = nodeToOpen.firstChild;
+			dispatchEvent({type:'change', target:this.location_treeview});
+			
+			// no longer open the organisation folder
+			//var virNode:XMLNode = nodeToOpen.firstChild.nextSibling;
+			//if(virNode.attributes.data.resourceID == WorkspaceModel.ORG_VFOLDER && !location_treeview.getIsOpen(virNode)){
+			//	openFolder(virNode, wm);
+			//}
+		}
+		
+		refreshTree();
+	
+	}
+	
+	/**
+	 * Closes the folder node
+	 * 
+	 * @usage   
+	 * @param   nodeToClose 
+	 * @param   wm          
+	 * @return  
+	 */
+	
+	private function closeFolder(nodeToClose:XMLNode, wm:WorkspaceModel){
+		Debugger.log('closeFolder:'+nodeToClose ,Debugger.GEN,'closeFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		
+		// close the node
+		nodeToClose.attributes.isOpen = false;
+		location_treeview.setIsOpen(nodeToClose, false);
+		
+		refreshTree();
+	}
+	
+	/**
+	 * Closes folder, then sends openEvent to controller
+	 * @usage   
+	 * @param   nodeToOpen 
+	 * @param   wm         
+	 * @return  
+	 */
+	private function refreshFolder(nodeToOpen:XMLNode, wm:WorkspaceModel){
+		Debugger.log('refreshFolder:'+nodeToOpen ,Debugger.GEN,'refreshFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		//close the node
+		location_treeview.setIsOpen(nodeToOpen,false);		
+		//we are gonna need to fire the event manually for some stupid reason the tree is not firing it.
+		//dispatchEvent({type:'nodeOpen',target:treeview,node:nodeToOpen});
+		_workspaceController = _workspaceView.getController();
+		_workspaceController.onTreeNodeOpen({type:'nodeOpen',target:location_treeview,node:nodeToOpen});
+	}
+
+	// BUTTON EVENT HANDLER methods
+	
+	private function scheduleNow(evt:Object){
+		trace('SCHEDULE CLICKED');
+		var wm:WizardModel = WizardModel(getModel());
+		if(validateStep(wm)){
+			var schDT = getScheduleDateTime(scheduleDate_dt.selectedDate, schedule_time.f_returnTime());
+			resultDTO.scheduleDateTime = schDT.dateTime
+					
+			if(resultDTO.scheduleDateTime == null || resultDTO.scheduleDateTime == undefined){
+				LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schstart'), null, null);
+				return;
+				
+			} else {
+				if (!schDT.validTime){
+					LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schtime'), null, null);
+					return;
+				}else {
+					trace(resultDTO.scheduleDateTime);
+					resultDTO.mode = START_SCH_MODE;
+				}
+			}
+			disableButtons();
+			_wizardController.initializeLesson(resultDTO);
+		}
+	}
+	
+	private function scheduleChange(evt:Object){
+		trace(evt.target);
+		trace('schedule clicked : ' + schedule_cb.selected);
+		var isSelected:Boolean = schedule_cb.selected;
+		if(isSelected){
+			schedule_time.f_enableTimeSelect(true);
+			finish_btn.enabled = false;
+			schedule_btn.enabled = true;
+			start_btn.visible = false;
+			schedule_btn.visible = true;
+			scheduleDate_dt.enabled = true;
+		} else {
+			schedule_time.f_enableTimeSelect(false);
+			scheduleDate_dt.enabled = false;
+			schedule_btn.visible = false;
+			start_btn.visible = true;
+			finish_btn.enabled = true;
+
+		}
+	}
+	
+	// SCREEN UPDATES
+	
+	private function updateScreen(cl_step:Number, sh_step:Number){
+		
+		switch(cl_step){
+			case 1:
+				clearStep1();
+				break;
+			case 2: 
+				clearStep2();
+				break;
+			case 3:
+				positionButtons(false);
+				clearStep3();
+				break;
+			case 4:
+				clearFinish();
+				break;
+			default:
+				trace('unknown step');
+		}
+		
+		switch(sh_step){
+			case 1:
+				showStep1();
+				break;
+			case 2: 
+				showStep2();
+				break;
+			case 3:
+				positionButtons(true);
+				showStep3();
+				break;
+			case 4:
+				showFinish();
+				break;
+			default:
+				trace('unknown step');
+		}
+		
+		
+	}
+	
+	// VALIDATE STEPS
+	
+	public function validateStep(wm:WizardModel):Boolean{
+		switch(wm.stepID){
+			case 1:
+				return validateStep1(wm);
+				break;
+			case 2: 
+				return validateStep2(wm);
+				break;
+			case 3:
+				return validateStep3(wm);
+				break;
+			default:
+				return false;
+				break;
+		}
+		
+		
+	}
+	
+	private function showStep1():Void{
+		trace('showing step 1');
+		setTitle(Dictionary.getValue('wizardTitle_1_lbl'));
+		setDescription(Dictionary.getValue('wizardDesc_2_lbl'));
+		location_treeview.visible = true;
+		
+		finish_btn.visible = false;
+		
+		prev_btn.enabled = false;
+		next_btn.enabled = true;
+		close_btn.visible = false;
+		
+		// hide step 2 (Startup)
+		title_lbl.visible = false;
+		resourceTitle_txi.visible = false;
+		desc_lbl.visible = false;
+		resourceDesc_txa.visible = false;
+		
+		// hide step 3 (Startup)
+		org_treeview.visible = false;
+		
+		staff_lbl.visible = false;
+		staff_scp.visible = false;
+		learner_lbl.visible = false;
+		learner_scp.visible = false;
+		staff_selAll_cb.visible = false;
+		learner_selAll_cb.visible = false;
+		
+		// hide step 4 (Startup)
+		date_lbl.visible = false;
+		time_lbl.visible = false;
+		start_btn.visible = false;
+		schedule_btn.visible = false;
+		summery_scp.visible = false;
+		summery_lbl.visible = false;
+		learner_expp_cb.visible = false;
+		schedule_cb.visible = false;
+		schedule_time._visible = false;
+		scheduleDate_dt.visible = false;
+		
+		// hide final screen elements
+		confirmMsg_txt.visible = false;
+	}
+	
+	private function clearStep1():Void{
+		location_treeview.visible = false;
+	}
+	
+	
+	public function validateStep1(wm:WizardModel):Boolean{
+		var snode = location_treeview.selectedNode;
+		if (snode.attributes.data.resourceType==wm.RT_FOLDER){
+			// set result DTO - folder selected cannot continue
+			doWorkspaceDispatch(false);
+			
+			// show folder selected warning
+			trace('folder selected.. need to select LD');
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg1'), null, null);
+			return false;
+		} else if(snode.attributes.data.resourceType==wm.RT_LD){
+			// set result DTO - lesson selected
+			trace('selection valid');
+			doWorkspaceDispatch(true);
+			
+			
+			return true;
+		} else {
+			// show general warning
+			trace('nothing selected!!!');
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg1'), null, null);
+			return false;
+		}
+	}
+	
+	private function showStep2():Void{
+		trace('showing step 2');
+		setTitle(Dictionary.getValue('wizardTitle_3_lbl'));
+		setDescription(Dictionary.getValue('wizardDesc_3_lbl'));
+		
+		// enable prev button after Step 1
+		prev_btn.enabled = true;
+		
+		if(!resultDTO.selectedLearners && !resultDTO.selectedStaff){
+			WizardModel(getModel()).getWizard().getOrganisations(_root.courseID, _root.classID);
+		}
+		
+		org_treeview.visible = true;
+		
+		staff_lbl.visible = true;
+		staff_scp.visible = true;
+		learner_lbl.visible = true;
+		learner_scp.visible = true;
+		
+		staff_selAll_cb.visible = true;
+		learner_selAll_cb.visible = true;
+		
+	}
+	
+	private function clearStep2():Void{
+		org_treeview.visible = false;
+		
+		staff_lbl.visible = false;
+		staff_scp.visible = false;
+		learner_lbl.visible = false;
+		learner_scp.visible = false;
+		staff_selAll_cb.visible = false;
+		learner_selAll_cb.visible = false;
+	}
+	
+	public function validateStep2(wm:WizardModel):Boolean{
+		_global.breakpoint();
+		
+		var valid:Boolean = true;
+		var snode = org_treeview.selectedNode;
+		var pnode = snode.parentNode;
+		var selectedLearners:Array = new Array();
+		var selectedStaff:Array = new Array();
+			
+		if(snode == null){
+			trace('no course/class selected');
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg3_1'), null, null);
+			return false;
+		} else {
+			// add selected users to dto
+			trace('learners')
+			
+			
+			for(var i=0; i<learnerList.length;i++){
+				if(learnerList[i].user_cb.selected){
+					trace('select item: ' + learnerList[i].fullName.text);
+					selectedLearners.push(learnerList[i].data.userID);
+				}
+			}
+			
+	
+			trace('staff')
+			for(var i=0; i<staffList.length;i++){
+				if(staffList[i].user_cb.selected){
+					trace('select item: ' + staffList[i].fullName.text);
+					selectedStaff.push(staffList[i].data.userID);
+				}
+			}
+			
+			if(selectedLearners.length <= 0){
+				trace('no learners selected');
+				valid = false;
+			}
+			
+			if(selectedStaff.length <= 0){
+				trace('no staff selected');
+				valid = false;
+			}
+			
+		}
+		
+		if(valid){
+			var selectedOrgID:Number = Number(snode.attributes.data.organisationID);
+			resultDTO.organisationID = selectedOrgID;
+			trace('type id is ' + snode.attributes.data.organisationTypeID);
+			if(snode.attributes.data.organisationTypeId == 2){
+				resultDTO.courseName = snode.attributes.data.name;
+				resultDTO.className = "";
+			} else {
+				resultDTO.className = snode.attributes.data.name;
+				resultDTO.courseName = pnode.attributes.data.name;
+			}
+			
+			resultDTO.selectedStaff = selectedStaff;
+			resultDTO.selectedLearners = selectedLearners;
+			var orgName:String = snode.attributes.data.name;
+			resultDTO.staffGroupName = Dictionary.getValue('staff_group_name', [orgName]);
+			resultDTO.learnersGroupName = Dictionary.getValue('learners_group_name', [orgName]);
+			
+			trace('selected org ID is: ' + selectedOrgID);
+			
+		}else{
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg3_2'), null, null);
+		}
+		
+		return valid;
+	}
+	
+	private function showStep3():Void{
+		
+		setTitle(Dictionary.getValue('wizardTitle_4_lbl'));
+		setDescription(Dictionary.getValue('wizardDesc_4_lbl'));
+		
+		title_lbl.visible = true;
+		resourceTitle_txi.visible = true;
+		desc_lbl.visible = true;
+		resourceDesc_txa.visible = true;
+		
+		// check for NULL value
+		if(resourceDesc_txa.text == STRING_NULL){
+			resourceDesc_txa.text = "";
+		}
+		
+		writeSummery();
+		
+		summery_lbl.visible = true;
+		schedule_cb.visible = true;
+		learner_expp_cb.visible = true;
+		learner_expp_cb.selected = true;
+		
+		//start_btn.visible = true;
+		
+		if(schedule_cb.selected){
+			schedule_time.f_enableTimeSelect(true);
+			scheduleDate_dt.enabled = true;
+			setScheduleDateRange();
+			finish_btn.enabled = false;
+			start_btn.visible = false;
+			schedule_btn.visible = true;
+		} else {
+			schedule_time.f_enableTimeSelect(false);
+			scheduleDate_dt.enabled = false;
+			schedule_btn.visible = false;
+			start_btn.visible = true;
+			finish_btn.enabled = true;
+		}
+		date_lbl.visible = true;
+		time_lbl.visible = true;
+		schedule_time._visible = true;
+		scheduleDate_dt.visible = true;
+		next_btn.visible = false;
+		finish_btn.visible = true;
+	}
+	
+	private function setScheduleDateRange():Void{
+		
+		var mydate = new Date();
+		var year = mydate.getFullYear();
+		var month = mydate.getMonth();
+		var date = mydate.getDate();
+		Debugger.log('schedule date range starts from :'+date + "/" +month+ "/" +year,Debugger.CRITICAL,'setScheduleDateRange','org.lamsfoundation.lams.WizardView');
+		scheduleDate_dt.selectableRange = {rangeStart: new Date(year, month, date)};
+	}
+	
+	private function writeSummery():Void{
+		
+		if(summery_lbl_arr.length > 0) {
+			for(var i=0; i<summery_lbl_arr.length; i++) {
+				summery_lbl_arr[i].removeMovieClip();
+			}
+		}
+		
+		summery_lbl_arr = new Array();
+		var summery_lbl;
+		
+		// design label
+		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_design', this.getNextHighestDepth(), {_x:SUMMERY_X+panel._x, _y:SUMMERY_Y+panel._y, _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_design_lbl') + ' ' + resultDTO.resourceName}));
+		summery_lbl = this['wizardSummery_lbl_design'];
+		
+		// course label
+		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_course', this.getNextHighestDepth(), {_x:summery_lbl._x, _y:summery_lbl._y + summery_lbl._height + SUMMERY_OFFSET, _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_course_lbl') + ' ' + resultDTO.courseName}));
+		summery_lbl = this['wizardSummery_lbl_course'];
+		
+		// class label
+		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_class', this.getNextHighestDepth(), {_x:SUMMERY_X+panel._x, _y:summery_lbl._y + summery_lbl._height + SUMMERY_OFFSET , _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_class_lbl') + ' ' + resultDTO.className}));
+		summery_lbl = this['wizardSummery_lbl_class'];
+		
+		// staff label
+		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_staff', this.getNextHighestDepth(), {_x:SUMMERY_X+panel._x, _y:summery_lbl._y + summery_lbl._height + SUMMERY_OFFSET , _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_staff_lbl') + ' ' + String(resultDTO.selectedStaff.length) + '/' + staffList.length}));
+		summery_lbl = this['wizardSummery_lbl_staff'];
+		
+		// learners label
+		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_learners', this.getNextHighestDepth(), {_x:SUMMERY_X+panel._x, _y:summery_lbl._y + summery_lbl._height+ SUMMERY_OFFSET, _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_learners_lbl') + ' ' + String(resultDTO.selectedLearners.length) + '/' + learnerList.length}));
+
+	}
+	
+	private function clearStep3():Void{
+		if(summery_lbl_arr.length > 0) {
+			for(var i=0; i<summery_lbl_arr.length; i++) {
+				summery_lbl_arr[i].removeMovieClip();
+			}
+		}
+		
+		title_lbl.visible = false;
+		resourceTitle_txi.visible = false;
+		desc_lbl.visible = false;
+		resourceDesc_txa.visible = false;
+		date_lbl.visible = false;
+		time_lbl.visible = false;
+		summery_lbl.visible = false;
+		schedule_cb.visible = false;
+		learner_expp_cb.visible = false;
+		start_btn.visible = false;
+		schedule_btn.visible = false;
+		schedule_time._visible = false;
+		scheduleDate_dt.visible = false;
+		next_btn.visible = true;
+		finish_btn.visible= false;
+	}
+	
+	private function validateStep3(wm:WizardModel):Boolean{
+		
+		var valid:Boolean = true;
+		if(resourceTitle_txi.text == ""){
+			trace('title is empty must contain value');
+			valid = false;
+		} 
+		
+		if(valid){
+			if(resourceTitle_txi.text != ""){resultDTO.resourceTitle = resourceTitle_txi.text;}
+			resultDTO.resourceDescription = resourceDesc_txa.text;
+		} else {
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg2'), null, null);
+		}
+		
+		if(schedule_cb.selected && (scheduleDate_dt.selectedDate == null || scheduleDate_dt.selectedDate == undefined)){
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schstart'), null, null);
+			valid = false;
+		}else {
+			
+		}
+		
+		resultDTO.learnerExpPortfolio = learner_expp_cb.selected;
+		
+		return valid;
+	}
+	
+	private function showFinish():Void{
+		
+		setTitle(Dictionary.getValue('wizardTitle_x_lbl', [resultDTO.resourceTitle]));
+		setDescription("");
+		showConfirmMessage(resultDTO.mode);
+		next_btn.visible = false;
+		prev_btn.visible = false;
+		cancel_btn.visible = false;
+		finish_btn.visible = false;
+		close_btn.visible = true;
+	}
+	
+	private function clearFinish():Void{
+		
+	}
+	
+	private function conclusionStep(mode:Number, wm:WizardModel):Void{
+		switch(mode){
+			case FINISH_MODE : 
+				trace('step id (finish mode) ' + wm.stepID);
+				updateScreen(wm.stepID, wm.stepID+1);
+				break;
+			case START_MODE :
+				trace('start mode');
+				wm.getWizard().startLesson(false, wm.lessonID);
+				break;
+			case START_SCH_MODE :
+				trace('schedule start mode');
+				wm.getWizard().startLesson(true, wm.lessonID, wm.resultDTO.scheduleDateTime);
+				break;
+			default:
+				trace('unknown mode');
+		}
+	}
+	
+	public function disableButtons():Void{
+		next_btn.enabled = false;
+		prev_btn.enabled = false;
+		cancel_btn.enabled = false;
+		finish_btn.enabled = false;
+		start_btn.enabled = false;
+		schedule_btn.enabled = false;
+	}
+	
+	public function enableButtons():Void{
+		next_btn.enabled = true;
+		prev_btn.enabled = true;
+		cancel_btn.enabled = true;
+		finish_btn.enabled = true;
+		start_btn.enabled = true;
+	}
+	
+	/**
+	 * Dispatches an event - picked up by the canvas in authoring
+	 * sends paramter containing:
+	 * _resultDTO.selectedResourceID 
+	 * _resultDTO.targetWorkspaceFolderID
+	 * 	_resultDTO.resourceName 
+		_resultDTO.resourceDescription 
+	 * @usage   
+	 * @param   useResourceID //if its true then we will send the resorceID of teh item selected in the tree - usually this means we are overwriting something
+	 * @return  
+	 */
+	public function doWorkspaceDispatch(useResourceID:Boolean){
+		//ObjectUtils.printObject();
+		var snode = location_treeview.selectedNode;
+		
+		if(useResourceID){
+			//its an LD
+			resultDTO.selectedResourceID = Number(snode.attributes.data.resourceID);
+			resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.workspaceFolderID);
+			resultDTO.resourceName = snode.attributes.data.name;
+		}else{
+			//its a folder
+			resultDTO.selectedResourceID  = null;
+			resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.resourceID);
+			resultDTO.resourceName = snode.attributes.data.name;
+		}
+
+       dispatchEvent({type:'okClicked',target:this});
+		
+	}
+	
+	/*
+	* Clear Method to clear movies from scrollpane
+	* 
+	*/
+	public static function clearScp(array:Array):Array{
+		if(array != null){
+			for (var i=0; i <array.length; i++){
+				array[i].removeMovieClip();
+			}
+		}
+		array = new Array();
+		return array;
+	}
+	
+
+	/**
+	 * Load learners into scrollpane
+	 * @param   users Users to load
+	 */
+	
+	public function loadLearners(users:Array, _selected:Boolean):Void{
+		trace('loading Learners...');
+		_learnerList = WizardView.clearScp(_learnerList);
+		_learner_mc = learner_scp.content;
+		trace('list length: ' + users.length);
+		
+		for(var i=0; i<users.length; i++){
+			var user:User = User(users[i]);
+			
+			_learnerList[i] = this._learner_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._learner_mc.getNextHighestDepth());
+			_learnerList[i].fullName.text = user.getFullName();
+			_learnerList[i]._x = USERS_X;
+			_learnerList[i]._y = USER_OFFSET * i;
+			_learnerList[i].data = user.getDTO();
+			var listItem:MovieClip = MovieClip(_learnerList[i]);
+			
+			listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:_selected})
+			trace('new row: ' + _learnerList[i]);
+			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
+			
+		}
+		
+		learner_selAll_cb.selected = _selected;
+		
+		learner_scp.redraw(true);
+	}
+	
+	/**
+	* Load staff into scrollpane
+	* @param 	users Users to load
+	*/
+	public function loadStaff(users:Array, _selected:Boolean):Void{
+		trace('loading Staff....');
+		trace('list length: ' + users.length);
+		_staffList = WizardView.clearScp(_staffList);
+		_staff_mc = staff_scp.content;
+		
+		for(var i=0; i<users.length; i++){
+			var user:User = User(users[i]);
+			
+			_staffList[i] = this._staff_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._staff_mc.getNextHighestDepth());
+			_staffList[i].fullName.text = user.getFullName();
+			_staffList[i]._x = USERS_X;
+			_staffList[i]._y = USER_OFFSET * i;
+			_staffList[i].data = user.getDTO();
+			var listItem:MovieClip = MovieClip(_staffList[i]);
+			listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:_selected})
+			
+			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
+			
+		}
+		
+		
+		staff_selAll_cb.selected = _selected;
+		
+		staff_scp.redraw(true);
+	}
+	
+	public function getScheduleDateTime(date:Date, timeStr:String):Object{
+		var bs:String = "%2F";		// backslash char
+		var dayStr:String;
+		var monthStr:String;
+		var mydate = new Date();
+		var dtObj = new Object();
+		if(date==null){
+			return null;
+		}
+		
+		trace('output time: ' + timeStr);
+		var day = date.getDate();
+		dayStr=day.toString();
+		
+		var month = date.getMonth()+1;
+		monthStr = month.toString();
+		
+		var dateStr = dayStr + bs + monthStr + bs + date.getFullYear();
+		trace('selected date: ' + dateStr);
+		Debugger.log('schedule time to starts :'+timeStr,Debugger.CRITICAL,'getScheduleDateTime','org.lamsfoundation.lams.WizardView');
+		if (day == mydate.getDate() && month == mydate.getMonth()+1 && date.getFullYear() == mydate.getFullYear()){
+			dtObj.validTime = validateTime()
+		}else {
+			dtObj.validTime = true
+		}
+		dtObj.dateTime = dateStr + '+' + timeStr;
+		return dtObj;
+	}
+	
+	private function validateTime():Boolean{
+		var mydate = new Date();
+		var checkHours:Number;
+		var hours = mydate.getHours();
+		var minutes = mydate.getMinutes();
+		var selectedHours = Number(schedule_time.tHour.text);
+		var selectedMinutes = Number(schedule_time.tMinute.text);
+		if (schedule_time.tMeridian.selectedItem.data == "AM"){
+			checkHours = 0
+		}
+		if (schedule_time.tMeridian.selectedItem.data == "PM"){
+			if (Number (selectedHours) == 12){
+				checkHours = 0
+			}else {
+				checkHours = 12
+			}
+		}
+		if (hours > (Number(selectedHours+checkHours))){
+			return false;
+		}else if (hours == Number(selectedHours+checkHours)){
+			if (minutes > selectedMinutes){
+				return false;
+			}else {
+				return true;
+			}
+		}else {
+			return true;
+		}
+	}
+	/**
+    * Sets the size of the canvas on stage, called from update
+    */
+	private function setSize(wm:WizardModel):Void{
+        var s:Object = wm.getSize();
+		
+		header_pnl.setSize(s.w, header_pnl._height);
+		panel.setSize(s.w, s.h-header_pnl._height);
+		
+		// move buttons
+        next_btn.move(panel._width-xNextOffset,panel._height-yNextOffset);
+		prev_btn.move(panel._width-xPrevOffset,panel._height-yPrevOffset);
+		finish_btn.move(panel._width-xNextOffset,panel._height-yNextOffset);
+		close_btn.move(panel._width-xCancelOffset,panel._height-yCancelOffset);
+        cancel_btn.move(panel._width-xCancelOffset,panel._height-yCancelOffset);
+				
+		// move logo
+		logo._x = header_pnl._width-xLogoOffset;
+		
+		// calculate height change
+		var dHeight:Number = Stage.height - lastStageHeight;
+		
+		trace('last stage height' + lastStageHeight);
+		
+		lastStageHeight = Stage.height;
+		trace('new height change: ' + dHeight);
+			
+		org_treeview.setSize(org_treeview.width, Number(org_treeview.height + dHeight));
+		location_treeview.setSize(location_treeview.width, Number(location_treeview.height + dHeight));
+		
+		resourceDesc_txa.setSize(resourceDesc_txa.width, Number(resourceDesc_txa.height + dHeight));
+		
+		//staff_scp.setSize(staff_scp._width, staff_scp._height + dHeight);
+		learner_scp.setSize(learner_scp._width, learner_scp._height + dHeight);
+		
+		
+	}
+	
+	 /**
+    * Sets the position of the canvas on stage, called from update
+    * @param cm Canvas model object 
+    */
+	private function setPosition(wm:WizardModel):Void{
+        var p:Object = wm.getPosition();
+		trace("X pos set in Model is: "+p.x+" and Y pos set in Model is "+p.y)
+        this._x = p.x;
+        this._y = p.y;
+	}
+	
+	public function get workspaceView():WorkspaceView{
+		return _workspaceView;
+	}
+	
+	public function set workspaceView(a:WorkspaceView){
+		_workspaceView = a;
+	}
+	
+	public function get resultDTO():Object{
+		return _resultDTO;
+	}
+	
+	public function get learnerList():Array{
+		return _learnerList;
+	}
+	
+	public function get staffList():Array{
+		return _staffList;
+	}
+	
+	public function setTitle(title:String){
+		wizTitle_lbl.text = "<b>" + title + "</b>";
+	}
+	
+	public function setDescription(desc:String){
+		wizDesc_txt.text = desc;
+	}
+	
+	public function showConfirmMessage(mode:Number){
+		var msg:String = "";
+		var lessonName:String = "<b>" + resultDTO.resourceTitle +"</b>";
+		switch(mode){
+			case FINISH_MODE : 
+				msg = Dictionary.getValue('confirmMsg_3_txt', [lessonName]);
+				break;
+			case START_MODE :
+				msg = Dictionary.getValue('confirmMsg_1_txt', [lessonName]);
+				break;
+			case START_SCH_MODE :
+				msg = Dictionary.getValue('confirmMsg_2_txt', [lessonName, unescape(resultDTO.scheduleDateTime)]);
+				break;
+			default:
+				trace('unknown mode');
+		}
+		confirmMsg_txt.html = true;
+		confirmMsg_txt.htmlText = msg;
+		confirmMsg_txt._width = confirmMsg_txt.textWidth + 5;
+		confirmMsg_txt._x = panel._x + (panel._width/2) - (confirmMsg_txt._width/2);
+		confirmMsg_txt._y = panel._y + (panel._height/4);
+		
+		confirmMsg_txt.visible = true;
+		
+	}
+	
+	private function toogleStaffSelection(evt:Object) {
+		Debugger.log("Toogle Staff Selection", Debugger.GEN, "toogleStaffSelection", "WizardView");
+		var target:CheckBox = CheckBox(evt.target);
+		var wm:WizardModel = WizardModel(getModel());
+		loadStaff(wm.organisation.getMonitors(), target.selected);
+	}
+	
+	private function toogleExpPortfolio(evt:Object) {
+		Debugger.log("Toogle Staff Selection", Debugger.GEN, "toogleStaffSelection", "WizardView");
+		var target:CheckBox = CheckBox(evt.target);
+		//var wm:WizardModel = WizardModel(getModel());
+		resultDTO.learnerExpPortfolio = target.selected;
+	}
+	
+	private function toogleLearnerSelection(evt:Object) {
+		Debugger.log("Toogle Staff Selection", Debugger.GEN, "toogleStaffSelection", "WizardView");
+		var target:CheckBox = CheckBox(evt.target);
+		var wm:WizardModel = WizardModel(getModel());
+		
+		loadLearners(wm.organisation.getLearners(), target.selected);
+	}
+	
+	/**
+	 * Overrides method in abstract view to ensure cortect type of controller is returned
+	 * @usage   
+	 * @return  CanvasController
+	 */
+	public function getController():WizardController{
+		var c:Controller = super.getController();
+		return WizardController(c);
+	}
+	
+	 /*
+    * Returns the default controller for this view.
+    */
+    public function defaultController (model:Observable):Controller {
+        return new WizardController(model);
+    }
+
+	
+}
