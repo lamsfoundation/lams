@@ -154,6 +154,10 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
     * layout visual elements on the canvas on initialisation
     */
 	private function draw(){
+		
+		// hide for the moment
+		this._visible = false;
+		
 		//get the content path for the sp
 		_canvas_branch_mc = canvas_scp.content;
 		
