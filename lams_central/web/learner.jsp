@@ -7,12 +7,11 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 
 <lams:html>
-<HEAD>
+<lams:head>
 	<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/main.jsp?lessonID=<c:out value="${lessonID}"/><c:if test="${mode != null}">&mode=<c:out value="${mode}"/></c:if>">
-	<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<TITLE><fmt:message key="title.learner.window"/></TITLE>
 	<lams:css/>
-</HEAD>
+</lams:head>
 
 <body class="stripes">
 	

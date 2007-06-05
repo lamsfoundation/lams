@@ -258,3 +258,8 @@
         <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
+	<tag-file>
+		<name>head</name>
+	    <path>/WEB-INF/tags/Head.tag</path>
+	</tag-file>  
+  

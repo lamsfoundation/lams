@@ -31,12 +31,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
             "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html xhtml="true">
 
-	<head>
+	<lams:head>
 		<title><c:out value="${GateForm.map.gate.title}"/></title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<lams:css/>
 		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>/gate.do?method=knockGate&activityID=${GateForm.map.activityID}&lessonID=${GateForm.map.lessonID }">
-	  </head>
+	  </lams:head>
 
 	<body class="stripes">
 		

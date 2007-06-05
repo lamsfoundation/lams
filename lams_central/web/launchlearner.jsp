@@ -8,12 +8,12 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 
 <lams:html>
-<head>
+<lams:head>
 	<title><fmt:message key="index.welcome" /></title>
 	<lams:css style="tabbed"/>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
-</head>
+</lams:head>
 
 <body class="stripes">
 	<div id="page">

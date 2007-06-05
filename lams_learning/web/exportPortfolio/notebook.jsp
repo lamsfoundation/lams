@@ -30,8 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
             "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
 
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<lams:head>
 	<fmt:setBundle basename = "org.lamsfoundation.lams.learning.ApplicationResources" />
 	<c:set var="pageTitle">
 		<fmt:message key="export.portfolio.notebook.title">
@@ -42,7 +41,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	    
 	<lams:css localLinkPath="../"/>
 
-</head>
+</lams:head>
 
 <body class="stripes">
 

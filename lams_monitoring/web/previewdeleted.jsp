@@ -28,11 +28,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <lams:html xhtml="true">
 
-	<head>
-      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<lams:head>
 		<lams:css style="core"/>
 		<title></title>
-	</head>
+	</lams:head>
 
 <body class="stripes">
 <H1><fmt:message key="preview.deleted.title"/></H1>

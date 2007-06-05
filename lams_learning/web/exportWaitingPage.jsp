@@ -28,26 +28,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 
-<%
-String protocol = request.getProtocol();
-if(protocol.startsWith("HTTPS")){
-	protocol = "https://";
-}else{
-	protocol = "http://";
-}
-String learning_root = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
-String exportUrl = learning_root + "portfolioExport?" + request.getQueryString();
-String downloadServlet = learning_root + "exportDownload?fileLocation=";
-
-%>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
             "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
-  <head>
+
+   <lams:head>
     <title><fmt:message key='export.portfolio.window.title'/></title>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
+
     <script type ="text/javascript">
     	var READY_STATE_UNINITIALIZED=0;
 		var READY_STATE_LOADING=1;
@@ -106,7 +94,7 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 				switch (req.status)
 				{
 					case 200: // status 200 OK
-						var url = "<%=downloadServlet%>"+req.responseText;
+						var url = "<lams:WebAppURL/>exportDownload?fileLocation="+req.responseText;
 
 						downloadStarted = new Boolean(true);
 						msg = "<p><fmt:message key='export.portfolio.generation.complete.message'/></p>\n"
@@ -133,7 +121,7 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 		}
 		
 		window.onload=function(){
-			sendRequest("<%=exportUrl%>");
+			sendRequest("<lams:WebAppURL/>portfolioExport?<c:out value="${pageContext.request.queryString}" escapeXml="false"/>");
 		}  
 	</script>
       <!--
@@ -141,7 +129,7 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
     -->
    
 
-  </head>
+  </lams:head>
   
   <body class="stripes">
 

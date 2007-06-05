@@ -29,8 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
             "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
-    <head>
-       <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <lams:head>
        
 		<%-- if localFiles == true then wanted for export portfolio and must run offline --%>
 		<c:choose>
@@ -44,9 +43,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
        
        
 	  <fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
-      <meta http-equiv="pragma" content="no-cache">
-      <meta http-equiv="cache-control" content="no-cache">
-    </head>
+    </lams:head>
     
     <body class="stripes">
 		<tiles:insert attribute="content" />

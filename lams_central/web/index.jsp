@@ -6,12 +6,11 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
 <lams:html>
-<head>
+<lams:head>
 	<meta HTTP-EQUIV="Refresh" CONTENT="0;URL=index.do?state=active">
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title><fmt:message key="index.welcome" /></title>
 	<lams:css/>
-</head>
+</lams:head>
 
 <body class="stripes">
 	

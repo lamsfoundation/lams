@@ -4,26 +4,16 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
-<%@ page import="org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO" %>
-<lams:html>
-<HEAD>
-<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<%
-String protocol = request.getProtocol();
-if(protocol.startsWith("HTTPS")){
-	protocol = "https://";
-}else{
-	protocol = "http://";
-}
-String pathToRoot = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
-String pathToShare = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
 
+<%
 String authoringClientVersion = Configuration.get(ConfigurationKeys.AUTHORING_CLIENT_VERSION);
-String serverLanguage = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 String languageDate = Configuration.get(ConfigurationKeys.DICTIONARY_DATE_CREATED);
 String actColour = Configuration.get(ConfigurationKeys.AUTHORING_ACTS_COLOUR);
 String version = Configuration.get(ConfigurationKeys.VERSION);
 %>
+
+<lams:html>
+<lams:head>
 <script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 <script src="<lams:LAMSURL/>includes/javascript/getSysInfo.js" type="text/javascript"></script>
 <script language="JavaScript" type="text/JavaScript">
@@ -33,8 +23,6 @@ String version = Configuration.get(ConfigurationKeys.VERSION);
 var ns = (document.layers)? true: false
 var ie = (document.all)? true: false
 var b = (ns)? "Netscape": (ie) ?"Explorer" : " Sorry, LAMS does not support your browser.  Please contact technical.support@lamsinternational.com "
-var platformDetected = "<%=session.getAttribute("lamsPlatformDetected")%>";
-var mac = platformDetected.indexOf('mac') != -1;
 
 //flag to show if the content (LD) in the flash UI has changed.
 var saved = true;
@@ -148,24 +136,17 @@ function openPopUpFS(args){
 }
 
 function openPreview( lessonId )
-		{
-			if(mac)
-			{
-				previewWin = window.open('home.do?method=learner&mode=preview&lessonID='+lessonId,'pWindow','width=796,height=570,resizable,status=yes');
-			}
-			else
-			{
-				if(previewWin && !previewWin.closed )
-				{
-					previewWin.location = 'home.do?method=learner&mode=preview&lessonID='+lessonId;		
-					previewWin.focus();
-				}
-				else
-				{
-					previewWin = window.open('home.do?method=learner&mode=preview&lessonID='+lessonId,'pWindow','width=796,height=570,resizable,status=yes');
-				}
-			}
-		}
+{
+	if(previewWin && !previewWin.closed )
+	{
+		previewWin.location = 'home.do?method=learner&mode=preview&lessonID='+lessonId;		
+		previewWin.focus();
+	}
+	else
+	{
+		previewWin = window.open('home.do?method=learner&mode=preview&lessonID='+lessonId,'pWindow','width=796,height=570,resizable,status=yes');
+	}
+}
 
 function openURL(args){
 	window.open(args);
@@ -205,15 +186,6 @@ function closeWindow(){
 	}
 }
 
-function getHostURL(){
-	//		http:					uklams.net:8080
-	var p = location.protocol+'//'+location.host;
-	//alert('pathname:'+location.pathname);
-	//debug:
-	//alert('getPathToRoot:'+p);
-	return p;
-}
-
 function setSaved(args){
 		//convert the strings returned from flash to proper boolean values
 		if(args=="true"){
@@ -249,10 +221,10 @@ else { window.onbeforeunload = myOnBeforeUnload; }
 </script>
 
 <TITLE><fmt:message key="title.author.window"/></TITLE>
-</HEAD>
+</lams:head>
 <body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
-<c:set var="authorurl_params">?loadFile=lams_authoring.swf&loadLibrary=lams_authoring_library.swf&userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&version=<%=version%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&actColour=<%= actColour %><c:if test="${not empty requestSrc}">&requestSrc=${requestSrc}</c:if><c:if test="${not empty learningDesignID}">&learningDesignID=${learningDesignID}</c:if><c:if test="${not empty layout}">&layout=${layout}</c:if>&uniqueID=<lams:generateID/></c:set>
+<c:set var="authorurl_params">?loadFile=lams_authoring.swf&loadLibrary=lams_authoring_library.swf&userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=authoringClientVersion%>&version=<%=version%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&actColour=<%= actColour %><c:if test="${not empty requestSrc}">&requestSrc=${requestSrc}</c:if><c:if test="${not empty learningDesignID}">&learningDesignID=${learningDesignID}</c:if><c:if test="${not empty layout}">&layout=${layout}</c:if>&uniqueID=<lams:generateID/></c:set>
 <c:set var="authorurl_nojs">lams_preloader.swf<c:out value="${authorurl_params}"/></c:set>
 <c:set var="authorurl_js">lams_preloader<c:out value="${authorurl_params}"/></c:set>
 

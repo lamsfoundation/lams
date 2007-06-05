@@ -5,8 +5,7 @@
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+	<lams:head>
 		<title><fmt:message key="title.import" /></title>
 		<!-- ********************  CSS ********************** -->
 		<lams:css />
@@ -15,7 +14,7 @@
 				window.close();
 			}
 		</script>
-	</head>
+	</lams:head>
 
 	<body class="stripes">
 

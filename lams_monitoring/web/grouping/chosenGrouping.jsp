@@ -28,14 +28,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
-    <head>
-       <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <lams:head>
        <html:base/>
 	   <lams:css/>
       <title><c:out value="${title}"/></title>
-      <meta http-equiv="pragma" content="no-cache">
-      <meta http-equiv="cache-control" content="no-cache">
-
 	<c:if test="${empty maxNumberOfGroups}">
 		<c:set var="maxNumberOfGroups" value="99"/>
 	</c:if>
@@ -406,7 +402,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	  <NOSCRIPT><!--This browser doesn't supports scripting--></NOSCRIPT>
 	
-</head>
+</lams:head>
 
 <body class="stripes" onLoad="init()">
 

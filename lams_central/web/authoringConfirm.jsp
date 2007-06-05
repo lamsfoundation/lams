@@ -8,8 +8,7 @@
 		"http://www.w3.org/TR/html4/loose.dtd">
 
 <lams:html>
-<head>
-	<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<lams:head>
 	<lams:css />
 	<script type="text/javascript">
 			  function closeWindow() {
@@ -21,7 +20,7 @@
 		    	window.close();
    	          }  				
 		</script>
-</head>
+</lams:head>
 <body class="stripes">
 
 	<div id="content" align="center">

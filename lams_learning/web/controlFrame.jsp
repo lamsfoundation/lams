@@ -28,8 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <html:html locale="true" xhtml="true">
 
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<lams:head>
 		<lams:css/>
 		<title><fmt:message key="learner.title"/></title>
 		<c:set var="randomID">
@@ -97,7 +96,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			}
 		//-->
 		</script>
-	</head>
+	</lams:head>
 	<body class="stripes" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 	
 	<% 

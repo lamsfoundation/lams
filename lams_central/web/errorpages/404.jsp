@@ -11,12 +11,10 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 
 <lams:html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+	<lams:head>
 		<title><fmt:message key="404.title" /></title>
-
 		<lams:css />
-	</head>
+	</lams:head>
 
 	<body class="stripes">
 

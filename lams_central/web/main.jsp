@@ -13,7 +13,7 @@
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <lams:html>
-<head>
+<lams:head>
 	<c:choose>
 	<c:when test="${page_direction == 'RTL'}">
 		<title><fmt:message key="index.welcome" /> :: <fmt:message key="title.lams"/></title>
@@ -23,10 +23,6 @@
 	</c:otherwise>
 	</c:choose>
 	
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta http-equiv="pragma" content="no-cache">
-	<meta http-equiv="cache-control" content="no-cache">
-	<meta http-equiv="Expires" content="-1">
 	<lams:css style="tabbed" />
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
@@ -39,7 +35,7 @@
 			}
 		//->
 	</script>
-</head>
+</lams:head>
 <body class="my-courses">
 <div id="page-mycourses">
 	<div id="header-my-courses">

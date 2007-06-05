@@ -30,13 +30,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <lams:html xhtml="true">
 
-	<head>
+	<lams:head>
 		<title><fmt:message key="${label.view.groups.title}"/></title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<lams:css/>
 		<META HTTP-EQUIV="Refresh" CONTENT="300;URL=<lams:WebAppURL/>/grouping.do?method=performGrouping&activityID=${activity.activityId}">
 		<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
-	  </head>
+	  </lams:head>
 
 	<body class="stripes">
 	      <tiles:insert attribute="body" />

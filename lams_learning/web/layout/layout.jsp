@@ -37,9 +37,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<tiles:useAttribute name="includeBodyTag" ignore="true" />
 
 	
-	<head>
+	<lams:head>
 		<title><fmt:message key="${pageTitleKey}"/></title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		
 		<%-- if localFiles == true then wanted for export portfolio and must run offline --%>
 		<c:choose>
@@ -53,7 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 		</c:otherwise>
 		</c:choose>
-	  </head>
+	  </lams:head>
 
 	<c:choose>
 			<c:when test="${includeBodyTag}">

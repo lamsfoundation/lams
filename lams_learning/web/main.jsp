@@ -28,8 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <lams:html>
 	
-	<head>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<lams:head>
 		<lams:css/>
 		<title><fmt:message key="learner.title"/></title>
 		<script language="JavaScript" type="text/JavaScript">
@@ -39,7 +38,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			}
 		//-->
 		</script>
-	</head>
+	</lams:head>
 
 	<c:choose>
 		<c:when test="${page_direction == 'RTL'}">

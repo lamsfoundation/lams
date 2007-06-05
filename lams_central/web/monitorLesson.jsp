@@ -7,12 +7,11 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 
 <lams:html>
-<HEAD>
+<lams:head>
 	<META HTTP-EQUIV="Refresh" CONTENT="0;URL=monitoring/monitorLesson.jsp?lessonID=<c:out value="${lessonID}"/>"/>
-	<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<TITLE><fmt:message key="title.monitor.lesson.window"/></TITLE>
 	<lams:css/>
-</HEAD>
+</lams:head>
 
 <body class="stripes">
 	

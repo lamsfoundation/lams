@@ -6,12 +6,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
-<head>
-
-<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<lams:head>
 <title>Send WDDX Packet To Server</title>
 <lams:css/>
-</head>
+</lams:head>
 
 <body class="stripes">
 
