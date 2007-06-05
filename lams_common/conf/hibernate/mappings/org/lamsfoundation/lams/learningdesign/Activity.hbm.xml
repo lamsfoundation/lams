@@ -263,6 +263,9 @@
 			<subclass name="org.lamsfoundation.lams.learningdesign.ParallelActivity" discriminator-value="6">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 			</subclass>
+			<subclass name="org.lamsfoundation.lams.learningdesign.BranchingActivity" discriminator-value="10">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+			</subclass>
 	</subclass>
 
 </class>

@@ -70,6 +70,7 @@ public abstract class Activity implements Serializable,Nullable {
 	public static final int OPTIONS_ACTIVITY_TYPE = 7;
 	public static final int SEQUENCE_ACTIVITY_TYPE = 8;
 	public static final int SYSTEM_GATE_ACTIVITY_TYPE = 9;
+	public static final int BRANCHING_ACTIVITY_TYPE = 10;
 	/******************************************************************/
 	
 	/**
@@ -327,6 +328,10 @@ public abstract class Activity implements Serializable,Nullable {
 				break;
 			case SYSTEM_GATE_ACTIVITY_TYPE:
 				activity = new SystemGateActivity();
+				activity.setActivityCategoryID(CATEGORY_SYSTEM);
+				break;
+			case BRANCHING_ACTIVITY_TYPE:
+				activity = new BranchingActivity();
 				activity.setActivityCategoryID(CATEGORY_SYSTEM);
 				break;
 			default:
@@ -793,7 +798,8 @@ public abstract class Activity implements Serializable,Nullable {
 	{
 		return getActivityTypeId().intValue()== SEQUENCE_ACTIVITY_TYPE || 
 			   getActivityTypeId().intValue()== PARALLEL_ACTIVITY_TYPE ||
-			   getActivityTypeId().intValue()== OPTIONS_ACTIVITY_TYPE;
+			   getActivityTypeId().intValue()== OPTIONS_ACTIVITY_TYPE ||
+			   getActivityTypeId().intValue()== BRANCHING_ACTIVITY_TYPE;
 	}
 	
 	public boolean isSystemToolActivity()
@@ -845,9 +851,23 @@ public abstract class Activity implements Serializable,Nullable {
 	    return getActivityTypeId().intValue() == SYSTEM_GATE_ACTIVITY_TYPE;
 	}
 	
+	/**
+	 * /**
+	 * Check up whether an activity is grouping activity or not.
+	 * @return is this activity a grouping activity
+	 */
 	public boolean isGroupingActivity()
 	{
 		return getActivityTypeId().intValue()== GROUPING_ACTIVITY_TYPE;
+	}
+	
+	/**
+	 * Check up whether an activity is branching activity or not.
+	 * @return is this activity a branching activity
+	 */
+	public boolean isBranchingActivity()
+	{
+		return getActivityTypeId().intValue()== BRANCHING_ACTIVITY_TYPE;
 	}
 
 	public boolean isActivityReadOnly()

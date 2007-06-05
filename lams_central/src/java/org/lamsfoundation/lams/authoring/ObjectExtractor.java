@@ -36,6 +36,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -803,6 +804,8 @@ public class ObjectExtractor implements IObjectExtractor {
 			 buildToolActivity((ToolActivity)activity,activityDetails);
 		else if(activity.isGateActivity())
 			 buildGateActivity(activity,activityDetails);
+		else if(activity.isBranchingActivity())
+			 buildBranchingActivity((BranchingActivity)activity,activityDetails);
 		else 			
 			 buildComplexActivity((ComplexActivity)activity,activityDetails);		
 	}
@@ -818,6 +821,20 @@ public class ObjectExtractor implements IObjectExtractor {
 			buildSequenceActivity((SequenceActivity)activity,activityDetails);
 		
 	}
+	private void buildBranchingActivity(BranchingActivity branchingActivity,Hashtable activityDetails) 
+		throws WDDXProcessorConversionException, ObjectExtractorException {
+		/**
+		 * read the createBranchingUUID, get the Branching Object, and set CreateBranching to that object
+		 */
+	    //Integer createBranchingUIID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.CREATE_BRANCHINGS_UIID);	    
+	    
+	    // Get Branching object
+	    
+		// doesn't extend SystemToolActivity class??
+		//SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.BRANCHING);
+		//branchingActivity.setSystemTool(systemTool);
+		
+	}	
 	private void buildGroupingActivity(GroupingActivity groupingActivity,Hashtable activityDetails) 
 		throws WDDXProcessorConversionException, ObjectExtractorException {
 		/**
@@ -843,8 +860,7 @@ public class ObjectExtractor implements IObjectExtractor {
 			groupingActivity.setCreateGrouping(null);
 			groupingActivity.setCreateGroupingUIID(null);
 		} */
-	}	
-
+	}
 	private void buildOptionsActivity(OptionsActivity optionsActivity,Hashtable activityDetails) throws WDDXProcessorConversionException{
 		if (keyExists(activityDetails, WDDXTAGS.MAX_OPTIONS))
 		    optionsActivity.setMaxNumberOfOptions(WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.MAX_OPTIONS));

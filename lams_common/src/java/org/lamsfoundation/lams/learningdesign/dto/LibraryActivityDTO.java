@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learningdesign.dto;
 import java.util.Date;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
@@ -143,8 +144,11 @@ public class LibraryActivityDTO extends BaseDTO
 			addOptionsActivityAttributes((OptionsActivity)activity);
 		else if (activity.isParallelActivity())
 			addParallelActivityAttributes((ParallelActivity)activity);
+		else if (activity.isBranchingActivity())
+			addBranchingActivityAttributes((BranchingActivity)activity);
 		else
 			addSequenceActivityAttributes((SequenceActivity)activity);
+		
 		
 	}
 	private void addGroupingActivityAttributes(GroupingActivity groupingActivity){
@@ -160,6 +164,9 @@ public class LibraryActivityDTO extends BaseDTO
 		this.optionsInstructions = optionsActivity.getOptionsInstructions();	 
 	}
 	private void addParallelActivityAttributes(ParallelActivity activity){	
+	    
+	}
+	private void addBranchingActivityAttributes(BranchingActivity activity){	
 	    
 	}
 	private void addSequenceActivityAttributes(SequenceActivity activity){

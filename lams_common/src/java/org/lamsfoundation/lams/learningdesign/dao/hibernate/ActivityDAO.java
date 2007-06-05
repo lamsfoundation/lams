@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SystemGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -99,6 +100,8 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 							return getActivityByActivityId(activityId,SequenceActivity.class);
 					case Activity.SYSTEM_GATE_ACTIVITY_TYPE: 
 						return getActivityByActivityId(activityId,SystemGateActivity.class);
+					case Activity.BRANCHING_ACTIVITY_TYPE: 
+							return getActivityByActivityId(activityId,BranchingActivity.class);
 					default: break; 
 				}
 			}
