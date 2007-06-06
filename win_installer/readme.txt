@@ -1,7 +1,7 @@
-LAMS 2.0.2 - Learning Activity Management System
+LAMS 2.0.3 - Learning Activity Management System
 ----------------------------------------------
 
-This is a pre-packaged copy of LAMS 2.0.2 for Windows 2000, XP, or 2003.
+This is a pre-packaged copy of LAMS 2.0.3 for Windows 2000, XP, or 2003.
 For the source code, please see the 'Building LAMS' wiki at 
 
 	http://wiki.lamsfoundation.org/display/lams/Building+LAMS 
@@ -20,6 +20,7 @@ LAMS' short cut in the LAMSv2 Start Menu folder.
 
 To stop LAMS 2, use the 'Stop LAMS' shortcut in the LAMSv2 Start Menu 
 folder.
+
 
 2. Server Configuration
 =======================
@@ -42,9 +43,9 @@ a couple of users.  e.g.
 For Sun JDK versions before 1.5.0_07, the default is 64m.  If your Sun JDK 
 version is 1.5.0_07 or later, the default is 256m.  
 
+
 3. Web Resources
 ================
-	
 Windows Installer Help wiki (includes download links)
 
 	http://wiki.lamsfoundation.org/display/lamsdocs/Windows+Installer+Help

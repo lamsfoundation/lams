@@ -7,7 +7,7 @@
 	<target name="insertLocale-db">
 		<sql driver="com.mysql.jdbc.Driver" 
 			classpath="${EARDIR}/mysql-connector-java-3.1.12-bin.jar" 
-			url="jdbc:mysql://localhost/${DB_NAME}?characterEncoding=UTF-8" 
+			url="jdbc:mysql://${MYSQL_HOST}/${DB_NAME}?characterEncoding=UTF-8" 
 			userid="${DB_USER}" 
 			password="${DB_PASS}"
 			encoding="utf8"

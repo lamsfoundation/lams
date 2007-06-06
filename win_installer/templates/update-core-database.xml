@@ -8,16 +8,16 @@
 	<target name="update-core-database"  description="Runs some update scripts found in lams_common\db\sql\updatscripts" >
 		<sql driver="com.mysql.jdbc.Driver" 
 			classpath="${jboss.deploy}/mysql-connector-java-3.1.12-bin.jar" 
-			url="jdbc:mysql://localhost/${db.name}?characterEncoding=UTF-8" 
+			url="${db.url}" 
 			userid="${db.username}" 
 			password="${db.password}"
 			encoding="utf8"
 			onerror="continue">
-			<transaction src="${temp}/lams/sql/alter_201_locale_id.sql" />
-			<transaction src="${temp}/lams/sql/alter_201_system_tool_user_workspace.sql" />
-			<transaction src="${temp}/lams/sql/alter_201_theme.sql" />
-			<transaction src="${temp}/lams/sql/alter_201_tool.sql" />
-			<transaction src="${temp}/lams/sql/alter_201_ext.sql" />
+			<transaction src="${temp}/lams/sql/updateConfiguration.sql" />
+			<transaction src="${temp}/lams/sql/alter_203_editonfly.sql" />
+			<transaction src="${temp}/lams/sql/alter_203_learner_progress.sql" />
+			<transaction src="${temp}/lams/sql/alter_203_rams_theme.sql" />
+			<transaction src="${temp}/lams/sql/alter_203_transition.sql" />
 		</sql>
 	</target>
 </project>

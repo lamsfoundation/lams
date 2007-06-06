@@ -18,7 +18,7 @@
 	</target>
 	
 	<target name="compile-java" depends="mk-build-dir" description="Compile custom java class">
-		<javac srcdir="src" destdir="build" />
+		<javac srcdir="src" classpath="../lams_build/lib/hibernate/hibernate3.jar" destdir="build" />
 	</target>
 	
 </project>

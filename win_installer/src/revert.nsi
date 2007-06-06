@@ -31,14 +31,14 @@
 !define MUI_ICON "..\graphics\lams2.ico"
 
 # Installer attributes
-Name "LAMS Revert Utility"
-BrandingText "LAMS Revert Utility"
-OutFile "..\build\revert-lams.exe"
+Name "LAMS Restore Utility"
+BrandingText "LAMS Restore Utility"
+OutFile "..\build\lams-restore.exe"
 InstallDir "C:\lams"
 Icon ..\graphics\lams2.ico
 InstallDirRegKey HKLM "${REG_HEAD}" ""
 VIProductVersion 2.0.0.0
-VIAddVersionKey ProductName "LAMS Revert Utility"
+VIAddVersionKey ProductName "LAMS Restore Utility"
 VIAddVersionKey ProductVersion "1.0"
 VIAddVersionKey CompanyName "LAMS International"
 VIAddVersionKey CompanyWebsite "lamscommunity.org"
@@ -46,7 +46,7 @@ VIAddVersionKey FileVersion ""
 VIAddVersionKey FileDescription ""
 VIAddVersionKey LegalCopyright ""
 
-!define MUI_FINISHPAGE_TEXT "LAMS has been successfully reverted up on your computer" 
+!define MUI_FINISHPAGE_TEXT "LAMS has been successfully Restored on your computer" 
 
 # set warning when cancelling install
 !define MUI_ABORTWARNING
@@ -79,7 +79,7 @@ Section Revert
     
     call revertFiles
     
-    detailprint "Reverting back to old database"
+    detailprint "Restoring back to old database"
     call revertDatabase
     
     detailprint "Updating registry with current values"
@@ -87,13 +87,19 @@ Section Revert
 SectionEnd
 
 Function .onInit
+    SetOutPath $TEMP
+    File "..\build\LocalPortScanner.class"
+    ReadRegStr $0 HKLM "${REG_HEAD}" "lams_port"
+    ReadRegStr $1 HKLM "${REG_HEAD}" "dir_jdk"
+    Goto checklams
+    
     checklams:
         nsExec::ExecToStack "$1\bin\java LocalPortScanner $0"
         Pop $2
         ${If} $2 == 2
-            MessageBox MB_YESNOCANCEL|MB_ICONQUESTION "LAMS appears to be running. Do you wish to continue with lams running? $\r$\n$\r$\nClick yes to continue or no to stop lams (will take a few seconds)" \
-                IDNO stoplams \
-                IDCANCEL quitrevert
+            MessageBox MB_YESNO|MB_ICONQUESTION "LAMS appears to be running. LAMS must be stopped before the restore can take place (will take a few seconds).$\r$\n$\r$\nDo you wish to continue? Click Yes to shutdown LAMS and restore, or click No to cancel the restore." \
+                IDYES stoplams \
+                IDNO quitrevert
         ${EndIf}
         goto continue
     stoplams:
@@ -127,7 +133,7 @@ FunctionEnd
 
 Function PreRevertDir
     !insertmacro MUI_INSTALLOPTIONS_WRITE "revert-dir.ini" "Field 1" "State" "$BACKUP_DIR"
-    !insertmacro MUI_HEADER_TEXT "Revert to Earlier LAMS Installation" "Enter the directory LAMS was backed up to and the reverter will do the rest"
+    !insertmacro MUI_HEADER_TEXT "Revert to Earlier LAMS Installation" "Enter the directory LAMS was backed up to and the Restorer will do the rest"
     !insertmacro MUI_INSTALLOPTIONS_DISPLAY "revert-dir.ini"
 FunctionEnd
 
@@ -185,13 +191,13 @@ Function readRegister
 FunctionEnd
 
 Function revertfiles
-    rmdir "$INSTDIR\jboss-4.0.2"
-    rmdir "$REPOSITORY_DIR"
-    rmdir "$INSTDIR\dump"
+    rmdir /r "$INSTDIR\jboss-4.0.2"
+    rmdir /r "$REPOSITORY_DIR"
+    rmdir /r "$INSTDIR\dump"
     detailprint "Copying files back to $INSTDIR"
     createdirectory $REPOSITORY_DIR
     
-    DetailPrint "Reverting LAMS files. This may take a few minutes"
+    DetailPrint "Restoring LAMS files. This may take a few minutes"
     SetDetailsPrint listonly
     copyfiles /SILENT "$BACKUP_DIR\repository\*" $REPOSITORY_DIR
     copyfiles /SILENT "$BACKUP_DIR\*" "$INSTDIR"
@@ -286,13 +292,13 @@ Function revertDatabase
 
     
 
-    strcpy $5 "$TEMP\apache-ant-1.6.5\bin\ant.bat -buildfile $TEMP\revert.xml -logfile $INSTDIR\revert.log revert-db"
+    strcpy $5 "$TEMP\apache-ant-1.6.5\bin\ant.bat -buildfile $TEMP\revert.xml -logfile $INSTDIR\restore.log revert-db"
     detailprint $5
     nsExec::ExecToStack $5
     Pop $3
     Pop $4
     ${If} $3 == 1
-        detailprint "Problem reverting database"
+        detailprint "Problem Restoring database"
         goto error
     ${EndIf}
     

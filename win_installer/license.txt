@@ -1,4 +1,4 @@
-LAMS 2.0.2 is released under the GPL license detailed below.  This package
+LAMS 2.0.3 is released under the GPL license detailed below.  This package
 also includes other libraries/packages, whose respective licenses are
 detailed below.
 

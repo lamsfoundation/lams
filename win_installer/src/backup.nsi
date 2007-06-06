@@ -64,6 +64,7 @@ Page custom PreFinish PostFinish
 
 
 # variables
+Var CURR_VERSION
 Var DB_NAME
 Var DB_USER
 Var DB_PASS
@@ -81,7 +82,7 @@ Section backup
     setoutpath $BACKUP_DIR
     file "..\backup.txt"
     clearerrors
-    DetailPrint "Backing up lams at: $BACKUP_DIR. This may take a few minutes"
+    DetailPrint "Backing up LAMS at: $BACKUP_DIR. This may take a few minutes"
     SetDetailsPrint listonly
     createdirectory $BACKUP_DIR
     copyfiles /SILENT "$INSTDIR\*" $BACKUP_DIR
@@ -129,7 +130,7 @@ Function .onInit
         nsExec::ExecToStack "$1\bin\java LocalPortScanner $0"
         Pop $2
         ${If} $2 == 2
-            MessageBox MB_YESNOCANCEL|MB_ICONQUESTION "LAMS appears to be running. Do you wish to continue with lams running? $\r$\n$\r$\nClick yes to continue or no to stop lams (will take a few seconds)" \
+            MessageBox MB_YESNOCANCEL|MB_ICONQUESTION "LAMS appears to be running. Do you wish to continue with LAMS running? $\r$\n$\r$\nClick yes to continue or no to stop LAMS (will take a few seconds)" \
                 IDNO stoplams \
                 IDCANCEL quitbackup
         ${EndIf}
@@ -164,6 +165,7 @@ Function .onInit
         Abort
     ${endif}
     
+    ReadRegStr $CURR_VERSION HKLM "${REG_HEAD}" "version"
     ReadRegStr $DB_NAME HKLM "${REG_HEAD}" "db_name"
     ReadRegStr $DB_USER HKLM "${REG_HEAD}" "db_user"
     ReadRegStr $DB_PASS HKLM "${REG_HEAD}" "db_pass"
@@ -200,7 +202,7 @@ Function .onInit
     ${endif}
     
     
-    strcpy $BACKUP_DIR "$INSTDIR-$2$1$0$4$5.bak"
+    strcpy $BACKUP_DIR "$INSTDIR-$CURR_VERSION-$2$1$0$4$5.bak"
    
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "backup.ini"
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "backup-finish.ini"

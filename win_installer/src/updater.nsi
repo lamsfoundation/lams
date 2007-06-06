@@ -50,11 +50,11 @@
 !insertmacro LineFind
 
 # constants
-!define VERSION "2.0.2"
-!define PREVIOUS_VERSION "2.0.1"
-!define LANGUAGE_PACK_VERSION "2007-03-21"
-!define LANGUAGE_PACK_VERSION_INT "20070321"
-!define DATE_TIME_STAMP "200703211600"
+!define VERSION "2.0.3"
+!define PREVIOUS_VERSION "2.0.2"
+!define LANGUAGE_PACK_VERSION "2007-06-01"
+!define LANGUAGE_PACK_VERSION_INT "20070601"
+!define DATE_TIME_STAMP "200706011007"
 !define SERVER_VERSION_NUMBER "${VERSION}.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
@@ -77,8 +77,8 @@ InstProgressFlags smooth
 !define MUI_ABORTWARNING
 
 # set welcome page
-!define MUI_WELCOMEPAGE_TITLE "LAMS ${VERSION} Install Wizard"
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of LAMS ${VERSION}.\r\n\r\n\
+!define MUI_WELCOMEPAGE_TITLE "LAMS ${VERSION} Install/Update Wizard"
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation/update to LAMS ${VERSION}.\r\n\r\n\
     Please ensure you have a copy of MySQL 5.x installed and running, and Java JDK version 1.5.x. or 1.6.x\r\n\r\n\
     Click Next to continue."
 
@@ -135,41 +135,38 @@ ReserveFile "final.ini"
 !insertmacro MUI_RESERVEFILE_LANGDLL
 
 # variables
-#
-Var MYSQL_DIR
-Var MYSQL_ROOT_PASS
-Var DB_NAME
-Var DB_USER
-Var DB_PASS
-Var JDK_DIR
-Var LAMS_DOMAIN
-Var LAMS_PORT
-Var LAMS_LOCALE
-Var LAMS_REPOSITORY
-Var LAMS_USER
-Var LAMS_PASS
-Var WILDFIRE_DOMAIN
-Var WILDFIRE_USER
-Var WILDFIRE_PASS
-Var WINTEMP
-Var RETAIN_DIR
-Var RETAIN_FILES
-Var IS_UPDATE
-Var INCLUDE_JSMATH
-Var TOOL_SIG
-Var TIMESTAMP
+Var MYSQL_DIR           ; path to user's mysql directory
+Var MYSQL_ROOT_PASS     ; root pass for mysql
+Var MYSQL_HOST            ; ip address for mysql
+Var DB_NAME             ; db name for lams
+Var DB_USER             ; db user for lams
+Var DB_PASS             ; db pass for lams
+Var JDK_DIR             ; path to user's JDK directory  
+Var LAMS_DOMAIN         ; server URL for lams
+Var LAMS_PORT           ; PORT for lams usually 8080
+Var LAMS_LOCALE         ; default language locale on startup
+Var LAMS_REPOSITORY     ; path to repository on user's box
+Var LAMS_USER           ; user name for lams system administrater
+Var LAMS_PASS           ; password for lams system administrater
+Var WILDFIRE_DOMAIN     ; wildfire URL
+Var WILDFIRE_USER       ; wildfire username
+Var WILDFIRE_PASS       ; wildfie password
+Var WINTEMP             ; temp dir
+Var RETAIN_DIR          ; path to directory to retain files on uninstall
+Var RETAIN_FILES        ; bool value to devide whether to retain files
+Var IS_UPDATE           ; bool value to determine whether this is an update
+Var INCLUDE_JSMATH      ; bool value to determine whether to include JBOSS
+Var TOOL_SIG            ; tool signature used for tool deployer
+Var TIMESTAMP           ; timestamp
+Var BACKUP              ; bool value to determine whether the updater will backup
 
 
 #LANGUAGE PACK VARIABLES #####
-Var UPDATE_LANGUAGES
-Var LAMS_DIR
-Var VERSION_INT
-Var SQL_QUERY
-Var FOLDER_FLAG
-Var OLD_VERSION
-${Array} RF_FOLDERS
-${Array} CS_FOLDERS
-${Array} FS_FOLDERS
+Var UPDATE_LANGUAGES    ; bool value to determine whether to update languages with language pack
+Var LAMS_DIR            ; directory lams is installed at
+Var VERSION_INT         ; version of the language pack
+Var OLD_LANG_VERSION         ; previous version of language pack
+
 ##############################
 
 # installer sections
@@ -181,6 +178,14 @@ SectionGroup "LAMS ${VERSION} Update (Requires LAMS 2.0)" update
             
             ; Backing up existing lams installation
             call backupLams
+           
+            ; Getting the mysql_ip from the registry (2.0.3)
+            ReadRegStr $MYSQL_HOST HKLM "${REG_HEAD}" "mysql_host"
+            
+            ${if} $MYSQL_HOST == ""
+                strcpy $MYSQL_HOST "localhost"
+            ${endif}
+            
             
             ; removing temporary jboss files
             clearerrors
@@ -216,10 +221,13 @@ SectionGroup "LAMS ${VERSION} Update (Requires LAMS 2.0)" update
         
         ${if} $IS_UPDATE == "1"           
             Detailprint "Installing LAMS ${VERSION} tools"
-                  
+            
             ; Generating the deploy.xml of the tools to support this version
             ; Then Calls deploy tools 
             call createAndDeployTools
+            
+            ; This function is specifiec to 2.0.3 updates
+            call update203Specific
             
 
             # RUNNING THE LANGUAGE PACK ##################
@@ -249,6 +257,8 @@ SectionGroup "LAMS ${VERSION} Update (Requires LAMS 2.0)" update
             SetOutPath $INSTDIR
             File /a "..\build\lams-start.exe"
             File /a "..\build\lams-stop.exe"
+            File /a "..\build\lams-backup.exe"
+            File /a "..\build\lams-restore.exe"
             File /a "..\license.txt"
             File /a "..\license-wrapper.txt"
             File /a "..\readme.txt"
@@ -303,6 +313,8 @@ SectionGroup "LAMS ${VERSION} Full Install" fullInstall
             SetOutPath $INSTDIR
             File /a "..\build\lams-start.exe"
             File /a "..\build\lams-stop.exe"
+            File /a "..\build\lams-backup.exe"
+            File /a "..\build\lams-restore.exe"
             File /a "..\license.txt"
             File /a "..\license-wrapper.txt"
             File /a "..\readme.txt"
@@ -370,35 +382,10 @@ SectionGroupEnd
 
 Function .onInit
     
-    strcpy $IS_UPDATE 0
-    
-    # Check the current version installed (if any)
-    ReadRegStr $0 HKLM "${REG_HEAD}" "version" 
-    
-    ${if} $0 == ""
-        # LAMS 2.0 is not installed, do full install
-        strcpy $IS_UPDATE "0"
-    ${else}
-        # LAMS is installed. Check if the current version is installed
-        ${VersionCompare} $0 ${VERSION} $1
-        ${if} $1 == 0
-        ${orif} $1 == 1
-            MessageBox MB_OK|MB_ICONSTOP "You already have LAMS $0 Installed on your computer."
-            Abort
-        ${elseif} $0 == ${PREVIOUS_VERSION}
-            # This is the correct version to update to
-            strcpy $IS_UPDATE "1" 
-        ${elseif} $0 == "2.0"
-            # !!!!!!!!!!!!!THIS BLOCK IS ONLY FOR 2.0.2 UPDATER !!!!!!!!!!!!!!!!
-            strcpy $IS_UPDATE "1" 
-        ${else}
-            MessageBox MB_OK|MB_ICONSTOP "Your existing version of LAMS ($0) is not compatible with this update. $\r$\n$\r$\nPlease update to LAMS-${PREVIOUS_VERSION} before running this update."
-            Abort 
-        ${endif}
-    ${endif}
+    # Checking to see if LAMS is installed 
+    call checkRegistry
     
     ${if} $IS_UPDATE == "1"
-        
         # check if LAMS is stopped
         SetOutPath $TEMP
         File "..\build\LocalPortScanner.class"
@@ -438,9 +425,6 @@ Function .onInit
         # clearing the update-logs directory
         Detailprint "Removing existing update logs"
         rmdir /r "$INSTDIR\update-logs"
-        
-        
-        
         SectionSetSize ${jboss} 0
         SectionSetSize ${lams} 0
         SectionSetSize ${service} 0
@@ -476,8 +460,27 @@ Function skipPage
 FunctionEnd
 
 Function checkRegistry
-    call CheckJava
-    call CheckMySQL
+    # Check the current version installed (if any)
+    ReadRegStr $0 HKLM "${REG_HEAD}" "version" 
+    
+    ${if} $0 == ""
+        # LAMS 2.0 is not installed, do full install
+        strcpy $IS_UPDATE "0"
+    ${else}
+        # LAMS is installed. Check if the current version is installed
+        ${VersionCompare} $0 ${VERSION} $1
+        ${if} $1 == 0
+        ${orif} $1 == 1
+            MessageBox MB_OK|MB_ICONSTOP "You already have LAMS $0 Installed on your computer."
+            Abort
+        ${elseif} $0 == ${PREVIOUS_VERSION}
+            # This is the correct version to update to
+            strcpy $IS_UPDATE "1" 
+        ${else}
+            MessageBox MB_OK|MB_ICONSTOP "Your existing version of LAMS ($0) is not compatible with this update. $\r$\n$\r$\nPlease update to LAMS-${PREVIOUS_VERSION} before running this update."
+            Abort 
+        ${endif}
+    ${endif}
 FunctionEnd
 
 
@@ -497,7 +500,7 @@ FunctionEnd
 
 Function Checkjava2    
     # check java version using given dir
-    nsExec::ExecToStack '$JDK_DIR\bin\javac -version'
+    nsExec::ExecToStack '$JDK_DIR\bin\javac.exe -version'
     Pop $0
     Pop $1
     ${StrStr} $0 $1 "1.6"
@@ -553,9 +556,7 @@ Function CheckMySQL
                 ${endif}
             ${EndIf}
         ${EndIf}
-
-    ${EndIf}
-    
+    ${EndIf}  
 FunctionEnd
 
 Function PreComponents
@@ -570,7 +571,7 @@ Function PreComponents
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 4" "Text" "LAMS ${VERSION} Update"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 1" "Text" "- LAMS ${VERSION} Core"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams_components.ini" "Field 2" "Text" "- LAMS ${VERSION} Tools"
-        !insertmacro MUI_HEADER_TEXT "LAMS ${VERSION} Components" "Lams 2.0 is installed. Proceeding with update to ${VERSION}"
+        !insertmacro MUI_HEADER_TEXT "LAMS ${VERSION} Components" "Lams ${PREVIOUS_VERSION} is installed. Proceeding with update to ${VERSION}"
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams_components.ini"
     ${endif}
 FunctionEnd 
@@ -636,7 +637,7 @@ Function PreMySQLConfig
         !insertmacro MUI_HEADER_TEXT "Setting Up MySQL Database Access (1/4)" "Choose a MySQL database and user account for LAMS.  If unsure, use the defaults."
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "mysql.ini"
     ${else}
-        Call CheckMySQL
+        #Call CheckMySQL
     ${endif}
 FunctionEnd
 
@@ -648,6 +649,7 @@ Function PostMySQLConfig
         !insertmacro MUI_INSTALLOPTIONS_READ $DB_NAME "mysql.ini" "Field 7" "State"
         !insertmacro MUI_INSTALLOPTIONS_READ $DB_USER "mysql.ini" "Field 9" "State"
         !insertmacro MUI_INSTALLOPTIONS_READ $DB_PASS "mysql.ini" "Field 10" "State"
+        !insertmacro MUI_INSTALLOPTIONS_READ $MYSQL_HOST "mysql.ini" "Field 14" "State"
         # Checking if the given database name already exists in the mysql database list
         ifFileExists "$MYSQL_DIRdata\$DB_NAME\*.*" databaseNameExists continue1
         databaseNameExists:
@@ -734,7 +736,7 @@ Function PreLAMSConfig
     ${else}
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 2" "State" "$JDK_DIR"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 4" "State" "$INSTDIR\repository"
-        !insertmacro MUI_HEADER_TEXT "Java setup" "If you have changed your java installation since installing LAMS 2.0, please enter the new details."
+        !insertmacro MUI_HEADER_TEXT "Java setup" "If you have changed your java installation since installing LAMS ${PREVIOUS_VERSION}, please enter the new details."
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams.ini"
     ${endif}
 FunctionEnd
@@ -810,9 +812,7 @@ Function PreFinal
 FunctionEnd
 
 Function PostFinal
-    ; Checking to see if lams2.0 exists
-    #call checkRegistry
-    
+
     Call GetLocalTime
     Pop "$0" ;Variable (for day)
     Pop "$1" ;Variable (for month)
@@ -845,11 +845,40 @@ Function PostFinal
     
     strcpy $TIMESTAMP "$2$1$0$4$5"
 
+    strcpy $BACKUP "0"
     ${if} $IS_UPDATE == "1"
-        MessageBox MB_OKCANCEL|MB_ICONQUESTION "Your installation of LAMS will be backed up at $INSTDIR-$TIMESTAMP.bak" IDOK continue IDCANCEL cancel
-                cancel:
-                    Abort
-                continue:
+        MessageBox MB_YESNOCANCEL|MB_ICONQUESTION "Do you wish to backup your LAMS installation? (Recommended) $\r$\nBackup dir: $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak $\r$\n$\r$\nNOTE: You must have MySql installed on this machine to do this." IDNO continue IDCANCEL cancel
+            # check mysql version is 5.0.x
+            nsExec::ExecToStack '$MYSQL_DIR\bin\mysqladmin --version'
+            Pop $0
+            Pop $1
+            ${if} $0 != 0
+                MessageBox MB_OK|MB_ICONSTOP "Error checking mysql, please check that MySql is installed in the same location as written in the registry under ${REG_HEAD}"
+                abort
+            ${endif}
+            ${If} $1 == "" ; if mySQL install directory field is empty, do not continue
+                MessageBox MB_OK|MB_ICONSTOP "No MySql installation found"
+                abort
+            ${EndIf}
+            ${StrStr} $0 $1 "5.0"
+            ${If} $0 == "" ; if not 5.0.x, check 5.1.x
+                ${StrStr} $0 $1 "5.1"
+                ${If} $0 == ""
+                    MessageBox MB_OK|MB_ICONSTOP "Your MySQL version does not appear to be compatible with LAMS (5.0.x or 5.1.x): $\r$\n$1"
+                    MessageBox MB_OK|MB_ICONSTOP "Your MySQL directory does not appear to be valid, please enter a valid MySQL directory before continuing.$\r$\n$\r$\n$1"
+                    ${if} $IS_UPDATE == "0"
+                        Abort
+                    ${else}
+                        quit
+                    ${endif}
+                ${EndIf}
+            ${EndIf}
+            
+            strcpy $BACKUP "1"
+            goto continue
+            cancel:
+                Abort
+            continue:
     ${endif}
     
      goto done
@@ -871,10 +900,44 @@ FunctionEnd
 # CODE USED FOR UPDATER                                                        #
 ################################################################################
 
-Function setupant
+Function update203Specific
+    #extract the jar
+    Setoutpath "$TEMP\lams\"
+    File "..\build\UpdateLAMS202Chat.class"
+    File "..\..\lams_build\lib\hibernate\hibernate3.jar"
     
-    ; setting the first tool sig for properties files
-    strcpy $TOOL_SIG "lachat11"
+    Detailprint "Updating the Chat tool"
+    
+   
+    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
+    ReadRegStr $2 HKLM "${REG_HEAD}" "dir_repository"
+    ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
+    # execute the chat update
+    Detailprint '"$3\bin\java.exe" -cp  ".;hibernate3.jar;lib\mysql-connector-java-3.1.12-bin.jar;lib\commons-logging.jar" UpdateLAMS202Chat "$1" "$DB_USER" "$DB_PASS" "$2"'
+    nsExec::ExecToStack '"$3\bin\java.exe" -cp  ".;hibernate3.jar;lib\mysql-connector-java-3.1.12-bin.jar;lib\commons-logging.jar" UpdateLAMS202Chat "$1" "$DB_USER" "$DB_PASS" "$2"'
+    pop $0
+    pop $1
+    ${if} $0 != '0'
+        Messagebox MB_OK|MB_ICONSTOP "Error while updating Chat tool $\r$\nError: $1"
+        Abort
+    ${endif}
+      
+    ;replacing the copyright notice on index.html
+    clearerrors
+    Push "2006" #text to be replaced
+    Push "2007" #replace with
+    Push all #replace all occurrences
+    Push all #replace all occurrences
+    Push "$INSTDIR\index.html" #file to replace in
+    Call AdvReplaceInFile
+    iferrors 0 end 
+        Detailprint "Problem updating index.html"
+    end:
+FunctionEnd
+
+
+
+Function setupant
     
     # extract support files to write configuration
     SetOutPath $INSTDIR
@@ -906,44 +969,45 @@ Functionend
 
 ; Backs up existing lams installation
 Function backupLams
-    
-    clearerrors
-    iffileexists "$INSTDIR-$TIMESTAMP.bak\*.*" backupExists continue
-    backupExists:
-        DetailPrint "Lams backup failed"
-        MessageBox MB_OK|MB_ICONSTOP "Lams backup failed, please delete or change the name of the backup file before continuing with the update$\r$\n$INSTDIR-$TIMESTAMP.bak"
-        Abort "LAMS configuration failed"
-    continue:
-    
-    DetailPrint "Backing up lams at: $INSTDIR-$TIMESTAMP.bak. This may take a few minutes"
-    SetDetailsPrint listonly
-    copyfiles /SILENT $INSTDIR  $INSTDIR-$TIMESTAMP.bak 86000
-    SetDetailsPrint both
-    iferrors error1 continue1
-    error1:
-        DetailPrint "Backup failed"
-        MessageBox MB_OK|MB_ICONSTOP "LAMS backup to $INSTDIR-$TIMESTAMP.bak failed. Check that all other applications are closed and LAMS is not running." 
-        Abort
-    continue1: 
-    
-    DetailPrint 'Dumping database to: $INSTDIR-$TIMESTAMP.bak'
-    setoutpath "$INSTDIR-$TIMESTAMP.bak"
-    Strcpy $4 '"$MYSQL_DIR\bin\mysqldump" -r "$INSTDIR-$TIMESTAMP.bak\dump.sql" $DB_NAME -u $DB_USER -p$DB_PASS'
-    DetailPrint $4
-    nsExec::ExecToStack $4
-    Pop $0
-    Pop $1
-    ${If} $0 == "yes"
-        goto error
-    ${EndIf}
-      
-    goto done
-    error:
-        DetailPrint "Database dump failed"
-        MessageBox MB_OK|MB_ICONSTOP "Database dump failed $\r$\nError:$\r$\n$\r$\n$1"
-        Abort "Database dump failed"
+    ${if} $BACKUP == "1"
+        clearerrors
+        iffileexists "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak\*.*" backupExists continue
+        backupExists:
+            DetailPrint "Lams backup failed"
+            MessageBox MB_OK|MB_ICONSTOP "Lams backup failed, please delete or change the name of the backup file before continuing with the update$\r$\n$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak"
+            Abort "LAMS configuration failed"
+        continue:
         
-    done:
+        DetailPrint "Backing up lams at: $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak. This may take a few minutes"
+        SetDetailsPrint listonly
+        copyfiles /SILENT $INSTDIR  $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak 86000
+        SetDetailsPrint both
+        iferrors error1 continue1
+        error1:
+            DetailPrint "Backup failed"
+            MessageBox MB_OK|MB_ICONSTOP "LAMS backup to $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak failed. Check that all other applications are closed and LAMS is not running." 
+            Abort
+        continue1: 
+        
+        DetailPrint 'Dumping database to: $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak'
+        setoutpath "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak"
+        Strcpy $4 '"$MYSQL_DIR\bin\mysqldump" -r "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak\dump.sql" $DB_NAME -u $DB_USER -p$DB_PASS'
+        DetailPrint $4
+        nsExec::ExecToStack $4
+        Pop $0
+        Pop $1
+        ${If} $0 == "yes"
+            goto error
+        ${EndIf}
+          
+        goto done
+        error:
+            DetailPrint "Database dump failed"
+            MessageBox MB_OK|MB_ICONSTOP "Database dump failed $\r$\nError:$\r$\n$\r$\n$1"
+            Abort "Database dump failed"
+            
+        done:
+    ${endif}
 FunctionEnd
 
 
@@ -952,6 +1016,11 @@ FunctionEnd
 Function updateCoreJarsWars
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear"
     File "..\assembly\lams.ear\*.*"
+    
+    Setoutpath "$INSTDIR\jboss-4.0.2\server\default\lib"
+    File "${SOURCE_JBOSS_HOME}\server\default\lib\lams-session.jar"
+    File "${SOURCE_JBOSS_HOME}\server\default\lib\lams-valve.jar"
+    
     createdirectory "$INSTDIR\update-logs" 
 FunctionEnd
 
@@ -960,201 +1029,106 @@ Function updateLamsCentral
     strcpy $0 "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-central.war"
     SetoutPath $0
     File /r "..\assembly\lams.ear\lams-central.war\*"
-    
-    ;removing all the unwanted cvs diorectories from the mistake in 2.0.1 updater
-    Detailprint "Removing CVS folders from lams-central.war"
-    rmdir /r "$0\CVS"
-    rmdir /r "$0\css\CVS"
-    rmdir /r "$0\development\CVS"
-    rmdir /r "$0\errorpages\CVS"
-    rmdir /r "$0\fckeditor\CVS"
-    rmdir /r "$0\fckeditor\editor\CVS"
-    rmdir /r "$0\fckeditor\editor\_source\CVS"
-    rmdir /r "$0\fckeditor\editor\_source\classes\CVS"
-    rmdir /r "$0\fckeditor\editor\_source\commandclasses\CVS"
-    rmdir /r "$0\fckeditor\editor\_source\internals\CVS"
-    rmdir /r "$0\fckeditor\editor\css\CVS"
-    rmdir /r "$0\fckeditor\editor\css\behaviors\CVS"
-    rmdir /r "$0\fckeditor\editor\css\images\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\common\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\common\images\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\fck_about\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\fck_docprops\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\fck_flash\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\fck_image\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\fck_link\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\fck_select\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\fck_spellerpages\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\fck_spellerpages\spellerpages\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\fck_spellerpages\spellerpages\server-scripts\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\fck_template\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\fck_template\images\CVS"
-    rmdir /r "$0\fckeditor\editor\dialog\fck_universalkey\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\asp\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\aspx\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\cfm\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\lasso\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\perl\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\php\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\connectors\py\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\images\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\images\icons\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\images\icons\32\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\browser\default\js\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\upload\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\upload\asp\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\upload\aspx\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\upload\cfm\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\upload\lasso\CVS"
-    rmdir /r "$0\fckeditor\editor\filemanager\upload\php\CVS"
-    rmdir /r "$0\fckeditor\editor\images\CVS"
-    rmdir /r "$0\fckeditor\editor\images\smiley\CVS"  
-    rmdir /r "$0\fckeditor\editor\images\smiley\msn\CVS"  
-    rmdir /r "$0\fckeditor\editor\js\CVS"
-    rmdir /r "$0\fckeditor\editor\lang\CVS"
-    rmdir /r "$0\fckeditor\editor\plugins\CVS"
-    rmdir /r "$0\fckeditor\editor\plugins\autogrow\CVS"
-    rmdir /r "$0\fckeditor\editor\plugins\placeholder\CVS"
-    rmdir /r "$0\fckeditor\editor\plugins\placeholder\lang\CVS"
-    rmdir /r "$0\fckeditor\editor\plugins\simplecommands\CVS"
-    rmdir /r "$0\fckeditor\editor\plugins\tablecommands\CVS"
-    rmdir /r "$0\fckeditor\editor\skins\CVS"
-    rmdir /r "$0\fckeditor\editor\skins\default\CVS"
-    rmdir /r "$0\fckeditor\editor\skins\default\images\CVS"
-    rmdir /r "$0\fckeditor\editor\skins\office2003\CVS"
-    rmdir /r "$0\fckeditor\editor\skins\office2003\images\CVS"
-    rmdir /r "$0\fckeditor\editor\skins\silver\CVS"
-    rmdir /r "$0\fckeditor\editor\skins\silver\images\CVS"
-    rmdir /r "$0\flashxml\CVS"
-    rmdir /r "$0\flashxml\authoring\CVS"
-    rmdir /r "$0\flashxml\learner\CVS"
-    rmdir /r "$0\flashxml\monitoring\CVS"
-    rmdir /r "$0\flashxml\wizard\CVS"
-    rmdir /r "$0\images\CVS"
-    rmdir /r "$0\images\css\CVS"
-    rmdir /r "$0\images\license\CVS"
-    rmdir /r "$0\includes\CVS"
-    rmdir /r "$0\includes\javascript\CVS"
-    rmdir /r "$0\META-INF\CVS"
-    rmdir /r "$0\toolcontent\CVS"
-    rmdir /r "$0\WEB-INF\CVS"
-    rmdir /r "$0\WEB-INF\attachments\CVS"
-    rmdir /r "$0\WEB-INF\jstl\CVS"
-    rmdir /r "$0\WEB-INF\jstl\tlds\CVS"
-    rmdir /r "$0\WEB-INF\struts\CVS"
-    rmdir /r "$0\WEB-INF\struts\tlds\CVS"
-    rmdir /r "$0\WEB-INF\tags\CVS"
-    rmdir /r "$0\WEB-INF\tiles\CVS"
-    
 FunctionEnd
 
 ; Updating lams-www.war
-Function updateLamswww
+Function updateLamswww 
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\images\"
     File "..\assembly\lams.ear\lams-www.war\images\learner.logo.swf"
     
+    SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\images\"
+    File "..\assembly\lams.ear\lams-www.war\images\about.logo.swf"
+    
+    SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\images\"
+    File "..\assembly\lams.ear\lams-www.war\images\monitor.logo.swf"
+    
+    SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\images\"
+    File "..\assembly\lams.ear\lams-www.war\images\preloader.logo.swf"
+    
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
-    File "..\..\lams_www\web\news.html" 
+    File "..\..\lams_www\conf\lams\news.html"     
 FunctionEnd
-
 
 
 ; Updating the database to support version
 Function updateCoreDatabase
 
-    StrCpy $0 '"$MYSQL_DIR\bin\mysql" -v $DB_NAME -e "update lams_configuration set config_value=$\'${SERVER_VERSION_NUMBER}$\' where config_key=$\'LearnerClientVersion$\' OR config_key=$\'ServerVersionNumber$\' OR config_key=$\'MonitorClientVersion$\' OR config_key=$\'AuthoringClientVersion$\'" -u$DB_USER -p$DB_PASS'
-    DetailPrint $0
-    nsExec::ExecToStack $0
-    Pop $0
-    Pop $1
-    ${If} $0 == 1
+    # generate a sql file to update the configuration table
+    Createdirectory "$TEMP\lams\sql\"
+    ClearErrors
+    FileOpen $0 "$TEMP\lams\sql\updateConfiguration.sql" w
+    IfErrors 0 +3
+        Detailprint "Problem opening updateConfiguration.sql to write"
         goto error
-    ${EndIf}
-    DetailPrint "mysql code: $0"
-    DetailPrint "mysql result: $1"
+    FileWrite $0 "update lams_configuration set config_value='${SERVER_VERSION_NUMBER}' where config_key='LearnerClientVersion' OR config_key='ServerVersionNumber' OR config_key='MonitorClientVersion' OR config_key='AuthoringClientVersion';$\r$\n"
+    Filewrite $0 "update lams_configuration set config_value='${VERSION}' where config_key='Version';$\r$\n"
+    Filewrite $0 "update lams_configuration set config_value='${LANG_PACK_VERSION}' where config_key='DictionaryDateCreated';$\r$\n"
+    Fileclose $0
+    IfErrors 0 +3
+        Detailprint "Problem closing updateConfiguration.sql"
+        goto error
     
-    StrCpy $0 '"$MYSQL_DIR\bin\mysql" -v $DB_NAME -e "update lams_configuration set config_value=$\'${VERSION}$\' where config_key=$\'Version$\' " -u$DB_USER -p$DB_PASS'
-    DetailPrint $0
-    nsExec::ExecToStack $0
-    Pop $0
-    Pop $1
-    ${If} $0 == 1
+    # generate a properties file 
+    ClearErrors
+    FileOpen $0 $TEMP\lams\core.properties w
+    IfErrors 0 +3
+        Detailprint "Problem opening core.properties to write"
         goto error
-    ${EndIf}
-    DetailPrint $1
+    
+    # convert '\' to '/' for Ant's benefit
+    Push $TEMP
+    Push "\"
+    Call StrSlash
+    Pop $2
+    FileWrite $0 "temp=$2/$\r$\n"
+            
+    Push $INSTDIR
+    Push "\"
+    Call StrSlash
+    Pop $2
+    
+    FileWrite $0 "instdir=$2/$\r$\n"
+    FileWrite $0 "db.name=$DB_NAME$\r$\n"
+    FileWrite $0 "db.username=$DB_USER$\r$\n"
+    FileWrite $0 "db.password=$DB_PASS$\r$\n"
+    FileWrite $0 "db.Driver=com.mysql.jdbc.Driver$\r$\n"
+    FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
+    FileWrite $0 "jboss.deploy=$${instdir}/jboss-4.0.2/server/default/deploy/lams.ear/$\r$\n"
+
+    Fileclose $0
+    IfErrors 0 +2
+        goto error
     
 
+    # Copying the core sql update scriptes to $TEMP/lams/sql
+    setoutpath "$TEMP\lams\sql"
+    ;file "..\..\lams_common\db\sql\updatescripts\alter_${VERSION}*.sql" 
+    file "..\..\lams_common\db\sql\updatescripts\alter_203*.sql" 
     
-    ReadRegStr $0 HKLM "${REG_HEAD}" "version"
+    setoutpath "$TEMP\lams\"
+    file "..\templates\update-core-database.xml"
     
-    ${if} $0 == "2.0"
-        # generate a properties file 
-        ClearErrors
-        FileOpen $0 $TEMP\lams\core.properties w
-        IfErrors 0 +2
-            goto error
-        
-        # convert '\' to '/' for Ant's benefit
-        Push $TEMP
-        Push "\"
-        Call StrSlash
-        Pop $2
-        FileWrite $0 "temp=$2/$\r$\n"
-                
-        Push $INSTDIR
-        Push "\"
-        Call StrSlash
-        Pop $2
-        
-        FileWrite $0 "instdir=$2/$\r$\n"
-        FileWrite $0 "db.name=$DB_NAME$\r$\n"
-        FileWrite $0 "db.username=$DB_USER$\r$\n"
-        FileWrite $0 "db.password=$DB_PASS$\r$\n"
-        FileWrite $0 "db.Driver=com.mysql.jdbc.Driver$\r$\n"
-        FileWrite $0 "db.url=jdbc:mysql://localhost/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
-        FileWrite $0 "jboss.deploy=$${instdir}/jboss-4.0.2/server/default/deploy/lams.ear/$\r$\n"
-    
-        Fileclose $0
-        IfErrors 0 +2
-            goto error
-        
-    
-        # Copying the core sql update scriptes to $TEMP/lams/sql
-        setoutpath "$TEMP\lams\sql"
-        ;file "..\..\lams_common\db\sql\updatescripts\alter_${VERSION}*.sql" 
-        file "..\..\lams_common\db\sql\updatescripts\*.sql" 
-        
-        setoutpath "$TEMP\lams\"
-        file "..\templates\update-core-database.xml"
-        
-    
-        # Running the ant scripts to create deploy.xml for the normal tools 
-        strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-core-database.log" -buildfile "$TEMP\lams\update-core-database.xml" update-core-database'
-        DetailPrint $0
-        nsExec::ExecToStack $0
-        Pop $0 ; return code, 0=success, error=fail
-        Pop $1 ; console output
-        ${if} $0 == "error"
-        ${orif} $0 == 1
-            goto error
-        ${endif}
-        DetailPrint "Result: $1"
-        
-        push "$INSTDIR\update-logs\ant-update-core-database.log"
-        push "Failed"
-        Call FileSearch
-        Pop $0 #Number of times found throughout
-        Pop $3 #Found at all? yes/no
-        Pop $2 #Number of lines found in
-        intcmp $0 0 +2 +2 0
-            goto error
-   ${endif}
 
+    # Running the ant scripts to create deploy.xml for the normal tools 
+    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-core-database.log" -buildfile "$TEMP\lams\update-core-database.xml" update-core-database'
+    DetailPrint $0
+    nsExec::ExecToStack $0
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    ${if} $0 == "error"
+    ${orif} $0 == 1
+        goto error
+    ${endif}
+    DetailPrint "Result: $1"
+    
+    push "$INSTDIR\update-logs\ant-update-core-database.log"
+    push "Failed"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    intcmp $0 0 +2 +2 0
+        goto error
     goto done
     error:
         DetailPrint "LAMS core database updates failed"
@@ -1165,11 +1139,10 @@ FunctionEnd
 
 ; Updating application.xml
 Function updateApplicationXML
-    iffileexists "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\ehcache-1.1.jar" fileExists continue
+    /*iffileexists "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\ehcache-1.1.jar" fileExists continue
     fileExists:
         delete "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\ehcache-1.1.jar"
     continue:  
-    
     
     # Running the ant scripts to update web.xmls and manifests
     strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-application-xml.log" -buildfile "$TEMP\lams\update-deploy-tools.xml" -D"prop.path=$TOOL_SIG" update-application-xml'
@@ -1198,11 +1171,15 @@ Function updateApplicationXML
         MessageBox MB_OK|MB_ICONSTOP "Application.xml update failed, check update logs in the installation directory for details $\r$\nError:$\r$\n$\r$\n$1"
         Abort "LAMS configuration failed"
     done:
+    */
 FunctionEnd
         
 ; Updating the deploy.xml of the tools to support this version using the tool deployer, called by create-deploy-package ant task
 ; Then deploys the tools using the tool deployer. Called by ant task deploy-tool
 Function createAndDeployTools
+    
+    ; setting the first tool sig for properties files
+    strcpy $TOOL_SIG "lachat11"
     
     # Copying tool-specific build.property files
     call copyToolBuildProperties
@@ -1219,6 +1196,16 @@ Function createAndDeployTools
 
     ; Updating application.xml
     call updateApplicationXML
+    
+    DetailPrint "Result: $1"
+    push "$INSTDIR\update-logs\ant-explode-wars.log"
+    push "FAILED"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    intcmp $0 0 +2 +2 0
+        goto error
     
     
     # Exploding the lams-learning.war and lams-monitoring.war
@@ -1412,7 +1399,6 @@ Function deployTool
     intcmp $0 0 +2 +2 0
         goto error
     
-
     goto done
     error:
         DetailPrint "Ant deploy-tool failed, check update-logs for details"
@@ -1453,7 +1439,7 @@ Function generateToolProperties
     FileWrite $0 "db.username=$DB_USER$\r$\n"
     FileWrite $0 "db.password=$DB_PASS$\r$\n"
     FileWrite $0 "db.Driver=com.mysql.jdbc.Driver$\r$\n"
-    FileWrite $0 "db.url=jdbc:mysql://localhost/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
+    FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
     FileWrite $0 "conf.language.dir=$${build.deploy}/language/$\r$\n"
     FileWrite $0 "jboss.deploy=$${instdir}/jboss-4.0.2/server/default/deploy/lams.ear/$\r$\n"
     FileWrite $0 "deploy.tool.dir=$${temp}/lams/$\r$\n"
@@ -1601,8 +1587,6 @@ Function extractToolJars
     
 FunctionEnd
 
-
-
 ################################################################################
 # END CODE USED FOR UPDATER                                                    #
 ################################################################################
@@ -1630,8 +1614,6 @@ Function DeployConfig
     File "..\templates\lamsauthentication.xml"
     File "..\templates\update_lams_configuration.sql"
     File "..\templates\login-config.xml"
-      
-
       
     # create installer.properties
     ClearErrors
@@ -1735,8 +1717,7 @@ Function DeployConfig
         intcmp $0 0 0 done done
             clearerrors
             ${LineFind} "$MYSQL_DIR\my.ini" "" "1" "WriteMyINI"
-            IfErrors nomyini myini
-             
+            IfErrors nomyini myini            
     difini:
     iffileexists "$WINDIR\my.ini" 0 nomyini
         push "$WINDIR\my.ini"
@@ -1749,15 +1730,6 @@ Function DeployConfig
             clearerrors
             ${LineFind} "$WINDIR\my.ini" "" "1" "WriteMyINI"
             IfErrors nomyini myini
-    
-    /*
-    ${LineFind} "$MYSQL_DIR\my.ini" "" "1" "WriteMyINI"
-    IfErrors 0 myini
-        clearerrors
-        ${LineFind} "$WINDIR\my.ini" "" "1" "WriteMyINI"    
-            IfErrors 0 myini
-            MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't write to $MYSQL_DIR\my.ini.  Please write this text into your MySQL configuration file and restart MySQL:$\r$\n$\r$\n[mysqld]$\r$\ntransaction-isolation=READ-COMMITTED"
-    */
     nomyini:
         MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't write to $MYSQL_DIR\my.ini.  Please write this text into your MySQL configuration file and restart MySQL:$\r$\n$\r$\n[mysqld]$\r$\ntransaction-isolation=READ-COMMITTED"       
         goto done
@@ -1905,41 +1877,8 @@ Function ImportDatabase
     FileWrite $R0 $1
     FileClose $R0
 
-    
-    /*${if} $RETAIN_FILES == '1'
-        #replace the install dump with the retained dump
-        #CopyFiles "$INSTDIR\backup\lamsDump.sql" "$TEMP\dump.sql"
-        DetailPrint "Using retained database: $INSTDIR\backup\lamsDump.sql"
-        strcpy $0 "$MYSQL_DIR\bin\mysql $DB_NAME -uroot - p$MYSQL_ROOT_PASS < $INSTDIR\backup\lamsDump.sql"
-        nsExec::ExecToStack $0
-        pop $1
-        pop $2
-        DetailPrint $0
-        DetailPrint $1
-        MessageBox MB_OK|MB_ICONEXCLAMATION "Rebuilding datbase $\n$0 $\n$1 $\n$2" 
-    
-        ${if} $0 != 0
-            goto error
-        ${endif}
-    ${endif}
-    */
-    goto done
-    
+    goto done 
     error:
-        # Just leave database if there is an error (don't want to remove someone's existing db)
-        /*StrCpy $0 '$MYSQL_DIR\bin\mysql -e "drop database $DB_NAME" -u root'
-        DetailPrint $0
-        ${If} $9 != 0
-            StrCpy $0 '$MYSQL_DIR\bin\mysql -e "drop database $DB_NAME" -u root -p$MYSQL_ROOT_PASS'
-        ${EndIf}
-        nsExec::ExecToStack $0
-        Pop $1
-        Pop $2
-        ${If} $1 != 1
-            DetailPrint "Undid create database action."
-        ${Else}
-            DetailPrint "Could not remove database '$DB_NAME'."
-        ${EndIf}*/
         MessageBox MB_OK|MB_ICONSTOP "Database setup failed.  Please check your MySQL configuration and try again.$\r$\nError:$\r$\n$\r$\n$1"
         Abort "Database setup failed."
     done:
@@ -1950,9 +1889,11 @@ FunctionEnd
 Function WriteRegEntries
     WriteRegStr HKLM "${REG_HEAD}" "dir_jdk" $JDK_DIR
     WriteRegStr HKLM "${REG_HEAD}" "dir_mysql" "$MYSQL_DIR\"
+    WriteRegStr HKLM "${REG_HEAD}" "mysql_host" "$MYSQL_HOST"
     WriteRegStr HKLM "${REG_HEAD}" "dir_inst" $INSTDIR
     WriteRegStr HKLM "${REG_HEAD}" "dir_repository" $LAMS_REPOSITORY
     WriteRegStr HKLM "${REG_HEAD}" "version" "${VERSION}"
+    WriteRegStr HKLM "${REG_HEAD}" "server_version" "${SERVER_VERSION_NUMBER}"
     WriteRegStr HKLM "${REG_HEAD}" "db_name" $DB_NAME
     WriteRegStr HKLM "${REG_HEAD}" "db_user" $DB_USER
     WriteRegStr HKLM "${REG_HEAD}" "db_pass" $DB_PASS
@@ -1993,6 +1934,8 @@ Function SetupStartMenu
     CreateShortCut "$SMPROGRAMS\LAMSv2\LAMS Community.lnk" "http://www.lamscommunity.org"
     CreateShortCut "$SMPROGRAMS\LAMSv2\Start LAMS.lnk" "$INSTDIR\lams-start.exe"
     CreateShortCut "$SMPROGRAMS\LAMSv2\Stop LAMS.lnk" "$INSTDIR\lams-stop.exe"
+    CreateShortCut "$SMPROGRAMS\LAMSv2\Backup LAMS.lnk" "$INSTDIR\lams-backup.exe"
+    CreateShortCut "$SMPROGRAMS\LAMSv2\Restore previous LAMS version.lnk" "$INSTDIR\lams-restore.exe"
     CreateShortCut "$SMPROGRAMS\LAMSv2\Uninstall LAMS.lnk" "$INSTDIR\lams-uninstall.exe"
 FunctionEnd
 
@@ -2029,6 +1972,8 @@ Function .onInstFailed
         Delete "$INSTDIR\installer_ant.log"
         Delete "$INSTDIR\lams-start.exe"
         Delete "$INSTDIR\lams-stop.exe"
+        Delete "$INSTDIR\lams-backup.exe"
+        Delete "$INSTDIR\lams-restore.exe"
         Delete "$INSTDIR\lams_uninstall.exe"
         Delete "$INSTDIR\license.txt"
         Delete "$INSTDIR\readme.txt"
@@ -2063,8 +2008,10 @@ Function .onInstFailed
         RMDir /r "$EXEDIR\build"
         rmdir /r "$TEMP\installer.properties"
         rmdir /r "$TEMP\lams"
-        WriteRegStr HKLM "${REG_HEAD}" "language_pack" $OLD_VERSION
-        WriteRegStr HKLM "${REG_HEAD}" "version" ${BASE_VERSION}
+        ${if} $OLD_LANG_VERSION != ""
+            WriteRegStr HKLM "${REG_HEAD}" "language_pack" $OLD_LANG_VERSION
+        ${endif} 
+        WriteRegStr HKLM "${REG_HEAD}" "version" ${PREVIOUS_VERSION}
         delete "$INSTDIR\updateLocales.sql"
         delete "$INSTDIR\LanguagePack.xml"
 
@@ -2083,7 +2030,6 @@ Function .onInstSuccess
         Delete "$INSTDIR\backup\lamsDump.sql"
     ${else}
         ;cleanup for update successfull install
-        #rmdir /r "$TEMP\lams\"
         rmdir /r "$INSTDIR\apache-ant-1.6.5"
         RMDir /r "$INSTDIR\zip"
         RMDir /r "$EXEDIR\zip"
@@ -2119,7 +2065,7 @@ Function languagePackInit
     ReadRegStr $DB_PASS   HKLM "${REG_HEAD}" "db_pass"
     
     # Abort install if already installed or if a newer version is installed
-    strcpy $OLD_VERSION "20061205" ;default old version (Date of First language pack of LAMS2)
+    strcpy $OLD_LANG_VERSION "20061205" ;default old version (Date of First language pack of LAMS2)
     ReadRegStr $0 HKLM "${REG_HEAD}" "language_pack"
     ${VersionCompare} "$VERSION_INT" "$0" $1
     ${If} $1 == "0"
@@ -2134,7 +2080,7 @@ Function languagePackInit
     ${EndIf}
     strcpy $UPDATE_LANGUAGES "1"
     ${If} $0 != ""
-        strcpy $OLD_VERSION $0
+        strcpy $OLD_LANG_VERSION $0
     ${EndIf}
     
     # Abort if there is no version of LAMS2 installed
@@ -2272,126 +2218,64 @@ FunctionEnd
 
 ; first, finds the location of the language files in the database
 ; then copy the required files to the dirname
+Var CSllid
+Var FSllid
+Var RFllid
 Function copyllid
-
-    ${CS_FOLDERS->Init}
-    ${FS_FOLDERS->Init}
-    ${RF_FOLDERS->Init}
-
-    ; getting the rows for Chat and Scribe
-    strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Chat and Scribe$\';"'
-    strcpy $SQL_QUERY '"$MYSQL_DIR\bin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
-    strcpy $FOLDER_FLAG "0"
-    call executeSQLScript
+    setoutpath "$TEMP\lams"
+    File "..\build\GetLlidFolderNames.class"
+    
+    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
+    ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
+    # execute llid finder
+    Detailprint '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
     pop $0
-    #detailprint "SQL script result for Chat and Scribe: $\n$0"
-    
-    ; getting the rows for Forum and Scribe
-    strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Forum and Scribe$\';"'
-    strcpy $SQL_QUERY '"$MYSQL_DIR\bin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
-    strcpy $FOLDER_FLAG "1"
-    call executeSQLScript
-    pop $0
-    #detailprint "SQL script result for Forum and Scribe: $\n$0"
-    
-    ; getting the rows for Resources and Forum
-    strcpy $SQL_QUERY '"SELECT learning_library_id FROM lams_learning_library WHERE title = $\'Resources and Forum$\';"'
-    strcpy $SQL_QUERY '"$MYSQL_DIR\bin\mysql.exe" -u"$DB_USER" -p"$DB_PASS" -s -i -B $DB_NAME -e $SQL_QUERY'
-    strcpy $FOLDER_FLAG "2"
-    call executeSQLScript
-    pop $0
-    #detailprint "SQL script result for Resource and Forum: $\n$0"
-    
-    ; copy all the folders for llid Chat and Scribe
-    IntOp $R0 "$CS_FOLDERS_UBound" + 1
-    ${do}
-        ${CS_FOLDERS->Get} $CS_FOLDERS_UBound $R1
-        ${CS_FOLDERS->Delete} $CS_FOLDERS_UBound
-        IntOp $R0 "$CS_FOLDERS_UBound" + 1
-        #MessageBox MB_OK|MB_ICONEXCLAMATION "Chat and Scribe: $R1 $\nElements $R0"
-        
-        setoutpath "$INSTDIR\library\llid$R1"
-        detailprint "Copying language files for chat and scribe"
-        file /a "..\..\lams_build\librarypackages\chatscribe\language\lams\*"
-        
-    ${loopuntil} $R0 == "0"
-    
-    ; copy all the folders for llid Forum and Scribe
-    IntOp $R0 "$FS_FOLDERS_UBound" + 1
-    ${do}
-        ${FS_FOLDERS->Get} $FS_FOLDERS_UBound $R1
-        ${FS_FOLDERS->Delete} $FS_FOLDERS_UBound
-        IntOp $R0 "$FS_FOLDERS_UBound" + 1
-        #MessageBox MB_OK|MB_ICONEXCLAMATION "Forum and Scribe: $R1 $\nElements $R0"
-    
-        setoutpath "$INSTDIR\library\llid$R1"
-        detailprint "Copying language files for forum and scribe"
-        file /a "..\..\lams_build\librarypackages\forumscribe\language\lams\*"
-    ${loopuntil} $R0 == "0"
-    
-    ; copy all the folders for llid Resource and Forum
-    IntOp $R0 "$RF_FOLDERS_UBound" + 1
-    ; copy all the folders for llid Forum and Scribe
-    IntOp $R0 "$FS_FOLDERS_UBound" + 1
-    ${do}
-        ${RF_FOLDERS->Get} $RF_FOLDERS_UBound $R1
-        ${RF_FOLDERS->Delete} $RF_FOLDERS_UBound
-        IntOp $R0 "$RF_FOLDERS_UBound" + 1
-        #MessageBox MB_OK|MB_ICONEXCLAMATION "Resource and Forum: $R1 $\nElements $R0"
-        setoutpath "$INSTDIR\library\llid$R1"
-        detailprint "Copying language files for resource and forum"
-        file /a "..\..\lams_build\librarypackages\shareresourcesforum\language\lams\*"
-    ${loopuntil} $R0 == "0"
-
-FunctionEnd
-
-
-; Executing sql scripts
-; Puts the result of sql script on the stack
-Function executeSQLScript
-    nsExec::ExecToStack $SQL_QUERY
-    detailprint $SQL_QUERY  
-    pop $0 
-    pop $1
-    
-    #check for errors and write result to install window
-    ${if} $0 != 0 
-        goto Errors
+    pop $CSllid
+    ${if} $0 != '0'
+        Messagebox MB_OK|MB_ICONSTOP "Error while finding Chat and Scrbe llid folders"
+        Abort
     ${endif}
+    
+    setoutpath "$TEMP\lams"
+    File "..\build\GetLlidFolderNames.class"
+    
+    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
+    ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
+    # execute llid finder
+    Detailprint '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    pop $0
+    pop $FSllid
+    ${if} $0 != '0'
+        Messagebox MB_OK|MB_ICONSTOP "Error while finding Forum and Scribe llid folders"
+        Abort
+    ${endif}
+    
+    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
+    ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
+    # execute llid finder
+    Detailprint '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Resource and Forum" "$1" "$DB_USER" "$DB_PASS"'
+    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Resources and Forum" "$1" "$DB_USER" "$DB_PASS"'
+    pop $0
+    pop $RFllid
+    ${if} $0 != '0'
+        Messagebox MB_OK|MB_ICONSTOP "Error while finding Resource and Forum llid folders"
+        Abort
+    ${endif}
+    
+  
+    
+    setoutpath "$INSTDIR\library\llid$CSllid"
+    file /a "..\..\lams_build\librarypackages\chatscribe\language\lams\*"
+    
+    setoutpath "$INSTDIR\library\llid$FSllid"
+    file /a "..\..\lams_build\librarypackages\forumscribe\language\lams\*"
+    
+    setoutpath "$INSTDIR\library\llid$RFllid"
+    file /a "..\..\lams_build\librarypackages\shareresourcesforum\language\lams\*"
+    
 
-    strcpy $1 $1 -2
-    push $1
-    
-    ; Getting the muliple entries out
-    ${while} $1 != ""
-        push "$\n"
-        push $1
-        call SplitFirstStrPart
-        pop $R0
-        pop $1
-        
-        ${if} $FOLDER_FLAG == "0"
-            ${CS_FOLDERS->Push} $R0
-            #MessageBox MB_OK|MB_ICONEXCLAMATION "Chat and scribe: $R0 $\n"
-        ${endif} 
-        ${if} $FOLDER_FLAG == "1"
-            ${FS_FOLDERS->Push} $R0
-            #MessageBox MB_OK|MB_ICONEXCLAMATION "Forum and Scribe: $R0"
-        ${endif}
-        ${if} $FOLDER_FLAG == "2"
-            ${RF_FOLDERS->Push} $R0
-            #MessageBox MB_OK|MB_ICONEXCLAMATION "Resource and Forum: $R0"
-        ${endif} 
-    ${endwhile}
-    
-    goto Finish
-    Errors:
-        DetailPrint "Can't read from $MYSQL_DIR\$DB_NAME database"
-        MessageBox MB_OK|MB_ICONSTOP "LAMS configuration failed.  Please check you database name, user and password are set the same as when you installed LAMS$\r$\nError:$\r$\n$\r$\n$1"
-        Abort "LAMS configuration failed."
-    Finish:
-        clearerrors
-    
 FunctionEnd
 
 Function SplitFirstStrPart
@@ -2465,6 +2349,7 @@ Function updateDatabase
     Pop $2
     FileWrite $0 "INSTDIR=$2/$\r$\n"
     FileWrite $0 "DB_NAME=$DB_NAME$\r$\n"
+    FileWrite $0 "MYSQL_HOST=$MYSQL_HOST$\r$\n"
     FileWrite $0 "DB_USER=$DB_USER$\r$\n"
     FileWrite $0 "DB_PASS=$DB_PASS$\r$\n"
     Push $LAMS_DIR
@@ -2478,14 +2363,12 @@ Function updateDatabase
     SetOutPath $INSTDIR
     File /a "LanguagePack.xml"
 
-    
-   ReadRegStr $0 HKLM "${REG_HEAD}" "dir_inst"
-    
+    ReadRegStr $0 HKLM "${REG_HEAD}" "dir_inst"
     
     ; update locals must be stored as a procedure first
     ; use ANT to store procedures
     DetailPrint '$0\apache-ant-1.6.5\bin\newAnt.bat insertLocale-db'
-    nsExec::ExecToStack '$0\apache-ant-1.6.5\bin\newAnt.bat -buildfile $INSTDIR\LanguagePack.xml insertLocale-db'
+    nsExec::ExecToStack '$0\apache-ant-1.6.5\bin\newAnt.bat -logfile "..\..\..\..\..\..\..\..\..\update-logs\ant-insert-locales.log" -buildfile $INSTDIR\LanguagePack.xml insertLocale-db'
     Pop $0 ; return code, 0=success, error=fail
     Pop $1 ; console output
     DetailPrint "Database insert status: $0"
