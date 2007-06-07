@@ -7,11 +7,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
 		"http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
-<head>
+<lams:head>
 	<title><fmt:message key="title.lams"/></title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<lams:css  style="core"/>
-</head>
+</lams:head>
 <body class="stripes">
 	<div id="page">	
 		<h1 class="no-tabs-below">
