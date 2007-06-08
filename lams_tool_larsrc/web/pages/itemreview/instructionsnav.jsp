@@ -23,7 +23,7 @@
 </c:choose>
 
 <lams:html>
-	<head>
+	<lams:head>
 		<title>${instructions.title}</title>
 
 		<%@ include file="/common/header.jsp"%>
@@ -58,7 +58,7 @@
 				}
 		//-->
 		</script>
-	</head>
+	</lams:head>
 	<body>
 
 		<div id="instructions">

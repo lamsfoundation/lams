@@ -3,10 +3,10 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <lams:html>
-<head>
+<lams:head>
 	<title><fmt:message key="page.title.monitoring.view.reflection" /></title>
 	<%@ include file="/common/header.jsp"%>
-</head>
+</lams:head>
 <body class="stripes">
 
 

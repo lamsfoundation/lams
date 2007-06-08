@@ -8,8 +8,7 @@
 <c:set var="title" value="${sessionMap.title}"/>
 
 <lams:html>
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<lams:head>
 	<title><fmt:message key="export.title" /></title>
 	<c:set var="lams">
 		<lams:LAMSURL />
@@ -25,7 +24,7 @@
 		}
 	</script>
 	<lams:css localLinkPath="../"/>
-</head>
+</lams:head>
 <body class="stripes">
 
 

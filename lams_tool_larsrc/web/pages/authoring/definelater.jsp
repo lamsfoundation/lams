@@ -11,7 +11,7 @@
 
 			%>
 <lams:html>
-<head>
+<lams:head>
 	<title><fmt:message key="label.author.title" /></title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
@@ -42,7 +42,7 @@
 	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
 
 
-</head>
+</lams:head>
 <body class="stripes" onLoad="init()">
 <div id="page">
 	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">

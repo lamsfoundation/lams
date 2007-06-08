@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
-<head>
+<lams:head>
 	<html:base />
 	<%@ include file="/common/header.jsp"%>
 	
@@ -76,7 +76,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script language="JavaScript" src="${ctxPath}/includes/javascript/tree.js"></script>
 	<script language="JavaScript" src="${ctxPath}/includes/javascript/tree_tpl.js"></script>
 
-</head>
+</lams:head>
 <body class="stripes">
 	<c:choose>
 		<c:when test="${empty cpPackage.organizationXml}">

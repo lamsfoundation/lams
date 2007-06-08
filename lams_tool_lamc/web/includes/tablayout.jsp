@@ -5,12 +5,12 @@
 <%@ taglib uri="tags-tiles" prefix="tiles"%>
 
 <lams:html>
-	<head>
+	<lams:head>
 		<title><fmt:message key="activity.title" /></title>
 		<%@ include file="/common/header.jsp"%>
 
 		<tiles:insert attribute="header" />
-	</head>
+	</lams:head>
 
 	<body onLoad="init()">
 		<div id="page">

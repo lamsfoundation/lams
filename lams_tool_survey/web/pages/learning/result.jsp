@@ -4,7 +4,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-<head>
+<lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 
@@ -29,7 +29,7 @@
 	-->        
     </script>
 
-</head>
+</lams:head>
 <body class="stripes">
 
 

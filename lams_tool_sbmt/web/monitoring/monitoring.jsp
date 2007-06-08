@@ -5,7 +5,7 @@
 <%@ page import="org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants"%>
 
 <lams:html>
-<head>
+<lams:head>
 	<title><fmt:message key="activity.title" /></title>
 	<lams:headItems />
 	<!-- ********************  CSS ********************** -->
@@ -73,7 +73,7 @@
 		hideBusy(statisticTargetDiv);
 	}        
 	</script>
-</head>
+</lams:head>
 
 <body class="stripes" onLoad="init()">
 	<div id="page">

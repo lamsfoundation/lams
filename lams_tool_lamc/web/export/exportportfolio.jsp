@@ -26,11 +26,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp"%>
 
 	<lams:html>
-	<head>
+	<lams:head>
 	<title> <fmt:message key="label.exportPortfolio"/> </title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<lams:css localLinkPath="../"/>
-	</head>
+	</lams:head>
 
 	<body class="stripes">
 	

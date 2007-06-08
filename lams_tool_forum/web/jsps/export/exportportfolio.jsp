@@ -10,10 +10,9 @@
 
 <lams:html>
 
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<lams:head>
 	<lams:css localLinkPath="../"/>
-</head>
+</lams:head>
 
 <body class="stripes">
 

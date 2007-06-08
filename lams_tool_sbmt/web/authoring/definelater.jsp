@@ -13,7 +13,7 @@
 
 			%>
 <lams:html>
-<head>
+<lams:head>
 	<lams:headItems />
 	<title><fmt:message key="activity.title" /></title>
 
@@ -36,7 +36,7 @@
 	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
 
 
-</head>
+</lams:head>
 <body class="stripes" onLoad="init()">
 	<div id="page">
 

@@ -42,8 +42,6 @@
 	<lams:WebAppURL />
 </c:set>
 
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-
 <lams:css style="tabbed"/>
 
 <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">

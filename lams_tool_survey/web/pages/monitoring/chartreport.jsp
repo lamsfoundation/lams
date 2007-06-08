@@ -5,9 +5,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.survey.SurveyConstants"%>
 <lams:html>
-<head>
+<lams:head>
 	    <%@ include file="/common/header.jsp" %>
-</head>
+</lams:head>
 <body>
 		<div id="content">
 			<h1>

@@ -5,10 +5,10 @@
 <%@ taglib uri="tags-tiles" prefix="tiles"%>
 
 <lams:html>
-	<head>
+	<lams:head>
 		<title><fmt:message key="activity.title" /></title>
 		<%@ include file="/common/header.jsp"%>
-	</head>
+	</lams:head>
 	<body class="stripes">
 		<div id="page">
 			<tiles:useAttribute name="pageTitleKey" scope="request" />

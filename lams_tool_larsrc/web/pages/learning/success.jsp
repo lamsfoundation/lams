@@ -5,9 +5,9 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 <lams:html>
-	<head>
+	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-	</head>
+	</lams:head>
 	<body class="stripes">
 		<script type="text/javascript">
 			var reqIDVar = new Date();

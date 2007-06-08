@@ -5,7 +5,7 @@
 <%@ page import="org.lamsfoundation.lams.tool.rsrc.ResourceConstants"%>
 
 <lams:html>
-	<head>
+	<lams:head>
 		 <%@ include file="/common/tabbedheader.jsp" %>
 	 <script>
 
@@ -23,7 +23,7 @@
 				launchPopup(myUrl,"MonitoringReview");
 			}
 	    </script>		 
-	</head>
+	</lams:head>
 	<body class="stripes" onLoad="init()">
 	<div id="page">
 		<h1>

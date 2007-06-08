@@ -3,9 +3,8 @@
 
 <%@include file="/common/taglibs.jsp"%>
 <lams:html>
-<head>
+<lams:head>
 	<title><fmt:message key="activity.title" /></title>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>
 	<c:set var="lams">
 		<lams:LAMSURL />
@@ -17,7 +16,7 @@
 			location.href=act + "?method=newMark&updateMode=listMark&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
 		}
 	</script>
-</head>
+</lams:head>
 <body class="stripes">
 		<div id="content">
 		<h1>

@@ -6,12 +6,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
 	"http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
-  	<head>
-  		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	    <title><c:out value="${NbExportForm.title}"/></title>
+  	<lams:head>
+ 	    <title><c:out value="${NbExportForm.title}"/></title>
 	  	
 		<lams:css localLinkPath="../"/>
-	</head>  
+	</lams:head>  
   	<body class="stripes">
 	
 			<div id="content">

@@ -5,7 +5,7 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <lams:html>
-<head>
+<lams:head>
 
 	<%@ include file="/common/header.jsp"%>
 
@@ -20,7 +20,7 @@
 			location.href= finishUrl;
 		}
 	</script>
-</head>
+</lams:head>
 
 <body class="stripes">
 	<div id="content">

@@ -3,9 +3,9 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
-	<head>
+	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-	</head>
+	</lams:head>
 	<body>
 		<html:form action="/learning/saveOrUpdateItem" method="post"
 			styleId="resourceItemForm" enctype="multipart/form-data">

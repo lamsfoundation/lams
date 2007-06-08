@@ -4,10 +4,10 @@
 <%@include file="/common/taglibs.jsp"%>
 
 <lams:html>
-<head>
+<lams:head>
 	<%@ include file="/common/header.jsp"%>
 	<meta http-equiv="refresh" content="60">
-</head>
+</lams:head>
 
 <body class="stripes">
 	<div id="content">

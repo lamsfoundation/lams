@@ -5,7 +5,7 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <lams:html>
-<head>
+<lams:head>
 <title><fmt:message key="tool.display.name" /></title>
 <html:base />
 <%@ include file="/common/header.jsp"%>
@@ -47,7 +47,7 @@
 		}
 	</script>
 
-</head>
+</lams:head>
 
 <body class="stripes">
 

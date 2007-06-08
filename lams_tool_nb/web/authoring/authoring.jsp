@@ -7,7 +7,7 @@
 	import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
 
 <lams:html>
-<head>
+<lams:head>
 	<lams:headItems />
 	<title><fmt:message key="activity.title" />
 	</title>
@@ -52,7 +52,7 @@
 			document.NbAuthoringForm.submit();
 		}        
      </script>
-</head>
+</lams:head>
 
 <body class="stripes" onLoad="init()">
 

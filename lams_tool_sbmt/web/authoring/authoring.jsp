@@ -11,7 +11,7 @@
 
 <%@ page import="org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants"%>
 <lams:html>
-<head>
+<lams:head>
 	
 	<lams:headItems />
 	<title><fmt:message key="activity.title" /></title>
@@ -45,7 +45,7 @@
         
     </script>
 
-</head>
+</lams:head>
 <body class="stripes" onLoad="init()">
 	<div id="page">
 

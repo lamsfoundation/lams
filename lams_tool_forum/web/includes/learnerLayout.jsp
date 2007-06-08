@@ -10,7 +10,7 @@
 	<lams:WebAppURL />
 </c:set>
 <lams:html>
-	<head>
+	<lams:head>
 		<title><fmt:message key="activity.title" /></title>
 		<%@ include file="/common/header.jsp"%>
 		<script type="text/javascript">
@@ -24,7 +24,7 @@
 			}
 		</script>		
 		
-	</head>
+	</lams:head>
 	<body class="stripes">
 			<tiles:insert attribute="body" />
 	</body>

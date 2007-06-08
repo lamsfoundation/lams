@@ -3,7 +3,7 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
-<head>
+<lams:head>
 	<title><fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
@@ -26,7 +26,7 @@
 		}
 	-->        
     </script>
-</head>
+</lams:head>
 <body class="stripes">
 	<html:form action="/learning/doSurvey" method="post"
 		styleId="surveyForm">

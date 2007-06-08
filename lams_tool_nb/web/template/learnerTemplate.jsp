@@ -11,10 +11,10 @@
 </c:set>
 
 <lams:html>
-<head>
+<lams:head>
 	<lams:css />
 	<title><fmt:message key="activity.title"/></title>
-</head>
+</lams:head>
 
 <body class="stripes">
 

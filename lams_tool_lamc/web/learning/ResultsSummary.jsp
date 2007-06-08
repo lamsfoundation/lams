@@ -32,9 +32,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </c:set>
 
 <lams:html>
-<head>
+<lams:head>
 	<html:base />
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css />
 	<title><fmt:message key="activity.title" />
 	</title>
@@ -46,7 +45,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			}
 		}
 	</script>
-</head>
+</lams:head>
 
 <body class="stripes">
 

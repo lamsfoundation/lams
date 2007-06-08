@@ -41,7 +41,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	%>
 
 <lams:html>		
-	<head>
+	<lams:head>
 	<title><fmt:message key="activity.title" /></title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
@@ -106,7 +106,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		}
 
 	</script>
-</head>
+</lams:head>
 
 
 <body class="stripes" onLoad="init();">

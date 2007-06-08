@@ -3,9 +3,9 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
-<head>
+<lams:head>
 	<lams:headItems />
-<head>
+<lams:head>
 <body class="stripes">
 	<div align="center">
 		<h1>

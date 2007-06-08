@@ -10,8 +10,8 @@ request using this page as target
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
             "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
-	<head>
-	</head>
+	<lams:head>
+	</lams:head>
 	<body class="stripes" bgcolor="#9DC5EC" border="1" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 		<c:redirect url="/nextInstruction.do">
 			<c:param name="mode" value="${param.mode}"/>

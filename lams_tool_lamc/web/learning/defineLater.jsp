@@ -32,11 +32,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </c:set>
 
 <lams:html>
-<head>
+<lams:head>
 	<html:base />
 	<lams:headItems />
 	<title><fmt:message key="activity.title" /></title>
-</head>
+</lams:head>
 
 <body>
 	<div id="page-learner">

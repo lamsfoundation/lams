@@ -3,7 +3,7 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
-	<head>
+	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
 		<%-- user for  rsrcresourceitem.js --%>
@@ -13,7 +13,7 @@
 	</script>
 		<script type="text/javascript"
 			src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
-	</head>
+	</lams:head>
 	<body class="tabpart">
 
 		<!-- Basic Info Form-->

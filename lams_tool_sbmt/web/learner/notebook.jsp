@@ -3,7 +3,7 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <lams:html>
-<head>
+<lams:head>
 	<title><fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
@@ -12,7 +12,7 @@
 			document.getElementById("finishButton").disabled = true;
 		}
 	</script>	
-</head>
+</lams:head>
 
 <body class="stripes">
 

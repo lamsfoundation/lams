@@ -4,16 +4,15 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
-	<head>
+	<lams:head>
 		<title><c:out value="${scribeDTO.title}" escapeXml="false" />
 		</title>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<lams:css localLinkPath="../" />
 
 		<style>
 			<jsp:include flush="true" page="/includes/css/scribe.css"></jsp:include>			
 		</style>
-	</head>
+	</lams:head>
 
 	<body class="stripes">
 

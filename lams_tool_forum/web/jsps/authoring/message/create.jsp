@@ -3,10 +3,10 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
-	<head>
+	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
-	</head>
+	</lams:head>
 	<body>
 		<!-- Basic Info Form-->
 		<%@ include file="/common/messages.jsp"%>

@@ -3,7 +3,7 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
-	<head>
+	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
 		<script type="text/javascript">
@@ -13,7 +13,7 @@
 		<script type="text/javascript"
 			src="${tool}includes/javascript/message.js"></script>
 
-	</head>
+	</lams:head>
 	<body>
 
 		<!-- Basic Info Form-->

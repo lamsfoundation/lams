@@ -23,7 +23,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
-	<head>
+	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
 		
@@ -39,7 +39,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			}
 			
 		</script>
-	</head>
+	</lams:head>
 
 	<body>
 		<html:form action="/authoring?validate=false"

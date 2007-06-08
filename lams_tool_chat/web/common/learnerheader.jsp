@@ -7,7 +7,7 @@
 	<lams:WebAppURL />
 </c:set>
 
-<head>
+<lams:head>
 	<title>
 		<fmt:message key="activity.title" />
 	</title>
@@ -19,7 +19,6 @@
 			<link href="${tool}includes/css/chat_rtl.css" rel="stylesheet" type="text/css">
 		</c:otherwise>
 	</c:choose>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:css/>	
 	<tiles:insert attribute="headItems" />
-</head>
+</lams:head>

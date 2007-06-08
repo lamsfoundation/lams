@@ -26,15 +26,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
             "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
-    <head>
+    <lams:head>
       <html:base/>
-      <meta http-equiv="pragma" content="no-cache">
-      <meta http-equiv="cache-control" content="no-cache">
 		<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
 	    <link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
 		<!-- this is the custom CSS for hte tool -->
 		<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
-</head>
+	</lams:head>
     
 	<tiles:importAttribute/>
 	<bean:define id="headerHeight" name="headerHeight" type="String"/>

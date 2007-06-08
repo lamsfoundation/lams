@@ -25,7 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp"%>
 
 	<lams:html>
-	<head>
+	<lams:head>
 	<title> <fmt:message key="label.learning.report"/> </title>
 	
 	<%@ include file="/common/header.jsp"%>
@@ -49,7 +49,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		//-->
 	</script>	
-</head>
+</lams:head>
 <body class="stripes">
 
 	<div id="content">

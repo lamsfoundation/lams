@@ -4,12 +4,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <html>
-	<head>
+	<lams:head>
 		<title><c:out value="${notebookDTO.title}" escapeXml="false" />
 		</title>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<lams:css localLinkPath="../" />
-	</head>
+	</lams:head>
 
 	<body class="stripes">
 
