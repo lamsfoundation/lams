@@ -76,7 +76,9 @@ INSERT INTO lams_learning_activity_type VALUES (6, 'PARALLEL');
 INSERT INTO lams_learning_activity_type VALUES (7, 'OPTIONS');
 INSERT INTO lams_learning_activity_type VALUES (8, 'SEQUENCE');
 INSERT INTO lams_learning_activity_type VALUES (9, 'GATE_SYSTEM');
-INSERT INTO lams_learning_activity_type VALUES (10, 'BRANCHING');
+INSERT INTO lams_learning_activity_type VALUES (10, 'BRANCHING_CHOSEN');
+INSERT INTO lams_learning_activity_type VALUES (11, 'BRANCHING_GROUP');
+INSERT INTO lams_learning_activity_type VALUES (12, 'BRANCHING_TOOL');
 
 INSERT INTO lams_gate_activity_level VALUES (1, 'LEARNER');
 INSERT INTO lams_gate_activity_level VALUES (2, 'GROUP');
@@ -178,12 +180,29 @@ VALUES (5, 9, 'System Gate', 'Gate: Opens under system control.',
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
 	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
 	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
-VALUES (6, 10, 'Branching', 'Contains multiple sequence activities.', 
-	'learning/branching.do?method=performBranching', 'learning/branching.do?method=performBranching', 
-	'learning/branching.do?method=viewBranching&mode=teacher', 'learning/branchingExportPortfolio?mode=learner',
-	'learning/branchingExportPortfolio?mode=teacher', 'monitoring/branching.do?method=startBranching', 
-	'monitoring/branching.do?method=startBranching', now()	);
+VALUES (6, 10, 'Monitor Chosen Branching', 'Select between multiple sequence activities, with the branch chosen in monitoring.', 
+	'learning/branching.do?method=performBranching&type=chosen', 'learning/branching.do?method=performBranching&type=chosen', 
+	'learning/branching.do?method=viewBranching&mode=teacher&type=chosen', 'learning/branchingExportPortfolio?mode=learner&type=chosen',
+	'learning/branchingExportPortfolio?mode=teacher&type=chosen', 'monitoring/branching.do?method=assignBranch&type=chosen', 
+	'monitoring/branching.do?method=assignBranch&type=chosen', now());
 
+INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description,
+        learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url,
+        export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+VALUES (7, 11, 'Group Based Branching', 'Select between multiple sequence activities, with the branch chosen by an existing group.',
+        'learning/branching.do?method=performBranching&type=group', 'learning/branching.do?method=performBranching&type=group',
+        'learning/branching.do?method=viewBranching&mode=teacher&type=group', 'learning/branchingExportPortfolio?mode=learner&type=group',
+        'learning/branchingExportPortfolio?mode=teacher&type=group', 'monitoring/branching.do?method=assignBranch&type=group',
+        'monitoring/branching.do?method=assignBranch&type=group', now());
+
+INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description,
+        learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url,
+        export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+VALUES (8, 12, 'Tool Output Based Branching', 'Select between multiple sequence activities, with the branch chosen on results of another activity.',
+        'learning/branching.do?method=performBranching&type=tool', 'learning/branching.do?method=performBranching&type=tool',
+        'learning/branching.do?method=viewBranching&mode=teacher&type=tool', 'learning/branchingExportPortfolio?mode=learner&type=tool',
+        'learning/branchingExportPortfolio?mode=teacher&type=tool', 'monitoring/branching.do?method=assignBranch&type=tool',
+        'monitoring/branching.do?method=assignBranch&type=tool', now());
 
 -- Supported Locales
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 

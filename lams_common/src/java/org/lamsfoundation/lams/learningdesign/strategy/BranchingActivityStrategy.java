@@ -23,9 +23,15 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.strategy;
 
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.NullActivity;
 
 
 /**
@@ -36,6 +42,9 @@ import org.lamsfoundation.lams.learningdesign.BranchingActivity;
  */
 public class BranchingActivityStrategy extends ComplexActivityStrategy
 {
+	
+	private static final long serialVersionUID = -1861859105441615028L;
+
 	private BranchingActivity branchingActivity = null;
 	
 	public BranchingActivityStrategy(BranchingActivity branchingActivity) {
@@ -43,15 +52,21 @@ public class BranchingActivityStrategy extends ComplexActivityStrategy
 	}
 
     /**
-     * Regarding incomplete parallel activity, the next activity will always
-     * be a waiting activity, which will finally translated into waiting
-     * message.
+     * @todo The real strategy is ???
+     * 
+     * For the moment, always get the first branch.
      * 
      * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
     public Activity getNextActivityByParent(ComplexActivity activity, Activity currentChild)
     {
-        return null;
+        Set children = new TreeSet(new ActivityOrderComparator());
+        children.addAll(activity.getActivities());
+        Iterator iter = children.iterator();
+        if ( iter.hasNext() ) 
+        	return (Activity) iter.next();
+        	
+        return new NullActivity();
     }
 
     /**
@@ -76,4 +91,6 @@ public class BranchingActivityStrategy extends ComplexActivityStrategy
     protected ComplexActivity getComplexActivity() {
     	return branchingActivity;
     }
+    
+    
 }

@@ -263,7 +263,13 @@
 			<subclass name="org.lamsfoundation.lams.learningdesign.ParallelActivity" discriminator-value="6">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 			</subclass>
-			<subclass name="org.lamsfoundation.lams.learningdesign.BranchingActivity" discriminator-value="10">
+			<subclass name="org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity" discriminator-value="10">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+			</subclass>
+			<subclass name="org.lamsfoundation.lams.learningdesign.GroupBranchingActivity" discriminator-value="11">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+			</subclass>
+			<subclass name="org.lamsfoundation.lams.learningdesign.ToolBranchingActivity" discriminator-value="12">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 			</subclass>
 	</subclass>

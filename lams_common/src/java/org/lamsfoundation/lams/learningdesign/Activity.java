@@ -70,7 +70,9 @@ public abstract class Activity implements Serializable,Nullable {
 	public static final int OPTIONS_ACTIVITY_TYPE = 7;
 	public static final int SEQUENCE_ACTIVITY_TYPE = 8;
 	public static final int SYSTEM_GATE_ACTIVITY_TYPE = 9;
-	public static final int BRANCHING_ACTIVITY_TYPE = 10;
+	public static final int CHOSEN_BRANCHING_ACTIVITY_TYPE = 10;
+	public static final int GROUP_BRANCHING_ACTIVITY_TYPE = 11;
+	public static final int TOOL_BRANCHING_ACTIVITY_TYPE = 12;
 	/******************************************************************/
 	
 	/**
@@ -330,8 +332,16 @@ public abstract class Activity implements Serializable,Nullable {
 				activity = new SystemGateActivity();
 				activity.setActivityCategoryID(CATEGORY_SYSTEM);
 				break;
-			case BRANCHING_ACTIVITY_TYPE:
-				activity = new BranchingActivity();
+			case CHOSEN_BRANCHING_ACTIVITY_TYPE:
+				activity = new ChosenBranchingActivity();
+				activity.setActivityCategoryID(CATEGORY_SYSTEM);
+				break;
+			case GROUP_BRANCHING_ACTIVITY_TYPE:
+				activity = new GroupBranchingActivity();
+				activity.setActivityCategoryID(CATEGORY_SYSTEM);
+				break;
+			case TOOL_BRANCHING_ACTIVITY_TYPE:
+				activity = new ToolBranchingActivity();
 				activity.setActivityCategoryID(CATEGORY_SYSTEM);
 				break;
 			default:
@@ -799,7 +809,9 @@ public abstract class Activity implements Serializable,Nullable {
 		return getActivityTypeId().intValue()== SEQUENCE_ACTIVITY_TYPE || 
 			   getActivityTypeId().intValue()== PARALLEL_ACTIVITY_TYPE ||
 			   getActivityTypeId().intValue()== OPTIONS_ACTIVITY_TYPE ||
-			   getActivityTypeId().intValue()== BRANCHING_ACTIVITY_TYPE;
+			   getActivityTypeId().intValue()== CHOSEN_BRANCHING_ACTIVITY_TYPE ||
+			   getActivityTypeId().intValue()== GROUP_BRANCHING_ACTIVITY_TYPE ||
+			   getActivityTypeId().intValue()== TOOL_BRANCHING_ACTIVITY_TYPE;
 	}
 	
 	public boolean isSystemToolActivity()
@@ -862,12 +874,42 @@ public abstract class Activity implements Serializable,Nullable {
 	}
 	
 	/**
-	 * Check up whether an activity is branching activity or not.
+	 * Check up whether an activity is some sort of branching activity or not
 	 * @return is this activity a branching activity
 	 */
 	public boolean isBranchingActivity()
 	{
-		return getActivityTypeId().intValue()== BRANCHING_ACTIVITY_TYPE;
+		return getActivityTypeId().intValue()== CHOSEN_BRANCHING_ACTIVITY_TYPE ||
+		   getActivityTypeId().intValue()== GROUP_BRANCHING_ACTIVITY_TYPE ||
+		   getActivityTypeId().intValue()== TOOL_BRANCHING_ACTIVITY_TYPE;
+	}
+
+
+	/**
+	 * Check up whether an activity is branching activity based on the monitor choice or not.
+	 * @return is this activity a branching activity
+	 */
+	public boolean isChosenBranchingActivity()
+	{
+		return getActivityTypeId().intValue()== CHOSEN_BRANCHING_ACTIVITY_TYPE;
+	}
+
+	/**
+	 * Check up whether an activity is branching activity based on an existing group or not.
+	 * @return is this activity a branching activity
+	 */
+	public boolean isGroupBranchingActivity()
+	{
+		return getActivityTypeId().intValue()== GROUP_BRANCHING_ACTIVITY_TYPE;
+	}
+
+	/**
+	 * Check up whether an activity is branching activity based on another activity's output or not.
+	 * @return is this activity a branching activity
+	 */
+	public boolean isToolBranchingActivity()
+	{
+		return getActivityTypeId().intValue()== TOOL_BRANCHING_ACTIVITY_TYPE;
 	}
 
 	public boolean isActivityReadOnly()

@@ -24,11 +24,9 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.learningdesign.strategy.BranchingActivityStrategy;
 
 /** 
  * @author Mitchell Seaton
@@ -36,10 +34,12 @@ import org.lamsfoundation.lams.learningdesign.strategy.BranchingActivityStrategy
  * 
  * @hibernate.class 
 */
-abstract public class BranchingActivity extends ComplexActivity implements Serializable {
+public class ToolBranchingActivity extends BranchingActivity implements Serializable {
+
+	private static final long serialVersionUID = 8343443197068061495L;
 
 	/** full constructor */
-    public BranchingActivity(Long activityId, 
+    public ToolBranchingActivity(Long activityId, 
             Integer id, 
             String description, 
             String title, 
@@ -79,16 +79,15 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 				transitionFrom,
 				languageFile,
                 activities);
-        super.activityStrategy = new BranchingActivityStrategy(this);
-    }
+   }
 
     /** default constructor */
-    public BranchingActivity() {
-        super.activityStrategy = new BranchingActivityStrategy(this);
+    public ToolBranchingActivity() {
+        super();
     }
 
     /** minimal constructor */
-    public BranchingActivity(Long activityId, 
+    public ToolBranchingActivity(Long activityId, 
             Boolean defineLater, 
             java.util.Date createDateTime, 
             org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary, 
@@ -110,16 +109,23 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
               transitionTo,
 			  transitionFrom,
               activities);
-      super.activityStrategy = new BranchingActivityStrategy(this);
-    }
-    
-    /**
-     * @see org.lamsfoundation.lams.util.Nullable#isNull()
-     */
-    public boolean isNull()
-    {
-        return false;
     }
 
+    /**
+     * Makes a copy of the BranchingActivity for authoring, preview and monitoring enviornment 
+     * @return BranchingActivity Returns a deep-copy of the originalActivity
+     */
+    public Activity createCopy(){
+    	
+    	ToolBranchingActivity newBranchingActivity = new ToolBranchingActivity();
+    	copyToNewActivity(newBranchingActivity);
+    	return newBranchingActivity;
+    }
+
+    public String toString() {
+        return new ToStringBuilder(this)
+            .append("activityId", getActivityId())
+            .toString();
+    }
 
 }

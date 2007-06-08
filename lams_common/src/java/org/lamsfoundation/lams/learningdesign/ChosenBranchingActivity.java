@@ -36,10 +36,12 @@ import org.lamsfoundation.lams.learningdesign.strategy.BranchingActivityStrategy
  * 
  * @hibernate.class 
 */
-abstract public class BranchingActivity extends ComplexActivity implements Serializable {
+public class ChosenBranchingActivity extends BranchingActivity implements Serializable {
+
+	private static final long serialVersionUID = 2735761434798827294L;
 
 	/** full constructor */
-    public BranchingActivity(Long activityId, 
+    public ChosenBranchingActivity(Long activityId, 
             Integer id, 
             String description, 
             String title, 
@@ -79,16 +81,15 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 				transitionFrom,
 				languageFile,
                 activities);
-        super.activityStrategy = new BranchingActivityStrategy(this);
     }
 
     /** default constructor */
-    public BranchingActivity() {
-        super.activityStrategy = new BranchingActivityStrategy(this);
+    public ChosenBranchingActivity() {
+    	super();
     }
 
     /** minimal constructor */
-    public BranchingActivity(Long activityId, 
+    public ChosenBranchingActivity(Long activityId, 
             Boolean defineLater, 
             java.util.Date createDateTime, 
             org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary, 
@@ -110,16 +111,22 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
               transitionTo,
 			  transitionFrom,
               activities);
-      super.activityStrategy = new BranchingActivityStrategy(this);
     }
-    
     /**
-     * @see org.lamsfoundation.lams.util.Nullable#isNull()
+     * Makes a copy of the BranchingActivity for authoring, preview and monitoring enviornment 
+     * @return BranchingActivity Returns a deep-copy of the originalActivity
      */
-    public boolean isNull()
-    {
-        return false;
+    public Activity createCopy(){
+    	
+    	ChosenBranchingActivity newBranchingActivity = new ChosenBranchingActivity();
+    	copyToNewActivity(newBranchingActivity);
+    	return newBranchingActivity;
     }
 
+    public String toString() {
+        return new ToStringBuilder(this)
+            .append("activityId", getActivityId())
+            .toString();
+    }
 
-}
+ }

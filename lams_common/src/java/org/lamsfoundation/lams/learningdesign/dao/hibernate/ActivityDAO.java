@@ -28,6 +28,8 @@ import java.util.List;
 import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
+import org.lamsfoundation.lams.learningdesign.GroupBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
@@ -37,8 +39,8 @@ import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SystemGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
-import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.springframework.dao.DataRetrievalFailureException;
 
@@ -100,8 +102,12 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 							return getActivityByActivityId(activityId,SequenceActivity.class);
 					case Activity.SYSTEM_GATE_ACTIVITY_TYPE: 
 						return getActivityByActivityId(activityId,SystemGateActivity.class);
-					case Activity.BRANCHING_ACTIVITY_TYPE: 
-							return getActivityByActivityId(activityId,BranchingActivity.class);
+					case Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE: 
+							return getActivityByActivityId(activityId,ChosenBranchingActivity.class);
+					case Activity.GROUP_BRANCHING_ACTIVITY_TYPE: 
+						return getActivityByActivityId(activityId,GroupBranchingActivity.class);
+					case Activity.TOOL_BRANCHING_ACTIVITY_TYPE: 
+						return getActivityByActivityId(activityId,ToolBranchingActivity.class);
 					default: break; 
 				}
 			}
