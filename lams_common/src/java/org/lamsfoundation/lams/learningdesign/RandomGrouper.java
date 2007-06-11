@@ -130,7 +130,7 @@ public class RandomGrouper extends Grouper implements Serializable
     {
         if(randomGrouping.getNumberOfGroups()!=null) {
             return getNewGroupsByNumberOfGroups(randomGrouping, randomGrouping.getNumberOfGroups(), isInitialization);
-        } else if(randomGrouping.getLearnersPerGroup()!=null) {
+        } else if(randomGrouping.getLearnersPerGroup()!=null && randomGrouping.getLearnersPerGroup().intValue()>0) {
             return getNewGroupsByLearnerPerGroup(randomGrouping,learners);
         } else {
         	log.warn("Random Grouping id="+randomGrouping.getGroupingId()+" is missing both the number of groups and learners per group. Defaulting to two groups.");

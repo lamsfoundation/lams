@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.learningdesign.NullActivity;
 
 
 /**
- * The progress calculation strategy for branching activity.
+ * The progress calculation strategy for branching activity. A learner can only do one branch.
  * 
  * @author Mitchell Seaton
  * @version 2.1
@@ -54,35 +54,32 @@ public class BranchingActivityStrategy extends ComplexActivityStrategy
     /**
      * @todo The real strategy is ???
      * 
-     * For the moment, always get the first branch.
+     * If there isn't a current child, give it any old branch, otherwise return the NulLActivity (can only do one branch).
      * 
      * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
     public Activity getNextActivityByParent(ComplexActivity activity, Activity currentChild)
     {
-        Set children = new TreeSet(new ActivityOrderComparator());
-        children.addAll(activity.getActivities());
-        Iterator iter = children.iterator();
-        if ( iter.hasNext() ) 
-        	return (Activity) iter.next();
-        	
+   
+    	if ( currentChild == null || currentChild.isNull() ) {
+    		Iterator iter = activity.getActivities().iterator();
+    		if ( iter.hasNext() ) 
+    			return (Activity) iter.next();
+    	}
+    	
         return new NullActivity();
     }
 
     /**
      * Return the completion status of children activities within a branching
-     * activity. A branching activity is marked as complete if all children
-     * activities are completed.
+     * activity. A branching activity is marked as complete if one child activity (one branch)
+     * is completed.
      * 
      * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#isComplete(int)
      */
     protected boolean isComplete(int numOfCompletedActivities)
     {
-    	if ( branchingActivity != null ) {
-    		return numOfCompletedActivities==branchingActivity.getActivities().size()?true:false;
-    	} else {
-    		return true;
-    	}
+    	return numOfCompletedActivities == 1;
     }
 
     /** 

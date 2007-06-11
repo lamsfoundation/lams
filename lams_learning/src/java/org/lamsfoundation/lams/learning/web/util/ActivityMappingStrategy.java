@@ -52,6 +52,10 @@ public class ActivityMappingStrategy implements Serializable {
 		        strutsAction = "/DisplayParallelActivity.do";
 		    else if (activity.isOptionsActivity()) 
 		        strutsAction = "/DisplayOptionsActivity.do";
+		    else {
+		    	// probably a branching activity
+			    strutsAction = "/LoadToolActivity.do";
+		    }
 		}
 		else // should be a simple activity - can handle tool, gates and grouping
 		{

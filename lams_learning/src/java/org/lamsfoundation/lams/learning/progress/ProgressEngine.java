@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -242,8 +243,8 @@ public class ProgressEngine
 		        //is a sequence activity.
 		        if(nextActivity.isSequenceActivity())
 		        {
-		            Activity firstActivityInSequence = 
-		                ((SequenceActivity)nextActivity).getFirstActivityInSequenceActivity();
+		        	SequenceActivity sequence = (SequenceActivity) activityDAO.getActivityByActivityId(nextActivity.getActivityId(), SequenceActivity.class);
+		            Activity firstActivityInSequence = sequence.getFirstActivityInSequenceActivity();
 		            learnerProgress.setNextActivity(firstActivityInSequence);
 		        }
 		        //set next activity as the activity follows the transition.

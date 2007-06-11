@@ -816,7 +816,7 @@ public abstract class Activity implements Serializable,Nullable {
 	
 	public boolean isSystemToolActivity()
 	{
-		return isGateActivity() || isGroupingActivity();
+		return isGateActivity() || isGroupingActivity() || isBranchingActivity();
 	}
 
 	public boolean isGateActivity()
