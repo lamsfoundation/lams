@@ -21,20 +21,19 @@
  * ************************************************************************
  */
 
-import org.lamsfoundation.lams.common.util.*
-import org.lamsfoundation.lams.common.ui.*
-import org.lamsfoundation.lams.common.style.*
-import org.lamsfoundation.lams.authoring.cv.*
-import org.lamsfoundation.lams.authoring.*
-import org.lamsfoundation.lams.common.dict.*
-import org.lamsfoundation.lams.common.mvc.*
-import org.lamsfoundation.lams.common.CommonCanvasView
-import com.polymercode.Draw;
-import mx.controls.*
-import mx.managers.*
+import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.ui.*;
+import org.lamsfoundation.lams.common.style.*;
+import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.common.dict.*;
+import org.lamsfoundation.lams.common.mvc.*;
+import org.lamsfoundation.lams.common.CommonCanvasView;
+
+import mx.controls.*;
 import mx.containers.*;
-import mx.events.*
-import mx.utils.*
+import mx.managers.*;
+import mx.utils.*;
 
 
 /**
@@ -43,22 +42,17 @@ import mx.utils.*
 */
 
 class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
-	//constants:
-	private var GRID_HEIGHT:Number;
-	private var GRID_WIDTH:Number;
-	private var H_GAP:Number;
-	private var V_GAP:Number;
 	
 	private var _tm:ThemeManager;
+	
 	private var _cm:CanvasModel;
     private var _canvasView:CanvasView;
 	
-	private var _canvas_mc:MovieClip;
 	private var canvas_scp:ScrollPane;
 	
-	private var bkg_pnl:Panel;
 	private var isRread_only:Boolean = false;
 	private var isRedit_on_fly:Boolean = false;
+	
 	private var read_only:MovieClip;
 	private var titleBar:MovieClip;
 	private var leftCurve:MovieClip;
@@ -66,24 +60,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	private var nameBG:MovieClip;
 	private var designName_lbl:Label;
 	
-    private var _gridLayer_mc:MovieClip;
-    private var _transitionLayer_mc:MovieClip;
-	private var _activityLayerComplex_mc:MovieClip;
-	private var _activityLayer_mc:MovieClip;
-	
 	private var startTransX:Number;
 	private var startTransY:Number;
+	
 	private var lastScreenWidth:Number = 1024;
 	private var lastScreenHeight:Number = 768;
-	
-	private var _transitionPropertiesOK:Function;
-	
-    //Defined so compiler can 'see' events added at runtime by EventDispatcher
-    private var dispatchEvent:Function;     
-    public var addEventListener:Function;
-    public var removeEventListener:Function;
-	
-
 	
 	/**
 	* Constructor
@@ -159,35 +140,31 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		}
 
 	}
-	/*
-	public function onRelease(){
-		getController().canvasRelease(_canvas_mc);
-	}
-	*/
 	
 	/**
     * layout visual elements on the canvas on initialisation
     */
 	private function draw(){
 		//get the content path for the sp
-		_canvas_mc = canvas_scp.content;
+		content = canvas_scp.content;
 		
-		bkg_pnl = _canvas_mc.createClassObject(Panel, "bkg_pnl", getNextHighestDepth());
-		_gridLayer_mc = _canvas_mc.createEmptyMovieClip("_gridLayer_mc", _canvas_mc.getNextHighestDepth());
-		_transitionLayer_mc = _canvas_mc.createEmptyMovieClip("_transitionLayer_mc", _canvas_mc.getNextHighestDepth());
+		bkg_pnl = content.createClassObject(Panel, "bkg_pnl", getNextHighestDepth());
+		gridLayer = content.createEmptyMovieClip("_gridLayer_mc", content.getNextHighestDepth());
+		transitionLayer = content.createEmptyMovieClip("_transitionLayer_mc", content.getNextHighestDepth());
 		
-		_activityLayerComplex_mc = _canvas_mc.createEmptyMovieClip("_activityLayerComplex_mc", _canvas_mc.getNextHighestDepth());
-		
-		_activityLayer_mc = _canvas_mc.createEmptyMovieClip("_activityLayer_mc", _canvas_mc.getNextHighestDepth());
+		activityComplexLayer = content.createEmptyMovieClip("_activityComplexLayer_mc", content.getNextHighestDepth());
+		activityLayer = content.createEmptyMovieClip("_activityLayer_mc", content.getNextHighestDepth());
 		
 		titleBar = _canvasView.attachMovie("DesignTitleBar", "titleBar", _canvasView.getNextHighestDepth())
+		
 		var styleObj = _tm.getStyleObject('label');
 		read_only = _canvasView.attachMovie('Label', 'read_only', _canvasView.getNextHighestDepth(), {_x:5, _y:titleBar._y, _visible:true, autoSize:"left", html:true, styleName:styleObj});
 		
 		bkg_pnl.onRelease = function(){
-			trace('_canvas_mc.onRelease');
+			trace('content.onRelease');
 			Application.getInstance().getCanvas().getCanvasView().getController().canvasRelease(this);
 		}
+		
 		bkg_pnl.useHandCursor = false;
 		
 		setDesignTitle();
@@ -201,6 +178,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	private function setDesignTitle(cm:CanvasModel){
 		var dTitle:String;
 		var titleToCheck:String;
+		
 		if (isRread_only){
 			dTitle = cm.getCanvas().ddm.title + " (<font color='#FF0000'>"+Dictionary.getValue('cv_readonly_lbl')+"</font>)"
 			titleToCheck = cm.getCanvas().ddm.title + Dictionary.getValue('cv_readonly_lbl')
@@ -221,8 +199,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	}
 	
 	private function setSizeTitleBar(dTitle:String):Void{
+		
 		dTitle = StringUtils.replace(dTitle, " ", "")
 		_canvasView.createTextField("designTitle", _canvasView.getNextHighestDepth(), -10000, -10000, 20, 20)
+		
 		var nameTextFormat = new TextFormat();
 		nameTextFormat.bold = true;
 		nameTextFormat.font = "Verdana";
@@ -243,12 +223,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		
 	}
 	
-	
 	private function positionTitleBar(cm:CanvasModel):Void{
 		titleBar._y = canvas_scp._y;
 		titleBar._x = (canvas_scp.width/2)-(titleBar._width/2)
 		read_only._x = titleBar._x + 5;
-		
 	}
 
     private function styleTitleBar():Void {
@@ -270,44 +248,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		rightCurveShadowColor.setRGB(bgShadowColor);
 		
 	}
-   
-	public function initDrawTempTrans(){
-		Debugger.log("Initialising drawing temp. Transition", Debugger.GEN, "initDrawTempTrans", "CanvasView");
-		_activityLayer_mc.createEmptyMovieClip("tempTrans", _activityLayer_mc.getNextHighestDepth());
-		_activityLayer_mc.attachMovie("squareHandle", "h1", _activityLayer_mc.getNextHighestDepth());
-		_activityLayer_mc.attachMovie("squareHandle", "h2", _activityLayer_mc.getNextHighestDepth());
-		_activityLayer_mc.h1._x = _canvas_mc._xmouse
-		_activityLayer_mc.h1._y = _canvas_mc._ymouse
-		_activityLayer_mc.tempTrans.onEnterFrame = drawTempTrans;
-	}
-	
-	/**
-	 * used to draw temp dotted transtion.
-	 * @usage   
-	 * @return  
-	 */
-	private function drawTempTrans(){
-	   Debugger.log("Started drawing temp. Transition", Debugger.GEN, "drawTempTrans", "CanvasView");
-	   
-	   this.clear();
-	   
-	   Debugger.log("Runtime movieclips cleared from CanvasView: clear()", Debugger.GEN, "drawTempTrans", "CanvasView");
-	   
-	   Draw.dashTo(this, _parent.h1._x, _parent.h1._y, _parent._parent._xmouse - 3, _parent._parent._ymouse - 3, 7, 4);
-	   _parent.h2._x = _parent._parent._xmouse - 3
-	   _parent.h2._y = _parent._parent._ymouse - 3
-   }
-	
-	public function removeTempTrans(){
-	   Debugger.log("Stopped drawing temp. Transition", Debugger.GEN, "removeTempTrans", "CanvasView");
-		
-		delete _activityLayer_mc.tempTrans.onEnterFrame;
-		
-		_activityLayer_mc.tempTrans.removeMovieClip();
-		_activityLayer_mc.h1.removeMovieClip();
-		_activityLayer_mc.h2.removeMovieClip();
-	}
-	 
 	   
 	/**
 	 * Draws new or replaces existing activity to canvas stage.
@@ -324,30 +264,30 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		Debugger.log('I am in drawActivity and Activity typeID :'+a.activityTypeID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity()){
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasView:cvv});
+			var newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasView:cvv});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Tool or gate activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasView');
 		}
 		else if (a.isGateActivity()){
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasGateActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasView:cvv});
+			var newActivity_mc = activityLayer.createChildAtDepth("CanvasGateActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasView:cvv});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Gate activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasView');
 		}
 		else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv, _locked:a.isReadOnly()});
+			var newActivity_mc = activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv, _locked:a.isReadOnly()});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Parallel activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 		}
 		else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
-			var newActivity_mc = _activityLayerComplex_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv,_locked:a.isReadOnly()});
+			var newActivity_mc = activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv,_locked:a.isReadOnly()});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 		}
 		else if(a.activityTypeID==Activity.BRANCHING_ACTIVITY_TYPE){	
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasView:cvv});
+			var newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasView:cvv});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Branching activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 	
@@ -407,7 +347,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	private function drawTransition(t:Transition,cm:CanvasModel):Boolean{
 		var cvv = CanvasView(this);
 		var cvc = getController();
-		var newTransition_mc:MovieClip = _transitionLayer_mc.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_canvasController:cvc,_canvasView:cvv});
+		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_canvasController:cvc,_canvasView:cvv});
 		
 		cm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
 		Debugger.log('drawn a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'drawTransition','CanvasView');
@@ -427,7 +367,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	private function hideTransition(t:Transition, cm:CanvasModel):Boolean{
 		var cvv = CanvasView(this);
 		var cvc = getController();
-		var newTransition_mc:MovieClip = _transitionLayer_mc.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_canvasController:cvc,_canvasView:cvv, _visible:false});
+		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_canvasController:cvc,_canvasView:cvv, _visible:false});
 		
 		cm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
 		Debugger.log('drawn (hidden) a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'hideTransition','CanvasView');
@@ -449,59 +389,29 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		return s;
 	}
 	
-		
-	/**
-    * Create a popup dialog to set transition parameters
-    * @param    pos - Position, either 'centre' or an object containing x + y coordinates
-    */
-    public function createTransitionPropertiesDialog(pos:Object,callBack:Function){
-	   var dialog:MovieClip;
-	   _transitionPropertiesOK = callBack;
-	   
-        //Check to see whether this should be a centered or positioned dialog
-        if(typeof(pos)=='string'){
-            dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('trans_dlg_title'),closeButton:true,scrollContentPath:"TransitionProperties"});
-        } else {
-            dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('trans_dlg_title'),closeButton:true,scrollContentPath:"TransitionProperties",_x:pos.x,_y:pos.y});
-        }
-        //Assign dialog load handler
-        dialog.addEventListener('contentLoaded',Delegate.create(this,transitionDialogLoaded));
-    }
-	
-	/**
-    * called when the transitionDialogLoaded is loaded
-    */
-    public function transitionDialogLoaded(evt:Object) {
-       //Check type is correct
-        if(evt.type == 'contentLoaded'){
-            //Set up callback for ok button click
-            evt.target.scrollContent.addEventListener('okClicked',_transitionPropertiesOK);
-        }else {
-            //TODO DI 25/05/05 raise wrong event type error 
-        }
-    }
-	
-	
     /**
     * Sets the size of the canvas on stage, called from update
     */
 	private function setSize(cm:CanvasModel):Void{
 		var s:Object = cm.getSize();
-		var newWidth:Number = Math.max(s.w, lastScreenWidth)
-		var newHeight:Number = Math.max(s.h, lastScreenHeight)
+		var newWidth:Number = Math.max(s.w, lastScreenWidth);
+		var newHeight:Number = Math.max(s.h, lastScreenHeight);
+		
 		canvas_scp.setSize(s.w,s.h);
 		bkg_pnl.setSize(newWidth,newHeight);
 		
 		//Create the grid.  The gris is re-drawn each time the canvas is resized.
-		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(newWidth),Math.round(newHeight),V_GAP,H_GAP);
+		var grid_mc = Grid.drawGrid(gridLayer,Math.round(newWidth),Math.round(newHeight),V_GAP,H_GAP);
 		
 		//position bin in canvas.  
 		var bin = cm.getCanvas().bin;
 		bin._x = (s.w - bin._width) - 20;
 		bin._y = (s.h - bin._height) - 20;
+		
 		canvas_scp.redraw(true);
-		lastScreenWidth = newWidth
-		lastScreenHeight = newHeight
+		
+		lastScreenWidth = newWidth;
+		lastScreenHeight = newHeight;
 	}
 	
 	/**
@@ -511,10 +421,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	 * @return  
 	 */
 	private function setStyles() {
-        
 		var styleObj = _tm.getStyleObject('CanvasPanel');
 		bkg_pnl.setStyle('styleName',styleObj);
-		
     }
 	
     /**
@@ -527,19 +435,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
         this._y = p.y;
 	}
 	
-	public function getViewMc(testString:String):MovieClip{
-		trace("passed on argument is "+testString)
-		return _canvas_mc;
-	}
+	/**public function getViewMc(testString:String):MovieClip{
+		return content;
+	}*/
 	
 	public function getTransitionLayer():MovieClip{
-		return _transitionLayer_mc;
+		return transitionLayer;
 	}
-	
-	public function get activityLayer():MovieClip{
-		return _activityLayer_mc;
-	}
-	
+
 	public function showReadOnly(b:Boolean){
 		isRread_only = b;
 	}
@@ -547,7 +450,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	public function showEditOnFly(b:Boolean){
 		isRedit_on_fly = b;
 	}
-	
+
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned
 	 * @usage   

@@ -60,7 +60,7 @@ class ToolkitController extends AbstractController {
 	public function iconDrop(dragIcon_mc:MovieClip):Void{
 		//lets do a test to see if we got the canvas
 		var cv:Canvas = Application.getInstance().getCanvas();
-		var canvasView:MovieClip = cv.getCanvasView().getViewMc();
+		var canvasView:MovieClip = cv.getCanvasView().content;
 		var iconMouseX = _xmouse - cv.model.getPosition().x;
 		var iconMouseY = _ymouse - cv.model.getPosition().y;
 		trace("iconMouseX: "+iconMouseX+" and iconMouseY: "+iconMouseY)

@@ -274,7 +274,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				} else if(ca.activity.activityTypeID == Activity.BRANCHING_ACTIVITY_TYPE) {
 					Debugger.log('activityDoubleClick CanvasBranchActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick','CanvasController');
 	   
-					_canvasModel.openBranchActivityContent(ca.activity);
+					_canvasModel.openBranchActivityContent(ca);
 					
 					// invalidate design after opening tool content window
 					_canvasModel.getCanvas().ddm.validDesign = false;

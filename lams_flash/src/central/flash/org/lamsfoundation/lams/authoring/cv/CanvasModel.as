@@ -68,6 +68,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	//each on contains a reference to the emelment in the ddm (activity or transition)
 	private var _activitiesDisplayed:Hashtable;
 	private var _transitionsDisplayed:Hashtable;
+	
+	private var _currentBranchingActivity:Object;
 
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -1065,9 +1067,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log('ta:'+ta.title+',toolContentID:'+ta.toolContentID+', activityUIID:'+ta.activityUIID,Debugger.GEN,'setDefaultToolContentID','CanvasModel');
 	}
 	
-	public function openBranchActivityContent(ba:BranchingActivity):Void {
-		//broadcastViewUpdate("BRANCHING_OPEN", ba);
-		_cv.openBranchView(ba);
+	public function openBranchActivityContent(ba):Void {
+		currentBranchingActivity = ba;
+		_cv.openBranchView(currentBranchingActivity);
+	}
+	
+	public function get currentBranchingActivity():Object {
+		return _currentBranchingActivity;
+	}
+	
+	public function set currentBranchingActivity(a:Object) {
+		_currentBranchingActivity = a;
 	}
 	
 	/**

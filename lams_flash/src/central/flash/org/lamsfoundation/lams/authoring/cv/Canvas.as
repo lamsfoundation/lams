@@ -29,11 +29,14 @@ import org.lamsfoundation.lams.common.comms.*
 import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.ws.Workspace
 import org.lamsfoundation.lams.common.ApplicationParent
 import org.lamsfoundation.lams.common.* 
 import mx.managers.*
 import mx.utils.*
+import mx.transitions.Tween;
+import mx.transitions.easing.*;
 
 /**
  * The canvas is the main screen area of the LAMS application where activies are added and sequenced
@@ -79,7 +82,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
     public var removeEventListener:Function;
-    
 
 	/**
 	* Canvas Constructor
@@ -147,34 +149,30 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
     */
     public function viewLoaded(evt:Object) {
         if(evt.type=='load') {
-			var autosave_config_interval = Config.getInstance().getItem(AUTOSAVE_CONFIG);
-			if(autosave_config_interval > 0) {
-				if(CookieMonster.cookieExists(AUTOSAVE_TAG + _root.userID)) {
-					canvasModel.autoSaveWait = true;
+			if(evt.target instanceof CanvasBranchView) {
+				mx.transitions.TransitionManager.start(evt.target,
+					{type:mx.transitions.Zoom, 
+					 direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
+
+			} else {
+			
+				var autosave_config_interval = Config.getInstance().getItem(AUTOSAVE_CONFIG);
+				if(autosave_config_interval > 0) {
+					if(CookieMonster.cookieExists(AUTOSAVE_TAG + _root.userID)) {
+						canvasModel.autoSaveWait = true;
+					}
+					setInterval(Proxy.create(this,autoSave), autosave_config_interval);
 				}
-				setInterval(Proxy.create(this,autoSave), autosave_config_interval);
+				
+				clearCanvas(true);
+				
+				dispatchEvent({type:'load',target:this});
 			}
 			
-			clearCanvas(true);
-			
-            dispatchEvent({type:'load',target:this});
-			
-        }else {
+		} else {
             Debugger.log('Event type not recognised : ' + evt.type,Debugger.CRITICAL,'viewLoaded','Canvas');
         }
     }
-	
-	/**
-    * Event dispatched from the view once it's loaded
-    */
-    public function branchViewLoaded(evt:Object) {
-        if(evt.type=='load') {
-			Debugger.log('Successful load: ' + evt.type,Debugger.CRITICAL,'branchViewLoaded','Canvas');
-        }else {
-            Debugger.log('Event type not recognised : ' + evt.type,Debugger.CRITICAL,'viewLoaded','Canvas');
-        }
-    }
-	
 	
 	/**
     * Opens the help->about dialog
@@ -254,19 +252,33 @@ b	 * @param   learningDesignID
 		
 	}
 	
-	public function openBranchView(ba:BranchingActivity){
+	public function openBranchView(ba){
 		
-		//Create the view
-		_canvasBranchView_mc = _target_mc.createChildAtDepth("canvasBranchView",DepthManager.kTop);		
-
-        //Cast toolkit view clip as ToolkitView and initialise passing in model
-		canvasBranchView = CanvasBranchView(_canvasBranchView_mc);
-		canvasBranchView.init(canvasModel,undefined);
+		fadeOtherOnCanvas(ba);
+		
+		var cx:Number = ba._x + ba.getVisibleWidth()/2;
+		var cy:Number = ba._y + ba.getVisibleHeight()/2;
+		
+		var _branchView_mc:MovieClip = _canvasView_mc.content.createChildAtDepth("canvasBrView", DepthManager.kTop, {_x: cx, _y: cy});	
+		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
+		branchView.init(canvasModel,undefined);
 		
 		//Add listener to view so that we know when it's loaded
-        canvasBranchView.addEventListener('load',Proxy.create(this,branchViewLoaded));
+        branchView.addEventListener('load', Proxy.create(this,viewLoaded));
 		
-		Application.getInstance().onResize();
+		canvasModel.addObserver(branchView);
+	}
+		
+	
+	private function fadeOtherOnCanvas(ba) {
+		
+		var k:Array = canvasModel.activitiesDisplayed.values();
+		for (var i=0; i<k.length; i++){
+			if(k[i] != ba) {
+			var tweenObj:Object = new Tween(k[i], "_alpha", Strong.easeIn, 100, 20, 0.7, true);
+			
+			}
+		}
 		
 	}
 	
@@ -711,12 +723,12 @@ b	 * @param   learningDesignID
 		
 		//give it the mouse co-ords
 		if (actType = "Parallel"){
-			actToAdd.xCoord = canvasView.getViewMc()._xmouse - (complexActWidth/2);
-			actToAdd.yCoord = canvasView.getViewMc()._ymouse;
+			actToAdd.xCoord = canvasView.content._xmouse - (complexActWidth/2);
+			actToAdd.yCoord = canvasView.content._ymouse;
 		}
 		if(actType = "Tool"){
-			actToAdd.xCoord = canvasView.getViewMc()._xmouse - (toolActWidth/2);
-			actToAdd.yCoord = canvasView.getViewMc()._ymouse - (toolActHeight/2);
+			actToAdd.xCoord = canvasView.content._xmouse - (toolActWidth/2);
+			actToAdd.yCoord = canvasView.content._ymouse - (toolActHeight/2);
 		}
 				
 		Debugger.log('actToAdd:'+actToAdd.title+':'+actToAdd.activityUIID,4,'setDroppedTemplateActivity','Canvas');		

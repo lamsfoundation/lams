@@ -49,25 +49,23 @@ import mx.controls.*;
 */
 
 class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends CommonCanvasView {
+	
 	public static var _tabID:Number = 1;
 	private var _className = "MonitorTabView";
-	//constants:
-	private var GRID_HEIGHT:Number;
-	private var GRID_WIDTH:Number;
-	private var H_GAP:Number;
-	private var V_GAP:Number;
+	
+	private var _tm:ThemeManager;
+	
+	private var mm:MonitorModel;
+	private var _monitorTabView:MonitorTabView;
+	
+	private var _tip:ToolTip;
+	
 	private var endGateOffset:Number = 60;
 	private var learner_X:Number = 22;
 	private var learner_Y:Number = 19;
 	private var drawDesignCalled:String;
 	
-	private var _tm:ThemeManager;
-	private var mm:MonitorModel;
-	private var _monitorTabView:MonitorTabView;
-	private var _tip:ToolTip;
 	
-	//Canvas clip
-	//private var _monitor_mc:MovieClip;
 	private var lessonEnd_lbl:Label;
 	private var finishedLearnersList:Array;
 	private var bg_pnl:MovieClip;
@@ -77,21 +75,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	private var learnerMenuBar:MovieClip;
 	private var monitorTabs_tb:MovieClip;
 	private var _monitorTabViewContainer_mc:MovieClip;
+	
 	private var bkg_pnl:MovieClip;
-	private var _gridLayer_mc:MovieClip;
-	private var _transitionLayer_mc:MovieClip;
-	private var _activityLayerComplex_mc:MovieClip;
-	private var _activityLayer_mc:MovieClip;
+	
 	private var _learnerContainer_mc:MovieClip;
 	private var endGate_mc:MovieClip;
-	
-	//private var _transitionPropertiesOK:Function;
-    //Defined so compiler can 'see' events added at runtime by EventDispatcher
-    private var dispatchEvent:Function;     
-    public var addEventListener:Function;
-    public var removeEventListener:Function;
-	//public var menu:ContextMenu;
-
 	
 	/**
 	* Constructor
@@ -99,8 +87,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	function MonitorTabView(){
 		_monitorTabView = this;
 		_monitorTabViewContainer_mc = this;
+		
 		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
+		
         //Init for event delegation
         mx.events.EventDispatcher.initialize(this);
 	}
@@ -112,10 +102,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		//Invoke superconstructor, which sets up MVC relationships.
 		super (m, c);
 		mm = MonitorModel(model)
+		
         //Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
-		//drawDesignCalled = false;
+		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
 		mm.getMonitor().getMV().getMonitorSequenceScp()._visible = false;
 		
@@ -241,16 +232,16 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		
 		bkg_pnl = this.attachMovie("Panel", "bkg_pnl", this.getNextHighestDepth());
 
-		_gridLayer_mc = this.createEmptyMovieClip("_gridLayer_mc", this.getNextHighestDepth());
+		gridLayer = this.createEmptyMovieClip("_gridLayer_mc", this.getNextHighestDepth());
 		
-		_transitionLayer_mc = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
-		_activityLayerComplex_mc = this.createEmptyMovieClip("_activityLayerComplex_mc", this.getNextHighestDepth());
-		_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
+		transitionLayer = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
+		activityComplexLayer = this.createEmptyMovieClip("_activityComplexLayer_mc", this.getNextHighestDepth());
+		activityLayer = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 		
 		_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", this.getNextHighestDepth());
 			
 		var s:Object = mm.getSize();
-		endGate_mc = _activityLayer_mc.createChildAtDepth("endGate",DepthManager.kTop, {_x:0, _y:s.h-endGateOffset});
+		endGate_mc = activityLayer.createChildAtDepth("endGate",DepthManager.kTop, {_x:0, _y:s.h-endGateOffset});
 		mm.endGate(endGate_mc);
 		mm.endGate = endGate_mc;
 		endGate_mc.tt_btn.onRollOver = Proxy.create(this,this['showToolTip'], "finish_learner_tooltip");
@@ -261,11 +252,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	}
 	
 	private function showEndGateData(mm:MonitorModel):Void{
-		endGate_mc.doorClosed._visible = true
 		var mc = getController();
 		var finishedLearners:Number = 0; 
-		finishedLearnersList = new Array();
 		var totalLearners:Number = mm.allLearnersProgress.length;
+		
+		endGate_mc.doorClosed._visible = true;
+		finishedLearnersList = new Array();
+		
 		for (var i=0; i<mm.allLearnersProgress.length; i++){
 			if (mm.allLearnersProgress[i].isLessonComplete()){
 				
@@ -282,15 +275,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 				
 			}
 		}
+		
 		endGate_mc.lessonEnd_lbl.text = "<b>"+Dictionary.getValue('title_sequencetab_endGate')+"</b> "+finishedLearners+" of "+ totalLearners;
-		//setSize(mm);
+		
 	}
 	
 	public function showToolTip(btnTT:String):Void{
 		var Xpos = Application.MONITOR_X+ 5;
 		var Ypos = Application.MONITOR_Y+ endGate_mc._y;
 		var ttHolder = Application.tooltip;
-		//var ttMessage = btnObj.label;
 		var ttMessage = Dictionary.getValue(btnTT);
 		
 		//param "true" is to specify that tooltip needs to be shown above the component 
@@ -303,7 +296,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	}
 	
 	private function hideMainExp(mm:MonitorModel):Void{
-		//var mcontroller = getController();
 		mm.broadcastViewUpdate("EXPORTSHOWHIDE", true);
 		mm.broadcastViewUpdate("EDITFLYSHOWHIDE", true);
 	}
@@ -321,15 +313,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			//Remove all the movies drawn on the transition and activity movieclip holder
 			
 			this._learnerContainer_mc.removeMovieClip();
-			this._transitionLayer_mc.removeMovieClip();
-			this._activityLayer_mc.removeMovieClip();
+			this.transitionLayer.removeMovieClip();
+			this.activityLayer.removeMovieClip();
 			this.endGate_mc.removeMovieClip();
 			
 			//Recreate both Transition holder and Activity holder Movieclips
-			_transitionLayer_mc = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
-			_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
+			transitionLayer = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
+			activityLayer = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 			_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", this.getNextHighestDepth());
-			endGate_mc = _activityLayer_mc.createChildAtDepth("endGate",DepthManager.kTop, {_x:0, _y:s.h-endGateOffset});
+			endGate_mc = activityLayer.createChildAtDepth("endGate",DepthManager.kTop, {_x:0, _y:s.h-endGateOffset});
 			
 			if (isChanged == false){
 				mm.setIsProgressChangedSequence(false);
@@ -368,7 +360,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	 * @return  
 	 */
 	private function removeTransition(t:Transition,mm:MonitorModel){
-		//Debugger.log('t.uiID:'+t.transitionUIID,Debugger.CRITICAL,'removeTransition','CanvasView');
 		var r = mm.transitionsDisplayed.remove(t.transitionUIID);
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;
@@ -393,15 +384,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity() ){
-			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring", learnerContainer:_learnerContainer_mc});
+			newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring", learnerContainer:_learnerContainer_mc});
 		} else if (a.isGateActivity()){
-			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasGateActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring"});
+			newActivity_mc = activityLayer.createChildAtDepth("CanvasGateActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring"});
 		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kBottom,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});
+			newActivity_mc = activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kBottom,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});
 		} else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kBottom,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});	
+			newActivity_mc = activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kBottom,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});	
 		} else{
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
 		}
@@ -411,10 +402,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		if (actItems < mm.getActivityKeys().length && newActivity_mc != null){
 			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 		}
-		
-		if (actItems == mm.getActivityKeys().length){
-			//setSize(mm);
-		} 
 		
 		mm.getMonitor().getMV().getMonitorSequenceScp().redraw(true);
 		
@@ -454,7 +441,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		var mtv = MonitorTabView(this);
 		var mc = getController();
 		
-		var newTransition_mc:MovieClip = _transitionLayer_mc.createChildAtDepth("MonitorTransition",DepthManager.kTop,{_transition:t,_monitorController:mc,_monitorTabView:mtv});
+		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("MonitorTransition",DepthManager.kTop,{_transition:t,_monitorController:mc,_monitorTabView:mtv});
 		
 		var trnsItems:Number = mm.transitionsDisplayed.size()
 		if (trnsItems < mm.getTransitionKeys().length){
@@ -479,7 +466,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		var mtv = MonitorTabView(this);
 		var mc = getController();
 		
-		var newTransition_mc:MovieClip = _transitionLayer_mc.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_monitorController:mc,_monitorTabView:mtv, _visible:false});
+		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_monitorController:mc,_monitorTabView:mtv, _visible:false});
 	
 		mm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
 		Debugger.log('drawn (hidden) a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'hideTransition','CanvasView');
@@ -508,19 +495,22 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
     */
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
-		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
-		//monitor_scp.setSize(s.w,s.h);
+		
 		bkg_pnl.setSize(s.w,s.h);
+		
 		endGate_mc._y = s.h-endGateOffset;
 		endGate_mc.bg_pnl.setSize(s.w,endGate_mc.bg_pnl.height);
 		endGate_mc.bar_pnl.setSize(s.w-20,endGate_mc.bar_pnl.height);
 		endGate_mc.tt_btn.setSize(s.w,endGate_mc.bg_pnl.height);
+		
 		for (var i=0; i<finishedLearnersList.length; i++){
 			finishedLearnersList[i]._y = endGate_mc._y+learner_Y
 		}
+		
 		mm.getMonitor().getMV().getMonitorSequenceScp().redraw(true); 
+		
 		//Create the grid.  The grid is re-drawn each time the canvas is resized.
-		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
+		var grid_mc = Grid.drawGrid(gridLayer,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
 				
 	}
 	
