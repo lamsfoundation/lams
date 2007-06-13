@@ -64,6 +64,7 @@ public interface WDDXTAGS {
 	public static final String GROUPINGS ="groupings";
 	public static final String TRANSITIONS ="transitions";
 	public static final String ACTIVITIES ="activities";
+	public static final String BRANCH_MAPPINGS = "branchMappings";
 	
 	/*Learning Library specific tags */
 	public static final String LEARNING_LIBRARY_ID ="learningLibraryID";	
@@ -124,7 +125,17 @@ public interface WDDXTAGS {
 	public static final String NUMBER_OF_GROUPS ="numberOfGroups";	
 	public static final String STAFF_GROUP_ID = "staffGroupID";
 	public static final String GROUPING_DTO = "groupingDTO";
+	public static final String GROUPS = "groups";
 	
+	public static final String GROUP_ID = "groupID";
+	public static final String GROUP_NAME = "groupName";
+	public static final String GROUP_USER_LIST = "userList";
+	public static final String GROUP_UIID = "groupUIID";
+
+	public static final String GROUP_BRANCH_ACTIVITY_ENTRY_ID = "entryID";
+	public static final String GROUP_BRANCH_ACTIVITY_ENTRY_UIID = "entryUIID";
+	public static final String GROUP_BRANCH_SEQUENCE_ACTIVITY_UIID = "sequenceActivityUIID";
+
 	/** Transition specific tags */
 	public static final String TRANSITION_ID ="transitionID";
 	public static final String TRANSITION_UIID ="transitionUIID";

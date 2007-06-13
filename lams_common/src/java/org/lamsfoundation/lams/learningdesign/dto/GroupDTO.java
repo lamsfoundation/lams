@@ -38,11 +38,18 @@ public class GroupDTO {
 	private int orderID;
 	//list of org.lamsfoundation.lams.usermanagement.dto.UserDTO
 	private List userList;
+    private Integer groupUIID;
 	
+    /** Get the DTO for this group. Does not include the GroupBranchActivities as they will
+     * be in a separate array for Flash. 
+     * @param group
+     */
+	@SuppressWarnings("unchecked")
 	public GroupDTO(Group group) {
 		groupID = group.getGroupId();
 		groupName = group.getGroupName();
 		orderID = group.getOrderId();
+		groupUIID = group.getGroupUIID();
 		userList = new ArrayList();
 		if(group.getUsers() != null){
 			Iterator iter = group.getUsers().iterator();
@@ -68,6 +75,12 @@ public class GroupDTO {
 	}
 	public void setOrderID(int orderID) {
 		this.orderID = orderID;
+	}
+	public Integer getGroupUIID() {
+		return groupUIID;
+	}
+	public void setGroupUIID(Integer groupUIID) {
+		this.groupUIID = groupUIID;
 	}
 	public List getUserList() {
 		return userList;

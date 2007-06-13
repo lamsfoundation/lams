@@ -33,9 +33,12 @@ import java.util.TreeSet;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityDTOOrderComparator;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
@@ -80,7 +83,8 @@ public class LearningDesignDTO extends BaseDTO{
 	private ArrayList groupings;
 	private ArrayList activities;
 	private ArrayList transitions;
-	
+	private ArrayList branchMappings;
+
 	public LearningDesignDTO(){		
 	}
 	public LearningDesignDTO(Long learningDesignId,
@@ -141,6 +145,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.groupings = new ArrayList();
 		this.activities = new ArrayList();
 		this.transitions = new ArrayList();
+		this.branchMappings = new ArrayList();
 	}	
 	public LearningDesignDTO(LearningDesign learningDesign, ActivityDAO activityDAO){
 		this.learningDesignID = learningDesign.getLearningDesignId();
@@ -196,6 +201,7 @@ public class LearningDesignDTO extends BaseDTO{
 						 null;
 		
 		this.lastModifiedDateTime = learningDesign.getLastModifiedDateTime();
+		this.branchMappings = new ArrayList(); // data will be set up by populateGroupings
 		this.groupings = populateGroupings(learningDesign,activityDAO);
 		this.activities = populateActivities(learningDesign);
 		this.transitions = populateTransitions(learningDesign);
@@ -405,6 +411,21 @@ public class LearningDesignDTO extends BaseDTO{
 	        GroupingActivity groupingActivity = (GroupingActivity) parentIterator.next();			
 		    Grouping grouping = groupingActivity.getCreateGrouping();
 		    groupingList.add(grouping.getGroupingDTO());			    
+		    
+	   		if ( grouping.getGroups().size() > 0 ) {
+    			Iterator iter = grouping.getGroups().iterator();
+    			while ( iter.hasNext() ) {
+    				Group group = (Group) iter.next();
+    	    		if ( group.getBranchActivities().size() > 0 ) {
+    	    			Iterator iter2 = group.getBranchActivities().iterator();
+    	    			while ( iter2.hasNext() ) {
+    	    				GroupBranchActivityEntry gba = (GroupBranchActivityEntry) iter2.next();
+    	    				branchMappings.add(gba.getGroupBranchActivityDTO());
+    	    			}
+    	    		}
+    			}
+    		}
+	   		
 	    }
 	    return groupingList;
 	}

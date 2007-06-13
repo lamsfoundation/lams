@@ -54,6 +54,10 @@ public class Group implements Serializable,Nullable,Comparable {
     /** persistent field */
     private int orderId;
 
+	/** FLASH generated value. Unique per LearningDesign.
+	 * Required by flash only.*/
+    private Integer groupUIID;
+
     /** persistent field */
     private Grouping grouping;
 
@@ -63,18 +67,23 @@ public class Group implements Serializable,Nullable,Comparable {
     /** persistent field */
     private Set toolSessions;
 
-    //---------------------------------------------------------------------
+    /** persistent field */
+	private Set branchActivities;
+
+	//---------------------------------------------------------------------
     // Object creation Methods
     //---------------------------------------------------------------------
     
     /** full constructor */
-    public Group(Long groupId, String groupName, int orderId, Grouping grouping, Set users, Set toolSessions) {
+    public Group(Long groupId, String groupName, int orderId, Integer groupUIID, Grouping grouping, Set users, Set toolSessions, Set branchActivities) {
         this.groupId = groupId;
         this.groupName = groupName;
         this.orderId = orderId;
+        this.groupUIID = groupUIID;
         this.grouping = grouping;
         this.users = users;
         this.toolSessions = toolSessions;
+        this.branchActivities = branchActivities;
     }
 
     /**
@@ -90,7 +99,7 @@ public class Group implements Serializable,Nullable,Comparable {
     {
     	int nextOrderId = grouping.getNextGroupOrderIdCheckName(groupName);
     	if ( nextOrderId > -1 ) {
-    		return new Group(null,groupName,nextOrderId,grouping,users,new HashSet());
+    		return new Group(null,groupName,nextOrderId,null,grouping,users,new HashSet(),null);
     	}
     	return null;
     }
@@ -110,7 +119,7 @@ public class Group implements Serializable,Nullable,Comparable {
     {
     	int nextOrderId = grouping.getNextGroupOrderIdCheckName(groupName);
     	if ( nextOrderId > -1 ) {
-    		return new Group(null,groupName,nextOrderId,grouping,users,toolSessions);
+    		return new Group(null,groupName,nextOrderId,null,grouping,users,toolSessions,null);
     	}
     	return null;
     }
@@ -126,7 +135,7 @@ public class Group implements Serializable,Nullable,Comparable {
      */
     public static Group createStaffGroup(Grouping grouping,  String groupName, Set staffs)
     {
-        return new Group(null,groupName, STAFF_GROUP_ORDER_ID,grouping,staffs,new HashSet());
+        return new Group(null,groupName, STAFF_GROUP_ORDER_ID,null,grouping,staffs,new HashSet(),null);
     }
     
     /** default constructor */
@@ -179,6 +188,17 @@ public class Group implements Serializable,Nullable,Comparable {
         this.orderId = orderId;
     }
 
+	/**
+	 * @hibernate.property column="group_ui_id" length="11"
+	 */
+	public Integer getGroupUIID() {
+		return this.groupUIID;
+	}
+
+	public void setGroupUIID(Integer uiId) {
+		this.groupUIID = uiId;
+	}
+
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
@@ -227,10 +247,33 @@ public class Group implements Serializable,Nullable,Comparable {
         this.toolSessions = toolSessions;
     }
 
+	/** Maps the branch activities appropriate for this Group. Normally there is only one branch
+	 * per branching activity that is applicable to a group, but this may be changed in the future.
+	 * If the group is applied to multiple branching activities, then there will be multiple
+	 * branches - one for each branching activity. 
+	 * 
+     *            @hibernate.set
+     *             lazy="true"
+     *             inverse="true"
+     *             cascade="all-delete-orphane"
+     *            @hibernate.collection-key
+     *             column="group_id"
+     *            @hibernate.collection-one-to-many
+     *             class="org.lamsfoundation.lams.learningdesign.GroupBranchActivity"
+     *         
+     */
+	public Set getBranchActivities() {
+		return this.branchActivities;
+	}
+	public void setBranchActivities(Set branchActivities) {
+		this.branchActivities = branchActivities;
+	}
+
     public String toString() {
         return new ToStringBuilder(this)
             .append("groupId", getGroupId())
             .append("groupName", getGroupName())
+            .append("groupUIID", getGroupUIID())
             .toString();
     }
 
@@ -242,6 +285,7 @@ public class Group implements Serializable,Nullable,Comparable {
         	.append(this.getGroupId(), castOther.getGroupId())
         	.append(this.getGroupName(), castOther.getGroupName())
             .append(this.getOrderId(), castOther.getOrderId())
+            .append(this.getGroupUIID(), castOther.getGroupUIID())
             .isEquals();
     }
 
@@ -250,6 +294,7 @@ public class Group implements Serializable,Nullable,Comparable {
         	.append(getGroupId())
         	.append(getGroupName())
             .append(getOrderId())
+            .append(getGroupUIID())
             .toHashCode();
     }
     
@@ -293,5 +338,26 @@ public class Group implements Serializable,Nullable,Comparable {
      * deleted if there are tool sessions attached */
     public boolean mayBeDeleted() {
     	return getToolSessions().size() == 0;
+    }
+
+    /** Create a copy of this group, without copying the users or tool sessions. 
+     * Copies any group to branch mappings, updating the group but not the activity. */
+    @SuppressWarnings("unchecked")
+	public Group createCopy(Grouping newGrouping) {
+    	
+    	Group newGroup = new Group(null, this.getGroupName(), this.getOrderId(), this.getGroupUIID(), 
+    			newGrouping, null, null, null);
+    	
+    	if ( this.getBranchActivities() != null && this.getBranchActivities().size() > 0) {
+			Iterator iter = this.getBranchActivities().iterator();
+			while ( iter.hasNext() ) {
+				GroupBranchActivityEntry oldEntry = (GroupBranchActivityEntry) iter.next();
+				GroupBranchActivityEntry newEntry = new GroupBranchActivityEntry(null, 
+						oldEntry.getEntryUIID(), newGroup, oldEntry.getBranchSequenceActivity());
+				newGroup.getBranchActivities().add(newEntry);
+			}
+    	}
+
+    	return newGroup;
     }
 }

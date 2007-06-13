@@ -50,8 +50,7 @@ public class ChosenGrouping extends Grouping
     public Grouping createCopy()
     {
     	ChosenGrouping chosenGrouping = new ChosenGrouping();
-    	chosenGrouping.setMaxNumberOfGroups(this.getMaxNumberOfGroups());
-    	chosenGrouping.setGroupingUIID(this.getGroupingUIID());
+    	copyGroupingFields(chosenGrouping);
     	return chosenGrouping;
     }
 

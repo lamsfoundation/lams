@@ -207,9 +207,11 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
         Group staffGroup = new Group(null,//group id 
         							 TEST_GROUP_NAME_STAFF,
                                      TEST_GROUP_ORDER_ID,
+                                     null,
                                      testLessonClass,
                                      staffs,
-                                     new HashSet());
+                                     new HashSet(),
+                                     null);
         testLessonClass.setStaffGroup(staffGroup);
 
         //create learner class group
@@ -219,9 +221,11 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
         Group learnerClassGroup = new Group(null,//group id
         									TEST_GROUP_NAME_LEARNER,
                                             testLessonClass.getNextGroupOrderIdCheckName(TEST_GROUP_NAME_LEARNER),
+                                            null,
                                             testLessonClass,
                                             learnergroups,
-                                            new HashSet());//tool session, should be empty now
+                                            new HashSet(),
+                                            null);//tool session, should be empty now
 
         learnergroups.add(learnerClassGroup);
         learnergroups.add(staffGroup);

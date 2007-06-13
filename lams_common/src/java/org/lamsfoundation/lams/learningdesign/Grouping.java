@@ -111,11 +111,38 @@ public abstract class Grouping implements Serializable
     }
     
 	/** Create a deep copy of the this grouping. It should return the same
-	 * subclass as the grouping being copied 
+	 * subclass as the grouping being copied. Does not copy the tool sessions.
+	 * Copies the groups but not users in the groups. Copies any group to 
+	 * branch mappings, updating the group but not the activity.
+	 * 
+	 * Any implementation of this method can call copyGroupingFields(Grouping newGrouping) 
+	 * to set max number of groups, grouping UIID, copy the groups 
+	 * and the group to branch mappings.
+	 *  
 	 * @return deep copy of this object
 	 */
     public abstract Grouping createCopy();
 
+    /** 
+     * Copy all the groups within this grouping to the newGrouping object.
+     * Copies the groups but not users in the groups. Copies any group to branch 
+     * mappings, updating the group but not the activity. Used by createCopy()
+     * implementations.
+     */
+    protected void copyGroupingFields(Grouping newGrouping){
+      	newGrouping.setMaxNumberOfGroups(this.getMaxNumberOfGroups());
+      	newGrouping.setGroupingUIID(this.getGroupingUIID());
+   
+    	if ( this.getGroups() != null && this.getGroups().size() > 0 ) {
+			Iterator iter = this.getGroups().iterator();
+			while ( iter.hasNext() ) {
+				Group oldGroup = (Group) iter.next();
+		    	Group newGroup = oldGroup.createCopy(newGrouping);
+		    	newGrouping.getGroups().add(newGroup);
+			}
+    	}
+    }
+    
     /**
      *            
      *

@@ -1,6 +1,24 @@
 -- Script to be run for LAMS 2.1 release, on LAMS 2.0.3 tables.
 -- Adds all the data needed for branching
 
+ALTER TABLE lams_group
+ADD COLUMN group_ui_id INT(11);
+
+CREATE TABLE lams_group_branch_activity (
+       entry_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , entry_ui_id INT(11)
+     , group_id BIGINT(20) NOT NULL
+     , activity_id BIGINT(20) NOT NULL
+     , UNIQUE UQ_lams_group_activity (activity_id, group_id)
+     , PRIMARY KEY (entry_id)
+     , INDEX (group_id)
+     , CONSTRAINT FK_lams_group_activity_1 FOREIGN KEY (group_id)
+                  REFERENCES lams_group (group_id)
+     , INDEX (activity_id)
+     , CONSTRAINT FK_lams_group_activity_2 FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id)
+)TYPE=InnoDB;
+
 INSERT INTO lams_learning_activity_type VALUES (10, 'BRANCHING_CHOSEN');
 INSERT INTO lams_learning_activity_type VALUES (11, 'BRANCHING_GROUP');
 INSERT INTO lams_learning_activity_type VALUES (12, 'BRANCHING_TOOL');
@@ -32,3 +50,5 @@ ty.',
         'learning/branching.do?method=viewBranching&mode=teacher&type=tool', 'learning/branchingExportPortfolio?mode=learner&type=tool',
         'learning/branchingExportPortfolio?mode=teacher&type=tool', 'monitoring/branching.do?method=assignBranch&type=tool',
         'monitoring/branching.do?method=assignBranch&type=tool', now());
+
+        

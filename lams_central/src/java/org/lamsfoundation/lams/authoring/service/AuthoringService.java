@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.authoring.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -47,11 +48,14 @@ import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
@@ -749,13 +753,13 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     
     /**
      * Updates the Activity information in the newLearningDesign based 
-     * on the originalLearningDesign
+     * on the originalLearningDesign. This any grouping details.
      * 
      * @param originalLearningDesign The LearningDesign to be copied
      * @param newLearningDesign The copy of the originalLearningDesign
      */
     private void updateDesignActivities(LearningDesign originalLearningDesign, LearningDesign newLearningDesign){
-    	TreeSet<Activity> newActivities = new TreeSet<Activity>(new ActivityOrderComparator());   
+    	HashMap<Integer, Activity> newActivities = new HashMap<Integer, Activity>(); // key is UIID   
     	HashMap<Integer, Grouping> newGroupings = new HashMap<Integer, Grouping>();    // key is UIID
     	
     	Set oldParentActivities = originalLearningDesign.getParentActivities();
@@ -766,23 +770,40 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    	}
     	}
     	
+    	Collection<Activity> activities = newActivities.values();
+    	
     	// Go back and find all the grouped activities and assign them the new groupings, based on the UIID. Can't
     	// be done as we go as the grouping activity may be processed after the grouped activity.
-    	for ( Activity activity : newActivities ) {
+    	for ( Activity activity : activities) {
     		Integer groupingUIID = activity.getGroupingUIID();
     		if ( groupingUIID != null ) {
    				activity.setGrouping(newGroupings.get(groupingUIID));
     		}
     	}
     	
+    	// Now go back and fix any branch mapping entries - they will still be pointing to old activities.
+    	for ( Grouping grouping: newGroupings.values() ) {
+    		if ( grouping.getGroups().size() > 0 ) {
+    			Iterator iter = grouping.getGroups().iterator();
+    			while ( iter.hasNext() ) {
+    				Group group = (Group) iter.next();
+    	    		if ( group.getBranchActivities().size() > 0 ) {
+    	    			Iterator iter2 = group.getBranchActivities().iterator();
+    	    			while ( iter2.hasNext() ) {
+    	    				GroupBranchActivityEntry entry = (GroupBranchActivityEntry) iter2.next();
+    	    				SequenceActivity oldSequenceActivity = entry.getBranchSequenceActivity();
+    	    				entry.setBranchSequenceActivity((SequenceActivity) newActivities.get(oldSequenceActivity.getActivityUIID()));
+    	    			}
+    	    		}
+    			}
+    		}
+    	}
+    	
     	// The activities collection in the learning design may already exist (as we have already done a save on the design).
     	// If so, we can't just override the existing collection as the cascade causes an error.
-    	if ( newLearningDesign.getActivities() != null ) {
-    		newLearningDesign.getActivities().clear();
-    		newLearningDesign.getActivities().addAll(newActivities);
-    	} else {
-    		newLearningDesign.setActivities(newActivities);
-    	}
+    	// newLearningDesign.getActivities() will create a new TreeSet(new ActivityOrderComparator()) if there isn't an existing set
+   		newLearningDesign.getActivities().clear();
+   		newLearningDesign.getActivities().addAll(activities);
     }
     
     /** As part of updateDesignActivities(), process an activity and, via recursive calls, the activity's child activities. Need to keep track
@@ -794,7 +815,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param newGroupings Temporary set of new groupings. Key is the grouping UUID. May not be null.
      * @param parentActivity This activity's parent activity (if one exists). May be null.
      */
-    private void processActivity(Activity activity, LearningDesign newLearningDesign, Set<Activity> newActivities, Map<Integer, Grouping> newGroupings, Activity parentActivity) {
+    private void processActivity(Activity activity, LearningDesign newLearningDesign, Map<Integer, Activity> newActivities, Map<Integer, Grouping> newGroupings, Activity parentActivity) {
 		Activity newActivity = getActivityCopy(activity, newGroupings);
 		newActivity.setLearningDesign(newLearningDesign);
 		if ( parentActivity != null ) {
@@ -802,7 +823,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 			newActivity.setParentUIID(parentActivity.getActivityUIID());
 		}
 		activityDAO.insert(newActivity);
-		newActivities.add(newActivity);
+		newActivities.put(newActivity.getActivityUIID(),newActivity);
 		
 		Set oldChildActivities = getChildActivities((Activity)activity);
 		if ( oldChildActivities != null ) {

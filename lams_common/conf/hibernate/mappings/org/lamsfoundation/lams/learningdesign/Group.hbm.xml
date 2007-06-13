@@ -65,6 +65,10 @@
         </meta>    
     </property>
 
+    <property name="groupUIID" type="java.lang.Integer" column="group_ui_id" length="11">
+				        <meta attribute="field-description">@hibernate.property column="group_ui_id" length="11"</meta>    
+	</property>				
+
     <!-- Associations -->
   
     <!-- bi-directional one-to-many association to User -->
@@ -126,5 +130,11 @@
         <column name="grouping_id" />
     </many-to-one>
 
+	<!--  bi-directional many-to-one association to GroupBranchActivity -->
+   <set name="branchActivities" lazy="true" inverse="true" cascade="all-delete-orphan">
+        <key><column name="group_id" /></key>
+        <one-to-many class="org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry"/>
+    </set>
+ 
 </class>
 </hibernate-mapping>

@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.authoring;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -41,6 +42,7 @@ import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -133,14 +135,18 @@ public class ObjectExtractor implements IObjectExtractor {
 	protected HashMap<Integer, Activity> oldActivityMap = new HashMap<Integer,Activity>(); // Activity UIID -> Activity
 	/* cache of groupings - too hard to get them from the db */
 	protected HashMap<Integer,Grouping> groupings = new HashMap<Integer,Grouping>();
+	protected HashMap<Integer,Group> groups = new HashMap<Integer,Group>();
+	protected HashMap<Integer,GroupBranchActivityEntry> branchEntries = new HashMap<Integer,GroupBranchActivityEntry>();
 	/* can't delete as we go as they are linked to other items - keep a list and delete at the end. */
 	protected Set<Grouping> groupingsToDelete = new HashSet<Grouping>();
 	protected LearningDesign learningDesign = null;
+	protected Date modificationDate = null;
 	
 	protected Logger log = Logger.getLogger(ObjectExtractor.class);	
 
 	/** Constructor to be used if Spring method injection is used */
 	public ObjectExtractor() {		
+		modificationDate = new Date();
 	}
 
 	/** Constructor to be used if Spring method injection is not used */
@@ -160,6 +166,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		this.groupDAO = groupDAO;
 		this.transitionDAO = transitionDAO;
 		this.toolSessionDAO = toolSessionDAO;
+		modificationDate = new Date();
 	}
 	
 	/** Spring injection methods */
@@ -317,8 +324,6 @@ public class ObjectExtractor implements IObjectExtractor {
 		    learningDesign.setOnlineInstructions(WDDXProcessor.convertToString(table,WDDXTAGS.ONLINE_INSTRUCTIONS));
 		if (keyExists(table, WDDXTAGS.HELP_TEXT))	
 		    learningDesign.setHelpText(WDDXProcessor.convertToString(table,WDDXTAGS.HELP_TEXT));
-		if (keyExists(table, WDDXTAGS.CREATION_DATE))	
-		    learningDesign.setCreateDateTime(WDDXProcessor.convertToDate(table,WDDXTAGS.CREATION_DATE));
 //		if (keyExists(table, WDDXTAGS.VERSION))	
 //		    learningDesign.setVersion(WDDXProcessor.convertToString(table,WDDXTAGS.VERSION));
 		//don't receive version from flash anymore(it was hardcode). Get it from lams configuration database.
@@ -326,8 +331,6 @@ public class ObjectExtractor implements IObjectExtractor {
 		
 		if (keyExists(table, WDDXTAGS.DURATION))	
 		    learningDesign.setDuration(WDDXProcessor.convertToLong(table,WDDXTAGS.DURATION));
-		if (keyExists(table, WDDXTAGS.LAST_MODIFIED_DATE))	
-		    learningDesign.setLastModifiedDateTime(WDDXProcessor.convertToDate(table,WDDXTAGS.LAST_MODIFIED_DATE));
 		
 		if (keyExists(table, WDDXTAGS.DURATION))
 		    learningDesign.setDuration(WDDXProcessor.convertToLong(table,WDDXTAGS.DURATION));
@@ -337,7 +340,12 @@ public class ObjectExtractor implements IObjectExtractor {
 		
 		if (keyExists(table, WDDXTAGS.SAVE_MODE))
 			mode = WDDXProcessor.convertToInteger(table, WDDXTAGS.SAVE_MODE);
-		
+
+		// Set creation date and modification date based on the server timezone, not the client.
+		if ( learningDesign.getCreateDateTime() == null )
+			learningDesign.setCreateDateTime(modificationDate);
+	    learningDesign.setLastModifiedDateTime(modificationDate);
+
 		Integer userId = getUserId();
 
 		if( userId != null ) {
@@ -390,11 +398,11 @@ public class ObjectExtractor implements IObjectExtractor {
 		learningDesignDAO.insertOrUpdate(learningDesign);
 	
 		// now process the "parts" of the learning design
-		//Vector v = (Vector)table.get(WDDXTAGS.GROUPINGS);
 		parseGroupings((Vector)table.get(WDDXTAGS.GROUPINGS));
 		parseActivities((Vector)table.get(WDDXTAGS.ACTIVITIES));
 		parseActivitiesToMatchUpParentActivityByParentUIID((Vector)table.get(WDDXTAGS.ACTIVITIES));
 		parseTransitions((Vector)table.get(WDDXTAGS.TRANSITIONS));
+		parseBranchMappings((Vector)table.get(WDDXTAGS.BRANCH_MAPPINGS));
 
 		learningDesign.setFirstActivity(learningDesign.calculateFirstActivity());
 		learningDesignDAO.insertOrUpdate(learningDesign);
@@ -420,20 +428,21 @@ public class ObjectExtractor implements IObjectExtractor {
 	/** Initialise the map of tool sessions already in the database. Used to work out what will be deleted
 	 * by Hibernate later - useful to clean up any unwanted tool sessions for edit on the fly.
 	 */
+	@SuppressWarnings("unchecked")
 	private void initialiseToolSessionMap(LearningDesign learningDesign) {
 		if (learningDesign.getEditOverrideLock() && learningDesign.getEditOverrideUser() != null) {
 			Iterator iter = learningDesign.getActivities().iterator();
 			while ( iter.hasNext() ) {
 				Activity activity = (Activity) iter.next();
 				oldActivityMap.put(activity.getActivityUIID(), activity);
-				List toolSessions = toolSessionDAO.getToolSessionByActivity(activity);
+				List<ToolSession> toolSessions = (List<ToolSession>) toolSessionDAO.getToolSessionByActivity(activity);
 				if ( toolSessions != null && toolSessions.size() > 0 )
 					toolSessionMap.put(activity.getActivityUIID(),toolSessions);
 			}
 		}
 	}
 
-	/** Delete the old unneeded groupings. Won't be done via a cascase */
+	/** Delete the old unneeded groupings. Won't be done via a cascade */
 	private void deleteUnwantedGroupings() {
 		for ( Grouping grouping: groupingsToDelete) {
 			groupingDAO.delete(grouping);	
@@ -504,9 +513,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	        }
 	        
 	    }
-	    
-	    
-	
 	}
 	
 
@@ -540,12 +546,56 @@ public class ObjectExtractor implements IObjectExtractor {
 			createChosenGrouping((ChosenGrouping)grouping,groupingDetails);
 		else
 			createLessonClass((LessonClass)grouping, groupingDetails);  
-		
+
 		if (keyExists(groupingDetails,WDDXTAGS.MAX_NUMBER_OF_GROUPS))
 		    grouping.setMaxNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.MAX_NUMBER_OF_GROUPS));
-		
+
+		List groupsList = (Vector)groupingDetails.get(WDDXTAGS.GROUPS);
+		if ( groupsList != null && groupsList.size() > 0 ) {
+			Iterator iter = groupsList.iterator();
+			while ( iter.hasNext() ) {
+				Hashtable groupDetails = (Hashtable)iter.next();
+				Group group = extractGroupObject(groupDetails, grouping);
+				groups.put(group.getGroupUIID(), group);
+			}
+		}
 		return grouping;
 	}
+	
+	@SuppressWarnings("unchecked")
+	private Group extractGroupObject(Hashtable groupDetails, Grouping grouping) throws WDDXProcessorConversionException {
+
+		Group group = null;
+		Integer groupUIID = WDDXProcessor.convertToInteger(groupDetails,WDDXTAGS.GROUP_UIID);
+	    if ( groupUIID == null ) { 
+	    	throw new WDDXProcessorConversionException("TGroup is missing its UUID. Group "+groupDetails+" grouping "+grouping);
+	    }
+		Long groupID = WDDXProcessor.convertToLong(groupDetails,WDDXTAGS.GROUP_ID);
+		
+		// does it exist already? Check on the ID field as the UIID field may not have 
+	    // been set if this grouping was created on the back end (based on a runtime copy of the sequence)
+		if ( groupID != null && grouping.getGroups() != null && grouping.getGroups().size() > 0 ) {
+			Iterator iter = grouping.getGroups().iterator();
+			while (group == null && iter.hasNext()) {
+				Group possibleGroup = (Group) iter.next();
+				if ( groupUIID.equals(possibleGroup.getGroupId()) ) {
+					group = possibleGroup;
+				}
+			}
+		}
+
+		if ( group == null ) {
+			group = new Group();
+			grouping.getGroups().add(group);
+		}
+		
+		group.setGroupName(WDDXProcessor.convertToString(groupDetails,WDDXTAGS.GROUP_NAME));
+		group.setGrouping(grouping);
+		group.setGroupUIID(groupUIID);
+		group.setOrderId(WDDXProcessor.convertToInteger(groupDetails,WDDXTAGS.ORDER_ID));
+		return group;
+	}
+
 	private void createRandomGrouping(RandomGrouping randomGrouping,Hashtable groupingDetails) throws WDDXProcessorConversionException{
 	    if (keyExists(groupingDetails, WDDXTAGS.LEARNERS_PER_GROUP))
 	        randomGrouping.setLearnersPerGroup(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.LEARNERS_PER_GROUP));
@@ -567,6 +617,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * @throws WDDXProcessorConversionException
 	 * @throws ObjectExtractorException
 	 */
+	@SuppressWarnings("unchecked")
 	private void parseActivities(List activitiesList) 
 			throws WDDXProcessorConversionException, ObjectExtractorException {
 		
@@ -654,6 +705,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * @param learningDesign
 	 * @throws WDDXProcessorConversionException
 	 */
+	@SuppressWarnings("unchecked")
 	private void parseTransitions(List transitionsList) throws WDDXProcessorConversionException{
 	    
 	    HashMap<Integer,Transition> newMap = new HashMap<Integer,Transition>();
@@ -769,8 +821,10 @@ public class ObjectExtractor implements IObjectExtractor {
 			}
 		}
 		
-		if (keyExists(activityDetails, WDDXTAGS.CREATION_DATE))
-		    activity.setCreateDateTime(WDDXProcessor.convertToDate(activityDetails,WDDXTAGS.CREATION_DATE));
+		// Set creation date based on the server timezone, not the client.
+		if ( activity.getCreateDateTime() == null )
+			activity.setCreateDateTime(modificationDate);
+
 		if (keyExists(activityDetails, WDDXTAGS.RUN_OFFLINE))
 		    activity.setRunOffline(WDDXProcessor.convertToBoolean(activityDetails,WDDXTAGS.RUN_OFFLINE));
 		if (keyExists(activityDetails, WDDXTAGS.ACTIVITY_CATEGORY_ID))
@@ -1002,8 +1056,10 @@ public class ObjectExtractor implements IObjectExtractor {
 	        transition.setDescription(WDDXProcessor.convertToString(transitionDetails,WDDXTAGS.DESCRIPTION));
 	    if(keyExists(transitionDetails, WDDXTAGS.TITLE))
 	        transition.setTitle(WDDXProcessor.convertToString(transitionDetails,WDDXTAGS.TITLE));
-		if(keyExists(transitionDetails, WDDXTAGS.CREATION_DATE))
-		    transition.setCreateDateTime(WDDXProcessor.convertToDate(transitionDetails,WDDXTAGS.CREATION_DATE));			
+
+	    // Set creation date based on the server timezone, not the client.
+		if ( transition.getCreateDateTime() == null )
+			transition.setCreateDateTime(modificationDate);
 
 		if ( transition.getToActivity() != null && transition.getFromActivity() != null ) {
 			transition.setLearningDesign(learningDesign);		
@@ -1061,45 +1117,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	        return false;
 	}
 
-	/**
-	 * Helper method to delete an activity from a learning design. Before the activity is deleted,
-	 * any associations with a transition is removed: any transitions to or from the activity
-	 * is deleted.
-	 * @param activityToDelete
-	 * @param design
-	 */
-	private void clearTransition(Activity activityToDelete)
-	{
-	   
-	   Transition transitionFrom = activityToDelete.getTransitionFrom();	 	   
-	   if (transitionFrom != null)
-	       deleteTransition(transitionFrom);
-	     
-	   Transition transitionTo = activityToDelete.getTransitionTo();
-	   if (transitionTo != null)
-		   deleteTransition(transitionTo);
-
-	}
-	
-	/**
-	 * Helper method which deletes a Transition object. Before the transition is deleted,
-	 * any relationship that this transition has with an activity, will be removed.
-	 * @param transition
-	 * @param design
-	 */
-	private void deleteTransition(Transition transition)
-	{
-	    Activity fromActivity = transition.getFromActivity();
-	    fromActivity.setTransitionFrom(null);
-	    
-		Activity toActivity = transition.getToActivity();
-		toActivity.setTransitionTo(null);
-		
-		//This will leave orphan content in the tool tables. It will be removed by the tool content cleaning job, 
-		//which may be run from the admin screen or via a cron job
-		learningDesign.getTransitions().remove(transition);
-	}
-	
 	public void setMode(Integer mode) {
 		this.mode = mode;
 	}
@@ -1119,5 +1136,75 @@ public class ObjectExtractor implements IObjectExtractor {
         UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
         return learner != null ? learner.getUserID() : null;
     }
+    
+	/**
+	 * Parses the mappings used for branching. They map groups to the sequence activities
+	 * that form a branch within a branching activity.
+	 * 
+	 * Must be done after all the other parsing as we need to match up activities
+	 * and groups.
+	 * @param branchMappingsList
+	 * @throws WDDXProcessorConversionException
+	 */
+	
+	private void parseBranchMappings(List branchMappingsList) 
+		throws WDDXProcessorConversionException 	
+	{
+	    if (branchMappingsList != null)
+	    {
+	        Iterator iterator = branchMappingsList.iterator();
+	        while(iterator.hasNext())
+	        {
+            	extractGroupBranchActivityEntry((Hashtable)iterator.next());
+	        }
+	    }
+	}
+	
+	@SuppressWarnings("unchecked")
+	private GroupBranchActivityEntry extractGroupBranchActivityEntry(Hashtable details) throws WDDXProcessorConversionException {
+
+    	Long entryId = WDDXProcessor.convertToLong(details, WDDXTAGS.GROUP_BRANCH_ACTIVITY_ENTRY_ID);	
+    	Integer entryUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.GROUP_BRANCH_ACTIVITY_ENTRY_UIID);	
+    	Integer groupUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.GROUP_UIID);	
+    	Integer sequenceActivityUIID=WDDXProcessor.convertToInteger(details,WDDXTAGS.GROUP_BRANCH_SEQUENCE_ACTIVITY_UIID);
+
+    	Group group = groups.get(groupUIID);
+   	    if ( group == null ) {
+		    	throw new WDDXProcessorConversionException("Group listed in the branch mapping list is missing. Mapping entry UUID "+entryUIID+" groupUIID "+groupUIID);
+   	    }
+
+   	    Activity sequenceActivity = newActivityMap.get(sequenceActivityUIID);
+   	    if ( sequenceActivity == null || ! sequenceActivity.isSequenceActivity() ) {
+		    	throw new WDDXProcessorConversionException("Activity listed in the branch mapping list is missing. Mapping entry UUID "+entryUIID+" sequenceActivityUIID "+sequenceActivityUIID);
+   	    }
+   	    if ( ! sequenceActivity.isSequenceActivity() ) {
+		    	throw new WDDXProcessorConversionException("Activity listed in the branch mapping list is not a sequence activity. Mapping entry UUID "+entryUIID+" sequenceActivityUIID "+sequenceActivityUIID);
+   	    }
+   	    
+   	    GroupBranchActivityEntry entry = null;
+   	    
+		// does it exist already? Check on the ID field as the UIID field may not have 
+	    // been set if this grouping was created on the back end (based on a runtime copy of the sequence)
+		if ( entryId != null && group.getBranchActivities() != null && group.getBranchActivities().size() > 0 ) {
+			Iterator iter = group.getBranchActivities().iterator();
+			while (entry == null && iter.hasNext()) {
+				GroupBranchActivityEntry possibleEntry = (GroupBranchActivityEntry) iter.next();
+				if ( entryId.equals(possibleEntry.getEntryId()) ) {
+					entry = possibleEntry;
+				}
+			}
+		}
+
+		if ( entry == null ) {
+   	    	entry = new GroupBranchActivityEntry();
+   			group.getBranchActivities().add(entry);
+   	    }
+		entry.setBranchSequenceActivity((SequenceActivity)sequenceActivity);
+		entry.setGroup(group);
+
+		return entry;
+	}
+
+
 }
 	

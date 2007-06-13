@@ -101,13 +101,12 @@ public class RandomGrouping extends Grouping
      * @return RandomGrouping The deep copied Grouping object
      */
     public Grouping createCopy(){
-    	RandomGrouping randomGrouping = new RandomGrouping();
-    	
-    	randomGrouping.setMaxNumberOfGroups(this.getMaxNumberOfGroups());
-    	randomGrouping.setGroupingUIID(this.getGroupingUIID());
+    	RandomGrouping randomGrouping = new RandomGrouping();    	
+    	copyGroupingFields(randomGrouping);
     	
     	randomGrouping.setNumberOfGroups(this.getNumberOfGroups());
-    	randomGrouping.setLearnersPerGroup(this.getLearnersPerGroup());    	
+    	randomGrouping.setLearnersPerGroup(this.getLearnersPerGroup());
+    	
     	return randomGrouping;
     }
 

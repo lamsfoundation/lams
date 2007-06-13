@@ -65,10 +65,6 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="authentication_method_id" sort="ASC"/>
-</index>
 <index alias="" name="authentication_method_type_id" remarks="" unique="false">
 <index-description></index-description>
 <index-column name="authentication_method_type_id" sort="ASC"/>
@@ -106,12 +102,7 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list/>
-<index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="authentication_method_type_id" sort="ASC"/>
-</index>
-</index-list>
+<index-list/>
 </table>
 <table alias="" name="lams_gate_activity_level" remarks="">
 <table-description></table-description>
@@ -144,12 +135,7 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list/>
-<index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="gate_activity_level_id" sort="ASC"/>
-</index>
-</index-list>
+<index-list/>
 </table>
 <table alias="" name="lams_grouping_type" remarks="">
 <table-description></table-description>
@@ -182,12 +168,7 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list/>
-<index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="grouping_type_id" sort="ASC"/>
-</index>
-</index-list>
+<index-list/>
 </table>
 <table alias="" name="lams_learning_activity" remarks="">
 <table-description></table-description>
@@ -746,10 +727,6 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="activity_id" sort="ASC"/>
-</index>
 <index alias="" name="idx_activity_library_id" remarks="" unique="false">
 <index-description></index-description>
 <index-column name="learning_library_id" sort="ASC"/>
@@ -803,12 +780,7 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list/>
-<index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="learning_activity_type_id" sort="ASC"/>
-</index>
-</index-list>
+<index-list/>
 </table>
 <table alias="" name="lams_learning_design" remarks="">
 <table-description></table-description>
@@ -1122,10 +1094,6 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="learning_design_id" sort="ASC"/>
-</index>
 <index alias="" name="idx_design_parent_id" remarks="" unique="false">
 <index-description></index-description>
 <index-column name="original_learning_design_id" sort="ASC"/>
@@ -1142,7 +1110,7 @@
 </table>
 <table alias="" name="lams_group" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="1142" y="698"/>
+<table-figure-bounds height="-1" width="-1" x="1104" y="670"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="group_id" remarks="">
 <column-description></column-description>
@@ -1190,6 +1158,19 @@
 <variant type-name-pattern="INT ZEROFILL"/>
 </data-type>
 </column>
+<column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="group_ui_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
+<variant type-name-pattern="INT"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
 </column-list>
 <primary-key alias="" name="PRIMARY" remarks="">
 <primary-key-description></primary-key-description>
@@ -1206,10 +1187,6 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="group_id" sort="ASC"/>
-</index>
 <index alias="" name="idx_group_grouping" remarks="" unique="false">
 <index-description></index-description>
 <index-column name="grouping_id" sort="ASC"/>
@@ -1327,10 +1304,6 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="grouping_id" sort="ASC"/>
-</index>
 <index alias="" name="idx_grouping_grouping_type" remarks="" unique="false">
 <index-description></index-description>
 <index-column name="grouping_type_id" sort="ASC"/>
@@ -1393,12 +1366,7 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list/>
-<index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="learning_library_id" sort="ASC"/>
-</index>
-</index-list>
+<index-list/>
 </table>
 <table alias="" name="lams_learning_transition" remarks="">
 <table-description></table-description>
@@ -1550,10 +1518,6 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="transition_id" sort="ASC"/>
-</index>
 <index alias="" name="ldId" remarks="" unique="false">
 <index-description></index-description>
 <index-column name="learning_design_id" sort="ASC"/>
@@ -1792,17 +1756,9 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="organisation_id" sort="ASC"/>
-</index>
 <index alias="" name="organisation_type_id" remarks="" unique="false">
 <index-description></index-description>
 <index-column name="organisation_type_id" sort="ASC"/>
-</index>
-<index alias="" name="workspace_id" remarks="" unique="false">
-<index-description></index-description>
-<index-column name="workspace_id" sort="ASC"/>
 </index>
 <index alias="" name="parent_organisation_id" remarks="" unique="false">
 <index-description></index-description>
@@ -1853,10 +1809,6 @@
 <unique-key-list/>
 <foreign-key-list/>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="organisation_type_id" sort="ASC"/>
-</index>
 <index alias="" name="UQ_lams_organisation_type_name" remarks="" unique="true">
 <index-description></index-description>
 <index-column name="name" sort="ASC"/>
@@ -1907,10 +1859,6 @@
 <unique-key-list/>
 <foreign-key-list/>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="role_id" sort="ASC"/>
-</index>
 <index alias="" name="gname" remarks="" unique="false">
 <index-description></index-description>
 <index-column name="name" sort="ASC"/>
@@ -2214,10 +2162,6 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="user_id" sort="ASC"/>
-</index>
 <index alias="" name="UQ_lams_user_login" remarks="" unique="true">
 <index-description></index-description>
 <index-column name="login" sort="ASC"/>
@@ -2302,10 +2246,6 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="user_organisation_id" sort="ASC"/>
-</index>
 <index alias="" name="user_id" remarks="" unique="false">
 <index-description></index-description>
 <index-column name="user_id" sort="ASC"/>
@@ -2382,10 +2322,6 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="user_organisation_role_id" sort="ASC"/>
-</index>
 <index alias="" name="role_id" remarks="" unique="false">
 <index-description></index-description>
 <index-column name="role_id" sort="ASC"/>
@@ -2468,15 +2404,7 @@
 <foreign-key-column column-name="default_fld_id" referenced-key-column-name="workspace_folder_id"/>
 </foreign-key>
 </foreign-key-list>
-<index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="workspace_id" sort="ASC"/>
-</index>
-<index alias="" name="root_folder_id" remarks="" unique="false">
-<index-description></index-description>
-</index>
-</index-list>
+<index-list/>
 </table>
 <table alias="" name="lams_workspace_folder" remarks="">
 <table-description></table-description>
@@ -2576,10 +2504,6 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="workspace_folder_id" sort="ASC"/>
-</index>
 <index alias="" name="parent_folder_id" remarks="" unique="false">
 <index-description></index-description>
 <index-column name="parent_folder_id" sort="ASC"/>
@@ -3558,7 +3482,7 @@ It will be used for the IMS LD import/export.</column-description>
 </table>
 <table alias="" name="lams_user_group" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="936" y="601"/>
+<table-figure-bounds height="-1" width="-1" x="1116" y="575"/>
 <column-list>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="user_id" remarks="">
 <column-description></column-description>
@@ -5375,6 +5299,92 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 </primary-key>
 <unique-key-list/>
 <foreign-key-list/>
+<index-list/>
+</table>
+<table alias="" name="lams_group_branch_activity" remarks="">
+<table-description>Maps a group to an activity. Used for allocating groups to a sequence activity, which forms one branch inside a branching activity. </table-description>
+<table-figure-bounds height="-1" width="-1" x="865" y="601"/>
+<column-list>
+<column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="entry_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="entry_ui_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="group_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="activity_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key alias="" name="PK_LAMS_GROUP_BRANCH_ACTIVITY" remarks="">
+<primary-key-description></primary-key-description>
+<primary-key-column name="entry_id"/>
+</primary-key>
+<unique-key-list>
+<unique-key alias="" name="UQ_lams_group_activity" remarks="">
+<unique-key-description></unique-key-description>
+<unique-key-column name="activity_id"/>
+<unique-key-column name="group_id"/>
+</unique-key>
+</unique-key-list>
+<foreign-key-list>
+<foreign-key alias="" name="FK_lams_group_activity_1" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_group" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key-description></foreign-key-description>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="group_id" referenced-key-column-name="group_id"/>
+</foreign-key>
+<foreign-key alias="" name="FK_lams_group_activity_2" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_learning_activity" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key-description></foreign-key-description>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="activity_id" referenced-key-column-name="activity_id"/>
+</foreign-key>
+</foreign-key-list>
 <index-list/>
 </table>
 </table-list>
