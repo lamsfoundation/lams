@@ -58,6 +58,8 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 	private var _activityLayer_mc:MovieClip;
 	private var _activityComplexLayer_mc:MovieClip;
 	
+	private var _transparentCover_mc:MovieClip;
+	
 	private var _transitionPropertiesOK:Function;
 
 	//Defined so compiler can 'see' events added at runtime by EventDispatcher
@@ -220,5 +222,12 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 		_transitionLayer_mc = a;
 	}
 	
+	public function get transparentCover():MovieClip {
+		return _transparentCover_mc;
+	}
+	
+	public function set transparentCover(a:MovieClip):Void {
+		_transparentCover_mc = a;
+	}
 
 }

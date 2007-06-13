@@ -57,6 +57,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private var grid_mc:Object;
 	private var hSpace:Number = 100;
 	private var vSpace:Number = 100;
+
+	private var close_mc:MovieClip;	
+	
 	/**
 	* Constructor
 	*/
@@ -104,7 +107,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @param   event
 	 */
 	public function viewUpdate(event:Object):Void{
-		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','CanvasView');
+		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','CanvasBranchView');
 		var cm:CanvasModel = event.target;
 	   
 		switch (event.updateType){ 
@@ -135,8 +138,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			case 'SELECTED_ITEM' :
                 highlightActivity(cm);
                 break;
+			case 'SET_ACTIVE' :
+				Debugger.log('setting activie :' + event.updateType + " event.data: " + event.data + " condition: " + (event.data == this),Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasBranchView');
+				transparentCover._visible = (event.data == this) ? false : true;
+				break;
             default :
-                Debugger.log('unknown update type :' + event.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
+                Debugger.log('unknown update type :' + event.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasBranchView');
 		}
 
 	}
@@ -158,11 +165,19 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		activityComplexLayer = content.createEmptyMovieClip("_activityComplexLayer_mc", content.getNextHighestDepth());
 		activityLayer = content.createEmptyMovieClip("_activityLayer_mc", content.getNextHighestDepth());
 		
+		transparentCover = content.createClassObject("Panel", "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
+		transparentCover.onPress = null;
+		
 		bkg_pnl.onRelease = function(){
 			Application.getInstance().getCanvas().getCanvasView().getController().canvasRelease(this);
 		}
 		
 		bkg_pnl.useHandCursor = false;
+		
+		close_mc = content.attachMovie("collapse_mc", "close_mc", DepthManager.kTop);
+		
+		close_mc.onRelease = Proxy.create(this, localOnRelease);
+		close_mc.onReleaseOutside = Proxy.create(this, localOnReleaseOutside);
 		
 		setStyles();
 		
@@ -173,6 +188,21 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
         //Dispatch load event 
         dispatchEvent({type:'load',target:this});
+	}
+	
+	public function localOnRelease():Void{
+		close();
+	}
+	
+	private function close():Void {
+		mx.transitions.TransitionManager.start(this,
+					{type:mx.transitions.Zoom, 
+					 direction:1, duration:0.5, easing:mx.transitions.easing.Strong.easeIn});
+		_cm.getCanvas().closeBranchView();
+	}
+	
+	public function localOnReleaseOutside():Void{
+		
 	}
 	
 	/**
@@ -352,6 +382,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		grid_mc._x = -cx+hSpace;
 		grid_mc._y = -cy+vSpace;
 		
+		close_mc._x = bkg_pnl._x + bkg_pnl.width - close_mc._width - 10;
+		close_mc._y = bkg_pnl._y + 10;
+		
 	}
 	
 	/**
@@ -363,17 +396,10 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private function setStyles() {
         
 		var styleObj = _tm.getStyleObject('CanvasPanel');
-		bkg_pnl.setStyle('styleName',styleObj);
+		bkg_pnl.setStyle('styleName', styleObj);
+		transparentCover.setStyle('styleName', styleObj);
 		
     }
-	
-	public function getTransitionLayer():MovieClip{
-		return transitionLayer;
-	}
-	
-	public function closeView():Void {
-		this.removeMovieClip();
-	}
 	
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned

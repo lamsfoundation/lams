@@ -150,6 +150,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
     public function viewLoaded(evt:Object) {
         if(evt.type=='load') {
 			if(evt.target instanceof CanvasBranchView) {
+				
+				canvasModel.activeView = evt.target;
 				mx.transitions.TransitionManager.start(evt.target,
 					{type:mx.transitions.Zoom, 
 					 direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
@@ -254,7 +256,7 @@ b	 * @param   learningDesignID
 	
 	public function openBranchView(ba){
 		
-		fadeOtherOnCanvas(ba);
+		//fadeOtherOnCanvas(ba);
 		
 		var cx:Number = ba._x + ba.getVisibleWidth()/2;
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
@@ -268,7 +270,11 @@ b	 * @param   learningDesignID
 		
 		canvasModel.addObserver(branchView);
 	}
-		
+	
+	public function closeBranchView() {
+		canvasModel.activeView = canvasView;
+		canvasModel.currentBranchingActivity = null;
+	}
 	
 	private function fadeOtherOnCanvas(ba) {
 		
@@ -280,10 +286,6 @@ b	 * @param   learningDesignID
 			}
 		}
 		
-	}
-	
-	public function closeBranchView(ba:BranchingActivity){
-		canvasBranchView.closeView();
 	}
 	
 	/**

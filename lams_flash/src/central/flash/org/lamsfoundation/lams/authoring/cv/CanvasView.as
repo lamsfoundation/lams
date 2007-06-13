@@ -135,6 +135,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 			case 'POSITION_TITLEBAR':
 				setDesignTitle(cm);
 				break;
+			case 'SET_ACTIVE' :
+				Debugger.log('setting activie :' + event.updateType + " event.data: " + event.data + " condition: " + (event.data == this),Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
+				transparentCover._visible = (event.data == this) ? false : true;
+				break;
             default :
                 Debugger.log('unknown update type :' + event.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
 		}
@@ -154,6 +158,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		
 		activityComplexLayer = content.createEmptyMovieClip("_activityComplexLayer_mc", content.getNextHighestDepth());
 		activityLayer = content.createEmptyMovieClip("_activityLayer_mc", content.getNextHighestDepth());
+		
+		transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
+		transparentCover.onPress = null;
+		
 		
 		titleBar = _canvasView.attachMovie("DesignTitleBar", "titleBar", _canvasView.getNextHighestDepth())
 		
@@ -398,7 +406,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		var newHeight:Number = Math.max(s.h, lastScreenHeight);
 		
 		canvas_scp.setSize(s.w,s.h);
-		bkg_pnl.setSize(newWidth,newHeight);
+		bkg_pnl.setSize(newWidth, newHeight);
+		transparentCover.setSize(newWidth, newHeight);
 		
 		//Create the grid.  The gris is re-drawn each time the canvas is resized.
 		var grid_mc = Grid.drawGrid(gridLayer,Math.round(newWidth),Math.round(newHeight),V_GAP,H_GAP);
@@ -422,7 +431,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	 */
 	private function setStyles() {
 		var styleObj = _tm.getStyleObject('CanvasPanel');
-		bkg_pnl.setStyle('styleName',styleObj);
+		bkg_pnl.setStyle('styleName', styleObj);
+		transparentCover.setStyle('styleName', styleObj);
     }
 	
     /**
@@ -433,14 +443,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
         var p:Object = cm.getPosition();
         this._x = p.x;
         this._y = p.y;
-	}
-	
-	/**public function getViewMc(testString:String):MovieClip{
-		return content;
-	}*/
-	
-	public function getTransitionLayer():MovieClip{
-		return transitionLayer;
 	}
 
 	public function showReadOnly(b:Boolean){

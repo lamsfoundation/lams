@@ -70,6 +70,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	private var _transitionsDisplayed:Hashtable;
 	
 	private var _currentBranchingActivity:Object;
+	private var _activeView:Object;
 
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -89,6 +90,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		_transitionsDisplayed = new Hashtable("_transitionsDisplayed");
 		
 		_activeTool = "none";
+		_activeView = null;
+		_currentBranchingActivity = null;
+		
 		_autoSaveWait = false;
 		_transitionActivities = new Array();
 		_defaultGroupingTypeID = Grouping.RANDOM_GROUPING;
@@ -104,13 +108,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		__width = width;
 		__height = height;
 		
-		/*
-		//send an update
-		setChanged();
-		infoObj = {};
-		infoObj.updateType = "SIZE";
-		notifyObservers(infoObj);
-		*/
 		broadcastViewUpdate("SIZE");
 		
 	}
@@ -134,17 +131,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function setPosition(x:Number, y:Number):Void{
 		__x=x;
 		__y=y;
-		/*
-		//send an update
-		setChanged();
-		infoObj = {};
-		infoObj.updateType = "POSITION";
-		notifyObservers(infoObj);
-		*/
+		
 		broadcastViewUpdate("POSITION");
 	}
-	
-	
 	
 	/**
 	* Used by View to get the size
@@ -157,14 +146,22 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		return p;
 	}
 	
+	public function set activeView(a:Object):Void{
+		_activeView = a;
+		
+		broadcastViewUpdate("SET_ACTIVE", a);
+	}
+	
+	public function get activeView():Object {
+		return _activeView;
+	}
+	
 	public function setPIHeight(h:Number){
-		trace ("height is set to: "+h)
-		_piHeight = h
+		_piHeight = h;
 		Application.getInstance().onResize();
 	}
 	
 	public function getPIHeight(){
-		trace ("returning pi height: "+_piHeight)
 		return _piHeight;
 	}
 	public function setDirty(){
@@ -175,16 +172,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		} else {
 			LFMenuBar.getInstance().enableExport(true);
 		}
-		
-		/*
-		//work out what we need to redraw.
-		//for now lets just do a full re-draw
-		//send an update
-		setChanged();
-		infoObj = {};
-		infoObj.updateType = "DRAW_DESIGN";
-		notifyObservers(infoObj);
-		*/
+
 		refreshDesign();
 	}
 	

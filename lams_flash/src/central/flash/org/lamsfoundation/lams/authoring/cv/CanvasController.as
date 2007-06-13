@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.authoring.cv.*
+import org.lamsfoundation.lams.authoring.br.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
@@ -478,6 +479,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	 * @return  
 	 */
 	public function canvasRelease(canvas_mc:MovieClip){
+		
 		var toolActWidth:Number = _canvasModel.getCanvas().toolActivityWidth;
 		var toolActHeight:Number = _canvasModel.getCanvas().toolActivityHeight;
 		
