@@ -335,7 +335,9 @@ Ant build file.
             <!-- <transaction src="${db.scripts}/shaun/all.sql"/> -->
 		</sql>
 		
-		<delete dir="${contentrepository.directory}"/>
+		<!-- 2.0.3 overwrites files in the repository so we don't -->
+		<!-- have to keep deleting it every time. -->
+		<!-- <delete dir="${contentrepository.directory}"/> -->
 		
         <delete file="${build}/create_lams_11_db.sql"/>
 	</target>
