@@ -23,7 +23,7 @@ function loading(){
 	: <fmt:message key="admin.importv1.title" />
 </h2>
 
-<lams:help page="<%= IImportService.IMPORTV1_HELP_PAGE %>"/>
+<lams:help style="no-tabs" page="<%= IImportService.IMPORTV1_HELP_PAGE %>"/>
 
 <p>&nbsp;</p>
 

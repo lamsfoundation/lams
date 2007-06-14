@@ -6,7 +6,7 @@
 	: <fmt:message key="admin.user.import" />
 </h2>
 
-<lams:help page="<%= IImportService.IMPORT_HELP_PAGE %>"/>
+<lams:help style="no-tabs" page="<%= IImportService.IMPORT_HELP_PAGE %>"/>
 
 <p>&nbsp;</p>
 

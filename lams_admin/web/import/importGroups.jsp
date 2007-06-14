@@ -8,7 +8,7 @@
 	: <fmt:message key="sysadmin.import.groups.title" />
 </h2>
 
-<lams:help page="<%= IImportService.IMPORT_GROUPS_HELP_PAGE %>"/>
+<lams:help style="no-tabs" page="<%= IImportService.IMPORT_GROUPS_HELP_PAGE %>"/>
 
 <p>&nbsp;</p>
 
