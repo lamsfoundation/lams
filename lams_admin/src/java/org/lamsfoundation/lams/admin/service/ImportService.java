@@ -47,16 +47,20 @@ import org.lamsfoundation.lams.admin.web.dto.V1UserDTO;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * <p>
@@ -124,10 +128,22 @@ public class ImportService implements IImportService {
 	private static final short ORGANISATION = 1;
 	private static final short ROLES = 2;
 	
+	// spreadsheet column indexes for groups spreadsheet
+	private static final short NAME = 0;
+	private static final short CODE = 1;
+	private static final short DESCRIPTION = 2;
+	private static final short LOCALE_ID = 3;
+	private static final short ORGANISATION_STATE = 4;
+	private static final short ADMIN_ADD_NEW_USERS = 5;
+	private static final short ADMIN_BROWSE_ALL_USERS = 6;
+	private static final short ADMIN_CHANGE_STATUS = 7;
+	
+	// class-wide variables
 	ArrayList<ArrayList> results = new ArrayList<ArrayList>();
 	ArrayList<String> rowResult = new ArrayList<String>();
 	private boolean emptyRow;
 	private boolean hasError;
+	private Organisation parentOrg;
 
 	private HSSFSheet getSheet(FormFile fileItem) throws IOException {
 		POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
@@ -157,6 +173,107 @@ public class ImportService implements IImportService {
 		}
 		return new ArrayList();
 	}
+	
+	// returns x size list where x is number of orgs.
+	// each item in the list lists the id, name, and parent's id of that org; otherwise
+	// the items in the list are error messages.
+	public List parseGroupSpreadsheet(FormFile fileItem) throws IOException {
+		results = new ArrayList<ArrayList>();
+		parentOrg = service.getRootOrganisation();
+		HSSFSheet sheet = getSheet(fileItem);
+		int startRow = sheet.getFirstRowNum();
+		int endRow = sheet.getLastRowNum();
+		
+		log.debug("sheet rows: "+startRow+".."+endRow);
+		
+		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+		
+		HSSFRow row;
+		Organisation org = null;
+		for (int i = startRow + 1; i < endRow + 1; i++) {
+			log.debug("starting row: "+i);
+			emptyRow = true;
+			hasError = false;
+			rowResult = new ArrayList<String>();
+			row = sheet.getRow(i);
+			if (row != null) {
+				org = parseGroup(row, i);
+			}
+			
+			// an empty row signifies a new group
+			if (emptyRow) {
+				log.debug("emptyRow: "+emptyRow);
+				parentOrg = service.getRootOrganisation();
+				continue;
+			}
+			if (hasError) {
+				log.debug("hasError: "+hasError);
+				results.add(rowResult);
+				continue;
+			} else {
+				//try {
+					org = service.saveOrganisation(org, user.getUserID());
+					rowResult.add(org.getOrganisationId().toString());
+					rowResult.add(org.getName());
+					rowResult.add(org.getParentOrganisation().getOrganisationId().toString());
+					rowResult.add(org.getOrganisationType().getOrganisationTypeId().toString());
+					writeOrgAuditLog(org);
+					// if we just added a group, then the rows under it become it's subgroups
+					if (parentOrg.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE)) {
+						parentOrg = org;
+					}
+				//} catch (Exception e) {
+				//	log.debug(e);
+				//	rowResult.add(messageService.getMessage("error.fail.add"));
+				//}
+				results.add(rowResult);
+			}
+		}
+		log.debug("found "+results.size()+" orgs in spreadsheet.");
+		return results;
+	}
+	
+	
+	private Organisation parseGroup(HSSFRow row, int rowIndex) {
+		Organisation org = new Organisation();
+		String[] args = new String[1];
+		
+		String name = parseStringCell(row.getCell(NAME));
+		if (name==null || name=="") {
+			rowResult.add(messageService.getMessage("error.name.required"));
+			hasError = true;
+			return null;
+		}
+		org.setName(name);
+		org.setCode(parseStringCell(row.getCell(CODE)));
+		org.setDescription(parseStringCell(row.getCell(DESCRIPTION)));
+		
+		String localeId = parseStringCell(row.getCell(LOCALE_ID));
+		SupportedLocale locale = getLocale(localeId);
+		if (locale==null) {
+			args[0] = "("+localeId+")";
+			rowResult.add(messageService.getMessage("error.locale.invalid", args));
+			hasError = true;
+		} else {
+			org.setLocale(locale);
+		}
+		
+		String orgStateText = parseStringCell(row.getCell(ORGANISATION_STATE));
+		OrganisationState orgState = getOrganisationState(orgStateText);
+		org.setOrganisationState(orgState);
+
+		org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,
+				parentOrg.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE)
+				? OrganisationType.COURSE_TYPE : OrganisationType.CLASS_TYPE));
+
+		org.setParentOrganisation(parentOrg);
+		org.setCourseAdminCanAddNewUsers(parseBooleanCell(row.getCell(ADMIN_ADD_NEW_USERS)));
+		org.setCourseAdminCanBrowseAllUsers(parseBooleanCell(row.getCell(ADMIN_BROWSE_ALL_USERS)));
+		org.setCourseAdminCanChangeStatusOfCourse(parseBooleanCell(row.getCell(ADMIN_CHANGE_STATUS)));
+		
+		return (hasError ? null : org);
+	}
+	
 	
 	public List<List> parseV1UsersFile(FormFile fileItem, boolean includeIntegrated) throws IOException {
 		ArrayList<V1UserDTO> users = new ArrayList<V1UserDTO>();
@@ -533,6 +650,32 @@ public class ImportService implements IImportService {
 	/*
 	 * the methods below return legible data from individual cells
 	 */
+	private boolean parseBooleanCell(HSSFCell cell){
+		if (cell!=null) {
+			String value;
+			try {
+				cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+				if (cell.getStringCellValue()!= null) {
+					if (cell.getStringCellValue().trim().length()!= 0) {
+						emptyRow = false;
+					}
+				} else {
+					return false;
+				}
+				value = cell.getStringCellValue().trim();
+			} catch(Exception e) {
+				cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+				double d = cell.getNumericCellValue();
+				emptyRow = false;
+				value = new Long(new Double(d).longValue()).toString();
+			}
+			if (StringUtils.equals(value, "1") || StringUtils.equalsIgnoreCase(value, "true")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	private String parseStringCell(HSSFCell cell){
 		if (cell!=null) {
 			try {
@@ -544,13 +687,13 @@ public class ImportService implements IImportService {
 				} else {
 					return null;
 				}
-				//log.debug("string cell value: "+cell.getStringCellValue().trim());
+				log.debug("string cell value: '"+cell.getStringCellValue().trim()+"'");
 				return cell.getStringCellValue().trim();
 			} catch(Exception e) {
 				cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
 				double d = cell.getNumericCellValue();
 				emptyRow = false;
-				//log.debug("numeric cell value: "+d);
+				log.debug("numeric cell value: '"+d+"'");
 				return (new Long(new Double(d).longValue()).toString());
 			}
 		}
@@ -689,11 +832,30 @@ public class ImportService implements IImportService {
 		}
 	}
 	
+	// set organisation state to active if cell is empty
+	private OrganisationState getOrganisationState(String orgStateText) {
+		if (StringUtils.equals(orgStateText, "hidden")) {
+			return (OrganisationState)service.findById(OrganisationState.class, OrganisationState.HIDDEN);
+		} else if (StringUtils.equals(orgStateText, "archived")) {
+			return (OrganisationState)service.findById(OrganisationState.class, OrganisationState.ARCHIVED);
+		} else {
+			return (OrganisationState)service.findById(OrganisationState.class, OrganisationState.ACTIVE);
+		}
+	}
+	
 	private void writeAuditLog(User user) {
 		String[] args = new String[2];
 		args[0] = user.getLogin()+"("+user.getUserId()+")";
 		args[1] = user.getFullName();
 		String message = messageService.getMessage("audit.user.create", args);
+		auditService.log(AdminConstants.MODULE_NAME, message);
+	}
+	
+	private void writeOrgAuditLog(Organisation org) {
+		String[] args = new String[2];
+		args[0] = org.getName()+"("+org.getOrganisationId()+")";
+		args[1] = org.getOrganisationType().getName();
+		String message = messageService.getMessage("audit.organisation.create", args);
 		auditService.log(AdminConstants.MODULE_NAME, message);
 	}
 }

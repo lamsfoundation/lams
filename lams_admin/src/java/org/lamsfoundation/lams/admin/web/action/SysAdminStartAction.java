@@ -62,6 +62,7 @@ public class SysAdminStartAction extends Action {
 			links.add(new LinkBean("config.do", "sysadmin.config.settings.edit"));
 			links.add(new LinkBean("toolcontentlist.do", "sysadmin.edit.default.tool.content"));
 			links.add(new LinkBean("usersearch.do", "admin.user.find"));
+			links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
 			links.add(new LinkBean("importexcel.do", "admin.user.import"));
 			links.add(new LinkBean("importv1.do", "admin.importv1.title"));
 			links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
@@ -75,6 +76,7 @@ public class SysAdminStartAction extends Action {
 		} else if (service.isUserGlobalGroupAdmin()) {
 			LinkBean linkBean = new LinkBean("usersearch.do", "admin.user.find");
 			links.add(linkBean);
+			links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
 			links.add(new LinkBean("importexcel.do", "admin.user.import"));
 			links.add(new LinkBean("importv1.do", "admin.importv1.title"));
 			links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));

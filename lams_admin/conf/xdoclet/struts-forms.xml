@@ -112,3 +112,8 @@
 <form-bean name="CleanupForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="numDays" type="java.lang.Integer" />
 </form-bean>
+
+<form-bean
+      name="ImportGroupsForm"
+      type="org.lamsfoundation.lams.admin.web.ImportExcelForm"
+    />

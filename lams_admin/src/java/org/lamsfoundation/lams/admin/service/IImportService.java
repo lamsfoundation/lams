@@ -41,6 +41,7 @@ public interface IImportService {
 	public static final String SEPARATOR = "|";
 	public static final String IMPORT_HELP_PAGE = "Import+Users";
 	public static final String IMPORTV1_HELP_PAGE = "Import+LAMS+1+Users";
+	public static final String IMPORT_GROUPS_HELP_PAGE = "Import+Groups";
 	
 	/**
 	 * Returns true if spreadsheet contains user data.
@@ -65,6 +66,14 @@ public interface IImportService {
 	 * @throws IOException
 	 */
 	public List parseSpreadsheet(FormFile fileItem) throws IOException;
+	
+	/**
+	 * 
+	 * @param fileItem
+	 * @return
+	 * @throws IOException
+	 */
+	public List parseGroupSpreadsheet(FormFile fileItem) throws IOException;
 	
 	/**
 	 * Returns list of V1 users and orgs after parsing the output of a mysql dump.

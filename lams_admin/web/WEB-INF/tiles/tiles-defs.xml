@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <tiles-definitions>
+	<definition name=".importGroups" path="/template.jsp">
+		<put name="title" value="sysadmin.import.groups.title"/>
+		<put name="content" value="import/importGroups.jsp" />	
+	</definition>
+
 	<definition name=".cleanup" path="/template.jsp">
 		<put name="title" value="sysadmin.batch.temp.file.delete"/>
 		<put name="content" value="cleanup.jsp" />	
