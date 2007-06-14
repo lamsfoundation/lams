@@ -1167,6 +1167,8 @@ border:0px;
 
 .help {text-align:left; margin-left:35px; cursor: pointer;}
 
+.help-no-tabs {float:left; cursor:pointer;}
+
 /************ My Profile custom **********/
 .align-right{
 text-align:left;

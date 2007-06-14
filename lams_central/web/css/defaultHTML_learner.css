@@ -453,6 +453,8 @@ input:hover.button {
 
 .help {text-align:left; margin-left:35px; cursor: pointer;}
 
+.help-no-tabs {float:right; cursor:pointer;}
+
 .align-right{
 text-align:right;
 }
