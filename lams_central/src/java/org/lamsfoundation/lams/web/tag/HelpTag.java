@@ -32,6 +32,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
@@ -59,6 +60,7 @@ public class HelpTag extends TagSupport {
 	private String module = null;
 	private String page = null;
 	private String toolSignature = null;
+	private String style = null;
 	
 	/**
 	 * 
@@ -77,7 +79,11 @@ public class HelpTag extends TagSupport {
 		    String fullURL = null;
 		    
         	JspWriter writer = pageContext.getOut();
-        	writer.println("<div class='help'>");
+        	if (StringUtils.equals(style, "no-tabs")) {
+        		writer.println("<div class='help-no-tabs'>");
+        	} else {
+        		writer.println("<div class='help'>");
+        	}
         	try {
         		
 	        	if(toolSignature != null && module != null) {
@@ -196,5 +202,23 @@ public class HelpTag extends TagSupport {
 		this.page = page;
 	}
 
+	/**
+	 * @return style
+	 * 
+	 * @jsp.attribute required="false"
+	 *                rtexprvalue="true"
+	 *                description="Style"
+	 */
+	public String getStyle() {
+		return style;
+	}
+	
+	/**
+	 * 
+	 * @param style
+	 */
+	public void setStyle(String style) {
+		this.style = style;
+	}
 	
 }

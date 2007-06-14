@@ -124,6 +124,14 @@
            <rtexprvalue>true</rtexprvalue>
 
       </attribute>
+      <attribute>
+         <description>Help tag</description>
+         <name>style</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
 
    </tag>
    <tag>
