@@ -265,6 +265,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	 * @return  Boolean - successfullit
 	 */
 	private function drawActivity(a:Activity,cm:CanvasModel):Boolean{
+		if(!cm.isActiveView(this)) return false;
 		
 		var cvv = CanvasView(this);
 		var cvc = getController();
@@ -316,6 +317,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	 */
 	
 	private function hideActivity(a:Activity, cm:CanvasModel):Boolean {
+		if(!cm.isActiveView(this)) return false;
+		
 		var cvv = CanvasView(this);
 		var cvc = getController();
 		
@@ -339,6 +342,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	 * @return  Boolean - successfull
 	 */
 	private function removeActivity(a:Activity,cm:CanvasModel):Boolean{
+		if(!cm.isActiveView(this)) return false;
+		
 		var r = cm.activitiesDisplayed.remove(a.activityUIID);
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;
@@ -353,6 +358,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	 * @return  
 	 */
 	private function drawTransition(t:Transition,cm:CanvasModel):Boolean{
+		if(!isActivityOnLayer(cm.activitiesDisplayed.get(t.fromUIID), this.activityLayer) && !isActivityOnLayer(cm.activitiesDisplayed.get(t.toUIID), this.activityLayer)) return false;
+		
 		var cvv = CanvasView(this);
 		var cvc = getController();
 		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_canvasController:cvc,_canvasView:cvv});
@@ -373,6 +380,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	 */
 	
 	private function hideTransition(t:Transition, cm:CanvasModel):Boolean{
+		if(!cm.isActiveView(this)) return false;
+		
 		var cvv = CanvasView(this);
 		var cvc = getController();
 		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_canvasController:cvc,_canvasView:cvv, _visible:false});
@@ -391,6 +400,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	 * @return  
 	 */
 	private function removeTransition(t:Transition,cm:CanvasModel){
+		if(!cm.isActiveView(this)) return false;
+		
 		var r = cm.transitionsDisplayed.remove(t.transitionUIID);
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;

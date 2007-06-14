@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.authoring.br.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.common.style.*;
@@ -42,7 +43,7 @@ import mx.utils.*
 * CanvasBranchingActivity
 * This is the UI / view representation of a complex (branching) activity
 */  
-class org.lamsfoundation.lams.authoring.cv.CanvasBranchingActivity extends MovieClip implements ICanvasActivity{
+class CanvasBranchingActivity extends MovieClip implements ICanvasActivity{
   
   
 	public static var TOOL_ACTIVITY_WIDTH:Number = 123.1;
@@ -58,6 +59,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasBranchingActivity extends Movie
 	
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
+	private var _branchView:CanvasBranchView;
 	
 	private var _monitorController:MonitorController;
 	private var _monitorView;
@@ -112,6 +114,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasBranchingActivity extends Movie
 		_visibleWidth = CanvasBranchingActivity.TOOL_ACTIVITY_WIDTH;
 		
 		_base_mc = this;
+		_branchView = null;
 		
 		//call init if we have passed in the _activity as an initObj in the attach movie,
 		//otherwise wait as the class outside will call it
@@ -453,6 +456,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasBranchingActivity extends Movie
 	 */
 	public function getVisibleHeight ():Number {
 		return _visibleHeight;
+	}
+	
+	public function get branchView():CanvasBranchView {
+		return _branchView;
+	}
+	
+	public function set branchView(a:CanvasBranchView):Void {
+		_branchView = a;
 	}
 	
 	/**

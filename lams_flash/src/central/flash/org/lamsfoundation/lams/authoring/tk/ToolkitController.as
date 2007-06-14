@@ -60,31 +60,31 @@ class ToolkitController extends AbstractController {
 	public function iconDrop(dragIcon_mc:MovieClip):Void{
 		//lets do a test to see if we got the canvas
 		var cv:Canvas = Application.getInstance().getCanvas();
-		var canvasView:MovieClip = cv.getCanvasView().content;
+		var canvasView:MovieClip = cv.getCanvasModel().activeView.content;
+		
 		var iconMouseX = _xmouse - cv.model.getPosition().x;
 		var iconMouseY = _ymouse - cv.model.getPosition().y;
-		trace("iconMouseX: "+iconMouseX+" and iconMouseY: "+iconMouseY)
 		var optionalOnCanvas:Array  = cv.getCanvasModel().findOptionalActivities();
+		
 		//SEE IF ITS HIT the canvas
-		var isCanvasDrop:Boolean = canvasView.hitTest(dragIcon_mc);
-		//var isOptionalDrop:Boolean;
+		var isCanvasDrop:Boolean = cv.getCanvasModel().activeView.hitTest(dragIcon_mc);
+		
 		Debugger.log('isCanvasDrop:'+isCanvasDrop,4,'dropIcon','TemplateActivity');
 		for (var i=0; i<optionalOnCanvas.length; i++){
 			var optionalX:Number = optionalOnCanvas[i].activity.xCoord;
 			var optionalY:Number = optionalOnCanvas[i].activity.yCoord;
 			var optionalWidth:Number = optionalOnCanvas[i]._width
 			var optionalHeight:Number = optionalOnCanvas[i]._height
-			trace("optional xPos: "+optionalX+", optional yPos: "+optionalY+  ", width: "+optionalWidth+" and height: "+optionalHeight)
+			
 			if (iconMouseX >= optionalX && iconMouseX <= (optionalX + optionalWidth)){
 				if (iconMouseY >= optionalY && iconMouseY <= (optionalY + optionalHeight)){
 					isCanvasDrop = false;
 					dragIcon_mc.removeMovieClip();
-					trace("optional Container is hitted")
+					
 					if (optionalOnCanvas[i].locked){
 						var msg:String = Dictionary.getValue('act_lock_chk');
 						LFMessage.showMessageAlert(msg);
 					}else{
-						trace("hit with optional")
 						var ta:TemplateActivity;
 						ta = _toolkitModel.getSelectedTemplateActivity();
 						cv.setDroppedTemplateActivity(ta, optionalOnCanvas[i].activity.activityUIID);
@@ -92,6 +92,7 @@ class ToolkitController extends AbstractController {
 				}					
 			}			
 		}
+		
 		if(isCanvasDrop){			//remove the drag icon
 			dragIcon_mc.removeMovieClip();
 			

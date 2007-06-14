@@ -50,6 +50,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	*/
 	public function CanvasController (cm:Observable) {
 		super (cm);
+		
 		//have to do an upcast
 		_canvasModel = CanvasModel(getModel());
 		_canvasView = CanvasView(getView());
@@ -60,9 +61,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    
     public function activityClick(ca:Object):Void{
 		_canvasModel.selectedItem = null;
-	    Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID + ' orderID: ' + ca.activity.orderID,Debugger.GEN,'activityClick','CanvasController');
+	    
+		Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID + ' orderID: ' + ca.activity.orderID,Debugger.GEN,'activityClick','CanvasController');
 	    Debugger.log('Check if transition tool active :'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityClick','CanvasController');
-	   //if transition tool active
+	    
+		//if transition tool active
 	    if(_canvasModel.isTransitionToolActive()){
 		   
 			var transitionTarget = createValidTransitionTarget(ca, true);
@@ -70,71 +73,64 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				transitionTarget.showErrorAlert(null); 
 		   }else{
 			   	_canvasModel.addActivityToTransition(transitionTarget);
-				_canvasModel.getCanvas().view.initDrawTempTrans();
+				_canvasModel.activeView.initDrawTempTrans();
 			}
 			
 	    }else{
 			
 		   //just select the activity
-			
 			var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID)
 					
 			if(ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
-				
-				// _canvasModel.selectedItem = ca;
 				 _canvasModel.isDragging = false;
 			} else {
-				//_canvasModel.selectedItem = ca;
 				_canvasModel.isDragging = true;
 				ca.startDrag(false);
 			}
 		}
 	   
-   }
+    }
    
-   public function clearAllSelections(optionalOnCanvas:Array, parallelOnCanvas:Array){
-	for (var i=0; i<optionalOnCanvas.length; i++){
+    public function clearAllSelections(optionalOnCanvas:Array, parallelOnCanvas:Array){
+		for (var i=0; i<optionalOnCanvas.length; i++){
 			for(var j=0; j < optionalOnCanvas[i].actChildren.length; j++){
 				optionalOnCanvas[i].actChildren[j].setSelected(false);
 			}
 			optionalOnCanvas[i].refreshChildren();
 		}
+		
 		for (var m=0; m<parallelOnCanvas.length; m++){
 			for(var n=0; n < parallelOnCanvas[m].actChildren.length; n++){
 				parallelOnCanvas[m].actChildren[n].selectActivity = "false";
 			}
 			parallelOnCanvas[m].refreshChildren();
 		}
-   }
+    }
 	
    
     public function activityRelease(ca:Object):Void{
-	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','CanvasController');
-	    if (_canvasModel.isTransitionToolActive()){
+	    Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','CanvasController');
+	    
+		if (_canvasModel.isTransitionToolActive()){
 			_canvasModel.getCanvas().stopTransitionTool();
-			_canvasModel.getCanvas().view.removeTempTrans();	
+			_canvasModel.activeView.removeTempTrans();	
 			app.controlKeyPressed = "";
 		}
-	    _canvasModel.getCanvas().stopActiveTool();
-		//_canvasModel.selectedItem = ca;
+	    
+		_canvasModel.getCanvas().stopActiveTool();
 		var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
 		var parallelOnCanvas:Array  = _canvasModel.findParallelActivities();
-		
 		 
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
 			 _canvasModel.isDragging = false;
 			if (ca.activity.parentUIID != null){
-				trace ("testing Optional child on Canvas "+ca.activity.activityUIID)
 				for (var i=0; i<optionalOnCanvas.length; i++){
-				//trace ("testing Optional on Canvas "+i)
 					if (ca.activity.parentUIID == optionalOnCanvas[i].activity.activityUIID){
 						if (optionalOnCanvas[i].locked == false){
 							
 							if (ca._x > 142 || ca._x < -129 || ca._y < -55 || ca._y > optionalOnCanvas[i].getpanelHeight){
-								trace (ca.activity.activityUIID+" had a hitTest with canvas.")
 								//give it the new co-ords and 'drop' it
-
 								ca.activity.xCoord = (_xmouse - _canvasModel.getPosition().x) - (_canvasModel.getCanvas().taWidth/2);
 								ca.activity.yCoord = (_ymouse - _canvasModel.getPosition().y) - (_canvasModel.getCanvas().taHeight/2);
 								_canvasModel.removeOptionalCA(ca, optionalOnCanvas[i].activity.activityUIID);
@@ -161,7 +157,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 									var msg:String = Dictionary.getValue('cv_gateoptional_hit_chk');
 									LFMessage.showMessageAlert(msg);
 								}else {
-									//_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca)
 									if (_canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(ca.activity.activityUIID).hasTrans){
 										activitySnapBack(ca);
 										var msg:String = Dictionary.getValue('cv_invalid_optional_activity', [ca.activity.title]);
@@ -180,7 +175,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				
 			}
 			
-			
 			//if we are on the bin - trash it
 			isActivityOnBin(ca);
 			
@@ -189,11 +183,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasView =  CanvasView(getView());
 			}
 			
-			
 			//give it the new co-ords and 'drop' it
 			ca.activity.xCoord = ca._x;
 			ca.activity.yCoord = ca._y;
-			
 			
 			//refresh the transitions
 			//TODO: refresh the transitions as you drag...
@@ -222,11 +214,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			Debugger.log('ca.activity.xCoord:'+ca.activity.xCoord,Debugger.GEN,'activityRelease','CanvasController');
 			
 			
-		}else {
+		} else {
 			if (_canvasModel.isTransitionToolActive()){
 				_canvasModel.getCanvas().stopTransitionTool();
-				//_canvasModel.resetTransitionTool();
-				_canvasModel.getCanvas().view.removeTempTrans();
+				_canvasModel.activeView.removeTempTrans();
 				new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
 			}
 			clearAllSelections(optionalOnCanvas, parallelOnCanvas)
@@ -234,7 +225,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			_canvasModel.selectedItem = ca;
 		}
 	}
-   
    
     private function activitySnapBack(ca:Object){
 		ca._x = ca.activity.xCoord;
@@ -249,8 +239,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	 * @return  
 	 */
 	public function activityDoubleClick(ca:Object):Void{
-	   Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick','CanvasController');
-	    var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID)
+	    Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick','CanvasController');
+		var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID)
 		_canvasModel.getCanvas().stopActiveTool();
 		_canvasModel.getCanvas().stopTransitionTool();	
 		if(!isActivityReadOnly(ca, Dictionary.getValue("cv_element_readOnly_action_mod"))) {
@@ -301,22 +291,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	 */
 	public function activityReleaseOutside(ca:Object):Void{
 		
-		_canvasModel.getCanvas().view.removeTempTrans();
+		_canvasModel.activeView.removeTempTrans();
 		
 	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityReleaseOutside','CanvasController');
 	   Debugger.log('activityReleaseOutside Check if Transition tool active:'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityReleaseOutside','CanvasController');
+	   
 	   if(_canvasModel.isTransitionToolActive()){
-				
 			
 			//get a ref to the CanvasActivity the transition pen is over when released
 			var currentCursor:MovieClip = Cursor.getCurrentCursorRef();
-			//Debugger.log("currentCursor:"+currentCursor, Debugger.GEN,'activityReleaseOutside','CanvasController');
-			//strip the last mc off the path as its the click target
-			//_global.breakpoint();
+			
 			Debugger.log("currentCursor._droptarget:"+currentCursor._droptarget, Debugger.GEN,'activityReleaseOutside','CanvasController');
-			//var _dt:String = currentCursor._droptarget;
-			//var idx:Number = _dt.indexOf("/", 1);
-			//var _dt = _dt.substring(idx, _dt.length);
 			
 			var dt:String = new String(eval(currentCursor._droptarget));
 			
@@ -334,8 +319,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasModel.resetTransitionTool();
 				_canvasModel.getCanvas().stopTransitionTool();
 				LFError(transitionTarget).showErrorAlert(null);
-				//LFMessage.showMessageAlert(transitionTarget);
-			}else{
+			} else {
 				var td = _canvasModel.addActivityToTransition(transitionTarget);
 				
 				_canvasModel.resetTransitionTool();
@@ -344,7 +328,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					_canvasModel.resetTransitionTool();
 					_canvasModel.getCanvas().stopTransitionTool();
 					LFError(td).showErrorAlert(null);
-					//LFMessage.showMessageAlert(td);
 				}
 			}
 			_canvasModel.resetTransitionTool();
@@ -358,12 +341,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				
 				//if we are on the bin - trash it
 				isActivityOnBin(ca);
-				
-				/**if (ca.hitTest(_canvasModel.getCanvas().bin)){
-					//_canvasModel.getCanvas().removeActivity(ca.activity.activityUIID);
-					_canvasModel.removeActivityOnBin(ca.activity.activityUIID);
-				}*/
-				
 			}
 		   
 		}
@@ -385,7 +362,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
    
     public function transitionClick(ct:CanvasTransition):Void{
-	   Debugger.log('transitionClick Transition:'+ct.transition.uiID,Debugger.GEN,'transitionClick','CanvasController');
+	    Debugger.log('transitionClick Transition:'+ct.transition.uiID,Debugger.GEN,'transitionClick','CanvasController');
 	    _canvasModel.getCanvas().stopActiveTool();
 		
 		_canvasModel.selectedItem = ct;
@@ -403,13 +380,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		_canvasView =  CanvasView(getView());
 		Debugger.log('_canvasView:'+_canvasView,Debugger.GEN,'transitionDoubleClick','CanvasController');
 	   
-		if(!isTransitionTargetReadOnly(ct, Dictionary.getValue("cv_element_readOnly_action_mod"))) _canvasView.createTransitionPropertiesDialog("centre",Delegate.create(this, transitionPropertiesOK));
+		if(!isTransitionTargetReadOnly(ct, Dictionary.getValue("cv_element_readOnly_action_mod"))) _canvasModel.activeView.createTransitionPropertiesDialog("centre",Delegate.create(this, transitionPropertiesOK));
 		
 	    _canvasModel.selectedItem = ct;
     }
    
     public function transitionRelease(ct:CanvasTransition):Void{
-	Debugger.log("transitionRelease Transition:" + ct.transition.uiID, Debugger.GEN, "transitionRelease", "CanvasController");
+		Debugger.log("transitionRelease Transition:" + ct.transition.uiID, Debugger.GEN, "transitionRelease", "CanvasController");
 		if(_canvasModel.isDragging){
 			ct.stopDrag();
 			
@@ -433,8 +410,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		ct.reDraw();
 		
 	}
+	
 	public function transitionReleaseOutside(ct:CanvasTransition):Void{
-		trace("transitionrelease outside")
 		transitionRelease(ct);
 		
 	}

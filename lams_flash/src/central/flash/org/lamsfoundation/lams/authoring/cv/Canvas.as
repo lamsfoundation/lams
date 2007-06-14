@@ -149,15 +149,12 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
     */
     public function viewLoaded(evt:Object) {
         if(evt.type=='load') {
-			if(evt.target instanceof CanvasBranchView) {
-				
-				canvasModel.activeView = evt.target;
-				mx.transitions.TransitionManager.start(evt.target,
-					{type:mx.transitions.Zoom, 
-					 direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
-
-			} else {
 			
+			canvasModel.activeView = evt.target;
+			if(evt.target instanceof CanvasBranchView) {
+				evt.target.open();
+			} else {
+		
 				var autosave_config_interval = Config.getInstance().getItem(AUTOSAVE_CONFIG);
 				if(autosave_config_interval > 0) {
 					if(CookieMonster.cookieExists(AUTOSAVE_TAG + _root.userID)) {
@@ -256,12 +253,10 @@ b	 * @param   learningDesignID
 	
 	public function openBranchView(ba){
 		
-		//fadeOtherOnCanvas(ba);
-		
 		var cx:Number = ba._x + ba.getVisibleWidth()/2;
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
 		
-		var _branchView_mc:MovieClip = _canvasView_mc.content.createChildAtDepth("canvasBrView", DepthManager.kTop, {_x: cx, _y: cy});	
+		var _branchView_mc:MovieClip = _canvasView_mc.content.createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy});	
 		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
 		branchView.init(canvasModel,undefined);
 		
@@ -269,6 +264,8 @@ b	 * @param   learningDesignID
         branchView.addEventListener('load', Proxy.create(this,viewLoaded));
 		
 		canvasModel.addObserver(branchView);
+		
+		ba.branchView = branchView;
 	}
 	
 	public function closeBranchView() {
@@ -276,6 +273,7 @@ b	 * @param   learningDesignID
 		canvasModel.currentBranchingActivity = null;
 	}
 	
+	/** deprecated */
 	private function fadeOtherOnCanvas(ba) {
 		
 		var k:Array = canvasModel.activitiesDisplayed.values();
@@ -583,7 +581,6 @@ b	 * @param   learningDesignID
 	
 	public function finishEditOnFly(forced:Boolean) {
 		Debugger.log('finishing and closing Edit On The Fly',Debugger.CRITICAL,'finishEditOnFly','Canvas');
-		
 		Debugger.log('valid design: ' + _ddm.validDesign,Debugger.CRITICAL,'finishEditOnFly','Canvas');
 		Debugger.log('modified: ' + _ddm.modified,Debugger.CRITICAL,'finishEditOnFly','Canvas');
 		
@@ -667,7 +664,7 @@ b	 * @param   learningDesignID
 		var actToAdd:Activity;
 		var actType:String;
 		Debugger.log('actToCopy.activityTypeID:'+actToCopy.activityTypeID,Debugger.GEN,'setDroppedTemplateActivity','Canvas');			
-		//_global.breakpoint();
+		
 		switch(actToCopy.activityTypeID){
 			
 			case(Activity.TOOL_ACTIVITY_TYPE):
@@ -725,12 +722,12 @@ b	 * @param   learningDesignID
 		
 		//give it the mouse co-ords
 		if (actType = "Parallel"){
-			actToAdd.xCoord = canvasView.content._xmouse - (complexActWidth/2);
-			actToAdd.yCoord = canvasView.content._ymouse;
+			actToAdd.xCoord = canvasModel.activeView.content._xmouse - (complexActWidth/2);
+			actToAdd.yCoord = canvasModel.activeView.content._ymouse;
 		}
 		if(actType = "Tool"){
-			actToAdd.xCoord = canvasView.content._xmouse - (toolActWidth/2);
-			actToAdd.yCoord = canvasView.content._ymouse - (toolActHeight/2);
+			actToAdd.xCoord = canvasModel.activeView.content._xmouse - (toolActWidth/2);
+			actToAdd.yCoord = canvasModel.activeView.content._ymouse - (toolActHeight/2);
 		}
 				
 		Debugger.log('actToAdd:'+actToAdd.title+':'+actToAdd.activityUIID,4,'setDroppedTemplateActivity','Canvas');		

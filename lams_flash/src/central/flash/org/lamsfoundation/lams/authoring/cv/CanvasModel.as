@@ -156,6 +156,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		return _activeView;
 	}
 	
+	public function isActiveView(view:Object):Boolean {
+		return (activeView == view);
+	}
+	
 	public function setPIHeight(h:Number){
 		_piHeight = h;
 		Application.getInstance().onResize();
@@ -212,7 +216,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		for (var i=0; i<k.length; i++){
 			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
 				actOptional.push(k[i]);
-				trace("find the Optional with id:"+k[i].activity.activityUIID )
 			}
 			
 		}
@@ -226,7 +229,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		for (var i=0; i<k.length; i++){
 			if (k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 				actParallel.push(k[i]);
-				trace("find the Parallel with id:"+k[i].activity.activityUIID )
 			}
 			
 		}
@@ -720,7 +722,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @return  
 	 */
 	private function compareTransitions(ddm_transition:Transition, cm_transition:Transition):Object{
-		Debugger.log('Comparing ddm_activity:'+ddm_transition.title+'('+ddm_transition.transitionUIID+') WITH cm_transition:'+cm_transition.title+'('+cm_transition.transitionUIID+')',Debugger.GEN,'compareTransitions','CanvasModel');
+		Debugger.log('Comparing ddm_transition:'+ddm_transition.title + '(' +ddm_transition.transitionUIID+') WITH cm_transition:' + cm_transition.title + '(' + cm_transition.transitionUIID +')' ,Debugger.GEN,'compareTransitions','CanvasModel');
 		var r:Object = new Object();
 		if(ddm_transition === cm_transition){
 			return r = "SAME";
@@ -854,10 +856,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			}
 			
 		}
-		
-		
-		
-		
 		
 	}
 	
@@ -1057,7 +1055,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	public function openBranchActivityContent(ba):Void {
 		currentBranchingActivity = ba;
-		_cv.openBranchView(currentBranchingActivity);
+		
+		if(ba.branchView != null) {
+			activeView = ba.branchView;
+			ba.branchView.open();
+		} else { _cv.openBranchView(currentBranchingActivity); }
 	}
 	
 	public function get currentBranchingActivity():Object {

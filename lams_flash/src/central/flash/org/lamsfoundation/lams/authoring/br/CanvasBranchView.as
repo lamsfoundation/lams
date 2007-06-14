@@ -182,7 +182,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		setStyles();
 		
 		setSize(_cm);
-		setPosition(_cm);
 		
 		this._visible = true;
 		
@@ -194,10 +193,19 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		close();
 	}
 	
+	private function open():Void {
+		setSize(_cm);
+		
+		mx.transitions.TransitionManager.start(this,
+					{type:mx.transitions.Zoom, 
+					 direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
+	}
+	
 	private function close():Void {
 		mx.transitions.TransitionManager.start(this,
 					{type:mx.transitions.Zoom, 
 					 direction:1, duration:0.5, easing:mx.transitions.easing.Strong.easeIn});
+					 
 		_cm.getCanvas().closeBranchView();
 	}
 	
@@ -213,6 +221,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  Boolean - successfullit
 	 */
 	private function drawActivity(a:Activity,cm:CanvasModel):Boolean{
+		
+		if(!cm.isActiveView(this)) return false;
 		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
@@ -264,6 +274,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 */
 	
 	private function hideActivity(a:Activity, cm:CanvasModel):Boolean {
+		if(!cm.isActiveView(this)) return false;
+		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
 		
@@ -287,6 +299,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  Boolean - successfull
 	 */
 	private function removeActivity(a:Activity,cm:CanvasModel):Boolean{
+		if(!cm.isActiveView(this)) return false;
+		
 		var r = cm.activitiesDisplayed.remove(a.activityUIID);
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;
@@ -301,6 +315,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  
 	 */
 	private function drawTransition(t:Transition,cm:CanvasModel):Boolean{
+		if(!isActivityOnLayer(cm.activitiesDisplayed.get(t.fromUIID), this.activityLayer) && !isActivityOnLayer(cm.activitiesDisplayed.get(t.toUIID), this.activityLayer)) return false;
+		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
 		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_canvasController:cbc,_canvasView:cbv});
@@ -321,6 +337,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 */
 	
 	private function hideTransition(t:Transition, cm:CanvasModel):Boolean{
+		if(!cm.isActiveView(this)) return false;
+		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
 		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_canvasController:cbc,_canvasView:cbv, _visible:false});
@@ -339,6 +357,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  
 	 */
 	private function removeTransition(t:Transition,cm:CanvasModel){
+		if(!cm.isActiveView(this)) return false;
+		
 		var r = cm.transitionsDisplayed.remove(t.transitionUIID);
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;
