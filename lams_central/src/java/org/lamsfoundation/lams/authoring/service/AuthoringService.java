@@ -782,12 +782,14 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     	}
     	
     	// Now go back and fix any branch mapping entries - they will still be pointing to old activities.
+    	// Need to check if the sets are not null as these are new objects and Hibernate may not have
+    	// backed them with collections yet.
     	for ( Grouping grouping: newGroupings.values() ) {
-    		if ( grouping.getGroups().size() > 0 ) {
+    		if ( grouping.getGroups() !=null && grouping.getGroups().size() > 0 ) {
     			Iterator iter = grouping.getGroups().iterator();
     			while ( iter.hasNext() ) {
     				Group group = (Group) iter.next();
-    	    		if ( group.getBranchActivities().size() > 0 ) {
+    	    		if ( group.getBranchActivities() != null && group.getBranchActivities().size() > 0 ) {
     	    			Iterator iter2 = group.getBranchActivities().iterator();
     	    			while ( iter2.hasNext() ) {
     	    				GroupBranchActivityEntry entry = (GroupBranchActivityEntry) iter2.next();
