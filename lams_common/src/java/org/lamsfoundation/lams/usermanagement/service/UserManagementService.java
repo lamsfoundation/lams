@@ -332,17 +332,20 @@ public class UserManagementService implements IUserManagementService {
 			
 		Organisation organisation = (Organisation)baseDAO.find(Organisation.class,organisationID);
 		if (organisation != null) {
-			Iterator iterator = organisation.getUserOrganisations().iterator();
-			while (iterator.hasNext()) {
-				UserOrganisation userOrganisation = (UserOrganisation) iterator.next();
-				Iterator userOrganisationRoleIterator = userOrganisation.getUserOrganisationRoles().iterator();
-				while (userOrganisationRoleIterator.hasNext()) {
-					UserOrganisationRole userOrganisationRole = (UserOrganisationRole) userOrganisationRoleIterator.next();
-					if (userOrganisationRole.getRole().getName().equals(roleName))
-						if(isFlashCall)
-							users.add(userOrganisation.getUser().getUserFlashDTO());
-						else 
-							users.add(userOrganisation.getUser().getUserDTO());
+			Set uos = organisation.getUserOrganisations();
+			if (uos != null) {
+				Iterator iterator = uos.iterator();
+				while (iterator.hasNext()) {
+					UserOrganisation userOrganisation = (UserOrganisation) iterator.next();
+					Iterator userOrganisationRoleIterator = userOrganisation.getUserOrganisationRoles().iterator();
+					while (userOrganisationRoleIterator.hasNext()) {
+						UserOrganisationRole userOrganisationRole = (UserOrganisationRole) userOrganisationRoleIterator.next();
+						if (userOrganisationRole.getRole().getName().equals(roleName))
+							if(isFlashCall)
+								users.add(userOrganisation.getUser().getUserFlashDTO());
+							else 
+								users.add(userOrganisation.getUser().getUserDTO());
+					}
 				}
 			}
 		}
@@ -482,6 +485,7 @@ public class UserManagementService implements IUserManagementService {
                     		Organisation pOrg = organisation.getParentOrganisation();
                     		// set parent's child orgs
                     		Set children = pOrg.getChildOrganisations();
+                    		if (children==null) children = new HashSet();
                     		children.add(organisation);
                     		pOrg.setChildOrganisations(children);
                     		// get course managers and give them staff role in this new class
