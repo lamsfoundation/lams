@@ -41,7 +41,7 @@
         <dependency>
 			<groupId>generic-dao</groupId>
 			<artifactId>generic-dao</artifactId>
-			<version>0.8</version>
+			<version>0.9</version>
 			<url>http://source.edtech.vt.edu/maven/</url>
         </dependency>
 
