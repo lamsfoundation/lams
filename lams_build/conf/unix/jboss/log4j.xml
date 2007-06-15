@@ -218,7 +218,7 @@
    </category>
 
    <!--  To avoid LDEV-881 exception info -->
-   <category name="org.apache.catalina.session">
+   <category name="org.apache.catalina.core">
       <priority value="ERROR"/>
    </category>
 
