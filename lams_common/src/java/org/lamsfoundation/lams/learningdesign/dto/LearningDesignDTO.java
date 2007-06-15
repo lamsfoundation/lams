@@ -691,4 +691,10 @@ public class LearningDesignDTO extends BaseDTO{
     public void setGroupings(ArrayList groupings) {
         this.groupings = groupings;
     }
+	public ArrayList getBranchMappings() {
+		return branchMappings;
+	}
+	public void setBranchMappings(ArrayList branchMappings) {
+		this.branchMappings = branchMappings;
+	}
 }
