@@ -407,6 +407,13 @@ public class ImportService implements IImportService {
 		return false;
 	}
 	
+	public int getNumRows(FormFile fileItem) throws IOException {
+		HSSFSheet sheet = getSheet(fileItem);
+		int startRow = sheet.getFirstRowNum();
+		int endRow = sheet.getLastRowNum();
+		return endRow - startRow;
+	}
+	
 	public List parseUserSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
 		results = new ArrayList<ArrayList>();
 		HSSFSheet sheet = getSheet(fileItem);
@@ -435,19 +442,20 @@ public class ImportService implements IImportService {
 			if (hasError) {
 				log.debug("hasError: "+hasError);
 				results.add(rowResult);
+				updateImportStatus(sessionId, results.size());
 				continue;
 			} else {
 				try {
 					service.save(user);
 					writeAuditLog(user, userDTO);
 					log.debug("saved user: "+user.getUserId());
-					updateImportStatus(sessionId, results.size()+1);
 				} catch (Exception e) {
 					log.debug(e);
 					rowResult.add(messageService.getMessage("error.fail.add"));
 				}
 				log.debug("rowResult size: "+rowResult.size());
 				results.add(rowResult);
+				updateImportStatus(sessionId, results.size());
 			}
 		}
 		log.debug("found "+results.size()+" users in spreadsheet.");

@@ -46,6 +46,7 @@ public interface IImportService {
 	public static final String STATUS_IMPORTED = "imported";
 	public static final String IMPORT_FILE = "file";
 	public static final String IMPORT_RESULTS = "results";
+	public static final int THRESHOLD = 500;
 	
 	/**
 	 * Returns true if spreadsheet contains user data.
@@ -86,6 +87,14 @@ public interface IImportService {
 	 * @throws IOException
 	 */
 	public List<List> parseV1UsersFile(FormFile fileItem, boolean includeIntegrated) throws IOException;
+	
+	/**
+	 * Returns number of rows found in spreadsheet.
+	 * @param fileItem
+	 * @return
+	 * @throws IOException
+	 */
+	public int getNumRows(FormFile fileItem) throws IOException;
 	
 	/**
 	 * Returns message results from parsing list of users in spreadsheet.

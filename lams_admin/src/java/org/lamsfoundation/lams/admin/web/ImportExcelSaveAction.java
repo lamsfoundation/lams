@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
  * @struts:action-forward name="sysadmin" path="/sysadminstart.do"
  * @struts:action-forward name="import" path="/importexcel.do"
  * @struts:action-forward name="status" path="/import/status.jsp"
+ * @struts:action-forward name="results" path="/importuserresult.do"
  */
 public class ImportExcelSaveAction extends Action {
 	
@@ -62,6 +63,7 @@ public class ImportExcelSaveAction extends Action {
 			return mapping.findForward("sysadmin");
 		}
 		
+		IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
 		ImportExcelForm importExcelForm = (ImportExcelForm)form;
 		FormFile file = importExcelForm.getFile();
 		
@@ -70,12 +72,18 @@ public class ImportExcelSaveAction extends Action {
 			return mapping.findForward("import");
 		}
 		
-		SessionManager.getSession().setAttribute(IImportService.IMPORT_FILE, file);
 		String sessionId = (String)SessionManager.getSession().getId();
-		Thread t = new Thread(new ImportExcelThread(sessionId));
-		t.start();
-		
-		return mapping.findForward("status");
+		SessionManager.getSession().setAttribute(IImportService.IMPORT_FILE, file);
+		// use a new thread only if number of users is > threshold
+		if (importService.getNumRows(file) < IImportService.THRESHOLD) {
+			List results = importService.parseSpreadsheet(file, sessionId);
+			SessionManager.getSession(sessionId).setAttribute(IImportService.IMPORT_RESULTS, results);
+			return mapping.findForward("results");
+		} else {		
+			Thread t = new Thread(new ImportExcelThread(sessionId));
+			t.start();
+			return mapping.findForward("status");
+		}
 	}
 	
 	
