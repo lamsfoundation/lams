@@ -31,7 +31,6 @@ public class LamstwoDaoImpl
 
 	public void init() {
 		log.debug("init");
-		super.init();
 	}
 
 }
