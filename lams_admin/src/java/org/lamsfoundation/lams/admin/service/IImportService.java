@@ -42,6 +42,10 @@ public interface IImportService {
 	public static final String IMPORT_HELP_PAGE = "Import+Users";
 	public static final String IMPORTV1_HELP_PAGE = "Import+LAMS+1+Users";
 	public static final String IMPORT_GROUPS_HELP_PAGE = "Import+Groups";
+	public static final String STATUS_IMPORT_TOTAL = "importTotal";
+	public static final String STATUS_IMPORTED = "imported";
+	public static final String IMPORT_FILE = "file";
+	public static final String IMPORT_RESULTS = "results";
 	
 	/**
 	 * Returns true if spreadsheet contains user data.
@@ -65,7 +69,7 @@ public interface IImportService {
 	 * @param fileItem
 	 * @throws IOException
 	 */
-	public List parseSpreadsheet(FormFile fileItem) throws IOException;
+	public List parseSpreadsheet(FormFile fileItem, String sessionId) throws IOException;
 	
 	/**
 	 * 
@@ -89,7 +93,7 @@ public interface IImportService {
 	 * @return
 	 * @throws IOException
 	 */
-	public List parseUserSpreadsheet(FormFile file) throws IOException;
+	public List parseUserSpreadsheet(FormFile file, String sessionId) throws IOException;
 	
 	/**
 	 * Returns message results from parsing list of organisation memberships

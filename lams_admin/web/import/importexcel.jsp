@@ -1,6 +1,12 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.admin.service.IImportService" %>
 
+<script language="javascript" type="text/JavaScript">
+	function goToStatus() {
+		document.location = '<lams:LAMSURL/>/admin/import/status.jsp';
+	}
+</script>
+
 <h2>
 	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 	: <fmt:message key="admin.user.import" />
@@ -38,7 +44,7 @@
 	</tr>
 </table>
 <p align="center">
-<html:submit styleClass="button"><fmt:message key="label.import"/></html:submit> &nbsp; 	
+<html:submit styleClass="button" onchange="goToStatus();"><fmt:message key="label.import"/></html:submit> &nbsp; 	
 <html:cancel styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
 </p>
 

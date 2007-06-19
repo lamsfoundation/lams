@@ -72,14 +72,22 @@ public class AuditService implements IAuditService {
 	   	if ( ss != null ) {
 	   		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	   		if ( user != null ) {
-	   			return user.getLogin()+"("+user.getUserID()+"): ";
+	   			return getUserString(user);
 	   		}
 	   	}
 	   	return "User unknown (session does not contain user details): ";
 	}
+	
+	private String getUserString(UserDTO userDTO) {
+		return userDTO.getLogin()+"("+userDTO.getUserID()+"): ";
+	}
 
 	public void log(String moduleName, String message) {
 		logger.info(getUserString()+moduleName+": "+message);
+	}
+	
+	public void log(UserDTO userDTO, String moduleName, String message) {
+		logger.info(getUserString(userDTO)+moduleName+": "+message);
 	}
 
 	public void logChange(String moduleName, Long originalUserId, String originalUserLogin,

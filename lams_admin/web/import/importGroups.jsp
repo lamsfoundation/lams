@@ -3,6 +3,14 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.OrganisationType" %>
 
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/prototype.js"></script>
+<script language="javascript" type="text/JavaScript">
+function loading(){
+	document.getElementById('loading').style.display="";
+	document.getElementById('main-page').style.display="none";
+}
+</script>
+
 <h2>
 	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 	: <fmt:message key="sysadmin.import.groups.title" />
@@ -11,6 +19,13 @@
 <lams:help style="no-tabs" page="<%= IImportService.IMPORT_GROUPS_HELP_PAGE %>"/>
 
 <p>&nbsp;</p>
+
+<div id="loading" style="display:none">
+	<h3><fmt:message key="msg.please.wait"/></h3>
+	<p align="center"><img src="<lams:LAMSURL/>/images/loading.gif" alt="loading..." /></p>
+</div>
+
+<div id="main-page">
 
 <logic:notEmpty name="results">
 	<h3><fmt:message key="heading.import.results"/></h3>
@@ -71,8 +86,10 @@
 	</tr>
 </table>
 <p align="center">
-<html:submit styleClass="button"><fmt:message key="label.import"/></html:submit> &nbsp; 	
+<html:submit styleClass="button" onchange="loading();"><fmt:message key="label.import"/></html:submit> &nbsp; 	
 <html:cancel styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
 </p>
 
 </html:form>
+
+</div>

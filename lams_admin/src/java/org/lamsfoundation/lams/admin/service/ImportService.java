@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -165,9 +167,9 @@ public class ImportService implements IImportService {
 		return (StringUtils.equals(string, "* organisation")) ? true : false;
 	}
 	
-	public List parseSpreadsheet(FormFile fileItem) throws IOException {
+	public List parseSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
 		if (isUserSpreadsheet(fileItem)) {
-			return parseUserSpreadsheet(fileItem);
+			return parseUserSpreadsheet(fileItem, sessionId);
 		} else if (isRolesSpreadsheet(fileItem)) {
 			return parseRolesSpreadsheet(fileItem);
 		}
@@ -185,8 +187,6 @@ public class ImportService implements IImportService {
 		int endRow = sheet.getLastRowNum();
 		
 		log.debug("sheet rows: "+startRow+".."+endRow);
-		
-		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 		
 		HSSFRow row;
 		Organisation org = null;
@@ -211,21 +211,16 @@ public class ImportService implements IImportService {
 				results.add(rowResult);
 				continue;
 			} else {
-				//try {
-					org = service.saveOrganisation(org, user.getUserID());
-					rowResult.add(org.getOrganisationId().toString());
-					rowResult.add(org.getName());
-					rowResult.add(org.getParentOrganisation().getOrganisationId().toString());
-					rowResult.add(org.getOrganisationType().getOrganisationTypeId().toString());
-					writeOrgAuditLog(org);
-					// if we just added a group, then the rows under it become it's subgroups
-					if (parentOrg.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE)) {
-						parentOrg = org;
-					}
-				//} catch (Exception e) {
-				//	log.debug(e);
-				//	rowResult.add(messageService.getMessage("error.fail.add"));
-				//}
+				org = service.saveOrganisation(org, getCurrentUserId());
+				rowResult.add(org.getOrganisationId().toString());
+				rowResult.add(org.getName());
+				rowResult.add(org.getParentOrganisation().getOrganisationId().toString());
+				rowResult.add(org.getOrganisationType().getOrganisationTypeId().toString());
+				writeOrgAuditLog(org);
+				// if we just added a group, then the rows under it become it's subgroups
+				if (parentOrg.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE)) {
+					parentOrg = org;
+				}
 				results.add(rowResult);
 			}
 		}
@@ -233,6 +228,15 @@ public class ImportService implements IImportService {
 		return results;
 	}
 	
+	private Integer getCurrentUserId() {
+		try {
+			UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+			return user.getUserID();
+		} catch (Exception e) {
+			log.error(e);
+		}
+		return null;
+	}
 	
 	private Organisation parseGroup(HSSFRow row, int rowIndex) {
 		Organisation org = new Organisation();
@@ -403,11 +407,14 @@ public class ImportService implements IImportService {
 		return false;
 	}
 	
-	public List parseUserSpreadsheet(FormFile fileItem) throws IOException {
+	public List parseUserSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
 		results = new ArrayList<ArrayList>();
 		HSSFSheet sheet = getSheet(fileItem);
 		int startRow = sheet.getFirstRowNum();
 		int endRow = sheet.getLastRowNum();
+		
+		setupImportStatus(sessionId, endRow-startRow);
+		UserDTO userDTO = (UserDTO)SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
 		
 		log.debug("sheet rows: "+startRow+".."+endRow);
 		
@@ -432,8 +439,9 @@ public class ImportService implements IImportService {
 			} else {
 				try {
 					service.save(user);
-					writeAuditLog(user);
+					writeAuditLog(user, userDTO);
 					log.debug("saved user: "+user.getUserId());
+					updateImportStatus(sessionId, results.size()+1);
 				} catch (Exception e) {
 					log.debug(e);
 					rowResult.add(messageService.getMessage("error.fail.add"));
@@ -444,6 +452,20 @@ public class ImportService implements IImportService {
 		}
 		log.debug("found "+results.size()+" users in spreadsheet.");
 		return results;
+	}
+	
+	// use session vars to update browser with import progress so page
+	// won't timeout
+	private void setupImportStatus(String sessionId, int importTotal) {
+		HttpSession ss = SessionManager.getSession(sessionId);
+		ss.setAttribute(STATUS_IMPORT_TOTAL, importTotal);
+		ss.setAttribute(STATUS_IMPORTED, 0);
+	}
+	
+	private void updateImportStatus(String sessionId, int imported) {
+		HttpSession ss = SessionManager.getSession(sessionId);
+		ss.removeAttribute(STATUS_IMPORTED);
+		ss.setAttribute(STATUS_IMPORTED, imported);
 	}
 	
 	public List parseRolesSpreadsheet(FormFile fileItem) throws IOException {
@@ -843,12 +865,12 @@ public class ImportService implements IImportService {
 		}
 	}
 	
-	private void writeAuditLog(User user) {
+	private void writeAuditLog(User user, UserDTO userDTO) {
 		String[] args = new String[2];
 		args[0] = user.getLogin()+"("+user.getUserId()+")";
 		args[1] = user.getFullName();
 		String message = messageService.getMessage("audit.user.create", args);
-		auditService.log(AdminConstants.MODULE_NAME, message);
+		auditService.log(userDTO, AdminConstants.MODULE_NAME, message);
 	}
 	
 	private void writeOrgAuditLog(Organisation org) {

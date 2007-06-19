@@ -21,12 +21,14 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.admin.web;
+package org.lamsfoundation.lams.admin.web.action;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -35,65 +37,49 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.service.IImportService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 
 /**
  * @author jliew
  *
- * @struts:action path="/importexcelsave"
- *              name="ImportExcelForm"
- *              input=".importexcel"
- *              scope="request"
- * 				validate="false"
- * 
+ * @struts:action path="/importuserresult" validate="false"
  * @struts:action-forward name="importresult" path=".importresult"
- * @struts:action-forward name="sysadmin" path="/sysadminstart.do"
- * @struts:action-forward name="import" path="/importexcel.do"
- * @struts:action-forward name="status" path="/import/status.jsp"
  */
-public class ImportExcelSaveAction extends Action {
-	
+public class ImportUserResultAction extends Action {
+
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
-		if (isCancelled(request)) {
-			return mapping.findForward("sysadmin");
+		MessageService messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
+		HttpSession ss = SessionManager.getSession();
+		
+		List results = (List)ss.getAttribute(IImportService.IMPORT_RESULTS);
+		FormFile file = (FormFile)ss.getAttribute(IImportService.IMPORT_FILE);
+		String successMessageKey = (importService.isUserSpreadsheet(file) ? "msg.users.created" : "msg.users.added");
+		
+		int successful = 0;
+		for(int i=0; i<results.size(); i++) {
+			ArrayList rowResult = (ArrayList)results.get(i);
+			if (rowResult.isEmpty()) successful++;
 		}
+		String[] args = new String[1];
+		args[0] = String.valueOf(successful);
 		
-		ImportExcelForm importExcelForm = (ImportExcelForm)form;
-		FormFile file = importExcelForm.getFile();
+		request.setAttribute("results", results);
+		request.setAttribute("successful", messageService.getMessage(successMessageKey, args));
 		
-		// validation
-		if (file==null || file.getFileSize()<=0) {
-			return mapping.findForward("import");
-		}
+		// remove temporary session vars that allowed status to be displayed
+		// to user during import
+		ss.removeAttribute(IImportService.STATUS_IMPORT_TOTAL);
+		ss.removeAttribute(IImportService.STATUS_IMPORTED);
+		ss.removeAttribute(IImportService.IMPORT_FILE);
+		ss.removeAttribute(IImportService.IMPORT_RESULTS);
 		
-		SessionManager.getSession().setAttribute(IImportService.IMPORT_FILE, file);
-		String sessionId = (String)SessionManager.getSession().getId();
-		Thread t = new Thread(new ImportExcelThread(sessionId));
-		t.start();
 		
-		return mapping.findForward("status");
+		return mapping.findForward("importresult");
 	}
-	
-	
-	private class ImportExcelThread implements Runnable {
-		private String sessionId;
-		
-		public ImportExcelThread(String sessionId) {
-			this.sessionId = sessionId;
-		}
-		
-		public void run() {
-			IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
-			try {
-				FormFile file = (FormFile)SessionManager.getSession(sessionId).getAttribute(IImportService.IMPORT_FILE);
-				List results = importService.parseSpreadsheet(file, sessionId);
-				SessionManager.getSession(sessionId).setAttribute(IImportService.IMPORT_RESULTS, results);
-			} catch (Exception e) {}
-		}
-	}
-
 }
