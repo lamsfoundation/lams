@@ -510,7 +510,7 @@ public class ImportService implements IImportService {
 				continue;
 			} else {
 				try {
-					saveUserRoles(login, orgId, roles, row);
+					saveUserRoles(isSysadmin(sessionId), login, orgId, roles, row);
 				} catch (Exception e) {
 					log.error("Unable to assign roles to user: "+login, e);
 					rowResult.add(messageService.getMessage("error.fail.add"));
@@ -535,10 +535,16 @@ public class ImportService implements IImportService {
 		hasError = true;
 	}
 	
+	// used when importing in a separate thread that doesn't have the user's DTO in session
+	private boolean isSysadmin(String sessionId) {
+		UserDTO userDTO = (UserDTO)SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
+		return service.isUserInRole(userDTO.getUserID(), service.getRootOrganisation().getOrganisationId(), Role.SYSADMIN);
+	}
+	
 	/*
 	 * user must already exist
 	 */
-	private void saveUserRoles(String login, String orgId, List<String> roles, HSSFRow row) {
+	private void saveUserRoles(boolean isSysadmin, String login, String orgId, List<String> roles, HSSFRow row) {
 		User user = null;
 		if (StringUtils.isNotBlank(login)) {
 			user = service.getUserByLogin(login);
@@ -556,7 +562,7 @@ public class ImportService implements IImportService {
 		if (StringUtils.isBlank(orgId) || org==null){
 			setError("error.org.invalid", "("+orgId+")");
 		} else {
-			if (roles==null || !checkValidRoles(roles, service.isUserSysAdmin(), org.getOrganisationType())) {
+			if (roles==null || !checkValidRoles(roles, isSysadmin, org.getOrganisationType())) {
 				setError("error.roles.invalid", "("+parseStringCell(row.getCell(ROLES))+")");
 			}
 		}
