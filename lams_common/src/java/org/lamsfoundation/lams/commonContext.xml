@@ -114,6 +114,9 @@
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="disable*">PROPAGATION_REQUIRED</prop>
+				<prop key="set*">PROPAGATION_REQUIRED</prop>
+				<prop key="userHasData">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
