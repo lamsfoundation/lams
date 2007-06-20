@@ -20,11 +20,3 @@ WHERE learning_design_id IN (SELECT learning_design_id FROM lams_learning_design
 insert into lams_configuration (config_key, config_value) values ('AllowLiveEdit','true');
 insert into lams_configuration (config_key, config_value) values ('ServerURLContextPath','lams/');
 insert into lams_learning_activity_type values (9, 'GATE_SYSTEM');
-
-INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
-	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
-VALUES (5, 9, 'System Gate', 'Gate: Opens under system control.', 
-	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, null, 
-	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
-	'monitoring/gate.do?method=viewGate', now()	);
