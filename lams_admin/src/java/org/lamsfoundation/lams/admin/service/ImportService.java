@@ -171,7 +171,7 @@ public class ImportService implements IImportService {
 		if (isUserSpreadsheet(fileItem)) {
 			return parseUserSpreadsheet(fileItem, sessionId);
 		} else if (isRolesSpreadsheet(fileItem)) {
-			return parseRolesSpreadsheet(fileItem);
+			return parseRolesSpreadsheet(fileItem, sessionId);
 		}
 		return new ArrayList();
 	}
@@ -476,13 +476,15 @@ public class ImportService implements IImportService {
 		ss.setAttribute(STATUS_IMPORTED, imported);
 	}
 	
-	public List parseRolesSpreadsheet(FormFile fileItem) throws IOException {
+	public List parseRolesSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
 		results = new ArrayList<ArrayList>();
 		HSSFSheet sheet = getSheet(fileItem);
 		int startRow = sheet.getFirstRowNum();
 		int endRow = sheet.getLastRowNum();
 		
 		log.debug("sheet rows: "+startRow+".."+endRow);
+		
+		setupImportStatus(sessionId, endRow-startRow);
 		
 		HSSFRow row;
 		List<String> roles;
@@ -504,16 +506,18 @@ public class ImportService implements IImportService {
 			if (hasError) {
 				log.debug("hasError: "+hasError);
 				results.add(rowResult);
+				updateImportStatus(sessionId, results.size());
 				continue;
 			} else {
 				try {
 					saveUserRoles(login, orgId, roles, row);
 				} catch (Exception e) {
-					log.debug(e);
+					log.error("Unable to assign roles to user: "+login, e);
 					rowResult.add(messageService.getMessage("error.fail.add"));
 				}
 				log.debug("rowResult size: "+rowResult.size());
 				results.add(rowResult);
+				updateImportStatus(sessionId, results.size());
 			}
 		}
 		log.debug("found "+results.size()+" users in spreadsheet.");
@@ -542,7 +546,7 @@ public class ImportService implements IImportService {
 			setError("error.login.required", "");
 		}
 		if (user==null) {
-			setError("user.does.not.exist", login);
+			setError("error.user.does.not.exist", "("+login+")");
 		}
 		
 		Organisation org = null;

@@ -99,17 +99,18 @@ public interface IImportService {
 	/**
 	 * Returns message results from parsing list of users in spreadsheet.
 	 * @param file
+	 * @param sessionId
 	 * @return
 	 * @throws IOException
 	 */
 	public List parseUserSpreadsheet(FormFile file, String sessionId) throws IOException;
 	
 	/**
-	 * Returns message results from parsing list of organisation memberships
-	 * in spreadsheet.
+	 * Returns message results from parsing list of organisation memberships.
 	 * @param file
+	 * @param sessionId
 	 * @return
 	 * @throws IOException
 	 */
-	public List parseRolesSpreadsheet(FormFile file) throws IOException;
+	public List parseRolesSpreadsheet(FormFile file, String sessionId) throws IOException;
 }
