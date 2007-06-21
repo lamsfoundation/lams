@@ -26,11 +26,13 @@ import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.authoring.br.*;
 
 class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{  
 	
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
+	private var _canvasBranchView:CanvasBranchView;
 	private var _transition:Transition;
 	
 	private var _drawnLineStyle:Number;
@@ -47,6 +49,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 	private var _toAct_edgePoint:Point;
 	private var xPos:Number;
 	
+	private var fromAct_override_mc:MovieClip;
+	private var toAct_override_mc:MovieClip;
 	
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
@@ -88,6 +92,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 		return _fromAct_edgePoint;
 	}
 	
+	public function set override_fromAct(a:MovieClip) {
+		fromAct_override_mc = a;
+	}
+	
+	public function set override_toAct(a:MovieClip) {
+		toAct_override_mc = a;
+	}
+	
 	/**
 	 * Renders the transition to stage
 	 * @usage   
@@ -101,9 +113,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 		var toAct_mc;
 		
 		if(_transition.mod_fromUIID != null) fromAct_mc = cv.model.getActivityMCByUIID(_transition.mod_fromUIID);
+		else if(fromAct_override_mc != null) fromAct_mc = fromAct_override_mc;
 		else fromAct_mc = cv.model.getActivityMCByUIID(_transition.fromUIID);
 		
 		if(_transition.mod_toUIID != null) toAct_mc = cv.model.getActivityMCByUIID(_transition.mod_toUIID);
+		else if(toAct_override_mc != null) toAct_mc = toAct_override_mc;
 		else toAct_mc = cv.model.getActivityMCByUIID(_transition.toUIID);
 		
 		var isGateTransition = toAct_mc.activity.isGateActivity();

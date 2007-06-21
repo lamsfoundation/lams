@@ -78,6 +78,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private var _activities:Hashtable;
 	private var _transitions:Hashtable;
 	private var _groupings:Hashtable;
+	private var _branches:Hashtable;
 	
 	
 	private var _licenseID:Number;
@@ -100,6 +101,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_activities = new Hashtable("_activities");
 		_transitions = new Hashtable("_transitions");
 		_groupings = new Hashtable("_groupings");
+		_branches = new Hashtable("_branches");
 		
 		//set the defualts:
 		_objectType = "LearningDesign";
@@ -156,7 +158,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		//validate the activity ?		
 		//validate if we can do it?
-		//dispatch an event before the design  has changed
+		//dispatch an event before the design has changed
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 		_activities.put(activity.activityUIID, activity);
 		//pull it out to check it
@@ -167,7 +169,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		}else{
 			return new LFError("Adding activity failed","addActivity",this,'activityUIID:'+activity.activityUIID);
 		}
-		//dispatch an event now the design  has changed
+		//dispatch an event now the design has changed
 		dispatchEvent({type:'ddmUpdate',target:this});
 		
 		
@@ -181,7 +183,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @return  
 	 */
 	public function removeActivity(activityUIID:Number):Object{
-		//dispatch an event to show the design  has changed
+		//dispatch an event to show the design has changed
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 	
 		
@@ -196,7 +198,23 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		}
 	}
 	
+	/**
+	 * Adds a transition to the DDM
+	 * @usage   
+	 * @param   transition 
+	 * @return  
+	 */
+	public function addTransition(transition:Transition):Boolean{
+		//dispatch an event to show the design has changed
+		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 	
+		Debugger.log('Transition from:'+transition.fromUIID+', to:'+transition.toUIID,4,'addTransition','DesignDataModel');
+		_transitions.put(transition.transitionUIID,transition);
+		dispatchEvent({type:'ddmUpdate',target:this});
+		
+		//TODO some validation would be nice
+		return true;
+	}
 	
 	/**
 	 * Removes the transition from the DDM
@@ -205,7 +223,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @return  
 	 */
 	public function removeTransition(transitionUIID):Object{
-		//dispatch an event to show the design  has changed
+		//dispatch an event to show the design has changed
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 		
 		var r:Object = _transitions.remove(transitionUIID);
@@ -234,18 +252,19 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	}
 	
 	/**
-	 * Adds a transition to the DDM
+	 * Adds a branch to the DDM
 	 * @usage   
-	 * @param   transition 
+	 * @param   branch 
 	 * @return  
 	 */
-	public function addTransition(transition:Transition):Boolean{
-		//dispatch an event to show the design  has changed
+	public function addBranch(branch:Branch):Boolean{
+		//dispatch an event to show the design has changed
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 	
-		Debugger.log('Transition from:'+transition.fromUIID+', to:'+transition.toUIID,4,'addActivity','DesignDataModel');
-		_transitions.put(transition.transitionUIID,transition);
+		Debugger.log('Branch from:'+branch.fromUIID+', to:'+branch.toUIID,4,'addBranch','DesignDataModel');
+		_branches.put(branch.branchUIID,branch);
 		dispatchEvent({type:'ddmUpdate',target:this});
+		
 		//TODO some validation would be nice
 		return true;
 	}
@@ -266,6 +285,40 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		dispatchEvent({type:'ddmUpdate',target:this});
 	}
 	
+	/**
+	 * Removes the branch from the DDM
+	 * @usage   
+	 * @param   branchUIID 
+	 * @return  
+	 */
+	public function removeBranch(branchUIID):Object{
+		//dispatch an event to show the design has changed
+		dispatchEvent({type:'ddmBeforeUpdate',target:this});
+		
+		var r:Object = _branches.remove(branchUIID);
+		if(r==null){
+			return new LFError("Removing branch failed:"+branchUIID,"removeBranch",this,null);
+		}else{
+			Debugger.log('Removed:'+r.branchUIID,Debugger.GEN,'removeBranch','DesignDataModel');
+			dispatchEvent({type:'ddmUpdate',target:this});
+		}
+	}
+	
+	/**
+	 * Removes the branch from the DDM which are connected to the Activity 
+	 *  
+	 * @param   connectUIID connected Activity UIID (SequenceActivity)
+	 */
+	
+	public function removeBranchByConnection(connectUIID):Void{
+		var keyArray:Array = _branches.keys();
+		for(var i=0; i<keyArray.length; i++){
+			var branch:Branch = Branch(_branches.get(keyArray[i]));
+			if(branch.fromUIID == connectUIID || branch.toUIID == connectUIID){
+				removeBranch(branch.branchUIID);
+			}
+		}
+	}
 	
 	/**
 	 * Sets a new design for the DDM.
@@ -938,6 +991,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public function set transitions(a:Hashtable):Void{
 		_transitions = a;
+	}
+	
+	public function get branches():Hashtable{
+		return _branches;
+	}
+	
+	public function set branches(a:Hashtable):Void{
+		_branches = a;
 	}
 	
 	/**

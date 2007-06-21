@@ -87,7 +87,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private static var X_KEY:Number = 88;
     private static var C_KEY:Number = 67;
 	private static var D_KEY:Number = 68;
-	//private static var T_KEY:Number = 84;
     private static var V_KEY:Number = 86;
     private static var Z_KEY:Number = 90; 
     private static var Y_KEY:Number = 89;
@@ -160,8 +159,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		_PI = new PropertyInspectorNew();
 		_ccm = CustomContextMenu.getInstance();
 		_root_layout = (_root.layout != undefined || _root.layout != null) ? _root.layout : null;
-		
-		//Mouse.addListener(someListener);
     }
     
     /**
@@ -184,7 +181,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		else
 			_isEditMode = false;
 		
-		
 		_container_mc = container_mc;
         _UILoaded = false;
 
@@ -200,16 +196,15 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		Cursor.addCursor(C_GATE);
 		Cursor.addCursor(C_GROUP);
 		
-		
 		//Get the instance of config class
         _config = Config.getInstance();
 		
         //Assign the config load event to
         _config.addEventListener('load',Delegate.create(this,configLoaded));
         
-        //Set up Key handler 
-        //TODO take out after testing and uncomment same key handler in ready();
+        //Set up Key handler
         Key.addListener(this);
+        
 		_container_mc.tabChildren = true;
     }
     

@@ -22,38 +22,39 @@
  */
 
 import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.common.*;
+import org.lamsfoundation.lams.common.util.*;
 
 
-class org.lamsfoundation.lams.authoring.BranchActivity {
+class Branch extends Transition {
 
-	public function BranchActivity(activityUIID:Number){
+	private var UIID:Number;
+	private var _sequenceActivity:Activity;
+	
+	
+	// TODO: add learningDesignID
+
+	public function Branch(activityUIID:Number, fromUIID:Number, toUIID:Number, sequenceActivity:Activity, learningDesignID:Number){
+		super(null, fromUIID, toUIID, learningDesignID);
+		
+		UIID = activityUIID;
+		_sequenceActivity = sequenceActivity;
+		
 	}
 	
-	/**
-	 * Creates a branching activity from a dto
-	 * @usage   
-	 * @param   dto 
-	 * @return  
-	 */
-	public function populateFromDTO(dto:Object){
-		super.populateFromDTO(dto);
-		
-		// unique attr
-		
-	}
-	
-	/**
-	 * Creates an object containing all the props of the BranchActivity.  
-	 * If a value is null then it is ommitted... if itsd the null value from const 
-	 * then its included
-	 * @usage   
-	 * @return  the DTO
-	 */
 	public function toData():Object{
 		var dto:Object = super.toData();
+		dto.branchUIID = branchUIID;
+		dto.sequenceActivity = sequenceActivity;
 		return dto;
 	}
 	
+	public function get branchUIID():Number {
+		return UIID;
+	}
 	
+	public function get sequenceActivity():Activity {
+		return _sequenceActivity;
+	}
 }
 

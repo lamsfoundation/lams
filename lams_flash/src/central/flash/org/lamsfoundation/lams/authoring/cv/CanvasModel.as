@@ -26,8 +26,9 @@ import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.ui.*;
-import org.lamsfoundation.lams.common.dict.*
-import mx.events.*
+import org.lamsfoundation.lams.common.dict.*;
+import mx.events.*;
+
 /*
 * Model for the Canvas
 */
@@ -68,6 +69,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	//each on contains a reference to the emelment in the ddm (activity or transition)
 	private var _activitiesDisplayed:Hashtable;
 	private var _transitionsDisplayed:Hashtable;
+	private var _branchesDisplayed:Hashtable;
 	
 	private var _currentBranchingActivity:Object;
 	private var _activeView:Object;
@@ -88,6 +90,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		_ddm = new DesignDataModel();
 		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
 		_transitionsDisplayed = new Hashtable("_transitionsDisplayed");
+		_branchesDisplayed = new Hashtable("_branchesDisplayed");
 		
 		_activeTool = "none";
 		_activeView = null;
@@ -590,16 +593,24 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		var toAct = _transitionActivities[1].activityUIID
 		
 		if(_transitionActivities.length == 2){
-			var t:Transition;
 			
 			// check if either end is a connector point for Branching
 			if(activeView.startHub.activity.activityUIID == fromAct || 
 			   activeView.endHub.activity.activityUIID == toAct) {
+				
+				/*********************************************
+				* TODO: REQUIRE NORMAL BRANCH CLIENT_SIDE VALIDATION
+				*********************************************/
+				Debugger.log('No validation errors, creating branch.......',Debugger.GEN,'addActivityToTransition','CanvasModel');
+			
 				//lets make the connection
-				t = createBranchConnector(_transitionActivities);
-				_cv.stopTransitionTool();
-				return;
+				var b:Branch = createBranchConnector(_transitionActivities);
+				
+				//add it to the DDM
+				var success:Object = _cv.ddm.addBranch(b);
+				
 			} else {
+				var t:Transition;
 			
 				/*********************************************
 				* BELOW: NORMAL TRANSITION CLIENT_SIDE VALIDATION
@@ -646,14 +657,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			
 				//lets make the transition
 				t = createTransition(_transitionActivities);
+				
+				//add it to the DDM
+				var success:Object = _cv.ddm.addTransition(t);
 			
 			}
 			
-			//add it to the DDM
-			var success:Object = _cv.ddm.addTransition(t);
-			
 			//flag the model as dirty and trigger a refresh
 			_cv.stopTransitionTool();
+			
 			setDirty();
 			
 		}
@@ -699,10 +711,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @param   transitionActs An array of transition activities. Must only contain 2
 	 * @return  
 	 */
-	private function createBranchConnector(transitionActs:Array):Transition{
-		return null;
+	private function createBranchConnector(transitionActs:Array):Branch{
+		var fromAct:Activity = transitionActs[0];
+		var toAct:Activity = transitionActs[1];
+		
+		// TODO: activeView.defaultSequenceActivity should return SequenceActivity obj
+		var b:Branch = new Branch(_cv.ddm.newUIID(), fromAct.activityUIID, toAct.activityUIID, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
+		
+		return b;
 	}
-	
 	
 	public function setDesignTitle(){
 		broadcastViewUpdate("POSITION_TITLEBAR", null);
@@ -711,8 +728,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////       REFRESHING DESIGNS       /////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
-	
-	
 	
 	/**
 	 * Compares 2 activities, decides if they are new, the same or to be deleted
@@ -724,7 +739,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	private function compareActivities(ddm_activity:Activity,cm_activity:Activity):Object{
 		Debugger.log('Comparing ddm_activity:'+ddm_activity.title+'('+ddm_activity.activityUIID+') WITH cm_activity:'+cm_activity.title+'('+cm_activity.activityUIID+')',Debugger.GEN,'compareActivities','CanvasModel');
 		var r:Object = new Object();
-		
 		
 		//check if act has been removed from canvas
 		if(ddm_activity == null || ddm_activity == undefined){
@@ -758,8 +772,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		if(cm_activity == null || cm_activity == undefined){
 			return r = "NEW";
 		}
-		
-			
 	}
 	
 	/**
@@ -771,18 +783,27 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 */
 	private function compareTransitions(ddm_transition:Transition, cm_transition:Transition):Object{
 		Debugger.log('Comparing ddm_transition:'+ddm_transition.title + '(' +ddm_transition.transitionUIID+') WITH cm_transition:' + cm_transition.title + '(' + cm_transition.transitionUIID +')' ,Debugger.GEN,'compareTransitions','CanvasModel');
+		return compareConnections(ddm_transition, cm_transition);
+	}
+	
+	private function compareBranches(ddm_branch:Branch, cm_branch:Branch):Object{
+		Debugger.log('Comparing ddm_branch:'+ddm_branch.title + '(' +ddm_branch.branchUIID+') WITH cm_branch:' + cm_branch.title + '(' + cm_branch.branchUIID +')' ,Debugger.GEN,'compareBranches','CanvasModel');
+		return compareConnections(ddm_branch, cm_branch);
+	}
+	
+	private function compareConnections(ddm_connect, cm_connect):Object{
 		var r:Object = new Object();
-		if(ddm_transition === cm_transition){
+		if(ddm_connect === cm_connect){
 			return r = "SAME";
 		}
 		
-		//check for a new act in the dmm
-		if(cm_transition == null){
+		//check for a new connection in the dmm
+		if(cm_connect == null){
 			return r = "NEW";
 		}
 		
-		//check if act has been removed from canvas
-		if(ddm_transition == null){
+		//check if connection has been removed from canvas
+		if(ddm_connect == null){
 			return r = "DELETE";
 		}
 	}
@@ -805,9 +826,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 		var cmActivity_keys:Array = _activitiesDisplayed.keys();
 		Debugger.log('cmActivity_keys.length:'+cmActivity_keys.length,Debugger.GEN,'refreshDesign','CanvasModel');
-		
-		
-		
+
 		var longest = Math.max(ddmActivity_keys.length, cmActivity_keys.length);
 		
 		//chose which array we are going to loop over
@@ -876,7 +895,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 
 			var ddmTransition:Transition = _cv.ddm.transitions.get(transitionKeyToCheck);
 			var cmTransition:Transition = _transitionsDisplayed.get(transitionKeyToCheck).transition;
-			
 			var r_transition:Object = compareTransitions(ddmTransition, cmTransition);
 			
 			if(r_transition == "NEW"){
@@ -887,6 +905,33 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			}
 		}
 		
+		//now check the transitions:
+		var ddmBranch_keys:Array = _cv.ddm.branches.keys();
+		var cmBranch_keys:Array = _branchesDisplayed.keys();
+		var trLongest = Math.max(ddmBranch_keys.length, cmBranch_keys.length);
+		
+		if(ddmTransition_keys.length == trLongest){
+			trIndexArray = ddmBranch_keys;
+		}else{
+			trIndexArray = cmBranch_keys;
+		}
+		
+		//loop through and do comparison
+		for(var i=0;i<trIndexArray.length;i++){
+			
+			var branchKeyToCheck:Number = trIndexArray[i];
+
+			var ddmBranch:Branch = _cv.ddm.transitions.get(branchKeyToCheck);
+			var cmBranch:Branch = _branchesDisplayed.get(branchKeyToCheck).branch;
+			var r_branch:Object = compareBranches(ddmBranch, cmBranch);
+			
+			if(r_branch == "NEW"){
+				//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
+				broadcastViewUpdate("DRAW_BRANCH",ddmBranch);
+			}else if(r_branch == "DELETE"){
+				broadcastViewUpdate("REMOVE_BRANCH",cmBranch);
+			}
+		}
 	}
 	
 	public function getModTransitionsForActivityUIID(UIID:Number):Object {
@@ -1102,8 +1147,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
         dispatchEvent({type:'viewUpdate',target:this,updateType:_updateType,data:_data});
     }
 	
-	
-	
 	/**
 	 * Returns a reference to the Activity Movieclip for the UIID passed in.  Gets from _activitiesDisplayed Hashable
 	 * @usage   
@@ -1129,6 +1172,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function get transitionsDisplayed():Hashtable{
 		return _transitionsDisplayed;
 	}
+	
+	public function get branchesDisplayed():Hashtable{
+		return _branchesDisplayed;
+	}
+	
 	
 	public function get isDrawingTransition():Boolean{
 		return _isDrawingTransition;

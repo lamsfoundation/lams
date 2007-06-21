@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.util.ui.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.authoring.br.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
 import org.lamsfoundation.lams.common.style.*
@@ -39,8 +40,7 @@ import mx.utils.*
 /**  
 * CanvasActivity - 
 */  
-class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip implements ICanvasActivity{  
-//class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip{  
+class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip implements ICanvasActivity{
   
 	public static var TOOL_ACTIVITY_WIDTH:Number = 123.1;
 	public static var TOOL_ACTIVITY_HEIGHT:Number = 50.5;
@@ -52,10 +52,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
+	private var _canvasBranchView:CanvasBranchView;
+	
 	private var _monitorController:MonitorController;
 	private var _monitorView;
+	
 	private var mm:MonitorModel; // used only when called from Monitor Environment
 	private var _canvasModel:CanvasModel;
+	
 	private var _tm:ThemeManager;
 	private var _ccm:CustomContextMenu;
 	
@@ -104,11 +108,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var authorMenu:ContextMenu;
 	
 	function CanvasActivity(){
-		//Debugger.log("_activity:"+_activity.title,4,'Constructor','CanvasActivity');
 		_tm = ThemeManager.getInstance();
 		_ccm = CustomContextMenu.getInstance();
+		
 		//Get reference to application and design data model
 		app = Application.getInstance();
+		
 		//let it wait one frame to set up the components.
 		//this has to be set b4 the do later :)
 		if(_activity.isGateActivity() || _branchConnector){
@@ -123,6 +128,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 		
 		_base_mc = this;
+		
 		//call init if we have passed in the _activity as an initObj in the attach movie,
 		//otherwise wait as the class outside will call it
 		if(_activity != undefined){
@@ -152,14 +158,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			_isSelected = false;
 			refresh();
 		}
-
 		
 		if(!_activity.isGateActivity() && !_activity.isGroupActivity() && !_activity.isBranchingActivity() || _branchConnector){
 			loadIcon();
 		}
+		
 		setStyles();
 		MovieClipUtils.doLater(Proxy.create(this,draw));
-
 	}
 	
 	private function showAssets(isVisible:Boolean){
@@ -202,12 +207,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			}
 			Debugger.log("tgt_mc:"+tgt_mc,4,'setSelected','CanvasActivity');
 				//vars
-				var tl_x = tgt_mc._x - MARGIN; 							//top left x
-				var tl_y = tgt_mc._y - MARGIN;							//top left y
-				var tr_x = tgt_mc._x + tgt_mc._width + MARGIN;//top right x
+				var tl_x = tgt_mc._x - MARGIN; 											//top left x
+				var tl_y = tgt_mc._y - MARGIN;											//top left y
+				var tr_x = tgt_mc._x + tgt_mc._width + MARGIN;							//top right x
 				var tr_y = tl_y;														//top right y
 				var br_x = tr_x;														//bottom right x
-				var br_y = tgt_mc._y + tgt_mc._height + MARGIN;//bottom right y
+				var br_y = tgt_mc._y + tgt_mc._height + MARGIN;							//bottom right y
 				var bl_x = tl_x;														//biottom left x															
 				var bl_y = br_y;														//bottom left y
 				
@@ -418,8 +423,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}	
 	
 	private function onPress():Void{
-		
-			
 			// check double-click
 			var now:Number = new Date().getTime();
 			
@@ -528,7 +531,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 	
 	private function getAssociatedStyle():Object{
-		trace("Category ID for Activity "+_activity.title +": "+_activity.activityCategoryID)
 		var styleObj:Object = new Object();
 		
 		if(_root.actColour == "true") {
@@ -571,17 +573,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	 * @usage   
 	 * @return  
 	 */
-	 
-	
 	private function setStyles() {
 		var my_color:Color = new Color(this);
-		var styleObj;
-		
 		var transNegative = {ra:-100, ga:-100, ba:-100, rb:255, gb:255, bb:255};
 		var transPositive = {ra:100, ga:100, ba:100, rb:0, gb:0, bb:0};
-		styleObj = _tm.getStyleObject('CALabel');
+		
+		var styleObj = _tm.getStyleObject('CALabel');
+		
 		title_lbl.setStyle('styleName',styleObj);
 		title_lbl.setStyle("textAlign", "center")
+		
 		if (bgNegative == "true"){
 			my_color.setTransform(transNegative);
 		}else if(bgNegative == "false"){

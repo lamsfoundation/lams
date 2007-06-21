@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.common.util.*;/**
 * @version     0.1
 * @comments    DesignDataModel stores a complete learning design
 */
-class org.lamsfoundation.lams.authoring.Transition {
+class Transition {
 	
 	// Transition Properties
 	

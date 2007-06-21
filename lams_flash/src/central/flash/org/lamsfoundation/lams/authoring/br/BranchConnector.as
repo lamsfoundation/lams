@@ -26,12 +26,33 @@ import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
-
+import org.lamsfoundation.lams.authoring.br.*;
 
 class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasTransition {
 	
+	private static var DIR_FROM_START:Number = 0;
+	private static var DIR_TO_END:Number = 1;
+	
+	private var _branch:Branch;
+	private var _direction:Number;
+
 	function BranchConnector(){
 		super();
+		
+		override_fromAct = (_direction == DIR_FROM_START) ? _canvasBranchView.startHub : null;
+		override_toAct = (_direction == DIR_TO_END) ? _canvasBranchView.endHub : null;
 	}
 	
+	public function get branch():Branch{
+		return _branch;
+	}
+	
+	public function set branch(b:Branch){
+		_branch = b;
+		_transition = _branch;
+	}
+	
+	public function get direction():Number {
+		return _direction;
+	}
 }  
