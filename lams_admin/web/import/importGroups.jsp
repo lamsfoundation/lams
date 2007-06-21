@@ -76,7 +76,7 @@ function loading(){
 </p>
 <p><fmt:message key="msg.import.conclusion"/></p>
 
-<html:form action="/importgroups.do" method="post" enctype="multipart/form-data">
+<html:form action="/importgroups.do" method="post" enctype="multipart/form-data" onsubmit="loading();">
 <html:hidden property="orgId" />
 
 <table>
@@ -86,7 +86,7 @@ function loading(){
 	</tr>
 </table>
 <p align="center">
-<html:submit styleClass="button" onchange="loading();"><fmt:message key="label.import"/></html:submit> &nbsp; 	
+<html:submit styleClass="button"><fmt:message key="label.import"/></html:submit> &nbsp; 	
 <html:cancel styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
 </p>
 

@@ -34,7 +34,7 @@
 </p>
 <p><fmt:message key="msg.import.conclusion"/></p>
 
-<html:form action="/importexcelsave.do" method="post" enctype="multipart/form-data">
+<html:form action="/importexcelsave.do" method="post" enctype="multipart/form-data" onsubmit="goToStatus();">
 <html:hidden property="orgId" />
 
 <table>
@@ -44,7 +44,7 @@
 	</tr>
 </table>
 <p align="center">
-<html:submit styleClass="button" onchange="goToStatus();"><fmt:message key="label.import"/></html:submit> &nbsp; 	
+<html:submit styleClass="button"><fmt:message key="label.import"/></html:submit> &nbsp; 	
 <html:cancel styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
 </p>
 
