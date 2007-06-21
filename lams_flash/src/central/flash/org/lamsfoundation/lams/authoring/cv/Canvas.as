@@ -141,7 +141,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		//if in monitor, dont do it!
 		initBin();
 		
-		
 	}
 
     /**
@@ -153,6 +152,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			canvasModel.activeView = evt.target;
 			if(evt.target instanceof CanvasBranchView) {
 				evt.target.open();
+				
+				canvasModel.setDirty();
 			} else {
 		
 				var autosave_config_interval = Config.getInstance().getItem(AUTOSAVE_CONFIG);
@@ -256,7 +257,7 @@ b	 * @param   learningDesignID
 		var cx:Number = ba._x + ba.getVisibleWidth()/2;
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
 		
-		var _branchView_mc:MovieClip = _canvasView_mc.content.createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy});	
+		var _branchView_mc:MovieClip = _canvasView_mc.content.createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba});	
 		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
 		branchView.init(canvasModel,undefined);
 		
@@ -266,6 +267,7 @@ b	 * @param   learningDesignID
 		canvasModel.addObserver(branchView);
 		
 		ba.branchView = branchView;
+		
 	}
 	
 	public function closeBranchView() {
@@ -730,9 +732,14 @@ b	 * @param   learningDesignID
 			actToAdd.yCoord = canvasModel.activeView.content._ymouse - (toolActHeight/2);
 		}
 				
-		Debugger.log('actToAdd:'+actToAdd.title+':'+actToAdd.activityUIID,4,'setDroppedTemplateActivity','Canvas');		
+		Debugger.log('actToAdd:'+actToAdd.title+':'+actToAdd.activityUIID + ":seq" + canvasModel.activeView.defaultSequenceActivity,4,'setDroppedTemplateActivity','Canvas');		
+		
+		if(canvasModel.activeView.defaultSequenceActivity != null) {
+			actToAdd.parentUIID = canvasModel.activeView.defaultSequenceActivity.activityUIID;
+		}
 
 		_ddm.addActivity(actToAdd);
+		
 		//refresh the design
 		canvasModel.setDirty();
 		canvasModel.selectedItem = (canvasModel.activitiesDisplayed.get(actToAdd.activityUIID));
@@ -743,6 +750,7 @@ b	 * @param   learningDesignID
 			canvasModel.removeActivity(actToAdd.activityUIID);
 			canvasModel.removeActivity(taParent);
 		}
+		
 		canvasModel.setDirty();
 		
 	}
@@ -757,10 +765,6 @@ b	 * @param   learningDesignID
 		
 	}
 
-/*	public function addActivity(a:Activity){
-		
-	}
-	*/
 	/**
 	 * Removes an activity from Design Data Model using its activityUIID.  
 	 * Called by the bin
@@ -845,8 +849,13 @@ b	 * @param   learningDesignID
 			_ddm.addEventListener('ddmBeforeUpdate',Proxy.create(this,onDDMBeforeUpdate));
 			checkValidDesign();
 			checkReadOnlyDesign();
-			canvasModel.setDirty();
 			
+			if(canvasModel.activeView instanceof CanvasBranchView) {
+				canvasModel.activeView.removeMovieClip();
+				closeBranchView();
+			}
+			
+			canvasModel.setDirty();
 			
 			createContentFolder();
 			

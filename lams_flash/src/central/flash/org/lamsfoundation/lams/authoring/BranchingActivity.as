@@ -59,7 +59,5 @@ class BranchingActivity extends ComplexActivity {
 		return dto;
 	}
 	
-	//get and sets
-
 }
 

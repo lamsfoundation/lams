@@ -219,7 +219,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			}
 			
 		}
-		return actOptional
+		return actOptional;
 	}
 	
 	public function findParallelActivities():Array{
@@ -232,7 +232,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			}
 			
 		}
-		return actParallel
+		return actParallel;
 	}
 	
 	public function findTopLevelActivities():Array{
@@ -267,6 +267,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			}
 		}
 	}
+	
 	/**
 	 * Craetes a [trans][gate act][trans] combo from an existing transition.
 	 * NOT used anymore as we dont want to allow users to think they can click transitions
@@ -335,6 +336,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		_cv.ddm.addActivity(gateAct);
 		
 		setDirty();
+		
 		//select the new thing
 		setSelectedItem(_activitiesDisplayed.get(gateAct.activityUIID));
 		
@@ -349,17 +351,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function createNewBranchActivity(pos:Point){
 		Debugger.log('Running...',Debugger.GEN,'createNewBranchActivity','CanvasModel');
 		
-		//first create the grouping object
-		
-		//var newBranching = new Branching(_cv.ddm.newUIID());
-		//_cv.ddm.addBranching(newBranching);
-		
 		var branchingActivity = new BranchingActivity(_cv.ddm.newUIID());
 		branchingActivity.title = Dictionary.getValue('branching_act_title');
 		branchingActivity.learningDesignID = _cv.ddm.learningDesignID;
 		branchingActivity.activityCategoryID = Activity.CATEGORY_SYSTEM;
 		branchingActivity.groupingSupportType = Activity.GROUPING_SUPPORT_OPTIONAL;
-		//branchingActivity.createBranchingUIID = newBranching.branchingUIID;
 		
 		branchingActivity.yCoord = pos.y;
 		branchingActivity.xCoord = pos.x;
@@ -374,6 +370,25 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 		//select the new thing
 		setSelectedItem(_activitiesDisplayed.get(branchingActivity.activityUIID));
+	}
+	
+	public function createNewSequenceActivity(parent){
+		Debugger.log('Running...',Debugger.GEN,'createNewSequenceActivity','CanvasModel');
+		var seqAct = new SequenceActivity(_cv.ddm.newUIID());
+		seqAct.title = "Sequence Activity";
+		seqAct.learningDesignID = _cv.ddm.learningDesignID;
+		seqAct.groupingSupportType = Activity.GROUPING_SUPPORT_OPTIONAL;
+		seqAct.activityCategoryID = Activity.CATEGORY_SYSTEM;
+		seqAct.orderID = 1;
+		
+		if(parent != null) {
+			seqAct.parentActivityID = parent.activityID;
+			seqAct.parentUIID = parent.activityUIID;
+		}
+		
+		_cv.ddm.addActivity(seqAct);
+		
+		setDirty();
 	}
 	
 	/**
@@ -398,7 +413,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 		groupingActivity.yCoord = pos.y;
 		groupingActivity.xCoord = pos.x;
-		
 		
 		Debugger.log('groupingActivity.createGroupingUIID :'+groupingActivity.createGroupingUIID ,Debugger.GEN,'createNewGroupActivity','CanvasModel');
 		Debugger.log('groupingActivity.yCoord:'+groupingActivity.yCoord,Debugger.GEN,'createNewGroupActivity','CanvasModel');
@@ -435,7 +449,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		_cv.ddm.addActivity(optAct);
 		
 		setDirty();
-		//select the new thing
 		setSelectedItem(_activitiesDisplayed.get(optAct.activityUIID));
 		
 	}
@@ -468,7 +481,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	*/
 	public function removeOptionalCA(ca:Object, parentID){
 		//lets do a test to see if we got the canvas
-		
 		Debugger.log('Removed Child '+ca.activity.activityUIID+ 'from : '+ca.activity.parentUIID,Debugger.GEN,'removeOptionalCA','CanvasModel');
 		ca.activity.parentUIID = null;
 		ca.activity.orderID = null;
@@ -494,21 +506,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	public function removeComplexActivityChildren(children){
 		for (var k=0; k<children.length; k++){
-			trace("Child has UIID : " + children[k].activityUIID);
 			Debugger.log('Removing Child ' + children[k].activity.activityUIID+ 'from : '+ children[k].activity.parentUIID,Debugger.GEN,'removeComplexActivityChildren','CanvasModel');
 		
 			children[k].parentUIID = null;
 			
-			if(children[k].activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || children[k].activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE) {
-				Debugger.log('Child is Complex Activity. Removing children with length: ' + children[k].children.length,Debugger.GEN,'removeComplexActivityChildren','CanvasModel');
+			// TODO: use method to determine is complex by type
+			if(children[k].activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || children[k].activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || children[k].activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE ) {
 				this.removeComplexActivityChildren(_cv.ddm.getComplexActivityChildren(children[k].activityUIID));
 			} else {
 				removeActivity(children[k].activityUIID);
 			}
 			
 			_cv.ddm.removeActivity(children[k].activityUIID);
-			
-			
 		}
 	}
 	
@@ -539,7 +548,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		}
 	}
 	
-	
 	private function isLoopingLD(fromAct, toAct):Boolean{
 		var toTransitions = _cv.ddm.getTransitionsForActivityUIID(toAct)
 		if (toTransitions.out != null){
@@ -552,9 +560,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		}else {
 			return false;
 		}
-		
 	}
-	
 	
 	/**
 	 * Adds another Canvas Activity to the transition.  
@@ -566,9 +572,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function addActivityToTransition(ca:Object):Object{
 		var activity:Activity;
 		//check we have not added too many
-		if(ca instanceof CanvasActivity || ca instanceof CanvasParallelActivity || ca instanceof CanvasOptionalActivity){
+		if(ca instanceof CanvasActivity || ca instanceof CanvasParallelActivity || ca instanceof CanvasOptionalActivity || ca instanceof CanvasBranchingActivity){
 			activity = ca.activity;
-		}else if(ca instanceof Activity){
+		} else if(ca instanceof Activity){
 			activity = Activity(ca);
 		}
 		
@@ -579,47 +585,69 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 		Debugger.log('Adding Activity.UIID:'+activity.activityUIID,Debugger.GEN,'addActivityToTransition','CanvasModel');
 		_transitionActivities.push(activity);
+		
 		var fromAct = _transitionActivities[0].activityUIID
 		var toAct = _transitionActivities[1].activityUIID
+		
 		if(_transitionActivities.length == 2){
-			//check we have 2 valid acts to create the transition.
-			if(fromAct == toAct){
-				return new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
-			}
-			if(!_cv.ddm.activities.containsKey(fromAct)){
-				return new LFError("First activity of the Transition is missing, UIID:"+_transitionActivities[0].activityUIID,"addActivityToTransition",this);
-			}
-			if(!_cv.ddm.activities.containsKey(toAct)){
-				return new LFError(Dictionary.getValue('cv_trans_target_act_missing'),"addActivityToTransition",this);
-			}
-			//check there is not already a transition to or from this activity:
-			var transitionsArray:Array = _cv.ddm.transitions.values();
+			var t:Transition;
 			
-			/**/
-			for(var i=0;i<transitionsArray.length;i++){
+			// check if either end is a connector point for Branching
+			if(activeView.startHub.activity.activityUIID == fromAct || 
+			   activeView.endHub.activity.activityUIID == toAct) {
+				//lets make the connection
+				t = createBranchConnector(_transitionActivities);
+				_cv.stopTransitionTool();
+				return;
+			} else {
+			
+				/*********************************************
+				* BELOW: NORMAL TRANSITION CLIENT_SIDE VALIDATION
+				*********************************************/
 				
-				if(transitionsArray[i].toUIID == toAct){
-					return new LFError(Dictionary.getValue('cv_invalid_trans_target_to_activity',[_transitionActivities[1].title]));
-				}
-				if(transitionsArray[i].fromUIID == fromAct){
-					return new LFError(Dictionary.getValue('cv_invalid_trans_target_from_activity',[_transitionActivities[0].title]));
+				//check we have 2 valid acts to create the transition.
+				if(fromAct == toAct){
+					return new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
 				}
 				
-				if ((transitionsArray[i].toUIID == toAct && transitionsArray[i].fromUIID == fromAct) || (transitionsArray[i].toUIID == fromAct && transitionsArray[i].fromUIID == toAct)){
+				if(!_cv.ddm.activities.containsKey(fromAct)){
+					return new LFError("First activity of the Transition is missing, UIID:"+_transitionActivities[0].activityUIID,"addActivityToTransition",this);
+				}
+				
+				if(!_cv.ddm.activities.containsKey(toAct)){
+					return new LFError(Dictionary.getValue('cv_trans_target_act_missing'),"addActivityToTransition",this);
+				}
+				
+				//check there is not already a transition to or from this activity:
+				var transitionsArray:Array = _cv.ddm.transitions.values();
+				
+				/**/
+				for(var i=0;i<transitionsArray.length;i++){
+					
+					if(transitionsArray[i].toUIID == toAct){
+						return new LFError(Dictionary.getValue('cv_invalid_trans_target_to_activity',[_transitionActivities[1].title]));
+					}
+					
+					if(transitionsArray[i].fromUIID == fromAct){
+						return new LFError(Dictionary.getValue('cv_invalid_trans_target_from_activity',[_transitionActivities[0].title]));
+					}
+					
+					if ((transitionsArray[i].toUIID == toAct && transitionsArray[i].fromUIID == fromAct) || (transitionsArray[i].toUIID == fromAct && transitionsArray[i].fromUIID == toAct)){
+						return new LFError(Dictionary.getValue('cv_invalid_trans_circular_sequence'),"addActivityToTransition",this);
+					}
+					
+				}
+				
+				if (isLoopingLD(fromAct, toAct)){
 					return new LFError(Dictionary.getValue('cv_invalid_trans_circular_sequence'),"addActivityToTransition",this);
 				}
 				
-				
+				Debugger.log('No validation errors, creating transition.......',Debugger.GEN,'addActivityToTransition','CanvasModel');
+			
+				//lets make the transition
+				t = createTransition(_transitionActivities);
+			
 			}
-			
-			if (isLoopingLD(fromAct, toAct)){
-				return new LFError(Dictionary.getValue('cv_invalid_trans_circular_sequence'),"addActivityToTransition",this);
-			}
-			
-			Debugger.log('No validation errors, creating transition.......',Debugger.GEN,'addActivityToTransition','CanvasModel');
-			
-			//lets make the transition
-			var t:Transition = createTransition(_transitionActivities);
 			
 			//add it to the DDM
 			var success:Object = _cv.ddm.addTransition(t);
@@ -628,8 +656,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			_cv.stopTransitionTool();
 			setDirty();
 			
-			
 		}
+		
 		return true;
 	}
 	
@@ -665,6 +693,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		return t;
 	}
 	
+	/**
+	 * Forms a transition	
+	 * @usage   
+	 * @param   transitionActs An array of transition activities. Must only contain 2
+	 * @return  
+	 */
+	private function createBranchConnector(transitionActs:Array):Transition{
+		return null;
+	}
+	
 	
 	public function setDesignTitle(){
 		broadcastViewUpdate("POSITION_TITLEBAR", null);
@@ -687,10 +725,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log('Comparing ddm_activity:'+ddm_activity.title+'('+ddm_activity.activityUIID+') WITH cm_activity:'+cm_activity.title+'('+cm_activity.activityUIID+')',Debugger.GEN,'compareActivities','CanvasModel');
 		var r:Object = new Object();
 		
-		//check if the activity has a parent, if so then we dont need to check it
-		Debugger.log('Checking parent activity IDs, parentUIID:'+ddm_activity.parentUIID+'parentID:'+ddm_activity.parentActivityID,Debugger.GEN,'refreshDesign','CanvasModel');
-		if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
-			return r = "CHILD";
+		
+		//check if act has been removed from canvas
+		if(ddm_activity == null || ddm_activity == undefined){
+			return r = "DELETE";
 		}
 		
 		//if they are the same (ref should point to same act) then nothing to do.
@@ -701,14 +739,24 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			return r = "SAME";
 		}
 		
+		//check if the activity has a parent, if so then we dont need to check it
+		Debugger.log('Checking parent activity IDs, parentUIID:'+ddm_activity.parentUIID+'parentID:'+ddm_activity.parentActivityID,Debugger.GEN,'refreshDesign','CanvasModel');
+		if(ddm_activity.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE){
+			return r = "SEQ";
+		}
+		
+		if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
+			var parentAct;
+			if((parentAct = _cv.ddm.activities.get(ddm_activity.parentUIID)) != null)
+				if(parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE)
+					return r = "NEW_SEQ_CHILD";
+			
+			return r = "CHILD";
+		}
+		
 		//check for a new act in the dmm
 		if(cm_activity == null || cm_activity == undefined){
 			return r = "NEW";
-		}
-		
-		//check if act has been removed from canvas
-		if(ddm_activity == null || ddm_activity == undefined){
-			return r = "DELETE";
 		}
 		
 			
@@ -737,8 +785,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		if(ddm_transition == null){
 			return r = "DELETE";
 		}
-		
-		
 	}
 	
 	/**
@@ -751,15 +797,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 */
 	private function refreshDesign(){
 	
-		//porobbably need to get a bit more granular
 		Debugger.log('Running',Debugger.GEN,'refreshDesign','CanvasModel');
+		
 		//go through the design and see what has changed, compare DDM to canvasModel
 		var ddmActivity_keys:Array = _cv.ddm.activities.keys();
 		Debugger.log('ddmActivity_keys.length:'+ddmActivity_keys.length,Debugger.GEN,'refreshDesign','CanvasModel');
-		//Debugger.log('ddmActivity_keys::'+ddmActivity_keys.toString(),Debugger.GEN,'refreshDesign','CanvasModel');
+		
 		var cmActivity_keys:Array = _activitiesDisplayed.keys();
 		Debugger.log('cmActivity_keys.length:'+cmActivity_keys.length,Debugger.GEN,'refreshDesign','CanvasModel');
-		//Debugger.log('cmActivity_keys:'+cmActivity_keys.toString(),Debugger.GEN,'refreshDesign','CanvasModel');
 		
 		
 		
@@ -774,27 +819,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			indexArray = cmActivity_keys;
 		}
 		
-		
 		//loop through and do comparison
 		for(var i=0;i<longest;i++){
 			//check DDM against CM, DDM is king.
-			/*
-			var keyToCheck:Number = ddmActivity_keys[i];
-			// if its nan then we have to use the cm version
-			if(isNaN(keyToCheck)){
-				keyToCheck = cmActivity_keys[i];
-			}
-			*/
-			
 			var keyToCheck:Number = indexArray[i];
-			
 			
 			var ddm_activity:Activity = _cv.ddm.activities.get(keyToCheck);
 			var cm_activity:Activity = _activitiesDisplayed.get(keyToCheck).activity;
-			//if they are the same (ref should point to same act) then nothing to do.
-			//if the ddm does not have an act displayed then we need to remove it from the cm
-			//if the ddm has an act that cm does not ref, then we need to add it.
 			
+			/**if they are the same (ref should point to same act) then nothing to do.
+			*  if the ddm does not have an act displayed then we need to remove it from the cm
+			*  if the ddm has an act that cm does not ref, then we need to add it.
+			**/
 			
 			var r_activity:Object = compareActivities(ddm_activity, cm_activity);
 			
@@ -802,9 +838,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			if(r_activity == "NEW"){
 				//draw this activity
 				//NOTE!: we are passing in a ref to the activity in the ddm so if we change any props of this, we are changing the ddm
-				
 				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity);
 
+			}else if(r_activity == "NEW_SEQ_CHILD"){
+				broadcastViewUpdate("DRAW_ACTIVITY_SEQ",ddm_activity);
 			}else if(r_activity == "DELETE"){
 				//remove this activity
 				if(cm_activity.parentUIID == null){
@@ -813,19 +850,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			}else if(r_activity == "CHILD"){
 				//dont ask the view to draw the activity if it is a child act				
 				Debugger.log('Found a child activity, not drawing. activityID:'+ddm_activity.activityID+'parentID:'+ddm_activity.parentActivityID,Debugger.GEN,'refreshDesign','CanvasModel');
-				
-				
-			}else{
-	
+			}else if(r_activity == "SEQ"){
+				broadcastViewUpdate("ADD_SEQUENCE", ddm_activity);
 			}
-		
-			
 		}
 		
 		//now check the transitions:
 		var ddmTransition_keys:Array = _cv.ddm.transitions.keys();
 		var cmTransition_keys:Array = _transitionsDisplayed.keys();
 		var trLongest = Math.max(ddmTransition_keys.length, cmTransition_keys.length);
+		
 		//chose which array we are going to loop over
 		var trIndexArray:Array;
 		
@@ -834,7 +868,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		}else{
 			trIndexArray = cmTransition_keys;
 		}
-		
 		
 		//loop through and do comparison
 		for(var i=0;i<trIndexArray.length;i++){
@@ -848,13 +881,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			
 			if(r_transition == "NEW"){
 				//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
-				
 				broadcastViewUpdate("DRAW_TRANSITION",ddmTransition);
-				
 			}else if(r_transition == "DELETE"){
 				broadcastViewUpdate("REMOVE_TRANSITION",cmTransition);
 			}
-			
 		}
 		
 	}
@@ -952,8 +982,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 				}
 			}
 		}
-		
-		
 	}
 	
 	private function validateTransitions(transitions:Hashtable, errorMap:Array):Void {
@@ -963,12 +991,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		for(var i=0; i<cmTransition_keys.length; i++) {
 		
 			var cmTransition:Transition = Transition(transitions.get(cmTransition_keys[i]).transition);
-			
-			
+
 			var fromActivity:Activity = _cv.ddm.getActivityByUIID(cmTransition.fromUIID);
 			var toActivity:Activity = _cv.ddm.getActivityByUIID(cmTransition.toUIID);
-			
-			
+
 			if(fromActivity == null) {
 				errorMap.push(new ValidationIssue(ValidationIssue.TRANSITION_ERROR_CODE, Dictionary.getValue(ValidationIssue.TRANSITION_ERROR_KEY), cmTransition.transitionUIID));
 			} else if (toActivity == null) {
@@ -987,7 +1013,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			if(actTransitions.into != null || actTransitions.out != null)				
 				errorMap.push(new ValidationIssue(ValidationIssue.ACTIVITY_TRANSITION_ERROR_CODE, Dictionary.getValue(ValidationIssue.ACTIVITY_TRANSITION_ERROR_KEY), activity.activityUIID));
 		}
-		
 		
 	}
 	
@@ -1090,12 +1115,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		var a_mc:MovieClip = _activitiesDisplayed.get(UIID);
 		return a_mc;
 	}
-	/*
-	public function setContainerRef(c:Canvas):Void{
-		_cv = c;
-	}
-	
-	*/
+
 	//Getters n setters
 	
 	public function getCanvas():Canvas{
@@ -1157,6 +1177,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		setSelectedItem(selectedCanvasElement);
 		
 	}
+	
 	/**
 	 * 
 	 * @usage   

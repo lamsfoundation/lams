@@ -47,6 +47,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
     
 	private var _cm:CanvasModel;
     private var _canvasBranchView:CanvasBranchView;
+	private var _canvasBranchingActivity:CanvasBranchingActivity;
 	
 	private var startTransX:Number;
 	private var startTransY:Number;
@@ -58,7 +59,13 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private var hSpace:Number = 100;
 	private var vSpace:Number = 100;
 
-	private var close_mc:MovieClip;	
+	private var close_mc:MovieClip;
+	
+	// connector hubs for branch connections into and out of sequence activities
+	private var cHubStart_mc:MovieClip;
+	private var cHubEnd_mc:MovieClip;
+	
+	private var _defaultSequenceActivity:Activity;
 	
 	/**
 	* Constructor
@@ -66,12 +73,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	function CanvasBranchView(){
 		_canvasBranchView = this;
 		_tm = ThemeManager.getInstance();
-        
+		defaultSequenceActivity = null;
+		
 		//Init for event delegation
         mx.events.EventDispatcher.initialize(this);
 		
 		this._visible = false;
-		
 	}
     
 	/**
@@ -85,8 +92,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		H_GAP = 10;
 		V_GAP = 10;
 		
-		_cm = CanvasModel(m)
-
+		_cm = CanvasModel(m);
 	   
 	   //register to recive updates form the model
 		_cm.addEventListener('viewUpdate',this);
@@ -117,7 +123,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
             case 'SIZE' :
                 setSize(cm);
                 break;
-            case 'DRAW_ACTIVITY':
+			case 'ADD_SEQUENCE':
+				Debugger.log("adding seq: " + event.data, Debugger.CRITICAL, "viewUpdate", "CanvasBranchView");
+				var b= addSequence(event.data,cm);
+				Debugger.log("return from seq: " + b, Debugger.CRITICAL, "viewUpdate", "CanvasBranchView");
+				break;
+            case 'DRAW_ACTIVITY_SEQ':
                 drawActivity(event.data,cm);
                 break;
 			case 'HIDE_ACTIVITY':
@@ -179,14 +190,43 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		close_mc.onRelease = Proxy.create(this, localOnRelease);
 		close_mc.onReleaseOutside = Proxy.create(this, localOnReleaseOutside);
 		
-		setStyles();
+		setupConnectorHubs();
+		loadSequenceActivities();
 		
+		setStyles();
 		setSize(_cm);
 		
 		this._visible = true;
 		
         //Dispatch load event 
         dispatchEvent({type:'load',target:this});
+	}
+	
+	private function setupConnectorHubs() {
+		
+		Debugger.log('adding hubs for branch activity:' + _canvasBranchingActivity,Debugger.CRITICAL,'setupConenctorHubs','org.lamsfoundation.lams.CanvasBranchView');
+		
+		cHubStart_mc = activityLayer.createChildAtDepth("CanvasBranchingConnector",DepthManager.kTop,{_activity:_canvasBranchingActivity.activity,_canvasController:getController(),_canvasView:_canvasBranchView, _x: 0 , _y: 0});
+		cHubEnd_mc = activityLayer.createChildAtDepth("CanvasBranchingConnector",DepthManager.kTop,{_activity:_canvasBranchingActivity.activity,_canvasController:getController(),_canvasView:_canvasBranchView, _x: 0 , _y: 0});
+		
+	}
+	
+	private function loadSequenceActivities() {
+		var sequenceActs:Array;
+		Debugger.log('loading sequence activities:',Debugger.CRITICAL,'loadSequenceActivities','org.lamsfoundation.lams.CanvasBranchView');
+		
+		if((sequenceActs = _cm.getCanvas().ddm.getComplexActivityChildren(activity.activityUIID)).length <= 0) {
+			Debugger.log('creating init seq activity:' + sequenceActs,Debugger.CRITICAL,'loadSequenceActivities','org.lamsfoundation.lams.CanvasBranchView');
+			createInitialSequenceActivity();
+		} else {
+			// load existing sequences
+			Debugger.log('attempting to load seq acts:' + sequenceActs,Debugger.CRITICAL,'loadSequenceActivities','org.lamsfoundation.lams.CanvasBranchView');
+			
+		}
+	}
+	
+	private function createInitialSequenceActivity() {
+		_cm.createNewSequenceActivity(activity);
 	}
 	
 	public function localOnRelease():Void{
@@ -211,6 +251,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	public function localOnReleaseOutside():Void{
 		
+	}
+	
+	private function addSequence(a:Activity, cm:CanvasModel):Boolean{
+		defaultSequenceActivity = a;
+		return true;
 	}
 	
 	/**
@@ -304,6 +349,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var r = cm.activitiesDisplayed.remove(a.activityUIID);
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;
+		
 		return s;
 	}
 	
@@ -323,8 +369,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 		cm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
 		Debugger.log('drawn a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'drawTransition','CanvasView');
-		return true;
 		
+		return true;
 	}
 	
 	/**
@@ -362,6 +408,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var r = cm.transitionsDisplayed.remove(t.transitionUIID);
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;
+		
 		return s;
 	}
 
@@ -420,6 +467,26 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		transparentCover.setStyle('styleName', styleObj);
 		
     }
+	
+	public function get startHub():CanvasActivity {
+		return CanvasActivity(cHubStart_mc);
+	}
+	
+	public function get endHub():CanvasActivity {
+		return CanvasActivity(cHubEnd_mc);
+	}
+	
+	public function get activity():BranchingActivity {
+		return _canvasBranchingActivity.activity;
+	}
+	
+	public function get defaultSequenceActivity():Activity {
+		return _defaultSequenceActivity;
+	}
+	
+	public function set defaultSequenceActivity(a:Activity):Void{
+		_defaultSequenceActivity = a;
+	}
 	
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned

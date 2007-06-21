@@ -64,32 +64,44 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	private var _isSelected:Boolean;
 	private var app:Application;
+	
 	//locals
 	private var learnerOffset_X:Number = 4;
 	private var learnerOffset_Y:Number = 3;
 	private var learnerContainer:MovieClip;
+	
 	private var _module:String;
+	private var _branchConnector:Boolean;
+	
 	private var icon_mc:MovieClip;
 	private var icon_mcl:MovieClipLoader;
+	
 	private var bkg_pnl:MovieClip;
 	private var act_pnl:MovieClip;
 	private var title_lbl:MovieClip;
+	
 	private var groupIcon_mc:MovieClip;
 	private var branchIcon_mc:MovieClip;
-	private var stopSign_mc:MovieClip;	
+	private var stopSign_mc:MovieClip;
+	private var branchSign_mc:MovieClip;
+	
 	private var clickTarget_mc:MovieClip;
+	
 	private var canvasActivity_mc:MovieClip;
 	private var canvasActivityGrouped_mc:MovieClip;
+	
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
+	
 	private var _visibleWidth:Number;
 	private var _visibleHeight:Number;
+	
 	private var _base_mc:MovieClip;
 	private var _selected_mc:MovieClip;
+
 	private var fade_mc:MovieClip;
 	private var bgNegative:String = "original";
 	private var authorMenu:ContextMenu;
-	
 	
 	function CanvasActivity(){
 		//Debugger.log("_activity:"+_activity.title,4,'Constructor','CanvasActivity');
@@ -99,7 +111,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		app = Application.getInstance();
 		//let it wait one frame to set up the components.
 		//this has to be set b4 the do later :)
-		if(_activity.isGateActivity()){
+		if(_activity.isGateActivity() || _branchConnector){
 			_visibleHeight = CanvasActivity.GATE_ACTIVITY_HEIGHT;
 			_visibleWidth = CanvasActivity.GATE_ACTIVITY_WIDTH;
 		}else if(_activity.isGroupActivity()){
@@ -142,7 +154,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 
 		
-		if(!_activity.isGateActivity() && !_activity.isGroupActivity() && !_activity.isBranchingActivity()){
+		if(!_activity.isGateActivity() && !_activity.isGroupActivity() && !_activity.isBranchingActivity() || _branchConnector){
 			loadIcon();
 		}
 		setStyles();
@@ -156,6 +168,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		title_lbl._visible = isVisible;
 		icon_mc._visible = isVisible;
 		stopSign_mc._visible = isVisible;
+		branchSign_mc._visible = isVisible;
 		canvasActivity_mc._visible = isVisible;
 		clickTarget_mc._visible = isVisible;
 		canvasActivityGrouped_mc._visible = isVisible;
@@ -169,7 +182,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	 */
 	public function refresh(setNegative:Boolean):Void{
 		bgNegative = String(setNegative);
-		trace("called from PI")
 		setStyles();
 		draw();
 		setSelected(_isSelected);
@@ -221,7 +233,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 		
 	}
-	
 	
 	private function loadIcon():Void{
 		icon_mc = this.createEmptyMovieClip("icon_mc", this.getNextHighestDepth());
@@ -315,12 +326,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		var theIcon_mc:MovieClip;
 		title_lbl._visible = true;
-		//act_pnl.__visible = true;
 		clickTarget_mc._visible = true;
 		fade_mc._visible = false;
-		
-		Debugger.log("Edit lock: " + app.canvas.ddm.editOverrideLock, Debugger.CRITICAL, 'draw', 'CanvasActivity');
-		Debugger.log("Read only: " + _activity.isReadOnly(), Debugger.CRITICAL, 'draw', 'CanvasActivity');
 			
 		if(_activity.isReadOnly() && app.canvas.ddm.editOverrideLock == 1){
 			Debugger.log("Making transparent layer visible. ", Debugger.CRITICAL, 'draw', 'CanvasActivity');
@@ -331,8 +338,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			stopSign_mc._visible = true;
 			stopSign_mc._x = 0;
 			stopSign_mc._y = 0;
-			
-			
+		} else if(_branchConnector) {
+			branchSign_mc._visible = true;
+			branchSign_mc._x = 0;
+			branchSign_mc._y = 0;
 		} else {
 			
 			//chose the icon:
@@ -340,12 +349,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				groupIcon_mc._visible = true;
 				icon_mc._visible = false;
 				theIcon_mc = groupIcon_mc;
-			} else if(_activity.isBranchingActivity()) {
+			} else if(_activity.isBranchingActivity()){
 				branchIcon_mc._visible = true;
+				groupIcon_mc._visible = false;
 				icon_mc._visible = false;
 				theIcon_mc = branchIcon_mc;
-			} else{
+			} else {
 				groupIcon_mc._visible = false;
+				branchIcon_mc._visible = false;
 				icon_mc._visible = true;
 				theIcon_mc = icon_mc;
 			}
@@ -356,29 +367,33 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			//chose the background mc
 			if(_activity.groupingUIID > 0){
 				canvasActivityGrouped_mc._visible = true;
-				canvasActivity_mc._visible=false;
+				canvasActivity_mc._visible = false;
 			}else{
-				canvasActivity_mc._visible=true;
+				canvasActivity_mc._visible = true;
 				canvasActivityGrouped_mc._visible = false;
 			}
 			
-			title_lbl.visible=true;
+			title_lbl.visible = true;
 			stopSign_mc._visible = false;
+			branchSign_mc._visible = false;
 			
 			//write text
 			title_lbl.text = _activity.title;
 			
 			clickTarget_mc._width = TOOL_ACTIVITY_WIDTH;
-			clickTarget_mc._height= TOOL_ACTIVITY_HEIGHT;
+			clickTarget_mc._height = TOOL_ACTIVITY_HEIGHT;
 			
 		}
 
 		//position
-		_x = _activity.xCoord //- (clickTarget_mc._width/2);
-		_y = _activity.yCoord //- (clickTarget_mc._height/2);
+		if(!_branchConnector) {
+			_x = _activity.xCoord;
+			_y = _activity.yCoord;
+		}
 		
 		Debugger.log('canvasActivity_mc._visible'+canvasActivity_mc._visible,4,'draw','CanvasActivity');
 		_visible = true;
+		
 		if (_activity.runOffline){
 			bgNegative = "true"
 			setStyles();
@@ -408,8 +423,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			// check double-click
 			var now:Number = new Date().getTime();
 			
-			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
-				trace("Module passed is: "+_module)
+			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY && !branchConnector){
 				if (app.controlKeyPressed != "transition"){
 					_doubleClicking = true;
 					if (_module == "monitoring"){
@@ -426,7 +440,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				
 				_doubleClicking = false;
 				
-				//Debugger.log('_canvasController:'+_canvasController,Debugger.GEN,'onPress','CanvasActivity');
 				if (_module == "monitoring"){
 					Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity for monitoring');
 					_monitorController.activityClick(this);
@@ -444,7 +457,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function onRelease():Void{
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
-				trace("Activity ID is: "+this.activity.activityUIID)	
 			if (_module == "monitoring"){
 				_monitorController.activityRelease(this);
 			}else {
@@ -506,6 +518,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		_activity = a;
 	}
 	
+	public function get branchConnector():Boolean {
+		if(_branchConnector != null) return _branchConnector;
+		else return false;
+	}
+	
+	public function set branchConnector(a:Boolean):Void {
+		_branchConnector = a;
+	}
 	
 	private function getAssociatedStyle():Object{
 		trace("Category ID for Activity "+_activity.title +": "+_activity.activityCategoryID)
@@ -574,17 +594,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				}else {
 					var parentAct = mm.getMonitor().ddm.getActivityByUIID(this.activity.parentUIID)
 				}
-				//if(parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
-					//trace("called by view")
-					//styleObj = _tm.getStyleObject('ACTPanel1')
-					//act_pnl.setStyle('styleName',styleObj);
-				//}else {
 					
-				styleObj = getAssociatedStyle()	//_tm.getStyleObject('ACTPanel')
+				styleObj = getAssociatedStyle();
 				act_pnl.setStyle('styleName',styleObj);
-				//}
+				
 			} else {
-				styleObj = getAssociatedStyle()	//_tm.getStyleObject('ACTPanel')
+				styleObj = getAssociatedStyle();
 				act_pnl.setStyle('styleName',styleObj);
 			}
 			

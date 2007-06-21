@@ -101,6 +101,9 @@ class CanvasBranchingActivity extends MovieClip implements ICanvasActivity{
 	private var _locked:Boolean;
 	private var _isSelected:Boolean;
 	
+	private var children_mc: Array;
+	private var childActivities_mc : MovieClip;
+	
 	function CanvasBranchingActivity(){
 		Debugger.log("_activity:"+_activity.title+'uiID:'+_activity.activityUIID+' children:'+_children.length,Debugger.GEN,'Constructor','CanvasBranchingActivity');
 		
@@ -135,8 +138,6 @@ class CanvasBranchingActivity extends MovieClip implements ICanvasActivity{
 			}
 			_activity = initObj.activity;
 		}
-
-		//_ddm.getComplexActivityChildren(_activity.activityUIID);
 
 		showAssets(false);
 		
@@ -407,6 +408,10 @@ class CanvasBranchingActivity extends MovieClip implements ICanvasActivity{
 	private function onReleaseOutside():Void{
 		Debugger.log('localOnReleaseOutside:'+this,Debugger.GEN,'localOnReleaseOutside','CanvasParallelActivity');
 		_canvasController.activityReleaseOutside(this);
+	}
+	
+	private function destroy() {
+		branchView.removeMovieClip();
 	}
 	
 	/**

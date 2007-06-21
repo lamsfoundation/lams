@@ -160,6 +160,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	
 	private var _readOnly:Boolean;
 	
+	private var _viewID:Boolean;
 	
      
     //Constructor
@@ -175,11 +176,10 @@ class org.lamsfoundation.lams.authoring.Activity {
 	 */
     function Activity(activityUIID:Number){
         Debugger.log('activityUIID:'+activityUIID,Debugger.GEN,'constructor','Activity');
-		//assign the values:
-		
 		_activityUIID = activityUIID;
-		//set default calues
-		_objectType = "Activity"; //should be "Activity"
+		
+		//defaults
+		_objectType = "Activity";
 		_applyGrouping = false;
 		_runOffline = false;
 		_defineLater = false;
@@ -196,7 +196,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 	 */
 	public static function getGateActivityTypes():Array{
 		var types:Array = [];
-		//types.addItem({label: Dictionary.getValue('none_act_lbl'), data: 0});
 		types.addItem({label: Dictionary.getValue('trans_dlg_nogate'), data: NO_GATE_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('synch_act_lbl'), data: SYNCH_GATE_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('sched_act_lbl'), data: SCHEDULE_GATE_ACTIVITY_TYPE});
@@ -290,7 +289,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 	 */
 	public function populateFromDTO(dto:Object){
 	
-	
 			//activity properties:
 			_activityTypeID = dto.activityTypeID;
 			_activityID = dto.activityID;
@@ -321,11 +319,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 			_createDateTime = dto.createDateTime;
 			_groupingSupportType = dto.groupingSupportType;
 			_readOnly = dto.readOnly;
-			
-	
-	
 
-		
 	}
 	
 	public function toData(){
@@ -339,8 +333,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 		if(_learningLibraryID){		dto.learningLibraryID	= _learningLibraryID;		}
 		if(_learningDesignID){		dto.learningDesignID	= _learningDesignID;		}
 		if(_libraryActivityID){		dto.libraryActivityID	= _libraryActivityID;		}
-		//if(_parentActivityID){		dto.parentActivityID	= _parentActivityID;		}
-		//if(_parentUIID){			dto.parentUIID			= _parentUIID;				}
 		if(_orderID){				dto.orderID				= _orderID;					}
 		if(_groupingID){			dto.groupingID			= _groupingID;				}
 		if(_groupingUIID){			dto.groupingUIID		= _groupingUIID;			}
@@ -362,8 +354,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 		if(_groupingSupportType){	dto.groupingSupportType = _groupingSupportType;		}
 		if(_readOnly){	dto.readOnly = _readOnly;	 }
 		
-		
-		
 		return dto;
 	}
 	
@@ -374,7 +364,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 		return n;
 
 	}
-	
 	
 	//getters and setters:
 	public function set objectType(a:String):Void{
@@ -393,6 +382,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function set activityTypeID (newactivityTypeID:Number):Void {
 		_activityTypeID = newactivityTypeID;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -409,16 +399,16 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function get activityToolContentID ():Number {
 		return _activityToolContentID;
 	}
-	
 
 	public function set activityID(a:Number):Void{
 		_activityID = a;
 	}
+	
 	public function get activityID():Number{
 		return _activityID;
 	}
 
-/**
+	/**
 	 * 
 	 * @usage   
 	 * @param   newactivityCategoryID 
@@ -427,6 +417,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function set activityCategoryID (newactivityCategoryID:Number):Void {
 		_activityCategoryID = newactivityCategoryID;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -445,6 +436,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function set activityUIID (newactivityUIID:Number):Void {
 		_activityUIID = newactivityUIID;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -457,6 +449,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function set learningLibraryID(a:Number):Void{
 		_learningLibraryID = a;
 	}
+	
 	public function get learningLibraryID():Number{
 		return _learningLibraryID;
 	}	public function set learningDesignID(a:Number):Void{
@@ -475,6 +468,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function set libraryActivityID (newlibraryActivityID:Number):Void {
 		_libraryActivityID = newlibraryActivityID;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -484,7 +478,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 		return _libraryActivityID;
 	}
 
-/**
+	/**
 	 * 
 	 * @usage   
 	 * @param   newparentActivityID 
@@ -493,6 +487,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function set parentActivityID (newparentActivityID:Number):Void {
 		_parentActivityID = newparentActivityID;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -502,7 +497,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 		return _parentActivityID;
 	}
 	
-/**
+	/**
 	 * 
 	 * @usage   
 	 * @param   newparentUIID 
@@ -511,6 +506,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function set parentUIID (newparentUIID:Number):Void {
 		_parentUIID = newparentUIID;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -529,6 +525,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function set orderID (neworderID:Number):Void {
 		_orderID = neworderID;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -622,6 +619,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function set groupingID (newgroupingID:Number):Void {
 		_groupingID = newgroupingID;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -630,7 +628,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function get groupingID ():Number {
 		return _groupingID;
 	}
-
 	
 	/**
 	 * 
@@ -647,7 +644,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 	 * @return  
 	 */
 	public function get groupingUIID ():Number {
-		trace('returning:'+_groupingUIID);
 		return _groupingUIID;
 	}
 	
@@ -666,7 +662,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 	 * @return  
 	 */
 	public function get selectActivity ():String {
-		trace('returning:'+_isActivitySelected);
 		return _isActivitySelected;
 	}
 
@@ -679,6 +674,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function set applyGrouping (newapplyGrouping:Boolean):Void {
 		_applyGrouping = newapplyGrouping;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -697,6 +693,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function set groupingSupportType (newgroupingSupportType:Number):Void {
 		_groupingSupportType = newgroupingSupportType;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -715,6 +712,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function set readOnly (readOnly:Boolean):Void {
 		_readOnly = readOnly;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -727,10 +725,5 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function isReadOnly():Boolean {
 		return _readOnly;
 	}
-	
-	
-
-	
-
 	
 }

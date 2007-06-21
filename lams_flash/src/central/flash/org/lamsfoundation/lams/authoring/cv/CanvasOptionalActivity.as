@@ -113,12 +113,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
 		
-		trace("complex MinOptions :"+_ca.minOptions)
 		actMinOptions = _ca.minOptions;
 		actMaxOptions = _ca.maxOptions;
 		
-		trace("MinOptions :"+actMinOptions)
-		trace("MaxOptions :"+actMaxOptions)
 		_ddm.getComplexActivityChildren(_activity.activityUIID);
 		showStatus(false);
 		

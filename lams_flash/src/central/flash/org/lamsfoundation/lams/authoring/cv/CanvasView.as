@@ -35,7 +35,6 @@ import mx.containers.*;
 import mx.managers.*;
 import mx.utils.*;
 
-
 /**
 *Authoring view for the canvas
 * Relects changes in the CanvasModel
@@ -162,7 +161,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
 		transparentCover.onPress = null;
 		
-		
 		titleBar = _canvasView.attachMovie("DesignTitleBar", "titleBar", _canvasView.getNextHighestDepth())
 		
 		var styleObj = _tm.getStyleObject('label');
@@ -227,7 +225,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		titleBar.nameBGShadow._width = bgWidth;
 		titleBar.nameBG._visible  = true;
 		titleBar.rightCurve._x = bgWidth+27;
-		titleBar.rightCurveShadow._x = titleBar.rightCurve._x+2
+		titleBar.rightCurveShadow._x = titleBar.rightCurve._x+2;
 		
 	}
 	
@@ -366,6 +364,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		
 		cm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
 		Debugger.log('drawn a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'drawTransition','CanvasView');
+		
 		return true;
 		
 	}

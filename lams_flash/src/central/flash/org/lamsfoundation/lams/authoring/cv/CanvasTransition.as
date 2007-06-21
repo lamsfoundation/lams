@@ -27,12 +27,8 @@ import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
 
-
-/**  
-* -+ - 
-*/  
 class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{  
-	//set by passing initObj to mc.createClass()
+	
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
 	private var _transition:Transition;
@@ -54,23 +50,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 	
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
-		
 	
 	function CanvasTransition(){
 		
 		Debugger.log("_transition.fromUIID:"+_transition.fromUIID,4,'Constructor','CanvasTransition');
 		Debugger.log("_transition.toUIID:"+_transition.toUIID,4,'Constructor','CanvasTransition');
+		
 		arrow_mc._visible = false;
 		stopArrow_mc._visible = false;
 		stopSign_mc._visible = false;
-		//let it wait one frame to set up the components.
+		
 		MovieClipUtils.doLater(Proxy.create(this,init));
-		//init();
 	}
 	
 	public function init():Void{
-		//Debugger.log('Running,',4,'init','CanvasTransition');
-		//todo: all a get style for this
 		_drawnLineStyle = 0x777E9D;
 		draw();
 	}
@@ -100,12 +93,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 	 * @usage   
 	 * @return  
 	 */
-	private function draw():Void{		//Debugger.log('',4,'draw','CanvasTransition');
+	private function draw():Void{
 
 		var cv:Canvas = Application.getInstance().getCanvas();
-		
-		//var fromAct = cv.ddm.getActivityByUIID(_transition.fromUIID);
-		//var toAct = cv.ddm.getActivityByUIID(_transition.toUIID);
 		
 		var fromAct_mc;
 		var toAct_mc;
@@ -116,12 +106,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 		if(_transition.mod_toUIID != null) toAct_mc = cv.model.getActivityMCByUIID(_transition.mod_toUIID);
 		else toAct_mc = cv.model.getActivityMCByUIID(_transition.toUIID);
 		
-		//var startPoint:Point = MovieClipUtils.getCenterOfMC(fromAct_mc);
-		//var endPoint:Point = MovieClipUtils.getCenterOfMC(toAct_mc);
-		
-		//TODO: check if its a gate transition and if so render a shorty
 		var isGateTransition = toAct_mc.activity.isGateActivity();
-		
 		
 		var offsetToCentre_x = fromAct_mc.getVisibleWidth() / 2;
 		var offsetToCentre_y = fromAct_mc.getVisibleHeight() / 2;
@@ -141,8 +126,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 		
 		this.lineStyle(2, _drawnLineStyle);
 		this.moveTo(_startPoint.x, _startPoint.y);
-		
-		//this.dashTo(startX, startY, endX, endY, 8, 4);
 		this.lineTo(_endPoint.x, _endPoint.y);
 		Debugger.log('drawn line from:'+_startPoint.x+','+_startPoint.y+'to:'+_endPoint.x+','+_endPoint.y,4,'draw','CanvasTransition');
 		
@@ -167,7 +150,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 		_fromAct_edgePoint = calcEdgePoint(degs, offsetToCentre_x, offsetToCentre_y, fromAct_Deg,  _startPoint);
 		_toAct_edgePoint = (degs >= 0) ? calcEdgePoint(degs - 180, toOTC_x, toOTC_y, toAct_Deg, _endPoint)
 										: calcEdgePoint(degs + 180, toOTC_x, toOTC_y, toAct_Deg, _endPoint);
-		
 		// calc midpoint
 		if(_fromAct_edgePoint != null & _toAct_edgePoint != null) {
 			arrow_mc._x = (_fromAct_edgePoint.x + _toAct_edgePoint.x)/2;
@@ -189,33 +171,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 		
 		_midPoint = new Point(arrow_mc._x,arrow_mc._y);
 		
-		xPos = this._x
-		trace("x position of start point: "+xPos)
-		
-		/*
-		stopArrow_mc._rotation = degs;
-			
-		// calculate the position for the stop sign
-		stopSign_mc._x = arrow_mc._x;
-		stopSign_mc._y = arrow_mc._y;
-		stopArrow_mc._x = arrow_mc._x;
-		stopArrow_mc._y = arrow_mc._y;
-		*/
+		xPos = this._x;
 			
 	}
-	/*
-	private function updateSynchStatus():Void{
-		
-		if(completionType == "synchronize_teacher"){
-			stopSign._visible = true;
-			stopSignArrow._visible = true;
-		}else{
-			stopSign._visible = false;
-			stopSignArrow._visible = false;
-		}
-		
-	}
-*/
 
 	public function get xPosition():Number{
 		return xPos;
@@ -291,11 +249,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 	private function onPress():Void{
 			// check double-click
 			var now:Number = new Date().getTime();
-			//Debugger.log('now:'+now,Debugger.GEN,'onPress','CanvasTransition');
-			//Debugger.log('_dcStartTime:'+_dcStartTime,Debugger.GEN,'onPress','CanvasTransition');
 			Debugger.log('now - _dcStartTime:'+(now - _dcStartTime)+' Config.DOUBLE_CLICK_DELAY:'+Config.DOUBLE_CLICK_DELAY,Debugger.GEN,'onPress','CanvasTransition');
 			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
-				//Debugger.log('DoubleClicking:'+this,Debugger.GEN,'onPress','CanvasTransition');
 				_doubleClicking = true;
 				_canvasController.transitionDoubleClick(this);
 				
@@ -303,11 +258,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 			}else{
 				Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasTransition');
 				_doubleClicking = false;
-				
-				//Debugger.log('_canvasController:'+_canvasController,Debugger.GEN,'onPress','CanvasTransition');
 				_canvasController.transitionClick(this);
-				
-	
 			}
 			
 			_dcStartTime = now;
@@ -316,18 +267,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 
 	private function onRelease():Void{
 		if(!_doubleClicking){
-			//Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasTransition');
 			_canvasController.transitionRelease(this);
 		}
 		
 	}
 	
 	private function onReleaseOutside():Void{
-		//Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasTransition');
 		_canvasController.transitionReleaseOutside(this);
 	}
 	
-
-	
-
 }

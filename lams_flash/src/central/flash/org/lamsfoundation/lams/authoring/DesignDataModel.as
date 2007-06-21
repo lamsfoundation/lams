@@ -347,14 +347,18 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			} else if(dto.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
 				
 				//TODO: Test this code when we are able to save and then open a design with grouping
-				var newGroupActiviy:GroupingActivity = new GroupingActivity(dto.activityUIID);
-				newGroupActiviy.populateFromDTO(dto);
-				_activities.put(newGroupActiviy.activityUIID,newGroupActiviy);
+				var newGroupActivity:GroupingActivity = new GroupingActivity(dto.activityUIID);
+				newGroupActivity.populateFromDTO(dto);
+				_activities.put(newGroupActivity.activityUIID,newGroupActivity);
 			
 			} else if(dto.activityTypeID == Activity.BRANCHING_ACTIVITY_TYPE){
-				var newBranchActiviy:BranchingActivity = new BranchingActivity(dto.activityUIID);
-				newBranchActiviy.populateFromDTO(dto);
-				_activities.put(newBranchActiviy.activityUIID,newBranchActiviy);
+				var newBranchActivity:BranchingActivity = new BranchingActivity(dto.activityUIID);
+				newBranchActivity.populateFromDTO(dto);
+				_activities.put(newBranchActivity.activityUIID,newBranchActivity);
+			} else if(dto.activityTypeID = Activity.SEQUENCE_ACTIVITY_TYPE){
+				var newSequenceActivity:SequenceActivity = new SequenceActivity(dto.activityUIID);
+				newSequenceActivity.populateFromDTO(dto);
+				_activities.put(newSequenceActivity.activityUIID, newSequenceActivity);
 			}
 		}
 		
@@ -778,7 +782,6 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		transObj.hasTrans = hasTrans;
 		return transObj;
 	}
-	
 	
 	//Getters and setters for the properties
 	public function get objectType():String{
