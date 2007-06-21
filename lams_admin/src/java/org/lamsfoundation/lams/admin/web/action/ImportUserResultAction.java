@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -48,6 +49,8 @@ import org.lamsfoundation.lams.web.session.SessionManager;
  */
 public class ImportUserResultAction extends Action {
 
+	private static Logger log = Logger.getLogger(ImportUserResultAction.class);
+	
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -58,8 +61,13 @@ public class ImportUserResultAction extends Action {
 		HttpSession ss = SessionManager.getSession();
 		
 		List results = (List)ss.getAttribute(IImportService.IMPORT_RESULTS);
-		FormFile file = (FormFile)ss.getAttribute(IImportService.IMPORT_FILE);
-		String successMessageKey = (importService.isUserSpreadsheet(file) ? "msg.users.created" : "msg.users.added");
+		String successMessageKey = "";
+		try {
+			FormFile file = (FormFile)ss.getAttribute(IImportService.IMPORT_FILE);
+			successMessageKey = (importService.isUserSpreadsheet(file) ? "msg.users.created" : "msg.users.added");
+		} catch (Exception e) {
+			log.error("Couldn't check spreadsheet type!", e);
+		}
 		
 		int successful = 0;
 		for(int i=0; i<results.size(); i++) {
