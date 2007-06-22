@@ -34,6 +34,7 @@
 				<filter token="DB_NAME" value="${DB_NAME}" />
 				<filter token="DB_USER" value="${DB_USER}" />
 				<filter token="DB_PASS" value="${DB_PASS}" />
+				<filter token="MYSQL_HOST" value="${MYSQL_HOST}" />
 			</filterset>
 		</copy>
 		<copy overwrite="yes" todir="${TOMCATDIR}">

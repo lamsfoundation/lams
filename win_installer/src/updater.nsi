@@ -619,7 +619,7 @@ Function DirectoryLeave
                     IDYES retainFiles \
                     IDNO noRetain
         noRetain:
-            MessageBox MB_OK|MB_ICONEXCLAMATION "Files will be backed up as $INSTDIR\backup"
+            MessageBox MB_OK "Files will be backed up at $INSTDIR\backup"
             goto end
         retainFiles:
             Strcpy $WINTEMP "C:\WINDOWS\Temp"
@@ -728,7 +728,7 @@ FunctionEnd
 Function PreLAMSConfig
     Call CheckJava
     ${if} $IS_UPDATE == "0"
-        
+
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 2" "State" "$JDK_DIR"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 4" "State" "$INSTDIR\repository"
         !insertmacro MUI_HEADER_TEXT "Setting Up LAMS (2/4)" "Configure the LAMS Server.  If unsure, use the defaults."
@@ -1667,6 +1667,7 @@ Function DeployConfig
     FileWrite $0 "WILDFIRE_USER=$WILDFIRE_USER$\r$\n"
     FileWrite $0 "WILDFIRE_PASS=$WILDFIRE_PASS$\r$\n"
     
+    FileWrite $0 "MYSQL_HOST=$MYSQL_HOST$\r$\n"
     FileWrite $0 "DB_NAME=$DB_NAME$\r$\n"
     FileWrite $0 "DB_USER=$DB_USER$\r$\n"
     FileWrite $0 "DB_PASS=$DB_PASS$\r$\n"

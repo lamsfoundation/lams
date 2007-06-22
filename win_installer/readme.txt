@@ -1,7 +1,7 @@
-LAMS 2.0.3 - Learning Activity Management System
+LAMS 2.0.4 - Learning Activity Management System
 ----------------------------------------------
 
-This is a pre-packaged copy of LAMS 2.0.3 for Windows 2000, XP, or 2003.
+This is a pre-packaged copy of LAMS 2.0.4 for Windows 2000, XP, or 2003.
 For the source code, please see the 'Building LAMS' wiki at 
 
 	http://wiki.lamsfoundation.org/display/lams/Building+LAMS 
