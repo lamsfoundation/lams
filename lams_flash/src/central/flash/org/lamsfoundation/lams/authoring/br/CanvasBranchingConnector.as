@@ -43,7 +43,7 @@ import mx.utils.*
 class CanvasBranchingConnector extends CanvasActivity { 
 
 	function CanvasBranchingConnector(){
-		super();
+		super(true);
 		branchConnector = true;
 	}	
 	

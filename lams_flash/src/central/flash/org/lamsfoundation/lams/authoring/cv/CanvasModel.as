@@ -601,11 +601,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 				/*********************************************
 				* TODO: REQUIRE NORMAL BRANCH CLIENT_SIDE VALIDATION
 				*********************************************/
-				Debugger.log('No validation errors, creating branch.......',Debugger.GEN,'addActivityToTransition','CanvasModel');
-			
+				
 				//lets make the connection
 				var b:Branch = createBranchConnector(_transitionActivities);
-				
+				Debugger.log('No validation errors, creating branch.......' + b,Debugger.GEN,'addActivityToTransition','CanvasModel');
+			
 				//add it to the DDM
 				var success:Object = _cv.ddm.addBranch(b);
 				
@@ -908,20 +908,23 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		//now check the transitions:
 		var ddmBranch_keys:Array = _cv.ddm.branches.keys();
 		var cmBranch_keys:Array = _branchesDisplayed.keys();
-		var trLongest = Math.max(ddmBranch_keys.length, cmBranch_keys.length);
+		var brLongest = Math.max(ddmBranch_keys.length, cmBranch_keys.length);
 		
-		if(ddmTransition_keys.length == trLongest){
-			trIndexArray = ddmBranch_keys;
+		//chose which array we are going to loop over
+		var brIndexArray:Array;
+		
+		if(ddmBranch_keys.length == brLongest){
+			brIndexArray = ddmBranch_keys;
 		}else{
-			trIndexArray = cmBranch_keys;
+			brIndexArray = cmBranch_keys;
 		}
 		
 		//loop through and do comparison
-		for(var i=0;i<trIndexArray.length;i++){
+		for(var i=0;i<brIndexArray.length;i++){
 			
-			var branchKeyToCheck:Number = trIndexArray[i];
+			var branchKeyToCheck:Number = brIndexArray[i];
 
-			var ddmBranch:Branch = _cv.ddm.transitions.get(branchKeyToCheck);
+			var ddmBranch:Branch = _cv.ddm.branches.get(branchKeyToCheck);
 			var cmBranch:Branch = _branchesDisplayed.get(branchKeyToCheck).branch;
 			var r_branch:Object = compareBranches(ddmBranch, cmBranch);
 			

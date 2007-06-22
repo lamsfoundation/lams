@@ -28,7 +28,7 @@ import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.authoring.br.*;
 
-class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasTransition {
+class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnection {
 	
 	private static var DIR_FROM_START:Number = 0;
 	private static var DIR_TO_END:Number = 1;
@@ -39,8 +39,45 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasTransit
 	function BranchConnector(){
 		super();
 		
-		override_fromAct = (_direction == DIR_FROM_START) ? _canvasBranchView.startHub : null;
-		override_toAct = (_direction == DIR_TO_END) ? _canvasBranchView.endHub : null;
+		Debugger.log("_branch.fromUIID:"+_branch.fromUIID,4,'Constructor','BranchConnector');
+		Debugger.log("_branch.toUIID:"+_branch.toUIID,4,'Constructor','BranchConnector');
+		
+		MovieClipUtils.doLater(Proxy.create(this,init));
+	}
+	
+	public function init():Void{
+		_drawnLineStyle = 0xEA00FF;
+		draw();
+	}
+	
+	/**
+	 * Renders the branch to stage
+	 * @usage   
+	 * @return  
+	 */
+	private function draw():Void{
+
+		var cv:Canvas = Application.getInstance().getCanvas();
+		
+		if(cv.model.activeView.startHub.activity.activityUIID = _branch.fromUIID) direction = DIR_FROM_START;
+		else if(cv.model.activeView.endHub.activity.activityUIID = _branch.toUIID) direction = DIR_TO_END;
+		
+		var fromAct_mc = (direction == DIR_FROM_START) ? cv.model.activeView.startHub : cv.model.getActivityMCByUIID(_branch.fromUIID);	
+		var toAct_mc = (direction == DIR_TO_END) ? cv.model.activeView.endHub : cv.model.getActivityMCByUIID(_branch.toUIID);
+		
+		var fromOTC:Object = getFromOTC(fromAct_mc);
+		var toOTC:Object = getToOTC(toAct_mc);
+		
+		Debugger.log('fromAct_mc.getActivity().xCoord:' + fromAct_mc.getActivity().xCoord , 4, 'draw', 'BranchConnector');	
+		Debugger.log('offsetToCentre_x: ' + fromOTC.x, 4, 'draw', 'BranchConnector');	
+		
+		_startPoint = (direction == DIR_FROM_START) ? new Point(fromAct_mc._x + fromOTC.x,fromAct_mc._y + fromOTC.y)
+													: new Point(fromAct_mc.getActivity().xCoord + fromOTC.x,fromAct_mc.getActivity().yCoord + fromOTC.y);
+		_endPoint = (direction == DIR_TO_END) ? new Point(toAct_mc._x + toOTC.x, toAct_mc._y + toOTC.y)
+											  : new Point(toAct_mc.getActivity().xCoord + toOTC.x, toAct_mc.getActivity().yCoord + toOTC.y);
+		
+		createConnection(fromAct_mc, toAct_mc, _startPoint, _endPoint, fromOTC, toOTC);
+			
 	}
 	
 	public function get branch():Branch{
@@ -49,10 +86,42 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasTransit
 	
 	public function set branch(b:Branch){
 		_branch = b;
-		_transition = _branch;
 	}
 	
 	public function get direction():Number {
 		return _direction;
+	}
+	
+	public function set direction(a:Number) {
+		_direction = a;
+	}
+	
+	private function onPress():Void{
+			// check double-click
+			var now:Number = new Date().getTime();
+			Debugger.log('now - _dcStartTime:'+(now - _dcStartTime)+' Config.DOUBLE_CLICK_DELAY:'+Config.DOUBLE_CLICK_DELAY,Debugger.GEN,'onPress','CanvasTransition');
+			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
+				_doubleClicking = true;
+				_canvasController.branchDoubleClick(this);
+			
+			}else{
+				Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasTransition');
+				_doubleClicking = false;
+				_canvasController.branchClick(this);
+			}
+			
+			_dcStartTime = now;
+	
+	}
+
+	private function onRelease():Void{
+		if(!_doubleClicking){
+			_canvasController.branchRelease(this);
+		}
+		
+	}
+	
+	private function onReleaseOutside():Void{
+		_canvasController.branchReleaseOutside(this);
 	}
 }  

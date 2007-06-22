@@ -281,8 +281,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			return new LFError("Adding grouping to hashtable failed","addGrouping",this,'groupingUIID:'+grp.groupingUIID);
 		}
 		*/
-		return true;
 		dispatchEvent({type:'ddmUpdate',target:this});
+		
+		return true;
 	}
 	
 	/**
@@ -834,6 +835,34 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		transObj.into = into;
 		transObj.hasTrans = hasTrans;
 		return transObj;
+	}
+	
+	public function getBranchesForActivityUIID(UIID):Object{
+		var br:Array = _branches.values();
+		var branchObj = new Object();
+		var myBranches:Array = new Array();
+		var into = null;
+		var out = null;
+		
+		for(var i=0; i<br.length;i++){
+			if(br[i].toUIID == UIID || br[i].fromUIID == UIID){
+				myBranches.push(br[i]);
+			}
+			if(into != null && out != null){
+					break;
+			}else{
+				if(br[i].fromUIID == UIID){
+					out = br[i];
+				}
+				if(br[i].toUIID == UIID){
+					into = br[i];
+				}
+			}
+		}
+		branchObj.myBranches = myBranches;
+		branchObj.out = out;
+		branchObj.into = into;
+		return branchObj;
 	}
 	
 	//Getters and setters for the properties

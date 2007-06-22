@@ -192,7 +192,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			//run in a loop to support branches, maybe more then 2 transitions.
 			for (var i=0; i<myTransitions.length;i++){
-				Debugger.log('removing transition for redraw:'+myTransitions[i].transitionUIID,Debugger.GEN,'activityRelease','CanvasController');
 				var t = _canvasModel.transitionsDisplayed.remove(myTransitions[i].transitionUIID);
 				t.removeMovieClip();
 			}
@@ -204,6 +203,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				Debugger.log('removing transition for redraw:'+modTransitions[i].transitionUIID,Debugger.GEN,'activityRelease','CanvasController');
 				var t = _canvasModel.transitionsDisplayed.remove(modTransitions[i].transitionUIID);
 				t.removeMovieClip();
+			}
+			
+			// refresh any branches connected to activities
+			//TODO: refresh the branches as you drag...
+			var myBranches = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
+			myBranches = myBranches.myBranches;
+			
+			for (var i=0; i<myBranches.length;i++){
+				Debugger.log('removing branch for redraw:'+myBranches[i].branchUIID,Debugger.GEN,'activityRelease','CanvasController');
+				var b = _canvasModel.branchesDisplayed.remove(myBranches[i].branchUIID);
+				b.removeMovieClip();
 			}
 			
 			clearAllSelections(optionalOnCanvas, parallelOnCanvas)		
@@ -365,7 +375,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		ct.startDrag(false);
 	   
 	}
-   
+	
+	public function branchClick(bc:BranchConnector):Void{
+	    Debugger.log('branchClick Transition:'+bc.branch.branchUIID,Debugger.GEN,'branchClick','CanvasController');
+	    _canvasModel.getCanvas().stopActiveTool();
+		
+		_canvasModel.selectedItem = bc;
+		_canvasModel.isDragging = true;
+		bc.startDrag(false);
+	   
+	}
+	
     public function transitionDoubleClick(ct:CanvasTransition):Void{
 		Debugger.log('transitionDoubleClick CanvasTransition:'+ct.transition.transitionUIID,Debugger.GEN,'transitionDoubleClick','CanvasController');
 	   
@@ -373,11 +393,23 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	   
 		//TODO: fix this, its null
 		_canvasView =  CanvasView(getView());
-		Debugger.log('_canvasView:'+_canvasView,Debugger.GEN,'transitionDoubleClick','CanvasController');
 	   
 		if(!isTransitionTargetReadOnly(ct, Dictionary.getValue("cv_element_readOnly_action_mod"))) _canvasModel.activeView.createTransitionPropertiesDialog("centre",Delegate.create(this, transitionPropertiesOK));
 		
 	    _canvasModel.selectedItem = ct;
+    }
+    
+    public function branchDoubleClick(bc:BranchConnector):Void{
+		Debugger.log('branchDoubleClick CanvasConnection:' + bc.branch.branchUIID,Debugger.GEN,'branchDoubleClick','CanvasController');
+	   
+		_canvasModel.getCanvas().stopActiveTool();
+	   
+		//TODO: fix this, its null
+		_canvasView =  CanvasView(getView());
+	   
+		//	if(!isTransitionTargetReadOnly(bc, Dictionary.getValue("cv_element_readOnly_action_mod"))) _canvasModel.activeView.createTransitionPropertiesDialog("centre",Delegate.create(this, transitionPropertiesOK));
+		
+	    _canvasModel.selectedItem = bc;
     }
    
     public function transitionRelease(ct:CanvasTransition):Void{
@@ -397,6 +429,24 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		}
 	
     }
+    
+    public function branchRelease(bc:BranchConnector):Void{
+		Debugger.log("branchRelease Transition:" + bc.branch.branchUIID, Debugger.GEN, "branchRelease", "CanvasController");
+		if(_canvasModel.isDragging){
+			bc.stopDrag();
+			
+			//if (bc.hitTest(_canvasModel.getCanvas().bin) && !isTransitionTargetReadOnly(bc, Dictionary.getValue("cv_element_readOnly_action_del"))){
+			//	_canvasModel.getCanvas().removeBranch(bc.branch.branchUIID); 
+			//} else {
+				if (bc._x != bc.xPosition){
+					var t = _canvasModel.branchesDisplayed.remove(bc.branch.branchUIID);
+					t.removeMovieClip();
+					_canvasModel.setDirty();
+				}
+		//	}
+		}
+	
+    }
 	
 	private function transitionSnapBack(ct:Object){
 		ct.reDraw();
@@ -404,6 +454,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	
 	public function transitionReleaseOutside(ct:CanvasTransition):Void{
 		transitionRelease(ct);
+	}
+   
+   	public function branchReleaseOutside(bc:BranchConnector):Void{
+		branchRelease(bc);
 	}
    
 	private function setBusy():Void{

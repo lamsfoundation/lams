@@ -56,8 +56,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private var lastScreenHeight:Number = 300;
 
 	private var grid_mc:Object;
-	private var hSpace:Number = 100;
-	private var vSpace:Number = 100;
+	private var hSpace:Number = 30;
+	private var vSpace:Number = 30;
 
 	private var close_mc:MovieClip;
 	
@@ -215,8 +215,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		Debugger.log('adding hubs for branch activity:' + _canvasBranchingActivity,Debugger.CRITICAL,'setupConenctorHubs','org.lamsfoundation.lams.CanvasBranchView');
 		
 		cHubStart_mc = activityLayer.createChildAtDepth("CanvasBranchingConnector",DepthManager.kTop,{_activity:_canvasBranchingActivity.activity,_canvasController:getController(),_canvasView:_canvasBranchView, _x: 0 , _y: 0});
-		cHubEnd_mc = activityLayer.createChildAtDepth("CanvasBranchingConnector",DepthManager.kTop,{_activity:_canvasBranchingActivity.activity,_canvasController:getController(),_canvasView:_canvasBranchView, _x: 0 , _y: 0});
-		
+		//cHubEnd_mc = activityLayer.createChildAtDepth("CanvasBranchingConnector",DepthManager.kTop,{_activity:_canvasBranchingActivity.activity,_canvasController:getController(),_canvasView:_canvasBranchView, _x: 0 , _y: 0});
+
 	}
 	
 	private function loadSequenceActivities() {

@@ -107,7 +107,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var bgNegative:String = "original";
 	private var authorMenu:ContextMenu;
 	
-	function CanvasActivity(){
+	function CanvasActivity(_connector){
 		_tm = ThemeManager.getInstance();
 		_ccm = CustomContextMenu.getInstance();
 		
@@ -116,7 +116,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		//let it wait one frame to set up the components.
 		//this has to be set b4 the do later :)
-		if(_activity.isGateActivity() || _branchConnector){
+		if(_activity.isGateActivity() || _connector){
 			_visibleHeight = CanvasActivity.GATE_ACTIVITY_HEIGHT;
 			_visibleWidth = CanvasActivity.GATE_ACTIVITY_WIDTH;
 		}else if(_activity.isGroupActivity()){

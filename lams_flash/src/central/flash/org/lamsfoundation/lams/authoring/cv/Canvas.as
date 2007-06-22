@@ -795,7 +795,18 @@ b	 * @param   learningDesignID
 		canvasModel.selectedItem = null;
 	}
 	
-	
+	/**
+	 * Removes an transition by using its branchUIID.  
+	 * Called by the bin
+	 * @usage   
+	 * @param   branchUIID 
+	 * @return  
+	 */
+	public function removeBranch(branchUIID:Number){	
+		_ddm.removeBranch(branchUIID);
+		canvasModel.setDirty();	
+		canvasModel.selectedItem = null;
+	}
 	
 	/**
 	 * Called by Comms after a design has been loaded, usually set as the call back of something like openDesignByID.
