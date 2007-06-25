@@ -110,11 +110,11 @@ class AboutDialog extends MovieClip implements Dialog {
         fm.enabled = true;
 
 		// autosize labels/textfields
-		version_lbl.autoSize = true;
-		version_txt.autoSize = true;
-		copyright_txt.autoSize = true;
-		trademark_txt.autoSize = true;
-		license_txt.autoSize = true;
+		version_lbl.autoSize = "true";
+		version_txt.autoSize = "true";
+		copyright_txt.autoSize = "true";
+		trademark_txt.autoSize = "true";
+		license_txt.autoSize = "true";
 
 		getList();
 		

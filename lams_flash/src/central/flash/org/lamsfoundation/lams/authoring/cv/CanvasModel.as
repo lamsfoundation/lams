@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.authoring.br.BranchConnector;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.ui.*;
@@ -63,7 +64,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	private var _importing:Boolean;
 	private var _editing:Boolean;
 	private var _autoSaveWait:Boolean;
-
 	
 	//these are hashtables of mc refs MOVIECLIPS (like CanvasActivity or CanvasTransition)
 	//each on contains a reference to the emelment in the ddm (activity or transition)
@@ -602,6 +602,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 				* TODO: REQUIRE NORMAL BRANCH CLIENT_SIDE VALIDATION
 				*********************************************/
 				
+				//check we have 2 valid acts to create the transition.
+				if(fromAct == toAct){
+					return new LFError("You cannot create a Branch between the same Activities","addActivityToTransition",this);
+				}
+				
 				//lets make the connection
 				var b:Branch = createBranchConnector(_transitionActivities);
 				Debugger.log('No validation errors, creating branch.......' + b,Debugger.GEN,'addActivityToTransition','CanvasModel');
@@ -716,7 +721,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		var toAct:Activity = transitionActs[1];
 		
 		// TODO: activeView.defaultSequenceActivity should return SequenceActivity obj
-		var b:Branch = new Branch(_cv.ddm.newUIID(), fromAct.activityUIID, toAct.activityUIID, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
+		var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, toAct.activityUIID, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
 		
 		return b;
 	}

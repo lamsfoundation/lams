@@ -125,9 +125,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
                 setSize(cm);
                 break;
 			case 'ADD_SEQUENCE':
-				Debugger.log("adding seq: " + event.data, Debugger.CRITICAL, "viewUpdate", "CanvasBranchView");
-				var b= addSequence(event.data,cm);
-				Debugger.log("return from seq: " + b, Debugger.CRITICAL, "viewUpdate", "CanvasBranchView");
+				addSequence(event.data,cm);
 				break;
             case 'DRAW_ACTIVITY_SEQ':
                 drawActivity(event.data,cm);
@@ -215,6 +213,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		Debugger.log('adding hubs for branch activity:' + _canvasBranchingActivity,Debugger.CRITICAL,'setupConenctorHubs','org.lamsfoundation.lams.CanvasBranchView');
 		
 		cHubStart_mc = activityLayer.createChildAtDepth("CanvasBranchingConnector",DepthManager.kTop,{_activity:_canvasBranchingActivity.activity,_canvasController:getController(),_canvasView:_canvasBranchView, _x: 0 , _y: 0});
+		
 		//cHubEnd_mc = activityLayer.createChildAtDepth("CanvasBranchingConnector",DepthManager.kTop,{_activity:_canvasBranchingActivity.activity,_canvasController:getController(),_canvasView:_canvasBranchView, _x: 0 , _y: 0});
 
 	}
@@ -227,9 +226,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			Debugger.log('creating init seq activity:' + sequenceActs,Debugger.CRITICAL,'loadSequenceActivities','org.lamsfoundation.lams.CanvasBranchView');
 			createInitialSequenceActivity();
 		} else {
-			// load existing sequences
-			Debugger.log('attempting to load seq acts:' + sequenceActs,Debugger.CRITICAL,'loadSequenceActivities','org.lamsfoundation.lams.CanvasBranchView');
-			
+			// TODO: make the last create sequence activity in array (order id) the default?
+			var children:Array = _cm.getCanvas().ddm.getComplexActivityChildren(activity.activityUIID);
+			// for(var i=0; i<children.length;i++) {
+				defaultSequenceActivity = children[children.length-1];
+			//}
 		}
 	}
 	
@@ -247,6 +248,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		mx.transitions.TransitionManager.start(this,
 					{type:mx.transitions.Zoom, 
 					 direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
+					 
+		dispatchEvent({type:'press', target:this.startHub});
 	}
 	
 	private function close():Void {

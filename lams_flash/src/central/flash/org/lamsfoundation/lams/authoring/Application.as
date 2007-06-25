@@ -104,7 +104,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private var _toolbar:Toolbar;
     private var _toolkit:Toolkit;
     private var _canvas:Canvas;
-    private var _PI:PropertyInspectorNew;
+    private var _PI:PropertyInspector;
 	
 	private var _workspace:Workspace;
 	private var _ccm:CustomContextMenu;
@@ -156,7 +156,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _toolbarLoaded = false;
 		_piLoaded = false;
 		_module = Application.MODULE;
-		_PI = new PropertyInspectorNew();
+		_PI = new PropertyInspector();
 		_ccm = CustomContextMenu.getInstance();
 		_root_layout = (_root.layout != undefined || _root.layout != null) ? _root.layout : null;
     }
@@ -345,7 +345,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
                 case 'Toolbar' :
                     _toolbarLoaded = true;
                     break;
-				case 'PropertyInspectorNew' :
+				case 'PropertyInspector' :
                     _piLoaded = true;
                     break;
                 default:
@@ -510,7 +510,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
            copy();
         }else if (Key.isDown(F12_KEY)) {
 			trace("P Pressed")
-			PropertyInspectorNew(_pi_mc).localOnRelease();
+			PropertyInspector(_pi_mc).localOnRelease();
 			
         }else if (Key.isDown(Key.CONTROL) && Key.isDown(V_KEY)) {
 			paste();

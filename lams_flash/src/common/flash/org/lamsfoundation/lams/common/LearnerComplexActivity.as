@@ -420,5 +420,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	public function get panelHeight():Number {
 		return _panelHeight;
 	}
+	public function setSelected(isSelected) {
+	}
 
 }

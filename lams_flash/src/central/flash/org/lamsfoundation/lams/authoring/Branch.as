@@ -22,6 +22,7 @@
  */
 
 import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.authoring.br.BranchConnector;
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;
 
@@ -31,13 +32,21 @@ class Branch extends Transition {
 	private var UIID:Number;
 	private var _sequenceActivity:Activity;
 	
+	private var _direction:Number;
+	private var _targetUIID:Number;
+	
 	
 	// TODO: add learningDesignID
 
-	public function Branch(activityUIID:Number, fromUIID:Number, toUIID:Number, sequenceActivity:Activity, learningDesignID:Number){
-		super(null, fromUIID, toUIID, learningDesignID);
+	public function Branch(activityUIID:Number, _dir:Number, targetUIID:Number, sequenceActivity:Activity, learningDesignID:Number){
+		if(_dir == BranchConnector.DIR_FROM_START)
+			super(null, null, targetUIID, learningDesignID);
+		else
+			super(null, targetUIID, null, learningDesignID);
 		
 		UIID = activityUIID;
+		_direction = _dir;
+		_targetUIID = targetUIID;
 		_sequenceActivity = sequenceActivity;
 		
 	}
@@ -55,6 +64,14 @@ class Branch extends Transition {
 	
 	public function get sequenceActivity():Activity {
 		return _sequenceActivity;
+	}
+	
+	public function get direction():Number {
+		return _direction;
+	}
+	
+	public function get targetUIID():Number {
+		return _targetUIID;
 	}
 }
 

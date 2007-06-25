@@ -139,7 +139,7 @@ class org.lamsfoundation.lams.authoring.cv.SaveConfirmDialog extends MovieClip {
 	}
 	
 	private function getButtonWidth(btnText:TextField, btnValue:String):Number {
-		btnText.autoSize = true;
+		btnText.autoSize = "true";
 		btnText.html = true;
 		btnText.htmlText = btnValue;
 		return btnText.textWidth + SPACING;

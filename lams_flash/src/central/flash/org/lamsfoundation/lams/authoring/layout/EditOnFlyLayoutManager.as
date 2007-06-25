@@ -104,7 +104,7 @@ class EditOnFlyLayoutManager extends LFLayoutManager {
 		setItem(app.toolkit);
 		
 		// Property Inspector
-		app.pi = Application.root.attachMovie('PropertyInspectorNew','_pi_mc', Application.PI_DEPTH, {_x:Application.PI_X,_y:Application.PI_Y, _canvasModel:app.canvas.model, _canvasController:app.canvas.view.getController()});
+		app.pi = Application.root.attachMovie('PropertyInspector','_pi_mc', Application.PI_DEPTH, {_x:Application.PI_X,_y:Application.PI_Y, _canvasModel:app.canvas.model, _canvasController:app.canvas.view.getController()});
 		app.pi.addEventListener('load',Proxy.create(app,app.UIElementLoaded));
 		setItem(app.pi);
 	}

@@ -35,7 +35,6 @@ class CustomContextMenu {
 	private var authorMenu:ContextMenu;
 	private var menuArr:Array;
 	private var app:ApplicationParent;
-	//private var _pi:PropertyInspectorNew;
 	
 	//ContextMenu instance is stored as a static in the CustomContextMenu class
     private static var _instance:CustomContextMenu = null;    

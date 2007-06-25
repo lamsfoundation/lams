@@ -30,17 +30,16 @@ import org.lamsfoundation.lams.authoring.br.*;
 
 class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnection {
 	
-	private static var DIR_FROM_START:Number = 0;
-	private static var DIR_TO_END:Number = 1;
+	public static var DIR_FROM_START:Number = 0;
+	public static var DIR_TO_END:Number = 1;
 	
 	private var _branch:Branch;
-	private var _direction:Number;
 
 	function BranchConnector(){
 		super();
 		
-		Debugger.log("_branch.fromUIID:"+_branch.fromUIID,4,'Constructor','BranchConnector');
-		Debugger.log("_branch.toUIID:"+_branch.toUIID,4,'Constructor','BranchConnector');
+		Debugger.log("_branch.targetUIID:"+_branch.targetUIID,4,'Constructor','BranchConnector');
+		Debugger.log("_branch.direction:"+_branch.direction,4,'Constructor','BranchConnector');
 		
 		MovieClipUtils.doLater(Proxy.create(this,init));
 	}
@@ -59,11 +58,8 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 
 		var cv:Canvas = Application.getInstance().getCanvas();
 		
-		if(cv.model.activeView.startHub.activity.activityUIID = _branch.fromUIID) direction = DIR_FROM_START;
-		else if(cv.model.activeView.endHub.activity.activityUIID = _branch.toUIID) direction = DIR_TO_END;
-		
-		var fromAct_mc = (direction == DIR_FROM_START) ? cv.model.activeView.startHub : cv.model.getActivityMCByUIID(_branch.fromUIID);	
-		var toAct_mc = (direction == DIR_TO_END) ? cv.model.activeView.endHub : cv.model.getActivityMCByUIID(_branch.toUIID);
+		var fromAct_mc = (branch.direction == DIR_FROM_START) ? cv.model.activeView.startHub : cv.model.getActivityMCByUIID(_branch.targetUIID);	
+		var toAct_mc = (branch.direction == DIR_TO_END) ? cv.model.activeView.endHub : cv.model.getActivityMCByUIID(_branch.targetUIID);
 		
 		var fromOTC:Object = getFromOTC(fromAct_mc);
 		var toOTC:Object = getToOTC(toAct_mc);
@@ -71,9 +67,9 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 		Debugger.log('fromAct_mc.getActivity().xCoord:' + fromAct_mc.getActivity().xCoord , 4, 'draw', 'BranchConnector');	
 		Debugger.log('offsetToCentre_x: ' + fromOTC.x, 4, 'draw', 'BranchConnector');	
 		
-		_startPoint = (direction == DIR_FROM_START) ? new Point(fromAct_mc._x + fromOTC.x,fromAct_mc._y + fromOTC.y)
+		_startPoint = (branch.direction == DIR_FROM_START) ? new Point(fromAct_mc._x + fromOTC.x,fromAct_mc._y + fromOTC.y)
 													: new Point(fromAct_mc.getActivity().xCoord + fromOTC.x,fromAct_mc.getActivity().yCoord + fromOTC.y);
-		_endPoint = (direction == DIR_TO_END) ? new Point(toAct_mc._x + toOTC.x, toAct_mc._y + toOTC.y)
+		_endPoint = (branch.direction == DIR_TO_END) ? new Point(toAct_mc._x + toOTC.x, toAct_mc._y + toOTC.y)
 											  : new Point(toAct_mc.getActivity().xCoord + toOTC.x, toAct_mc.getActivity().yCoord + toOTC.y);
 		
 		createConnection(fromAct_mc, toAct_mc, _startPoint, _endPoint, fromOTC, toOTC);
@@ -86,14 +82,6 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 	
 	public function set branch(b:Branch){
 		_branch = b;
-	}
-	
-	public function get direction():Number {
-		return _direction;
-	}
-	
-	public function set direction(a:Number) {
-		_direction = a;
 	}
 	
 	private function onPress():Void{

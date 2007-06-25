@@ -413,6 +413,15 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				var newSequenceActivity:SequenceActivity = new SequenceActivity(dto.activityUIID);
 				newSequenceActivity.populateFromDTO(dto);
 				_activities.put(newSequenceActivity.activityUIID, newSequenceActivity);
+				
+				if(_activities.get(newSequenceActivity.parentUIID) instanceof BranchingActivity) {
+					Debugger.log("creating linked Branch for seq: " + newSequenceActivity.activityUIID, Debugger.CRITICAL, "setDesign", "DesignDataModel");
+					
+					// create linked branch
+					// var sb:Branch = new Branch(newUIID(), BranchConnector.DIR_FROM_START, newSequenceActivity.firstActivity, newSequenceActivity, learningDesignID);
+					
+				}
+	
 			}
 		}
 		
@@ -440,6 +449,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			_groupings.put(newGrouping.groupingUIID,newGrouping);
 		
 		}
+		
+		// update branches in the hashtable 
+		//	loop iover sequence activities
+			// if(!newSequenceActivity.terminates) {
+			// get last activity for sequence by transiting from firstActivity.
+			// 	var eb:Branch = new Branch(newUIID(), BranchConnector.DIR_TO_END, newSequenceActivity.endActivityUIID, newSequenceActivity, learningDesignID);
+			// }
+		// end loop
 		
 		return success;
 	}

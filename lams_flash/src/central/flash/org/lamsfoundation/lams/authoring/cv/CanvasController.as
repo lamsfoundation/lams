@@ -39,7 +39,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	
 	private var _canvasModel:CanvasModel;
 	private var _canvasView:CanvasView;
-	private var _pi:PropertyInspectorNew;
+	private var _pi:PropertyInspector;
 	private var app:Application;
 	private var _isBusy:Boolean;
 	
@@ -54,7 +54,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		//have to do an upcast
 		_canvasModel = CanvasModel(getModel());
 		_canvasView = CanvasView(getView());
-		_pi = new PropertyInspectorNew();
+		_pi = new PropertyInspector();
 		app = Application.getInstance();
 		_isBusy = false;
 	}
@@ -406,9 +406,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	   
 		//TODO: fix this, its null
 		_canvasView =  CanvasView(getView());
-	   
-		//	if(!isTransitionTargetReadOnly(bc, Dictionary.getValue("cv_element_readOnly_action_mod"))) _canvasModel.activeView.createTransitionPropertiesDialog("centre",Delegate.create(this, transitionPropertiesOK));
-		
 	    _canvasModel.selectedItem = bc;
     }
    
@@ -435,15 +432,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		if(_canvasModel.isDragging){
 			bc.stopDrag();
 			
-			//if (bc.hitTest(_canvasModel.getCanvas().bin) && !isTransitionTargetReadOnly(bc, Dictionary.getValue("cv_element_readOnly_action_del"))){
-			//	_canvasModel.getCanvas().removeBranch(bc.branch.branchUIID); 
-			//} else {
 				if (bc._x != bc.xPosition){
 					var t = _canvasModel.branchesDisplayed.remove(bc.branch.branchUIID);
 					t.removeMovieClip();
 					_canvasModel.setDirty();
 				}
-		//	}
 		}
 	
     }
