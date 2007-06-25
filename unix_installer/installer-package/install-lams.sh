@@ -20,10 +20,12 @@
 #
 #   Author: Luke Foxton 
 
-# Installer shell script for LAMS 2.0.2
+# Installer shell script for LAMS 2.0.4
 
 # Usage: sudo ./install.sh
 
+LAMS_VERSION=2.0.4
+MYSQL_VERSION_STR=5.
 JAVA_REQ_VERSION=1.5
 # Transform the required version string into a number that can be used in comparisons
 JAVA_REQ_VERSION=`echo $JAVA_REQ_VERSION | sed -e 's;\.;0;g'`
@@ -106,83 +108,50 @@ checkJava()
 }
 
 checkMysql()
-{	
-        if [ -x  "$SQL_DIR/mysql" ]
+{
+	if [ $SQL_HOST = localhost ]
         then
-		echo "Found mysql executable"
-	else
-		echo "Install failed, could not find sql executable at $SQL_DIR. Check your lams.properties file for correct configurations."
-       		exit 1	
-        fi
 
-	sql_version=`$SQL_DIR/mysql -V | grep 5.`
-	echo $sql_version
-	if [ "$sql_version" ]
-	then
-		echo "Mysql executable valid."
-	else
-		echo "Install failed. Could not find MySql 5.0 or higher executable at $SQL_DIR. Check your lams.properties file and that your MySql installation is a compatible version for LAMS."
-		exit 1
+		$JDK_DIR/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$MYSQL_DB_URL" "root" "$DB_ROOT_PASSWORD" "$MYSQL_VERSION_STR"
+		if [  "$?" -ne  "0" ]
+        	then
+        		printf "\nInstall Failed. MySql check did not pass. Please check that your DB_ROOT_PASSWORD in lams.properties is set to the root password of your MySql 5.x server\n\n"
+        		exit 1
+		fi
 	fi
 }
 
 createDatabase()
 {
-        if [ $DB_ROOT_PASSWORD ]
-        then
-                $SQL_DIR/mysql -uroot -p$DB_ROOT_PASSWORD -e "SET FOREIGN_KEY_CHECKS=0"
-                $SQL_DIR/mysql -uroot -p$DB_ROOT_PASSWORD -e "DROP DATABASE IF EXISTS $DB_NAME"
-                $SQL_DIR/mysql -uroot -p$DB_ROOT_PASSWORD -e "CREATE DATABASE $DB_NAME DEFAULT CHARACTER SET utf8"
-                $SQL_DIR/mysql -uroot -p$DB_ROOT_PASSWORD -e "SET FOREIGN_KEY_CHECKS=1"
-                $SQL_DIR/mysql -uroot -p$DB_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON *.* TO $DB_USER@localhost IDENTIFIED BY '$DB_PASS'"
-                $SQL_DIR/mysql -uroot -p$DB_ROOT_PASSWORD -e "REVOKE PROCESS,SUPER ON *.* from $DB_USER@localhost"
-                if [  "$?" -ne  "0" ]
-                then
-                        echo "Install Failed. Could not create database. Check that your root mysql password corresponds to the DB_ROOT_PASSWORD property in lams.properties\n."
-                        exit 1
-                fi
-        else
-                $SQL_DIR/mysql -uroot -e "SET FOREIGN_KEY_CHECKS=0"
-                $SQL_DIR/mysql -uroot -e "DROP DATABASE IF EXISTS $DB_NAME"
-                $SQL_DIR/mysql -uroot -e "CREATE DATABASE $DB_NAME DEFAULT CHARACTER SET utf8"
-                $SQL_DIR/mysql -uroot -e "SET FOREIGN_KEY_CHECKS=1"
-                $SQL_DIR/mysql -uroot -e "GRANT ALL PRIVILEGES ON *.* TO $DB_USER@localhost IDENTIFIED BY '$DB_PASS'"
-                $SQL_DIR/mysql -uroot -e "REVOKE PROCESS,SUPER ON *.* from $DB_USER@localhost"
-                if [  "$?" -ne  "0" ]
-                then
-                        echo "Install Failed. Could not create database. Check that your root mysql password corresponds to the DB_ROOT_PASSWORD property in lams.properties\n."
-                        exit 1
-                fi
-        fi
-
-	# Filling the database with tables
-	$SQL_DIR/mysql -u$DB_USER -p$DB_PASS $DB_NAME < database/lams.dump
-	if [  "$?" -ne  "0" ]
-        then
-        	echo "Install Failed. Error filling datbase with tables. Check your database settings and try again."
-	        exit 1
-        fi
-
-	# Applying the settings from lams.properties to the lams_configuration table
-	ant/bin/ant -buildfile ant-scripts/filter-config.xml  -logfile log/filter-config.log filter-config
-	if [  "$?" -ne  "0" ]
-        then
-        	echo "Installation Failed. Error during ant tasks, check log/filter-config.log for details and check your lams.properties for mistakes."
-        	exit 1
-	fi
-
+	if [ $SQL_HOST = localhost ]
+	then
+		printf "\nCreating LAMS database.\n"
 	
-	printf "Configuring LAMS database with your settings..."
-	# running the sql script
-	$SQL_DIR/mysql -u$DB_USER -p$DB_PASS $DB_NAME < sql-scripts/setLamsConfiguration.sql
-	if [  "$?" -ne  "0" ]
-        
-then
-        	echo "Install failed. Error updating database with LAMS configuration. Check your MySql settings and try again."
-        	exit 1
+	        ant/bin/ant -buildfile ant-scripts/configure-database.xml -logfile log/create-database.log create-database
+		if [  "$?" -ne  "0" ]
+		then
+        		echo "Install failed. Error creating the LAMS database. Check your MySql settings and try again."
+        		exit 1
+		fi
+		printf "Database Created.\n \n"
 	fi
 
-	printf "Done. \n"
+	printf "Filling database with LAMS tables\n\n"
+	ant/bin/ant -buildfile ant-scripts/filter-config.xml -logfile log/filter-config.log filter-config
+        if [  "$?" -ne  "0" ]
+        then
+                        echo "Install failed. Error generating setLamsConfiguration.sql. Please check log/filter-config for errors.\n\n"
+                        exit 1
+        fi
+
+
+	ant/bin/ant -buildfile ant-scripts/configure-database.xml -logfile log/fill-database.log fill-database
+	if [  "$?" -ne  "0" ]
+        then
+                        printf "\nInstall failed. Could not fill the LAMS database. If you are installing with a remote MySql server, please check that your SQL_HOST in lams.properties points to a MySql 5.x installation and that you have created a database with the name DB_NAME as in lams.properties and that the DB_USER has remote access granted. Check the readme for instructions on how to do this.\n\n"
+                        exit 1
+        fi
+	print "Done.\n\n"
 
 }
 
@@ -337,14 +306,33 @@ checkJboss
 clear
 printf "\n--------------------------------------------------------------------------------\n\n"
 printf "WELCOME to the LAMS $LAMS_VERSION unix Installer! \n\n"
-printf "Please ensure you have read and accepted the licence agreement before continuing\n\n"
+printf "Please ensure you have read and accepted the license agreement before continuing\n\n"
 printf "Make sure you have correctly configured the lams.properties file to your \n"
 printf "preferred settings.\n\n"
 printf "You should read the installation guide before continuing.\n"
 printf "\nJAVA_HOME = $JAVA_HOME\n"
 printf "\n--------------------------------------------------------------------------------\n\n"
 
-printf "LAMS requires about 117MB of space, do you wish to continue? (y)es, (n)o: "
+if [ $SQL_HOST != localhost ]
+then
+	printf "You are installing LAMS with a remote MySQL server. You MUST first create the \nLAMS database and user with remote privileges before continuing. Refer to the\nreadme chapter 'Setting up MySql on a Different Server' for instructions on how\nto do this.\n\nDo you wish to Continue? (y)es or (n)o: " 
+	continue=""
+	read continue
+	case "$continue" in
+	y)
+        	printf "\n"
+		;;
+	n)      
+		printf "\nBye!\n\n"
+        	exit 0
+        	;;
+	*)      printf "\n\n"
+        	exit 1
+        	;;
+		esac
+fi
+
+printf "LAMS requires about 117MB of space, continue with installation? (y)es, (n)o: "
 continue=""
 read continue
 case "$continue" in
@@ -362,7 +350,7 @@ esac
 installWrapper
 
 
-printf "\nCreating LAMS database with the following parameters...\n"
+printf "\nUsing LAMS database with the following parameters...\n"
 printf "Database name: $DB_NAME\n"
 printf "Database user: $DB_USER\n"
 printf "Database password: $DB_PASS\n"
@@ -411,7 +399,7 @@ mkdir -p  /etc/lams2
 cp lams.properties /etc/lams2/
 
 
-printf "\n\nLAMS 2.0.2 Configuration completed!\n"
+printf "\n\nLAMS $LAMS_VERSION Configuration completed!\n"
 printf "Please view the README for instructions on how to run LAMS.\n\n"
 
 

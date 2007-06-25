@@ -1,0 +1,7 @@
+SET FOREIGN_KEY_CHECKS=0;
+DROP DATABASE IF EXISTS lamstest;
+CREATE DATABASE lamstest DEFAULT CHARACTER SET utf8;
+SET FOREIGN_KEY_CHECKS=1;
+GRANT ALL PRIVILEGES ON *.* TO lamsusertest@localhost IDENTIFIED BY 'lamsdemo';
+REVOKE PROCESS,SUPER ON *.* from lamsusertest@localhost;
+USE lamstest;

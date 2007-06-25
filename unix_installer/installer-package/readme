@@ -1,7 +1,7 @@
-LAMS 2.0.2 - Learning Activity Management System Installer
+LAMS 2.0.4 - Learning Activity Management System Installer
 --------------------------------------------------------------------------------
 
-This is an installer package for LAMS 2.0.2. Please read this 
+This is an installer package for LAMS 2.0.4. Please read this 
 document carefully before installing. Please also ensure that you have read
 and understood the terms of the license agreement.
 
@@ -11,11 +11,12 @@ CONTENTS
 1) Required Software
 2) Installation
 3) Languages and Locales
-4) Server Configuration
-5) Startup and Shutdown
-6) Using the Java Service Wrapper
-7) Backing up LAMS
-8) Web Resources and further help
+4) Setting up MySql on a Different Server 
+5) Server Configuration
+6) Startup and Shutdown
+7) Using the Java Service Wrapper
+8) Backing up LAMS
+9) Web Resources and further help
 
 
 1. Required Software
@@ -37,10 +38,10 @@ ANT - Included in this package
 There are a few steps to installing LAMS on your computer.
 
 Firstly make sure you have all the required software installed on your computer.
-You will need to make sure that mysql is running. 
+You will need to make sure that MySql is running. 
 
-Next, you need to edit the lams.properties file (located in the root directory of
-the package) to comply with the settings you want for your computer. Open the 
+Next, you need to edit the lams.properties file (located in the root directory 
+of the package) to comply with the settings you want for your computer. Open the
 lams.properties file in a text editor and follow the instructions to alter the 
 settings. The default settings are in the lams.properties file already so you 
 need not change a lot. Pay particular attention to the Installation Options 
@@ -58,30 +59,30 @@ Once you have finished editing lams.properties file you are ready to run the
 install script. Go to the root directory of the package and type:
 > sudo ./install-lams.sh 
 
-Follow the prompts in the install script. The installer will ask you if you wish 
-to set up lams as a service, this will make lams start automatically each time
-you boot your machine. The installer will attempt to detect the wrapper jar 
+Follow the prompts in the install script. The installer will ask you if you 
+wish to set up lams as a service, this will make lams start automatically each 
+time you boot your machine. The installer will attempt to detect the wrapper jar
 that is suitable for you, if it cannot you can choose the wrapper that is the 
 closest to suiting your architecture, or follow the instructions at: 
 http://wiki.lamsfoundation.org/display/lamsdocs/Setup+Java+Service+Wrapper+for+LAMS
 to set up the wrapper manually.
 
 You can find out your architecture types by typing
-> uname -a	to get all the inforamtion 
+> uname -a	to get all the information 
 > uname -m	to get the architecture type
 
 wrapper-linux-ppc-64-3.2.3	Linux	PPC
 wrapper-linux-x86-32-3.2.3	Linux	i386 	
-wrapper-linux-x86-64-3.2.3	Linix	IA64 	
+wrapper-linux-x86-64-3.2.3	Linux	IA64 	
 
 
 3. Languages and Locales
 ========================
 
-In LAMS 2.0 you can set the defualt language of your server to be one of many
+In LAMS 2.0 you can set the default language of your server to be one of many
 languages, and more to come, see http://lamscommunity.org
 
-Look out for unix language packs to add to your list of language locales
+Look out for UNIX language packs to add to your list of language locales
 
 The locale options for LAMS-2.0 available are listed below, simply put in
 your lams.properties file (under Installation Options):
@@ -89,26 +90,57 @@ your lams.properties file (under Installation Options):
 LOCALE - (locale)
 LOCALE_DIRECTION - (locale direction)
 
-Language		Locale	Locale-Direction
-------------------------------------------------
-English	(Australia)		en_AU	LTR
-Español	(Spanish)		es_ES	LTR
-Deutsch	(German)		de_DE	LTR
-简体中文 (Chinese Simplified)	zh_CN	LTR
-Français (French)		fr_FR	LTR
-Italiano (Italian)		it_IT	LTR
-Norsk (Norwegian)		no_NO	LTR
-Svenska	(Swedish)		sv_SE	LTR
-한국어 (Korean)			ko_KR	LTR
-Polski (Polish)			pl_PL	LTR
-Português (Portuguese Brazil)	pt_BR	LTR
-Tiếng Việt (Vietnamese)		vi_VN	LTR
-Chinese (Taiwan)		zh_TW	LTR
-Arabic (عربي) (Jordan)		ar_JO	RTL
-Ελληνικά (Greek)		el_GR	LTR
+Language		        Locale	Locale-Direction
+-------------------------------------------------------
+English (Australia)		en_AU   LTR
+Espanol (Spanish)		es_ES	LTR
+Deutsch (German)		de_DE	LTR
+Chinese (Simplified)		zh_CN	LTR
+Francais (French) 		fr_FR   LTR
+Italiano (Italian)              it_IT   LTR
+Norsk (Norwegian)               no_NO   LTR
+Svenska (Swedish)               sv_SE   LTR
+Korean				ko_KR	LTR
+Polski (Polish)                 pl_PL   LTR
+Portugues (Brazil Portuguese)	pl_PL   LTR
+Tieng Viet (Vietnamese)		vi_VN	LTR
+Chinese (Taiwan)                zh_TW   LTR
+Arabic (Jordan)			ar_JO	RTL
+Greek				el_GR	LTR
 
 
-4. Production Server Configuration
+4. Setting up MySql on a Different Server
+=========================================
+
+If you wish to use a separate server for your MySql database, there are a few
+steps to follow.
+
+Firstly, you need to create the database and user on the MySql server. For 
+this example we will use the MySql host IP "111.111.111.11", the database 
+name "lams", the database user "user" and the password "pass". These 
+correspond to the MYSQL_HOST, DB_NAME, DB_USER and DB_PASS fields in 
+lams.properties, you should change them to match your own.
+
+Start the MySql command line on your MySql server and type the following:
+mysql> SET FOREIGN_KEY_CHECKS=0;
+mysql> DROP DATABASE IF EXISTS lams;
+mysql> CREATE DATABASE lams DEFAULT CHARACTER SET utf8;
+mysql> SET FOREIGN_KEY_CHECKS=1;
+mysql> GRANT ALL PRIVILEGES ON *.* TO user@111.111.111.11 IDENTIFIED BY 'pass';
+mysql> REVOKE PROCESS,SUPER ON *.* from user@111.111.111.11;
+
+Finally, you have to grant remote permission to this user. Still in Mysql 
+command line, type the following:
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'user'@'%' IDENTIFIED BY 'pass';
+
+This user now has remote access to the database, you can continue with the 
+installation.
+
+For more help on setting up MySql on a separate server, go to:
+http://wiki.lamsfoundation.org/display/lamsdocs/Moving+MySQL+to+another+Server
+
+
+5. Production Server Configuration
 ============================
 
 For single user installations, (i.e. personal use on your desktop), please
@@ -127,7 +159,7 @@ More information can be found at:
 http://wiki.lamsfoundation.org/display/lamsdocs/Production+Server+Settings 
 
 
-5. Startup and Shutdown
+6. Startup and Shutdown
 =======================
 
 To start LAMS 2.0 go to (jboss directory)/bin and type:
@@ -150,7 +182,6 @@ Or type the following on Macintosh
 If you aren't sure which version of 'ps' to use, try the '-ef' version and if
 that gives and error 'ps: illegal option --f" then try the -A version.
 
-
 If you can see the LAMS 2.0 process still running, type:
 > sudo kill (pid) 
 Where pid is the process id listed next to the LAMS 2.0 process
@@ -159,7 +190,7 @@ Be careful to type the correct (pid). If you type the wrong number, you will
 stop another process on your server, and as you are using sudo you could stop 
 an important process!
 
-6. Using the Java Service Wrapper
+7. Using the Java Service Wrapper
 ================================
 
 If the wrapper installed correctly, LAMS will start automatically when you 
@@ -176,10 +207,11 @@ directory and using these commands.
 > sudo ./lams2 dump 	(send a kill -3 signal to the wrapper causing the 
 			JVM to do a full thread dump)
 
-For more information about using the Jave Service Wrapper with LAMS, go to
+For more information about using the Java Service Wrapper with LAMS, go to
 wiki.lamsfoundation.org/display/lamsdocs/Setup+Java+Service+Wrapper+for+LAMS
 
-7. Backing up LAMS
+
+8. Backing up LAMS
 ================== 
 
 To backup your LAMS installation manually, simply follow the following steps
@@ -198,7 +230,7 @@ backup directory
 <sqldir>/mysqldump -u<dbuser> -p<dbpassword> <dbname> > <backupdir>/lams.dump
 
 
-8. Web Resources
+9. Web Resources
 ================
 
 Unix Installer help wiki
@@ -224,3 +256,4 @@ LAMS 2.0 bug tracker
 LAMS Foundation					
 	
 	http://www.lamsfoundation.org
+

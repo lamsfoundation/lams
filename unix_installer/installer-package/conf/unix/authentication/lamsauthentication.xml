@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Authentication PUBLIC "-//LAMS//DTD LAMS//EN" "http://lamsfoundation.org/dtd/lamsauthentication.dtd">
+<!DOCTYPE Authentication PUBLIC "-//LAMS//DTD LAMS//EN" "file:///@confdir@/lamsauthentication.dtd">
 
 <Authentication>
 
 <Method Name="MQ-LDAP" Enabled="true">
 	<Param Name="java.naming.factory.initial">com.sun.jndi.ldap.LdapCtxFactory</Param>
-	<Param Name="java.naming.provider.url">ldap://mams.melcoe.mq.edu.au:636</Param>
+	<Param Name="java.naming.provider.url">ldap://192.168.111.35</Param>
 	<Param Name="java.naming.security.authentication">simple</Param>
-	<Param Name="java.naming.security.protocol">ssl</Param>
-	<Param Name="principalDNPrefix">uid=</Param>
-	<Param Name="principalDNSuffix">,ou=mams,dc=melcoe,dc=mq,dc=edu,dc=au</Param>
-	<Param Name="dsJndiName">java:/MySqlDS</Param>
+	<Param Name="principalDNPrefix">cn=</Param>
+	<Param Name="principalDNSuffix">,dc=melcoe,dc=local</Param>
+	<Param Name="dsJndiName">java:/jdbc/lams-ds</Param>
 	<Param Name="principalsQuery">select password from lams_user where login=?</Param>
-	<Param Name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</Param>
+	<Param Name="rolesQuery">
+             	SELECT DISTINCT  r.name,'Roles' FROM
+             	lams_user u LEFT OUTER JOIN lams_user_organisation uo USING(user_id)
+             	LEFT OUTER JOIN lams_user_organisation_role urr USING(user_organisation_id)
+             	LEFT OUTER JOIN lams_role r USING (role_id)
+             	WHERE u.login=?
+	</Param>
+	<!-- Uncomment the following if connecting using SSL
+	<Param Name="java.naming.security.protocol">ssl</Param>
 	<Param Name="truststore.path">D:/MQLdapTrustStore</Param>
 	<Param Name="truststore.password">webauth</Param>
+	-->
 </Method>
 
 

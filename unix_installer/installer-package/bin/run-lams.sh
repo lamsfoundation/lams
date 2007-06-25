@@ -26,7 +26,7 @@ export JAVA_OPTS="-server -Xms256m -Xmx512m -XX:MaxPermSize=256m"
 echo " "
 echo "LAMS will take a few minutes to startup..."
 echo " "
-echo "Check server/defalt/log/boot.log and server/defalt/log/server.log to see if LAMS has started correctly. The server.log will contain a line similar to 'JBoss (MX MicroKernel) [4.0.2 (build: CVSTag=JBoss_4_0_2 date=200505022023)] Started in 1m:6s:987ms' when LAMS has finished loading."
+echo "Check server/default/log/boot.log and server/default/log/server.log to see if LAMS has started correctly. The server.log will contain a line similar to 'JBoss (MX MicroKernel) [4.0.2 (build: CVSTag=JBoss_4_0_2 date=200505022023)] Started in 1m:6s:987ms' when LAMS has finished loading."
 echo " "
 nohup ./run.sh > /dev/null &
 

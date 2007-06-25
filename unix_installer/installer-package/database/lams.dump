@@ -1,6 +1,6 @@
 -- MySQL dump 10.10
 --
--- Host: localhost    D
+-- Host: localhost    Database: lams
 -- ------------------------------------------------------
 -- Server version	5.0.24a-Debian_9ubuntu0.1-log
 
@@ -14,6 +14,14 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Current Database: `lams`
+--
+
+--CREATE DATABASE /*!32312 IF NOT EXISTS*/ `lams` /*!40100 DEFAULT CHARACTER SET utf8 */;
+
+--USE `lams`;
 
 --
 -- Table structure for table `lams_activity_category`
@@ -127,7 +135,7 @@ CREATE TABLE `lams_configuration` (
 
 /*!40000 ALTER TABLE `lams_configuration` DISABLE KEYS */;
 LOCK TABLES `lams_configuration` WRITE;
-INSERT INTO `lams_configuration` VALUES ('ServerURL','http://137.111.246.57:8080/lams/'),('Version','2.0.2'),('TempDir','/var/opt/lams/temp'),('DumpDir','/var/opt/lams/dump'),('EARDir','/usr/local/jboss-4.0.2/server/default/deploy/lams.ear'),('SMTPServer',''),('LamsSupportEmail','lams_support@melcoe.mq.edu.au'),('ContentRepositoryPath','/var/opt/lams/repository'),('UploadFileMaxSize','1048576'),('UploadLargeFileMaxSize','10485760'),('UploadFileMaxMemorySize','4096'),('ExecutableExtensions','.bat,.bin,.com,.cmd,.exe,.msi,.msp,.ocx,.pif,.scr,.sct,.sh,.shs,.vbs'),('UserInactiveTimeout','86400'),('UseCacheDebugListener','false'),('CleanupPreviewOlderThanDays','7'),('AuthoringActivitiesColour','true'),('AuthoringClientVersion','2.0.2.200705030401'),('MonitorClientVersion','2.0.2.200705030401'),('LearnerClientVersion','2.0.2.200705030401'),('ServerVersionNumber','2.0.2.200705030401'),('ServerLanguage','en_AU'),('ServerPageDirection','LTR'),('DictionaryDateCreated','2007-03-19'),('HelpURL','http://wiki.lamsfoundation.org/display/lamsdocs/'),('XmppDomain','shaun.melcoe.mq.edu.au'),('XmppConference','conference.shaun.melcoe.mq.edu.au'),('XmppAdmin','admin'),('XmppPassword','wildfire'),('DefaultFlashTheme','default'),('DefaultHTMLTheme','defaultHTML'),('AllowDirectLessonLaunch','false'),('LAMS_Community_enable','false');
+INSERT INTO `lams_configuration` VALUES ('ServerURL','http://shaun.melcoe.mq.edu.au/lams/'),('ServerURLContextPath','lams/'),('Version','2.0.4'),('TempDir','/var/opt/lams/temp'),('DumpDir','/var/opt/lams/dump'),('EARDir','/usr/local/jboss-4.0.2/server/default/deploy/lams.ear'),('SMTPServer',''),('LamsSupportEmail','lams_support@melcoe.mq.edu.au'),('ContentRepositoryPath','/var/opt/lams/repository'),('UploadFileMaxSize','1048576'),('UploadLargeFileMaxSize','10485760'),('UploadFileMaxMemorySize','4096'),('ExecutableExtensions','.bat,.bin,.com,.cmd,.exe,.msi,.msp,.ocx,.pif,.scr,.sct,.sh,.shs,.vbs'),('UserInactiveTimeout','86400'),('UseCacheDebugListener','false'),('CleanupPreviewOlderThanDays','7'),('AuthoringActivitiesColour','true'),('AuthoringClientVersion','2.0.4.200706211047'),('MonitorClientVersion','2.0.4.200706211047'),('LearnerClientVersion','2.0.4.200706211047'),('ServerVersionNumber','2.0.4.200706211047'),('ServerLanguage','en_AU'),('ServerPageDirection','LTR'),('DictionaryDateCreated','2007-06-01'),('HelpURL','http://wiki.lamsfoundation.org/display/lamsdocs/'),('XmppDomain','shaun.melcoe.mq.edu.au'),('XmppConference','conference.shaun.melcoe.mq.edu.au'),('XmppAdmin','admin'),('XmppPassword','wildfire'),('DefaultFlashTheme','default'),('DefaultHTMLTheme','defaultHTML'),('AllowDirectLessonLaunch','false'),('LAMS_Community_enable','false'),('AllowLiveEdit','true');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `lams_configuration` ENABLE KEYS */;
 
@@ -374,7 +382,7 @@ CREATE TABLE `lams_css_theme_ve` (
 
 /*!40000 ALTER TABLE `lams_css_theme_ve` DISABLE KEYS */;
 LOCK TABLES `lams_css_theme_ve` WRITE;
-INSERT INTO `lams_css_theme_ve` VALUES (1,'default','Default Flash style',NULL,1,NULL),(2,'defaultHTML','Default HTML style',NULL,1,'css');
+INSERT INTO `lams_css_theme_ve` VALUES (1,'default','Default Flash style',NULL,1,NULL),(2,'defaultHTML','Default HTML style',NULL,1,'css'),(3,'rams','RAMS Default Flash style',NULL,1,NULL),(4,'ramsthemeHTML','RAMS Default HTML sty;e',NULL,1,'ramsthemecss');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `lams_css_theme_ve` ENABLE KEYS */;
 
@@ -595,7 +603,7 @@ CREATE TABLE `lams_learner_progress` (
   `user_id` bigint(20) NOT NULL,
   `lesson_id` bigint(20) NOT NULL,
   `lesson_completed_flag` tinyint(1) NOT NULL default '0',
-  `waiting_flag` tinyint(1) NOT NULL,
+  `waiting_flag` tinyint(4) NOT NULL,
   `start_date_time` datetime NOT NULL,
   `finish_date_time` datetime default NULL,
   `current_activity_id` bigint(20) default NULL,
@@ -670,6 +678,8 @@ CREATE TABLE `lams_learning_activity` (
   `library_activity_id` bigint(20) default NULL,
   `language_file` varchar(255) default NULL,
   `system_tool_id` bigint(20) default NULL,
+  `read_only` tinyint(4) default '0',
+  `initialised` tinyint(4) default '0',
   PRIMARY KEY  (`activity_id`),
   KEY `learning_library_id` (`learning_library_id`),
   KEY `learning_design_id` (`learning_design_id`),
@@ -704,7 +714,7 @@ CREATE TABLE `lams_learning_activity` (
 
 /*!40000 ALTER TABLE `lams_learning_activity` DISABLE KEYS */;
 LOCK TABLES `lams_learning_activity` WRITE;
-INSERT INTO `lams_learning_activity` VALUES (1,NULL,'Forum/Message Board','Forum','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,1,'2007-05-03 04:01:43',0,NULL,NULL,NULL,1,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lafrum11/images/icon_forum.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.forum.ApplicationResources',NULL),(2,NULL,'Displays a NoticeboardX','NoticeboardX','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,2,'2007-05-03 04:01:50',0,NULL,NULL,NULL,2,NULL,4,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lanb11/images/icon_htmlnb.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.noticeboard.ApplicationResources',NULL),(3,NULL,'Allows creation and use of question and answer format','Question and Answer','Help text',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,3,'2007-05-03 04:01:55',0,NULL,NULL,NULL,3,NULL,6,NULL,NULL,NULL,NULL,NULL,NULL,'tool/laqa11/images/icon_questionanswer.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.qa.ApplicationResources',NULL),(4,NULL,'Uploading of files by learners, for review by teachers.','Submit File','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,4,'2007-05-03 04:02:01',0,NULL,NULL,NULL,4,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lasbmt11/images/icon_reportsubmission.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.sbmt.ApplicationResources',NULL),(5,NULL,'Chat Tool','Chat Tool','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,5,'2007-05-03 04:02:12',0,NULL,NULL,NULL,5,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lachat11/images/icon_chat.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.chat.ApplicationResources',NULL),(6,NULL,'Share Resources','Share Resources','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,6,'2007-05-03 04:02:23',0,NULL,NULL,NULL,6,NULL,4,NULL,NULL,NULL,NULL,NULL,NULL,'tool/larsrc11/images/icon_rsrc.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.rsrc.ApplicationResources',NULL),(7,NULL,'Allows creation and use of voting format','Voting','Help text',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,7,'2007-05-03 04:02:29',0,NULL,NULL,NULL,7,NULL,6,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lavote11/images/icon_ranking.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.vote.ApplicationResources',NULL),(8,NULL,'Notebook Tool','Notebook Tool','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,8,'2007-05-03 04:02:38',0,NULL,NULL,NULL,8,NULL,6,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lantbk11/images/icon_notebook.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.notebook.ApplicationResources',NULL),(9,NULL,'Survey','Survey','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,9,'2007-05-03 04:02:49',0,NULL,NULL,NULL,9,NULL,6,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lasurv11/images/icon_survey.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.survey.ApplicationResources',NULL),(10,NULL,'Scribe Tool','Scribe Tool','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,10,'2007-05-03 04:02:59',0,NULL,NULL,NULL,10,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lascrb11/images/icon_scribe.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.scribe.ApplicationResources',NULL),(11,NULL,'Allows creation and use of multiple choice questioning format','Multiple Choice Questions','Help text',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,11,'2007-05-03 04:03:05',0,NULL,NULL,NULL,11,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lamc11/images/icon_mcq.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.mc.ApplicationResources',NULL),(12,NULL,'Combined Share Resources and Forum','Discuss Shared Resources','Learners to discuss items they have viewed via Share Resources.',NULL,NULL,NULL,NULL,6,2,0,NULL,NULL,NULL,0,NULL,12,'2007-05-03 04:03:07',0,NULL,NULL,NULL,NULL,NULL,5,NULL,NULL,NULL,NULL,NULL,NULL,'images/icon_urlcontentmessageboard.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.library.llid12.ApplicationResources',NULL),(13,NULL,'Share Resources','Share Resources','Share Resources',NULL,NULL,12,NULL,1,2,0,NULL,NULL,NULL,0,NULL,NULL,'2007-05-03 04:03:07',0,NULL,NULL,NULL,6,NULL,4,NULL,NULL,NULL,NULL,NULL,NULL,'tool/larsrc11/images/icon_rsrc.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.rsrc.ApplicationResources',NULL),(14,NULL,'Forum/Message Board','Forum','Forum/Message Board',NULL,NULL,12,NULL,1,2,0,NULL,NULL,NULL,0,NULL,NULL,'2007-05-03 04:03:07',0,NULL,NULL,NULL,1,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lafrum11/images/icon_forum.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.forum.ApplicationResources',NULL),(15,NULL,'Combined Chat and Scribe','Prepare Group Report','Learners to prepare group report, discussing report in chat',NULL,NULL,NULL,NULL,6,2,0,NULL,NULL,NULL,0,NULL,13,'2007-05-03 04:03:08',0,NULL,NULL,NULL,NULL,NULL,5,NULL,NULL,NULL,NULL,NULL,NULL,'images/icon_groupreporting.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.library.llid13.ApplicationResources',NULL),(16,NULL,'Chat Tool','Chat Tool','Chat',NULL,NULL,15,NULL,1,2,0,NULL,NULL,NULL,0,NULL,NULL,'2007-05-03 04:03:08',0,NULL,NULL,NULL,5,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lachat11/images/icon_chat.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.chat.ApplicationResources',NULL),(17,NULL,'Scribe Tool','Scribe Tool','Scribe',NULL,NULL,15,NULL,1,2,0,NULL,NULL,NULL,0,NULL,NULL,'2007-05-03 04:03:08',0,NULL,NULL,NULL,10,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lascrb11/images/icon_scribe.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.scribe.ApplicationResources',NULL),(18,NULL,'Combined Chat and Scribe','Prepare Group Report','Learners to prepare group report, discussing report in chat',NULL,NULL,NULL,NULL,6,2,0,NULL,NULL,NULL,0,NULL,14,'2007-05-03 04:03:10',0,NULL,NULL,NULL,NULL,NULL,5,NULL,NULL,NULL,NULL,NULL,NULL,'images/icon_forum_and_scribe.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.library.llid14.ApplicationResources',NULL),(19,NULL,'Forum/Message Board','Forum','Forum/Message Board',NULL,NULL,18,NULL,1,2,0,NULL,NULL,NULL,0,NULL,NULL,'2007-05-03 04:03:10',0,NULL,NULL,NULL,1,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lafrum11/images/icon_forum.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.forum.ApplicationResources',NULL),(20,NULL,'Scribe Tool','Scribe Tool','Scribe',NULL,NULL,18,NULL,1,2,0,NULL,NULL,NULL,0,NULL,NULL,'2007-05-03 04:03:10',0,NULL,NULL,NULL,10,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lascrb11/images/icon_scribe.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.scribe.ApplicationResources',NULL);
+INSERT INTO `lams_learning_activity` VALUES (1,NULL,'Forum/Message Board','Forum','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,1,'2007-06-04 14:44:58',0,NULL,NULL,NULL,1,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lafrum11/images/icon_forum.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.forum.ApplicationResources',NULL,0,0),(2,NULL,'Displays a NoticeboardX','NoticeboardX','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,2,'2007-06-04 14:45:09',0,NULL,NULL,NULL,2,NULL,4,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lanb11/images/icon_htmlnb.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.noticeboard.ApplicationResources',NULL,0,0),(3,NULL,'Allows creation and use of question and answer format','Question and Answer','Help text',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,3,'2007-06-04 14:45:14',0,NULL,NULL,NULL,3,NULL,6,NULL,NULL,NULL,NULL,NULL,NULL,'tool/laqa11/images/icon_questionanswer.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.qa.ApplicationResources',NULL,0,0),(4,NULL,'Uploading of files by learners, for review by teachers.','Submit File','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,4,'2007-06-04 14:45:21',0,NULL,NULL,NULL,4,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lasbmt11/images/icon_reportsubmission.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.sbmt.ApplicationResources',NULL,0,0),(5,NULL,'Chat Tool','Chat Tool','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,5,'2007-06-04 14:45:31',0,NULL,NULL,NULL,5,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lachat11/images/icon_chat.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.chat.ApplicationResources',NULL,0,0),(6,NULL,'Share Resources','Share Resources','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,6,'2007-06-04 14:45:42',0,NULL,NULL,NULL,6,NULL,4,NULL,NULL,NULL,NULL,NULL,NULL,'tool/larsrc11/images/icon_rsrc.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.rsrc.ApplicationResources',NULL,0,0),(7,NULL,'Allows creation and use of voting format','Voting','Help text',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,7,'2007-06-04 14:45:48',0,NULL,NULL,NULL,7,NULL,6,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lavote11/images/icon_ranking.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.vote.ApplicationResources',NULL,0,0),(8,NULL,'Notebook Tool','Notebook Tool','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,8,'2007-06-04 14:45:57',0,NULL,NULL,NULL,8,NULL,6,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lantbk11/images/icon_notebook.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.notebook.ApplicationResources',NULL,0,0),(9,NULL,'Survey','Survey','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,9,'2007-06-04 14:46:08',0,NULL,NULL,NULL,9,NULL,6,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lasurv11/images/icon_survey.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.survey.ApplicationResources',NULL,0,0),(10,NULL,'Scribe Tool','Scribe Tool','Put some help text here.',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,10,'2007-06-04 14:46:19',0,NULL,NULL,NULL,10,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lascrb11/images/icon_scribe.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.scribe.ApplicationResources',NULL,0,0),(11,NULL,'Allows creation and use of multiple choice questioning format','Multiple Choice Questions','Help text',NULL,NULL,NULL,NULL,1,2,0,NULL,NULL,NULL,0,NULL,11,'2007-06-04 14:46:24',0,NULL,NULL,NULL,11,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lamc11/images/icon_mcq.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.mc.ApplicationResources',NULL,0,0),(12,NULL,'Combined Share Resources and Forum','Discuss Shared Resources','Learners to discuss items they have viewed via Share Resources.',NULL,NULL,NULL,NULL,6,2,0,NULL,NULL,NULL,0,NULL,12,'2007-06-04 14:46:26',0,NULL,NULL,NULL,NULL,NULL,5,NULL,NULL,NULL,NULL,NULL,NULL,'images/icon_urlcontentmessageboard.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.library.llid12.ApplicationResources',NULL,0,0),(13,NULL,'Share Resources','Share Resources','Share Resources',NULL,NULL,12,NULL,1,2,0,NULL,NULL,NULL,0,NULL,NULL,'2007-06-04 14:46:26',0,NULL,NULL,NULL,6,NULL,4,NULL,NULL,NULL,NULL,NULL,NULL,'tool/larsrc11/images/icon_rsrc.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.rsrc.ApplicationResources',NULL,0,0),(14,NULL,'Forum/Message Board','Forum','Forum/Message Board',NULL,NULL,12,NULL,1,2,0,NULL,NULL,NULL,0,NULL,NULL,'2007-06-04 14:46:26',0,NULL,NULL,NULL,1,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lafrum11/images/icon_forum.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.forum.ApplicationResources',NULL,0,0),(15,NULL,'Combined Chat and Scribe','Prepare Group Report','Learners to prepare group report, discussing report in chat',NULL,NULL,NULL,NULL,6,2,0,NULL,NULL,NULL,0,NULL,13,'2007-06-04 14:46:28',0,NULL,NULL,NULL,NULL,NULL,5,NULL,NULL,NULL,NULL,NULL,NULL,'images/icon_groupreporting.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.library.llid13.ApplicationResources',NULL,0,0),(16,NULL,'Chat Tool','Chat Tool','Chat',NULL,NULL,15,NULL,1,2,0,NULL,NULL,NULL,0,NULL,NULL,'2007-06-04 14:46:28',0,NULL,NULL,NULL,5,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lachat11/images/icon_chat.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.chat.ApplicationResources',NULL,0,0),(17,NULL,'Scribe Tool','Scribe Tool','Scribe',NULL,NULL,15,NULL,1,2,0,NULL,NULL,NULL,0,NULL,NULL,'2007-06-04 14:46:28',0,NULL,NULL,NULL,10,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lascrb11/images/icon_scribe.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.scribe.ApplicationResources',NULL,0,0),(18,NULL,'Combined Chat and Scribe','Prepare Group Report','Learners to prepare group report, discussing report in chat',NULL,NULL,NULL,NULL,6,2,0,NULL,NULL,NULL,0,NULL,14,'2007-06-04 14:46:29',0,NULL,NULL,NULL,NULL,NULL,5,NULL,NULL,NULL,NULL,NULL,NULL,'images/icon_forum_and_scribe.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.library.llid14.ApplicationResources',NULL,0,0),(19,NULL,'Forum/Message Board','Forum','Forum/Message Board',NULL,NULL,18,NULL,1,2,0,NULL,NULL,NULL,0,NULL,NULL,'2007-06-04 14:46:29',0,NULL,NULL,NULL,1,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lafrum11/images/icon_forum.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.forum.ApplicationResources',NULL,0,0),(20,NULL,'Scribe Tool','Scribe Tool','Scribe',NULL,NULL,18,NULL,1,2,0,NULL,NULL,NULL,0,NULL,NULL,'2007-06-04 14:46:29',0,NULL,NULL,NULL,10,NULL,2,NULL,NULL,NULL,NULL,NULL,NULL,'tool/lascrb11/images/icon_scribe.swf',NULL,NULL,NULL,'org.lamsfoundation.lams.tool.scribe.ApplicationResources',NULL,0,0);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `lams_learning_activity` ENABLE KEYS */;
 
@@ -726,7 +736,7 @@ CREATE TABLE `lams_learning_activity_type` (
 
 /*!40000 ALTER TABLE `lams_learning_activity_type` DISABLE KEYS */;
 LOCK TABLES `lams_learning_activity_type` WRITE;
-INSERT INTO `lams_learning_activity_type` VALUES (1,'TOOL'),(2,'GROUPING'),(3,'GATE_SYNCH'),(4,'GATE_SCHEDULE'),(5,'GATE_PERMISSION'),(6,'PARALLEL'),(7,'OPTIONS'),(8,'SEQUENCE');
+INSERT INTO `lams_learning_activity_type` VALUES (1,'TOOL'),(2,'GROUPING'),(3,'GATE_SYNCH'),(4,'GATE_SCHEDULE'),(5,'GATE_PERMISSION'),(6,'PARALLEL'),(7,'OPTIONS'),(8,'SEQUENCE'),(9,'GATE_SYSTEM');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `lams_learning_activity_type` ENABLE KEYS */;
 
@@ -759,17 +769,22 @@ CREATE TABLE `lams_learning_design` (
   `license_text` text,
   `last_modified_date_time` datetime default NULL,
   `content_folder_id` varchar(32) default NULL,
+  `edit_override_lock` tinyint(4) default '0',
+  `edit_override_user_id` bigint(20) default NULL,
+  `design_version` int(11) default '1',
   PRIMARY KEY  (`learning_design_id`),
   KEY `user_id` (`user_id`),
   KEY `workspace_folder_id` (`workspace_folder_id`),
   KEY `license_id` (`license_id`),
   KEY `copy_type_id` (`copy_type_id`),
+  KEY `edit_override_user_id` (`edit_override_user_id`),
   KEY `idx_design_parent_id` (`original_learning_design_id`),
   KEY `idx_design_first_act` (`first_activity_id`),
   CONSTRAINT `FK_lams_learning_design_3` FOREIGN KEY (`user_id`) REFERENCES `lams_user` (`user_id`),
   CONSTRAINT `FK_lams_learning_design_4` FOREIGN KEY (`workspace_folder_id`) REFERENCES `lams_workspace_folder` (`workspace_folder_id`),
   CONSTRAINT `FK_lams_learning_design_5` FOREIGN KEY (`license_id`) REFERENCES `lams_license` (`license_id`),
-  CONSTRAINT `FK_lams_learning_design_6` FOREIGN KEY (`copy_type_id`) REFERENCES `lams_copy_type` (`copy_type_id`)
+  CONSTRAINT `FK_lams_learning_design_6` FOREIGN KEY (`copy_type_id`) REFERENCES `lams_copy_type` (`copy_type_id`),
+  CONSTRAINT `FK_lams_learning_design_7` FOREIGN KEY (`edit_override_user_id`) REFERENCES `lams_user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -803,7 +818,7 @@ CREATE TABLE `lams_learning_library` (
 
 /*!40000 ALTER TABLE `lams_learning_library` DISABLE KEYS */;
 LOCK TABLES `lams_learning_library` WRITE;
-INSERT INTO `lams_learning_library` VALUES (1,'Forum, also known Message Board','Forum',1,'2007-05-03 04:01:43'),(2,'Displays a Noticeboard','Noticeboard',1,'2007-05-03 04:01:50'),(3,'Question and Answer Learning Library Description','Question and Answer',1,'2007-05-03 04:01:55'),(4,'Uploading of files by learners, for review by teachers.','Submit file',1,'2007-05-03 04:02:01'),(5,'Chat Tool','Chat',1,'2007-05-03 04:02:12'),(6,'Share resources','Share resources',1,'2007-05-03 04:02:23'),(7,'Voting Learning Library Description','Voting',1,'2007-05-03 04:02:29'),(8,'Notebook Tool','Notebook',1,'2007-05-03 04:02:38'),(9,'Survey','Survey',1,'2007-05-03 04:02:49'),(10,'Scribe Tool','Scribe',0,'2007-05-03 04:02:59'),(11,'MCQ Learning Library Description','MCQ',1,'2007-05-03 04:03:04'),(12,'Shared Resources and Forum','Resources and Forum',1,'2007-05-03 04:03:07'),(13,'Chat and Scribe','Chat and Scribe',1,'2007-05-03 04:03:08'),(14,'Forum and Scribe','Forum and Scribe',1,'2007-05-03 04:03:10');
+INSERT INTO `lams_learning_library` VALUES (1,'Forum, also known Message Board','Forum',1,'2007-06-04 14:44:58'),(2,'Displays a Noticeboard','Noticeboard',1,'2007-06-04 14:45:09'),(3,'Question and Answer Learning Library Description','Question and Answer',1,'2007-06-04 14:45:14'),(4,'Uploading of files by learners, for review by teachers.','Submit file',1,'2007-06-04 14:45:21'),(5,'Chat Tool','Chat',1,'2007-06-04 14:45:31'),(6,'Share resources','Share resources',1,'2007-06-04 14:45:42'),(7,'Voting Learning Library Description','Voting',1,'2007-06-04 14:45:48'),(8,'Notebook Tool','Notebook',1,'2007-06-04 14:45:57'),(9,'Survey','Survey',1,'2007-06-04 14:46:08'),(10,'Scribe Tool','Scribe',0,'2007-06-04 14:46:19'),(11,'MCQ Learning Library Description','MCQ',1,'2007-06-04 14:46:24'),(12,'Shared Resources and Forum','Resources and Forum',1,'2007-06-04 14:46:26'),(13,'Chat and Scribe','Chat and Scribe',1,'2007-06-04 14:46:28'),(14,'Forum and Scribe','Forum and Scribe',1,'2007-06-04 14:46:29');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `lams_learning_library` ENABLE KEYS */;
 
@@ -824,6 +839,7 @@ CREATE TABLE `lams_learning_transition` (
   `to_ui_id` int(11) default NULL,
   `from_ui_id` int(11) default NULL,
   PRIMARY KEY  (`transition_id`),
+  UNIQUE KEY `UQ_transition_activities` (`from_activity_id`,`to_activity_id`),
   KEY `from_activity_id` (`from_activity_id`),
   KEY `to_activity_id` (`to_activity_id`),
   KEY `learning_design_id` (`learning_design_id`),
@@ -862,7 +878,9 @@ CREATE TABLE `lams_lesson` (
   `end_date_time` datetime default NULL,
   `schedule_end_date_time` datetime default NULL,
   `previous_state_id` int(3) default NULL,
-  `learner_exportport_avail` tinyint(1) default NULL,
+  `learner_exportport_avail` tinyint(1) default '1',
+  `locked_for_edit` tinyint(4) default '0',
+  `version` int(11) default '1',
   PRIMARY KEY  (`lesson_id`),
   KEY `learning_design_id` (`learning_design_id`),
   KEY `user_id` (`user_id`),
@@ -1075,7 +1093,7 @@ CREATE TABLE `lams_organisation` (
 
 /*!40000 ALTER TABLE `lams_organisation` DISABLE KEYS */;
 LOCK TABLES `lams_organisation` WRITE;
-INSERT INTO `lams_organisation` VALUES (1,'Root',NULL,'Root Organisation',NULL,1,'2007-05-03 04:01:31',1,1,1,0,0,0,0,1,NULL),(2,'Playpen','PP101','Developers Playpen',1,2,'2007-05-03 04:01:31',1,2,1,0,0,0,0,1,NULL),(3,'Everybody',NULL,'All People In Course',2,3,'2007-05-03 04:01:31',1,NULL,1,0,0,0,0,1,NULL),(4,'Mathematics 1','MATH111','Mathematics 1',1,2,'2007-05-03 04:01:31',1,3,1,0,0,0,0,2,NULL),(5,'Tutorial Group A','TUTA','Tutorial Group A',4,3,'2007-05-03 04:01:31',1,NULL,1,0,0,0,0,2,NULL),(6,'Tutorial Group B','TUTB','Tutorial Group B',4,3,'2007-05-03 04:01:31',1,NULL,1,0,0,0,0,2,NULL),(7,'Moodle','Moodle','Moodle Test',1,2,'2007-05-03 04:01:31',1,50,2,0,0,0,0,1,NULL);
+INSERT INTO `lams_organisation` VALUES (1,'Root',NULL,'Root Organisation',NULL,1,'2007-06-04 14:44:48',1,1,1,0,0,0,0,1,NULL),(2,'Playpen','PP101','Developers Playpen',1,2,'2007-06-04 14:44:48',1,2,1,0,0,0,0,1,NULL),(3,'Everybody',NULL,'All People In Course',2,3,'2007-06-04 14:44:48',1,NULL,1,0,0,0,0,1,NULL),(4,'Mathematics 1','MATH111','Mathematics 1',1,2,'2007-06-04 14:44:48',1,3,1,0,0,0,0,2,NULL),(5,'Tutorial Group A','TUTA','Tutorial Group A',4,3,'2007-06-04 14:44:48',1,NULL,1,0,0,0,0,2,NULL),(6,'Tutorial Group B','TUTB','Tutorial Group B',4,3,'2007-06-04 14:44:48',1,NULL,1,0,0,0,0,2,NULL),(7,'Moodle','Moodle','Moodle Test',1,2,'2007-06-04 14:44:48',1,50,2,0,0,0,0,1,NULL);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `lams_organisation` ENABLE KEYS */;
 
@@ -1511,7 +1529,7 @@ CREATE TABLE `lams_role` (
 
 /*!40000 ALTER TABLE `lams_role` DISABLE KEYS */;
 LOCK TABLES `lams_role` WRITE;
-INSERT INTO `lams_role` VALUES (1,'SYSADMIN','LAMS System Adminstrator','2007-05-03 04:01:31'),(2,'GROUP MANAGER','Group Manager','2007-05-03 04:01:31'),(3,'AUTHOR','Authors Learning Designs','2007-05-03 04:01:31'),(4,'MONITOR','Member of Staff','2007-05-03 04:01:31'),(5,'LEARNER','Student','2007-05-03 04:01:31'),(6,'GROUP ADMIN','Group Administrator','2007-05-03 04:01:31'),(7,'AUTHOR ADMIN','Author Administrator','2007-05-03 04:01:31');
+INSERT INTO `lams_role` VALUES (1,'SYSADMIN','LAMS System Adminstrator','2007-06-04 14:44:48'),(2,'GROUP MANAGER','Group Manager','2007-06-04 14:44:48'),(3,'AUTHOR','Authors Learning Designs','2007-06-04 14:44:48'),(4,'MONITOR','Member of Staff','2007-06-04 14:44:48'),(5,'LEARNER','Student','2007-06-04 14:44:48'),(6,'GROUP ADMIN','Group Administrator','2007-06-04 14:44:48'),(7,'AUTHOR ADMIN','Author Administrator','2007-06-04 14:44:48');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `lams_role` ENABLE KEYS */;
 
@@ -1599,7 +1617,7 @@ CREATE TABLE `lams_system_tool` (
 
 /*!40000 ALTER TABLE `lams_system_tool` DISABLE KEYS */;
 LOCK TABLES `lams_system_tool` WRITE;
-INSERT INTO `lams_system_tool` VALUES (1,2,'Grouping','All types of grouping including random and chosen.','learning/grouping.do?method=performGrouping','learning/grouping.do?method=performGrouping','learning/grouping.do?method=viewGrouping&mode=teacher','learning/groupingExportPortfolio?mode=learner','learning/groupingExportPortfolio?mode=teacher','monitoring/grouping.do?method=startGrouping','monitoring/grouping.do?method=startGrouping',NULL,'2007-05-03 04:01:31'),(2,3,'Sync Gate','Gate: Synchronise Learners.','learning/gate.do?method=knockGate','learning/gate.do?method=knockGate',NULL,NULL,'monitoring/gateExportPortfolio?mode=teacher','monitoring/gate.do?method=viewGate','monitoring/gate.do?method=viewGate',NULL,'2007-05-03 04:01:31'),(3,4,'Schedule Gate','Gate: Opens/shuts at particular times.','learning/gate.do?method=knockGate','learning/gate.do?method=knockGate',NULL,NULL,'monitoring/gateExportPortfolio?mode=teacher','monitoring/gate.do?method=viewGate','monitoring/gate.do?method=viewGate',NULL,'2007-05-03 04:01:31'),(4,5,'Permission Gate','Gate: Opens under teacher or staff control.','learning/gate.do?method=knockGate','learning/gate.do?method=knockGate',NULL,NULL,'monitoring/gateExportPortfolio?mode=teacher','monitoring/gate.do?method=viewGate','monitoring/gate.do?method=viewGate',NULL,'2007-05-03 04:01:31');
+INSERT INTO `lams_system_tool` VALUES (1,2,'Grouping','All types of grouping including random and chosen.','learning/grouping.do?method=performGrouping','learning/grouping.do?method=performGrouping','learning/grouping.do?method=viewGrouping&mode=teacher','learning/groupingExportPortfolio?mode=learner','learning/groupingExportPortfolio?mode=teacher','monitoring/grouping.do?method=startGrouping','monitoring/grouping.do?method=startGrouping',NULL,'2007-06-04 14:44:48'),(2,3,'Sync Gate','Gate: Synchronise Learners.','learning/gate.do?method=knockGate','learning/gate.do?method=knockGate',NULL,NULL,'monitoring/gateExportPortfolio?mode=teacher','monitoring/gate.do?method=viewGate','monitoring/gate.do?method=viewGate',NULL,'2007-06-04 14:44:48'),(3,4,'Schedule Gate','Gate: Opens/shuts at particular times.','learning/gate.do?method=knockGate','learning/gate.do?method=knockGate',NULL,NULL,'monitoring/gateExportPortfolio?mode=teacher','monitoring/gate.do?method=viewGate','monitoring/gate.do?method=viewGate',NULL,'2007-06-04 14:44:48'),(4,5,'Permission Gate','Gate: Opens under teacher or staff control.','learning/gate.do?method=knockGate','learning/gate.do?method=knockGate',NULL,NULL,'monitoring/gateExportPortfolio?mode=teacher','monitoring/gate.do?method=viewGate','monitoring/gate.do?method=viewGate',NULL,'2007-06-04 14:44:48'),(5,9,'System Gate','Gate: Opens under system control.','learning/gate.do?method=knockGate','learning/gate.do?method=knockGate',NULL,NULL,'monitoring/gateExportPortfolio?mode=teacher','monitoring/gate.do?method=viewGate','monitoring/gate.do?method=viewGate',NULL,'2007-06-04 14:44:48');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `lams_system_tool` ENABLE KEYS */;
 
@@ -1653,7 +1671,7 @@ CREATE TABLE `lams_tool` (
 
 /*!40000 ALTER TABLE `lams_tool` DISABLE KEYS */;
 LOCK TABLES `lams_tool` WRITE;
-INSERT INTO `lams_tool` VALUES (1,'lafrum11','forumService','Forum','Forum / Message Boards','forum','20070227',1,1,1,2,1,'tool/lafrum11/learning/viewForum.do?mode=learner','tool/lafrum11/learning/viewForum.do?mode=author','tool/lafrum11/learning/viewForum.do?mode=teacher','tool/lafrum11/authoring.do','tool/lafrum11/defineLater.do','tool/lafrum11/exportPortfolio?mode=learner','tool/lafrum11/exportPortfolio?mode=teacher','tool/lafrum11/monitoring.do','tool/lafrum11/contribute.do','tool/lafrum11/moderate.do','http://wiki.lamsfoundation.org/display/lamsdocs/lafrum11','2007-05-03 04:01:43','org.lamsfoundation.lams.tool.forum.ApplicationResources','2007-05-03 04:01:43','lams-tool-lafrum11.jar','/org/lamsfoundation/lams/tool/forum/forumApplicationContext.xml'),(2,'lanb11','nbService','NoticeboardX','Displays a NoticeboardX','nb','20070315',2,2,1,2,1,'tool/lanb11/starter/learner.do?mode=learner','tool/lanb11/starter/learner.do?mode=author','tool/lanb11/starter/learner.do?mode=teacher','tool/lanb11/authoring.do','tool/lanb11/authoring.do?defineLater=true','tool/lanb11/portfolioExport?mode=learner','tool/lanb11/portfolioExport?mode=teacher','tool/lanb11/monitoring.do',NULL,NULL,'http://wiki.lamsfoundation.org/display/lamsdocs/lanb11','2007-05-03 04:01:50','org.lamsfoundation.lams.tool.noticeboard.ApplicationResources','2007-05-03 04:01:50','lams-tool-lanb11.jar','/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml'),(3,'laqa11','qaService','Question and Answer','Q/A Tool','qa','20070214',3,3,1,2,1,'tool/laqa11/learningStarter.do?mode=learner','tool/laqa11/learningStarter.do?mode=author','tool/laqa11/learningStarter.do?mode=teacher','tool/laqa11/authoringStarter.do','tool/laqa11/defineLaterStarter.do','tool/laqa11/exportPortfolio?mode=learner','tool/laqa11/exportPortfolio?mode=teacher','tool/laqa11/monitoringStarter.do','tool/laqa11/monitoringStarter.do','tool/laqa11/monitoringStarter.do','http://wiki.lamsfoundation.org/display/lamsdocs/laqa11','2007-05-03 04:01:55','org.lamsfoundation.lams.tool.qa.ApplicationResources','2007-05-03 04:01:55','lams-tool-laqa11.jar','/org/lamsfoundation/lams/tool/qa/qaApplicationContext.xml'),(4,'lasbmt11','submitFilesService','Submit File','Submit File Tool Description','submitfile','20070227',4,4,1,2,1,'tool/lasbmt11/learner.do?mode=learner','tool/lasbmt11/learner.do?mode=author','tool/lasbmt11/learner.do?mode=teacher','tool/lasbmt11/authoring.do','tool/lasbmt11/definelater.do?mode=teacher','tool/lasbmt11/exportPortfolio?mode=learner','tool/lasbmt11/exportPortfolio?mode=teacher','tool/lasbmt11/monitoring.do','tool/lasbmt11/contribute.do','tool/lasbmt11/moderation.do','http://wiki.lamsfoundation.org/display/lamsdocs/lasbmt11','2007-05-03 04:02:01','org.lamsfoundation.lams.tool.sbmt.ApplicationResources','2007-05-03 04:02:01','lams-tool-lasbmt11.jar','/org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml'),(5,'lachat11','chatService','Chat','Chat','chat','20070315',5,5,1,2,1,'tool/lachat11/learning.do?mode=learner','tool/lachat11/learning.do?mode=author','tool/lachat11/learning.do?mode=teacher','tool/lachat11/authoring.do','tool/lachat11/authoring.do?mode=teacher','tool/lachat11/exportPortfolio?mode=learner','tool/lachat11/exportPortfolio?mode=teacher','tool/lachat11/monitoring.do','tool/lachat11/contribute.do','tool/lachat11/moderate.do','http://wiki.lamsfoundation.org/display/lamsdocs/lachat11','2007-05-03 04:02:12','org.lamsfoundation.lams.tool.chat.ApplicationResources','2007-05-03 04:02:12','lams-tool-lachat11.jar','/org/lamsfoundation/lams/tool/chat/chatApplicationContext.xml'),(6,'larsrc11','resourceService','Shared Resources','Shared Resources','sharedresources','20070227',6,6,1,2,1,'tool/larsrc11/learning/start.do?mode=learner','tool/larsrc11/learning/start.do?mode=author','tool/larsrc11/learning/start.do?mode=teacher','tool/larsrc11/authoring/start.do','tool/larsrc11/definelater.do','tool/larsrc11/exportPortfolio?mode=learner','tool/larsrc11/exportPortfolio?mode=teacher','tool/larsrc11/monitoring/summary.do','tool/larsrc11/contribute.do','tool/larsrc11/moderate.do','http://wiki.lamsfoundation.org/display/lamsdocs/larsrc11','2007-05-03 04:02:23','org.lamsfoundation.lams.tool.rsrc.ApplicationResources','2007-05-03 04:02:23','lams-tool-larsrc11.jar','/org/lamsfoundation/lams/tool/rsrc/rsrcApplicationContext.xml'),(7,'lavote11','voteService','Voting','Voting','vote','20070214',7,7,1,2,1,'tool/lavote11/learningStarter.do?mode=learner','tool/lavote11/learningStarter.do?mode=author','tool/lavote11/learningStarter.do?mode=teacher','tool/lavote11/authoringStarter.do','tool/lavote11/defineLaterStarter.do','tool/lavote11/exportPortfolio?mode=learner','tool/lavote11/exportPortfolio?mode=teacher','tool/lavote11/monitoringStarter.do','tool/lavote11/monitoringStarter.do','tool/lavote11/monitoringStarter.do','http://wiki.lamsfoundation.org/display/lamsdocs/lavote11','2007-05-03 04:02:29','org.lamsfoundation.lams.tool.vote.ApplicationResources','2007-05-03 04:02:29','lams-tool-lavote11.jar','/org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml'),(8,'lantbk11','notebookService','Notebook','Notebook','notebook','20070227',8,8,1,2,1,'tool/lantbk11/learning.do?mode=learner','tool/lantbk11/learning.do?mode=author','tool/lantbk11/learning.do?mode=teacher','tool/lantbk11/authoring.do','tool/lantbk11/authoring.do?mode=teacher','tool/lantbk11/exportPortfolio?mode=learner','tool/lantbk11/exportPortfolio?mode=teacher','tool/lantbk11/monitoring.do','tool/lantbk11/contribute.do','tool/lantbk11/moderate.do','http://wiki.lamsfoundation.org/display/lamsdocs/lantbk11','2007-05-03 04:02:38','org.lamsfoundation.lams.tool.notebook.ApplicationResources','2007-05-03 04:02:38','lams-tool-lantbk11.jar','/org/lamsfoundation/lams/tool/notebook/notebookApplicationContext.xml'),(9,'lasurv11','lasurvSurveyService','Survey','Survey','survey','20070220',9,9,1,2,1,'tool/lasurv11/learning/start.do?mode=learner','tool/lasurv11/learning/start.do?mode=author','tool/lasurv11/learning/start.do?mode=teacher','tool/lasurv11/authoring/start.do','tool/lasurv11/definelater.do','tool/lasurv11/exportPortfolio?mode=learner','tool/lasurv11/exportPortfolio?mode=teacher','tool/lasurv11/monitoring/summary.do','tool/lasurv11/contribute.do','tool/lasurv11/moderate.do','http://wiki.lamsfoundation.org/display/lamsdocs/lasurv11','2007-05-03 04:02:49','org.lamsfoundation.lams.tool.survey.ApplicationResources','2007-05-03 04:02:49','lams-tool-lasurv11.jar','/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml'),(10,'lascrb11','lascrbScribeService','Scribe','Scribe','scribe','20070315',10,10,1,2,1,'tool/lascrb11/learning.do?mode=learner','tool/lascrb11/learning.do?mode=author','tool/lascrb11/learning.do?mode=teacher','tool/lascrb11/authoring.do','tool/lascrb11/authoring.do?mode=teacher','tool/lascrb11/exportPortfolio?mode=learner','tool/lascrb11/exportPortfolio?mode=teacher','tool/lascrb11/monitoring.do','tool/lascrb11/contribute.do','tool/lascrb11/moderate.do','http://wiki.lamsfoundation.org/display/lamsdocs/lascrb11','2007-05-03 04:02:59','org.lamsfoundation.lams.tool.scribe.ApplicationResources','2007-05-03 04:02:59','lams-tool-lascrb11.jar','/org/lamsfoundation/lams/tool/scribe/scribeApplicationContext.xml'),(11,'lamc11','mcService','MCQ','Multiple Choice Questions','mc','20070214',11,11,1,2,1,'tool/lamc11/learningStarter.do?mode=learner','tool/lamc11/learningStarter.do?mode=author','tool/lamc11/learningStarter.do?mode=teacher','tool/lamc11/authoringStarter.do','tool/lamc11/defineLaterStarter.do','tool/lamc11/exportPortfolio?mode=learner','tool/lamc11/exportPortfolio?mode=teacher','tool/lamc11/monitoringStarter.do','tool/lamc11/monitoringStarter.do','tool/lamc11/monitoringStarter.do','http://wiki.lamsfoundation.org/display/lamsdocs/lamc11','2007-05-03 04:03:04','org.lamsfoundation.lams.tool.mc.ApplicationResources','2007-05-03 04:03:04','lams-tool-lamc11.jar','/org/lamsfoundation/lams/tool/mc/mcApplicationContext.xml');
+INSERT INTO `lams_tool` VALUES (1,'lafrum11','forumService','Forum','Forum / Message Boards','forum','20070524',1,1,1,2,1,'tool/lafrum11/learning/viewForum.do?mode=learner','tool/lafrum11/learning/viewForum.do?mode=author','tool/lafrum11/learning/viewForum.do?mode=teacher','tool/lafrum11/authoring.do','tool/lafrum11/defineLater.do','tool/lafrum11/exportPortfolio?mode=learner','tool/lafrum11/exportPortfolio?mode=teacher','tool/lafrum11/monitoring.do','tool/lafrum11/contribute.do','tool/lafrum11/moderate.do','http://wiki.lamsfoundation.org/display/lamsdocs/lafrum11','2007-06-04 14:44:58','org.lamsfoundation.lams.tool.forum.ApplicationResources','2007-06-04 14:44:58','lams-tool-lafrum11.jar','/org/lamsfoundation/lams/tool/forum/forumApplicationContext.xml'),(2,'lanb11','nbService','NoticeboardX','Displays a NoticeboardX','nb','20070524',2,2,1,2,1,'tool/lanb11/starter/learner.do?mode=learner','tool/lanb11/starter/learner.do?mode=author','tool/lanb11/starter/learner.do?mode=teacher','tool/lanb11/authoring.do','tool/lanb11/authoring.do?defineLater=true','tool/lanb11/portfolioExport?mode=learner','tool/lanb11/portfolioExport?mode=teacher','tool/lanb11/monitoring.do',NULL,NULL,'http://wiki.lamsfoundation.org/display/lamsdocs/lanb11','2007-06-04 14:45:09','org.lamsfoundation.lams.tool.noticeboard.ApplicationResources','2007-06-04 14:45:09','lams-tool-lanb11.jar','/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml'),(3,'laqa11','qaService','Question and Answer','Q/A Tool','qa','20070524',3,3,1,2,1,'tool/laqa11/learningStarter.do?mode=learner','tool/laqa11/learningStarter.do?mode=author','tool/laqa11/learningStarter.do?mode=teacher','tool/laqa11/authoringStarter.do','tool/laqa11/defineLaterStarter.do','tool/laqa11/exportPortfolio?mode=learner','tool/laqa11/exportPortfolio?mode=teacher','tool/laqa11/monitoringStarter.do','tool/laqa11/monitoringStarter.do','tool/laqa11/monitoringStarter.do','http://wiki.lamsfoundation.org/display/lamsdocs/laqa11','2007-06-04 14:45:14','org.lamsfoundation.lams.tool.qa.ApplicationResources','2007-06-04 14:45:14','lams-tool-laqa11.jar','/org/lamsfoundation/lams/tool/qa/qaApplicationContext.xml'),(4,'lasbmt11','submitFilesService','Submit File','Submit File Tool Description','submitfile','20070524',4,4,1,2,1,'tool/lasbmt11/learner.do?mode=learner','tool/lasbmt11/learner.do?mode=author','tool/lasbmt11/learner.do?mode=teacher','tool/lasbmt11/authoring.do','tool/lasbmt11/definelater.do?mode=teacher','tool/lasbmt11/exportPortfolio?mode=learner','tool/lasbmt11/exportPortfolio?mode=teacher','tool/lasbmt11/monitoring.do','tool/lasbmt11/contribute.do','tool/lasbmt11/moderation.do','http://wiki.lamsfoundation.org/display/lamsdocs/lasbmt11','2007-06-04 14:45:21','org.lamsfoundation.lams.tool.sbmt.ApplicationResources','2007-06-04 14:45:21','lams-tool-lasbmt11.jar','/org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml'),(5,'lachat11','chatService','Chat','Chat','chat','20070524',5,5,1,2,1,'tool/lachat11/learning.do?mode=learner','tool/lachat11/learning.do?mode=author','tool/lachat11/learning.do?mode=teacher','tool/lachat11/authoring.do','tool/lachat11/authoring.do?mode=teacher','tool/lachat11/exportPortfolio?mode=learner','tool/lachat11/exportPortfolio?mode=teacher','tool/lachat11/monitoring.do','tool/lachat11/contribute.do','tool/lachat11/moderate.do','http://wiki.lamsfoundation.org/display/lamsdocs/lachat11','2007-06-04 14:45:31','org.lamsfoundation.lams.tool.chat.ApplicationResources','2007-06-04 14:45:31','lams-tool-lachat11.jar','/org/lamsfoundation/lams/tool/chat/chatApplicationContext.xml'),(6,'larsrc11','resourceService','Shared Resources','Shared Resources','sharedresources','20070524',6,6,1,2,1,'tool/larsrc11/learning/start.do?mode=learner','tool/larsrc11/learning/start.do?mode=author','tool/larsrc11/learning/start.do?mode=teacher','tool/larsrc11/authoring/start.do','tool/larsrc11/definelater.do','tool/larsrc11/exportPortfolio?mode=learner','tool/larsrc11/exportPortfolio?mode=teacher','tool/larsrc11/monitoring/summary.do','tool/larsrc11/contribute.do','tool/larsrc11/moderate.do','http://wiki.lamsfoundation.org/display/lamsdocs/larsrc11','2007-06-04 14:45:42','org.lamsfoundation.lams.tool.rsrc.ApplicationResources','2007-06-04 14:45:42','lams-tool-larsrc11.jar','/org/lamsfoundation/lams/tool/rsrc/rsrcApplicationContext.xml'),(7,'lavote11','voteService','Voting','Voting','vote','20070524',7,7,1,2,1,'tool/lavote11/learningStarter.do?mode=learner','tool/lavote11/learningStarter.do?mode=author','tool/lavote11/learningStarter.do?mode=teacher','tool/lavote11/authoringStarter.do','tool/lavote11/defineLaterStarter.do','tool/lavote11/exportPortfolio?mode=learner','tool/lavote11/exportPortfolio?mode=teacher','tool/lavote11/monitoringStarter.do','tool/lavote11/monitoringStarter.do','tool/lavote11/monitoringStarter.do','http://wiki.lamsfoundation.org/display/lamsdocs/lavote11','2007-06-04 14:45:48','org.lamsfoundation.lams.tool.vote.ApplicationResources','2007-06-04 14:45:48','lams-tool-lavote11.jar','/org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml'),(8,'lantbk11','notebookService','Notebook','Notebook','notebook','20070524',8,8,1,2,1,'tool/lantbk11/learning.do?mode=learner','tool/lantbk11/learning.do?mode=author','tool/lantbk11/learning.do?mode=teacher','tool/lantbk11/authoring.do','tool/lantbk11/authoring.do?mode=teacher','tool/lantbk11/exportPortfolio?mode=learner','tool/lantbk11/exportPortfolio?mode=teacher','tool/lantbk11/monitoring.do','tool/lantbk11/contribute.do','tool/lantbk11/moderate.do','http://wiki.lamsfoundation.org/display/lamsdocs/lantbk11','2007-06-04 14:45:57','org.lamsfoundation.lams.tool.notebook.ApplicationResources','2007-06-04 14:45:57','lams-tool-lantbk11.jar','/org/lamsfoundation/lams/tool/notebook/notebookApplicationContext.xml'),(9,'lasurv11','lasurvSurveyService','Survey','Survey','survey','20070524',9,9,1,2,1,'tool/lasurv11/learning/start.do?mode=learner','tool/lasurv11/learning/start.do?mode=author','tool/lasurv11/learning/start.do?mode=teacher','tool/lasurv11/authoring/start.do','tool/lasurv11/definelater.do','tool/lasurv11/exportPortfolio?mode=learner','tool/lasurv11/exportPortfolio?mode=teacher','tool/lasurv11/monitoring/summary.do','tool/lasurv11/contribute.do','tool/lasurv11/moderate.do','http://wiki.lamsfoundation.org/display/lamsdocs/lasurv11','2007-06-04 14:46:08','org.lamsfoundation.lams.tool.survey.ApplicationResources','2007-06-04 14:46:08','lams-tool-lasurv11.jar','/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml'),(10,'lascrb11','lascrbScribeService','Scribe','Scribe','scribe','20070524',10,10,1,2,1,'tool/lascrb11/learning.do?mode=learner','tool/lascrb11/learning.do?mode=author','tool/lascrb11/learning.do?mode=teacher','tool/lascrb11/authoring.do','tool/lascrb11/authoring.do?mode=teacher','tool/lascrb11/exportPortfolio?mode=learner','tool/lascrb11/exportPortfolio?mode=teacher','tool/lascrb11/monitoring.do','tool/lascrb11/contribute.do','tool/lascrb11/moderate.do','http://wiki.lamsfoundation.org/display/lamsdocs/lascrb11','2007-06-04 14:46:19','org.lamsfoundation.lams.tool.scribe.ApplicationResources','2007-06-04 14:46:19','lams-tool-lascrb11.jar','/org/lamsfoundation/lams/tool/scribe/scribeApplicationContext.xml'),(11,'lamc11','mcService','MCQ','Multiple Choice Questions','mc','20070524',11,11,1,2,1,'tool/lamc11/learningStarter.do?mode=learner','tool/lamc11/learningStarter.do?mode=author','tool/lamc11/learningStarter.do?mode=teacher','tool/lamc11/authoringStarter.do','tool/lamc11/defineLaterStarter.do','tool/lamc11/exportPortfolio?mode=learner','tool/lamc11/exportPortfolio?mode=teacher','tool/lamc11/monitoringStarter.do','tool/lamc11/monitoringStarter.do','tool/lamc11/monitoringStarter.do','http://wiki.lamsfoundation.org/display/lamsdocs/lamc11','2007-06-04 14:46:24','org.lamsfoundation.lams.tool.mc.ApplicationResources','2007-06-04 14:46:24','lams-tool-lamc11.jar','/org/lamsfoundation/lams/tool/mc/mcApplicationContext.xml');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `lams_tool` ENABLE KEYS */;
 
@@ -1844,7 +1862,7 @@ CREATE TABLE `lams_user` (
 
 /*!40000 ALTER TABLE `lams_user` DISABLE KEYS */;
 LOCK TABLES `lams_user` WRITE;
-INSERT INTO `lams_user` VALUES (1,'sysadmin','a159b7ae81ba3552af61e9731b20870515944538','The','System','Administrator',NULL,NULL,NULL,'Sydney','NSW',NULL,'Australia',NULL,NULL,NULL,NULL,'sysadmin@x.x',0,'2007-05-03 04:01:31',1,51,1,2,NULL,1,NULL,0),(5,'test1','b444ac06613fc8d63795be9ad0beaf55011936ac','Dr','One','Test','1','Test Ave',NULL,'Nowhere','NSW',NULL,'Australia','0211111111','0211111112','0411111111','0211111113','test1@xx.os',0,'2004-12-23 00:00:00',1,5,1,2,NULL,1,NULL,0),(6,'test2','109f4b3c50d7b0df729d299bc6f8e9ef9066971f','Dr','Two','Test','2','Test Ave',NULL,'Nowhere','NSW',NULL,'Australia','0211111111','0211111112','0411111111','0211111113','test2@xx.os',0,'2004-12-23 00:00:00',1,6,1,2,NULL,1,NULL,0),(7,'test3','3ebfa301dc59196f18593c45e519287a23297589','Dr','Three','Test','3','Test Ave',NULL,'Nowhere','NSW',NULL,'Australia','0211111111','0211111112','0411111111','0211111113','test3@xx.os',0,'2004-12-23 00:00:00',1,7,1,2,NULL,1,NULL,0),(8,'test4','1ff2b3704aede04eecb51e50ca698efd50a1379b','Dr','Four','Test','4','Test Ave',NULL,'Nowhere','NSW',NULL,'Australia','0211111111','0211111112','0411111111','0211111113','test4@xx.os',0,'2004-12-23 00:00:00',1,8,1,2,NULL,1,NULL,0);
+INSERT INTO `lams_user` VALUES (1,'sysadmin','a159b7ae81ba3552af61e9731b20870515944538','The','System','Administrator',NULL,NULL,NULL,'Sydney','NSW',NULL,'Australia',NULL,NULL,NULL,NULL,'sysadmin@x.x',0,'2007-06-04 14:44:48',1,51,1,2,NULL,1,NULL,0),(5,'test1','b444ac06613fc8d63795be9ad0beaf55011936ac','Dr','One','Test','1','Test Ave',NULL,'Nowhere','NSW',NULL,'Australia','0211111111','0211111112','0411111111','0211111113','test1@xx.os',0,'2004-12-23 00:00:00',1,5,1,2,NULL,1,NULL,0),(6,'test2','109f4b3c50d7b0df729d299bc6f8e9ef9066971f','Dr','Two','Test','2','Test Ave',NULL,'Nowhere','NSW',NULL,'Australia','0211111111','0211111112','0411111111','0211111113','test2@xx.os',0,'2004-12-23 00:00:00',1,6,1,2,NULL,1,NULL,0),(7,'test3','3ebfa301dc59196f18593c45e519287a23297589','Dr','Three','Test','3','Test Ave',NULL,'Nowhere','NSW',NULL,'Australia','0211111111','0211111112','0411111111','0211111113','test3@xx.os',0,'2004-12-23 00:00:00',1,7,1,2,NULL,1,NULL,0),(8,'test4','1ff2b3704aede04eecb51e50ca698efd50a1379b','Dr','Four','Test','4','Test Ave',NULL,'Nowhere','NSW',NULL,'Australia','0211111111','0211111112','0411111111','0211111113','test4@xx.os',0,'2004-12-23 00:00:00',1,8,1,2,NULL,1,NULL,0);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `lams_user` ENABLE KEYS */;
 
@@ -2106,9 +2124,8 @@ CREATE TABLE `tl_lachat11_attachment` (
   `create_date` datetime default NULL,
   `chat_uid` bigint(20) default NULL,
   PRIMARY KEY  (`uid`),
-  KEY `FK9ED6CB2E1A3926E3` (`chat_uid`),
-  CONSTRAINT `FK9ED6CB2E1A3926E3` FOREIGN KEY (`chat_uid`) REFERENCES `tl_lachat11_chat` (`uid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FK9ED6CB2E1A3926E3` (`chat_uid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `tl_lachat11_attachment`
@@ -2144,7 +2161,7 @@ CREATE TABLE `tl_lachat11_chat` (
   `filtering_enabled` bit(1) default NULL,
   `filter_keywords` text,
   PRIMARY KEY  (`uid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `tl_lachat11_chat`
@@ -2174,11 +2191,8 @@ CREATE TABLE `tl_lachat11_message` (
   PRIMARY KEY  (`uid`),
   KEY `FKCC08C1DC2AF61E05` (`to_user_uid`),
   KEY `FKCC08C1DC9C8469FC` (`chat_session_uid`),
-  KEY `FKCC08C1DCCF3BF9B6` (`from_user_uid`),
-  CONSTRAINT `FKCC08C1DCCF3BF9B6` FOREIGN KEY (`from_user_uid`) REFERENCES `tl_lachat11_user` (`uid`),
-  CONSTRAINT `FKCC08C1DC2AF61E05` FOREIGN KEY (`to_user_uid`) REFERENCES `tl_lachat11_user` (`uid`),
-  CONSTRAINT `FKCC08C1DC9C8469FC` FOREIGN KEY (`chat_session_uid`) REFERENCES `tl_lachat11_session` (`uid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FKCC08C1DCCF3BF9B6` (`from_user_uid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `tl_lachat11_message`
@@ -2204,10 +2218,10 @@ CREATE TABLE `tl_lachat11_session` (
   `session_name` varchar(250) default NULL,
   `chat_uid` bigint(20) default NULL,
   `jabber_room` varchar(250) default NULL,
+  `room_created` bit(1) default NULL,
   PRIMARY KEY  (`uid`),
-  KEY `FK96E446B1A3926E3` (`chat_uid`),
-  CONSTRAINT `FK96E446B1A3926E3` FOREIGN KEY (`chat_uid`) REFERENCES `tl_lachat11_chat` (`uid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FK96E446B1A3926E3` (`chat_uid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `tl_lachat11_session`
@@ -2235,9 +2249,8 @@ CREATE TABLE `tl_lachat11_user` (
   `jabber_nickname` varchar(255) default NULL,
   `chat_session_uid` bigint(20) default NULL,
   PRIMARY KEY  (`uid`),
-  KEY `FK4EB82169C8469FC` (`chat_session_uid`),
-  CONSTRAINT `FK4EB82169C8469FC` FOREIGN KEY (`chat_session_uid`) REFERENCES `tl_lachat11_session` (`uid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FK4EB82169C8469FC` (`chat_session_uid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `tl_lachat11_user`
@@ -2399,7 +2412,7 @@ CREATE TABLE `tl_lafrum11_message` (
 
 /*!40000 ALTER TABLE `tl_lafrum11_message` DISABLE KEYS */;
 LOCK TABLES `tl_lafrum11_message` WRITE;
-INSERT INTO `tl_lafrum11_message` VALUES (1,'2007-05-03 04:01:43','2007-05-03 04:01:43','2007-05-03 04:01:43',NULL,NULL,'Topic Heading','Topic message',1,0,NULL,NULL,1,0,0,NULL);
+INSERT INTO `tl_lafrum11_message` VALUES (1,'2007-06-04 14:44:59','2007-06-04 14:44:59','2007-06-04 14:44:59',NULL,NULL,'Topic Heading','Topic message',1,0,NULL,NULL,1,0,0,NULL);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `tl_lafrum11_message` ENABLE KEYS */;
 
@@ -2520,7 +2533,7 @@ CREATE TABLE `tl_lamc11_content` (
 
 /*!40000 ALTER TABLE `tl_lamc11_content` DISABLE KEYS */;
 LOCK TABLES `tl_lamc11_content` WRITE;
-INSERT INTO `tl_lamc11_content` VALUES (1,11,'MCQ','Instructions','2007-05-03 04:03:05',NULL,0,0,1,0,0,'','',0,0,0,0,NULL,0,0);
+INSERT INTO `tl_lamc11_content` VALUES (1,11,'MCQ','Instructions','2007-06-04 14:46:24',NULL,0,0,1,0,0,'','',0,0,0,0,NULL,0,0);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `tl_lamc11_content` ENABLE KEYS */;
 
@@ -2755,7 +2768,7 @@ CREATE TABLE `tl_lanb11_content` (
 
 /*!40000 ALTER TABLE `tl_lanb11_content` DISABLE KEYS */;
 LOCK TABLES `tl_lanb11_content` WRITE;
-INSERT INTO `tl_lanb11_content` VALUES (1,2,'Noticeboard','Content','','',0,0,0,'Reflect on noticeboard',0,NULL,'2007-05-03 04:01:50',NULL);
+INSERT INTO `tl_lanb11_content` VALUES (1,2,'Noticeboard','Content','','',0,0,0,'Reflect on noticeboard',0,NULL,'2007-06-04 14:45:09',NULL);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `tl_lanb11_content` ENABLE KEYS */;
 
@@ -2966,7 +2979,7 @@ CREATE TABLE `tl_laqa11_content` (
 
 /*!40000 ALTER TABLE `tl_laqa11_content` DISABLE KEYS */;
 LOCK TABLES `tl_laqa11_content` WRITE;
-INSERT INTO `tl_laqa11_content` VALUES (1,3,'Q&A','Instructions','2007-05-03 04:01:55',NULL,0,0,0,0,0,0,0,NULL,NULL,0,NULL,1,1);
+INSERT INTO `tl_laqa11_content` VALUES (1,3,'Q&A','Instructions','2007-06-04 14:45:14',NULL,0,0,0,0,0,0,0,NULL,NULL,0,NULL,1,1);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `tl_laqa11_content` ENABLE KEYS */;
 
@@ -3268,7 +3281,7 @@ CREATE TABLE `tl_larsrc11_resource_item` (
 
 /*!40000 ALTER TABLE `tl_larsrc11_resource_item` DISABLE KEYS */;
 LOCK TABLES `tl_larsrc11_resource_item` WRITE;
-INSERT INTO `tl_larsrc11_resource_item` VALUES (1,NULL,NULL,NULL,NULL,NULL,NULL,'Web Search','http://www.google.com ',NULL,'2007-05-03 04:02:23',1,0,1,NULL,NULL,0,1,NULL);
+INSERT INTO `tl_larsrc11_resource_item` VALUES (1,NULL,NULL,NULL,NULL,NULL,NULL,'Web Search','http://www.google.com ',NULL,'2007-06-04 14:45:43',1,0,1,NULL,NULL,0,1,NULL);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `tl_larsrc11_resource_item` ENABLE KEYS */;
 
@@ -3780,7 +3793,7 @@ CREATE TABLE `tl_lasurv11_question` (
 
 /*!40000 ALTER TABLE `tl_lasurv11_question` DISABLE KEYS */;
 LOCK TABLES `tl_lasurv11_question` WRITE;
-INSERT INTO `tl_lasurv11_question` VALUES (1,1,'Sample Multiple choice - only one response allowed?',NULL,'2007-05-03 04:02:49',1,0,0,0,1),(2,2,'Sample Multiple choice - multiple response allowed?',NULL,'2007-05-03 04:02:49',2,0,0,1,1),(3,3,'Sample Free text question?',NULL,'2007-05-03 04:02:49',3,0,0,0,1);
+INSERT INTO `tl_lasurv11_question` VALUES (1,1,'Sample Multiple choice - only one response allowed?',NULL,'2007-06-04 14:46:08',1,0,0,0,1),(2,2,'Sample Multiple choice - multiple response allowed?',NULL,'2007-06-04 14:46:08',2,0,0,1,1),(3,3,'Sample Free text question?',NULL,'2007-06-04 14:46:08',3,0,0,0,1);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `tl_lasurv11_question` ENABLE KEYS */;
 
@@ -3911,7 +3924,7 @@ CREATE TABLE `tl_lavote11_content` (
 
 /*!40000 ALTER TABLE `tl_lavote11_content` DISABLE KEYS */;
 LOCK TABLES `tl_lavote11_content` WRITE;
-INSERT INTO `tl_lavote11_content` VALUES (1,7,'Voting','Instructions','2007-05-03 04:02:29',NULL,'1',0,0,1,0,0,'','',0,1,0,NULL);
+INSERT INTO `tl_lavote11_content` VALUES (1,7,'Voting','Instructions','2007-06-04 14:45:48',NULL,'1',0,0,1,0,0,'','',0,1,0,NULL);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `tl_lavote11_content` ENABLE KEYS */;
 

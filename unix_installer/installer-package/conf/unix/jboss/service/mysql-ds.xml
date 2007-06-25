@@ -9,7 +9,7 @@ http://www.mysql.com/downloads/api-jdbc-stable.html
   <!-- lams-ds datasource for use by LAMS Core and Services -->
   <local-tx-datasource>
     <jndi-name>jdbc/lams-ds</jndi-name>
-    <connection-url>jdbc:mysql://localhost:3306/@DB_NAME@</connection-url>
+    <connection-url>jdbc:mysql://@MYSQL_HOST@:3306/@DB_NAME@</connection-url>
     <driver-class>com.mysql.jdbc.Driver</driver-class>
     <!-- Tell MySQL Connector to use UTF-8 character encoding, -->
     <!-- and convert MySQL zero times to null -->
@@ -29,7 +29,7 @@ http://www.mysql.com/downloads/api-jdbc-stable.html
   <!-- tool-ds datasource for use by Tools -->
   <local-tx-datasource>
     <jndi-name>jdbc/tool-ds</jndi-name>
-    <connection-url>jdbc:mysql://localhost:3306/@DB_NAME@</connection-url>
+    <connection-url>jdbc:mysql://@MYSQL_HOST@:3306/@DB_NAME@</connection-url>
     <driver-class>com.mysql.jdbc.Driver</driver-class>
     <!-- Tell MySQL Connector to use UTF-8 character encoding, -->
     <!-- and convert MySQL zero times to null -->
@@ -49,7 +49,7 @@ http://www.mysql.com/downloads/api-jdbc-stable.html
   <!-- quartz-ds datasource for use by Quartz -->
   <local-tx-datasource>
     <jndi-name>jdbc/quartz-ds</jndi-name>
-    <connection-url>jdbc:mysql://localhost:3306/@DB_NAME@</connection-url>
+    <connection-url>jdbc:mysql://@MYSQL_HOST@:3306/@DB_NAME@</connection-url>
     <driver-class>com.mysql.jdbc.Driver</driver-class>
     <!-- Set transaction isolation level to match db -->
     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>	
