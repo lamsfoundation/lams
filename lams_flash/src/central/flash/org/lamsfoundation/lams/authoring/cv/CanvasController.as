@@ -72,7 +72,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		    if(transitionTarget instanceof LFError){
 				transitionTarget.showErrorAlert(null); 
 		   }else{
-			   	var td = _canvasModel.addActivityToTransition(transitionTarget);
+			   	var td = _canvasModel.addActivityToConnection(transitionTarget);
 				_canvasModel.activeView.initDrawTempTrans();
 			}
 			
@@ -199,6 +199,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			// check for modified transition connected to activity
 			var modTransitions = _canvasModel.getModTransitionsForActivityUIID(ca.activity.activityUIID);
 			modTransitions = modTransitions.modTransitions;
+			
 			for (var i=0; i<modTransitions.length;i++){
 				Debugger.log('removing transition for redraw:'+modTransitions[i].transitionUIID,Debugger.GEN,'activityRelease','CanvasController');
 				var t = _canvasModel.transitionsDisplayed.remove(modTransitions[i].transitionUIID);
@@ -210,7 +211,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			var myBranches = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
 			myBranches = myBranches.myBranches;
 			
-			for (var i=0; i<myBranches.length;i++){
+			for (var i=0; i<myBranches.length; i++){
 				Debugger.log('removing branch for redraw:'+myBranches[i].branchUIID,Debugger.GEN,'activityRelease','CanvasController');
 				var b = _canvasModel.branchesDisplayed.remove(myBranches[i].branchUIID);
 				b.removeMovieClip();
@@ -324,7 +325,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasModel.getCanvas().stopTransitionTool();
 				LFError(transitionTarget).showErrorAlert(null);
 			} else {
-				var td = _canvasModel.addActivityToTransition(transitionTarget);
+				var td = _canvasModel.addActivityToConnection(transitionTarget);
 						
 				_canvasModel.resetTransitionTool();
 				_canvasModel.getCanvas().stopTransitionTool();

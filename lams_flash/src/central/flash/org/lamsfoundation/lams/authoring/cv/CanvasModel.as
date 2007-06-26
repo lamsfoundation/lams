@@ -59,7 +59,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	private var _selectedItem:Object;  // the currently selected thing - could be activity, transition etc.
 	private var _prevSelectedItem:Object;
 	private var _isDrawingTransition:Boolean;
-	private var _transitionActivities:Array;
+	private var _connectionActivities:Array;
 	private var _isDragging:Boolean;
 	private var _importing:Boolean;
 	private var _editing:Boolean;
@@ -97,7 +97,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		_currentBranchingActivity = null;
 		
 		_autoSaveWait = false;
-		_transitionActivities = new Array();
+		_connectionActivities = new Array();
 		_defaultGroupingTypeID = Grouping.RANDOM_GROUPING;
 	}
 
@@ -182,7 +182,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 
 		refreshDesign();
 	}
-	
 	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////       TRANSITIONS         //////////////////////////////////////////
@@ -377,6 +376,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	public function createNewSequenceActivity(parent){
 		Debugger.log('Running...',Debugger.GEN,'createNewSequenceActivity','CanvasModel');
+		
 		var seqAct = new SequenceActivity(_cv.ddm.newUIID());
 		seqAct.title = "Sequence Activity";
 		seqAct.learningDesignID = _cv.ddm.learningDesignID;
@@ -565,14 +565,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		}
 	}
 	
-	/**
-	 * Adds another Canvas Activity to the transition.  
-	 * Only 2 may be added, adding the 2nd one triggers the creation of the transition.
-	 * @usage   
-	 * @param   ca (Canvas or data Activity)
-	 * @return  
-	 */
-	public function addActivityToTransition(ca:Object):Object{
+	public function addActivityToConnection(ca:Object):Object{
 		var activity:Activity;
 		//check we have not added too many
 		if(ca instanceof CanvasActivity || ca instanceof CanvasParallelActivity || ca instanceof CanvasOptionalActivity || ca instanceof CanvasBranchingActivity){
@@ -581,98 +574,142 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			activity = Activity(ca);
 		}
 		
-		if(_transitionActivities.length >= 2){
+		if(_connectionActivities.length > 0) {
+			if(_connectionActivities[0].activityUIID == activeView.startHub.activity.activityUIID) {
+				return addActivityToBranch(activity);
+			} else {
+				return addActivityToTransition(activity);
+			}
+		}
+
+		_connectionActivities.push(activity);
+		return true;
+	}
+	
+	private function addActivityToBranch(activity:Activity):Object{
+		
+		if(_connectionActivities.length >= 2){
 			//TODO: show an error
-			return new LFError("Too many activities in the Transition","addActivityToTransition",this);
+			return new LFError("Too many activities in the Branch","addActivityToBranch",this);
 		}
 		
-		Debugger.log('Adding Activity.UIID:'+activity.activityUIID,Debugger.GEN,'addActivityToTransition','CanvasModel');
-		_transitionActivities.push(activity);
+		Debugger.log('Adding Activity.UIID:'+activity.activityUIID,Debugger.GEN,'addActivityToBranch','CanvasModel');
+		_connectionActivities.push(activity);
 		
-		var fromAct = _transitionActivities[0].activityUIID
-		var toAct = _transitionActivities[1].activityUIID
+		var fromAct = _connectionActivities[0].activityUIID
+		var toAct = _connectionActivities[1].activityUIID
 		
-		if(_transitionActivities.length == 2){
+		//check we have 2 valid acts to create the transition.
+		if(fromAct == toAct){
+			return new LFError("You cannot create a Branch between the same Activities","addActivityToTransition",this);
+		}
+		
+		
+		if(_connectionActivities.length == 2){
+			/*********************************************
+			* TODO: REQUIRE NORMAL BRANCH CLIENT_SIDE VALIDATION
+			*********************************************/
+			Debugger.log('fromAct: ' + fromAct + " toAct:" + toAct, Debugger.GEN,'addActivityToBranch','CanvasModel');
 			
-			// check if either end is a connector point for Branching
-			if(activeView.startHub.activity.activityUIID == fromAct || 
-			   activeView.endHub.activity.activityUIID == toAct) {
-				
-				/*********************************************
-				* TODO: REQUIRE NORMAL BRANCH CLIENT_SIDE VALIDATION
-				*********************************************/
-				
-				//check we have 2 valid acts to create the transition.
-				if(fromAct == toAct){
-					return new LFError("You cannot create a Branch between the same Activities","addActivityToTransition",this);
-				}
-				
-				//lets make the connection
-				var b:Branch = createBranchConnector(_transitionActivities);
-				Debugger.log('No validation errors, creating branch.......' + b,Debugger.GEN,'addActivityToTransition','CanvasModel');
-			
-				//add it to the DDM
-				var success:Object = _cv.ddm.addBranch(b);
-				
-			} else {
-				var t:Transition;
-			
-				/*********************************************
-				* BELOW: NORMAL TRANSITION CLIENT_SIDE VALIDATION
-				*********************************************/
-				
-				//check we have 2 valid acts to create the transition.
-				if(fromAct == toAct){
-					return new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
-				}
-				
-				if(!_cv.ddm.activities.containsKey(fromAct)){
-					return new LFError("First activity of the Transition is missing, UIID:"+_transitionActivities[0].activityUIID,"addActivityToTransition",this);
-				}
-				
-				if(!_cv.ddm.activities.containsKey(toAct)){
-					return new LFError(Dictionary.getValue('cv_trans_target_act_missing'),"addActivityToTransition",this);
-				}
-				
-				//check there is not already a transition to or from this activity:
-				var transitionsArray:Array = _cv.ddm.transitions.values();
-				
-				/**/
-				for(var i=0;i<transitionsArray.length;i++){
-					
-					if(transitionsArray[i].toUIID == toAct){
-						return new LFError(Dictionary.getValue('cv_invalid_trans_target_to_activity',[_transitionActivities[1].title]));
-					}
-					
-					if(transitionsArray[i].fromUIID == fromAct){
-						return new LFError(Dictionary.getValue('cv_invalid_trans_target_from_activity',[_transitionActivities[0].title]));
-					}
-					
-					if ((transitionsArray[i].toUIID == toAct && transitionsArray[i].fromUIID == fromAct) || (transitionsArray[i].toUIID == fromAct && transitionsArray[i].fromUIID == toAct)){
-						return new LFError(Dictionary.getValue('cv_invalid_trans_circular_sequence'),"addActivityToTransition",this);
-					}
-					
-				}
-				
-				if (isLoopingLD(fromAct, toAct)){
-					return new LFError(Dictionary.getValue('cv_invalid_trans_circular_sequence'),"addActivityToTransition",this);
-				}
-				
-				Debugger.log('No validation errors, creating transition.......',Debugger.GEN,'addActivityToTransition','CanvasModel');
-			
-				//lets make the transition
-				t = createTransition(_transitionActivities);
-				
-				//add it to the DDM
-				var success:Object = _cv.ddm.addTransition(t);
-			
+			if(!_cv.ddm.activities.containsKey(toAct)){
+				return new LFError(Dictionary.getValue('cv_trans_target_act_missing'),"addActivityToBranch",this);
 			}
+			
+			//lets make the connection
+			var b:Branch = createBranchStartConnector(_connectionActivities);
+
+			Debugger.log('No validation errors, creating branch.......' + b,Debugger.GEN,'addActivityToBranch','CanvasModel');
+				
+			//add it to the DDM
+			var success:Object = _cv.ddm.addBranch(b);
 			
 			//flag the model as dirty and trigger a refresh
 			_cv.stopTransitionTool();
 			
 			setDirty();
+		}
 			
+		return true;
+	}
+	
+	/**
+	 * Adds another Canvas Activity to the transition.  
+	 * Only 2 may be added, adding the 2nd one triggers the creation of the transition.
+	 * @usage   
+	 * @param   ca (Canvas or data Activity)
+	 * @return  
+	 */
+	private function addActivityToTransition(activity:Activity):Object{
+		
+		if(_connectionActivities.length >= 2){
+			//TODO: show an error
+			return new LFError("Too many activities in the Transition","addActivityToTransition",this);
+		}
+		
+		Debugger.log('Adding Activity.UIID:'+activity.activityUIID,Debugger.GEN,'addActivityToTransition','CanvasModel');
+		_connectionActivities.push(activity);
+		
+		var fromAct = _connectionActivities[0].activityUIID
+		var toAct = _connectionActivities[1].activityUIID
+		
+		if(_connectionActivities.length == 2){
+			
+			var t:Transition;
+			
+			/*********************************************
+			* BELOW: NORMAL TRANSITION CLIENT_SIDE VALIDATION
+			*********************************************/
+				
+			//check we have 2 valid acts to create the transition.
+			if(fromAct == toAct){
+				return new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
+			}
+				
+			if(!_cv.ddm.activities.containsKey(fromAct)){
+				return new LFError("First activity of the Transition is missing, UIID:"+_connectionActivities[0].activityUIID,"addActivityToTransition",this);
+			}
+			
+			if(!_cv.ddm.activities.containsKey(toAct)){
+				return new LFError(Dictionary.getValue('cv_trans_target_act_missing'),"addActivityToTransition",this);
+			}
+				
+			//check there is not already a transition to or from this activity:
+			var transitionsArray:Array = _cv.ddm.transitions.values();
+				
+			/**/
+			for(var i=0;i<transitionsArray.length;i++){
+					
+				if(transitionsArray[i].toUIID == toAct){
+					return new LFError(Dictionary.getValue('cv_invalid_trans_target_to_activity',[_connectionActivities[1].title]));
+				}
+				
+				if(transitionsArray[i].fromUIID == fromAct){
+					return new LFError(Dictionary.getValue('cv_invalid_trans_target_from_activity',[_connectionActivities[0].title]));
+				}
+					
+				if ((transitionsArray[i].toUIID == toAct && transitionsArray[i].fromUIID == fromAct) || (transitionsArray[i].toUIID == fromAct && transitionsArray[i].fromUIID == toAct)){
+					return new LFError(Dictionary.getValue('cv_invalid_trans_circular_sequence'),"addActivityToTransition",this);
+				}
+					
+			}
+				
+			if (isLoopingLD(fromAct, toAct)){
+				return new LFError(Dictionary.getValue('cv_invalid_trans_circular_sequence'),"addActivityToTransition",this);
+			}
+				
+			Debugger.log('No validation errors, creating transition.......',Debugger.GEN,'addActivityToTransition','CanvasModel');
+			
+			//lets make the transition
+			t = createTransition(_connectionActivities);
+				
+			//add it to the DDM
+			var success:Object = _cv.ddm.addTransition(t);
+				
+				
+			//flag the model as dirty and trigger a refresh
+			_cv.stopTransitionTool();
+			
+			setDirty();
 		}
 		
 		return true;
@@ -684,7 +721,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 */
 	public function resetTransitionTool():Void{
 		//clear the transitions array
-			_transitionActivities = new Array();
+		_connectionActivities = new Array();
 	}
 	
 	public function isTransitionToolActive():Boolean{
@@ -716,15 +753,35 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @param   transitionActs An array of transition activities. Must only contain 2
 	 * @return  
 	 */
-	private function createBranchConnector(transitionActs:Array):Branch{
+	private function createBranchStartConnector(transitionActs:Array):Branch{
 		var fromAct:Activity = transitionActs[0];
 		var toAct:Activity = transitionActs[1];
 		
 		// TODO: activeView.defaultSequenceActivity should return SequenceActivity obj
-		var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, toAct.activityUIID, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
+		var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, toAct.activityUIID, activeView.startHub.activity.activityUIID, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
+		
+		createNewSequenceActivity(activeView.activity);
 		
 		return b;
 	}
+	
+	public function moveActivitiesToBranchSequence(activityUIID:Number, sequence:SequenceActivity):Boolean {
+		// move first activity
+		var ca = _activitiesDisplayed.get(activityUIID);
+		
+		if(sequence.activityUIID != ca.activity.parentUIID) {
+			addParentToActivity(sequence.activityUIID, ca);
+		} else {
+			return true;
+		}
+		
+		// get next activity from transition
+		var transObj = _cv.ddm.getTransitionsForActivityUIID(activityUIID);
+		
+		return (transObj.out == null) ? true : moveActivitiesToBranchSequence(transObj.out.toUIID, sequence);
+
+	}
+	
 	
 	public function setDesignTitle(){
 		broadcastViewUpdate("POSITION_TITLEBAR", null);

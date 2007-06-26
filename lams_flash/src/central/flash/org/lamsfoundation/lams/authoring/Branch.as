@@ -34,19 +34,21 @@ class Branch extends Transition {
 	
 	private var _direction:Number;
 	private var _targetUIID:Number;
+	private var _hubUIID:Number;
 	
 	
 	// TODO: add learningDesignID
 
-	public function Branch(activityUIID:Number, _dir:Number, targetUIID:Number, sequenceActivity:Activity, learningDesignID:Number){
+	public function Branch(activityUIID:Number, _dir:Number, targetUIID:Number, hubUIID:Number, sequenceActivity:Activity, learningDesignID:Number){
 		if(_dir == BranchConnector.DIR_FROM_START)
-			super(null, null, targetUIID, learningDesignID);
+			super(null, hubUIID, targetUIID, learningDesignID);
 		else
-			super(null, targetUIID, null, learningDesignID);
+			super(null, targetUIID, hubUIID, learningDesignID);
 		
 		UIID = activityUIID;
 		_direction = _dir;
 		_targetUIID = targetUIID;
+		_hubUIID = hubUIID;
 		_sequenceActivity = sequenceActivity;
 		
 	}
@@ -72,6 +74,10 @@ class Branch extends Transition {
 	
 	public function get targetUIID():Number {
 		return _targetUIID;
+	}
+	
+	public function get hubUIID():Number {
+		return _hubUIID;
 	}
 }
 

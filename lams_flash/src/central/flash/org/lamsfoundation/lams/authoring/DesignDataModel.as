@@ -418,7 +418,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 					Debugger.log("creating linked Branch for seq: " + newSequenceActivity.activityUIID, Debugger.CRITICAL, "setDesign", "DesignDataModel");
 					
 					// create linked branch
-					// var sb:Branch = new Branch(newUIID(), BranchConnector.DIR_FROM_START, newSequenceActivity.firstActivity, newSequenceActivity, learningDesignID);
+					// var sb:Branch = new Branch(newUIID(), BranchConnector.DIR_FROM_START, hubUIID, newSequenceActivity.firstActivity, newSequenceActivity, learningDesignID);
 					
 				}
 	
@@ -858,27 +858,27 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var br:Array = _branches.values();
 		var branchObj = new Object();
 		var myBranches:Array = new Array();
-		var into = null;
-		var out = null;
+		var hub = null;
+		var target = null;
 		
 		for(var i=0; i<br.length;i++){
-			if(br[i].toUIID == UIID || br[i].fromUIID == UIID){
+			if(br[i].targetUIID == UIID || br[i].hubUIID == UIID){
 				myBranches.push(br[i]);
 			}
-			if(into != null && out != null){
+			if(target != null && hub != null){
 					break;
 			}else{
-				if(br[i].fromUIID == UIID){
-					out = br[i];
+				if(br[i].targetUIID == UIID){
+					target = br[i];
 				}
-				if(br[i].toUIID == UIID){
-					into = br[i];
+				if(br[i].hubUIID == UIID){
+					hub = br[i];
 				}
 			}
 		}
 		branchObj.myBranches = myBranches;
-		branchObj.out = out;
-		branchObj.into = into;
+		branchObj.target = target;
+		branchObj.hub = hub;
 		return branchObj;
 	}
 	

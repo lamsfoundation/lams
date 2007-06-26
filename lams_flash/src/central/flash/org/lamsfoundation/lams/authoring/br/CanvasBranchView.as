@@ -381,6 +381,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		cm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
 		Debugger.log('drawn a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'drawTransition','CanvasView');
 		
+		var parentID = cm.getCanvas().ddm.getActivityByUIID(t.fromUIID).parentUIID;
+		cm.moveActivitiesToBranchSequence(t.toUIID, cm.getCanvas().ddm.getActivityByUIID(parentID));
+		
 		return true;
 	}
 	
@@ -395,10 +398,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
 		
-		var newBranch_mc:MovieClip = branchLayer.createChildAtDepth("BranchConnector",DepthManager.kTop,{_branch:b,_transition:b,_canvasController:cbc,_canvasBranchView:cbv});
+		var newBranch_mc:MovieClip = branchLayer.createChildAtDepth("BranchConnector",DepthManager.kTop,{_branch:b,_canvasController:cbc,_canvasBranchView:cbv});
 		
 		cm.branchesDisplayed.put(b.branchUIID,newBranch_mc);
 		Debugger.log('drawn a branch:'+b.branchUIID+','+newBranch_mc,Debugger.GEN,'drawBranch','CanvasView');
+		
+		cm.moveActivitiesToBranchSequence(b.targetUIID, b.sequenceActivity);
 		
 		return true;
 	}

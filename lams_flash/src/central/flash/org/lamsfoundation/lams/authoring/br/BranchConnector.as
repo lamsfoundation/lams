@@ -46,6 +46,7 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 	
 	public function init():Void{
 		_drawnLineStyle = 0xEA00FF;
+		arrow_mc.setStyle("backgroundColor", "0xEA00FF");
 		draw();
 	}
 	
