@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.style.*;
 import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.authoring.br.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.mvc.*;
@@ -212,9 +213,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 		Debugger.log('adding hubs for branch activity:' + _canvasBranchingActivity,Debugger.CRITICAL,'setupConenctorHubs','org.lamsfoundation.lams.CanvasBranchView');
 		
-		cHubStart_mc = activityLayer.createChildAtDepth("CanvasBranchingConnector",DepthManager.kTop,{_activity:_canvasBranchingActivity.activity,_canvasController:getController(),_canvasView:_canvasBranchView, _x: 0 , _y: 0});
+		// start-point connector hub
+		cHubStart_mc = activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity:_canvasBranchingActivity.activity,_canvasController:getController(),_canvasView:_canvasBranchView, _x: 0 , _y: 0});
 		
-		//cHubEnd_mc = activityLayer.createChildAtDepth("CanvasBranchingConnector",DepthManager.kTop,{_activity:_canvasBranchingActivity.activity,_canvasController:getController(),_canvasView:_canvasBranchView, _x: 0 , _y: 0});
+		// end-point connector hub
+		cHubEnd_mc = activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity:_canvasBranchingActivity.activity,_canvasController:getController(),_canvasView:_canvasBranchView, _x: 0 , _y: 0});
 
 	}
 	
@@ -228,9 +231,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		} else {
 			// TODO: make the last create sequence activity in array (order id) the default?
 			var children:Array = _cm.getCanvas().ddm.getComplexActivityChildren(activity.activityUIID);
-			// for(var i=0; i<children.length;i++) {
-				defaultSequenceActivity = children[children.length-1];
-			//}
+			defaultSequenceActivity = children[children.length-1];
 		}
 	}
 	
@@ -403,7 +404,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		cm.branchesDisplayed.put(b.branchUIID,newBranch_mc);
 		Debugger.log('drawn a branch:'+b.branchUIID+','+newBranch_mc,Debugger.GEN,'drawBranch','CanvasView');
 		
-		cm.moveActivitiesToBranchSequence(b.targetUIID, b.sequenceActivity);
+		if(b.direction != BranchConnector.DIR_TO_END)
+			cm.moveActivitiesToBranchSequence(b.targetUIID, b.sequenceActivity);
 		
 		return true;
 	}

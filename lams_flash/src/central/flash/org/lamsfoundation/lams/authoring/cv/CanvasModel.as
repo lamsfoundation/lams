@@ -575,7 +575,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		}
 		
 		if(_connectionActivities.length > 0) {
-			if(_connectionActivities[0].activityUIID == activeView.startHub.activity.activityUIID) {
+			if(_connectionActivities[0].activityUIID == activeView.startHub.activity.activityUIID || 
+			   activity.activityUIID == activeView.endHub.activity.activityUIID) {
 				return addActivityToBranch(activity);
 			} else {
 				return addActivityToTransition(activity);
@@ -616,7 +617,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			}
 			
 			//lets make the connection
-			var b:Branch = createBranchStartConnector(_connectionActivities);
+			var b:Branch = (toAct == activeView.endHub.activity.activityUIID) ? createBranchEndConnector(_connectionActivities) 
+								: createBranchStartConnector(_connectionActivities);
 
 			Debugger.log('No validation errors, creating branch.......' + b,Debugger.GEN,'addActivityToBranch','CanvasModel');
 				
@@ -748,7 +750,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	}
 	
 	/**
-	 * Forms a transition	
 	 * @usage   
 	 * @param   transitionActs An array of transition activities. Must only contain 2
 	 * @return  
@@ -764,7 +765,22 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 		return b;
 	}
-	
+
+	/**
+	 * @usage   
+	 * @param   transitionActs An array of transition activities. Must only contain 2
+	 * @return  
+	 */
+	private function createBranchEndConnector(transitionActs:Array):Branch{
+		var fromAct:Activity = transitionActs[0];
+		var toAct:Activity = transitionActs[1];
+		
+		var sequence:Activity = _cv.ddm.getActivityByUIID(fromAct.parentUIID);
+		var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_TO_END, fromAct.activityUIID, activeView.endHub.activity.activityUIID, sequence, _cv.ddm.learningDesignID);
+		
+		return b;
+	}
+
 	public function moveActivitiesToBranchSequence(activityUIID:Number, sequence:SequenceActivity):Boolean {
 		// move first activity
 		var ca = _activitiesDisplayed.get(activityUIID);
