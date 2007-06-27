@@ -623,7 +623,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			Debugger.log('No validation errors, creating branch.......' + b,Debugger.GEN,'addActivityToBranch','CanvasModel');
 				
 			//add it to the DDM
-			var success:Object = _cv.ddm.addBranch(b);
+			if(b != null)
+				var success:Object = _cv.ddm.addBranch(b);
 			
 			//flag the model as dirty and trigger a refresh
 			_cv.stopTransitionTool();
@@ -673,6 +674,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			
 			if(!_cv.ddm.activities.containsKey(toAct)){
 				return new LFError(Dictionary.getValue('cv_trans_target_act_missing'),"addActivityToTransition",this);
+			}
+			
+			var branch = _cv.ddm.getBranchesForActivityUIID(toAct);
+			if(branch.target != null) {
+				return new LFError("Can't create transition between activities in different branches", "addActivityToTransition", this);
 			}
 				
 			//check there is not already a transition to or from this activity:
@@ -776,8 +782,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		var toAct:Activity = transitionActs[1];
 		
 		var sequence:Activity = _cv.ddm.getActivityByUIID(fromAct.parentUIID);
-		var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_TO_END, fromAct.activityUIID, activeView.endHub.activity.activityUIID, sequence, _cv.ddm.learningDesignID);
-		
+		var b:Branch = (_cv.ddm.getBranchesForActivityUIID(sequence.activityUIID).myBranches.length > 0) ? new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_TO_END, fromAct.activityUIID, activeView.endHub.activity.activityUIID, sequence, _cv.ddm.learningDesignID)
+						: null;
 		return b;
 	}
 

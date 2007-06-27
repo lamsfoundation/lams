@@ -80,8 +80,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasConnection extends MovieClip{
 		this.moveTo(_startPoint.x, _startPoint.y);
 		this.lineTo(_endPoint.x, _endPoint.y);
 		
-		Debugger.log('drawn line from:'+_startPoint.x+','+_startPoint.y+'to:'+_endPoint.x+','+_endPoint.y,4,'draw','CanvasTransition');
-		
 		// calc activity root angles
 		var fromAct_Angle:Number = Math.atan2(fromOTC.y, fromOTC.x);
 		var toAct_Angle:Number = Math.atan2(toOTC.y,toOTC.x);
@@ -89,15 +87,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasConnection extends MovieClip{
 		var fromAct_Deg:Number = convertToDegrees(fromAct_Angle);
 		var toAct_Deg:Number = convertToDegrees(toAct_Angle);
 		
-		Debugger.log("fromAct root angle: " + fromAct_Deg, Debugger.CRITICAL, "draw", "CanvasConnection");
-		Debugger.log("toAct root angle: " + toAct_Deg, Debugger.CRITICAL, "draw", "CanvasConnection");
-		
 		// gradient
 		var angle:Number = Math.atan2((_endPoint.y - _startPoint.y),(_endPoint.x - _startPoint.x));
 		var degs:Number = convertToDegrees(angle);
-		
-		Debugger.log("angle: " + angle, Debugger.CRITICAL, "draw", "CanvasConnection");
-		Debugger.log("degs: " + degs, Debugger.CRITICAL, "draw", "CanvasConnection");
 		
 		// get edgepoint for connected activities 
 		_fromAct_edgePoint = calcEdgePoint(degs, fromOTC.x, fromOTC.y, fromAct_Deg,  _startPoint);
@@ -111,13 +103,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasConnection extends MovieClip{
 			arrow_mc._x = (_startPoint.x + _endPoint.x)/2;
 			arrow_mc._y = (_startPoint.y + _endPoint.y)/2;
 		}
-		
-		Debugger.log("startPoint: (" + _startPoint.x + ", " + _startPoint.y + ")", Debugger.CRITICAL, "draw", "CanvasConnection");
-		Debugger.log("fromAct edge point: (" + _fromAct_edgePoint.x + ", " + _fromAct_edgePoint.y + ")", Debugger.CRITICAL, "draw", "CanvasConnection");
-		Debugger.log("toAct edge point: (" + _toAct_edgePoint.x + ", " + _toAct_edgePoint.y + ")", Debugger.CRITICAL, "draw", "CanvasConnection");
-		Debugger.log("endPoint: (" + _endPoint.x + ", " + _endPoint.y + ")", Debugger.CRITICAL, "draw", "CanvasConnection");
-		
-		Debugger.log("mid point: (" + _midPoint.x + ", " + _midPoint.y + ")", Debugger.CRITICAL, "draw", "CanvasConnection");
 		
 		arrow_mc._rotation = degs;
 		arrow_mc._visible = true;

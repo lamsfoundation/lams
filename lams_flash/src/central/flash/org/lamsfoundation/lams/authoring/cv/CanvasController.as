@@ -415,7 +415,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		if(_canvasModel.isDragging){
 			ct.stopDrag();
 			
-			if (ct.hitTest(_canvasModel.getCanvas().bin) && !isTransitionTargetReadOnly(ct, Dictionary.getValue("cv_element_readOnly_action_del"))){
+			if(ct.hitTest(_canvasModel.getCanvas().bin) && !isTransitionTargetReadOnly(ct, Dictionary.getValue("cv_element_readOnly_action_del"))){
 				_canvasModel.getCanvas().removeTransition(ct.transition.transitionUIID); 
 			} else {
 				if (ct._x != ct.xPosition){
@@ -432,12 +432,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		Debugger.log("branchRelease Transition:" + bc.branch.branchUIID, Debugger.GEN, "branchRelease", "CanvasController");
 		if(_canvasModel.isDragging){
 			bc.stopDrag();
-			
+			if(bc.hitTest(_canvasModel.getCanvas().bin) && !isBranchTargetReadOnly(bc, Dictionary.getValue("cv_element_readOnly_action_del"))){
+				_canvasModel.getCanvas().removeBranch(bc.branch.branchUIID); 
+			} else {
 				if (bc._x != bc.xPosition){
 					var t = _canvasModel.branchesDisplayed.remove(bc.branch.branchUIID);
 					t.removeMovieClip();
 					_canvasModel.setDirty();
 				}
+			}
 		}
 	
     }
@@ -561,6 +564,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	private function isTransitionTargetReadOnly(ct:CanvasTransition, action:String):Boolean {
 		if(_canvasModel.getActivityMCByUIID(ct.transition.toUIID).activity.isReadOnly()) {
 			LFMessage.showMessageAlert(Dictionary.getValue('cv_trans_readOnly', [action]));
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	private function isBranchTargetReadOnly(bc:BranchConnector, action:String):Boolean {
+		if(_canvasModel.getActivityMCByUIID(bc.branch.targetUIID).activity.isReadOnly()) {
+			LFMessage.showMessageAlert(Dictionary.getValue('cv_trans_readOnly', [action])); // TODO: change dictionary message.
 			return true;
 		} else {
 			return false;

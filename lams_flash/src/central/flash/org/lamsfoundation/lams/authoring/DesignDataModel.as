@@ -860,9 +860,10 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var myBranches:Array = new Array();
 		var hub = null;
 		var target = null;
+		var sequence = null;
 		
 		for(var i=0; i<br.length;i++){
-			if(br[i].targetUIID == UIID || br[i].hubUIID == UIID){
+			if(br[i].targetUIID == UIID || br[i].hubUIID == UIID || br[i].sequenceActivity.activityUIID == UIID){
 				myBranches.push(br[i]);
 			}
 			if(target != null && hub != null){
@@ -874,10 +875,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				if(br[i].hubUIID == UIID){
 					hub = br[i];
 				}
+				if(br[i].sequenceActivity.activityUIID == UIID){
+					sequence = br[i].sequenceActivity;
+				}
 			}
 		}
 		branchObj.myBranches = myBranches;
 		branchObj.target = target;
+		branchObj.sequence = sequence;
 		branchObj.hub = hub;
 		return branchObj;
 	}
