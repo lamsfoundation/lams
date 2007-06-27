@@ -345,6 +345,11 @@
 				<include name="mysql*.xml" />
 				<include name="local-service.xml" />
 			</fileset>
+	        <filterset>
+	            <filter token="db.name" value="${db.name}"/>
+                <filter token="db.username" value="${db.username}"/>
+                <filter token="db.password" value="${db.password}"/>
+	        </filterset>
 		</copy>
 		<copy overwrite="yes" todir="${jboss.ear.deploy}/jbossweb-tomcat55.sar/META-INF">
 			<fileset dir="${conf.jboss}/tomcat">
