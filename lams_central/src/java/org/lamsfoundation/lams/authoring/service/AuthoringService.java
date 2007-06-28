@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.authoring.IObjectExtractor;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
@@ -795,6 +796,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     	    				GroupBranchActivityEntry entry = (GroupBranchActivityEntry) iter2.next();
     	    				SequenceActivity oldSequenceActivity = entry.getBranchSequenceActivity();
     	    				entry.setBranchSequenceActivity((SequenceActivity) newActivities.get(oldSequenceActivity.getActivityUIID()));
+    	    				BranchingActivity oldBranchingActivity = entry.getBranchingActivity();
+    	    				entry.setBranchingActivity((BranchingActivity) newActivities.get(oldBranchingActivity.getActivityUIID()));
     	    			}
     	    		}
     			}
