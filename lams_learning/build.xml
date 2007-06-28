@@ -246,6 +246,8 @@
 				<include name="grouping/*"/>
 				<include name="images/*"/>
 				<include name="layout/*"/>
+				<include name="branching/*"/>
+				<include name="sequence/*"/>
 			</fileset>
 		</war>
 	</target>
