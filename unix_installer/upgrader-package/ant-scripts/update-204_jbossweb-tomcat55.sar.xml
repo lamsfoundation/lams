@@ -1,0 +1,32 @@
+<project name="update-jbossweb-tommcat55" basedir=".">
+
+	<property file="../lams.properties" />
+	<target name="update-conf-204" description="Fixes a 2.0.2 installer bug, conf files in update-jbossweb-tommcat55.sar were copied to the lams.ear directory and not the server/default/deploy directory">
+		<copy overwrite="true" todir="${DEPLOY_DIR}/jbossweb-tomcat55.sar/META-INF" failonerror="true">
+                        <fileset dir="tomcat-204-files">
+                                <include name="jboss-service.xml" />
+                        </fileset>
+                </copy>
+
+                <copy overwrite="true" todir="${DEPLOY_DIR}/jbossweb-tomcat55.sar/" failonerror="true">
+                        <fileset dir="tomcat-204-files">
+                                <include name="server.xml" />
+                        </fileset>
+                        <filterset>
+                                <filter token="LAMS_PORT" value="${LAMS_PORT}"/>
+                        </filterset>
+                </copy>
+
+                <copy overwrite="true" todir="${DEPLOY_DIR}/jbossweb-tomcat55.sar/" failonerror="true">
+                        <fileset dir="tomcat-204-files">
+                                <include name="context.xml" />
+                        </fileset>
+                </copy>
+
+                <copy overwrite="true" todir="${DEPLOY_DIR}/jbossweb-tomcat55.sar/conf" failonerror="true">
+                         <fileset dir="tomcat-204-files">
+                                 <include name="web.xml" />
+                         </fileset>
+                </copy>
+	</target>
+</project>

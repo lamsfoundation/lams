@@ -4,7 +4,7 @@
 	<property file="lang.properties"/>
 
 	<target name="update-languages" description="Runs the entire language pack process">
-		<antcall target="copy-languages"/>
+		<!-- Done in main update-lams.xml build <antcall target="copy-languages"/> -->
 		<antcall target="copy-flash-xml"/>
 		<antcall target="copy-llid"/>
 		<antcall target="update-database"/>
@@ -34,7 +34,7 @@
 	<target name="update-database" description="Updates the database to record the current language pack">
 		<sql driver="com.mysql.jdbc.Driver" 
 			classpath="${sql.classpath}" 
-			url="${db.url}" 
+			url="${SQL_URL}" 
 			userid="${DB_USER}" 
 			password="${DB_PASS}"
 			encoding="utf8"

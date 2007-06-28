@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+#   Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+#   License Information: http://lamsfoundation.org/licensing/lams/2.0/
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License version 2.0 
+#   as published by the Free Software Foundation.
+# 
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+# 
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+#   USA
+# 
+#   http://www.gnu.org/licenses/gpl.txt 
+#
+#   Author: Luke Foxton
+-->
+
+<project name="update-lams" basedir=".">
+	<property file="../lams.properties" />
+	<property file="lang.properties"/>
+
+	<!-- Main Task, calls all the other tasks -->
+	<target name="update-lams" description="Runs the entire update process">
+		<!-- antcall target="check-software" / -->
+		<antcall target="configure-jboss" />
+		<antcall target="copy-core-jars-wars" />
+		<antcall target="update-core-database" />
+		<antcall target="update-mysql-ds" />
+		<antcall target="update-lams-www-war" />
+		<antcall target="explode-wars"/>
+		<antcall target="create-tool-deployer" />
+		<antcall target="deploy-tools"/>
+		<antcall target="update-context-paths"/>
+		<antcall target="compress-wars"/>
+		<antcall target="language-pack" />
+		<antcall target="remove-lams-temp" />
+		<antcall target="set-lams-configuration" />
+		<antcall target="copy-properties-to-etc"/>
+		<echo message="Install complete"/>
+	</target>
+
+
+	<target name="configure-jboss" description="Copying jboss-cash.jar and jgroups.jar from server/all/lib to server/default/lib">
+		<echo message="Copying jboss-cache.jar and jgroups.jar from ${JBOSS_DIR}/server/all/lib to ${JBOSS_DIR}/server/default/lib"/>
+		<copy file="${JBOSS_DIR}/server/all/lib/jboss-cache.jar" todir="${JBOSS_DIR}/server/default/lib" failonerror="true" overwrite="true" />
+		<copy file="${JBOSS_DIR}/server/all/lib/jgroups.jar" todir="${JBOSS_DIR}/server/default/lib" failonerror="true" overwrite="true" />
+
+		<copy todir="${JBOSS_DIR}/bin" overwrite="true" failonerror="true">
+			<fileset dir="../bin/">
+				<include name="run-lams.sh" />
+			</fileset>
+			<filterset> 
+				<filter token="JAVA_HOME" value="${JDK_DIR}" />
+			</filterset>
+		</copy>
+
+		<chmod file="${JBOSS_DIR}/bin/run-lams.sh" perm="755"/>
+	</target>
+
+	<target name="copy-core-jars-wars" description="Overwrites lams.ear files built from assemble-ear ant task. Does not deploy tools">
+		<echo message="Overwriting assembled files into the deploy directory"/>
+		<copy todir="${DEPLOY_DIR}/lams.ear" overwrite="true">
+			<fileset dir="../assembly/lams.ear" >
+				<exclude name="*.bak"/>
+				<exclude name="*.tmp"/>
+				<exclude name="**/lams-www.war/**"/>
+				<exclude name="**/META-INF/**"/>
+				<exclude name="**/lams-dictionary.jar/org/lamsfoundation/lams/library/**"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${DEFAULT_DIR}/lib" overwrite="true">
+			<fileset dir="../assembly">
+				<include name="lams-valve.jar"/>
+				<include name="lams-session.jar"/>
+			</fileset>
+		</copy>	
+	
+		<echo message="lams.ear successfully updated"/>
+	</target>
+
+	<target name="update-core-database" description="Runs the sql scripts required to update the database">
+		<echo>Updating core database</echo>
+		<ant antfile="update-core-database.xml" output="../log/update-core-database.log" target="update-core-database" />
+	</target>
+
+	<target name="update-lams-www-war" description="Updates files in lams-www.war">
+		<echo>Updating lams-www.war</echo>
+
+
+		<copy todir="${DEPLOY_DIR}/lams.ear/lams-www.war/images" overwrite="true">
+			<fileset dir="../assembly/lams.ear/lams-www.war/images/">
+				<include name="learner.logo.swf"/>
+				<include name="monitor.logo.swf"/>
+				<include name="preloader.logo.swf"/>
+				<include name="about.logo.swf"/>
+			</fileset>			
+		</copy>
+	
+		<!-- uncomment for 2.1 
+		<copy todir="${DEPLOY_DIR}/lams.ear/lams-www.war/WEB-INF/tags" overwrite="true">
+                        <fileset dir="../assembly/lams.ear/lams-www.war/WEB-INF/tags">
+                                <include name="AuthoringButton.tag"/>
+                                <include name="ImgButton.tag"/>
+                                <include name="TabBody.tag"/>
+                                <include name="Tabs.tag"/>
+				<include name="Tab.tag"/>
+				<include name="FCKEditor.tag"/>
+				<include name="Passon.tag"/>
+                        </fileset>
+                </copy>
+		
+		<copy todir="${DEPLOY_DIR}/lams.ear/lams-www.war/WEB-INF" overwrite="true">
+			<fileset dir="../assembly/lams.ear/lams-www.war/WEB-INF">
+				<include name="lams.tld"/>
+			</fileset>
+		</copy>	
+		-->
+
+		<copy todir="${DEPLOY_DIR}/lams.ear/lams-www.war/" overwrite="true">
+			<fileset dir="../assembly/lams.ear/lams-www.war">
+				<include name="news.html"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="update-mysql-ds" description="Updates mysql-ds.xml to have the SQL url in the lams.properties">
+		<copy todir="${DEPLOY_DIR}" overwrite="true">
+			<fileset dir="../conf">
+				<include name="mysql-ds.xml"/>
+			</fileset>
+			<filterset>
+				<filter token="SQL_HOST" value="${SQL_HOST}"/>
+				<filter token="DB_NAME" value="${DB_NAME}"/>
+				<filter token="DB_USER" value="${DB_USER}"/>
+				<filter token="DB_PASS" value="${DB_PASS}"/>
+			</filterset>
+		</copy>
+	</target>
+
+	<target name="explode-wars" description="Explodes the lams-learning and lams-monitoring wars so their files can be altered by the tool deployer">
+		<ant antfile="../tools/update-deploy-tools.xml" output="../log/explode-wars.log" target="explode-wars">
+			<property name="jboss.deploy" value="${EAR_DIR}"/>
+		</ant>
+	</target>
+
+	<target name="compress-wars" description="Compresses the lams-learning and lams-monitoring wars after their files have been altered by the tool deployer">
+		<ant antfile="../tools/update-deploy-tools.xml" output="../log/compress-wars.log" target="compress-wars">
+			<property name="jboss.deploy" value="${EAR_DIR}"/>
+		</ant>
+	</target>
+
+	<target name="create-tool-deployer" description="Creates all the required deploy.xml files for the tool deployer">
+		<ant antfile="update-deploy-tools.xml" output="../log/create-lachat11-deploy.log" target="create-deploy-package">
+			<property name="prop.path" value="lachat11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/create-lafrum11-deploy.log" target="create-deploy-package">
+			<property name="prop.path" value="lafrum11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/create-lamc11-deploy.log" target="create-deploy-package">
+			<property name="prop.path" value="lamc11"/>
+		</ant>
+		
+		<ant antfile="update-deploy-tools.xml" output="../log/create-lanb11-deploy.log" target="create-deploy-package">
+			<property name="prop.path" value="lanb11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/create-lantbk11-deploy.log" target="create-deploy-package">
+			<property name="prop.path" value="lantbk11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/create-laqa11-deploy.log" target="create-deploy-package">
+			<property name="prop.path" value="laqa11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/create-larsrc11-deploy.log" target="create-deploy-package">
+			<property name="prop.path" value="larsrc11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/create-lasbmt11-deploy.log" target="create-deploy-package">
+			<property name="prop.path" value="lasbmt11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/create-lascrb11-deploy.log" target="create-deploy-package">
+			<property name="prop.path" value="lascrb11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/create-lasurv11-deploy.log" target="create-deploy-package">
+			<property name="prop.path" value="lasurv11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/create-lavote11-deploy.log" target="create-deploy-package">
+			<property name="prop.path" value="lavote11"/>
+		</ant>
+	</target>
+
+	<target name="deploy-tools" description="Deploys the tools once all the deploy.xml files have been generated">
+		<ant antfile="update-deploy-tools.xml" output="../log/deploy-lachat11.log" target="deploy-tool">
+			<property name="prop.path" value="lachat11"/>
+		</ant>
+		<ant antfile="update-deploy-tools.xml" output="../log/deploy-lafrum11.log" target="deploy-tool">
+			<property name="prop.path" value="lafrum11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/deploy-lamc11.log" target="deploy-tool">
+			<property name="prop.path" value="lamc11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/deploy-lanb11.log" target="deploy-tool">
+			<property name="prop.path" value="lanb11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/deploy-lantbk11.log" target="deploy-tool">
+			<property name="prop.path" value="lantbk11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/deploy-laqa11.log" target="deploy-tool">
+			<property name="prop.path" value="laqa11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/deploy-larsrc11.log" target="deploy-tool">
+			<property name="prop.path" value="larsrc11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/deploy-lasbmt11.log" target="deploy-tool">
+			<property name="prop.path" value="lasbmt11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/deploy-lascrb11.log" target="deploy-tool">
+			<property name="prop.path" value="lascrb11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/deploy-lasurv11.log" target="deploy-tool">
+			<property name="prop.path" value="lasurv11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/deploy-lavote11.log" target="deploy-tool">
+			<property name="prop.path" value="lavote11"/>
+		</ant>
+	</target> 
+
+	<target name="update-context-paths" description="Updating web.xml and MANIFEST.MF for lams-central.war, lams-monitor.war and lams-learning.war. using config from ${build.deploy}/deploy.xml">
+		<ant antfile="update-deploy-tools.xml" output="../log/update-tool-context-lachat11.log" target="update-tool-context">
+			<property name="prop.path" value="lachat11"/>
+		</ant>
+		<ant antfile="update-deploy-tools.xml" output="../log/update-tool-context-lafrum11.log" target="update-tool-context">
+			<property name="prop.path" value="lafrum11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/update-tool-context-lamc11.log" target="update-tool-context">
+			<property name="prop.path" value="lamc11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/update-tool-context-lanb11.log" target="update-tool-context">
+			<property name="prop.path" value="lanb11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/update-tool-context-lantbk11.log" target="update-tool-context">
+			<property name="prop.path" value="lantbk11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/update-tool-context-laqa11.log" target="update-tool-context">
+			<property name="prop.path" value="laqa11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/update-tool-context-larsrc11.log" target="update-tool-context">
+			<property name="prop.path" value="larsrc11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/update-tool-context-lasbmt11.log" target="update-tool-context">
+			<property name="prop.path" value="lasbmt11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/update-tool-context-lascrb11.log" target="update-tool-context">
+			<property name="prop.path" value="lascrb11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/update-tool-context-lasurv11.log" target="update-tool-context">
+			<property name="prop.path" value="lasurv11"/>
+		</ant>
+
+		<ant antfile="update-deploy-tools.xml" output="../log/update-tool-context-lavote11.log" target="update-tool-context">
+			<property name="prop.path" value="lavote11"/>
+		</ant>
+		
+	</target> 
+
+
+
+	<target name="language-pack" description="Runs the latest language pack included with the updater">
+		<ant antfile="../language-pack/language-pack.xml" output="../log/language-pack.log" target="update-languages" inheritAll="true">
+			<property file="../language-pack/lang.properties"/>
+		</ant>
+	</target>
+
+	<target name="remove-lams-temp" description="Removes temporary cache files so that LAMS will restart correctly in the browser">
+                
+		<delete dir="${DEFAULT_DIR}/tmp" includeemptydirs="true" failonerror="false"/>
+		<delete dir="${DEFAULT_DIR}/work/jboss.web/localhost" includeemptydirs="true" failonerror="false"/>
+
+	</target>
+
+
+	<target name="set-lams-configuration" description="Updates the lams_configuration table with all the settings from lams.properties">
+		<sql driver="com.mysql.jdbc.Driver" 
+			classpath="${DEPLOY_DIR}/lams.ear/mysql-connector-java-3.1.12-bin.jar" 
+			url="${SQL_URL}" 
+			userid="${DB_USER}" 
+			password="${DB_PASS}"
+			encoding="utf8"
+			onerror="abort"
+			>
+			<transaction src="../sql-scripts/setLamsConfiguration.sql" />
+		</sql>
+	</target>
+
+	<target name="copy-properties-to-etc" description="Copies properties files to etc, so they can be used in late updaters">
+		<mkdir dir="/etc/lams2"/>
+
+		<copy todir="/etc/lams2" file= "../lams.properties"/>
+		<copy todir="/etc/lams2" file= "lang.properties"/>
+	</target>		
+
+</project>

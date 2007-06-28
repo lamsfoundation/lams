@@ -36,7 +36,7 @@
 			outputPath="${build.deploy}"
 			dbPassword="${db.password}"
 			dbUsername="${db.username}"
-			dbDriverUrl="${db.url}"
+			dbDriverUrl="${SQL_URL}"
 			dbDriverClass="com.mysql.jdbc.Driver"
 			deployFiles="${build.deploy}/${product}.war,${build.deploy}/${product}.jar"
 			toolJarFileName="${product}.jar"
