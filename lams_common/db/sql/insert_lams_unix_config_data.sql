@@ -1,6 +1,6 @@
 insert into lams_configuration (config_key, config_value) values ('ServerURL','http://shaun.melcoe.mq.edu.au/lams/');
 insert into lams_configuration (config_key, config_value) values ('ServerURLContextPath','lams/');
-insert into lams_configuration (config_key, config_value) values ('Version','2.0.3');
+insert into lams_configuration (config_key, config_value) values ('Version','2.0.4 DEV');
 insert into lams_configuration (config_key, config_value) values ('TempDir','/var/opt/lams/temp');
 insert into lams_configuration (config_key, config_value) values ('DumpDir','/var/opt/lams/dump');
 insert into lams_configuration (config_key, config_value) values ('EARDir','/usr/local/jboss-4.0.2/server/default/deploy/lams.ear');
@@ -15,10 +15,10 @@ insert into lams_configuration (config_key, config_value) values ('UserInactiveT
 insert into lams_configuration (config_key, config_value) values ('UseCacheDebugListener','false');
 insert into lams_configuration (config_key, config_value) values ('CleanupPreviewOlderThanDays','7');
 insert into lams_configuration (config_key, config_value) values ('AuthoringActivitiesColour', 'true');
-insert into lams_configuration (config_key, config_value) values ('AuthoringClientVersion','2.0.3.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('MonitorClientVersion','2.0.3.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('LearnerClientVersion','2.0.3.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('ServerVersionNumber','2.0.3.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('AuthoringClientVersion','2.0.4.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('MonitorClientVersion','2.0.4.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('LearnerClientVersion','2.0.4.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('ServerVersionNumber','2.0.4.@datetimestamp@');
 insert into lams_configuration (config_key, config_value) values ('ServerLanguage','en_AU');
 insert into lams_configuration (config_key, config_value) values ('ServerPageDirection','LTR');
 insert into lams_configuration (config_key, config_value) values ('DictionaryDateCreated','2007-05-24');
