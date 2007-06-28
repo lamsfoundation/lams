@@ -59,8 +59,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
- *  * @struts.action name = "ImportAction"
- *  			  path = "/authoring/importToolContent"
+ *  * @struts.action path = "/authoring/importToolContent"
  * 				  validate = "false"
  * @struts.action-forward name = "upload" path = "/toolcontent/import.jsp"
  * @struts.action-forward name = "success" path = "/toolcontent/importresult.jsp"

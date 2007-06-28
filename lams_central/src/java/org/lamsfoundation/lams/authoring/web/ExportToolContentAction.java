@@ -49,8 +49,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * 
- * @struts.action name = "ExportAction"
- *   			  path = "/authoring/exportToolContent"
+ * @struts.action path = "/authoring/exportToolContent"
  * 				  validate = "false"
  * @struts.action-forward name = "choice" path = "/toolcontent/exportchoice.jsp"
  * @struts.action-forward name = "loading" path = "/toolcontent/exportloading.jsp"

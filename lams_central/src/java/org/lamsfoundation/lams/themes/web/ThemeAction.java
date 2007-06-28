@@ -51,8 +51,7 @@ import org.lamsfoundation.lams.util.MessageService;
  * 
  * @author Mitchell Seaton
  * 
- * @struts.action name = "ThemeAction"
- * 				  path = "/theme"
+ * @struts.action path = "/theme"
  * 				  parameter = "method"
  * 				  validate = "false"
  *

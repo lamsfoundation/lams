@@ -51,8 +51,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author Manpreet Minhas
  * 
- * @struts.action name = "AuthoringAction"
- * 				  path = "/authoring/author"
+ * @struts.action path = "/authoring/author"
  * 				  parameter = "method"
  * 				  validate = "false"
  *    
