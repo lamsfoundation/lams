@@ -48,6 +48,7 @@
 				<filter token="DB_NAME" value="${DB_NAME}" />
 				<filter token="DB_USER" value="${DB_USER}" />
 				<filter token="DB_PASS" value="${DB_PASS}" />
+				<filter token="MYSQL_HOST" value="${SQL_HOST}" />
 			</filterset>
 		</copy>
 		<copy overwrite="true" todir="${DEPLOY_DIR}" failonerror="true">
@@ -56,7 +57,7 @@
 			</fileset>
 		</copy>
 
-		<copy overwrite="true" todir="${EAR_DIR}/jbossweb-tomcat55.sar/META-INF" failonerror="true">
+		<copy overwrite="true" todir="${DEPLOY_DIR}/jbossweb-tomcat55.sar/META-INF" failonerror="true">
 			<fileset dir="${JBOSS_CONF}/tomcat">
 				<include name="jboss-service.xml" />
 			</fileset>
@@ -77,13 +78,13 @@
 			</fileset>
 		</copy>
 
-		<copy overwrite="true" todir="${EAR_DIR}/jbossweb-tomcat55.sar/conf" failonerror="true">
+		<copy overwrite="true" todir="${DEPLOY_DIR}/jbossweb-tomcat55.sar/conf" failonerror="true">
 			 <fileset dir="${JBOSS_CONF}/tomcat">
 				 <include name="web.xml" />
 			 </fileset>
 		</copy>
 		
-		<copy overwrite="yes" todir="${BINDIR}">
+		<copy overwrite="true" todir="${BINDIR}">
                         <fileset dir="bin">
                                 <include name="run-lams.sh" />
                         </fileset>
