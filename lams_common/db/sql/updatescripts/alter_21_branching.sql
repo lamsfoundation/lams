@@ -8,14 +8,18 @@ CREATE TABLE lams_group_branch_activity (
        entry_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , entry_ui_id INT(11)
      , group_id BIGINT(20) NOT NULL
-     , activity_id BIGINT(20) NOT NULL
-     , UNIQUE UQ_lams_group_activity (activity_id, group_id)
+     , sequence_activity_id BIGINT(20) NOT NULL
+     , branch_activity_id BIGINT(20) NOT NULL
+     , UNIQUE UQ_lams_group_activity (group_id, branch_activity_id)
      , PRIMARY KEY (entry_id)
      , INDEX (group_id)
      , CONSTRAINT FK_lams_group_activity_1 FOREIGN KEY (group_id)
                   REFERENCES lams_group (group_id)
-     , INDEX (activity_id)
-     , CONSTRAINT FK_lams_group_activity_2 FOREIGN KEY (activity_id)
+     , INDEX (sequence_activity_id)
+     , CONSTRAINT FK_lams_branch_map_sequence FOREIGN KEY (sequence_activity_id)
+                  REFERENCES lams_learning_activity (activity_id)
+     , INDEX (branch_activity_id)
+     , CONSTRAINT FK_lams_branch_map_branch FOREIGN KEY (branch_activity_id)
                   REFERENCES lams_learning_activity (activity_id)
 )TYPE=InnoDB;
 

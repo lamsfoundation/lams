@@ -54,16 +54,20 @@ public class GroupBranchActivityEntry implements Serializable {
     /** persistent field */
     private SequenceActivity branchSequenceActivity;
 
-	//---------------------------------------------------------------------
+    /** persistent field */
+    private BranchingActivity branchingActivity;
+
+    //---------------------------------------------------------------------
     // Object creation Methods
     //---------------------------------------------------------------------
     
     /** full constructor */
-    public GroupBranchActivityEntry(Long entryId, Integer entryUIID, Group group, SequenceActivity branchSequenceActivity) {
+    public GroupBranchActivityEntry(Long entryId, Integer entryUIID, Group group, SequenceActivity branchSequenceActivity, BranchingActivity branchingActivity) {
         this.entryId = entryId;
         this.entryUIID = entryUIID;
         this.group = group;
         this.branchSequenceActivity = branchSequenceActivity;
+        this.branchingActivity = branchingActivity;
     }
 
     /** default constructor */
@@ -116,7 +120,7 @@ public class GroupBranchActivityEntry implements Serializable {
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
-     *            @hibernate.column name="activity_id"         
+     *            @hibernate.column name="sequence_activity_id"         
      *         
      */
     public org.lamsfoundation.lams.learningdesign.SequenceActivity getBranchSequenceActivity() {
@@ -125,6 +129,20 @@ public class GroupBranchActivityEntry implements Serializable {
 
     public void setBranchSequenceActivity(org.lamsfoundation.lams.learningdesign.SequenceActivity branchSequenceActivity) {
         this.branchSequenceActivity = branchSequenceActivity;
+    }
+
+    /** 
+     *            @hibernate.many-to-one
+     *             not-null="true"
+     *            @hibernate.column name="branch_activity_id"         
+     *         
+     */
+    public org.lamsfoundation.lams.learningdesign.BranchingActivity getBranchingActivity() {
+        return this.branchingActivity;
+    }
+
+    public void setBranchingActivity(org.lamsfoundation.lams.learningdesign.BranchingActivity branchingActivity) {
+        this.branchingActivity = branchingActivity;
     }
 
     public String toString() {

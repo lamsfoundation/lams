@@ -32,9 +32,16 @@
 
     <!-- bi-directional many-to-one association from the Branch's Sequence Activity -->
     <many-to-one name="branchSequenceActivity" class="org.lamsfoundation.lams.learningdesign.SequenceActivity">
-        <meta attribute="field-description">@hibernate.column name="activity_id"         
+        <meta attribute="field-description">@hibernate.column name="sequence_activity_id"         
         </meta>
-        <column name="activity_id" />
+        <column name="sequence_activity_id" />
+    </many-to-one>
+
+    <!-- bi-directional many-to-one association from the Branch's Sequence Activity -->
+    <many-to-one name="branchingActivity" class="org.lamsfoundation.lams.learningdesign.BranchingActivity">
+        <meta attribute="field-description">@hibernate.column name="branch_activity_id"         
+        </meta>
+        <column name="branch_activity_id" />
     </many-to-one>
     
 </class>

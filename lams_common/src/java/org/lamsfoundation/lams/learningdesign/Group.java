@@ -259,7 +259,7 @@ public class Group implements Serializable,Nullable,Comparable {
      *            @hibernate.collection-key
      *             column="group_id"
      *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.learningdesign.GroupBranchActivity"
+     *             class="org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry"
      *         
      */
 	public Set getBranchActivities() {
@@ -349,11 +349,12 @@ public class Group implements Serializable,Nullable,Comparable {
     			newGrouping, null, null, null);
     	
     	if ( this.getBranchActivities() != null && this.getBranchActivities().size() > 0) {
+    		newGroup.setBranchActivities(new HashSet());
 			Iterator iter = this.getBranchActivities().iterator();
 			while ( iter.hasNext() ) {
 				GroupBranchActivityEntry oldEntry = (GroupBranchActivityEntry) iter.next();
 				GroupBranchActivityEntry newEntry = new GroupBranchActivityEntry(null, 
-						oldEntry.getEntryUIID(), newGroup, oldEntry.getBranchSequenceActivity());
+						oldEntry.getEntryUIID(), newGroup, oldEntry.getBranchSequenceActivity(), oldEntry.getBranchingActivity());
 				newGroup.getBranchActivities().add(newEntry);
 			}
     	}

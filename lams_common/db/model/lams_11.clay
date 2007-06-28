@@ -5308,8 +5308,8 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="entry_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -5321,8 +5321,8 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="entry_ui_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
+<variant type-name-pattern="INT"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
@@ -5344,7 +5344,20 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="activity_id" remarks="">
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="sequence_activity_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="branch_activity_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
@@ -5365,8 +5378,8 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <unique-key-list>
 <unique-key alias="" name="UQ_lams_group_activity" remarks="">
 <unique-key-description></unique-key-description>
-<unique-key-column name="activity_id"/>
 <unique-key-column name="group_id"/>
+<unique-key-column name="branch_activity_id"/>
 </unique-key>
 </unique-key-list>
 <foreign-key-list>
@@ -5377,12 +5390,19 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 </foreign-key-figure>
 <foreign-key-column column-name="group_id" referenced-key-column-name="group_id"/>
 </foreign-key>
-<foreign-key alias="" name="FK_lams_group_activity_2" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_learning_activity" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key alias="" name="FK_lams_branch_map_sequence" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_learning_activity" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
 <foreign-key-description></foreign-key-description>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
-<foreign-key-column column-name="activity_id" referenced-key-column-name="activity_id"/>
+<foreign-key-column column-name="sequence_activity_id" referenced-key-column-name="activity_id"/>
+</foreign-key>
+<foreign-key alias="" name="FK_lams_branch_map_branch" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_learning_activity" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key-description></foreign-key-description>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="branch_activity_id" referenced-key-column-name="activity_id"/>
 </foreign-key>
 </foreign-key-list>
 <index-list/>

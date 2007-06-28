@@ -50,6 +50,7 @@ public class AttributeNames {
     public static final String PARAM_DEST_ACTIVITY_ID = "destActivityID"; 
     public static final String PARAM_ACTIVITY_ID = "activityID";
     public static final String PARAM_CONTENT_FOLDER_ID = "contentFolderID";
+    public static final String PARAM_TITLE = "title"; 
     
     public static final String PARAM_COURSE_ID = "courseID";
     public static final String PARAM_CLASS_ID = "classID";
@@ -58,6 +59,7 @@ public class AttributeNames {
     public static final String PARAM_LEARNINGDESIGN_ID = "learningDesignID";
     public static final String PARAM_ORGANISATION_ID = "organisationID";
     
+    public static final String PARAM_LEARNER_PROGRESS_ID = "progressID";
     public static final String PARAM_LESSON_ID = "lessonID";
     public static final String PARAM_DIRECTORY_NAME = "directoryName";
     public static final String PARAM_FILENAME = "filename";

@@ -206,13 +206,26 @@ public class LessonService implements ILessonService
     }
 
 	/**
-     * Perform the grouping, setting the given list of learners as one group. Not used initially.
+     * Perform the grouping, setting the given list of learners as one group. 
      * @param groupingActivity the activity that has create grouping. (mandatory)
-     * @param learners to form one group
+     * @param groupName (optional)
+     * @param learners to form one group (mandatory)
      */
   	public void performGrouping(GroupingActivity groupingActivity, String groupName, List learners) throws LessonServiceException {
     	
         Grouping grouping = groupingActivity.getCreateGrouping();
+        performGrouping(grouping, groupName, learners);
+  	}
+  	
+	/**
+     * Perform the grouping, setting the given list of learners as one group.  Used in suitations
+     * where there is a grouping but no grouping activity (e.g. in branching).
+     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param groupName (optional)
+     * @param learners to form one group (mandatory)
+     */
+  	public void performGrouping(Grouping grouping, String groupName, List learners) throws LessonServiceException {
+  		
 		if ( grouping != null && grouping.isChosenGrouping() ) {
         	Grouper grouper = grouping.getGrouper();
         	if ( grouper != null ) {
@@ -225,7 +238,7 @@ public class LessonService implements ILessonService
         		groupingDAO.update(grouping);
         	}
 		} else {
-			String error = "The method performChosenGrouping supports only grouping methods where the supplied list should be used as a single group (currently only ChosenGrouping). Called with a groupingActivity with the wrong grouper "+groupingActivity.getActivityId();
+			String error = "The method performChosenGrouping supports only grouping methods where the supplied list should be used as a single group (currently only ChosenGrouping). Called with wrong grouper "+grouping;
 			log.error(error);
 			throw new LessonServiceException(error);
 		}

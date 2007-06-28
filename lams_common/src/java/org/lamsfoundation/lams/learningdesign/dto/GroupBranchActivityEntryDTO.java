@@ -43,6 +43,7 @@ public class GroupBranchActivityEntryDTO implements Serializable {
     private Integer entryUIID;
     private Integer groupUIID;
     private Integer sequenceActivityUIID;
+    private Integer branchingActivityUIID;
 
 	//---------------------------------------------------------------------
     // Object creation Methods
@@ -54,6 +55,7 @@ public class GroupBranchActivityEntryDTO implements Serializable {
         this.entryUIID = gba.getEntryUIID();
         this.groupUIID = gba.getGroup().getGroupUIID();
         this.sequenceActivityUIID = gba.getBranchSequenceActivity().getActivityUIID();
+        this.branchingActivityUIID = gba.getBranchingActivity().getActivityUIID();
     }
 
     public Long getEntryID() {
@@ -86,6 +88,14 @@ public class GroupBranchActivityEntryDTO implements Serializable {
 
 	public void setEntryUIID(Integer entryUIID) {
 		this.entryUIID = entryUIID;
+	}
+
+	public Integer getBranchingActivityUIID() {
+		return branchingActivityUIID;
+	}
+
+	public void setBranchingActivityUIID(Integer branchingActivityUIID) {
+		this.branchingActivityUIID = branchingActivityUIID;
 	}
 
 }

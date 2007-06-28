@@ -877,17 +877,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 	private void buildBranchingActivity(BranchingActivity branchingActivity,Hashtable activityDetails) 
 		throws WDDXProcessorConversionException, ObjectExtractorException {
-		/**
-		 * read the createBranchingUUID, get the Branching Object, and set CreateBranching to that object
-		 */
-	    //Integer createBranchingUIID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.CREATE_BRANCHINGS_UIID);	    
-	    
-	    // Get Branching object
-	    
-		// doesn't extend SystemToolActivity class??
-		//SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.BRANCHING);
-		//branchingActivity.setSystemTool(systemTool);
-		
 	}	
 	private void buildGroupingActivity(GroupingActivity groupingActivity,Hashtable activityDetails) 
 		throws WDDXProcessorConversionException, ObjectExtractorException {
@@ -1167,20 +1156,29 @@ public class ObjectExtractor implements IObjectExtractor {
     	Integer entryUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.GROUP_BRANCH_ACTIVITY_ENTRY_UIID);	
     	Integer groupUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.GROUP_UIID);	
     	Integer sequenceActivityUIID=WDDXProcessor.convertToInteger(details,WDDXTAGS.GROUP_BRANCH_SEQUENCE_ACTIVITY_UIID);
-
+    	Integer branchingActivityUIID=WDDXProcessor.convertToInteger(details,WDDXTAGS.GROUP_BRANCH_ACTIVITY_UIID);
+    	
     	Group group = groups.get(groupUIID);
    	    if ( group == null ) {
 		    	throw new WDDXProcessorConversionException("Group listed in the branch mapping list is missing. Mapping entry UUID "+entryUIID+" groupUIID "+groupUIID);
    	    }
 
    	    Activity sequenceActivity = newActivityMap.get(sequenceActivityUIID);
-   	    if ( sequenceActivity == null || ! sequenceActivity.isSequenceActivity() ) {
-		    	throw new WDDXProcessorConversionException("Activity listed in the branch mapping list is missing. Mapping entry UUID "+entryUIID+" sequenceActivityUIID "+sequenceActivityUIID);
+   	    if ( sequenceActivity == null ) {
+		    	throw new WDDXProcessorConversionException("Sequence Activity listed in the branch mapping list is missing. Mapping entry UUID "+entryUIID+" sequenceActivityUIID "+sequenceActivityUIID);
    	    }
    	    if ( ! sequenceActivity.isSequenceActivity() ) {
 		    	throw new WDDXProcessorConversionException("Activity listed in the branch mapping list is not a sequence activity. Mapping entry UUID "+entryUIID+" sequenceActivityUIID "+sequenceActivityUIID);
    	    }
    	    
+   	    Activity branchingActivity = newActivityMap.get(branchingActivityUIID);
+   	    if ( branchingActivity == null ) {
+		    	throw new WDDXProcessorConversionException("Branching Activity listed in the branch mapping list is missing. Mapping entry UUID "+entryUIID+" branchingActivityUIID "+branchingActivityUIID);
+   	    }
+   	    if ( ! branchingActivity.isBranchingActivity() ) {
+		    	throw new WDDXProcessorConversionException("Activity listed in the branch mapping list is not a branching activity. Mapping entry UUID "+entryUIID+" branchingActivityUIID "+branchingActivityUIID);
+   	    }
+
    	    GroupBranchActivityEntry entry = null;
    	    
 		// does it exist already? Check on the ID field as the UIID field may not have 
@@ -1200,6 +1198,7 @@ public class ObjectExtractor implements IObjectExtractor {
    			group.getBranchActivities().add(entry);
    	    }
 		entry.setBranchSequenceActivity((SequenceActivity)sequenceActivity);
+		entry.setBranchingActivity((BranchingActivity)branchingActivity);
 		entry.setGroup(group);
 
 		return entry;

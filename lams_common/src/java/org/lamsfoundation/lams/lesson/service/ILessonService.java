@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
@@ -99,13 +100,21 @@ public interface ILessonService {
     public void performGrouping(Long lessonId, GroupingActivity groupingActivity, User learner) throws LessonServiceException;
 
 	/**
-     * Perform grouping for all the learners who have started the lesson, based on the grouping activity. 
-     * Currently used for chosen grouping.
-     * @param lessonId lesson id (mandatory)
-     * @param groupName group name (mandatory)
-     * @param groupingActivityId the activity that has create grouping. (mandatory)
+     * Perform the grouping, setting the given list of learners as one group. 
+     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param groupName (optional)
+     * @param learners to form one group (mandatory)
      */
-    public void performGrouping(GroupingActivity groupingActivity, String groupName, List learners) throws LessonServiceException;
+  	public void performGrouping(GroupingActivity groupingActivity, String groupName, List learners) throws LessonServiceException;
+  	
+	/**
+     * Perform the grouping, setting the given list of learners as one group.  Used in suitations
+     * where there is a grouping but no grouping activity (e.g. in branching).
+     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param groupName (optional)
+     * @param learners to form one group (mandatory)
+     */
+  	public void performGrouping(Grouping grouping, String groupName, List learners) throws LessonServiceException;  		
 
    /**
     * Perform grouping for all the learners who have started the lesson, based on the grouping activity. 
