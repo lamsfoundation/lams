@@ -39,6 +39,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="body" value=""/>
 	</definition>
 
+	<!-- Waiting layout for a branching page. -->
+	<definition name=".branchingWaitLayout" path="/layout/branchingWaitLayout.jsp">
+		<put name="body" value=""/>
+	</definition>
+
 	<definition name=".systemError" extends=".layout" >
 		<put name="pageTitleKey" value="error.title"/>
 		<put name="body" value="/error.jsp" />	
@@ -55,6 +60,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</definition>
 	<definition name=".optionsActivity" extends=".layout">
 		<put name="body" value="/optionsActivity.jsp"/>
+	</definition>
+	<definition name=".branchingActivity" extends=".layout">
+		<put name="body" value="/branchingActivity.jsp"/>
 	</definition>
 	<definition name=".requestDisplay" path="/requestURL.jsp" />
 	<definition name=".parallelWait" extends=".layout">
@@ -125,4 +133,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="pageTitleKey" value="label.schedule.gate.title" />
 		<put name="body" value="/gate/scheduleGateContent.jsp"/>
 	</definition>
+	
+	<!--  Branching definitions -->
+	<definition name=".branchingActivityWait" extends=".branchingWaitLayout">
+		<put name="pageTitleKey" value="label.branching.title" />
+		<put name="body" value="/branching/wait.jsp"/>
+	</definition>
+	<definition name=".sequenceActivityEmpty" extends=".layout">
+		<put name="body" value="/sequence/empty.jsp"/>
+	</definition>
+
 </tiles-definitions>

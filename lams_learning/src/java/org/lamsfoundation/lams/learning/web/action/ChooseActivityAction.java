@@ -59,7 +59,7 @@ public class ChooseActivityAction extends ActivityAction {
 			ActionForm actionForm,
 			HttpServletRequest request,
 			HttpServletResponse response) {
-		ActivityMapping actionMappings = getActivityMapping();
+		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 		
 		// check token
 		if (!this.isTokenValid(request, true)) {

@@ -102,14 +102,6 @@ public class GateAction extends LamsDispatchAction
     /** Input parameter. Boolean value */
     public static final String PARAM_FORCE_GATE_OPEN  = "force";
 
-	/**
-	 * Get the ActionMappings.
-	 */
-	protected ActivityMapping getActivityMapping() {
-        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
-        return (ActivityMapping)wac.getBean("activityMapping");
-	}
-
 	//---------------------------------------------------------------------
     // Struts Dispatch Method
     //---------------------------------------------------------------------    
@@ -136,7 +128,7 @@ public class GateAction extends LamsDispatchAction
         //initialize service object
         ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
         Activity activity = learnerService.getActivity(activityId);
-		ActivityMapping actionMappings = getActivityMapping();
+		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 
 		User learner = LearningWebUtil.getUser(learnerService);
         Lesson lesson = learnerService.getLesson(lessonId);

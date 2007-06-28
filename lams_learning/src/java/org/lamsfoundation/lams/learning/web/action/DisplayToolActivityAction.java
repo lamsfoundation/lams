@@ -62,7 +62,7 @@ public class DisplayToolActivityAction extends ActivityAction {
 		setupProgressString(actionForm, request);
 
 		//ActivityForm form = (ActivityForm)actionForm;
-		ActivityMapping actionMappings = getActivityMapping();
+		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 		
 		ICoreLearnerService learnerService = getLearnerService();
 		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);

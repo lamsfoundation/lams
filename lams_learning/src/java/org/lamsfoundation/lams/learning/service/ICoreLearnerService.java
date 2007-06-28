@@ -29,7 +29,9 @@ import java.util.List;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
@@ -258,4 +260,19 @@ public interface ICoreLearnerService extends ILearnerService
      * @return updated Learner Progress
      */
     public LearnerProgress moveToActivity(Integer learnerId, Long lessonId, Activity fromActivity, Activity toActivity);
+    
+    /**
+     * Work out which branch to which a user should go. If the current lesson is a preview lesson, it will force 
+     * the user to a branch if at all possible.
+     * 
+     * @param lesson current lesson.
+     * @param BranchingActivity the branching activity
+     * @param learnerId the learner who triggers the grouping.
+     * @param forceBranch if true and the lesson is a preview lesson then the branching is done irrespective of 
+     * whether the teacher has set up all the mappings, allocated learner to branch, etc
+     * @return SequenceActivity that forms the branch if known, null if still awaiting teacher input.
+     * @throws LearnerServiceException 
+     */
+    public SequenceActivity determineBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId) throws LearnerServiceException;
+
 }

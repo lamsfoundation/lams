@@ -35,9 +35,14 @@ import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
@@ -85,11 +90,17 @@ public class LearnerService implements ICoreLearnerService
     // Inversion of Control Methods - Constructor injection
     //---------------------------------------------------------------------
     
-    /** Creates a new instance of LearnerService */
-    public LearnerService(ProgressEngine progressEngine)
-    {
+    /** Creates a new instance of LearnerService*/
+    public LearnerService(ProgressEngine progressEngine) {
         this.progressEngine = progressEngine;
     }
+
+    /** Creates a new instance of LearnerService. To be used by Spring, assuming the Spring 
+     * will set up the progress engine via method injection. If you are creating the bean manually
+     * then use the other constructor. */
+    public LearnerService() {
+    }
+
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
@@ -347,15 +358,11 @@ public class LearnerService implements ICoreLearnerService
     public LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity) 
     {
     	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
-    	
-    	activity.setReadOnly(true);
-    	activityDAO.insertOrUpdate(activity);
-    	
-    	progress.setProgressState(activity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
+    	progressEngine.setActivityAttempted(progress, activity);
     	progress.setCurrentActivity(activity);
-    	progress.setNextActivity(activity);
+       	progress.setNextActivity(activity);
+
     	learnerProgressDAO.saveLearnerProgress(progress);
-    	
     	return progress;
     }
     
@@ -543,18 +550,13 @@ public class LearnerService implements ICoreLearnerService
 		    			
 		    		} else if ( forceGrouping ) {
 		    			// preview case for chosen grouping 
-		            	Lesson lesson = getLesson(lessonId);
-		            	if ( lesson.isPreviewLesson() ) {
-		            		ArrayList<User> learnerList = new ArrayList<User>();
-		            		learnerList.add(learner);
-		            		lessonService.performGrouping(groupingActivity, (String)null, learnerList);
-			    			groupingDone = true;
-		            	}
+		    			Lesson lesson = getLesson(lessonId);
+		            	groupingDone = forceGrouping(lesson, grouping, learner);
 		        	} 
     			}
 	    		
 	    	} else {
-	    		String error = "Grouping activity "+groupingActivity.getActivityId()+" learner "+learnerId+" does not exist. Cannot perform grouping.";
+	    		String error = "Grouping activity "+groupingActivity+" learner "+learnerId+" does not exist. Cannot perform grouping.";
 	            log.error(error);
 	            throw new LearnerServiceException(error);
 	    	}
@@ -563,6 +565,17 @@ public class LearnerService implements ICoreLearnerService
     	}
     	return groupingDone;
     }
+    
+	private boolean forceGrouping(Lesson lesson, Grouping grouping, User learner) {
+		boolean groupingDone = false;
+		if ( lesson.isPreviewLesson() ) {
+			ArrayList<User> learnerList = new ArrayList<User>();
+			learnerList.add(learner);
+			lessonService.performGrouping(grouping, (String)null, learnerList);
+			groupingDone = true;
+		}
+		return groupingDone;
+	}
     	
 
     /**
@@ -692,5 +705,95 @@ public class LearnerService implements ICoreLearnerService
         }
         return (LessonDTO[])lessonDTOList.toArray(new LessonDTO[lessonDTOList.size()]);   
     }
+
+    /**
+     * @throws LearnerServiceException 
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#determineBranch(org.lamsfoundation.lams.lesson.Lesson, org.lamsfoundation.lams.learningdesign.BranchingActivity, java.lang.Integer)
+     */
+    public SequenceActivity determineBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId) throws LearnerServiceException
+    {
+    	User learner = (User)userManagementService.findById(User.class,learnerId);
+    	if ( learner == null ) {
+    		String error = "determineBranch: learner "+learnerId+" does not exist. Cannot determine branch.";
+    		log.error(error);
+    		throw new LearnerServiceException(error);
+    	}
+
+        if ( branchingActivity.isToolBranchingActivity() ) {
+			String message = "Tool based branching not yet supported. Activity was "+branchingActivity;
+			log.error(message);
+			throw new LearnerServiceException(message);
+ 
+    	} else {
+    		// assume either isGroupBranchingActivity() || isChosenBranchingActivity() ) 
+    		// in both cases, the branch is based on the group the learner is in.
+        	try {
+        		return determineGroupBasedBranch(lesson, branchingActivity, learner);
+
+        	} catch ( LessonServiceException e ) {
+        		String message = "determineBranch failed due to "+e.getMessage();
+        		log.error(message,e);
+        		throw new LearnerServiceException("determineBranch failed due to "+e.getMessage(), e);
+        	}
+		}
+    }
+    
+    private SequenceActivity determineGroupBasedBranch(Lesson lesson, BranchingActivity branchingActivity, User learner) 
+    {
+    	SequenceActivity sequenceActivity = null;
+
+    	if ( branchingActivity.getGrouping()!=null ) {
+    		Grouping grouping = branchingActivity.getGrouping();
+	    		
+	    	// If the user is in a group, then check if the group is assigned to a sequence activity. If it
+    		// is then we are done and we return the sequence
+    		Group group = grouping.getGroupBy(learner);
+    		if ( group == null && lesson.isPreviewLesson()) {    			
+    			// if it is preview, we force the user into a group.
+    			if (forceGrouping(lesson, grouping, learner) ) {
+    				group = grouping.getGroupBy(learner);
+    			}
+    			if ( log.isDebugEnabled() )
+    				log.debug("Forced the user into group "+group+" for branching purposes.");
+    		}
+    		
+    		if ( group != null ) {
+    			Iterator branchesIterator = group.getBranchActivities().iterator();
+    			while (sequenceActivity==null && branchesIterator.hasNext()) {
+    				GroupBranchActivityEntry branchActivityEntry = (GroupBranchActivityEntry) branchesIterator.next();
+    				if ( branchActivityEntry.getBranchingActivity().equals(branchingActivity) )
+    					sequenceActivity = branchActivityEntry.getBranchSequenceActivity();
+				}
+    			if ( sequenceActivity == null && lesson.isPreviewLesson()) {
+    				// how do we force them into a branch ? do we just pick one ? is that good enough for preview ?
+    				Iterator iter= branchingActivity.getActivities().iterator();
+    				if (iter.hasNext()) {
+						sequenceActivity = (SequenceActivity) iter.next();
+					}
+        			if ( log.isDebugEnabled() )
+        				log.debug("Forced the user into branch"+sequenceActivity);
+    			}
+    		} 
+    		
+    		if ( sequenceActivity != null ) {
+    			if ( log.isDebugEnabled()) {
+    				log.debug("Found branch "+sequenceActivity.getActivityId()+":"+ sequenceActivity.getTitle()
+    						+" for branching activity "+branchingActivity.getActivityId()+":"+ branchingActivity.getTitle()
+    						+" for learner "+learner.getUserId()+":"+learner.getLogin());
+    			}
+    		}
+
+    	}
+    	
+    	return sequenceActivity;
+    }
+
+	public ProgressEngine getProgressEngine() {
+		return progressEngine;
+	}
+
+	public void setProgressEngine(ProgressEngine progressEngine) {
+		this.progressEngine = progressEngine;
+	}
 
 }

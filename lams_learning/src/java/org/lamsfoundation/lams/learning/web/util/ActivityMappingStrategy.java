@@ -52,8 +52,12 @@ public class ActivityMappingStrategy implements Serializable {
 		        strutsAction = "/DisplayParallelActivity.do";
 		    else if (activity.isOptionsActivity()) 
 		        strutsAction = "/DisplayOptionsActivity.do";
-		    else {
-		    	// probably a branching activity
+		    else if (activity.isBranchingActivity()){
+			    strutsAction = "/LoadToolActivity.do";
+		    } else if ( activity.isSequenceActivity() ) {
+			    strutsAction = "/SequenceActivity.do";
+		    } else {
+		    	// unexpected type, try the tool loading page - that will work for system tools
 			    strutsAction = "/LoadToolActivity.do";
 		    }
 		}

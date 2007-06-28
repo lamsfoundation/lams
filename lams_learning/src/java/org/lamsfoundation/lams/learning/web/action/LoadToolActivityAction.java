@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /** 
  * Action class to forward the user to a Tool using an intermediate loading page. Can handle
@@ -57,7 +58,6 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 public class LoadToolActivityAction extends ActivityAction {
 
 	public static final String DEFINE_LATER = "previewDefineLater";
-	public static final String PARAM_ACTIVITY_TITLE = "activityTitle";
 	public static final String PARAM_ACTIVITY_URL = "activityURL";
 
 	/**
@@ -87,7 +87,7 @@ public class LoadToolActivityAction extends ActivityAction {
 
 			if ( activity.getDefineLater() && learnerProgress.getLesson().isPreviewLesson() ) {
 				// preview define later
-				request.setAttribute(PARAM_ACTIVITY_TITLE, activity.getTitle());
+				request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
 				request.setAttribute(PARAM_ACTIVITY_URL, url);
 				return mapping.findForward("previewDefineLater");
 			} else {

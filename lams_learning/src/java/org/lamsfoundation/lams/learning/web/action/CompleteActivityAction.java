@@ -73,7 +73,7 @@ public class CompleteActivityAction extends ActivityAction {
 			ActionForm actionForm,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
-		ActivityMapping actionMappings = getActivityMapping();
+		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 		
 		ICoreLearnerService learnerService = getLearnerService();
 

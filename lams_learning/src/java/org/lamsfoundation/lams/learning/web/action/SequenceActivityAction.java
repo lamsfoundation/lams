@@ -35,92 +35,79 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.form.OptionsActivityForm;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * Action class to display an OptionsActivity.
+ * Action class to display a sequence activity.
  * 
- * @author daveg
- *
- * XDoclet definition:
+ * Normally this will display the first activity inside a sequence activity.
+ * If there are no activities within the sequence activity then it will display
+ * an "empty" message.
  * 
- * @struts:action path="/DisplayOptionsActivity" name="optionsActivityForm"
- *                input="/Activity.do" validate="false" scope="request"
+ * @struts:action path="/SequenceActivity" name="activityForm"
+ *                validate="false" scope="request"
  * 
- * @struts:action-forward name="displayOptions" path=".optionsActivity"
+ * @struts:action-forward name="empty" path=".sequenceActivityEmpty"
  * 
  */
-public class DisplayOptionsActivityAction extends ActivityAction {
+public class SequenceActivityAction extends ActivityAction {
 	
 
 	/**
-	 * Gets an options activity from the request (attribute) and forwards to
-	 * the display JSP.
+	 * Gets an sequence activity from the request (attribute) and forwards to
+	 * either the first activity in the sequence activity or the "empty" JSP.
 	 */
 	public ActionForward execute(
 			ActionMapping mapping,
 			ActionForm actionForm,
 			HttpServletRequest request,
 			HttpServletResponse response) {
-		OptionsActivityForm form = (OptionsActivityForm)actionForm;
+
+		ActivityForm form = (ActivityForm)actionForm;
 		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
-		
+		Integer learnerId = LearningWebUtil.getUserId();
+
 		ICoreLearnerService learnerService = getLearnerService();
 		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
-		if (!(activity instanceof OptionsActivity)) {
-		    log.error(className+": activity not OptionsActivity "+activity.getActivityId());
+		if (!(activity instanceof SequenceActivity)) {
+		    log.error(className+": activity not SequenceActivity "+activity.getActivityId());
 			return mapping.findForward(ActivityMapping.ERROR);
 		}
 
-		OptionsActivity optionsActivity = (OptionsActivity)activity;
-
-		form.setActivityID(activity.getActivityId());
-
-		List<ActivityURL> activityURLs = new ArrayList<ActivityURL>();
-		Set subActivities = optionsActivity.getActivities();
-		Iterator i = subActivities.iterator();
-		int completedCount = 0;
-		while (i.hasNext()) {
-			Activity subActivity = (Activity)i.next();
-			ActivityURL activityURL = new ActivityURL();
-			String url = actionMappings.getActivityURL(subActivity);
-			activityURL.setUrl(url);
-			activityURL.setActivityId(subActivity.getActivityId());
-			activityURL.setTitle(subActivity.getTitle());
-			activityURL.setDescription(subActivity.getDescription());
-			if (learnerProgress.getProgressState(subActivity) == LearnerProgress.ACTIVITY_COMPLETED) {
-			    activityURL.setComplete(true);
-				completedCount++;
-			}
-			activityURLs.add(activityURL);
+		ActionForward forward = null;
+		SequenceActivity sequenceActivity = (SequenceActivity)activity;
+        Activity firstActivityInSequence = sequenceActivity.getFirstActivityInSequenceActivity();
+        
+        if ( firstActivityInSequence != null && ! firstActivityInSequence.isNull() ) {
+			// Set the first activity as the current activity and display it
+			learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(), firstActivityInSequence);
+			forward = actionMappings.getActivityForward(firstActivityInSequence, learnerProgress, true);
+			LearningWebUtil.putActivityInRequest(request, firstActivityInSequence, learnerService);
+		} else {
+			request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());
+			request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
+			request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());
+			request.setAttribute(AttributeNames.PARAM_LEARNER_PROGRESS_ID, learnerProgress.getLearnerProgressId());
+			setupProgressString(form, request);
+			forward = mapping.findForward("empty");
 		}
-		form.setActivityURLs(activityURLs);
-		
-		if ( optionsActivity.getMinNumberOfOptionsNotNull().intValue() <= completedCount ) {
-			form.setFinished(true);
-		}
-		form.setMinimum(optionsActivity.getMinNumberOfOptionsNotNull().intValue());
-		form.setMaximum(optionsActivity.getMaxNumberOfOptionsNotNull().intValue());
-		form.setDescription(optionsActivity.getDescription());
-		form.setTitle(optionsActivity.getTitle());
-		form.setLessonID(learnerProgress.getLesson().getLessonId());
-		form.setProgressID(learnerProgress.getLearnerProgressId());
-		
-		this.saveToken(request);
-		
-		setupProgressString(form, request);
 
-		String forward = "displayOptions";
-		return mapping.findForward(forward);
+        LearningWebUtil.putLearnerProgressInRequest(request,learnerProgress);
+        return forward;
+       	
 	}
 	
 }

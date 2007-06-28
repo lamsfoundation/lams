@@ -97,14 +97,6 @@ public abstract class ActivityAction extends LamsAction {
 		return null;
 	}
 	       	
-	/**
-	 * Get the ActionMappings.
-	 */
-	protected ActivityMapping getActivityMapping() {
-        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
-        return (ActivityMapping)wac.getBean("activityMapping");
-	}
-	
 	private String getProgressSummary(LearnerProgress learnerProgress) {
 		StringBuffer progressSummary = new StringBuffer(100);
 		if ( learnerProgress == null  ) {

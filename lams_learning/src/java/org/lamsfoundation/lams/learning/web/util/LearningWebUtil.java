@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learning.web.util;
 
 import java.io.UnsupportedEncodingException;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -43,6 +44,8 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -121,6 +124,7 @@ public class LearningWebUtil
 		    Long learnerProgressId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_PROGRESS_ID, true);
 		    // temp hack until Flash side updates it call.
 		    if ( learnerProgressId == null ) {
+		    	log.error("Flash client still using progressId, instead of progressID in a learner call");
 		    	learnerProgressId = WebUtil.readLongParam(request,"progressId", true);
 		    }
 		    
@@ -130,6 +134,7 @@ public class LearningWebUtil
 					log.debug("getLearnerProgress: found progress via progress id");
 				}
 		    }
+		    
 		}
 		
 		if (learnerProgress == null) 
@@ -165,6 +170,10 @@ public class LearningWebUtil
             
             activity = learnerService.getActivity(new Long(activityId));
             
+            if ( activity != null ) {
+            	// getActivityFromRequest() may be called multiple times, so make it quicker next time
+           		request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, activity);
+            }
         }
         return activity;
     }
@@ -215,4 +224,13 @@ public class LearningWebUtil
 		return actionMappings.getProgressForward(progress, redirect, false, request, learnerService);
     }
     
+	/**
+	 * Get the ActionMappings.
+	 */
+	public static ActivityMapping getActivityMapping(ServletContext context) {
+        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
+        return (ActivityMapping)wac.getBean("activityMapping");
+	}
+	
+
 }

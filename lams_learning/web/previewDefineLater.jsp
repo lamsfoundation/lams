@@ -33,7 +33,7 @@
 		<h1><fmt:message key="label.preview.definelater.title"/></h1>
 
 		<p><fmt:message key="label.preview.definelater.message">
-				<fmt:param><c:out value="${requestScope.activityTitle}"/></fmt:param>
+				<fmt:param><c:out value="${requestScope.title}"/></fmt:param>
 			</fmt:message>
 		</p>
 

@@ -235,6 +235,7 @@
 				<include name="tags/*"/>
 				<include name="lams.tld"/>
 				<exclude name="web.xml"/>
+				<exclude name="classes"/>
 			</webinf>
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
@@ -327,6 +328,7 @@
 			<fileset dir="${conf.web.dir}">
 				<include name="**/*.*" />
 				<exclude name="WEB-INF/web.xml"/>
+				<exclude name="WEB-INF/classes/**"/>
 			</fileset>
 		</copy>
 	</target>
