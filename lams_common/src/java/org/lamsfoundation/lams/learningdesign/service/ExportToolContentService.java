@@ -1279,10 +1279,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		Map<Long,Grouping> groupingMapper = new HashMap<Long,Grouping>();
 		Map<Integer,Group> groupByUIIDMapper = new HashMap<Integer, Group>();
 		for(GroupingDTO groupingDto : groupingDtoList){
-			Long originalGroupingId = groupingDto.getGroupingID();
 			Grouping grouping = getGrouping(groupingDto, groupByUIIDMapper);
-			groupingMapper.put(originalGroupingId,grouping);
-
+			groupingMapper.put(grouping.getGroupingId(),grouping);
+			
+			//persist
+			grouping.setGroupingId(null);
+			groupingDAO.insert(grouping);
 		}
 		
 		//================== Start handle activities ======================
@@ -1424,7 +1426,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		Set<GroupBranchActivityEntry> entryList = new HashSet<GroupBranchActivityEntry>();
 		for (GroupBranchActivityEntryDTO entryDto : entryDtoList) {
 			GroupBranchActivityEntry entry = getGroupBranchActivityEntry(entryDto, groupByUIIDMapper, activityByUIIDMapper);
-			groupingDAO.insert(entry);
 			entryList.add(entry);
 		}
 		
@@ -1593,19 +1594,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 		
 		//common fields
+		grouping.setGroupingId(groupingDto.getGroupingID());
 		grouping.setGroupingUIID(groupingDto.getGroupingUIID());
 		grouping.setMaxNumberOfGroups(groupingDto.getMaxNumberOfGroups());
 		
-		//persist
-		groupingDAO.insert(grouping);
-
 		// process any groups that the design might have
 		if ( groupingDto.getGroups() != null ) {
 			Iterator iter = groupingDto.getGroups().iterator();
 			while ( iter.hasNext() ) {
 				GroupDTO groupDto = (GroupDTO) iter.next();
 				Group group = getGroup(groupDto, grouping);
-				groupingDAO.insert(group);
 				grouping.getGroups().add(group);
 				groupByUIIDMapper.put(group.getGroupUIID(), group);
 			}

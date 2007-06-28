@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -282,9 +283,9 @@ public class Group implements Serializable,Nullable,Comparable {
         if ( !(other instanceof Group) ) return false;
         Group castOther = (Group) other;
         return new EqualsBuilder()
+        	.append(this.getOrderId(), castOther.getOrderId())
         	.append(this.getGroupId(), castOther.getGroupId())
         	.append(this.getGroupName(), castOther.getGroupName())
-            .append(this.getOrderId(), castOther.getOrderId())
             .append(this.getGroupUIID(), castOther.getGroupUIID())
             .isEquals();
     }
@@ -304,9 +305,13 @@ public class Group implements Serializable,Nullable,Comparable {
      */
     public int compareTo(Object o)
     {
-        Group group = (Group)o;
-        
-        return this.orderId - group.orderId;
+        Group castOther = (Group)o;
+        return new CompareToBuilder()
+    	.append(this.getOrderId(), castOther.getOrderId())
+    	.append(this.getGroupId(), castOther.getGroupId())
+    	.append(this.getGroupName(), castOther.getGroupName())
+        .append(this.getGroupUIID(), castOther.getGroupUIID())
+        .toComparison();
     }
 
     //---------------------------------------------------------------------
