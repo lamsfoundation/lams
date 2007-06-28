@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.learningdesign.dto;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
 
 /** 
@@ -98,4 +99,13 @@ public class GroupBranchActivityEntryDTO implements Serializable {
 		this.branchingActivityUIID = branchingActivityUIID;
 	}
 
+	public String toString() {
+		return new ToStringBuilder(this)
+			.append("entryID",entryID)
+			.append("entryUIID", entryUIID)
+			.append("branchingActivityUIID",branchingActivityUIID)
+			.append("sequenceActivityUIID", sequenceActivityUIID)
+			.append("groupUIID",groupUIID)
+			.toString();
+	}
 }

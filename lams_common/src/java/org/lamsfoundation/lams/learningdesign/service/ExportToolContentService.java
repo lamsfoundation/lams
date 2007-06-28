@@ -80,8 +80,13 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
+import org.lamsfoundation.lams.learningdesign.GroupBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -94,6 +99,7 @@ import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
@@ -102,6 +108,8 @@ import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
+import org.lamsfoundation.lams.learningdesign.dto.GroupBranchActivityEntryDTO;
+import org.lamsfoundation.lams.learningdesign.dto.GroupDTO;
 import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
@@ -122,7 +130,6 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.springframework.beans.BeansException;
@@ -1270,13 +1277,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		//grouping object list
 		List<GroupingDTO> groupingDtoList = dto.getGroupings();
 		Map<Long,Grouping> groupingMapper = new HashMap<Long,Grouping>();
+		Map<Integer,Group> groupByUIIDMapper = new HashMap<Integer, Group>();
 		for(GroupingDTO groupingDto : groupingDtoList){
-			Grouping grouping = getGrouping(groupingDto);
-			groupingMapper.put(grouping.getGroupingId(),grouping);
-			
-			//persist
-			grouping.setGroupingId(null);
-			groupingDAO.insert(grouping);
+			Long originalGroupingId = groupingDto.getGroupingID();
+			Grouping grouping = getGrouping(groupingDto, groupByUIIDMapper);
+			groupingMapper.put(originalGroupingId,grouping);
+
 		}
 		
 		//================== Start handle activities ======================
@@ -1293,11 +1299,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 		Set<Activity> actList = new TreeSet<Activity> (new ActivityOrderComparator());
 		Map<Long,Activity> activityMapper = new HashMap<Long,Activity>();
-		
+		Map<Integer,Activity> activityByUIIDMapper = new HashMap<Integer, Activity>();
+
 		for(AuthoringActivityDTO actDto: actDtoList){
 			Activity act = getActivity(actDto,groupingMapper,toolMapper);
 			//so far, the activitiy ID is still old one, so setup the mapping relation between old ID and new activity.
 			activityMapper.put(act.getActivityId(),act);
+			activityByUIIDMapper.put(act.getActivityUIID(),act);
 			//if this act is removed, then does not save it into LD
 			if(!removedActMap.containsKey(actDto.getActivityID()))
 				actList.add(act);
@@ -1411,6 +1419,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 //			transitionDAO.insert(trans);
 		}
 		
+		// branch mappings - maps groups to branchs
+		List<GroupBranchActivityEntryDTO> entryDtoList = dto.getBranchMappings();
+		Set<GroupBranchActivityEntry> entryList = new HashSet<GroupBranchActivityEntry>();
+		for (GroupBranchActivityEntryDTO entryDto : entryDtoList) {
+			GroupBranchActivityEntry entry = getGroupBranchActivityEntry(entryDto, groupByUIIDMapper, activityByUIIDMapper);
+			groupingDAO.insert(entry);
+			entryList.add(entry);
+		}
 		
 		LearningDesign ld = getLearningDesign(dto,importer,folder,actList,transList,activityMapper);
 		
@@ -1482,7 +1498,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * @return
 	 * @throws ImportToolContentException 
 	 */
-	private LearningDesign getLearningDesign(LearningDesignDTO dto, User importer, WorkspaceFolder folder,
+	private LearningDesign getLearningDesign(LearningDesignDTO dto, User importer, WorkspaceFolder folder, 
 			Set<Activity> actList, Set<Transition> transList, Map<Long, Activity> activityMapper) throws ImportToolContentException {
 		LearningDesign ld = new LearningDesign();
 	
@@ -1556,7 +1572,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * @param groupingDto
 	 * @return
 	 */
-	private Grouping getGrouping(GroupingDTO groupingDto) {
+	private Grouping getGrouping(GroupingDTO groupingDto, Map<Integer,Group> groupByUIIDMapper) {
 		Grouping grouping = null;
 		if(groupingDto == null)
 			return grouping;
@@ -1572,16 +1588,81 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			((RandomGrouping)grouping).setNumberOfGroups(groupingDto.getNumberOfGroups());
 		}else if (Grouping.CLASS_GROUPING_TYPE.equals(type)) {
 			grouping = new LessonClass();
+		}else{
+			log.error("Unable to determine the grouping type. Creating a random grouping. GroupingDTO was "+groupingDto);
 		}
 		
-		//commont fields
-		grouping.setGroupingId(groupingDto.getGroupingID());
+		//common fields
 		grouping.setGroupingUIID(groupingDto.getGroupingUIID());
 		grouping.setMaxNumberOfGroups(groupingDto.getMaxNumberOfGroups());
 		
+		//persist
+		groupingDAO.insert(grouping);
+
+		// process any groups that the design might have
+		if ( groupingDto.getGroups() != null ) {
+			Iterator iter = groupingDto.getGroups().iterator();
+			while ( iter.hasNext() ) {
+				GroupDTO groupDto = (GroupDTO) iter.next();
+				Group group = getGroup(groupDto, grouping);
+				groupingDAO.insert(group);
+				grouping.getGroups().add(group);
+				groupByUIIDMapper.put(group.getGroupUIID(), group);
+			}
+		}
 		return grouping;
 	}
 	
+	private Group getGroup(GroupDTO groupDto, Grouping grouping) {
+		Group group = new Group();
+		group.setBranchActivities(null);
+		group.setGrouping(grouping);
+		group.setGroupName(groupDto.getGroupName());
+		group.setGroupUIID(groupDto.getGroupUIID());
+		group.setOrderId(groupDto.getOrderID());
+		return group;
+	}
+	
+	/** Creates the map entry between a branch sequence activity and a group. We need the group maps and the activity maps
+	 * so that we can update the ids to the groups and the activities. Therefore this method must be done after all
+	 * the groups are imported and the activities are imported.
+	 * 
+	 * Note: there isn't an set in the learning design for the branch mappings. The group objects actually contain the link
+	 * to the mappings, so this method updates the group objects.
+	 */
+	private GroupBranchActivityEntry getGroupBranchActivityEntry(GroupBranchActivityEntryDTO entryDto, Map<Integer, Group>groupByUIIDMapper, 
+			Map<Integer, Activity> activityByUIIDMapper) {
+		GroupBranchActivityEntry entry = new GroupBranchActivityEntry();
+		entry.setEntryUIID(entryDto.getEntryUIID());
+		
+		Group group = groupByUIIDMapper.get(entryDto.getGroupUIID());
+
+		if ( group == null ) {
+			log.error("Unable to find matching group for group to branch mapping "+entryDto+" Skipping entry");
+			return null;
+		}
+		if ( group.getBranchActivities() == null )
+			group.setBranchActivities(new HashSet());
+		group.getBranchActivities().add(entry);
+		entry.setGroup(group);
+
+		Activity activity = activityByUIIDMapper.get(entryDto.getSequenceActivityUIID());
+		if ( activity == null ) {
+			log.error("Unable to find matching sequence activity for group to branch mapping "+entryDto+" Skipping entry");
+			return null;
+		}
+		entry.setBranchSequenceActivity((SequenceActivity)activity);
+		
+		activity = activityByUIIDMapper.get(entryDto.getBranchingActivityUIID());
+		if ( activity == null ) {
+			log.error("Unable to find matching branching activity for group to branch mapping "+entryDto+" Skipping entry");
+			return null;
+		}
+		entry.setBranchingActivity((BranchingActivity)activity);
+
+		return entry;
+	}
+
 	private Transition getTransition(TransitionDTO transDto, Map<Long, Activity> activityMapper) {
 		Transition trans = new Transition();
 		
@@ -1684,6 +1765,18 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			case Activity.SEQUENCE_ACTIVITY_TYPE:
 				act = new SequenceActivity();
 				break;
+			case Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE:
+				act = new ChosenBranchingActivity();
+				break;
+			case Activity.GROUP_BRANCHING_ACTIVITY_TYPE:
+				act = new GroupBranchingActivity();
+				break;
+			case Activity.TOOL_BRANCHING_ACTIVITY_TYPE:
+				act = new ToolBranchingActivity();
+				break;
+			default:
+				log.error("Unable to determine the activity type. Creating a tool activity. ActivityDTO was "+actDto);
+				act = new ToolActivity();
 		}		
 		
 		act.setGroupingSupportType(actDto.getGroupingSupportType());
