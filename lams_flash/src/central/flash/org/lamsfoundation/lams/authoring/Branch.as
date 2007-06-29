@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.common.util.*;
 class Branch extends Transition {
 
 	private var UIID:Number;
-	private var _sequenceActivity:Activity;
+	private var _sequenceActivity:SequenceActivity;
 	
 	private var _direction:Number;
 	private var _targetUIID:Number;
@@ -39,7 +39,7 @@ class Branch extends Transition {
 	
 	// TODO: add learningDesignID
 
-	public function Branch(activityUIID:Number, _dir:Number, targetUIID:Number, hubUIID:Number, sequenceActivity:Activity, learningDesignID:Number){
+	public function Branch(activityUIID:Number, _dir:Number, targetUIID:Number, hubUIID:Number, sequenceActivity:SequenceActivity, learningDesignID:Number){
 		if(_dir == BranchConnector.DIR_FROM_START)
 			super(null, hubUIID, targetUIID, learningDesignID);
 		else
@@ -64,7 +64,7 @@ class Branch extends Transition {
 		return UIID;
 	}
 	
-	public function get sequenceActivity():Activity {
+	public function get sequenceActivity():SequenceActivity {
 		return _sequenceActivity;
 	}
 	

@@ -565,6 +565,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		}
 	}
 	
+	public function addNewBranch(sequence:SequenceActivity):Void {
+		if(sequence.firstActivityUIID != null) {
+			var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, _cv.ddm.getActivityByUIID(sequence.firstActivityUIID).activityUIID, activeView.startHub.activity.activityUIID, sequence, _cv.ddm.learningDesignID);
+			_cv.ddm.addBranch(b);
+		}
+	}
+	
 	public function addActivityToConnection(ca:Object):Object{
 		var activity:Activity;
 		//check we have not added too many
@@ -609,7 +616,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			return new LFError("You cannot create a Branch between the same Activities","addActivityToTransition",this);
 		}
 		
-		
 		if(_connectionActivities.length == 2){
 			/*********************************************
 			* TODO: REQUIRE NORMAL BRANCH CLIENT_SIDE VALIDATION
@@ -621,15 +627,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			}
 			
 			//lets make the connection
-			var b:Object = (toAct == activeView.endHub.activity.activityUIID || fromAct == activeView.endHub.activity.activityUIID) ? createBranchEndConnector(_connectionActivities) 
-								: createBranchStartConnector(_connectionActivities);
+			var b:Object = (activeView.fingerprint == activeView.endHub) ? createBranchEndConnector(_connectionActivities) : createBranchStartConnector(_connectionActivities);
 
 			Debugger.log('No validation errors, creating branch.......' + b,Debugger.GEN,'addActivityToBranch','CanvasModel');
 				
 			//add it to the DDM
 			if(b instanceof LFError) {
 				return b;
-			} else {
+			} else if(b != null){
 				var success:Object = _cv.ddm.addBranch(Branch(b));
 			}
 			
@@ -765,9 +770,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @param   transitionActs An array of transition activities. Must only contain 2
 	 * @return  
 	 */
-	private function createTransition(transitionActs:Array):Transition{
-		var fromAct:Activity = transitionActs[0];
-		var toAct:Activity = transitionActs[1];
+	private function createTransition(transActivities:Array):Transition{
+		var fromAct:Activity = transActivities[0];
+		var toAct:Activity = transActivities[1];
 		
 		var t:Transition = new Transition(_cv.ddm.newUIID(),fromAct.activityUIID,toAct.activityUIID,_cv.ddm.learningDesignID);
 		
@@ -779,23 +784,25 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @param   transitionActs An array of transition activities. Must only contain 2
 	 * @return  
 	 */
-	private function createBranchStartConnector(transitionActs:Array):Object{
-		var fromAct:Activity = transitionActs[0];
-		var toAct:Activity = transitionActs[1];
+	private function createBranchStartConnector(branchActivities:Array):Object{
 		
-		var sequence:Activity = _cv.ddm.getActivityByUIID(toAct.parentUIID);
+		var fromAct:Activity = branchActivities[0];
+		var toAct:Activity = branchActivities[1];
+		
+		var sequence:SequenceActivity = SequenceActivity(_cv.ddm.getActivityByUIID(toAct.parentUIID));
+		var branchesSize:Number = _cv.ddm.getBranchesForActivityUIID(sequence.activityUIID).myBranches.length;
 			
 		/** Basic validation for Branch(s)/Branch Connector(s) */
-		if(fromAct == activeView.endHub.activity) {
-			return new LFError("Cannot create a branch from the end point or hub");
+		if(toAct.activityUIID == activeView.startHub.activity.activityUIID) {
+			return new LFError("Branch Connector must be drawn from the Hub to an Activity");
 		} else if(_cv.ddm.getTransitionsForActivityUIID(toAct.activityUIID).into != null) {
 			return new LFError("Cannot create start-branch connection to Activity with inward Transition.", "createBranchStartConnector", this);
-		} else if(_cv.ddm.getBranchesForActivityUIID(sequence.activityUIID).myBranches.length > 0) {
+		} else if(branchesSize > 0) {
 			return new LFError("Cannot create start-branch connection to Activity in a already connected Sequence.", "createBranchStartConnector", this);
 		} else {
-			var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, toAct.activityUIID, activeView.startHub.activity.activityUIID, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
-			createNewSequenceActivity(activeView.activity);
+			var b = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, toAct.activityUIID, activeView.startHub.activity.activityUIID, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
 			
+			createNewSequenceActivity(activeView.activity);
 			return b;
 		}
 	}
@@ -805,14 +812,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @param   transitionActs An array of transition activities. Must only contain 2
 	 * @return  
 	 */
-	private function createBranchEndConnector(transitionActs:Array):Object{
-		var fromAct:Activity = transitionActs[0];
-		var toAct:Activity = transitionActs[1];
+	private function createBranchEndConnector(branchActivities:Array):Object{
+		var fromAct:Activity = branchActivities[0];
+		var toAct:Activity = branchActivities[1];
 		
-		var sequence:Activity = _cv.ddm.getActivityByUIID(fromAct.parentUIID);
+		var sequence:SequenceActivity = SequenceActivity(_cv.ddm.getActivityByUIID(fromAct.parentUIID));
 		
 		/** Basic validation for Branch(s)/Branch Connector(s) */
-		if(_cv.ddm.getTransitionsForActivityUIID(fromAct.activityUIID).out != null) {
+		if(fromAct.activityUIID == activeView.endHub.activity.activityUIID) {
+			return new LFError("Cannot create branch from end-point.");
+		} else if(_cv.ddm.getTransitionsForActivityUIID(fromAct.activityUIID).out != null) {
 			return new LFError("Cannot create end-branch connection to Activity with outward Transition", "createBranchEndConnector", this);
 		} else if(_cv.ddm.getBranchesForActivityUIID(sequence.activityUIID).myBranches.length <= 0) {
 			return new LFError("Cannot create end-branch connection to an unconnected Sequence.", "createBranchStartConnector", this);
@@ -1372,6 +1381,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 */
 	public function get selectedItem ():Object {
 		return _selectedItem;
+	}
+	
+	public function get connectionActivities():Array {
+		return _connectionActivities;
 	}
 	
 	/**

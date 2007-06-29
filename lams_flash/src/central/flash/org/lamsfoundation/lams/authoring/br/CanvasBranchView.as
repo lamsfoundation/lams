@@ -67,7 +67,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private var cHubEnd_mc:MovieClip;
 	
 	private var _branchLayer:MovieClip;
-	private var _defaultSequenceActivity:Activity;
+	private var _defaultSequenceActivity:SequenceActivity;
+	private var _fingerprint:MovieClip;
 	
 	/**
 	* Constructor
@@ -76,6 +77,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		_canvasBranchView = this;
 		_tm = ThemeManager.getInstance();
 		defaultSequenceActivity = null;
+		fingerprint = null;
 		
 		//Init for event delegation
         mx.events.EventDispatcher.initialize(this);
@@ -223,16 +225,20 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	private function loadSequenceActivities() {
 		var sequenceActs:Array;
-		Debugger.log('loading sequence activities:',Debugger.CRITICAL,'loadSequenceActivities','org.lamsfoundation.lams.CanvasBranchView');
 		
-		if((sequenceActs = _cm.getCanvas().ddm.getComplexActivityChildren(activity.activityUIID)).length <= 0) {
-			Debugger.log('creating init seq activity:' + sequenceActs,Debugger.CRITICAL,'loadSequenceActivities','org.lamsfoundation.lams.CanvasBranchView');
-			createInitialSequenceActivity();
-		} else {
-			// TODO: make the last create sequence activity in array (order id) the default?
-			var children:Array = _cm.getCanvas().ddm.getComplexActivityChildren(activity.activityUIID);
-			defaultSequenceActivity = children[children.length-1];
+		if((sequenceActs = _cm.getCanvas().ddm.getComplexActivityChildren(activity.activityUIID)).length > 0) {
+			for(var i=0; i<sequenceActs.length;  i++) {
+				if(SequenceActivity(sequenceActs[i]).firstActivityUIID != null) {
+					defaultSequenceActivity = SequenceActivity(sequenceActs[i]);
+				}
+				
+				_cm.addNewBranch(SequenceActivity(sequenceActs[i]));
+			}
 		}
+		
+		if(defaultSequenceActivity == null)
+			createInitialSequenceActivity();
+
 	}
 	
 	private function createInitialSequenceActivity() {
@@ -265,8 +271,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 	}
 	
-	private function addSequence(a:Activity, cm:CanvasModel):Boolean{
+	private function addSequence(a:SequenceActivity, cm:CanvasModel):Boolean{
 		defaultSequenceActivity = a;
+		
 		return true;
 	}
 	
@@ -402,8 +409,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
 		
+		if(b.direction == BranchConnector.DIR_FROM_START) b.sequenceActivity.firstActivityUIID = b.targetUIID;
 		var newBranch_mc:MovieClip = branchLayer.createChildAtDepth("BranchConnector",DepthManager.kTop,{_branch:b,_canvasController:cbc,_canvasBranchView:cbv});
-		
 		cm.branchesDisplayed.put(b.branchUIID,newBranch_mc);
 		Debugger.log('drawn a branch:'+b.branchUIID+','+newBranch_mc,Debugger.GEN,'drawBranch','CanvasView');
 		
@@ -462,6 +469,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 */
 	private function removeBranch(b:Branch,cm:CanvasModel){
 		if(!cm.isActiveView(this)) return false;
+		if(b.direction == BranchConnector.DIR_FROM_START) b.sequenceActivity.firstActivityUIID = null;
 		
 		var r = cm.branchesDisplayed.remove(b.branchUIID);
 		r.removeMovieClip();
@@ -539,11 +547,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		return _canvasBranchingActivity.activity;
 	}
 	
-	public function get defaultSequenceActivity():Activity {
+	public function get defaultSequenceActivity():SequenceActivity {
 		return _defaultSequenceActivity;
 	}
 	
-	public function set defaultSequenceActivity(a:Activity):Void{
+	public function set defaultSequenceActivity(a:SequenceActivity):Void{
 		_defaultSequenceActivity = a;
 	}
 	
@@ -553,6 +561,15 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	public function set branchLayer(a:MovieClip):Void{
 		_branchLayer = a;
+	}
+	
+	public function get fingerprint():MovieClip {
+		return _fingerprint;
+	}
+	
+	public function set fingerprint(a:MovieClip):Void{
+		if(a == startHub || a == endHub)
+			_fingerprint = a;
 	}
 	
 	/**

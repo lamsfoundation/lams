@@ -300,6 +300,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		if(r==null){
 			return new LFError("Removing branch failed:"+branchUIID,"removeBranch",this,null);
 		}else{
+			
 			Debugger.log('Removed:'+r.branchUIID,Debugger.GEN,'removeBranch','DesignDataModel');
 			dispatchEvent({type:'ddmUpdate',target:this});
 		}
@@ -335,7 +336,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var success:Boolean = false;
 		//TODO:Validate if design is saved if not notify user
 		success = true;
-		//_global.breakpoint();
+		
 		Debugger.log('Setting design ID:'+design.learningDesignID,Debugger.GEN,'setDesign','DesignDataModel');
 		Debugger.log('Printing the design revieced:...\n'+ObjectUtils.toString(design),Debugger.VERBOSE,'setDesign','DesignDataModel');
 		
@@ -672,7 +673,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		if(classActs.length > 0){
 			
 			for(var i=0; i<classActs.length; i++){
-				design.activities[i] = classActs[i].toData();
+				var classAct = classActs[i].toData();
+				if(classAct != null)
+					design.activities.push(classAct);
 			}
 		}
 		

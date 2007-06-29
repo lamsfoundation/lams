@@ -67,11 +67,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	    
 		//if transition tool active
 	    if(_canvasModel.isTransitionToolActive()){
-		   
+		    
 			var transitionTarget = createValidTransitionTarget(ca, true);
 		    if(transitionTarget instanceof LFError){
 				transitionTarget.showErrorAlert(null); 
-		   }else{
+		    }else{
+				_canvasModel.activeView.fingerprint = transitionTarget;
 			   	var td = _canvasModel.addActivityToConnection(transitionTarget);
 				_canvasModel.activeView.initDrawTempTrans();
 			}
@@ -325,6 +326,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasModel.getCanvas().stopTransitionTool();
 				LFError(transitionTarget).showErrorAlert(null);
 			} else {
+				_canvasModel.activeView.fingerprint = transitionTarget;
 				var td = _canvasModel.addActivityToConnection(transitionTarget);
 						
 				_canvasModel.resetTransitionTool();
