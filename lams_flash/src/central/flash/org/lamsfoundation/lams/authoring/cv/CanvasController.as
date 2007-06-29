@@ -433,7 +433,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		if(_canvasModel.isDragging){
 			bc.stopDrag();
 			if(bc.hitTest(_canvasModel.getCanvas().bin) && !isBranchTargetReadOnly(bc, Dictionary.getValue("cv_element_readOnly_action_del"))){
-				_canvasModel.getCanvas().removeBranch(bc.branch.branchUIID); 
+				var branchesToDelete:Array;
+				if(bc.branch.direction == BranchConnector.DIR_FROM_START) {
+					branchesToDelete = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(bc.branch.sequenceActivity.activityUIID);
+					for(var i=0; i<branchesToDelete.myBranches.length; i++) {
+						_canvasModel.getCanvas().removeBranch(branchesToDelete.myBranches[i].branchUIID);
+					}
+				} else {
+					_canvasModel.getCanvas().removeBranch(bc.branch.branchUIID);
+				}
+				
 			} else {
 				if (bc._x != bc.xPosition){
 					var t = _canvasModel.branchesDisplayed.remove(bc.branch.branchUIID);

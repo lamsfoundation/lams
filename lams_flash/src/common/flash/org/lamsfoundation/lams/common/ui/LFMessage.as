@@ -61,14 +61,11 @@ class LFMessage{
 	//msg += "\n  \n  \n  \n  ";
 	Alert.okLabel = Dictionary.getValue('al_ok');
 	if(okHandler != undefined){
-	   //alt = Alert.show(msg,"__Message__",Alert.OK,null,okHandler,"alertIcon_gen",Alert.OK);
 	   alt = Alert.show(msg,Dictionary.getValue('al_alert'),Alert.OK,null,okHandler,null,Alert.OK);
 	}else{
 	   alt = Alert.show(msg,Dictionary.getValue('al_alert'),Alert.OK,null,null,null,Alert.OK);
-	   //alt = super.show(msg,"__Message__",Alert.OK,null,null,"alertIcon_gen",Alert.OK);
 	}
 	
-	//alt.setSize(800,250);
   }
   
 /**

@@ -249,8 +249,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		mx.transitions.TransitionManager.start(this,
 					{type:mx.transitions.Zoom, 
 					 direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
-					 
-		dispatchEvent({type:'press', target:this.startHub});
+		
+		getController().activityRelease(this.startHub);
 	}
 	
 	private function close():Void {
@@ -396,6 +396,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  
 	 */
 	private function drawBranch(b:Branch, cm:CanvasModel):Boolean{
+		
+		if(!cm.isActiveView(this)) return false;
+		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
 		
