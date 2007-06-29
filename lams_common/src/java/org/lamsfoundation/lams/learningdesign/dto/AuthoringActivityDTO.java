@@ -173,7 +173,6 @@ public class AuthoringActivityDTO extends BaseDTO{
 	private Integer groupingSupportType;
 	
 	private Integer groupingType;
-
 	
 	/** The image that represents the icon of this 
 	 * activity in the UI*/
@@ -206,6 +205,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
 	private String languageFile;
 	
+	/** Used by a sequence activity to determine the start of the transition based sequence */
+	private Integer firstActivityUIID;
+	
 	/*****************************************************************************
 	 * Constructors
 	 *****************************************************************************/
@@ -225,7 +227,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 			Integer createGroupingUIID, Long libraryActivityID,
 			Boolean applyGrouping,Integer groupingSupportType,
 			Integer groupingType,GroupingDTO groupingDTO, 
-			Boolean readOnly, Boolean initialised) {
+			Boolean readOnly, Boolean initialised, Integer firstActivityUIID) {
 		super();
 		this.activityID = activityID;
 		this.activityUIID = activityUIID;
@@ -269,6 +271,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		//this.groupingDTO = groupingDTO;
 		this.readOnly = readOnly;
 		this.initialised = initialised;
+		this.firstActivityUIID = firstActivityUIID;
 	}
 	public AuthoringActivityDTO(ToolActivity toolActivity){
 		super();
@@ -359,7 +362,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 	private void addBranchingActivityAttributes(BranchingActivity activity){		
 	}
 	private void addSequenceActivityAttributes(SequenceActivity activity){
-		
+		if ( activity.getFirstActivity() != null )
+			firstActivityUIID = activity.getFirstActivity().getActivityUIID();
 	}
 	private void addToolActivityAttributes(ToolActivity toolActivity){
 		this.toolContentID = toolActivity.getToolContentId();
@@ -977,5 +981,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 	}
 	public void setInitialised(Boolean initialised) {
 		this.initialised = initialised;
+	}
+	public Integer getFirstActivityUIID() {
+		return firstActivityUIID;
+	}
+	public void setFirstActivityUIID(Integer firstActivityUIID) {
+		this.firstActivityUIID = firstActivityUIID;
 	}
 }

@@ -37,6 +37,9 @@ import org.lamsfoundation.lams.learningdesign.strategy.SequenceActivityStrategy;
 */
 public class SequenceActivity extends ComplexActivity implements Serializable {
 
+	/** nullable persistent field */
+	private Activity firstActivity;
+
     /** full constructor */
     public SequenceActivity(Long activityId, 
             Integer id, 
@@ -123,15 +126,6 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 		return newSequenceActivity;
     }
 
-    /**
-     * Retrieve the first activity in current sequence activity;
-     * @return the first activity;
-     */
-    public Activity getFirstActivityInSequenceActivity()
-    {
-        return this.getNextActivityByParent(new NullActivity()); 
-    }
-    
     public String toString() {
         return new ToStringBuilder(this)
             .append("activityId", getActivityId())
@@ -146,5 +140,20 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     {
         return false;
     }
+
+    /** Get the first activity in the sequence. A Sequence activity is like a little learning design, and while is it being
+     * drawn all the the contained activities may not have transitions between them. So Flash needs to know what the first 
+     * activity is!
+	 * @hibernate.many-to-one not-null="false"
+     * @hibernate.column name="first_activity_id" 
+     */
+	public Activity getFirstActivity() {
+		return firstActivity;
+	}
+
+
+	public void setFirstActivity(Activity firstActivity) {
+		this.firstActivity = firstActivity;
+	}
 
 }

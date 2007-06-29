@@ -23,6 +23,9 @@ CREATE TABLE lams_group_branch_activity (
                   REFERENCES lams_learning_activity (activity_id)
 )TYPE=InnoDB;
 
+ALTER TABLE lams_learning_activity 
+ADD COLUMN first_activity_id BIGINT(20);
+
 INSERT INTO lams_learning_activity_type VALUES (10, 'BRANCHING_CHOSEN');
 INSERT INTO lams_learning_activity_type VALUES (11, 'BRANCHING_GROUP');
 INSERT INTO lams_learning_activity_type VALUES (12, 'BRANCHING_TOOL');

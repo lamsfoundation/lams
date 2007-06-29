@@ -515,6 +515,7 @@ CREATE TABLE lams_learning_activity (
      , system_tool_id BIGINT(20)
      , read_only TINYINT DEFAULT 0
      , initialised TINYINT DEFAULT 0
+     , first_activity_id BIGINT(20)
      , PRIMARY KEY (activity_id)
      , INDEX (learning_library_id)
      , CONSTRAINT FK_lams_learning_activity_7 FOREIGN KEY (learning_library_id)

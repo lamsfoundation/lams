@@ -1303,8 +1303,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		Map<Long,Activity> activityMapper = new HashMap<Long,Activity>();
 		Map<Integer,Activity> activityByUIIDMapper = new HashMap<Integer, Activity>();
 
+		// as we create the activities, we need to record any "first child UIID's for the sequence activity
+		// to process later - we can't process them now as the children won't have been created yet and if we
+		// leave it till later and then find all the sequence activities we are going through the activity
+		// set over and over again for no reason.
+		Map<Integer,SequenceActivity> firstChildUIIDToSequenceMapper = new HashMap<Integer,SequenceActivity>();
+		
 		for(AuthoringActivityDTO actDto: actDtoList){
-			Activity act = getActivity(actDto,groupingMapper,toolMapper);
+			Activity act = getActivity(actDto,groupingMapper,toolMapper,firstChildUIIDToSequenceMapper);
 			//so far, the activitiy ID is still old one, so setup the mapping relation between old ID and new activity.
 			activityMapper.put(act.getActivityId(),act);
 			activityByUIIDMapper.put(act.getActivityUIID(),act);
@@ -1312,7 +1318,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			if(!removedActMap.containsKey(actDto.getActivityID()))
 				actList.add(act);
 		}
-		//rescan the activity list and refresh their parent activity.
+		// rescan the activity list and refresh their parent activity.
 		for(AuthoringActivityDTO actDto: actDtoList){
 			Activity act = activityMapper.get(actDto.getActivityID());
 			if(removedActMap.containsKey(actDto.getActivityID()))
@@ -1344,6 +1350,24 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			activityDAO.insert(act);
 		}
 		
+		// process the "first child" for any sequence activities. If the child has been removed then leave it
+		// as null as the progress engine will cope (it will pick a new one based on the lack of an input transition)
+		// and in authoring the author will just have to set up a new first activity
+		if ( firstChildUIIDToSequenceMapper.size() > 0 ) {
+			for ( Integer firstChildUIID : firstChildUIIDToSequenceMapper.keySet() ) {
+				SequenceActivity sequence = firstChildUIIDToSequenceMapper.get(firstChildUIID);
+				Activity childActivity = activityByUIIDMapper.get(firstChildUIID);
+				if ( childActivity == null )  {
+					log.error("Unable to find first child activity ("+firstChildUIID
+							+") for the sequence activity ("+sequence
+							+") referred to in First Child to Sequence map. The activity was probably removed. "
+							+"The first activity should be reset up in authoring "
+							+"otherwise the progress engine will just do the best it can.");
+				} else {
+					sequence.setFirstActivity(childActivity);
+				}
+			}
+		}
 		
 //		reset first activity UUID for LD if old first removed
 		//set first as remove activity's next existed one
@@ -1698,7 +1722,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * @param toolMapper
 	 * @return
 	 */
-	private Activity getActivity(AuthoringActivityDTO actDto, Map<Long, Grouping> groupingList, Map<Long,ToolContent> toolMapper) {
+	private Activity getActivity(AuthoringActivityDTO actDto, Map<Long, Grouping> groupingList, 
+			Map<Long,ToolContent> toolMapper, Map<Integer,SequenceActivity> firstChildUIIDToSequenceMapper) {
 		Activity act = null;
 		if(actDto == null)
 			return act;
@@ -1762,6 +1787,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				break;
 			case Activity.SEQUENCE_ACTIVITY_TYPE:
 				act = new SequenceActivity();
+				if ( actDto.getFirstActivityUIID() != null ) {
+					firstChildUIIDToSequenceMapper.put(actDto.getFirstActivityUIID(), (SequenceActivity)act);
+				}
 				break;
 			case Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE:
 				act = new ChosenBranchingActivity();
