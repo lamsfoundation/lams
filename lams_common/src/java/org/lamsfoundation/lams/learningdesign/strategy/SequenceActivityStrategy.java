@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -40,6 +41,8 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
  */
 public class SequenceActivityStrategy extends ComplexActivityStrategy
 {
+	protected Logger log = Logger.getLogger(SequenceActivityStrategy.class);	
+
 	protected SequenceActivity sequenceActivity = null;
 	
 	public SequenceActivityStrategy(SequenceActivity sequenceActivity) {
@@ -53,36 +56,49 @@ public class SequenceActivityStrategy extends ComplexActivityStrategy
      * via transitions, so we are only interested in child activities that
      * start a series of linked activities.
      * 
-     * <p>This will return the next such activity (ie one that doesn't 
+     * <p>If the sequence has a firstActivity (according to the firstActivity field)
+     * then: If the currentChild is the NullActivity then it will return the first
+     * Activity, otherwise it will return the NullActivity.
+     * 
+     * If no firstActivity exists then it looks for the child activity that doesn't 
      * have in input transition) with the order id greater the 
      * currentChild. If the currentChild is the NullActivity then 
-     * it will return the first (and normally the only) such child.</p>
+     * it will return the first such child. </p>
      * 
      * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
 	public Activity getNextActivityByParent(ComplexActivity parent, Activity currentChild)
     {
-        Set children = new TreeSet(new ActivityOrderComparator());
-        children.addAll(parent.getActivities());
-        
-        Activity inputChild = currentChild;
-        if ( inputChild != null ) {
-        	if ( inputChild.isNull() ) {
-        		inputChild = null;
-        	} else if ( inputChild.getOrderId() == null ) {
-        		inputChild = null;
-        	}
-        }
-        
-        for(Iterator i=children.iterator();i.hasNext();)
-        {
-            Activity curChild = (Activity)i.next();
-            if(  ( inputChild==null || curChild.getOrderId().longValue() > currentChild.getOrderId().longValue() ) ) {
-            	// we are past the 'currentChild' so look for an activity with no input transition
-            	if ( curChild.getTransitionTo() == null ) 
-            		return curChild;
-            }
-        }
+		Activity firstActivity = sequenceActivity.getFirstActivity();
+		if ( firstActivity != null ) {
+			return (currentChild==null || currentChild.isNull() ) ? firstActivity : new NullActivity();
+		}
+
+		if ( sequenceActivity.getActivities().size() > 0 ) {
+			
+			log.warn("getNextActivityByParent: child activities exist but no firstActivity is set up. Trying to work it out based on transitions. SequenceActivity "+sequenceActivity);
+	        
+	        Activity inputChild = currentChild;
+	        if ( inputChild != null ) {
+	        	if ( inputChild.isNull() ) {
+	        		inputChild = null;
+	        	} else if ( inputChild.getOrderId() == null ) {
+	        		inputChild = null;
+	        	}
+	        }
+	        
+	        // getActivities is ordered by order id ()
+	        for(Iterator i=sequenceActivity.getActivities().iterator();i.hasNext();)
+	        {
+	            Activity curChild = (Activity)i.next();
+	            if(  ( inputChild==null || curChild.getOrderId().longValue() > currentChild.getOrderId().longValue() ) ) {
+	            	// we are past the 'currentChild' so look for an activity with no input transition
+	            	if ( curChild.getTransitionTo() == null ) 
+	            		return curChild;
+	            }
+	        }
+		}
+		
         return new NullActivity();
     }
 

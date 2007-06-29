@@ -137,6 +137,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	protected HashMap<Integer,Grouping> groupings = new HashMap<Integer,Grouping>();
 	protected HashMap<Integer,Group> groups = new HashMap<Integer,Group>();
 	protected HashMap<Integer,GroupBranchActivityEntry> branchEntries = new HashMap<Integer,GroupBranchActivityEntry>();
+	protected HashMap<Integer,SequenceActivity> firstChildToSequenceMap = new HashMap<Integer,SequenceActivity>();
 	/* can't delete as we go as they are linked to other items - keep a list and delete at the end. */
 	protected Set<Grouping> groupingsToDelete = new HashSet<Grouping>();
 	protected LearningDesign learningDesign = null;
@@ -403,7 +404,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		parseActivitiesToMatchUpParentActivityByParentUIID((Vector)table.get(WDDXTAGS.ACTIVITIES));
 		parseTransitions((Vector)table.get(WDDXTAGS.TRANSITIONS));
 		parseBranchMappings((Vector)table.get(WDDXTAGS.BRANCH_MAPPINGS));
-
+		progressFirstActivityWithinSequence();
+		
 		learningDesign.setFirstActivity(learningDesign.calculateFirstActivity());
 		learningDesignDAO.insertOrUpdate(learningDesign);
 		deleteUnwantedGroupings();
@@ -411,7 +413,29 @@ public class ObjectExtractor implements IObjectExtractor {
 		
 		return learningDesign;	
 		}
-	
+
+	/** Link SequenceActivities up with their firstActivity entries 
+	 * @throws WDDXProcessorConversionException */
+	private void progressFirstActivityWithinSequence() throws WDDXProcessorConversionException {
+		
+		if ( firstChildToSequenceMap.size() > 0 ) {
+			for ( Integer firstChildUIID : firstChildToSequenceMap.keySet() ) {
+				SequenceActivity sequence = firstChildToSequenceMap.get(firstChildUIID);
+				Activity childActivity = newActivityMap.get(firstChildUIID);
+				if ( childActivity == null )  {
+					String msg = "Unable to find first child activity ("+firstChildUIID
+						+") for the sequence activity ("+sequence
+						+") referred to in First Child to Sequence map.";
+			    	throw new WDDXProcessorConversionException(msg);
+				} else {
+					sequence.setFirstActivity(childActivity);
+				}
+			}
+			
+		}
+	}
+
+
 	/** 
 	 * Initialise the map of groupings with those in the db from a previous save.
 	 * This must be called as soon as the learning design is read from the db and before it is changed.
@@ -915,8 +939,12 @@ public class ObjectExtractor implements IObjectExtractor {
 	private void buildParallelActivity(ParallelActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
 	}
 	private void buildSequenceActivity(SequenceActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
-		
+		Integer firstActivityUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.FIRST_ACTIVITY_UIID);
+		if ( firstActivityUIID != null ) {
+			firstChildToSequenceMap.put(firstActivityUIID, (SequenceActivity)activity);
+		}
 	}
+	
 	private void buildToolActivity(ToolActivity toolActivity,Hashtable activityDetails) throws WDDXProcessorConversionException{
 		if ( log.isDebugEnabled() ) {
 			log.debug("In tool activity UUID"+activityDetails.get(WDDXTAGS.ACTIVITY_UIID)

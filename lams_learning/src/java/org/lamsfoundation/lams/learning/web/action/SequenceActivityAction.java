@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.form.OptionsActivityForm;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.NullActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -89,7 +90,7 @@ public class SequenceActivityAction extends ActivityAction {
 
 		ActionForward forward = null;
 		SequenceActivity sequenceActivity = (SequenceActivity)activity;
-        Activity firstActivityInSequence = sequenceActivity.getFirstActivity();
+        Activity firstActivityInSequence = sequenceActivity.getNextActivityByParent(new NullActivity());
         
         if ( firstActivityInSequence != null && ! firstActivityInSequence.isNull() ) {
 			// Set the first activity as the current activity and display it
