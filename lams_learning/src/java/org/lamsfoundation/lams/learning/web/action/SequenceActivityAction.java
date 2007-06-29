@@ -89,7 +89,7 @@ public class SequenceActivityAction extends ActivityAction {
 
 		ActionForward forward = null;
 		SequenceActivity sequenceActivity = (SequenceActivity)activity;
-        Activity firstActivityInSequence = sequenceActivity.getFirstActivityInSequenceActivity();
+        Activity firstActivityInSequence = sequenceActivity.getFirstActivity();
         
         if ( firstActivityInSequence != null && ! firstActivityInSequence.isNull() ) {
 			// Set the first activity as the current activity and display it
