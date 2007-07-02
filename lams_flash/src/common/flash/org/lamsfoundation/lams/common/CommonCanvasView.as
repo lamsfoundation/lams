@@ -87,7 +87,7 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 			// deselect previously selected item
 			if(m.prevSelectedItem != null) {
 				// if child of an complex activity is previously selected, it is easiest to clear all the children
-				if(m.prevSelectedItem.activity.parentUIID != null) {
+				if(m.prevSelectedItem.activity.parentUIID != null && m.getCanvas().ddm.getActivityByUIID(m.prevSelectedItem.activity.parentUIID).activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE) {
 					var caComplex = m.activitiesDisplayed.get(m.prevSelectedItem.activity.parentUIID);
 					caComplex.refreshChildren();
 				} else {

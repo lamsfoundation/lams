@@ -121,10 +121,10 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var cm:CanvasModel = event.target;
 	   
 		switch (event.updateType){ 
-			case 'POSITION' :
+			case 'POSITION':
                 setPosition(cm);
                 break;
-            case 'SIZE' :
+            case 'SIZE':
                 setSize(cm);
                 break;
 			case 'ADD_SEQUENCE':
@@ -154,10 +154,10 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			case 'REMOVE_TRANSITION':
 				removeTransition(event.data,cm);
 				break;
-			case 'SELECTED_ITEM' :
+			case 'SELECTED_ITEM':
                 highlightActivity(cm);
                 break;
-			case 'SET_ACTIVE' :
+			case 'SET_ACTIVE':
 				Debugger.log('setting activie :' + event.updateType + " event.data: " + event.data + " condition: " + (event.data == this),Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasBranchView');
 				transparentCover._visible = (event.data == this) ? false : true;
 				break;

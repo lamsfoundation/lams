@@ -279,17 +279,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @param   gateTypeID     
 	 * @return  
 	 */
-	public function createGateTransition(transitionUIID,gateTypeID){
+	public function createGateTransition(transitionUIID,gateTypeID, parent){
 		Debugger.log('transitionUIID:'+transitionUIID,Debugger.GEN,'createGateTransition','CanvasModel');
 		Debugger.log('gateTypeID:'+gateTypeID,Debugger.GEN,'createGateTransition','CanvasModel');
+		
 		var editedTrans = _cv.ddm.getTransitionByUIID(transitionUIID);
 		var editedCanvasTrans = _transitionsDisplayed.get(transitionUIID);
 		var fromAct = _cv.ddm.getActivityByUIID(editedTrans.fromUIID);
 		var toAct = _cv.ddm.getActivityByUIID(editedTrans.toUIID);
+		
 		//create a gate activity
 		var gateAct = new GateActivity(_cv.ddm.newUIID(),gateTypeID);
 		gateAct.learningDesignID = _cv.ddm.learningDesignID;
-		
 		gateAct.title = Dictionary.getValue('gate_btn');
 		gateAct.yCoord = editedCanvasTrans.midPoint.y - (CanvasActivity.GATE_ACTIVITY_WIDTH / 2);
 		gateAct.xCoord = editedCanvasTrans.midPoint.x - (CanvasActivity.GATE_ACTIVITY_HEIGHT / 2);
@@ -297,22 +298,30 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log('gateAct.yCoord:'+gateAct.yCoord,Debugger.GEN,'createGateTransition','CanvasModel');
 		Debugger.log('gateAct.xCoord:'+gateAct.xCoord,Debugger.GEN,'createGateTransition','CanvasModel');
 
+		if(parent != null) {
+			gateAct.parentActivityID = parent.activityID;
+			gateAct.parentUIID = parent.activityUIID;
+		}
+
 		_cv.ddm.addActivity(gateAct);
 		_cv.ddm.removeTransition(transitionUIID);
+		
 		//create the from trans
 		addActivityToTransition(fromAct);
 		addActivityToTransition(gateAct);
-		resetTransitionTool()
+		resetTransitionTool();
+		
 		//create the to trans
 		addActivityToTransition(gateAct);
 		addActivityToTransition(toAct);
-		resetTransitionTool()
-		
+		resetTransitionTool();
 		
 		//flag the model as dirty and trigger a refresh
-		setDirty();	
+		setDirty();
+		
 		//select the new thing
 		setSelectedItem(_activitiesDisplayed.get(gateAct.activityUIID));
+		
 	}
 	
 	/**
@@ -322,7 +331,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @param   pos        
 	 * @return  
 	 */
-	public function createNewGate(gateTypeID, pos:Point){
+	public function createNewGate(gateTypeID, pos:Point, parent){
 		Debugger.log('gateTypeID:'+gateTypeID,Debugger.GEN,'createNewGate','CanvasModel');
 		var gateAct = new GateActivity(_cv.ddm.newUIID(),gateTypeID);
 		gateAct.learningDesignID = _cv.ddm.learningDesignID;
@@ -331,9 +340,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		gateAct.yCoord = pos.y;
 		gateAct.xCoord = pos.x;
 		
-		
 		Debugger.log('gateAct.yCoord:'+gateAct.yCoord,Debugger.GEN,'createGateTransition','CanvasModel');
 		Debugger.log('gateAct.xCoord:'+gateAct.xCoord,Debugger.GEN,'createGateTransition','CanvasModel');
+
+		if(parent != null) {
+			gateAct.parentActivityID = parent.activityID;
+			gateAct.parentUIID = parent.activityUIID;
+		}
 
 		_cv.ddm.addActivity(gateAct);
 		
@@ -350,7 +363,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @param   pos 
 	 * @return  
 	 */
-	public function createNewBranchActivity(pos:Point){
+	public function createNewBranchActivity(pos:Point, parent){
 		Debugger.log('Running...',Debugger.GEN,'createNewBranchActivity','CanvasModel');
 		
 		var branchingActivity = new BranchingActivity(_cv.ddm.newUIID());
@@ -364,6 +377,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 		Debugger.log('branchingActivity.yCoord:'+branchingActivity.yCoord,Debugger.GEN,'createNewBranchActivity','CanvasModel');
 		Debugger.log('branchingActivity.xCoord:'+branchingActivity.xCoord,Debugger.GEN,'createNewBranchActivity','CanvasModel');
+
+		if(parent != null) {
+			branchingActivity.parentActivityID = parent.activityID;
+			branchingActivity.parentUIID = parent.activityUIID;
+		}
 
 		_cv.ddm.addActivity(branchingActivity);
 		
@@ -400,7 +418,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @param   pos 
 	 * @return  
 	 */
-	public function createNewGroupActivity(pos:Point){
+	public function createNewGroupActivity(pos:Point, parent){
 		Debugger.log('Running...',Debugger.GEN,'createNewGroupActivity','CanvasModel');
 		
 		//first create the grouping object
@@ -421,6 +439,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log('groupingActivity.yCoord:'+groupingActivity.yCoord,Debugger.GEN,'createNewGroupActivity','CanvasModel');
 		Debugger.log('groupingActivity.xCoord:'+groupingActivity.xCoord,Debugger.GEN,'createNewGroupActivity','CanvasModel');
 
+		if(parent != null) {
+			groupingActivity.parentActivityID = parent.activityID;
+			groupingActivity.parentUIID = parent.activityUIID;
+		}
+
 		_cv.ddm.addActivity(groupingActivity);
 		
 		//tell the canvas to go refresh
@@ -436,7 +459,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @param   pos        
 	 * @return  
 	 */
-	public function createNewOptionalActivity(ActivityTypeID, pos:Point){
+	public function createNewOptionalActivity(ActivityTypeID, pos:Point, parent){
 		var optAct = new ComplexActivity(_cv.ddm.newUIID());
 		
 		optAct.learningDesignID = _cv.ddm.learningDesignID;
@@ -448,6 +471,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		optAct.xCoord = pos.x;
 		
 		Debugger.log('Optional Activitys Y Coord is :'+optAct.yCoord,Debugger.GEN,'createNewOptionalActivity','CanvasModel');
+		
+		if(parent != null) {
+			optAct.parentActivityID = parent.activityID;
+			optAct.parentUIID = parent.activityUIID;
+		}
 		
 		_cv.ddm.addActivity(optAct);
 		

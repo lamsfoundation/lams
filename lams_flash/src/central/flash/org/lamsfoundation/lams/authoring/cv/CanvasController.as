@@ -124,8 +124,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		 
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
-			 _canvasModel.isDragging = false;
-			if (ca.activity.parentUIID != null){
+			_canvasModel.isDragging = false;
+			if (ca.activity.parentUIID != null && _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID).activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE){
 				for (var i=0; i<optionalOnCanvas.length; i++){
 					if (ca.activity.parentUIID == optionalOnCanvas[i].activity.activityUIID){
 						if (optionalOnCanvas[i].locked == false){
@@ -146,19 +146,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 				//if we are on the optional Activity remove this activity from canvas and assign it a parentID of optional activity and place it in the optional activity window.
 				for (var i=0; i<optionalOnCanvas.length; i++){
-					//trace ("testing Optional on Canvas "+i)
-					if (ca.activity.activityUIID != optionalOnCanvas[i].activity.activityUIID ){
-						if (ca.hitTest(optionalOnCanvas[i])){
-							if (optionalOnCanvas[i].locked == true){
+					if(ca.activity.activityUIID != optionalOnCanvas[i].activity.activityUIID ){
+						if(ca.hitTest(optionalOnCanvas[i])){
+							if(optionalOnCanvas[i].locked == true){
 								var msg:String = Dictionary.getValue('act_lock_chk');
 								LFMessage.showMessageAlert(msg);
 							}else{
-								if (ca.activity.isGateActivity()){
+								if(ca.activity.isGateActivity()){
 									activitySnapBack(ca);
 									var msg:String = Dictionary.getValue('cv_gateoptional_hit_chk');
 									LFMessage.showMessageAlert(msg);
 								}else {
-									if (_canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(ca.activity.activityUIID).hasTrans){
+									if(_canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(ca.activity.activityUIID).hasTrans){
 										activitySnapBack(ca);
 										var msg:String = Dictionary.getValue('cv_invalid_optional_activity', [ca.activity.title]);
 										LFMessage.showMessageAlert(msg);
@@ -185,6 +184,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				ca.activity.xCoord = ca._x;
 				ca.activity.yCoord = ca._y;
 			}
+			// TODO: set coord if dragging/release branch start/end hub
 			
 			//refresh the transitions
 			//TODO: refresh the transitions as you drag...
@@ -218,9 +218,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				b.removeMovieClip();
 			}
 			
-			clearAllSelections(optionalOnCanvas, parallelOnCanvas)		
+			clearAllSelections(optionalOnCanvas, parallelOnCanvas);
+			_canvasModel.selectedItem = ca;	
 			_canvasModel.setDirty();
-			_canvasModel.selectedItem = ca;
 			Debugger.log('ca.activity.xCoord:'+ca.activity.xCoord,Debugger.GEN,'activityRelease','CanvasController');
 			
 			
@@ -230,9 +230,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasModel.activeView.removeTempTrans();
 				new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
 			}
-			clearAllSelections(optionalOnCanvas, parallelOnCanvas)
-			_canvasModel.setDirty();
+			clearAllSelections(optionalOnCanvas, parallelOnCanvas);
 			_canvasModel.selectedItem = ca;
+			_canvasModel.setDirty();
 		}
 	}
    
@@ -492,7 +492,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		//cm creates gate act and another transition to make [trans][gate][trans] seq
 		//sets in ddm
 		//flags dirty to refresh view
-		_canvasModel.createGateTransition(_canvasModel.selectedItem.transition.transitionUIID,evt.gate);
+		var parent:SequenceActivity = null;
+		if(_canvasModel.activeView instanceof CanvasBranchView) {
+			parent = _canvasModel.activeView.defaultSequenceActivity;
+		}
+		
+		_canvasModel.createGateTransition(_canvasModel.selectedItem.transition.transitionUIID, evt.gate, parent);
 	}
 		
 	/**
@@ -512,34 +517,39 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 		var complexActWidth:Number = _canvasModel.getCanvas().complexActivityWidth;
 		
-		Debugger.log(_canvasModel.activeView,Debugger.GEN,'canvasRelease','CanvasController');
+		Debugger.log(_canvasModel.activeView + " " + _canvasModel.activeView instanceof CanvasBranchView,Debugger.GEN,'canvasRelease','CanvasController');
 		Debugger.log('_canvasModel.activeTool:'+_canvasModel.activeTool,Debugger.GEN,'canvasRelease','CanvasController');
 		
 		_canvasModel.selectedItem = null;
 		
+		var parent:SequenceActivity = null;
+		if(_canvasModel.activeView instanceof CanvasBranchView) {
+			parent = _canvasModel.activeView.defaultSequenceActivity;
+		}
+		
 		if(_canvasModel.activeTool == CanvasModel.GATE_TOOL){
 			var p = new Point(_canvasModel.activeView._xmouse, _canvasModel.activeView._ymouse); 
-			_canvasModel.createNewGate(Activity.PERMISSION_GATE_ACTIVITY_TYPE,p);
+			_canvasModel.createNewGate(Activity.PERMISSION_GATE_ACTIVITY_TYPE,p,parent);
 			_canvasModel.getCanvas().stopGateTool();
 		}
 		
 		if(_canvasModel.activeTool == CanvasModel.OPTIONAL_TOOL){
 			var p = new Point(_canvasModel.activeView._xmouse-(complexActWidth/2), _canvasModel.activeView._ymouse); 
-			_canvasModel.createNewOptionalActivity(Activity.OPTIONAL_ACTIVITY_TYPE,p);
+			_canvasModel.createNewOptionalActivity(Activity.OPTIONAL_ACTIVITY_TYPE,p,parent);
 			_canvasModel.getCanvas().stopOptionalActivity();
 			
 		}
 		
 		if(_canvasModel.activeTool == CanvasModel.GROUP_TOOL){
 			var p = new Point(_canvasModel.activeView._xmouse-(toolActWidth/2), _canvasModel.activeView._ymouse-(toolActHeight/2)); 
-			_canvasModel.createNewGroupActivity(p);
+			_canvasModel.createNewGroupActivity(p,parent);
 			_canvasModel.getCanvas().stopGroupTool();
 			
 		}
 		
 		if(_canvasModel.activeTool == CanvasModel.BRANCH_TOOL){
 			var p = new Point(_canvasModel.activeView._xmouse-(toolActWidth/2), _canvasModel.activeView._ymouse-(toolActHeight/2)); 
-			_canvasModel.createNewBranchActivity(p);
+			_canvasModel.createNewBranchActivity(p,parent);
 			_canvasModel.getCanvas().stopBranchTool();
 		}
 		
