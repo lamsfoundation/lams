@@ -190,4 +190,11 @@ public interface WDDXTAGS {
 	public static final String EXTERNAL_ID_TYPE = "externalIDType";
 	public static final String EXTERNAL_SIG = "externalSignature";
 	public static final String ENTRY = "entry";
+	
+	/** Branching Activity Specific Tags */
+	public static final String START_XCOORD="startXCoord";
+	public static final String START_YCOORD="startYCoord";	
+	public static final String END_XCOORD="endXCoord";
+	public static final String END_YCOORD="endYCoord";	
+	
 }

@@ -899,9 +899,14 @@ public class ObjectExtractor implements IObjectExtractor {
 			buildSequenceActivity((SequenceActivity)activity,activityDetails);
 		
 	}
-	private void buildBranchingActivity(BranchingActivity branchingActivity,Hashtable activityDetails) 
+	private void buildBranchingActivity(BranchingActivity branchingActivity,Hashtable activityDetails)
 		throws WDDXProcessorConversionException, ObjectExtractorException {
+		branchingActivity.setStartXcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.START_XCOORD));
+		branchingActivity.setStartYcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.START_YCOORD));
+		branchingActivity.setEndXcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.END_XCOORD));
+		branchingActivity.setEndYcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.END_YCOORD));
 	}	
+	
 	private void buildGroupingActivity(GroupingActivity groupingActivity,Hashtable activityDetails) 
 		throws WDDXProcessorConversionException, ObjectExtractorException {
 		/**
