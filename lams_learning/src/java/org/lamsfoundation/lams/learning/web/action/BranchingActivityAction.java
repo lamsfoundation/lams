@@ -59,10 +59,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  */
 public class BranchingActivityAction extends LamsDispatchAction {
 	
-	public static final String CHOSEN_TYPE = "chosen";
-	public static final String GROUP_BASED_TYPE = "group";
-	public static final String TOOL_BASED_TYPE = "tool";
-
 	private ICoreLearnerService learnerService = null;
 	
 	protected ICoreLearnerService getLearnerService() {
@@ -114,11 +110,11 @@ public class BranchingActivityAction extends LamsDispatchAction {
 		        groupForm.set("title", activity.getTitle());
 		        
 		        if ( branchingActivity.isChosenBranchingActivity() ) {
-		        	groupForm.set("type", CHOSEN_TYPE);
+		        	groupForm.set("type", BranchingActivity.CHOSEN_TYPE);
 		        } else if ( branchingActivity.isGroupBranchingActivity() ) {
-		        	groupForm.set("type", GROUP_BASED_TYPE);
+		        	groupForm.set("type", BranchingActivity.GROUP_BASED_TYPE);
 		        } else if ( branchingActivity.isToolBranchingActivity() ) {
-		        	groupForm.set("type", TOOL_BASED_TYPE);
+		        	groupForm.set("type", BranchingActivity.TOOL_BASED_TYPE);
 		        }
 
 				forward = mapping.findForward("displayBranchingWait");
