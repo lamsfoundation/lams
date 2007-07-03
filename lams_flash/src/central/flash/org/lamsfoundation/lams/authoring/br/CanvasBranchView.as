@@ -216,10 +216,10 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		Debugger.log('adding hubs for branch activity:' + _canvasBranchingActivity,Debugger.CRITICAL,'setupConenctorHubs','org.lamsfoundation.lams.CanvasBranchView');
 		
 		// start-point connector hub
-		cHubStart_mc = activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity:_canvasBranchingActivity.activity,_canvasController:getController(),_canvasView:_canvasBranchView, _x: 0 , _y: 0});
+		cHubStart_mc = activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity,_canvasController:getController(),_canvasBranchView:_canvasBranchView, _x: activity.startXCoord , _y: activity.startYCoord, branchConnector:true});
 		
 		// end-point connector hub
-		cHubEnd_mc = activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity:_canvasBranchingActivity.activity,_canvasController:getController(),_canvasView:_canvasBranchView, _x: 0 , _y: 0});
+		cHubEnd_mc = activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity,_canvasController:getController(),_canvasBranchView:_canvasBranchView, _x: activity.endXCoord , _y: activity.endYCoord, branchConnector:true});
 
 	}
 	
@@ -541,6 +541,16 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	public function get endHub():CanvasActivity {
 		return CanvasActivity(cHubEnd_mc);
+	}
+	
+	public function isStart(a:MovieClip):Boolean {
+		if(startHub == a) return true;
+		else return false;
+	}
+	
+	public function isEnd(a:MovieClip):Boolean {
+		if(endHub == a) return true;
+		else return false;
 	}
 	
 	public function get activity():BranchingActivity {

@@ -183,8 +183,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			if(!ca.branchConnector) {
 				ca.activity.xCoord = ca._x;
 				ca.activity.yCoord = ca._y;
+			} else {
+				if(_canvasModel.activeView.isStart(ca)) {
+					ca.activity.startXCoord = ca._x;
+					ca.activity.startYCoord = ca._y;
+				} else if(_canvasModel.activeView.isEnd(ca)) {
+					ca.activity.endXCoord = ca._x;
+					ca.activity.endYCoord = ca._y;
+				}
 			}
-			// TODO: set coord if dragging/release branch start/end hub
 			
 			//refresh the transitions
 			//TODO: refresh the transitions as you drag...

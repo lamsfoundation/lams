@@ -391,9 +391,22 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 
 		//position
+		Debugger.log('setting position:',Debugger.CRITICAL,'draw','CanvasActivity');
 		if(!_branchConnector) {
+			Debugger.log('not branch:',Debugger.CRITICAL,'draw','CanvasActivity');
+		
 			_x = _activity.xCoord;
 			_y = _activity.yCoord;
+		} else {
+			if(_canvasBranchView.isStart(this)) {
+				Debugger.log('start branch:' + _canvasBranchView.activity.startXCoord + ":" + _canvasBranchView.activity.startYCoord, Debugger.CRITICAL,'draw','CanvasActivity');
+				_x = _canvasBranchView.activity.startXCoord;
+				_y = _canvasBranchView.activity.startYCoord;
+			} else if(_canvasBranchView.isEnd(this)) {
+				Debugger.log('end branch:' + _canvasBranchView.activity.endXCoord + ":" + _canvasBranchView.activity.endYCoord,Debugger.CRITICAL,'draw','CanvasActivity');
+				_x = _canvasBranchView.activity.endXCoord;
+				_y = _canvasBranchView.activity.endYCoord;
+			}
 		}
 		
 		Debugger.log('canvasActivity_mc._visible'+canvasActivity_mc._visible,4,'draw','CanvasActivity');

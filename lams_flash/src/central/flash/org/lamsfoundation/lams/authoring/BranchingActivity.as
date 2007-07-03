@@ -30,11 +30,26 @@ import org.lamsfoundation.lams.authoring.*;
 * @see		   Activity
 */
 class BranchingActivity extends ComplexActivity {
-
+	
+	private var _startXCoord:Number;
+	private var _startYCoord:Number;
+	private var _endXCoord:Number;
+	private var _endYCoord:Number;
+	
+	private static var DEFAULT_STARTX:Number = 0;
+	private static var DEFAULT_STARTY:Number = 0;
+	private static var DEFAULT_ENDX:Number = 0;
+	private static var DEFAULT_ENDY:Number = 0;
 	
 	function BranchingActivity(activityUIID:Number){
 		super(activityUIID);
 		_activityTypeID = BRANCHING_ACTIVITY_TYPE;
+		
+		_startXCoord = DEFAULT_STARTX;
+		_startYCoord = DEFAULT_STARTY;
+		_endXCoord = DEFAULT_ENDX;
+		_endYCoord = DEFAULT_ENDY;
+		
 	}
 	
 	/**
@@ -45,6 +60,11 @@ class BranchingActivity extends ComplexActivity {
 	 */
 	public function populateFromDTO(dto:Object){
 		super.populateFromDTO(dto);
+		_startXCoord = dto.startXCoord;
+		_startYCoord = dto.startYCoord;
+		_endXCoord = dto.endXCoord;
+		_endYCoord = dto.endXCoord;
+		
 	}
 	
 	/**
@@ -56,8 +76,45 @@ class BranchingActivity extends ComplexActivity {
 	 */
 	public function toData():Object{
 		var dto:Object = super.toData();
+		
+		if(_startXCoord) dto.startXCoord = _startXCoord;
+		if(_startYCoord) dto.startYCoord = _startYCoord;
+		if(_endXCoord) dto.endXCoord = _endXCoord;
+		if(_endYCoord) dto.endYCoord = _endYCoord;
+		
 		return dto;
 	}
 	
+	public function set startXCoord(a:Number):Void{
+		_startXCoord = Math.round(a);
+	}
+	
+	public function get startXCoord():Number{
+		return _startXCoord;
+	}
+	
+	public function set startYCoord(a:Number):Void{
+		_startYCoord = Math.round(a);
+	}
+	
+	public function get startYCoord():Number{
+		return _startYCoord;
+	}
+	
+	public function set endXCoord(a:Number):Void{
+		_endXCoord = Math.round(a);
+	}
+	
+	public function get endXCoord():Number{
+		return _endXCoord;
+	}
+	
+	public function set endYCoord(a:Number):Void{
+		_endYCoord = Math.round(a);
+	}
+	
+	public function get endYCoord():Number{
+		return _endYCoord;
+	}
 }
 

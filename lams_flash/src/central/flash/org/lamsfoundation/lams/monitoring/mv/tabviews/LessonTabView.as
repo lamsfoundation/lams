@@ -69,7 +69,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var _tip:ToolTip;
 	private var mm:MonitorModel;
 	
-	private var isLessonLaunchChecked:Boolean
+	private var isLessonLaunchChecked:Boolean;
+	
 	//TabView clips
 	private var reqTasks_depth:Number = 4000;
 	private var listCount:Number = 0; 
@@ -137,7 +138,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
     public var removeEventListener:Function;
-	//public var menu:ContextMenu;
 
 	
 	/**
@@ -146,20 +146,21 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	function LessonTabView(){
 		trace("loaded lesson tab view")
 		_lessonTabView = this;
-		//this._visible = false;
+		
 		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
+		
 		//Init for event delegation
         mx.events.EventDispatcher.initialize(this);
-		//MovieClipUtils.doLater(Proxy.create(this,init));
+		
 	}
 	
 	/**
 	* Called to initialise Canvas  . CAlled by the Canvas container
 	*/
 	public function init(m:Observable,c:Controller){
-		trace("called Lesson Tab Init")
 		super (m, c);
+		
 		isLessonLaunchChecked = true;
 		btnLabel = Dictionary.getValue('td_goContribute_btn');
 		
@@ -187,15 +188,10 @@ public function update (o:Observable,infoObj:Object):Void{
                 break;
 			case 'TABCHANGE' :
 				if (infoObj.tabID == _tabID && !mm.locked){
-				trace("TabID for Selected tab is (LessonTab TABCHANGE): "+infoObj.tabID)
-					//this._visible = true;
+					
 					mm.getMonitor().getMV().getMonitorLessonScp()._visible = true;
-					//mm.getMonitor().getMV().getMonitorScp().contentPath = this;
 					hideMainExp(mm);
 					mm.broadcastViewUpdate("JOURNALSSHOWHIDE", false);
-						
-					//mm.setDirty();
-					//MovieClipUtils.doLater(Proxy.create(this,draw));
 					
 					if(mm.getIsProgressChangedLesson()){
 						trace("I am calling reloadProgress now")
@@ -206,7 +202,6 @@ public function update (o:Observable,infoObj:Object):Void{
 				
 				} else {
 					mm.getMonitor().getMV().getMonitorLessonScp()._visible = false;
-					//this._visible = false;
 				}
 				break;
 			case 'SEQUENCE' :
@@ -243,10 +238,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				break;
 			case 'DRAW_DESIGN' :
 				if (infoObj.tabID == _tabID && !mm.locked){
-					//drawDesignCalled = "called";
-					trace("TabID for Selected tab is (LessonTab): "+infoObj.tabID)
 					populateLessonDetails();
-					//mm.setIsProgressChanged(false);
 				}
 				break;
             default :
@@ -256,8 +248,6 @@ public function update (o:Observable,infoObj:Object):Void{
 	}
 	
 	private function setupTab(){
-		//start_date_lbl.visible = false;
-		//schedule_date_lbl.visible = false;
 		_monitorController = getController();
 		
 		editClass_btn.addEventListener("click", _monitorController);
@@ -295,13 +285,13 @@ public function update (o:Observable,infoObj:Object):Void{
 		var year = mydate.getFullYear();
 		var month = mydate.getMonth();
 		var date = mydate.getDate();
+		
 		Debugger.log('schedule date range starts from :'+date + "/" +month+ "/" +year,Debugger.CRITICAL,'setScheduleDateRange','org.lamsfoundation.lams.WizardView');
 		scheduleDate_dt.selectableRange = {rangeStart: new Date(year, month, date)};
 	}
 	
 	
 	private function hideMainExp(mm:MonitorModel):Void{
-		//var mcontroller = getController();
 		mm.broadcastViewUpdate("EXPORTSHOWHIDE", false)
 		mm.broadcastViewUpdate("EDITFLYSHOWHIDE", false);
 	}
@@ -315,18 +305,13 @@ public function update (o:Observable,infoObj:Object):Void{
 	 */
 	private function reloadProgress(isChanged:Boolean){
 		
-			trace("reloading Progress data for Learners")
-			//mm.getMonitor().reloadLessonToMonitor();
-			
 			if (isChanged == false){
 				mm.setIsProgressChangedLesson(false);
 				
 			}else {
-				//mm.setIsProgressChangedLesson(true);
 				mm.setIsProgressChangedLearner(true);
 				mm.setIsProgressChangedSequence(true)
 			}
-			//mm.getMonitor().getProgressData(mm.getSequence());
 			mm.getMonitor().reloadLessonToMonitor();
 	}
 	
@@ -338,30 +323,25 @@ public function update (o:Observable,infoObj:Object):Void{
 		listCount = 0; 
 		this.onEnterFrame = setupLabels;
 		
-		//get the content path for the sp
-		//_monitorLesson_mc = monitorLesson_scp.contentPath = this;
 		_monitorReqTask_mc = reqTasks_scp.content;
 		_monitorController = getController();
 		
-		trace("Loaded LessonTabView Data"+ this)
-	
 		startMsg_txt.visible = false;
 		editLockMessage_txt.visible = false;
 	
 		var seq:Sequence = mm.getSequence();
+		
 		if (_root.lessonLaunch == "false" && isLessonLaunchChecked){
 			rearrangeAll();		
 			isLessonLaunchChecked = false;
 		}
+		
 		populateStatusList(seq.state);
 		populateLessonDetails();
 		enableEditClass(seq.state);
-		//showStartFields(true, true);
 		
 		var requestLessonID:Number = seq.ID;
 		
-		trace('seq id: ' + mm.getSequence().ID);
-		trace('last seq id: ' + mm.getLastSelectedSequence().ID);
 		if (mm.getSequence().ID == mm.getLastSelectedSequence().ID){
 			if(mm.getToDos() == null){
 				mm.getMonitor().getContributeActivities(mm.getSequence().ID);
@@ -428,10 +408,8 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		sessionStatus_txt.text = showStatus(s.state);
 		numLearners_txt.text = String(s.noStartedLearners) + " "  + Dictionary.getValue('ls_of_text')+" "+String(s.noPossibleLearners);
-		trace("current logged in learners are: "+mm.allLearnersProgress.length)
 		learnerURL_txt.text = _root.serverURL+"launchlearner.do?lessonID="+_root.lessonID;
 
-		//numLearners_txt.text = mm.allLearnersProgress.length + " "  + Dictionary.getValue('ls_of_text')+" "+String(s.noPossibleLearners);
 		class_txt.text = s.organisationName;
 		learner_expp_cb.selected = s.learnerExportAvailable;
 	}
@@ -515,26 +493,13 @@ public function update (o:Observable,infoObj:Object):Void{
 		}
 		
 		start_btn.visible = a;
-		
-		
-		
-		
-		
+
 		scheduleTime._visible = b;
 		scheduleDate_dt.visible = b;
 		schedule_btn.visible = b;
 		manageDate_lbl.visible = b;
 		manageTime_lbl.visible = b;
 		
-		/**	
-			if(seq.isStarted()){
-				startMsg_txt.text = "Currently Started."
-			} else {
-				startMsg_txt.text = "Scheduled to start at "
-			}
-			
-			startMsg_txt.visible = true;
-			*/
 	}
 
 	private function showStatus(seqStatus:Number):String{
@@ -582,13 +547,11 @@ public function update (o:Observable,infoObj:Object):Void{
 		if (scheduleDate_dt.selectedDate == null || scheduleDate_dt.selectedDate == undefined){
 			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schstart'), null, null);
 		}else {
-			//var datetime:String = getScheduleDateTime(scheduleDate_dt.selectedDate, scheduleTime.f_returnTime());
 			var schDT = getScheduleDateTime(scheduleDate_dt.selectedDate, scheduleTime.f_returnTime());
 			if (!schDT.validTime){
 				LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schtime'), null, null);
 				return;
 			}else {
-				//trace(resultDTO.scheduleDateTime);
 				mm.getMonitor().startLesson(true, _root.lessonID, schDT.dateTime);
 			}
 			
@@ -599,9 +562,9 @@ public function update (o:Observable,infoObj:Object):Void{
 	private function populateContributeActivities():Void{
 		if (requiredTaskList.length == 0){
 			var todos:Array = mm.getToDos();
+			
 			// show isRequired activities in scrollpane
 			for (var i=0; i<todos.length; i++){
-				trace('main CA title: ' + todos[i].title);
 				var array:Array = getEntries(todos[i]);
 				drawIsRequiredTasks(todos[i], array, 0);
 			}
@@ -618,8 +581,8 @@ public function update (o:Observable,infoObj:Object):Void{
 	
 	private function getEntries(ca:Object):Array{
 		var array:Array = new Array();
+		
 		for (var i=0; i<ca.childActivities.length; i++){
-			trace(ca.title+"'s Child Activity "+i+" is: "+ca.childActivities[i].title)
 			var tmp:Array = getEntries(ca.childActivities[i]);
 			if(tmp.length > 0){
 				var obj:Object = {}
@@ -628,13 +591,14 @@ public function update (o:Observable,infoObj:Object):Void{
 				array.push(obj);
 			}
 		}
+		
 		for (var j=0; j<ca.contributeEntries.length; j++){ 
-			trace("Contribute Entry for "+ca.title+" is: "+ca.contributeEntries[j].contributionType)
 			if(ca.contributeEntries[j].isRequired){
 				// show isRequired entry
 				array.push(ca.contributeEntries[j]);
 			}
 		}
+		
 		return array;
 	}
 	
@@ -647,7 +611,6 @@ public function update (o:Observable,infoObj:Object):Void{
 	 */
 	
 	private function drawIsRequiredTasks(ca:Object, array:Array, x:Number):Void{
-		//var o:Object;
 		
 		if(array.length > 0){
 			// write ca title / details to screen with x position
@@ -677,21 +640,23 @@ public function update (o:Observable,infoObj:Object):Void{
 				reqTasks_scp.redraw(true);
 				requiredTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
 				requiredTaskList[listCount].goContribute._x = reqTasks_scp._width-50
-				//requiredTaskList[listCount].goContribute.label = Dictionary.getValue('td_goContribute_btn');
+				
 				requiredTaskList[listCount].goContribute.onRelease = function (){
 					trace("Contribute Type is: "+o.taskURL);
 					JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 600, 800, true, true, false, false, false);
 				}
+				
 				requiredTaskList[listCount].goContribute.onRollOver = Proxy.create(this,this['showToolTip'], requiredTaskList[listCount].goContribute, "goContribute_btn_tooltip", reqTasks_scp._y+requiredTaskList[listCount]._y+requiredTaskList[listCount]._height, reqTasks_scp._x);
 				requiredTaskList[listCount].goContribute.onRollOut = Proxy.create(this,this['hideToolTip']);
+				
 				var styleObj = _tm.getStyleObject('button');
 				requiredTaskList[listCount].goContribute.setStyle('styleName',styleObj); 
-				listCount++
+				
+				listCount++;
+			
 			}else{
 				// child CA
-				trace('child entries length:' + o.entrievs.length)
 				if(o.entries.length > 0){
-					trace('now drawing child');
 					// write child ca title (indented - x + 10 position)
 					drawIsRequiredTasks(o.child, o.entries, x);
 				}
@@ -706,10 +671,7 @@ public function update (o:Observable,infoObj:Object):Void{
     * Opens the lesson manager dialog
     */
     public function showLessonManagerDialog(mm:MonitorModel) {
-		trace('doing Lesson Manager popup...');
-		trace('app root: ' + mm.getMonitor().root);
-		trace('lfwindow: ' + LFWindow);
-        var dialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:Dictionary.getValue('ls_win_editclass_title'),closeButton:true,scrollContentPath:'selectClass'});
+		var dialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:Dictionary.getValue('ls_win_editclass_title'),closeButton:true,scrollContentPath:'selectClass'});
 		dialog.addEventListener('contentLoaded',Delegate.create(_monitorController,_monitorController.openDialogLoaded));
 		
     }
@@ -718,10 +680,7 @@ public function update (o:Observable,infoObj:Object):Void{
     * Opens the lesson manager dialog
     */
     public function showLearnersDialog(mm:MonitorModel) {
-		trace('doing Learners popup...');
-		trace('app root: ' + mm.getMonitor().root);
-		trace('lfwindow: ' + LFWindow);
-        var opendialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:Dictionary.getValue('ls_win_learners_title'),closeButton:true,scrollContentPath:'learnersDialog'});
+		var opendialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:Dictionary.getValue('ls_win_learners_title'),closeButton:true,scrollContentPath:'learnersDialog'});
 		opendialog.addEventListener('contentLoaded',Delegate.create(_monitorController,_monitorController.openDialogLoaded));
 		
     }
@@ -746,10 +705,6 @@ public function update (o:Observable,infoObj:Object):Void{
 	
 	public function showToolTip(btnObj, btnTT:String, goBtnYpos:Number, goBtnXpos:Number):Void{
 		var ttData = mm.getTTData();
-		trace("Monitor_X: " + ttData.monitorX);
-		trace("Monitor_Y: " + ttData.monitorY);
-		trace("ttHolder : " + ttData.ttHolderMC);
-		
 		
 		if(goBtnYpos != null && goBtnXpos != null){
 			var xpos:Number = mm.getMonitor().getMV().getMonitorLessonScp().width - 150;
@@ -767,8 +722,6 @@ public function update (o:Observable,infoObj:Object):Void{
 		_tip.CloseToolTip();
 	}
 	public function setupLabels(){
-		
-		//max_lbl.text = Dictionary.getValue('pi_max_act');
 		
 		//populate the synch type combo:
 		status_lbl.text = "<b>"+Dictionary.getValue('ls_status_lbl')+"</b>";
@@ -789,8 +742,6 @@ public function update (o:Observable,infoObj:Object):Void{
 		statusApply_btn.label = Dictionary.getValue('ls_manage_apply_btn');
 		schedule_btn.label = Dictionary.getValue('ls_manage_schedule_btn');
 		start_btn.label = Dictionary.getValue('ls_manage_start_btn');
-		
-		//_lessonStateArr = ["CREATED", "NOT_STARTED", "STARTED", "SUSPENDED", "FINISHED", "ARCHIVED", "DISABLED"];
 		
 		taskManager.border = true
 		taskManager.borderColor = 0x003366;
@@ -820,8 +771,7 @@ public function update (o:Observable,infoObj:Object):Void{
 	private function toogleExpPortfolio(evt:Object) {
 		Debugger.log("Toogle Staff Selection", Debugger.GEN, "toogleStaffSelection", "WizardView");
 		var target:CheckBox = CheckBox(evt.target);
-		//var wm:WizardModel = WizardModel(getModel());
-		//resultDTO.learnerExpPortfolio = target.selected;
+		
 		var callback:Function = Proxy.create(this,confirmOutput);
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=learnerExportPortfolioAvailable&lessonID='+_root.lessonID+'&learnerExportPortfolio='+target.selected, callback, false);
 	}
@@ -857,7 +807,6 @@ public function update (o:Observable,infoObj:Object):Void{
 		manageClass_lbl.setStyle('styleName',styleObj);
 		manageStatus_lbl.setStyle('styleName',styleObj);
 		manageStart_lbl.setStyle('styleName',styleObj);
-		//learner_expp_cb.setStyle('styleName',styleObj);
 		
 		schedule_date_lbl.setStyle('styleName', styleObj);
 		sessionStatus_txt.setStyle('styleName', styleObj);
@@ -921,8 +870,9 @@ public function update (o:Observable,infoObj:Object):Void{
 		var monthStr:String;
 		var mydate = new Date();
 		var dtObj = new Object();
-		trace('output time: ' + timeStr);
+		
 		var day = date.getDate();
+		
 		if(day<10){
 			dayStr=String(0)+day;
 		} else {
@@ -930,6 +880,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		}
 		
 		var month = date.getMonth()+1;
+		
 		if(month<10){
 			monthStr=String(0)+month;
 		} else {
@@ -937,16 +888,15 @@ public function update (o:Observable,infoObj:Object):Void{
 		}
 		
 		var dateStr = dayStr + bs + monthStr + bs + date.getFullYear();
-		trace('selected date: ' + dateStr);
 		
 		if (day == mydate.getDate() && month == mydate.getMonth()+1 && date.getFullYear() == mydate.getFullYear()){
 			dtObj.validTime = validateTime()
-		}else {
+		} else {
 			dtObj.validTime = true
 		}
+		
 		dtObj.dateTime = dateStr + '+' + timeStr;
 		return dtObj;
-		//return dateStr + '+' + timeStr;
 	}
 	
 	private function validateTime():Boolean{
@@ -987,14 +937,13 @@ public function update (o:Observable,infoObj:Object):Void{
     */
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
-		trace("Monitor Tab Widtht: "+s.w+" Monitor Tab Height: "+s.h);
-		//bkg_pnl.setSize(s.w-20,s.h);
+		
 		lessonManager.setSize(s.w-20,lessonManager._height);
 		taskManager.setSize(s.w-20,lessonManager._height);
-		//qTasks_scp.setSize(s.w._width,reqTasks_scp._height);
-		var scpHeight:Number = mm.getMonitor().getMV().getMonitorLessonScp()._height
-		trace("scpHeight in lesson tab:"+scpHeight)
+		
+		var scpHeight:Number = mm.getMonitor().getMV().getMonitorLessonScp()._height;
 		reqTasks_scp.setSize(s.w-30,(scpHeight-reqTasks_scp._y)-20);
+		
 		for (var i=0; i<requiredTaskList.length; i++){
 			requiredTaskList[i].contributeActivity._width = reqTasks_scp._width-20;
 			requiredTaskList[i].goContribute._x = reqTasks_scp._width-50
@@ -1008,12 +957,10 @@ public function update (o:Observable,infoObj:Object):Void{
     */
 	private function setPosition(mm:MonitorModel):Void{
         var p:Object = mm.getPosition();
-		trace("X pos set in Model is: "+p.x+" and Y pos set in Model is "+p.y)
+		
 		for (var i=0; i<requiredTaskList.length; i++){
 			requiredTaskList[i].goContribute._x = reqTasks_scp._width-50;
 		}	
-        //this._x = p.x;
-        //this._y = p.y;
 	}
 	
 	/**

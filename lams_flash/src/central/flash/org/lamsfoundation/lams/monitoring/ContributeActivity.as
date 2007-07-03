@@ -37,6 +37,8 @@ class ContributeActivity extends Activity {
 	public static var SCHEDULE_GATE:Number = 5;
 	public static var CHOSEN_GROUPING:Number = 6;
 	public static var CONTRIBUTION:Number = 7;
+	public static var SYS_GATE:Number = 8;
+	public static var TEACHER_CHOSEN_BRANCHNG:Number = 9;
 	
 	private var _childActivities:Array;
 	private var _contributeEntries:Array;
@@ -79,7 +81,6 @@ class ContributeActivity extends Activity {
 				var ca:ContributeActivity = new ContributeActivity();
 				ca.populateFromDTO(dto.childActivities[i], id);
 				_childActivities.push(ca);
-				trace('adding a child');
 			}
 		}
 		
@@ -89,13 +90,11 @@ class ContributeActivity extends Activity {
 				var ca:ContributeActivity = new ContributeActivity();
 				ca.populateFromDTO(dto.contributeEntries[i], id);
 				_contributeEntries.push(ca);
-				trace('adding a entry');
 			}
 		}
 		_title = dto.title;
 		_description = dto.description;
 		_taskURL = dto.URL + '&contentFolderID=' + id;
-		trace("URL in DTO for "+dto.title+ " is: "+dto.URL)
 		_contributionType = dto.contributionType;
 		_isRequired = dto.isRequired;
 	}
