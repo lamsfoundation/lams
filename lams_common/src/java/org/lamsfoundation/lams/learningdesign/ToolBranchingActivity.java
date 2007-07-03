@@ -58,6 +58,10 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
             Transition transitionTo,
             Transition transitionFrom,
             String languageFile,
+            Integer startXcoord,
+            Integer startYcoord,
+            Integer endXcoord,
+            Integer endYcoord,
             Set activities) {
         super(activityId, 
                 id, 
@@ -78,6 +82,10 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
                 transitionTo,
 				transitionFrom,
 				languageFile,
+	            startXcoord,
+	            startYcoord,
+	            endXcoord,
+	            endYcoord,
                 activities);
    }
 

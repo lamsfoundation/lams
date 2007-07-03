@@ -24,11 +24,9 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.learningdesign.strategy.BranchingActivityStrategy;
 
 /** 
  * @author Mitchell Seaton
@@ -60,6 +58,10 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
             Transition transitionTo,
             Transition transitionFrom,
             String languageFile,
+            Integer startXcoord,
+            Integer startYcoord,
+            Integer endXcoord,
+            Integer endYcoord,
             Set activities) {
         super(activityId, 
                 id, 
@@ -80,7 +82,11 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
                 transitionTo,
 				transitionFrom,
 				languageFile,
-                activities);
+	            startXcoord,
+	            startYcoord,
+	            endXcoord,
+	            endYcoord,
+	            activities);
     }
 
     /** default constructor */

@@ -245,12 +245,12 @@ public class LessonService implements ILessonService
   	}
     
 	/**
-     * Perform the grouping, setting the given list of learners as one group. Currently used for chosen grouping.
-     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * Perform the grouping, setting the given list of learners as one group. Currently used for chosen grouping and 
+     * teacher chosen branching
+     * @param grouping The grouping that needs to have the grouping performed.. (mandatory)
      * @param learners to form one group
      */
-   public void performGrouping(GroupingActivity groupingActivity, Long groupId, List learners) throws LessonServiceException {
-       Grouping grouping = groupingActivity.getCreateGrouping();
+   public void performGrouping(Grouping grouping, Long groupId, List learners) throws LessonServiceException {
 		if ( grouping != null && grouping.isChosenGrouping() ) {
 	       	Grouper grouper = grouping.getGrouper();
 	       	if ( grouper != null ) {
@@ -263,7 +263,7 @@ public class LessonService implements ILessonService
 	       		groupingDAO.update(grouping);
 	       	}
 		} else {
-			String error = "The method performChosenGrouping supports only grouping methods where the supplied list should be used as a single group (currently only ChosenGrouping). Called with a groupingActivity with the wrong grouper "+groupingActivity.getActivityId();
+			String error = "The method performChosenGrouping supports only grouping methods where the supplied list should be used as a single group (currently only ChosenGrouping). Called with a grouping with the wrong grouper "+grouping;
 			log.error(error);
 			throw new LessonServiceException(error);
 		}
@@ -271,13 +271,12 @@ public class LessonService implements ILessonService
 
 	/**
      * Remove learners from the given group. 
-     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param grouping the grouping that contains the users to be removed (mandatory)
      * @param groupID if not null only remove user from this group, if null remove learner from any group.
      * @param learners the learners to be removed (mandatory)
      */
-    public void removeLearnersFromGroup(GroupingActivity groupingActivity, Long groupID, List<User> learners) throws LessonServiceException
+    public void removeLearnersFromGroup(Grouping grouping, Long groupID, List<User> learners) throws LessonServiceException
     {
-		Grouping grouping = groupingActivity.getCreateGrouping();
 		if ( grouping != null ) {
 			// get the real objects, not the CGLIB version
 			grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
@@ -296,12 +295,11 @@ public class LessonService implements ILessonService
     /** Create an empty group for the given grouping. If the group name is not supplied
      * or the group name already exists then nothing happens.
      * 
-     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param grouping the grouping. (mandatory)
      * @param groupName (mandatory)
      */
-    public void createGroup(GroupingActivity groupingActivity, String name) throws LessonServiceException 
+    public void createGroup(Grouping grouping, String name) throws LessonServiceException 
     {
-		Grouping grouping = groupingActivity.getCreateGrouping();
 		if ( grouping != null ) {
 			// get the real objects, not the CGLIB version
 			grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
@@ -321,11 +319,10 @@ public class LessonService implements ILessonService
      * Remove a group for the given grouping. If the group is already used (e.g. a tool session exists)
      * then it throws a GroupingException.
      *  
-     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param grouping the grouping that contains the group to be removed (mandatory)
      * @param groupID (mandatory)
      */
-    public void removeGroup(GroupingActivity groupingActivity, Long groupID) throws LessonServiceException {
-		Grouping grouping = groupingActivity.getCreateGrouping();
+    public void removeGroup(Grouping grouping, Long groupID) throws LessonServiceException {
 		if ( grouping != null ) {
 			// get the real objects, not the CGLIB version
 			grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
@@ -595,5 +592,6 @@ public class LessonService implements ILessonService
 			 if ( log.isDebugEnabled() )
 				 log.debug("Reset completed flag for "+count+" learners for lesson "+lessonId);
 		 }
+
 		 
 }

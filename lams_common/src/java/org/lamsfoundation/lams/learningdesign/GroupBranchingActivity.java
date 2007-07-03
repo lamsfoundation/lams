@@ -58,6 +58,10 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
             Transition transitionTo,
             Transition transitionFrom,
             String languageFile,
+            Integer startXcoord,
+            Integer startYcoord,
+            Integer endXcoord,
+            Integer endYcoord,
             Set activities) {
         super(activityId, 
                 id, 
@@ -78,6 +82,10 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
                 transitionTo,
 				transitionFrom,
 				languageFile,
+	            startXcoord,
+	            startYcoord,
+	            endXcoord,
+	            endYcoord,
                 activities);
     }
 

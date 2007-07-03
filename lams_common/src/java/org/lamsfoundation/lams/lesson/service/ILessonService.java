@@ -110,46 +110,46 @@ public interface ILessonService {
 	/**
      * Perform the grouping, setting the given list of learners as one group.  Used in suitations
      * where there is a grouping but no grouping activity (e.g. in branching).
-     * @param groupingActivity the activity that has create grouping. (mandatory)
+    * @param grouping the object on which to perform the grouing. (mandatory)
      * @param groupName (optional)
      * @param learners to form one group (mandatory)
      */
   	public void performGrouping(Grouping grouping, String groupName, List learners) throws LessonServiceException;  		
 
    /**
-    * Perform grouping for all the learners who have started the lesson, based on the grouping activity. 
-    * Currently used for chosen grouping.
+    * Perform grouping for all the learners who have started the lesson, based on the grouping. 
+    * Currently used for chosen grouping and branching
     * @param lessonId lesson id (mandatory)
     * @param groupId group id (mandatory)
-    * @param groupingActivityId the activity that has create grouping. (mandatory)
+    * @param grouping the object on which to perform the grouing. (mandatory)
     */
-   public void performGrouping(GroupingActivity groupingActivity, Long groupId, List learners) throws LessonServiceException;
+   public void performGrouping(Grouping grouping, Long groupId, List learners) throws LessonServiceException;
 
     /**
      * Remove learners from the given group. 
-     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param grouping the grouping from which to remove the learners (mandatory)
      * @param groupName if not null only remove user from this group, if null remove learner from any group.
      * @param learners the learners to be removed (mandatory)
      */
-    public void removeLearnersFromGroup(GroupingActivity groupingActivity, Long groupId, List<User> learners) throws LessonServiceException;
+    public void removeLearnersFromGroup(Grouping grouping, Long groupId, List<User> learners) throws LessonServiceException;
     
     
     /** Create an empty group for the given grouping. If the group name is not supplied
-     * or the group name already exists then nothing happens.
+     * or the group name already exists then nothing happens. 
      * 
-     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param grouping the grouping in which to create the group. (mandatory)
      * @param groupName (mandatory)
      */
-    public void createGroup(GroupingActivity groupingActivity, String name) throws LessonServiceException; 
+    public void createGroup(Grouping grouping, String name) throws LessonServiceException;
 
     /** 
      * Remove a group for the given grouping. If the group is already used (e.g. a tool session exists)
      * then it throws a GroupingException.
      *  
-     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param grouping the grouping that contains the group to remove. (mandatory)
      * @param groupName (mandatory)
      */
-    public void removeGroup(GroupingActivity groupingActivity, Long groupId) throws LessonServiceException;
+    public void removeGroup(Grouping grouping, Long groupId) throws LessonServiceException;
     
     /** 
      * Add a learner to the lesson class. Checks for duplicates.

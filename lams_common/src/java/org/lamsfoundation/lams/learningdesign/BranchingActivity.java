@@ -24,10 +24,7 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Set;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.BranchingActivityStrategy;
 
 /** 
@@ -38,6 +35,17 @@ import org.lamsfoundation.lams.learningdesign.strategy.BranchingActivityStrategy
 */
 abstract public class BranchingActivity extends ComplexActivity implements Serializable {
 
+	// types are used on the URLS to determine which type of branch is expected 
+	// the code should always then check against the activity to make sure it is correct
+	public static final String CHOSEN_TYPE = "chosen";
+	public static final String GROUP_BASED_TYPE = "group";
+	public static final String TOOL_BASED_TYPE = "tool";
+
+	private Integer startXcoord;
+	private Integer startYcoord;
+	private Integer endXcoord;
+	private Integer endYcoord;
+	
 	/** full constructor */
     public BranchingActivity(Long activityId, 
             Integer id, 
@@ -58,6 +66,10 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
             Transition transitionTo,
             Transition transitionFrom,
             String languageFile,
+            Integer startXcoord,
+            Integer startYcoord,
+            Integer endXcoord,
+            Integer endYcoord,
             Set activities) {
         super(activityId, 
                 id, 
@@ -80,6 +92,11 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 				languageFile,
                 activities);
         super.activityStrategy = new BranchingActivityStrategy(this);
+        this.startXcoord = startXcoord;
+        this.startYcoord = startYcoord;
+        this.endXcoord = endXcoord;
+        this.endYcoord = endYcoord;
+
     }
 
     /** default constructor */
@@ -120,6 +137,50 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
     {
         return false;
     }
+
+	/**
+	 * @hibernate.property column="end_xcoord" length="11"
+	 */
+	public Integer getEndXcoord() {
+		return endXcoord;
+	}
+
+	public void setEndXcoord(Integer endXcoord) {
+		this.endXcoord = endXcoord;
+	}
+
+	/**
+	 * @hibernate.property column="end_ycoord" length="11"
+	 */
+	public Integer getEndYcoord() {
+		return endYcoord;
+	}
+
+	public void setEndYcoord(Integer endYcoord) {
+		this.endYcoord = endYcoord;
+	}
+
+	/**
+	 * @hibernate.property column="start_xcoord" length="11"
+	 */
+	public Integer getStartXcoord() {
+		return startXcoord;
+	}
+
+	public void setStartXcoord(Integer startXcoord) {
+		this.startXcoord = startXcoord;
+	}
+
+	/**
+	 * @hibernate.property column="start_ycoord" length="11"
+	 */
+	public Integer getStartYcoord() {
+		return startYcoord;
+	}
+
+	public void setStartYcoord(Integer startYcoord) {
+		this.startYcoord = startYcoord;
+	}
 
 
 }

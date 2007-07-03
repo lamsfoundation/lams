@@ -208,6 +208,12 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/** Used by a sequence activity to determine the start of the transition based sequence */
 	private Integer firstActivityUIID;
 	
+	private Integer startXCoord;
+	private Integer startYCoord;
+	private Integer endXCoord;
+	private Integer endYCoord;
+	
+
 	/*****************************************************************************
 	 * Constructors
 	 *****************************************************************************/
@@ -227,7 +233,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 			Integer createGroupingUIID, Long libraryActivityID,
 			Boolean applyGrouping,Integer groupingSupportType,
 			Integer groupingType,GroupingDTO groupingDTO, 
-			Boolean readOnly, Boolean initialised, Integer firstActivityUIID) {
+			Boolean readOnly, Boolean initialised, Integer firstActivityUIID,
+			Integer startXCoord, Integer startYCoord, Integer endXCoord, Integer endYCoord) {
 		super();
 		this.activityID = activityID;
 		this.activityUIID = activityUIID;
@@ -271,13 +278,14 @@ public class AuthoringActivityDTO extends BaseDTO{
 		//this.groupingDTO = groupingDTO;
 		this.readOnly = readOnly;
 		this.initialised = initialised;
+		// Sequence Activity field
 		this.firstActivityUIID = firstActivityUIID;
-	}
-	public AuthoringActivityDTO(ToolActivity toolActivity){
-		super();
-		this.activityID = toolActivity.getActivityId();
-		this.activityUIID = toolActivity.getActivityUIID();
-		this.toolContentID = toolActivity.getToolContentId();
+		// Branching Activity fields
+		this.startXCoord = startXCoord;
+		this.startYCoord = startYCoord;
+		this.endXCoord = endXCoord;
+		this.endYCoord = endYCoord;
+
 	}
 	public AuthoringActivityDTO(Activity activity){
 		processActivityType(activity);
@@ -319,6 +327,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.groupingSupportType = activity.getGroupingSupportType();
 		this.readOnly = activity.getReadOnly();
 		this.initialised = activity.isInitialised();
+
 	}
 	
 	
@@ -360,6 +369,10 @@ public class AuthoringActivityDTO extends BaseDTO{
 	private void addParallelActivityAttributes(ParallelActivity activity){		
 	}
 	private void addBranchingActivityAttributes(BranchingActivity activity){		
+		this.startXCoord = activity.getStartXcoord();
+		this.startYCoord = activity.getStartYcoord();
+		this.endXCoord = activity.getEndXcoord();
+		this.endYCoord = activity.getEndYcoord();
 	}
 	private void addSequenceActivityAttributes(SequenceActivity activity){
 		if ( activity.getFirstActivity() != null )
@@ -612,6 +625,96 @@ public class AuthoringActivityDTO extends BaseDTO{
 	public Integer getyCoord() {
 		return yCoord;
 	}	
+	/** Get the authoring url related to this tool */
+	public String getAuthoringURL() {
+		return authoringURL;
+	}
+	/**
+	 * @return Returns the readOnly.
+	 */
+	public Boolean getReadOnly() {
+		return readOnly;
+	}
+	/** 
+	 * Name of the file (including the package) that contains the text strings for
+	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties.
+	 */
+	public String getLanguageFile() {
+		return languageFile;
+	}
+	/** Get the tool's display name */
+	public String getToolDisplayName() {
+		return toolDisplayName;
+	}
+	/** Get the contribution url related to this tool */
+	public String getContributeURL() {
+		return contributeURL;
+	}
+	/** Get the monitoring url related to this tool */
+	public String getMonitoringURL() {
+		return monitoringURL;
+	}
+	public String getModerationURL() {
+		return moderationURL;
+	}
+	public String getHelpURL(){
+		return helpURL;
+	}
+	public String getToolSignature() {
+		return toolSignature;
+	}
+	public String getToolVersion() {
+		return toolVersion;
+	}
+	public Boolean getInitialised() {
+		return initialised;
+	}
+	/**
+	 * @return Returns the applyGrouping.
+	 */
+	public Boolean getApplyGrouping() {
+		return applyGrouping;
+	}
+	/**
+	 * @return Returns the groupingSupportType.
+	 */
+	public Integer getGroupingSupportType() {
+		return groupingSupportType;
+	}
+	/**
+	 * @return Returns the groupingType.
+	 */
+	public Integer getGroupingType() {
+		return groupingType;
+	}
+	/** Get the UI ID of the first activity within a sequence activity */
+	public Integer getFirstActivityUIID() {
+		return firstActivityUIID;
+	}
+	/**
+	 * @return Returns the xcoord of the end hub for a branching activity
+	 */
+	public Integer getEndXCoord() {
+		return endXCoord;
+	}
+	/**
+	 * @return Returns the tcoord of the end hub for a branching activity
+	 */
+	public Integer getEndYCoord() {
+		return endYCoord;
+	}
+	/**
+	 * @return Returns the xcoord of the start hub for a branching activity
+	 */
+	public Integer getStartXCoord() {
+		return startXCoord;
+	}
+	/**
+	 * @return Returns the ycoord of the start hub for a branching activity
+	 */
+	public Integer getStartYCoord() {
+		return startYCoord;
+	}
 	/*************************************************
 	 * Setters
 	 ************************************************/
@@ -851,22 +954,10 @@ public class AuthoringActivityDTO extends BaseDTO{
 			this.yCoord = ycoord;
 	}	
 	/**
-	 * @return Returns the applyGrouping.
-	 */
-	public Boolean getApplyGrouping() {
-		return applyGrouping;
-	}
-	/**
 	 * @param applyGrouping The applyGrouping to set.
 	 */
 	public void setApplyGrouping(Boolean applyGrouping) {
 		this.applyGrouping = applyGrouping;
-	}
-	/**
-	 * @return Returns the groupingSupportType.
-	 */
-	public Integer getGroupingSupportType() {
-		return groupingSupportType;
 	}
 	/**
 	 * @param groupingSupportType The groupingSupportType to set.
@@ -876,34 +967,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 			this.groupingSupportType = groupingSupportType;
 	}
 	/**
-	 * @return Returns the groupingType.
-	 */
-	public Integer getGroupingType() {
-		return groupingType;
-	}
-	/**
 	 * @param groupingType The groupingType to set.
 	 */
 	public void setGroupingType(Integer groupingType) {
 		if(!groupingType.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
 			this.groupingType = groupingType;
-	}
-	/**
-	 * GroupingDTO removed and is now part of the "groupings" array located in LearningDesignDTO
-	 * 
-	public GroupingDTO getGroupingDTO() {
-		return groupingDTO;
-	}
-	
-	public void setGroupingDTO(GroupingDTO groupingDTO) {
-		this.groupingDTO = groupingDTO;
-	}	 */
-	
-	/**
-	 * @return Returns the readOnly.
-	 */
-	public Boolean getReadOnly() {
-		return readOnly;
 	}
 	/**
 	 * 
@@ -914,78 +982,54 @@ public class AuthoringActivityDTO extends BaseDTO{
 			this.readOnly = readOnly;
 	}
 	
-	/** Get the authoring url related to this tool */
-	public String getAuthoringURL() {
-		return authoringURL;
-	}
 	public void setAuthoringURL(String toolAuthoringURL) {
 		this.authoringURL = toolAuthoringURL;
-	}
-	/** Get the tool's display name */
-	public String getToolDisplayName() {
-		return toolDisplayName;
 	}
 	public void setToolDisplayName(String toolDisplayName) {
 		this.toolDisplayName = toolDisplayName;
 	}
-	/** 
-	 * Name of the file (including the package) that contains the text strings for
-	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties.
-	 */
-	public String getLanguageFile() {
-		return languageFile;
-	}
 	public void setLanguageFile(String languageFile) {
 		this.languageFile = languageFile;
-	}
-	/** Get the contribution url related to this tool */
-	public String getContributeURL() {
-		return contributeURL;
 	}
 	public void setContributeURL(String contributeURL) {
 		this.contributeURL = contributeURL;
 	}
-	/** Get the monitoring url related to this tool */
-	public String getMonitoringURL() {
-		return monitoringURL;
-	}
 	public void setMonitoringURL(String monitoringURL) {
 		this.monitoringURL = monitoringURL;
-	}
-	public String getModerationURL() {
-		return moderationURL;
 	}
 	public void setModerationURL(String moderationURL) {
 		this.moderationURL = moderationURL;
 	}
-	public String getHelpURL(){
-		return helpURL;
-	}
 	public void setHelpURL(String helpURL) {
 		this.helpURL = helpURL;
-	}
-	public String getToolSignature() {
-		return toolSignature;
 	}
 	public void setToolSignature(String toolSignature) {
 		this.toolSignature = toolSignature;
 	}
-	public String getToolVersion() {
-		return toolVersion;
-	}
 	public void setToolVersion(String toolVersion) {
 		this.toolVersion = toolVersion;
-	}
-	public Boolean getInitialised() {
-		return initialised;
 	}
 	public void setInitialised(Boolean initialised) {
 		this.initialised = initialised;
 	}
-	public Integer getFirstActivityUIID() {
-		return firstActivityUIID;
-	}
 	public void setFirstActivityUIID(Integer firstActivityUIID) {
-		this.firstActivityUIID = firstActivityUIID;
+		if(!firstActivityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
+			this.firstActivityUIID = firstActivityUIID;
+	}
+	public void setEndXCoord(Integer endXCoord) {
+		if(!endXCoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
+			this.endXCoord = endXCoord;
+	}
+	public void setEndYCoord(Integer endYCoord) {
+		if(!endYCoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
+			this.endYCoord = endYCoord;
+	}
+	public void setStartXCoord(Integer startXCoord) {
+		if(!startXCoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
+			this.startXCoord = startXCoord;
+	}
+	public void setStartYCoord(Integer startYCoord) {
+		if(!startYCoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
+			this.startYCoord = startYCoord;
 	}
 }

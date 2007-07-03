@@ -1447,10 +1447,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		// branch mappings - maps groups to branchs
 		List<GroupBranchActivityEntryDTO> entryDtoList = dto.getBranchMappings();
-		Set<GroupBranchActivityEntry> entryList = new HashSet<GroupBranchActivityEntry>();
-		for (GroupBranchActivityEntryDTO entryDto : entryDtoList) {
-			GroupBranchActivityEntry entry = getGroupBranchActivityEntry(entryDto, groupByUIIDMapper, activityByUIIDMapper);
-			entryList.add(entry);
+		if ( entryDtoList != null ) {
+			Set<GroupBranchActivityEntry> entryList = new HashSet<GroupBranchActivityEntry>();
+			for (GroupBranchActivityEntryDTO entryDto : entryDtoList) {
+				GroupBranchActivityEntry entry = getGroupBranchActivityEntry(entryDto, groupByUIIDMapper, activityByUIIDMapper);
+				entryList.add(entry);
+			}
 		}
 		
 		LearningDesign ld = getLearningDesign(dto,importer,folder,actList,transList,activityMapper);
