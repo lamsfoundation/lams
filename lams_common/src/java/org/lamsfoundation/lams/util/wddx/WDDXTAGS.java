@@ -157,7 +157,7 @@ public interface WDDXTAGS {
 	public static final String LEARNING_DESIGN_ID="learningDesignID";
 	public static final String LEARNING_DESIGN_UIID="learningDesignUIID";
 	public static final String FIRST_ACTIVITY_ID ="firstActivityID";
-	public static final String FIRST_ACTIVITY_UIID ="firstActivityUUID";
+	public static final String FIRST_ACTIVITY_UIID ="firstActivityUIID";
 	
 	public static final String MAX_ID ="maxID";
 	public static final String VALID_DESIGN ="validDesign";
@@ -195,6 +195,7 @@ public interface WDDXTAGS {
 	public static final String START_XCOORD="startXCoord";
 	public static final String START_YCOORD="startYCoord";	
 	public static final String END_XCOORD="endXCoord";
-	public static final String END_YCOORD="endYCoord";	
+	public static final String END_YCOORD="endYCoord";
+	
 	
 }

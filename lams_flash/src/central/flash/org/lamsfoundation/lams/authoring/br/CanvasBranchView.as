@@ -224,16 +224,15 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	}
 	
 	private function loadSequenceActivities() {
-		var sequenceActs:Array;
+		var sequenceActs:Array = _cm.getCanvas().ddm.getComplexActivityChildren(activity.activityUIID);
+		Debugger.log("Sequence Activities length: " + sequenceActs.length, Debugger.CRITICAL, "loadSequenceActivities", "CanvasBranchView");
 		
-		if((sequenceActs = _cm.getCanvas().ddm.getComplexActivityChildren(activity.activityUIID)).length > 0) {
-			for(var i=0; i<sequenceActs.length;  i++) {
-				if(SequenceActivity(sequenceActs[i]).firstActivityUIID != null) {
-					defaultSequenceActivity = SequenceActivity(sequenceActs[i]);
-				}
-				
-				_cm.addNewBranch(SequenceActivity(sequenceActs[i]));
+		for(var i=0; i<sequenceActs.length;  i++) {
+			if(SequenceActivity(sequenceActs[i]).firstActivityUIID != null) {
+				defaultSequenceActivity = SequenceActivity(sequenceActs[i]);
 			}
+				
+			_cm.addNewBranch(SequenceActivity(sequenceActs[i]));
 		}
 		
 		if(defaultSequenceActivity == null)
