@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -1817,26 +1818,26 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
        /* ************** Grouping related calls ***************************************/
        /** Get all the active learners in the lesson who are not in a group. 
         * 
+        * If the activity is a grouping activity, then set useCreatingGrouping = true to 
+        * base the list on the create grouping. Otherwise leave it false and it will use the 
+        * grouping applied to the activity - this is used for branching activities. 
+        * 
         * TODO Optimise the database query. Do a single query rather then large collection access
         * 
         * @param activityID
+        * @param lessonID
+        * @param useCreateGrouping true/false for GroupingActivities, always false for non-GroupingActivities
         * @return Sorted set of Users, sorted by surname
         */
-       public SortedSet<User> getClassMembersNotGrouped(Long lessonID, Long activityID) {
+       public SortedSet<User> getClassMembersNotGrouped(Long lessonID, Long activityID, boolean useCreateGrouping) {
 
-    	    GroupingActivity activity = getGroupingActivityById(activityID);
-    		Grouping grouping = activity.getCreateGrouping();
-    		if ( grouping == null ) {
-    			String error = "Grouping activity missing grouping. Activity was "+activity+" Grouping was "+grouping; 
-    			log.error(error);
-    			throw new MonitoringServiceException(error);
-    		}
-			
+    	    Grouping grouping = getGroupingForActivity(activityID, useCreateGrouping,"getClassMembersNotGrouped");
+    	    
 			// get all the learners in the class, irrespective of whether they have joined the lesson or not.
 			// then go through each group and remove the grouped users from the activeLearners set.
     		Lesson lesson = lessonDAO.getLesson(lessonID);
     		if ( lesson == null ) {
-    			String error = "Lesson missing. LessonID was "+lessonID+" Activity was "+activity; 
+    			String error = "Lesson missing. LessonID was "+lessonID+" Activity id was "+activityID; 
     			log.error(error);
     			throw new MonitoringServiceException(error);
     		}
@@ -1864,35 +1865,91 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 			return sortedUsers;
        }
        
-
-		/** Add a new group to a grouping activity. If name already exists or the name is blank, does not add a new group. 
-		 * 	@param activityID id of the grouping activity
-		 * @param name group name
-		 * @throws LessonServiceException 
-		 */
-		public void addGroup(Long activityID, String name) throws LessonServiceException {
-			GroupingActivity groupingActivity = getGroupingActivityById(activityID);
-			lessonService.createGroup(groupingActivity, name);
+    /** Get the grouping appropriate for this activity. 
+     * 
+     *  If the activity is a grouping activity, then set useCreatingGrouping = true to 
+     * base the list on the create grouping. Otherwise leave it false and it will use the 
+     * grouping applied to the activity - this is used for branching activities. 
+ 	 *  
+ 	 * If it is a teacher chosen branching activity and the grouping doesn't exist, it creates
+ 	 * one.
+     */ 
+	private Grouping getGroupingForActivity(Long activityID, boolean useCreateGrouping, String methodName) {
+   	    Activity activity = getActivityById(activityID);
+		if ( useCreateGrouping && (activity == null || !activity.isGroupingActivity()) ) {
+			String error = methodName+": Trying to use the create grouping option but the activity isn't a grouping activity. Activity was "+activity; 
+			log.error(error);
+			throw new MonitoringServiceException(error);
 		}
 		
-		/** Remove a group to from a grouping activity. If the group does not exists then nothing happens.
-		 * If the group is already used (e.g. a tool session exists) then it throws a LessonServiceException.
-		 * @param activityID id of the grouping activity
-		 * @param name group name
-		 * @throws LessonServiceException 
-		 **/
-		public void removeGroup(Long activityID, Long groupId) throws LessonServiceException {
-			GroupingActivity groupingActivity = getGroupingActivityById(activityID);
-			lessonService.removeGroup(groupingActivity, groupId);
+		Grouping grouping = null;
+		
+		if ( useCreateGrouping ) {
+			GroupingActivity groupingActivity = (GroupingActivity) activity; 
+			grouping = groupingActivity.getCreateGrouping();
+		} else {
+			grouping = activity.getGrouping();
+			if ( grouping == null && activity.isChosenBranchingActivity() ) {
+				// for chosen, create one on the fly the first time required
+				grouping = new ChosenGrouping(null, null, null);
+				grouping.getActivities().add(activity);
+				groupingDAO.insert(grouping);
+				if ( log.isDebugEnabled() ) {
+					log.debug( methodName+": Created chosen grouping "+grouping+" for branching activity "+activity);
+				}
+			}
 		}
 
-		/** Add learners to a group. Doesn't necessarily check if the user is already in another group. */
-		public void addUsersToGroup(Long activityID, Long groupId, String learnerIDs[])  throws LessonServiceException {
-
-			GroupingActivity groupingActivity = getGroupingActivityById(activityID);
-			ArrayList<User> learners = createUserList(activityID, learnerIDs,"add");
-			lessonService.performGrouping(groupingActivity, groupId, learners);
+		if ( grouping == null ) {
+			String error = methodName+": Grouping activity missing grouping. Activity was "+activity; 
+			log.error(error);
+			throw new MonitoringServiceException(error);
 		}
+		return grouping;
+	}
+       
+
+	/** Add a new group to a grouping activity. If name already exists or the name is blank, does not add a new group. 
+     *  If the activity is a grouping activity, then set useCreatingGrouping = true to 
+     * base the list on the create grouping. Otherwise leave it false and it will use the 
+     * grouping applied to the activity - this is used for branching activities. 
+ 	 *  
+ 	 * If it is a teacher chosen branching activity and the grouping doesn't exist, it creates
+ 	 * one.
+	 * 	@param activityID id of the grouping activity
+	 * @param name group name
+	 * @throws LessonServiceException 
+	 */
+	public void addGroup(Long activityID, String name, boolean useCreateGrouping) throws LessonServiceException {
+        Grouping grouping = getGroupingForActivity(activityID, useCreateGrouping,"addGroup");
+		lessonService.createGroup(grouping, name);
+	}
+		
+	/** Remove a group to from a grouping activity. If the group does not exists then nothing happens.
+	 * If the group is already used (e.g. a tool session exists) then it throws a LessonServiceException.
+     *
+     *  If the activity is a grouping activity, then set useCreatingGrouping = true to 
+     * base the list on the create grouping. Otherwise leave it false and it will use the 
+     * grouping applied to the activity - this is used for branching activities. 
+ 	 *  
+ 	 * If it is a teacher chosen branching activity and the grouping doesn't exist, it creates
+ 	 * one.
+	 * @param activityID id of the grouping activity
+	 * @param name group name
+	 * @throws LessonServiceException 
+	 **/
+	public void removeGroup(Long activityID, Long groupId, boolean useCreateGrouping) throws LessonServiceException {
+   	    Grouping grouping = getGroupingForActivity(activityID, useCreateGrouping,"removeGroup");
+		lessonService.removeGroup(grouping, groupId);
+	}
+
+	/** Add learners to a group. Doesn't necessarily check if the user is already in another group. */
+	public void addUsersToGroup(Long activityID, Long groupId, String learnerIDs[], boolean useCreateGrouping)  throws LessonServiceException {
+
+   	    Grouping grouping = getGroupingForActivity(activityID, useCreateGrouping,"addUsersToGroup");
+		ArrayList<User> learners = createUserList(activityID, learnerIDs,"add");
+		lessonService.performGrouping(grouping, groupId, learners);
+	} 
 		
 		private ArrayList<User> createUserList(Long activityID, String[] learnerIDs, String addRemoveText) {
 			ArrayList<User> learners = new ArrayList<User>();
@@ -1915,10 +1972,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 
 		/** Remove a user to a group. If the user is not in the group, then nothing is changed. 
 		 * @throws LessonServiceException */
-		public void removeUsersFromGroup(Long activityID, Long groupId, String learnerIDs[]) throws LessonServiceException {
+		public void removeUsersFromGroup(Long activityID, Long groupId, String learnerIDs[], boolean useCreateGrouping) throws LessonServiceException {
 
-			GroupingActivity groupingActivity = getGroupingActivityById(activityID);
+	   	    Grouping grouping = getGroupingForActivity(activityID, useCreateGrouping,"removeUsersFromGroup");
 			ArrayList<User> learners = createUserList(activityID, learnerIDs,"remove");
-			lessonService.removeLearnersFromGroup(groupingActivity, groupId, learners);
+			lessonService.removeLearnersFromGroup(grouping, groupId, learners);
 		}
 }

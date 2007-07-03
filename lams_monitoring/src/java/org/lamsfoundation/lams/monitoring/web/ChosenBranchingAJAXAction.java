@@ -41,11 +41,14 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
@@ -61,33 +64,33 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
 * The action servlet that provides the support for the 
 * <UL>
-* <LI>AJAX based Chosen Grouping screen</LI>
-* <LI>forwards to the learner's view grouping screen for Random Grouping.</LI>
+* <LI>AJAX based Chosen Branching screen</LI>
+* <LI>View only screen for Group Based and Tool Based branching</LI>
 * </UL>
 * 
 * @author Fiona Malikoff
 
 * ----------------XDoclet Tags--------------------
 * 
-* @struts:action path="/grouping" 
+* @struts:action path="/branching" 
 *                parameter="method" 
 *                validate="false"
-* @struts.action-forward name = "chosenGrouping" path = "/grouping/chosenGrouping.jsp"
-* @struts.action-forward name = "viewGroups" path = ".viewGroups"
+* @struts.action-forward name = "chosenSelection" path = "/branching/chosenSelection.jsp"
+* @struts.action-forward name = "viewBranches" path = "/branching/viewBranches.jsp"
 * 
 * ----------------XDoclet Tags--------------------
 */
-public class GroupingAJAXAction extends LamsDispatchAction {
+public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 
     //---------------------------------------------------------------------
 
-	private static final String CHOSEN_GROUPING_SCREEN = "chosenGrouping";
-	private static final String VIEW_GROUPS_SCREEN = "viewGroups";
-	private static final String PARAM_ACTIVITY_TITLE = "title";
+	private static final String CHOSEN_SELECTION_SCREEN = "chosenSelection";
+	private static final String VIEW_BRANCHES_SCREEN = "viewBranches";
 	private static final String PARAM_ACTIVITY_DESCRIPTION = "description";
-	public static final String PARAM_MAX_NUM_GROUPS = "maxNumberOfGroups";
+	public static final String PARAM_TYPE = "type";
+//	public static final String PARAM_MAX_NUM_GROUPS = "maxNumberOfGroups";
 	public static final String PARAM_NAME = "name";
-	public static final String PARAM_GROUPS = "groups";
+	public static final String PARAM_BRANCHES = "branches";
 	public static final String PARAM_MEMBERS = "members";
 	public static final String PARAM_MAY_DELETE = "mayDelete";
 	
@@ -111,10 +114,10 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 		writeAJAXResponse(response, "OK");
 	}
 
-	private Grouping getGrouping(GroupingActivity activity) {
-		Grouping grouping = activity.getCreateGrouping();
+	private Grouping getGrouping(ChosenBranchingActivity activity) {
+		Grouping grouping = activity.getGrouping();
 		if ( grouping == null ) {
-			String error = "Grouping activity missing grouping. Activity was "+activity+" Grouping was "+grouping; 
+			String error = "Chosen branching activity missing grouping. Activity was "+activity+" Grouping was "+grouping; 
 			log.error(error);
 			throw new MonitoringServiceException(error);
 		}
@@ -126,28 +129,36 @@ public class GroupingAJAXAction extends LamsDispatchAction {
      *
 	 * Input parameters: activityID
 	 */
-	public ActionForward startGrouping(ActionMapping mapping,
+	public ActionForward assignBranch(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
-		
+
+		String type = WebUtil.readStrParam(request, PARAM_TYPE);
     	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
         Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	GroupingActivity activity = monitoringService.getGroupingActivityById(activityID);
-		Grouping grouping = activity.getCreateGrouping();
+
+        IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	Activity activity = monitoringService.getActivityById(activityID);
+    	if ( activity == null ||  !activity.isBranchingActivity() ) {
+			String error = "Activity is not a branching activity. Activity was "+activity; 
+			log.error(error);
+			throw new MonitoringServiceException(error);
+    	}
+		Grouping grouping = activity.getGrouping();
 		if ( grouping == null  ) {
-			String error = "Grouping activity missing grouping. Activity was "+activity; 
+			// need to create the grouping for a chosen branching activity
+			String error = "Grouping for branching activity missing. Activity was "+activity; 
 			log.error(error);
 			throw new MonitoringServiceException(error);
 		}
 
 		request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activityID);
 		request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
-		request.setAttribute(PARAM_ACTIVITY_TITLE, activity.getTitle());
+		request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
 		request.setAttribute(PARAM_ACTIVITY_DESCRIPTION, activity.getDescription());
 		
-		if ( grouping.isChosenGrouping() ) {
-			request.setAttribute(PARAM_MAX_NUM_GROUPS, grouping.getMaxNumberOfGroups());
+		if ( activity.isBranchingActivity() ) {
+//			request.setAttribute(PARAM_MAX_NUM_GROUPS, grouping.getMaxNumberOfGroups());
 			// can I remove groups/users - can't if tool sessions have been created
 			Set groups = grouping.getGroups();
 			Iterator iter = groups.iterator();
@@ -157,15 +168,16 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 				mayDelete = group.mayBeDeleted();
 			}
 			request.setAttribute(PARAM_MAY_DELETE, mayDelete);
-			return mapping.findForward(CHOSEN_GROUPING_SCREEN);
+			return mapping.findForward(CHOSEN_SELECTION_SCREEN);
 			
 		} else {
 			
-			// go to a view only screen for random grouping
-	        SortedSet groups = new TreeSet(new GroupComparator());
-	        groups.addAll(grouping.getGroups());
-	        request.setAttribute(PARAM_GROUPS,groups);
-			return mapping.findForward(VIEW_GROUPS_SCREEN);
+			// go to a view only screen for group based and tool based grouping
+			// view all the branches, along with the groups for each branch and each groups members
+			SortedSet<SequenceActivity> branches = new TreeSet<SequenceActivity>();
+			branches.addAll(((BranchingActivity)activity).getActivities());
+	        request.setAttribute(PARAM_BRANCHES,branches);
+			return mapping.findForward(VIEW_BRANCHES_SCREEN);
 		}
     	
 	}
@@ -184,7 +196,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 		// get the grouping data and sort it.
     	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	GroupingActivity activity = monitoringService.getGroupingActivityById(activityID);
+		ChosenBranchingActivity activity = (ChosenBranchingActivity) monitoringService.getActivityById(activityID);
     	Grouping grouping = getGrouping(activity);
 		Set<Group> sortedGroups = new TreeSet<Group>(new GroupComparator());
 		sortedGroups.addAll(grouping.getGroups());
@@ -222,7 +234,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 		Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-		SortedSet<User> users = monitoringService.getClassMembersNotGrouped(lessonID, activityID, true);
+		SortedSet<User> users = monitoringService.getClassMembersNotGrouped(lessonID, activityID, false);
 		String groupOutput = buildUserString(users);
 		writeAJAXResponse(response, groupOutput);
 		return null;
@@ -245,7 +257,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
     	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	GroupingActivity activity = monitoringService.getGroupingActivityById(activityID);
+		ChosenBranchingActivity activity = (ChosenBranchingActivity) monitoringService.getActivityById(activityID);
     	Grouping grouping = getGrouping(activity);
     	Set groups = grouping.getGroups();
     	Iterator iter = groups.iterator();
@@ -306,7 +318,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
     	String name = WebUtil.readStrParam(request, PARAM_NAME);
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-		monitoringService.addGroup(activityID, name, true);
+		monitoringService.addGroup(activityID, name, false);
 		writeAJAXResponse(response,"");
 		return null;
 	}
@@ -326,7 +338,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
 
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-		monitoringService.removeGroup(activityID, groupID, true);
+		monitoringService.removeGroup(activityID, groupID, false);
 		writeAJAXOKResponse(response);
 		return null;
 	}
@@ -348,7 +360,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	if ( members != null ) {
         	String[] membersSplit = members.split(","); 
 			IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-			monitoringService.addUsersToGroup(activityID,  groupID, membersSplit, true);
+			monitoringService.addUsersToGroup(activityID,  groupID, membersSplit, false);
     	}
 		writeAJAXOKResponse(response);
 		return null;
@@ -371,7 +383,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	if ( members != null ) {
         	String[] membersSplit = members.split(","); 
 	    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-			monitoringService.removeUsersFromGroup(activityID, groupID, membersSplit, true);
+			monitoringService.removeUsersFromGroup(activityID, groupID, membersSplit, false);
     	}
 		writeAJAXOKResponse(response);
 		return null;

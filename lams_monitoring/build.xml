@@ -131,7 +131,7 @@
 			</webinf>
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
-				<include name="css/*"/>
+				<include name="branching/*"/>
 				<include name="gate/*"/>
 				<include name="grouping/*"/>
 				<include name="images/*"/>

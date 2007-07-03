@@ -484,28 +484,50 @@ public interface IMonitoringService
 	 */
 	public abstract int deleteAllOldPreviewLessons();
 
-	/* ************ Supports the Chosen Groupings **********************************/
-    public abstract SortedSet<User> getClassMembersNotGrouped(Long lessonID, Long activityID);
+	/* ************ Supports the Chosen Groupings and Branching **********************************/
+    /** Get all the active learners in the lesson who are not in a group. 
+     * 
+     * If the activity is a grouping activity, then set useCreatingGrouping = true to 
+     * base the list on the create grouping. Otherwise leave it false and it will use the 
+     * grouping applied to the activity - this is used for branching activities. 
+     * 
+     * @param activityID
+     * @param lessonID
+     * @param useCreateGrouping true/false for GroupingActivities, always false for non-GroupingActivities
+     * @return Sorted set of Users, sorted by surname
+     */
+    public SortedSet<User> getClassMembersNotGrouped(Long lessonID, Long activityID, boolean useCreateGrouping);
+    
 	/** Add a new group to a grouping activity. If name already exists or the name is blank, does not add a new group. 
-	 * 	@param activityID id of the grouping activity
+     * 
+     * If the activity is a grouping activity, then set useCreatingGrouping = true to 
+     * base the list on the create grouping. Otherwise leave it false and it will use the 
+     * grouping applied to the activity - this is used for branching activities. 
+     * 
+ 	 * 	@param activityID id of the activity
 	 * @param name group name
 	 * @throws LessonServiceException 
 	 */
-	public abstract void addGroup(Long activityID, String name) throws LessonServiceException;
+	public abstract void addGroup(Long activityID, String name, boolean useCreateGrouping) throws LessonServiceException;
 	
 	/** Remove a group to from a grouping activity. If the group does not exists then nothing happens.
 	 * If the group is already used (e.g. a tool session exists) then it throws a LessonServiceException.
-	 * @param activityID id of the grouping activity
+     * 
+     * If the activity is a grouping activity, then set useCreatingGrouping = true to 
+     * base the list on the create grouping. Otherwise leave it false and it will use the 
+     * grouping applied to the activity - this is used for branching activities. 
+     * 
+ 	 * @param activityID id of the activity
 	 * @param name group name
 	 * @throws LessonServiceException 
 	 **/
-	public abstract void removeGroup(Long activityID, Long groupID) throws LessonServiceException;
+	public abstract void removeGroup(Long activityID, Long groupID, boolean useCreateGrouping) throws LessonServiceException;
 
 	/** Add learners to a group. Doesn't necessarily check if the user is already in another group. */
-	public abstract void addUsersToGroup(Long activityID, Long groupID, String learnerIDs[])  throws LessonServiceException ;
+	public abstract void addUsersToGroup(Long activityID, Long groupID, String learnerIDs[], boolean useCreateGrouping)  throws LessonServiceException ;
 
 	/** Remove a user to a group. If the user is not in the group, then nothing is changed. 
 	 * @throws LessonServiceException */
-	public abstract void removeUsersFromGroup(Long activityID, Long groupID, String learnerIDs[]) throws LessonServiceException;
+	public abstract void removeUsersFromGroup(Long activityID, Long groupID, String learnerIDs[], boolean useCreateGrouping) throws LessonServiceException;
 
 }
