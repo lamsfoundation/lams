@@ -757,7 +757,7 @@ public class LearnerService implements ICoreLearnerService
     				log.debug("Forced the user into group "+group+" for branching purposes.");
     		}
     		
-    		if ( group != null ) {
+    		if ( group != null && group.getBranchActivities() != null ) {
     			Iterator branchesIterator = group.getBranchActivities().iterator();
     			while (sequenceActivity==null && branchesIterator.hasNext()) {
     				GroupBranchActivityEntry branchActivityEntry = (GroupBranchActivityEntry) branchesIterator.next();
