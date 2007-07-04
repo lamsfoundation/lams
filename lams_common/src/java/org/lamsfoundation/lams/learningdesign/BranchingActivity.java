@@ -96,8 +96,7 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
         this.startYcoord = startYcoord;
         this.endXcoord = endXcoord;
         this.endYcoord = endYcoord;
-
-    }
+   }
 
     /** default constructor */
     public BranchingActivity() {
@@ -181,6 +180,7 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 	public void setStartYcoord(Integer startYcoord) {
 		this.startYcoord = startYcoord;
 	}
-
+	
+	
 
 }

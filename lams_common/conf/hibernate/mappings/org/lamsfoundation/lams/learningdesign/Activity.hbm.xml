@@ -259,14 +259,23 @@
 			
 			<subclass name="org.lamsfoundation.lams.learningdesign.SequenceActivity" discriminator-value="8">
 				<meta attribute="class-description" inherit="false">@hibernate.class</meta>
-				    <!-- uni-directional many-to-one association to Activity-->    
-				    <many-to-one name="firstActivity" class="org.lamsfoundation.lams.learningdesign.Activity">
-				        <meta attribute="field-description">
- 					      	@hibernate.many-to-one not-null="false"
-        					@hibernate.column name="first_activity_id"         
-				      	</meta>
-				        <column name="first_activity_id" />
-				    </many-to-one>
+
+			    <many-to-one name="firstActivity" class="org.lamsfoundation.lams.learningdesign.Activity">
+			        <meta attribute="field-description">
+					      	@hibernate.many-to-one not-null="false"
+       					@hibernate.column name="first_activity_id"         
+			      	</meta>
+			        <column name="first_activity_id" />
+			    </many-to-one>
+
+			    <set name="branchEntries" lazy="true" inverse="true" cascade="none">
+		    		<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="none"
+		    				@hibernate.collection-key column="sequence_activity_id" 
+		    				@hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry"
+					</meta>    										
+		            <key><column name="branch_activity_id" /></key>
+		            <one-to-many class="org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry"/>
+				</set>
 			</subclass>
 			<subclass name="org.lamsfoundation.lams.learningdesign.ParallelActivity" discriminator-value="6">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
@@ -287,7 +296,6 @@
 			    <property name="endYcoord" type="java.lang.Integer" column="end_ycoord" length="11">
 			       <meta attribute="field-description">@hibernate.property column="end_ycoord" length="11"</meta>    
 			    </property>
-	  			
 				<subclass name="org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity" discriminator-value="10">
 					<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 				</subclass>

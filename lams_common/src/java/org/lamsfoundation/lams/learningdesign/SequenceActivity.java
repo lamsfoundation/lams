@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 import java.util.SortedSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -39,6 +40,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 
 	/** nullable persistent field */
 	private Activity firstActivity;
+
+	private Set branchEntries;
 
     /** full constructor */
     public SequenceActivity(Long activityId, 
@@ -60,7 +63,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
             Transition transitionTo,
             Transition transitionFrom,
             String languageFile,
-            SortedSet activities) {
+            SortedSet activities,
+            Set branchEntries) {
         super(activityId, 
                 id, 
                 description, 
@@ -82,6 +86,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 				languageFile,
                 activities);
         super.activityStrategy = new SequenceActivityStrategy(this);
+        this.branchEntries = branchEntries;
+        
     }
 
 
@@ -154,6 +160,21 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 
 	public void setFirstActivity(Activity firstActivity) {
 		this.firstActivity = firstActivity;
+	}
+
+	/** 
+	 * Get the set of the branch to group mappings used for this branching activity. The set contains GroupBranchActivityEntry entries
+	 * 
+	 * 	@hibernate.set lazy="true" inverse="true" cascade="none"
+	 *		@hibernate.collection-key column="branch_activity_id" 
+	 *		@hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry"
+	*/
+	public Set getBranchEntries() {
+		return branchEntries;
+	}
+
+	public void setBranchEntries(Set branchEntries) {
+		this.branchEntries = branchEntries;
 	}
 
 }

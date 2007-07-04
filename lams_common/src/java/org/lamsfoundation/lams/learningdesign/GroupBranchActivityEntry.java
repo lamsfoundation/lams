@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -40,7 +41,7 @@ import org.lamsfoundation.lams.learningdesign.dto.GroupBranchActivityEntryDTO;
  * 
  * @hibernate.class table="lams_group_branch_activity"
 */
-public class GroupBranchActivityEntry implements Serializable {
+public class GroupBranchActivityEntry implements Serializable, Comparable {
     
     /** identifier field */
     private Long entryId;
@@ -174,5 +175,13 @@ public class GroupBranchActivityEntry implements Serializable {
     public GroupBranchActivityEntryDTO getGroupBranchActivityDTO() {
     	return new GroupBranchActivityEntryDTO(this);
     }
+
+	public int compareTo(Object other) {
+        GroupBranchActivityEntry castOther = (GroupBranchActivityEntry) other;
+		return new CompareToBuilder()
+			.append(this.getEntryId(), castOther.getEntryId())
+    		.append(this.getEntryUIID(), castOther.getEntryUIID())
+    		.toComparison();
+	}
 
 }

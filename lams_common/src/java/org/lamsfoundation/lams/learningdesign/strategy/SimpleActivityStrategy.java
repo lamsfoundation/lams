@@ -46,7 +46,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
  * @author Minhas
  * @version 1.1
  */
-public abstract class SimpleActivityStrategy implements Serializable
+public abstract class SimpleActivityStrategy implements Serializable, IContributionTypeStrategy
 {
 
     //---------------------------------------------------------------------

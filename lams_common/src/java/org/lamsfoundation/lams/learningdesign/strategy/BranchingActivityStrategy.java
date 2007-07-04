@@ -23,14 +23,13 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.strategy;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.NullActivity;
 
 
@@ -89,5 +88,18 @@ public class BranchingActivityStrategy extends ComplexActivityStrategy
     	return branchingActivity;
     }
     
+
+    /**
+     * Setup contribution type for chosen branching activities. 
+     * @param contributionTypes the list that holds contribution types.
+     */
+   protected void setUpContributionType(ArrayList<Integer> contributionTypes)
+    {
+		if ( branchingActivity != null && branchingActivity.isChosenBranchingActivity()) {
+			    contributionTypes.add(ContributionTypes.CHOSEN_BRANCHING);
+		}
+    }
+    
+
     
 }

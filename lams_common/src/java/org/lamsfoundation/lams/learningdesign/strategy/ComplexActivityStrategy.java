@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.learningdesign.strategy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -39,7 +40,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
  * @author Jacky Fang 2005-2-23
  * @version 1.1
  */
-public abstract class ComplexActivityStrategy implements Serializable
+public abstract class ComplexActivityStrategy implements Serializable, IContributionTypeStrategy
 {
     /**
      * <p>Check up all children completion status for a complex activity. </p>
@@ -107,5 +108,33 @@ public abstract class ComplexActivityStrategy implements Serializable
      */
     protected Activity getActivity() {
     	return getComplexActivity();
+    }
+    
+    //---------------------------------------------------------------------
+    // Implementation of IContributeTypeStrategy
+    //---------------------------------------------------------------------
+    /**
+     * Template method that get contribute type according its sub concrete
+     * activity.
+     * @param activity the activity that has contribute type.
+     * @return an array of contribute types.
+     */
+    public Integer[] getContributionType()
+    {
+		ArrayList<Integer> contributionTypes = new ArrayList<Integer>();
+		
+		//abstract method to polymorphically setup contribute type.
+		setUpContributionType(contributionTypes);
+		
+		return (Integer[])contributionTypes.toArray(new Integer[contributionTypes.size()]);
+    }
+
+    /**
+     * Setup contribution type polymorphically according its activity type.
+     * Most complex activities don't have a contribution type, so default to setting up nothing
+     * @param contributionTypes the list that holds contribution types.
+     */
+    protected void setUpContributionType(ArrayList<Integer> contributionTypes) {
+
     }
 }

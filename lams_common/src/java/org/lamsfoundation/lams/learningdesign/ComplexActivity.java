@@ -34,6 +34,7 @@ import java.util.TreeSet;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy;
+import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /**
@@ -194,4 +195,9 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 		
 		return dtoSet;
 	}
+	
+	public ComplexActivityStrategy getComplexActivityStrategy() {
+		return activityStrategy;
+	}
+
 }
