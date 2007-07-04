@@ -48,7 +48,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
     
 	private var _cm:CanvasModel;
     private var _canvasBranchView:CanvasBranchView;
-	private var _canvasBranchingActivity:CanvasBranchingActivity;
+	private var _canvasBranchingActivity:CanvasActivity;
 	
 	private var startTransX:Number;
 	private var startTransY:Number;

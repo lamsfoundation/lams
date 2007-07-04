@@ -107,6 +107,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var bgNegative:String = "original";
 	private var authorMenu:ContextMenu;
 	
+	private var _branchView:CanvasBranchView;
+	
 	function CanvasActivity(_connector){
 		_tm = ThemeManager.getInstance();
 		_ccm = CustomContextMenu.getInstance();
@@ -620,6 +622,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 		
     }
+	
+	private function destroy() {
+		branchView.removeMovieClip();
+	}
+	
+	public function get branchView():CanvasBranchView {
+		return _branchView;
+	}
+	
+	public function set branchView(a:CanvasBranchView):Void {
+		_branchView = a;
+	}
+	
     
 
 }

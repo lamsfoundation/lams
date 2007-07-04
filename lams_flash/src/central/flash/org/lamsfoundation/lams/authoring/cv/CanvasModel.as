@@ -253,7 +253,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log("Locking all Complex Activities", Debugger.GEN, "lockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
 		for (var i=0; i<k.length; i++){
-			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.isBranchingActivity()){
+			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 				k[i].locked = true;
 			}
 		}
@@ -264,7 +264,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log("Unlocking all Complex Activities", Debugger.GEN, "unlockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
 		for (var i=0; i<k.length; i++){
-			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.isBranchingActivity()){
+			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 				k[i].locked = (k[i].activity.readOnly) ? true : false;
 			}
 		}
@@ -603,7 +603,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function addActivityToConnection(ca:Object):Object{
 		var activity:Activity;
 		//check we have not added too many
-		if(ca instanceof CanvasActivity || ca instanceof CanvasParallelActivity || ca instanceof CanvasOptionalActivity || ca instanceof CanvasBranchingActivity){
+		if(ca instanceof CanvasActivity || ca instanceof CanvasParallelActivity || ca instanceof CanvasOptionalActivity){
 			activity = ca.activity;
 		} else if(ca instanceof Activity){
 			activity = Activity(ca);

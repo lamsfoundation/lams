@@ -578,10 +578,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				Debugger.log("Casting to CanvasOptionalActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
 				targetCA = CanvasOptionalActivity(transitionTargetObj);
 				return (isValidTransitionTarget(targetCA) || isInitTarget) ? targetCA : new LFError();
-			}else if(CanvasBranchingActivity(transitionTargetObj)!=null){
-				Debugger.log("Casting to CanvasBranchingActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
-				targetCA = CanvasBranchingActivity(transitionTargetObj);
-				return (isValidTransitionTarget(targetCA) || isInitTarget) ? targetCA : new LFError();
 			}
 	}
 	

@@ -342,19 +342,16 @@ class PropertyInspector extends MovieClip{
 	 */
 	public function viewUpdate(event:Object):Void{
 		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','PropertyInspector');
-		 //Update view from info object
+		//Update view from info object
       
-       var cm:CanvasModel = event.target;
+        var cm:CanvasModel = event.target;
 	   
-	   switch (event.updateType){
+	    switch (event.updateType){
             case 'SELECTED_ITEM' :
                 updateItemProperties(cm);
-
                 break;
                    
-				
             default :
-                //Debugger.log('unknown update type :' + event.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
 		}
 
 	}
@@ -369,6 +366,7 @@ class PropertyInspector extends MovieClip{
 	 */
 	private function updateItemProperties(cm:CanvasModel):Void{
 		//try to cast the selected item to see what we have (instance of des not seem to work)
+			
 		if(CanvasActivity(cm.selectedItem) != null){
 			cover_pnl.visible = false;
 			
@@ -386,6 +384,7 @@ class PropertyInspector extends MovieClip{
 				showToolActivityControls(false);
 				showGeneralInfo(false);
 				showOptionalControls(false);
+				showBranchingControls(false);
 				showGateControls(true, !a.readOnly);
 				showAppliedGroupingControls(false);
 				checkEnableGateControls();
@@ -394,11 +393,31 @@ class PropertyInspector extends MovieClip{
 				
 				showGeneralControls(true, !a.readOnly);
 				
+			} else if(a.isBranchingActivity()) {
+				var ba:BranchingActivity = BranchingActivity(ca.activity);
+				
+				cover_pnl.visible = false;
+				delimitLine._visible = true;
+				
+				showBranchingControls(true, !ba.readOnly);
+				showGeneralControls(true, !ba.readOnly);
+					
+				showOptionalControls(false);
+				showGeneralInfo(false);
+				showToolActivityControls(false);
+				showGateControls(false);
+				showAppliedGroupingControls(false);
+				
+				showBranchingActivityProperties(ba);
+				showAppliedGroupingProperties(ba);
+					
 			} else if(a.isGroupActivity()) {
+			
 			
 				showGroupingControls(true, !a.readOnly);
 				showGeneralControls(true, !a.readOnly);
 				showOptionalControls(false);
+				showBranchingControls(false);
 				showGeneralInfo(false);
 				showRelevantGroupOptions();
 				showToolActivityControls(false);
@@ -413,6 +432,7 @@ class PropertyInspector extends MovieClip{
 				showGroupingControls(false);
 				showToolActivityControls(false);
 				showGateControls(false);
+				showBranchingControls(false);
 				showGeneralInfo(false);
 				showAppliedGroupingControls(false);
 				showOptionalControls(true, !a.readOnly);
@@ -426,6 +446,7 @@ class PropertyInspector extends MovieClip{
 				showGeneralControls(true, !a.readOnly);
 				showGeneralInfo(false);
 				showGroupingControls(false);
+				showBranchingControls(false);
 				showToolActivityControls(false);
 				showGateControls(false);
 				showAppliedGroupingControls(true, !a.readOnly);
@@ -437,6 +458,7 @@ class PropertyInspector extends MovieClip{
 				showOptionalControls(false);
 				showGeneralControls(true, !a.readOnly);
 				showGroupingControls(false);
+				showBranchingControls(false);
 				showGeneralInfo(false);
 				showAppliedGroupingControls(true, !a.readOnly);
 				showToolActivityControls(true, !a.readOnly);
@@ -450,28 +472,6 @@ class PropertyInspector extends MovieClip{
 			title_txt.text = StringUtils.cleanNull(a.title);
 			desc_txt.text = StringUtils.cleanNull(a.description);
 			
-		} else if(CanvasBranchingActivity(cm.selectedItem) != null) {
-			var cb = CanvasBranchingActivity(cm.selectedItem);
-			var ba:BranchingActivity = BranchingActivity(cb.activity);
-			
-			cover_pnl.visible = false;
-			delimitLine._visible = true;
-			
-			showBranchingControls(true, !ba.readOnly);
-			showGeneralControls(true, !ba.readOnly);
-				
-			showOptionalControls(false);
-			showGeneralInfo(false);
-			showToolActivityControls(false);
-			showGateControls(false);
-			showAppliedGroupingControls(false);
-			
-			showBranchingActivityProperties(ba);
-			showAppliedGroupingProperties(ba);
-				
-			title_txt.text = StringUtils.cleanNull(ba.title);
-			desc_txt.text = StringUtils.cleanNull(ba.description);
-			
 		} else if(CanvasOptionalActivity(cm.selectedItem) != null){
 			var co = CanvasOptionalActivity(cm.selectedItem);
 			var cca:ComplexActivity = ComplexActivity(co.activity);
@@ -481,6 +481,7 @@ class PropertyInspector extends MovieClip{
 				
 			showGeneralControls(true, !co.activity.readOnly);
 			showGroupingControls(false);
+			showBranchingControls(false);
 			showToolActivityControls(false);
 			showGateControls(false);
 			showGeneralInfo(false);
@@ -504,6 +505,7 @@ class PropertyInspector extends MovieClip{
 			showGeneralControls(true, !co.activity.readOnly);
 			showGeneralInfo(false);
 			showGroupingControls(false);
+			showBranchingControls(false);
 			
 			showToolActivityControls(false);
 			showGateControls(false);
@@ -528,6 +530,7 @@ class PropertyInspector extends MovieClip{
 			showGeneralControls(false);
 			showOptionalControls(false);
 			showGroupingControls(false);
+			showBranchingControls(false);
 			showToolActivityControls(false);
 			showGateControls(false);
 			showAppliedGroupingControls(false);
@@ -540,6 +543,7 @@ class PropertyInspector extends MovieClip{
 			
 			showGeneralInfo(true);
 			showGroupingControls(false);
+			showBranchingControls(false);
 			showGeneralControls(false);
 			showOptionalControls(false);
 			showRelevantGroupOptions();
