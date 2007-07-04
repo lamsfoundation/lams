@@ -37,7 +37,9 @@ import org.lamsfoundation.lams.common.Config;
 */
 class SequenceActivity extends ComplexActivity{
 	
+	
 	private var _firstActivityUIID:Number;
+	
 	private var _empty:Boolean;
 	
 	function SequenceActivity(activityUIID:Number){

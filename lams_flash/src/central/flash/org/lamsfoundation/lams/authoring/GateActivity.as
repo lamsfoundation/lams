@@ -49,6 +49,7 @@ class GateActivity extends Activity{
 	function GateActivity(activityUIID:Number,activityTypeID){
 		super(activityUIID);
 		_activityTypeID = activityTypeID;
+		
 		//defaults to class
 		_gateActivityLevelID = GATE_ACTIVITY_LEVEL_LEARNER;
 		_activityCategoryID = CATEGORY_SYSTEM;

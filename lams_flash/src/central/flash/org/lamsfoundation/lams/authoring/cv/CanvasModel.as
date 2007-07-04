@@ -253,7 +253,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log("Locking all Complex Activities", Debugger.GEN, "lockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
 		for (var i=0; i<k.length; i++){
-			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.BRANCHING_ACTIVITY_TYPE){
+			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.isBranchingActivity()){
 				k[i].locked = true;
 			}
 		}
@@ -264,7 +264,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log("Unlocking all Complex Activities", Debugger.GEN, "unlockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
 		for (var i=0; i<k.length; i++){
-			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.BRANCHING_ACTIVITY_TYPE){
+			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.isBranchingActivity()){
 				k[i].locked = (k[i].activity.readOnly) ? true : false;
 			}
 		}
@@ -333,7 +333,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 */
 	public function createNewGate(gateTypeID, pos:Point, parent){
 		Debugger.log('gateTypeID:'+gateTypeID,Debugger.GEN,'createNewGate','CanvasModel');
-		var gateAct = new GateActivity(_cv.ddm.newUIID(),gateTypeID);
+		var gateAct = new GateActivity(_cv.ddm.newUIID(), gateTypeID);
 		gateAct.learningDesignID = _cv.ddm.learningDesignID;
 		
 		gateAct.title = Dictionary.getValue('gate_btn');
@@ -363,10 +363,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @param   pos 
 	 * @return  
 	 */
-	public function createNewBranchActivity(pos:Point, parent){
+	public function createNewBranchActivity(branchTypeID, pos:Point, parent){
 		Debugger.log('Running...',Debugger.GEN,'createNewBranchActivity','CanvasModel');
 		
-		var branchingActivity = new BranchingActivity(_cv.ddm.newUIID());
+		var branchingActivity = new BranchingActivity(_cv.ddm.newUIID(), branchTypeID);
 		branchingActivity.title = Dictionary.getValue('branching_act_title');
 		branchingActivity.learningDesignID = _cv.ddm.learningDesignID;
 		branchingActivity.activityCategoryID = Activity.CATEGORY_SYSTEM;

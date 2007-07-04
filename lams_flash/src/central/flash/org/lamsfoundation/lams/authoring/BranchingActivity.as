@@ -31,19 +31,19 @@ import org.lamsfoundation.lams.authoring.*;
 */
 class BranchingActivity extends ComplexActivity {
 	
-	private var _startXCoord:Number;
-	private var _startYCoord:Number;
-	private var _endXCoord:Number;
-	private var _endYCoord:Number;
-	
 	private static var DEFAULT_STARTX:Number = 0;
 	private static var DEFAULT_STARTY:Number = 0;
 	private static var DEFAULT_ENDX:Number = 0;
 	private static var DEFAULT_ENDY:Number = 0;
 	
-	function BranchingActivity(activityUIID:Number){
+	private var _startXCoord:Number;
+	private var _startYCoord:Number;
+	private var _endXCoord:Number;
+	private var _endYCoord:Number;
+	
+	function BranchingActivity(activityUIID:Number, activityTypeID:Number){
 		super(activityUIID);
-		_activityTypeID = BRANCHING_ACTIVITY_TYPE;
+		_activityTypeID = activityTypeID;
 		
 		_startXCoord = DEFAULT_STARTX;
 		_startYCoord = DEFAULT_STARTY;
@@ -63,7 +63,7 @@ class BranchingActivity extends ComplexActivity {
 		_startXCoord = dto.startXCoord;
 		_startYCoord = dto.startYCoord;
 		_endXCoord = dto.endXCoord;
-		_endYCoord = dto.endXCoord;
+		_endYCoord = dto.endYCoord;
 		
 	}
 	
@@ -76,13 +76,20 @@ class BranchingActivity extends ComplexActivity {
 	 */
 	public function toData():Object{
 		var dto:Object = super.toData();
-		
 		if(_startXCoord) dto.startXCoord = _startXCoord;
 		if(_startYCoord) dto.startYCoord = _startYCoord;
 		if(_endXCoord) dto.endXCoord = _endXCoord;
 		if(_endYCoord) dto.endYCoord = _endYCoord;
 		
 		return dto;
+	}
+	
+	public function set type(a:Number):Void{
+		_activityTypeID = a;
+	}
+	
+	public function get type():Number {
+		return _activityTypeID;
 	}
 	
 	public function set startXCoord(a:Number):Void{

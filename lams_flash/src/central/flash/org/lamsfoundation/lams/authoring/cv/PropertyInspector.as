@@ -91,6 +91,10 @@ class PropertyInspector extends MovieClip{
 	private var mins_stp:NumericStepper;
 	private var endHours_stp:NumericStepper;
 	private var endMins_stp:NumericStepper;
+	
+	//branches
+	private var branchType_lbl:Label;
+	private var branchType_cmb:ComboBox;
 
 	//grouping 
 	private var groupType_lbl:Label;
@@ -157,31 +161,32 @@ class PropertyInspector extends MovieClip{
 		runOffline_chk.addEventListener("click",this);
 		defineLater_chk.addEventListener("click",this);
 		
-		numGroups_rdo.addEventListener("click",Delegate.create(this,onGroupingMethodChange));
-		numLearners_rdo.addEventListener("click",Delegate.create(this,onGroupingMethodChange));
-		groupType_cmb.addEventListener("change",Delegate.create(this,onGroupTypeChange));
-		gateType_cmb.addEventListener("change",Delegate.create(this,onGateTypeChange));
-		appliedGroupingActivity_cmb.addEventListener("change",Delegate.create(this,onAppliedGroupingChange));
-		minAct_stp.addEventListener("change",Delegate.create(this,updateOptionalData));
-		minAct_stp.addEventListener("focusOut",Delegate.create(this,updateOptionalData));
-		maxAct_stp.addEventListener("change",Delegate.create(this,updateOptionalData));
-		maxAct_stp.addEventListener("focusOut",Delegate.create(this,updateOptionalData));
-		days_stp.addEventListener("change",Delegate.create(this,onScheduleOffsetChange));
-		hours_stp.addEventListener("change",Delegate.create(this,onScheduleOffsetChange));
-		mins_stp.addEventListener("change",Delegate.create(this,onScheduleOffsetChange));
-		days_stp.addEventListener("focusOut",Delegate.create(this,onScheduleOffsetChange));
-		hours_stp.addEventListener("focusOut",Delegate.create(this,onScheduleOffsetChange));
-		mins_stp.addEventListener("focusOut",Delegate.create(this,onScheduleOffsetChange));
-		endHours_stp.addEventListener("change",Delegate.create(this,onScheduleOffsetChange));
-		endMins_stp.addEventListener("change",Delegate.create(this,onScheduleOffsetChange));
-		endHours_stp.addEventListener("focusOut",Delegate.create(this,onScheduleOffsetChange));
-		endMins_stp.addEventListener("focusOut",Delegate.create(this,onScheduleOffsetChange));
-		numGroups_stp.addEventListener("change",Delegate.create(this,updateGroupingMethodData));
-		numLearners_stp.addEventListener("change",Delegate.create(this,updateGroupingMethodData));
-		numLearners_stp.addEventListener("focusOut",Delegate.create(this,updateGroupingMethodData));
-		numGroups_stp.addEventListener("focusOut",Delegate.create(this,updateGroupingMethodData));
-		numRandomGroups_stp.addEventListener("change",Delegate.create(this,updateGroupingMethodData));
-		numRandomGroups_stp.addEventListener("focusOut",Delegate.create(this,updateGroupingMethodData));
+		numGroups_rdo.addEventListener("click", Delegate.create(this, onGroupingMethodChange));
+		numLearners_rdo.addEventListener("click", Delegate.create(this, onGroupingMethodChange));
+		groupType_cmb.addEventListener("change", Delegate.create(this, onGroupTypeChange));
+		gateType_cmb.addEventListener("change", Delegate.create(this, onGateTypeChange));
+		branchType_cmb.addEventListener("change", Delegate.create(this, onBranchTypeChange));
+		appliedGroupingActivity_cmb.addEventListener("change", Delegate.create(this, onAppliedGroupingChange));
+		minAct_stp.addEventListener("change", Delegate.create(this, updateOptionalData));
+		minAct_stp.addEventListener("focusOut", Delegate.create(this, updateOptionalData));
+		maxAct_stp.addEventListener("change", Delegate.create(this, updateOptionalData));
+		maxAct_stp.addEventListener("focusOut", Delegate.create(this, updateOptionalData));
+		days_stp.addEventListener("change", Delegate.create(this, onScheduleOffsetChange));
+		hours_stp.addEventListener("change", Delegate.create(this, onScheduleOffsetChange));
+		mins_stp.addEventListener("change", Delegate.create(this, onScheduleOffsetChange));
+		days_stp.addEventListener("focusOut", Delegate.create(this, onScheduleOffsetChange));
+		hours_stp.addEventListener("focusOut", Delegate.create(this, onScheduleOffsetChange));
+		mins_stp.addEventListener("focusOut", Delegate.create(this, onScheduleOffsetChange));
+		endHours_stp.addEventListener("change", Delegate.create(this, onScheduleOffsetChange));
+		endMins_stp.addEventListener("change", Delegate.create(this,onScheduleOffsetChange));
+		endHours_stp.addEventListener("focusOut", Delegate.create(this,onScheduleOffsetChange));
+		endMins_stp.addEventListener("focusOut", Delegate.create(this, onScheduleOffsetChange));
+		numGroups_stp.addEventListener("change", Delegate.create(this, updateGroupingMethodData));
+		numLearners_stp.addEventListener("change", Delegate.create(this, updateGroupingMethodData));
+		numLearners_stp.addEventListener("focusOut", Delegate.create(this, updateGroupingMethodData));
+		numGroups_stp.addEventListener("focusOut", Delegate.create(this, updateGroupingMethodData));
+		numRandomGroups_stp.addEventListener("change", Delegate.create(this, updateGroupingMethodData));
+		numRandomGroups_stp.addEventListener("focusOut", Delegate.create(this, updateGroupingMethodData));
 		
 		
 		this.onEnterFrame = setupLabels;
@@ -193,7 +198,10 @@ class PropertyInspector extends MovieClip{
 	
 	public function setupLabels(){
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b>"
+		
 		gateType_lbl.text = Dictionary.getValue('trans_dlg_gatetypecmb');
+		branchType_lbl.text = Dictionary.getValue("trans_dlg_gatetypecmb");
+		
 		days_lbl.text = Dictionary.getValue('pi_days');
 		hours_lbl.text = Dictionary.getValue('pi_hours');
 		mins_lbl.text = Dictionary.getValue('pi_mins');
@@ -220,16 +228,16 @@ class PropertyInspector extends MovieClip{
 		
 			//populate the synch type combo:
 		gateType_cmb.dataProvider = Activity.getGateActivityTypes();
+		branchType_cmb.dataProvider = Activity.getBranchingActivityTypes();
 		groupType_cmb.dataProvider = Grouping.getGroupingTypesDataProvider();
 		
 		//Call to apply style to all the labels and input fields
 		setStyles();
 		
 		//fire event to say we have loaded
-		
 		delete this.onEnterFrame; 
-		//hide all the controls at startup
 		
+		//hide all the controls at startup
 		delimitLine._visible = false;
 		hideAllSteppers(false);
 		showGroupingControls(false);
@@ -237,6 +245,7 @@ class PropertyInspector extends MovieClip{
 		showOptionalControls(false);
 		showToolActivityControls(false);
 		showGateControls(false);
+		showBranchingControls(false);
 		showAppliedGroupingControls(false);
 		showGeneralInfo(true);
 		
@@ -363,38 +372,30 @@ class PropertyInspector extends MovieClip{
 		if(CanvasActivity(cm.selectedItem) != null){
 			cover_pnl.visible = false;
 			
-			// its a Canvas activity then
-			Debugger.log('Its a canvas activity',4,'updateItemProperties','PropertyInspector');
 			var ca = CanvasActivity(cm.selectedItem);
 			var a:Activity = ca.activity;	
+			
 			var cao = CanvasOptionalActivity(cm.selectedItem);
 			var cap = CanvasParallelActivity(cm.selectedItem);
+			
 			var caco:ComplexActivity = ComplexActivity(cao.activity);
 			var cacp:ComplexActivity = ComplexActivity(cap.activity);
 			
-			if(a.isGateActivity()){
-				//its a gate
-				delimitLine._visible = true;
+			if(a.isGateActivity()) {
 				showGroupingControls(false);
 				showToolActivityControls(false);
 				showGeneralInfo(false);
 				showOptionalControls(false);
 				showGateControls(true, !a.readOnly);
 				showAppliedGroupingControls(false);
-				//showGeneralProperties(a)
 				checkEnableGateControls();
 				showGateActivityProperties(GateActivity(a));
-				
 				showAppliedGroupingProperties(a);
-				//show the title
-				title_txt.text = StringUtils.cleanNull(a.title);
-				desc_txt.text = StringUtils.cleanNull(a.description);
+				
 				showGeneralControls(true, !a.readOnly);
 				
-				//PI_sp.refreshPane();
-			}else if(a.isGroupActivity()){
-				//its a grouping activity
-				delimitLine._visible = true;
+			} else if(a.isGroupActivity()) {
+			
 				showGroupingControls(true, !a.readOnly);
 				showGeneralControls(true, !a.readOnly);
 				showOptionalControls(false);
@@ -403,56 +404,36 @@ class PropertyInspector extends MovieClip{
 				showToolActivityControls(false);
 				showGateControls(false);
 				showAppliedGroupingControls(false);
-				//showGeneralProperties(a)
 				populateGroupingProperties(GroupingActivity(a));
 				showAppliedGroupingProperties(a);
-				//show the title
-				title_txt.text = StringUtils.cleanNull(a.title);
-				desc_txt.text = StringUtils.cleanNull(a.description);
-				//PI_sp.refreshPane();
 			
-			} else if(a.isOptionalActivity()){
-				//its a grouping activity
-				delimitLine._visible = true;
+			} else if(a.isOptionalActivity()) {
 				
 				showGeneralControls(true, !a.readOnly);
 				showGroupingControls(false);
-				//showRelevantGroupOptions();
 				showToolActivityControls(false);
 				showGateControls(false);
 				showGeneralInfo(false);
 				showAppliedGroupingControls(false);
 				showOptionalControls(true, !a.readOnly);
-				//showGeneralProperties(cca)
 				populateGroupingProperties(GroupingActivity(caco));
 				showAppliedGroupingProperties(caco);
 				showOptionalActivityProperties(caco);
-				//show the title
-				title_txt.text = StringUtils.cleanNull(a.title);
-				desc_txt.text = StringUtils.cleanNull(a.description);
-				//PI_sp.refreshPane();
-			}else if(a.isParallelActivity()){
-				//its a grouping activity
-				delimitLine._visible = true;
-				//its an parallel activity
+				
+			} else if(a.isParallelActivity()) {
+				
 				showOptionalControls(false);
 				showGeneralControls(true, !a.readOnly);
 				showGeneralInfo(false);
 				showGroupingControls(false);
-				//showRelevantGroupOptions();
 				showToolActivityControls(false);
 				showGateControls(false);
 				showAppliedGroupingControls(true, !a.readOnly);
-				//showGeneralProperties(cca)
 				populateGroupingProperties(GroupingActivity(cacp));
 				showAppliedGroupingProperties(cacp);
 				showParallelActivityProperties(cacp);
-				//show the title
-				title_txt.text = StringUtils.cleanNull(a.title);
-				desc_txt.text = StringUtils.cleanNull(a.description);
-			}else{
-				//its a tool activity
-				delimitLine._visible = true;	
+				
+			} else {
 				showOptionalControls(false);
 				showGeneralControls(true, !a.readOnly);
 				showGroupingControls(false);
@@ -460,93 +441,111 @@ class PropertyInspector extends MovieClip{
 				showAppliedGroupingControls(true, !a.readOnly);
 				showToolActivityControls(true, !a.readOnly);
 				showGateControls(false);
-				//showAppliedGroupingControls(true);
 				showToolActivityProperties(ToolActivity(a));
-				//showGeneralProperties(a)
 				showAppliedGroupingProperties(a);
-				//show the title
-				title_txt.text = StringUtils.cleanNull(a.title);
-				desc_txt.text = StringUtils.cleanNull(a.description);
-				//PI_sp.refreshPane();
 			}
-
 			
-		}else if(CanvasOptionalActivity(cm.selectedItem) != null){
+			delimitLine._visible = true;
+				
+			title_txt.text = StringUtils.cleanNull(a.title);
+			desc_txt.text = StringUtils.cleanNull(a.description);
+			
+		} else if(CanvasBranchingActivity(cm.selectedItem) != null) {
+			var cb = CanvasBranchingActivity(cm.selectedItem);
+			var ba:BranchingActivity = BranchingActivity(cb.activity);
+			
 			cover_pnl.visible = false;
+			delimitLine._visible = true;
+			
+			showBranchingControls(true, !ba.readOnly);
+			showGeneralControls(true, !ba.readOnly);
+				
+			showOptionalControls(false);
+			showGeneralInfo(false);
+			showToolActivityControls(false);
+			showGateControls(false);
+			showAppliedGroupingControls(false);
+			
+			showBranchingActivityProperties(ba);
+			showAppliedGroupingProperties(ba);
+				
+			title_txt.text = StringUtils.cleanNull(ba.title);
+			desc_txt.text = StringUtils.cleanNull(ba.description);
+			
+		} else if(CanvasOptionalActivity(cm.selectedItem) != null){
 			var co = CanvasOptionalActivity(cm.selectedItem);
 			var cca:ComplexActivity = ComplexActivity(co.activity);
-				//its an optional activity
-				delimitLine._visible = true;
-				
-				showGeneralControls(true, !co.activity.readOnly);
-				showGroupingControls(false);
-				//showRelevantGroupOptions();
-				showToolActivityControls(false);
-				showGateControls(false);
-				showGeneralInfo(false);
-				showAppliedGroupingControls(false);
-				showOptionalControls(true, !co.activity.readOnly);
-				//showGeneralProperties(cca)
-				populateGroupingProperties(GroupingActivity(cca));
-				showAppliedGroupingProperties(cca);
-				showOptionalActivityProperties(cca);
-				//show the title
-				title_txt.text = StringUtils.cleanNull(cca.title);
-				desc_txt.text = StringUtils.cleanNull(cca.description);
-				//PI_sp.refreshPane();
-		}else if(CanvasParallelActivity(cm.selectedItem) != null){
+			
 			cover_pnl.visible = false;
+			delimitLine._visible = true;
+				
+			showGeneralControls(true, !co.activity.readOnly);
+			showGroupingControls(false);
+			showToolActivityControls(false);
+			showGateControls(false);
+			showGeneralInfo(false);
+			showAppliedGroupingControls(false);
+			showOptionalControls(true, !co.activity.readOnly);
+			populateGroupingProperties(GroupingActivity(cca));
+			showAppliedGroupingProperties(cca);
+			showOptionalActivityProperties(cca);
+				
+			title_txt.text = StringUtils.cleanNull(cca.title);
+			desc_txt.text = StringUtils.cleanNull(cca.description);
+				
+		} else if(CanvasParallelActivity(cm.selectedItem) != null) {
 			var co = CanvasParallelActivity(cm.selectedItem);
 			var cca:ComplexActivity = ComplexActivity(co.activity);
-				delimitLine._visible = true;
-				//its an parallel activity
-				showOptionalControls(false);
-				showGeneralControls(true, !co.activity.readOnly);
-				showGeneralInfo(false);
-				showGroupingControls(false);
-				//showRelevantGroupOptions();
-				showToolActivityControls(false);
-				showGateControls(false);
-				showAppliedGroupingControls(true, !co.activity.readOnly);
-				//showGeneralProperties(cca)
-				populateGroupingProperties(GroupingActivity(cca));
-				showAppliedGroupingProperties(cca);
-				showParallelActivityProperties(cca);
-				//show the title
-				title_txt.text = StringUtils.cleanNull(cca.title);
-				desc_txt.text = StringUtils.cleanNull(cca.description);
-		}else if(CanvasTransition(cm.selectedItem) != null){
+			
 			cover_pnl.visible = false;
+			delimitLine._visible = true;
+			
+			showOptionalControls(false);
+			showGeneralControls(true, !co.activity.readOnly);
+			showGeneralInfo(false);
+			showGroupingControls(false);
+			
+			showToolActivityControls(false);
+			showGateControls(false);
+			showAppliedGroupingControls(true, !co.activity.readOnly);
+			
+			populateGroupingProperties(GroupingActivity(cca));
+			showAppliedGroupingProperties(cca);
+			showParallelActivityProperties(cca);
+			
+			title_txt.text = StringUtils.cleanNull(cca.title);
+			desc_txt.text = StringUtils.cleanNull(cca.description);
+			
+		} else if(CanvasTransition(cm.selectedItem) != null) {
 			var ct = CanvasTransition(cm.selectedItem);
 			var t:Transition = ct.transition;
-				Debugger.log('Its a canvas transition',4,'updateItemProperties','PropertyInspector');
-				delimitLine._visible = false;
-				showTransitionProperties(t);
-				//showGeneralProperties(t)
-				showGeneralInfo(false);
-				showGeneralControls(false);
-				showOptionalControls(false);
-				showGroupingControls(false);
-				showToolActivityControls(false);
-				showGateControls(false);
-				showAppliedGroupingControls(false);
-				//PI_sp.complete;
 			
-		}else{
 			cover_pnl.visible = false;
-				Debugger.log('Its a something we dont know',Debugger.CRITICAL,'updateItemProperties','PropertyInspector');
-				showGeneralInfo(true);
-				delimitLine._visible = false;
-				toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> "//Dictionary.getValue('pi_title_generalinfo');
-				showGroupingControls(false);
-				showGeneralControls(false);
-				showOptionalControls(false);
-				showRelevantGroupOptions();
-				showToolActivityControls(false);
-				showGateControls(false);
-				showAppliedGroupingControls(false);
-		
-				//PI_sp.complete
+			delimitLine._visible = false;
+			
+			showTransitionProperties(t);
+			showGeneralInfo(false);
+			showGeneralControls(false);
+			showOptionalControls(false);
+			showGroupingControls(false);
+			showToolActivityControls(false);
+			showGateControls(false);
+			showAppliedGroupingControls(false);
+			
+		} else {
+			cover_pnl.visible = false;
+			delimitLine._visible = false;
+			
+			toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> ";
+			
+			showGeneralInfo(true);
+			showGroupingControls(false);
+			showGeneralControls(false);
+			showOptionalControls(false);
+			showRelevantGroupOptions();
+			showToolActivityControls(false);
+			showGateControls(false);
+			showAppliedGroupingControls(false);
 		}
 	}
 	
@@ -554,20 +553,20 @@ class PropertyInspector extends MovieClip{
 		
 		var a = _canvasModel.selectedItem.activity;
 		var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(a.parentUIID)
-		if (a.parentUIID != null && parentAct.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE) {
+		
+		if(a.parentUIID != null && parentAct.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE) {
 			applied_grouping_lbl.visible = v
 			appliedGroupingActivity_cmb.visible = false;
 			
 			applied_grouping_lbl.enabled = e;
 			
-		}else {
+		} else {
 			applied_grouping_lbl.visible = false
 			appliedGroupingActivity_cmb.visible = v;
 			
 			appliedGroupingActivity_cmb.enabled = e;
 			
 		}
-		
 		
 		grouping_lbl.visible = v;
 		currentGrouping_lbl.visible = v;
@@ -625,6 +624,7 @@ class PropertyInspector extends MovieClip{
 	}
 	
 	private function showGateControls(v:Boolean, e:Boolean){
+		
 		days_lbl.visible = v;
 		hours_lbl.visible = v;
 		mins_lbl.visible = v;
@@ -651,6 +651,16 @@ class PropertyInspector extends MovieClip{
 			startOffset_lbl.enabled = e;
 		}
 		
+	}
+	
+	private function showBranchingControls(v:Boolean, e:Boolean){
+		branchType_lbl.visible = v;
+		branchType_cmb.visible = v;
+		
+		if(e != null) {
+			branchType_lbl.enabled = e;
+			branchType_cmb.enabled = e;
+		}
 	}
 	
 	/**
@@ -713,34 +723,34 @@ class PropertyInspector extends MovieClip{
 	}
 	
 	private function showGeneralProperties(ta:ToolActivity){
+		
 	}
 	
 	private function showOptionalActivityProperties(ca:ComplexActivity){
-		
 	
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_optional_title');
 		runOffline_chk.selected = ca.runOffline;
 		defineLater_chk.selected = ca.defineLater;
-		trace("min options when starting: "+ca.minOptions)
-		if (ca.minOptions == undefined){
+		
+		if(ca.minOptions == undefined) {
 			minAct_stp.value = 0
-		}else{
+		} else {
 			minAct_stp.value = ca.minOptions
 		}
 		
-		if (ca.maxOptions == undefined){
+		if(ca.maxOptions == undefined) {
 			maxAct_stp.value = 0
-		}else{
+		} else {
 			maxAct_stp.value = ca.maxOptions
 		}
+		
 		currentGrouping_lbl.text = "GroupingUIID:"+StringUtils.cleanNull(ca.runOffline.groupingUIID);
-			
-
 	}
 	
 	private function updateOptionalData(){
 		var oa = _canvasModel.selectedItem.activity;
 		var	o = ComplexActivity(oa);
+		
 		o.minOptions = minAct_stp.value;
 		o.maxOptions = maxAct_stp.value;
 		oa.init();
@@ -749,30 +759,38 @@ class PropertyInspector extends MovieClip{
 	}
 	
 	private function showParallelActivityProperties(ca:ComplexActivity){
-		
-		
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_parallel_title');
 		runOffline_chk.selected = ca.runOffline;
 		defineLater_chk.selected = ca.defineLater;
 					
 		currentGrouping_lbl.text = "GroupingUIID:"+StringUtils.cleanNull(ca.runOffline.groupingUIID);
-			
-
 	}
 	
 	private function showGateActivityProperties(ga:GateActivity){
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_activity_type_gate');
+		
 		//loop through combo to find SI of our gate activity type
-		trace("gate Type is: "+ga.activityTypeID)
 		for (var i=0; i<gateType_cmb.dataProvider.length;i++){
 			if(_canvasModel.selectedItem.activity.activityTypeID == gateType_cmb.dataProvider[i].data){
 				
 				gateType_cmb.selectedIndex=i;
 			}
 		}
+		
 		//TODO: set the stepper values too!
+	
+	}
+	
+	private function showBranchingActivityProperties(ba:BranchingActivity){
+		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_activity_type_branching');
 		
-		
+		//loop through combo to find SI of our branching activity type
+		for (var i=0; i<branchType_cmb.dataProvider.length;i++){
+			if(_canvasModel.selectedItem.activity.activityTypeID == branchType_cmb.dataProvider[i].data){
+				
+				branchType_cmb.selectedIndex=i;
+			}
+		}
 	
 	}
 	
@@ -957,9 +975,6 @@ class PropertyInspector extends MovieClip{
 		MovieClipUtils.doLater(Proxy.create(this,reDrawTroublesomeSteppers));
 	}
 	
-	
-	
-	
 	/**
 	 * Called when there is a change in the values of the group method steppers
 	 * Butdates the value inthe grouping class being edited.
@@ -985,13 +1000,15 @@ class PropertyInspector extends MovieClip{
 		var gActsDP = new Array();
 		var ga = _canvasModel.selectedItem.activity;
 		var g = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
+		
 		gActsDP.push({label:Dictionary.getValue('pi_no_grouping'),data:null});
+		
 		for(var i=0; i<gActs.length;i++){
 			if (ga.createGroupingUIID != gActs[i].createGroupingUIID){
-				trace("Grouping "+gActs[i].title+" has UIID: "+ gActs[i].createGroupingUIID );
 				gActsDP.push({label:gActs[i].title,data:gActs[i]});
 			}
 		}
+		
 		return gActsDP;
 	}
 	
@@ -1039,7 +1056,7 @@ class PropertyInspector extends MovieClip{
 		grouping_lbl.setStyle('styleName',styleObj);
 		currentGrouping_lbl.setStyle('styleName',styleObj);
 		gateType_lbl.setStyle('styleName',styleObj);
-		gateType_lbl.setStyle('styleName',styleObj);
+		branchType_lbl.setStyle('styleName',styleObj);
 		startOffset_lbl.setStyle('styleName',styleObj);
 		endOffset_lbl.setStyle('styleName',styleObj);
 		days_lbl.setStyle('styleName', styleObj);
@@ -1066,6 +1083,7 @@ class PropertyInspector extends MovieClip{
 		
 		styleObj = _tm.getStyleObject('picombo');
 		gateType_cmb.setStyle('styleName',styleObj);
+		branchType_cmb.setStyle('styleName', styleObj);
 		groupType_cmb.setStyle('styleName',styleObj);
 		appliedGroupingActivity_cmb.setStyle('styleName',styleObj);
 		
@@ -1101,6 +1119,19 @@ class PropertyInspector extends MovieClip{
 		_canvasModel.selectedItem.activity.activityTypeID = evt.target.value;
 		Debugger.log('Set gate type to: _canvasModel.selectedItem.activity.activityTypeID:'+_canvasModel.selectedItem.activity.activityTypeID,Debugger.GEN,'onGateTypeChange','PropertyInspector');
 		checkEnableGateControls(!_canvasModel.selectedItem.activity.readOnly);
+		
+		setModified();
+	}
+	
+	/**
+	 *Handles change event fired from the branchType_cmb
+	 * @usage   
+	 * @param   evt 
+	 * @return  
+	 */
+	private function onBranchTypeChange(evt:Object){
+		_canvasModel.selectedItem.activity.activityTypeID = evt.target.value;
+		Debugger.log('Set branch type to: _canvasModel.selectedItem.activity.activityTypeID:'+_canvasModel.selectedItem.activity.activityTypeID,Debugger.GEN,'onBranchTypeChange','PropertyInspector');
 		
 		setModified();
 	}

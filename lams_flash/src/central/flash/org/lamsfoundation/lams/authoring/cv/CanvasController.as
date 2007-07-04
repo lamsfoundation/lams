@@ -279,7 +279,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 						_canvasModel.setPIHeight(_pi.piFullHeight());
 						
 					}
-				} else if(ca.activity.activityTypeID == Activity.BRANCHING_ACTIVITY_TYPE) {
+				} else if(ca.activity.isBranchingActivity()) {
 					Debugger.log('activityDoubleClick CanvasBranchActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick','CanvasController');
 	   
 					_canvasModel.openBranchActivityContent(ca);
@@ -556,7 +556,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 		if(_canvasModel.activeTool == CanvasModel.BRANCH_TOOL){
 			var p = new Point(_canvasModel.activeView._xmouse-(toolActWidth/2), _canvasModel.activeView._ymouse-(toolActHeight/2)); 
-			_canvasModel.createNewBranchActivity(p,parent);
+			_canvasModel.createNewBranchActivity(Activity.CHOOSEN_BRANCHING_ACTIVITY_TYPE,p,parent);
 			_canvasModel.getCanvas().stopBranchTool();
 		}
 		
