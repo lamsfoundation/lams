@@ -735,7 +735,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         for (Iterator i = activities.iterator(); i.hasNext();)
         {
             Activity activity = (Activity) i.next();
-            // if it is a non-grouped Tool Activity, create the tool sessions now
+            // if it is a non-grouped and non-branched Tool Activity, create the tool sessions now
             if ( activity.isToolActivity() ) {
             	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId()); 
 				initToolSessionIfSuitable(toolActivity, requestedLesson);
@@ -745,6 +745,19 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             	ScheduleGateActivity gateActivity = (ScheduleGateActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
                 activity = runGateScheduler(gateActivity,lessonStartTime,requestedLesson.getLessonName()); 
             }
+			if ( activity.isBranchingActivity() && activity.getGrouping() == null) {
+				// all branching activities must have a grouping, as the learner will be allocated to a group linked to a sequence (branch)
+				Grouping grouping = new ChosenGrouping(null, null, null);
+				grouping.getActivities().add(activity);
+				activity.setGrouping(grouping);
+				groupingDAO.insert(grouping);
+
+				activity.setGrouping(grouping);
+				if ( log.isDebugEnabled() ) {
+					log.debug( "startLesson: Created chosen grouping "+grouping+" for branching activity "+activity);
+				}
+			}
+
             activity.setInitialised(Boolean.TRUE);
             activityDAO.update(activity);
             
@@ -1609,6 +1622,22 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     //---------------------------------------------------------------------
     // Helper Methods - start lesson
     //---------------------------------------------------------------------
+    /** 
+     * Is this activity inside a branch?
+     */
+    private boolean isInBranch(Activity activity) {
+    	
+    	Activity parent = activity.getParentActivity();
+    	
+    	if ( parent == null )
+    		return false;
+    	
+    	if ( parent.isBranchingActivity() )
+    		return true;
+    	
+    	return isInBranch(parent);
+    }
+    
     /**
      * If the activity is not grouped, then it create lams tool session for 
      * all the learners in the lesson. After the creation of lams tool session, 
@@ -1620,7 +1649,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     private void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson) 
     {
-    	if ( ! activity.getApplyGrouping().booleanValue() ) {
+    	// TODO: also need to check if it is inside a branch. If so, don't create
+    	// the tool session as it will only apply to some users in the lesson.
+    	if ( ! activity.getApplyGrouping().booleanValue() || isInBranch(activity) ) {
     		activity.setToolSessions(new HashSet());
     		try {
     		
@@ -1815,8 +1846,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
        }
        
        
-       /* ************** Grouping related calls ***************************************/
-       /** Get all the active learners in the lesson who are not in a group. 
+       /* ************** Grouping and branching related calls ***************************************/
+       /** Get all the active learners in the lesson who are not in a group/branch
         * 
         * If the activity is a grouping activity, then set useCreatingGrouping = true to 
         * base the list on the create grouping. Otherwise leave it false and it will use the 
@@ -1889,15 +1920,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 			grouping = groupingActivity.getCreateGrouping();
 		} else {
 			grouping = activity.getGrouping();
-			if ( grouping == null && activity.isChosenBranchingActivity() ) {
-				// for chosen, create one on the fly the first time required
-				grouping = new ChosenGrouping(null, null, null);
-				grouping.getActivities().add(activity);
-				groupingDAO.insert(grouping);
-				if ( log.isDebugEnabled() ) {
-					log.debug( methodName+": Created chosen grouping "+grouping+" for branching activity "+activity);
-				}
-			}
 		}
 
 		if ( grouping == null ) {

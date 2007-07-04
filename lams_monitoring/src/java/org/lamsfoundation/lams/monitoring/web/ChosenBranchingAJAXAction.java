@@ -41,15 +41,19 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityTitleComparator;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
+import org.lamsfoundation.lams.monitoring.BranchDTO;
+import org.lamsfoundation.lams.monitoring.BranchingDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
@@ -86,13 +90,11 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 
 	private static final String CHOSEN_SELECTION_SCREEN = "chosenSelection";
 	private static final String VIEW_BRANCHES_SCREEN = "viewBranches";
-	private static final String PARAM_ACTIVITY_DESCRIPTION = "description";
 	public static final String PARAM_TYPE = "type";
-//	public static final String PARAM_MAX_NUM_GROUPS = "maxNumberOfGroups";
-	public static final String PARAM_NAME = "name";
-	public static final String PARAM_BRANCHES = "branches";
-	public static final String PARAM_MEMBERS = "members";
+	public static final String PARAM_BRANCHING_DTO = "branching";
+	public static final String PARAM_BRANCH_ID = "branchID";
 	public static final String PARAM_MAY_DELETE = "mayDelete";
+	public static final String PARAM_MEMBERS = "members";
 	
 	private Integer getUserId(HttpServletRequest request) {
 		HttpSession ss = SessionManager.getSession();
@@ -144,87 +146,107 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 			log.error(error);
 			throw new MonitoringServiceException(error);
     	}
-		Grouping grouping = activity.getGrouping();
-		if ( grouping == null  ) {
-			// need to create the grouping for a chosen branching activity
-			String error = "Grouping for branching activity missing. Activity was "+activity; 
-			log.error(error);
-			throw new MonitoringServiceException(error);
-		}
 
+    	// in general the progress engine expects the activity and lesson id to be in the request,
+    	// so follow that standard.
 		request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activityID);
 		request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 		request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
-		request.setAttribute(PARAM_ACTIVITY_DESCRIPTION, activity.getDescription());
-		
-		if ( activity.isBranchingActivity() ) {
-//			request.setAttribute(PARAM_MAX_NUM_GROUPS, grouping.getMaxNumberOfGroups());
-			// can I remove groups/users - can't if tool sessions have been created
-			Set groups = grouping.getGroups();
-			Iterator iter = groups.iterator();
-			boolean mayDelete = true;
-			while (mayDelete && iter.hasNext()) {
-				Group group = (Group) iter.next();
-				mayDelete = group.mayBeDeleted();
+	
+		if ( activity.isChosenBranchingActivity() ) {
+			
+			// can we still move users? check each group for tool sessions.
+			Iterator iter = ((BranchingActivity)activity).getActivities().iterator();
+			boolean mayMoveUser = true;
+			while (iter.hasNext()) {
+				SequenceActivity branch = (SequenceActivity) iter.next();
+				Set<GroupBranchActivityEntry> mappingEntries = branch.getBranchEntries();
+				for ( GroupBranchActivityEntry entry : mappingEntries ) {
+					mayMoveUser = mayMoveUser && entry.getGroup().mayBeDeleted();
+				}
 			}
-			request.setAttribute(PARAM_MAY_DELETE, mayDelete);
+			request.setAttribute(PARAM_MAY_DELETE, mayMoveUser);
+
 			return mapping.findForward(CHOSEN_SELECTION_SCREEN);
 			
 		} else {
-			
 			// go to a view only screen for group based and tool based grouping
-			// view all the branches, along with the groups for each branch and each groups members
-			SortedSet<SequenceActivity> branches = new TreeSet<SequenceActivity>();
-			branches.addAll(((BranchingActivity)activity).getActivities());
-	        request.setAttribute(PARAM_BRANCHES,branches);
+			BranchingDTO dto = new BranchingDTO((BranchingActivity) activity);
+			request.setAttribute(PARAM_BRANCHING_DTO, dto);
+			if ( log.isDebugEnabled() ) {
+				log.debug("assignBranch: Branching activity "+dto);
+			}
 			return mapping.findForward(VIEW_BRANCHES_SCREEN);
 		}
     	
 	}
     
 	/** 
-	 * Get a list of group names and the number of users in each group. Designed to respond to an AJAX call.
+	 * Get a list of branch names, their associated group id and the number of users in the group. Designed to respond to an AJAX call.
      *
-	 * Input parameters: activityID
+	 * Input parameters: activityID (which is the branching activity id)
 	 * 
-	 * Output format: "groupid,name,num users;groupid,name,num users" 
+	 * Output format: "branchid,name,num users;branchid,groupid,name,num users" 
 	 */
-	public ActionForward getGroups(ActionMapping mapping,
+	public ActionForward getBranches(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
 
-		// get the grouping data and sort it.
+		// get the branching data and sort it.
     	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-		ChosenBranchingActivity activity = (ChosenBranchingActivity) monitoringService.getActivityById(activityID);
-    	Grouping grouping = getGrouping(activity);
-		Set<Group> sortedGroups = new TreeSet<Group>(new GroupComparator());
-		sortedGroups.addAll(grouping.getGroups());
+		BranchingActivity activity = (BranchingActivity) monitoringService.getActivityById(activityID);
+		
+		TreeSet<SequenceActivity> sortedBranches = new TreeSet<SequenceActivity>(new ActivityTitleComparator());
+		sortedBranches.addAll(activity.getActivities());
 
-		// build the output string to return to the chosen grouping page.
-		String groupOutput = "";
+		// build the output string to return to the chosen branching page.
+		// there should only ever be one group for each branch in chosen branching
+		String branchesOutput = "";
+
 		boolean first = true;
-		for ( Group group: sortedGroups ) {
-			Long groupId = group.getGroupId();
-			String name = group.getGroupName();
-			Integer numberOfMembers = group.getUsers().size();
+		for ( SequenceActivity branch : sortedBranches ) {
+			Long branchId = branch.getActivityId();
+			String name = branch.getTitle();
+			Integer numberOfMembers = null;
+			
+			Set<GroupBranchActivityEntry> mappingEntries = branch.getBranchEntries();
+			if ( mappingEntries != null ) {
+				if ( mappingEntries.size() > 0 ) {
+					log.warn("Branch "+branch+" for branching activity "+activity+" has more than one group. This should not happen. Using only the first group.");
+					mappingEntries = new TreeSet<GroupBranchActivityEntry>();
+				}
+				
+				Iterator mappingIter = mappingEntries.iterator();
+				if ( mappingIter.hasNext() )  {
+					Group group = ((GroupBranchActivityEntry) mappingIter.next()).getGroup();
+					numberOfMembers = group.getUsers().size();
+				}
+			}
+
 			if ( ! first ) {
-				groupOutput=groupOutput+";";
+				branchesOutput=branchesOutput+";";
 			} else {
 				first = false;
 			}
-			groupOutput=groupOutput+groupId+","+name+","+numberOfMembers;
+
+			branchesOutput=branchesOutput+branchId+","+name+","+numberOfMembers;
 		}
-		writeAJAXResponse(response, groupOutput);
+
+		if ( log.isDebugEnabled() ) {
+			log.debug("getBranches activity id "+activityID+" returning "+branchesOutput);
+		}
+		
+		writeAJAXResponse(response, branchesOutput);
 		return null;
 	}
 
 	/** 
 	 * Get a list of all the class members who aren't grouped yet. Designed to respond to an AJAX call.
      *
-	 * Input parameters: activityID
+	 * Input parameters: activityID (which is the branching activity id) 
 	 * 
-	 * Output format: "groupid,name,num users;groupid,name,num users" 
+	 * Output format: "userid,lastname,firstname;userid,lastname,firstname;" 
 	 */
 	public ActionForward getClassMembersNotGrouped(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
@@ -244,39 +266,44 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 	/** 
 	 * Get a list of group names and the number of users in each group. Designed to respond to an AJAX call.
      *
-	 * Input parameters: activityID, groupID
+	 * Input parameters: branchID which is sequence activity id
 	 * 
 	 * Output format: "userid,lastname,firstname;" 
 	 */
-	public ActionForward getGroupMembers(ActionMapping mapping,
+	public ActionForward getBranchMembers(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
 
-		// TODO optimise this call - we don't really need the activity and the grouping - go straight to the group in the db
-		// get the group, and from there the user data and sort the user data.
-    	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-    	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
+    	Long branchID = WebUtil.readLongParam(request, PARAM_BRANCH_ID);
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-		ChosenBranchingActivity activity = (ChosenBranchingActivity) monitoringService.getActivityById(activityID);
-    	Grouping grouping = getGrouping(activity);
-    	Set groups = grouping.getGroups();
-    	Iterator iter = groups.iterator();
-    	Group group = null;
-    	while (group==null && iter.hasNext()) {
-			Group candidateGroup = (Group) iter.next();
-			if ( groupID.equals(candidateGroup.getGroupId()) )
-				group = candidateGroup;
-		}
-		if ( group == null ) {
-			String error = "Group cannot be found. Activity was "+activity+" Grouping was "+grouping+" Grouping ID was "+groupID; 
-			log.error(error);
-			throw new MonitoringServiceException(error);
+		SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(branchID);
+
+		Set<GroupBranchActivityEntry> mappingEntries = branch.getBranchEntries();
+		Group group = null;
+		
+		if ( mappingEntries != null ) {
+			if ( mappingEntries.size() > 0 ) {
+				log.warn("Branch "+branch+" for branching activity "+branch+" has more than one group. This should not happen. Using only the first group.");
+				mappingEntries = new TreeSet<GroupBranchActivityEntry>();
+			}
+			
+			Iterator mappingIter = mappingEntries.iterator();
+			if ( mappingIter.hasNext() )  {
+				group = ((GroupBranchActivityEntry) mappingIter.next()).getGroup();
+			}
 		}
 
-		Set users = group.getUsers();
-		SortedSet<User> sortedUsers = new TreeSet<User>(new LastNameAlphabeticComparator());
-		sortedUsers.addAll(users);
-		String userOutput = buildUserString(sortedUsers);
+		String userOutput = null;
+		if ( group != null ) {
+			SortedSet<User> sortedUsers = new TreeSet<User>(new LastNameAlphabeticComparator());
+			sortedUsers.addAll(group.getUsers());
+			userOutput = buildUserString(sortedUsers);
+		}
+		
+		if ( log.isDebugEnabled() ) {
+			log.debug("getBranchMembers branch id "+branchID+" returning "+userOutput);
+		}
+
 		writeAJAXResponse(response, userOutput);
 		return null;
 	}
@@ -305,48 +332,9 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 	}
 	
 	/** 
-	 * Add a new group. Designed to respond to an AJAX call.
-     *
-	 * Input parameters: activityID, name (group name)
-	 * 
-	 * Output format: no data returned - just the header 
-	 */
-	public ActionForward addGroup(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws IOException, ServletException, LessonServiceException {
-
-    	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-    	String name = WebUtil.readStrParam(request, PARAM_NAME);
-		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-		monitoringService.addGroup(activityID, name, false);
-		writeAJAXResponse(response,"");
-		return null;
-	}
-
-	/** 
-	 * Remove a group. Cannot remove the group if it is in use (tool session ids exist). Designed to respond to an AJAX call.
-     *
-	 * Input parameters: activityID, name: group name
-	 * 
-	 * Output format: no data returned - just the header 
-	 */
-	public ActionForward removeGroup(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws IOException, ServletException, LessonServiceException {
-
-    	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-    	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
-
-    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-		monitoringService.removeGroup(activityID, groupID, false);
-		writeAJAXOKResponse(response);
-		return null;
-	}
-
-	/** 
 	 * Add learners to a group. Designed to respond to an AJAX call.
      *
-	 * Input parameters: activityID, name: group name, members: comma separated list of users 
+	 * Input parameters: branchID, name: group name, members: comma separated list of users 
 	 * 
 	 * Output format: no data returned - just the header 
 	 */
@@ -354,15 +342,32 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException, LessonServiceException {
 
-    	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-    	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
+    	Long branchID = WebUtil.readLongParam(request, PARAM_BRANCH_ID);
+		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+		SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(branchID);
+
+		Set<GroupBranchActivityEntry> mappingEntries = branch.getBranchEntries();
+		Group group = null;
+		
+		if ( mappingEntries != null ) {
+			if ( mappingEntries.size() > 0 ) {
+				log.warn("Branch "+branch+" for branching activity "+branch+" has more than one group. This should not happen. Using only the first group.");
+				mappingEntries = new TreeSet<GroupBranchActivityEntry>();
+			}
+			
+			Iterator mappingIter = mappingEntries.iterator();
+			if ( mappingIter.hasNext() )  {
+				group = ((GroupBranchActivityEntry) mappingIter.next()).getGroup();
+			}
+		}
+
     	String members = WebUtil.readStrParam(request, PARAM_MEMBERS, true);
     	if ( members != null ) {
         	String[] membersSplit = members.split(","); 
-			IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-			monitoringService.addUsersToGroup(activityID,  groupID, membersSplit, false);
+//			monitoringService.addUsersToGroup(activityID,  groupID, membersSplit, false);
     	}
-		writeAJAXOKResponse(response);
+
+    	writeAJAXOKResponse(response);
 		return null;
 	}
 
@@ -377,15 +382,15 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException, LessonServiceException {
 
-    	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-    	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
-    	String members = WebUtil.readStrParam(request, PARAM_MEMBERS, true);
-    	if ( members != null ) {
-        	String[] membersSplit = members.split(","); 
-	    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-			monitoringService.removeUsersFromGroup(activityID, groupID, membersSplit, false);
-    	}
-		writeAJAXOKResponse(response);
+//    	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+//    	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
+//    	String members = WebUtil.readStrParam(request, PARAM_MEMBERS, true);
+//    	if ( members != null ) {
+//        	String[] membersSplit = members.split(","); 
+//	    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+//			monitoringService.removeUsersFromGroup(activityID, groupID, membersSplit, false);
+//    	}
+//		writeAJAXOKResponse(response);
 		return null;
 	}
 

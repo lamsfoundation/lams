@@ -24,10 +24,15 @@
 /* $Id$ */
 package org.lamsfoundation.lams.monitoring;
 
+import java.util.Vector;
+
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.SimpleActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy;
+import org.lamsfoundation.lams.learningdesign.strategy.IContributionTypeStrategy;
 import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
@@ -45,20 +50,26 @@ public class ContributeDTOFactory {
 		ContributeActivityDTO dto = null;
 		SimpleActivityStrategy strategy = activity.getSimpleActivityStrategy();
 		if ( strategy != null ) {
-			Integer[] contributionType = activity.getSimpleActivityStrategy().getContributionType();
-			if ( contributionType.length > 0 ) {
-				dto = new ContributeActivityDTO(activity);
-				for(int i=0;i<contributionType.length;i++){
-					Integer contributionTypeEntry = contributionType[i];
-					String url = getURL(lessonID, activity, contributionTypeEntry, toolService);
-					dto.addContribution(contributionTypeEntry,url);
-				}
+			dto = addContributionURLS(lessonID, activity, strategy, toolService);
+		}
+		return dto;
+	}
+
+	private static ContributeActivityDTO addContributionURLS(Long lessonID, Activity activity, IContributionTypeStrategy strategy, ILamsCoreToolService toolService) {
+		ContributeActivityDTO dto = null;
+		Integer[] contributionType = strategy.getContributionType();
+		if ( contributionType.length > 0 ) {
+			dto = new ContributeActivityDTO(activity);
+			for(int i=0;i<contributionType.length;i++){
+				Integer contributionTypeEntry = contributionType[i];
+				String url = getURL(lessonID, activity, contributionTypeEntry, toolService);
+				dto.addContribution(contributionTypeEntry,url);
 			}
 		}
 		return dto;
 	}
 
-	private static String getURL(Long lessonID, SimpleActivity activity, Integer contributionTypeEntry, ILamsCoreToolService toolService) throws LamsToolServiceException {
+	private static String getURL(Long lessonID, Activity activity, Integer contributionTypeEntry, ILamsCoreToolService toolService) throws LamsToolServiceException {
 
 		String url = null;
 		if ( activity.isToolActivity() ) {
@@ -72,7 +83,8 @@ public class ContributeDTOFactory {
 		
 		if ( url == null ) { 
 			/* PERMISSION_GAE || SYNC_GATE || SCHEDULE_GATE  || CHOSEN_GROUPING ||
-			   CONTRIBUTION   || Unknown contribution type ||  (!ToolActivity && ( MODERATION || DEFINE_LATER)) */ 
+			   CONTRIBUTION   || CHOSEN_BRANCHING || 
+			   Unknown contribution type ||  (!ToolActivity && ( MODERATION || DEFINE_LATER)) */ 
 			url = toolService.getToolContributionURL(lessonID, activity);
 		} 
 		return url != null ? WebUtil.convertToFullURL(url) : null;
@@ -81,9 +93,21 @@ public class ContributeDTOFactory {
 	/** Get the Contribute DTO for this activity. As a complex activity it always returns 
 	 * a DTO - as it may be needed to enclose a child activity.
 	 */ 
-	public static ContributeActivityDTO getContributeActivityDTO(ComplexActivity activity)
+	public static ContributeActivityDTO getContributeActivityDTO(Long lessonID, ComplexActivity activity, 
+			ILamsCoreToolService toolService, Vector<ContributeActivityDTO> childActivities)
 	{
-		return new ContributeActivityDTO(activity);
+		ContributeActivityDTO dto = null;
+		ComplexActivityStrategy strategy = activity.getComplexActivityStrategy();
+		if ( strategy != null ) {
+			dto = addContributionURLS(lessonID, activity, strategy, toolService);
+			if ( childActivities != null && childActivities.size() > 0 ) {
+				if ( dto == null ) {
+					dto = new ContributeActivityDTO(activity);
+				}
+				dto.setChildActivities(childActivities);
+			}
+		}
+		return dto;
 		
 	}
 
