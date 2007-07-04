@@ -145,14 +145,15 @@ public abstract class Grouper
     }
 
     /** 
-     * Create an empty group for the given grouping. If the group name is not supplied
-     * or the group name already exists then nothing happens. Trims the name of the group before creating
-     * the group.
+     * Create an empty group for the given grouping. Trims the name of the group before creating the group.
+     * If the group name group name already exists then it appends a datetime string to make the name unique. Gives
+     * it 5 attempts to make it unique then gives up.
      * 
      * Throws a GroupingException if name is null or blank.
      *
      * @param grouping (mandatory)
      * @param name (mandatory)
+     * @param forceName (mandatory)
      */
     public Group createGroup(Grouping grouping, String name) throws GroupingException 
     {
@@ -161,8 +162,32 @@ public abstract class Grouper
 			log.warn("Tried to add a group with no name to grouping "+grouping+". Not creating group.");
 			return null;
 		}
-		Group newGroup = Group.createLearnerGroup(grouping,trimmedName,new HashSet());
-		grouping.getGroups().add(newGroup);
+		Set emptySet = new HashSet();
+		Group newGroup = Group.createLearnerGroup(grouping,trimmedName,emptySet);
+		
+		if ( newGroup == null ) {
+			trimmedName = trimmedName + " " + new Long(System.currentTimeMillis()).toString();
+			newGroup = Group.createLearnerGroup(grouping, trimmedName, emptySet);
+		}
+
+		if ( newGroup == null ) {
+			// what, still not unique? Okay try sticking a number on the end. Try 5 times then give up
+			log.warn("Having trouble creating a unique name for a group. Have tried "+trimmedName);
+			int attempt = 1;
+			while ( newGroup == null && attempt < 5) {
+				newGroup = Group.createLearnerGroup(grouping, trimmedName+" "+new Integer(attempt).toString(), emptySet);
+			}
+			if ( newGroup == null ) {
+				String error = "Unable to create a unique name for a group. Tried 5 variations on "+trimmedName+" now giving up.";
+	    		log.error(error); 
+	    		throw new GroupingException(error);
+
+			}
+		}
+
+		if ( newGroup != null )
+			grouping.getGroups().add(newGroup);
+
 		return newGroup;
 		
 	}

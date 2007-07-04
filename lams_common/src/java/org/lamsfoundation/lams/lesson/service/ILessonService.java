@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -133,14 +134,14 @@ public interface ILessonService {
      */
     public void removeLearnersFromGroup(Grouping grouping, Long groupId, List<User> learners) throws LessonServiceException;
     
-    
-    /** Create an empty group for the given grouping. If the group name is not supplied
-     * or the group name already exists then nothing happens. 
+    /** Create an empty group for the given grouping. If the group name already exists 
+     * then it will force the name to be unique.
      * 
-     * @param grouping the grouping in which to create the group. (mandatory)
+     * @param grouping the grouping. (mandatory)
      * @param groupName (mandatory)
+     * @return the new group
      */
-    public void createGroup(Grouping grouping, String name) throws LessonServiceException;
+    public Group createGroup(Grouping grouping, String name) throws LessonServiceException;
 
     /** 
      * Remove a group for the given grouping. If the group is already used (e.g. a tool session exists)

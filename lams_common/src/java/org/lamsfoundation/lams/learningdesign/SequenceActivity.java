@@ -24,11 +24,13 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.strategy.SequenceActivityStrategy;
 
 
@@ -38,6 +40,8 @@ import org.lamsfoundation.lams.learningdesign.strategy.SequenceActivityStrategy;
 */
 public class SequenceActivity extends ComplexActivity implements Serializable {
 
+	private static Logger log = Logger.getLogger(SequenceActivity.class);
+	
 	/** nullable persistent field */
 	private Activity firstActivity;
 
@@ -166,7 +170,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 	 * Get the set of the branch to group mappings used for this branching activity. The set contains GroupBranchActivityEntry entries
 	 * 
 	 * 	@hibernate.set lazy="true" inverse="true" cascade="none"
-	 *		@hibernate.collection-key column="branch_activity_id" 
+	 *		@hibernate.collection-key column="sequence_activity_id" 
 	 *		@hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry"
 	*/
 	public Set getBranchEntries() {
@@ -175,6 +179,39 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 
 	public void setBranchEntries(Set branchEntries) {
 		this.branchEntries = branchEntries;
+	}
+
+	/** Get the groups related to this sequence activity, related via the BranchEntries */
+	public SortedSet<Group> getGroupsForBranch() {
+		
+		Set<GroupBranchActivityEntry> mappingEntries = getBranchEntries();
+		TreeSet<Group> sortedGroups = new TreeSet<Group>();
+	
+		if ( mappingEntries != null ) {
+			Iterator mappingIter = mappingEntries.iterator();
+			if ( mappingIter.hasNext() )  {
+				sortedGroups.add(((GroupBranchActivityEntry) mappingIter.next()).getGroup());
+			}
+		}
+		
+		return sortedGroups;
+	}
+
+	/** For chosen and tool based branching, we expect there to be only one group per branch, so get the single group.
+	 * If there is more than one group, put out a warning and return the first group for this sequence activity, 
+	 * related via the BranchEntries */
+	public Group getSoleGroupForBranch() {
+		
+		SortedSet<Group> groups = getGroupsForBranch();
+		if ( groups.size() > 1 ) {
+			log.warn("Branch "+this+" has more than one group. This is unexpected. Using only the first group.");
+		}
+		Iterator iter = groups.iterator();
+		if ( iter.hasNext() )  {
+			return (Group) iter.next();
+		}
+	
+		return null;
 	}
 
 }

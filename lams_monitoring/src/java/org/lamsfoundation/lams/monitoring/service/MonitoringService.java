@@ -49,14 +49,17 @@ import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
@@ -1942,8 +1945,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 * @param name group name
 	 * @throws LessonServiceException 
 	 */
-	public void addGroup(Long activityID, String name, boolean useCreateGrouping) throws LessonServiceException {
-        Grouping grouping = getGroupingForActivity(activityID, useCreateGrouping,"addGroup");
+	public void addGroup(Long activityID, String name) throws LessonServiceException {
+        Grouping grouping = getGroupingForActivity(activityID, true,"addGroup");
 		lessonService.createGroup(grouping, name);
 	}
 		
@@ -1960,20 +1963,20 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 * @param name group name
 	 * @throws LessonServiceException 
 	 **/
-	public void removeGroup(Long activityID, Long groupId, boolean useCreateGrouping) throws LessonServiceException {
-   	    Grouping grouping = getGroupingForActivity(activityID, useCreateGrouping,"removeGroup");
+	public void removeGroup(Long activityID, Long groupId) throws LessonServiceException {
+   	    Grouping grouping = getGroupingForActivity(activityID, true,"removeGroup");
 		lessonService.removeGroup(grouping, groupId);
 	}
 
 	/** Add learners to a group. Doesn't necessarily check if the user is already in another group. */
-	public void addUsersToGroup(Long activityID, Long groupId, String learnerIDs[], boolean useCreateGrouping)  throws LessonServiceException {
+	public void addUsersToGroup(Long activityID, Long groupId, String learnerIDs[])  throws LessonServiceException {
 
-   	    Grouping grouping = getGroupingForActivity(activityID, useCreateGrouping,"addUsersToGroup");
+   	    Grouping grouping = getGroupingForActivity(activityID, true, "addUsersToGroup");
 		ArrayList<User> learners = createUserList(activityID, learnerIDs,"add");
 		lessonService.performGrouping(grouping, groupId, learners);
 	} 
 		
-		private ArrayList<User> createUserList(Long activityID, String[] learnerIDs, String addRemoveText) {
+		private ArrayList<User> createUserList(Long activityIDForErrorMessage, String[] learnerIDs, String addRemoveTextForErrorMessage) {
 			ArrayList<User> learners = new ArrayList<User>();
 			for ( String strlearnerID: learnerIDs ) {
 				boolean added = false;
@@ -1986,18 +1989,93 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 					}
 				} catch ( NumberFormatException e ) { }
 				if ( ! added ) {
-					log.warn("Unable to "+addRemoveText+" learner "+strlearnerID+" for group in grouping activity "+activityID+" as learner cannot be found.");
+					log.warn("Unable to "+addRemoveTextForErrorMessage+" learner "+strlearnerID
+							+" for group in related to activity "+activityIDForErrorMessage+" as learner cannot be found.");
 				}
 			}
 			return learners;
 		}
 
+		/** Add learners to a branch. Doesn't necessarily check if the user is already in another branch.
+		 * Assumes there should only be one group for this branch. Use for Teacher Chosen Branching. Don't use 
+		 * for Group Based Branching as there could be more than one group for the branch.
+		 * 
+		 * @param sequenceActivityID Activity id of the sequenceActivity representing this branch
+		 * @param learnerIDs the IDS of the learners to be added.
+		 */
+		public void addUsersToBranch(Long sequenceActivityID, String learnerIDs[])  throws LessonServiceException {
+
+			SequenceActivity branch = (SequenceActivity) getActivityById(sequenceActivityID);
+			if ( branch == null ) {
+				String error = "addUsersToBranch: Branch missing. ActivityID was "+sequenceActivityID; 
+				log.error(error);
+				throw new MonitoringServiceException(error);
+			}
+
+			Group group = branch.getSoleGroupForBranch();
+			Grouping grouping = null;
+			if ( group == null ) {
+				// create a new group and a matching mapping entry
+				Activity parentActivity = branch.getParentActivity();
+				if ( parentActivity == null || !parentActivity.isBranchingActivity()) {
+					String error = "addUsersToBranch: Branching activity missing or not a branching activity. Branch was "+branch+" parent activity was "+parentActivity; 
+					log.error(error);
+					throw new MonitoringServiceException(error);
+				}
+				BranchingActivity branchingActivity = (BranchingActivity) getActivityById(parentActivity.getActivityId());
+				grouping = branchingActivity.getGrouping();
+				
+				group = lessonService.createGroup(grouping, branch.getTitle());
+				
+				GroupBranchActivityEntry entry = new GroupBranchActivityEntry(null, null, group, branch, (BranchingActivity) branchingActivity);
+				if ( group.getBranchActivities() == null ) {
+					group.setBranchActivities(new HashSet());
+				}
+				group.getBranchActivities().add(entry);
+				groupingDAO.update(group);
+				
+			} else {
+				grouping = group.getGrouping();
+			}
+
+			ArrayList<User> learners = createUserList(sequenceActivityID, learnerIDs,"add");
+			lessonService.performGrouping(grouping, group.getGroupId(), learners);
+		} 
+		
 		/** Remove a user to a group. If the user is not in the group, then nothing is changed. 
 		 * @throws LessonServiceException */
-		public void removeUsersFromGroup(Long activityID, Long groupId, String learnerIDs[], boolean useCreateGrouping) throws LessonServiceException {
+		public void removeUsersFromGroup(Long activityID, Long groupId, String learnerIDs[]) throws LessonServiceException {
 
-	   	    Grouping grouping = getGroupingForActivity(activityID, useCreateGrouping,"removeUsersFromGroup");
+	   	    Grouping grouping = getGroupingForActivity(activityID, true,"removeUsersFromGroup");
 			ArrayList<User> learners = createUserList(activityID, learnerIDs,"remove");
 			lessonService.removeLearnersFromGroup(grouping, groupId, learners);
+		}
+		
+		/** Remove learners from a branch. 
+		 * Assumes there should only be one group for this branch. Use for Teacher Chosen Branching. Don't use 
+		 * for Group Based Branching as there could be more than one group for the branch.
+		 * 
+		 * @param sequenceActivityID Activity id of the sequenceActivity representing this branch
+		 * @param learnerIDs the IDS of the learners to be added.
+		 */
+		public void removeUsersFromBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException {
+
+			SequenceActivity branch = (SequenceActivity) getActivityById(sequenceActivityID);
+			if ( branch == null ) {
+				String error = "addUsersToBranch: Branch missing. ActivityID was "+sequenceActivityID; 
+				log.error(error);
+				throw new MonitoringServiceException(error);
+			}
+
+			Group group = branch.getSoleGroupForBranch();
+			Grouping grouping = null;
+			if ( group != null ) {
+				grouping = group.getGrouping();
+				ArrayList<User> learners = createUserList(sequenceActivityID, learnerIDs,"remove");
+				lessonService.removeLearnersFromGroup(grouping, group.getGroupId(), learners);
+			} else {
+				log.warn("Trying to remove users "+learnerIDs+" from branch "+branch+" but no group exists for this branch, so the users can't be in the group!");
+			}
+
 		}
 }

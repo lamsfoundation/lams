@@ -306,7 +306,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
     	String name = WebUtil.readStrParam(request, PARAM_NAME);
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-		monitoringService.addGroup(activityID, name, true);
+		monitoringService.addGroup(activityID, name);
 		writeAJAXResponse(response,"");
 		return null;
 	}
@@ -326,7 +326,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
 
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-		monitoringService.removeGroup(activityID, groupID, true);
+		monitoringService.removeGroup(activityID, groupID);
 		writeAJAXOKResponse(response);
 		return null;
 	}
@@ -348,7 +348,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	if ( members != null ) {
         	String[] membersSplit = members.split(","); 
 			IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-			monitoringService.addUsersToGroup(activityID,  groupID, membersSplit, true);
+			monitoringService.addUsersToGroup(activityID,  groupID, membersSplit);
     	}
 		writeAJAXOKResponse(response);
 		return null;
@@ -371,7 +371,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	if ( members != null ) {
         	String[] membersSplit = members.split(","); 
 	    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-			monitoringService.removeUsersFromGroup(activityID, groupID, membersSplit, true);
+			monitoringService.removeUsersFromGroup(activityID, groupID, membersSplit);
     	}
 		writeAJAXOKResponse(response);
 		return null;

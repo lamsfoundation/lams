@@ -273,7 +273,7 @@
 		    				@hibernate.collection-key column="sequence_activity_id" 
 		    				@hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry"
 					</meta>    										
-		            <key><column name="branch_activity_id" /></key>
+		            <key><column name="sequence_activity_id" /></key>
 		            <one-to-many class="org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry"/>
 				</set>
 			</subclass>

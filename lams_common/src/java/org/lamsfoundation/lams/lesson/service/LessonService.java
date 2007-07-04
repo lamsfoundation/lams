@@ -292,29 +292,31 @@ public class LessonService implements ILessonService
 		}
     }
 
-    /** Create an empty group for the given grouping. If the group name is not supplied
-     * or the group name already exists then nothing happens.
+    /** Create an empty group for the given grouping. Create an empty group for the given grouping. 
+     * If the group name already exists then it will force the name to be unique.
      * 
      * @param grouping the grouping. (mandatory)
      * @param groupName (mandatory)
+     * @return the new group
      */
-    public void createGroup(Grouping grouping, String name) throws LessonServiceException 
+    public Group createGroup(Grouping grouping, String name) throws LessonServiceException 
     {
+    	Group newGroup = null;
 		if ( grouping != null ) {
 			// get the real objects, not the CGLIB version
 			grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
         	Grouper grouper = grouping.getGrouper();
         	if ( grouper != null ) {
         		try {
-        			grouper.createGroup(grouping, name);
+        			newGroup = grouper.createGroup(grouping, name);
         		} catch ( GroupingException e ) {
         			throw new LessonServiceException(e);
         		}
         	}
     		groupingDAO.update(grouping);
 		}
+		return newGroup;
 	}
-
     /** 
      * Remove a group for the given grouping. If the group is already used (e.g. a tool session exists)
      * then it throws a GroupingException.

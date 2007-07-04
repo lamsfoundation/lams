@@ -107,7 +107,7 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 		response.setContentType("text/html");
 	    PrintWriter writer = response.getWriter();
 	    // set it to unicode
-		if (output.length()>0) {
+		if (output != null && output.length()>0) {
 	        writer.println(output);
 		}
 	}
@@ -116,16 +116,6 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 		writeAJAXResponse(response, "OK");
 	}
 
-	private Grouping getGrouping(ChosenBranchingActivity activity) {
-		Grouping grouping = activity.getGrouping();
-		if ( grouping == null ) {
-			String error = "Chosen branching activity missing grouping. Activity was "+activity+" Grouping was "+grouping; 
-			log.error(error);
-			throw new MonitoringServiceException(error);
-		}
-		return grouping;
-	}
-	
 	/** 
 	 * Start the process of doing the chosen grouping
      *
@@ -135,7 +125,6 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
 
-		String type = WebUtil.readStrParam(request, PARAM_TYPE);
     	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
         Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
@@ -208,21 +197,11 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 		for ( SequenceActivity branch : sortedBranches ) {
 			Long branchId = branch.getActivityId();
 			String name = branch.getTitle();
-			Integer numberOfMembers = null;
-			
-			Set<GroupBranchActivityEntry> mappingEntries = branch.getBranchEntries();
-			if ( mappingEntries != null ) {
-				if ( mappingEntries.size() > 0 ) {
-					log.warn("Branch "+branch+" for branching activity "+activity+" has more than one group. This should not happen. Using only the first group.");
-					mappingEntries = new TreeSet<GroupBranchActivityEntry>();
-				}
-				
-				Iterator mappingIter = mappingEntries.iterator();
-				if ( mappingIter.hasNext() )  {
-					Group group = ((GroupBranchActivityEntry) mappingIter.next()).getGroup();
-					numberOfMembers = group.getUsers().size();
-				}
-			}
+			int numberOfMembers = 0;
+
+			Group group = branch.getSoleGroupForBranch();
+			if ( group != null )
+				numberOfMembers = group.getUsers().size();
 
 			if ( ! first ) {
 				branchesOutput=branchesOutput+";";
@@ -278,20 +257,7 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 		SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(branchID);
 
-		Set<GroupBranchActivityEntry> mappingEntries = branch.getBranchEntries();
-		Group group = null;
-		
-		if ( mappingEntries != null ) {
-			if ( mappingEntries.size() > 0 ) {
-				log.warn("Branch "+branch+" for branching activity "+branch+" has more than one group. This should not happen. Using only the first group.");
-				mappingEntries = new TreeSet<GroupBranchActivityEntry>();
-			}
-			
-			Iterator mappingIter = mappingEntries.iterator();
-			if ( mappingIter.hasNext() )  {
-				group = ((GroupBranchActivityEntry) mappingIter.next()).getGroup();
-			}
-		}
+		Group group = branch.getSoleGroupForBranch();
 
 		String userOutput = null;
 		if ( group != null ) {
@@ -343,28 +309,13 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 			HttpServletResponse response) throws IOException, ServletException, LessonServiceException {
 
     	Long branchID = WebUtil.readLongParam(request, PARAM_BRANCH_ID);
-		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-		SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(branchID);
-
-		Set<GroupBranchActivityEntry> mappingEntries = branch.getBranchEntries();
-		Group group = null;
-		
-		if ( mappingEntries != null ) {
-			if ( mappingEntries.size() > 0 ) {
-				log.warn("Branch "+branch+" for branching activity "+branch+" has more than one group. This should not happen. Using only the first group.");
-				mappingEntries = new TreeSet<GroupBranchActivityEntry>();
-			}
-			
-			Iterator mappingIter = mappingEntries.iterator();
-			if ( mappingIter.hasNext() )  {
-				group = ((GroupBranchActivityEntry) mappingIter.next()).getGroup();
-			}
-		}
 
     	String members = WebUtil.readStrParam(request, PARAM_MEMBERS, true);
     	if ( members != null ) {
         	String[] membersSplit = members.split(","); 
-//			monitoringService.addUsersToGroup(activityID,  groupID, membersSplit, false);
+
+        	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+			monitoringService.addUsersToBranch(branchID, membersSplit);
     	}
 
     	writeAJAXOKResponse(response);
@@ -374,7 +325,7 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 	/** 
 	 * Remove a list of users from a group. Designed to respond to an AJAX call.
      *
-	 * Input parameters: activityID, name: group name, members: comma separated list of users
+	 * Input parameters: branchID, members: comma separated list of users
 	 * 
 	 * Output format: no data returned - just the header 
 	 */
@@ -382,15 +333,17 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException, LessonServiceException {
 
-//    	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-//    	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
-//    	String members = WebUtil.readStrParam(request, PARAM_MEMBERS, true);
-//    	if ( members != null ) {
-//        	String[] membersSplit = members.split(","); 
-//	    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-//			monitoringService.removeUsersFromGroup(activityID, groupID, membersSplit, false);
-//    	}
-//		writeAJAXOKResponse(response);
+    	Long branchID = WebUtil.readLongParam(request, PARAM_BRANCH_ID);
+
+    	String members = WebUtil.readStrParam(request, PARAM_MEMBERS, true);
+    	if ( members != null ) {
+        	String[] membersSplit = members.split(","); 
+
+        	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+			monitoringService.removeUsersFromBranch(branchID, membersSplit);
+    	}
+
+		writeAJAXOKResponse(response);
 		return null;
 	}
 
