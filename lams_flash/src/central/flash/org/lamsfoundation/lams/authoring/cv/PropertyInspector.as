@@ -200,7 +200,7 @@ class PropertyInspector extends MovieClip{
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b>"
 		
 		gateType_lbl.text = Dictionary.getValue('trans_dlg_gatetypecmb');
-		branchType_lbl.text = Dictionary.getValue("trans_dlg_gatetypecmb");
+		branchType_lbl.text = Dictionary.getValue("pi_branch_type");
 		
 		days_lbl.text = Dictionary.getValue('pi_days');
 		hours_lbl.text = Dictionary.getValue('pi_hours');
@@ -226,7 +226,7 @@ class PropertyInspector extends MovieClip{
 		min_lbl.text = Dictionary.getValue('pi_min_act');
 		max_lbl.text = Dictionary.getValue('pi_max_act');
 		
-			//populate the synch type combo:
+		//populate the synch type combo:
 		gateType_cmb.dataProvider = Activity.getGateActivityTypes();
 		branchType_cmb.dataProvider = Activity.getBranchingActivityTypes();
 		groupType_cmb.dataProvider = Grouping.getGroupingTypesDataProvider();
@@ -299,17 +299,14 @@ class PropertyInspector extends MovieClip{
 	public function localOnRelease():Void{
 		
 		if (_piIsExpended){
-			trace("P Pressed in 'localOnRelease' and _piIsExpended is: "+_piIsExpended)
 			_piIsExpended = false
 			_canvasModel.setPIHeight(piHeightHide);
 			showExpand(true);
 			
 		}else {
-			trace("P Pressed in 'localOnRelease' and _piIsExpended is: "+_piIsExpended)
 			_piIsExpended = true
 			_canvasModel.setPIHeight(piHeightFull);
 			showExpand(false);
-			//Application.getInstance().onResize();
 		}
 	}
 	
@@ -696,9 +693,9 @@ class PropertyInspector extends MovieClip{
 	}
 	
 	private function showGroupingControls(v:Boolean, e:Boolean){
-		//grouping 
 		groupType_lbl.visible = v;
 		groupType_cmb.visible = v;
+		
 		if(v){
 			showRelevantGroupOptions();
 		}else{
@@ -715,7 +712,6 @@ class PropertyInspector extends MovieClip{
 	}
 	
 	private function showToolActivityProperties(ta:ToolActivity){
-		
 		
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+StringUtils.cleanNull(ta.toolDisplayName);
 		runOffline_chk.selected = ta.runOffline;

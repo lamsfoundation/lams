@@ -396,7 +396,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log('Running...',Debugger.GEN,'createNewSequenceActivity','CanvasModel');
 		
 		var seqAct = new SequenceActivity(_cv.ddm.newUIID());
-		seqAct.title = "Sequence Activity";
+		seqAct.title = Dictionary.getValue('sequence_act_title');
 		seqAct.learningDesignID = _cv.ddm.learningDesignID;
 		seqAct.groupingSupportType = Activity.GROUPING_SUPPORT_OPTIONAL;
 		seqAct.activityCategoryID = Activity.CATEGORY_SYSTEM;
