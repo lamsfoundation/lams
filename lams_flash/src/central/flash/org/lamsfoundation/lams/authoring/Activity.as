@@ -199,7 +199,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 	 */
 	public static function getGateActivityTypes():Array{
 		var types:Array = [];
-		types.addItem({label: Dictionary.getValue('trans_dlg_nogate'), data: NO_GATE_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('synch_act_lbl'), data: SYNCH_GATE_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('sched_act_lbl'), data: SCHEDULE_GATE_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('perm_act_lbl'), data: PERMISSION_GATE_ACTIVITY_TYPE});
