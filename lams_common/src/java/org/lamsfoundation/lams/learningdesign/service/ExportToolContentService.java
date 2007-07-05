@@ -1795,12 +1795,15 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				break;
 			case Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE:
 				act = new ChosenBranchingActivity();
+				processBranchingFields((BranchingActivity) act, actDto);
 				break;
 			case Activity.GROUP_BRANCHING_ACTIVITY_TYPE:
 				act = new GroupBranchingActivity();
+				processBranchingFields((BranchingActivity) act, actDto);
 				break;
 			case Activity.TOOL_BRANCHING_ACTIVITY_TYPE:
 				act = new ToolBranchingActivity();
+				processBranchingFields((BranchingActivity) act, actDto);
 				break;
 			default:
 				log.error("Unable to determine the activity type. Creating a tool activity. ActivityDTO was "+actDto);
@@ -1854,6 +1857,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		act.setCreateDateTime(new Date());
 		return act;
 	}
+	
+	private void processBranchingFields(BranchingActivity act, AuthoringActivityDTO actDto) {
+		act.setStartXcoord(actDto.getStartXCoord());
+		act.setEndXcoord(actDto.getEndXCoord());
+		act.setStartYcoord(actDto.getStartYCoord());
+		act.setEndYcoord(actDto.getEndYCoord());
+	}
+
 	//******************************************************************
 	// Spring injection properties set/get
 	//******************************************************************
