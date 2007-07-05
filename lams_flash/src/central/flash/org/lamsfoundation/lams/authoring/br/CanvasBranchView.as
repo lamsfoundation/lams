@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.CommonCanvasView;
 
 import mx.controls.*;
+import mx.containers.*;
 import mx.managers.*;
 import mx.utils.*;
 
@@ -50,6 +51,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
     private var _canvasBranchView:CanvasBranchView;
 	private var _canvasBranchingActivity:CanvasActivity;
 	
+	private var canvas_scp:ScrollPane;
+	
 	private var startTransX:Number;
 	private var startTransY:Number;
 	
@@ -59,6 +62,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private var grid_mc:Object;
 	private var hSpace:Number = 30;
 	private var vSpace:Number = 30;
+
+	private var currentActivity_x:Number;
+	private var currentActivity_y:Number;
 
 	private var close_mc:MovieClip;
 	
@@ -75,6 +81,10 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	*/
 	function CanvasBranchView(){
 		_canvasBranchView = this;
+		
+		currentActivity_x = null;
+		currentActivity_y = null;
+		
 		_tm = ThemeManager.getInstance();
 		defaultSequenceActivity = null;
 		fingerprint = null;
@@ -173,7 +183,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private function draw(){
 		
 		//get the content path for the sp
-		content = this;
+		content = canvas_scp.content;
 		
 		bkg_pnl = content.createClassObject(Panel, "bkg_pnl", getNextHighestDepth());
 		
@@ -249,6 +259,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	}
 	
 	private function open():Void {
+		_cm.getCanvas().addBin(this);
+		
 		setSize(_cm);
 		
 		mx.transitions.TransitionManager.start(this,
@@ -259,11 +271,15 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	}
 	
 	private function close():Void {
+		_cm.getCanvas().hideBin();
+		
 		mx.transitions.TransitionManager.start(this,
 					{type:mx.transitions.Zoom, 
 					 direction:1, duration:0.5, easing:mx.transitions.easing.Strong.easeIn});
 					 
 		_cm.getCanvas().closeBranchView();
+		_cm.getCanvas().addBin(_cm.activeView);
+		_cm.broadcastViewUpdate("SIZE");
 	}
 	
 	public function localOnReleaseOutside():Void{
@@ -477,7 +493,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		return s;
 	}
 
-
 	/**
     * Sets the size of the canvas on stage, called from update
     */
@@ -492,10 +507,18 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		s.w -= 2*hSpace;
 		s.h -= 2*vSpace;
 		
+		canvas_scp.setSize(s.w,s.h);
 		bkg_pnl.setSize(s.w, s.h);
 
 		//Create the grid.  The gris is re-drawn each time the canvas is resized.
 		grid_mc = Grid.drawGrid(gridLayer,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
+		
+		//position bin in canvas.  
+		var bin = cm.getCanvas().bin;
+		bin._x = canvas_scp._x + (s.w - bin._width) - 10;
+		bin._y = canvas_scp._y + (s.h - bin._height) - 10;
+		
+		canvas_scp.redraw(true);
 		
 		setPosition(cm);
 	}
@@ -510,10 +533,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var cx:Number = ba._x + ba.getVisibleWidth()/2;
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
 		
-		bkg_pnl._x = -cx+hSpace;
-		bkg_pnl._y = -cy+vSpace;
-		grid_mc._x = -cx+hSpace;
-		grid_mc._y = -cy+vSpace;
+		canvas_scp._x = -cx+hSpace;
+		canvas_scp._y = -cy+vSpace;
 		
 		close_mc._x = bkg_pnl._x + bkg_pnl.width - close_mc._width - 10;
 		close_mc._y = bkg_pnl._y + 10;

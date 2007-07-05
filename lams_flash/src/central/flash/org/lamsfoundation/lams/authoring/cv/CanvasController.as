@@ -183,6 +183,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			if(!ca.branchConnector) {
 				ca.activity.xCoord = ca._x;
 				ca.activity.yCoord = ca._y;
+				
+				if(ca.activity.isBranchingActivity()) ca.setPosition(ca._x, ca._y);
+				
 			} else {
 				if(_canvasModel.activeView.isStart(ca)) {
 					ca.activity.startXCoord = ca._x;
@@ -244,8 +247,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
    
     private function activitySnapBack(ca:Object){
-		ca._x = ca.activity.xCoord;
-		ca._y = ca.activity.yCoord;
+		if(ca.branchConnector) {
+			
+			if(_canvasModel.activeView.isStart(ca)) {
+				ca._x = ca.activity.startXCoord;
+				ca._y = ca.activity.startYCoord;
+			} else if(_canvasModel.activeView.isEnd(ca)) {
+				ca._x = ca.activity.endXCoord;
+				ca._y = ca.activity.endYCoord;
+			}
+				
+		} else {
+			ca._x = ca.activity.xCoord;
+			ca._y = ca.activity.yCoord;
+		}
 	}
 	
 	/**
@@ -364,10 +379,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
     
 	private function isActivityOnBin(ca:Object):Void{
 		if (ca.hitTest(_canvasModel.getCanvas().bin)) {
-			if(!isActivityReadOnly(ca, Dictionary.getValue("cv_element_readOnly_action_del"))){
+			if(!isActivityReadOnly(ca, Dictionary.getValue("cv_element_readOnly_action_del")) && !ca.branchConnector){
 				if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 					_canvasModel.removeComplexActivity(ca);
-				}else {
+				} else {
 					_canvasModel.removeActivityOnBin(ca.activity.activityUIID);
 				}
 			} else {
@@ -535,27 +550,27 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		}
 		
 		if(_canvasModel.activeTool == CanvasModel.GATE_TOOL){
-			var p = new Point(_canvasModel.activeView._xmouse, _canvasModel.activeView._ymouse); 
+			var p = new Point(_canvasModel.activeView.content._xmouse, _canvasModel.activeView.content._ymouse); 
 			_canvasModel.createNewGate(Activity.PERMISSION_GATE_ACTIVITY_TYPE,p,parent);
 			_canvasModel.getCanvas().stopGateTool();
 		}
 		
 		if(_canvasModel.activeTool == CanvasModel.OPTIONAL_TOOL){
-			var p = new Point(_canvasModel.activeView._xmouse-(complexActWidth/2), _canvasModel.activeView._ymouse); 
+			var p = new Point(_canvasModel.activeView.content._xmouse-(complexActWidth/2), _canvasModel.activeView.content._ymouse); 
 			_canvasModel.createNewOptionalActivity(Activity.OPTIONAL_ACTIVITY_TYPE,p,parent);
 			_canvasModel.getCanvas().stopOptionalActivity();
 			
 		}
 		
 		if(_canvasModel.activeTool == CanvasModel.GROUP_TOOL){
-			var p = new Point(_canvasModel.activeView._xmouse-(toolActWidth/2), _canvasModel.activeView._ymouse-(toolActHeight/2)); 
+			var p = new Point(_canvasModel.activeView.content._xmouse-(toolActWidth/2), _canvasModel.activeView.content._ymouse-(toolActHeight/2)); 
 			_canvasModel.createNewGroupActivity(p,parent);
 			_canvasModel.getCanvas().stopGroupTool();
 			
 		}
 		
 		if(_canvasModel.activeTool == CanvasModel.BRANCH_TOOL){
-			var p = new Point(_canvasModel.activeView._xmouse-(toolActWidth/2), _canvasModel.activeView._ymouse-(toolActHeight/2)); 
+			var p = new Point(_canvasModel.activeView.content._xmouse-(toolActWidth/2), _canvasModel.activeView.content._ymouse-(toolActHeight/2)); 
 			_canvasModel.createNewBranchActivity(Activity.CHOOSEN_BRANCHING_ACTIVITY_TYPE,p,parent);
 			_canvasModel.getCanvas().stopBranchTool();
 		}

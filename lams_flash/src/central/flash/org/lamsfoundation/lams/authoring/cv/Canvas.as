@@ -741,13 +741,18 @@ b	 * @param   learningDesignID
 	 * @return  
 	 */
 	public function initBin():Void{
-		var cc:CanvasController = canvasView.getController();
-		_bin = _canvasView_mc.attachMovie("Bin", "Bin", _canvasView_mc.getNextHighestDepth(),{_canvasController:cc,_canvasView:canvasView});
+		addBin(_canvasView_mc);
 	}
 	
-	public function addBin():Void{
-		// var cc:CanvasController = canvasView.getController();
-		// return view.attachMovie("Bin", "Bin", view.getNextHighestDepth(),{_controller:cc,_view:cv}
+	public function addBin(target:MovieClip) {
+		if(_bin != null) hideBin();
+		
+		var cc:CanvasController = canvasView.getController();
+		_bin = target.attachMovie("Bin", "Bin", target.getNextHighestDepth(), {_canvasController:cc, _targetView:target});
+	}
+	
+	public function hideBin():Void{
+		_bin.removeMovieClip();
 	}
 	
 	/**

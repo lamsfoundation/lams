@@ -512,6 +512,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	public function getVisibleHeight ():Number {
 		return _visibleHeight;
 	}
+	
+	public function setPosition(x:Number, y:Number):Void {
+		_x = x;
+		_y = y;
+		
+		if(branchView != null) {
+			branchView._x = _x + getVisibleWidth()/2;
+			branchView._y = _y + getVisibleHeight()/2;
+			
+			//branchView.setCurrentPosition(_x, _y);
+			
+		}
+		
+	}
 
 	
 	public function set isSetSelected(v:Boolean):Void{

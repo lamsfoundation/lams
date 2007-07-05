@@ -118,10 +118,10 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 		activityLayer.attachMovie("squareHandle", "h1", activityLayer.getNextHighestDepth());
 		activityLayer.attachMovie("squareHandle", "h2", activityLayer.getNextHighestDepth());
 		
-		activityLayer.h1._x = this._xmouse
-		activityLayer.h1._y = this._ymouse
-		Debugger.log("content: " + content, Debugger.GEN, "initDrawTempTrans", "CommonCanvasView");
+		activityLayer.h1._x = content._xmouse;
+		activityLayer.h1._y = content._ymouse;
 		
+		Debugger.log("content: " + content, Debugger.GEN, "initDrawTempTrans", "CommonCanvasView");
 		
 		activityLayer.tempTrans.onEnterFrame = drawTempTrans;
 		
@@ -142,6 +142,7 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 	   Draw.dashTo(this, _parent.h1._x, _parent.h1._y,  _parent._parent._xmouse - 3, _parent._parent._ymouse - 3, 7, 4);
 	   _parent.h2._x = _parent._parent._xmouse - 3;
 	   _parent.h2._y = _parent._parent._ymouse - 3;
+	   
     }
 	
 	

@@ -36,7 +36,7 @@ class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{
 	
 	//this is set by the init object
 	private var _canvasController:CanvasController;
-	private var _canvasView:CanvasView;
+	private var _targetView:MovieClip;
 	private var _tip:ToolTip;
 	
 	//locals
