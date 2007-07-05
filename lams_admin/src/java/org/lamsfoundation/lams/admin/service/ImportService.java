@@ -568,7 +568,7 @@ public class ImportService implements IImportService {
 		}
 		
 		if (!hasError) {
-			service.setRolesForUserOrganisation(user, org, roles);
+			service.setRolesForUserOrganisation(user, org.getOrganisationId(), roles);
 			log.debug("added: "+login+" to: "+org.getName()+" with roles: "+roles);
 		}
 	}

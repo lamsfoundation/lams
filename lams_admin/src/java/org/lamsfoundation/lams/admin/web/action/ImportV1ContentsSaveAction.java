@@ -169,7 +169,7 @@ public class ImportV1ContentsSaveAction extends Action {
 			if (v1user.getRoleIds().contains(V1UserDTO.ROLE_CORE)) {
 				ArrayList<String> roles = new ArrayList<String>();
 				roles.add(Role.ROLE_SYSADMIN.toString());
-				service.setRolesForUserOrganisation(user, service.getRootOrganisation(), roles);
+				service.setRolesForUserOrganisation(user, service.getRootOrganisation().getOrganisationId(), roles);
 			}
 			for (V1OrgRightDTO v1orgRight : v1user.getOrgRights()) {
 				// the org was not selected to be imported
@@ -177,8 +177,7 @@ public class ImportV1ContentsSaveAction extends Action {
 					continue;
 				}
 				List<String> roles = getV2RoleIds(v1user.getRoleIds(), v1orgRight);
-				Organisation org = (Organisation)service.findById(Organisation.class, orgIdsMap.get(v1orgRight.getOrgSid()));
-				service.setRolesForUserOrganisation(user, org, roles);
+				service.setRolesForUserOrganisation(user, orgIdsMap.get(v1orgRight.getOrgSid()), roles);
 			}
 		}
 		

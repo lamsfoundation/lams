@@ -100,7 +100,7 @@ public class UserRolesSaveAction extends Action {
 			return mapping.findForward("userroles");
 		}
 	
-		service.setRolesForUserOrganisation(user, org, (List<String>)Arrays.asList(roles));
+		service.setRolesForUserOrganisation(user, orgId, (List<String>)Arrays.asList(roles));
 		
 		return mapping.findForward("userlist");
 	}

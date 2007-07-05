@@ -83,8 +83,6 @@ public class UserOrgRoleSaveAction extends Action {
 		Integer orgId = (Integer)userOrgRoleForm.getOrgId();
 		log.debug("orgId: "+orgId);
 		
-		Organisation organisation = (Organisation)service.findById(Organisation.class, orgId);
-		
 		request.setAttribute("org",orgId);
 		request.getSession().removeAttribute("UserOrgRoleForm");		
 		
@@ -107,12 +105,14 @@ public class UserOrgRoleSaveAction extends Action {
 				request.setAttribute("orgId", orgId);
 				return mapping.findForward("userorg");
 			}
-			service.setRolesForUserOrganisation(user, organisation, (List<String>)Arrays.asList(roleIds));
-			if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-				if (service.getUserOrganisation(bean.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null) {
-					service.setRolesForUserOrganisation(user, organisation.getParentOrganisation(), (List<String>)Arrays.asList(roleIds));
-				}
-			}
+			service.setRolesForUserOrganisation(user, orgId, (List<String>)Arrays.asList(roleIds));
+			// FMALIKOFF 5/7/7 Commented out the following code that set the roles in the course if the current org is a class, as the logic 
+			// is done in service.setRolesForUserOrganisation()
+			//if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
+			//	if (service.getUserOrganisation(bean.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null) {
+			//		service.setRolesForUserOrganisation(user, organisation.getParentOrganisation(), (List<String>)Arrays.asList(roleIds));
+			//	}
+			//}
 		}
 		return mapping.findForward("userlist");
 	}

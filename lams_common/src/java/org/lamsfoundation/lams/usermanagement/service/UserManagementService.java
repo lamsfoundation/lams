@@ -651,9 +651,21 @@ public class UserManagementService implements IUserManagementService {
 	
 	/**
 	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setRolesForUserOrganisation(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.usermanagement.Organisation, java.util.List)
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setRolesForUserOrganisation(org.lamsfoundation.lams.usermanagement.User, java.lang.Integer, java.util.List)
 	 */
-	public void setRolesForUserOrganisation(User user, Organisation org, List<String> rolesList) {
+	public void setRolesForUserOrganisation(User user, Integer organisationId, List<String> rolesList) {
+
+		// Don't pass in the org from the web layer. The import for roles doesn't use the HIbernate open session
+		// filter, so it may throw a lazy loading exception when it tried to access the org.UserOrganisations set
+		// if org has come from the web layer.
+		Organisation org = (Organisation) findById(Organisation.class, organisationId);
+		setRolesForUserOrganisation(user, org, rolesList);
+	}
+	
+	private void setRolesForUserOrganisation(User user, Organisation org, List<String> rolesList) {
+		
+		// The private version of setRolesForUserOrganisation can pass around the org safely as we are within
+		// our transation, so no lazy loading errors. This is more efficient for recursive calls to this method.
 		
 		UserOrganisation uo = getUserOrganisation(user.getUserId(), org.getOrganisationId());
 		if (uo == null) {
