@@ -324,7 +324,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<p><c:out value="${description}"/></p>
 	</c:if>
 	
-	<span id="message" align="right"></span></p>
+	<p>&nbsp;<span id="message" align="right"></span></p>
 
 	<P><STRONG><fmt:message key="label.grouping.general.instructions.heading"/></STRONG> <fmt:message key="label.branching.general.instructions"/></P>
 
