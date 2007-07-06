@@ -153,6 +153,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/** The url of the tool's moderation screen. */
 	private String moderationURL;
 
+	/** The url of the tool's admin screen. */
+	private String adminURL;
+
 	/** The category of activity */
 	private Integer activityCategoryID;
 	
@@ -360,6 +363,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.createGroupingID = grouping.getGroupingId();
 		this.createGroupingUIID = grouping.getGroupingUIID();
 		//this.groupingType = grouping.getGroupingTypeId();
+		this.adminURL = groupingActivity.getSystemTool().getAdminUrl();
 	}
 	private void addOptionsActivityAttributes(OptionsActivity optionsActivity){
 		this.maxOptions = optionsActivity.getMaxNumberOfOptions();
@@ -387,6 +391,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.contributeURL = toolActivity.getTool().getContributeUrl();
 		this.moderationURL = toolActivity.getTool().getModerationUrl();
 		this.helpURL = toolActivity.getTool().getHelpUrl();
+		this.adminURL = toolActivity.getTool().getAdminUrl();
 		this.toolDisplayName = toolActivity.getTool().getToolDisplayName();
 		this.toolVersion = toolActivity.getTool().getToolVersion();
 	}
@@ -402,6 +407,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		GateActivity gateActivity = (GateActivity)activity ;
 		this.gateActivityLevelID = gateActivity.getGateActivityLevelId();
 		this.gateOpen = gateActivity.getGateOpen();
+		this.adminURL = gateActivity.getSystemTool().getAdminUrl();
 				
 	}
 	private void addSynchGateActivityAttributes(SynchGateActivity activity){	
@@ -1031,5 +1037,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 	public void setStartYCoord(Integer startYCoord) {
 		if(!startYCoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
 			this.startYCoord = startYCoord;
+	}
+	public String getAdminURL() {
+		return adminURL;
+	}
+	public void setAdminURL(String adminURL) {
+		this.adminURL = adminURL;
 	}
 }

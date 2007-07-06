@@ -78,6 +78,9 @@ public class Tool implements Serializable {
     private String helpUrl;
     
     /** persistent field */
+    private String adminUrl;
+    
+    /** persistent field */
     private boolean supportsRunOffline;
     
     /** persistent field */
@@ -533,6 +536,23 @@ public class Tool implements Serializable {
     public void setHelpUrl(String helpUrl)
     {
         this.helpUrl = helpUrl;
+    }
+
+    
+    /**
+     * @hibernate.property column="admin_url" length="65535" not-null="false"  
+     * @return Returns the helpUrl.
+     */
+    public String getAdminUrl()
+    {
+        return adminUrl;
+    }
+    /**
+     * @param helpUrl The helpUrl to set.
+     */
+    public void setAdminUrl(String adminUrl)
+    {
+        this.adminUrl = adminUrl;
     }
 
     

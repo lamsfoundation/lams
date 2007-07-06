@@ -1333,7 +1333,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				}else{
 					act.setParentActivity(parent);
 					//also add child as Complex activity: It is useless for persist data, but helpful for validate in learning design!
-					if(isComplexActivity(parent)){
+					if(parent.isComplexActivity()){
 						Set<Activity> set = ((ComplexActivity)parent).getActivities();
 						if(set == null){
 							set = new TreeSet<Activity>(new ActivityOrderComparator());
@@ -1912,12 +1912,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 	public void setTransitionDAO(ITransitionDAO transitionDAO) {
 		this.transitionDAO = transitionDAO;
-	}
-	private boolean isComplexActivity(Activity act)
-	{
-		return act.getActivityTypeId().intValue() == Activity.SEQUENCE_ACTIVITY_TYPE || 
-		 act.getActivityTypeId().intValue()== Activity.PARALLEL_ACTIVITY_TYPE ||
-		 act.getActivityTypeId().intValue()== Activity.OPTIONS_ACTIVITY_TYPE;
 	}
 	public void setToolImportSupportDAO(IToolImportSupportDAO toolImportSupportDAO) {
 		this.toolImportSupportDAO = toolImportSupportDAO;

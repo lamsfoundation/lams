@@ -1,5 +1,5 @@
 -- Script to be run for LAMS 2.1 release, on LAMS 2.0.3 tables.
--- Adds all the data needed for branching
+-- Adds all the data needed for branching, plus a small change to the tool table needed for tool admin screen.
 
 ALTER TABLE lams_group
 ADD COLUMN group_ui_id INT(11);
@@ -63,4 +63,8 @@ ty.',
         'learning/branchingExportPortfolio?mode=teacher&type=tool', 'monitoring/branching.do?method=assignBranch&type=tool',
         'monitoring/branching.do?method=assignBranch&type=tool', now());
 
-        
+
+-- support tools having an admin screen
+
+ALTER TABLE lams_tool ADD COLUMN admin_url TEXT;
+ALTER TABLE lams_system_tool ADD COLUMN admin_url TEXT;
