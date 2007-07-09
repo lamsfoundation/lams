@@ -61,6 +61,24 @@
       />
     </action>
     <action
+      path="/branching"
+      type="org.lamsfoundation.lams.monitoring.web.ChosenBranchingAJAXAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="chosenSelection"
+        path="/branching/chosenSelection.jsp"
+        redirect="false"
+      />
+      <forward
+        name="viewBranches"
+        path=".viewBranches"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/monitoring"
       type="org.lamsfoundation.lams.monitoring.web.MonitoringAction"
       parameter="method"

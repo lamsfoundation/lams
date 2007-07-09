@@ -45,4 +45,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<definition name=".viewGroups" extends=".baseDef" >
 		<put name="content" value="/grouping/viewGroups.jsp" />	
 	</definition>
+<!-- ============= Branching Page Definitions ====================== -->	
+	<definition name=".viewBranches" extends=".baseDef" >
+		<put name="content" value="/branching/viewBranches.jsp" />	
+	</definition>
 </tiles-definitions>

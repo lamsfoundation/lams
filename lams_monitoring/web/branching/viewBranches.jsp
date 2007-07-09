@@ -36,32 +36,30 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<p><c:out value="${description}"/></p>
 	</c:if>
 
-	<c:choose>
-	<c:when test="${empty branches}">
-		<p><fmt:message key="label.grouping.no.branches.created"/></p>
-	</c:when>
-	<c:otherwise>
-	
-	
-		<table class="alternative-color" cellspacing="0">
-			<c:forEach items="${branches}" var="branch">
-			<tr>
-				<td width="25%" class="first">
-					<c:out value="${branch.branchName}"/>
-				</td>
-				<td>
-					<c:forEach items="${branch.groups}" var="group">
+	<table class="alternative-color" cellspacing="0">
+		<tr>
+			<th><fmt:message key="label.branching.branch.heading"/></th>
+			<th>&nbsp;</th>
+		</tr>
+			
+		<c:forEach items="${branching.branches}" var="branch">
+		<tr>
+			<td width="25%" class="first">
+				<c:out value="${branch.branchName}"/>
+			</td>
+			<td>
+				<c:forEach items="${branch.groups}" var="group" varStatus="status">
+ 					<c:if test="${showGroupName}">
 						<strong><c:out value="${group.groupName}"/></strong><BR>
-						<c:forEach items="${group.users}" var="user">
-							<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/>
-						</c:forEach>
+					</c:if>
+					<c:forEach items="${group.users}" var="user">
+						<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/><BR>
 					</c:forEach>
-				</td>
-			</tr>
-			</c:forEach>
-		</table>
-	</c:otherwise>
-	</c:choose>
+				</c:forEach>
+			</td>
+		</tr>
+		</c:forEach>
+	</table>
 		
 	<%@ include file="../template/finishbutton.jsp" %>
 

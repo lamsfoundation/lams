@@ -80,7 +80,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 *                parameter="method" 
 *                validate="false"
 * @struts.action-forward name = "chosenSelection" path = "/branching/chosenSelection.jsp"
-* @struts.action-forward name = "viewBranches" path = "/branching/viewBranches.jsp"
+* @struts.action-forward name = "viewBranches" path = ".viewBranches"
 * 
 * ----------------XDoclet Tags--------------------
 */
@@ -95,6 +95,7 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 	public static final String PARAM_BRANCH_ID = "branchID";
 	public static final String PARAM_MAY_DELETE = "mayDelete";
 	public static final String PARAM_MEMBERS = "members";
+	public static final String PARAM_SHOW_GROUP_NAME = "showGroupName";
 	
 	private Integer getUserId(HttpServletRequest request) {
 		HttpSession ss = SessionManager.getSession();
@@ -160,8 +161,11 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 			
 		} else {
 			// go to a view only screen for group based and tool based grouping
+			// only show the group names if this is a group based branching activity - the names
+			// are meaningless for tool based branching
 			BranchingDTO dto = new BranchingDTO((BranchingActivity) activity);
 			request.setAttribute(PARAM_BRANCHING_DTO, dto);
+			request.setAttribute(PARAM_SHOW_GROUP_NAME, activity.isGroupBranchingActivity());
 			if ( log.isDebugEnabled() ) {
 				log.debug("assignBranch: Branching activity "+dto);
 			}
