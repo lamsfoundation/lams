@@ -259,7 +259,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	}
 	
 	private function open():Void {
-		_cm.getCanvas().addBin(this);
+		_cm.getCanvas().addBin(this.activityLayer);
 		
 		setSize(_cm);
 		
@@ -516,8 +516,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		//position bin in canvas.  
 		if(cm.activeView == this) {
 			var bin = cm.getCanvas().bin;
-			bin._x = canvas_scp._x + (s.w - bin._width) - 10;
-			bin._y = canvas_scp._y + (s.h - bin._height) - 10;
+			bin._x = (s.w - bin._width) - 10;
+			bin._y = (s.h - bin._height) - 10;
 		}
 			
 		canvas_scp.redraw(true);

@@ -118,8 +118,9 @@ class Canvas extends CanvasHelper {
 			// raise alert if design is empty
 			if (canvasModel.activitiesDisplayed.size() < 1){
 				Cursor.showCursor(Application.C_DEFAULT);
-				LFMessage.showMessageAlert(msg);
 				var msg:String = Dictionary.getValue('al_empty_design');
+				LFMessage.showMessageAlert(msg);
+				
 			}else {
 				saveDesignToServerAs(Workspace.MODE_SAVE);
 			}
@@ -741,7 +742,7 @@ b	 * @param   learningDesignID
 	 * @return  
 	 */
 	public function initBin():Void{
-		addBin(_canvasView_mc);
+		addBin(canvasView.activityLayer);
 	}
 	
 	public function addBin(target:MovieClip) {
