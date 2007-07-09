@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="Unix-Installer-Build-2.0.4" default="build" basedir=".">
+<project name="Unix-Build-Script-2.0.4" default="build" basedir=".">
 
  	<property name="VERSION" value="2.0.4" />
  	<property name="PACKAGE-ROOT" value="build/lams-unix-installer-2.0.4" />
@@ -9,16 +9,16 @@
 	<property name="db.name" value="lams" />
 	
 	<description>
-		Unix installer file for lams ${VERSION}
+		Unix build script for lams ${VERSION}
 	</description>
 	
 	<target name="dump-db" description="Dump full LAMS database contents.">
-		    <exec executable="mysqldump" 
+		<exec executable="mysqldump" 
 		     output="${basedir}/database/lams.dump" failonerror="true">
 		      <arg line="-u${db.username}" />
 		      <arg line="--password=${db.password}" />
 		      <arg line="${db.name}" />
-		    </exec>
+		</exec>
 	</target>
 	
 	<target name="build" depends="clean" description="Compile all sources.">
@@ -30,38 +30,38 @@
 		<mkdir dir="${PACKAGE-ROOT}/doc" />
 		
 		<!-- copy files to new created folders -->
-		<copy todir="${PACKAGE-ROOT}/ant">
-			<fileset dir="ant" />
-		</copy>
-		<copy todir="${PACKAGE-ROOT}/ant-scripts">
-			<fileset dir="ant-scripts" />
-		</copy>
-		<copy todir="${PACKAGE-ROOT}/assembly">
-			<fileset dir="assembly" />
-		</copy>
-		<copy todir="${PACKAGE-ROOT}/bin">
-			<fileset dir="bin" />
-		</copy>	
-		<copy todir="${PACKAGE-ROOT}/conf">
-			<fileset dir="conf" />
-		</copy>	
-		<copy todir="${PACKAGE-ROOT}/database">
-			<fileset dir="database" />
-		</copy>	
-		<copy todir="${PACKAGE-ROOT}/wrapper">
-			<fileset dir="wrapper" />
-		</copy>
-		<copy todir="${PACKAGE-ROOT}/sql-scripts">
-			<fileset dir="sql-scripts">
-				<include name="create-database.sql" />
-			</fileset>
-		</copy>
+		<exec executable="cp" failonerror="true">
+			<arg line="-r" />
+		    <arg line="ant" />
+		    <arg line="ant-scripts" />
+		    <arg line="assembly" />
+		    <arg line="bin" />
+			<arg line="conf" />
+		    <arg line="database" />
+		    <arg line="install-lams.sh" />		
+			<arg line="wrapper" />		
+			<arg line="readme" />
+			<arg line="license" />
+			<arg line="lams.properties" />
+			<arg line="${PACKAGE-ROOT}" />
+		</exec>
 		
-		<copy todir="${PACKAGE-ROOT}" file="install-lams.sh" />
-		<copy todir="${PACKAGE-ROOT}" file="readme" />
-		<copy todir="${PACKAGE-ROOT}" file="license" />
-		<copy todir="${PACKAGE-ROOT}" file="lams.properties" />		
-		<copy todir="${PACKAGE-ROOT}/doc" file="doc/setLamsConfiguration.sql" />
+		<exec executable="cp" failonerror="true">
+			<arg line="doc/setLamsConfiguration.sql" />
+		    <arg line="${PACKAGE-ROOT}/doc" />
+		</exec>
+		
+		<exec executable="cp" failonerror="true">
+			<arg line="sql-scripts/create-database.sql" />
+		    <arg line="${PACKAGE-ROOT}/sql-scripts" />
+		</exec>
+	
+		<exec executable="cp" failonerror="true">
+			<arg line="bin/checkmysql.class" />
+			<arg line="bin/testJava.class" />
+			<arg line="bin/run-lams.sh" />
+			<arg line="${PACKAGE-ROOT}/bin" />	
+		</exec>
 
 		<!-- create ${PACKAGE-ROOT}.tar.gz and place it in the build directory -->
 		<tar longfile="gnu" destfile="${PACKAGE-ROOT}.tar" basedir="build" excludes="*.tar.gz, *.tar.gz.bak"/>
