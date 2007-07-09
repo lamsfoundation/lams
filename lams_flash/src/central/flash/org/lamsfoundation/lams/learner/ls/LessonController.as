@@ -68,7 +68,6 @@ class LessonController extends AbstractController {
 	 * @param   evt 
 	 */
 	public function click(evt):Void{
-		trace(String(evt.target));
 		
 		var tgt:String = new String(evt.target);
 		if(tgt.indexOf("export_btn") != -1){
@@ -78,14 +77,12 @@ class LessonController extends AbstractController {
 	}
 	
 	public function activityClick(ca:Object):Void{
-		//if (ca.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
-			
-			Debugger.log('activityClick CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityClick','LessonController');
-		//}
+		Debugger.log('activityClick CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityClick','LessonController');
     }
    
 	public function activityDoubleClick(ca:Object):Void{
-		setBusy()
+		setBusy();
+		
 		Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityID + ' status: ' + ca.activityStatus + 'type id: ' + ca.activity.activityTypeID,Debugger.GEN,'activityDoubleClick','LessonController');
 	   
 		if(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.isGroupActivity()){
@@ -149,7 +146,6 @@ class LessonController extends AbstractController {
 	}
 	
 	public function get appData():Object{
-		trace("called monitor application")
 		var myObj:Object = new Object();
 		myObj.compX = Application.LESSON_X
 		myObj.compY = Application.LESSON_Y

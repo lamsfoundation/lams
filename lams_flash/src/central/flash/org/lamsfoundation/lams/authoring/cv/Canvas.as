@@ -118,8 +118,8 @@ class Canvas extends CanvasHelper {
 			// raise alert if design is empty
 			if (canvasModel.activitiesDisplayed.size() < 1){
 				Cursor.showCursor(Application.C_DEFAULT);
-				var msg:String = Dictionary.getValue('al_empty_design');
 				LFMessage.showMessageAlert(msg);
+				var msg:String = Dictionary.getValue('al_empty_design');
 			}else {
 				saveDesignToServerAs(Workspace.MODE_SAVE);
 			}

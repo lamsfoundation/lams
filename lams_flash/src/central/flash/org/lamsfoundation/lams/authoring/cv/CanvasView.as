@@ -422,10 +422,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		//Create the grid.  The gris is re-drawn each time the canvas is resized.
 		var grid_mc = Grid.drawGrid(gridLayer,Math.round(newWidth),Math.round(newHeight),V_GAP,H_GAP);
 		
-		//position bin in canvas.  
-		var bin = cm.getCanvas().bin;
-		bin._x = (s.w - bin._width) - 20;
-		bin._y = (s.h - bin._height) - 20;
+		//position bin in canvas. 
+		if(cm.activeView == this) {
+			var bin = cm.getCanvas().bin;
+			bin._x = (s.w - bin._width) - 20;
+			bin._y = (s.h - bin._height) - 20;
+		}
 		
 		canvas_scp.redraw(true);
 		

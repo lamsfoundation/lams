@@ -71,9 +71,9 @@ class Lesson {
         
 		//Create the model
 		lessonModel = new LessonModel(this);
+		
 		//Create the view
 		lessonView_mc = target_mc.createChildAtDepth("Lesson",DepthManager.kTop);	
-		trace(lessonView_mc);
 		lessonView = LessonView(lessonView_mc);
 		lessonView.init(lessonModel,undefined);
        
@@ -100,7 +100,7 @@ class Lesson {
 	
 	private function viewLoaded(evt:Object){
         Debugger.log('viewLoaded called',Debugger.GEN,'viewLoaded','Lesson');
-		//lessonModel.setDefaultState();
+		
 		if(evt.type=='load') {
             dispatchEvent({type:'load',target:this});
         }else {
@@ -113,8 +113,7 @@ class Lesson {
 		
 		// call action
 		var lessonId:Number = _root.lessonID;
-		//var userId:Number = Application.getInstance().getUserID();
-
+		
 		// do request
 		Application.getInstance().getComms().getRequest('learning/learner.do?method=getLesson&lessonID='+String(lessonId), callback, false);
 			
@@ -142,8 +141,7 @@ class Lesson {
 		
 		// call action
 		var lessonId:Number = lessonModel.ID;
-		//var userId:Number = Application.getInstance().getUserID();
-
+		
 		// do request
 		Application.getInstance().getComms().getRequest('learning/learner.do?method=resumeLesson&lessonID='+String(lessonId), callback, false);
 			
@@ -185,11 +183,8 @@ class Lesson {
 	}
 	
 	private function startLesson(pkt:Object){
-		trace('received message back from server aftering joining lesson...');
-		
 		// set lesson as active
 		lessonModel.setActive();
-		trace('pktobject value: '+String(pkt));
 		getURL(_root.serverURL + 'learning'+String(pkt)+'?lessonID='+lessonModel.getLessonID(),'contentFrame');
 		
 		
@@ -295,8 +290,6 @@ class Lesson {
 	}
 	
 	private function closeLesson(pkt:Object){
-		trace('receiving message back from server...');
-		
 		// set lesson as inactive
 		//lessonModel.setInactive();
 		
@@ -311,7 +304,6 @@ class Lesson {
 	}
 
 	private function openLearningDesign(){
-		trace('opening learning design...');
 		finishedDesign = false;
 		
 		var designId:Number = lessonModel.learningDesignID;
@@ -322,8 +314,6 @@ class Lesson {
 	}
 	
 	private function saveDataDesignModel(learningDesignDTO:Object){
-		trace('returning learning design...');
-		trace('saving model data...');
 		if(learningDesignDTO instanceof LFError) {
 			Cursor.showCursor(Application.C_DEFAULT);
 			learningDesignDTO.showErrorAlert();

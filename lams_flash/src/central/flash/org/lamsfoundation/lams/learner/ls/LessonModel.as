@@ -30,7 +30,6 @@ import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.Transition;
 
-
 /*
 * Model for the Lesson
 */
@@ -86,7 +85,6 @@ class LessonModel extends Observable {
 	}
 	
 	public function populateFromDTO(dto:Object){
-		trace('populating lesson object for lesson:' + dto.lessonName);
 		_lessonID = dto.lessonID;
 		_lessonName = dto.lessonName;
 		_lessonDescription = dto.lessonDescription;
@@ -105,13 +103,11 @@ class LessonModel extends Observable {
 	
 	
 	public function setSpadHeight(h:Number){
-		trace ("height is set to: "+h)
 		_spadHeight = h
 		Application.getInstance().onResize();
 	}
 	
 	public function getSpadHeight(){
-		trace ("returning pi height: "+_spadHeight)
 		return _spadHeight;
 	}
 	
@@ -286,7 +282,6 @@ class LessonModel extends Observable {
 	
 	public function setActive() {
 		_active = true;
-		trace('setting lesson active...');
 		
 		setChanged();
 		
@@ -298,7 +293,6 @@ class LessonModel extends Observable {
 	
 	public function setInactive() {
 		_active = false;
-		trace('setting lesson inactive...');
 		
 		setChanged();
 		
@@ -313,14 +307,11 @@ class LessonModel extends Observable {
 	}
 	
 	private function orderDesign(activity:Activity, order:Array):Void{
-		trace("==> "+activity.activityID);
 		order.push(activity);
-		trace("transition keys length: "+ddmTransition_keys.length);
+		
 		for(var i=0;i<ddmTransition_keys.length;i++){
 			var transitionKeyToCheck:Number = ddmTransition_keys[i];
 			var ddmTransition:Transition = learningDesignModel.transitions.get(transitionKeyToCheck);
-			trace("transition value is: "+ ddmTransition.transitionUIID);
-			trace("transition from activity id: "+ ddmTransition.fromActivityID);
 			
 				if (ddmTransition.fromUIID == activity.activityUIID){
 					var ddm_activity:Activity = learningDesignModel.activities.get(ddmTransition.toUIID);
@@ -341,18 +332,10 @@ class LessonModel extends Observable {
 		var dataObj:Object;
 		var ddmfirstActivity_key:Number = learningDesignModel.firstActivityID;
 		var learnerFirstActivity:Activity = learningDesignModel.activities.get(ddmfirstActivity_key);
-		trace("first activity in desgn: "+ddmfirstActivity_key);
-		
-		//trace("==> "+learnerFirstActivity.title);
+
 		// recursive method to order design
 		orderDesign(learnerFirstActivity, orderedActivityArr);
-		
-		for(var i=0; i<orderedActivityArr.length; i++){
-			trace("--> "+orderedActivityArr[i].title);
-			
-		}
 		return orderedActivityArr;
-		trace("New Ordered Activities has length: "+orderedActivityArr.length)
 		
 	}
 	
@@ -387,25 +370,17 @@ class LessonModel extends Observable {
 		var indexArray:Array = setDesignOrder();
 		
 		//go through the design and get the activities and transitions 
-		
 		var dataObj:Object;
 		ddmActivity_keys = learningDesignModel.activities.keys();
-		
-		//indexArray = ddmActivity_keys;
-		trace("Length of Activities in DDM: "+indexArray.length)
 		
 		//loop through 
 		for(var i=0;i<indexArray.length;i++){
 					
 			var keyToCheck:Number = indexArray[i].activityUIID;
-			
 			var ddm_activity:Activity = learningDesignModel.activities.get(keyToCheck);
-			trace("Activity type ID: "+ddm_activity.activityTypeID)
-			if (ddm_activity.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
-				trace("Activity is an optional activity "+ddm_activity.activityUIID)
-			}
+			
 			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
-				trace("this is Child")
+				return;
 			}else {
 				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity);
 			}
@@ -417,26 +392,19 @@ class LessonModel extends Observable {
 		var indexArray:Array = setDesignOrder();
 		
 		//go through the design and get the activities and transitions 
-		
 		var dataObj:Object;
 		ddmActivity_keys = learningDesignModel.activities.keys();
-		
-		//indexArray = ddmActivity_keys;
-		trace("Length of Activities in DDM: "+indexArray.length)
-		
+
 		//loop through 
 		for(var i=0;i<indexArray.length;i++){
 					
 			var keyToCheck:Number = indexArray[i].activityUIID;
 			
 			var ddm_activity:Activity = learningDesignModel.activities.get(keyToCheck);
-			trace("Activity type ID: "+ddm_activity.activityTypeID)
-			if (ddm_activity.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
-				trace("Activity is an optional activity "+ddm_activity.activityUIID)
-			}
+
 			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
-				trace("this is Child")
-			}else {
+				return;
+			} else {
 				broadcastViewUpdate("UPDATE_ACTIVITY",ddm_activity);
 			}
 		}
@@ -488,6 +456,7 @@ class LessonModel extends Observable {
         //Set state variables
 		__x = x;
 		__y = y;
+		
         //Set flag for notify observers
 		setChanged();
         

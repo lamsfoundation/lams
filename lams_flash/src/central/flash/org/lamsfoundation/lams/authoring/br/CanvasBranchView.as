@@ -514,10 +514,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		grid_mc = Grid.drawGrid(gridLayer,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
 		
 		//position bin in canvas.  
-		var bin = cm.getCanvas().bin;
-		bin._x = canvas_scp._x + (s.w - bin._width) - 10;
-		bin._y = canvas_scp._y + (s.h - bin._height) - 10;
-		
+		if(cm.activeView == this) {
+			var bin = cm.getCanvas().bin;
+			bin._x = canvas_scp._x + (s.w - bin._width) - 10;
+			bin._y = canvas_scp._y + (s.h - bin._height) - 10;
+		}
+			
 		canvas_scp.redraw(true);
 		
 		setPosition(cm);
