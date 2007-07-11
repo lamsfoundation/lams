@@ -126,6 +126,7 @@ UninstPage custom un.PreUninstall un.PostUninstall
 # reserve files
 #
 ReserveFile "lams.ini"
+ReserveFile "lams-update.ini"
 ReserveFile "lams2.ini"
 ReserveFile "mysql.ini"
 ReserveFile "wildfire.ini"
@@ -436,6 +437,7 @@ Function .onInit
     
     # extract custom page display config
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "lams.ini"
+    !insertmacro MUI_INSTALLOPTIONS_EXTRACT "lams-update.ini"
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "lams2.ini"
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "mysql.ini"
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "wildfire.ini"
@@ -508,11 +510,7 @@ Function Checkjava2
         ${StrStr} $0 $1 "1.5"
         ${If} $0 == ""
             MessageBox MB_OK|MB_ICONEXCLAMATION "Could not find a Java 5 or Java 6 installation in the given directory. $\r$\nPlease check your Java installation and try again.$\r$\n$\r$\n$JDK_DIR"
-            ${if} $IS_UPDATE == "0"
-                Abort
-            ${else}
-                quit
-            ${endif}
+            Abort
         ${EndIf}
     ${EndIf}
 FunctionEnd
@@ -734,10 +732,10 @@ Function PreLAMSConfig
         !insertmacro MUI_HEADER_TEXT "Setting Up LAMS (2/4)" "Configure the LAMS Server.  If unsure, use the defaults."
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams.ini"
     ${else}
-        !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 2" "State" "$JDK_DIR"
-        !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 4" "State" "$INSTDIR\repository"
+        !insertmacro MUI_INSTALLOPTIONS_WRITE "lams-update.ini" "Field 2" "State" "$JDK_DIR"
+        !insertmacro MUI_INSTALLOPTIONS_WRITE "lams-update.ini" "Field 4" "State" "$INSTDIR\repository"
         !insertmacro MUI_HEADER_TEXT "Java setup" "If you have changed your java installation since installing LAMS ${PREVIOUS_VERSION}, please enter the new details."
-        !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams.ini"
+        !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams-update.ini"
     ${endif}
 FunctionEnd
 
@@ -747,9 +745,38 @@ Function PostLAMSConfig
     ${if} $IS_UPDATE == "0"
         !insertmacro MUI_INSTALLOPTIONS_READ $JDK_DIR "lams.ini" "Field 2" "State"
         !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_REPOSITORY "lams.ini" "Field 4" "State"
+        
+        # check java version using given dir
+        Call Checkjava2
+    ${else}
+        !insertmacro MUI_INSTALLOPTIONS_READ $MYSQL_HOST "lams-update.ini" "Field 8" "State"
+        !insertmacro MUI_INSTALLOPTIONS_READ $JDK_DIR "lams-update.ini" "Field 2" "State"
+        #!insertmacro MUI_INSTALLOPTIONS_READ $LAMS_REPOSITORY "lams-update.ini" "Field 4" "State"
+        
+        # check java version using given dir
+        Call Checkjava2
+        
+        Setoutpath "$TEMP\lams\"
+        File "..\build\checkmysql.class"
+        File "..\mysql-connector-java-3.1.12-bin.jar"
+        nsExec::ExecToStack '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysql "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8" $DB_USER $DB_PASS 2.0.2'
+        Pop $0
+        Pop $1
+        ${If} $0 != 0
+            ${StrStr} $3 $1 "UnknownHostException"
+            ${if} $3 == "" 
+                MessageBox MB_OK|MB_ICONEXCLAMATION "An error occurred whilst checking your mysql configuration $\r$\n$\r$\nError: $1"
+            ${else}
+                MessageBox MB_OK|MB_ICONEXCLAMATION "An error occurred whilst checking your mysql configuration $\r$\n$\r$\nError: Could not connect to MySql host: $MYSQL_HOST. Please check your database configurations and try again."
+            ${endif}               
+            Abort
+        ${EndIf}
+        
+        Delete "$TEMP\lams\checkmysql.class"
+        Delete "$TEMP\mysql-connector-java-3.1.12-bin.jar"
+        
     ${endif}
-    # check java version using given dir
-    Call Checkjava2
+    
 FunctionEnd
 
 
