@@ -3,14 +3,16 @@
 <project name="LAMS-Win_Installer-Build" basedir=".">
 	
 	<property file="../lams_build/common.properties" />
+	<property name="build" value="build" />
+	<property name="src" value="src" />
 
 	<target name="mk-build-dir" description="Create build dir.">
-		<mkdir dir="build" />
+		<mkdir dir="${build}" />
 	</target>
 	
 	<target name="dump-db" depends="mk-build-dir" description="Dump full LAMS database contents.">
 	    <exec dir="" executable="C:\Program Files\MySQL\MySQL Server 5.0\bin\mysqldump.exe" 
-	     output="build/dump.sql">
+	     output="${build}/dump.sql">
 	      <arg line="-u${db.username}" />
 	      <arg line="--password=${db.password}" />
 	      <arg line="${db.name}" />
@@ -18,7 +20,9 @@
 	</target>
 	
 	<target name="compile-java" depends="mk-build-dir" description="Compile custom java class">
-		<javac srcdir="src" classpath="../lams_build/lib/hibernate/hibernate3.jar" destdir="build" />
-	</target>
-	
+		<javac srcdir="${src}" 
+			classpath="../lams_build/lib/hibernate/hibernate3.jar:mysql-connector-java-3.1.12-bin.jar" 
+			destdir="${build}"
+		/>
+	</target>	
 </project>
