@@ -44,41 +44,41 @@ public class checkmysql
 			Class.forName(dbDriverClass);
 	       		Connection conn = DriverManager.getConnection(dbDriverUrl, dbUsername, dbPassword);
 	       		conn.setAutoCommit(false);
-	       		PreparedStatement stmt  = conn.prepareStatement("SELECT * FROM lams_configuration WHERE config_key= \"Version\"");
+	       		PreparedStatement stmt  = conn.prepareStatement("show variables where Variable_name=\"version\"");
 		       	ResultSet results = stmt.executeQuery();
 	
 			if (results.first() == false)
 			{
-				throw new SQLException("Could not find LAMS database using url: " + dbDriverUrl);
+				throw new SQLException("No version row found in database");
 			}
 			else
 			{
-				String dbVersion = results.getString("config_value");
-				if (dbVersion.equals(version) == false)
+				String dbVersion = results.getString("Value");
+				if (dbVersion.contains(version) == false)
 				{
-					throw new SQLException("Your current LAMS version: " +dbVersion+ " is not compatible with this upgrade. Required version: " +version);		
+					throw new SQLException("Your MySql Version: \"" + dbVersion + "\" is not compatible LAMS");		
 				}
 				else
 				{
-					System.out.println("LAMS version is compatible with this upgrade.\n");
+					System.out.println("MySql host is compatible with LAMS.");
 				}
+
 			}
 			conn.close();
 		}
 		catch (SQLException e)
 		{
 			System.out.println(e.getMessage());
-			System.out.println("Upgrade failed. LAMS database check failed.\n");
+			System.out.println("MySql check failed. Check that your MYSQL_HOST variable in lams.properties points to a MySql 5.x installation");
 			System.exit(1); 
 		}
 		catch (Exception e)
                 {
                         System.out.println(e.getMessage());
-                        System.out.println("Upgrade failed. Unknown failure checking LAMS database version.\n");
+                        System.out.println("Unknown failure finding MySql version");
                         e.printStackTrace();
 			System.exit(1);
 		}
-		
 	}
 	
 }
