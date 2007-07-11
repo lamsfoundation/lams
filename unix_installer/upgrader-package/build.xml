@@ -1,89 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="Unix-Updater-Build" basedir=".">
+<project name="Unix-Updater-Script-2.0.4" default="build" basedir=".">
 
-	<property file="../../lams_build/common.properties" />
-	<property file="../../lams_build/unix.properties" />
-	<property name="package-root" value="build/lams-unix-updater-2.0.2"/>
+ 	<property name="VERSION" value="2.0.4" />
+ 	<property name="PACKAGE-ROOT" value="build/lams-unix-updater-2.0.4" />
+	<property name="db.username" value="lams" />
+	<property name="db.password" value="lamsdemo" />
+	<property name="db.name" value="lams" />
 	
-	<target name="clean" description="Create build dir.">
-		<delete dir="build" />
-		<mkdir dir="build" />
-		<mkdir dir="${package-root}" />
-		<mkdir dir="${package-root}/assembly" />
-		<mkdir dir="${package-root}/assembly/lams.ear" />
-		<mkdir dir="${package-root}/sql-scripts" />
-		<mkdir dir="${package-root}/log" />
-		<mkdir dir="${package-root}/database" />
-		<mkdir dir="${package-root}/bin" />
-		<mkdir dir="${package-root}/doc" />
-		<mkdir dir="${package-root}/ant" />
-		<mkdir dir="${package-root}/ant-scripts" />
-		<mkdir dir="${package-root}/language-pack" />
-		<mkdir dir="${package-root}/tools" />
+	<description>
+		Unix updater build script for lams ${VERSION}
+	</description>
+	
+	<target name="dump-db" description="Dump full LAMS database contents.">
+		<exec executable="mysqldump" 
+		     output="${basedir}/database/lams.dump" failonerror="true">
+		      <arg line="-u${db.username}" />
+		      <arg line="--password=${db.password}" />
+		      <arg line="${db.name}" />
+		</exec>
 	</target>
 	
-	
-	<target name="compile-java" description="Compile custom java class">
-		<javac srcdir="bin" destdir="bin" />
-	</target>
-	
-	<target name="copy-assembly">
-		<copy todir="${package-root}/assembly">
-			<fileset dir="${j2eelibs}">
-				<include name="lams-session.jar"/>
-				<include name="lams-valve.jar"/>
-			</fileset>
-		</copy>
+	<target name="build" depends="clean" description="Build all sources.">
+
+		<!-- create the necessary directories -->
+		<mkdir dir="${PACKAGE-ROOT}" /> 
+		<mkdir dir="${PACKAGE-ROOT}/log" /> 
+		<mkdir dir="${PACKAGE-ROOT}/bin" />
+		<mkdir dir="${PACKAGE-ROOT}/docs" /> 
 		
-		<copy todir="${package-root}/assembly/lams.ear">
-			<fileset dir="${jboss.deploy}"/>
-		</copy>	
+		<!-- copy files to new created folders -->
+		<exec executable="cp" failonerror="true">
+			<arg line="-r" />
+		    <arg line="ant" />
+		    <arg line="ant-scripts" />
+		    <arg line="assembly" />
+			<arg line="conf" />
+			<arg line="language-pack" />
+			<arg line="sql-scripts" />
+			<arg line="tools" />
+			<arg line="license" />
+			<arg line="readme" />
+			<arg line="update-lams.sh" />
+			<arg line="lams.properties" />
+			<arg line="${PACKAGE-ROOT}" />
+		</exec>
+		
+		<exec executable="cp" failonerror="true">
+			<arg line="bin/backup.class" />
+			<arg line="bin/checkmysql.class" />
+			<arg line="bin/copyllid.class" />
+			<arg line="bin/getJbossDir.class" />
+			<arg line="bin/readProperty.class" />
+			<arg line="bin/testJava.class" />
+			<arg line="bin/UpdateLAMS202Chat.class" />      
+			<arg line="bin/run-lams.sh" />
+			<arg line="bin/shutdown.sh" />
+			<arg line="bin/lamsdump.sql" />
+			<arg line="bin/hibernate3.jar" />
+			<arg line="${PACKAGE-ROOT}/bin" />
+		</exec>
+		
+		<!-- create ${PACKAGE-ROOT}.tar.gz and place it in the build directory -->
+		<tar longfile="gnu" destfile="${PACKAGE-ROOT}.tar" basedir="build" excludes="*.tar.gz, *.tar.gz.bak"/>
+		<gzip zipfile="${PACKAGE-ROOT}.tar.gz" src="${PACKAGE-ROOT}.tar" />
+		
+		<delete failonerror="false" file="${PACKAGE-ROOT}.tar" />
 	</target>
 	
-	
-	<target name="copy-files" depends="copy-assembly" description="Copies the files to the build dir">
-		<copy todir="${package-root}">
-			<fileset file="docs/lams.properties"/>
-			<fileset dir="${basedir}">
-				<include name="readme"/>
-				<include name="license"/>
-				<include name="update-lams.sh"/>
-			</fileset>
-		</copy>
+	<!-- clean the installation, the .bak file will remain in the build dir -->
+	<target name="clean" description="Clean up output directories.">
+		<delete dir="${PACKAGE-ROOT}" failonerror="false"/>
 		
-			
-		<copy todir="${package-root}/ant">
-			<fileset dir="ant"/>
-		</copy>
-		<copy todir="${package-root}/ant-scripts">
-			<fileset dir="ant-scripts"/>
-		</copy>
-		<copy todir="${package-root}/bin">
-			<fileset dir="bin">
-				<include name="*.class"/>	
-				<include name="*.sh"/>
-			</fileset>
-		</copy>
-		<copy todir="${package-root}/language-pack">
-			<fileset dir="language-pack"/>
-		</copy>	
-		<copy todir="${package-root}/tools">
-			<fileset dir="tools"/>
-		</copy>	
-	</target>
-	
-	<target name="create-package">
-		<delete failonerror="false" file="${package-root}.tar.gz" />
-		
-		<tar destfile="${package-root}.tar" basedir="${package-root}" excludes="CVS"/>
-		<gzip zipfile="${package-root}.tar.gz" src="${package-root}.tar" />
-		
-		<delete failonerror="false" file="${package-root}.tar" />
-	</target>
-	
-	<target name="build-package" depends="clean, compile-java, copy-files, create-package"> 
-		<echo>Build Successful</echo>
+		<!-- backup existing tar.gz file if it exists-->
+		<delete file="${PACKAGE-ROOT}.tar.gz" failonerror="false"/>
 	</target>
 	
 </project>
