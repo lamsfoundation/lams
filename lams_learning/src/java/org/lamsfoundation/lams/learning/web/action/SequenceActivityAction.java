@@ -24,26 +24,17 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.action;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
-import org.lamsfoundation.lams.learning.web.form.OptionsActivityForm;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.NullActivity;
-import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -102,11 +93,10 @@ public class SequenceActivityAction extends ActivityAction {
 			request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
 			request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());
 			request.setAttribute(AttributeNames.PARAM_LEARNER_PROGRESS_ID, learnerProgress.getLearnerProgressId());
-			setupProgressString(form, request);
 			forward = mapping.findForward("empty");
 		}
 
-        LearningWebUtil.putLearnerProgressInRequest(request,learnerProgress);
+		LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
         return forward;
        	
 	}

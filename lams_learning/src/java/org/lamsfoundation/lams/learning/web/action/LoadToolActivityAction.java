@@ -69,7 +69,6 @@ public class LoadToolActivityAction extends ActivityAction {
 	                             HttpServletRequest request,
 	                             HttpServletResponse response) 
 	{
-		setupProgressString(actionForm, request);
 
 		ActivityForm form = (ActivityForm)actionForm;
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
@@ -100,6 +99,7 @@ public class LoadToolActivityAction extends ActivityAction {
 			return mapping.findForward(ActivityMapping.ERROR);
 		}
 		
+		LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
 		return mapping.findForward("displayTool");
 	}
 

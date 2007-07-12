@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learning.web.util;
 
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 
 /**
@@ -34,7 +35,10 @@ import org.lamsfoundation.lams.learningdesign.Activity;
  */
 public class ActivityMappingStrategy implements Serializable {
 	
+	private static Logger log = Logger.getLogger(ActivityMappingStrategy.class);
+	 
 	private static final String PROGRESS_BROKEN_ACTION = "/progressBroken.do";
+
 	/**
 	 * Returns the struts action used to display the specified activity.
 	 * @param activity, Activity to be displayed
@@ -53,12 +57,13 @@ public class ActivityMappingStrategy implements Serializable {
 		    else if (activity.isOptionsActivity()) 
 		        strutsAction = "/DisplayOptionsActivity.do";
 		    else if (activity.isBranchingActivity()){
-			    strutsAction = "/LoadToolActivity.do";
+			    strutsAction = "/Branching.do?method=performBranching";
 		    } else if ( activity.isSequenceActivity() ) {
 			    strutsAction = "/SequenceActivity.do";
 		    } else {
-		    	// unexpected type, try the tool loading page - that will work for system tools
-			    strutsAction = "/LoadToolActivity.do";
+		    	// unexpected type
+		    	log.error("Unexpected complex activity type "+activity);
+				strutsAction = PROGRESS_BROKEN_ACTION;
 		    }
 		}
 		else // should be a simple activity - can handle tool, gates and grouping

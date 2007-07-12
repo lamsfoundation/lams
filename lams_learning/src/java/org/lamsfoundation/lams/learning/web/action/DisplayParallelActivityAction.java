@@ -31,12 +31,12 @@ import java.util.*;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 
 import org.lamsfoundation.lams.learningdesign.*;
-import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learning.web.util.ParallelActivityMappingStrategy;
@@ -64,15 +64,15 @@ public class DisplayParallelActivityAction extends ActivityAction {
 	                             HttpServletRequest request,
 	                             HttpServletResponse response) 
 	{
-		setupProgressString(actionForm, request);
 
 		ActivityForm form = (ActivityForm)actionForm;
+		ICoreLearnerService learnerService = getLearnerService();
 		
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 		
 		actionMappings.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
 		
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 		if (!(activity instanceof ParallelActivity)) {
 		    log.error(className+": activity not ParallelActivity "+activity.getActivityId());
 			return mapping.findForward(ActivityMapping.ERROR);
@@ -98,6 +98,8 @@ public class DisplayParallelActivityAction extends ActivityAction {
 		}
 		form.setActivityURLs(activityURLs);
 		
+		LearningWebUtil.setupProgressInRequest((ActivityForm)actionForm, request, LearningWebUtil.getLearnerProgress(request, learnerService));
+
 		return mapping.findForward("displayParallel");
 	}
 

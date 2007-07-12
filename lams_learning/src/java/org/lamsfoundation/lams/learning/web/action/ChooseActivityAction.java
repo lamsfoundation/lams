@@ -31,6 +31,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -84,10 +85,8 @@ public class ChooseActivityAction extends ActivityAction {
 			progress = learnerService.joinLesson(learnerId, lesson.getLessonId());
   		}
 
-		LearningWebUtil.putLearnerProgressInRequest(request,progress);
-
 		// need to do the choose first as the chooseActivity / joinLesson changes the progress details 
-		setupProgressString(actionForm, request);
+		LearningWebUtil.setupProgressInRequest((ActivityForm)actionForm, request, progress);
 
 		ActionForward forward = actionMappings.getActivityForward(activity, progress, true);
 		return forward;

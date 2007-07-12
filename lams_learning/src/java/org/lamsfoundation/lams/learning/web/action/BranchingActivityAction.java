@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  *
  * XDoclet definition:
  * 
- * @struts:action path="/branching" 
+ * @struts:action path="/Branching" 
  * 				  name="BranchingForm"
  * 				  parameter="method" 
  *                validate="false"
@@ -118,6 +118,8 @@ public class BranchingActivityAction extends LamsDispatchAction {
 		        }
 
 				forward = mapping.findForward("displayBranchingWait");
+				LearningWebUtil.setupProgressInRequest(groupForm, request, learnerProgress);
+
 			} else {
 				// forward to the sequence activity.
 				if ( log.isDebugEnabled() ) {
@@ -127,10 +129,10 @@ public class BranchingActivityAction extends LamsDispatchAction {
 				// Set the branch as the current part of the sequence and display it
 				learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(), branch);
 				forward = actionMappings.getActivityForward(branch, learnerProgress, true);
+				LearningWebUtil.putLearnerProgressInRequest(request,learnerProgress);
 			}
 		}
-
-		LearningWebUtil.putLearnerProgressInRequest(request,learnerProgress);
+		
 		return forward;
 	}
 	

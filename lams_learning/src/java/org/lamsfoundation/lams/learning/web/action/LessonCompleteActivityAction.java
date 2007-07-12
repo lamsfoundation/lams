@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.web.form.ActivityForm;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 
 
 
@@ -62,8 +64,7 @@ public class LessonCompleteActivityAction extends ActivityAction {
 	                             HttpServletRequest request,
 	                             HttpServletResponse response) 
 	{
-		
-		setupProgressString(actionForm, request);
+		LearningWebUtil.setupProgressInRequest((ActivityForm)actionForm, request, LearningWebUtil.getLearnerProgress(request, getLearnerService()));
 		return mapping.findForward("lessonComplete");
 	}
 }

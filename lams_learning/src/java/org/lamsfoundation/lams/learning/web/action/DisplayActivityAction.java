@@ -35,6 +35,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -95,7 +96,6 @@ public class DisplayActivityAction extends ActivityAction {
 	    	lessonId = WebUtil.readLongParam(request,"progressId");
 	    }
 	    LearnerProgress learnerProgress = learnerService.getProgress(learnerId, lessonId);
-	    LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
 	    
 	    // Normally this is used to display the initial page, so initialDisplay=true. But if called from the 
 	    // special handling for completed activities (ie close window) then we need to set it to false.
@@ -103,7 +103,7 @@ public class DisplayActivityAction extends ActivityAction {
 		
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(getServlet().getServletContext());
 		ActionForward forward =actionMappings.getProgressForward(learnerProgress,false,displayParallelFrames,request,learnerService);
-		setupProgressString(actionForm, request);
+		LearningWebUtil.setupProgressInRequest((ActivityForm)actionForm, request, learnerProgress);
 	
 		if(log.isDebugEnabled())
 		    log.debug(forward);

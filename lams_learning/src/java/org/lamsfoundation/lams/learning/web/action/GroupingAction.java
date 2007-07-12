@@ -47,13 +47,10 @@ import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -151,7 +148,9 @@ public class GroupingAction extends LamsDispatchAction
         groupForm.set("previewLesson",learnerProgress.getLesson().isPreviewLesson());
         groupForm.set("title", activity.getTitle());
         
-        if ( groupingDone ) {
+		LearningWebUtil.setupProgressInRequest(groupForm, request, learnerProgress);
+
+		if ( groupingDone ) {
         	request.setAttribute(FINISHED_BUTTON, Boolean.TRUE);
         	return mapping.findForward(VIEW_GROUP); 
         }

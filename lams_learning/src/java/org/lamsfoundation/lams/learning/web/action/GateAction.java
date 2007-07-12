@@ -49,8 +49,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -133,7 +131,14 @@ public class GateAction extends LamsDispatchAction
 		User learner = LearningWebUtil.getUser(learnerService);
         Lesson lesson = learnerService.getLesson(lessonId);
 
-         if ( activity != null ) {
+        // don't use LearningWebUtil.getLearnerProgress(request, learnerService) as it may try to get the lesson 
+        //  from the activity and the activity may be null (if this was a system stop gate).
+ 		LearnerProgress learnerProgress = (LearnerProgress)request.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+        if ( learnerProgress == null ) {
+        	learnerProgress = learnerService.getProgress(learner.getUserId(), lessonId);
+        }
+
+        if ( activity != null ) {
 	        
             Integer totalNumActiveLearners =  learnerService.getCountActiveLearnersByLesson(lesson.getLessonId());
 	        //knock the gate
@@ -141,20 +146,17 @@ public class GateAction extends LamsDispatchAction
 
 	        //if the gate is closed, ask the learner to wait ( updating the cached learner progress on the way )
 	        if ( ! gateOpen)  {
-	            return findViewByGateType(mapping, (DynaActionForm)form, activity, totalNumActiveLearners, lesson);
+	            ActionForward forward = findViewByGateType(mapping, (DynaActionForm)form, activity, totalNumActiveLearners, lesson);
+	    		LearningWebUtil.setupProgressInRequest((DynaActionForm)form, request, learnerProgress);
+	            return forward;
 	        }
         }
         
         // gate is open, so let the learner go to the next activity ( updating the cached learner progress on the way )
-        // don't use LearningWebUtil.getLearnerProgress(request, learnerService) as it may try to get the lesson 
-       //  from the activity and the activity may be null (if this was a system stop gate).
- 		LearnerProgress learnerProgress = (LearnerProgress)request.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
-        if ( learnerProgress == null ) {
-        	learnerProgress = learnerService.getProgress(learner.getUserId(), lessonId);
-        }
         return LearningWebUtil.completeActivity(request, response,
 		    		actionMappings, learnerProgress, activity, 
 		    			learner.getUserId(), learnerService, true);
+
     }
 	
     //---------------------------------------------------------------------

@@ -31,6 +31,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -59,20 +60,21 @@ public class DisplayToolActivityAction extends ActivityAction {
 	                             HttpServletRequest request,
 	                             HttpServletResponse response) 
 	{
-		setupProgressString(actionForm, request);
-
 		//ActivityForm form = (ActivityForm)actionForm;
 		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 		
 		ICoreLearnerService learnerService = getLearnerService();
 		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+
 		if (!(activity instanceof ToolActivity)) 
 		{
 		    log.error(className+": activity not ToolActivity");
 			return mapping.findForward(ActivityMapping.ERROR);
 		}
 		
+		LearningWebUtil.setupProgressInRequest((ActivityForm)actionForm, request, learnerProgress);
+
 		ToolActivity toolActivity = (ToolActivity)activity;
 
 		String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(), toolActivity, learnerProgress.getUser());

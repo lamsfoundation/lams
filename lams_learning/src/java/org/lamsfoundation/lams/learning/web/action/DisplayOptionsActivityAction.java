@@ -117,7 +117,7 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		
 		this.saveToken(request);
 		
-		setupProgressString(form, request);
+		LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
 
 		String forward = "displayOptions";
 		return mapping.findForward(forward);

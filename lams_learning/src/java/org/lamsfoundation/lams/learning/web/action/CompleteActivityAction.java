@@ -25,9 +25,7 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,16 +33,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
+import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author daveg
@@ -96,7 +92,7 @@ public class CompleteActivityAction extends ActivityAction {
 			return mapping.findForward("error");
 		}
 
-		setupProgressString(actionForm, request);
+		LearningWebUtil.setupProgressInRequest((ActivityForm)actionForm, request, progress);
 		return forward;
 	}
 
