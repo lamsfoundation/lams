@@ -27,6 +27,10 @@
 	<property file="../lams.properties" />
 	<property file="lang.properties"/>
 
+	<condition property="files.match">
+		<filesmatch file1="${DEPLOY_DIR}/lams.ear/lams-www.war/news.html" file2="../assembly/lams.ear/lams-www.war/news-2.0.2.html" />
+	</condition>
+
 	<!-- Main Task, calls all the other tasks -->
 	<target name="update-lams" description="Runs the entire update process">
 		<!-- antcall target="check-software" / -->
@@ -35,6 +39,7 @@
 		<antcall target="update-core-database" />
 		<antcall target="update-mysql-ds" />
 		<antcall target="update-lams-www-war" />
+		<antcall target="overwrite-news.html" />
 		<antcall target="explode-wars"/>
 		<antcall target="create-tool-deployer" />
 		<antcall target="deploy-tools"/>
@@ -124,7 +129,9 @@
 			</fileset>
 		</copy>	
 		-->
+	</target>
 
+	<target name="overwrite-news.html" if="files.match">
 		<copy todir="${DEPLOY_DIR}/lams.ear/lams-www.war/" overwrite="true">
 			<fileset dir="../assembly/lams.ear/lams-www.war">
 				<include name="news.html"/>
