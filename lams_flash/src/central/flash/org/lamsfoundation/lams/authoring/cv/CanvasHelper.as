@@ -96,11 +96,13 @@ class CanvasHelper {
         if(evt.type=='load') {
 			
 			canvasModel.activeView = evt.target;
+			
 			if(evt.target instanceof CanvasBranchView) {
 				evt.target.open();
 				canvasModel.setDirty();
 			} else {
-		
+				canvasModel.getCanvas().addBin(evt.target.activityLayer);
+				
 				var autosave_config_interval = Config.getInstance().getItem(AUTOSAVE_CONFIG);
 				if(autosave_config_interval > 0) {
 					if(CookieMonster.cookieExists(AUTOSAVE_TAG + _root.userID)) {

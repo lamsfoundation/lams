@@ -107,9 +107,6 @@ class Canvas extends CanvasHelper {
         //Initialise size to the designed size
         canvasModel.setSize(w,h);
 		
-		//if in monitor, dont do it!
-		initBin();
-		
 	}
 
 	public function saveDesign(){
@@ -120,7 +117,6 @@ class Canvas extends CanvasHelper {
 				Cursor.showCursor(Application.C_DEFAULT);
 				var msg:String = Dictionary.getValue('al_empty_design');
 				LFMessage.showMessageAlert(msg);
-				
 			}else {
 				saveDesignToServerAs(Workspace.MODE_SAVE);
 			}
@@ -734,15 +730,6 @@ b	 * @param   learningDesignID
 	*/
 	public function setSize(width:Number,height:Number):Void{
 		canvasModel.setSize(width, height);
-	}
-	
-	/**
-	 * Sts up the bin
-	 * @usage   
-	 * @return  
-	 */
-	public function initBin():Void{
-		addBin(canvasView.activityLayer);
 	}
 	
 	public function addBin(target:MovieClip) {
