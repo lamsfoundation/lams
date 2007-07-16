@@ -21,6 +21,7 @@
  * ************************************************************************
  */
 
+import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
 import mx.controls.Alert;
@@ -53,7 +54,7 @@ class LFError extends Error{
   }
   
   public function showErrorAlert(okHandler){
-	title = Dictionary.getValue('al_alert')
+	/**title = Dictionary.getValue('al_alert')
 	var a:Alert;
 	
 	Alert.okLabel = Dictionary.getValue('al_ok');
@@ -65,7 +66,9 @@ class LFError extends Error{
 	}else{
 	   a = Alert.show(message,title,Alert.OK,null,null,null,Alert.OK);
 	}
+	*/
 	
+	LFMessage.showMessageAlert(message, okHandler);
   }
   /**
  * Shows an alert confirm dialogue.  It is centred in the root time line and diplays the standard LAMS alert icon
@@ -75,6 +78,7 @@ class LFError extends Error{
  * @return  
  */
   public static function showSendErrorRequest(msg:String, msgTitle:String, okHandler:Function, cancelHandler:Function){
+	/**
 	var alt:Alert;
 	var customTitle = Dictionary.getValue(msgTitle)
 	var handlerObj = new Object();
@@ -93,8 +97,11 @@ class LFError extends Error{
 	}
 	
 	alt = Alert.show(msg, customTitle ,Alert.OK | Alert.CANCEL, null, handlerObj, null, Alert.OK);
+	*/
 	
-	//alt.setSize(250, 600);
+	var customTitle = Dictionary.getValue(msgTitle);
+	LFMessage.showMessageConfirm(msg, okHandler, cancelHandler, Dictionary.getValue('al_send'), Dictionary.getValue('al_cancel'), customTitle);
+  
   }
   
   public function get reference():Object{

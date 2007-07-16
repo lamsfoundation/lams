@@ -1013,6 +1013,8 @@ class WorkspaceDialog extends MovieClip{
 			ddm.prevLearningDesignID = null;
 		}
 		
+		workspaceView.isOpen = false;
+		
         //close parent window
 		if(container != null) { container.deletePopUp(); }
         else { _container.deletePopUp(); }

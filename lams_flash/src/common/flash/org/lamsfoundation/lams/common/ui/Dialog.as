@@ -41,40 +41,42 @@ class org.lamsfoundation.lams.common.ui.Dialog {
     
 	private static var _inputDialog:MovieClip;
 	private static var _inputInstructions:String;
+	private static var _inputTitle:String;
+	private static var _inputMessage:String;
+	private static var _inputType:Number;
     private static var _inputOkButtonLabel:String;
     private static var _inputCancelButtonLabel:String;
     private static var _inputOkHandler:Function;
     private static var _inputCancelHandler:Function;
-	
-//   
-    //private static var _dialogInstances:Array;
-    //private static var _currentIndex:Number;
-//    
-    ///**
-    //* This will return a reference to the Dialog that is currently in focus. If there are none in focus is will return null
-    //*/
-    //public static function getDialogWithFocus():Object{
-        //_dialogInstances = [];
-        //_currentIndex = null;
-        //return null;
-    //}
-//    
-//  
-    ///**
-    //* Constuctor
-    //* @param target The target movieclip in which
-    //*/
-    //function Dialog(target:MovieClip,linkageId:String,x:Number,y:Number,w:Number,h:Number){
-        ////Create a new window for the dialog
-        //trace('Dialog');
-        ////componentInstance.createClassObject(linkageName, instanceName, depth, initObject);
-    //}
-//
 
     static function createPopUp(path:MovieClip,cls:Object, initobj:Object):MovieClip{
-        trace('Dialog.createPopUp');
         return path.createClassChildAtDepth(cls, DepthManager.kTopmost, initobj);
     }
+	
+	static function createAlertDialog(title:String, msg:String, okButtonLabel:String, cancelButtonLabel:String, okHandler:Function, cancelHandler:Function, type:Number) {
+		_inputTitle = title;
+		_inputMessage = msg;
+		_inputOkButtonLabel = okButtonLabel;
+		_inputCancelButtonLabel = cancelButtonLabel;
+		_inputOkHandler = okHandler;
+		_inputCancelHandler = cancelHandler;
+		
+		if(type != null) _inputType = type;
+		
+		var target:MovieClip;
+		
+		if(ApplicationParent.getInstance().getWorkspace().getWV().isOpen) {
+			target = ApplicationParent.getInstance().getWorkspace().getWV().workspaceDialog;
+		} else {
+			target = ApplicationParent.root;
+		}
+		
+		_inputDialog = target.attachMovie('alertDialog', 'alertDialog', DepthManager.kTopmost, {_x:0, _y:0});
+		
+		//Assign dialog load handler
+		_inputDialog.addEventListener('contentLoaded', Proxy.create(org.lamsfoundation.lams.common.ui.Dialog,alertDialogLoaded));
+	
+	}
 	
 	static function createInputDialog(instructions:String, okButtonLabel:String, cancelButtonLabel:String, okHandler:Function, cancelHandler:Function){
 		_inputInstructions = instructions;
@@ -83,6 +85,7 @@ class org.lamsfoundation.lams.common.ui.Dialog {
 		_inputOkHandler = okHandler;
 		_inputCancelHandler = cancelHandler;
 		_inputDialog = PopUpManager.createPopUp(ApplicationParent.root, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'InputDialog'});
+		
 		//Assign dialog load handler
 		_inputDialog.addEventListener('contentLoaded',Proxy.create(org.lamsfoundation.lams.common.ui.Dialog,inputDialogLoaded));
 	}
@@ -97,6 +100,21 @@ class org.lamsfoundation.lams.common.ui.Dialog {
 		evt.target.scrollContent.setOKButton(_inputOkButtonLabel,_inputOkHandler);
 		evt.target.scrollContent.setCancelButton(_inputCancelButtonLabel,_inputCancelButtonLabel);
 		
+	}
+	
+	static function alertDialogLoaded(evt:Object) {
+		
+        Debugger.log('!evt.type:'+evt.type,Debugger.GEN,'alertDialogLoaded','org.lamsfoundation.lams.common.ui.Dialog');
+
+        //Set up handlers and labels
+        Debugger.log('!evt.target:'+evt.target,Debugger.GEN,'inputDialogLoaded','org.lamsfoundation.lams.common.ui.Dialog');
+		
+		evt.target.title = _inputTitle;
+		evt.target.message = _inputMessage;
+		evt.target.setOKButton(_inputOkButtonLabel,_inputOkHandler);
+		evt.target.setCancelButton(_inputCancelButtonLabel,_inputCancelHandler);
+		
+		evt.target.type = (_inputType != null) ? _inputType : AlertDialog.ALERT;
 
 	}
 

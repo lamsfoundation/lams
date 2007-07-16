@@ -283,5 +283,18 @@ class StringUtils {
 		}
 		
 	}
+	
+	public static function getButtonWidthForStr(s:String):Number {
+		var spacing:Number = 10;
+		if(s != null) {
+			var container = ApplicationParent.root;
+			container.createTextField("str", container.getNextHighestDepth(), -1000, -1000, 0, 0);
+			var str:TextField = container["str"];
+			str.text = s;
+			return str.textWidth + spacing;
+		} else {
+			return 0;
+		}
+	}
     
 }

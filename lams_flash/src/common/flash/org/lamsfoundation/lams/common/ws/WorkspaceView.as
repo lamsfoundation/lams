@@ -45,6 +45,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 	private var _workspaceController:WorkspaceController;
 	private var dialog:MovieClip;
 	private var cursorContainer:MovieClip;
+	
+	private var _isOpen:Boolean;
+	
 	/*
 	* Constructor
 	*/
@@ -64,11 +67,11 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 	public function viewUpdate(event:Object):Void{
 		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','WorkspaceView');
 		 //Update view from info object
-        //Debugger.log('Recived an UPDATE!, updateType:'+infoObj.updateType,4,'update','CanvasView');
-       var wm:WorkspaceModel = event.target;
-	   //set a ref to the controller for ease (sorry mvc guru)
-	   _workspaceController = getController();
-	   switch (event.updateType){
+        var wm:WorkspaceModel = event.target;
+	   
+	    //set a ref to the controller for ease (sorry mvc guru)
+	    _workspaceController = getController();
+	    switch (event.updateType){
             case 'CREATE_DIALOG' :
                 createWorkspaceDialog(event.data.pos,event.data.tabToSelect);
                 break;
@@ -90,16 +93,13 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
         
 		var m:WorkspaceModel = WorkspaceModel(getModel());
 		var mode:String = m.currentMode
-		trace('mode returned: ' + mode);
 		var classRoot:MovieClip;
+		
 		if(mode == Workspace.MODE_READONLY){
 			classRoot = org.lamsfoundation.lams.monitoring.Application.root;
 		} else {
 			classRoot = org.lamsfoundation.lams.authoring.Application.root;
 		}
-		
-		
-		trace('root output: ' + classRoot);
 		
         //Check to see whether this should be a centered or positioned dialog
         if(typeof(pos)=='string'){
@@ -113,7 +113,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 		
 		//Assign dialog load handler
 		dialog.addEventListener('contentLoaded',Delegate.create(_workspaceController,_workspaceController.openDialogLoaded));
-		
+		isOpen = true;
     }
 	
 	/**
@@ -141,8 +141,16 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 	 * @usage   
 	 * @return  
 	 */
-	public function get workspaceDialog ():MovieClip {
+	public function get workspaceDialog():MovieClip {
 		return dialog;
+	}
+	
+	public function get isOpen():Boolean {
+		return _isOpen;
+	}
+	
+	public function set isOpen(a:Boolean):Void {
+		_isOpen = a;
 	}
 
 	public function get workspaceCursor():MovieClip {
@@ -151,6 +159,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 	
 	public function clearDialog():Void {
 		dialog.deletePopUp();
+		isOpen = false;
 	}
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned

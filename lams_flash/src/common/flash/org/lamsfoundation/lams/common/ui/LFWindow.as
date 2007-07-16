@@ -38,7 +38,6 @@ class LFWindow extends Window{
     //Declarations
     //Static vars
     public static var symbolOwner:Object = Window;
-    //public static var symbolName:String = 'LFWindow';
 	
     private static var MIN_WIDTH = 160;                      //Minimum window dimensions
     private static var MIN_HEIGHT = 120;
@@ -67,9 +66,7 @@ class LFWindow extends Window{
     }
     
 	public function init():Void {
-        //trace('init');
  	    super.init();
-		
 		
 		//LFWindow contains a scroll pane which contains the content.
         contentPath = 'ScrollPane';
@@ -92,7 +89,7 @@ class LFWindow extends Window{
 		//Assign scroll pane content
 		content.contentPath = _scrollContentPath;
 		
-		if (_scrollContentPath == "AboutLams"){
+		if (_scrollContentPath == "AboutLams" || _scrollContentPath == "AlertDialog"){
 			resize_mc._visible = false
 		}
 
@@ -105,18 +102,17 @@ class LFWindow extends Window{
         centre();
 		this._visible = true;
         setUpFinished = true;
+		
 		this.removeEventListener('complete',scrollLoaded);
 	}
     
     public function createChildren(Void):Void {
-        //trace('createChildren');
         super.createChildren();
         
         //TODO DI-13/05/05 add the code to handle dynamic button addition
         //Add extra buttons as required
         
-        //Attach resize and set up resize handling 
-		//resize_mc._visible = viewResize
+        //Attach resize and set up resize handling
         resize_mc = this.createChildAtDepth('resize',DepthManager.kTop);
         resize_mc.resize_btn.useHandCursor = false;
 
@@ -136,6 +132,7 @@ class LFWindow extends Window{
             }
             this.startDrag();
         }
+		
         //On release / releaseOutside stop the drag and kill onEnterFrame handler
         resize_mc.resize_btn.onRelease = resize_mc.resize_btn.onReleaseOutside = function (){
             this.stopDrag();
@@ -144,7 +141,6 @@ class LFWindow extends Window{
     }
     
 	public function draw(Void):Void {
-        //trace('draw');
         //Call the super methods and size after a draw.
         super.draw();
         size();
@@ -154,7 +150,6 @@ class LFWindow extends Window{
 	* called when object is sized, e.g. draw, setSize etc.
 	*/
     public function size(Void):Void {
-        //trace('size')
         super.size();
         
         //If the content is too small then put in scroll bars
@@ -170,8 +165,12 @@ class LFWindow extends Window{
             content.vScrollPolicy = 'off';
         }
         
-		//content.setSize(width,height);
-        if(setUpFinished){
+		if(_scrollContentPath = "AlertDialog") {
+			content.vScrollPolicy = 'off';
+			content.hScrollPolicy = 'off';
+		}
+		
+		if(setUpFinished){
 		    content.content.setSize(width-MARGIN_WIDTH,height-MARGIN_HEIGHT);
         }
         
@@ -191,7 +190,6 @@ class LFWindow extends Window{
     * Centres the window on the stage
     */
     public function centre() {
-        //trace('centre');
         //Calculate centre
         this._x = Stage.width/2 - this.width/2;
         this._y = Stage.height/2 - this.height/2;
@@ -201,7 +199,6 @@ class LFWindow extends Window{
     * overrides UIObject.setStyle to provide custom style setting
     */
     public function setStyle(styleName:String,styleObj:Object){
-        //trace('setstyle');
         //Pass it up the inheritance chain to set any inherited styles or non-custom/LAMS style properties
         super.setStyle(styleName,styleObj);
         //Pass on to the scrollpane as the theme color doesn't seem to inherit correctly from the Window parent
