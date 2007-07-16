@@ -35,18 +35,35 @@ JAVA_REQ_VERSION=`echo $JAVA_REQ_VERSION | sed -e 's;\.;0;g'`
 
 wrapper=""
 
+# invoked when the install is failed
+installfailed()
+{
+       	echo ""
+	export JAVA_HOME=$ORIG_JAVA_HOME        
+	exit 1
+}
+
+# Invoked when the install is exited
+installexit()
+{
+	echo ""
+        export JAVA_HOME=$ORIG_JAVA_HOME
+	exit 0
+}
+
 checkJava()
 {
-	$JDK_DIR/bin/java -cp bin testJava	
+	ORIG_JAVA_HOME=$JAVA_HOME
+        export JAVA_HOME=$JDK_DIR
+        JAVA_EXE=$JAVA_HOME/bin/java
+
+	java -cp bin testJava	
 	if [  "$?" -ne  "0" ]
         then
 		echo "Install failed. Could not verify java installation, check your lams.properties file for the correct JDK_DIR entry, and that you have set your JAVA_HOME and PATH environment variables correctly."
 		echo "Refer to the readme for help with setting up java for LAMS."
-       		exit 1
+       		installfailed
         fi
-
-	
-	
 	
 	# Check JAVA_HOME directory to see if Java version is adequate
 	if [ $JAVA_HOME ]
@@ -103,7 +120,7 @@ checkJava()
 		export JAVA_HOME
 	else
 		echo "No installation of java found, please set your JAVA_HOME to point to java 1.5 or newer, then run the installer."
-		exit 0
+		installexit
 	fi
 }
 
@@ -116,7 +133,7 @@ checkMysql()
 		if [  "$?" -ne  "0" ]
         	then
         		printf "\nInstall Failed. MySql check did not pass. Please check that your DB_ROOT_PASSWORD in lams.properties is set to the root password of your MySql 5.x server\n\n"
-        		exit 1
+        		installfailed
 		fi
 	fi
 }
@@ -131,7 +148,7 @@ createDatabase()
 		if [  "$?" -ne  "0" ]
 		then
         		echo "Install failed. Error creating the LAMS database. Check your MySql settings and try again."
-        		exit 1
+        		installfailed
 		fi
 		printf "Database Created.\n \n"
 	fi
@@ -141,7 +158,7 @@ createDatabase()
         if [  "$?" -ne  "0" ]
         then
                         echo "Install failed. Error generating setLamsConfiguration.sql. Please check log/filter-config for errors.\n\n"
-                        exit 1
+                        installfailed
         fi
 
 
@@ -149,7 +166,7 @@ createDatabase()
 	if [  "$?" -ne  "0" ]
         then
                         printf "\nInstall failed. Could not fill the LAMS database. If you are installing with a remote MySql server, please check that your SQL_HOST in lams.properties points to a MySql 5.x installation and that you have created a database with the name DB_NAME as in lams.properties and that the DB_USER has remote access granted. Check the readme for instructions on how to do this.\n\n"
-                        exit 1
+                        installfailed
         fi
 	print "Done.\n\n"
 
@@ -213,7 +230,7 @@ chooseWrapper()
                                 ;;
                         q)
                                 printf "\n\nBye!\n\n"
-                               	exit 0
+                               	installexit
 				;;
 			n)
 				wrapper=""
@@ -239,7 +256,7 @@ installWrapper()
         case "$input" in
         q)
            	printf "\n\nBye!\n\n" 
-                exit 0
+                installexit
                 ;;
         y)
 		chooseWrapper
@@ -267,7 +284,7 @@ configureWrapper()
 		if [  "$?" -ne  "0" ]
   	    	then
         		echo "\nInstall Failed. Problem while configuring wrapper. Please configure-wrapper.log for details.\n\n"
-        		exit 1
+        		installfailed
 		fi
 
 
@@ -295,7 +312,7 @@ checkJboss()
   		echo "JBoss Directory Found"
 	else
 		printf "\n\nInstall Failed. No installation of JBoss-4.0.2 was found at $JBOSS_DIR. Please check your lams.properties file and retry.\n\n"
-		exit 1
+		installfailed
 	fi	
 }
 
@@ -324,10 +341,10 @@ then
 		;;
 	n)      
 		printf "\nBye!\n\n"
-        	exit 0
+        	installexit
         	;;
 	*)      printf "\n\n"
-        	exit 1
+        	installfailed
         	;;
 		esac
 fi
@@ -339,10 +356,10 @@ case "$continue" in
 y)
 	;;
 n)	printf "\nBye!\n\n"
-	exit 0 
+	installexit
 	;;
 *)  	printf "\n\n"
-	exit 1
+	installfailed
 	;;
 esac
 
@@ -364,7 +381,7 @@ printf "\nDone.\n\n"
 if [  "$?" -ne  "0" ]
         then
         echo "Install Failed. Problem while copying the jboss-4.0.2 directory, please try again."
-       	exit 1
+       	installfailed
 fi
 
 
@@ -375,7 +392,7 @@ ant/bin/ant -buildfile ant-scripts/configure-deploy.xml -logfile log/copy-conf.l
 if [  "$?" -ne  "0" ]
         then
         echo "Install Failed. Problem while copying the jboss-4.0.2 configuration files, check log/configure-deploy.log for details."
-        exit 1
+        installfailed
 fi
 
 chmod 755 $JBOSS_DIR/bin/run-lams.sh
@@ -390,7 +407,7 @@ cp assembly/lams-session.jar  assembly/lams-valve.jar $JBOSS_DIR/server/default/
 if [  "$?" -ne  "0" ]
         then
         echo "\nInstall Failed. Problem while configuring JBoss, please ensure you have the correct version of JBoss (4.0.2).\n\n"
-        exit 1
+        installfailed
 fi
 
 
@@ -398,6 +415,8 @@ printf "Copying lams.properties to /etc.\n"
 mkdir -p  /etc/lams2
 cp lams.properties /etc/lams2/
 
+# changing JAVA_HOME back 
+export JAVA_HOME=$ORIG_JAVA_HOME
 
 printf "\n\nLAMS $LAMS_VERSION Configuration completed!\n"
 printf "Please view the README for instructions on how to run LAMS.\n\n"
