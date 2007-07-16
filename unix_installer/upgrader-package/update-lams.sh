@@ -19,39 +19,95 @@
 #   http://www.gnu.org/licenses/gpl.txt 
 #
 #   Author: Luke Foxton 
+#   Updater shell script for LAMS
 
-# Installer shell script for LAMS 2.0.2
+# Usage: sudo ./update-lams.sh
 
-# Usage: sudo ./install.sh
-
-
-lams_dir=''
+LAMS_VERSION=2.0.4
+REQ_LAMS_VERSION=2.0.2
 JAVA_REQ_VERSION=1.5
 # Transform the required version string into a number that can be used in comparisons
 JAVA_REQ_VERSION=`echo $JAVA_REQ_VERSION | sed -e 's;\.;0;g'`
 
-lamsdir=`java -cp bin readProperty LAMS_DIR`
-jbossdir=`java -cp bin readProperty JBOSS_DIR`
-sqldir=`java -cp bin readProperty SQL_DIR`
-dbname=`java -cp bin readProperty DB_NAME`
-dbuser=`java -cp bin readProperty DB_USER`
-dbpass=`java -cp bin readProperty DB_PASS`	
+# backup the lams.properties
+cp lams.properties docs/lams.properties.backup.orig
+
+# Invoked when the install is failed
+installfailed()
+{
+        echo ""
+	cp lams.properties docs/lams.properties.backup.exec
+	cp docs/lams.properties.backup.orig lams.properties
+	export JAVA_HOME=$ORIG_JAVA_HOME
+        exit 1
+}
+
+# Invoked when the install is exited
+installexit()
+{
+	echo ""
+	cp lams.properties docs/lams.properties.backup.exec
+	cp docs/lams.properties.backup.orig lams.properties
+	export JAVA_HOME=$ORIG_JAVA_HOME
+        exit 0
+}
+
+
+# Detecting if there is an existing lams.properties file
+if [ -r /etc/lams2/lams.properties ]
+then
+	useproperties=""
+	clear
+	printf "\nThe LAMS $LAMS_VERSION updater has detected a lams.properties file in /etc/lams2.\n"
+	printf "Do you wish to use this file? (y)es (n)o (q)uit\n> "
+	read useproperties
+
+	case "$useproperties" in
+        y)
+		printf "\nUsing lams.properties from /etc/lams2.\n"
+		cp /etc/lams2/lams.properties .		
+
+		# backup the lams.properties
+		cp lams.properties docs/lams.properties.backup.etc
+		sleep 1
+                ;;
+        n)
+		# do nothing
+                ;;
+        *)
+		installexit
+		;;
+	esac	
+fi
+
+# getting all the lams.properties variables into the variable space
+. ./lams.properties
+
+# New variables introduced with 2.0.4 updater
+SQL_HOST=localhost
+SQL_URL=jdbc:mysql://$SQL_HOST/$DB_NAME?characterEncoding=utf8&autoReconnect=true
+
+# Checking that the lams.properties points to 'a' lams installation
+if [ ! -r "$JBOSS_DIR/server/default/deploy/lams.ear/lams.jar" ]
+                then
+                        printf "\nUpdate failed, Could not find lams.jar at JBOSS_DIR/server/default/deploy/lams.ear.\nPlease check that have LAMS $REQ_LAMS_VERSION is installed and your lams.properties file is correct before running this update.\n"
+                        installfailed
+fi
+
 
 checkJava()
 {
-	
-	
-	jdkdir=`java -cp bin readProperty JDK_DIR`
-	$jdkdir/bin/java -cp bin testJava	
+	ORIG_JAVA_HOME=$JAVA_HOME
+        export JAVA_HOME=$JDK_DIR
+        JAVA_EXE=$JAVA_HOME/bin/java
+
+	$JDK_DIR/bin/java -cp bin testJava	
         if [  "$?" -ne  "0" ]
         then
 		echo "Update failed. Could not verify java installation, check your lams.properties file for the correct JDK_DIR entry, and that you have set your JAVA_HOME and PATH environment variables correctly"
 		echo "Refer to the readme for help with setting up java for LAMS"
-       		exit 1
-        fi
-
-	
-	
+        	installfailed
+	fi
 	
 	# Check JAVA_HOME directory to see if Java version is adequate
 	if [ $JAVA_HOME ]
@@ -108,56 +164,89 @@ checkJava()
 		export JAVA_HOME
 	else
 		echo "No installation of java found, please set your JAVA_HOME to point to java 1.5 or newer, then run the installer."
-		exit 0
+		installfailed
 	fi
 }
 
-checkmysql()
+checkMysql()
 {
-	mysqldir=`java -cp bin readProperty SQL_DIR`
-		
-        if [ -x  "$mysqldir/mysql" ]
-        then
-		echo "Found mysql executable"
-	else
-		echo "Update failed, could not fine sql executable at $mysqldir. Check your lams.properties file for correct configurations."
-       		exit 1	
-        fi
+	printf "Checking LAMS database...\n"
+        $JDK_DIR/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$SQL_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION"
 
-	java -cp bin:tools/lib/mysql-connector-java-3.1.12-bin.jar checkmysql
-        if [  "$?" -ne  "0" ]
+	if [  "$?" -ne  "0" ]
         then
-                "Update failed, The version of lams installed is not compatible with this upgrader"
-		exit 1
+		installfailed
         fi
+}
+
+getMysqlHost()
+{
+	SQL_HOST=""
+        SQL_URL=""
+        continue=""
+        printf "Please enter the location of your MySql Host (Default: localhost)\n> "
+        read SQL_HOST
+        if [ -z "$SQL_HOST" ]
+	then	
+                SQL_HOST=localhost
+	fi
+
+        SQL_URL="jdbc:mysql://$SQL_HOST/$DB_NAME?characterEncoding=utf8&autoReconnect=true"
+
+        printf "\nAll LAMS database update connections will be done through: \n$SQL_URL.\n"
+        printf "Is this correct? (y)es, (n)o, (q)uit.\n> "
+        read continue
+
+        case $continue in
+        q)
+                printf "\nTo set up MySql on a separate server, follow the instructions in the readme.\n\n"
+                printf "LAMS update aborted by user.\n\n"
+                installexit
+                ;;
+        y)
+	
+		# append SQL_HOST and SQL_URL to lams.properties
+               	echo "# Updater-generated properties, used instead of default localhost" >> lams.properties
+		echo "SQL_HOST=$SQL_HOST" >> lams.properties
+		echo "SQL_URL=jdbc:mysql://${SQL_HOST}/${DB_NAME}?characterEncoding=utf8&autoReconnect=true" >> lams.properties
+		printf "\n"
+		;;
+	n)
+                printf "\n"
+                getMysqlHost
+                ;;
+        *)
+                printf "\nPlease enter your MySql host and then enter (y).\n"
+                getMysqlHost
+                ;;
+        esac
 }
 
 checklams()
 {
 	printf "Do you want to run the LAMS shutdown script before continuing? (Recommended)\n"
-	printf "(y)es I want to run the JBOSS shutdown script\n"
-	printf "(n)o I have already shutdown LAMS. Continue with the upgrade:\n"
-	printf "(q)uit\n"
+	printf "(y)es I want to run the JBOSS shutdown script.\n"
+	printf "(n)o I have already shutdown LAMS. Continue with the upgrade.\n"
+	printf "(q)uit.\n"
 	printf "> "
 	shutdown=""
 	read shutdown
 
 	case "$shutdown" in 
 	q)
-		exit
+		echo "Update aborted by user"
+		installexit
 		;;
 	y)
-		java -cp bin getJbossDir
-		if [  "$?" -ne  "0" ]
-		then
-			va -cp bin:tools/lib/mysql-connector-java-3.1.12-bin.jar checkmysql
-echo "Update failed, please check that LAMS 2.0 is installed and you lams.properties file is correct."
-			exit 1
-		fi
-		chmod 755 bin/shutdown.sh
 		printf "\nPlease wait a few moments while LAMS shuts down\n"
-		bin/shutdown.sh
-		printf "Waiting for shutdown to finish\n"
+		if [ -x "$JBOSS_DIR/bin/lams2" ]
+		then
+			$JBOSS_DIR/bin/lams2 stop
+		else
+	        	$JBOSS_DIR/bin/shutdown.sh -S 	
+		fi	
+	
+		printf "\nWaiting for shutdown to finish.\n"
 		printf "..........."
 		sleep 3
 		printf "....................."
@@ -179,34 +268,35 @@ echo "Update failed, please check that LAMS 2.0 is installed and you lams.proper
 
 backup()
 {
-	printf "Do you wish to backup lams before updating? (Recommended) (y)es, (n)o, (q)uit): "
+	printf "\nDo you wish to backup lams before updating? (Recommended. NOTE: Requires MySql to be installed at localhost)\n"
 	printf "The space required to backup your LAMS installation: \n"
-	du -chs $lamsdir $jbossdir
-	printf "(y)es, (n)o, (q)uit "
-	printf "\n> "
+	du -chs $LAMS_DIR $JBOSS_DIR
+	printf "(y)es I wish to backup LAMS.\n"
+	printf "(n)o I have already backed up LAMS, I am ready to update.\n"
+	printf "(q)uit.\n"
+	printf "> "
 	backup=""	
 	read backup
 
 	case "$backup" in 
 	q)
 		printf "\nTo backup your LAMS installation manually, simply follow the follwing steps..."
-		printf "\n1) Backup $jbossdir\n"				      
-		printf "2) Backup $lamsdir\n"					      
+		printf "\n1) Backup $JBOSS_DIR\n"				      
+		printf "2) Backup $LAMS_DIR\n"					      
 		printf "3) Backup /etc/lams2\n"					      
 		printf "4) Dump the database by executing the following command. Fill in your own backup direcory\n"
 		printf "> $sqldir/mysqldump -u$dbuser -p$dbpass $dbname > (backup dir)/lams.dump\n\n" 
 		
-		exit 0 
+		installexit 
 		;;
 	y)
-		checkmysql
 		
 		
-		java -cp bin backup
+		$JDK_DIR/bin/java -cp bin backup
 		if [  "$?" -ne  "0" ]
                 then
                         echo "Update failed, please check that LAMS 2.0 is installed and your lams.properties file is correct."
-                        exit 1
+                        installfailed
                 fi
 
 		chmod 755 bin/lamsdump.sql
@@ -214,12 +304,11 @@ backup()
 		if [  "$?" -ne  "0" ]
                 then
                         echo "Update failed, please check that LAMS 2.0 is installed and your lams.properties file is correct."
-                        exit 1
+                        installfailed
                 fi
 
 		;;
 	n) 
-		checkmysql
 
 		;;
 	*)
@@ -233,7 +322,7 @@ backup()
 checkJava
 clear
 printf "\n--------------------------------------------------------------------------------\n\n"
-printf "WELCOME to the LAMS 2.0.2 Unix updater! \n\n"
+printf "WELCOME to the LAMS $LAMS_VERSION Unix updater! \n\n"
 printf "Please ensure you have read and accepted the licence agreement before continuing\n\n"
 printf "This installer will prompt you to enter many configurations and locations\n"
 printf "on your computer so please make sure you are ready.\n"
@@ -241,24 +330,88 @@ printf "You should read the installation guide before continuing.\n"
 printf "\nJAVA_HOME = $JAVA_HOME\n"
 printf "\n--------------------------------------------------------------------------------\n\n"
 
-
+getMysqlHost
+checkMysql
 checklams
 backup
-printf "\nBeginning ant scripts, check log/install.log for install log\n"
-ant/bin/ant -logfile log/install.log -buildfile ant-scripts/update-lams-2.0.2.xml update-lams
+printf "\nBeginning ant scripts, check log/install.log for install log. This may take a few minutes...\n"
+ant/bin/ant -logfile log/install.log -buildfile ant-scripts/update-lams.xml update-lams
 if [  "$?" -ne  "0" ]
         then
         echo "Update failed, check the log/install.log file for details."
-       	exit 1
+       	installfailed
+fi
+
+# Checking the log to see if there was any failures from the tool deployer (invoked in update-lams.xml)
+failed=`grep FAILED log/*`
+if [ "$failed" ]
+then
+	printf "\nUpdate failed. There were failures during the updating process. You may have the wrong MySql host, database name, user or password in your lams.properties file.\nCheck the logs listed below for details.\n"
+	printf "$failed\n"
+	installfailed
 fi
 
 
-printf "\nLAMS 2.0.2 Configuration completed!\n"
+# creating the repository, dump and temp dirs if they dont already exist
+if [ ! -d $LAMS_DIR ]
+then
+	mkdir $LAMS_DIR
+fi
+if [ ! -d $LAMS_DIR/repository ]
+then
+	mkdir $LAMS_DIR/repository
+fi
+if [ ! -d $LAMS_DIR/temp ]
+then
+        mkdir $LAMS_DIR/temp
+fi
+if [ ! -d $LAMS_DIR/dump ]
+then
+        mkdir $LAMS_DIR/dump
+fi
+
+##### 2.0.4 Update Specific Java Program, DELETE for later updates
+$JDK_DIR/bin/java -cp  bin:bin/hibernate3.jar:tools/lib/mysql-connector-java-3.1.12-bin.jar:tools/lib/commons-logging.jar UpdateLAMS202Chat "$SQL_URL" "$DB_USER" "$DB_PASS" "$LAMS_DIR/repository" > log/update-chat-204.log
+if [  "$?" -ne  "0" ]
+then
+        echo "Update failed, problem while updating chat tool to 2.0.4. Check log/update-chat-204.log for details.\n"
+        installfailed
+fi
+#####
+
+##### 2.0.4 Update specific, updating lamsauthentication.xml
+if [ -d "$EAR_DIR/jbossweb-tomcat55.sar" ]
+then 
+	printf "\nRemoving $DEPLOY_DIR/jbossweb-tomcat55.sar\n"
+	rm -r "$EAR_DIR/jbossweb-tomcat55.sar"
+fi
+cp conf/lamsauthentication.xml $DEFAULT_DIR/conf
+
+ant/bin/ant -logfile log/update-conf.log -buildfile ant-scripts/update-204_jbossweb-tomcat55.sar.xml update-conf-204
+if [  "$?" -ne  "0" ]
+then
+        echo "Update failed, problem while updating configuration files to 2.0.4. Check log/update-conf.log for details.\n"
+        installfailed
+fi
+#####
+
+# copying lams.properties to /etc/lams2
+printf "\nCopying lams.properties to /etc/lams2"
+if [ ! -d /etc/lams2 ]
+then
+        mkdir /etc/lams2
+fi
+cp lams.properties /etc/lams2/lams.properties
+
+# changing JAVA_HOME back
+export JAVA_HOME=$ORIG_JAVA_HOME
+
+printf "\nLAMS $LAMS_VERSION Configuration completed!\n"
 printf "Please view the README for instructions on how to run LAMS\n\n"
 
 printf "\nTo backup your LAMS installation manually, simply follow the follwing steps..."
-printf "\n1) Backup $jbossdir\n"
-printf "2) Backup $lamsdir\n"
+printf "\n1) Backup $JBOSS_DIR\n"
+printf "2) Backup $LAMS_DIR\n"
 printf "3) Backup /etc/lams2\n"
 printf "4) Dump the database by executing the following command. Fill in your own backup direcory\n"
 printf "> $sqldir/mysqldump -u$dbuser -p$dbpass $dbname > (backup dir)/lams.dump\n\n"
