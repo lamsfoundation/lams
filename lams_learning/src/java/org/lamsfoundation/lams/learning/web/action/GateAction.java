@@ -209,7 +209,7 @@ public class GateAction extends LamsDispatchAction
      * class to tell the ActionServlet where to send the end-user.
      * @param gateForm The ActionForm class that will contain any data submitted
      * by the end-user via a form.
-     * @param permissionGate the gate acitivty object
+     * @param permissionGate the gate activity object
      * @return An ActionForward class that will be returned to the ActionServlet 
      * 		   indicating where the user is to go next.
      */
