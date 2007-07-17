@@ -39,20 +39,13 @@ import javax.servlet.http.HttpSession;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityTitleComparator;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
-import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
-import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
-import org.lamsfoundation.lams.learningdesign.GroupComparator;
-import org.lamsfoundation.lams.learningdesign.Grouping;
-import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
-import org.lamsfoundation.lams.monitoring.BranchDTO;
 import org.lamsfoundation.lams.monitoring.BranchingDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
@@ -70,6 +63,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 * <UL>
 * <LI>AJAX based Chosen Branching screen</LI>
 * <LI>View only screen for Group Based and Tool Based branching</LI>
+* <LI>Class export portfolio page for all branching types
 * </UL>
 * 
 * @author Fiona Malikoff
@@ -96,14 +90,9 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 	public static final String PARAM_MAY_DELETE = "mayDelete";
 	public static final String PARAM_MEMBERS = "members";
 	public static final String PARAM_SHOW_GROUP_NAME = "showGroupName";
+	/** If localFiles = true will be written to a local file for export portfolio */
+	public static final String PARAM_LOCAL_FILES= "localFiles"; 
 	
-	private Integer getUserId(HttpServletRequest request) {
-		HttpSession ss = SessionManager.getSession();
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		return user != null ? user.getUserID() : null;
-	}
-	
-
 	private void writeAJAXResponse(HttpServletResponse response, String output) throws IOException {
 		response.setContentType("text/html");
 	    PrintWriter writer = response.getWriter();
@@ -137,14 +126,15 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 			throw new MonitoringServiceException(error);
     	}
 
-    	// in general the progress engine expects the activity and lesson id to be in the request,
-    	// so follow that standard.
-		request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activityID);
-		request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
-		request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
 	
 		if ( activity.isChosenBranchingActivity() ) {
 			
+	    	// in general the progress engine expects the activity and lesson id to be in the request,
+	    	// so follow that standard.
+			request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activityID);
+			request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
+			request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
+
 			// can we still move users? check each group for tool sessions.
 			Iterator iter = ((BranchingActivity)activity).getActivities().iterator();
 			boolean mayMoveUser = true;
@@ -161,19 +151,61 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 			
 		} else {
 			// go to a view only screen for group based and tool based grouping
-			// only show the group names if this is a group based branching activity - the names
-			// are meaningless for tool based branching
-			BranchingDTO dto = new BranchingDTO((BranchingActivity) activity);
-			request.setAttribute(PARAM_BRANCHING_DTO, dto);
-			request.setAttribute(PARAM_SHOW_GROUP_NAME, activity.isGroupBranchingActivity());
-			if ( log.isDebugEnabled() ) {
-				log.debug("assignBranch: Branching activity "+dto);
-			}
-			return mapping.findForward(VIEW_BRANCHES_SCREEN);
+			return viewBranching((BranchingActivity) activity, lessonId, false, mapping, request);
 		}
     	
 	}
     
+   /**
+     * Export Portfolio Page
+     */
+    public ActionForward exportPortfolio(ActionMapping mapping,
+                                  ActionForm form,
+                                  HttpServletRequest request,
+                                  HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+        long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+        long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+
+        IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	Activity activity = monitoringService.getActivityById(activityId);
+    	if ( activity == null ||  !activity.isBranchingActivity() ) {
+			String error = "Activity is not a branching activity. Activity was "+activity; 
+			log.error(error);
+			throw new MonitoringServiceException(error);
+    	}
+
+    	return viewBranching((BranchingActivity) activity, lessonId, true, mapping, request);
+    }
+
+
+	/** 
+	 * Display the view screen, irrespective of the branching type.
+     *
+	 * Input parameters: activityID
+	 */
+	private ActionForward viewBranching(BranchingActivity activity, Long lessonId, boolean useLocalFiles, 
+			ActionMapping mapping, HttpServletRequest request) throws IOException, ServletException {
+
+    	// in general the progress engine expects the activity and lesson id to be in the request,
+    	// so follow that standard.
+		request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());
+		request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
+		request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
+		request.setAttribute(PARAM_LOCAL_FILES, useLocalFiles);
+	    	
+		// only show the group names if this is a group based branching activity - the names
+		// are meaningless for chosen and tool based branching
+		BranchingDTO dto = new BranchingDTO((BranchingActivity) activity);
+		request.setAttribute(PARAM_BRANCHING_DTO, dto);
+		request.setAttribute(PARAM_SHOW_GROUP_NAME, activity.isGroupBranchingActivity());
+		if ( log.isDebugEnabled() ) {
+			log.debug("viewBranching: Branching activity "+dto);
+		}
+		return mapping.findForward(VIEW_BRANCHES_SCREEN);
+	}
+    	
 	/** 
 	 * Get a list of branch names, their associated group id and the number of users in the group. Designed to respond to an AJAX call.
      *
@@ -351,4 +383,4 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 		return null;
 	}
 
-}
+ }

@@ -83,6 +83,11 @@
 
    </servlet>
    <servlet>
+      <servlet-name>branchingExportPortfolio</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.BranchingExportPortfolioServlet</servlet-class>
+
+   </servlet>
+   <servlet>
       <servlet-name>gateExportPortfolio</servlet-name>
       <servlet-class>org.lamsfoundation.lams.monitoring.web.GateExportPortfolioServlet</servlet-class>
 
@@ -126,6 +131,10 @@
    <servlet-mapping>
       <servlet-name>createLessonClass</servlet-name>
       <url-pattern>/createLessonClass</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>branchingExportPortfolio</servlet-name>
+      <url-pattern>/branchingExportPortfolio</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>gateExportPortfolio</servlet-name>

@@ -50,26 +50,23 @@ public class ActivityMappingStrategy implements Serializable {
 		if ( activity == null ) {
 			strutsAction = PROGRESS_BROKEN_ACTION;
 		}
-		else if ( activity.isComplexActivity() ) 
-		{
-			if ( activity.isParallelActivity() )
-		        strutsAction = "/DisplayParallelActivity.do";
-		    else if (activity.isOptionsActivity()) 
-		        strutsAction = "/DisplayOptionsActivity.do";
-		    else if (activity.isBranchingActivity()){
-			    strutsAction = "/Branching.do?method=performBranching";
-		    } else if ( activity.isSequenceActivity() ) {
-			    strutsAction = "/SequenceActivity.do";
-		    } else {
-		    	// unexpected type
-		    	log.error("Unexpected complex activity type "+activity);
-				strutsAction = PROGRESS_BROKEN_ACTION;
-		    }
-		}
-		else // should be a simple activity - can handle tool, gates and grouping
-		{
+		else if ( activity.isSystemToolActivity() || activity.isToolActivity() ) {
 		    strutsAction = "/LoadToolActivity.do";
 		}
+		else if ( activity.isParallelActivity() ) {
+		    strutsAction = "/DisplayParallelActivity.do";
+		} 
+		else if (activity.isOptionsActivity())  {
+		    strutsAction = "/DisplayOptionsActivity.do";
+		}
+		else if ( activity.isSequenceActivity() ) {
+		    strutsAction = "/SequenceActivity.do";
+	    } 
+		else {
+	    	// unexpected type
+	    	log.error("Unexpected activity type "+activity);
+			strutsAction = PROGRESS_BROKEN_ACTION;
+	    }
 		return strutsAction;
 	}
 

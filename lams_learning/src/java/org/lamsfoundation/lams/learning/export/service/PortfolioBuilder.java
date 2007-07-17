@@ -32,14 +32,13 @@ import org.apache.commons.collections.ArrayStack;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.export.ActivityPortfolio;
 import org.lamsfoundation.lams.learning.export.NotebookPortfolio;
-import org.lamsfoundation.lams.learning.export.ExportPortfolioConstants;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.ISystemToolActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignProcessor;
 import org.lamsfoundation.lams.learningdesign.SimpleActivity;
-import org.lamsfoundation.lams.learningdesign.SystemToolActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
@@ -124,6 +123,12 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 			complexPortfolio.setChildPortfolios(currentPortfolioList);
 		}
 		
+		if ( activity.isSystemToolActivity() ) {
+			String exportURL = getExportURLForSystemTool(activity);
+			complexPortfolio = complexPortfolio == null ? createActivityPortfolio(activity) : complexPortfolio;
+			complexPortfolio.setExportUrl(exportURL);
+		}
+		
 		currentPortfolioList = (ArrayList<ActivityPortfolio>) activityListStack.pop();
 		if ( complexPortfolio != null )
 			currentPortfolioList.add(complexPortfolio);
@@ -137,12 +142,9 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	public void endSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
 		
 		// if learner only include the attempted and completed activities
-		// if learner don't include gates
-		if (accessMode == ToolAccessMode.LEARNER) {
-			if ( activity.isGateActivity() || 
-					! ( progress.getCompletedActivities().contains(activity) || progress.getAttemptedActivities().contains(activity)) ) {
-				return;
-			}
+		if (accessMode == ToolAccessMode.LEARNER &&
+			 ! ( progress.getCompletedActivities().contains(activity) || progress.getAttemptedActivities().contains(activity)) ) {
+			return;
 		}
 
 		ActivityPortfolio p = createActivityPortfolio(activity);
@@ -179,36 +181,52 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 			}
 			
 		} else if ( activity.isSystemToolActivity() ) {
-			// only include the gates in the teacher version - learner gate has been avoided at the beginning of this method
-			// always include grouping
-			// system tools don't use the modes or the tool session id but need to add them or the validation fails in 
-			// AbstractExportPortfolio servlet. So why leave the validation there - because system tools are the exception
-			// rather than the rule. In the future, they may need these parameters.
-			SystemToolActivity sysToolActivity = (SystemToolActivity) activity;
-			SystemTool tool = sysToolActivity.getSystemTool();
-			if ( tool != null ) {
-				if (accessMode == ToolAccessMode.LEARNER) {
-					exportUrlForTool = tool.getExportPortfolioLearnerUrl();
-				} else { 
-					exportUrlForTool = tool.getExportPortfolioClassUrl();
-				}
-			}
-			if ( exportUrlForTool != null ) {
-				if (accessMode == ToolAccessMode.LEARNER) {
-					exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_USER_ID, user.getUserId().toString());
-					exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_TOOL_SESSION_ID, "0");
-				} else { 
-					exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_TOOL_CONTENT_ID, "0");
-				}
-				exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId().toString());
-				exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_LESSON_ID, lesson.getLessonId().toString());
-			}
+			exportUrlForTool = getExportURLForSystemTool(activity);
 		} 
 		
 		p.setExportUrl(exportUrlForTool);
 		
 		currentPortfolioList.add(p);
 		
+	}
+
+	/**
+	 * A system tool may be a simple or a complex activity, so the logic is in a method called by both endSimpleActivity()
+	 * and endComplexActivity(). Only include the gates and branching in the teacher version, but always include grouping. This is
+	 * controlled by the urls in the db - if there isn't a url in the system table then we assume that there shouldn't
+	 * be a screen.
+	 * <p>
+	 * System tools don't use the modes or the tool session id but need to add them or the validation fails in 
+	 * AbstractExportPortfolio servlet. So why leave the validation there - because system tools are the exception rather than the rule. 
+	 * In the future, they may need these parameters.
+	 *
+	 * @param activity: an activity which also meets the ISystemToolActivity interface
+	 * @param exportUrlForTool
+	 */
+	private String getExportURLForSystemTool(Activity activity) {
+		
+		String exportUrlForTool = null;
+		ISystemToolActivity sysToolActivity = (ISystemToolActivity) activity;
+		SystemTool tool = sysToolActivity.getSystemTool();
+		
+		if ( tool != null ) {
+			if (accessMode == ToolAccessMode.LEARNER) {
+				exportUrlForTool = tool.getExportPortfolioLearnerUrl();
+			} else { 
+				exportUrlForTool = tool.getExportPortfolioClassUrl();
+			}
+		}
+		if ( exportUrlForTool != null ) {
+			if (accessMode == ToolAccessMode.LEARNER) {
+				exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_USER_ID, user.getUserId().toString());
+				exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_TOOL_SESSION_ID, "0");
+			} else { 
+				exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_TOOL_CONTENT_ID, "0");
+			}
+			exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId().toString());
+			exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_LESSON_ID, lesson.getLessonId().toString());
+		}
+		return exportUrlForTool;
 	}
 	
 	/**

@@ -61,8 +61,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:forEach>
 	</table>
 		
-	<%@ include file="../template/finishbutton.jsp" %>
-
+	<c:if test="${localFiles}">
+		<%@ include file="../template/finishbutton.jsp" %>
+	</c:if>
 </div>  <!--closes content-->
 
 

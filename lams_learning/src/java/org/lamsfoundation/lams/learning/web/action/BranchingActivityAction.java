@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  *
  * XDoclet definition:
  * 
- * @struts:action path="/Branching" 
+ * @struts:action path="/branching" 
  * 				  name="BranchingForm"
  * 				  parameter="method" 
  *                validate="false"
