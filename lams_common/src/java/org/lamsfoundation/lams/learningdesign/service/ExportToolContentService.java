@@ -1726,14 +1726,15 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 */
 	private Activity getActivity(AuthoringActivityDTO actDto, Map<Long, Grouping> groupingList, 
 			Map<Long,ToolContent> toolMapper, Map<Integer,SequenceActivity> firstChildUIIDToSequenceMapper) {
-		Activity act = null;
+
 		if(actDto == null)
-			return act;
+			return null;
 		int type = actDto.getActivityTypeID().intValue();
 		Grouping newGrouping;
-		switch(type){
+
+		Activity act = Activity.getActivityInstance(type);
+		switch(act.getActivityTypeId()){
 			case Activity.TOOL_ACTIVITY_TYPE:
-				act = new ToolActivity();
 				//get back the toolContent in new system by toolContentID in old system.
 				ToolContent content = toolMapper.get(actDto.getToolContentID());
 				//if activity can not find matching tool, the content should be null.
@@ -1744,14 +1745,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				}
 				break;
 			case Activity.GROUPING_ACTIVITY_TYPE:
-				act = new GroupingActivity();
 				newGrouping = groupingList.get(actDto.getCreateGroupingID());
 				((GroupingActivity)act).setCreateGrouping(newGrouping);
 				((GroupingActivity)act).setCreateGroupingUIID(newGrouping.getGroupingUIID());
 				((GroupingActivity)act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUPING));
 				break;
 			case Activity.SYNCH_GATE_ACTIVITY_TYPE:
-				act = new SynchGateActivity();
 				((SynchGateActivity)act).setGateActivityLevelId(actDto.getGateActivityLevelID());
 				//always set false
 				((SynchGateActivity)act).setGateOpen(false);
@@ -1759,7 +1758,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				((SynchGateActivity)act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.SYNC_GATE));
 				break;
 			case Activity.SCHEDULE_GATE_ACTIVITY_TYPE:
-				act = new ScheduleGateActivity();
 				((ScheduleGateActivity)act).setGateActivityLevelId(actDto.getGateActivityLevelID());
 				((ScheduleGateActivity)act).setWaitingLearners(null);
 				//always set false
@@ -1772,42 +1770,35 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				((ScheduleGateActivity)act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.SCHEDULE_GATE));
 				break;
 			case Activity.PERMISSION_GATE_ACTIVITY_TYPE:
-				act = new PermissionGateActivity();
 				((PermissionGateActivity)act).setGateActivityLevelId(actDto.getGateActivityLevelID());
 				((PermissionGateActivity)act).setGateOpen(false);
 				((PermissionGateActivity)act).setWaitingLearners(null);
 				((PermissionGateActivity)act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
 				break;
 			case Activity.PARALLEL_ACTIVITY_TYPE:
-				act = new ParallelActivity();
 				break;
 			case Activity.OPTIONS_ACTIVITY_TYPE:
-				act = new OptionsActivity();
 				((OptionsActivity)act).setMaxNumberOfOptions(actDto.getMaxOptions());
 				((OptionsActivity)act).setMinNumberOfOptions(actDto.getMinOptions());
 				((OptionsActivity)act).setOptionsInstructions(actDto.getOptionsInstructions());
 				break;
 			case Activity.SEQUENCE_ACTIVITY_TYPE:
-				act = new SequenceActivity();
 				if ( actDto.getFirstActivityUIID() != null ) {
 					firstChildUIIDToSequenceMapper.put(actDto.getFirstActivityUIID(), (SequenceActivity)act);
 				}
 				break;
 			case Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE:
-				act = new ChosenBranchingActivity();
+				((BranchingActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TEACHER_CHOSEN_BRANCHING));
 				processBranchingFields((BranchingActivity) act, actDto);
 				break;
 			case Activity.GROUP_BRANCHING_ACTIVITY_TYPE:
-				act = new GroupBranchingActivity();
+				((BranchingActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUP_BASED_BRANCHING));
 				processBranchingFields((BranchingActivity) act, actDto);
 				break;
 			case Activity.TOOL_BRANCHING_ACTIVITY_TYPE:
-				act = new ToolBranchingActivity();
+				((BranchingActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TOOL_BASED_BRANCHING));
 				processBranchingFields((BranchingActivity) act, actDto);
 				break;
-			default:
-				log.error("Unable to determine the activity type. Creating a tool activity. ActivityDTO was "+actDto);
-				act = new ToolActivity();
 		}		
 		
 		act.setGroupingSupportType(actDto.getGroupingSupportType());

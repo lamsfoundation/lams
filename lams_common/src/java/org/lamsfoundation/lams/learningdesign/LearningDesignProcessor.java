@@ -99,14 +99,26 @@ public abstract class LearningDesignProcessor {
 		ComplexActivity complex = (ComplexActivity) activityDAO.getActivityByActivityId(activity.getActivityId(),SimpleActivity.class);
 		startComplexActivity(complex);
 
-		// work through all the child activities for this activity, in order id.
-		Set children = new TreeSet(new ActivityOrderComparator());
-        children.addAll(complex.getActivities());
-        Iterator i=children.iterator();
-        while ( i.hasNext() ) {
-			handleActivity((Activity)i.next());
-        }
-        
+		if ( activity.isSequenceActivity() ) {
+			// sequence is a funny one - the child activities are linked by transitions rather
+	        // than ordered by order id
+			SequenceActivity sequenceActivity = (SequenceActivity) complex;
+			Activity child = sequenceActivity.getNextActivityByParent(new NullActivity());
+			while ( ! child.isNull() ) {
+				handleActivity(child);
+				child = sequenceActivity.getNextActivityByParent(child);
+			}
+			
+		} else {
+			// work through all the child activities for this activity, in order id
+			Set children = new TreeSet(new ActivityOrderComparator());
+	        children.addAll(complex.getActivities());
+	        Iterator i=children.iterator();
+	        while ( i.hasNext() ) {
+				handleActivity((Activity)i.next());
+	        }
+		}
+		
 		endComplexActivity(complex);
 
 	}

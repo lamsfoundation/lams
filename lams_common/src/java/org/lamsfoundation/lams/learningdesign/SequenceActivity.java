@@ -127,12 +127,13 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     }
     
     /**
-     * Makes a copy of the SequenceActivity for authoring, preview and monitoring enviornment
+     * Makes a copy of the SequenceActivity for authoring, preview and monitoring environment
      * @return SequenceActivity Returns a deep-copy of the originalActivity
      */
     public Activity createCopy(){
     	SequenceActivity newSequenceActivity = new SequenceActivity();
     	copyToNewActivity(newSequenceActivity);
+    	newSequenceActivity.firstActivity = this.firstActivity;
 		return newSequenceActivity;
     }
 

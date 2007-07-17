@@ -37,8 +37,11 @@ import org.lamsfoundation.lams.tool.SystemTool;
  * A GroupingActivity creates Grouping.
  * @author Manpreet Minhas
  */
-public class GroupingActivity extends SystemToolActivity implements Serializable
+public class GroupingActivity extends SimpleActivity implements Serializable
 {
+    /** persistent field */
+	private SystemTool systemTool; 
+
 	/** The grouping_ui_id of the Grouping that this activity creates */
 	private Integer createGroupingUIID;
 	
@@ -88,10 +91,10 @@ public class GroupingActivity extends SystemToolActivity implements Serializable
                 activityTypeId, 
                 transitionTo,
 				transitionFrom,
-				languageFile,
-	            sysTool);
+				languageFile);
         this.createGrouping = createGrouping;        
         this.createGroupingUIID = create_grouping_ui_id;
+        this.systemTool = sysTool;
         super.simpleActivityStrategy = new GroupingActivityStrategy(this);
     }
     
@@ -186,4 +189,19 @@ public class GroupingActivity extends SystemToolActivity implements Serializable
     {
         return false;
     }
+    
+	public SystemTool getSystemTool() {
+		return systemTool;
+	}
+
+	public void setSystemTool(SystemTool systemTool) {
+		this.systemTool = systemTool;
+	}
+ 
+    protected void copyToNewActivity(GroupingActivity newActivity ) {
+
+    	super.copyToNewActivity(newActivity);
+    	newActivity.setSystemTool(this.getSystemTool());
+    }
+
 }

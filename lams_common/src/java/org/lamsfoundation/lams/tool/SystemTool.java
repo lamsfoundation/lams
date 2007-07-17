@@ -46,7 +46,9 @@ public class SystemTool implements Serializable {
 	public static final Long SCHEDULE_GATE = new Long(3);
 	public static final Long PERMISSION_GATE = new Long(4);
 	public static final Long SYSTEM_GATE = new Long(5);
-	public static final Long BRANCHING = new Long(6);
+	public static final Long TEACHER_CHOSEN_BRANCHING = new Long(6);
+	public static final Long GROUP_BASED_BRANCHING = new Long(7);
+	public static final Long TOOL_BASED_BRANCHING = new Long(8);
 	
     /** identifier field */
     private Long systemToolId;

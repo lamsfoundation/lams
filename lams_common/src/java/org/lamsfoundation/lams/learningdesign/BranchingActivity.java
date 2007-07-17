@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learningdesign;
 import java.io.Serializable;
 import java.util.Set;
 import org.lamsfoundation.lams.learningdesign.strategy.BranchingActivityStrategy;
+import org.lamsfoundation.lams.tool.SystemTool;
 
 /** 
  * @author Mitchell Seaton
@@ -33,7 +34,7 @@ import org.lamsfoundation.lams.learningdesign.strategy.BranchingActivityStrategy
  * 
  * @hibernate.class 
 */
-abstract public class BranchingActivity extends ComplexActivity implements Serializable {
+abstract public class BranchingActivity extends ComplexActivity implements Serializable, ISystemToolActivity {
 
 	// types are used on the URLS to determine which type of branch is expected 
 	// the code should always then check against the activity to make sure it is correct
@@ -41,6 +42,7 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 	public static final String GROUP_BASED_TYPE = "group";
 	public static final String TOOL_BASED_TYPE = "tool";
 
+	private SystemTool systemTool; 
 	private Integer startXcoord;
 	private Integer startYcoord;
 	private Integer endXcoord;
@@ -70,7 +72,8 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
             Integer startYcoord,
             Integer endXcoord,
             Integer endYcoord,
-            Set activities) {
+            Set activities,
+            SystemTool systemTool) {
         super(activityId, 
                 id, 
                 description, 
@@ -92,6 +95,7 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 				languageFile,
                 activities);
         super.activityStrategy = new BranchingActivityStrategy(this);
+        this.systemTool = systemTool;
         this.startXcoord = startXcoord;
         this.startYcoord = startYcoord;
         this.endXcoord = endXcoord;
@@ -180,7 +184,25 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 	public void setStartYcoord(Integer startYcoord) {
 		this.startYcoord = startYcoord;
 	}
-	
-	
+
+	/**
+	 * @hibernate.many-to-one lazy="false"
+	 * @hibernate.column name="system_tool_id"
+	*/
+	public SystemTool getSystemTool() {
+		return systemTool;
+	}
+
+	public void setSystemTool(SystemTool systemTool) {
+		this.systemTool = systemTool;
+	}
+ 
+	public void copyBranchingFields(BranchingActivity newBranchingActivity) {
+		newBranchingActivity.systemTool = this.systemTool;
+		newBranchingActivity.startXcoord = this.startXcoord;
+		newBranchingActivity.startYcoord = this.startYcoord;
+		newBranchingActivity.endXcoord = this.endXcoord;
+		newBranchingActivity.endYcoord = this.endYcoord;
+	}
 
 }

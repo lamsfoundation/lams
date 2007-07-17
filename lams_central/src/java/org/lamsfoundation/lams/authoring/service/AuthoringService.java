@@ -763,6 +763,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     	HashMap<Integer, Activity> newActivities = new HashMap<Integer, Activity>(); // key is UIID   
     	HashMap<Integer, Grouping> newGroupings = new HashMap<Integer, Grouping>();    // key is UIID
     	
+		// as we create the activities, we need to record any "first child" UIID's for the sequence activity to process later
+		Map<Integer,SequenceActivity> firstChildUIIDToSequence = new HashMap<Integer,SequenceActivity>();
+
     	Set oldParentActivities = originalLearningDesign.getParentActivities();
     	if ( oldParentActivities != null ) {
 	    	Iterator iterator = oldParentActivities.iterator();    	
@@ -782,6 +785,18 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     		}
     	}
     	
+      	// fix up any old "first activity" in the sequence activities
+    	for ( Activity activity : activities) {
+    		if ( activity.isSequenceActivity() ) {
+    			SequenceActivity newSeq = (SequenceActivity) activity;
+    			Activity oldFirstActivity = newSeq.getFirstActivity();
+    			if ( oldFirstActivity != null ) {
+    				Activity newFirstActivity = newActivities.get(oldFirstActivity.getActivityUIID());
+    				newSeq.setFirstActivity(newFirstActivity);
+    			}
+    		}
+    	}
+
     	// Now go back and fix any branch mapping entries - they will still be pointing to old activities.
     	// Need to check if the sets are not null as these are new objects and Hibernate may not have
     	// backed them with collections yet.

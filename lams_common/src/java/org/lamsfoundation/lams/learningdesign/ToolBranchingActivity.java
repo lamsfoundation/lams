@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.tool.SystemTool;
 
 /** 
  * @author Mitchell Seaton
@@ -62,7 +63,8 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
             Integer startYcoord,
             Integer endXcoord,
             Integer endYcoord,
-            Set activities) {
+            Set activities,
+            SystemTool systemTool) {
         super(activityId, 
                 id, 
                 description, 
@@ -86,7 +88,8 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
 	            startYcoord,
 	            endXcoord,
 	            endYcoord,
-                activities);
+                activities,
+                systemTool);
    }
 
     /** default constructor */
@@ -126,6 +129,7 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
     public Activity createCopy(){
     	
     	ToolBranchingActivity newBranchingActivity = new ToolBranchingActivity();
+    	copyBranchingFields(newBranchingActivity);
     	copyToNewActivity(newBranchingActivity);
     	return newBranchingActivity;
     }

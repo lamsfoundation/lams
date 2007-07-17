@@ -155,73 +155,73 @@
                  </many-to-one>                 
 			</subclass>
 			
-		    <subclass name="org.lamsfoundation.lams.learningdesign.SystemToolActivity" >
-		     	 <meta attribute="class-description" inherit="false">@hibernate.class </meta>
-		         <meta attribute="scope-class" inherit="false">public abstract</meta>
-
-                 <!-- bi-directional many-to-one association to System Tool -->
+			<subclass name="org.lamsfoundation.lams.learningdesign.GroupingActivity" discriminator-value="2">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>					
+				
+                 <!-- uni-directional many-to-one association to System Tool -->
                  <many-to-one name="systemTool" class="org.lamsfoundation.lams.tool.SystemTool" lazy="false" >
                  	<column name="system_tool_id" not-null="false"/>
                  </many-to-one>                 
 
-				<subclass name="org.lamsfoundation.lams.learningdesign.GroupingActivity" discriminator-value="2">
-					<meta attribute="class-description" inherit="false">@hibernate.class </meta>					
-					
-					<property name="createGroupingUIID" type="java.lang.Integer" column="create_grouping_ui_id" length="11" lazy="false">
-					        <meta attribute="field-description">@hibernate.property column="create_grouping_ui_id" length="11" </meta>    
-					</property>
-									
-					 <!-- bi-directional many-to-one association to Grouping-->
-	                  <many-to-one name="createGrouping" class="org.lamsfoundation.lams.learningdesign.Grouping" >
-	                  	<column name="create_grouping_id" />
-	                  </many-to-one>					                  
-				</subclass>
+				<property name="createGroupingUIID" type="java.lang.Integer" column="create_grouping_ui_id" length="11" lazy="false">
+				        <meta attribute="field-description">@hibernate.property column="create_grouping_ui_id" length="11" </meta>    
+				</property>
+								
+				 <!-- bi-directional many-to-one association to Grouping-->
+                  <many-to-one name="createGrouping" class="org.lamsfoundation.lams.learningdesign.Grouping" >
+                  	<column name="create_grouping_id" />
+                  </many-to-one>					                  
+			</subclass>
 				
-				<subclass name="org.lamsfoundation.lams.learningdesign.GateActivity">
-					<meta attribute="class-description" inherit="false">@hibernate.class </meta>
-					<set  name="waitingLearners" lazy="true" cascade="none" table="lams_activity_learners" batch-size="20">
-	        			<key><column name="activity_id" /></key>
-	        			<many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User"/>
-	    			</set>
-					<property name="gateActivityLevelId" type="java.lang.Integer" column="gate_activity_level_id" length="11" />
-					<property name="gateOpen" type="java.lang.Boolean" column="gate_open_flag" length="4" />
-					
-					<subclass name="org.lamsfoundation.lams.learningdesign.ScheduleGateActivity" discriminator-value="4">
-						<meta attribute="class-description" inherit="false">@hibernate.class </meta>					
-						
-						<property name="gateStartTimeOffset" type="java.lang.Long" column="gate_start_time_offset" length="20">
-	        				<meta attribute="field-description">@hibernate.property column="gate_start_time_offset" length="20"</meta>    
-		        			<meta attribute="use-in-toString">true</meta>
-					    </property>
-					    
-					    <property name="gateEndTimeOffset" type="java.lang.Long" column="gate_end_time_offset" length="20" >
-					    	<meta attribute="field-description">@hibernate.property column="gate_end_time_offset" length="20" </meta>    
-				    		<meta attribute="use-in-toString">true</meta>
-					    </property>
-					    
-					    <property name="gateStartDateTime" type="java.sql.Timestamp" column="gate_start_date_time" length="19">
-	        				<meta attribute="field-description">@hibernate.property column="gate_start_date_time" length="19"</meta>    
-		        			<meta attribute="use-in-toString">true</meta>
-					    </property>
-					    
-					    <property name="gateEndDateTime" type="java.sql.Timestamp" column="gate_end_date_time" length="19" >
-					    	<meta attribute="field-description">@hibernate.property column="gate_end_date_time" length="19" </meta>    
-				    		<meta attribute="use-in-toString">true</meta>
-					    </property>
-					    
-					</subclass>
-					<subclass name="org.lamsfoundation.lams.learningdesign.SynchGateActivity" discriminator-value="3">
-						<meta attribute="class-description" inherit="false">@hibernate.class </meta>
-					</subclass>
-					<subclass name="org.lamsfoundation.lams.learningdesign.PermissionGateActivity" discriminator-value="5">
-						<meta attribute="class-description" inherit="false">@hibernate.class </meta>
-					</subclass>
-					<subclass name="org.lamsfoundation.lams.learningdesign.SystemGateActivity" discriminator-value="9">
-						<meta attribute="class-description" inherit="false">@hibernate.class </meta>
-					</subclass>
-				</subclass>			
+		<subclass name="org.lamsfoundation.lams.learningdesign.GateActivity">
+			<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+             <!-- uni-directional many-to-one association to System Tool -->
+             <many-to-one name="systemTool" class="org.lamsfoundation.lams.tool.SystemTool" lazy="false" >
+             	<column name="system_tool_id" not-null="false"/>
+             </many-to-one>                 
+
+			<set  name="waitingLearners" lazy="true" cascade="none" table="lams_activity_learners" batch-size="20">
+       			<key><column name="activity_id" /></key>
+       			<many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User"/>
+   			</set>
+			<property name="gateActivityLevelId" type="java.lang.Integer" column="gate_activity_level_id" length="11" />
+			<property name="gateOpen" type="java.lang.Boolean" column="gate_open_flag" length="4" />
+			
+			<subclass name="org.lamsfoundation.lams.learningdesign.ScheduleGateActivity" discriminator-value="4">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>					
 				
-		</subclass>	<!--  System Tool Activity -->
+				<property name="gateStartTimeOffset" type="java.lang.Long" column="gate_start_time_offset" length="20">
+       				<meta attribute="field-description">@hibernate.property column="gate_start_time_offset" length="20"</meta>    
+        			<meta attribute="use-in-toString">true</meta>
+			    </property>
+			    
+			    <property name="gateEndTimeOffset" type="java.lang.Long" column="gate_end_time_offset" length="20" >
+			    	<meta attribute="field-description">@hibernate.property column="gate_end_time_offset" length="20" </meta>    
+		    		<meta attribute="use-in-toString">true</meta>
+			    </property>
+			    
+			    <property name="gateStartDateTime" type="java.sql.Timestamp" column="gate_start_date_time" length="19">
+       				<meta attribute="field-description">@hibernate.property column="gate_start_date_time" length="19"</meta>    
+        			<meta attribute="use-in-toString">true</meta>
+			    </property>
+			    
+			    <property name="gateEndDateTime" type="java.sql.Timestamp" column="gate_end_date_time" length="19" >
+			    	<meta attribute="field-description">@hibernate.property column="gate_end_date_time" length="19" </meta>    
+		    		<meta attribute="use-in-toString">true</meta>
+			    </property>
+			    
+			</subclass>
+			<subclass name="org.lamsfoundation.lams.learningdesign.SynchGateActivity" discriminator-value="3">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+			</subclass>
+			<subclass name="org.lamsfoundation.lams.learningdesign.PermissionGateActivity" discriminator-value="5">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+			</subclass>
+			<subclass name="org.lamsfoundation.lams.learningdesign.SystemGateActivity" discriminator-value="9">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+			</subclass>
+		</subclass>			
+				
 	</subclass>
 
 	<subclass name="org.lamsfoundation.lams.learningdesign.ComplexActivity" >
@@ -284,6 +284,11 @@
 			<subclass name="org.lamsfoundation.lams.learningdesign.BranchingActivity" >
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>			
 	  			<meta attribute="scope-class" inherit="false">public abstract</meta>			
+	             <!-- uni-directional many-to-one association to System Tool -->
+	             <many-to-one name="systemTool" class="org.lamsfoundation.lams.tool.SystemTool" lazy="false" >
+	             	<column name="system_tool_id" not-null="false"/>
+	             </many-to-one>                 
+
 	  			<property name="startXcoord" type="java.lang.Integer" column="start_xcoord" length="11" >
 			       <meta attribute="field-description">@hibernate.property column="start_xcoord" length="11" </meta>    
  			    </property>

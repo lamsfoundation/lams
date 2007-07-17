@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.tool.SystemTool;
 
 /** 
  * @author Mitchell Seaton
@@ -62,7 +63,8 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
             Integer startYcoord,
             Integer endXcoord,
             Integer endYcoord,
-            Set activities) {
+            Set activities,
+            SystemTool systemTool) {
         super(activityId, 
                 id, 
                 description, 
@@ -86,7 +88,8 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
 	            startYcoord,
 	            endXcoord,
 	            endYcoord,
-	            activities);
+	            activities,
+	            systemTool);
     }
 
     /** default constructor */
@@ -119,13 +122,15 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
               activities);
     }
     /**
-     * Makes a copy of the BranchingActivity for authoring, preview and monitoring enviornment 
+     * Makes a copy of the BranchingActivity for authoring, preview and monitoring environment 
      * @return BranchingActivity Returns a deep-copy of the originalActivity
      */
     public Activity createCopy(){
     	
     	ChosenBranchingActivity newBranchingActivity = new ChosenBranchingActivity();
+    	copyBranchingFields(newBranchingActivity);
     	copyToNewActivity(newBranchingActivity);
+    	
     	return newBranchingActivity;
     }
 

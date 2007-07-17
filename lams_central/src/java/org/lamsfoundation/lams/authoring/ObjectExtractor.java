@@ -901,6 +901,14 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 	private void buildBranchingActivity(BranchingActivity branchingActivity,Hashtable activityDetails)
 		throws WDDXProcessorConversionException, ObjectExtractorException {
+		if ( branchingActivity.isChosenBranchingActivity() ) {
+			branchingActivity.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TEACHER_CHOSEN_BRANCHING));
+		} else if ( branchingActivity.isGroupBranchingActivity() ) {
+			branchingActivity.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUP_BASED_BRANCHING));
+		} else if ( branchingActivity.isToolBranchingActivity() ) {
+			branchingActivity.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TOOL_BASED_BRANCHING));
+		}
+
 		branchingActivity.setStartXcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.START_XCOORD));
 		branchingActivity.setStartYcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.START_YCOORD));
 		branchingActivity.setEndXcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.END_XCOORD));

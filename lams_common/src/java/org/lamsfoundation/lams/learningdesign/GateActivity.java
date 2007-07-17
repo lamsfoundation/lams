@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 /**
  * @hibernate.class
  */
-public abstract class GateActivity extends SystemToolActivity implements Serializable
+public abstract class GateActivity extends SimpleActivity implements Serializable
 {
     
     public static final int LEARNER_GATE_LEVEL = 1;
@@ -46,6 +46,9 @@ public abstract class GateActivity extends SystemToolActivity implements Seriali
     
     public static final int CLASS_GATE_LEVEL = 3;
     
+    /** persistent field */
+	private SystemTool systemTool; 
+
     /** persistent field */
     private Integer gateActivityLevelId;
     
@@ -99,10 +102,10 @@ public abstract class GateActivity extends SystemToolActivity implements Seriali
                 activityTypeId,
                 transitionTo,
 				transitionFrom,
-				languageFile,
-				sysTool);
+				languageFile);
         this.gateActivityLevelId = gateActivityLevelId;
         this.waitingLearners = waitingLearners;
+        this.systemTool = sysTool;
     }
     
     /** default constructor */
@@ -233,6 +236,20 @@ public abstract class GateActivity extends SystemToolActivity implements Seriali
         return new ToStringBuilder(this)
         .append("activityId", getActivityId())
         .toString();
+    }
+
+	public SystemTool getSystemTool() {
+		return systemTool;
+	}
+
+	public void setSystemTool(SystemTool systemTool) {
+		this.systemTool = systemTool;
+	}
+ 
+    protected void copyToNewActivity(GateActivity newActivity ) {
+
+    	super.copyToNewActivity(newActivity);
+    	newActivity.setSystemTool(this.getSystemTool());
     }
 
 }

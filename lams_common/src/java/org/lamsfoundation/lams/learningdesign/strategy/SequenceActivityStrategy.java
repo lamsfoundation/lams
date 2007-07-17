@@ -60,10 +60,11 @@ public class SequenceActivityStrategy extends ComplexActivityStrategy
      * then: If the currentChild is the NullActivity then it will return the first
      * Activity, otherwise it will return the NullActivity.
      * 
-     * If no firstActivity exists then it looks for the child activity that doesn't 
-     * have in input transition) with the order id greater the 
+     * <p>If no firstActivity exists then it looks for the child activity that doesn't 
+     * have in input transition with the order id greater the 
      * currentChild. If the currentChild is the NullActivity then 
-     * it will return the first such child. </p>
+     * it will return the first such child. This case should never be used but it is 
+     * a backup in case the firstChild isn't set for some reason.
      * 
      * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
@@ -79,22 +80,19 @@ public class SequenceActivityStrategy extends ComplexActivityStrategy
 			log.warn("getNextActivityByParent: child activities exist but no firstActivity is set up. Trying to work it out based on transitions. SequenceActivity "+sequenceActivity);
 	        
 	        Activity inputChild = currentChild;
-	        if ( inputChild != null ) {
-	        	if ( inputChild.isNull() ) {
-	        		inputChild = null;
-	        	} else if ( inputChild.getOrderId() == null ) {
-	        		inputChild = null;
-	        	}
+	        if ( inputChild == null  ) {
+	        		inputChild = new NullActivity();
 	        }
 	        
 	        // getActivities is ordered by order id ()
-	        for(Iterator i=sequenceActivity.getActivities().iterator();i.hasNext();)
-	        {
+	        boolean pastCurrentChild = false;
+	        Iterator i=sequenceActivity.getActivities().iterator();
+	        while ( i.hasNext() ) {
 	            Activity curChild = (Activity)i.next();
-	            if(  ( inputChild==null || curChild.getOrderId().longValue() > currentChild.getOrderId().longValue() ) ) {
-	            	// we are past the 'currentChild' so look for an activity with no input transition
-	            	if ( curChild.getTransitionTo() == null ) 
-	            		return curChild;
+	            if ( (inputChild.isNull() || pastCurrentChild) && curChild.getTransitionTo() == null ) {
+            		return curChild;
+	            } else if ( inputChild.equals(curChild) ) {
+	            	pastCurrentChild = true;
 	            }
 	        }
 		}
