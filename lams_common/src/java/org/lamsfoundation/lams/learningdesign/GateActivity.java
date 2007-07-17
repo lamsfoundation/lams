@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 /**
  * @hibernate.class
  */
-public abstract class GateActivity extends SimpleActivity implements Serializable
+public abstract class GateActivity extends SimpleActivity implements Serializable, ISystemToolActivity
 {
     
     public static final int LEARNER_GATE_LEVEL = 1;

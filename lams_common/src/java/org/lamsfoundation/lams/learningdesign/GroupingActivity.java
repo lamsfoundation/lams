@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.GroupingActivityStrategy;
@@ -37,7 +36,7 @@ import org.lamsfoundation.lams.tool.SystemTool;
  * A GroupingActivity creates Grouping.
  * @author Manpreet Minhas
  */
-public class GroupingActivity extends SimpleActivity implements Serializable
+public class GroupingActivity extends SimpleActivity implements Serializable, ISystemToolActivity
 {
     /** persistent field */
 	private SystemTool systemTool; 
