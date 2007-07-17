@@ -40,6 +40,7 @@ public class ActivityPortfolio {
 	private List childPortfolios;
 	/* The link to the tool page from the main export page */
 	private String toolLink;
+	private boolean headingNoPage;
 		
 	/**
 	 * @return Returns the toolLink.
@@ -62,6 +63,7 @@ public class ActivityPortfolio {
 		this.exportUrl = null;
 		this.toolLink = null;
 		this.childPortfolios = null;
+		this.headingNoPage = false;
 	}
 	
 	
@@ -123,6 +125,17 @@ public class ActivityPortfolio {
 	}
 	public void setChildPortfolios(List childPortfolios) {
 		this.childPortfolios = childPortfolios;
+	}
+	/** Generate just a heading for this portfolio, don't try to link to a page. This is 
+	 * used for Parallel and Sequence activities in both learner and teacher modes,
+	 * and for Branching in learner mode.
+	 * @return
+	 */
+	public boolean isHeadingNoPage() {
+		return headingNoPage;
+	}
+	public void setHeadingNoPage(boolean headingNoPage) {
+		this.headingNoPage = headingNoPage;
 	}
 	
 	

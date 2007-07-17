@@ -127,6 +127,11 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 			String exportURL = getExportURLForSystemTool(activity);
 			complexPortfolio = complexPortfolio == null ? createActivityPortfolio(activity) : complexPortfolio;
 			complexPortfolio.setExportUrl(exportURL);
+			// if there isn't a url, we assume we just want a heading
+			complexPortfolio.setHeadingNoPage(exportURL == null);
+		} else {
+			// sequence, parallel, etc
+			complexPortfolio.setHeadingNoPage(true);
 		}
 		
 		currentPortfolioList = (ArrayList<ActivityPortfolio>) activityListStack.pop();
@@ -147,12 +152,12 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 			return;
 		}
 
-		ActivityPortfolio p = createActivityPortfolio(activity);
 		String exportUrlForTool = null;
 		
 		if ( activity.isToolActivity() ) {
 			
-			/* if the tool does not have an export url, use the url that points to the servlet that generates a page saying that the export is not supported */
+			// if the tool does not have an export url, then the processor will include an "not supported" error page
+			
 			ToolActivity toolActivity = (ToolActivity) activity;
 			Tool tool = toolActivity.getTool();	
 			if (accessMode == ToolAccessMode.LEARNER)
@@ -179,14 +184,21 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 					exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_TOOL_CONTENT_ID, toolActivity.getToolContentId().toString());
 				}
 			}
+
+			ActivityPortfolio p = createActivityPortfolio(activity);
+			p.setExportUrl(exportUrlForTool);
+			currentPortfolioList.add(p);
 			
 		} else if ( activity.isSystemToolActivity() ) {
+			
 			exportUrlForTool = getExportURLForSystemTool(activity);
+			if ( exportUrlForTool != null ) {
+				ActivityPortfolio p = createActivityPortfolio(activity);
+				p.setExportUrl(exportUrlForTool);
+				currentPortfolioList.add(p);
+			}
 		} 
-		
-		p.setExportUrl(exportUrlForTool);
-		
-		currentPortfolioList.add(p);
+
 		
 	}
 
