@@ -105,7 +105,6 @@ class ToolbarModel extends Observable {
 		infoObj.data = buttonArr;
 		notifyObservers(infoObj);
 		
-		
 	}
 	/**
 	* set the button state to enabled/disabled and set a changed flag and notify view and controller.
@@ -113,7 +112,7 @@ class ToolbarModel extends Observable {
 	
 	public function setDefaultState(){
 		Debugger.log('setDefaultState is called: ',Debugger.GEN,'setDefaultState','Toolbar');
-		setButtonState("preview", false)
+		setButtonState("preview_btn", false)
 	}
 
 	/**

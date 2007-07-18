@@ -115,7 +115,7 @@ class org.lamsfoundation.lams.common.ui.Dialog {
 		evt.target.setCancelButton(_inputCancelButtonLabel,_inputCancelHandler);
 		
 		evt.target.type = (_inputType != null) ? _inputType : AlertDialog.ALERT;
-
+		evt.target._visible = true;
 	}
 
 }

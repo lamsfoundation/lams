@@ -195,7 +195,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		activityComplexLayer = content.createEmptyMovieClip("_activityComplexLayer_mc", content.getNextHighestDepth());
 		activityLayer = content.createEmptyMovieClip("_activityLayer_mc", content.getNextHighestDepth());
 		
-		transparentCover = content.createClassObject("Panel", "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
+		transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
 		transparentCover.onPress = null;
 		
 		bkg_pnl.onRelease = function(){
@@ -509,7 +509,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 		canvas_scp.setSize(s.w,s.h);
 		bkg_pnl.setSize(s.w, s.h);
-
+		transparentCover.setSize(s.w, s.h);
+		
 		//Create the grid.  The gris is re-drawn each time the canvas is resized.
 		grid_mc = Grid.drawGrid(gridLayer,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
 		

@@ -217,7 +217,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         loader.complete();
 		setupData();
 		checkDataLoaded();
-		
     }
     
     /**
@@ -230,8 +229,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _dictionary = Dictionary.getInstance();
         _dictionary.addEventListener('load',Delegate.create(this,onDictionaryLoad));
         _dictionary.load(language);
-        
-		
 		
         //Set reference to StyleManager and load Themes and setup load handler.
         var theme:String = String(_config.getItem('theme'));
@@ -254,18 +251,15 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 			_DataLoadCheckIntervalID = setInterval(Proxy.create(this, checkDataLoaded), DATA_LOAD_CHECK_INTERVAL);
 		} else {
 			_dataLoadCheckCount++;
+			
 			// if dictionary and theme data loaded setup UI
 			if(_dictionaryLoaded && _themeLoaded) {
 				clearInterval(_DataLoadCheckIntervalID);
 				setupUI();
 				checkUILoaded();
-				
-        
 			} else if(_dataLoadCheckCount >= DATA_LOAD_CHECK_TIMEOUT_COUNT) {
 				Debugger.log('reached timeout waiting for data to load.',Debugger.CRITICAL,'checkUILoaded','Application');
 				clearInterval(_UILoadCheckIntervalID);
-				
-        
 			}
 		}
 	}
@@ -287,9 +281,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
             }else {
                 //If UI loaded check which events can be broadcast
                 if(_UILoaded){
-					//Debugger.log('ALL UI LOADED, waiting for all true to dispatch init events: _dictionaryLoaded:'+_dictionaryLoaded+'_themeLoaded:'+_themeLoaded ,Debugger.GEN,'checkUILoaded','Application');
-
-                    //If dictionary is loaded and event hasn't been dispatched - dispatch it
+					//If dictionary is loaded and event hasn't been dispatched - dispatch it
                     if(_dictionaryLoaded && !_dictionaryEventDispatched){
 						_dictionaryEventDispatched = true;
                         _dictionary.broadcastInit();
@@ -313,6 +305,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 						msg+=Dictionary.getValue("app_fail_continue");
 						var e:LFError = new LFError(msg,"Canvas.setDroppedTemplateActivity",this,'_themeEventDispatched:'+_themeEventDispatched+' _dictionaryEventDispatched:'+_dictionaryEventDispatched);
 						e.showErrorAlert();
+						
 						//todo:  give the user a message
 						clearInterval(_UILoadCheckIntervalID);
 					}
@@ -372,7 +365,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		_ccm.showCustomCM(_ccm.loadMenu("application", "authoring"))
 		
 		//Create the application root
-        _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
+        _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc', APP_ROOT_DEPTH);
         
 		//Create screen elements
         _dialogueContainer_mc = _container_mc.createEmptyMovieClip('_dialogueContainer_mc',DIALOGUE_DEPTH);
@@ -576,7 +569,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	
 	
 	public function cut():Void{
-		trace("testing cut");
 		var ca = _canvas.model.selectedItem
 		if (CanvasActivity(ca) != null){
 			if (ca.activity.parentUIID == null || ca.activity.parentUIID == undefined){
@@ -591,7 +583,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	}
 	
 	public function copy():Void{
-		trace("testing copy");
 		var ca = _canvas.model.selectedItem
 		if (CanvasActivity(ca) != null){
 			if (ca.activity.parentUIID == null || ca.activity.parentUIID == undefined){
@@ -605,7 +596,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	}
 	
 	public function openEditActivtiyContent():Void{
-		trace("testing openEditActivtiyContent");
 		var ca = _canvas.model.selectedItem
 		if (CanvasActivity(ca) != null){ 
 			_canvas.view.getController().activityDoubleClick(ca);

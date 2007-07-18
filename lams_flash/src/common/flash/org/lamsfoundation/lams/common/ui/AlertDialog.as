@@ -45,6 +45,7 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 	public static var CONFIRM:Number = 1;
 	
 	private var _bgpanel:MovieClip;
+	private var _bgcolor:Color;
 
     private var ok_btn:Button;         //OK+Cancel buttons
     private var cancel_btn:Button;
@@ -57,15 +58,16 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 	
 	private var _type:Number;
     
+	private var app:Object;
     private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
     
+	private var transparentCover:MovieClip;
     
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
     public var removeEventListener:Function;
-    
     
     /**
     * constructor
@@ -75,6 +77,8 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
         EventDispatcher.initialize(this);
 		
 		this._visible = false;
+		
+		app = ApplicationParent.getInstance();
 
         //set the reference to the StyleManager
         themeManager = ThemeManager.getInstance();
@@ -109,6 +113,8 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 		else
 			setPosition(Stage.width/2 - _parent._x,  Stage.height/2 - _parent._y);
 		
+		addTransparentLayer(ApplicationParent.root);
+		
 		contentLoaded();
         
 	}
@@ -117,11 +123,23 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
     * method called by content when it is loaded
     */
     public function contentLoaded() {
-		this._visible = true;
-		
         //dispatch an onContentLoaded event to listeners
         dispatchEvent({type:'contentLoaded',target:this});
     }
+	
+	private function addTransparentLayer(target:MovieClip) {
+		var styleObj = themeManager.getStyleObject('CanvasPanel');
+		
+		transparentCover = target.createClassObject(Panel, "transparentCover", this.getDepth()-1, {_visible: true, enabled: false, _alpha: 15, _width: Stage.width, _height: Stage.height, styleName: styleObj});
+		transparentCover.onPress = null;
+		
+		org.lamsfoundation.lams.authoring.Application.getInstance().getToolbar().disableAll();
+	}
+	
+	private function removeTransparentLayer() {
+		transparentCover.removeMovieClip();
+		org.lamsfoundation.lams.authoring.Application.getInstance().getToolbar().enableAll();
+	}
 	
 	public function setOKButton(lbl:String,fn:Function){
 		if(lbl != null) {
@@ -243,7 +261,13 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 		
         _title.setStyle("styleName", styleObj);
         _title.setStyle("disabledColor", "0xFFFFFF");
-	   
+		
+		styleObj = themeManager.getStyleObject('AlertDialog');
+		var colorTransform = styleObj.colorTransform;
+		
+		_bgcolor = new Color(_bgpanel);
+		_bgcolor.setTransform(colorTransform);
+		
     }
 
 	/** Fade out on click if normal Alert (not Confirm)*/
@@ -267,8 +291,10 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
     private function cancel(){
        Debugger.log('cancel click',Debugger.GEN,'cancel','org.lamsfoundation.lams.common.ui.InputDialog');
        
-	   this.removeMovieClip();
 	   _cancelHandler();
+	   
+	   removeTransparentLayer();
+	   this.removeMovieClip();
     }
     
     /**
@@ -278,6 +304,8 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 		Debugger.log('ok click',Debugger.GEN,'ok','org.lamsfoundation.lams.common.ui.InputDialog');
 		
 		_okHandler();
+		
+		removeTransparentLayer();
 		this.removeMovieClip();
     }
     
@@ -285,7 +313,8 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
     * If an alert was spawned by this dialog this method is called when it's closed
     */
     private function alertClosed(){
-       this.removeMovieClip();
+		removeTransparentLayer();
+        this.removeMovieClip();
     }
 	
     /**

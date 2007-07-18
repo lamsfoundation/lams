@@ -161,6 +161,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 
 	private var _groupingSupportType:Number; //*
 	
+	private var _stopAfterActivity:Boolean;
 	private var _readOnly:Boolean;
 	
 	private var _viewID:Boolean;
@@ -184,6 +185,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 		//defaults
 		_objectType = "Activity";
 		_applyGrouping = false;
+		_stopAfterActivity = false;
 		_runOffline = false;
 		_defineLater = false;
 		_readOnly = false;
@@ -336,6 +338,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 			_createDateTime = dto.createDateTime;
 			_groupingSupportType = dto.groupingSupportType;
 			_readOnly = dto.readOnly;
+			_stopAfterActivity = dto.stopAfterActivity;
 
 	}
 	
@@ -370,6 +373,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 		if(_createDateTime){		dto.createDateTime		= _createDateTime;			}
 		if(_groupingSupportType){	dto.groupingSupportType = _groupingSupportType;		}
 		if(_readOnly){	dto.readOnly = _readOnly;	 }
+		if(_stopAfterActivity){ dto.stopAfterActivity = _stopAfterActivity } 
 		
 		return dto;
 	}
@@ -743,4 +747,16 @@ class org.lamsfoundation.lams.authoring.Activity {
 		return _readOnly;
 	}
 	
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get stopAfterActivity():Boolean {
+		return _stopAfterActivity;
+	}
+	
+	public function set stopAfterActivity(a:Boolean):Void {
+		_stopAfterActivity = a;
+	}
 }

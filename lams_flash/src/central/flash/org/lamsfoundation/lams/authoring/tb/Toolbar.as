@@ -97,6 +97,24 @@ class Toolbar {
         }
     }
 	
+	public function disableAll() {
+		Debugger.log("disabling all", Debugger.CRITICAL, "disableAll", "Toolbar");
+		enableAll(false);
+	}
+	
+	public function enableAll(a:Boolean) {
+		if(a == null) a = true;
+		var buttons:Array = toolbarView.toolbarMenu;
+		
+		Debugger.log("disabling all", Debugger.CRITICAL, "disableAll", "Toolbar");
+		
+		
+		for(var i=0; i < buttons.length; i++) {
+		
+			setButtonState(buttons[i]._name, a);
+		}
+	}
+	
 	public function setButtonState(btnName:String, btnState:Boolean){
 		toolbarModel.setButtonState(btnName, btnState);
 	}

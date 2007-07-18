@@ -401,6 +401,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		seqAct.groupingSupportType = Activity.GROUPING_SUPPORT_OPTIONAL;
 		seqAct.activityCategoryID = Activity.CATEGORY_SYSTEM;
 		seqAct.orderID = 1;
+		seqAct.stopAfterActivity = true;
 		
 		if(parent != null) {
 			seqAct.parentActivityID = parent.activityID;
@@ -661,6 +662,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 				
 			//add it to the DDM
 			if(b instanceof LFError) {
+				b.sequenceActivity.stopAfterActivity = false;
 				return b;
 			} else if(b != null){
 				var success:Object = _cv.ddm.addBranch(Branch(b));
@@ -855,6 +857,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			return new LFError("Cannot create end-branch connection to an unconnected Sequence.", "createBranchStartConnector", this);
 		} else {
 			return new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_TO_END, fromAct.activityUIID, activeView.endHub.activity.activityUIID, sequence, _cv.ddm.learningDesignID);
+		
 		}
 	}
 

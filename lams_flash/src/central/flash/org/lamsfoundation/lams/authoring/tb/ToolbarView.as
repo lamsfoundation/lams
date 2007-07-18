@@ -333,10 +333,7 @@ class ToolbarView extends AbstractView {
     */
 	private function setState(tm:ToolbarModel, infoObj:Object):Void{
 		Debugger.log('button name in setButtonState is : '+infoObj.button, Debugger.GEN,'setState','ToolbarView');		
-        if (infoObj.button == "preview"){
-			
-			this.preview_btn.enabled = infoObj.buttonstate;
-		}
+		this[infoObj.button].enabled = infoObj.buttonstate;
 	}
 	
 	public function showToolTip(btnObj, btnTT:String):Void{
@@ -416,4 +413,8 @@ class ToolbarView extends AbstractView {
     public function defaultController (model:Observable):Controller {
         return new ToolbarController(model);
     }
+	
+	public function get toolbarMenu():Array {
+		return _toolbarMenu;
+	}
 }
