@@ -29,6 +29,8 @@
 
 	<condition property="files.match">
 		<filesmatch file1="${DEPLOY_DIR}/lams.ear/lams-www.war/news.html" file2="../assembly/lams.ear/lams-www.war/news-2.0.2.html" />
+		<!-- Uncomment the line below for 2.1.x upgrader and delete the line above (2.1 installer will create news-unmodified in the deploy dir)
+		 <filesmatch file1="${DEPLOY_DIR}/lams.ear/lams-www.war/news.html" file2="${DEPLOY_DIR}/lams.ear/lams-www.war/news-unmodified.html" /> -->
 	</condition>
 
 	<!-- Main Task, calls all the other tasks -->
@@ -40,6 +42,7 @@
 		<antcall target="update-mysql-ds" />
 		<antcall target="update-lams-www-war" />
 		<antcall target="overwrite-news.html" />
+		<!-- UNCOMMENT FOR 2.1.x <antcall target="overwrite-news-unmodified.html" /> -->
 		<antcall target="explode-wars"/>
 		<antcall target="create-tool-deployer" />
 		<antcall target="deploy-tools"/>
@@ -138,6 +141,18 @@
 			</fileset>
 		</copy>
 	</target>
+	
+	<!--	
+	# UNCOMMENT FOR 2.1.x upgrader
+	#  The updater will always update news-unmodified.html to the current version, but it 
+	#  will only update news.html if it has not been modified. This way, the user has the
+	#  ability to revert back to the standard news.html page is they so desire
+	# <target name="overwrite-news-unmodified.html">
+	#	<copy file="../assembly/lams.ear/lams-www.war/news.html" 
+	#		tofile="${DEPLOY_DIR}/lams.ear/lams-www.war/news-unmodified.html"
+	#		overwrite="true"/>
+	# </target>
+	-->
 
 	<target name="update-mysql-ds" description="Updates mysql-ds.xml to have the SQL url in the lams.properties">
 		<copy todir="${DEPLOY_DIR}" overwrite="true">

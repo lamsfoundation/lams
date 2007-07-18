@@ -377,6 +377,7 @@ printf "\nDatabase Created.\n\n"
 # Copying the main lams files
 printf "Copying lams.ear directory to $JBOSS_DIR/server/default/deploy.\n"
 cp -rv assembly/lams.ear $JBOSS_DIR/server/default/deploy
+
 printf "\nDone.\n\n"
 if [  "$?" -ne  "0" ]
         then
@@ -384,7 +385,9 @@ if [  "$?" -ne  "0" ]
        	installfailed
 fi
 
-
+# UNCOMMENT FOR (2.1) Create news-unmodified.html and place it with news.html such that the upgrader can do a 
+# diff between the two files to determine whether it should update news.html or not.
+# cp assembly/lams.ear/lams-www.war/news.html $JBOSS_DIR/server/default/deploy/lams.ear/lams-www.war/news-unmodified.html
 
 # Configuring jboss with settings from lams.properties
 printf "Configuring JBoss with your settings.\n"
