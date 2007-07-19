@@ -21,6 +21,7 @@
  * ************************************************************************
  */
 
+import org.lamsfoundation.lams.authoring.Application
 import org.lamsfoundation.lams.authoring.tb.*
 import org.lamsfoundation.lams.common.util.*
 import mx.managers.*;
@@ -34,6 +35,8 @@ class Toolbar {
 	// View
 	private var toolbarView:ToolbarView;
 	private var toolbarView_mc:MovieClip;
+	
+	private var _prevButtonState:Array;
     
 	public static var NORMAL_MODE:Number = 0;
 	public static var EDIT_MODE:Number = 1;
@@ -99,20 +102,38 @@ class Toolbar {
 	
 	public function disableAll() {
 		Debugger.log("disabling all", Debugger.CRITICAL, "disableAll", "Toolbar");
+		
+		_prevButtonState = new Array();
 		enableAll(false);
 	}
 	
 	public function enableAll(a:Boolean) {
+		
 		if(a == null) a = true;
 		var buttons:Array = toolbarView.toolbarMenu;
 		
 		Debugger.log("disabling all", Debugger.CRITICAL, "disableAll", "Toolbar");
 		
-		
 		for(var i=0; i < buttons.length; i++) {
 		
-			setButtonState(buttons[i]._name, a);
+			if(a) { 
+				if(_prevButtonState[i] != null) {
+					setButtonState(_prevButtonState[i].name, _prevButtonState[i].value);
+				}
+					
+			} else {
+				var buttonState = new Object();
+				buttonState.name = buttons[i]._name;
+				buttonState.value = buttons[i].enabled;
+				
+				setButtonState(buttons[i]._name, a);
+				_prevButtonState.push(buttonState);
+			}
+			
 		}
+		
+		if(a) 
+			Application.getInstance().canvas.checkValidDesign();
 	}
 	
 	public function setButtonState(btnName:String, btnState:Boolean){

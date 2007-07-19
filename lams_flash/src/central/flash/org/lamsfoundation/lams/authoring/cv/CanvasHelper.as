@@ -409,10 +409,10 @@ class CanvasHelper {
 	
 	public function checkValidDesign(){
 		if(_ddm.validDesign){
-			Application.getInstance().getToolbar().setButtonState('preview_btn',true);
+			Application.getInstance().getToolbar().setButtonState('preview_btn', true);
 			LFMenuBar.getInstance().enableExport(true);
 		}else{
-			Application.getInstance().getToolbar().setButtonState('preview_btn',false);
+			Application.getInstance().getToolbar().setButtonState('preview_btn', false);
 			LFMenuBar.getInstance().enableExport(false);
 		}
 		
