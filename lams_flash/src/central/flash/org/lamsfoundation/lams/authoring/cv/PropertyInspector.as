@@ -672,6 +672,14 @@ class PropertyInspector extends MovieClip{
 	 * @return  
 	 */
 	private function showAppliedGroupingControls(v:Boolean, e:Boolean){
+		if(_canvasModel.selectedItem.activity.activityTypeID != Activity.GROUP_BRANCHING_ACTIVITY_TYPE) {
+			grouping_lbl._y = 52;
+			appliedGroupingActivity_cmb._y = 52;
+		} else {
+			grouping_lbl._y = 75;
+			appliedGroupingActivity_cmb._y = 75;
+		}
+			
 		grouping_lbl.visible = v;
 		appliedGroupingActivity_cmb.visible = v;
 		
@@ -790,6 +798,10 @@ class PropertyInspector extends MovieClip{
 				
 				branchType_cmb.selectedIndex=i;
 			}
+		}
+		
+		if(_canvasModel.selectedItem.activity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE) {
+			showAppliedGroupingControls(true, !ba.readOnly);
 		}
 	
 	}
@@ -1133,6 +1145,20 @@ class PropertyInspector extends MovieClip{
 		_canvasModel.selectedItem.activity.activityTypeID = evt.target.value;
 		Debugger.log('Set branch type to: _canvasModel.selectedItem.activity.activityTypeID:'+_canvasModel.selectedItem.activity.activityTypeID,Debugger.GEN,'onBranchTypeChange','PropertyInspector');
 		
+		if(evt.target.value == Activity.GROUP_BRANCHING_ACTIVITY_TYPE) {
+			var selectedGroup = appliedGroupingActivity_cmb.dataProvider[appliedGroupingActivity_cmb.selectedIndex].data;
+			if(selectedGroup != null) {
+				_canvasModel.selectedItem.activity.groupingUIID = selectedGroup.createGroupingUIID;
+			}
+				
+			showAppliedGroupingControls(true, !_canvasModel.selectedItem.activity.readOnly);
+		} else {
+			_canvasModel.selectedItem.activity.groupingUIID = null;
+			showAppliedGroupingControls(false);
+		}
+		
+		_canvasModel.selectedItem.refresh();
+		
 		setModified();
 	}
 	
@@ -1160,7 +1186,6 @@ class PropertyInspector extends MovieClip{
 		a.activity.groupingUIID = newGroupingUIID;
 		if (a.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 			for (var k=0; k<a.actChildren.length; k++){
-				trace("Child has title : "+a.actChildren[k].title)
 				a.actChildren[k].groupingUIID = newGroupingUIID;
 			}
 			a.init();
@@ -1257,6 +1282,11 @@ class PropertyInspector extends MovieClip{
 		_canvasModel.getCanvas().checkValidDesign();
 		
 		ApplicationParent.extCall("setSaved", "false");
+	}
+	
+	private function moveItem(item:Object, xDiff:Number, yDiff:Number) {
+		item._x += xDiff;
+		item._y += yDiff;
 	}
 	
 }
