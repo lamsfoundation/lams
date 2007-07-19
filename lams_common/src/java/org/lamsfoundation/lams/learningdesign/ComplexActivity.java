@@ -68,11 +68,12 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 			Transition transitionTo,
 			Transition transitionFrom,
 			String languageFile,
+			Boolean stopAfterActivity,
 			Set activities) {
 		super(activityId, id, description, title, xcoord, ycoord, orderId,
 				defineLater, createDateTime, 
 				learningLibrary, parentActivity, libraryActivity,parentUIID,learningDesign, grouping,
-				activityTypeId, transitionTo,transitionFrom, languageFile);
+				activityTypeId, transitionTo,transitionFrom, languageFile, stopAfterActivity);
 		this.activities = activities;
 	}
 

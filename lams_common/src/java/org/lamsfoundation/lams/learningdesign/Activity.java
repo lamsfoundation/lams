@@ -243,7 +243,8 @@ public abstract class Activity implements Serializable,Nullable {
 			Integer activityTypeId, 
 			Transition transitionTo,
 			Transition transitionFrom,
-			String languageFile) {
+			String languageFile,
+			Boolean stopAfterActivity) {
 		this.activityId = activityId;
 		this.activityUIID = id;
 		this.description = description;
@@ -265,7 +266,7 @@ public abstract class Activity implements Serializable,Nullable {
 		this.languageFile = languageFile;
 		this.readOnly = false;
 		this.initialised = false;
-		this.stopAfterActivity = false;
+		this.stopAfterActivity = stopAfterActivity;
 	}	
 	/** default constructor */
 	public Activity() {
@@ -1005,6 +1006,7 @@ public abstract class Activity implements Serializable,Nullable {
 			
 	   	newActivity.setOrderId(this.getOrderId());
 	   	newActivity.setReadOnly(this.getReadOnly());
+	   	newActivity.setStopAfterActivity(this.isStopAfterActivity());
    }
 	
 	

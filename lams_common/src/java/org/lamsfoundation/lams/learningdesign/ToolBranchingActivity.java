@@ -63,6 +63,7 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
             Integer startYcoord,
             Integer endXcoord,
             Integer endYcoord,
+			Boolean stopAfterActivity,
             Set activities,
             SystemTool systemTool) {
         super(activityId, 
@@ -88,6 +89,7 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
 	            startYcoord,
 	            endXcoord,
 	            endYcoord,
+                stopAfterActivity,
                 activities,
                 systemTool);
    }

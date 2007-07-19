@@ -58,6 +58,7 @@ public class SynchGateActivity extends GateActivity implements Serializable {
             Transition transitionTo,
             Transition transitionFrom,
             String languageFile,
+            Boolean stopAfterActivity,
             Integer gateActivityLevelId,
             Set waitingLearners,
             SystemTool sysTool) {
@@ -80,6 +81,7 @@ public class SynchGateActivity extends GateActivity implements Serializable {
                 transitionTo,
 				transitionFrom,
 				languageFile,
+                stopAfterActivity,
                 gateActivityLevelId,
                 waitingLearners,
                 sysTool);

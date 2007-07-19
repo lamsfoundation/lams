@@ -116,22 +116,26 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 
 	/** Creates an ActivityPortfolio and sets up the list of its children. Doesn't create an entry if there are no children. */
 	public void endComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
+		
 		ActivityPortfolio complexPortfolio = null;
 		
-		if ( currentPortfolioList.size()>0 ) {
+		if ( currentPortfolioList.size()>0 || accessMode == ToolAccessMode.TEACHER) {
 			complexPortfolio = createActivityPortfolio(activity);
+
+			if ( currentPortfolioList.size()>0 ) {
 			complexPortfolio.setChildPortfolios(currentPortfolioList);
-		}
+			}
 		
-		if ( activity.isSystemToolActivity() ) {
-			String exportURL = getExportURLForSystemTool(activity);
-			complexPortfolio = complexPortfolio == null ? createActivityPortfolio(activity) : complexPortfolio;
-			complexPortfolio.setExportUrl(exportURL);
-			// if there isn't a url, we assume we just want a heading
-			complexPortfolio.setHeadingNoPage(exportURL == null);
-		} else {
-			// sequence, parallel, etc
-			complexPortfolio.setHeadingNoPage(true);
+			if ( activity.isSystemToolActivity() ) {
+				String exportURL = getExportURLForSystemTool(activity);
+				complexPortfolio = complexPortfolio == null ? createActivityPortfolio(activity) : complexPortfolio;
+				complexPortfolio.setExportUrl(exportURL);
+				// if there isn't a url, we assume we just want a heading
+				complexPortfolio.setHeadingNoPage(exportURL == null);
+			} else {
+				// sequence, parallel, etc
+				complexPortfolio.setHeadingNoPage(true);
+			}
 		}
 		
 		currentPortfolioList = (ArrayList<ActivityPortfolio>) activityListStack.pop();

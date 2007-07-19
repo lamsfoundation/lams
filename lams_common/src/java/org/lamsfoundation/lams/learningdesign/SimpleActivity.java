@@ -56,7 +56,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
             Grouping grouping, 
             Integer activityTypeId, Transition transitionTo,
 			Transition transitionFrom,
-			String languageFile){
+			String languageFile,
+			Boolean stopAfterActivity){
         super(activityId, 
                 id, 
                 description, 
@@ -75,7 +76,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
                 activityTypeId, 
                 transitionTo,
 				transitionFrom,
-				languageFile);
+				languageFile,
+				stopAfterActivity);
     }
     
     /** default constructor */

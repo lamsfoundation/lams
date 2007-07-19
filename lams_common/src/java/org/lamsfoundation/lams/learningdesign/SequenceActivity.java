@@ -68,6 +68,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
             Transition transitionFrom,
             String languageFile,
             SortedSet activities,
+			Boolean stopAfterActivity,
             Set branchEntries) {
         super(activityId, 
                 id, 
@@ -88,6 +89,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
                 transitionTo,
 				transitionFrom,
 				languageFile,
+				stopAfterActivity,
                 activities);
         super.activityStrategy = new SequenceActivityStrategy(this);
         this.branchEntries = branchEntries;

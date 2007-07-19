@@ -63,6 +63,7 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
             Integer startYcoord,
             Integer endXcoord,
             Integer endYcoord,
+			Boolean stopAfterActivity,
             Set activities,
             SystemTool systemTool) {
         super(activityId, 
@@ -88,6 +89,7 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
 	            startYcoord,
 	            endXcoord,
 	            endYcoord,
+	            stopAfterActivity,
                 activities,
                 systemTool);
     }

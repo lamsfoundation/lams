@@ -86,19 +86,25 @@ public class ProgressEngine
                                          LearnerProgress.ACTIVITY_COMPLETED,
                                          activityDAO);
         completedActivityList.add(completedActivity.getActivityId());
-        Transition transition = completedActivity.getTransitionFrom();
 
-        if (transition != null)
-            return progressCompletedActivity(learner,
-            								 completedActivity,
-                                             learnerProgress,
-                                             transition,
-                                             completedActivityList);
-        else
-            return progressParentActivity(learner,
-                                          completedActivity,
-                                          learnerProgress,
-                                          completedActivityList);
+        if ( completedActivity.isStopAfterActivity() ) {
+        	// special case - terminate the lesson here.
+        	populateCurrentCompletedActivityList(learnerProgress, completedActivityList);
+        	return setLessonComplete(learnerProgress);
+        } else {
+	        Transition transition = completedActivity.getTransitionFrom();
+	        if (transition != null)
+	            return progressCompletedActivity(learner,
+	            								 completedActivity,
+	                                             learnerProgress,
+	                                             transition,
+	                                             completedActivityList);
+	        else
+	            return progressParentActivity(learner,
+	                                          completedActivity,
+	                                          learnerProgress,
+	                                          completedActivityList);
+        }
     }
 
     /**
@@ -329,12 +335,23 @@ public class ProgressEngine
         }
         //lesson is meant to be completed if there is no transition and no parent.
         else {
-        	learnerProgress.setCurrentActivity(null);
-            learnerProgress.setLessonComplete(true);
+        	learnerProgress = setLessonComplete(learnerProgress);
         }
 
         return learnerProgress;
     }
+
+	/**
+	 * Set the lesson to complete for this learner.
+	 * 
+	 * @param learnerProgress
+	 * @return updated learnerProgress
+	 */
+	private LearnerProgress setLessonComplete(LearnerProgress learnerProgress) {
+		learnerProgress.setCurrentActivity(null);
+		learnerProgress.setLessonComplete(true);
+		return learnerProgress;
+	}
 
     /**
      * The helper method to setup the completed activity list since the last
