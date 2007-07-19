@@ -209,6 +209,12 @@ public abstract class Activity implements Serializable,Nullable {
 	 * is set up, schedule gates are scheduled, etc. Used to detect which activities
 	 * need to be initialised for live edit. */
 	private Boolean initialised;
+
+	/** If stopAfterActivity is true, then the progress engine should "end" the lesson at this point.
+	 * Used to arbitrarily stop somewhere in a design, such as at the end of the branch. The normal
+	 * final activity of a design does not necessarily have this set - the progress engine will just
+	 * stop when it runs out of transitions to follow. */
+	private Boolean stopAfterActivity;
    //---------------------------------------------------------------------
     // Object constructors
     //---------------------------------------------------------------------
@@ -259,6 +265,7 @@ public abstract class Activity implements Serializable,Nullable {
 		this.languageFile = languageFile;
 		this.readOnly = false;
 		this.initialised = false;
+		this.stopAfterActivity = false;
 	}	
 	/** default constructor */
 	public Activity() {
@@ -266,6 +273,7 @@ public abstract class Activity implements Serializable,Nullable {
 		this.createDateTime = new Date(); //default value is set to when the object is created
 		this.readOnly = false;
 		this.initialised = false;
+		this.stopAfterActivity = false;
 	}
 
 	/** minimal constructor */
@@ -291,6 +299,8 @@ public abstract class Activity implements Serializable,Nullable {
 		this.transitionTo = transitionTo;
 		this.transitionFrom = transitionFrom;
 		this.readOnly = false;
+		this.initialised = false;
+		this.stopAfterActivity = false;
 	}
 	
 	public static Activity getActivityInstance(int activityType)
@@ -564,7 +574,7 @@ public abstract class Activity implements Serializable,Nullable {
 	}	
 
 	/**
-	 * @return Returns the initialised.
+	 * @return Returns the initialised flag.
 	 */
 	public Boolean isInitialised() {
 		return initialised;
@@ -574,6 +584,19 @@ public abstract class Activity implements Serializable,Nullable {
 	 */
 	public void setInitialised(Boolean initialised) {
 		this.initialised = initialised;
+	}	
+
+	/**
+	 * @return Returns the stopAfterActivity flag.
+	 */
+	public Boolean isStopAfterActivity() {
+		return stopAfterActivity;
+	}
+	/**
+	 * @param readOnly The stopAfterActivity to set.
+	 */
+	public void setStopAfterActivity(Boolean stopAfterActivity) {
+		this.stopAfterActivity = stopAfterActivity;
 	}	
 
 	public String toString() {

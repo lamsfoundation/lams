@@ -859,6 +859,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		if (keyExists(activityDetails, WDDXTAGS.GROUPING_SUPPORT_TYPE))	
 			activity.setGroupingSupportType(WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.GROUPING_SUPPORT_TYPE));
 		
+		if (keyExists(activityDetails, WDDXTAGS.STOP_AFTER_ACTIVITY))	
+		    activity.setStopAfterActivity(WDDXProcessor.convertToBoolean(activityDetails,WDDXTAGS.STOP_AFTER_ACTIVITY));
+
 		return activity;
 	}
 

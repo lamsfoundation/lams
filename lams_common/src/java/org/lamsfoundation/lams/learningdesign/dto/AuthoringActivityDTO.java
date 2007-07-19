@@ -192,6 +192,12 @@ public class AuthoringActivityDTO extends BaseDTO{
 	 * need to be initialised for live edit. */
 	private Boolean initialised;
 
+	/** If stopAfterActivity is true, then the progress engine should "end" the lesson at this point.
+	 * Used to arbitrarily stop somewhere in a design, such as at the end of the branch. The normal
+	 * final activity of a design does not necessarily have this set - the progress engine will just
+	 * stop when it runs out of transitions to follow. */
+	private Boolean stopAfterActivity;
+ 
 	/* Server will send Grouping objects as an array (in the Groupings array)
 	 * rather than being part of the GroupingActivity. For the groupings array
 	 * see LearningDesignDTO.
@@ -236,7 +242,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 			Integer createGroupingUIID, Long libraryActivityID,
 			Boolean applyGrouping,Integer groupingSupportType,
 			Integer groupingType,GroupingDTO groupingDTO, 
-			Boolean readOnly, Boolean initialised, Integer firstActivityUIID,
+			Boolean readOnly, Boolean initialised, Boolean stopAfterActivity,
+			Integer firstActivityUIID,
 			Integer startXCoord, Integer startYCoord, Integer endXCoord, Integer endYCoord) {
 		super();
 		this.activityID = activityID;
@@ -281,6 +288,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		//this.groupingDTO = groupingDTO;
 		this.readOnly = readOnly;
 		this.initialised = initialised;
+		this.stopAfterActivity=stopAfterActivity;
 		// Sequence Activity field
 		this.firstActivityUIID = firstActivityUIID;
 		// Branching Activity fields
@@ -330,7 +338,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.groupingSupportType = activity.getGroupingSupportType();
 		this.readOnly = activity.getReadOnly();
 		this.initialised = activity.isInitialised();
-
+		this.stopAfterActivity = activity.isStopAfterActivity();
 	}
 	
 	
@@ -675,6 +683,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	public Boolean getInitialised() {
 		return initialised;
 	}
+	public Boolean getStopAfterActivity() {
+		return stopAfterActivity;
+	}
 	/**
 	 * @return Returns the applyGrouping.
 	 */
@@ -1017,6 +1028,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	}
 	public void setInitialised(Boolean initialised) {
 		this.initialised = initialised;
+	}
+	public void setStopAfterActivity(Boolean stopAfterActivity) {
+		this.stopAfterActivity = stopAfterActivity;
 	}
 	public void setFirstActivityUIID(Integer firstActivityUIID) {
 		if(!firstActivityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))

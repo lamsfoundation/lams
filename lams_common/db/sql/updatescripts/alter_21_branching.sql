@@ -28,7 +28,9 @@ ADD COLUMN first_activity_id BIGINT(20)
 ,ADD COLUMN start_xcoord INT(11)
 ,ADD COLUMN start_ycoord INT(11)
 ,ADD COLUMN end_xcoord INT(11)
-,ADD COLUMN end_ycoord INT(11);
+,ADD COLUMN end_ycoord INT(11)
+,ADD COLUMN stop_after_activity TINYINT NOT NULL DEFAULT 0
+;
  
 
 INSERT INTO lams_learning_activity_type VALUES (10, 'BRANCHING_CHOSEN');

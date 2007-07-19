@@ -1811,6 +1811,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		act.setDescription(actDto.getDescription());
 		act.setHelpText(actDto.getHelpText());
 		act.setLanguageFile(actDto.getLanguageFile());
+		
+		// added in 2.1 - will be missing from earlier import files.
+		if ( actDto.getStopAfterActivity() != null )
+			act.setStopAfterActivity(actDto.getStopAfterActivity());
+		
 		//do not need set so far
 //		act.setLearningDesign();
 		

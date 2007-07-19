@@ -94,6 +94,7 @@ public interface WDDXTAGS {
 	
 	public static final String APPLY_GROUPING = "applyGrouping";
 	public static final String GROUPING_SUPPORT_TYPE = "groupingSupportType";
+	public static final String STOP_AFTER_ACTIVITY = "stopAfterActivity";
 	
 	/** OptionsActivity specific tags*/
 	public static final String MAX_OPTIONS="maxOptions";

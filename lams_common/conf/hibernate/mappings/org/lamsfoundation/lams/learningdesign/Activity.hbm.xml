@@ -87,6 +87,7 @@
     <property name="languageFile" type="java.lang.String" column="language_file" length="255"/>
     <property name="readOnly" type="java.lang.Boolean" column="read_only"/>
     <property name="initialised" type="java.lang.Boolean" column="initialised"/>
+    <property name="stopAfterActivity" type="java.lang.Boolean" column="stop_after_activity"/>
 
     <!-- Associations -->
     
