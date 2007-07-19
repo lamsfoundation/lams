@@ -598,7 +598,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		if(sequence.firstActivityUIID != null) {
 			var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, _cv.ddm.getActivityByUIID(sequence.firstActivityUIID).activityUIID, activeView.startHub.activity.activityUIID, sequence, _cv.ddm.learningDesignID);
 			_cv.ddm.addBranch(b);
+			
+			if(!sequence.stopAfterActivity) {
+				b = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_TO_END, _cv.ddm.getActivityByUIID(this.getLastActivityUIID(sequence.firstActivityUIID)).activityUIID, activeView.endHub.activity.activityUIID, sequence, _cv.ddm.learningDesignID);
+			
+				_cv.ddm.addBranch(b);
+			}
 		}
+	}
+	
+	private function getLastActivityUIID(activityUIID:Number):Number {
+		
+		// get next activity from transition
+		var transObj = _cv.ddm.getTransitionsForActivityUIID(activityUIID);
+		
+		return (transObj.out == null) ? activityUIID : getLastActivityUIID(transObj.out.toUIID);
 	}
 	
 	public function addActivityToConnection(ca:Object):Object{

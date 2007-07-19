@@ -243,6 +243,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			}
 				
 			_cm.addNewBranch(SequenceActivity(sequenceActs[i]));
+			
 		}
 		
 		if(defaultSequenceActivity == null)
@@ -429,8 +430,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		cm.branchesDisplayed.put(b.branchUIID,newBranch_mc);
 		Debugger.log('drawn a branch:'+b.branchUIID+','+newBranch_mc,Debugger.GEN,'drawBranch','CanvasView');
 		
-		if(b.direction != BranchConnector.DIR_TO_END)
+		if(b.direction != BranchConnector.DIR_TO_END) {
 			cm.moveActivitiesToBranchSequence(b.targetUIID, b.sequenceActivity);
+		} else {
+			b.sequenceActivity.stopAfterActivity = false;
+		}
 		
 		return true;
 	}
@@ -485,6 +489,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private function removeBranch(b:Branch,cm:CanvasModel){
 		if(!cm.isActiveView(this)) return false;
 		if(b.direction == BranchConnector.DIR_FROM_START) b.sequenceActivity.firstActivityUIID = null;
+		else if(b.direction == BranchConnector.DIR_TO_END) b.sequenceActivity.stopAfterActivity = true;
 		
 		var r = cm.branchesDisplayed.remove(b.branchUIID);
 		r.removeMovieClip();

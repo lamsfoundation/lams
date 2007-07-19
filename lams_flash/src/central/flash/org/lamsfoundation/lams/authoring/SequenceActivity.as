@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.common.Config;
 * @version     2.1
 * @see		   Activity
 */
-class SequenceActivity extends ComplexActivity{
+class SequenceActivity extends ComplexActivity {
 	
 	
 	private var _firstActivityUIID:Number;
@@ -70,7 +70,8 @@ class SequenceActivity extends ComplexActivity{
 	 */
 	public function toData():Object{
 		var dto:Object = super.toData();
-		dto.firstActivityUIID = (_firstActivityUIID == null) ? Config.NUMERIC_NULL_VALUE : _firstActivityUIID;
+		if(_firstActivityUIID == null) { return null; }
+		else { dto.firstActivityUIID = _firstActivityUIID; }
 
 		return dto;
 	}

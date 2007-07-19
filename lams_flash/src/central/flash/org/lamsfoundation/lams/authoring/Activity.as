@@ -373,7 +373,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 		if(_createDateTime){		dto.createDateTime		= _createDateTime;			}
 		if(_groupingSupportType){	dto.groupingSupportType = _groupingSupportType;		}
 		if(_readOnly){	dto.readOnly = _readOnly;	 }
-		if(_stopAfterActivity){ dto.stopAfterActivity = _stopAfterActivity } 
+		if(_stopAfterActivity != null){ dto.stopAfterActivity = _stopAfterActivity } 
 		
 		return dto;
 	}
