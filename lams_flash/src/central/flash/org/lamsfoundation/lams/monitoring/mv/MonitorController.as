@@ -480,7 +480,6 @@ class MonitorController extends AbstractController {
 			var stateID:Number = evt.target.changeStatus_cmb.selectedItem.data;
 			switch(stateID){
 				case LessonTabView.REMOVE_CBI :
-					trace('removing...');
 					var confirmMsg:String = Dictionary.getValue('ls_remove_confirm_msg');
 					var warningMsg:String = Dictionary.getValue('ls_remove_warning_msg', [_monitorModel.getSequence().getSequenceName()]);
 					
@@ -492,27 +491,20 @@ class MonitorController extends AbstractController {
 					break;
 				case LessonTabView.NULL_CBI :
 					// error msg
-					trace('nothing selected...');
 					break;
 				case LessonTabView.ACTIVE_CBI :
-					trace('activating...');
 					_monitorModel.activateSequence();
 					break;
 				case LessonTabView.DISABLE_CBI :
-					trace('suspending...');
 					_monitorModel.suspendSequence();
 					break;
 				case LessonTabView.ARCHIVE_CBI :
-					trace('archiving...');
 					_monitorModel.archiveSequence();
 					break;
 				case LessonTabView.UNARCHIVE_CBI :
-					trace('unarchiving...');
 					_monitorModel.unarchiveSequence();
 					break;
 				default :
-					trace('no such combo box item');
-					
 			}
 			
 			clearBusy();
@@ -528,7 +520,6 @@ class MonitorController extends AbstractController {
 	}
 	
 	public function get appData():Object{
-		trace("called monitor application")
 		var myObj:Object = new Object();
 		myObj.compX = Application.MONITOR_X
 		myObj.compY = Application.MONITOR_Y

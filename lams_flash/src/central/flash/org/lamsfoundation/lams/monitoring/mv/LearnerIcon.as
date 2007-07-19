@@ -244,14 +244,6 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	 * @return  
 	 */
 	private function setStyles() {
-		//var styleObj = _tm.getStyleObject('label');
-		
-		//title_lbl.setStyle('styleName',styleObj);
-		//title_lbl.setStyle('textAlign', 'center');
-		
-		//styleObj = _tm.getStyleObject('ACTPanel')
-		//act_pnl.setStyle('styleName',styleObj);
-			
     }
     
 

@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.Config;
 import org.lamsfoundation.lams.common.ToolTip;
 import org.lamsfoundation.lams.common.ApplicationParent;
+
 import mx.managers.*
 import mx.containers.*
 import mx.events.*
@@ -83,12 +84,10 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private var exportPortfolio_btn:Button;
 	private var viewJournals_btn:Button;
 	private var editFly_btn:Button;
-	//private var _activityLayerComplex_mc:MovieClip;
-	//private var _activityLayer_mc:MovieClip;
 	
-	//private var _transitionPropertiesOK:Function;
     private var _monitorView:MonitorView;
 	private var _monitorModel:MonitorModel;
+	
 	//Tab Views Initialisers
 	
 	//LessonTabView
@@ -203,7 +202,6 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     */
 	private function showData(mm:MonitorModel):Void{
         var s:Object = mm.getSequence();
-		trace("Item Description is : "+s._learningDesignID);
 		
 	}
 	
@@ -242,10 +240,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		
 		
 		_learnerTabLayer_mc = _monitorLearner_mc.createEmptyMovieClip("_learnerTabLayer_mc", _monitorLearner_mc.getNextHighestDepth());
-		
-		//_todoTabLayer_mc = _monitor_mc.createEmptyMovieClip("_todoTabLayer_mc", _monitor_mc.getNextHighestDepth());
-		
-				
+	
 		var tab_arr:Array = [{label:Dictionary.getValue('mtab_lesson'), data:"lesson"}, {label:Dictionary.getValue('mtab_seq'), data:"monitor"}, {label:Dictionary.getValue('mtab_learners'), data:"learners"}];
 		
 		monitorTabs_tb.dataProvider = tab_arr;
@@ -367,11 +362,8 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     */
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
-		trace("Monitor Tab Widtht: "+s.w+" Monitor Tab Height: "+s.h);
 		bkg_pnl.setSize(s.w,s.h);
-		bkgHeader_pnl.setSize(s.w, bkgHeader_pnl._height)
-		trace("Monitor View Stage Width "+s.w+" and Monitor View Stage height "+s.h)
-		trace("Monitor View bg panel Width "+bkg_pnl.width+" and Monitor View bg panel height "+bkg_pnl.height)
+		bkgHeader_pnl.setSize(s.w, bkgHeader_pnl._height);
 		monitorLesson_scp.setSize(s.w-monitorLesson_scp._x,s.h-monitorLesson_scp._y);
 		monitorSequence_scp.setSize(s.w-monitorSequence_scp._x,s.h-monitorSequence_scp._y);
 		monitorLearner_scp.setSize(s.w-monitorLearner_scp._x,s.h-monitorLearner_scp._y);
@@ -389,7 +381,6 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     */
 	private function setPosition(mm:MonitorModel):Void{
         var p:Object = mm.getPosition();
-		trace("X pos set in Model is: "+p.x+" and Y pos set in Model is "+p.y)
         this._x = p.x;
         this._y = p.y;
 	}
