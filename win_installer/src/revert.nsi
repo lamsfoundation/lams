@@ -154,11 +154,12 @@ FunctionEnd
 
 Function CheckMySQL    
     # Checking if the given database name already exists in the mysql database list
-    ifFileExists "$MYSQL_DIR\data\$DB_NAME\*.*" continue NoDatabaseNameExists
-    NoDatabaseNameExists:
-        MessageBox MB_OK|MB_ICONSTOP "Could not find database $DB_NAME. Please check your database settings and try again"
-        quit   
-    continue:
+    #ifFileExists "$MYSQL_DIR\data\$DB_NAME\*.*" stoprevert NoDatabaseNameExists
+    #stoprevert
+      #  MessageBox MB_OK|MB_ICONSTOP "Could not find database $DB_NAME. Please check your database settings and try again"
+     #   quit
+    #NoDatabaseNameExists:   
+    
     
     # check mysql version is 5.0.x
     nsExec::ExecToStack '$MYSQL_DIR\bin\mysqladmin --version'
