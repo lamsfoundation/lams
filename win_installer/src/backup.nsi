@@ -242,11 +242,20 @@ FunctionEnd
 
 Function CheckMySQL    
     # Checking if the given database name already exists in the mysql database list
-    ifFileExists "$MYSQL_DIR\data\$DB_NAME\*.*" continue NoDatabaseNameExists
-    NoDatabaseNameExists:
+    nsExec::ExecToStack '$MYSQL_DIR\bin\mysql -u$DB_USER -p$DB_PASS $DB_NAME -e "SELECT * FROM lams_configuration"'
+    Pop $0
+    Pop $1
+    ${If} $0 != 0 ; if mySQL install directory field is empty, do not continue
         MessageBox MB_OK|MB_ICONSTOP "Could not find database $DB_NAME. Please check your database settings and try again"
-        quit   
-    continue:
+        Abort
+    ${EndIf}
+    
+    
+    #ifFileExists "$MYSQL_DIR\data\$DB_NAME\*.*" continue NoDatabaseNameExists
+    #NoDatabaseNameExists:
+    #    MessageBox MB_OK|MB_ICONSTOP "Could not find database $DB_NAME. Please check your database settings and try again"
+    #    quit   
+    #continue:
     
     # check mysql version is 5.0.x
     nsExec::ExecToStack '$MYSQL_DIR\bin\mysqladmin --version'
