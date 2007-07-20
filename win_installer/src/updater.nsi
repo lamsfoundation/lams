@@ -50,7 +50,7 @@
 !insertmacro LineFind
 
 # constants
-!define VERSION "2.0.3"
+!define VERSION "2.0.4"
 !define PREVIOUS_VERSION "2.0.2"
 !define LANGUAGE_PACK_VERSION "2007-06-01"
 !define LANGUAGE_PACK_VERSION_INT "20070601"
@@ -1073,7 +1073,17 @@ Function updateLamswww
     File "..\assembly\lams.ear\lams-www.war\images\preloader.logo.swf"
     
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
-    File "..\..\lams_www\conf\lams\news.html"     
+    File "..\templates\news-2.0.2.html"
+    ;if news and news-2.0.2 are the same
+
+    nsExec::ExecToStack 'fc $INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\news.html $INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\news-2.0.2.html'
+    pop $0
+    pop $1
+    ${StrStr} "$3" "$1" "FC: no differences encountered"
+    ;if there aren't any differences output the new news.html
+    ${if} "$3" != ""
+        File "..\..\lams_www\conf\lams\news.html"
+    ${endif}
 FunctionEnd
 
 
