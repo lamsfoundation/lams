@@ -45,7 +45,7 @@ installfailed()
 # Invoked when the install is exited
 installexit()
 {
-	echo ""
+	printf "\nLAMS update exited by user.\n\n"
 	cp lams.properties docs/lams.properties.backup.exec
 	cp docs/lams.properties.backup.orig lams.properties
 	export JAVA_HOME=$ORIG_JAVA_HOME
@@ -268,7 +268,7 @@ checklams()
 
 backup()
 {
-	printf "\nDo you wish to backup lams before updating? (Recommended. NOTE: Requires MySql to be installed at localhost)\n"
+	printf "\nDo you wish to automatically backup lams before updating? (Recommended. NOTE: Requires MySql to be installed at localhost)\n"
 	printf "The space required to backup your LAMS installation: \n"
 	du -chs $LAMS_DIR $JBOSS_DIR
 	printf "(y)es I wish to backup LAMS.\n"
@@ -280,13 +280,12 @@ backup()
 
 	case "$backup" in 
 	q)
-		printf "\nTo backup your LAMS installation manually, simply follow the follwing steps..."
-		printf "\n1) Backup $JBOSS_DIR\n"				      
-		printf "2) Backup $LAMS_DIR\n"					      
-		printf "3) Backup /etc/lams2\n"					      
-		printf "4) Dump the database by executing the following command. Fill in your own backup direcory\n"
-		printf "> $sqldir/mysqldump -u$dbuser -p$dbpass $dbname > (backup dir)/lams.dump\n\n" 
-		
+		printf "\nIf you would like manually backup LAMS, please complete the following steps:\n"
+		printf "\n1) Backup $JBOSS_DIR\n"
+		printf "2) Backup $LAMS_DIR\n"
+		printf "3) Backup /etc/lams2\n"
+		printf "4) Dump the database by executing the following command. Fill in your own backup \ndirectory.\n"
+		printf "> $sqldir/mysqldump -u$dbuser -p$dbpass $dbname > (backup dir)/lams.dump\n"
 		installexit 
 		;;
 	y)
@@ -328,6 +327,15 @@ printf "This installer will prompt you to enter many configurations and location
 printf "on your computer so please make sure you are ready.\n"
 printf "You should read the installation guide before continuing.\n"
 printf "\nJAVA_HOME = $JAVA_HOME\n"
+printf "\n--------------------------------------------------------------------------------\n\n"
+
+printf "The updater can backup LAMS automatically for you, but if you would like to\n"
+printf "backup LAMS manually before proceeding, please complete the following steps:\n"
+printf "\n1) Backup $JBOSS_DIR\n"
+printf "2) Backup $LAMS_DIR\n"
+printf "3) Backup /etc/lams2\n"
+printf "4) Dump the database by executing the following command. Fill in your own backup \ndirectory.\n"
+printf "> $sqldir/mysqldump -u$dbuser -p$dbpass $dbname > (backup dir)/lams.dump\n"
 printf "\n--------------------------------------------------------------------------------\n\n"
 
 getMysqlHost
@@ -409,10 +417,5 @@ export JAVA_HOME=$ORIG_JAVA_HOME
 printf "\nLAMS $LAMS_VERSION Configuration completed!\n"
 printf "Please view the README for instructions on how to run LAMS\n\n"
 
-printf "\nTo backup your LAMS installation manually, simply follow the follwing steps..."
-printf "\n1) Backup $JBOSS_DIR\n"
-printf "2) Backup $LAMS_DIR\n"
-printf "3) Backup /etc/lams2\n"
-printf "4) Dump the database by executing the following command. Fill in your own backup direcory\n"
-printf "> $sqldir/mysqldump -u$dbuser -p$dbpass $dbname > (backup dir)/lams.dump\n\n"
+
 
