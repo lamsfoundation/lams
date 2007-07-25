@@ -56,10 +56,10 @@
 	</target>
 
 
-	<target name="configure-jboss" description="Copying jboss-cash.jar and jgroups.jar from server/all/lib to server/default/lib">
-		<echo message="Copying jboss-cache.jar and jgroups.jar from ${JBOSS_DIR}/server/all/lib to ${JBOSS_DIR}/server/default/lib"/>
-		<copy file="${JBOSS_DIR}/server/all/lib/jboss-cache.jar" todir="${JBOSS_DIR}/server/default/lib" failonerror="true" overwrite="true" />
-		<copy file="${JBOSS_DIR}/server/all/lib/jgroups.jar" todir="${JBOSS_DIR}/server/default/lib" failonerror="true" overwrite="true" />
+	<target name="configure-jboss" description="Copying jboss-cash.jar and jgroups.jar from server/all/lib to ${DEFAULT_DIR}/lib">
+		<echo message="Copying jboss-cache.jar and jgroups.jar from ${JBOSS_DIR}/server/all/lib to ${DEFAULT_DIR}/lib"/>
+		<copy file="${JBOSS_DIR}/server/all/lib/jboss-cache.jar" todir="${DEFAULT_DIR}/lib" failonerror="true" overwrite="true" />
+		<copy file="${JBOSS_DIR}/server/all/lib/jgroups.jar" todir="${DEFAULT_DIR}/lib" failonerror="true" overwrite="true" />
 
 		<copy todir="${JBOSS_DIR}/bin" overwrite="true" failonerror="true">
 			<fileset dir="../bin/">

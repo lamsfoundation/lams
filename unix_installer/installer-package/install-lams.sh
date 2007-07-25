@@ -375,8 +375,8 @@ createDatabase
 printf "\nDatabase Created.\n\n"
 
 # Copying the main lams files
-printf "Copying lams.ear directory to $JBOSS_DIR/server/default/deploy.\n"
-cp -rv assembly/lams.ear $JBOSS_DIR/server/default/deploy
+printf "Copying lams.ear directory to ${DEFAULT_DIR}/deploy.\n"
+cp -rv assembly/lams.ear ${DEFAULT_DIR}/deploy
 
 printf "\nDone.\n\n"
 if [  "$?" -ne  "0" ]
@@ -387,7 +387,7 @@ fi
 
 # UNCOMMENT FOR (2.1) Create news-unmodified.html and place it with news.html such that the upgrader can do a 
 # diff between the two files to determine whether it should update news.html or not.
-# cp assembly/lams.ear/lams-www.war/news.html $JBOSS_DIR/server/default/deploy/lams.ear/lams-www.war/news-unmodified.html
+# cp assembly/lams.ear/lams-www.war/news.html ${DEFAULT_DIR}/deploy/lams.ear/lams-www.war/news-unmodified.html
 
 # Configuring jboss with settings from lams.properties
 printf "Configuring JBoss with your settings.\n"
@@ -405,8 +405,9 @@ printf "\nConfiguring the java Wrapper\n"
 configureWrapper
 
 # configure jboss
-cp $JBOSS_DIR/server/all/lib/jgroups.jar $JBOSS_DIR/server/all/lib/jboss-cache.jar $JBOSS_DIR/server/default/lib
-cp assembly/lams-session.jar  assembly/lams-valve.jar $JBOSS_DIR/server/default/lib
+mkdir ${DEFAULT_DIR}/lib
+cp $JBOSS_DIR/server/all/lib/jgroups.jar $JBOSS_DIR/server/all/lib/jboss-cache.jar ${DEFAULT_DIR}/lib
+cp assembly/lams-session.jar  assembly/lams-valve.jar ${DEFAULT_DIR}/lib
 if [  "$?" -ne  "0" ]
         then
         echo "\nInstall Failed. Problem while configuring JBoss, please ensure you have the correct version of JBoss (4.0.2).\n\n"
