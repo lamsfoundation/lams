@@ -65,10 +65,13 @@ class org.lamsfoundation.lams.common.ui.Dialog {
 		
 		var target:MovieClip;
 		
+		
 		if(ApplicationParent.getInstance().getWorkspace().getWV().isOpen) {
 			target = ApplicationParent.getInstance().getWorkspace().getWV().workspaceDialog;
+		} else if(ApplicationParent.getInstance().dialog.content) {
+			target = ApplicationParent.getInstance().dialog;
 		} else {
-			target = ApplicationParent.root;
+			target = ApplicationParent.dialogue;
 		}
 		
 		_inputDialog = target.attachMovie('alertDialog', 'alertDialog', DepthManager.kTopmost, {_x:0, _y:0});

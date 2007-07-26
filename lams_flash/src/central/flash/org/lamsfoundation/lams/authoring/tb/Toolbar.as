@@ -57,7 +57,7 @@ class Toolbar {
 		toolbarModel = new ToolbarModel(this, mode);
         
 		//Create the view
-		toolbarView_mc = target_mc.createChildAtDepth("toolbarView",DepthManager.kTop);		
+		toolbarView_mc = target_mc.createChildAtDepth("toolbarView", DepthManager.kTop);		
         
         //Cast toolbar view clip as ToolbarBview and initialise passing in model
 		toolbarView = ToolbarView(toolbarView_mc);

@@ -31,7 +31,6 @@ class Branch extends Transition {
 
 	private var UIID:Number;
 	private var _sequenceActivity:SequenceActivity;
-	
 	private var _direction:Number;
 	private var _targetUIID:Number;
 	private var _hubUIID:Number;
@@ -50,7 +49,6 @@ class Branch extends Transition {
 		_targetUIID = targetUIID;
 		_hubUIID = hubUIID;
 		_sequenceActivity = sequenceActivity;
-		
 	}
 	
 	public function toData():Object{
@@ -66,6 +64,10 @@ class Branch extends Transition {
 	
 	public function get sequenceActivity():SequenceActivity {
 		return _sequenceActivity;
+	}
+	
+	public function get sequenceName():String {
+		return _sequenceActivity.title;
 	}
 	
 	public function get direction():Number {

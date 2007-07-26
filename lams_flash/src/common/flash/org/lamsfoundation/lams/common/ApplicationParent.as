@@ -59,7 +59,7 @@ class ApplicationParent {
     private var _config:Config;
     private var _workspace:Workspace;
 	
-	
+	private var _currentDialog:MovieClip;
 	private var _customCursor_mc:MovieClip;         //Cursor container
     
 	
@@ -74,6 +74,8 @@ class ApplicationParent {
 	private var _module:String;
 
 	private var _appRoot_mc:MovieClip;                 //Application root clip
+	private var _dialogueContainer_mc:MovieClip;       //Dialog container
+    
     
 
 	// constructor
@@ -244,6 +246,30 @@ class ApplicationParent {
 		target.duplicateMovieClip(newName, depth, initObject);
 		
 		return target._parent[newName];
+	}
+	
+	/**
+    * Returns the Dialogue conatiner mc
+    * 
+    * @usage    Import authoring package and then use
+	* 
+    */
+    static function get dialogue():MovieClip {
+        //Return root if valid otherwise raise a big system error as app. will not work without it
+        if(_instance._dialogueContainer_mc != undefined) {
+            return _instance._dialogueContainer_mc;
+        } else {
+            //TODO DI 11/05/05 Raise error if mc hasn't been created
+			
+        }
+    }
+	
+	public function get dialog():MovieClip {
+		return _currentDialog;
+	}
+	
+	public function set dialog(a:MovieClip) {
+		_currentDialog = a;
 	}
 	
 }

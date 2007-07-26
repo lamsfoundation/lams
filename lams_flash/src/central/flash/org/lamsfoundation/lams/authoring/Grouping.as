@@ -93,7 +93,23 @@ class org.lamsfoundation.lams.authoring.Grouping {
 		if(_learnersPerGroups){	dto.learnersPerGroups = _learnersPerGroups;	}
 		return dto;
 	}
-/**
+	
+	public function getGroups():Array {
+		var groups:Array = new Array();
+		var groupTotal = (groupingTypeID == RANDOM_GROUPING) ? numberOfGroups : maxNumberOfGroups;
+		
+		for(var i=0; i<groupTotal; i++) {
+			var group = new Object();
+			group.name = "Group " + i;
+			group.groupID = i;
+			group.groupingUIID = groupingUIID;
+			groups.push(group);
+		}
+		
+		return groups;
+	}
+	
+	/**
 	 * 
 	 * @usage   
 	 * @param   newgroupingID 

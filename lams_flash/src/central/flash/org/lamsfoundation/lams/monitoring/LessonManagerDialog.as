@@ -105,13 +105,14 @@ class LessonManagerDialog extends MovieClip implements Dialog{
     * constructor
     */
     function LessonManagerDialog(){
-		trace('initialising Lesson Manager Dialog');
-        //Set up this class to use the Flash event delegation model
+		//Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
+		
 		_resultDTO = new Object();
         _learnersLoaded = false;
 		_staffLoaded = false;
-        //Create a clip that will wait a frame before dispatching init to give components time to setup
+        
+		//Create a clip that will wait a frame before dispatching init to give components time to setup
         MovieClipUtils.doLater(Proxy.create(this,init));
 	}
 	
@@ -119,35 +120,22 @@ class LessonManagerDialog extends MovieClip implements Dialog{
     * Called a frame after movie attached to allow components to initialise
     */
     private function init():Void{
-        
-        trace('now initialising ...');
-        
+		
 		//set the reference to the StyleManager
         themeManager = ThemeManager.getInstance();
         
-		// Set the styles
         setStyles();
 		setLabels();
-        //Set the text for buttons
-        //ok_btn.label = Dictionary.getValue('lesson_dlg_ok');
-        //cancel_btn.label = Dictionary.getValue('lesson_dlg_cancel');
-		
 		
 		// disable on startup until learners/staff loaded
 		enableButtons(false);
-		
-        //Set the labels
-        
-        //get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
-        //fm = _container.getFocusManager();
-        //fm.enabled = true;
-        //ok_btn.setFocus();
 		
         //EVENTS
         //Add event listeners for ok, cancel and close buttons
         ok_btn.addEventListener('click',Delegate.create(this, ok));
         cancel_btn.addEventListener('click',Delegate.create(this, cancel));
-        //Assign Click (close button) and resize handlers
+        
+		//Assign Click (close button) and resize handlers
         _container.addEventListener('click',this);
         _container.addEventListener('size',this);
         
@@ -158,8 +146,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
         yCancelOffset = panel._height - cancel_btn._y;
 		
 		treeview = org_dnd.getTree();
-		trace('LF window: ' + _container);
-		trace('Tree: ' + treeview);
+		
 		//fire event to say we have loaded
 		_container.contentLoaded();
     }
@@ -171,9 +158,6 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	 */
 	public function setUpContent():Void{
 		
-		//register to recive updates form the model
-		//MonitorModel(_monitorView.getModel()).addEventListener('viewUpdate',this);
-		
 		Debugger.log('_monitorView:'+_monitorView,Debugger.GEN,'setUpContent','org.lamsfoundation.lams.LessonManagerDialog');
 		
 		//get a ref to the controller and kkep it here to listen for events:
@@ -183,13 +167,9 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		 //Add event listeners for ok, cancel and close buttons
         ok_btn.addEventListener('onPress',Delegate.create(this, ok));
         cancel_btn.addEventListener('onPress',Delegate.create(this, cancel));
-		trace("OrganisationID is: "+_monitorModel.getSequence().organisationID)
+		
 		getOrganisations(_monitorModel.getSequence().organisationID, null);
-		
-		//Set up the treeview
-        //setUpTreeview();
-		
-		//itemSelected(treeview.selectedNode);
+
 	}
 
 	/**
@@ -209,7 +189,6 @@ class LessonManagerDialog extends MovieClip implements Dialog{
     * Called by the cancel button 
     */
     private function cancel(){
-        trace('Cancel');
         //close parent window
         _container.deletePopUp();
     }
@@ -229,37 +208,26 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		var selectedStaff:Array = new Array();
 			
 		if(snode == null){
-			trace('no course/class selected');
-			//LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg3_1'), null, null);
 			return false;
 		} else {
 			// add selected users to dto
-			trace('learners')
-			
-			
 			for(var i=0; i<learnerList.length;i++){
 				if(learnerList[i].user_cb.selected){
-					trace('select item: ' + learnerList[i].fullName.text);
 					selectedLearners.push(learnerList[i].data.userID);
 				}
 			}
 			
-	
-			trace('staff')
 			for(var i=0; i<staffList.length;i++){
 				if(staffList[i].user_cb.selected){
-					trace('select item: ' + staffList[i].fullName.text);
 					selectedStaff.push(staffList[i].data.userID);
 				}
 			}
 			
 			if(selectedLearners.length <= 0){
-				trace('no learners selected');
 				valid = false;
 			}
 			
 			if(selectedStaff.length <= 0){
-				trace('no staff selected');
 				valid = false;
 			}
 			
@@ -284,12 +252,9 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 			resultDTO.staffGroupName = Dictionary.getValue('staff_group_name', [orgName]);
 			resultDTO.learnersGroupName = Dictionary.getValue('learners_group_name', [orgName]);
 			
-			trace('selected org ID is: ' + selectedOrgID);
-			
 			doOrganisationDispatch();
 			
 		}else{
-			//LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg3_2'), null, null);
 		}
 		
 		
@@ -297,7 +262,6 @@ class LessonManagerDialog extends MovieClip implements Dialog{
     
 	public function doOrganisationDispatch(){
 		
-        //dispatchEvent({type:'okClicked',target:this});
 		_monitorController.editLessonClass(resultDTO);
 	   
         closeThisDialogue();
@@ -312,8 +276,6 @@ class LessonManagerDialog extends MovieClip implements Dialog{
     * If an alert was spawned by this dialog this method is called when it's closed
     */
     private function alertClosed(evt:Object){
-        //Should prefs dialog be closed?
-        //TODO DI 01/06/05 check for delete of dialog
         //_container.deletePopUp();
     }
     
@@ -340,7 +302,6 @@ class LessonManagerDialog extends MovieClip implements Dialog{
     * Event dispatched by parent container when close button clicked
     */
     public function click(e:Object):Void{
-        trace('LessonManagerDialog.click');
         e.target.deletePopUp();
     }
     
@@ -358,13 +319,6 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 			for (var i = 0; i<node.childNodes.length; i++) {
 				var cNode = node.getTreeNodeAt(i);
 				setBranches(cNode);
-				/*
-				if(cNode.hasChildNodes()){
-					treeview.setIsBranch(cNode, true);
-					setBranches(cNode);
-				}
-				*/
-				
 			}
 		}
 	}
@@ -397,17 +351,9 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	 */
 	private function setUpTreeview(){
 			
-		//Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-		
 		setUpBranchesInit();
 		
-		//treeview.addEventListener("nodeOpen", Delegate.create(_monitorController, _monitorController.onTreeNodeOpen));
-		//treeview.addEventListener("nodeClose", Delegate.create(_monitorController, _monitorController.onTreeNodeClose));
-		//treeview.addEventListener("change", Delegate.create(_monitorController, _monitorController.onTreeNodeChange));
-
-		//org_dnd.addEventListener("drag_complete", Delegate.create(_lessonManagerController, _lessonManagerController.onDragComplete));
 		treeview.selectedNode = treeview.firstVisibleNode;
-		//_monitorController.selectTreeNode(treeview.selectedNode);
 		
 		_monitorModel.setOrganisation(new Organisation(treeview.selectedNode.attributes.data));
 		
@@ -435,11 +381,9 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 			_usersLoadCheckCount++;
             //If all events dispatched clear interval and call start()
             if(_learnersLoaded && _staffLoaded){
-				//Debugger.log('Clearing Interval and calling start :',Debugger.CRITICAL,'checkUILoaded','Application');	
-                clearInterval(_UsersLoadCheckIntervalID);
+				clearInterval(_UsersLoadCheckIntervalID);
 				enableButtons(true);
             }else {
-				//Debugger.log('ALL UI LOADED, waiting for all true to dispatch init events: _dictionaryLoaded:'+_dictionaryLoaded+'_themeLoaded:'+_themeLoaded ,Debugger.GEN,'checkUILoaded','Application');
 				if(_usersLoadCheckCount >= USERS_LOAD_CHECK_TIMEOUT_COUNT){
 					//if we havent loaded the dict or theme by the timeout count then give up
 					Debugger.log('raeached time out waiting to load dict and themes, giving up.',Debugger.CRITICAL,'checkUILoaded','Application');
@@ -457,7 +401,6 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		if(classID != undefined){
 			Application.getInstance().getComms().getRequest('workspace.do?method=getUserOrganisation&userID='+_root.userID+'&organisationID='+classID+'&roles=MONITOR,COURSE MANAGER',callback, false);
 		}else if(courseID != undefined){
-			trace('course defined: doing request');
 			Application.getInstance().getComms().getRequest('workspace.do?method=getUserOrganisation&userID='+_root.userID+'&organisationID='+courseID+'&roles=MONITOR,COURSE MANAGER',callback, false);
 		}else{
 			// TODO no course or class defined
@@ -465,15 +408,18 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	}
 	
 	private function showOrgTree(dto:Object):Void{
-		trace('organisations tree returned...');
-		trace('creating root node...');
-		// create root (dummy) node
 		
+		if(dto instanceof LFError) {
+			LFError(dto).showErrorAlert();
+			return;
+		}
+		
+		// create root (dummy) node
 		var odto = getDataObject(dto);
 			
 		_monitorModel.initOrganisationTree();
+		
 		var rootNode:XMLNode = _monitorModel.treeDP.addTreeNode(odto.name, odto);
-		//rootNode.attributes.isBranch = true;
 		_monitorModel.setOrganisationResource(RT_ORG+'_'+odto.organisationID,rootNode);
 		
 		// create tree xml branches
@@ -486,12 +432,9 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 
 	private function createXMLNodes(root:XMLNode, nodes:Array) {
 		for(var i=0; i<nodes.length; i++){
-			trace('creating child node...');
 			
 			var odto = getDataObject(nodes[i]);
 			var childNode:XMLNode = root.addTreeNode(odto.name, odto);
-			
-			trace('adding node with org ID: ' + odto.organisationID);
 			
 			if(nodes[i].nodes.length>0){
 				childNode.attributes.isBranch = true;
@@ -539,11 +482,9 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	 */
 	
 	public function loadLearners(users:Array):Void{
-		trace('loading Learners...');
 		_learnerList = clearScp(_learnerList);
 		_learner_mc = learner_scp.content;
 
-		trace('list length: ' + users.length);
 		for(var i=0; i<users.length; i++){
 		var user:User = new User(users[i]);
 
@@ -552,15 +493,13 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		_learnerList[i]._x = USERS_X;
 		_learnerList[i]._y = USER_OFFSET * i;
 		_learnerList[i].data = user.getDTO();
+		
 		var listItem:MovieClip = MovieClip(_learnerList[i]);
 		listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:false})
-		trace('new row: ' + _learnerList[i]);
-		trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
-
+		
 		}
 		
 		learner_scp.redraw(true);
-		
 		
 		var callback:Function = Proxy.create(_monitorModel,_monitorModel.saveLearners);
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonLearners&lessonID='+_monitorModel.getSequence().ID,callback, false);
@@ -568,11 +507,9 @@ class LessonManagerDialog extends MovieClip implements Dialog{
  
 	public function checkLearners(org:Organisation):Void{
 		var s:Object = _monitorModel.getSequence();
+		
 		for(var i=0; i<_learnerList.length; i++){
-			trace('checking learner list item : ' + i);
-			trace(_learnerList[i].data.userID);
 			if(org.isLearner(_learnerList[i].data.userID)){
-				trace('selecting check box');
 				_learnerList[i].user_cb.selected = true;
 				if(s.isStarted){
 					_learnerList[i].user_cb.enabled = false;
@@ -589,23 +526,20 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	* @param  users Users to load
 	*/
 	public function loadStaff(users:Array):Void{
-		trace('loading Staff....');
-		trace('list length: ' + users.length);
 		_staffList = clearScp(_staffList);
 		_staff_mc = staff_scp.content;
 
 		for(var i=0; i<users.length; i++){
-		var user:User = new User(users[i]);
+			var user:User = new User(users[i]);
 
-		_staffList[i] = this._staff_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._staff_mc.getNextHighestDepth());
-		_staffList[i].fullName.text = user.getFullName();
-		_staffList[i]._x = USERS_X;
-		_staffList[i]._y = USER_OFFSET * i;
-		_staffList[i].data = user.getDTO();
-		var listItem:MovieClip = MovieClip(_staffList[i]);
-		listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:false})
-
-		trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
+			_staffList[i] = this._staff_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._staff_mc.getNextHighestDepth());
+			_staffList[i].fullName.text = user.getFullName();
+			_staffList[i]._x = USERS_X;
+			_staffList[i]._y = USER_OFFSET * i;
+			_staffList[i].data = user.getDTO();
+			
+			var listItem:MovieClip = MovieClip(_staffList[i]);
+			listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:false})
 
 		}
 		
@@ -618,10 +552,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 
 	public function checkStaff(org:Organisation):Void{
 		var s:Object = _monitorModel.getSequence();
-		trace('checking staff' + _staffList.length);
 		for(var i=0; i<_staffList.length; i++){
-			trace('checking staff list item : ' + i);
-			trace(_staffList[i].data.userID);
 			if(org.isMonitor(_staffList[i].data.userID)){
 				_staffList[i].user_cb.selected = true;
 				if(s.isStarted){
@@ -684,7 +615,6 @@ class LessonManagerDialog extends MovieClip implements Dialog{
     * Main resize method, called by scrollpane container/parent
     */
     public function setSize(w:Number,h:Number):Void{
-        //Debugger.log('setSize',Debugger.GEN,'setSize','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
         //Size the panel
         panel.setSize(w,h);
 

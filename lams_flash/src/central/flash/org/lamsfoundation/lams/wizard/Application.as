@@ -97,14 +97,11 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 	private var _DataLoadCheckIntervalID:Number;
 	
     //UI Elements
-    //private var _toolbarLoaded:Boolean;                //These are flags set to true when respective element is 'loaded'
     private var _wizardLoaded:Boolean;
 	private var _showCMItem:Boolean;
 	
 	//clipboard
 	private var _clipboardData:Object;
-	// set up Key Listener
-	//private var keyListener:Object;
     
     //Application instance is stored as a static in the application class
     private static var _instance:Application = null;     
@@ -177,9 +174,7 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
         _dictionary = Dictionary.getInstance();
         _dictionary.addEventListener('load',Delegate.create(this,onDictionaryLoad));
 		_dictionary.load(language);
-        
-		
-		
+
         //Set reference to StyleManager and load Themes and setup load handler.
         var theme:String = String(_config.getItem('theme'));
         _themeManager = ThemeManager.getInstance();
@@ -205,8 +200,7 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 				
 				setupUI();
 				checkUILoaded();
-				
-        
+
 			} else if(_dataLoadCheckCount >= DATA_LOAD_CHECK_TIMEOUT_COUNT) {
 				Debugger.log('reached timeout waiting for data to load.',Debugger.CRITICAL,'checkDataLoaded','Application');
 				clearInterval(_DataLoadCheckIntervalID);

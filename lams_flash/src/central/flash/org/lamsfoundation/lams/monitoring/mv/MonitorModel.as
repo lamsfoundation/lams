@@ -628,14 +628,12 @@ class MonitorModel extends Observable{
 			
 			var user:User = User(organisation.getUser(u.userID));
 			if(user != null){
-				trace('adding role to existing user: ' + user.getFirstName() + ' ' + user.getLastName());
 				user.addRole(role);
 			} else {
 				user = new User();
 				user.populateFromDTO(u);
 				user.addRole(role);
 				
-				trace('adding user: ' + user.getFirstName() + ' ' + user.getLastName() + ' ' + user.getUserId());
 				organisation.addUser(user);
 			}
 		}
@@ -647,8 +645,6 @@ class MonitorModel extends Observable{
 		var staff:Object = new Object();
 		var learners:Object = new Object();
 		if(r){
-			trace('getting lesson class data...');
-			trace('org resource id: ' + r.organisationID);
 			if(_root.lessonID){classData.lessonID = _root.lessonID;}
 			if(r.organisationID){classData.organisationID = r.organisationID;}
 			classData.staff = staff;
@@ -777,47 +773,6 @@ class MonitorModel extends Observable{
 	public function get organisation():Organisation{
 		return _org;
 	}
-	
-	/**
-	 * 
-	 * @usage   
-	 * @param   newselectedTreeNode 
-	 * @return  
-	 
-	public function setSelectedTreeNode (newselectedTreeNode:XMLNode):Void {
-		_selectedTreeNode = newselectedTreeNode;
-		trace('branch: ' + _selectedTreeNode.attributes.isBranch);
-		if(!_selectedTreeNode.attributes.isBranch){
-			// get the organisations (node) users by role
-			//var roles:Array = new Array(LEARNER_ROLE, MONITOR_ROLE, TEACHER_ROLE);
-			setOrganisation(new Organisation(_selectedTreeNode.attributes.data));
-			resetUserFlags();
-			// polling method - waiting for all users to load before displaying users in UI
-			checkUsersLoaded();
-			
-			// load users
-			requestLearners(_selectedTreeNode.attributes.data);
-			requestStaff(_selectedTreeNode.attributes.data);
-			
-			trace(staffLoaded);
-			trace(learnersLoaded);
-		}
-		
-		//dispatch an update to the view
-		//broadcastViewUpdate('ITEM_SELECTED',_selectedTreeNode);
-	}
-	*/
-
-	/**
-	 * 
-	 * @usage   
-	 * @return 
- 
-	 
-	public function getSelectedTreeNode ():XMLNode {
-		return _selectedTreeNode;
-	}
-	*/
 	
 	private function setSelectedItem(newselectItem:Object){
 		prevSelectedItem = _selectedItem;

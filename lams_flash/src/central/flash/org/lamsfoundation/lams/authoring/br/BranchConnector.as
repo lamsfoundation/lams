@@ -85,6 +85,10 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 		_branch = b;
 	}
 	
+	public function get activity():Activity {
+		return Activity(_branch.sequenceActivity);
+	}
+	
 	private function onPress():Void{
 			// check double-click
 			var now:Number = new Date().getTime();

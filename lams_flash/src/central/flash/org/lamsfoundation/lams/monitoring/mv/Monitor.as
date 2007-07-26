@@ -273,7 +273,6 @@ class Monitor {
 	 */
 	
 	public function createLessonClass():Void{
-		trace('creating lesson class...');
 		var dto:Object = monitorModel.getLessonClassData();
 		var callback:Function = Proxy.create(this,onCreateLessonClass);
 		
@@ -286,12 +285,10 @@ class Monitor {
 			r.showErrorAlert();
 		} else if(r) {
 			// lesson class created
-			trace('lesson class created');
 			monitorModel.broadcastViewUpdate("SAVED_LC", null);
 			loadLessonToMonitor(_root.lessonID);
 		} else {
 			// failed creating lesson class
-			trace('failed creating lesson class');
 		}
 	}
 	

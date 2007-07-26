@@ -71,7 +71,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     
 	private static var LOADING_ROOT_DEPTH:Number = 100;	//depth of the loading movie
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
-    private static var DIALOGUE_DEPTH:Number = 20;	//depth of the dialogue box
+    private static var DIALOGUE_DEPTH:Number = 55;	//depth of the dialogue box
     private static var TOOLTIP_DEPTH:Number = 60;	//depth of the tooltip
     private static var CURSOR_DEPTH:Number = 70;   //depth of the cursors
 	private static var CCURSOR_DEPTH:Number = 101;
@@ -110,7 +110,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	private var _ccm:CustomContextMenu;
 	private var _debugDialog:MovieClip;                //Reference to the debug dialog
     
-    private var _dialogueContainer_mc:MovieClip;       //Dialog container
     private var _tooltipContainer_mc:MovieClip;        //Tooltip container
     private var _cursorContainer_mc:MovieClip;         //Cursor container
     private var _menu_mc:MovieClip;                    //Menu bar clip
@@ -434,7 +433,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     * Opens the preferences dialog
     */
     public function showPrefsDialog() {
-        PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue("prefs_dlg_title"),closeButton:true,scrollContentPath:'preferencesDialog'});
+        dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue("prefs_dlg_title"),closeButton:true,scrollContentPath:'preferencesDialog'});
     }
 	
     /**
@@ -554,7 +553,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		_clipboardData.type = type;
 		_clipboardData.count = 0;
 		
-		trace("clipBoard data id"+_clipboardData);
 	}
 	
 	/**
@@ -579,7 +577,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		}else {
 			LFMessage.showMessageAlert(Dictionary.getValue('al_activity_copy_invalid'));
 		}
-		//_canvas.removeActivity(_canvas.model.selectedItem.activity.activityUIID);
 	}
 	
 	public function copy():Void{
@@ -715,9 +712,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     * Opens the help->about dialog
     */
     public function showAboutDialog() {
-        var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"About - LAMS Author",closeButton:true,scrollContentPath:'helpaboutDialog'});
-		//dialog.addEventListener('contentLoaded',);
-		// dict: title:Dictionary.getValue('ls_win_helpabout_title')
+        dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"About - LAMS Author",closeButton:true,scrollContentPath:'helpaboutDialog'});
     }
     
 	 /**

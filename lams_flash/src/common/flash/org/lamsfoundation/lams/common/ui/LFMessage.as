@@ -22,13 +22,13 @@
  */
 
 
-import org.lamsfoundation.lams.common.ApplicationParent
-import org.lamsfoundation.lams.common.ui.*
-import org.lamsfoundation.lams.common.util.*
-import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.common.ApplicationParent;
+import org.lamsfoundation.lams.common.ui.*;
+import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.dict.*;
 
 import mx.controls.Alert;
-import mx.managers.*
+import mx.managers.*;
 
 /**  
 * LFMessage  

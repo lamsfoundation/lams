@@ -81,8 +81,6 @@ class ToolbarView extends AbstractView {
 		_tm = ThemeManager.getInstance();
 		_dictionary = Dictionary.getInstance();
 		_tip = new ToolTip();
-		//_dictionary.addEventListener('init',Proxy.create(this,setupButtons));
-		//_dictionary.addEventListener('init',Proxy.create(this,setupLabels));
 	}
     
     /**
@@ -109,7 +107,7 @@ class ToolbarView extends AbstractView {
 		var widthSet1:Number = Math.max(flowW, gateW)
 		var widthSet2:Number = Math.max(flowW, branchW)
 		var maxWidth:Number = Math.max(widthSet1, widthSet2)
-		trace("flow  width: "+flowW+" gate width: "+gateW+" branch width: "+branchW+" and max button width: "+maxWidth)
+		
 		flow_bkg_pnl.setSize(maxWidth+6, 95)
 		flow_bkg_pnl._x = branch_btn._x-3;
 		

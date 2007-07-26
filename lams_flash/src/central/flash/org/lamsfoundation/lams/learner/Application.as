@@ -259,15 +259,12 @@ class Application extends ApplicationParent {
             //Which item has loaded
             switch (evt.target.className) {
                 case 'Lesson' :
-					trace('Lesson loaded...');
                     _lessonLoaded = true;
                     break;
 				case 'Header' :
-					trace('Header loaded...');
 					_headerLoaded = true;
 					break;
 				case 'Scratchpad' :
-					trace('Scratchpad loaded...');
 					_scratchpadLoaded = true;
 					break;
                 default:
@@ -338,7 +335,6 @@ class Application extends ApplicationParent {
 		Debugger.log('current: ' + current,Debugger.CRITICAL,'refreshProgress','Application');
 		Debugger.log('version: ' + version,Debugger.CRITICAL,'refreshProgress','Application');
         Debugger.log('_root lesson ID: ' + _root.lessonID + ' passed in lesson ID: ' + lessonID,Debugger.CRITICAL,'refreshProgress','Application');
-        //Debugger.log('_root unique ID: ' + _root.uniqueID + ' passed in unique ID: ' + uniqueID,Debugger.CRITICAL,'refreshProgress','Application');
         
 		if(_root.lessonID == lessonID){
 			var attemptedArray:Array = attempted.split("_");
@@ -362,8 +358,7 @@ class Application extends ApplicationParent {
 	* 
     */
     static function get tooltip():MovieClip {
-		trace("tooltip called")
-        //Return root if valid otherwise raise a big system error as app. will not work without it
+		//Return root if valid otherwise raise a big system error as app. will not work without it
         if(_instance._tooltipContainer_mc != undefined) {
             return _instance._tooltipContainer_mc;
         } else {
@@ -418,10 +413,7 @@ class Application extends ApplicationParent {
     */
     private function onKeyDown(){
 		
-		//var mouseListener:Object = new Object();
-        //Debugger.log('Key.isDown(Key.CONTROL): ' + Key.isDown(Key.CONTROL),Debugger.GEN,'onKeyDown','Application');
-        //Debugger.log('Key: ' + Key.getCode(),Debugger.GEN,'onKeyDown','Application');
-		//the debug window:
+		// show/hide the debug window:
         if (Key.isDown(Key.CONTROL) && Key.isDown(Key.ALT) && Key.isDown(QUESTION_MARK_KEY)) {
             if (!_debugDialog.content){
                 showDebugger();

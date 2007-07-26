@@ -113,7 +113,7 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 		else
 			setPosition(Stage.width/2 - _parent._x,  Stage.height/2 - _parent._y);
 		
-		addTransparentLayer(ApplicationParent.root);
+		addTransparentLayer(this._parent);
 		
 		contentLoaded();
         
@@ -130,15 +130,15 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 	private function addTransparentLayer(target:MovieClip) {
 		var styleObj = themeManager.getStyleObject('CanvasPanel');
 		
-		transparentCover = target.createClassObject(Panel, "transparentCover", this.getDepth()-1, {_visible: true, enabled: false, _alpha: 15, _width: Stage.width, _height: Stage.height, styleName: styleObj});
+		transparentCover = target.createClassObject(Panel, "transparentCover", DepthManager.kTop, {_visible: true, enabled: false, _alpha: 0, _width: Stage.width, _height: Stage.height, styleName: styleObj});
 		transparentCover.onPress = null;
 		
-		org.lamsfoundation.lams.authoring.Application.getInstance().getToolbar().disableAll();
+		///org.lamsfoundation.lams.authoring.Application.getInstance().getToolbar().disableAll();
 	}
 	
 	private function removeTransparentLayer() {
 		transparentCover.removeMovieClip();
-		org.lamsfoundation.lams.authoring.Application.getInstance().getToolbar().enableAll();
+		//org.lamsfoundation.lams.authoring.Application.getInstance().getToolbar().enableAll();
 	}
 	
 	public function setOKButton(lbl:String,fn:Function){

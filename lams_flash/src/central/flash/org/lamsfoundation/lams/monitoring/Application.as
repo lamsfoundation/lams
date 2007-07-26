@@ -67,7 +67,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     public static var WORKSPACE_H:Number = 200;
     
     public static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
-    public static var DIALOGUE_DEPTH:Number = 20;	//depth of the cursors
+    public static var DIALOGUE_DEPTH:Number = 55;	//depth of the cursors
     public static var TOOLTIP_DEPTH:Number = 60;	//depth of the cursors
     public static var CURSOR_DEPTH:Number = 40;   //depth of the cursors
     public static var MENU_DEPTH:Number = 25;   //depth of the menu
@@ -104,8 +104,6 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     private var _config:Config;
     private var _debugDialog:MovieClip;                //Reference to the debug dialog
     
-    
-    private var _dialogueContainer_mc:MovieClip;       //Dialog container
     private var _tooltipContainer_mc:MovieClip;        //Tooltip container
     private var _cursorContainer_mc:MovieClip;         //Cursor container
     private var _menu_mc:MovieClip;                    //Menu bar clip

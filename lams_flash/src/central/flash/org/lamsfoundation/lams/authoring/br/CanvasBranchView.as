@@ -242,7 +242,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 				defaultSequenceActivity = SequenceActivity(sequenceActs[i]);
 			}
 				
-			_cm.addNewBranch(SequenceActivity(sequenceActs[i]));
+			_cm.addNewBranch(SequenceActivity(sequenceActs[i]), activity);
 			
 		}
 		

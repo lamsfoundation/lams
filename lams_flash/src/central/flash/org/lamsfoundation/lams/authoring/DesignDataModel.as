@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.authoring.br.BranchConnector;
 import org.lamsfoundation.lams.common.*;
 import mx.events.*
 /*
@@ -46,12 +47,10 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public static var COPY_TYPE_ID_AUTHORING:Number = 1;
 	public static var COPY_TYPE_ID_RUN:Number = 2;
-	public static var COPY_TYPE_ID_PREVIEW:Number = 3;	
+	public static var COPY_TYPE_ID_PREVIEW:Number = 3;	
 	//LearningDesign Properties:
-	
 	private var _objectType:String;
 	private var _copyTypeID:Number;
-	
 
 	private var _learningDesignID:Number;
 	private var _prevLearningDesignID:Number;	// used for backup retrieval of the learning Design ID
@@ -73,6 +72,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private var _maxID:Number;
 	private var _firstActivityID:Number;
 	private var _firstActivityUIID:Number;
+	
 	//James has asked for previous and next fields so I can build up a sequence map of LDs when browsing workspaces...
 	private var _parentLearningDesignID:Number;
 	private var _activities:Hashtable;
@@ -119,20 +119,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		//dispatch an event now the design  has changed
 		dispatchEvent({type:'ddmUpdate',target:this});
 		
-		
     }
-	/*
-	public function getChildActivities(ActivityUIID:Number):Array{
-		var _child:Array = new Array();
-		var values = _activities.values();
-		for (var i=0; i<values.length; i++){
-			if (values[i].parentActivityID == ActivityUIID){
-				_child.push(values[i];
-			}
-		}
-		return _child;
-	}
-	*/
+	
 	/**
 	 * Validates the design data model
 	 * @usage   
@@ -311,7 +299,6 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 *  
 	 * @param   connectUIID connected Activity UIID (SequenceActivity)
 	 */
-	
 	public function removeBranchByConnection(connectUIID):Void{
 		var keyArray:Array = _branches.keys();
 		for(var i=0; i<keyArray.length; i++){
@@ -334,12 +321,12 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		//note: Dont fire the update event as we dont want to store this change in an undo!
 		//TODO: Validate that the design is clear
 		var success:Boolean = false;
+		
 		//TODO:Validate if design is saved if not notify user
 		success = true;
 		
 		Debugger.log('Setting design ID:'+design.learningDesignID,Debugger.GEN,'setDesign','DesignDataModel');
 		Debugger.log('Printing the design revieced:...\n'+ObjectUtils.toString(design),Debugger.VERBOSE,'setDesign','DesignDataModel');
-		
 		
 		_learningDesignID = design.learningDesignID;
 		_title = design.title;
@@ -369,18 +356,17 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		//set the activities in the hash table
 		for(var i=0; i<design.activities.length;i++){
 			//note if the design is being opened - then it must have ui_ids already
-			//Debugger.log('Adding activity ID:'+design.activities[i].activityUIID,Debugger.GEN,'setDesign','DesignDataModel');
-			
 			var dto = design.activities[i];
+			
 			//change to using if _activityTypeID == Activity.TOOL_ACTIVITY_TYPE
 			//depending on the objectType call the relevent constructor.
 			Debugger.log('Adding activity dto.activityTypeID:'+dto.activityTypeID,Debugger.GEN,'setDesign','DesignDataModel');	
 			
-			//if(dto.objectType = "ToolActivity"){
 			if(dto.activityTypeID == Activity.TOOL_ACTIVITY_TYPE){
 			
 				var newToolActivity:ToolActivity = new ToolActivity(dto.activityUIID);
 				newToolActivity.populateFromDTO(dto);				
+				
 				_activities.put(newToolActivity.activityUIID,newToolActivity);
 				
 			} else if(dto.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || 
@@ -390,6 +376,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				
 				var newGateActivity:GateActivity = new GateActivity(dto.activityUIID);
 				newGateActivity.populateFromDTO(dto);				
+				
 				_activities.put(newGateActivity.activityUIID,newGateActivity);
 			
 			} else if(dto.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || dto.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
@@ -397,6 +384,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				//TODO: Test this!
 				var cAct:ComplexActivity= new ComplexActivity(dto.activityUIID);
 				cAct.populateFromDTO(dto);				
+				
 				_activities.put(cAct.activityUIID,cAct);
 					
 			} else if(dto.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
@@ -404,26 +392,22 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				//TODO: Test this code when we are able to save and then open a design with grouping
 				var newGroupActivity:GroupingActivity = new GroupingActivity(dto.activityUIID);
 				newGroupActivity.populateFromDTO(dto);
+				
 				_activities.put(newGroupActivity.activityUIID,newGroupActivity);
 			
 			} else if(dto.activityTypeID == Activity.CHOOSEN_BRANCHING_ACTIVITY_TYPE || 
 					  dto.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE ||
 					  dto.activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE){
+				
 				var newBranchActivity:BranchingActivity = new BranchingActivity(dto.activityUIID);
 				newBranchActivity.populateFromDTO(dto);
+				
 				_activities.put(newBranchActivity.activityUIID,newBranchActivity);
 			} else if(dto.activityTypeID = Activity.SEQUENCE_ACTIVITY_TYPE){
 				var newSequenceActivity:SequenceActivity = new SequenceActivity(dto.activityUIID);
 				newSequenceActivity.populateFromDTO(dto);
-				_activities.put(newSequenceActivity.activityUIID, newSequenceActivity);
 				
-				if(_activities.get(newSequenceActivity.parentUIID) instanceof BranchingActivity) {
-					Debugger.log("creating linked Branch for seq: " + newSequenceActivity.activityUIID, Debugger.CRITICAL, "setDesign", "DesignDataModel");
-					
-					// create linked branch
-					// var sb:Branch = new Branch(newUIID(), BranchConnector.DIR_FROM_START, hubUIID, newSequenceActivity.firstActivity, newSequenceActivity, learningDesignID);
-					
-				}
+				_activities.put(newSequenceActivity.activityUIID, newSequenceActivity);
 	
 			}
 		}
@@ -452,14 +436,6 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			_groupings.put(newGrouping.groupingUIID,newGrouping);
 		
 		}
-		
-		// update branches in the hashtable 
-		//	loop iover sequence activities
-			// if(!newSequenceActivity.terminates) {
-			// get last activity for sequence by transiting from firstActivity.
-			// 	var eb:Branch = new Branch(newUIID(), BranchConnector.DIR_TO_END, newSequenceActivity.endActivityUIID, newSequenceActivity, learningDesignID);
-			// }
-		// end loop
 		
 		return success;
 	}
@@ -699,7 +675,6 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				design.groupings[i] = classGroups[i].toData();
 			}
 		}
-
 		
 		return design;
 	}
@@ -715,9 +690,11 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			Debugger.log('MaxID was null, resetting',Debugger.GEN,'newUIID','DesignDataModel');
 			_maxID = 0;
 		}
+		
 		//add one for a new ID
 		_maxID++;
 		Debugger.log('New maxID:'+_maxID,Debugger.GEN,'newUIID','DesignDataModel');
+		
 		return _maxID;
 	}
 	
@@ -733,10 +710,11 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		var a:Activity = _activities.get(UIID);
 		Debugger.log('Returning activity:'+a.activityUIID,Debugger.GEN,'getActivityByUIID','DesignDataModel');
+		
 		return a;
 	}
 	
-	/**
+		/**
 	 * Retreives a reference to a transition in the DDM using its UIID
 	 * @usage   
 	 * @param   UIID 
@@ -863,7 +841,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var br:Array = _branches.values();
 		var branchObj = new Object();
 		var myBranches:Array = new Array();
-		var hub = null;
+		var hub = new Array();
 		var target = null;
 		var sequence = null;
 		
@@ -878,8 +856,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 					target = br[i];
 				}
 				if(br[i].hubUIID == UIID){
-					hub = br[i];
+					hub.push(br[i]);
 				}
+				
 				if(br[i].sequenceActivity.activityUIID == UIID){
 					sequence = br[i].sequenceActivity;
 				}
