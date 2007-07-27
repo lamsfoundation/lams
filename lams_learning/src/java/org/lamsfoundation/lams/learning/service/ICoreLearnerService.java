@@ -26,8 +26,6 @@ package org.lamsfoundation.lams.learning.service;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.learning.progress.ProgressEngine;
-import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -268,11 +266,18 @@ public interface ICoreLearnerService extends ILearnerService
      * @param lesson current lesson.
      * @param BranchingActivity the branching activity
      * @param learnerId the learner who triggers the grouping.
-     * @param forceBranch if true and the lesson is a preview lesson then the branching is done irrespective of 
-     * whether the teacher has set up all the mappings, allocated learner to branch, etc
-     * @return SequenceActivity that forms the branch if known, null if still awaiting teacher input.
      * @throws LearnerServiceException 
      */
     public SequenceActivity determineBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId) throws LearnerServiceException;
+
+    /**
+     * Select a particular branch - we are in preview mode and the author has selected a particular activity.
+     * @param lesson current lesson.
+     * @param BranchingActivity the branching activity
+     * @param learnerId the learner who triggers the grouping.
+     * @return branchId of the desired branch
+     * @throws LearnerServiceException 
+     */
+    public SequenceActivity selectBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId, Long branchId) throws LearnerServiceException;
 
 }

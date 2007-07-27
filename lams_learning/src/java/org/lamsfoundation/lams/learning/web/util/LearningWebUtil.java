@@ -33,10 +33,12 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.action.ActivityAction;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -336,5 +338,17 @@ public class LearningWebUtil
 		return progressSummary.toString();
 	}
 
-	
+	public static ActivityURL getActivityURL( ActivityMapping activityMapping, LearnerProgress learnerProgress, Activity activity, boolean defaultURL) {
+		ActivityURL activityURL = new ActivityURL();
+		String url = activityMapping.getActivityURL(activity);
+		activityURL.setUrl(url);
+		activityURL.setActivityId(activity.getActivityId());
+		activityURL.setTitle(activity.getTitle());
+		activityURL.setDescription(activity.getDescription());
+		if (learnerProgress.getProgressState(activity) == LearnerProgress.ACTIVITY_COMPLETED) {
+		    activityURL.setComplete(true);
+		}
+		activityURL.setDefaultURL(defaultURL);
+		return activityURL;
+	}
 }

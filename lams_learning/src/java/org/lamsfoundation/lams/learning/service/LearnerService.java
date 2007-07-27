@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
@@ -41,7 +42,6 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
-import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
@@ -551,7 +551,7 @@ public class LearnerService implements ICoreLearnerService
 		    		} else if ( forceGrouping ) {
 		    			// preview case for chosen grouping 
 		    			Lesson lesson = getLesson(lessonId);
-		            	groupingDone = forceGrouping(lesson, grouping, learner);
+		            	groupingDone = forceGrouping(lesson, grouping, null, learner);
 		        	} 
     			}
 	    		
@@ -566,18 +566,17 @@ public class LearnerService implements ICoreLearnerService
     	return groupingDone;
     }
     
-	private boolean forceGrouping(Lesson lesson, Grouping grouping, User learner) {
+	private boolean forceGrouping(Lesson lesson, Grouping grouping, Group group, User learner) {
 		boolean groupingDone = false;
 		if ( lesson.isPreviewLesson() ) {
 			ArrayList<User> learnerList = new ArrayList<User>();
 			learnerList.add(learner);
-			lessonService.performGrouping(grouping, (String)null, learnerList);
+			lessonService.performGrouping(grouping, group!=null?group.getGroupId():null, learnerList);
 			groupingDone = true;
 		}
 		return groupingDone;
 	}
     	
-
     /**
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#knockGate(java.lang.Long, org.lamsfoundation.lams.usermanagement.User)
      */
@@ -748,30 +747,14 @@ public class LearnerService implements ICoreLearnerService
 	    	// If the user is in a group, then check if the group is assigned to a sequence activity. If it
     		// is then we are done and we return the sequence
     		Group group = grouping.getGroupBy(learner);
-    		if ( group == null && lesson.isPreviewLesson()) {    			
-    			// if it is preview, we force the user into a group.
-    			if (forceGrouping(lesson, grouping, learner) ) {
-    				group = grouping.getGroupBy(learner);
-    			}
-    			if ( log.isDebugEnabled() )
-    				log.debug("Forced the user into group "+group+" for branching purposes.");
-    		}
-    		
-    		if ( group != null && group.getBranchActivities() != null ) {
-    			Iterator branchesIterator = group.getBranchActivities().iterator();
-    			while (sequenceActivity==null && branchesIterator.hasNext()) {
-    				GroupBranchActivityEntry branchActivityEntry = (GroupBranchActivityEntry) branchesIterator.next();
-    				if ( branchActivityEntry.getBranchingActivity().equals(branchingActivity) )
-    					sequenceActivity = branchActivityEntry.getBranchSequenceActivity();
-				}
-    			if ( sequenceActivity == null && lesson.isPreviewLesson()) {
-    				// how do we force them into a branch ? do we just pick one ? is that good enough for preview ?
-    				Iterator iter= branchingActivity.getActivities().iterator();
-    				if (iter.hasNext()) {
-						sequenceActivity = (SequenceActivity) iter.next();
-					}
-        			if ( log.isDebugEnabled() )
-        				log.debug("Forced the user into branch"+sequenceActivity);
+    		if ( group != null ) {
+    			if ( group.getBranchActivities() != null ) {
+	    			Iterator branchesIterator = group.getBranchActivities().iterator();
+	    			while (sequenceActivity==null && branchesIterator.hasNext()) {
+	    				GroupBranchActivityEntry branchActivityEntry = (GroupBranchActivityEntry) branchesIterator.next();
+	    				if ( branchActivityEntry.getBranchingActivity().equals(branchingActivity) )
+	    					sequenceActivity = branchActivityEntry.getBranchSequenceActivity();
+	    			}
     			}
     		} 
     		
@@ -788,7 +771,79 @@ public class LearnerService implements ICoreLearnerService
     	return sequenceActivity;
     }
 
-	public ProgressEngine getProgressEngine() {
+    /**
+     * Select a particular branch - we are in preview mode and the author has selected a particular activity.
+     * 
+     * @throws LearnerServiceException 
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#determineBranch(org.lamsfoundation.lams.lesson.Lesson, org.lamsfoundation.lams.learningdesign.BranchingActivity, java.lang.Integer)
+     */
+    public SequenceActivity selectBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId, Long branchId) throws LearnerServiceException {
+
+    	User learner = (User)userManagementService.findById(User.class,learnerId);
+    	if ( learner == null ) {
+    		String error = "selectBranch: learner "+learnerId+" does not exist. Cannot determine branch.";
+    		log.error(error);
+    		throw new LearnerServiceException(error);
+    	}
+
+    	// Find the matching branch - all the child activities in the branching activity
+    	// should be sequence activities.
+    	SequenceActivity selectedBranch = null;
+    	Iterator iter = branchingActivity.getActivities().iterator();
+    	while (selectedBranch==null && iter.hasNext()) {
+			SequenceActivity aBranch = (SequenceActivity) iter.next();
+			if ( aBranch.getActivityId().equals(branchId) ) {
+    			selectedBranch = aBranch;
+    		}
+    	}
+
+    	if ( selectedBranch != null ) {
+    		
+    		Set<Group> groups = selectedBranch.getGroupsForBranch();
+    		Grouping grouping = branchingActivity.getGrouping();
+    		
+    		// Does this matching branch have any groups? If so, see if the learner is in 
+    		// the appropriate group and add them if necessary.
+    		if ( groups != null && groups.size() > 0) {
+	    		boolean isInGroup = false;
+	    		Group aGroup = null;
+	    		Iterator<Group> groupIter = groups.iterator();
+	    		while (!isInGroup && groupIter.hasNext()) {
+					aGroup = (Group) groupIter.next();
+					isInGroup =  aGroup.hasLearner(learner);
+				}
+	    		
+	    		// If the learner is not in the appropriate group, then force the learner in the 
+	    		// last group we checked. this will only work if the user is in preview.
+				if (!isInGroup) {
+					if ( ! forceGrouping(lesson, grouping, aGroup, learner) ) {
+			    		String error = "selectBranch: learner "+learnerId+" cannot be added to the group "+aGroup+" for the branch "
+			    			+selectedBranch+" for the lesson "+lesson.getLessonName()+" preview is "+lesson.isPreviewLesson()
+			    			+". This will only work if preview is true.";
+			    		log.error(error);
+			    		throw new LearnerServiceException(error);
+					}
+				}
+				
+			// if no groups exist, then create one and assign it to the branch.
+    		} else {
+				Group group = lessonService.createGroup(grouping, selectedBranch.getTitle());
+				group.allocateBranchToGroup(null,null, selectedBranch, branchingActivity);
+    		}
+			groupingDAO.update(grouping);
+			
+   			if ( log.isDebugEnabled()) {
+   				log.debug("Found branch "+selectedBranch.getActivityId()+":"+ selectedBranch.getTitle()
+   						+" for branching activity "+branchingActivity.getActivityId()+":"+ branchingActivity.getTitle()
+   						+" for learner "+learner.getUserId()+":"+learner.getLogin());
+   			}
+    	}
+    	
+    	return selectedBranch;
+    }
+    
+
+    public ProgressEngine getProgressEngine() {
 		return progressEngine;
 	}
 

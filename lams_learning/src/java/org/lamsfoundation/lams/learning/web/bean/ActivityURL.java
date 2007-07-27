@@ -38,6 +38,7 @@ public class ActivityURL {
 	private String title;
 	private String description;
 	private boolean complete;
+	private boolean defaultURL;
 
 	public ActivityURL(){}
 	
@@ -77,5 +78,13 @@ public class ActivityURL {
 	}
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public boolean isDefaultURL() {
+		return defaultURL;
+	}
+
+	public void setDefaultURL(boolean defaultURL) {
+		this.defaultURL = defaultURL;
 	}
 }

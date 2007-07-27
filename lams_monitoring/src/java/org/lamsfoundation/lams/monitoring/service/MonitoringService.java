@@ -2026,12 +2026,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 				grouping = branchingActivity.getGrouping();
 				
 				group = lessonService.createGroup(grouping, branch.getTitle());
-				
-				GroupBranchActivityEntry entry = new GroupBranchActivityEntry(null, null, group, branch, (BranchingActivity) branchingActivity);
-				if ( group.getBranchActivities() == null ) {
-					group.setBranchActivities(new HashSet());
-				}
-				group.getBranchActivities().add(entry);
+				group.allocateBranchToGroup(null,null, branch, (BranchingActivity)branchingActivity);
 				groupingDAO.update(group);
 				
 			} else {

@@ -48,6 +48,8 @@
 				<prop key="exitLesson">PROPAGATION_REQUIRED</prop>
 				<prop key="performGrouping">PROPAGATION_REQUIRED</prop>
 				<prop key="knockGate">PROPAGATION_REQUIRED</prop>
+				<prop key="determineBranch">PROPAGATION_REQUIRED</prop>				
+				<prop key="selectBranch">PROPAGATION_REQUIRED</prop>				
    			</props>
 		</property>
 	</bean> 
