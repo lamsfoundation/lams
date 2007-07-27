@@ -41,11 +41,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<p><fmt:message key="label.branching.refresh.message"/></p>
 
-			<c:if test="${BranchingForm.map.previewLesson == true}">
-				<c:set var="formAction"><c:out value="${formAction}"/>&force=true</c:set>
-				<p><em><fmt:message key="label.branching.preview.message"/></em></p>
-			</c:if>
-
 			<table><tr><td><div class="right-buttons">
 					<html:submit styleClass="button"><fmt:message key="label.next.button"/></html:submit>
 			</div></td></tr></table>

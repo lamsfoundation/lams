@@ -139,6 +139,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="pageTitleKey" value="label.branching.title" />
 		<put name="body" value="/branching/wait.jsp"/>
 	</definition>
+	<definition name=".branchingActivityPreview" extends=".branchingWaitLayout">
+		<put name="pageTitleKey" value="label.branching.title" />
+		<put name="body" value="/branching/preview.jsp"/>
+	</definition>
 	<definition name=".sequenceActivityEmpty" extends=".layout">
 		<put name="body" value="/sequence/empty.jsp"/>
 	</definition>
