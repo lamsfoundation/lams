@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.NullActivity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 
 /**
@@ -51,34 +52,68 @@ public class BranchingActivityStrategy extends ComplexActivityStrategy
 	}
 
     /**
-     * @todo The real strategy is ???
-     * 
-     * If there isn't a current child, give it any old branch, otherwise return the NulLActivity (can only do one branch).
-     * 
+     * Return the next activity for a incomplete branching activity. In terms of 
+     * incomplete branching activity, the next activity will always be the branching
+     * activity itself so as to select a branch either determined by the server or to display
+     * the wait screen (for the normal learner) or for the author to select a particular
+     * branch (in preview).
+ 
      * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
-    public Activity getNextActivityByParent(ComplexActivity activity, Activity currentChild)
+    public Activity getNextActivityByParent(ComplexActivity parent, Activity currentChild)
     {
-   
-    	if ( currentChild == null || currentChild.isNull() ) {
-    		Iterator iter = activity.getActivities().iterator();
-    		if ( iter.hasNext() ) 
-    			return (Activity) iter.next();
-    	}
-    	
-        return new NullActivity();
+    	return parent;
     }
 
     /**
-     * Return the completion status of children activities within a branching
-     * activity. A branching activity is marked as complete if one child activity (one branch)
-     * is completed.
+     * <p>Check up all children completion status for a branching activity. Normally
+     * it will be complete if one branch is complete, but if this is preview, then only complete 
+     * the branch when all branches have been completed. </p>
+     * 
+     * Precondition: the activity should a complex activity that has children.
+     * 
+     * @param activity the complex activity
+     * @param learnerProgress the progress data that record what has been 
+     * 						  completed
+     * @return true if all children are completed.
+     */
+    public boolean areChildrenCompleted(LearnerProgress learnerProgress)
+    {
+        ComplexActivity complexActivity = getComplexActivity();
+        boolean isPreview = learnerProgress.getLesson().isPreviewLesson();
+
+        if ( complexActivity != null && complexActivity.getActivities().size() > 0 ) {
+	        for(Iterator i = complexActivity.getActivities().iterator();i.hasNext();)
+	        {
+	            Activity currentActivity = (Activity)i.next();
+	            boolean actComplete = learnerProgress.getCompletedActivities().contains(currentActivity);
+	            if ( isPreview && ! actComplete) {
+	            	// found one not complete, so can try more branches
+	            	return false;
+	            } else if (! isPreview && actComplete) {
+	            	// found one complete, so branching is finished
+	            	return true;
+	            }
+	        }
+	        // We've checked all the activities. If we are in preview, then they are all
+	        // completed so return true. If we are not in preview (ie normal learner) then
+	        // we haven't found any that were completed so we return false. So we can just 
+	        // return isPreview as that is the correct boolean state.
+	        return ( isPreview );
+       }
+
+       // didn't find any child activities so we are complete
+       return true; 
+    }
+
+    /**
+     * Do not use (for this class only) - isComplete() is not called by the areChildrenCompleted() method in this class.
      * 
      * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#isComplete(int)
      */
     protected boolean isComplete(int numOfCompletedActivities)
     {
-    	return numOfCompletedActivities == 1;
+    	return true;
     }
 
     /** 

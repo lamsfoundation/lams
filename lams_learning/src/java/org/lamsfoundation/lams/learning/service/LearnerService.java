@@ -786,19 +786,21 @@ public class LearnerService implements ICoreLearnerService
     		throw new LearnerServiceException(error);
     	}
 
-    	// Find the matching branch - all the child activities in the branching activity
-    	// should be sequence activities.
-    	SequenceActivity selectedBranch = null;
-    	Iterator iter = branchingActivity.getActivities().iterator();
-    	while (selectedBranch==null && iter.hasNext()) {
-			SequenceActivity aBranch = (SequenceActivity) iter.next();
-			if ( aBranch.getActivityId().equals(branchId) ) {
-    			selectedBranch = aBranch;
-    		}
-    	}
+    	Activity activity = activityDAO.getActivityByActivityId(branchId, Activity.class);
+    	if ( activity !=null ) {
 
-    	if ( selectedBranch != null ) {
+    		if ( !activity.isSequenceActivity() ) {
+        		String error = "selectBranch: activity "+activity+" Is not a sequence activity. Unable to branch.";
+        		log.error(error);
+        		throw new LearnerServiceException(error);
+    		} 
+    		if ( activity.getParentActivity() == null ||  !activity.getParentActivity().equals(branchingActivity) ) {
+        		String error = "selectBranch: activity "+activity+" is not a branch within the branching activity "+branchingActivity+". Unable to branch.";
+        		log.error(error);
+        		throw new LearnerServiceException(error);
+    		} 
     		
+    		SequenceActivity selectedBranch = (SequenceActivity) activity;
     		Set<Group> groups = selectedBranch.getGroupsForBranch();
     		Grouping grouping = branchingActivity.getGrouping();
     		
@@ -837,9 +839,15 @@ public class LearnerService implements ICoreLearnerService
    						+" for branching activity "+branchingActivity.getActivityId()+":"+ branchingActivity.getTitle()
    						+" for learner "+learner.getUserId()+":"+learner.getLogin());
    			}
+
+   	    	return selectedBranch;
+
+    	} else {
+       		String error = "selectBranch: Unable to find branch for branch id "+branchId;
+    		log.error(error);
+    		throw new LearnerServiceException(error);
     	}
-    	
-    	return selectedBranch;
+
     }
     
 
