@@ -1238,13 +1238,14 @@ public class ObjectExtractor implements IObjectExtractor {
 		}
 
 		if ( entry == null ) {
-   	    	entry = new GroupBranchActivityEntry();
-   			group.getBranchActivities().add(entry);
+			group.allocateBranchToGroup(entryId,entryUIID, (SequenceActivity)sequenceActivity, (BranchingActivity)branchingActivity);
+   	    } else {
+   	    	entry.setBranchSequenceActivity((SequenceActivity)sequenceActivity);
+   	    	entry.setBranchingActivity((BranchingActivity)branchingActivity);
+   	    	entry.setGroup(group);
    	    }
-		entry.setBranchSequenceActivity((SequenceActivity)sequenceActivity);
-		entry.setBranchingActivity((BranchingActivity)branchingActivity);
-		entry.setGroup(group);
-
+		
+		groupingDAO.update(group);
 		return entry;
 	}
 

@@ -366,4 +366,16 @@ public class Group implements Serializable,Nullable,Comparable {
 
     	return newGroup;
     }
+
+    /** Allocate this group to the given branch, in a branching activity. This creates the GroupBranchActivityEntry record and adds it 
+     * to the branchActivities set. The entryId, entryUIID will only be populated if this is called from authoring
+     */
+    public GroupBranchActivityEntry allocateBranchToGroup(Long entryId, Integer entryUIID, SequenceActivity branch, BranchingActivity branchingActivity) {
+		GroupBranchActivityEntry entry = new GroupBranchActivityEntry(entryId, entryUIID, this, branch, (BranchingActivity) branchingActivity);
+		if ( getBranchActivities() == null ) {
+			setBranchActivities(new HashSet());
+		}
+		getBranchActivities().add(entry);
+		return entry;
+    }
 }

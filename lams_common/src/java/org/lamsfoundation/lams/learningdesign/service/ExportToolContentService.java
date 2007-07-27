@@ -1656,35 +1656,26 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 */
 	private GroupBranchActivityEntry getGroupBranchActivityEntry(GroupBranchActivityEntryDTO entryDto, Map<Integer, Group>groupByUIIDMapper, 
 			Map<Integer, Activity> activityByUIIDMapper) {
-		GroupBranchActivityEntry entry = new GroupBranchActivityEntry();
-		entry.setEntryUIID(entryDto.getEntryUIID());
-		
-		Group group = groupByUIIDMapper.get(entryDto.getGroupUIID());
 
+		Activity branch = activityByUIIDMapper.get(entryDto.getSequenceActivityUIID());
+		if ( branch == null ) {
+			log.error("Unable to find matching sequence activity for group to branch mapping "+entryDto+" Skipping entry");
+			return null;
+		}
+		
+		Activity branchingActivity = activityByUIIDMapper.get(entryDto.getBranchingActivityUIID());
+		if ( branchingActivity == null ) {
+			log.error("Unable to find matching branching activity for group to branch mapping "+entryDto+" Skipping entry");
+			return null;
+		}
+
+		Group group = groupByUIIDMapper.get(entryDto.getGroupUIID());
 		if ( group == null ) {
 			log.error("Unable to find matching group for group to branch mapping "+entryDto+" Skipping entry");
 			return null;
 		}
-		if ( group.getBranchActivities() == null )
-			group.setBranchActivities(new HashSet());
-		group.getBranchActivities().add(entry);
-		entry.setGroup(group);
 
-		Activity activity = activityByUIIDMapper.get(entryDto.getSequenceActivityUIID());
-		if ( activity == null ) {
-			log.error("Unable to find matching sequence activity for group to branch mapping "+entryDto+" Skipping entry");
-			return null;
-		}
-		entry.setBranchSequenceActivity((SequenceActivity)activity);
-		
-		activity = activityByUIIDMapper.get(entryDto.getBranchingActivityUIID());
-		if ( activity == null ) {
-			log.error("Unable to find matching branching activity for group to branch mapping "+entryDto+" Skipping entry");
-			return null;
-		}
-		entry.setBranchingActivity((BranchingActivity)activity);
-
-		return entry;
+		return 	group.allocateBranchToGroup(null, entryDto.getEntryUIID(), (SequenceActivity) branch, (BranchingActivity) branchingActivity);
 	}
 
 	private Transition getTransition(TransitionDTO transDto, Map<Long, Activity> activityMapper) {
