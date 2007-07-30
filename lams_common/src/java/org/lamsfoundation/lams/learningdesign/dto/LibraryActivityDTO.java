@@ -28,7 +28,6 @@ import java.util.Date;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
-import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
@@ -80,6 +79,7 @@ public class LibraryActivityDTO extends BaseDTO
 	private Boolean supportsModeration;
 	private Boolean supportsContribute;	
 	private String authoringURL;
+	private String adminURL;
 	
 	/* Grouping Activities */
 	
@@ -185,6 +185,7 @@ public class LibraryActivityDTO extends BaseDTO
 			this.supportsModeration = new Boolean(tool.getSupportsModeration());
 			this.supportsContribute = new Boolean(tool.getSupportsContribute());
 			this.authoringURL = tool.getAuthorUrl();
+			this.adminURL = tool.getAdminUrl();
 			this.helpURL = tool.getHelpUrl();
 	    }
 	     
@@ -364,6 +365,12 @@ public class LibraryActivityDTO extends BaseDTO
      */
     public String getAuthoringURL() {
         return authoringURL;
+    }
+    /**
+     * @return Returns the adminURL.
+     */
+    public String getAdminURL() {
+        return adminURL;
     }
     /**
      * @return Returns the supportsContribute.
