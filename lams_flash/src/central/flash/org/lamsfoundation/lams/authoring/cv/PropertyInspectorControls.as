@@ -850,7 +850,8 @@ class PropertyInspectorControls extends MovieClip {
 		
 		Debugger.log("grouping: " + grouping, Debugger.CRITICAL, "GroupNamingDialogLoaded", "PropertyInspectorControls");
 		
-		evt.target.scrollContent.groups = grouping.getGroups();
+		evt.target.scrollContent.grouping = grouping;
+		evt.target.scrollContent.groups = grouping.getGroups(_canvasModel.getCanvas().ddm);
 		evt.target.scrollContent.setupGrid();
 	}
 	

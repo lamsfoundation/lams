@@ -616,7 +616,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		group.setGroupName(WDDXProcessor.convertToString(groupDetails,WDDXTAGS.GROUP_NAME));
 		group.setGrouping(grouping);
 		group.setGroupUIID(groupUIID);
-		group.setOrderId(WDDXProcessor.convertToInteger(groupDetails,WDDXTAGS.ORDER_ID));
+		// group.setOrderId(WDDXProcessor.convertToInteger(groupDetails,WDDXTAGS.ORDER_ID));
 		return group;
 	}
 

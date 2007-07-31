@@ -401,7 +401,6 @@ class PropertyInspector extends PropertyInspectorControls {
 		defineLater_chk.selected = ta.defineLater;
 					
 		currentGrouping_lbl.text = "GroupingUIID:"+StringUtils.cleanNull(ta.runOffline.groupingUIID);
-			
 
 	}
 	

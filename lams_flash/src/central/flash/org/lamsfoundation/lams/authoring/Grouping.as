@@ -43,9 +43,13 @@ class org.lamsfoundation.lams.authoring.Grouping {
 	private var _maxNumberOfGroups:Number;
 	private var _learnersPerGroups:Number;
 	
+	private var _groups:Hashtable;
+	
 	
 	function Grouping(uiid){
 		_groupingUIID = uiid;
+		_groups = new Hashtable("_groups");
+		
 		Debugger.log('Created a new Grouping:'+_groupingUIID,Debugger.GEN,'Constructor','Grouping');
 	}
 	//static class level methods
@@ -74,9 +78,32 @@ class org.lamsfoundation.lams.authoring.Grouping {
 			_numberOfGroups = dto.numberOfGroups;
 			_maxNumberOfGroups = dto.maxNumberOfGroups;
 			_learnersPerGroups = dto.learnersPerGroups;
-
+			
+			populateGroups(dto.groups);
 	}
 	
+	private function populateGroups(groups:Array):Void {
+		var _newGroups = new Array(); 
+		
+		for(var i=0; i<groups.length; i++) {
+			var gdto = groups[i];
+			var newGroup = new Group(null, gdto.groupUIID, gdto.groupName, gdto.orderID);
+			
+			_groups.put(newGroup.groupUIID, newGroup);
+		}
+	}
+	
+	public function addGroup(group:Group) {
+		_groups.put(group.groupUIID, group);
+	}
+	
+	public function removeGroup(groupUIID) {
+		var r:Object = _groups.remove(groupUIID);
+		
+		if(r==null){
+			return new LFError("Removing group failed:"+groupUIID,"removeGroup",this,null);
+		}
+	}
 	
 	/**
 	 * Returnd a DatTransferObject with all the fields.  If a field is null it is excluded
@@ -91,22 +118,54 @@ class org.lamsfoundation.lams.authoring.Grouping {
 		if(_numberOfGroups){	dto.numberOfGroups = _numberOfGroups;		}
 		if(_maxNumberOfGroups){	dto.maxNumberOfGroups = _maxNumberOfGroups;	}
 		if(_learnersPerGroups){	dto.learnersPerGroups = _learnersPerGroups;	}
+		
+		dto.groups = new Array();
+		
+		var groups:Array = _groups.values();
+		if(groups.length > 0){
+			for(var i=0; i<groups.length; i++){
+				dto.groups[i] = groups[i].toData();
+			}
+		}
+		
 		return dto;
 	}
 	
-	public function getGroups():Array {
-		var groups:Array = new Array();
+	public function getGroups(_ddm:DesignDataModel):Array {
 		var groupTotal = (groupingTypeID == RANDOM_GROUPING) ? numberOfGroups : maxNumberOfGroups;
+		var groupDiff:Number = groupTotal - _groups.size();
+		var groups = _groups.values();
 		
-		for(var i=0; i<groupTotal; i++) {
-			var group = new Object();
-			group.name = "Group " + i;
-			group.groupID = i;
-			group.groupingUIID = groupingUIID;
-			groups.push(group);
+		if(_groups.size() == groupTotal && _groups.size() > 0)
+			return groups;
+		
+		if(groupDiff >= 0) {
+			for(var i=0; i<groupDiff; i++) {
+				var group = (groups.length > 0) ? new Group(null, _ddm.newUIID(), "Group " + Number(groups.length + i + 1), Number(groups.length+i))
+												: new Group(null, _ddm.newUIID(), "Group " + Number(i+1), i);
+				addGroup(group);
+			}
+		} else {
+			for(var i=-1; i>=groupDiff; i--) {
+				_groups.remove(groups[groups.length+i].groupUIID);
+			}
 		}
 		
-		return groups;
+		return _groups.values();
+		
+	}
+	
+	public function updateGroups(groups:Array):Void {
+		for(var i=0; i<groups.length; i++) {
+			addGroup(groups[i]);
+		}
+	}
+	
+	public function clearGroups():Void {
+		var keyArray:Array = _groups.keys();
+		for(var i in keyArray) {
+			removeGroup(keyArray[i]);
+		}
 	}
 	
 	/**

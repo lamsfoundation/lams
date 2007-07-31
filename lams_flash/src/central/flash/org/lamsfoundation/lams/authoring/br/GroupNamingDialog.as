@@ -48,6 +48,8 @@ class GroupNamingDialog extends MovieClip implements Dialog {
     private var _container:MovieClip;  //The container window that holds the dialog
     
 	private var _groups:Array;
+	private var _grouping:Grouping;
+	private var _changedGroups:Hashtable;
 	
     private var ok_btn:Button;         //OK+Cancel buttons
     private var cancel_btn:Button;
@@ -78,6 +80,8 @@ class GroupNamingDialog extends MovieClip implements Dialog {
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
 		
+		_changedGroups = new Hashtable("_changedGroups");
+		
         //Create a clip that will wait a frame before dispatching init to give components time to setup
         this.onEnterFrame = init;
     }
@@ -105,6 +109,9 @@ class GroupNamingDialog extends MovieClip implements Dialog {
         //Add event listeners for ok, cancel and close buttons
         ok_btn.addEventListener('click',Delegate.create(this, ok));
         cancel_btn.addEventListener('click',Delegate.create(this, cancel));
+		_group_naming_dgd.addEventListener('cellEdit', Delegate.create(this, itemEdited));
+		_group_naming_dgd.addEventListener('cellFocusIn', Delegate.create(this, itemSelected));
+
 
 		//Assign Click (close button) and resize handlers
         _container.addEventListener('click',this);
@@ -128,8 +135,8 @@ class GroupNamingDialog extends MovieClip implements Dialog {
     * Event fired by StyleManager class to notify listeners that Theme has changed
     * it is up to listeners to then query Style Manager for relevant style info
     */
-    public function themeChanged(event:Object):Void{
-        if(event.type=='themeChanged') {
+    public function themeChanged(evt:Object):Void{
+        if(evt.type=='themeChanged') {
             //Theme has changed so update objects to reflect new styles
             setStyles();
         }else {
@@ -137,19 +144,39 @@ class GroupNamingDialog extends MovieClip implements Dialog {
         }
     }
 	
+	/**
+	 * Event fired by DataGrid class when an item has been edited i.e. its value changes
+	 * 
+	 * @usage   
+	 * @param   evt 
+	 * @return  
+	 */
+	
+	public function itemEdited(evt:Object):Void {
+		var group = _group_naming_dgd.getItemAt(evt.itemIndex);
+		
+		_changedGroups.put(group.groupUIID, group);
+		
+		Debugger.log("item changed: " + group.groupUIID, Debugger.CRITICAL, "itemChanged", "GroupNamingDialog");
+	}
+	
+	public function itemSelected(evt:Object):Void {
+		// TODO: Highlight the text to be changed
+		var item = _group_naming_dgd.getItemAt(evt.itemIndex);
+		Debugger.log("current selection: " + Selection.getFocus(), Debugger.CRITICAL, "itemSelected", "GroupNamingDialog");
+	}
+	
 	public function setupGrid():Void {
-		var column_name:DataGridColumn = new DataGridColumn("name");
+		var column_name:DataGridColumn = new DataGridColumn("groupName");
 		column_name.headerText = "Group Name";
 		column_name.editable = true;
 		
 		_group_naming_dgd.editable = true;
 		_group_naming_dgd.addColumn(column_name);
 		
-		Debugger.log("setingup grid length: " + _groups.length, Debugger.CRITICAL, "setupGrid", "GroupNamingDialog");
 		for(var i=0; i < _groups.length; i++) {
 			_group_naming_dgd.addItem(_groups[i]);
 		}
-
 	}
     
     /**
@@ -177,7 +204,6 @@ class GroupNamingDialog extends MovieClip implements Dialog {
     * Called by the cancel button 
     */
     private function cancel(){
-        //close parent window
         _container.deletePopUp();
     }
     
@@ -185,9 +211,7 @@ class GroupNamingDialog extends MovieClip implements Dialog {
     * Called by the OK button 
     */
     private function ok(){
-        Debugger.log('OK Clicked',Debugger.GEN,'ok','org.lamsfoundation.lams.GroupMatchingDialog');
-        
-        //close popup
+		_grouping.updateGroups(_changedGroups.values());
         _container.deletePopUp();
     }
 	
@@ -197,7 +221,6 @@ class GroupNamingDialog extends MovieClip implements Dialog {
     public function click(e:Object):Void{
         e.target.deletePopUp();
     }
-    
     
     /**
     * Main resize method, called by scrollpane container/parent
@@ -221,6 +244,10 @@ class GroupNamingDialog extends MovieClip implements Dialog {
 	
 	public function set groups(a:Array){
 		_groups = a;
+	}
+
+	public function set grouping(a:Grouping) {
+		_grouping = a;
 	}
 
 }
