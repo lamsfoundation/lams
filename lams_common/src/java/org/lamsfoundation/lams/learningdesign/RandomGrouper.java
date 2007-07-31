@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.exception.GroupingException;
@@ -36,7 +35,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * <p>The random grouping algorithm implementation. It allocates user into the 
- * groups according to the attributes acceptted from user interface: 
+ * groups according to the attributes accepted from user interface: 
  * <code>numberOfGroups</code> and <code>learnersPerGroup</code>. If any of 
  * these two attribute has be set, the random grouping will be done 
  * correspondently.</p>

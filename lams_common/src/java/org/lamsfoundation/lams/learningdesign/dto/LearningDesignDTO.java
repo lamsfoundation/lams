@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
@@ -147,7 +148,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.transitions = new ArrayList();
 		this.branchMappings = new ArrayList();
 	}	
-	public LearningDesignDTO(LearningDesign learningDesign, ActivityDAO activityDAO){
+	public LearningDesignDTO(LearningDesign learningDesign, ActivityDAO activityDAO, GroupingDAO groupingDAO){
 		this.learningDesignID = learningDesign.getLearningDesignId();
 		this.learningDesignUIID = learningDesign.getLearningDesignUIID();
 		this.description = learningDesign.getDescription();
@@ -202,7 +203,7 @@ public class LearningDesignDTO extends BaseDTO{
 		
 		this.lastModifiedDateTime = learningDesign.getLastModifiedDateTime();
 		this.branchMappings = new ArrayList(); // data will be set up by populateGroupings
-		this.groupings = populateGroupings(learningDesign,activityDAO);
+		this.groupings = populateGroupings(learningDesign,groupingDAO);
 		this.activities = populateActivities(learningDesign);
 		this.transitions = populateTransitions(learningDesign);
 		
@@ -390,42 +391,38 @@ public class LearningDesignDTO extends BaseDTO{
 	}
 	
 	/**
-	 * In order to get the Grouping objects, it will go through the parent 
-	 * activities in the learning design and for all grouping activities, it will 
-	 * then retrieve the Grouping object which was created by the GroupingActivity.
+	 * Gets all the grouping objects for a learning design. Can't do it via activities as the grouping
+	 * related to a teacher chosen grouping does not have a related grouping activity.
 	 * @param design
-	 * @param groupingDAO DAO to reget grouping objects due to the hibernate cglib casting problems.
+	 * @param groupingDAO DAO to directory get the grouping objects (no direct link from learning design possible).
 	 * @return ArrayList the array of groupingDTOs
 	 */
-	public ArrayList populateGroupings(LearningDesign design, ActivityDAO activityDAO)
+	public ArrayList populateGroupings(LearningDesign design, GroupingDAO groupingDAO)
 	{
-	    // Unfortunately, we can't just go through all the activities via design.getParentActivities()
-	    // as the activities returned won't cast to GroupingActivity, so we would
-	    // have to reget every activity to get the right type. So the easiest way
-	    // is to get them all in a list directly via a HQL call.
 	    ArrayList<GroupingDTO> groupingList = new ArrayList<GroupingDTO>();
-	    List groupingActivities = activityDAO.getGroupingActivitiesByLearningDesignId(design.getLearningDesignId());
-	    Iterator parentIterator = groupingActivities.iterator();
-	    while (parentIterator.hasNext())
-	    {
-	        GroupingActivity groupingActivity = (GroupingActivity) parentIterator.next();			
-		    Grouping grouping = groupingActivity.getCreateGrouping();
-		    groupingList.add(grouping.getGroupingDTO());			    
-		    
-	   		if ( grouping.getGroups().size() > 0 ) {
-    			Iterator iter = grouping.getGroups().iterator();
-    			while ( iter.hasNext() ) {
-    				Group group = (Group) iter.next();
-    	    		if ( group.getBranchActivities().size() > 0 ) {
-    	    			Iterator iter2 = group.getBranchActivities().iterator();
-    	    			while ( iter2.hasNext() ) {
-    	    				GroupBranchActivityEntry gba = (GroupBranchActivityEntry) iter2.next();
-    	    				branchMappings.add(gba.getGroupBranchActivityDTO());
-    	    			}
-    	    		}
-    			}
-    		}
-	   		
+	    List dbGroupings = groupingDAO.getGroupingsByLearningDesign(design.getLearningDesignId());
+	    if ( dbGroupings != null ) {
+	    	Iterator groupingIter = dbGroupings.iterator();
+		    while (groupingIter.hasNext())
+		    {
+			    Grouping grouping = (Grouping) groupingIter.next();
+			    groupingList.add(grouping.getGroupingDTO());			    
+			    
+		   		if ( grouping.getGroups().size() > 0 ) {
+	    			Iterator iter = grouping.getGroups().iterator();
+	    			while ( iter.hasNext() ) {
+	    				Group group = (Group) iter.next();
+	    	    		if ( group.getBranchActivities().size() > 0 ) {
+	    	    			Iterator iter2 = group.getBranchActivities().iterator();
+	    	    			while ( iter2.hasNext() ) {
+	    	    				GroupBranchActivityEntry gba = (GroupBranchActivityEntry) iter2.next();
+	    	    				branchMappings.add(gba.getGroupBranchActivityDTO());
+	    	    			}
+	    	    		}
+	    			}
+	    		}
+		   		
+		    }
 	    }
 	    return groupingList;
 	}

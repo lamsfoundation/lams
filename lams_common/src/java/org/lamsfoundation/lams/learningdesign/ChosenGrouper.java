@@ -58,7 +58,7 @@ public class ChosenGrouper extends Grouper implements Serializable
         List learners = new ArrayList();
         learners.add(learner);
         //delegate to do grouping for a list of learners.
-        doGrouping(chosenGrouping,groupName, learners);
+        doGrouping(chosenGrouping,groupName,learners);
     }
     
     /**
@@ -66,22 +66,34 @@ public class ChosenGrouper extends Grouper implements Serializable
      */
     public void doGrouping(Grouping chosenGrouping,String groupName, List learners)
     {
+    	Group selectedGroup = null;
+
     	String trimmedName = groupName != null ? groupName.trim() : null;
     	if ( trimmedName == null || trimmedName.length() == 0 ) {
-    		String prefix = getPrefix();
-    		trimmedName = prefix+" "+System.currentTimeMillis();
-    		log.warn("Chosen grouper for grouping "+chosenGrouping.toString()+" did not get a group name. Selecting default name of "+trimmedName);
-    	}
-    	Iterator iter = chosenGrouping.getGroups().iterator();
-    	Group selectedGroup = null;
-    	while (iter.hasNext() && selectedGroup==null) {
-			Group group = (Group) iter.next();
-			if ( trimmedName.equals(selectedGroup.getGroupName()) ) {
-				selectedGroup = group;
+    		trimmedName = generateGroupName(chosenGrouping);
+    	} else {
+	    	Iterator iter = chosenGrouping.getGroups().iterator();
+	    	while (iter.hasNext() && selectedGroup==null) {
+				Group group = (Group) iter.next();
+				if ( trimmedName.equals(group.getGroupName()) ) {
+					selectedGroup = group;
+				}
 			}
-		}
+    	}
     	doGrouping(chosenGrouping, selectedGroup, trimmedName, learners);
     }
+
+	/**
+	 * @param chosenGrouping
+	 * @return
+	 */
+	private String generateGroupName(Grouping chosenGrouping) {
+		String trimmedName;
+		String prefix = getPrefix();
+		trimmedName = prefix+" "+System.currentTimeMillis();
+		log.info("Chosen grouper for grouping "+chosenGrouping.toString()+" did not get a group name. Selecting default name of "+trimmedName);
+		return trimmedName;
+	}
 
     /**
      * @throws GroupingException 
@@ -89,31 +101,35 @@ public class ChosenGrouper extends Grouper implements Serializable
      */
     public void doGrouping(Grouping chosenGrouping,Long groupId, List learners) throws GroupingException
     {
-    	Iterator iter = chosenGrouping.getGroups().iterator();
-    	Group selectedGroup = null;
-    	while (iter.hasNext() && selectedGroup==null) {
-			Group group = (Group) iter.next();
-			if ( group.getGroupId().equals(groupId) ) {
-				selectedGroup = group;
+    	if ( groupId != null ) {
+	    	Iterator iter = chosenGrouping.getGroups().iterator();
+	    	Group selectedGroup = null;
+	    	while (iter.hasNext() && selectedGroup==null) {
+				Group group = (Group) iter.next();
+				if ( group.getGroupId().equals(groupId) ) {
+					selectedGroup = group;
+				}
 			}
-		}
-    	if ( selectedGroup == null ) {
-    		String error = "Tried to add users to group "+groupId+" but group cannot be found.";
-    		log.error(error); 
-    		throw new GroupingException(error);
+	    	if ( selectedGroup == null ) {
+	    		String error = "Tried to add users to group "+groupId+" but group cannot be found.";
+	    		log.error(error); 
+	    		throw new GroupingException(error);
+	    	}
+	    	doGrouping(chosenGrouping, selectedGroup, null, learners);
+    	} else {
+    		String groupName = generateGroupName(chosenGrouping);
+    		doGrouping(chosenGrouping, null, groupName, learners);
     	}
-    	doGrouping(chosenGrouping, selectedGroup, null, learners);
     }
 
-    /** If the group exists add them to the group, otherwise creates a new group. Group will always
-     * exist if called from doGrouping(Grouping chosenGrouping,Long groupId, List learners), but it may or 
-     * may not exist if called from doGrouping(Grouping chosenGrouping,String groupName, List learners).
-     * @param chosenGrouping
-     * @param group
-     * @param groupName
-     * @param learners
+    /** If the group exists add them to the group, otherwise creates a new group. If group is not supplied, then groupName must
+     * be supplied.
+     * @param chosenGrouping (Mandatory)
+     * @param group (Optional)
+     * @param groupName (Optional)
+     * @param learners (Mandatory)
      */
-    public void doGrouping(Grouping chosenGrouping, Group group, String groupName, List learners)
+    private void doGrouping(Grouping chosenGrouping, Group group, String groupName, List learners)
     {
     	if ( group != null ) {
     		group.getUsers().addAll(learners);

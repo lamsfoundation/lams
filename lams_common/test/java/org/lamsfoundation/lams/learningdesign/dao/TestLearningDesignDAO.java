@@ -28,6 +28,7 @@ import java.util.List;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
@@ -40,6 +41,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 public class TestLearningDesignDAO extends AbstractCommonTestCase {
 	
 	protected ActivityDAO activityDAO;
+	protected GroupingDAO groupingDAO;
 	private LearningDesignDAO learningDesignDAO;
 	protected TransitionDAO transitionDAO;
 	private LearningDesign learningDesign;
@@ -52,6 +54,7 @@ public class TestLearningDesignDAO extends AbstractCommonTestCase {
 		learningDesignDAO =(LearningDesignDAO)context.getBean("learningDesignDAO");		
 		transitionDAO =(TransitionDAO) context.getBean("transitionDAO");
 		activityDAO =(ActivityDAO) context.getBean("activityDAO");
+		groupingDAO =(GroupingDAO) context.getBean("groupingDAO");
 		//userDAO = (UserDAO)context.getBean("userDAO");
 	}
 	public void testCalculateFirstActivity(){
@@ -67,7 +70,7 @@ public class TestLearningDesignDAO extends AbstractCommonTestCase {
 	}
 	public void testGetLearningDesignDTO() throws Exception{
 		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
-		LearningDesignDTO learningDesignDTO = new LearningDesignDTO(learningDesign,activityDAO);		
+		LearningDesignDTO learningDesignDTO = new LearningDesignDTO(learningDesign,activityDAO,groupingDAO);		
 		String str = WDDXProcessor.serialize(learningDesignDTO);
 		System.out.println(str);		
 	}	

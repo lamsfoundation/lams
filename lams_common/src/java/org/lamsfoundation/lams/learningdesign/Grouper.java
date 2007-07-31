@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.util.MessageService;
  * This is interface that defines the contract for performing grouping 
  * algorithm.
  * 
- * It would be nicer to get the message service directly from within the classes, rather than havea setter.
+ * It would be nicer to get the message service directly from within the classes, rather than have a setter.
  * But can't think of a way to directly access it when the grouper object doesn't 
  * have any link to the Spring context. (Fiona Malikoff)
  * 
@@ -68,25 +68,28 @@ public abstract class Grouper
 	}
 
 	/**
-     * Do the grouping for a list of learners that the teacher requested. 
+     * Do the grouping for a list of learners that the teacher requested. If you don't supply a name, you may get a system
+     * generated name.
      * @param grouping the grouping that is used to perform groups creation.
-     * @param name for this group
+     * @param name for this group (optional)
      * @param learners the list of learners that the teacher requested.
      */
 	public abstract void doGrouping(Grouping grouping, String groupName, List learners) throws GroupingException;
 	
 	/**
 	 * Do the grouping for a single learner. Should call setCommonMessageService() before calling this method.
+	 * If you don't supply a name, you may get a system generated name.
 	 * @param grouping the grouping that is used to perform groups creation.
-	 * @param name for this group
+	 * @param name for this group (optional)
 	 * @param learner the learner teacher want to add.
 	 */
 	public abstract void doGrouping(Grouping grouping, String groupName, User learner) throws GroupingException;
 
 	/**
-     * Do the grouping for a list of learners that the teacher requested. 
+     * Do the grouping for a list of learners that the teacher requested. If you don't supply an id, you may get a group with a 
+     * system generated name. 
 	 * @param grouping the grouping that is used to perform groups creation.
-	 * @param id of the group
+	 * @param id of the group (optional)
 	 * @param learner the learner teacher want to add.
      * @throws GroupingException if the group does not exist. 
      */

@@ -125,6 +125,7 @@
 		<property name="messageService"><ref bean="commonMessageService"/></property>
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
+		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="learningLibraryDAO"><ref bean="learningLibraryDAO"/></property>
 		<property name="toolActMessageService"><ref bean="loadedMessageSourceService"/></property>
 	</bean>

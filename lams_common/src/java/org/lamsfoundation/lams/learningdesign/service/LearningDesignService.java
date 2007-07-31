@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
@@ -71,6 +72,7 @@ public class LearningDesignService implements ILearningDesignService{
 	
 	protected LearningDesignDAO learningDesignDAO;
 	protected ActivityDAO activityDAO;
+	protected GroupingDAO groupingDAO;
 	
 	protected LearningLibraryDAO learningLibraryDAO;
 	protected ILoadedMessageSourceService toolActMessageService;
@@ -115,6 +117,19 @@ public class LearningDesignService implements ILearningDesignService{
 		this.learningLibraryDAO = learningLibraryDAO;
 	}
 	
+	public void setActivityDAO(ActivityDAO activityDAO) {
+		this.activityDAO = activityDAO;
+	}
+
+	public void setLearningDesignDAO(LearningDesignDAO learningDesignDAO) {
+		this.learningDesignDAO = learningDesignDAO;
+	}
+	
+	public void setGroupingDAO(GroupingDAO groupingDAO) {
+		this.groupingDAO = groupingDAO;
+	}
+
+	
 	/**********************************************
 	 * Service Methods
 	 * *******************************************/
@@ -126,7 +141,7 @@ public class LearningDesignService implements ILearningDesignService{
 	 */
 	public LearningDesignDTO getLearningDesignDTO(Long learningDesignID) {
 		LearningDesign design = learningDesignID!=null ? learningDesignDAO.getLearningDesignById(learningDesignID) : null;
-		return design != null ? new LearningDesignDTO(design,activityDAO) : null;
+		return design != null ? new LearningDesignDTO(design,activityDAO,groupingDAO) : null;
 	}
 	
 	/**
@@ -456,15 +471,6 @@ public class LearningDesignService implements ILearningDesignService{
 			}
 		
 	}
-
-	public void setActivityDAO(ActivityDAO activityDAO) {
-		this.activityDAO = activityDAO;
-	}
-
-	public void setLearningDesignDAO(LearningDesignDAO learningDesignDAO) {
-		this.learningDesignDAO = learningDesignDAO;
-	}
-	
 
 	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails()throws IOException{
 		//only return valid learning library
