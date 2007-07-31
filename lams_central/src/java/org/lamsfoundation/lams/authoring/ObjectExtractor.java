@@ -596,7 +596,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    }
 		Long groupID = WDDXProcessor.convertToLong(groupDetails,WDDXTAGS.GROUP_ID);
 		
-		// does it exist already? Check on the ID field as the UIID field may not have 
+		// does it exist already? Check on the ID field first as the UIID field may not have 
 	    // been set if this grouping was created on the back end (based on a runtime copy of the sequence)
 		if ( groupID != null && grouping.getGroups() != null && grouping.getGroups().size() > 0 ) {
 			Iterator iter = grouping.getGroups().iterator();
@@ -616,7 +616,12 @@ public class ObjectExtractor implements IObjectExtractor {
 		group.setGroupName(WDDXProcessor.convertToString(groupDetails,WDDXTAGS.GROUP_NAME));
 		group.setGrouping(grouping);
 		group.setGroupUIID(groupUIID);
-		// group.setOrderId(WDDXProcessor.convertToInteger(groupDetails,WDDXTAGS.ORDER_ID));
+		
+		if ( keyExists(groupDetails,WDDXTAGS.ORDER_ID) )
+			group.setOrderId(WDDXProcessor.convertToInteger(groupDetails,WDDXTAGS.ORDER_ID));
+		else
+			group.setOrderId(0);
+		
 		return group;
 	}
 
