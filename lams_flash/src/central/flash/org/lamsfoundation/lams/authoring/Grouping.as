@@ -172,6 +172,14 @@ class org.lamsfoundation.lams.authoring.Grouping {
 		}
 	}
 	
+	public function get groups():Hashtable {
+		return _groups;
+	}
+	
+	public function getGroup(groupUIID:Number) {
+		return _groups.get(groupUIID);
+	}
+	
 	/**
 	 * 
 	 * @usage   

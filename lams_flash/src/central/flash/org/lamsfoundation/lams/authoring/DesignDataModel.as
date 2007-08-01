@@ -481,7 +481,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		for(var i=0; i<design.branchMappings.length;i++){
 			var mdto = design.branchMappings[i];
 			
-			var newMappingEntry:GroupBranchActivityEntry = new GroupBranchActivityEntry(mdto.entryID, mdto.entryUIID, getGroupByUIID(mdto.groupUIID), SequenceActivity(getActivityByUIID(mdto.sequenceActivityUIID)), BranchingActivity(getActivityByUIID(mdto.branchActivityUIID)));
+			var newMappingEntry:GroupBranchActivityEntry = new GroupBranchActivityEntry(mdto.entryID, mdto.entryUIID, getGroupByUIID(mdto.groupUIID), SequenceActivity(getActivityByUIID(mdto.sequenceActivityUIID)), BranchingActivity(getActivityByUIID(mdto.branchingActivityUIID)));
 			_branchMappings.put(newMappingEntry.entryUIID, newMappingEntry);
 		}
 		
@@ -831,7 +831,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var groupings = _groupings.values();
 		
 		for(var i=0; i<groupings.length; i++) {
-			var group:Group = Group(groupings[i].groups.get(groupUIID));
+			var group:Group = Group(groupings[i].getGroup(groupUIID));
 			if(group != null) return group;
 		}
 		
