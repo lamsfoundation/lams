@@ -61,7 +61,7 @@ class GroupNamingDialog extends MovieClip implements Dialog {
     
     private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
-    
+	
     //Dimensions for resizing
     private var xOkOffset:Number;
     private var yOkOffset:Number;

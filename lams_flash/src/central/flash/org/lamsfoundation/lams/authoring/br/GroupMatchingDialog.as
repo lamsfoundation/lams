@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.authoring.br.*
 
 import mx.controls.*
+import mx.controls.gridclasses.DataGridColumn;
 import mx.utils.*
 import mx.managers.*
 import mx.events.*
@@ -49,8 +50,7 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
 	private var _groups:Array;
 	private var _branches:Array;
 	
-    private var ok_btn:Button;         //OK+Cancel buttons
-    private var cancel_btn:Button;
+    private var close_btn:Button;         // Close button
 	
 	private var add_match_btn:Button;
 	private var remove_match_btn:Button;
@@ -64,11 +64,14 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
     private var branches_lst_lbl:Label;
 	private var match_dgd_lbl:Label;
 	
-	private var match_lst:List;		// Group-Branch Matching listbox
+	private var match_dgd:DataGrid;		// Group-Branch Matching listbox
     
     private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
+	private var app:Application;
     
+	private var _branchingActivity:BranchingActivity;
+	
     //Dimensions for resizing
     private var xOkOffset:Number;
     private var yOkOffset:Number;
@@ -87,6 +90,8 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
 		
+		app = Application.getInstance();
+		
         //Create a clip that will wait a frame before dispatching init to give components time to setup
         this.onEnterFrame = init;
     }
@@ -102,9 +107,8 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
         themeManager = ThemeManager.getInstance();
         
         //Set the text for buttons
-        ok_btn.label = Dictionary.getValue('al_ok');
-        cancel_btn.label = Dictionary.getValue('al_cancel');
-        
+        close_btn.label = "Done" //Dictionary.getValue('al_close');
+       
         //Set the labels
         groups_lst_lbl.text = Dictionary.getValue('groupmatch_dlg_groups_lst_lbl');
         branches_lst_lbl.text = Dictionary.getValue('groupmatch_dlg_branches_lst_lbl');
@@ -116,8 +120,7 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
         
         //EVENTS
         //Add event listeners for ok, cancel and close buttons
-        ok_btn.addEventListener('click',Delegate.create(this, ok));
-        cancel_btn.addEventListener('click',Delegate.create(this, cancel));
+        close_btn.addEventListener('click',Delegate.create(this, close));
         add_match_btn.addEventListener('click',Delegate.create(this, addMatch));
         remove_match_btn.addEventListener('click',Delegate.create(this, removeMatch));
         
@@ -126,10 +129,8 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
         _container.addEventListener('size',this);
         
         //work out offsets from bottom RHS of panel
-        xOkOffset = panel._width - ok_btn._x;
-        yOkOffset = panel._height - ok_btn._y;
-        xCancelOffset = panel._width - cancel_btn._x;
-        yCancelOffset = panel._height - cancel_btn._y;
+        xOkOffset = panel._width - close_btn._x;
+        yOkOffset = panel._height - close_btn._y;
         
         //Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
@@ -143,8 +144,8 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
 		Debugger.log("Loading Lists: branch length: " + _branches.length, Debugger.CRITICAL, "loadLists", "GroupMatchingDialog");
 		
 		groups_lst.dataProvider = _groups;
-		groups_lst.sortItemsBy("groupID", Array.NUMERIC);
-		groups_lst.labelField = "name";
+		groups_lst.sortItemsBy("groupUIID", Array.NUMERIC);
+		groups_lst.labelField = "groupName";
 		groups_lst.hScrollPolicy = "on";
 		groups_lst.maxHPosition = 200;
 		
@@ -153,9 +154,20 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
 		branches_lst.hScrollPolicy = "on";
 		branches_lst.maxHPosition = 200;
 		
-		match_lst.hScrollPolicy = "on";
-		match_lst.maxHPosition = 200;
+		var column_sequence:DataGridColumn = new DataGridColumn("sequenceName");
+		column_sequence.headerText = "Branch";
 		
+		var column_name:DataGridColumn = new DataGridColumn("groupName");
+		column_name.headerText = "Group";
+		
+		match_dgd.addColumn(column_sequence);
+		match_dgd.addColumn(column_name);
+		
+		var mappings = app.getCanvas().ddm.branchMappings.values();
+		
+		for(var m in mappings) {
+			match_dgd.addItem(mappings[m]);
+		}
 	}
     
     /**
@@ -181,8 +193,7 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
 
         //Get the button style from the style manager and apply to both buttons
         styleObj = themeManager.getStyleObject('button');
-        ok_btn.setStyle('styleName', styleObj);
-        cancel_btn.setStyle('styleName', styleObj);
+        close_btn.setStyle('styleName', styleObj);
         add_match_btn.setStyle('styleName', styleObj);
         remove_match_btn.setStyle('styleName', styleObj);
 		
@@ -196,19 +207,11 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
         branches_lst_lbl.setStyle('styleName', styleObj);
 		match_dgd_lbl.setStyle('styleName', styleObj);
     }
-
-    /**
-    * Called by the cancel button 
-    */
-    private function cancel(){
-        //close parent window
-        _container.deletePopUp();
-    }
     
     /**
     * Called by the OK button 
     */
-    private function ok(){
+    private function close(){
         Debugger.log('OK Clicked',Debugger.GEN,'ok','org.lamsfoundation.lams.GroupMatchingDialog');
         
         //close popup
@@ -237,23 +240,27 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
 		}
 	}
 	
-	private function setupMatch(group:Object, branch:Branch):Void {
+	private function setupMatch(group:Group, branch:Branch):Void {
 		Debugger.log("group: " + group + " branch: " + branch, Debugger.CRITICAL, "setupMatch", "GroupMatchingDialog");
 		 
-		var desc = "Group: " + group.groupID + " :: >> Branch: " + branch.sequenceName;
-		match_lst.addItem({label: desc, data: group});
+		var gbMatch:GroupBranchActivityEntry = new GroupBranchActivityEntry(null, app.getCanvas().ddm.newUIID(), group, branch.sequenceActivity, _branchingActivity);
+		match_dgd.addItem(gbMatch);
+		
+		app.getCanvas().ddm.addBranchMapping(gbMatch);
 		
 	}
 	
 	private function removeMatch():Void {
 		
-		var rItem:Object = match_lst.selectedItem;
+		var rItem:Object = match_dgd.selectedItem;
 		
 		if(rItem != null) {
-			groups_lst.addItem(rItem.data);
-			groups_lst.sortItemsBy("groupID", Array.NUMERIC);
+			groups_lst.addItem(rItem.group);
+			groups_lst.sortItemsBy("groupUIID", Array.NUMERIC);
 			
-			match_lst.removeItemAt(match_lst.selectedIndex);
+			match_dgd.removeItemAt(match_dgd.selectedIndex);
+			app.getCanvas().ddm.removeBranchMapping(rItem);
+			
 		} else {
 			LFMessage.showMessageAlert("No match selected");
 		}
@@ -276,8 +283,7 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
         panel.setSize(w,h);
 
         //Buttons
-        ok_btn.move(w-xOkOffset,h-yOkOffset);
-        cancel_btn.move(w-xCancelOffset,h-yCancelOffset);
+        close_btn.move(w-xOkOffset,h-yOkOffset);
     }
     
     //Gets+Sets
@@ -294,6 +300,10 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
 	
 	public function set branches(a:Array){
 		_branches = a;
+	}
+	
+	public function set branchingActivity(a:BranchingActivity) {
+		_branchingActivity = a;
 	}
 
 }

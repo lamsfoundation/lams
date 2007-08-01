@@ -839,8 +839,10 @@ class PropertyInspectorControls extends MovieClip {
 		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
 		var grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.groupingUIID);
 		
+		evt.target.scrollContent.branchingActivity = _canvasModel.selectedItem.activity;
 		evt.target.scrollContent.groups = grouping.getGroups();
 		evt.target.scrollContent.branches = getValidBranches(branches.myBranches);
+		
 		evt.target.scrollContent.loadLists();
 		
 	}

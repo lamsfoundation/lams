@@ -87,7 +87,11 @@ class org.lamsfoundation.lams.authoring.Grouping {
 		
 		for(var i=0; i<groups.length; i++) {
 			var gdto = groups[i];
-			var newGroup = new Group(null, gdto.groupUIID, gdto.groupName, gdto.orderID);
+			if(gdto.groupUIID == null) gdto.groupUIID = Application.getInstance().getCanvas().ddm.newUIID();
+			
+			var newGroup = new Group(gdto.groupID, gdto.groupUIID, gdto.groupName, gdto.orderID);
+			
+			
 			
 			_groups.put(newGroup.groupUIID, newGroup);
 		}

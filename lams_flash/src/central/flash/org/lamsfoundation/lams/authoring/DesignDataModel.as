@@ -79,6 +79,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private var _transitions:Hashtable;
 	private var _groupings:Hashtable;
 	private var _branches:Hashtable;
+	private var _branchMappings:Hashtable;
 	
 	
 	private var _licenseID:Number;
@@ -102,6 +103,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_transitions = new Hashtable("_transitions");
 		_groupings = new Hashtable("_groupings");
 		_branches = new Hashtable("_branches");
+		_branchMappings = new Hashtable("_branchMappings");
 		
 		//set the defualts:
 		_objectType = "LearningDesign";
@@ -257,6 +259,24 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		return true;
 	}
 	
+	/**
+	 * Adds a branch/group mapping to the DDM
+	 * @usage   
+	 * @param   branch 
+	 * @return  
+	 */
+	public function addBranchMapping(entry:GroupBranchActivityEntry):Boolean{
+		//dispatch an event to show the design has changed
+		dispatchEvent({type:'ddmBeforeUpdate',target:this});
+	
+		Debugger.log('Branch Mapping entry:' + entry.entryUIID,4,'addBranchMapping','DesignDataModel');
+		_branchMappings.put(entry.entryUIID,entry);
+		
+		dispatchEvent({type:'ddmUpdate',target:this});
+		
+		return true;
+	}
+	
 	public function addGrouping(grp:Grouping):Object{
 		//dispatch an event to show the design is going to change
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
@@ -308,6 +328,27 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			}
 		}
 	}
+	
+	/**
+	 * Removes the branch from the DDM
+	 * @usage   
+	 * @param   branchUIID 
+	 * @return  
+	 */
+	public function removeBranchMapping(entryUIID):Object{
+		//dispatch an event to show the design has changed
+		dispatchEvent({type:'ddmBeforeUpdate',target:this});
+		
+		var r:Object = _branchMappings.remove(entryUIID);
+		if(r==null){
+			return new LFError("Removing branch mapping failed:"+entryUIID,"removeBranch",this,null);
+		}else{
+			
+			Debugger.log('Removed:'+r.entryUIID,Debugger.GEN,'removeBranch','DesignDataModel');
+			dispatchEvent({type:'ddmUpdate',target:this});
+		}
+	}
+	
 	
 	/**
 	 * Sets a new design for the DDM.
@@ -437,10 +478,15 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		}
 		
+		for(var i=0; i<design.branchMappings.length;i++){
+			var mdto = design.branchMappings[i];
+			
+			var newMappingEntry:GroupBranchActivityEntry = new GroupBranchActivityEntry(mdto.entryID, mdto.entryUIID, getGroupByUIID(mdto.groupUIID), SequenceActivity(getActivityByUIID(mdto.sequenceActivityUIID)), BranchingActivity(getActivityByUIID(mdto.branchActivityUIID)));
+			_branchMappings.put(newMappingEntry.entryUIID, newMappingEntry);
+		}
+		
 		return success;
 	}
-	
-	
 	
 	
 	/**
@@ -465,7 +511,6 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		//set modified date time to now
 		_lastModifiedDateTime = new Date();
 		_autoSaved = true;
-		
 
 	}
 	
@@ -659,22 +704,25 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		design.transitions = new Array();
 		var classTrans:Array = _transitions.values();
-		if(classTrans.length > 0){
-			
-			for(var i=0; i<classTrans.length; i++){
+		
+		if(classTrans.length > 0)
+			for(var i=0; i<classTrans.length; i++)
 				design.transitions[i] = classTrans[i].toData();
-			}
-		}
 		
 		design.groupings = new Array();
 		var classGroups:Array = _groupings.values();
-		if(classGroups.length > 0){
-			
-			for(var i=0; i<classGroups.length; i++){
-				//TODO: Add a toData to the gorup class (after we make the group class :)
+		
+		if(classGroups.length > 0)
+			for(var i=0; i<classGroups.length; i++)
 				design.groupings[i] = classGroups[i].toData();
-			}
-		}
+				
+				
+		design.branchMappings = new Array();
+		var classMappingEntries = _branchMappings.values();
+		
+		if(classMappingEntries.length > 0)
+			for(var i=0; i<classMappingEntries.length; i++)
+				design.branchMappings[i] = classMappingEntries[i].toData();
 		
 		return design;
 	}
@@ -772,11 +820,22 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		for(var i=0; i<acts.length;i++){
 			if(acts[i].activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
 				gActs.push(acts[i]);
-				//trace("Grouping "+gActs[i]+" has "+ gActs[i].groupingUIID );
 			}
 		}
+		
 		Debugger.log('Returning '+gActs.length+' grouping activities',Debugger.GEN,'getGroupingActivities','DesignDataModel');
 		return gActs;
+	}
+	
+	public function getGroupByUIID(groupUIID:Number):Group {
+		var groupings = _groupings.values();
+		
+		for(var i=0; i<groupings.length; i++) {
+			var group:Group = Group(groupings[i].groups.get(groupUIID));
+			if(group != null) return group;
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -1035,6 +1094,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function set branches(a:Hashtable):Void{
 		_branches = a;
 	}
+	
+	public function get branchMappings():Hashtable {
+		return _branchMappings;
+	}
+	
+	public function set branchMappings(a:Hashtable):Void {
+		_branchMappings = a;
+	}	
 	
 	/**
 	 * 

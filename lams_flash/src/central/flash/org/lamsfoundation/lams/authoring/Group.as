@@ -25,8 +25,8 @@ import org.lamsfoundation.lams.authoring.*;
 
 /**
  *
- * @author
- * @version
+ * @author Mitchell Seaton
+ * @version 2.1
  **/
 class Group {
 	

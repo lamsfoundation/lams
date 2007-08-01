@@ -129,7 +129,6 @@ class WizardModel extends Observable{
 
 	
 	public function broadcastViewUpdate(updateType, data){
-		//getMonitor().getMV().clearView();
 		setChanged();
 		
 		//send an update
@@ -310,7 +309,6 @@ class WizardModel extends Observable{
 		return _orgResources[key];
 		
 	}
-
 	
 	public function get treeDP():XML{
 		return _treeDP;
