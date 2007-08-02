@@ -90,7 +90,7 @@ public class PerformChosenGroupingServlet extends AbstractStoreWDDXPacketServlet
 			Grouping grouping = activity.getCreateGrouping();
 			Map map = new HashMap();
 			map.put(MonitoringConstants.KEY_GROUPING_ACTIVITY,new Long(activityId));
-			map.put("grouping",grouping.getGroupingDTO());
+			map.put("grouping",grouping.getGroupingDTO(true));
 			flashMessage = new FlashMessage("performChosenGrouping",map);
 		} catch (Exception e) {
 			log.error(e);

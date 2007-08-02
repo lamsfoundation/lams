@@ -45,13 +45,13 @@ public class GroupDTO {
      * @param group
      */
 	@SuppressWarnings("unchecked")
-	public GroupDTO(Group group) {
+	public GroupDTO(Group group, boolean setupUserList) {
 		groupID = group.getGroupId();
 		groupName = group.getGroupName();
 		orderID = group.getOrderId();
 		groupUIID = group.getGroupUIID();
 		userList = new ArrayList();
-		if(group.getUsers() != null){
+		if(setupUserList && group.getUsers() != null){
 			Iterator iter = group.getUsers().iterator();
 			while(iter.hasNext()){
 				userList.add(((User)iter.next()).getUserFlashDTO());

@@ -335,8 +335,8 @@ public class Group implements Serializable,Nullable,Comparable {
         return false;
     }
     
-    public GroupDTO getGroupDTO(){
-    	return new GroupDTO(this);
+    public GroupDTO getGroupDTO(boolean setupUserList){
+    	return new GroupDTO(this, setupUserList);
     }
     
     /** May this group be deleted or a user from this group deleted? It should not be 

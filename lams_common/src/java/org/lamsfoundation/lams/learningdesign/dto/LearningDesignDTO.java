@@ -393,8 +393,12 @@ public class LearningDesignDTO extends BaseDTO{
 	/**
 	 * Gets all the grouping objects for a learning design. Can't do it via activities as the grouping
 	 * related to a teacher chosen grouping does not have a related grouping activity.
+	 * 
+	 * Don't set up the userlist if this is to be sent to authoring.
+	 * 
 	 * @param design
 	 * @param groupingDAO DAO to directory get the grouping objects (no direct link from learning design possible).
+	 * @param setupUserList
 	 * @return ArrayList the array of groupingDTOs
 	 */
 	public ArrayList populateGroupings(LearningDesign design, GroupingDAO groupingDAO)
@@ -406,7 +410,7 @@ public class LearningDesignDTO extends BaseDTO{
 		    while (groupingIter.hasNext())
 		    {
 			    Grouping grouping = (Grouping) groupingIter.next();
-			    groupingList.add(grouping.getGroupingDTO());			    
+			    groupingList.add(grouping.getGroupingDTO(false));			    
 			    
 		   		if ( grouping.getGroups().size() > 0 ) {
 	    			Iterator iter = grouping.getGroups().iterator();

@@ -344,8 +344,8 @@ public abstract class Grouping implements Serializable
 	{
 	    return !getGroupBy(learner).isNull();
 	}
-	public GroupingDTO getGroupingDTO(){
-		return new GroupingDTO(this);
+	public GroupingDTO getGroupingDTO(boolean setupUserList){
+		return new GroupingDTO(this, setupUserList);
 	}
 	public static Object getGroupingInstance(Integer groupingType){
 		if(groupingType.equals(RANDOM_GROUPING_TYPE))

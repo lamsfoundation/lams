@@ -64,7 +64,7 @@ public class GroupingDTO extends BaseDTO{
 		this.maxNumberOfGroups = maxNumberOfGroups;
 		this.groups = groupDTOs;
 	}
-	public GroupingDTO(Grouping grouping){
+	public GroupingDTO(Grouping grouping, boolean setupUserList){
 		this.groupingID = grouping.getGroupingId();
 		this.groupingUIID = grouping.getGroupingUIID();
 		this.maxNumberOfGroups = grouping.getMaxNumberOfGroups();		
@@ -74,7 +74,7 @@ public class GroupingDTO extends BaseDTO{
 		if(groupSet != null){
 			Iterator iter = groupSet.iterator();
 			while(iter.hasNext()){
-				groups.add(((Group)iter.next()).getGroupDTO());
+				groups.add(((Group)iter.next()).getGroupDTO(setupUserList));
 			}
 		}
 		/*The two lines of code below are commented out, because it creates a new grouping instance and then tries to 
