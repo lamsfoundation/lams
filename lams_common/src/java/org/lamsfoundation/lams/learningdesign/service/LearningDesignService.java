@@ -35,9 +35,11 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
@@ -342,6 +344,7 @@ public class LearningDesignService implements ILearningDesignService{
 			validateGroupingIfGroupingIsApplied(activity, listOfValidationErrorDTOs);	
 			validateOptionalActivity(activity, listOfValidationErrorDTOs);
 			validateOptionsActivityOrderId(activity, listOfValidationErrorDTOs);
+			validateGroupingActivity(activity, listOfValidationErrorDTOs);
 			Vector<ValidationErrorDTO> activityErrors = activity.validateActivity(messageService);
 			if(activityErrors != null && !activityErrors.isEmpty())
 				listOfValidationErrorDTOs.addAll(activityErrors);
@@ -408,6 +411,38 @@ public class LearningDesignService implements ILearningDesignService{
 		
 	}
 	
+	/**
+	 * If this activity is an GroupingActivity and the grouping has some groups, then the number of groups must no exceed the desired number
+	 * of groups..
+	 * 
+	 * @param parentActivity
+	 */
+	private void validateGroupingActivity(Activity activity, Vector<ValidationErrorDTO> listOfValidationErrorDTOs)
+	{
+			
+			if (activity.isGroupingActivity())
+			{
+				//get the child activities and check how many there are.
+				GroupingActivity groupingActivity = (GroupingActivity)activity;
+				Grouping grouping = groupingActivity.getCreateGrouping();
+				if ( grouping == null ) {
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_ACTIVITY_MISSING_GROUPING_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.GROUPING_ACTIVITY_MISSING_GROUPING_KEY), activity.getActivityUIID()));
+				}
+				Integer numGroupsInteger = null;
+				if ( grouping.isRandomGrouping() ) {
+					RandomGrouping random = (RandomGrouping) grouping;
+					numGroupsInteger = random.getNumberOfGroups();
+				} else {
+					numGroupsInteger = grouping.getMaxNumberOfGroups();
+				}
+				int maxNumGroups = numGroupsInteger == null ? 0 : numGroupsInteger.intValue(); 
+				if ( grouping.getGroups() != null && grouping.getGroups().size() > maxNumGroups) {
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY), activity.getActivityUIID()));
+				}
+			}
+		
+	}
+
 	/**
 	 * This method ensures that the order id of the optional activities
 	 * start from 1, are sequential and do not contain any duplicates.

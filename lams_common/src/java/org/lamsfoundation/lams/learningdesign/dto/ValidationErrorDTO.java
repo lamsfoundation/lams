@@ -45,6 +45,8 @@ public class ValidationErrorDTO {
 	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY = "validation.error.OptionalActivityOrderId";	// OAOI
 	public static final String SCHEDULE_GATE_ERROR_TYPE1_KEY = "validation.error.illegalScheduleGateOffsetsType1";			// SG
 	public static final String SCHEDULE_GATE_ERROR_TYPE2_KEY = "validation.error.illegalScheduleGateOffsetsType2";			
+	public static final String GROUPING_ACTIVITY_MISSING_GROUPING_KEY = "validation.error.grouping.missing";				// GM
+	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY = "validation.error.group.count.mismatch";			// GC
 	
 	public static final String OTHER_ERROR_CODE = "O";
 	public static final String TRANSITION_ERROR_CODE = "T";
@@ -57,6 +59,8 @@ public class ValidationErrorDTO {
 	public static final String OPTIONAL_ACTIVITY_ERROR_CODE = "OA";
 	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_CODE = "OAOI";
 	public static final String SCHEDULE_GATE_ERROR_CODE = "SG1";
+	public static final String GROUPING_ACTIVITY_MISSING_GROUPING_ERROR_CODE = "GM";
+	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_ERROR_CODE = "GC";
 	
 	
 	private static MessageResources resources = MessageResources.getMessageResources(CONFIG_PARAM);
@@ -138,6 +142,16 @@ public class ValidationErrorDTO {
 	 */
 	public static final String SCHEDULE_GATE_ERROR_TYPE2 = resources.getMessage(SCHEDULE_GATE_ERROR_TYPE2_KEY);
 	
+	/**
+	 * Rule: For Grouping Activities there must be a grouping.
+	 */
+	public static final String GROUPING_ACTIVITY_MISSING_GROUPING = resources.getMessage(GROUPING_ACTIVITY_MISSING_GROUPING_KEY); 	// GM
+
+	/**
+	 * Rule: For Grouping Activities the number of groups must be less than or equal to the desired number.
+	 */
+	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH = resources.getMessage(GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY); 	// GC
+
 	private Integer UIID;
 	private String message; //the validation message explaining what the problem is
 	private String code;	// unique code representing the validation error message
