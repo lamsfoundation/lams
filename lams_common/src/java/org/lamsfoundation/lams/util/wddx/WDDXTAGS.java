@@ -136,7 +136,7 @@ public interface WDDXTAGS {
 	public static final String GROUP_BRANCH_ACTIVITY_ENTRY_ID = "entryID";
 	public static final String GROUP_BRANCH_ACTIVITY_ENTRY_UIID = "entryUIID";
 	public static final String GROUP_BRANCH_SEQUENCE_ACTIVITY_UIID = "sequenceActivityUIID";
-	public static final String GROUP_BRANCH_ACTIVITY_UIID = "branchActivityUIID";
+	public static final String GROUP_BRANCH_ACTIVITY_UIID = "branchingActivityUIID";
 
 	/** Transition specific tags */
 	public static final String TRANSITION_ID ="transitionID";
