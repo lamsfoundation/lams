@@ -51,8 +51,7 @@ class GroupNamingDialog extends MovieClip implements Dialog {
 	private var _grouping:Grouping;
 	private var _changedGroups:Hashtable;
 	
-    private var ok_btn:Button;         //OK+Cancel buttons
-    private var cancel_btn:Button;
+    private var close_btn:Button;         // Close button
     
 	private var instructions_lbl:Label;
 	private var _group_naming_dgd:DataGrid;
@@ -97,9 +96,8 @@ class GroupNamingDialog extends MovieClip implements Dialog {
         themeManager = ThemeManager.getInstance();
         
         //Set the text for buttons
-        ok_btn.label = Dictionary.getValue('al_ok');
-        cancel_btn.label = Dictionary.getValue('al_cancel');
-		instructions_lbl.text = "Changes names for Groups";
+        close_btn.label = Dictionary.getValue('al_ok');
+        instructions_lbl.text = Dictionary.getValue('groupnaming_dialog_instructions_lbl');
 		
         //get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
         fm = _container.getFocusManager();
@@ -107,8 +105,8 @@ class GroupNamingDialog extends MovieClip implements Dialog {
         
         //EVENTS
         //Add event listeners for ok, cancel and close buttons
-        ok_btn.addEventListener('click',Delegate.create(this, ok));
-        cancel_btn.addEventListener('click',Delegate.create(this, cancel));
+        close_btn.addEventListener('click',Delegate.create(this, close));
+		
 		_group_naming_dgd.addEventListener('cellEdit', Delegate.create(this, itemEdited));
 		_group_naming_dgd.addEventListener('cellFocusIn', Delegate.create(this, itemSelected));
 
@@ -118,10 +116,8 @@ class GroupNamingDialog extends MovieClip implements Dialog {
         _container.addEventListener('size',this);
         
         //work out offsets from bottom RHS of panel
-        xOkOffset = _bgpanel._width - ok_btn._x;
-        yOkOffset = _bgpanel._height - ok_btn._y;
-        xCancelOffset = _bgpanel._width - cancel_btn._x;
-        yCancelOffset = _bgpanel._height - cancel_btn._y;
+        xOkOffset = _bgpanel._width - close_btn._x;
+        yOkOffset = _bgpanel._height - close_btn._y;
         
         //Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
@@ -189,9 +185,8 @@ class GroupNamingDialog extends MovieClip implements Dialog {
 
         //Get the button style from the style manager and apply to both buttons
         styleObj = themeManager.getStyleObject('button');
-        ok_btn.setStyle('styleName', styleObj);
-        cancel_btn.setStyle('styleName', styleObj);
-		
+        close_btn.setStyle('styleName', styleObj);
+       
 		styleObj = themeManager.getStyleObject('CanvasPanel');
 		_bgpanel.setStyle('styleName', styleObj);
 		
@@ -199,18 +194,11 @@ class GroupNamingDialog extends MovieClip implements Dialog {
         styleObj = themeManager.getStyleObject('label');
         instructions_lbl.setStyle('styleName', styleObj);
     }
-
-    /**
-    * Called by the cancel button 
-    */
-    private function cancel(){
-        _container.deletePopUp();
-    }
-    
+	
     /**
     * Called by the OK button 
     */
-    private function ok(){
+    private function close(){
 		_grouping.updateGroups(_changedGroups.values());
         _container.deletePopUp();
     }
@@ -230,8 +218,8 @@ class GroupNamingDialog extends MovieClip implements Dialog {
         _bgpanel.setSize(w,h);
 
         //Buttons
-        ok_btn.move(w-xOkOffset,h-yOkOffset);
-        cancel_btn.move(w-xCancelOffset,h-yCancelOffset);
+        close_btn.move(w-xOkOffset,h-yOkOffset);
+		
     }
     
     //Gets+Sets

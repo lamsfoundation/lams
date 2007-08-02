@@ -125,6 +125,9 @@ class org.lamsfoundation.lams.authoring.Grouping {
 		
 		dto.groups = new Array();
 		
+		var groupTotal = (groupingTypeID == RANDOM_GROUPING) ? numberOfGroups : maxNumberOfGroups;
+		if(groupTotal == 0) _groups.clear();
+			
 		var groups:Array = _groups.values();
 		if(groups.length > 0){
 			for(var i=0; i<groups.length; i++){

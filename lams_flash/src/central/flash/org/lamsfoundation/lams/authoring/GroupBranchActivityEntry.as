@@ -54,7 +54,7 @@ class GroupBranchActivityEntry   {
 		if(_entryUIID) dto.entryUIID = _entryUIID;
 		if(_group) dto.groupUIID = _group.groupUIID;
 		if(_sequenceActivity) dto.sequenceActivityUIID = _sequenceActivity.activityUIID;
-		if(_branchingActivity) dto.branchActivityUIID = _branchingActivity.activityUIID;
+		if(_branchingActivity) dto.branchingActivityUIID = _branchingActivity.activityUIID;
 		
 		return dto;
 	}

@@ -65,5 +65,4 @@ interface org.lamsfoundation.lams.common.layout.ILayoutManager {
 
 	public function resize(w:Number, h:Number);
 	
-	//public function completed():Boolean;
 }
