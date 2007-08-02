@@ -596,16 +596,24 @@ public class ObjectExtractor implements IObjectExtractor {
 	    }
 		Long groupID = WDDXProcessor.convertToLong(groupDetails,WDDXTAGS.GROUP_ID);
 		
-		// does it exist already? Check on the ID field first as the UIID field may not have 
-	    // been set if this grouping was created on the back end (based on a runtime copy of the sequence)
-		if ( groupID != null && grouping.getGroups() != null && grouping.getGroups().size() > 0 ) {
+		// Does it exist already? If the group was created at runtime, there will be an ID but no IU ID field.
+		// If it was created in authoring, will have a UI ID and may or may not have an ID.
+		// So try to match up on UI ID first, failing that match on ID. Then the worst case, which is the group
+		// is created at runtime but then modified in authoring (and has has a new UI ID added) is handled.
+		if ( grouping.getGroups() != null && grouping.getGroups().size() > 0  ) {
+			Group uiid_match = null;
+			Group id_match = null;
 			Iterator iter = grouping.getGroups().iterator();
-			while (group == null && iter.hasNext()) {
+			while (uiid_match == null && iter.hasNext()) {
 				Group possibleGroup = (Group) iter.next();
-				if ( groupUIID.equals(possibleGroup.getGroupId()) ) {
-					group = possibleGroup;
+				if ( groupUIID.equals(possibleGroup.getGroupUIID()) ) {
+					uiid_match = possibleGroup;
+				}
+				if ( groupID != null && groupID.equals(possibleGroup.getGroupId()) ) {
+					id_match = possibleGroup;
 				}
 			}
+			group = uiid_match != null ? uiid_match : id_match;
 		}
 
 		if ( group == null ) {
