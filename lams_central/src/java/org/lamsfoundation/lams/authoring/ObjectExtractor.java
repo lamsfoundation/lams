@@ -592,7 +592,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		Group group = null;
 		Integer groupUIID = WDDXProcessor.convertToInteger(groupDetails,WDDXTAGS.GROUP_UIID);
 	    if ( groupUIID == null ) { 
-	    	throw new WDDXProcessorConversionException("TGroup is missing its UUID. Group "+groupDetails+" grouping "+grouping);
+	    	throw new WDDXProcessorConversionException("Group is missing its UUID. Group "+groupDetails+" grouping "+grouping);
 	    }
 		Long groupID = WDDXProcessor.convertToLong(groupDetails,WDDXTAGS.GROUP_ID);
 		
@@ -1211,6 +1211,10 @@ public class ObjectExtractor implements IObjectExtractor {
 
     	Long entryId = WDDXProcessor.convertToLong(details, WDDXTAGS.GROUP_BRANCH_ACTIVITY_ENTRY_ID);	
     	Integer entryUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.GROUP_BRANCH_ACTIVITY_ENTRY_UIID);	
+	    if ( entryUIID == null ) { 
+	    	throw new WDDXProcessorConversionException("Group based branch mapping entry is missing its UUID. Entry "+details);
+	    }
+
     	Integer groupUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.GROUP_UIID);	
     	Integer sequenceActivityUIID=WDDXProcessor.convertToInteger(details,WDDXTAGS.GROUP_BRANCH_SEQUENCE_ACTIVITY_UIID);
     	Integer branchingActivityUIID=WDDXProcessor.convertToInteger(details,WDDXTAGS.GROUP_BRANCH_ACTIVITY_UIID);
@@ -1237,17 +1241,25 @@ public class ObjectExtractor implements IObjectExtractor {
    	    }
 
    	    GroupBranchActivityEntry entry = null;
-   	    
-		// does it exist already? Check on the ID field as the UIID field may not have 
-	    // been set if this grouping was created on the back end (based on a runtime copy of the sequence)
-		if ( entryId != null && group.getBranchActivities() != null && group.getBranchActivities().size() > 0 ) {
+
+		// Does it exist already? If the mapping was created at runtime, there will be an ID but no IU ID field.
+		// If it was created in authoring, will have a UI ID and may or may not have an ID.
+		// So try to match up on UI ID first, failing that match on ID. Then the worst case, which is the mapping
+		// is created at runtime but then modified in authoring (and has has a new UI ID added) is handled.
+		if ( group.getBranchActivities() != null && group.getBranchActivities().size() > 0  ) {
+			GroupBranchActivityEntry uiid_match = null;
+			GroupBranchActivityEntry id_match = null;
 			Iterator iter = group.getBranchActivities().iterator();
-			while (entry == null && iter.hasNext()) {
+			while (uiid_match == null && iter.hasNext()) {
 				GroupBranchActivityEntry possibleEntry = (GroupBranchActivityEntry) iter.next();
-				if ( entryId.equals(possibleEntry.getEntryId()) ) {
-					entry = possibleEntry;
+				if ( entryUIID.equals(possibleEntry.getEntryUIID()) ) {
+					uiid_match = possibleEntry;
+				}
+				if ( entryId != null && entryId.equals(possibleEntry.getEntryId()) ) {
+					id_match = possibleEntry;
 				}
 			}
+			entry = uiid_match != null ? uiid_match : id_match;
 		}
 
 		if ( entry == null ) {
