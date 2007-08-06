@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<manifest>
+  <!-- core extension information -->
+<plugin>
+    <name value= "LAMS2 Module"/>
+    <handle value= "plglamscontent"/>
+    <description value= "LAMS2 and Blackboard integration allows LAMS2 leaning designs to be managed and views in a Blackboard Environment."/>
+    <version value= "1.0.0"/>
+    <requires>
+      <bbversion value="6.2.3"/>
+    </requires>
+     <vendor>
+      <id value="lams"/>
+      <name value="LAMS2"/>
+      <url value="http://lamscommunity.org/" />
+      <description value="Learning Activity Management System" />
+    </vendor>
+    <http-actions>
+      <config value="admin/config.jsp"/>
+	  <!-- This page is not executed when installing/uninstalling
+	  	<create value="admin/install.jsp"/>
+	    <remove value="admin/uninstall.jsp"/>
+	  -->
+    </http-actions>
+    
+    <!-- Custom content types defined by this extension -->
+    <content-handlers>
+        <content-handler>
+            <name value="LAMS2" />
+            <handle value="resource/x-lams-lamscontent" />
+            <http-actions>
+                <create value="modules/create.jsp" />
+                <modify value="modules/modify.jsp"/>
+                <!-- This page is not executed when removing 
+	                <remove value="modules/remove.jsp" />
+                -->
+            </http-actions>
+            <icons>
+                <toolbar value="/images/logo.gif" />
+                <listitem value="/images/logo.gif" />
+            </icons>
+        </content-handler>
+    </content-handlers>
+    
+    <!-- Tools defined by this extension -->
+    <application-defs>
+        <application handle="plglamscontent" type="course" use-ssl="false" name="LAMS" can-allow-guest="false" small-icon="" large-icon="">
+            <description lang="en_US">application-def description goes here</description>
+            <links>
+                <link>
+                    <type value="course_tool"/>
+                    <name value="LAMS Monitor"/>
+                    <url value="/LamsActionRequest?method=monitor" />
+                    <description value="Monitor the learners' progress" />
+                    <icons>
+                        <listitem value="/images/logo.gif"/>
+                    </icons>
+                </link>
+                <link>
+                    <type value="course_tool"/>
+                    <name value="LAMS Author"/>
+                    <url value="/LamsActionRequest?method=author" />
+                    <description value="Author new or edit existing LAMS sequences" />
+                    <icons>
+                        <listitem value="/images/logo.gif"/>
+                    </icons>
+                </link>
+            </links>
+        </application>
+    </application-defs>
+    
+        
+    <!-- code permissions required for proper operation -->
+    <permissions>
+        <permission type="attribute" name="user.authinfo" actions="get"/>
+        <permission type="persist" name="Content"  actions="create,modify,delete"/> 
+        <permission type="persist" name="contenthandler" actions="modify"/>
+		<permission type="blackboard.data.AttributePermission" name="user.personalinfo" actions="get" />
+
+        <!-- Permission for WebService -->
+		<permission type="java.lang.RuntimePermission" name="getClassLoader" />
+		<permission type="java.lang.RuntimePermission" name="createClassLoader" />
+		<permission type="java.lang.RuntimePermission" name="accessDeclaredMembers" actions=""/>
+		<permission type="java.net.SocketPermission" name="*" actions="connect"/>
+		<permission type="java.util.PropertyPermission" name="java.protocol.handler.pkgs" actions="write"/>
+		
+    </permissions>
+</plugin>
+</manifest>
