@@ -30,12 +30,14 @@ import org.lamsfoundation.lams.authoring.*;
  **/
 class Group {
 	
+	private var _parentID:Number;
 	private var _groupID:Number;
 	private var _groupUIID:Number;
 	private var _groupName:String;
 	private var _orderID:Number;
 	
-	function Group(groupID, groupUIID, groupName, orderID){
+	function Group(parentID, groupID, groupUIID, groupName, orderID){
+		_parentID = parentID;
 		_groupID = groupID;
 		_groupUIID = groupUIID;
 		_groupName = groupName;
@@ -51,6 +53,14 @@ class Group {
 		if(_orderID) dto.orderID = _orderID;
 		
 		return dto;
+	}
+	
+	public function get parentID():Number {
+		return _parentID;
+	}
+	
+	public function set parentID(a:Number) {
+		_parentID = a;
 	}
 	
 	public function get groupID():Number {

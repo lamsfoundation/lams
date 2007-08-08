@@ -89,10 +89,8 @@ class org.lamsfoundation.lams.authoring.Grouping {
 			var gdto = groups[i];
 			if(gdto.groupUIID == null) gdto.groupUIID = Application.getInstance().getCanvas().ddm.newUIID();
 			
-			var newGroup = new Group(gdto.groupID, gdto.groupUIID, gdto.groupName, gdto.orderID);
-			
-			
-			
+			var newGroup = new Group(this.groupingUIID, gdto.groupID, gdto.groupUIID, gdto.groupName, gdto.orderID);
+
 			_groups.put(newGroup.groupUIID, newGroup);
 		}
 	}
@@ -114,7 +112,7 @@ class org.lamsfoundation.lams.authoring.Grouping {
 	 * @usage   
 	 * @return  
 	 */
-	public function toData():Object{
+	public function toData(_ddm:DesignDataModel):Object{
 		var dto:Object = new Object();
 		if(_groupingID){		dto.groupingID = _groupingID;				}
 		if(_groupingUIID){		dto.groupingUIID = _groupingUIID;			}
@@ -128,7 +126,8 @@ class org.lamsfoundation.lams.authoring.Grouping {
 		var groupTotal = (groupingTypeID == RANDOM_GROUPING) ? numberOfGroups : maxNumberOfGroups;
 		if(groupTotal == 0) _groups.clear();
 			
-		var groups:Array = _groups.values();
+		var groups:Array = getGroups(_ddm);
+		
 		if(groups.length > 0){
 			for(var i=0; i<groups.length; i++){
 				dto.groups[i] = groups[i].toData();
@@ -141,19 +140,22 @@ class org.lamsfoundation.lams.authoring.Grouping {
 	public function getGroups(_ddm:DesignDataModel):Array {
 		var groupTotal = (groupingTypeID == RANDOM_GROUPING) ? numberOfGroups : maxNumberOfGroups;
 		var groupDiff:Number = groupTotal - _groups.size();
+		
 		var groups = _groups.values();
+		groups.sortOn("groupUIID", Array.NUMERIC);
 		
 		if(_groups.size() == groupTotal && _groups.size() > 0)
 			return groups;
 		
 		if(groupDiff >= 0) {
 			for(var i=0; i<groupDiff; i++) {
-				var group = (groups.length > 0) ? new Group(null, _ddm.newUIID(), "Group " + Number(groups.length + i + 1), Number(groups.length+i))
-												: new Group(null, _ddm.newUIID(), "Group " + Number(i+1), i);
+				var group = (groups.length > 0) ? new Group(this.groupingUIID, null, _ddm.newUIID(), "Group " + Number(groups.length + i + 1), Number(groups.length+i))
+												: new Group(this.groupingUIID, null, _ddm.newUIID(), "Group " + Number(i+1), i);
 				addGroup(group);
 			}
 		} else {
 			for(var i=-1; i>=groupDiff; i--) {
+				_ddm.removeBranchMappingsByGroupUIID(groups[groups.length+i].groupUIID);
 				_groups.remove(groups[groups.length+i].groupUIID);
 			}
 		}

@@ -167,6 +167,16 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
 		
 		for(var m in mappings) {
 			match_dgd.addItem(mappings[m]);
+			removeGroup(mappings[m].group);
+		}
+	}
+	
+	private function removeGroup(g:Group) {
+		var indexList:Array = new Array();
+		
+		for(var i=0; i<groups_lst.rowCount; i++) {
+			var item = groups_lst.getItemAt(i);
+			if(item.groupUIID == g.groupUIID) { groups_lst.removeItemAt(i); return; }
 		}
 	}
     
@@ -219,21 +229,27 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
     }
 	
 	private function addMatch():Void {
+		var selectedGroups:Array = new Array();
+		
 		// get selected items and put together in match
 		if(groups_lst.selectedItems.length > 0) {
-			
-			for(var i=0; i< groups_lst.selectedItems.length; i++) {
+		
+			for(var i=0; i<groups_lst.selectedIndices.length; i++) {
 				if(branches_lst.selectedItem != null) {
-					setupMatch(groups_lst.selectedItems[i], branches_lst.selectedItem);
+					setupMatch(groups_lst.getItemAt(groups_lst.selectedIndices[i]), branches_lst.selectedItem);
+					selectedGroups.push(groups_lst.selectedIndices[i]);
 				} else {
 					LFMessage.showMessageAlert("No branch selected");
 					return;
 				}
-;			}
-			
-			for(var index in groups_lst.selectedIndices) {
-				groups_lst.removeItemAt(groups_lst.selectedIndices[index]);
+				
 			}
+			var delCount = 0;
+			for(var i=0; i<selectedGroups.length; i++) {
+				groups_lst.removeItemAt(selectedGroups[i]-delCount);
+				delCount++;
+			}
+			
 			
 		} else {
 			LFMessage.showMessageAlert("No groups selected");
@@ -259,7 +275,7 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
 			groups_lst.sortItemsBy("groupUIID", Array.NUMERIC);
 			
 			match_dgd.removeItemAt(match_dgd.selectedIndex);
-			app.getCanvas().ddm.removeBranchMapping(rItem);
+			app.getCanvas().ddm.removeBranchMapping(rItem.entryUIID);
 			
 		} else {
 			LFMessage.showMessageAlert("No match selected");

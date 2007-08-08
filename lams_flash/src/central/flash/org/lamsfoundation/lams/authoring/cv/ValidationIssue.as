@@ -17,6 +17,9 @@
 	public static var INPUT_TRANSITION_ERROR_CODE:String = "IT";
 	public static var OUTPUT_TRANSITION_ERROR_CODE:String = "OT1";
 	
+	public static var GROUPING_ACTIVITY_MISSING_GROUPING_ERROR_CODE:String = "GM";
+	public static var GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_ERROR_CODE:String = "GC";
+	
 	function ValidationIssue(code:String, message:String, UIID:Number) {
 		_code = code;
 		_message = message;

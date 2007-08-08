@@ -714,7 +714,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		if(classGroups.length > 0)
 			for(var i=0; i<classGroups.length; i++)
-				design.groupings[i] = classGroups[i].toData();
+				design.groupings[i] = classGroups[i].toData(this);
 				
 				
 		design.branchMappings = new Array();
@@ -828,7 +828,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	}
 	
 	public function getGroupByUIID(groupUIID:Number):Group {
-		var groupings = _groupings.values();
+		var groupings:Array = _groupings.values();
 		
 		for(var i=0; i<groupings.length; i++) {
 			var group:Group = Group(groupings[i].getGroup(groupUIID));
@@ -837,6 +837,35 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		return null;
 	}
+	
+	public function hasBranchMappingsForGroupingUIID(groupingUIID:Number):Boolean {
+		var bMappings:Array = _branchMappings.values();
+		Debugger.log("checking for branch mappings", Debugger.CRITICAL, "hasBranch*", "DDM");
+		for(var i=0; i<bMappings.length; i++) {
+			Debugger.log("parentID: " + bMappings[i].group.parentID, Debugger.CRITICAL, "hasBranch*", "DDM");
+		
+			if(bMappings[i].group.parentID == groupingUIID) return true;
+		}
+		
+		return false;
+	}
+	
+	public function clearBranchMappingsByGroupingUIID(groupingUIID:Number):Void {
+		var bMappings:Array = _branchMappings.values();
+		
+		for(var i=0; i<bMappings.length; i++) {
+			if(bMappings[i].group.parentID == groupingUIID) _branchMappings.remove(bMappings[i].entryUIID);
+		}
+	}
+	
+	public function removeBranchMappingsByGroupUIID(groupUIID:Number):Void {
+		var bMappings:Array = _branchMappings.values();
+		
+		for(var i=0; i<bMappings.length; i++) {
+			if(bMappings[i].group.groupUIID == groupUIID) _branchMappings.remove(bMappings[i].entryUIID);
+		}
+	}
+	
 	
 	/**
 	 * Retrieves all children of a complexy activity

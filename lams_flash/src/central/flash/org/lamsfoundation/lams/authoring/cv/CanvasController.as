@@ -490,7 +490,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		branchRelease(bc);
 	}
    
-	private function setBusy():Void{
+	public function setBusy():Void{
 		if(_isBusy){
 			//Debugger.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',1,'checkBusy','org.lamsfoundation.lams.common.util.Hashtable');
 			//Debugger.log('!!!!!!!!!!!!!!!!!!!! HASHTABLE ACCESED WHILE BUSY !!!!!!!!!!!!!!!!',1,'checkBusy','org.lamsfoundation.lams.common.util.Hashtable');
@@ -499,8 +499,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		_isBusy=true;
 	}
 	
-	private function clearBusy():Void{
+	public function clearBusy():Void{
 		_isBusy=false;
+	}
+	
+	public function get isBusy():Boolean {
+		return _isBusy;
 	}
 	
 	

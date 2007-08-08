@@ -493,38 +493,6 @@ class PropertyInspector extends PropertyInspectorControls {
 		
 	}
 	
-	private function  populateGroupingProperties(ga:GroupingActivity){
-		var g = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
-		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_activity_type_grouping');
-		
-		Debugger.log('This is the grouping object:',Debugger.GEN,'populateGroupingProperties','PropertyInspector');
-		ObjectUtils.printObject(g);
-		
-		//loop through combo to fins SI of our gate activity type
-		for (var i=0; i<groupType_cmb.dataProvider.length;i++){
-			if(g.groupingTypeID == groupType_cmb.dataProvider[i].data){
-				groupType_cmb.selectedIndex=i;
-			}
-		}
-		
-		if(g.groupingTypeID == Grouping.RANDOM_GROUPING){
-			if(g.learnersPerGroup != null){
-				numLearners_stp.value = g.learnersPerGroup;
-			}else if(g.numberOfGroups != null){
-				numRandomGroups_stp.value = g.numberOfGroups;
-				_group_naming_btn.enabled = (numRandomGroups_stp.value > 0) ? true : false;
-			}
-		}else{
-			if(g.maxNumberOfGroups != null){
-				numGroups_stp.value = g.maxNumberOfGroups;
-				_group_naming_btn.enabled = (numGroups_stp.value > 0) ? true : false;
-			} else {
-				_group_naming_btn.enabled = false;
-			}
-		}
-		
-	}
-	
 	/**
 	 * Shows which grouping activity is applied to this activity, 
 	 * if you click the edit button, the the activity is selected, 

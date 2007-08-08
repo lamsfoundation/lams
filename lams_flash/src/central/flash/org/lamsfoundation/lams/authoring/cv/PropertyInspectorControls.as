@@ -535,7 +535,9 @@ class PropertyInspectorControls extends MovieClip {
 	 */
 	private function checkEnableGroupsOptions(e:Boolean){
 		var groupingBy = rndGroup_radio.selection.data;
+		
 		Debugger.log('groupingBy:'+groupingBy,Debugger.GEN,'checkEnableGroupsOptions','PropertyInspector');
+		
 		if(groupingBy == 'num_learners'){
 			numRandomGroups_stp.value = 0;
 			numRandomGroups_stp.enabled = false;
@@ -546,8 +548,8 @@ class PropertyInspectorControls extends MovieClip {
 			numRandomGroups_stp.enabled = (e != null) ? e : true;
 			numLearners_stp.value = 0;
 			numLearners_stp.enabled = false;
-			
-			_group_naming_btn.enabled = (e != null && numRandomGroups_stp.value > 0) ? e : true;
+	
+			_group_naming_btn.enabled = (e != null) ? e : true;
 		}
 		
 		//this is a crazy hack to stop the steppter dissapearing after its .enabled property is set.
@@ -560,24 +562,86 @@ class PropertyInspectorControls extends MovieClip {
 		MovieClipUtils.doLater(Proxy.create(this,reDrawTroublesomeSteppers));
 	}
 	
+	private function  populateGroupingProperties(ga:GroupingActivity){
+		var g = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
+		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_activity_type_grouping');
+		
+		Debugger.log('This is the grouping object:',Debugger.GEN,'populateGroupingProperties','PropertyInspector');
+		ObjectUtils.printObject(g);
+		
+		//loop through combo to fins SI of our gate activity type
+		for (var i=0; i<groupType_cmb.dataProvider.length;i++){
+			if(g.groupingTypeID == groupType_cmb.dataProvider[i].data){
+				groupType_cmb.selectedIndex=i;
+			}
+		}
+		
+		if(g.groupingTypeID == Grouping.RANDOM_GROUPING){
+			if(g.learnersPerGroup != null){
+				numLearners_stp.value = g.learnersPerGroup;
+			}else if(g.numberOfGroups != null){
+				numRandomGroups_stp.value = g.numberOfGroups;
+			}
+		}else{
+			if(g.maxNumberOfGroups != null){
+				numGroups_stp.value = g.maxNumberOfGroups;
+			}
+		}
+		
+	}
+	
 	/**
 	 * Called when there is a change in the values of the group method steppers
 	 * Butdates the value inthe grouping class being edited.
 	 * @usage   
 	 * @return  
 	 */
-	public function updateGroupingMethodData(){
-		var ga = _canvasModel.selectedItem.activity;
-		var g = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
+	public function updateGroupingMethodData(evt:Object){
+		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
+		
+		Debugger.log("updating grouping method data: " + g.groupingUIID, Debugger.CRITICAL, "updateGroupingMethodData", "PropertyInspectorControls");
+		
+		if(!_canvasController.isBusy && evt.type == 'focusOut') {
+			if(_canvasModel.getCanvas().ddm.hasBranchMappingsForGroupingUIID(g.groupingUIID)) {
+				_canvasController.setBusy();
+			
+				LFMessage.showMessageConfirm("Warning: Existing Group-to-Branch mappings may be effected by your change. Do you wish to continue?", Proxy.create(this, doUpdateGroupingMethodData, g), Proxy.create(this, retainOldGroupingMethodData), "Yes", "No",  "Warning");
+			} else {
+				doUpdateGroupingMethodData(g);
+			}
+		}
+	}
+	
+	private function doUpdateGroupingMethodData(g:Grouping) {
+		
 		if(g.groupingTypeID == Grouping.RANDOM_GROUPING){
-			//not only one of these should actually have a non 0 value
-			g.learnersPerGroup = numLearners_stp.value;
+			//note only one of these should actually have a non 0 value
+			g.learnersPerGroups = numLearners_stp.value;
 			g.numberOfGroups = numRandomGroups_stp.value;
+			
 		}else{
 			g.maxNumberOfGroups = numGroups_stp.value;
 		}
-		
+				
 		setModified();
+		
+		_canvasController.clearBusy();
+		
+	}
+	
+	public function retainOldGroupingMethodData(){
+		var ga = _canvasModel.selectedItem.activity;
+		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
+		
+		if(g.groupingTypeID == Grouping.RANDOM_GROUPING){
+			numLearners_stp.value = (g.learnersPerGroups == null) ? 0 : g.learnersPerGroups;
+			numRandomGroups_stp.value = (g.numberOfGroups == null) ? 0 : g.numberOfGroups;
+		} else{
+			numGroups_stp.value = (g.maxNumberOfGroups == null) ? 0 : g.maxNumberOfGroups;
+		}
+		
+		_canvasController.clearBusy();
+		
 	}
 	
 	private function getGroupingActivitiesDP(){
@@ -596,8 +660,6 @@ class PropertyInspectorControls extends MovieClip {
 		
 		return gActsDP;
 	}
-	
-	
 	
 
 	/**
@@ -747,11 +809,24 @@ class PropertyInspectorControls extends MovieClip {
 	 * @return  
 	 */
 	private function onGroupTypeChange(evt:Object){
-		var ga = _canvasModel.selectedItem.activity;
-		var g = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
-		g.groupingTypeID = evt.target.value;
+		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
+		
+		Debugger.log('groupingUIID: '+g.groupingUIID,Debugger.GEN,'onGroupTypeChange','PropertyInspector');
+		
+		if(_canvasModel.getCanvas().ddm.hasBranchMappingsForGroupingUIID(g.groupingUIID))
+			LFMessage.showMessageConfirm("Warning: Existing Group-to-Branch mappings may be effected by your change. Do you wish to continue?", Proxy.create(this, updateGroupingType, g, evt.target.value), Proxy.create(this, populateGroupingProperties, _canvasModel.selectedItem.activity), "Yes", "No",  "Warning");
+		else {	
+			updateGroupingType(g, evt.target.value);
+		}
+		
+	}
+	
+	private function updateGroupingType(g:Grouping, typeID:Number) {
+		g.groupingTypeID = typeID;
+		
 		Debugger.log('Set group type to: '+g.groupingTypeID,Debugger.GEN,'onGroupTypeChange','PropertyInspector');
-		showRelevantGroupOptions(!ga.readOnly);
+		showRelevantGroupOptions(!_canvasModel.selectedItem.activity.readOnly);
+		doUpdateGroupingMethodData(g);
 		
 		setModified();
 	}
@@ -840,7 +915,7 @@ class PropertyInspectorControls extends MovieClip {
 		var grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.groupingUIID);
 		
 		evt.target.scrollContent.branchingActivity = _canvasModel.selectedItem.activity;
-		evt.target.scrollContent.groups = grouping.getGroups();
+		evt.target.scrollContent.groups = grouping.getGroups(_canvasModel.getCanvas().ddm);
 		evt.target.scrollContent.branches = getValidBranches(branches.myBranches);
 		
 		evt.target.scrollContent.loadLists();
