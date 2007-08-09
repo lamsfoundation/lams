@@ -206,7 +206,6 @@ class Application extends ApplicationParent {
     
 	
 	private function setupUI():Void {
-		trace('Setting up UI...');
 		
 		//Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);

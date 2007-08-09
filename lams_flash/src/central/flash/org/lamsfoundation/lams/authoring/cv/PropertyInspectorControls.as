@@ -240,7 +240,6 @@ class PropertyInspectorControls extends MovieClip {
 		maxAct_stp.tabIndex = 404
 		
 		//Gate Activities
-		//gateType_cmb.enabled = true
 		gateType_cmb.tabIndex = 402
 		days_stp.tabIndex = 403
 		hours_stp.tabIndex = 404
@@ -292,7 +291,6 @@ class PropertyInspectorControls extends MovieClip {
 		}
 	}
 	
-	
 	private function showGeneralInfo(v:Boolean, e:Boolean){
 		total_num_activities_lbl.visible = v;
 		total_num_activities_lbl.enabled = (e != null) ? e : true;
@@ -328,7 +326,6 @@ class PropertyInspectorControls extends MovieClip {
 		}
 		
 		grouping_lbl.visible = false;
-		
 		
 	}
 	
@@ -367,6 +364,12 @@ class PropertyInspectorControls extends MovieClip {
 		branchType_cmb.visible = v;
 		
 		if(_group_match_btn.visible && !v) _group_match_btn.visible = v;
+		
+		if(_canvasModel.selectedItem.activity.groupingUIID != null) {
+			var grouping:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.groupingUIID);
+		
+			_group_match_btn.visible = (grouping.numberOfGroups > 0 || grouping.maxNumberOfGroups > 0) ? v : false;
+		}
 		
 		if(e != null) {
 			branchType_lbl.enabled = e;
@@ -433,6 +436,7 @@ class PropertyInspectorControls extends MovieClip {
 		
 		var ga = _canvasModel.selectedItem.activity;
 		var g = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
+		
 		Debugger.log('g.groupingTypeID:'+g.groupingTypeID,Debugger.GEN,'showRelevantGroupOptions','org.lamsfoundation.lams.common.cv.PropertyInspector');
 		Debugger.log('Grouping.CHOSEN_GROUPING:'+Grouping.CHOSEN_GROUPING,Debugger.GEN,'showRelevantGroupOptions','org.lamsfoundation.lams.common.cv.PropertyInspector');
 		Debugger.log('Grouping.RANDOM_GROUPING:'+Grouping.RANDOM_GROUPING,Debugger.GEN,'showRelevantGroupOptions','org.lamsfoundation.lams.common.cv.PropertyInspector');
@@ -453,7 +457,7 @@ class PropertyInspectorControls extends MovieClip {
 				_group_naming_btn.enabled = e;
 			}
 			
-		}else if(g.groupingTypeID == Grouping.RANDOM_GROUPING){
+		} else if(g.groupingTypeID == Grouping.RANDOM_GROUPING) {
 			numGroups_lbl.visible = true;
 			numLearners_lbl.visible = true;
 			numGroups_stp.visible = false;
@@ -476,25 +480,21 @@ class PropertyInspectorControls extends MovieClip {
 				_group_naming_btn.enabled = e;
 			}
 			
-			
 			checkEnableGroupsOptions(e);
 			
 		}else{
 			//error dont understand the grouping type
 		}
 		
-		
 	}
 	
 	private function reDrawTroublesomeSteppers(e:Boolean){
 		numLearners_stp.visible = true;
 		numRandomGroups_stp.visible = true;
-		
-		
 	}
 	
 	private function checkEnableGateControls(e:Boolean){
-		if(_canvasModel.selectedItem.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE){
+		if(_canvasModel.selectedItem.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE) {
 			if(e != null) {
 				days_stp.enabled = e;
 				hours_stp.enabled = e;
@@ -509,9 +509,7 @@ class PropertyInspectorControls extends MovieClip {
 				endMins_stp.enabled = true;
 			}
 					
-		}
-		/**/
-		else{
+		} else {
 			days_stp.enabled = false;
 			hours_stp.enabled = false;
 			mins_stp.enabled = false;
@@ -537,16 +535,22 @@ class PropertyInspectorControls extends MovieClip {
 		var groupingBy = rndGroup_radio.selection.data;
 		
 		Debugger.log('groupingBy:'+groupingBy,Debugger.GEN,'checkEnableGroupsOptions','PropertyInspector');
+		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
 		
 		if(groupingBy == 'num_learners'){
 			numRandomGroups_stp.value = 0;
+			g.numberOfGroups = 0;
+			
 			numRandomGroups_stp.enabled = false;
+			
 			numLearners_stp.enabled = (e != null) ? e :true;
 			
 			_group_naming_btn.enabled = false;
 		}else{
 			numRandomGroups_stp.enabled = (e != null) ? e : true;
 			numLearners_stp.value = 0;
+			g.learnersPerGroups = 0;
+			
 			numLearners_stp.enabled = false;
 	
 			_group_naming_btn.enabled = (e != null) ? e : true;
@@ -619,8 +623,17 @@ class PropertyInspectorControls extends MovieClip {
 			g.learnersPerGroups = numLearners_stp.value;
 			g.numberOfGroups = numRandomGroups_stp.value;
 			
+			numGroups_stp.value = 0;
+			g.maxNumberOfGroups = 0;
 		}else{
 			g.maxNumberOfGroups = numGroups_stp.value;
+			
+			numRandomGroups_stp.value = 0;
+			numLearners_stp.value = 0;
+			g.learnersPerGroups = 0;
+			g.numberOfGroups = 0;
+			
+			_group_naming_btn.enabled = true;
 		}
 				
 		setModified();
@@ -689,7 +702,6 @@ class PropertyInspectorControls extends MovieClip {
 	 * @return  
 	 */
 	private function setStyles() {
-       // Debugger.log('Button stykle obejct',Debugger.GEN,'setStyles','PropertyInspector');
 		var styleObj = _tm.getStyleObject('button');
 		editGrouping_btn.setStyle('styleName',styleObj);
 		_group_match_btn.setStyle('styleName',styleObj);
@@ -752,7 +764,6 @@ class PropertyInspectorControls extends MovieClip {
 		
 		
     }
-    
   
 	/////////////////////////////////////////////////
 	//------------ controller section -------------//
@@ -858,8 +869,12 @@ class PropertyInspectorControls extends MovieClip {
 		var ca = _canvasModel.selectedItem;
 		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
 		
+		Debugger.log("grouping UIID: " + ca.activity.groupingUIID, Debugger.CRITICAL, "showGroupBasedBranchingControls", "PIC*");
+		
 		if(branches.myBranches.length > 0 && ca.activity.groupingUIID != null) {
-			_group_match_btn.visible = v;
+			var grouping:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(ca.activity.groupingUIID);
+			
+			_group_match_btn.visible = (grouping.numberOfGroups > 0 || grouping.maxNumberOfGroups > 0) ? v : false;
 			_group_match_btn.enabled = e;
 		} else {
 			_group_match_btn.visible = false;
@@ -875,6 +890,7 @@ class PropertyInspectorControls extends MovieClip {
 	 */
 	private function onGroupingMethodChange(evt:Object){
 		checkEnableGroupsOptions(!_canvasModel.selectedItem.activity.readOnly);
+		
 		setModified();
 	}
 	
@@ -883,8 +899,10 @@ class PropertyInspectorControls extends MovieClip {
 		
 		var startOffsetMins:Number = (days_stp.value * 60 * 24) + (hours_stp.value * 60) + mins_stp.value;
 		_canvasModel.selectedItem.activity.gateStartTimeOffset = startOffsetMins;
+		
 		var endOffsetMins:Number = (endHours_stp.value * 60) + endMins_stp.value;
 		_canvasModel.selectedItem.activity.gateEndTimeOffset = endOffsetMins;
+		
 		Debugger.log('activity.gateStartTimeOffset :'+_canvasModel.selectedItem.activity.gateStartTimeOffset ,Debugger.GEN,'onScheduleOffsetChange','PropertyInspector');
 		Debugger.log('activity.gateEndTimeOffset :'+_canvasModel.selectedItem.activity.gateEndTimeOffset,Debugger.GEN,'onScheduleOffsetChange','PropertyInspector');
 		
@@ -914,7 +932,7 @@ class PropertyInspectorControls extends MovieClip {
 		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
 		var grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.groupingUIID);
 		
-		evt.target.scrollContent.branchingActivity = _canvasModel.selectedItem.activity;
+		evt.target.scrollContent.branchingActivity = BranchingActivity(_canvasModel.selectedItem.activity);
 		evt.target.scrollContent.groups = grouping.getGroups(_canvasModel.getCanvas().ddm);
 		evt.target.scrollContent.branches = getValidBranches(branches.myBranches);
 		
@@ -949,6 +967,7 @@ class PropertyInspectorControls extends MovieClip {
 	 /**/
 	public function click(e):Void{
 		var tgt:String = new String(e.target);
+		
 		if(tgt.indexOf("defineLater_chk") != -1){
 			
 			_canvasModel.selectedItem.activity.defineLater = defineLater_chk.selected;
@@ -981,6 +1000,7 @@ class PropertyInspectorControls extends MovieClip {
 		}else if(tgt.indexOf("desc_txt") != -1){
 			_canvasModel.selectedItem.activity.description= desc_txt.text;
 		}
+		
 		_canvasModel.selectedItem.refresh();
 		if (_canvasModel.selectedItem.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || _canvasModel.selectedItem.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
 			_canvasModel.selectedItem.init();

@@ -89,7 +89,6 @@ class Header extends MovieClip {
     * Called a frame after movie attached to allow components to initialise
     */
     public function init(){
-		trace('initialing header..');
 		
         //Delete the enterframe dispatcher
         delete this.onEnterFrame;
@@ -105,13 +104,11 @@ class Header extends MovieClip {
 		//Add event listeners for resume and exit buttons
 		
 		resume_btn.onRelease = function(){
-			trace('on releasing resuming button..');
 			var app:Application = Application.getInstance();
 			app.getLesson().resumeLesson();
 		}
 		
 		exit_btn.onRelease = function(){
-			trace('on releasing exit button..');
 			var app:Application = Application.getInstance();
 			app.getLesson().exitLesson();
 		}

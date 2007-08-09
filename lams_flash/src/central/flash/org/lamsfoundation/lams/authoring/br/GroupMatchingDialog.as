@@ -142,6 +142,7 @@ class GroupMatchingDialog extends MovieClip implements Dialog {
 	
 	public function loadLists() {
 		Debugger.log("Loading Lists: branch length: " + _branches.length, Debugger.CRITICAL, "loadLists", "GroupMatchingDialog");
+		Debugger.log("Loading Lists: branching act: " + _branchingActivity.activityUIID, Debugger.CRITICAL, "loadLists", "GroupMatchingDialog");
 		
 		groups_lst.dataProvider = _groups;
 		groups_lst.sortItemsBy("groupUIID", Array.NUMERIC);
