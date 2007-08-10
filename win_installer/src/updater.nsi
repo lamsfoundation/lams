@@ -50,7 +50,7 @@
 !insertmacro LineFind
 
 # constants
-!define VERSION "2.0.4"
+!define VERSION "2.0.3"
 !define PREVIOUS_VERSION "2.0.2"
 !define LANGUAGE_PACK_VERSION "2007-06-01"
 !define LANGUAGE_PACK_VERSION_INT "20070601"
@@ -103,8 +103,8 @@ Page custom PreComponents PostComponents
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE DirectoryLeave
 !define MUI_PAGE_CUSTOMFUNCTION_PRE skipPage
 !insertmacro MUI_PAGE_DIRECTORY
-Page custom PreMySQLConfig PostMySQLConfig
 Page custom PreLAMSConfig PostLAMSConfig
+Page custom PreMySQLConfig PostMySQLConfig
 Page custom PreLAMS2Config PostLAMS2Config
 Page custom PreWildfireConfig PostWildfireConfig
 Page custom PreFinal PostFinal
@@ -516,45 +516,25 @@ Function Checkjava2
 FunctionEnd
 
 
-Function CheckMySQL    
-    # check for MySQL
-    ;ReadRegStr $MYSQL_DIR HKLM "SOFTWARE\MySQL AB\MySQL Server 5.0" "Location"
-    ${If} $MYSQL_DIR == ""
-        ReadRegStr $MYSQL_DIR HKLM "SOFTWARE\MySQL AB\MySQL Server 5.1" "Location"
-        ${If} $MYSQL_DIR == ""
-            ReadRegStr $MYSQL_DIR HKLM "SOFTWARE\MySQL AB\MySQL Server 5.0" "Location"
-            ${If} $MYSQL_DIR == ""
-                MessageBox MB_OK|MB_ICONSTOP "Could not find a MySQL installation.  Please ensure you have MySQL 5.0 or 5.1 installed."
-   
-            ${EndIf}
-        ${endif}
-    ${else}
+Function CheckMySQL  
         # check mysql version is 5.0.x
-        nsExec::ExecToStack '$MYSQL_DIR\bin\mysqladmin --version'
+        Setoutpath "$TEMP\lams\"
+        File "..\build\checkmysqlversion.class"
+        File "..\mysql-connector-java-3.1.12-bin.jar"
+        nsExec::ExecToStack '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/?characterEncoding=utf8" $DB_USER $DB_PASS'
         Pop $0
         Pop $1
-        ${If} $1 == "" ; if mySQL install directory field is empty, do not continue
-            MessageBox MB_OK|MB_ICONSTOP "Your MySQL directory does not appear to be valid, please enter a valid MySQL directory before continuing.$\r$\n$\r$\n$1"
-            ${if} $IS_UPDATE == "0"
-                Abort
+        ${If} $0 != 0
+            ${StrStr} $3 $1 "UnknownHostException"
+            ${if} $3 == "" 
+                MessageBox MB_OK|MB_ICONEXCLAMATION "An error occurred whilst checking your mysql configuration $\r$\n$\r$\nError: $1"
             ${else}
-                quit
-            ${endif}
+                MessageBox MB_OK|MB_ICONEXCLAMATION "An error occurred whilst checking your mysql configuration $\r$\n$\r$\nError: Could not connect to MySql host: $MYSQL_HOST. Please check your database configurations and try again."
+            ${endif}               
+            Abort
         ${EndIf}
-        ${StrStr} $0 $1 "5.0"
-        ${If} $0 == "" ; if not 5.0.x, check 5.1.x
-            ${StrStr} $0 $1 "5.1"
-            ${If} $0 == ""
-                MessageBox MB_OK|MB_ICONSTOP "Your MySQL version does not appear to be compatible with LAMS (5.0.x or 5.1.x): $\r$\n$1"
-                MessageBox MB_OK|MB_ICONSTOP "Your MySQL directory does not appear to be valid, please enter a valid MySQL directory before continuing.$\r$\n$\r$\n$1"
-                ${if} $IS_UPDATE == "0"
-                    Abort
-                ${else}
-                    quit
-                ${endif}
-            ${EndIf}
-        ${EndIf}
-    ${EndIf}  
+        Delete "$TEMP\lams\checkmysql.class"
+        Delete "$TEMP\mysql-connector-java-3.1.12-bin.jar"  
 FunctionEnd
 
 Function PreComponents
@@ -630,15 +610,23 @@ FunctionEnd
 
 Function PreMySQLConfig
     ${if} $IS_UPDATE == "0"
-        Call CheckMySQL
+        #Call CheckMySQL
+        # check for MySQL in registry
+        ReadRegStr $MYSQL_DIR HKLM "SOFTWARE\MySQL AB\MySQL Server 5.0" "Location"
+        ${If} $MYSQL_DIR == ""
+            ReadRegStr $MYSQL_DIR HKLM "SOFTWARE\MySQL AB\MySQL Server 5.1" "Location"
+            ${If} $MYSQL_DIR == ""
+                    #messageBox MB_OK|MB_ICONSTOP "Could not find a MySQL installation.  Please ensure you have MySQL 5.0 or 5.1 installed."
+            ${endif}
+        ${endif}
+        
         !insertmacro MUI_INSTALLOPTIONS_WRITE "mysql.ini" "Field 3" "State" "$MYSQL_DIR"
-        !insertmacro MUI_HEADER_TEXT "Setting Up MySQL Database Access (1/4)" "Choose a MySQL database and user account for LAMS.  If unsure, use the defaults."
+        !insertmacro MUI_HEADER_TEXT "Setting Up MySQL Database Access (2/4)" "Choose a MySQL database and user account for LAMS.  If unsure, use the defaults."
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "mysql.ini"
     ${else}
         #Call CheckMySQL
     ${endif}
 FunctionEnd
-
 
 Function PostMySQLConfig
     ${if} $IS_UPDATE == "0"
@@ -648,8 +636,15 @@ Function PostMySQLConfig
         !insertmacro MUI_INSTALLOPTIONS_READ $DB_USER "mysql.ini" "Field 9" "State"
         !insertmacro MUI_INSTALLOPTIONS_READ $DB_PASS "mysql.ini" "Field 10" "State"
         !insertmacro MUI_INSTALLOPTIONS_READ $MYSQL_HOST "mysql.ini" "Field 14" "State"
+        
+        #TODO should automatically check presence of database on remote computer
+        ${if} $MYSQL_HOST != 'localhost'
+            MessageBox MB_OK|MB_ICONINFORMATION  "Please ensure that you have created the $DB_NAME database on your MySQL host $MYSQL_HOST before proceeding, otherwise the installation will not work."
+        ${endif}
+        
+        #Call CheckMySQL
         # Checking if the given database name already exists in the mysql database list
-        ifFileExists "$MYSQL_DIRdata\$DB_NAME\*.*" databaseNameExists continue1
+        /*ifFileExists "$MYSQL_DIRdata\$DB_NAME\*.*" databaseNameExists continue1
         databaseNameExists:
             MessageBox MB_OK|MB_ICONSTOP "Database $DB_NAME already exists. Please try a different database name"
             quit   
@@ -661,38 +656,14 @@ Function PostMySQLConfig
             MessageBox MB_OK|MB_ICONSTOP "Could not find database $DB_NAME. Please check your database settings and try again"
             quit   
         continue:
+        */
     ${endif}
+    
     # check mysql version is 5.0.x
-    nsExec::ExecToStack '$MYSQL_DIR\bin\mysqladmin --version'
-    Pop $0
-    Pop $1
-    ${If} $1 == "" ; if mySQL install directory field is empty, do not continue
-        MessageBox MB_OK|MB_ICONSTOP "Your MySQL directory does not appear to be valid, please enter a valid MySQL directory before continuing.$\r$\n$\r$\n$1"
-        ${if} $IS_UPDATE == "0"
-            Abort
-        ${else}
-            quit
-        ${endif}
-    ${EndIf}
-    ${StrStr} $0 $1 "5.0"
-    ${If} $0 == "" ; if not 5.0.x, check 5.1.x
-        ${StrStr} $0 $1 "5.1"
-        ${If} $0 == ""
-            MessageBox MB_OK|MB_ICONSTOP "Your MySQL version does not appear to be compatible with LAMS (5.0.x or 5.1.x): $\r$\n$\r$\n$1"
-            MessageBox MB_OK|MB_ICONSTOP "Your MySQL directory does not appear to be valid, please enter a valid MySQL directory before continuing.$\r$\n$\r$\n$1"
-            ${if} $IS_UPDATE == "0"
-                Abort
-            ${else}
-                quit
-            ${endif}
-        ${EndIf}
-    ${EndIf}
-    
-    
-        
+    call CheckMySQL 
     
     # check root password, server status
-    StrLen $0 $MYSQL_ROOT_PASS
+    /*StrLen $0 $MYSQL_ROOT_PASS
     ${If} $0 == 0
         nsExec::ExecToStack '$MYSQL_DIR\bin\mysqladmin ping -u root'
     ${Else}
@@ -720,6 +691,7 @@ Function PostMySQLConfig
             quit
         ${endif}
     ${EndIf}
+    */
 FunctionEnd
 
 
@@ -729,7 +701,7 @@ Function PreLAMSConfig
 
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 2" "State" "$JDK_DIR"
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 4" "State" "$INSTDIR\repository"
-        !insertmacro MUI_HEADER_TEXT "Setting Up LAMS (2/4)" "Configure the LAMS Server.  If unsure, use the defaults."
+        !insertmacro MUI_HEADER_TEXT "Setting Up LAMS (1/4)" "Configure the LAMS Server.  If unsure, use the defaults."
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams.ini"
     ${else}
         !insertmacro MUI_INSTALLOPTIONS_WRITE "lams-update.ini" "Field 2" "State" "$JDK_DIR"
@@ -749,7 +721,7 @@ Function PostLAMSConfig
         # check java version using given dir
         Call Checkjava2
     ${else}
-        !insertmacro MUI_INSTALLOPTIONS_READ $MYSQL_HOST "lams-update.ini" "Field 8" "State"
+        !insertmacro MUI_INSTALLOPTIONS_READ $MYSQL_HOST "lams-update.ini" "Field 6" "State"
         !insertmacro MUI_INSTALLOPTIONS_READ $JDK_DIR "lams-update.ini" "Field 2" "State"
         #!insertmacro MUI_INSTALLOPTIONS_READ $LAMS_REPOSITORY "lams-update.ini" "Field 4" "State"
         
@@ -876,8 +848,9 @@ Function PostFinal
     ${if} $IS_UPDATE == "1"
         MessageBox MB_YESNOCANCEL|MB_ICONQUESTION "Do you wish to backup your LAMS installation? (Recommended) $\r$\nBackup dir: $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak $\r$\n$\r$\nNOTE: You must have MySql installed on this machine to do this." IDNO continue IDCANCEL cancel
             # check mysql version is 5.0.x
-            nsExec::ExecToStack '$MYSQL_DIR\bin\mysqladmin --version'
-            Pop $0
+#            nsExec::ExecToStack '$MYSQL_DIR\bin\mysqladmin --version'
+            call CheckMySQL
+            /*Pop $0
             Pop $1
             ${if} $0 != 0
                 MessageBox MB_OK|MB_ICONSTOP "Error checking mysql, please check that MySql is installed in the same location as written in the registry under ${REG_HEAD}"
@@ -900,7 +873,7 @@ Function PostFinal
                     ${endif}
                 ${EndIf}
             ${EndIf}
-            
+            */
             strcpy $BACKUP "1"
             goto continue
             cancel:
@@ -997,43 +970,49 @@ Functionend
 ; Backs up existing lams installation
 Function backupLams
     ${if} $BACKUP == "1"
-        clearerrors
-        iffileexists "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak\*.*" backupExists continue
-        backupExists:
-            DetailPrint "Lams backup failed"
-            MessageBox MB_OK|MB_ICONSTOP "Lams backup failed, please delete or change the name of the backup file before continuing with the update$\r$\n$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak"
-            Abort "LAMS configuration failed"
-        continue:
-        
-        DetailPrint "Backing up lams at: $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak. This may take a few minutes"
-        SetDetailsPrint listonly
-        copyfiles /SILENT $INSTDIR  $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak 86000
-        SetDetailsPrint both
-        iferrors error1 continue1
-        error1:
-            DetailPrint "Backup failed"
-            MessageBox MB_OK|MB_ICONSTOP "LAMS backup to $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak failed. Check that all other applications are closed and LAMS is not running." 
-            Abort
-        continue1: 
-        
-        DetailPrint 'Dumping database to: $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak'
-        setoutpath "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak"
-        Strcpy $4 '"$MYSQL_DIR\bin\mysqldump" -r "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak\dump.sql" $DB_NAME -u $DB_USER -p$DB_PASS'
-        DetailPrint $4
-        nsExec::ExecToStack $4
-        Pop $0
-        Pop $1
-        ${If} $0 == "yes"
-            goto error
-        ${EndIf}
-          
-        goto done
-        error:
-            DetailPrint "Database dump failed"
-            MessageBox MB_OK|MB_ICONSTOP "Database dump failed $\r$\nError:$\r$\n$\r$\n$1"
-            Abort "Database dump failed"
+        ${if} $MYSQL_HOST == "localhost"
+            clearerrors
+            iffileexists "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak\*.*" backupExists continue
+            backupExists:
+                DetailPrint "Lams backup failed"
+                MessageBox MB_OK|MB_ICONSTOP "Lams backup failed, please delete or change the name of the backup file before continuing with the update$\r$\n$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak"
+                Abort "LAMS configuration failed"
+            continue:
             
-        done:
+            DetailPrint "Backing up lams at: $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak. This may take a few minutes"
+            SetDetailsPrint listonly
+            copyfiles /SILENT $INSTDIR  $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak 86000
+            SetDetailsPrint both
+            iferrors error1 continue1
+            error1:
+                DetailPrint "Backup failed"
+                MessageBox MB_OK|MB_ICONSTOP "LAMS backup to $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak failed. Check that all other applications are closed and LAMS is not running." 
+                Abort
+            continue1: 
+            
+            DetailPrint 'Dumping database to: $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak'
+            setoutpath "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak"
+            Strcpy $4 '"$MYSQL_DIR\bin\mysqldump" -r "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak\dump.sql" $DB_NAME -u $DB_USER -p$DB_PASS'
+            DetailPrint $4
+            nsExec::ExecToStack $4
+            Pop $0
+            Pop $1
+            ${If} $0 == "yes"
+                goto error
+            ${EndIf}
+              
+            goto done
+            error:
+                DetailPrint "Database dump failed"
+                MessageBox MB_OK|MB_ICONSTOP "Database dump failed $\r$\nError:$\r$\n$\r$\n$1"
+                Abort "Database dump failed"
+            done:
+        ${else}
+            MessageBox MB_YESNO|MB_ICONQUESTION "Unable to backup LAMS. MYSQL_HOST is not set to localhost. Manual backup required. $\r$\n$\r$\nWould you like to quit the update and backup LAMS manually? If you choose 'No', the update will proceed and your existing LAMS installation will be overwritten." IDYES quit IDNO continue2
+                quit:
+                    Abort
+                continue2:
+        ${endif}
     ${endif}
 FunctionEnd
 
@@ -1810,103 +1789,92 @@ Function ImportDatabase
     SetOutPath $TEMP
     File "..\build\dump.sql"
     
-    # $9 == 0 for empty password
-    StrLen $9 $MYSQL_ROOT_PASS
-    
-    StrCpy $0 '$MYSQL_DIR\bin\mysql -e "CREATE DATABASE $DB_NAME DEFAULT CHARACTER SET utf8" -u root'
-    DetailPrint $0
-    ${If} $9 != 0
-        StrCpy $0 '$MYSQL_DIR\bin\mysql -e "CREATE DATABASE $DB_NAME DEFAULT CHARACTER SET utf8" -u root -p$MYSQL_ROOT_PASS' 
-    ${EndIf}
-    nsExec::ExecToStack $0
-    Pop $0
-    Pop $1
-    ${If} $0 == 1
-        goto error
-    ${EndIf}
-    
-    StrCpy $0 `$MYSQL_DIR\bin\mysql -e "GRANT ALL PRIVILEGES ON *.* TO $DB_USER@localhost IDENTIFIED BY '$DB_PASS'" -u root`
-    DetailPrint $0
-    ${If} $9 != 0
-        StrCpy $0 `$MYSQL_DIR\bin\mysql -e "GRANT ALL PRIVILEGES ON *.* TO $DB_USER@localhost IDENTIFIED BY '$DB_PASS'" -u root -p$MYSQL_ROOT_PASS`
-    ${EndIf}
-    nsExec::ExecToStack $0
-    Pop $0
-    Pop $1
-    ${If} $0 == 1
-        goto error
-    ${EndIf}
-    
-    StrCpy $0 '$MYSQL_DIR\bin\mysql -e "REVOKE PROCESS,SUPER ON *.* from $DB_USER@localhost" -u root'
-    DetailPrint $0
-    ${If} $9 != 0
-        StrCpy $0 '$MYSQL_DIR\bin\mysql -e "REVOKE PROCESS,SUPER ON *.* from $DB_USER@localhost" -u root -p$MYSQL_ROOT_PASS' 
-    ${EndIf}
-    nsExec::ExecToStack $0
-    Pop $0
-    Pop $1
-    ${If} $0 == 1
-        goto error
-    ${EndIf}
-    
-    StrCpy $0 '$MYSQL_DIR\bin\mysqladmin flush-privileges -u root'
-    DetailPrint $0
-    ${If} $9 != 0
-        StrCpy $0 '$MYSQL_DIR\bin\mysqladmin flush-privileges -u root -p$MYSQL_ROOT_PASS' 
-    ${EndIf}
-    nsExec::ExecToStack $0
-    Pop $0
-    Pop $1
-    ${If} $0 == 1
-        goto error
-    ${EndIf}
-    
-    /* mysql keeps rejecting 'mysql -e...' and 'mysql db_name < dump.sql' commands
-    StrCpy $0 `$MYSQL_DIR\bin\mysql -e "use $DB_NAME; source '$TEMP\dump.sql'" -u $DB_USER`
-    DetailPrint $0
-    StrLen $9 $DB_PASS
-    ${If} $9 != 0
-        StrCpy $0 `$MYSQL_DIR\bin\mysql -e "use $DB_NAME; source '$TEMP\dump.sql'" -u $DB_USER -p$DB_PASS`
-    ${EndIf}
-    nsExec::ExecToStack $0
-    Pop $0
-    Pop $1
-    ${If} $0 == 1
-        goto error
-    ${EndIf}
-    */
-    
-     ${if} $RETAIN_FILES == '1'      
-        #unzip repository files
-        setoutpath "$INSTDIR\backup"
-        strcpy $4 '$INSTDIR\zip\7za.exe x -aoa "backup.zip"'
-        nsExec::ExecToStack $4
-        pop $5
-        pop $6
-        ${if} $5 != 0
-            Detailprint  "7za Unzip error: $\r$\n$\r$\n$6"
-            MessageBox MB_OK|MB_ICONSTOP "7za Unzip error:$\r$\nError:$\r$\n$\r$\n$6"
-            Abort "Lams configuration failed"
-        ${endif}
-         
-        #replace the install dump with the retained dump    
-        #MessageBox MB_OK|MB_ICONEXCLAMATION "Rebuilding datbase"   
-        CopyFiles "$INSTDIR\backup\lamsDump.sql" "$TEMP\dump.sql"     
-        DetailPrint "Using retained database: $INSTDIR\backup\lamsDump.sql"
+    # Only do this if mysql is set up on local host 
+    #######################################################
+    ${If} $MYSQL_HOST == 'localhost'
+        # $9 == 0 for empty password
+        StrLen $9 $MYSQL_ROOT_PASS
         
-        RMdir /r  "$INSTDIR\backup\jboss-4.0.2"
-        RMdir /r  "$INSTDIR\backup\repository"
-        delete  "$INSTDIR\backup\lamsDump.sql"
+        StrCpy $0 '$MYSQL_DIR\bin\mysql -e "CREATE DATABASE $DB_NAME DEFAULT CHARACTER SET utf8" -u root'
+        DetailPrint $0
+        ${If} $9 != 0
+            StrCpy $0 '$MYSQL_DIR\bin\mysql -e "CREATE DATABASE $DB_NAME DEFAULT CHARACTER SET utf8" -u root -p$MYSQL_ROOT_PASS' 
+        ${EndIf}
+        nsExec::ExecToStack $0
+        Pop $0
+        Pop $1
+        ${If} $0 == 1
+            goto error
+        ${EndIf}
         
-        Detailprint  "finished copying lamsdump.sql"
+        StrCpy $0 `$MYSQL_DIR\bin\mysql -e "GRANT ALL PRIVILEGES ON *.* TO $DB_USER@localhost IDENTIFIED BY '$DB_PASS'" -u root`
+        DetailPrint $0
+        ${If} $9 != 0
+            StrCpy $0 `$MYSQL_DIR\bin\mysql -e "GRANT ALL PRIVILEGES ON *.* TO $DB_USER@localhost IDENTIFIED BY '$DB_PASS'" -u root -p$MYSQL_ROOT_PASS`
+        ${EndIf}
+        nsExec::ExecToStack $0
+        Pop $0
+        Pop $1
+        ${If} $0 == 1
+            goto error
+        ${EndIf}
+        
+        StrCpy $0 '$MYSQL_DIR\bin\mysql -e "REVOKE PROCESS,SUPER ON *.* from $DB_USER@localhost" -u root'
+        DetailPrint $0
+        ${If} $9 != 0
+            StrCpy $0 '$MYSQL_DIR\bin\mysql -e "REVOKE PROCESS,SUPER ON *.* from $DB_USER@localhost" -u root -p$MYSQL_ROOT_PASS' 
+        ${EndIf}
+        nsExec::ExecToStack $0
+        Pop $0
+        Pop $1
+        ${If} $0 == 1
+            goto error
+        ${EndIf}
+        
+        StrCpy $0 '$MYSQL_DIR\bin\mysqladmin flush-privileges -u root'
+        DetailPrint $0
+        ${If} $9 != 0
+            StrCpy $0 '$MYSQL_DIR\bin\mysqladmin flush-privileges -u root -p$MYSQL_ROOT_PASS' 
+        ${EndIf}
+        nsExec::ExecToStack $0
+        Pop $0
+        Pop $1
+        ${If} $0 == 1
+            goto error
+        ${EndIf}
+        
+         ${if} $RETAIN_FILES == '1'      
+            #unzip repository files
+            setoutpath "$INSTDIR\backup"
+            strcpy $4 '$INSTDIR\zip\7za.exe x -aoa "backup.zip"'
+            nsExec::ExecToStack $4
+            pop $5
+            pop $6
+            ${if} $5 != 0
+                Detailprint  "7za Unzip error: $\r$\n$\r$\n$6"
+                MessageBox MB_OK|MB_ICONSTOP "7za Unzip error:$\r$\nError:$\r$\n$\r$\n$6"
+                Abort "Lams configuration failed"
+            ${endif}
+             
+            #replace the install dump with the retained dump    
+            #MessageBox MB_OK|MB_ICONEXCLAMATION "Rebuilding datbase"   
+            CopyFiles "$INSTDIR\backup\lamsDump.sql" "$TEMP\dump.sql"     
+            DetailPrint "Using retained database: $INSTDIR\backup\lamsDump.sql"
+            
+            RMdir /r  "$INSTDIR\backup\jboss-4.0.2"
+            RMdir /r  "$INSTDIR\backup\repository"
+            delete  "$INSTDIR\backup\lamsDump.sql"
+            
+            Detailprint  "finished copying lamsdump.sql"
+         ${endif}
      ${endif}
-    
-    
-    
+     #######################################################
+       
     SetOutPath $TEMP
     # use Ant to import database
     DetailPrint '$INSTDIR\apache-ant-1.6.5\bin\ant.bat import-db'
     nsExec::ExecToStack '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat import-db'
+    # MessageBox MB_OK|MB_ICONEXCLAMATION "Database has been filled"
     Pop $0 ; return code, 0=success, error=fail
     Pop $1 ; console output
     DetailPrint "DB import status: $0"
@@ -2015,8 +1983,7 @@ Function .onInstFailed
         Delete "$INSTDIR\lams_uninstall.exe"
         Delete "$INSTDIR\license.txt"
         Delete "$INSTDIR\readme.txt"
-        
-        ; remove the db 
+
         strcpy $0 $MYSQL_DIR
         strcpy $1 $DB_NAME
         strcpy $2 $DB_USER
@@ -2028,12 +1995,16 @@ Function .onInstFailed
         ${If} $9 != 0
             StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2 -p$3' 
         ${EndIf}
-        nsExec::ExecToStack $4
-        Pop $0
-        Pop $1
-        ${If} $0 == 1
-            MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't remove LAMS database:$\r$\n$\r$\n$1"
-            DetailPrint "Failed to remove LAMS database."
+        
+        ReadRegStr $MYSQL_HOST HKLM "${REG_HEAD}" "mysql_host"
+        ${If} $MYSQL_HOST == 'localhost'
+            nsExec::ExecToStack $4
+            Pop $0
+            Pop $1
+            ${If} $0 == 1
+                MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't remove LAMS database:$\r$\n$\r$\n$1"
+                DetailPrint "Failed to remove LAMS database."
+            ${EndIf}
         ${EndIf}
         
         Call RemoveTempFiles
@@ -2492,9 +2463,17 @@ Function un.PreUninstall
     !insertmacro MUI_INSTALLOPTIONS_DISPLAY "uninstall.ini"
 FunctionEnd
 
-Function un.PostUninstall
+Function un.PostUninstall      
     !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_RETAIN "uninstall.ini" "Field 1" "State"
-    
+    ReadRegStr $MYSQL_HOST HKLM "${REG_HEAD}" "mysql_host"
+    ${if} $UNINSTALL_RETAIN == 1
+        ${if} MYSQL_HOST != 'localhost'
+            MessageBox MB_YESNO|MB_ICONQUESTION "Unable to backup LAMS. MYSQL_HOST is not set to localhost. Manual backup required. $\r$\n$\r$\nWould you like to quit the uninstaller and backup LAMS manually? If you choose 'No', the unistallation will proceed and lams will not be backed up." IDYES quit IDNO continue
+                quit:
+                    Quit
+                continue:
+        ${endif}
+    ${endif}   
 FunctionEnd
 
 
@@ -2565,7 +2544,6 @@ FunctionEnd
 
 
 Section "Uninstall"
-    
 
     strcpy $WINTEMP "C:\WINDOWS\Temp"
     RMDir /r "$WINTEMP\lams\backup"
@@ -2575,6 +2553,7 @@ Section "Uninstall"
     strcpy $RETAIN_DIR "$INSTDIR\backup"
     CreateDirectory $RETAIN_DIR
 
+    ReadRegStr $MYSQL_HOST HKLM "${REG_HEAD}" "mysql_host"
     ;Now copy files that are to be retained to the temp folder
     ${If} $UNINSTALL_RETAIN == 1
         #MessageBox MB_OK|MB_ICONEXCLAMATION "retaining repository"
@@ -2602,9 +2581,6 @@ Section "Uninstall"
     ; NOT SURE IF THIS SECTION OF CODE IS NECCESSARY
     ReadRegStr $0 HKLM "${REG_HEAD}" "dir_conf"
     RMDir /r $0
-    
-    
-    
     
     ; RESTORE Retained folders to their original localtion then delete temp files
     ; DUMP database into backup folder
@@ -2644,18 +2620,20 @@ Section "Uninstall"
     RMDir /r "$WINTEMP\lams"
     
     StrLen $9 $3
-    StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2'
-    DetailPrint $4
-    ${If} $9 != 0
-        StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2 -p$3' 
-    ${EndIf}
-    nsExec::ExecToStack $4
-    Pop $0
-    Pop $1
-    ${If} $0 == 1
-        MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't remove LAMS database:$\r$\n$\r$\n$1"
-        DetailPrint "Failed to remove LAMS database."
-    ${EndIf}
+    ${if} $MYSQL_HOST == 'localhost'
+        StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2'
+        DetailPrint $4
+        ${If} $9 != 0
+            StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2 -p$3' 
+        ${EndIf}
+        nsExec::ExecToStack $4
+        Pop $0
+        Pop $1
+        ${If} $0 == 1
+            MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't remove LAMS database:$\r$\n$\r$\n$1"
+            DetailPrint "Failed to remove LAMS database."
+        ${EndIf}        
+    ${endif}
     
     ; batch file doesn't want to work when called with ExecToStack
     ; nsExec::ExecToStack '$INSTDIR\jboss-4.0.2\bin\UninstallLAMS-NT.bat'
