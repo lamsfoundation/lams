@@ -85,8 +85,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			if(ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 				_canvasModel.isDragging = false;
 			} else {
-				_canvasModel.isDragging = true;
 				ca.startDrag(false);
+				_canvasModel.isDragging = true;
 			}
 		}
 	   
@@ -125,6 +125,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
 			_canvasModel.isDragging = false;
+			
 			if (ca.activity.parentUIID != null && _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID).activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE){
 				for (var i=0; i<optionalOnCanvas.length; i++){
 					if (ca.activity.parentUIID == optionalOnCanvas[i].activity.activityUIID){
@@ -178,6 +179,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			if(!_canvasView){
 				_canvasView =  CanvasView(getView());
 			}
+			
+			// restricting (x, y) position to positive plane only
+			Debugger.log("ca x: " + ca._x, Debugger.CRITICAL, "activityRelease", "CanvasController");
+			Debugger.log("ca y: " + ca._y, Debugger.CRITICAL, "activityRelease", "CanvasController");
+			if(ca._x < 0) ca._x = 0;
+			if(ca._y < 0) ca._y = 0;
+			if(ca._x > _canvasView.gridLayer._width - ca.getVisibleWidth()) ca._x = _canvasView.gridLayer._width - ca.getVisibleWidth();
+			if(ca._y > _canvasView.gridLayer._height - ca.getVisibleHeight()) ca._y = _canvasView.gridLayer._height - ca.getVisibleHeight();
 			
 			//give it the new co-ords and 'drop' it
 			if(!ca.branchConnector) {
@@ -240,6 +249,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasModel.activeView.removeTempTrans();
 				new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
 			}
+			
 			clearAllSelections(optionalOnCanvas, parallelOnCanvas);
 			_canvasModel.selectedItem = ca;
 			_canvasModel.setDirty();
@@ -372,8 +382,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				
 				//if we are on the bin - trash it
 				isActivityOnBin(ca);
+				
+				if(ca._x < 0) ca._x = 0;
+				if(ca._y < 0) ca._y = 0;
+				if(ca._x > _canvasView.gridLayer._width - ca.getVisibleWidth()) ca._x = _canvasView.gridLayer._width - ca.getVisibleWidth();
+				if(ca._y > _canvasView.gridLayer._height - ca.getVisibleHeight()) ca._y = _canvasView.gridLayer._height - ca.getVisibleHeight();
+			
+				// give it the new co-ords and 'drop' it
+				ca.activity.xCoord = ca._x;
+				ca.activity.yCoord = ca._y;
 			}
-		   
 		}
 	}
     

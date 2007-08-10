@@ -542,18 +542,15 @@ class PropertyInspectorControls extends MovieClip {
 			g.numberOfGroups = 0;
 			
 			numRandomGroups_stp.enabled = false;
-			
-			numLearners_stp.enabled = (e != null) ? e :true;
-			
+			numLearners_stp.enabled = e&&true;
 			_group_naming_btn.enabled = false;
 		}else{
-			numRandomGroups_stp.enabled = (e != null) ? e : true;
+			numRandomGroups_stp.enabled = e&&true;
 			numLearners_stp.value = 0;
 			g.learnersPerGroups = 0;
 			
 			numLearners_stp.enabled = false;
-	
-			_group_naming_btn.enabled = (e != null) ? e : true;
+			_group_naming_btn.enabled = (e != null && numRandomGroups_stp.value > 0) ? e&&true : false;
 		}
 		
 		//this is a crazy hack to stop the steppter dissapearing after its .enabled property is set.
@@ -625,6 +622,9 @@ class PropertyInspectorControls extends MovieClip {
 			
 			numGroups_stp.value = 0;
 			g.maxNumberOfGroups = 0;
+			
+			_group_naming_btn.enabled = (numRandomGroups_stp.value > 0) ? true : false;
+			
 		}else{
 			g.maxNumberOfGroups = numGroups_stp.value;
 			
@@ -633,7 +633,7 @@ class PropertyInspectorControls extends MovieClip {
 			g.learnersPerGroups = 0;
 			g.numberOfGroups = 0;
 			
-			_group_naming_btn.enabled = true;
+			_group_naming_btn.enabled = (numGroups_stp.value > 0) ? true : false;
 		}
 				
 		setModified();

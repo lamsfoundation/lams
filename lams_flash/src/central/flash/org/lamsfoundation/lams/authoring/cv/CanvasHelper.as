@@ -101,7 +101,7 @@ class CanvasHelper {
 				evt.target.open();
 				canvasModel.setDirty();
 			} else {
-				canvasModel.getCanvas().addBin(evt.target.activityLayer);
+				canvasModel.getCanvas().addBin(evt.target);
 				
 				var autosave_config_interval = Config.getInstance().getItem(AUTOSAVE_CONFIG);
 				if(autosave_config_interval > 0) {

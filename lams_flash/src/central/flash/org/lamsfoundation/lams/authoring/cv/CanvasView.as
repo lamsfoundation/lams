@@ -167,7 +167,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		read_only = _canvasView.attachMovie('Label', 'read_only', _canvasView.getNextHighestDepth(), {_x:5, _y:titleBar._y, _visible:true, autoSize:"left", html:true, styleName:styleObj});
 		
 		bkg_pnl.onRelease = function(){
-			trace('content.onRelease');
 			Application.getInstance().getCanvas().getCanvasView().getController().canvasRelease(this);
 		}
 		
@@ -404,6 +403,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		var r = cm.transitionsDisplayed.remove(t.transitionUIID);
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;
+		
 		return s;
 	}
 	
@@ -412,6 +412,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
     */
 	private function setSize(cm:CanvasModel):Void{
 		var s:Object = cm.getSize();
+		
 		var newWidth:Number = Math.max(s.w, lastScreenWidth);
 		var newHeight:Number = Math.max(s.h, lastScreenHeight);
 		
@@ -420,7 +421,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		transparentCover.setSize(newWidth, newHeight);
 		
 		//Create the grid.  The gris is re-drawn each time the canvas is resized.
-		var grid_mc = Grid.drawGrid(gridLayer,Math.round(newWidth),Math.round(newHeight),V_GAP,H_GAP);
+		var grid_mc = Grid.drawGrid(gridLayer, Math.round(newWidth), Math.round(newHeight), V_GAP, H_GAP);
 		
 		//position bin in canvas. 
 		if(cm.activeView == this) {
