@@ -480,6 +480,7 @@ class PropertyInspectorControls extends MovieClip {
 				_group_naming_btn.enabled = e;
 			}
 			
+			checkGroupRadioOptions(e);
 			checkEnableGroupsOptions(e);
 			
 		}else{
@@ -543,6 +544,7 @@ class PropertyInspectorControls extends MovieClip {
 			
 			numRandomGroups_stp.enabled = false;
 			numLearners_stp.enabled = e&&true;
+			
 			_group_naming_btn.enabled = false;
 		}else{
 			numRandomGroups_stp.enabled = e&&true;
@@ -550,6 +552,7 @@ class PropertyInspectorControls extends MovieClip {
 			g.learnersPerGroups = 0;
 			
 			numLearners_stp.enabled = false;
+			
 			_group_naming_btn.enabled = (e != null && numRandomGroups_stp.value > 0) ? e&&true : false;
 		}
 		
@@ -559,34 +562,36 @@ class PropertyInspectorControls extends MovieClip {
 		
 	}
 	
+	private function checkGroupRadioOptions(e:Boolean) {
+		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
+		
+		if(g.numberOfGroups > 0 && g.learnersPerGroups <= 0) { numGroups_rdo.selected = true; _group_naming_btn.enabled = e&&true; }
+		else if(g.learnersPerGroups > 0 && g.numberOfGroups <= 0) { numLearners_rdo.selected = true; _group_naming_btn.enabled = false; }
+		else { numGroups_rdo.selected = true; _group_naming_btn.enabled = false; }
+	}
+	
 	public function reDrawTroublesomeSteppersLater(){
 		MovieClipUtils.doLater(Proxy.create(this,reDrawTroublesomeSteppers));
 	}
 	
 	private function  populateGroupingProperties(ga:GroupingActivity){
-		var g = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
+		Debugger.log("populating Grouping Properties createGroupingUIID: " + ga.createGroupingUIID, Debugger.CRITICAL, "populateGroupingProperties", "PIC*");
+		
+		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_activity_type_grouping');
 		
 		Debugger.log('This is the grouping object:',Debugger.GEN,'populateGroupingProperties','PropertyInspector');
 		ObjectUtils.printObject(g);
 		
 		//loop through combo to fins SI of our gate activity type
-		for (var i=0; i<groupType_cmb.dataProvider.length;i++){
-			if(g.groupingTypeID == groupType_cmb.dataProvider[i].data){
-				groupType_cmb.selectedIndex=i;
-			}
-		}
+		for (var i=0; i<groupType_cmb.dataProvider.length;i++)
+			if(g.groupingTypeID == groupType_cmb.dataProvider[i].data) groupType_cmb.selectedIndex=i;
 		
-		if(g.groupingTypeID == Grouping.RANDOM_GROUPING){
-			if(g.learnersPerGroup != null){
-				numLearners_stp.value = g.learnersPerGroup;
-			}else if(g.numberOfGroups != null){
-				numRandomGroups_stp.value = g.numberOfGroups;
-			}
-		}else{
-			if(g.maxNumberOfGroups != null){
-				numGroups_stp.value = g.maxNumberOfGroups;
-			}
+		if(g.groupingTypeID == Grouping.RANDOM_GROUPING) {
+			numLearners_stp.value = (g.learnersPerGroups != null) ? g.learnersPerGroups : 0;
+			numRandomGroups_stp.value = (g.numberOfGroups != null) ? g.numberOfGroups : 0;
+		} else {
+			numGroups_stp.value = (g.maxNumberOfGroups != null) ? g.maxNumberOfGroups : 0;
 		}
 		
 	}

@@ -77,7 +77,7 @@ class org.lamsfoundation.lams.authoring.Grouping {
 			_groupingTypeID= dto.groupingTypeID;
 			_numberOfGroups = dto.numberOfGroups;
 			_maxNumberOfGroups = dto.maxNumberOfGroups;
-			_learnersPerGroups = dto.learnersPerGroups;
+			_learnersPerGroups = dto.learnersPerGroup;
 			
 			populateGroups(dto.groups);
 	}
@@ -117,9 +117,10 @@ class org.lamsfoundation.lams.authoring.Grouping {
 		if(_groupingID){		dto.groupingID = _groupingID;				}
 		if(_groupingUIID){		dto.groupingUIID = _groupingUIID;			}
 		if(_groupingTypeID){	dto.groupingTypeID = _groupingTypeID;		}
-		if(_numberOfGroups){	dto.numberOfGroups = _numberOfGroups;		}
-		if(_maxNumberOfGroups){	dto.maxNumberOfGroups = _maxNumberOfGroups;	}
-		if(_learnersPerGroups){	dto.learnersPerGroups = _learnersPerGroups;	}
+		
+		dto.numberOfGroups = (_numberOfGroups > 0) ? _numberOfGroups : Config.NUMERIC_NULL_VALUE;
+		dto.maxNumberOfGroups = (_maxNumberOfGroups > 0) ? _maxNumberOfGroups : Config.NUMERIC_NULL_VALUE;
+		dto.learnersPerGroup = (_learnersPerGroups > 0) ? _learnersPerGroups :  Config.NUMERIC_NULL_VALUE; 
 		
 		dto.groups = new Array();
 		
