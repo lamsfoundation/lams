@@ -896,6 +896,17 @@ class PropertyInspectorControls extends MovieClip {
 		setModified();
 	}
 	
+	private function onBranchToolInputChange(evt:Object) {
+		var a = _canvasModel.selectedItem;
+		
+		a.activity.toolActivityUIID = evt.target.value;
+		a.refresh();
+		
+		// TODO: show tool outputs to branch mappings dialog
+		
+		setModified();
+	}
+	
 	private function showToolBasedBranchingControls(v:Boolean, e:Boolean) {
 		toolActs_cmb.visible = v;
 		branchToolActs_lbl.visible = v;

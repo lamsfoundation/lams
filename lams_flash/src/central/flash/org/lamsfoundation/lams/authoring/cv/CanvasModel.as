@@ -626,8 +626,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 			_activity = (transObj.into != null) ? _cv.ddm.getActivityByUIID(transObj.into.fromUIID) : null;
 			
-			if(_activity != null && _activity instanceof ToolActivity) {
-				tActivities.addItem({label: _activity.title, data: _activity.activityUIID});
+			if(_activity != null) {
+				if(_activity instanceof ToolActivity) {
+					tActivities.addItem({label: _activity.title, data: _activity.activityUIID});
+				} else if(_activity instanceof ComplexActivity) {
+					var children:Array = getCanvas().ddm.getComplexActivityChildren(_activity.activityUIID);
+					for(var i=0; i<children.length; i++) {
+						if(children[i] instanceof ToolActivity) tActivities.addItem({label: children[i].title, data: children[i].activityUIID});
+					}
+				}
 			}
 			
 			_activityUIID = _activity.activityUIID;

@@ -87,7 +87,10 @@ class PropertyInspector extends PropertyInspectorControls {
 		groupType_cmb.addEventListener("change", Delegate.create(this, onGroupTypeChange));
 		gateType_cmb.addEventListener("change", Delegate.create(this, onGateTypeChange));
 		branchType_cmb.addEventListener("change", Delegate.create(this, onBranchTypeChange));
+		
+		toolActs_cmb.addEventListener("change", Delegate.create(this, onBranchToolInputChange));
 		appliedGroupingActivity_cmb.addEventListener("change", Delegate.create(this, onAppliedGroupingChange));
+		
 		minAct_stp.addEventListener("change", Delegate.create(this, updateOptionalData));
 		minAct_stp.addEventListener("focusOut", Delegate.create(this, updateOptionalData));
 		maxAct_stp.addEventListener("change", Delegate.create(this, updateOptionalData));

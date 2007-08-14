@@ -28,42 +28,50 @@ import org.lamsfoundation.lams.authoring.*;
  * @author Mitchell Seaton
  * @version 2.1
  **/
-class GroupBranchActivityEntry extends BranchActivityEntry {
+class BranchActivityEntry   {
 	
-	private var _group:Group;
+	private var _entryID:Number;
+	private var _entryUIID:Number;
+	private var _sequenceActivity:SequenceActivity;
+	private var _branchingActivity:BranchingActivity;
 	
-	function GroupBranchActivityEntry(entryID:Number, entryUIID:Number, group:Group, sequenceActivity:SequenceActivity, branchingActivity:BranchingActivity){
-		this.entryID = entryID;
-		this.entryUIID = entryUIID;
-		this.sequenceActivity = sequenceActivity;
-		this.branchingActivity = branchingActivity;
-		
-		this.group = group;
+	function BranchActivityEntry(){
 	}
 	
-	public function toData():Object {
-		var dto:Object = new Object();
-		
-		if(this.entryID) dto.entryID = this.entryID;
-		if(this.entryUIID) dto.entryUIID = this.entryUIID;
-		if(this.sequenceActivity) dto.sequenceActivityUIID = this.sequenceActivity.activityUIID;
-		if(this.branchingActivity) dto.branchingActivityUIID = this.branchingActivity.activityUIID;
-		
-		if(_group) dto.groupUIID = _group.groupUIID;
-		
-		return dto;
+	public function set entryID(a:Number) {
+		_entryID = a;
 	}
 	
-	public function set group(a:Group) {
-		_group = a;
+	public function get entryID():Number {
+		return _entryID;
 	}
 	
-	public function get group():Group {
-		return _group;
+	public function set entryUIID(a:Number) {
+		_entryUIID = a;
 	}
 	
-	public function get groupName():String {
-		return _group.groupName;
+	public function get entryUIID():Number {
+		return _entryUIID;
+	}
+	
+	public function set sequenceActivity(a:SequenceActivity) {
+		_sequenceActivity = a;
+	}
+	
+	public function get sequenceActivity():SequenceActivity {
+		return _sequenceActivity;
+	}
+	
+	public function set branchingActivity(a:BranchingActivity) {
+		_branchingActivity = a;
+	}
+	
+	public function get branchingActivity():BranchingActivity {
+		return _branchingActivity;
+	}
+	
+	public function get sequenceName():String {
+		return _sequenceActivity.title;
 	}
 
 }
