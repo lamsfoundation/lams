@@ -630,10 +630,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 				if(_activity instanceof ToolActivity) {
 					tActivities.addItem({label: _activity.title, data: _activity.activityUIID});
 				} else if(_activity instanceof ComplexActivity) {
-					var children:Array = getCanvas().ddm.getComplexActivityChildren(_activity.activityUIID);
-					for(var i=0; i<children.length; i++) {
-						if(children[i] instanceof ToolActivity) tActivities.addItem({label: children[i].title, data: children[i].activityUIID});
-					}
+					getToolActivitiesFromComplex(_activity.activityUIID, tActivities);
 				}
 			}
 			
@@ -641,6 +638,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		}
 
 		return tActivities;
+	}
+	
+	private function getToolActivitiesFromComplex(complexUIID, toolActs:Array):Void {
+		var children:Array = getCanvas().ddm.getComplexActivityChildren(complexUIID);
+		
+		for(var i=0; i<children.length; i++) {
+			if(children[i] instanceof ToolActivity) toolActs.addItem({label: children[i].title, data: children[i].activityUIID});
+			else if(children[i] instanceof ComplexActivity) getToolActivitiesFromComplex(children[i].activityUIID, toolActs);
+		}
+
 	}
 	
 	public function addActivityToConnection(ca:Object):Object{
