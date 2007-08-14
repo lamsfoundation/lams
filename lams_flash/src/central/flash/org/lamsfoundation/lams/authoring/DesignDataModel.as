@@ -902,6 +902,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var into = null;
 		var out = null;
 		var hasTrans:Boolean = false;
+		
 		for(var i=0; i<ts.length;i++){
 			if(ts[i].toUIID == UIID || ts[i].fromUIID == UIID){
 				myTransitions.push(ts[i]);
@@ -918,6 +919,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				}
 			}
 		}
+		
 		transObj.myTransitions = myTransitions;
 		transObj.out = out;
 		transObj.into = into;

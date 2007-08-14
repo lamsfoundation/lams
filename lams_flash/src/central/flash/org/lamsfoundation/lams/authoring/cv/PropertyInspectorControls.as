@@ -101,6 +101,9 @@ class PropertyInspectorControls extends MovieClip {
 	private var branchType_lbl:Label;
 	private var branchType_cmb:ComboBox;
 	private var _group_match_btn:Button;
+	
+	private var toolActs_cmb:ComboBox;
+	private var branchToolActs_lbl:Label;
 
 	//grouping 
 	private var groupType_lbl:Label;
@@ -157,6 +160,7 @@ class PropertyInspectorControls extends MovieClip {
 		
 		gateType_lbl.text = Dictionary.getValue('trans_dlg_gatetypecmb');
 		branchType_lbl.text = Dictionary.getValue("pi_branch_type");
+		branchToolActs_lbl.text = Dictionary.getValue("pi_branch_tool_acts_lbl");
 		
 		days_lbl.text = Dictionary.getValue('pi_days');
 		hours_lbl.text = Dictionary.getValue('pi_hours');
@@ -363,17 +367,25 @@ class PropertyInspectorControls extends MovieClip {
 		branchType_lbl.visible = v;
 		branchType_cmb.visible = v;
 		
-		if(_group_match_btn.visible && !v) _group_match_btn.visible = v;
+		var _activityTypeID:Number = _canvasModel.selectedItem.activity.activityTypeID;
 		
-		if(_canvasModel.selectedItem.activity.groupingUIID != null) {
-			var grouping:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.groupingUIID);
-		
-			_group_match_btn.visible = (grouping.numberOfGroups > 0 || grouping.maxNumberOfGroups > 0) ? v : false;
+		if(_activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE) {
+			showGroupBasedBranchingControls(v, e);
+			showAppliedGroupingControls(v, e);
+		} else if(_activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) {
+			showToolBasedBranchingControls(v, e);
+			if(toolActs_cmb.visible) toolActs_cmb.dataProvider = _canvasModel.getDownstreamToolActivities();
+		} else {
+			showGroupBasedBranchingControls(false);
+			showAppliedGroupingControls(false);
+			showToolBasedBranchingControls(false);
 		}
-		
+			
 		if(e != null) {
 			branchType_lbl.enabled = e;
 			branchType_cmb.enabled = e;
+			_group_match_btn.enabled = e;
+			toolActs_cmb.enabled = e;
 		}
 	}
 	
@@ -708,65 +720,66 @@ class PropertyInspectorControls extends MovieClip {
 	 */
 	private function setStyles() {
 		var styleObj = _tm.getStyleObject('button');
-		editGrouping_btn.setStyle('styleName',styleObj);
-		_group_match_btn.setStyle('styleName',styleObj);
+		editGrouping_btn.setStyle('styleName', styleObj);
+		_group_match_btn.setStyle('styleName', styleObj);
 		_group_naming_btn.setStyle('styleName', styleObj);
 		
 		styleObj = _tm.getStyleObject('PIlabel');
 		
-		toolDisplayName_lbl.setStyle('styleName',styleObj);
-		title_lbl.setStyle('styleName',styleObj);
-		desc_lbl.setStyle('styleName',styleObj);
-		min_lbl.setStyle('styleName',styleObj);
-		max_lbl.setStyle('styleName',styleObj);
-		grouping_lbl.setStyle('styleName',styleObj);
-		currentGrouping_lbl.setStyle('styleName',styleObj);
-		gateType_lbl.setStyle('styleName',styleObj);
-		branchType_lbl.setStyle('styleName',styleObj);
-		startOffset_lbl.setStyle('styleName',styleObj);
-		endOffset_lbl.setStyle('styleName',styleObj);
+		toolDisplayName_lbl.setStyle('styleName', styleObj);
+		title_lbl.setStyle('styleName', styleObj);
+		desc_lbl.setStyle('styleName', styleObj);
+		min_lbl.setStyle('styleName', styleObj);
+		max_lbl.setStyle('styleName', styleObj);
+		grouping_lbl.setStyle('styleName', styleObj);
+		currentGrouping_lbl.setStyle('styleName', styleObj);
+		gateType_lbl.setStyle('styleName', styleObj);
+		branchType_lbl.setStyle('styleName', styleObj);
+		branchToolActs_lbl.setStyle('styleName', styleObj);
+		startOffset_lbl.setStyle('styleName', styleObj);
+		endOffset_lbl.setStyle('styleName', styleObj);
 		days_lbl.setStyle('styleName', styleObj);
-		hours_lbl.setStyle('styleName',styleObj);
-		mins_lbl.setStyle('styleName',styleObj);
-		hoursEnd_lbl.setStyle('styleName',styleObj);
-		minsEnd_lbl.setStyle('styleName',styleObj);
-		numGroups_lbl.setStyle('styleName',styleObj);
-		numLearners_lbl.setStyle('styleName',styleObj);
-		groupType_lbl.setStyle('styleName',styleObj);
-		applied_grouping_lbl.setStyle('styleName',styleObj);
-		title_txt.setStyle('styleName',styleObj);
-		desc_txt.setStyle('styleName',styleObj);
-		runOffline_chk.setStyle('styleName',styleObj);
-		defineLater_chk.setStyle('styleName',styleObj);
+		hours_lbl.setStyle('styleName', styleObj);
+		mins_lbl.setStyle('styleName', styleObj);
+		hoursEnd_lbl.setStyle('styleName', styleObj);
+		minsEnd_lbl.setStyle('styleName', styleObj);
+		numGroups_lbl.setStyle('styleName', styleObj);
+		numLearners_lbl.setStyle('styleName', styleObj);
+		groupType_lbl.setStyle('styleName', styleObj);
+		applied_grouping_lbl.setStyle('styleName', styleObj);
+		title_txt.setStyle('styleName', styleObj);
+		desc_txt.setStyle('styleName', styleObj);
+		runOffline_chk.setStyle('styleName', styleObj);
+		defineLater_chk.setStyle('styleName', styleObj);
 		days_stp.setStyle('styleName', styleObj);
-		hours_stp.setStyle('styleName',styleObj);
-		mins_stp.setStyle('styleName',styleObj);
-		endHours_stp.setStyle('styleName',styleObj);
-		endMins_stp.setStyle('styleName',styleObj);
-		minAct_stp.setStyle('styleName',styleObj);
-		maxAct_stp.setStyle('styleName',styleObj);
+		hours_stp.setStyle('styleName', styleObj);
+		mins_stp.setStyle('styleName', styleObj);
+		endHours_stp.setStyle('styleName', styleObj);
+		endMins_stp.setStyle('styleName', styleObj);
+		minAct_stp.setStyle('styleName', styleObj);
+		maxAct_stp.setStyle('styleName', styleObj);
 		
 		
 		styleObj = _tm.getStyleObject('picombo');
-		gateType_cmb.setStyle('styleName',styleObj);
+		gateType_cmb.setStyle('styleName', styleObj);
 		branchType_cmb.setStyle('styleName', styleObj);
-		groupType_cmb.setStyle('styleName',styleObj);
-		appliedGroupingActivity_cmb.setStyle('styleName',styleObj);
+		groupType_cmb.setStyle('styleName', styleObj);
+		appliedGroupingActivity_cmb.setStyle('styleName', styleObj);
+		toolActs_cmb.setStyle('styleName', styleObj);
 		
 		styleObj = _tm.getStyleObject('numericstepper');
-		days_stp.setStyle('styleName',styleObj);
-		hours_stp.setStyle('styleName',styleObj);
-		mins_stp.setStyle('styleName',styleObj);
-		endHours_stp.setStyle('styleName',styleObj);
-		endMins_stp.setStyle('styleName',styleObj);
+		days_stp.setStyle('styleName', styleObj);
+		hours_stp.setStyle('styleName', styleObj);
+		mins_stp.setStyle('styleName', styleObj);
+		endHours_stp.setStyle('styleName', styleObj);
+		endMins_stp.setStyle('styleName', styleObj);
 		
 		styleObj = _tm.getStyleObject('BGPanel');
 		bar_pnl.setStyle('styleName',styleObj);
 		
 		styleObj = _tm.getStyleObject('WZPanel');
-		body_pnl.setStyle('styleName',styleObj);
-		cover_pnl.setStyle('styleName',styleObj);
-		
+		body_pnl.setStyle('styleName', styleObj);
+		cover_pnl.setStyle('styleName', styleObj);
 		
     }
   
@@ -796,19 +809,32 @@ class PropertyInspectorControls extends MovieClip {
 	 */
 	private function onBranchTypeChange(evt:Object){
 		_canvasModel.selectedItem.activity.activityTypeID = evt.target.value;
-		Debugger.log('Set branch type to: _canvasModel.selectedItem.activity.activityTypeID:'+_canvasModel.selectedItem.activity.activityTypeID,Debugger.GEN,'onBranchTypeChange','PropertyInspector');
 		
 		if(evt.target.value == Activity.GROUP_BRANCHING_ACTIVITY_TYPE) {
 			var selectedGroup = appliedGroupingActivity_cmb.dataProvider[appliedGroupingActivity_cmb.selectedIndex].data;
+			
 			if(selectedGroup != null) {
 				_canvasModel.selectedItem.activity.groupingUIID = selectedGroup.createGroupingUIID;
 			}
 				
 			showGroupBasedBranchingControls(true, !_canvasModel.selectedItem.activity.readOnly);
 			showAppliedGroupingControls(true, !_canvasModel.selectedItem.activity.readOnly);
-		} else {
-
+			
+			showToolBasedBranchingControls(false);
+			
+		} else if(evt.target.value == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) {
+			showToolBasedBranchingControls(true, !_canvasModel.selectedItem.activity.readOnly);
+			
 			_canvasModel.selectedItem.activity.groupingUIID = null;
+			showGroupBasedBranchingControls(false);
+			showAppliedGroupingControls(false);
+		
+			if(toolActs_cmb.visible) toolActs_cmb.dataProvider = _canvasModel.getDownstreamToolActivities();
+			
+		} else {
+			_canvasModel.selectedItem.activity.groupingUIID = null;
+			
+			showToolBasedBranchingControls(false);
 			showGroupBasedBranchingControls(false);
 			showAppliedGroupingControls(false);
 		}
@@ -870,17 +896,25 @@ class PropertyInspectorControls extends MovieClip {
 		setModified();
 	}
 	
+	private function showToolBasedBranchingControls(v:Boolean, e:Boolean) {
+		toolActs_cmb.visible = v;
+		branchToolActs_lbl.visible = v;
+
+		if(e != null) toolActs_cmb.enabled = e;
+	}
+	
 	private function showGroupBasedBranchingControls(v:Boolean, e:Boolean) {
+		if(!v) { _group_match_btn.visible = false; return; }		
+
 		var ca = _canvasModel.selectedItem;
 		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
 		
 		Debugger.log("grouping UIID: " + ca.activity.groupingUIID, Debugger.CRITICAL, "showGroupBasedBranchingControls", "PIC*");
-		
 		if(branches.myBranches.length > 0 && ca.activity.groupingUIID != null) {
 			var grouping:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(ca.activity.groupingUIID);
 			
 			_group_match_btn.visible = (grouping.numberOfGroups > 0 || grouping.maxNumberOfGroups > 0) ? v : false;
-			_group_match_btn.enabled = e;
+			if(e != null) _group_match_btn.enabled = e;
 		} else {
 			_group_match_btn.visible = false;
 		}

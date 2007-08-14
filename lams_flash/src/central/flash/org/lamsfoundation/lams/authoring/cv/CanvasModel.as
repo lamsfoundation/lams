@@ -1,4 +1,4 @@
-﻿/***************************************************************************
+﻿/****************************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -47,7 +47,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	private var __y:Number;
 	private var _piHeight:Number;
 	private var infoObj:Object;
-	
 	
 	private var _cv:Canvas;
 	private var _ddm:DesignDataModel;
@@ -171,6 +170,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function getPIHeight(){
 		return _piHeight;
 	}
+	
 	public function setDirty(){
 		_isDirty = true;
 		
@@ -210,8 +210,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		_activeTool = "none";
 	}
 	
-	
-	
 	public function findOptionalActivities():Array{
 		var actOptional:Array = new Array();
 		var k:Array = _activitiesDisplayed.values();
@@ -246,7 +244,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			}
 			
 		}
-		return actParent
+		return actParent;
 	}
 	
 	public function lockAllComplexActivities():Void{
@@ -615,6 +613,27 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		var transObj = _cv.ddm.getTransitionsForActivityUIID(activityUIID);
 		
 		return (transObj.out == null) ? activityUIID : getLastActivityUIID(transObj.out.toUIID);
+	}
+	
+	public function getDownstreamToolActivities():Array {
+		var _activity;
+		var _activityUIID:Number = selectedItem.activity.activityUIID;
+		var tActivities:Array = new Array();
+		
+		while(_activityUIID != null) {
+			
+			var transObj:Object = getCanvas().ddm.getTransitionsForActivityUIID(_activityUIID);
+		
+			_activity = (transObj.into != null) ? _cv.ddm.getActivityByUIID(transObj.into.fromUIID) : null;
+			
+			if(_activity != null && _activity instanceof ToolActivity) {
+				tActivities.addItem({label: _activity.title, data: _activity.activityUIID});
+			}
+			
+			_activityUIID = _activity.activityUIID;
+		}
+
+		return tActivities;
 	}
 	
 	public function addActivityToConnection(ca:Object):Object{
