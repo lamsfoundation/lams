@@ -92,30 +92,9 @@ public class LamsActionRequestServlet extends HttpServlet {
 	        BbSessionManagerService sessionService = BbServiceManager.getSessionManagerService();
 	        BbSession bbSession = sessionService.getSession( request );
 	        String username = bbSession.getUserName();
-	        
-	        //attach the learningSessionId, learningDesignId or courseId to the redirect url
-	        //String redirect = LamsSecurityUtil.generateRequestURL(username, p_method);
+
 	        String redirect = LamsSecurityUtil.generateRequestURL(ctx, p_method);
-	        
-	        //redirect = LamsSecurityUtil.generateRequestURL(username, p_method);
-	        /*if(p_learningSessionId!=null)
-	        {
-	            redirect += '&' + Constants.PARAM_LEARNING_SESSION_ID + '=' + p_learningSessionId;
-	            //redirect1 += '&' + Constants.PARAM_LEARNING_SESSION_ID + '=' + p_learningSessionId;
-	        }
-	        if(p_learningDesignId!=null)
-	        {
-	            redirect += '&' + Constants.PARAM_LEARNING_DESIGN_ID + '=' + p_learningDesignId;
-	            //redirect1 += '&' + Constants.PARAM_LEARNING_SESSION_ID + '=' + p_learningSessionId;
-	        }
-	        if(p_courseId!=null)
-	        {
-	            redirect += '&' + Constants.PARAM_COURSE_ID + '=' + p_courseId;
-	            //redirect1 += '&' + Constants.PARAM_LEARNING_SESSION_ID + '=' + p_learningSessionId;
-	        }
-	        */
-	        
-	        
+
 	        if(p_courseId!=null)
 	        {
 	            redirect += '&' + Constants.PARAM_COURSE_ID + '=' + p_courseId;

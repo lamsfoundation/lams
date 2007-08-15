@@ -16,9 +16,9 @@
  * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
  */
 
-package org.lamsfoundation.lams.webservice;
+package org.lamsfoundation.ld.webservice;
 
-public class LessonManagerServiceLocator extends org.apache.axis.client.Service implements org.lamsfoundation.lams.webservice.LessonManagerService {
+public class LessonManagerServiceLocator extends org.apache.axis.client.Service implements org.lamsfoundation.ld.webservice.LessonManagerService {
 
     public LessonManagerServiceLocator() {
     }
@@ -50,7 +50,7 @@ public class LessonManagerServiceLocator extends org.apache.axis.client.Service 
         LessonManagerServiceWSDDServiceName = name;
     }
 
-    public org.lamsfoundation.lams.webservice.LessonManager getLessonManagerService() throws javax.xml.rpc.ServiceException {
+    public org.lamsfoundation.ld.webservice.LessonManager getLessonManagerService() throws javax.xml.rpc.ServiceException {
        java.net.URL endpoint;
         try {
             endpoint = new java.net.URL(LessonManagerService_address);
@@ -61,9 +61,9 @@ public class LessonManagerServiceLocator extends org.apache.axis.client.Service 
         return getLessonManagerService(endpoint);
     }
 
-    public org.lamsfoundation.lams.webservice.LessonManager getLessonManagerService(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
+    public org.lamsfoundation.ld.webservice.LessonManager getLessonManagerService(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
         try {
-            org.lamsfoundation.lams.webservice.LessonManagerServiceSoapBindingStub _stub = new org.lamsfoundation.lams.webservice.LessonManagerServiceSoapBindingStub(portAddress, this);
+        	org.lamsfoundation.ld.webservice.LessonManagerServiceSoapBindingStub _stub = new org.lamsfoundation.ld.webservice.LessonManagerServiceSoapBindingStub(portAddress, this);
             _stub.setPortName(getLessonManagerServiceWSDDServiceName());
             return _stub;
         }
@@ -83,8 +83,8 @@ public class LessonManagerServiceLocator extends org.apache.axis.client.Service 
      */
     public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
-            if (org.lamsfoundation.lams.webservice.LessonManager.class.isAssignableFrom(serviceEndpointInterface)) {
-                org.lamsfoundation.lams.webservice.LessonManagerServiceSoapBindingStub _stub = new org.lamsfoundation.lams.webservice.LessonManagerServiceSoapBindingStub(new java.net.URL(LessonManagerService_address), this);
+            if (org.lamsfoundation.ld.webservice.LessonManager.class.isAssignableFrom(serviceEndpointInterface)) {
+            	org.lamsfoundation.ld.webservice.LessonManagerServiceSoapBindingStub _stub = new org.lamsfoundation.ld.webservice.LessonManagerServiceSoapBindingStub(new java.net.URL(LessonManagerService_address), this);
                 _stub.setPortName(getLessonManagerServiceWSDDServiceName());
                 return _stub;
             }

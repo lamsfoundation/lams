@@ -33,13 +33,16 @@
 
 
 <form name="workspace_form" id="workspace_form" action="start_lesson.jsp" method="post">
+    
+    
     <input type="hidden" name="content_id" value="<%=request.getParameter("content_id")%>">
     <input type="hidden" name="course_id" value="<%=request.getParameter("course_id")%>">
     <input type="hidden" name="sequence_id" id="sequence_id" value="0">
     
     
     <bbUI:step title="Select an existing sequence from the LAMS workspace.">
-        <bbUI:dataElement>                     
+        <bbUI:dataElement> 
+        <br>                    
             <script language="JavaScript" type="text/javascript" src="../lib/tigra/tree.js"></script>
 			<script language="JavaScript" type="text/javascript" src="../lib/tigra/tree_tpl.js"></script>
             <script language="JavaScript" type="text/javascript">
@@ -49,15 +52,16 @@
 					
 				//-->
 			</script>
+		<br>
 		</bbUI:dataElement>
 	 </bbUI:step>
 	 <bbUI:step title="Open author, refresh or start the chosen lesson.">		
-            <br>
         <bbUI:dataElement> 
            	<input type="button" name="author" onClick="openAuthor();" value="Open Author">
             <input type="button" name="action" onClick="refreshSeqList();" value="Refresh Workspace">
             <input id="nextButton" type="submit" name="nextButton" onClick="openNext();" value="Next" disabled="true">
      	</bbUI:dataElement> 
+     	<br>
      </bbUI:step>
     
 </form>

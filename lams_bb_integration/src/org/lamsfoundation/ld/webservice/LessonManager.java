@@ -16,7 +16,7 @@
  * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
  */
 
-package org.lamsfoundation.lams.webservice;
+package org.lamsfoundation.ld.webservice;
 
 public interface LessonManager extends java.rmi.Remote {
     public java.lang.Long startLesson(java.lang.String serverId, java.lang.String datetime, java.lang.String hashValue, java.lang.String username, long ldId, java.lang.String courseId, java.lang.String title, java.lang.String desc, java.lang.String countryIsoCode, java.lang.String langIsoCode) throws java.rmi.RemoteException;

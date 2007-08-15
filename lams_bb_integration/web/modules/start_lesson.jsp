@@ -13,7 +13,6 @@
 <%@ page import="blackboard.platform.session.BbSession"%>
 <%@ page import="blackboard.platform.*"%>
 <%@ page import="blackboard.platform.plugin.PlugInUtil"%>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsServiceUtil"%>
 <%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsPluginUtil"%>
 <%@ page import="org.lamsfoundation.ld.integration.Constants"%>
             
@@ -23,23 +22,25 @@
 <%@ taglib uri="/bbData" prefix="bbData"%>
 
 <%
-	String courseId = request.getParameter("course_id");
-	String contentId = request.getParameter("content_id");
-	String designId = request.getParameter("itemSequenceId");
 	String sequenceID = request.getParameter("sequence_id");
 %>
 
 <bbData:context id="ctx">
 	<bbUI:docTemplate title = "Start a LAMS lesson." >
 
-	<form name="lesson_form" id="lesson_form" action="start_lesson.jsp" method="post">
+	<form name="lesson_form" id="lesson_form" action="start_lesson_proc.jsp" method="post">
+		<input type="hidden" name="sequence_id" id="sequence_id" value="<%=sequenceID%>">
+		<input type="hidden" name="content_id" value="<%=request.getParameter("content_id")%>">
+    	<input type="hidden" name="course_id" value="<%=request.getParameter("course_id")%>">
+   		
+		
 		<bbUI:step title="Name and describe the lesson">
 			<bbUI:dataElement label="Name">
 	            <input id="title" type="text" name="title" value="">
 	        </bbUI:dataElement>
 	    
 	        <bbUI:dataElement label="Description">
-	            <bbUI:textbox name="description" rows="12" cols="55"></bbUI:textbox>
+				<textarea name="description" rows="12" cols="35"></textarea>
 	        </bbUI:dataElement>
 	    </bbUI:step> 
 	        
@@ -56,7 +57,39 @@
 	            <bbUI:dateAvailability formName="lesson_form" startDateField="startDate" endDateField="endDate"/>
 	        </bbUI:dataElement>
 	    </bbUI:step> 
-	    <bbUI:stepSubmit title="Start lesson"/>
+	    <bbUI:step title="Start lesson">
+	    	<br>
+	    	<bbUI:dataElement> 
+	    		<input type="submit" name="start" onClick="validateStartLesson();" value="Start Lesson">
+	    		<input type="button" name="cancel" onClick="back();" value="Cancel">
+	    	</bbUI:dataElement> 
+	    </bbUI:step>
 	   </form>
+	   
+	   <script language="JavaScript" type="text/javascript">
+		<!--
+			function back()
+			{
+				history.go(-1);
+			}
+			
+			function validateStartLesson()
+			{
+				var title = trim(document.getElementById("title").value);
+				
+				// valdation
+				if (title==null||title=="")
+				{
+					alert("Lesson must have a name.");
+					return false;
+				}
+
+			}
+			
+			
+			
+			
+		//-->
+		</script>
 	</bbUI:docTemplate>
 </bbData:context>
