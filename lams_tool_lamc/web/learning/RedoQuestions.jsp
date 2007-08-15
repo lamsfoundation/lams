@@ -87,9 +87,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  
 					  <p>
 						  	 <fmt:message key="label.learner.bestMark"/>
-						  	   <c:out value="${mcGeneralLearnerFlowDTO.learnerBestMark}"/> 
+						  	   <c:out value="${mcGeneralLearnerFlowDTO.latestAttemptMark}"/> 
 						  	<fmt:message key="label.outof"/> 
-						  	<c:out value="${mcGeneralLearnerFlowDTO.totalQuestionCount}"/> 
+						  	<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}"/> 
 					  	</p>
 					  
 					  

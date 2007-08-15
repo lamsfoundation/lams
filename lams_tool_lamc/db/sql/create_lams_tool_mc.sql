@@ -71,6 +71,8 @@ CREATE TABLE tl_lamc11_que_usr (
      , fullname VARCHAR(255)
      , responseFinalised TINYINT(1) NOT NULL DEFAULT 0
      , viewSummaryRequested TINYINT(1) NOT NULL DEFAULT 0
+     , last_attempt_order INTEGER
+     , last_attempt_total_mark INTEGER
      , PRIMARY KEY (uid)
      , INDEX (mc_session_id)
      , CONSTRAINT FK_tl_lamc11_que_usr_1 FOREIGN KEY (mc_session_id)

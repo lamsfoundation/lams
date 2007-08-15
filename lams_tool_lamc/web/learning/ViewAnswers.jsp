@@ -214,7 +214,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:when test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.reportViewOnly!='true'}">
 						<div class="space-bottom-top align-right">
 							<c:if
-								test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
+								test="${((mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true'))}">
 								<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
 									<html:hidden property="learnerFinished" value="Finished" />
 									

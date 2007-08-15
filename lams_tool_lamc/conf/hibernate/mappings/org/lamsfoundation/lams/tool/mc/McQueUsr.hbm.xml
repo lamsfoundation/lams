@@ -69,6 +69,20 @@
     >
     </property>
 
+    <property
+    name="lastAttemptOrder"
+    type="java.lang.Integer"
+    access="property"        
+    column="last_attempt_order"
+    />
+ 
+   <property
+        name="lastAttemptTotalMark"
+        type="java.lang.Integer"
+        access="property"
+        column="last_attempt_total_mark"
+    />
+
 
     <many-to-one
         name="mcSession"

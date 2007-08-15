@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
 
 	<strong> <fmt:message key="label.learner.message" /> ( <c:out
-			value="${mcGeneralLearnerFlowDTO.passMark}" /> ) </strong>>
+			value="${mcGeneralLearnerFlowDTO.passMark}" /> ) </strong>
 	</c:if>
 
 <html:hidden property="nextQuestionSelected" />
@@ -55,7 +55,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<div style="overflow: auto;">
 				<c:out value="${dto.question}" escapeXml="false" />
 				
-				<c:if test="${dto.mark != '1'}">
+				<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">
 					[
 					<strong> <fmt:message key="label.mark" /> </strong>
 					<c:out value="${dto.mark}" />

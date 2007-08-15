@@ -253,9 +253,21 @@
 	   </target>
 	
 		<!-- =================================================================== -->
+		<!-- Deploy the jar only                                                 -->
+		<!-- =================================================================== -->
+			<target name="deploy-jar" depends="lams-lamc11-jar" description="Deploy the MCQ tool jar file">
+			<delete quiet="true">
+				<fileset dir="${jboss.deploy}/tmp"/>
+				<fileset dir="${jboss.deploy}/work"/>
+			</delete>
+			<copy file="${build.lib}/${product}.jar"
+					todir="${jboss.deploy}"/> 
+		</target>
+
+		<!-- =================================================================== -->
 		<!-- Deploy the jar and war                               -->
 		<!-- =================================================================== -->
-			<target name="deploy-war" depends="lams-lamc11-war" description="Deploy the SubmitFiles tool war file and jar file">
+			<target name="deploy-war" depends="lams-lamc11-war" description="Deploy the MCQ tool war file and jar file">
 			<delete quiet="true">
 				<fileset dir="${jboss.deploy}/tmp"/>
 				<fileset dir="${jboss.deploy}/work"/>
