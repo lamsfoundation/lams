@@ -20,7 +20,8 @@
   
 <%
     //check permission
-    if (!PlugInUtil.authorizeForCourseControlPanel(request, response))
+    
+	if (!PlugInUtil.authorizeForCourseControlPanel(request, response))
         return;
 
     BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
@@ -36,23 +37,7 @@
     myContent.setIsAvailable(request.getParameter("isAvailable").equals("true")?true:false);
     myContent.setIsTracked(request.getParameter("isTracked").equals("true")?true:false);
     
-
-    //get descriptions entered
-    String descText = request.getParameter("descriptiontext");
-    FormattedText.Type descType = FormattedText.Type.DEFAULT; //type of description (S|H|P)
-    switch(request.getParameter("descriptiontype").charAt(0)){
-        case 'H':
-            descType = FormattedText.Type.HTML; break;
-        case 'S':
-            descType = FormattedText.Type.SMART_TEXT; break;
-        case 'P':
-            descType = FormattedText.Type.PLAIN_TEXT; break;
-    }
-    if(!myContent.getIsAvailable()){
-        descText = "<i>Item is not available.</i><br>" + descText;
-    }
-    FormattedText description = new FormattedText(descText,descType);
-    
+    FormattedText description = new FormattedText(request.getParameter("description"),FormattedText.Type.HTML);
     myContent.setBody(description);
 
     //Parse start/end Date from the <bbUI:dateAvailability>
@@ -62,6 +47,8 @@
     cstart.setTime(formatter.parse(request.getParameter("startDate")));
     cend.setTime(formatter.parse(request.getParameter("endDate")));
 
+    
+    
     // Set Availability Dates
     myContent.setStartDate(cstart);
     if (request.getParameter("restrict_end") != null){
@@ -74,6 +61,9 @@
     persister.persist( myContent );
     
     String strReturnUrl = PlugInUtil.getEditableContentReturnURL(myContent.getParentId());
+	
+	
+
 %>
 
 
@@ -86,7 +76,8 @@
             <bbUI:receipt type="SUCCESS" 
                           iconUrl="/images/ci/icons/tools_u.gif" 
                           title="Content Modified" 
-                          recallUrl="<%=strReturnUrl%>">
+                          recallUrl="<%=strReturnUrl%>"
+                          >
                 Content successfully modified.<br>
             </bbUI:receipt>
         </bbUI:coursePage>
