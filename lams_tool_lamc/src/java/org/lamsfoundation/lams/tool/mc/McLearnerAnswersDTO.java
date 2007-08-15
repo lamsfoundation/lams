@@ -39,9 +39,9 @@ public class McLearnerAnswersDTO implements Comparable
     
     protected String displayOrder;
     
-    protected String questionUid;
+    protected Long questionUid;
     
-    protected String mark;
+    protected Integer mark;
     
     protected Map candidateAnswers;
     
@@ -114,13 +114,13 @@ public class McLearnerAnswersDTO implements Comparable
     /**
      * @return Returns the questionUid.
      */
-    public String getQuestionUid() {
+    public Long getQuestionUid() {
         return questionUid;
     }
     /**
      * @param questionUid The questionUid to set.
      */
-    public void setQuestionUid(String questionUid) {
+    public void setQuestionUid(Long questionUid) {
         this.questionUid = questionUid;
     }
     /**
@@ -174,13 +174,13 @@ public class McLearnerAnswersDTO implements Comparable
     /**
      * @return Returns the mark.
      */
-    public String getMark() {
+    public Integer getMark() {
         return mark;
     }
     /**
      * @param mark The mark to set.
      */
-    public void setMark(String mark) {
+    public void setMark(Integer mark) {
         this.mark = mark;
     }
     /**

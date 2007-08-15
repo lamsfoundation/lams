@@ -38,15 +38,13 @@ public class McGeneralLearnerFlowDTO implements Comparable
 {
     protected String retries;
     
-    protected String learnerMark;
+    protected Integer learnerMark;
     
     protected String userName;
     
-    protected String learnerMarkAtLeast;
+    protected Integer totalQuestionCount;
     
-    protected String totalQuestionCount;
-    
-    protected String passMark;
+    protected Integer passMark;
     
     protected String passMarkApplicable;
     
@@ -60,13 +58,13 @@ public class McGeneralLearnerFlowDTO implements Comparable
     
     protected String activityTitle;
     
-    protected String learnerBestMark;
+    protected Integer latestAttemptMark;
     
-    protected String currentQuestionIndex;
+    protected Integer currentQuestionIndex;
     
     protected String countSessionComplete;
     
-    protected String topMark;
+    protected Integer topMark;
     
     protected String reflection;
     
@@ -76,9 +74,9 @@ public class McGeneralLearnerFlowDTO implements Comparable
     
     protected String notebookEntriesVisible; 
     
-    protected String lowestMark;
+    protected Integer lowestMark;
 
-    protected String averageMark;
+    protected Integer averageMark;
 
     protected String reportViewOnly;
     
@@ -102,13 +100,11 @@ public class McGeneralLearnerFlowDTO implements Comparable
     
     protected String totalCountReached;
     
-    protected String questionIndex;
+    protected Integer questionIndex;
     
     protected String questionListingMode;
     
-    protected String totalUserMark;
-    
-    protected String totalMarksPossible;
+    protected Integer totalMarksPossible;
     
     protected Map mapFeedbackContent;
     
@@ -130,18 +126,6 @@ public class McGeneralLearnerFlowDTO implements Comparable
         this.mapFeedbackContent = mapFeedbackContent;
     }
     /**
-     * @return Returns the totalUserMark.
-     */
-    public String getTotalUserMark() {
-        return totalUserMark;
-    }
-    /**
-     * @param totalUserMark The totalUserMark to set.
-     */
-    public void setTotalUserMark(String totalUserMark) {
-        this.totalUserMark = totalUserMark;
-    }
-    /**
      * @return Returns the questionListingMode.
      */
     public String getQuestionListingMode() {
@@ -156,13 +140,13 @@ public class McGeneralLearnerFlowDTO implements Comparable
     /**
      * @return Returns the questionIndex.
      */
-    public String getQuestionIndex() {
+    public Integer getQuestionIndex() {
         return questionIndex;
     }
     /**
      * @param questionIndex The questionIndex to set.
      */
-    public void setQuestionIndex(String questionIndex) {
+    public void setQuestionIndex(Integer questionIndex) {
         this.questionIndex = questionIndex;
     }
     /**
@@ -204,13 +188,13 @@ public class McGeneralLearnerFlowDTO implements Comparable
     /**
      * @return Returns the averageMark.
      */
-    public String getAverageMark() {
+    public Integer getAverageMark() {
         return averageMark;
     }
     /**
      * @param averageMark The averageMark to set.
      */
-    public void setAverageMark(String averageMark) {
+    public void setAverageMark(Integer averageMark) {
         this.averageMark = averageMark;
     }
     /**
@@ -228,38 +212,38 @@ public class McGeneralLearnerFlowDTO implements Comparable
     /**
      * @return Returns the lowestMark.
      */
-    public String getLowestMark() {
+    public Integer getLowestMark() {
         return lowestMark;
     }
     /**
      * @param lowestMark The lowestMark to set.
      */
-    public void setLowestMark(String lowestMark) {
+    public void setLowestMark(Integer lowestMark) {
         this.lowestMark = lowestMark;
     }
     /**
      * @return Returns the topMark.
      */
-    public String getTopMark() {
+    public Integer getTopMark() {
         return topMark;
     }
     /**
      * @param topMark The topMark to set.
      */
-    public void setTopMark(String topMark) {
+    public void setTopMark(Integer topMark) {
         this.topMark = topMark;
     }
     /**
-     * @return Returns the learnerBestMark.
+     * @return Returns the LatestAttemptMark.
      */
-    public String getLearnerBestMark() {
-        return learnerBestMark;
+    public Integer getLatestAttemptMark() {
+        return latestAttemptMark;
     }
     /**
      * @param learnerBestMark The learnerBestMark to set.
      */
-    public void setLearnerBestMark(String learnerBestMark) {
-        this.learnerBestMark = learnerBestMark;
+    public void setLatestAttemptMark(Integer latestAttemptMark) {
+        this.latestAttemptMark = latestAttemptMark;
     }
     /**
      * @return Returns the activityInstructions.
@@ -277,37 +261,25 @@ public class McGeneralLearnerFlowDTO implements Comparable
     /**
      * @return Returns the learnerMark.
      */
-    public String getLearnerMark() {
+    public Integer getLearnerMark() {
         return learnerMark;
     }
     /**
      * @param learnerMark The learnerMark to set.
      */
-    public void setLearnerMark(String learnerMark) {
+    public void setLearnerMark(Integer learnerMark) {
         this.learnerMark = learnerMark;
-    }
-    /**
-     * @return Returns the learnerMarkAtLeast.
-     */
-    public String getLearnerMarkAtLeast() {
-        return learnerMarkAtLeast;
-    }
-    /**
-     * @param learnerMarkAtLeast The learnerMarkAtLeast to set.
-     */
-    public void setLearnerMarkAtLeast(String learnerMarkAtLeast) {
-        this.learnerMarkAtLeast = learnerMarkAtLeast;
     }
     /**
      * @return Returns the passMark.
      */
-    public String getPassMark() {
+    public Integer getPassMark() {
         return passMark;
     }
     /**
      * @param passMark The passMark to set.
      */
-    public void setPassMark(String passMark) {
+    public void setPassMark(Integer passMark) {
         this.passMark = passMark;
     }
     /**
@@ -337,13 +309,13 @@ public class McGeneralLearnerFlowDTO implements Comparable
     /**
      * @return Returns the totalQuestionCount.
      */
-    public String getTotalQuestionCount() {
+    public Integer getTotalQuestionCount() {
         return totalQuestionCount;
     }
     /**
      * @param totalQuestionCount The totalQuestionCount to set.
      */
-    public void setTotalQuestionCount(String totalQuestionCount) {
+    public void setTotalQuestionCount(Integer totalQuestionCount) {
         this.totalQuestionCount = totalQuestionCount;
     }
     /**
@@ -375,7 +347,6 @@ public class McGeneralLearnerFlowDTO implements Comparable
             .append("mapQueAttempts: ", mapQueAttempts)
             .append("mapGeneralOptionsContent: ", mapGeneralOptionsContent)
             .append("learnerMark : ", learnerMark)
-            .append("learnerMarkAtLeast: ", learnerMarkAtLeast)
             .append("totalQuestionCount: ", totalQuestionCount)
             .append("passMark: ", passMark)
             .append("passMarkApplicable: ", passMarkApplicable)
@@ -435,13 +406,13 @@ public class McGeneralLearnerFlowDTO implements Comparable
     /**
      * @return Returns the currentQuestionIndex.
      */
-    public String getCurrentQuestionIndex() {
+    public Integer getCurrentQuestionIndex() {
         return currentQuestionIndex;
     }
     /**
      * @param currentQuestionIndex The currentQuestionIndex to set.
      */
-    public void setCurrentQuestionIndex(String currentQuestionIndex) {
+    public void setCurrentQuestionIndex(Integer currentQuestionIndex) {
         this.currentQuestionIndex = currentQuestionIndex;
     }
     /**
@@ -594,22 +565,27 @@ public class McGeneralLearnerFlowDTO implements Comparable
     /**
      * @return Returns the totalMarksPossible.
      */
-    public String getTotalMarksPossible() {
+    public Integer getTotalMarksPossible() {
         return totalMarksPossible;
     }
     /**
      * @param totalMarksPossible The totalMarksPossible to set.
      */
-    public void setTotalMarksPossible(String totalMarksPossible) {
+    public void setTotalMarksPossible(Integer totalMarksPossible) {
         this.totalMarksPossible = totalMarksPossible;
     }
     /**
+     * If using for a display screen then showMarks controls whether or not
+     * to show the average and top marks for the session. If using for the "get answers"
+     * screens, then this controls whether or not to show the marks for each question -
+     * this allows us to NOT show the marks if ALL of the questions have a mark of 1.
      * @return Returns the showMarks.
      */
     public String getShowMarks() {
         return showMarks;
     }
     /**
+     * See getShowMarks() for the meaning of "showMarks".
      * @param showMarks The showMarks to set.
      */
     public void setShowMarks(String showMarks) {

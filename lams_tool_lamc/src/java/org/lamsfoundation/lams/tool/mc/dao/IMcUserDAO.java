@@ -79,15 +79,6 @@ public interface IMcUserDAO {
      */
     public void removeMcUserById(Long userId);
     
-    /**
-     * Returns the number of users that are in this particular
-     * session.
-     * 
-     * @param nbSession
-     * @return the number of users that are in this session
-     */
-    public int getNumberOfUsers(McSession mcSession);
-    
     public List getMcUserBySessionOnly(final McSession mcSession);
     
     public int getTotalNumberOfUsers(McContent mcContent);
@@ -96,4 +87,6 @@ public interface IMcUserDAO {
     
     public int countUserComplete(McContent mcContent);
    
+    /** Get the max, min and average mark (in that order) for a session */
+    public Integer[] getMarkStatisticsForSession(Long sessionUid);
 }

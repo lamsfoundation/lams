@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McLearnerStarterDTO;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
@@ -269,6 +270,27 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    mcLearningForm.setToolContentID(mcContent.getMcContentId().toString());
 	    commonContentSetup(request, mcContent, mcService,mcLearningForm, toolSessionID);
 	    
+ 	    /* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
+	    boolean isRunOffline=McUtils.isRunOffline(mcContent);
+	    logger.debug("isRunOffline: " + isRunOffline);
+	    if (isRunOffline == true)
+	    {
+	        logger.debug("the activity is offline.");
+			logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
+			
+	    	logger.debug("fwding to :" + RUN_OFFLINE);
+			return (mapping.findForward(RUN_OFFLINE));
+	    }
+
+	    /* find out if the content is being modified at the moment. */
+	    boolean isDefineLater=McUtils.isDefineLater(mcContent);
+	    logger.debug("isDefineLater: " + isDefineLater);
+	    if (isDefineLater == true)
+	    {
+	    	logger.debug("fwding to :" + DEFINE_LATER);
+	    	return (mapping.findForward(DEFINE_LATER));
+	    }
+
 	    
     	/* Is the request for a preview by the author?
     	Preview The tool must be able to show the specified content as if it was running in a lesson. 
@@ -278,7 +300,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			teacher
 			learner
 		*/
-       
+
 	    /*handle PREVIEW mode*/
 	    //String mode=mcLearningForm.getLearningMode();
 	    String mode=request.getParameter(MODE);
@@ -289,13 +311,12 @@ public class McLearningStarterAction extends Action implements McAppConstants {
     		logger.debug("Author requests for a preview of the content.");
     	}
 	    
-    	/* by now, we know that the mode is either teacher or learner
+	   	/* by now, we know that the mode is either teacher or learner
     	 * check if the mode is teacher and request is for Learner Progress
     	 */
 		String userId=request.getParameter(USER_ID);
 		logger.debug("userId: " + userId);
-		
-		
+	    
 		if ((userId != null) && (mode.equals("teacher")))
 		{
 			logger.debug("request is for learner progress");
@@ -341,28 +362,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		}
     	
 		/* by now, we know that the mode is learner*/
-	    
-	    /* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
-	    boolean isRunOffline=McUtils.isRunOffline(mcContent);
-	    logger.debug("isRunOffline: " + isRunOffline);
-	    if (isRunOffline == true)
-	    {
-	        logger.debug("the activity is offline.");
-			logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
-			
-	    	logger.debug("fwding to :" + RUN_OFFLINE);
-			return (mapping.findForward(RUN_OFFLINE));
-	    }
-
-	    /* find out if the content is being modified at the moment. */
-	    boolean isDefineLater=McUtils.isDefineLater(mcContent);
-	    logger.debug("isDefineLater: " + isDefineLater);
-	    if (isDefineLater == true)
-	    {
-	    	logger.debug("fwding to :" + DEFINE_LATER);
-	    	return (mapping.findForward(DEFINE_LATER));
-	    }
-
     	/*
 	     * verify that userId does not already exist in the db.
 	     * If it does exist, that means, that user already responded to the content and 
@@ -370,97 +369,41 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     * 
 	     */
 
-		String userID = "";
+		Integer userID = null;
 	    HttpSession ss = SessionManager.getSession();
-	    logger.debug("ss: " + ss);
-	    
 	    if (ss != null)
 	    {
 		    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		    if ((user != null) && (user.getUserID() != null))
+		    if (user != null)
 		    {
-		    	userID = user.getUserID().toString();
-			    logger.debug("retrieved userId: " + userID);
+		    	userID = user.getUserID();
 		    }
 	    }
 
-	    
-    	McQueUsr mcQueUsr=mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
-	    logger.debug("mcQueUsr:" + mcQueUsr);
-	    
-	    if (mcQueUsr != null)
-	    {
-	    	logger.debug("mcQueUsr is available in the db:" + mcQueUsr);
-	    	Long queUsrId=mcQueUsr.getUid();
-			logger.debug("queUsrId: " + queUsrId);
-			
-			int highestAttemptOrder=LearningUtil.getHighestAttemptOrder(request, queUsrId, mcService);
-			logger.debug("highestAttemptOrder: " + highestAttemptOrder);
-			if (highestAttemptOrder == 0)
-				highestAttemptOrder=1;
-			logger.debug("highestAttemptOrder: " + highestAttemptOrder);
-			
-			int learnerBestMark=LearningUtil.getHighestMark(request, queUsrId, mcService);
-			logger.debug("learnerBestMark: " + learnerBestMark);
-	    }
-	    else
-	    {
-	    	logger.debug("mcQueUsr is not available in the db:" + mcQueUsr);
-	    }
-	    
-	    logger.debug("users learning mode is: " + mode);
+    	McQueUsr mcQueUsr=mcService.getMcUserBySession(new Long(userID.longValue()), mcSession.getUid());
+    	if ( logger.isDebugEnabled())
+    		logger.debug("mcQueUsr:" + mcQueUsr);
+
 	    request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 
 	    boolean viewSummaryRequested=false;
 	    /*if the user's session id AND user id exists in the tool tables go to redo questions.*/
 	    if (mcQueUsr != null)
 	    {
-	        viewSummaryRequested=mcQueUsr.isViewSummaryRequested();
-	        logger.debug("viewSummaryRequested: " + viewSummaryRequested);
-	        
-	        //if (viewSummaryRequested)
-	        //{
-		    	Long sessionUid=mcQueUsr.getMcSessionId();
-		    	logger.debug("users sessionUid: " + sessionUid);
-		    	McSession mcUserSession= mcService.getMcSessionByUID(sessionUid);
-		    	logger.debug("mcUserSession: " + mcUserSession);
-		    	String userSessionId=mcUserSession.getMcSessionId().toString();
-		    	logger.debug("userSessionId: " + userSessionId);
-		    	
-		    	logger.debug("current toolSessionID: " + toolSessionID);
-		    	
-		    	if (toolSessionID.equals(userSessionId))
-		    	{
-		    		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionID + " mcQueUsr: " + 
-		    				mcQueUsr + " user id: " + mcQueUsr.getQueUsrId());
-		    		logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
-		    		
-		    		boolean isRetries=mcContent.isRetries();
-		    		logger.debug("isRetries: " + isRetries);
-		    		McLearningAction mcLearningAction= new McLearningAction();
-			    	logger.debug("present to learner with previous attempts data");
-			    	
-			    	String sessionStatus=mcUserSession.getSessionStatus(); 
-			    	logger.debug("sessionStatus: " +sessionStatus);
-			    	/*one limitation by design here is that once a user finishes the activity, subsequent users in the same group are also assumed finished
-			    	 * since they belong to the same ungrouped activity and these users have the same tool session id*/
-			    	
-			    	boolean isResponseFinalised=mcQueUsr.isResponseFinalised();
-			    	logger.debug("isResponseFinalised: " +isResponseFinalised);
-			    	
-			    	if (isResponseFinalised)
-			    	{
-				    	mcLearningForm.setReportViewOnly(new Boolean(true).toString());		    	    
-			    	}
-			    	else
-			    	{
-			    	    mcLearningForm.setReportViewOnly(new Boolean(false).toString());
-			    	}
+	    	Long sessionUid=mcQueUsr.getMcSessionId();
+	    	McSession mcUserSession= mcService.getMcSessionByUID(sessionUid);
+	    	String userSessionId=mcUserSession.getMcSessionId().toString();
+	    	
+	    	if (toolSessionID.equals(userSessionId))
+	    	{
+	    		McLearningAction mcLearningAction= new McLearningAction();
 
-			    	request.setAttribute(REQUEST_BY_STARTER, new Boolean (true).toString());
-			    	return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
-		    	}
-	        //}
+		    	/*one limitation by design here is that once a user finishes the activity, subsequent users in the same group are also assumed finished
+		    	 * since they belong to the same ungrouped activity and these users have the same tool session id*/
+		    	mcLearningForm.setReportViewOnly(new Boolean(mcQueUsr.isResponseFinalised()).toString());		    	    
+		    	request.setAttribute(REQUEST_BY_STARTER, (Boolean.TRUE).toString());
+		    	return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
+	    	}
 	    }
 	    else if (mode.equals("teacher"))
 	    {
@@ -492,7 +435,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		boolean randomize=mcContent.isRandomize();
 		logger.debug("randomize: " + randomize);
 		
-		List listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, randomize, mcService);
+		List<McLearnerAnswersDTO> listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, randomize, mcService);
 		
 		logger.debug("listQuestionAndCandidateAnswersDTO: " + listQuestionAndCandidateAnswersDTO);
 		request.setAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO, listQuestionAndCandidateAnswersDTO);
@@ -500,8 +443,13 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		
 		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
 		mcGeneralLearnerFlowDTO.setTotalCountReached(new Boolean(false).toString());
-		mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(1).toString());
+		mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(1));
 		
+	    // should we show the marks for each question - we show the marks if any of the questions
+	    // have a mark > 1.
+	    Boolean showMarks = LearningUtil.isShowMarksOnQuestion(listQuestionAndCandidateAnswersDTO);
+	    mcGeneralLearnerFlowDTO.setShowMarks(showMarks.toString());
+
 	    logger.debug("is tool reflective: " + mcContent.isReflect());
 	    mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 		logger.debug("reflection subject: " + mcContent.getReflectionSubject());

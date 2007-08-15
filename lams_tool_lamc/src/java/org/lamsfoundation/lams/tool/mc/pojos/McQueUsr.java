@@ -63,6 +63,10 @@ public class McQueUsr implements Serializable {
     /** persistent field */
     private Set mcUsrAttempts;
 
+    private Integer lastAttemptOrder;
+    
+    private Integer lastAttemptTotalMark;
+    
     /** full constructor */
     public McQueUsr(Long queUsrId, String username, String fullname,  org.lamsfoundation.lams.tool.mc.pojos.McSession mcSession, Set mcUsrAttempts) {
         this.queUsrId = queUsrId;
@@ -149,6 +153,14 @@ public class McQueUsr implements Serializable {
     public String toString() {
         return new ToStringBuilder(this)
             .append("uid", getUid())
+            .append("queUsrId", getQueUsrId())
+            .append("username", getUsername())
+            .append("fullname", getFullname())
+            .append("responseFinalised", isResponseFinalised())
+            .append("viewSummaryRequested", isViewSummaryRequested())
+            .append("mcSessionId", getMcSessionId())
+            .append("lastAttemptOrder", getLastAttemptOrder())
+            .append("lastAttemptTotalMark", getLastAttemptTotalMark())
             .toString();
     }
 
@@ -176,4 +188,40 @@ public class McQueUsr implements Serializable {
     public void setViewSummaryRequested(boolean viewSummaryRequested) {
         this.viewSummaryRequested = viewSummaryRequested;
     }
+
+	public Integer getLastAttemptOrder() {
+		return lastAttemptOrder;
+	}
+
+	public void setLastAttemptOrder(Integer lastAttemptOrder) {
+		this.lastAttemptOrder = lastAttemptOrder;
+	}
+
+	public Integer getLastAttemptTotalMark() {
+		return lastAttemptTotalMark;
+	}
+
+	public void setLastAttemptTotalMark(Integer lastAttemptTotalMark) {
+		this.lastAttemptTotalMark = lastAttemptTotalMark;
+	}
+	
+	/** Is the latest attempt a pass? True if and only if passmark is applicable for
+	 * the related content and the user's lastAttemptTotalMark >= passmark. 
+	 */
+	public boolean isLastAttemptMarkPassed() {
+		return isMarkPassed(lastAttemptTotalMark);
+	}
+	
+	/** Does this mark count as a pass? True if and only if passmark is applicable for
+	 * the related content and the given mark >= passmark. Used to calculate
+	 * if the user has passed before setting up the learner's attempts. 
+	 */
+	public boolean isMarkPassed(Integer mark) {
+		McContent content = mcSession.getMcContent();
+		if ( mark != null && content.isPassMarkApplicable() ) {
+			Integer passMark = content.getPassMark();
+			return passMark!=null && (mark.compareTo(passMark) >= 0); 
+		}
+		return false;
+	}
 }

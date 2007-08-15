@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.mc.dao;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 
 
@@ -83,33 +84,35 @@ public interface IMcUsrAttemptDAO
 	public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt);
 	
 	/**
-	 *  * <p>returns the highest mark of a learner  
-	 * with the given identifier <code>queUsrId</code> </p>
+	 * <p>gets all the attempts (for all questions) for one user in one tool session </p>
 	 * 
 	 * @param queUsrId
 	 * @return 
 	 */
-	public List getHighestMark(Long queUsrId);
+	public List getUserAttemptsForSession(Long queUsrId);
 
 	/**
-	 *  * <p>returns the highest mark of a learner  
-	 * with the given identifier <code>queUsrId</code> </p>
-	 * 
-	 * @param queUsrId
-	 * @return 
-	 */	
-	public List getHighestAttemptOrder(Long queUsrId);
+	 * Get the most recent attempts (for all questions) for one user in one tool session
+	 * @param queUserUid
+	 * @return
+	 */
+	public List getLatestAttemptsForAUser(Long queUserUid);
 	
 	/**
-	 *  * <p>returns a list of attempts  
-	 * with the given identifiers <code>queUsrId</code> and <code>mcQueContentId</code> </p>
+	 * <p>gets all the attempts for one questions for one user in one tool session <code>queUsrId</code>,
+	 * ordered by the attempt id. If there is more than one option selected for a question, the attempts 
+	 * are "batched". </p>
 	 * 
 	 * @param queUsrId
-	 * @param mcQueContentId
 	 * @return 
 	 */
-	public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId);
+	public List<McUsrAttempt> getAllAttemptsForAUserForOneQuestionContentOrderByAttempt(Long queUsrUid,  Long mcQueContentId);
 	
+	/** 
+	 * Get the highest attempt order for a user for a particular question 
+	 */
+	public List<McUsrAttempt> getLatestAttemptsForAUserForOneQuestionContent(Long queUsrUid, Long mcQueContentId);
+
 	/**
 	 *  * <p>returns a list of attempts  
 	 * with the given identifiers <code>queUsrId</code> and <code>mcQueContentId</code> and <code>attemptOrder</code> </p>
@@ -119,35 +122,8 @@ public interface IMcUsrAttemptDAO
 	 * @param attemptOrder
 	 * @return 
 	 */
-	public List getAttemptByAttemptOrder(final Long queUsrId, final Long mcQueContentId, final Integer attemptOrder);
-	
-	/**
-	 *  * <p>returns a list of marks
-	 * 
-	 * @return 
-	 */
-	
-	public List getAttemptsForUser(final Long queUsrId);
-	
-	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long mcQueContentId);
-	
-	public List getUserAttemptsForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid);
-	
-	public McUsrAttempt getAttemptWithLastAttemptOrderForUserInSession(Long queUsrUid, final Long mcSessionUid);
-	
-	public List getAttemptsForUserInSession(final Long queUsrUid, final Long mcSessionUid);
-	
-	public List getAttemptsForUserOnHighestAttemptOrderInSession(final Long queUsrUid, final Long mcSessionUid, final Integer attemptOrder);
-	
-	public List getAttemptsOnHighestAttemptOrder(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder);
-	
-	public boolean getUserAttemptCorrectForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder);
-	
-	public List getMarks();
-	
-	public List getMarksForContent(McContent mcContent);
-	
-	public McUsrAttempt getUserAttemptForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder);
+	public List getAttemptByAttemptOrder(final Long queUsrUid, final Long mcQueContentId, final Integer attemptOrder);
+		
 }
 
 

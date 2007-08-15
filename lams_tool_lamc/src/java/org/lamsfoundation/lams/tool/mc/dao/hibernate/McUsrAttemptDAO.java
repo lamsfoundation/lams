@@ -22,14 +22,11 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -37,29 +34,32 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 /**
  * @author Ozgur Demirtas
  * <p>Hibernate implementation for database access to McUsrAttempt for the mc tool.</p>
+ * <p>Be very careful about the queUserId and the McQueUser.uid fields. McQueUser.queUsrId is the core's user id for this user and McQueUser.uid 
+ * is the primary key for McQueUser. McUsrAttempt.queUsrId = McQueUser.uid, not McUsrAttempt.queUsrId = McQueUser.queUsrId
+ * as you would expect. A new McQueUser object is created for each new tool session, so if the McQueUser.uid is supplied, then this
+ * denotes one user in a particular tool session, but if McQueUser.queUsrId is supplied, then this is just the user, not the session and the session
+ * must also be checked.
  */
 public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemptDAO {
 	 	static Logger logger = Logger.getLogger(McUsrAttemptDAO.class.getName());
 	 	
-	 	private static final String LOAD_HIGHEST_MARK_BY_USER_ID = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId";
+	 	private static final String LOAD_ATTEMPT_BY_USER_SESSION = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrUid";
+	 		 	
+	 	private static final String LOAD_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrUid"
+	 		+" and mcUsrAttempt.mcQueContentId=:mcQueContentId and mcUsrAttempt.attemptOrder=:attemptOrder"
+	 		+" order by mcUsrAttempt.attemptOrder, mcUsrAttempt.mcOptionsContent.uid";
 	 	
-	 	private static final String LOAD_HIGHEST_ATTEMPT_ORDER_BY_USER_ID = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId";
-	 	
-	 	private static final String LOAD_ATTEMPT_FOR_QUE_CONTENT = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId and mcUsrAttempt.mcQueContentId=:mcQueContentId";
-	 	
-	 	private static final String LOAD_ATTEMPT_FOR_USER		 = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId";
-	 	
-	 	private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT	 = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId and mcUsrAttempt.mcQueContentId=:mcQueContentId";
-	 	
-	 	private static final String LOAD_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId and mcUsrAttempt.mcQueContentId=:mcQueContentId and attemptOrder=:attemptOrder";
-	 	
-	 	private static final String LOAD_ATTEMPT_FOR_QUESTION_CONTENT	 = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueContentId=:mcQueContentId";
-	 	
-	 	private static final String LOAD_MARK = "from mcUsrAttempt in class McUsrAttempt";
-	 	
-	 	private static final String LOAD_ATTEMPTS_ON_HIGHEST_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.attemptOrder=:attemptOrder";
-	 	
-	 	private static final String LOAD_HIGHEST_MARK = "from mcUsrAttempt in class McUsrAttempt";
+	 	private static final String LOAD_LAST_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
+	 		+" and mcUsrAttempt.mcQueContentId=:mcQueContentId and mcUsrAttempt.attemptOrder=mcUsrAttempt.mcQueUsr.lastAttemptOrder" 
+	 		+" order by mcUsrAttempt.mcOptionsContent.uid";
+
+	 	private static final String LOAD_ATTEMPT_FOR_QUESTION_CONTENT	 = "from mcUsrAttempt in class McUsrAttempt "
+	 		+" where mcUsrAttempt.mcQueContentId=:mcQueContentId and mcUsrAttempt.queUsrId=:queUsrUid"
+	 		+" order by mcUsrAttempt.attemptOrder";
+
+	 	private static final String LOAD_LAST_ATTEMPTS = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
+	 		+" and mcUsrAttempt.attemptOrder=mcUsrAttempt.mcQueUsr.lastAttemptOrder"
+ 			+" order by mcUsrAttempt.mcQueContentId, mcUsrAttempt.mcOptionsContent.uid";
 	 	
 	 	public McUsrAttempt getMcUserAttemptByUID(Long uid)
 		{
@@ -72,388 +72,43 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	    	this.getHibernateTemplate().save(mcUsrAttempt);
 	    }
 	    
-		public List getHighestMark(Long queUsrId)
+		public List getUserAttemptsForSession(Long queUsrUid)
 	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_HIGHEST_MARK_BY_USER_ID)
-				.setLong("queUsrId", queUsrId.longValue())
+			List list = getSession().createQuery(LOAD_ATTEMPT_BY_USER_SESSION)
+				.setLong("queUsrUid", queUsrUid.longValue())
 				.list();
 			
 			return list;
 	    }
 		
-		public List getMarks()
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_MARK)
+		public List getLatestAttemptsForAUser(final Long queUserUid) {
+			return (List) getSession().createQuery(LOAD_LAST_ATTEMPTS)
+				.setLong("queUsrUid", queUserUid.longValue())
 				.list();
-			
-			return list;
-	    }
+		}
 
-		public List getMarksForContent(McContent mcContent)
-	    {
-		    logger.debug("running getMarksForContent for mcContent:"  + mcContent);
-		    logger.debug("running getMarksForContent for mcContent uid :"  + mcContent.getUid());
-		    
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_MARK)
+		// should be able to get rid of this one by rewriting export portfolio
+		@SuppressWarnings("unchecked")
+		public List<McUsrAttempt> getLatestAttemptsForAUserForOneQuestionContent(final Long queUsrUid, final Long mcQueContentId) {
+			return (List<McUsrAttempt>) getSession().createQuery(LOAD_LAST_ATTEMPT_BY_ATTEMPT_ORDER)
+				.setLong("queUsrUid", queUsrUid.longValue())
+				.setLong("mcQueContentId", mcQueContentId.longValue())
 				.list();
+		}
 
-			List userEntries= new ArrayList();
-			
-			if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    	    McUsrAttempt attempt=(McUsrAttempt)listIterator.next();
-		    	    logger.debug("attempt:"  + attempt);
-		    	    logger.debug("attempt content uid:"  + attempt.getMcQueContent().getMcContent().getUid());
-		    	    
-		    	    if (attempt.getMcQueContent().getMcContent().getUid() == mcContent.getUid())
-		    	    {
-		    	        logger.debug("same content found:"  + mcContent);
-		    	        userEntries.add(attempt);
-		    	    }
-		    	}
-			}
-			
-			logger.debug("returning userEntries:"  + userEntries);
-			return userEntries;
-	    }
-
-		
-		
-		public List getHighestAttemptOrder(Long queUsrId)
+		@SuppressWarnings("unchecked")
+		public List<McUsrAttempt> getAllAttemptsForAUserForOneQuestionContentOrderByAttempt(final Long queUsrUid,  final Long mcQueContentId)
 	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_HIGHEST_ATTEMPT_ORDER_BY_USER_ID)
-				.setLong("queUsrId", queUsrId.longValue())
-				.list();
-			return list;
-	    }
-		
-		
-		public List getAttemptsForUser(final Long queUsrId)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER)
-			.setLong("queUsrId", queUsrId.longValue())
-			.list();
-			return list;
-	    }
-		
-		public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long mcQueContentId)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT)
-			.setLong("queUsrId", queUsrId.longValue())
+	        return (List<McUsrAttempt>)getSession().createQuery(LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
 			.setLong("mcQueContentId", mcQueContentId.longValue())
+			.setLong("queUsrUid", queUsrUid.longValue())
 			.list();
-	        
-			return list;
-	    }
-		
-		public List getUserAttemptsForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid)
-	    {
-		    logger.debug("starting getUserAttemptsForQuestionContentAndSessionUid:");
-		    logger.debug("queUsrUid:"  + queUsrUid);
-		    logger.debug("mcQueContentId:"  + mcQueContentId);
-		    logger.debug("mcSessionUid:"  + mcSessionUid);
-		    
-	        HibernateTemplate templ = this.getHibernateTemplate();
-	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
-			.setLong("mcQueContentId", mcQueContentId.longValue())
-			.list();
-	        
-	        List userEntries= new ArrayList();
-			if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    	    McUsrAttempt attempt=(McUsrAttempt)listIterator.next();
-		    	    logger.debug("attempt:"  + attempt);
-		    	    
-		    	    if (attempt.getMcQueUsr().getUid().toString().equals(queUsrUid.toString()))
-		    	    {
-		    	        logger.debug("queUsrUid equal:"  + queUsrUid);
-			    	    if (attempt.getMcQueUsr().getMcSession().getUid().toString().equals(mcSessionUid.toString()))
-			    	    {
-			    	        logger.debug("user belong to this session:"  + mcSessionUid);
-			    	        userEntries.add(attempt);    
-			    	    }
-		    	        
-		    	    }
-		    	}
-			}
-			logger.debug("userEntries:"  + userEntries);
-			return userEntries;
-	    }
-		
-
-		public List getAttemptsOnHighestAttemptOrder(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder)
-	    {
-		    logger.debug("starting getUserAttemptsForQuestionContentAndSessionUid:");
-		    logger.debug("queUsrUid:"  + queUsrUid);
-		    logger.debug("mcQueContentId:"  + mcQueContentId);
-		    logger.debug("mcSessionUid:"  + mcSessionUid);
-		    logger.debug("attemptOrder:"  + attemptOrder);
-		    
-	        HibernateTemplate templ = this.getHibernateTemplate();
-	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
-			.setLong("mcQueContentId", mcQueContentId.longValue())
-			.list();
-	        
-	        List userEntries= new ArrayList();
-			if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    	    McUsrAttempt attempt=(McUsrAttempt)listIterator.next();
-		    	    logger.debug("attempt:"  + attempt);
-		    	    
-		    	    if (attempt.getMcQueUsr().getUid().toString().equals(queUsrUid.toString()))
-		    	    {
-		    	        logger.debug("queUsrUid equal:"  + queUsrUid);
-			    	    if (attempt.getMcQueUsr().getMcSession().getUid().toString().equals(mcSessionUid.toString()))
-			    	    {
-			    	        logger.debug("user belongs to this session:"  + mcSessionUid);
-			    	        
-			    	        if (attempt.getAttemptOrder().intValue() == attemptOrder.intValue()) 
-			    	            userEntries.add(attempt);    
-			    	    }
-		    	        
-		    	    }
-		    	}
-			}
-			logger.debug("userEntries:"  + userEntries);
-			return userEntries;
 	    }
 
-		
-		public List getAttemptsForUserInSession(final Long queUsrUid, final Long mcSessionUid)
+		public List getAttemptByAttemptOrder(final Long queUsrUid, final Long mcQueContentId, final Integer attemptOrder)
 	    {
-		    logger.debug("starting getAttemptsForUserInSession:");
-		    logger.debug("queUsrUid:"  + queUsrUid);
-		    logger.debug("mcSessionUid:"  + mcSessionUid);
-		    
-	        HibernateTemplate templ = this.getHibernateTemplate();
-	        List list = getSession().createQuery(LOAD_MARK)
-			.list();
-	        
-	        List userEntries= new ArrayList();
-			if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    	    McUsrAttempt attempt=(McUsrAttempt)listIterator.next();
-		    	    logger.debug("attempt:"  + attempt);
-		    	    
-		    	    if (attempt.getMcQueUsr().getUid().toString().equals(queUsrUid.toString()))
-		    	    {
-		    	        logger.debug("queUsrUid equal:"  + queUsrUid);
-			    	    if (attempt.getMcQueUsr().getMcSession().getUid().toString().equals(mcSessionUid.toString()))
-			    	    {
-			    	        logger.debug("user belong to this session:"  + mcSessionUid);
-			    	        userEntries.add(attempt);    
-			    	    }
-		    	        
-		    	    }
-		    	}
-			}
-			logger.debug("userEntries:"  + userEntries);
-			return userEntries;
-	    }
-
-		
-		public List getAttemptsForUserOnHighestAttemptOrderInSession(final Long queUsrUid, final Long mcSessionUid, final Integer attemptOrder)
-	    {
-		    logger.debug("starting getAttemptsForUserOnHighestAttemptOrderInSession:");
-		    logger.debug("queUsrUid:"  + queUsrUid);
-		    logger.debug("mcSessionUid:"  + mcSessionUid);
-		    
-	        HibernateTemplate templ = this.getHibernateTemplate();
-	        List list = getSession().createQuery(LOAD_ATTEMPTS_ON_HIGHEST_ATTEMPT_ORDER)
-			.setInteger("attemptOrder", attemptOrder.intValue())
-			.list();
-	        
-	        List userEntries= new ArrayList();
-			if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    	    McUsrAttempt attempt=(McUsrAttempt)listIterator.next();
-		    	    logger.debug("attempt:"  + attempt);
-		    	    
-		    	    if (attempt.getMcQueUsr().getUid().toString().equals(queUsrUid.toString()))
-		    	    {
-		    	        logger.debug("queUsrUid equal:"  + queUsrUid);
-			    	    if (attempt.getMcQueUsr().getMcSession().getUid().toString().equals(mcSessionUid.toString()))
-			    	    {
-			    	        logger.debug("user belong to this session:"  + mcSessionUid);
-			    	        userEntries.add(attempt);    
-			    	    }
-		    	        
-		    	    }
-		    	}
-			}
-			logger.debug("userEntries:"  + userEntries);
-			return userEntries;
-	    }
-
-
-		public boolean getUserAttemptCorrectForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder)
-	    {
-		    logger.debug("starting getUserAttemptsForQuestionContentAndSessionUid:");
-		    logger.debug("queUsrUid:"  + queUsrUid);
-		    logger.debug("mcQueContentId:"  + mcQueContentId);
-		    logger.debug("mcSessionUid:"  + mcSessionUid);
-		    logger.debug("attemptOrder:"  + attemptOrder);
-		    
-	        HibernateTemplate templ = this.getHibernateTemplate();
-	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
-			.setLong("mcQueContentId", mcQueContentId.longValue())
-			.list();
-	        
-	        if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    	    McUsrAttempt attempt=(McUsrAttempt)listIterator.next();
-		    	    logger.debug("attempt:"  + attempt);
-		    	    
-		    	    if (attempt.getMcQueUsr().getUid().toString().equals(queUsrUid.toString()))
-		    	    {
-		    	        logger.debug("queUsrUid equal:"  + queUsrUid);
-			    	    if (attempt.getMcQueUsr().getMcSession().getUid().toString().equals(mcSessionUid.toString()))
-			    	    {
-			    	        logger.debug("user belong to this session:"  + mcSessionUid);
-			    	        logger.debug("isAttemptCorrect:"  + attempt.isAttemptCorrect());
-			    	        if (attempt.getAttemptOrder().intValue() == attemptOrder.intValue())  
-			    	            return attempt.isAttemptCorrect(); 
-			    	    }
-		    	    }
-		    	}
-			}
-	        return false;
-	    }
-
-
-		public McUsrAttempt getUserAttemptForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder)
-	    {
-		    logger.debug("starting getUserAttemptsForQuestionContentAndSessionUid:");
-		    logger.debug("queUsrUid:"  + queUsrUid);
-		    logger.debug("mcQueContentId:"  + mcQueContentId);
-		    logger.debug("mcSessionUid:"  + mcSessionUid);
-		    logger.debug("attemptOrder:"  + attemptOrder);
-		    
-	        HibernateTemplate templ = this.getHibernateTemplate();
-	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
-			.setLong("mcQueContentId", mcQueContentId.longValue())
-			.list();
-	        
-	        if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    	    McUsrAttempt attempt=(McUsrAttempt)listIterator.next();
-		    	    logger.debug("attempt:"  + attempt);
-		    	    
-		    	    if (attempt.getMcQueUsr().getUid().toString().equals(queUsrUid.toString()))
-		    	    {
-		    	        logger.debug("queUsrUid equal:"  + queUsrUid);
-			    	    if (attempt.getMcQueUsr().getMcSession().getUid().toString().equals(mcSessionUid.toString()))
-			    	    {
-			    	        logger.debug("user belong to this session:"  + mcSessionUid);
-			    	        logger.debug("isAttemptCorrect:"  + attempt.isAttemptCorrect());
-			    	        if (attempt.getAttemptOrder().intValue() == attemptOrder.intValue())  
-			    	            return attempt; 
-			    	    }
-		    	    }
-		    	}
-			}
-	        return null;
-	    }
-
-		
-		
-		
-		public McUsrAttempt getAttemptWithLastAttemptOrderForUserInSession(Long queUsrUid, final Long mcSessionUid)
-	    {
-		    logger.debug("starting getLastAttemptOrderForUserInSession:");
-		    logger.debug("queUsrUid:"  + queUsrUid);
-		    logger.debug("mcSessionUid:"  + mcSessionUid);
-		    
-	        HibernateTemplate templ = this.getHibernateTemplate();
-	        List list = getSession().createQuery(LOAD_MARK)
-			.list();
-	        
-		    logger.debug("list:"  + list);
-	        
-	        List userEntries= new ArrayList();
-			if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    	    McUsrAttempt attempt=(McUsrAttempt)listIterator.next();
-		    	    logger.debug("attempt:"  + attempt);
-		    	    
-		    	    if (attempt.getMcQueUsr().getUid().toString().equals(queUsrUid.toString()))
-		    	    {
-		    	        logger.debug("queUsrUid equal:"  + queUsrUid);
-			    	    if (attempt.getMcQueUsr().getMcSession().getUid().toString().equals(mcSessionUid.toString()))
-			    	    {
-			    	        logger.debug("user belong to this session:"  + mcSessionUid);
-			    	        userEntries.add(attempt);    
-			    	    }
-		    	        
-		    	    }
-		    	}
-			}
-			logger.debug("userEntries:"  + userEntries);
-			
-			Iterator itAttempts=userEntries.iterator();
-			int highestOrder=0;
-			McUsrAttempt mcHighestUsrAttempt=null;
-			
-			while (itAttempts.hasNext())
-			{
-	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttempts.next();
-	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
-	    		int currentOrder=mcUsrAttempt.getAttemptOrder().intValue();
-	    		logger.debug("currentOrder: " + currentOrder);
-	    		
-	    		if (currentOrder > highestOrder)
-	    		{
-	    		    mcHighestUsrAttempt=mcUsrAttempt;
-	    		    highestOrder=currentOrder;
-	    		    logger.debug("highestOrder is updated to: " + highestOrder);
-	    		}
-			}
-			
-			logger.debug("returning mcHighestUsrAttempt: " + mcHighestUsrAttempt);
-			logger.debug("highestOrder has become: " + highestOrder);
-			logger.debug("returning mcHighestUsrAttempt: " + mcHighestUsrAttempt);
-			return mcHighestUsrAttempt;
-	    }
-		
-		
-		public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_QUE_CONTENT)
-			.setLong("queUsrId", queUsrId.longValue())
-			.setLong("mcQueContentId", mcQueContentId.longValue())				
-			.list();
-			return list;
-	    }
-		
-		
-		public List getAttemptByAttemptOrder(final Long queUsrId, final Long mcQueContentId, final Integer attemptOrder)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
 	        List list = getSession().createQuery(LOAD_ATTEMPT_BY_ATTEMPT_ORDER)
-			.setLong("queUsrId", queUsrId.longValue())
+			.setLong("queUsrUid", queUsrUid.longValue())
 			.setLong("mcQueContentId", mcQueContentId.longValue())
 			.setInteger("attemptOrder", attemptOrder.intValue())
 			.list();
@@ -479,5 +134,5 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 			this.getSession().setFlushMode(FlushMode.AUTO);
 	        this.getHibernateTemplate().delete(mcUsrAttempt);
 	    }
-	 	
+		
 } 

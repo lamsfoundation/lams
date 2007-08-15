@@ -267,6 +267,18 @@ public class McQueContent implements Serializable, Comparable {
         this.mcOptionsContents = mcOptionsContents;
     }
 
+    /** Get an options content record by its uid. Iterates
+     * over the set from  getMcOptionsContents(). */
+    public McOptsContent getOptionsContentByUID(Long uid) {
+    	Iterator iter = getMcOptionsContents().iterator();
+    	while (iter.hasNext()) {
+			McOptsContent elem = (McOptsContent) iter.next();
+			if ( elem.getUid().equals(uid))
+				return elem;
+		}
+    	return null;
+    }
+    
     public String toString() {
         return new ToStringBuilder(this)
             .append("uid", getUid())

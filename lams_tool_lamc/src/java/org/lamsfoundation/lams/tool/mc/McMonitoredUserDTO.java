@@ -22,6 +22,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -47,7 +48,7 @@ public class McMonitoredUserDTO implements Comparable
 	
 	private String isCorrect;
 	
-	private String mark;
+	private Integer mark;
 	
 	private String response;
 	
@@ -55,7 +56,7 @@ public class McMonitoredUserDTO implements Comparable
 	
 	private String questionUid;
     
-    private Map usersAttempts;
+    private Map<Integer,String> usersAttempts;
 	
 	/**
 	 * @return Returns the queUsrId.
@@ -72,19 +73,28 @@ public class McMonitoredUserDTO implements Comparable
 	
 	public String toString() {
         return new ToStringBuilder(this)
-            .append("queUsrId and username", getQueUsrId() + " and " + getUserName())
+            .append("queUsrId", queUsrId)
+            .append("username", userName)
+            .append("isCorrect", isCorrect)
+            .append("mark", mark)
+            .append("sessionId", sessionId)
+            .append("questionUid", questionUid)
+            .append("usersAttempts", usersAttempts)
             .toString();
     }
 	/**
+	 * UserAttempts is a map, where the key is the attemptOrder and the value is String array with the text of the attempt.
+	 * At present, the string array will be of length one, but if we ever support more than one answer to a question then this
+	 * will need to be changed to a list of strings.
 	 * @return Returns the usersAttempts.
 	 */
-	public Map getUsersAttempts() {
+	public Map<Integer,String> getUsersAttempts() {
 		return usersAttempts;
 	}
 	/**
 	 * @param usersAttempts The usersAttempts to set.
 	 */
-	public void setUsersAttempts(Map usersAttempts) {
+	public void setUsersAttempts(Map<Integer,String> usersAttempts) {
 		this.usersAttempts = usersAttempts;
 	}
 	
@@ -196,13 +206,13 @@ public class McMonitoredUserDTO implements Comparable
     /**
      * @return Returns the mark.
      */
-    public String getMark() {
+    public Integer getMark() {
         return mark;
     }
     /**
      * @param mark The mark to set.
      */
-    public void setMark(String mark) {
+    public void setMark(Integer mark) {
         this.mark = mark;
     }
 }

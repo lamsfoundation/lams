@@ -484,9 +484,6 @@ public abstract class McUtils implements McAppConstants {
     	request.getSession().removeAttribute(CURRENT_QUESTION_INDEX);
     	request.getSession().removeAttribute(TOTAL_QUESTION_COUNT);
     	request.getSession().removeAttribute(LEARNER_MARK);
-    	request.getSession().removeAttribute(LEARNER_BEST_MARK);
-    	request.getSession().removeAttribute(LEARNER_LAST_ATTEMPT_ORDER);
-    	request.getSession().removeAttribute(LEARNER_MARK_ATLEAST);
     	request.getSession().removeAttribute(MAP_ANSWERS);
     	request.getSession().removeAttribute(CURRENT_ANSWER);
     	request.getSession().removeAttribute(USER_FEEDBACK);

@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.tool.mc.service;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
@@ -78,9 +80,7 @@ public interface IMcService
     public void createMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;
     
     public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;
-    
-    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long mcQueContentId) throws McApplicationException; 
-    
+       
     public McQueContent retrieveMcQueContentByUID(Long uid) throws McApplicationException;
 	
     public void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException;
@@ -105,8 +105,6 @@ public interface IMcService
     
     public List findMcOptionUidsByQueId(Long mcQueContentId)  throws McApplicationException;
     
-    public McOptsContent findMcOptionsContentByUid(Long uid) throws McApplicationException;
-    
     public McQueContent findMcQuestionContentByUid(Long uid) throws McApplicationException;
     
     public void removeMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException;
@@ -123,7 +121,7 @@ public interface IMcService
     
     public List getCorrectOption(Long mcQueContentId);
     
-    public List getAllQuestionEntries(final Long mcContentId) throws McApplicationException;
+    public List<McQueContent> getAllQuestionEntries(final Long mcContentId) throws McApplicationException;
     
     public McSession retrieveMcSession(Long mcSessionId) throws McApplicationException;
     
@@ -140,6 +138,8 @@ public interface IMcService
     public List populateCandidateAnswersDTO(Long mcQueContentId) throws McApplicationException;
     
     public McSession getMcSessionByUID(Long uid) throws McApplicationException;
+    
+    public List getLatestAttemptsForAUser(final Long queUserUid) throws McApplicationException;
     
     public void deleteMc(McContent mc) throws McApplicationException;
     
@@ -179,18 +179,18 @@ public interface IMcService
     
 	public boolean studentActivityOccurredGlobal(McContent mcContent) throws McApplicationException;
 	
-	public List getUserAttemptsForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid) throws McApplicationException;
-	
-	public boolean getUserAttemptCorrectForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder) throws McApplicationException;
-	
-	public List getAttemptsForUserInSession(final Long queUsrUid, final Long mcSessionUid) throws McApplicationException;
-	
-	public List getAttemptsForUserOnHighestAttemptOrderInSession(final Long queUsrUid, final Long mcSessionUid, final Integer attemptOrder) throws McApplicationException;
-	
-	public List getAttemptsOnHighestAttemptOrder(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder) throws McApplicationException;
-	
-	public McUsrAttempt getAttemptWithLastAttemptOrderForUserInSession(Long queUsrUid, final Long mcSessionUid) throws McApplicationException;
-	
+	/**
+	 * <p>gets all the attempts for one questions for one user in one tool session <code>queUsrId</code>,
+	 * ordered by the attempt id. If there is more than one option selected for a question, the attempts 
+	 * are "batched". </p>
+	 * 
+	 * @param queUsrId
+	 * @return 
+	 */
+	public List<McUsrAttempt> getAllAttemptsForAUserForOneQuestionContentOrderByAttempt(Long queUsrUid,  Long mcQueContentId) throws McApplicationException;
+
+	public List<McUsrAttempt> getLatestAttemptsForAUserForOneQuestionContent(Long queUsrUid, Long mcQueContentId) throws McApplicationException;
+
 	public int countIncompleteSession(McContent mc) throws McApplicationException;
 	
 	public boolean studentActivityOccurred(McContent mc) throws McApplicationException;
@@ -239,17 +239,7 @@ public interface IMcService
     
     public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent) throws McApplicationException;
     
-    public List getHighestMark(Long queUsrId) throws McApplicationException;
-    
-    public List getHighestAttemptOrder(Long queUsrId) throws McApplicationException;
-    
-	public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId) throws McApplicationException;
-	
 	public List getAttemptByAttemptOrder(final Long queUsrId, final Long mcQueContentId, final Integer attemptOrder) throws McApplicationException;
-	
-	public List getAttemptsForUser(final Long queUsrId) throws McApplicationException;
-	
-	public List getMarks() throws McApplicationException;
 	
 	public int countSessionComplete() throws McApplicationException;
 	
@@ -286,9 +276,12 @@ public interface IMcService
     
     public List retrieveMcUploadedFiles(McContent mcContent) throws McApplicationException;
     
-    public List getMarksForContent(McContent mcContent) throws McApplicationException;
-    
-    public McUsrAttempt getUserAttemptForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder) throws McApplicationException;    
-    
+    /**
+     * Return the top, lowest and average mark for all learners for one particular tool session.
+     * @param request
+     * @return top mark, lowest mark, average mark in that order
+     */
+    public Integer[] getMarkStatistics(McSession mcSession);
+     
 }
 

@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -502,5 +504,27 @@ public class McContent implements Serializable {
      */
     public void setRandomize(boolean randomize) {
         this.randomize = randomize;
+    }
+    
+    /**
+     * Get total possible marks for this content. Iterates over the McQueContents set 
+     */
+    public Integer getTotalMarksPossible() {
+
+    	int totalMarksPossible=0;
+	    Iterator itQuestions=getMcQueContents().iterator() ;
+	    while (itQuestions.hasNext())
+	    {
+	        McQueContent mcQueContent = (McQueContent)itQuestions.next(); 
+	        Integer mark=mcQueContent.getMark();
+	        totalMarksPossible += (mark!=null ? mark.intValue() : 0);
+	    }
+	    logger.debug("totalMarksPossible: " + totalMarksPossible);
+	    
+	    return new Integer(totalMarksPossible);
+    }
+    
+    public boolean isPassMarkApplicable() {
+    	return passMark != null;
     }
 }

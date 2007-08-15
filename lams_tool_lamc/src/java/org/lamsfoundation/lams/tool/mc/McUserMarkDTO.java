@@ -22,6 +22,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
+import java.util.Collection;
 import java.util.LinkedList;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -39,8 +40,8 @@ public class McUserMarkDTO implements Comparable
     private String sessionName;
     private String queUsrId;
     private String userName;
-    private LinkedList marks; 
-    private String totalMark;
+    private Integer[] marks; 
+    private Long totalMark;
 
 	public String toString() {
         return new ToStringBuilder(this)
@@ -57,13 +58,13 @@ public class McUserMarkDTO implements Comparable
     /**
      * @return Returns the marks.
      */
-    public LinkedList getMarks() {
+    public Integer[] getMarks() {
         return marks;
     }
     /**
      * @param marks The marks to set.
      */
-    public void setMarks(LinkedList marks) {
+    public void setMarks(Integer[] marks) {
         this.marks = marks;
     }
     /**
@@ -117,13 +118,13 @@ public class McUserMarkDTO implements Comparable
     /**
      * @return Returns the totalMark.
      */
-    public String getTotalMark() {
+    public Long getTotalMark() {
         return totalMark;
     }
     /**
      * @param totalMark The totalMark to set.
      */
-    public void setTotalMark(String totalMark) {
+    public void setTotalMark(Long totalMark) {
         this.totalMark = totalMark;
     }
     /**

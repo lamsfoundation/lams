@@ -46,25 +46,10 @@ public class McMonitoredAnswersDTO implements Comparable
 	
 	private String sessionName;
 	
-	private List candidateAnswers;
-	
 	private List candidateAnswersCorrect;
 	
 	private Map questionAttempts;
 	
-	
-	/**
-	 * @return Returns the candidateAnswers.
-	 */
-	public List getCandidateAnswers() {
-		return candidateAnswers;
-	}
-	/**
-	 * @param candidateAnswers The candidateAnswers to set.
-	 */
-	public void setCandidateAnswers(List candidateAnswers) {
-		this.candidateAnswers = candidateAnswers;
-	}
 	/**
 	 * @return Returns the question.
 	 */
@@ -108,7 +93,6 @@ public class McMonitoredAnswersDTO implements Comparable
         return new ToStringBuilder(this)
             .append("questionUid: ", questionUid)
             .append("question: ", question)
-            .append("candidateAnswers: ", candidateAnswers)            
             .append("questionAttempts: ", questionAttempts)
             .append("candidateAnswersCorrect:", candidateAnswersCorrect)
             .toString();

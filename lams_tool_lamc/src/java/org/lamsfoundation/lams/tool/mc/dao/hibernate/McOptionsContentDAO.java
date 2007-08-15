@@ -44,8 +44,6 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	 	
 	 	//private static final String FIND_MC_OPTIONS_CONTENT = "from " + McOptsContent.class.getName() + " as mco where mc_que_content_id=?";
 	 	private static final String FIND_MC_OPTIONS_CONTENT = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid order by mcOptsContent.displayOrder";
-	 	private static final String FIND_MC_OPTIONS_CONTENT_BY_UID = "from mcOptsContent in class McOptsContent where mcOptsContent.uid=:uid";
-	 	
 	 	private static final String LOAD_OPTION_CONTENT_BY_OPTION_TEXT = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueOptionText=:option and mcOptsContent.mcQueContentId=:mcQueContentUid";
 	 	
 	 	private static final String LOAD_PERSISTED_SELECTED_OPTIONS = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid and  mcOptsContent.correctOption = 1";
@@ -70,23 +68,6 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 					.setLong("mcQueContentUid",mcQueContentId.longValue())
 					.list();
 				return list;
-			}
-			return null;
-	    }
-
-	 	
-	 	public McOptsContent findMcOptionsContentByUid(Long uid)
-	    {
-			HibernateTemplate templ = this.getHibernateTemplate();
-			if ( uid != null) {
-				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT_BY_UID)
-					.setLong("uid",uid.longValue())
-					.list();
-				
-				if(list != null && list.size() > 0){
-					McOptsContent mco = (McOptsContent) list.get(0);
-					return mco;
-				}
 			}
 			return null;
 	    }

@@ -34,12 +34,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class McTempDataHolderDTO implements Comparable
 {
-    protected String learnerMark;
-    protected String totalUserWeight;
-    protected String totalUserMark;
-    protected String totalReportableUserMark;
-    protected String totalMarksPossible;
-    protected String displayOrder;
+    protected Integer learnerMark;
+    protected Integer totalMarksPossible;
+    protected Integer displayOrder;
 
     
 	public int compareTo(Object o)
@@ -55,9 +52,6 @@ public class McTempDataHolderDTO implements Comparable
 	public String toString() {
         return new ToStringBuilder(this)
             .append("learnerMark: ", learnerMark)
-            .append("totalUserWeight : ", totalUserWeight)
-            .append("totalUserMark : ", totalUserMark)
-            .append("totalReportableUserMark : ", totalReportableUserMark)
             .append("totalMarksPossible : ", totalMarksPossible)
             .append("displayOrder : ", displayOrder)
             .toString();
@@ -66,74 +60,37 @@ public class McTempDataHolderDTO implements Comparable
     /**
      * @return Returns the learnerMark.
      */
-    public String getLearnerMark() {
+    public Integer getLearnerMark() {
         return learnerMark;
     }
     /**
      * @param learnerMark The learnerMark to set.
      */
-    public void setLearnerMark(String learnerMark) {
+    public void setLearnerMark(Integer learnerMark) {
         this.learnerMark = learnerMark;
-    }
-    /**
-     * @return Returns the totalUserWeight.
-     */
-    public String getTotalUserWeight() {
-        return totalUserWeight;
-    }
-    /**
-     * @param totalUserWeight The totalUserWeight to set.
-     */
-    public void setTotalUserWeight(String totalUserWeight) {
-        this.totalUserWeight = totalUserWeight;
-    }
-    /**
-     * @return Returns the totalUserMark.
-     */
-    public String getTotalUserMark() {
-        return totalUserMark;
-    }
-    /**
-     * @param totalUserMark The totalUserMark to set.
-     */
-    public void setTotalUserMark(String totalUserMark) {
-        this.totalUserMark = totalUserMark;
-    }
-    
-    /**
-     * @return Returns the totalReportableUserMark.
-     */
-    public String getTotalReportableUserMark() {
-        return totalReportableUserMark;
-    }
-    /**
-     * @param totalReportableUserMark The totalReportableUserMark to set.
-     */
-    public void setTotalReportableUserMark(String totalReportableUserMark) {
-        this.totalReportableUserMark = totalReportableUserMark;
     }
     /**
      * @return Returns the totalMarksPossible.
      */
-    public String getTotalMarksPossible() {
+    public Integer getTotalMarksPossible() {
         return totalMarksPossible;
     }
     /**
      * @param totalMarksPossible The totalMarksPossible to set.
      */
-    public void setTotalMarksPossible(String totalMarksPossible) {
+    public void setTotalMarksPossible(Integer totalMarksPossible) {
         this.totalMarksPossible = totalMarksPossible;
     }
     /**
      * @return Returns the displayOrder.
      */
-    public String getDisplayOrder() {
+    public Integer getDisplayOrder() {
         return displayOrder;
     }
     /**
      * @param displayOrder The displayOrder to set.
      */
-    public void setDisplayOrder(String displayOrder) {
+    public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
     }
 }

@@ -44,8 +44,6 @@ public interface IMcOptionsContentDAO
 
 	public List findMcOptionUidsByQueId(Long mcQueContentId);
 	
-	public McOptsContent findMcOptionsContentByUid(Long uid);
-	
 	/**
 	 *  <p>Return a list of a McOptsContents  
 	 * with the given identifier <code>mcQueContentId</code>, returns null if not found. </p>

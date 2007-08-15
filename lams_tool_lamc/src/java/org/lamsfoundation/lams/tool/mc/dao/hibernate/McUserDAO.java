@@ -43,11 +43,11 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 	
 	private static final String COUNT_USERS_IN_SESSION = "select mu.queUsrId from McQueUsr mu where mu.mcSession= :mcSession";
 	
-	private static final String COUNT_USERS = "select mu.queUsrId from McQueUsr";
-	
 	private static final String LOAD_USER_FOR_SESSION = "from mcQueUsr in class McQueUsr where  mcQueUsr.mcSessionId= :mcSessionId";
    
-    
+ 	private static final String CALC_MARK_STATS_FOR_SESSION = "select max(mu.lastAttemptTotalMark), min(mu.lastAttemptTotalMark), avg(mu.lastAttemptTotalMark)"
+ 		+" from McQueUsr mu where mu.mcSessionId = :mcSessionUid";
+
    public McQueUsr getMcUserByUID(Long uid)
 	{
 		 return (McQueUsr) this.getHibernateTemplate()
@@ -137,14 +137,6 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
     }
     
 
-    public int getNumberOfUsers(McSession mcSession)
-    {
-        return (getHibernateTemplate().findByNamedParam(COUNT_USERS_IN_SESSION,
-	            "mcSession",
-				mcSession)).size();
-    }  
-    
-    
     public int getTotalNumberOfUsers() {
 		String query="from obj in class McQueUsr"; 
 		return this.getHibernateTemplate().find(query).size();
@@ -221,5 +213,17 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 		logger.debug("final totalUserCount: " + totalUserCount);
         return totalUserCount;
     }
+    
+    /** Get the max, min and average mark (in that order) for a session */
+	public Integer[] getMarkStatisticsForSession(Long sessionUid)
+	{
+		Object[] stats = (Object[]) getSession().createQuery(CALC_MARK_STATS_FOR_SESSION)
+			.setLong("mcSessionUid",sessionUid.longValue())
+			.uniqueResult();
+		
+		return new Integer[]{(Integer)stats[0], (Integer)stats[1], new Integer(((Float)stats[2]).intValue())};
+	}	
+
+
     
 }

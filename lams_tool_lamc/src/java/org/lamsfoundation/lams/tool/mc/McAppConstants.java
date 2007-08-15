@@ -192,8 +192,6 @@ public interface McAppConstants {
     
     public static final String DEFAULT_FEEDBACK_INCORRECT				="Your answer is incorrect";
     public static final String DEFAULT_FEEDBACK_CORRECT					="Correct";    
-    public static final String PASSMARK_APPLICABLE						="passMarkApplicable";
-    public static final String USER_OVER_PASSMARK						="userOverPassMark";
     
     public static final String TITLE									="title";
     public static final String INSTRUCTIONS								="instructions";
@@ -270,9 +268,6 @@ public interface McAppConstants {
     public static final String TOTAL_QUESTION_COUNT						="totalQuestionCount";
     public static final String HR_COLUMN_COUNT							="hrColumnCount";
     public static final String LEARNER_MARK								="learnerMark";
-    public static final String LEARNER_BEST_MARK						="learnerBestMark";
-    public static final String LEARNER_LAST_ATTEMPT_ORDER				="learnerLastAttemptOrder";
-    public static final String LEARNER_MARK_ATLEAST						="learnerMarkAtLeast";
     public static final String MAP_ANSWERS								="mapAnswers";
     public static final String CURRENT_ANSWER							="currentAnswer";
     public static final String USER_FEEDBACK							="userFeedback";

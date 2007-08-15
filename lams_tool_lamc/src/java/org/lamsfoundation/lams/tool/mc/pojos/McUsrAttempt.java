@@ -275,4 +275,18 @@ public class McUsrAttempt implements Serializable {
     public void setFinished(boolean finished) {
         this.finished = finished;
     }
+    
+	/** Get the mark for displaying to the user. 
+	 * If retries or passmark is off, then just check whether or not answer is correct
+	 * If retries and passmark is on, then we only want the marks if the user has passed!
+	 */
+	public Integer getMarkForShow( boolean allowRetries ) {
+    	if ( isAttemptCorrect() && 
+   			( !allowRetries || (allowRetries && isPassed()) ) )  {
+    		return getMark();
+    	} else {
+    		return new Integer(0);
+    	}
+	}
+
 }

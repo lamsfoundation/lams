@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
@@ -483,21 +485,6 @@ public class McServicePOJO implements
     }
     
     
-    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long mcQueContentId) throws McApplicationException
-	{
-        try
-        {
-        	return mcUsrAttemptDAO.getAttemptsForUserAndQuestionContent(queUsrId, mcQueContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is getting mc UsrAttempt by user id and que content id: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-    
-    
 	public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException
     {
         try
@@ -511,68 +498,6 @@ public class McServicePOJO implements
 														   e);
         }
     }
-	
-   
-	public List getHighestMark(Long queUsrId) throws McApplicationException
-	{
-        try
-        {
-        	return mcUsrAttemptDAO.getHighestMark(queUsrId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is getting the learner's highest mark: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	
-
-	public List getHighestAttemptOrder(Long queUsrId) throws McApplicationException
-	{
-        try
-        {
-        	return mcUsrAttemptDAO.getHighestAttemptOrder(queUsrId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is getting the learner's highest attempt order: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-
-	
-	public List getAttemptsForUser(final Long queUsrId) throws McApplicationException
-	{
-        try
-        {
-        	return mcUsrAttemptDAO.getAttemptsForUser(queUsrId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is getting the attempts by user id: "
-                                                         + e.getMessage(),
-														   e);
-        }
-		
-	}
-	
-	
-	public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId) throws McApplicationException
-	{
-        try
-        {
-        	return mcUsrAttemptDAO.getAttemptForQueContent(queUsrId, mcQueContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is getting the learner's attempts by user id and que content id: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-	
 	
 	public List getAttemptByAttemptOrder(final Long queUsrId, final Long mcQueContentId, final Integer attemptOrder) throws McApplicationException
 	{
@@ -588,7 +513,56 @@ public class McServicePOJO implements
         }
 	}
 	
+	public List getLatestAttemptsForAUser(final Long queUserUid) throws McApplicationException
+	{
+        try
+        {
+        	return mcUsrAttemptDAO.getLatestAttemptsForAUser(queUserUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting the learner's attempts by user id and que content id and attempt order: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+	   
+	/**
+	 * <p>gets all the attempts for one questions for one user in one tool session <code>queUsrId</code>,
+	 * ordered by the attempt id. If there is more than one option selected for a question, the attempts 
+	 * are "batched". </p>
+	 * 
+	 * @param queUsrId
+	 * @return 
+	 */
+	public List<McUsrAttempt> getAllAttemptsForAUserForOneQuestionContentOrderByAttempt(final Long queUsrUid,  final Long mcQueContentId) throws McApplicationException
+    {
+    	try
+        {
+    		return mcUsrAttemptDAO.getAllAttemptsForAUserForOneQuestionContentOrderByAttempt(queUsrUid, mcQueContentId);
+        }
+        catch(DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting attempts. "
+                                                 + e.getMessage(),e);
+        }        
+    }    
     
+
+	public List getLatestAttemptsForAUserForOneQuestionContent(Long queUsrUid, Long mcQueContentId) throws McApplicationException
+	{
+        try
+        {
+        	return mcUsrAttemptDAO.getLatestAttemptsForAUserForOneQuestionContent(queUsrUid, mcQueContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting the learner's attempts by user id and que content id and attempt order: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+	   
     public McQueContent retrieveMcQueContentByUID(Long uid) throws McApplicationException
     {
         try
@@ -618,11 +592,11 @@ public class McServicePOJO implements
         }    	
 	}
     
-    public List getAllQuestionEntries(final Long uid) throws McApplicationException
+    public List<McQueContent> getAllQuestionEntries(final Long uid) throws McApplicationException
 	{
 	   try
         {
-            return mcQueContentDAO.getAllQuestionEntries(uid.longValue());
+            return (List<McQueContent>) mcQueContentDAO.getAllQuestionEntries(uid.longValue());
         }
         catch (DataAccessException e)
         {
@@ -940,131 +914,17 @@ public class McServicePOJO implements
 	}
     
     
-    public List getMarksForContent(McContent mcContent) throws McApplicationException
+    /**
+     * Return the top, lowest and average mark for all learners for one particular tool session.
+     * 
+     * @param request
+     * @return top mark, lowest mark, average mark in that order
+     */
+    public Integer[] getMarkStatistics(McSession mcSession)
     {
-    	try
-        {
-    		return mcUsrAttemptDAO.getMarksForContent(mcContent);
-        }
-        catch(DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is getting marks "
-                                                 + e.getMessage(),e);
-        }        
+        logger.debug("getting mark statistics on mcSession: " + mcSession.getUid());
+        return mcUserDAO.getMarkStatisticsForSession(mcSession.getUid());
     }
-    
-    public List getMarks() throws McApplicationException
-	{
-    	try
-        {
-    		return mcUsrAttemptDAO.getMarks();
-        }
-        catch(DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is getting marks "
-                                                 + e.getMessage(),e);
-        }
-	}
-    
-    
-    public McUsrAttempt getAttemptWithLastAttemptOrderForUserInSession(Long queUsrUid, final Long mcSessionUid) throws McApplicationException
-    {
-    	try
-        {
-    		return mcUsrAttemptDAO.getAttemptWithLastAttemptOrderForUserInSession(queUsrUid, mcSessionUid);
-        }
-        catch(DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is getting last attempt order for user in session"
-                                                 + e.getMessage(),e);
-        }        
-    }
-
-    
-    public List getUserAttemptsForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid)
-    {
-    	try
-        {
-    		return mcUsrAttemptDAO.getUserAttemptsForQuestionContentAndSessionUid(queUsrUid, mcQueContentId, mcSessionUid);
-        }
-        catch(DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is getting marks based on userid, sessionid and que content id "
-                                                 + e.getMessage(),e);
-        }
-    }
-    
-    
-    public List getAttemptsForUserOnHighestAttemptOrderInSession(final Long queUsrUid, final Long mcSessionUid, final Integer attemptOrder) throws McApplicationException
-    {
-    	try
-        {
-    		return mcUsrAttemptDAO.getAttemptsForUserOnHighestAttemptOrderInSession(queUsrUid, mcSessionUid, attemptOrder);
-        }
-        catch(DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is finding whether attempt is correct based on userid, sessionid"
-                                                 + e.getMessage(),e);
-        }        
-    }
-    
-    public List getAttemptsOnHighestAttemptOrder(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder) throws McApplicationException
-    {
-    	try
-        {
-    		return mcUsrAttemptDAO.getAttemptsOnHighestAttemptOrder(queUsrUid, mcQueContentId, mcSessionUid, attemptOrder);
-        }
-        catch(DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is getting attempts on hightest attempt order"
-                                                 + e.getMessage(),e);
-        }        
-    }
-    
-    public List getAttemptsForUserInSession(final Long queUsrUid, final Long mcSessionUid) throws McApplicationException
-    {
-    	try
-        {
-    		return mcUsrAttemptDAO.getAttemptsForUserInSession(queUsrUid, mcSessionUid);
-        }
-        catch(DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is finding whether attempt is correct based on userid, sessionid"
-                                                 + e.getMessage(),e);
-        }
-    }
-    
-
-    public boolean getUserAttemptCorrectForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid,  final Integer attemptOrder) throws McApplicationException
-    {
-    	try
-        {
-    		return mcUsrAttemptDAO.getUserAttemptCorrectForQuestionContentAndSessionUid(queUsrUid, mcQueContentId, mcSessionUid, attemptOrder);
-        }
-        catch(DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is finding whether attempt is correct based on userid, sessionid and que content id "
-                                                 + e.getMessage(),e);
-        }
-    }
-    
-    
-    
-    public McUsrAttempt getUserAttemptForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder) throws McApplicationException
-    {
-    	try
-        {
-    		return mcUsrAttemptDAO.getUserAttemptForQuestionContentAndSessionUid(queUsrUid,  mcQueContentId, mcSessionUid, attemptOrder);
-        }
-        catch(DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is running getUserAttemptForQuestionContentAndSessionUid:"
-                                                 + e.getMessage(),e);
-        }        
-    }
-    
-    
-    
     
     public void deleteMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException
     {
@@ -1149,19 +1009,6 @@ public class McServicePOJO implements
             throw new McApplicationException("Exception occured when lams is getting que content by uid"
                                                  + e.getMessage(),e);
         }
-    }
-    
-    public McOptsContent findMcOptionsContentByUid(Long uid) throws McApplicationException
-    {
-    	try
-        {
-            return mcOptionsContentDAO.findMcOptionsContentByUid(uid);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is getting opts by uid"
-                                                 + e.getMessage(),e);
-        }        
     }
     
     public void saveMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException
