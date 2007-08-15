@@ -64,7 +64,9 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
             Integer endXcoord,
             Integer endYcoord,
 			Boolean stopAfterActivity,
-            Set activities,
+			Set inputActivities,
+			Set activities,
+			Activity defaultActivity,
             SystemTool systemTool) {
         super(activityId, 
                 id, 
@@ -90,7 +92,9 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
 	            endXcoord,
 	            endYcoord,
 	            stopAfterActivity,
+				inputActivities,
 	            activities,
+	            defaultActivity,
 	            systemTool);
     }
 

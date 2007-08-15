@@ -81,6 +81,7 @@ public class ToolActivity extends SimpleActivity implements Serializable
             Transition transitionFrom,
             String languageFile,
             Boolean stopAfterActivity,
+			Set inputActivities,
             Tool tool,
             Long toolContentId)
     {
@@ -103,7 +104,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
                 transitionTo,
 				transitionFrom,
 				languageFile,
-                stopAfterActivity);
+                stopAfterActivity,
+    			inputActivities);
         this.tool = tool;
         this.toolContentId = toolContentId;
         super.simpleActivityStrategy = new ToolActivityStrategy(this);

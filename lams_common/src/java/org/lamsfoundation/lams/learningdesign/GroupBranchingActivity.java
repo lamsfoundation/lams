@@ -64,7 +64,9 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
             Integer endXcoord,
             Integer endYcoord,
 			Boolean stopAfterActivity,
+			Set inputActivities,
             Set activities,
+			Activity defaultActivity,
             SystemTool systemTool) {
         super(activityId, 
                 id, 
@@ -90,7 +92,9 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
 	            endXcoord,
 	            endYcoord,
 	            stopAfterActivity,
+				inputActivities,
                 activities,
+    			defaultActivity,
                 systemTool);
     }
 

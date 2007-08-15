@@ -517,7 +517,7 @@ CREATE TABLE lams_learning_activity (
      , system_tool_id BIGINT(20)
      , read_only TINYINT DEFAULT 0
      , initialised TINYINT DEFAULT 0
-     , first_activity_id BIGINT(20)
+     , default_activity_id BIGINT(20)
      , start_xcoord INT(11)
      , start_ycoord INT(11)
      , end_xcoord INT(11)
@@ -560,6 +560,18 @@ CREATE TABLE lams_learning_activity (
      , INDEX (system_tool_id)
      , CONSTRAINT FK_lams_learning_activity_14 FOREIGN KEY (system_tool_id)
                   REFERENCES lams_system_tool (system_tool_id)
+)TYPE=InnoDB;
+
+CREATE TABLE lams_input_activity (
+       activity_id BIGINT(20) NOT NULL
+     , input_activity_id BIGINT(20) NOT NULL
+     , UNIQUE UQ_lams_input_activity_1 (activity_id, input_activity_id)
+     , INDEX (activity_id)
+     , CONSTRAINT FK_lams_input_activity_1 FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (activity_id)
+     , CONSTRAINT FK_lams_input_activity_2 FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_group_branch_activity (

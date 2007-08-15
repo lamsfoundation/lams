@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.GroupingActivityStrategy;
@@ -71,6 +72,7 @@ public class GroupingActivity extends SimpleActivity implements Serializable, IS
 			Integer create_grouping_ui_id,
 			String languageFile,
 			Boolean stopAfterActivity,
+			Set inputActivities,
             SystemTool sysTool)
     {
         super(activityId, 
@@ -92,7 +94,8 @@ public class GroupingActivity extends SimpleActivity implements Serializable, IS
                 transitionTo,
 				transitionFrom,
 				languageFile,
-                stopAfterActivity);
+                stopAfterActivity,
+                inputActivities);
         this.createGrouping = createGrouping;        
         this.createGroupingUIID = create_grouping_ui_id;
         this.systemTool = sysTool;

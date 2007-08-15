@@ -106,6 +106,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
             Transition transitionFrom,
             String languageFile,
             Boolean stopAfterActivity,
+			Set inputActivities,
             Integer gateActivityLevelId,
             Long gateStartTimeOffset, 
             Long gateEndTimeOffset,
@@ -131,6 +132,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 				transitionFrom,
 				languageFile,
                 stopAfterActivity,
+    			inputActivities,
                 gateActivityLevelId,
                 waitingLearners,
                 sysTool);

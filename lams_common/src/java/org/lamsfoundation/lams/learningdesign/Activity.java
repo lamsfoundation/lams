@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
@@ -140,7 +141,7 @@ public abstract class Activity implements Serializable,Nullable {
 	private Integer orderId;
 
 	/** Indicates whether the content of this activity 
-	 * would be defined later in the monitoring enviornment or not.*/
+	 * would be defined later in the monitoring environment or not.*/
 	private Boolean defineLater;
 	
 	/** Indicates whether this activity is available offline*/
@@ -215,6 +216,13 @@ public abstract class Activity implements Serializable,Nullable {
 	 * final activity of a design does not necessarily have this set - the progress engine will just
 	 * stop when it runs out of transitions to follow. */
 	private Boolean stopAfterActivity;
+	
+    /**
+     * The activities that supplied inputs to this activity.
+     */
+    private Set inputActivities;
+    
+ 
    //---------------------------------------------------------------------
     // Object constructors
     //---------------------------------------------------------------------
@@ -244,7 +252,8 @@ public abstract class Activity implements Serializable,Nullable {
 			Transition transitionTo,
 			Transition transitionFrom,
 			String languageFile,
-			Boolean stopAfterActivity) {
+			Boolean stopAfterActivity,
+			Set inputActivities) {
 		this.activityId = activityId;
 		this.activityUIID = id;
 		this.description = description;
@@ -267,6 +276,7 @@ public abstract class Activity implements Serializable,Nullable {
 		this.readOnly = false;
 		this.initialised = false;
 		this.stopAfterActivity = stopAfterActivity;
+		this.inputActivities = inputActivities;
 	}	
 	/** default constructor */
 	public Activity() {
@@ -599,6 +609,23 @@ public abstract class Activity implements Serializable,Nullable {
 	public void setStopAfterActivity(Boolean stopAfterActivity) {
 		this.stopAfterActivity = stopAfterActivity;
 	}	
+
+    /**
+     * @return Returns the inputActivities.
+     */
+    public Set getInputActivities()
+    {
+        if(this.inputActivities == null)
+            this.setInputActivities(new HashSet());
+        return inputActivities;
+    }
+    /**
+     * @param InputActivities The InputActivities to set.
+     */
+    public void setInputActivities(Set inputActivities)
+    {
+        this.inputActivities = inputActivities;
+    }
 
 	public String toString() {
 		return new ToStringBuilder(this)
@@ -1007,6 +1034,7 @@ public abstract class Activity implements Serializable,Nullable {
 	   	newActivity.setOrderId(this.getOrderId());
 	   	newActivity.setReadOnly(this.getReadOnly());
 	   	newActivity.setStopAfterActivity(this.isStopAfterActivity());
+	   	
    }
 	
 	

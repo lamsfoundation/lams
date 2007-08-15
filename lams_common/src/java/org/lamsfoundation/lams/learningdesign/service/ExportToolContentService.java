@@ -1364,7 +1364,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 							+"The first activity should be reset up in authoring "
 							+"otherwise the progress engine will just do the best it can.");
 				} else {
-					sequence.setFirstActivity(childActivity);
+					sequence.setDefaultActivity(childActivity);
 				}
 			}
 		}
@@ -1774,8 +1774,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				((OptionsActivity)act).setOptionsInstructions(actDto.getOptionsInstructions());
 				break;
 			case Activity.SEQUENCE_ACTIVITY_TYPE:
-				if ( actDto.getFirstActivityUIID() != null ) {
-					firstChildUIIDToSequenceMapper.put(actDto.getFirstActivityUIID(), (SequenceActivity)act);
+				if ( actDto.getDefaultActivityUIID() != null ) {
+					firstChildUIIDToSequenceMapper.put(actDto.getDefaultActivityUIID(), (SequenceActivity)act);
 				}
 				break;
 			case Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE:

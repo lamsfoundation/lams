@@ -95,6 +95,7 @@ public interface WDDXTAGS {
 	public static final String APPLY_GROUPING = "applyGrouping";
 	public static final String GROUPING_SUPPORT_TYPE = "groupingSupportType";
 	public static final String STOP_AFTER_ACTIVITY = "stopAfterActivity";
+	public static final String INPUT_ACTIVITIES = "inputActivities";
 	
 	/** OptionsActivity specific tags*/
 	public static final String MAX_OPTIONS="maxOptions";
@@ -182,6 +183,7 @@ public interface WDDXTAGS {
 	
 	/**ComplexActivity specific tags */
 	public static final String CHILD_ACTIVITIES ="childActivities";
+	public static final String DEFAULT_ACTIVITY_UIID ="defaultActivityUIID";
 	
 	/** Crash Dump Specific Tags */
 	public static final String CRASH_DUMP_BATCH="crashDataBatch";

@@ -81,6 +81,7 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
             Transition transitionFrom,
             String languageFile,
             Boolean stopAfterActivity,
+			Set inputActivities,
             Integer gateActivityLevelId,
             Set waitingLearners,
             SystemTool sysTool)
@@ -104,7 +105,8 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
                 transitionTo,
 				transitionFrom,
 				languageFile,
-                stopAfterActivity);
+                stopAfterActivity,
+    			inputActivities);
         this.gateActivityLevelId = gateActivityLevelId;
         this.waitingLearners = waitingLearners;
         this.systemTool = sysTool;

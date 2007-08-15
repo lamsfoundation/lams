@@ -401,7 +401,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		// now process the "parts" of the learning design
 		parseGroupings((Vector)table.get(WDDXTAGS.GROUPINGS));
 		parseActivities((Vector)table.get(WDDXTAGS.ACTIVITIES));
-		parseActivitiesToMatchUpParentActivityByParentUIID((Vector)table.get(WDDXTAGS.ACTIVITIES));
+		parseActivitiesToMatchUpParentandInputActivities((Vector)table.get(WDDXTAGS.ACTIVITIES));
 		parseTransitions((Vector)table.get(WDDXTAGS.TRANSITIONS));
 		parseBranchMappings((Vector)table.get(WDDXTAGS.BRANCH_MAPPINGS));
 		progressFirstActivityWithinSequence();
@@ -428,7 +428,7 @@ public class ObjectExtractor implements IObjectExtractor {
 						+") referred to in First Child to Sequence map.";
 			    	throw new WDDXProcessorConversionException(msg);
 				} else {
-					sequence.setFirstActivity(childActivity);
+					sequence.setDefaultActivity(childActivity);
 				}
 			}
 			
@@ -683,16 +683,15 @@ public class ObjectExtractor implements IObjectExtractor {
 	
 	/**
 	 * Because the activities list was processed before by the method parseActivities, it is assumed that 
-	 * all activities have already been saved into the database. Because the parent activity is already
-	 * created and saved, this method will go through the activity list and will match up the parentActivityID 
-	 * based on the parentUIID.
+	 * all activities have already been saved into the database. So now we can go through and find the any parent 
+	 * activity or input activities for an activity.
 	 * 
 	 * @param activitiesList
 	 * @param learningDesign
 	 * @throws WDDXProcessorConversionException
 	 * @throws ObjectExtractorException
 	 */
-	private void parseActivitiesToMatchUpParentActivityByParentUIID(List activitiesList) throws WDDXProcessorConversionException, ObjectExtractorException
+	private void parseActivitiesToMatchUpParentandInputActivities(List activitiesList) throws WDDXProcessorConversionException, ObjectExtractorException
 	{
 		if (activitiesList != null)
 		{
@@ -703,7 +702,8 @@ public class ObjectExtractor implements IObjectExtractor {
 				
 				Integer activityUUID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.ACTIVITY_UIID);
 				Activity existingActivity = newActivityMap.get(activityUUID); 
-				//match up id to parent based on UIID
+				
+				// match up activity to parent based on UIID
 				if (keyExists(activityDetails, WDDXTAGS.PARENT_UIID))
 			    {
 					Integer parentUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.PARENT_UIID);
@@ -725,6 +725,22 @@ public class ObjectExtractor implements IObjectExtractor {
 						existingActivity.setOrderId(null); // top level activities don't have order ids.
 					}
 			    }
+				
+				// match up activity to input activities based on UIID
+				existingActivity.getInputActivities().clear();
+				if ( keyExists(activityDetails, WDDXTAGS.INPUT_ACTIVITIES) ) {
+					List inputActivities = (List) activityDetails.get(WDDXTAGS.INPUT_ACTIVITIES);
+					Iterator iter = inputActivities.iterator();
+					while ( iter.hasNext() ) {
+						Integer inputActivityUIID = (Integer) iter.next();
+						Activity inputActivity = newActivityMap.get(inputActivityUIID);
+						if ( inputActivity == null ) {
+								throw new ObjectExtractorException("Input activity "+inputActivityUIID+" missing for activity "+existingActivity.getTitle()+": "+existingActivity.getActivityUIID());
+						}
+						existingActivity.getInputActivities().add(inputActivity);
+					}
+				} 
+				
 				activityDAO.update(existingActivity);
 				
 			}

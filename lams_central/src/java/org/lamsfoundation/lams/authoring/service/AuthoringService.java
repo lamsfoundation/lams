@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.Vector;
 import java.util.Date;
 
@@ -46,8 +45,8 @@ import org.hibernate.id.UUIDHexGenerator;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
@@ -785,17 +784,19 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     		}
     	}
     	
-      	// fix up any old "first activity" in the sequence activities
+      	// fix up any old "default activity" in the complex activities and the input activities
     	for ( Activity activity : activities) {
-    		if ( activity.isSequenceActivity() ) {
-    			SequenceActivity newSeq = (SequenceActivity) activity;
-    			Activity oldFirstActivity = newSeq.getFirstActivity();
-    			if ( oldFirstActivity != null ) {
-    				Activity newFirstActivity = newActivities.get(oldFirstActivity.getActivityUIID());
-    				newSeq.setFirstActivity(newFirstActivity);
+    		if ( activity.isComplexActivity() ) {
+    			ComplexActivity newComplex = (ComplexActivity) activity;
+    			Activity oldDefaultActivity = newComplex.getDefaultActivity();
+    			if ( oldDefaultActivity != null ) {
+    				Activity newDefaultActivity = newActivities.get(oldDefaultActivity.getActivityUIID());
+    				newComplex.setDefaultActivity(newDefaultActivity);
     			}
     		}
     	}
+    	
+    	// fix up the input activities
 
     	// Now go back and fix any branch mapping entries - they will still be pointing to old activities.
     	// Need to check if the sets are not null as these are new objects and Hibernate may not have

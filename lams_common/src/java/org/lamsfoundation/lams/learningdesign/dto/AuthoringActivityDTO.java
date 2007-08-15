@@ -23,7 +23,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -102,7 +104,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 	private Integer orderID;
 
 	/** Indicates whether the content of this activity 
-	 * would be defined later in the monitoring enviornment or not.*/
+	 * would be defined later in the monitoring environment or not.*/
 	private Boolean defineLater;
 	
 	/** The LearningDesign to which this activity belongs*/
@@ -214,8 +216,12 @@ public class AuthoringActivityDTO extends BaseDTO{
 	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
 	private String languageFile;
 	
-	/** Used by a sequence activity to determine the start of the transition based sequence */
-	private Integer firstActivityUIID;
+	/** List of the UIIDs of the activities that are input activities for this activity */
+	private ArrayList inputActivities;
+
+	/** Used by a sequence activity to determine the start of the transition based sequence and used by tool
+	 * based branching to determine the default branch. */
+	private Integer defaultActivityUIID;
 	
 	private Integer startXCoord;
 	private Integer startYCoord;
@@ -243,7 +249,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 			Boolean applyGrouping,Integer groupingSupportType,
 			Integer groupingType,GroupingDTO groupingDTO, 
 			Boolean readOnly, Boolean initialised, Boolean stopAfterActivity,
-			Integer firstActivityUIID,
+			ArrayList<Integer> inputActivities, Integer defaultActivityUIID,
 			Integer startXCoord, Integer startYCoord, Integer endXCoord, Integer endYCoord) {
 		super();
 		this.activityID = activityID;
@@ -289,8 +295,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.readOnly = readOnly;
 		this.initialised = initialised;
 		this.stopAfterActivity=stopAfterActivity;
-		// Sequence Activity field
-		this.firstActivityUIID = firstActivityUIID;
+		this.inputActivities=inputActivities;
+		// Complex Activity field
+		this.defaultActivityUIID = defaultActivityUIID;
 		// Branching Activity fields
 		this.startXCoord = startXCoord;
 		this.startYCoord = startYCoord;
@@ -339,6 +346,16 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.readOnly = activity.getReadOnly();
 		this.initialised = activity.isInitialised();
 		this.stopAfterActivity = activity.isStopAfterActivity();
+		
+		if ( activity.getInputActivities() != null && activity.getInputActivities().size() > 0 ) {
+			ArrayList<Integer> list = new ArrayList<Integer>();
+			Iterator iter = activity.getInputActivities().iterator();
+			while ( iter.hasNext() ) {
+				Activity inputAct = (Activity) iter.next();
+				list.add(inputAct.getActivityUIID());
+			}
+			this.inputActivities = list;
+		}
 	}
 	
 	
@@ -387,8 +404,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.endYCoord = activity.getEndYcoord();
 	}
 	private void addSequenceActivityAttributes(SequenceActivity activity){
-		if ( activity.getFirstActivity() != null )
-			firstActivityUIID = activity.getFirstActivity().getActivityUIID();
+		if ( activity.getDefaultActivity() != null )
+			defaultActivityUIID = activity.getDefaultActivity().getActivityUIID();
 	}
 	private void addToolActivityAttributes(ToolActivity toolActivity){
 		this.toolContentID = toolActivity.getToolContentId();
@@ -704,9 +721,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	public Integer getGroupingType() {
 		return groupingType;
 	}
-	/** Get the UI ID of the first activity within a sequence activity */
-	public Integer getFirstActivityUIID() {
-		return firstActivityUIID;
+	/** Get the UI ID of the first activity within a sequence activity or default branch in tool based branching */
+	public Integer getDefaultActivityUIID() {
+		return defaultActivityUIID;
 	}
 	/**
 	 * @return Returns the xcoord of the end hub for a branching activity
@@ -1032,9 +1049,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	public void setStopAfterActivity(Boolean stopAfterActivity) {
 		this.stopAfterActivity = stopAfterActivity;
 	}
-	public void setFirstActivityUIID(Integer firstActivityUIID) {
-		if(!firstActivityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-			this.firstActivityUIID = firstActivityUIID;
+	public void setDefaultActivityUIID(Integer defaultActivityUIID) {
+		if(!defaultActivityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
+			this.defaultActivityUIID = defaultActivityUIID;
 	}
 	public void setEndXCoord(Integer endXCoord) {
 		if(!endXCoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
@@ -1057,5 +1074,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 	}
 	public void setAdminURL(String adminURL) {
 		this.adminURL = adminURL;
+	}
+	public ArrayList getInputActivities() {
+		return inputActivities;
+	}
+	public void setInputActivities(ArrayList inputActivities) {
+		this.inputActivities = inputActivities;
 	}
 }

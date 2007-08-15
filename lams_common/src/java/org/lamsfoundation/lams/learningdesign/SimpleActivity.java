@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
@@ -57,7 +58,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
             Integer activityTypeId, Transition transitionTo,
 			Transition transitionFrom,
 			String languageFile,
-			Boolean stopAfterActivity){
+			Boolean stopAfterActivity,
+			Set inputActivities){
         super(activityId, 
                 id, 
                 description, 
@@ -77,7 +79,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
                 transitionTo,
 				transitionFrom,
 				languageFile,
-				stopAfterActivity);
+				stopAfterActivity,
+				inputActivities);
     }
     
     /** default constructor */

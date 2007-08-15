@@ -24,12 +24,9 @@
 package org.lamsfoundation.lams.learningdesign.strategy;
 
 import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.NullActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
@@ -70,7 +67,7 @@ public class SequenceActivityStrategy extends ComplexActivityStrategy
      */
 	public Activity getNextActivityByParent(ComplexActivity parent, Activity currentChild)
     {
-		Activity firstActivity = sequenceActivity.getFirstActivity();
+		Activity firstActivity = sequenceActivity.getDefaultActivity();
 		if ( firstActivity != null ) {
 			return (currentChild==null || currentChild.isNull() ) ? firstActivity : new NullActivity();
 		}

@@ -59,6 +59,7 @@ public class SystemGateActivity extends PermissionGateActivity implements Serial
             Transition transitionFrom,
             String languageFile,
             Boolean stopAfterActivity,
+			Set inputActivities,
             Integer gateActivityLevelId,
             Set waitingLearners,
             SystemTool sysTool) {
@@ -82,6 +83,7 @@ public class SystemGateActivity extends PermissionGateActivity implements Serial
 				transitionFrom,
 				languageFile,
                 stopAfterActivity,
+                inputActivities,
                 gateActivityLevelId,
                 waitingLearners,
                 sysTool);

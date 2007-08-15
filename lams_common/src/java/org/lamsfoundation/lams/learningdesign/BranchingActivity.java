@@ -73,7 +73,9 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
             Integer endXcoord,
             Integer endYcoord,
 			Boolean stopAfterActivity,
+			Set inputActivities,
             Set activities,
+			Activity defaultActivity,
             SystemTool systemTool) {
         super(activityId, 
                 id, 
@@ -95,7 +97,9 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 				transitionFrom,
 				languageFile,
 				stopAfterActivity,
-                activities);
+				inputActivities,
+                activities,
+    			defaultActivity);
         super.activityStrategy = new BranchingActivityStrategy(this);
         this.systemTool = systemTool;
         this.startXcoord = startXcoord;
@@ -205,6 +209,8 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 		newBranchingActivity.startYcoord = this.startYcoord;
 		newBranchingActivity.endXcoord = this.endXcoord;
 		newBranchingActivity.endYcoord = this.endYcoord;
+		newBranchingActivity.defaultActivity = this.defaultActivity;
 	}
+	
 
 }

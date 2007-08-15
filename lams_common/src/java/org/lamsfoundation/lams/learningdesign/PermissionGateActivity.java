@@ -60,6 +60,7 @@ public class PermissionGateActivity extends GateActivity implements Serializable
             Transition transitionFrom,
             String languageFile,
             Boolean stopAfterActivity,
+			Set inputActivities,
             Integer gateActivityLevelId,
             Set waitingLearners,
             SystemTool sysTool)
@@ -84,6 +85,7 @@ public class PermissionGateActivity extends GateActivity implements Serializable
 				transitionFrom,
 				languageFile,
                 stopAfterActivity,
+    			inputActivities,
                 gateActivityLevelId,
                 waitingLearners,
                 sysTool);

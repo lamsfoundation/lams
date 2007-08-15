@@ -42,9 +42,6 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 
 	private static Logger log = Logger.getLogger(SequenceActivity.class);
 	
-	/** nullable persistent field */
-	private Activity firstActivity;
-
 	private Set branchEntries;
 
     /** full constructor */
@@ -67,8 +64,10 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
             Transition transitionTo,
             Transition transitionFrom,
             String languageFile,
-            SortedSet activities,
 			Boolean stopAfterActivity,
+			Set inputActivities,
+			Set activities,
+			Activity defaultActivity,
             Set branchEntries) {
         super(activityId, 
                 id, 
@@ -90,7 +89,9 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 				transitionFrom,
 				languageFile,
 				stopAfterActivity,
-                activities);
+				inputActivities,
+                activities,
+                defaultActivity);
         super.activityStrategy = new SequenceActivityStrategy(this);
         this.branchEntries = branchEntries;
         
@@ -135,7 +136,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     public Activity createCopy(){
     	SequenceActivity newSequenceActivity = new SequenceActivity();
     	copyToNewActivity(newSequenceActivity);
-    	newSequenceActivity.firstActivity = this.firstActivity;
+    	newSequenceActivity.defaultActivity = this.defaultActivity;
 		return newSequenceActivity;
     }
 
@@ -153,21 +154,6 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     {
         return false;
     }
-
-    /** Get the first activity in the sequence. A Sequence activity is like a little learning design, and while is it being
-     * drawn all the the contained activities may not have transitions between them. So Flash needs to know what the first 
-     * activity is!
-	 * @hibernate.many-to-one not-null="false"
-     * @hibernate.column name="first_activity_id" 
-     */
-	public Activity getFirstActivity() {
-		return firstActivity;
-	}
-
-
-	public void setFirstActivity(Activity firstActivity) {
-		this.firstActivity = firstActivity;
-	}
 
 	/** 
 	 * Get the set of the branch to group mappings used for this branching activity. The set contains GroupBranchActivityEntry entries

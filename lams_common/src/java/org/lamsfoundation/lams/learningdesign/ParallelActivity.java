@@ -57,7 +57,9 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
             Transition transitionFrom,
             String languageFile,
 			Boolean stopAfterActivity,
-            Set activities) {
+			Set inputActivities,
+			Set activities,
+			Activity defaultActivity) {
         super(activityId, 
                 id, 
                 description, 
@@ -78,7 +80,9 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
 				transitionFrom,
 				languageFile,
 				stopAfterActivity,
-                activities);
+				inputActivities,
+                activities,
+                defaultActivity);
         super.activityStrategy = new ParallelActivityStrategy(this);
     }
 

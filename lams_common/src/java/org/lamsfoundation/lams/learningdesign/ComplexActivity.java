@@ -46,6 +46,10 @@ public abstract class ComplexActivity extends Activity implements Serializable {
     protected ComplexActivityStrategy activityStrategy;
 	/** persistent field */
 	private Set activities;
+	
+	/** nullable persistent field */
+	protected Activity defaultActivity;
+
 
 	/** full constructor */
 	public ComplexActivity(
@@ -69,11 +73,13 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 			Transition transitionFrom,
 			String languageFile,
 			Boolean stopAfterActivity,
-			Set activities) {
+			Set inputActivities,
+			Set activities,
+			Activity defaultActivity) {
 		super(activityId, id, description, title, xcoord, ycoord, orderId,
 				defineLater, createDateTime, 
 				learningLibrary, parentActivity, libraryActivity,parentUIID,learningDesign, grouping,
-				activityTypeId, transitionTo,transitionFrom, languageFile, stopAfterActivity);
+				activityTypeId, transitionTo,transitionFrom, languageFile, stopAfterActivity, inputActivities);
 		this.activities = activities;
 	}
 
@@ -118,6 +124,28 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 		return this.activities;
 	}
 
+    /** Get the first activity in the sequence,or the default branch for a branching activity. 
+     * <p>
+     * A Sequence activity is like a little learning design, and while is it being
+     * drawn all the the contained activities may not have transitions between them. So Flash needs to know what the first 
+     * activity is!
+     * <p>
+     * A tool based branching activity has to have a default branch in case the conditions don't
+     * match to any other branch.
+     * 
+	 * @hibernate.many-to-one not-null="false"
+     * @hibernate.column name="default_activity_id" 
+     */
+	public Activity getDefaultActivity() {
+		return defaultActivity;
+	}
+
+
+	public void setDefaultActivity(Activity defaultActivity) {
+		this.defaultActivity = defaultActivity;
+	}
+
+
 	public void setActivities(Set activities) {
 	    this.activities=activities;
 	}
@@ -159,8 +187,8 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	 * within the parent activity.</p>
 	 * 
 	 * <b>Note:</b> The logic of what is the next activity here is progress
-	 * 				enigne specific now. Please see the <code>ActivityStrategy</code>
-	 * 				for details explaination of what is next.
+	 * 				engine specific now. Please see the <code>ActivityStrategy</code>
+	 * 				for details explanation of what is next.
 	 * 
 	 * @return the next activity within a parent activity
 	 */

@@ -4,6 +4,19 @@
 ALTER TABLE lams_group
 ADD COLUMN group_ui_id INT(11);
 
+CREATE TABLE lams_input_activity (
+       activity_id BIGINT(20) NOT NULL
+     , input_activity_id BIGINT(20) NOT NULL
+     , UNIQUE UQ_lams_input_activity_1 (activity_id, input_activity_id)
+     , INDEX (activity_id)
+     , CONSTRAINT FK_lams_input_activity_1 FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (activity_id)
+     , CONSTRAINT FK_lams_input_activity_2 FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id)
+)TYPE=InnoDB;
+
+
 CREATE TABLE lams_group_branch_activity (
        entry_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , entry_ui_id INT(11)
@@ -24,7 +37,7 @@ CREATE TABLE lams_group_branch_activity (
 )TYPE=InnoDB;
 
 ALTER TABLE lams_learning_activity 
-ADD COLUMN first_activity_id BIGINT(20)
+ADD COLUMN default_activity_id BIGINT(20)
 ,ADD COLUMN start_xcoord INT(11)
 ,ADD COLUMN start_ycoord INT(11)
 ,ADD COLUMN end_xcoord INT(11)
@@ -68,3 +81,6 @@ VALUES (8, 12, 'Tool Output Based Branching', 'Select between multiple sequence 
 
 ALTER TABLE lams_tool ADD COLUMN admin_url TEXT;
 ALTER TABLE lams_system_tool ADD COLUMN admin_url TEXT;
+
+
+-
