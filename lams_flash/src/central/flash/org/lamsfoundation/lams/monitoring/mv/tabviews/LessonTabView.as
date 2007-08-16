@@ -418,10 +418,11 @@ public function update (o:Observable,infoObj:Object):Void{
 		changeStatus_cmb.removeAll();
 		
 		switch(stateID){
-			case Sequence.SUSPENDED_STATE_ID :
+			case Sequence.SUSPENDED_STATE_ID : 
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_enable'), LessonTabView.ACTIVE_CBI);
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_archive'), LessonTabView.ARCHIVE_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_remove'), LessonTabView.REMOVE_CBI);	
 				break;
 			case Sequence.ARCHIVED_STATE_ID :
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
@@ -430,11 +431,14 @@ public function update (o:Observable,infoObj:Object):Void{
 				break;
 			case Sequence.ACTIVE_STATE_ID :
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_disable'), LessonTabView.DISABLE_CBI);
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_archive'), LessonTabView.ARCHIVE_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_remove'), LessonTabView.REMOVE_CBI);
 				break;
-			case Sequence.NOTSTARTED_STATE_ID :
+			case Sequence.NOTSTARTED_STATE_ID :  
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_archive'), LessonTabView.ARCHIVE_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_remove'), LessonTabView.REMOVE_CBI);
 				break;
 			case Sequence.REMOVED_STATE_ID :
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
@@ -443,7 +447,6 @@ public function update (o:Observable,infoObj:Object):Void{
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_disable'), LessonTabView.DISABLE_CBI);
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_archive'), LessonTabView.ARCHIVE_CBI);
-				
 		}
 	
 	}
