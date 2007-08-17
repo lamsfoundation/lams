@@ -620,6 +620,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		var _activityUIID:Number = selectedItem.activity.activityUIID;
 		var tActivities:Array = new Array();
 		
+		tActivities.addItem({label: "--Selection--", data: 0});
+		
 		while(_activityUIID != null) {
 			
 			var transObj:Object = getCanvas().ddm.getTransitionsForActivityUIID(_activityUIID);
@@ -644,8 +646,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		var children:Array = getCanvas().ddm.getComplexActivityChildren(complexUIID);
 		
 		for(var i=0; i<children.length; i++) {
-			if(children[i] instanceof ToolActivity) toolActs.addItem({label: children[i].title, data: children[i].activityUIID});
-			else if(children[i] instanceof ComplexActivity) getToolActivitiesFromComplex(children[i].activityUIID, toolActs);
+			if(children[i] instanceof ToolActivity)
+				toolActs.addItem({label: children[i].title, data: children[i].activityUIID});
+			else if(children[i] instanceof ComplexActivity)
+				getToolActivitiesFromComplex(children[i].activityUIID, toolActs);
 		}
 
 	}

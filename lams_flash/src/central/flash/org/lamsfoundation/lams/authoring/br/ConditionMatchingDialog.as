@@ -39,10 +39,12 @@ import mx.managers.*
 import mx.events.*
 
 /*
-* Group Matching Dialog window
+* Tool-Output based Condition 
+* Matching Dialog window
+* 
 * @author  Mitchell Seaton
 */
-class GroupMatchingDialog extends BranchMappingDialog {
+class ConditionMatchingDialog extends BranchMappingDialog {
 
     //References to components + clips 
     private var _branchingActivity:BranchingActivity;
@@ -55,7 +57,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
     /**
     * constructor
     */
-    function GroupMatchingDialog(){
+    function ConditionMatchingDialog(){
         super();
 		
 		//Set up this class to use the Flash event delegation model
@@ -73,7 +75,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
         delete this.onEnterFrame;
         
         //Set the labels
-        groups_label.text = Dictionary.getValue('groupmatch_dlg_groups_lst_lbl');
+        conditions_label.text = Dictionary.getValue('condmatch_dlg_cond_lst_lbl');
         branches_label.text = Dictionary.getValue('groupmatch_dlg_branches_lst_lbl');
         match_dgd_lbl.text = Dictionary.getValue('groupmatch_dlg_match_dgd_lbl');
 		
@@ -92,14 +94,14 @@ class GroupMatchingDialog extends BranchMappingDialog {
 	}
 	
 	public function loadLists() {
-		Debugger.log("Loading Lists: branch length: " + branches.length, Debugger.CRITICAL, "loadLists", "GroupMatchingDialog");
-		Debugger.log("Loading Lists: branching act: " + _branchingActivity.activityUIID, Debugger.CRITICAL, "loadLists", "GroupMatchingDialog");
+		Debugger.log("Loading Lists: branch length: " + branches.length, Debugger.CRITICAL, "loadLists", "ConditionMatchingDialog");
+		Debugger.log("Loading Lists: branching act: " + _branchingActivity.activityUIID, Debugger.CRITICAL, "loadLists", "ConditionMatchingDialog");
 		
-		groups_lst.dataProvider = groups;
-		groups_lst.sortItemsBy("groupUIID", Array.NUMERIC);
-		groups_lst.labelField = "groupName";
-		groups_lst.hScrollPolicy = "on";
-		groups_lst.maxHPosition = 200;
+		conditions_lst.dataProvider = conditions;
+		conditions_lst.sortItemsBy("conditionUIID", Array.NUMERIC);
+		conditions_lst.labelField = "description";
+		conditions_lst.hScrollPolicy = "on";
+		conditions_lst.maxHPosition = 200;
 		
 		branches_lst.dataProvider = branches;
 		branches_lst.labelField = "sequenceName";
@@ -109,28 +111,28 @@ class GroupMatchingDialog extends BranchMappingDialog {
 		var column_sequence:DataGridColumn = new DataGridColumn("sequenceName");
 		column_sequence.headerText = "Branch";
 		
-		var column_name:DataGridColumn = new DataGridColumn("groupName");
-		column_name.headerText = "Group";
+		var column_desc:DataGridColumn = new DataGridColumn("description");
+		column_desc.headerText = "Condition";
 		
 		match_dgd.addColumn(column_sequence);
-		match_dgd.addColumn(column_name);
+		match_dgd.addColumn(column_desc);
 		
 		var mappings = app.getCanvas().ddm.branchMappings.values();
 		
 		for(var m in mappings) {
-			if(m instanceof GroupBranchActivityEntry) {
+			if(m instanceof ToolOutputBranchActivityEntry) {
 				match_dgd.addItem(mappings[m]);
-				removeGroup(mappings[m].group);
+				removeCondition(mappings[m].condition);
 			}
 		}
 	}
 	
-	private function removeGroup(g:Group) {
+	private function removeCondition(c:ToolOutputCondition) {
 		var indexList:Array = new Array();
 		
-		for(var i=0; i<groups_lst.rowCount; i++) {
-			var item = groups_lst.getItemAt(i);
-			if(item.groupUIID == g.groupUIID) { groups_lst.removeItemAt(i); return; }
+		for(var i=0; i<conditions_lst.rowCount; i++) {
+			var item = conditions_lst.getItemAt(i);
+			if(item.conditionUIID == c.conditionUIID) { conditions_lst.removeItemAt(i); return; }
 		}
 	}
     
@@ -143,7 +145,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
             //Theme has changed so update objects to reflect new styles
             setStyles();
         }else {
-            Debugger.log('themeChanged event broadcast with an object.type not equal to "themeChanged"',Debugger.CRITICAL,'themeChanged','GroupMatchingDialog');
+            Debugger.log('themeChanged event broadcast with an object.type not equal to "themeChanged"',Debugger.CRITICAL,'themeChanged','ConditionMatchingDialog');
         }
     }
     
@@ -151,7 +153,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
     * Called by the OK button 
     */
     private function close(){
-        Debugger.log('OK Clicked',Debugger.GEN,'ok','GroupMatchingDialog');
+        Debugger.log('OK Clicked',Debugger.GEN,'ok','ConditionMatchingDialog');
         
         //close popup
         _container.deletePopUp();
@@ -161,12 +163,12 @@ class GroupMatchingDialog extends BranchMappingDialog {
 		var selectedGroups:Array = new Array();
 		
 		// get selected items and put together in match
-		if(groups_lst.selectedItems.length > 0) {
+		if(conditions_lst.selectedItems.length > 0) {
 		
-			for(var i=0; i<groups_lst.selectedIndices.length; i++) {
+			for(var i=0; i<conditions_lst.selectedIndices.length; i++) {
 				if(branches_lst.selectedItem != null) {
-					setupMatch(groups_lst.getItemAt(groups_lst.selectedIndices[i]), branches_lst.selectedItem);
-					selectedGroups.push(groups_lst.selectedIndices[i]);
+					setupMatch(conditions_lst.getItemAt(conditions_lst.selectedIndices[i]), branches_lst.selectedItem);
+					selectedGroups.push(conditions_lst.selectedIndices[i]);
 				} else {
 					LFMessage.showMessageAlert("No branch selected");
 					return;
@@ -175,7 +177,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
 			}
 			var delCount = 0;
 			for(var i=0; i<selectedGroups.length; i++) {
-				groups_lst.removeItemAt(selectedGroups[i]-delCount);
+				conditions_lst.removeItemAt(selectedGroups[i]-delCount);
 				delCount++;
 			}
 			
@@ -185,13 +187,13 @@ class GroupMatchingDialog extends BranchMappingDialog {
 		}
 	}
 	
-	private function setupMatch(group:Group, branch:Branch):Void {
-		Debugger.log("group: " + group + " branch: " + branch, Debugger.CRITICAL, "setupMatch", "GroupMatchingDialog");
+	private function setupMatch(condition:ToolOutputCondition, branch:Branch):Void {
+		Debugger.log("condition: " + condition + " branch: " + branch, Debugger.CRITICAL, "setupMatch", "ConditionMatchingDialog");
 		 
-		var gbMatch:GroupBranchActivityEntry = new GroupBranchActivityEntry(null, app.getCanvas().ddm.newUIID(), group, branch.sequenceActivity, _branchingActivity);
-		match_dgd.addItem(gbMatch);
+		var toMatch:ToolOutputBranchActivityEntry = new ToolOutputBranchActivityEntry(null, app.getCanvas().ddm.newUIID(), condition, branch.sequenceActivity, _branchingActivity);
+		match_dgd.addItem(toMatch);
 		
-		app.getCanvas().ddm.addBranchMapping(gbMatch);
+		app.getCanvas().ddm.addBranchMapping(toMatch);
 		
 	}
 	
@@ -200,8 +202,8 @@ class GroupMatchingDialog extends BranchMappingDialog {
 		var rItem:Object = match_dgd.selectedItem;
 		
 		if(rItem != null) {
-			groups_lst.addItem(rItem.group);
-			groups_lst.sortItemsBy("groupUIID", Array.NUMERIC);
+			conditions_lst.addItem(rItem.condition);
+			conditions_lst.sortItemsBy("conditionUIID", Array.NUMERIC);
 			
 			match_dgd.removeItemAt(match_dgd.selectedIndex);
 			app.getCanvas().ddm.removeBranchMapping(rItem.entryUIID);
@@ -212,7 +214,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
 		
 	}
 	
-	public function set groups(a:Array){
+	public function set conditions(a:Array){
 		_primary = a;
 	}
 	
@@ -220,7 +222,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
 		_secondary = a;
 	}
 	
-	public function get groups():Array{
+	public function get conditions():Array{
 		return _primary;
 	}
 	
@@ -228,11 +230,11 @@ class GroupMatchingDialog extends BranchMappingDialog {
 		return _secondary;
 	}
 	
-	public function get groups_lst():List {
+	public function get conditions_lst():List {
 		return primary_lst;
 	}
 	
-	public function get groups_label():Label {
+	public function get conditions_label():Label {
 		return primary_lst_lbl;
 	}
 	

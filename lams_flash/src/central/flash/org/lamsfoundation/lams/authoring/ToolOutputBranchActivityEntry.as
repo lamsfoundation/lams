@@ -30,15 +30,12 @@ import org.lamsfoundation.lams.authoring.*;
  **/
 class ToolOutputBranchActivityEntry extends BranchActivityEntry {
 	
-	private var _orderId:Number;
-	private var _name:String;
-	private var _type:String;
-	private var _startValue:Object;
-	private var _endValue:Object;
-	private var _exactMatchValue:Object;
+	private var _condition:ToolOutputCondition;
 	
-	function ToolOutputBranchActivityEntry(entryID:Number, entryUIID:Number, sequenceActivity:SequenceActivity, branchingActivity:BranchingActivity){
+	function ToolOutputBranchActivityEntry(entryID:Number, entryUIID:Number, condition:ToolOutputCondition, sequenceActivity:SequenceActivity, branchingActivity:BranchingActivity){
 		super(entryID, entryUIID, sequenceActivity, branchingActivity);
+		
+		_condition = condition;
 	}
 
 	public function toData():Object {
@@ -49,62 +46,17 @@ class ToolOutputBranchActivityEntry extends BranchActivityEntry {
 		if(this.sequenceActivity) dto.sequenceActivityUIID = this.sequenceActivity.activityUIID;
 		if(this.branchingActivity) dto.branchingActivityUIID = this.branchingActivity.activityUIID;
 		
-		if(_orderId) dto.orderId = _orderId;
-		if(_name) dto.name = _name;
-		if(_type) dto.type = _type;
-		if(_startValue) dto.startValue = _startValue;
-		if(_endValue) dto.endValue = _endValue;
-		if(_exactMatchValue) dto.exactMatchValue = _exactMatchValue;
+		if(this.condition) dto = _condition.addConditionData(dto);
 		
 		return dto;
 	}
 	
-	public function set name(a:String) {
-		_name = a;
+	public function get condition():ToolOutputCondition {
+		return _condition;
 	}
 	
-	public function get name():String {
-		return _name;
+	public function set condition(a:ToolOutputCondition):Void {
+		_condition = a;
 	}
 	
-	public function set type(a:String) {
-		_type = a;
-	}
-	
-	public function get type():String {
-		return _type;
-	}
-	
-	public function set startValue(a:Object) {
-		_startValue = a;
-	}
-	
-	public function get startValue():Object {
-		return _startValue;
-	}
-	
-	public function set endValue(a:Object) {
-		_endValue = a;
-	}
-	
-	public function get endValue():Object {
-		return _endValue;
-	}
-	
-	public function set exactMatchValue(a:Object) {
-		_exactMatchValue = a;
-	}
-	
-	public function get exactMatchValue():Object {
-		return _exactMatchValue;
-	}
-	
-	public function set orderId(a:Number) {
-		_orderId = a;
-	}
-	
-	public function get orderId():Number {
-		return _orderId;
-	}
-
 }

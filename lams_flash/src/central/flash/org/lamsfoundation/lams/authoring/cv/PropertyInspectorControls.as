@@ -100,10 +100,13 @@ class PropertyInspectorControls extends MovieClip {
 	//branches
 	private var branchType_lbl:Label;
 	private var branchType_cmb:ComboBox;
-	private var _group_match_btn:Button;
 	
 	private var toolActs_cmb:ComboBox;
 	private var branchToolActs_lbl:Label;
+	
+	private var _group_match_btn:Button;
+	private var _tool_output_match_btn:Button;
+	private var _conditions_setup_btn:Button;
 
 	//grouping 
 	private var groupType_lbl:Label;
@@ -188,6 +191,8 @@ class PropertyInspectorControls extends MovieClip {
 		
 		_group_match_btn.label = Dictionary.getValue('pi_group_match_btn_lbl');
 		_group_naming_btn.label = Dictionary.getValue('pi_group_naming_btn_lbl');
+		_tool_output_match_btn.label = Dictionary.getValue('pi_tomatch_btn_lbl');
+		_conditions_setup_btn.label = Dictionary.getValue('pi_condmatch_btn_lbl');
 		
 		//populate the synch type combo:
 		gateType_cmb.dataProvider = Activity.getGateActivityTypes();
@@ -374,7 +379,18 @@ class PropertyInspectorControls extends MovieClip {
 			showAppliedGroupingControls(v, e);
 		} else if(_activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) {
 			showToolBasedBranchingControls(v, e);
-			if(toolActs_cmb.visible) toolActs_cmb.dataProvider = _canvasModel.getDownstreamToolActivities();
+			if(toolActs_cmb.visible) {
+				toolActs_cmb.dataProvider = _canvasModel.getDownstreamToolActivities();
+				
+				if(_canvasModel.selectedItem.activity.toolActivityUIID != null) {
+					var dp = toolActs_cmb.dataProvider;
+				
+					for(var i=0; i < dp.length; i++)
+						if(dp[i].data == _canvasModel.selectedItem.activity.toolActivityUIID)
+							toolActs_cmb.selectedIndex = i;
+				}
+			}
+			
 		} else {
 			showGroupBasedBranchingControls(false);
 			showAppliedGroupingControls(false);
@@ -384,7 +400,10 @@ class PropertyInspectorControls extends MovieClip {
 		if(e != null) {
 			branchType_lbl.enabled = e;
 			branchType_cmb.enabled = e;
+			
 			_group_match_btn.enabled = e;
+			_tool_output_match_btn.enabled = e;
+			
 			toolActs_cmb.enabled = e;
 		}
 	}
@@ -721,8 +740,12 @@ class PropertyInspectorControls extends MovieClip {
 	private function setStyles() {
 		var styleObj = _tm.getStyleObject('button');
 		editGrouping_btn.setStyle('styleName', styleObj);
+		
 		_group_match_btn.setStyle('styleName', styleObj);
 		_group_naming_btn.setStyle('styleName', styleObj);
+		
+		_tool_output_match_btn.setStyle('styleName', styleObj);
+		_conditions_setup_btn.setStyle('styleName', styleObj);
 		
 		styleObj = _tm.getStyleObject('PIlabel');
 		
@@ -816,7 +839,8 @@ class PropertyInspectorControls extends MovieClip {
 			if(selectedGroup != null) {
 				_canvasModel.selectedItem.activity.groupingUIID = selectedGroup.createGroupingUIID;
 			}
-				
+			
+			_canvasModel.selectedItem.activity.toolActivityUIID = null;
 			showGroupBasedBranchingControls(true, !_canvasModel.selectedItem.activity.readOnly);
 			showAppliedGroupingControls(true, !_canvasModel.selectedItem.activity.readOnly);
 			
@@ -829,10 +853,12 @@ class PropertyInspectorControls extends MovieClip {
 			showGroupBasedBranchingControls(false);
 			showAppliedGroupingControls(false);
 		
-			if(toolActs_cmb.visible) toolActs_cmb.dataProvider = _canvasModel.getDownstreamToolActivities();
+			if(toolActs_cmb.visible)
+				toolActs_cmb.dataProvider = _canvasModel.getDownstreamToolActivities();
 			
 		} else {
 			_canvasModel.selectedItem.activity.groupingUIID = null;
+			_canvasModel.selectedItem.activity.toolActivityUIID = null;
 			
 			showToolBasedBranchingControls(false);
 			showGroupBasedBranchingControls(false);
@@ -897,12 +923,12 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	private function onBranchToolInputChange(evt:Object) {
-		var a = _canvasModel.selectedItem;
-		
-		a.activity.toolActivityUIID = evt.target.value;
-		a.refresh();
-		
-		// TODO: show tool outputs to branch mappings dialog
+		Debugger.log('branch input change: ' + evt.target.value, Debugger.CRITICAL, "onBranchToolInputChange", "PIC*");
+		_canvasModel.selectedItem.activity.toolActivityUIID = (evt.target.value != 0) ? evt.target.value : null;
+		_canvasModel.selectedItem.refresh();
+			
+		_conditions_setup_btn.visible = (_canvasModel.selectedItem.activity.toolActivityUIID != null) ? true : false;
+		Debugger.log('button visible ' + _conditions_setup_btn.visible, Debugger.CRITICAL, "onBranchToolInputChange", "PIC*");
 		
 		setModified();
 	}
@@ -910,8 +936,23 @@ class PropertyInspectorControls extends MovieClip {
 	private function showToolBasedBranchingControls(v:Boolean, e:Boolean) {
 		toolActs_cmb.visible = v;
 		branchToolActs_lbl.visible = v;
-
-		if(e != null) toolActs_cmb.enabled = e;
+		
+		if(!v) { _tool_output_match_btn.visible = false; _conditions_setup_btn.visible = false; return; }
+		
+		var ca = _canvasModel.selectedItem;
+		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
+		
+		if(branches.myBranches.length > 0)
+			_tool_output_match_btn.visible = v;
+		
+		if(_canvasModel.selectedItem.activity.toolActivityUIID != null)
+			_conditions_setup_btn.visible = v;
+		
+		if(e != null) {
+			toolActs_cmb.enabled = e;
+			_tool_output_match_btn.enabled = e;
+			_conditions_setup_btn.enabled = e;
+		}
 	}
 	
 	private function showGroupBasedBranchingControls(v:Boolean, e:Boolean) {
@@ -920,7 +961,6 @@ class PropertyInspectorControls extends MovieClip {
 		var ca = _canvasModel.selectedItem;
 		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
 		
-		Debugger.log("grouping UIID: " + ca.activity.groupingUIID, Debugger.CRITICAL, "showGroupBasedBranchingControls", "PIC*");
 		if(branches.myBranches.length > 0 && ca.activity.groupingUIID != null) {
 			var grouping:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(ca.activity.groupingUIID);
 			
@@ -963,7 +1003,7 @@ class PropertyInspectorControls extends MovieClip {
 	private function onGroupMatchClick(evt:Object){
 		
 		// open group to branch matching window
-		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('groupmatch_dlg_title_lbl'), closeButton:true, viewResize:false, scrollContentPath:'groupMatchDialog'});
+		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('groupmatch_dlg_title_lbl'), closeButton:true, viewResize:false, scrollContentPath:'GroupMatchingDialog'});
 		_app.dialog.addEventListener('contentLoaded', Delegate.create(this, groupMatchDialogLoaded));
 		
 		setModified();
@@ -976,6 +1016,33 @@ class PropertyInspectorControls extends MovieClip {
 		_app.dialog.addEventListener('contentLoaded', Delegate.create(this, GroupNamingDialogLoaded));
 		
 		setModified();
+	}
+	
+	private function onToolOutputMatchClick(evt:Object){
+
+		// show tool outputs to branch mappings dialog
+		var ta:ToolActivity = ToolActivity(_canvasModel.getCanvas().ddm.getActivityByUIID(_canvasModel.selectedItem.activity.toolActivityUIID));
+		_canvasModel.getCanvas().getToolOutputDefinitions(ta);
+		
+		setModified();
+	}
+	
+	private function onConditionsSetupClick(evt:Object){
+
+		// open group to branch matching window
+		//_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('to_conditions_dlg_title_lbl'), closeButton:true, viewResize:false, scrollContentPath:'ToolOutputConditionsDialog'});
+		//_app.dialog.addEventListener('contentLoaded', Delegate.create(this,ToolOutputConditionsDialogLoaded));
+		Debugger.log("conditions button pressed", Debugger.CRITICAL, "onConditionsSetupClick", "PIC*");
+		
+		setModified();
+	}
+	
+	private function ToolOutputConditionsDialogLoaded(evt:Object) {
+		var ta:ToolActivity = ToolActivity(_canvasModel.getCanvas().ddm.getActivityByUIID(_canvasModel.selectedItem.activity.toolActivityUIID));
+		evt.target.scrollContent.definitions = _canvasModel.getCanvas().getToolOutputDefinitions(ta);
+		
+		//evt.target.scrollContent.load();
+		
 	}
 	
 	private function groupMatchDialogLoaded(evt:Object) {

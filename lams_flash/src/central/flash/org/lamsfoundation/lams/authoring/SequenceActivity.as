@@ -57,8 +57,8 @@ class SequenceActivity extends ComplexActivity {
 	 */
 	public function populateFromDTO(dto:Object){
 		super.populateFromDTO(dto);
-		if(StringUtils.isWDDXNull(dto.firstActivityUIID)) _firstActivityUIID = null;
-		else _firstActivityUIID = dto.firstActivityUIID;
+		if(StringUtils.isWDDXNull(dto.defaultActivityUIID)) _firstActivityUIID = null;
+		else _firstActivityUIID = dto.defaultActivityUIID;
 	}
 	
 	/**
@@ -71,7 +71,7 @@ class SequenceActivity extends ComplexActivity {
 	public function toData():Object{
 		var dto:Object = super.toData();
 		if(_firstActivityUIID == null) { return null; }
-		else { dto.firstActivityUIID = _firstActivityUIID; }
+		else { dto.defaultActivityUIID = _firstActivityUIID; }
 
 		return dto;
 	}

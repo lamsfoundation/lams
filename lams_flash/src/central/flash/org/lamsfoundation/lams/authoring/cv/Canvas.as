@@ -490,6 +490,34 @@ b	 * @param   learningDesignID
 		
 	}
 	
+	public function getToolOutputDefinitions(ta:ToolActivity) {
+		var callback:Function; 
+       
+		if(ta.toolContentID) {
+			callback = Proxy.create(this, setToolOutputDefinitions, ta);
+			Application.getInstance().getComms().getRequest('authoring/author.do?method=getToolOutputDefinitions&toolContentID='+ta.toolContentID, callback, false);
+		} else {
+			callback = Proxy.create(this, setToolContentForDefinitions, ta);
+			canvasModel.getNewToolContentID(ta, callback);
+		}
+			
+	}
+	
+	public function setToolContentForDefinitions(toolContentID:Number, ta:ToolActivity):Void {
+		ta.toolContentID = toolContentID;
+		
+		getToolOutputDefinitions(ta);
+	}
+	
+	public function setToolOutputDefinitions(dto:Object, toolActivity:ToolActivity) {
+		if(dto instanceof LFError){
+			Cursor.showCursor(Application.C_DEFAULT);
+			dto.showErrorAlert();
+		}
+		
+		toolActivity.addDefinition(dto);
+	}
+	
 	/**
 	 * Called from the toolbar usually - starts or stops the gate tool
 	 * @usage   

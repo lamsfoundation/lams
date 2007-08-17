@@ -114,6 +114,8 @@ class PropertyInspector extends PropertyInspectorControls {
 		
 		_group_match_btn.addEventListener("click", Delegate.create(this, onGroupMatchClick));
 		_group_naming_btn.addEventListener("click", Delegate.create(this, onGroupNamingClick));
+		_tool_output_match_btn.addEventListener("click", Delegate.create(this, onToolOutputMatchClick));
+		_conditions_setup_btn.addEventListener("click", Delegate.create(this, onConditionsSetupClick));
 		
 		this.onEnterFrame = setupLabels;
 		
