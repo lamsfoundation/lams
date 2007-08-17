@@ -23,3 +23,7 @@ update tl_lamc11_que_usr qu1 set qu1.last_attempt_order =
 
 update tl_lamc11_que_usr qu1 set qu1.last_attempt_total_mark = 
 ( select sum(mark) from tl_lamc11_usr_attempt att where att.que_usr_id = qu1.uid and att.attemptOrder = qu1.last_attempt_order);
+
+-- update the tool version - special code that should only be executed if the upgrade is being done manually.
+-- if it is being done via the tool deployer then it will update the version automatically.
+-- update lams_tool set tool_version = "20070820" where tool_signature = "lamc11";
