@@ -42,30 +42,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<td NOWRAP  valign=top align=center>  <b> <fmt:message key="label.selectGroup"/> </b>
 
 								<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
-								<c:forEach var="toolSessionName" items="${mcGeneralMonitoringDTO.summaryToolSessions}">
-									<c:forEach var="toolSessionId" items="${mcGeneralMonitoringDTO.summaryToolSessionsId}">
-										<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
-									
-											<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
-										
-												<c:set var="SELECTED_SESSION" scope="request" value=""/>
-												<c:if test="${requestScope.selectionCase == 2}"> 			
-													<c:set var="currentMonitoredToolSession" scope="request" value="All"/>
-												</c:if>						
-												
-												<c:if test="${toolSessionId.value == mcGeneralMonitoringDTO.currentMonitoredToolSession}"> 			
-														<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
-												</c:if>						
-												
-												<c:if test="${toolSessionId.value != 'All'}"> 		
-													<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> <c:out value="${toolSessionName.value}"/>  </option>						
-												</c:if>						
-												
-												<c:if test="${toolSessionId.value == 'All'}"> 	
-													<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
-												</c:if>						
-										</c:if>							
-									</c:forEach>		  	
+								<c:forEach var="toolSessionEntry" items="${mcGeneralMonitoringDTO.summaryToolSessions}">
+										<c:set var="SELECTED_SESSION" scope="request" value=""/>
+										<c:if test="${toolSessionEntry.key == mcGeneralMonitoringDTO.currentMonitoredToolSession}"> 			
+												<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
+										</c:if>						
+										<c:choose>										
+										<c:when test="${toolSessionId.value == 'All'}"> 	
+											<option value="<c:out value="${toolSessionEntry.key}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>All</option>						
+										</c:when>		
+										<c:otherwise> 		
+											<option value="<c:out value="${toolSessionEntry.key}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>><c:out value="${toolSessionEntry.value}"/></option>						
+										</c:otherwise>						
+										</c:choose>				
 								</c:forEach>		  	
 								</select>									
 							</td> 

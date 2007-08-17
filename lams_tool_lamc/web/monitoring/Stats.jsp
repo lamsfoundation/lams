@@ -30,7 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  				<b> <fmt:message key="count.total.user" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
-							  	  <c:out value="${mcStatsDTO.countAllUsers}"/>
+							  	  <c:out value="${mcGeneralMonitoringDTO.countAllUsers}"/>
 							</td> 
 						</tr>
 						
@@ -39,7 +39,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  				<b>  <fmt:message key="count.finished.session" /> </b>
 				  			</td>
 							<td NOWRAP valign=top>
-							  	 <c:out value="${mcStatsDTO.countSessionComplete}"/>
+							  	 <c:out value="${mcGeneralMonitoringDTO.countSessionComplete}"/>
 							</td> 
 						</tr>
 		</table>
