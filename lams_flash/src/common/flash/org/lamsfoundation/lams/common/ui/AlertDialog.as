@@ -166,7 +166,7 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 		Debugger.log("width: " + w, Debugger.CRITICAL, "setCancelButton", "AlertDialog");
 		
 		if(w > cancel_btn.width)
-		cancel_btn.setSize(w, cancel_btn.height);
+			cancel_btn.setSize(w, cancel_btn.height);
 		
 	}
 	
@@ -289,12 +289,12 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
     * Called by the cancel button 
     */
     private function cancel(){
-       Debugger.log('cancel click',Debugger.GEN,'cancel','org.lamsfoundation.lams.common.ui.InputDialog');
+		Debugger.log('cancel click',Debugger.GEN,'cancel','org.lamsfoundation.lams.common.ui.InputDialog');
        
-	   _cancelHandler();
+		removeTransparentLayer();
 	   
-	   removeTransparentLayer();
-	   this.removeMovieClip();
+		_cancelHandler();
+		this.removeMovieClip();
     }
     
     /**
@@ -303,12 +303,14 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
     public function ok(){
 		Debugger.log('ok click',Debugger.GEN,'ok','org.lamsfoundation.lams.common.ui.InputDialog');
 		
-		_okHandler();
-		
 		removeTransparentLayer();
+		
+		Debugger.log('okHandler fn:' + _okHandler, Debugger.CRITICAL, "ok", "AlertDialog");		
+		
+		_okHandler();
 		this.removeMovieClip();
     }
-    
+	
     /**
     * If an alert was spawned by this dialog this method is called when it's closed
     */

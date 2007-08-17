@@ -48,12 +48,19 @@ class org.lamsfoundation.lams.common.ui.Dialog {
     private static var _inputCancelButtonLabel:String;
     private static var _inputOkHandler:Function;
     private static var _inputCancelHandler:Function;
+	
+	private static var _intervalID:Number;
+	private static var _dialogLoaded:Boolean;
+	private static var _count:Number;
+
+	private static var CHECK_INTERVAL:Number = 200;
+	private static var LIMIT:Number = 10;
 
     static function createPopUp(path:MovieClip,cls:Object, initobj:Object):MovieClip{
         return path.createClassChildAtDepth(cls, DepthManager.kTopmost, initobj);
     }
 	
-	static function createAlertDialog(title:String, msg:String, okButtonLabel:String, cancelButtonLabel:String, okHandler:Function, cancelHandler:Function, type:Number) {
+	static function createAlertDialog(title:String, msg:String, okButtonLabel:String, cancelButtonLabel:String, okHandler:Function, cancelHandler:Function, type:Number):MovieClip {
 		_inputTitle = title;
 		_inputMessage = msg;
 		_inputOkButtonLabel = okButtonLabel;
@@ -74,11 +81,17 @@ class org.lamsfoundation.lams.common.ui.Dialog {
 			target = ApplicationParent.dialogue;
 		}
 		
-		_inputDialog = target.attachMovie('alertDialog', 'alertDialog', DepthManager.kTopmost, {_x:0, _y:0});
+		var _alertDialog:MovieClip = target.attachMovie('alertDialog', 'alertDialog' + new Date().toString(), DepthManager.kTopmost, {_x:0, _y:0});
 		
 		//Assign dialog load handler
-		_inputDialog.addEventListener('contentLoaded', Proxy.create(org.lamsfoundation.lams.common.ui.Dialog,alertDialogLoaded));
+		_alertDialog.addEventListener('contentLoaded', Proxy.create(org.lamsfoundation.lams.common.ui.Dialog,alertDialogLoaded));
 	
+		return _alertDialog;
+	}
+	
+	static function checkDialog() {
+		_dialogLoaded = (_inputDialog != null || _inputDialog != undefined) ? true : false;
+		_count++;
 	}
 	
 	static function createInputDialog(instructions:String, okButtonLabel:String, cancelButtonLabel:String, okHandler:Function, cancelHandler:Function){
