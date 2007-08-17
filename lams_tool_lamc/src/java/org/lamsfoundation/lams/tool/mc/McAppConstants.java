@@ -46,7 +46,6 @@ public interface McAppConstants {
     public static final String LOAD_MONITORING_CONTENT					="loadMonitoring";
     public static final String LOAD_MONITORING							="refreshMonitoring";
     public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY		="loadMonitoringEditActivity";
-    public static final String MC_STATS_DTO								="mcStatsDTO";
     public static final String LIST_ALL_GROUPS_DTO						="listAllGroupsDTO";
     public static final String EXPORT_PORTFOLIO 						= "exportPortfolio";
     public static final String INDIVIDUAL_REPORT						="individualReport";

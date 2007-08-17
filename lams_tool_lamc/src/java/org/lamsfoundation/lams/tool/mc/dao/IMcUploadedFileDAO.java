@@ -50,9 +50,7 @@ public interface IMcUploadedFileDAO
 	    
 	    public void deleteUploadFile(McUploadedFile mcUploadedFile);
         
-        public List retrieveMcUploadedFiles(McContent mc);
-	    
-	    public void cleanUploadedFilesMetaData();
+        public List<McUploadedFile> retrieveMcUploadedFiles(McContent mc);
 	    
 	    public void flush();
 }

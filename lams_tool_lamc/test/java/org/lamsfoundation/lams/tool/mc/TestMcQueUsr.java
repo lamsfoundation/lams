@@ -82,9 +82,4 @@ public class TestMcQueUsr extends McDataAccessTestCase
     }
     
     
-    public void testRemoveMcUserById()
-    {
-    	mcUserDAO.removeMcUserById(TEST_NEW_USER_ID);
-    }
-    
 }

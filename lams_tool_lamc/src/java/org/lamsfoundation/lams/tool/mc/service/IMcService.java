@@ -133,8 +133,6 @@ public interface IMcService
     
     public void updateMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
     
-    public List getMcUserBySessionOnly(final McSession mcSession) throws McApplicationException;
-    
     public List populateCandidateAnswersDTO(Long mcQueContentId) throws McApplicationException;
     
     public McSession getMcSessionByUID(Long uid) throws McApplicationException;
@@ -145,15 +143,9 @@ public interface IMcService
     
     public void deleteMcById(Long mcId) throws McApplicationException;
     
-    public void deleteMcSession(McSession mcSession) throws McApplicationException;
-    
-    public List getSessionNamesFromContent(McContent mcContent) throws McApplicationException;
-    
     public void removeAttempt (McUsrAttempt attempt) throws McApplicationException;
 	
     public void deleteMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
-    
-    public int countUserComplete(McContent mcContent) throws McApplicationException;
     
     public List findMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException;
     
@@ -169,10 +161,6 @@ public interface IMcService
 	
 	public User getCurrentUserData(String username) throws McApplicationException;
 	
-	public int getTotalNumberOfUsers() throws McApplicationException;
-	
-	public int getTotalNumberOfUsers(McContent mcContent) throws McApplicationException;
-    
     public Lesson getCurrentLesson(long lessonId) throws McApplicationException;
     
     public void saveMcContent(McContent mc) throws McApplicationException;
@@ -225,8 +213,6 @@ public interface IMcService
     
     public McQueContent getToolDefaultQuestionContent(long contentId) throws McApplicationException;
 
-    public List getToolSessionsForContent(McContent mc);
-    
     public ITicket getRepositoryLoginTicket() throws McApplicationException;
 	
 	public void deleteFromRepository(Long uuid, Long versionID);
@@ -235,27 +221,17 @@ public interface IMcService
 	
 	public InputStream downloadFile(Long uuid, Long versionID) throws McApplicationException;
 	
-	public void cleanUploadedFilesMetaData() throws McApplicationException;
-    
     public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent) throws McApplicationException;
     
 	public List getAttemptByAttemptOrder(final Long queUsrId, final Long mcQueContentId, final Integer attemptOrder) throws McApplicationException;
 	
-	public int countSessionComplete() throws McApplicationException;
-	
-    public int countSessionComplete(McContent mcContent) throws McApplicationException;
-	
 	public McSession findMcSessionById(Long mcSessionId) throws McApplicationException;
 	
-	public int countSessionIncomplete() throws McApplicationException;
-    
-    public List getNextAvailableDisplayOrder(final long mcContentId) throws McApplicationException;
+   public List getNextAvailableDisplayOrder(final long mcContentId) throws McApplicationException;
     
     public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType) throws RepositoryCheckedException;
     
     public NodeKey copyFile(Long uuid) throws RepositoryCheckedException;
-    
-    public List getSessionsFromContent(McContent mcContent) throws McApplicationException;
     
     public List findMcOptionCorrectByQueId(Long mcQueContentId) throws McApplicationException;
     
@@ -274,7 +250,7 @@ public interface IMcService
     
     public void removeFile(Long submissionId) throws McApplicationException;
     
-    public List retrieveMcUploadedFiles(McContent mcContent) throws McApplicationException;
+    public List<McUploadedFile> retrieveMcUploadedFiles(McContent mcContent) throws McApplicationException;
     
     /**
      * Return the top, lowest and average mark for all learners for one particular tool session.

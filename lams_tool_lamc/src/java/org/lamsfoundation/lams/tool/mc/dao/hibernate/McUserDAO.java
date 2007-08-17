@@ -39,14 +39,13 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
     
-	private static final String FIND_MC_USR_CONTENT = "from " + McQueUsr.class.getName() + " as mcu where que_usr_id=?";
-	
-	private static final String COUNT_USERS_IN_SESSION = "select mu.queUsrId from McQueUsr mu where mu.mcSession= :mcSession";
-	
-	private static final String LOAD_USER_FOR_SESSION = "from mcQueUsr in class McQueUsr where  mcQueUsr.mcSessionId= :mcSessionId";
-   
  	private static final String CALC_MARK_STATS_FOR_SESSION = "select max(mu.lastAttemptTotalMark), min(mu.lastAttemptTotalMark), avg(mu.lastAttemptTotalMark)"
  		+" from McQueUsr mu where mu.mcSessionId = :mcSessionUid";
+
+ 	private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSessionId=:mcSessionId";
+
+ 	private static final String GET_USER_BY_USER_ID = "from McQueUsr user where user.queUsrId=?";
+	
 
    public McQueUsr getMcUserByUID(Long uid)
 	{
@@ -57,10 +56,7 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 	
 	public McQueUsr findMcUserById(Long userId)
 	{
-		String query = "from McQueUsr user where user.queUsrId=?";
-	
-		HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(query)
+		List list = getSession().createQuery(GET_USER_BY_USER_ID)
 		.setLong(0,userId.longValue())
 		.list();
 		
@@ -71,22 +67,10 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 		return null;
 	}
 	
-	
-	public List getMcUserBySessionOnly(final McSession mcSession)
-    {
-        HibernateTemplate templ = this.getHibernateTemplate();
-        List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
-		.setLong("mcSessionId", mcSession.getUid().longValue())				
-		.list();
-		return list;
-    }
-	
 	public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionId)
 	{
 		
-		String strGetUser = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSessionId=:mcSessionId";
-        HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(strGetUser)
+		List list = getSession().createQuery(GET_USER_BY_USER_ID_SESSION)
 			.setLong("queUsrId", queUsrId.longValue())
 			.setLong("mcSessionId", mcSessionId.longValue())				
 			.list();
@@ -110,108 +94,10 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
     	this.getHibernateTemplate().update(mcUser);
     }
     
-
-    public void removeMcUserById(Long userId)
-    {
-    	HibernateTemplate templ = this.getHibernateTemplate();
-		if ( userId != null) {
-			List list = getSession().createQuery(FIND_MC_USR_CONTENT)
-				.setLong(0,userId.longValue())
-				.list();
-			
-			if(list != null && list.size() > 0){
-				McQueUsr mcu = (McQueUsr) list.get(0);
-				this.getSession().setFlushMode(FlushMode.AUTO);
-				templ.delete(mcu);
-				templ.flush();
-			}
-		}
-      
-    }
-    
-
     public void removeMcUser(McQueUsr mcUser)
     {
 		this.getSession().setFlushMode(FlushMode.AUTO);
         this.getHibernateTemplate().delete(mcUser);
-    }
-    
-
-    public int getTotalNumberOfUsers() {
-		String query="from obj in class McQueUsr"; 
-		return this.getHibernateTemplate().find(query).size();
-	}
-    
-    
-    public int getTotalNumberOfUsers(McContent mcContent)
-    {
-        logger.debug("starting getTotalNumberOfUsers: " + mcContent);
-		String strGetUser = "from mcQueUsr in class McQueUsr";
-        HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(strGetUser)
-			.list();
-		logger.debug("strGetUser: " + strGetUser);
-		logger.debug("list: " + list);
-		
-		
-		int totalUserCount=0;
-		if(list != null && list.size() > 0){
-			Iterator listIterator=list.iterator();
-	    	while (listIterator.hasNext())
-	    	{
-	    	    McQueUsr usr=(McQueUsr)listIterator.next();
-				logger.debug("usr: " + usr);
-				logger.debug("local usr content uid versus incoming content uid: " + 
-				        usr.getMcSession().getMcContent().getUid().intValue() + " versus " + mcContent.getUid().intValue());
-				
-				if (usr.getMcSession().getMcContent().getUid().intValue() == mcContent.getUid().intValue())
-				{
-				    logger.debug("increasing user count");
-				    ++totalUserCount;
-				}	    	    
-	    	}
-		}
-
-		logger.debug("final totalUserCount: " + totalUserCount);
-        return totalUserCount;
-    }
-    
-
-    public int countUserComplete(McContent mcContent)
-    {
-        logger.debug("starting countUserComplete: " + mcContent);
-		String strGetUser = "from mcQueUsr in class McQueUsr";
-        HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(strGetUser)
-			.list();
-		logger.debug("strGetUser: " + strGetUser);
-		logger.debug("list: " + list);
-		
-		
-		int totalUserCount=0;
-		if(list != null && list.size() > 0){
-			Iterator listIterator=list.iterator();
-	    	while (listIterator.hasNext())
-	    	{
-	    	    McQueUsr usr=(McQueUsr)listIterator.next();
-				logger.debug("usr: " + usr);
-				logger.debug("local usr content uid versus incoming content uid: " + 
-				        usr.getMcSession().getMcContent().getUid().intValue() + " versus " + mcContent.getUid().intValue());
-				
-				if (usr.getMcSession().getMcContent().getUid().intValue() == mcContent.getUid().intValue())
-				{
-				    if (usr.getMcSession().getSessionStatus().equals("COMPLETED"))
-				    {
-				        logger.debug("this user's session is COMPLETED,  increasing user count");
-					    ++totalUserCount;    
-				    }
-				    
-				}	    	    
-	    	}
-		}
-
-		logger.debug("final totalUserCount: " + totalUserCount);
-        return totalUserCount;
     }
     
     /** Get the max, min and average mark (in that order) for a session */

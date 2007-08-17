@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
+import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -185,40 +186,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
    
     /**
-     * submitSession
-     * 
-     * enables getting monitoring data for different sessions
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @param mcService
-     * @param mcGeneralMonitoringDTO
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward submitSession(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response,
-            IMcService mcService,
-            McGeneralMonitoringDTO mcGeneralMonitoringDTO
-            ) throws IOException,
-                                         ServletException
-	{
-        logger.debug("calling submitSession...mcGeneralMonitoringDTO:" + mcGeneralMonitoringDTO);
-        commonSubmitSessionCode(form, request, mcService,mcGeneralMonitoringDTO);
-        logger.debug("post commonSubmitSessionCode: " +mcGeneralMonitoringDTO);
-    	return (mapping.findForward(LOAD_MONITORING));
-	}
-    
-
-    /**
-     * commonSubmitSessionCode(ActionForm form, HttpServletRequest request,IMcService mcService,
-            McGeneralMonitoringDTO mcGeneralMonitoringDTO)
-     * 
      * @param form
      * @param request
      * @param mcService
@@ -226,14 +193,11 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @throws IOException
      * @throws ServletException
      */
-    protected void commonSubmitSessionCode(ActionForm form, HttpServletRequest request,IMcService mcService,
-            McGeneralMonitoringDTO mcGeneralMonitoringDTO) throws IOException, ServletException
+    protected ActionForward commonSubmitSessionCode(McMonitoringForm mcMonitoringForm, HttpServletRequest request, ActionMapping mapping,
+    		IMcService mcService, McGeneralMonitoringDTO mcGeneralMonitoringDTO) throws IOException, ServletException
     {
     	logger.debug("starting  commonSubmitSessionCode...mcGeneralMonitoringDTO:" + mcGeneralMonitoringDTO);
     	
-		logger.debug("mcService:" + mcService);
-		McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
-		
 		repopulateRequestParameters(request, mcMonitoringForm, mcGeneralMonitoringDTO);
 		logger.debug("done repopulateRequestParameters");
 
@@ -285,20 +249,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    mcGeneralMonitoringDTO.setSbmtSuccess(new Boolean(false).toString());
 	    mcGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
 	    
-		
-		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, mcContent, mcService);
-		logger.debug("summaryToolSessions: " + summaryToolSessions);
-		mcGeneralMonitoringDTO.setSummaryToolSessions(summaryToolSessions);
+		mcGeneralMonitoringDTO.setSummaryToolSessions(populateToolSessions(mcContent));
 
-		Map summaryToolSessionsId=MonitoringUtil.populateToolSessionsId(request, mcContent, mcService);
-		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
-		mcGeneralMonitoringDTO.setSummaryToolSessionsId(summaryToolSessionsId);
-
-		logger.debug("calling initStatsContent.");
-		initStatsContent(toolContentID, request, mcService, mcGeneralMonitoringDTO);
-		logger.debug("post initStatsContent, mcGeneralMonitoringDTO: " + mcGeneralMonitoringDTO);
-
-		
 		/*setting editable screen properties*/
 		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
 		mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
@@ -353,7 +305,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
 		mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
 		
-        List attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
+		List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
         logger.debug("attachmentList: " + attachmentList);
         mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
         mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
@@ -395,7 +347,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		}
 		/* ... till here*/
 		
-		MonitoringUtil.buildMcStatsDTO(request,mcService, mcContent);
+		MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
 		
 		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
 		
@@ -407,195 +359,40 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
         
         
         logger.debug("dumping request level  controlllers, REQUEST selectionCase: " + request.getAttribute(SELECTION_CASE));
+        
+        return (mapping.findForward(LOAD_MONITORING_CONTENT));	
+
     }
     
-
-    /**
-     * refreshSummaryData(HttpServletRequest request, McContent mcContent, IMcService mcService, 
-			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, 
-			boolean showUserEntriesBySession, McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO, 
-			McGeneralMonitoringDTO mcGeneralMonitoringDTO, ExportPortfolioDTO exportPortfolioDTO)
-			
-     * refreshes summary data
-     * 
-     * @param request
-     * @param mcContent
-     * @param mcService
-     * @param isUserNamesVisible
-     * @param isLearnerRequest
-     * @param currentSessionId
-     * @param userId
-     * @param showUserEntriesBySession
-     * @param mcGeneralLearnerFlowDTO
-     * @param mcGeneralMonitoringDTO
-     * @param exportPortfolioDTO
-     */
-	public void refreshSummaryData(HttpServletRequest request, McContent mcContent, IMcService mcService, 
-			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, 
-			boolean showUserEntriesBySession, McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO, 
-			McGeneralMonitoringDTO mcGeneralMonitoringDTO, ExportPortfolioDTO exportPortfolioDTO)
+	/**
+	 * Populates a sorted map of the tool session where the key is the mcSessionId and the value is name of the session.
+	 * If no sessions exists, there will be a single entry "None", otherwise on the end of the list will be the entry "All"
+	 */
+	public static Map<String,String> populateToolSessions(McContent mcContent)
 	{
-	    logger.debug("doing refreshSummaryData." + mcGeneralLearnerFlowDTO);
-	    logger.debug("mcGeneralMonitoringDTO:" + mcGeneralMonitoringDTO);
-	    logger.debug("exportPortfolioDTO:" + exportPortfolioDTO);
-	    
-		if (mcService == null)
-		{
-			logger.debug("will retrieve mcService");
-			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-			logger.debug("retrieving mcService from session: " + mcService);
-		}
-		logger.debug("mcService: " + mcService);
-		
-		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-		logger.debug("isLearnerRequest: " + isLearnerRequest);
-				
-		/* this section is related to summary tab. Starts here. */
-		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, mcContent, mcService);
-		logger.debug("summaryToolSessions: " + summaryToolSessions);
-		
-		if (mcService.studentActivityOccurredGlobal(mcContent))
-		{
-		    if (mcGeneralMonitoringDTO != null)
-		        mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
-				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
-		}
-		else
-		{
-		    if (mcGeneralMonitoringDTO != null)
-		        mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
-				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
-		}
-		
-		String userExceptionNoToolSessions=mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-		logger.debug("userExceptionNoToolSessions: " + userExceptionNoToolSessions);
-		if (exportPortfolioDTO != null)
-		{
-		    exportPortfolioDTO.setUserExceptionNoToolSessions(userExceptionNoToolSessions);
-		}
-		
-		Map summaryToolSessionsId=MonitoringUtil.populateToolSessionsId(request, mcContent, mcService);
-		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
-	    logger.debug("currentSessionId: " + currentSessionId);
-	    
-	    if ((currentSessionId != null) && (!currentSessionId.equals("All")))
-	    {
-		    McSession mcSession= mcService.retrieveMcSession(new Long(currentSessionId));
-		    logger.debug("mcSession:" + mcSession);
-		    if (mcGeneralMonitoringDTO != null)
-		        mcGeneralMonitoringDTO.setGroupName(mcSession.getSession_name());
-	    }
-	    else
-	    {
-	        mcGeneralMonitoringDTO.setGroupName("All Groups");
-	    }
-	    
-	    logger.debug("using allUsersData to retrieve data: " + isUserNamesVisible);
-	    
-	    List listMonitoredAnswersContainerDTO = new LinkedList();
-	    logger.debug("listMonitoredAnswersContainerDTO: " + listMonitoredAnswersContainerDTO);	    
-	    /* ends here. */
-	    
-	    logger.debug("decide processing user entered values based on isLearnerRequest: " + isLearnerRequest);
-
-	    
-	    if (exportPortfolioDTO != null)
-	    {
-	        logger.debug("placing dtos within the exportPortfolioDTO: ");
-	        exportPortfolioDTO.setListMonitoredAnswersContainerDto(listMonitoredAnswersContainerDTO);
-	    }
-	    
-	    
-	    if (mcGeneralMonitoringDTO != null)
-	    {
-	        mcGeneralMonitoringDTO.setSummaryToolSessions(summaryToolSessions);
-	        mcGeneralMonitoringDTO.setSummaryToolSessionsId(summaryToolSessionsId);
-	        mcGeneralMonitoringDTO.setSelectionCase(new Long(2));
-	        mcGeneralMonitoringDTO.setCurrentMonitoredToolSession("All");
-	        mcGeneralMonitoringDTO.setListMonitoredAnswersContainerDto(listMonitoredAnswersContainerDTO);
-		    
-		    mcGeneralMonitoringDTO.setExistsOpenMcs(new Boolean(false).toString());
-	    }
-	    
-	    logger.debug("final mcGeneralLearnerFlowDTO: " + mcGeneralLearnerFlowDTO);
-	    logger.debug("final mcGeneralMonitoringDTO: " + mcGeneralMonitoringDTO);
-		
-		boolean isContentInUse=McUtils.isContentInUse(mcContent);
-		logger.debug("isContentInUse:" + isContentInUse);
-		mcGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
-		if (isContentInUse == true)
-		{
-			logger.debug("monitoring url does not allow editActivity since the content is in use.");
-			mcGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(true).toString());
+		Map<String, String> sessionsMap = new TreeMap<String, String>();
+		Iterator iter = mcContent.getMcSessions().iterator();
+		while (iter.hasNext()) {
+			McSession elem = (McSession) iter.next();
+			sessionsMap.put(elem.getMcSessionId().toString(), elem.getSession_name() );
 		}
 
-		prepareReflectionData(request, mcContent, mcService, null, false, "All");
-		
-		if (mcService.studentActivityOccurredGlobal(mcContent))
+		if (sessionsMap.isEmpty())
 		{
-			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
-			mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
+        	sessionsMap.put("None", "None");
 		}
-		else
-		{
-			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
-			mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
-		}
+    	else
+    	{
+    		sessionsMap.put("All" , "All");	
+    	}
+ 
+		if ( logger.isDebugEnabled() )
+			logger.debug("final sessionsMap:" + sessionsMap);
 
-		/**getting instructions screen content from here... */
-		mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
-		mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
-		
-        List attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
-        logger.debug("attachmentList: " + attachmentList);
-        mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
-        mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-        /** ...till here **/
+		return sessionsMap;
 
-		
-	    logger.debug("end of refreshSummaryData, mcGeneralMonitoringDTO" + mcGeneralMonitoringDTO);
-		request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
-		
-    	EditActivityDTO editActivityDTO = new EditActivityDTO();
-		isContentInUse=McUtils.isContentInUse(mcContent);
-		logger.debug("isContentInUse:" + isContentInUse);
-		if (isContentInUse == true)
-		{
-		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
-		}
-		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
-		
-		
-		/*find out if there are any reflection entries, from here*/
-		boolean notebookEntriesExist=MonitoringUtil.notebookEntriesExist(mcService, mcContent);
-		logger.debug("notebookEntriesExist : " + notebookEntriesExist);
-		
-		if (notebookEntriesExist)
-		{
-		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-		    
-		    userExceptionNoToolSessions=(String)mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
-		    
-		    if (userExceptionNoToolSessions.equals("true"))
-		    {
-		        logger.debug("there are no online student activity but there are reflections : ");
-		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-		    }
-		}
-		else
-		{
-		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
-		}
-		/* ... till here*/
-		
-		MonitoringUtil.buildMcStatsDTO(request,mcService, mcContent);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
 	}
 
-
-    
 	/**
 	 * ActionForward submitSession(ActionMapping mapping,
             ActionForm form,
@@ -618,16 +415,9 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) 
     		throws IOException,ServletException
 	{
-        logger.debug("dispathcing submitSession..");
+        logger.debug("dispatching submitSession..");
         IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-        logger.debug("mcService: " +mcService);
-        
-        McGeneralMonitoringDTO mcGeneralMonitoringDTO= new McGeneralMonitoringDTO();
-        
-        commonSubmitSessionCode(form, request, mcService,mcGeneralMonitoringDTO);
-        logger.debug("post commonSubmitSessionCode: " + mcGeneralMonitoringDTO);
-
-        return (mapping.findForward(LOAD_MONITORING_CONTENT));	
+        return commonSubmitSessionCode((McMonitoringForm) form, request, mapping, mcService, new McGeneralMonitoringDTO() );
 	}
 
 
@@ -696,11 +486,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
         mcAuthoringForm.setTitle(mcContent.getTitle());
         
         mcGeneralAuthoringDTO.setActivityInstructions(mcContent.getInstructions());
-        
-        sessionMap.put(ACTIVITY_TITLE_KEY, mcContent.getTitle());
-        sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, mcContent.getInstructions());
-    	
-		
+        		
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
@@ -788,7 +574,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
 		mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
 		
-        List attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
+		List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
         logger.debug("attachmentList: " + attachmentList);
         mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
         mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
@@ -821,16 +607,15 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
 		}
 		/* ... till here*/
-
-		MonitoringUtil.buildMcStatsDTO(request,mcService, mcContent);
+		MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
 		MonitoringUtil.generateGroupsSessionData(request, mcService, mcContent);
 		
 		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
 		
 
 		logger.debug("forwarding to LOAD_MONITORING_CONTENT: " + LOAD_MONITORING_CONTENT);
-		return mapping.findForward(LOAD_MONITORING_CONTENT);
-    }
+		return mapping.findForward(LOAD_MONITORING_CONTENT); 
+    } 
     
     
 
@@ -1128,7 +913,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
     	mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
     	
-        List attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
+        List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
         logger.debug("attachmentList: " + attachmentList);
         mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
         mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
@@ -1156,8 +941,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
     	}
     	/* ... till here*/
-
-    	MonitoringUtil.buildMcStatsDTO(request,mcService, mcContent);
+		MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
     	MonitoringUtil.generateGroupsSessionData(request, mcService, mcContent);
     	logger.debug("ending setupCommonScreenData, mcContent " + mcContent);
  
@@ -4697,258 +4481,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 	}
 
-	
-	/**
-	 * initSummaryContent(String toolContentID,
-            HttpServletRequest request,
-            IMcService mcService,
-            McGeneralMonitoringDTO mcGeneralMonitoringDTO)
-	 * 
-	 * @param toolContentID
-	 * @param request
-	 * @param mcService
-	 * @param mcGeneralMonitoringDTO
-	 * @throws IOException
-	 * @throws ServletException
-	 */
-    public void initSummaryContent(String toolContentID,
-            HttpServletRequest request,
-            IMcService mcService,
-            McGeneralMonitoringDTO mcGeneralMonitoringDTO) throws IOException,
-                                         ServletException
-	{
-    	logger.debug("start  initSummaryContent...toolContentID: " + toolContentID);
-    	logger.debug("dispatching getSummary...mcGeneralMonitoringDTO:" + mcGeneralMonitoringDTO);
-   	    	
-		logger.debug("mcService: " + mcService);
-	    logger.debug("toolContentID: " + toolContentID);
-	    
-	    McContent mcContent=mcService.retrieveMc(new Long(toolContentID));
-		logger.debug("existing mcContent:" + mcContent);
-		
-    	/* this section is related to summary tab. Starts here. */
-		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, mcContent, mcService);
-		logger.debug("summaryToolSessions: " + summaryToolSessions);
-		mcGeneralMonitoringDTO.setSummaryToolSessions(summaryToolSessions);
-		
-		Map summaryToolSessionsId=MonitoringUtil.populateToolSessionsId(request, mcContent, mcService);
-		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
-		mcGeneralMonitoringDTO.setSummaryToolSessionsId(summaryToolSessionsId);
-	    /* ends here. */
-	    
-		/*true means there is at least 1 response*/
-		if (mcService.studentActivityOccurredGlobal(mcContent))
-		{
-		    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
-			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
-		}
-		else
-		{
-			mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
-			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
-		}
-
-		prepareReflectionData(request, mcContent, mcService, null, false, "All");
-		
-    	EditActivityDTO editActivityDTO = new EditActivityDTO();
-		boolean isContentInUse=McUtils.isContentInUse(mcContent);
-		logger.debug("isContentInUse:" + isContentInUse);
-		if (isContentInUse == true)
-		{
-		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
-		}
-		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
-		
-		/**getting instructions screen content from here... */
-		mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
-		mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
-		
-        List attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
-        logger.debug("attachmentList: " + attachmentList);
-        mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
-        mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-        /** ...till here **/
-
-		
-		mcGeneralMonitoringDTO.setCurrentMonitoringTab("summary");
-
-	    logger.debug("end of refreshSummaryData, mcGeneralMonitoringDTO" + mcGeneralMonitoringDTO);
-		request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
-
-		/*find out if there are any reflection entries, from here*/
-		boolean notebookEntriesExist=MonitoringUtil.notebookEntriesExist(mcService, mcContent);
-		logger.debug("notebookEntriesExist : " + notebookEntriesExist);
-		
-		if (notebookEntriesExist)
-		{
-		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-		    
-		    String userExceptionNoToolSessions=(String)mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
-		    
-		    if (userExceptionNoToolSessions.equals("true"))
-		    {
-		        logger.debug("there are no online student activity but there are reflections : ");
-		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-		    }
-		}
-		else
-		{
-		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
-		}
-		/* ... till here*/
-		
-		MonitoringUtil.buildMcStatsDTO(request,mcService, mcContent);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-
-    	logger.debug("end  initSummaryContent...");
-	}
-    
-
-    /**
-     * void initStatsContent(String toolContentID,
-            HttpServletRequest request,
-            IMcService mcService, 
-            McGeneralMonitoringDTO mcGeneralMonitoringDTO)
-     * 
-     * @param toolContentID
-     * @param request
-     * @param mcService
-     * @param mcGeneralMonitoringDTO
-     * @throws IOException
-     * @throws ServletException
-     */
-    public void initStatsContent(String toolContentID,
-            HttpServletRequest request,
-            IMcService mcService, 
-            McGeneralMonitoringDTO mcGeneralMonitoringDTO) throws IOException,
-                                         ServletException
-	{
-    	logger.debug("starting  initStatsContent...:" + toolContentID);
-    	logger.debug("dispatching getStats..." + request);
-		logger.debug("mcService: " + mcService);
-		
-	    McContent mcContent=mcService.retrieveMc(new Long(toolContentID));
-		logger.debug("existing mcContent:" + mcContent);
-		
-		if (mcService.studentActivityOccurredGlobal(mcContent))
-		{
-			mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
-			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
-		}
-		else
-		{
-			mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
-			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
-		}
-
-		
-    	refreshStatsData(request, mcService,mcGeneralMonitoringDTO);
-    	logger.debug("post refreshStatsData, mcGeneralMonitoringDTO: " + mcGeneralMonitoringDTO );
-    	
-    	prepareReflectionData(request, mcContent, mcService, null, false, "All");
-
-    	EditActivityDTO editActivityDTO = new EditActivityDTO();
-		boolean isContentInUse=McUtils.isContentInUse(mcContent);
-		logger.debug("isContentInUse:" + isContentInUse);
-		if (isContentInUse == true)
-		{
-		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
-		}
-		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
-
-		/**getting instructions screen content from here... */
-		mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
-		mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
-		
-        List attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
-        logger.debug("attachmentList: " + attachmentList);
-        mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
-        mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-        /** ...till here **/
-
-		
-    	mcGeneralMonitoringDTO.setCurrentMonitoringTab("stats");
-	    
-    	logger.debug("end of refreshSummaryData, mcGeneralMonitoringDTO" + mcGeneralMonitoringDTO);
-		request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
-
-    	
-		/*find out if there are any reflection entries, from here*/
-		boolean notebookEntriesExist=MonitoringUtil.notebookEntriesExist(mcService, mcContent);
-		logger.debug("notebookEntriesExist : " + notebookEntriesExist);
-		
-		if (notebookEntriesExist)
-		{
-		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-		    
-		    String userExceptionNoToolSessions=(String)mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-		    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
-		    
-		    if (userExceptionNoToolSessions.equals("true"))
-		    {
-		        logger.debug("there are no online student activity but there are reflections : ");
-		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-		    }
-		}
-		else
-		{
-		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
-		}
-		/* ... till here*/
-		
-		MonitoringUtil.buildMcStatsDTO(request,mcService, mcContent);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-		
-    	logger.debug("ending  initStatsContent...");
-	}
-
-    
-    /**
-     * void refreshStatsData(HttpServletRequest request, IMcService mcService, 
-	        McGeneralMonitoringDTO mcGeneralMonitoringDTO)
-     * 
-     * @param request
-     * @param mcService
-     * @param mcGeneralMonitoringDTO
-     */
-	public void refreshStatsData(HttpServletRequest request, IMcService mcService, 
-	        McGeneralMonitoringDTO mcGeneralMonitoringDTO)
-	{
-	    logger.debug("starting refreshStatsData: " + mcService);
-		/* it is possible that no users has ever logged in for the activity yet*/
-		if (mcService == null)
-		{
-			logger.debug("will retrieve mcService");
-			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-			logger.debug("retrieving mcService from session: " + mcService);
-		}
-		
-	    int countAllUsers=mcService.getTotalNumberOfUsers();
-		logger.debug("countAllUsers: " + countAllUsers);
-		
-		if (countAllUsers == 0)
-		{
-	    	logger.debug("error: countAllUsers is 0");
-	    	mcGeneralMonitoringDTO.setUserExceptionNoStudentActivity(new Boolean(true).toString());
-		}
-		
-		mcGeneralMonitoringDTO.setCountAllUsers(new Integer(countAllUsers).toString());
- 		
-		int countSessionComplete=mcService.countSessionComplete();
-		logger.debug("countSessionComplete: " + countSessionComplete);
-		mcGeneralMonitoringDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
-		
-
-		logger.debug("end of refreshStatsData, mcGeneralMonitoringDTO" + mcGeneralMonitoringDTO);
-		request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
-	}
-	
-
-	
-	/**
+ 	/**
 	 * void repopulateRequestParameters(HttpServletRequest request, McMonitoringForm mcMonitoringForm, 
             McGeneralMonitoringDTO mcGeneralMonitoringDTO)
 	 * 
@@ -5057,7 +4590,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	}
     	/* ... till here*/
 
-    	MonitoringUtil.buildMcStatsDTO(request,mcService, mcContent);
+    	MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
     	MonitoringUtil.generateGroupsSessionData(request, mcService, mcContent);
     	MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
     	logger.debug("ending setupCommonScreenData, mcContent " + mcContent);

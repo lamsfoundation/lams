@@ -71,22 +71,6 @@ public interface IMcUserDAO {
      */
     public void removeMcUser(McQueUsr mcUser);
     
-    /**
-     * <p>Delete the given instance of McQueUsr with the
-     * given user id <code>userId</code>
-     * 
-     * @param userId The mc user id.
-     */
-    public void removeMcUserById(Long userId);
-    
-    public List getMcUserBySessionOnly(final McSession mcSession);
-    
-    public int getTotalNumberOfUsers(McContent mcContent);
-    
-    public int getTotalNumberOfUsers();
-    
-    public int countUserComplete(McContent mcContent);
-   
-    /** Get the max, min and average mark (in that order) for a session */
+     /** Get the max, min and average mark (in that order) for a session */
     public Integer[] getMarkStatisticsForSession(Long sessionUid);
 }

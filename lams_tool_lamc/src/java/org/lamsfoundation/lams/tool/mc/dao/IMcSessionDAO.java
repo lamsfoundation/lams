@@ -73,15 +73,8 @@ public interface IMcSessionDAO {
     public void updateMcSession(McSession mcSession);
 
     /**
-     * <p>Delete the given instance of McSession with the
-     * given identifier <code>uid</code>
-     * 
-     * @param uid an identifier for the McSession instance. 
+     * Delete the given instance of McSession
      */
-    public void removeMcSessionByUID(Long uid);
-    
-    public void removeMcSessionById(Long mcSessionId);
-
     public void removeMcSession(McSession mcSession);
     
     
@@ -95,31 +88,5 @@ public interface IMcSessionDAO {
      */	
     public McSession getMcSessionByUser(Long userId);
     
-   
 
-    /**
-     * <p>Creates and persists an instance of McQueUsr which is associated
-     * with the McSession with tool session id <code>mcSessionId</code> </p>
-     * 
-     * @param mcSessionId The tool session id
-     * @param user The instance of McQueUsr
-     */
-    public void addMcUsers(Long mcSessionId, McQueUsr user);
-    
-    /**
-     * Returns a list of tool session ids which are associated with this
-     * instance of McContent. 
-     
-     * @param nbContent The instance of McContent in which you want the list of toolSessionIds
-     * @return a list of tool session Ids
-     */
-    public List getSessionsFromContent(McContent mcContent);
-    
-    public List getSessionNamesFromContent(McContent mcContent);
-    
-    public int countSessionComplete();
-    
-    public int countSessionComplete(McContent mcContent);
-
-    public int countSessionIncomplete();
 }

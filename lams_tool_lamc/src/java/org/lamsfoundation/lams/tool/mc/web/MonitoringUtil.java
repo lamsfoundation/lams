@@ -37,13 +37,13 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.mc.McAllGroupsDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
+import org.lamsfoundation.lams.tool.mc.McComparator;
+import org.lamsfoundation.lams.tool.mc.McGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.mc.McMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
-import org.lamsfoundation.lams.tool.mc.McStatsDTO;
 import org.lamsfoundation.lams.tool.mc.McStringComparator;
 import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
-import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
@@ -59,44 +59,6 @@ import org.lamsfoundation.lams.tool.mc.service.IMcService;
  */
 public class MonitoringUtil implements McAppConstants{
 	static Logger logger = Logger.getLogger(MonitoringUtil.class.getName());
-	
-	/**
-	 *  
-	 * populateToolSessions(HttpServletRequest request, McContent mcContent)
-	 * 
-	 * populates all the tool sessions in a map
-	 * 
-	 * @param request
-	 * @param mcContent
-	 * @return Map
-	 */
-	public static Map populateToolSessions(HttpServletRequest request, McContent mcContent, IMcService mcService)
-	{
-		List sessionsList=mcService.getSessionNamesFromContent(mcContent);
-    	logger.debug("sessionsList size is:..." + sessionsList.size());
-    	
-    	Map sessionsMap=McUtils.convertToStringMap(sessionsList, "String");
-    	logger.debug("generated sessionsMap:..." + sessionsMap);
-    	logger.debug("sessionsMap size:..." + sessionsMap.size());
-    	
-    	if (sessionsMap.isEmpty())
-		{
-    		logger.debug("sessionsMap size is 0:");
-        	sessionsMap.put(new Long(1).toString() , "None");
-		}
-    	else
-    	{
-    		logger.debug("sessionsMap has some entries: " +  sessionsMap.size());
-    		sessionsMap.put(new Long(sessionsMap.size()+ 1).toString() , "All");	
-    	}
-    	
-    	logger.debug("final sessionsMap:" + sessionsMap);
-    	return sessionsMap;		
-		
-		
-	}
-	
-	
 	
 	/**
 	 * 
@@ -309,41 +271,19 @@ public class MonitoringUtil implements McAppConstants{
 		logger.debug("will be building groups attempt data  for mcQueContent:..." + mcQueContent + " questionUid:" + questionUid);
     	Map<String,List>  mapMonitoredAttemptsContainerDTO= new TreeMap(new McStringComparator());
     	
-    	Map summaryToolSessions=populateToolSessionsId(request, mcContent, mcService);
-    	logger.debug("summaryToolSessions: " + summaryToolSessions);
-    	
-    	Iterator itMap = summaryToolSessions.entrySet().iterator();
-    	while (itMap.hasNext()) 
+    	Iterator sessionIterator = mcContent.getMcSessions().iterator();
+    	while (sessionIterator.hasNext()) 
     	{
-        	Map.Entry pairs = (Map.Entry)itMap.next();
-            logger.debug("using the  summary tool sessions pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            
-            if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All")))
-            {
-            	logger.debug("using the  numerical summary tool sessions pair: " +  " = " + pairs.getValue());
-            	McSession mcSession= mcService.findMcSessionById(new Long(pairs.getValue().toString()));
-            	logger.debug("mcSession: " +  " = " + mcSession);
-            	if (mcSession != null)
-            	{
-            		List listMcUsers=mcService.getMcUserBySessionOnly(mcSession);	
-            		logger.debug("listMcUsers for session id:"  + mcSession.getMcSessionId() +  " = " + listMcUsers);
-            		List sessionUsersAttempts=populateSessionUsersAttempts(request,mcSession.getMcSessionId(), listMcUsers, questionUid, mcService);
-
-            		// create a unique group name as the key for these attempts. This name will be shown on the output screen.
-            		// the group name should be unique, so this a a "just in case"
-            		String sessionName = mcSession.getSession_name();
-            		int extra = 1;
-            		while ( mapMonitoredAttemptsContainerDTO.containsKey(sessionName) ) {
-            			sessionName = sessionName + new Integer(extra).toString();
-            			extra++;
-            		}
-            		mapMonitoredAttemptsContainerDTO.put(sessionName, sessionUsersAttempts);
-            	}
-            }
+    		McSession mcSession = (McSession) sessionIterator.next();
+    		Set listMcUsers=mcSession.getMcQueUsers();	
+    		List sessionUsersAttempts=populateSessionUsersAttempts(request,mcSession.getMcSessionId(), listMcUsers, questionUid, mcService);
+    		mapMonitoredAttemptsContainerDTO.put(mcSession.getSession_name(), sessionUsersAttempts);
 		}
-    	    
-    	logger.debug("final mapMonitoredAttemptsContainerDTO:..." + mapMonitoredAttemptsContainerDTO);
-		return mapMonitoredAttemptsContainerDTO;
+
+    	if ( logger.isDebugEnabled() )
+    		logger.debug("final mapMonitoredAttemptsContainerDTO:..." + mapMonitoredAttemptsContainerDTO);
+
+    	return mapMonitoredAttemptsContainerDTO;
 	}
 
 	/**
@@ -358,23 +298,20 @@ public class MonitoringUtil implements McAppConstants{
 	 * @param listMcUsers
 	 * @return List
 	 */
-	public static List  populateSessionUsersAttempts(HttpServletRequest request,Long sessionId, List listMcUsers, Long questionUid, IMcService mcService)
+	public static List  populateSessionUsersAttempts(HttpServletRequest request,Long sessionId, Set listMcUsers, Long questionUid, IMcService mcService)
 	{
-	    logger.debug("starting populateSessionUsersAttempts");
-		logger.debug("will be populating users marks for session id: " + sessionId);
+		if ( logger.isDebugEnabled() ) {
+			logger.debug("starting populateSessionUsersAttempts");
+			logger.debug("will be populating users marks for session id: " + sessionId);
+		}
 		
 		McSession mcSession=mcService.retrieveMcSession(sessionId);
-	    logger.debug("retrieving mcSession: " + mcSession);
 
 		List listMonitoredUserContainerDTO= new LinkedList();
-		
-		logger.debug("generating standard summary page");
 		Iterator itUsers=listMcUsers.iterator();
 		while (itUsers.hasNext())
 		{
     		McQueUsr mcQueUsr=(McQueUsr)itUsers.next();
-    		logger.debug("current User is: " + mcQueUsr);
-		    logger.debug("request is standard summary page.");
 		    listMonitoredUserContainerDTO=getAttemptEntries(request, mcService, mcQueUsr, mcSession, questionUid, listMonitoredUserContainerDTO, true);
 		}
 			
@@ -450,112 +387,15 @@ public class MonitoringUtil implements McAppConstants{
 		return listMonitoredUserContainerDTO;
 	}
 
-
 	/**
-	 * McUsrAttempt getAttemptWithHighestOrder(List listUserAttempts)
-	 * 
-	 * @param listUserAttempts
-	 * @return
-	 */
-	public static McUsrAttempt getAttemptWithHighestOrder(List listUserAttempts)
-	{
-		logger.debug("starting getAttemptWithHighestOrder: " + listUserAttempts);
-		Iterator itAttempts=listUserAttempts.iterator();
-		int highestOrder=0;
-		McUsrAttempt mcHighestUsrAttempt=null;
-		
-		while (itAttempts.hasNext())
-		{
-    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttempts.next();
-    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
-    		int currentOrder=mcUsrAttempt.getAttemptOrder().intValue();
-    		logger.debug("currentOrder: " + currentOrder);
-    		
-    		if (currentOrder > highestOrder)
-    		{
-    		    mcHighestUsrAttempt=mcUsrAttempt;
-    		    highestOrder=currentOrder;
-    		    logger.debug("highestOrder is updated to: " + highestOrder);
-    		}
-		}
-		
-		logger.debug("returning mcHighestUsrAttempt: " + mcHighestUsrAttempt);
-		logger.debug("highestOrder has become: " + highestOrder);
-		return mcHighestUsrAttempt;
-	}
-
-	
-	/**
-	 * Map populateToolSessionsId(HttpServletRequest request, McContent mcContent, IMcService mcService)
-	 * 
-	 * @param request
-	 * @param mcContent
-	 * @param mcService
-	 * @return
-	 */
-	public static Map populateToolSessionsId(HttpServletRequest request, McContent mcContent, IMcService mcService)
-	{
-		List sessionsList=mcService.getSessionsFromContent(mcContent);
-    	logger.debug("sessionsList size is:..." + sessionsList.size());
-    	
-    	Map sessionsMap=McUtils.convertToStringMap(sessionsList, "Long");
-    	logger.debug("generated sessionsMap:..." + sessionsMap);
-    	logger.debug("sessionsMap size:..." + sessionsMap.size());
-    	
-    	if (sessionsMap.isEmpty())
-		{
-    		logger.debug("sessionsMap size is 0:");
-        	sessionsMap.put(new Long(1).toString() , "None");
-		}
-    	else
-    	{
-    		logger.debug("sessionsMap has some entries: " +  sessionsMap.size());
-    		sessionsMap.put(new Long(sessionsMap.size()+ 1).toString() , "All");	
-    	}
-    	
-    	logger.debug("final sessionsMap:" + sessionsMap);
-    	return sessionsMap;
-	}
-
-	
-	/**
-	 * Map convertToMap(List list)
-	 * 
-	 * @param list
-	 * @return
-	 */
-	public static Map convertToMap(List list)
-	{
-		logger.debug("using convertToMap: " + list);
-		Map map= new TreeMap(new McStringComparator());
-		
-		Iterator listIterator=list.iterator();
-    	Long mapIndex=new Long(1);
-    	
-    	while (listIterator.hasNext())
-    	{
-   			Map data=(Map)listIterator.next();
-   			map.put(mapIndex.toString(), data);
-    		mapIndex=new Long(mapIndex.longValue()+1);
-    	}
-    	return map;
-	}	
-	
-	/**
-	 * void buildMcStatsDTO(HttpServletRequest request, IMcService mcService, McContent mcContent)
-	 * 
 	 * @param request
 	 * @param mcService
 	 * @param mcContent
 	 */
-	public static void buildMcStatsDTO(HttpServletRequest request, IMcService mcService, McContent mcContent)
+	public static void setSessionUserCount(McContent mcContent, McGeneralMonitoringDTO mcGeneralMonitoringDTO)
 	{
-		logger.debug("building mcStatsDTO: " + mcContent);
-		McStatsDTO mcStatsDTO= new McStatsDTO();
-		
 		int countSessionComplete=0;
 		int countAllUsers=0;
-		logger.debug("finding out about content level notebook entries: " + mcContent);
 		Iterator iteratorSession= mcContent.getMcSessions().iterator();
 		while (iteratorSession.hasNext())
 		{
@@ -568,33 +408,17 @@ public class MonitoringUtil implements McAppConstants{
 			    
 			    if (mcSession.getSessionStatus().equals(COMPLETED))
 			    {
-			        ++countSessionComplete;
+			        countSessionComplete++;
 			    }
-			        
-			    Iterator iteratorUser=mcSession.getMcQueUsers().iterator();
-			    while (iteratorUser.hasNext())
-				{
-			        McQueUsr mcQueUsr=(McQueUsr) iteratorUser.next();
-			        logger.debug("mcQueUsr: " + mcQueUsr);
-			        
-			        if (mcQueUsr != null)
-			        {
-				        logger.debug("mcQueUsr foundid");
-				        ++countAllUsers;
-			        }
-				}		        
+			    countAllUsers += mcSession.getMcQueUsers().size();
 		    }
 		}
-		logger.debug("countAllUsers: " + countAllUsers);
-		logger.debug("countSessionComplete: " + countSessionComplete);
 		
+		mcGeneralMonitoringDTO.setCountAllUsers(new Integer(countAllUsers));
+		mcGeneralMonitoringDTO.setCountSessionComplete(new Integer(countSessionComplete));
 		
-		mcStatsDTO.setCountAllUsers(new Integer(countAllUsers).toString());
-		mcStatsDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
-		
-		logger.debug("mcStatsDTO: " + mcStatsDTO);
-
-		request.setAttribute(MC_STATS_DTO, mcStatsDTO);
+		if ( countSessionComplete > 0 )
+			mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(Boolean.FALSE.toString());
 	}
 
 	

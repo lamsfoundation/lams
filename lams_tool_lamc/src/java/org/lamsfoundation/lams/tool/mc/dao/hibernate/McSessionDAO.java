@@ -42,18 +42,10 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
 	
-	private static final String FIND_MC_SESSION_CONTENT = "from " + McSession.class.getName() + " as mcs where mc_session_id=?";
-	
     private static final String LOAD_MCSESSION_BY_USER = "select ms from McSession ms left join fetch "
         + "ms.mcQueUsers user where user.queUsrId=:userId";
     
-    private static final String GET_SESSIONS_FROM_CONTENT = "select ms.mcSessionId from McSession ms where ms.mcContent=:mcContent";
-    
-    private static final String COUNT_SESSION_COMPLETE = "from mcSession in class McSession where mcSession.sessionStatus='COMPLETED'";
-    
-    private static final String COUNT_SESSION_INCOMPLETE = "from mcSession in class McSession where mcSession.sessionStatus='INCOMPLETE'";
-    
-    private static final String GET_SESSIONNAMES_FROM_CONTENT 	= "select mcs.session_name from McSession mcs where mcs.mcContent=:mcContent order by mcs.mcSessionId";
+	private static final String LOAD_MCSESSION_BY_MCSESSIONID = "from McSession mcs where mcs.mcSessionId=?";
     
     public McSession getMcSessionByUID(Long uid)
 	{
@@ -63,10 +55,8 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
 	
     public McSession findMcSessionById(Long mcSessionId)
     {
-    	String query = "from McSession mcs where mcs.mcSessionId=?";
 		
-		HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(query)
+		List list = getSession().createQuery(LOAD_MCSESSION_BY_MCSESSIONID)
 		.setLong(0,mcSessionId.longValue())
 		.list();
 		
@@ -76,57 +66,6 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
 		}
 		return null;
 	}
-    
-    public int countSessionComplete()
-    {
-    	HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(COUNT_SESSION_COMPLETE)
-		.list();
-		
-		if(list != null && list.size() > 0){
-			return list.size();
-		}
-		else return 0;
-	}
-
-    
-    public int countSessionComplete(McContent mcContent)
-    {
-        logger.debug("starting countSessionComplete: " + mcContent);
-    	HibernateTemplate templ = this.getHibernateTemplate();
-    	List list = getSession().createQuery(COUNT_SESSION_COMPLETE)
-    	.list();
-
-    	int sessionCount=0;
-    	if(list != null && list.size() > 0){
-    		McSession mcSession = (McSession) list.get(0);
-    		logger.debug("mcSession: " + mcSession);
-    		logger.debug("local session's content uid versus incoming content uid: " + 
-    		        mcSession.getMcContent().getUid().intValue() + " versus " + mcContent.getUid().intValue());
-    		
-    		if (mcSession.getMcContent().getUid().intValue() == mcContent.getUid().intValue())
-    		{
-    		    ++sessionCount;
-    		}
-    	}
-    	logger.debug("sessionCount: " + sessionCount);
-    	return sessionCount;
-        
-    }
-    
-    
-    public int countSessionIncomplete()
-    {
-    	HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(COUNT_SESSION_INCOMPLETE)
-		.list();
-		
-		if(list != null && list.size() > 0){
-			return list.size();
-		}
-		else return 0;
-	}
-    
     
     public void saveMcSession(McSession mcSession)
     {
@@ -140,41 +79,11 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
     	this.getHibernateTemplate().update(mcSession);
     }
 
-   
-    public void removeMcSessionByUID(Long uid)
-    {
-        McSession ms = (McSession)getHibernateTemplate().get(McSession.class, uid);
-    	this.getHibernateTemplate().delete(ms);
-    }
-    
-    public void removeMcSessionById(Long mcSessionId)
-    {
-        String query = "from McSession as mcs where mcs.mcSessionId =";
-        
-		HibernateTemplate templ = this.getHibernateTemplate();
-		if ( mcSessionId != null) {
-			List list = getSession().createQuery(FIND_MC_SESSION_CONTENT)
-				.setLong(0,mcSessionId.longValue())
-				.list();
-			
-			if(list != null && list.size() > 0){
-				McSession mcs = (McSession) list.get(0);
-				this.getSession().setFlushMode(FlushMode.AUTO);
-				templ.delete(mcs);
-				templ.flush();
-			}
-		}
-        
-        
-    }
-
     public void removeMcSession(McSession mcSession)
     {
 		this.getSession().setFlushMode(FlushMode.AUTO);
         this.getHibernateTemplate().delete(mcSession);
     }
-
-    
 
     public McSession getMcSessionByUser(final Long userId)
 	{
@@ -191,36 +100,4 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
                 });
 	}
 	
-	 
-    public void removeMcUsers(McSession mcSession)
-    {
-    	this.getHibernateTemplate().deleteAll(mcSession.getMcQueUsers());
-    }
-	
-    
-    public void addMcUsers(Long mcSessionId, McQueUsr user)
-	{
-    	McSession session = findMcSessionById(mcSessionId);
-	    user.setMcSession(session);
-	    session.getMcQueUsers().add(user);
-	    this.getHibernateTemplate().saveOrUpdate(user);
-	    this.getHibernateTemplate().saveOrUpdate(session);
-	    	    
-	}
-	
-
-	public List getSessionsFromContent(McContent mcContent)
-	{
-	    return (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT,
-	            "mcContent",
-				mcContent));
-	}
-	
-	public List getSessionNamesFromContent(McContent mcContent)
-	{
-	    return (getHibernateTemplate().findByNamedParam(GET_SESSIONNAMES_FROM_CONTENT,
-	            "mcContent",
-				mcContent));
-	}
-
 }

@@ -30,8 +30,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
@@ -79,7 +77,6 @@ import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
-import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -741,21 +738,6 @@ public class McServicePOJO implements
     	
 	}
    
-    public List getMcUserBySessionOnly(final McSession mcSession) throws McApplicationException
-    {
-     	try
-        {
-            return mcUserDAO.getMcUserBySessionOnly(mcSession);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is retrieving users by session: "
-                                                         + e.getMessage(),
-														   e);
-        }
-    }
-    
-    
     public McContent retrieveMcBySessionId(Long mcSessionId) throws McApplicationException
     {
         try
@@ -770,22 +752,6 @@ public class McServicePOJO implements
         }
     }
    
-    public List getSessionNamesFromContent(McContent mcContent) throws McApplicationException
-    {
-        try
-        {
-        	return mcSessionDAO.getSessionNamesFromContent(mcContent);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is getting session names from content: "
-                                                         + e.getMessage(),
-														   e);
-        }
-    }
-
-    
-    
     public void updateMc(McContent mc) throws McApplicationException
     {
         try
@@ -842,62 +808,6 @@ public class McServicePOJO implements
                                                  + e.getMessage(),e);
         }
     }
-
-    
-    public int countSessionComplete(McContent mcContent) throws McApplicationException
-	{
-		try
-        {
-			return mcSessionDAO.countSessionComplete(mcContent);
-        }
-		catch(DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is counting incomplete sessions"
-                                                 + e.getMessage(),e);
-        }		
-	}
-
-    
-	public int countSessionComplete() throws McApplicationException
-	{
-		try
-        {
-			return mcSessionDAO.countSessionComplete();
-        }
-		catch(DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is counting incomplete sessions"
-                                                 + e.getMessage(),e);
-        }		
-	}
-
-    public int countSessionIncomplete() throws McApplicationException
-	{
-		try
-        {
-			return mcSessionDAO.countSessionIncomplete();
-        }
-		catch(DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is counting incomplete sessions"
-                                                 + e.getMessage(),e);
-        }    	
-	}
-    
-    public void deleteMcSession(McSession mcSession) throws McApplicationException 
-	{
-		try
-        {
-			mcSessionDAO.removeMcSession(mcSession);
-        }
-		catch(DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is deleting"
-                                                 + " the mc session: "
-                                                 + e.getMessage(),e);
-        }
-	}
-    
     
     public void removeAttempt (McUsrAttempt attempt) throws McApplicationException
 	{
@@ -1068,20 +978,6 @@ public class McServicePOJO implements
         }
 	}
 
-    public List getSessionsFromContent(McContent mcContent) throws McApplicationException
-	{
-    	try
-        {
-            return mcSessionDAO.getSessionsFromContent(mcContent);
-        }
-        catch (DataAccessException e)
-        {
-            throw new McApplicationException("Exception occured when lams is getting"
-                                                 + " the mc sessions list: "
-                                                 + e.getMessage(),e);
-        }
-	}
-
     public List findMcOptionCorrectByQueId(Long mcQueContentId) throws McApplicationException
     {
     	try
@@ -1157,53 +1053,7 @@ public class McServicePOJO implements
         }
 	}
 
-
-    public int countUserComplete(McContent mcContent) throws McApplicationException
-	{
- 	   try
-       {
-	   		return mcUserDAO.countUserComplete(mcContent);
-       }
-       catch (DataAccessException e)
-       {
-           throw new McApplicationException("Exception occured when lams is retrieving completed user count: "
-                                                        + e.getMessage(),
-														   e);
-       }
-	}
-    
-    
-    
-    public int getTotalNumberOfUsers(McContent mcContent) throws McApplicationException
-	{
- 	   try
-       {
-	   		return mcUserDAO.getTotalNumberOfUsers(mcContent);
-       }
-       catch (DataAccessException e)
-       {
-           throw new McApplicationException("Exception occured when lams is retrieving total number of McQueUsr: "
-                                                        + e.getMessage(),
-														   e);
-       }
-	}
-    
-    
-    public int getTotalNumberOfUsers() throws McApplicationException
-	{
- 	   try
-       {
-	   		return mcUserDAO.getTotalNumberOfUsers();
-       }
-       catch (DataAccessException e)
-       {
-           throw new McApplicationException("Exception occured when lams is retrieving total number of McQueUsr: "
-                                                        + e.getMessage(),
-														   e);
-       }
-	}
-    
-    public User getCurrentUserData(String username) throws McApplicationException
+   public User getCurrentUserData(String username) throws McApplicationException
     {
         try
         {
@@ -1971,15 +1821,7 @@ public class McServicePOJO implements
     }
 
     
-    public List getToolSessionsForContent(McContent mc)
-    {
-    	logger.debug("attempt retrieving listToolSessionIds for : " + mc);
-    	List listToolSessionIds=mcSessionDAO.getSessionsFromContent(mc);
-    	return listToolSessionIds;
-    }
-    
-
-    public void removeAttachment(McContent content, McUploadedFile attachment) throws RepositoryCheckedException
+   public void removeAttachment(McContent content, McUploadedFile attachment) throws RepositoryCheckedException
 	{
 	    try
 	    {
@@ -2127,18 +1969,6 @@ public class McServicePOJO implements
 		mcUploadedFileDAO.saveUploadFile(mcUploadedFile);
 		logger.debug("persisted mcUploadedFile: " + mcUploadedFile);
 	}
-
-	/**
-	 * 
-	 * removes all the entries in the uploaded files table
-	 */
-	public void cleanUploadedFilesMetaData() throws McApplicationException {
-		logger.debug("attempt cleaning up uploaded file meta data table from the db");
-		mcUploadedFileDAO.cleanUploadedFilesMetaData();
-		logger.debug("files meta data has been cleaned up");
-	}
-	
-	
 
 	/**
 	 * @return Returns the logger.
@@ -2474,7 +2304,7 @@ public class McServicePOJO implements
    
 
     
-    public List retrieveMcUploadedFiles(McContent mc) throws McApplicationException {
+    public List<McUploadedFile> retrieveMcUploadedFiles(McContent mc) throws McApplicationException {
         try {
             return mcUploadedFileDAO.retrieveMcUploadedFiles(mc);
         }

@@ -145,6 +145,7 @@ import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -461,7 +462,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	    mcGeneralAuthoringDTO.setReflectionSubject(mcContent.getReflectionSubject());
 	
 	    
-        List attachmentList = mcService.retrieveMcUploadedFiles(mcContent); 
+	    List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent); 
         mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
         mcGeneralAuthoringDTO.setDeletedAttachmentList(new ArrayList());
 

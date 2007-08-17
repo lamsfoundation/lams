@@ -58,8 +58,8 @@ public class McGeneralMonitoringDTO implements Comparable
 	protected String activityTitle;
 	protected String activityInstructions;
 	protected String defaultOptionContent;
-	protected String countAllUsers;
-	protected String countSessionComplete;
+	protected Integer countAllUsers;
+	protected Integer countSessionComplete;
 	protected String isPortfolioExport;
 	protected String groupName;
 	protected String currentMonitoredToolSession;
@@ -72,7 +72,6 @@ public class McGeneralMonitoringDTO implements Comparable
 	protected String toolContentID;
 	protected Map mapOptionsContent;
 	protected Map summaryToolSessions;
-	protected Map summaryToolSessionsId;
 	protected List listMonitoredAnswersContainerDto;
 	protected List listUserEntries;
 	protected String selectedToolSessionId;
@@ -366,25 +365,25 @@ public class McGeneralMonitoringDTO implements Comparable
     /**
      * @return Returns the countAllUsers.
      */
-    public String getCountAllUsers() {
+    public Integer getCountAllUsers() {
         return countAllUsers;
     }
     /**
      * @param countAllUsers The countAllUsers to set.
      */
-    public void setCountAllUsers(String countAllUsers) {
+    public void setCountAllUsers(Integer countAllUsers) {
         this.countAllUsers = countAllUsers;
     }
     /**
      * @return Returns the countSessionComplete.
      */
-    public String getCountSessionComplete() {
+    public Integer getCountSessionComplete() {
         return countSessionComplete;
     }
     /**
      * @param countSessionComplete The countSessionComplete to set.
      */
-    public void setCountSessionComplete(String countSessionComplete) {
+    public void setCountSessionComplete(Integer countSessionComplete) {
         this.countSessionComplete = countSessionComplete;
     }
     /**
@@ -410,18 +409,6 @@ public class McGeneralMonitoringDTO implements Comparable
      */
     public void setSummaryToolSessions(Map summaryToolSessions) {
         this.summaryToolSessions = summaryToolSessions;
-    }
-    /**
-     * @return Returns the summaryToolSessionsId.
-     */
-    public Map getSummaryToolSessionsId() {
-        return summaryToolSessionsId;
-    }
-    /**
-     * @param summaryToolSessionsId The summaryToolSessionsId to set.
-     */
-    public void setSummaryToolSessionsId(Map summaryToolSessionsId) {
-        this.summaryToolSessionsId = summaryToolSessionsId;
     }
     /**
      * @return Returns the selectionCase.
@@ -679,7 +666,6 @@ public class McGeneralMonitoringDTO implements Comparable
             .append("countSessionComplete: ", countSessionComplete)
             .append("isPortfolioExport: ", isPortfolioExport)
             .append("summaryToolSessions: ", summaryToolSessions)
-            .append("summaryToolSessionsId: ", summaryToolSessionsId)            
             .append("currentMonitoredToolSession: ", currentMonitoredToolSession)            
             .append("groupName: ", groupName)
             .append("listMonitoredAnswersContainerDto: ", listMonitoredAnswersContainerDto)
