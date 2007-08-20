@@ -107,7 +107,7 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 			try {
 				String username = getUsername();
 				WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
-				UserManagementService service = (UserManagementService) ctx.getBean("userManagementServiceTarget");
+				UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
 				User user = service.getUserByLogin(username);
 
 				log.debug("===> authenticating user: " + username);

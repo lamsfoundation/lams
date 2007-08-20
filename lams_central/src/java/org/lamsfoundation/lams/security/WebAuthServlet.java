@@ -63,7 +63,7 @@ public class WebAuthServlet extends HttpServlet {
 		else
 		{
 			WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(request.getSession().getServletContext()); 
-			UserManagementService service = (UserManagementService)ctx.getBean("userManagementServiceTarget");
+			UserManagementService service = (UserManagementService)ctx.getBean("userManagementService");
 			User webAuthUser = service.getUserByLogin(webAuthUserID);
 				
 			if (webAuthUser != null) 

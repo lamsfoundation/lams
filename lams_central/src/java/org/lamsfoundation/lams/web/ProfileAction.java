@@ -104,7 +104,7 @@ public class ProfileAction extends LamsDispatchAction {
 	private IUserManagementService getService(){
 		if(service==null){
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+			service = (IUserManagementService) ctx.getBean("userManagementService");
 			locales = getService().findAll(SupportedLocale.class);
 			Collections.sort(locales);
 		}

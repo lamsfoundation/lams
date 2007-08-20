@@ -48,7 +48,7 @@ public class AdminServiceProxy {
 	public static final IUserManagementService getService(ServletContext servletContext){
 		if (manageService == null) {
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-			return (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+			return (IUserManagementService) ctx.getBean("userManagementService");
 		} else {
 			return manageService;
 		}

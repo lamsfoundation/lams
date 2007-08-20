@@ -71,7 +71,7 @@ public class ToolContentListAction extends Action {
 		}
 		
 		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-		ILearningDesignService learningDesignService = (ILearningDesignService)ctx.getBean("learningDesignServiceTarget");
+		ILearningDesignService learningDesignService = (ILearningDesignService)ctx.getBean("learningDesignService");
 		
 		List learningLibraryDTOs = learningDesignService.getAllLearningLibraryDetails();
 		

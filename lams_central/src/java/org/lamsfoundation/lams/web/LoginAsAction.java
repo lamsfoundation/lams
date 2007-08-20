@@ -63,7 +63,7 @@ public class LoginAsAction extends Action {
             HttpServletResponse response) throws Exception {
 		
 		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-		IUserManagementService service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+		IUserManagementService service = (IUserManagementService) ctx.getBean("userManagementService");
 		MessageService messageService = (MessageService)ctx.getBean("centralMessageService");
 		String login = WebUtil.readStrParam(request, "login", false);
 		

@@ -128,7 +128,7 @@ public class ProfileSaveAction extends Action {
 	private IUserManagementService getService(){
 		if(service==null){
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementServiceTarget");
+			service = (IUserManagementService) ctx.getBean("userManagementService");
 		}
 		return service;
 	}

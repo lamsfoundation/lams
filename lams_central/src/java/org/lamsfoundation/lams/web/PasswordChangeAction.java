@@ -102,7 +102,7 @@ public class PasswordChangeAction extends Action {
 	    	    {
 					//WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(request.getSession(true).getServletContext());
 					WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServlet().getServletContext());
-					UserManagementService service = (UserManagementService)ctx.getBean("userManagementServiceTarget");
+					UserManagementService service = (UserManagementService)ctx.getBean("userManagementService");
 					
 					User user = service.getUserByLogin(login);
 					if(!user.getPassword().equals(HashUtil.sha1(oldPassword)))

@@ -64,7 +64,7 @@ public class LDAPAuthenticator {
 		if (service==null) {
 			WebApplicationContext ctx = WebApplicationContextUtils
 				.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
-			service = (UserManagementService) ctx.getBean("userManagementServiceTarget");
+			service = (UserManagementService) ctx.getBean("userManagementService");
 		}
 		return service;
 	}
