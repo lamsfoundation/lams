@@ -92,6 +92,23 @@ public class AuthoringAction extends LamsDispatchAction{
 		return null;
 	}
 	
+	public ActionForward getToolOutputDefinitions(ActionMapping mapping,
+								   ActionForm form,
+								   HttpServletRequest request,
+								   HttpServletResponse response) throws ServletException, IOException {
+		String wddxPacket;
+		IAuthoringService authoringService = getAuthoringService();
+		try {	
+			Long toolContentID = new Long(WebUtil.readLongParam(request,"toolContentID"));
+			
+			wddxPacket = authoringService.getToolOutputDefinitions(toolContentID);
+			
+		} catch (Exception e) {
+			wddxPacket = handleException(e, "getLearningDesignDetails", authoringService).serializeMessage();
+		}
+		return outputPacket(mapping, request, response, wddxPacket, "definitions");
+	}
+	
 	public ActionForward getLearningDesignDetails(ActionMapping mapping,
 								   ActionForm form,
 								   HttpServletRequest request,

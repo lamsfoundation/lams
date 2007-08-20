@@ -161,6 +161,15 @@ public interface IAuthoringService {
 	public Vector<AuthoringActivityDTO> getToolActivities(Long learningDesignId);
 	
 	/**
+	 * This method returns a output definitions of the Tool
+	 * in WDDX format.
+	 * 
+	 * @return String The required definitions in WDDX format
+	 * @throws IOException
+	 */
+	public String getToolOutputDefinitions(Long toolContentID)throws IOException;
+	
+	/**
 	 * This method returns a list of all available Learning Designs
 	 * in WDDX format.
 	 * 

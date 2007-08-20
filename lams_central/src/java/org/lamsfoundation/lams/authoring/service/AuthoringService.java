@@ -75,11 +75,14 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
+import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.dao.hibernate.SystemToolDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
+import org.lamsfoundation.lams.tool.dto.ToolOutputDefinitionDTO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
@@ -280,6 +283,29 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	/**********************************************
 	 * Utility/Service Methods
 	 * *******************************************/
+	
+	 /**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getToolOutputDefinitions(java.lang.Long)
+	 */
+	public String getToolOutputDefinitions(Long toolContentID)throws IOException{
+		// create dummy wddx packet to return
+		FlashMessage flashMessage = null;
+		
+		ToolOutputDefinition definition = new ToolOutputDefinition();
+		definition.setName("USERS_MARK");
+		definition.setDescription("User's mark from a Quiz");
+		definition.setType(OutputType.OUTPUT_LONG);
+		definition.setStartValue(new Long(0));
+		definition.setEndValue(new Long(10));
+		
+		ToolOutputDefinitionDTO dto = new ToolOutputDefinitionDTO(definition);
+		
+		if(dto != null) {
+			flashMessage = new FlashMessage("getToolOutputDefinitions", dto);
+		}
+		
+		return flashMessage.serializeMessage();
+	}
 	
 	/**
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesignDetails(java.lang.Long)
