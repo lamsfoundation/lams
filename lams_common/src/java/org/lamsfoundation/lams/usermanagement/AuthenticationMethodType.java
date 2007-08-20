@@ -35,6 +35,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *     
 */
 public class AuthenticationMethodType implements Serializable {
+	
+	public static final String LAMS = "LAMS";
+	public static final String WEB_AUTH = "WEB_AUTH";
+	public static final String LDAP = "LDAP";
 
     /** identifier field */
     private Integer authenticationMethodTypeId;

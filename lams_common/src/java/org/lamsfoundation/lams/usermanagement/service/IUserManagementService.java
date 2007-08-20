@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -377,4 +378,22 @@ public interface IUserManagementService {
 	 * @return
 	 */
 	public Integer getCountRoleForSystem(Integer roleId);
+	
+	/**
+	 * Get default flash theme of server.
+	 * @return default flash theme object
+	 */
+	public CSSThemeVisualElement getDefaultFlashTheme();
+	
+	/**
+	 * Get default html theme of server.
+	 * @return default html theme object
+	 */
+	public CSSThemeVisualElement getDefaultHtmlTheme();
+	
+	/**
+	 * Get default server locale.
+	 * @return server default supported locale object
+	 */
+	public SupportedLocale getDefaultLocale();
 }

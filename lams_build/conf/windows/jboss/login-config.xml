@@ -150,10 +150,10 @@ $Revision$
        </authentication>
     </application-policy>
 
-	<application-policy name = "lams-DB">
+	<application-policy name = "lams">
        <authentication>
-          <login-module code = "org.jboss.security.auth.spi.DatabaseServerLoginModule" flag = "required">
-             <module-option name="dsJndiName">java:/MySqlDS</module-option>
+          <login-module code = "org.lamsfoundation.lams.security.UniversalLoginModule" flag = "required">
+             <module-option name="dsJndiName">java:/jdbc/lams-ds</module-option>
              <module-option name="principalsQuery">select password from lams_user where login=?</module-option>
              <module-option name="rolesQuery">
              	SELECT DISTINCT  r.name,'Roles' FROM
@@ -162,14 +162,6 @@ $Revision$
              	LEFT OUTER JOIN lams_role r USING (role_id)
              	WHERE u.login=?
              </module-option>
-          </login-module>
-       </authentication>
-    </application-policy>
-
-	<application-policy name = "lams">
-       <authentication>
-          <login-module code = "org.lamsfoundation.lams.security.UniversalLoginModule" flag = "required">
-             <module-option name="authenticationPropertyFile">@confdir@/lamsauthentication.xml</module-option>
           </login-module>
        </authentication>
     </application-policy>

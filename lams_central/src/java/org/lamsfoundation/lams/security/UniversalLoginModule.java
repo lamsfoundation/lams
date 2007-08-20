@@ -55,9 +55,12 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethodParameter;
+import org.lamsfoundation.lams.usermanagement.AuthenticationMethodType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
@@ -65,48 +68,29 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class UniversalLoginModule extends UsernamePasswordLoginModule {
+	
 	private static Logger log = Logger.getLogger(UniversalLoginModule.class);
-
-	private static final String USE_OBJECT_CREDENTIAL_OPT = "useObjectCredential";
-
-	private static final String PRINCIPAL_DN_PREFIX_OPT = "principalDNPrefix";
-
-	private static final String PRINCIPAL_DN_SUFFIX_OPT = "principalDNSuffix";
-
-	private static final String ROLES_CTX_DN_OPT = "rolesCtxDN";
-
-	private static final String USER_ROLES_CTX_DN_ATTRIBUTE_ID_OPT = "userRolesCtxDNAttributeName";
-
-	private static final String UID_ATTRIBUTE_ID_OPT = "uidAttributeID";
-
-	private static final String ROLE_ATTRIBUTE_ID_OPT = "roleAttributeID";
-
-	private static final String MATCH_ON_USER_DN_OPT = "matchOnUserDN";
-
-	private static final String ROLE_ATTRIBUTE_IS_DN_OPT = "roleAttributeIsDN";
-
-	private static final String ROLE_NAME_ATTRIBUTE_ID_OPT = "roleNameAttributeID";
 
 	public UniversalLoginModule() {
 	}
 
-	private transient SimpleGroup userRoles = new SimpleGroup("Roles");
-
 	protected String dsJndiName;
-
 	protected String rolesQuery;
-
-	protected String propertyFilePath;
+	protected String principalsQuery;
+	//protected String propertyFilePath;
 
 	public void initialize(Subject subject, CallbackHandler callbackHandler,
 			Map sharedState, Map options) {
 		super.initialize(subject, callbackHandler, sharedState, options);
 
 		//from options to get path to property file -> authentication.xml
-		propertyFilePath = (String) options.get("authenticationPropertyFile");
+		//propertyFilePath = (String) options.get("authenticationPropertyFile");
 		//load authentication property file  
-		AuthenticationMethodConfigurer.setConfigFilePath(propertyFilePath);
+		//AuthenticationMethodConfigurer.setConfigFilePath(propertyFilePath);
 
+		dsJndiName = (String)options.get("dsJndiName");
+		principalsQuery = (String)options.get("principalsQuery");
+		rolesQuery = (String)options.get("rolesQuery");
 	}
 
 	protected boolean validatePassword(String inputPassword,
@@ -127,57 +111,83 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 				User user = service.getUserByLogin(username);
 
 				log.debug("===> authenticating user: " + username);
-				if (user == null)
-					return false;
+				if (user == null) {
+					// provision a new user by checking ldap server
+					if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_PROVISIONING_ENABLED)) {
+						log.debug("===> LDAP provisioning is enabled, checking username against LDAP server...");
+						LDAPAuthenticator ldap = new LDAPAuthenticator();
+						isValid = ldap.authenticate(username, inputPassword);
+						if (isValid) {  // create a new user
+							log.info("===> Creating new user for LDAP username: " + username);
+							if (ldap.createLDAPUser(ldap.getAttrs())) {
+								user = service.getUserByLogin(username);
+								if (!ldap.addLDAPUser(ldap.getAttrs(), user.getUserId())) {
+									log.error("===> Couldn't add LDAP user: "+username+" to organisation.");
+								}
+							} else {
+								log.error("===> Couldn't create new user for LDAP username: "+username);
+								return false;
+							}
+						} else {  // didn't authenticate successfully with ldap
+							return false;
+						}
+					} else {
+						return false;
+					}
+				}
 
 				if (user.getDisabledFlag()) {
 					log.debug("===> user is disabled.");
 					return false;
 				}
 				
-				AuthenticationMethod method = null;
-				try {
-					method = user.getAuthenticationMethod();
+				AuthenticationMethod method = user.getAuthenticationMethod();
+				/*try {
 					AuthenticationMethodConfigurer.configure(method);
 
-					this.dsJndiName = method.getParameterByName("dsJndiName").getValue();
-					this.rolesQuery = method.getParameterByName("rolesQuery").getValue();
+					// use User's AuthMethod's dsJndiName and rolesQuery if set, otherwise use LAMS-Database's
+					AuthenticationMethodParameter dsParam = method.getParameterByName("dsJndiName");
+					AuthenticationMethodParameter rolesQueryParam = method.getParameterByName("rolesQuery");
+					if (dsParam!=null && rolesQueryParam!=null) {
+						this.dsJndiName = dsParam.getValue();
+						this.rolesQuery = rolesQueryParam.getValue();
+					} else {
+						AuthenticationMethod defaultAuthMethod = (AuthenticationMethod)service
+							.findById(AuthenticationMethod.class, AuthenticationMethod.DB);
+						this.dsJndiName = defaultAuthMethod.getParameterByName("dsJndiName").getValue();
+						this.rolesQuery = defaultAuthMethod.getParameterByName("rolesQuery").getValue();
+					}
 				} catch (Exception e) {
-					log.debug("===>Exception : " + e);
+					log.error("===> Error retrieving authentication method parameters : " + e, e);
 					return false;
 				}
-
-				List parameters = method.getAuthenticationMethodParameters();
 
 				//for debug purpose only
-				for (int i = 0; i < parameters.size(); i++) {
-					AuthenticationMethodParameter mp = (AuthenticationMethodParameter) parameters.get(i);
-					log.debug("===>" + mp.getName() + " = " + mp.getValue());
-				}
+				if (log.isDebugEnabled()) {
+					List parameters = method.getAuthenticationMethodParameters();
+					for (int i = 0; i < parameters.size(); i++) {
+						AuthenticationMethodParameter mp = (AuthenticationMethodParameter) parameters.get(i);
+						log.debug("===>" + mp.getName() + " = " + mp.getValue());
+					}
+				}*/
 				
-				String type = method.getAuthenticationMethodType().getDescription();
-				log.debug("===> authentication type :" + type);
-				if ("LDAP".equals(type)) {
-					LDAPAuthenticator authenticator = new LDAPAuthenticator(method);
-					isValid = authenticator.authenticate(username,inputPassword);
-					log.debug("===> LDAP :: user:" + username + ":"
-							+ inputPassword + " authenticated! ");
-				} else if ("LAMS".equals(type)) {
-					DatabaseAuthenticator authenticator = new DatabaseAuthenticator(method);
-					isValid = authenticator.authenticate(username,inputPassword);
-					log.debug("===> LAMS:: user:" + username + ":"
-							+ inputPassword + " authenticated! ");
-				} else if ("WEB_AUTH".equals(type)) {
-					log.debug("===> WEBAUTH: " + username + " type: " + type);
-					WebAuthAuthenticator authenticator = new WebAuthAuthenticator();
-					log.debug("===> webauth authenticator is:" + authenticator);
-					isValid = authenticator.authenticate(username,inputPassword);
-					log.debug("===> WEBAUTH :: user:" + username + ":"
-							+ inputPassword + " authenticated! ");
-
-				} else {
-					log.debug("Unexpected authentication type!");
-					return false;
+				if (!isValid) {
+					String type = method.getAuthenticationMethodType().getDescription();
+					log.debug("===> authentication type: " + type);
+					if (AuthenticationMethodType.LDAP.equals(type)) {
+						LDAPAuthenticator authenticator = new LDAPAuthenticator();
+						isValid = authenticator.authenticate(username,inputPassword);
+					} else if (AuthenticationMethodType.LAMS.equals(type)) {
+						// DatabaseAuthenticator authenticator = new DatabaseAuthenticator(method);
+						DatabaseAuthenticator authenticator = new DatabaseAuthenticator(dsJndiName, principalsQuery);
+						isValid = authenticator.authenticate(username,inputPassword);
+					} else if (AuthenticationMethodType.WEB_AUTH.equals(type)) {
+						WebAuthAuthenticator authenticator = new WebAuthAuthenticator();
+						isValid = authenticator.authenticate(username,inputPassword);
+					} else {
+						log.error("===> Unexpected authentication type: "+type);
+						return false;
+					}
 				}
 				//if login is valid, register userDTO into session.
 				if(isValid){
@@ -186,7 +196,7 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				log.debug("===> exception: " + e,e);
+				log.error("===> exception: " + e,e);
 			}
 		}
 		return isValid;
@@ -211,7 +221,7 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 			InitialContext ctx = new InitialContext();
 			DataSource ds = (DataSource) ctx.lookup(this.dsJndiName);
 
-			log.debug("===> getRoleSets() called: " + dsJndiName + ":" + rolesQuery);
+			//log.debug("===> getRoleSets() called: " + dsJndiName + ": " + rolesQuery);
 			conn = ds.getConnection();
 			// Get the user role names
 			ps = conn.prepareStatement(this.rolesQuery);
@@ -248,25 +258,25 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 					// Assign minimal role if user has none
 					if (name==null) {
 						name = Role.LEARNER;
-						log.info("Found no roles");
+						log.info("===> Found no roles");
 					}
 					p = super.createIdentity(name);
 					if (!groupMembers.contains(name)) {
-						log.info("Assign user to role " + p.getName());
+						log.info("===> Assign user to role " + p.getName());
 						group.addMember(p);
 						groupMembers.add(name);
 					}
 					if (name.equals(Role.SYSADMIN) || name.equals(Role.AUTHOR_ADMIN)) {
 						p = super.createIdentity(Role.AUTHOR);
-						log.info("Found "+name);
+						log.info("===> Found "+name);
 						if (!groupMembers.contains(Role.AUTHOR)) {
-							log.info("Assign user to role "+Role.AUTHOR);
+							log.info("===> Assign user to role "+Role.AUTHOR);
 							group.addMember(p);
 							groupMembers.add(Role.AUTHOR);
 						}
 					}
 				} catch (Exception e) {
-					log.debug("Failed to create principal: " + name, e);
+					log.debug("===> Failed to create principal: " + name, e);
 				}
 			} while (rs.next());
 		} catch (NamingException ex) {

@@ -37,15 +37,18 @@ import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 
 public class DatabaseAuthenticator
 {
-	private AuthenticationMethod method;
 	private String dsJndiName;
 	private String principalsQuery;
 	
-	public DatabaseAuthenticator( AuthenticationMethod method)
+	public DatabaseAuthenticator(AuthenticationMethod method)
 	{
-		this.method = method;
 		this.dsJndiName = method.getParameterByName("dsJndiName").getValue();
 		this.principalsQuery = method.getParameterByName("principalsQuery").getValue();
+	}
+	
+	public DatabaseAuthenticator(String dsJndiName, String principalsQuery) {
+		this.dsJndiName = dsJndiName;
+		this.principalsQuery = principalsQuery;
 	}
 
 	public boolean authenticate( String username, String inputPassword )

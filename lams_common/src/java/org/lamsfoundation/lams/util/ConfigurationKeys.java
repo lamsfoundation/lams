@@ -134,4 +134,48 @@ public class ConfigurationKeys {
 	public static String LAMS_COMMUNITY_ENABLE = "LAMS_Community_enable";
 
 	public static String ALLOW_EDIT_ON_FLY = "AllowLiveEdit";
+	
+	public static String LDAP_PROVISIONING_ENABLED = "LDAPProvisioningEnabled";
+	
+	public static String LDAP_PROVIDER_URL = "LDAPProviderURL";
+	
+	public static String LDAP_SECURITY_AUTHENTICATION = "LDAPSecurityAuthentication";
+	
+	public static String LDAP_PRINCIPAL_DN_PREFIX = "LDAPPrincipalDNPrefix";
+	
+	public static String LDAP_PRINCIPAL_DN_SUFFIX = "LDAPPrincipalDNSuffix";
+	
+	public static String LDAP_SECURITY_PROTOCOL = "LDAPSecurityProtocol";
+	
+	public static String LDAP_TRUSTSTORE_PATH = "LDAPTruststorePath";
+	
+	public static String LDAP_TRUSTSTORE_PASSWORD = "LDAPTruststorePassword";
+	
+	public static String LDAP_LOGIN_ATTR = "LDAPLoginAttr";
+	
+	public static String LDAP_FIRST_NAME_ATTR = "LDAPFNameAttr";
+	
+	public static String LDAP_LAST_NAME_ATTR = "LDAPLNameAttr";
+	
+	public static String LDAP_EMAIL_ATTR = "LDAPEmailAttr";
+	
+	public static String LDAP_PHONE_ATTR = "LDAPPhoneAttr";
+	
+	public static String LDAP_FAX_ATTR = "LDAPFaxAttr";
+	
+	public static String LDAP_MOBILE_ATTR = "LDAPMobileAttr";
+	
+	public static String LDAP_ORG_CODE_ATTR = "LDAPOrgCodeAttr";
+	
+	public static String LDAP_ROLES_ATTR = "LDAPRolesAttr";
+	
+	public static String LDAP_LEARNER_MAP = "LDAPLearnerMap";
+	
+	public static String LDAP_MONITOR_MAP = "LDAPMonitorMap";
+	
+	public static String LDAP_AUTHOR_MAP = "LDAPAuthorMap";
+	
+	public static String LDAP_GROUP_ADMIN_MAP = "LDAPGroupAdminMap";
+	
+	public static String LDAP_GROUP_MANAGER_MAP = "LDAPGroupManagerMap";
 }

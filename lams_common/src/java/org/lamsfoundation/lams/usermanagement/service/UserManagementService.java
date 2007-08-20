@@ -38,6 +38,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -54,6 +55,8 @@ import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -876,5 +879,22 @@ public class UserManagementService implements IUserManagementService {
 			return count;
 		else
 			return new Integer(0);
+	}
+	
+	public CSSThemeVisualElement getDefaultFlashTheme() {
+		String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
+		List list = findByProperty(CSSThemeVisualElement.class, "name", flashName);
+		return (list!=null ? (CSSThemeVisualElement)list.get(0) : null);
+	}
+	
+	public CSSThemeVisualElement getDefaultHtmlTheme() {
+		String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
+		List list = findByProperty(CSSThemeVisualElement.class, "name", htmlName);
+		return (list!=null ? (CSSThemeVisualElement)list.get(0) : null);
+	}
+	
+	public SupportedLocale getDefaultLocale() {
+		String localeName = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
+		return getSupportedLocale(localeName.substring(0,2),localeName.substring(3));
 	}
 }
