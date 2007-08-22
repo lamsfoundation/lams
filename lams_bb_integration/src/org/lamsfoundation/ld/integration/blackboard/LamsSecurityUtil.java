@@ -22,6 +22,8 @@
  */
 package org.lamsfoundation.ld.integration.blackboard;
 
+import java.lang.IllegalStateException;
+import java.net.ConnectException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -33,40 +35,38 @@ import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.Locale;
-import javax.xml.rpc.ServiceException;
 import blackboard.platform.context.Context;
 import org.apache.commons.codec.binary.Hex;
-import javax.servlet.ServletException;
-
-//import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.ld.integration.Constants;
-import org.lamsfoundation.ld.webservice.LessonManager;
-import org.lamsfoundation.ld.webservice.LessonManagerService;
-import org.lamsfoundation.ld.webservice.LessonManagerServiceLocator;
-
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.apache.log4j.Logger;
-
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 
 /**
+ *  This class creates URLs, servlet calls and webservice calls
+ *  for communication with LAMS
+ *  
  *  @author <a href="mailto:lfoxton@melcoe.mq.edu.au">Luke Foxton</a>
  */
 public class LamsSecurityUtil {
     
-    //private static Connection _conn = null;
     static Logger logger = Logger.getLogger(LamsSecurityUtil.class);
     
+    
+    /**
+     * Generates login requests to LAMS for author, monitor and learner
+     * 
+     * @param ctx the blackboard contect, contains session data
+     * @param method the mehtod to request of LAMS "author", "monitor", "learner" 
+     * @return a url pointing to the LAMS lesson, monitor, author session
+     * @throws Exception
+     */
     public static String generateRequestURL(Context ctx, String method) throws Exception
     {
     	String serverAddr = getServerAddress();
@@ -82,16 +82,10 @@ public class LamsSecurityUtil {
 		String username = ctx.getUser().getUserName();
 		String hash = generateAuthenticationHash(timestamp, username, method, serverId);
 		String courseId = ctx.getCourse().getCourseId();
-		String country = "US";
-		String lang = "en";
 		
-		
-		//ResourceLoader rl = new ResourceLoader();
-		//String[] locale = ctx.getGuestSessionLocale().split("-");
-
-		//String siteID = getCurrentContext();
-		
-		// TODO: Make locale settings work
+		String locale = ctx.getUser().getLocale();
+		String country = getCountry(locale);
+		String lang = getLanguage(locale);
 
 		String url;
 		try {
@@ -109,11 +103,20 @@ public class LamsSecurityUtil {
 			throw new RuntimeException();
 		}
 		
-		System.out.println(url);
+		logger.info("LAMS Req: " + url);
+		//System.out.println(url);
 
 		return url;
 	}
     
+    /**
+     * Gets a list of learning designs for the current user from LAMS
+     * 
+     * @param ctx the blackboard contect, contains session data
+     * @param mode the mode to call upon learning designes
+     * @return a string containing the LAMS workspace tree in tigra format
+     * @throws Exception
+     */
     public static String getLearningDesigns(Context ctx, Integer mode) throws Exception
     {
 		String serverAddr = getServerAddress();
@@ -129,8 +132,10 @@ public class LamsSecurityUtil {
 		String username = ctx.getUser().getUserName();
 		String hash = generateAuthenticationHash(timestamp, username, serverId);
 		String courseId = ctx.getCourse().getCourseId();
-		String country = "US";
-		String lang = "en";
+
+		String locale = ctx.getUser().getLocale();
+		String country = getCountry(locale);
+		String lang = getLanguage(locale);
 
 		// TODO: Make locale settings work
 		String learningDesigns = "[]"; // empty javascript array
@@ -156,9 +161,12 @@ public class LamsSecurityUtil {
 			if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
 				logger.error("HTTP Response Code: " + httpConn.getResponseCode() 
 						+ ", HTTP Response Message: " + httpConn.getResponseMessage());
+				return "error";
 			}
 			
-			InputStream is = url.openConnection().getInputStream();
+			//InputStream is = url.openConnection().getInputStream();
+			InputStream is = conn.getInputStream();
+			
 			
 			// parse xml response
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -174,114 +182,59 @@ public class LamsSecurityUtil {
 			
 			// TODO better error handling
 		} catch (MalformedURLException e) {
+			logger.error("Unable to get LAMS learning designs, bad URL: '"
+					+ serverAddr
+					+ "', please check lams.properties", e);
 			e.printStackTrace();
+			return "error";
+		}catch (IllegalStateException e){
+			logger.error("LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator", e);
+			e.printStackTrace();
+			return "error";
+		}catch (ConnectException e){
+			logger.error("LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator", e);
+			e.printStackTrace();
+			return "error";
 		} catch (UnsupportedEncodingException e) {
+			logger.error(e);
 			e.printStackTrace();
+			return "error";
 		} catch (IOException e) {
+			logger.error(e);
 			e.printStackTrace();
+			return "error";
 		} catch (ParserConfigurationException e) {
+			logger.error(e);
 			e.printStackTrace();
+			return "error";
 		} catch (SAXException e) {
+			logger.error(e);
 			e.printStackTrace();
+			return "error";
 		}
-		
 		return learningDesigns;
-	}
+    }
     
-    
-    
-    
-    
-    
-    /* Scheduling is handled by blackboard
-    public static Long scheduleLesson(Context ctx, long ldId, String title, String desc, String startDate) {
-		
-		
-		String serverID = getServerID();
-		String serverAddress = getServerAddress();
-		String serverKey = getServerKey();
-		String courseId = ctx.getCourse().getCourseId();
-		String username = ctx.getUser().getUserName();
-		String siteId = getReqSrc();
-		
-		if (serverID == null || serverAddress == null || serverKey == null ) {
-			logger.error("Unable to retrieve learning designs from LAMS, one or more lams configuration properties is null");
-			return null;
-		}
-		
-		try {
-
-			String datetime = new Date().toString();
-			String hashValue = generateAuthenticationHash(serverID, serverKey, username, datetime);
-	
-			LessonManagerService service = new LessonManagerServiceLocator();
-			LessonManager lessonManager = service.getLessonManagerService(new URL(serverAddress + "/services/LessonManagerService"));
-			Long lessonId = lessonManager.scheduleLesson(serverID, datetime, hashValue, username, ldId, siteId, title, desc, startDate, "US", "en"); 
-						
-			return lessonId;
-			
-		} catch (MalformedURLException e) {
-			logger.error("Unable to schedule LAMS lesson, bad URL: '"
-					+ serverAddress
-					+ "', please check sakai.properties");
-		} catch (ServiceException e) {
-			logger.error("Unable to schedule LAMS lesson, RPC Service Exception");
-			e.printStackTrace();
-		} catch (RemoteException e) {
-			logger.error("Unable to schedule LAMS lesson, RMI Remote Exception");
-			e.printStackTrace();
-		}
-		return null;
-	}
-	*/
-    
-    
-    /*
-	String serverId 	= request.getParameter(CentralConstants.PARAM_SERVER_ID);
-	String datetime 	= request.getParameter(CentralConstants.PARAM_DATE_TIME);
-	String hashValue 	= request.getParameter(CentralConstants.PARAM_HASH_VALUE);
-	String username  	= request.getParameter(CentralConstants.PARAM_USERNAME);
-	String courseId 	= request.getParameter(CentralConstants.PARAM_COURSE_ID);
-	String ldIdStr 		= request.getParameter(CentralConstants.PARAM_LEARNING_DESIGN_ID);
-	String lsIdStr 		= request.getParameter(CentralConstants.PARAM_LESSON_ID);
-	String country 		= request.getParameter(CentralConstants.PARAM_COUNTRY);
-	String title 		= request.getParameter(CentralConstants.PARAM_TITLE);
-	String desc 		= request.getParameter(CentralConstants.PARAM_DESC);
-	String startDate 	= request.getParameter(CentralConstants.PARAM_STARTDATE);
-	String lang 		= request.getParameter(CentralConstants.PARAM_LANG);
-	String method 		= request.getParameter(CentralConstants.PARAM_METHOD);
- 
- 										serverId, 
- 										datetime, 
- 										hashValue,
-										username, 
-										ldId, 
-										courseId, 
-										title, 
-										desc, 
-										country, 
-										lang
- 	
- 	/lams//services/xml/LessonManager?serverId=lamsbb
- 	 									&datetime=1186617857718
- 	 									&username=administrator
- 	 									&hashValue=696e870fde732c1e14a6f79a2872f6eaff9be349
- 	 									&courseId=1
- 	 									&ldId=5
- 	 									&country=US
- 	 									&lang=en
- 	 									&method=start
- 	 									&title=test
- 	 									&desc=+%0D%0A
- */
-    
+    /**
+     * Starts lessons in lams through a LAMS webservice
+     * 
+     * @param ctx the blackboard contect, contains session data
+     * @param ldId the learning design id for which you wish to start a lesson
+     * @param title the title of the lesson
+     * @param desc the description of the lesson
+     * @return the learning session id
+     */
     public static Long startLesson(Context ctx, long ldId, String title, String desc) 
     {
-		String serverId = getServerID();
+		Long error = new Long(-1);
+    	String serverId = getServerID();
 		String serverAddr = getServerAddress();
 		String serverKey = getServerKey();
 		String courseId = ctx.getCourse().getCourseId();
 		String username = ctx.getUser().getUserName();
+		String locale = ctx.getUser().getLocale();
+		String country = getCountry(locale);
+		String lang = getLanguage(locale);
 		
 		if (serverId == null || serverAddr == null || serverKey == null ) {
 			logger.error("Unable to retrieve learning designs from LAMS, one or more lams configuration properties is null");
@@ -302,13 +255,15 @@ public class LamsSecurityUtil {
 			+ "&hashValue=" + hash
 			+ "&courseId=" 	+ URLEncoder.encode(courseId, "utf8")
 			+ "&ldId="		+ new Long(ldId).toString()
-			+ "&country="	+ "US"
-			+ "&lang=" 		+ "en"
+			+ "&country="	+ country
+			+ "&lang=" 		+ lang
 			+ "&method="	+ "start"
 			+ "&title="		+ URLEncoder.encode(title, "utf8").trim()
 			+ "&desc="		+ URLEncoder.encode(desc, "utf8").trim();
 			
-			System.out.println("START LESSON: " + serviceURL);
+			
+			logger.info("LAMS START LESSON Req: " + serviceURL);
+			//System.out.println("START LESSON: " + serviceURL);
 			
 			URL url = new URL(serviceURL);
 			URLConnection conn = url.openConnection();
@@ -321,9 +276,12 @@ public class LamsSecurityUtil {
 			if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
 				logger.error("HTTP Response Code: " + httpConn.getResponseCode() 
 						+ ", HTTP Response Message: " + httpConn.getResponseMessage());
+				return error;
 			}
 			
-			InputStream is = url.openConnection().getInputStream();
+			//InputStream is = url.openConnection().getInputStream();
+			InputStream is = conn.getInputStream();
+			
 			
 			// parse xml response
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -338,113 +296,64 @@ public class LamsSecurityUtil {
 		} catch (MalformedURLException e) {
 			logger.error("Unable to start LAMS lesson, bad URL: '"
 					+ serverAddr
-					+ "', please check lams.properties");
+					+ "', please check lams.properties", e);
 			e.printStackTrace();
+			return error;
+		}catch (IllegalStateException e){
+			logger.error("LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator", e);
+			e.printStackTrace();
+			return error;
 		} catch (RemoteException e) {
-			logger.error("Unable to start LAMS lesson, RMI Remote Exception");
+			logger.error("Unable to start LAMS lesson, RMI Remote Exception",e);
 			e.printStackTrace();
+			return error;
 		} catch (UnsupportedEncodingException e)
 		{
-			logger.error("Unable to start LAMS lesson, Unsupported Encoding Exception");
+			logger.error("Unable to start LAMS lesson, Unsupported Encoding Exception",e);
 			e.printStackTrace();
+			return error;
 		}
-		catch (Exception e)
+		catch (ConnectException e)
 		{
-			logger.error("Unable to start LAMS lesson");
+			logger.error("LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator", e);
 			e.printStackTrace();
+			return error;
 		}
+		catch (Exception e) {
+			logger.error("Unable to start LAMS lesson. Please contact your system administrator.",e);
+			e.printStackTrace();
+			return error;
+		} 
 		
-		return null;
 	}
     
-    
-    /*
-     * TODO: 
+    /**
+     * @return gets server address from the lams.properties file
      */
-    public static boolean deleteLesson(Context ctx, long lsId) {
-    	String serverId = getServerID();
-		String serverAddr = getServerAddress();
-		String serverKey = getServerKey();
-		String username = ctx.getUser().getUserName();
-		if (serverId == null || serverAddr == null || serverKey == null ) {
-			logger.error("Unable to retrieve learning designs from LAMS, one or more lams configuration properties is null");
-			return false;
-		}
-		
-		try {
-			
-			String timestamp = new Long(System.currentTimeMillis()).toString();
-			String hash = generateAuthenticationHash(serverId, serverKey, username, timestamp);
-		
-			// Boolean deleted = deleteLesson(serverId, datetime, hashValue, username, lsId);
-			
-			
-			String serviceURL = serverAddr + "/services/xml/LessonManager?" 
-			+ "datetime=" 	+ timestamp
-			+ "&username="	+ URLEncoder.encode(username, "utf8")
-			+ "&serverId=" 	+ URLEncoder.encode(serverId, "utf8")
-			+ "&serverKey="	+ URLEncoder.encode(serverKey, "utf8")
-			+ "&hashValue=" + hash
-			+ "&lsId="		+ new Long(lsId).toString()
-			+ "&method="	+ "delete";
-			
-			URL url = new URL(serviceURL);
-			URLConnection conn = url.openConnection();
-			if (!(conn instanceof HttpURLConnection)) {
-				logger.error("Unable to open connection to: " + serviceURL); 
-			}
-			
-			HttpURLConnection httpConn = (HttpURLConnection)conn;
-			
-			if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-				logger.error("HTTP Response Code: " + httpConn.getResponseCode() 
-						+ ", HTTP Response Message: " + httpConn.getResponseMessage());
-			}
-			
-			InputStream is = url.openConnection().getInputStream();
-			
-			// parse xml response
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document document = db.parse(is);
-			
-			return Boolean.parseBoolean(document.getElementById("lesson").getAttribute("deleted"));
-		
-		} catch (MalformedURLException e) {
-			logger.error("Unable to delete LAMS lesson, bad URL: '"
-					+ serverAddr
-					+ "', please check lams.properties");
-		} catch (RemoteException e) {
-			logger.error("Unable to delete LAMS lesson, RMI Remote Exception");
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e)
-		{
-			logger.error("Unable to delet LAMS lesson, Unsupported Encoding Exception");
-			e.printStackTrace();
-		} catch (Exception e)
-		{
-			logger.error("Unable to delete LAMS lesson");
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-
     public static String getServerAddress()
     {
     	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_LAMS_URL);
     }
     
+    /**
+     * @return gets server id from the lams.properties file
+     */
     public static String getServerID()
     {
     	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_LAMS_SERVER_ID);
     }
     
+    /**
+     * @return gets server key from the lams.properties file
+     */
     public static String getServerKey()
     {
     	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_LAMS_SECRET_KEY);
     }
     
+    /**
+     * @return gets request source from the lams.properties file
+     */
     public static String getReqSrc()
     {
     	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_REQ_SRC);
@@ -452,7 +361,11 @@ public class LamsSecurityUtil {
     
     
     
-    
+    /**
+     * 
+     * @param node the node from which to do the recursive conversion
+     * @return the string converted to tigra format
+     */
     public static String convertToTigraFormat(Node node) {
 
 		StringBuilder sb = new StringBuilder();
@@ -500,14 +413,13 @@ public class LamsSecurityUtil {
                            serverId.toLowerCase().trim() + 
                            secretkey.toLowerCase().trim();
         
-        System.out.println(plaintext);
-        String hash = sha1(plaintext);  
-        
+        String hash = sha1(plaintext);    
         return hash;
     }
     
     
     //generate authentication hash code to validate parameters
+
     public static String generateAuthenticationHash(String datetime, String login, String serverId) {
         String secretkey = getServerKey();
                 
@@ -516,7 +428,6 @@ public class LamsSecurityUtil {
                            serverId.toLowerCase().trim() + 
                            secretkey;
         
-        System.out.println(plaintext);
         String hash = sha1(plaintext);  
         
         return hash;
@@ -554,5 +465,33 @@ public class LamsSecurityUtil {
 	        throw new RuntimeException(e);
 	    }
 	}
+	
+	/**
+	 * 
+	 * @param localeStr the full balckboard locale string
+	 * @return the language 
+	 */
+	public static String getLanguage(String localeStr)
+	{
+		if (localeStr==null) 
+			return "xx";
+		String[] split = localeStr.split("_");
+		return split[0];
+	}
+	
+	/**
+	 * 
+	 * @param localeStr the full balckboard locale string
+	 * @return the country 
+	 */
+	public static String getCountry(String localeStr)
+	{
+		if (localeStr==null) 
+			return "XX";
+		String[] split = localeStr.split("_");
+		return split[1];
+	}
+	
+	
 	
 }

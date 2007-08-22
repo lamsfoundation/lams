@@ -27,7 +27,6 @@
 	
 	String course_idstr = request.getParameter("course_id");	
 
-
 	BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
 	Id course_id = bbPm.generateId(Course.COURSE_DATA_TYPE, course_idstr);
 	User sessionUser = ctx.getUser();
@@ -56,30 +55,25 @@
 		pe.printStackTrace();
 	}
 
-	boolean instructor=false;
-	boolean student=false;
-	
+
+	String instructorstr="hidden";
 	if (courseRole.equals(CourseMembership.Role.INSTRUCTOR)||courseRole.equals(CourseMembership.Role.TEACHING_ASSISTANT)) 
 	{
 		// instructor or assistant
 		// can choose to redirect to monitor or learner
-		instructor=true;
+		instructorstr="button";
 	}
-	else if (courseRole.equals(CourseMembership.Role.STUDENT))
+	else if (!courseRole.equals(CourseMembership.Role.STUDENT))
 	{
-		// student
-		// can only access learner pages
-		student=true;
-	}
-	else 
-	{
+
 		response.sendRedirect("notAllowed.jsp");
 	}
-	
 %>
 
 <bbUI:docTemplate>
-
+<head>
+	<link type="text/css" rel="stylesheet" href="css/bb.css" />
+</head>
 <script language="JavaScript" type="text/javascript">
 		<!--
 			var learnerWin = null;
@@ -117,91 +111,28 @@
 		            monitorWin.focus();
 		        }
 			}
-			
-			
-			
 		//-->
 </script>
 
-<script language="JavaScript" type="text/javascript">
-	 <!--
-	 if (true) 
-	 {
-	 	openLearner();
-	 	back();
-	 }	
-	 //-->
-</script>
+
+
+<bbUI:breadcrumbBar handle="control_panel" isContent="true" >
+    <bbUI:breadcrumb>LAMS Options</bbUI:breadcrumb>
+</bbUI:breadcrumbBar>
+
+<bbUI:titleBar iconUrl ="/images/ci/icons/bookopen_u.gif">LAMS Options</bbUI:titleBar>
+
 
 <form name="workspace_form" id="workspace_form" method="post">
-	<input type="button" name="OpenMonitor" onClick="openMonitor();" value="Open Monitor">
-	<input type="button" name="OpenLearner" onClick="openLearner();" value="Open Learner">
-	<input type="button" name="Cancel" onClick="back();" value="Cancel">
-<form>
-	
-	
-	
+	<br>
+	<b>Please Choose an Option</b>
+	<br><br>
+	&nbsp&nbsp&nbsp&nbsp
+	<input type="<%=instructorstr%>" class="button" name="OpenMonitor" onClick="openMonitor();" value="Open Monitor">
+	<input type="button" class="button" name="OpenLearner" onClick="openLearner();" value="Open Lesson">
+	<input type="button" class="button" name="Cancel" onClick="back();" value="Cancel">
 
+</form>
+	
 </bbUI:docTemplate>						  
 </bbData:context>
-
-<%!
-static public String getRoleString(String type, Object role) {
-	// return a User Friendly String for the type Role passed in
-	String uRole = "";
-	if ( type.equals( "COURSE" ) ) {
-		// get role based on coursemembershipRole (CourseMembership.Role)
-		if( (CourseMembership.Role)role == CourseMembership.Role.COURSE_BUILDER ) {
-			uRole="Course Builder";
-		} else if ( (CourseMembership.Role)role == CourseMembership.Role.DEFAULT ){
-			uRole="Student(Default)";
-		} else if ( (CourseMembership.Role)role == CourseMembership.Role.GRADER ) {
-			uRole="Grader";
-		} else if ( (CourseMembership.Role)role == CourseMembership.Role.GUEST ) {
-			uRole="Guest";
-		} else if ( (CourseMembership.Role)role
-					== CourseMembership.Role.INSTRUCTOR ) {
-			uRole="Instructor";
-		} else if ( (CourseMembership.Role)role == CourseMembership.Role.NONE) {
-			uRole="No explicit role (NONE)";
-		} else if ( (CourseMembership.Role)role == CourseMembership.Role.STUDENT) {
-			uRole="Student";
-		} else if ( (CourseMembership.Role)role 
-				== CourseMembership.Role.TEACHING_ASSISTANT ) {
-			uRole="Teaching Assistant";
-		} else {
-			uRole = "Cannot Identify Course Membership Role";
-		}
-	} else if ( type.equals( "SYSTEM" ) ) {
-	    // get role based on SystemRole
-		if( (User.SystemRole)role == User.SystemRole.ACCOUNT_ADMIN ) {
-			uRole="Account Administrator";
-		} else if ( (User.SystemRole)role == User.SystemRole.COURSE_CREATOR ) {
-         		uRole = "Course creator";
-        	} else if ( (User.SystemRole)role == User.SystemRole.COURSE_SUPPORT ) {
-          		uRole = "Course support";
-        	} else if ( (User.SystemRole)role == User.SystemRole.DEFAULT ) {
-        		uRole = "User";
-        	} else if ( (User.SystemRole)role == User.SystemRole.GUEST ) {
-        		uRole = "Guest";
-        	} else if ( (User.SystemRole)role == User.SystemRole.NONE ) {
-        		uRole = "No explicit role (NONE)";
-        	} else if ( (User.SystemRole)role == User.SystemRole.OBSERVER ) {
-        		uRole = "Observer";
-        	} else if ( (User.SystemRole)role == User.SystemRole.SYSTEM_ADMIN ) {
-        		uRole = "System Administrator";
-        	} else if ( (User.SystemRole)role == User.SystemRole.SYSTEM_SUPPORT ) {
-        		uRole = "System support";
-        	} else if ( (User.SystemRole)role == User.SystemRole.USER ) {
-        		uRole = "User";
-        	} else {
-        		uRole = "Cannot Identify User System Role";
-        	}
-	} else {
-		uRole = "TYPE not qualified in method.";
-	}
-	
-	return uRole;
-}
-
-%>

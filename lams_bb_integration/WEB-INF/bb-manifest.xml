@@ -3,11 +3,11 @@
   <!-- core extension information -->
 <plugin>
     <name value= "LAMS2 Module"/>
-    <handle value= "plglamscontent"/>
+    <handle value= "lamscontent"/>
     <description value= "LAMS2 and Blackboard integration allows LAMS2 leaning designs to be managed and views in a Blackboard Environment."/>
     <version value= "1.0.0"/>
     <requires>
-      <bbversion value="6.2.3"/>
+      <bbversion value="7.0.0"/>
     </requires>
      <vendor>
       <id value="lams"/>
@@ -31,7 +31,6 @@
             <http-actions>
                 <create value="modules/create.jsp" />
                 <modify value="modules/modify.jsp"/>
-				<remove value="modules/remove.jsp" />
             </http-actions>
             <icons>
                 <toolbar value="/images/logo.gif" />
@@ -40,7 +39,7 @@
         </content-handler>
     </content-handlers>
     
-   
+    
     
         
     <!-- code permissions required for proper operation -->

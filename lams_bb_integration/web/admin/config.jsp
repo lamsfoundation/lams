@@ -23,6 +23,10 @@
 	String lamsServerId = p.getProperty("LAMS_SERVER_ID", "");
 	String SecretKey = p.getProperty("LAMS_SERVER_SKEY", "");
 	String ReqSrc = p.getProperty("BB_REQ_SRC");
+
+	//	 add port to the url if the port is in the blackboard url.
+	int bbport = request.getServerPort();
+	String bbportstr = bbport != 0 ? ":" + bbport : "";
 %>
 
 <bbUI:docTemplate title="Configure LAMS">
@@ -48,7 +52,7 @@
   <bbUI:step title="Callback URL" number="2">
   	<bbUI:instructions>
 		Copy and paste the user data callback URL into LAMS <BR>
-		<B>USER DATA CALLBACK URL</B>: http://<%=request.getServerName()%><%=request.getContextPath()%>/UserData?uid=%username%&ts=%timestamp%&hash=%hash%
+		<B>USER DATA CALLBACK URL</B>: http://<%=request.getServerName()%><%=bbportstr%><%=request.getContextPath()%>/UserData?uid=%username%&ts=%timestamp%&hash=%hash%
 	</bbUI:instructions>
   </bbUI:step>
   <bbUI:stepSubmit title="Submit" number="3" />

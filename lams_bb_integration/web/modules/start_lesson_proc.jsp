@@ -6,7 +6,6 @@
 <%@ page import="blackboard.data.content.ContentFile"%>
 <%@ page import="blackboard.data.content.ContentFolder"%>
 <%@ page import="blackboard.data.content.CourseDocument"%>
-
 <%@ page import="blackboard.persist.Id"%>
 <%@ page import="blackboard.persist.BbPersistenceManager"%>
 <%@ page import="blackboard.persist.content.ContentDbPersister"%>
@@ -62,24 +61,8 @@
 	    myContent.setIsAvailable(request.getParameter("isAvailable").equals("true")?true:false);
 	    myContent.setIsTracked(request.getParameter("isTracked").equals("true")?true:false);
 		
-		//get descriptions entered
-		//FormattedText.Type descType = FormattedText.Type.DEFAULT; //type of description (S|H|P)
-	    //switch(p_descType.charAt(0)){
-	    //    case 'H':
-	    //        descType = FormattedText.Type.HTML; break;
-	    //    case 'S':
-	    //        descType = FormattedText.Type.SMART_TEXT; break;
-	    //    case 'P':
-	    //        descType = FormattedText.Type.PLAIN_TEXT; break;
-	    //}
-	    //if(!myContent.getIsAvailable()){
-	    //    p_descText = "<i>Item is not available.</i><br>" + p_descText;
-	    //}
-	    //FormattedText description = new FormattedText(p_descText,descType);
 	   	FormattedText fdescription = new FormattedText(description, FormattedText.Type.HTML);
-		
-		
-	    
+
 		// set core course data
 	    myContent.setContentHandler( LamsPluginUtil.CONTENT_HANDLE );
 	    myContent.setCourseId( courseId );
@@ -94,21 +77,24 @@
 	    //	  tell lams to create the learning session using webservices
 	    try{  	
 	    	long lsId = LamsSecurityUtil.startLesson(ctx, ldId, title, description);
-		    learningSessionId = Long.toString(lsId);
-		} catch (Exception e){
+		    
+	    	//error checking
+	    	if (lsId == -1)
+	    	{
+	    		response.sendRedirect("lamsServerDown.jsp");
+	    		System.exit(1);
+	    	}
+	    	
+	    	learningSessionId = Long.toString(lsId);
+	    	
+	    
+	    } catch (Exception e){
 			throw new ServletException(e.getMessage(), e);
 		}
 		
+		// add port to the url if the port is in the blackboard url.
 		int bbport = request.getServerPort();
-		String bbportstr;
-		if (new Integer(bbport).equals(null) || bbport==0)
-		{
-			bbportstr = "";
-		}
-		else
-		{
-			bbportstr = ":" + bbport;
-		}
+		String bbportstr = bbport != 0 ? ":" + bbport : "";
 		
 		//String contentUrl = LamsSecurityUtil.generateRequestURL(ctx, "learner") + "&lsid=" + learningSessionId;
 		String contentUrl = "http://" + request.getServerName() + 
@@ -116,15 +102,8 @@
 										request.getContextPath() + 
 										"/modules/learnermonitor.jsp?lsid=" + learningSessionId + 
 										"&course_id=" + request.getParameter("course_id");
-		
-	
-		
 		myContent.setUrl(contentUrl);
-		
-		
-		//myContent.setPosition(0);
-		//myContent.setLaunchInNewWindow(true);
-		
+
 		//Parse start/end Date from the <bbUI:dateAvailability>
 	    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	    Calendar cstart = Calendar.getInstance();
