@@ -26,26 +26,33 @@ package org.lamsfoundation.lams.util;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.MessageSourceAccessor;
 /**
  * Service class to help Service bean get i18n value quickly. The locale information will get from <code>LAMS_USER</code>
  * table. For more detail see <code>org.lamsfoundation.lams.web.filter.LocaleFilter</code>.
  * 
  * @author Steve.Ni
  * @version $Revision$
- * @see org.springframework.context.support.MessageSourceAccessor
+ * @see org.springframework.context.support.MessageSource
  */
 public class MessageService {
-    private MessageSourceAccessor messageAccessor;
+    private MessageSource messageSource;
     
     /**
      * Set <code>MessageSource</code> from spring IoC. 
      * @param messageSource
      */
     public void setMessageSource(MessageSource messageSource){
-    	messageAccessor = new MessageSourceAccessor(messageSource);
+    	this.messageSource = messageSource;
     }
     
+    /**
+     * Set <code>MessageSource</code> from spring IoC. 
+     * @param messageSource
+     */
+    public MessageSource getMessageSource(){
+    	return this.messageSource;
+    }
+
     /**
      * @see org.springframework.context.support.MessageSourceAccessor#getMessage(java.lang.String)
      * @param key
@@ -54,7 +61,7 @@ public class MessageService {
     public String getMessage(String key){
     	String message;
     	try {
-    		message = messageAccessor.getMessage(key,LocaleContextHolder.getLocale());
+    		message = messageSource.getMessage(key,null,LocaleContextHolder.getLocale());
 		} catch (NoSuchMessageException e) {
 			message = "??" + key + "??";
 		}
@@ -69,7 +76,7 @@ public class MessageService {
     public String getMessage(String key, String defaultMessage){
     	String message = defaultMessage;
     	try {
-    		message = messageAccessor.getMessage(key,defaultMessage,LocaleContextHolder.getLocale());
+    		message = messageSource.getMessage(key,null,defaultMessage,LocaleContextHolder.getLocale());
 		} catch (NoSuchMessageException e) {
 			message = defaultMessage;
 		}
@@ -84,7 +91,7 @@ public class MessageService {
     public String getMessage(String key, Object[] args){
     	String message;
     	try {
-    		message = messageAccessor.getMessage(key,args,LocaleContextHolder.getLocale());
+    		message = messageSource.getMessage(key,args,LocaleContextHolder.getLocale());
 		} catch (NoSuchMessageException e) {
 			message = "??" + key + "??";
 		}
@@ -100,7 +107,7 @@ public class MessageService {
     public String getMessage(String key, Object[] args, String defaultMessage){
     	String message = defaultMessage;
     	try {
-    		message = messageAccessor.getMessage(key,args,defaultMessage,LocaleContextHolder.getLocale());
+    		message = messageSource.getMessage(key,args,defaultMessage,LocaleContextHolder.getLocale());
 		} catch (NoSuchMessageException e) {
 			message = defaultMessage;
 		}

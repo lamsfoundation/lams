@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -37,6 +39,7 @@ import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.dao.ISystemToolDAO;
@@ -318,6 +321,52 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
 			throw new ToolException(message,e);
 		}
     }
+    
+    /**
+     * Ask a tool for its OutputDefinitions, based on the given toolContentId. If the tool doesn't
+     * have any content matching the toolContentId then it should create the OutputDefinitions based
+     * on the tool's default content.
+     * 
+     * This functionality relies on a method added to the Tool Contract in LAMS 2.1, so if the tool
+     * doesn't support the required method, it writes out an error to the log but doesn't throw 
+     * an exception - just returns an empty map.
+     * 
+     * @param toolContentId
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+     * @throws ToolException 
+     */
+    public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromTool(Long toolContentId) throws ToolException {
+
+    	ToolContent toolContent = (ToolContent) toolContentDAO.find(ToolContent.class, toolContentId);
+    	if ( toolContent == null ) {
+    		String error = "The toolContentID "+ toolContentId + " is not valid. No such record exists on the database.";
+ 	       log.error(error);
+ 	       throw new DataMissingException(error);
+    	}
+    	
+		Tool tool = toolContent.getTool();
+    	if ( tool == null ) {
+    		String error = "The tool for toolContentId "+ toolContentId + " is missing.";
+ 	       log.error(error);
+ 	       throw new DataMissingException(error);
+    	}
+
+        try {
+			ToolContentManager contentManager = (ToolContentManager) findToolService(tool);
+            return contentManager.getToolOutputDefinitions(toolContentId);
+		} catch ( NoSuchBeanDefinitionException e ) {
+			String message = "A tool which is defined in the database appears to missing from the classpath. Unable to copy the tool content. ToolContentId "+toolContentId;
+			log.error(message,e);
+			throw new ToolException(message,e);
+		} catch ( java.lang.AbstractMethodError e ) {
+			String message = "Tool "+tool.getToolDisplayName()+" doesn't support the getToolOutputDefinitions(toolContentId) method so no output definitions can be accessed.";
+			log.error(message,e);
+			throw new ToolException(message,e);
+		}
+
+    }
+   
+
     /**
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#updateToolSession(org.lamsfoundation.lams.tool.ToolSession)
      */

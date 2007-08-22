@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.dto;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 
 /**
@@ -31,7 +32,7 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
  * This class acts as a data transfer object for
  * transferring information between FLASH and the core module. 
  * 
- * This class is required in the authoring enviornment to pass
+ * This class is required in the authoring environment to pass
  * information about the ToolOutput for a ToolActivity 
  */
 public class ToolOutputDefinitionDTO {
@@ -109,5 +110,15 @@ public class ToolOutputDefinitionDTO {
 	 */
 	public String getComplexDefinition() {
 		return complexDefinition;
+	}
+
+	public String toString() {
+    	return new ToStringBuilder(this)
+            .append("name", name)
+            .append("description", description)
+            .append("type", type)
+            .append("startValue", startValue)
+            .append("endValue", endValue)
+        .toString();
 	}
 }

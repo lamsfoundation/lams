@@ -23,6 +23,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool;
 
+import java.util.SortedMap;
+import java.util.SortedSet;
+
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -116,5 +119,13 @@ public interface ToolContentManager
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion, String toVersion) 
     	throws ToolException;
     
- 
+    /** Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions that are always
+     * available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created for a particular activity
+     * such as the answer to the third question contains the word Koala and hence the need for the toolContentId
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition.
+     * 
+     * Added in LAMS 2.1
+     */
+   public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException;
+   
 }

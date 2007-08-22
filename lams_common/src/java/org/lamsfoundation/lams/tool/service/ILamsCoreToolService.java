@@ -26,10 +26,12 @@ package org.lamsfoundation.lams.tool.service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -167,7 +169,22 @@ public interface ILamsCoreToolService
      * @throws ToolException 
      */
     public void notifyToolToDeleteContent(ToolActivity toolActivity) throws ToolException;
-    
+
+    /**
+     * Ask a tool for its OutputDefinitions, based on the given toolContentId. If the tool doesn't
+     * have any content matching the toolContentId then it should create the OutputDefinitions based
+     * on the tool's default content.
+     * 
+     * This functionality relies on a method added to the Tool Contract in LAMS 2.1, so if the tool
+     * doesn't support the required method, it writes out an error to the log but doesn't throw 
+     * an exception - just returns an empty map.
+	*
+     * @param toolContentId
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+     * @throws ToolException 
+     */
+    public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromTool(Long toolContentId) throws ToolException;
+   
     /**
      * Update the tool session data.
      * @param toolSession the new tool session object.

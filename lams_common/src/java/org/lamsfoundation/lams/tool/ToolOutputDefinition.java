@@ -23,6 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool;
 
+import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -49,7 +50,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *   complexDefinition = null;
  *   }
  */
-public class ToolOutputDefinition {
+public class ToolOutputDefinition implements Comparable {
 	
     private String name;
     private String description;
@@ -129,21 +130,24 @@ public class ToolOutputDefinition {
 	    ToolOutputDefinition castOther = (ToolOutputDefinition) other;
 	    return new EqualsBuilder()
 	        .append(this.name, castOther.name)
-	        .append(this.description, castOther.description)
 	        .append(this.type, castOther.type)
-	        .append(this.startValue, castOther.startValue)
-	        .append(this.endValue, castOther.endValue)
 	        .isEquals();
 	}
 
 	public int hashCode() {
 	    return new HashCodeBuilder()
 	        .append(name)
-	        .append(description)
 	        .append(type)
-	        .append(startValue)
-	        .append(endValue)
 	        .toHashCode();
+	}
+
+	public int compareTo(Object o) {
+		
+	     ToolOutputDefinition myClass = (ToolOutputDefinition) o;
+	     return new CompareToBuilder()
+	       .append(this.name, myClass.name)
+	       .append(this.type, myClass.type)
+	       .toComparison();
 	}
 
 
