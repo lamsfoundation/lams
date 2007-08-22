@@ -66,6 +66,10 @@
 	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
 	</bean> 
 	
+	<bean id="forumOuputDefinitionFactory" class="org.lamsfoundation.lams.tool.forum.service.ForumOutputDefinitionFactory">
+ 		<property name="toolMessageService"><ref bean="forumMessageService"/></property>
+ 	</bean>
+	
     <bean id="forumManagerTarget" class="org.lamsfoundation.lams.tool.forum.service.ForumService">
         <property name="forumDao">
             <ref local="forumDao"/>
@@ -106,6 +110,7 @@
    		<property name="auditService"><ref bean="auditService"/></property>
    		<property name="messageService"><ref bean="forumMessageService"/></property>
   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+  		<property name="forumOuputDefinitionFactory"><ref local="forumOuputDefinitionFactory"/></property>
     </bean>
 
     <bean id="forumService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

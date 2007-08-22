@@ -25,10 +25,13 @@
 package org.lamsfoundation.lams.tool.example.service;
 
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.example.dao.IExampleAttachmentDAO;
@@ -139,6 +142,17 @@ public class ExampleService implements ToolSessionManager, ToolContentManager,
 	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
 		// TODO Auto-generated method stub
 	}
+	
+	  /** Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions that are always
+     * available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created for a particular activity
+     * such as the answer to the third question contains the word Koala and hence the need for the toolContentId
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+     */
+	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+		return new TreeMap<String, ToolOutputDefinition>();
+	}
+ 
+	
 
 	/* ******************* Used by Spring to "inject" the linked objects **************************/
 	public IExampleAttachmentDAO getExampleAttachmentDAO() {

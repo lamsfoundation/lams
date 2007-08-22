@@ -984,7 +984,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	private void buildParallelActivity(ParallelActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
 	}
 	private void buildSequenceActivity(SequenceActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
-		Integer firstActivityUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.FIRST_ACTIVITY_UIID);
+		Integer firstActivityUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.DEFAULT_ACTIVITY_UIID);
 		if ( firstActivityUIID != null ) {
 			firstChildToSequenceMap.put(firstActivityUIID, (SequenceActivity)activity);
 		}

@@ -31,7 +31,7 @@
 
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 
-	<!-- tool beans -->
+	<!-- data access and repository access beans -->
 
 
 	<bean id="mcContentDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McContentDAO">
@@ -68,9 +68,13 @@
  		<property name="repositoryService"><ref bean="repositoryService"/></property>
 	</bean> 
 	
+	<!-- end of data access and repository access beans -->
 
-	<!-- end of tool beans -->
-
+	<bean id="mcOutputDefinitionFactory" class="org.lamsfoundation.lams.tool.mc.service.MCOutputDefinitionFactory">
+		<property name="loadedMessageSourceService"><ref bean="loadedMessageSourceService"/></property>
+		<property name="languageFilename"><value>org.lamsfoundation.lams.tool.mc.ApplicationResources</value></property>
+	</bean>
+	
 	<bean id="mcService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 			<property name="target">
@@ -89,6 +93,7 @@
 					<property name="auditService"><ref bean="auditService"/></property>					
 					<property name="exportContentService"><ref bean="exportToolContentService"/></property> 		
 			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>										
+			   		<property name="mcOutputDefinitionFactory"><ref bean="mcOutputDefinitionFactory"/></property>										
 				</bean>
 			</property>
 			<property name="transactionAttributes">
@@ -107,5 +112,8 @@
 				</props>
 			</property>
 	</bean>  
+	
+	
+	
 </beans>
 

@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.Vector;
 import java.util.Date;
 
@@ -288,22 +289,17 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getToolOutputDefinitions(java.lang.Long)
 	 */
 	public String getToolOutputDefinitions(Long toolContentID)throws IOException{
-		// create dummy wddx packet to return
-		FlashMessage flashMessage = null;
 		
-		ToolOutputDefinition definition = new ToolOutputDefinition();
-		definition.setName("USERS_MARK");
-		definition.setDescription("User's mark from a Quiz");
-		definition.setType(OutputType.OUTPUT_LONG);
-		definition.setStartValue(new Long(0));
-		definition.setEndValue(new Long(10));
+		SortedMap<String, ToolOutputDefinition> defns = lamsCoreToolService.getOutputDefinitionsFromTool(toolContentID);
 		
-		ToolOutputDefinitionDTO dto = new ToolOutputDefinitionDTO(definition);
-		
-		if(dto != null) {
-			flashMessage = new FlashMessage("getToolOutputDefinitions", dto);
+		ArrayList<ToolOutputDefinitionDTO> defnDTOList = new ArrayList<ToolOutputDefinitionDTO>(defns != null ? defns.size():0);
+		if ( defns != null ) {
+			for ( ToolOutputDefinition defn : defns.values() ) {
+				defnDTOList.add(new ToolOutputDefinitionDTO(defn));
+			}
 		}
-		
+
+		FlashMessage flashMessage = new FlashMessage("getToolOutputDefinitions", defnDTOList);
 		return flashMessage.serializeMessage();
 	}
 	

@@ -104,7 +104,7 @@ public class AuthoringAction extends LamsDispatchAction{
 			wddxPacket = authoringService.getToolOutputDefinitions(toolContentID);
 			
 		} catch (Exception e) {
-			wddxPacket = handleException(e, "getLearningDesignDetails", authoringService).serializeMessage();
+			wddxPacket = handleException(e, "getToolOutputDefinitions", authoringService).serializeMessage();
 		}
 		return outputPacket(mapping, request, response, wddxPacket, "definitions");
 	}

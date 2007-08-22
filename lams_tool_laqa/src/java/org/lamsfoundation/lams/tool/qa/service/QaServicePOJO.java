@@ -29,6 +29,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -55,6 +57,7 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -1490,6 +1493,15 @@ public class QaServicePOJO
 			}
 	}
 
+	  /** Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions that are always
+	     * available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created for a particular activity
+	     * such as the answer to the third question contains the word Koala and hence the need for the toolContentId
+	     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+	     */
+		public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+			return new TreeMap<String, ToolOutputDefinition>();
+		}
+	 
     /**
 	 * it is possible that the tool session id already exists in the tool sessions table
 	 * as the users from the same session are involved.

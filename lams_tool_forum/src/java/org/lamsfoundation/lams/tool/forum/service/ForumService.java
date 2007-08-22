@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -125,6 +126,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     private IExportToolContentService exportContentService;
     private IUserManagementService userManagementService;
 	private ICoreNotebookService coreNotebookService;
+	private ForumOutputDefinitionFactory forumOuputDefinitionFactory;
 	
 	//---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
@@ -141,6 +143,15 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		this.messageService = messageService;
 	}
 	
+	public ForumOutputDefinitionFactory getForumOuputDefinitionFactory() {
+		return forumOuputDefinitionFactory;
+	}
+
+	public void setForumOuputDefinitionFactory(
+			ForumOutputDefinitionFactory forumOuputDefinitionFactory) {
+		this.forumOuputDefinitionFactory = forumOuputDefinitionFactory;
+	}
+
 	public Forum updateForum(Forum forum) throws PersistenceException {
         forumDao.saveOrUpdate(forum);
         return forum;
@@ -767,6 +778,20 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			throw new ToolException(e);
 		}
 	}
+
+	  /** Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions that are always
+     * available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created for a particular activity
+     * such as the answer to the third question contains the word Koala and hence the need for the toolContentId
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+     */
+	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+		Forum forum = getForum(toolContentId);
+		if ( forum == null ) {
+			forum = getDefaultForum();
+		}
+		return getForumOuputDefinitionFactory().getToolOutputDefinitions(forum);
+	}
+ 
 
 	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String, java.lang.Long) */
 	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
