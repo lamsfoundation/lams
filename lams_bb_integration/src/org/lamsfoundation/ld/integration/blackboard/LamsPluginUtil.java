@@ -29,7 +29,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import blackboard.platform.plugin.PlugInException;
 import blackboard.platform.plugin.PlugInUtil;
 
@@ -46,7 +45,7 @@ import blackboard.platform.plugin.PlugInUtil;
 public class LamsPluginUtil {
     
     public static final String VENDOR_ID = "lams";
-    public static final String PLUGIN_HANDLE = "plglamscontent";
+    public static final String PLUGIN_HANDLE = "lamscontent";
     public static final String CONTENT_HANDLE = "resource/x-lams-lamscontent";
     public static final String FILE_PROPERTIES = "lams.properties";
     
@@ -121,18 +120,34 @@ public class LamsPluginUtil {
 	    }
     }
     
+    /**
+     * 
+     * @return the secret key from lams.properties
+     */
     public static String getSecretKey(){
         return getProperties().getProperty(PROP_LAMS_SECRET_KEY);
     }
     
+    /**
+     * 
+     * @return the secret url from lams.properties
+     */
     public static String getServerUrl(){
         return getProperties().getProperty(PROP_LAMS_URL);
     }
     
+    /**
+     * 
+     * @return the server id from lams.properties
+     */
     public static String getServerId(){
         return getProperties().getProperty(PROP_LAMS_SERVER_ID);
     }
     
+    /**
+     * 
+     * @return the request source from lams.properties
+     */
     public static String getReqSrc(){
         return getProperties().getProperty(PROP_REQ_SRC);
     }

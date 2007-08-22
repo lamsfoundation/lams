@@ -14,14 +14,14 @@
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.LamsActionRequestServlet</servlet-class>
   </servlet>
 
-  <!--   servlet-mapping>
+  <servlet-mapping>
     <servlet-name>LamsActionRequestServlet</servlet-name>
     <url-pattern>/LamsActionRequest</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>UserDataServlet</servlet-name>
     <url-pattern>/UserData</url-pattern>
-  </servlet-mapping-->
+  </servlet-mapping>
   
 
   <taglib>

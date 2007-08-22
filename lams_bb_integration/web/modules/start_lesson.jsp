@@ -27,8 +27,17 @@
 
 <bbData:context id="ctx">
 	<bbUI:docTemplate title = "Start a LAMS lesson." >
+	<head>
+		<link type="text/css" rel="stylesheet" href="css/bb.css" />
+	</head>
+	
+	<bbUI:breadcrumbBar handle="control_panel" isContent="true" >
+    <bbUI:breadcrumb>Start LAMS Lesson</bbUI:breadcrumb>
+	</bbUI:breadcrumbBar>
 
-	<form name="lesson_form" id="lesson_form" action="start_lesson_proc.jsp" method="post">
+	<bbUI:titleBar iconUrl ="/images/ci/icons/bookopen_u.gif">Start LAMS Lesson</bbUI:titleBar>
+	
+	<form name="lesson_form" id="lesson_form" action="start_lesson_proc.jsp" method="post" onSubmit="return confirmSubmit();">
 		<input type="hidden" name="sequence_id" id="sequence_id" value="<%=sequenceID%>">
 		<input type="hidden" name="content_id" value="<%=request.getParameter("content_id")%>">
     	<input type="hidden" name="course_id" value="<%=request.getParameter("course_id")%>">
@@ -60,8 +69,8 @@
 	    <bbUI:step title="Start lesson">
 	    	<br>
 	    	<bbUI:dataElement> 
-	    		<input type="submit" name="start" onClick="validateStartLesson();" value="Start Lesson">
-	    		<input type="button" name="cancel" onClick="back();" value="Cancel">
+	    		<input class="button" type="submit" name="start" value="Start Lesson">
+	    		<input class="button" type="button" name="cancel" onClick="back();" value="Cancel">
 	    	</bbUI:dataElement> 
 	    </bbUI:step>
 	   </form>
@@ -73,22 +82,21 @@
 				history.go(-1);
 			}
 			
-			function validateStartLesson()
+			function confirmSubmit()
 			{
-				var title = trim(document.getElementById("title").value);
-				
-				// valdation
-				if (title==null||title=="")
-				{
-					alert("Lesson must have a name.");
-					return false;
-				}
+				var title = rettrim(document.lesson_form.title.value);
+		    	if ((title == "")||(title == null))
+		    	{
+		    		alert("The title is empty. Please enter a title for the LAMS sequence.");
+		    		return false;
+		    	}
 
 			}
 			
-			
-			
-			
+			function rettrim(stringToTrim) {
+				return stringToTrim.replace(/^\s+|\s+$/g,"");
+			}
+
 		//-->
 		</script>
 	</bbUI:docTemplate>

@@ -24,32 +24,26 @@
 package org.lamsfoundation.ld.integration.blackboard;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.lamsfoundation.ld.integration.Constants;
-import blackboard.persist.BbPersistenceManager;
-import blackboard.persist.Id;
 import blackboard.platform.BbServiceManager;
-import blackboard.data.course.Course;
 import blackboard.platform.context.ContextManager;
 import blackboard.platform.context.Context;
-import blackboard.platform.plugin.PlugInException;
-import blackboard.platform.plugin.PlugInUtil;
 import blackboard.platform.session.BbSession;
 import blackboard.platform.session.BbSessionManagerService;
 
 
 /**
+ *  Handles requests to the LAMS server
+ *  
  *  @author <a href="mailto:lfoxton@melcoe.mq.edu.au">Luke Foxton</a>
  */
 public class LamsActionRequestServlet extends HttpServlet {
           
-    /**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -91,7 +85,6 @@ public class LamsActionRequestServlet extends HttpServlet {
             // get the session object to obtain the current user and course object
 	        BbSessionManagerService sessionService = BbServiceManager.getSessionManagerService();
 	        BbSession bbSession = sessionService.getSession( request );
-	        String username = bbSession.getUserName();
 
 	        String redirect = LamsSecurityUtil.generateRequestURL(ctx, p_method);
 
@@ -100,8 +93,6 @@ public class LamsActionRequestServlet extends HttpServlet {
 	            redirect += '&' + Constants.PARAM_COURSE_ID + '=' + p_courseId;
 	            //redirect1 += '&' + Constants.PARAM_LEARNING_SESSION_ID + '=' + p_learningSessionId;
 	        }
-	        
-	        //response.sendRedirect(redirect1);
 	        
 	        response.sendRedirect(response.encodeRedirectURL(redirect));
 	        

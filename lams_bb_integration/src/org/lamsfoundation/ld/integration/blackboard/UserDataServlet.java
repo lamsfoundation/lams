@@ -24,28 +24,20 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-//import javax.servlet.ServletException;
-
 import org.apache.commons.codec.binary.Hex;
-//import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
-//import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
-//import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.ld.util.CSVUtil;
 import org.lamsfoundation.ld.integration.Constants;
-
 import blackboard.persist.BbPersistenceManager;
 import blackboard.persist.user.UserDbLoader;
 import blackboard.platform.BbServiceManager;
 import blackboard.data.user.User;
 import blackboard.platform.context.ContextManager;
-import blackboard.platform.context.Context;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil;
 
 
 /**
@@ -53,6 +45,7 @@ import org.apache.log4j.Logger;
  */
 public class UserDataServlet extends HttpServlet {
           
+	private static final long serialVersionUID = 2L;
 	static Logger logger = Logger.getLogger(UserDataServlet.class);
 	
 	/**
@@ -69,11 +62,11 @@ public class UserDataServlet extends HttpServlet {
             throws ServletException, IOException{
         
         ContextManager ctxMgr = null;
-        Context ctx = null;
+        
         //get Blackboard context
         try{
             ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
-            ctx = ctxMgr.setContext(request);    
+  
             
             
             //get Parameter values
@@ -120,26 +113,11 @@ public class UserDataServlet extends HttpServlet {
             
             PrintWriter out = response.getWriter();
             
-            String loc_lang="en";
-            String loc_cntry="US";
-           
-            /*
             String locale = u.getLocale();
-            String loc_lang;
-            String loc_cntry;
-            if (u.getLocale()==null)
-            {
-            	loc_lang="en";
-            	loc_cntry="US";
-            }
-            else
-            {
-            	String [] loc = locale.split("_");
-            	loc_lang=loc[0];
-            	loc_cntry=loc[1];
-            }
-            */
-            
+            String loc_lang=LamsSecurityUtil.getLanguage(locale);
+            String loc_cntry=LamsSecurityUtil.getCountry(locale);
+           
+
             // The CSV list should be the format below	
             // <Title>,<First name>,<Last name>,<Address>,<City>,<State>,
             // <Postcode>,<Country>,<Day time number>,<Mobile number>,
@@ -160,24 +138,7 @@ public class UserDataServlet extends HttpServlet {
 				    loc_lang,
 				    loc_cntry
     			};
-            // DEBUGGING
-            System.out.println(valList[0]);
-            System.out.println(valList[1]);
-            System.out.println(valList[2]);
-            System.out.println(valList[3]);
-            System.out.println(valList[4]);
-            System.out.println(valList[5]);
-            System.out.println(valList[6]);
-            System.out.println(valList[7]);
-            System.out.println(valList[8]);
-            System.out.println(valList[9]);
-            System.out.println(valList[10]);
-            System.out.println(valList[11]);
-            System.out.println(valList[12]);
-            System.out.println(valList[13]);
-            System.out.println("LUKE IS AWESOME: " + CSVUtil.write(valList));
-            
-        
+
             out.println(CSVUtil.write(valList));
             
         } catch (Exception e){
@@ -200,4 +161,6 @@ public class UserDataServlet extends HttpServlet {
 	        throw new RuntimeException(e);
 	    }
 	}
+	
+
 }

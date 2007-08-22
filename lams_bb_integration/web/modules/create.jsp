@@ -8,7 +8,9 @@
 
 <bbData:context  id="ctx">
 <bbUI:docTemplate title = "Add new LAMS">
-
+<head>
+	<link type="text/css" rel="stylesheet" href="css/bb.css" />
+</head>
 <%
 	// SECURITY!
     //AccessManagerService accessManager = (AccessManagerService) BbServiceManager.lookupService(AccessManagerService.class);
@@ -20,6 +22,13 @@
 	}
 	String authorUrl = LamsSecurityUtil.generateRequestURL(ctx, "author");
 	String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, 2);
+	
+	// Error checking
+	if (learningDesigns.equals("error"))
+	{
+		response.sendRedirect("lamsServerDown.jsp");
+	}
+
 %>
 
 <bbUI:breadcrumbBar handle="control_panel" isContent="true" >
@@ -55,11 +64,12 @@
 		<br>
 		</bbUI:dataElement>
 	 </bbUI:step>
-	 <bbUI:step title="Open author, refresh or start the chosen lesson.">		
+	 <bbUI:step title="Open author, refresh the workspace or start the chosen lesson.">		
         <bbUI:dataElement> 
-           	<input type="button" name="author" onClick="openAuthor();" value="Open Author">
-            <input type="button" name="action" onClick="refreshSeqList();" value="Refresh Workspace">
-            <input id="nextButton" type="submit" name="nextButton" onClick="openNext();" value="Next" disabled="true">
+           	<input type="button" class="button"name="author" onClick="openAuthor();" value="Open Author">
+            <input type="button" class="button"name="action" onClick="refreshSeqList();" value="Refresh">
+            <input id="disabledNextButton" class="disabled" type="button" name="disabledNextButton" value="Next" disabled="true">
+            <input id="nextButton" class="button" type="hidden" name="nextButton" onClick="openNext();" value="Next">
      	</bbUI:dataElement> 
      	<br>
      </bbUI:step>
@@ -96,7 +106,12 @@
     
     function selectSequence(id) 
     {
-		document.getElementById("nextButton").disabled = false;  	
+		//document.workspace_form.nextButton.class= "button"; 
+		//document.getElementById("nextButton").disabled = false;
+		document.getElementById("nextButton").type = "submit";  
+		document.getElementById("disabledNextButton").type = "hidden";
+		
+		//document.getElementById("nextButton").class = "button"; 	
     	document.getElementById("sequence_id").value=id;
 	}
 //-->

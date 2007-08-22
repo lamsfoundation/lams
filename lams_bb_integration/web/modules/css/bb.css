@@ -1,0 +1,28 @@
+
+.disabled {
+	background: url('btnDisabled.gif') no-repeat 1px 1px;
+	color: #CCC;
+	border: 0px none;
+	padding:5px 20px 6px 20px;
+	text-decoration: none;
+    text-align:center;
+	font-size:10px;
+	width:100px;
+	font-weight: bold;
+	font-family: verdana, arial, helvetica, sans-serif;
+}
+
+.button {
+	background: url('btn.gif') no-repeat 1px 1px;
+	color: #333;
+	border: 0px none;
+	padding:5px 20px 6px 20px;
+	text-decoration: none;
+	text-align:center;
+	font-weight: bold;
+	font-size:10px;
+	width:100px;
+	font-family: verdana, arial, helvetica, sans-serif;
+}
+
+

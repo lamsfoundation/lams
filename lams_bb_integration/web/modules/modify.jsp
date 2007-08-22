@@ -78,9 +78,11 @@
             <input type="radio" name="isTracked" value="true" <%=(courseDoc.getIsTracked())?"checked":""%>>Yes
             <input type="radio" name="isTracked" value="false" <%=(courseDoc.getIsTracked())?"":"checked"%>>No
         </bbUI:dataElement>
-        <bbUI:dateAvailability formName="lams_form" 
+        <bbUI:dataElement label="Choose date restrictions">
+        	<bbUI:dateAvailability formName="lams_form" 
                                    startDateField="startDate" endDateField="endDate" 
                                    startDate="<%=startDate%>" endDate="<%=endDate%>"/>
+    	</bbUI:dataElement>   
     </bbUI:step> 
     <bbUI:step title="Start lesson">
     	<br>
