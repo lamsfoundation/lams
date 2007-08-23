@@ -6,10 +6,9 @@
 	padding:5px 20px 6px 20px;
 	text-decoration: none;
     text-align:center;
-	font-size:10px;
+	font-size:11px;
 	width:100px;
-	font-weight: bold;
-	font-family: verdana, arial, helvetica, sans-serif;
+	font-family: tahoma, arial, verdana, helvetica, sans-serif;
 }
 
 .button {
@@ -19,10 +18,9 @@
 	padding:5px 20px 6px 20px;
 	text-decoration: none;
 	text-align:center;
-	font-weight: bold;
-	font-size:10px;
+	font-size:11px;
 	width:100px;
-	font-family: verdana, arial, helvetica, sans-serif;
+	font-family: tahoma, arial, verdana, helvetica, sans-serif;
 }
 
 
