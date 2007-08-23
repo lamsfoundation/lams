@@ -77,15 +77,16 @@ class LFMessage{
   
   public static function showMessageAlert(msg, okHandler){
 	var title:String = "<b>" + Dictionary.getValue('al_alert') + "</b>\n";
-	  
+	var _dialog:MovieClip;
 	if(okHandler != undefined){
-		Dialog.createAlertDialog(title, msg, Dictionary.getValue('al_ok'), null, okHandler, null, AlertDialog.ALERT);
+		_dialog = Dialog.createAlertDialog(title, msg, Dictionary.getValue('al_ok'), null, okHandler, null, AlertDialog.ALERT);
 	}else{
-		Dialog.createAlertDialog(title, msg, Dictionary.getValue('al_ok'), null, null, null, AlertDialog.ALERT);
+		_dialog = Dialog.createAlertDialog(title, msg, Dictionary.getValue('al_ok'), null, null, null, AlertDialog.ALERT);
 	}
   }
   
    public static function showMessageConfirm(msg:String, okHandler:Function, cancelHandler:Function, okLabel:String, cancelLabel:String,  msgTitle:String){
+
 	if(msgTitle == null){
 		msgTitle = Dictionary.getValue('al_confirm');
 	}

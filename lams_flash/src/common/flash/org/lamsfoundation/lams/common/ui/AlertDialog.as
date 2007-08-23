@@ -181,9 +181,9 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 	public function set message(msg:String) {
 		modTextArea(_message);
 		_message.text = "<p align='center'>" + msg + "</p>";
-		
 		_message._x = -_message._width/2;
 		_message._y = _title._y + _title._height;
+		
 		setMessageHeight();
 	}
 	
@@ -196,17 +196,17 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 	private function setMessageHeight() {
 		
 			this.createTextField("message", this.getNextHighestDepth(), -1000, -1000, 0, 0); 
-		
+
 			var msg_text = this["message"];
 			
 			msg_text.html = true;
 			msg_text.htmlText = _message.text;
 			msg_text.wordWrap = true;
 			msg_text.autoSize = true;
-			msg_text._width = _message.width;
-			
-			Debugger.log('textHeight: ' + msg_text.textHeight, Debugger.CRITICAL, 'setMessageHeight', 'org.lamsfoundation.lams.Alertialog');
-			_message.setSize(_message.width, msg_text.textHeight);
+			msg_text._width = _message.width; 
+				
+			Debugger.log('textHeight: ' + msg_text.textHeight * 2, Debugger.GEN, 'setMessageHeight', 'org.lamsfoundation.lams.Alertialog');
+			_message.setSize(_message.width, msg_text.textHeight * 2); // fix  for messages being concatenated in message box
 			
 	}
 	
