@@ -3,7 +3,7 @@
 
 ALTER TABLE tl_lamc11_que_usr 
 ADD COLUMN last_attempt_order INTEGER
-, ADD COLUMN last_attempt_total_mark INTEGER
+, ADD COLUMN last_attempt_total_mark INTEGER;
 
 -- Fix problems with the marks in the attempt table. It was recording the number of questions answered correctly for the activity.
 -- Now it records the mark for each question. The overall mark is put in the  que_usr table.
