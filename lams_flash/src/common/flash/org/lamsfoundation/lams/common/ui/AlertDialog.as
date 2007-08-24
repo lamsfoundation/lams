@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.dict.*
 
 /*
-* Dialogue to collect a string form the user, adn call some specified action on OK
+* Dialogue to collect a string form the user, and call some specified action on OK
 * @author  DC
 */
 class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
@@ -57,12 +57,14 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 	private var _cancelHandler:Function;
 	
 	private var _type:Number;
+	private var _isDragging:Boolean;
     
 	private var app:Object;
     private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
     
 	private var transparentCover:MovieClip;
+	private var clickTarget:MovieClip;
     
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -75,6 +77,7 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
     function AlertDialog(){
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
+		EventDispatcher.initialize(clickTarget);
 		
 		this._visible = false;
 		
@@ -96,7 +99,13 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 		
 		ok_btn.visible = false;
 		cancel_btn.visible = false;
+		_isDragging = false;
 		
+		clickTarget.enabled = true;	
+		
+		clickTarget.onPress = Proxy.create(this, onDrag);
+		clickTarget.onRelease = Proxy.create(this, onDrag);
+
 		ok_btn.addEventListener('click', Delegate.create(this, onOkPress));
         cancel_btn.addEventListener('click', Delegate.create(this, onCancelPress));
 		
@@ -112,11 +121,10 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 			setPosition(Stage.width/2, Stage.height/2);
 		else
 			setPosition(Stage.width/2 - _parent._x,  Stage.height/2 - _parent._y);
-		
+				
 		addTransparentLayer(this._parent);
 		
 		contentLoaded();
-        
 	}
 	
 	/**
@@ -126,6 +134,18 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
         //dispatch an onContentLoaded event to listeners
         dispatchEvent({type:'contentLoaded',target:this});
     }
+	
+	private function onDrag() {
+		
+		if(!_isDragging) {
+			this.startDrag();
+			_isDragging = true;
+		}
+		else {
+			this.stopDrag();
+			_isDragging = false;
+		}
+	}
 	
 	private function addTransparentLayer(target:MovieClip) {
 		var styleObj = themeManager.getStyleObject('CanvasPanel');
@@ -325,6 +345,9 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
     public function setSize(w:Number,h:Number):Void{
 		_bgpanel._width = w;
 		_bgpanel._height = h;
+		
+		clickTarget._width = w;
+		clickTarget._height = h;
     }
 	
 	public function setPosition(x:Number, y:Number):Void {
@@ -333,6 +356,9 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 		
 		_bgpanel._x = -_bgpanel._width/2;
 		_bgpanel._Y = -_bgpanel._height/2;
+		
+		clickTarget._x = -clickTarget._width/2;
+		clickTarget._Y = -clickTarget._height/2;
 	}
 
 }
