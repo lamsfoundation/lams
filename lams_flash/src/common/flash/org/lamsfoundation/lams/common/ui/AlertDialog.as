@@ -169,7 +169,6 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 			
 		_okHandler = fn;
 		var w = StringUtils.getButtonWidthForStr(lbl);
-		Debugger.log("width: " + w, Debugger.CRITICAL, "setCancelButton", "AlertDialog");
 		
 		if(w > ok_btn.width) 
 			ok_btn.setSize(w, ok_btn.height);
@@ -183,7 +182,6 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 
 		_cancelHandler = fn;
 		var w = StringUtils.getButtonWidthForStr(lbl);
-		Debugger.log("width: " + w, Debugger.CRITICAL, "setCancelButton", "AlertDialog");
 		
 		if(w > cancel_btn.width)
 			cancel_btn.setSize(w, cancel_btn.height);
@@ -240,12 +238,11 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 			
 		} else {
 			
-			cancel_btn._x = _bgpanel._x + _bgpanel._width/2 - cancel_btn._width/2;
-			cancel_btn._y = _bgpanel._y + _bgpanel._height - ok_btn._height - 10;
+			cancel_btn._x = _bgpanel._x + _bgpanel._width/2 + 5;
+			cancel_btn._y = _bgpanel._y + _bgpanel._height - cancel_btn._height - 10;
 			
-			ok_btn._x = _bgpanel._x + _bgpanel._width/2 - ok_btn._width/2;
-			ok_btn._y = cancel_btn._y - ok_btn._height - 5;
-			
+			ok_btn._x = _bgpanel._x + _bgpanel._width/2 - ok_btn._width;
+			ok_btn._y = _bgpanel._y + _bgpanel._height - ok_btn._height - 10;
 		}
 
 		Debugger.log("bg width: " + _bgpanel._width + " setting height: " + Math.round(Math.abs(_bgpanel._y) + Math.abs(ok_btn._y) + ok_btn._height), Debugger.CRITICAL, "type", "AlertDialog");
@@ -343,10 +340,11 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
     * Main resize method, called by scrollpane container/parent
     */
     public function setSize(w:Number,h:Number):Void{
-		_bgpanel._width = w;
-		_bgpanel._height = h;
 		
+		_bgpanel._width = w;
 		clickTarget._width = w;
+	
+		_bgpanel._height = h;
 		clickTarget._height = h;
     }
 	
