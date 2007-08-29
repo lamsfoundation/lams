@@ -38,7 +38,7 @@ public class BranchConditionDTO {
 
 	private Long conditionId;
 	private Integer conditionUIID;
-    private Integer orderId; 
+    private Integer orderID; 
     private String name; 
     private String type; 
     private String startValue; 
@@ -48,7 +48,7 @@ public class BranchConditionDTO {
     public BranchConditionDTO( BranchCondition condition ) {
     	this.conditionId = condition.getConditionId();
     	this.conditionUIID = condition.getConditionUIID();
-    	this.orderId = condition.getOrderId();
+    	this.orderID = condition.getOrderId();
     	this.name = condition.getName();
     	this.type = condition.getType();
     	this.startValue = condition.getStartValue();
@@ -72,11 +72,11 @@ public class BranchConditionDTO {
 		this.conditionUIID = conditionUIID;
 	}
 
-	public Integer getOrderId() {
-		return orderId;
+	public Integer getOrderID() {
+		return orderID;
 	}
-	public void setOrderId(Integer orderId) {
-		this.orderId = orderId;
+	public void setOrderID(Integer orderId) {
+		this.orderID = orderId;
 	}
 	public String getName() {
 		return name;
@@ -113,7 +113,7 @@ public class BranchConditionDTO {
         return new ToStringBuilder(this)
         	.append("conditionId", conditionId)
         	.append("conditionUIID", conditionUIID)
-            .append("orderId", orderId)
+            .append("orderId", orderID)
             .append("name", name)
             .append("type", type)
             .append("startValue", startValue)
