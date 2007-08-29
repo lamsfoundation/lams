@@ -274,13 +274,13 @@
 			<subclass name="org.lamsfoundation.lams.learningdesign.SequenceActivity" discriminator-value="8">
 				<meta attribute="class-description" inherit="false">@hibernate.class</meta>
 
-			    <set name="branchEntries" lazy="true" inverse="true" cascade="none">
-		    		<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="none"
+			    <set name="branchEntries" lazy="true" inverse="true" cascade="all-delete-orphan" >
+		    		<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan" 
 		    				@hibernate.collection-key column="sequence_activity_id" 
-		    				@hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry"
+		    				@hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.BranchActivityEntry"
 					</meta>    										
 		            <key><column name="sequence_activity_id" /></key>
-		            <one-to-many class="org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry"/>
+		            <one-to-many class="org.lamsfoundation.lams.learningdesign.BranchActivityEntry"/>
 				</set>
 			</subclass>
 			<subclass name="org.lamsfoundation.lams.learningdesign.ParallelActivity" discriminator-value="6">

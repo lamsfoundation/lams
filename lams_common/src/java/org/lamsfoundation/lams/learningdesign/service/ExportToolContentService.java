@@ -80,26 +80,22 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
+import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
-import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
-import org.lamsfoundation.lams.learningdesign.GroupBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
-import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
@@ -108,7 +104,7 @@ import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
-import org.lamsfoundation.lams.learningdesign.dto.GroupBranchActivityEntryDTO;
+import org.lamsfoundation.lams.learningdesign.dto.BranchActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.GroupDTO;
 import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
@@ -1446,11 +1442,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 		
 		// branch mappings - maps groups to branchs
-		List<GroupBranchActivityEntryDTO> entryDtoList = dto.getBranchMappings();
+		List<BranchActivityEntryDTO> entryDtoList = dto.getBranchMappings();
 		if ( entryDtoList != null ) {
-			Set<GroupBranchActivityEntry> entryList = new HashSet<GroupBranchActivityEntry>();
-			for (GroupBranchActivityEntryDTO entryDto : entryDtoList) {
-				GroupBranchActivityEntry entry = getGroupBranchActivityEntry(entryDto, groupByUIIDMapper, activityByUIIDMapper);
+			Set<BranchActivityEntry> entryList = new HashSet<BranchActivityEntry>();
+			for (BranchActivityEntryDTO entryDto : entryDtoList) {
+				BranchActivityEntry entry = getBranchActivityEntry(entryDto, groupByUIIDMapper, activityByUIIDMapper);
 				entryList.add(entry);
 			}
 		}
@@ -1654,7 +1650,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * Note: there isn't an set in the learning design for the branch mappings. The group objects actually contain the link
 	 * to the mappings, so this method updates the group objects.
 	 */
-	private GroupBranchActivityEntry getGroupBranchActivityEntry(GroupBranchActivityEntryDTO entryDto, Map<Integer, Group>groupByUIIDMapper, 
+	private BranchActivityEntry getBranchActivityEntry(BranchActivityEntryDTO entryDto, Map<Integer, Group>groupByUIIDMapper, 
 			Map<Integer, Activity> activityByUIIDMapper) {
 
 		Activity branch = activityByUIIDMapper.get(entryDto.getSequenceActivityUIID());
@@ -1675,7 +1671,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			return null;
 		}
 
-		return 	group.allocateBranchToGroup(null, entryDto.getEntryUIID(), (SequenceActivity) branch, (BranchingActivity) branchingActivity);
+		return 	group.allocateBranchToGroup(entryDto.getEntryUIID(), (SequenceActivity) branch, (BranchingActivity) branchingActivity);
 	}
 
 	private Transition getTransition(TransitionDTO transDto, Map<Long, Activity> activityMapper) {

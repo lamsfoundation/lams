@@ -134,11 +134,6 @@ public interface WDDXTAGS {
 	public static final String GROUP_USER_LIST = "userList";
 	public static final String GROUP_UIID = "groupUIID";
 
-	public static final String GROUP_BRANCH_ACTIVITY_ENTRY_ID = "entryID";
-	public static final String GROUP_BRANCH_ACTIVITY_ENTRY_UIID = "entryUIID";
-	public static final String GROUP_BRANCH_SEQUENCE_ACTIVITY_UIID = "sequenceActivityUIID";
-	public static final String GROUP_BRANCH_ACTIVITY_UIID = "branchingActivityUIID";
-
 	/** Transition specific tags */
 	public static final String TRANSITION_ID ="transitionID";
 	public static final String TRANSITION_UIID ="transitionUIID";
@@ -199,6 +194,25 @@ public interface WDDXTAGS {
 	public static final String START_YCOORD="startYCoord";	
 	public static final String END_XCOORD="endXCoord";
 	public static final String END_YCOORD="endYCoord";
+	
+	/** Branch Mapping and Tool Condition Tags */
+	public static final String BRANCH_ACTIVITY_ENTRY_ID = "entryID";
+	public static final String BRANCH_ACTIVITY_ENTRY_UIID = "entryUIID";
+	public static final String BRANCH_SEQUENCE_ACTIVITY_UIID = "sequenceActivityUIID";
+	public static final String BRANCH_ACTIVITY_UIID = "branchingActivityUIID";
+	public static final String BRANCH_CONDITION = "condition";
+	// reuse GROUP_UIID for the Group field
+	public static final String CONDITION_ID = "conditionID";
+	public static final String CONDITION_UIID = "conditionUIID";	
+	// reuse ORDER_ID for the OrderId field
+	public static final String CONDITION_NAME = "name";
+	public static final String CONDITION_TYPE = "type";
+	public static final String CONDITION_START_VALUE = "startValue";
+	public static final String CONDITION_END_VALUE = "endValue";
+	public static final String CONDITION_EXACT_MATCH_VALUE = "exactMatchValue";
+
+	
+
 	
 	
 }

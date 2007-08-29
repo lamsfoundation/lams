@@ -133,7 +133,7 @@
 	<!--  bi-directional many-to-one association to GroupBranchActivity -->
    <set name="branchActivities" lazy="true" inverse="true" cascade="all-delete-orphan">
         <key><column name="group_id" /></key>
-        <one-to-many class="org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry"/>
+        <one-to-many class="org.lamsfoundation.lams.learningdesign.BranchActivityEntry"/>
     </set>
  
 </class>

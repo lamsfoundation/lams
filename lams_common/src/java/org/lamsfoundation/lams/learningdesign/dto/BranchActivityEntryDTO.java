@@ -20,13 +20,12 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 package org.lamsfoundation.lams.learningdesign.dto;
 
 import java.io.Serializable;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
 
 /** 
  * Models the relationship between a group and a branch for Chosen or Group based branching. 
@@ -38,7 +37,7 @@ import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
  * @version 2.1
  * 
 */
-public class GroupBranchActivityEntryDTO implements Serializable {
+public class BranchActivityEntryDTO implements Serializable {
     
     private Long entryID;
     private Integer entryUIID;
@@ -49,15 +48,6 @@ public class GroupBranchActivityEntryDTO implements Serializable {
 	//---------------------------------------------------------------------
     // Object creation Methods
     //---------------------------------------------------------------------
-    
-    /** full constructor */
-    public GroupBranchActivityEntryDTO(GroupBranchActivityEntry gba) {
-        this.entryID = gba.getEntryId();
-        this.entryUIID = gba.getEntryUIID();
-        this.groupUIID = gba.getGroup().getGroupUIID();
-        this.sequenceActivityUIID = gba.getBranchSequenceActivity().getActivityUIID();
-        this.branchingActivityUIID = gba.getBranchingActivity().getActivityUIID();
-    }
 
     public Long getEntryID() {
         return this.entryID;

@@ -33,8 +33,8 @@ import java.util.TreeSet;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityDTOOrderComparator;
+import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -419,8 +419,8 @@ public class LearningDesignDTO extends BaseDTO{
 	    	    		if ( group.getBranchActivities().size() > 0 ) {
 	    	    			Iterator iter2 = group.getBranchActivities().iterator();
 	    	    			while ( iter2.hasNext() ) {
-	    	    				GroupBranchActivityEntry gba = (GroupBranchActivityEntry) iter2.next();
-	    	    				branchMappings.add(gba.getGroupBranchActivityDTO());
+	    	    				BranchActivityEntry ba = (BranchActivityEntry) iter2.next();
+	    	    				branchMappings.add(ba.getBranchActivityDTO());
 	    	    			}
 	    	    		}
 	    			}

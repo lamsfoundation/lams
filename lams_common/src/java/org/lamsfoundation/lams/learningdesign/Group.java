@@ -260,7 +260,7 @@ public class Group implements Serializable,Nullable,Comparable {
      *            @hibernate.collection-key
      *             column="group_id"
      *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry"
+     *             class="org.lamsfoundation.lams.learningdesign.BranchActivityEntry"
      *         
      */
 	public Set getBranchActivities() {
@@ -353,25 +353,14 @@ public class Group implements Serializable,Nullable,Comparable {
     	Group newGroup = new Group(null, this.getGroupName(), this.getOrderId(), this.getGroupUIID(), 
     			newGrouping, null, null, null);
     	
-    	if ( this.getBranchActivities() != null && this.getBranchActivities().size() > 0) {
-    		newGroup.setBranchActivities(new HashSet());
-			Iterator iter = this.getBranchActivities().iterator();
-			while ( iter.hasNext() ) {
-				GroupBranchActivityEntry oldEntry = (GroupBranchActivityEntry) iter.next();
-				GroupBranchActivityEntry newEntry = new GroupBranchActivityEntry(null, 
-						oldEntry.getEntryUIID(), newGroup, oldEntry.getBranchSequenceActivity(), oldEntry.getBranchingActivity());
-				newGroup.getBranchActivities().add(newEntry);
-			}
-    	}
-
-    	return newGroup;
+     	return newGroup;
     }
 
-    /** Allocate this group to the given branch, in a branching activity. This creates the GroupBranchActivityEntry record and adds it 
-     * to the branchActivities set. The entryId, entryUIID will only be populated if this is called from authoring
+    /** Allocate this group to the given branch, in a branching activity. This creates the BranchActivityEntry record and adds it 
+     * to the branchActivities set. EntryUIID will only be populated if this is called from authoring
      */
-    public GroupBranchActivityEntry allocateBranchToGroup(Long entryId, Integer entryUIID, SequenceActivity branch, BranchingActivity branchingActivity) {
-		GroupBranchActivityEntry entry = new GroupBranchActivityEntry(entryId, entryUIID, this, branch, (BranchingActivity) branchingActivity);
+    public BranchActivityEntry allocateBranchToGroup(Integer entryUIID, SequenceActivity branch, BranchingActivity branchingActivity) {
+    	BranchActivityEntry entry = new BranchActivityEntry(null, entryUIID, branch, (BranchingActivity) branchingActivity, this);
 		if ( getBranchActivities() == null ) {
 			setBranchActivities(new HashSet());
 		}

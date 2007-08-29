@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+
+
+<class 
+    name="org.lamsfoundation.lams.learningdesign.BranchCondition" 
+    table="lams_branch_condition"
+>
+    <id
+        name="conditionId"
+        type="java.lang.Long"
+        column="condition_id"
+    >
+        <generator class="native" />
+    </id>
+    
+    <property name="conditionUIID" type="java.lang.Integer" column="condition_ui_id" length="11">
+        <meta attribute="field-description">@hibernate.property column="condition_ui_id" length="11"</meta>    
+	</property>				
+
+    <property name="orderId" type="java.lang.Integer" column="order_id" length="11">
+        <meta attribute="field-description">@hibernate.property column="order_id" length="11"</meta>    
+	</property>				
+    
+    <property name="name" type="java.lang.String" column="name" length="255">
+        <meta attribute="field-description">@hibernate.property column="name" length="255" </meta>    
+    </property>
+    
+    
+    <property name="type" type="java.lang.String" column="type" length="255">
+        <meta attribute="field-description">@hibernate.property column="type" length="255" </meta>    
+    </property>
+    
+    <property name="startValue" type="java.lang.String" column="start_value" length="255">
+        <meta attribute="field-description">@hibernate.property column="start_value" length="255" </meta>    
+    </property>
+    
+    <property name="endValue" type="java.lang.String" column="end_value" length="255">
+        <meta attribute="field-description">@hibernate.property column="end_value" length="255" </meta>    
+    </property>
+    
+    <property name="exactMatchValue" type="java.lang.String" column="exact_match_value" length="255">
+        <meta attribute="field-description">@hibernate.property column="exact_match_value" length="255" </meta>    
+    </property>
+    
+</class>
+</hibernate-mapping>

@@ -378,4 +378,17 @@ public abstract class Grouping implements Serializable
 	public void setGrouper(Grouper grouper) {
 		this.grouper = grouper;
 	}
+	
+	public Group getGroup(Integer groupUIID) {
+		if ( this.getGroups() != null ) {
+			Iterator iter = this.getGroups().iterator();
+			while (iter.hasNext()) {
+				Group elem = (Group) iter.next();
+				if ( elem.getGroupUIID().equals(groupUIID)) 
+					return elem;
+			}
+		}
+		return null;
+	}
+
 }

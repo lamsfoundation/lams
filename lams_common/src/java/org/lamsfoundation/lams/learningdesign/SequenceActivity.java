@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
@@ -137,6 +138,21 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     	SequenceActivity newSequenceActivity = new SequenceActivity();
     	copyToNewActivity(newSequenceActivity);
     	newSequenceActivity.defaultActivity = this.defaultActivity;
+    	
+       	if ( this.getBranchEntries() != null && this.getBranchEntries().size() > 0) {
+       		newSequenceActivity.setBranchEntries(new HashSet());
+			Iterator iter = this.getBranchEntries().iterator();
+			while ( iter.hasNext() ) {
+				BranchActivityEntry oldEntry = (BranchActivityEntry) iter.next();
+				BranchActivityEntry newEntry = new BranchActivityEntry(null, 
+						oldEntry.getEntryUIID(), oldEntry.getBranchSequenceActivity(), oldEntry.getBranchingActivity(), oldEntry.getGroup());
+				if ( oldEntry.getCondition() != null ) {
+					newEntry.setCondition(oldEntry.getCondition().clone());
+				}
+				newSequenceActivity.getBranchEntries().add(newEntry);
+			}
+    	}
+
 		return newSequenceActivity;
     }
 
@@ -156,11 +172,11 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     }
 
 	/** 
-	 * Get the set of the branch to group mappings used for this branching activity. The set contains GroupBranchActivityEntry entries
+	 * Get the set of the branch to group mappings used for this branching activity. The set contains BranchActivityEntry entries
 	 * 
-	 * 	@hibernate.set lazy="true" inverse="true" cascade="none"
+	 * 	@hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan" 
 	 *		@hibernate.collection-key column="sequence_activity_id" 
-	 *		@hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry"
+	 *		@hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.BranchActivityEntry"
 	*/
 	public Set getBranchEntries() {
 		return branchEntries;
@@ -173,13 +189,13 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 	/** Get the groups related to this sequence activity, related via the BranchEntries */
 	public SortedSet<Group> getGroupsForBranch() {
 		
-		Set<GroupBranchActivityEntry> mappingEntries = getBranchEntries();
+		Set<BranchActivityEntry> mappingEntries = getBranchEntries();
 		TreeSet<Group> sortedGroups = new TreeSet<Group>();
 	
 		if ( mappingEntries != null ) {
 			Iterator mappingIter = mappingEntries.iterator();
 			if ( mappingIter.hasNext() )  {
-				sortedGroups.add(((GroupBranchActivityEntry) mappingIter.next()).getGroup());
+				sortedGroups.add(((BranchActivityEntry) mappingIter.next()).getGroup());
 			}
 		}
 		
