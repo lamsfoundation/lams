@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.authoring;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,12 +38,13 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
+import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -59,6 +61,7 @@ import org.lamsfoundation.lams.learningdesign.SystemGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IBranchActivityEntryDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
@@ -115,6 +118,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	protected ISystemToolDAO systemToolDAO = null;
 	protected IGroupDAO groupDAO = null;
 	protected IToolSessionDAO toolSessionDAO = null;
+	protected IBranchActivityEntryDAO branchActivityEntryDAO = null;
 
 	private Integer mode = null;
 	
@@ -132,11 +136,18 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * that we are trying to avoid!
 	 */
 	protected HashMap<Integer, List<ToolSession>> toolSessionMap = new HashMap<Integer,List<ToolSession>>(); // Activity UIID -> ToolSession
+	/* Used for easy access (rather than going back to the db) and makes it easier to clean them up at the end 
+	 * - they can't be deleted easily via the cascades as we don't get a list of deleted entries sent back 
+	 * from the client! We would end up with mappings still attached to a sequence activity that shouldn't be there! Not 
+	 * done as a map as we sometimes will check via UIID, sometimes by ID
+	 */
+	protected List<BranchActivityEntry> oldbranchActivityEntryList = new ArrayList<BranchActivityEntry>();
+	
 	protected HashMap<Integer, Activity> oldActivityMap = new HashMap<Integer,Activity>(); // Activity UIID -> Activity
 	/* cache of groupings - too hard to get them from the db */
 	protected HashMap<Integer,Grouping> groupings = new HashMap<Integer,Grouping>();
 	protected HashMap<Integer,Group> groups = new HashMap<Integer,Group>();
-	protected HashMap<Integer,GroupBranchActivityEntry> branchEntries = new HashMap<Integer,GroupBranchActivityEntry>();
+	protected HashMap<Integer,BranchActivityEntry> branchEntries = new HashMap<Integer,BranchActivityEntry>();
 	protected HashMap<Integer,SequenceActivity> firstChildToSequenceMap = new HashMap<Integer,SequenceActivity>();
 	/* can't delete as we go as they are linked to other items - keep a list and delete at the end. */
 	protected Set<Grouping> groupingsToDelete = new HashSet<Grouping>();
@@ -268,6 +279,15 @@ public class ObjectExtractor implements IObjectExtractor {
 		this.baseDAO = baseDAO;
 	}
 
+	public IBranchActivityEntryDAO getBranchActivityEntryDAO() {
+		return branchActivityEntryDAO;
+	}
+
+	public void setBranchActivityEntryDAO(
+			IBranchActivityEntryDAO branchActivityEntryDAO) {
+		this.branchActivityEntryDAO = branchActivityEntryDAO;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.authoring.IObjectExtractor#extractSaveLearningDesign(java.util.Hashtable)
 	 */
@@ -297,6 +317,10 @@ public class ObjectExtractor implements IObjectExtractor {
 		// three objects (learning design -> grouping activity -> grouping) so put both the existing ones and the new ones
 		// here for reference later.
 		initialiseGroupings();
+
+		// Branch activity mappings are indirectly accessible via sequence activities or groupings. Have a separate list
+		// to make them easier to delete unwanted ones later.
+		intialiseBranchActivityMappings();
 		
 		// get a mapping of all the existing activities and their tool sessions, in case we need to delete some tool sessions later.
 		initialiseToolSessionMap(learningDesign);
@@ -447,6 +471,10 @@ public class ObjectExtractor implements IObjectExtractor {
 			Grouping grouping = (Grouping) iter.next();
 			groupings.put(grouping.getGroupingUIID(), grouping);
 		}
+	}
+	
+	private void intialiseBranchActivityMappings() {
+		oldbranchActivityEntryList = branchActivityEntryDAO.getEntriesByLearningDesign(learningDesign.getLearningDesignId());
 	}
 
 	/** Initialise the map of tool sessions already in the database. Used to work out what will be deleted
@@ -1205,6 +1233,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * 
 	 * Must be done after all the other parsing as we need to match up activities
 	 * and groups.
+	 * 
+	 * Will also delete any old (now unused) mappings
+	 * 
 	 * @param branchMappingsList
 	 * @throws WDDXProcessorConversionException
 	 */
@@ -1217,35 +1248,43 @@ public class ObjectExtractor implements IObjectExtractor {
 	        Iterator iterator = branchMappingsList.iterator();
 	        while(iterator.hasNext())
 	        {
-            	extractGroupBranchActivityEntry((Hashtable)iterator.next());
+            	extractBranchActivityEntry((Hashtable)iterator.next());
 	        }
 	    }
+	    
+	    // now go through and delete any old branch mappings that are no longer used.
+	    // need to remove them via the sequence activity so that the cascade will work.
+	    Iterator iter = oldbranchActivityEntryList.iterator();
+	    while (iter.hasNext()) {
+			BranchActivityEntry oldEntry = (BranchActivityEntry) iter.next();
+			SequenceActivity sequenceActivity = oldEntry.getBranchSequenceActivity();
+			if ( sequenceActivity != null ) {
+				sequenceActivity.getBranchEntries().remove(oldEntry);
+			}
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	private GroupBranchActivityEntry extractGroupBranchActivityEntry(Hashtable details) throws WDDXProcessorConversionException {
+	/** Get the BranchActivityEntry details. This may be either for group based branching, or it may be for tool output based branching */
+	private BranchActivityEntry extractBranchActivityEntry(Hashtable details) throws WDDXProcessorConversionException {
 
-    	Long entryId = WDDXProcessor.convertToLong(details, WDDXTAGS.GROUP_BRANCH_ACTIVITY_ENTRY_ID);	
-    	Integer entryUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.GROUP_BRANCH_ACTIVITY_ENTRY_UIID);	
+    	Long entryId = WDDXProcessor.convertToLong(details, WDDXTAGS.BRANCH_ACTIVITY_ENTRY_ID);	
+    	Integer entryUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.BRANCH_ACTIVITY_ENTRY_UIID);	
 	    if ( entryUIID == null ) { 
 	    	throw new WDDXProcessorConversionException("Group based branch mapping entry is missing its UUID. Entry "+details);
 	    }
 
-    	Integer groupUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.GROUP_UIID);	
-    	Integer sequenceActivityUIID=WDDXProcessor.convertToInteger(details,WDDXTAGS.GROUP_BRANCH_SEQUENCE_ACTIVITY_UIID);
-    	Integer branchingActivityUIID=WDDXProcessor.convertToInteger(details,WDDXTAGS.GROUP_BRANCH_ACTIVITY_UIID);
+    	Integer sequenceActivityUIID=WDDXProcessor.convertToInteger(details,WDDXTAGS.BRANCH_SEQUENCE_ACTIVITY_UIID);
+    	Integer branchingActivityUIID=WDDXProcessor.convertToInteger(details,WDDXTAGS.BRANCH_ACTIVITY_UIID);
     	
-    	Group group = groups.get(groupUIID);
-   	    if ( group == null ) {
-		    	throw new WDDXProcessorConversionException("Group listed in the branch mapping list is missing. Mapping entry UUID "+entryUIID+" groupUIID "+groupUIID);
-   	    }
-
-   	    Activity sequenceActivity = newActivityMap.get(sequenceActivityUIID);
-   	    if ( sequenceActivity == null ) {
+   	    SequenceActivity sequenceActivity = null;
+   	    Activity activity = newActivityMap.get(sequenceActivityUIID);
+   	    if ( activity == null ) {
 		    	throw new WDDXProcessorConversionException("Sequence Activity listed in the branch mapping list is missing. Mapping entry UUID "+entryUIID+" sequenceActivityUIID "+sequenceActivityUIID);
-   	    }
-   	    if ( ! sequenceActivity.isSequenceActivity() ) {
+   	    }  else if ( ! sequenceActivity.isSequenceActivity() ) {
 		    	throw new WDDXProcessorConversionException("Activity listed in the branch mapping list is not a sequence activity. Mapping entry UUID "+entryUIID+" sequenceActivityUIID "+sequenceActivityUIID);
+   	    } else {
+   	    	sequenceActivity = (SequenceActivity) activity;
    	    }
    	    
    	    Activity branchingActivity = newActivityMap.get(branchingActivityUIID);
@@ -1256,38 +1295,102 @@ public class ObjectExtractor implements IObjectExtractor {
 		    	throw new WDDXProcessorConversionException("Activity listed in the branch mapping list is not a branching activity. Mapping entry UUID "+entryUIID+" branchingActivityUIID "+branchingActivityUIID);
    	    }
 
-   	    GroupBranchActivityEntry entry = null;
 
-		// Does it exist already? If the mapping was created at runtime, there will be an ID but no IU ID field.
+		// If the mapping was created at runtime, there will be an ID but no IU ID field.
 		// If it was created in authoring, will have a UI ID and may or may not have an ID.
 		// So try to match up on UI ID first, failing that match on ID. Then the worst case, which is the mapping
 		// is created at runtime but then modified in authoring (and has has a new UI ID added) is handled.
-		if ( group.getBranchActivities() != null && group.getBranchActivities().size() > 0  ) {
-			GroupBranchActivityEntry uiid_match = null;
-			GroupBranchActivityEntry id_match = null;
-			Iterator iter = group.getBranchActivities().iterator();
-			while (uiid_match == null && iter.hasNext()) {
-				GroupBranchActivityEntry possibleEntry = (GroupBranchActivityEntry) iter.next();
-				if ( entryUIID.equals(possibleEntry.getEntryUIID()) ) {
-					uiid_match = possibleEntry;
-				}
-				if ( entryId != null && entryId.equals(possibleEntry.getEntryId()) ) {
-					id_match = possibleEntry;
-				}
+    	BranchActivityEntry uiid_match = null;
+		BranchActivityEntry id_match = null;
+   	    Iterator iter = sequenceActivity.getBranchEntries().iterator();
+		while (uiid_match == null && iter.hasNext()) {
+			BranchActivityEntry possibleEntry = (BranchActivityEntry) iter.next();
+			if ( entryUIID.equals(possibleEntry.getEntryUIID()) ) {
+				uiid_match = possibleEntry;
 			}
-			entry = uiid_match != null ? uiid_match : id_match;
+			if ( entryId != null && entryId.equals(possibleEntry.getEntryId()) ) {
+				id_match = possibleEntry;
+			}
 		}
 
-		if ( entry == null ) {
-			group.allocateBranchToGroup(entryId,entryUIID, (SequenceActivity)sequenceActivity, (BranchingActivity)branchingActivity);
+   	    BranchActivityEntry entry = uiid_match != null ? uiid_match : id_match;
+
+   	    // Does it exist already? If it does, remove it from the "old" set (which is used for doing deletions later).
+   	    oldbranchActivityEntryList.remove(entry);
+   	    
+    	BranchCondition condition = extractCondition((Hashtable)details.get(WDDXTAGS.BRANCH_CONDITION), entry);
+
+    	Integer groupUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.GROUP_UIID);	
+    	Group group = null;
+    	if ( groupUIID != null ) {
+    		group = groups.get(groupUIID);
+    		if ( group == null ) {
+		    	throw new WDDXProcessorConversionException("Group listed in the branch mapping list is missing. Mapping entry UUID "+entryUIID+" groupUIID "+groupUIID);
+    		}
+    	}
+    	
+    	if ( condition == null && group == null ) {
+	    	throw new WDDXProcessorConversionException("Branch mapping has neither a group or a condition. Not a valid mapping. "+details);
+    	}
+
+    	if ( entry == null ) {
+    		if ( condition != null ) {
+    			entry = condition.allocateBranchToCondition(entryUIID, sequenceActivity, (BranchingActivity)branchingActivity);
+    		} else {
+    			entry = group.allocateBranchToGroup(entryUIID, sequenceActivity, (BranchingActivity)branchingActivity);
+    		}
    	    } else {
-   	    	entry.setBranchSequenceActivity((SequenceActivity)sequenceActivity);
+   	    	entry.setEntryUIID(entryUIID);
+   	    	entry.setBranchSequenceActivity(sequenceActivity);
    	    	entry.setBranchingActivity((BranchingActivity)branchingActivity);
-   	    	entry.setGroup(group);
    	    }
+    	
+    	entry.setGroup(group);
+    	entry.setCondition(condition);
 		
 		groupingDAO.update(group);
 		return entry;
+	}
+
+	/**
+	 * @param details
+	 * @param entry
+	 * @return
+	 * @throws WDDXProcessorConversionException
+	 */
+	private BranchCondition extractCondition(Hashtable conditionTable,
+			BranchActivityEntry entry) throws WDDXProcessorConversionException {
+		
+    	BranchCondition condition = null;
+
+    	if ( conditionTable != null && conditionTable.size() > 0 ) {
+
+    		Long conditionID=WDDXProcessor.convertToLong(conditionTable,WDDXTAGS.CONDITION_ID);
+    		if ( entry != null ) {
+    			condition = entry.getCondition();
+    		} 
+    		if ( condition != null && conditionID != null && ! condition.getConditionId().equals(conditionID)) {
+    			log.warn("Unexpected behaviour: condition supplied in WDDX packet has a different ID to matching branch activity entry in the database. Dropping old database condition."
+    					+" Old db condition "+condition+" new entry in WDDX "+conditionTable);
+    			condition = null; // Hibernate should dispose of it automatically via the cascade
+    		}
+    		
+    		if ( condition == null ) {
+    	    	Integer conditionUIID=WDDXProcessor.convertToInteger(conditionTable,WDDXTAGS.CONDITION_UIID);
+    		    if ( conditionUIID == null ) { 
+    		    	throw new WDDXProcessorConversionException("Condition is missing its UUID: "+conditionTable);
+    		    }
+
+    			condition = new BranchCondition(null, conditionUIID, 
+    					WDDXProcessor.convertToInteger(conditionTable,WDDXTAGS.ORDER_ID), 
+    					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_NAME),
+    					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_TYPE),
+    					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_START_VALUE),
+    					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_END_VALUE),
+    					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_EXACT_MATCH_VALUE) );
+    		}
+    	}
+		return condition;
 	}
 
 

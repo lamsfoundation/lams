@@ -10,7 +10,7 @@ import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
+import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 
 /** Represents an overall branching activity. Used by the Teacher Chosen Grouping screen for 
@@ -30,9 +30,9 @@ public class BranchingDTO implements Serializable, Comparable {
 		Iterator iter = activity.getActivities().iterator();
 		while (iter.hasNext()) {
 			SequenceActivity branch = (SequenceActivity) iter.next();
-			Set<GroupBranchActivityEntry> mappingEntries = branch.getBranchEntries();
+			Set<BranchActivityEntry> mappingEntries = branch.getBranchEntries();
 			SortedSet<Group> groups = new TreeSet<Group>();
-			for ( GroupBranchActivityEntry entry : mappingEntries ) {
+			for ( BranchActivityEntry entry : mappingEntries ) {
 				Group group = entry.getGroup();
 				groups.add(group);
 			}

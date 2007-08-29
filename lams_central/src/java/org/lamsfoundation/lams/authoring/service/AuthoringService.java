@@ -50,7 +50,7 @@ import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
+import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -807,6 +807,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     	}
     	
       	// fix up any old "default activity" in the complex activities and the input activities
+    	// and fix any branch mappings
     	for ( Activity activity : activities) {
     		if ( activity.isComplexActivity() ) {
     			ComplexActivity newComplex = (ComplexActivity) activity;
@@ -816,32 +817,31 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     				newComplex.setDefaultActivity(newDefaultActivity);
     			}
     		}
+
+    		if ( activity.isSequenceActivity() ) {
+    			SequenceActivity newSequenceActivity = (SequenceActivity) activity;
+            	// Need to check if the sets are not null as these are new objects and Hibernate may not have backed them with collections yet.
+	    		if ( newSequenceActivity.getBranchEntries() != null && newSequenceActivity.getBranchEntries().size() > 0 ) {
+	    			Iterator beIter = newSequenceActivity.getBranchEntries().iterator();
+	    			while ( beIter.hasNext() ) {
+	    				// sequence activity will be correct but the branching activity and the grouping will be wrong
+	    				// the condition was copied by the sequence activity copy
+	    				BranchActivityEntry entry = (BranchActivityEntry) beIter.next();
+	    				BranchingActivity oldBranchingActivity = entry.getBranchingActivity();
+	    				entry.setBranchingActivity((BranchingActivity) newActivities.get(oldBranchingActivity.getActivityUIID()));
+	    				Group oldGroup = entry.getGroup();
+	    				if ( oldGroup != null ) {
+	    					Grouping oldGrouping = oldGroup.getGrouping();
+	    					entry.setGroup(oldGrouping.getGroup(oldGroup.getGroupUIID()));
+	    				}
+	    			}
+	    		}
+    			
+    		}
     	}
     	
     	// fix up the input activities
 
-    	// Now go back and fix any branch mapping entries - they will still be pointing to old activities.
-    	// Need to check if the sets are not null as these are new objects and Hibernate may not have
-    	// backed them with collections yet.
-    	for ( Grouping grouping: newGroupings.values() ) {
-    		if ( grouping.getGroups() !=null && grouping.getGroups().size() > 0 ) {
-    			Iterator iter = grouping.getGroups().iterator();
-    			while ( iter.hasNext() ) {
-    				Group group = (Group) iter.next();
-    	    		if ( group.getBranchActivities() != null && group.getBranchActivities().size() > 0 ) {
-    	    			Iterator iter2 = group.getBranchActivities().iterator();
-    	    			while ( iter2.hasNext() ) {
-    	    				GroupBranchActivityEntry entry = (GroupBranchActivityEntry) iter2.next();
-    	    				SequenceActivity oldSequenceActivity = entry.getBranchSequenceActivity();
-    	    				entry.setBranchSequenceActivity((SequenceActivity) newActivities.get(oldSequenceActivity.getActivityUIID()));
-    	    				BranchingActivity oldBranchingActivity = entry.getBranchingActivity();
-    	    				entry.setBranchingActivity((BranchingActivity) newActivities.get(oldBranchingActivity.getActivityUIID()));
-    	    			}
-    	    		}
-    			}
-    		}
-    	}
-    	
     	// The activities collection in the learning design may already exist (as we have already done a save on the design).
     	// If so, we can't just override the existing collection as the cascade causes an error.
     	// newLearningDesign.getActivities() will create a new TreeSet(new ActivityOrderComparator()) if there isn't an existing set

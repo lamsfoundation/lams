@@ -43,7 +43,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityTitleComparator;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
+import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.monitoring.BranchingDTO;
@@ -140,8 +140,8 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 			boolean mayMoveUser = true;
 			while (iter.hasNext()) {
 				SequenceActivity branch = (SequenceActivity) iter.next();
-				Set<GroupBranchActivityEntry> mappingEntries = branch.getBranchEntries();
-				for ( GroupBranchActivityEntry entry : mappingEntries ) {
+				Set<BranchActivityEntry> mappingEntries = branch.getBranchEntries();
+				for ( BranchActivityEntry entry : mappingEntries ) {
 					mayMoveUser = mayMoveUser && entry.getGroup().mayBeDeleted();
 				}
 			}

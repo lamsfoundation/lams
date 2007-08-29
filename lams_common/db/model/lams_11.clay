@@ -139,7 +139,7 @@
 </table>
 <table alias="" name="lams_grouping_type" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="954" y="780"/>
+<table-figure-bounds height="-1" width="-1" x="888" y="1003"/>
 <column-list>
 <column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="true" name="grouping_type_id" remarks="">
 <column-description></column-description>
@@ -1188,7 +1188,7 @@
 </table>
 <table alias="" name="lams_group" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="1104" y="670"/>
+<table-figure-bounds height="-1" width="-1" x="1169" y="734"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="group_id" remarks="">
 <column-description></column-description>
@@ -1273,7 +1273,7 @@
 </table>
 <table alias="" name="lams_grouping" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="1045" y="956"/>
+<table-figure-bounds height="-1" width="-1" x="1128" y="958"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="grouping_id" remarks="">
 <column-description></column-description>
@@ -2812,7 +2812,7 @@
 </table>
 <table alias="" name="lams_learner_progress" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="1471" y="1055"/>
+<table-figure-bounds height="-1" width="-1" x="1580" y="1060"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="learner_progress_id" remarks="">
 <column-description></column-description>
@@ -3258,7 +3258,7 @@ It will be used for the IMS LD import/export.</column-description>
 </table>
 <table alias="" name="lams_tool_session" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="1352" y="763"/>
+<table-figure-bounds height="-1" width="-1" x="1415" y="763"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="tool_session_id" remarks="">
 <column-description></column-description>
@@ -3533,7 +3533,7 @@ It will be used for the IMS LD import/export.</column-description>
 </table>
 <table alias="" name="lams_tool_session_state" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="1372" y="970"/>
+<table-figure-bounds height="-1" width="-1" x="1354" y="970"/>
 <column-list>
 <column alias="" auto-increment="false" column-size="3" decimal-digits="0" default-value="" mandatory="true" name="tool_session_state_id" remarks="">
 <column-description></column-description>
@@ -5391,9 +5391,9 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <foreign-key-list/>
 <index-list/>
 </table>
-<table alias="" name="lams_group_branch_activity" remarks="">
-<table-description>Maps a group to an activity. Used for allocating groups to a sequence activity, which forms one branch inside a branching activity. </table-description>
-<table-figure-bounds height="-1" width="-1" x="865" y="601"/>
+<table alias="" name="lams_branch_activity_entry" remarks="">
+<table-description>(1) Maps a group to an activity. Used for allocating groups to a sequence activity, which forms one branch inside a branching activity. &#13;(2) Maps a condition to an activity. Used for allocating groups to a sequence activity, based on a tool condition. </table-description>
+<table-figure-bounds height="-1" width="-1" x="869" y="570"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="entry_id" remarks="">
 <column-description></column-description>
@@ -5460,8 +5460,21 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="condition_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
 </column-list>
-<primary-key alias="" name="PK_LAMS_GROUP_BRANCH_ACTIVITY" remarks="">
+<primary-key alias="" name="PK_LAMS_BRANCH_ACTIVITY_ENTRY" remarks="">
 <primary-key-description></primary-key-description>
 <primary-key-column name="entry_id"/>
 </primary-key>
@@ -5494,6 +5507,13 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 </foreign-key-figure>
 <foreign-key-column column-name="branch_activity_id" referenced-key-column-name="activity_id"/>
 </foreign-key>
+<foreign-key alias="" name="FK_lams_branch_activity_entry_4" on-delete="" on-update="" referenced-key="PK_LAMS_BRANCH_CONDITION" referenced-table="lams_branch_condition" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key-description></foreign-key-description>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="condition_id" referenced-key-column-name="condition_id"/>
+</foreign-key>
 </foreign-key-list>
 <index-list/>
 </table>
@@ -5504,8 +5524,8 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="activity_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -5517,8 +5537,8 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="input_activity_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -5554,6 +5574,106 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <foreign-key-column column-name="activity_id" referenced-key-column-name="activity_id"/>
 </foreign-key>
 </foreign-key-list>
+<index-list/>
+</table>
+<table alias="" name="lams_branch_condition" remarks="">
+<table-description></table-description>
+<table-figure-bounds height="-1" width="-1" x="955" y="771"/>
+<column-list>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="condition_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="condition_ui_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
+<variant type-name-pattern="INT"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="0" mandatory="true" name="order_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
+<variant type-name-pattern="INT"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="true" name="name" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="true" name="type" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="startValue" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="endValue" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="exactMatch" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="entry_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key alias="" name="PK_LAMS_BRANCH_CONDITION" remarks="">
+<primary-key-description></primary-key-description>
+<primary-key-column name="condition_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list/>
 <index-list/>
 </table>
 </table-list>

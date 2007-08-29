@@ -33,6 +33,7 @@
 		<property name="groupDAO"><ref bean="groupDAO"/></property>
 		<property name="licenseDAO"><ref bean="licenseDAO"/></property>
 		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
+		<property name="branchActivityEntryDAO"><ref bean="branchActivityEntryDAO"/></property>
    	</bean>
 
 	<bean id="authoringServiceTarget" class="org.lamsfoundation.lams.authoring.service.AuthoringService">

@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
+import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
@@ -751,7 +751,7 @@ public class LearnerService implements ICoreLearnerService
     			if ( group.getBranchActivities() != null ) {
 	    			Iterator branchesIterator = group.getBranchActivities().iterator();
 	    			while (sequenceActivity==null && branchesIterator.hasNext()) {
-	    				GroupBranchActivityEntry branchActivityEntry = (GroupBranchActivityEntry) branchesIterator.next();
+	    				BranchActivityEntry branchActivityEntry = (BranchActivityEntry) branchesIterator.next();
 	    				if ( branchActivityEntry.getBranchingActivity().equals(branchingActivity) )
 	    					sequenceActivity = branchActivityEntry.getBranchSequenceActivity();
 	    			}
@@ -830,7 +830,7 @@ public class LearnerService implements ICoreLearnerService
 			// if no groups exist, then create one and assign it to the branch.
     		} else {
 				Group group = lessonService.createGroup(grouping, selectedBranch.getTitle());
-				group.allocateBranchToGroup(null,null, selectedBranch, branchingActivity);
+				group.allocateBranchToGroup(null, selectedBranch, branchingActivity);
     		}
 			groupingDAO.update(grouping);
 			

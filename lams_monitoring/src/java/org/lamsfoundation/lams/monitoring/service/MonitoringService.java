@@ -54,7 +54,6 @@ import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -2026,7 +2025,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 				grouping = branchingActivity.getGrouping();
 				
 				group = lessonService.createGroup(grouping, branch.getTitle());
-				group.allocateBranchToGroup(null,null, branch, (BranchingActivity)branchingActivity);
+				group.allocateBranchToGroup(null, branch, (BranchingActivity)branchingActivity);
 				groupingDAO.update(group);
 				
 			} else {

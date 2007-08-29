@@ -1,4 +1,4 @@
--- Script to be run for LAMS 2.1 release, on LAMS 2.0.3 tables.
+-- Script to be run for LAMS 2.1 release, on LAMS 2.0.3/2.0.4 tables.
 -- Adds all the data needed for branching, plus a small change to the tool table needed for tool admin screen.
 
 ALTER TABLE lams_group
@@ -17,12 +17,26 @@ CREATE TABLE lams_input_activity (
 )TYPE=InnoDB;
 
 
-CREATE TABLE lams_group_branch_activity (
+CREATE TABLE lams_branch_condition (
+       condition_id BIGINT(20) NOT NULL
+     , condition_ui_id INT(11)
+     , order_id INT(11) NOT NULL DEFAULT 0
+     , name VARCHAR(255) NOT NULL
+     , type VARCHAR(255) NOT NULL
+     , startValue VARCHAR(255)
+     , endValue VARCHAR(255)
+     , exactMatch VARCHAR(255)
+     , entry_id BIGINT(20) NOT NULL
+     , PRIMARY KEY (condition_id)
+)TYPE=InnoDB;
+
+CREATE TABLE lams_branch_activity_entry (
        entry_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , entry_ui_id INT(11)
      , group_id BIGINT(20) NOT NULL
      , sequence_activity_id BIGINT(20) NOT NULL
      , branch_activity_id BIGINT(20) NOT NULL
+     , condition_id BIGINT(20)
      , UNIQUE UQ_lams_group_activity (group_id, branch_activity_id)
      , PRIMARY KEY (entry_id)
      , INDEX (group_id)
@@ -34,6 +48,9 @@ CREATE TABLE lams_group_branch_activity (
      , INDEX (branch_activity_id)
      , CONSTRAINT FK_lams_branch_map_branch FOREIGN KEY (branch_activity_id)
                   REFERENCES lams_learning_activity (activity_id)
+     , INDEX (condition_id)
+     , CONSTRAINT FK_lams_branch_activity_entry_4 FOREIGN KEY (condition_id)
+                  REFERENCES lams_branch_condition (condition_id)
 )TYPE=InnoDB;
 
 ALTER TABLE lams_learning_activity 
