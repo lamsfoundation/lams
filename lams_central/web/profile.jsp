@@ -5,6 +5,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ page import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod" %>
 
 <script language="JavaScript" type="text/javascript"
 	src="includes/javascript/prototype.js"></script>
@@ -41,6 +42,9 @@
 
 		<td rowspan="3" class="userpage-td" valign="top">
 		<ul>
+			<c:set var="authenticationMethodId"><lams:user property="authenticationMethodId"/></c:set>
+			<c:set var="dbId"><%= AuthenticationMethod.DB %></c:set>
+			<c:if test="${authenticationMethodId eq dbId}">
 			<li class="no-list-type"><a
 				href="index.do?state=active&tab=editprofile"><fmt:message
 				key="title.profile.edit.screen" /> </a></li>
@@ -48,6 +52,7 @@
 			<li class="no-list-type"><a
 				href="index.do?state=active&tab=password"><fmt:message
 				key="title.password.change.screen" /></a></li>
+			</c:if>
 
 			<li class="no-list-type"><a
 				href="index.do?state=active&tab=portrait"><fmt:message

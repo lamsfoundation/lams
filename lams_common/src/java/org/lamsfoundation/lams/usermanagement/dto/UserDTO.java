@@ -44,6 +44,7 @@ public class UserDTO {
     private CSSThemeBriefDTO flashTheme;
     private CSSThemeBriefDTO htmlTheme;
     private TimeZone timeZone;
+    private Integer authenticationMethodId;
 
 //	public UserDTO(Integer userID, String firstName, String lastName,
 //			String login, String email, CSSThemeVisualElement theme) {		
@@ -58,7 +59,7 @@ public class UserDTO {
 	public UserDTO(Integer userID, String firstName, String lastName,
 			String login, String localeLanguage,  String localeCountry, String direction, 
 			String email, CSSThemeBriefDTO flashTheme, CSSThemeBriefDTO htmlTheme,
-			TimeZone timezone) {		
+			TimeZone timezone, Integer authenticationMethodId) {		
 		this.userID = userID;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -70,6 +71,7 @@ public class UserDTO {
 		this.flashTheme = flashTheme;
 		this.htmlTheme = htmlTheme;
 		this.timeZone = timezone;
+		this.authenticationMethodId = authenticationMethodId;
 	}
 	
 	/**
@@ -160,6 +162,10 @@ public class UserDTO {
 		return timeZone;
 	}
 	
+	public Integer getAuthenticationMethodId() {
+		return authenticationMethodId;
+	}
+	
 	public String toString() {
 		return new ToStringBuilder(this)
 			.append("userID", getUserID())
@@ -173,6 +179,7 @@ public class UserDTO {
 			.append("flashTheme", getFlashTheme())
 			.append("htmlTheme", getHtmlTheme())
 			.append("timeZone", getTimeZone())
+			.append("authenticationMethodId", getAuthenticationMethodId())
 			.toString();
 	}
 

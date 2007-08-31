@@ -723,7 +723,9 @@ public class User implements Serializable,Comparable {
 							this.email,
 							new CSSThemeBriefDTO(this.flashTheme),
 							new CSSThemeBriefDTO(this.htmlTheme),
-							TimeZone.getTimeZone("Australia/Sydney"));
+							//TimeZone.getTimeZone("Australia/Sydney"),
+							TimeZone.getDefault(),
+							this.authenticationMethod.getAuthenticationMethodId());
     }
 	
     public UserFlashDTO getUserFlashDTO() {
