@@ -832,7 +832,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    				Group oldGroup = entry.getGroup();
 	    				if ( oldGroup != null ) {
 	    					Grouping oldGrouping = oldGroup.getGrouping();
-	    					entry.setGroup(oldGrouping.getGroup(oldGroup.getGroupUIID()));
+	    					Grouping newGroouping = newGroupings.get(oldGrouping.getGroupingUIID());
+	    					entry.setGroup(newGroouping.getGroup(oldGroup.getGroupUIID()));
 	    				}
 	    			}
 	    		}
@@ -865,7 +866,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 			newActivity.setParentActivity(parentActivity);
 			newActivity.setParentUIID(parentActivity.getActivityUIID());
 		}
-		activityDAO.insert(newActivity);
+//		activityDAO.insert(newActivity);
 		newActivities.put(newActivity.getActivityUIID(),newActivity);
 		
 		Set oldChildActivities = getChildActivities((Activity)activity);

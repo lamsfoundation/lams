@@ -1281,7 +1281,7 @@ public class ObjectExtractor implements IObjectExtractor {
    	    Activity activity = newActivityMap.get(sequenceActivityUIID);
    	    if ( activity == null ) {
 		    	throw new WDDXProcessorConversionException("Sequence Activity listed in the branch mapping list is missing. Mapping entry UUID "+entryUIID+" sequenceActivityUIID "+sequenceActivityUIID);
-   	    }  else if ( ! sequenceActivity.isSequenceActivity() ) {
+   	    }  else if ( ! activity.isSequenceActivity() ) {
 		    	throw new WDDXProcessorConversionException("Activity listed in the branch mapping list is not a sequence activity. Mapping entry UUID "+entryUIID+" sequenceActivityUIID "+sequenceActivityUIID);
    	    } else {
    	    	sequenceActivity = (SequenceActivity) activity;
@@ -1302,14 +1302,16 @@ public class ObjectExtractor implements IObjectExtractor {
 		// is created at runtime but then modified in authoring (and has has a new UI ID added) is handled.
     	BranchActivityEntry uiid_match = null;
 		BranchActivityEntry id_match = null;
-   	    Iterator iter = sequenceActivity.getBranchEntries().iterator();
-		while (uiid_match == null && iter.hasNext()) {
-			BranchActivityEntry possibleEntry = (BranchActivityEntry) iter.next();
-			if ( entryUIID.equals(possibleEntry.getEntryUIID()) ) {
-				uiid_match = possibleEntry;
-			}
-			if ( entryId != null && entryId.equals(possibleEntry.getEntryId()) ) {
-				id_match = possibleEntry;
+		if ( sequenceActivity.getBranchEntries() != null ) {
+	   	    Iterator iter = sequenceActivity.getBranchEntries().iterator();
+			while (uiid_match == null && iter.hasNext()) {
+				BranchActivityEntry possibleEntry = (BranchActivityEntry) iter.next();
+				if ( entryUIID.equals(possibleEntry.getEntryUIID()) ) {
+					uiid_match = possibleEntry;
+				}
+				if ( entryId != null && entryId.equals(possibleEntry.getEntryId()) ) {
+					id_match = possibleEntry;
+				}
 			}
 		}
 
