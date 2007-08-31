@@ -165,7 +165,7 @@ public class ConfigurationKeys {
 	
 	public static String LDAP_MOBILE_ATTR = "LDAPMobileAttr";
 	
-	public static String LDAP_ORG_CODE_ATTR = "LDAPOrgCodeAttr";
+	public static String LDAP_ORG_ATTR = "LDAPOrgAttr";
 	
 	public static String LDAP_ROLES_ATTR = "LDAPRolesAttr";
 	
@@ -178,4 +178,10 @@ public class ConfigurationKeys {
 	public static String LDAP_GROUP_ADMIN_MAP = "LDAPGroupAdminMap";
 	
 	public static String LDAP_GROUP_MANAGER_MAP = "LDAPGroupManagerMap";
+	
+	public static String LDAP_UPDATE_ON_LOGIN = "LDAPUpdateOnLogin";
+	
+	public static String LDAP_ORG_FIELD = "LDAPOrgField";
+	
+	public static String LDAP_ONLY_ONE_ORG = "LDAPOnlyOneOrg";
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="ldapServiceTarget" class="org.lamsfoundation.lams.usermanagement.service.LdapService">
+		<property name="service"><ref bean="userManagementService"/></property>
+	</bean>
+	
+	<bean id="ldapService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target"><ref bean="ldapServiceTarget"/></property>
+		
+		<!-- TransactionProxyFactoryBean by default just proxies all interfaces implemented by the target object -->
+		<!-- AuthoringService is class so needs to be proxied via CGLIB -->
+		<!-- Specify "proxyTargetClass" = "true" to generate a CGLIB proxy-->
+		<property name="proxyTargetClass"><value>true</value></property>     
+		<property name="transactionAttributes">
+			<props>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+</beans>

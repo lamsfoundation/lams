@@ -47,10 +47,13 @@ insert into lams_configuration (config_key, config_value) values ('LDAPEmailAttr
 insert into lams_configuration (config_key, config_value) values ('LDAPPhoneAttr','telephoneNumber');
 insert into lams_configuration (config_key, config_value) values ('LDAPFaxAttr','facsimileTelephoneNumber');
 insert into lams_configuration (config_key, config_value) values ('LDAPMobileAttr','mobile');
-insert into lams_configuration (config_key, config_value) values ('LDAPOrgCodeAttr','deetITSchoolCode');
+insert into lams_configuration (config_key, config_value) values ('LDAPOrgAttr','deetITSchoolCode');
 insert into lams_configuration (config_key, config_value) values ('LDAPRolesAttr','memberOf');
 insert into lams_configuration (config_key, config_value) values ('LDAPLearnerMap','Student;SchoolSupportStaff;Teacher;SeniorStaff;Principal');
 insert into lams_configuration (config_key, config_value) values ('LDAPMonitorMap','SchoolSupportStaff;Teacher;SeniorStaff;Principal');
 insert into lams_configuration (config_key, config_value) values ('LDAPAuthorMap','Teacher;SeniorStaff;Principal');
 insert into lams_configuration (config_key, config_value) values ('LDAPGroupAdminMap','Teacher;SeniorStaff');
 insert into lams_configuration (config_key, config_value) values ('LDAPGroupManagerMap','Principal');
+insert into lams_configuration (config_key, config_value) values ('LDAPUpdateOnLogin', 'true');
+insert into lams_configuration (config_key, config_value) values ('LDAPOrgField', 'code');
+insert into lams_configuration (config_key, config_value) values ('LDAPOnlyOneOrg', 'true');

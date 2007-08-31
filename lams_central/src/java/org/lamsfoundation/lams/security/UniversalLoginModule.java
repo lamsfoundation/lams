@@ -40,7 +40,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.naming.InitialContext;
@@ -53,11 +52,10 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
-import org.lamsfoundation.lams.usermanagement.AuthenticationMethodParameter;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethodType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.LdapService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -77,12 +75,12 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 	protected String dsJndiName;
 	protected String rolesQuery;
 	protected String principalsQuery;
-	//protected String propertyFilePath;
 
 	public void initialize(Subject subject, CallbackHandler callbackHandler,
 			Map sharedState, Map options) {
 		super.initialize(subject, callbackHandler, sharedState, options);
 
+		// TODO cleanup unneeded authentication method related classes
 		//from options to get path to property file -> authentication.xml
 		//propertyFilePath = (String) options.get("authenticationPropertyFile");
 		//load authentication property file  
@@ -108,6 +106,7 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 				String username = getUsername();
 				WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
 				UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
+				LdapService ldapService = (LdapService) ctx.getBean("ldapService");
 				User user = service.getUserByLogin(username);
 
 				log.debug("===> authenticating user: " + username);
@@ -119,9 +118,9 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 						isValid = ldap.authenticate(username, inputPassword);
 						if (isValid) {  // create a new user
 							log.info("===> Creating new user for LDAP username: " + username);
-							if (ldap.createLDAPUser(ldap.getAttrs())) {
+							if (ldapService.createLDAPUser(ldap.getAttrs())) {
 								user = service.getUserByLogin(username);
-								if (!ldap.addLDAPUser(ldap.getAttrs(), user.getUserId())) {
+								if (!ldapService.addLDAPUser(ldap.getAttrs(), user.getUserId())) {
 									log.error("===> Couldn't add LDAP user: "+username+" to organisation.");
 								}
 							} else {
@@ -141,44 +140,15 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 					return false;
 				}
 				
-				AuthenticationMethod method = user.getAuthenticationMethod();
-				/*try {
-					AuthenticationMethodConfigurer.configure(method);
-
-					// use User's AuthMethod's dsJndiName and rolesQuery if set, otherwise use LAMS-Database's
-					AuthenticationMethodParameter dsParam = method.getParameterByName("dsJndiName");
-					AuthenticationMethodParameter rolesQueryParam = method.getParameterByName("rolesQuery");
-					if (dsParam!=null && rolesQueryParam!=null) {
-						this.dsJndiName = dsParam.getValue();
-						this.rolesQuery = rolesQueryParam.getValue();
-					} else {
-						AuthenticationMethod defaultAuthMethod = (AuthenticationMethod)service
-							.findById(AuthenticationMethod.class, AuthenticationMethod.DB);
-						this.dsJndiName = defaultAuthMethod.getParameterByName("dsJndiName").getValue();
-						this.rolesQuery = defaultAuthMethod.getParameterByName("rolesQuery").getValue();
-					}
-				} catch (Exception e) {
-					log.error("===> Error retrieving authentication method parameters : " + e, e);
-					return false;
-				}
-
-				//for debug purpose only
-				if (log.isDebugEnabled()) {
-					List parameters = method.getAuthenticationMethodParameters();
-					for (int i = 0; i < parameters.size(); i++) {
-						AuthenticationMethodParameter mp = (AuthenticationMethodParameter) parameters.get(i);
-						log.debug("===>" + mp.getName() + " = " + mp.getValue());
-					}
-				}*/
-				
 				if (!isValid) {
-					String type = method.getAuthenticationMethodType().getDescription();
+					String type = user.getAuthenticationMethod().getAuthenticationMethodType().getDescription();
 					log.debug("===> authentication type: " + type);
 					if (AuthenticationMethodType.LDAP.equals(type)) {
 						LDAPAuthenticator authenticator = new LDAPAuthenticator();
 						isValid = authenticator.authenticate(username,inputPassword);
+						// if ldap user profile has updated, udpate user object for dto below
+						user = service.getUserByLogin(username);
 					} else if (AuthenticationMethodType.LAMS.equals(type)) {
-						// DatabaseAuthenticator authenticator = new DatabaseAuthenticator(method);
 						DatabaseAuthenticator authenticator = new DatabaseAuthenticator(dsJndiName, principalsQuery);
 						isValid = authenticator.authenticate(username,inputPassword);
 					} else if (AuthenticationMethodType.WEB_AUTH.equals(type)) {
