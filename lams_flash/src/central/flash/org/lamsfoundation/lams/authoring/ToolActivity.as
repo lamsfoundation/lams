@@ -253,6 +253,10 @@ class ToolActivity extends Activity{
 		_toolOutputDefinitions.remove(key);
 	}
 	
+	public function get definitions():Array {
+		return _toolOutputDefinitions.values();
+	}
+	
 	//GETTERS + SETTERS
 	
 	/**

@@ -509,13 +509,22 @@ b	 * @param   learningDesignID
 		getToolOutputDefinitions(ta);
 	}
 	
-	public function setToolOutputDefinitions(dto:Object, toolActivity:ToolActivity) {
-		if(dto instanceof LFError){
+	public function setToolOutputDefinitions(r:Object, toolActivity:ToolActivity) {
+		if(r instanceof LFError){
 			Cursor.showCursor(Application.C_DEFAULT);
-			dto.showErrorAlert();
+			r.showErrorAlert();
 		}
 		
-		toolActivity.addDefinition(dto);
+		if(r.length > 0) {
+			for(var i=0; i < r.length; i++) {
+				Debugger.log("adding def: " + r[i].name, Debugger.CRITICAL, "setToolOutputDefinitions", "Canvas");
+				toolActivity.addDefinition(r[i]);
+			}
+		}
+				
+		canvasModel.broadcastViewUpdate("OPEN_CONDITIONS_DIALOG", toolActivity);
+		Debugger.log("total def: " + toolActivity.definitions.length, Debugger.CRITICAL, "setToolOutputDefinitions", "Canvas");
+				
 	}
 	
 	/**

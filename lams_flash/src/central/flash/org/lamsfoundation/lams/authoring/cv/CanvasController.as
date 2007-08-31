@@ -29,7 +29,9 @@ import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.dict.*
 import com.polymercode.Draw;
-import mx.utils.*
+
+import mx.utils.*;
+import mx.managers.*;
 
 
 /*
@@ -661,4 +663,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
         }
 		
     }
+	
+	public function openToolOutputConditionsDialog(ta:ToolActivity){
+		// open group to branch matching window
+		app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('to_conditions_dlg_title_lbl'), closeButton:true, viewResize:false, scrollContentPath:'ToolOutputConditionsDialog'});
+		app.dialog.addEventListener('contentLoaded', Proxy.create(this, ToolOutputConditionsDialogLoaded, ta));
+		
+		Debugger.log("conditions button pressed", Debugger.CRITICAL, "openToolOutputConditionsDialog", "CanvasController");
+	}
+	
+	private function ToolOutputConditionsDialogLoaded(evt:Object, ta:ToolActivity) {
+		evt.target.scrollContent.definitions = ta.definitions;
+		Debugger.log("def length: " + ta.definitions.length, Debugger.CRITICAL, "ToolOutputConditionsDialogLoaded", "CanvasController");
+	}
+	
 }

@@ -134,6 +134,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 			case 'POSITION_TITLEBAR':
 				setDesignTitle(cm);
 				break;
+			case 'OPEN_CONDITIONS_DIALOG':
+				getController().openToolOutputConditionsDialog(event.data);
+				break;
 			case 'SET_ACTIVE' :
 				Debugger.log('setting activie :' + event.updateType + " event.data: " + event.data + " condition: " + (event.data == this),Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
 				transparentCover._visible = (event.data == this) ? false : true;

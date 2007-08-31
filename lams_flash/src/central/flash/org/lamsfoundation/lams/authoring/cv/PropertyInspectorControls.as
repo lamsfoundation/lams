@@ -1021,28 +1021,18 @@ class PropertyInspectorControls extends MovieClip {
 	private function onToolOutputMatchClick(evt:Object){
 
 		// show tool outputs to branch mappings dialog
+		//var ta:ToolActivity = ToolActivity(_canvasModel.getCanvas().ddm.getActivityByUIID(_canvasModel.selectedItem.activity.toolActivityUIID));
+		//_canvasModel.getCanvas().getToolOutputDefinitions(ta);
+		
+		//setModified();
+	}
+	
+	private function onConditionsSetupClick(evt:Object){
+		// show tool outputs to branch mappings dialog
 		var ta:ToolActivity = ToolActivity(_canvasModel.getCanvas().ddm.getActivityByUIID(_canvasModel.selectedItem.activity.toolActivityUIID));
 		_canvasModel.getCanvas().getToolOutputDefinitions(ta);
 		
 		setModified();
-	}
-	
-	private function onConditionsSetupClick(evt:Object){
-
-		// open group to branch matching window
-		//_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('to_conditions_dlg_title_lbl'), closeButton:true, viewResize:false, scrollContentPath:'ToolOutputConditionsDialog'});
-		//_app.dialog.addEventListener('contentLoaded', Delegate.create(this,ToolOutputConditionsDialogLoaded));
-		Debugger.log("conditions button pressed", Debugger.CRITICAL, "onConditionsSetupClick", "PIC*");
-		
-		setModified();
-	}
-	
-	private function ToolOutputConditionsDialogLoaded(evt:Object) {
-		var ta:ToolActivity = ToolActivity(_canvasModel.getCanvas().ddm.getActivityByUIID(_canvasModel.selectedItem.activity.toolActivityUIID));
-		evt.target.scrollContent.definitions = _canvasModel.getCanvas().getToolOutputDefinitions(ta);
-		
-		//evt.target.scrollContent.load();
-		
 	}
 	
 	private function groupMatchDialogLoaded(evt:Object) {

@@ -33,7 +33,7 @@ class ToolOutputCondition   {
 	private var _conditionID:Number;
 	private var _conditionUIID:Number;
 	
-	private var _orderId:Number;
+	private var _orderID:Number;
 	private var _name:String;
 	private var _type:String;
 	private var _startValue:Object;
@@ -43,7 +43,7 @@ class ToolOutputCondition   {
 	function ToolOutputCondition(conditionID:Number, conditionUIID:Number, name:String, type:String, startValue:Object, endValue:Object, exactMatchValue:Object){
 		_conditionID = conditionID;
 		_conditionUIID = conditionUIID;
-		_orderId = 1;
+		_orderID = 1;
 		_name = name;
 		_startValue = startValue;
 		_endValue = endValue;
@@ -52,7 +52,7 @@ class ToolOutputCondition   {
 	
 	public function addConditionData(dto:Object):Object {
 		
-		if(_orderId) dto.orderId = _orderId;
+		if(_orderID) dto.orderID = _orderID;
 		if(_name) dto.name = _name;
 		if(_type) dto.type = _type;
 		if(_startValue) dto.startValue = _startValue;
@@ -118,12 +118,12 @@ class ToolOutputCondition   {
 		return _exactMatchValue;
 	}
 	
-	public function set orderId(a:Number) {
-		_orderId = a;
+	public function set orderID(a:Number) {
+		_orderID = a;
 	}
 	
-	public function get orderId():Number {
-		return _orderId;
+	public function get orderID():Number {
+		return _orderID;
 	}
 
 
