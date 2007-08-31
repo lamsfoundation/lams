@@ -145,7 +145,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 			while ( iter.hasNext() ) {
 				BranchActivityEntry oldEntry = (BranchActivityEntry) iter.next();
 				BranchActivityEntry newEntry = new BranchActivityEntry(null, 
-						oldEntry.getEntryUIID(), oldEntry.getBranchSequenceActivity(), oldEntry.getBranchingActivity(), oldEntry.getGroup());
+						oldEntry.getEntryUIID(), newSequenceActivity, oldEntry.getBranchingActivity(), oldEntry.getGroup());
 				if ( oldEntry.getCondition() != null ) {
 					newEntry.setCondition(oldEntry.getCondition().clone());
 				}
