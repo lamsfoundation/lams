@@ -480,7 +480,7 @@ public class LearningAction extends Action {
 
 
 	/**
-	 * Dipslay replay topic page. Message form subject will include parent
+	 * Display replay topic page. Message form subject will include parent
 	 * topics same subject.
 	 * 
 	 * @param mapping
@@ -502,6 +502,11 @@ public class LearningAction extends Action {
 
 		if (topic != null && topic.getMessage() != null) {
 			String reTitle = topic.getMessage().getSubject();
+			
+			MessageDTO originalMessage = MessageDTO.getMessageDTO(topic.getMessage());
+			
+			request.setAttribute(ForumConstants.ATTR_ORIGINAL_MESSAGE, originalMessage);
+			
 			// echo back current topic subject to web page
 			if(reTitle != null && !reTitle.trim().startsWith("Re:"))
 				msgForm.getMessage().setSubject("Re:" + reTitle);
@@ -510,6 +515,7 @@ public class LearningAction extends Action {
 		}
 		SessionMap sessionMap = getSessionMap(request, msgForm);
 		sessionMap.put(ForumConstants.ATTR_PARENT_TOPIC_ID, parentId);
+	
 		
 		return mapping.findForward("success");
 	}
@@ -566,6 +572,8 @@ public class LearningAction extends Action {
 					sessionMap.put(ForumConstants.ATTR_NO_MORE_POSTS, Boolean.TRUE);
 			}
 		}
+		sessionMap.remove(ForumConstants.ATTR_ORIGINAL_MESSAGE);
+		
 		return mapping.findForward("success");
 	}
 

@@ -106,6 +106,9 @@ public interface ForumConstants {
 
 	public static final String ATTR_PARENT_TOPIC_ID = "parentID";
 
+	// used when replying message LDEV-1305
+	public static final String ATTR_ORIGINAL_MESSAGE = "originalMessage";
+
 	public static final String ATTR_TOPIC_ID = "topicID";
 	public static final String ATTR_REFLECTION_ON = "reflectOn";
 	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
