@@ -10,7 +10,7 @@
 	</c:when>
 	<c:otherwise>
 		<%-- Does not user general tag becuase this field need keep compatible with FCKEditor's content --%>
-		<lams:STRUTS-textarea rows="10" cols="40" tabindex="2" property="message.body" styleId="messageBody" />
+		<lams:STRUTS-textarea rows="10" cols="60" tabindex="2" property="message.body" styleId="messageBody" />
 		<BR>
 		<%-- If limitChars == 0, then we don't want to limit the characters at all. --%>
 		<c:if test="${sessionMap.limitedChars > 0}">
