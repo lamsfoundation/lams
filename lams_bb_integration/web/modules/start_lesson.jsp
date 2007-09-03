@@ -54,7 +54,7 @@
 	    </bbUI:step> 
 	        
 	   	<bbUI:step title="Lesson options">
-	        <bbUI:dataElement label="Do you want to make LAMS visible?">
+	        <bbUI:dataElement label="Do you want to make this LAMS lesson visible?">
 	            <input type="Radio" name="isAvailable" value="true" checked>Yes 
 	            <input type="Radio" name="isAvailable" value="false">No
 	        </bbUI:dataElement>
