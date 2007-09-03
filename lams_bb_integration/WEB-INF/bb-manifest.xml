@@ -31,6 +31,9 @@
             <http-actions>
                 <create value="modules/create.jsp" />
                 <modify value="modules/modify.jsp"/>
+                <!-- This page is not executed when removing 
+	                <remove value="modules/remove.jsp" />
+                -->
             </http-actions>
             <icons>
                 <toolbar value="/images/logo.gif" />
@@ -39,6 +42,7 @@
         </content-handler>
     </content-handlers>
     
+    <!-- Tools defined by this extension -->
     
     
         

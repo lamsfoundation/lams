@@ -84,6 +84,8 @@
     function openAuthor()
     {
     	authorUrl = '<%=authorUrl%>'; 
+    	//authorUrl += "&notifyCloseURL=" + window.location.href; 
+    	authorUrl += "&notifyCloseURL="
     	if(authorWin && authorWin.open && !authorWin.closed){
     	
             authorWin.focus();
