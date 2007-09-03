@@ -22,6 +22,7 @@
  */
  
 import org.lamsfoundation.lams.authoring.br.*;
+import org.lamsfoundation.lams.authoring.ToolOutputDefinition;
 
 import org.lamsfoundation.lams.common.Dialog;
 import org.lamsfoundation.lams.common.style.*;
@@ -45,7 +46,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     
 	private var _definitions:Array;
 	private var _conditions:Array;
-	private var _selectedDefinition:Object;
+	private var _selectedDefinition:ToolOutputDefinition;
 	
 	
 	private var _toolOutputDefin_cmb:ComboBox;
@@ -183,22 +184,26 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	}
 	
 	private function itemChanged(evt:Object):Void {
-		_selectedDefinition = evt.target.value;
+		_selectedDefinition = _toolOutputDefin_cmb.dataProvider[_toolOutputDefin_cmb.selectedIndex];
 		
 		_output_type_lbl.text = "Output Type: " + _selectedDefinition.type;
+
+		Debugger.log("type: " + _selectedDefinition.type, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
+
+		Debugger.log("val: " + evt.target.value, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
 		
 		if(_selectedDefinition.type == "OUTPUT_LONG") {
 			
 			_start_value_stp.visible = true;
 			_end_value_stp.visible = true;
 			
-			_start_value_stp.minimum = _selectedDefinition.startValue;
-			_end_value_stp.minimum = _selectedDefinition.startValue;
-			_start_value_stp.maximum = _selectedDefinition.endValue;
-			_end_value_stp.maximum = _selectedDefinition.endValue;
+			_start_value_stp.minimum = Number(_selectedDefinition.startValue);
+			_end_value_stp.minimum = Number(_selectedDefinition.startValue);
+			_start_value_stp.maximum = Number(_selectedDefinition.endValue);
+			_end_value_stp.maximum = Number(_selectedDefinition.endValue);
 			
-			_start_value_stp.value = _selectedDefinition.startValue;
-			_end_value_stp.value = _selectedDefinition.endValue;
+			_start_value_stp.value = Number(_selectedDefinition.startValue);
+			_end_value_stp.value = Number(_selectedDefinition.endValue);
 		} else {
 			_start_value_stp.visible = false;
 			_end_value_stp.visible = false;
@@ -236,7 +241,14 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     //Gets+Sets
     
 	public function set definitions(a:Array):Void {
-		_definitions = a;
+		_definitions = new Array();
+		
+		for(var i=0; i< a.length; i++) {
+			var newTOD = new ToolOutputDefinition();
+			newTOD.populateFromDTO(a[i]);
+			
+			_definitions.push(newTOD);
+		}
 		
 		_toolOutputDefin_cmb.dataProvider = _definitions;
 		_toolOutputDefin_cmb.labelField = "name";
