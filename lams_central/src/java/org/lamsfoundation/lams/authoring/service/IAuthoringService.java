@@ -98,17 +98,6 @@ public interface IAuthoringService {
 											 										 WorkspaceFolderException, IOException;
 	
 	/**
-	 * 
-	 * @param design
-	 * @param originalLearningDesign
-	 * @param copyType
-	 * @return
-	 * @throws LearningDesignException
-	 */
-	public LearningDesign copyLearningDesignToolContent(LearningDesign design, LearningDesign originalLearningDesign, Integer copyType ) throws LearningDesignException;
-	    
-	
-	/**
 	 * @return List Returns the list of all the available LearningDesign's   
 	 * */
 	public List getAllLearningDesigns();

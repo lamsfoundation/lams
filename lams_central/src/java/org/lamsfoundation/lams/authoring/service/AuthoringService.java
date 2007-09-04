@@ -731,18 +731,15 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesignToolContent(org.lamsfoundation.lams.learningdesign.LearningDesign, org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer)
      */
-    public LearningDesign copyLearningDesignToolContent(LearningDesign design, LearningDesign originalLearningDesign, Integer copyType ) throws LearningDesignException {
+    private LearningDesign copyLearningDesignToolContent(LearningDesign design, LearningDesign originalLearningDesign, Integer copyType ) throws LearningDesignException {
     	
-    	// copy the tool content
-        // unfortuanately, we have to reaccess the activities to make sure we get the
-        // subclass, not a hibernate proxy.
         for (Iterator i = design.getActivities().iterator(); i.hasNext();)
         {
             Activity currentActivity = (Activity) i.next();
             if (currentActivity.isToolActivity())
             {
                 try {
-                	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(currentActivity.getActivityId());
+                	ToolActivity toolActivity = (ToolActivity) currentActivity;
                 	// copy the content, but don't set the define later flags if it is preview
                     Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, copyType.intValue() != LearningDesign.COPY_TYPE_PREVIEW);
                     toolActivity.setToolContentId(newContentId);
@@ -848,6 +845,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     	// newLearningDesign.getActivities() will create a new TreeSet(new ActivityOrderComparator()) if there isn't an existing set
    		newLearningDesign.getActivities().clear();
    		newLearningDesign.getActivities().addAll(activities);
+   		
     }
     
     /** As part of updateDesignActivities(), process an activity and, via recursive calls, the activity's child activities. Need to keep track
@@ -866,7 +864,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 			newActivity.setParentActivity(parentActivity);
 			newActivity.setParentUIID(parentActivity.getActivityUIID());
 		}
-//		activityDAO.insert(newActivity);
 		newActivities.put(newActivity.getActivityUIID(),newActivity);
 		
 		Set oldChildActivities = getChildActivities((Activity)activity);
