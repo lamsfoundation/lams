@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.lams.toolbuilder.util.LamsToolBuilderLog;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
+import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 
 
 /**
@@ -36,7 +37,7 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 	private Text toolName;
 	private Text vendor;
 	private Text compatibility;
-	private Text toolSignature;
+	private Text toolDisplayName;
 	private Button LAMSButton;
 	private Button RAMSButton;
 	private Button notVisible;
@@ -52,8 +53,8 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 	 */
 	public LAMSNewToolWizardPage(ISelection selection) {
 		super("wizardPage");
-		setTitle(WizardConstants.WIZARD_TITLE);
-		setDescription(WizardConstants.WIZARD_DESCRIPTION);
+		setTitle("LAMS Tool Project Wizard");
+		setDescription("Enter in details to produce a new LAMS tool project.");
 		this.selection = selection;
 	}
 
@@ -63,7 +64,6 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 	public void createControl(Composite parent) {
 		LamsToolBuilderLog.logInfo("Drawing LAMS Tool Wizard");
 		super.createControl(parent);
-		
 		Composite control = (Composite)getControl();
 		GridLayout layout = new GridLayout();
 		layout.verticalSpacing = 10;
@@ -78,24 +78,19 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 		namesGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// put the key field in the group
-		createLabel(namesGroup,	"Tool Signature");
-		toolSignature = createText(namesGroup);
-		toolSignature.setText(WizardConstants.SAMPLE_TOOL_SIGNATURE);		/*createLabel(namesGroup,	""); //$NON-NLS-1$
-		Label label = new Label(namesGroup, SWT.WRAP);
-		label.setText(KEY_INSTRUCTIONS);
-		GridData gd = new GridData();
-		gd.horizontalIndent = 30;
-		label.setLayoutData(gd);
-		*/
+		createLabel(namesGroup,	"Tool Display Name");
+		toolDisplayName = createText(namesGroup);
+		//toolDisplayName.setText(WizardConstants.SAMPLE_TOOL_SIGNATURE);		
 		
+
 		// put the package field in the group
-		createLabel(namesGroup,	"Vendor Prefix");
+		createLabel(namesGroup,	"Vendor");
 		vendor = createText(namesGroup);
-		vendor.setText(WizardConstants.SAMPLE_VENDOR);
+		//vendor.setText(WizardConstants.SAMPLE_VENDOR);
 		
 		createLabel(namesGroup,	"Minimum Server Version");
 		compatibility = createText(namesGroup);
-		compatibility.setText(WizardConstants.LAMS_BASE_VERSION);
+		compatibility.setText("2.0");
 
 		// create a group for columns
 		Group organisingGroup = new Group(control, SWT.NONE);
@@ -242,11 +237,11 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 		label = new Label(container, SWT.NULL);
 		label.setText("&File name:");
 		
-		toolSignature = new Text(container, SWT.BORDER | SWT.SINGLE);
+		toolDisplayName = new Text(container, SWT.BORDER | SWT.SINGLE);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan=2;
-		toolSignature.setLayoutData(gd);
-		toolSignature.addModifyListener(new ModifyListener() {
+		toolDisplayName.setLayoutData(gd);
+		toolDisplayName.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();
 			}
@@ -284,7 +279,7 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 		
 		
 		
-		//initialise();
+		//toolDisplayName();
 		//dialogChanged();
 		//setControl(container);
 		
@@ -312,10 +307,10 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 			}
 		}
 		
-		compatibility.setText(WizardConstants.LAMS_BASE_VERSION);
-		toolName.setText(WizardConstants.SAMPLE_TOOL_NAME);
-		toolSignature.setText(WizardConstants.SAMPLE_TOOL_SIGNATURE);
-		vendor.setText(WizardConstants.SAMPLE_VENDOR);
+		compatibility.setText("2.0");
+		//toolName.setText(WizardConstants.SAMPLE_TOOL_NAME);
+		//toolDisplayName.setText(WizardConstants.SAMPLE_TOOL_SIGNATURE);
+		//vendor.setText(WizardConstants.SAMPLE_VENDOR);
 	}
 
 	/**
@@ -347,7 +342,7 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 			updateStatus("Tool Name must be specified");
 			return;
 		}
-		if (getToolSignature().length() == 0) {
+		if (getToolDisplayName().length() == 0) {
 			updateStatus("Tool Signature must be specified");
 			return;
 		}
@@ -429,7 +424,7 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 	
 	public String getToolName(){return toolName.getText();}
 	public String getVendor(){return vendor.getText();}
-	public String getToolSignature() {return toolSignature.getText();}
+	public String getToolDisplayName() {return toolDisplayName.getText();}
 	public String getCompatibility(){return compatibility.getText();}
 	public boolean getIsLams(){return LAMSButton.getSelection();}
 	public boolean getVisible(){return isVisible.getSelection();}

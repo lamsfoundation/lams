@@ -19,6 +19,9 @@ import java.io.*;
 import org.eclipse.ui.*;
 import org.eclipse.ui.ide.IDE;
 import org.lams.toolbuilder.util.LamsToolBuilderLog;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import org.lams.toolbuilder.util.Constants;
 import org.eclipse.jdt.core.IJavaProject;
@@ -47,7 +50,7 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 	private static String toolName;
 	private static String vendor;
 	private static String compatibility;
-	private static String toolSignature;
+	private static String toolDisplayName;
 	private static boolean isLAMS;
 	private static boolean toolVisible;
 	
@@ -83,7 +86,7 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		//private static String toolName;
 		vendor = page.getVendor();
 		compatibility = page.getCompatibility();
-		toolSignature = page.getToolSignature();
+		toolDisplayName = page.getToolDisplayName();
 		isLAMS = page.getIsLams();
 		toolVisible = page.getVisible();
 		
@@ -171,8 +174,6 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		{
 			throwCoreException("Project \"" + containerName + "\" does not exist.");
 		}
-		
-		
 		monitor.worked(2);
 		
 		try{
@@ -182,6 +183,27 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		{
 			LamsToolBuilderLog.logError(e);
 		}
+		
+		List<String[]> commandList = new ArrayList<String[]>();
+		commandList.add(new String[] {"lasbmt11",projHandle.getName()});
+		commandList.add(new String[] {"SubmitFiles",toolDisplayName.replaceAll(" ", "").trim()});
+		commandList.add(new String[] {"Submit Files",toolDisplayName.trim()});
+		commandList.add(new String[] {"sbmt",projHandle.getName().toLowerCase()});
+		commandList.add(new String[] {"Sbmt",projHandle.getName()});
+		commandList.add(new String[] {"Submit",toolDisplayName.replaceAll(" ", "").trim()});
+		commandList.add(new String[] {"submit",toolDisplayName.replaceAll(" ", "").trim()});
+		
+		RenameTool rt = new RenameTool();
+		LamsToolBuilderLog.logInfo(projHandle.getLocation().toPortableString());
+		try{
+			rt.renameTool(commandList, projHandle.getLocation().toPortableString());
+		}
+		catch (Exception e)
+		{
+			LamsToolBuilderLog.logError(e);
+		}
+		
+		root.refreshLocal(IWorkspaceRoot.DEPTH_INFINITE, monitor);
 		projHandle.open(monitor);
 		monitor.worked(2);
 		
@@ -206,9 +228,9 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 	 * the editor on the newly created file.
 	 */
 
-	private void doFinish(
+	/*private void doFinish(
 		String toolName,
-		String toolSignature,
+		String toolDisplayName,
 		String vendor,
 		String compatibility,
 		IProgressMonitor monitor)
@@ -219,7 +241,7 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		
 		Properties buildProperties = new Properties();
 		buildProperties.setProperty(Constants.PROP_TOOL_NAME, toolName);
-		buildProperties.setProperty(Constants.PROP_SIGNATURE, toolSignature);
+		buildProperties.setProperty(Constants.PROP_SIGNATURE, toolDisplayName);
 		buildProperties.setProperty(Constants.PROP_PACKAGE, "org.lams.testtool");
 		buildProperties.setProperty(Constants.PROP_PACKAGE_PATH, "org/lams/testtool");
 		buildProperties.setProperty(Constants.PROP_TOOL_VERSION, "20070000");
@@ -261,9 +283,9 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 				}
 			}
 		});
-		*/
+		
 		monitor.worked(1);
-	}
+	}*/
 	
 	/**
 	 * We will initialize file contents with a sample text.
