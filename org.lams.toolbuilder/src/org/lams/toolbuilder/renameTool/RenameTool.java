@@ -12,18 +12,104 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.lams.toolbuilder.util.LamsToolBuilderLog;
 
 /**
  * 
  * @author Anthony Sukkar
  * 
  */
-public class Main {
+public class RenameTool {
 
-	static Set<String> txtType = new HashSet<String>();
+	private String taskliststr;
+	
+	private Set<String> txtType = new HashSet<String>();
 
-	static List<String[]> nameList = new ArrayList<String[]>();
+	private List<String[]> nameList = new ArrayList<String[]>();
 
+	public RenameTool(String taskliststr, String source)
+	{
+		this.taskliststr = taskliststr;
+		txtType.add("clay");
+		txtType.add("classpath");
+		txtType.add("txt");
+		txtType.add("cvsignore");
+		txtType.add("html");
+		txtType.add("htm");
+		txtType.add("java");
+		txtType.add("js");
+		txtType.add("jsp");
+		txtType.add("MF");
+		txtType.add("bat");
+		txtType.add("myd");
+		txtType.add("mymetadata");
+		txtType.add("project");
+		txtType.add("properties");
+		txtType.add("sh");
+		txtType.add("sql");
+		txtType.add("tag");
+		txtType.add("log");
+		txtType.add("tld");
+		txtType.add("xml");
+	}
+	
+	public boolean renameTool() throws Exception
+	{
+		File tasklist = new File(taskliststr);
+
+		if (!tasklist.exists()) 
+		{
+			LamsToolBuilderLog.logError(new Exception("Cannot find tasklist configuration file"));
+			throw new Exception("Cannot find tasklist configuration file");
+		}
+		
+		File sourceDir = null;
+		try {
+			FileInputStream fis = new FileInputStream(tasklist);
+			BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+
+			String line;
+			while ((line = br.readLine()) != null) {
+
+				line = line.trim();
+
+				if (line.length() == 0 || (line.charAt(0) == '#'))
+					continue;
+
+				String[] strArray = line.split("\\s");
+
+				String command = strArray[0];
+
+				if (command.equals("Source")) {
+					sourceDir = getFile(strArray);
+				}
+
+				if (command.equals("Rename")) {
+
+					if (strArray.length != 3) {
+						continue;
+					} else {
+						String[] pair = { strArray[1], strArray[2] };
+						nameList.add(pair);
+					}
+				}
+
+			}
+
+			visitFile(sourceDir, "rename");
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			System.exit(0);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		return true;
+	}
+	
+	/*
 	public static void main(String[] args) {
 		
 		txtType.add("clay");
@@ -97,15 +183,15 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
-
-	public static void renameFile(File dir) {
+	*/
+	public void renameFile(File dir) {
 		for (String[] pair : nameList) {
 			String newFileName = updateFilename(dir.getName(), pair[0], pair[1]);
 			dir.renameTo(new File(dir.getParentFile(), newFileName));
 		}
 	}
 
-	private static String updateFilename(String currentFileName, String regex,
+	private String updateFilename(String currentFileName, String regex,
 			String replacement) {
 
 		String newFileName = currentFileName.replaceAll(regex, replacement);
@@ -120,7 +206,7 @@ public class Main {
 		return newFileName;
 	}
 
-	public static void replaceText(File file) {
+	public void replaceText(File file) {
 
 		try {
 			FileInputStream fis = new FileInputStream(file);
@@ -157,7 +243,7 @@ public class Main {
 
 	}
 
-	public static void visitFile(File file, String mode) {
+	public void visitFile(File file, String mode) {
 
 		if (file.isDirectory()
 				&& (file.getName().equals("CVS") || file.getName().equals(
@@ -191,7 +277,7 @@ public class Main {
 		}
 	}
 
-	public static File getFile(String[] array) {
+	public File getFile(String[] array) {
 		// merge remaining array elements and restoring spaces.
 		String path = "";
 		for (int i = 1; i < array.length; i++) {

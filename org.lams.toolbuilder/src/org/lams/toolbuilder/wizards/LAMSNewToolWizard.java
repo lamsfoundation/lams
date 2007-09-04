@@ -2,6 +2,7 @@ package org.lams.toolbuilder.wizards;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.INewWizard;
@@ -9,6 +10,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.core.runtime.*;
 import org.eclipse.jface.operation.*;
 import java.lang.reflect.InvocationTargetException;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.core.resources.*;
@@ -22,6 +24,8 @@ import org.lams.toolbuilder.util.Constants;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
+import org.lams.toolbuilder.renameTool.RenameTool;
 /**
  * This is a sample new wizard. Its role is to create a new file 
  * resource in the provided container. If the container resource
@@ -37,6 +41,9 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 	private LAMSNewToolWizardPage page;
 	private ISelection selection;
 
+	// The handle to the new LAMS Tool Project to be created
+	private IProject projectHandle;
+	
 	private static String toolName;
 	private static String vendor;
 	private static String compatibility;
@@ -85,89 +92,112 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		if (!page.useDefaults()) 
 		{
 			projPath = page.getLocationPath();
-			/*if (newPath.toFile().exists()) {
+			if (projPath.toFile().exists()) {
 				// add the project key to the path if this folder exists
-				newPath = newPath.addTrailingSeparator().append(projectKey).addTrailingSeparator();
-				System.out.println("Changed project location to: " + newPath);
+				projPath = projPath.addTrailingSeparator().append("Sample_Project").addTrailingSeparator();
+				System.out.println("Changed project location to: " + projPath);
 			}
-			*/
+			
 		}
-		
+
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProjectDescription description = workspace.newProjectDescription(project.getName());
-		description.setLocation(projPath.append("lams_tool"));
+		description.setLocation(projPath);
 		
 		
-		//		 setup java project capability
-		IJavaProject jproject = JavaCore.create(project);
-		IPath output = project.getFolder("bin").getFullPath();
-		
-		//ProgressMonitorPart monitor = new ProgressMonitorPart();
-		
-		try{
-			
-			monitor.beginTask("Create LAMS Tool Project", 2);
-			project.create(description, new SubProgressMonitor(monitor, 1000));
-			monitor.done();
-		}
-		catch (CoreException e)
-		{
-			
-		}
-		
-		
-		
-		return true;
-		
-		/*
-		projectKey = page.getProjectKey().trim();
-		projectPackage = page.getProjectPackage().trim();
-		PACKAGE_BASE = projectPackage.replaceAll("\\.", "\\/") + "/";
-		//System.out.println("AZAZAZ: new PACKAGE_BASE = " + PACKAGE_BASE);
-		projectType = page.getProjectType();
-		projectImpl = page.getProjectImpl();
-		addTesting = page.isTesting();
-		*/
-		
-		/*
-		final String toolName = page.getToolName();
-		final String toolSignature = page.getToolSignature();
-		final String vendor = page.getVendor();
-		final String compatibility = page.getCompatibility();
-		IRunnableWithProgress op = new IRunnableWithProgress() {
-			public void run(IProgressMonitor monitor) throws InvocationTargetException {
-				try {
-					doFinish(toolName, toolSignature, vendor, compatibility, monitor);
-				} catch (CoreException e) {
-					throw new InvocationTargetException(e);
-				} finally {
-					monitor.done();
-				}
+		//Operation to create a new LAMS Tool Project
+		WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
+			protected void execute(IProgressMonitor monitor)
+					throws CoreException {
+				monitor.beginTask("Create LAMS Tool project", 2000);
+				createLamsToolProject(project, description, 
+						new SubProgressMonitor(monitor, 1000));
+				monitor.done();
 			}
 		};
+		
+		// Run the project operations for creating the LAMS Tool Project
 		try {
 			getContainer().run(true, false, op);
-		} catch (InterruptedException e) {
+		} catch (InterruptedException e) 
+		{
+			LamsToolBuilderLog.logInfo("Project creation cancelled by user");
 			return false;
 		} catch (InvocationTargetException e) {
-			Throwable realException = e.getTargetException();
-			MessageDialog.openError(getShell(), "Error", realException.getMessage());
+			// ie.- one of the steps resulted in a core exception
+			Throwable t = e.getTargetException();
+			LamsToolBuilderLog.logError(t);
+			if (t instanceof CoreException) {
+				if (((CoreException) t).getStatus().getCode() ==
+							IResourceStatus.CASE_VARIANT_EXISTS) {
+					MessageDialog.openError(getShell(),
+								"New Project Error:",
+								NLS.bind("Case Variant Exists:", project.getName()));
+				} else {
+					ErrorDialog.openError(getShell(),
+							"New Project Error:",
+							null, // no special message
+							((CoreException) t).getStatus());
+				}
+			} else {
+				Throwable realException = e.getTargetException();
+				MessageDialog.openError(getShell(), "Error", realException.getMessage());
+				return false;
+			}
 			return false;
 		}
+		
+		this.projectHandle = project;
 		return true;
-		*/
 	}
 	
-	private void createLamsProject (IProject projectHandle, IProjectDescription description,IProgressMonitor monitor) 
+	private void createLamsToolProject (IProject projHandle, IProjectDescription description,IProgressMonitor monitor) 
 	throws CoreException, OperationCanceledException 
 	{
-		monitor.beginTask("Creating LAMS tool project", 10);
-	
-		projectHandle.create(description, monitor);
-		monitor.worked(2);
+		
+		monitor.beginTask("Creating LAMS tool project", 50);
+		
+		
 		if (monitor.isCanceled()) {
 			throw new OperationCanceledException();
 		}
+		
+		//############### test project to template from 
+		String containerName = "lams_tool_sbmt";
+		
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IProject projTemplate = (IProject)root.findMember(new Path(containerName));
+		if (!projTemplate.exists() || !(projTemplate instanceof IContainer)) 
+		{
+			throwCoreException("Project \"" + containerName + "\" does not exist.");
+		}
+		
+		
+		monitor.worked(2);
+		
+		try{
+			projTemplate.copy(description, IResource.FORCE | IResource.SHALLOW, new SubProgressMonitor(monitor, 50));
+		}
+		catch (CoreException e)
+		{
+			LamsToolBuilderLog.logError(e);
+		}
+		projHandle.open(monitor);
+		monitor.worked(2);
+		
+		
+		projHandle.open(monitor);
+		monitor.done();
+		
+		
+	}
+	
+	
+	
+	// Get method for the project created by this wizard
+	public IProject getProjectHandle()
+	{
+		return this.projectHandle;
 	}
 	
 	/**
