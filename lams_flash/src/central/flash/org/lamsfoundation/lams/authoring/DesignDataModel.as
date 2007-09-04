@@ -680,16 +680,16 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		if(_maxID){				design.maxID			= _maxID;				}
 		if(_firstActivityID){	design.firstActivityID	= _firstActivityID;		}
 		if(_firstActivityUIID){	design.firstActivityUIID= _firstActivityID;		}
-		if(_parentLearningDesignID){design.parentLearningDesignID= _parentLearningDesignID; }
+		if(_parentLearningDesignID){design.parentLearningDesignID= _parentLearningDesignID; 	}
 		if(_licenseID){			design.licenseID		= _licenseID;			}
 		if(_licenseText){		design.licenseText		= _licenseText;			}
 		if(_workspaceFolderID){	design.workspaceFolderID= _workspaceFolderID;	}
 		if(_createDateTime){	design.createDateTime 	= _createDateTime;		}
-		if(_lastModifiedDateTime){ design.lastModifiedDateTime = _lastModifiedDateTime;	}
+		if(_lastModifiedDateTime){ design.lastModifiedDateTime = _lastModifiedDateTime;		}
 		if(_dateReadOnly){		design.dateReadOnly		= _dateReadOnly;		}
 		if(_contentFolderID){	design.contentFolderID 	= _contentFolderID;		}
 		
-		if(_autoSaved) { 		design.autoSaved 		= _autoSaved 					}
+		if(_autoSaved) { 		design.autoSaved 		= _autoSaved; 			}
 		
 		design.activities = new Array();
 		var classActs:Array = _activities.values();

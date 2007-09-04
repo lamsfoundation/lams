@@ -67,7 +67,7 @@ class BranchMappingDialog extends MovieClip implements Dialog {
     
     private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
-	private var app:Application;
+	public var app:Application;
 	
     //Dimensions for resizing
     private var xOkOffset:Number;
@@ -83,7 +83,7 @@ class BranchMappingDialog extends MovieClip implements Dialog {
     /**
     * constructor
     */
-    function GroupMatchingDialog(){
+    function BranchMappingDialog(){
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
 		
