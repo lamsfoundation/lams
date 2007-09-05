@@ -219,6 +219,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/** List of the UIIDs of the activities that are input activities for this activity */
 	private ArrayList inputActivities;
 
+	/** List of the UIIDs of the activities that are input activities for this activity */
+	private Integer toolActivityUIID;
+
 	/** Used by a sequence activity to determine the start of the transition based sequence and used by tool
 	 * based branching to determine the default branch. */
 	private Integer defaultActivityUIID;
@@ -249,7 +252,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 			Boolean applyGrouping,Integer groupingSupportType,
 			Integer groupingType,GroupingDTO groupingDTO, 
 			Boolean readOnly, Boolean initialised, Boolean stopAfterActivity,
-			ArrayList<Integer> inputActivities, Integer defaultActivityUIID,
+			ArrayList<Integer> inputActivities, Integer toolActivityUIID, Integer defaultActivityUIID,
 			Integer startXCoord, Integer startYCoord, Integer endXCoord, Integer endYCoord) {
 		super();
 		this.activityID = activityID;
@@ -295,6 +298,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.readOnly = readOnly;
 		this.initialised = initialised;
 		this.stopAfterActivity=stopAfterActivity;
+		this.toolActivityUIID=toolActivityUIID;
 		this.inputActivities=inputActivities;
 		// Complex Activity field
 		this.defaultActivityUIID = defaultActivityUIID;
@@ -353,6 +357,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 			while ( iter.hasNext() ) {
 				Activity inputAct = (Activity) iter.next();
 				list.add(inputAct.getActivityUIID());
+				this.toolActivityUIID=inputAct.getActivityUIID();
 			}
 			this.inputActivities = list;
 		}
@@ -1080,5 +1085,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 	}
 	public void setInputActivities(ArrayList inputActivities) {
 		this.inputActivities = inputActivities;
+	}
+	public Integer getToolActivityUIID() {
+		return toolActivityUIID;
+	}
+	public void setToolActivityUIID(Integer toolActivityUIID) {
+		this.toolActivityUIID = toolActivityUIID;
 	}
 }

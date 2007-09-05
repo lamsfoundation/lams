@@ -135,7 +135,7 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
     	
     	ChosenBranchingActivity newBranchingActivity = new ChosenBranchingActivity();
     	copyBranchingFields(newBranchingActivity);
-    	copyToNewActivity(newBranchingActivity);
+    	copyToNewComplexActivity(newBranchingActivity);
     	
     	return newBranchingActivity;
     }

@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -1815,6 +1816,40 @@ public class McServicePOJO implements
 
     }
     
+	/** 
+	 * Get the tool output for the given tool output names.
+	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long, java.lang.Long)
+	 */
+	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
+			Long toolSessionId, Long learnerId) {
+		
+		TreeMap<String,ToolOutput> output = new TreeMap<String, ToolOutput>();
+		if ( names == null || names.contains(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK) ) {
+			McQueUsr queUser = getMcUserBySession(learnerId, toolSessionId);
+			Long mark = queUser != null ? queUser.getLastAttemptTotalMark() : new Long(0);
+			ToolOutput toolOutput = new ToolOutput(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, 
+					MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, mark);
+			output.put(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, toolOutput);
+		}
+		return output;
+	}
+
+	/** 
+	 * Get the tool output for the given tool output name.
+	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long, java.lang.Long)
+	 */
+	public ToolOutput getToolOutput(String name, Long toolSessionId,
+			Long learnerId) {
+		if ( name != null && name.equals(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK) ) {
+			McQueUsr queUser = getMcUserBySession(learnerId, toolSessionId);
+			Long mark = queUser != null ? queUser.getLastAttemptTotalMark() : new Long(0);
+			return new ToolOutput(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, 
+					MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, mark);
+		}
+		return null;
+	}
+
+
     public IToolVO getToolBySignature(String toolSignature) throws McApplicationException
     {
     	logger.debug("attempt retrieving tool with signature : " + toolSignature);

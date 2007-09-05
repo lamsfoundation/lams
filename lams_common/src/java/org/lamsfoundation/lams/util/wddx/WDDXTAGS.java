@@ -95,7 +95,8 @@ public interface WDDXTAGS {
 	public static final String APPLY_GROUPING = "applyGrouping";
 	public static final String GROUPING_SUPPORT_TYPE = "groupingSupportType";
 	public static final String STOP_AFTER_ACTIVITY = "stopAfterActivity";
-	public static final String INPUT_ACTIVITIES = "inputActivities";
+	public static final String INPUT_ACTIVITIES = "inputActivities"; // not used yet
+	public static final String INPUT_TOOL_ACTIVITY_UIID = "toolActivityUIID";
 	
 	/** OptionsActivity specific tags*/
 	public static final String MAX_OPTIONS="maxOptions";
@@ -206,6 +207,7 @@ public interface WDDXTAGS {
 	public static final String CONDITION_UIID = "conditionUIID";	
 	// reuse ORDER_ID for the OrderId field
 	public static final String CONDITION_NAME = "name";
+	public static final String CONDITION_DISPLAY_NAME = "displayName";
 	public static final String CONDITION_TYPE = "type";
 	public static final String CONDITION_START_VALUE = "startValue";
 	public static final String CONDITION_END_VALUE = "endValue";

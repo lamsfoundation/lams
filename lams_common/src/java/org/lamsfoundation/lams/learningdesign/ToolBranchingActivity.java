@@ -136,7 +136,7 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
     	
     	ToolBranchingActivity newBranchingActivity = new ToolBranchingActivity();
     	copyBranchingFields(newBranchingActivity);
-    	copyToNewActivity(newBranchingActivity);
+    	copyToNewComplexActivity(newBranchingActivity);
     	return newBranchingActivity;
     }
 

@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -842,7 +843,38 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		forumToolSessionDao.delete(toolSessionId);
 	}
     
-    /* (non-Javadoc)
+	/** 
+	 * Get the tool output for the given tool output names.
+	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long, java.lang.Long)
+	 */
+	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
+			Long toolSessionId, Long learnerId) {
+		
+		TreeMap<String,ToolOutput> map = new TreeMap<String,ToolOutput>();
+		if ( names == null || names.contains(ForumOutputDefinitionFactory.OUTPUT_NAME_LEARNER_NUM_POSTS)) {
+			log.error("Forum getToolOutput(): Not implemented properly yet - just returning 0");
+			ToolOutput output = new ToolOutput(ForumOutputDefinitionFactory.OUTPUT_NAME_LEARNER_NUM_POSTS, "", new Long(0));
+			map.put(ForumOutputDefinitionFactory.OUTPUT_NAME_LEARNER_NUM_POSTS,output);
+		}
+		return map;
+
+	}
+
+	/** 
+	 * Get the tool output for the given tool output name.
+	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long, java.lang.Long)
+	 */
+	public ToolOutput getToolOutput(String name, Long toolSessionId,
+			Long learnerId) {
+		if ( ForumOutputDefinitionFactory.OUTPUT_NAME_LEARNER_NUM_POSTS.equals(name) ) {
+			log.error("Forum getToolOutput(): Not implemented properly yet - just returning 0");
+			return new ToolOutput(ForumOutputDefinitionFactory.OUTPUT_NAME_LEARNER_NUM_POSTS, "", new Long(0));
+		}
+		
+		return null;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getDefaultContent(java.lang.Long)
      */
 	public Forum getDefaultContent(Long contentID) {

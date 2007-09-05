@@ -148,7 +148,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	protected HashMap<Integer,Grouping> groupings = new HashMap<Integer,Grouping>();
 	protected HashMap<Integer,Group> groups = new HashMap<Integer,Group>();
 	protected HashMap<Integer,BranchActivityEntry> branchEntries = new HashMap<Integer,BranchActivityEntry>();
-	protected HashMap<Integer,SequenceActivity> firstChildToSequenceMap = new HashMap<Integer,SequenceActivity>();
+	protected HashMap<Integer,ComplexActivity> defaultActivityMap = new HashMap<Integer,ComplexActivity>();
 	/* can't delete as we go as they are linked to other items - keep a list and delete at the end. */
 	protected Set<Grouping> groupingsToDelete = new HashSet<Grouping>();
 	protected LearningDesign learningDesign = null;
@@ -428,7 +428,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		parseActivitiesToMatchUpParentandInputActivities((Vector)table.get(WDDXTAGS.ACTIVITIES));
 		parseTransitions((Vector)table.get(WDDXTAGS.TRANSITIONS));
 		parseBranchMappings((Vector)table.get(WDDXTAGS.BRANCH_MAPPINGS));
-		progressFirstActivityWithinSequence();
+		progressDefaultChildActivities();
 		
 		learningDesign.setFirstActivity(learningDesign.calculateFirstActivity());
 		learningDesignDAO.insertOrUpdate(learningDesign);
@@ -438,21 +438,22 @@ public class ObjectExtractor implements IObjectExtractor {
 		return learningDesign;	
 		}
 
-	/** Link SequenceActivities up with their firstActivity entries 
+	/** Link SequenceActivities up with their firstActivity entries and BranchingActivities with their
+	 * default branch.
 	 * @throws WDDXProcessorConversionException */
-	private void progressFirstActivityWithinSequence() throws WDDXProcessorConversionException {
+	private void progressDefaultChildActivities() throws WDDXProcessorConversionException {
 		
-		if ( firstChildToSequenceMap.size() > 0 ) {
-			for ( Integer firstChildUIID : firstChildToSequenceMap.keySet() ) {
-				SequenceActivity sequence = firstChildToSequenceMap.get(firstChildUIID);
-				Activity childActivity = newActivityMap.get(firstChildUIID);
-				if ( childActivity == null )  {
-					String msg = "Unable to find first child activity ("+firstChildUIID
-						+") for the sequence activity ("+sequence
+		if ( defaultActivityMap.size() > 0 ) {
+			for ( Integer defaultChildUIID : defaultActivityMap.keySet() ) {
+				ComplexActivity complex = defaultActivityMap.get(defaultChildUIID);
+				Activity defaultActivity = newActivityMap.get(defaultChildUIID);
+				if ( defaultActivity == null )  {
+					String msg = "Unable to find the default child activity ("+defaultChildUIID
+						+") for the activity ("+complex
 						+") referred to in First Child to Sequence map.";
 			    	throw new WDDXProcessorConversionException(msg);
 				} else {
-					sequence.setDefaultActivity(childActivity);
+					complex.setDefaultActivity(defaultActivity);
 				}
 			}
 			
@@ -754,19 +755,15 @@ public class ObjectExtractor implements IObjectExtractor {
 					}
 			    }
 				
-				// match up activity to input activities based on UIID
+				// match up activity to input activities based on UIID. At present there will be only one input activity
 				existingActivity.getInputActivities().clear();
-				if ( keyExists(activityDetails, WDDXTAGS.INPUT_ACTIVITIES) ) {
-					List inputActivities = (List) activityDetails.get(WDDXTAGS.INPUT_ACTIVITIES);
-					Iterator iter = inputActivities.iterator();
-					while ( iter.hasNext() ) {
-						Integer inputActivityUIID = (Integer) iter.next();
-						Activity inputActivity = newActivityMap.get(inputActivityUIID);
-						if ( inputActivity == null ) {
-								throw new ObjectExtractorException("Input activity "+inputActivityUIID+" missing for activity "+existingActivity.getTitle()+": "+existingActivity.getActivityUIID());
-						}
-						existingActivity.getInputActivities().add(inputActivity);
+				Integer inputActivityUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.INPUT_TOOL_ACTIVITY_UIID);
+				if ( inputActivityUIID != null ) {
+					Activity inputActivity = newActivityMap.get(inputActivityUIID);
+					if ( inputActivity == null ) {
+							throw new ObjectExtractorException("Input activity "+inputActivityUIID+" missing for activity "+existingActivity.getTitle()+": "+existingActivity.getActivityUIID());
 					}
+					existingActivity.getInputActivities().add(inputActivity);
 				} 
 				
 				activityDAO.update(existingActivity);
@@ -942,22 +939,28 @@ public class ObjectExtractor implements IObjectExtractor {
 			 buildToolActivity((ToolActivity)activity,activityDetails);
 		else if(activity.isGateActivity())
 			 buildGateActivity(activity,activityDetails);
-		else if(activity.isBranchingActivity())
-			 buildBranchingActivity((BranchingActivity)activity,activityDetails);
 		else 			
 			 buildComplexActivity((ComplexActivity)activity,activityDetails);		
 	}
-	private void buildComplexActivity(ComplexActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
+	private void buildComplexActivity(ComplexActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException, ObjectExtractorException{
 		// clear all the children - will be built up again by parseActivitiesToMatchUpParentActivityByParentUIID
 		// we don't use all-delete-orphan on the activities relationship so we can do this clear.
 		activity.getActivities().clear();
+		
+		activity.setDefaultActivity(null);
+		Integer defaultActivityMapUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.DEFAULT_ACTIVITY_UIID);
+		if ( defaultActivityMapUIID != null ) {
+			defaultActivityMap.put(defaultActivityMapUIID, activity);
+		}
+		
 		if(activity instanceof OptionsActivity)
 			buildOptionsActivity((OptionsActivity)activity,activityDetails);
 		else if (activity instanceof ParallelActivity)
 			buildParallelActivity((ParallelActivity)activity,activityDetails);
-		else
+		else if ( activity instanceof BranchingActivity)
+			 buildBranchingActivity((BranchingActivity)activity,activityDetails);
+		else 
 			buildSequenceActivity((SequenceActivity)activity,activityDetails);
-		
 	}
 	private void buildBranchingActivity(BranchingActivity branchingActivity,Hashtable activityDetails)
 		throws WDDXProcessorConversionException, ObjectExtractorException {
@@ -1012,10 +1015,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	private void buildParallelActivity(ParallelActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
 	}
 	private void buildSequenceActivity(SequenceActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
-		Integer firstActivityUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.DEFAULT_ACTIVITY_UIID);
-		if ( firstActivityUIID != null ) {
-			firstChildToSequenceMap.put(firstActivityUIID, (SequenceActivity)activity);
-		}
 	}
 	
 	private void buildToolActivity(ToolActivity toolActivity,Hashtable activityDetails) throws WDDXProcessorConversionException{
@@ -1349,8 +1348,15 @@ public class ObjectExtractor implements IObjectExtractor {
     	
     	entry.setGroup(group);
     	entry.setCondition(condition);
-		
-		groupingDAO.update(group);
+
+    	if ( sequenceActivity.getBranchEntries() == null ) {
+    		sequenceActivity.setBranchEntries(new HashSet());
+    	}
+    	sequenceActivity.getBranchEntries().add(entry);
+
+    	if ( group != null )
+    		groupingDAO.update(group);
+    	
 		return entry;
 	}
 
@@ -1386,6 +1392,7 @@ public class ObjectExtractor implements IObjectExtractor {
     			condition = new BranchCondition(null, conditionUIID, 
     					WDDXProcessor.convertToInteger(conditionTable,WDDXTAGS.ORDER_ID), 
     					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_NAME),
+    					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_DISPLAY_NAME),
     					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_TYPE),
     					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_START_VALUE),
     					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_END_VALUE),

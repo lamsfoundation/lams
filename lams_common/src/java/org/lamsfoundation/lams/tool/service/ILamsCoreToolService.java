@@ -31,12 +31,16 @@ import java.util.SortedMap;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * <p>This interface defines the service that lams tool package offers to other
@@ -185,6 +189,66 @@ public interface ILamsCoreToolService
      */
     public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromTool(Long toolContentId) throws ToolException;
    
+    /**
+     * Ask a tool for one particular ToolOutput, based on the given toolSessionId. If the tool doesn't
+     * have any content matching the toolSessionId then should return an "empty" but valid set of data. e.g
+     * an empty mark would be 0.
+     * 
+     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
+     * 
+     * @throws ToolException 
+     */
+    public ToolOutput getOutputFromTool(String conditionName, Long toolSessionId, Integer learnerId) throws ToolException;
+    
+    /**
+     * Ask a tool for one particular ToolOutput, based on the given toolSessionId. If the tool doesn't
+     * have any content matching the toolSessionId then should return an "empty" but valid set of data. e.g
+     * an empty mark would be 0.
+     * 
+     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
+     * 
+     * @throws ToolException 
+     */
+    public ToolOutput getOutputFromTool(String conditionName, ToolSession toolSession, Integer learnerId) throws ToolException;
+    
+    /**
+     * Ask a tool for a set of ToolOutputs, based on the given toolSessionId. 
+     * 
+     * If conditionName array is null, then return all the outputs for the tool, otherwise just restrict the 
+     * outputs to the given list. If it is empty, then no outputs will be returned.
+     * 
+     * If the learnerId is null, then return the outputs based on all learners in that toolSession. If the 
+     * output is nonsense for all learners, then return an "empty" but valid answer. For example, for a mark
+     * you might return 0.
+     * 
+     * If there isn't any content matching the toolSessionId then should return an "empty" but valid set of data. e.g
+     * an empty mark would be 0.
+     * 
+     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
+     * 
+     * @throws ToolException 
+     */
+    public SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, Long toolSessionId, Integer learnerId) throws ToolException;
+    
+    /**
+     * Ask a tool for a set of ToolOutputs, based on the given toolSessionId. 
+     * 
+     * If conditionName array is null, then return all the outputs for the tool, otherwise just restrict the 
+     * outputs to the given list. If it is empty, then no outputs will be returned.
+     * 
+     * If the learnerId is null, then return the outputs based on all learners in that toolSession. If the 
+     * output is nonsense for all learners, then return an "empty" but valid answer. For example, for a mark
+     * you might return 0.
+     * 
+     * If there isn't any content matching the toolSessionId then should return an "empty" but valid set of data. e.g
+     * an empty mark would be 0.
+     * 
+     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
+     * 
+     * @throws ToolException 
+     */
+    public SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, ToolSession toolSession, Integer learnerId) throws ToolException;
+
     /**
      * Update the tool session data.
      * @param toolSession the new tool session object.

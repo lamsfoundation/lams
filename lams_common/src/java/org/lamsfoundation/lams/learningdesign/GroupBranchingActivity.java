@@ -135,7 +135,7 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
     	
     	GroupBranchingActivity newBranchingActivity = new GroupBranchingActivity();
     	copyBranchingFields(newBranchingActivity);
-    	copyToNewActivity(newBranchingActivity);
+    	copyToNewComplexActivity(newBranchingActivity);
     	return newBranchingActivity;
     }
 

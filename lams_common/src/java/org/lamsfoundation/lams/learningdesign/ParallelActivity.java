@@ -123,7 +123,7 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
     public Activity createCopy(){
     	
     	ParallelActivity newParallelActivity = new ParallelActivity();
-    	copyToNewActivity(newParallelActivity);
+    	copyToNewComplexActivity(newParallelActivity);
     	return newParallelActivity;
     }
 

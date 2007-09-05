@@ -27,15 +27,19 @@ package org.lamsfoundation.lams.learning.service;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -44,6 +48,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -54,6 +59,7 @@ import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
+import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -696,13 +702,13 @@ public class LearnerService implements ICoreLearnerService
      */
     private LessonDTO[] getLessonDataFor(List lessons)
     {
-        List lessonDTOList = new ArrayList();
+        List<LessonDTO> lessonDTOList = new ArrayList<LessonDTO>();
         for(Iterator i=lessons.iterator();i.hasNext();)
         {
             Lesson currentLesson = (Lesson)i.next();
             lessonDTOList.add(currentLesson.getLessonData());
         }
-        return (LessonDTO[])lessonDTOList.toArray(new LessonDTO[lessonDTOList.size()]);   
+        return lessonDTOList.toArray(new LessonDTO[lessonDTOList.size()]);   
     }
 
     /**
@@ -718,25 +724,106 @@ public class LearnerService implements ICoreLearnerService
     		throw new LearnerServiceException(error);
     	}
 
-        if ( branchingActivity.isToolBranchingActivity() ) {
-			String message = "Tool based branching not yet supported. Activity was "+branchingActivity;
-			log.error(message);
-			throw new LearnerServiceException(message);
- 
-    	} else {
-    		// assume either isGroupBranchingActivity() || isChosenBranchingActivity() ) 
-    		// in both cases, the branch is based on the group the learner is in.
-        	try {
+    	try {
+	        if ( branchingActivity.isToolBranchingActivity() ) {
+	        	return determineToolBasedBranch(lesson, (ToolBranchingActivity)branchingActivity, learner);
+	 
+	    	} else {
+	    		// assume either isGroupBranchingActivity() || isChosenBranchingActivity() ) 
+	    		// in both cases, the branch is based on the group the learner is in.
         		return determineGroupBasedBranch(lesson, branchingActivity, learner);
 
-        	} catch ( LessonServiceException e ) {
-        		String message = "determineBranch failed due to "+e.getMessage();
-        		log.error(message,e);
-        		throw new LearnerServiceException("determineBranch failed due to "+e.getMessage(), e);
-        	}
-		}
+	    	}
+    	} catch ( LessonServiceException e ) {
+    		String message = "determineBranch failed due to "+e.getMessage();
+    		log.error(message,e);
+    		throw new LearnerServiceException("determineBranch failed due to "+e.getMessage(), e);
+    	}
     }
     
+	/** Get all the conditions for this branching activity, ordered by order id.
+	 * Go through each condition until we find one that passes and that is the required branch.
+	 * If no conditions match, use the branch that is the "default" branch for this branching activity.
+	 */
+	private SequenceActivity determineToolBasedBranch(Lesson lesson, ToolBranchingActivity branchingActivity, User learner) 
+    {
+    	Activity defaultBranch = (Activity) branchingActivity.getDefaultActivity();
+    	SequenceActivity matchedBranch = null;
+    	
+    	// Work out the tool session appropriate for this user and branching activity. We expect there to be only one at this point.
+    	ToolSession toolSession = null;
+    	for ( Activity inputActivity :  (Set<Activity>) branchingActivity.getInputActivities() ) {
+    		toolSession = lamsCoreToolService.getToolSessionByLearner(learner, inputActivity);
+    	}
+
+    	if ( toolSession != null ) {
+    	
+	    	// Get all the conditions for this branching activity, ordered by order id.
+	    	Map<BranchCondition,SequenceActivity> conditionsMap = new TreeMap<BranchCondition,SequenceActivity>();
+	    	Iterator branchIterator = branchingActivity.getActivities().iterator();
+	    	while ( branchIterator.hasNext() ) {
+	    		Activity branchActivity = (Activity) branchIterator.next();
+	    		SequenceActivity branchSequence = (SequenceActivity) activityDAO.getActivityByActivityId(branchActivity.getActivityId(), SequenceActivity.class);
+	    		Iterator<BranchActivityEntry> entryIterator = branchSequence.getBranchEntries().iterator();
+	    		while (entryIterator.hasNext()) {
+					BranchActivityEntry entry = entryIterator.next();
+					if ( entry.getCondition() != null ) {
+						conditionsMap.put(entry.getCondition(), branchSequence);
+					} 
+				}
+	    	}
+	
+	    	// Go through each condition until we find one that passes and that is the required branch.
+	    	// Cache the tool output so that we aren't calling it over an over again.
+	    	Map<String, ToolOutput> toolOutputMap = new HashMap<String, ToolOutput>();
+	    	Iterator<BranchCondition> conditionIterator = conditionsMap.keySet().iterator();
+	
+	    	while (matchedBranch==null && conditionIterator.hasNext()) {
+	    		BranchCondition condition = conditionIterator.next();
+	    		String conditionName = condition.getName();
+	    		ToolOutput toolOutput = toolOutputMap.get(conditionName);
+	    		if ( toolOutput == null ) {
+	    			toolOutput = lamsCoreToolService.getOutputFromTool(conditionName, toolSession, learner.getUserId());
+	    			if ( toolOutput == null ) {
+	    				log.warn("Condition "+condition+" refers to a tool output "+conditionName+" but tool doesn't return any tool output for that name. Skipping this condition.");
+	    			} else {
+	    				toolOutputMap.put(conditionName, toolOutput);
+	    			}
+	    		}
+	    		
+	    		if ( toolOutput != null && condition.isMet(toolOutput) ) {
+						matchedBranch = conditionsMap.get(condition);
+	    		}
+	    	}
+    	}
+    	
+   	 	// If no conditions match, use the branch that is the "default" branch for this branching activity.
+    	if ( matchedBranch != null ) {
+			if ( log.isDebugEnabled()) {
+				log.debug("Found branch "+matchedBranch.getActivityId()+":"+ matchedBranch.getTitle()
+						+" for branching activity "+branchingActivity.getActivityId()+":"+ branchingActivity.getTitle()
+						+" for learner "+learner.getUserId()+":"+learner.getLogin());
+			}
+    		return matchedBranch;
+    		
+    	} else if ( defaultBranch != null) {
+			if ( log.isDebugEnabled() ) {
+				log.debug("Using default branch "+defaultBranch.getActivityId()+":"+ defaultBranch.getTitle()
+						+" for branching activity "+branchingActivity.getActivityId()+":"+ branchingActivity.getTitle()
+						+" for learner "+learner.getUserId()+":"+learner.getLogin());
+			}
+			// have to convert it to a real activity of the correct type, as it could be a cglib value
+    		return (SequenceActivity) activityDAO.getActivityByActivityId(defaultBranch.getActivityId(), SequenceActivity.class);
+    	} else {
+			if ( log.isDebugEnabled() ) {
+				log.debug("No branches match and no default branch exists. Uable to allocate learner to a branch for the branching activity"
+						+branchingActivity.getActivityId()+":"+ branchingActivity.getTitle()
+						+" for learner "+learner.getUserId()+":"+learner.getLogin());
+			}
+			return null;
+    	}
+    }
+
     private SequenceActivity determineGroupBasedBranch(Lesson lesson, BranchingActivity branchingActivity, User learner) 
     {
     	SequenceActivity sequenceActivity = null;
@@ -811,7 +898,7 @@ public class LearnerService implements ICoreLearnerService
 	    		Group aGroup = null;
 	    		Iterator<Group> groupIter = groups.iterator();
 	    		while (!isInGroup && groupIter.hasNext()) {
-					aGroup = (Group) groupIter.next();
+					aGroup = groupIter.next();
 					isInGroup =  aGroup.hasLearner(learner);
 				}
 	    		

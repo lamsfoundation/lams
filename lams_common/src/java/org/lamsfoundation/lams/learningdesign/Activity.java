@@ -1034,7 +1034,11 @@ public abstract class Activity implements Serializable,Nullable {
 	   	newActivity.setOrderId(this.getOrderId());
 	   	newActivity.setReadOnly(this.getReadOnly());
 	   	newActivity.setStopAfterActivity(this.isStopAfterActivity());
-	   	
+
+	   	if ( this.getInputActivities()!=null && this.getInputActivities().size() > 0 ) {
+		   	newActivity.setInputActivities(new HashSet());
+	   		newActivity.getInputActivities().addAll(this.getInputActivities());
+	   	}
    }
 	
 	

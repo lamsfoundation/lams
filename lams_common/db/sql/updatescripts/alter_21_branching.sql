@@ -18,14 +18,15 @@ CREATE TABLE lams_input_activity (
 
 
 CREATE TABLE lams_branch_condition (
-       condition_id BIGINT(20) NOT NULL
+       condition_id BIGINT(20) NOT NULL   AUTO_INCREMENT
      , condition_ui_id INT(11)
-     , order_id INT(11) NOT NULL DEFAULT 0
+     , order_id INT(11)
      , name VARCHAR(255) NOT NULL
+     , display_name VARCHAR(255)
      , type VARCHAR(255) NOT NULL
-     , startValue VARCHAR(255)
-     , endValue VARCHAR(255)
-     , exactMatch VARCHAR(255)
+     , start_value VARCHAR(255)
+     , end_value VARCHAR(255)
+     , exact_match_value VARCHAR(255)
      , entry_id BIGINT(20) NOT NULL
      , PRIMARY KEY (condition_id)
 )TYPE=InnoDB;
@@ -33,7 +34,7 @@ CREATE TABLE lams_branch_condition (
 CREATE TABLE lams_branch_activity_entry (
        entry_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , entry_ui_id INT(11)
-     , group_id BIGINT(20) NOT NULL
+     , group_id BIGINT(20)
      , sequence_activity_id BIGINT(20) NOT NULL
      , branch_activity_id BIGINT(20) NOT NULL
      , condition_id BIGINT(20)

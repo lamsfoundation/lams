@@ -24,10 +24,10 @@
 package org.lamsfoundation.lams.tool;
 
 import java.util.List;
+import java.util.SortedMap;
 
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.usermanagement.User;
 
 
 
@@ -90,5 +90,40 @@ public interface ToolSessionManager
      */
     public void removeToolSession(Long toolSessionId)
     	throws DataMissingException, ToolException;
+    
+    /** Get all the outputs that match the list of names. 
+     * 
+     * If names is null, then all possible output will be returned. If names is an array of length 0, then no output will be returned. 
+     * 
+     * The toolSessionId and learnerId will be used to determine the data on which the outputs are to be based. If the output is for 
+     * the entire group/class (e.g. average mark) then the tool can ignore the learnerId. 
+     * 
+     * If the learnerId is null, then return the outputs based on all learners in that toolSession. If the 
+     * output is nonsense for all learners, then return an "empty" but valid answer. For example, for a mark
+     * you might return 0.
+     *
+     * Note: the learnerId may not be the userId of the current user as the current user may be a staff member.
+     *
+     * The tool's output will be returned in a map, where the key is the "name" for each output and the ToolOutput is the output for 
+     * that "name". At present, if there are multiple attempts at an activity for one learner, we assume each attempt would have a 
+     * different toolSessionId, and hence getToolOutput[] would be called multiple times. This may not be a valid assumption.
+ 	*/
+    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId);
+    
+    /** 
+     * Get the outputs for a particular tool output name. 
+     * 
+     * The toolSessionId and learnerId will be used to determine the data on which the outputs are to be based. If the output is for 
+     * the entire group/class (e.g. average mark) then the tool can ignore the learnerId. 
+     * 
+     * If the learnerId is null, then return the outputs based on all learners in that toolSession. If the 
+     * output is nonsense for all learners, then return an "empty" but valid answer. For example, for a mark
+     * you might return 0.
+     *
+     * Note: the learnerId may not be the userId of the current user as the current user may be a staff member.
+ 	*/
+    public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId);
+
+
     
 }

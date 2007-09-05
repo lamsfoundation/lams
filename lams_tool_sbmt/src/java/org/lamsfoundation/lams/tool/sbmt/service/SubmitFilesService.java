@@ -65,6 +65,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -546,6 +547,24 @@ public class SubmitFilesService implements ToolContentManager,
 		submitFilesSessionDAO.delete(session);
 	}
 	
+	/** 
+	 * Get the tool output for the given tool output names.
+	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long, java.lang.Long)
+	 */
+	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
+			Long toolSessionId, Long learnerId) {
+		return new TreeMap<String,ToolOutput>();
+	}
+
+	/** 
+	 * Get the tool output for the given tool output name.
+	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long, java.lang.Long)
+	 */
+	public ToolOutput getToolOutput(String name, Long toolSessionId,
+			Long learnerId) {
+		return null;
+	}
+
 	/**
 	 * (non-Javadoc)
 	 * 

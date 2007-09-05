@@ -44,6 +44,7 @@ import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.UUIDHexGenerator;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
+import org.lamsfoundation.lams.authoring.service.EditOnFlyProcessor;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -717,8 +718,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     	newLearningDesign.setUser(user);    	
     	newLearningDesign.setWorkspaceFolder(workspaceFolder);    	
     	learningDesignDAO.insert(newLearningDesign);
-    	updateDesignActivities(originalLearningDesign,newLearningDesign); 
-    	updateDesignTransitions(originalLearningDesign,newLearningDesign);
+    	HashMap<Integer, Activity> newActivities = updateDesignActivities(originalLearningDesign,newLearningDesign); 
+    	updateDesignTransitions(originalLearningDesign,newLearningDesign, newActivities);
     	// set first activity assumes that the transitions are all set up correctly.
     	newLearningDesign.setFirstActivity(newLearningDesign.calculateFirstActivity());
     	newLearningDesign.setLearningDesignUIID(originalLearningDesign.getLearningDesignUIID());
@@ -776,8 +777,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * 
      * @param originalLearningDesign The LearningDesign to be copied
      * @param newLearningDesign The copy of the originalLearningDesign
+     * @return Map of all the new activities, where the key is the UIID value. This is used as an input to updateDesignTransitions
      */
-    private void updateDesignActivities(LearningDesign originalLearningDesign, LearningDesign newLearningDesign){
+    private HashMap<Integer, Activity> updateDesignActivities(LearningDesign originalLearningDesign, LearningDesign newLearningDesign){
     	HashMap<Integer, Activity> newActivities = new HashMap<Integer, Activity>(); // key is UIID   
     	HashMap<Integer, Grouping> newGroupings = new HashMap<Integer, Grouping>();    // key is UIID
     	
@@ -834,17 +836,27 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    				}
 	    			}
 	    		}
-    			
     		}
+    		
+    		if ( activity.getInputActivities() != null && activity.getInputActivities().size() > 0 ) {
+    			Set<Activity> newInputActivities = new HashSet<Activity>();
+    			Iterator inputIter =  activity.getInputActivities().iterator();
+    			while (inputIter.hasNext()) {
+					Activity elem = (Activity) inputIter.next();
+					newInputActivities.add(newActivities.get(elem.getActivityUIID()));
+				}
+    			activity.getInputActivities().clear();
+    			activity.getInputActivities().addAll(newInputActivities);
+    		} 
     	}
-    	
-    	// fix up the input activities
 
     	// The activities collection in the learning design may already exist (as we have already done a save on the design).
     	// If so, we can't just override the existing collection as the cascade causes an error.
     	// newLearningDesign.getActivities() will create a new TreeSet(new ActivityOrderComparator()) if there isn't an existing set
    		newLearningDesign.getActivities().clear();
    		newLearningDesign.getActivities().addAll(activities);
+   		
+   		return newActivities;
    		
     }
     
@@ -882,7 +894,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param originalLearningDesign The LearningDesign to be copied 
      * @param newLearningDesign The copy of the originalLearningDesign
      */
-    public void updateDesignTransitions(LearningDesign originalLearningDesign, LearningDesign newLearningDesign){
+    public void updateDesignTransitions(LearningDesign originalLearningDesign, LearningDesign newLearningDesign, HashMap<Integer, Activity> newActivities){
     	HashSet newTransitions = new HashSet();
     	Set oldTransitions = originalLearningDesign.getTransitions();
     	Iterator iterator = oldTransitions.iterator();
@@ -892,11 +904,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     		Activity toActivity = null;
         	Activity fromActivity=null;
     		if(newTransition.getToUIID()!=null) {
-    			toActivity = activityDAO.getActivityByUIID(newTransition.getToUIID(),newLearningDesign);
+    			toActivity = newActivities.get(newTransition.getToUIID());
     			toActivity.setTransitionTo(newTransition);
     		}
     		if(newTransition.getFromUIID()!=null) {
-    			fromActivity = activityDAO.getActivityByUIID(newTransition.getFromUIID(),newLearningDesign);
+    			fromActivity = newActivities.get(newTransition.getFromUIID());
     			fromActivity.setTransitionFrom(newTransition);
     		}
     		newTransition.setToActivity(toActivity);

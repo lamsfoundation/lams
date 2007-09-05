@@ -32,8 +32,8 @@ import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 
 public class MCOutputDefinitionFactory extends OutputDefinitionFactory {
 
-	protected final String OUTPUT_NAME_LEARNER_MARK = "learner.mark";
-	protected final String OUTPUT_NAME_LEARNER_ALL_CORRECT = "learner.all.correct";
+	protected static final String OUTPUT_NAME_LEARNER_MARK = "learner.mark";
+	protected static final String OUTPUT_NAME_LEARNER_ALL_CORRECT = "learner.all.correct";
 	
 	/** 
 	 * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)

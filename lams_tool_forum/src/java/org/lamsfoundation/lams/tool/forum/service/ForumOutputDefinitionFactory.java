@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 public class ForumOutputDefinitionFactory extends OutputDefinitionFactory {
 
 	/** The number of posts the learner has made in one forum activity. */
-	protected final String OUTPUT_NAME_LEARNER_NUM_POSTS = "learner.number.of.posts";
+	protected final static String OUTPUT_NAME_LEARNER_NUM_POSTS = "learner.number.of.posts";
 	
 	/** 
 	 * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)

@@ -136,7 +136,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
      */
     public Activity createCopy(){
     	SequenceActivity newSequenceActivity = new SequenceActivity();
-    	copyToNewActivity(newSequenceActivity);
+    	copyToNewComplexActivity(newSequenceActivity);
     	newSequenceActivity.defaultActivity = this.defaultActivity;
     	
        	if ( this.getBranchEntries() != null && this.getBranchEntries().size() > 0) {

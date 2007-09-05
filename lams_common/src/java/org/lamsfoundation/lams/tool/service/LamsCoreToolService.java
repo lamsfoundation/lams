@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -50,7 +51,6 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -327,9 +327,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
      * have any content matching the toolContentId then it should create the OutputDefinitions based
      * on the tool's default content.
      * 
-     * This functionality relies on a method added to the Tool Contract in LAMS 2.1, so if the tool
-     * doesn't support the required method, it writes out an error to the log but doesn't throw 
-     * an exception - just returns an empty map.
+     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
      * 
      * @param toolContentId
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
@@ -355,7 +353,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
 			ToolContentManager contentManager = (ToolContentManager) findToolService(tool);
             return contentManager.getToolOutputDefinitions(toolContentId);
 		} catch ( NoSuchBeanDefinitionException e ) {
-			String message = "A tool which is defined in the database appears to missing from the classpath. Unable to copy the tool content. ToolContentId "+toolContentId;
+			String message = "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output definitions. ToolContentId "+toolContentId;
 			log.error(message,e);
 			throw new ToolException(message,e);
 		} catch ( java.lang.AbstractMethodError e ) {
@@ -366,6 +364,129 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
 
     }
    
+    /**
+     * Ask a tool for one particular ToolOutput, based on the given toolSessionId. If the tool doesn't
+     * have any content matching the toolSessionId then should return an "empty" but valid set of data. e.g
+     * an empty mark would be 0.
+     * 
+     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
+     * 
+     * @throws ToolException 
+     */
+    public ToolOutput getOutputFromTool(String conditionName, Long toolSessionId, Integer learnerId) throws ToolException {
+    	
+    	ToolSession session = (ToolSession) toolSessionDAO.getToolSession(toolSessionId);
+    	return getOutputFromTool(conditionName, session, learnerId);
+
+    }
+    
+    /**
+     * Ask a tool for one particular ToolOutput, based on the given toolSessionId. If the tool doesn't
+     * have any content matching the toolSessionId then should return an "empty" but valid set of data. e.g
+     * an empty mark would be 0.
+     * 
+     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
+     * 
+     * @throws ToolException 
+     */
+    public ToolOutput getOutputFromTool(String conditionName, ToolSession toolSession, Integer learnerId) throws ToolException {
+
+    	if ( toolSession == null ) {
+    		String error = "The toolSession is not valid. Unable to get the tool output";
+ 	       log.error(error);
+ 	       throw new DataMissingException(error);
+    	}
+    	
+		Tool tool = toolSession.getToolActivity().getTool();
+    	if ( tool == null ) {
+    		String error = "The tool for toolSession "+ toolSession.getToolSessionId() + " is missing.";
+ 	       log.error(error);
+ 	       throw new DataMissingException(error);
+    	}
+
+        try {
+			ToolSessionManager sessionManager = (ToolSessionManager) findToolService(tool);
+			Long longLearnerId = learnerId != null ? new Long(learnerId.longValue()) : null;
+            return sessionManager.getToolOutput(conditionName, toolSession.getToolSessionId(), longLearnerId);
+		} catch ( NoSuchBeanDefinitionException e ) {
+			String message = "A tool which is defined in the database appears to missing from the classpath. Unable to gt the tol output. toolSession "+toolSession.getToolSessionId();
+			log.error(message,e);
+			throw new ToolException(message,e);
+		} catch ( java.lang.AbstractMethodError e ) {
+			String message = "Tool "+tool.getToolDisplayName()+" doesn't support the getToolOutput(name, toolSessionId, learnerId) method so no output definitions can be accessed.";
+			log.error(message,e);
+			throw new ToolException(message,e);
+		}
+    }
+    
+    /**
+     * Ask a tool for a set of ToolOutputs, based on the given toolSessionId. 
+     * 
+     * If conditionName array is null, then return all the outputs for the tool, otherwise just restrict the 
+     * outputs to the given list. If it is empty, then no outputs will be returned.
+     * 
+     * If the learnerId is null, then return the outputs based on all learners in that toolSession. If the 
+     * output is nonsense for all learners, then return an "empty" but valid answer. For example, for a mark
+     * you might return 0.
+     * 
+     * If there isn't any content matching the toolSessionId then should return an "empty" but valid set of data. e.g
+     * an empty mark would be 0.
+     * 
+     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
+     * 
+     * @throws ToolException 
+     */
+    public SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, Long toolSessionId, Integer learnerId) throws ToolException {
+    	ToolSession session = (ToolSession) toolSessionDAO.getToolSession(toolSessionId);
+    	return getOutputFromTool(names, session, learnerId);
+    }
+    
+    /**
+     * Ask a tool for a set of ToolOutputs, based on the given toolSessionId. 
+     * 
+     * If conditionName array is null, then return all the outputs for the tool, otherwise just restrict the 
+     * outputs to the given list. If it is empty, then no outputs will be returned.
+     * 
+     * If the learnerId is null, then return the outputs based on all learners in that toolSession. If the 
+     * output is nonsense for all learners, then return an "empty" but valid answer. For example, for a mark
+     * you might return 0.
+     * 
+     * If there isn't any content matching the toolSessionId then should return an "empty" but valid set of data. e.g
+     * an empty mark would be 0.
+     * 
+     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
+     * 
+     * @throws ToolException 
+     */
+    public SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, ToolSession toolSession, Integer learnerId) throws ToolException {
+
+       	if ( toolSession == null ) {
+    		String error = "The toolSession is not valid. Unable to get the tool output";
+ 	       log.error(error);
+ 	       throw new DataMissingException(error);
+    	}
+    	
+		Tool tool = toolSession.getToolActivity().getTool();
+    	if ( tool == null ) {
+    		String error = "The tool for toolSession "+ toolSession.getToolSessionId() + " is missing.";
+ 	       log.error(error);
+ 	       throw new DataMissingException(error);
+    	}
+
+        try {
+			ToolSessionManager sessionManager = (ToolSessionManager) findToolService(tool);
+			Long longLearnerId = learnerId != null ? new Long(learnerId.longValue()) : null;
+            return sessionManager.getToolOutput(names, toolSession.getToolSessionId(), longLearnerId);
+		} catch ( NoSuchBeanDefinitionException e ) {
+			String message = "A tool which is defined in the database appears to missing from the classpath. Unable to gt the tol output. toolSession "+toolSession.getToolSessionId();
+			log.error(message,e);
+			throw new ToolException(message,e);
+		} catch ( java.lang.AbstractMethodError e ) {
+			String message = "Tool "+tool.getToolDisplayName()+" doesn't support the getToolOutput(name, toolSessionId, learnerId) method so no output definitions can be accessed.";
+			log.error(message,e);
+			throw new ToolException(message,e);
+		}
+    }
 
     /**
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#updateToolSession(org.lamsfoundation.lams.tool.ToolSession)

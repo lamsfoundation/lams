@@ -40,6 +40,7 @@ public class BranchConditionDTO {
 	private Integer conditionUIID;
     private Integer orderID; 
     private String name; 
+    private String displayName;
     private String type; 
     private String startValue; 
     private String endValue; 
@@ -50,6 +51,7 @@ public class BranchConditionDTO {
     	this.conditionUIID = condition.getConditionUIID();
     	this.orderID = condition.getOrderId();
     	this.name = condition.getName();
+    	this.displayName = condition.getDisplayName();
     	this.type = condition.getType();
     	this.startValue = condition.getStartValue();
     	this.endValue = condition.getEndValue();
@@ -121,5 +123,13 @@ public class BranchConditionDTO {
             .append("exactMatchValue", exactMatchValue)
             .toString();
     }
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
  
 }
