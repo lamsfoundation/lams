@@ -35,25 +35,80 @@ class ToolOutputCondition   {
 	
 	private var _orderID:Number;
 	private var _name:String;
+	private var _display_name:String;
 	private var _type:String;
 	private var _startValue:Object;
 	private var _endValue:Object;
 	private var _exactMatchValue:Object;
 	
-	function ToolOutputCondition(conditionID:Number, conditionUIID:Number, name:String, type:String, startValue:Object, endValue:Object, exactMatchValue:Object){
+	private var _branchingActivity:Activity;
+	
+	function ToolOutputCondition(conditionID:Number, conditionUIID:Number, name:String, type:String, startValue:Object, endValue:Object, exactMatchValue:Object, displayName:String, toolContentID:Number){
 		_conditionID = conditionID;
 		_conditionUIID = conditionUIID;
 		_orderID = 1;
+		_type = type;
 		_name = name;
 		_startValue = startValue;
 		_endValue = endValue;
 		_exactMatchValue = exactMatchValue;
+		
+		_display_name = displayName;
+	}
+	
+	public static function createBoolCondition(UIID:Number, definition:ToolOutputDefinition, value:Boolean):ToolOutputCondition {
+		var condition:ToolOutputCondition = new ToolOutputCondition();
+		condition.conditionUIID = UIID;
+		
+		if(definition.type == ToolOutputDefinition.BOOL) {
+			condition.type = definition.type;
+			condition.name = definition.name;
+			condition.displayName = definition.type + " (" + String(value) + ") ";
+			condition.exactMatchValue = value;
+			
+		}
+		
+		return condition;
+	}
+	
+	public static function createLongCondition(UIID:Number, displayName:String, definition:ToolOutputDefinition, startValue:Number, endValue:Number):ToolOutputCondition {
+		var condition:ToolOutputCondition = new ToolOutputCondition();
+		condition.conditionUIID = UIID;
+		
+		if(definition.type == ToolOutputDefinition.LONG) {
+			condition.name = definition.name;
+			condition.type = definition.type;
+			condition.displayName = displayName;
+			
+			if(startValue == endValue) {
+				condition.exactMatchValue = startValue;
+			} else { 
+				condition.startValue = startValue;
+				condition.endValue = endValue;
+			}
+		}
+		
+		return condition;
+	}
+	
+	public function populateFromDTO(dto:Object):Void {
+		_conditionID = dto.conditionID;
+		_conditionUIID = dto.conditionUIID;
+		
+		_orderID = dto.orderID;
+		_name = dto.name;
+		_display_name = dto.displayName;
+		_type = dto.type;
+		_startValue = dto.startValue;
+		_endValue = dto.endValue;
+		_exactMatchValue = dto.exactMatchValue;
 	}
 	
 	public function addConditionData(dto:Object):Object {
 		
 		if(_orderID) dto.orderID = _orderID;
 		if(_name) dto.name = _name;
+		if(_display_name) dto.displayName = _display_name;
 		if(_type) dto.type = _type;
 		if(_startValue) dto.startValue = _startValue;
 		if(_endValue) dto.endValue = _endValue;
@@ -84,6 +139,14 @@ class ToolOutputCondition   {
 	
 	public function get name():String {
 		return _name;
+	}
+	
+	public function set displayName(a:String) {
+		_display_name = a;
+	}
+	
+	public function get displayName():String {
+		return _display_name;
 	}
 	
 	public function set type(a:String) {

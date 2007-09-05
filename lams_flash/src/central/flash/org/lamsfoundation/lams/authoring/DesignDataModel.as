@@ -80,6 +80,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private var _groupings:Hashtable;
 	private var _branches:Hashtable;
 	private var _branchMappings:Hashtable;
+	private var _outputConditions:Hashtable;
 	
 	
 	private var _licenseID:Number;
@@ -104,6 +105,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_groupings = new Hashtable("_groupings");
 		_branches = new Hashtable("_branches");
 		_branchMappings = new Hashtable("_branchMappings");
+		_outputConditions = new Hashtable("_outputConditions");
 		
 		//set the defualts:
 		_objectType = "LearningDesign";
@@ -294,6 +296,16 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		return true;
 	}
 	
+	public function addOutputCondition(condition:ToolOutputCondition):Boolean {
+		dispatchEvent({type:'ddmBeforeUpdate',target:this});
+		
+		_outputConditions.put(condition.conditionUIID, condition);
+		
+		dispatchEvent({type:'ddmUpdate',target:this});
+		
+		return true;
+	}
+	
 	/**
 	 * Removes the branch from the DDM
 	 * @usage   
@@ -349,6 +361,22 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		}
 	}
 	
+	public function removeOutputCondition(conditionUIID):Object{
+	
+		//dispatch an event to show the design has changed
+		dispatchEvent({type:'ddmBeforeUpdate',target:this});
+		
+		var r:Object = _outputConditions.remove(conditionUIID);
+		if(r==null){
+			return new LFError("Removing tool output condition failed:"+conditionUIID,"removeOutputCondition",this,null);
+		}else{
+			
+			Debugger.log('Removed:'+r.conditionUIID,Debugger.GEN,'removeOutputCondition','DesignDataModel');
+			
+			dispatchEvent({type:'ddmUpdate',target:this});
+		}
+	
+	}
 	
 	/**
 	 * Sets a new design for the DDM.
@@ -480,9 +508,18 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		for(var i=0; i<design.branchMappings.length;i++){
 			var mdto = design.branchMappings[i];
+			var newMappingEntry:BranchActivityEntry;
+			if(mdto.groupUIID != null) {
+				newMappingEntry = new GroupBranchActivityEntry(mdto.entryID, mdto.entryUIID, getGroupByUIID(mdto.groupUIID), SequenceActivity(getActivityByUIID(mdto.sequenceActivityUIID)), BranchingActivity(getActivityByUIID(mdto.branchingActivityUIID)));
+			} else if(mdto.condition != null) {
+				var condition:ToolOutputCondition = new ToolOutputCondition();
+				condition.populateFromDTO(mdto.condition);
+				
+				newMappingEntry = new ToolOutputBranchActivityEntry(mdto.entryID, mdto.entryUIID, condition, SequenceActivity(getActivityByUIID(mdto.sequenceActivityUIID)), BranchingActivity(getActivityByUIID(mdto.branchingActivityUIID)));
+			}
 			
-			var newMappingEntry:GroupBranchActivityEntry = new GroupBranchActivityEntry(mdto.entryID, mdto.entryUIID, getGroupByUIID(mdto.groupUIID), SequenceActivity(getActivityByUIID(mdto.sequenceActivityUIID)), BranchingActivity(getActivityByUIID(mdto.branchingActivityUIID)));
-			_branchMappings.put(newMappingEntry.entryUIID, newMappingEntry);
+			if(newMappingEntry != null)
+				_branchMappings.put(newMappingEntry.entryUIID, newMappingEntry);
 		}
 		
 		return success;
@@ -1133,6 +1170,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function set branchMappings(a:Hashtable):Void {
 		_branchMappings = a;
 	}	
+	
+	public function set conditions(a:Hashtable):Void {
+		_outputConditions = a;
+	}
+	
+	public function get conditions():Hashtable {
+		return _outputConditions;
+	}
 	
 	/**
 	 * 

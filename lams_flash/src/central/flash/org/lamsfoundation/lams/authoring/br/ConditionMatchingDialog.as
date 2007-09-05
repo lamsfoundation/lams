@@ -99,7 +99,7 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 		
 		conditions_lst.dataProvider = conditions;
 		conditions_lst.sortItemsBy("conditionUIID", Array.NUMERIC);
-		conditions_lst.labelField = "description";
+		conditions_lst.labelField = "displayName";
 		conditions_lst.hScrollPolicy = "on";
 		conditions_lst.maxHPosition = 200;
 		
@@ -111,11 +111,11 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 		var column_sequence:DataGridColumn = new DataGridColumn("sequenceName");
 		column_sequence.headerText = "Branch";
 		
-		var column_desc:DataGridColumn = new DataGridColumn("description");
-		column_desc.headerText = "Condition";
+		var column_condition:DataGridColumn = new DataGridColumn("displayName");
+		column_condition.headerText = "Condition";
 		
 		match_dgd.addColumn(column_sequence);
-		match_dgd.addColumn(column_desc);
+		match_dgd.addColumn(column_condition);
 		
 		var mappings = app.getCanvas().ddm.branchMappings.values();
 		
@@ -155,12 +155,37 @@ class ConditionMatchingDialog extends BranchMappingDialog {
     private function close(){
         Debugger.log('OK Clicked',Debugger.GEN,'ok','ConditionMatchingDialog');
         
-        //close popup
-        _container.deletePopUp();
+		// check for any remaining conditions
+		if(conditions_lst.length > 0) {
+			LFMessage.showMessageAlert("All remaining conditions will be mapped to the default branch", Proxy.create(this, cleanupUnmappedConditions));
+		} else {
+			//close popup
+			_container.deletePopUp();
+		}
+		
+		
     }
 	
+	private function cleanupUnmappedConditions(){
+        for(var i=0; i < conditions_lst.length; i++) {
+			setupMatch(conditions_lst.getItemAt(i), _branchingActivity.defaultBranch);
+		}
+		
+		conditions_lst.removeAll();
+		
+		close();
+	}
+	
+	/**
+    * Event dispatched by parent container when close button clicked
+    */
+    public function click(e:Object):Void{
+        close();
+    }
+    
+	
 	private function addMatch():Void {
-		var selectedGroups:Array = new Array();
+		var selectedConditions:Array = new Array();
 		
 		// get selected items and put together in match
 		if(conditions_lst.selectedItems.length > 0) {
@@ -168,7 +193,7 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 			for(var i=0; i<conditions_lst.selectedIndices.length; i++) {
 				if(branches_lst.selectedItem != null) {
 					setupMatch(conditions_lst.getItemAt(conditions_lst.selectedIndices[i]), branches_lst.selectedItem);
-					selectedGroups.push(conditions_lst.selectedIndices[i]);
+					selectedConditions.push(conditions_lst.selectedIndices[i]);
 				} else {
 					LFMessage.showMessageAlert("No branch selected");
 					return;
@@ -176,8 +201,8 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 				
 			}
 			var delCount = 0;
-			for(var i=0; i<selectedGroups.length; i++) {
-				conditions_lst.removeItemAt(selectedGroups[i]-delCount);
+			for(var i=0; i<selectedConditions.length; i++) {
+				conditions_lst.removeItemAt(selectedConditions[i]-delCount);
 				delCount++;
 			}
 			

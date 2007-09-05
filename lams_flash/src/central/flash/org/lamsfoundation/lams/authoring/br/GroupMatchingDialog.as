@@ -46,7 +46,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
 
     //References to components + clips 
     private var _branchingActivity:BranchingActivity;
-
+	
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;

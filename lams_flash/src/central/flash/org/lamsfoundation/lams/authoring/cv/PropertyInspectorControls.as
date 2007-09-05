@@ -924,11 +924,12 @@ class PropertyInspectorControls extends MovieClip {
 	
 	private function onBranchToolInputChange(evt:Object) {
 		Debugger.log('branch input change: ' + evt.target.value, Debugger.CRITICAL, "onBranchToolInputChange", "PIC*");
+		
 		_canvasModel.selectedItem.activity.toolActivityUIID = (evt.target.value != 0) ? evt.target.value : null;
 		_canvasModel.selectedItem.refresh();
-			
-		_conditions_setup_btn.visible = (_canvasModel.selectedItem.activity.toolActivityUIID != null) ? true : false;
-		Debugger.log('button visible ' + _conditions_setup_btn.visible, Debugger.CRITICAL, "onBranchToolInputChange", "PIC*");
+		
+		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
+		_conditions_setup_btn.visible = ((_canvasModel.selectedItem.activity.toolActivityUIID != null) && (branches.myBranches.length > 0)) ? true : false;
 		
 		setModified();
 	}
@@ -939,14 +940,14 @@ class PropertyInspectorControls extends MovieClip {
 		
 		if(!v) { _tool_output_match_btn.visible = false; _conditions_setup_btn.visible = false; return; }
 		
-		var ca = _canvasModel.selectedItem;
-		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
+		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
 		
-		if(branches.myBranches.length > 0)
+		if(branches.myBranches.length > 0) {
 			_tool_output_match_btn.visible = v;
-		
-		if(_canvasModel.selectedItem.activity.toolActivityUIID != null)
-			_conditions_setup_btn.visible = v;
+			
+			if(_canvasModel.selectedItem.activity.toolActivityUIID != null)
+				_conditions_setup_btn.visible = v;
+		}
 		
 		if(e != null) {
 			toolActs_cmb.enabled = e;
@@ -1018,13 +1019,16 @@ class PropertyInspectorControls extends MovieClip {
 		setModified();
 	}
 	
-	private function onToolOutputMatchClick(evt:Object){
-
-		// show tool outputs to branch mappings dialog
-		//var ta:ToolActivity = ToolActivity(_canvasModel.getCanvas().ddm.getActivityByUIID(_canvasModel.selectedItem.activity.toolActivityUIID));
-		//_canvasModel.getCanvas().getToolOutputDefinitions(ta);
+	public function openConditionMatchDialog():Void {
+		onConditionMatchClick();
+	}
+	
+	private function onConditionMatchClick(evt:Object){
+		// open group to branch matching window
+		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('condmatch_dlg_title_lbl'), closeButton:true, viewResize:false, scrollContentPath:'ConditionMatchingDialog'});
+		_app.dialog.addEventListener('contentLoaded', Delegate.create(this, ConditionMatchingDialogLoaded));
 		
-		//setModified();
+		setModified();
 	}
 	
 	private function onConditionsSetupClick(evt:Object){
@@ -1055,6 +1059,16 @@ class PropertyInspectorControls extends MovieClip {
 		evt.target.scrollContent.grouping = grouping;
 		evt.target.scrollContent.groups = grouping.getGroups(_canvasModel.getCanvas().ddm);
 		evt.target.scrollContent.setupGrid();
+	}
+	
+	private function ConditionMatchingDialogLoaded(evt:Object) {
+		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
+		
+		evt.target.scrollContent.branchingActivity = BranchingActivity(_canvasModel.selectedItem.activity);
+		evt.target.scrollContent.conditions = _canvasModel.getCanvas().ddm.conditions.values();
+		evt.target.scrollContent.branches = getValidBranches(branches.myBranches);
+		
+		evt.target.scrollContent.loadLists();
 	}
 	
 	private function getValidBranches(branches:Array):Array {

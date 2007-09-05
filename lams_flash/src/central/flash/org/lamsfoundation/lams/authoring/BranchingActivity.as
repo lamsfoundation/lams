@@ -42,6 +42,7 @@ class BranchingActivity extends ComplexActivity {
 	private var _endYCoord:Number;
 	
 	private var _toolActivityUIID:Number;
+	private var _defaultBranch:Branch;
 	
 	function BranchingActivity(activityUIID:Number, activityTypeID:Number){
 		super(activityUIID);
@@ -53,6 +54,7 @@ class BranchingActivity extends ComplexActivity {
 		_endYCoord = DEFAULT_ENDY;
 		
 		_toolActivityUIID == null;
+		_defaultBranch = null;
 		
 	}
 	
@@ -85,6 +87,7 @@ class BranchingActivity extends ComplexActivity {
 		if(_endXCoord) dto.endXCoord = _endXCoord;
 		if(_endYCoord) dto.endYCoord = _endYCoord;
 		if(_toolActivityUIID) dto.toolActivityUIID = _toolActivityUIID;
+		if(_defaultBranch) dto.defaultBranch = _defaultBranch.sequenceActivity.activityUIID;
 		
 		return dto;
 	}
@@ -135,6 +138,14 @@ class BranchingActivity extends ComplexActivity {
 	
 	public function get toolActivityUIID():Number {
 		return _toolActivityUIID;
+	}
+	
+	public function set defaultBranch(a:Branch) {
+		_defaultBranch = a;
+	}
+	
+	public function get defaultBranch():Branch {
+		return _defaultBranch;
 	}
 	
 }

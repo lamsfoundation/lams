@@ -23,6 +23,8 @@
  
 import org.lamsfoundation.lams.authoring.br.*;
 import org.lamsfoundation.lams.authoring.ToolOutputDefinition;
+import org.lamsfoundation.lams.authoring.ToolOutputCondition;
+import org.lamsfoundation.lams.authoring.Application;
 
 import org.lamsfoundation.lams.common.Dialog;
 import org.lamsfoundation.lams.common.style.*;
@@ -47,7 +49,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private var _definitions:Array;
 	private var _conditions:Array;
 	private var _selectedDefinition:ToolOutputDefinition;
-	
+	private var _toolContentID:Number;
 	
 	private var _toolOutputDefin_cmb:ComboBox;
 	private var _condition_item_dgd:DataGrid;
@@ -57,13 +59,17 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private var add_btn:Button;
 	private var close_btn:Button;
+	private var cancel_btn:Button;
+	private var remove_item_btn:Button;
+	private var clear_all_btn:Button;
 	
 	private var _output_type_lbl:Label;
 	private var _condition_range_lbl:Label;
 	
 	private var _bgpanel:MovieClip;       //The underlaying panel base
     
-    private var fm:FocusManager;            //Reference to focus manager
+    private var app:Application;
+	private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
 	
     //Dimensions for resizing
@@ -71,6 +77,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     private var yOkOffset:Number;
     private var xCancelOffset:Number;
     private var yCancelOffset:Number;
+	
+	private var _itemCount:Number;
 
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -79,6 +87,11 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     
 	
 	function ToolOutputConditionsDialog(){
+		_itemCount = 0;
+		this._visible = false;
+		
+		app = Application.getInstance();
+		
 		//Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
 		
@@ -97,11 +110,18 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
         themeManager = ThemeManager.getInstance();
         
 		//EVENTS
-        //Add event listeners close button
-        close_btn.addEventListener('click',Delegate.create(this, close));
-        add_btn.addEventListener('click',Delegate.create(this, addCondition));
+        //Add event listeners for buttons
+        close_btn.addEventListener('click', Delegate.create(this, close));
+        cancel_btn.addEventListener('click', Delegate.create(this, cancel));
+		
+		add_btn.addEventListener('click',Delegate.create(this, addButton_onPress));
+		remove_item_btn.addEventListener('click', Delegate.create(this, removeItemButton_onPress));
+		clear_all_btn.addEventListener('click', Delegate.create(this, clearAllButton_onPress));
 		
 		_toolOutputDefin_cmb.addEventListener('change', Delegate.create(this, itemChanged));
+		
+		_condition_item_dgd.addEventListener('cellEdit', Delegate.create(this, itemEdited));
+		_condition_item_dgd.addEventListener('cellFocusIn', Delegate.create(this, itemSelected));
 		
 		//Assign Click (close button) and resize handlers
         _container.addEventListener('click',this);
@@ -140,7 +160,12 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 		//Set the text for buttons
         close_btn.label = Dictionary.getValue('al_done');
+		cancel_btn.label = Dictionary.getValue('al_cancel');
+		
 		add_btn.label = "+ Add";
+		clear_all_btn.label = "Clear All";
+		remove_item_btn.label = "- Remove";
+		
 	}
 	
 	/**
@@ -154,7 +179,11 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
         //Get the button style from the style manager and apply to both buttons
         styleObj = themeManager.getStyleObject('button');
         close_btn.setStyle('styleName', styleObj);
+		cancel_btn.setStyle('styleName', styleObj);
+		
 		add_btn.setStyle('styleName', styleObj);
+		remove_item_btn.setStyle('styleName', styleObj);
+		clear_all_btn.setStyle('styleName', styleObj);
        
 		styleObj = themeManager.getStyleObject('CanvasPanel');
 		_bgpanel.setStyle('styleName', styleObj);
@@ -172,6 +201,53 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		_end_value_stp.setStyle('styleName', styleObj);
     }
 	
+	public function setupContent():Void {
+		
+		var column_name:DataGridColumn = new DataGridColumn("conditionName");
+		column_name.headerText = "Name";
+		column_name.editable = true;
+		
+		var column_value:DataGridColumn = new DataGridColumn("conditionValue");
+		column_value.headerText = "Condition";
+		column_value.editable = false;
+		
+		_condition_item_dgd.addColumn(column_name);
+		_condition_item_dgd.addColumn(column_value);
+		
+		// wait second frame for steppers to be setup
+		
+		this.onEnterFrame = initSetup;
+		
+	}
+	
+	private function initSetup():Void {
+		delete this.onEnterFrame;
+		
+		// get branch conditions by branch activity uiid from ddm
+		
+		// selected definition and add items to list that already exist in ddm for this matchup
+		
+		// else no items do normal startup
+		itemChanged();
+		
+		this._visible = true;
+	}
+	
+	private function addButton_onPress():Void {
+		addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), "unnamed", _selectedDefinition, _start_value_stp.value, _end_value_stp.value));
+	}
+	
+	private function clearAllButton_onPress():Void {
+		_condition_item_dgd.removeAll();
+	}
+	
+	private function removeItemButton_onPress():Void {
+		var selectedItem = _condition_item_dgd.getItemAt(_condition_item_dgd.selectedIndex);
+		app.getCanvas().ddm.removeOutputCondition(selectedItem.conditionUIID);
+		
+		_condition_item_dgd.removeItemAt(_condition_item_dgd.selectedIndex);
+	}
+	
 	/**
 	 * Called by ADD button
 	 * 
@@ -179,51 +255,144 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	 * @return  
 	 */
 	
-	private function addCondition():Void {
+	private function addCondition(condition:ToolOutputCondition):Void {
+		if(_condition_item_dgd.getItemAt(0).data == null)
+			_condition_item_dgd.removeItemAt(0);
+		
+		switch(condition.type) {
+			case ToolOutputDefinition.LONG :
+				if(condition.startValue != null && condition.endValue != null)
+					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.startValue) + " TO " + String(condition.endValue), data: condition});
+				else
+					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: "exact(" + String(condition.exactMatchValue) + ")", data: condition});
+				
+				break;
+			case ToolOutputDefinition.BOOL: 
+				_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.exactMatchValue), data: condition});
+				break;
+			default: 
+				Debugger.log("No type found", Debugger.GEN, "addCondition", "ToolOutputConditionsDialog");
+		}
+		
+		app.getCanvas().ddm.addOutputCondition(condition);
 		
 	}
 	
-	private function itemChanged(evt:Object):Void {
-		_selectedDefinition = _toolOutputDefin_cmb.dataProvider[_toolOutputDefin_cmb.selectedIndex];
+	private function removeCondition(conditionUIID:Number):Void {
+		app.getCanvas().ddm.removeOutputCondition(conditionUIID);
+	}
+	
+	private function removeAllItems():Void {
+		for(var i=0; i<_condition_item_dgd.length; i++) {
+			var item = _condition_item_dgd.getItemAt(i);
+			app.getCanvas().ddm.removeOutputCondition(item.conditionUIID);
+		}
 		
+		_condition_item_dgd.removeAll();
+	}
+	
+	private function itemChanged(evt:Object):Void {
+		Debugger.log("type: " + _selectedDefinition.type, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
+		
+		var ddm = app.getCanvas().ddm;
+		_selectedDefinition = _toolOutputDefin_cmb.dataProvider[_toolOutputDefin_cmb.selectedIndex];
 		_output_type_lbl.text = "Output Type: " + _selectedDefinition.type;
 
-		Debugger.log("type: " + _selectedDefinition.type, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
-
-		Debugger.log("val: " + evt.target.value, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
+		switch(_selectedDefinition.type) {
+			case ToolOutputDefinition.LONG:
+				removeAllItems();
 		
-		if(_selectedDefinition.type == "OUTPUT_LONG") {
+				_start_value_stp.visible = true;
+				_end_value_stp.visible = true;
+				
+				_start_value_stp.minimum = Number(_selectedDefinition.startValue);
+				_end_value_stp.minimum = Number(_selectedDefinition.startValue);
+				_start_value_stp.maximum = Number(_selectedDefinition.endValue);
+				_end_value_stp.maximum = Number(_selectedDefinition.endValue);
+				
+				_start_value_stp.value = Number(_selectedDefinition.startValue);
+				_end_value_stp.value = Number(_selectedDefinition.endValue);
+				
+				add_btn.visible = true;
+				clear_all_btn.enabled = true;
+				remove_item_btn.enabled = true;
+				
+				_condition_range_lbl.visible = true;
+				
+				break;
 			
-			_start_value_stp.visible = true;
-			_end_value_stp.visible = true;
-			
-			_start_value_stp.minimum = Number(_selectedDefinition.startValue);
-			_end_value_stp.minimum = Number(_selectedDefinition.startValue);
-			_start_value_stp.maximum = Number(_selectedDefinition.endValue);
-			_end_value_stp.maximum = Number(_selectedDefinition.endValue);
-			
-			_start_value_stp.value = Number(_selectedDefinition.startValue);
-			_end_value_stp.value = Number(_selectedDefinition.endValue);
-		} else {
-			_start_value_stp.visible = false;
-			_end_value_stp.visible = false;
+			case ToolOutputDefinition.BOOL:
+				removeAllItems();
+				
+				_start_value_stp.visible = false;
+				_end_value_stp.visible = false;
+				
+				add_btn.visible = false;
+				clear_all_btn.enabled = false;
+				remove_item_btn.enabled = false;
+				
+				_condition_range_lbl.visible = false;
+				
+				// add default conditions for boolean output type
+				addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, true));
+				addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, false));
+				
+				break;
+			default:
+				Debugger.log("type not found", Debugger.GEN, "itemChanged", "ToolOutputConditionsDialog");
 		}
 			
+	}
+	
+	private function itemEdited(evt:Object):Void {
+		var item = _condition_item_dgd.getItemAt(evt.itemIndex);
+		var condition:ToolOutputCondition = ToolOutputCondition(item.data);
+		condition.displayName = item.conditionName;
+		
+		app.getCanvas().ddm.addOutputCondition(condition);
+		
+	}
+	
+	public function itemSelected(evt:Object):Void {
+		var item = _condition_item_dgd.getItemAt(evt.itemIndex);
+		
+		Debugger.log("current selection: " + Selection.getFocus(), Debugger.CRITICAL, "itemSelected", "GroupNamingDialog");
+	}
+
+	public static function getOutputType(type:String):String {
+		switch(type) {
+			case ToolOutputDefinition.BOOL:
+				return "boolean";
+				break;
+			case ToolOutputDefinition.LONG:
+				return "long";
+				break;
+			default:
+				return "undefined";
+		}
 	}
 	
     /**
     * Called by the CLOSE button 
     */
     private function close(){
-		
+		app.pi.openConditionMatchingDialog();
+		 
         _container.deletePopUp();
     }
+	
+	private function cancel(){
+		// remove any entries
+		removeAllItems();
+		
+        _container.deletePopUp();
+	}
 	
     /**
     * Event dispatched by parent container when close button clicked
     */
     public function click(e:Object):Void{
-        e.target.deletePopUp();
+		close();
     }
     
     /**
@@ -251,13 +420,24 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		}
 		
 		_toolOutputDefin_cmb.dataProvider = _definitions;
-		_toolOutputDefin_cmb.labelField = "name";
+		_toolOutputDefin_cmb.labelFunction = function(itemObj){
+			return (itemObj.name + " (" + ToolOutputConditionsDialog.getOutputType(itemObj.type) + ")");
+		}
 		
 		_toolOutputDefin_cmb.redraw(true);
+
 	}
 	
 	public function get definitions():Array {
 		return _definitions;
+	}
+	
+	public function get toolContentID():Number {
+		return _toolContentID;
+	}
+	
+	public function set toolContentID(a:Number):Void {
+		_toolContentID = a;
 	}
 	
 	/**

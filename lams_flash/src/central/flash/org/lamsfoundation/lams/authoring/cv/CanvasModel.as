@@ -593,10 +593,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	}
 	
 	public function addNewBranch(sequence:SequenceActivity, branchingActivity:Activity):Void {
+		
 		if(sequence.firstActivityUIID != null) {
 			var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, _cv.ddm.getActivityByUIID(sequence.firstActivityUIID).activityUIID, branchingActivity.activityUIID, sequence, _cv.ddm.learningDesignID);
 			_cv.ddm.addBranch(b);
 			
+			if(BranchingActivity(branchingActivity).defaultBranch == null) {
+				BranchingActivity(branchingActivity).defaultBranch = b;
+			}
+		
+			// TODO: review
 			if(!sequence.stopAfterActivity) {
 				b = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_TO_END, _cv.ddm.getActivityByUIID(this.getLastActivityUIID(sequence.firstActivityUIID)).activityUIID, branchingActivity.activityUIID, sequence, _cv.ddm.learningDesignID);
 			

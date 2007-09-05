@@ -675,6 +675,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	private function ToolOutputConditionsDialogLoaded(evt:Object, ta:ToolActivity) {
 		evt.target.scrollContent.definitions = ta.definitions;
 		Debugger.log("def length: " + ta.definitions.length, Debugger.CRITICAL, "ToolOutputConditionsDialogLoaded", "CanvasController");
+	
+		evt.target.scrollContent.setupContent();
 	}
 	
 }
