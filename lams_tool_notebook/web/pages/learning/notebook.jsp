@@ -1,9 +1,37 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <script type="text/javascript">
+<!--
+	function validateForm() {
+	
+		// Validates that there's input from the user. 
+		
+		// disables the Finish button to avoid double submittion 
+		disableFinishButton();
+		
+		if (document.learningForm.entryText.value == "") {
+			
+			// if the input is blank, then we further inquire to make sure it is correct
+			if (confirm("\n<fmt:message>message.learner.blank.input</fmt:message>"))  {
+				// if correct, submit form
+				return true;
+			} else {
+				// otherwise, focus on the text area
+				document.learningForm.entryText.focus();
+				document.getElementById("finishButton").disabled = false;
+				return false;      
+			}
+		} else {
+			// there was something on the form, so submit the form
+			return true;
+		}
+	
+	}
+
 	function disableFinishButton() {
 		document.getElementById("finishButton").disabled = true;
 	}
+-->
 </script>
 
 <div id="content">
@@ -11,7 +39,7 @@
 		${notebookDTO.title}
 	</h1>
 
-	<html:form action="/learning" method="post" onsubmit="disableFinishButton();">
+	<html:form action="/learning" method="post" onsubmit="return validateForm();">
 		<html:hidden property="dispatch" value="finishActivity" />
 		<html:hidden property="toolSessionID" />
 
