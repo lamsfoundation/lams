@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,6 +37,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
+import org.lamsfoundation.lams.learningdesign.dto.BranchActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
@@ -983,16 +985,11 @@ public abstract class Activity implements Serializable,Nullable {
 
 	/** Get the authoring DTO for this activity. Overidden by ComplexActivity.
 	 */
-	public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet()
+	public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet(ArrayList<BranchActivityEntryDTO> branchMappings)
 	{
 		Set<AuthoringActivityDTO> dtoSet = new TreeSet<AuthoringActivityDTO>(new ActivityDTOOrderComparator());
-		dtoSet.add(new AuthoringActivityDTO(this));
+		dtoSet.add(new AuthoringActivityDTO(this, branchMappings));
 		return dtoSet;
-	}
-	
-	private AuthoringActivityDTO getAuthoringActivityDTO()
-	{
-		return new AuthoringActivityDTO(this);
 	}
 	
 	public LibraryActivityDTO getLibraryActivityDTO(){

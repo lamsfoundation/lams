@@ -411,21 +411,6 @@ public class LearningDesignDTO extends BaseDTO{
 		    {
 			    Grouping grouping = (Grouping) groupingIter.next();
 			    groupingList.add(grouping.getGroupingDTO(false));			    
-			    
-		   		if ( grouping.getGroups().size() > 0 ) {
-	    			Iterator iter = grouping.getGroups().iterator();
-	    			while ( iter.hasNext() ) {
-	    				Group group = (Group) iter.next();
-	    	    		if ( group.getBranchActivities().size() > 0 ) {
-	    	    			Iterator iter2 = group.getBranchActivities().iterator();
-	    	    			while ( iter2.hasNext() ) {
-	    	    				BranchActivityEntry ba = (BranchActivityEntry) iter2.next();
-	    	    				branchMappings.add(ba.getBranchActivityDTO());
-	    	    			}
-	    	    		}
-	    			}
-	    		}
-		   		
 		    }
 	    }
 	    return groupingList;
@@ -441,12 +426,12 @@ public class LearningDesignDTO extends BaseDTO{
 			//getAuthoringActivityDTOSet() method will:
 			//for complex activity: It already populate its children activities.
 			//for other activity: only get itself DTO object.
-			dtoSet.addAll(object.getAuthoringActivityDTOSet());
-		}
-		
+			dtoSet.addAll(object.getAuthoringActivityDTOSet(branchMappings));
+		}		
 		return new ArrayList<AuthoringActivityDTO>(dtoSet);
 	}	
-	public ArrayList populateTransitions(LearningDesign design){
+
+public ArrayList populateTransitions(LearningDesign design){
 		ArrayList<TransitionDTO> transitions = new ArrayList<TransitionDTO>();
 		if(design.getTransitions()!=null){
 			Iterator iterator = design.getTransitions().iterator();

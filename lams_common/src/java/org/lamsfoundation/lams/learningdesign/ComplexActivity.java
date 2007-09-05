@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,6 +34,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
+import org.lamsfoundation.lams.learningdesign.dto.BranchActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy;
 import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -210,16 +212,16 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	    
 	}
 	
-	public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet()
+	public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet(ArrayList<BranchActivityEntryDTO> branchMappings)
 	{
 		Set<AuthoringActivityDTO> dtoSet = new TreeSet<AuthoringActivityDTO>(new ActivityDTOOrderComparator());
-		dtoSet.add(new AuthoringActivityDTO(this)); //add parent activity
+		dtoSet.add(new AuthoringActivityDTO(this, branchMappings)); //add parent activity
 		
 		//add the DTO for all child activities
 		for(Iterator i = this.getActivities().iterator();i.hasNext();) {
             Activity child = (Activity)i.next();
             
-            dtoSet.addAll(child.getAuthoringActivityDTOSet());
+            dtoSet.addAll(child.getAuthoringActivityDTOSet(branchMappings));
 		}
 		
 		return dtoSet;

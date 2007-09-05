@@ -178,7 +178,7 @@ public class BranchActivityEntry {
 	}
 
 
-	public BranchActivityEntryDTO getBranchActivityDTO() {
+	public BranchActivityEntryDTO getBranchActivityEntryDTO() {
 
 		BranchActivityEntryDTO entryDTO = null;
 		if ( getCondition() != null ) {
@@ -191,7 +191,9 @@ public class BranchActivityEntry {
 
 		entryDTO.setEntryID(getEntryId());
 		entryDTO.setEntryUIID(getEntryUIID());
-		entryDTO.setGroupUIID(getGroup().getGroupUIID());
+		if ( getGroup() != null ) {
+			entryDTO.setGroupUIID(getGroup().getGroupUIID());
+		}
 		entryDTO.setSequenceActivityUIID(getBranchSequenceActivity().getActivityUIID());
 		entryDTO.setBranchingActivityUIID(getBranchingActivity().getActivityUIID());
 		return entryDTO;
