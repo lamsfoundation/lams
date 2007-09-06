@@ -30,6 +30,7 @@ import java.util.Iterator;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
@@ -377,6 +378,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 			 addComplexActivityAttributes(activity, branchMappings);		
 	}
 	private void addComplexActivityAttributes(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings){		
+		ComplexActivity complex = (ComplexActivity) activity;
+		if ( complex.getDefaultActivity() != null ) {
+			defaultActivityUIID = complex.getDefaultActivity().getActivityUIID();
+		}
+		
 		if(activity.isOptionsActivity())
 			addOptionsActivityAttributes((OptionsActivity)activity);
 		else if (activity.isParallelActivity())
