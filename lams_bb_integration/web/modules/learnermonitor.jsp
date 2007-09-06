@@ -94,7 +94,7 @@
 		            learnerWin.focus();
 		        }
 		        else{
-		            learnerWin = window.open(learnerUrl,'aWindow','width=800,height=600,resizable');
+		            learnerWin = window.open(learnerUrl,'learnerWin','width=800,height=600,resizable');
 		            learnerWin.focus();
 		        }
 			}
@@ -104,10 +104,10 @@
 				monitorUrl = '<%=monitorUrl%>'; 
 		    	if(monitorWin && monitorWin.open && !monitorWin.closed){
 		    	
-		            learnerWin.focus();
+		            monitorWin.focus();
 		        }
 		        else{
-		            monitorWin = window.open(monitorUrl,'aWindow','width=800,height=600,resizable');
+		            monitorWin = window.open(monitorUrl,'monitorWin','width=800,height=600,resizable');
 		            monitorWin.focus();
 		        }
 			}
