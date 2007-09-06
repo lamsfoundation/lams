@@ -157,18 +157,19 @@ public class LessonManagerServlet extends HttpServlet {
 			out.write(writer.toString());			
 			
 		} catch (NumberFormatException nfe) {
-			log.error("lsId or ldId is not an integer" + lsIdStr + ldIdStr);
+			log.error("lsId or ldId is not an integer" + lsIdStr + ldIdStr, nfe);
 			response.sendError(response.SC_BAD_REQUEST, "lsId or ldId is not an integer");
 		} catch (TransformerConfigurationException e) {
-			log.error("Can not convert XML document to string");
+			log.error("Can not convert XML document to string", e);
 			response.sendError(response.SC_INTERNAL_SERVER_ERROR);
 		} catch (TransformerException e) {
-			log.error("Can not convert XML document to string");
-			response.sendError(response.SC_INTERNAL_SERVER_ERROR);
+			log.error("Can not convert XML document to string", e);
+			response.sendError(response.SC_INTERNAL_SERVER_ERROR );
 		} catch (ParserConfigurationException e) {
-			log.error("Can not build XML document");
+			log.error("Can not build XML document", e);
 			response.sendError(response.SC_INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
+			log.error("Problem loading learning manager servlet request", e);
 			response.sendError(response.SC_INTERNAL_SERVER_ERROR);
 		}
 		

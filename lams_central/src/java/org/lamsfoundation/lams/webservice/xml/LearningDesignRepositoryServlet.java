@@ -324,17 +324,25 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 			out.print(contentTree);
 
 		} catch (NumberFormatException nfe) {
-			log.error("mode is not an integer");
+			log.error("mode is not an integer", nfe);
 			response.sendError(response.SC_BAD_REQUEST, "mode is not an integer");
 		} catch (AuthenticationException e) {
+			log.error("can not authenticate", e);
 			response.sendError(response.SC_BAD_REQUEST, "can not authenticate");
 		} catch (UserInfoFetchException e) {
+			log.error("can not retreive user information", e);
 			response.sendError(response.SC_BAD_REQUEST, "can not retreive user information");
 		} catch (UserAccessDeniedException e) {
+			log.error("user access denied", e);
 			response.sendError(response.SC_BAD_REQUEST, "user access denied");
 		} catch (RepositoryCheckedException e) {
+			log.error("repository checked", e);
 			response.sendError(response.SC_BAD_REQUEST, "repository checked");
+		} catch (Exception e){
+			log.error("Problem with LearningDesignRepositoryServlet request", e);
+			response.sendError(response.SC_BAD_REQUEST, "Problem with LearningDesignRepositoryServlet request");
 		}
+		
 	}
 
 	/**
