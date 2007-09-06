@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,11 +15,13 @@ import org.lams.toolbuilder.util.LamsToolBuilderLog;
 
 /**
  * 
- * @author Anthony Sukkar
+ * @author Luke Foxton - Based on code written by: Anthony Sukar
  * 
  */
 public class RenameTool {
 
+	//$$$$$$$$$$$$$$$$$$$$$$TO BE IMPLEMENTED DYNAMICALLY
+	private final String DEFAULT_LANGUAGE = "en_AU";
 	
 	
 	private Set<String> txtType = new HashSet<String>();
@@ -65,59 +66,6 @@ public class RenameTool {
 
 		visitFile(sourceDir, "rename");
 		return true;
-		
-		/*
-		if (!tasklist.exists()) 
-		{
-			LamsToolBuilderLog.logError(new Exception("Cannot find tasklist configuration file"));
-			throw new Exception("Cannot find tasklist configuration file");
-		}
-		
-		File sourceDir = null;
-		try {
-			FileInputStream fis = new FileInputStream(tasklist);
-			BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-
-			String line;
-			while ((line = br.readLine()) != null) {
-
-				line = line.trim();
-
-				if (line.length() == 0 || (line.charAt(0) == '#'))
-					continue;
-
-				String[] strArray = line.split("\\s");
-
-				String command = strArray[0];
-
-				if (command.equals("Source")) {
-					sourceDir = getFile(strArray);
-				}
-
-				if (command.equals("Rename")) {
-
-					if (strArray.length != 3) {
-						continue;
-					} else {
-						String[] pair = { strArray[1], strArray[2] };
-						nameList.add(pair);
-					}
-				}
-
-			}
-
-			visitFile(sourceDir, "rename");
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			System.exit(0);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		
-		return true;
-		*/
 	}
 	
 
@@ -188,6 +136,21 @@ public class RenameTool {
 			mode = "delete";
 		}
 
+		if (file.getName().contains("ApplicationResources"))
+		{
+			// it is a language file, delete if not the default language
+			// if it is the default language, do not alter it
+			if (file.getName().contains(this.DEFAULT_LANGUAGE))
+			{
+				return;
+			}
+			else
+			{
+				file.delete();
+				System.out.println("Deleted non-default language file: " + file.getPath());
+			}	
+		}
+		
 		if (file.isDirectory()) {
 			String[] children = file.list();
 			for (int i = 0; i < children.length; i++) {

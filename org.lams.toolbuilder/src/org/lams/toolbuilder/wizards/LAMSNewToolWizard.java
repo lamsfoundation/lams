@@ -29,6 +29,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.lams.toolbuilder.renameTool.RenameTool;
+import org.lams.toolbuilder.renameTool.RenameToolTaskList;
 /**
  * This is a sample new wizard. Its role is to create a new file 
  * resource in the provided container. If the container resource
@@ -184,14 +185,18 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 			LamsToolBuilderLog.logError(e);
 		}
 		
-		List<String[]> commandList = new ArrayList<String[]>();
-		commandList.add(new String[] {"lasbmt11",projHandle.getName()});
+		RenameToolTaskList tasklist = new RenameToolTaskList(Constants.SUBMIT_TOOL_DIR, projHandle.getName(), toolDisplayName);
+		
+		List<String[]> commandList = tasklist.getTasklist();
+		/*commandList.add(new String[] {"lasbmt11",projHandle.getName()});
 		commandList.add(new String[] {"SubmitFiles",toolDisplayName.replaceAll(" ", "").trim()});
 		commandList.add(new String[] {"Submit Files",toolDisplayName.trim()});
 		commandList.add(new String[] {"sbmt",projHandle.getName().toLowerCase()});
 		commandList.add(new String[] {"Sbmt",projHandle.getName()});
 		commandList.add(new String[] {"Submit",toolDisplayName.replaceAll(" ", "").trim()});
 		commandList.add(new String[] {"submit",toolDisplayName.replaceAll(" ", "").trim()});
+		*/
+		
 		
 		RenameTool rt = new RenameTool();
 		LamsToolBuilderLog.logInfo(projHandle.getLocation().toPortableString());
