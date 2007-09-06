@@ -65,6 +65,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private var clear_all_btn:Button;
 	
 	private var _condition_range_lbl:Label;
+	private var _condition_from_lbl:Label;
+	private var _condition_to_lbl:Label;
 	
 	private var _bgpanel:MovieClip;       //The underlaying panel base
     
@@ -157,16 +159,17 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     }
 	
 	private function setLabels(){
-		_condition_range_lbl.text = "Range:";
-		
-		//Set the text for buttons
-        close_btn.label = Dictionary.getValue('al_done');
-		cancel_btn.label = Dictionary.getValue('al_cancel');
+		_condition_range_lbl.text = "Set Range:";
+		_condition_from_lbl.text = "From:";
+		_condition_to_lbl.text = "To:";
 		
 		add_btn.label = "+ Add";
 		clear_all_btn.label = "Clear All";
 		remove_item_btn.label = "- Remove";
-		
+	
+		//Set the text for buttons
+        close_btn.label = Dictionary.getValue('al_done');
+		cancel_btn.label = Dictionary.getValue('al_cancel');
 	}
 	
 	/**
@@ -192,6 +195,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
         //Apply label style 
         styleObj = themeManager.getStyleObject('label');
 		_condition_range_lbl.setStyle('styleName', styleObj);
+		_condition_from_lbl.setStyle('styleName', styleObj);
+		_condition_to_lbl.setStyle('styleName', styleObj);
 		
 		styleObj = themeManager.getStyleObject('picombo');
 		_toolOutputDefin_cmb.setStyle('styleName', styleObj);
@@ -322,6 +327,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				remove_item_btn.enabled = true;
 				
 				_condition_range_lbl.visible = true;
+				_condition_from_lbl.visible = true;
+				_condition_to_lbl.visible = true;
 				
 				break;
 			
@@ -335,6 +342,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				remove_item_btn.enabled = false;
 				
 				_condition_range_lbl.visible = false;
+				_condition_from_lbl.visible = false;
+				_condition_to_lbl.visible = false;
 				
 				// add default conditions for boolean output type
 				if(evt != null) {
