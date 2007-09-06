@@ -1018,7 +1018,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
             {
             	try {
             		ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(currentActivity.getActivityId());
-            		AuthoringActivityDTO activityDTO = new AuthoringActivityDTO(toolActivity);
+            		AuthoringActivityDTO activityDTO = new AuthoringActivityDTO(toolActivity, null);
             		listOfAuthoringActivityDTOs.add(activityDTO);
             	} catch (ToolException e) {
                         String error = ""
