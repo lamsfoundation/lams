@@ -33,9 +33,12 @@ class ToolOutputBranchActivityEntry extends BranchActivityEntry {
 	private var _condition:ToolOutputCondition;
 	
 	function ToolOutputBranchActivityEntry(entryID:Number, entryUIID:Number, condition:ToolOutputCondition, sequenceActivity:SequenceActivity, branchingActivity:BranchingActivity){
-		super(entryID, entryUIID, sequenceActivity, branchingActivity);
+		this.entryID = entryID;
+		this.entryUIID = entryUIID;
+		this.sequenceActivity = sequenceActivity;
+		this.branchingActivity = branchingActivity;
 		
-		_condition = condition;
+		this.condition = condition;
 	}
 
 	public function toData():Object {
@@ -46,7 +49,7 @@ class ToolOutputBranchActivityEntry extends BranchActivityEntry {
 		if(this.sequenceActivity) dto.sequenceActivityUIID = this.sequenceActivity.activityUIID;
 		if(this.branchingActivity) dto.branchingActivityUIID = this.branchingActivity.activityUIID;
 		
-		if(this.condition) dto = _condition.addConditionData(dto);
+		if(this.condition) dto.condition = _condition.toData(dto);
 		
 		return dto;
 	}
@@ -57,6 +60,10 @@ class ToolOutputBranchActivityEntry extends BranchActivityEntry {
 	
 	public function set condition(a:ToolOutputCondition):Void {
 		_condition = a;
+	}
+	
+	public function get displayName():String {
+		return _condition.displayName;
 	}
 	
 }

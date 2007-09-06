@@ -115,13 +115,13 @@ class GroupMatchingDialog extends BranchMappingDialog {
 		match_dgd.addColumn(column_sequence);
 		match_dgd.addColumn(column_name);
 		
-		var mappings = app.getCanvas().ddm.branchMappings.values();
+		var mappings:Array = app.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(_branchingActivity.activityUIID).groupBased;
 		
-		for(var m in mappings) {
-			if(m instanceof GroupBranchActivityEntry) {
-				match_dgd.addItem(mappings[m]);
-				removeGroup(mappings[m].group);
-			}
+		Debugger.log("Loading Lists: mappings length: " + mappings.length, Debugger.CRITICAL, "loadLists", "GroupMatchingDialog");
+		
+		for(var i=0; i< mappings.length; i++) {
+			match_dgd.addItem(mappings[i]);
+			removeGroup(mappings[i].group);
 		}
 	}
 	

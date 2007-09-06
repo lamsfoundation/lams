@@ -117,6 +117,8 @@ class PropertyInspector extends PropertyInspectorControls {
 		_tool_output_match_btn.addEventListener("click", Delegate.create(this, onConditionMatchClick));
 		_conditions_setup_btn.addEventListener("click", Delegate.create(this, onConditionsSetupClick));
 		
+		_pi_defaultBranch_cb.addEventListener("click", Delegate.create(this, onDefaultBranchSelect));
+		
 		this.onEnterFrame = setupLabels;
 		
 		this.tabChildren = true;
@@ -298,6 +300,8 @@ class PropertyInspector extends PropertyInspectorControls {
 			title_txt.text = StringUtils.cleanNull(a.title);
 			desc_txt.text = StringUtils.cleanNull(a.description);
 			
+			showBranchControls(false);
+			
 		} else if(CanvasOptionalActivity(cm.selectedItem) != null){
 			var co = CanvasOptionalActivity(cm.selectedItem);
 			var cca:ComplexActivity = ComplexActivity(co.activity);
@@ -306,6 +310,7 @@ class PropertyInspector extends PropertyInspectorControls {
 			delimitLine._visible = true;
 				
 			showGeneralControls(true, !co.activity.readOnly);
+			showBranchControls(false);
 			showGroupingControls(false);
 			showBranchingControls(false);
 			showToolActivityControls(false);
@@ -329,6 +334,7 @@ class PropertyInspector extends PropertyInspectorControls {
 			
 			showOptionalControls(false);
 			showGeneralControls(true, !co.activity.readOnly);
+			showBranchControls(false);
 			showGeneralInfo(false);
 			showGroupingControls(false);
 			showBranchingControls(false);
@@ -354,6 +360,7 @@ class PropertyInspector extends PropertyInspectorControls {
 			showTransitionProperties(t);
 			
 			showGeneralInfo(false);
+			showBranchControls(false);
 			showGeneralControls(false);
 			showOptionalControls(false);
 			showGroupingControls(false);
@@ -372,6 +379,7 @@ class PropertyInspector extends PropertyInspectorControls {
 			showBranchProperties(branch);
 			
 			showGeneralControls(true, !branch.sequenceActivity.readOnly);
+			showBranchControls(true);
 			
 			showGeneralInfo(false);
 			showOptionalControls(false);
@@ -388,6 +396,7 @@ class PropertyInspector extends PropertyInspectorControls {
 			toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> ";
 			
 			showGeneralInfo(true);
+			showBranchControls(false);
 			showGroupingControls(false);
 			showBranchingControls(false);
 			showGeneralControls(false);
@@ -491,11 +500,16 @@ class PropertyInspector extends PropertyInspectorControls {
 		
 	}
 	
+	private function showBranchControls(v:Boolean):Void {
+		_pi_defaultBranch_cb.visible = v;
+	}
+	
 	private function showBranchProperties(b:Branch){
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_activity_type_sequence');
-		
 		title_txt.text = b.sequenceActivity.title;
 		
+		_pi_defaultBranch_cb.selected = (b.sequenceActivity.activityUIID == _canvasModel.activeView.activity.defaultBranch.sequenceActivity.activityUIID) ? true : false;
+		_pi_defaultBranch_cb.enabled = !_pi_defaultBranch_cb.selected;
 	}
 	
 	/**

@@ -22,6 +22,7 @@
  */
 
 import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.common.util.StringUtils;
 /*
 * This class represents all the complex activity types.  they are not much different, so we can handle them in one class.
 * For reference these are the activity types
@@ -40,12 +41,12 @@ class ComplexActivity extends Activity{
 	private var _minOptions:Number;
 	private var _optionsInstructions:String;
 	
-	
+	private var _firstActivityUIID:Number;
 	
 	function ComplexActivity(activityUIID:Number){
 		super(activityUIID);
+		_firstActivityUIID = null;
 	}
-	
 	
 	/**
 	 * Creates a complex activity from a dto... which is nice
@@ -61,6 +62,9 @@ class ComplexActivity extends Activity{
 			//TODO: This is missing in the Library packet - tell mai.
 			_optionsInstructions = dto.optionsInstructions;
 		}
+		
+		if(StringUtils.isWDDXNull(dto.defaultActivityUIID)) _firstActivityUIID = null;
+		else _firstActivityUIID = dto.defaultActivityUIID;
 	}
 	
 	/**
@@ -147,12 +151,14 @@ class ComplexActivity extends Activity{
 	public function get optionsInstructions ():String {
 		return _optionsInstructions;
 	}
-
 	
+	public function get firstActivityUIID():Number{
+		return _firstActivityUIID;
+	}
 	
-
-
-	
+	public function set firstActivityUIID(a:Number):Void{
+		_firstActivityUIID = a;
+	}
 
 }
 

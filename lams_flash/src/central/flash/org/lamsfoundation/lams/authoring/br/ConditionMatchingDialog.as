@@ -117,20 +117,21 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 		match_dgd.addColumn(column_sequence);
 		match_dgd.addColumn(column_condition);
 		
-		var mappings = app.getCanvas().ddm.branchMappings.values();
+		var mappings:Array = app.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(_branchingActivity.activityUIID).toolBased;
 		
-		for(var m in mappings) {
-			if(m instanceof ToolOutputBranchActivityEntry) {
-				match_dgd.addItem(mappings[m]);
-				removeCondition(mappings[m].condition);
-			}
+		Debugger.log("Loading Lists: mappings length: " + mappings.length, Debugger.CRITICAL, "loadLists", "ConditionMatchingDialog");
+		
+		for(var i=0; i < mappings.length; i++) {
+			match_dgd.addItem(mappings[i]);
+			removeCondition(mappings[i].condition);
 		}
+		
 	}
 	
 	private function removeCondition(c:ToolOutputCondition) {
 		var indexList:Array = new Array();
 		
-		for(var i=0; i<conditions_lst.rowCount; i++) {
+		for(var i=0; i<conditions_lst.length; i++) {
 			var item = conditions_lst.getItemAt(i);
 			if(item.conditionUIID == c.conditionUIID) { conditions_lst.removeItemAt(i); return; }
 		}
@@ -167,11 +168,14 @@ class ConditionMatchingDialog extends BranchMappingDialog {
     }
 	
 	private function cleanupUnmappedConditions(){
-        for(var i=0; i < conditions_lst.length; i++) {
+        Debugger.log("clearing all unmapped conditions: " + conditions_lst.length, Debugger.CRITICAL, "cleanupUnmappedConditions", "ConditionMatchingDialog");
+		
+		for(var i=0; i < conditions_lst.length; i++) {
 			setupMatch(conditions_lst.getItemAt(i), _branchingActivity.defaultBranch);
 		}
 		
 		conditions_lst.removeAll();
+		app.getCanvas().ddm.conditions.clear();
 		
 		close();
 	}
@@ -208,7 +212,7 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 			
 			
 		} else {
-			LFMessage.showMessageAlert("No groups selected");
+			LFMessage.showMessageAlert("No condition selected");
 		}
 	}
 	

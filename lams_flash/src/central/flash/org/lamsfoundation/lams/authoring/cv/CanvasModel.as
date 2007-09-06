@@ -597,10 +597,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		if(sequence.firstActivityUIID != null) {
 			var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, _cv.ddm.getActivityByUIID(sequence.firstActivityUIID).activityUIID, branchingActivity.activityUIID, sequence, _cv.ddm.learningDesignID);
 			_cv.ddm.addBranch(b);
-			
-			if(BranchingActivity(branchingActivity).defaultBranch == null) {
-				BranchingActivity(branchingActivity).defaultBranch = b;
-			}
 		
 			// TODO: review
 			if(!sequence.stopAfterActivity) {

@@ -22,7 +22,6 @@
  */
 
 import org.lamsfoundation.lams.authoring.*;
-import org.lamsfoundation.lams.common.util.StringUtils;
 import org.lamsfoundation.lams.common.Config;
 
 /*
@@ -37,15 +36,11 @@ import org.lamsfoundation.lams.common.Config;
 */
 class SequenceActivity extends ComplexActivity {
 	
-	
-	private var _firstActivityUIID:Number;
-	
 	private var _empty:Boolean;
 	
 	function SequenceActivity(activityUIID:Number){
 		super(activityUIID);
 		_activityTypeID = SEQUENCE_ACTIVITY_TYPE;
-		_firstActivityUIID = null;
 		_empty = true;
 	}
 	
@@ -57,8 +52,6 @@ class SequenceActivity extends ComplexActivity {
 	 */
 	public function populateFromDTO(dto:Object){
 		super.populateFromDTO(dto);
-		if(StringUtils.isWDDXNull(dto.defaultActivityUIID)) _firstActivityUIID = null;
-		else _firstActivityUIID = dto.defaultActivityUIID;
 	}
 	
 	/**
@@ -86,14 +79,6 @@ class SequenceActivity extends ComplexActivity {
 		var sa = new SequenceActivity();
 		sa.populateFromDTO(dto);
 		return sa;
-	}
-
-	public function get firstActivityUIID():Number{
-		return _firstActivityUIID;
-	}
-	
-	public function set firstActivityUIID(a:Number):Void{
-		_firstActivityUIID = a;
 	}
 	
 	public function set empty(b:Boolean):Void{

@@ -267,12 +267,12 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @param   branch 
 	 * @return  
 	 */
-	public function addBranchMapping(entry:GroupBranchActivityEntry):Boolean{
+	public function addBranchMapping(entry):Boolean{
 		//dispatch an event to show the design has changed
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 	
 		Debugger.log('Branch Mapping entry:' + entry.entryUIID,4,'addBranchMapping','DesignDataModel');
-		_branchMappings.put(entry.entryUIID,entry);
+		_branchMappings.put(entry.entryUIID, entry);
 		
 		dispatchEvent({type:'ddmUpdate',target:this});
 		
@@ -903,6 +903,24 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		}
 	}
 	
+	public function getBranchMappingsByActivityUIIDAndType(activityUIID:Number):Object {
+		var bMappings:Array = _branchMappings.values();
+		var myMappings:Object = new Object();
+		myMappings.groupBased = new Array();
+		myMappings.toolBased = new Array();
+		myMappings.uncategorised = new Array();
+		
+		for(var i=0; i<bMappings.length; i++) {
+			if(bMappings[i] instanceof GroupBranchActivityEntry)	
+					myMappings.groupBased.push(bMappings[i]);
+			else if(bMappings[i] instanceof ToolOutputBranchActivityEntry)
+				myMappings.toolBased.push(bMappings[i]);
+			else 
+				myMappings.uncategorised.push(bMappings[i]);
+		}
+		
+		return myMappings;
+	}
 	
 	/**
 	 * Retrieves all children of a complexy activity
@@ -991,11 +1009,16 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				}
 			}
 		}
+		
 		branchObj.myBranches = myBranches;
 		branchObj.target = target;
 		branchObj.sequence = sequence;
 		branchObj.hub = hub;
 		return branchObj;
+	}
+	
+	public function getAllConditions():Array {
+		return _outputConditions.values();
 	}
 	
 	//Getters and setters for the properties

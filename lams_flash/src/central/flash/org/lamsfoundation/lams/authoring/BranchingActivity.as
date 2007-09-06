@@ -142,6 +142,7 @@ class BranchingActivity extends ComplexActivity {
 	
 	public function set defaultBranch(a:Branch) {
 		_defaultBranch = a;
+		_firstActivityUIID = SequenceActivity(a.sequenceActivity).activityUIID;
 	}
 	
 	public function get defaultBranch():Branch {

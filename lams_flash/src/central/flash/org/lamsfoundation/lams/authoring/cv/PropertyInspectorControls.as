@@ -128,6 +128,9 @@ class PropertyInspectorControls extends MovieClip {
 	private var minAct_stp:NumericStepper;
 	private var maxAct_stp:NumericStepper;
 	
+	// Branch Connector
+	private var _pi_defaultBranch_cb:CheckBox;
+	
 	//screen assets:
 	private var body_pnl:Panel;
 	private var bar_pnl:Panel;
@@ -193,6 +196,9 @@ class PropertyInspectorControls extends MovieClip {
 		_group_naming_btn.label = Dictionary.getValue('pi_group_naming_btn_lbl');
 		_tool_output_match_btn.label = Dictionary.getValue('pi_tomatch_btn_lbl');
 		_conditions_setup_btn.label = Dictionary.getValue('pi_condmatch_btn_lbl');
+		
+		// Branch 
+		_pi_defaultBranch_cb.label = Dictionary.getValue("_pi_defaultBranch_cb_lbl");
 		
 		//populate the synch type combo:
 		gateType_cmb.dataProvider = Activity.getGateActivityTypes();
@@ -782,6 +788,8 @@ class PropertyInspectorControls extends MovieClip {
 		minAct_stp.setStyle('styleName', styleObj);
 		maxAct_stp.setStyle('styleName', styleObj);
 		
+		_pi_defaultBranch_cb.setStyle('styleName', styleObj);
+		
 		
 		styleObj = _tm.getStyleObject('picombo');
 		gateType_cmb.setStyle('styleName', styleObj);
@@ -1026,7 +1034,7 @@ class PropertyInspectorControls extends MovieClip {
 	private function onConditionMatchClick(evt:Object){
 		// open group to branch matching window
 		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('condmatch_dlg_title_lbl'), closeButton:true, viewResize:false, scrollContentPath:'ConditionMatchingDialog'});
-		_app.dialog.addEventListener('contentLoaded', Delegate.create(this, ConditionMatchingDialogLoaded));
+		_app.dialog.addEventListener('contentLoaded', Delegate.create(this, ConditionMatchDialogLoaded));
 		
 		setModified();
 	}
@@ -1061,11 +1069,12 @@ class PropertyInspectorControls extends MovieClip {
 		evt.target.scrollContent.setupGrid();
 	}
 	
-	private function ConditionMatchingDialogLoaded(evt:Object) {
+	private function ConditionMatchDialogLoaded(evt:Object) {
 		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
+		var conditions:Array = _canvasModel.getCanvas().ddm.getAllConditions();
 		
 		evt.target.scrollContent.branchingActivity = BranchingActivity(_canvasModel.selectedItem.activity);
-		evt.target.scrollContent.conditions = _canvasModel.getCanvas().ddm.conditions.values();
+		evt.target.scrollContent.conditions = conditions;
 		evt.target.scrollContent.branches = getValidBranches(branches.myBranches);
 		
 		evt.target.scrollContent.loadLists();
@@ -1078,6 +1087,13 @@ class PropertyInspectorControls extends MovieClip {
 		}
 		
 		return branches;
+	}
+	
+	public function onDefaultBranchSelect(evt:Object):Void {
+		if(_pi_defaultBranch_cb.selected) {
+			_canvasModel.activeView.activity.defaultBranch = BranchConnector(_canvasModel.selectedItem).branch; _pi_defaultBranch_cb.selected
+			_pi_defaultBranch_cb.enabled = false;
+		}
 	}
 	
    /**

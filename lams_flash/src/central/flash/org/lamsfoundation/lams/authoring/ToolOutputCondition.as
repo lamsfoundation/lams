@@ -22,6 +22,7 @@
  */
 
 import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.common.Config;
 
 /**
  *
@@ -104,15 +105,20 @@ class ToolOutputCondition   {
 		_exactMatchValue = dto.exactMatchValue;
 	}
 	
-	public function addConditionData(dto:Object):Object {
+	public function toData():Object {
+		var dto:Object = new Object();
+		
+		if(_conditionID) dto.conditionID = conditionID;
+		if(_conditionUIID) dto.conditionUIID = _conditionUIID;
 		
 		if(_orderID) dto.orderID = _orderID;
 		if(_name) dto.name = _name;
 		if(_display_name) dto.displayName = _display_name;
 		if(_type) dto.type = _type;
-		if(_startValue) dto.startValue = _startValue;
-		if(_endValue) dto.endValue = _endValue;
-		if(_exactMatchValue) dto.exactMatchValue = _exactMatchValue;
+		
+		dto.startValue = (_startValue) ? _startValue : Config.STRING_NULL_VALUE;
+		dto.endValue = (_endValue)  ? _endValue : Config.STRING_NULL_VALUE;
+		dto.exactMatchValue = (_exactMatchValue) ? _exactMatchValue : Config.STRING_NULL_VALUE;
 		
 		return dto;
 	}

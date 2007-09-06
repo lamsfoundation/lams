@@ -425,6 +425,10 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
 		
+		if(activity.defaultBranch == null) {
+			activity.defaultBranch = b;
+		}
+		
 		if(b.direction == BranchConnector.DIR_FROM_START) b.sequenceActivity.firstActivityUIID = b.targetUIID;
 		var newBranch_mc:MovieClip = branchLayer.createChildAtDepth("BranchConnector",DepthManager.kTop,{_branch:b,_canvasController:cbc,_canvasBranchView:cbv});
 		cm.branchesDisplayed.put(b.branchUIID,newBranch_mc);

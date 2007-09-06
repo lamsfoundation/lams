@@ -24,6 +24,7 @@
 import org.lamsfoundation.lams.authoring.br.*;
 import org.lamsfoundation.lams.authoring.ToolOutputDefinition;
 import org.lamsfoundation.lams.authoring.ToolOutputCondition;
+import org.lamsfoundation.lams.authoring.BranchingActivity;
 import org.lamsfoundation.lams.authoring.Application;
 
 import org.lamsfoundation.lams.common.Dialog;
@@ -63,7 +64,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private var remove_item_btn:Button;
 	private var clear_all_btn:Button;
 	
-	private var _output_type_lbl:Label;
 	private var _condition_range_lbl:Label;
 	
 	private var _bgpanel:MovieClip;       //The underlaying panel base
@@ -79,6 +79,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     private var yCancelOffset:Number;
 	
 	private var _itemCount:Number;
+	
+	private var _branchingActivity:BranchingActivity;
 
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -156,7 +158,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private function setLabels(){
 		_condition_range_lbl.text = "Range:";
-		_output_type_lbl.text = "Output Type:";
 		
 		//Set the text for buttons
         close_btn.label = Dictionary.getValue('al_done');
@@ -191,7 +192,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
         //Apply label style 
         styleObj = themeManager.getStyleObject('label');
 		_condition_range_lbl.setStyle('styleName', styleObj);
-		_output_type_lbl.setStyle('styleName', styleObj);
 		
 		styleObj = themeManager.getStyleObject('picombo');
 		_toolOutputDefin_cmb.setStyle('styleName', styleObj);
@@ -223,14 +223,25 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private function initSetup():Void {
 		delete this.onEnterFrame;
 		
-		// get branch conditions by branch activity uiid from ddm
+		var branches:Array = app.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(_branchingActivity.activityUIID).toolBased;
 		
-		// selected definition and add items to list that already exist in ddm for this matchup
+		for(var i=0; i<branches.length; i++) {
+			if(i==0) setDefinition(branches[i].condition.name);
+			addCondition(branches[i].condition);
+			itemChanged(null);
+		}
 		
-		// else no items do normal startup
-		itemChanged();
+		if(branches.length <= 0) itemChanged(true);
 		
 		this._visible = true;
+	}
+	
+	private function setDefinition(name:String):Void {
+		var items:Array = _toolOutputDefin_cmb.dataProvider;
+		
+		for(var i=0; i < items.length; i++)
+			if(items[i].name == name) 
+				_toolOutputDefin_cmb.selectedIndex = i;
 	}
 	
 	private function addButton_onPress():Void {
@@ -256,8 +267,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	 */
 	
 	private function addCondition(condition:ToolOutputCondition):Void {
-		if(_condition_item_dgd.getItemAt(0).data == null)
-			_condition_item_dgd.removeItemAt(0);
 		
 		switch(condition.type) {
 			case ToolOutputDefinition.LONG :
@@ -283,11 +292,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	}
 	
 	private function removeAllItems():Void {
-		for(var i=0; i<_condition_item_dgd.length; i++) {
-			var item = _condition_item_dgd.getItemAt(i);
-			app.getCanvas().ddm.removeOutputCondition(item.conditionUIID);
-		}
-		
+		app.getCanvas().ddm.conditions.clear();
 		_condition_item_dgd.removeAll();
 	}
 	
@@ -296,11 +301,10 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 		var ddm = app.getCanvas().ddm;
 		_selectedDefinition = _toolOutputDefin_cmb.dataProvider[_toolOutputDefin_cmb.selectedIndex];
-		_output_type_lbl.text = "Output Type: " + _selectedDefinition.type;
-
+		
 		switch(_selectedDefinition.type) {
 			case ToolOutputDefinition.LONG:
-				removeAllItems();
+				if(evt != null) removeAllItems();
 		
 				_start_value_stp.visible = true;
 				_end_value_stp.visible = true;
@@ -322,7 +326,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				break;
 			
 			case ToolOutputDefinition.BOOL:
-				removeAllItems();
 				
 				_start_value_stp.visible = false;
 				_end_value_stp.visible = false;
@@ -334,9 +337,11 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				_condition_range_lbl.visible = false;
 				
 				// add default conditions for boolean output type
-				addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, true));
-				addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, false));
-				
+				if(evt != null) {
+					removeAllItems();
+					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, true));
+					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, false));
+				}
 				break;
 			default:
 				Debugger.log("type not found", Debugger.GEN, "itemChanged", "ToolOutputConditionsDialog");
@@ -376,7 +381,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     * Called by the CLOSE button 
     */
     private function close(){
-		app.pi.openConditionMatchingDialog();
+		app.pi.openConditionMatchDialog();
 		 
         _container.deletePopUp();
     }
@@ -446,4 +451,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     function set container(value:MovieClip){
         _container = value;
     }
+	
+	public function set branchingActivity(a:BranchingActivity) {
+		_branchingActivity = a;
+	}
 }
