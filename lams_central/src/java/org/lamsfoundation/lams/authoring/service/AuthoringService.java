@@ -1017,6 +1017,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
             if (currentActivity.isToolActivity())
             {
             	try {
+            		// Normally we pass in an array for the branch mappings as the second parameter to new  AuthoringActivityDTO()
+            		// but we don't need to in this case as it is only doing it for tool activities, and the extra parameter is only 
+            		// used for branching activities
             		ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(currentActivity.getActivityId());
             		AuthoringActivityDTO activityDTO = new AuthoringActivityDTO(toolActivity, null);
             		listOfAuthoringActivityDTOs.add(activityDTO);
