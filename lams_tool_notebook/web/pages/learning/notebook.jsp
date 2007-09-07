@@ -1,13 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <script type="text/javascript">
-<!--
+<!--	
 	function validateForm() {
 	
 		// Validates that there's input from the user. 
 		
 		// disables the Finish button to avoid double submittion 
 		disableFinishButton();
+
+ 	<c:if test='${mode != "author"}'>
+		// if this is preview mode, then we add these validation
 		
 		if (document.learningForm.entryText.value == "") {
 			
@@ -25,6 +28,8 @@
 			// there was something on the form, so submit the form
 			return true;
 		}
+		
+		</c:if>
 	
 	}
 
@@ -39,6 +44,7 @@
 		${notebookDTO.title}
 	</h1>
 
+	
 	<html:form action="/learning" method="post" onsubmit="return validateForm();">
 		<html:hidden property="dispatch" value="finishActivity" />
 		<html:hidden property="toolSessionID" />
