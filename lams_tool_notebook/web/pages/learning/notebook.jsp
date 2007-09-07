@@ -9,8 +9,8 @@
 		// disables the Finish button to avoid double submittion 
 		disableFinishButton();
 
- 	<c:if test='${mode != "author"}'>
-		// if this is preview mode, then we add these validation
+ 	<c:if test='${mode == "learner"}'>
+		// if this is learner mode, then we add this validation see (LDEV-1319)
 		
 		if (document.learningForm.entryText.value == "") {
 			
@@ -29,7 +29,7 @@
 			return true;
 		}
 		
-		</c:if>
+	</c:if>
 	
 	}
 
