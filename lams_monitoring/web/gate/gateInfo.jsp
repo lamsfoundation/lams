@@ -33,3 +33,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</strong>
 </p>
 
+
+		<%-- set to read only if in export portfolio --%>
+		<c:if test="${not GateForm.map.readOnly}"> 
+			<c:if test="${not GateForm.map.gate.gateOpen}" >
+				<html:form action="/gate?method=openGate" target="_self">
+					<p><html:submit styleClass="button"><fmt:message key="label.gate.open"/></html:submit></p>
+				</html:form>
+			</c:if>
+		</c:if>
+

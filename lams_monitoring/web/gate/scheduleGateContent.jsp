@@ -31,8 +31,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<h1><fmt:message key="label.schedule.gate.title"/></h1>
 
 		<%@ include file="gateInfo.jsp" %>
-		<p><fmt:message key="label.schedule.gate.open.message"/> <lams:Date value="${GateForm.map.startingTime}"/></p>
-
+		
+		<c:if test="${not GateForm.map.gate.gateOpen}" >
+			<p><fmt:message key="label.schedule.gate.open.message"/> <lams:Date value="${GateForm.map.startingTime}"/></p>
+		</c:if>
+		
 		<c:if test="${GateForm.map.endingTime!=null}">
 			<p><fmt:message key="label.schedule.gate.close.message"/> <lams:Date value="${GateForm.map.endingTime}"/></p>
 		</c:if>

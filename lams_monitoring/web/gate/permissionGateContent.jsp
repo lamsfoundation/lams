@@ -30,15 +30,9 @@
 		<h1><fmt:message key="label.permission.gate.title"/></h1>
 
 		<%@ include file="gateInfo.jsp" %>
-		<p><fmt:message key="label.gate.you.open.message"/>
-
-		<%-- set to read only if in export portfolio --%>
-		<c:if test="${not GateForm.map.readOnly}"> 
-			<c:if test="${not GateForm.map.gate.gateOpen}" >
-				<html:form action="/gate?method=openGate" target="_self">
-					<p><html:submit styleClass="button"><fmt:message key="label.gate.open"/></html:submit></p>
-				</html:form>
-			</c:if>
+		
+		<c:if test="${not GateForm.map.gate.gateOpen}" >
+			<p><fmt:message key="label.gate.you.open.message"/>
 		</c:if>
 
 		</p>
