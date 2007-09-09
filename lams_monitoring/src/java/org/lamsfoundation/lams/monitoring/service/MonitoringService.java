@@ -54,6 +54,7 @@ import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupBranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -556,7 +557,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     
     /**
      * <p>Pre-condition: This method must be called under the condition of the
-     * 					 existance of new lesson (without lesson class).</p>
+     * 					 the new lesson exists (without lesson class).</p>
      * <p>A lesson class record should be inserted and organization should be
      * 	  setup after execution of this service.</p> 
      * @param staffGroupName 
@@ -773,9 +774,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             log.debug("=============Lesson "+lessonId+" started===============");
     }
     
+    
+    
     /**
      * <p>Runs the system scheduler to start the scheduling for opening gate and
-     * closing gate. It invlovs a couple of steps to start the scheduler:</p>
+     * closing gate. It involves a couple of steps to start the scheduler:</p>
      * <li>1. Initialize the resource needed by scheduling job by setting 
      * 		  them into the job data map.
      * </li>
@@ -992,6 +995,20 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         GateActivity gate = (GateActivity)activityDAO.getActivityByActivityId(gateId);
         if ( gate != null ) {
         	gate.setGateOpen(new Boolean(true));
+        	
+        	// we un-schedule the gate from the scheduler if it's of a scheduled gate (LDEV-1271)
+        	if (gate.isScheduleGate()) {
+        	
+        		 try {
+					scheduler.unscheduleJob("openGateTrigger:" + gate.getActivityId(), Scheduler.DEFAULT_GROUP);
+				} catch (SchedulerException e) {
+					
+					throw new MonitoringServiceException("Error unscheduling trigger for gate activity id:"+ gate.getActivityId());	
+					
+				}
+        	
+        	}
+        	
         	activityDAO.update(gate);
         }
         return gate;
@@ -2025,7 +2042,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 				grouping = branchingActivity.getGrouping();
 				
 				group = lessonService.createGroup(grouping, branch.getTitle());
-				group.allocateBranchToGroup(null, branch, (BranchingActivity)branchingActivity);
+				group.allocateBranchToGroup(null,null, branch, (BranchingActivity)branchingActivity);
 				groupingDAO.update(group);
 				
 			} else {
