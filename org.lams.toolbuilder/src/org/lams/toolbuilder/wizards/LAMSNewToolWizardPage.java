@@ -35,6 +35,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 
 public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 	private Text toolName;
+	private Text toolSignature;
 	private Text vendor;
 	private Text compatibility;
 	private Text toolDisplayName;
@@ -77,6 +78,10 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 		namesGroup.setLayout(namesLayout);
 		namesGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+		createLabel(namesGroup,	"Tool Signature");
+		toolSignature = createText(namesGroup);
+
+		
 		// put the key field in the group
 		createLabel(namesGroup,	"Tool Display Name");
 		toolDisplayName = createText(namesGroup);
@@ -421,12 +426,12 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 	}
 
 	
-	
-	public String getToolName(){return toolName.getText();}
-	public String getVendor(){return vendor.getText();}
-	public String getToolDisplayName() {return toolDisplayName.getText();}
-	public String getCompatibility(){return compatibility.getText();}
-	public boolean getIsLams(){return LAMSButton.getSelection();}
-	public boolean getVisible(){return isVisible.getSelection();}
+	public String getToolSignature() {return toolSignature.getText().trim().toLowerCase();}
+	public String getToolName() {return toolName.getText().trim();}
+	public String getVendor() {return vendor.getText().trim();}
+	public String getToolDisplayName() {return toolDisplayName.getText().trim();}
+	public String getCompatibility() {return compatibility.getText().trim();}
+	public boolean getIsLams() {return LAMSButton.getSelection();}
+	public boolean getVisible() {return isVisible.getSelection();}
 
 }

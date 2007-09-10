@@ -48,6 +48,8 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 	// The handle to the new LAMS Tool Project to be created
 	private IProject projectHandle;
 	
+	
+	private static String toolSignature;
 	private static String toolName;
 	private static String vendor;
 	private static String compatibility;
@@ -86,6 +88,7 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		
 		//private static String toolName;
 		vendor = page.getVendor();
+		toolSignature = page.getToolSignature();
 		compatibility = page.getCompatibility();
 		toolDisplayName = page.getToolDisplayName();
 		isLAMS = page.getIsLams();
@@ -185,18 +188,10 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 			LamsToolBuilderLog.logError(e);
 		}
 		
-		RenameToolTaskList tasklist = new RenameToolTaskList(Constants.SUBMIT_TOOL_DIR, projHandle.getName(), toolDisplayName);
+		RenameToolTaskList tasklist = new RenameToolTaskList(Constants.SUBMIT_TOOL_DIR, toolSignature, toolDisplayName);
 		
 		List<String[]> commandList = tasklist.getTasklist();
-		/*commandList.add(new String[] {"lasbmt11",projHandle.getName()});
-		commandList.add(new String[] {"SubmitFiles",toolDisplayName.replaceAll(" ", "").trim()});
-		commandList.add(new String[] {"Submit Files",toolDisplayName.trim()});
-		commandList.add(new String[] {"sbmt",projHandle.getName().toLowerCase()});
-		commandList.add(new String[] {"Sbmt",projHandle.getName()});
-		commandList.add(new String[] {"Submit",toolDisplayName.replaceAll(" ", "").trim()});
-		commandList.add(new String[] {"submit",toolDisplayName.replaceAll(" ", "").trim()});
-		*/
-		
+
 		
 		RenameTool rt = new RenameTool();
 		LamsToolBuilderLog.logInfo(projHandle.getLocation().toPortableString());

@@ -30,7 +30,6 @@ public class RenameTool {
 
 	public RenameTool()
 	{
-		
 		txtType.add("clay");
 		txtType.add("classpath");
 		txtType.add("txt");

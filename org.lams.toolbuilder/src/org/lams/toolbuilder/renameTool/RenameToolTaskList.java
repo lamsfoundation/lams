@@ -99,26 +99,21 @@ public class RenameToolTaskList
 	
 	public void initSubmit() 
 	{
-		/*
-		 * lasbmt11
-		 * SubmitFiles
-		 * Submit Files
-		 * sbmt
-		 * Sbmt
-		 * Submit
-		 * submit
-		 */
-		
 		String submitClassPrefix = toJavaClassString(toolDispName);
 		String submitVariablePrefix = toJavaVariableString(toolDispName);
+		System.out.println("Java Class Prefix: " + submitClassPrefix);
+		System.out.println("Java Variable Prefix: " + submitVariablePrefix);
+		
 		
 		tasklist.add(new String[] {"lasbmt11", toolSig});
+		tasklist.add(new String[] {"TestSubmitFiles", "Test" + submitClassPrefix});
 		tasklist.add(new String[] {"SubmitFiles", submitClassPrefix});
-		tasklist.add(new String[] {"Submit Files",toolDispName});
+		tasklist.add(new String[] {"submitFiles", submitVariablePrefix});
+		tasklist.add(new String[] {"Submit Files", toolDispName});
+		tasklist.add(new String[] {"Submit",submitClassPrefix});
+		tasklist.add(new String[] {"submit",submitVariablePrefix});		
 		tasklist.add(new String[] {"sbmt",submitVariablePrefix});
 		tasklist.add(new String[] {"Sbmt",submitClassPrefix});
-		tasklist.add(new String[] {"Submit",submitClassPrefix});
-		tasklist.add(new String[] {"submit",submitVariablePrefix});
 		tasklist.add(new String[] {"Submission",submitClassPrefix});
 		tasklist.add(new String[] {"submission",submitVariablePrefix});
 	}
@@ -136,14 +131,15 @@ public class RenameToolTaskList
 	 */
 	public String toJavaClassString(String str)
 	{
+		String retStr = "";
 		str = str.trim();
 		String[] strs = str.split(" ");
 		
 		for (int i =0; i<strs.length; i++)
 		{
-			str += strs[i].substring(0, 1).toUpperCase() + strs[i].substring(1);
+			retStr += strs[i].substring(0, 1).toUpperCase() + strs[i].substring(1);
 		}
-		return str;
+		return retStr;
 	}
 	
 	/**
@@ -154,8 +150,18 @@ public class RenameToolTaskList
 	public String toJavaVariableString(String str)
 	{
 		str = str.trim();
-		str = str.substring(0, 1).toLowerCase() + toJavaClassString(str.substring(1));
-		return str;
+		String firstWord;
+		
+		if (str.contains(" "))
+		{
+			firstWord = str.substring(0, str.indexOf(" "));
+			firstWord = firstWord.substring(0, 1).toLowerCase() + firstWord.substring(1);
+			return firstWord + toJavaClassString(str.substring(str.indexOf(" ")));
+		}
+		else
+		{
+			return str.substring(0, 1).toLowerCase() + str.substring(1);
+		}
 	}
 	
 	
