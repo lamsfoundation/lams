@@ -1353,6 +1353,7 @@ public class ObjectExtractor implements IObjectExtractor {
     		sequenceActivity.setBranchEntries(new HashSet());
     	}
     	sequenceActivity.getBranchEntries().add(entry);
+    	activityDAO.update(sequenceActivity);
 
     	if ( group != null )
     		groupingDAO.update(group);
