@@ -75,7 +75,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
         //Set the labels
         groups_label.text = Dictionary.getValue('groupmatch_dlg_groups_lst_lbl');
         branches_label.text = Dictionary.getValue('groupmatch_dlg_branches_lst_lbl');
-        match_dgd_lbl.text = Dictionary.getValue('groupmatch_dlg_match_dgd_lbl');
+        match_dgd_lbl.text = Dictionary.getValue('branch_mapping_dlg_match_dgd_lbl');
 		
         //EVENTS
         //Add event listeners for ok, cancel and close buttons
@@ -107,10 +107,12 @@ class GroupMatchingDialog extends BranchMappingDialog {
 		branches_lst.maxHPosition = 200;
 		
 		var column_sequence:DataGridColumn = new DataGridColumn("sequenceName");
-		column_sequence.headerText = "Branch";
+		column_sequence.headerText = Dictionary.getValue("branch_mapping_dlg_branch_col_lbl");
+		column_sequence.width = match_dgd.width/2;
 		
 		var column_name:DataGridColumn = new DataGridColumn("groupName");
-		column_name.headerText = "Group";
+		column_name.headerText = Dictionary.getValue("branch_mapping_dlg_group_col_lbl");
+		column_name.width = match_dgd.width/2;
 		
 		match_dgd.addColumn(column_sequence);
 		match_dgd.addColumn(column_name);
@@ -168,7 +170,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
 					setupMatch(groups_lst.getItemAt(groups_lst.selectedIndices[i]), branches_lst.selectedItem);
 					selectedGroups.push(groups_lst.selectedIndices[i]);
 				} else {
-					LFMessage.showMessageAlert("No branch selected");
+					LFMessage.showMessageAlert(Dictionary.getValue("branch_mapping_no_branch_msg"));
 					return;
 				}
 				
@@ -181,7 +183,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
 			
 			
 		} else {
-			LFMessage.showMessageAlert("No groups selected");
+			LFMessage.showMessageAlert(Dictionary.getValue("branch_mapping_no_groups_msg"));
 		}
 	}
 	
@@ -207,7 +209,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
 			app.getCanvas().ddm.removeBranchMapping(rItem.entryUIID);
 			
 		} else {
-			LFMessage.showMessageAlert("No match selected");
+			LFMessage.showMessageAlert(Dictionary.getValue("branch_mapping_no_mapping_msg"));
 		}
 		
 	}

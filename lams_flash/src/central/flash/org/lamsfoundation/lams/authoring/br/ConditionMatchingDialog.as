@@ -77,7 +77,7 @@ class ConditionMatchingDialog extends BranchMappingDialog {
         //Set the labels
         conditions_label.text = Dictionary.getValue('condmatch_dlg_cond_lst_lbl');
         branches_label.text = Dictionary.getValue('groupmatch_dlg_branches_lst_lbl');
-        match_dgd_lbl.text = Dictionary.getValue('groupmatch_dlg_match_dgd_lbl');
+        match_dgd_lbl.text = Dictionary.getValue('branch_mapping_dlg_match_dgd_lbl');
 		
         //EVENTS
         //Add event listeners for ok, cancel and close buttons
@@ -109,10 +109,12 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 		branches_lst.maxHPosition = 200;
 		
 		var column_sequence:DataGridColumn = new DataGridColumn("sequenceName");
-		column_sequence.headerText = "Branch";
+		column_sequence.headerText = Dictionary.getValue("branch_mapping_dlg_branch_col_lbl");
+		column_sequence.width = match_dgd.width/2;
 		
 		var column_condition:DataGridColumn = new DataGridColumn("displayName");
-		column_condition.headerText = "Condition";
+		column_condition.headerText = Dictionary.getValue("branch_mapping_dlg_condition_col_lbl");
+		column_condition.width = match_dgd.width/2;
 		
 		match_dgd.addColumn(column_sequence);
 		match_dgd.addColumn(column_condition);
@@ -158,7 +160,7 @@ class ConditionMatchingDialog extends BranchMappingDialog {
         
 		// check for any remaining conditions
 		if(conditions_lst.length > 0) {
-			LFMessage.showMessageAlert("All remaining conditions will be mapped to the default branch", Proxy.create(this, cleanupUnmappedConditions));
+			LFMessage.showMessageAlert(Dictionary.getValue("branch_mapping_auto_condition_msg"), Proxy.create(this, cleanupUnmappedConditions));
 		} else {
 			//close popup
 			_container.deletePopUp();
@@ -199,7 +201,7 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 					setupMatch(conditions_lst.getItemAt(conditions_lst.selectedIndices[i]), branches_lst.selectedItem);
 					selectedConditions.push(conditions_lst.selectedIndices[i]);
 				} else {
-					LFMessage.showMessageAlert("No branch selected");
+					LFMessage.showMessageAlert(Dictionary.getValue("branch_mapping_no_branch_msg"));
 					return;
 				}
 				
@@ -212,7 +214,7 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 			
 			
 		} else {
-			LFMessage.showMessageAlert("No condition selected");
+			LFMessage.showMessageAlert(Dictionary.getValue("branch_mapping_no_condition_msg"));
 		}
 	}
 	
@@ -238,7 +240,7 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 			app.getCanvas().ddm.removeBranchMapping(rItem.entryUIID);
 			
 		} else {
-			LFMessage.showMessageAlert("No match selected");
+			LFMessage.showMessageAlert(Dictionary.getValue("branch_mapping_no_branch_msg"));
 		}
 		
 	}

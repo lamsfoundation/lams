@@ -196,9 +196,9 @@ class PropertyInspectorControls extends MovieClip {
 		_group_naming_btn.label = Dictionary.getValue('pi_group_naming_btn_lbl');
 		_tool_output_match_btn.label = Dictionary.getValue('pi_tomatch_btn_lbl');
 		_conditions_setup_btn.label = Dictionary.getValue('pi_condmatch_btn_lbl');
-		
+
 		// Branch 
-		_pi_defaultBranch_cb.label = Dictionary.getValue("_pi_defaultBranch_cb_lbl");
+		_pi_defaultBranch_cb.label = Dictionary.getValue("pi_defaultBranch_cb_lbl");
 		
 		//populate the synch type combo:
 		gateType_cmb.dataProvider = Activity.getGateActivityTypes();
@@ -207,6 +207,7 @@ class PropertyInspectorControls extends MovieClip {
 		
 		//Call to apply style to all the labels and input fields
 		setStyles();
+		setButtonSizes();
 		
 		//fire event to say we have loaded
 		delete this.onEnterFrame; 
@@ -226,6 +227,28 @@ class PropertyInspectorControls extends MovieClip {
 		showGeneralInfo(true);
 		
 		dispatchEvent({type:'load',target:this});
+	}
+	
+	private function setButtonSizes():Void {
+		var offset:Number = 10;
+		this.createTextField("btn_text", this.getNextHighestDepth(), -100, -100, 10, 18); 
+		var btn_text = this["btn_text"]
+		btn_text.autoSize = true;
+		btn_text.html = true;
+		
+		btn_text.htmlText = _group_match_btn.label;
+		_group_match_btn.setSize(btn_text.textWidth + offset, 22);
+		
+		btn_text.htmlText = _group_naming_btn.label;
+		_group_naming_btn.setSize(btn_text.textWidth + offset, 22);
+		
+		btn_text.htmlText = _tool_output_match_btn.label;
+		_tool_output_match_btn.setSize(btn_text.textWidth + offset, 22);
+		
+		btn_text.htmlText = _conditions_setup_btn.label;
+		_conditions_setup_btn.setSize(btn_text.textWidth + offset, 22);
+		
+		btn_text.removeTextField();
 	}
 	
 	private function hideAllSteppers(v):Void{ 
@@ -1012,7 +1035,7 @@ class PropertyInspectorControls extends MovieClip {
 	private function onGroupMatchClick(evt:Object){
 		
 		// open group to branch matching window
-		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('groupmatch_dlg_title_lbl'), closeButton:true, viewResize:false, scrollContentPath:'GroupMatchingDialog'});
+		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('groupmatch_dlg_title_lbl'), closeButton:true, resize:false, scrollContentPath:'GroupMatchingDialog'});
 		_app.dialog.addEventListener('contentLoaded', Delegate.create(this, groupMatchDialogLoaded));
 		
 		setModified();
@@ -1021,7 +1044,7 @@ class PropertyInspectorControls extends MovieClip {
 	private function onGroupNamingClick(evt:Object){
 		
 		// open group to branch matching window
-		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('groupnaming_dlg_title_lbl'), closeButton:true, viewResize:false, scrollContentPath:'GroupNamingDialog'});
+		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('groupnaming_dlg_title_lbl'), closeButton:true, resize:false, scrollContentPath:'GroupNamingDialog'});
 		_app.dialog.addEventListener('contentLoaded', Delegate.create(this, GroupNamingDialogLoaded));
 		
 		setModified();
@@ -1033,7 +1056,7 @@ class PropertyInspectorControls extends MovieClip {
 	
 	private function onConditionMatchClick(evt:Object){
 		// open group to branch matching window
-		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('condmatch_dlg_title_lbl'), closeButton:true, viewResize:false, scrollContentPath:'ConditionMatchingDialog'});
+		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('condmatch_dlg_title_lbl'), closeButton:true, resize:false, scrollContentPath:'ConditionMatchingDialog'});
 		_app.dialog.addEventListener('contentLoaded', Delegate.create(this, ConditionMatchDialogLoaded));
 		
 		setModified();

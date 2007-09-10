@@ -104,7 +104,7 @@ class BranchMappingDialog extends MovieClip implements Dialog {
         themeManager = ThemeManager.getInstance();
         
         //Set the text for buttons
-        close_btn.label = "Done";
+        close_btn.label = Dictionary.getValue("al_done");
 		
         //get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
         fm = _container.getFocusManager();
@@ -113,7 +113,7 @@ class BranchMappingDialog extends MovieClip implements Dialog {
         //work out offsets from bottom RHS of panel
         xOkOffset = panel._width - close_btn._x;
         yOkOffset = panel._height - close_btn._y;
-        
+		
         //Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
         setStyles();

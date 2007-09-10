@@ -159,13 +159,13 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     }
 	
 	private function setLabels(){
-		_condition_range_lbl.text = "Set Range:";
-		_condition_from_lbl.text = "From:";
-		_condition_to_lbl.text = "To:";
+		_condition_range_lbl.text = Dictionary.getValue("to_conditions_dlg_range_lbl");
+		_condition_from_lbl.text = Dictionary.getValue("to_conditions_dlg_from_lbl");
+		_condition_to_lbl.text = Dictionary.getValue("to_conditions_dlg_to_lbl");
 		
-		add_btn.label = "+ Add";
-		clear_all_btn.label = "Clear All";
-		remove_item_btn.label = "- Remove";
+		add_btn.label = Dictionary.getValue("to_conditions_dlg_add_btn_lbl");
+		clear_all_btn.label = Dictionary.getValue("to_conditions_dlg_clear_all_btn_lbl");
+		remove_item_btn.label = Dictionary.getValue("to_conditions_dlg_remove_item_btn_lbl");
 	
 		//Set the text for buttons
         close_btn.label = Dictionary.getValue('al_done');
@@ -211,10 +211,12 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		var column_name:DataGridColumn = new DataGridColumn("conditionName");
 		column_name.headerText = "Name";
 		column_name.editable = true;
+		column_name.width = _condition_item_dgd.width*0.4;
 		
 		var column_value:DataGridColumn = new DataGridColumn("conditionValue");
 		column_value.headerText = "Condition";
 		column_value.editable = false;
+		column_value.width = _condition_item_dgd.width*0.6;
 		
 		_condition_item_dgd.addColumn(column_name);
 		_condition_item_dgd.addColumn(column_value);
@@ -276,9 +278,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		switch(condition.type) {
 			case ToolOutputDefinition.LONG :
 				if(condition.startValue != null && condition.endValue != null)
-					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.startValue) + " TO " + String(condition.endValue), data: condition});
+					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value", [String(condition.startValue), String(condition.endValue)]), data: condition});
 				else
-					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: "exact(" + String(condition.exactMatchValue) + ")", data: condition});
+					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_exact", [String(condition.exactMatchValue)]), data: condition});
 				
 				break;
 			case ToolOutputDefinition.BOOL: 
@@ -416,8 +418,18 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		//Size the panel
         _bgpanel.setSize(w,h);
 
-        //Buttons
+		_condition_item_dgd._width = w - 2*_condition_item_dgd._x;
+		_condition_item_dgd.getColumnAt(0).width = _condition_item_dgd.width*0.4;
+        _condition_item_dgd.getColumnAt(1).width = _condition_item_dgd.width*0.6;
+        
+		_toolOutputDefin_cmb._width = w - 2*_toolOutputDefin_cmb._x;
+		
+		//Buttons
+		remove_item_btn._x = _condition_item_dgd._x + _condition_item_dgd.width - remove_item_btn.width;
+		clear_all_btn._x = remove_item_btn._x - clear_all_btn.width - 5;
+		
         close_btn.move(w-xOkOffset,h-yOkOffset);
+		cancel_btn.move(close_btn._x - cancel_btn.width - 5, h-yOkOffset);
 		
     }
     
