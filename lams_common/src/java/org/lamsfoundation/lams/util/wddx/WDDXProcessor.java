@@ -397,7 +397,8 @@ public class WDDXProcessor {
 		}
 	}
 	
-   	/** Convert a string to an string. 
+   	/** Convert an object to an string. If it isn't a string already, uses toString(). 
+   	 * There is the odd case where we may wish to convert a number to a string.
      * If it gets any of the NULL value objects (see WDDXTAGS) then it will return null
      * 
 	 * @param identifier - name of value being converted - using in the exception thrown
@@ -414,7 +415,11 @@ public class WDDXProcessor {
 		}
 		
 		try {
-			return (String) value;
+			if ( value instanceof String ) {
+				return (String) value;
+			} else {
+				return value.toString();
+			}
 		} catch ( Exception e2) {
 			throw new WDDXProcessorConversionException("Unable to convert value "+identifier+":"+value+" to an String");
 		}
