@@ -1825,7 +1825,8 @@ public class McServicePOJO implements
 		
 		TreeMap<String,ToolOutput> output = new TreeMap<String, ToolOutput>();
 		if ( names == null || names.contains(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK) ) {
-			McQueUsr queUser = getMcUserBySession(learnerId, toolSessionId);
+			McSession session = findMcSessionById(toolSessionId);
+			McQueUsr queUser = getMcUserBySession(learnerId, session.getUid());
 			Long mark = queUser != null ? queUser.getLastAttemptTotalMark() : new Long(0);
 			ToolOutput toolOutput = new ToolOutput(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, 
 					MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, mark);
@@ -1841,7 +1842,8 @@ public class McServicePOJO implements
 	public ToolOutput getToolOutput(String name, Long toolSessionId,
 			Long learnerId) {
 		if ( name != null && name.equals(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK) ) {
-			McQueUsr queUser = getMcUserBySession(learnerId, toolSessionId);
+			McSession session = findMcSessionById(toolSessionId);
+			McQueUsr queUser = getMcUserBySession(learnerId, session.getUid());
 			Long mark = queUser != null ? queUser.getLastAttemptTotalMark() : new Long(0);
 			return new ToolOutput(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, 
 					MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, mark);
