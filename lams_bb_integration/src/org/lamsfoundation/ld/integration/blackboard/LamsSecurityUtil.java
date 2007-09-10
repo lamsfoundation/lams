@@ -158,11 +158,13 @@ public class LamsSecurityUtil {
 			
 			HttpURLConnection httpConn = (HttpURLConnection)conn;
 			
+			
 			if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
 				logger.error("HTTP Response Code: " + httpConn.getResponseCode() 
 						+ ", HTTP Response Message: " + httpConn.getResponseMessage());
 				return "error";
 			}
+			
 			
 			//InputStream is = url.openConnection().getInputStream();
 			InputStream is = conn.getInputStream();
