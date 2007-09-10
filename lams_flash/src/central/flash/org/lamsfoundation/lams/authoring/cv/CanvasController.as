@@ -309,7 +309,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				} else if(ca.activity.isBranchingActivity()) {
 					Debugger.log('activityDoubleClick CanvasBranchActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick','CanvasController');
 	   
-					_canvasModel.openBranchActivityContent(ca);
+					_canvasModel.openBranchActivityContent(ca, true);
 					
 					// invalidate design after opening tool content window
 					_canvasModel.getCanvas().ddm.validDesign = false;
@@ -597,6 +597,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			var p = new Point(_canvasModel.activeView.content._xmouse-(toolActWidth/2), _canvasModel.activeView.content._ymouse-(toolActHeight/2)); 
 			_canvasModel.createNewBranchActivity(Activity.CHOOSEN_BRANCHING_ACTIVITY_TYPE,p,parent);
 			_canvasModel.getCanvas().stopBranchTool();
+			_canvasModel.lastBranchActionType = CanvasModel.ADD_FROM_TEMPLATE;
+			
 		}
 		
 	}

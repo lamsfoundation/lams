@@ -108,6 +108,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var authorMenu:ContextMenu;
 	
 	private var _branchView:CanvasBranchView;
+	private var _setupBranchView:Boolean;
 	
 	function CanvasActivity(_connector){
 		_tm = ThemeManager.getInstance();
@@ -418,6 +419,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			bgNegative = "true"
 			setStyles();
 		}
+		
+		if(setupBranchView)
+			_canvasModel.openBranchActivityContent(this, false);
+					
 	}
 
 	
@@ -649,6 +654,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		_branchView = a;
 	}
 	
-    
+	public function get setupBranchView():Boolean {
+		return _setupBranchView;
+	}
+	
+	public function set setupBranchView(a:Boolean):Void {
+		_setupBranchView = a;
+	}
 
 }

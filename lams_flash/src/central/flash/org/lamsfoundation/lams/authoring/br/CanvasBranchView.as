@@ -76,6 +76,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private var _defaultSequenceActivity:SequenceActivity;
 	private var _fingerprint:MovieClip;
 	
+	private var _open:Boolean;
+	
 	/**
 	* Constructor
 	*/
@@ -215,10 +217,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		setStyles();
 		setSize(_cm);
 		
-		this._visible = true;
+		if(_open) {
+			this._visible = true;
 		
-        //Dispatch load event 
-        dispatchEvent({type:'load',target:this});
+			//Dispatch load event 
+			dispatchEvent({type:'load',target:this});
+		}
 	}
 	
 	private function setupConnectorHubs() {
@@ -260,13 +264,14 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	}
 	
 	private function open():Void {
+		Debugger.log("calling open: " + _open, Debugger.CRITICAL, "open", " CanvasBranchView");
 		_cm.getCanvas().addBin(this.activityLayer);
-		
+			
 		setSize(_cm);
-		
+			
 		mx.transitions.TransitionManager.start(this,
 					{type:mx.transitions.Zoom, 
-					 direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
+						direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
 		
 		getController().activityRelease(this.startHub);
 	}
@@ -631,4 +636,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
     public function defaultController (model:Observable):Controller {
         return new CanvasController(model);
     }
+	
+	public function setOpen(a:Boolean):Void {
+		_open = a;
+	}
 }

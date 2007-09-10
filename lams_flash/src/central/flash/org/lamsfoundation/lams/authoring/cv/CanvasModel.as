@@ -72,6 +72,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	private var _currentBranchingActivity:Object;
 	private var _activeView:Object;
+	
+	private var _lastBranchActionType:Number;
+	public static var OPEN_FROM_FILE:Number = 0;
+	public static var ADD_FROM_TEMPLATE:Number = 1;
 
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -94,6 +98,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		_activeTool = "none";
 		_activeView = null;
 		_currentBranchingActivity = null;
+		_lastBranchActionType = null;
 		
 		_autoSaveWait = false;
 		_connectionActivities = new Array();
@@ -1339,13 +1344,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log('ta:'+ta.title+',toolContentID:'+ta.toolContentID+', activityUIID:'+ta.activityUIID,Debugger.GEN,'setDefaultToolContentID','CanvasModel');
 	}
 	
-	public function openBranchActivityContent(ba):Void {
+	public function openBranchActivityContent(ba, visible:Boolean):Void {
 		currentBranchingActivity = ba;
 		
+		if(visible == null) visible = true;
+		Debugger.log("visible: " + visible, Debugger.CRITICAL, "openBranchActivityContent", "CanvasModel");
+		
 		if(ba.branchView != null) {
-			activeView = ba.branchView;
+			activeView = (visible) ? ba.branchView : activeView;
+			ba.branchView.setOpen(visible);
 			ba.branchView.open();
-		} else { _cv.openBranchView(currentBranchingActivity); }
+		} else { _cv.openBranchView(currentBranchingActivity, visible); }
+		
+		_lastBranchActionType = null;
 	}
 	
 	public function get currentBranchingActivity():Object {
@@ -1515,4 +1526,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		_autoSaveWait = autoSaveWait;
 	}
 	
+	public function set lastBranchActionType(a:Number):Void {
+		_lastBranchActionType = a;
+	}
+	
+	public function get lastBranchActionType():Number {
+		return _lastBranchActionType;
+	}
 }

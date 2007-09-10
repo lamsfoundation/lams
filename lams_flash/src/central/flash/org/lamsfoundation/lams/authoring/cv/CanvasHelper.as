@@ -148,6 +148,7 @@ class CanvasHelper {
 			checkValidDesign();
 			checkReadOnlyDesign();
 			canvasModel.setDesignTitle();
+			canvasModel.lastBranchActionType = CanvasModel.OPEN_FROM_FILE;
 			canvasModel.setDirty();
 			LFMenuBar.getInstance().enableExport(!canvasModel.autoSaveWait);
 		
@@ -512,12 +513,13 @@ class CanvasHelper {
 		
 	}
 	
-	public function openBranchView(ba){
+	public function openBranchView(ba, visible:Boolean){
 		
 		var cx:Number = ba._x + ba.getVisibleWidth()/2;
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
+		var isVisible:Boolean = (visible == null) ? true : visible;
 		
-		var _branchView_mc:MovieClip = _canvasView_mc.content.createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba});	
+		var _branchView_mc:MovieClip = _canvasView_mc.content.createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
 		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
 		branchView.init(canvasModel,undefined);
 		
