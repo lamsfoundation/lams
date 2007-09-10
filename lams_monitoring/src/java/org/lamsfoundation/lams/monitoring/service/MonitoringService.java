@@ -1001,8 +1001,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         		 try {
 					scheduler.unscheduleJob("openGateTrigger:" + gate.getActivityId(), Scheduler.DEFAULT_GROUP);
 				} catch (SchedulerException e) {
-					
-					throw new MonitoringServiceException("Error unscheduling trigger for gate activity id:"+ gate.getActivityId());	
+					log.error("Error unscheduling trigger for gate activity id:"+ gate.getActivityId(), e);
+					throw new MonitoringServiceException("Error unscheduling trigger for gate activity id:"+ gate.getActivityId(), e);	
 					
 				}
         	
