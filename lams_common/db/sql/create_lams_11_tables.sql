@@ -583,7 +583,6 @@ CREATE TABLE lams_branch_condition (
      , start_value VARCHAR(255)
      , end_value VARCHAR(255)
      , exact_match_value VARCHAR(255)
-     , entry_id BIGINT(20) NOT NULL
      , PRIMARY KEY (condition_id)
 )TYPE=InnoDB;
 
