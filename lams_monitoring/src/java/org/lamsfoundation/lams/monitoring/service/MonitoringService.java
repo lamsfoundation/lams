@@ -416,7 +416,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
                                                                                   workspaceFolder,
                                                                                   true);
         
-		copiedLearningDesign.setTitle(newName);
+        // clear the live edit flag
+        copiedLearningDesign.setEditOverrideLock(false);
+        
+        copiedLearningDesign.setTitle(newName);
 		
         authoringService.saveLearningDesign(copiedLearningDesign);
         
