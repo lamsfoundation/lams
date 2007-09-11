@@ -57,3 +57,4 @@ insert into lams_configuration (config_key, config_value) values ('LDAPGroupMana
 insert into lams_configuration (config_key, config_value) values ('LDAPUpdateOnLogin', 'true');
 insert into lams_configuration (config_key, config_value) values ('LDAPOrgField', 'code');
 insert into lams_configuration (config_key, config_value) values ('LDAPOnlyOneOrg', 'true');
+insert into lams_configuration (config_key, config_value) values ('LDAPEncryptPasswordFromBrowser', 'false');

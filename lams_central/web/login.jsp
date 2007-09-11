@@ -32,6 +32,7 @@
 flash is searching for this string, so leave it!:
 j_security_login_page
 -->
+<c:set var="encrypt"><%= Configuration.getAsBoolean(ConfigurationKeys.LDAP_ENCRYPT_PASSWORD_FROM_BROWSER) %></c:set>
 <lams:head>
 	<title><fmt:message key="title.login.window"/></title>
 	<lams:css  style="core"/>
@@ -46,8 +47,10 @@ j_security_login_page
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/sha1.js"></script>
 	<script>
 		function submitForm(){
-			  var password=document.loginForm.j_password.value;	 
+			  var password=document.loginForm.j_password.value;
+			  <c:if test="${encrypt eq 'true'}">
 			  document.loginForm.j_password.value=hex_sha1(password);
+			  </c:if>
 			  document.loginForm.submit();
 		}
 		

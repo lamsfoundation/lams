@@ -184,4 +184,6 @@ public class ConfigurationKeys {
 	public static String LDAP_ORG_FIELD = "LDAPOrgField";
 	
 	public static String LDAP_ONLY_ONE_ORG = "LDAPOnlyOneOrg";
+	
+	public static String LDAP_ENCRYPT_PASSWORD_FROM_BROWSER = "LDAPEncryptPasswordFromBrowser";
 }

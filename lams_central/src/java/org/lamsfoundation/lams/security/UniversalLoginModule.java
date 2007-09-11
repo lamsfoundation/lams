@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.usermanagement.service.LdapService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
@@ -150,6 +151,11 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 						user = service.getUserByLogin(username);
 					} else if (AuthenticationMethodType.LAMS.equals(type)) {
 						DatabaseAuthenticator authenticator = new DatabaseAuthenticator(dsJndiName, principalsQuery);
+						// if the password is not encrypted when sent from the jsp (e.g. when it is passed
+						// unencrypted to say, ldap) then encrypt it here when authenticating against local db
+						if (!Configuration.getAsBoolean(ConfigurationKeys.LDAP_ENCRYPT_PASSWORD_FROM_BROWSER)) {
+							inputPassword = HashUtil.sha1(inputPassword);
+						}
 						isValid = authenticator.authenticate(username,inputPassword);
 					} else if (AuthenticationMethodType.WEB_AUTH.equals(type)) {
 						WebAuthAuthenticator authenticator = new WebAuthAuthenticator();
