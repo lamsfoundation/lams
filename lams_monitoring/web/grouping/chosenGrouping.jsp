@@ -91,6 +91,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				} catch (e) {
 						alert(e);
 				}
+				groupRequest.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
 				groupRequest.send(null);
 			} else if (window.ActiveXObject) { // IE
 				groupRequest = new ActiveXObject("Microsoft.XMLHTTP");
@@ -134,6 +135,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				} catch (e) {
 					alert(e);
 				}
+				nonmembersRequest.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
 				nonmembersRequest.send(null);
 			} else if (window.ActiveXObject) { // IE
 				nonmembersRequest = new ActiveXObject("Microsoft.XMLHTTP");
@@ -177,6 +179,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				} catch (e) {
 					alert(e);
 				}
+				memberRequest.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
 				memberRequest.send(null);
 			} else if (window.ActiveXObject) { // IE
 				memberRequest = new ActiveXObject("Microsoft.XMLHTTP");
@@ -215,16 +218,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				alert("<fmt:message key="error.grouping.add.group"/>");
 				document.getElementById("newgroupname").focus();
 			}else{
-				url="<lams:WebAppURL/>/grouping.do?method=addGroup&activityID=<c:out value="${activityID}"/>&name="+document.getElementById("newgroupname").value;
+				
+				url="<lams:WebAppURL/>/grouping.do";
+				var params = "method=addGroup&activityID=<c:out value="${activityID}"/>&name="+document.getElementById("newgroupname").value;
+				
 				if (window.XMLHttpRequest) { // Non-IE browsers
 						addgrpRequest = new XMLHttpRequest();
 						addgrpRequest.onreadystatechange = grpAdded;
 						try {
-								addgrpRequest.open("GET", url, true);
+								addgrpRequest.open("POST", url, true);
 						} catch (e) {
 								alert(e);
 						}
-						addgrpRequest.send(null);
+						addgrpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+						addgrpRequest.setRequestHeader("Content-length", params.length);
+						addgrpRequest.setRequestHeader("Connection", "close");
+						addgrpRequest.send(params);
 				} else if (window.ActiveXObject) { // IE
 						addgrpRequest = new ActiveXObject("Microsoft.XMLHTTP");
 						if (addgrpRequest) {
@@ -262,6 +271,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						} catch (e) {
 								alert(e);
 						}
+						rmgrpRequest.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
 						rmgrpRequest.send(null);
 				} else if (window.ActiveXObject) { // IE
 						rmgrpRequest = new ActiveXObject("Microsoft.XMLHTTP");
@@ -308,6 +318,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					} catch (e) {
 							alert(e);
 					}
+					addmbrs.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
 					addmbrsRequest.send(null);
 			} else if (window.ActiveXObject) { // IE
 					addmbrsRequest = new ActiveXObject("Microsoft.XMLHTTP");
@@ -358,6 +369,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					} catch (e) {
 							alert(e);
 					}
+					rmmbrsRequest.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
 					rmmbrsRequest.send(null);
 			} else if (window.ActiveXObject) { // IE
 					rmmbrsRequest = new ActiveXObject("Microsoft.XMLHTTP");
