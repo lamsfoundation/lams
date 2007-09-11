@@ -425,7 +425,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		_toolOutputDefin_cmb._width = w - 2*_toolOutputDefin_cmb._x;
 		
 		//Buttons
-		remove_item_btn._x = _condition_item_dgd._x + _condition_item_dgd.width - remove_item_btn.width;
+		
+		remove_item_btn._x = _condition_item_dgd._x + _condition_item_dgd._width - remove_item_btn.width;
 		clear_all_btn._x = remove_item_btn._x - clear_all_btn.width - 5;
 		
         close_btn.move(w-xOkOffset,h-yOkOffset);

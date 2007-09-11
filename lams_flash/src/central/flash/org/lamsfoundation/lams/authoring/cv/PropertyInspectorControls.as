@@ -515,6 +515,8 @@ class PropertyInspectorControls extends MovieClip {
 			if(e != null) {
 				numGroups_lbl.enabled = e;
 				_group_naming_btn.enabled = e;
+			} else {
+				_group_naming_btn.enabled = false;
 			}
 			
 		} else if(g.groupingTypeID == Grouping.RANDOM_GROUPING) {
@@ -538,6 +540,8 @@ class PropertyInspectorControls extends MovieClip {
 				numGroups_rdo.enabled = e;
 				
 				_group_naming_btn.enabled = e;
+			} else {
+				_group_naming_btn.enabled = false;
 			}
 			
 			checkGroupRadioOptions(e);
@@ -603,17 +607,17 @@ class PropertyInspectorControls extends MovieClip {
 			g.numberOfGroups = 0;
 			
 			numRandomGroups_stp.enabled = false;
-			numLearners_stp.enabled = e&&true;
+			numLearners_stp.enabled = (e != null) ? e&&true : true;
 			
 			_group_naming_btn.enabled = false;
 		}else{
-			numRandomGroups_stp.enabled = e&&true;
+			numRandomGroups_stp.enabled = (e != null) ? e&&true : true;
 			numLearners_stp.value = 0;
 			g.learnersPerGroups = 0;
 			
 			numLearners_stp.enabled = false;
 			
-			_group_naming_btn.enabled = (e != null && numRandomGroups_stp.value > 0) ? e&&true : false;
+			_group_naming_btn.enabled = (e != null) ? e&&(numRandomGroups_stp.value > 0) : (numRandomGroups_stp.value > 0);
 		}
 		
 		//this is a crazy hack to stop the steppter dissapearing after its .enabled property is set.
@@ -624,10 +628,14 @@ class PropertyInspectorControls extends MovieClip {
 	
 	private function checkGroupRadioOptions(e:Boolean) {
 		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
+		Debugger.log("checking group radio options: " + g.numberOfGroups, Debugger.CRITICAL, "checkGroupRadioOptions", "PIC*");
 		
-		if(g.numberOfGroups > 0 && g.learnersPerGroups <= 0) { numGroups_rdo.selected = true; _group_naming_btn.enabled = e&&true; }
-		else if(g.learnersPerGroups > 0 && g.numberOfGroups <= 0) { numLearners_rdo.selected = true; _group_naming_btn.enabled = false; }
-		else { numGroups_rdo.selected = true; _group_naming_btn.enabled = false; }
+		if(g.numberOfGroups > 0 && g.learnersPerGroups <= 0) 
+			{ numGroups_rdo.selected = true; _group_naming_btn.enabled = (e != null) ? e&&true : true; }
+		else if(g.learnersPerGroups > 0 && g.numberOfGroups <= 0) 
+			{ numLearners_rdo.selected = true; _group_naming_btn.enabled = false; }
+		else 
+			{ numGroups_rdo.selected = true; _group_naming_btn.enabled = false; }
 	}
 	
 	public function reDrawTroublesomeSteppersLater(){
@@ -667,10 +675,9 @@ class PropertyInspectorControls extends MovieClip {
 		
 		Debugger.log("updating grouping method data: " + g.groupingUIID, Debugger.CRITICAL, "updateGroupingMethodData", "PropertyInspectorControls");
 		
-		if(!_canvasController.isBusy && evt.type == 'focusOut') {
+		if(!_canvasController.isBusy() && evt.type == 'focusOut') {
 			if(_canvasModel.getCanvas().ddm.hasBranchMappingsForGroupingUIID(g.groupingUIID)) {
 				_canvasController.setBusy();
-			
 				LFMessage.showMessageConfirm("Warning: Existing Group-to-Branch mappings may be effected by your change. Do you wish to continue?", Proxy.create(this, doUpdateGroupingMethodData, g), Proxy.create(this, retainOldGroupingMethodData), "Yes", "No",  "Warning");
 			} else {
 				doUpdateGroupingMethodData(g);
@@ -688,7 +695,12 @@ class PropertyInspectorControls extends MovieClip {
 			numGroups_stp.value = 0;
 			g.maxNumberOfGroups = 0;
 			
+			Debugger.log("groups: " + g.numberOfGroups, Debugger.CRITICAL, "doUpdateGroupingMethodData", "PIC*");
+			
 			_group_naming_btn.enabled = (numRandomGroups_stp.value > 0) ? true : false;
+			
+			Debugger.log("enabled: " + _group_naming_btn.enabled, Debugger.CRITICAL, "doUpdateGroupingMethodData", "PIC*");
+			
 			
 		}else{
 			g.maxNumberOfGroups = numGroups_stp.value;
