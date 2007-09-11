@@ -321,7 +321,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					} catch (e) {
 							alert(e);
 					}
-					addmbrs.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
+					addmbrsRequest.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
 					addmbrsRequest.send(null);
 			} else if (window.ActiveXObject) { // IE
 					addmbrsRequest = new ActiveXObject("Microsoft.XMLHTTP");
