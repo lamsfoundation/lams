@@ -5,6 +5,8 @@
 <%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ page import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod" %>
 
 <html:form action="/saveprofile.do" method="post">
 <html:hidden property="userId" />
@@ -22,7 +24,11 @@
 <div class="shading-bg">
 
 <table>
-	
+
+<c:set var="authenticationMethodId"><lams:user property="authenticationMethodId"/></c:set>
+<c:set var="dbId"><%= AuthenticationMethod.DB %></c:set>
+<c:if test="${authenticationMethodId eq dbId}">	
+
     <tr>
 		<td class="align-right"><fmt:message key="label.username"/>:</td>
 		<td><bean:write name="UserForm" property="login" /></td>
@@ -87,6 +93,78 @@
 		<td class="align-right"><fmt:message key="label.fax"/>:</td>
 		<td><html:text property="fax" size="50" maxlength="64" /></td>
 	</tr>
+	
+</c:if>
+
+<c:if test="${authenticationMethodId != dbId}">	
+
+    <tr>
+		<td class="align-right"><fmt:message key="label.username"/>:</td>
+		<td><bean:write name="UserForm" property="login" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.title"/>:</td>
+		<td><html:text property="title" size="32" maxlength="32" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.first_name"/> *:</td>
+		<td><html:text property="firstName" size="50" maxlength="128" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.last_name"/> *:</td>
+		<td><html:text property="lastName" size="50" maxlength="128" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.email"/> *:</td>
+		<td><html:text property="email" size="50" maxlength="128" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.address_line_1"/>:</td>
+		<td><html:text property="addressLine1" size="50" maxlength="64" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.address_line_2"/>:</td>
+		<td><html:text property="addressLine2" size="50" maxlength="64" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.address_line_3"/>:</td>
+		<td><html:text property="addressLine3" size="50" maxlength="64" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.city"/>:</td>
+		<td><html:text property="city" size="50" maxlength="64" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.state"/>:</td>
+		<td><html:text property="state" size="50" maxlength="64" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.postcode"/>:</td>
+		<td><html:text property="postcode" size="10" maxlength="10" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.country"/>:</td>
+		<td><html:text property="country" size="50" maxlength="64" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.day_phone"/>:</td>
+		<td><html:text property="dayPhone" size="50" maxlength="64" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.evening_phone"/>:</td>
+		<td><html:text property="eveningPhone" size="50" maxlength="64" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.mobile_phone"/>:</td>
+		<td><html:text property="mobilePhone" size="50" maxlength="64" disabled="true" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.fax"/>:</td>
+		<td><html:text property="fax" size="50" maxlength="64" disabled="true" /></td>
+	</tr>
+	
+</c:if>
+	
 	<tr>
 		<td class="align-right"><fmt:message key="label.language"/>:</td>
 		<td>
