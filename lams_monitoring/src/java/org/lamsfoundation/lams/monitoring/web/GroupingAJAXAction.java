@@ -99,9 +99,10 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	
 
 	private void writeAJAXResponse(HttpServletResponse response, String output) throws IOException {
-		response.setContentType("text/html");
+	    // set it to unicode (LDEV-1275)
+		response.setContentType("text/html;charset=utf-8");
 	    PrintWriter writer = response.getWriter();
-	    // set it to unicode
+
 		if (output.length()>0) {
 	        writer.println(output);
 		}
