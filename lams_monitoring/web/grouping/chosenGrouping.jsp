@@ -238,8 +238,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						addgrpRequest = new ActiveXObject("Microsoft.XMLHTTP");
 						if (addgrpRequest) {
 								addgrpRequest.onreadystatechange = grpAdded;
-								addgrpRequest.open("GET", url, true);
-								addgrpRequest.send();
+								addgrpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+								addgrpRequest.setRequestHeader("Content-length", params.length);
+								addgrpRequest.setRequestHeader("Connection", "close");
+								addgrpRequest.open("POST", url, true);
+								addgrpRequest.send(params);
 						}
 				}
 			}
