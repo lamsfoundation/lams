@@ -48,7 +48,7 @@ public class MCOutputDefinitionFactory extends OutputDefinitionFactory {
 			McContent content = (McContent) toolContentObject;
 			
 			definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_MARK,
-					content.getMcQueContents().size() > 0 ? new Long(1) : new Long(0),
+					new Long(0),
 					new Long ( content.getTotalMarksPossible().longValue() ) );
 			definitionMap.put(OUTPUT_NAME_LEARNER_MARK, definition);
 		} else {
