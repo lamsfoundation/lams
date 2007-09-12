@@ -73,8 +73,7 @@
 <bbUI:docTemplate>
 <head>
 	<link type="text/css" rel="stylesheet" href="css/bb.css" />
-</head>
-<script language="JavaScript" type="text/javascript">
+	<script language="JavaScript" type="text/javascript">
 		<!--
 			var learnerWin = null;
 			var monitorWin = null;
@@ -90,12 +89,19 @@
 			{
 				learnerUrl = '<%=learnerUrl%>'; 
 		    	if(learnerWin && learnerWin.open && !learnerWin.closed){
-		    	
-		            learnerWin.focus();
+		            try {
+		            	learnerWin.focus();
+		            }catch(e){
+		            	// popups blocked by a 3rd party
+		            }
 		        }
 		        else{
-		            learnerWin = window.open(learnerUrl,'learnerWin','width=800,height=600,resizable');
-		            learnerWin.focus();
+		            try {
+			            learnerWin = window.open(learnerUrl,'lWin','width=800,height=600,resizable=1');
+			            learnerWin.focus();
+			        }catch(e){
+		            	// popups blocked by a 3rd party
+		            }
 		        }
 			}
 			
@@ -104,15 +110,26 @@
 				monitorUrl = '<%=monitorUrl%>'; 
 		    	if(monitorWin && monitorWin.open && !monitorWin.closed){
 		    	
+		            try {
 		            monitorWin.focus();
+		            }catch(e){
+		            	// popups blocked by a 3rd party
+		            }
 		        }
 		        else{
-		            monitorWin = window.open(monitorUrl,'monitorWin','width=800,height=600,resizable');
+		            try {
+		            monitorWin = window.open(monitorUrl,'aWin','width=800,height=600,resizable=1');
 		            monitorWin.focus();
+		            }catch(e){
+		            	// popups blocked by a 3rd party
+		            }
+		            
 		        }
 			}
 		//-->
 </script>
+</head>
+
 
 
 
