@@ -68,8 +68,8 @@
         <bbUI:dataElement> 
            	<input type="button" class="button"name="author" onClick="openAuthor();" value="Open Author">
             <input type="button" class="button"name="action" onClick="refreshSeqList();" value="Refresh">
-            <input id="disabledNextButton" class="disabled" type="button" name="disabledNextButton" value="Next" disabled="true">
-            <input id="nextButton" class="button" type="hidden" name="nextButton" onClick="openNext();" value="Next">
+            <input id="disabledNextButton" style="visibility:visible" class="disabled" type="button" name="disabledNextButton" value="Next" disabled="true">
+            <input id="nextButton" style="visibility:hidden" class="button" type="submit" name="nextButton" onClick="openNext();" value="Next">
      	</bbUI:dataElement> 
      	<br>
      </bbUI:step>
@@ -87,12 +87,19 @@
     	//authorUrl += "&notifyCloseURL=" + window.location.href; 
     	authorUrl += "&notifyCloseURL="
     	if(authorWin && authorWin.open && !authorWin.closed){
-    	
-            authorWin.focus();
+    		try {
+            	authorWin.focus();
+            }catch(e){
+		        // popups blocked by a 3rd party
+		   	}
         }
         else{
-            authorWin = window.open(authorUrl,'aWindow','width=800,height=600,resizable');
-            authorWin.focus();
+            try {
+            	authorWin = window.open(authorUrl,'aWindow','width=800,height=600,resizable');
+            	authorWin.focus();
+            }catch(e){
+		        // popups blocked by a 3rd party
+		    }
         }
     }
     
@@ -110,8 +117,14 @@
     {
 		//document.workspace_form.nextButton.class= "button"; 
 		//document.getElementById("nextButton").disabled = false;
-		document.getElementById("nextButton").type = "submit";  
-		document.getElementById("disabledNextButton").type = "hidden";
+		//document.getElementById("nextButton").type = "submit";  
+		//document.getElementById("disabledNextButton").type = "hidden";
+		
+		var b = document.getElementById("disabledNextButton")
+		b.parentNode.removeChild(b);
+
+		document.getElementById("nextButton").style.visibility = "visible";  
+		
 		
 		//document.getElementById("nextButton").class = "button"; 	
     	document.getElementById("sequence_id").value=id;
