@@ -1,4 +1,4 @@
-package org.lams.toolbuilder.wizards;
+  package org.lams.toolbuilder.wizards;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -30,6 +30,7 @@ import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.lams.toolbuilder.renameTool.RenameTool;
 import org.lams.toolbuilder.renameTool.RenameToolTaskList;
+import org.lams.toolbuilder.LAMSToolBuilderPlugin;
 /**
  * This is a sample new wizard. Its role is to create a new file 
  * resource in the provided container. If the container resource
@@ -45,34 +46,125 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 	private LAMSNewToolWizardPage page;
 	private ISelection selection;
 
+	private boolean workspaceValid;
+	
 	// The handle to the new LAMS Tool Project to be created
 	private IProject projectHandle;
 	
+	private String toolName;
+	private String vendor;
+	private String compatibility;
+	private String toolDisplayName;
+	private boolean isLAMS;
+	private boolean toolVisible;
 	
-	private static String toolSignature;
-	private static String toolName;
-	private static String vendor;
-	private static String compatibility;
-	private static String toolDisplayName;
-	private static boolean isLAMS;
-	private static boolean toolVisible;
+	// The list of base LAMS projects required for the workspace
+	private List<String> projectList;
 	
 	/**
 	 * Constructor for LAMSNewToolWizard.
 	 */
-	public LAMSNewToolWizard() {
+	public LAMSNewToolWizard() throws Exception{
 		super();
 		setNeedsProgressMonitor(true);
+		
+		initiate();
+		
+		
+		workspaceValid = checkWorkspace();
+		if (!workspaceValid)
+		{
+			this.performCancel();
+			this.dispose();
+		}
+		
 	}
+	
+	
+	/**
+	 * Initiate some local static variblaes
+	 */
+	public void initiate()
+	{
+		projectList = new ArrayList();
+		projectList.add("lams_admin");
+		projectList.add("lams_central");
+		projectList.add("lams_common");
+		projectList.add("lams_learning");
+		projectList.add("lams_monitoring");
+		projectList.add("lams_build");
+		projectList.add("lams_tool_deploy");
+		projectList.add("lams_www");
+		
+	}
+	
+	/**
+	 * Checks the workspace contains the base LAMS project
+	 * @return true if workspace contains the base lams projects
+	 */
+	public boolean checkWorkspace()
+	{
+		boolean result = true;
+		List<String> missingList = new ArrayList();
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		
+		LamsToolBuilderLog.logInfo("Checking required LAMS projects exist");
+		for (String dir : projectList) {
+			
+			
+			
+			IPath path = new Path(dir);
+			if (!root.exists(path))
+			{
+				LamsToolBuilderLog.logInfo("Project not found: " + path.toPortableString());
+				missingList.add(dir);
+				result = false;
+			}
+			
+		}
+		
+		if (result==false)
+		{
+			// Print a error dialog informing that the workspace is missing projects
+			String message= "You are missing the following required LAMS projects for your workspace:\n ";
+			String statusMessage = "Missing LAMS projects in workspace.";
+			String title = "LAMS Project Creation Error";
+			for (String dir : missingList)
+				message += "\t" + dir + "\n";
+			
+			message += "\nYou can get the required projects from the anonymous CVS account." +
+					"\n\t* access method: pserver" +
+					"\n\t* user name: anonymous" +
+					"\n\t* server name: lamscvs.melcoe.mq.edu.au" +
+					"\n\t* location: /usr/local/cvsroot";
+
+			IStatus error = new Status(
+					IStatus.ERROR, 
+					LAMSToolBuilderPlugin.PLUGIN_ID, 
+					IStatus.ERROR, 
+					statusMessage, 
+					null);
+			ErrorDialog.openError(this.getShell(), title, message, error);
+			
+			
+			this.dispose();
+		}
+		
+		return result;
+	}
+	
+	
 	
 	/**
 	 * Adding the page to the wizard.
 	 */
-
 	public void addPages() {
-		LamsToolBuilderLog.logInfo("Adding pages to LAMS Tool Wizard");
-		page = new LAMSNewToolWizardPage(selection);
-		addPage(page);
+		if(workspaceValid)
+		{
+			LamsToolBuilderLog.logInfo("Adding pages to LAMS Tool Wizard");
+			page = new LAMSNewToolWizardPage(selection);
+			addPage(page);
+		}
 	}
 
 	/**
@@ -88,7 +180,6 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		
 		//private static String toolName;
 		vendor = page.getVendor();
-		toolSignature = page.getToolSignature();
 		compatibility = page.getCompatibility();
 		toolDisplayName = page.getToolDisplayName();
 		isLAMS = page.getIsLams();
@@ -170,7 +261,7 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		}
 		
 		//############### test project to template from 
-		String containerName = "lams_tool_sbmt";
+		String containerName = "lams_tool_forum";
 		
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IProject projTemplate = (IProject)root.findMember(new Path(containerName));
@@ -188,12 +279,11 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 			LamsToolBuilderLog.logError(e);
 		}
 		
-		RenameToolTaskList tasklist = new RenameToolTaskList(Constants.SUBMIT_TOOL_DIR, toolSignature, toolDisplayName);
+		//TODO: 
 		
-		List<String[]> commandList = tasklist.getTasklist();
-
+		//RenameToolTaskList taskList = new RenameToolTaskList(Constants.FORUM_TOOL_DIR, )
 		
-		RenameTool rt = new RenameTool();
+		//RenameTool rt = new RenameTool();
 		LamsToolBuilderLog.logInfo(projHandle.getLocation().toPortableString());
 		try{
 			rt.renameTool(commandList, projHandle.getLocation().toPortableString());
@@ -213,6 +303,7 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		
 		
 	}
+	
 	
 	
 	

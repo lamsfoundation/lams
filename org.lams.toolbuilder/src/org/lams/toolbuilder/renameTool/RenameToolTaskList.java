@@ -36,6 +36,9 @@ public class RenameToolTaskList
 	//private String toolName;			// the name of the new tool
 	private String toolDispName;		// the display name of the new tool
 	
+	private String classPrefix;			// the string to replce the tool's java class prefixes with eg JavaClass
+	private String variablePrefix; 		// the string to replce the tool's java variable prefixes with eg javaVariable
+	
 	private List<String[]> tasklist; 	// the tasklist created for the rename tool
 	
 	public RenameToolTaskList(String tooltemplate, String toolsig, String tooldispname)
@@ -70,6 +73,9 @@ public class RenameToolTaskList
 	 */
 	public void init()
 	{
+		classPrefix = toJavaClassString(toolDispName);
+		variablePrefix = toJavaVariableString(toolDispName);
+		
 		if (toolTemplate.equals(Constants.CHAT_TOOL_DIR)) {initChat();}
 		else if (toolTemplate.equals(Constants.FORUM_TOOL_DIR)) {initForum();}
 		else if (toolTemplate.equals(Constants.MC_TOOL_DIR)) {initMC();}
@@ -85,7 +91,17 @@ public class RenameToolTaskList
 	
 	public void initChat() {}
 	
-	public void initForum() {}
+	public void initForum() 
+	{
+		System.out.println("Java Class Prefix: " + classPrefix);
+		System.out.println("Java Variable Prefix: " + variablePrefix);
+		
+		
+		tasklist.add(new String[] {"lafrum11", toolSig});
+		tasklist.add(new String[] {"TestForum", "Test" + classPrefix});
+		tasklist.add(new String[] {"Forum", classPrefix});
+		tasklist.add(new String[] {"forum", variablePrefix});
+	}
 	
 	public void initMC() {}
 	
@@ -99,23 +115,22 @@ public class RenameToolTaskList
 	
 	public void initSubmit() 
 	{
-		String submitClassPrefix = toJavaClassString(toolDispName);
-		String submitVariablePrefix = toJavaVariableString(toolDispName);
-		System.out.println("Java Class Prefix: " + submitClassPrefix);
-		System.out.println("Java Variable Prefix: " + submitVariablePrefix);
+		
+		System.out.println("Java Class Prefix: " + classPrefix);
+		System.out.println("Java Variable Prefix: " + variablePrefix);
 		
 		
 		tasklist.add(new String[] {"lasbmt11", toolSig});
-		tasklist.add(new String[] {"TestSubmitFiles", "Test" + submitClassPrefix});
-		tasklist.add(new String[] {"SubmitFiles", submitClassPrefix});
-		tasklist.add(new String[] {"submitFiles", submitVariablePrefix});
+		tasklist.add(new String[] {"TestSubmitFiles", "Test" + classPrefix});
+		tasklist.add(new String[] {"SubmitFiles", classPrefix});
+		tasklist.add(new String[] {"submitFiles", variablePrefix});
 		tasklist.add(new String[] {"Submit Files", toolDispName});
-		tasklist.add(new String[] {"Submit",submitClassPrefix});
-		tasklist.add(new String[] {"submit",submitVariablePrefix});		
-		tasklist.add(new String[] {"sbmt",submitVariablePrefix});
-		tasklist.add(new String[] {"Sbmt",submitClassPrefix});
-		tasklist.add(new String[] {"Submission",submitClassPrefix});
-		tasklist.add(new String[] {"submission",submitVariablePrefix});
+		tasklist.add(new String[] {"Submit",classPrefix});
+		tasklist.add(new String[] {"submit",variablePrefix});		
+		tasklist.add(new String[] {"sbmt",variablePrefix});
+		tasklist.add(new String[] {"Sbmt",classPrefix});
+		tasklist.add(new String[] {"Submission",classPrefix});
+		tasklist.add(new String[] {"submission",variablePrefix});
 	}
 	
 	
