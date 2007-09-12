@@ -236,7 +236,7 @@ public class BranchCondition implements Comparable {
 	
 	public boolean exactMatchMet(ToolOutputValue outputValue) {
 		if ( "OUTPUT_LONG".equals(type) ) {
-			Long exactMatchObj = exactMatchValue != null ? Long.parseLong(exactMatchValue) : null;
+			Long exactMatchObj = exactMatchValue != null ? convertToLong(exactMatchValue) : null;
 			Long actualValue = outputValue.getLong();
 			return ( actualValue != null && actualValue.equals(exactMatchObj)); 
 		} else if ( "OUTPUT_DOUBLE".equals(type) ) {
@@ -256,8 +256,8 @@ public class BranchCondition implements Comparable {
 	
 	public boolean inRange(ToolOutputValue outputValue) {
 		if ( "OUTPUT_LONG".equals(type) ) {
-			Long startValueLong = startValue != null ? Long.parseLong(startValue) : null;
-			Long endValueLong = endValue != null ? Long.parseLong(endValue) : null;
+			Long startValueLong = startValue != null ? convertToLong(startValue) : null;
+			Long endValueLong = endValue != null ? convertToLong(endValue) : null;
 			Long actualValue = outputValue.getLong();
 			return ( actualValue != null &&
 				( startValueLong==null || actualValue.compareTo(startValueLong) >= 0 ) &&
@@ -287,4 +287,15 @@ public class BranchCondition implements Comparable {
 		return false;
 	}
 
+	/** The data may have come in from WDDX and have .0 on the end of Longs, so eliminate that */
+	private Long convertToLong( String textValue ) {
+		if ( textValue.length() == 0 )
+			return null;
+
+		int posPeriod = textValue.indexOf('.');
+		if ( posPeriod > 0 ) {
+			textValue = textValue.substring(0,posPeriod);
+		}
+		return new Long (textValue);
+	}
 }
