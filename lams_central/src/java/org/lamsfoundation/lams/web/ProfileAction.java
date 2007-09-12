@@ -34,6 +34,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -61,6 +63,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 				  validate="false"
  * 
  * @struts:action-forward name="view" path=".profile"
+ * @struts:action-forward name="lessons" path=".lessons"
  * @struts:action-forward name="edit" path=".editprofile"
  */
 public class ProfileAction extends LamsDispatchAction {
@@ -68,6 +71,7 @@ public class ProfileAction extends LamsDispatchAction {
 	private static Logger log = Logger.getLogger(ProfileAction.class);
 	private static IUserManagementService service;
 	private static List<SupportedLocale> locales;
+	private static ICoreLearnerService learnerService;
 
 	public ActionForward view(ActionMapping mapping,
             ActionForm form,
@@ -82,7 +86,22 @@ public class ProfileAction extends LamsDispatchAction {
 		request.setAttribute("email", (email!=null ? email : ""));
 		request.setAttribute("portraitUuid", (requestor.getPortraitUuid()==null ? 0 : requestor.getPortraitUuid()));
 		request.setAttribute("tab", "profile");
+		
 		return mapping.findForward("view");
+	}
+	
+	public ActionForward lessons(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+		
+		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());		
+		// list all active lessons for this learner (single sql query)
+		LessonDTO[] lessons = getLearnerService().getActiveLessonsFor(requestor.getUserId());
+		request.setAttribute("lessons", lessons);
+		request.setAttribute("tab", "profile");
+		
+		return mapping.findForward("lessons");
 	}
 	
 	public ActionForward edit(ActionMapping mapping,
@@ -109,5 +128,13 @@ public class ProfileAction extends LamsDispatchAction {
 			Collections.sort(locales);
 		}
 		return service;
+	}
+	
+	private ICoreLearnerService getLearnerService(){
+		if(learnerService==null){
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+			learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
+		}
+		return learnerService;
 	}
 }
