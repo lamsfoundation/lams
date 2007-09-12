@@ -270,6 +270,11 @@ class org.lamsfoundation.lams.authoring.Activity {
 			return false;
 		}
 	}
+	
+	public function isSequenceActivity():Boolean{
+		return _activityTypeID == SEQUENCE_ACTIVITY_TYPE;
+	}
+	
 	/**
 	 * Populates all the fields in this activity from a dto object contaning the following fields
 	 * NB: This is not very clever, if the field in the dto is blank then the value is overwritten in the class...

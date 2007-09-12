@@ -76,7 +76,7 @@ class ConditionMatchingDialog extends BranchMappingDialog {
         
         //Set the labels
         conditions_label.text = Dictionary.getValue('condmatch_dlg_cond_lst_lbl');
-        branches_label.text = Dictionary.getValue('groupmatch_dlg_branches_lst_lbl');
+        branches_label.text = Dictionary.getValue('branch_mapping_dlg_branches_lst_lbl');
         match_dgd_lbl.text = Dictionary.getValue('branch_mapping_dlg_match_dgd_lbl');
 		
         //EVENTS

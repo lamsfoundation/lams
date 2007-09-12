@@ -191,6 +191,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	public function refresh(setNegative:Boolean):Void{
 		bgNegative = String(setNegative);
 		setStyles();
+		
+		setupBranchView = false;
+		
 		draw();
 		setSelected(_isSelected);
 	}

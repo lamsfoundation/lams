@@ -117,6 +117,8 @@ class PropertyInspector extends PropertyInspectorControls {
 		_tool_output_match_btn.addEventListener("click", Delegate.create(this, onConditionMatchClick));
 		_conditions_setup_btn.addEventListener("click", Delegate.create(this, onConditionsSetupClick));
 		
+		_define_monitor_cb.addEventListener("click", Delegate.create(this, onDefineMonitorSelect));
+		
 		_pi_defaultBranch_cb.addEventListener("click", Delegate.create(this, onDefaultBranchSelect));
 		
 		this.onEnterFrame = setupLabels;
@@ -491,6 +493,8 @@ class PropertyInspector extends PropertyInspectorControls {
 		if(_canvasModel.selectedItem.activity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE) {
 			showAppliedGroupingControls(true, !ba.readOnly);
 			showGroupBasedBranchingControls(true, !ba.readOnly);
+			
+			_define_monitor_cb.selected = (ba.defineLater != null) ? ba.defineLater : false;
 		}
 	
 	}

@@ -23,7 +23,6 @@
 
 import org.lamsfoundation.lams.learner.*;
 import org.lamsfoundation.lams.learner.ls.*;
-import org.lamsfoundation.lams.learner.lb.*;
 
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.mvc.*;
@@ -208,6 +207,7 @@ class LessonView extends AbstractView {
 			var r = lm.activitiesDisplayed.remove(keys[i]);
 			r.removeMovieClip();
 		}
+		
 		ACT_X = -20;
 		ACT_Y = 32.5;
 	}
@@ -253,10 +253,10 @@ class LessonView extends AbstractView {
 		
 		
 		//take action depending on act type
-		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity() ){
+		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity() || a.isBranchingActivity()) {
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivity", "LearnerActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, actLabel:activityTitle, learner:lm.progressData, _complex:false});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
-			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is tool/gate/group activity',Debugger.CRITICAL,'drawActivity','LessonView');
+			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is tool/gate/group/branching activity',Debugger.CRITICAL,'drawActivity','LessonView');
 		} else if(a.isGateActivity()){
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerGateActivity", "LearnerGateActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, actLabel:activityTitle, learner:lm.progressData, _complex:false});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;

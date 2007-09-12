@@ -448,7 +448,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 		_toolOutputDefin_cmb.dataProvider = _definitions;
 		_toolOutputDefin_cmb.labelFunction = function(itemObj){
-			return (itemObj.name + " (" + ToolOutputConditionsDialog.getOutputType(itemObj.type) + ")");
+			return (itemObj.description + " (" + ToolOutputConditionsDialog.getOutputType(itemObj.type) + ")");
 		}
 		
 		_toolOutputDefin_cmb.redraw(true);

@@ -23,7 +23,6 @@
 
 import org.lamsfoundation.lams.learner.*;
 import org.lamsfoundation.lams.learner.ls.*;
-import org.lamsfoundation.lams.learner.lb.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.Progress;
 import org.lamsfoundation.lams.common.ui.Cursor;
@@ -44,7 +43,6 @@ class Lesson {
 	private var lessonView:LessonView;
 	private var lessonView_mc:MovieClip;
 	
-	private var _libraryView:LibraryView;
 	private var _lesson:Lesson;
 	
 	private var _instance:Lesson;

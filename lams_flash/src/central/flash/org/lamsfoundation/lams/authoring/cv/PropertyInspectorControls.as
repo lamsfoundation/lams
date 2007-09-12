@@ -107,6 +107,7 @@ class PropertyInspectorControls extends MovieClip {
 	private var _group_match_btn:Button;
 	private var _tool_output_match_btn:Button;
 	private var _conditions_setup_btn:Button;
+	private var _define_monitor_cb:CheckBox;
 
 	//grouping 
 	private var groupType_lbl:Label;
@@ -192,10 +193,12 @@ class PropertyInspectorControls extends MovieClip {
 		min_lbl.text = Dictionary.getValue('pi_min_act');
 		max_lbl.text = Dictionary.getValue('pi_max_act');
 		
-		_group_match_btn.label = Dictionary.getValue('pi_group_match_btn_lbl');
+		_group_match_btn.label = Dictionary.getValue('pi_mapping_btn_lbl');
 		_group_naming_btn.label = Dictionary.getValue('pi_group_naming_btn_lbl');
-		_tool_output_match_btn.label = Dictionary.getValue('pi_tomatch_btn_lbl');
+		_tool_output_match_btn.label = Dictionary.getValue('pi_mapping_btn_lbl');
 		_conditions_setup_btn.label = Dictionary.getValue('pi_condmatch_btn_lbl');
+
+		_define_monitor_cb.label = Dictionary.getValue('pi_define_monitor_cb_lbl');
 
 		// Branch 
 		_pi_defaultBranch_cb.label = Dictionary.getValue("pi_defaultBranch_cb_lbl");
@@ -510,13 +513,11 @@ class PropertyInspectorControls extends MovieClip {
 			numLearners_rdo.visible = false;
 			numGroups_rdo.visible = false;
 			
-			_group_naming_btn.visible = true;
+			_group_naming_btn.visible = (numGroups_stp.value > 0) ? true : false;
 			
 			if(e != null) {
 				numGroups_lbl.enabled = e;
 				_group_naming_btn.enabled = e;
-			} else {
-				_group_naming_btn.enabled = false;
 			}
 			
 		} else if(g.groupingTypeID == Grouping.RANDOM_GROUPING) {
@@ -540,8 +541,6 @@ class PropertyInspectorControls extends MovieClip {
 				numGroups_rdo.enabled = e;
 				
 				_group_naming_btn.enabled = e;
-			} else {
-				_group_naming_btn.enabled = false;
 			}
 			
 			checkGroupRadioOptions(e);
@@ -607,17 +606,20 @@ class PropertyInspectorControls extends MovieClip {
 			g.numberOfGroups = 0;
 			
 			numRandomGroups_stp.enabled = false;
-			numLearners_stp.enabled = (e != null) ? e&&true : true;
+			numLearners_stp.enabled = (e != null) ? e : true;
 			
-			_group_naming_btn.enabled = false;
+			_group_naming_btn.visible = false;
+			
 		}else{
-			numRandomGroups_stp.enabled = (e != null) ? e&&true : true;
+			numRandomGroups_stp.enabled = (e != null) ? e : true;
 			numLearners_stp.value = 0;
 			g.learnersPerGroups = 0;
 			
 			numLearners_stp.enabled = false;
 			
-			_group_naming_btn.enabled = (e != null) ? e&&(numRandomGroups_stp.value > 0) : (numRandomGroups_stp.value > 0);
+			_group_naming_btn.enabled = (e != null) ? e : true;
+			_group_naming_btn.visible = (numRandomGroups_stp.value > 0) ? true : false;
+		
 		}
 		
 		//this is a crazy hack to stop the steppter dissapearing after its .enabled property is set.
@@ -630,12 +632,14 @@ class PropertyInspectorControls extends MovieClip {
 		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
 		Debugger.log("checking group radio options: " + g.numberOfGroups, Debugger.CRITICAL, "checkGroupRadioOptions", "PIC*");
 		
-		if(g.numberOfGroups > 0 && g.learnersPerGroups <= 0) 
-			{ numGroups_rdo.selected = true; _group_naming_btn.enabled = (e != null) ? e&&true : true; }
-		else if(g.learnersPerGroups > 0 && g.numberOfGroups <= 0) 
-			{ numLearners_rdo.selected = true; _group_naming_btn.enabled = false; }
+		if(g.numberOfGroups > 0 && g.learnersPerGroups <= 0) { 	
+			numGroups_rdo.selected = true; 
+			_group_naming_btn.visible = true; 
+			_group_naming_btn.enabled = (e != null) ? e : true; 
+		} else if(g.learnersPerGroups > 0 && g.numberOfGroups <= 0) 
+			{ numLearners_rdo.selected = true; _group_naming_btn.visible = false; }
 		else 
-			{ numGroups_rdo.selected = true; _group_naming_btn.enabled = false; }
+			{ numGroups_rdo.selected = true; _group_naming_btn.visible = false; }
 	}
 	
 	public function reDrawTroublesomeSteppersLater(){
@@ -671,11 +675,12 @@ class PropertyInspectorControls extends MovieClip {
 	 * @return  
 	 */
 	public function updateGroupingMethodData(evt:Object){
-		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
 		
 		Debugger.log("updating grouping method data: " + g.groupingUIID, Debugger.CRITICAL, "updateGroupingMethodData", "PropertyInspectorControls");
 		
 		if(!_canvasController.isBusy() && evt.type == 'focusOut') {
+			var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
+		
 			if(_canvasModel.getCanvas().ddm.hasBranchMappingsForGroupingUIID(g.groupingUIID)) {
 				_canvasController.setBusy();
 				LFMessage.showMessageConfirm("Warning: Existing Group-to-Branch mappings may be effected by your change. Do you wish to continue?", Proxy.create(this, doUpdateGroupingMethodData, g), Proxy.create(this, retainOldGroupingMethodData), "Yes", "No",  "Warning");
@@ -695,12 +700,8 @@ class PropertyInspectorControls extends MovieClip {
 			numGroups_stp.value = 0;
 			g.maxNumberOfGroups = 0;
 			
-			Debugger.log("groups: " + g.numberOfGroups, Debugger.CRITICAL, "doUpdateGroupingMethodData", "PIC*");
-			
-			_group_naming_btn.enabled = (numRandomGroups_stp.value > 0) ? true : false;
-			
-			Debugger.log("enabled: " + _group_naming_btn.enabled, Debugger.CRITICAL, "doUpdateGroupingMethodData", "PIC*");
-			
+			_group_naming_btn.visible = (numRandomGroups_stp.value > 0) ? true : false;
+			_define_monitor_cb.selected = false;
 			
 		}else{
 			g.maxNumberOfGroups = numGroups_stp.value;
@@ -710,7 +711,9 @@ class PropertyInspectorControls extends MovieClip {
 			g.learnersPerGroups = 0;
 			g.numberOfGroups = 0;
 			
-			_group_naming_btn.enabled = (numGroups_stp.value > 0) ? true : false;
+			_group_naming_btn.visible = (numGroups_stp.value > 0) ? true : false;
+			_define_monitor_cb.selected = false;
+			
 		}
 				
 		setModified();
@@ -824,7 +827,7 @@ class PropertyInspectorControls extends MovieClip {
 		maxAct_stp.setStyle('styleName', styleObj);
 		
 		_pi_defaultBranch_cb.setStyle('styleName', styleObj);
-		
+		_define_monitor_cb.setStyle('styleName', styleObj);
 		
 		styleObj = _tm.getStyleObject('picombo');
 		gateType_cmb.setStyle('styleName', styleObj);
@@ -884,15 +887,20 @@ class PropertyInspectorControls extends MovieClip {
 			}
 			
 			_canvasModel.selectedItem.activity.toolActivityUIID = null;
+			_canvasModel.selectedItem.activity.defineLater = null;
+			
 			showGroupBasedBranchingControls(true, !_canvasModel.selectedItem.activity.readOnly);
 			showAppliedGroupingControls(true, !_canvasModel.selectedItem.activity.readOnly);
 			
 			showToolBasedBranchingControls(false);
+
 			
 		} else if(evt.target.value == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) {
 			showToolBasedBranchingControls(true, !_canvasModel.selectedItem.activity.readOnly);
 			
 			_canvasModel.selectedItem.activity.groupingUIID = null;
+			_canvasModel.selectedItem.activity.defineLater = null;
+			
 			showGroupBasedBranchingControls(false);
 			showAppliedGroupingControls(false);
 		
@@ -902,6 +910,7 @@ class PropertyInspectorControls extends MovieClip {
 		} else {
 			_canvasModel.selectedItem.activity.groupingUIID = null;
 			_canvasModel.selectedItem.activity.toolActivityUIID = null;
+			_canvasModel.selectedItem.activity.defineLater = null;
 			
 			showToolBasedBranchingControls(false);
 			showGroupBasedBranchingControls(false);
@@ -959,7 +968,14 @@ class PropertyInspectorControls extends MovieClip {
 		a.refresh()
 		
 		if(a.activity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE) {
-			showGroupBasedBranchingControls(true, !_canvasModel.selectedItem.activity.readOnly);
+			
+			if(a.activity.groupingUIID == null) {
+				a.activity.defineLater = null;
+				showGroupBasedBranchingControls(false);
+			} else { 
+				showGroupBasedBranchingControls(true, !_canvasModel.selectedItem.activity.readOnly); 
+				onDefineMonitorSelect();
+			}
 		}
 		
 		setModified();
@@ -1000,7 +1016,14 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	private function showGroupBasedBranchingControls(v:Boolean, e:Boolean) {
-		if(!v) { _group_match_btn.visible = false; return; }		
+		if(!v) { 
+			_group_match_btn.visible = false; 
+			_define_monitor_cb.visible = false; 
+			return; 
+		}		
+		
+		if(_canvasModel.selectedItem.activity.defineLater != null)
+			_canvasModel.selectedItem.activity.defineLater = _define_monitor_cb.selected;
 
 		var ca = _canvasModel.selectedItem;
 		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
@@ -1008,12 +1031,20 @@ class PropertyInspectorControls extends MovieClip {
 		if(branches.myBranches.length > 0 && ca.activity.groupingUIID != null) {
 			var grouping:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(ca.activity.groupingUIID);
 			
-			_group_match_btn.visible = (grouping.numberOfGroups > 0 || grouping.maxNumberOfGroups > 0) ? v : false;
-			if(e != null) _group_match_btn.enabled = e;
-		} else {
-			_group_match_btn.visible = false;
+			if(grouping.learnersPerGroups > 0)
+				_canvasModel.selectedItem.activity.defineLater = true;
+			
+			_define_monitor_cb.selected = (_canvasModel.selectedItem.activity.defineLater != null) ? _canvasModel.selectedItem.activity.defineLater : false;
+			
+			_group_match_btn.visible = ((grouping.numberOfGroups > 0 || grouping.maxNumberOfGroups > 0) && !_define_monitor_cb.selected) ? v : false;
+			_define_monitor_cb.visible = (grouping.numberOfGroups > 0 || grouping.maxNumberOfGroups > 0 || grouping.learnersPerGroups > 0) ? v : false;
+
+			if(e != null && !e) {
+				_group_match_btn.enabled = e;
+				_define_monitor_cb.enabled = e;
+			}
+			
 		}
-		
 	}
 	
 	/**
@@ -1129,9 +1160,24 @@ class PropertyInspectorControls extends MovieClip {
 			_canvasModel.activeView.activity.defaultBranch = BranchConnector(_canvasModel.selectedItem).branch; _pi_defaultBranch_cb.selected
 			_pi_defaultBranch_cb.enabled = false;
 		}
+		
+		setModified();
 	}
 	
-   /**
+	public function onDefineMonitorSelect(evt:Object):Void {
+			
+		if(_define_monitor_cb.selected)
+			_canvasModel.selectedItem.activity.defineLater = _define_monitor_cb.selected;
+		else
+			_canvasModel.selectedItem.activity.defineLater = false;
+		
+		var grouping:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.groupingUIID);
+		_group_match_btn.visible = ((grouping.numberOfGroups > 0 || grouping.maxNumberOfGroups > 0) && !_define_monitor_cb.selected) ? true : false;
+		
+		setModified();
+	}
+    
+	/**
 	 * Recieves the click events from the canvas views (inc Property Inspector) buttons.  Based on the target
 	 * the relevent method is called to action the user request
 	 * @param   evt 

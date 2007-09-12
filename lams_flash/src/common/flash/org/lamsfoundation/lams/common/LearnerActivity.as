@@ -101,7 +101,7 @@ class LearnerActivity extends MovieClip {
 		if(_activity.isGateActivity()){
 			_visibleHeight = LearnerActivity.GATE_ACTIVITY_HEIGHT;
 			_visibleWidth = LearnerActivity.GATE_ACTIVITY_WIDTH;
-		}else if(_activity.isGroupActivity()){
+		}else if(_activity.isGroupActivity() || _activity.isBranchingActivity()) {
 			_visibleHeight = LearnerActivity.TOOL_ACTIVITY_HEIGHT;
 			_visibleWidth = LearnerActivity.TOOL_ACTIVITY_WIDTH;
 		}
