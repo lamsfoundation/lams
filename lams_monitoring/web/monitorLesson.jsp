@@ -35,6 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:css style="core"/>
 	<title><fmt:message key="monitor.title"/></title>
 	
+	<script src="<lams:LAMSURL/>includes/javascript/openUrls.js" type="text/javascript"></script>
 	<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 	<script language="JavaScript" type="text/JavaScript">
 	<!--
@@ -54,7 +55,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			}else if(command == "openAuthorForEditOnFly") {
 				openAuthorForEditOnFly(args);
 			}else if(command == "reloadWindow") {
-				reloadWindow();
+				reloadWindow(); 
 			}
 			
 		}
@@ -117,7 +118,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		}
 		
 		function openAuthorForEditOnFly(learningDesignID) {
-			window.opener.openAuthorForEditOnFly(learningDesignID);
+			try{
+				window.opener.openAuthorForEditOnFly(learningDesignID);
+			}
+			catch(e)
+			{
+				openAuthorForEditOnFlyIntegrated(learningDesignID);
+			}
 		}
 		
 		function openURL(args){

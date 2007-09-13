@@ -14,6 +14,7 @@ String version = Configuration.get(ConfigurationKeys.VERSION);
 
 <lams:html>
 <lams:head>
+<script src="<lams:LAMSURL/>includes/javascript/openUrls.js" type="text/javascript"></script>
 <script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 <script src="<lams:LAMSURL/>includes/javascript/getSysInfo.js" type="text/javascript"></script>
 <script language="JavaScript" type="text/JavaScript">
@@ -80,7 +81,7 @@ function authoring_DoFSCommand(command, args) {
 	}else if(command == "openURL"){
 		openURL(args, "_blank");
 	}else if(command == "openMonitorLesson") {
-		openMonitorLesson(args);
+		openMonitorLesson(args); 
 	}
 
 }
@@ -209,8 +210,12 @@ function myOnBeforeUnload(){
 	}
 }
 
-function openMonitorLesson(lessonID) {
-	window.opener.openMonitorLesson(lessonID);
+function openMonitorLesson(lessonID) {	
+	try{
+		window.opener.openMonitorLesson(lessonID);
+	}catch(e){
+		returnToMonitorLessonIntegrated(lessonID);
+	}
 }
 		
 

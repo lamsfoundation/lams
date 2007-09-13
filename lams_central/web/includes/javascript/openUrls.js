@@ -90,6 +90,16 @@
 				}
 			}
 		}
+		
+		function openAuthorForEditOnFlyIntegrated( learningDesignID )
+		{
+			window.location = '../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID;
+		}
+		
+		function returnToMonitorLessonIntegrated( lessonID )
+		{
+			window.location = 'home.do?method=monitorLesson&lessonID='+lessonID;
+		}
 
 		function openMonitorLesson( lessonID )
 		{
