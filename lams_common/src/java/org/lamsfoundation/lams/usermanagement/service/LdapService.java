@@ -28,13 +28,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
+import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -257,5 +264,80 @@ public class LdapService implements ILdapService {
 			log.error("===> Naming exception occurred: "+e.getMessage());
 		}
 		return null;
+	}
+	
+	public int updateLAMSFromLdap() {
+		// setup ldap context
+		Properties env = new Properties();
+		env.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+		env.setProperty(Context.SECURITY_AUTHENTICATION, Configuration.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
+		env.setProperty(Context.PROVIDER_URL, Configuration.get(ConfigurationKeys.LDAP_PROVIDER_URL));
+		String securityProtocol = Configuration.get(ConfigurationKeys.LDAP_SECURITY_PROTOCOL);
+		if (StringUtils.equals("ssl", securityProtocol)) {
+			env.setProperty(Context.SECURITY_PROTOCOL, securityProtocol);
+			// FIXME: synchronization issue: dynamically load certificate into
+			// system instead of overwritting it.
+			System.setProperty("javax.net.ssl.trustStore", Configuration.get(ConfigurationKeys.LDAP_TRUSTSTORE_PATH));
+			System.setProperty("javax.net.ssl.trustStorePassword", Configuration.get(ConfigurationKeys.LDAP_TRUSTSTORE_PASSWORD));
+		}
+		
+		// get base dn
+		String baseDN = Configuration.get(ConfigurationKeys.LDAP_PRINCIPAL_DN_SUFFIX);
+		if (baseDN.startsWith(",")) {
+			baseDN = baseDN.substring(1);
+		}
+		
+		// get search filter
+		String filter = Configuration.get(ConfigurationKeys.LDAP_PRINCIPAL_DN_PREFIX);
+		filter = "(" + filter + (filter.endsWith("=") ? "" : "=") + "*)";
+		
+		int numResults = 0;
+		try {
+			DirContext ctx = new InitialDirContext(env);
+			
+			// set search to subtree of base dn
+			SearchControls ctrl = new SearchControls();
+            ctrl.setSearchScope(SearchControls.SUBTREE_SCOPE);
+            
+            // do the search for all ldap users
+            NamingEnumeration<SearchResult> results = ctx.search(baseDN, filter, ctrl);
+            while (results.hasMore()) {
+            	SearchResult result = results.next();
+            	Attributes attrs = result.getAttributes();
+            	
+            	// add or update this user to LAMS
+            	String login = getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR)));
+            	if (login != null && login.trim().length() > 0) {
+            		User user = getService().getUserByLogin(login);
+            		if (user == null) {
+            			log.info("Creating new user for LDAP username: " + login);
+            			if (createLDAPUser(attrs)) {
+            				user = getService().getUserByLogin(login);
+            			} else {
+    						log.error("Couldn't create new user for LDAP username: "+login);
+    					}
+            		} else {
+            			updateLDAPUser(user, attrs);
+            		}
+            		if (!addLDAPUser(attrs, user.getUserId())) {
+            			log.error("Couldn't add LDAP user: "+login+" to organisation.");
+            		}
+            	} else {
+            		log.error("Couldn't find login attribute for user using attribute name: " 
+            				+ Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR) + ".  Dumping attributes...");
+            		NamingEnumeration enumAttrs = attrs.getAll();
+    				while (enumAttrs.hasMoreElements()) {
+    					log.error(enumAttrs.next());
+    				}
+            	}
+            	
+            	numResults++;
+            }
+            log.info("Ldap returned " + numResults + " users.");
+		} catch (Exception e) {
+			log.error(e, e);
+		}
+		
+		return numResults;
 	}
 }

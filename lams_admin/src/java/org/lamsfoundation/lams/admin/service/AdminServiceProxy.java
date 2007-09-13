@@ -27,6 +27,7 @@ import javax.servlet.ServletContext;
 
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.usermanagement.service.LdapService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.web.context.WebApplicationContext;
@@ -44,46 +45,54 @@ public class AdminServiceProxy {
 	private static IIntegrationService integrationService;
 	private static IAuditService auditService;
 	private static IImportService importService;
+	private static LdapService ldapService;
 	
-	public static final IUserManagementService getService(ServletContext servletContext){
+	public static final IUserManagementService getService(ServletContext servletContext) {
 		if (manageService == null) {
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-			return (IUserManagementService) ctx.getBean("userManagementService");
+			return (IUserManagementService)getDomainService(servletContext, "userManagementService");
 		} else {
 			return manageService;
 		}
 	}
 	
-	public static final MessageService getMessageService(ServletContext servletContext){
+	public static final MessageService getMessageService(ServletContext servletContext) {
 		if (messageService == null) {
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-			return (MessageService)ctx.getBean("adminMessageService");
+			return (MessageService)getDomainService(servletContext, "adminMessageService");
 		} else {
 			return messageService;
 		}
 	}
 	
-	public static final IIntegrationService getIntegrationService(ServletContext servletContext){
-		if(integrationService == null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-			integrationService = (IIntegrationService)ctx.getBean("integrationService");
+	public static final IIntegrationService getIntegrationService(ServletContext servletContext) {
+		if (integrationService == null){
+			integrationService = (IIntegrationService)getDomainService(servletContext, "integrationService");
 		}
 		return integrationService;
 	}
 	
-	public static final IAuditService getAuditService(ServletContext servletContext){
-		if(auditService==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-			auditService = (IAuditService)ctx.getBean("auditService");
+	public static final IAuditService getAuditService(ServletContext servletContext) {
+		if (auditService == null){
+			auditService = (IAuditService)getDomainService(servletContext, "auditService");
 		}
 		return auditService;
 	}
 	
-	public static final IImportService getImportService(ServletContext servletContext){
-		if(importService==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-			importService = (IImportService)ctx.getBean("importService");
+	public static final IImportService getImportService(ServletContext servletContext) {
+		if (importService == null){
+			importService = (IImportService)getDomainService(servletContext, "importService");
 		}
 		return importService;
 	}
+	
+	public static final LdapService getLdapService(ServletContext servletContext) {
+		if (ldapService == null) {
+			ldapService = (LdapService)getDomainService(servletContext, "ldapService");
+		}
+		return ldapService;
+	}
+	
+	private static Object getDomainService(ServletContext servletContext,String serviceName) {
+        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        return wac.getBean(serviceName);
+    }
 }

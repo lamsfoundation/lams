@@ -14,6 +14,7 @@
 		classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/integrationContext.xml
 		classpath:/org/lamsfoundation/lams/admin/adminApplicationContext.xml
+		classpath:/org/lamsfoundation/lams/usermanagement/ldapContext.xml
 	</param-value>
 </context-param>
 

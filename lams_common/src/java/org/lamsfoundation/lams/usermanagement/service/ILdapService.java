@@ -38,4 +38,6 @@ public interface ILdapService {
 	public boolean createLDAPUser(Attributes attrs);
 	
 	public boolean addLDAPUser(Attributes attrs, Integer userId);
+	
+	public int updateLAMSFromLdap();
 }
