@@ -175,7 +175,7 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 		checkTesting.setSelection(true);
 		*/
 		
-		
+		initialise();
 		setControl(control);
 		
 		
