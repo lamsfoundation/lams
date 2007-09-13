@@ -162,18 +162,8 @@ public class UserSaveAction extends Action {
 				log.debug("creating user... new login: " + user.getLogin());
 				if (errors.isEmpty()) {
 					// TODO set flash/html themes according to user input instead of server default.
-					String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
-					List list = service.findByProperty(CSSThemeVisualElement.class, "name", flashName);
-					if (list!=null) {
-						CSSThemeVisualElement flashTheme = (CSSThemeVisualElement)list.get(0);
-						user.setFlashTheme(flashTheme);
-					}
-					String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
-					list = service.findByProperty(CSSThemeVisualElement.class, "name", htmlName);
-					if (list!=null) {
-						CSSThemeVisualElement htmlTheme = (CSSThemeVisualElement)list.get(0);
-						user.setHtmlTheme(htmlTheme);
-					}
+					user.setFlashTheme(service.getDefaultFlashTheme());
+					user.setHtmlTheme(service.getDefaultHtmlTheme());
 					user.setDisabledFlag(false);
 					user.setCreateDate(new Date());
 					user.setAuthenticationMethod((AuthenticationMethod)service.findByProperty(AuthenticationMethod.class,
