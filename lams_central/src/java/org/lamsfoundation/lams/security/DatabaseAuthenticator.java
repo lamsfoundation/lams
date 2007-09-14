@@ -27,11 +27,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-
-import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 
 
 
@@ -39,12 +38,6 @@ public class DatabaseAuthenticator
 {
 	private String dsJndiName;
 	private String principalsQuery;
-	
-	public DatabaseAuthenticator(AuthenticationMethod method)
-	{
-		this.dsJndiName = method.getParameterByName("dsJndiName").getValue();
-		this.principalsQuery = method.getParameterByName("principalsQuery").getValue();
-	}
 	
 	public DatabaseAuthenticator(String dsJndiName, String principalsQuery) {
 		this.dsJndiName = dsJndiName;

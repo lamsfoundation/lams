@@ -152,7 +152,6 @@ Ant build file.
 		<mkdir dir="${build.classes.java}"/>
 		<mkdir dir="${build.classes.test}"/>
 		<mkdir dir="${build.lib}"/>
-		<mkdir dir="${build.auth.dtd}"/>
 	</target>
 
 	<target name="clean" depends="preparedirs" description="removes all class files">
@@ -163,20 +162,8 @@ Ant build file.
 		<mkdir dir="${build.classes.java}"/>
 		<mkdir dir="${build.lib}"/>
 	</target>
-
-	<target name="copy-dtd" description="copy required dtd files.">
-		<delete failonerror="false">
-			<fileset dir="${src.lams.resources}"/>
-		</delete>
-		<mkdir dir="${src.lams.resources}"/>
-		<copy overwrite="yes" todir="${src.lams.resources}">
-			<fileset dir="${build.auth.dtd}">
-				<include name="**/*.dtd"/>
-			</fileset>
-		</copy>
-	</target>
 	
-	<target name="compile" depends="clean, copy-dtd" description="compile java sources">
+	<target name="compile" depends="clean" description="compile java sources">
 		<javac srcdir="${src.java.dir}" compiler="modern"
 	         	 	destdir="${build.classes.java}" deprecation="on" debug="on">
 			<classpath>
@@ -190,11 +177,6 @@ Ant build file.
 						<include name="**/*.xml"/>
 						<include name="**/*.properties"/>
 				</fileset>
-		</copy>
-		<copy overwrite="yes" todir="${build.classes.java}/org/lamsfoundation/lams/resources/">
-			<fileset dir="${src.lams.resources}">
-				<include name="**/*.dtd"/>
-			</fileset>
 		</copy>
 		<copy overwrite="yes" todir="${build.classes.java}" verbose="true">
 			<fileset dir="${src.java.dir}">

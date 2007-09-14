@@ -58,12 +58,7 @@
 
 	<!-- build sub-projects -->
 	<target name="build-subprojects" 
-		description="builds sub porjects">
-		<copy overwrite="yes" todir="${shareddtd}">
-			<fileset dir="${conf.auth}">
-				<include name="**/*.dtd"/>
-			</fileset>
-		</copy>
+		description="builds sub projects">
 		<ant antfile="../${lams_common}/build.xml" target="build-jar"
 			inheritAll="false" />
 		<ant antfile="../${lams_contentrepository}/build.xml"
@@ -325,15 +320,6 @@
 				<include name="login-config.xml" />
 				<include name="log4j.xml" />
 				<include name="jboss-service.xml" />
-			</fileset>
-	        <filterset>
-	                <filter token="confdir" value="${jboss.server.instance}/conf"/>
-	        </filterset>
-		</copy>
-		
-		<copy overwrite="yes" todir="${jboss.server.instance}/conf/">
-			<fileset dir="${conf.auth}/">
-				<include name="*.xml" />
 			</fileset>
 	        <filterset>
 	                <filter token="confdir" value="${jboss.server.instance}/conf"/>

@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
 import java.util.Set;
-import java.util.List;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -56,8 +55,6 @@ public class AuthenticationMethod implements Serializable {
     private Set users;
     
     private boolean enabled = true;
-    
-    private List authenticationMethodParameters;
 
     /** full constructor */
     public AuthenticationMethod(String authenticationMethodName, AuthenticationMethodType authenticationMethodType, Set users) {
@@ -147,29 +144,6 @@ public class AuthenticationMethod implements Serializable {
 	 */
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
-	}
-    
-	/**
-	 * @return Returns the authenticationMethodParameters.
-	 */
-	public List getAuthenticationMethodParameters() {
-		return authenticationMethodParameters;
-	}
-	/**
-	 * @param authenticationMethodParameters The authenticationMethodParameters to set.
-	 */
-	public void setAuthenticationMethodParameters(
-			List authenticationMethodParameters) {
-		this.authenticationMethodParameters = authenticationMethodParameters;
-	}
-	
-	public AuthenticationMethodParameter getParameterByName(String name){
-		for(int i=0; i<authenticationMethodParameters.size(); i++){
-			if(((AuthenticationMethodParameter)authenticationMethodParameters.get(i)).getName().equals(name)){
-				return (AuthenticationMethodParameter)authenticationMethodParameters.get(i);
-			}
-		}
-		return null;
 	}
 	
     public String toString() {
