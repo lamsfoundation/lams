@@ -111,6 +111,7 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 				User user = service.getUserByLogin(username);
 
 				log.debug("===> authenticating user: " + username);
+				// LDAP user provisioning
 				if (user == null) {
 					// provision a new user by checking ldap server
 					if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_PROVISIONING_ENABLED)) {
@@ -136,11 +137,19 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 					}
 				}
 
+				// disabled users can't login
 				if (user.getDisabledFlag()) {
 					log.debug("===> user is disabled.");
 					return false;
 				}
 				
+				// allow sysadmin to login as another user; in this case, the LAMS shared session
+				// will be present, allowing the following check to work
+				if (service.isUserSysAdmin()) {
+					isValid = true;
+				}
+				
+				// perform password checking according to user's authentication method
 				if (!isValid) {
 					String type = user.getAuthenticationMethod().getAuthenticationMethodType().getDescription();
 					log.debug("===> authentication type: " + type);
