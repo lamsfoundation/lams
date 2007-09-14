@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.lamsfoundation.lams.usermanagement.Role;
-
 /**
  * @version
  *
@@ -133,5 +131,13 @@ public class IndexOrgBean implements Comparable {
     	IndexOrgBean b = (IndexOrgBean)indexOrgBean;
 	    return name.compareTo(b.getName());
     }
+	
+	public void addLesson(IndexLessonBean lesson) {
+		lessons.add(lesson);
+	}
+	
+	public void addChildOrgBean(IndexOrgBean orgBean) {
+		childIndexOrgBeans.add(orgBean);
+	}
 
 }

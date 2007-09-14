@@ -22,13 +22,16 @@
  */
 package org.lamsfoundation.lams.web;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -36,6 +39,8 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -95,13 +100,67 @@ public class ProfileAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
-		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());		
 		// list all active lessons for this learner (single sql query)
+		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());		
 		LessonDTO[] lessons = getLearnerService().getActiveLessonsFor(requestor.getUserId());
-		request.setAttribute("lessons", lessons);
+		
+		// make org-sorted beans out of the lessons
+		HashMap<Integer, IndexOrgBean> orgBeansMap = new HashMap<Integer, IndexOrgBean>();
+		for (LessonDTO lesson : lessons) {
+			Integer orgId = lesson.getOrganisationID();
+			Organisation org = (Organisation)getService().findById(Organisation.class, orgId);
+			Integer orgTypeId = org.getOrganisationType().getOrganisationTypeId();
+			IndexLessonBean lessonBean = new IndexLessonBean(
+				lesson.getLessonName(), 
+				"javascript:openLearner("+lesson.getLessonID()+")"
+			);
+			log.debug("Lesson: "+lesson.getLessonName());
+			
+			// insert or update bean if it is a course
+			if (orgTypeId.equals(OrganisationType.COURSE_TYPE)) {
+				IndexOrgBean orgBean = (!orgBeansMap.containsKey(orgId))
+					? new IndexOrgBean(org.getName(), orgTypeId)
+					: orgBeansMap.get(orgId);
+				orgBean.addLesson(lessonBean);
+				orgBeansMap.put(orgId, orgBean);
+			} else if (orgTypeId.equals(OrganisationType.CLASS_TYPE)) {
+				
+				// if it is a class, find existing or create new parent bean
+				Organisation parentOrg = org.getParentOrganisation();
+				Integer parentOrgId = parentOrg.getOrganisationId();
+				IndexOrgBean parentOrgBean = (!orgBeansMap.containsKey(parentOrgId))
+					? new IndexOrgBean(parentOrg.getName(), OrganisationType.COURSE_TYPE)
+					: orgBeansMap.get(parentOrgId);
+				// create new bean for class, or use existing bean
+				IndexOrgBean orgBean = new IndexOrgBean(org.getName(), orgTypeId);
+				List<IndexOrgBean> childOrgBeans = parentOrgBean.getChildIndexOrgBeans();
+				if (childOrgBeans.contains(orgBean)) {
+					orgBean = getOrgBean(org.getName(), childOrgBeans);
+				}
+				// add lesson to class bean
+				orgBean.addLesson(lessonBean);
+				// set the parent bean
+				parentOrgBean.addChildOrgBean(orgBean);
+				orgBeansMap.put(parentOrgId, parentOrgBean);
+			}
+		}
+		
+		ArrayList beans = new ArrayList(orgBeansMap.values());
+		Collections.sort(beans);
+		
+		request.setAttribute("beans", beans);
 		request.setAttribute("tab", "profile");
 		
 		return mapping.findForward("lessons");
+	}
+	
+	private IndexOrgBean getOrgBean(String name, List<IndexOrgBean> list) {
+		for (IndexOrgBean bean : list) {
+			if (StringUtils.equals(name, bean.getName())) {
+				return bean;
+			}
+		}
+		return null;
 	}
 	
 	public ActionForward edit(ActionMapping mapping,

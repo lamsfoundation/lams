@@ -41,6 +41,11 @@ public class IndexLessonBean implements Comparable{
 	private Integer state;
 	private List<IndexLinkBean> links;
 
+	public IndexLessonBean(String name, String url) {
+		this.name = name;
+		this.url = url;
+	}
+	
 	public IndexLessonBean(String name, List<IndexLinkBean> links) {
 		this.name = name;
 		this.links = links;

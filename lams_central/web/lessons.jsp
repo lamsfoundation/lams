@@ -10,16 +10,26 @@
 
 <div class="shading-bg">
 
-<c:if test="${not empty lessons}">
-	<p>
-	<c:forEach var="lesson" items="${lessons}">
-		<a href="javascript:openLearner(<c:out value="${lesson.lessonID}"/>)" class="sequence-name-link"> 
-			<c:out value="${lesson.lessonName}" />
-		</a><br/>
+<c:if test="${not empty beans}">
+	<c:forEach var="group" items="${beans}">
+		<br/>
+		<h4><c:out value="${group.name}"/></h4>
+		<ul><c:forEach var="lesson" items="${group.lessons}">
+			<li><a href="<c:out value="${lesson.url}"/>" class="sequence-name-link"> 
+				<c:out value="${lesson.name}" />
+			</a></li>
+		</c:forEach></ul>
+		<ul><c:forEach var="subgroup" items="${group.childIndexOrgBeans}">
+			<c:out value="${subgroup.name}"/>
+			<ul><c:forEach var="s_lesson" items="${subgroup.lessons}">
+				<li><a href="<c:out value="${s_lesson.url}"/>" class="sequence-name-link"> 
+					<c:out value="${s_lesson.name}" />
+				</a></li>
+			</c:forEach></ul>
+		</c:forEach></ul>
 	</c:forEach>
-	</p>
 </c:if>
-<c:if test="${empty lessons}">
+<c:if test="${empty beans}">
 	<p class="align-left"><fmt:message key="msg.no.lessons"/></p>
 </c:if>
 
