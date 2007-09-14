@@ -76,6 +76,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     private var _gridLayer_mc:MovieClip;
     private var _lessonTabLayer_mc:MovieClip;
 	private var _monitorTabLayer_mc:MovieClip;
+	private var _monitorGateLayer_mc:MovieClip;
 	private var _learnerTabLayer_mc:MovieClip;
 	private var _todoTabLayer_mc:MovieClip;
 	private var _editOnFlyLayer_mc:MovieClip;
@@ -96,6 +97,9 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	//MonitorTabView
 	private var monitorTabView:MonitorTabView;
 	private var monitorTabView_mc:MovieClip;
+	//MonitorGateView
+	private var monitorGateView:MonitorGateView;
+	private var monitorGateView_mc:MovieClip;
 	//TodoTabView
 	private var todoTabView:TodoTabView;
 	private var todoTabView_mc:MovieClip;
@@ -107,6 +111,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	
 	private var lessonTabLoaded;
 	private var monitorTabLoaded;
+	private var monitorGateLoaded;
 	private var learnerTabLoaded;
 	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
@@ -125,6 +130,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		
 		lessonTabLoaded = false;
 		monitorTabLoaded = false;
+		monitorGateLoaded = false;
 		learnerTabLoaded = false;
 		
 		//Init for event delegation
@@ -132,7 +138,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	}
 	
 	/**
-	* Called to initialise Canvas  . CAlled by the Canvas container
+	* Called to initialise Canvas  . Called by the Canvas container
 	*/
 	public function init(m:Observable,c:Controller,x:Number,y:Number,w:Number,h:Number){
 
@@ -141,6 +147,8 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		H_GAP = 10;
 		V_GAP = 10;
 		//_monitorModel = getModel();
+		bkg_pnl._visible = false;
+		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
 		
     }    
@@ -152,10 +160,11 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 			var tgt:String = new String(evt.target);
             if(tgt.indexOf('lessonTabView_mc') != -1) { lessonTabLoaded = true; }
 			else if(tgt.indexOf('monitorTabView_mc') != -1) { monitorTabLoaded = true; }
+			else if(tgt.indexOf('monitorGateView_mc') != -1) { monitorGateLoaded = true; }
 			else if(tgt.indexOf('learnerTabView_mc') != -1) { learnerTabLoaded = true; }
 			else Debugger.log('not recognised instance ' + evt.target,Debugger.GEN,'tabLoaded','MonitorView');
 		
-			if(lessonTabLoaded && monitorTabLoaded && learnerTabLoaded) { dispatchEvent({type:'tload',target:this}); }
+			if(lessonTabLoaded && monitorTabLoaded && learnerTabLoaded && monitorGateLoaded) { dispatchEvent({type:'tload',target:this}); }
 			
         }else {
             //Raise error for unrecognized event
@@ -234,13 +243,9 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		_monitorLearner_mc = monitorLearner_scp.content;
 		
 		_lessonTabLayer_mc = _monitorLesson_mc.createEmptyMovieClip("_lessonTabLayer_mc", _monitorLesson_mc.getNextHighestDepth());
-		
-		
 		_monitorTabLayer_mc = _monitorSequence_mc.createEmptyMovieClip("_monitorTabLayer_mc", _monitorSequence_mc.getNextHighestDepth());
-		
-		
 		_learnerTabLayer_mc = _monitorLearner_mc.createEmptyMovieClip("_learnerTabLayer_mc", _monitorLearner_mc.getNextHighestDepth());
-	
+		
 		var tab_arr:Array = [{label:Dictionary.getValue('mtab_lesson'), data:"lesson"}, {label:Dictionary.getValue('mtab_seq'), data:"monitor"}, {label:Dictionary.getValue('mtab_learners'), data:"learners"}];
 		
 		monitorTabs_tb.dataProvider = tab_arr;
@@ -292,16 +297,22 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		monitorTabView.init(mm, undefined);
 		monitorTabView.addEventListener('load',Proxy.create(this,tabLoaded));
 		
+		// Inititialsation for Monitor Gate View 	
+		monitorGateView_mc = this.attachMovie("endGate", "monitorGateView_mc", DepthManager.kTop, {_x: 0, _y: 0});
+		monitorGateView = MonitorGateView(monitorGateView_mc);
+		monitorGateView.init(mm, undefined);
+		monitorGateView.addEventListener('load',Proxy.create(this,tabLoaded));
+		
 		// Inititialsation for Learner Tab View 
 		learnerTabView_mc = _learnerTabLayer_mc.attachMovie("LearnerTabView", "learnerTabView_mc",DepthManager.kTop)
 		learnerTabView = LearnerTabView(learnerTabView_mc);
 		learnerTabView.init(mm, undefined);
 		learnerTabView.addEventListener('load',Proxy.create(this,tabLoaded));
-		
+				
 		mm.addObserver(lessonTabView);
 		mm.addObserver(monitorTabView);
+		mm.addObserver(monitorGateView);
 		mm.addObserver(learnerTabView);
-
 	}
 	
 	public function showToolTip(btnObj, btnTT:String):Void{
@@ -364,15 +375,16 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
         var s:Object = mm.getSize();
 		bkg_pnl.setSize(s.w,s.h);
 		bkgHeader_pnl.setSize(s.w, bkgHeader_pnl._height);
-		monitorLesson_scp.setSize(s.w-monitorLesson_scp._x,s.h-monitorLesson_scp._y);
-		monitorSequence_scp.setSize(s.w-monitorSequence_scp._x,s.h-monitorSequence_scp._y);
-		monitorLearner_scp.setSize(s.w-monitorLearner_scp._x,s.h-monitorLearner_scp._y);
+		monitorLesson_scp.setSize(s.w-monitorLesson_scp._x, s.h-monitorLesson_scp._y);
+		monitorSequence_scp.setSize(s.w-monitorSequence_scp._x, s.h-40.7);
+		monitorLearner_scp.setSize(s.w-monitorLearner_scp._x, s.h-monitorLearner_scp._y);
+		monitorGateView_mc.setSize(s.w, 40.7);
+		
 		viewJournals_btn._x = s.w - 260;
 		exportPortfolio_btn._x = s.w - 260;
 		editFly_btn._x = s.w - 360;
 		refresh_btn._x = s.w - 160
 		help_btn._x = s.w - 80
-				
 	}
 	
 	 /**
@@ -390,7 +402,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	}
 	
 	/**
-	 * Overrides method in abstract view to ensure cortect type of controller is returned
+	 * Overrides method in abstract view to ensure correct type of controller is returned
 	 * @usage   
 	 * @return  CanvasController
 	 */

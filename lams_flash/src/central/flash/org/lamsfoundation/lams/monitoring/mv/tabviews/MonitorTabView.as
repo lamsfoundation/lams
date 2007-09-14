@@ -59,19 +59,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	private var _monitorTabView:MonitorTabView;
 	
 	private var _tip:ToolTip;
-	
-	private var endGateOffset:Number = 60;
+
 	private var learner_X:Number = 22;
 	private var learner_Y:Number = 19;
 	private var drawDesignCalled:String;
 	
-	
-	private var lessonEnd_lbl:Label;
-	private var finishedLearnersList:Array;
-	private var bg_pnl:MovieClip;
-	private var doorClosed:MovieClip;
-	private var doorOpen:MovieClip;
-	private var bar_pnl:MovieClip;
 	private var learnerMenuBar:MovieClip;
 	private var monitorTabs_tb:MovieClip;
 	private var _monitorTabViewContainer_mc:MovieClip;
@@ -79,7 +71,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	private var bkg_pnl:MovieClip;
 	
 	private var _learnerContainer_mc:MovieClip;
-	private var endGate_mc:MovieClip;
 	
 	/**
 	* Constructor
@@ -96,7 +87,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	}
 
 	/**
-	* Called to initialise Canvas  . CAlled by the Canvas container
+	* 
 	*/
 	public function init(m:Observable,c:Controller){
 		//Invoke superconstructor, which sets up MVC relationships.
@@ -214,7 +205,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 						
 						drawDesignCalled = "called";
 						
-						showEndGateData(mm);
 						mm.drawDesign(infoObj.tabID);
 						
 					}
@@ -237,57 +227,22 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		transitionLayer = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
 		activityComplexLayer = this.createEmptyMovieClip("_activityComplexLayer_mc", this.getNextHighestDepth());
 		activityLayer = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
-		
-		_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", this.getNextHighestDepth());
-			
+				
 		var s:Object = mm.getSize();
-		endGate_mc = activityLayer.createChildAtDepth("endGate",DepthManager.kTop, {_x:0, _y:s.h-endGateOffset});
-		mm.endGate(endGate_mc);
-		mm.endGate = endGate_mc;
-		endGate_mc.tt_btn.onRollOver = Proxy.create(this,this['showToolTip'], "finish_learner_tooltip");
-		endGate_mc.tt_btn.onRollOut =  Proxy.create(this,this['hideToolTip']);
+		
 		setStyles();
 		
 		dispatchEvent({type:'load',target:this});
 	}
-	
-	private function showEndGateData(mm:MonitorModel):Void{
-		var mc = getController();
-		var finishedLearners:Number = 0; 
-		var totalLearners:Number = mm.allLearnersProgress.length;
 		
-		endGate_mc.doorClosed._visible = true;
-		finishedLearnersList = new Array();
-		
-		for (var i=0; i<mm.allLearnersProgress.length; i++){
-			if (mm.allLearnersProgress[i].isLessonComplete()){
-				
-				var learner:Object = new Object();
-				learner = mm.allLearnersProgress[i]
-				
-				var temp_mc = _learnerContainer_mc.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), _learnerContainer_mc.getNextHighestDepth(),{learner:learner, _monitorController:mc, _x:learner_X+(finishedLearners*10), _y:(endGate_mc._y+learner_Y), _hasPlus:false});
-				finishedLearnersList.push(temp_mc);
-				finishedLearners++;
-				
-				var learnerIcon_mc = _learnerContainer_mc["learnerIcon"+learner.getUserName()];
-				learnerIcon_mc.init();
-				
-				
-			}
-		}
-		
-		endGate_mc.lessonEnd_lbl.text = "<b>"+Dictionary.getValue('title_sequencetab_endGate')+"</b> "+finishedLearners+" of "+ totalLearners;
-		
-	}
-	
 	public function showToolTip(btnTT:String):Void{
 		var Xpos = Application.MONITOR_X+ 5;
-		var Ypos = Application.MONITOR_Y+ endGate_mc._y;
+		//var Ypos = Application.MONITOR_Y+ endGate_mc._y;
 		var ttHolder = Application.tooltip;
 		var ttMessage = Dictionary.getValue(btnTT);
 		
 		//param "true" is to specify that tooltip needs to be shown above the component 
-		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos, true);
+		//_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos, true);
 		
 	}
 	
@@ -302,7 +257,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	
 	/**
 	 * Reloads the learner Progress and 
-	 * @Param isChanged Boolean Value to pass it to setIsProgressChanged in monitor model so 		that it sets it to true if refresh button is clicked and sets it to fasle as soon as latest data is loaded and design is redrawn.
+	 * @Param isChanged Boolean Value to pass it to setIsProgressChanged in monitor model so that it sets it to true if refresh button is clicked and sets it to fasle as soon as latest data is loaded and design is redrawn.
 	 * @usage   
 	 * @return  nothing
 	 */
@@ -311,17 +266,14 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			drawDesignCalled = undefined;
 			
 			//Remove all the movies drawn on the transition and activity movieclip holder
-			
 			this._learnerContainer_mc.removeMovieClip();
 			this.transitionLayer.removeMovieClip();
 			this.activityLayer.removeMovieClip();
-			this.endGate_mc.removeMovieClip();
 			
 			//Recreate both Transition holder and Activity holder Movieclips
 			transitionLayer = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
 			activityLayer = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 			_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", this.getNextHighestDepth());
-			endGate_mc = activityLayer.createChildAtDepth("endGate",DepthManager.kTop, {_x:0, _y:s.h-endGateOffset});
 			
 			if (isChanged == false){
 				mm.setIsProgressChangedSequence(false);
@@ -366,7 +318,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		return s;
 	}
 	
-	
 	/**
 	 * Draws new activity to monitor tab view stage.
 	 * @usage   
@@ -408,6 +359,30 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		mm.getMonitor().getMV().getMonitorSequenceScp().redraw(true);
 		
 		return true;
+	}
+	
+	/**
+	* Gets the Y Coordinate of the lowest activity that will be displayed on the canvas from the DesignDataModel
+	* 
+	* @usage   
+	* @param    
+	* @return  The Y Coordinate
+	*/
+	private function getLowestActivityYCoord():Number {
+			
+		var lowestActivity:Number = 0; //lowest position in layout
+		var activeSeq:Sequence = MonitorModel(getModel()).getSequence();
+		var activitiesHash:Hashtable = activeSeq.getLearningDesignModel().activities;
+		var activityKeys:Array = activitiesHash.keys();
+		
+		for(var i=0; i < activityKeys.length; i++) {
+			
+			if (activitiesHash.get(activityKeys[i]).yCoord  > lowestActivity) {
+				lowestActivity = activitiesHash.get(activityKeys[i]).yCoord;
+			}
+		} 
+		Debugger.log("Lowest activity Y Coord from DDM: "+activitiesHash.get(activityKeys[i]).yCoord, Debugger.GEN, 'getLowestActivityYCoord', 'MonitorTabView');
+		return lowestActivity;
 	}
 	
 	/**
@@ -484,36 +459,31 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	private function setStyles():Void{
 		var styleObj = _tm.getStyleObject('CanvasPanel');
 		bkg_pnl.setStyle('styleName',styleObj);
-		styleObj = _tm.getStyleObject('MHPanel');
-		endGate_mc.bg_pnl.setStyle('styleName',styleObj);
-		styleObj = _tm.getStyleObject('BGPanel');
-		endGate_mc.bar_pnl.setStyle('styleName',styleObj);
-		styleObj = _tm.getStyleObject('EndGatelabel');
-		endGate_mc.lessonEnd_lbl.setStyle('styleName',styleObj);
 	}
 	
 	/**
     * Sets the size of the canvas on stage, called from update
     */
 	private function setSize(mm:MonitorModel):Void{
-        var s:Object = mm.getSize();
+
+		var activitySpan:Number = getLowestActivityYCoord();
+        var verticalSpacing:Number = 100;
+		var s:Object = mm.getSize();
 		
-		bkg_pnl.setSize(s.w,s.h);
+		Debugger.log("Setting canvas size, activitySpan: "+activitySpan, Debugger.CRITICAL, 'setSize', 'MonitorTabView');
 		
-		endGate_mc._y = s.h-endGateOffset;
-		endGate_mc.bg_pnl.setSize(s.w,endGate_mc.bg_pnl.height);
-		endGate_mc.bar_pnl.setSize(s.w-20,endGate_mc.bar_pnl.height);
-		endGate_mc.tt_btn.setSize(s.w,endGate_mc.bg_pnl.height);
-		
-		for (var i=0; i<finishedLearnersList.length; i++){
-			finishedLearnersList[i]._y = endGate_mc._y+learner_Y
-		}
-		
-		mm.getMonitor().getMV().getMonitorSequenceScp().redraw(true); 
-		
-		//Create the grid.  The grid is re-drawn each time the canvas is resized.
-		var grid_mc = Grid.drawGrid(gridLayer,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
-				
+		if (activitySpan == 0) {
+			bkg_pnl.setSize(s.w, s.h);
+			var grid_mc = Grid.drawGrid(gridLayer,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
+		} 
+		else {
+			bkg_pnl.setSize(s.w,activitySpan + verticalSpacing);
+			
+			//Create the grid.  The grid is re-drawn each time the canvas is resized.
+			var grid_mc = Grid.drawGrid(gridLayer,Math.round(s.w),Math.round(activitySpan + verticalSpacing), V_GAP, H_GAP);
+		}		
+			
+		mm.getMonitor().getMV().getMonitorSequenceScp().redraw(true);
 	}
 	
 	 /**
@@ -527,7 +497,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
         this._y = p.y;
 		
 	}
-	
 	
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned
@@ -545,9 +514,4 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
     public function defaultController (model:Observable):Controller {
         return new MonitorController(model);
     }
-	
-	public function getEndGate():MovieClip{
-		return endGate_mc;
-	}
-	
 }
