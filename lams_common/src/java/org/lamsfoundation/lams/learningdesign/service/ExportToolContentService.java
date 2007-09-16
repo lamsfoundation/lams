@@ -42,7 +42,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -485,7 +484,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			}
 			
 			// zip file name with full path
-			targetZipFileName = URLEncoder.encode(ldDto.getTitle() + EXPORT_TOOLCONTNET_ZIP_SUFFIX, "UTF-8");
+			targetZipFileName = ldDto.getTitle() + EXPORT_TOOLCONTNET_ZIP_SUFFIX;
 			
 			log.debug("Create export content target zip file. File name is " + targetZipFileName);
 			//create zip file and return zip full file name
