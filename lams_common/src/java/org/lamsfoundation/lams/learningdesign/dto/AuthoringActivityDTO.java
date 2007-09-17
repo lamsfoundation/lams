@@ -218,8 +218,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
 	private String languageFile;
 	
-	/** List of the UIIDs of the activities that are input activities for this activity */
-	private ArrayList inputActivities;
+	/** List of the UIIDs of the activities that are input activities for this activity. This array
+	 * will only contain integers. We can't type the get method as that breaks WDDX. */
+	private ArrayList<Integer> inputActivities;
 
 	/** List of the UIIDs of the activities that are input activities for this activity */
 	private Integer toolActivityUIID;
@@ -1090,10 +1091,10 @@ public class AuthoringActivityDTO extends BaseDTO{
 	public void setAdminURL(String adminURL) {
 		this.adminURL = adminURL;
 	}
-	public ArrayList getInputActivities() {
+	public ArrayList<Integer> getInputActivities() {
 		return inputActivities;
 	}
-	public void setInputActivities(ArrayList inputActivities) {
+	public void setInputActivities(ArrayList<Integer> inputActivities) {
 		this.inputActivities = inputActivities;
 	}
 	public Integer getToolActivityUIID() {

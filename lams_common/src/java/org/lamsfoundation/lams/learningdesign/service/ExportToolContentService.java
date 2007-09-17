@@ -47,6 +47,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +81,7 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
+import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -104,9 +106,11 @@ import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.BranchActivityEntryDTO;
+import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
 import org.lamsfoundation.lams.learningdesign.dto.GroupDTO;
 import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ToolOutputBranchActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.tool.SystemTool;
@@ -125,6 +129,9 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
+import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.springframework.beans.BeansException;
@@ -1298,14 +1305,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		Map<Long,Activity> activityMapper = new HashMap<Long,Activity>();
 		Map<Integer,Activity> activityByUIIDMapper = new HashMap<Integer, Activity>();
 
-		// as we create the activities, we need to record any "first child UIID's for the sequence activity
-		// to process later - we can't process them now as the children won't have been created yet and if we
-		// leave it till later and then find all the sequence activities we are going through the activity
-		// set over and over again for no reason.
-		Map<Integer,SequenceActivity> firstChildUIIDToSequenceMapper = new HashMap<Integer,SequenceActivity>();
+		// as we create the activities, we need to record any "default activities" for the sequence activity
+		// and branching activities to process later - we can't process them now as the children won't have 
+		// been created yet and if we leave it till later and then find all the activities we are 
+		// going through the activity set over and over again for no reason.
+		Map<Integer,ComplexActivity> defaultActivityToParentActivityMapping = new HashMap<Integer,ComplexActivity>();
 		
 		for(AuthoringActivityDTO actDto: actDtoList){
-			Activity act = getActivity(actDto,groupingMapper,toolMapper,firstChildUIIDToSequenceMapper);
+			Activity act = getActivity(actDto,groupingMapper,toolMapper,defaultActivityToParentActivityMapping);
 			//so far, the activitiy ID is still old one, so setup the mapping relation between old ID and new activity.
 			activityMapper.put(act.getActivityId(),act);
 			activityByUIIDMapper.put(act.getActivityUIID(),act);
@@ -1313,7 +1320,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			if(!removedActMap.containsKey(actDto.getActivityID()))
 				actList.add(act);
 		}
-		// rescan the activity list and refresh their parent activity.
+		// rescan the activity list and refresh their parent activity and input activities
 		for(AuthoringActivityDTO actDto: actDtoList){
 			Activity act = activityMapper.get(actDto.getActivityID());
 			if(removedActMap.containsKey(actDto.getActivityID()))
@@ -1340,26 +1347,40 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				}
 			}
 			
+			if (actDto.getInputActivities() != null) {
+				act.setInputActivities(new HashSet<Activity>());
+				for ( Integer inputActivityUIID : actDto.getInputActivities() ) {
+					Activity inputAct = activityByUIIDMapper.get(inputActivityUIID);
+					if ( inputAct == null ) {
+						log.error("Unable to find input activity with UIID "+inputActivityUIID+" for activity "+act);
+					} else {
+						act.getInputActivities().add(inputAct);
+					}
+				}				
+			}
+			
 			//persist
 			act.setActivityId(null);
 			activityDAO.insert(act);
 		}
 		
-		// process the "first child" for any sequence activities. If the child has been removed then leave it
-		// as null as the progress engine will cope (it will pick a new one based on the lack of an input transition)
-		// and in authoring the author will just have to set up a new first activity
-		if ( firstChildUIIDToSequenceMapper.size() > 0 ) {
-			for ( Integer firstChildUIID : firstChildUIIDToSequenceMapper.keySet() ) {
-				SequenceActivity sequence = firstChildUIIDToSequenceMapper.get(firstChildUIID);
-				Activity childActivity = activityByUIIDMapper.get(firstChildUIID);
+		// Process the "first child" for any sequence activities and the "default branch" for branching activities. 
+		// If the child has been removed then leave it as null as the progress engine will cope (it will pick a 
+		// new one based on the lack of an input transition) and in authoring the author will just have to set 
+		// up a new first activity. If the default branch is missing and other details are missing (e.g. missing conditions)
+		// from the design then it may have to be fixed in authoring before it will run, so the default branch missing
+		// case needs to be picked up by the validation (done later).
+		if ( defaultActivityToParentActivityMapping.size() > 0 ) {
+			for ( Integer childUIID : defaultActivityToParentActivityMapping.keySet() ) {
+				ComplexActivity complex = defaultActivityToParentActivityMapping.get(childUIID);
+				Activity childActivity = activityByUIIDMapper.get(childUIID);
 				if ( childActivity == null )  {
-					log.error("Unable to find first child activity ("+firstChildUIID
-							+") for the sequence activity ("+sequence
-							+") referred to in First Child to Sequence map. The activity was probably removed. "
-							+"The first activity should be reset up in authoring "
+					log.error("Unable to find the default child activity ("+childUIID
+							+") for the activity ("+complex.getTitle()
+							+"). The activity "+complex.getTitle()+" will need to be fixed in authoring "
 							+"otherwise the progress engine will just do the best it can.");
 				} else {
-					sequence.setDefaultActivity(childActivity);
+					complex.setDefaultActivity(childActivity);
 				}
 			}
 		}
@@ -1376,16 +1397,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 						Long existFirstAct = null;
 						Long nextActId = actDto.getActivityID();
 						boolean found = false;
-						// try to find next availble activity
+						// try to find next available activity
 						//1000 is failure tolerance: to avoid dead loop.
 						for(int idx=0;idx<1000;idx++){
 							if(transDtoList == null || transDtoList.isEmpty())
 								break;
-							boolean tranisionBreak = true;
+							boolean transitionBreak = true;
 							for(TransitionDTO transDto: transDtoList){
 								//find out the transition of current first activity
 								if(nextActId.equals(transDto.getFromActivityID())){
-									tranisionBreak = false;
+									transitionBreak = false;
 									nextActId = transDto.getToActivityID();
 									if(nextActId != null && !removedActMap.containsKey(nextActId)){
 										existFirstAct = nextActId;
@@ -1402,10 +1423,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 									//continue try 3rd...
 								}
 							}
-							//hi, this acitivty also removed!!! then retrieve again
-							//if found is false, then the nextAct is still not available, then continue find.
-							//tranisionBreak mean the activity is removed but it can not find its transition to decide next available activity.
-							if(found || tranisionBreak)
+							// This activity also removed!!! then retrieve again
+							// If found is false, then the nextAct is still not available, then continue find.
+							// tranisitionBreak mean the activity is removed but it can not find its transition to decide next available activity.
+							if(found || transitionBreak)
 								break;
 						}
 						Activity next = activityMapper.get(existFirstAct);
@@ -1440,7 +1461,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 //			transitionDAO.insert(trans);
 		}
 		
-		// branch mappings - maps groups to branchs
+		// branch mappings - maps groups to branches, map conditions to branches
 		List<BranchActivityEntryDTO> entryDtoList = dto.getBranchMappings();
 		if ( entryDtoList != null ) {
 			Set<BranchActivityEntry> entryList = new HashSet<BranchActivityEntry>();
@@ -1652,7 +1673,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private BranchActivityEntry getBranchActivityEntry(BranchActivityEntryDTO entryDto, Map<Integer, Group>groupByUIIDMapper, 
 			Map<Integer, Activity> activityByUIIDMapper) {
 
-		Activity branch = activityByUIIDMapper.get(entryDto.getSequenceActivityUIID());
+		SequenceActivity branch = (SequenceActivity) activityByUIIDMapper.get(entryDto.getSequenceActivityUIID());
 		if ( branch == null ) {
 			log.error("Unable to find matching sequence activity for group to branch mapping "+entryDto+" Skipping entry");
 			return null;
@@ -1665,13 +1686,35 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 
 		Group group = groupByUIIDMapper.get(entryDto.getGroupUIID());
-		if ( group == null ) {
-			log.error("Unable to find matching group for group to branch mapping "+entryDto+" Skipping entry");
-			return null;
+
+		BranchCondition condition = null;
+		if ( entryDto instanceof ToolOutputBranchActivityEntryDTO ) {
+			BranchConditionDTO dto = ((ToolOutputBranchActivityEntryDTO)entryDto).getCondition();
+			if ( dto != null ) {
+				condition = new BranchCondition(dto);
+				condition.setConditionId(null);
+			}
 		}
 
-		return 	group.allocateBranchToGroup(entryDto.getEntryUIID(), (SequenceActivity) branch, (BranchingActivity) branchingActivity);
+		BranchActivityEntry entry = null;
+		if ( condition != null ) {
+			entry = condition.allocateBranchToCondition(entryDto.getEntryUIID(), (SequenceActivity) branch, (BranchingActivity) branchingActivity);
+		} else if ( group != null ) {
+			entry =	group.allocateBranchToGroup(entryDto.getEntryUIID(), (SequenceActivity) branch, (BranchingActivity) branchingActivity);
+		} 
+		
+		if ( entry != null ) {
+			if ( branch.getBranchEntries() == null ) {
+				branch.setBranchEntries(new HashSet());
+			}
+			branch.getBranchEntries().add(entry);
+			return entry;
+		} else {
+			log.error("Unable to find group or condition for branch mapping "+entryDto+" Skipping entry");
+			return null;
+		}
 	}
+	
 
 	private Transition getTransition(TransitionDTO transDto, Map<Long, Activity> activityMapper) {
 		Transition trans = new Transition();
@@ -1698,7 +1741,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		trans.setTransitionId(transDto.getTransitionID());
 		trans.setTransitionUIID(transDto.getTransitionUIID());
 		
-		//reste value
+		//reset value
 		trans.setCreateDateTime(new Date());
 		return trans;
 	}
@@ -1711,7 +1754,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * @return
 	 */
 	private Activity getActivity(AuthoringActivityDTO actDto, Map<Long, Grouping> groupingList, 
-			Map<Long,ToolContent> toolMapper, Map<Integer,SequenceActivity> firstChildUIIDToSequenceMapper) {
+			Map<Long,ToolContent> toolMapper, Map<Integer,ComplexActivity> defaultActivityToParentActivityMapping) {
 
 		if(actDto == null)
 			return null;
@@ -1769,9 +1812,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				((OptionsActivity)act).setOptionsInstructions(actDto.getOptionsInstructions());
 				break;
 			case Activity.SEQUENCE_ACTIVITY_TYPE:
-				if ( actDto.getDefaultActivityUIID() != null ) {
-					firstChildUIIDToSequenceMapper.put(actDto.getDefaultActivityUIID(), (SequenceActivity)act);
-				}
 				break;
 			case Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE:
 				((BranchingActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TEACHER_CHOSEN_BRANCHING));
@@ -1786,6 +1826,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				processBranchingFields((BranchingActivity) act, actDto);
 				break;
 		}		
+		
+		if ( act.isComplexActivity() && actDto.getDefaultActivityUIID() != null ) {
+			defaultActivityToParentActivityMapping.put(actDto.getDefaultActivityUIID(), (ComplexActivity)act);
+		}
 		
 		act.setGroupingSupportType(actDto.getGroupingSupportType());
 		act.setActivityUIID(actDto.getActivityUIID());

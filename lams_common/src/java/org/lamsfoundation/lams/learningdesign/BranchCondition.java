@@ -71,6 +71,18 @@ public class BranchCondition implements Comparable {
     	this.exactMatchValue = exactMatchValue;
     }
 
+    /** Create a condition object based on an existing DTO object. Copies all fields including the id field */
+    public BranchCondition(BranchConditionDTO conditionDTO) {
+    	this(conditionDTO.getConditionId(), 
+			conditionDTO.getConditionUIID(), 
+			conditionDTO.getOrderID(),
+			conditionDTO.getName(),
+			conditionDTO.getDisplayName(),
+			conditionDTO.getType(),
+			conditionDTO.getStartValue(),
+			conditionDTO.getEndValue(),
+			conditionDTO.getExactMatchValue());
+    }
     
  	/** 
 	 *            @hibernate.id
