@@ -349,6 +349,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td>
 		</tr>
 		<tr>
+			<td width="34%">
+				&nbsp;
+			</td >
 			<td width="33%">
 				<input type="button" class="button"  id="nonmembersadd" name="nonmembersadd" value="<fmt:message key="button.branching.add.user.to.branch"/>" onclick="addMembersToBranch()" disabled="true"/>
 			</td>
