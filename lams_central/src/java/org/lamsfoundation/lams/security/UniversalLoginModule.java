@@ -80,13 +80,6 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 	public void initialize(Subject subject, CallbackHandler callbackHandler,
 			Map sharedState, Map options) {
 		super.initialize(subject, callbackHandler, sharedState, options);
-
-		// TODO cleanup unneeded authentication method related classes
-		//from options to get path to property file -> authentication.xml
-		//propertyFilePath = (String) options.get("authenticationPropertyFile");
-		//load authentication property file  
-		//AuthenticationMethodConfigurer.setConfigFilePath(propertyFilePath);
-
 		dsJndiName = (String)options.get("dsJndiName");
 		principalsQuery = (String)options.get("principalsQuery");
 		rolesQuery = (String)options.get("rolesQuery");
