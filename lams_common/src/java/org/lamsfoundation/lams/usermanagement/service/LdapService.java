@@ -109,7 +109,7 @@ public class LdapService implements ILdapService {
 				user.setCreateDate(new Date());
 				user.setLocale(service.getDefaultLocale());
 				service.save(user);
-				// TODO write audit log
+				service.auditUserCreated(user, "common");
 				return true;
 			} else {
 				log.error("===> Login name from LDAP is empty - user not created.");

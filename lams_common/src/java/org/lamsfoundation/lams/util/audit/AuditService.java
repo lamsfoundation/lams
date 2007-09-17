@@ -75,7 +75,7 @@ public class AuditService implements IAuditService {
 	   			return getUserString(user);
 	   		}
 	   	}
-	   	return "User unknown (session does not contain user details): ";
+	   	return "System Generated (No Current User): ";
 	}
 	
 	private String getUserString(UserDTO userDTO) {
