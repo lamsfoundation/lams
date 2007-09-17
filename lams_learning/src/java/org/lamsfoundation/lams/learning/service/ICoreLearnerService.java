@@ -161,7 +161,6 @@ public interface ICoreLearnerService extends ILearnerService
     /**
      * Retrieve all lessons that has been started, suspended or finished. All
      * finished but archived lesson should not be loaded.
-     * TODO to be removed when dummy learner interface is removed
      * @param learner the user who intend to start a lesson
      * @return a list of active lessons.
      */
