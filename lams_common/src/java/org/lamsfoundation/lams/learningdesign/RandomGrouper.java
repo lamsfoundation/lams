@@ -103,12 +103,33 @@ public class RandomGrouper extends Grouper implements Serializable
     }
     
     /**
+     * Need to be able to force a user into a particular group for group based branching in preview. 
+     * So this is a non-random random. Bleah!
      * @throws GroupingException 
      * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping,java.lang.Long, java.util.List)
      */
     public void doGrouping(Grouping randomGrouping,Long groupId, List learners) throws GroupingException
     {
-    	doGrouping(randomGrouping, (String)null, learners);
+    	if ( groupId != null ) {
+	    	Iterator iter = randomGrouping.getGroups().iterator();
+	    	Group selectedGroup = null;
+	    	while (iter.hasNext() && selectedGroup==null) {
+				Group group = (Group) iter.next();
+				if ( group.getGroupId().equals(groupId) ) {
+					selectedGroup = group;
+				}
+			}
+	    	if ( selectedGroup == null ) {
+	    		String error = "Tried to add users to group "+groupId+" but group cannot be found.";
+	    		log.error(error); 
+	    		throw new GroupingException(error);
+	    	}
+	    	selectedGroup.getUsers().addAll(learners);
+    	} else {
+    		// normal random !!!
+        	doGrouping(randomGrouping, (String)null, learners);
+    	}
+
     }
     
     //---------------------------------------------------------------------

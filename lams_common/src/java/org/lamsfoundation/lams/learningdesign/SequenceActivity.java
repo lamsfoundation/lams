@@ -186,7 +186,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 		this.branchEntries = branchEntries;
 	}
 
-	/** Get the groups related to this sequence activity, related via the BranchEntries */
+	/** Get the groups related to this sequence activity, related via the BranchEntries.  */
 	public SortedSet<Group> getGroupsForBranch() {
 		
 		Set<BranchActivityEntry> mappingEntries = getBranchEntries();
@@ -195,7 +195,12 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 		if ( mappingEntries != null ) {
 			Iterator mappingIter = mappingEntries.iterator();
 			if ( mappingIter.hasNext() )  {
-				sortedGroups.add(((BranchActivityEntry) mappingIter.next()).getGroup());
+				// Not all the BranchEntries have groups - when in preview, if the user selects a different
+				// branch to their expected branch then a group may not exist yet.
+				Group group = ((BranchActivityEntry) mappingIter.next()).getGroup();
+				if ( group != null ) {
+					sortedGroups.add(group);
+				}
 			}
 		}
 		

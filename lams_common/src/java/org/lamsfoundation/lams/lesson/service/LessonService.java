@@ -246,13 +246,14 @@ public class LessonService implements ILessonService
     
 	/**
      * Perform the grouping, setting the given list of learners as one group. Currently used for chosen grouping and 
-     * teacher chosen branching
+     * teacher chosen branching, and for group based branching in preview (when the user selects a branch that would 
+     * not be their normal branch).
      * @param grouping The grouping that needs to have the grouping performed.. (mandatory)
      * @param the id of the preferred group (optional)
      * @param learners to form one group (mandatory) 
      */
    public void performGrouping(Grouping grouping, Long groupId, List learners) throws LessonServiceException {
-		if ( grouping != null && grouping.isChosenGrouping() ) {
+		if ( grouping != null  ) {
 	       	Grouper grouper = grouping.getGrouper();
 	       	if ( grouper != null ) {
 	       		grouper.setCommonMessageService(messageService);
