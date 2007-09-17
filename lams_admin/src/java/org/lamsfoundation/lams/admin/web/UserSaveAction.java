@@ -148,7 +148,7 @@ public class UserSaveAction extends Action {
 				log.debug("editing userId: " + userId);
 				// hash the new password if necessary, and audit the fact
 				if (passwordChanged) {
-					writeAuditLog(user, new String[1]);
+					service.auditPasswordChanged(user, AdminConstants.MODULE_NAME);
 					userForm.set("password", HashUtil.sha1((String)userForm.get("password")));
 				} else {
 					userForm.set("password", user.getPassword());
@@ -173,7 +173,7 @@ public class UserSaveAction extends Action {
 					service.save(user);
 					
 					// make 'create user' audit log entry
-					writeAuditLog(user, new String[2]);
+					service.auditUserCreated(user, AdminConstants.MODULE_NAME);
 					
 					log.debug("user: " + user.toString());
 				}
@@ -197,23 +197,6 @@ public class UserSaveAction extends Action {
 			saveErrors(request, errors);
 			request.setAttribute("orgId", orgId);
 			return mapping.findForward("user");
-		}
-	}
-
-	private void writeAuditLog(User user, String[] args) {
-		if (args.length==1) {  // password changed
-			args[0] = user.getLogin()+"("+user.getUserId()+")";
-			String message = AdminServiceProxy.getMessageService(getServlet().getServletContext())
-				.getMessage("audit.user.password.change",args);
-			AdminServiceProxy.getAuditService(getServlet().getServletContext())
-				.log(AdminConstants.MODULE_NAME, message);
-		} else if (args.length==2) {  // user created
-			args[0] = user.getLogin()+"("+user.getUserId()+")";
-			args[1] = user.getFullName();
-			String message = AdminServiceProxy.getMessageService(getServlet().getServletContext())
-				.getMessage("audit.user.create", args);
-			AdminServiceProxy.getAuditService(getServlet().getServletContext())
-				.log(AdminConstants.MODULE_NAME, message);
 		}
 	}
 	

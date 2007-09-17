@@ -59,8 +59,13 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.audit.AuditService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.HttpSessionManager;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * <p>
@@ -84,6 +89,15 @@ public class UserManagementService implements IUserManagementService {
 	private IGroupDAO groupDAO; 
 	private IRoleDAO roleDAO;
 	protected MessageService messageService;
+	private static IAuditService auditService;
+	
+	private IAuditService getAuditService() {
+		if (auditService == null) {
+			WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
+			auditService = (IAuditService) ctx.getBean("auditService");
+		}
+		return auditService;
+	}
 
 	/**
 	 * Set i18n MessageService
@@ -897,4 +911,20 @@ public class UserManagementService implements IUserManagementService {
 		String localeName = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 		return getSupportedLocale(localeName.substring(0,2),localeName.substring(3));
 	}
+	
+	public void auditPasswordChanged(User user, String moduleName) {
+		String[] args = new String[1];
+		args[0] = user.getLogin() + "(" + user.getUserId() + ")";
+		String message = messageService.getMessage("audit.user.password.change", args);
+		getAuditService().log(moduleName, message);
+	}
+	
+	public void auditUserCreated(User user, String moduleName) {
+		String[] args = new String[2];
+		args[0] = user.getLogin() + "(" + user.getUserId() + ")";
+		args[1] = user.getFullName();
+		String message = messageService.getMessage("audit.user.create", args);
+		getAuditService().log(moduleName, message);
+	}
+
 }

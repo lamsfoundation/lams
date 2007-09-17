@@ -396,4 +396,8 @@ public interface IUserManagementService {
 	 * @return server default supported locale object
 	 */
 	public SupportedLocale getDefaultLocale();
+	
+	public void auditPasswordChanged(User user, String moduleName);
+	
+	public void auditUserCreated(User user, String moduleName);
 }
