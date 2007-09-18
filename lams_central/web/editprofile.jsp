@@ -98,69 +98,85 @@
 
 <c:if test="${authenticationMethodId != dbId}">	
 
+	<html:hidden property="title" />
+	<html:hidden property="firstName" />
+	<html:hidden property="lastName" />
+	<html:hidden property="email" />
+	<html:hidden property="addressLine1" />
+	<html:hidden property="addressLine2" />
+	<html:hidden property="addressLine3" />
+	<html:hidden property="city" />
+	<html:hidden property="state" />
+	<html:hidden property="postcode" />
+	<html:hidden property="country" />
+	<html:hidden property="dayPhone" />
+	<html:hidden property="eveningPhone" />
+	<html:hidden property="mobilePhone" />
+	<html:hidden property="fax" />
+
     <tr>
 		<td class="align-right"><fmt:message key="label.username"/>:</td>
 		<td><bean:write name="UserForm" property="login" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.title"/>:</td>
-		<td><html:text property="title" size="32" maxlength="32" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="title" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.first_name"/> *:</td>
-		<td><html:text property="firstName" size="50" maxlength="128" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="firstName" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.last_name"/> *:</td>
-		<td><html:text property="lastName" size="50" maxlength="128" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="lastName" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.email"/> *:</td>
-		<td><html:text property="email" size="50" maxlength="128" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="email" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.address_line_1"/>:</td>
-		<td><html:text property="addressLine1" size="50" maxlength="64" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="addressLine1" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.address_line_2"/>:</td>
-		<td><html:text property="addressLine2" size="50" maxlength="64" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="addressLine2" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.address_line_3"/>:</td>
-		<td><html:text property="addressLine3" size="50" maxlength="64" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="addressLine3" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.city"/>:</td>
-		<td><html:text property="city" size="50" maxlength="64" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="city" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.state"/>:</td>
-		<td><html:text property="state" size="50" maxlength="64" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="state" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.postcode"/>:</td>
-		<td><html:text property="postcode" size="10" maxlength="10" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="postcode" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.country"/>:</td>
-		<td><html:text property="country" size="50" maxlength="64" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="country" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.day_phone"/>:</td>
-		<td><html:text property="dayPhone" size="50" maxlength="64" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="dayPhone" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.evening_phone"/>:</td>
-		<td><html:text property="eveningPhone" size="50" maxlength="64" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="eveningPhone" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.mobile_phone"/>:</td>
-		<td><html:text property="mobilePhone" size="50" maxlength="64" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="mobilePhone" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.fax"/>:</td>
-		<td><html:text property="fax" size="50" maxlength="64" disabled="true" /></td>
+		<td><bean:write name="UserForm" property="fax" /></td>
 	</tr>
 	
 </c:if>
