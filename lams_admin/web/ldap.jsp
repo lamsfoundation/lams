@@ -3,7 +3,9 @@
 <h2>
 	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 	: <fmt:message key="sysadmin.ldap.configuration"/></h2>
-<p>&nbsp;</p>
+
+<lams:help page="LDAP+Configuration"/>
+<br/>
 
 <h3><fmt:message key="heading.ldap.synchronise"/></h3>
 <p>
