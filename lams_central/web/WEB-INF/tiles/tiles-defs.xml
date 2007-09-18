@@ -25,6 +25,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<definition name=".portrait" path="/main.jsp">
 		<put name="profile" value="portrait.jsp"/>	
 	</definition>
+	
+	<definition name=".lessons" path="/main.jsp">
+		<put name="profile" value="lessons.jsp"/>	
+	</definition>
 
 	<definition name=".profile" path="/main.jsp">
 		<put name="profile" value="profile.jsp"/>	
