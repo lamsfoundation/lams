@@ -31,6 +31,7 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.lams.toolbuilder.renameTool.RenameTool;
 import org.lams.toolbuilder.renameTool.RenameToolTaskList;
 import org.lams.toolbuilder.LAMSToolBuilderPlugin;
+
 /**
  * This is a sample new wizard. Its role is to create a new file 
  * resource in the provided container. If the container resource
@@ -44,6 +45,8 @@ import org.lams.toolbuilder.LAMSToolBuilderPlugin;
 
 public class LAMSNewToolWizard extends Wizard implements INewWizard {
 	private LAMSNewToolWizardPage page;
+	private LAMSNewToolWizardTemplatePage page2;
+	
 	private ISelection selection;
 
 	private boolean workspaceValid;
@@ -51,7 +54,8 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 	// The handle to the new LAMS Tool Project to be created
 	private IProject projectHandle;
 	
-	private String toolName;
+	private String toolTemplate;
+	private String toolSignature;
 	private String vendor;
 	private String compatibility;
 	private String toolDisplayName;
@@ -68,7 +72,8 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		super();
 		setNeedsProgressMonitor(true);
 		
-		initiate();
+		Constants.initCorePrjects();
+		projectList = Constants.coreProjects;
 		
 		
 		workspaceValid = checkWorkspace();
@@ -102,7 +107,7 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 	 * Checks the workspace contains the base LAMS project
 	 * @return true if workspace contains the base lams projects
 	 */
-	public boolean checkWorkspace()
+	public boolean checkWorkspace() 
 	{
 		boolean result = true;
 		List<String> missingList = new ArrayList();
@@ -147,7 +152,8 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 			ErrorDialog.openError(this.getShell(), title, message, error);
 			
 			
-			this.dispose();
+			
+			
 		}
 		
 		return result;
@@ -164,7 +170,10 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 			LamsToolBuilderLog.logInfo("Adding pages to LAMS Tool Wizard");
 			page = new LAMSNewToolWizardPage(selection);
 			addPage(page);
-		}
+			
+			page2 = new LAMSNewToolWizardTemplatePage(selection);
+			addPage(page2);
+		}	
 	}
 
 	/**
@@ -184,6 +193,7 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		toolDisplayName = page.getToolDisplayName();
 		isLAMS = page.getIsLams();
 		toolVisible = page.getVisible();
+		toolSignature = page.getToolDisplayName();
 		
 		// create a project descriptor
 		IPath projPath = null;
@@ -261,13 +271,13 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		}
 		
 		//############### test project to template from 
-		String containerName = "lams_tool_forum";
+		toolTemplate = page2.getTemplate();
 		
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IProject projTemplate = (IProject)root.findMember(new Path(containerName));
+		IProject projTemplate = (IProject)root.findMember(new Path(toolTemplate));
 		if (!projTemplate.exists() || !(projTemplate instanceof IContainer)) 
 		{
-			throwCoreException("Project \"" + containerName + "\" does not exist.");
+			throwCoreException("Project \"" + toolTemplate + "\" does not exist.");
 		}
 		monitor.worked(2);
 		
@@ -281,12 +291,11 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		
 		//TODO: 
 		
-		//RenameToolTaskList taskList = new RenameToolTaskList(Constants.FORUM_TOOL_DIR, )
-		
-		//RenameTool rt = new RenameTool();
+		RenameToolTaskList taskList = new RenameToolTaskList(Constants.FORUM_TOOL_DIR, toolSignature, toolDisplayName );
+		RenameTool rt = new RenameTool();
 		LamsToolBuilderLog.logInfo(projHandle.getLocation().toPortableString());
 		try{
-			rt.renameTool(commandList, projHandle.getLocation().toPortableString());
+			rt.renameTool(taskList.getTasklist(), projHandle.getLocation().toPortableString());
 		}
 		catch (Exception e)
 		{
