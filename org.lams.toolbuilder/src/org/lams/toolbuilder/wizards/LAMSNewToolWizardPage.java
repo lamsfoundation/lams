@@ -176,6 +176,7 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 		*/
 		
 		initialise();
+		dialogChanged();
 		setControl(control);
 		
 		

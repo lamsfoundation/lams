@@ -97,10 +97,11 @@ public class RenameToolTaskList
 		System.out.println("Java Variable Prefix: " + variablePrefix);
 		
 		
-		tasklist.add(new String[] {"lafrum11", toolSig});
+		
 		tasklist.add(new String[] {"TestForum", "Test" + classPrefix});
 		tasklist.add(new String[] {"Forum", classPrefix});
-		tasklist.add(new String[] {"forum", variablePrefix});
+		tasklist.add(new String[] {"forum", variablePrefix.toLowerCase()});
+		tasklist.add(new String[] {"lafrum11", toolSig});
 	}
 	
 	public void initMC() {}

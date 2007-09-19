@@ -193,7 +193,7 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		toolDisplayName = page.getToolDisplayName();
 		isLAMS = page.getIsLams();
 		toolVisible = page.getVisible();
-		toolSignature = page.getToolDisplayName();
+		toolSignature = page.getToolSignature();
 		
 		// create a project descriptor
 		IPath projPath = null;
@@ -296,10 +296,12 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		LamsToolBuilderLog.logInfo(projHandle.getLocation().toPortableString());
 		try{
 			rt.renameTool(taskList.getTasklist(), projHandle.getLocation().toPortableString());
+			System.out.print(taskList.getTasklist().toString());
 		}
 		catch (Exception e)
 		{
-			LamsToolBuilderLog.logError(e);
+			LamsToolBuilderLog.logError("LAMS Tool Renaming Error: ", e);
+
 		}
 		
 		root.refreshLocal(IWorkspaceRoot.DEPTH_INFINITE, monitor);

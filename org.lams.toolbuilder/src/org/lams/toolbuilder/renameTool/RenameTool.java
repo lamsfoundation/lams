@@ -23,6 +23,7 @@ public class RenameTool {
 	//$$$$$$$$$$$$$$$$$$$$$$TO BE IMPLEMENTED DYNAMICALLY
 	private final String DEFAULT_LANGUAGE = "en_AU";
 	
+	private String sourceDirStr;
 	
 	private Set<String> txtType = new HashSet<String>();
 
@@ -56,11 +57,14 @@ public class RenameTool {
 	public boolean renameTool(List<String[]> nameList, String source) throws Exception
 	{
 		this.nameList = nameList;
-		File sourceDir = new File(source);
+		
+		this.sourceDirStr = source;
+		
+		File sourceDir = new File(sourceDirStr);
 		if (!sourceDir.exists())
 		{		
-			LamsToolBuilderLog.logError(new FileNotFoundException("Source file: " + source + "not found."));
-			throw new FileNotFoundException("Source file: " + source + "not found.");
+			LamsToolBuilderLog.logError(new FileNotFoundException("Source file: " + sourceDirStr + "not found."));
+			throw new FileNotFoundException("Source file: " + sourceDirStr + "not found.");
 		}
 
 		visitFile(sourceDir, "rename");
@@ -104,8 +108,19 @@ public class RenameTool {
 			String line;
 			while ((line = br.readLine()) != null) {
 
-				for (String[] pair : nameList) {
+				int replaceCount = 0;
+				String[] replaceStrings = new String[] {};
+				for (String[] pair : nameList) 
+				{
+					System.out.print("Line: " + line + " replaced with: ");
 					line = line.replaceAll(pair[0], pair[1]);
+					System.out.print(line + "\n");
+					
+					
+					replaceStrings[replaceCount] = pair[1];
+					
+					
+					replaceCount++;
 				}
 
 				bw.write(line);
@@ -127,12 +142,20 @@ public class RenameTool {
 
 	}
 
-	public void visitFile(File file, String mode) {
-
+	public void visitFile(File file, String mode) 
+	{
+		boolean rename=true;
+		
 		if (file.isDirectory()
 				&& (file.getName().equals("CVS") || file.getName().equals(
 						"build"))) {
 			mode = "delete";
+		}
+		
+		// Do not rename the root directory of the tool
+		if (file.isDirectory() && file.getName().equals(sourceDirStr.substring(sourceDirStr.lastIndexOf("/")+1)))
+		{
+			rename = false;
 		}
 
 		if (file.getName().contains("ApplicationResources"))
@@ -157,7 +180,8 @@ public class RenameTool {
 			}
 		}
 
-		if (mode.equals("rename")) {
+		if (mode.equals("rename") && rename==true) 
+		{
 
 			if (file.isFile()) {
 				

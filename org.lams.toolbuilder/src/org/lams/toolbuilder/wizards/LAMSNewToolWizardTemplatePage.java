@@ -126,9 +126,9 @@ public class LAMSNewToolWizardTemplatePage extends WizardPage
    		control.setLayout(layout);
 	   
    		createLabel(control, "Please choose a LAMS tool template from the list below to build a new tool." +
-				"\n\nThis list is derived from your current workspace. To add more tools to your workspace," +
-				"\nsimply use the 'import' option from the file menu, then enter the following details in" +
-				"\nthe 'Import Projects From CVS' menu:" +
+				"\n\nThis list is derived from your current workspace. To add more default LAMS tools to " +
+				"\nyour workspace, simply use the 'import' option from the file menu, then enter the " +
+				"\nfollowing details in the 'Import Projects From CVS' menu:" +
 				"\n\n\t* access method: pserver " +
 				"\n\t* user name: anonymous" +
 				"\n\t* server name: lamscvs.melcoe.mq.edu.au" +
