@@ -96,8 +96,13 @@
 		int bbport = request.getServerPort();
 		String bbportstr = bbport != 0 ? ":" + bbport : "";
 		
+		
+		
+		
 		//String contentUrl = LamsSecurityUtil.generateRequestURL(ctx, "learner") + "&lsid=" + learningSessionId;
-		String contentUrl = "http://" + request.getServerName() + 
+		String contentUrl = request.getScheme()
+										+ "://" +
+										request.getServerName() + 
 									    bbportstr +
 										request.getContextPath() + 
 										"/modules/learnermonitor.jsp?lsid=" + learningSessionId + 
