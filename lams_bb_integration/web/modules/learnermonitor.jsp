@@ -24,6 +24,8 @@
 	String lsid = request.getParameter("lsid");
 	String learnerUrl = LamsSecurityUtil.generateRequestURL(ctx, "learner") + "&lsid=" + lsid;
 	String monitorUrl = LamsSecurityUtil.generateRequestURL(ctx, "monitor") + "&lsid=" + lsid;
+	String liveEditUrl = LamsSecurityUtil.generateRequestURL(ctx, "author");
+	
 	
 	String course_idstr = request.getParameter("course_id");	
 
@@ -77,6 +79,7 @@
 		<!--
 			var learnerWin = null;
 			var monitorWin = null;
+			var liveEditUrl= null;
 			var learnerUrl = null;
 			var monitorUrl = null;
 			
@@ -119,12 +122,27 @@
 		        else{
 		            try {
 		            monitorWin = window.open(monitorUrl,'aWin','width=800,height=600,resizable=1');
+		            monitorWin.opener = self;
 		            monitorWin.focus();
 		            }catch(e){
 		            	// popups blocked by a 3rd party
 		            }
 		            
 		        }
+			}
+			
+			function openAuthorForEditOnFly( learningDesignID )
+			{				
+				liveEditUrl= '<%=liveEditUrl%>' + '&layout=editonfly&learningDesignID=' + learningDesignID;
+				if(monitorWin && !monitorWin.closed)
+				{
+					monitorWin.location = liveEditUrl;
+				}
+				else
+				{
+					monitorWin = window.open(liveEditUrl,'width=800,height=600,resizable');
+					monitorWin.focus();
+				}
 			}
 		//-->
 </script>

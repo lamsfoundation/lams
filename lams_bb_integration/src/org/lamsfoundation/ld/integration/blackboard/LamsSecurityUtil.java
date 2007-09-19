@@ -291,10 +291,13 @@ public class LamsSecurityUtil {
 			Document document = db.parse(is);
 			
 			// get the lesson id from the response
-			return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes().getNamedItem("lessonId").getTextContent());
-		
 			
-
+			/*
+			 * The getTextContext is not a java 1.4 method, so Blackboard 7.1 comes up with errors
+			 * using getNodeValue() instead
+			 */
+			//return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes().getNamedItem("lessonId").getTextContent());
+			return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes().getNamedItem("lessonId").getNodeValue());
 		} catch (MalformedURLException e) {
 			logger.error("Unable to start LAMS lesson, bad URL: '"
 					+ serverAddr
@@ -374,11 +377,12 @@ public class LamsSecurityUtil {
 
 		if (node.getNodeName().equals(Constants.ELEM_FOLDER)) {
 			sb.append("['");
-			sb.append(
-					node.getAttributes().getNamedItem(
-							Constants.ATTR_NAME).getNodeValue()).append(
-					"',").append("null").append(',');
-
+			
+			StringBuilder attribute= new StringBuilder(node.getAttributes().getNamedItem(
+					Constants.ATTR_NAME).getNodeValue().replace("'", "\\'"));
+			
+			sb.append(attribute.append("',").append("null").append(','));
+					
 			NodeList children = node.getChildNodes();
 			if (children.getLength() == 0) {
 				sb.append("['',null]");
@@ -393,13 +397,19 @@ public class LamsSecurityUtil {
 		} else if (node.getNodeName().equals(
 				Constants.ELEM_LEARNING_DESIGN)) {
 			sb.append('[');
-			sb.append('\'').append(
-					node.getAttributes().getNamedItem(
-							Constants.ATTR_NAME).getNodeValue()).append(
-					'\'').append(',').append('\'').append(
-					node.getAttributes().getNamedItem(
-							Constants.ATTR_RESOURCE_ID).getNodeValue())
-					.append('\'');
+			
+			StringBuilder attrName = new StringBuilder(node.getAttributes().getNamedItem(
+							Constants.ATTR_NAME).getNodeValue().replace("'", "\\'"));
+			StringBuilder attrResId = new StringBuilder(node.getAttributes().getNamedItem(
+					Constants.ATTR_RESOURCE_ID).getNodeValue().replace("'", "\\'"));			
+			
+			sb.append('\'')
+				.append(attrName
+				.append('\'')
+				.append(',')
+				.append('\'')
+				.append(attrResId.append('\'')));
+
 			sb.append(']');
 		}
 		return sb.toString();
