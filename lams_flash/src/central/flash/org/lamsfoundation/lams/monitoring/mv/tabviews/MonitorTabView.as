@@ -62,14 +62,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 
 	private var learner_X:Number = 22;
 	private var learner_Y:Number = 19;
+	
 	private var drawDesignCalled:String;
+	
+	private var finishedLearnersList:Array;
 	
 	private var learnerMenuBar:MovieClip;
 	private var monitorTabs_tb:MovieClip;
 	private var _monitorTabViewContainer_mc:MovieClip;
-	
 	private var bkg_pnl:MovieClip;
-	
 	private var _learnerContainer_mc:MovieClip;
 	
 	/**
@@ -227,7 +228,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		transitionLayer = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
 		activityComplexLayer = this.createEmptyMovieClip("_activityComplexLayer_mc", this.getNextHighestDepth());
 		activityLayer = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
-				
+		
+		// creates learner icon on initial draw
+		_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", this.getNextHighestDepth());
+		
 		var s:Object = mm.getSize();
 		
 		setStyles();
@@ -472,7 +476,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		
 		Debugger.log("Setting canvas size, activitySpan: "+activitySpan, Debugger.CRITICAL, 'setSize', 'MonitorTabView');
 		
-		if (activitySpan == 0) {
+		if (s.h > activitySpan) {
 			bkg_pnl.setSize(s.w, s.h);
 			var grid_mc = Grid.drawGrid(gridLayer,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
 		} 
@@ -496,6 +500,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
         this._x = p.x;
         this._y = p.y;
 		
+	}
+	
+	public function getLearnerIcon():MovieClip {
+		return _learnerContainer_mc;
 	}
 	
 	/**
