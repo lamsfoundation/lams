@@ -316,48 +316,69 @@ public class RenameTool {
 			Pattern p = Pattern.compile(startRegex);
 			String startAndEnd[]= p.split(rename);
 			//System.out.println("SUB STRING startAndEnd: "+startAndEnd[0] +" " +startAndEnd[startAndEnd.length -1]);
-
-			if (rename.startsWith(startAndEnd[0])
-					&&startAndEnd[0].length()>0)
+			
+			
+			if (startAndEnd.length>0)
 			{
-				String prefix = addRegexIgnoreConstruct(startAndEnd[0], true);
-				if (!regexIgnoreSuffix.contains(prefix))
+				if (startAndEnd[0].length()>0 && rename.startsWith(startAndEnd[0]))
 				{
-					regexIgnorePrefix += prefix;
-					//System.out.println("Prefix regex changed: " + regexIgnorePrefix);
+					String prefix = addRegexIgnoreConstruct(startAndEnd[0], true);
+					if (!regexIgnoreSuffix.contains(prefix))
+					{
+						regexIgnorePrefix += prefix;
+						//System.out.println("Prefix regex changed: " + regexIgnorePrefix);
+					}
 				}
-			}
-				
-			if (rename.endsWith(startAndEnd[startAndEnd.length -1]) 
-					&& startAndEnd[startAndEnd.length -1].length()>0)
-			{
-				String suffix = addRegexIgnoreConstruct(startAndEnd[startAndEnd.length -1], false);
-				if (!regexIgnoreSuffix.contains(suffix))
+					
+				if (startAndEnd[startAndEnd.length -1].length()>0 && rename.endsWith(startAndEnd[startAndEnd.length -1]))
 				{
-					regexIgnoreSuffix += suffix;
-					//System.out.println("Suffix regex changed: " + regexIgnoreSuffix);
+					String suffix = addRegexIgnoreConstruct(startAndEnd[startAndEnd.length -1], false);
+					if (!regexIgnoreSuffix.contains(suffix))
+					{
+						regexIgnoreSuffix += suffix;
+						//System.out.println("Suffix regex changed: " + regexIgnoreSuffix);
+					}
 				}
 			}
 		}
 		
-		/* TODO:
+		/* TODO: add regex prefix and suffix into separate methods to reduce code size
 		 * Next check all strings that have been replaced and dont replace them again
 		 */
 		for (String replacedString: replacedStrings)
 		{
-			System.out.println("REPLACE STRING: "+rename + " " + replacedString);
-			if (rename.contains(replacedString))
+			System.out.println("REPLACE STRING: "+startRegex + " " + replacedString);
+			if (startRegex.contains(replacedString))
 			{
-				System.out.println("REPLACE STRING TRUE: "+rename + " " + replacedString);
-				Pattern p = Pattern.compile(rename);
+				System.out.println("REPLACE STRING TRUE: "+startRegex + " " + replacedString);
+				Pattern p = Pattern.compile(startRegex);
 				String startAndEnd[]= p.split(replacedString);
-				System.out.println("REPLACE startAndEnd: "+startAndEnd[0] +" " +startAndEnd[startAndEnd.length -1]);
+			
 				
-				if (rename.startsWith(startAndEnd[0]))
-					regexIgnorePrefix += addRegexIgnoreConstruct(startAndEnd[0], true);
 				
-				if (rename.endsWith(startAndEnd[startAndEnd.length -1]))
-					regexIgnoreSuffix += addRegexIgnoreConstruct(startAndEnd[startAndEnd.length -1], false);
+				if (startAndEnd.length>0)
+				{
+					if (startAndEnd[0].length()>0 && startRegex.startsWith(startAndEnd[0]))
+					{
+						String prefix = addRegexIgnoreConstruct(startAndEnd[0], true);
+						if (!regexIgnoreSuffix.contains(prefix))
+						{
+							regexIgnorePrefix += prefix;
+							System.out.println("Prefix regex changed: " + regexIgnorePrefix);
+						}
+					}
+						
+					
+					if (startAndEnd[startAndEnd.length -1].length()>0 && startRegex.endsWith(startAndEnd[startAndEnd.length -1]))
+					{
+						String suffix = addRegexIgnoreConstruct(startAndEnd[startAndEnd.length -1], false);
+						if (!regexIgnoreSuffix.contains(suffix))
+						{
+							regexIgnoreSuffix += suffix;
+							System.out.println("Suffix regex changed: " + regexIgnoreSuffix);
+						}
+					}
+				}
 			}
 		}
 		
