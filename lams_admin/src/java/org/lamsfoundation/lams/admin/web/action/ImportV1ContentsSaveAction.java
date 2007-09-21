@@ -45,7 +45,6 @@ import org.lamsfoundation.lams.admin.web.dto.V1OrgRightDTO;
 import org.lamsfoundation.lams.admin.web.dto.V1OrganisationDTO;
 import org.lamsfoundation.lams.admin.web.dto.V1UserDTO;
 import org.lamsfoundation.lams.admin.web.form.ImportV1ContentsForm;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -55,9 +54,8 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.LangUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -113,8 +111,7 @@ public class ImportV1ContentsSaveAction extends Action {
 		boolean onlyMembers = importV1ContentsForm.getOnlyMembers();
 		
 		// default import options
-		String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
-		SupportedLocale locale = service.getSupportedLocale(defaultLocale.substring(0,2),defaultLocale.substring(3));
+		SupportedLocale locale = LangUtil.getDefaultLocale();
 		final OrganisationType courseType = (OrganisationType)service.findById(
 				OrganisationType.class, OrganisationType.COURSE_TYPE);
 		final OrganisationState activeState = (OrganisationState)service.findById(
@@ -244,18 +241,8 @@ public class ImportV1ContentsSaveAction extends Action {
 		newUser.setPassword(HashUtil.sha1(user.getLogin()));
 		newUser.setChangePassword(true);
 		
-		String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
-		List list = service.findByProperty(CSSThemeVisualElement.class, "name", flashName);
-		if (list!=null) {
-			CSSThemeVisualElement flashTheme = (CSSThemeVisualElement)list.get(0);
-			newUser.setFlashTheme(flashTheme);
-		}
-		String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
-		list = service.findByProperty(CSSThemeVisualElement.class, "name", htmlName);
-		if (list!=null) {
-			CSSThemeVisualElement htmlTheme = (CSSThemeVisualElement)list.get(0);
-			newUser.setHtmlTheme(htmlTheme);
-		}
+		newUser.setFlashTheme(service.getDefaultFlashTheme());
+		newUser.setHtmlTheme(service.getDefaultHtmlTheme());
 		newUser.setDisabledFlag(false);
 		newUser.setCreateDate(new Date());
 		newUser.setAuthenticationMethod((AuthenticationMethod)service.findByProperty(AuthenticationMethod.class,

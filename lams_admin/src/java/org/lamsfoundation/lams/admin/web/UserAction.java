@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -50,8 +49,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.LangUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -140,9 +138,7 @@ public class UserAction extends LamsDispatchAction {
 			request.setAttribute("globalRoles", getGlobalRoles(user));
 		} else {  // create a user
 			try {
-				String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
-				log.debug("using defaultLocale: "+defaultLocale);
-				SupportedLocale locale = service.getSupportedLocale(defaultLocale.substring(0,2),defaultLocale.substring(3));
+				SupportedLocale locale = LangUtil.getDefaultLocale();
 				userForm.set("localeId", locale.getLocaleId());
 			} catch(Exception e) {
                 log.debug(e);				

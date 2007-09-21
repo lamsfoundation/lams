@@ -9,7 +9,6 @@ package org.lamsfoundation.lams.webservice;
 
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServlet;
@@ -22,17 +21,14 @@ import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.LangUtil;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class RegisterServiceSoapBindingImpl implements Register {
@@ -80,19 +76,9 @@ public class RegisterServiceSoapBindingImpl implements Register {
 					AuthenticationMethod.class, AuthenticationMethod.DB));
 			user.setCreateDate(new Date());
 			user.setDisabledFlag(false);
-			user.setLocale(getLocale());
-			String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
-			List list = service.findByProperty(CSSThemeVisualElement.class, "name", flashName);
-			if (list != null && list.size() > 0) {
-				CSSThemeVisualElement flashTheme = (CSSThemeVisualElement) list.get(0);
-				user.setFlashTheme(flashTheme);
-			}
-			String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
-			list = service.findByProperty(CSSThemeVisualElement.class, "name", htmlName);
-			if (list != null && list.size() > 0) {
-				CSSThemeVisualElement htmlTheme = (CSSThemeVisualElement) list.get(0);
-				user.setHtmlTheme(htmlTheme);
-			}
+			user.setLocale(LangUtil.getDefaultLocale());
+			user.setFlashTheme(service.getDefaultFlashTheme());
+			user.setHtmlTheme(service.getDefaultHtmlTheme());
 			service.save(user);
 			return true;
 		} catch (Exception e) {
@@ -194,12 +180,6 @@ public class RegisterServiceSoapBindingImpl implements Register {
 			log.debug(e.getMessage(), e);
 			throw new java.rmi.RemoteException(e.getMessage());
 		}
-	}
-	
-	private SupportedLocale getLocale() {
-		String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
-		return service
-				.getSupportedLocale(defaultLocale.substring(0, 2), defaultLocale.substring(3));
 	}
 
 	@SuppressWarnings("unchecked")

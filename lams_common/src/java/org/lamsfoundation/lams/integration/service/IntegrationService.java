@@ -33,7 +33,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.ParseException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -45,21 +44,18 @@ import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
-import org.lamsfoundation.lams.usermanagement.SupportedLocale;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
-import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.CSVUtil;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.LangUtil;
 
 /**
  * <p>
@@ -142,7 +138,7 @@ public class IntegrationService implements IIntegrationService{
 		org.setParentOrganisation(serverMap.getOrganisation());
 		org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.CLASS_TYPE));
 		org.setOrganisationState((OrganisationState)service.findById(OrganisationState.class,OrganisationState.ACTIVE));
-		org.setLocale(getLocale(countryIsoCode, langIsoCode));
+		org.setLocale(LangUtil.getSupportedLocale(langIsoCode, countryIsoCode));
 		service.saveOrganisation(org, user.getUserId());
 		addMemberships(user,org);
 		ExtCourseClassMap map = new ExtCourseClassMap();
@@ -151,30 +147,6 @@ public class IntegrationService implements IIntegrationService{
 		map.setOrganisation(org);
 		service.save(map);
 		return map;
-	}
-
-	private SupportedLocale getLocale(String countryIsoCode, String langIsoCode) {
-		SupportedLocale locale = null;
-		if(countryIsoCode.trim().length()>0 && langIsoCode.trim().length()>0){
-			locale = service.getSupportedLocale(countryIsoCode, langIsoCode);
-		}else if(langIsoCode.trim().length()>0){
-			List list = service.findByProperty(SupportedLocale.class, "languageIsoCode", langIsoCode);
-			if(list!=null && list.size()>0){
-				Collections.sort(list);
-				locale = (SupportedLocale)list.get(0);
-			}
-		}else if(countryIsoCode.trim().length()>0){
-			List list = service.findByProperty(SupportedLocale.class, "countryIsoCode", countryIsoCode);
-			if(list!=null && list.size()>0){
-				Collections.sort(list);
-				locale = (SupportedLocale)list.get(0);
-			}
-		}
-		if(locale==null){
-			String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
-			locale = service.getSupportedLocale(defaultLocale.substring(0,2), defaultLocale.substring(3));
-		}
-		return locale;
 	}
 
 	private ExtUserUseridMap createExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException {
@@ -197,19 +169,9 @@ public class IntegrationService implements IIntegrationService{
         user.setAuthenticationMethod((AuthenticationMethod)service.findById(AuthenticationMethod.class, AuthenticationMethod.DB));
         user.setCreateDate(new Date());
         user.setDisabledFlag(false);
-        user.setLocale(getLocale(userData[12],userData[13]));
-		String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
-		List list = service.findByProperty(CSSThemeVisualElement.class, "name", flashName);
-		if (list!=null && list.size()>0) {
-			CSSThemeVisualElement flashTheme = (CSSThemeVisualElement)list.get(0);
-			user.setFlashTheme(flashTheme);
-		}
-		String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
-		list = getService().findByProperty(CSSThemeVisualElement.class, "name", htmlName);
-		if (list!=null && list.size()>0) {
-			CSSThemeVisualElement htmlTheme = (CSSThemeVisualElement)list.get(0);
-			user.setHtmlTheme(htmlTheme);
-		}
+        user.setLocale(LangUtil.getSupportedLocale(userData[13], userData[12]));
+		user.setFlashTheme(service.getDefaultFlashTheme());
+		user.setHtmlTheme(service.getDefaultHtmlTheme());
 		service.save(user);
 		ExtUserUseridMap map = new ExtUserUseridMap();
 		map.setExtServerOrgMap(serverMap);

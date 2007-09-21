@@ -93,6 +93,18 @@
 		<td class="align-right"><fmt:message key="label.fax"/>:</td>
 		<td><html:text property="fax" size="50" maxlength="64" /></td>
 	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.language"/>:</td>
+		<td>
+			<html:select property="localeId">
+				<c:forEach items="${locales}" var="locale">
+					<html:option value="${locale.localeId}">
+						<c:out value="${locale.description}" />
+					</html:option>
+				</c:forEach>	
+			</html:select>
+		</td>
+	</tr>
 	
 </c:if>
 
@@ -178,21 +190,21 @@
 		<td class="align-right"><fmt:message key="label.fax"/>:</td>
 		<td><bean:write name="UserForm" property="fax" /></td>
 	</tr>
-	
-</c:if>
-	
 	<tr>
 		<td class="align-right"><fmt:message key="label.language"/>:</td>
 		<td>
-			<html:select property="localeId">
-				<c:forEach items="${locales}" var="locale">
-					<html:option value="${locale.localeId}">
-						<c:out value="${locale.description}" />
-					</html:option>
-				</c:forEach>	
-			</html:select>
+			<c:set var="localeId"><bean:write name="UserForm" property="localeId" /></c:set>
+			<c:forEach items="${locales}" var="locale">
+				<c:if test="${locale.localeId eq localeId}">
+					<c:out value="${locale.description}" />
+				</c:if>
+			</c:forEach>
 		</td>
 	</tr>
+	
+</c:if>
+	
+	
 	</table>
 			</div>
 			

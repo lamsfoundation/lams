@@ -48,10 +48,12 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.LangUtil;
 
 /**
  * @author jliew
@@ -76,10 +78,34 @@ public class LdapService implements ILdapService {
 		user.setFirstName(map.get("fname"));
 		user.setLastName(map.get("lname"));
 		user.setEmail(map.get("email"));
-		user.setDayPhone(map.get("phone"));
+		user.setAddressLine1(map.get("address1"));
+		user.setAddressLine2(map.get("address2"));
+		user.setAddressLine3(map.get("address3"));
+		user.setCity(map.get("city"));
+		user.setState(map.get("state"));
+		user.setPostcode(map.get("postcode"));
+		user.setCountry(map.get("country"));
+		user.setDayPhone(map.get("dayphone"));
+		user.setEveningPhone(map.get("eveningphone"));
 		user.setFax(map.get("fax"));
 		user.setMobilePhone(map.get("mobile"));
+		user.setLocale(getLocale(map.get("locale")));
 		getService().save(user);
+	}
+	
+	// tries to match ldap attribute to a locale, otherwise returns server default
+	private SupportedLocale getLocale(String attribute) {
+		if (attribute!=null && attribute.trim().length()>0) {
+			int index = attribute.indexOf("_");
+			if (index>0) {
+				String language = attribute.substring(0, index);
+				String country = attribute.substring(index);
+				return LangUtil.getSupportedLocale(language, country);
+			} else {
+				return LangUtil.getSupportedLocale(attribute);
+			}
+		}
+		return LangUtil.getDefaultLocale();
 	}
 	
 	public boolean createLDAPUser(Attributes attrs) {
@@ -98,7 +124,15 @@ public class LdapService implements ILdapService {
 				user.setFirstName(map.get("fname"));
 				user.setLastName(map.get("lname"));
 				user.setEmail(map.get("email"));
-				user.setDayPhone(map.get("phone"));
+				user.setAddressLine1(map.get("address1"));
+				user.setAddressLine2(map.get("address2"));
+				user.setAddressLine3(map.get("address3"));
+				user.setCity(map.get("city"));
+				user.setState(map.get("state"));
+				user.setPostcode(map.get("postcode"));
+				user.setCountry(map.get("country"));
+				user.setDayPhone(map.get("dayphone"));
+				user.setEveningPhone(map.get("eveningphone"));
 				user.setFax(map.get("fax"));
 				user.setMobilePhone(map.get("mobile"));
 				user.setAuthenticationMethod((AuthenticationMethod)service
@@ -107,7 +141,7 @@ public class LdapService implements ILdapService {
 				user.setHtmlTheme(service.getDefaultHtmlTheme());
 				user.setDisabledFlag(false);
 				user.setCreateDate(new Date());
-				user.setLocale(service.getDefaultLocale());
+				user.setLocale(getLocale(map.get("locale")));
 				service.save(user);
 				service.auditUserCreated(user, "common");
 				return true;
@@ -127,9 +161,18 @@ public class LdapService implements ILdapService {
 			map.put("fname", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_FIRST_NAME_ATTR))));
 			map.put("lname", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_LAST_NAME_ATTR))));
 			map.put("email", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_EMAIL_ATTR))));
-			map.put("phone", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_PHONE_ATTR))));
+			map.put("address1", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_ADDR1_ATTR))));
+			map.put("address2", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_ADDR2_ATTR))));
+			map.put("address3", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_ADDR3_ATTR))));
+			map.put("city", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_CITY_ATTR))));
+			map.put("state", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_STATE_ATTR))));
+			map.put("postcode", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_POSTCODE_ATTR))));
+			map.put("country", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_COUNTRY_ATTR))));
+			map.put("dayphone", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_DAY_PHONE_ATTR))));
+			map.put("eveningphone", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_EVENING_PHONE_ATTR))));
 			map.put("fax", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_FAX_ATTR))));
 			map.put("mobile", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_MOBILE_ATTR))));
+			map.put("locale", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_LOCALE_ATTR))));
 		} catch (Exception e) {
 			log.error("===> Exception occurred while getting LDAP user attributes: ", e);
 		}

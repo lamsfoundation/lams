@@ -159,11 +159,31 @@ public class ConfigurationKeys {
 	
 	public static String LDAP_EMAIL_ATTR = "LDAPEmailAttr";
 	
-	public static String LDAP_PHONE_ATTR = "LDAPPhoneAttr";
+	public static String LDAP_ADDR1_ATTR = "LDAPAddr1Attr";
+	
+	public static String LDAP_ADDR2_ATTR = "LDAPAddr2Attr";
+	
+	public static String LDAP_ADDR3_ATTR = "LDAPAddr3Attr";
+	
+	public static String LDAP_CITY_ATTR = "LDAPCityAttr";
+	
+	public static String LDAP_STATE_ATTR = "LDAPStateAttr";
+	
+	public static String LDAP_POSTCODE_ATTR = "LDAPPostcodeAttr";
+	
+	public static String LDAP_COUNTRY_ATTR = "LDAPCountryAttr";
+	
+	public static String LDAP_DAY_PHONE_ATTR = "LDAPDayPhoneAttr";
+	
+	public static String LDAP_EVENING_PHONE_ATTR = "LDAPEveningPhoneAttr";
 	
 	public static String LDAP_FAX_ATTR = "LDAPFaxAttr";
 	
 	public static String LDAP_MOBILE_ATTR = "LDAPMobileAttr";
+	
+	//public static String LDAP_DISABLED_ATTR = "LDAPDisabledAttr";
+	
+	public static String LDAP_LOCALE_ATTR = "LDAPLocaleAttr";
 	
 	public static String LDAP_ORG_ATTR = "LDAPOrgAttr";
 	

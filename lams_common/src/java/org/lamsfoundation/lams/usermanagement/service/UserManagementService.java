@@ -42,7 +42,6 @@ import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
@@ -59,7 +58,6 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.AuditService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -533,16 +531,6 @@ public class UserManagementService implements IUserManagementService {
             return organisation; 	 
     } 	 
 
-	public SupportedLocale getSupportedLocale(String language, String country) {
-		Map<String, Object> properties = new HashMap<String, Object>();
-		properties.put("languageIsoCode",language);
-		if(country!=null){
-			properties.put("countryIsoCode",country);
-		}
-		List results = findByProperties(SupportedLocale.class,properties);
-		return results.isEmpty() ? null : (SupportedLocale)results.get(0);
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<UserManageBean> getUserManageBeans(Integer orgId) {
 		String query = "select u.userId,u.login,u.title,u.firstName,u.lastName, r " +
@@ -905,11 +893,6 @@ public class UserManagementService implements IUserManagementService {
 		String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
 		List list = findByProperty(CSSThemeVisualElement.class, "name", htmlName);
 		return (list!=null ? (CSSThemeVisualElement)list.get(0) : null);
-	}
-	
-	public SupportedLocale getDefaultLocale() {
-		String localeName = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
-		return getSupportedLocale(localeName.substring(0,2),localeName.substring(3));
 	}
 	
 	public void auditPasswordChanged(User user, String moduleName) {

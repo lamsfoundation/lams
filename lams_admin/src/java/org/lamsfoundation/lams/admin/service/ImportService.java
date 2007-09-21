@@ -56,9 +56,8 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.LangUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -831,9 +830,7 @@ public class ImportService implements IImportService {
 	// set CSSThemeVisualElement to default flash theme if cell is empty
 	private CSSThemeVisualElement getFlashTheme(String flashId){
 		if (flashId==null || flashId=="") {
-			String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
-			List list = service.findByProperty(CSSThemeVisualElement.class, "name", flashName);
-			return (list != null && list.size() > 0) ? (CSSThemeVisualElement) list.get(0) : null;
+			return service.getDefaultFlashTheme();
 		} else {
 			try {
 				return (CSSThemeVisualElement)service.findById(CSSThemeVisualElement.class, new Long(flashId));
@@ -846,9 +843,7 @@ public class ImportService implements IImportService {
 	// set CSSThemeVisualElement to default html theme if cell is empty
 	private CSSThemeVisualElement getHtmlTheme(String htmlId){
 		if (htmlId==null || htmlId=="") {
-			String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
-			List list = service.findByProperty(CSSThemeVisualElement.class, "name", htmlName);
-			return (list != null && list.size() > 0) ? (CSSThemeVisualElement) list.get(0) : null;
+			return service.getDefaultHtmlTheme();
 		} else {
 			try {
 				return (CSSThemeVisualElement)service.findById(CSSThemeVisualElement.class, new Long(htmlId));
@@ -861,8 +856,7 @@ public class ImportService implements IImportService {
 	// set locale to default system locale if cell is empty
 	private SupportedLocale getLocale(String localeId){
 		if (localeId==null || localeId=="") {
-			String defaultLocale = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
-			return service.getSupportedLocale(defaultLocale.substring(0, 2), defaultLocale.substring(3));
+			return LangUtil.getDefaultLocale();
 		} else {
 			try {
 				return (SupportedLocale)service.findById(SupportedLocale.class, new Integer(localeId));

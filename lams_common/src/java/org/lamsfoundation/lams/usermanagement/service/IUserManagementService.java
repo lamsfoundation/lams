@@ -33,7 +33,6 @@ import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
@@ -294,14 +293,6 @@ public interface IUserManagementService {
      */ 	 
     public Organisation saveOrganisation( Organisation organisation, Integer userID );
     
-    /**
-     * 
-     * @param language
-     * @param country
-     * @return SupportedLocale
-     */
-    public SupportedLocale  getSupportedLocale(String language, String country);
-    
     public List<UserManageBean> getUserManageBeans(Integer orgId);
     
 	/** Remove a user from the system completely. Only able to be done if they don't have any 
@@ -390,12 +381,6 @@ public interface IUserManagementService {
 	 * @return default html theme object
 	 */
 	public CSSThemeVisualElement getDefaultHtmlTheme();
-	
-	/**
-	 * Get default server locale.
-	 * @return server default supported locale object
-	 */
-	public SupportedLocale getDefaultLocale();
 	
 	public void auditPasswordChanged(User user, String moduleName);
 	
