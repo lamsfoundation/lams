@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.LangUtil;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -138,7 +138,7 @@ public class UserAction extends LamsDispatchAction {
 			request.setAttribute("globalRoles", getGlobalRoles(user));
 		} else {  // create a user
 			try {
-				SupportedLocale locale = LangUtil.getDefaultLocale();
+				SupportedLocale locale = LanguageUtil.getDefaultLocale();
 				userForm.set("localeId", locale.getLocaleId());
 			} catch(Exception e) {
                 log.debug(e);				

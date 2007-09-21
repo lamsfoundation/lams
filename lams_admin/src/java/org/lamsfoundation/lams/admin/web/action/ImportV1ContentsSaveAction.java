@@ -55,7 +55,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.HashUtil;
-import org.lamsfoundation.lams.util.LangUtil;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -111,7 +111,7 @@ public class ImportV1ContentsSaveAction extends Action {
 		boolean onlyMembers = importV1ContentsForm.getOnlyMembers();
 		
 		// default import options
-		SupportedLocale locale = LangUtil.getDefaultLocale();
+		SupportedLocale locale = LanguageUtil.getDefaultLocale();
 		final OrganisationType courseType = (OrganisationType)service.findById(
 				OrganisationType.class, OrganisationType.COURSE_TYPE);
 		final OrganisationState activeState = (OrganisationState)service.findById(

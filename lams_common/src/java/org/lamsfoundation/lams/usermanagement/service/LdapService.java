@@ -53,7 +53,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.LangUtil;
+import org.lamsfoundation.lams.util.LanguageUtil;
 
 /**
  * @author jliew
@@ -100,12 +100,12 @@ public class LdapService implements ILdapService {
 			if (index>0) {
 				String language = attribute.substring(0, index);
 				String country = attribute.substring(index);
-				return LangUtil.getSupportedLocale(language, country);
+				return LanguageUtil.getSupportedLocale(language, country);
 			} else {
-				return LangUtil.getSupportedLocale(attribute);
+				return LanguageUtil.getSupportedLocale(attribute);
 			}
 		}
-		return LangUtil.getDefaultLocale();
+		return LanguageUtil.getDefaultLocale();
 	}
 	
 	public boolean createLDAPUser(Attributes attrs) {

@@ -55,7 +55,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CSVUtil;
 import org.lamsfoundation.lams.util.HashUtil;
-import org.lamsfoundation.lams.util.LangUtil;
+import org.lamsfoundation.lams.util.LanguageUtil;
 
 /**
  * <p>
@@ -133,12 +133,13 @@ public class IntegrationService implements IIntegrationService{
 
 	private ExtCourseClassMap createExtCourseClassMap(ExtServerOrgMap serverMap, User user, String extCourseId, String countryIsoCode, String langIsoCode) {
 		Organisation org = new Organisation();
+		// TODO group name could be more human readable, need name as well as id from 3rd party server?
 		org.setName(buildName(serverMap.getPrefix(), extCourseId));
 		org.setDescription(extCourseId);
-		org.setParentOrganisation(serverMap.getOrganisation());
-		org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.CLASS_TYPE));
+		org.setParentOrganisation(service.getRootOrganisation());
+		org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.COURSE_TYPE));
 		org.setOrganisationState((OrganisationState)service.findById(OrganisationState.class,OrganisationState.ACTIVE));
-		org.setLocale(LangUtil.getSupportedLocale(langIsoCode, countryIsoCode));
+		org.setLocale(LanguageUtil.getSupportedLocale(langIsoCode, countryIsoCode));
 		service.saveOrganisation(org, user.getUserId());
 		addMemberships(user,org);
 		ExtCourseClassMap map = new ExtCourseClassMap();
@@ -169,7 +170,7 @@ public class IntegrationService implements IIntegrationService{
         user.setAuthenticationMethod((AuthenticationMethod)service.findById(AuthenticationMethod.class, AuthenticationMethod.DB));
         user.setCreateDate(new Date());
         user.setDisabledFlag(false);
-        user.setLocale(LangUtil.getSupportedLocale(userData[13], userData[12]));
+        user.setLocale(LanguageUtil.getSupportedLocale(userData[13], userData[12]));
 		user.setFlashTheme(service.getDefaultFlashTheme());
 		user.setHtmlTheme(service.getDefaultHtmlTheme());
 		service.save(user);
@@ -178,6 +179,8 @@ public class IntegrationService implements IIntegrationService{
 		map.setExtUsername(extUsername);
 		map.setUser(user);
 		service.save(map);
+		// every integration user is added to the group for their 3rd party server;
+		// becomes the 'public' folder for that server
 		addMemberships(user, serverMap.getOrganisation());
 		return map;
 	}

@@ -23,7 +23,17 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.util;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
+
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.web.util.HttpSessionManager;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -37,7 +47,17 @@ public class LanguageUtil {
 	public static final String DEFAULT_LANGUAGE = "en";
 	public static final String DEFAULT_COUNTRY = "AU";
 	public static final String DEFAULT_DIRECTION = "LTR";
-
+	private static IUserManagementService service;
+	
+	private static IUserManagementService getService() {
+		if (service == null) {
+			WebApplicationContext ctx = WebApplicationContextUtils
+				.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
+			service = (IUserManagementService) ctx.getBean("userManagementService");
+		}
+		return service;
+	}
+	
 	/** 
 	 * Get the default language, country, based on entries in the 
 	 * server configuration file. 
@@ -85,6 +105,55 @@ public class LanguageUtil {
 	 */
 	public static TimeZone getDefaultTimeZone() {
 		return TimeZone.getDefault();
+	}
+	
+	/**
+	 * Returns server default locale.
+	 */
+	public static SupportedLocale getDefaultLocale() {
+		String localeName = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
+		return getSupportedLocale(localeName.substring(0,2),localeName.substring(3));
+	}
+	
+	/**
+	 * Searches for a locale based on language, then country, matching the single input string.
+	 * Otherwise returns server default locale.
+	 */
+	public static SupportedLocale getSupportedLocale(String input) {
+    	List list = getService().findByProperty(SupportedLocale.class, "languageIsoCode", input);
+    	if (list!=null && list.size()>0) {
+    		return (SupportedLocale)list.get(0);
+    	} else {
+    		list = getService().findByProperty(SupportedLocale.class, "countryIsoCode", input);
+    		if (list!=null && list.size()>0) {
+    			return (SupportedLocale)list.get(0);
+    		}
+    	}
+    	return getDefaultLocale();
+    }
+    
+	/**
+	 * Finds a locale based on language and/or country.
+	 */
+	public static SupportedLocale getSupportedLocale(String langIsoCode, String countryIsoCode) {
+		SupportedLocale locale = null;
+		Map<String, Object> properties = new HashMap<String, Object>();
+		if(countryIsoCode.trim().length()>0 && langIsoCode.trim().length()>0){
+			properties.put("languageIsoCode", langIsoCode);
+			properties.put("countryIsoCode", countryIsoCode);
+		}else if(langIsoCode.trim().length()>0){
+			properties.put("languageIsoCode", langIsoCode);
+		}else if(countryIsoCode.trim().length()>0){
+			properties.put("countryIsoCode", countryIsoCode);
+		}
+		List list = getService().findByProperties(SupportedLocale.class, properties);
+		if(list!=null && list.size()>0){
+			Collections.sort(list);
+			locale = (SupportedLocale)list.get(0);
+		}else{
+			locale = getDefaultLocale();
+		}
+		return locale;
 	}
 
 }

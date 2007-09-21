@@ -48,7 +48,7 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.LangUtil;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -105,7 +105,7 @@ public class ServerSaveAction extends Action {
 				org.setParentOrganisation(userService.getRootOrganisation());
 				org.setOrganisationType((OrganisationType)userService.findById(OrganisationType.class,OrganisationType.COURSE_TYPE));
 				org.setOrganisationState((OrganisationState)userService.findById(OrganisationState.class,OrganisationState.ACTIVE));
-				SupportedLocale locale = LangUtil.getDefaultLocale();
+				SupportedLocale locale = LanguageUtil.getDefaultLocale();
 				org.setLocale(locale);
 				userService.saveOrganisation(org, user.getUserID());
 				serverOrgMapForm.set("orgId", org.getOrganisationId());

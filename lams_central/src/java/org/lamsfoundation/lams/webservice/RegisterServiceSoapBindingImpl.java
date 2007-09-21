@@ -28,7 +28,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.LangUtil;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class RegisterServiceSoapBindingImpl implements Register {
@@ -76,7 +76,7 @@ public class RegisterServiceSoapBindingImpl implements Register {
 					AuthenticationMethod.class, AuthenticationMethod.DB));
 			user.setCreateDate(new Date());
 			user.setDisabledFlag(false);
-			user.setLocale(LangUtil.getDefaultLocale());
+			user.setLocale(LanguageUtil.getDefaultLocale());
 			user.setFlashTheme(service.getDefaultFlashTheme());
 			user.setHtmlTheme(service.getDefaultHtmlTheme());
 			service.save(user);
