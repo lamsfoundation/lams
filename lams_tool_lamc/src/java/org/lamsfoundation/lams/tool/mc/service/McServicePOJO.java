@@ -120,7 +120,7 @@ public class McServicePOJO implements
 	private IMcUserDAO				mcUserDAO;
 	private IMcUsrAttemptDAO		mcUsrAttemptDAO;
 	private IMcUploadedFileDAO  	mcUploadedFileDAO;
-	private MCOutputDefinitionFactory mcOutputDefinitionFactory;
+	private MCOutputFactory mcOutputFactory;
 	
 	private IAuditService auditService;
     private IUserManagementService 	userManagementService;
@@ -1560,7 +1560,7 @@ public class McServicePOJO implements
 			long defaultToolContentId = getToolDefaultContentIdBySignature(MY_SIGNATURE);
 			content = retrieveMc(defaultToolContentId);
 		}
-		return getMcOutputDefinitionFactory().getToolOutputDefinitions(content);
+		return getMcOutputFactory().getToolOutputDefinitions(content);
 	}
  
 
@@ -1823,16 +1823,7 @@ public class McServicePOJO implements
 	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
 			Long toolSessionId, Long learnerId) {
 		
-		TreeMap<String,ToolOutput> output = new TreeMap<String, ToolOutput>();
-		if ( names == null || names.contains(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK) ) {
-			McSession session = findMcSessionById(toolSessionId);
-			McQueUsr queUser = getMcUserBySession(learnerId, session.getUid());
-			Long mark = queUser != null ? queUser.getLastAttemptTotalMark() : new Long(0);
-			ToolOutput toolOutput = new ToolOutput(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, 
-					MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, mark);
-			output.put(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, toolOutput);
-		}
-		return output;
+		return mcOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
 	}
 
 	/** 
@@ -1841,14 +1832,7 @@ public class McServicePOJO implements
 	 */
 	public ToolOutput getToolOutput(String name, Long toolSessionId,
 			Long learnerId) {
-		if ( name != null && name.equals(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK) ) {
-			McSession session = findMcSessionById(toolSessionId);
-			McQueUsr queUser = getMcUserBySession(learnerId, session.getUid());
-			Long mark = queUser != null ? queUser.getLastAttemptTotalMark() : new Long(0);
-			return new ToolOutput(MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, 
-					MCOutputDefinitionFactory.OUTPUT_NAME_LEARNER_MARK, mark);
-		}
-		return null;
+		return mcOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
 	}
 
 
@@ -2236,13 +2220,13 @@ public class McServicePOJO implements
 		this.exportContentService = exportContentService;
 	}
 
-    public MCOutputDefinitionFactory getMcOutputDefinitionFactory() {
-		return mcOutputDefinitionFactory;
+    public MCOutputFactory getMcOutputFactory() {
+		return mcOutputFactory;
 	}
 
-	public void setMcOutputDefinitionFactory(
-			MCOutputDefinitionFactory mcOutputDefinitionFactory) {
-		this.mcOutputDefinitionFactory = mcOutputDefinitionFactory;
+	public void setMcOutputFactory(
+			MCOutputFactory mcOutputFactory) {
+		this.mcOutputFactory = mcOutputFactory;
 	}
 
 

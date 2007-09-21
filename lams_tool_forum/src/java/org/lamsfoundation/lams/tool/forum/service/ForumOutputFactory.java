@@ -23,10 +23,12 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.forum.service;
 
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.lamsfoundation.lams.tool.OutputDefinitionFactory;
+import org.lamsfoundation.lams.tool.OutputFactory;
+import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 
@@ -36,7 +38,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
  * simple definitions so that we can try various features of the tool output based 
  * branching.
  */
-public class ForumOutputDefinitionFactory extends OutputDefinitionFactory {
+public class ForumOutputFactory extends OutputFactory {
 
 	/** The number of posts the learner has made in one forum activity. */
 	protected final static String OUTPUT_NAME_LEARNER_NUM_POSTS = "learner.number.of.posts";
@@ -54,4 +56,28 @@ public class ForumOutputDefinitionFactory extends OutputDefinitionFactory {
 		return definitionMap;
 	}
 
+	public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IForumService forumService,
+			Long toolSessionId, Long learnerId) {
+		
+		TreeMap<String,ToolOutput> map = new TreeMap<String,ToolOutput>();
+		if ( names == null || names.contains(OUTPUT_NAME_LEARNER_NUM_POSTS)) {
+			map.put(OUTPUT_NAME_LEARNER_NUM_POSTS,getNumPosts(forumService, learnerId, toolSessionId));
+		}
+		return map;
+
+	}
+
+	public ToolOutput getToolOutput(String name, IForumService forumService, Long toolSessionId, Long learnerId) {
+		
+		if ( name != null && name.equals(OUTPUT_NAME_LEARNER_NUM_POSTS)) {
+			 return getNumPosts(forumService, learnerId, toolSessionId);
+		}
+		return null;
+
+	}
+
+	private ToolOutput getNumPosts(IForumService forumService, Long learnerId, Long toolSessionId) {
+		int num = forumService.getTopicsNum(learnerId, toolSessionId);		
+		return new ToolOutput(OUTPUT_NAME_LEARNER_NUM_POSTS, "", new Long(num));
+	}
 }

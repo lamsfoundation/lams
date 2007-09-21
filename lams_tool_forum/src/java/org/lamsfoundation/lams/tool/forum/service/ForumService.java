@@ -127,7 +127,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     private IExportToolContentService exportContentService;
     private IUserManagementService userManagementService;
 	private ICoreNotebookService coreNotebookService;
-	private ForumOutputDefinitionFactory forumOuputDefinitionFactory;
+	private ForumOutputFactory forumOutputFactory;
 	
 	//---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
@@ -144,13 +144,13 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		this.messageService = messageService;
 	}
 	
-	public ForumOutputDefinitionFactory getForumOuputDefinitionFactory() {
-		return forumOuputDefinitionFactory;
+	public ForumOutputFactory getForumOutputFactory() {
+		return forumOutputFactory;
 	}
 
-	public void setForumOuputDefinitionFactory(
-			ForumOutputDefinitionFactory forumOuputDefinitionFactory) {
-		this.forumOuputDefinitionFactory = forumOuputDefinitionFactory;
+	public void setForumOutputFactory(
+			ForumOutputFactory forumOutputFactory) {
+		this.forumOutputFactory = forumOutputFactory;
 	}
 
 	public Forum updateForum(Forum forum) throws PersistenceException {
@@ -790,7 +790,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		if ( forum == null ) {
 			forum = getDefaultForum();
 		}
-		return getForumOuputDefinitionFactory().getToolOutputDefinitions(forum);
+		return getForumOutputFactory().getToolOutputDefinitions(forum);
 	}
  
 
@@ -850,13 +850,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
 			Long toolSessionId, Long learnerId) {
 		
-		TreeMap<String,ToolOutput> map = new TreeMap<String,ToolOutput>();
-		if ( names == null || names.contains(ForumOutputDefinitionFactory.OUTPUT_NAME_LEARNER_NUM_POSTS)) {
-			log.error("Forum getToolOutput(): Not implemented properly yet - just returning 0");
-			ToolOutput output = new ToolOutput(ForumOutputDefinitionFactory.OUTPUT_NAME_LEARNER_NUM_POSTS, "", new Long(0));
-			map.put(ForumOutputDefinitionFactory.OUTPUT_NAME_LEARNER_NUM_POSTS,output);
-		}
-		return map;
+		return forumOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
 
 	}
 
@@ -866,12 +860,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	 */
 	public ToolOutput getToolOutput(String name, Long toolSessionId,
 			Long learnerId) {
-		if ( ForumOutputDefinitionFactory.OUTPUT_NAME_LEARNER_NUM_POSTS.equals(name) ) {
-			log.error("Forum getToolOutput(): Not implemented properly yet - just returning 0");
-			return new ToolOutput(ForumOutputDefinitionFactory.OUTPUT_NAME_LEARNER_NUM_POSTS, "", new Long(0));
-		}
-		
-		return null;
+		return forumOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
 	}
 
 	/* (non-Javadoc)

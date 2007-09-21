@@ -23,6 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
 
@@ -36,9 +37,9 @@ import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
- * This class forms the basic implementation of an output definition factory, which is the class in a tool that 
- * creates the output definitions for a tool. Each tool that has outputs should create its own factory class that
- * extends this class and uses the methods implemented in this class to create the actual ToolOutputDefinition objects.
+ * This class forms the basic implementation of an output definition and output value factory, which is the class in a tool that 
+ * creates the output definition and output values for a tool. Each tool that has outputs should create its own factory class that
+ * extends this class and uses the methods implemented in this class to create the actual ToolOutputDefinition and ToolOutput objects.
  * 
  * The implemented factory (in the tool) needs to supply either (a) its own messageService bean (a Spring bean normally 
  * defined in the tool's applicationContext file in the toolMessageService property or (b) the name of its I18N language package/filename AND
@@ -47,20 +48,30 @@ import org.springframework.context.i18n.LocaleContextHolder;
  * from the tool's internationalisation files. If neither the messageService or the I18N name is not supplied then the name 
  * if the output definition will appear in the description field.
  * 
+ * The implemented factory should implement public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject)
+ * and this method should call the buildBlahDefinition() calls to build the definitions. 
+ * 
+ * It should also implement two methods similar to SortedMap<String, ToolOutput> getToolOutput(List<String> names, various tool objects) and 
+ * ToolOutput getToolOutput(String name, various tool objects)  to get the actual outputs. The "various tool objects" will vary from tool to 
+ * tool - some tools may wish to pass in the raw session and user ids, others may pass in specific tool objects. As these inputs will vary 
+ * greatly from tool to tool, no abstract method has been included in this parent class. Putting these calls in the factory allows
+ * all the "work" of the output generation to be grouped together and it also allows the getToolOutput() logic to get to getDescription()
+ * logic in the factory. 
+ * 
  * Example definitions for tool factories:
- * 	<bean id="mcOuputDefinitionFactory" class="org.lamsfoundation.lams.tool.mc.service.MCOutputDefinitionFactory">
+ * 	<bean id="mcOuputFactory" class="org.lamsfoundation.lams.tool.mc.service.MCOutputFactory">
  *		<property name="loadedMessageSourceService"><ref bean="loadedMessageSourceService"/></property>
  *		<property name="languageFilename"><value>org.lamsfoundation.lams.tool.mc.ApplicationResources</value></property>
  *	</bean>
  *
- *  <bean id="forumOuputDefinitionFactory" class="org.lamsfoundation.lams.tool.forum.service.ForumOutputDefinitionFactory">
+ *  <bean id="forumOuputDefinitionFactory" class="org.lamsfoundation.lams.tool.forum.service.ForumOutputFactory">
  *		<property name="toolMessageService"><ref bean="forumMessageService"/></property>
  *	</bean>
  *
  */
-public abstract class OutputDefinitionFactory {
+public abstract class OutputFactory {
 
-	protected Logger log = Logger.getLogger(OutputDefinitionFactory.class);
+	protected Logger log = Logger.getLogger(OutputFactory.class);
 
 	private MessageService toolMessageService;
 

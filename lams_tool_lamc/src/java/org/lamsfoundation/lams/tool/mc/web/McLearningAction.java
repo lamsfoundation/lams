@@ -571,7 +571,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
        		mcLearnerAnswersDTO.setFeedback(mcQueContent.getFeedback() != null ? mcQueContent.getFeedback() : "");
         		
     		Map<String,String> caMap= new TreeMap<String,String>(new McStringComparator());
-    		Map<String,String> caIdsMap= new TreeMap<String,String>(new McStringComparator());
+    		Set<String> caIds= new HashSet<String>();
     		long mapIndex=new Long(1);
     		
             Iterator listLearnerInputIterator=learnerInput.iterator();
@@ -593,7 +593,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             		McOptsContent mcOptsContent= mcQueContent.getOptionsContentByUID(new Long(caUid));
             		String mapIndexAsString = new Long(mapIndex).toString();
             		caMap.put(mapIndexAsString, mcOptsContent.getMcQueOptionText());
-            		caIdsMap.put(mapIndexAsString, caUid );
+            		caIds.add( caUid );
             		mapIndex++;
             		
             		if ( log.isDebugEnabled() ) {
@@ -603,25 +603,10 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             		}
         		}
         	}
-        	logger.debug("current caMap: " + caMap);
-        	logger.debug("current caIdsMap: " + caIdsMap);
         	mcLearnerAnswersDTO.setCandidateAnswers(caMap);
             	
-        	Long mcQueContentUid= mcQueContent.getUid(); 
-        	logger.debug("mcQueContentUid: " + mcQueContentUid);
-        	
-            List correctOptions=(List) mcService.getPersistedSelectedOptions(mcQueContentUid);
-            logger.debug("correctOptions: " +  correctOptions);
-            Map mapCorrectOptionUids=LearningUtil.buildMapCorrectOptionUids(correctOptions);
-            logger.debug("mapCorrectOptionUids: " +  mapCorrectOptionUids);
-        	
-            boolean isEqual=LearningUtil.compareMapItems(mapCorrectOptionUids, caIdsMap);
-            logger.debug("isEqual: " +  isEqual);
-            boolean isEqualCross=LearningUtil.compareMapsItemsCross(mapCorrectOptionUids, caIdsMap);
-            logger.debug("isEqualCross: " +  isEqualCross);
-            boolean compareResult= isEqual && isEqualCross; 
-            logger.debug("compareResult: " +  compareResult);
-
+        	List correctOptions = (List) mcService.getPersistedSelectedOptions(mcQueContent.getUid());
+            boolean compareResult = LearningUtil.isQuestionCorrect(correctOptions, caIds);
             mcLearnerAnswersDTO.setAttemptCorrect(new Boolean(compareResult).toString());
             if (compareResult)
             {
@@ -634,10 +619,12 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
                 mcLearnerAnswersDTO.setFeedbackIncorrect(mcQueContent.getFeedback());
             	mcLearnerAnswersDTO.setMark(new Integer(0));
             }
-        	logger.debug("assesment complete");
-        	logger.debug("mark:: " + learnerMarks);
-        	
-        	logger.debug("current mcLearnerAnswersDTO: " + mcLearnerAnswersDTO);
+
+            if ( log.isDebugEnabled() ) {
+            	logger.debug("mark:: " + learnerMarks);
+            	logger.debug("current mcLearnerAnswersDTO: " + mcLearnerAnswersDTO);
+            }
+            
         	questionAndCandidateAnswersList.add(mcLearnerAnswersDTO);
     		    
        	}//end question iterator

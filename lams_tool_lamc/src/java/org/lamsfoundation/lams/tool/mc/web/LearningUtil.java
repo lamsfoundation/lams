@@ -22,12 +22,17 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.web;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -104,236 +109,31 @@ public class LearningUtil implements McAppConstants {
 
 	 	logger.debug("ending saveFormRequestData:");
 	}
-	
-    
-    
-    /**
-     * calculateWeights(Map mapLeanerAssessmentResults, Map mapQuestionWeights)
-     * 
-     * @param mapLeanerAssessmentResults
-     * @param mapQuestionWeights
-     * @return int
-     */
-    public static int calculateWeights(Map mapLeanerAssessmentResults, Map mapQuestionWeights)
-	{
-    	logger.debug("starting calculate weights...");
-    	logger.debug("mapLeanerAssessmentResults : " + mapLeanerAssessmentResults);
-    	logger.debug("mapQuestionWeights : " + mapQuestionWeights);
-    	
-    	int totalUserWeight=0;
-    	Iterator itLearnerAssessmentMap = mapLeanerAssessmentResults.entrySet().iterator();
-		while (itLearnerAssessmentMap.hasNext()) 
-		{
-			Map.Entry pairs = (Map.Entry)itLearnerAssessmentMap.next();
-            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            
-            Iterator itWeightsMap = mapQuestionWeights.entrySet().iterator();
-            while (itWeightsMap.hasNext())
-            {
-            	Map.Entry pairsWeight = (Map.Entry)itWeightsMap.next();
-            	logger.debug("using the  weight pair: " +  pairsWeight.getKey() + " = " + pairsWeight.getValue());
-            	if (pairs.getKey().toString().equals(pairsWeight.getKey().toString()))
-            	{
-            		logger.debug("equal question found " +  pairsWeight.getKey() + " = " + pairsWeight.getValue() + " and " +  pairs.getValue());
-            		
-            		if (pairs.getValue().toString().equalsIgnoreCase("true"))
-            		{
-                		logger.debug("equal question found " +  pairsWeight.getKey() + " is a correct answer.");
-                		int weight= new Integer(pairsWeight.getValue().toString()).intValue();
-                		logger.debug("weight: " + weight);
-                		
-                		totalUserWeight=totalUserWeight + weight;  
-            		}
-            	}
-            }
-		}
-		logger.debug("totalUserWeight: " + totalUserWeight);
-		return totalUserWeight;
-	}
-     
-    /**
-     * conversts correct options list to correct options map
-     * buildMapCorrectOptions(List correctOptions)
-     * 
-     * @param correctOptions
-     * @return Map
-     */
-    public static Map buildMapCorrectOptions(List correctOptions)
-	{
-    	Map mapCorrectOptions= new TreeMap(new McComparator());
-    	Iterator correctOptionsIterator=correctOptions.iterator();
-    	Long mapIndex=new Long(1);
-    	while (correctOptionsIterator.hasNext())
-    	{
-    		McOptsContent mcOptsContent=(McOptsContent)correctOptionsIterator.next();
-    		if (mcOptsContent != null)
-    		{
-    			mapCorrectOptions.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
-        		mapIndex=new Long(mapIndex.longValue()+1);
-    		}
-    	}
-    	logger.debug("mapCorrectOptions : " + mapCorrectOptions);
-    	return mapCorrectOptions;
-	}
-    
-
-    /**
-     * Map buildMapCorrectOptionUids(List correctOptions)
-     * 
-     * @param correctOptions
-     * @return
-     */
-    public static Map buildMapCorrectOptionUids(List correctOptions)
-	{
-    	Map mapCorrectOptionUids= new TreeMap(new McComparator());
-    	Iterator correctOptionsIterator=correctOptions.iterator();
-    	Long mapIndex=new Long(1);
-    	while (correctOptionsIterator.hasNext())
-    	{
-    		McOptsContent mcOptsContent=(McOptsContent)correctOptionsIterator.next();
-    		if (mcOptsContent != null)
-    		{
-    		    mapCorrectOptionUids.put(mapIndex.toString(),mcOptsContent.getUid().toString());
-        		mapIndex=new Long(mapIndex.longValue()+1);
-    		}
-    	}
-    	logger.debug("mapCorrectOptionUids : " + mapCorrectOptionUids);
-    	return mapCorrectOptionUids;
-	}
-
-    
-    /**
-     * Map compare(Map mapGeneralCorrectOptions,Map mapGeneralCheckedOptionsContent)
+         
+    /** A question is correct if the number of correct options and the number of checked options is the same, 
+     * plus all the checked options appears in the correct options list.
      * 
      * @param mapGeneralCorrectOptions
-     * @param mapGeneralCheckedOptionsContent
+     * @param checkedOptionsUIDs
      * @return
      */
-    public static Map compare(Map mapGeneralCorrectOptions,Map mapGeneralCheckedOptionsContent)
-    {
-    	logger.debug("incoming mapGeneralCorrectOptions : " + mapGeneralCorrectOptions);
-    	logger.debug("incoming mapGeneralCheckedOptionsContent : " + mapGeneralCheckedOptionsContent);
+    public static boolean isQuestionCorrect(Collection<McOptsContent> correctOptions, Collection<String> checkedOptionIds) {
+
+    	if ( logger.isDebugEnabled() ) {
+    		logger.debug("performing isQuestionCorrect correctOptions: " +  correctOptions + " checkedOptionIds: " +  checkedOptionIds);
+    	}
     	
-    	Map mapLeanerAssessmentResults= new TreeMap(new McComparator());
-    	
-    	if (mapGeneralCheckedOptionsContent == null)
-    		return mapLeanerAssessmentResults;
-		
-    	Iterator itMap = mapGeneralCorrectOptions.entrySet().iterator();
-    	boolean compareResult= false;
-		while (itMap.hasNext()) {
-			compareResult= false;
-        	Map.Entry pairs = (Map.Entry)itMap.next();
-            
-            Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
-            while (itCheckedMap.hasNext()) 
-            {
-            	compareResult= false;
-            	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
-                if (pairs.getKey().toString().equals(checkedPairs.getKey().toString()))
-    			{
-                    Map mapCorrectOptions=(Map) pairs.getValue();
-                    Map mapCheckedOptions=(Map) checkedPairs.getValue();
-                    
-                    boolean isEqual=compareMapItems(mapCorrectOptions, mapCheckedOptions);
-                    boolean isEqualCross=compareMapsItemsCross(mapCorrectOptions, mapCheckedOptions);
-                    
-                    compareResult= isEqual && isEqualCross; 
-                    mapLeanerAssessmentResults.put(pairs.getKey(), new Boolean(compareResult).toString());
-        		}
-            }
-		}
-		logger.debug("constructed mapLeanerAssessmentResults: " + mapLeanerAssessmentResults);
-		return mapLeanerAssessmentResults;
-    }
-    
-    /**
-     * boolean compareMapItems(Map mapCorrectOptions, Map mapCheckedOptions)
-     * 
-     * @param mapCorrectOptions
-     * @param mapCheckedOptions
-     * @return
-     */
-    public static boolean compareMapItems(Map mapCorrectOptions, Map mapCheckedOptions)
-	{
-       logger.debug("performing compareMaps");
-	   logger.debug("mapCorrectOptions: " +  mapCorrectOptions);
-       logger.debug("mapCheckedOptions: " +  mapCheckedOptions);
-       
-       Iterator itMap = mapCorrectOptions.entrySet().iterator();
-       boolean response=false;
-       while (itMap.hasNext()) 
-       {
-       		Map.Entry pairs = (Map.Entry)itMap.next();
-       		logger.debug("pairs.getValue(): " +  pairs.getValue());
-			boolean optionExists=optionExists(pairs.getValue().toString(), mapCheckedOptions);
-			logger.debug("optionExists: " + optionExists);
-			
-			if (optionExists == false)
-			{
-				return false;
-			}
-		}
-       return true;
-	}
-    
-    
-    /**
-     * compareMapsCross(Map mapCorrectOptions, Map mapCheckedOptions)
-     * 
-     * @param mapCorrectOptions
-     * @param mapCheckedOptions
-     * @return boolean
-     */
-    public static boolean compareMapsItemsCross(Map mapCorrectOptions, Map mapCheckedOptions)
-	{
-       logger.debug("performing compareMapsCross");
-	   logger.debug("mapCorrectOptions: " +  mapCorrectOptions);
-       logger.debug("mapCheckedOptions: " +  mapCheckedOptions);
-       
-       Iterator itMap = mapCheckedOptions.entrySet().iterator();
-       boolean response=false;
-       while (itMap.hasNext()) 
-       {
-       		Map.Entry pairs = (Map.Entry)itMap.next();
-       		logger.debug("pairs.getValue(): " + pairs.getValue());
-       		boolean optionExists=optionExists(pairs.getValue().toString(), mapCorrectOptions);
-       		logger.debug("optionExists: " + optionExists);
-			
-			if (optionExists == false)
-			{
-				return false;
-			}
-		}
-       return true;
-	}
-    
-    
-    /**
-     * optionExists(String optionValue, Map generalMap)
-     * 
-     * @param optionValue
-     * @param generalMap
-     * @return boolean
-     */
-    public static boolean optionExists(String optionValue, Map generalMap)
-    {
-        logger.debug("performing optionExists: " + optionValue);
-        logger.debug("generalMap: " + generalMap);
-        
-    	Iterator itMap = generalMap.entrySet().iterator();
-    	while (itMap.hasNext()) 
-    	{
-       		Map.Entry pairsChecked = (Map.Entry)itMap.next();
-       		logger.debug("pairsChecked: " + pairsChecked);
-       		
-       		if (pairsChecked.getValue().toString().equals(optionValue.toString()))
-				return true;
-    	}	
+        if ( correctOptions.size() == checkedOptionIds.size() ) {
+            for ( McOptsContent mcOptsContent : correctOptions ) {
+        	   	String optionId = mcOptsContent.getUid().toString();
+    			 if ( !checkedOptionIds.contains(optionId) )
+    				 return false;
+    		}
+           return true;
+    	}
     	return false;
     }
-	
-    
+
     /**
      * McQueUsr getUser(HttpServletRequest request, IMcService mcService, String toolSessionId)
      * 
@@ -692,143 +492,7 @@ public class LearningUtil implements McAppConstants {
 	}
 
     
-    /**
-     * int getHighestMark(Map mapQuestionMarks, boolean mapExcluded)
-     * 
-     * @param mapQuestionMarks
-     * @param mapExcluded
-     * @return
-     */
-    public static int getHighestMark(Map mapQuestionMarks, boolean mapExcluded)
-	{
-	    logger.debug("mapExcluded: " + mapExcluded);
-	   
-		if ((mapQuestionMarks.size() == 1) && (!mapExcluded))
-		{
-			logger.debug("using map with 1 question only");
-			/*the only alternative is 100*/
-			return 100;
-		}
-		
-	   logger.debug("continue excluding map");
-	   Iterator itMap = mapQuestionMarks.entrySet().iterator();
- 	   int highestMark=0; 	   
-       while (itMap.hasNext()) 
-       {
-       		Map.Entry pair = (Map.Entry)itMap.next();
-       		String mark=pair.getValue().toString();
-       		int intMark=new Integer(mark).intValue();
-       		
-			if (intMark > highestMark)
-			    highestMark= intMark;
-       }
-       return highestMark;
-	}
-
-    
- 
-	/**
-	 * Map rebuildMarksMapExcludeHighestMark(Map mapQuestionMarks, int highestMark)
-	 * 
-	 * @param mapQuestionMarks
-	 * @param highestMark
-	 * @return
-	 */
-	public static Map rebuildMarksMapExcludeHighestMark(Map mapQuestionMarks, int highestMark)
-	{
-		logger.debug("doing rebuildMarksMapExcludeHighestMark: " + mapQuestionMarks);
-		logger.debug("using highestMark: " + highestMark);
-		
-	   Map mapMarksExcludeHighestMark= new TreeMap(new McComparator());
-	   
-	   Iterator itMap = mapQuestionMarks.entrySet().iterator();
-	   Long mapIndex=new Long(1);
-       while (itMap.hasNext()) 
-       {
-       		Map.Entry pair = (Map.Entry)itMap.next();
-       		String mark=pair.getValue().toString();
-       		int intMark=new Integer(mark).intValue();
-       		
-       		logger.debug("intMark: " + intMark);
-       		logger.debug("intMark versus highestMark:" + intMark + " versus" + highestMark);
-       		if (intMark != highestMark)
-       		{
-       		    mapMarksExcludeHighestMark.put(mapIndex.toString(),mark);
-    	   		mapIndex=new Long(mapIndex.longValue()+1);
-       		}
-       		else
-       		{
-       			logger.debug("excluding highest weight from the reconstructed map: " + intMark);
-       		}
-       }
-       logger.debug("returning mapWeightsExcludeHighestWeight: " + mapMarksExcludeHighestMark);
-       return mapMarksExcludeHighestMark; 
-	}
-	
-    public static boolean isTextMarkup(String text)
-    {
-        logger.debug("starting isTextMarkup: " + text);
-        
-        int markupSignPos=text.indexOf("<");
-        logger.debug("markupSignPos: " + markupSignPos);
-        
-        int markupSignPos2=text.indexOf(">");
-        logger.debug("markupSignPos2: " + markupSignPos2);
-        
-        if ((markupSignPos != -1) && (markupSignPos2) != -1)
-        {
-            logger.debug("text has markup in it: " + text);
-            return true;
-        }
-        return false;
-    }
-
-    /*
-    public static String getWrappedText(String text, boolean authoring)
-    {
-        
-        logger.debug("starting getWrappedText: " + text);
-        logger.debug("authoring: " + authoring);
-    	
-        String newText="";
-        int breakPos=50;
-        
-        if (authoring)
-        	breakPos=30;
-        
-        if (text.length() > breakPos)
-    	{
-    		int counter=0;
-    		while (counter < 100)
-    		{
-    		    counter++;
-    		    logger.debug("using text: " + text);
-    		    
-    		    if (text.length() > breakPos)
-    		    {
-    		        newText += text.substring(0, breakPos+1) + "<br>" ;
-    		        text=text.substring(breakPos+1);
-        		    
-    		    }
-    		    else
-    		    {
-    		        newText +=text;
-    		        break;
-    		    }
-    		}
-
-    	}
-    	else
-    	{
-    	    newText=text;
-    	}
-        
-	    logger.debug("returning newText: " + newText);
-    	return newText;
-    }
-    */
-
-    /** Gets the various maps used by jsps to display a learner's attempts.
+     /** Gets the various maps used by jsps to display a learner's attempts.
      * @return Map[mapFinalAnswersIsContent, mapFinalAnswersContent, mapQueAttempts, mapQueCorrectAttempts,  mapQueIncorrectAttempts, mapMarks] */
     public static Map[] getAttemptMapsForUser(int intTotalQuestionCount, Long toolContentUID, boolean allowRetries, IMcService mcService, McQueUsr mcQueUsr) {
     	

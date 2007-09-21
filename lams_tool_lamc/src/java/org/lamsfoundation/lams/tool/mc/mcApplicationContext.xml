@@ -70,7 +70,7 @@
 	
 	<!-- end of data access and repository access beans -->
 
-	<bean id="mcOutputDefinitionFactory" class="org.lamsfoundation.lams.tool.mc.service.MCOutputDefinitionFactory">
+	<bean id="mcOutputFactory" class="org.lamsfoundation.lams.tool.mc.service.MCOutputFactory">
 		<property name="loadedMessageSourceService"><ref bean="loadedMessageSourceService"/></property>
 		<property name="languageFilename"><value>org.lamsfoundation.lams.tool.mc.ApplicationResources</value></property>
 	</bean>
@@ -93,7 +93,7 @@
 					<property name="auditService"><ref bean="auditService"/></property>					
 					<property name="exportContentService"><ref bean="exportToolContentService"/></property> 		
 			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>										
-			   		<property name="mcOutputDefinitionFactory"><ref bean="mcOutputDefinitionFactory"/></property>										
+			   		<property name="mcOutputFactory"><ref bean="mcOutputFactory"/></property>										
 				</bean>
 			</property>
 			<property name="transactionAttributes">
