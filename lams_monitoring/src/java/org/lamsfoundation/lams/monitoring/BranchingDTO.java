@@ -22,24 +22,6 @@ public class BranchingDTO implements Serializable, Comparable {
 	private String branchActivityName;
 	private SortedSet<BranchDTO> branches;
 	
-	public BranchingDTO(BranchingActivity activity) {
-		this.branchActivityId = activity.getActivityId();
-		this.branchActivityName = activity.getTitle();
-		
-		branches = new TreeSet<BranchDTO>();
-		Iterator iter = activity.getActivities().iterator();
-		while (iter.hasNext()) {
-			SequenceActivity branch = (SequenceActivity) iter.next();
-			Set<BranchActivityEntry> mappingEntries = branch.getBranchEntries();
-			SortedSet<Group> groups = new TreeSet<Group>();
-			for ( BranchActivityEntry entry : mappingEntries ) {
-				Group group = entry.getGroup();
-				groups.add(group);
-			}
-			branches.add(new BranchDTO(branch, groups));
-		}
-	}
-
 	public String toString() {
 		return new ToStringBuilder(this)
 			.append("branchActivityId", branchActivityId)

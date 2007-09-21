@@ -409,6 +409,15 @@ public interface IMonitoringService
     public Activity getActivityById(Long activityId);
     
     /**
+     * Return an activity object based on the requested id. Where possible, give it the type we want 
+     * so that it can be cast properly.
+     * 
+     * @param activityId id of the activity.
+     * @return the requested activity object.
+     */
+    public Activity getActivityById(Long activityId, Class clasz);
+    
+    /**
      * Return an activity object based on the requested id.
      * @param activityId id of the activity.
      * @return the requested activity object.

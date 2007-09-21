@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
+import org.lamsfoundation.lams.monitoring.BranchDTO;
 import org.lamsfoundation.lams.monitoring.BranchingDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
@@ -119,13 +120,7 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
         Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
         IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Activity activity = monitoringService.getActivityById(activityID);
-    	if ( activity == null ||  !activity.isBranchingActivity() ) {
-			String error = "Activity is not a branching activity. Activity was "+activity; 
-			log.error(error);
-			throw new MonitoringServiceException(error);
-    	}
-
+    	BranchingActivity activity = (BranchingActivity) monitoringService.getActivityById(activityID, BranchingActivity.class);
 	
 		if ( activity.isChosenBranchingActivity() ) {
 			
@@ -136,10 +131,11 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 			request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
 
 			// can we still move users? check each group for tool sessions.
-			Iterator iter = ((BranchingActivity)activity).getActivities().iterator();
+			Iterator iter = activity.getActivities().iterator();
 			boolean mayMoveUser = true;
 			while (iter.hasNext()) {
-				SequenceActivity branch = (SequenceActivity) iter.next();
+				Activity childActivity = (Activity) iter.next();
+				SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(childActivity.getActivityId(), SequenceActivity.class);
 				Set<BranchActivityEntry> mappingEntries = branch.getBranchEntries();
 				for ( BranchActivityEntry entry : mappingEntries ) {
 					mayMoveUser = mayMoveUser && entry.getGroup().mayBeDeleted();
@@ -151,7 +147,7 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 			
 		} else {
 			// go to a view only screen for group based and tool based grouping
-			return viewBranching((BranchingActivity) activity, lessonId, false, mapping, request);
+			return viewBranching(activity, lessonId, false, mapping, request, monitoringService);
 		}
     	
 	}
@@ -169,14 +165,8 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
         long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
         IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Activity activity = monitoringService.getActivityById(activityId);
-    	if ( activity == null ||  !activity.isBranchingActivity() ) {
-			String error = "Activity is not a branching activity. Activity was "+activity; 
-			log.error(error);
-			throw new MonitoringServiceException(error);
-    	}
-
-    	return viewBranching((BranchingActivity) activity, lessonId, true, mapping, request);
+        BranchingActivity activity = (BranchingActivity) monitoringService.getActivityById(activityId, BranchingActivity.class);
+    	return viewBranching(activity, lessonId, true, mapping, request, monitoringService);
     }
 
 
@@ -186,7 +176,7 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 	 * Input parameters: activityID
 	 */
 	private ActionForward viewBranching(BranchingActivity activity, Long lessonId, boolean useLocalFiles, 
-			ActionMapping mapping, HttpServletRequest request) throws IOException, ServletException {
+			ActionMapping mapping, HttpServletRequest request, IMonitoringService monitoringService) throws IOException, ServletException {
 
     	// in general the progress engine expects the activity and lesson id to be in the request,
     	// so follow that standard.
@@ -197,7 +187,7 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 	    	
 		// only show the group names if this is a group based branching activity - the names
 		// are meaningless for chosen and tool based branching
-		BranchingDTO dto = new BranchingDTO((BranchingActivity) activity);
+		BranchingDTO dto = getBranchingDTO(activity, monitoringService);
 		request.setAttribute(PARAM_BRANCHING_DTO, dto);
 		request.setAttribute(PARAM_SHOW_GROUP_NAME, activity.isGroupBranchingActivity());
 		if ( log.isDebugEnabled() ) {
@@ -222,7 +212,7 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 		BranchingActivity activity = (BranchingActivity) monitoringService.getActivityById(activityID);
 		
-		TreeSet<SequenceActivity> sortedBranches = new TreeSet<SequenceActivity>(new ActivityTitleComparator());
+		TreeSet<Activity> sortedBranches = new TreeSet<Activity>(new ActivityTitleComparator());
 		sortedBranches.addAll(activity.getActivities());
 
 		// build the output string to return to the chosen branching page.
@@ -230,7 +220,10 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 		String branchesOutput = "";
 
 		boolean first = true;
-		for ( SequenceActivity branch : sortedBranches ) {
+		for ( Activity childActivity : sortedBranches ) {
+
+			SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(childActivity.getActivityId(), SequenceActivity.class);
+
 			Long branchId = branch.getActivityId();
 			String name = branch.getTitle();
 			int numberOfMembers = 0;
@@ -382,5 +375,32 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 		writeAJAXOKResponse(response);
 		return null;
 	}
+
+	// Can't do this in BranchingDTO (although that's where it should be) as we have
+	// to get the SequenceActivities via the getActivityById to get around Hibernate
+	// not allowing us to cast the cglib classes. 
+	private  BranchingDTO getBranchingDTO(BranchingActivity activity, IMonitoringService monitoringService) {
+		BranchingDTO dto = new BranchingDTO();
+		
+		dto.setBranchActivityId(activity.getActivityId());
+		dto.setBranchActivityName(activity.getTitle());
+		
+		TreeSet<BranchDTO> branches = new TreeSet<BranchDTO>();
+		Iterator iter = activity.getActivities().iterator();
+		while (iter.hasNext()) {
+			Activity childActivity = (Activity) iter.next();
+			SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(childActivity.getActivityId(), SequenceActivity.class);
+			Set<BranchActivityEntry> mappingEntries = branch.getBranchEntries();
+			SortedSet<Group> groups = new TreeSet<Group>();
+			for ( BranchActivityEntry entry : mappingEntries ) {
+				Group group = entry.getGroup();
+				groups.add(group);
+			}
+			branches.add(new BranchDTO(branch, groups));
+		}
+		dto.setBranches(branches);
+		return dto;
+	}
+
 
  }

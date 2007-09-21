@@ -1315,6 +1315,14 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     }
     
     /**
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityById(Long, Class)
+     */
+    public Activity getActivityById(Long activityId, Class clasz)
+    {
+        return activityDAO.getActivityByActivityId(activityId, clasz);
+    }
+
+    /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getGroupingActivityById(Long)
      */
     public GroupingActivity getGroupingActivityById(Long activityID)  {
