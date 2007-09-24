@@ -71,6 +71,8 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
     public var addEventListener:Function;
     public var removeEventListener:Function;
     
+	private var _textHeight:Number;
+	
     /**
     * constructor
     */
@@ -115,13 +117,6 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
         
 		setStyles();
 		
-		setSize(200, 200);
-		
-		if(_parent == ApplicationParent.root)
-			setPosition(Stage.width/2, Stage.height/2);
-		else
-			setPosition(Stage.width/2 - _parent._x,  Stage.height/2 - _parent._y);
-				
 		addTransparentLayer(this._parent);
 		
 		contentLoaded();
@@ -191,18 +186,25 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 	public function set title(__title:String) {
 		modTextArea(_title);
 		_title.text = __title;
-		
-		_title._y = _bgpanel._y + 10;
-		_title._x = -_title._width/2;
 	}
 	
 	public function set message(msg:String) {
 		modTextArea(_message);
 		_message.text = "<p align='center'>" + msg + "</p>";
+
+		setMessageHeight();
+		setSize(200, 200);
+		
+		if(_parent == ApplicationParent.root)
+			setPosition(Stage.width/2, Stage.height/2);
+		else
+			setPosition(Stage.width/2 - _parent._x,  Stage.height/2 - _parent._y);
+			
+		_title._y = _bgpanel._y + 10;
+		_title._x = -_title._width/2;
+			
 		_message._x = -_message._width/2;
 		_message._y = _title._y + _title._height;
-		
-		setMessageHeight();
 	}
 	
 	private function modTextArea(_obj:TextArea) {
@@ -212,7 +214,6 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 	}
 	
 	private function setMessageHeight() {
-		
 			this.createTextField("message", this.getNextHighestDepth(), -1000, -1000, 0, 0); 
 
 			var msg_text = this["message"];
@@ -221,11 +222,11 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 			msg_text.htmlText = _message.text;
 			msg_text.wordWrap = true;
 			msg_text.autoSize = true;
-			msg_text._width = _message.width; 
+			msg_text._width = _message.width;
 				
-			Debugger.log('textHeight: ' + msg_text.textHeight * 2, Debugger.GEN, 'setMessageHeight', 'org.lamsfoundation.lams.Alertialog');
-			_message.setSize(_message.width, msg_text.textHeight * 2); // fix  for messages being concatenated in message box
-			
+			Debugger.log('textHeight: ' + msg_text.textHeight + 120, Debugger.GEN, 'setMessageHeight', 'org.lamsfoundation.lams.Alertialog');
+			_message.setSize(_message.width, msg_text.textHeight + 120); 
+			_textHeight = msg_text.textHeight + 120;			
 	}
 	
 	public function set type(a:Number) {
@@ -343,9 +344,14 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 		
 		_bgpanel._width = w;
 		clickTarget._width = w;
-	
-		_bgpanel._height = h;
-		clickTarget._height = h;
+		
+		if (_textHeight > h) {
+			_bgpanel._height = _textHeight;
+			clickTarget._height = _textHeight;
+		} else {
+			_bgpanel._height = h;
+			clickTarget._height = h;
+		}
     }
 	
 	public function setPosition(x:Number, y:Number):Void {
