@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Inteface defines Lesson DAO Methods
@@ -82,4 +83,21 @@ public interface ILearnerProgressDAO
      */
     public List getCompletedLearnerProgressForLesson(final Long lessonId);
  
+    /**
+     * Get all the users records where the user has attempted the given activity. Uses the progress records
+     * to determine the users.
+     * 
+     * @param activityId
+     * @return List<User>
+     */
+	public List<User> getLearnersHaveAttemptedActivity(final Activity activity);
+	
+	/**
+     * Get all the users records where the user has completed the given activity. Uses the progress records
+     * to determine the users.
+     * 
+     * @param activityId
+     * @return List<User>
+     */
+	public List<User> getLearnersHaveCompletedActivity(final Activity activity);
  }

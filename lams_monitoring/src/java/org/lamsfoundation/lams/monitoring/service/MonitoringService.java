@@ -2099,4 +2099,15 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 			}
 
 		}
+		
+		/**
+		 * Get the list of users who have attempted an activity. This is based on the progress engine records.
+		 * This will give the users in all tool sessions for an activity (if it is a tool activity) or
+		 * it will give all the users who have attempted an activity that doesn't have any tool sessions, i.e. 
+		 * system activities such as branching.
+		 */
+		public List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException {
+			return lessonService.getLearnersHaveAttemptedActivity(activity);
+		}
+
 }

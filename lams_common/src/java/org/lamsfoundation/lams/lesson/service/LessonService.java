@@ -47,6 +47,8 @@ import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
+import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.MessageService;
 
@@ -597,5 +599,23 @@ public class LessonService implements ILessonService
 				 log.debug("Reset completed flag for "+count+" learners for lesson "+lessonId);
 		 }
 
-		 
+		/**
+		 * Get the list of users who have attempted an activity. This is based on the progress engine records.
+		 * This will give the users in all tool sessions for an activity (if it is a tool activity) or
+		 * it will give all the users who have attempted an activity that doesn't have any tool sessions, i.e. 
+		 * system activities such as branching.
+		 */
+		public List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException {
+			return learnerProgressDAO.getLearnersHaveAttemptedActivity(activity);
+		}
+
+		/**
+		 * Get the list of users who have completed an activity. This is based on the progress engine records.
+		 * This will give the users in all tool sessions for an activity (if it is a tool activity) or
+		 * it will give all the users who have attempted an activity that doesn't have any tool sessions, i.e. 
+		 * system activities such as branching.
+		 */
+		public List<User> getLearnersHaveCompletedActivity(Activity activity) throws LessonServiceException {
+			return learnerProgressDAO.getLearnersHaveCompletedActivity(activity);
+		}
 }

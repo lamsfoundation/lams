@@ -32,6 +32,7 @@ import org.hibernate.Session;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -141,7 +142,6 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     public List getCompletedLearnerProgressForLesson(final Long lessonId) 
     {
         HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-        log.debug("Hibernate template is "+hibernateTemplate);
 
         return (List)hibernateTemplate.execute(
              new HibernateCallback() 
@@ -156,4 +156,55 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
        );     
     }
 
+    /**
+     * Get all the users records where the user has attempted the given activity. Uses the progress records
+     * to determine the users.
+     * 
+     * @param activityId
+     * @return List<User>
+     */
+	@SuppressWarnings("unchecked")
+	public List<User> getLearnersHaveAttemptedActivity(final Activity activity) 
+    {
+		List<User> learners = null;
+		
+	    HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	    learners = (List<User>) hibernateTemplate.execute(
+	            new HibernateCallback() {
+	                public Object doInHibernate(Session session) throws HibernateException {
+	        	    	return session.getNamedQuery("usersAttemptedActivity")
+	        	    		.setLong("activityId", activity.getActivityId().longValue())
+	        	    		.list();
+	                }
+	            }
+	        );
+	    
+	    return learners;
+    }
+	
+	/**
+     * Get all the users records where the user has completed the given activity. Uses the progress records
+     * to determine the users.
+     * 
+     * @param activityId
+     * @return List<User>
+     */
+	@SuppressWarnings("unchecked")
+	public List<User> getLearnersHaveCompletedActivity(final Activity activity) 
+    {
+		List<User> learners = null;
+		
+	    HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	    learners = (List<User>) hibernateTemplate.execute(
+	            new HibernateCallback() {
+	                public Object doInHibernate(Session session) throws HibernateException {
+	        	    	return session.getNamedQuery("usersCompletedActivity")
+	        	    		.setLong("activityId", activity.getActivityId().longValue())
+	        	    		.list();
+	                }
+	            }
+	        );
+	    
+	    return learners;
+    }
 }

@@ -26,7 +26,9 @@ package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -131,10 +133,10 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 			request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
 
 			// can we still move users? check each group for tool sessions.
-			Iterator iter = activity.getActivities().iterator();
+			Iterator<Activity> iter = activity.getActivities().iterator();
 			boolean mayMoveUser = true;
 			while (iter.hasNext()) {
-				Activity childActivity = (Activity) iter.next();
+				Activity childActivity = iter.next();
 				SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(childActivity.getActivityId(), SequenceActivity.class);
 				Set<BranchActivityEntry> mappingEntries = branch.getBranchEntries();
 				for ( BranchActivityEntry entry : mappingEntries ) {
@@ -386,14 +388,28 @@ public class ChosenBranchingAJAXAction extends LamsDispatchAction {
 		dto.setBranchActivityName(activity.getTitle());
 		
 		TreeSet<BranchDTO> branches = new TreeSet<BranchDTO>();
-		Iterator iter = activity.getActivities().iterator();
+		Iterator<Activity> iter = activity.getActivities().iterator();
 		while (iter.hasNext()) {
-			Activity childActivity = (Activity) iter.next();
+			Activity childActivity = iter.next();
 			SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(childActivity.getActivityId(), SequenceActivity.class);
 			Set<BranchActivityEntry> mappingEntries = branch.getBranchEntries();
+			
+			// If it is a grouped based or teacher chosen branching, the users will be in groups.
+			// If not get the user based on the progress engine and create a dummy group.
+			// Can't use tool session as sequence activities don't have a tool session! 
 			SortedSet<Group> groups = new TreeSet<Group>();
-			for ( BranchActivityEntry entry : mappingEntries ) {
-				Group group = entry.getGroup();
+			if ( activity.isChosenBranchingActivity() || activity.isGroupBranchingActivity() ) {
+				for ( BranchActivityEntry entry : mappingEntries ) {
+					Group group = entry.getGroup();
+					groups.add(group);
+				}
+			} else {
+				Group group = new Group();
+				if ( group.getUsers() == null ) {
+					group.setUsers(new HashSet());
+				}
+				List<User> learners = monitoringService.getLearnersHaveAttemptedActivity(branch);
+				group.getUsers().addAll(learners);
 				groups.add(group);
 			}
 			branches.add(new BranchDTO(branch, groups));
