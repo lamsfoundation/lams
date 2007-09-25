@@ -300,18 +300,16 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 			Authenticator
 					.authenticate(serverMap, datetime, username, hashValue);
 
-			// get user map and course class map
+			// get user map, user is created if this is their first use
 
-			ExtUserUseridMap userMap;
-
-			userMap = integrationService.getExtUserUseridMap(serverMap,
+			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap,
 					username);
-			// integrationService.getExtCourseClassMap(serverMap, userMap,
-			// courseId,
-			// country, lang);
-			// TODO, do we need this ?? does not assign return values to a
-			// variable,
-			// copied from original WS
+			
+			// create group for external course if necessary
+			
+			integrationService.getExtCourseClassMap(serverMap, userMap,
+					courseId,
+					country, lang);
 
 			String contentTree = buildContentTree(
 					userMap.getUser().getUserId(), mode).toString();
