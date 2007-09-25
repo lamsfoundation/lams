@@ -191,26 +191,34 @@ public class LdapService implements ILdapService {
 		}
 	}
 	
-	private boolean getAsBoolean(Attribute attr) {
+	private Boolean getAsBoolean(Attribute attr) {
 		String attrString = getSingleAttributeString(attr);
 		if (attrString!=null) {
 			if (attrString.equals("1") || attrString.equals("true")) {
 				return true;
+			} else if (attrString.equals("0") || attrString.equals("false")) {
+				return false;
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	public boolean getDisabledBoolean(Attributes attrs) {
 		String ldapDisabledAttrStr = Configuration.get(ConfigurationKeys.LDAP_DISABLED_ATTR);
-		boolean toggleBoolean = false;
 		if (ldapDisabledAttrStr.startsWith("!")) {
 			ldapDisabledAttrStr = ldapDisabledAttrStr.substring(1);
-			toggleBoolean = true;
+			Attribute ldapDisabledAttr = attrs.get(ldapDisabledAttrStr);
+			Boolean booleanValue = getAsBoolean(ldapDisabledAttr);
+			if (booleanValue != null) {
+				return !booleanValue;
+			} else {
+				// if there is no value, assume not disabled
+				return false;
+			}
+		} else {
+			return getAsBoolean(attrs.get(ldapDisabledAttrStr));
 		}
-		Attribute ldapDisabledAttr = attrs.get(ldapDisabledAttrStr);
-		boolean booleanValue = getAsBoolean(ldapDisabledAttr);
-		return (toggleBoolean ? !booleanValue : booleanValue);
+		
 	}
 	
 	public boolean addLDAPUser(Attributes attrs, Integer userId) {

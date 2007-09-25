@@ -129,12 +129,6 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 						return false;
 					}
 				}
-
-				// disabled users can't login
-				if (user.getDisabledFlag()) {
-					log.debug("===> user is disabled.");
-					return false;
-				}
 				
 				// allow sysadmin to login as another user; in this case, the LAMS shared session
 				// will be present, allowing the following check to work
@@ -167,6 +161,15 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 						return false;
 					}
 				}
+				
+				// disabled users can't login;
+				// check after authentication to give non-db authentication methods
+				// a chance to update disabled flag
+				if (user.getDisabledFlag()) {
+					log.debug("===> user is disabled.");
+					return false;
+				}
+				
 				//if login is valid, register userDTO into session.
 				if(isValid){
 					HttpSession sharedsession = SessionManager.getSession(); 
