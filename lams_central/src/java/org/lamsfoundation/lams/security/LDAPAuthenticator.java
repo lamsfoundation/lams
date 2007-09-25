@@ -127,9 +127,18 @@ public class LDAPAuthenticator {
 				}
 			}
 			
+			// check user is disabled in ldap
+			if (getLdapService().getDisabledBoolean(attrs)) {
+				log.debug("===> User is disabled in LDAP.");
+				User user = getService().getUserByLogin(username);
+				if (user != null) {
+					getService().disableUser(user.getUserId());
+				}
+				return false;
+			}
+			
 			if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_UPDATE_ON_LOGIN)) {
-				UserManagementService service = getService();
-				User user = service.getUserByLogin(username);
+				User user = getService().getUserByLogin(username);
 				if (user != null) {
 					// update user's attributes and org membership
 					getLdapService().updateLDAPUser(user, attrs);

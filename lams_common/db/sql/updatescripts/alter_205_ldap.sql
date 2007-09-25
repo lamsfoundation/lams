@@ -24,6 +24,7 @@ insert into lams_configuration (config_key, config_value) values ('LDAPEveningPh
 insert into lams_configuration (config_key, config_value) values ('LDAPFaxAttr','facsimileTelephoneNumber');
 insert into lams_configuration (config_key, config_value) values ('LDAPMobileAttr','mobile');
 insert into lams_configuration (config_key, config_value) values ('LDAPLocaleAttr','preferredLanguage');
+insert into lams_configuration (config_key, config_value) values ('LDAPDisabledAttr','!accountStatus');
 insert into lams_configuration (config_key, config_value) values ('LDAPOrgAttr','deetITSchoolCode');
 insert into lams_configuration (config_key, config_value) values ('LDAPRolesAttr','memberOf');
 insert into lams_configuration (config_key, config_value) values ('LDAPLearnerMap','Student;SchoolSupportStaff;Teacher;SeniorStaff;Principal');

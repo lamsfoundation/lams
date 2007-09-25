@@ -90,6 +90,7 @@ public class LdapService implements ILdapService {
 		user.setFax(map.get("fax"));
 		user.setMobilePhone(map.get("mobile"));
 		user.setLocale(getLocale(map.get("locale")));
+		user.setDisabledFlag(getDisabledBoolean(attrs));
 		getService().save(user);
 	}
 	
@@ -139,7 +140,7 @@ public class LdapService implements ILdapService {
 						.findById(AuthenticationMethod.class, AuthenticationMethod.LDAP));
 				user.setFlashTheme(service.getDefaultFlashTheme());
 				user.setHtmlTheme(service.getDefaultHtmlTheme());
-				user.setDisabledFlag(false);
+				user.setDisabledFlag(getDisabledBoolean(attrs));
 				user.setCreateDate(new Date());
 				user.setLocale(getLocale(map.get("locale")));
 				service.save(user);
@@ -173,10 +174,43 @@ public class LdapService implements ILdapService {
 			map.put("fax", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_FAX_ATTR))));
 			map.put("mobile", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_MOBILE_ATTR))));
 			map.put("locale", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_LOCALE_ATTR))));
+			map.put("disabled", getSingleAttributeString(attrs.get(
+					getLdapAttr(Configuration.get(ConfigurationKeys.LDAP_DISABLED_ATTR))))
+			);
 		} catch (Exception e) {
 			log.error("===> Exception occurred while getting LDAP user attributes: ", e);
 		}
 		return map;
+	}
+	
+	public String getLdapAttr(String ldapAttr) {
+		if (ldapAttr != null) {
+			return (ldapAttr.startsWith("!") ? ldapAttr.substring(1) : ldapAttr);
+		} else {
+			return ldapAttr;
+		}
+	}
+	
+	private boolean getAsBoolean(Attribute attr) {
+		String attrString = getSingleAttributeString(attr);
+		if (attrString!=null) {
+			if (attrString.equals("1") || attrString.equals("true")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean getDisabledBoolean(Attributes attrs) {
+		String ldapDisabledAttrStr = Configuration.get(ConfigurationKeys.LDAP_DISABLED_ATTR);
+		boolean toggleBoolean = false;
+		if (ldapDisabledAttrStr.startsWith("!")) {
+			ldapDisabledAttrStr = ldapDisabledAttrStr.substring(1);
+			toggleBoolean = true;
+		}
+		Attribute ldapDisabledAttr = attrs.get(ldapDisabledAttrStr);
+		boolean booleanValue = getAsBoolean(ldapDisabledAttr);
+		return (toggleBoolean ? !booleanValue : booleanValue);
 	}
 	
 	public boolean addLDAPUser(Attributes attrs, Integer userId) {
@@ -349,21 +383,29 @@ public class LdapService implements ILdapService {
             	Attributes attrs = result.getAttributes();
             	
             	// add or update this user to LAMS
+            	boolean disabled = getDisabledBoolean(attrs);
             	String login = getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR)));
             	if (login != null && login.trim().length() > 0) {
             		User user = getService().getUserByLogin(login);
-            		if (user == null) {
-            			log.info("Creating new user for LDAP username: " + login);
-            			if (createLDAPUser(attrs)) {
-            				user = getService().getUserByLogin(login);
+            		if (!disabled) {
+            			if (user == null) {
+            				log.info("Creating new user for LDAP username: " + login);
+            				if (createLDAPUser(attrs)) {
+            					user = getService().getUserByLogin(login);
+            				} else {
+            					log.error("Couldn't create new user for LDAP username: "+login);
+            				}
             			} else {
-    						log.error("Couldn't create new user for LDAP username: "+login);
-    					}
+            				updateLDAPUser(user, attrs);
+            			}
+            			if (!addLDAPUser(attrs, user.getUserId())) {
+            				log.error("Couldn't add LDAP user: "+login+" to organisation.");
+            			}
             		} else {
-            			updateLDAPUser(user, attrs);
-            		}
-            		if (!addLDAPUser(attrs, user.getUserId())) {
-            			log.error("Couldn't add LDAP user: "+login+" to organisation.");
+            			// remove user from groups and set disabled flag
+            			if (user != null) {
+            				getService().disableUser(user.getUserId());
+            			}
             		}
             	} else {
             		log.error("Couldn't find login attribute for user using attribute name: " 

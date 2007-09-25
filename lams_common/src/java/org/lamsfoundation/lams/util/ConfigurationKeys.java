@@ -181,9 +181,9 @@ public class ConfigurationKeys {
 	
 	public static String LDAP_MOBILE_ATTR = "LDAPMobileAttr";
 	
-	//public static String LDAP_DISABLED_ATTR = "LDAPDisabledAttr";
-	
 	public static String LDAP_LOCALE_ATTR = "LDAPLocaleAttr";
+	
+	public static String LDAP_DISABLED_ATTR = "LDAPDisabledAttr";
 	
 	public static String LDAP_ORG_ATTR = "LDAPOrgAttr";
 	
