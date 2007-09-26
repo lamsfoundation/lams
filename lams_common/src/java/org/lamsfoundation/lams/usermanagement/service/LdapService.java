@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.usermanagement.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -253,6 +254,11 @@ public class LdapService implements ILdapService {
 				// if the user is a member of any other groups, remove them
 				if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_ONLY_ONE_ORG)) {
 					Set uos = user.getUserOrganisations();
+					// safety net in case hibernate hasn't initialised this set yet
+					if (uos == null) {
+						uos = new HashSet();
+						user.setUserOrganisations(uos);
+					}
 					Iterator i = uos.iterator();
 					while (i.hasNext()) {
 						UserOrganisation uo = (UserOrganisation)i.next();
