@@ -438,7 +438,7 @@ public class LamsSecurityUtil {
         String plaintext = datetime.toLowerCase().trim() +
                            login.toLowerCase().trim() +
                            serverId.toLowerCase().trim() + 
-                           secretkey;
+                           secretkey.toLowerCase().trim();
         
         String hash = sha1(plaintext);  
         
