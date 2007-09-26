@@ -1,0 +1,23 @@
+LAMS-Blackboard Integration Release Notes
+=========================================
+
+All Jira bug references can be found at:
+https://bugs.lamsfoundation.org/browse/<bug reference>
+
+1.0.1 Release
+=============
+* LDEV-1326 Implement "return to Blackboard" message
+* LDEV-1331 Monitoring and Learning windows open in the same window
+
+1.0.2 Release
+=============
+* LDEV-1342 Live edit wont start when using the Blackboard integration
+* LDEV-1345 When selecting a sequence, the next button wont work with IE6
+* LDEV-1350 Start lesson in Blackboard 7.1 throws NoSuchMethodError 
+* LDEV-1351 Quotes in design names breaks the workspace tree
+* LDEV-1353 All uppercase characters in secret key causes an illegal state 
+		  	exception
+
+
+
+
