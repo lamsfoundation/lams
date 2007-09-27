@@ -443,10 +443,11 @@ public function update (o:Observable,infoObj:Object):Void{
 			case Sequence.REMOVED_STATE_ID :
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
 				break;
-			default :
+			default :  // started state
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_disable'), LessonTabView.DISABLE_CBI);
 				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_archive'), LessonTabView.ARCHIVE_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_remove'), LessonTabView.REMOVE_CBI);
 		}
 	
 	}
