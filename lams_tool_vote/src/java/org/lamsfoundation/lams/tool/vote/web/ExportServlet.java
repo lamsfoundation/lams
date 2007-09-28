@@ -76,8 +76,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 		
 		if ( generateCharts ) {
 			logger.debug("writing out chart to directoryName: " + directoryName);
-			writeOutChart(request, "pie",  directoryName);
-			writeOutChart(request, "bar",  directoryName);
+			writeOutChart(request, response, VoteChartGenerator.CHART_TYPE_PIE,  directoryName);
+			writeOutChart(request, response, VoteChartGenerator.CHART_TYPE_BAR,  directoryName);
 			logger.debug("basePath: " + basePath);
 		}
 		
@@ -217,7 +217,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
      * @param chartType
      * @param directoryName
      */
-    public void writeOutChart(HttpServletRequest request, String chartType, String directoryName) {
+    public void writeOutChart(HttpServletRequest request, HttpServletResponse response, String chartType, String directoryName) {
         logger.debug("File.separator: " + File.separator) ;
         String fileName=chartType + ".png";
         logger.debug("output image fileName: " + fileName) ;
@@ -226,18 +226,11 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         try{
             OutputStream out = new FileOutputStream(directoryName +  File.separator + fileName);
             VoteChartGenerator  voteChartGenerator= new VoteChartGenerator();
-            JFreeChart chart=null;
-            if (chartType.equals("pie"))
-            {
-                chart = voteChartGenerator.createChart(request, "pie");    
+            JFreeChart chart = voteChartGenerator.createChart(request, chartType);    
+            if ( chart != null ) {
+                response.setContentType("image/png");
+            	ChartUtilities.writeChartAsPNG(out, chart, 400, 300);
             }
-            else
-            {
-                chart = voteChartGenerator.createChart(request, "bar");
-            }
-            logger.debug("chart:" + chart);
-            
-            ChartUtilities.writeChartAsPNG(out, chart, 400, 300);
         }
         catch(FileNotFoundException e)
         {

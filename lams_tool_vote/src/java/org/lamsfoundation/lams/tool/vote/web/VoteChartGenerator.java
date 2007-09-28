@@ -47,13 +47,15 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 
 /**
- * <p> Enables generation of enerates JFreeCharts </p>
+ * <p> Enables generation of JFreeCharts </p>
  * 
  * @author Ozgur Demirtas
  *  
  */
 public class VoteChartGenerator extends HttpServlet implements VoteAppConstants {
     static Logger logger = Logger.getLogger(VoteChartGenerator.class.getName());
+    public static final String CHART_TYPE_PIE = "pie";
+    public static final String CHART_TYPE_BAR = "bar";
     
     public VoteChartGenerator(){
     }
@@ -123,46 +125,43 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
     
     public JFreeChart createChart(HttpServletRequest request, String type)
     {
-        logger.debug("chartType: " + type);
-        
-    	if (type.equals("pie"))
+    	if (type.equals(CHART_TYPE_PIE))
     	{
     	    return createPieChart (request);    
     	}
-    	else if (type.equals("bar"))
+    	else 
     	{
     	    return createBarChart (request);    
     	}
-    	return null;
     }
 
     public JFreeChart createPieChart(HttpServletRequest request)
     {
-    
         logger.debug("starting createPieChart...");
         DefaultPieDataset data= new DefaultPieDataset();
         
         Map mapNominationsContent=(Map)request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT);
-        logger.error("mapNominationsContent: " + mapNominationsContent);
-        
         Map mapVoteRatesContent=(Map)request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT);
-        logger.error("mapVoteRatesContent: " + mapVoteRatesContent);
+        if ( mapNominationsContent == null || mapNominationsContent == null ) {
+        	logger.debug("No voting data, unable to create pie chart");
+        	return null;
+        }
 
         Iterator itMap = mapNominationsContent.entrySet().iterator();
     	while (itMap.hasNext()) 
     	{
         	Map.Entry pairs = (Map.Entry)itMap.next();
-            logger.debug("using the  nomination content pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            
             String voteRate=(String) mapVoteRatesContent.get(pairs.getKey());
-            logger.debug("voteRate:" + voteRate);
             data.setValue(pairs.getValue().toString(), new Double(voteRate));
 		}
         
     	JFreeChart chart=null;
    	    chart=ChartFactory.createPieChart3D(SESSION_VOTES_CHART , data, true, true, false);
-   	    logger.debug("chart: " + chart) ;
-
+   	   
+   	    if ( logger.isDebugEnabled() ) {
+   	    	logger.debug("chart: " + chart+" data: "+data) ;
+   	    }
+   	    
    	    return chart;
     }
     
@@ -172,26 +171,28 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
         DefaultCategoryDataset data= new DefaultCategoryDataset();
         
         Map mapNominationsContent=(Map)request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT);
-        logger.error("mapNominationsContent: " + mapNominationsContent);
-        
         Map mapVoteRatesContent=(Map)request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT);
-        logger.error("mapVoteRatesContent: " + mapVoteRatesContent);
+        if ( mapNominationsContent == null || mapNominationsContent == null ) {
+        	logger.debug("No voting data, unable to create pie chart");
+        	return null;
+        }
 
         Iterator itMap = mapNominationsContent.entrySet().iterator();
     	while (itMap.hasNext()) 
     	{
         	Map.Entry pairs = (Map.Entry)itMap.next();
-            logger.debug("using the  nomination content pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            
             String voteRate=(String) mapVoteRatesContent.get(pairs.getKey());
-            logger.debug("voteRate:" + voteRate);
             data.setValue(new Double(voteRate), pairs.getValue().toString(), pairs.getValue().toString());
 		}
         
     	JFreeChart chart=null;
    	    chart=ChartFactory.createBarChart3D(SESSION_VOTES_CHART , "Open Vote", "Percentage", 
    	    									data, PlotOrientation.VERTICAL, true, true, false);
-   	    logger.debug("chart: " + chart) ;
+
+   	    if ( logger.isDebugEnabled() ) {
+   	    	logger.debug("chart: " + chart+" data: "+data) ;
+   	    }
+
    	    return chart;
     }
     
