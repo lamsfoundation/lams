@@ -110,6 +110,10 @@ public class ExportToolContentAction extends LamsAction {
 			// get only filename
 			String zipfile = FileUtil.getFileName(zipFilename);
 			
+			// replace spaces (" ") with underscores ("_")
+			
+			zipfile = zipfile.replaceAll(" ", "_");
+			
 			//write zip file as response stream. 
 
 			// Different browsers handle stream downloads differently LDEV-1243
@@ -118,6 +122,8 @@ public class ExportToolContentAction extends LamsAction {
 			log.debug("Browser is:" + agent);
 			
 			String filename = null;
+			
+			
 			
 			if (null != agent && -1 != agent.indexOf("MSIE"))
 			{
