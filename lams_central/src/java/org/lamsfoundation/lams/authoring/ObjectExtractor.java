@@ -1094,57 +1094,54 @@ public class ObjectExtractor implements IObjectExtractor {
 		
 	    Integer transitionUUID = WDDXProcessor.convertToInteger(transitionDetails,WDDXTAGS.TRANSITION_UIID);
 	    if ( transitionUUID == null ) { 
-	    	throw new WDDXProcessorConversionException("Transition is missing its UUID");
+	    	throw new WDDXProcessorConversionException("Transition is missing its UUID "+transitionDetails);
 	    }
 	    
-	    Transition transition = null;	
-	    Transition existingTransition = findTransition(transitionUUID);
+	    Integer toUIID=WDDXProcessor.convertToInteger(transitionDetails,WDDXTAGS.TO_ACTIVITY_UIID); 
+	    if ( toUIID == null ) { 
+	    	throw new WDDXProcessorConversionException("Transition is missing its toUUID "+transitionDetails);
+	    }
+
+        Integer fromUIID=WDDXProcessor.convertToInteger(transitionDetails,WDDXTAGS.FROM_ACTIVITY_UIID);
+		if(fromUIID == null){
+	    	throw new WDDXProcessorConversionException("Transition is missing its fromUUID "+transitionDetails);
+	    }
+
+		Transition transition = null;	
+	    Transition existingTransition = findTransition(transitionUUID, toUIID, fromUIID);
 		
 	    if (existingTransition == null) {
 	        transition = new Transition();
-		    transition.setTransitionUIID(transitionUUID);
 	    } else {
 	        transition = existingTransition;
 	    }
 
-	    if (keyExists(transitionDetails, WDDXTAGS.TO_ACTIVITY_UIID))
-	    {
-	        Integer toUIID=WDDXProcessor.convertToInteger(transitionDetails,WDDXTAGS.TO_ACTIVITY_UIID); 
-			if(toUIID!=null){
-				Activity toActivity = newActivityMap.get(toUIID);
-				if ( toActivity  != null ) {
-					transition.setToActivity(toActivity);
-					transition.setToUIID(toUIID);
-					//update the transitionTo property for the activity
-					toActivity.setTransitionTo(transition);
-				} else {
-					transition.setToActivity(null);
-					transition.setToUIID(null);
-				}
-			}
-	    }
-		
-	    if (keyExists(transitionDetails, WDDXTAGS.FROM_ACTIVITY_UIID))
-	    {
-	        Integer fromUIID=WDDXProcessor.convertToInteger(transitionDetails,WDDXTAGS.FROM_ACTIVITY_UIID);
-			if(fromUIID!=null){
-				Activity fromActivity = newActivityMap.get(fromUIID);
-				if ( fromActivity != null ) {
-					transition.setFromActivity(fromActivity);
-					transition.setFromUIID(fromUIID);
-					//update the transitionFrom property for the activity
-					fromActivity.setTransitionFrom(transition);
-				} else {
-					transition.setFromActivity(null);
-					transition.setFromUIID(null);
-				}
-			}	
-	    }
+	    transition.setTransitionUIID(transitionUUID);
 	    
-	    if(keyExists(transitionDetails, WDDXTAGS.DESCRIPTION))
-	        transition.setDescription(WDDXProcessor.convertToString(transitionDetails,WDDXTAGS.DESCRIPTION));
-	    if(keyExists(transitionDetails, WDDXTAGS.TITLE))
-	        transition.setTitle(WDDXProcessor.convertToString(transitionDetails,WDDXTAGS.TITLE));
+		Activity toActivity = newActivityMap.get(toUIID);
+		if ( toActivity  != null ) {
+			transition.setToActivity(toActivity);
+			transition.setToUIID(toUIID);
+			//update the transitionTo property for the activity
+			toActivity.setTransitionTo(transition);
+		} else {
+			transition.setToActivity(null);
+			transition.setToUIID(null);
+		}
+		
+		Activity fromActivity = newActivityMap.get(fromUIID);
+		if ( fromActivity != null ) {
+			transition.setFromActivity(fromActivity);
+			transition.setFromUIID(fromUIID);
+			//update the transitionFrom property for the activity
+			fromActivity.setTransitionFrom(transition);
+		} else {
+			transition.setFromActivity(null);
+			transition.setFromUIID(null);
+		}
+	    
+        transition.setDescription(WDDXProcessor.convertToString(transitionDetails,WDDXTAGS.DESCRIPTION));
+        transition.setTitle(WDDXProcessor.convertToString(transitionDetails,WDDXTAGS.TITLE));
 
 	    // Set creation date based on the server timezone, not the client.
 		if ( transition.getCreateDateTime() == null )
@@ -1177,14 +1174,21 @@ public class ObjectExtractor implements IObjectExtractor {
 	/** Search in learning design for existing object. Can't go to database as that will trigger 
 	* a Flush, and we haven't updated the rest of the design, so this would trigger a 
 	* "deleted object would be re-saved by cascade" error.
+	* 
+	* Check both the UUID for a match, and the to and from for a match. If the user deletes a 
+	* transition then redraws it between the same activities, then inserting a new one in the db
+	* will trigger a duplicate key exception. So we need to reuse any that have the same to/from.
 	*/
-	private Transition findTransition(Integer transitionUUID) {
+	private Transition findTransition(Integer transitionUUID, Integer toUIID, Integer fromUIID) {
 	    Transition existingTransition = null;
 		Set transitions = learningDesign.getTransitions();
 		Iterator iter = transitions.iterator();
 		while (existingTransition==null && iter.hasNext()) {
 			Transition element = (Transition) iter.next();
-			if ( transitionUUID.equals(element.getTransitionUIID()) ) { 
+			if ( transitionUUID != null && transitionUUID.equals(element.getTransitionUIID()) ) { 
+				existingTransition = element;
+			} else if ( ( toUIID != null && toUIID.equals(element.getToUIID())) && 
+					(fromUIID != null && fromUIID.equals(element.getFromUIID())) ) {
 				existingTransition = element;
 			}
 		}
