@@ -6,9 +6,9 @@ ad_page_contract {
     
     @author Ernie Ghiglione (ErnieG@melcoe.mq.edu.au)
     @creation-date 2007-04-16
-    @cvs-id $Id$
+    @cvs-id add-2.tcl,v 1.1 2007/09/12 06:37:02 ernieg Exp
 } {
-    name
+    name:notnull
     lesson_id:integer
     sequence_id:integer
     introduction:optional    
