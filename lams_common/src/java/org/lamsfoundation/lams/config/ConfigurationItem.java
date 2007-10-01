@@ -32,22 +32,41 @@ import java.io.Serializable;
  */
 public class ConfigurationItem implements Serializable {
 
+	public static String STRING_FORMAT = "STRING";
+	public static String LONG_FORMAT = "LONG";
+	public static String BOOLEAN_FORMAT = "BOOLEAN";
+
     /** identifier field */
     private String key;
 
     /** persistent field */
     private String value;
 
+    /** persistent field */
+    private String descriptionKey;
+
+    /** persistent field */
+    private String headerName;
+
+    /** persistent field */
+    private String format;
+
+    /** persistent field - defaults in db to false */
+    private Boolean required;
+    
     /** default constructor */
     public ConfigurationItem() {
     }
     
     /** full constructor */
-    public ConfigurationItem(String key, 
-                String value) 
+    public ConfigurationItem(String key, String value, String descriptionKey, String headerName, String format, Boolean required) 
     {
     	this.key = key;
     	this.value = value;
+    	this.descriptionKey = descriptionKey;
+    	this.headerName = headerName;
+    	this.format = format;
+    	this.required = required;
     }
 
     /** 
@@ -73,5 +92,49 @@ public class ConfigurationItem implements Serializable {
     public void setValue(String value) {
         this.value = value;
     }
+
+    /** 
+     * @hibernate.property column="description" length="255"
+     */
+	public String getDescriptionKey() {
+		return descriptionKey;
+	}
+
+	public void setDescriptionKey(String descriptionKey) {
+		this.descriptionKey = descriptionKey;
+	}
+
+    /** 
+     * @hibernate.property column="header_name" length="255"
+     */
+	public String getHeaderName() {
+		return headerName;
+	}
+
+	public void setHeaderName(String headerName) {
+		this.headerName = headerName;
+	}
+
+   /** 
+     * @hibernate.property column="format" length="30"
+     */
+	public String getFormat() {
+		return format;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
+	}
+
+	/** 
+     * @hibernate.property column="required" not-null="true"
+     */
+	public Boolean isRequired() {
+		return required;
+	}
+
+	public void setRequired(Boolean required) {
+		this.required = required;
+	}
 
 }

@@ -579,7 +579,7 @@ CREATE TABLE lams_branch_condition (
      , order_id INT(11) 
      , name VARCHAR(255) NOT NULL
      , display_name VARCHAR(255)
-     , type VARCHAR(255) NOT NULL
+     , type VARCHAR(30) NOT NULL
      , start_value VARCHAR(255)
      , end_value VARCHAR(255)
      , exact_match_value VARCHAR(255)
@@ -939,8 +939,14 @@ CREATE TABLE lams_tool_import_support (
 CREATE TABLE lams_configuration (
        config_key VARCHAR(30) NOT NULL
      , config_value VARCHAR(255)
+     , description_key VARCHAR(255)
+     , header_name VARCHAR(50)
+     , format VARCHAR(30)
+     , required TINYINT NOT NULL DEFAULT 0
      , PRIMARY KEY (config_key)
 );
+
+
 
 
  

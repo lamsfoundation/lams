@@ -100,4 +100,56 @@ ALTER TABLE lams_tool ADD COLUMN admin_url TEXT;
 ALTER TABLE lams_system_tool ADD COLUMN admin_url TEXT;
 
 
--
+ALTER TABLE lams_configuration 
+ADD COLUMN description_key VARCHAR(255)
+, ADD COLUMN header_name VARCHAR(50)
+, ADD COLUMN format VARCHAR(30)
+, ADD COLUMN required TINYINT NOT NULL DEFAULT 0;
+
+update lams_configuration set description_key = 'config.server.url', header_name='config.header.system', format='STRING', required=1
+where config_key = 'ServerURL';
+
+update lams_configuration set description_key = 'config.server.url.context.path', header_name='config.header.system', format='STRING', required=1
+where config_key = 'ServerURLContextPath';
+
+update lams_configuration set description_key = 'config.version', header_name='config.header.system', format='STRING', required=1
+where config_key = 'Version';
+
+update lams_configuration set description_key = 'config.temp.dir', header_name='config.header.system', format='STRING', required=1
+where config_key = 'TempDir';
+
+update lams_configuration set description_key = 'config.dump.dir', header_name='config.header.system', format='STRING', required=1
+where config_key = 'DumpDir';
+
+update lams_configuration set description_key = 'config.ear.dir', header_name='config.header.system', format='STRING', required=1
+where config_key = 'EARDir';
+
+update lams_configuration set description_key = 'config.smtp.server', header_name='config.header.system', format='STRING', required=0
+where config_key = 'SMTPServer';
+
+update lams_configuration set description_key = 'config.lams.support.email', header_name='config.header.system', format='STRING', required=0
+where config_key = 'LamsSupportEmail';
+
+update lams_configuration set description_key = 'config.content.repository.path', header_name='config.header.system', format='STRING', required=1
+where config_key = 'ContentRepositoryPath';
+
+update lams_configuration set description_key = 'config.upload.file.max.size', header_name='config.header.system', format='LONG', required=1
+where config_key = 'UploadFileMaxSize';
+
+update lams_configuration set description_key = 'config.upload.large.file.max.size', header_name='config.header.system', format='LONG', required=1
+where config_key = 'UploadLargeFileMaxSize';
+
+update lams_configuration set description_key = 'config.upload.file.max.memory.size', header_name='config.header.system', format='LONG', required=1
+where config_key = 'UploadFileMaxMemorySize';
+
+update lams_configuration set description_key = 'config.executable.extensions', header_name='config.header.system', format='STRING', required=1
+where config_key = 'ExecutableExtensions';
+
+update lams_configuration set description_key = 'config.user.inactive.timeout', header_name='config.header.system', format='LONG', required=1
+where config_key = 'UserInactiveTimeout';
+
+update lams_configuration set description_key = 'config.use.cache.debug.listener', header_name='config.header.system', format='BOOLEAN', required=1
+where config_key = 'UseCacheDebugListener';
+
+update lams_configuration set description_key = 'config.cleanup.preview.older.than.days', header_name='config.header.system', format='LONG', required=1
+where config_key = 'CleanupPreviewOlderThanDays';
