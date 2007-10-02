@@ -397,7 +397,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
             
             //If all of them are loaded set UILoad accordingly
 			if(_layout.manager.completedLayout){
-                _UILoaded=true;                
+                _UILoaded = true;                
             } else {
 				_UILoaded = false;            
 			}
