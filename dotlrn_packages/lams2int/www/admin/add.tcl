@@ -6,7 +6,7 @@ ad_page_contract {
     
     @author Ernie Ghiglione (ErnieG@melcoe.mq.edu.au)
     @creation-date 2007-04-16
-    @cvs-id $Id$
+    @cvs-id add.tcl,v 1.1 2007/09/12 06:37:02 ernieg Exp
 } {
     
 } -properties {
@@ -57,7 +57,9 @@ proc process_node { node } {
 
     if {[string equal [$node nodeName] "Folder"]} {
 
-	append output "\[ '[$node getAttribute name]', null , "
+	regsub -all {'} [$node getAttribute name] {\\'} folder_name
+
+	append output "\[ '$folder_name', null , "
 
 	if {[$node hasChildNodes]} {
 
@@ -84,7 +86,9 @@ proc process_node { node } {
     } else {
 	# the node is a LearningDesign
 
-	append output "\[ '[$node getAttribute name]', 'javascript:selectSequence([$node getAttribute resourceId])' \] "
+	regsub -all {'} [$node getAttribute name] {\\'} design_name
+
+	append output "\[ '$design_name', 'javascript:selectSequence([$node getAttribute resourceId])' \] "
 
 	if {![empty_string_p [$node nextSibling]]} {
 	    append output ", " 
@@ -100,4 +104,6 @@ proc process_node { node } {
 
 
 set sequence_list [concat [process_node $content] " \] "]
+
+#regsub -all {'} $sequence_list {\\'} sequence_list
 
