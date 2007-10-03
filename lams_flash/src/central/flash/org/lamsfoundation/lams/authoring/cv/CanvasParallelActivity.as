@@ -45,12 +45,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private var CHILD2_OFFSET_Y:Number = 108 //130.5;
 	private var newContainerXCoord:Number; 
 	private var newContainerYCoord:Number;
+	
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
 	private var _monitorController:MonitorController;
-	private var _monitorTabView : MonitorTabView;
+	private var _monitorTabView:MonitorTabView;
 	private var _tm:ThemeManager;
+	
 	//Set by the init obj
 	private var _activity:Activity;
 	private var _children:Array;

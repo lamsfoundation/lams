@@ -47,14 +47,9 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		
 	private static var SHOW_DEBUGGER:Boolean = false;
 	private static var MODULE:String = "monitoring";
-	/*
-    private static var TOOLBAR_X:Number = 10;
-    private static var TOOLBAR_Y:Number = 35;*/
-	private static var _controlKeyPressed:String;
+
 	public static var TOOLBAR_X:Number = 0;
     public static var TOOLBAR_Y:Number = 21;
-    //private static var LESSONS_X:Number = 0;
-    //private static var LESSONS_Y:Number = 21;
     
     public static var MONITOR_X:Number = 0;
     public static var MONITOR_Y:Number = 55;
@@ -82,7 +77,6 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     private static var X_KEY:Number = 88;
     private static var C_KEY:Number = 67;
 	private static var D_KEY:Number = 68;
-	//private static var T_KEY:Number = 84;
     private static var V_KEY:Number = 86;
     private static var Z_KEY:Number = 90; 
     private static var Y_KEY:Number = 89;
@@ -92,8 +86,6 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	private var _uiLoadCheckCount = 0;				// instance counter for number of times we have checked to see if theme and dict are loaded
 	private var _dataLoadCheckCount = 0;			
 	
-	//private var _ddm:DesignDataModel;
-    //private var _toolbar:Toolbar;
     private var _lessons:Lesson;
     private var _monitor:Monitor;
     private var _workspace:Workspace;
@@ -380,17 +372,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     public function UIElementLoaded(evt:Object) {
         //Debugger.log('UIElementLoaded: ' + evt.target.className,Debugger.GEN,'UIElementLoaded','Application');
         if(evt.type=='load'){
-            //Which item has loaded
-            /**switch (evt.target.className) {
-				case 'LFMenuBar' :
-                    _menuLoaded = true;
-                    break;
-                case 'Monitor' :
-                    _monitorLoaded = true;
-                    break;
-                default:
-            }*/
-			
+
 			_layout.manager.addLayoutItem(new LFLayoutItem(evt.target.className, evt.target));
 			
 			loader.complete();
@@ -410,9 +392,11 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     */
     private function setupUI(){
 		_ccm.showCustomCM(_ccm.loadMenu("application", "monitoring"))
-        //Create the application root
+        
+		//Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
-        //Create screen elements
+        
+		//Create screen elements
         _dialogueContainer_mc = _container_mc.createEmptyMovieClip('_dialogueContainer_mc',DIALOGUE_DEPTH);
         
         _cursorContainer_mc = _container_mc.createEmptyMovieClip('_cursorContainer_mc',CURSOR_DEPTH);
@@ -539,10 +523,6 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     public function getMonitor():Monitor{
         return _monitor;
     }
-	public function get controlKeyPressed():String{
-        return _controlKeyPressed;
-    }
-   
 	
 	/**
 	* returns the lesson instance

@@ -54,6 +54,10 @@ class org.lamsfoundation.lams.common.ui.Dialog {
     }
 	
 	static function createAlertDialog(title:String, msg:String, okButtonLabel:String, cancelButtonLabel:String, okHandler:Function, cancelHandler:Function, type:Number):MovieClip {
+		Debugger.log("static fn", Debugger.CRITICAL, "createAlertDialog", "Dialog");
+		
+		var _alertDialog:MovieClip;
+		
 		_inputTitle = title;
 		_inputMessage = msg;
 		_inputOkButtonLabel = okButtonLabel;
@@ -63,19 +67,29 @@ class org.lamsfoundation.lams.common.ui.Dialog {
 		
 		if(type != null) _inputType = type;
 		
-		var target:MovieClip;
-		
+		var target:MovieClip = null;
 		
 		if(ApplicationParent.getInstance().getWorkspace().getWV().isOpen) {
 			target = ApplicationParent.getInstance().getWorkspace().getWV().workspaceDialog;
+			Debugger.log("target 1:" + target, Debugger.CRITICAL, "createAlertDialog", "Dialog");
 		} else if(ApplicationParent.getInstance().dialog.content) {
 			target = ApplicationParent.getInstance().dialog;
+			Debugger.log("target 2:" + target, Debugger.CRITICAL, "createAlertDialog", "Dialog");
 		} else {
-			target = ApplicationParent.dialogue;
+			target = ApplicationParent.getInstance().dialogueContainer;
+			Debugger.log("target 3:" + target, Debugger.CRITICAL, "createAlertDialog", "Dialog");
 		}
 		
-		var _alertDialog:MovieClip = target.attachMovie('alertDialog', 'alertDialog' + new Date().toString(), DepthManager.kTopmost, {_x:0, _y:0});
-
+		try {
+			_alertDialog = target.attachMovie('alertDialog', 'alertDialog' + new Date().toString(), DepthManager.kTopmost, {_x:0, _y:0});
+			
+			Debugger.log("target:" + target, Debugger.CRITICAL, "createAlertDialog", "Dialog");
+			Debugger.log("alertDialog:" + _alertDialog, Debugger.CRITICAL, "createAlertDialog", "Dialog");
+			
+		} catch(error:Error) {
+			Debugger.log(error.name + ": " + error.message, Debugger.CRITICAL, "createAlertDialog", "Dialog");
+			_alertDialog.removeMovieClip();
+		}
 		//Assign dialog load handler
 		_alertDialog.addEventListener('contentLoaded', Proxy.create(org.lamsfoundation.lams.common.ui.Dialog,alertDialogLoaded));
 

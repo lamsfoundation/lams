@@ -506,7 +506,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 	}
 
-	private function showStatus(seqStatus:Number):String{
+	public function showStatus(seqStatus:Number):String{
 		var seqStat:String;
 		var s:Object = mm.getSequence();
 		

@@ -481,7 +481,7 @@ class MonitorController extends AbstractController {
 			switch(stateID){
 				case LessonTabView.REMOVE_CBI :
 					var confirmMsg:String = Dictionary.getValue('ls_remove_confirm_msg');
-					var warningMsg:String = Dictionary.getValue('ls_remove_warning_msg', [_monitorModel.getSequence().getSequenceName()]);
+					var warningMsg:String = Dictionary.getValue('ls_remove_warning_msg', [LessonTabView(getView()).showStatus(_monitorModel.getSequence().state).toLowerCase()]);
 					
 					var warningNoHandler = Proxy.create(_monitorModel, _monitorModel.removeSequence);
 					var confirmOkHandler = Proxy.create(this, removalAlert, warningMsg, null, warningNoHandler);
@@ -508,6 +508,8 @@ class MonitorController extends AbstractController {
 			}
 			
 			clearBusy();
+		} else {
+			Debugger.log("Unable to run method as controller is busy", Debugger.CRITICAL, "changeStatus", "MonitorController");
 		}
 	}
 	

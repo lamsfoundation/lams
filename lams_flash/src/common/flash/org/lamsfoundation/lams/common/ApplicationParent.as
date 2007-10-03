@@ -53,6 +53,8 @@ class ApplicationParent {
 	public static var NORMAL_MODE:String = "author";		// Normal Operation Mode
 	public static var EDIT_MODE:String = "editonfly";		// Edit-On-The-Fly Mode
 
+	public static var DIALOGUE_DEPTH:Number = 55;	//depth of the cursors
+    
     private var _comms:Communication;
     private var _themeManager:ThemeManager;
     private var _dictionary:Dictionary;
@@ -61,7 +63,8 @@ class ApplicationParent {
 	
 	private var _currentDialog:MovieClip;
 	private var _customCursor_mc:MovieClip;         //Cursor container
-    
+	
+	private static var _controlKeyPressed:String;
 	
 	//Data flags
     private var _dictionaryLoaded:Boolean;             //Dictionary loaded flag
@@ -75,8 +78,6 @@ class ApplicationParent {
 
 	private var _appRoot_mc:MovieClip;                 //Application root clip
 	private var _dialogueContainer_mc:MovieClip;       //Dialog container
-    
-    
 
 	// constructor
 	public function ApplicationParent(app:Object) {
@@ -264,6 +265,11 @@ class ApplicationParent {
         }
     }
 	
+	public function get dialogueContainer():MovieClip {
+		if(_dialogueContainer_mc == undefined) _dialogueContainer_mc = _appRoot_mc.createEmptyMovieClip('_dialogueContainer_mc', DIALOGUE_DEPTH);
+		return _dialogueContainer_mc;
+	}
+	
 	public function get dialog():MovieClip {
 		return _currentDialog;
 	}
@@ -271,5 +277,13 @@ class ApplicationParent {
 	public function set dialog(a:MovieClip) {
 		_currentDialog = a;
 	}
+	
+	public function get controlKeyPressed():String{
+        return _controlKeyPressed;
+    }
+	
+	public function set controlKeyPressed(key:String){
+        _controlKeyPressed = key;
+    }
 	
 }

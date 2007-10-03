@@ -471,6 +471,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	public function showEditOnFly(b:Boolean){
 		isRedit_on_fly = b;
 	}
+	
+	public function get ddm():DesignDataModel {
+		return _cm.getCanvas().ddm;
+	}
 
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned

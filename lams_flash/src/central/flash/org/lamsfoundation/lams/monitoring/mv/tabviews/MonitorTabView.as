@@ -25,17 +25,19 @@ import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.*
 import org.lamsfoundation.lams.common.style.*
+import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.common.mvc.*
+
 import org.lamsfoundation.lams.monitoring.mv.*
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.monitoring.*;
-import org.lamsfoundation.lams.common.dict.*
-import org.lamsfoundation.lams.common.mvc.*
+
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.ComplexActivity;
 import org.lamsfoundation.lams.authoring.cv.CanvasActivity;
-//import org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity;
+import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.authoring.Transition;
-//import org.lamsfoundation.lams.authoring.cv.*;
+
 import mx.managers.*
 import mx.containers.*;
 import mx.events.*
@@ -339,17 +341,17 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity() ){
-			newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring", learnerContainer:_learnerContainer_mc});
+			newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc, _monitorView:mtv, _module:"monitoring", learnerContainer:_learnerContainer_mc});
 		} else if (a.isGateActivity()){
-			newActivity_mc = activityLayer.createChildAtDepth("CanvasGateActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring"});
+			newActivity_mc = activityLayer.createChildAtDepth("CanvasGateActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc, _monitorView:mtv, _module:"monitoring"});
 		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			newActivity_mc = activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kBottom,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});
+			newActivity_mc = activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kBottom,{_activity:a,_children:children, _monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});
 		} else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			newActivity_mc = activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kBottom,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});	
 		} else if(a.isBranchingActivity()){	
-			var newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring", learnerContainer:_learnerContainer_mc});
+			var newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc, _monitorView:mtv, _module:"monitoring", learnerContainer:_learnerContainer_mc});
 		} else {
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
 		}
@@ -504,6 +506,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	
 	public function getLearnerIcon():MovieClip {
 		return _learnerContainer_mc;
+	}
+	
+	public function get ddm():DesignDataModel {
+		return mm.getMonitor().ddm;
 	}
 	
 	/**

@@ -47,7 +47,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	
 	private static var MODULE:String = "authoring";
 
-	private static var _controlKeyPressed:String;
 	public static var TOOLBAR_X:Number = 0;
     public static var TOOLBAR_Y:Number = 21;
 	public static var TOOLBAR_HEIGHT:Number = 35;
@@ -688,14 +687,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	public function get canvas():Canvas {
 		return _canvas;
 	}
-	
-	public function get controlKeyPressed():String{
-        return _controlKeyPressed;
-    }
-	
-	public function set controlKeyPressed(key:String){
-        _controlKeyPressed = key;
-    }
 	
 	public function set root_layout(a:String){
 		_root_layout = a;

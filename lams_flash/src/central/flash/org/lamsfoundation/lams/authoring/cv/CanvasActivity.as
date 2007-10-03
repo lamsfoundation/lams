@@ -67,7 +67,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _activity:Activity;
 	
 	private var _isSelected:Boolean;
-	private var app:Application;
+	private var app:ApplicationParent;
 	
 	//locals
 	private var learnerOffset_X:Number = 4;
@@ -110,12 +110,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _branchView:CanvasBranchView;
 	private var _setupBranchView:Boolean;
 	
+	private var _ddm:DesignDataModel;
+	
 	function CanvasActivity(_connector){
 		_tm = ThemeManager.getInstance();
 		_ccm = CustomContextMenu.getInstance();
 		
 		//Get reference to application and design data model
-		app = Application.getInstance();
+		app = ApplicationParent.getInstance();
 		
 		//let it wait one frame to set up the components.
 		//this has to be set b4 the do later :)
@@ -340,7 +342,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		clickTarget_mc._visible = true;
 		fade_mc._visible = false;
 			
-		if(_activity.isReadOnly() && app.canvas.ddm.editOverrideLock == 1){
+		if(_activity.isReadOnly() && getDDM().editOverrideLock == 1){
 			Debugger.log("Making transparent layer visible. ", Debugger.CRITICAL, 'draw', 'CanvasActivity');
 			fade_mc._visible = true;
 		}
@@ -460,6 +462,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 						_canvasController.activityDoubleClick(this);
 					}
 				}
+				
 				app.controlKeyPressed = "";
 				
 			}else{
@@ -663,6 +666,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	public function set setupBranchView(a:Boolean):Void {
 		_setupBranchView = a;
+	}
+	
+	private function getDDM():DesignDataModel {
+		if(_module == "monitoring") {
+			return _monitorView.ddm;
+		} else {
+			return _canvasView.ddm;
+		}
 	}
 
 }
