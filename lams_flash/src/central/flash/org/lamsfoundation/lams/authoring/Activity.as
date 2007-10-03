@@ -85,7 +85,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public static var OPTIONAL_ACTIVITY_TYPE:Number = 7;
 	public static var SEQUENCE_ACTIVITY_TYPE:Number = 8;
 	public static var SYSTEM_GATE_ACTIVITY_TYPE:Number = 9;
-	public static var CHOOSEN_BRANCHING_ACTIVITY_TYPE:Number = 10;
+	public static var CHOSEN_BRANCHING_ACTIVITY_TYPE:Number = 10;
 	public static var GROUP_BRANCHING_ACTIVITY_TYPE:Number = 11;
 	public static var TOOL_BRANCHING_ACTIVITY_TYPE:Number = 12;
 	
@@ -214,7 +214,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	 */
 	public static function getBranchingActivityTypes():Array{
 		var types:Array = [];
-		types.addItem({label: Dictionary.getValue('choosen_branch_act_lbl'), data: CHOOSEN_BRANCHING_ACTIVITY_TYPE});
+		types.addItem({label: Dictionary.getValue('chosen_branch_act_lbl'), data: CHOSEN_BRANCHING_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('group_branch_act_lbl'), data: GROUP_BRANCHING_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('tool_branch_act_lbl'), data: TOOL_BRANCHING_ACTIVITY_TYPE});
 		return types;
@@ -262,7 +262,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	}
 	
 	public function isBranchingActivity():Boolean{
-		if (_activityTypeID == CHOOSEN_BRANCHING_ACTIVITY_TYPE || 
+		if (_activityTypeID == CHOSEN_BRANCHING_ACTIVITY_TYPE || 
 			_activityTypeID == GROUP_BRANCHING_ACTIVITY_TYPE ||
 			_activityTypeID == TOOL_BRANCHING_ACTIVITY_TYPE){
 			return true;

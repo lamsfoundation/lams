@@ -464,7 +464,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				
 				_activities.put(newGroupActivity.activityUIID,newGroupActivity);
 			
-			} else if(dto.activityTypeID == Activity.CHOOSEN_BRANCHING_ACTIVITY_TYPE || 
+			} else if(dto.activityTypeID == Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE || 
 					  dto.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE ||
 					  dto.activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE){
 				

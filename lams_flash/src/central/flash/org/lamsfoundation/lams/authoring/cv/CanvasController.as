@@ -595,7 +595,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 		if(_canvasModel.activeTool == CanvasModel.BRANCH_TOOL){
 			var p = new Point(_canvasModel.activeView.content._xmouse-(toolActWidth/2), _canvasModel.activeView.content._ymouse-(toolActHeight/2)); 
-			_canvasModel.createNewBranchActivity(Activity.CHOOSEN_BRANCHING_ACTIVITY_TYPE,p,parent);
+			_canvasModel.createNewBranchActivity(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE,p,parent);
 			_canvasModel.getCanvas().stopBranchTool();
 			_canvasModel.lastBranchActionType = CanvasModel.ADD_FROM_TEMPLATE;
 			
