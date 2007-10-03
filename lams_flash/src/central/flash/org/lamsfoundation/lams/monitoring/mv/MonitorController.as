@@ -67,6 +67,7 @@ class MonitorController extends AbstractController {
 	public function activityClick(act:Object, forObj:String):Void{
 		if (forObj == "LearnerIcon"){
 			_monitorModel.isDragging = true;
+			
 			act.startDrag(false);
 			
 			Debugger.log('activityClick CanvasActivity:'+act.Learner.getUserName(),Debugger.GEN,'activityClick','MonitorController');
@@ -220,26 +221,33 @@ class MonitorController extends AbstractController {
 						cActivity = matchChildActivity(cActivity.children, dropTarget);
 					
 					hasHit = (cActivity == dropTarget) ? checkHit(cActivity, act, indexArray) : hasHit;
-				}
-				
+				} 
+
 			}
 			
 			if (act.hitTest(_monitorModel.endGate)){
 				_monitorModel.endGate.doorClosed._visible = false;
 				_monitorModel.endGate.doorOpen._visible = true;
+				
 				var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+act.Learner.getLearnerId()+"&activityID=null";
 				var ref = this;
 				var fnOk:Function = Proxy.create(ref,reloadProgress, ref, URLToSend);
 				var fnCancel:Function = Proxy.create(ref,activitySnapBack, act);
+				
 				LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_forcecomplete_tofinish',[act.Learner.getFullName(), indexArray[i].activity.title]), fnOk,fnCancel);
 				hasHit = true;
 			}
 			
+			Debugger.log("droptarget: " + eval(act._droptarget), Debugger.CRITICAL, "activityRelease", "MonitoringController");
+			
 			if (!hasHit){
-				activitySnapBack(act)
+				activitySnapBack(act);
+				
+				if(eval(act._droptarget)._parent instanceof LearnerIcon) return;
+				
 				var msg:String = Dictionary.getValue('al_error_forcecomplete_notarget',[act.Learner.getFullName()]) ;
 				LFMessage.showMessageAlert(msg);
-			}
+			} 
 
 		}
 		
@@ -277,7 +285,7 @@ class MonitorController extends AbstractController {
 		var URLToSend:String;
 		setBusy()
 		
-	   if (forTabView == "MonitorTabView"){
+	    if (forTabView == "MonitorTabView"){
 			URLToSend = _root.serverURL+_root.monitoringURL+'getActivityMonitorURL&activityID='+ca.activity.activityID+'&lessonID='+_root.lessonID;
 			URLToSend += '&contentFolderID='+MonitorModel(getModel()).getSequence().contentFolderID
 		}else {

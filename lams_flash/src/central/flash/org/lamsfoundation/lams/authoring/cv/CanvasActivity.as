@@ -297,12 +297,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				// We are unable to display all the users across the Activity's panel.
 				Debugger.log("learner_X: " + learner_X + " ref: " + learnerContainer + " xcoord: " + xCoord, Debugger.CRITICAL, "drawLearners", "CanvasActivity");
 				if(learner_X > (xCoord + 112)) {
-					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:true });
+					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(), {_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:true, _clone:false });
 					return;
 				}
 					
 				// attach icon
-				learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:false });
+				learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(), {_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:false, _clone:false });
 						
 				//  space icons
 				learner_X += 10;
@@ -531,9 +531,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		if(branchView != null) {
 			branchView._x = _x + getVisibleWidth()/2;
 			branchView._y = _y + getVisibleHeight()/2;
-			
-			//branchView.setCurrentPosition(_x, _y);
-			
 		}
 		
 	}

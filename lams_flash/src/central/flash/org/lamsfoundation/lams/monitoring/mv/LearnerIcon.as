@@ -38,8 +38,7 @@ import mx.utils.*
 /**  
 * CanvasActivity - 
 */  
-class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {  
-//class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip{  
+class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
   
 	public static var ICON_WIDTH:Number = 8;
 	public static var ICON_HEIGHT:Number = 20;
@@ -54,7 +53,8 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	private var learner:Progress;
 	
 	private var _isSelected:Boolean;
-	private var app:Application;
+	private var app:ApplicationParent;
+	
 	//locals
 	private var toolTip:MovieClip;
 	private var learnerOffset_X:Number
@@ -69,12 +69,15 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	private var smallCross:MovieClip;
 	private var _hasPlus:Boolean;
 	
+	private var _clone_mc:MovieClip;
+	private var _clone:Boolean;
+	
 	
 	function LearnerIcon(){
 		//Debugger.log("_activity:"+_activity.title,4,'Constructor','CanvasActivity');
 		_tm = ThemeManager.getInstance();
 		//Get reference to application and design data model
-		app = Application.getInstance();
+		app = ApplicationParent.getInstance();
 		//let it wait one frame to set up the components.
 		//this has to be set b4 the do later :)
 		//_base_mc = this;
@@ -93,12 +96,15 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 			_monitorController = initObj._monitorController;
 			_activity = initObj.activity;
 			learner = initObj.learner;
-			learnerOffset_X = initObj._x
-			learnerOffset_Y = initObj._y
+			learnerOffset_X = initObj._x;
+			learnerOffset_Y = initObj._y;
 			_hasPlus = initObj._hasPlus;
+			_clone = initObj._clone;
 		}
-		learnerOffset_X = _x
-		learnerOffset_Y = _y
+		
+		learnerOffset_X = _x;
+		learnerOffset_Y = _y;
+		
 		Debugger.log('Learner x pos and y pos : '+learnerOffset_X+ " and "+learnerOffset_Y ,4,'draw','LearnerIcon');
 		
 		showAssets(false);
@@ -106,6 +112,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 		//Click, Rollover and rollout Events for Learner Icon;
 		click_mc.onRollOver = Proxy.create (this, localOnRollOver);
 		click_mc.onRollOut = Proxy.create (this, localOnRollOut);
+		
 		if (_activity != undefined){
 			click_mc.onPress = Proxy.create (this, localOnPress);
 			click_mc.onRelease = Proxy.create (this, localOnRelease);
@@ -149,7 +156,6 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 		var now:Number = new Date().getTime();
 		
 		if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
-			//trace("Module passed is: "+_module)
 			if (app.controlKeyPressed != "transition"){
 				_doubleClicking = true;
 				Debugger.log('DoubleClicking: '+this.activity.activityID,Debugger.CRITICAL,'onPress','CanvasActivity For Monitoring');
@@ -158,12 +164,13 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 						
 			}
 			
-			
-		}else{
-			
+		} else {
+
 			_doubleClicking = false;
 			Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity for monitoring');
-			_monitorController.activityClick(this, "LearnerIcon");
+			_clone_mc = ApplicationParent.root.attachMovie("learnerIcon", _name + "_clone", DepthManager.kTop, {_activity:_activity, learner:learner, _monitorController:_monitorController, _x:_x + org.lamsfoundation.lams.monitoring.Application.MONITOR_X, _y:_y + org.lamsfoundation.lams.monitoring.Application.MONITOR_Y, _hasPlus:_hasPlus, _clone: true });
+					
+			_monitorController.activityClick(_clone_mc, "LearnerIcon");
 			
 		}
 		
@@ -172,12 +179,10 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	}
 	
 	private function localOnRollOver():Void{
-		trace("I am: "+learner.getUserName()+" with learner ID: "+learner.getLearnerId())
 		toolTip._visible = true;
 	}
 	
 	private function localOnRollOut():Void{
-		trace("I am: "+learner.getUserName())
 		toolTip._visible = false;
 	}
 	
@@ -185,13 +190,15 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	private function localOnRelease():Void{
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
-			_monitorController.activityRelease(this, "LearnerIcon");
+			_monitorController.activityRelease(_clone_mc, "LearnerIcon");
+			_clone_mc.removeMovieClip();
 		}
 	}
 	
 	private function localOnReleaseOutside():Void{
 		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
-		_monitorController.activityReleaseOutside(this);
+		_monitorController.activityRelease(_clone_mc, "LearnerIcon");
+		_clone_mc.removeMovieClip();
 	}
 	
 	
@@ -202,6 +209,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	public function get yCoord():Number{
 		return learnerOffset_Y;
 	}
+	
 	public function get Learner():Progress{
 		return getLearner();
 	}
@@ -237,6 +245,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	public function setActivity(a:Activity){
 		_activity = a;
 	}
+	
 	/**
 	 * Get the CSSStyleDeclaration objects for each component and applies them
 	 * directly to the instanced
