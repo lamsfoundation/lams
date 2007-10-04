@@ -14,6 +14,8 @@
 <%@ page import="blackboard.platform.session.BbSession"%>
 <%@ page import="blackboard.platform.*"%>
 <%@ page import="blackboard.platform.plugin.PlugInUtil"%>
+<%@ page import="blackboard.data.gradebook.Lineitem" %>
+<%@ page import="blackboard.persist.gradebook.LineitemDbPersister" %>
 <%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
 <%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsPluginUtil"%>    
                
@@ -24,10 +26,12 @@
 
 
 <bbData:context id="ctx">
+	
 	<jsp:useBean id="myContent" scope="page" class="blackboard.data.content.CourseDocument"/>
 	<jsp:setProperty name="myContent" property="title"/>
 	<jsp:setProperty name="myContent" property="isAvailable"/>
 	<jsp:setProperty name="myContent" property="isTracked"/>
+	
 	<%
 		String title = request.getParameter("title").trim();
 		String description = request.getParameter("description").trim();	
@@ -92,12 +96,28 @@
 			throw new ServletException(e.getMessage(), e);
 		}
 		
-		// add port to the url if the port is in the blackboard url.
+	    
+	    // Creating the gradebook row for this lesson
+		Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE,learningSessionId);
+	    
+	    Lineitem lineitem = new Lineitem();
+	    lineitem.setCourseId(courseId);
+	    lineitem.setName("LAMS Lesson: " + title);
+	    lineitem.setId(lineitemId);
+	    lineitem.setAssessmentId(learningSessionId,Lineitem.AssessmentLocation.EXTERNAL);
+	    lineitem.setAssessmentLocation( Lineitem.AssessmentLocation.EXTERNAL );
+	    lineitem.setDateAdded();
+	    lineitem.setIsAvailable(true);
+	    lineitem.setType("LAMS");
+	    lineitem.setColumnOrder(3000);
+	    lineitem.validate();
+	    lineitem.setPointsPossible(1);
+	    
+	    
+	    
+	    // add port to the url if the port is in the blackboard url.
 		int bbport = request.getServerPort();
 		String bbportstr = bbport != 0 ? ":" + bbport : "";
-		
-		
-		
 		
 		//String contentUrl = LamsSecurityUtil.generateRequestURL(ctx, "learner") + "&lsid=" + learningSessionId;
 		String contentUrl = request.getScheme()
@@ -106,7 +126,8 @@
 									    bbportstr +
 										request.getContextPath() + 
 										"/modules/learnermonitor.jsp?lsid=" + learningSessionId + 
-										"&course_id=" + request.getParameter("course_id");
+										"&course_id=" + request.getParameter("course_id") +
+										"&lineitem_id=" + lineitemId.getExternalString();
 		myContent.setUrl(contentUrl);
 
 		//Parse start/end Date from the <bbUI:dateAvailability>
@@ -123,6 +144,13 @@
 	            myContent.setEndDate(cend);
 	        }
 	    }
+	    
+	    
+	   
+	    
+	    //LineitemDbLoader liLoader = (LineitemDbLoader) bbPm.getLoader(LineitemDbLoader.TYPE);
+	    LineitemDbPersister lineItempersist = (LineitemDbPersister) bbPm.getPersister(LineitemDbPersister.TYPE);
+	    lineItempersist.persist(lineitem);
 	    
 	    
 	    ContentDbPersister persister= (ContentDbPersister) bbPm.getPersister( ContentDbPersister.TYPE );
