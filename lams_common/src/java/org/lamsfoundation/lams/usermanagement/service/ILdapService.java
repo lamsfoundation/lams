@@ -23,16 +23,18 @@
 /* $Id$ */
 package org.lamsfoundation.lams.usermanagement.service;
 
-import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.BulkUpdateResultDTO;
 
 /**
  * @author jliew
  *
  */
 public interface ILdapService {
+	
+	public static final String SYNC_RESULTS = "syncResults";
 	
 	/**
 	 * Updates a LAMS user's profile with LDAP attributes.
@@ -75,7 +77,7 @@ public interface ILdapService {
 	
 	/**
 	 * Bulk updates LAMS with LDAP users.
-	 * @return number of LDAP users received.
+	 * @return stats on result of bulk update.
 	 */
-	public int updateLAMSFromLdap();
+	public BulkUpdateResultDTO bulkUpdate();
 }

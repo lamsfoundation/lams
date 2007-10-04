@@ -36,3 +36,4 @@ insert into lams_configuration (config_key, config_value) values ('LDAPUpdateOnL
 insert into lams_configuration (config_key, config_value) values ('LDAPOrgField', 'code');
 insert into lams_configuration (config_key, config_value) values ('LDAPOnlyOneOrg', 'true');
 insert into lams_configuration (config_key, config_value) values ('LDAPEncryptPasswordFromBrowser', 'false');
+insert into lams_configuration (config_key, config_value) values ('LDAPSearchResultsPageSize', '100');

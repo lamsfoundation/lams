@@ -37,13 +37,17 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
+import javax.naming.ldap.Control;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.PagedResultsControl;
+import javax.naming.ldap.PagedResultsResponseControl;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -52,8 +56,10 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
+import org.lamsfoundation.lams.usermanagement.dto.BulkUpdateResultDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 
 /**
@@ -64,6 +70,9 @@ public class LdapService implements ILdapService {
 
 	private Logger log = Logger.getLogger(LdapService.class);
 	private IUserManagementService service;
+	private static final int BULK_UPDATE_CREATED = 0;
+	private static final int BULK_UPDATE_UPDATED = 1;
+	private static final int BULK_UPDATE_DISABLED = 2;
 	
 	public IUserManagementService getService() {
 		return service;
@@ -117,12 +126,26 @@ public class LdapService implements ILdapService {
 			if (map.get("login")!=null && map.get("login").trim().length()>0) {
 				if (log.isDebugEnabled()) {
 					log.debug("===> using LDAP attributes: "
-							+map.get("login")+","+map.get("fname")+","+map.get("lname")+","
-							+map.get("email")+","+map.get("phone")+","+map.get("fax")+","
-							+map.get("mobile"));
+							+map.get("login")+","
+							+map.get("fname")+","
+							+map.get("lname")+","
+							+map.get("email")+","
+							+map.get("address1")+","
+							+map.get("address2")+","
+							+map.get("address3")+","
+							+map.get("city")+","
+							+map.get("state")+","
+							+map.get("postcode")+","
+							+map.get("country")+","
+							+map.get("dayphone")+","
+							+map.get("eveningphone")+","
+							+map.get("fax")+","
+							+map.get("mobile")+","
+							+map.get("locale")
+					);
 				}
 				user.setLogin(map.get("login"));
-				user.setPassword("dummy");  // password column is not-null
+				user.setPassword(HashUtil.sha1(RandomPasswordGenerator.nextPassword(10)));
 				user.setFirstName(map.get("fname"));
 				user.setLastName(map.get("lname"));
 				user.setEmail(map.get("email"));
@@ -181,6 +204,54 @@ public class LdapService implements ILdapService {
 		} catch (Exception e) {
 			log.error("===> Exception occurred while getting LDAP user attributes: ", e);
 		}
+
+		// field validation; trim values before they get to database
+		if (map.get("login") != null && map.get("login").trim().length() > 255) {
+			map.put("login", map.get("login").substring(0, 255));
+		}
+		if (map.get("fname") != null && map.get("fname").trim().length() > 128) {
+			map.put("fname", map.get("fname").substring(0, 128));
+		}
+		if (map.get("lname") != null && map.get("lname").trim().length() > 128) {
+			map.put("lname", map.get("lname").substring(0, 128));
+		}
+		if (map.get("email") != null && map.get("email").trim().length() > 128) {
+			map.put("email", map.get("email").substring(0, 128));
+		}
+		if (map.get("address1") != null && map.get("address1").trim().length() > 64) {
+			map.put("address1", map.get("address1").substring(0, 64));
+		}
+		if (map.get("address2") != null && map.get("address2").trim().length() > 64) {
+			map.put("address2", map.get("address2").substring(0, 64));
+		}
+		if (map.get("address3") != null && map.get("address3").trim().length() > 64) {
+			map.put("address3", map.get("address3").substring(0, 64));
+		}
+		if (map.get("city") != null && map.get("city").trim().length() > 64) {
+			map.put("city", map.get("city").substring(0, 64));
+		}
+		if (map.get("state") != null && map.get("state").trim().length() > 64) {
+			map.put("state", map.get("state").substring(0, 64));
+		}
+		if (map.get("postcode") != null && map.get("postcode").trim().length() > 10) {
+			map.put("postcode", map.get("postcode").substring(0, 10));
+		}
+		if (map.get("country") != null && map.get("country").trim().length() > 64) {
+			map.put("country", map.get("country").substring(0, 64));
+		}
+		if (map.get("dayphone") != null && map.get("dayphone").trim().length() > 64) {
+			map.put("dayphone", map.get("dayphone").substring(0, 64));
+		}
+		if (map.get("eveningphone") != null && map.get("eveningphone").trim().length() > 64) {
+			map.put("eveningphone", map.get("eveningphone").substring(0, 64));
+		}
+		if (map.get("fax") != null && map.get("fax").trim().length() > 64) {
+			map.put("fax", map.get("fax").substring(0, 64));
+		}
+		if (map.get("mobile") != null && map.get("mobile").trim().length() > 64) {
+			map.put("mobile", map.get("mobile").substring(0, 64));
+		}
+		
 		return map;
 	}
 	
@@ -357,11 +428,13 @@ public class LdapService implements ILdapService {
 		return null;
 	}
 	
-	public int updateLAMSFromLdap() {
+	public BulkUpdateResultDTO bulkUpdate() {
 		// setup ldap context
 		Properties env = new Properties();
 		env.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 		env.setProperty(Context.SECURITY_AUTHENTICATION, Configuration.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
+		// make java ldap provider return 10 results at a time instead of default 1
+		env.setProperty(Context.BATCHSIZE, "10");
 		env.setProperty(Context.PROVIDER_URL, Configuration.get(ConfigurationKeys.LDAP_PROVIDER_URL));
 		String securityProtocol = Configuration.get(ConfigurationKeys.LDAP_SECURITY_PROTOCOL);
 		if (StringUtils.equals("ssl", securityProtocol)) {
@@ -372,71 +445,145 @@ public class LdapService implements ILdapService {
 			System.setProperty("javax.net.ssl.trustStorePassword", Configuration.get(ConfigurationKeys.LDAP_TRUSTSTORE_PASSWORD));
 		}
 		
-		// get base dn
-		String baseDN = Configuration.get(ConfigurationKeys.LDAP_PRINCIPAL_DN_SUFFIX);
-		if (baseDN.startsWith(",")) {
-			baseDN = baseDN.substring(1);
-		}
+		// get base DN/s to search on
+		String[] baseDNs = Configuration.get(ConfigurationKeys.LDAP_PRINCIPAL_DN_SUFFIX).split(";");
 		
 		// get search filter
 		String filter = Configuration.get(ConfigurationKeys.LDAP_PRINCIPAL_DN_PREFIX);
 		filter = "(" + filter + (filter.endsWith("=") ? "" : "=") + "*)";
 		
-		int numResults = 0;
+		// get page size
+		int pageSize = 100;
 		try {
-			DirContext ctx = new InitialDirContext(env);
-			
-			// set search to subtree of base dn
-			SearchControls ctrl = new SearchControls();
-            ctrl.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            
-            // do the search for all ldap users
-            NamingEnumeration<SearchResult> results = ctx.search(baseDN, filter, ctrl);
-            while (results.hasMore()) {
-            	SearchResult result = results.next();
-            	Attributes attrs = result.getAttributes();
-            	
-            	// add or update this user to LAMS
-            	boolean disabled = getDisabledBoolean(attrs);
-            	String login = getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR)));
-            	if (login != null && login.trim().length() > 0) {
-            		User user = getService().getUserByLogin(login);
-            		if (!disabled) {
-            			if (user == null) {
-            				log.info("Creating new user for LDAP username: " + login);
-            				if (createLDAPUser(attrs)) {
-            					user = getService().getUserByLogin(login);
-            				} else {
-            					log.error("Couldn't create new user for LDAP username: "+login);
-            				}
-            			} else {
-            				updateLDAPUser(user, attrs);
-            			}
-            			if (!addLDAPUser(attrs, user.getUserId())) {
-            				log.error("Couldn't add LDAP user: "+login+" to organisation.");
-            			}
-            		} else {
-            			// remove user from groups and set disabled flag
-            			if (user != null) {
-            				getService().disableUser(user.getUserId());
-            			}
-            		}
-            	} else {
-            		log.error("Couldn't find login attribute for user using attribute name: " 
-            				+ Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR) + ".  Dumping attributes...");
-            		NamingEnumeration enumAttrs = attrs.getAll();
-    				while (enumAttrs.hasMoreElements()) {
-    					log.error(enumAttrs.next());
-    				}
-            	}
-            	
-            	numResults++;
-            }
-            log.info("Ldap returned " + numResults + " users.");
+			pageSize = new Integer(Configuration.get(ConfigurationKeys.LDAP_SEARCH_RESULTS_PAGE_SIZE)).intValue();
 		} catch (Exception e) {
-			log.error(e, e);
+			log.error("Couldn't read " + ConfigurationKeys.LDAP_SEARCH_RESULTS_PAGE_SIZE + ", using default page size of 100.");
 		}
 		
-		return numResults;
+		int totalResults = 0;
+		int createdUsers = 0;
+		int updatedUsers = 0;
+		int disabledUsers = 0;
+		List<String> messages = new ArrayList<String>();
+		
+		for (String baseDN : baseDNs) {
+			int contextResults = 0;
+			if (baseDN.startsWith(",")) {
+				baseDN = baseDN.substring(1);
+			}
+			try {
+				// open LDAP connection
+				LdapContext ctx = null;
+				try {
+					ctx = new InitialLdapContext(env, null);
+					// ask ldap server to return results in pages of PAGE_SIZE, if supported
+					ctx.setRequestControls(new Control[] {
+							new PagedResultsControl(pageSize, Control.NONCRITICAL) });
+				} catch (Exception e) {
+					messages.add("Error creating control.");
+					log.error(e, e);
+				}
+				
+				// perform ldap search, in batches
+				byte[] cookie = null;
+				do {
+					// set search to subtree of base dn
+					SearchControls ctrl = new SearchControls();
+					ctrl.setSearchScope(SearchControls.SUBTREE_SCOPE);
+            
+					// do the search for all ldap users
+					NamingEnumeration<SearchResult> results = ctx.search(baseDN, filter, ctrl);
+					while (results.hasMore()) {
+						SearchResult result = results.next();
+						Attributes attrs = result.getAttributes();
+            	
+						// add or update this user to LAMS
+						boolean disabled = getDisabledBoolean(attrs);
+						String login = getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR)));
+						if (login != null && login.trim().length() > 0) {
+							int code = bulkUpdateLDAPUser(login, attrs, disabled);
+							switch (code) {
+								case BULK_UPDATE_CREATED: createdUsers++; break;
+								case BULK_UPDATE_UPDATED: updatedUsers++; break;
+								case BULK_UPDATE_DISABLED: disabledUsers++; break;
+							}
+						} else {
+							log.error("Couldn't find login attribute for user using attribute name: " 
+									+ Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR) + ".  Dumping attributes...");
+							NamingEnumeration enumAttrs = attrs.getAll();
+							while (enumAttrs.hasMoreElements()) {
+								log.error(enumAttrs.next());
+							}
+						}
+            	
+						contextResults++;
+					}
+					
+					cookie = getPagedResponseCookie(ctx.getResponseControls());
+					
+					// set response cookie to continue paged result
+					ctx.setRequestControls(new Control[] {
+							new PagedResultsControl(pageSize, cookie, Control.NONCRITICAL) }
+					);
+				} while (cookie != null);
+				log.info("Ldap context " + baseDN + " returned " + contextResults + " users.");
+				ctx.close();
+			} catch (Exception e) {
+				messages.add("Error while processing " + baseDN + ": " + e.getMessage());
+				log.error(e, e);
+			}
+			totalResults += contextResults;
+		}
+		
+		BulkUpdateResultDTO dto = new BulkUpdateResultDTO(totalResults, createdUsers, updatedUsers, disabledUsers, messages);
+		
+		log.info("Ldap returned " + totalResults + " users.");
+		log.info(createdUsers + " were created, " + updatedUsers + " were updated/existed, and " + disabledUsers + " were disabled.");
+		
+		return dto;
 	}
+	
+	// create, update, or disable this user
+	private int bulkUpdateLDAPUser(String login, Attributes attrs, boolean disabled) {
+		int returnCode = -1;
+		User user = getService().getUserByLogin(login);
+		if (!disabled) {
+			if (user == null) {
+				log.info("Creating new user for LDAP username: " + login);
+				if (createLDAPUser(attrs)) {
+					user = getService().getUserByLogin(login);
+					returnCode = BULK_UPDATE_CREATED;
+				} else {
+					log.error("Couldn't create new user for LDAP username: "+login);
+				}
+			} else {
+				updateLDAPUser(user, attrs);
+				returnCode = BULK_UPDATE_UPDATED;
+			}
+			if (!addLDAPUser(attrs, user.getUserId())) {
+				log.error("Couldn't add LDAP user: "+login+" to organisation.");
+			}
+		} else {
+			// remove user from groups and set disabled flag
+			if (user != null) {
+				getService().disableUser(user.getUserId());
+				returnCode = BULK_UPDATE_DISABLED;
+			}
+		}
+		return returnCode;
+	}
+	
+	// get paged result response cookie
+	private byte[] getPagedResponseCookie(Control[] controls) { 
+		if (controls != null) {
+			for (Control control : controls) {
+				if (control instanceof PagedResultsResponseControl) {
+					PagedResultsResponseControl prrc = (PagedResultsResponseControl)control;
+					return prrc.getCookie();
+				}
+			}
+		}
+		return null;
+	}
+	
 }

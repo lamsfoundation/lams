@@ -32,7 +32,7 @@ insert into lams_configuration (config_key, config_value) values ('DefaultHTMLTh
 insert into lams_configuration (config_key, config_value) values ('AllowDirectLessonLaunch','false');
 insert into lams_configuration (config_key, config_value) values ('LAMS_Community_enable','false');
 insert into lams_configuration (config_key, config_value) values ('AllowLiveEdit','true');
-insert into lams_configuration (config_key, config_value) values ('LDAPProvisioningEnabled','true');
+insert into lams_configuration (config_key, config_value) values ('LDAPProvisioningEnabled','false');
 insert into lams_configuration (config_key, config_value) values ('LDAPProviderURL','ldap://192.168.111.15');
 insert into lams_configuration (config_key, config_value) values ('LDAPSecurityAuthentication','simple');
 insert into lams_configuration (config_key, config_value) values ('LDAPPrincipalDNPrefix','cn=');
@@ -67,4 +67,5 @@ insert into lams_configuration (config_key, config_value) values ('LDAPGroupMana
 insert into lams_configuration (config_key, config_value) values ('LDAPUpdateOnLogin', 'true');
 insert into lams_configuration (config_key, config_value) values ('LDAPOrgField', 'code');
 insert into lams_configuration (config_key, config_value) values ('LDAPOnlyOneOrg', 'true');
-insert into lams_configuration (config_key, config_value) values ('LDAPEncryptPasswordFromBrowser', 'false');
+insert into lams_configuration (config_key, config_value) values ('LDAPEncryptPasswordFromBrowser', 'true');
+insert into lams_configuration (config_key, config_value) values ('LDAPSearchResultsPageSize', '100');

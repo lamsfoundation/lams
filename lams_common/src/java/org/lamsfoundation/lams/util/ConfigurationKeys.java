@@ -206,4 +206,6 @@ public class ConfigurationKeys {
 	public static String LDAP_ONLY_ONE_ORG = "LDAPOnlyOneOrg";
 	
 	public static String LDAP_ENCRYPT_PASSWORD_FROM_BROWSER = "LDAPEncryptPasswordFromBrowser";
+	
+	public static String LDAP_SEARCH_RESULTS_PAGE_SIZE = "LDAPSearchResultsPageSize";
 }

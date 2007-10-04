@@ -92,9 +92,7 @@ public class LDAPAuthenticator {
 		env.setProperty(Context.SECURITY_AUTHENTICATION, Configuration.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
 
 		String principalDNPrefix = Configuration.get(ConfigurationKeys.LDAP_PRINCIPAL_DN_PREFIX);
-		String principalDNSuffix = Configuration.get(ConfigurationKeys.LDAP_PRINCIPAL_DN_SUFFIX);
-		String userDN = principalDNPrefix + username + principalDNSuffix;
-		env.setProperty(Context.SECURITY_PRINCIPAL, userDN);
+		String[] principalDNSuffixes = Configuration.get(ConfigurationKeys.LDAP_PRINCIPAL_DN_SUFFIX).split(";");
 
 		env.setProperty(Context.PROVIDER_URL, Configuration.get(ConfigurationKeys.LDAP_PROVIDER_URL));
 		env.put(Context.SECURITY_CREDENTIALS, credential);
@@ -114,61 +112,69 @@ public class LDAPAuthenticator {
 		log.debug("===> LDAP authenticator: " + env);
 
 		InitialLdapContext ctx = null;
-		try {
-			ctx = new InitialLdapContext(env, null);
-			log.debug("===> LDAP context created: "+ctx);
-			Attributes attrs = ctx.getAttributes(userDN);
-			setAttrs(attrs);
-			
-			if (log.isDebugEnabled()) {
-				NamingEnumeration enumAttrs = attrs.getAll();
-				while (enumAttrs.hasMoreElements()) {
-					log.debug(enumAttrs.next());
-				}
+		
+		for (String principalDNSuffix : principalDNSuffixes) {
+			if (!principalDNSuffix.startsWith(",")) {
+				principalDNSuffix = "," + principalDNSuffix;
 			}
-			
-			// check user is disabled in ldap
-			if (getLdapService().getDisabledBoolean(attrs)) {
-				log.debug("===> User is disabled in LDAP.");
-				User user = getService().getUserByLogin(username);
-				if (user != null) {
-					getService().disableUser(user.getUserId());
-				}
-				return false;
-			}
-			
-			if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_UPDATE_ON_LOGIN)) {
-				User user = getService().getUserByLogin(username);
-				if (user != null) {
-					// update user's attributes and org membership
-					getLdapService().updateLDAPUser(user, attrs);
-					getLdapService().addLDAPUser(attrs, user.getUserId());
-				}
-			}
-			
-			return true;
-		} catch (AuthenticationNotSupportedException e) {
-			log.error("===> Authentication mechanism not supported.  Check your "
-					+ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION+" parameter: "
-					+Configuration.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
-		} catch (AuthenticationException e) {
-			log.info("===> Incorrect username ("+userDN+") or password ("+credential+"): "+e.getMessage());
-		} catch (Exception e) {
-			log.error("===> LDAP exception: " + e, e);
-		} finally {
-
+			String userDN = principalDNPrefix + username + principalDNSuffix;
+			env.setProperty(Context.SECURITY_PRINCIPAL, userDN);
 			try {
-				//FIXME: synchronization issue -- dynamically load certificate
-				// instead of overwritting system properties
-				//System.setProperty("javax.net.ssl.trustStore",(String)originalTrustStore
-				// );
-				//System.setProperty("javax.net.ssl.trustStorePassword",(String)originalTrustPass
-				// );
-
-				if (ctx != null)
-					ctx.close();
+				ctx = new InitialLdapContext(env, null);
+				log.debug("===> LDAP context created using DN: "+userDN);
+				Attributes attrs = ctx.getAttributes(userDN);
+				setAttrs(attrs);
+				
+				if (log.isDebugEnabled()) {
+					NamingEnumeration enumAttrs = attrs.getAll();
+					while (enumAttrs.hasMoreElements()) {
+						log.debug(enumAttrs.next());
+					}
+				}
+			
+				// check user is disabled in ldap
+				if (getLdapService().getDisabledBoolean(attrs)) {
+					log.debug("===> User is disabled in LDAP.");
+					User user = getService().getUserByLogin(username);
+					if (user != null) {
+						getService().disableUser(user.getUserId());
+					}
+					return false;
+				}
+			
+				if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_UPDATE_ON_LOGIN)) {
+					User user = getService().getUserByLogin(username);
+					if (user != null) {
+						// update user's attributes and org membership
+						getLdapService().updateLDAPUser(user, attrs);
+						getLdapService().addLDAPUser(attrs, user.getUserId());
+					}
+				}
+			
+				return true;
+			} catch (AuthenticationNotSupportedException e) {
+				log.error("===> Authentication mechanism not supported.  Check your "
+						+ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION+" parameter: "
+						+Configuration.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
+			} catch (AuthenticationException e) {
+				log.info("===> Incorrect username ("+userDN+") or password ("+credential+"): "+e.getMessage());
 			} catch (Exception e) {
-				log.error("===> gettting problem when closing context. Excetion: "+e);
+				log.error("===> LDAP exception: " + e, e);
+			} finally {
+
+				try {
+					// FIXME: synchronization issue -- dynamically load certificate
+					// instead of overwritting system properties
+					//System.setProperty("javax.net.ssl.trustStore",(String)originalTrustStore
+					// );
+					//System.setProperty("javax.net.ssl.trustStorePassword",(String)originalTrustPass
+					// );
+
+					if (ctx != null)
+						ctx.close();
+				} catch (Exception e) {
+					log.error("===> gettting problem when closing context. Excetion: "+e);
+				}
 			}
 		}
 		

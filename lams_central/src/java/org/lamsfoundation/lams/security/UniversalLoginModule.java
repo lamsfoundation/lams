@@ -150,9 +150,16 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 						// if the password is not encrypted when sent from the jsp (e.g. when it is passed
 						// unencrypted to say, ldap) then encrypt it here when authenticating against local db
 						if (!Configuration.getAsBoolean(ConfigurationKeys.LDAP_ENCRYPT_PASSWORD_FROM_BROWSER)) {
-							inputPassword = HashUtil.sha1(inputPassword);
+							// try the passed in password first, LoginRequestServlet always passes in encrypted
+							// passwords
+							isValid = authenticator.authenticate(username,inputPassword);
+							if (!isValid) {
+								inputPassword = HashUtil.sha1(inputPassword);
+							}
+							isValid = authenticator.authenticate(username,inputPassword);
+						} else {
+							isValid = authenticator.authenticate(username,inputPassword);
 						}
-						isValid = authenticator.authenticate(username,inputPassword);
 					} else if (AuthenticationMethodType.WEB_AUTH.equals(type)) {
 						WebAuthAuthenticator authenticator = new WebAuthAuthenticator();
 						isValid = authenticator.authenticate(username,inputPassword);

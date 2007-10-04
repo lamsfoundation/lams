@@ -1,6 +1,6 @@
 insert into lams_configuration (config_key, config_value) values ('ServerURL','http://localhost:8080/lams/');
 insert into lams_configuration (config_key, config_value) values ('ServerURLContextPath','lams/');
-insert into lams_configuration (config_key, config_value) values ('Version','2.0.3');
+insert into lams_configuration (config_key, config_value) values ('Version','2.0.4');
 insert into lams_configuration (config_key, config_value) values ('TempDir','C:/lams/temp');
 insert into lams_configuration (config_key, config_value) values ('DumpDir','C:/lams/dump');
 insert into lams_configuration (config_key, config_value) values ('EARDir','C:/jboss-4.0.2/server/default/deploy/lams.ear');
@@ -15,10 +15,10 @@ insert into lams_configuration (config_key, config_value) values ('UserInactiveT
 insert into lams_configuration (config_key, config_value) values ('UseCacheDebugListener','false');
 insert into lams_configuration (config_key, config_value) values ('CleanupPreviewOlderThanDays','7');
 insert into lams_configuration (config_key, config_value) values ('AuthoringActivitiesColour', 'true');
-insert into lams_configuration (config_key, config_value) values ('AuthoringClientVersion','2.0.3.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('MonitorClientVersion','2.0.3.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('LearnerClientVersion','2.0.3.@datetimestamp@');
-insert into lams_configuration (config_key, config_value) values ('ServerVersionNumber','2.0.3.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('AuthoringClientVersion','2.0.4.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('MonitorClientVersion','2.0.4.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('LearnerClientVersion','2.0.4.@datetimestamp@');
+insert into lams_configuration (config_key, config_value) values ('ServerVersionNumber','2.0.4.@datetimestamp@');
 insert into lams_configuration (config_key, config_value) values ('ServerLanguage','en_AU');
 insert into lams_configuration (config_key, config_value) values ('ServerPageDirection','LTR');
 insert into lams_configuration (config_key, config_value) values ('DictionaryDateCreated','2007-05-24');
@@ -32,7 +32,7 @@ insert into lams_configuration (config_key, config_value) values ('DefaultHTMLTh
 insert into lams_configuration (config_key, config_value) values ('AllowDirectLessonLaunch','false'); 
 insert into lams_configuration (config_key, config_value) values ('LAMS_Community_enable','false');
 insert into lams_configuration (config_key, config_value) values ('AllowLiveEdit','true');
-insert into lams_configuration (config_key, config_value) values ('LDAPProvisioningEnabled','true');
+insert into lams_configuration (config_key, config_value) values ('LDAPProvisioningEnabled','false');
 insert into lams_configuration (config_key, config_value) values ('LDAPProviderURL','ldap://192.168.111.15');
 insert into lams_configuration (config_key, config_value) values ('LDAPSecurityAuthentication','simple');
 insert into lams_configuration (config_key, config_value) values ('LDAPPrincipalDNPrefix','cn=');
@@ -68,3 +68,4 @@ insert into lams_configuration (config_key, config_value) values ('LDAPUpdateOnL
 insert into lams_configuration (config_key, config_value) values ('LDAPOrgField', 'code');
 insert into lams_configuration (config_key, config_value) values ('LDAPOnlyOneOrg', 'true');
 insert into lams_configuration (config_key, config_value) values ('LDAPEncryptPasswordFromBrowser', 'false');
+insert into lams_configuration (config_key, config_value) values ('LDAPSearchResultsPageSize', '100');

@@ -23,10 +23,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web.action;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -36,11 +35,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
-import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.BulkUpdateResultDTO;
+import org.lamsfoundation.lams.usermanagement.service.ILdapService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.LdapService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 
 /**
  * @author jliew
@@ -85,28 +86,15 @@ public class LdapConfigAction extends Action {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
-		// check if url contains request for refresh folder sizes only
 		String action = WebUtil.readStrParam(request, "action", true);
-		if (action != null && StringUtils.equals(action, "sync")) {
-			return sync(mapping, form, request, response);
+		if (action != null) {
+			if (StringUtils.equals(action, "sync")) return sync(mapping, form, request, response);
+			if (StringUtils.equals(action, "waiting")) return waiting(mapping, form, request, response);
+			if (StringUtils.equals(action, "results")) return results(mapping, form, request, response);
 		}
 		
-		// get number of ldap users
-		List ldapUsers = getService().findByProperty(
-				User.class, 
-				"authenticationMethod.authenticationMethodId", 
-				AuthenticationMethod.LDAP
-			);
-		if (ldapUsers != null) {
-			int numLdapUsers = ldapUsers.size();
-			request.setAttribute(
-					"numLdapUsersMsg", 
-					getMessageService().getMessage(
-							"msg.num.ldap.users",
-							getNumLdapUsersMessage(numLdapUsers)
-					)
-			);
-		}
+		int numLdapUsers = getNumLdapUsers();
+		request.setAttribute("numLdapUsersMsg", getNumLdapUsersMsg(numLdapUsers));
 		
 		return mapping.findForward("ldap");
 	}
@@ -116,24 +104,99 @@ public class LdapConfigAction extends Action {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 		
-		log.info("=== Beginning LDAP user sync ===");
-		int numLdapUsers = getLdapService().updateLAMSFromLdap();
-		log.info("=== Finished LDAP user sync ===");
-		request.setAttribute(
-				"numLdapUsersMsg", 
-				getMessageService().getMessage(
-						"msg.num.ldap.users",
-						getNumLdapUsersMessage(numLdapUsers)
-				)
-		);
-		request.setAttribute("done", getMessageService().getMessage("msg.done"));
+		String sessionId = (String)SessionManager.getSession().getId();
+		Thread t = new Thread(new LdapSyncThread(sessionId));
+		t.start();
+		
+		request.setAttribute("wait", getMessageService().getMessage("msg.ldap.synchronise.wait"));
 		
 		return mapping.findForward("ldap");
 	}
 	
-	private String[] getNumLdapUsersMessage(int numLdapUsers) {
+	public ActionForward waiting(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+		
+		request.setAttribute("wait", getMessageService().getMessage("msg.ldap.synchronise.wait"));
+		
+		return mapping.findForward("ldap");
+	}
+	
+	public ActionForward results(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+		
+		HttpSession ss = SessionManager.getSession();
+		BulkUpdateResultDTO dto = (BulkUpdateResultDTO)ss.getAttribute(ILdapService.SYNC_RESULTS);
+		
+		int numLdapUsers = getNumLdapUsers();
+		request.setAttribute("numLdapUsersMsg", getNumLdapUsersMsg(numLdapUsers));
+		
+		request.setAttribute("numSearchResults", getNumSearchResultsUsersMsg(dto.getNumSearchResults()));
+		request.setAttribute("numLdapUsersCreated", getNumCreatedUsersMsg(dto.getNumUsersCreated()));
+		request.setAttribute("numLdapUsersUpdated", getNumUpdatedUsersMsg(dto.getNumUsersUpdated()));
+		request.setAttribute("numLdapUsersDisabled", getNumDisabledUsersMsg(dto.getNumUsersDisabled()));
+		request.setAttribute("messages", dto.getMessages());
+		request.setAttribute("done", getMessageService().getMessage("msg.done"));
+		
+		// remove session variable that flags bulk update as done
+		ss.removeAttribute(ILdapService.SYNC_RESULTS);
+		
+		return mapping.findForward("ldap");
+	}
+	
+	private int getNumLdapUsers() {
+		Integer count = getService().getCountUsers(AuthenticationMethod.LDAP);
+		return (count != null ? count.intValue() : -1);
+	}
+	
+	private String getNumLdapUsersMsg(int numLdapUsers) {
 		String[] args = new String[1];
 		args[0] = String.valueOf(numLdapUsers);
-		return args;
+		return getMessageService().getMessage("msg.num.ldap.users", args);
+	}
+	
+	private String getNumSearchResultsUsersMsg(int searchResults) {
+		String[] args = new String[1];
+		args[0] = String.valueOf(searchResults);
+		return getMessageService().getMessage("msg.num.search.results.users", args);
+	}
+	
+	private String getNumCreatedUsersMsg(int created) {
+		String[] args = new String[1];
+		args[0] = String.valueOf(created);
+		return getMessageService().getMessage("msg.num.created.users", args);
+	}
+	
+	private String getNumUpdatedUsersMsg(int updated) {
+		String[] args = new String[1];
+		args[0] = String.valueOf(updated);
+		return getMessageService().getMessage("msg.num.updated.users", args);
+	}
+	
+	private String getNumDisabledUsersMsg(int disabled) {
+		String[] args = new String[1];
+		args[0] = String.valueOf(disabled);
+		return getMessageService().getMessage("msg.num.disabled.users", args);
+	}
+	
+	private class LdapSyncThread implements Runnable {
+		private String sessionId;
+		
+		public LdapSyncThread(String sessionId) {
+			this.sessionId = sessionId;
+		}
+		
+		public void run() {
+			log.info("=== Beginning LDAP user sync ===");
+			long start = System.currentTimeMillis();
+			BulkUpdateResultDTO dto = getLdapService().bulkUpdate();
+			long end = System.currentTimeMillis();
+			log.info("=== Finished LDAP user sync ===");
+			log.info("Bulk update took " + (end-start)/1000 + " seconds.");
+			SessionManager.getSession(sessionId).setAttribute(ILdapService.SYNC_RESULTS, dto);
+		}
 	}
 }

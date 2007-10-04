@@ -385,4 +385,8 @@ public interface IUserManagementService {
 	public void auditPasswordChanged(User user, String moduleName);
 	
 	public void auditUserCreated(User user, String moduleName);
+	
+	public Integer getCountUsers();
+	
+	public Integer getCountUsers(Integer authenticationMethodId);
 }

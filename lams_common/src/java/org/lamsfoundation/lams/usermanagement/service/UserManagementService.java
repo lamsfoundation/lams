@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -529,7 +530,7 @@ public class UserManagementService implements IUserManagementService {
             } 	 
 	 	 
             return organisation; 	 
-    } 	 
+    }
 
 	@SuppressWarnings("unchecked")
 	public List<UserManageBean> getUserManageBeans(Integer orgId) {
@@ -908,6 +909,26 @@ public class UserManagementService implements IUserManagementService {
 		args[1] = user.getFullName();
 		String message = messageService.getMessage("audit.user.create", args);
 		getAuditService().log(moduleName, message);
+	}
+	
+	public Integer getCountUsers() {
+		String query = "select count(u) from User u";
+		return getFindIntegerResult(query);
+	}
+	
+	public Integer getCountUsers(Integer authenticationMethodId) {
+		String query = "select count(u) from User u "
+			+ "where u.authenticationMethod.authenticationMethodId="
+			+ authenticationMethodId;
+		return getFindIntegerResult(query);
+	}
+	
+	private Integer getFindIntegerResult(String query) {
+		List list = baseDAO.find(query);
+		if (list != null && list.size() > 0) {
+			return (Integer)list.get(0);
+		}
+		return null;
 	}
 
 }

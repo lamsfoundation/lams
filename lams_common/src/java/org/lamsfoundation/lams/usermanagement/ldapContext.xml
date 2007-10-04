@@ -15,9 +15,9 @@
 		<property name="proxyTargetClass"><value>true</value></property>     
 		<property name="transactionAttributes">
 			<props>
-				<prop key="add*">PROPAGATION_REQUIRED</prop>
-				<prop key="create*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="addLDAPUser">PROPAGATION_REQUIRED</prop>
+				<prop key="createLDAPUser">PROPAGATION_REQUIRED</prop>
+				<prop key="updateLDAPUser">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
