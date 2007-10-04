@@ -26,7 +26,22 @@
 	String monitorUrl = LamsSecurityUtil.generateRequestURL(ctx, "monitor") + "&lsid=" + lsid;
 	String liveEditUrl = LamsSecurityUtil.generateRequestURL(ctx, "author");
 	
+//	 add port to the url if the port is in the blackboard url.
+	int bbport = request.getServerPort();
+	String bbportstr = bbport != 0 ? ":" + bbport : "";
 	
+	//String contentUrl = LamsSecurityUtil.generateRequestURL(ctx, "learner") + "&lsid=" + learningSessionId;
+	String updateGradesUrl = "\"" + request.getScheme()
+									+ "://" +
+									request.getServerName() + 
+								    bbportstr +
+									request.getContextPath() + 
+									"/modules/updateGrades.jsp?lsid=" + lsid + 
+									"&course_id=" + request.getParameter("course_id") +
+									"&lineitem_id=" + request.getParameter("lineitem_id")
+									+ "\"";
+	
+
 	String course_idstr = request.getParameter("course_id");	
 
 	BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
@@ -131,6 +146,11 @@
 		        }
 			}
 			
+			function updateGrades()
+			{
+				window.location = <%=updateGradesUrl%>
+			}
+			
 			function openAuthorForEditOnFly( learningDesignID )
 			{				
 				liveEditUrl= '<%=liveEditUrl%>' + '&layout=editonfly&learningDesignID=' + learningDesignID;
@@ -144,6 +164,8 @@
 					monitorWin.focus();
 				}
 			}
+			
+			
 		//-->
 </script>
 </head>
@@ -163,8 +185,9 @@
 	<b>Please Choose an Option</b>
 	<br><br>
 	&nbsp&nbsp&nbsp&nbsp
-	<input type="<%=instructorstr%>" class="button" name="OpenMonitor" onClick="openMonitor();" value="Open Monitor">
 	<input type="button" class="button" name="OpenLearner" onClick="openLearner();" value="Open Lesson">
+	<input type="<%=instructorstr%>" class="button" name="OpenMonitor" onClick="openMonitor();" value="Open Monitor">
+	<input type="<%=instructorstr%>" class="button" name="UpdateGrades" onClick="updateGrades();" value="Update Progress">
 	<input type="button" class="button" name="Cancel" onClick="back();" value="Cancel">
 
 </form>

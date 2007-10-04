@@ -60,6 +60,9 @@
 		<permission type="java.net.SocketPermission" name="*" actions="connect"/>
 		<permission type="java.util.PropertyPermission" name="java.protocol.handler.pkgs" actions="write"/>
 		
-    </permissions>
+		<permission type="persist" name="Outcome" actions="create,modify,delete"/>
+    	<permission type="persist" name="OutcomeDefinition" actions="create,modify,delete"/>
+    	<permission type="persist" name="OutcomeDefinitionCategory" actions="create,modify,delete"/>
+    	</permissions>
 </plugin>
 </manifest>
