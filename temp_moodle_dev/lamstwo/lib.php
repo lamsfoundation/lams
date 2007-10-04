@@ -199,6 +199,160 @@ function lamstwo_get_sequences($username,$courseid,$country,$lang) {
     return preg_replace($pattern,$replacement,$result);
 }
 
+
+/**
+ * Get sequences(learning designs) for the user in lamstwo using the REST interface
+ *
+ * @param string $username The username of the user. Set this to "" if you would just like to get sequences for the currently logged in user.
+ * @return string to define the tree structure
+ * @TODO complete the documentation of this function
+ */
+function lamstwo_get_sequences_rest($username,$courseid,$country,$lang) {
+    global $CFG,$USER;
+    if(!isset($CFG->lamstwo_serverid)||!isset($CFG->lamstwo_serverkey)||!isset($CFG->lamstwo_serverurl))
+    {
+        return get_string("notsetup", "lamstwo");
+    }
+
+    // generate hash
+    $datetime =    date("F d,Y g:i a");
+    $datetime_encoded = urlencode($datetime);
+
+    $rawstring = trim($datetime).trim($username).trim($CFG->lamstwo_serverid).trim($CFG->lamstwo_serverkey);
+    $hashvalue = sha1(strtolower($rawstring));
+
+    // Put together REST URL
+    $service = "/services/xml/LearningDesignRepository";
+
+    $request = "$CFG->lamstwo_serverurl$service?serverId=$CFG->lamstwo_serverid&datetime=$datetime_encoded&hashValue=$hashvalue&username=$username&courseId=$courseid&mode=2&country=$country&lang=$lang";
+
+
+    // GET call to LAMS
+    $xml = file_get_contents($request);
+
+    // Retrieve HTTP status code
+    list($version,$status_code,$msg) = explode(' ',$http_response_header[0], 3);
+
+    // Check the HTTP Status code
+    switch($status_code) {
+      case 200:
+      	   // Success
+	    break;
+      case 503:
+	    die(get_string("restcall503", "lamstwo"));
+	    break;
+      case 403:
+	    die(get_string("restcall403", "lamstwo"));
+	    break;
+      case 400:
+	   // You may want to fall through here and read the specific XML error
+	   die(get_string("restcall400", "lamstwo"));
+	   break;
+	   default:
+	   die(get_string("restcalldefault", "lamstwo") . $status_code);
+
+}
+
+      if (version_compare(PHP_VERSION,'5','>=')) {
+
+      	 // if PHP5 then we use the xml dom implementation as per PHP5
+
+            $xml = utf8_encode($xml);
+
+      	    $domdoc = new DOMDocument('1.0', 'UTF-8');
+	    if ($domdoc->loadXML($xml) == false ) {
+		 die(get_string("parsingerror", "lamstwo"));
+	    }
+
+	    $root = $domdoc->firstChild;
+
+	    return lamstwo_php5_process_node($root) . ']';
+
+
+      } else {
+
+      	// Assume PHP4. 
+
+
+
+      }
+
+
+      
+
+
+}
+
+
+/**
+ * Get process REST output
+ *
+ * @param string $node The XML DOM node to transform for the javascript tree.
+ * @return string to define the tree structure
+ * @TODO complete the documentation of this function
+ */
+function lamstwo_php5_process_node($node) {
+
+	 if ($node->nodeName == 'Folder') {
+
+	    $folder_name = preg_replace("/'/", "$1\'", $node->getAttribute('name'));
+
+	    $output = $output . '[\'' . $folder_name . '\',null,';
+
+	    if ($node->hasChildNodes()) {
+
+	       foreach($node->childNodes as $child) {
+
+	          $output = $output . lamstwo_php5_process_node($child);
+
+		  if ($child->nodeName == 'Folder') {
+
+		     if (is_null($child->nextSibling)) {
+
+		     	$output = $output . ']';
+
+		     } else {
+
+		       $output = $output . '],';
+
+		     }
+
+		  }
+
+	      }
+
+	    } else {
+
+	      $output = $output . ' [\'\',null]';
+
+	    }
+
+	 } else {
+
+
+	   // the node is a Learning Design
+
+	   $seq_name = preg_replace("/'/", "$1\'", $node->getAttribute('name'));
+
+	   $output = $output . '[\'' . $seq_name . '\',' . '\'javascript:selectSequence(' . $node->getAttribute('resourceId') . ')\']';
+
+	   if (is_null($node->nextSibling)) {
+
+	      $output = $output . '';
+
+
+	   } else {
+
+	      $output = $output . ',';
+
+	   }
+
+	 }
+
+	 return $output;
+}
+
+
 /**
  * Get lesson id from lamstwo
  *

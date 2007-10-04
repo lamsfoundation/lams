@@ -65,7 +65,7 @@ if (!isset($form->create_sequence_url)) {
 					<script type="text/javascript" src="../mod/lamstwo/tree_tpl.js"></script>
 					<script language="javascript">
 						<!--
-							<?php $lds = lamstwo_get_sequences($USER->username,$form->course,$USER->country,$USER->lang);
+							<?php $lds = '[' . lamstwo_get_sequences_rest($USER->username,$form->course,$USER->country,$USER->lang) . ']';
 								if (strpos($lds, '[') === 0){
 									echo "var TREE_ITEMS = $lds; new tree (TREE_ITEMS, TREE_TPL);";
 								}else{
