@@ -59,8 +59,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	
 	private var mm:MonitorModel;
 	private var _monitorTabView:MonitorTabView;
-	
-	private var _tip:ToolTip;
 
 	private var learner_X:Number = 22;
 	private var learner_Y:Number = 19;
@@ -83,7 +81,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		_monitorTabViewContainer_mc = this;
 		
 		_tm = ThemeManager.getInstance();
-		_tip = new ToolTip();
 		
         //Init for event delegation
         mx.events.EventDispatcher.initialize(this);
@@ -240,22 +237,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		
 		dispatchEvent({type:'load',target:this});
 	}
-		
-	public function showToolTip(btnTT:String):Void{
-		var Xpos = Application.MONITOR_X+ 5;
-		//var Ypos = Application.MONITOR_Y+ endGate_mc._y;
-		var ttHolder = Application.tooltip;
-		var ttMessage = Dictionary.getValue(btnTT);
-		
-		//param "true" is to specify that tooltip needs to be shown above the component 
-		//_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos, true);
-		
-	}
-	
-	public function hideToolTip():Void{
-		_tip.CloseToolTip();
-	}
-	
+			
 	private function hideMainExp(mm:MonitorModel):Void{
 		mm.broadcastViewUpdate("EXPORTSHOWHIDE", true);
 		mm.broadcastViewUpdate("EDITFLYSHOWHIDE", true);

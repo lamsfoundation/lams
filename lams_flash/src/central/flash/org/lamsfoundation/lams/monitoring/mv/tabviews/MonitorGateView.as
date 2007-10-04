@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.monitoring.mv.*
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.* 
+import org.lamsfoundation.lams.monitoring.Application;
 
 import mx.managers.*
 import mx.containers.*;
@@ -61,10 +62,6 @@ import mx.controls.*;
 	private var doorClosed:MovieClip;
 	private var doorOpen:MovieClip;
 	private var bar_pnl:MovieClip;
-	
-	private var _tooltipContainer_mc:MovieClip;
-
-	private var endGate_mc:MovieClip;
 	private var _learnerContainer_mc:MovieClip;
 	
     private var dispatchEvent:Function; 
@@ -75,7 +72,7 @@ import mx.controls.*;
 	*/
 	function MonitorGateView(){
 		_monitorGateView = this;
-		
+	
 		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
 		
@@ -94,11 +91,6 @@ import mx.controls.*;
 		mm = MonitorModel(model)
 		
 		setPosition(mm);
-
-
-		_tooltipContainer_mc._visible = true;
-		
-		//_tooltipContainer_mc._alpha = 100;
 		
 		MovieClipUtils.doLater(Proxy.create(this, draw)); 
     }   
@@ -151,25 +143,21 @@ import mx.controls.*;
 		
 		mm.endGate.tt_btn.onRollOver = Proxy.create(this,this['showToolTip'], "finish_learner_tooltip");
 		mm.endGate.tt_btn.onRollOut =  Proxy.create(this,this['hideToolTip']);
-		
+				
 		setStyles();
 		
 		dispatchEvent({type:'load',target:this});
 	}
 	
 	public function showToolTip(btnTT:String):Void{
-		
-		_tooltipContainer_mc = this.createEmptyMovieClip("_tooltipContainer_mc",DepthManager.kTop);
-		_tooltipContainer_mc._visible = true;
-
 		var Xpos = this._x + 5;
-		var Ypos = this._y;
-
+		var Ypos = this._y + this._height;
+		var ttHolder = Application.tooltip;	
 		var ttMessage = Dictionary.getValue(btnTT);
 		Debugger.log("ttMessage"+ttMessage, Debugger.CRITICAL);
-		
+
 		//param "true" is to specify that tooltip needs to be shown above the component 
-		_tip.DisplayToolTip(_tooltipContainer_mc, ttMessage, Xpos, Ypos, true);
+		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos, true);
 	}
 	
 	public function hideToolTip():Void{
@@ -190,8 +178,7 @@ import mx.controls.*;
 				
 				var learner:Object = new Object();
 				learner = mm.allLearnersProgress[i]
-				
-				var temp_mc = _learnerContainer_mc.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), _learnerContainer_mc.getNextHighestDepth(),{learner:learner, _monitorController:mc, _x:learner_X+(finishedLearners*10), _y:(this._y+learner_Y), _hasPlus:false});
+				var temp_mc = _learnerContainer_mc.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), _learnerContainer_mc.getNextHighestDepth(),{learner:learner, _monitorController:mc, _x:learner_X+(finishedLearners*10), _y:(learner_Y), _hasPlus:false});
 				finishedLearnersList.push(temp_mc);
 				finishedLearners++;
 				
@@ -202,7 +189,7 @@ import mx.controls.*;
 		
 		lessonEnd_lbl.text = "<b>"+Dictionary.getValue('title_sequencetab_endGate')+"</b> "+finishedLearners+" of "+ totalLearners;
 	}
-		
+			
 	/**
     * Sets the position of the gate, called from update
     * @param cm Canvas model object 
@@ -237,11 +224,6 @@ import mx.controls.*;
 		bg_pnl.setSize(s.w, bg_pnl.height);
 		bar_pnl.setSize(s.w-20, bar_pnl.height);
 		mm.endGate.tt_btn.setSize(s.w, bg_pnl.height);
-		
-		for (var i=0; i<finishedLearnersList.length; i++){
-			finishedLearnersList[i]._y = this._y + learner_Y;
-		}
-		
 	}
 	
 	/**
