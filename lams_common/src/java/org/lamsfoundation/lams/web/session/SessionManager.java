@@ -56,7 +56,7 @@ public class SessionManager{
 
 	private static final Logger log = Logger.getLogger(SessionManager.class);
 	
-	//signlton 
+	//singleton 
 	private static SessionManager sessionMgr;
 	//KEY: sessionId, each session will have an identified id. VALUE: SessionImpl instance, which contains 
 	//true session key/value pairs. 
@@ -95,7 +95,7 @@ public class SessionManager{
 	 */
 	public static HttpSession getSession(String sessionId){
 		if(sessionId == null){
-			log.error("Failed on finding current system session with null sessionId");
+			log.debug("Failed on finding current system session with null sessionId");
 			return null;
 		}
 		return (HttpSession) getInstance().sessionContainer.get(sessionId);
@@ -106,20 +106,18 @@ public class SessionManager{
 		//initialize a new one
 		HttpSession session = getInstance().new SessionImpl(sessionId);
 		getInstance().sessionContainer.put(sessionId,session);
-		// TODO remove this debugging - only put in to diagnose Ozgur's session problem
-		log.debug("SessionManager: creating new session "+sessionId);
 	}
 	
 	/**
 	 * Return  <code>SessionVisitor</code> of <code>currentSessionId</code>.
-	 * <strong>An internal method, only avaliable in package.</strong>
+	 * <strong>An internal method, only available in package.</strong>
 	 * @return
 	 */
 	static SessionVisitor getSessionVisitor() {
 		return (SessionVisitor)getSession();
 	}
 	/**
-	 * <strong>An internal method, only avaliable in package.</strong>
+	 * <strong>An internal method, only available in package.</strong>
 	 * @param currentSessionId
 	 */
 	static void setCurrentSessionId(String currentSessionId) {
@@ -177,11 +175,6 @@ public class SessionManager{
 		if(cookie != null){
 			currentSessionId = cookie.getValue();
 			Object obj = getSession(currentSessionId);
-			// TODO remove this debugging - only put in to diagnose Ozgur's session problem
-			if ( log.isDebugEnabled() ) {
-				log.debug("SessionManager: cookie is not null, currentSessionId="+currentSessionId
-						+" session="+obj);
-			}
 			//if cookie exist, but session does not. This usually menas seesion expired. 
 			//then delete the cookie first and set it null in order to create a new one
 			if(obj == null){
