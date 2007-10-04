@@ -59,23 +59,41 @@ public class CentralConstants {
 
 	public static final String METHOD_SCHEDULE = "schedule";
 
-	public static final String METHOD_DELETE = "delete";	
+	public static final String METHOD_DELETE = "delete";
+	
+	public static final String METHOD_STUDENT_PROGRESS = "studentProgress";
 	
 	public static final String PARAM_MODE = "mode";
 	
+	public static final String ATTR_COURSE_ID = "courseId";
 	
 	public static final String ELEM_LESSON = "Lesson";
+	
+	public static final String ELEM_LESSON_PROGRESS ="LessonProgress";
 	
 	public static final String ATTR_LESSON_ID = "lessonId";
 	
 	public static final String ATTR_DELETED = "deleted";
 	
+	public static final String ATTR_STUDENT_ID = "studentId";
+	
+	public static final String ATTR_LESSON_COMPLETE = "lessonComplete";
+	
+	public static final String ATTR_ACTIVITY_COUNT = "activityCount";
+	
+	public static final String ATTR_ACTIVITIES_COMPLETED = "activitiesCompleted";
+	
+	public static final String ATTR_PERCENTAGE_COMPLETE = "percentageComplete";
+	
+	public static final String ELEM_LEARNER_PROGRESS = "LearnerProgress";
 	
 	public static final String ELEM_FOLDER = "Folder";
 	
 	public static final String ELEM_LEARNING_DESIGN = "LearningDesign";
 	
 	public static final String ATTR_NAME = "name";
+	
+	public static final String ATTR_USERNAME = "username";
 	
 	public static final String ATTR_RESOURCE_ID = "resourceId";
 }

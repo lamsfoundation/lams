@@ -7,6 +7,8 @@ import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -30,14 +32,19 @@ import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.lesson.service.LessonService;
+import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 public class LessonManagerServlet extends HttpServlet {
 
@@ -49,6 +56,8 @@ public class LessonManagerServlet extends HttpServlet {
 
 	private static IMonitoringService monitoringService = null;
 
+	private static ILessonService lessonService = null;
+	
 	/**
 	 * Constructor of the object.
 	 */
@@ -130,7 +139,6 @@ public class LessonManagerServlet extends HttpServlet {
 				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
 
 			} else if (method.equals(CentralConstants.METHOD_DELETE)) {
-				lsId = new Long(lsIdStr);				
 				Boolean deleted = deleteLesson(serverId, datetime, hashValue,
 						username, lsId);
 
@@ -138,7 +146,12 @@ public class LessonManagerServlet extends HttpServlet {
 				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lsId.toString());
 				element.setAttribute(CentralConstants.ATTR_DELETED, deleted.toString());
 
-			} else {
+			}  else if (method.equals(CentralConstants.METHOD_STUDENT_PROGRESS)) {
+				lsId = new Long(lsIdStr);				
+				element = getAllStudentProgress(document, serverId, datetime, hashValue, 
+					username, lsId, courseId);
+			}	
+			else {
 				String msg = "Method :" + method + " is not recognised"; 
 				log.error(msg);
 				response.sendError(response.SC_BAD_REQUEST, msg);
@@ -201,6 +214,8 @@ public class LessonManagerServlet extends HttpServlet {
 		out.flush();
 		out.close();
 	}
+	
+	
 
 	public Long startLesson(String serverId, String datetime, String hashValue,
 			String username, long ldId, String courseId, String title,
@@ -264,6 +279,74 @@ public class LessonManagerServlet extends HttpServlet {
 		}
 	}
 
+	public Element getAllStudentProgress(Document document, String serverId, String datetime,
+			String hashValue, String username, long lsId, String courseID)
+			throws RemoteException
+	{
+		try {
+			ExtServerOrgMap serverMap = integrationService
+					.getExtServerOrgMap(serverId);
+			Authenticator
+					.authenticate(serverMap, datetime, username, hashValue);
+			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(
+					serverMap, username);
+			Lesson lesson = lessonService.getLesson(lsId);
+
+			Element element = document.createElement(CentralConstants.ELEM_LESSON_PROGRESS);
+			element.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);
+			
+			String prefix = serverMap.getPrefix();
+			if(lesson!=null){
+				
+				int activities = lesson.getLearningDesign().getActivities().size();
+				Iterator iterator = lesson.getLearnerProgresses().iterator();
+				while(iterator.hasNext()){
+	    			LearnerProgress learnProg = (LearnerProgress)iterator.next();
+	    			LearnerProgressDTO learnerProgress = learnProg.getLearnerProgressData();
+	    			
+	    			// get the username with the integration prefix removed
+	    			String userNoPrefixName = learnerProgress.getUserName().
+	    				substring(prefix.length()+1);		
+	    			ExtUserUseridMap learnerMap = integrationService.getExtUserUseridMap(
+	    					serverMap, userNoPrefixName);
+	    			
+	    			Element learnerProgElem = document.createElement(CentralConstants.ELEM_LEARNER_PROGRESS);
+	    			
+	    			int completedActivities = learnerProgress.getCompletedActivities().length;
+	    			
+	    			float percentageComplete;
+	    		
+	    			percentageComplete = (float)completedActivities/(float)activities;
+	    			percentageComplete *= 100;
+	    			
+	    			if(learnerProgElem.getNodeType()== Node.ELEMENT_NODE)
+	    			{
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_COMPLETE , "" + learnerProgress.getLessonComplete());
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITY_COUNT , "" + activities);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_COMPLETED , "" + completedActivities);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_PERCENTAGE_COMPLETE , "" + percentageComplete);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + learnerMap.getSid());
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_COURSE_ID, courseID);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, userNoPrefixName);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);	
+	    			}
+	    			
+	    			element.appendChild(learnerProgElem);
+				}
+	    	}
+			else{
+	    		throw new Exception("Lesson with lessonID: " + lsId + " could not be found for learner progresses");
+	    	}
+			
+			return element;
+			
+		} catch (Exception e) {
+			throw new RemoteException(e.getMessage(), e);
+		}
+		
+	}
+	
+	
 	public boolean deleteLesson(String serverId, String datetime,
 			String hashValue, String username, long lsId)
 			throws RemoteException {
@@ -280,6 +363,8 @@ public class LessonManagerServlet extends HttpServlet {
 			throw new RemoteException(e.getMessage(), e);
 		}
 	}
+	
+	
 
 	private void createLessonClass(Lesson lesson, Organisation organisation,
 			User creator) {
@@ -345,5 +430,9 @@ public class LessonManagerServlet extends HttpServlet {
 		monitoringService = (IMonitoringService) WebApplicationContextUtils
 				.getRequiredWebApplicationContext(getServletContext()).getBean(
 						"monitoringService");
+	
+		lessonService = (ILessonService) WebApplicationContextUtils
+				.getRequiredWebApplicationContext(getServletContext()).getBean(
+						"lessonService");
 	}
 }
