@@ -58,5 +58,10 @@ $string['notvalidconfirm'] = 'It seems the setting is not valid. Are you sure to
 $string['update'] = 'Update the lesson details';
 $string['updateExplanation'] = 'Please change name and description';
 $string['settingsValid'] = 'These settings are valid';
+$string['restcall503'] = 'The Moodle to LAMS REST call failed and returned an HTTP status of 503. This might mean that LAMS is unavailable. Please check the configurations settings and/or contact your system administrator.';
+$string['restcall403'] = 'The Moodle to LAMS REST call failed and returned an HTTP status of 403 Forbidden. Please check the configurations settings and/or contact your system administrator.';
+$string['restcall400'] = 'The Moodle to LAMS REST call failed and returned an HTTP status of 400 Bad Request. Please check the configurations settings and/or contact your system administrator.';
+$string['restcalldefault'] = 'The Moodle to LAMS REST call failed and returned an HTTP status of: ';
+$string['parsingerror'] = 'There has been an error parsing the rest response. Please contact your system administrator.';
 
 ?>
