@@ -39,7 +39,7 @@ class ToolOutputDefinition  {
 	private var _startValue:Object;
 	private var _endValue:Object;
 	
-	function ToolOutputCondition(){
+	function ToolOutputDefinition(){
 	}
 	
 	public function populateFromDTO(dto:Object):Void {
@@ -68,6 +68,14 @@ class ToolOutputDefinition  {
 	
 	public function get name():String {
 		return _name;
+	}
+	
+	public function set description(a:String) {
+		_description = a;
+	}
+	
+	public function get description():String {
+		return _description;
 	}
 	
 	public function set type(a:String) {

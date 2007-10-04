@@ -94,10 +94,10 @@ class Canvas extends CanvasHelper {
 
 
 		//Add listener to view so that we know when it's loaded
-        canvasView.addEventListener('load',Proxy.create(this,viewLoaded));
+        canvasView.addEventListener('load', Proxy.create(this,viewLoaded));
         
-		_ddm.addEventListener('ddmUpdate',Proxy.create(this,onDDMUpdated));
-		_ddm.addEventListener('ddmBeforeUpdate',Proxy.create(this,onDDMBeforeUpdate));
+		_ddm.addEventListener('ddmUpdate', Proxy.create(this,onDDMUpdated));
+		_ddm.addEventListener('ddmBeforeUpdate', Proxy.create(this,onDDMBeforeUpdate));
 		
         //Register view with model to receive update events
 		canvasModel.addObserver(canvasView);
@@ -517,7 +517,7 @@ b	 * @param   learningDesignID
 		
 		if(r.length > 0) {
 			for(var i=0; i < r.length; i++) {
-				Debugger.log("adding def: " + r[i].name, Debugger.CRITICAL, "setToolOutputDefinitions", "Canvas");
+				Debugger.log("adding def: " + r[i].name + " desc: " + r[i].description, Debugger.CRITICAL, "setToolOutputDefinitions", "Canvas");
 				toolActivity.addDefinition(r[i]);
 			}
 		}

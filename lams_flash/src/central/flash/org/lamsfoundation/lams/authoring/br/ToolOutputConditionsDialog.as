@@ -256,12 +256,17 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	}
 	
 	private function clearAllButton_onPress():Void {
+		for(var i=0; i < _condition_item_dgd.dataProvider.length; i++) {
+			app.getCanvas().ddm.removeOutputCondition(ToolOutputCondition(_condition_item_dgd.dataProvider[i].data).conditionUIID);
+		}
+		
 		_condition_item_dgd.removeAll();
 	}
 	
 	private function removeItemButton_onPress():Void {
-		var selectedItem = _condition_item_dgd.getItemAt(_condition_item_dgd.selectedIndex);
-		app.getCanvas().ddm.removeOutputCondition(selectedItem.conditionUIID);
+		var _selectedItem:ToolOutputCondition = ToolOutputCondition(_condition_item_dgd.dataProvider[_condition_item_dgd.selectedIndex].data);
+		
+		app.getCanvas().ddm.removeOutputCondition(_selectedItem.conditionUIID);
 		
 		_condition_item_dgd.removeItemAt(_condition_item_dgd.selectedIndex);
 	}
@@ -440,14 +445,14 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		_definitions = new Array();
 		
 		for(var i=0; i< a.length; i++) {
-			var newTOD = new ToolOutputDefinition();
+			var newTOD:ToolOutputDefinition = new ToolOutputDefinition();
 			newTOD.populateFromDTO(a[i]);
 			
 			_definitions.push(newTOD);
 		}
 		
 		_toolOutputDefin_cmb.dataProvider = _definitions;
-		_toolOutputDefin_cmb.labelFunction = function(itemObj){
+		_toolOutputDefin_cmb.labelFunction = function(itemObj) {
 			return (itemObj.description + " (" + ToolOutputConditionsDialog.getOutputType(itemObj.type) + ")");
 		}
 		
