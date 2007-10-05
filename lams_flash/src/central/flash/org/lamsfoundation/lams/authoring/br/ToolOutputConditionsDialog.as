@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.common.Dialog;
 import org.lamsfoundation.lams.common.style.*;
 import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.ui.LFMessage;
 
 import mx.controls.*
 import mx.controls.gridclasses.DataGridColumn;
@@ -252,7 +253,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	}
 	
 	private function addButton_onPress():Void {
-		addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), "unnamed", _selectedDefinition, _start_value_stp.value, _end_value_stp.value));
+		if(validateCondition(_selectedDefinition))
+			addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), "unnamed", _selectedDefinition, _start_value_stp.value, _end_value_stp.value));
 	}
 	
 	private function clearAllButton_onPress():Void {
@@ -306,6 +308,57 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private function removeAllItems():Void {
 		app.getCanvas().ddm.conditions.clear();
 		_condition_item_dgd.removeAll();
+	}
+	
+	private function validateCondition(selectedDefinition:ToolOutputDefinition):Boolean {
+		
+		switch(selectedDefinition.type) {
+			case ToolOutputDefinition.LONG:
+				return validateLongCondition(_start_value_stp.value, _end_value_stp.value)
+				break;
+			case ToolOutputDefinition.BOOL:
+				return true;
+			default: 
+				return false;
+		}
+	
+	}
+	
+	private function validateLongCondition(start_value:Number, end_value:Number) {
+		Debugger.log("validating Long Condition", Debugger.CRITICAL, "validateLongCondition", "ToolOutputconditiosDialog")
+		
+		if(start_value > end_value) {
+			LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_direction", [Dictionary.getValue("to_condition_start_value"), Dictionary.getValue("to_condition_end_value")]), null);
+			return false;
+		}
+		
+		for(var i=0; i<_condition_item_dgd.dataProvider.length; i++) {
+			var condition:ToolOutputCondition = ToolOutputCondition(_condition_item_dgd.dataProvider[i].data);
+			
+			Debugger.log("condition: " + condition, Debugger.CRITICAL, "validateLongCondition", "ToolOutputconditiosDialog");
+			Debugger.log("startValue: " + start_value + " / " + condition.startValue, Debugger.CRITICAL, "validateLongCondition", "ToolOutputconditiosDialog");
+			Debugger.log("endValue: " + end_value + " / " + condition.endValue, Debugger.CRITICAL, "validateLongCondition", "ToolOutputconditiosDialog");
+			
+			if(condition.exactMatchValue != null) {
+				if(start_value == condition.exactMatchValue) {
+					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_start_value")]), null);
+					return false;
+				} else if(end_value == condition.exactMatchValue) {
+					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_end_value")]), null);
+					return false;
+				}
+			} else { 
+				if(start_value >= condition.startValue && start_value <= condition.endValue) {
+					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_start_value")]), null);
+					return false;
+				} else if(end_value >= condition.startValue && end_value <= condition.endValue) {
+					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_end_value")]), null);
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	private function itemChanged(evt:Object):Void {
