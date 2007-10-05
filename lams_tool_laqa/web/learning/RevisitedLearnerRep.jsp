@@ -331,6 +331,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>				
 
 
+			<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
+				<c:if test="${generalLearnerFlowDTO.lockWhenFinished != 'true'}">
+					<br>
+					<html:button property="redoQuestions" styleClass="button"
+						onclick="submitMethod('redoQuestions');">
+						<fmt:message key="label.redo" />
+					</html:button>
+				</c:if>						
+			</c:if>
+
 			<c:if test="${generalLearnerFlowDTO.reflection == 'true' }">					
 					<h2>
 							<c:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeXml="false" />						
@@ -338,61 +348,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					<c:out value="${QaLearningForm.entryText}" escapeXml="false" />
 
-					<c:if test="${generalLearnerFlowDTO.lockWhenFinished == 'true' }">										
-						<br>
-								<html:button property="forwardtoReflection" styleClass="button"
-									onclick="submitMethod('forwardtoReflection');"> 
-									<fmt:message key="label.edit" />
-								</html:button>
-					</c:if>													
+					<br>
+					<html:button property="forwardtoReflection" styleClass="button"
+						onclick="submitMethod('forwardtoReflection');"> 
+						<fmt:message key="label.edit" />
+					</html:button>
 			</c:if>													
 				
-				<c:if
-					test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }">
-					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
+			<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
 
-						<c:if test="${generalLearnerFlowDTO.lockWhenFinished != 'true'}">
-							<br>
-							<html:button property="redoQuestions" styleClass="button"
-								onclick="submitMethod('redoQuestions');">
-								<fmt:message key="label.redo" />
-							</html:button>
-						</c:if>						
-
-						<div class="space-bottom-top align-right">
-								<html:button property="endLearning" styleId="finishButton"
-									onclick="javascript:submitMethod('endLearning');"
-									styleClass="button">
-									<fmt:message key="button.endLearning" />
-								</html:button>
-						</div>
-					</c:if>
-				</c:if>
-				
-				<c:if
-					test="${generalLearnerFlowDTO.requestLearningReportViewOnly == 'true' }">
-					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
-
-						<c:if test="${generalLearnerFlowDTO.lockWhenFinished != 'true'}">
-						<br>
-							<html:button property="redoQuestions" styleClass="button"
-								onclick="submitMethod('redoQuestions');">
-								<fmt:message key="label.redo" />
-							</html:button>
-						</c:if>						
-
-
-						<div class="space-bottom-top align-right" >
-								<html:button property="endLearning" styleId="finishButton"
-									onclick="javascript:submitMethod('endLearning');"
-									styleClass="button">
-									<fmt:message key="button.endLearning" />
-								</html:button>
-						</div>
-					</c:if>
-				</c:if>
-				
-				
+				<div class="space-bottom-top align-right">
+						<html:button property="endLearning" styleId="finishButton"
+							onclick="javascript:submitMethod('endLearning');"
+							styleClass="button">
+							<fmt:message key="button.endLearning" />
+						</html:button>
+				</div>
+			</c:if>
+						
 			</html:form>
 		</c:if>
 	</div>
