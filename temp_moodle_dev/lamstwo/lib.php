@@ -4,7 +4,7 @@
 require_once($CFG->libdir.'/datalib.php');
 require_once($CFG->libdir.'/moodlelib.php');
 require_once($CFG->libdir.'/soap/nusoap.php');
-
+require_once('lib.xml.inc.php');
 
 function lamstwo_add_instance($lamstwo) {
 /// Given an object containing all the necessary data,
@@ -253,32 +253,13 @@ function lamstwo_get_sequences_rest($username,$courseid,$country,$lang) {
 
 }
 
-      if (version_compare(PHP_VERSION,'5','>=')) {
+      $xml = utf8_encode($xml);
 
-      	 // if PHP5 then we use the xml dom implementation as per PHP5
+      $domdoc = new XML();
+      $domdoc->parseXML($xml);
+      $root = $domdoc->firstChild;
+      return lamstwo_process_node($root) . ']';
 
-            $xml = utf8_encode($xml);
-
-      	    $domdoc = new DOMDocument('1.0', 'UTF-8');
-	    if ($domdoc->loadXML($xml) == false ) {
-		 die(get_string("parsingerror", "lamstwo"));
-	    }
-
-	    $root = $domdoc->firstChild;
-
-	    return lamstwo_php5_process_node($root) . ']';
-
-
-      } else {
-
-      	// Assume PHP4. 
-
-
-
-      }
-
-
-      
 
 
 }
@@ -286,12 +267,15 @@ function lamstwo_get_sequences_rest($username,$courseid,$country,$lang) {
 
 /**
  * Get process REST output
+ * We use phpdomxml library for dom as there's conflicting implementation with the PHP4/PHP5 dom native implementations
+ * See (http://sourceforge.net/projects/phpdomxml) for further details. library: lib.xml.inc.php
+ * PHPdomxml is licensed under GNU GENERAL PUBLIC LICENSE
  *
  * @param string $node The XML DOM node to transform for the javascript tree.
  * @return string to define the tree structure
  * @TODO complete the documentation of this function
  */
-function lamstwo_php5_process_node($node) {
+function lamstwo_process_node($node) {
 
 	 if ($node->nodeName == 'Folder') {
 
@@ -303,7 +287,7 @@ function lamstwo_php5_process_node($node) {
 
 	       foreach($node->childNodes as $child) {
 
-	          $output = $output . lamstwo_php5_process_node($child);
+	          $output = $output . lamstwo_process_node($child);
 
 		  if ($child->nodeName == 'Folder') {
 
