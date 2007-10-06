@@ -36,7 +36,7 @@ set method "start"
 
 set hashSeq [lams2int::ws::generate_hash -datetime $datetime -username $username]
 
-set lesson_url "$lams_server_url/services/xml/LessonManager?method=$method&serverId=$server_id&ldId=$sequence_id&datetime=[ad_urlencode $datetime]&hashValue=$hashSeq&username=$username&courseId=$course_id&title=$name&desc=$introduction&country=AU&lang=en"
+set lesson_url "$lams_server_url/services/xml/LessonManager?method=$method&serverId=$server_id&ldId=$sequence_id&datetime=[ad_urlencode $datetime]&hashValue=$hashSeq&username=$username&courseId=$course_id&title=[ad_urlencode $name]&desc=[ad_urlencode $introduction]&country=AU&lang=en"
 
 
 set xml [lindex [ad_httpget -url $lesson_url -timeout 30] 1]
