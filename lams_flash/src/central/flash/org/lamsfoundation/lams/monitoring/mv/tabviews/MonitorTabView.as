@@ -53,6 +53,10 @@ import mx.controls.*;
 class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends CommonCanvasView {
 	
 	public static var _tabID:Number = 1;
+	
+	public static var HORIZONTAL = 1;
+	public static var VERTICAL = 2;
+	
 	private var _className = "MonitorTabView";
 	
 	private var _tm:ThemeManager;
@@ -62,7 +66,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 
 	private var learner_X:Number = 22;
 	private var learner_Y:Number = 19;
-	
+
 	private var drawDesignCalled:String;
 	
 	private var finishedLearnersList:Array;
@@ -72,6 +76,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	private var _monitorTabViewContainer_mc:MovieClip;
 	private var bkg_pnl:MovieClip;
 	private var _learnerContainer_mc:MovieClip;
+		
+	private var orig_width:Number;
+	private var orig_height:Number
+	private var firstRun:Number;
 	
 	/**
 	* Constructor
@@ -79,7 +87,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	function MonitorTabView(){
 		_monitorTabView = this;
 		_monitorTabViewContainer_mc = this;
-		
+				
 		_tm = ThemeManager.getInstance();
 		
         //Init for event delegation
@@ -92,11 +100,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	public function init(m:Observable,c:Controller){
 		//Invoke superconstructor, which sets up MVC relationships.
 		super (m, c);
-		mm = MonitorModel(model)
+		mm = MonitorModel(model);
 		
         //Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
+		
+		firstRun = 1;
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
 		mm.getMonitor().getMV().getMonitorSequenceScp()._visible = false;
@@ -350,27 +360,31 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	}
 	
 	/**
-	* Gets the Y Coordinate of the lowest activity that will be displayed on the canvas from the DesignDataModel
+	* Returns an object that contains the vertical and horizontal spans of the activities from the DesignDataModel
 	* 
 	* @usage   
 	* @param    
-	* @return  The Y Coordinate
+	* @return  span, the span object
 	*/
-	private function getLowestActivityYCoord():Number {
-			
-		var lowestActivity:Number = 0; //lowest position in layout
+	private function getActivitySpan():Object {
+				
 		var activeSeq:Sequence = MonitorModel(getModel()).getSequence();
 		var activitiesHash:Hashtable = activeSeq.getLearningDesignModel().activities;
 		var activityKeys:Array = activitiesHash.keys();
 		
+		var span = new Object();
+		span.x = 0;
+		span.y = 0;
+		
 		for(var i=0; i < activityKeys.length; i++) {
-			
-			if (activitiesHash.get(activityKeys[i]).yCoord  > lowestActivity) {
-				lowestActivity = activitiesHash.get(activityKeys[i]).yCoord;
+			if (activitiesHash.get(activityKeys[i]).xCoord > span.x) {
+				span.x = activitiesHash.get(activityKeys[i]).xCoord;
 			}
-		} 
-		Debugger.log("Lowest activity Y Coord from DDM: "+activitiesHash.get(activityKeys[i]).yCoord, Debugger.GEN, 'getLowestActivityYCoord', 'MonitorTabView');
-		return lowestActivity;
+			if (activitiesHash.get(activityKeys[i]).yCoord > span.y) {
+				span.y = activitiesHash.get(activityKeys[i]).yCoord;
+			}
+		}
+		return span;
 	}
 	
 	/**
@@ -438,8 +452,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		
 		return true;
 	}
-	
-	
+		
 	/**
 	 * Get the CSSStyleDeclaration objects for each component and apply them
 	 * directly to the instance
@@ -454,23 +467,28 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
     */
 	private function setSize(mm:MonitorModel):Void{
 
-		var activitySpan:Number = getLowestActivityYCoord();
-        var verticalSpacing:Number = 100;
 		var s:Object = mm.getSize();
+		var span:Object = getActivitySpan();
 		
-		Debugger.log("Setting canvas size, activitySpan: "+activitySpan, Debugger.CRITICAL, 'setSize', 'MonitorTabView');
+        var vSpacing:Number = 100;
+		var hSpacing:Number = 170;
 		
-		if (s.h > activitySpan) {
-			bkg_pnl.setSize(s.w, s.h);
-			var grid_mc = Grid.drawGrid(gridLayer,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
+		if (firstRun) { 
+			// Get original width/height as we want these values define the minimum size of the canvas
+			orig_width = Math.max((span.x + hSpacing), s.w);
+			orig_height = Math.max((span.y + vSpacing), s.h);
+			firstRun = 0;
 		} 
-		else {
-			bkg_pnl.setSize(s.w,activitySpan + verticalSpacing);
-			
-			//Create the grid.  The grid is re-drawn each time the canvas is resized.
-			var grid_mc = Grid.drawGrid(gridLayer,Math.round(s.w),Math.round(activitySpan + verticalSpacing), V_GAP, H_GAP);
-		}		
-			
+
+		var cvWidth:Number = Math.max(Math.max(orig_width, span.x + hSpacing), s.w);
+		var cvHeight:Number = Math.max(Math.max(orig_height, span.y + vSpacing), s.h);
+		
+		bkg_pnl.setSize(cvWidth,cvHeight);
+		bkg_pnl.redraw(true);
+						
+		//Create the grid.  The grid is re-drawn each time the canvas is resized.
+		var grid_mc = Grid.drawGrid(gridLayer,Math.round(cvWidth),Math.round(cvHeight), V_GAP, H_GAP);
+		gridLayer.redraw(true);
 		mm.getMonitor().getMV().getMonitorSequenceScp().redraw(true);
 	}
 	
