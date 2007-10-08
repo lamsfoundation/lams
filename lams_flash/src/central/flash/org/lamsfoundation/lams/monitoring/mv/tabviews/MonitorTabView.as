@@ -54,9 +54,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	
 	public static var _tabID:Number = 1;
 	
-	public static var HORIZONTAL = 1;
-	public static var VERTICAL = 2;
-	
 	private var _className = "MonitorTabView";
 	
 	private var _tm:ThemeManager;

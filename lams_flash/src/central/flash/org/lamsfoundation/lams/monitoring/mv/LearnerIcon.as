@@ -105,7 +105,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 		learnerOffset_X = _x;
 		learnerOffset_Y = _y;
 		
-		Debugger.log('Learner x pos and y pos : '+learnerOffset_X+ " and "+learnerOffset_Y ,4,'draw','LearnerIcon');
+		Debugger.log('Learner x pos and y pos : '+learnerOffset_X+ " and "+learnerOffset_Y ,4,'init','LearnerIcon');
 		
 		showAssets(false);
 		
@@ -150,7 +150,6 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	
 	
 	private function localOnPress():Void{
-	
 		
 		// check double-click
 		var now:Number = new Date().getTime();
@@ -169,7 +168,8 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 			_doubleClicking = false;
 			Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity for monitoring');
 			_clone_mc = ApplicationParent.root.attachMovie("learnerIcon", _name + "_clone", DepthManager.kTop, {_activity:_activity, learner:learner, _monitorController:_monitorController, _x:_x + org.lamsfoundation.lams.monitoring.Application.MONITOR_X, _y:_y + org.lamsfoundation.lams.monitoring.Application.MONITOR_Y, _hasPlus:_hasPlus, _clone: true });
-					
+			_clone_mc._y = 	_root._ymouse - ICON_HEIGHT/2;
+			_clone_mc._x = 	_root._xmouse - ICON_WIDTH/2
 			_monitorController.activityClick(_clone_mc, "LearnerIcon");
 			
 		}
@@ -197,6 +197,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	
 	private function localOnReleaseOutside():Void{
 		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
+		toolTip._visible = false;
 		_monitorController.activityRelease(_clone_mc, "LearnerIcon");
 		_clone_mc.removeMovieClip();
 	}
