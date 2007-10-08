@@ -59,6 +59,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private var _start_value_stp:NumericStepper;
 	private var _end_value_stp:NumericStepper;
 	
+	private var _opt_greaterThan_cb:CheckBox;
+	private var _opt_greaterThan_lbl:Label;
+	
 	private var add_btn:Button;
 	private var close_btn:Button;
 	private var cancel_btn:Button;
@@ -123,6 +126,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		remove_item_btn.addEventListener('click', Delegate.create(this, removeItemButton_onPress));
 		clear_all_btn.addEventListener('click', Delegate.create(this, clearAllButton_onPress));
 		
+		_opt_greaterThan_cb.addEventListener('click', Delegate.create(this, onGreaterThanSelect));
+		
 		_toolOutputDefin_cmb.addEventListener('change', Delegate.create(this, itemChanged));
 		
 		_condition_item_dgd.addEventListener('cellEdit', Delegate.create(this, itemEdited));
@@ -167,6 +172,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		add_btn.label = Dictionary.getValue("to_conditions_dlg_add_btn_lbl");
 		clear_all_btn.label = Dictionary.getValue("to_conditions_dlg_clear_all_btn_lbl");
 		remove_item_btn.label = Dictionary.getValue("to_conditions_dlg_remove_item_btn_lbl");
+		
+		_opt_greaterThan_lbl.text = "Greater than (>)";
 	
 		//Set the text for buttons
         close_btn.label = Dictionary.getValue('al_done');
@@ -198,6 +205,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		_condition_range_lbl.setStyle('styleName', styleObj);
 		_condition_from_lbl.setStyle('styleName', styleObj);
 		_condition_to_lbl.setStyle('styleName', styleObj);
+		_opt_greaterThan_lbl.setStyle('styleName', styleObj);
 		
 		styleObj = themeManager.getStyleObject('picombo');
 		_toolOutputDefin_cmb.setStyle('styleName', styleObj);
@@ -254,23 +262,42 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private function addButton_onPress():Void {
 		if(validateCondition(_selectedDefinition))
-			addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), "unnamed", _selectedDefinition, _start_value_stp.value, _end_value_stp.value));
+			if(Boolean(_opt_greaterThan_cb.value)) addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), "unnamed", _selectedDefinition, _start_value_stp.value, null));
+			else addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), "unnamed", _selectedDefinition, _start_value_stp.value, _end_value_stp.value));
 	}
 	
-	private function clearAllButton_onPress():Void {
-		for(var i=0; i < _condition_item_dgd.dataProvider.length; i++) {
-			app.getCanvas().ddm.removeOutputCondition(ToolOutputCondition(_condition_item_dgd.dataProvider[i].data).conditionUIID);
+	private function clearAllButton_onPress(evt:Object, c:Boolean):Void {
+		if(!app.getCanvas().ddm.hasBranchMappingsForConditionSet(_condition_item_dgd.dataProvider) || c) {
+		
+			for(var i=0; i<=_condition_item_dgd.dataProvider.length; i++) {
+				var conditionUIID:Number = ToolOutputCondition(_condition_item_dgd.dataProvider[i].data).conditionUIID;
+				app.getCanvas().ddm.removeOutputCondition(conditionUIID);
+		
+				if(c) {
+					app.getCanvas().ddm.removeBranchMappingsByCondition(conditionUIID);
+				}
+				
+				_condition_item_dgd.removeAll();
+			}
+			
+		} else {
+			LFMessage.showMessageConfirm("There are conditions linked to an existing branch. Do you wish to continue?", Proxy.create(this, clearAllButton_onPress, evt, true), null, "continue", null, "Warning");
 		}
 		
-		_condition_item_dgd.removeAll();
 	}
 	
-	private function removeItemButton_onPress():Void {
+	private function removeItemButton_onPress(evt:Object, c:Boolean):Void {
 		var _selectedItem:ToolOutputCondition = ToolOutputCondition(_condition_item_dgd.dataProvider[_condition_item_dgd.selectedIndex].data);
 		
-		app.getCanvas().ddm.removeOutputCondition(_selectedItem.conditionUIID);
+		if(!app.getCanvas().ddm.hasBranchMappingsForCondition(_selectedItem.conditionUIID) || c) {
+			removeCondition(_selectedItem.conditionUIID, _condition_item_dgd.selectedIndex);
+		} else {
+			LFMessage.showMessageConfirm("WARNING: This condition is linked to an existing branch. Do you wish to continue?", Proxy.create(this, removeItemButton_onPress, evt, true), null, "continue", null, "");
+		}
 		
-		_condition_item_dgd.removeItemAt(_condition_item_dgd.selectedIndex);
+		if(c)
+			app.getCanvas().ddm.removeBranchMappingsByCondition(_selectedItem.conditionUIID);
+		
 	}
 	
 	/**
@@ -286,6 +313,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 			case ToolOutputDefinition.LONG :
 				if(condition.startValue != null && condition.endValue != null)
 					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value", [String(condition.startValue), String(condition.endValue)]), data: condition});
+				else if(condition.startValue != null && condition.endValue == null)
+					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_max", [String(condition.startValue)]), data: condition});
 				else
 					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_exact", [String(condition.exactMatchValue)]), data: condition});
 				
@@ -301,8 +330,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 	}
 	
-	private function removeCondition(conditionUIID:Number):Void {
+	private function removeCondition(conditionUIID:Number, index:Number):Void {
 		app.getCanvas().ddm.removeOutputCondition(conditionUIID);
+		_condition_item_dgd.removeItemAt(index);
 	}
 	
 	private function removeAllItems():Void {
@@ -314,7 +344,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 		switch(selectedDefinition.type) {
 			case ToolOutputDefinition.LONG:
-				return validateLongCondition(_start_value_stp.value, _end_value_stp.value)
+				return (Boolean(_opt_greaterThan_cb.value)) ? validateLongCondition(_start_value_stp.value, null) : validateLongCondition(_start_value_stp.value, _end_value_stp.value)
 				break;
 			case ToolOutputDefinition.BOOL:
 				return true;
@@ -326,6 +356,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private function validateLongCondition(start_value:Number, end_value:Number) {
 		Debugger.log("validating Long Condition", Debugger.CRITICAL, "validateLongCondition", "ToolOutputconditiosDialog")
+		
+		Debugger.log("start:" + start_value, Debugger.CRITICAL, "validateLongCondition", "ToolOutputconditiosDialog")
+		Debugger.log("end:" + end_value, Debugger.CRITICAL, "validateLongCondition", "ToolOutputconditiosDialog")
 		
 		if(start_value > end_value) {
 			LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_direction", [Dictionary.getValue("to_condition_start_value"), Dictionary.getValue("to_condition_end_value")]), null);
@@ -357,7 +390,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				}
 			}
 		}
-		
+			
 		return true;
 	}
 	
@@ -372,7 +405,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				if(evt != null) removeAllItems();
 		
 				_start_value_stp.visible = true;
-				_end_value_stp.visible = true;
+				_end_value_stp.visible = !_opt_greaterThan_cb.value;
 				
 				_start_value_stp.minimum = Number(_selectedDefinition.startValue);
 				_end_value_stp.minimum = Number(_selectedDefinition.startValue);
@@ -381,6 +414,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				
 				_start_value_stp.value = Number(_selectedDefinition.startValue);
 				_end_value_stp.value = Number(_selectedDefinition.endValue);
+				
+				_opt_greaterThan_cb.visible = true;
+				_opt_greaterThan_lbl.visible = true;
 				
 				add_btn.visible = true;
 				clear_all_btn.enabled = true;
@@ -396,6 +432,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				
 				_start_value_stp.visible = false;
 				_end_value_stp.visible = false;
+				
+				_opt_greaterThan_cb.visible = false;
+				_opt_greaterThan_lbl.visible = false;
 				
 				add_btn.visible = false;
 				clear_all_btn.enabled = false;
@@ -429,8 +468,10 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	public function itemSelected(evt:Object):Void {
 		var item = _condition_item_dgd.getItemAt(evt.itemIndex);
-		
-		Debugger.log("current selection: " + Selection.getFocus(), Debugger.CRITICAL, "itemSelected", "GroupNamingDialog");
+	}
+	
+	private function onGreaterThanSelect(evt:Object):Void {
+		_end_value_stp.visible = !evt.target.value;
 	}
 
 	public static function getOutputType(type:String):String {

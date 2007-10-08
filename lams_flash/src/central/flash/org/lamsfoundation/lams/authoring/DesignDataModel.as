@@ -349,7 +349,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 */
 	public function removeBranchMapping(entryUIID):Object{
 		//dispatch an event to show the design has changed
-		dispatchEvent({type:'ddmBeforeUpdate',target:this});
+		dispatchEvent({type:'ddmBeforeUpdate', target:this});
 		
 		var r:Object = _branchMappings.remove(entryUIID);
 		if(r==null){
@@ -877,10 +877,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public function hasBranchMappingsForGroupingUIID(groupingUIID:Number):Boolean {
 		var bMappings:Array = _branchMappings.values();
-		Debugger.log("checking for branch mappings", Debugger.CRITICAL, "hasBranch*", "DDM");
 		for(var i=0; i<bMappings.length; i++) {
-			Debugger.log("parentID: " + bMappings[i].group.parentID, Debugger.CRITICAL, "hasBranch*", "DDM");
-		
 			if(bMappings[i].group.parentID == groupingUIID) return true;
 		}
 		
@@ -900,6 +897,32 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		for(var i=0; i<bMappings.length; i++) {
 			if(bMappings[i].group.groupUIID == groupUIID) _branchMappings.remove(bMappings[i].entryUIID);
+		}
+	}
+	
+	public function hasBranchMappingsForCondition(conditionUIID:Number):Boolean {
+		var bMappings:Array = _branchMappings.values();
+		for(var i=0; i<bMappings.length; i++) {
+			if(bMappings[i].condition.conditionUIID == conditionUIID) return true;
+		}
+		
+		return false;
+	}
+	
+	public function hasBranchMappingsForConditionSet(dataProvider:Array):Boolean {
+		for(var i=0; i<=dataProvider.length; i++) {
+			if(hasBranchMappingsForCondition(ToolOutputCondition(dataProvider[i].data).conditionUIID))
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public function removeBranchMappingsByCondition(conditionUIID:Number):Void {
+		var bMappings:Array = _branchMappings.values();
+		
+		for(var i=0; i<bMappings.length; i++) {
+			if(bMappings[i].condition.conditionUIID == conditionUIID) _branchMappings.remove(bMappings[i].entryUIID);
 		}
 	}
 	
