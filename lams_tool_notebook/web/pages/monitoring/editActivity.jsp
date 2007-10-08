@@ -2,6 +2,12 @@
 
 <c:set var="dto" value="${notebookDTO}" />
 
+<c:if test="${dto.contentInUse}">
+	<p class="warning">
+		<fmt:message key="message.alertContentEdit" />
+	</p>
+</c:if>
+
 <table cellspacing="0">
 	<tbody>
 		<tr>
@@ -24,23 +30,14 @@
 </table>
 
 <p class="align-right">
-	<c:choose>
-		<c:when test="${not dto.contentInUse}">
-			<c:url value="/authoring.do" var="authoringUrl">
-				<c:param name="toolContentID" value="${dto.toolContentId}" />
-				<c:param name="mode" value="teacher" />
-				<c:param name="contentFolderID" value="${contentFolderID}" />
-			</c:url>
-			<html:link href="${authoringUrl}" styleClass="button" target="_blank">
-				<fmt:message key="button.editActivity" />
-			</html:link>
-		</c:when>
-		<c:otherwise>
-			<p>
-				<fmt:message key="message.contentInUseSet" />
-			</p>
-		</c:otherwise>
-	</c:choose>
+	<c:url value="/authoring.do" var="authoringUrl">
+		<c:param name="toolContentID" value="${dto.toolContentId}" />
+		<c:param name="mode" value="teacher" />
+		<c:param name="contentFolderID" value="${contentFolderID}" />
+	</c:url>
+	<html:link href="${authoringUrl}" styleClass="button" target="_blank">
+		<fmt:message key="button.editActivity" />
+	</html:link>
 </p>
 
 
