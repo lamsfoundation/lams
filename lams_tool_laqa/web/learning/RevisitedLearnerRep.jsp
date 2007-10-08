@@ -279,6 +279,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</div>
 				</c:forEach>
 				
+				<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
+					<c:if test="${generalLearnerFlowDTO.lockWhenFinished != 'true'}">
+						<br>
+						<html:button property="redoQuestions" styleClass="button"
+							onclick="submitMethod('redoQuestions');">
+							<fmt:message key="label.redo" />
+						</html:button>
+					</c:if>						
+				</c:if>
+
 				
 				<c:if test="${generalLearnerFlowDTO.existMultipleUserResponses == 'true'}">				
 					<h2>
@@ -331,24 +341,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>				
 
 
-			<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
-				<c:if test="${generalLearnerFlowDTO.lockWhenFinished != 'true'}">
-					<br>
-					<html:button property="redoQuestions" styleClass="button"
-						onclick="submitMethod('redoQuestions');">
-						<fmt:message key="label.redo" />
-					</html:button>
-				</c:if>						
-			</c:if>
-
 			<c:if test="${generalLearnerFlowDTO.reflection == 'true' }">					
 					<h2>
 							<c:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeXml="false" />						
 					</h2>
 
-					<c:out value="${QaLearningForm.entryText}" escapeXml="false" />
+					<p><c:out value="${QaLearningForm.entryText}" escapeXml="false" /></p>
 
-					<br>
 					<html:button property="forwardtoReflection" styleClass="button"
 						onclick="submitMethod('forwardtoReflection');"> 
 						<fmt:message key="label.edit" />
