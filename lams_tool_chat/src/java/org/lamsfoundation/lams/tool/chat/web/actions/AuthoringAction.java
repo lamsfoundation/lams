@@ -123,14 +123,6 @@ public class AuthoringAction extends LamsDispatchAction {
 			// TODO NOTE: this causes DB orphans when LD not saved.
 		}
 
-		// check if content in use is set
-		if (chat.isContentInUse()) {
-			// Cannot edit, send to message page.
-			request.setAttribute(ChatConstants.ATTR_MESSAGE, getResources(
-					request).getMessage("error.content.locked"));
-			return mapping.findForward("message_page");
-		}
-
 		if (mode != null && mode.isTeacher()) {
 			// Set the defineLater flag so that learners cannot use content
 			// while we
