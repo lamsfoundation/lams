@@ -60,33 +60,6 @@ public class NbWebUtil {
 	 		
 	 	}
 	 	
-	     /**
-	      * <p> This method checks the two tool content flags, defineLater and contentInUse
-	      * to determine whether the tool content is modifiable or not. Returns true if the content is
-	      * modifiable and false otherwise 
-	      * <br>Tool content is modifiable if:
-	      * <li>defineLater is set to true</li>
-	      * <li>defineLater is set to false and contentInUse is set to false</li>
-	      * <br>Tool content is not modifiable if:
-	      * <li>contentInUse is set to true</li></p>
-	      * @param content The instance of NoticeboardContent to check
-	      * @return true if content is modifiable and false otherwise
-	      * @throws NbApplicationException
-	      */
-	     public static boolean isContentEditable(NoticeboardContent content) throws NbApplicationException
-	     {
-	         if ( (content.isDefineLater() == true) && (content.isContentInUse()==true) )
-	         {
-	             throw new NbApplicationException("An exception has occurred: There is a bug in this tool, conflicting flags are set");
-	                     //return false;
-	         }
-	         else if ( (content.isDefineLater() == true) && (content.isContentInUse() == false))
-	             return true;
-	         else if ( (content.isDefineLater() == false) && (content.isContentInUse() == false))
-	             return true;
-	         else //  (content.isContentInUse()==true && content.isDefineLater() == false)
-	             return false;
-	     }
 	     
 	     /**
 	     * <p>This method is used in authoring and monitoring to display the list of files that have been uploaded.

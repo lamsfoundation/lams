@@ -109,17 +109,13 @@ public class NbMonitoringAction extends LamsDispatchAction {
     	monitorForm.setOfflineInstructions(content.getOfflineInstructions());
 		monitorForm.setAttachmentsList(NbWebUtil.setupAttachmentList(nbService, content));
 
-		if ( NbWebUtil.isContentEditable(content) ) {
-			monitorForm.setContentEditable("true");
-		    //set up the request parameters to append to the URL
-		    Map<String,Object> map = new HashMap<String,Object>();
-		    map.put(NoticeboardConstants.TOOL_CONTENT_ID, toolContentId.toString());
-		    map.put(NoticeboardConstants.DEFINE_LATER, "true");
-		    map.put(NoticeboardConstants.CONTENT_FOLDER_ID, contentFolderID);
-		    monitorForm.setParametersToAppend(map);
-		} else {
-			monitorForm.setContentEditable("false");
-		}
+		monitorForm.setContentEditable("true");
+	    //set up the request parameters to append to the URL
+	    Map<String,Object> mapParameters = new HashMap<String,Object>();
+	    mapParameters.put(NoticeboardConstants.TOOL_CONTENT_ID, toolContentId.toString());
+	    mapParameters.put(NoticeboardConstants.DEFINE_LATER, "true");
+	    mapParameters.put(NoticeboardConstants.CONTENT_FOLDER_ID, contentFolderID);
+	    monitorForm.setParametersToAppend(mapParameters);
 		
         //Get the total number of learners that have participated in this tool activity
         monitorForm.setTotalLearners(nbService.calculateTotalNumberOfUsers(toolContentId));

@@ -163,28 +163,14 @@ public class NbAuthoringAction extends LamsDispatchAction {
 			 * author is not allowed to edit content 
 			 */
 			
-			if (NbWebUtil.isContentEditable(nb))
-			{
-			    /* Define later set to true when the edit activity tab is brought up 
-			     * So that users cannot start using the content while the staff member is editing the content */
-			    nbForm.populateFormWithNbContentValues(nb);
-			    nbForm.setContentFolderID(contentFolderId);
-			    nb.setDefineLater(Boolean.parseBoolean(nbForm.getDefineLater()));
-			    nbService.saveNoticeboard(nb);
+		    /* Define later set to true when the edit activity tab is brought up 
+		     * So that users cannot start using the content while the staff member is editing the content */
+		    nbForm.populateFormWithNbContentValues(nb);
+		    nbForm.setContentFolderID(contentFolderId);
+		    nb.setDefineLater(Boolean.parseBoolean(nbForm.getDefineLater()));
+		    nbService.saveNoticeboard(nb);
 			    
-			    /** TODO: setup values in the instructions map */
-			 
-			}
-			else
-			{
-			    //The contentInUse flag is set and a user has already reached this activity.
-			    saveMessages(request, null); //ensure there are no existing messages
-			    ActionMessages message = new ActionMessages();
-			    message.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.contentInUseSet"));
-			    saveMessages(request, message);
-			    return mapping.findForward(NoticeboardConstants.DISPLAY_MESSAGE);
-			    
-			}
+		    /** TODO: setup values in the instructions map */
 			
 			//Setup the map containing the files that have been uploaded for this particular tool content id
 			attachmentList = NbWebUtil.setupAttachmentList(nbService,nb);
