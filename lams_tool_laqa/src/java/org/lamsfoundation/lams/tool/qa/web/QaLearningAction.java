@@ -347,10 +347,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
  	    logger.debug("httpSessionID: " + httpSessionID);
  	    
 	    SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	    logger.debug("sessionMap: " + sessionMap);
-	    
-	    Map mapSequentialAnswers= new HashMap();
-	    sessionMap.put(MAP_SEQUENTIAL_ANSWERS_KEY, mapSequentialAnswers);
 	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	    qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
 		generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
@@ -488,49 +484,42 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
     	
     	logger.debug("mapQuestions: " + mapQuestions);
-    	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
     	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
     	generalLearnerFlowDTO.setMapQuestions(mapQuestions);
     	logger.debug("mapQuestions has : " + mapQuestions.size() + " entries.");
 
     	
-    	if (mapAnswers != null)
-    	{
-    	    String currentAnswer=(String)mapAnswers.get("1");
-    	    logger.debug("first entry as the current answer : " + currentAnswer);
-    	    generalLearnerFlowDTO.setCurrentAnswer(currentAnswer);
-    	}
-    	else
-    	{
-    	    logger.debug("since mapAnswers is null recreate it");
+    	if (mapAnswers == null)
+    	{   
     	    mapAnswers= new TreeMap(new QaComparator());
-        	Iterator itMapQuestions = mapQuestions.entrySet().iterator();
-        	
-        	while (itMapQuestions.hasNext()) 
-        	{
-            	Map.Entry pairs = (Map.Entry)itMapQuestions.next();
-            	mapAnswers.put(pairs.getKey(), "");
+    		// maybe we have come in from the review screen, if so get the answers from db.
+    	    if ( mapAnswersFromDb.size() > 0 ) {
+            	Iterator itMapAnswers = mapAnswersFromDb.entrySet().iterator();
+            	while (itMapAnswers.hasNext()) 
+            	{
+                	Map.Entry pairs = (Map.Entry)itMapAnswers.next();
+                	mapAnswers.put(pairs.getKey().toString(), pairs.getValue());
+            	}
+    	    	mapAnswers.putAll(mapAnswersFromDb);
+    	    } else {
+            	Iterator itMapQuestions = mapQuestions.entrySet().iterator();
+            	while (itMapQuestions.hasNext()) 
+            	{
+                	Map.Entry pairs = (Map.Entry)itMapQuestions.next();
+                	mapAnswers.put(pairs.getKey(), "");
 
-        	}
-        	logger.debug("mapAnswers : " + mapAnswers);
-        	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
-        	logger.debug("mapQuestions: " + mapQuestions);
-    	}
-
-    	
-    	if (isResponseFinalized)
-    	{
-    	    logger.debug("isResponseFinalized is true");
-    	    logger.debug("mapAnswersFromDb: " + mapAnswersFromDb);
-    	    if (mapAnswersFromDb.size() > 0)
-    	    {
-        	    logger.debug("since isResponseFinalized, use mapAnswersFromDb");
-        	    generalLearnerFlowDTO.setMapAnswers(mapAnswersFromDb);
+            	}
     	    }
     	}
-    	
-    	
+    	    
+    	String currentAnswer=(String)mapAnswers.get("1");
+    	logger.debug("first entry as the current answer : " + currentAnswer);
+    	generalLearnerFlowDTO.setCurrentAnswer(currentAnswer);    	    
+
+	    sessionMap.put(MAP_SEQUENTIAL_ANSWERS_KEY, mapAnswers);
+
     	logger.debug("final mapAnswers : " + mapAnswers);
+	    generalLearnerFlowDTO.setMapAnswers(mapAnswers);
     	sessionMap.put(MAP_ALL_RESULTS_KEY, mapAnswers);
     	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		
@@ -539,7 +528,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(mapQuestions.size()));
     	qaLearningForm.setTotalQuestionCount(new Integer(mapQuestions.size()).toString());
         generalLearnerFlowDTO.setRemainingQuestionCount(new Integer(mapQuestions.size()).toString());
-    	
     	
 	    request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 		logger.debug("GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(GENERAL_LEARNER_FLOW_DTO));
