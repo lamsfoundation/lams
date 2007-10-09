@@ -36,19 +36,6 @@ import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
  */
 public class SbmtWebUtils {
 
-	public static boolean isSbmtEditable(SubmitFilesContent submitContent) {
-        if ( (submitContent.isDefineLater() == true) && (submitContent.isContentInUse()==true) )
-        {
-            throw new SubmitFilesException("An exception has occurred: There is a bug in this tool, conflicting flags are set");
-                    //return false;
-        }
-        else if ( (submitContent.isDefineLater() == true) && (submitContent.isContentInUse() == false))
-            return true;
-        else if ( (submitContent.isDefineLater() == false) && (submitContent.isContentInUse() == false))
-            return true;
-        else //  (content.isContentInUse()==true && content.isDefineLater() == false)
-            return false;
-	}
-
+ // We'll leave this here for future use 
 
 }

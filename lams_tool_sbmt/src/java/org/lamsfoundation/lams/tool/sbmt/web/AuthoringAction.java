@@ -117,16 +117,10 @@ public class AuthoringAction extends LamsDispatchAction {
 		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
 		
 		if(mode.isTeacher()){
-			boolean isForumEditable = SbmtWebUtils.isSbmtEditable(persistContent);
-			if(!isForumEditable){
-				request.setAttribute(SbmtConstants.PAGE_EDITABLE, new Boolean(isForumEditable));
-				return mapping.findForward("forbidden");
-			}
+
+			persistContent.setDefineLater(true);
+			submitFilesService.saveOrUpdateContent(persistContent);
 			
-			if(!persistContent.isContentInUse()){
-				persistContent.setDefineLater(true);
-				submitFilesService.saveOrUpdateContent(persistContent);
-			}
 		}
 		
 		//if this content does not exist(empty without id), create a content by default content record.

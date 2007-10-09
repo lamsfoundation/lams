@@ -135,12 +135,12 @@ public class MonitoringAction extends LamsDispatchAction {
 		
 		AuthoringDTO authorDto = new AuthoringDTO(persistContent);
 		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
-		request.setAttribute(SbmtConstants.PAGE_EDITABLE, new Boolean(SbmtWebUtils.isSbmtEditable(persistContent)));
+		request.setAttribute(SbmtConstants.PAGE_EDITABLE, persistContent.isContentInUse());
 		
 		return mapping.findForward("success");
     }
     /**
-     * AJAX call to refresh statisitic page.
+     * AJAX call to refresh statistic page.
      * @param mapping
      * @param form
      * @param request
