@@ -156,7 +156,7 @@ public class MonitoringAction extends Action {
 		
 		//cache into sessionMap
 		sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
-		sessionMap.put(ResourceConstants.PAGE_EDITABLE, new Boolean(ResourceWebUtils.isResourceEditable(resource)));
+		sessionMap.put(ResourceConstants.PAGE_EDITABLE, resource.isContentInUse());
 		sessionMap.put(ResourceConstants.ATTR_RESOURCE, resource);
 		sessionMap.put(ResourceConstants.ATTR_TOOL_CONTENT_ID, contentId);
 		sessionMap.put(ResourceConstants.ATTR_REFLECT_LIST, relectList);

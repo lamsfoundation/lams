@@ -37,19 +37,5 @@ import org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction;
  */
 public class ResourceWebUtils {
 
-	public static boolean isResourceEditable(Resource resource) {
-	        if ( (resource.isDefineLater() == true) && (resource.isContentInUse()==true) )
-	        {
-	//            throw new ResourceApplicationException("An exception has occurred: There is a bug in this tool, conflicting flags are set");
-	        	 MonitoringAction.log.error("An exception has occurred: There is a bug in this tool, conflicting flags are set");
-	             return false;
-	        }
-	        else if ( (resource.isDefineLater() == true) && (resource.isContentInUse() == false))
-	            return true;
-	        else if ( (resource.isDefineLater() == false) && (resource.isContentInUse() == false))
-	            return true;
-	        else //  (content.isContentInUse()==true && content.isDefineLater() == false)
-	            return false;
-		}
-	
+// We leave this blank for future use
 }

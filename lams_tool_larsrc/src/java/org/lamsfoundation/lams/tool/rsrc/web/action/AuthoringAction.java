@@ -113,16 +113,8 @@ public class AuthoringAction extends Action {
 			IResourceService service = getResourceService();
 			Resource resource = service.getResourceByContentId(contentId);
 			
-			boolean isEditable = ResourceWebUtils.isResourceEditable(resource);
-			if(!isEditable){
-				request.setAttribute(ResourceConstants.PAGE_EDITABLE, new Boolean(isEditable));
-				return mapping.findForward("forbidden");
-			}
-			
-			if(!resource.isContentInUse()){
-				resource.setDefineLater(true);
-				service.saveOrUpdateResource(resource);
-			}
+			resource.setDefineLater(true);
+			service.saveOrUpdateResource(resource);
 			
 			request.setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER.toString());
 			return start(mapping, form, request, response);
