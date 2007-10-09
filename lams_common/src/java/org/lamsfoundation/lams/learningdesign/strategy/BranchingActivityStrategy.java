@@ -130,8 +130,12 @@ public class BranchingActivityStrategy extends ComplexActivityStrategy
      */
    protected void setUpContributionType(ArrayList<Integer> contributionTypes)
     {
-		if ( branchingActivity != null && branchingActivity.isChosenBranchingActivity()) {
+		if ( branchingActivity != null ) {
+			if ( branchingActivity.isChosenBranchingActivity() ) {
 			    contributionTypes.add(ContributionTypes.CHOSEN_BRANCHING);
+			} else if(branchingActivity.getDefineLater().booleanValue()) {
+				    contributionTypes.add(ContributionTypes.DEFINE_LATER);
+			}
 		}
     }
     
