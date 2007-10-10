@@ -194,7 +194,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 	
 		if ( mappingEntries != null ) {
 			Iterator mappingIter = mappingEntries.iterator();
-			if ( mappingIter.hasNext() )  {
+			while ( mappingIter.hasNext() )  {
 				// Not all the BranchEntries have groups - when in preview, if the user selects a different
 				// branch to their expected branch then a group may not exist yet.
 				Group group = ((BranchActivityEntry) mappingIter.next()).getGroup();

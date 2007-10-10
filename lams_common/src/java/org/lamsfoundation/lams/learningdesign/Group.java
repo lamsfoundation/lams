@@ -345,6 +345,12 @@ public class Group implements Serializable,Nullable,Comparable {
     	return getToolSessions().size() == 0;
     }
 
+    /** May this group be deleted or a user from this group deleted? It should not be 
+     * deleted if there are tool sessions attached */
+    public boolean isUsedForActivity() {
+    	return getToolSessions().size() == 0;
+    }
+
     /** Create a copy of this group, without copying the users or tool sessions. 
      * Copies any group to branch mappings, updating the group but not the activity. */
     @SuppressWarnings("unchecked")
@@ -366,5 +372,20 @@ public class Group implements Serializable,Nullable,Comparable {
 		}
 		getBranchActivities().add(entry);
 		return entry;
+    }
+    
+    /** Remove the branch with which this group is associated.
+     */
+    public void removeGroupFromBranch(SequenceActivity branch) {
+    	if ( getBranchActivities() != null ) {
+    		Iterator iter = getBranchActivities().iterator();
+    		while (iter.hasNext()) {
+				BranchActivityEntry object = (BranchActivityEntry) iter.next();
+				if ( object.getBranchSequenceActivity().equals(branch) ) {
+					iter.remove();
+				}
+			}
+    	}
+    	// branch.getGroupsForBranch().remove(this);
     }
 }

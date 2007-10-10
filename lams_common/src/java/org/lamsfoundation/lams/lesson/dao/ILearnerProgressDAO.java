@@ -25,9 +25,13 @@ package org.lamsfoundation.lams.lesson.dao;
 
 import java.util.List;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
  * Inteface defines Lesson DAO Methods
@@ -100,4 +104,23 @@ public interface ILearnerProgressDAO
      * @return List<User>
      */
 	public List<User> getLearnersHaveCompletedActivity(final Activity activity);
+	
+	/**
+     * Count of the number of users that have attempted or completed an activity. Useful for activities that don't have 
+     * tool sessions.
+     * 
+     * @param activityId
+     * @return List<User>
+     */
+	public Integer getNumUsersAttemptedActivity(final Activity activity);
+
+
+	/**
+     * Count of the number of users that have completed an activity. Useful for activities that don't have 
+     * tool sessions.
+     * 
+     * @param activityId
+     * @return List<User>
+     */
+	public Integer getNumUsersCompletedActivity(final Activity activity) ;
  }

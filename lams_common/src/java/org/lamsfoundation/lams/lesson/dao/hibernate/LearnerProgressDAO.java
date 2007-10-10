@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -54,6 +53,13 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
    // 	"or activity in elements(p.previousActivity) or activity in elements(p.completedActivities)";
 	private final static String LOAD_COMPLETED_PROGRESS_BY_LESSON = 
         "from LearnerProgress p where p.lessonComplete = true and p.lesson.id = :lessonId";
+
+	private final static String COUNT_ATTEMPTED_ACTIVITY ="select count(*) from LearnerProgress prog, "
+		+" Activity act where act.id = :activityId and " 
+		+" act in elements(prog.attemptedActivities)";
+	private final static String COUNT_COMPLETED_ACTIVITY ="select count(*) from LearnerProgress prog, "
+		+" Activity act where act.id = :activityId and " 
+		+" act in elements(prog.completedActivities)";
 
     /**
      * Retrieves the Lesson
@@ -183,6 +189,29 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     }
 	
 	/**
+     * Count of the number of users that have attempted or completed an activity. Useful for activities that don't have 
+     * tool sessions.
+     * 
+     * @param activityId
+     * @return List<User>
+     */
+	public Integer getNumUsersAttemptedActivity(final Activity activity) 
+    {
+       HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+       Integer attempted = (Integer) hibernateTemplate.execute(new HibernateCallback() {
+            public Object doInHibernate(Session session)
+                    throws HibernateException {
+            	Object value = session.createQuery(COUNT_ATTEMPTED_ACTIVITY)
+    	    		.setLong("activityId", activity.getActivityId().longValue())
+    	    	 	.uniqueResult();
+    	    	return new Integer (((Number)value).intValue()); 
+            }
+        });
+       return new Integer(attempted.intValue() + getNumUsersCompletedActivity(activity).intValue());
+    }
+	
+
+	/**
      * Get all the users records where the user has completed the given activity. Uses the progress records
      * to determine the users.
      * 
@@ -207,4 +236,26 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 	    
 	    return learners;
     }
+	
+	/**
+     * Count of the number of users that have completed an activity. Useful for activities that don't have 
+     * tool sessions.
+     * 
+     * @param activityId
+     * @return List<User>
+     */
+	public Integer getNumUsersCompletedActivity(final Activity activity) 
+    {
+       HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+        return (Integer) hibernateTemplate.execute(new HibernateCallback() {
+            public Object doInHibernate(Session session)
+                    throws HibernateException {
+            	Object value = session.createQuery(COUNT_COMPLETED_ACTIVITY)
+    	    		.setLong("activityId", activity.getActivityId().longValue())
+    	    	 	.uniqueResult();
+    	    	return new Integer (((Number)value).intValue()); 
+            }
+        });
+    }
+
 }

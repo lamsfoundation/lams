@@ -23,7 +23,11 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.web.action;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.actions.DispatchAction;
@@ -64,4 +68,18 @@ public abstract class LamsDispatchAction extends DispatchAction {
     	return token.getForward(request, true);
     }*/
     
+	protected void writeAJAXResponse(HttpServletResponse response, String output) throws IOException {
+	    // set it to unicode (LDEV-1275)
+		response.setContentType("text/html;charset=utf-8");
+	    PrintWriter writer = response.getWriter();
+
+		if (output.length()>0) {
+	        writer.println(output);
+		}
+	}
+
+	protected void writeAJAXOKResponse(HttpServletResponse response) throws IOException {
+		writeAJAXResponse(response, "OK");
+	}
+
 }
