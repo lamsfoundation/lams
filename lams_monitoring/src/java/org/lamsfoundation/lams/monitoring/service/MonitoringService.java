@@ -2100,6 +2100,142 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 
 		}
 		
+		/** Match group(s) to a branch. Doesn't necessarily check if the group is already assigned to another branch.
+		 * Use for Group Based Branching and define later.
+		 *
+		 * @param sequenceActivityID Activity id of the sequenceActivity representing this branch
+		 * @param learnerIDs the IDS of the learners to be added.
+		 */
+		public void addGroupToBranch(Long sequenceActivityID, String groupIDs[])  throws LessonServiceException {
+
+			SequenceActivity branch = (SequenceActivity) getActivityById(sequenceActivityID);
+			if ( branch == null ) {
+				String error = "addGroupToBranch: Branch missing. ActivityID was "+sequenceActivityID; 
+				log.error(error);
+				throw new MonitoringServiceException(error);
+			}
+
+			Activity parentActivity = branch.getParentActivity();
+			if ( parentActivity == null || !parentActivity.isBranchingActivity()) {
+				String error = "addUsersToBranch: Branching activity missing or not a branching activity. Branch was "+branch+" parent activity was "+parentActivity; 
+				log.error(error);
+				throw new MonitoringServiceException(error);
+			}
+			BranchingActivity branchingActivity = (BranchingActivity) getActivityById(parentActivity.getActivityId());
+			Grouping grouping = branchingActivity.getGrouping();
+
+			for ( String groupIDString: groupIDs) {
+				Long groupID = Long.parseLong(groupIDString);
+
+				Group group = null;
+				Iterator groupIterator = grouping.getGroups().iterator();
+				while (groupIterator.hasNext() && group == null) {
+					Group obj = (Group) groupIterator.next();
+					if ( obj.getGroupId().equals(groupID) )
+						group = obj;
+				}
+				if ( group == null ) {
+					String error = "addGroupToBranch: Group missing. Group ID was "+groupIDString; 
+					log.error(error);
+					throw new MonitoringServiceException(error);
+				}
+				
+				group.allocateBranchToGroup(null, branch, branchingActivity);
+				groupingDAO.update(group);
+			}
+				
+		} 
+		
+		/** Remove group / branch mapping. Cannot be done if any users in the group have started the branch. 
+		 * Used for group based branching in define later.
+		 * 
+		 * @param sequenceActivityID Activity id of the sequenceActivity representing this branch
+		 * @param learnerIDs the IDS of the learners to be added.
+		 */
+		public void removeGroupFromBranch(Long sequenceActivityID, String groupIDs[]) throws LessonServiceException {
+
+			SequenceActivity branch = (SequenceActivity) getActivityById(sequenceActivityID);
+			if ( branch == null ) {
+				String error = "addUsersToBranch: Branch missing. ActivityID was "+sequenceActivityID; 
+				log.error(error);
+				throw new MonitoringServiceException(error);
+			}
+
+			Activity parentActivity = branch.getParentActivity();
+			if ( parentActivity == null || !parentActivity.isBranchingActivity()) {
+				String error = "addUsersToBranch: Branching activity missing or not a branching activity. Branch was "+branch+" parent activity was "+parentActivity; 
+				log.error(error);
+				throw new MonitoringServiceException(error);
+			}
+			BranchingActivity branchingActivity = (BranchingActivity) getActivityById(parentActivity.getActivityId());
+			Grouping grouping = branchingActivity.getGrouping();
+
+			for ( String groupIDString: groupIDs) {
+				Long groupID = Long.parseLong(groupIDString);
+
+				Group group = null;
+				Iterator groupIterator = grouping.getGroups().iterator();
+				while (groupIterator.hasNext() && group == null) {
+					Group obj = (Group) groupIterator.next();
+					if ( obj.getGroupId().equals(groupID) )
+						group = obj;
+				}
+				if ( group == null ) {
+					String error = "removeGroupFromBranch: Group missing. Group ID was "+groupIDString; 
+					log.error(error);
+					throw new MonitoringServiceException(error);
+				}
+				
+				// can't remove the group if someone has already started working on the branch.
+				if ( isActivityAttempted(branch) )  {
+					log.warn("removeGroupFromBranch: A group member has already started the branch. Unable to remove the group from the branch. Group ID was "+groupIDString);
+				} else {
+					group.removeGroupFromBranch(branch);
+					groupingDAO.update(group);
+				}
+			}
+			
+		}
+
+		/** Has anyone started this branch / branching activity ? Irrespective of the groups. 
+		 * Used to determine if a branch mapping can be removed. */
+		public boolean isActivityAttempted(Activity activity) {
+			Integer numAttempted = lessonService.getCountLearnersHaveAttemptedActivity(activity);
+			if ( log.isDebugEnabled() ) {
+				log.debug("isActivityAttempted: num attempts for activity "+activity.getActivityId()+" is "+numAttempted);
+			}
+			return numAttempted !=null && numAttempted.intValue() > 0;
+		}
+		
+		/** 
+		 * Get all the groups that exist for the related grouping activity that have not been allocated to a branch.
+		 * 
+		 * @param branchingActivityID Activity id of the branchingActivity
+		 */
+		public SortedSet<Group> getGroupsNotAssignedToBranch(Long branchingActivityID) throws LessonServiceException {
+
+			BranchingActivity branchingActivity = (BranchingActivity)  getActivityById(branchingActivityID);
+			if ( branchingActivity == null ) {
+				String error = "getGroupsNotAssignedToBranch: Branching Activity missing missing. ActivityID was "+branchingActivityID; 
+				log.error(error);
+				throw new MonitoringServiceException(error);
+			}
+
+			TreeSet<Group> unassignedGroups = new TreeSet<Group>();
+			
+			Grouping grouping = branchingActivity.getGrouping();
+			Iterator groupIterator = grouping.getGroups().iterator();
+			while (groupIterator.hasNext() ) {
+				Group group = (Group) groupIterator.next();
+				if ( group.getBranchActivities() == null || group.getBranchActivities().size()==0 ) {
+					unassignedGroups.add(group);
+				}
+			}
+			
+			return unassignedGroups;
+			
+		}
+
 		/**
 		 * Get the list of users who have attempted an activity. This is based on the progress engine records.
 		 * This will give the users in all tool sessions for an activity (if it is a tool activity) or

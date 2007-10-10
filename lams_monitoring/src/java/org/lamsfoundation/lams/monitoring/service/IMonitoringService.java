@@ -31,6 +31,7 @@ import java.util.SortedSet;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
@@ -549,6 +550,33 @@ public interface IMonitoringService
 	 */
 	public void removeUsersFromBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException;
 
+	/** Has anyone started this branch / branching activity ? Irrespective of the groups. 
+	 * Used to determine if a branch mapping can be removed. */
+	public boolean isActivityAttempted(Activity activity) throws LessonServiceException;
+		
+	/** Match group(s) to a branch. Doesn't necessarily check if the group is already assigned to another branch.
+	 * Use for Group Based Branching and define later.
+	 *
+	 * @param sequenceActivityID Activity id of the sequenceActivity representing this branch
+	 * @param learnerIDs the IDS of the learners to be added.
+	 */
+	public void addGroupToBranch(Long sequenceActivityID, String groupIDs[])  throws LessonServiceException;
+
+	/** Remove group / branch mapping. Cannot be done if any users in the group have started the branch. 
+	 * Used for group based branching in define later.
+	 * 
+	 * @param sequenceActivityID Activity id of the sequenceActivity representing this branch
+	 * @param learnerIDs the IDS of the learners to be added.
+	 */
+	public void removeGroupFromBranch(Long sequenceActivityID, String groupIDs[]) throws LessonServiceException;
+
+	/** 
+	 * Get all the groups that exist for the related grouping activity that have not been allocated to a branch.
+	 * 
+	 * @param branchingActivityID Activity id of the branchingActivity
+	 */
+	public SortedSet<Group> getGroupsNotAssignedToBranch(Long branchingActivityID) throws LessonServiceException;
+	
 	/**
 	 * Get the list of users who have attempted an activity. This is based on the progress engine records.
 	 * This will give the users in all tool sessions for an activity (if it is a tool activity) or
@@ -557,4 +585,5 @@ public interface IMonitoringService
 	 */
 	public List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
 
+	
 }

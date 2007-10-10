@@ -61,7 +61,25 @@
       />
     </action>
     <action
-      path="/branching"
+      path="/groupedBranching"
+      type="org.lamsfoundation.lams.monitoring.web.GroupBasedBranchingAJAXAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="groupedSelection"
+        path="/branching/groupedSelection.jsp"
+        redirect="false"
+      />
+      <forward
+        name="viewBranches"
+        path=".viewBranches"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/chosenBranching"
       type="org.lamsfoundation.lams.monitoring.web.ChosenBranchingAJAXAction"
       parameter="method"
       unknown="false"
@@ -93,6 +111,19 @@
       <forward
         name="notsupported"
         path=".notsupported"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/toolBranching"
+      type="org.lamsfoundation.lams.monitoring.web.ToolOutputBranchingAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="viewBranches"
+        path=".viewBranches"
         redirect="false"
       />
     </action>

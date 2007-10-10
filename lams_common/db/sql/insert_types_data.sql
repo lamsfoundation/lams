@@ -183,8 +183,8 @@ INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_di
 VALUES (6, 10, 'Monitor Chosen Branching', 'Select between multiple sequence activities, with the branch chosen in monitoring.', 
 	'learning/branching.do?method=performBranching', 'learning/branching.do?method=performBranching', 
 	'learning/branching.do?method=viewBranching&mode=teacher', NULL,
-	'monitoring/branchingExportPortfolio?mode=teacher', 'monitoring/branching.do?method=assignBranch', 
-	'monitoring/branching.do?method=assignBranch', now());
+	'monitoring/branchingExportPortfolio?mode=teacher', 'monitoring/chosenBranching.do?method=assignBranch', 
+	'monitoring/chosenBranching.do?method=assignBranch', now());
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description,
         learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url,
@@ -192,8 +192,8 @@ INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_di
 VALUES (7, 11, 'Group Based Branching', 'Select between multiple sequence activities, with the branch chosen by an existing group.',
         'learning/branching.do?method=performBranching', 'learning/branching.do?method=performBranching',
         'learning/branching.do?method=viewBranching&mode=teacher', NULL,
-        'monitoring/branchingExportPortfolio?mode=teacher', 'monitoring/branching.do?method=assignBranch',
-        'monitoring/branching.do?method=assignBranch', now());
+        'monitoring/branchingExportPortfolio?mode=teacher', 'monitoring/groupedBranching.do?method=viewBranching',
+        'monitoring/groupedBranching.do?method=assignBranch', now());
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description,
         learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url,
@@ -201,8 +201,8 @@ INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_di
 VALUES (8, 12, 'Tool Output Based Branching', 'Select between multiple sequence activities, with the branch chosen on results of another activity.',
         'learning/branching.do?method=performBranching', 'learning/branching.do?method=performBranching',
         'learning/branching.do?method=viewBranching&mode=teacher', NULL, 
-        'monitoring/branchingExportPortfolio?mode=teacher', 'monitoring/branching.do?method=assignBranch',
-        'monitoring/branching.do?method=assignBranch', now());
+        'monitoring/branchingExportPortfolio?mode=teacher', 'monitoring/toolBranching.do?method=viewBranching',
+        'monitoring/toolBranching.do?method=viewBranching', now());
 
 -- Supported Locales
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 

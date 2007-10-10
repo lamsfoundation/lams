@@ -98,20 +98,6 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	}
 	
 
-	private void writeAJAXResponse(HttpServletResponse response, String output) throws IOException {
-	    // set it to unicode (LDEV-1275)
-		response.setContentType("text/html;charset=utf-8");
-	    PrintWriter writer = response.getWriter();
-
-		if (output.length()>0) {
-	        writer.println(output);
-		}
-	}
-
-	private void writeAJAXOKResponse(HttpServletResponse response) throws IOException {
-		writeAJAXResponse(response, "OK");
-	}
-
 	private Grouping getGrouping(GroupingActivity activity) {
 		Grouping grouping = activity.getCreateGrouping();
 		if ( grouping == null ) {
