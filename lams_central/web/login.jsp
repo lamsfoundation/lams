@@ -132,13 +132,17 @@ j_security_login_page
 					<p class="login-button">
 					 <a href="javascript:submitForm()" class="button" tabindex="3"/><fmt:message key="button.login"/></a>
 					 </p>
-				</form>	 
+				</form>	
+				<p class="login-button">
+				   <a href="<lams:LAMSURL/>/www/help/troubleshoot-<%=Configuration.get(ConfigurationKeys.SERVER_LANGUAGE)%>.pdf">
+				   	<fmt:message key="label.help"/>
+				   </a>
+				</p>   
 				</div><!--closes right col-->
 	 
 	  <div class="clear"></div><!-- forces the CSS to display the columns-->
 	
 	  </div>  <!--closes content-->
-	   
 		
 		
 		
