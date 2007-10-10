@@ -597,7 +597,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		}
 	}
 	
-	public function addNewBranch(sequence:SequenceActivity, branchingActivity:Activity):Void {
+	public function addNewBranch(sequence:SequenceActivity, branchingActivity:BranchingActivity, isDefault:Boolean):Void {
 		
 		if(sequence.firstActivityUIID != null) {
 			var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, _cv.ddm.getActivityByUIID(sequence.firstActivityUIID).activityUIID, branchingActivity.activityUIID, sequence, _cv.ddm.learningDesignID);
@@ -609,6 +609,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			
 				_cv.ddm.addBranch(b);
 			}
+			
+			if(isDefault)
+				branchingActivity.defaultBranch = b;
 		}
 		
 		setDirty();

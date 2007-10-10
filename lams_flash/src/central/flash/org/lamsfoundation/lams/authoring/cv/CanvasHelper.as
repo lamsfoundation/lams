@@ -173,6 +173,7 @@ class CanvasHelper {
 			//as its a new instance of the ddm,need to add the listener again
 			_ddm.addEventListener('ddmUpdate',Proxy.create(this,onDDMUpdated));
 			_ddm.addEventListener('ddmBeforeUpdate',Proxy.create(this,onDDMBeforeUpdate));
+			
 			checkValidDesign();
 			checkReadOnlyDesign();
 			
@@ -181,6 +182,7 @@ class CanvasHelper {
 				closeBranchView();
 			}
 			
+			canvasModel.selectedItem = null;
 			canvasModel.setDirty();
 			
 			createContentFolder();

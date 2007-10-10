@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.Config;
+import org.lamsfoundation.lams.common.util.Debugger;
 
 /**
  *
@@ -116,9 +117,13 @@ class ToolOutputCondition   {
 		if(_display_name) dto.displayName = _display_name;
 		if(_type) dto.type = _type;
 		
-		dto.startValue = (_startValue) ? _startValue : Config.STRING_NULL_VALUE;
-		dto.endValue = (_endValue)  ? _endValue : Config.STRING_NULL_VALUE;
-		dto.exactMatchValue = (_exactMatchValue) ? _exactMatchValue : Config.STRING_NULL_VALUE;
+		Debugger.log("start value: " + _startValue, Debugger.CRITICAL, "toData", "ToolOutputCondition");
+		Debugger.log("end value: " + _endValue, Debugger.CRITICAL, "toData", "ToolOutputCondition");
+		Debugger.log("exact value: " + _exactMatchValue, Debugger.CRITICAL, "toData", "ToolOutputCondition");
+		
+		dto.startValue = (_startValue != null || _startValue instanceof Number) ? _startValue : Config.STRING_NULL_VALUE;
+		dto.endValue = (_endValue != null || _startValue instanceof Number)  ? _endValue : Config.STRING_NULL_VALUE;
+		dto.exactMatchValue = (_exactMatchValue != null || _startValue instanceof Number) ? _exactMatchValue : Config.STRING_NULL_VALUE;
 		
 		return dto;
 	}

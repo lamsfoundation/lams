@@ -22,6 +22,7 @@
  */
 
 import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.common.util.Debugger;
 /*
 *
 * @author      Mitchell Seaton
@@ -71,6 +72,7 @@ class BranchingActivity extends ComplexActivity {
 		_endXCoord = dto.endXCoord;
 		_endYCoord = dto.endYCoord;
 		_toolActivityUIID = dto.toolActivityUIID;
+		
 	}
 	
 	/**
@@ -87,6 +89,7 @@ class BranchingActivity extends ComplexActivity {
 		if(_endXCoord) dto.endXCoord = _endXCoord;
 		if(_endYCoord) dto.endYCoord = _endYCoord;
 		if(_toolActivityUIID) dto.toolActivityUIID = _toolActivityUIID;
+		
 		if(_defaultBranch) dto.defaultActivityUIID = _defaultBranch.sequenceActivity.activityUIID;
 		
 		return dto;

@@ -51,6 +51,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private var _definitions:Array;
 	private var _conditions:Array;
 	private var _selectedDefinition:ToolOutputDefinition;
+	private var _selectedIndex:Number;
 	private var _toolContentID:Number;
 	
 	private var _toolOutputDefin_cmb:ComboBox;
@@ -268,20 +269,22 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private function clearAllButton_onPress(evt:Object, c:Boolean):Void {
 		if(!app.getCanvas().ddm.hasBranchMappingsForConditionSet(_condition_item_dgd.dataProvider) || c) {
-		
+			Debugger.log("length: " + _condition_item_dgd.dataProvider.length, Debugger.CRITICAL, "clearAllButton_onPress", "ToolOutputConditionsDialog");
+			
 			for(var i=0; i<=_condition_item_dgd.dataProvider.length; i++) {
 				var conditionUIID:Number = ToolOutputCondition(_condition_item_dgd.dataProvider[i].data).conditionUIID;
-				app.getCanvas().ddm.removeOutputCondition(conditionUIID);
-		
+				
 				if(c) {
 					app.getCanvas().ddm.removeBranchMappingsByCondition(conditionUIID);
 				}
 				
-				_condition_item_dgd.removeAll();
 			}
 			
+			app.getCanvas().ddm.conditions.clear();
+			_condition_item_dgd.removeAll();
+
 		} else {
-			LFMessage.showMessageConfirm("There are conditions linked to an existing branch. Do you wish to continue?", Proxy.create(this, clearAllButton_onPress, evt, true), null, "continue", null, "Warning");
+			LFMessage.showMessageConfirm(Dictionary.getValue("branch_mapping_dlg_condition_linked_msg", [Dictionary.getValue("branch_mapping_dlg_condition_linked_all")]), Proxy.create(this, clearAllButton_onPress, evt, true), Proxy.create(this, returnDefinitionState), Dictionary.getValue("al_continue"), null);
 		}
 		
 	}
@@ -292,7 +295,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		if(!app.getCanvas().ddm.hasBranchMappingsForCondition(_selectedItem.conditionUIID) || c) {
 			removeCondition(_selectedItem.conditionUIID, _condition_item_dgd.selectedIndex);
 		} else {
-			LFMessage.showMessageConfirm("WARNING: This condition is linked to an existing branch. Do you wish to continue?", Proxy.create(this, removeItemButton_onPress, evt, true), null, "continue", null, "");
+			LFMessage.showMessageConfirm(Dictionary.getValue("branch_mapping_dlg_condition_linked_msg", [Dictionary.getValue("branch_mapping_dlg_condition_linked_single")]), Proxy.create(this, removeItemButton_onPress, evt, true), null, "continue", null, "");
 		}
 		
 		if(c)
@@ -335,9 +338,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		_condition_item_dgd.removeItemAt(index);
 	}
 	
-	private function removeAllItems():Void {
-		app.getCanvas().ddm.conditions.clear();
-		_condition_item_dgd.removeAll();
+	private function removeAllItems(c:Boolean):Void {
+		clearAllButton_onPress(null, true);
+		if(c) selectDefinition();
 	}
 	
 	private function validateCondition(selectedDefinition:ToolOutputDefinition):Boolean {
@@ -379,6 +382,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				} else if(end_value == condition.exactMatchValue) {
 					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_end_value")]), null);
 					return false;
+				} else if(start_value < condition.exactMatchValue && end_value == null) {
+					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_end_value")]), null);
+					return false;
 				}
 			} else { 
 				if(start_value >= condition.startValue && start_value <= condition.endValue) {
@@ -396,14 +402,27 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private function itemChanged(evt:Object):Void {
 		Debugger.log("type: " + _selectedDefinition.type, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
+		Debugger.log("index: " + _toolOutputDefin_cmb.selectedIndex, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
 		
+		if(_selectedIndex == _toolOutputDefin_cmb.selectedIndex)
+			return;
+		
+		if(app.getCanvas().ddm.hasBranchMappingsForConditionSet(_condition_item_dgd.dataProvider) && evt != null)
+			LFMessage.showMessageConfirm(Dictionary.getValue("branch_mapping_dlg_condition_linked_msg", [Dictionary.getValue("branch_mapping_dlg_condition_linked_all")]), Proxy.create(this, removeAllItems, true), Proxy.create(this, returnDefinitionState), Dictionary.getValue("al_continue"), null);
+		else if(evt != null) removeAllItems(true);
+		else selectDefinition();
+			
+	}
+	
+	private function selectDefinition():Void {
 		var ddm = app.getCanvas().ddm;
+		
 		_selectedDefinition = _toolOutputDefin_cmb.dataProvider[_toolOutputDefin_cmb.selectedIndex];
+		Debugger.log("select definition: " + _selectedDefinition.description, Debugger.CRITICAL, "selectDefinition", "ToolOutputConditionsDialog");
 		
 		switch(_selectedDefinition.type) {
 			case ToolOutputDefinition.LONG:
-				if(evt != null) removeAllItems();
-		
+				
 				_start_value_stp.visible = true;
 				_end_value_stp.visible = !_opt_greaterThan_cb.value;
 				
@@ -444,17 +463,29 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				_condition_from_lbl.visible = false;
 				_condition_to_lbl.visible = false;
 				
-				// add default conditions for boolean output type
-				if(evt != null) {
-					removeAllItems();
+				if(_condition_item_dgd.dataProvider.length <= 0) {
 					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, true));
 					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, false));
 				}
+				
 				break;
 			default:
 				Debugger.log("type not found", Debugger.GEN, "itemChanged", "ToolOutputConditionsDialog");
+				
 		}
-			
+		
+		_selectedIndex = _toolOutputDefin_cmb.selectedIndex;
+		
+	}
+	
+	private function returnDefinitionState() {
+		Debugger.log("_selectedIndex: " + _selectedIndex, Debugger.CRITICAL, "returnDefinitionState", "ToolOutputConditionsDialog");
+		//_toolOutputDefin_cmb.selectedItem = _toolOutputDefin_cmb.getItemAt(_selectedIndex);
+		_toolOutputDefin_cmb.selectedIndex = _selectedIndex;
+		_selectedDefinition = _toolOutputDefin_cmb.dataProvider[_selectedIndex];
+		
+		Debugger.log("_selectedItem: " + _toolOutputDefin_cmb.selectedItem, Debugger.CRITICAL, "returnDefinitionState", "ToolOutputConditionsDialog");
+		
 	}
 	
 	private function itemEdited(evt:Object):Void {

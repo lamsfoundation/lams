@@ -242,11 +242,14 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		Debugger.log("Sequence Activities length: " + sequenceActs.length, Debugger.CRITICAL, "loadSequenceActivities", "CanvasBranchView");
 		
 		for(var i=0; i<sequenceActs.length;  i++) {
-			if(SequenceActivity(sequenceActs[i]).firstActivityUIID != null) {
+			Debugger.log('firstActivityUIID:' + activity.firstActivityUIID, Debugger.CRITICAL, "loadSequenceActivities", "CanvasBranchView");
+			
+			if(SequenceActivity(sequenceActs[i]).activityUIID == activity.firstActivityUIID) {
 				defaultSequenceActivity = SequenceActivity(sequenceActs[i]);
+				_cm.addNewBranch(SequenceActivity(sequenceActs[i]), activity, true);
+			} else {
+				_cm.addNewBranch(SequenceActivity(sequenceActs[i]), activity, false);
 			}
-				
-			_cm.addNewBranch(SequenceActivity(sequenceActs[i]), activity);
 			
 		}
 		
@@ -278,6 +281,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	private function close():Void {
 		_cm.getCanvas().hideBin();
+		_cm.selectedItem = null;
 		
 		mx.transitions.TransitionManager.start(this,
 					{type:mx.transitions.Zoom, 
@@ -591,7 +595,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	}
 	
 	public function get activity():BranchingActivity {
-		return _canvasBranchingActivity.activity;
+		return BranchingActivity(_canvasBranchingActivity.activity);
 	}
 	
 	public function get defaultSequenceActivity():SequenceActivity {
