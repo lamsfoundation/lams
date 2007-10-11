@@ -2,31 +2,25 @@ package org.lams.toolbuilder.wizards;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.dialogs.ContainerSelectionDialog;
-import org.lams.toolbuilder.util.LamsToolBuilderLog;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
-import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
+import org.lams.toolbuilder.util.LamsToolBuilderLog;
+import org.lams.toolbuilder.util.Constants;
 /**
  * The "New" wizard page allows setting the container for the new file as well
  * as the file name. The page will only accept file name without the extension
@@ -34,31 +28,35 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
  */
 
 public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
-	private Text toolName;
 	private Text toolSignature;
 	private Text vendor;
-	private Text compatibility;
+	private Text compatibility; 
 	private Text toolDisplayName;
+	private Text toolVersion;
 	private Button LAMSButton;
 	private Button RAMSButton;
 	private Button notVisible;
 	private Button isVisible;
-	
-
+	private boolean canContinue= false;
 	private ISelection selection;
 
 	/**
 	 * Constructor for SampleNewWizardPage.
-	 * 
-	 * @param pageName
 	 */
 	public LAMSNewToolWizardPage(ISelection selection) {
 		super("wizardPage");
-		setTitle("LAMS Tool Project Wizard");
+		this.canContinue = false;
+		setTitle("LAMS Tool Project Wizard: Project Details");
 		setDescription("Enter in details to produce a new LAMS tool project.");
 		this.selection = selection;
 	}
 
+	public boolean canFlipToNextPage()
+	{
+		return canContinue;
+	}
+	
+	
 	/**
 	 * @see IDialogPage#createControl(Composite)
 	 */
@@ -80,23 +78,35 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 
 		createLabel(namesGroup,	"Tool Signature");
 		toolSignature = createText(namesGroup);
+		toolSignature.setToolTipText(WizardConstants.TOOL_SIG_TOOL_TIP);
+		toolSignature.addModifyListener(new wizardModifyListener());
 
 		
 		// put the key field in the group
-		createLabel(namesGroup,	"Tool Display Name");
+		createLabel(namesGroup,	"Tool Name");
 		toolDisplayName = createText(namesGroup);
-		//toolDisplayName.setText(WizardConstants.SAMPLE_TOOL_SIGNATURE);		
+		toolDisplayName.setToolTipText(WizardConstants.TOOL_NAME_TOOL_TIP);
+		toolDisplayName.addModifyListener(new wizardModifyListener());		
 		
 
 		// put the package field in the group
 		createLabel(namesGroup,	"Vendor");
 		vendor = createText(namesGroup);
-		//vendor.setText(WizardConstants.SAMPLE_VENDOR);
+		vendor.setToolTipText(WizardConstants.TOOL_VENDOR_TOOL_TIP);
+		vendor.addModifyListener(new wizardModifyListener());
 		
-		createLabel(namesGroup,	"Minimum Server Version");
+		createLabel(namesGroup, "Tool Version");
+		toolVersion = createText(namesGroup);
+		toolVersion.setText(WizardConstants.DEFAULT_TOOL_VERSION);
+		toolVersion.setToolTipText(WizardConstants.TOOL_VERSION_TOOL_TIP);
+		toolVersion.addModifyListener(new wizardModifyListener());
+		
+		createLabel(namesGroup,	"Minimum LAMS Version");
 		compatibility = createText(namesGroup);
-		compatibility.setText("2.0");
-
+		compatibility.setText(WizardConstants.DEFAULT_SERVER_VERSION);
+		compatibility.setToolTipText(WizardConstants.SERVER_VERSION_TOOL_TIP);
+		compatibility.addModifyListener(new wizardModifyListener());
+		
 		// create a group for columns
 		Group organisingGroup = new Group(control, SWT.NONE);
 		organisingGroup.setText("Tool Options");
@@ -143,151 +153,9 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 		isVisible.setSelection(true);
 		notVisible = createButton(toolVisibleGroup, SWT.RADIO, buttonSpan, buttonIndent);
 		notVisible.setText("No");
-		
-		
-		/*
-		for (int i=0; i<implRadios.length; i++) {
-			implRadios[i] = createButton(implsGroup, SWT.RADIO, buttonSpan, buttonIndent);
-			implRadios[i].setText(validImplTags[i]);
-			if (i == 0) {
-				implRadios[i].setSelection(true);
-			}
-			implRadios[i].addListener(SWT.Selection, new Listener() {
-					public void handleEvent(Event event) {
-						checkTesting();
-					}
-				}
-			);
-		}
-
-		// create a group
-		Group optionsGroup = new Group(organisingGroup, SWT.NONE);
-		optionsGroup.setText(Messages.getString("SakaiNewWizardPage.options")); //$NON-NLS-1$
-		GridLayout optionsLayout = new GridLayout();
-		optionsLayout.numColumns = 1;
-		optionsGroup.setLayout(implsLayout);
-		optionsGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
-
-		checkTesting = new Button(optionsGroup, SWT.CHECK);
-		checkTesting.setLayoutData(gdButton);
-		checkTesting.setText(Messages.getString("SakaiNewWizardPage.testing")); //$NON-NLS-1$
-		checkTesting.setToolTipText(Messages.getString("SakaiNewWizardPage.testing.tooltip")); //$NON-NLS-1$
-		checkTesting.setSelection(true);
-		*/
-		
 		initialise();
-		//dialogChanged();
+		dialogChanged();
 		setControl(control);
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		/*
-		Composite container = new Composite(parent, SWT.NULL);
-		
-		
-		GridLayout layout = new GridLayout();
-		container.setLayout(layout);
-		layout.numColumns = 3;
-		layout.verticalSpacing = 9;
-		layout.makeColumnsEqualWidth = true;
-		
-		Label label = new Label(container, SWT.NULL);
-		label.setText("&Tool Name:");
-		toolName = new Text(container, SWT.BORDER | SWT.SINGLE);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan=2;
-		toolName.setLayoutData(gd);
-		toolName.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				dialogChanged();
-			}
-		});
-		
-		label = new Label(container, SWT.NULL);
-		label.setText("&Vendor:");
-		vendor = new Text(container, SWT.BORDER | SWT.SINGLE);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan=2;
-		vendor.setLayoutData(gd);
-		vendor.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				dialogChanged();
-			}
-		});
-		
-		label = new Label(container, SWT.NULL);
-		label.setText("&Tool Signature:");
-		compatibility = new Text(container, SWT.BORDER | SWT.SINGLE);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan=2;
-		compatibility.setLayoutData(gd);
-		compatibility.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				dialogChanged();
-			}
-		});
-		
-		
-		
-		
-		label = new Label(container, SWT.NULL);
-		label.setText("&File name:");
-		
-		toolDisplayName = new Text(container, SWT.BORDER | SWT.SINGLE);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan=2;
-		toolDisplayName.setLayoutData(gd);
-		toolDisplayName.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				dialogChanged();
-			}
-		});
-		
-		
-		label = new Label(container, SWT.NULL);
-		label.setText("&Project Type:");
-		
-		LAMSButton = new Button(container, SWT.RADIO);
-		LAMSButton.setText("LAMS");
-		/*button.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				handleBrowse();
-			}
-		});*/
-		
-		/*
-		RAMSButton = new Button(container, SWT.RADIO);
-		RAMSButton.setText("RAMS");
-		/*button.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				handleBrowse();
-			}
-		});*/
-		
-		
-		/*Button button = new Button(container, SWT.PUSH);
-		button.setText("Browse...");
-		button.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				handleBrowse();
-			}
-		});*/
-		
-		
-		
-		//toolDisplayName();
-		//dialogChanged();
-		//setControl(container);
 		
 	}
 
@@ -313,87 +181,17 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 			}
 		}
 		
-		compatibility.setText("2.0");
-		//toolName.setText(WizardConstants.SAMPLE_TOOL_NAME);
+		compatibility.setText(WizardConstants.DEFAULT_SERVER_VERSION);
+		
 		//toolDisplayName.setText(WizardConstants.SAMPLE_TOOL_SIGNATURE);
 		//vendor.setText(WizardConstants.SAMPLE_VENDOR);
 	}
 
-	/**
-	 * Uses the standard container selection dialog to choose the new value for
-	 * the container field.
-	 */
 
-	/*private void handleBrowse() {
-		ContainerSelectionDialog dialog = new ContainerSelectionDialog(
-				getShell(), ResourcesPlugin.getWorkspace().getRoot(), false,
-				"Select new file container");
-		if (dialog.open() == ContainerSelectionDialog.OK) {
-			Object[] result = dialog.getResult();
-			if (result.length == 1) {
-				containerText.setText(((Path) result[0]).toString());
-			}
-		}
-	}*/
 
-	/**
-	 * Ensures that all required fields are set.
-	 */
-	private void dialogChanged() {
-		//IResource container = ResourcesPlugin.getWorkspace().getRoot()
-		//		.findMember(new Path(getContainerName()));
-		
+	
 
-		if (getToolName().length() == 0) {
-			updateStatus("Tool Name must be specified");
-			return;
-		}
-		if (getToolDisplayName().length() == 0) {
-			updateStatus("Tool Signature must be specified");
-			return;
-		}
-		if (getCompatibility().length() == 0) {
-			updateStatus("Content Compatibility must be specified");
-			return;
-		}
-		
-		
-		/*if (container == null
-				|| (container.getType() & (IResource.PROJECT | IResource.FOLDER)) == 0) {
-			updateStatus("File container must exist");
-			return;
-		}
-		if (!container.isAccessible()) {
-			updateStatus("Project must be writable");
-			return;
-		}
-		*/
-		
-		/*
-		 * String fileName = getFileName();
-		 * if (fileName.length() == 0) {
-			updateStatus("File name must be specified");
-			return;
-		}
-		if (fileName.replace('\\', '/').indexOf('/', 1) > 0) {
-			updateStatus("File name must be valid");
-			return;
-		}
-		int dotLoc = fileName.lastIndexOf('.');
-		if (dotLoc != -1) {
-			String ext = fileName.substring(dotLoc + 1);
-			if (ext.equalsIgnoreCase("mpe") == false) {
-				updateStatus("File extension must be \"mpe\"");
-				return;
-			}
-		}*/
-		updateStatus(null);
-	}
-
-	private void updateStatus(String message) {
-		setErrorMessage(message);
-		setPageComplete(message == null);
-	}
+	
 	
 	private Button createButton(Composite container, int style, int span, int indent) {
 		Button button = new Button(container, style);
@@ -427,12 +225,161 @@ public class LAMSNewToolWizardPage extends WizardNewProjectCreationPage {
 	}
 
 	
+
+	
+	
+	public class wizardModifyListener implements ModifyListener
+	{
+		public void modifyText(ModifyEvent event)
+		{
+			dialogChanged();
+		}
+	}
+	
+	/**
+	 * Ensures that all required fields are set.
+	 */
+	private void dialogChanged() {
+		super.setPageComplete(false);
+		this.canContinue = false;
+		
+		
+		if(super.getProjectName().trim().length()==0)
+		{
+			// allow super class to handle this case
+			return;
+		}
+		if (getToolSignature().trim().length()==0)
+		{
+			updateStatus("Tool signature must be specified.");
+			return;
+		}
+		else
+		{
+			 if (!matchRegex(WizardConstants.TOOL_SIG_REGEX, getToolSignature()))
+			 {
+				 setErrorMessage(WizardConstants.TOOL_SIG_ERROR);
+				 setPageComplete(false);	
+				 return;
+			 }
+			 else
+			 {
+				 // check the tool signature does not clash with an existing
+				 for (String sig : Constants.getToolSignatures())
+				 {
+					 if (getToolSignature().trim().equals(sig))
+					 {
+						 setErrorMessage(WizardConstants.TOOL_SIG_EXISTS_ERROR);
+						 setPageComplete(false);
+						 return;
+					 }
+					 
+				 }
+			 }
+		}
+		
+		if (getToolDisplayName().trim().length() == 0) {
+			updateStatus("Tool name must be specified.\n\n" + WizardConstants.TOOL_NAME_TOOL_TIP);
+			return;
+		}
+		else
+		{
+			if (!matchRegex(WizardConstants.TOOL_NAME_REGEX, getToolDisplayName()))
+			{
+				setErrorMessage(WizardConstants.TOOL_NAME_ERROR);
+				setPageComplete(false);
+				return;
+			}
+		}
+		
+		if (getCompatibility().trim().length() == 0) {
+			updateStatus("Minimum LAMS Server version must be specified");
+			return;
+		}
+		else
+		{
+			if (!matchRegex(WizardConstants.SERVER_VERSION_REGEX, getCompatibility()))
+			{
+				setErrorMessage(WizardConstants.SERVER_VERSION_ERROR);
+				setPageComplete(false);
+				return;
+			}
+		}
+		
+		if (getVendor().trim().length() == 0) 
+		{
+			updateStatus("Vendor details must be specified");
+			return;
+		}
+		else
+		{
+			if (!matchRegex(WizardConstants.VENDOR_REGEX, getVendor()))
+			{
+				setErrorMessage(WizardConstants.VENDOR_ERROR);
+				setPageComplete(false);
+				return;
+			}
+		}
+		
+		if (getToolVersion().trim().length() == 0)
+		{
+			updateStatus("Tool version must be specified");
+			return;
+		}
+		else
+		{
+			if (!matchRegex(WizardConstants.TOOL_VERSION_REGEX, getToolVersion()))
+			{
+				setErrorMessage(WizardConstants.TOOL_VERSION_ERROR);
+				setPageComplete(false);				
+				return;
+			}
+		}
+		
+		updateStatus(null);
+	}
+	
+	/**
+	 * 
+	 * @param regex The regex to test the text	
+	 * @param text The text to be tested
+	 * @return true if the regex matches the string
+	 */
+	private boolean matchRegex(String regex, String text)
+	{
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(text.trim());
+		if (!m.matches())
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}		
+	}
+	
+	private void updateStatus(String message) {
+		
+		
+		if (message==null)
+		{
+			this.setMessage(WizardConstants.PAGE_COMPLETE_MESSAGE);
+			setPageComplete(true);
+		}
+		else
+		{
+			this.setMessage(message);
+			setPageComplete(false);
+		}
+	}
+	
+	// GET METHODS
 	public String getToolSignature() {return toolSignature.getText().trim().toLowerCase();}
-	public String getToolName() {return toolName.getText().trim();}
 	public String getVendor() {return vendor.getText().trim();}
 	public String getToolDisplayName() {return toolDisplayName.getText().trim();}
 	public String getCompatibility() {return compatibility.getText().trim();}
 	public boolean getIsLams() {return LAMSButton.getSelection();}
 	public boolean getVisible() {return isVisible.getSelection();}
-
+	public String getToolVersion() {return toolVersion.getText().trim();}
 }

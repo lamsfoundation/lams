@@ -13,16 +13,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.ArrayList;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import org.lams.toolbuilder.util.LamsToolBuilderLog;
 
 /**
  * 
- * @author Luke Foxton - Based on code written by: Anthony Sukar
+ * @author Luke Foxton - Modelled on code written by: Anthony Sukar
  * 
  */
 public class RenameTool {
 
-	//$$$$$$$$$$$$$$$$$$$$$$TO BE IMPLEMENTED DYNAMICALLY
 	private final String DEFAULT_LANGUAGE = "en_AU";
 	
 	private String sourceDirStr;
@@ -31,10 +33,7 @@ public class RenameTool {
 
 	private List<String[]> nameList;
 	
-	private String regexIgnorePrefix;
-	private String regexIgnoreSuffix;
-	
-	private static final int MAX_REPLACEMENTS = 20;
+	private String vendor; // needs to be implicitly defined to replace the directory file
 
 	public RenameTool()
 	{
@@ -61,10 +60,10 @@ public class RenameTool {
 		txtType.add("xml");
 	}
 	
-	public boolean renameTool(List<String[]> nameList, String source) throws Exception
+	public boolean renameTool(List<String[]> nameList, String source, String vendor, IProgressMonitor monitor) throws Exception
 	{
 		this.nameList = nameList;
-		
+		this.vendor = vendor.replaceAll(" " , "").toLowerCase();
 		this.sourceDirStr = source;
 		
 		File sourceDir = new File(sourceDirStr);
@@ -74,15 +73,16 @@ public class RenameTool {
 			throw new FileNotFoundException("Source file: " + sourceDirStr + "not found.");
 		}
 
-		visitFile(sourceDir, "rename");
+		visitFile(sourceDir, "rename", monitor);
 		return true;
 	}
 	
 
 	public void renameFile(File dir) {
-		
-		for (String[] pair : nameList) {
-			String newFileName = updateFilename(dir.getName(), pair[0], pair[1]);
+		String regex;
+		for (String[] task : nameList) {
+			regex = constructRegex(task[0], task[1], task[2], task[3]);
+			String newFileName = updateFilename(dir.getName(), regex, task[3]);
 			dir.renameTo(new File(dir.getParentFile(), newFileName));
 		}
 	}
@@ -92,13 +92,13 @@ public class RenameTool {
 
 		String newFileName = currentFileName.replaceAll(regex, replacement);
 
-		if (!currentFileName.equals(newFileName)) {
+		/*if (!currentFileName.equals(newFileName)) {
 
 			String format = "Renamed %1$-40s ---> %2$-1s\n";
 
 			System.out.format(format, currentFileName, newFileName);
 
-		}
+		}*/
 		return newFileName;
 	}
 
@@ -115,80 +115,27 @@ public class RenameTool {
 
 			String line;
 			while ((line = br.readLine()) != null) {
-				regexIgnorePrefix = "";
-				regexIgnoreSuffix = "";
 				String regex;
 				ArrayList<String> replacedStrings = new ArrayList<String>();
 				
 				
-				for (String[] pair : nameList) 
+				for (String[] task : nameList) 
 				{
 					
-					regex = constructRegex(pair[0], pair[1], replacedStrings);
-					System.out.println("REGEX: " + regex);
-					/*
-					 * First check that the string to be replaced is not a substring of the replacement string
-					 * Ie if we want to replace forum with testforum, and the searcher finds testforum,
-					 * we dont want to end up with testtestforum.
-					 */
-					/*
-					if (pair[1].indexOf(pair[0])>0 || pair[1].startsWith(pair[0]))
-					{
-						// The string to be replaced is a substring of the replacement string
-						System.out.println("SUB STRING: " + pair[1] + " " + pair[0] );
-						Pattern p = Pattern.compile(pair[0]);
-						String startAndEnd[]= p.split(pair[1]);
-						System.out.println("SUB STRING startAndEnd: "+startAndEnd[0] +" " +startAndEnd[startAndEnd.length -1]);
-						
-						
-						if (pair[1].startsWith(startAndEnd[0])&&startAndEnd[0].length()>0)
-						{
-							regexIgnorePrefix += addRegexIgnoreConstruct(startAndEnd[0], true);
-							System.out.println("Prefix regex changed: " + regexIgnorePrefix);
-						}
-							
-						if (pair[1].endsWith(startAndEnd[startAndEnd.length -1]) && startAndEnd[startAndEnd.length -1].length()>0)
-						{
-							regexIgnoreSuffix += addRegexIgnoreConstruct(startAndEnd[startAndEnd.length -1], false);
-							System.out.println("Suffix regex changed: " + regexIgnoreSuffix);
-						}
-					}
-					
-					/* TODO:
-					 * Next check all strings that have been replaced and dont replace them again
-					 */
-					/*
-					for (String replaceString: replaceStrings)
-					{
-						if (pair[1].indexOf(replaceString)>0)
-						{
-							System.out.println("REPLACE STRING: "+pair[1] + " " + replaceString);
-							Pattern p = Pattern.compile(pair[1]);
-							String startAndEnd[]= p.split(replaceString);
-							System.out.println("REPLACE startAndEnd: "+startAndEnd[0] +" " +startAndEnd[startAndEnd.length -1]);
-							
-							if (pair[1].startsWith(startAndEnd[0]))
-								regexIgnorePrefix += addRegexIgnoreConstruct(startAndEnd[0], true);
-							
-							if (pair[1].endsWith(startAndEnd[startAndEnd.length -1]))
-								regexIgnoreSuffix += addRegexIgnoreConstruct(startAndEnd[startAndEnd.length -1], false);
-						}
-					}
-					
-					regex = "(" +regexIgnorePrefix+ ")" +pair[0]+ "(" +regexIgnoreSuffix+ ")";
-					*/
-					
-					
-					
+					//regex = constructRegex(task[0], task[1], replacedStrings);
+					//System.out.println("REGEX: " + regex);
+
+					//System.out.println("AARGH: " + task[0] + "," + task[1] + "," + task[2] + "," + task[3]);
+					regex = constructRegex(task[0], task[1], task[2], task[3]);
 					
 					
 					String temp = line;
-					line = line.replaceAll(regex, pair[1]);
+					line = line.replaceAll(regex, task[3]);
 					
 					if (!temp.equals(line))
-						System.out.println("REGEX: " +regex+ " TEXT REPLACEMENT: " + temp + " replaced with: " + line);
+						//System.out.println("REGEX: " +regex+ " TEXT REPLACEMENT: " + temp + " replaced with: " + line);
 					
-					replacedStrings.add(pair[1]);
+					replacedStrings.add(task[1]);
 				}
 
 				bw.write(line);
@@ -210,7 +157,7 @@ public class RenameTool {
 
 	}
 
-	public void visitFile(File file, String mode) 
+	public void visitFile(File file, String mode, IProgressMonitor monitor) 
 	{
 		boolean rename=true;
 		
@@ -230,21 +177,21 @@ public class RenameTool {
 		{
 			// it is a language file, delete if not the default language
 			// if it is the default language, do not alter it
-			if (file.getName().contains(this.DEFAULT_LANGUAGE))
+			if (file.getName().contains(this.DEFAULT_LANGUAGE) || file.getName().equals("ApplicationResources.properties"))
 			{
 				return;
 			}
 			else
 			{
 				file.delete();
-				System.out.println("Deleted non-default language file: " + file.getPath());
+				//System.out.println("Deleted non-default language file: " + file.getPath());
 			}	
 		}
 		
 		if (file.isDirectory()) {
 			String[] children = file.list();
 			for (int i = 0; i < children.length; i++) {
-				visitFile(new File(file, children[i]), mode);
+				visitFile(new File(file, children[i]), mode, monitor);
 			}
 		}
 
@@ -261,11 +208,23 @@ public class RenameTool {
 			}
 			renameFile(file);
 		}
-
+		
+		/**
+		 * This rename must be done after the recursion to prevent 
+		 * an unexpected break in the recursion
+		 */
+		if (file.isDirectory() && file.getName().equals("lamsfoundation"))
+		{
+			// we need to implicitly replace this with the new vendor
+			String newFileName = updateFilename(file.getName(), "lamsfoundation", vendor);
+			file.renameTo(new File(file.getParentFile(), newFileName));
+		}
+		
 		if (mode.equals("delete")) {
 			file.delete();
-			System.out.println("Deleted file: " + file.getPath());
+			//System.out.println("Deleted file: " + file.getPath());
 		}
+		monitor.worked(1);
 	}
 
 	public File getFile(String[] array) {
@@ -298,6 +257,43 @@ public class RenameTool {
 		return "("+operator+ignore+")";
 	}
 	
+	/**
+	 * This method returns adds an ignore prefix or suffix to an existing  regex construct
+	 * @param currRegex the current regex
+	 * @param ignoreRegex the ignore string you wish to add
+	 * @param isPrefix true if it is a prefix false if it is a suffix
+	 * @return the regex with the ignore contruct added to it
+	 */
+	public String constructRegexPrefixOrSuffix(String currRegex, String ignoreRegex, boolean isPrefix)
+	{
+		String ret = addRegexIgnoreConstruct(ignoreRegex, isPrefix);
+		
+
+		if (currRegex.length()==0) // if it is an empty regex, return a new ignore regex
+		{
+			if (ignoreRegex.length()==0) //if there is nothing to add, return nothing
+			{
+				return "";
+			}
+			else
+			{
+				return ret;
+			}	
+		}
+		else  // add an ignore construct to the existing regex
+		{
+			if(ignoreRegex.length()==0) //return the current regex if theres nothing to add
+			{
+				return currRegex;
+			}
+			else
+			{
+				return "("+ ret + currRegex + ")";
+			}
+		}
+		
+	}
+	
 	
 	/**
 	 * This function constructs a safe regular expression for search and replace
@@ -306,7 +302,7 @@ public class RenameTool {
 	 * @param replacedStrings a list of strings that have already been used for replacement
 	 * @return
 	 */
-	public String constructRegex(String startRegex, String rename, ArrayList<String> replacedStrings)
+	public String constructRegex(String regexPrefix, String regexSuffix, String startRegex, String rename)
 	{
 		//System.out.println("HELLO: " + startRegex + " " + rename);
 		if (rename.contains(startRegex))
@@ -317,71 +313,42 @@ public class RenameTool {
 			String startAndEnd[]= p.split(rename);
 			//System.out.println("SUB STRING startAndEnd: "+startAndEnd[0] +" " +startAndEnd[startAndEnd.length -1]);
 			
-			
+			//System.out.println("HELLO: " + regexPrefix + "," + regexSuffix + "," + startRegex + "," + rename);
 			if (startAndEnd.length>0)
 			{
 				if (startAndEnd[0].length()>0 && rename.startsWith(startAndEnd[0]))
 				{
-					String prefix = addRegexIgnoreConstruct(startAndEnd[0], true);
-					if (!regexIgnoreSuffix.contains(prefix))
-					{
-						regexIgnorePrefix += prefix;
-						//System.out.println("Prefix regex changed: " + regexIgnorePrefix);
-					}
+					regexPrefix = constructRegexPrefixOrSuffix(regexPrefix, startAndEnd[0], true);
+					//System.out.println("Prefix regex changed: " + regexPrefix);
+
 				}
 					
 				if (startAndEnd[startAndEnd.length -1].length()>0 && rename.endsWith(startAndEnd[startAndEnd.length -1]))
 				{
-					String suffix = addRegexIgnoreConstruct(startAndEnd[startAndEnd.length -1], false);
-					if (!regexIgnoreSuffix.contains(suffix))
-					{
-						regexIgnoreSuffix += suffix;
-						//System.out.println("Suffix regex changed: " + regexIgnoreSuffix);
-					}
+
+					regexSuffix = constructRegexPrefixOrSuffix(regexSuffix, startAndEnd[0], true);;
+					//System.out.println("Suffix regex changed: " + regexSuffix);
+
 				}
 			}
 		}
-		
-		/* TODO: add regex prefix and suffix into separate methods to reduce code size
-		 * Next check all strings that have been replaced and dont replace them again
-		 */
-		for (String replacedString: replacedStrings)
-		{
-			System.out.println("REPLACE STRING: "+startRegex + " " + replacedString);
-			if (startRegex.contains(replacedString))
-			{
-				System.out.println("REPLACE STRING TRUE: "+startRegex + " " + replacedString);
-				Pattern p = Pattern.compile(startRegex);
-				String startAndEnd[]= p.split(replacedString);
-			
-				
-				
-				if (startAndEnd.length>0)
-				{
-					if (startAndEnd[0].length()>0 && startRegex.startsWith(startAndEnd[0]))
-					{
-						String prefix = addRegexIgnoreConstruct(startAndEnd[0], true);
-						if (!regexIgnoreSuffix.contains(prefix))
-						{
-							regexIgnorePrefix += prefix;
-							System.out.println("Prefix regex changed: " + regexIgnorePrefix);
-						}
-					}
-						
-					
-					if (startAndEnd[startAndEnd.length -1].length()>0 && startRegex.endsWith(startAndEnd[startAndEnd.length -1]))
-					{
-						String suffix = addRegexIgnoreConstruct(startAndEnd[startAndEnd.length -1], false);
-						if (!regexIgnoreSuffix.contains(suffix))
-						{
-							regexIgnoreSuffix += suffix;
-							System.out.println("Suffix regex changed: " + regexIgnoreSuffix);
-						}
-					}
-				}
-			}
-		}
-		
-		return "(" +regexIgnorePrefix+ ")" +startRegex+ "(" +regexIgnoreSuffix+ ")";
+		return regexPrefix + startRegex + regexSuffix;
+
 	}
+	
+	
+	public void renameProperties(String serverVersion, String hideTool, String toolVersion, IProgressMonitor monitor)
+	{
+		File properties = new File(sourceDirStr+ "/build.properties");
+		
+		nameList.clear();
+		nameList.add(new String[] {"", "", "hideTool=.+", "hideTool=" + hideTool});
+		nameList.add(new String[] {"", "", "min.server.version.number=.+", "min.server.version.number=" + serverVersion});
+		nameList.add(new String[] {"", "", "tool.version=.+", "tool.version=" + toolVersion});
+		
+		this.replaceText(properties);
+		
+	}
+	
+
 }

@@ -5,34 +5,25 @@ import java.util.ArrayList;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
-
-
-import org.lams.toolbuilder.LAMSToolBuilderPlugin;
 import org.lams.toolbuilder.util.LamsToolBuilderLog;
 import org.lams.toolbuilder.util.Constants;
+
 
 
 
@@ -59,10 +50,11 @@ public class LAMSNewToolWizardTemplatePage extends WizardPage
 	{
 		super("selectTemplate");
 		this.selection = selection;
-		setTitle("Select a Template");
+		setTitle("LAMS Tool Project Wizard: Select a Template");
     	setDescription("Select a LAMS tool template to build your tool from");
     	templatesAvailable = false; 	// set to false to begin with
     	setAvailableTemplates();
+    	this.setPageComplete(true);
     	
 	}
    
@@ -97,9 +89,6 @@ public class LAMSNewToolWizardTemplatePage extends WizardPage
 		else
 		{
 			LamsToolBuilderLog.logInfo("No templates found in workspace");
-			//this.setVisible(false);
-			//TODO: Dialog box goes here "Do you want to use default template?"
-			// choose a default template to use. Hopefully an empty example tool
 		}
 	
 	}
@@ -114,12 +103,21 @@ public class LAMSNewToolWizardTemplatePage extends WizardPage
     */
    public void createControl(Composite parent) 
    {
+	    if(!templatesAvailable)
+	    {
+	    	MessageDialog.openError(getShell(),
+					"Workspace error:",
+					"No LAMS tool templates found in the workspace");
+	    	return;
+	    }
+	    
 	    Composite container = new Composite(parent, SWT.NULL);
 	    container.setLayout(new FormLayout());
 	    setControl(container);
-	   
-	    LamsToolBuilderLog.logInfo("Drawing LAMS Tool Template Wizard");
 	    Composite control = (Composite)getControl();
+	    
+	    LamsToolBuilderLog.logInfo("Drawing LAMS Tool Template Wizard");
+	    
 	    
 	    GridLayout layout = new GridLayout();
 	    layout.verticalSpacing = 10;
@@ -132,7 +130,10 @@ public class LAMSNewToolWizardTemplatePage extends WizardPage
 				"\n\n\t* access method: pserver " +
 				"\n\t* user name: anonymous" +
 				"\n\t* server name: lamscvs.melcoe.mq.edu.au" +
-				"\n\t* location: /usr/local/cvsroot\n\n");
+				"\n\t* location: /usr/local/cvsroot\n\n" +
+				"Note: Only Forum, Noticeboard, Notebook and Share Resources are available as " +
+				"\ntemplates at this stage. Please refer to the ToolBuilder wiki page for more details:" +
+				"\nhttp://wiki.lamsfoundation.org/display/lams/Tool+Builder\n\n");
    		
    		//create a group
 		Group templatesGroup = new Group(control, SWT.NONE);
@@ -154,6 +155,23 @@ public class LAMSNewToolWizardTemplatePage extends WizardPage
 		// add all available templates to the list
 		for(String dir:availableTemplates)
 		{
+			if (dir.equals(Constants.FORUM_TOOL_DIR))
+			{
+				dir = "Forum    (" +dir+ ")";
+			}
+			else if (dir.equals(Constants.SHARE_RESOURCE_TOOL_DIR))
+			{
+				dir = "Share Resources    (" +dir+ ")";
+			}
+			else if ( dir.equals(Constants.NOTEBOOK_TOOL_DIR))
+			{
+				dir = "Notebook    (" +dir+ ")";
+			}
+			else if ( dir.equals(Constants.NOTICEBOARD_TOOL_DIR))
+			{
+				dir = "Noticeboard    (" +dir+ ")";
+			}
+			
 			dispList.add(dir);
 		}
 		
@@ -169,6 +187,7 @@ public class LAMSNewToolWizardTemplatePage extends WizardPage
 				if (selected.length==1)
 				{
 					chosenTemplate = selected[0];
+					
 				}
 			}
 			

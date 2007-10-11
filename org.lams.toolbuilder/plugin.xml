@@ -16,7 +16,7 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <category
-            name="LAMS"
+            name="LAMS/RAMS"
             id="org.lams.toolbuilder">
       </category>
       <wizard
