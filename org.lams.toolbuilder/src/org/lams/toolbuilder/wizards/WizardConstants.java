@@ -115,6 +115,7 @@ public class WizardConstants
 		"* deploy-ear\n" +
 		"* copyfiles\n" +
 		"* deploy-tools\n\n" +
-		"Once you have LAMS core deployed, you can run the tool's 'deploy'\n" +
-		"task in its build.xml. Then run LAMS to check that the tool appears in author.";
+		"Once you have LAMS core deployed, you can run the tool's\n" +
+		"'deploy' task in its build.xml. Then run LAMS to check that\n" +
+		"the tool appears in author.";
 }
