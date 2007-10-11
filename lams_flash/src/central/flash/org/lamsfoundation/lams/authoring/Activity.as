@@ -374,7 +374,16 @@ class org.lamsfoundation.lams.authoring.Activity {
 		//bnools need to be included - so do as follows:
 		dto.applyGrouping = (_applyGrouping==null) ? false : _applyGrouping;
 		dto.runOffline = (_runOffline==null) ? false : _runOffline;
-		dto.defineLater = (_defineLater==null) ? false : _defineLater;
+		
+		if(isBranchingActivity())
+			if(_activityTypeID == GROUP_BRANCHING_ACTIVITY_TYPE)
+				dto.defineLater = _defineLater;
+			else
+				dto.defineLater = false;
+		else
+			dto.defineLater = (_defineLater==null) ? false : _defineLater;
+		
+		
 		if(_createDateTime){		dto.createDateTime		= _createDateTime;			}
 		if(_groupingSupportType){	dto.groupingSupportType = _groupingSupportType;		}
 		if(_readOnly){	dto.readOnly = _readOnly;	 }

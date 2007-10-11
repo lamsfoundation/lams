@@ -513,7 +513,7 @@ class PropertyInspectorControls extends MovieClip {
 			numLearners_rdo.visible = false;
 			numGroups_rdo.visible = false;
 			
-			_group_naming_btn.visible = (numGroups_stp.value > 0) ? true : false;
+			_group_naming_btn.visible = true; //(numGroups_stp.value > 0) ? true : false;
 			
 			if(e != null) {
 				numGroups_lbl.enabled = e;
@@ -618,7 +618,7 @@ class PropertyInspectorControls extends MovieClip {
 			numLearners_stp.enabled = false;
 			
 			_group_naming_btn.enabled = (e != null) ? e : true;
-			_group_naming_btn.visible = (numRandomGroups_stp.value > 0) ? true : false;
+			_group_naming_btn.visible = true; // (numRandomGroups_stp.value > 0) ? true : false;
 		
 		}
 		
@@ -700,9 +700,6 @@ class PropertyInspectorControls extends MovieClip {
 			numGroups_stp.value = 0;
 			g.maxNumberOfGroups = 0;
 			
-			_group_naming_btn.visible = (numRandomGroups_stp.value > 0) ? true : false;
-			_define_monitor_cb.selected = false;
-			
 		}else{
 			g.maxNumberOfGroups = numGroups_stp.value;
 			
@@ -710,9 +707,6 @@ class PropertyInspectorControls extends MovieClip {
 			numLearners_stp.value = 0;
 			g.learnersPerGroups = 0;
 			g.numberOfGroups = 0;
-			
-			_group_naming_btn.visible = (numGroups_stp.value > 0) ? true : false;
-			_define_monitor_cb.selected = false;
 			
 		}
 				
@@ -887,7 +881,7 @@ class PropertyInspectorControls extends MovieClip {
 			}
 			
 			_canvasModel.selectedItem.activity.toolActivityUIID = null;
-			_canvasModel.selectedItem.activity.defineLater = null;
+			//_canvasModel.selectedItem.activity.defineLater = null;
 			
 			showGroupBasedBranchingControls(true, !_canvasModel.selectedItem.activity.readOnly);
 			showAppliedGroupingControls(true, !_canvasModel.selectedItem.activity.readOnly);
@@ -899,7 +893,6 @@ class PropertyInspectorControls extends MovieClip {
 			showToolBasedBranchingControls(true, !_canvasModel.selectedItem.activity.readOnly);
 			
 			_canvasModel.selectedItem.activity.groupingUIID = null;
-			_canvasModel.selectedItem.activity.defineLater = null;
 			
 			showGroupBasedBranchingControls(false);
 			showAppliedGroupingControls(false);
@@ -910,7 +903,6 @@ class PropertyInspectorControls extends MovieClip {
 		} else {
 			_canvasModel.selectedItem.activity.groupingUIID = null;
 			_canvasModel.selectedItem.activity.toolActivityUIID = null;
-			_canvasModel.selectedItem.activity.defineLater = null;
 			
 			showToolBasedBranchingControls(false);
 			showGroupBasedBranchingControls(false);
@@ -1022,8 +1014,8 @@ class PropertyInspectorControls extends MovieClip {
 			return; 
 		}		
 		
-		if(_canvasModel.selectedItem.activity.defineLater != null)
-			_canvasModel.selectedItem.activity.defineLater = _define_monitor_cb.selected;
+		//if(_canvasModel.selectedItem.activity.defineLater != null)
+		//	_define_monitor_cb.selected = _canvasModel.selectedItem.activity.defineLater;
 
 		var ca = _canvasModel.selectedItem;
 		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
@@ -1034,7 +1026,7 @@ class PropertyInspectorControls extends MovieClip {
 			if(grouping.learnersPerGroups > 0)
 				_canvasModel.selectedItem.activity.defineLater = true;
 			
-			_define_monitor_cb.selected = (_canvasModel.selectedItem.activity.defineLater != null) ? _canvasModel.selectedItem.activity.defineLater : false;
+			_define_monitor_cb.selected = _canvasModel.selectedItem.activity.defineLater;
 			
 			_group_match_btn.visible = ((grouping.numberOfGroups > 0 || grouping.maxNumberOfGroups > 0) && !_define_monitor_cb.selected) ? v : false;
 			_define_monitor_cb.visible = (grouping.numberOfGroups > 0 || grouping.maxNumberOfGroups > 0 || grouping.learnersPerGroups > 0) ? v : false;
@@ -1157,7 +1149,7 @@ class PropertyInspectorControls extends MovieClip {
 	
 	public function onDefaultBranchSelect(evt:Object):Void {
 		if(_pi_defaultBranch_cb.selected) {
-			_canvasModel.activeView.activity.defaultBranch = BranchConnector(_canvasModel.selectedItem).branch; _pi_defaultBranch_cb.selected
+			_canvasModel.activeView.activity.defaultBranch = BranchConnector(_canvasModel.selectedItem).branch;
 			_pi_defaultBranch_cb.enabled = false;
 		}
 		
@@ -1166,11 +1158,8 @@ class PropertyInspectorControls extends MovieClip {
 	
 	public function onDefineMonitorSelect(evt:Object):Void {
 			
-		if(_define_monitor_cb.selected)
-			_canvasModel.selectedItem.activity.defineLater = _define_monitor_cb.selected;
-		else
-			_canvasModel.selectedItem.activity.defineLater = false;
-		
+		_canvasModel.selectedItem.activity.defineLater = _define_monitor_cb.selected;
+
 		var grouping:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.groupingUIID);
 		_group_match_btn.visible = ((grouping.numberOfGroups > 0 || grouping.maxNumberOfGroups > 0) && !_define_monitor_cb.selected) ? true : false;
 		
@@ -1190,7 +1179,6 @@ class PropertyInspectorControls extends MovieClip {
 			
 			_canvasModel.selectedItem.activity.defineLater = defineLater_chk.selected;
 			Debugger.log('_canvasModel.selectedItem.activity.defineLater:'+_canvasModel.selectedItem.activity.defineLater,Debugger.GEN,'click','PropertyInspector');
-		
 		}else if(tgt.indexOf("runOffline_chk") != -1){
 			
 			_canvasModel.selectedItem.activity.runOffline = runOffline_chk.selected;

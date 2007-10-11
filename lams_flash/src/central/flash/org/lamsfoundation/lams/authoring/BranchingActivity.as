@@ -89,7 +89,6 @@ class BranchingActivity extends ComplexActivity {
 		if(_endXCoord) dto.endXCoord = _endXCoord;
 		if(_endYCoord) dto.endYCoord = _endYCoord;
 		if(_toolActivityUIID) dto.toolActivityUIID = _toolActivityUIID;
-		
 		if(_defaultBranch) dto.defaultActivityUIID = _defaultBranch.sequenceActivity.activityUIID;
 		
 		return dto;

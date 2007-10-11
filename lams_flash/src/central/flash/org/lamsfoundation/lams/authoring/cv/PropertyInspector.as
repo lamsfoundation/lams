@@ -381,7 +381,7 @@ class PropertyInspector extends PropertyInspectorControls {
 			showBranchProperties(branch);
 			
 			showGeneralControls(true, !branch.sequenceActivity.readOnly);
-			showBranchControls(true);
+			showBranchControls((Activity(cm.getCanvas().ddm.getActivityByUIID(branch.sequenceActivity.parentUIID)).activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE));
 			
 			showGeneralInfo(false);
 			showOptionalControls(false);
@@ -494,7 +494,8 @@ class PropertyInspector extends PropertyInspectorControls {
 			showAppliedGroupingControls(true, !ba.readOnly);
 			showGroupBasedBranchingControls(true, !ba.readOnly);
 			
-			_define_monitor_cb.selected = (ba.defineLater != null) ? ba.defineLater : false;
+			Debugger.log("defineLater: " + ba.defineLater, Debugger.CRITICAL, "showBranchingActivityProperties", "PropertyInspector");
+			//_define_monitor_cb.selected = (ba.defineLater != null) ? ba.defineLater : false;
 		}
 	
 	}
