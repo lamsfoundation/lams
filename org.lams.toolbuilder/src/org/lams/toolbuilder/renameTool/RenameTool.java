@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.ArrayList;
-
+import java.util.Properties;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.lams.toolbuilder.util.LamsToolBuilderLog;
@@ -91,14 +92,6 @@ public class RenameTool {
 			String replacement) {
 
 		String newFileName = currentFileName.replaceAll(regex, replacement);
-
-		/*if (!currentFileName.equals(newFileName)) {
-
-			String format = "Renamed %1$-40s ---> %2$-1s\n";
-
-			System.out.format(format, currentFileName, newFileName);
-
-		}*/
 		return newFileName;
 	}
 
@@ -334,6 +327,17 @@ public class RenameTool {
 		}
 		return regexPrefix + startRegex + regexSuffix;
 
+	}
+	
+	public void updateLanguageFile(String filePath, String rename)
+	{
+		
+		File language = new File(filePath);
+		
+		nameList.clear();
+		nameList.add(new String[] {"", "", "activity\\.title.+", "activity.title  =" + rename});
+		
+		this.replaceText(language);
 	}
 	
 	

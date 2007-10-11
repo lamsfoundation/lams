@@ -175,7 +175,7 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		// Get the project from the page
 		final IProject project = projectPage.getProjectHandle();
 		
-		this.vendor = projectPage.getVendor();
+		this.vendor = projectPage.getVendor().toLowerCase();
 		this.compatibility = projectPage.getCompatibility();
 		this.toolDisplayName = projectPage.getToolDisplayName();
 		this.isLAMS = projectPage.getIsLams();
@@ -306,13 +306,19 @@ public class LAMSNewToolWizard extends Wizard implements INewWizard {
 		monitor.subTask("Translating LAMS tool template: " + toolTemplate);
 		LamsToolBuilderLog.logInfo(projHandle.getLocation().toPortableString());
 		try{
-			rt.renameTool(taskList.getTasklist(), projHandle.getLocation().toPortableString(), vendor, monitor);
+			String projPath = projHandle.getLocation().toPortableString();
+			
+			rt.renameTool(taskList.getTasklist(), projPath, vendor, monitor);
 			monitor.worked(10);
 			String hideTool = toolVisible ? "false" : "true";
 			
 			
 			monitor.subTask("Translating properties file");
 			rt.renameProperties(compatibility, hideTool, toolVersion, monitor);
+			rt.updateLanguageFile(projPath + "/conf/language/lams/ApplicationResources.properties", toolDisplayName);
+			rt.updateLanguageFile(projPath + "/conf/language/lams/ApplicationResources_en_AU.properties",toolDisplayName);
+			rt.updateLanguageFile(projPath + "/conf/language/rams/ApplicationResources.properties",toolDisplayName);
+			rt.updateLanguageFile(projPath + "/conf/language/rams/ApplicationResources_en_AU.properties",toolDisplayName);
 			System.out.print(taskList.getTasklist().toString());
 		}
 		catch (Exception e)
