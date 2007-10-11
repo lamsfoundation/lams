@@ -1033,7 +1033,9 @@ class PropertyInspectorControls extends MovieClip {
 
 			if(e != null && !e) {
 				_group_match_btn.enabled = e;
-				_define_monitor_cb.enabled = e;
+				_define_monitor_cb.enabled = (grouping.learnersPerGroups > 0) ? false : e;
+			} else {
+				_define_monitor_cb.enabled = (grouping.learnersPerGroups > 0) ? false : true;
 			}
 			
 		}
