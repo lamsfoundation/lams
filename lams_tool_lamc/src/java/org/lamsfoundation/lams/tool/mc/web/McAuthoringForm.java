@@ -48,6 +48,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	
 	protected String showMarks;
 	protected String randomize;
+	protected String displayAnswers;
 	
 	protected String fileItem;
 	protected String uuid;
@@ -202,6 +203,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 		this.monitoringReportTitle=null;
 		this.questionsSequenced=null;
 		this.randomize =null;
+		this.displayAnswers =null;
 		this.showFeedback=null;
 		this.retries=null;
 		this.sln=null;
@@ -1028,4 +1030,18 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     public void setRandomize(String randomize) {
         this.randomize = randomize;
     }
+
+    /**
+     * @return Returns the displayAnswers.
+     */
+    public String getDisplayAnswers() {
+        return displayAnswers;
+    }
+    /**
+     * @param displayAnswers The displayAnswers to set.
+     */
+    public void setDisplayAnswers(String displayAnswers) {
+        this.displayAnswers = displayAnswers;
+    }
+
 }

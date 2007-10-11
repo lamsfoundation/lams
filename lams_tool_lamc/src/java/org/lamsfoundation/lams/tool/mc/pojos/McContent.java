@@ -99,6 +99,8 @@ public class McContent implements Serializable {
     
     private boolean randomize;
     
+    private boolean displayAnswers;
+
     private boolean showMarks;
     
     /** nullable persistent field */
@@ -118,7 +120,7 @@ public class McContent implements Serializable {
     /** full constructor */
     public McContent(Long mcContentId, String content, String title, String instructions, boolean defineLater, boolean runOffline, Date creationDate, 
     		Date updateDate, boolean questionsSequenced,  long createdBy, boolean contentInUse, String offlineInstructions, String onlineInstructions, 
-			Integer passMark, boolean showReport, boolean randomize, boolean showMarks, boolean retries, boolean reflect, String reflectionSubject, Set mcQueContents, Set mcSessions, 
+			Integer passMark, boolean showReport, boolean randomize, boolean displayAnswers, boolean showMarks, boolean retries, boolean reflect, String reflectionSubject, Set mcQueContents, Set mcSessions, 
 			Set mcAttachments) {
         
         logger.debug("copying properties");
@@ -141,6 +143,7 @@ public class McContent implements Serializable {
         this.passMark = passMark;
         this.showReport = showReport;
         this.randomize = randomize;
+        this.displayAnswers = displayAnswers;
         this.showMarks = showMarks;
         this.mcQueContents = mcQueContents;
         this.mcSessions = mcSessions;
@@ -190,6 +193,7 @@ public class McContent implements Serializable {
 					 mc.getPassMark(),
 					 mc.isShowReport(),
 					 mc.isRandomize(),
+					 mc.isDisplayAnswers(),
 					 mc.isShowMarks(),
 					 mc.isRetries(),
 					 mc.isReflect(),
@@ -504,6 +508,18 @@ public class McContent implements Serializable {
      */
     public void setRandomize(boolean randomize) {
         this.randomize = randomize;
+    }
+    /**
+     * @return Returns the displayAnswers.
+     */
+    public boolean isDisplayAnswers() {
+        return displayAnswers;
+    }
+    /**
+     * @param displayAnswers The displayAnswers to set.
+     */
+    public void setDisplayAnswers(boolean displayAnswers) {
+    	this.displayAnswers = displayAnswers;
     }
     
     /**

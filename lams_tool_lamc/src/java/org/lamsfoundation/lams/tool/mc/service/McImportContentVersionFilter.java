@@ -30,4 +30,11 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter{
 	    this.addField(McContent.class, "randomize",new Boolean(false));
 	    this.addField(McOptsContent.class, "displayOrder",new Integer(0));
 	}
+	
+	public void up20061113To20070820() {
+		// Adds displayAnswers LDEV-1156
+		
+		this.addField(McContent.class, "displayAnswers", new Boolean(true));
+		
+	}
 }

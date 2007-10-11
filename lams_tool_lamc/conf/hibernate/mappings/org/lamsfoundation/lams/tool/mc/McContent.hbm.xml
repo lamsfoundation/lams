@@ -169,6 +169,13 @@
         length="1"        
    />
 
+   <property
+        name="displayAnswers"
+        type="boolean"
+        access="property"
+        column="displayAnswers"
+        length="1"        
+   />
 
     
     <property

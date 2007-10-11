@@ -5,6 +5,9 @@ ALTER TABLE tl_lamc11_que_usr
 ADD COLUMN last_attempt_order INTEGER
 , ADD COLUMN last_attempt_total_mark INTEGER;
 
+ALTER TABLE tl_lamc11_content
+ADD COLUMN displayAnswers TINYINT(1) NOT NULL DEFAULT 1 AFTER randomize;
+
 -- Fix problems with the marks in the attempt table. It was recording the number of questions answered correctly for the activity.
 -- Now it records the mark for each question. The overall mark is put in the  que_usr table.
 update tl_lamc11_usr_attempt a

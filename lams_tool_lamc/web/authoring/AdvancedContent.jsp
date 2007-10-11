@@ -49,7 +49,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</label>
 </p>
 
-
+<p class="small-space-top">
+	<html:checkbox property="displayAnswers" value="1" styleId="displayAnswers"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="displayAnswers">
+		<fmt:message key="label.displayAnswers" />
+	</label>
+</p>
 
 
 <p>

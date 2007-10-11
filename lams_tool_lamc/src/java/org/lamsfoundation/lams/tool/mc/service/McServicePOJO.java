@@ -2259,6 +2259,7 @@ public class McServicePOJO implements
     	toolContentObj.setQuestionsSequenced(false);
     	toolContentObj.setShowMarks(false);
     	toolContentObj.setRandomize(false);
+    	toolContentObj.setDisplayAnswers(false);
     	// I can't find a use for setShowReport anywhere
     	toolContentObj.setShowReport(false);
     	

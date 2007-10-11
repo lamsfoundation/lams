@@ -67,6 +67,7 @@ public class AuthoringUtil implements McAppConstants {
 	{
 		mcAuthoringForm.setQuestionsSequenced(mcContent.isQuestionsSequenced()?"1":"0");
 		mcAuthoringForm.setRandomize(mcContent.isRandomize ()?"1":"0");
+		mcAuthoringForm.setDisplayAnswers(mcContent.isDisplayAnswers ()?"1":"0");
 		mcAuthoringForm.setShowMarks(mcContent.isShowMarks()?"1":"0");
 		mcAuthoringForm.setRetries(mcContent.isRetries()?"1":"0");
 		mcAuthoringForm.setSln(mcContent.isShowReport()?"1":"0");
@@ -1384,6 +1385,9 @@ public class AuthoringUtil implements McAppConstants {
 
 		String randomize=request.getParameter("randomize");
 		logger.debug("randomize: " + randomize);
+
+		String displayAnswers=request.getParameter("displayAnswers");
+		logger.debug("displayAnswers: " + displayAnswers);
 		
 		String showMarks=request.getParameter("showMarks");
 		logger.debug("showMarks: " + showMarks);
@@ -1416,6 +1420,7 @@ public class AuthoringUtil implements McAppConstants {
 		
         boolean questionsSequencedBoolean=false;
         boolean randomizeBoolean=false;
+        boolean displayAnswersBoolean=false;
         boolean showMarksBoolean=false;
         boolean slnBoolean=false;
         boolean retriesBoolean=false;
@@ -1426,6 +1431,9 @@ public class AuthoringUtil implements McAppConstants {
     	
     	if ((randomize != null) && (randomize.equalsIgnoreCase("1")))
     	    randomizeBoolean=true;            
+
+    	if ((displayAnswers != null) && (displayAnswers.equalsIgnoreCase("1")))
+    		displayAnswersBoolean=true;         	
     	
     	if ((showMarks != null) && (showMarks.equalsIgnoreCase("1")))
     	    showMarksBoolean=true;            
@@ -1508,6 +1516,7 @@ public class AuthoringUtil implements McAppConstants {
          	mcContent.setOfflineInstructions(richTextOfflineInstructions);
          	mcContent.setQuestionsSequenced(questionsSequencedBoolean);
          	mcContent.setRandomize(randomizeBoolean);
+         	mcContent.setDisplayAnswers(displayAnswersBoolean);
          	mcContent.setShowMarks(showMarksBoolean);
          	mcContent.setRetries(retriesBoolean);
          	mcContent.setShowReport(slnBoolean);	

@@ -19,6 +19,7 @@ CREATE TABLE tl_lamc11_content (
      , reflectionSubject TEXT
      , showMarks TINYINT(1) NOT NULL DEFAULT 0
      , randomize TINYINT(1) NOT NULL DEFAULT 0
+     , displayAnswers TINYINT(1) NOT NULL DEFAULT 1
      , UNIQUE UQ_tl_lamc11_content_1 (content_id)
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
