@@ -1317,7 +1317,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			
 				Debugger.log('Opening url:'+url,Debugger.GEN,'openToolActivityContent','CanvasModel');
 				
-				JsPopup.getInstance().launchPopupWindow(url, 'ToolActivityContent', 600, 800, true, true, false, false, false);
+				// TODO: Maybe add learningDesignID and serverURL to window title to handle multiple LAMS(s) running in same browser session.
+				JsPopup.getInstance().launchPopupWindow(url, 'ToolActivityContent_' + ta.toolContentID, 600, 800, true, true, false, false, false);
 			
 				// set modified (not-saved) flag so that potential changes cannot be lost.
 				ApplicationParent.extCall('setSaved', 'false');

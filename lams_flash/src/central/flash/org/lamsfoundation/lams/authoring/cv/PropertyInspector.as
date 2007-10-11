@@ -381,7 +381,7 @@ class PropertyInspector extends PropertyInspectorControls {
 			showBranchProperties(branch);
 			
 			showGeneralControls(true, !branch.sequenceActivity.readOnly);
-			showBranchControls((Activity(cm.getCanvas().ddm.getActivityByUIID(branch.sequenceActivity.parentUIID)).activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE));
+			showBranchControls((Activity(cm.getCanvas().ddm.getActivityByUIID(branch.sequenceActivity.parentUIID)).activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE));
 			
 			showGeneralInfo(false);
 			showOptionalControls(false);
