@@ -18,7 +18,7 @@
 		var copyrightWin = null;
 		
 		function closeAllChildren(){
-			if (authorWin && !authorWin.closed) authorWin.close();
+			if (authorWin && !authorWin.closed) authorWin.closeWindow();
 			if (learnWin && !learnWin.closed) learnWin.close();
 			if (monitorLessonWin && !monitorLessonWin.closed) monitorLessonWin.close();
 			if (addLessonWin && !addLessonWin.closed) addLessonWin.close();

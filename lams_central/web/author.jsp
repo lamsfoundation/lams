@@ -33,6 +33,11 @@ var theFilePopUp = null;
 var previewWin = null;
 var previewSessionId = null;
 
+// Use for handling popup windows
+var pWins = new Array();
+var iWins = 0;
+	
+
 function getWindowSize() {
   var myWidth = 0, myHeight = 0;
   if( typeof( window.innerWidth ) == 'number' ) {
@@ -115,8 +120,21 @@ function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolba
 	//		thePopUp.focus();
 			
 	//}else{
-		thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
+	//	thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
 	//}
+
+	for(var i=0; i<pWins.length; i++) {
+		if(pWins[i] != null && !pWins[i].closed && pWins[i].open) {
+			if(pWins[i].name == title) {
+				window.blur();
+				pWins[i].focus();
+				return;	
+			}
+		}
+	}
+	
+	pWins[iWins] = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
+	iWins++;
 }
 
 function openPopUpFS(args){
@@ -171,6 +189,7 @@ function openFilePopUp(args){
 }
 
 function closeWindow(){
+	
 	// refresh the parent window
 	var parentURL = "${notifyCloseURL}";
 	
@@ -184,6 +203,15 @@ function closeWindow(){
 		window.close();
 	} else {
 		window.location.href = "javascript: window.close()";
+	}
+	
+	// close all open windows
+	if(window.closed) {
+		for(var i=0; i<pWins.length; i++) {
+			if(pWins[i] != null && !pWins[i].closed) {
+				pWins[i].close();
+			}
+		}
 	}
 }
 
