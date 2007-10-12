@@ -36,7 +36,7 @@ import java.util.ArrayList;
 public class Alter21Integration {
 
 	/**
-	 * Dump out a list of all the nodes in the content repository, with their type and expected paths
+	 * Update 3rd party integration courses to classes, LDEV-1284.
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
@@ -45,6 +45,7 @@ public class Alter21Integration {
 		if (args.length < 3)
 		{
 			System.out.println("Usage: java Alter21Integration DB_NAME DB_USERNAME DB_PASSWORD");
+			System.out.println("Make sure mysql-connector-java-3.x.x-bin.jar is in your classpath.")
 			System.exit(1);
 		}
 		
@@ -64,6 +65,7 @@ public class Alter21Integration {
         Connection conn = DriverManager.getConnection(dbDriverUrl, dbUsername, dbPassword);
         conn.setAutoCommit(false);
 		
+        // change integration orgs from classes to courses, with root org as parent.
 		String updateToCourseType = "UPDATE lams_organisation "
 				+ "SET organisation_type_id=2, "
 				+ "parent_organisation_id=1 "
@@ -72,15 +74,23 @@ public class Alter21Integration {
 					+ "FROM lams_ext_course_class_map "
 					+ ")";	
 		
+		// we want to give these newly converted courses their own workspaces;
 		String getCoursesWithoutWorkspaces = "SELECT organisation_id, name "
 			+ "FROM lams_organisation "
 			+ "WHERE organisation_type_id=2 "
 			+ "AND workspace_id IS NULL";
 		
-		// do twice for run folders
-		String insertFolder = "INSERT INTO lams_workspace_folder (name, user_id, create_date_time, last_modified_date_time, lams_workspace_folder_type_id) "
+		// normal folder;
+		String insertNormalFolder = "INSERT INTO lams_workspace_folder (name, user_id, create_date_time, "
+			+ "last_modified_date_time, lams_workspace_folder_type_id) "
 			+ "VALUES (?, ?, ?, ?, ?)";
 
+		// and run sequence folder
+		String insertRunSequencesFolder = "INSERT INTO lams_workspace_folder (name, user_id, create_date_time, "
+			+ "last_modified_date_time, lams_workspace_folder_type_id, parent_folder_id) "
+			+ "VALUES (?, ?, ?, ?, ?, ?)";
+		
+		// insert workspace, links to its folders, and link to its org 
 		String insertWorkspace = "INSERT INTO lams_workspace (name, default_fld_id, def_run_seq_fld_id) "
 			+ "VALUES (?, ?, ?)";
 		
@@ -91,10 +101,12 @@ public class Alter21Integration {
 			+ "SET workspace_id=? "
 			+ "WHERE organisation_id=?";
 
-        // update to course type
+        // Start update
+		
+		// update classes to courses
         PreparedStatement query = conn.prepareStatement(updateToCourseType);
         int numUpdatedCourses = query.executeUpdate();
-        System.out.println("Updated " + numUpdatedCourses + " integration classes to courses.");
+        System.out.println("Set " + numUpdatedCourses + " integration organisations to courses.");
       
         // get courses without workspaces
         ArrayList<OrgDTO> orgs = new ArrayList<OrgDTO>();
@@ -107,7 +119,7 @@ public class Alter21Integration {
         // create workspace and folders for each org
         for (OrgDTO org : orgs) {
         	// insert normal folder
-        	query = conn.prepareStatement(insertFolder, Statement.RETURN_GENERATED_KEYS);
+        	query = conn.prepareStatement(insertNormalFolder, Statement.RETURN_GENERATED_KEYS);
         	query.setString(1, org.getOrgName());
         	query.setLong(2, new Long(1));
         	query.setDate(3, new Date(System.currentTimeMillis()));
@@ -120,7 +132,13 @@ public class Alter21Integration {
         	System.out.println("Inserted " + numInsert + " workspace folders, with id " + wkspcFolderId + ".");
 
         	// insert run sequences folder
+        	query = conn.prepareStatement(insertRunSequencesFolder, Statement.RETURN_GENERATED_KEYS);
+        	query.setString(1, org.getOrgName()+" Run Sequences");
+        	query.setLong(2, new Long(1));
+        	query.setDate(3, new Date(System.currentTimeMillis()));
+        	query.setDate(4, new Date(System.currentTimeMillis()));
         	query.setInt(5, new Integer(2));
+        	query.setLong(6, wkspcFolderId);
         	numInsert = query.executeUpdate();
         	results = query.getGeneratedKeys();
         	long wkspcRunFolderId = -1;
