@@ -98,15 +98,18 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
     private function init():Void{
         //Delete the enterframe dispatcher
         delete this.onEnterFrame;
-		
+
 		ok_btn.visible = false;
 		cancel_btn.visible = false;
 		_isDragging = false;
 		
 		clickTarget.enabled = true;	
 		
+		//clickTarget.onPress = Proxy.create(this, onDrag);
 		clickTarget.onPress = Proxy.create(this, onDrag);
 		clickTarget.onRelease = Proxy.create(this, onDrag);
+		
+		clickTarget.onReleaseOutside = Proxy.create(this, onDrag);
 
 		ok_btn.addEventListener('click', Delegate.create(this, onOkPress));
         cancel_btn.addEventListener('click', Delegate.create(this, onCancelPress));
@@ -131,12 +134,16 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
     }
 	
 	private function onDrag() {
-		
 		if(!_isDragging) {
 			this.startDrag();
 			_isDragging = true;
 		}
 		else {
+			if (this._x < 0) { this._x = 0; }
+			if (this._x > Stage.width) { this._x = Stage.width; }
+			if (this._y < 0) { this._y = 0; }
+			if (this._y > Stage.height) { this._y = Stage.height; }
+
 			this.stopDrag();
 			_isDragging = false;
 		}
