@@ -65,31 +65,33 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="learnerProgressUserId" />
 			<html:hidden property="questionListingMode" />
 
-			<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
+
+			<c:choose>
+			<c:when test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
 
 				<h3>
 					<fmt:message key="label.individual.results.withRetries" />
 				</h3>
 
-			</c:if>
-
-			<c:if test="${mcGeneralLearnerFlowDTO.retries != 'true'}">
+			</c:when>
+			<c:when test="${mcGeneralLearnerFlowDTO.retries != 'true'}">
 
 				<h3>
 					<fmt:message key="label.individual.results.withoutRetries" />
 				</h3>
 
+			</c:when>
+			</c:choose>
+			
+			<c:if test="${(mcGeneralLearnerFlowDTO.retries == 'true') or (mcGeneralLearnerFlowDTO.displayAnswers == 'true')}">
+				<p>
+					<strong><fmt:message key="label.mark" /> </strong>
+					<c:out value="${mcGeneralLearnerFlowDTO.learnerMark}" />
+					<fmt:message key="label.outof" />
+					<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}" />
+				</p>
 			</c:if>
-
-			<p>
-				<strong><fmt:message key="label.mark" /> </strong>
-
-				<c:out value="${mcGeneralLearnerFlowDTO.learnerMark}" />
-				<fmt:message key="label.outof" />
-				<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}" />
-
-			</p>
-
+			
 			<p>
 				<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
 					<c:if
@@ -119,32 +121,36 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<c:out value="${dto.question}" escapeXml="false" />
 						</div>									
 
+                    <c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
 						[
 						<strong> <fmt:message key="label.mark" /> </strong>
-						<c:out value="${dto.mark}" />
+						<c:out value="${dto.mark}" /> 
 						]
+					</c:if>
 
-					<p>
-						<c:forEach var="caText" varStatus="status"
-							items="${dto.candidateAnswers}">
-							<c:out value="${caText.value}" escapeXml="false" />
-						</c:forEach>
+						<p>
+							<c:forEach var="caText" varStatus="status"
+								items="${dto.candidateAnswers}">
+								<c:out value="${caText.value}" escapeXml="false" />
+							</c:forEach>
 
-							<c:if test="${dto.attemptCorrect == 'true'}">
-								<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">
-							</c:if>
-							<c:if test="${dto.attemptCorrect != 'true'}">
-								<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
-							</c:if>
-
-					</p>
+                    <c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
+	
+								<c:if test="${dto.attemptCorrect == 'true'}">
+									<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">
+								</c:if>
+								<c:if test="${dto.attemptCorrect != 'true'}">
+									<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
+								</c:if>
+	
+						</p>
 
 						<c:if test="${(dto.feedback != null) && (dto.feedback != '')}">
 							<div style="overflow: auto;">
 								<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${dto.feedback}" escapeXml="false" /> 
 							</div>		
 						</c:if>												
-
+					</c:if>
 				</div>
 			</c:forEach>
 

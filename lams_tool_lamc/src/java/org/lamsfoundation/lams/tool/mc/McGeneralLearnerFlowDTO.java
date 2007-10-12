@@ -86,6 +86,8 @@ public class McGeneralLearnerFlowDTO implements Comparable
     
     protected String showMarks;
     
+    protected String displayAnswers;
+    
     protected Map mapQueAttempts;
 	
     protected Map mapQueCorrectAttempts;
@@ -357,6 +359,7 @@ public class McGeneralLearnerFlowDTO implements Comparable
             .append("activityTitle: ", activityTitle)
             .append("questionListingMode: ", questionListingMode)
             .append("learnerProgress: ", learnerProgress)
+            .append("displayAnswers: ", displayAnswers)
             .append("reportViewOnly: ", reportViewOnly)
             .append("reflection: ", reflection)
             .append("reflectionSubject: ", reflectionSubject)
@@ -591,6 +594,22 @@ public class McGeneralLearnerFlowDTO implements Comparable
     public void setShowMarks(String showMarks) {
         this.showMarks = showMarks;
     }
+    
+    /**
+     * Displays answers on the screen
+     * @return Returns the displayAnswers.
+     */
+    public String getDisplayAnswers() {
+        return displayAnswers;
+    }
+    /**
+     * See getDisplayAnswers() for the meaning of "displayAnswers".
+     * @param displayAnswers The displayAnswers to set.
+     */
+    public void setDisplayAnswers(String displayAnswers) {
+        this.displayAnswers = displayAnswers;
+    }
+    
     /**
      * @return Returns the mapFinalAnswersContent.
      */

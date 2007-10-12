@@ -95,26 +95,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<c:set var="queIndex" scope="request" value="${queIndex +1}" />
 
 						<c:if test="${requestScope.mainQueIndex == requestScope.queIndex}">
-							<ul>
-								<c:forEach var="subEntry" items="${mainEntry.value}">
-									<li>
-										<c:out value="${subEntry.value}" escapeXml="false" />
-									</li>
+							<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
+								<ul>
+									<c:forEach var="subEntry" items="${mainEntry.value}">
+										<li>
+											<c:out value="${subEntry.value}" escapeXml="false" /> 
+										</li>
+									</c:forEach>
+								</ul>
+								<c:set var="attemptCount" scope="request" value="0" />
+								<c:forEach var="attemptEntry"
+									items="${mcGeneralLearnerFlowDTO.mapQueAttempts}">
+									<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
+										<c:set var="attemptCount" scope="request" value="${attemptCount +1}" />								
+									</c:if>
 								</c:forEach>
-							</ul>
-
-
-							<c:set var="attemptCount" scope="request" value="0" />
-							<c:forEach var="attemptEntry"
-								items="${mcGeneralLearnerFlowDTO.mapQueAttempts}">
-								<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
-									<c:set var="attemptCount" scope="request" value="${attemptCount +1}" />								
-								</c:if>
-							</c:forEach>
-
-							<h4> <fmt:message key="label.attempt.count" />   <c:out value="${highestAttempOrder}" /> </h4>
+								<h4> <fmt:message key="label.attempt.count" />   <c:out value="${highestAttempOrder}" /> </h4>
+							</c:if>
 							
-
 
 							<c:forEach var="attemptEntryFinal"
 								items="${mcGeneralLearnerFlowDTO.mapFinalAnswersContent}">
@@ -123,6 +121,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</c:if>
 							</c:forEach>
 
+						<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
 							<c:forEach var="attemptEntryCorrect"
 								items="${mcGeneralLearnerFlowDTO.mapFinalAnswersIsContent}">
 								<c:if test="${requestScope.mainQueIndex == attemptEntryCorrect.key}">
@@ -134,21 +133,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									</c:if>									
 								</c:if>
 							</c:forEach>
-
+						</c:if>
 						</c:if>
 					</c:forEach>
 
-
-					<c:forEach var="feedbackEntry"
-						items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">
-						<c:if test="${requestScope.mainQueIndex == feedbackEntry.key}">
-							<c:if test="${(feedbackEntry.value != null) && (feedbackEntry.value != '')}">
-								<div style="overflow: auto;">									  							
-									<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${feedbackEntry.value}" escapeXml="false" />
-								</div>								
-							</c:if>																			
-						</c:if>
-					</c:forEach>
+					<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
+						<c:forEach var="feedbackEntry"
+							items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">
+							<c:if test="${requestScope.mainQueIndex == feedbackEntry.key}">
+								<c:if test="${(feedbackEntry.value != null) && (feedbackEntry.value != '')}">
+									<div style="overflow: auto;">									  							
+										<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${feedbackEntry.value}" escapeXml="false" />
+									</div>								
+								</c:if>																			
+							</c:if>
+						</c:forEach>
+					</c:if>
 				</div>
 			</c:forEach>
 			<!-- END QUESTION  -->

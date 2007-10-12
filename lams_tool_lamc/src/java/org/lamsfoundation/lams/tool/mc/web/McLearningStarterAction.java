@@ -450,6 +450,10 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    Boolean showMarks = LearningUtil.isShowMarksOnQuestion(listQuestionAndCandidateAnswersDTO);
 	    mcGeneralLearnerFlowDTO.setShowMarks(showMarks.toString());
 
+		Boolean displayAnswers = mcContent.isDisplayAnswers();
+		mcGeneralLearnerFlowDTO.setDisplayAnswers(displayAnswers.toString());
+		logger.debug("MCQ displayAnswers: " + mcGeneralLearnerFlowDTO.getDisplayAnswers());
+	    
 	    logger.debug("is tool reflective: " + mcContent.isReflect());
 	    mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 		logger.debug("reflection subject: " + mcContent.getReflectionSubject());

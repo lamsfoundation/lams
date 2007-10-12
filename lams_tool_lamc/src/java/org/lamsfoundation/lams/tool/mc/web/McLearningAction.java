@@ -870,6 +870,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		mcQueUsr.setLastAttemptTotalMark(learnerMark);
 		mcService.updateMcQueUsr(mcQueUsr);
 
+		logger.debug("displayAnswers: " + mcContent.isDisplayAnswers());
+		mcGeneralLearnerFlowDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
+
 		logger.debug("showMarks: " + mcContent.isShowMarks());
 		mcGeneralLearnerFlowDTO.setShowMarks(new Boolean(mcContent.isShowMarks()).toString());
 		if ( mcContent.isShowMarks() ) {
@@ -1292,6 +1295,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	mcGeneralLearnerFlowDTO.setUserOverPassMark (new Boolean(mcQueUsr.isLastAttemptMarkPassed()).toString());
 	    mcGeneralLearnerFlowDTO.setTotalMarksPossible(mcContent.getTotalMarksPossible());
 		mcGeneralLearnerFlowDTO.setShowMarks(new Boolean(mcContent.isShowMarks()).toString());
+		mcGeneralLearnerFlowDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
 		if ( mcContent.isShowMarks() ) {
 		    Integer[] markStatistics = mcService.getMarkStatistics(mcSession);
 			mcGeneralLearnerFlowDTO.setTopMark(markStatistics[0]);
