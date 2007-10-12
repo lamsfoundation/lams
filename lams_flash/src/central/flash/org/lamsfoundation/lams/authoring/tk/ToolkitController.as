@@ -64,12 +64,15 @@ class ToolkitController extends AbstractController {
 		
 		var iconMouseX = _xmouse - cv.model.getPosition().x;
 		var iconMouseY = _ymouse - cv.model.getPosition().y;
+		
+		Debugger.log("iconMouseX: "+iconMouseX+" iconMouseY: "+iconMouseY, Debugger.GEN, "iconDrop", "ToolkitController");
+		
 		var optionalOnCanvas:Array  = cv.getCanvasModel().findOptionalActivities();
 		
 		//SEE IF ITS HIT the canvas
-		var isCanvasDrop:Boolean = cv.getCanvasModel().activeView.hitTest(dragIcon_mc);
+		var isCanvasDrop:Boolean = cv.getCanvasModel().activeView.content.hitTest(dragIcon_mc);
 		
-		Debugger.log('isCanvasDrop:'+isCanvasDrop,4,'dropIcon','TemplateActivity');
+		Debugger.log('isCanvasDrop:'+isCanvasDrop,Debugger.GEN,'iconDrop','ToolkitController');
 		for (var i=0; i<optionalOnCanvas.length; i++){
 			var optionalX:Number = optionalOnCanvas[i].activity.xCoord;
 			var optionalY:Number = optionalOnCanvas[i].activity.yCoord;
@@ -93,9 +96,10 @@ class ToolkitController extends AbstractController {
 			}			
 		}
 		
-		if(isCanvasDrop){			//remove the drag icon
-			dragIcon_mc.removeMovieClip();
-			
+		//remove the drag icon
+		dragIcon_mc.removeMovieClip();
+		
+		if(isCanvasDrop){
 			var ta:TemplateActivity;
 			ta = _toolkitModel.getSelectedTemplateActivity();			Debugger.log('ta:'+ta.toolActivity.title,4,'canvasDrop','ToolkitController');		
 			cv.setDroppedTemplateActivity(ta);
