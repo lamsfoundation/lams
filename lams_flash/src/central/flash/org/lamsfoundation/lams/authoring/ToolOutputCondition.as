@@ -44,8 +44,9 @@ class ToolOutputCondition   {
 	private var _exactMatchValue:Object;
 	
 	private var _branchingActivity:Activity;
+	private var _toolActivity:ToolActivity;
 	
-	function ToolOutputCondition(conditionID:Number, conditionUIID:Number, name:String, type:String, startValue:Object, endValue:Object, exactMatchValue:Object, displayName:String, toolContentID:Number){
+	function ToolOutputCondition(conditionID:Number, conditionUIID:Number, name:String, type:String, startValue:Object, endValue:Object, exactMatchValue:Object, displayName:String){
 		_conditionID = conditionID;
 		_conditionUIID = conditionUIID;
 		_orderID = 1;
@@ -58,7 +59,7 @@ class ToolOutputCondition   {
 		_display_name = displayName;
 	}
 	
-	public static function createBoolCondition(UIID:Number, definition:ToolOutputDefinition, value:Boolean):ToolOutputCondition {
+	public static function createBoolCondition(UIID:Number, definition:ToolOutputDefinition, toolActivity:ToolActivity, value:Boolean):ToolOutputCondition {
 		var condition:ToolOutputCondition = new ToolOutputCondition();
 		condition.conditionUIID = UIID;
 		
@@ -67,13 +68,13 @@ class ToolOutputCondition   {
 			condition.name = definition.name;
 			condition.displayName = definition.type + " (" + String(value) + ") ";
 			condition.exactMatchValue = value;
-			
+			condition.toolActivity = toolActivity;
 		}
 		
 		return condition;
 	}
 	
-	public static function createLongCondition(UIID:Number, displayName:String, definition:ToolOutputDefinition, startValue:Number, endValue:Number):ToolOutputCondition {
+	public static function createLongCondition(UIID:Number, displayName:String, definition:ToolOutputDefinition, toolActivity:ToolActivity, startValue:Number, endValue:Number):ToolOutputCondition {
 		var condition:ToolOutputCondition = new ToolOutputCondition();
 		condition.conditionUIID = UIID;
 		
@@ -198,6 +199,14 @@ class ToolOutputCondition   {
 	
 	public function get orderID():Number {
 		return _orderID;
+	}
+	
+	public function set toolActivity(a:ToolActivity) {
+		_toolActivity = a;
+	}
+	
+	public function get toolActivity():ToolActivity {
+		return _toolActivity;
 	}
 
 

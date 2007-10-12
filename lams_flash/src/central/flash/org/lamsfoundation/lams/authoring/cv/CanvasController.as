@@ -674,7 +674,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	
 	private function ToolOutputConditionsDialogLoaded(evt:Object, ta:ToolActivity) {
 		evt.target.scrollContent.branchingActivity = BranchingActivity(_canvasModel.selectedItem.activity);
-		evt.target.scrollContent.definitions = ta.definitions;
+		evt.target.scrollContent.toolActivity = ta;
 		evt.target.scrollContent.setupContent();
 	}
 	

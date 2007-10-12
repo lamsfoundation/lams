@@ -881,7 +881,6 @@ class PropertyInspectorControls extends MovieClip {
 			}
 			
 			_canvasModel.selectedItem.activity.toolActivityUIID = null;
-			//_canvasModel.selectedItem.activity.defineLater = null;
 			
 			showGroupBasedBranchingControls(true, !_canvasModel.selectedItem.activity.readOnly);
 			showAppliedGroupingControls(true, !_canvasModel.selectedItem.activity.readOnly);
@@ -897,8 +896,13 @@ class PropertyInspectorControls extends MovieClip {
 			showGroupBasedBranchingControls(false);
 			showAppliedGroupingControls(false);
 		
-			if(toolActs_cmb.visible)
+			if(toolActs_cmb.visible) {
 				toolActs_cmb.dataProvider = _canvasModel.getDownstreamToolActivities();
+				for(var i in toolActs_cmb.dataProvider)
+					selectToolActivityItem(i, toolActs_cmb.dataProvider[i].data);
+						
+			}
+				
 			
 		} else {
 			_canvasModel.selectedItem.activity.groupingUIID = null;
@@ -914,6 +918,20 @@ class PropertyInspectorControls extends MovieClip {
 		setModified();
 	}
 	
+	private function selectToolActivityItem(index:Number, UIID:Number):Void {
+		
+		var mappings:Array = _canvasModel.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(_canvasModel.selectedItem.activity.activityUIID).toolBased;
+		
+		Debugger.log("Loading Lists: mappings length: " + mappings.length, Debugger.CRITICAL, "loadLists", "ConditionMatchingDialog");
+		
+		for(var i=0; i < mappings.length; i++) {
+			if(mappings[i].condition.toolActivity.activityUIID == UIID) {
+				toolActs_cmb.selectedIndex = index;
+				dispatchEvent({type: "click", target:toolActs_cmb});
+			}
+		}
+	}
+	
 	/**
 	 * Handles change event fired from the groupType_cmb
 	 * @usage   
@@ -927,9 +945,9 @@ class PropertyInspectorControls extends MovieClip {
 		
 		if(_canvasModel.getCanvas().ddm.hasBranchMappingsForGroupingUIID(g.groupingUIID))
 			LFMessage.showMessageConfirm("Warning: Existing Group-to-Branch mappings may be effected by your change. Do you wish to continue?", Proxy.create(this, updateGroupingType, g, evt.target.value), Proxy.create(this, populateGroupingProperties, _canvasModel.selectedItem.activity), "Yes", "No",  "Warning");
-		else {	
+		else	
 			updateGroupingType(g, evt.target.value);
-		}
+		
 		
 	}
 	

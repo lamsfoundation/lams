@@ -514,6 +514,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			} else if(mdto.condition != null) {
 				var condition:ToolOutputCondition = new ToolOutputCondition();
 				condition.populateFromDTO(mdto.condition);
+				condition.toolActivity = ToolActivity(getActivityByUIID(mdto.condition.toolActivityUIID));
 				
 				newMappingEntry = new ToolOutputBranchActivityEntry(mdto.entryID, mdto.entryUIID, condition, SequenceActivity(getActivityByUIID(mdto.sequenceActivityUIID)), BranchingActivity(getActivityByUIID(mdto.branchingActivityUIID)));
 			}
@@ -757,9 +758,16 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		design.branchMappings = new Array();
 		var classMappingEntries = _branchMappings.values();
 		
-		if(classMappingEntries.length > 0)
-			for(var i=0; i<classMappingEntries.length; i++)
-				design.branchMappings[i] = classMappingEntries[i].toData();
+		if(classMappingEntries.length > 0) {
+			for(var i=0; i<classMappingEntries.length; i++) {
+				if((classMappingEntries[i].branchingActivity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE 
+						&& classMappingEntries[i].group != null) ||
+					(classMappingEntries[i].branchingActivity.activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE 
+						&& classMappingEntries[i].condition != null)) {
+					design.branchMappings.push(classMappingEntries[i].toData());
+				}
+			}
+		}
 		
 		return design;
 	}
@@ -910,7 +918,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	}
 	
 	public function hasBranchMappingsForConditionSet(dataProvider:Array):Boolean {
-		for(var i=0; i<=dataProvider.length; i++) {
+		for(var i=0; i<dataProvider.length; i++) {
 			if(hasBranchMappingsForCondition(ToolOutputCondition(dataProvider[i].data).conditionUIID))
 				return true;
 		}
@@ -922,7 +930,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var bMappings:Array = _branchMappings.values();
 		
 		for(var i=0; i<bMappings.length; i++) {
-			if(bMappings[i].condition.conditionUIID == conditionUIID) _branchMappings.remove(bMappings[i].entryUIID);
+			if((bMappings[i].condition.conditionUIID == conditionUIID) && (conditionUIID != null)) _branchMappings.remove(bMappings[i].entryUIID);
 		}
 	}
 	

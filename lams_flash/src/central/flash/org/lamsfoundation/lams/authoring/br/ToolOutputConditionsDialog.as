@@ -22,10 +22,11 @@
  */
  
 import org.lamsfoundation.lams.authoring.br.*;
+import org.lamsfoundation.lams.authoring.Application;
+import org.lamsfoundation.lams.authoring.BranchingActivity;
+import org.lamsfoundation.lams.authoring.ToolActivity;
 import org.lamsfoundation.lams.authoring.ToolOutputDefinition;
 import org.lamsfoundation.lams.authoring.ToolOutputCondition;
-import org.lamsfoundation.lams.authoring.BranchingActivity;
-import org.lamsfoundation.lams.authoring.Application;
 
 import org.lamsfoundation.lams.common.Dialog;
 import org.lamsfoundation.lams.common.style.*;
@@ -88,6 +89,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private var _itemCount:Number;
 	
 	private var _branchingActivity:BranchingActivity;
+	private var _toolActivity:ToolActivity;
 
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -245,10 +247,11 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		for(var i=0; i<branches.length; i++) {
 			if(i==0) setDefinition(branches[i].condition.name);
 			addCondition(branches[i].condition);
-			itemChanged(null);
+			//itemChanged(null);
 		}
 		
-		if(branches.length <= 0) itemChanged(true);
+		//if(branches.length <= 0) 
+		itemChanged(null);
 		
 		this._visible = true;
 	}
@@ -263,8 +266,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private function addButton_onPress():Void {
 		if(validateCondition(_selectedDefinition))
-			if(Boolean(_opt_greaterThan_cb.value)) addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), "unnamed", _selectedDefinition, _start_value_stp.value, null));
-			else addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), "unnamed", _selectedDefinition, _start_value_stp.value, _end_value_stp.value));
+			if(Boolean(_opt_greaterThan_cb.value)) addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), "unnamed", _selectedDefinition, _toolActivity, _start_value_stp.value, null));
+			else addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), "unnamed", _selectedDefinition, _toolActivity, _start_value_stp.value, _end_value_stp.value));
 	}
 	
 	private function clearAllButton_onPress(evt:Object, c:Boolean):Void {
@@ -360,9 +363,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private function validateLongCondition(start_value:Number, end_value:Number) {
 		Debugger.log("validating Long Condition", Debugger.CRITICAL, "validateLongCondition", "ToolOutputconditiosDialog")
 		
-		Debugger.log("start:" + start_value, Debugger.CRITICAL, "validateLongCondition", "ToolOutputconditiosDialog")
-		Debugger.log("end:" + end_value, Debugger.CRITICAL, "validateLongCondition", "ToolOutputconditiosDialog")
-		
 		if(start_value > end_value) {
 			LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_direction", [Dictionary.getValue("to_condition_start_value"), Dictionary.getValue("to_condition_end_value")]), null);
 			return false;
@@ -370,10 +370,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 		for(var i=0; i<_condition_item_dgd.dataProvider.length; i++) {
 			var condition:ToolOutputCondition = ToolOutputCondition(_condition_item_dgd.dataProvider[i].data);
-			
-			Debugger.log("condition: " + condition, Debugger.CRITICAL, "validateLongCondition", "ToolOutputconditiosDialog");
-			Debugger.log("startValue: " + start_value + " / " + condition.startValue, Debugger.CRITICAL, "validateLongCondition", "ToolOutputconditiosDialog");
-			Debugger.log("endValue: " + end_value + " / " + condition.endValue, Debugger.CRITICAL, "validateLongCondition", "ToolOutputconditiosDialog");
 			
 			if(condition.exactMatchValue != null) {
 				if(start_value == condition.exactMatchValue) {
@@ -407,9 +403,12 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		if(_selectedIndex == _toolOutputDefin_cmb.selectedIndex)
 			return;
 		
-		if(app.getCanvas().ddm.hasBranchMappingsForConditionSet(_condition_item_dgd.dataProvider) && evt != null)
+		Debugger.log("has mappings: " + app.getCanvas().ddm.hasBranchMappingsForConditionSet(_condition_item_dgd.dataProvider), Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
+		Debugger.log("dp length: " + _condition_item_dgd.dataProvider.length, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
+		
+		if(app.getCanvas().ddm.hasBranchMappingsForConditionSet(_condition_item_dgd.dataProvider) && evt != null) {
 			LFMessage.showMessageConfirm(Dictionary.getValue("branch_mapping_dlg_condition_linked_msg", [Dictionary.getValue("branch_mapping_dlg_condition_linked_all")]), Proxy.create(this, removeAllItems, true), Proxy.create(this, returnDefinitionState), Dictionary.getValue("al_continue"), null);
-		else if(evt != null) removeAllItems(true);
+		} else if(evt != null) removeAllItems(true);
 		else selectDefinition();
 			
 	}
@@ -464,8 +463,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				_condition_to_lbl.visible = false;
 				
 				if(_condition_item_dgd.dataProvider.length <= 0) {
-					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, true));
-					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, false));
+					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, _toolActivity, true));
+					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, _toolActivity, false));
 				}
 				
 				break;
@@ -479,13 +478,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	}
 	
 	private function returnDefinitionState() {
-		Debugger.log("_selectedIndex: " + _selectedIndex, Debugger.CRITICAL, "returnDefinitionState", "ToolOutputConditionsDialog");
-		//_toolOutputDefin_cmb.selectedItem = _toolOutputDefin_cmb.getItemAt(_selectedIndex);
 		_toolOutputDefin_cmb.selectedIndex = _selectedIndex;
 		_selectedDefinition = _toolOutputDefin_cmb.dataProvider[_selectedIndex];
-		
-		Debugger.log("_selectedItem: " + _toolOutputDefin_cmb.selectedItem, Debugger.CRITICAL, "returnDefinitionState", "ToolOutputConditionsDialog");
-		
 	}
 	
 	private function itemEdited(evt:Object):Void {
@@ -529,7 +523,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private function cancel(){
 		// remove any entries
-		removeAllItems();
+		app.getCanvas().ddm.conditions.clear();
+		_condition_item_dgd.removeAll();
 		
         _container.deletePopUp();
 	}
@@ -607,4 +602,10 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	public function set branchingActivity(a:BranchingActivity) {
 		_branchingActivity = a;
 	}
+	
+	public function set toolActivity(a:ToolActivity) {
+		_toolActivity = a;
+		definitions = _toolActivity.definitions;
+	}
+
 }
