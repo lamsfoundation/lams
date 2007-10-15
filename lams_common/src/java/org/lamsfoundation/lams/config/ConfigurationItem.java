@@ -129,7 +129,7 @@ public class ConfigurationItem implements Serializable {
 	/** 
      * @hibernate.property column="required" not-null="true"
      */
-	public Boolean isRequired() {
+	public Boolean getRequired() {
 		return required;
 	}
 

@@ -97,6 +97,10 @@ public class Configuration implements InitializingBean {
 		return items;
 	}
 	
+	public ConfigurationItem getConfigItemByKey(String key) {
+		return configurationDAO.getConfigItemByKey(key);
+	}
+	
 	public static String getItemValue(Object obj) {
 		ConfigurationItem item = (ConfigurationItem) obj;
 		if(item.getValue() != null)

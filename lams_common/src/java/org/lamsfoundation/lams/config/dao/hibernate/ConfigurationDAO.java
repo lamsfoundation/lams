@@ -31,7 +31,6 @@ import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.config.dao.IConfigurationDAO;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
 /**
@@ -41,7 +40,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class ConfigurationDAO extends BaseDAO implements IConfigurationDAO
 {
-	private static final String LOAD_CONFIG_ITEM_BY_KEY = "from configuration in class " + ConfigurationItem.class.getName() + " where configuration.key=:key";
+	private static final String LOAD_CONFIG_ITEM_BY_KEY = "from configuration in class " + ConfigurationItem.class.getName() 
+		+ " where configuration.key=:key";
 	
 	
     /**
