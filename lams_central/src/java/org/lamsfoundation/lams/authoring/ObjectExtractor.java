@@ -1256,7 +1256,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    }
 	    
 	    // now go through and delete any old branch mappings that are no longer used.
-	    // need to remove them via the sequence activity so that the cascade will work.
+	    // need to remove them from their collections to make sure it isn't accidently re-added.
 	    Iterator iter = oldbranchActivityEntryList.iterator();
 	    while (iter.hasNext()) {
 			BranchActivityEntry oldEntry = (BranchActivityEntry) iter.next();
@@ -1264,6 +1264,11 @@ public class ObjectExtractor implements IObjectExtractor {
 			if ( sequenceActivity != null ) {
 				sequenceActivity.getBranchEntries().remove(oldEntry);
 			}
+			Group group = oldEntry.getGroup();
+			if (group != null ) {
+				group.getBranchActivities().remove(oldEntry);
+			}
+			activityDAO.delete(oldEntry);
 		}
 	}
 	
