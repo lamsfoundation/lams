@@ -45,8 +45,9 @@ public class BranchConditionDTO {
     private String startValue; 
     private String endValue; 
     private String exactMatchValue;
+    private Integer toolActivityUIID;
     
-    public BranchConditionDTO( BranchCondition condition ) {
+    public BranchConditionDTO( BranchCondition condition, Integer toolActivityUIID ) {
     	this.conditionId = condition.getConditionId();
     	this.conditionUIID = condition.getConditionUIID();
     	this.orderID = condition.getOrderId();
@@ -56,6 +57,7 @@ public class BranchConditionDTO {
     	this.startValue = condition.getStartValue();
     	this.endValue = condition.getEndValue();
     	this.exactMatchValue = condition.getExactMatchValue();
+    	this.toolActivityUIID = toolActivityUIID;
     }
     
     public Long getConditionId() {
@@ -130,6 +132,20 @@ public class BranchConditionDTO {
 
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
+	}
+
+	/** The UIID of the tool activity that will be queried for the tool output. This should match the 
+	 * output field in the appropriate branching activity. It is here to make life easier on the Flash side - so that
+	 * it has the UIID somewhere if the user changes from a tool based branch -> group/teacher based and 
+	 * back to tool based without saving.
+	 * @return toolActivityUIID
+	 */
+	public Integer getToolActivityUIID() {
+		return toolActivityUIID;
+	}
+
+	public void setToolActivityUIID(Integer toolActivityUIID) {
+		this.toolActivityUIID = toolActivityUIID;
 	}
  
 }

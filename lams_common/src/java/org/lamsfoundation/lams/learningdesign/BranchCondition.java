@@ -174,8 +174,8 @@ public class BranchCondition implements Comparable {
 		this.exactMatchValue = exactMatchValue;
 	} 
 
-	public BranchConditionDTO getBranchConditionDTO() {
-		return new BranchConditionDTO(this);
+	public BranchConditionDTO getBranchConditionDTO(Integer toolActivityUIID) {
+		return new BranchConditionDTO(this, toolActivityUIID);
 	}
 
     public String toString() {

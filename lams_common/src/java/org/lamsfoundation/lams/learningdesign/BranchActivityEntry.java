@@ -178,12 +178,12 @@ public class BranchActivityEntry {
 	}
 
 
-	public BranchActivityEntryDTO getBranchActivityEntryDTO() {
+	public BranchActivityEntryDTO getBranchActivityEntryDTO(Integer toolActivityUIID) {
 
 		BranchActivityEntryDTO entryDTO = null;
 		if ( getCondition() != null ) {
 			ToolOutputBranchActivityEntryDTO toolEntryDTO = new ToolOutputBranchActivityEntryDTO();
-			toolEntryDTO.setCondition(getCondition().getBranchConditionDTO());
+			toolEntryDTO.setCondition(getCondition().getBranchConditionDTO(toolActivityUIID));
 			entryDTO = toolEntryDTO;
 		} else {
 			entryDTO = new BranchActivityEntryDTO();
