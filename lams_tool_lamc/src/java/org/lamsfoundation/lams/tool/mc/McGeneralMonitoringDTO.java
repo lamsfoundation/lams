@@ -68,6 +68,7 @@ public class McGeneralMonitoringDTO implements Comparable
 	protected String isToolSessionChanged;
 	protected String responseId;
 	protected String currentUid;
+	protected String displayAnswers;
 	
 	protected String toolContentID;
 	protected Map mapOptionsContent;
@@ -569,6 +570,18 @@ public class McGeneralMonitoringDTO implements Comparable
         this.currentUid = currentUid;
     }
     /**
+     * @return Returns the displayAnswers.
+     */
+    public String getDisplayAnswers() {
+        return displayAnswers;
+    }
+    /**
+     * @param displayAnswers The displayAnswers to set.
+     */
+    public void setDisplayAnswers(String displayAnswers) {
+        this.displayAnswers = displayAnswers;
+    }
+    /**
      * @return Returns the isToolSessionChanged.
      */
     public String getIsToolSessionChanged() {
@@ -683,6 +696,7 @@ public class McGeneralMonitoringDTO implements Comparable
 			.append("mapStudentsMcd: ", mapStudentsMcd)
 			.append("responseId: ", responseId)
 			.append("currentUid: ", currentUid)
+			.append("displayAnswers: ", displayAnswers)
 			.append("sessionUserCount: ", sessionUserCount)
 			.append("completedSessionUserCount: ", completedSessionUserCount)
 			.append("completedSessionUserPercent: ", completedSessionUserPercent)

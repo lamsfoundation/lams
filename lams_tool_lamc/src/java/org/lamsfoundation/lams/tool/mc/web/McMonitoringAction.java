@@ -216,8 +216,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    
 	    McContent mcContent=mcService.retrieveMc(new Long(toolContentID));
 		logger.debug("existing mcContent:" + mcContent);
-
-
+		
 		if (currentMonitoredToolSession.equals("All"))
 	    {
 		    List listMcAllSessionsDTO = new LinkedList();
@@ -250,6 +249,9 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    mcGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
 	    
 		mcGeneralMonitoringDTO.setSummaryToolSessions(populateToolSessions(mcContent));
+		mcGeneralMonitoringDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
+		logger.debug("existing mcContent:" + mcContent);
+
 
 		/*setting editable screen properties*/
 		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
@@ -417,9 +419,45 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	{
         logger.debug("dispatching submitSession..");
         IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+        String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+        McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
+        mcContent.setDisplayAnswers(new Boolean(true));
+		logger.debug("mcContent: " + mcContent);
         return commonSubmitSessionCode((McMonitoringForm) form, request, mapping, mcService, new McGeneralMonitoringDTO() );
 	}
 
+	/**
+	 * ActionForward displayAnswers(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+	 * 
+	 * displayAnswers
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+    public ActionForward displayAnswers(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) 
+    		throws IOException,ServletException
+	{
+        logger.debug("dispatching displayAnswers..");
+        IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+        String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+        McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
+        mcContent.setDisplayAnswers(new Boolean(true));
+		logger.debug("mcContent: " + mcContent);
+        return commonSubmitSessionCode((McMonitoringForm) form, request, mapping, mcService, new McGeneralMonitoringDTO() );
+	}
+    
+    
 
     /**
      * editActivityQuestions

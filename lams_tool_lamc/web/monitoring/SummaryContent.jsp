@@ -32,6 +32,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</table>
 			</c:if>							
 		</c:if>			
+
+	<c:choose>
+		<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'true'}">
+			<p>
+				<fmt:message key="label.monitoring.yesDisplayAnswers"/>
+			</p>
+		</c:when>
+		<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'false'}">
+			<p>
+				<fmt:message key="label.monitoring.noDisplayAnswers1"/><br>
+				<quote>
+				<fmt:message key="label.monitoring.noDisplayAnswers2"/>
+				<input onclick="javascript:submitChangeDisplayAnswers(this.value, 'displayAnswers');" class="button" name="displayAnswers" class="button" value="<fmt:message key='button.monitoring.noDisplayAnswers'/>" type="button">	
+				</quote>
+			</p>
+		</c:when>
+	</c:choose>
 		
 		<c:if test="${mcGeneralMonitoringDTO.userExceptionNoToolSessions != 'true'}"> 	
 		

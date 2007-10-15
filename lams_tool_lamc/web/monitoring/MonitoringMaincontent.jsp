@@ -92,7 +92,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.McMonitoringForm.questionIndex.value=questionIndexValue; 
 			submitMethod(actionMethod);
 		}
-		
+
+		function submitChangeDisplayAnswers(displayAnswers, actionMethod) {
+			document.McMonitoringForm.displayAnswers.value=displayAnswers; 
+			submitMonitoringMethod(actionMethod);
+		}		
 		
 		function submitEditResponse(responseId, actionMethod) 
 		{
