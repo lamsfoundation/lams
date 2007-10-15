@@ -5518,13 +5518,7 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <primary-key-description></primary-key-description>
 <primary-key-column name="entry_id"/>
 </primary-key>
-<unique-key-list>
-<unique-key alias="" name="UQ_lams_group_activity" remarks="">
-<unique-key-description></unique-key-description>
-<unique-key-column name="group_id"/>
-<unique-key-column name="branch_activity_id"/>
-</unique-key>
-</unique-key-list>
+<unique-key-list/>
 <foreign-key-list>
 <foreign-key alias="" name="FK_lams_group_activity_1" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_group" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
 <foreign-key-description></foreign-key-description>

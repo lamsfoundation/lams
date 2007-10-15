@@ -37,7 +37,6 @@ CREATE TABLE lams_branch_activity_entry (
      , sequence_activity_id BIGINT(20) NOT NULL
      , branch_activity_id BIGINT(20) NOT NULL
      , condition_id BIGINT(20)
-     , UNIQUE UQ_lams_group_activity (group_id, branch_activity_id)
      , PRIMARY KEY (entry_id)
      , INDEX (group_id)
      , CONSTRAINT FK_lams_group_activity_1 FOREIGN KEY (group_id)
