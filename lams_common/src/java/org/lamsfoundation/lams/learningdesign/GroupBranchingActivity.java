@@ -25,9 +25,12 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Set;
+import java.util.Vector;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.tool.SystemTool;
+import org.lamsfoundation.lams.util.MessageService;
 
 /** 
  * @author Mitchell Seaton
@@ -144,5 +147,37 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
             .append("activityId", getActivityId())
             .toString();
     }
+
+	/**
+     * Validate the branching activity. A Grouping must be applied to the branching activity. 
+     * If Define Later == false, then there must be at least one group in the grouping.
+     * If Define Later == false then all groups must have a branch allocated to them
+     * @return error message key
+     */
+    public Vector validateActivity(MessageService messageService) {
+    	Vector listOfValidationErrors = new Vector();
+    	if ( getActivities() == null || getActivities().size() == 0 ) {
+			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH), this.getActivityUIID()));
+    	} 
+    	
+    	if ( getGrouping() == null ) {
+			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING), this.getActivityUIID()));
+    	} else if ( ! getDefineLater().booleanValue() ){
+   			Set<Group> groups = getGrouping().getGroups();
+   			if ( groups == null || groups.size() == 0 ) {
+   				listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING), this.getActivityUIID()));
+   			} else {
+	  			for ( Group group : groups ) {
+	   				if ( group.getBranchActivities() == null || group.getBranchActivities().size() != 1 ) {
+	   					listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED), this.getActivityUIID()));
+	   					break;
+	   				}
+	   			}
+   			}
+    	}
+    	return listOfValidationErrors;
+    }
+    
+
 
 }

@@ -29,6 +29,7 @@ import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
@@ -42,6 +43,8 @@ import org.lamsfoundation.lams.tool.ToolOutputValue;
  * There should be one branch condition for each ToolOutputBranchActivityEntry.
  */
 public class BranchCondition implements Comparable {
+
+	private static Logger log = Logger.getLogger(BranchCondition.class);
 
 	private Long conditionId;
 	private Integer conditionUIID;
@@ -310,4 +313,57 @@ public class BranchCondition implements Comparable {
 		}
 		return new Long (textValue);
 	}
+
+	/** All conditions must have either (a) an exact match value or (b) a start value and no end value 
+	 * or (c) start value and an end value and the end value must be >= start value. 
+	 */
+	protected boolean isValid() {
+		if ( exactMatchValue != null ) {
+			try {
+				if ( getTypedValue(exactMatchValue) != null )
+					return true;
+			} catch ( Exception e ) { }
+			log.error("Condition contains an unconvertible value for exactMatchValue. Type is "+type+" value "+exactMatchValue);
+			return false;
+		} else {
+			Comparable typedStartValue = null;
+			Comparable typedEndValue = null;
+
+			try {
+				if ( startValue != null )
+					typedStartValue = getTypedValue(startValue);
+			} catch ( Exception e ) {
+				log.error("Condition contains an unconvertible value for startValue. Type is "+type+" value "+startValue);
+				return false;
+			}
+			
+			try {
+				if ( endValue != null ) 
+					typedEndValue = getTypedValue(endValue);
+			} catch ( Exception e ) {
+				log.error("Condition contains an unconvertible value for endValue. Type is "+type+" value "+endValue);
+				return false; 
+			}
+
+			if ( typedStartValue != null && ( typedEndValue == null || typedEndValue.compareTo(typedStartValue) >= 0 ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private Comparable getTypedValue( String untypedValue ) {
+		if ( "OUTPUT_LONG".equals(type) ) {
+			return convertToLong(untypedValue);
+		} else if ( "OUTPUT_DOUBLE".equals(type) ) {
+			return Double.parseDouble(untypedValue);
+		} else if ( "OUTPUT_BOOLEAN".equals(type) ) {
+			return Boolean.parseBoolean(untypedValue);
+		} else if ( "OUTPUT_STRING".equals(type) ) {
+			return untypedValue;
+		} else {
+			return null;
+		}
+	}
+
 }

@@ -228,16 +228,18 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 	}
 	
 	/**
-     * Validate the sequence activity. All sequence activities should have at least one child activity.
+     * Validate the sequence activity. All sequence activities must have at least child activity and the default 
+     * activity must be set as this is the first activity in the sequence. One sequence activity exists for each 
+     * branch in a branching activity, so this ensures all branches have a valid child activity.
      * @return error message key
      */
-//    public Vector validateActivity(MessageService messageService) {
-//    	Vector listOfValidationErrors = new Vector();
-//    	if ( getActivities() == null || getActivities().size() == 0) {
-//			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH), this.getActivityUIID()));
-//    	}
-//    	return listOfValidationErrors;
-//    }
+    public Vector validateActivity(MessageService messageService) {
+    	Vector listOfValidationErrors = new Vector();
+    	if ( getActivities() == null || getActivities().size() == 0 || getDefaultActivity() == null )  {
+			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY), this.getActivityUIID()));
+    	}
+    	return listOfValidationErrors;
+    }
     
 
 }

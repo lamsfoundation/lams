@@ -24,10 +24,14 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.Vector;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.tool.SystemTool;
+import org.lamsfoundation.lams.util.MessageService;
 
 /** 
  * @author Mitchell Seaton
@@ -145,5 +149,46 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
             .append("activityId", getActivityId())
             .toString();
     }
+    
+	/**
+     * Validate the tool based branching activity.  All branching activities should have at 
+     * least one branch and the default activity must be set for a tool based branch and all conditions 
+     * must be valid (as determined by ToolCondition).
+     * 
+     * @return error message key
+     */
+    public Vector validateActivity(MessageService messageService) {
+    	Vector listOfValidationErrors = new Vector();
+
+    	if ( getDefaultActivity() == null  ) {
+			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_DEFAULT_BRANCH_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_DEFAULT_BRANCH), this.getActivityUIID()));
+	    }
+    	
+    	if ( getInputActivities() == null || getInputActivities().size() == 0 ) {
+			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTVITY_TOOLINPUT_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_TOOLINPUT), this.getActivityUIID()));
+    	}
+
+    	if ( getActivities() == null || getActivities().size() == 0 ) {
+			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH), this.getActivityUIID()));
+    	} else {
+	    	Iterator actIterator = getActivities().iterator();
+	   		while (actIterator.hasNext()) {
+				SequenceActivity branch = (SequenceActivity) actIterator.next();
+				if ( branch.getBranchEntries() != null ) {
+					Iterator condIterator = branch.getBranchEntries().iterator();
+					while (condIterator.hasNext()) {
+						BranchActivityEntry entry = (BranchActivityEntry) condIterator.next();
+						BranchCondition condition = entry.getCondition();
+						if ( condition == null || ! condition.isValid() ) {
+							listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCH_CONDITION_INVALID_ERROR_CODE, 
+									messageService.getMessage(ValidationErrorDTO.BRANCH_CONDITION_INVALID), this.getActivityUIID()));
+						}
+					}
+				}
+			}
+    	}
+    	return listOfValidationErrors;
+    }
+
 
 }

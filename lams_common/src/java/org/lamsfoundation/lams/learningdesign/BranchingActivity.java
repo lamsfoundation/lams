@@ -217,15 +217,15 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 	}
 	
 	/**
-     * Validate the branching activity. All branching activities should have at least one branch and the 
-     * default activity must be set (this is the default branch). 
+     * Validate the branching activity.  All branching activities should have at 
+     * least one branch and the default activity must be set for a tool based branch.
      * @return error message key
      */
     public Vector validateActivity(MessageService messageService) {
     	Vector listOfValidationErrors = new Vector();
-    	if ( getActivities() == null || getActivities().size() == 0 || getDefaultActivity() == null ) {
-			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_DEFAULT_BRANCH_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_DEFAULT_BRANCH), this.getActivityUIID()));
-    	}
+    	if ( getActivities() == null || getActivities().size() == 0 ) {
+			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH), this.getActivityUIID()));
+    	} 
     	return listOfValidationErrors;
     }
     
