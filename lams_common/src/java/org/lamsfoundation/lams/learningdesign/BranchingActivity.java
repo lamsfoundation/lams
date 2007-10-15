@@ -25,8 +25,12 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Set;
+import java.util.Vector;
+
+import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.BranchingActivityStrategy;
 import org.lamsfoundation.lams.tool.SystemTool;
+import org.lamsfoundation.lams.util.MessageService;
 
 /** 
  * @author Mitchell Seaton
@@ -212,5 +216,18 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 		newBranchingActivity.defaultActivity = this.defaultActivity;
 	}
 	
+	/**
+     * Validate the branching activity. All branching activities should have at least one branch and the 
+     * default activity must be set (this is the default branch). 
+     * @return error message key
+     */
+    public Vector validateActivity(MessageService messageService) {
+    	Vector listOfValidationErrors = new Vector();
+    	if ( getActivities() == null || getActivities().size() == 0 || getDefaultActivity() == null ) {
+			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_DEFAULT_BRANCH_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_DEFAULT_BRANCH), this.getActivityUIID()));
+    	}
+    	return listOfValidationErrors;
+    }
+    
 
 }

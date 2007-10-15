@@ -29,10 +29,13 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.SequenceActivityStrategy;
+import org.lamsfoundation.lams.util.MessageService;
 
 
 /** 
@@ -174,7 +177,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 	/** 
 	 * Get the set of the branch to group mappings used for this branching activity. The set contains BranchActivityEntry entries
 	 * 
-	 * 	@hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan" 
+	 * 	@hibernate.set lazy="true" cascade="all-delete-orphan" 
 	 *		@hibernate.collection-key column="sequence_activity_id" 
 	 *		@hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.BranchActivityEntry"
 	*/
@@ -223,5 +226,18 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 	
 		return null;
 	}
+	
+	/**
+     * Validate the sequence activity. All sequence activities should have at least one child activity.
+     * @return error message key
+     */
+//    public Vector validateActivity(MessageService messageService) {
+//    	Vector listOfValidationErrors = new Vector();
+//    	if ( getActivities() == null || getActivities().size() == 0) {
+//			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH), this.getActivityUIID()));
+//    	}
+//    	return listOfValidationErrors;
+//    }
+    
 
 }
