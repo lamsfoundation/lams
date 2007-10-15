@@ -46,7 +46,8 @@ public class ValidationErrorDTO {
 	public static final String SCHEDULE_GATE_ERROR_TYPE1_KEY = "validation.error.illegalScheduleGateOffsetsType1";			// SG
 	public static final String SCHEDULE_GATE_ERROR_TYPE2_KEY = "validation.error.illegalScheduleGateOffsetsType2";			
 	public static final String GROUPING_ACTIVITY_MISSING_GROUPING_KEY = "validation.error.grouping.missing";				// GM
-	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY = "validation.error.group.count.mismatch";			// GC
+	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY = "validation.error.group.count.mismatch";		// GC
+	public static final String BRANCHING_ACTIVITY_MUST_HAVE_DEFAULT_BRANCH = "validation.error.branching.must.have.default.branch"; 		// BB
 	
 	public static final String OTHER_ERROR_CODE = "O";
 	public static final String TRANSITION_ERROR_CODE = "T";
@@ -61,6 +62,7 @@ public class ValidationErrorDTO {
 	public static final String SCHEDULE_GATE_ERROR_CODE = "SG1";
 	public static final String GROUPING_ACTIVITY_MISSING_GROUPING_ERROR_CODE = "GM";
 	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_ERROR_CODE = "GC";
+	public static final String BRANCHING_ACTIVITY_MUST_HAVE_DEFAULT_BRANCH_ERROR_CODE = "BB";
 	
 	
 	private static MessageResources resources = MessageResources.getMessageResources(CONFIG_PARAM);
