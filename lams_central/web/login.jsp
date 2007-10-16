@@ -62,7 +62,7 @@ j_security_login_page
 	</script>
 </lams:head>
 
-<body class="stripes">
+<body class="stripes" onLoad="self.focus();document.loginForm.j_username.focus()">
 	<div id="login-page"><!--main box 'page'-->
 	
 		<h1 class="no-tabs-below">&nbsp;</h1>
