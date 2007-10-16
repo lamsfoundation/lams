@@ -1393,12 +1393,12 @@ public class ObjectExtractor implements IObjectExtractor {
     			condition = null; // Hibernate should dispose of it automatically via the cascade
     		}
     		
-    		if ( condition == null ) {
-    	    	Integer conditionUIID=WDDXProcessor.convertToInteger(conditionTable,WDDXTAGS.CONDITION_UIID);
-    		    if ( conditionUIID == null ) { 
-    		    	throw new WDDXProcessorConversionException("Condition is missing its UUID: "+conditionTable);
-    		    }
+	    	Integer conditionUIID=WDDXProcessor.convertToInteger(conditionTable,WDDXTAGS.CONDITION_UIID);
+		    if ( conditionUIID == null ) { 
+		    	throw new WDDXProcessorConversionException("Condition is missing its UUID: "+conditionTable);
+		    }
 
+		    if ( condition == null ) {
     			condition = new BranchCondition(null, conditionUIID, 
     					WDDXProcessor.convertToInteger(conditionTable,WDDXTAGS.ORDER_ID), 
     					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_NAME),
@@ -1407,6 +1407,15 @@ public class ObjectExtractor implements IObjectExtractor {
     					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_START_VALUE),
     					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_END_VALUE),
     					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_EXACT_MATCH_VALUE) );
+    		} else {
+    			condition.setConditionUIID(conditionUIID);
+    			condition.setDisplayName(WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_DISPLAY_NAME));
+    			condition.setEndValue(WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_END_VALUE));
+    			condition.setExactMatchValue(WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_EXACT_MATCH_VALUE) );
+    			condition.setName(WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_NAME));
+    			condition.setOrderId(WDDXProcessor.convertToInteger(conditionTable,WDDXTAGS.ORDER_ID));
+    			condition.setStartValue(WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_START_VALUE));
+    			condition.setType(WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_TYPE));
     		}
     	}
 		return condition;
