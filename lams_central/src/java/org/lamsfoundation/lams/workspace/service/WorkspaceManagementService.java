@@ -322,7 +322,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		if(user!=null){
 			Integer permissions = getPermissions(workspaceFolder,user);
 			if(permissions!=WorkspaceFolder.NO_ACCESS){					
-				getFolderContent(workspaceFolder,permissions,mode,contentDTO);
+				getFolderContent(workspaceFolder,permissions,mode,contentDTO,user);
 				if(workspaceFolder.hasSubFolders())
 					getSubFolderDetails(workspaceFolder,user,contentDTO, skipFolder);	
 				Vector<FolderContentDTO> repositoryContent = getContentsFromRepository(workspaceFolder,permissions);
@@ -337,7 +337,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		return contentDTO;
 		
 	}	
-	private void getFolderContent(WorkspaceFolder workspaceFolder, Integer permissions, Integer mode,Vector<FolderContentDTO> contentDTO){
+	private void getFolderContent(WorkspaceFolder workspaceFolder, Integer folderPermissions, Integer mode,Vector<FolderContentDTO> contentDTO, User user){
 		
 		List designs = null;
 		
@@ -346,7 +346,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		else
 			designs = learningDesignDAO.getAllValidLearningDesignsInFolder(workspaceFolder.getWorkspaceFolderId());
 		
-		getFolderContentDTO(designs,permissions,contentDTO);
+		getFolderContentDTO(designs,folderPermissions,contentDTO,user);
 	}
 	/** 
 	 * Get the folders in the given workspaceFolder. If skipContentId is not null, then skip any contents found with this id.
@@ -413,11 +413,15 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		
 	}
 */	
-	private Vector getFolderContentDTO(List designs, Integer permissions,Vector<FolderContentDTO> folderContent){		
+	private Vector getFolderContentDTO(List designs, Integer folderPermissions,Vector<FolderContentDTO> folderContent, User user){		
 		Iterator iterator = designs.iterator();
 		while(iterator.hasNext()){
 			LearningDesign design = (LearningDesign)iterator.next();
-			folderContent.add(new FolderContentDTO(design,permissions));			
+			if ( design.getUser() != null && design.getUser().equals(user) ) {
+				folderContent.add(new FolderContentDTO(design,WorkspaceFolder.OWNER_ACCESS));			
+			} else {
+				folderContent.add(new FolderContentDTO(design,folderPermissions));			
+			}
 		}
 		return folderContent;
 		
