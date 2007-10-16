@@ -130,7 +130,7 @@
         <column name="grouping_id" />
     </many-to-one>
     
-	<set  name="inputActivities" lazy="true" cascade="none" table="lams_input_activity">
+	<set  name="inputActivities" lazy="true" cascade="none" table="lams_input_activity" order-by="activity_id">
    		<key><column name="activity_id" /></key>
    		<many-to-many column="input_activity_id" class="org.lamsfoundation.lams.learningdesign.Activity"/>
 	</set>

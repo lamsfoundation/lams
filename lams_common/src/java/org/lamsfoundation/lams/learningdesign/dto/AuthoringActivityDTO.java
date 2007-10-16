@@ -313,6 +313,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 
 	}
 	public AuthoringActivityDTO(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings){
+		processActivityType(activity, branchMappings);
+
 		this.activityID = activity.getActivityId();
 		this.activityUIID = activity.getActivityUIID();
 		this.description = activity.getDescription();
@@ -353,26 +355,14 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.initialised = activity.isInitialised();
 		this.stopAfterActivity = activity.isStopAfterActivity();
 		
-		if ( activity.getInputActivities() != null && activity.getInputActivities().size() > 0 ) {
-			ArrayList<Integer> list = new ArrayList<Integer>();
-			Iterator iter = activity.getInputActivities().iterator();
-			while ( iter.hasNext() ) {
-				Activity inputAct = (Activity) iter.next();
-				list.add(inputAct.getActivityUIID());
-				if ( this.toolActivityUIID == null )
-					this.toolActivityUIID=inputAct.getActivityUIID();
-			}
-			this.inputActivities = list;
-		}
-		
-		// must be done last as it depends on toolActivityUIID
-		processActivityType(activity, branchMappings, toolActivityUIID);
+		this.inputActivities = activity.getInputActivityUIIDs();
+		this.toolActivityUIID = activity.getToolInputActivityUIID();
 
 	}
 	
 	
 
-	private  void processActivityType(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings, Integer toolActivityUIID){
+	private  void processActivityType(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings){
 		if(activity.isGroupingActivity())
 			 addGroupingActivityAttributes((GroupingActivity)activity);
 		else if(activity.isToolActivity())
@@ -380,9 +370,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 		else if(activity.isGateActivity())
 			 addGateActivityAttributes(activity);
 		else 			
-			 addComplexActivityAttributes(activity, branchMappings, toolActivityUIID);		
+			 addComplexActivityAttributes(activity, branchMappings);		
 	}
-	private void addComplexActivityAttributes(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings, Integer toolActivityUIID){		
+	private void addComplexActivityAttributes(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings){		
 		ComplexActivity complex = (ComplexActivity) activity;
 		if ( complex.getDefaultActivity() != null ) {
 			defaultActivityUIID = complex.getDefaultActivity().getActivityUIID();
@@ -395,7 +385,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		else if(activity.isBranchingActivity())
 			addBranchingActivityAttributes((BranchingActivity)activity);
 		else
-			addSequenceActivityAttributes((SequenceActivity)activity, branchMappings, toolActivityUIID);
+			addSequenceActivityAttributes((SequenceActivity)activity, branchMappings);
 		
 	}
 	private void addGroupingActivityAttributes(GroupingActivity groupingActivity){
@@ -420,13 +410,18 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.endXCoord = activity.getEndXcoord();
 		this.endYCoord = activity.getEndYcoord();
 	}
-	private void addSequenceActivityAttributes(SequenceActivity activity, ArrayList<BranchActivityEntryDTO> branchMappings, Integer toolActivityUIID){
+	private void addSequenceActivityAttributes(SequenceActivity activity, ArrayList<BranchActivityEntryDTO> branchMappings){
+		
+		Activity parentActivity = activity.getParentActivity();
+		Integer toolActivityUIID = parentActivity != null ? parentActivity.getToolInputActivityUIID() : null;
+
 		Iterator iter = activity.getBranchEntries().iterator();
 		while ( iter.hasNext() ) {
 			BranchActivityEntry ba = (BranchActivityEntry) iter.next();
 			branchMappings.add(ba.getBranchActivityEntryDTO(toolActivityUIID));
 		}
 	}
+	
 	private void addToolActivityAttributes(ToolActivity toolActivity){
 		this.toolContentID = toolActivity.getToolContentId();
 		this.toolID = toolActivity.getTool().getToolId();

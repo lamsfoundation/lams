@@ -1051,5 +1051,31 @@ public abstract class Activity implements Serializable,Nullable {
 		return null; 
 	}
 
-   
+	/** Get the input activity UIIDs in a format suitable for Flash. See also getToolInputActivityID */
+	public ArrayList<Integer> getInputActivityUIIDs() {
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		if ( getInputActivities() != null && getInputActivities().size() > 0 ) {
+			Iterator iter = getInputActivities().iterator();
+			while ( iter.hasNext() ) {
+				Activity inputAct = (Activity) iter.next();
+				list.add(inputAct.getActivityUIID());
+			}
+		}
+		return list;
+	}
+
+	/** 
+	 * Get the first input activity's UIID as the tool input activity. The db is set up to allow multiple input
+	 * activities, but at present we only support one. See also getInputActivityUIIDs.
+	 */
+	public Integer getToolInputActivityUIID() {
+		if ( getInputActivities() != null ) {
+			Iterator iter = getInputActivities().iterator();
+			if ( iter.hasNext() ) {
+				return ((Activity)iter.next()).getActivityUIID();
+			}
+		}
+		return null;
+	}
+
 }
