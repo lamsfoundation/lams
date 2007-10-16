@@ -681,12 +681,12 @@ class PropertyInspectorControls extends MovieClip {
 		if(!_canvasController.isBusy() && evt.type == 'focusOut') {
 			var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
 		
-			if(_canvasModel.getCanvas().ddm.hasBranchMappingsForGroupingUIID(g.groupingUIID)) {
-				_canvasController.setBusy();
-				LFMessage.showMessageConfirm("Warning: Existing Group-to-Branch mappings may be effected by your change. Do you wish to continue?", Proxy.create(this, doUpdateGroupingMethodData, g), Proxy.create(this, retainOldGroupingMethodData), "Yes", "No",  "Warning");
-			} else {
+			//if(_canvasModel.getCanvas().ddm.hasBranchMappingsForGroupingUIID(g.groupingUIID)) {
+			//	_canvasController.setBusy();
+			//	LFMessage.showMessageConfirm("Warning: Existing Group-to-Branch mappings may be effected by your change. Do you wish to continue?", Proxy.create(this, doUpdateGroupingMethodData, g), Proxy.create(this, retainOldGroupingMethodData), "Yes", "No",  "Warning");
+			//} else {
 				doUpdateGroupingMethodData(g);
-			}
+			//}
 		}
 	}
 	
@@ -898,7 +898,7 @@ class PropertyInspectorControls extends MovieClip {
 		
 			if(toolActs_cmb.visible) {
 				toolActs_cmb.dataProvider = _canvasModel.getDownstreamToolActivities();
-				for(var i in toolActs_cmb.dataProvider)
+				for(var i=0; i < toolActs_cmb.dataProvider.length; i++)
 					selectToolActivityItem(i, toolActs_cmb.dataProvider[i].data);
 						
 			}
@@ -927,9 +927,11 @@ class PropertyInspectorControls extends MovieClip {
 		for(var i=0; i < mappings.length; i++) {
 			if(mappings[i].condition.toolActivity.activityUIID == UIID) {
 				toolActs_cmb.selectedIndex = index;
-				dispatchEvent({type: "click", target:toolActs_cmb});
+				branchToolInputChange(_canvasModel.selectedItem, toolActs_cmb.dataProvider[index].data);
 			}
 		}
+		
+		
 	}
 	
 	/**
@@ -943,11 +945,7 @@ class PropertyInspectorControls extends MovieClip {
 		
 		Debugger.log('groupingUIID: '+g.groupingUIID,Debugger.GEN,'onGroupTypeChange','PropertyInspector');
 		
-		if(_canvasModel.getCanvas().ddm.hasBranchMappingsForGroupingUIID(g.groupingUIID))
-			LFMessage.showMessageConfirm("Warning: Existing Group-to-Branch mappings may be effected by your change. Do you wish to continue?", Proxy.create(this, updateGroupingType, g, evt.target.value), Proxy.create(this, populateGroupingProperties, _canvasModel.selectedItem.activity), "Yes", "No",  "Warning");
-		else	
-			updateGroupingType(g, evt.target.value);
-		
+		updateGroupingType(g, evt.target.value);
 		
 	}
 	
@@ -994,12 +992,19 @@ class PropertyInspectorControls extends MovieClip {
 	private function onBranchToolInputChange(evt:Object) {
 		Debugger.log('branch input change: ' + evt.target.value, Debugger.CRITICAL, "onBranchToolInputChange", "PIC*");
 		
-		_canvasModel.selectedItem.activity.toolActivityUIID = (evt.target.value != 0) ? evt.target.value : null;
-		_canvasModel.selectedItem.refresh();
+		branchToolInputChange(_canvasModel.selectedItem, evt.target.value);
+	}
+	
+	private function branchToolInputChange(ca, toolActivityUIID) {
+		var mappings:Array = _canvasModel.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(ca.activity.activityUIID).toolBased;
 		
-		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
-		_conditions_setup_btn.visible = ((_canvasModel.selectedItem.activity.toolActivityUIID != null) && (branches.myBranches.length > 0)) ? true : false;
-		
+		ca.activity.toolActivityUIID = (toolActivityUIID != 0) ? toolActivityUIID : null;
+		ca.refresh();
+			
+		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
+		_conditions_setup_btn.visible = ((ca.activity.toolActivityUIID != null) && (branches.myBranches.length > 0)) ? true : false;
+		_tool_output_match_btn.visible = ((ca.activity.toolActivityUIID != null) && (branches.myBranches.length > 0)) ? true : false;
+			
 		setModified();
 	}
 	
@@ -1149,7 +1154,7 @@ class PropertyInspectorControls extends MovieClip {
 	
 	private function ConditionMatchDialogLoaded(evt:Object) {
 		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
-		var conditions:Array = _canvasModel.getCanvas().ddm.getAllConditions();
+		var conditions:Array = _canvasModel.getCanvas().ddm.getAllConditionsForToolOutput(BranchingActivity(_canvasModel.selectedItem.activity).toolActivityUIID);
 		
 		evt.target.scrollContent.branchingActivity = BranchingActivity(_canvasModel.selectedItem.activity);
 		evt.target.scrollContent.conditions = conditions;

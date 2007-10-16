@@ -89,6 +89,8 @@ class ToolOutputCondition   {
 				condition.startValue = startValue;
 				condition.endValue = endValue;
 			}
+			
+			condition.toolActivity = toolActivity;
 		}
 		
 		return condition;

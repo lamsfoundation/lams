@@ -197,18 +197,22 @@ class Canvas extends CanvasHelper {
 			_ddm.licenseText = workspaceResultDTO.resourceLicenseText;
 			_ddm.licenseID = workspaceResultDTO.resourceLicenseID;
 		}
-		var mode:String = Application.getInstance().getWorkspace().getWorkspaceModel().currentMode;
 		
+		var mode:String = Application.getInstance().getWorkspace().getWorkspaceModel().currentMode;
 		_ddm.saveMode = (mode == Workspace.MODE_SAVEAS) ? 1 : 0;
 		
 		Debugger.log('SAVE MODE:'+_ddm.saveMode,Debugger.CRITICAL,'saveDesignToServer','Canvas');
 		
+		if(_ddm.hasRedundantBranchMappings(false)) {
+			Cursor.showCursor(Application.C_DEFAULT);
+			LFMessage.showMessageConfirm(Dictionary.getValue("redundant_branch_mappings_msg"), Proxy.create(_ddm, _ddm.removeRedundantBranchMappings, Proxy.create(this, saveDesignToServer, workspaceResultDTO)), null, Dictionary.getValue("al_continue"), null);
+		} else {
 		
-		var dto:Object = _ddm.getDesignForSaving();
-		
-		var callback:Function = Proxy.create(this,onStoreDesignResponse);
-		
-		Application.getInstance().getComms().sendAndReceive(dto,"servlet/authoring/storeLearningDesignDetails",callback,false);
+			var dto:Object = _ddm.getDesignForSaving();
+			var callback:Function = Proxy.create(this,onStoreDesignResponse);
+			
+			Application.getInstance().getComms().sendAndReceive(dto,"servlet/authoring/storeLearningDesignDetails",callback,false);
+		}	
 		
 		return true;
 	}

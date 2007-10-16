@@ -124,8 +124,10 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 		Debugger.log("Loading Lists: mappings length: " + mappings.length, Debugger.CRITICAL, "loadLists", "ConditionMatchingDialog");
 		
 		for(var i=0; i < mappings.length; i++) {
-			match_dgd.addItem(mappings[i]);
-			removeCondition(mappings[i].condition);
+			if(mappings[i].condition.toolActivity.activityUIID == _branchingActivity.toolActivityUIID) {
+				match_dgd.addItem(mappings[i]);
+				removeCondition(mappings[i].condition);
+			}
 		}
 		
 	}

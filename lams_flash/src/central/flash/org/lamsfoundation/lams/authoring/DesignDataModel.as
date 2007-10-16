@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.ui.Cursor;
 import org.lamsfoundation.lams.authoring.br.BranchConnector;
 import org.lamsfoundation.lams.common.*;
 import mx.events.*
@@ -763,7 +764,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				if((classMappingEntries[i].branchingActivity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE 
 						&& classMappingEntries[i].group != null) ||
 					(classMappingEntries[i].branchingActivity.activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE 
-						&& classMappingEntries[i].condition != null)) {
+						&& classMappingEntries[i].condition != null 
+						&& classMappingEntries[i].condition.toolActivity.activityUIID == classMappingEntries[i].branchingActivity.toolActivityUIID)) {
 					design.branchMappings.push(classMappingEntries[i].toData());
 				}
 			}
@@ -870,6 +872,18 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		Debugger.log('Returning '+gActs.length+' grouping activities',Debugger.GEN,'getGroupingActivities','DesignDataModel');
 		return gActs;
+	}
+	
+	public function getActivitiesByType(type:Number):Array{
+		var acts:Array = _activities.values();
+		var tActs = new Array();
+		for(var i=0; i<acts.length;i++){
+			if(acts[i].activityTypeID == type){
+				tActs.push(acts[i]);
+			}
+		}
+		
+		return tActs;
 	}
 	
 	public function getGroupByUIID(groupUIID:Number):Group {
@@ -1050,6 +1064,92 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public function getAllConditions():Array {
 		return _outputConditions.values();
+	}
+	public function getAllConditionsForToolOutput(toolActivityUIID:Number):Array {
+		var conditions:Array = getAllConditions();
+		var rConditions:Array = new Array();
+		
+		for(var i=0; i<conditions.length; i++) {
+			if(conditions[i].toolActivity.activityUIID = toolActivityUIID)
+				rConditions.push(conditions[i]);
+		}
+		
+		return rConditions;
+	}
+	
+	/**
+	 * Search through all Branching Activities and check if any unused or redundant mappings exist in the DDM
+	 * @param remove  remove all instances if true
+	 */
+	public function hasRedundantBranchMappings(remove:Boolean):Boolean {
+		var i;
+		var v:Boolean = true;
+		
+		var gActs:Array = getActivitiesByType(Activity.GROUP_BRANCHING_ACTIVITY_TYPE);
+		var tActs:Array = getActivitiesByType(Activity.TOOL_BRANCHING_ACTIVITY_TYPE);
+		var cActs:Array = getActivitiesByType(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE);
+		
+		var mappingsToRemove:Array = new Array();
+		
+		for(i=0; i<gActs.length; i++) {
+			var mappings:Object = getBranchMappingsByActivityUIIDAndType(gActs[i].activityUIID);
+			if(mappings.toolBased.length > 0) {
+				v = false;
+				mappingsToRemove.concat(mappings.toolBased);
+			}
+			
+			for(var j=0; j<mappings.groupBased.length; j++) {
+				if(mappings.groupBased[j].group.parentID != GroupingActivity(gActs[i]).createGroupingUIID) {
+					v = false;
+					mappingsToRemove.push(mappings.groupBased[j]);
+				}
+			}
+		}
+		
+		for(i=0; i<tActs.length; i++) {
+			var mappings:Object = getBranchMappingsByActivityUIIDAndType(gActs[i].activityUIID);
+			if(mappings.groupBased.length > 0) {
+				v = false;
+				mappingsToRemove.concat(mappings.groupBased);
+			} 
+			
+			for(var j=0; j<mappings.toolBased.length; j++) {
+				if(mappings.toolBased[j].condition.toolActivity.activityUIID != BranchingActivity(tActs[i]).toolActivityUIID) {
+					v = false;
+					mappingsToRemove.push(mappings.toolBased[j]);
+				}
+			}
+		}
+		
+		for(i=0; i<cActs.length; i++) {
+			var mappings:Object = getBranchMappingsByActivityUIIDAndType(cActs[i].activityUIID);
+			
+			for(var j=0; j<mappings.groupBased.length; j++) {
+				mappingsToRemove.concat(mappings.groupBased[j]);
+				v = false;
+			}
+			
+			for(var j=0; j<mappings.toolBased.length; j++) {
+				mappingsToRemove.concat(mappings.toolBased[j]);
+				v = false;
+			}
+		}
+		
+		if(remove && !v) {
+			for(var k=0; k<mappingsToRemove.length; k++) {
+				Debugger.log("removing entry: " + mappingsToRemove[k].entryUIID, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
+				removeBranchMapping(mappingsToRemove[k].entryUIID);
+			}
+		}
+		
+		return !v;
+		
+	}
+	
+	public function removeRedundantBranchMappings(returnToSave:Function):Void {
+		Cursor.showCursor(ApplicationParent.C_HOURGLASS);
+		hasRedundantBranchMappings(true);
+		returnToSave();
 	}
 	
 	//Getters and setters for the properties
