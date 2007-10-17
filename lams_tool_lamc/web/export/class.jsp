@@ -70,9 +70,7 @@
 					<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
 					<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
 						<td valign=top class="align-left"> <b>  <fmt:message key="label.question.only"/> 
-							<c:out value="${queIndex}"/></b><BR>
-							 (<fmt:message key="label.mark"/> <c:out value="${currentDto.mark}"/>)
-						</td>
+							<c:out value="${queIndex}"/></b></td>
 					</c:forEach>		  	
 					 
 					 <td NOWRAP valign=top class="align-left"> <b> <fmt:message key="label.total"/>  </b> </td>  
