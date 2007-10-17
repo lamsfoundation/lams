@@ -496,6 +496,11 @@ class PropertyInspector extends PropertyInspectorControls {
 			
 			Debugger.log("defineLater: " + ba.defineLater, Debugger.CRITICAL, "showBranchingActivityProperties", "PropertyInspector");
 			//_define_monitor_cb.selected = (ba.defineLater != null) ? ba.defineLater : false;
+		} else if(_canvasModel.selectedItem.activity.activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) {
+			if(toolActs_cmb.selectedIndex == 0) {
+				_canvasModel.selectedItem.activity.toolActivityUIID = null;
+				branchToolInputChange(_canvasModel.selectedItem, toolActs_cmb.dataProvider[0].data);
+			}
 		}
 	
 	}

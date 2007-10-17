@@ -559,7 +559,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	public function removeActivity(activityUIID):Object{
 		//dispatch an event to show the design  has changed
-				
+		
 		var r:Object = _activitiesDisplayed.remove(activityUIID);
 		if(r==null){
 			return new LFError("Removing activity failed:"+activityUIID,"removeActivity",this,null);

@@ -914,6 +914,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		}
 	}
 	
+	public function clearBranchMappingsByToolActivity(activityUIID:Number):Void {
+		var bMappings:Array = _branchMappings.values();
+		
+		for(var i=0; i<bMappings.length; i++) {
+			if(bMappings[i].condition.toolActivity == activityUIID) _branchMappings.remove(bMappings[i].entryUIID);
+		}
+	}
+	
 	public function removeBranchMappingsByGroupUIID(groupUIID:Number):Void {
 		var bMappings:Array = _branchMappings.values();
 		
@@ -1089,61 +1097,71 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var tActs:Array = getActivitiesByType(Activity.TOOL_BRANCHING_ACTIVITY_TYPE);
 		var cActs:Array = getActivitiesByType(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE);
 		
+		Debugger.log("gacts len:" + gActs.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
+		Debugger.log("tacts len:" + tActs.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
+		Debugger.log("cacts len:" + cActs.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
+		
 		var mappingsToRemove:Array = new Array();
 		
 		for(i=0; i<gActs.length; i++) {
 			var mappings:Object = getBranchMappingsByActivityUIIDAndType(gActs[i].activityUIID);
-			if(mappings.toolBased.length > 0) {
-				v = false;
-				mappingsToRemove.concat(mappings.toolBased);
-			}
 			
-			for(var j=0; j<mappings.groupBased.length; j++) {
-				if(mappings.groupBased[j].group.parentID != GroupingActivity(gActs[i]).createGroupingUIID) {
-					v = false;
+			Debugger.log("gacts mappings len tool:" + mappings.toolBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
+			Debugger.log("gacts mappings len group:" + mappings.groupBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
+			
+			if(mappings.toolBased.length > 0)
+				mappingsToRemove.push(Array(mappings.toolBased));
+
+			
+			for(var j=0; j<mappings.groupBased.length; j++)
+				if(mappings.groupBased[j].group.parentID != BranchingActivity(gActs[i]).groupingUIID)
 					mappingsToRemove.push(mappings.groupBased[j]);
-				}
-			}
+
 		}
 		
 		for(i=0; i<tActs.length; i++) {
 			var mappings:Object = getBranchMappingsByActivityUIIDAndType(gActs[i].activityUIID);
-			if(mappings.groupBased.length > 0) {
-				v = false;
-				mappingsToRemove.concat(mappings.groupBased);
-			} 
 			
-			for(var j=0; j<mappings.toolBased.length; j++) {
-				if(mappings.toolBased[j].condition.toolActivity.activityUIID != BranchingActivity(tActs[i]).toolActivityUIID) {
-					v = false;
+			Debugger.log("tacts mappings len tool:" + mappings.toolBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
+			Debugger.log("tacts mappings len group:" + mappings.groupBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
+			
+			if(mappings.groupBased.length > 0)
+				mappingsToRemove.push(Array(mappings.groupBased));
+			
+			for(var j=0; j<mappings.toolBased.length; j++)
+				if(mappings.toolBased[j].condition.toolActivity.activityUIID != BranchingActivity(tActs[i]).toolActivityUIID)
 					mappingsToRemove.push(mappings.toolBased[j]);
-				}
-			}
 		}
 		
 		for(i=0; i<cActs.length; i++) {
 			var mappings:Object = getBranchMappingsByActivityUIIDAndType(cActs[i].activityUIID);
 			
-			for(var j=0; j<mappings.groupBased.length; j++) {
-				mappingsToRemove.concat(mappings.groupBased[j]);
-				v = false;
-			}
+			Debugger.log("cacts mappings len tool:" + mappings.toolBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
+			Debugger.log("cacts mappings len group:" + mappings.groupBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
 			
-			for(var j=0; j<mappings.toolBased.length; j++) {
-				mappingsToRemove.concat(mappings.toolBased[j]);
-				v = false;
-			}
+			for(var j=0; j<mappings.groupBased.length; j++)
+				mappingsToRemove.push(Array(mappings.groupBased[j]));
+			
+			for(var j=0; j<mappings.toolBased.length; j++)
+				mappingsToRemove.push(Array(mappings.toolBased[j]));
 		}
 		
-		if(remove && !v) {
-			for(var k=0; k<mappingsToRemove.length; k++) {
-				Debugger.log("removing entry: " + mappingsToRemove[k].entryUIID, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
-				removeBranchMapping(mappingsToRemove[k].entryUIID);
-			}
-		}
+		if(mappingsToRemove.length > 0)
+			v = false;
+		
+		if(remove && !v)
+			removeEntries(mappingsToRemove);
 		
 		return !v;
 		
+	}
+	
+	private function removeEntries(e:Array) {
+		for(var i=0; i<e.length; i++)
+			if(e[i] instanceof Array)
+				removeEntries(e[i]);
+			else 
+				removeBranchMapping(e[i].entryUIID);
 	}
 	
 	public function removeRedundantBranchMappings(returnToSave:Function):Void {

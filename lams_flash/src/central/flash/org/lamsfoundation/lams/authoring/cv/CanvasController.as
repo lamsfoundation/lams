@@ -399,7 +399,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
     
 	private function isActivityOnBin(ca:Object):Void{
 		if (ca.hitTest(_canvasModel.getCanvas().bin)) {
-			if(!isActivityReadOnly(ca, Dictionary.getValue("cv_element_readOnly_action_del")) && !ca.branchConnector){
+			if(!isActivityReadOnly(ca, Dictionary.getValue("cv_element_readOnly_action_del")) && !ca.branchConnector && !isActivityProtected(ca)) {
 				if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 					_canvasModel.removeComplexActivity(ca);
 				} else {
@@ -651,6 +651,39 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		} else {
 			return false; 
 		}
+	}
+ 
+	private function isActivityProtected(ca:Object, message:String):Boolean {
+		var activity:Activity = Activity(ca.activity);
+		if(activity.isOptionalActivity() || activity.isParallelActivity()) {
+				for(var i=0; i<ca.children.length; i++)
+					if(isActivityProtected(ca.children[i], "cv_activityProtected_complex_child_msg")) return true;
+		} else if(activity.isBranchingActivity() || activity.isSequenceActivity()) {
+			var childrenActs:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(activity.activityUIID);
+			for(var i=0; i<childrenActs.length; i++)
+				if(isActivityProtected(ca.children[i], "cv_activityProtected_complex_child_msg")) return true;
+		} else if(activity.isGroupActivity()) {
+			var gActs:Array = _canvasModel.getCanvas().ddm.getActivitiesByType(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
+				for(var i=0; i<gActs.length; i++) {
+					if(gActs[i].groupingUIID == activity.activityUIID) {
+						if(message == null) message = "cv_activityProtected_grouping_msg";
+						LFMessage.showMessageAlert(Dictionary.getValue(message), null);
+						return true;
+					}
+				}
+		} else {
+			var tActs:Array = _canvasModel.getCanvas().ddm.getActivitiesByType(Activity.TOOL_BRANCHING_ACTIVITY_TYPE)
+			
+			for(var i=0; i<tActs.length; i++) {
+				if(tActs[i].toolActivityUIID == activity.activityUIID) {
+					if(message == null) message = "cv_activityProtected_tool_msg";
+					LFMessage.showMessageAlert(Dictionary.getValue(message), null);
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
  
 	public function openDialogLoaded(evt:Object) {

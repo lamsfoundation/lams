@@ -411,6 +411,7 @@ class PropertyInspectorControls extends MovieClip {
 			showAppliedGroupingControls(v, e);
 		} else if(_activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) {
 			showToolBasedBranchingControls(v, e);
+			
 			if(toolActs_cmb.visible) {
 				toolActs_cmb.dataProvider = _canvasModel.getDownstreamToolActivities();
 				
@@ -420,6 +421,11 @@ class PropertyInspectorControls extends MovieClip {
 					for(var i=0; i < dp.length; i++)
 						if(dp[i].data == _canvasModel.selectedItem.activity.toolActivityUIID)
 							toolActs_cmb.selectedIndex = i;
+							
+					if(toolActs_cmb.selectedIndex == 0) {
+						_canvasModel.selectedItem.activity.toolActivityUIID = null;
+						branchToolInputChange(_canvasModel.selectedItem, toolActs_cmb.dataProvider[0].data);
+					}
 				}
 			}
 			
@@ -900,7 +906,6 @@ class PropertyInspectorControls extends MovieClip {
 				toolActs_cmb.dataProvider = _canvasModel.getDownstreamToolActivities();
 				for(var i=0; i < toolActs_cmb.dataProvider.length; i++)
 					selectToolActivityItem(i, toolActs_cmb.dataProvider[i].data);
-						
 			}
 				
 			
@@ -1017,10 +1022,13 @@ class PropertyInspectorControls extends MovieClip {
 		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
 		
 		if(branches.myBranches.length > 0) {
-			_tool_output_match_btn.visible = v;
-			
-			if(_canvasModel.selectedItem.activity.toolActivityUIID != null)
+			if(_canvasModel.selectedItem.activity.toolActivityUIID != null) {
+				_tool_output_match_btn.visible = v;
 				_conditions_setup_btn.visible = v;
+			} else {
+				_tool_output_match_btn.visible = false;
+				_conditions_setup_btn.visible = false;
+			}
 		}
 		
 		if(e != null) {
