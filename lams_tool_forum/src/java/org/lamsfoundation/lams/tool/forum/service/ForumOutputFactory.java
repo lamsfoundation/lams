@@ -50,7 +50,7 @@ public class ForumOutputFactory extends OutputFactory {
 			Object toolContentObject) throws ToolException {
 		TreeMap<String, ToolOutputDefinition> definitionMap =  new TreeMap<String, ToolOutputDefinition>();
 		
-		ToolOutputDefinition definition = buildLongOutputDefinition(OUTPUT_NAME_LEARNER_NUM_POSTS);
+		ToolOutputDefinition definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_POSTS, new Long(0), null);
 		definitionMap.put(OUTPUT_NAME_LEARNER_NUM_POSTS, definition);
 
 		return definitionMap;

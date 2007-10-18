@@ -36,6 +36,12 @@ import org.lamsfoundation.lams.learningdesign.BranchCondition;
  */
 public class BranchConditionDTO {
 
+	/** If a range is open ended e.g. starts at zero and has no end value then Flash needs a maximum value for endValue 
+	 * so that it can render a stepper. So set the max value to 9999 on the way out, and convert it back to null
+	 * on the way in. This logic is also used for the ToolOutputDefinitionDTO.
+	 */
+	public static String MAX_FOR_FLASH = "9999";
+	
 	private Long conditionId;
 	private Integer conditionUIID;
     private Integer orderID; 
@@ -54,8 +60,13 @@ public class BranchConditionDTO {
     	this.name = condition.getName();
     	this.displayName = condition.getDisplayName();
     	this.type = condition.getType();
+
     	this.startValue = condition.getStartValue();
     	this.endValue = condition.getEndValue();
+		if ( startValue != null && endValue == null ) {
+			endValue = BranchConditionDTO.MAX_FOR_FLASH;
+		}
+
     	this.exactMatchValue = condition.getExactMatchValue();
     	this.toolActivityUIID = toolActivityUIID;
     }

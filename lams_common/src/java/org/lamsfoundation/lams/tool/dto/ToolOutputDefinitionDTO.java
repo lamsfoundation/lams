@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 
 /**
@@ -49,8 +50,13 @@ public class ToolOutputDefinitionDTO {
 		this.name = name;
 		this.description = description;
 		this.type = type;
+
 		this.startValue = startValue;
 		this.endValue = endValue;
+		if ( startValue != null && endValue == null ) {
+			endValue = BranchConditionDTO.MAX_FOR_FLASH;
+		}
+
 		this.complexDefinition = complexDefinition;
 	}
 	
@@ -59,8 +65,13 @@ public class ToolOutputDefinitionDTO {
 		this.name = definition.getName();
 		this.description = definition.getDescription();
 		this.type = (definition.getType() != null)? definition.getType().toString() : null;
+
 		this.startValue = (definition.getStartValue() != null) ? definition.getStartValue().toString() : null;
 		this.endValue = (definition.getEndValue() != null) ? definition.getEndValue().toString() : null;
+		if ( startValue != null && endValue == null ) {
+			endValue = BranchConditionDTO.MAX_FOR_FLASH;
+		}
+
 		this.complexDefinition = (definition.getComplexDefinition() != null) ? definition.getComplexDefinition().toString() : null;
 	}
 	

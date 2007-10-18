@@ -68,6 +68,7 @@ import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
+import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
@@ -153,6 +154,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	protected Set<Grouping> groupingsToDelete = new HashSet<Grouping>();
 	protected LearningDesign learningDesign = null;
 	protected Date modificationDate = null;
+	/* cache of system tools so we aren't going back to the db all the time */
+	protected HashMap<Long,SystemTool> systemTools = new HashMap<Long, SystemTool>();
 	
 	protected Logger log = Logger.getLogger(ObjectExtractor.class);	
 
@@ -962,14 +965,15 @@ public class ObjectExtractor implements IObjectExtractor {
 		else 
 			buildSequenceActivity((SequenceActivity)activity,activityDetails);
 	}
+
 	private void buildBranchingActivity(BranchingActivity branchingActivity,Hashtable activityDetails)
 		throws WDDXProcessorConversionException, ObjectExtractorException {
 		if ( branchingActivity.isChosenBranchingActivity() ) {
-			branchingActivity.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TEACHER_CHOSEN_BRANCHING));
+			branchingActivity.setSystemTool(getSystemTool(SystemTool.TEACHER_CHOSEN_BRANCHING));
 		} else if ( branchingActivity.isGroupBranchingActivity() ) {
-			branchingActivity.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUP_BASED_BRANCHING));
+			branchingActivity.setSystemTool(getSystemTool(SystemTool.GROUP_BASED_BRANCHING));
 		} else if ( branchingActivity.isToolBranchingActivity() ) {
-			branchingActivity.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TOOL_BASED_BRANCHING));
+			branchingActivity.setSystemTool(getSystemTool(SystemTool.TOOL_BASED_BRANCHING));
 		}
 
 		branchingActivity.setStartXcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.START_XCOORD));
@@ -991,7 +995,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		    groupingActivity.setCreateGroupingUIID(createGroupingUIID);
 	    }
 	    
-		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.GROUPING);
+		SystemTool systemTool = getSystemTool(SystemTool.GROUPING);
 		groupingActivity.setSystemTool(systemTool);
 		
 	    /*Hashtable groupingDetails = (Hashtable) activityDetails.get(WDDXTAGS.GROUPING_DTO); 
@@ -1015,6 +1019,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	private void buildParallelActivity(ParallelActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
 	}
 	private void buildSequenceActivity(SequenceActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
+		activity.setSystemTool(getSystemTool(SystemTool.SEQUENCE));
 	}
 	
 	private void buildToolActivity(ToolActivity toolActivity,Hashtable activityDetails) throws WDDXProcessorConversionException{
@@ -1033,7 +1038,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		}
 	}
 	private void buildGateActivity(Object activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
-		if(activity instanceof SynchGateActivity)
+		if(activity instanceof SynchGateActivity) 
 			buildSynchGateActivity((SynchGateActivity)activity,activityDetails);
 		else if (activity instanceof PermissionGateActivity)
 			buildPermissionGateActivity((PermissionGateActivity)activity,activityDetails);
@@ -1047,23 +1052,20 @@ public class ObjectExtractor implements IObjectExtractor {
 				
 	}
 	private void buildSynchGateActivity(SynchGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{	
-		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.SYNC_GATE);
-		activity.setSystemTool(systemTool);
+		activity.setSystemTool(getSystemTool(SystemTool.SYNC_GATE));
 	}
 	private void buildPermissionGateActivity(PermissionGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
-		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE);
-		activity.setSystemTool(systemTool);
+		activity.setSystemTool(getSystemTool(SystemTool.PERMISSION_GATE));
 	}
 	private void buildSystemGateActivity(SystemGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
-		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.SYSTEM_GATE);
-		activity.setSystemTool(systemTool);
+		activity.setSystemTool(getSystemTool(SystemTool.SYSTEM_GATE));
 	}
 	private void buildScheduleGateActivity(ScheduleGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
 	    //activity.setGateStartDateTime(WDDXProcessor.convertToDate(activityDetails,WDDXTAGS.GATE_START_DATE));
 		//activity.setGateEndDateTime(WDDXProcessor.convertToDate(activityDetails,WDDXTAGS.GATE_END_DATE));
 		activity.setGateStartTimeOffset(WDDXProcessor.convertToLong(activityDetails,WDDXTAGS.GATE_START_OFFSET));
 		activity.setGateEndTimeOffset(WDDXProcessor.convertToLong(activityDetails,WDDXTAGS.GATE_END_OFFSET));		
-		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.SCHEDULE_GATE);
+		SystemTool systemTool = getSystemTool(SystemTool.SCHEDULE_GATE);
 		activity.setSystemTool(systemTool);
 	}
 	
@@ -1398,6 +1400,11 @@ public class ObjectExtractor implements IObjectExtractor {
 		    	throw new WDDXProcessorConversionException("Condition is missing its UUID: "+conditionTable);
 		    }
 
+		    String endValue = WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_END_VALUE);
+		    if ( BranchConditionDTO.MAX_FOR_FLASH.equals(endValue) ) {
+		    	endValue = null;
+		    }
+		    
 		    if ( condition == null ) {
     			condition = new BranchCondition(null, conditionUIID, 
     					WDDXProcessor.convertToInteger(conditionTable,WDDXTAGS.ORDER_ID), 
@@ -1405,12 +1412,12 @@ public class ObjectExtractor implements IObjectExtractor {
     					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_DISPLAY_NAME),
     					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_TYPE),
     					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_START_VALUE),
-    					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_END_VALUE),
+    					endValue,
     					WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_EXACT_MATCH_VALUE) );
     		} else {
     			condition.setConditionUIID(conditionUIID);
     			condition.setDisplayName(WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_DISPLAY_NAME));
-    			condition.setEndValue(WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_END_VALUE));
+    			condition.setEndValue(endValue);
     			condition.setExactMatchValue(WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_EXACT_MATCH_VALUE) );
     			condition.setName(WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_NAME));
     			condition.setOrderId(WDDXProcessor.convertToInteger(conditionTable,WDDXTAGS.ORDER_ID));
@@ -1421,6 +1428,18 @@ public class ObjectExtractor implements IObjectExtractor {
 		return condition;
 	}
 
+	private SystemTool getSystemTool(Long systemToolId) {
+		SystemTool tool = systemTools.get(systemToolId);
+		if ( tool == null ) {
+			tool = systemToolDAO.getSystemToolByID(systemToolId);
+			if ( tool != null ) {
+				systemTools.put(systemToolId, tool);
+			} else {
+				log.error("ObjectExtractor: Unable to find matching system tool for id "+systemToolId);
+			}
+		}
+		return tool;
+	}
 
 }
 	
