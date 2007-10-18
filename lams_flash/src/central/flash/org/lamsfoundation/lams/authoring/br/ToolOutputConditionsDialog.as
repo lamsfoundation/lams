@@ -46,6 +46,9 @@ import mx.events.*
  * @version 2.1
  **/
 class ToolOutputConditionsDialog extends MovieClip implements Dialog {
+	private static var STP_MAX:Number = 9999;
+	private static var STP_MIN:Number = 0;
+	
 	//References to components + clips 
     private var _container:MovieClip;  //The container window that holds the dialog
     
@@ -383,10 +386,10 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 					return false;
 				}
 			} else { 
-				if(start_value >= condition.startValue && start_value <= condition.endValue) {
+				if(start_value >= condition.startValue && start_value <= condition.endValue && start_value != null) {
 					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_start_value")]), null);
 					return false;
-				} else if(end_value >= condition.startValue && end_value <= condition.endValue) {
+				} else if(end_value >= condition.startValue && end_value <= condition.endValue && end_value != null) {
 					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_end_value")]), null);
 					return false;
 				}
@@ -425,13 +428,13 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				_start_value_stp.visible = true;
 				_end_value_stp.visible = !_opt_greaterThan_cb.value;
 				
-				_start_value_stp.minimum = Number(_selectedDefinition.startValue);
-				_end_value_stp.minimum = Number(_selectedDefinition.startValue);
-				_start_value_stp.maximum = Number(_selectedDefinition.endValue);
-				_end_value_stp.maximum = Number(_selectedDefinition.endValue);
+				_start_value_stp.minimum = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
+				_end_value_stp.minimum = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
+				_start_value_stp.maximum = (_selectedDefinition.endValue != null) ? Number(_selectedDefinition.endValue) : STP_MAX;
+				_end_value_stp.maximum = (_selectedDefinition.endValue != null) ? Number(_selectedDefinition.endValue) : STP_MAX;
 				
-				_start_value_stp.value = Number(_selectedDefinition.startValue);
-				_end_value_stp.value = Number(_selectedDefinition.endValue);
+				_start_value_stp.value = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
+				_end_value_stp.value = (_selectedDefinition.endValue != null) ? Number(_selectedDefinition.endValue) : STP_MIN;
 				
 				_opt_greaterThan_cb.visible = true;
 				_opt_greaterThan_lbl.visible = true;
@@ -497,6 +500,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private function onGreaterThanSelect(evt:Object):Void {
 		_end_value_stp.visible = !evt.target.value;
+		_condition_to_lbl.visible = !evt.target.value;
 	}
 
 	public static function getOutputType(type:String):String {
