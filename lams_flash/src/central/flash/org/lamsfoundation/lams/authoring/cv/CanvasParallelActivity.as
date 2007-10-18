@@ -364,6 +364,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	public function get actChildren():Array {
 		return _children;
 	} 
+	
+	public function get children():Array {
+		return new Array(child1_mc, child2_mc);
+	}
 
 
 }

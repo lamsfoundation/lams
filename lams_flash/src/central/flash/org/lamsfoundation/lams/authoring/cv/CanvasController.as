@@ -653,31 +653,33 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		}
 	}
  
-	private function isActivityProtected(ca:Object, message:String):Boolean {
+	private function isActivityProtected(ca:Object, message:String, type:String):Boolean {
 		var activity:Activity = Activity(ca.activity);
 		if(activity.isOptionalActivity() || activity.isParallelActivity()) {
 				for(var i=0; i<ca.children.length; i++)
-					if(isActivityProtected(ca.children[i], "cv_activityProtected_complex_child_msg")) return true;
+					if(isActivityProtected(ca.children[i], "cv_activityProtected_child_activity_link_msg", activity.getDictionaryLabel())) return true;
 		} else if(activity.isBranchingActivity() || activity.isSequenceActivity()) {
 			var childrenActs:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(activity.activityUIID);
 			for(var i=0; i<childrenActs.length; i++)
-				if(isActivityProtected(ca.children[i], "cv_activityProtected_complex_child_msg")) return true;
+				if(isActivityProtected(ca.children[i], "cv_activityProtected_child_activity_link_msg", activity.getDictionaryLabel())) return true;
 		} else if(activity.isGroupActivity()) {
 			var gActs:Array = _canvasModel.getCanvas().ddm.getActivitiesByType(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
-				for(var i=0; i<gActs.length; i++) {
-					if(gActs[i].groupingUIID == activity.activityUIID) {
-						if(message == null) message = "cv_activityProtected_grouping_msg";
-						LFMessage.showMessageAlert(Dictionary.getValue(message), null);
-						return true;
-					}
+				
+			for(var i=0; i<gActs.length; i++) {
+				if(gActs[i].groupingUIID == GroupingActivity(activity).createGroupingUIID) {
+					if(message == null) message = "cv_activityProtected_activity_link_msg";
+					LFMessage.showMessageAlert(Dictionary.getValue(message, [Dictionary.getValue(activity.getDictionaryLabel()), Dictionary.getValue("pi_activity_type_branching")]) + " " + Dictionary.getValue("cv_activityProtected_activity_remove_msg", [Dictionary.getValue("grouping_act_title")]), null);
+					return true;
 				}
+			}
 		} else {
 			var tActs:Array = _canvasModel.getCanvas().ddm.getActivitiesByType(Activity.TOOL_BRANCHING_ACTIVITY_TYPE)
 			
 			for(var i=0; i<tActs.length; i++) {
 				if(tActs[i].toolActivityUIID == activity.activityUIID) {
-					if(message == null) message = "cv_activityProtected_tool_msg";
-					LFMessage.showMessageAlert(Dictionary.getValue(message), null);
+					if(message == null) message = "cv_activityProtected_activity_link_msg";
+					if(type == null) type = "ld_val_activity_column";
+					LFMessage.showMessageAlert(Dictionary.getValue(message, [Dictionary.getValue(type), Dictionary.getValue("pi_activity_type_branching")]) + " " + Dictionary.getValue("cv_activityProtected_activity_remove_msg", [Dictionary.getValue("pi_branch_tool_acts_lbl")]), null);
 					return true;
 				}
 			}

@@ -773,4 +773,17 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public function set stopAfterActivity(a:Boolean):Void {
 		_stopAfterActivity = a;
 	}
+	
+	public function getDictionaryLabel():String {
+		if(isParallelActivity())
+			return "pi_parallel_title";
+		else if(isOptionalActivity())
+			return "opt_activity_title";
+		else if(isBranchingActivity() || isSequenceActivity())
+			return "pi_activity_type_branching";
+		else if(isGroupActivity())
+			return "pi_activity_type_grouping";
+		else
+			return null;
+	}
 }
