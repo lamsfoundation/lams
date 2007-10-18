@@ -63,8 +63,7 @@ class SequenceActivity extends ComplexActivity {
 	 */
 	public function toData():Object{
 		var dto:Object = super.toData();
-		if(_firstActivityUIID == null) { return null; }
-		else { dto.defaultActivityUIID = _firstActivityUIID; }
+		dto.defaultActivityUIID = (_firstActivityUIID == null) ? Config.NUMERIC_NULL_VALUE : _firstActivityUIID;
 
 		return dto;
 	}
