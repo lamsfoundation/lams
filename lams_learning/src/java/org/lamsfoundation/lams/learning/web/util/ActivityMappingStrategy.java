@@ -59,9 +59,6 @@ public class ActivityMappingStrategy implements Serializable {
 		else if (activity.isOptionsActivity())  {
 		    strutsAction = "/DisplayOptionsActivity.do";
 		}
-		else if ( activity.isSequenceActivity() ) {
-		    strutsAction = "/SequenceActivity.do";
-	    } 
 		else {
 	    	// unexpected type
 	    	log.error("Unexpected activity type "+activity);
