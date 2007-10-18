@@ -274,6 +274,11 @@
 			<subclass name="org.lamsfoundation.lams.learningdesign.SequenceActivity" discriminator-value="8">
 				<meta attribute="class-description" inherit="false">@hibernate.class</meta>
 
+                 <!-- uni-directional many-to-one association to System Tool -->
+                 <many-to-one name="systemTool" class="org.lamsfoundation.lams.tool.SystemTool" lazy="false" >
+                 	<column name="system_tool_id" not-null="false"/>
+                 </many-to-one>                 
+
 			    <set name="branchEntries" lazy="true" inverse="true" cascade="all-delete-orphan" >
 		    		<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan" 
 		    				@hibernate.collection-key column="sequence_activity_id" 

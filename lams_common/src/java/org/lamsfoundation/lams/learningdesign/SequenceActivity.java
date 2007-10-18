@@ -35,6 +35,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.SequenceActivityStrategy;
+import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.util.MessageService;
 
 
@@ -42,11 +43,12 @@ import org.lamsfoundation.lams.util.MessageService;
  * @author Manpreet Minhas
  * @hibernate.class 
 */
-public class SequenceActivity extends ComplexActivity implements Serializable {
+public class SequenceActivity extends ComplexActivity implements Serializable, ISystemToolActivity {
 
 	private static Logger log = Logger.getLogger(SequenceActivity.class);
 	
 	private Set branchEntries;
+	private SystemTool systemTool; 
 
     /** full constructor */
     public SequenceActivity(Long activityId, 
@@ -72,7 +74,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 			Set inputActivities,
 			Set activities,
 			Activity defaultActivity,
-            Set branchEntries) {
+            Set branchEntries,
+            SystemTool systemTool) {
         super(activityId, 
                 id, 
                 description, 
@@ -98,7 +101,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
                 defaultActivity);
         super.activityStrategy = new SequenceActivityStrategy(this);
         this.branchEntries = branchEntries;
-        
+        this.systemTool = systemTool;
     }
 
 
@@ -133,6 +136,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
       super.activityStrategy = new SequenceActivityStrategy(this);
     }
     
+    
     /**
      * Makes a copy of the SequenceActivity for authoring, preview and monitoring environment
      * @return SequenceActivity Returns a deep-copy of the originalActivity
@@ -141,6 +145,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     	SequenceActivity newSequenceActivity = new SequenceActivity();
     	copyToNewComplexActivity(newSequenceActivity);
     	newSequenceActivity.defaultActivity = this.defaultActivity;
+    	newSequenceActivity.systemTool = this.systemTool;
     	
        	if ( this.getBranchEntries() != null && this.getBranchEntries().size() > 0) {
        		newSequenceActivity.setBranchEntries(new HashSet());
@@ -165,7 +170,6 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
             .toString();
     }
 
-
     /**
      * @see org.lamsfoundation.lams.util.Nullable#isNull()
      */
@@ -174,6 +178,18 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
         return false;
     }
 
+	/**
+	 * @hibernate.many-to-one lazy="false"
+	 * @hibernate.column name="system_tool_id"
+	*/
+	public SystemTool getSystemTool() {
+		return systemTool;
+	}
+
+	public void setSystemTool(SystemTool systemTool) {
+		this.systemTool = systemTool;
+	}
+	
 	/** 
 	 * Get the set of the branch to group mappings used for this branching activity. The set contains BranchActivityEntry entries
 	 * 

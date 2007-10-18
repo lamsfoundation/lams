@@ -49,6 +49,7 @@ public class SystemTool implements Serializable {
 	public static final Long TEACHER_CHOSEN_BRANCHING = new Long(6);
 	public static final Long GROUP_BASED_BRANCHING = new Long(7);
 	public static final Long TOOL_BASED_BRANCHING = new Long(8);
+	public static final Long SEQUENCE = new Long(9);
 	
     /** identifier field */
     private Long systemToolId;

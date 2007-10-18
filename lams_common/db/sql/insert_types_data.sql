@@ -204,6 +204,15 @@ VALUES (8, 12, 'Tool Output Based Branching', 'Select between multiple sequence 
         'monitoring/branchingExportPortfolio?mode=teacher', 'monitoring/toolBranching.do?method=viewBranching',
         'monitoring/toolBranching.do?method=viewBranching', now());
 
+INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description,
+        learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url,
+        export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+VALUES (9, 8, 'Sequence', 'A sequence of activities',
+        'learning/SequenceActivity.do', 'learning/SequenceActivity.do',
+        NULL, NULL, 
+        'monitoring/sequenceExportPortfolio?mode=teacher', 'monitoring/sequence.do?method=viewSequence',
+        'monitoring/sequence.do?method=viewSequence', now());
+
 -- Supported Locales
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction) 
 VALUES (1, 'en', 'AU', 'English (Australia)', 'LTR');
