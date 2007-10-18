@@ -24,7 +24,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.authoring.web;
 
+import java.io.File;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -78,7 +80,6 @@ public class ImportToolContentAction extends LamsAction {
 	public static final String ATTR_LD_ID = "learningDesignID";
 	
 	private static final String KEY_MSG_IMPORT_FILE_NOT_FOUND = "msg.import.file.not.found";
-	private static final String KEY_MSG_IMPORT_FILE_FORMAT = "msg.import.file.format";  
 	private static final String KEY_MSG_IMPORT_FAILED_UNKNOWN_REASON = "msg.import.failed.unknown.reason";
 
 
@@ -103,10 +104,11 @@ public class ImportToolContentAction extends LamsAction {
 	 * @param request
 	 */
 	private void importLD(HttpServletRequest request) {
+
 		List<String> ldErrorMsgs = new ArrayList<String>();
         List<String> toolsErrorMsgs = new ArrayList<String>();
         Long ldId = null;
-
+                
         try {
         	Integer workspaceFolderUid = null;
         	
@@ -116,7 +118,7 @@ public class ImportToolContentAction extends LamsAction {
 			UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 			User user = (User)getUserService().findById(User.class,userDto.getUserID());
 			
-        	FileItem file = null;
+        	File designFile = null;
         	Map<String,String> params = new HashMap<String,String>();
         	String filename = null;
         	
@@ -126,7 +128,7 @@ public class ImportToolContentAction extends LamsAction {
         	// maximum size that will be stored in memory
         	fu.setSizeThreshold(4096);
         	// the location for saving data that is larger than getSizeThreshold()
-        	fu.setRepositoryPath(uploadPath);
+        	// fu.setRepositoryPath(uploadPath);
         	
             List fileItems = fu.parseRequest(request);
             Iterator iter = fileItems.iterator();
@@ -138,39 +140,27 @@ public class ImportToolContentAction extends LamsAction {
                 else {
                     // filename on the client
                 	filename = FileUtil.getFileName(fi.getName());
-                    file = fi;
+                	designFile = new File(uploadPath + filename);
+                	fi.write(designFile);
+                	
                 }
                 workspaceFolderUid = NumberUtils.createInteger((String) params.get("WORKSPACE_FOLDER_UID"));
             }
             
-            if (file == null) {
+            if (designFile == null) {
             	MessageService msgService = getMessageService(); 
             	log.error("Upload file missing. Filename was "+filename);
             	String msg = msgService.getMessage(KEY_MSG_IMPORT_FILE_NOT_FOUND);
             	ldErrorMsgs.add(msg != null ? msg : "Upload file missing");
             	
             } else {
-	            
-	            // if it is a .las file then it must be a 1.0.x file. Otherwise assume it is a 2.0 formatting zip file.
-	            String extension = filename != null && filename.length() >= 4 ? filename.substring(filename.length()-4) : "";
-	            
-	            if ( extension.equalsIgnoreCase(".las") ) {
-	            	// process 1.0.x file.
-	            	String wddxPacket = getPacket(file.getInputStream());
-	            	if ( wddxPacket == null || ! ( wddxPacket.startsWith("<wddx") || wddxPacket.startsWith("<?xml")) ) {
-		            	badFileType(ldErrorMsgs, filename,"Not a valid wddx/xml file");
-	            	} else {
-	            		IExportToolContentService service = getExportService();
-	            		ldId = service.importLearningDesign102(wddxPacket,user,workspaceFolderUid,toolsErrorMsgs);
-	            	}
-	            } else if ( extension.equalsIgnoreCase(".zip") ){
-		            // write the file
-		            String ldPath = ZipFileUtil.expandZip(file.getInputStream(),filename);
-		            IExportToolContentService service = getExportService();
-		            ldId = service.importLearningDesign(ldPath,user,workspaceFolderUid,toolsErrorMsgs);
-	            } else {
-	            	badFileType(ldErrorMsgs, filename,"Unexpected extension");
-	            }
+
+        		IExportToolContentService service = getExportService();
+        		Object[] ldResults = service.importLearningDesign(designFile,user,workspaceFolderUid,toolsErrorMsgs);
+        		ldId = (Long) ldResults[0];
+        		ldErrorMsgs = (List<String>) ldResults[1];
+        		toolsErrorMsgs = (List<String>) ldResults[2];
+  		
 
             }
             
@@ -194,13 +184,6 @@ public class ImportToolContentAction extends LamsAction {
 
 	}
 
-
-	private void badFileType(List<String> ldErrorMsgs, String filename, String errDescription) {
-		log.error("Uploaded file not an expected type. Filename was "+filename+" "+errDescription);
-		MessageService msgService = getMessageService(); 
-		String msg = msgService.getMessage(KEY_MSG_IMPORT_FILE_FORMAT);
-		ldErrorMsgs.add(msg != null ? msg : "Uploaded file not an expected type.");
-	}
 	
 	//***************************************************************************************
 	// Private method
@@ -218,22 +201,6 @@ public class ImportToolContentAction extends LamsAction {
 		return (MessageService) webContext.getBean(MESSAGE_SERVICE_BEAN_NAME);		
 	}
 	
-	protected String getPacket(InputStream sis)
-		throws IOException
-	{
-	    BufferedReader buff = new BufferedReader(new InputStreamReader(sis));
-	   
-	    StringBuffer tempStrBuf = new StringBuffer( 200 );
-		String tempStr;
-		tempStr = buff.readLine();
-		while ( tempStr != null )
-		{
-			tempStrBuf.append(tempStr);
-			tempStr = buff.readLine();
-		}
-	
-		return(tempStrBuf.toString()); 
-	}
 
 }
 
