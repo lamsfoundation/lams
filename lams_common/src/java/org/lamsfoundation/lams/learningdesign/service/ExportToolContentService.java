@@ -24,6 +24,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.learningdesign.service;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -184,8 +185,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private static final String IMS_PREFIX_RESOURCE_IDENTIFIER = "R-";
 	private static final String IMS_PREFIX_ACTIVITY_REF = "A-";
 	private static final String IMS_PREFIX_COMPLEX_REF = "S-";
-
-		//this is not IMS standard tag, temporarily use to gather all tools node list
+	
+	//this is not IMS standard tag, temporarily use to gather all tools node list
 	private static final String IMS_TAG_TRANSITIONS = "transitions";
 
 	// this is not IMS standard tag, temp use to ref grouping/gate activities 
@@ -241,6 +242,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private ILearningDesignDAO learningDesignDAO;
 	private ILearningLibraryDAO learningLibraryDAO;
 	private IToolImportSupportDAO toolImportSupportDAO;
+
+
+	private static final String KEY_MSG_IMPORT_FILE_FORMAT = "msg.import.file.format"; 
+
+
 	
 	/**
 	 * Class of tool attachment file handler class and relative fields information container.
@@ -875,13 +881,87 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		this.filterClass = filterClass;
 	}
 
+	/** Import the learning design from the given path. Set the importer as the creator. If the workspaceFolderUid is
+	 * null then saves the design in the user's own workspace folder.
+	 * 
+	 * @param designFile
+	 * @param importer
+	 * @param workspaceFolderUid
+	 * @return An object array where:
+	 * <ul>
+	 *   <li>Object[0] = ldID (Long)</li>
+	 *   <li>Object[1] = ldErrors when importing (List<String>)</li>
+	 *   <li>Object[2] = toolErrors when importing (List<String>)</li>
+	 * </ul>
+	 * 
+	 * @throws ImportToolContentException
+	 */
+	public Object[] importLearningDesign(File designFile, User importer, Integer workspaceFolderUid,
+			List<String> toolsErrorMsgs) throws ImportToolContentException {
+		
+		Object[] ldResults = new Object[3];
+		Long ldId = null;
+		List<String> ldErrorMsgs = new ArrayList<String>();
+		String filename = designFile.getName();
+        String extension = filename != null && filename.length() >= 4 ? filename.substring(filename.length()-4) : "";
+		
+		try {
+
+            if ( extension.equalsIgnoreCase(".las") ) {
+            	// process 1.0.x file.
+            	String wddxPacket = getPacket(new FileInputStream(designFile));
+            	if ( wddxPacket == null || ! ( wddxPacket.startsWith("<wddx") || wddxPacket.startsWith("<?xml")) ) {
+	            	badFileType(ldErrorMsgs, filename,"Not a valid wddx/xml file");
+            	} else {
+            		// IExportToolContentService service = getExportService();
+            		ldId = importLearningDesignV102(wddxPacket,importer,workspaceFolderUid,toolsErrorMsgs);
+            	}
+            } else if ( extension.equalsIgnoreCase(".zip") ){
+	            // write the file
+	            // String ldPath = ZipFileUtil.expandZip(file.getInputStream(),filename);
+            	String ldPath = ZipFileUtil.expandZip(new FileInputStream(designFile) ,filename);
+	            
+	            ldId = importLearningDesignV2(ldPath,importer,workspaceFolderUid,toolsErrorMsgs);
+            } else {
+            	badFileType(ldErrorMsgs, filename,"Unexpected extension");
+            }
+
+			
+		} catch (Exception e) {
+			throw new ImportToolContentException(e);
+		}
+
+		ldResults[0] = ldId;
+		ldResults[1] = ldErrorMsgs;
+		ldResults[2] = toolsErrorMsgs;
+		return ldResults;
+	}
+	
+	protected String getPacket(InputStream sis)
+	throws IOException
+{
+    BufferedReader buff = new BufferedReader(new InputStreamReader(sis));
+   
+    StringBuffer tempStrBuf = new StringBuffer( 200 );
+	String tempStr;
+	tempStr = buff.readLine();
+	while ( tempStr != null )
+	{
+		tempStrBuf.append(tempStr);
+		tempStr = buff.readLine();
+	}
+
+	return(tempStrBuf.toString()); 
+}
+
+	
 	/**
 	 * Import 1.0.2 learning design 
 	 * @return learningDesingID
 	 * @throws ExportToolContentException 
 	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign102(String, User, WorkspaceFolder)
 	 */
-	public Long importLearningDesign102(String ldWddxPacket, User importer, Integer workspaceFolderUid
+	public Long importLearningDesignV102(String ldWddxPacket, User importer, Integer workspaceFolderUid
 			, List<String> toolsErrorMsgs) throws ImportToolContentException {
 		WorkspaceFolder folder = getWorkspaceFolderForDesign(importer, workspaceFolderUid);
     	LD102Importer oldImporter = getLD102Importer();
@@ -894,7 +974,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * @throws ExportToolContentException 
 	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign(String)
 	 */
-	public Long importLearningDesign(String learningDesignPath, User importer, Integer workspaceFolderUid
+	public Long importLearningDesignV2(String learningDesignPath, User importer, Integer workspaceFolderUid
 			, List<String> toolsErrorMsgs) throws ImportToolContentException {
 		
 		try {
@@ -1015,6 +1095,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 		return folder;
 	}
+	
+	private void badFileType(List<String> ldErrorMsgs, String filename, String errDescription) {
+		log.error("Uploaded file not an expected type. Filename was "+filename+" "+errDescription);
+		MessageService msgService = getMessageService(); 
+		String msg = msgService.getMessage(KEY_MSG_IMPORT_FILE_FORMAT);
+		ldErrorMsgs.add(msg != null ? msg : "Uploaded file not an expected type.");
+	}
+
 
 	/**
 	 * Import tool content 

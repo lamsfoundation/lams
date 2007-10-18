@@ -108,6 +108,24 @@ public interface IExportToolContentService {
 			String initialItemFieldName);
 	
 	void registerImportVersionFilterClass(Class filterClass);
+
+	/** Import the learning design from the given path. Set the importer as the creator. If the workspaceFolderUid is
+	 * null then saves the design in the user's own workspace folder.
+	 * 
+	 * @param designFile
+	 * @param importer
+	 * @param workspaceFolderUid
+	 * @return An object array where:
+	 * <ul>
+	 *   <li>Object[0] = ldID (Long)</li>
+	 *   <li>Object[1] = ldErrors when importing (List<String>)</li>
+	 *   <li>Object[2] = toolErrors when importing (List<String>)</li>
+	 * </ul>
+	 * 
+	 * @throws ImportToolContentException
+	 */
+	Object[] importLearningDesign(File designFile, User importer, Integer workspaceFolderUid,
+			List<String> toolsErrorMsgs) throws ImportToolContentException ;
 	
 	/** Import the learning design from the given path. Set the importer as the creator. If the workspaceFolderUid is
 	 * null then saves the design in the user's own workspace folder.
@@ -118,7 +136,7 @@ public interface IExportToolContentService {
 	 * @return learningDesignID
 	 * @throws ImportToolContentException
 	 */
-	Long importLearningDesign(String learningDesignPath,User importer, Integer workspaceFolderUid, List<String> toolsErrorMsgs) throws ImportToolContentException;
+//	Long importLearningDesignv2(String learningDesignPath,User importer, Integer workspaceFolderUid, List<String> toolsErrorMsgs) throws ImportToolContentException;
 	
 	/** 
 	 * Import the tool content. This is called by tools to do the actual content import, once the tool
@@ -133,7 +151,7 @@ public interface IExportToolContentService {
 	 * @throws ExportToolContentException 
 	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign102(String, User, WorkspaceFolder)
 	 */
-	public Long importLearningDesign102(String ldWddxPacket, User importer, Integer workspaceFolderUid
-			, List<String> toolsErrorMsgs) throws ImportToolContentException;
+//	public Long importLearningDesignV102(String ldWddxPacket, User importer, Integer workspaceFolderUid
+//			, List<String> toolsErrorMsgs) throws ImportToolContentException;
 
 }
