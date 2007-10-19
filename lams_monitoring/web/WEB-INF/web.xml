@@ -78,11 +78,6 @@
 
    </servlet>
    <servlet>
-      <servlet-name>createLessonClass</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.CreateLessonServlet</servlet-class>
-
-   </servlet>
-   <servlet>
       <servlet-name>branchingExportPortfolio</servlet-name>
       <servlet-class>org.lamsfoundation.lams.monitoring.web.BranchingExportPortfolioServlet</servlet-class>
 
@@ -90,6 +85,16 @@
    <servlet>
       <servlet-name>gateExportPortfolio</servlet-name>
       <servlet-class>org.lamsfoundation.lams.monitoring.web.GateExportPortfolioServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>sequenceExportPortfolio</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.SequenceExportPortfolioServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>createLessonClass</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.CreateLessonServlet</servlet-class>
 
    </servlet>
 
@@ -129,16 +134,20 @@
       <url-pattern>/monitoring/performChosenGrouping</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>createLessonClass</servlet-name>
-      <url-pattern>/createLessonClass</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
       <servlet-name>branchingExportPortfolio</servlet-name>
       <url-pattern>/branchingExportPortfolio</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>gateExportPortfolio</servlet-name>
       <url-pattern>/gateExportPortfolio</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>sequenceExportPortfolio</servlet-name>
+      <url-pattern>/sequenceExportPortfolio</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>createLessonClass</servlet-name>
+      <url-pattern>/createLessonClass</url-pattern>
    </servlet-mapping>
 
    <session-config>

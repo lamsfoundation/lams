@@ -25,12 +25,7 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,13 +34,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
-import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
-import org.lamsfoundation.lams.monitoring.BranchDTO;
-import org.lamsfoundation.lams.monitoring.BranchingDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -84,7 +74,7 @@ public class SequenceAction extends LamsDispatchAction {
         long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
         IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-        SequenceActivity activity = (SequenceActivity) monitoringService.getActivityById(activityId, BranchingActivity.class);
+        SequenceActivity activity = (SequenceActivity) monitoringService.getActivityById(activityId, SequenceActivity.class);
     	return viewSequence(activity, lessonId, true, mapping, request, monitoringService);
     }
 
@@ -101,7 +91,7 @@ public class SequenceAction extends LamsDispatchAction {
         long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
         IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-        SequenceActivity activity = (SequenceActivity) monitoringService.getActivityById(activityId, BranchingActivity.class);
+        SequenceActivity activity = (SequenceActivity) monitoringService.getActivityById(activityId, SequenceActivity.class);
     	return viewSequence(activity, lessonId, false, mapping, request, monitoringService);
     }
 

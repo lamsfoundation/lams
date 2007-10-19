@@ -61,6 +61,31 @@
       />
     </action>
     <action
+      path="/gate"
+      type="org.lamsfoundation.lams.monitoring.web.GateAction"
+      name="GateForm"
+      scope="session"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="viewSynchGate"
+        path=".viewSynchGate"
+        redirect="false"
+      />
+      <forward
+        name="viewPermissionGate"
+        path=".viewPermissionGate"
+        redirect="false"
+      />
+      <forward
+        name="viewScheduleGate"
+        path=".viewScheduleGate"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/groupedBranching"
       type="org.lamsfoundation.lams.monitoring.web.GroupBasedBranchingAJAXAction"
       parameter="method"
@@ -128,27 +153,15 @@
       />
     </action>
     <action
-      path="/gate"
-      type="org.lamsfoundation.lams.monitoring.web.GateAction"
-      name="GateForm"
-      scope="session"
+      path="/sequence"
+      type="org.lamsfoundation.lams.monitoring.web.SequenceAction"
       parameter="method"
       unknown="false"
       validate="false"
     >
       <forward
-        name="viewSynchGate"
-        path=".viewSynchGate"
-        redirect="false"
-      />
-      <forward
-        name="viewPermissionGate"
-        path=".viewPermissionGate"
-        redirect="false"
-      />
-      <forward
-        name="viewScheduleGate"
-        path=".viewScheduleGate"
+        name="viewSequence"
+        path=".viewSequence"
         redirect="false"
       />
     </action>

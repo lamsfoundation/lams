@@ -49,4 +49,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<definition name=".viewBranches" extends=".baseDef" >
 		<put name="content" value="/branching/viewBranches.jsp" />	
 	</definition>
+<!-- ============= Sequence Page Definitions ====================== -->	
+	<definition name=".viewSequence" extends=".baseDef" >
+		<put name="content" value="/viewSequence.jsp" />	
+	</definition>
 </tiles-definitions>

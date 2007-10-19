@@ -40,7 +40,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:forEach>
 	</table>
 		
-	<c:if test="${localFiles}">
+	<c:if test="${not localFiles}">
 		<%@ include file="../template/finishbutton.jsp" %>
 	</c:if>
 </div>  <!--closes content-->
