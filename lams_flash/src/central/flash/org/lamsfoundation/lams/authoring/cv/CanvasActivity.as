@@ -426,8 +426,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 		
 		if(setupBranchView)
-			_canvasModel.openBranchActivityContent(this, false);
-					
+			if(_module == "monitoring")
+				mm.openBranchActivityContent(this, false);
+			else
+				_canvasModel.openBranchActivityContent(this, false);
 	}
 
 	

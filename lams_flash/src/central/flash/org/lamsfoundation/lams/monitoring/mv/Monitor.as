@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.cv.CanvasActivity;
+import org.lamsfoundation.lams.authoring.br.CanvasBranchView;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.dict.*;
@@ -434,6 +435,26 @@ class Monitor {
 			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
 		}
 	}
+	
+	public function openBranchView(ba, visible:Boolean){
+		
+		var cx:Number = ba._x + ba.getVisibleWidth()/2;
+		var cy:Number = ba._y + ba.getVisibleHeight()/2;
+		var isVisible:Boolean = (visible == null) ? true : visible;
+		
+		var _branchView_mc:MovieClip = MovieClip(monitorView.getMonitorTabView()).createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
+		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
+		branchView.init(monitorModel,undefined);
+		
+		//Add listener to view so that we know when it's loaded
+        branchView.addEventListener('load', Proxy.create(this,viewLoaded));
+		
+		monitorModel.addObserver(branchView);
+		
+		ba.branchView = branchView;
+		
+	}
+	
 	
 	/**
 	 * Open the Help page for the selected Tool (Canvas) Activity

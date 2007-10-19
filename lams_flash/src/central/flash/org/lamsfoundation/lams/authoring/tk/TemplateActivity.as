@@ -193,6 +193,7 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 	*/
 	private function draw():Void{
 		var toolTitle:String = _mainActivity.title
+		Debugger.log("_mainActivity.title: "+_mainActivity.title, Debugger.CRITICAL, "draw", "TemplateActivity");
 		if (toolTitle.length > 15){
 			toolTitle = toolTitle.substr(0, 15)+"..."
 		}

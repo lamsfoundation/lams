@@ -24,9 +24,13 @@
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.authoring.Activity;
+import org.lamsfoundation.lams.authoring.Branch;
+import org.lamsfoundation.lams.authoring.BranchingActivity;
 import org.lamsfoundation.lams.authoring.Transition
 import org.lamsfoundation.lams.authoring.GateActivity;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
+import org.lamsfoundation.lams.authoring.SequenceActivity;
+import org.lamsfoundation.lams.authoring.br.BranchConnector;
 import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.util.*;
@@ -71,6 +75,9 @@ class MonitorModel extends Observable{
 	private var _monitor:Monitor;
 	private var _selectedItem:Object;  // the currently selected thing - could be activity, transition etc.
 	private var _prevSelectedItem:Object;
+	
+	private var _currentBranchingActivity:Object;
+	private var _activeView:Object;
 	
 	// add model data
 	private var _activeSeq:Sequence;
@@ -121,6 +128,8 @@ class MonitorModel extends Observable{
 		isDesignDrawn = true;
 		_staffLoaded = false;
 		_learnersLoaded = false;
+		
+		_activeView = null;
 		
 		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
 		_transitionsDisplayed = new Hashtable("_transitionsDisplayed");
@@ -359,14 +368,13 @@ class MonitorModel extends Observable{
 	 * @return  
 	 */
 	public function clearDesign(tabID:Number, learner:Object){
-		
 		if (learner != null || learner != undefined){
 			var drawLearner:Object = new Object();
 			drawLearner = learner;
 		}
 	
 		//porobbably need to get a bit more granular
-		Debugger.log('Running',Debugger.GEN,'refreshDesign','MonitorModel');
+		Debugger.log('Running',Debugger.GEN,'clearDesign','MonitorModel');
 		var mmActivity_keys:Array = _activitiesDisplayed.keys();
 		var longest = mmActivity_keys.length;
 		
@@ -377,7 +385,7 @@ class MonitorModel extends Observable{
 		//loop through and remove activities
 		for(var i=0;i<longest;i++){
 			var keyToCheck:Number = indexArray[i];
-			var mm_activity:Activity = _activitiesDisplayed.get(keyToCheck).activity;			
+			var mm_activity:Activity = _activitiesDisplayed.get(keyToCheck).activity;
 			broadcastViewUpdate("REMOVE_ACTIVITY",mm_activity, getSelectedTab());
 		}
 		
@@ -402,6 +410,51 @@ class MonitorModel extends Observable{
 		return learnerTabActArr;
 	}
 	
+	public function set activeView(a:Object):Void{
+		_activeView = a;
+		
+		broadcastViewUpdate("SET_ACTIVE", a);
+	}
+	
+	public function get activeView():Object {
+		return _activeView;
+	}
+	
+	public function isActiveView(view:Object):Boolean {
+		return (activeView == view);
+	}
+	
+	public function addNewBranch(sequence:SequenceActivity, branchingActivity:BranchingActivity, isDefault:Boolean):Void {
+		Debugger.log("ok now i should be invoked", Debugger.CRITICAL, "addNewBranch", "MonitorModel");
+		Debugger.log("sequence.firstActivityUIID: "+sequence.firstActivityUIID, Debugger.CRITICAL, "addNewBranch", "MonitorModel");
+				
+		if(sequence.firstActivityUIID != null) {
+			var b:Branch = new Branch(app.getMonitor().ddm.newUIID(), BranchConnector.DIR_FROM_START, app.getMonitor().ddm.getActivityByUIID(sequence.firstActivityUIID).activityUIID, branchingActivity.activityUIID, sequence, app.getMonitor().ddm.learningDesignID);
+			app.getMonitor().ddm.addBranch(b);
+		
+			Debugger.log("sequence.stopAfterActivity: "+sequence.stopAfterActivity, Debugger.CRITICAL, "addNewBranch", "MonitorModel");
+			// TODO: review
+			if(!sequence.stopAfterActivity) {
+				b = new Branch(app.getMonitor().ddm.newUIID(), BranchConnector.DIR_TO_END, app.getMonitor().ddm.getActivityByUIID(this.getLastActivityUIID(sequence.firstActivityUIID)).activityUIID, branchingActivity.activityUIID, sequence, app.getMonitor().ddm.learningDesignID);
+			
+				app.getMonitor().ddm.addBranch(b);
+			}
+			
+			if(isDefault)
+				branchingActivity.defaultBranch = b;
+		}
+		
+		setDirty();
+	}
+	
+	private function getLastActivityUIID(activityUIID:Number):Number {
+		
+		// get next activity from transition
+		var transObj = app.getMonitor().ddm.getTransitionsForActivityUIID(activityUIID);
+		Debugger.log("transObj: "+transObj, Debugger.CRITICAL, "getLastActivityUIID", "MonitorModel");
+		
+		return (transObj.out == null) ? activityUIID : getLastActivityUIID(transObj.out.toUIID);
+	}
 	
 	private function orderDesign(activity:Activity, order:Array):Void{
 		order.push(activity);
@@ -459,7 +512,7 @@ class MonitorModel extends Observable{
 		for(var i=0;i<indexArray.length;i++){
 			var keyToCheck:Number = indexArray[i].activityUIID;
 			var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(keyToCheck);
-			
+			Debugger.log("ddm_activity.title: "+ddm_activity.title, Debugger.GEN, "drawDesign", "MonitorModel");
 			if(!(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0) && !isDesignDrawn){
 				broadcastViewUpdate("DRAW_ACTIVITY", ddm_activity, tabID, drawLearner);
 			} else {
@@ -675,6 +728,23 @@ class MonitorModel extends Observable{
 	
 		Debugger.log('Opening url:'+URLToSend,Debugger.GEN,'openToolActivityContent','CanvasModel');
 		getURL(URLToSend,"_blank");		
+	}
+	
+	public function openBranchActivityContent(ba, visible:Boolean):Void {
+		currentBranchingActivity = ba;
+		Debugger.log("openBranchActivityContent invoked", Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
+		if(visible == null) visible = true;
+		Debugger.log("visible: " + visible, Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
+		
+		if(ba.branchView != null) {
+			Debugger.log("INIF openBranchActivityContent", Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
+			activeView = (visible) ? ba.branchView : activeView;
+			// for monitoring activeView = ba.branchView
+			ba.branchView.setOpen(visible);
+			ba.branchView.open();
+		} else { 
+			Debugger.log("INELSE openBranchActivityContent", Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
+			_monitor.openBranchView(currentBranchingActivity, visible); }
 	}
 	
 
@@ -948,5 +1018,13 @@ class MonitorModel extends Observable{
 		_isDragging = newisDragging;
 	}
 	
+	
+	public function get currentBranchingActivity():Object {
+		return _currentBranchingActivity;
+	}
+	
+	public function set currentBranchingActivity(a:Object) {
+		_currentBranchingActivity = a;
+	}
 	
 }

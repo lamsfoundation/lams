@@ -40,6 +40,8 @@ import mx.core.*
 import mx.events.*
 import mx.effects.*
 
+import org.lamsfoundation.lams.authoring.cv.CanvasModel;
+
 /**
 * Controller for the sequence library
 */
@@ -281,42 +283,50 @@ class MonitorController extends AbstractController {
 	}
    
 	public function activityDoubleClick(ca:Object, forTabView:String, learnerID:Number):Void{
-		var _learnerID:Number;
-		var URLToSend:String;
-		setBusy()
 		
-	    if (forTabView == "MonitorTabView"){
-			URLToSend = _root.serverURL+_root.monitoringURL+'getActivityMonitorURL&activityID='+ca.activity.activityID+'&lessonID='+_root.lessonID;
-			URLToSend += '&contentFolderID='+MonitorModel(getModel()).getSequence().contentFolderID
-		}else {
-			if (learnerID != null){
-				_learnerID = learnerID;
-			}else {
-				_learnerID = ca.learnerID;
-			}
-			if (forTabView == "MonitorTabViewLearner"){
-				Debugger.log('activityDoubleClick CanvasActivity:'+ca.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
-				URLToSend = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activityID+'&userID='+_learnerID+'&lessonID='+_root.lessonID;
-			}else {
-				URLToSend = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_learnerID+'&lessonID='+_root.lessonID;
-			}
+		Debugger.log("ca.activity.isBranchingActivity(): "+ca.activity.isBranchingActivity(), Debugger.GEN, "activityDoubleClick", "MonitorController");
+		if(ca.activity.isBranchingActivity()) {
+			_monitorModel.openBranchActivityContent(ca, true);
 		}
+		else {
+					
+			var _learnerID:Number;
+			var URLToSend:String;
+			setBusy();
+			
+			if (forTabView == "MonitorTabView"){
+				URLToSend = _root.serverURL+_root.monitoringURL+'getActivityMonitorURL&activityID='+ca.activity.activityID+'&lessonID='+_root.lessonID;
+				URLToSend += '&contentFolderID='+MonitorModel(getModel()).getSequence().contentFolderID
+			}else {
+				if (learnerID != null){
+					_learnerID = learnerID;
+				}else {
+					_learnerID = ca.learnerID;
+				}
+				if (forTabView == "MonitorTabViewLearner"){
+					Debugger.log('activityDoubleClick CanvasActivity:'+ca.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
+					URLToSend = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activityID+'&userID='+_learnerID+'&lessonID='+_root.lessonID;
+				}else {
+					URLToSend = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_learnerID+'&lessonID='+_root.lessonID;
+				}
+			}
 
-		Debugger.log('Opening url (ca.activityID) :'+URLToSend+" Opening url (ca.activityID)"+URLToSend,Debugger.CRITICAL,'openToolActivityContent','MonitorModel');
-		if (forTabView != "MonitorTabView" && forTabView != "MonitorTabViewLearner"){
-			if (ca.activityStatus == undefined){
-		
-				var alertMSG:String = Dictionary.getValue('al_doubleclick_todoactivity',[ca.learnerName, ca.activity.title]);
-				getURL("javascript:alert('"+alertMSG+"');");
-				
+			Debugger.log('Opening url (ca.activityID) :'+URLToSend+" Opening url (ca.activityID)"+URLToSend,Debugger.CRITICAL,'openToolActivityContent','MonitorModel');
+			if (forTabView != "MonitorTabView" && forTabView != "MonitorTabViewLearner"){
+				if (ca.activityStatus == undefined){
+			
+					var alertMSG:String = Dictionary.getValue('al_doubleclick_todoactivity',[ca.learnerName, ca.activity.title]);
+					getURL("javascript:alert('"+alertMSG+"');");
+					
+				}else {
+					JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
+				}
 			}else {
 				JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
 			}
-		}else {
-			JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
-		}
 
-	   clearBusy()
+		   clearBusy();
+	   }
 	}
    
    

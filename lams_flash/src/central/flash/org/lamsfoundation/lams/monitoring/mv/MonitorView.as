@@ -401,6 +401,10 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		return lessonTabView;
 	}
 	
+	public function getMonitorTabView():MonitorTabView{
+		return monitorTabView;
+	}
+	
 	/**
 	 * Overrides method in abstract view to ensure correct type of controller is returned
 	 * @usage   
