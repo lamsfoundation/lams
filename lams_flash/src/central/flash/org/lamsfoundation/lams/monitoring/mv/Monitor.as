@@ -147,15 +147,21 @@ class Monitor {
 	public function broadcastInit(){
 		dispatchEvent({type:'init',target:this});		
 	}
- 
 	
 	private function viewLoaded(evt:Object){
         Debugger.log('viewLoaded called',Debugger.GEN,'viewLoaded','Monitor');
-		
+  
 		if(evt.type=='load') {
-            if((monitorLockView != null || !locked) && monitorView != null)
+
+			monitorModel.activeView = evt.target;
+   
+			if(evt.target instanceof CanvasBranchView) {
+				evt.target.open();
+				monitorModel.setDirty();
+			} else if((monitorLockView != null || !locked) && monitorView != null) {
 				dispatchEvent({type:'load',target:this});
-        }else {
+			}
+        } else {
             //Raise error for unrecognized event
         }
     }
@@ -437,7 +443,7 @@ class Monitor {
 	}
 	
 	public function openBranchView(ba, visible:Boolean){
-		
+
 		var cx:Number = ba._x + ba.getVisibleWidth()/2;
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
 		var isVisible:Boolean = (visible == null) ? true : visible;
@@ -448,11 +454,10 @@ class Monitor {
 		
 		//Add listener to view so that we know when it's loaded
         branchView.addEventListener('load', Proxy.create(this,viewLoaded));
-		
+
 		monitorModel.addObserver(branchView);
 		
 		ba.branchView = branchView;
-		
 	}
 	
 	
