@@ -31,11 +31,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.mail.internet.MimeUtility;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -117,32 +115,7 @@ public class ExportToolContentAction extends LamsAction {
 			//write zip file as response stream. 
 
 			// Different browsers handle stream downloads differently LDEV-1243
-			String agent = request.getHeader("USER-AGENT");
-			
-			log.debug("Browser is:" + agent);
-			
-			String filename = null;
-			
-			
-			
-			if (null != agent && -1 != agent.indexOf("MSIE"))
-			{
-				// if MSIE then urlencode it
-				filename = URLEncoder.encode(zipfile, "UTF-8");
-
-			}
-			else if (null != agent && -1 != agent.indexOf("Mozilla"))
-			{
-				// if Mozilla then base64 url_safe encoding
-				filename = MimeUtility.encodeText(zipfile, "UTF-8", "B");
-				
-			}
-			else 
-			{
-				// any others use same filename. 
-				filename = zipfile;
-				
-			}
+			String filename = FileUtil.encodeFilenameForDownload(request, zipfile); 
 			log.debug("Final filename to export: " + filename);
 			
 			response.setContentType("application/x-download");

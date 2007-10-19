@@ -28,13 +28,17 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
+import javax.mail.internet.MimeUtility;
 
 /**
  * General File Utilities
@@ -549,5 +553,38 @@ public class FileUtil {
 			name = name.replaceAll("\\$", "");
 			name = name.replaceAll("\\;", "");
 			return name;
+		}
+		
+		/** Encode a filename in such a way that the UTF-8 characters won't be munged during the download by a browser. Need the
+		 * request to work out the user's browser type 
+		 * @return encoded filename
+		 * @throws UnsupportedEncodingException 
+		 */
+		public static String encodeFilenameForDownload(HttpServletRequest request, String unEncodedFilename) throws UnsupportedEncodingException {
+			
+			// Different browsers handle stream downloads differently LDEV-1243
+			String agent = request.getHeader("USER-AGENT");
+			String filename = null;
+			
+			if (null != agent && -1 != agent.indexOf("MSIE"))
+			{
+				// if MSIE then urlencode it
+				filename = URLEncoder.encode(unEncodedFilename, "UTF-8");
+
+			}
+			else if (null != agent && -1 != agent.indexOf("Mozilla"))
+			{
+				// if Mozilla then base64 url_safe encoding
+				filename = MimeUtility.encodeText(unEncodedFilename, "UTF-8", "B");
+				
+			}
+			else 
+			{
+				// any others use same filename. 
+				filename = unEncodedFilename;
+				
+			}
+
+			return filename;
 		}
 }
