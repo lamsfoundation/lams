@@ -137,7 +137,8 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 				complexPortfolio.setHeadingNoPage(true);
 			}
 		}
-		
+		if ( activity.isSequenceActivity() && activity.getParentActivity() != null && activity.getParentActivity().isBranchingActivity() ) 
+
 		currentPortfolioList = (ArrayList<ActivityPortfolio>) activityListStack.pop();
 		if ( complexPortfolio != null )
 			currentPortfolioList.add(complexPortfolio);
@@ -220,6 +221,13 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	 * @param exportUrlForTool
 	 */
 	private String getExportURLForSystemTool(Activity activity) {
+		
+		// At present the sequence activity always has a page, which is a bit redundant for when it is a branch.
+		// If we just want the sequence activity to be a heading when it is a branch (rather than in an optional activity)
+		// then uncomment this code.
+		// if ( activity.isSequenceActivity() && activity.getParentActivity() != null && activity.getParentActivity().isBranchingActivity() ) {
+		//	return null;
+		//}
 		
 		String exportUrlForTool = null;
 		ISystemToolActivity sysToolActivity = (ISystemToolActivity) activity;
