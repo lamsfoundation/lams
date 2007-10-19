@@ -39,8 +39,8 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
-import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
@@ -87,6 +88,7 @@ public class UserManagementService implements IUserManagementService {
 	private IBaseDAO baseDAO;
 	private IGroupDAO groupDAO; 
 	private IRoleDAO roleDAO;
+	private IOrganisationDAO organisationDAO;
 	protected MessageService messageService;
 	private static IAuditService auditService;
 	
@@ -122,6 +124,10 @@ public class UserManagementService implements IUserManagementService {
 	
 	public void setRoleDAO(IRoleDAO roleDAO) {
 		this.roleDAO = roleDAO;
+	}
+	
+	public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
+		this.organisationDAO = organisationDAO; 
 	}
 
 	public void save(Object object) {
@@ -929,6 +935,14 @@ public class UserManagementService implements IUserManagementService {
 			return (Integer)list.get(0);
 		}
 		return null;
+	}
+	
+	public List getActiveCourseIdsByUser(Integer userId, boolean isSysadmin) {
+		return organisationDAO.getActiveCourseIdsByUser(userId, isSysadmin);
+	}
+	
+	public List getArchivedCourseIdsByUser(Integer userId, boolean isSysadmin) {
+		return organisationDAO.getArchivedCourseIdsByUser(userId, isSysadmin);
 	}
 
 }

@@ -23,9 +23,7 @@
 package org.lamsfoundation.lams.web;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,14 +34,8 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationState;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.UserOrganisation;
-import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -75,28 +67,17 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action-forward name="passwordChanged" path=".passwordChangeOk"
  * @struts.action-forward name="portrait" path="/portrait.do"
  * @struts.action-forward name="lessons" path="/profile.do?method=lessons"
- * @struts.action-forward name="content" path="/indexContent.jsp"
  */
 public class IndexAction extends Action {
 
 	private static Logger log = Logger.getLogger(IndexAction.class);
-
 	private static IUserManagementService service;
-	
-	private Integer state;
 	
 	@SuppressWarnings("unchecked")
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		String stateParam = WebUtil.readStrParam(request, "state");
-		state = (stateParam.equals("active")?OrganisationState.ACTIVE:OrganisationState.ARCHIVED);
-		
-		log.debug("User:"+request.getRemoteUser());
-		// only set header links if we are displaying 'active' organisations; i.e., on the index page
-		if(state.equals(OrganisationState.ACTIVE)){
-			setHeaderLinks(request);
-			setAdminLinks(request);
-		}
+		setHeaderLinks(request);
+		setAdminLinks(request);
 		
 		// check if user is flagged as needing to change their password
 		User loggedInUser = getService().getUserByLogin(request.getRemoteUser());
@@ -108,6 +89,8 @@ public class IndexAction extends Action {
 		
 		String tab = WebUtil.readStrParam(request, "tab", true);
 		if (StringUtils.equals(tab, "profile")) {
+			List courseIds = getService().getArchivedCourseIdsByUser(loggedInUser.getUserId(), request.isUserInRole(Role.SYSADMIN));
+			request.setAttribute("courseIds", courseIds);
 			return mapping.findForward("profile");
 		} else if (StringUtils.equals(tab, "editprofile")) {
 			return mapping.findForward("editprofile");
@@ -125,56 +108,10 @@ public class IndexAction extends Action {
 			return mapping.findForward("community");
 		}
 		
-		List<IndexOrgBean> orgBeans = new ArrayList<IndexOrgBean>();
-		if (request.isUserInRole(Role.SYSADMIN)) {
-			List<Organisation> organisations = getService().getOrganisationsByTypeAndStatus(OrganisationType.COURSE_TYPE,state);
-			// when listing archived orgs, make sure we get subgroups that are archived under still-active groups
-			if (state.equals(OrganisationState.ARCHIVED)) {
-				organisations.addAll(getService().getOrganisationsByTypeAndStatus(OrganisationType.COURSE_TYPE,OrganisationState.ACTIVE));
-			}
-			for (Organisation org:organisations) {
-				List<Integer> roles = new ArrayList<Integer>();
-				roles.add(Role.ROLE_SYSADMIN);
-				List<UserOrganisationRole> userOrganisationRoles = getService().getUserOrganisationRoles(org.getOrganisationId(),request.getRemoteUser());
-				for(UserOrganisationRole userOrganisationRole:userOrganisationRoles){
-					roles.add(userOrganisationRole.getRole().getRoleId());
-				}
-				// don't set the orgbean to display if subgroups are not archived
-				IndexOrgBean iob = createOrgBean(org, roles, request.getRemoteUser(),true);
-				if (state.equals(OrganisationState.ARCHIVED)
-						&& org.getOrganisationState().getOrganisationStateId().equals(OrganisationState.ACTIVE)
-						&& iob.getChildIndexOrgBeans().isEmpty()) {
-					continue;
-				}
-				orgBeans.add(iob);
-			}
-		} else {
-			List<UserOrganisation> userOrganisations = getService().getUserOrganisationsForUserByTypeAndStatus(request.getRemoteUser(),OrganisationType.COURSE_TYPE,state);
-			// when listing archived orgs, make sure we get subgroups that are archived under still-active groups
-			if (state.equals(OrganisationState.ARCHIVED)) {
-				userOrganisations.addAll(getService().getUserOrganisationsForUserByTypeAndStatus(request.getRemoteUser(),OrganisationType.COURSE_TYPE,OrganisationState.ACTIVE));
-			}
-			for (UserOrganisation userOrganisation: userOrganisations) {
-				List<Integer> roles = new ArrayList<Integer>();
-				for(Object userOrganisationRole:userOrganisation.getUserOrganisationRoles()){
-					roles.add(((UserOrganisationRole)userOrganisationRole).getRole().getRoleId());
-				}
-				// don't set the orgbean to display if subgroups are not archived
-				IndexOrgBean iob = createOrgBean(userOrganisation.getOrganisation(),roles,request.getRemoteUser(),false);
-				if (state.equals(OrganisationState.ARCHIVED)
-						&& userOrganisation.getOrganisation().getOrganisationState().getOrganisationStateId().equals(OrganisationState.ACTIVE)
-						&& iob.getChildIndexOrgBeans().isEmpty()) {
-					continue;
-				}
-				orgBeans.add(iob);
-			}
-		}
-		Collections.sort(orgBeans);
-		request.setAttribute("orgBeans",orgBeans);
-		if(state.equals(OrganisationState.ACTIVE))
-			return mapping.findForward("main");
-		else
-			return mapping.findForward("content");
+		List courseIds = getService().getActiveCourseIdsByUser(loggedInUser.getUserId(), request.isUserInRole(Role.SYSADMIN));
+		request.setAttribute("courseIds", courseIds);
+		
+		return mapping.findForward("main");
 	}
 	
 	private void setHeaderLinks(HttpServletRequest request) {
@@ -183,12 +120,12 @@ public class IndexAction extends Action {
 			log.debug("user is author");
 			headerLinks.add(new IndexLinkBean("index.author", "javascript:openAuthor()"));
 		}
-		headerLinks.add(new IndexLinkBean("index.myprofile", "index.do?state=active&tab=profile"));
+		headerLinks.add(new IndexLinkBean("index.myprofile", "index.do?tab=profile"));
 		
 		if(Configuration.getAsBoolean(ConfigurationKeys.LAMS_COMMUNITY_ENABLE))
 			if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.GROUP_ADMIN) || request.isUserInRole(Role.GROUP_MANAGER) || 
 				request.isUserInRole(Role.AUTHOR) || request.isUserInRole(Role.AUTHOR_ADMIN) || request.isUserInRole(Role.MONITOR))
-				headerLinks.add(new IndexLinkBean("index.community", "index.do?state=active&tab=community"));
+				headerLinks.add(new IndexLinkBean("index.community", "index.do?tab=community"));
 		
 		log.debug("set headerLinks in request");
 		request.setAttribute("headerLinks", headerLinks);
@@ -201,120 +138,6 @@ public class IndexAction extends Action {
 		if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.AUTHOR_ADMIN) || getService().isUserGlobalGroupAdmin())
 			adminLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
 		request.setAttribute("adminLinks", adminLinks);
-	}
-
-	@SuppressWarnings({"unchecked","static-access"})
-	private IndexOrgBean createOrgBean(Organisation org, List<Integer> roles, String username, boolean isSysAdmin) {
-		//log.debug("creating orgBean for org:"+org.getName());
-		User user = (User)getService().findByProperty(User.class, "login",username).get(0);
-		IndexOrgBean orgBean = new IndexOrgBean(org.getName(), org.getOrganisationType().getOrganisationTypeId());
-		List<IndexLinkBean> links = new ArrayList<IndexLinkBean>();
-		if(isSysAdmin && state.equals(OrganisationState.ACTIVE)){
-			if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
-				links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")", "manage-group-button"));
-			}
-		}
-		if ((contains(roles, Role.ROLE_GROUP_ADMIN) || contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
-				&& state.equals(OrganisationState.ACTIVE)) {
-			if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
-				if((!isSysAdmin)&&(contains(roles, Role.ROLE_GROUP_ADMIN) || contains(roles, Role.ROLE_GROUP_MANAGER))){
-					links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")", "manage-group-button"));
-				}
-				if(contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
-					links.add(new IndexLinkBean("index.addlesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')", "add-lesson-button"));
-			}else{//CLASS_TYPE
-				if(contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
-					links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")", "add-lesson-button"));
-			}
-		}
-		orgBean.setLinks(links);
-		
-		if (state.equals(OrganisationState.ARCHIVED) && org.getOrganisationState().getOrganisationStateId().equals(OrganisationState.ARCHIVED)) {
-			orgBean.setArchivedDate(org.getArchivedDate());
-		}
-
-		List<IndexLessonBean> lessonBeans = new ArrayList<IndexLessonBean>();
-		Set<Lesson> lessons = org.getLessons();
-		for(Lesson lesson:lessons) {
-			if(isInLesson(user,lesson)){
-				if(!lesson.isPreviewLesson()){
-					List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
-					String url = null;
-					if(state.equals(OrganisationState.ACTIVE)){
-						if(contains(roles,Role.ROLE_GROUP_MANAGER)||contains(roles,Role.ROLE_MONITOR)){
-							if(!lesson.getLessonStateId().equals(lesson.REMOVED_STATE)){
-								lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + lesson.getLessonId()+")"));
-							}
-						}
-						if(contains(roles,Role.ROLE_LEARNER)){
-							log.debug("Lesson State:"+lesson.getLessonStateId());
-							if(lesson.getLessonStateId().equals(lesson.STARTED_STATE)||lesson.getLessonStateId().equals(lesson.FINISHED_STATE)){
-								url = "javascript:openLearner("+lesson.getLessonId()+")";
-							}
-						}
-					}else if(state.equals(OrganisationState.ARCHIVED)){
-						if(contains(roles,Role.ROLE_GROUP_MANAGER)){
-							if(!lesson.getLessonStateId().equals(lesson.REMOVED_STATE)){
-								lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + lesson.getLessonId()+")"));
-							}
-						}
-						if(contains(roles,Role.ROLE_LEARNER)){
-							log.debug("Lesson State:"+lesson.getLessonStateId());
-							if(lesson.getLessonStateId().equals(lesson.STARTED_STATE)||lesson.getLessonStateId().equals(lesson.FINISHED_STATE)){
-								lessonLinks.add(new IndexLinkBean("label.export.portfolio","javascript:openExportPortfolio("+lesson.getLessonId()+")"));
-							}
-						}
-					}
-					if(lessonLinks.size()>0 || url!=null){
-						IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), lessonLinks);
-						lessonBean.setUrl(url);
-						lessonBean.setState(lesson.getLessonStateId());
-						lessonBeans.add(lessonBean);
-					}
-				}
-			}
-		}
-		Collections.sort(lessonBeans);
-		orgBean.setLessons(lessonBeans);
-
-		if(orgBean.getType().equals(OrganisationType.COURSE_TYPE)){
-			Set<Organisation> children = org.getChildOrganisations();
-			List<IndexOrgBean> childOrgBeans = new ArrayList<IndexOrgBean>();
-			for(Organisation organisation:children){
-				if(organisation.getOrganisationState().getOrganisationStateId().equals(state)){
-					List<Integer> classRoles = new ArrayList<Integer>();
-					List<UserOrganisationRole> userOrganisationRoles = getService().getUserOrganisationRoles(organisation.getOrganisationId(),username);
-					// don't list the subgroup if user is not a member, and not a group admin/manager
-					if (userOrganisationRoles==null || userOrganisationRoles.isEmpty()) {
-						if (!contains(roles,Role.ROLE_GROUP_ADMIN) && 
-								!contains(roles,Role.ROLE_GROUP_MANAGER) &&
-								!contains(roles,Role.ROLE_SYSADMIN)) {
-							continue;
-						}
-					}
-					for(UserOrganisationRole userOrganisationRole:userOrganisationRoles){
-						classRoles.add(userOrganisationRole.getRole().getRoleId());
-					}
-					if(contains(roles,Role.ROLE_GROUP_MANAGER)) classRoles.add(Role.ROLE_GROUP_MANAGER);
-					childOrgBeans.add(createOrgBean(organisation,classRoles,username,isSysAdmin));
-				}
-			}
-			Collections.sort(childOrgBeans);
-			orgBean.setChildIndexOrgBeans(childOrgBeans);
-		}
-		return orgBean;
-	}
-
-	private boolean isInLesson(User user, Lesson lesson) {
-		return lesson.getLessonClass().isStaffMember(user)||lesson.getLessonClass().getLearners().contains(user);
-	}
-
-	private boolean contains(List<Integer> roles, Integer roleId) {
-		for (int i = 0; i < roles.size(); i++) {
-			if (roleId.equals(roles.get(i)))
-				return true;
-		}
-		return false;
 	}
 	
 	private IUserManagementService getService(){

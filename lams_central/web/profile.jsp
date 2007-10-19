@@ -7,23 +7,20 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod" %>
 
-<script language="JavaScript" type="text/javascript"
-	src="includes/javascript/prototype.js"></script>
-<script type="text/javascript" language="javascript">
-		var i = Math.round(1000*Math.random());
-		function getContent(){
-			i++;
-			var url = "index.do?unique="+i+"&state=archived";
-			var params = "";
-			var myAjax = new Ajax.Updater(
-				"courselist",
-				url,
-				{
-					method: 'get',
-					parameters: params
-				});
-		}
-	</script>
+<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-1.2.1.min.js"></script>
+<script language="javascript" type="text/javascript">
+	$(function(){
+		$("div.display-group").each(function(){
+			$(this).load("displayGroup.do", {stateId: 3, orgId: this.id});
+		});
+		$("body").click(function(event) {
+			if ($(event.target).is("a.group-header")){
+				$(event.target).parent("h2").parent("div.left-buttons").parent("div.row").next("div.course-contents").toggle("fast");
+				return false;
+			}
+		});
+	});
+</script>
 	
 <div style="clear:both;"></div>
 
@@ -95,10 +92,7 @@
 <h2 class="space-top"><fmt:message key="title.archived.groups" />
 </h2>
 
-<div id="courselist" class="shading-bg"><img
-	src="images/loading.gif" /> <font color="gray" size="4"><fmt:message
-	key="msg.loading" /> </font></div>
+<c:forEach items="${courseIds}" var="courseId">
+	<div id="<c:out value="${courseId}"/>" class="display-group"></div>
+</c:forEach>
 
-<script type="text/javascript" language="javascript">
-	getContent();
-</script>

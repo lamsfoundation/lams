@@ -28,8 +28,23 @@
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
-	<script>
+	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-1.2.1.min.js"></script>
+	<script language="javascript" type="text/javascript">
 		<!--
+			<c:if test="${empty tab}">
+				$(function(){
+					$("div.display-group").each(function(){
+						$(this).load("displayGroup.do", {stateId: 1, orgId: this.id});
+					});
+					$("body").click(function(event) {
+						if ($(event.target).is("a.group-header")){
+							$(event.target).parent("h2").parent("div.left-buttons").parent("div.row").next("div.course-contents").toggle("fast");
+							return false;
+						}
+					});
+				});
+			</c:if>
+								
 			function refresh(){
 				document.location.reload();
 			}
@@ -44,12 +59,12 @@
 				<c:choose>
 					<c:when test="${empty tab}">
 						<div class="tab-left-selected"></div>
-						<div class="tab-middle-selected"><a class="tab-middle-link-selected" style="border:0;" href="index.do?state=active"><fmt:message key="index.mycourses"/> </a></div>
+						<div class="tab-middle-selected"><a class="tab-middle-link-selected" style="border:0;" href="index.do"><fmt:message key="index.mycourses"/> </a></div>
 						<div class="tab-right-selected"></div>
 					</c:when>
 					<c:otherwise>
 						<div class="tab-left"></div>
-						<div class="tab-middle"><a class="tab-middle-link" style="border:0;" href="index.do?state=active"><fmt:message key="index.mycourses"/> </a></div>
+						<div class="tab-middle"><a class="tab-middle-link" style="border:0;" href="index.do"><fmt:message key="index.mycourses"/> </a></div>
 						<div class="tab-right"></div>
 					</c:otherwise>
 				</c:choose>
@@ -120,7 +135,9 @@
 								</div>
 							</div>
 							<c:if test="${empty tab}">
-								<c:import url="indexCommon.jsp" charEncoding="utf-8"/>	
+								<c:forEach items="${courseIds}" var="courseId">
+									<div id="<c:out value="${courseId}"/>" class="display-group"></div>
+								</c:forEach>
 							</c:if>
 							<c:if test="${tab eq 'profile'}">
 								<tiles:insert attribute="profile" />

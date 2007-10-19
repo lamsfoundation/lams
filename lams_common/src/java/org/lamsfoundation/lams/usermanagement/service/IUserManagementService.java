@@ -389,4 +389,8 @@ public interface IUserManagementService {
 	public Integer getCountUsers();
 	
 	public Integer getCountUsers(Integer authenticationMethodId);
+	
+	public List getActiveCourseIdsByUser(Integer userId, boolean isSysadmin);
+	
+	public List getArchivedCourseIdsByUser(Integer userId, boolean isSysadmin);
 }

@@ -7,7 +7,7 @@
 
 <lams:html>
 <lams:head>
-	<meta HTTP-EQUIV="Refresh" CONTENT="0;URL=index.do?state=active">
+	<meta HTTP-EQUIV="Refresh" CONTENT="0;URL=index.do">
 	<title><fmt:message key="index.welcome" /></title>
 	<lams:css/>
 </lams:head>
