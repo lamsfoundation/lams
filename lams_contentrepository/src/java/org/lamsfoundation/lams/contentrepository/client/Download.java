@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.contentrepository.PropertyName;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
+import org.lamsfoundation.lams.util.FileUtil;
 
 
 /**
@@ -191,7 +192,7 @@ public abstract class Download extends HttpServlet {
 				
 			} else if ( node.isNodeType(NodeType.FILENODE) ) {
 
-				handleFileNode(response, node, saveFile);
+				handleFileNode(response, request, node, saveFile);
 
 			} else {
 			    throw new RepositoryCheckedException("Unsupported node type "
@@ -226,7 +227,7 @@ public abstract class Download extends HttpServlet {
 			    throw new RepositoryCheckedException("Unexpected type of node "
 						+node.getNodeType()+" Expected File node. Data is "+node);
 			}
-			handleFileNode(response, node, saveFile);
+			handleFileNode(response, request, node, saveFile);
 
 		}
 	}
@@ -260,7 +261,7 @@ public abstract class Download extends HttpServlet {
 	 * @param aNode
 	 * @throws IOException
 	 */
-	protected void handleFileNode(HttpServletResponse response, IVersionedNode fileNode, boolean saveFile) 
+	protected void handleFileNode(HttpServletResponse response, HttpServletRequest request, IVersionedNode fileNode, boolean saveFile) 
 		throws IOException, FileException, ValueFormatException {
 
 	    // Try to get the mime type and set the response content type.
@@ -283,7 +284,8 @@ public abstract class Download extends HttpServlet {
 		// Get the filename stored with the file
 		prop = fileNode.getProperty(PropertyName.FILENAME);
 		String filename = prop != null ? prop.getString() : null;
-
+		filename = FileUtil.encodeFilenameForDownload(request, filename);
+		
 		log.debug("Downloading file " + filename + " mime type " + mimeType);
 
 		if (saveFile) {
