@@ -22,6 +22,20 @@
 			document.getElementById("save2").disabled = false;
 		}
 	}
+
+
+	function previewSequence(){
+	    sequenceObj = document.getElementById("sequence_id");
+	    if(sequenceObj.value == ""){
+	        alert('You have to select a sequence to proceed.');
+	        return false;
+	    }
+
+	   url = 'preview?sequence_id=' + document.getElementById("sequence_id").value;
+	   window.open(url,'LAMS-Preview','height=600,width=800,resizable');
+
+	}
+
 	function nextStep(){
 	    sequenceObj = document.getElementById("sequence_id");
 	    if(sequenceObj.value == ""){
@@ -142,6 +156,7 @@
 <tr>
         <td align="center">
                 <input type="button" id="create" name="create" value="Open LAMS Author" onClick="window.open('@lams_server_url@/LoginRequest?uid=@username@&method=author&ts=@datetime@&sid=@server_id@&hash=@hashValue@&courseid=@course_id@&country=AU&lang=EN&requestSrc=@requestSrc@&notifyCloseURL=@notifyCloseURL@','LAMS_Author','height=600,width=800,resizable');">
+                <input type="button" id="preview" name="preview" value="Preview" onClick="previewSequence();">
                 <input type="button" id="refresh" name="refresh" value="Refresh" onclick="javascript:refreshSequences();"/>
                 <input type="submit" id="cancel" name=cancel value="Cancel" />
                 <input type="button" id="next" name="next" value="Next" onClick="javascript:nextStep();"/>
