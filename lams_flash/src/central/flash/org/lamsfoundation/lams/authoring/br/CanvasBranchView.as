@@ -29,7 +29,6 @@ import org.lamsfoundation.lams.authoring.br.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.mvc.*;
-import org.lamsfoundation.lams.common.ApplicationParent;
 import org.lamsfoundation.lams.common.CommonCanvasView;
 import org.lamsfoundation.lams.monitoring.mv.MonitorModel;
 import org.lamsfoundation.lams.monitoring.mv.MonitorController;
@@ -116,12 +115,14 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 
 		_cm = (m instanceof CanvasModel) ? CanvasModel(m) : null;
 		_mm = (m instanceof MonitorModel) ? MonitorModel(m) : null;
-		Debugger.log('_cm:'+_cm, Debugger.CRITICAL,'viewUpdate','CanvasBranchView');
-		Debugger.log('_mm:'+_mm, Debugger.CRITICAL,'viewUpdate','CanvasBranchView');
-	   //register to recive updates form the model
 		
-		if(_cm != null) _cm.addEventListener('viewUpdate',this);
-		if(_mm != null) _mm.addEventListener('viewUpdate',this);
+		Debugger.log('_cm:'+_cm, Debugger.CRITICAL,'init','CanvasBranchView');
+		Debugger.log('_mm:'+_mm, Debugger.CRITICAL,'init','CanvasBranchView');
+	    
+		//register to recive updates form the model
+		
+		if(_cm != null) _cm.addEventListener('viewUpdate', Proxy.create(this, viewUpdate));
+		//if(_mm != null) _mm.addEventListener('viewUpdate', Proxy.create(this, viewUpdate));
 		
 		MovieClipUtils.doLater(Proxy.create(this, draw)); 
     }   
@@ -134,6 +135,19 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
     }
     
 	/**
+	 * Recieved update events from the MonitorModel. Dispatches to relevent handler depending on update.Type
+	 * @usage   
+	 * @param   event
+	 */
+	public function update (o:Observable, infoObj:Object):Void{
+			
+		   var mm:MonitorModel = MonitorModel(o);
+		   infoObj.target = mm;
+		   
+		   viewUpdate(infoObj);
+	}
+	
+	/**
 	 * Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
 	 * @usage   
 	 * @param   event
@@ -141,18 +155,18 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	public function viewUpdate(event:Object):Void{
 		Debugger.log('Received an Event dispatcher UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','CanvasBranchView');
 		var _model = event.target;
+		
 		Debugger.log("_model instance: " + (_model instanceof MonitorModel), Debugger.CRITICAL, "viewUpdate", "CanvasBranchView");
 		
 		var isCanvasModel:Boolean;
 		var isMonitorModel:Boolean;
+		
 		isMonitorModel = model instanceof MonitorModel;
 		isCanvasModel = model instanceof CanvasModel;
 		
-		
 		Debugger.log('isCanvasModel:'+isCanvasModel, Debugger.CRITICAL,'viewUpdate','CanvasBranchView');
 		Debugger.log('isMonitorModel:'+isMonitorModel,Debugger.CRITICAL,'viewUpdate','CanvasBranchView');
-		
-		
+
 		switch (event.updateType){ 
 			case 'POSITION':
                 setPosition(_model);
@@ -231,15 +245,13 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 		close_mc.onRelease = Proxy.create(this, localOnRelease);
 		close_mc.onReleaseOutside = Proxy.create(this, localOnReleaseOutside);
-			
+		
 		setupConnectorHubs();
 		loadSequenceActivities();
 		
 		setStyles();
 		setSize(model);
 		
-		//_open is consistently false in monitor
-		Debugger.log("_open: "+_open, Debugger.CRITICAL, "draw", "CanvasBranchView");
 		if(_open) {
 			this._visible = true;
 		
@@ -339,8 +351,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private function drawActivity(a:Activity, cm):Boolean{
 		
 		Debugger.log("pnt1", Debugger.CRITICAL, "drawActivity", "CanvasBranchView");
+		
 		if(!cm.isActiveView(this)) return false;
+		
 		Debugger.log("pnt2", Debugger.CRITICAL, "drawActivity", "CanvasBranchView");
+		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
 		
@@ -660,16 +675,21 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 */
 	public function getController():Object {
 		var c:Controller = super.getController();
-
-		if (ApplicationParent.getInstance().module == "monitoring") {
-			Debugger.log("We are in the monitoring module", Debugger.GEN,'getController','CanvasBranchView');
+	/*	Debugger.log("ApplicationParent.module: "+ApplicationParent.module, Debugger.CRITICAL,'getController','CanvasBranchView');
+		if (ApplicationParent.module == "monitoring") {
+			Debugger.log("We are in the montioring module", Debugger.CRITICAL,'getController','CanvasBranchView');
 			return MonitorController(c);
 		}
-		else {
-			Debugger.log("We are in the authoring module", Debugger.GEN,'getController','CanvasBranchView');
+		else if (ApplicationParent.module == "authoring") {
+			Debugger.log("We are in the montioring module", Debugger.CRITICAL,'getController','CanvasBranchView');
 			return CanvasController(c);
 		}
+		else {
+			Debugger.log("Unkown module", Debugger.CRITICAL,'getController','CanvasBranchView');
+			return null;
+		}*/
 
+		return (c instanceof CanvasController) ? CanvasController(c) : MonitorController(c);
 	}
 	
 	/**
@@ -685,8 +705,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	}
 	
 	public function get model():Object {
-		if(_cm) return _cm;
-		if(_mm) return _mm;
+		if(_cm != null) return _cm;
+		if(_mm != null) return _mm;
 		return null;
 	}
 }

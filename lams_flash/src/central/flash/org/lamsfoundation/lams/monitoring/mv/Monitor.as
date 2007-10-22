@@ -147,20 +147,22 @@ class Monitor {
 	public function broadcastInit(){
 		dispatchEvent({type:'init',target:this});		
 	}
+ 
 	
 	private function viewLoaded(evt:Object){
         Debugger.log('viewLoaded called',Debugger.GEN,'viewLoaded','Monitor');
-  
+		
 		if(evt.type=='load') {
 
 			monitorModel.activeView = evt.target;
-   
+			
 			if(evt.target instanceof CanvasBranchView) {
 				evt.target.open();
 				monitorModel.setDirty();
 			} else if((monitorLockView != null || !locked) && monitorView != null) {
 				dispatchEvent({type:'load',target:this});
 			}
+			
         } else {
             //Raise error for unrecognized event
         }
@@ -422,7 +424,6 @@ class Monitor {
 	 * @return  
 	 */
 	public function clearCanvas(noWarn:Boolean):Boolean{
-		//_global.breakpoint();
 		var s = false;
 		var ref = this;
 		Debugger.log('noWarn:'+noWarn,4,'clearCanvas','Monitor');
@@ -431,8 +432,9 @@ class Monitor {
 			_ddm = new DesignDataModel();
 			//as its a new instance of the ddm,need to add the listener again
 			//_ddm.addEventListener('ddmUpdate',Proxy.create(this,onDDMUpdated));
+			
 			Debugger.log('noWarn2:'+noWarn,4,'clearCanvas','Monitor');//_ddm.addEventListener('ddmBeforeUpdate',Proxy.create(this,onDDMBeforeUpdate));
-			//checkValidDesign();
+			
 			monitorModel.setDirty();
 			return true;
 		}else{
@@ -443,21 +445,22 @@ class Monitor {
 	}
 	
 	public function openBranchView(ba, visible:Boolean){
-
+		
 		var cx:Number = ba._x + ba.getVisibleWidth()/2;
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
 		var isVisible:Boolean = (visible == null) ? true : visible;
 		
 		var _branchView_mc:MovieClip = MovieClip(monitorView.getMonitorTabView()).createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
 		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
-		branchView.init(monitorModel,undefined);
+		
+		monitorModel.addObserver(branchView);
+		branchView.init(monitorModel, undefined);
 		
 		//Add listener to view so that we know when it's loaded
-        branchView.addEventListener('load', Proxy.create(this,viewLoaded));
-
-		monitorModel.addObserver(branchView);
+        branchView.addEventListener('load', Proxy.create(this, viewLoaded));
 		
 		ba.branchView = branchView;
+		
 	}
 	
 	
