@@ -129,6 +129,14 @@ public class LessonManagerServlet extends HttpServlet {
 				element = document.createElement(CentralConstants.ELEM_LESSON);
 				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
 
+			} else if (method.equals(CentralConstants.METHOD_PREVIEW)) {
+				ldId = new Long(ldIdStr);
+				Long lessonId = startPreview(serverId, datetime, hashValue,
+						username, ldId, courseId, title, desc, country, lang);
+				
+				element = document.createElement(CentralConstants.ELEM_LESSON);
+				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
+				
 			} else if (method.equals(CentralConstants.METHOD_SCHEDULE)) {
 				ldId = new Long(ldIdStr);
 				Long lessonId = scheduleLesson(serverId, datetime, hashValue,
@@ -364,6 +372,40 @@ public class LessonManagerServlet extends HttpServlet {
 		}
 	}
 	
+	public Long startPreview(String serverId, String datetime, String hashValue,
+			String username, Long ldId, String courseId, String title,
+			String desc, String countryIsoCode, String langIsoCode)
+			throws RemoteException {
+
+		try {
+			ExtServerOrgMap serverMap = integrationService
+					.getExtServerOrgMap(serverId);
+			Authenticator
+					.authenticate(serverMap, datetime, username, hashValue);
+			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(
+					serverMap, username);
+			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(
+					serverMap, userMap, courseId, countryIsoCode, langIsoCode);
+			// 1. init lesson
+			Lesson lesson = monitoringService
+					.initializeLessonForPreview(title, desc, ldId, userMap.getUser().getUserId());
+			// 2. create lessonClass for lesson
+			monitoringService.createPreviewClassForLesson(userMap.getUser().getUserId(), lesson.getLessonId());
+			
+			// 3. start lesson
+			monitoringService.startLesson(lesson.getLessonId(), userMap.getUser().getUserId());
+
+			return lesson.getLessonId();
+		} catch (Exception e) {
+			throw new RemoteException(e.getMessage(), e);
+		}
+
+		
+		
+	}
+
+
+		
 	
 
 	private void createLessonClass(Lesson lesson, Organisation organisation,
@@ -377,7 +419,7 @@ public class LessonManagerServlet extends HttpServlet {
 						.getUserId());
 
 	}
-
+	
 	// private IMonitoringService getMonitoringService() {
 	// if (monitoringService == null) {
 	// monitoringService = (IMonitoringService) WebApplicationContextUtils

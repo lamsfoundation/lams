@@ -56,6 +56,8 @@ public class CentralConstants {
 	public static final String PARAM_METHOD = "method";
 
 	public static final String METHOD_START = "start";
+	
+	public static final String METHOD_PREVIEW = "preview";
 
 	public static final String METHOD_SCHEDULE = "schedule";
 
