@@ -99,6 +99,7 @@ ALTER TABLE lams_tool ADD COLUMN admin_url TEXT;
 ALTER TABLE lams_system_tool ADD COLUMN admin_url TEXT;
 
 
+-- LDEV-1301
 ALTER TABLE lams_configuration 
 ADD COLUMN description_key VARCHAR(255)
 , ADD COLUMN header_name VARCHAR(50)
@@ -176,3 +177,6 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPOnlyOneOrg', 'true', 'config.ldap.only.one.org', 'config.header.ldap', 'BOOLEAN', 1);
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPEncryptPasswordFromBrowser', 'true', 'config.ldap.encrypt.password.from.browser', 'config.header.ldap', 'BOOLEAN', 1);
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPSearchResultsPageSize', '100', 'config.ldap.search.results.page.size', 'config.header.ldap', 'LONG', 0);
+
+delete from lams_configuration where config_key='LamsHome';
+delete from lams_configuration where config_key='FileManagerDir';
