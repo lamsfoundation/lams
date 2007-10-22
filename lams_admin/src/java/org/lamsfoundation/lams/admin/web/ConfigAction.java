@@ -107,7 +107,8 @@ public class ConfigAction extends LamsDispatchAction {
 					return mapping.findForward("config");
 				}
 			}
-			if (item.getFormat().equals(ConfigurationItem.LONG_FORMAT)) {
+			String format = item.getFormat();
+			if (format!=null && format.equals(ConfigurationItem.LONG_FORMAT)) {
 				try {
 					Long.parseLong(values[i]);
 				} catch (NumberFormatException e) {
