@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.CommonCanvasView;
+import org.lamsfoundation.lams.common.ApplicationParent;
 import org.lamsfoundation.lams.monitoring.mv.MonitorModel;
 import org.lamsfoundation.lams.monitoring.mv.MonitorController;
 
@@ -675,21 +676,16 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 */
 	public function getController():Object {
 		var c:Controller = super.getController();
-	/*	Debugger.log("ApplicationParent.module: "+ApplicationParent.module, Debugger.CRITICAL,'getController','CanvasBranchView');
-		if (ApplicationParent.module == "monitoring") {
-			Debugger.log("We are in the montioring module", Debugger.CRITICAL,'getController','CanvasBranchView');
+		
+		if(model instanceof CanvasModel) {
+			Debugger.log("canvas controller: " + c, Debugger.CRITICAL,'getController','CanvasBranchView');
+			return CanvasController(c);
+		} else {
+			Debugger.log("monitor controller: " + c, Debugger.CRITICAL,'getController','CanvasBranchView');
 			return MonitorController(c);
 		}
-		else if (ApplicationParent.module == "authoring") {
-			Debugger.log("We are in the montioring module", Debugger.CRITICAL,'getController','CanvasBranchView');
-			return CanvasController(c);
-		}
-		else {
-			Debugger.log("Unkown module", Debugger.CRITICAL,'getController','CanvasBranchView');
-			return null;
-		}*/
 
-		return (c instanceof CanvasController) ? CanvasController(c) : MonitorController(c);
+		//return (c instanceof CanvasController) ? CanvasController(c) : MonitorController(c);
 	}
 	
 	/**
