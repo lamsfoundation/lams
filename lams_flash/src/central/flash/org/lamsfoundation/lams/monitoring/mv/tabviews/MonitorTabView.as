@@ -199,10 +199,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 					break;
 					
 				case 'REMOVE_ACTIVITY' :
-						removeActivity(infoObj.data, mm)
+					removeActivity(infoObj.data, mm)
 					break;
 				case 'REMOVE_TRANSITION' :
-						removeTransition(infoObj.data, mm)
+					removeTransition(infoObj.data, mm)
 					break;
 				case 'DRAW_DESIGN' :
 					if (infoObj.tabID == _tabID && !mm.locked){
@@ -273,12 +273,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			this._learnerContainer_mc.removeMovieClip();
 			this.transitionLayer.removeMovieClip();
 			this.activityLayer.removeMovieClip();
+			this.transparentCover.removeMovieClip();
 			
 			//Recreate both Transition holder and Activity holder Movieclips
 			transitionLayer = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
 			activityLayer = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 			_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", this.getNextHighestDepth());
-			
+			transparentCover = this.attachMovie("Panel", "_transparentCover_mc", this.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
+			transparentCover.onPress = null;
+		
 			if (isChanged == false){
 				mm.setIsProgressChangedSequence(false);
 				

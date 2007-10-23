@@ -57,6 +57,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _monitorController:MonitorController;
 	private var _monitorView;
 	
+	private var _controller;
+	
 	private var mm:MonitorModel; // used only when called from Monitor Environment
 	private var _canvasModel:CanvasModel;
 	
@@ -452,6 +454,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function onPress():Void{
 			// check double-click
 			var now:Number = new Date().getTime();
+			Debugger.log('_module:'+_module,Debugger.GEN,'onPress','CanvasActivity');
+			Debugger.log('_controller:'+_monitorController,Debugger.GEN,'onPress','CanvasActivity');
 			
 			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY && !branchConnector){
 				if (app.controlKeyPressed != "transition"){
@@ -472,12 +476,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				_doubleClicking = false;
 				
 				if (_module == "monitoring"){
-					Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity for monitoring');
+					Debugger.log('SingleClicking1:+'+this,Debugger.GEN,'onPress','CanvasActivity for monitoring');
 					_monitorController.activityClick(this);
 				}else {
-					Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity');
+					Debugger.log('SingleClicking2:+'+this,Debugger.GEN,'onPress','CanvasActivity');
 					_canvasController.activityClick(this);
-				}				
+				}			
 				
 			}
 			
@@ -488,11 +492,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function onRelease():Void{
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
+			Debugger.log('_module:'+_module,Debugger.GEN,'onRelease','CanvasActivity');
+			
+			
 			if (_module == "monitoring"){
 				_monitorController.activityRelease(this);
 			}else {
 				_canvasController.activityRelease(this);
 			}
+			
 		}
 		
 	}
@@ -673,13 +681,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		} else {
 			return _canvasView.ddm;
 		}
-	}
-	
-	public function set controller(a):Void {
-		if(a instanceof CanvasController)
-			_canvasController = a;
-		else
-			_monitorController = a;
 	}
 
 }

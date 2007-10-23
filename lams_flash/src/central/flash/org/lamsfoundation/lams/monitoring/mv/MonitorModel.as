@@ -73,6 +73,7 @@ class MonitorModel extends Observable{
 	private var monitor_x:Number;
 	private var ttHolder:MovieClip;
 	private var _monitor:Monitor;
+	
 	private var _selectedItem:Object;  // the currently selected thing - could be activity, transition etc.
 	private var _prevSelectedItem:Object;
 	

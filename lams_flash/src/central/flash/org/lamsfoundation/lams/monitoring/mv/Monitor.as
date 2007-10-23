@@ -454,7 +454,7 @@ class Monitor {
 		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
 		
 		monitorModel.addObserver(branchView);
-		branchView.init(monitorModel, undefined);
+		branchView.init(monitorModel, monitorView.getController());
 		
 		//Add listener to view so that we know when it's loaded
         branchView.addEventListener('load', Proxy.create(this, viewLoaded));

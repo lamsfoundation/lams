@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.cv.ICanvasActivity;
 import org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity;
+import org.lamsfoundation.lams.authoring.br.CanvasBranchView;
 
 import mx.utils.*
 import mx.controls.*
@@ -75,6 +76,7 @@ class MonitorController extends AbstractController {
 			Debugger.log('activityClick CanvasActivity:'+act.Learner.getUserName(),Debugger.GEN,'activityClick','MonitorController');
 		}else {
 			_monitorModel.selectedItem = act;
+			_monitorModel.setDirty();
 		}
     }
    
@@ -388,6 +390,11 @@ class MonitorController extends AbstractController {
 		} else if(tgt.indexOf("exportPortfolio_btn") != -1){
 			exportClassPortfolio();
 		}else if(tgt.indexOf("refresh_btn") != -1){
+			if(_monitorModel.activeView instanceof CanvasBranchView) {
+				_monitorModel.activeView.removeMovieClip();
+				_monitorModel.getMonitor.closeBranchView();
+			}
+			
 			_app.reloadLearningDesign(_monitorModel.getSequence(), Proxy.create(_monitorModel, _monitorModel.refreshAllData));
 		}else if(tgt.indexOf("help_btn") != -1){
 			_monitorModel.tabHelp();

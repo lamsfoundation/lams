@@ -106,9 +106,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	/**
 	* Called to initialise Canvas  . Called by the Canvas container
 	*/
-	public function init(m:Observable,c:Controller){
+	public function init(m:Observable, c:Controller){
 
-		super (m, c);
+		super(m, c);
         
 		//Set up parameters for the grid
 		H_GAP = 10;
@@ -360,7 +360,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var fromModuleTab:String = null;
 		var _module = null;
 		
-		if(cbc instanceof MonitorController) {
+		if(cm instanceof MonitorModel) {
 			fromModuleTab = "monitorMonitorTab";
 			_module = "monitoring";
 		}
@@ -368,30 +368,44 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		Debugger.log('I am in drawActivity and Activity typeID :'+a.activityTypeID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasBranchView');
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity()){
-			var newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, controller:cbc, _canvasBranchView:cbv, _module:_module});
+			Debugger.log('controller cbc :'+MonitorController(cbc), Debugger.CRITICAL, 'drawActivity','CanvasBranchView');
+			Debugger.log('controller obj cbc :'+cbc, Debugger.CRITICAL, 'drawActivity','CanvasBranchView');
+		
+			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _canvsController:CanvasController(cbc), _canvasBranchView:cbv})
+															: activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _monitorController:MonitorController(cbc), _canvasBranchView:cbv, _module:_module});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Tool or gate activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasBranchView');
 		}
 		else if (a.isGateActivity()){
-			var newActivity_mc = activityLayer.createChildAtDepth("CanvasGateActivity",DepthManager.kTop,{_activity:a, controller:cbc, _canvasBranchView:cbv, _module:_module});
+			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasGateActivity",DepthManager.kTop,{_activity:a, _canvasController:cbc, _canvasBranchView:cbv})
+															: activityLayer.createChildAtDepth("CanvasGateActivity",DepthManager.kTop,{_activity:a, _monitorController:cbc, _canvasBranchView:cbv, _module:_module});
+			
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Gate activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasBranchView');
 		}
 		else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
-			var newActivity_mc = activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children, controller:cbc,_canvasBranchView:cbv, _locked:a.isReadOnly(), fromModuleTab:fromModuleTab});
+			
+			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children, _canvasController:cbc,_canvasBranchView:cbv, _locked:a.isReadOnly()})
+															: activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children, _monitorController:cbc,_canvasBranchView:cbv, _locked:a.isReadOnly(), fromModuleTab:fromModuleTab});
+			
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Parallel activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasBranchView');
 		}
 		else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
-			var newActivity_mc = activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, controller:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly(), fromModuleTab:fromModuleTab});
+			
+			var newActivity_mc = (_module != "monitoring") ? activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _canvasController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly()})
+															: activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _monitorController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly(), fromModuleTab:fromModuleTab});
+			
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasBranchView');
 		}
 		else if(a.isBranchingActivity()) {	
-			var newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, controller:cbc,_canvasBranchView:cbv, _module:_module});
+			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _canvasController:cbc,_canvasBranchView:cbv})
+															: activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _monitorController:cbc,_canvasBranchView:cbv, _module:_module});
+
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Branching activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasBranchView');
 	
@@ -680,7 +694,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @usage   
 	 * @return  CanvasController
 	 */
-	public function getController():Object {
+	public function getController() {
 		var c:Controller = super.getController();
 		
 		if(model instanceof CanvasModel) {

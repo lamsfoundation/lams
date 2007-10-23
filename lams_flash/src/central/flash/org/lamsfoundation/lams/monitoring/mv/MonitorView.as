@@ -420,15 +420,12 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	}
 	
 	public function getMonitorLessonScp():MovieClip{
-		trace("Called getMonitorScp")
 		return monitorLesson_scp;
 	}
 	public function getMonitorSequenceScp():MovieClip{
-		trace("Called getMonitorScp")
 		return monitorSequence_scp;
 	}
 	public function getMonitorLearnerScp():MovieClip{
-		trace("Called getMonitorScp")
 		return monitorLearner_scp;
 	}
 

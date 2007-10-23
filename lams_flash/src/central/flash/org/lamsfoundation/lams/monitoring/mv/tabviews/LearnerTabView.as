@@ -48,7 +48,7 @@ import mx.controls.*;
 * Reflects changes in the MonitorModel
 */
 
-class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends AbstractView{
+class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends AbstractView {
 	
 	public static var _tabID:Number = 2;
 	private var _className = "LearnerTabView";

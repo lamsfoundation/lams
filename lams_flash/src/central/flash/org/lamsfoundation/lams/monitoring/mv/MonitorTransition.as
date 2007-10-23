@@ -38,6 +38,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorTransition extends MovieClip{
 	//set by passing initObj to mc.createClass()
 	//private var _MonitorController:CanvasController;
 	//private var _monitorTabView:MonitorTabView;
+	
 	private var _transition:Transition;
 	
 	private var _drawnLineStyle:Number;
@@ -63,13 +64,12 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorTransition extends MovieClip{
 		arrow_mc._visible = false;
 		stopArrow_mc._visible = false;
 		stopSign_mc._visible = false;
+		
 		//let it wait one frame to set up the components.
 		MovieClipUtils.doLater(Proxy.create(this,init));
-		//init();
 	}
 	
 	public function init():Void{
-		//Debugger.log('Running,',4,'init','CanvasTransition');
 		//todo: all a get style for this
 		_drawnLineStyle = 0x777E9D;
 		draw();
@@ -95,12 +95,10 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorTransition extends MovieClip{
 	 * @return  
 	 */
 	private function draw():Void{
-		//Debugger.log('',4,'draw','CanvasTransition');
-
 		var monitor:Monitor = Application.getInstance().getMonitor();
 		
-		var fromAct_mc = monitor.getMM().getActivityMCByUIID(_transition.fromUIID);
-		var toAct_mc = monitor.getMM().getActivityMCByUIID(_transition.toUIID);
+		var fromAct_mc = monitor.model.getActivityMCByUIID(_transition.fromUIID);
+		var toAct_mc = monitor.model.getActivityMCByUIID(_transition.toUIID);
 	
 		//TODO: check if its a gate transition and if so render a shorty
 		var isGateTransition = toAct_mc.activity.isGateActivity();
@@ -128,8 +126,6 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorTransition extends MovieClip{
 		arrow_mc._y = (_startPoint.y + _endPoint.y)/2;
 		
 		_midPoint = new Point(arrow_mc._x,arrow_mc._y);
-		
-		
 		
 		// gradient
 		var angle:Number = Math.atan2((_endPoint.y- _startPoint.y),(_endPoint.x- _startPoint.x));

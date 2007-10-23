@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.mvc.*;
+import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.authoring.Activity;
@@ -83,11 +84,12 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 			
 			var ca = CanvasActivity(m.selectedItem);
 			var a:Activity = ca.activity;	
-		
+			var ddm:DesignDataModel = (model instanceof MonitorModel) ? MonitorModel(model).getMonitor().ddm : CanvasModel(model).getCanvas().ddm;
+			
 			// deselect previously selected item
 			if(m.prevSelectedItem != null) {
 				// if child of an complex activity is previously selected, it is easiest to clear all the children
-				if(m.prevSelectedItem.activity.parentUIID != null && m.getCanvas().ddm.getActivityByUIID(m.prevSelectedItem.activity.parentUIID).activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE) {
+				if(m.prevSelectedItem.activity.parentUIID != null && ddm.getActivityByUIID(m.prevSelectedItem.activity.parentUIID).activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE) {
 					var caComplex = m.activitiesDisplayed.get(m.prevSelectedItem.activity.parentUIID);
 					caComplex.refreshChildren();
 				} else {
