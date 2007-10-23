@@ -59,6 +59,8 @@ public class CentralConstants {
 	
 	public static final String METHOD_PREVIEW = "preview";
 
+	public static final String METHOD_IMPORT = "import";
+
 	public static final String METHOD_SCHEDULE = "schedule";
 
 	public static final String METHOD_DELETE = "delete";
@@ -67,7 +69,11 @@ public class CentralConstants {
 	
 	public static final String PARAM_MODE = "mode";
 	
+	public static final String PARAM_FILEPATH = "filePath";
+	
 	public static final String ATTR_COURSE_ID = "courseId";
+	
+	public static final String ELEM_LEARNINGDESIGN = "Lesson";
 	
 	public static final String ELEM_LESSON = "Lesson";
 	
@@ -98,4 +104,6 @@ public class CentralConstants {
 	public static final String ATTR_USERNAME = "username";
 	
 	public static final String ATTR_RESOURCE_ID = "resourceId";
+	
+	public static final String EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME = "exportToolContentService";
 }

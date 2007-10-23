@@ -1,14 +1,17 @@
 package org.lamsfoundation.lams.webservice.xml;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.File;
 import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -28,9 +31,12 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
+import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonService;
@@ -41,6 +47,7 @@ import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -57,6 +64,8 @@ public class LessonManagerServlet extends HttpServlet {
 	private static IMonitoringService monitoringService = null;
 
 	private static ILessonService lessonService = null;
+	
+	private static IExportToolContentService exportService = null;
 	
 	/**
 	 * Constructor of the object.
@@ -107,6 +116,7 @@ public class LessonManagerServlet extends HttpServlet {
 		String startDate 	= request.getParameter(CentralConstants.PARAM_STARTDATE);
 		String lang 		= request.getParameter(CentralConstants.PARAM_LANG);
 		String method 		= request.getParameter(CentralConstants.PARAM_METHOD);
+		String filePath		= request.getParameter(CentralConstants.PARAM_FILEPATH);
 
 		Long ldId = null;
 		Long lsId = null;
@@ -158,8 +168,17 @@ public class LessonManagerServlet extends HttpServlet {
 				lsId = new Long(lsIdStr);				
 				element = getAllStudentProgress(document, serverId, datetime, hashValue, 
 					username, lsId, courseId);
-			}	
-			else {
+
+			}  else if (method.equals(CentralConstants.METHOD_IMPORT)) {
+
+				// ldId = new Long(ldIdStr);
+				Long ldID = importLearningDesign(filePath, username, serverId);
+				
+				element = document.createElement(CentralConstants.ELEM_LEARNINGDESIGN);
+				element.setAttribute(CentralConstants.PARAM_LEARNING_DESIGN_ID, ldID.toString());
+
+				
+			}  else {
 				String msg = "Method :" + method + " is not recognised"; 
 				log.error(msg);
 				response.sendError(response.SC_BAD_REQUEST, msg);
@@ -405,7 +424,37 @@ public class LessonManagerServlet extends HttpServlet {
 	}
 
 
+	public Long importLearningDesign(String filePath, String username, String serverId) 
+		throws RemoteException {
 		
+		List<String> ldErrorMsgs = new ArrayList<String>();
+        List<String> toolsErrorMsgs = new ArrayList<String>();
+        Long ldId = null;
+        Integer workspaceFolderUid = null;
+        ExtUserUseridMap userMap;
+		User user = null;
+    	ExtServerOrgMap serverMap = integrationService
+		.getExtServerOrgMap(serverId);
+    	
+		try {
+        
+			userMap = integrationService.getExtUserUseridMap(
+						serverMap, username);
+	
+		    user = userMap.getUser();
+		        
+	     	File designFile = new File(filePath);
+	     	Object[] ldResults = exportService.importLearningDesign(designFile, user, workspaceFolderUid, toolsErrorMsgs);
+	     	ldId = (Long) ldResults[0];
+	     	ldErrorMsgs = (List<String>) ldResults[1];
+	     	toolsErrorMsgs = (List<String>) ldResults[2];
+			
+			return ldId;
+		} catch (Exception e) {
+			throw new RemoteException(e.getMessage(), e);
+		}	
+		
+	}
 	
 
 	private void createLessonClass(Lesson lesson, Organisation organisation,
@@ -476,5 +525,12 @@ public class LessonManagerServlet extends HttpServlet {
 		lessonService = (ILessonService) WebApplicationContextUtils
 				.getRequiredWebApplicationContext(getServletContext()).getBean(
 						"lessonService");
+		
+		exportService = (IExportToolContentService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean(
+				"exportToolContentService");
+	
 	}
+	
+	
 }
