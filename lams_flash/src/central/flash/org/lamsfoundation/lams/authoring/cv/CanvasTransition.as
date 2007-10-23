@@ -63,24 +63,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends CanvasConnec
 	 * @return  
 	 */
 	private function draw():Void{
-
-		var cv:Canvas = Application.getInstance().getCanvas();
 		
 		var fromAct_mc;
 		var toAct_mc;
 		
-		if(_transition.mod_fromUIID != null) fromAct_mc = cv.model.getActivityMCByUIID(_transition.mod_fromUIID);
-		else fromAct_mc = cv.model.getActivityMCByUIID(_transition.fromUIID);
+		if(_transition.mod_fromUIID != null) fromAct_mc = model.getActivityMCByUIID(_transition.mod_fromUIID);
+		else fromAct_mc = model.getActivityMCByUIID(_transition.fromUIID);
 			
-		if(_transition.mod_toUIID != null) toAct_mc = cv.model.getActivityMCByUIID(_transition.mod_toUIID);
-		else toAct_mc = cv.model.getActivityMCByUIID(_transition.toUIID);
+		if(_transition.mod_toUIID != null) toAct_mc = model.getActivityMCByUIID(_transition.mod_toUIID);
+		else toAct_mc = model.getActivityMCByUIID(_transition.toUIID);
 		
 		var fromOTC:Object = getFromOTC(fromAct_mc);
 		var toOTC:Object = getToOTC(toAct_mc);
-		
-		Debugger.log('fromAct_mc.getActivity().xCoord:' + fromAct_mc.getActivity().xCoord , 4, 'draw', 'CanvasTransition');	
-		Debugger.log('offsetToCentre_x: ' + fromOTC.x, 4, 'draw', 'CanvasTransition');	
-		
+
 		_startPoint = new Point(fromAct_mc.getActivity().xCoord + fromOTC.x, fromAct_mc.getActivity().yCoord + fromOTC.y);
 		_endPoint = new Point(toAct_mc.getActivity().xCoord + toOTC.x, toAct_mc.getActivity().yCoord + toOTC.y);
 		
@@ -89,21 +84,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends CanvasConnec
 	}
 
 	private function onPress():Void{
-			// check double-click
-			var now:Number = new Date().getTime();
-			Debugger.log('now - _dcStartTime:'+(now - _dcStartTime)+' Config.DOUBLE_CLICK_DELAY:'+Config.DOUBLE_CLICK_DELAY,Debugger.GEN,'onPress','CanvasTransition');
-			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
-				_doubleClicking = true;
-				_canvasController.transitionDoubleClick(this);
-				
+		// check double-click
+		var now:Number = new Date().getTime();
+		Debugger.log('now - _dcStartTime:'+(now - _dcStartTime)+' Config.DOUBLE_CLICK_DELAY:'+Config.DOUBLE_CLICK_DELAY,Debugger.GEN,'onPress','CanvasTransition');
+		
+		if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
+			_doubleClicking = true;
+			_canvasController.transitionDoubleClick(this);
+		} else {
+			Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasTransition');
+			_doubleClicking = false;
+			_canvasController.transitionClick(this);
+		}
 			
-			}else{
-				Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasTransition');
-				_doubleClicking = false;
-				_canvasController.transitionClick(this);
-			}
-			
-			_dcStartTime = now;
+		_dcStartTime = now;
 	
 	}
 

@@ -465,6 +465,10 @@ class MonitorModel extends Observable{
 		setDirty();
 	}
 	
+	public function moveActivitiesToBranchSequence(activityUIID:Number, sequence:SequenceActivity):Boolean {
+		return true;
+	}
+	
 	private function getLastActivityUIID(activityUIID:Number):Number {
 		
 		// get next activity from transition
@@ -1008,7 +1012,6 @@ class MonitorModel extends Observable{
 	public function getActivityMCByUIID(UIID:Number):MovieClip{
 		
 		var a_mc:MovieClip = _activitiesDisplayed.get(UIID);
-		//Debugger.log('UIID:'+UIID+'='+a_mc,Debugger.GEN,'getActivityMCByUIID','CanvasModel');
 		return a_mc;
 	}
 	

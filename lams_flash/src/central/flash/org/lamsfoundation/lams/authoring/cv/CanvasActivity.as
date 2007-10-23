@@ -674,5 +674,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			return _canvasView.ddm;
 		}
 	}
+	
+	public function set controller(a):Void {
+		if(a instanceof CanvasController)
+			_canvasController = a;
+		else
+			_monitorController = a;
+	}
 
 }

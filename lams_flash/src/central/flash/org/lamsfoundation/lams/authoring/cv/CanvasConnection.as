@@ -24,14 +24,22 @@
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.*;
+
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.authoring.br.*;
 
+import org.lamsfoundation.lams.monitoring.mv.*;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView;
+
 class org.lamsfoundation.lams.authoring.cv.CanvasConnection extends MovieClip{  
 	
 	private var _canvasController:CanvasController;
+	private var _monitorController:MonitorController;
+	
 	private var _canvasView:CanvasView;
+	private var _monitorTabView:MonitorTabView;
+	
 	private var _canvasBranchView:CanvasBranchView;
 	
 	private var _drawnLineStyle:Number;
@@ -73,9 +81,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasConnection extends MovieClip{
 	}
 	
 	public function createConnection(fromAct_mc, toAct_mc, _startPoint:Point, _endPoint:Point, fromOTC:Object, toOTC:Object) {
-		Debugger.log('fromAct_mc:'+fromAct_mc,4,'draw','CanvasConnection');
-		Debugger.log('toAct_mc:'+toAct_mc,4,'draw','CanvasConnection');
-		
 		this.lineStyle(2, _drawnLineStyle);
 		this.moveTo(_startPoint.x, _startPoint.y);
 		this.lineTo(_endPoint.x, _endPoint.y);
@@ -192,5 +197,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasConnection extends MovieClip{
 		_fromOTC.x = fromAct_mc.getVisibleWidth()/2;
 		_fromOTC.y = fromAct_mc.getVisibleHeight()/2;
 		return _fromOTC;
+	}
+	
+	public function set controller(a):Void {
+		if(a instanceof CanvasController)
+			_canvasController = a;
+		else
+			_monitorController = a;
+	}
+	
+	public function get model() {
+		if(_canvasController != null || _canvasController != undefined) 
+			return org.lamsfoundation.lams.authoring.Application.getInstance().getCanvas().model;
+		else
+			return org.lamsfoundation.lams.monitoring.Application.getInstance().getMonitor().getMM();
 	}
 }

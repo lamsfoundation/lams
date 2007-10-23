@@ -371,4 +371,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		styleObj = getAssociatedStyle();
 		container_pnl.setStyle ('styleName', styleObj);
 	}
+	
+	public function set controller(a):Void {
+		if(a instanceof CanvasController)
+			_canvasController = a;
+		else
+			_monitorController = a;
+	}
 }

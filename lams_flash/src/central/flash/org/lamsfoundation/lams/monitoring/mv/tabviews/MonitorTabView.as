@@ -347,7 +347,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			newActivity_mc = activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kBottom,{_activity:a,_children:children, _monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});
 		} else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			newActivity_mc = activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kBottom,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});	
+			newActivity_mc = activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kBottom,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv, fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});	
 		} else if(a.isBranchingActivity()){	
 			var newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc, _monitorView:mtv, _module:"monitoring", learnerContainer:_learnerContainer_mc, setupBranchView:false});
 		} else {
@@ -428,7 +428,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		
 		if(!isActivityOnLayer(mm.activitiesDisplayed.get(t.fromUIID), this.activityLayer) && !isActivityOnLayer(mm.activitiesDisplayed.get(t.toUIID), this.activityLayer)) return false;
 		
-		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("MonitorTransition",DepthManager.kTop,{_transition:t,_monitorController:mc,_monitorTabView:mtv});
+		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_monitorController:mc,_monitorTabView:mtv});
 		
 		var trnsItems:Number = mm.transitionsDisplayed.size()
 		if (trnsItems < mm.getTransitionKeys().length){
@@ -492,8 +492,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		var cvWidth:Number = Math.max(Math.max(orig_width, span.x + hSpacing), s.w);
 		var cvHeight:Number = Math.max(Math.max(orig_height, span.y + vSpacing), s.h);
 		
-		bkg_pnl.setSize(cvWidth,cvHeight);
+		bkg_pnl.setSize(cvWidth, cvHeight);
 		bkg_pnl.redraw(true);
+		
+		transparentCover.setSize(cvWidth, cvHeight);
 		
 		//Create the grid.  The grid is re-drawn each time the canvas is resized.
 		var grid_mc = Grid.drawGrid(gridLayer,Math.round(cvWidth),Math.round(cvHeight), V_GAP, H_GAP);

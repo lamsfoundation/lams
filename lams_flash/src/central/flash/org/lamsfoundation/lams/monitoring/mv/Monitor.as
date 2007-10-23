@@ -463,6 +463,10 @@ class Monitor {
 		
 	}
 	
+	public function closeBranchView() {
+		monitorModel.activeView = monitorView.getMonitorTabView();
+		monitorModel.currentBranchingActivity = null;
+	}
 	
 	/**
 	 * Open the Help page for the selected Tool (Canvas) Activity
@@ -595,12 +599,15 @@ class Monitor {
 		return monitorModel;
 	}
 	public function getMV():MonitorView{
-		trace("Called getMV")
 		return monitorView;
 	}
 
 	public function get ddm():DesignDataModel{
 		return _ddm;
+	}
+	
+	public function get model():MonitorModel {
+		return monitorModel;
 	}
 	
 	public function get root():MovieClip{

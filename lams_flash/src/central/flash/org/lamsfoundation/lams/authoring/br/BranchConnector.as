@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.authoring.br.*;
+import org.lamsfoundation.lams.monitoring.mv.*;
 
 class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnection {
 	
@@ -56,17 +57,14 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 	 * @return  
 	 */
 	private function draw():Void{
-
-		var cv:Canvas = Application.getInstance().getCanvas();
 		
-		var fromAct_mc = (branch.direction == DIR_FROM_START) ? cv.model.activeView.startHub : cv.model.getActivityMCByUIID(_branch.targetUIID);	
-		var toAct_mc = (branch.direction == DIR_TO_END) ? cv.model.activeView.endHub : cv.model.getActivityMCByUIID(_branch.targetUIID);
+		var fromAct_mc = (branch.direction == DIR_FROM_START) ? model.activeView.startHub : model.getActivityMCByUIID(_branch.targetUIID);	
+		var toAct_mc = (branch.direction == DIR_TO_END) ? model.activeView.endHub : model.getActivityMCByUIID(_branch.targetUIID);
 		
 		var fromOTC:Object = getFromOTC(fromAct_mc);
 		var toOTC:Object = getToOTC(toAct_mc);
 		
-		Debugger.log('fromAct_mc.getActivity().xCoord:' + fromAct_mc.getActivity().xCoord , 4, 'draw', 'BranchConnector');	
-		Debugger.log('offsetToCentre_x: ' + fromOTC.x, 4, 'draw', 'BranchConnector');	
+		Debugger.log("fromAct: " + fromAct_mc);
 		
 		_startPoint = (branch.direction == DIR_FROM_START) ? new Point(fromAct_mc._x + fromOTC.x,fromAct_mc._y + fromOTC.y)
 													: new Point(fromAct_mc.getActivity().xCoord + fromOTC.x,fromAct_mc.getActivity().yCoord + fromOTC.y);

@@ -368,6 +368,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	public function get children():Array {
 		return new Array(child1_mc, child2_mc);
 	}
-
-
+	
+	public function set controller(a):Void {
+		if(a instanceof CanvasController)
+			_canvasController = a;
+		else
+			_monitorController = a;
+	}
+	
 }
