@@ -24,21 +24,15 @@
 package org.lamsfoundation.lams.util;
 
 import java.util.Collections;
-import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import org.apache.log4j.Logger;
-
 import org.lamsfoundation.lams.config.ConfigurationItem;
-import org.lamsfoundation.lams.config.dao.IConfigurationDAO;
 import org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Configuration Object
@@ -98,7 +92,10 @@ public class Configuration implements InitializingBean {
 	}
 	
 	public ConfigurationItem getConfigItemByKey(String key) {
-		return configurationDAO.getConfigItemByKey(key);
+		if ((items != null)&&(items.get(key)!=null))
+			if (items.get(key)!=null)
+				return (ConfigurationItem)items.get(key);
+		return null;
 	}
 	
 	public static String getItemValue(Object obj) {

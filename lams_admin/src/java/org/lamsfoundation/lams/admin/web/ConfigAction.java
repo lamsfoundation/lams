@@ -100,25 +100,28 @@ public class ConfigAction extends LamsDispatchAction {
 		
 		for(int i=0; i<keys.length; i++) {
 			ConfigurationItem item = getConfiguration().getConfigItemByKey(keys[i]);
-			if (item.getRequired()) {
-				if (!(values[i]!=null && values[i].length()>0)) {
-					request.setAttribute("error", getRequiredError(item.getDescriptionKey()));
-					request.setAttribute("config", arrangeItems());
-					return mapping.findForward("config");
+			if (item!=null) {
+				if (item.getRequired()) {
+					if (!(values[i]!=null && values[i].length()>0)) {
+						request.setAttribute("error", getRequiredError(item.getDescriptionKey()));
+						request.setAttribute("config", arrangeItems());
+						return mapping.findForward("config");
+					}
 				}
-			}
-			String format = item.getFormat();
-			if (format!=null && format.equals(ConfigurationItem.LONG_FORMAT)) {
-				try {
-					Long.parseLong(values[i]);
-				} catch (NumberFormatException e) {
-					request.setAttribute("error", getNumericError(item.getDescriptionKey()));
-					request.setAttribute("config", arrangeItems());
-					return mapping.findForward("config");
+				String format = item.getFormat();
+				if (format!=null && format.equals(ConfigurationItem.LONG_FORMAT)) {
+					try {
+						Long.parseLong(values[i]);
+					} catch (NumberFormatException e) {
+						request.setAttribute("error", getNumericError(item.getDescriptionKey()));
+						request.setAttribute("config", arrangeItems());
+						return mapping.findForward("config");
+					}
 				}
+				Configuration.updateItem(keys[i], values[i]);
 			}
-			Configuration.updateItem(keys[i], values[i]);
 		}
+		getConfiguration().persistUpdate();
 		
 		return mapping.findForward("sysadmin");
 	}
