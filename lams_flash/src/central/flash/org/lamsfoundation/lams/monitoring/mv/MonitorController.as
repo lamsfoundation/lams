@@ -76,7 +76,6 @@ class MonitorController extends AbstractController {
 			Debugger.log('activityClick CanvasActivity:'+act.Learner.getUserName(),Debugger.GEN,'activityClick','MonitorController');
 		}else {
 			_monitorModel.selectedItem = act;
-			_monitorModel.setDirty();
 		}
     }
    
@@ -284,27 +283,27 @@ class MonitorController extends AbstractController {
 	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityReleaseOutside','MonitorController');
 	}
    
-	public function activityDoubleClick(ca:Object, forTabView:String, learnerID:Number):Void{
+	public function activityDoubleClick(ca:Object, forTabView:String, learnerID:Number, fromContextMenu:Boolean):Void{
 		
 		Debugger.log("ca.activity.isBranchingActivity(): "+ca.activity.isBranchingActivity(), Debugger.GEN, "activityDoubleClick", "MonitorController");
-		if(ca.activity.isBranchingActivity()) {
+		if(ca.activity.isBranchingActivity() && !fromContextMenu) {
 			_monitorModel.openBranchActivityContent(ca, true);
-		}
-		else {
+		} else {
 					
 			var _learnerID:Number;
 			var URLToSend:String;
 			setBusy();
 			
-			if (forTabView == "MonitorTabView"){
+			if(forTabView == "MonitorTabView"){
 				URLToSend = _root.serverURL+_root.monitoringURL+'getActivityMonitorURL&activityID='+ca.activity.activityID+'&lessonID='+_root.lessonID;
 				URLToSend += '&contentFolderID='+MonitorModel(getModel()).getSequence().contentFolderID
-			}else {
-				if (learnerID != null){
+			} else {
+				if(learnerID != null){
 					_learnerID = learnerID;
-				}else {
+				} else {
 					_learnerID = ca.learnerID;
 				}
+				
 				if (forTabView == "MonitorTabViewLearner"){
 					Debugger.log('activityDoubleClick CanvasActivity:'+ca.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
 					URLToSend = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activityID+'&userID='+_learnerID+'&lessonID='+_root.lessonID;
@@ -314,16 +313,17 @@ class MonitorController extends AbstractController {
 			}
 
 			Debugger.log('Opening url (ca.activityID) :'+URLToSend+" Opening url (ca.activityID)"+URLToSend,Debugger.CRITICAL,'openToolActivityContent','MonitorModel');
-			if (forTabView != "MonitorTabView" && forTabView != "MonitorTabViewLearner"){
-				if (ca.activityStatus == undefined){
+			
+			if(forTabView != "MonitorTabView" && forTabView != "MonitorTabViewLearner"){
+				if(ca.activityStatus == undefined){
 			
 					var alertMSG:String = Dictionary.getValue('al_doubleclick_todoactivity',[ca.learnerName, ca.activity.title]);
 					getURL("javascript:alert('"+alertMSG+"');");
 					
-				}else {
+				} else {
 					JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
 				}
-			}else {
+			} else {
 				JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
 			}
 
@@ -342,29 +342,20 @@ class MonitorController extends AbstractController {
 	 * @return  
 	 */
 	public function change(evt):Void{
-		trace(evt.target);
-		trace("test: "+ String(evt.target.selectedIndex))
 		_monitorModel.setSelectedTab(evt.target.selectedIndex)
-		if (_monitorModel.getSequence() == null){
-			trace ("None of Sequence is selected yet!");
-		}else {
+		
+		if (_monitorModel.getSequence() != null)
 			_monitorModel.changeTab(evt.target.selectedIndex);
-		}
-	
-	
 	}
 	
 	private function exportClassPortfolio():Void{
 		var exp_url:String = _root.serverURL+"learning/exportWaitingPage.jsp?mode=teacher&lessonID="+_root.lessonID;
-		
 		JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 410, 640, true, true, false, false, false);
 	}
 
 	private function openJournalEntries():Void{
 		var journals_url:String = _root.serverURL+"learning/notebook.do?method=viewAllJournals&lessonID="+_root.lessonID;
-		
 		JsPopup.getInstance().launchPopupWindow(journals_url, 'JournalEntries', 570, 796, true, true, false, false, false);
-	
 	}
 	
 	private function openEditOnFly():Void{
@@ -379,7 +370,6 @@ class MonitorController extends AbstractController {
 	}
 
 	public function click(evt):Void{
-		trace(evt.target);
 		var tgt:String = new String(evt.target);
 		if(tgt.indexOf("editClass_btn") != -1){
 			_monitorModel.setDialogOpen("LM_DIALOG");
@@ -420,9 +410,9 @@ class MonitorController extends AbstractController {
 	 */
     public function openDialogLoaded(evt:Object) {
         Debugger.log('!evt.type:'+evt.type,Debugger.GEN,'openDialogLoaded','org.lamsfoundation.lams.MonitorController');
-        //Check type is correct
-		trace('open dialog evt type:' + evt.type);
-        if(evt.type == 'contentLoaded'){
+        
+		//Check type is correct
+		if(evt.type == 'contentLoaded'){
 			//set a ref to the view
 			evt.target.scrollContent.monitorView = LessonTabView(getView());
 			

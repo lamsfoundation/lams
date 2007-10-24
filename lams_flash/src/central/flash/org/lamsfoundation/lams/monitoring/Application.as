@@ -420,11 +420,10 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     
 	
 	public function MonitorActivityContent():Void{
-		trace("testing MonitorActivityContent");
 		var ca = _monitor.getMM().selectedItem
-		if (CanvasActivity(ca) != null){ 
-			_monitor.getMV().getController().activityDoubleClick(ca, "MonitorTabView");
-		}else {
+		if(CanvasActivity(ca) != null){ 
+			_monitor.getMV().getController().activityDoubleClick(ca, "MonitorTabView", null, true);
+		} else {
 			LFMessage.showMessageAlert(Dictionary.getValue('al_activity_openContent_invalid'));
 		}
 	}

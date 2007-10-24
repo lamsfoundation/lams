@@ -482,12 +482,19 @@ class MonitorModel extends Observable{
 	private function orderDesign(activity:Activity, order:Array):Void{
 		order.push(activity);
 		
+		if(activity.isBranchingActivity() || activity.isSequenceActivity()) {
+			var children:Array = _activeSeq.getLearningDesignModel().getComplexActivityChildren(activity.activityUIID);
+			for(var i=0; i<children.length; i++)
+				orderDesign(children[i], order);
+		}
+		
 		for(var i=0;i<ddmTransition_keys.length;i++){
 			var transitionKeyToCheck:Number = ddmTransition_keys[i];
 			var ddmTransition:Transition = _activeSeq.getLearningDesignModel().transitions.get(transitionKeyToCheck);
 			
 				if (ddmTransition.fromUIID == activity.activityUIID){
 					var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(ddmTransition.toUIID);
+					
 					orderDesign(ddm_activity, order);
 				}
 				
@@ -520,36 +527,39 @@ class MonitorModel extends Observable{
 	 * @return  
 	 */
 	public function drawDesign(tabID:Number, learner:Object){
-		//var indexArray:Array = setDesignOrder();
+		ddmActivity_keys = _activeSeq.getLearningDesignModel().activities.keys();
+		var indexArray:Array = setDesignOrder();
 		
 		if (learner != null || learner != undefined){
 			var drawLearner:Object = new Object();
 			drawLearner = learner;
+			
+			//indexArray = setDesignOrder();
 		}
 		
 		//go through the design and get the activities and transitions 
 		var dataObj:Object;
-		ddmActivity_keys = _activeSeq.getLearningDesignModel().activities.keys();
 		Debugger.log("ddm_activity keys: "+ddmActivity_keys.length, Debugger.GEN, "drawDesign", "MonitorModel");
 			
 		//loop through 
-		for(var i=0;i<ddmActivity_keys.length;i++){
-			var keyToCheck:Number = ddmActivity_keys[i];
+		for(var i=0;i< indexArray.length; i++){
+			var keyToCheck:Number = indexArray[i].activityUIID;
 			var ddm_activity:Activity = Activity(_activeSeq.getLearningDesignModel().activities.get(keyToCheck));
 			
 			if(!isDesignDrawn) {
 				Debugger.log("isDrawnDesign: "+isDesignDrawn, Debugger.GEN, "drawDesign", "MonitorModel");
 			}
-				if(ddm_activity.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE){
-					broadcastViewUpdate("ADD_SEQUENCE", ddm_activity);
-				} else if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
-					var parentAct;
-					if((parentAct = _activeSeq.getLearningDesignModel().activities.get(ddm_activity.parentUIID)) != null)
-						if(parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE)
-							broadcastViewUpdate("DRAW_ACTIVITY_SEQ", ddm_activity, tabID, drawLearner);
-				} else {
-					broadcastViewUpdate("DRAW_ACTIVITY", ddm_activity, tabID, drawLearner);
-				}
+			
+			if(ddm_activity.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE){
+				broadcastViewUpdate("ADD_SEQUENCE", ddm_activity);
+			} else if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
+				var parentAct;
+				if((parentAct = _activeSeq.getLearningDesignModel().activities.get(ddm_activity.parentUIID)) != null)
+					if(parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE)
+						broadcastViewUpdate("DRAW_ACTIVITY_SEQ", ddm_activity, tabID, drawLearner);
+			} else {
+				broadcastViewUpdate("DRAW_ACTIVITY", ddm_activity, tabID, drawLearner);
+			}
 		}
 		
 		//now check the transitions:

@@ -84,17 +84,18 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 			
 			var ca = CanvasActivity(m.selectedItem);
 			var a:Activity = ca.activity;	
-			var ddm:DesignDataModel = (model instanceof MonitorModel) ? MonitorModel(model).getMonitor().ddm : CanvasModel(model).getCanvas().ddm;
+			var module = (model instanceof MonitorModel) ? MonitorModel(model).getMonitor() : CanvasModel(model).getCanvas();
+			
+			Debugger.log("prevSelectedItem : " + m.prevSelectedItem.activity.title, Debugger.CRITICAL, "highlightActivity", "CommonCanvasView");
 			
 			// deselect previously selected item
 			if(m.prevSelectedItem != null) {
 				// if child of an complex activity is previously selected, it is easiest to clear all the children
-				if(m.prevSelectedItem.activity.parentUIID != null && ddm.getActivityByUIID(m.prevSelectedItem.activity.parentUIID).activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE) {
+				if(m.prevSelectedItem.activity.parentUIID != null && module.ddm.getActivityByUIID(m.prevSelectedItem.activity.parentUIID).activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE) {
 					var caComplex = m.activitiesDisplayed.get(m.prevSelectedItem.activity.parentUIID);
 					caComplex.refreshChildren();
 				} else {
-					var dca:ICanvasActivity = m.activitiesDisplayed.get(m.prevSelectedItem.activity.activityUIID);
-					dca.setSelected(false);
+					m.prevSelectedItem.setSelected(false);
 				}
 			}
 			

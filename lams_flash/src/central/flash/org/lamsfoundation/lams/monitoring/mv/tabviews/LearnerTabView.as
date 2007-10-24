@@ -278,7 +278,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			mm.activitiesDisplayed.clear();
 			
 			mm.getMonitor().getProgressData(mm.getSequence());
-		
+			
 	}
 	
 	private function drawAllLearnersDesign(mm:MonitorModel, tabID:Number){
@@ -404,7 +404,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		}
 		
 		//take action depending on act type
-		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity()){
+		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity() || a.isBranchingActivity()) {
 			newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerActivity", _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
 			
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
