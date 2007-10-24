@@ -24,3 +24,36 @@
     		<form-error-page>/login.jsp</form-error-page>
    		</form-login-config>
    	</login-config>
+	<!-- ======================================================== -->
+	<!--  Security Roles -->
+    <!-- ======================================================== -->
+	<security-role>
+		<description>Student</description>
+		<role-name>LEARNER</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can create/modify a learning design</description>
+		<role-name>AUTHOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can running and monitoring a learning session</description>
+		<role-name>MONITOR</role-name>
+	</security-role>
+
+    <security-role>
+		<role-name>GROUP MANAGER</role-name>
+	</security-role>
+   	<security-role>
+		<role-name>GROUP ADMIN</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can add/remove users to the system, set up classes of users for sessions</description>
+		<role-name>SYSADMIN</role-name>
+	</security-role>
+
+	<security-role>
+		<role-name>AUTHOR ADMIN</role-name>
+	</security-role>
