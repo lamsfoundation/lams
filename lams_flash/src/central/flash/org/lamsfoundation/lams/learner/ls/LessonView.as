@@ -109,7 +109,6 @@ class LessonView extends AbstractView {
 		//Delete the enterframe dispatcher
         delete this.onEnterFrame;
 		
-		trace('creating new Lesson ...');
         setStyles();
 		
         _lesson_mc = this;
@@ -129,8 +128,8 @@ class LessonView extends AbstractView {
 	public function update (o:Observable,infoObj:Object):Void {
 	    //Cast the generic observable object into the Toolbar model.
         var lm:LessonModel = LessonModel(o);
-		trace('getting lesson update...');
-        //Update view from info object
+		
+		//Update view from info object
         switch (infoObj.updateType) {
             case 'POSITION' :
                 setPosition(lm);
@@ -194,7 +193,6 @@ class LessonView extends AbstractView {
 	 */
 	private function removeActivity(a:Activity,lm:LessonModel){
 		//dispatch an event to show the design  has changed
-		trace("in removeActivity")
 		var r = lm.activitiesDisplayed.remove(a.activityUIID);
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;

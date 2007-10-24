@@ -308,7 +308,24 @@ class LessonModel extends Observable {
 	}
 	
 	private function orderDesign(activity:Activity, order:Array):Void{
+		Debugger.log("order design activity: " + activity.title, Debugger.CRITICAL, "orderDesign", "LessonModel");
+		
 		order.push(activity);
+		
+		if(activity.isBranchingActivity()) {
+			Debugger.log("branching activity found: " + activity.activityUIID, Debugger.CRITICAL, "orderDesign", "LessonModel");
+		
+			var children:Array = learningDesignModel.getComplexActivityChildren(activity.activityUIID);
+			Debugger.log("seq children length: " + children.length, Debugger.CRITICAL, "orderDesign", "LessonModel");
+		
+			for(var i=0; i<children.length; i++) {
+				Debugger.log("progress: " + Progress.compareProgressData(_progressData, children[i].activityID), Debugger.CRITICAL, "orderDesign", "LessonModel");
+				var _progress:String = Progress.compareProgressData(_progressData, children[i].activityID);
+				if((_progress == "attempted_mc" || _progress == "completed_mc") && children[i].isSequenceActivity())
+					orderDesign(Activity(learningDesignModel.activities.get(SequenceActivity(children[i]).firstActivityUIID)), order);
+			
+			}
+		}
 		
 		for(var i=0;i<ddmTransition_keys.length;i++){
 			var transitionKeyToCheck:Number = ddmTransition_keys[i];
@@ -316,20 +333,6 @@ class LessonModel extends Observable {
 			
 				if (ddmTransition.fromUIID == activity.activityUIID){
 					var ddm_activity:Activity = learningDesignModel.activities.get(ddmTransition.toUIID);
-					
-					if(ddm_activity.isBranchingActivity()) {
-						var children:Array = learningDesignModel.getComplexActivityChildren(ddm_activity.activityUIID);
-						Debugger.log("brancing child length: " + children.length, Debugger.CRITICAL, "orderDesign", "LessonModel");
-						if(children.length > 0) {
-							for(var j=0; j < children.length; j++) {
-								if(Progress.compareProgressData(_progressData, children[i].activityID) == "attempted_mc" && children[i] instanceof SequenceActivity) {
-									orderDesign(learningDesignModel.activities.get(SequenceActivity(children[i].firstActivityUIID)), order);
-									Debugger.log("child is attempted (UIID): " + children[i].activityUIID, Debugger.CRITICAL, "orderDesign", "LessonModel");
-								}
-							}
-						}
-					}
-					
 					orderDesign(ddm_activity, order);
 				}
 				
@@ -338,7 +341,6 @@ class LessonModel extends Observable {
 	}
 	
 	private function setDesignOrder(){
-		trace("set Design order called")
 		ddmActivity_keys = learningDesignModel.activities.keys();
 		ddmTransition_keys = learningDesignModel.transitions.keys();
 		
@@ -422,11 +424,11 @@ class LessonModel extends Observable {
 			var keyToCheck:Number = indexArray[i].activityUIID;
 			var ddm_activity:Activity = learningDesignModel.activities.get(keyToCheck);
 			
-			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
+			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0) {
 				if(_learningDesignModel.getActivityByUIID(ddm_activity.parentUIID).isSequenceActivity())
-					broadcastViewUpdate("UPDATE_ACTIVITY",ddm_activity);
-				return;
-			}else {
+					broadcastViewUpdate("DRAW_ACTIVITY", ddm_activity);
+					return;
+			} else {
 				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity);
 			}
 		}
@@ -434,8 +436,6 @@ class LessonModel extends Observable {
 	}
 	
 	public function updateDesign(){
-		
-		
 		var indexArray:Array = setDesignOrder();
 		
 		if(indexArray.length > activitiesDisplayed.length) {
@@ -478,7 +478,6 @@ class LessonModel extends Observable {
 		infoObj.updateType = updateType;
 		infoObj.data = data;
 		notifyObservers(infoObj);
-		
 	}
 	
 	/**
