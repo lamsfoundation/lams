@@ -266,8 +266,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		Debugger.log('adding hubs for branch activity:' + _canvasBranchingActivity,Debugger.CRITICAL,'setupConenctorHubs','org.lamsfoundation.lams.CanvasBranchView');
 		
 		// start-point connector hub
-		cHubStart_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _canvasController:CanvasController(getController()), _canvasBranchView:_canvasBranchView, _x: activity.startXCoord , _y: activity.startYCoord, branchConnector:true})
-												  : activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _monitorController:MonitorController(getController()), _canvasBranchView:_canvasBranchView, _x: activity.startXCoord , _y: activity.startYCoord, branchConnector:true});
+		cHubStart_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _canvasController:getController(), _canvasBranchView:_canvasBranchView, _x: activity.startXCoord , _y: activity.startYCoord, branchConnector:true})
+												  : activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _monitorController:getController(), _canvasBranchView:_canvasBranchView, _x: activity.startXCoord , _y: activity.startYCoord, branchConnector:true});
 		// end-point connector hub
 		cHubEnd_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _canvasController:CanvasController(getController()), _canvasBranchView:_canvasBranchView, _x: activity.endXCoord , _y: activity.endYCoord, branchConnector:true})
 												: activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _monitorController:MonitorController(getController()), _canvasBranchView:_canvasBranchView, _x: activity.endXCoord , _y: activity.endYCoord, branchConnector:true});
@@ -372,8 +372,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			Debugger.log('controller cbc :'+MonitorController(cbc), Debugger.CRITICAL, 'drawActivity','CanvasBranchView');
 			Debugger.log('controller obj cbc :'+cbc, Debugger.CRITICAL, 'drawActivity','CanvasBranchView');
 		
-			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _canvsController:CanvasController(cbc), _canvasBranchView:cbv})
-															: activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _monitorController:MonitorController(cbc), _canvasBranchView:cbv, _module:_module});
+			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _canvsController:cbc, _canvasBranchView:cbv})
+															: activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _monitorController:cbc, _canvasBranchView:cbv, _module:_module});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Tool or gate activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasBranchView');
 		}
