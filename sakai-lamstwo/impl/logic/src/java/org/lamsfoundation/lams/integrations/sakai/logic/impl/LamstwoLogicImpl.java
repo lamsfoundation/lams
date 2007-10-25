@@ -37,7 +37,6 @@ import org.lamsfoundation.lams.integrations.sakai.model.LamstwoItem;
 import org.lamsfoundation.lams.webservice.LessonManager;
 import org.lamsfoundation.lams.webservice.LessonManagerService;
 import org.lamsfoundation.lams.webservice.LessonManagerServiceLocator;
-import org.lamsfoundation.ld.integration.Constants;
 import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.AuthzPermissionException;
@@ -352,7 +351,7 @@ public class LamstwoLogicImpl implements LamstwoLogic {
 
 		String learningDesigns = "[]"; // empty javascript array
 		try {
-			String serviceURL = serverAddress + "/services/xml/timestamp?" 
+			String serviceURL = serverAddress + "/services/xml/LearningDesignRepository?" 
 				+ "datetime=" 	+ datetime
 				+ "&username="	+ URLEncoder.encode(username, "utf8")
 				+ "&serverId=" 	+ URLEncoder.encode(serverID, "utf8")
@@ -656,11 +655,11 @@ public class LamstwoLogicImpl implements LamstwoLogic {
 
 		StringBuilder sb = new StringBuilder();
 
-		if (node.getNodeName().equals(Constants.ELEM_FOLDER)) {
+		if (node.getNodeName().equals(LamstwoConstants.ELEM_FOLDER)) {
 			sb.append("['");
 			
 			StringBuilder attribute= new StringBuilder(node.getAttributes().getNamedItem(
-					Constants.ATTR_NAME).getNodeValue().replace("'", "\\'"));
+					LamstwoConstants.ATTR_NAME).getNodeValue().replace("'", "\\'"));
 			
 			sb.append(attribute.append("',").append("null").append(','));
 					
@@ -676,13 +675,13 @@ public class LamstwoLogicImpl implements LamstwoLogic {
 			}
 			sb.append(']');
 		} else if (node.getNodeName().equals(
-				Constants.ELEM_LEARNING_DESIGN)) {
+				LamstwoConstants.ELEM_LEARNING_DESIGN)) {
 			sb.append('[');
 			
 			StringBuilder attrName = new StringBuilder(node.getAttributes().getNamedItem(
-							Constants.ATTR_NAME).getNodeValue().replace("'", "\\'"));
+					LamstwoConstants.ATTR_NAME).getNodeValue().replace("'", "\\'"));
 			StringBuilder attrResId = new StringBuilder(node.getAttributes().getNamedItem(
-					Constants.ATTR_RESOURCE_ID).getNodeValue().replace("'", "\\'"));			
+					LamstwoConstants.ATTR_RESOURCE_ID).getNodeValue().replace("'", "\\'"));			
 			
 			sb.append('\'')
 				.append(attrName
