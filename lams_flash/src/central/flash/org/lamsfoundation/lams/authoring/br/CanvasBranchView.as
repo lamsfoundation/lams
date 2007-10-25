@@ -372,7 +372,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			Debugger.log('controller cbc :'+MonitorController(cbc), Debugger.CRITICAL, 'drawActivity','CanvasBranchView');
 			Debugger.log('controller obj cbc :'+cbc, Debugger.CRITICAL, 'drawActivity','CanvasBranchView');
 		
-			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _canvsController:cbc, _canvasBranchView:cbv})
+			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _canvasController:cbc, _canvasBranchView:cbv})
 															: activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _monitorController:cbc, _canvasBranchView:cbv, _module:_module});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Tool or gate activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasBranchView');

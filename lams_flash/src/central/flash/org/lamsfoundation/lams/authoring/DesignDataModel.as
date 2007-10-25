@@ -244,6 +244,33 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		}
 	}
 	
+	public function removeBranchByConnection(connectUIID, activity:BranchingActivity):Void {
+		var keyArray:Array = _branches.keys();
+		for(var i=0; i<keyArray.length; i++){
+			var branch:Branch = Branch(_branches.get(keyArray[i]));
+			if(branch.targetUIID == connectUIID) {
+				if(activity.firstActivityUIID == branch.sequenceActivity.activityUIID && branch.isStart)
+					activity.defaultBranch = findNewDefaultBranch(activity, branch);
+				
+				removeBranch(branch.branchUIID);
+			}
+		}
+	}
+	
+	private function findNewDefaultBranch(activity:BranchingActivity, branch:Branch):Branch {
+		var children:Array = getComplexActivityChildren(activity.activityUIID);
+		
+		for(var i=0; i<children.length; i++) {
+			if(SequenceActivity(children[i]) != branch.sequenceActivity) {
+				var branches:Array = getBranchesForActivityUIID(SequenceActivity(children[i]).activityUIID).myBranches;
+				for(var j=0; j<branches.length; j++) {
+					if(branches[j].isStart)
+						return Branch(branches[j]);
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Adds a branch to the DDM
 	 * @usage   
@@ -318,27 +345,13 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 		
 		var r:Object = _branches.remove(branchUIID);
+		
 		if(r==null){
 			return new LFError("Removing branch failed:"+branchUIID,"removeBranch",this,null);
 		}else{
 			
 			Debugger.log('Removed:'+r.branchUIID,Debugger.GEN,'removeBranch','DesignDataModel');
 			dispatchEvent({type:'ddmUpdate',target:this});
-		}
-	}
-	
-	/**
-	 * Removes the branch from the DDM which are connected to the Activity 
-	 *  
-	 * @param   connectUIID connected Activity UIID (SequenceActivity)
-	 */
-	public function removeBranchByConnection(connectUIID):Void{
-		var keyArray:Array = _branches.keys();
-		for(var i=0; i<keyArray.length; i++){
-			var branch:Branch = Branch(_branches.get(keyArray[i]));
-			if(branch.fromUIID == connectUIID || branch.toUIID == connectUIID){
-				removeBranch(branch.branchUIID);
-			}
 		}
 	}
 	

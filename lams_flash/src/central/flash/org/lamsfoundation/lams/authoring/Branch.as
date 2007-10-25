@@ -81,5 +81,13 @@ class Branch extends Transition {
 	public function get hubUIID():Number {
 		return _hubUIID;
 	}
+	
+	public function get isStart():Boolean {
+		return (_direction == BranchConnector.DIR_FROM_START);
+	}
+	
+	public function get isEnd():Boolean {
+		return (_direction == BranchConnector.DIR_TO_END);
+	}
 }
 

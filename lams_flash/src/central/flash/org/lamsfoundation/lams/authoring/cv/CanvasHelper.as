@@ -241,9 +241,13 @@ class CanvasHelper {
 	public function removeActivity(activityUIID:Number){
 		Debugger.log('activityUIID:'+activityUIID,4,'removeActivity','Canvas');
 		
-		// remove transitions connected to this activity being removed
+		// remove transitions and/or branches connected to this activity being removed
 		_ddm.removeTransitionByConnection(activityUIID);
+		if(canvasModel.activeView instanceof CanvasBranchView)
+			_ddm.removeBranchByConnection(activityUIID, CanvasBranchView(canvasModel.activeView).activity);
+		
 		_ddm.removeActivity(activityUIID);
+		
 		canvasModel.setDirty();
 		canvasModel.selectedItem = null;
 	}
