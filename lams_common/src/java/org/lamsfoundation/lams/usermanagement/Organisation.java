@@ -95,13 +95,15 @@ public class Organisation implements Serializable, Comparable {
     
     /** persistent field */
     private Date archivedDate;
+    
+    private String orderedLessonIds;
 
     /** full constructor */
     public Organisation(String name, String description, Organisation parentOrganisation, 
     			Date createDate, User createdBy, Workspace workspace, 
     			OrganisationType organisationType, Set userOrganisations, Set childOrganisations, Set lessons,
     			Boolean courseAdminCanAddNewUsers, Boolean courseAdminCanBrowseAllUsers, Boolean courseAdminCanChangeStatusOfCourse, 
-    			Boolean courseAdminCanCreateGuestAccounts) {
+    			Boolean courseAdminCanCreateGuestAccounts, String orderedLessonIds) {
         this.name = name;
         this.description = description;
         this.parentOrganisation = parentOrganisation;
@@ -116,6 +118,7 @@ public class Organisation implements Serializable, Comparable {
         this.courseAdminCanBrowseAllUsers = courseAdminCanBrowseAllUsers;
         this.courseAdminCanChangeStatusOfCourse = courseAdminCanChangeStatusOfCourse;
         this.courseAdminCanCreateGuestAccounts = courseAdminCanCreateGuestAccounts;
+        this.orderedLessonIds = orderedLessonIds;
     }
 
     /** default constructor */
@@ -469,6 +472,19 @@ public class Organisation implements Serializable, Comparable {
 
     public void setArchivedDate(Date archivedDate) {
         this.archivedDate = archivedDate;
+    }
+    
+    /**
+	 * @hibernate.property column="ordered_lesson_ids" length="65535"
+     */
+    public String getOrderedLessonIds()
+    {
+        return orderedLessonIds;
+    }
+
+    public void setOrderedLessonIds(String orderedLessonIds)
+    {
+        this.orderedLessonIds = orderedLessonIds;
     }
 
 }

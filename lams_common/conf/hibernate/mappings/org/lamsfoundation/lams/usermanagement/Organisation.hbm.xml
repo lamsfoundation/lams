@@ -326,5 +326,14 @@
             length="19"
             not-null="false"
         />
+    
+    <property
+            name="orderedLessonIds"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="ordered_lesson_ids"
+            length="65535"
+        />
 </class>
 </hibernate-mapping>

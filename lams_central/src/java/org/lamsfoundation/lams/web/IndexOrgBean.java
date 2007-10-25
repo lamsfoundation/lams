@@ -39,6 +39,7 @@ import java.util.List;
  */
 public class IndexOrgBean implements Comparable {
 	
+	private Integer id;
 	private String name;
 	private Date archivedDate;
 	private Integer type;
@@ -47,7 +48,8 @@ public class IndexOrgBean implements Comparable {
 	private List<IndexOrgBean> childIndexOrgBeans;
 	
 	
-	public IndexOrgBean(String name, Integer type) {
+	public IndexOrgBean(Integer id, String name, Integer type) {
+		this.id = id;
 		this.name = name;
 		this.type = type;
 		this.links = new ArrayList<IndexLinkBean>();
@@ -89,6 +91,18 @@ public class IndexOrgBean implements Comparable {
 	 */
 	public void setLinks(List<IndexLinkBean> links) {
 		this.links = links;
+	}
+	/**
+	 * @return Returns the id.
+	 */
+	public Integer getId() {
+		return id;
+	}
+	/**
+	 * @param id The id to set.
+	 */
+	public void setId(Integer id) {
+		this.id = id;
 	}
 	/**
 	 * @return Returns the name.

@@ -119,7 +119,7 @@ public class ProfileAction extends LamsDispatchAction {
 			// insert or update bean if it is a course
 			if (orgTypeId.equals(OrganisationType.COURSE_TYPE)) {
 				IndexOrgBean orgBean = (!orgBeansMap.containsKey(orgId))
-					? new IndexOrgBean(org.getName(), orgTypeId)
+					? new IndexOrgBean(org.getOrganisationId(), org.getName(), orgTypeId)
 					: orgBeansMap.get(orgId);
 				orgBean.addLesson(lessonBean);
 				orgBeansMap.put(orgId, orgBean);
@@ -129,10 +129,10 @@ public class ProfileAction extends LamsDispatchAction {
 				Organisation parentOrg = org.getParentOrganisation();
 				Integer parentOrgId = parentOrg.getOrganisationId();
 				IndexOrgBean parentOrgBean = (!orgBeansMap.containsKey(parentOrgId))
-					? new IndexOrgBean(parentOrg.getName(), OrganisationType.COURSE_TYPE)
+					? new IndexOrgBean(parentOrg.getOrganisationId(), parentOrg.getName(), OrganisationType.COURSE_TYPE)
 					: orgBeansMap.get(parentOrgId);
 				// create new bean for class, or use existing bean
-				IndexOrgBean orgBean = new IndexOrgBean(org.getName(), orgTypeId);
+				IndexOrgBean orgBean = new IndexOrgBean(org.getOrganisationId(), org.getName(), orgTypeId);
 				List<IndexOrgBean> childOrgBeans = parentOrgBean.getChildIndexOrgBeans();
 				if (childOrgBeans.contains(orgBean)) {
 					orgBean = getOrgBean(org.getName(), childOrgBeans);

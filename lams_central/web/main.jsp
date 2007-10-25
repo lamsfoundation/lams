@@ -29,16 +29,41 @@
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-1.2.1.min.js"></script>
+	<script language="JavaScript" type="text/javascript" src="includes/javascript/interface.js"></script>
 	<script language="javascript" type="text/javascript">
 		<!--
 			<c:if test="${empty tab}">
-				$(function(){
-					$("div.display-group").each(function(){
-						$(this).load("displayGroup.do", {stateId: 1, orgId: this.id});
+				jQuery(document).ready(function(){
+					jQuery("div.j-display-group").each(function(){
+						jQuery(this).load("displayGroup.do", {stateId: 1, orgId: this.id}, function() {
+								jQuery("ul.j-lessons", this).Sortable({
+									accept: "j-single-lesson", 
+									// containment: "parent",
+									onStop: function s() {
+										// serial = $.SortSerialize(jQuery(this).parent().attr("id"));
+										// $.get("servlet/saveLessonOrder", { ids: serial.hash } );
+										var ids = [];
+										jQuery(this).parent().children("p").each(function(i, element) {
+											ids.push(element.id);
+										});
+										$.ajax({
+											url: "servlet/saveLessonOrder",
+											data: {orgId: jQuery(this).parent().attr("id"), 
+												ids: ids.join(",")
+											},
+											error: function(a,b) {
+												refresh();
+											}
+										});
+									}
+								});
+								
+							}
+						);
 					});
-					$("body").click(function(event) {
-						if ($(event.target).is("a.group-header")){
-							$(event.target).parent("h2").parent("div.left-buttons").parent("div.row").next("div.course-contents").toggle("fast");
+					jQuery("body").click(function(event) {
+						if (jQuery(event.target).is("a.j-group-header")){
+							jQuery(event.target).parent("h2").parent("div.left-buttons").parent("div.row").next("div.j-course-contents").toggle("fast");
 							return false;
 						}
 					});
@@ -136,7 +161,7 @@
 							</div>
 							<c:if test="${empty tab}">
 								<c:forEach items="${courseIds}" var="courseId">
-									<div id="<c:out value="${courseId}"/>" class="display-group"></div>
+									<div id="<c:out value="${courseId}"/>" class="j-display-group"></div>
 								</c:forEach>
 							</c:if>
 							<c:if test="${tab eq 'profile'}">
@@ -160,6 +185,7 @@
 		</p>
 	</div>
 </div>
+
 </body>
 </lams:html>
 

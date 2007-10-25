@@ -1,0 +1,154 @@
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */ 
+ 
+/* $Id$ */ 
+package org.lamsfoundation.lams.web; 
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.HttpSessionManager;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+ 
+/**
+ * Used by main.jsp to persist the ordering of lessonIds when lessons are 
+ * ordered by a staff member for a group.  Currently stores lessonIds as a
+ * single comma separated string in lams_organisation.
+ * 
+ * @author jliew
+ *
+ * @web:servlet name="saveLessonOrder"
+ * @web:servlet-mapping url-pattern="/servlet/saveLessonOrder"
+ */
+public class LessonOrderServlet extends HttpServlet {
+
+	private static Logger log = Logger.getLogger(LessonOrderServlet.class);
+	
+	public void doGet(HttpServletRequest request, HttpServletResponse response) 
+		throws ServletException, IOException {
+		
+		Integer orgId = WebUtil.readIntParam(request, "orgId", false);
+		String ids = request.getParameter("ids");
+		
+		WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
+		UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
+		
+		if (orgId != null && ids != null) {
+			Organisation org = (Organisation)service.findById(Organisation.class, orgId);
+						
+			if (org != null) {
+				// verify the ids are lessons that belong to orgId;
+				// necessary since javascript on index page doesn't restrict
+				// where user drops a lesson when sorting.
+				// TODO: remove this validation when the javascript sortable's
+				// containment parameter is working.
+				List<String> idList = Arrays.asList(ids.split(","));
+				Set lessons = org.getLessons();
+				for (String id : idList) {
+					try {
+						Long l = new Long(Long.parseLong(id));
+						if (!contains(lessons, l)) {
+							response.sendError(HttpServletResponse.SC_FORBIDDEN);
+						}
+					} catch(NumberFormatException e) {
+						continue;
+					}
+				}
+					
+				String oldIds = org.getOrderedLessonIds();
+				String updatedIds = mergeLessonIds((oldIds!=null ? oldIds : ""), ids);
+				org.setOrderedLessonIds(updatedIds);
+				service.save(org);
+			}
+		}
+		
+	}
+	
+	private boolean contains(Set lessons, Long id) {
+		Iterator it = lessons.iterator();
+		while (it.hasNext()) {
+			Lesson lesson = (Lesson)it.next();
+			if (lesson.getLessonId().equals(id)) return true;
+		}
+		return false;
+	}
+	
+	// take the updated list and insert elements of the old list that don't exist in it;
+	private String mergeLessonIds(String old, String updated) {
+		List<String> oldIds = Arrays.asList(old.split(","));
+		List<String> updatedIds = Arrays.asList(updated.split(","));
+		ArrayList<String> mergedIds = new ArrayList<String>(updatedIds);
+		
+		for (int i=0; i<oldIds.size(); i++) {
+			String current = oldIds.get(i);
+			if (!updatedIds.contains(current)) {
+				int indexNextExistingId = indexNextExistingId(i, oldIds, mergedIds);
+				if (indexNextExistingId < 0) {
+					mergedIds.add(current);
+				} else {
+					mergedIds.add(indexNextExistingId, current);
+				}
+			}
+		}
+		return joinString(mergedIds);
+	}
+	
+	// find the index of the next lesson Id in the old list that exists in the updated list
+	private int indexNextExistingId(int i, List<String> oldIds, List<String> updatedIds) {
+		for (int j=i; j<oldIds.size(); j++) {
+			String current = oldIds.get(j);
+			int index = updatedIds.indexOf(current);
+			if (index > -1) {
+				return index;
+			}
+		}
+		return -1;
+	}
+	
+	// implode strings in list separated by commas
+	private String joinString(List<String> list) {
+		String s = "";
+		if (list != null) {
+			for (String i : list) {
+				s += i + ",";
+			}
+			s = s.substring(0, s.length()-1);
+		}
+		return s;
+	}
+}
+ 

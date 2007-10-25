@@ -95,4 +95,6 @@
 <c:forEach items="${courseIds}" var="courseId">
 	<div id="<c:out value="${courseId}"/>" class="display-group"></div>
 </c:forEach>
-
+<c:if test="${empty courseIds}">
+	<p class="align-left"><fmt:message key="msg.groups.empty" /></p>
+</c:if>

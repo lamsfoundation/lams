@@ -36,6 +36,7 @@ import java.util.List;
  * Created at 10:13:43 on 14/06/2006
  */
 public class IndexLessonBean implements Comparable{
+	private Long id;
 	private String name;
 	private String description;
 	private String url;
@@ -47,7 +48,15 @@ public class IndexLessonBean implements Comparable{
 		this.url = url;
 	}
 	
-	public IndexLessonBean(String name, String description, String url, Integer state, List<IndexLinkBean> links) {
+	public IndexLessonBean(Long id, String name, String description, Integer state) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.state = state;
+	}
+	
+	public IndexLessonBean(Long id, String name, String description, String url, Integer state, List<IndexLinkBean> links) {
+		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.url = url;
@@ -65,6 +74,12 @@ public class IndexLessonBean implements Comparable{
 	 */
 	public void setLinks(List<IndexLinkBean> links) {
 		this.links = links;
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
 	}
 	/**
 	 * @return Returns the name.

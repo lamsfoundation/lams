@@ -180,3 +180,6 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 
 delete from lams_configuration where config_key='LamsHome';
 delete from lams_configuration where config_key='FileManagerDir';
+
+-- LDEV-1250
+alter table lams_organisation add column ordered_lesson_ids text;

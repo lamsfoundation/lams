@@ -23,19 +23,30 @@
 /* $Id$ */ 
 package org.lamsfoundation.lams.web; 
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -60,6 +71,7 @@ public class DisplayGroupAction extends Action {
 	private static IUserManagementService service;
 	private Integer stateId = OrganisationState.ACTIVE;
 	
+	@SuppressWarnings({"unchecked"})
 	public ActionForward execute(ActionMapping mapping, 
 			ActionForm form, 
 			HttpServletRequest request, 
@@ -85,11 +97,13 @@ public class DisplayGroupAction extends Action {
 		return mapping.findForward("group");
 	}
 
-	//@SuppressWarnings({"unchecked","static-access"})
-	private IndexOrgBean createOrgBean(Organisation org, List<Integer> roles, String username, boolean isSysAdmin) {
+	@SuppressWarnings({"unchecked"})
+	private IndexOrgBean createOrgBean(Organisation org, List<Integer> roles, String username, boolean isSysAdmin)
+		throws SQLException, NamingException {
 		User user = (User)getService().findByProperty(User.class, "login", username).get(0);
-		IndexOrgBean orgBean = new IndexOrgBean(org.getName(), org.getOrganisationType().getOrganisationTypeId());
+		IndexOrgBean orgBean = new IndexOrgBean(org.getOrganisationId(), org.getName(), org.getOrganisationType().getOrganisationTypeId());
 
+		// set org links
 		List<IndexLinkBean> links = new ArrayList<IndexLinkBean>();
 		if(isSysAdmin && stateId.equals(OrganisationState.ACTIVE)){
 			if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
@@ -111,56 +125,21 @@ public class DisplayGroupAction extends Action {
 		}
 		orgBean.setLinks(links);
 		
+		// set archived date if archived
 		if (stateId.equals(OrganisationState.ARCHIVED) && org.getOrganisationState().getOrganisationStateId().equals(OrganisationState.ARCHIVED)) {
 			orgBean.setArchivedDate(org.getArchivedDate());
 		}
-
-		List<IndexLessonBean> lessonBeans = new ArrayList<IndexLessonBean>();
-		Set<Lesson> lessons = org.getLessons();
-		for(Lesson lesson:lessons) {
-			if(isInLesson(user,lesson)){
-				if(!lesson.isPreviewLesson()){
-					List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
-					String url = null;
-					if(stateId.equals(OrganisationState.ACTIVE)){
-						if(contains(roles,Role.ROLE_GROUP_MANAGER)||contains(roles,Role.ROLE_MONITOR)){
-							if(!lesson.getLessonStateId().equals(lesson.REMOVED_STATE)){
-								lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + lesson.getLessonId()+")"));
-							}
-						}
-						if(contains(roles,Role.ROLE_LEARNER)){
-							log.debug("Lesson State:"+lesson.getLessonStateId());
-							if(lesson.getLessonStateId().equals(lesson.STARTED_STATE)||lesson.getLessonStateId().equals(lesson.FINISHED_STATE)){
-								url = "javascript:openLearner("+lesson.getLessonId()+")";
-							}
-						}
-					}else if(stateId.equals(OrganisationState.ARCHIVED)){
-						if(contains(roles,Role.ROLE_GROUP_MANAGER)){
-							if(!lesson.getLessonStateId().equals(lesson.REMOVED_STATE)){
-								lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + lesson.getLessonId()+")"));
-							}
-						}
-						if(contains(roles,Role.ROLE_LEARNER)){
-							log.debug("Lesson State:"+lesson.getLessonStateId());
-							if(lesson.getLessonStateId().equals(lesson.STARTED_STATE)||lesson.getLessonStateId().equals(lesson.FINISHED_STATE)){
-								lessonLinks.add(new IndexLinkBean("label.export.portfolio","javascript:openExportPortfolio("+lesson.getLessonId()+")"));
-							}
-						}
-					}
-					if(lessonLinks.size()>0 || url!=null){
-						IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), 
-								lesson.getLessonDescription(), 
-								url,
-								lesson.getLessonStateId(),
-								lessonLinks);
-						lessonBeans.add(lessonBean);
-					}
-				}
-			}
+		
+		// set lesson beans
+		List<IndexLessonBean> lessonBeans = null;
+		try {
+			lessonBeans = getLessonBeans(user.getUserId(), org.getOrganisationId(), roles, org.getOrderedLessonIds());
+		} catch (Exception e) {
+			log.error("Failed retrieving user's lessons from database: " + e, e);
 		}
-		Collections.sort(lessonBeans);
 		orgBean.setLessons(lessonBeans);
 
+		// create subgroup beans
 		if(orgBean.getType().equals(OrganisationType.COURSE_TYPE)){
 			Set<Organisation> children = org.getChildOrganisations();
 
@@ -189,9 +168,91 @@ public class DisplayGroupAction extends Action {
 		}
 		return orgBean;
 	}
-
-	private boolean isInLesson(User user, Lesson lesson) {
-		return lesson.getLessonClass().isStaffMember(user)||lesson.getLessonClass().getLearners().contains(user);
+	
+	// get lesson beans and sort them
+	private List<IndexLessonBean> getLessonBeans(Integer userId, Integer orgId, List<Integer> roles, String orderedLessonIds) 
+		throws SQLException, NamingException {
+		Map<Long, IndexLessonBean> map = populateLessonBeans(userId, orgId, roles);
+		ArrayList<IndexLessonBean> orderedList = new ArrayList<IndexLessonBean>();
+		
+		if (orderedLessonIds != null) {
+			List<String> idList = Arrays.asList(orderedLessonIds.split(","));
+		
+			// sort mapped lesson beans according to orderedLessonIds
+			for (String idString : idList) {
+				try {
+					Long id = new Long(Long.parseLong(idString));
+					if (map.containsKey(id)) {
+						orderedList.add(map.get(id));
+						map.remove(id);
+					}
+				} catch (NumberFormatException e) {
+					continue;
+				}
+			}
+		}
+		
+		// append lesson beans not mentioned in orderedLessonIds
+		if (!map.values().isEmpty()) {
+			orderedList.addAll(map.values());
+		}
+		
+		return orderedList;
+	}
+	
+	// create lesson beans
+	private Map<Long, IndexLessonBean> populateLessonBeans(Integer userId, Integer orgId, List<Integer> roles) 
+		throws SQLException, NamingException {
+		
+		// iterate through user's lessons where they are learner
+		Map<Long, IndexLessonBean> map = getLessonsByOrgAndUser(userId, orgId, false);
+		for (IndexLessonBean bean : map.values()) {
+			List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
+			String url = null;
+			Integer lessonStateId = bean.getState();
+			if (stateId.equals(OrganisationState.ACTIVE)) {
+				if (contains(roles, Role.ROLE_LEARNER)) {
+					if (lessonStateId.equals(Lesson.STARTED_STATE) || lessonStateId.equals(Lesson.FINISHED_STATE)) {
+						url = "javascript:openLearner("+bean.getId()+")";
+					}
+				}
+			} else if (stateId.equals(OrganisationState.ARCHIVED)) {
+				if (contains(roles, Role.ROLE_LEARNER)) {
+					if (lessonStateId.equals(Lesson.STARTED_STATE) || lessonStateId.equals(Lesson.FINISHED_STATE)) {
+						lessonLinks.add(new IndexLinkBean("label.export.portfolio","javascript:openExportPortfolio("+bean.getId()+")"));
+					}
+				}
+			}
+			if (lessonLinks.size()>0 || url!=null) {
+				bean.setUrl(url);
+				bean.setLinks(lessonLinks);
+			}
+		}
+		
+		// iterate through user's lessons where they are staff, and add staff links to the beans in the map.
+		Map<Long, IndexLessonBean> staffMap = getLessonsByOrgAndUser(userId, orgId, true);
+		for (IndexLessonBean bean : staffMap.values()) {
+			if (map.containsKey(bean.getId())) {
+				bean = map.get(bean.getId());
+			}
+			List<IndexLinkBean> lessonLinks = bean.getLinks();
+			if (lessonLinks == null) lessonLinks = new ArrayList<IndexLinkBean>();
+			if (stateId.equals(OrganisationState.ACTIVE)) {
+				if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR)){
+					lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + bean.getId()+")"));
+				}
+			} else if (stateId.equals(OrganisationState.ARCHIVED)) {
+				if (contains(roles, Role.ROLE_GROUP_MANAGER)) {
+					lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + bean.getId()+")"));
+				}
+			}
+			if (lessonLinks.size() > 0) {
+				bean.setLinks(lessonLinks);
+			}
+			map.put(bean.getId(), bean);
+		}
+		
+		return map;
 	}
 
 	private boolean contains(List<Integer> roles, Integer roleId) {
@@ -208,6 +269,56 @@ public class DisplayGroupAction extends Action {
 			service = (IUserManagementService) ctx.getBean("userManagementService");
 		}
 		return service;
+	}
+	
+	// get lesson beans where user is learner (if isStaff=true, gets lessons where user is staff)
+	private Map<Long, IndexLessonBean> getLessonsByOrgAndUser(Integer userId, Integer orgId, boolean isStaff) 
+		throws SQLException, NamingException {
+		String learnerQuery = "select l.lesson_id, l.name, l.description, l.lesson_state_id "
+			+ " from lams_lesson l, lams_learning_design ld, lams_group g, lams_user_group ug, lams_grouping gi"
+			+ " where l.learning_design_id=ld.learning_design_id"
+			+ " and ld.copy_type_id!=" + LearningDesign.COPY_TYPE_PREVIEW
+			+ " and l.organisation_id=?"
+			+ " and l.class_grouping_id=g.grouping_id"
+			+ " and l.lesson_state_id!=" + Lesson.REMOVED_STATE
+			+ " and ug.group_id=g.group_id"
+			+ " and ug.user_id=?"
+			+ " and gi.grouping_id=g.grouping_id"
+			+ " and g.group_id" + (isStaff ? "" : "!") + "=gi.staff_group_id";
+		
+		InitialContext ctx = new InitialContext();
+		DataSource ds = (DataSource) ctx.lookup("java:/jdbc/lams-ds");
+		Connection conn = null;
+		
+		HashMap<Long, IndexLessonBean> map = new HashMap<Long, IndexLessonBean>();
+		
+		try {
+			conn = ds.getConnection();
+			PreparedStatement ps = conn.prepareStatement(learnerQuery);
+			ps.setInt(1, orgId.intValue());
+			ps.setInt(2, userId.intValue());
+			ResultSet rs = ps.executeQuery();
+
+			// check if there is any result
+			while (rs.next() != false) {
+				long id = rs.getLong(1);
+				String name = rs.getString(2);
+				String description = rs.getString(3);
+				int state = rs.getInt(4);
+				IndexLessonBean bean = new IndexLessonBean(
+					new Long(id), name, description, new Integer(state)
+				);
+				map.put(new Long(id), bean);
+			}
+
+			rs.close();
+		} finally {
+			if (conn != null && !conn.isClosed()) {
+				conn.close();
+			}
+		}
+		
+		return map;
 	}
 }
  

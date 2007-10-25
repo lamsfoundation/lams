@@ -228,6 +228,7 @@ CREATE TABLE lams_organisation (
      , admin_create_guest TINYINT(1) NOT NULL DEFAULT 0
      , locale_id INTEGER
      , archived_date DATETIME
+     , ordered_lesson_ids TEXT
      , PRIMARY KEY (organisation_id)
      , INDEX (organisation_type_id)
      , CONSTRAINT FK_lams_organisation_1 FOREIGN KEY (organisation_type_id)
@@ -241,7 +242,12 @@ CREATE TABLE lams_organisation (
      , INDEX (organisation_state_id)
      , CONSTRAINT FK_lams_organisation_4 FOREIGN KEY (organisation_state_id)
                   REFERENCES lams_organisation_state (organisation_state_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (locale_id)
+     , CONSTRAINT FK_lams_organisation_5 FOREIGN KEY (locale_id)
+                  REFERENCES lams_supported_locale (locale_id)
 )TYPE=InnoDB;
+
+
 
 CREATE TABLE lams_css_theme_ve (
        theme_ve_id BIGINT(20) NOT NULL AUTO_INCREMENT
