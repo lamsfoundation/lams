@@ -35,31 +35,7 @@
 			<c:if test="${empty tab}">
 				jQuery(document).ready(function(){
 					jQuery("div.j-display-group").each(function(){
-						jQuery(this).load("displayGroup.do", {stateId: 1, orgId: this.id}, function() {
-								jQuery("ul.j-lessons", this).Sortable({
-									accept: "j-single-lesson", 
-									// containment: "parent",
-									onStop: function s() {
-										// serial = $.SortSerialize(jQuery(this).parent().attr("id"));
-										// $.get("servlet/saveLessonOrder", { ids: serial.hash } );
-										var ids = [];
-										jQuery(this).parent().children("p").each(function(i, element) {
-											ids.push(element.id);
-										});
-										$.ajax({
-											url: "servlet/saveLessonOrder",
-											data: {orgId: jQuery(this).parent().attr("id"), 
-												ids: ids.join(",")
-											},
-											error: function(a,b) {
-												refresh();
-											}
-										});
-									}
-								});
-								
-							}
-						);
+						jQuery(this).load("displayGroup.do", {stateId: 1, orgId: this.id});
 					});
 					jQuery("body").click(function(event) {
 						if (jQuery(event.target).is("a.j-group-header")){
@@ -68,6 +44,28 @@
 						}
 					});
 				});
+				
+				function makeSortable(element) {
+					jQuery(element).Sortable({
+						accept: "j-single-lesson", 
+						// containment: "parent",
+						onStop: function s() {
+							var ids = [];
+							jQuery(this).parent().children("p").each(function(i, element) {
+								ids.push(element.id);
+							});
+							$.ajax({
+								url: "servlet/saveLessonOrder",
+								data: {orgId: jQuery(this).parent().attr("id"), 
+									ids: ids.join(",")
+								},
+								error: function(a,b) {
+									refresh();
+								}
+							});
+						}
+					});
+				}
 			</c:if>
 								
 			function refresh(){

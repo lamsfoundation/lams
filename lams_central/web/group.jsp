@@ -24,7 +24,7 @@
 		<div class="j-course-contents">
 		
 		<div class="sequence-name">
-			<ul id="<c:out value="${orgBean.id}"/>" class="j-lessons"><c:forEach var="lesson" items="${orgBean.lessons}">
+			<div id="<c:out value="${orgBean.id}"/>" class="j-lessons"><c:forEach var="lesson" items="${orgBean.lessons}">
 				<p id="<c:out value="${lesson.id}"/>" class="j-single-lesson">
 					<c:if test="${empty lesson.url}">
 						<a class="disabled-sequence-name-link"> <c:out value="${lesson.name}" /></a> 
@@ -42,7 +42,7 @@
 						</a>
 					</c:forEach>
 				</p>
-			</c:forEach></ul>
+			</c:forEach></div>
 		</div>
 		
 		<c:forEach var="childOrg" items="${orgBean.childIndexOrgBeans}">
@@ -87,5 +87,10 @@
 		
 		</div>
 	</div>
+	<c:if test="${allowSorting}">
+	<script language="javascript" type="text/javascript">
+		makeSortable(jQuery("#<c:out value="${orgBean.id}"/>"));
+	</script>
+	</c:if>
 </c:if>
 
