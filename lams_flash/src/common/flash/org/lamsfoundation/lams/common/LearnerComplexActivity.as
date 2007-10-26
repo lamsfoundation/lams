@@ -26,9 +26,11 @@ import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.authoring.Activity;
+import org.lamsfoundation.lams.authoring.SequenceActivity;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.authoring.cv.ICanvasActivity;
 import org.lamsfoundation.lams.learner.ls.LessonController;
+import org.lamsfoundation.lams.learner.Application;
 import org.lamsfoundation.lams.monitoring.mv.MonitorController;
 import org.lamsfoundation.lams.common.style. *;
 import mx.controls. *;
@@ -81,40 +83,45 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	var children_mc:Array
 	//---------------------------//
 	
-	private var child_mc : MovieClip;
-	private var _visibleHeight : Number;
-	private var _visibleWidth : Number;
+	private var child_mc:MovieClip;
+	private var _visibleHeight:Number;
+	private var _visibleWidth:Number;
 	
-	private var _tm : ThemeManager;
-	private var _ddm : DesignDataModel;
+	private var _tm:ThemeManager;
+	private var _ddm:DesignDataModel;
 	private var app:ApplicationParent;
 	
-	function LearnerComplexActivity ()
-	{
-		complexActivity_mc = this
-		_ddm = new DesignDataModel ();
+	private var activeSequence:SequenceActivity;
+	
+	function LearnerComplexActivity () {
+		complexActivity_mc = this;
+		activeSequence = null;
+		
+		_ddm = new DesignDataModel();
 		app = ApplicationParent.getInstance();
+	
 		_visible = false;
+		
 		_tm = ThemeManager.getInstance ();
 		_tip = new ToolTip();
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
 		
-		MovieClipUtils.doLater (Proxy.create (this, init));
+		MovieClipUtils.doLater(Proxy.create (this, init));
 	}
 	
-	public function init () : Void
-	{
+	public function init():Void {
 		var styleObj = _tm.getStyleObject('smallLabel');
 		title_lbl = labelHolder_mc.attachMovie("Label", "actTitle", this.getNextHighestDepth(), {_width:LABEL_W, _height:LABEL_H, autoSize:"center", styleName:styleObj});
 		
-
 		children_mc = new Array();
 		var childrenArray:Array;
 		
 		childActivities_mc = this;
+		
 		_locked = false;
 		showStatus(false);
+		
 		clickTarget_mc.onRollOver = Proxy.create(this, localOnRollOver);
 		clickTarget_mc.onRollOut = Proxy.create(this, localOnRollOut);
 		clickTarget_mc.onPress = Proxy.create(this, localOnPress);
@@ -125,78 +132,135 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		if(_activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 			if(_children[0].orderID < _children[1].orderID){
 				childrenArray = orderParallelActivities(_children[0],_children[1]);
-			}else{
+			} else {
 				childrenArray = orderParallelActivities(_children[1],_children[0]);
 			}
 		} else {
 			childrenArray = _children;
 		}
-		var childCoordY = 0
-		for (var i = 0; i < childrenArray.length; i ++)
-		{
-			var progStatus:String = Progress.compareProgressData(learner, childrenArray[i].activityID);
-			
-			children_mc [i] = childHolder_mc.attachMovie("LearnerActivity_forComplex", "LearnerActivity_forComplex"+i, childHolder_mc.getNextHighestDepth(), {_activity:childrenArray[i], _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _complex:true, xPos:this._x, yPos:childCoordY});
-			Debugger.log('attaching child movieL ' + children_mc[i],Debugger.CRITICAL,'init','LearnerComplexActivity');
-        
-			//set the positioning co-ords
-			children_mc [i]._y = (i*21);
-			childCoordY = this._y + ((i+1)*21)+29 ;
-			children_mc [i]._visible = true;
-			
-		}
+		
+		drawChildren(childrenArray, children_mc);
+		checkIfSequenceActive();
 		
 		childHolder_mc._visible = false;
 		
-		MovieClipUtils.doLater (Proxy.create (this, draw));
+		MovieClipUtils.doLater(Proxy.create(this, draw));
 	}
 	
-	private function showStatus(isVisible:Boolean){
+	private function drawChildren(children:Array, container:Array):Void {
+		var childCoordY=0;
+		
+		for(var i=0; i<children.length; i++) {
+			var progStatus:String = Progress.compareProgressData(learner, children[i].activityID);
+			
+			container[i] = childHolder_mc.attachMovie("LearnerActivity_forComplex", "LearnerActivity_forComplex"+i, childHolder_mc.getNextHighestDepth(), {_activity:children[i], _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _complex:true, xPos:this._x, yPos:childCoordY});
+			Debugger.log('attaching child movieL ' + container[i],Debugger.CRITICAL,'drawChildren','LearnerComplexActivity');
+        
+			var parentAct:Activity = Application(app).getLesson().model.learningDesignModel.getActivityByUIID(Activity(children[i]).parentUIID);
+			
+			//set the positioning co-ords
+			container[i]._y = (i*21);
+			childCoordY = this._y + ((i+1)*21)+29 ;
+			container[i]._visible = true;
+			
+			if(activity.isBranchingActivity() && parentAct.isSequenceActivity()) {
+				/** TODO: Use for Sequence in Optional */
+				container[i].lineTopVisible = (i != 0) ? false : true;
+				container[i].lineBottomVisible = (i == children.length-1) ? true : false;
+			}
+		}
+		
+	}
+	
+	private function showStatus(isVisible:Boolean) {
 		completed_mc._visible = isVisible;
 		current_mc._visible = isVisible;
 		attempted_mc._visible = isVisible;
 		todo_mc._visible = isVisible;
-		
 	}
 	
-	public function get activity () : Activity
-	{
-		return getActivity ();
+	public function get activity():Activity {
+		return getActivity();
 	}
 	
-	public function set activity (a : Activity)
-	{
-		setActivity (a);
+	public function set activity(a:Activity) {
+		setActivity(a);
 	}
 	
-	public function getActivity () : Activity
-	{
+	public function getActivity():Activity {
 		return _activity;
 	}
 	
-	public function setActivity (a : Activity)
-	{
+	public function setActivity(a:Activity) {
 		_activity = a;
 	}
 	
-	public function refresh(){
+	public function refresh() {
 		showStatus(false);
 		learner = controller.getModel().progressData;
 		actStatus = null;
 		
-		for(var i=0; i<children_mc.length;i++){
-			children_mc[i].refresh();
-		}
+		checkIfSequenceActive();
 		
 		draw();
 	}
 	
+	/** TODO: Use for Sequence in Optional */
+	private function checkIfSequenceActive():Void {
+		/**for(var i=0; i<_children.length; i++) {
+			if(_children[i] == activeSequence
+				&& Progress.compareProgressData(learner, _children[i].activityID) == 'completed_mc')
+				
+		}*/
+		
+		for(var i=0; i<children_mc.length; i++) {
+			children_mc[i].refresh();
+	
+			/**if(activity.isBranchingActivity() 
+				&& children_mc[i].activity.isSequenceActivity() 
+				&& (children_mc[i].isAttempted || children_mc[i].isCompleted)) 
+				removeAllChildrenAndInputSequence(SequenceActivity(children_mc[i].activity));*/
+		
+		}
+	}
+	
+	private function removeAllChildren():Void {
+		for(var i=0; i<children_mc.length;i++){
+			children_mc[i].removeMovieClip();
+		}
+	}
+	
+	/** TODO: Use for Sequence in Optional */
+	private function removeAllChildrenAndLoadSequences(activity:Activity):Void {
+		activeSequence = null;
+		children_mc = new Array();
+		
+		removeAllChildren();
+		drawChildren(_children, children_mc);
+		
+		MovieClipUtils.doLater(Proxy.create(this, draw));
+	}
+	
+	/** TODO: Use for Sequence in Optional */
+	private function removeAllChildrenAndInputSequence(activity:SequenceActivity):Void {
+		activeSequence = activity;
+		children_mc = new Array();
+		
+		var actOrder:Array = Application(app).getLesson().model.getDesignOrder(activity.firstActivityUIID);
+		
+		removeAllChildren();
+		drawChildren(actOrder, children_mc);
+		
+		MovieClipUtils.doLater(Proxy.create(this, draw));
+	}
+	
 	private function hasCurrentChild(){
 		for(var i=0; i<children_mc.length;i++){
-			if(children_mc[i].activityStatus == 'current_mc'){
+			if(children_mc[i].isCurrent){
 				return true;
 			}
 		}
+		
 		return false;
 	}
 	
@@ -214,43 +278,31 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 				current_mc._visible = true;
                 break;
             case 'attempted_mc' :
-			if(_root.mode == 'preview'){  
-				if(hasCurrentChild()){current_mc._visible = true; } 
-				else { attempted_mc._visible = true; } }
-			else {current_mc._visible = true; }
+				if(_root.mode == 'preview'){  
+					if(hasCurrentChild()) { current_mc._visible = true; } 
+					else { attempted_mc._visible = true; } }
+				else { current_mc._visible = true; }
                 break;
 			default :
 				todo_mc._visible = true;
-                //Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
 		}
 		
-		var numOfChildren = _children.length;
+		var numOfChildren:Number = children_mc.length;
 		panelHeight = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
 
 		//write text
-		//if(_activity.title != undefined){
 		toolTitle = _activity.title
 		if (toolTitle.length > 19){
 			toolTitle = toolTitle.substr(0, 17)+"..."
 		}
-		//} 
-		//else {
-			//if(_activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
-				//title_lbl.text = 'Optional Activities';
-				//containerPanelHeader.title_lbl.text = 'Optional Activities';
-			//} else {
-				//title_lbl.text = 'Parallel Activities';
-				//containerPanelHeader.title_lbl.text = 'Parallel Activities';
-			//}
-		//}
+		
 		title_lbl.text = toolTitle;
 		containerPanelHeader.title_lbl.text = toolTitle;
-		container_pnl.setStyle ("backgroundColor", 0x4289FF);
+		container_pnl.setStyle("backgroundColor", 0x4289FF);
 		
 		//position the container (this)
-		container_pnl._height = 16+(numOfChildren * 21);
+		container_pnl._height = 16 + (numOfChildren * 21);
 		
-		Debugger.log ("I am in Draw :" + _activity.title + 'uiID:' + _activity.activityUIID + ' children:' + _children.length, Debugger.GEN, 'Draw', 'LearnerOptionalActivity');
 		_visible = true;
 		
 	}
@@ -260,12 +312,13 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		var Xpos = appData.compX+ this._x - 10;
 		var Ypos = appData.compY+( (this._y+btnObj._height)-4);
 		var ttHolder = appData.ttHolder;
-		trace("x pos: "+Xpos+" and y pos: "+Ypos+" and tt holder is: "+ttHolder)
+		
 		if (btnTT == undefined || btnTT == null || btnTT == "" || btnTT == "undefined"){
 			var ttMessage = "<b>"+ _activity.title+"</b>"
 		}else {
 			var ttMessage = "<b>"+ _activity.title+"</b> \n"+Dictionary.getValue(btnTT);
 		}
+		
 		var ttWidth = 140;
 		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos, undefined, ttWidth);
 		
@@ -276,14 +329,14 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	}
 	
 	private function localOnRollOver(){
-		if (actStatus == "completed_mc"){
+		if(isCompleted){
 			showToolTip(this.clickTarget_mc, "completed_act_tooltip");
-		}else if (actStatus == "current_mc"){
+		} else if(isCurrent){
 			showToolTip(this.clickTarget_mc, "current_act_tooltip");
-		}else if (actStatus == "attempted_mc"){
+		} else if(isAttempted){
 			showToolTip(this.clickTarget_mc, "current_act_tooltip");
-		}else {
-			if (String(_activity.title).length > 19){
+		} else {
+			if(String(_activity.title).length > 19){
 				showToolTip(this.clickTarget_mc, "undefined");
 			}
 		}
@@ -291,26 +344,29 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	}
 	
 	private function localOnRollOut(){
-		
 		hideToolTip();
 	}
 
 	private function localOnPress():Void{
 		hideToolTip();
+		
 		this.swapDepths(this._parent.getNextHighestDepth());
 		// check double-click
+		
 		var now : Number = new Date ().getTime ();
 		if ((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY)	{
 			Debugger.log ('DoubleClicking:' + this, Debugger.GEN, 'localOnPress', 'LearnerOptionalActivity');
 			_doubleClicking = true;
+			
 			//if we double click on the glass mask - then open the container to allow the usr to see the activities inside.
 			draw ();
 			controller.activityDoubleClick(this);
 		
-		}else {
+		} else {
 			Debugger.log ('SingleClicking:+' + this, Debugger.GEN, 'localOnPress', 'LearnerOptionalActivity');
 			_doubleClicking = false;
 		}
+		
 		_dcStartTime = now;
 	}
 	
@@ -320,11 +376,9 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			if (_locked && !_doubleClicking){
 				collapse();
 				controller.complexActivityRelease(this, _doubleClicking);
-				
 			} else {
 				expand();
 				controller.complexActivityRelease(this,_doubleClicking);
-				
 			}
 	}
 	
@@ -420,7 +474,20 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	public function get panelHeight():Number {
 		return _panelHeight;
 	}
+	
 	public function setSelected(isSelected) {
+	
 	}
-
+	
+	public function get isCurrent():Boolean {
+		return (actStatus == 'current_mc');
+	}
+	
+	public function get isCompleted():Boolean {
+		return (actStatus == 'completed_mc');
+	}
+	
+	public function get isAttempted():Boolean {
+		return (actStatus == 'attempted_mc');
+	}
 }

@@ -94,7 +94,6 @@ class Application extends ApplicationParent {
 	private var _tooltipContainer_mc:MovieClip;        //Tooltip container
     private var _debugDialog:MovieClip;                //Reference to the debug dialog
 
-
 	/**
     * Application - Constructor
     */
@@ -106,7 +105,6 @@ class Application extends ApplicationParent {
 		_scratchpadLoaded = false;
 		
 		_module = Application.MODULE;
- 
     }
     
 	/**
@@ -116,6 +114,7 @@ class Application extends ApplicationParent {
         if(Application._instance == null){
             Application._instance = new Application();
         }
+		
         return Application._instance;
     }
 
@@ -138,7 +137,6 @@ class Application extends ApplicationParent {
         //Assign the config load event to
         _config.addEventListener('load',Delegate.create(this,configLoaded));
         
-		
 		Key.addListener(this);
 
     }
@@ -165,14 +163,13 @@ class Application extends ApplicationParent {
         _dictionary = Dictionary.getInstance();
         _dictionary.addEventListener('load',Delegate.create(this,onDictionaryLoad));
 		_dictionary.load(language);
-        
-		
 		
         //Set reference to StyleManager and load Themes and setup load handler.
         var theme:String = String(_config.getItem('theme'));
         _themeManager = ThemeManager.getInstance();
         _themeManager.addEventListener('load',Delegate.create(this,onThemeLoad));
         _themeManager.loadTheme(theme);
+		
 		Debugger.getInstance().crashDumpSeverityLevel = Number(_config.getItem('crashDumpSeverityLevelLog'));
 		Debugger.getInstance().severityLevel = Number(_config.getItem('severityLevelLog')); 
 		
@@ -193,13 +190,10 @@ class Application extends ApplicationParent {
 				
 				setupUI();
 				checkUILoaded();
-				
         
 			} else if(_dataLoadCheckCount >= DATA_LOAD_CHECK_TIMEOUT_COUNT) {
 				Debugger.log('reached timeout waiting for data to load.',Debugger.CRITICAL,'checkDataLoaded','Application');
 				clearInterval(_DataLoadCheckIntervalID);
-				
-        
 			}
 		}
 	}
@@ -314,8 +308,6 @@ class Application extends ApplicationParent {
 		Header(_header_mc).resize(w);
 		
 		_lesson.setSize(w,h-(LESSON_Y+_lesson.model.getSpadHeight()));
-		//Property Inspector
-		//_pi_mc.setSize(w-_toolkit.width,_pi_mc._height)
 		_scratchpad_mc._y = h - _lesson.model.getSpadHeight();
 		
 	}

@@ -71,12 +71,10 @@ class LessonView extends AbstractView {
 	private static var ACT_X_OFFSET:Number = 65;
 	private var ACT_Y:Number = 32.5;
 	
-	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
     public var removeEventListener:Function;    
-
 
 	/**
 	* Constructor
@@ -151,13 +149,14 @@ class LessonView extends AbstractView {
 			case 'REMOVE_ACTIVITY' :
 				removeActivity(infoObj.data, lm);
 				break;
+			case 'REMOVE_ACTIVITY_ALL' :
+				removeAll(lm);
+				break;
 			case 'LESSON' :
-				trace('setting lesson name');
 				setLessonName(lm.name);
 				Application.getInstance().getHeader().showExportButton(lm.learnerExportAvailable);
 				break;
 			case 'DESIGNMODEL' :
-				trace('updating design model for lesson..');
 				lm.getLesson().finishedDesign = true;
 				break;
 			case 'PROGRESS' :
@@ -165,7 +164,6 @@ class LessonView extends AbstractView {
 				break;
 			case 'PROGRESS_UPDATE' :
 				Debugger.log('progress data receieved for user..' + lm.progressData.getUserName(),Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonView');
-				//removeAll(lm);
 				lm.updateDesign();
 				break;
 			case 'CLOSE_COMPLEX_ACTIVITY' :
@@ -181,6 +179,7 @@ class LessonView extends AbstractView {
 		if (lessonName.length > LESSON_NAME_LENGTH_LIMIT){
 			lessonName = lessonName.substr(0, LESSON_NAME_LENGTH_LIMIT)+STRING_CONT;
 		}
+		
 		Application.getInstance().getHeader().setLessonName(lessonName);
 	}
 	
@@ -199,7 +198,9 @@ class LessonView extends AbstractView {
 		
 	}
 	
-	private function removeAll(lm:LessonModel){
+	public function removeAll(lm:LessonModel){
+		Debugger.log("removin all", Debugger.CRITICAL, "removeAll", "LessonView");
+		
 		var keys = lm.activitiesDisplayed.keys();
 		for(var i=0; i<keys.length; i++){
 			var r = lm.activitiesDisplayed.remove(keys[i]);
@@ -249,23 +250,22 @@ class LessonView extends AbstractView {
 			activityTitle = activityTitle.substr(0,ACT_TITLE_LENGTH_LIMIT) + STRING_CONT;
 		}
 		
-		
 		//take action depending on act type
-		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity() || a.isBranchingActivity()) {
+		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity() || (a.isBranchingActivity() && _root.mode != 'preview')){
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivity", "LearnerActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, actLabel:activityTitle, learner:lm.progressData, _complex:false});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
 			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is tool/gate/group/branching activity',Debugger.CRITICAL,'drawActivity','LessonView');
 		} else if(a.isGateActivity()){
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerGateActivity", "LearnerGateActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, actLabel:activityTitle, learner:lm.progressData, _complex:false});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
-		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE ||  (a.isBranchingActivity() && _root.mode == 'preview')){
 			//get the children
 			var children:Array = lm.learningDesignModel.getComplexActivityChildren(a.activityUIID);
 			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is is parellel (complex) activity',Debugger.CRITICAL,'drawActivity','LessonView');
 		
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerComplexActivity", "LearnerComplexActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_children:children,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, learner:lm.progressData});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
-		}else if(a != null){
+		} else if(a != null){
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, drawing default icon',Debugger.CRITICAL,'drawActivity','LessonView');
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivity", "LearnerActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, actLabel:activityTitle, learner:lm.progressData, _complex:false});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
@@ -306,9 +306,6 @@ class LessonView extends AbstractView {
 		} else {
 			drawActivity(a, lm);
 		}
-		
-		
-		
 		
 		return true;
 	}
@@ -380,7 +377,6 @@ class LessonView extends AbstractView {
         var s:Object = lm.getSize();
         
 		//Size panel
-		trace('lesson view  setting width to '+s.w);
 		bkg_pnl.setSize(s.w,s.h);
 		progress_scp.setSize(s.w, s.h-progress_scp._y)
 	}
@@ -414,6 +410,7 @@ class LessonView extends AbstractView {
 	public function getModel():LessonModel{
 			return LessonModel(model);
 	}
+	
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned
 	 * @usage   
@@ -423,6 +420,7 @@ class LessonView extends AbstractView {
 		var c:Controller = super.getController();
 		return LessonController(c);
 	}
+	
 	/*
     * Returns the default controller for this view.
     */

@@ -185,10 +185,8 @@ class Lesson {
 		lessonModel.setActive();
 		getURL(_root.serverURL + 'learning'+String(pkt)+'?lessonID='+lessonModel.getLessonID(),'contentFrame');
 		
-		
 		// check was successful join
 		getFlashProgress();
-		
 		
 	}  
 	

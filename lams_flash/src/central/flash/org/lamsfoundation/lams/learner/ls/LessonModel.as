@@ -307,7 +307,7 @@ class LessonModel extends Observable {
 		return _active;
 	}
 	
-	private function orderDesign(activity:Activity, order:Array):Void{
+	private function orderDesign(activity:Activity, order:Array):Boolean{
 		Debugger.log("order design activity: " + activity.title, Debugger.CRITICAL, "orderDesign", "LessonModel");
 		
 		order.push(activity);
@@ -321,9 +321,11 @@ class LessonModel extends Observable {
 			for(var i=0; i<children.length; i++) {
 				Debugger.log("progress: " + Progress.compareProgressData(_progressData, children[i].activityID), Debugger.CRITICAL, "orderDesign", "LessonModel");
 				var _progress:String = Progress.compareProgressData(_progressData, children[i].activityID);
-				if((_progress == "attempted_mc" || _progress == "completed_mc") && children[i].isSequenceActivity())
-					orderDesign(Activity(learningDesignModel.activities.get(SequenceActivity(children[i]).firstActivityUIID)), order);
-			
+				if((_progress == "attempted_mc" || _progress == "completed_mc") && children[i].isSequenceActivity()) {
+					if(_root.mode != 'preview') order.pop();
+					if(!orderDesign(Activity(learningDesignModel.activities.get(SequenceActivity(children[i]).firstActivityUIID)), order)) return false;
+					if(children[i].stopAfterActivity) return false;
+				}
 			}
 		}
 		
@@ -333,14 +335,16 @@ class LessonModel extends Observable {
 			
 				if (ddmTransition.fromUIID == activity.activityUIID){
 					var ddm_activity:Activity = learningDesignModel.activities.get(ddmTransition.toUIID);
-					orderDesign(ddm_activity, order);
+					if(!orderDesign(ddm_activity, order)) return false;
 				}
 				
 		}
 		
+		return true;
+		
 	}
 	
-	private function setDesignOrder(){
+	private function setDesignOrder():Array {
 		ddmActivity_keys = learningDesignModel.activities.keys();
 		ddmTransition_keys = learningDesignModel.transitions.keys();
 		
@@ -356,31 +360,15 @@ class LessonModel extends Observable {
 		
 	}
 	
-	/**
-	private function getDesignToInsert():Object {
-		// check if Sequence Activity (Branching Activity child) is current activity
-		var insertObject = new Object();
-		insertObject.array = new Array();
-		insertObject.parent = null;
-		
-		var currentActivity:Activity = _learningDesignModel.getActivityByUIID(getActivityUIID(_progressData.getCurrentActivityId()));
-		
-		Debugger.log("current id: " + _progressData.getCurrentActivityId(), Debugger.CRITICAL, "getDesignToInsert", "LessonModel");
-		Debugger.log("currentActivity: " + currentActivity.activityUIID, Debugger.CRITICAL, "getDesignToInsert", "LessonModel");
-		
-		if(currentActivity.parentUIID != null) {
-			
-			insertObject.parent = _learningDesignModel.getActivityByUIID(currentActivity.parentUIID);
-			Debugger.log("parentActivity: " + insertObject.parent.title, Debugger.CRITICAL, "getDesignToInsert", "LessonModel");
-		
-			if(currentActivity.isSequenceActivity()) {
-				orderDesign(currentActivity, insertObject.array);
-			}
-		}
-		
-		return insertObject;
+	public function getDesignOrder(firstActivityUIID):Array {
+		var orderedActivityArr:Array = new Array();
+		var learnerFirstActivity:Activity = learningDesignModel.activities.get(firstActivityUIID);
+
+		// recursive method to order design
+		orderDesign(learnerFirstActivity, orderedActivityArr);
+		return orderedActivityArr;
 	}
-	*/
+	
 	public function setCurrentActivityOpen(ca:Object){
 		
 		if(_currentActivityOpen != null && ca != null){
@@ -411,9 +399,6 @@ class LessonModel extends Observable {
 	public function drawDesign(){
 		var indexArray:Array = setDesignOrder();
 		
-		//var insertObject:Object = getDesignToInsert(indexArray);
-		//Debugger.log("insert Object array length: " + insertObject.array.length, Debugger.CRITICAL, "updateDesign", "LessonModel");
-		
 		//go through the design and get the activities and transitions 
 		var dataObj:Object;
 		ddmActivity_keys = learningDesignModel.activities.keys();
@@ -427,7 +412,6 @@ class LessonModel extends Observable {
 			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0) {
 				if(_learningDesignModel.getActivityByUIID(ddm_activity.parentUIID).isSequenceActivity())
 					broadcastViewUpdate("DRAW_ACTIVITY", ddm_activity);
-					return;
 			} else {
 				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity);
 			}
@@ -438,8 +422,11 @@ class LessonModel extends Observable {
 	public function updateDesign(){
 		var indexArray:Array = setDesignOrder();
 		
-		if(indexArray.length > activitiesDisplayed.length) {
-			removeAllActivities(indexArray);
+		Debugger.log("indexArray length: " + indexArray.length, Debugger.CRITICAL, "updateDesign", "LessonModel");
+		Debugger.log("activitiesDisplayed length: " + activitiesDisplayed.size(), Debugger.CRITICAL, "updateDesign", "LessonModel");
+		
+		if(indexArray.length > activitiesDisplayed.size()) {
+			broadcastViewUpdate("REMOVE_ACTIVITY_ALL");
 		}
 		
 		//go through the design and get the activities and transitions 
@@ -457,16 +444,9 @@ class LessonModel extends Observable {
 			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
 				if(_learningDesignModel.getActivityByUIID(ddm_activity.parentUIID).isSequenceActivity())
 					broadcastViewUpdate("UPDATE_ACTIVITY",ddm_activity);
-				return;
 			} else {
 				broadcastViewUpdate("UPDATE_ACTIVITY",ddm_activity);
 			}
-		}
-	}
-	
-	private function removeAllActivities(indexArray:Array):Void {
-		for(var i=0; i < indexArray.length; i++) {
-			broadcastViewUpdate("REMOVE_ACTIVITY", _learningDesignModel.getActivityByUIID(indexArray[i].activityUIID));
 		}
 	}
 	

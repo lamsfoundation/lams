@@ -66,6 +66,7 @@ class LearnerActivity extends MovieClip {
 	private var _isSelected:Boolean;
 	private var app:ApplicationParent;
 	private var _tip:ToolTip;
+	
 	//locals
 	private var tooltipTitle:String;
 	private var actStatus:String;
@@ -88,6 +89,9 @@ class LearnerActivity extends MovieClip {
 	private var _base_mc:MovieClip;
 	private var _selected_mc:MovieClip;
 	
+	private var _line_bottom:MovieClip;
+	private var _line_top:MovieClip;
+	
 	private var _complex:Boolean;
 	
 	function LearnerActivity(){
@@ -101,10 +105,11 @@ class LearnerActivity extends MovieClip {
 		if(_activity.isGateActivity()){
 			_visibleHeight = LearnerActivity.GATE_ACTIVITY_HEIGHT;
 			_visibleWidth = LearnerActivity.GATE_ACTIVITY_WIDTH;
-		}else if(_activity.isGroupActivity() || _activity.isBranchingActivity()) {
+		} else if(_activity.isGroupActivity() || _activity.isBranchingActivity()) {
 			_visibleHeight = LearnerActivity.TOOL_ACTIVITY_HEIGHT;
 			_visibleWidth = LearnerActivity.TOOL_ACTIVITY_WIDTH;
 		}
+		
 		//_base_mc = this;
 		//call init if we have passed in the _activity as an initObj in the attach movie,
 		//otherwise wait as the class outside will call it
@@ -379,4 +384,25 @@ class LearnerActivity extends MovieClip {
 	public function get learnerName():String{
 		return learner.getFullName();
 	}
+	
+	public function set lineTopVisible(a:Boolean):Void {
+		_line_top._visible = a;
+	}
+	
+	public function set lineBottomVisible(a:Boolean):Void {
+		_line_bottom._visible = a;
+	}
+	
+	public function get isCurrent():Boolean {
+		return (actStatus == 'current_mc');
+	}
+	
+	public function get isCompleted():Boolean {
+		return (actStatus == 'completed_mc');
+	}
+	
+	public function get isAttempted():Boolean {
+		return (actStatus == 'attempted_mc');
+	}
+	
 }
