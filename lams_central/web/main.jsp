@@ -47,7 +47,8 @@
 				
 				function makeSortable(element) {
 					jQuery(element).Sortable({
-						accept: "j-single-lesson", 
+						accept: "j-single-lesson",
+						axis: "vertically",
 						// containment: "parent",
 						onStop: function s() {
 							var ids = [];
