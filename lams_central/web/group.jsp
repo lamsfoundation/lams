@@ -42,7 +42,7 @@
 						</a>
 					</c:forEach>
 				</p>
-			</c:forEach></div>
+			</c:forEach><p class="j-single-lesson"></p></div>
 		</div>
 		
 		<c:forEach var="childOrg" items="${orgBean.childIndexOrgBeans}">
