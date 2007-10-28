@@ -77,7 +77,7 @@ public class LessonOrderServlet extends HttpServlet {
 				// TODO: remove this validation when the javascript sortable's
 				// containment parameter is working.
 				List<String> idList = Arrays.asList(ids.split(","));
-				Set lessons = org.getLessons();
+				List lessons = service.findByProperty(Lesson.class, "organisation", org);
 				for (String id : idList) {
 					try {
 						Long l = new Long(Long.parseLong(id));
@@ -98,11 +98,13 @@ public class LessonOrderServlet extends HttpServlet {
 		
 	}
 	
-	private boolean contains(Set lessons, Long id) {
-		Iterator it = lessons.iterator();
-		while (it.hasNext()) {
-			Lesson lesson = (Lesson)it.next();
-			if (lesson.getLessonId().equals(id)) return true;
+	private boolean contains(List lessons, Long id) {
+		if (lessons != null) {
+			Iterator it = lessons.iterator();
+			while (it.hasNext()) {
+				Lesson lesson = (Lesson)it.next();
+				if (lesson.getLessonId().equals(id)) return true;
+			}
 		}
 		return false;
 	}
