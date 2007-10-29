@@ -69,6 +69,7 @@ class LessonModel extends Observable {
 	private var _currentActivityOpen:Object;
 	private var _active:Boolean;
 	
+	private var _activeSeq:Array;
 	
 	/**
 	* Constructor.
@@ -82,6 +83,8 @@ class LessonModel extends Observable {
 		
 		ddmActivity_keys = new Array();
 		ddmTransition_keys = new Array();
+		_activeSeq = new Array();
+		
 		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
 	}
 	
@@ -307,10 +310,13 @@ class LessonModel extends Observable {
 		return _active;
 	}
 	
-	private function orderDesign(activity:Activity, order:Array):Boolean{
+	private function orderDesign(activity:Activity, order:Array, backtrack:Boolean):Boolean{
 		Debugger.log("order design activity: " + activity.title, Debugger.CRITICAL, "orderDesign", "LessonModel");
+		if(backtrack == null || backtrack == undefined)
+			backtrack = false;
 		
-		order.push(activity);
+		if(backtrack) order.pop(); 
+		else order.push(activity);
 		
 		if(activity.isBranchingActivity()) {
 			Debugger.log("branching activity found: " + activity.activityUIID, Debugger.CRITICAL, "orderDesign", "LessonModel");
@@ -319,13 +325,7 @@ class LessonModel extends Observable {
 			Debugger.log("seq children length: " + children.length, Debugger.CRITICAL, "orderDesign", "LessonModel");
 		
 			for(var i=0; i<children.length; i++) {
-				Debugger.log("progress: " + Progress.compareProgressData(_progressData, children[i].activityID), Debugger.CRITICAL, "orderDesign", "LessonModel");
-				var _progress:String = Progress.compareProgressData(_progressData, children[i].activityID);
-				if((_progress == "attempted_mc" || _progress == "completed_mc") && children[i].isSequenceActivity()) {
-					if(_root.mode != 'preview') order.pop();
-					if(!orderDesign(Activity(learningDesignModel.activities.get(SequenceActivity(children[i]).firstActivityUIID)), order)) return false;
-					if(children[i].stopAfterActivity) return false;
-				}
+				if(!orderDesignChildren(children, i, order, false)) return false;
 			}
 		}
 		
@@ -333,15 +333,61 @@ class LessonModel extends Observable {
 			var transitionKeyToCheck:Number = ddmTransition_keys[i];
 			var ddmTransition:Transition = learningDesignModel.transitions.get(transitionKeyToCheck);
 			
-				if (ddmTransition.fromUIID == activity.activityUIID){
-					var ddm_activity:Activity = learningDesignModel.activities.get(ddmTransition.toUIID);
-					if(!orderDesign(ddm_activity, order)) return false;
-				}
+			if (ddmTransition.fromUIID == activity.activityUIID){
+				var ddm_activity:Activity = learningDesignModel.activities.get(ddmTransition.toUIID);
+				if(!orderDesign(ddm_activity, order, backtrack)) return false;
+			}
 				
 		}
 		
 		return true;
 		
+	}
+	
+	private function orderDesignChildren(children:Array, i:Number,  order:Array, backtrack:Boolean):Boolean {
+		Debugger.log("progress: " + Progress.compareProgressData(_progressData, children[i].activityID), Debugger.CRITICAL, "orderDesign", "LessonModel");
+		var _progress:String = Progress.compareProgressData(_progressData, children[i].activityID);
+				
+		if((_progress == "attempted_mc" || _progress == "completed_mc") && children[i].isSequenceActivity()) {
+			var firstActivitySeq:Activity = Activity(learningDesignModel.activities.get(SequenceActivity(children[i]).firstActivityUIID));
+			var _progressStr:String = Progress.compareProgressData(_progressData, firstActivitySeq.activityID)
+			
+			if(_root.mode != 'preview') {
+				if(!backtrack) order.pop();
+				
+				if(!orderDesign(firstActivitySeq, order, backtrack)) return false;
+				if(children[i].stopAfterActivity && !backtrack) return false;
+				
+				if(_activeSeq[children[i].parentUIID] == null) {
+					_activeSeq[children[i].parentUIID] = Activity(children[i]);
+					broadcastViewUpdate("REMOVE_ACTIVITY_ALL");
+				}
+				
+			} else {
+				
+				Debugger.log("progress: " + _progressStr + " for id: " + firstActivitySeq.activityID, Debugger.CRITICAL, "orderDesign", "LessonModel");
+			
+				if(_progressStr == "current_mc") {
+					for(var j=i-1; j>=0; j--) {
+						if(!orderDesignChildren(children, j, order, true)) return false;
+					}
+					
+					_activeSeq[children[i].parentUIID] = Activity(children[i]);
+					
+					if(!orderDesign(firstActivitySeq, order, backtrack)) return false;
+					broadcastViewUpdate("REMOVE_ACTIVITY_ALL");
+				}
+						
+				if(_activeSeq[children[i].parentUIID] == Activity(children[i])) {
+					if(!orderDesign(firstActivitySeq, order, backtrack)) return false;
+					if(children[i].stopAfterActivity && !backtrack) return false;
+				}
+				
+			}
+			
+		}
+		
+		return true;
 	}
 	
 	private function setDesignOrder():Array {
