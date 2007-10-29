@@ -39,6 +39,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 	<script language="JavaScript" type="text/JavaScript">
 	<!--
+		
+		// Use for handling popup windows
+  	 	var pWins = new Array();
+  	 	var iWins = 0;
 	
 		var isInternetExplorer = navigator.appName.indexOf("Microsoft") != -1;
 		
@@ -71,11 +75,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		}	
 		
 		function openPopUpFS(args){
-			var params = args.split(",");
+			var params = args.split(",");		
+			var urlparams = args.split("&");
 			
+			var activityID = urlparams[1];
+
 			// assigned the args
 			var url = params[0];
-			var title = params[1];
+			var title = params[1] + "_" + activityID;
 			var h = params[2];
 			var w = params[3];
 			var resize = params[4];
@@ -98,8 +105,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	//		thePopUp.focus();
 			
 	//}else{
-		thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
-	//}
+	//	thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
+	//}		
+			var found = false;
+			
+			for(var i=0; i<pWins.length; i++) {
+				if(pWins[i] != null && !pWins[i].closed && pWins[i].open) {
+					if(pWins[i].name == title) {
+						window.blur();
+						pWins[i].focus();
+						found = true;	
+					}
+				}
+			}
+			
+			if(!found) {
+				pWins[iWins] = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
+				iWins++;
+			}
 		}
 		
 		function closeWindow() {
@@ -110,6 +133,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			} else {
 				window.location.href = "javascript: window.close()";
 			}
+			// close all open windows
+  	 		if(window.closed) {
+  	 			for(var i=0; i<pWins.length; i++) {
+  	 		    	if(pWins[i] != null && !pWins[i].closed) {
+  	 		        	pWins[i].close();
+  	 		        }
+  	 		    }
+  	 		}
 		}
 		
 		function closeWindowRefresh() {

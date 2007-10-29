@@ -20,7 +20,8 @@
 		function closeAllChildren(){
 			if (authorWin && !authorWin.closed) authorWin.closeWindow();
 			if (learnWin && !learnWin.closed) learnWin.close();
-			if (monitorLessonWin && !monitorLessonWin.closed) monitorLessonWin.close();
+			//if (monitorLessonWin && !monitorLessonWin.closed) monitorLessonWin.close();
+			if (monitorLessonWin && !monitorLessonWin.closed) monitorLessonWin.closeWindow();
 			if (addLessonWin && !addLessonWin.closed) addLessonWin.close();
 			if (epWin && !epWin.closed) epWin.close();
 			if (sysadminWin && !sysadminWin.closed) sysadminWin.close();
