@@ -49,7 +49,10 @@
 					jQuery(element).Sortable({
 						accept: "j-single-lesson",
 						axis: "vertically",
-						// containment: "parent",
+						containment: [jQuery(element).offset().left,
+							jQuery(element).offset().top,
+							jQuery(element).width(),
+							jQuery(element).height()],
 						onStop: function s() {
 							var ids = [];
 							jQuery(this).parent().children("p").each(function(i, element) {

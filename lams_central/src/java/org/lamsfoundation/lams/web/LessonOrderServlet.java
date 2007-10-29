@@ -26,9 +26,7 @@ package org.lamsfoundation.lams.web;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -36,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -70,25 +67,7 @@ public class LessonOrderServlet extends HttpServlet {
 		if (orgId != null && ids != null) {
 			Organisation org = (Organisation)service.findById(Organisation.class, orgId);
 						
-			if (org != null) {
-				// verify the ids are lessons that belong to orgId;
-				// necessary since javascript on index page doesn't restrict
-				// where user drops a lesson when sorting.
-				// TODO: remove this validation when the javascript sortable's
-				// containment parameter is working.
-				List<String> idList = Arrays.asList(ids.split(","));
-				List lessons = service.findByProperty(Lesson.class, "organisation", org);
-				for (String id : idList) {
-					try {
-						Long l = new Long(Long.parseLong(id));
-						if (!contains(lessons, l)) {
-							response.sendError(HttpServletResponse.SC_FORBIDDEN);
-						}
-					} catch(NumberFormatException e) {
-						continue;
-					}
-				}
-					
+			if (org != null) {					
 				String oldIds = org.getOrderedLessonIds();
 				String updatedIds = mergeLessonIds((oldIds!=null ? oldIds : ""), ids);
 				org.setOrderedLessonIds(updatedIds);
@@ -96,17 +75,6 @@ public class LessonOrderServlet extends HttpServlet {
 			}
 		}
 		
-	}
-	
-	private boolean contains(List lessons, Long id) {
-		if (lessons != null) {
-			Iterator it = lessons.iterator();
-			while (it.hasNext()) {
-				Lesson lesson = (Lesson)it.next();
-				if (lesson.getLessonId().equals(id)) return true;
-			}
-		}
-		return false;
 	}
 	
 	// take the updated list and insert elements of the old list that don't exist in it;
