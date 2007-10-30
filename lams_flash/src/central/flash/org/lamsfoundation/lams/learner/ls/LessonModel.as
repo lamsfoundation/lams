@@ -325,7 +325,10 @@ class LessonModel extends Observable {
 			Debugger.log("seq children length: " + children.length, Debugger.CRITICAL, "orderDesign", "LessonModel");
 		
 			for(var i=0; i<children.length; i++) {
-				if(!orderDesignChildren(children, i, order, false)) return false;
+				if(!orderDesignChildren(children, i, order, false)) {
+					broadcastViewUpdate("REMOVE_ACTIVITY_ALL");
+					return false;
+				}
 			}
 		}
 		
@@ -355,13 +358,13 @@ class LessonModel extends Observable {
 			if(_root.mode != 'preview') {
 				if(!backtrack) order.pop();
 				
-				if(!orderDesign(firstActivitySeq, order, backtrack)) return false;
-				if(children[i].stopAfterActivity && !backtrack) return false;
-				
-				if(_activeSeq[children[i].parentUIID] == null) {
+				if(_activeSeq[children[i].parentUIID] == null && _progressStr == "current_mc") {
 					_activeSeq[children[i].parentUIID] = Activity(children[i]);
 					broadcastViewUpdate("REMOVE_ACTIVITY_ALL");
 				}
+				
+				if(!orderDesign(firstActivitySeq, order, backtrack)) return false;
+				if(children[i].stopAfterActivity && !backtrack) return false;
 				
 			} else {
 				
