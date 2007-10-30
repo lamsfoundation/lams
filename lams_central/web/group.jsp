@@ -62,8 +62,8 @@
 			</p>
 			
 			<div class="sequence-name">
-				<c:forEach var="childLesson" items="${childOrg.lessons}">
-					<p>
+				<div id="<c:out value="${childOrg.id}"/>" class="j-lessons"><c:forEach var="childLesson" items="${childOrg.lessons}">
+					<p id="<c:out value="${childLesson.id}"/>" class="j-single-lesson">
 						<c:if test="${empty childLesson.url}">
 							<a class="disabled-sequence-name-link"> <c:out value="${childLesson.name}" /></a>
 							<c:if test="${childLesson.state eq 4}">&nbsp;(<fmt:message key="label.disabled"/>)</c:if>
@@ -80,9 +80,12 @@
 						</a>
 						</c:forEach>
 					</p>
-				</c:forEach>
+				</c:forEach></div>
 			</div>
 		</div>
+		<script language="javascript" type="text/javascript">
+			makeSortable(jQuery("#<c:out value="${childOrg.id}"/>"));
+		</script>
 		</c:forEach>
 		
 		</div>

@@ -28,7 +28,8 @@
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-1.2.1.min.js"></script>
+	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-1.1.4.pack.js"></script>
+	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery.dimensions.pack.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/interface.js"></script>
 	<script language="javascript" type="text/javascript">
 		<!--
