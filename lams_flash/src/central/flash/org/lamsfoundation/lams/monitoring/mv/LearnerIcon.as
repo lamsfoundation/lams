@@ -56,7 +56,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	private var app:ApplicationParent;
 	
 	//locals
-	private var toolTip:MovieClip;
+	private var toolTip:ToolTip;
 	private var learnerOffset_X:Number
 	private var learnerOffset_Y:Number
 	private var click_mc:MovieClip;
@@ -76,6 +76,8 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	function LearnerIcon(){
 		//Debugger.log("_activity:"+_activity.title,4,'Constructor','CanvasActivity');
 		_tm = ThemeManager.getInstance();
+		toolTip = new ToolTip();
+		
 		//Get reference to application and design data model
 		app = ApplicationParent.getInstance();
 		//let it wait one frame to set up the components.
@@ -124,8 +126,25 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 
 	}
 	
+	public function showToolTip():Void{
+			
+		var ttHolder = this;
+		var ttMessage = learner.getFullName();
+		
+		var ttWidth = StringUtils.getButtonWidthForStr(ttMessage);
+		
+		toolTip.DisplayToolTip(ttHolder, ttMessage, -5, -10, undefined, ttWidth);
+		
+	}
+	
+	public function hideToolTip():Void{
+		toolTip.CloseToolTip();
+	}
+	
 	private function showAssets(isVisible:Boolean){
-		toolTip._visible = isVisible;
+		//toolTip._visible = isVisible;
+		if(isVisible) showToolTip();
+		else hideToolTip();
 	}
 	
 	/**
@@ -140,7 +159,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 				
 		Debugger.log('Learner is in Activity: '+_activity.title,4,'draw','LearnerIcon');
 		setStyles();
-		toolTip.text = learner.getFullName();
+		//toolTip.text = learner.getFullName();
 
 		Debugger.log('hasPlus: '+ _hasPlus,Debugger.CRITICAL,'draw','CanvasActivity');
 		smallCross._visible = _hasPlus;
@@ -179,11 +198,13 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	}
 	
 	private function localOnRollOver():Void{
-		toolTip._visible = true;
+		//toolTip._visible = true;
+		showAssets(true);
 	}
 	
 	private function localOnRollOut():Void{
-		toolTip._visible = false;
+		//toolTip._visible = false;
+		showAssets(false);
 	}
 	
 	
@@ -197,7 +218,8 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	
 	private function localOnReleaseOutside():Void{
 		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
-		toolTip._visible = false;
+		//toolTip._visible = false;
+		showAssets(false);
 		_monitorController.activityRelease(_clone_mc, "LearnerIcon");
 		_clone_mc.removeMovieClip();
 	}

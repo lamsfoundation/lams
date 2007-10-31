@@ -132,6 +132,8 @@ class MonitorController extends AbstractController {
 		var actUIIDToCompare = learnerObj.activity.activityUIID;
 		var parentUIIDToCompare = learnerObj.activity.parentUIID;
 		
+		Debugger.log("completed: " + checkifActivityNotComplete(learnerObj.Learner, cActivity.activity.activityID), Debugger.CRITICAL, "checkHit", "MonitorController");
+		
 		//if learner is on the next or further activity - get new progress data.
 		if(checkifActivityNotComplete(learnerObj.Learner, cActivity.activity.activityID)) {
 			if(actUIIDToCompare == cActivity.activity.activityUIID)
@@ -214,16 +216,19 @@ class MonitorController extends AbstractController {
 				act.stopDrag();
 			}
 			
+			var dropTarget:Object = findParentActivity(eval(act._droptarget));
+				
 			//run a loop to check which activity has been hitted by the learner.
 			for (var i=0; i<indexArray.length; i++){ 
-				var dropTarget:Object = findParentActivity(eval(act._droptarget));
 				var cActivity = indexArray[i];
 				
 				if(dropTarget != null) {
-					if(dropTarget.activity.parentUIID != null && cActivity.children != null)
+					if(dropTarget.activity.parentUIID != null 
+							&& cActivity.children != null
+							&& !cActivity.activity.isBranchingActivity())
 						cActivity = matchChildActivity(cActivity.children, dropTarget);
 					
-					hasHit = (cActivity == dropTarget) ? checkHit(cActivity, act, indexArray) : hasHit;
+					hasHit = (cActivity.activity.activityUIID == dropTarget.activity.activityUIID) ? checkHit(cActivity, act, indexArray) : hasHit;
 				} 
 
 			}

@@ -81,6 +81,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private var _defaultSequenceActivity:SequenceActivity;
 	private var _fingerprint:MovieClip;
 	
+	private var _learnerContainer_mc:MovieClip;
+	
 	private var _open:Boolean;
 	
 	/**
@@ -233,9 +235,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		activityComplexLayer = content.createEmptyMovieClip("_activityComplexLayer_mc", content.getNextHighestDepth());
 		activityLayer = content.createEmptyMovieClip("_activityLayer_mc", content.getNextHighestDepth());
 		
+		_learnerContainer_mc = content.createEmptyMovieClip("_learnerContainer_mc", content.getNextHighestDepth());
+		
 		transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
 		transparentCover.onPress = null;
-		
+			
 		bkg_pnl.onRelease = function(){
 			Application.getInstance().getCanvas().getCanvasView().getController().canvasRelease(this);
 		}
@@ -373,13 +377,13 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			Debugger.log('controller obj cbc :'+cbc, Debugger.CRITICAL, 'drawActivity','CanvasBranchView');
 		
 			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _canvasController:cbc, _canvasBranchView:cbv})
-															: activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _monitorController:cbc, _canvasBranchView:cbv, _module:_module});
+															: activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _monitorController:cbc, _canvasBranchView:cbv, _module:_module, learnerContainer:_learnerContainer_mc});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Tool or gate activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasBranchView');
 		}
 		else if (a.isGateActivity()){
 			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasGateActivity",DepthManager.kTop,{_activity:a, _canvasController:cbc, _canvasBranchView:cbv})
-															: activityLayer.createChildAtDepth("CanvasGateActivity",DepthManager.kTop,{_activity:a, _monitorController:cbc, _canvasBranchView:cbv, _module:_module});
+															: activityLayer.createChildAtDepth("CanvasGateActivity",DepthManager.kTop,{_activity:a, _monitorController:cbc, _canvasBranchView:cbv, _module:_module, learnerContainer:_learnerContainer_mc});
 			
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Gate activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasBranchView');
@@ -389,7 +393,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
 			
 			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children, _canvasController:cbc,_canvasBranchView:cbv, _locked:a.isReadOnly()})
-															: activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children, _monitorController:cbc,_canvasBranchView:cbv, _locked:a.isReadOnly(), fromModuleTab:fromModuleTab});
+															: activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children, _monitorController:cbc,_canvasBranchView:cbv, _locked:a.isReadOnly(), fromModuleTab:fromModuleTab, learnerContainer:_learnerContainer_mc});
 			
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Parallel activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasBranchView');
@@ -398,14 +402,14 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
 			
 			var newActivity_mc = (_module != "monitoring") ? activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _canvasController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly()})
-															: activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _monitorController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly(), fromModuleTab:fromModuleTab});
+															: activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _monitorController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly(), fromModuleTab:fromModuleTab, learnerContainer:_learnerContainer_mc});
 			
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasBranchView');
 		}
 		else if(a.isBranchingActivity()) {	
 			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _canvasController:cbc,_canvasBranchView:cbv})
-															: activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _monitorController:cbc,_canvasBranchView:cbv, _module:_module});
+															: activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _monitorController:cbc,_canvasBranchView:cbv, _module:_module, learnerContainer:_learnerContainer_mc});
 
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Branching activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasBranchView');

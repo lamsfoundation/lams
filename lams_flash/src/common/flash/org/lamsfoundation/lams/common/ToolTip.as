@@ -43,7 +43,8 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 	var xoffset:Number = 0;
 	var yoffset:Number = 5;	
 	var showAbove:Boolean = false;
-	var ttWidth:Number = 155
+	var ttWidth:Number = 155;
+	
 	// Visible features
 	var textFormat:Object;
 	var tiptext:TextFormat;
@@ -68,8 +69,6 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 	}
 	
 	private function createTT()	{
-		
-		trace("TT Holder is: "+ttHolder)
 		ttHolder.createEmptyMovieClip("ToolTipHolder", ttHolder.getNextHighestDepth());
 		ttHolder.delay = delay;
 	}
@@ -78,7 +77,6 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 		// Create our text field
 		ttHolder.ToolTipHolder.createTextField("ToolTipText", 4, 2, 0, 1, 1);
 		with(ttHolder.ToolTipHolder.ToolTipText)	{
-			trace("ToolTip Message: "+this.message)
 			html = true;
 			htmlText = this.message;
 			setTextFormat(this.tiptext);
@@ -216,12 +214,13 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 		
 		ttHolder.ToolTipHolder._visible = true;
 		ttHolder.ToolTipHolder._alpha = 0;
-		trace("x mouse: "+_root._xmouse+" and y mouse: "+_root._ymouse)
+		
 		//ttHolder.ToolTipHolder._x = _root._xmouse + xoffset
 		//ttHolder.ToolTipHolder._y = _root._ymouse + yoffset
+		
 		var delayed = 0;
 		var delayfor = this.delay * 10;
-		trace("asked to display TT")
+		
 		ttHolder.ToolTipHolder.onEnterFrame = function(){
 			if(delayed < delayfor){
 				delayed++;
@@ -230,7 +229,6 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 				if(_alpha < 100){
 					_alpha += 20;
 				}else{
-					trace("message value is: "+ToolTipText.text)
 					ToolTipText._visible = true
 					delete this.onEnterFrame;
 				}
@@ -239,7 +237,6 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 	}
 	
 	public function CloseToolTip(){
-		trace("asked to hide TT")
 		delete ttHolder.ToolTipHolder.onEnterFrame;
 		//ttHolder.ToolTipHolder._visible = false;	
 		ttHolder.ToolTipHolder.removeMovieClip();

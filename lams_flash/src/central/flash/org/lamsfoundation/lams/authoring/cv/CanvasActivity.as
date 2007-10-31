@@ -274,9 +274,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		var xCoord = _activity.xCoord;
 				
 		if (_activity.parentUIID != null) {
-			xCoord = parentAct.xCoord;
+			xCoord = (parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE) ? _activity.xCoord : parentAct.xCoord;
 
-			if(parentAct.activityTypeID != Activity.PARALLEL_ACTIVITY_TYPE){
+			if(parentAct.activityTypeID != Activity.PARALLEL_ACTIVITY_TYPE && parentAct.activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE){
 				xCoord = parentAct.xCoord + _activity.xCoord;
 				learner_X = (learner_X != null) ? learner_X + parentAct.xCoord : null;
 				learner_Y = learner_Y + parentAct.yCoord;

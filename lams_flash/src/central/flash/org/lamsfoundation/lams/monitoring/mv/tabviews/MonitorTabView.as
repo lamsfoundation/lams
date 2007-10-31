@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.ComplexActivity;
 import org.lamsfoundation.lams.authoring.cv.CanvasActivity;
+import org.lamsfoundation.lams.authoring.br.CanvasBranchView;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.authoring.Transition;
 
@@ -268,6 +269,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	private function reloadProgress(isChanged:Boolean){
 			var s:Object = mm.getSize();
 			drawDesignCalled = undefined;
+			
+			mm.getMonitor().closeBranchView();
 			
 			//Remove all the movies drawn on the transition and activity movieclip holder
 			this._learnerContainer_mc.removeMovieClip();
