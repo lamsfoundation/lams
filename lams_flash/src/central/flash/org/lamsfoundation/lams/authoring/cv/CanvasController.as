@@ -230,6 +230,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			// refresh any branches connected to activities
 			//TODO: refresh the branches as you drag...
+			
 			var myBranches = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
 			myBranches = myBranches.myBranches;
 			

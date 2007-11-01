@@ -210,6 +210,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			case 'SET_ACTIVE':
 				Debugger.log('setting activie :' + event.updateType + " event.data: " + event.data + " condition: " + (event.data == this),Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasBranchView');
 				transparentCover._visible = (event.data == this) ? false : true;
+				
+				if(event.data == this) {
+					getController().activityClick(this.startHub);
+					getController().activityRelease(this.startHub);
+				}
+				
 				break;
             default :
                 Debugger.log('unknown update type :' + event.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasBranchView');
@@ -317,8 +323,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		mx.transitions.TransitionManager.start(this,
 					{type:mx.transitions.Zoom, 
 						direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
-		
-		getController().activityRelease(this.startHub);
 	}
 	
 	private function close():Void {
@@ -357,8 +361,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  Boolean - successfullit
 	 */
 	private function drawActivity(a:Activity, cm):Boolean {
-		
-		if(!cm.isActiveView(this)) return false;
+		Debugger.log("isActiveView: " + cm.isActiveView(this), Debugger.CRITICAL, "drawActivity", "CanvasBranchView");
+		if(!cm.isActiveView(this) && !cm.findParent(a, activity)) return false;
 		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
@@ -431,7 +435,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 */
 	
 	private function hideActivity(a:Activity, cm):Boolean {
-		if(!cm.isActiveView(this)) return false;
+		if(!cm.isActiveView(this) && !cm.findParent(a, activity)) return false;
 		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
@@ -455,8 +459,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @param   cm - Refernce to the model
 	 * @return  Boolean - successfull
 	 */
-	private function removeActivity(a:Activity,cm):Boolean{
-		if(!cm.isActiveView(this)) return false;
+	private function removeActivity(a:Activity, cm):Boolean{
+		if(!cm.isActiveView(this) && !cm.findParent(a, activity)) return false;
 		
 		var r = cm.activitiesDisplayed.remove(a.activityUIID);
 		r.removeMovieClip();
@@ -497,7 +501,13 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 */
 	private function drawBranch(b:Branch, cm):Boolean{
 		
-		if(!cm.isActiveView(this)) return false;
+		Debugger.log("branch: " + b, Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
+		Debugger.log("sequence: " + b.sequenceActivity.activityUIID, Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
+		Debugger.log("isActiveView: " + cm.isActiveView(this), Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
+		
+		Debugger.log("findParent: " + cm.findParent(b.sequenceActivity, activity), Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
+		
+		if(!cm.isActiveView(this) && !cm.findParent(b.sequenceActivity, activity)) return false;
 		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
@@ -569,7 +579,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  
 	 */
 	private function removeBranch(b:Branch,cm){
-		if(!cm.isActiveView(this)) return false;
+		if(!cm.isActiveView(this) && !cm.findParent(b.sequenceActivity, activity)) return false;
 		if(b.direction == BranchConnector.DIR_FROM_START) b.sequenceActivity.firstActivityUIID = null;
 		else if(b.direction == BranchConnector.DIR_TO_END) b.sequenceActivity.stopAfterActivity = true;
 		

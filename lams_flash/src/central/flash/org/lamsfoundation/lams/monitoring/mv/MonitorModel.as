@@ -1091,4 +1091,13 @@ class MonitorModel extends Observable{
 		_currentBranchingActivity = a;
 	}
 	
+	public function findParent(a:Activity, b:Activity):Boolean {
+		if(a.parentUIID == b.activityUIID)
+			return true;
+		else if(a.parentUIID == null)
+			return false;
+		else
+			return findParent(_activeSeq.getLearningDesignModel().getActivityByUIID(a.parentUIID), b);
+    }
+	
 }

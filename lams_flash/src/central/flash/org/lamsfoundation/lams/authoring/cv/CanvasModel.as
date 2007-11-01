@@ -1151,7 +1151,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			
 			if(r_branch == "NEW"){
 				//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
-				broadcastViewUpdate("DRAW_BRANCH",ddmBranch);
+				broadcastViewUpdate("DRAW_BRANCH", ddmBranch);
 			}else if(r_branch == "DELETE"){
 				broadcastViewUpdate("REMOVE_BRANCH",cmBranch);
 			}
@@ -1537,4 +1537,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function get lastBranchActionType():Number {
 		return _lastBranchActionType;
 	}
+	
+	public function findParent(a:Activity, b:Activity):Boolean {
+		if(a.parentUIID == b.activityUIID)
+			return true;
+		else if(a.parentUIID == null)
+			return false;
+		else
+			return findParent(_cv.ddm.getActivityByUIID(a.parentUIID), b);
+    }
 }
