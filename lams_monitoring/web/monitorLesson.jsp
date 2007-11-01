@@ -112,8 +112,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			for(var i=0; i<pWins.length; i++) {
 				if(pWins[i] != null && !pWins[i].closed && pWins[i].open) {
 					if(pWins[i].name == title) {
-						window.blur();
-						pWins[i].focus();
+					 	pWins[i].focus();
 						found = true;	
 					}
 				}
