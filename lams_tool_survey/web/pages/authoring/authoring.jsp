@@ -2,17 +2,8 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
-<%@ page import="java.util.HashSet"%>
-<%@ page import="java.util.Set"%>
 <%@ page import="org.lamsfoundation.lams.tool.survey.SurveyConstants"%>
 
-<%Set tabs = new HashSet();
-			tabs.add("label.authoring.heading.basic");
-			tabs.add("label.authoring.heading.advance");
-			tabs.add("label.authoring.heading.instructions");
-			pageContext.setAttribute("tabs", tabs);
-
-			%>
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.author.title" /></title>
@@ -62,7 +53,11 @@
 			<fmt:message key="label.authoring.heading" />
 		</h1>
 <div id="header">
-		<lams:Tabs collection="${tabs}" useKey="true" control="true" />
+		<lams:Tabs useKey="true" control="true">
+			<lams:Tab id="1" key="label.authoring.heading.basic" />
+			<lams:Tab id="2" key="label.authoring.heading.advance" />
+			<lams:Tab id="3" key="label.authoring.heading.instructions" />
+		</lams:Tabs>
 </div>
 		<!-- start tabs -->
 <div id="content">
