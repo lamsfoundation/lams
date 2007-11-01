@@ -36,7 +36,12 @@
 			<c:if test="${empty tab}">
 				jQuery(document).ready(function(){
 					jQuery("div.j-display-group").each(function(){
-						jQuery(this).load("displayGroup.do", {stateId: 1, orgId: this.id});
+						jQuery(this).load("displayGroup.do", {stateId: 1, orgId: this.id}, function() {
+							jQuery("a.disabled-sequence-name-link, a.sequence-name-link", this).ToolTip({
+								className: 'sequence-description-tooltip',
+								position: 'mouse'
+							});
+						});
 					});
 					jQuery("body").click(function(event) {
 						if (jQuery(event.target).is("a.j-group-header")){

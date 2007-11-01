@@ -27,12 +27,12 @@
 			<div id="<c:out value="${orgBean.id}"/>" class="j-lessons"><c:forEach var="lesson" items="${orgBean.lessons}">
 				<p id="<c:out value="${lesson.id}"/>" class="j-single-lesson">
 					<c:if test="${empty lesson.url}">
-						<a class="disabled-sequence-name-link"> <c:out value="${lesson.name}" /></a> 
+						<a title="<c:out value="${lesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${lesson.name}" /></a> 
 						<c:if test="${lesson.state eq 4}">&nbsp;(<fmt:message key="label.disabled"/>)</c:if>
 						<c:if test="${lesson.state eq 6}">&nbsp;(<fmt:message key="label.archived"/>)</c:if>
 					</c:if>
 					<c:if test="${not empty lesson.url}">
-						<a href="<c:out value="${lesson.url}"/>" class="sequence-name-link"> <c:out value="${lesson.name}" /></a> 
+						<a title="<c:out value="${lesson.description}"/>" href="<c:out value="${lesson.url}"/>" class="sequence-name-link"> <c:out value="${lesson.name}" /></a> 
 					</c:if>
 					<c:forEach var="lessonlink" items="${lesson.links}">
 						<a href="<c:out value='${lessonlink.url}'/>" class="sequence-action-link"> 
@@ -65,12 +65,12 @@
 				<div id="<c:out value="${childOrg.id}"/>" class="j-lessons"><c:forEach var="childLesson" items="${childOrg.lessons}">
 					<p id="<c:out value="${childLesson.id}"/>" class="j-single-lesson">
 						<c:if test="${empty childLesson.url}">
-							<a class="disabled-sequence-name-link"> <c:out value="${childLesson.name}" /></a>
+							<a title="<c:out value="${childLesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${childLesson.name}" /></a>
 							<c:if test="${childLesson.state eq 4}">&nbsp;(<fmt:message key="label.disabled"/>)</c:if>
 							<c:if test="${childLesson.state eq 6}">&nbsp;(<fmt:message key="label.archived"/>)</c:if>
 						</c:if>
 						<c:if test="${not empty childLesson.url}">
-							<a href="<c:out value='${childLesson.url}'/>" class="sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
+							<a title="<c:out value="${childLesson.description}"/>" href="<c:out value='${childLesson.url}'/>" class="sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
 						</c:if>
 						<c:forEach var="childlessonlink" items="${childLesson.links}">
 						<a href="<c:out value='${childlessonlink.url}'/>" class="sequence-action-link"> 
