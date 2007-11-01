@@ -255,6 +255,8 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	private function hideAllSteppers(v):Void{ 
+
+		days_stp.visible = v
 		hours_stp.visible = v
 		mins_stp.visible = v
 		endHours_stp.visible = v
@@ -403,7 +405,7 @@ class PropertyInspectorControls extends MovieClip {
 	private function showBranchingControls(v:Boolean, e:Boolean){
 		branchType_lbl.visible = v;
 		branchType_cmb.visible = v;
-		
+		hideAllSteppers(false);
 		var _activityTypeID:Number = _canvasModel.selectedItem.activity.activityTypeID;
 		
 		if(_activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE) {

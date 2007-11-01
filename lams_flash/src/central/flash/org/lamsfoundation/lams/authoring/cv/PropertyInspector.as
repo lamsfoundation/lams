@@ -125,6 +125,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		
 		this.tabChildren = true;
 		setTabIndex();
+		hideAllSteppers(false);
 		
 	}
 	
