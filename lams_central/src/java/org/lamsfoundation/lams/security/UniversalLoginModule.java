@@ -93,9 +93,6 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 			if (inputPassword.length() == 0)
 				return false;
 
-			log.debug("===> validatePassword() called: " + inputPassword
-					+ " : " + expectedPassword);
-
 			try {
 				String username = getUsername();
 				WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());

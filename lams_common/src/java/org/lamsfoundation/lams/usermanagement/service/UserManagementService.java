@@ -865,6 +865,19 @@ public class UserManagementService implements IUserManagementService {
 		}
 	}
 	
+	public void deleteUserOrganisation(User user, Organisation org) {
+		UserOrganisation uo = getUserOrganisation(user.getUserId(), org.getOrganisationId());
+		if (uo != null) {
+			org.getUserOrganisations().remove(uo);
+			save(org);
+			user.getUserOrganisations().remove(uo);
+			log.debug("Removed user "+user.getUserId()+" from organisation "+org.getOrganisationId());
+			if (org.getOrganisationType().equals(OrganisationType.COURSE_TYPE)) {
+				deleteChildUserOrganisations(user, org);
+			}
+		}
+	}
+	
 	private Integer getRequestorId() {
 		UserDTO userDTO = (UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER);
 		return (userDTO!=null ? userDTO.getUserID() : null);		

@@ -109,8 +109,7 @@ public class LDAPAuthenticator {
 			System.setProperty("javax.net.ssl.trustStorePassword", Configuration.get(ConfigurationKeys.LDAP_TRUSTSTORE_PASSWORD));
 		}
 
-		log.debug("===> LDAP authenticator: " + env);
-
+		boolean isValid = false;
 		InitialLdapContext ctx = null;
 		
 		for (String principalDNSuffix : principalDNSuffixes) {
@@ -122,6 +121,7 @@ public class LDAPAuthenticator {
 			try {
 				ctx = new InitialLdapContext(env, null);
 				log.debug("===> LDAP context created using DN: "+userDN);
+				isValid = true;
 				Attributes attrs = ctx.getAttributes(userDN);
 				setAttrs(attrs);
 				
@@ -157,7 +157,7 @@ public class LDAPAuthenticator {
 						+ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION+" parameter: "
 						+Configuration.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
 			} catch (AuthenticationException e) {
-				log.info("===> Incorrect username ("+userDN+") or password ("+credential+"): "+e.getMessage());
+				log.info("===> Incorrect username ("+userDN+") or password. "+e.getMessage());
 			} catch (Exception e) {
 				log.error("===> LDAP exception: " + e, e);
 			} finally {
@@ -173,12 +173,12 @@ public class LDAPAuthenticator {
 					if (ctx != null)
 						ctx.close();
 				} catch (Exception e) {
-					log.error("===> gettting problem when closing context. Excetion: "+e);
+					log.error("===> gettting problem when closing context. Exception: "+e);
 				}
 			}
 		}
 		
-		return false;
+		return isValid;
 	}
 
 }

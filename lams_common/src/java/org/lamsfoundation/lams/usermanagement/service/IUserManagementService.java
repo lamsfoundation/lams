@@ -352,6 +352,13 @@ public interface IUserManagementService {
 	public void deleteChildUserOrganisations(User user, Organisation org);
 	
 	/**
+	 * Removes user from this group and its subgroups.
+	 * @param user
+	 * @param org
+	 */
+	public void deleteUserOrganisation(User user, Organisation org);
+	
+	/**
 	 * Return true if user is a global group admin.
 	 * @return
 	 */

@@ -324,36 +324,26 @@ public class LdapService implements ILdapService {
 				}
 				// if the user is a member of any other groups, remove them
 				if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_ONLY_ONE_ORG)) {
-					Set uos = user.getUserOrganisations();
-					// safety net in case hibernate hasn't initialised this set yet
-					if (uos == null) {
-						uos = new HashSet();
-						user.setUserOrganisations(uos);
-					}
-					Iterator i = uos.iterator();
-					while (i.hasNext()) {
-						UserOrganisation uo = (UserOrganisation)i.next();
-						Organisation currentOrg = uo.getOrganisation();
-						if (currentOrg.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
-							if (!currentOrg.equals(org)) {
-								i.remove();
-								// remove userOrg from the org's collection
-								Set currentOrgUos = currentOrg.getUserOrganisations();
-								currentOrgUos.remove(uo);
-								currentOrg.setUserOrganisations(currentOrgUos);
-								// remove subgroups
-								service.deleteChildUserOrganisations(uo.getUser(), uo.getOrganisation());
+					List uos = service.findByProperty(UserOrganisation.class, "user", user);
+					if (uos != null) {
+						for (Object obj : uos) {
+							UserOrganisation uo = (UserOrganisation)obj;
+							Organisation currentOrg = uo.getOrganisation();
+							if (currentOrg.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
+								if (!currentOrg.equals(org)) {
+									service.deleteUserOrganisation(user, currentOrg);
+								}
 							}
 						}
 					}
-					user.setUserOrganisations(uos);
-					service.save(user);
 				}
 				// now convert the roles to lams roles and add the user to the org
 				List<String> roleIds = getRoleIds(ldapRoles);
 				if (roleIds!=null && !roleIds.isEmpty()) {
 					service.setRolesForUserOrganisation(user, org.getOrganisationId(), roleIds);
 					return true;
+				} else {
+					log.warn("Couldn't map any roles from attribute: "+Configuration.get(ConfigurationKeys.LDAP_ROLES_ATTR));
 				}
 			} else {
 				log.warn("No LAMS organisations found with the "+orgField+": "+ldapOrgAttr);
@@ -367,23 +357,23 @@ public class LdapService implements ILdapService {
 		if (ldapRoles!=null) {
 			ArrayList<String> roleIds = new ArrayList<String>();
 			for (String role : ldapRoles) {
-				if (Configuration.get(ConfigurationKeys.LDAP_LEARNER_MAP).indexOf(role) >= 0 
+				if (isRoleInList(Configuration.get(ConfigurationKeys.LDAP_LEARNER_MAP), role) 
 						&& !roleIds.contains(Role.ROLE_LEARNER.toString())) {
 					roleIds.add(Role.ROLE_LEARNER.toString());
 				}
-				if (Configuration.get(ConfigurationKeys.LDAP_MONITOR_MAP).indexOf(role) >= 0
+				if (isRoleInList(Configuration.get(ConfigurationKeys.LDAP_MONITOR_MAP), role)
 						&& !roleIds.contains(Role.ROLE_MONITOR.toString())) {
 					roleIds.add(Role.ROLE_MONITOR.toString());
 				}
-				if (Configuration.get(ConfigurationKeys.LDAP_AUTHOR_MAP).indexOf(role) >= 0
+				if (isRoleInList(Configuration.get(ConfigurationKeys.LDAP_AUTHOR_MAP), role)
 						&& !roleIds.contains(Role.ROLE_AUTHOR.toString())) {
 					roleIds.add(Role.ROLE_AUTHOR.toString());
 				}
-				if (Configuration.get(ConfigurationKeys.LDAP_GROUP_ADMIN_MAP).indexOf(role) >= 0
+				if (isRoleInList(Configuration.get(ConfigurationKeys.LDAP_GROUP_ADMIN_MAP), role)
 						&& !roleIds.contains(Role.ROLE_GROUP_ADMIN.toString())) {
 					roleIds.add(Role.ROLE_GROUP_ADMIN.toString());
 				}
-				if (Configuration.get(ConfigurationKeys.LDAP_GROUP_MANAGER_MAP).indexOf(role) >= 0
+				if (isRoleInList(Configuration.get(ConfigurationKeys.LDAP_GROUP_MANAGER_MAP), role)
 						&& !roleIds.contains(Role.ROLE_GROUP_MANAGER.toString())) {
 					roleIds.add(Role.ROLE_GROUP_MANAGER.toString());
 				}
@@ -391,6 +381,18 @@ public class LdapService implements ILdapService {
 			return roleIds;
 		}
 		return null;
+	}
+	
+	private boolean isRoleInList(String list, String role) {
+		if (list != null && role != null) {
+			String[] array = list.split(";");
+			for (String s : array) {
+				if (role.contains(s)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	// get the multiple values of an ldap attribute
