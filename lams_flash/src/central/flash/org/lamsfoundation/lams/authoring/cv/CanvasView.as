@@ -347,6 +347,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	private function removeActivity(a:Activity,cm:CanvasModel):Boolean{
 		if(!cm.isActiveView(this)) return false;
 		
+		if(a.isBranchingActivity()) {
+			Debugger.log("removing Branching Activity: " + a.title, Debugger.CRITICAL, "removeActivity", "CanvasView");
+			cm.clearAllBranches(a);
+			cm.activitiesDisplayed.get(a.activityUIID).branchView.removeMovieClip();
+		}
+		
 		var r = cm.activitiesDisplayed.remove(a.activityUIID);
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;

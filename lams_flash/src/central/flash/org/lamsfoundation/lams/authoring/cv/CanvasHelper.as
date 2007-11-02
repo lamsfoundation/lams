@@ -180,11 +180,15 @@ class CanvasHelper {
 			if(canvasModel.activeView instanceof CanvasBranchView) {
 				canvasModel.activeView.removeMovieClip();
 				closeBranchView();
+				canvasModel.getCanvas().addBin(canvasModel.activeView);
+				
+				canvasModel.broadcastViewUpdate("SIZE");
 			}
 			
 			canvasModel.selectedItem = null;
 			canvasModel.setDirty();
 			
+			canvasModel.clearAllElements();
 			createContentFolder();
 			
 			return true;

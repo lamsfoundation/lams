@@ -1085,7 +1085,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			}else if(r_activity == "DELETE"){
 				//remove this activity
 				if(cm_activity.parentUIID == null){
-					broadcastViewUpdate("REMOVE_ACTIVITY",cm_activity);
+					broadcastViewUpdate("REMOVE_ACTIVITY", cm_activity);
 				}
 			}else if(r_activity == "CHILD"){
 				//dont ask the view to draw the activity if it is a child act				
@@ -1546,4 +1546,53 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		else
 			return findParent(_cv.ddm.getActivityByUIID(a.parentUIID), b);
     }
+	
+	public function clearAllBranches(a:Activity):Void {
+		var branch_keys:Array = _branchesDisplayed.keys();
+		var act_keys:Array = _activitiesDisplayed.keys();
+		Debugger.log("clearing branches: " + branch_keys.length, Debugger.CRITICAL, "clearAllBranches", "CanvasModel");
+		
+			
+		for(var i=0; i<branch_keys.length; i++) {
+			var branch:Branch = _branchesDisplayed.get(branch_keys[i]).branch;
+			
+			Debugger.log("branch: " + branch.branchUIID, Debugger.CRITICAL, "clearAllBranches", "CanvasModel");
+		
+			if(branch.sequenceActivity.parentUIID == a.activityUIID) {
+				for(var j=0; j<act_keys.length; j++) {
+					
+					Debugger.log("activity parent: " + _activitiesDisplayed.get(act_keys[i]).activity.parentUIID, Debugger.CRITICAL, "clearAllBranches", "CanvasModel");
+					Debugger.log("seq uiid: " + branch.sequenceActivity.activityUIID, Debugger.CRITICAL, "clearAllBranches", "CanvasModel");
+					
+					if(_activitiesDisplayed.get(act_keys[i]).activity.parentUIID == branch.sequenceActivity.activityUIID) {
+						_activitiesDisplayed.remove(act_keys[i]);
+					}
+		
+				}
+			}
+		}
+		
+	}
+	
+	public function clearAllElements():Void {
+		var branch_keys:Array = _branchesDisplayed.keys();
+		var act_keys:Array = _activitiesDisplayed.keys();
+		var trans_keys:Array = _transitionsDisplayed.keys();
+		
+		for(var i=0; i<branch_keys.length; i++)
+			_branchesDisplayed.get(branch_keys[i]).removeMovieClip();
+		for(var i=0; i<trans_keys.length; i++)
+			_transitionsDisplayed.get(trans_keys[i]).removeMovieClip();
+		for(var i=0; i<act_keys.length; i++) {
+			if(_activitiesDisplayed.get(act_keys[i]).activity.isBranchingActivity())
+				_activitiesDisplayed.get(act_keys[i]).branchView.removeMovieClip();
+			_activitiesDisplayed.get(act_keys[i]).removeMovieClip();
+			
+		}
+		
+		_branchesDisplayed.clear();
+		_transitionsDisplayed.clear();
+		_activitiesDisplayed.clear();
+		
+	}
 }

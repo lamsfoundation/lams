@@ -462,6 +462,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private function removeActivity(a:Activity, cm):Boolean{
 		if(!cm.isActiveView(this) && !cm.findParent(a, activity)) return false;
 		
+		if(a.isBranchingActivity())
+			cm.activitiesDisplayed.get(a.activityUIID).branchView.removeMovieClip();
+		
 		var r = cm.activitiesDisplayed.remove(a.activityUIID);
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;
