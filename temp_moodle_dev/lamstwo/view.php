@@ -48,6 +48,12 @@ print_heading(format_string($lamstwo->name));
 //              navmenu($course, $cm));
 
 /// Print the main part of the page
+
+if ($lamstwo->introduction) {
+    print_simple_box(format_text($lamstwo->introduction), 'center', '70%', '', 5, 'generalbox', 'description');
+    echo '<br />';
+}
+
 if(isteacher($course->id,$USER->id)||isteacheredit($course->id,$USER->id)){
     $datetime =    date("F d,Y g:i a");
     $plaintext = trim($datetime).trim($USER->username).trim($LAMS2CONSTANTS->monitor_method).trim($CFG->lamstwo_serverid).trim($CFG->lamstwo_serverkey);
@@ -63,8 +69,8 @@ if(isteacher($course->id,$USER->id)||isteacheredit($course->id,$USER->id)){
 		'&'.$LAMS2CONSTANTS->param_country.'='.trim($USER->country).
 		'&'.$LAMS2CONSTANTS->param_lang.'='.substr(trim($USER->lang),0,2);
     print_simple_box_start('center');
-    echo '<a href="#" onClick="javascript:window.open(\''.$url.'\',\'monitor\',\'location=0,toolbar=0,menubar=0,statusbar=0,width=796,height=570,resizable\')">'.get_string("openmonitor", "lamstwo").'</a>';
-    print_simple_box_end();
+    echo '[ <a href="#" onClick="javascript:window.open(\''.$url.'\',\'monitor\',\'location=0,toolbar=0,menubar=0,statusbar=0,width=796,height=570,resizable\')">'.get_string("openmonitor", "lamstwo").'</a> ]  ';
+
     
     $plaintext = trim($datetime).trim($USER->username).trim($LAMS2CONSTANTS->learner_method).trim($CFG->lamstwo_serverid).trim($CFG->lamstwo_serverkey);
     $hash = sha1(strtolower($plaintext));
@@ -78,8 +84,9 @@ if(isteacher($course->id,$USER->id)||isteacheredit($course->id,$USER->id)){
         '&'.$LAMS2CONSTANTS->param_courseid.'='.$lamstwo->course.
 		'&'.$LAMS2CONSTANTS->param_country.'='.trim($USER->country).
 		'&'.$LAMS2CONSTANTS->param_lang.'='.substr(trim($USER->lang),0,2);
-    print_simple_box_start('center');
-    echo '<a href="#" onClick="javascript:window.open(\''.$url.'\',\'learner\',\'location=0,toolbar=0,menubar=0,statusbar=0,width=796,height=570,resizable\',0)">'.get_string("openlearner", "lamstwo").'</a>';
+
+
+    echo '  [ <a href="#" onClick="javascript:window.open(\''.$url.'\',\'learner\',\'location=0,toolbar=0,menubar=0,statusbar=0,width=796,height=570,resizable\',0)">'.get_string("openlearner", "lamstwo").'</a>  ]';
     print_simple_box_end();
 }else if(isstudent($course->id,$USER->id)){
     $datetime =    date("F d,Y g:i a");
@@ -100,10 +107,6 @@ if(isteacher($course->id,$USER->id)||isteacheredit($course->id,$USER->id)){
     print_simple_box_end();
 }
 
-if ($lamstwo->introduction) {
-    print_simple_box(format_text($lamstwo->introduction), 'center', '70%', '', 5, 'generalbox', 'description');
-    echo '<br />';
-}
 
 
 /// Finish the page
