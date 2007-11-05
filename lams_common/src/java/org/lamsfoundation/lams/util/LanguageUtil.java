@@ -145,7 +145,9 @@ public class LanguageUtil {
 			properties.put("languageIsoCode", langIsoCode);
 		}else if(countryIsoCode.trim().length()>0){
 			properties.put("countryIsoCode", countryIsoCode);
-		}
+		}else{
+			return getDefaultLocale();
+		}		
 		List list = getService().findByProperties(SupportedLocale.class, properties);
 		if(list!=null && list.size()>0){
 			Collections.sort(list);
