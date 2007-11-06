@@ -126,11 +126,16 @@ public class SimpleRepository implements IRepositoryAdmin {
 	 */
 	private Integer getCurrentUserId() throws AccessDeniedException {
 		HttpSession ss = SessionManager.getSession();
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		if ( user == null ) {
-			throw new AccessDeniedException("Cannot get user details for content repository. User may not be logged in.");
+		if ( ss != null ) {
+			log.debug("Getting user from UserDTO - must have come from a normal request");
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			if ( user == null ) {
+				throw new AccessDeniedException("Cannot get user details for content repository. User may not be logged in.");
+			}
+			return user.getUserID();
+		} else {
+			throw new AccessDeniedException("Cannot get user details for content repository. No session found - user not logged in or the webservice call has not set up the session details.");
 		}
-		return user.getUserID();
 	}
 	/**
 	 * @param workspaceName
