@@ -14,9 +14,12 @@ import java.util.Iterator;
 import java.util.ArrayList;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -46,6 +49,8 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -172,7 +177,7 @@ public class LessonManagerServlet extends HttpServlet {
 			}  else if (method.equals(CentralConstants.METHOD_IMPORT)) {
 
 				// ldId = new Long(ldIdStr);
-				Long ldID = importLearningDesign(filePath, username, serverId);
+				Long ldID = importLearningDesign(request, response, filePath, username, serverId);
 				
 				element = document.createElement(CentralConstants.ELEM_LEARNINGDESIGN);
 				element.setAttribute(CentralConstants.PARAM_LEARNING_DESIGN_ID, ldID.toString());
@@ -424,7 +429,8 @@ public class LessonManagerServlet extends HttpServlet {
 	}
 
 
-	public Long importLearningDesign(String filePath, String username, String serverId) 
+	public Long importLearningDesign(HttpServletRequest request, HttpServletResponse response,
+				String filePath, String username, String serverId) 
 		throws RemoteException {
 		
 		List<String> ldErrorMsgs = new ArrayList<String>();
@@ -442,6 +448,16 @@ public class LessonManagerServlet extends HttpServlet {
 						serverMap, username);
 	
 		    user = userMap.getUser();
+
+		    HttpSession ss = SessionManager.getSession();
+		    boolean createdTemporarySession = false;
+		    if ( ss == null ) {
+		    	// import requires a session containing the user details, so dummy it up here.
+		    	SessionManager.startSession(request, response);
+		    	ss = SessionManager.getSession();
+				ss.setAttribute(AttributeNames.USER, user.getUserDTO());
+				createdTemporarySession = true;
+		    }
 		        
 	     	File designFile = new File(filePath);
 	     	Object[] ldResults = exportService.importLearningDesign(designFile, user, workspaceFolderUid, toolsErrorMsgs);
@@ -449,6 +465,10 @@ public class LessonManagerServlet extends HttpServlet {
 	     	ldErrorMsgs = (List<String>) ldResults[1];
 	     	toolsErrorMsgs = (List<String>) ldResults[2];
 			
+	     	if (  createdTemporarySession ) {
+	     		SessionManager.endSession();
+	     	}
+	     	
 			return ldId;
 		} catch (Exception e) {
 			throw new RemoteException(e.getMessage(), e);
