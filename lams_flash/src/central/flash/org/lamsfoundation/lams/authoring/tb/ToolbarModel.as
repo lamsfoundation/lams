@@ -62,7 +62,6 @@ class ToolbarModel extends Observable {
 		infoObj.updateType = "SIZE";
 		notifyObservers(infoObj);
     }
-    
 	
 	public function toolbarButtons(){
 		var buttonArr:Array = new Array();
@@ -79,8 +78,10 @@ class ToolbarModel extends Observable {
 			buttonArr[7] 	= ["flow_btn", "icon_flow"];
 			buttonArr[8] 	= ["group_btn", "icon_group"];
 			buttonArr[9] 	= ["preview_btn", "icon_preview"];
-			buttonArr[10] 	= ["gate_btn", "icon_gate"];
-			buttonArr[11] 	= ["branch_btn", "icon_branch"];
+			buttonArr[10] 	= ["optional_act_btn", "icon_optional"];
+			buttonArr[11] 	= ["optional_seq_btn", "icon_optional"];
+			buttonArr[12] 	= ["gate_btn", "icon_gate"];
+			buttonArr[13] 	= ["branch_btn", "icon_branch"];
 			
 		} else {
 			buttonArr[0] 	= ["apply_changes_btn", "icon_saveDesign"];
@@ -92,8 +93,10 @@ class ToolbarModel extends Observable {
 			buttonArr[6] 	= ["optional_btn", "icon_optional"];
 			buttonArr[7] 	= ["flow_btn", "icon_flow"];
 			buttonArr[8] 	= ["group_btn", "icon_group"];
-			buttonArr[9] 	= ["gate_btn", "icon_gate"];
-			buttonArr[10] 	= ["branch_btn", "icon_branch"];
+			buttonArr[9] 	= ["optional_act_btn", "icon_optional"];
+			buttonArr[10] 	= ["optional_seq_btn", "icon_optional"];
+			buttonArr[11] 	= ["gate_btn", "icon_gate"];
+			buttonArr[12] 	= ["branch_btn", "icon_branch"];
 		
 		}
 		

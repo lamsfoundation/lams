@@ -40,6 +40,7 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 	private var _app:Application;
 	private var _toolbarModel:ToolbarModel;
 	private var isflowActive:Boolean = false;
+	private var isOptActive:Boolean = false;
 	
 	public function ToolbarController (cm:Observable) {
 		super (cm);
@@ -48,8 +49,9 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 		
 	}
     
-    public function hideFlow(){
+    public function hideOptionPanels(){
 		isflowActive = false;
+		isOptActive = false;
 		_toolbarModel.getToolbar().view.showHideAssets(false);
 	}
 	
@@ -62,11 +64,10 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 		Debugger.log('click evt.target.label:'+evt.target.label,Debugger.GEN,'click','ToolbarController');
 		var tgt:String = new String(evt.target);
 		
-		hideFlow();
+		hideOptionPanels();
 		
 		if(tgt.indexOf("new") != -1){
 			_app.getCanvas().clearCanvas(false);
-		
 		}else if(tgt.indexOf("open") != -1){
 			_app.getCanvas().openDesignBySelection();
 		}else if(tgt.indexOf("save") != -1){
@@ -81,18 +82,30 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 			_app.paste();
 		}else if(tgt.indexOf("trans") != -1){	
 			_app.getCanvas().toggleTransitionTool();
-					
-		}else if(tgt.indexOf("optional") != -1){
+		}else if(tgt.indexOf("optional_act") != -1){
 			_app.getCanvas().toggleOptionalActivity();
-						
-		}else if(tgt.indexOf("flow") != -1){
-			if (!isflowActive){
+		}else if(tgt.indexOf("optional_seq") != -1){
+			_app.getCanvas().toggleOptionalSequenceActivity();
+		}else if(tgt.indexOf("optional") != -1){
+			if (!isOptActive){
 				var c:String = Cursor.getCurrentCursor();
 				if(c==Application.C_GATE){
 					_app.getCanvas().stopGateTool();
 				}
+				
+				isOptActive = true;
+				_toolbarModel.getToolbar().view.showHideOptAssets(true);
+			}
+		}else if(tgt.indexOf("flow") != -1){
+			if (!isflowActive){
+				var c:String = Cursor.getCurrentCursor();
+				
+				if(c==Application.C_GATE){
+					_app.getCanvas().stopGateTool();
+				}
+				
 				isflowActive = true;
-				_toolbarModel.getToolbar().view.showHideAssets(true);
+				_toolbarModel.getToolbar().view.showHideFlowAssets(true);
 			}
 						
 		}else if(tgt.indexOf("gate") != -1){

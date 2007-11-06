@@ -34,30 +34,43 @@ import mx.controls.*
 * Authoring view for the toolbar
 */
 class ToolbarView extends AbstractView {
+	
 	//Toolbar clip
 	private var _toolbar_mc:MovieClip;
 	private var _tm:ThemeManager;
 	private var _tip:ToolTip;
-    private var btnOffset_X:Number = 4;
+    
+	private var btnOffset_X:Number = 4;
 	private var btnOffset_Y:Number = 6;
+	
 	private var new_btn:Button;
 	private var open_btn:Button;
 	private var save_btn:Button;
 	private var apply_changes_btn:Button;
+	
 	private var copy_btn:Button;
 	private var paste_btn:Button;
+	
 	private var trans_btn:Button;
+	
 	private var optional_btn:Button;
+	private var optional_act_btn:Button;
+	private var optional_seq_btn:Button;
+	
 	private var gate_btn:Button;
 	private var flow_btn:Button;
 	private var branch_btn:Button;
+	
 	private var group_btn:Button;
 	private var preview_btn:Button;
 	private var cancel_btn:Button;
+	
 	private var _toolbarMenu:Array;
 	
 	private var bkg_pnl:Panel;
 	private var flow_bkg_pnl:Panel;
+	private var optional_bkg_pnl:Panel;
+	
 	private var _dictionary:Dictionary;
 	
 	private static var SPACER_DEPTH:Number = 30;
@@ -89,29 +102,39 @@ class ToolbarView extends AbstractView {
     public function init(m:Observable, c:Controller) {
 		//Invoke superconstructor, which sets up MVC relationships.
 		super (m, c);
+		
 		//In one frame call createToolbar this gives components one frame to setup etc.
         MovieClipUtils.doLater(Proxy.create(this,createToolbar));		
+		
 		this.tabChildren = true;
 		setTabIndex();
     }
 	
 	public function showHideAssets(v:Boolean){
+		showHideFlowAssets(v);
+		showHideOptAssets(v);
+	}
+	
+	public function showHideFlowAssets(v:Boolean){
+		//showHideOptAssets(false);
 		
-		//branch_btn.enabled = false;
 		gate_btn.visible = v;
 		branch_btn.visible = v;
 		flow_bkg_pnl.visible = v;
-		var flowW:Number = flow_btn.width
-		var gateW:Number = gate_btn.width
-		var branchW:Number = branch_btn.width
-		var widthSet1:Number = Math.max(flowW, gateW)
-		var widthSet2:Number = Math.max(flowW, branchW)
-		var maxWidth:Number = Math.max(widthSet1, widthSet2)
 		
-		flow_bkg_pnl.setSize(maxWidth+6, 95)
-		flow_bkg_pnl._x = branch_btn._x-3;
+		flow_bkg_pnl.setSize(Math.max(Math.max(flow_btn.width, gate_btn.width), Math.max(flow_btn.width, branch_btn.width)) + 6, 95)
+		flow_bkg_pnl._x = branch_btn._x - 3;
+	}
+	
+	public function showHideOptAssets(v:Boolean){
+		//showHideFlowAssets(false);
 		
+		optional_act_btn.visible = v;
+		optional_seq_btn.visible = v;
+		optional_bkg_pnl.visible = v;
 		
+		optional_bkg_pnl.setSize(Math.max(Math.max(optional_btn.width, optional_act_btn.width), Math.max(optional_btn.width, optional_seq_btn.width)) + 6, 95);
+		optional_bkg_pnl._x = optional_act_btn._x - 3;
 	}
     
 	/*
@@ -129,20 +152,22 @@ class ToolbarView extends AbstractView {
         //Add the button handlers, essentially this is handing on clicked event to controller.
         var controller = getController();
 		
-		new_btn.addEventListener("click",controller);
-		open_btn.addEventListener("click",controller);
-		save_btn.addEventListener("click",controller);
-		copy_btn.addEventListener("click",controller);
-		paste_btn.addEventListener("click",controller);
-		trans_btn.addEventListener("click",controller);
-		optional_btn.addEventListener("click",controller);
-		flow_btn.addEventListener("click",controller);
-		gate_btn.addEventListener("click",controller);
-		group_btn.addEventListener("click",controller);
-		branch_btn.addEventListener("click",controller);
-		preview_btn.addEventListener("click",controller);
+		new_btn.addEventListener("click", controller);
+		open_btn.addEventListener("click", controller);
+		save_btn.addEventListener("click", controller);
+		copy_btn.addEventListener("click", controller);
+		paste_btn.addEventListener("click", controller);
+		trans_btn.addEventListener("click", controller);
+		optional_btn.addEventListener("click", controller);
+		optional_act_btn.addEventListener("click", controller);
+		optional_seq_btn.addEventListener("click", controller);
+		flow_btn.addEventListener("click", controller);
+		gate_btn.addEventListener("click", controller);
+		group_btn.addEventListener("click", controller);
+		branch_btn.addEventListener("click", controller);
+		preview_btn.addEventListener("click", controller);
 		apply_changes_btn.addEventListener("click", controller);
-		cancel_btn.addEventListener("click",controller);
+		cancel_btn.addEventListener("click", controller);
 		
 		// Button handler for rollover and rollout.
 		
@@ -176,6 +201,12 @@ class ToolbarView extends AbstractView {
 		branch_btn.onRollOver = Proxy.create(this,this['showToolTip'], branch_btn, "branch_btn_tooltip");
 		branch_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
+		optional_act_btn.onRollOver = Proxy.create(this,this['showToolTip'], optional_act_btn, "optional_btn_tooltip");
+		optional_act_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		optional_seq_btn.onRollOver = Proxy.create(this,this['showToolTip'], optional_seq_btn, "optional_seq_btn_tooltip");
+		optional_seq_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
 		group_btn.onRollOver = Proxy.create(this,this['showToolTip'], group_btn, "group_btn_tooltip");
 		group_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
@@ -189,9 +220,11 @@ class ToolbarView extends AbstractView {
 		cancel_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
 		showHideAssets(false);
+		
 		Debugger.log('dispatch it',Debugger.GEN,'createToolbar','ToolbarView');
-        //Now that view is setup dispatch loaded event
-       dispatchEvent({type:'load',target:this});
+        
+		//Now that view is setup dispatch loaded event
+		dispatchEvent({type:'load',target:this});
 	}
 	
 	public function setupLabels(){
@@ -203,6 +236,8 @@ class ToolbarView extends AbstractView {
 		paste_btn.label = Dictionary.getValue('paste_btn');
 		trans_btn.label = Dictionary.getValue('trans_btn');
 		optional_btn.label = Dictionary.getValue('optional_btn');
+		optional_act_btn.label = Dictionary.getValue('optional_act_btn');
+		optional_seq_btn.label = Dictionary.getValue('optional_seq_btn');
 		gate_btn.label = Dictionary.getValue('gate_btn');
 		branch_btn.label = Dictionary.getValue('branch_btn');
 		flow_btn.label = Dictionary.getValue('flow_btn');
@@ -223,12 +258,14 @@ class ToolbarView extends AbstractView {
 		paste_btn.tabIndex = 206
 		trans_btn.tabIndex = 207
 		optional_btn.tabIndex = 208
-		flow_btn.tabIndex = 209
-		gate_btn.tabIndex = 210
-		branch_btn.tabIndex = 211
-		group_btn.tabIndex = 212
-		preview_btn.tabIndex = 213	
-		cancel_btn.tabIndex = 214
+		optional_act_btn.tabIndex = 209
+		optional_seq_btn.tabIndex = 210
+		flow_btn.tabIndex = 211
+		gate_btn.tabIndex = 212
+		branch_btn.tabIndex = 213
+		group_btn.tabIndex = 214
+		preview_btn.tabIndex = 215	
+		cancel_btn.tabIndex = 216
 	}
 	
 	public function setupButtons(tm:ToolbarModel, menuList:Array){
@@ -245,12 +282,12 @@ class ToolbarView extends AbstractView {
 				var btn_text = this["btn_text"]
 				btn_text.autoSize = true;
 				btn_text.html = true;
-				btn_text.htmlText = btnLabel
+				btn_text.htmlText = btnLabel;
 				
-				var btnWidth:Number = btn_text.textWidth+37
+				var btnWidth:Number = btn_text.textWidth+37;
 				
-				_toolbarMenu[i] = this.attachMovie("Button", menuList[i][0], this.getNextHighestDepth(), {label:btnLabel, icon:menuList[i][1] })
-				_toolbarMenu[i].setSize(btnWidth, 25)
+				_toolbarMenu[i] = this.attachMovie("Button", menuList[i][0], this.getNextHighestDepth(), {label:btnLabel, icon:menuList[i][1] });
+				_toolbarMenu[i].setSize(btnWidth, 25);
 			
 			} else {
 				_toolbarMenu[i] = null;
@@ -259,7 +296,7 @@ class ToolbarView extends AbstractView {
 			if(_toolbarMenu[i] != null) {
 				
 				if (i == 0){
-					_toolbarMenu[i]._x  = btnOffset_X
+					_toolbarMenu[i]._x  = btnOffset_X;
 					
 				} else {
 					_toolbarMenu[i]._x = getToolbarButtonXPos(_toolbarMenu, i-1, 1); //(_toolbarMenu[i-1]._x+_toolbarMenu[i-1].width)+btnOffset_X
@@ -267,9 +304,14 @@ class ToolbarView extends AbstractView {
 				
 				_toolbarMenu[i]._y = btnOffset_Y;
 			
+				if ((i >= menuList.length-4) && (i < menuList.length-2)) {
+					_toolbarMenu[i]._x = this.optional_btn._x;
+					_toolbarMenu[i]._y = (_toolbarMenu[i-1]._y+_toolbarMenu[i-1].height)+btnOffset_Y;
+				}
+				
 				if (i >= menuList.length-2){
 					_toolbarMenu[i]._x = this.flow_btn._x;
-					_toolbarMenu[i]._y = (_toolbarMenu[i-1]._y+_toolbarMenu[i-1].height)+btnOffset_Y
+					_toolbarMenu[i]._y = (_toolbarMenu[i-3]._y+_toolbarMenu[i-3].height)+btnOffset_Y;
 				}
 				
 				if (i == menuList.length){
@@ -353,8 +395,8 @@ class ToolbarView extends AbstractView {
 	private function setSize(tm:ToolbarModel):Void{
 		
         var s:Object = tm.getSize();
+		
         //Size panel
-		trace('toolbar view  setting width to '+s.w);
 		bkg_pnl.setSize(s.w,bkg_pnl._height);
 	}
 	
@@ -382,16 +424,21 @@ class ToolbarView extends AbstractView {
 		paste_btn.setStyle('styleName',styleObj);
 		trans_btn.setStyle('styleName',styleObj);
 		optional_btn.setStyle('styleName',styleObj);
+		optional_act_btn.setStyle('styleName',styleObj);
+		optional_seq_btn.setStyle('styleName',styleObj);
 		gate_btn.setStyle('styleName',styleObj);
 		flow_btn.setStyle('styleName',styleObj);
 		branch_btn.setStyle('styleName',styleObj);
 		group_btn.setStyle('styleName', styleObj);
 		preview_btn.setStyle('styleName',styleObj);
 		cancel_btn.setStyle('styleName',styleObj);
+		
 		styleObj = _tm.getStyleObject('BGPanel');
 		bkg_pnl.setStyle('styleName',styleObj);
+		
 		styleObj = _tm.getStyleObject('FlowPanel');
 		flow_bkg_pnl.setStyle('styleName',styleObj);
+		optional_bkg_pnl.setStyle('styleName',styleObj);
 
     }
 	

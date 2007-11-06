@@ -568,7 +568,16 @@ b	 * @param   learningDesignID
 		if(c==ApplicationParent.C_OPTIONAL){
 			stopOptionalActivity();
 		}else{
-			startOptionalActivity();
+			startOptionalActivity(false);
+		}
+	}
+	
+	public function toggleOptionalSequenceActivity():Void{
+		var c:String = Cursor.getCurrentCursor();
+		if(c==ApplicationParent.C_OPTIONAL){
+			stopOptionalActivity();
+		}else{
+			startOptionalActivity(true);
 		}
 	}
 	
@@ -624,10 +633,11 @@ b	 * @param   learningDesignID
 	}
 	
 	
-	public function startOptionalActivity(){
+	public function startOptionalActivity(isSequence:Boolean){
 		Debugger.log('Starting Optioanl Activity',Debugger.GEN,'startOptionalActivity','Canvas');
 		Cursor.showCursor(ApplicationParent.C_OPTIONAL);
-		canvasModel.activeTool = CanvasModel.OPTIONAL_TOOL;
+		
+		canvasModel.activeTool = (isSequence) ? CanvasModel.OPTIONAL_SEQ_TOOL : CanvasModel.OPTIONAL_TOOL;
 	}
 		
 	public function stopOptionalActivity(){

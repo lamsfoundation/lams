@@ -37,6 +37,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	public static var TRANSITION_TOOL:String = "TRANSITION";  //activie tool ID strings definition
 	public static var OPTIONAL_TOOL:String = "OPTIONAL";
+	public static var OPTIONAL_SEQ_TOOL:String = "OPTIONAL_SEQ";
 	public static var GATE_TOOL:String = "GATE";
 	public static var GROUP_TOOL:String = "GROUP";
 	public static var BRANCH_TOOL:String = "BRANCH";
@@ -463,7 +464,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @param   pos        
 	 * @return  
 	 */
-	public function createNewOptionalActivity(ActivityTypeID, pos:Point, parent){
+	public function createNewOptionalActivity(ActivityTypeID, pos:Point, parent, isSequence:Boolean){
 		var optAct = new ComplexActivity(_cv.ddm.newUIID());
 		
 		optAct.learningDesignID = _cv.ddm.learningDesignID;
@@ -473,6 +474,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		optAct.activityCategoryID = Activity.CATEGORY_SYSTEM;
 		optAct.yCoord = pos.y;
 		optAct.xCoord = pos.x;
+		optAct.isSequenceBased = (isSequence) ? isSequence : false;
 		
 		Debugger.log('Optional Activitys Y Coord is :'+optAct.yCoord,Debugger.GEN,'createNewOptionalActivity','CanvasModel');
 		

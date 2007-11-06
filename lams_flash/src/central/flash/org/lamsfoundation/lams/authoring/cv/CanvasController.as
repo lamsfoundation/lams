@@ -582,9 +582,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 		if(_canvasModel.activeTool == CanvasModel.OPTIONAL_TOOL){
 			var p = new Point(_canvasModel.activeView.content._xmouse-(complexActWidth/2), _canvasModel.activeView.content._ymouse); 
-			_canvasModel.createNewOptionalActivity(Activity.OPTIONAL_ACTIVITY_TYPE,p,parent);
+			_canvasModel.createNewOptionalActivity(Activity.OPTIONAL_ACTIVITY_TYPE,p,parent,false);
 			_canvasModel.getCanvas().stopOptionalActivity();
 			
+		}
+		
+		if(_canvasModel.activeTool == CanvasModel.OPTIONAL_SEQ_TOOL){
+			var p = new Point(_canvasModel.activeView.content._xmouse-(complexActWidth/2), _canvasModel.activeView.content._ymouse); 
+			_canvasModel.createNewOptionalActivity(Activity.OPTIONAL_ACTIVITY_TYPE,p,parent,true);
+			_canvasModel.getCanvas().stopOptionalActivity();
 		}
 		
 		if(_canvasModel.activeTool == CanvasModel.GROUP_TOOL){
