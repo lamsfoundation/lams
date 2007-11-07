@@ -39,34 +39,52 @@
 						jQuery(this).load("displayGroup.do", {stateId: 1, orgId: this.id}, function() {
 							jQuery("a.disabled-sequence-name-link, a.sequence-name-link", this).ToolTip({
 								className: 'sequence-description-tooltip',
-								position: 'mouse'
+								position: 'mouse',
+								delay: 300
+							});
+							jQuery("a.disabled-sequence-name-link, a.sequence-name-link", this).each(function(i, element) {
+								var title = jQuery(element).attr("title");
+								if (title!=null) {
+									var newTitle = title.replace(/\r\n/g,"<BR>").replace(/\n/g,"<BR>")
+									jQuery(element).attr("title", newTitle);
+								}
 							});
 						});
 					});
 					jQuery("body").click(function(event) {
 						if (jQuery(event.target).is("a.j-group-header")){
-							jQuery(event.target).parent("h2").parent("div.left-buttons").parent("div.row").next("div.j-course-contents").toggle("fast");
+							var course = jQuery(event.target).parent("h2").parent("div.left-buttons").parent("div.row").next("div.j-course-contents");
+							if (jQuery.browser.msie) {
+								if (jQuery.browser.version == '6.0') {
+									course.slideToggle("fast");
+								}
+							} else {
+								course.toggle("fast");
+							}
 							return false;
 						}
 					});
 				});
 				
-				function makeSortable(element) {
+				function makeSortable(element, acceptClass) {
 					jQuery(element).Sortable({
-						accept: "j-single-lesson",
+						accept: acceptClass,
 						axis: "vertically",
 						containment: [jQuery(element).offset().left,
 							jQuery(element).offset().top,
 							jQuery(element).width(),
 							jQuery(element).height()],
-						onStop: function s() {
+						onStop: function() {
 							var ids = [];
 							jQuery(this).parent().children("p").each(function(i, element) {
 								ids.push(element.id);
 							});
+							var jLessonsId = jQuery(this).parent().attr("id");
+							var dashIndex = jLessonsId.indexOf("-");
+							var orgId = (dashIndex>0 ? jLessonsId.substring(0, dashIndex) : jLessonsId);
 							$.ajax({
 								url: "servlet/saveLessonOrder",
-								data: {orgId: jQuery(this).parent().attr("id"), 
+								data: {orgId: orgId, 
 									ids: ids.join(",")
 								},
 								error: function(a,b) {

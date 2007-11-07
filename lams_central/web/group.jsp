@@ -24,7 +24,7 @@
 		<div class="j-course-contents">
 		
 		<div class="sequence-name">
-			<div id="<c:out value="${orgBean.id}"/>" class="j-lessons"><c:forEach var="lesson" items="${orgBean.lessons}">
+			<div id="<c:out value="${orgBean.id}"/>-lessons" class="j-lessons"><c:forEach var="lesson" items="${orgBean.lessons}">
 				<p id="<c:out value="${lesson.id}"/>" class="j-single-lesson">
 					<c:if test="${empty lesson.url}">
 						<a title="<c:out value="${lesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${lesson.name}" /></a> 
@@ -42,7 +42,7 @@
 						</a>
 					</c:forEach>
 				</p>
-			</c:forEach><p class="j-single-lesson"></p></div>
+			</c:forEach></div>
 		</div>
 		
 		<c:forEach var="childOrg" items="${orgBean.childIndexOrgBeans}">
@@ -62,8 +62,8 @@
 			</p>
 			
 			<div class="sequence-name">
-				<div id="<c:out value="${childOrg.id}"/>" class="j-lessons"><c:forEach var="childLesson" items="${childOrg.lessons}">
-					<p id="<c:out value="${childLesson.id}"/>" class="j-single-lesson">
+				<div id="<c:out value="${childOrg.id}"/>" class="j-subgroup-lessons"><c:forEach var="childLesson" items="${childOrg.lessons}">
+					<p id="<c:out value="${childLesson.id}"/>" class="j-single-subgroup-lesson">
 						<c:if test="${empty childLesson.url}">
 							<a title="<c:out value="${childLesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${childLesson.name}" /></a>
 							<c:if test="${childLesson.state eq 4}">&nbsp;(<fmt:message key="label.disabled"/>)</c:if>
@@ -83,17 +83,19 @@
 				</c:forEach></div>
 			</div>
 		</div>
-		<script language="javascript" type="text/javascript">
-			makeSortable(jQuery("#<c:out value="${childOrg.id}"/>"));
-		</script>
 		</c:forEach>
 		
 		</div>
 	</div>
+	 
 	<c:if test="${allowSorting}">
 	<script language="javascript" type="text/javascript">
-		makeSortable(jQuery("#<c:out value="${orgBean.id}"/>"));
+		makeSortable(jQuery("div#<c:out value="${orgBean.id}"/>-lessons"), "j-single-lesson");
+		<c:forEach items="${orgBean.childIndexOrgBeans}" var="childOrg">
+		makeSortable(jQuery("div#<c:out value="${childOrg.id}"/>"), "j-single-subgroup-lesson");
+		</c:forEach>
 	</script>
 	</c:if>
+	
 </c:if>
 

@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.web;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -34,7 +35,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
@@ -67,7 +71,40 @@ public class LessonOrderServlet extends HttpServlet {
 		if (orgId != null && ids != null) {
 			Organisation org = (Organisation)service.findById(Organisation.class, orgId);
 						
-			if (org != null) {					
+			if (org != null) {
+				// make sure user has permission to sort org lessons
+				boolean allowSorting = false;
+				List<Integer> roles = new ArrayList<Integer>();
+				List<UserOrganisationRole> userOrganisationRoles = service.getUserOrganisationRoles(orgId,request.getRemoteUser());
+				for(UserOrganisationRole userOrganisationRole:userOrganisationRoles){
+					Integer roleId = userOrganisationRole.getRole().getRoleId();
+					roles.add(roleId);
+					if (roleId.equals(Role.ROLE_GROUP_MANAGER) || roleId.equals(Role.ROLE_MONITOR)) {
+						allowSorting = true;
+					}
+				}
+				if (!allowSorting) {
+					log.warn("User " + request.getRemoteUser() + " tried to sort lessons in orgId " + orgId);
+					response.sendError(HttpServletResponse.SC_FORBIDDEN);
+					return;
+				}
+				
+				// make sure we record lesson ids that belong to this org
+				List<String> idList = Arrays.asList(ids.split(","));
+				List lessons = service.findByProperty(Lesson.class, "organisation", org);
+				for (String id : idList) {
+					try {
+						Long l = new Long(Long.parseLong(id));
+						if (!contains(lessons, l)) {
+							log.warn("Lesson with id " + l + " doesn't belong in org with id " + orgId);
+							response.sendError(HttpServletResponse.SC_FORBIDDEN);
+							return;
+						}
+					} catch(NumberFormatException e) {
+						continue;
+					}
+				}
+				
 				String oldIds = org.getOrderedLessonIds();
 				String updatedIds = mergeLessonIds((oldIds!=null ? oldIds : ""), ids);
 				org.setOrderedLessonIds(updatedIds);
@@ -75,6 +112,17 @@ public class LessonOrderServlet extends HttpServlet {
 			}
 		}
 		
+	}
+	
+	private boolean contains(List lessons, Long id) {
+		if (lessons != null) {
+			Iterator it = lessons.iterator();
+			while (it.hasNext()) {
+				Lesson lesson = (Lesson)it.next();
+				if (lesson.getLessonId().equals(id)) return true;
+			}
+		}
+		return false;
 	}
 	
 	// take the updated list and insert elements of the old list that don't exist in it;

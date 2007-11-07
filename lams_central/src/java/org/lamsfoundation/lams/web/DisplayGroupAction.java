@@ -92,11 +92,9 @@ public class DisplayGroupAction extends Action {
 				Integer roleId = userOrganisationRole.getRole().getRoleId();
 				roles.add(roleId);
 				if (roleId.equals(Role.ROLE_GROUP_MANAGER) || roleId.equals(Role.ROLE_MONITOR)) {
-					log.debug("found roleId: "+roleId);
 					allowSorting = true;
 				}
 			}
-			log.debug("orgId: "+org.getOrganisationId()+" allowSorting: "+allowSorting);
 			IndexOrgBean iob = createOrgBean(org, roles, request.getRemoteUser(), request.isUserInRole(Role.SYSADMIN));
 			request.setAttribute("orgBean", iob);
 			request.setAttribute("allowSorting", allowSorting);

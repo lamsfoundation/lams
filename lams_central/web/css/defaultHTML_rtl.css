@@ -1141,12 +1141,12 @@ My Courses Pages
 
 .sequence-description-tooltip {
 	border: 1px solid #d2d2d2;
-	background-color: #85aacd;
+	background-color: #ffffff;
 	padding: 4px;
-	color: #ccc;
+	color: #000000;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 12px;
-	width: 150px;
+	width: 250px;
 }
 .sequence-description-tooltip #tooltipURL {
 	display: none;
