@@ -73,23 +73,27 @@ class ToolkitController extends AbstractController {
 		var isCanvasDrop:Boolean = cv.getCanvasModel().activeView.content.hitTest(dragIcon_mc);
 		
 		Debugger.log('isCanvasDrop:'+isCanvasDrop,Debugger.GEN,'iconDrop','ToolkitController');
-		for (var i=0; i<optionalOnCanvas.length; i++){
+		
+		for(var i=0; i<optionalOnCanvas.length; i++){
 			var optionalX:Number = optionalOnCanvas[i].activity.xCoord;
 			var optionalY:Number = optionalOnCanvas[i].activity.yCoord;
 			var optionalWidth:Number = optionalOnCanvas[i]._width
 			var optionalHeight:Number = optionalOnCanvas[i]._height
 			
-			if (iconMouseX >= optionalX && iconMouseX <= (optionalX + optionalWidth)){
-				if (iconMouseY >= optionalY && iconMouseY <= (optionalY + optionalHeight)){
+			if(iconMouseX >= optionalX && iconMouseX <= (optionalX + optionalWidth)){
+				if(iconMouseY >= optionalY && iconMouseY <= (optionalY + optionalHeight)){
 					isCanvasDrop = false;
 					dragIcon_mc.removeMovieClip();
 					
-					if (optionalOnCanvas[i].locked){
-						var msg:String = Dictionary.getValue('act_lock_chk');
+					var ta:TemplateActivity = _toolkitModel.getSelectedTemplateActivity();
+					
+					if(optionalOnCanvas[i].locked){
+						var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('act_lock_chk') : Dictionary.getValue('act_seq_lock_chk');
 						LFMessage.showMessageAlert(msg);
-					}else{
-						var ta:TemplateActivity;
-						ta = _toolkitModel.getSelectedTemplateActivity();
+					} else if(optionalOnCanvas[i].activity.isSequenceBased && optionalOnCanvas[i].activity.noSequences <= 0) {
+						var msg:String = Dictionary.getValue('ta_iconDrop_optseq_error_msg');
+						LFMessage.showMessageAlert(msg);
+					} else {
 						cv.setDroppedTemplateActivity(ta, optionalOnCanvas[i].activity.activityUIID);
 					}
 				}					

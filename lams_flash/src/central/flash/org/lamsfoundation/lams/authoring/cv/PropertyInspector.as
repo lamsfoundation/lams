@@ -95,6 +95,10 @@ class PropertyInspector extends PropertyInspectorControls {
 		minAct_stp.addEventListener("focusOut", Delegate.create(this, updateOptionalData));
 		maxAct_stp.addEventListener("change", Delegate.create(this, updateOptionalData));
 		maxAct_stp.addEventListener("focusOut", Delegate.create(this, updateOptionalData));
+		
+		noSeqAct_stp.addEventListener("change", Delegate.create(this, updateOptionalSequenceData));
+		noSeqAct_stp.addEventListener("focusOut", Delegate.create(this, updateOptionalSequenceData));
+		
 		days_stp.addEventListener("change", Delegate.create(this, onScheduleOffsetChange));
 		hours_stp.addEventListener("change", Delegate.create(this, onScheduleOffsetChange));
 		mins_stp.addEventListener("change", Delegate.create(this, onScheduleOffsetChange));
@@ -266,7 +270,7 @@ class PropertyInspector extends PropertyInspectorControls {
 				showBranchingControls(false);
 				showGeneralInfo(false);
 				showAppliedGroupingControls(false);
-				showOptionalControls(true, !a.readOnly);
+				checkEnableOptionalControls(!a.readOnly);
 				populateGroupingProperties(GroupingActivity(caco));
 				showAppliedGroupingProperties(caco);
 				showOptionalActivityProperties(caco);
@@ -320,7 +324,7 @@ class PropertyInspector extends PropertyInspectorControls {
 			showGateControls(false);
 			showGeneralInfo(false);
 			showAppliedGroupingControls(false);
-			showOptionalControls(true, !co.activity.readOnly);
+			checkEnableOptionalControls(!co.activity.readOnly);
 			populateGroupingProperties(GroupingActivity(cca));
 			showAppliedGroupingProperties(cca);
 			showOptionalActivityProperties(cca);
@@ -426,24 +430,38 @@ class PropertyInspector extends PropertyInspectorControls {
 	}
 	
 	private function showOptionalActivityProperties(ca:ComplexActivity){
+		if(ca.isSequenceBased) return showOptionalSequenceActivityProperties(ca);
 	
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_optional_title');
+		
 		runOffline_chk.selected = ca.runOffline;
 		defineLater_chk.selected = ca.defineLater;
 		
 		if(ca.minOptions == undefined) {
-			minAct_stp.value = 0
+			minAct_stp.value = 0;
 		} else {
-			minAct_stp.value = ca.minOptions
+			minAct_stp.value = ca.minOptions;
 		}
 		
 		if(ca.maxOptions == undefined) {
-			maxAct_stp.value = 0
+			maxAct_stp.value = 0;
 		} else {
-			maxAct_stp.value = ca.maxOptions
+			maxAct_stp.value = ca.maxOptions;
 		}
 		
 		currentGrouping_lbl.text = "GroupingUIID:"+StringUtils.cleanNull(ca.runOffline.groupingUIID);
+	}
+	
+	private function showOptionalSequenceActivityProperties(ca:ComplexActivity){
+		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('opt_activity_seq_title');
+		
+		runOffline_chk.selected = ca.runOffline;
+		defineLater_chk.selected = ca.defineLater;
+		
+		if(ca.noSequences == undefined)
+			noSeqAct_stp.value = 0;
+		else
+			noSeqAct_stp.value = ca.noSequences;
 	}
 	
 	private function updateOptionalData(){
@@ -452,9 +470,34 @@ class PropertyInspector extends PropertyInspectorControls {
 		
 		o.minOptions = minAct_stp.value;
 		o.maxOptions = maxAct_stp.value;
-		oa.init();
+		
+		var newChildren = _canvasModel.getCanvas().ddm.getComplexActivityChildren(oa.activityUIID);
+		CanvasOptionalActivity(_canvasModel.selectedItem).updateChildren(newChildren);
 		
 		setModified();
+	}
+	
+	private function updateOptionalSequenceData(){
+		var controller = _canvasModel.activeView.getController();
+		if(!controller.isBusy) {
+			controller.setBusy()
+			
+			var oa = _canvasModel.selectedItem.activity;
+			var o = ComplexActivity(oa);
+			
+			if(o.noSequences < noSeqAct_stp.value) {
+				_canvasModel.createNewSequenceActivity(oa);
+			} else {
+				var itemToRemove:Number = CanvasOptionalActivity(_canvasModel.selectedItem).getLastItem();
+				_canvasModel.removeActivity(itemToRemove);
+			}
+				
+			var newChildren:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(oa.activityUIID);
+			CanvasOptionalActivity(_canvasModel.selectedItem).updateChildren(newChildren);
+			
+			setModified();
+			controller.clearBusy()
+		}
 	}
 	
 	private function showParallelActivityProperties(ca:ComplexActivity){

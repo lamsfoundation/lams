@@ -38,6 +38,9 @@ import mx.managers. *
 */
 class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieClip implements ICanvasActivity{
 
+	public static var ACT_TYPE:Number = 0;
+	public static var SEQ_TYPE:Number = 1;
+
 	private var CHILD_OFFSET_X : Number = 8;
 	private var CHILD_OFFSET_Y : Number = 57;
 	private var CHILD_INCRE : Number = 60;
@@ -50,35 +53,39 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var learnerContainer:MovieClip;
 	
 	//this is set by the init object
-	private var _canvasController : CanvasController;
-	private var _canvasView : CanvasView;
-	private var _monitorController : MonitorController;
-	private var _monitorTabView : MonitorTabView;
+	private var _canvasController:CanvasController;
+	private var _canvasView:CanvasView;
+	private var _monitorController:MonitorController;
+	private var _monitorTabView:MonitorTabView;
 	private var _ca = ComplexActivity;
 	
 	//Set by the init obj
-	private var _activity : Activity;
-	private var _children : Array;
-	private var children_mc : Array 
-	private var panelHeight : Number;
-	private var actMinOptions: Number;
-	private var actMaxOptions: Number;
+	private var _activity:Activity;
+	private var _children:Array;
+	private var children_mc:Array 
+	private var panelHeight:Number;
+	private var actMinOptions:Number;
+	private var actMaxOptions:Number;
+	private var noSeqActivities:Number;
 	
 	//refs to screen items:
-	private var container_pnl : Panel;
-	private var header_pnl : Panel;
-	private var act_pnl : Panel;
-	private var title_lbl : Label;
-	private var actCount_lbl : Label;
+	private var container_pnl:Panel;
+	private var header_pnl:Panel;
+	private var act_pnl:Panel;
+	private var title_lbl:Label;
+	private var actCount_lbl:Label;
+	
+	// type
+	private var _type:Number;
 	
 	//locals
-	private var childActivities_mc : MovieClip;
-	private var optionalActivity_mc : MovieClip;
-	private var clickTarget_mc : MovieClip;
-	private var padlockClosed_mc : MovieClip;
-	private var padlockOpen_mc : MovieClip;
-	private var _dcStartTime : Number = 0;
-	private var _doubleClicking : Boolean;
+	private var childActivities_mc:MovieClip;
+	private var optionalActivity_mc:MovieClip;
+	private var clickTarget_mc:MovieClip;
+	private var padlockClosed_mc:MovieClip;
+	private var padlockOpen_mc:MovieClip;
+	private var _dcStartTime:Number = 0;
+	private var _doubleClicking:Boolean;
 	
 	// Only for Monitor Optional Container children
 	private var fromModuleTab:String;
@@ -106,10 +113,25 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		_ca = new ComplexActivity(_activity.activityUIID)
 		_activity.activityCategoryID = Activity.CATEGORY_SYSTEM;
 		
-		MovieClipUtils.doLater (Proxy.create (this, init));
+		_type = (ComplexActivity(_activity).isSequenceBased) ? SEQ_TYPE : ACT_TYPE;
+		
+		MovieClipUtils.doLater(Proxy.create(this, init));
 	}
 	
 	public function init():Void {
+		switch(_type) {
+			case ACT_TYPE:
+				initActivityType();
+				break;
+			case SEQ_TYPE:
+				initSequenceType();
+				break;
+			default:
+		}
+	}
+	
+	public function initActivityType():Void {
+		
 		clickTarget_mc.onPress = Proxy.create (this, localOnPress);
 		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
@@ -122,42 +144,82 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		CHILD_OFFSET_X = 8;
 		CHILD_OFFSET_Y = 57;
 		
-		for (var j=0; j<children_mc.length; j++){
-			children_mc[j].removeMovieClip();
-		}
+		removeAllChildren();
 		
 		children_mc = new Array();
 		
-		for (var i = 0; i < _children.length; i ++)		{
-			if (fromModuleTab == "monitorMonitorTab"){
-				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children [i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+		for (var i=0; i < _children.length; i++)		{
+			if(fromModuleTab == "monitorMonitorTab"){
+				children_mc[i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children [i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
 			}else {
-				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children [i] , _canvasController:_canvasController, _canvasView:_canvasView});
-				
+				children_mc[i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children [i] , _canvasController:_canvasController, _canvasView:_canvasView});
 			}
 			
 			//set the positioning co-ords
-			children_mc [i].activity.xCoord = CHILD_OFFSET_X;
-			children_mc [i].activity.yCoord = CHILD_OFFSET_Y + (i * CHILD_INCRE);
+			children_mc[i].activity.xCoord = CHILD_OFFSET_X;
+			children_mc[i].activity.yCoord = CHILD_OFFSET_Y + (i * CHILD_INCRE);
 			
-			children_mc [i]._visible = true;
+			children_mc[i]._visible = true;
 
 		}
 		
-		MovieClipUtils.doLater (Proxy.create (this, draw));
+		MovieClipUtils.doLater(Proxy.create(this, draw));
+		
+	}
+	
+	public function initSequenceType():Void {
+		clickTarget_mc.onPress = Proxy.create(this, localOnPress);
+		clickTarget_mc.onRelease = Proxy.create(this, localOnRelease);
+		clickTarget_mc.onReleaseOutside = Proxy.create(this, localOnReleaseOutside);
+		
+		showStatus(false);
+		
+		CHILD_OFFSET_X = 8;
+		CHILD_OFFSET_Y = 57;
+		
+		removeAllChildren();
+		
+		children_mc = new Array();
+		
+		for(var i=0; i < _children.length; i++) {
+			if(_children.isSequenceActivity()) {
+				if(fromModuleTab == "monitorMonitorTab")
+					children_mc[i] = childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+				else
+					children_mc[i] = childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView});
+			}
+		}
+		
+		ComplexActivity(_activity).noSequences = _children.length;
+		
+		MovieClipUtils.doLater(Proxy.create(this, draw));
+	}
+	
+	public function removeAllChildren():Void {
+		for(var j=0; j<children_mc.length; j++)
+			children_mc[j].removeMovieClip();
+	}
+	
+	public function updateChildren(newChildren:Array):Void {
+		_visible = false;
+		_children = newChildren;
+		init();
 	}
 	
 	public function refreshChildren():Void {
-		for (var i = 0; i < children_mc.length; i ++)		{
+		for(var i = 0; i < children_mc.length; i ++)		{
 			children_mc[i].setSelected(false);
 		}
+	}
+	
+	public function getLastItem():Number {
+		return Number(children_mc[children_mc.length - 1].activity.activityUIID);
 	}
 	
 	private function showStatus(isVisible:Boolean){
 		completed_mc._visible = isVisible;
 		current_mc._visible = isVisible;
 		todo_mc._visible = isVisible;
-		
 	}
 	
 	public function setSelected(isSelected){}
@@ -217,9 +279,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		setStyles();
 		
 		//write text
-		title_lbl.text = _activity.title 		//Dictionary.getValue('opt_activity_title'); //'Optional Activities'
-		//_activity.title = 'Optional Activities';
-		actCount_lbl.text = _children.length +" - "+ Dictionary.getValue('lbl_num_activities'); //" activities";
+		title_lbl.text = _activity.title;
+		
+		actCount_lbl.text = (type == ACT_TYPE) ? Dictionary.getValue('lbl_num_activities', [children_mc.length]) : Dictionary.getValue('lbl_num_sequences', [children_mc.length]);
 		
 		//position the container (this)
 		if(numOfChildren > 1){
@@ -377,5 +439,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			_canvasController = a;
 		else
 			_monitorController = a;
+	}
+	
+	public function get type():Number {
+		return _type;
 	}
 }

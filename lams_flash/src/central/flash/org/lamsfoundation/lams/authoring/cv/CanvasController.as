@@ -50,12 +50,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	*
 	* @param   cm   The model to modify.
 	*/
-	public function CanvasController (cm:Observable) {
-		super (cm);
+	public function CanvasController(cm:Observable) {
+		super(cm);
 		
 		//have to do an upcast
 		_canvasModel = CanvasModel(getModel());
 		_canvasView = CanvasView(getView());
+
 		_pi = new PropertyInspector();
 		app = Application.getInstance();
 		_isBusy = false;
@@ -150,22 +151,34 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				//if we are on the optional Activity remove this activity from canvas and assign it a parentID of optional activity and place it in the optional activity window.
 				for (var i=0; i<optionalOnCanvas.length; i++){
 					if(ca.activity.activityUIID != optionalOnCanvas[i].activity.activityUIID ){
+						
 						if(ca.hitTest(optionalOnCanvas[i])){
 							if(optionalOnCanvas[i].locked == true){
-								var msg:String = Dictionary.getValue('act_lock_chk');
+								activitySnapBack(ca);
+								var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('act_lock_chk') : Dictionary.getValue('act_seq_lock_chk');
 								LFMessage.showMessageAlert(msg);
-							}else{
-								if(ca.activity.isGateActivity()){
+							} else {
+								if(ca.activity.isGateActivity() && !optionalOnCanvas[i].activity.isSequenceBased){
 									activitySnapBack(ca);
 									var msg:String = Dictionary.getValue('cv_gateoptional_hit_chk');
 									LFMessage.showMessageAlert(msg);
-								}else {
-									if(_canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(ca.activity.activityUIID).hasTrans){
+								} else {
+									if(_canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(ca.activity.activityUIID).hasTrans) {
 										activitySnapBack(ca);
-										var msg:String = Dictionary.getValue('cv_invalid_optional_activity', [ca.activity.title]);
+										var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity', [ca.activity.title]);
 										LFMessage.showMessageAlert(msg);
-									}else {
-										_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca)
+									} else if(_canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID).hasBranches) {
+										activitySnapBack(ca);
+										var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity_no_branches', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity_no_branches', [ca.activity.title]);
+										LFMessage.showMessageAlert(msg);
+									} else if(optionalOnCanvas[i].activity.isSequenceBased && optionalOnCanvas[i].activity.noSequences <= 0) {
+										activitySnapBack(ca);
+										var msg:String = Dictionary.getValue('ta_iconDrop_optseq_error_msg');
+										LFMessage.showMessageAlert(msg);
+									} else {
+										_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca, false);
+										var newChildren:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(optionalOnCanvas[i].activity.activityUIID);
+										optionalOnCanvas[i].updateChildren(newChildren);
 									}
 								}
 							}						
@@ -241,8 +254,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			}
 			
 			clearAllSelections(optionalOnCanvas, parallelOnCanvas);
+			
 			_canvasModel.selectedItem = ca;	
 			_canvasModel.setDirty();
+			
 			Debugger.log('ca.activity.xCoord:'+ca.activity.xCoord,Debugger.GEN,'activityRelease','CanvasController');
 			
 			
@@ -250,10 +265,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			if (_canvasModel.isTransitionToolActive()){
 				_canvasModel.getCanvas().stopTransitionTool();
 				_canvasModel.activeView.removeTempTrans();
+				
 				new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
 			}
 			
 			clearAllSelections(optionalOnCanvas, parallelOnCanvas);
+			
 			_canvasModel.selectedItem = ca;
 			_canvasModel.setDirty();
 		}

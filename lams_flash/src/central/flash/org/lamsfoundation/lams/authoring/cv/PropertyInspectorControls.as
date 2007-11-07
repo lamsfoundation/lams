@@ -126,8 +126,10 @@ class PropertyInspectorControls extends MovieClip {
 	//Complex Activity
 	private var min_lbl:Label;
 	private var max_lbl:Label;
+	private var noSeqAct_lbl:Label;
 	private var minAct_stp:NumericStepper;
 	private var maxAct_stp:NumericStepper;
+	private var noSeqAct_stp:NumericStepper;
 	
 	// Branch Connector
 	private var _pi_defaultBranch_cb:CheckBox;
@@ -193,6 +195,8 @@ class PropertyInspectorControls extends MovieClip {
 		min_lbl.text = Dictionary.getValue('pi_min_act');
 		max_lbl.text = Dictionary.getValue('pi_max_act');
 		
+		noSeqAct_lbl.text = Dictionary.getValue('pi_no_seq_act');
+		
 		_group_match_btn.label = Dictionary.getValue('pi_mapping_btn_lbl');
 		_group_naming_btn.label = Dictionary.getValue('pi_group_naming_btn_lbl');
 		_tool_output_match_btn.label = Dictionary.getValue('pi_mapping_btn_lbl');
@@ -220,6 +224,7 @@ class PropertyInspectorControls extends MovieClip {
 		_group_match_btn.visible = false;
 		
 		hideAllSteppers(false);
+		
 		showGroupingControls(false);
 		showGeneralControls(false);
 		showOptionalControls(false);
@@ -350,8 +355,24 @@ class PropertyInspectorControls extends MovieClip {
 		}
 	} 
 	
-	private function showOptionalControls(v:Boolean, e:Boolean){
+	private function showOptionalSequenceControls(v:Boolean, e:Boolean){
+		desc_lbl.visible = v;
+		desc_txt.visible = v;
+		noSeqAct_lbl.visible = v;
+		noSeqAct_stp.visible = v;
 		
+		if(e != null) {
+			noSeqAct_stp.enabled = e;
+			noSeqAct_lbl.enabled = e;
+			desc_lbl.enabled = e;
+			desc_txt.enabled = e;
+		}
+		
+		grouping_lbl.visible = false;
+
+	}
+	
+	private function showOptionalActivityControls(v:Boolean, e:Boolean){
 		min_lbl.visible = v;	
 		max_lbl.visible = v;
 		minAct_stp.visible = v;
@@ -369,7 +390,45 @@ class PropertyInspectorControls extends MovieClip {
 		}
 		
 		grouping_lbl.visible = false;
+	}
+	
+	private function showOptionalControls(v:Boolean, e:Boolean){
+		if(!v) {
+			showOptionalActivityControls(v);
+			showOptionalSequenceControls(v);
+		}
+
+	}
+	
+	private function checkEnableOptionalControls(e:Boolean):Void {
 		
+		if(CanvasOptionalActivity(_canvasModel.selectedItem).type == CanvasOptionalActivity.SEQ_TYPE) {
+			if(e != null)
+				noSeqAct_stp.enabled = e;
+			else
+				noSeqAct_stp.enabled = true;
+			
+			MovieClipUtils.doLater(Proxy.create(this,showOptionalControlsLater, true));
+		} else {
+			if(e != null) {
+				minAct_stp.enabled = e;
+				maxAct_stp.enabled = e;
+			} else {
+				minAct_stp.enabled = true;
+				maxAct_stp.enabled = true;
+			}
+			
+			MovieClipUtils.doLater(Proxy.create(this, showOptionalControlsLater, false));
+		}
+		
+	
+	}
+	
+	private function showOptionalControlsLater(isSequence:Boolean):Void {
+		if(isSequence)
+			MovieClipUtils.doLater(Proxy.create(this, showOptionalSequenceControls, true));
+		else
+			MovieClipUtils.doLater(Proxy.create(this, showOptionalActivityControls, true));
 	}
 	
 	private function showGateControls(v:Boolean, e:Boolean){
@@ -406,6 +465,7 @@ class PropertyInspectorControls extends MovieClip {
 		branchType_lbl.visible = v;
 		branchType_cmb.visible = v;
 		hideAllSteppers(false);
+		
 		var _activityTypeID:Number = _canvasModel.selectedItem.activity.activityTypeID;
 		
 		if(_activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE) {
@@ -800,6 +860,7 @@ class PropertyInspectorControls extends MovieClip {
 		desc_lbl.setStyle('styleName', styleObj);
 		min_lbl.setStyle('styleName', styleObj);
 		max_lbl.setStyle('styleName', styleObj);
+		noSeqAct_lbl.setStyle('styleName', styleObj);
 		grouping_lbl.setStyle('styleName', styleObj);
 		currentGrouping_lbl.setStyle('styleName', styleObj);
 		gateType_lbl.setStyle('styleName', styleObj);
@@ -827,6 +888,7 @@ class PropertyInspectorControls extends MovieClip {
 		endMins_stp.setStyle('styleName', styleObj);
 		minAct_stp.setStyle('styleName', styleObj);
 		maxAct_stp.setStyle('styleName', styleObj);
+		noSeqAct_stp.setStyle('styleName', styleObj);
 		
 		_pi_defaultBranch_cb.setStyle('styleName', styleObj);
 		_define_monitor_cb.setStyle('styleName', styleObj);

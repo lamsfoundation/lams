@@ -344,4 +344,8 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 		return _childActivities;
 	}
 	
+	public function get title():String {
+		return title_lbl.text;
+	}
+	
 }

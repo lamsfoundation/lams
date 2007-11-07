@@ -1063,9 +1063,12 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var target = null;
 		var sequence = null;
 		
+		var hasBranches:Boolean = false;
+		
 		for(var i=0; i<br.length;i++){
 			if(br[i].targetUIID == UIID || br[i].hubUIID == UIID || br[i].sequenceActivity.activityUIID == UIID){
 				myBranches.push(br[i]);
+				hasBranches = true;
 			}
 			if(target != null && hub != null){
 					break;
@@ -1087,6 +1090,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		branchObj.target = target;
 		branchObj.sequence = sequence;
 		branchObj.hub = hub;
+		branchObj.hasBranches = hasBranches;
 		return branchObj;
 	}
 	
