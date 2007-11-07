@@ -207,7 +207,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 							}
 							idx++;
 						}
-						topic.setAttachmentLocalUrl(userName + "/" + idx + "/" + att.getFileName());
+						topic.setAttachmentLocalUrl(userName + "/" + idx + "/" + att.getFileUuid() + '.' + FileUtil.getFileExtension(att.getFileName()));
 						try {
 							handler = getToolContentHandler();
 							handler.saveFile(att.getFileUuid(), FileUtil.getFullPath(directoryName, topic.getAttachmentLocalUrl()));
