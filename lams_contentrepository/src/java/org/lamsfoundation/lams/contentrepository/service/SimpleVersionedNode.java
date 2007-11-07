@@ -43,6 +43,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.CrNode;
 import org.lamsfoundation.lams.contentrepository.CrNodeVersion;
+import org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty;
 import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -60,6 +61,7 @@ import org.lamsfoundation.lams.contentrepository.ValidationException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.dao.IFileDAO;
 import org.lamsfoundation.lams.contentrepository.dao.INodeDAO;
+import org.lamsfoundation.lams.util.FileUtil;
 
 
 /**
@@ -270,37 +272,17 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	/**
 	 * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#getZipCompatiblePath()
 	 */
-    public String getZipCompatiblePath() {
+    public String getZipCompatibleFilename() {
     	nodeObjectInitilised("Unable to get path.");
-    	String path = node.getPath();
-    	if ( path == null ) {
+    	
+    	CrNodeVersionProperty filenameProperty = nodeVersion.getProperty(PropertyName.FILENAME);
+    	String filename = filenameProperty != null ? filenameProperty.getString() : null;
+
+    	if ( filename == null ) {
     		return null;
     	} else {
         	String uuidString = node.getNodeId().toString(); 
-        	
-    		path = path.trim();
-    		int dotPos = path.lastIndexOf(".");
-    		String extension = dotPos >= 0 ? path.substring(dotPos + 1, path.length()) : null;
-    		
-			// convert each section of the path to the number
-			// should try to handle funny paths like ones with leading or trailing slashes
-			String modified = "";
-			if ( path.startsWith("/") ) {
-				modified = "/" + modified;
-				path = path.substring(1,path.length());
-			}
-
-			String[] pathParts = path.split("[/]+");
-			for ( int i=0; i<pathParts.length-1; i++) {
-				modified = modified + uuidString + '/'; 
-			}
-			modified = modified + uuidString;
-
-			if ( path.endsWith("/") )
-				modified = modified + "/";
-
-			// now add the extension back on the end
-			return extension != null ? modified + "." + extension : modified;
+        	return uuidString + '.' + FileUtil.getFileExtension(filename);
     	}
     }
 
