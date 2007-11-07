@@ -62,6 +62,12 @@ public class LoginRequestDispatcher {
 	public static final String PARAM_REQUEST_SRC ="requestSrc";
 	
 	public static final String PARAM_NOTIFY_CLOSE_URL ="notifyCloseURL";
+	
+	public static final String PARAM_FIRST_NAME = "firstName";
+	
+	public static final String PARAM_LAST_NAME = "lastName";
+	
+	public static final String PARAM_EMAIL = "email";
 
 	public static final String METHOD_AUTHOR = "author";
 

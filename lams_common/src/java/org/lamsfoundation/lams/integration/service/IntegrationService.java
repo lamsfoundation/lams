@@ -119,13 +119,38 @@ public class IntegrationService implements IIntegrationService{
 		service.save(user);
 	}
 
-	public ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException {
+	public ExtUserUseridMap getExtUserUseridMap(
+									ExtServerOrgMap serverMap, 
+									String extUsername) 
+									throws UserInfoFetchException 
+	{
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put("extServerOrgMap.sid", serverMap.getSid());
 		properties.put("extUsername", extUsername);
 		List list = service.findByProperties(ExtUserUseridMap.class, properties);
 		if(list==null || list.size()==0){
 			return createExtUserUseridMap(serverMap, extUsername);
+		}else{
+			return (ExtUserUseridMap)list.get(0);
+		}
+	}
+	
+	public ExtUserUseridMap getImplicitExtUserUseridMap(
+									ExtServerOrgMap serverMap, 
+									String extUsername,
+									String firstName, 
+									String lastName,
+									String language,
+									String country,
+									String email) 
+									throws UserInfoFetchException 
+	{
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put("extServerOrgMap.sid", serverMap.getSid());
+		properties.put("extUsername", extUsername);
+		List list = service.findByProperties(ExtUserUseridMap.class, properties);
+		if(list==null || list.size()==0){
+			return createImplicitExtUserUseridMap(serverMap, extUsername, firstName, lastName, language, country, email);
 		}else{
 			return (ExtUserUseridMap)list.get(0);
 		}
@@ -184,6 +209,50 @@ public class IntegrationService implements IIntegrationService{
 		addMemberships(user, serverMap.getOrganisation());
 		return map;
 	}
+	
+	public ExtUserUseridMap createImplicitExtUserUseridMap(ExtServerOrgMap serverMap, 
+			String extUsername,
+			String firstName, 
+			String lastName,
+			String language,
+			String country,
+			String email) throws UserInfoFetchException
+	{
+		
+		User user = new User();
+		user.setLogin(buildName(serverMap.getPrefix(),extUsername));
+		user.setPassword(HashUtil.sha1(RandomPasswordGenerator.nextPassword(10)));
+		user.setTitle("");
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setAddressLine1("");
+        user.setCity("");
+        user.setState("");
+        user.setPostcode("");
+        user.setCountry("");
+        user.setDayPhone("");
+        user.setMobilePhone("");
+        user.setFax("");
+        user.setEmail(email);
+        user.setAuthenticationMethod((AuthenticationMethod)service.findById(AuthenticationMethod.class, AuthenticationMethod.DB));
+        user.setCreateDate(new Date());
+        user.setDisabledFlag(false);
+        user.setLocale(LanguageUtil.getSupportedLocale(language, country));
+		user.setFlashTheme(service.getDefaultFlashTheme());
+		user.setHtmlTheme(service.getDefaultHtmlTheme());
+		service.save(user);
+		ExtUserUseridMap map = new ExtUserUseridMap();
+		map.setExtServerOrgMap(serverMap);
+		map.setExtUsername(extUsername);
+		map.setUser(user);
+		service.save(map);
+		// every integration user is added to the group for their 3rd party server;
+		// becomes the 'public' folder for that server
+		addMemberships(user, serverMap.getOrganisation());
+		return map;
+		
+	}
+	
 
 	private String[] getUserDataFromExtServer(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException {
         //the callback url must contain %username%, %timestamp% and %hash%

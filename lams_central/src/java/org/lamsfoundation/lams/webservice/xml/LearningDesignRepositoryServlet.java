@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
+import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.CentralConstants;
@@ -281,6 +282,20 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 			String lang 		= request.getParameter(CentralConstants.PARAM_LANG);
 			String modeStr 		= request.getParameter(CentralConstants.PARAM_MODE);
 
+			String firstName = "";
+			String lastName = "";
+			String email = "";
+			
+			try{
+				firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
+				lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
+				email  = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
+			} catch (NullPointerException e)
+			{
+			}
+			
+			
+			
 			if (serverId == null || datetime == null || hashValue == null
 					|| username == null || courseId == null || country == null
 					|| lang == null || modeStr == null) {
@@ -301,9 +316,17 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 					.authenticate(serverMap, datetime, username, hashValue);
 
 			// get user map, user is created if this is their first use
-
-			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap,
-					username);
+	
+			ExtUserUseridMap userMap = null;
+			if (firstName.equals("") && lastName.equals(""))
+			{
+				userMap = integrationService.getExtUserUseridMap(serverMap, username);
+			}
+			else
+			{
+				userMap = integrationService.getImplicitExtUserUseridMap(serverMap, username, firstName, lastName, lang, country, email);
+			}	
+		
 			
 			// create group for external course if necessary
 			

@@ -47,6 +47,16 @@ public interface IIntegrationService {
 
 	ExtServerOrgMap getExtServerOrgMap(String serverId);
 	
+	ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, 
+			String extUsername,
+			String firstName, 
+			String lastName,
+			String language,
+			String country,
+			String email) 
+			throws UserInfoFetchException; 
+
+	
 	List getAllExtServerOrgMaps();
 	
 	void saveExtServerOrgMap(ExtServerOrgMap map);

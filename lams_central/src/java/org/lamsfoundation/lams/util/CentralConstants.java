@@ -91,7 +91,9 @@ public class CentralConstants {
 	
 	public static final String ATTR_ACTIVITIES_COMPLETED = "activitiesCompleted";
 	
-	public static final String ATTR_PERCENTAGE_COMPLETE = "percentageComplete";
+	public static final String ATTR_ACTIVITIES_ATTEMPTED = "attemptedActivities";
+	
+	public static final String ATTR_CURRENT_ACTIVITY = "currentActivity";
 	
 	public static final String ELEM_LEARNER_PROGRESS = "LearnerProgress";
 	

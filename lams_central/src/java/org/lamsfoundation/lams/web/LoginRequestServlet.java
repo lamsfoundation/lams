@@ -109,6 +109,20 @@ public class LoginRequestServlet extends HttpServlet {
 		String countryIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_COUNTRY);
 		String langIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
 
+		String firstName = "";
+		String lastName = "";
+		String email = "";
+		
+		try{
+			firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
+			lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
+			email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
+		} catch (NullPointerException e)
+		{
+			log.info("Not using implicit logon");
+		}
+		
+		
 		if (extUsername == null || method == null || serverId == null || timestamp == null
 				|| hash == null || extCourseId == null) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST,
@@ -118,7 +132,18 @@ public class LoginRequestServlet extends HttpServlet {
 		ExtServerOrgMap serverMap = getService().getExtServerOrgMap(serverId);
 
 		try {
-			ExtUserUseridMap userMap = getService().getExtUserUseridMap(serverMap, extUsername);
+			ExtUserUseridMap userMap = null;
+			
+			if (firstName.equals("") && lastName.equals(""))
+			{
+				userMap = getService().getExtUserUseridMap(serverMap, extUsername);
+			}
+			else
+			{
+				userMap = getService().getImplicitExtUserUseridMap(serverMap, extUsername, firstName, lastName, langIsoCode, countryIsoCode, email);
+			}
+			
+			 
 			Authenticator.authenticate(serverMap, timestamp, extUsername, method, hash);
 			ExtCourseClassMap orgMap = getService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode);
 			User user = userMap.getUser();
@@ -165,17 +190,22 @@ public class LoginRequestServlet extends HttpServlet {
 			hses.setAttribute(AttributeNames.USER, user.getUserDTO());
 			response.sendRedirect("j_security_check?j_username=" + login + "&j_password=" + pass);
 		} catch (AuthenticationException e) {
+			log.error("Authentication error: ", e);
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 					"Login Failed - authentication error");
 		} catch (UserInfoFetchException e) {
+			log.error("User fetch info error: ", e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, 
 					"Login Failed - failed to fetch user info from the third party server");
 		} catch (FailedLoginException e) {
+			log.error("Login error: ", e);
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 					"Login Failed - user was not found");
 		} catch (NamingException e) {
+			log.error("Naming error: ", e);
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		} catch (SQLException e) {
+			log.error("Database error: ", e);
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}

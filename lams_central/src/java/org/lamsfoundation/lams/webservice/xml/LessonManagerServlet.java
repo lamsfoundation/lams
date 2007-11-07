@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -330,11 +331,27 @@ public class LessonManagerServlet extends HttpServlet {
 			String prefix = serverMap.getPrefix();
 			if(lesson!=null){
 				
-				int activities = lesson.getLearningDesign().getActivities().size();
+				int activitiesTotal = lesson.getLearningDesign().getActivities().size();
 				Iterator iterator = lesson.getLearnerProgresses().iterator();
 				while(iterator.hasNext()){
 	    			LearnerProgress learnProg = (LearnerProgress)iterator.next();
 	    			LearnerProgressDTO learnerProgress = learnProg.getLearnerProgressData();
+	    			
+	    			//Iterator activities = learnProg.getLesson().getLearningDesign().getActivities().iterator();
+	    			
+	    			//String currActivity = "";
+	    			//while (activities.hasNext())
+	    			//{
+	    			//	Activity act = (Activity)iterator.next();
+	    			//	
+	    			//	if (learnerProgress.getCurrentActivityId() == ((Activity)iterator.next()).getActivityId())
+	    			//	{
+	    			//		currActivity = act.getTitle();
+	    			//		break;
+	    			//	}
+	    			//}
+	    			
+	    			
 	    			
 	    			// get the username with the integration prefix removed
 	    			String userNoPrefixName = learnerProgress.getUserName().
@@ -345,18 +362,15 @@ public class LessonManagerServlet extends HttpServlet {
 	    			Element learnerProgElem = document.createElement(CentralConstants.ELEM_LEARNER_PROGRESS);
 	    			
 	    			int completedActivities = learnerProgress.getCompletedActivities().length;
-	    			
-	    			float percentageComplete;
-	    		
-	    			percentageComplete = (float)completedActivities/(float)activities;
-	    			percentageComplete *= 100;
+	    			int attemptedActivities = learnerProgress.getAttemptedActivities().length;
 	    			
 	    			if(learnerProgElem.getNodeType()== Node.ELEMENT_NODE)
 	    			{
 		    			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_COMPLETE , "" + learnerProgress.getLessonComplete());
-		    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITY_COUNT , "" + activities);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITY_COUNT , "" + activitiesTotal);
 		    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_COMPLETED , "" + completedActivities);
-		    			learnerProgElem.setAttribute(CentralConstants.ATTR_PERCENTAGE_COMPLETE , "" + percentageComplete);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_ATTEMPTED , "" + attemptedActivities);
+		    			//learnerProgElem.setAttribute(CentralConstants.ATTR_CURRENT_ACTIVITY , currActivity);
 		    			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + learnerMap.getSid());
 		    			learnerProgElem.setAttribute(CentralConstants.ATTR_COURSE_ID, courseID);
 		    			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, userNoPrefixName);
