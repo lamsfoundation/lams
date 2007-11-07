@@ -167,6 +167,18 @@ public interface IVersionedNode {
     public String getPath() ;
 
     /**
+     * Get zip compatible filename/path.
+     * 
+     * There are problems with zipping up files where the names are UTF-8 names - depending on what platform
+     * and what zip utility you are using, the filename may be corrupted. To avoid this, we can produce a filename (and
+     * path) where the normal "names" are replaced with the uuid but the extension is kept. This will allow downloaded
+     * files to be opened by their applications
+     * 
+     * @return a file path (from parent) or filename that may be used for naming a file put in a zip archive.
+     */
+    public String getZipCompatiblePath() ;
+
+    /**
      * Get the ticket through which this node was accessed.
      * 
      * @return A (@link ITicket} object.

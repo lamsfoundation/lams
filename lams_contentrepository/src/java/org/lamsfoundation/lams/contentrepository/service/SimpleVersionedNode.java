@@ -268,6 +268,43 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	}
 
 	/**
+	 * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#getZipCompatiblePath()
+	 */
+    public String getZipCompatiblePath() {
+    	nodeObjectInitilised("Unable to get path.");
+    	String path = node.getPath();
+    	if ( path == null ) {
+    		return null;
+    	} else {
+        	String uuidString = node.getNodeId().toString(); 
+        	
+    		path = path.trim();
+    		int dotPos = path.lastIndexOf(".");
+    		String extension = dotPos >= 0 ? path.substring(dotPos + 1, path.length()) : null;
+    		
+			// convert each section of the path to the number
+			// should try to handle funny paths like ones with leading or trailing slashes
+			String modified = "";
+			if ( path.startsWith("/") ) {
+				modified = "/" + modified;
+				path = path.substring(1,path.length());
+			}
+
+			String[] pathParts = path.split("[/]+");
+			for ( int i=0; i<pathParts.length-1; i++) {
+				modified = modified + uuidString + '/'; 
+			}
+			modified = modified + uuidString;
+
+			if ( path.endsWith("/") )
+				modified = modified + "/";
+
+			// now add the extension back on the end
+			return extension != null ? modified + "." + extension : modified;
+    	}
+    }
+
+	/**
 	 * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#getTicket()
 	 */
 	public ITicket getTicket() {
@@ -889,7 +926,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 					
 					// Open the file ready for reading then create
 					// the file node. Mime type is unknown.
-					// no need to the new node as a childe node, as createFileNode will do it.
+					// no need to the new node as a child node, as createFileNode will do it.
 					FileInputStream istream = new FileInputStream(file);
 					nodeFactory.createFileNode(workspace, this, relPath, istream, filename, null, versionDescription, userId);
 				}
