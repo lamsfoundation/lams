@@ -124,9 +124,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				FileDetailsDTO submittedFile = (FileDetailsDTO) fileListIter
 						.next();
 
-				logger.debug("doExport: starting to write file:"
-						+ submittedFile.getFilePath());
-
 				IVersionedNode node = sbmtService.downloadFile(submittedFile
 						.getUuID(), submittedFile.getVersionID());
 				
@@ -143,10 +140,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 						// Creating the directory structure
 						outFileDir.mkdirs();
-
-						File outFile = new File(outFileDir, submittedFile
-								.getFilePath());
-
+						
+						logger.debug("doExport: starting to write file in zip compatible format:"
+								+ node.getZipCompatibleFilename());
+						
+						File outFile = new File(outFileDir, node.getZipCompatibleFilename());
+						
 						// writing the data to file
 						FileOutputStream fos = new FileOutputStream(outFile);
 						BufferedOutputStream bos = new BufferedOutputStream(fos);
@@ -178,7 +177,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				logger.debug("doExport: encoding exportedURL");
 				
 				String exportedURL = user.getLogin() + "/" + submissionCount
-						+ "/" + submittedFile.getFilePath();
+				+ "/" + node.getZipCompatibleFilename();
 				
 				attachmentList.add(exportedURL);
 				
