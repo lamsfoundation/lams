@@ -988,7 +988,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		try {
 			//import learning design
-			LearningDesignDTO ldDto = getLDDTO(learningDesignPath, toolsErrorMsgs);
+			String fullFilePath = FileUtil.getFullPath(learningDesignPath,LEARNING_DESIGN_FILE_NAME);
+			checkImportVersion(fullFilePath, toolsErrorMsgs);
+			LearningDesignDTO ldDto = (LearningDesignDTO) getObjectFromXML(null, fullFilePath);
 			log.debug("Learning design xml deserialize to LearingDesignDTO success.");
 			
 			//begin tool import
@@ -1082,10 +1084,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 	}
 	/**
-	 * Call xstream to get the learning design from the export file. To make it forwardly compatible we catch any exceptions
+	 * Call xstream to get the POJOs from the XML file. To make it backwardly compatible we catch any exceptions
 	 * due to added fields, remove the field using the ToolContentVersionFilter functionality and try to reparse. We can't
-	 * nominate the problem fields in advance as we are dealing with FORWARD compatibility ie making XML created by newer
-	 * versions of LAMS compatible with an existing version.
+	 * nominate the problem fields in advance as we are making XML created by newer versions of LAMS compatible with an older version.
 	 * 
 	 * This logic depends on the exception message containing the text. When we upgrade xstream, we must check that this message
 	 * doesn't change.
@@ -1103,13 +1104,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * 	-------------------------------
 	 * </pre>
 	 */
-	private LearningDesignDTO getLDDTO(String learningDesignPath, List<String> toolsErrorMsgs) throws JDOMException, IOException {
-		String fullFilePath = FileUtil.getFullPath(learningDesignPath,LEARNING_DESIGN_FILE_NAME);
-		log.debug("Checking the version in the import file against the version in the database");
-		checkImportVersion(fullFilePath, toolsErrorMsgs);
+	private Object getObjectFromXML(XStream xStream, String fullFilePath) throws JDOMException, IOException {
 
-		Reader ldFile = null;
-		XStream designXml = new XStream();
+		Reader file = null;
+		XStream conversionXml = xStream != null ? xStream : new XStream();
 		ConversionException finalException = null;
 		String lastFieldRemoved = "";
 		ToolContentVersionFilter contentFilter = null;
@@ -1124,13 +1122,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 					break;
 				numTries++;
 				
-				ldFile = new InputStreamReader(new FileInputStream(fullFilePath),"UTF-8"); 
-				return (LearningDesignDTO) designXml.fromXML(ldFile);
+				file = new InputStreamReader(new FileInputStream(fullFilePath),"UTF-8"); 
+				return conversionXml.fromXML(file);
 
 			} catch ( ConversionException ce) {
 				log.debug("Failed import",ce);
 				finalException = ce;
-				ldFile.close();
+				file.close();
 
 				if ( ce.getMessage() == null ) {
 					// can't retry, so get out of here!
@@ -1163,8 +1161,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 					}
 				} 
 			} finally {
-				if ( ldFile != null ) 
-					ldFile.close();
+				if ( file != null ) 
+					file.close();
 			}
 		}
 		throw finalException;
@@ -1276,8 +1274,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			filterClass = null;
 			
 			//read tool file after transform.
-			Reader toolFile = new InputStreamReader(new FileInputStream(toolFilePath),"UTF-8");
-			toolPOJO = toolXml.fromXML(toolFile);
+			toolPOJO = getObjectFromXML(toolXml, toolFilePath);
 			
 			//upload file node if has
 			if(handler != null){
