@@ -113,6 +113,8 @@ import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ToolOutputBranchActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
+import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter.AddedField;
+import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter.RemovedField;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
@@ -130,6 +132,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.VersionUtil;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
@@ -141,6 +144,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.Converter;
 /**
  * Export tool content service bean.
@@ -169,9 +173,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private static final String ERROR_TOOL_NOT_FOUND = "error.import.matching.tool.not.found";
 	private static final String ERROR_SERVICE_ERROR = "error.import.tool.service.fail";
 	private static final String ERROR_NO_VALID_TOOL = "error.no.valid.tool";
+	private static final String ERROR_INCOMPATIBLE_VERSION = "error.possibly.incompatible.version";
 	private static final String FILTER_METHOD_PREFIX_DOWN = "down";
 	private static final String FILTER_METHOD_PREFIX_UP = "up";
 	private static final String FILTER_METHOD_MIDDLE = "To";
+	
+	// LAMS export format tag names
+	private static final String LAMS_VERSION = "version";
+	private static final String LAMS_TITLE = "title";
 	
 	//IMS format some tag name
 	private static final String IMS_FILE_NAME_EXT = "_imsld";
@@ -979,12 +988,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		try {
 			//import learning design
-			Reader ldFile = new InputStreamReader(new FileInputStream(FileUtil.getFullPath(learningDesignPath,LEARNING_DESIGN_FILE_NAME)),"UTF-8"); 
-			XStream designXml = new XStream();
-			LearningDesignDTO ldDto = (LearningDesignDTO) designXml.fromXML(ldFile);
-			
+			LearningDesignDTO ldDto = getLDDTO(learningDesignPath, toolsErrorMsgs);
 			log.debug("Learning design xml deserialize to LearingDesignDTO success.");
-	
+			
 			//begin tool import
 			Map<Long,ToolContent> toolMapper = new HashMap<Long,ToolContent>();
 			Map<Long,AuthoringActivityDTO> removedActMap = new HashMap<Long,AuthoringActivityDTO>();
@@ -1069,15 +1075,150 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			WorkspaceFolder folder = getWorkspaceFolderForDesign(importer, workspaceFolderUid);
 			return saveLearningDesign(ldDto,importer,folder,toolMapper,removedActMap);
 			
-		}catch (ToolException e) {
+		}catch (Exception e) {
+			log.error("Exception occured during import.",e);
 			throw new ImportToolContentException(e);
-		} catch (FileNotFoundException e) {
-			throw new ImportToolContentException(e);
-		} catch (UnsupportedEncodingException e) {
-			throw new ImportToolContentException(e);
-		}
+		} 
 		
 	}
+	/**
+	 * Call xstream to get the learning design from the export file. To make it forwardly compatible we catch any exceptions
+	 * due to added fields, remove the field using the ToolContentVersionFilter functionality and try to reparse. We can't
+	 * nominate the problem fields in advance as we are dealing with FORWARD compatibility ie making XML created by newer
+	 * versions of LAMS compatible with an existing version.
+	 * 
+	 * This logic depends on the exception message containing the text. When we upgrade xstream, we must check that this message
+	 * doesn't change.
+	 * 
+	 * <pre>
+	 * 	com.thoughtworks.xstream.converters.ConversionException: unknownField : unknownField
+	 * 	---- Debugging information ----
+	 * 	required-type       : org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO 
+	 * 	cause-message       : unknownField : unknownField 
+	 * 	class               : org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO 
+	 * 	message             : unknownField : unknownField 
+	 * 	line number         : 15 
+	 * 	path                : /org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO/unknownField 
+	 * 	cause-exception     : com.thoughtworks.xstream.alias.CannotResolveClassException 
+	 * 	-------------------------------
+	 * </pre>
+	 */
+	private LearningDesignDTO getLDDTO(String learningDesignPath, List<String> toolsErrorMsgs) throws JDOMException, IOException {
+		String fullFilePath = FileUtil.getFullPath(learningDesignPath,LEARNING_DESIGN_FILE_NAME);
+		log.debug("Checking the version in the import file against the version in the database");
+		checkImportVersion(fullFilePath, toolsErrorMsgs);
+
+		Reader ldFile = null;
+		XStream designXml = new XStream();
+		ConversionException finalException = null;
+		String lastFieldRemoved = "";
+		ToolContentVersionFilter contentFilter = null;
+		// cap the maximum number of retries to 30 - if we add more than 30 new fields then we need to rethink our strategy
+		int maxRetries = 30; 
+		int numTries = 0;
+		
+		while (true) {
+			try {
+				
+				if ( numTries > maxRetries) 
+					break;
+				numTries++;
+				
+				ldFile = new InputStreamReader(new FileInputStream(fullFilePath),"UTF-8"); 
+				return (LearningDesignDTO) designXml.fromXML(ldFile);
+
+			} catch ( ConversionException ce) {
+				log.debug("Failed import",ce);
+				finalException = ce;
+				ldFile.close();
+
+				if ( ce.getMessage() == null ) {
+					// can't retry, so get out of here!
+					break;
+
+				} else {
+					// try removing the field from our XML and retry
+					String message = ce.getMessage();
+					String classname = extractValue(message, "required-type");
+					String fieldname = extractValue(message, "message");
+					if ( fieldname == null || fieldname.equals("") || lastFieldRemoved.equals(classname+"."+fieldname) ) {
+						// can't retry, so get out of here!
+						break;
+					} else {
+						if ( contentFilter == null ) {
+							contentFilter = new ToolContentVersionFilter();
+						}
+						
+						Class problemClass = getClass(classname);
+						if ( problemClass == null ) {
+							// can't retry, so get out of here!
+							break;
+						}
+
+						contentFilter.removeField(problemClass, fieldname);
+						contentFilter.transformXML(fullFilePath);
+						lastFieldRemoved = classname+"."+fieldname;
+						log.debug("Retrying import after removing field "+fieldname);
+						continue;
+					}
+				} 
+			} finally {
+				if ( ldFile != null ) 
+					ldFile.close();
+			}
+		}
+		throw finalException;
+	}
+
+	private void checkImportVersion(String fullFilePath, List<String> toolsErrorMsgs) throws FileNotFoundException, JDOMException {
+
+		SAXBuilder sax = new SAXBuilder();
+		Document doc = sax.build(new FileInputStream(fullFilePath),"UTF-8");
+		Element root = doc.getRootElement();
+		String title = root.getChildTextTrim(LAMS_TITLE);
+		String versionString = root.getChildTextTrim(LAMS_VERSION);
+		
+		String currentVersionString = Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER);
+		try { 
+			boolean isLaterVersion = VersionUtil.isSameOrLaterVersionAsServer(versionString,true);
+			if ( ! isLaterVersion ) {
+				log.warn("Importing a design from a later version of LAMS. There may be parts of the design that will fail to import. Design name \'"+title+"\'. Version in import file "+versionString);
+				toolsErrorMsgs.add(getMessageService().getMessage(ERROR_INCOMPATIBLE_VERSION,new Object[]{versionString,currentVersionString}));
+			}
+		} catch ( Exception e) {
+			log.warn("Unable to properly determine current version from an import file. Design name \'"+title+"\'. Version in import file "+versionString);
+			toolsErrorMsgs.add(getMessageService().getMessage(ERROR_INCOMPATIBLE_VERSION,new Object[]{versionString,currentVersionString}));
+		}
+	}
+
+	private Class getClass(String classname) {
+		try {
+			return Class.forName(classname);
+		} catch (ClassNotFoundException e) {
+			log.error("Trying to remove unwanted fields from import but we can't find the matching class "+classname+". Aborting retry.", e);
+			return null;
+		}
+	}
+	/**
+	 * Extract the class name or field name from a ConversionException message 
+	 */
+	private String extractValue(String message, String fieldToLookFor) {
+		try {
+			int startIndex = message.indexOf(fieldToLookFor);
+			if ( startIndex > -1) {
+				startIndex = message.indexOf(":", startIndex+1);
+				if ( startIndex > -1 && startIndex+2 < message.length() ) {
+					startIndex = startIndex+2;
+					int endIndex = message.indexOf(" ", startIndex);
+					String value = message.substring(startIndex, endIndex);
+					return value.trim();
+				}
+			}
+		} catch ( ArrayIndexOutOfBoundsException e ) {
+		}
+		return "";
+	}
+	
 	private WorkspaceFolder getWorkspaceFolderForDesign(User importer, Integer workspaceFolderUid) throws ImportToolContentException {
 		// if workspaceFolderUid == null use the user's default folder
 		WorkspaceFolder folder = null;
@@ -1264,7 +1405,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 
 	/**
-	 * Tansform tool XML file to correct version format.
+	 * Transform tool XML file to correct version format.
 	 * @param toVersion 
 	 * @param fromVersion 
 	 * @throws IllegalAccessException 
