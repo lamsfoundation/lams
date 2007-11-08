@@ -25,8 +25,6 @@
 
 package org.lamsfoundation.lams.tool.sbmt.web;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -131,7 +129,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				if (node.isNodeType(NodeType.FILENODE)) {
 					try {
 						InputStream is = node.getFile();
-						BufferedInputStream bis = new BufferedInputStream(is);
 						
 						// The path name where this file is to be stored
 						File outFileDir = new File(directoryName
@@ -147,18 +144,21 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 						File outFile = new File(outFileDir, node.getZipCompatibleFilename());
 						
 						// writing the data to file
-						FileOutputStream fos = new FileOutputStream(outFile);
-						BufferedOutputStream bos = new BufferedOutputStream(fos);
 						
-						for (int c = bis.read(); c != -1; c = bis.read()) {
-							bos.write(c);
+						FileOutputStream fos = new FileOutputStream(outFile);
+						
+						byte[] out  = new byte[8 * 1024];
+						int len = -1;
+						while((len = is.read(out)) != -1){
+							fos.write(out,0,len);
 						}
-
+						
 						logger.debug("doExport: finished writing to file");
 						
 						is.close();
 						fos.close();
-
+						
+						
 					} catch (FileException fe) {
 						String error = "Unable to retrieve file from repository";
 						logger.error(error);
