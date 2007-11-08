@@ -181,7 +181,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 					}
 					idx++;
 				}
-				summary.setAttachmentLocalUrl(userName + "/" + idx + "/" + summary.getFileName());
+				summary.setAttachmentLocalUrl(userName + "/" + idx + "/" + summary.getFileUuid() + '.' + FileUtil.getFileExtension(summary.getFileName()));
 				handler.saveFile(summary.getFileUuid(), FileUtil.getFullPath(directoryName, summary.getAttachmentLocalUrl()));
 			} catch (Exception e) {
 				logger.error("Export forum topic attachment failed: " + e.toString());
