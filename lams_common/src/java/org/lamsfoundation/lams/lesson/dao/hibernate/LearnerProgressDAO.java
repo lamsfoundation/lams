@@ -61,6 +61,17 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 		+" Activity act where act.id = :activityId and " 
 		+" act in elements(prog.completedActivities)";
 
+    private final static String COUNT_PROGRESS_BY_LESSON = 
+    	"select count(*) from LearnerProgress p where p.lesson.id = :lessonId";
+    private final static String LOAD_PROGRESS_BY_LESSON = 
+    	"from LearnerProgress p where p.lesson.id = :lessonId order by p.user.lastName, p.user.firstName, p.user.userId";
+    private final static String LOAD_NEXT_BATCH_PROGRESS_BY_LESSON = 
+    	"from LearnerProgress p where p.lesson.id = :lessonId "
+    	+" and (( p.user.lastName > :lastUserLastName)" 
+    	+" or ( p.user.lastName = :lastUserLastName and p.user.firstName > :lastUserFirstName) " 
+    	+" or ( p.user.lastName = :lastUserLastName and p.user.firstName = :lastUserFirstName and p.user.userId > :lastUserId))"
+    	+" order by p.user.lastName, p.user.firstName, p.user.userId";
+
     /**
      * Retrieves the Lesson
      * @param lessonId identifies the lesson to get
@@ -73,7 +84,7 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     
     /**
      * Saves or Updates learner progress data.
-     * @param learnerProgress holds the learne progress data
+     * @param learnerProgress holds the learner progress data
      */
     public void saveLearnerProgress(LearnerProgress learnerProgress)
     {
@@ -256,6 +267,62 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     	    	return new Integer (((Number)value).intValue()); 
             }
         });
+    }
+
+	/**
+     * Get the count of all learner progress records for an lesson without loading the records.
+     * @return Number of learner progress records for this lesson
+     */
+	public Integer getNumAllLearnerProgress(final Long lessonId) 
+    {
+	       HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	        return (Integer) hibernateTemplate.execute(new HibernateCallback() {
+	            public Object doInHibernate(Session session)
+	                    throws HibernateException {
+	            	Object value = session.createQuery(COUNT_PROGRESS_BY_LESSON)
+	            		.setLong("lessonId", lessonId.longValue())
+	    	    	 	.uniqueResult();
+	    	    	return new Integer (((Number)value).intValue()); 
+	            }
+	        });
+    }
+
+	/**
+     * Get a batch of learner progress records (size batchSize) for an lesson, sorted by surname and the first name. Start at the beginning
+     * of the table if no lastUser is given, otherwise get the batch after lastUser.
+     * @param lessonId
+     * @param lastUser
+     * @param batchSize
+     * @return List<LearnerProgress>
+     */
+	@SuppressWarnings("unchecked")
+	public List<LearnerProgress> getBatchLearnerProgress(final Long lessonId, final User lastUser, final int batchSize) 
+    {
+       HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+        if ( lastUser == null ) {
+	        return (List<LearnerProgress>) hibernateTemplate.execute(new HibernateCallback() {
+	            public Object doInHibernate(Session session)
+                	throws HibernateException {
+	            return session.createQuery(LOAD_PROGRESS_BY_LESSON)
+	            	.setLong("lessonId", lessonId.longValue())
+	            	.setMaxResults(batchSize)
+	            	.list();
+	            }
+	        });
+        } else {
+	        return (List<LearnerProgress>) hibernateTemplate.execute(new HibernateCallback() {
+	            public Object doInHibernate(Session session)
+	                    throws HibernateException {
+	            	return session.createQuery(LOAD_NEXT_BATCH_PROGRESS_BY_LESSON)
+	    	    		.setLong("lessonId", lessonId.longValue())
+	    	    		.setString("lastUserLastName", lastUser.getLastName())
+	    	    		.setString("lastUserFirstName", lastUser.getFirstName())
+	    	    		.setInteger("lastUserId", lastUser.getUserId().intValue())
+	    	    		.setMaxResults(batchSize)
+	    	    	 	.list();
+	            }
+	        });
+        }
     }
 
 }

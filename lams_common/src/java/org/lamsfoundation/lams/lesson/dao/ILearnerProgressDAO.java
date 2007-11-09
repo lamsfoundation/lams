@@ -123,4 +123,21 @@ public interface ILearnerProgressDAO
      * @return List<User>
      */
 	public Integer getNumUsersCompletedActivity(final Activity activity) ;
+	
+	/**
+     * Get the count of all learner progress records for an lesson without loading the records.
+     * @return Number of learner progress records for this lesson
+     */
+	public Integer getNumAllLearnerProgress(final Long lessonId);
+
+	/**
+     * Get a batch of learner progress records (size batchSize) for an lesson, sorted by surname and the first name. Start at the beginning
+     * of the table if no previousUserId is given, otherwise get the batch after lastUserId.
+     * @param lessonId
+     * @param lastUserId
+     * @param batchSize
+     * @return List<LearnerProgress>
+     */
+	public List<LearnerProgress> getBatchLearnerProgress(final Long lessonId, final User lastUser, final int batchSize);
+
  }

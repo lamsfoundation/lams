@@ -177,6 +177,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPOnlyOneOrg', 'true', 'config.ldap.only.one.org', 'config.header.ldap', 'BOOLEAN', 1);
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPEncryptPasswordFromBrowser', 'true', 'config.ldap.encrypt.password.from.browser', 'config.header.ldap', 'BOOLEAN', 1);
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPSearchResultsPageSize', '100', 'config.ldap.search.results.page.size', 'config.header.ldap', 'LONG', 0);
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LearnerProgressBatchSize', '20', 'config.learner.progress.batch.size', 'config.header.look.feel', 'LONG', 1);
 
 delete from lams_configuration where config_key='LamsHome';
 delete from lams_configuration where config_key='FileManagerDir';

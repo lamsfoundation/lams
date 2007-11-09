@@ -210,3 +210,6 @@ values ('LDAPEncryptPasswordFromBrowser', 'true', 'config.ldap.encrypt.password.
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LDAPSearchResultsPageSize', '100', 'config.ldap.search.results.page.size', 'config.header.ldap', 'LONG', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LearnerProgressBatchSize', '20', 'config.learner.progress.batch.size', 'config.header.look.feel', 'LONG', 1);

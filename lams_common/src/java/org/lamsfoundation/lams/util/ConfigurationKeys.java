@@ -208,4 +208,7 @@ public class ConfigurationKeys {
 	public static String LDAP_ENCRYPT_PASSWORD_FROM_BROWSER = "LDAPEncryptPasswordFromBrowser";
 	
 	public static String LDAP_SEARCH_RESULTS_PAGE_SIZE = "LDAPSearchResultsPageSize";
+	
+	/** Number of learners to be displayed on the learner progress screen in monitoring. */
+	public static String LEARNER_PROGRESS_BATCH_SIZE = "LearnerProgressBatchSize";
 }
