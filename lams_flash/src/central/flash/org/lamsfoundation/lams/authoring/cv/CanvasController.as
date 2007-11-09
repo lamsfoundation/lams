@@ -84,8 +84,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 		   //just select the activity
 			var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID)
-					
-			if(ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+			
+			if(ca.activity.parentUIID != null && (parentAct.isParallelActivity() || 
+			    ca.activity.isOptionalSequenceActivity(parentAct))) {
 				_canvasModel.isDragging = false;
 			} else {
 				ca.startDrag(false);

@@ -73,6 +73,9 @@ class PropertyInspector extends PropertyInspectorControls {
 		_canvasModel.setPIHeight(piHeightHide);
 		_canvasModel.addEventListener('viewUpdate',this);
 		
+		for(var i=0; i<=10; i++)
+			noSeqAct_cmb.addItem(i);
+
 		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
 		
@@ -96,8 +99,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		maxAct_stp.addEventListener("change", Delegate.create(this, updateOptionalData));
 		maxAct_stp.addEventListener("focusOut", Delegate.create(this, updateOptionalData));
 		
-		noSeqAct_stp.addEventListener("change", Delegate.create(this, updateOptionalSequenceData));
-		noSeqAct_stp.addEventListener("focusOut", Delegate.create(this, updateOptionalSequenceData));
+		noSeqAct_cmb.addEventListener("change", Delegate.create(this, updateOptionalSequenceData));
 		
 		days_stp.addEventListener("change", Delegate.create(this, onScheduleOffsetChange));
 		hours_stp.addEventListener("change", Delegate.create(this, onScheduleOffsetChange));
@@ -459,9 +461,9 @@ class PropertyInspector extends PropertyInspectorControls {
 		defineLater_chk.selected = ca.defineLater;
 		
 		if(ca.noSequences == undefined)
-			noSeqAct_stp.value = 0;
+			noSeqAct_cmb.selectedIndex = 0;
 		else
-			noSeqAct_stp.value = ca.noSequences;
+			noSeqAct_cmb.selectedIndex = ca.noSequences;
 	}
 	
 	private function updateOptionalData(){
@@ -485,19 +487,33 @@ class PropertyInspector extends PropertyInspectorControls {
 			var oa = _canvasModel.selectedItem.activity;
 			var o = ComplexActivity(oa);
 			
-			if(o.noSequences < noSeqAct_stp.value) {
-				_canvasModel.createNewSequenceActivity(oa);
+			if(o.noSequences < noSeqAct_cmb.value) {
+				for(var i=0; i<(noSeqAct_cmb.value - o.noSequences); i++)
+					_canvasModel.createNewSequenceActivity(oa);
 			} else {
-				var itemToRemove:Number = CanvasOptionalActivity(_canvasModel.selectedItem).getLastItem();
-				_canvasModel.removeActivity(itemToRemove);
-			}
+				var itemsToRemove:Array = CanvasOptionalActivity(_canvasModel.selectedItem).getLastItems((o.noSequences - noSeqAct_cmb.value));
+				Debugger.log("itemsToRemove len: " + itemsToRemove.length,Debugger.CRITICAL, "updateOptionalSequenceData", "PropertyInspector");
 				
-			var newChildren:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(oa.activityUIID);
-			CanvasOptionalActivity(_canvasModel.selectedItem).updateChildren(newChildren);
+				for(var i=0; i<itemsToRemove.length; i++)
+					_canvasModel.getCanvas().ddm.removeActivity(itemsToRemove[i]);
+				
+				_canvasModel.setDirty();
+			}
 			
-			setModified();
-			controller.clearBusy()
+			this.onEnterFrame = onUpdateOptionalSequenceData;
 		}
+	}
+	
+	private function onUpdateOptionalSequenceData() {
+		delete this.onEnterFrame;
+		
+		var newChildren:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
+		CanvasOptionalActivity(_canvasModel.selectedItem).updateChildren(newChildren);
+		
+		setModified();
+	
+		_canvasModel.activeView.getController().clearBusy()	
+			
 	}
 	
 	private function showParallelActivityProperties(ca:ComplexActivity){

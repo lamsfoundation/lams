@@ -129,7 +129,7 @@ class PropertyInspectorControls extends MovieClip {
 	private var noSeqAct_lbl:Label;
 	private var minAct_stp:NumericStepper;
 	private var maxAct_stp:NumericStepper;
-	private var noSeqAct_stp:NumericStepper;
+	private var noSeqAct_cmb:ComboBox;
 	
 	// Branch Connector
 	private var _pi_defaultBranch_cb:CheckBox;
@@ -359,10 +359,10 @@ class PropertyInspectorControls extends MovieClip {
 		desc_lbl.visible = v;
 		desc_txt.visible = v;
 		noSeqAct_lbl.visible = v;
-		noSeqAct_stp.visible = v;
+		noSeqAct_cmb.visible = v;
 		
 		if(e != null) {
-			noSeqAct_stp.enabled = e;
+			noSeqAct_cmb.enabled = e;
 			noSeqAct_lbl.enabled = e;
 			desc_lbl.enabled = e;
 			desc_txt.enabled = e;
@@ -404,9 +404,9 @@ class PropertyInspectorControls extends MovieClip {
 		
 		if(CanvasOptionalActivity(_canvasModel.selectedItem).type == CanvasOptionalActivity.SEQ_TYPE) {
 			if(e != null)
-				noSeqAct_stp.enabled = e;
+				noSeqAct_cmb.enabled = e;
 			else
-				noSeqAct_stp.enabled = true;
+				noSeqAct_cmb.enabled = true;
 			
 			MovieClipUtils.doLater(Proxy.create(this,showOptionalControlsLater, true));
 		} else {
@@ -888,7 +888,6 @@ class PropertyInspectorControls extends MovieClip {
 		endMins_stp.setStyle('styleName', styleObj);
 		minAct_stp.setStyle('styleName', styleObj);
 		maxAct_stp.setStyle('styleName', styleObj);
-		noSeqAct_stp.setStyle('styleName', styleObj);
 		
 		_pi_defaultBranch_cb.setStyle('styleName', styleObj);
 		_define_monitor_cb.setStyle('styleName', styleObj);
@@ -899,6 +898,7 @@ class PropertyInspectorControls extends MovieClip {
 		groupType_cmb.setStyle('styleName', styleObj);
 		appliedGroupingActivity_cmb.setStyle('styleName', styleObj);
 		toolActs_cmb.setStyle('styleName', styleObj);
+		noSeqAct_cmb.setStyle('styleName', styleObj);
 		
 		styleObj = _tm.getStyleObject('numericstepper');
 		days_stp.setStyle('styleName', styleObj);

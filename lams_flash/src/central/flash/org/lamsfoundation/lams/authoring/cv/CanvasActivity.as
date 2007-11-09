@@ -115,6 +115,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _ddm:DesignDataModel;
 	
 	function CanvasActivity(_connector){
+		_visible = false;
 		_tm = ThemeManager.getInstance();
 		_ccm = CustomContextMenu.getInstance();
 		

@@ -243,32 +243,25 @@ class org.lamsfoundation.lams.authoring.Activity {
 	}
 
 	public function isGroupActivity():Boolean{
-		if (_activityTypeID == GROUPING_ACTIVITY_TYPE){
-			return true;
-		}
+		return (_activityTypeID == GROUPING_ACTIVITY_TYPE);
 	}
 	
 	public function isOptionalActivity():Boolean{
-		if (_activityTypeID == OPTIONAL_ACTIVITY_TYPE){
-			return true;
-		}
+		return (_activityTypeID == OPTIONAL_ACTIVITY_TYPE);
 	}
 	
+	public function isOptionalSequenceActivity(parent:Activity):Boolean {
+		return (this.isSequenceActivity() && parent.isOptionalActivity());
+	}
 	
 	public function isParallelActivity():Boolean{
-		if (_activityTypeID == PARALLEL_ACTIVITY_TYPE){
-			return true;
-		}
+		return (_activityTypeID == PARALLEL_ACTIVITY_TYPE);
 	}
 	
 	public function isBranchingActivity():Boolean{
-		if (_activityTypeID == CHOSEN_BRANCHING_ACTIVITY_TYPE || 
+		return (_activityTypeID == CHOSEN_BRANCHING_ACTIVITY_TYPE || 
 			_activityTypeID == GROUP_BRANCHING_ACTIVITY_TYPE ||
-			_activityTypeID == TOOL_BRANCHING_ACTIVITY_TYPE){
-			return true;
-		} else {
-			return false;
-		}
+			_activityTypeID == TOOL_BRANCHING_ACTIVITY_TYPE);
 	}
 	
 	public function isSequenceActivity():Boolean{
