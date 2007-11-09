@@ -39,6 +39,7 @@
 		<property name="transitionDAO"><ref bean="transitionDAO"/></property>	
 		<property name="activityDAO"><ref bean="activityDAO"/></property>	
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
+		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>			
 		<property name="learnerService"><ref bean="learnerService"/></property>			
 		<property name="auditService"><ref bean="auditService"/></property>			

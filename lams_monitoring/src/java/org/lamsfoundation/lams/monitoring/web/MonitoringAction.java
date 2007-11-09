@@ -636,6 +636,7 @@ public class MonitoringAction extends LamsDispatchAction
         writer.println(wddxPacket);
         return null;
     }
+    /** Get the learner progress data for all learners in a lesson. This is called by the sequence tab in monitoring */
     public ActionForward getAllLearnersProgress(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -643,10 +644,47 @@ public class MonitoringAction extends LamsDispatchAction
     	String wddxPacket;
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	try{
-    		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+    		Long lessonID = WebUtil.readLongParam(request,"lessonID",false);
     		wddxPacket = monitoringService.getAllLearnersProgress(lessonID, getUserId());
      	}catch (Exception e) {
      		wddxPacket = handleException(e, "getAllLearnersProgress", monitoringService).serializeMessage();
+    	}
+    		
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
+    }
+    /** Get the first batch of learner progress data learners in a lesson. This is called by the learner progress tab in monitoring */
+    public ActionForward getInitialLearnersProgress(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)throws IOException{
+    	String wddxPacket;
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	try{
+    		Long lessonID = WebUtil.readLongParam(request,"lessonID",false);
+    		wddxPacket = monitoringService.getInitialLearnersProgress(lessonID, getUserId());
+     	}catch (Exception e) {
+     		wddxPacket = handleException(e, "getInitialLearnersProgress", monitoringService).serializeMessage();
+    	}
+    		
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
+    }
+    /** Get a followup batch of learner progress data learners in a lesson. This is called by the learner progress tab in monitoring */
+    public ActionForward getAdditionalLearnersProgress(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)throws IOException{
+    	String wddxPacket;
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	try{
+    		Long lessonID = WebUtil.readLongParam(request,"lessonID",false);
+    		Integer lastUserID = WebUtil.readIntParam(request,"lastUserID",false);
+    		wddxPacket = monitoringService.getAdditionalLearnersProgress(lessonID, lastUserID, getUserId());
+     	}catch (Exception e) {
+     		wddxPacket = handleException(e, "getAdditionalLearnersProgress", monitoringService).serializeMessage();
     	}
     		
         PrintWriter writer = response.getWriter();

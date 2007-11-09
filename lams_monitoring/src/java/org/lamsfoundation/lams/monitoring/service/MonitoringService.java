@@ -68,11 +68,13 @@ import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorE
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
+import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
+import org.lamsfoundation.lams.monitoring.LearnerProgressBatchDTO;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -128,7 +130,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
    	private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
    	private static final String AUDIT_LEARNER_PORTFOLIO_SET = "audit.learner.portfolio.set";
    	private static final String AUDIT_LESSON_CREATED_KEY = "audit.lesson.created";
-
+   	private static final int DEFAULT_LEARNER_PROGRESS_BATCH_SIZE = 15;
+   	
     private ILessonDAO lessonDAO;    
     private ILessonClassDAO lessonClassDAO;        
     private ITransitionDAO transitionDAO;
@@ -136,6 +139,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private IBaseDAO baseDAO;
     private ILearningDesignDAO learningDesignDAO;
     private IGroupingDAO groupingDAO;
+    private ILearnerProgressDAO learnerProgressDAO;
     private IAuthoringService authoringService;
     private ICoreLearnerService learnerService;
     private ILessonService lessonService;
@@ -225,6 +229,15 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         this.lessonDAO = lessonDAO;
     }
+
+    /**
+     * @param learnerProgressDAO The learnerProgressDAO to set.
+     */
+    public void setLearnerProgressDAO(ILearnerProgressDAO learnerProgressDAO)
+    {
+        this.learnerProgressDAO = learnerProgressDAO;
+    }
+
     /**
      * @param userDAO
      */
@@ -1283,15 +1296,15 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     }
     /**
      * (non-Javadoc)
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLearnersProgress(java.lang.Long)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLearnersProgress(java.lang.Long, java.lang.Integer)
      */
     public String getAllLearnersProgress(Long lessonID, Integer userID)throws IOException {
     	Lesson lesson = lessonDAO.getLesson(lessonID);
-    	checkOwnerOrStaffMember(userID, lesson, "get all learners progress");
-
-    	Vector progressData = new Vector();
-    	FlashMessage flashMessage;
-    	if(lesson!=null){
+   		FlashMessage flashMessage;
+   		
+   	   	if(lesson!=null){
+    		checkOwnerOrStaffMember(userID, lesson, "get all learners progress");
+    		Vector progressData = new Vector();
     		Iterator iterator = lesson.getLearnerProgresses().iterator();
     		while(iterator.hasNext()){
     			LearnerProgress learnerProgress = (LearnerProgress)iterator.next();
@@ -1305,7 +1318,70 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	}
     	return flashMessage.serializeMessage();
     } 
-    
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getInitialLearnersProgress(java.lang.Long, java.lang.Integer)
+     */
+    public String getInitialLearnersProgress(Long lessonID, Integer userID)throws IOException {
+    	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	FlashMessage flashMessage;
+
+    	if(lesson!=null){
+    		checkOwnerOrStaffMember(userID, lesson, "get first batch of learners progress details");
+    		Vector progressData = new Vector();
+    		
+    		int batchSize = Configuration.getAsInt(ConfigurationKeys.LEARNER_PROGRESS_BATCH_SIZE);
+    		if ( batchSize < 1 ) 
+    			batchSize = DEFAULT_LEARNER_PROGRESS_BATCH_SIZE;
+    		
+    		Iterator iterator = learnerProgressDAO.getBatchLearnerProgress(lessonID, null, batchSize).iterator();
+    		while(iterator.hasNext()){
+    			LearnerProgress learnerProgress = (LearnerProgress)iterator.next();
+    			progressData.add(learnerProgress.getLearnerProgressData());
+    		}
+
+        	Integer numAllLearnerProgress = learnerProgressDAO.getNumAllLearnerProgress(lessonID);
+        	LearnerProgressBatchDTO dto = new LearnerProgressBatchDTO(progressData, batchSize, numAllLearnerProgress);
+        	
+    		flashMessage = new FlashMessage("getInitialLearnersProgress",dto);
+    	}else{
+    		flashMessage = new FlashMessage("getInitialLearnersProgress",
+    				 							messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
+												FlashMessage.ERROR);
+    	}
+    	return flashMessage.serializeMessage();
+    } 
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAdditionalLearnersProgress(java.lang.Long, java.lang.Integer, java.lang.Integer)
+     */
+    public String getAdditionalLearnersProgress(Long lessonID, Integer lastUserID, Integer userID)throws IOException {
+    	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	FlashMessage flashMessage;
+    	
+    	if(lesson!=null){
+        	checkOwnerOrStaffMember(userID, lesson, "get next batch of learners progress details");
+    		Vector progressData = new Vector();
+    		
+    		User lastUser = (User)baseDAO.find(User.class,lastUserID);
+    		int batchSize = Configuration.getAsInt(ConfigurationKeys.LEARNER_PROGRESS_BATCH_SIZE);
+    		if ( batchSize < 1 ) 
+    			batchSize = DEFAULT_LEARNER_PROGRESS_BATCH_SIZE;
+    		
+    		Iterator iterator = learnerProgressDAO.getBatchLearnerProgress(lessonID, lastUser, batchSize).iterator();
+    		while(iterator.hasNext()){
+    			LearnerProgress learnerProgress = (LearnerProgress)iterator.next();
+    			progressData.add(learnerProgress.getLearnerProgressData());
+    		}
+    		flashMessage = new FlashMessage("getAdditionalLearnersProgress",progressData);
+    	}else{
+    		flashMessage = new FlashMessage("getAdditionalLearnersProgress",
+    				 							messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
+												FlashMessage.ERROR);
+    	}
+    	return flashMessage.serializeMessage();
+    }
+
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityById(Long)
      */

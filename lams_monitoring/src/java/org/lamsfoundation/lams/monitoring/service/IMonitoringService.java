@@ -318,6 +318,32 @@ public interface IMonitoringService
     public String getAllLearnersProgress(Long lessonID, Integer userID)throws IOException;
     
     /**
+     * This method returns a batch of progress information of learners
+     * in a given Lesson. It returns the first batch of users, using the learner's name as the
+     * sorting order. The batch size is determined by the LEARNER_PROGRESS_BATCH size
+     * in the database.
+     * 
+     * @param lessonID The lesson_id of the Lesson whose progress information is required
+     * @param userID The user id of the user requesting the progress details
+     * @return String The requested information in wddx format
+     * @throws IOException
+     */
+    public String getInitialLearnersProgress(Long lessonID, Integer userID)throws IOException;
+
+    /**
+     * This method returns the next batch of progress information of learners
+     * in a given Lesson. The batch size is determined by the LEARNER_PROGRESS_BATCH size
+     * in the database, and the next batch starts at after the supplied user_id
+     * 
+     * @param lessonID The lesson_id of the Lesson whose progress information is required
+     * @param lastUserID The user id of the last user from the previous batch
+     * @param userID The user id of the user requesting the progress details
+     * @return String The requested information in wddx format
+     * @throws IOException
+     */
+    public String getAdditionalLearnersProgress(Long lessonID, Integer lastUserID, Integer userID)throws IOException;
+
+    /**
      * This method is called when the user clicks the 'Contribute' tab in the 
      * monitoring enviornment. It returns a list of activities "in the 
      * order" they have to be performed and with additional information as to 
