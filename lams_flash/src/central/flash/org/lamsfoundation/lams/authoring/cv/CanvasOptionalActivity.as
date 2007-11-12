@@ -41,9 +41,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	public static var ACT_TYPE:Number = 0;
 	public static var SEQ_TYPE:Number = 1;
 
-	private var CHILD_OFFSET_X : Number = 8;
-	private var CHILD_OFFSET_Y : Number = 57;
-	private var CHILD_INCRE : Number = 60;
+	private var CHILD_OFFSET_X:Number = 8;
+	private var CHILD_OFFSET_Y:Number = 57;
+	private var CHILD_INCRE:Number = 60;
 	
 	private var newContainerXCoord:Number; 
 	private var newContainerYCoord:Number;
@@ -174,9 +174,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		
 		showStatus(false);
 		
-		CHILD_OFFSET_X = 8;
-		CHILD_OFFSET_Y = 57;
-		
+		CHILD_OFFSET_X = 4;
+		CHILD_OFFSET_Y = 48;
+		CHILD_INCRE = 50;
 		removeAllChildren();
 		
 		children_mc = new Array();
@@ -302,6 +302,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			container_pnl._height = CHILD_OFFSET_Y + CHILD_INCRE;
 		}
 		
+		if(_type == SEQ_TYPE)
+			container_pnl._height += 10;
+		
 		_x = _activity.xCoord;
 		_y = _activity.yCoord;
 
@@ -406,7 +409,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	}
 	
 	private function getAssociatedStyle():Object{
-		trace("Category ID for Activity "+_activity.title +": "+_activity.activityCategoryID)
 		var styleObj:Object = new Object();
 		switch (String(_activity.activityCategoryID)){
 			case '0' :

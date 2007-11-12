@@ -42,13 +42,13 @@ import mx.utils.*
 */  
 class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieClip implements ICanvasActivity{
   
-	public static var TOOL_ACTIVITY_WIDTH:Number = 123.1;
-	public static var TOOL_ACTIVITY_HEIGHT:Number = 50.5;
+	public static var TOOL_ACTIVITY_WIDTH:Number = 136;
+	public static var TOOL_ACTIVITY_HEIGHT:Number = 55.5;
 	public static var ICON_WIDTH:Number = 25;
 	public static var ICON_HEIGHT:Number = 25;
 	
-	private var CHILD_OFFSET_X : Number = 8;
-	private var CHILD_OFFSET_Y : Number = 57;
+	private var CHILD_OFFSET_X : Number = 2;
+	private var CHILD_OFFSET_Y : Number = 50.5;
 	private var CHILD_INCRE : Number = 60;
 	
 	//this is set by the init object
@@ -91,7 +91,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	private var clickTarget_mc:MovieClip;
 	
 	private var canvasActivity_mc:MovieClip;
-	private var canvasActivityGrouped_mc:MovieClip;
 	
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
@@ -120,8 +119,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		//let it wait one frame to set up the components.
 		//this has to be set b4 the do later :)
 		
-		_visibleHeight = CanvasActivity.TOOL_ACTIVITY_HEIGHT;
-		_visibleWidth = CanvasActivity.TOOL_ACTIVITY_WIDTH;
+		_visibleHeight = CanvasSequenceActivity.TOOL_ACTIVITY_HEIGHT;
+		_visibleWidth = CanvasSequenceActivity.TOOL_ACTIVITY_WIDTH;
 		
 		_base_mc = this;
 		
@@ -198,7 +197,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		icon_mc._visible = isVisible;
 		canvasActivity_mc._visible = isVisible;
 		clickTarget_mc._visible = isVisible;
-		canvasActivityGrouped_mc._visible = isVisible;
 		fade_mc._visible = isVisible;
 	}
 	
@@ -218,16 +216,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	
 	public function setSelected(isSelected){
 		Debugger.log(_activity.title+" isSelected:"+isSelected,4,'setSelected','CanvasActivity');
-		var MARGIN = 5;
+		//var MARGIN = 5;
 		
 		if(isSelected){
 			//draw a selected border
-			var tgt_mc;
-			if(_activity.groupingUIID > 0){
-				tgt_mc = canvasActivityGrouped_mc;
-			}else{
-				tgt_mc = canvasActivity_mc;
-			}
+		/**	var tgt_mc;
+			tgt_mc = canvasActivity_mc;
 			
 			Debugger.log("tgt_mc:"+tgt_mc,4,'setSelected','CanvasActivity');
 				
@@ -254,19 +248,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 			Draw.dashTo(_selected_mc,tr_x,tr_y,br_x,br_y,2,3,2,color);
 			Draw.dashTo(_selected_mc,br_x,br_y,bl_x,bl_y,2,3,2,color);
 			Draw.dashTo(_selected_mc,bl_x,bl_y,tl_x,tl_y,2,3,2,color);
-						
+			*/			
 			_isSelected = isSelected;
 					
 		} else {
 			//hide the selected border
-			_selected_mc.removeMovieClip();
+			//_selected_mc.removeMovieClip();
 		}
 		
 	}
 	
 	private function setUpActIcon(icon_mc):Void{
-		icon_mc._x = (CanvasActivity.TOOL_ACTIVITY_WIDTH / 2) - (icon_mc._width / 2);
-		icon_mc._y = (CanvasActivity.TOOL_ACTIVITY_HEIGHT / 2) - (icon_mc._height / 2) - 6;
+		icon_mc._x = (_visibleWidth / 2) - (icon_mc._width / 2);
+		icon_mc._y = (_visibleHeight / 2) - (icon_mc._height / 2) - 6;
 	}
 	
 	/**
@@ -311,17 +305,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 			theIcon_mc._visible = true;
 		}
 		
+		//canvasActivity_mc._width = _visibleWidth;
+		//canvasActivity_mc._height = _visibleHeight;
+		
 		//chose the background mc
-		if(_activity.groupingUIID > 0){
-			canvasActivityGrouped_mc._visible = true;
-			canvasActivity_mc._visible = false;
-		}else{
-			canvasActivity_mc._visible = true;
-			canvasActivityGrouped_mc._visible = false;
-		}
-			
-		clickTarget_mc._width = TOOL_ACTIVITY_WIDTH;
-		clickTarget_mc._height = TOOL_ACTIVITY_HEIGHT;
+		canvasActivity_mc._visible = false;
+		
+		act_pnl._width = _visibleWidth - 3.5;
+		act_pnl._height = _visibleHeight - 3.5;
+		
+		clickTarget_mc._width = _visibleWidth;
+		clickTarget_mc._height = _visibleHeight;
 		
 		_visible = true;
 		
@@ -438,8 +432,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	
 	private function getAssociatedStyle():Object{
 		var styleObj:Object = new Object();
-		styleObj = _tm.getStyleObject('ACTPanel');
-
+		
+		styleObj = _tm.getStyleObject('ACTPanel' + String(_activity.orderID%6));
+				
 		return styleObj;
 	}
 
@@ -451,32 +446,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	 * @return  
 	 */
 	private function setStyles() {
-		/**var my_color:Color = new Color(this);
-		var transNegative = {ra:-100, ga:-100, ba:-100, rb:255, gb:255, bb:255};
-		var transPositive = {ra:100, ga:100, ba:100, rb:0, gb:0, bb:0};
-		
-		if (bgNegative == "true"){
-			my_color.setTransform(transNegative);
-		}else if(bgNegative == "false"){
-			my_color.setTransform(transPositive);
-		}else if(bgNegative == "original"){
-			
-			if (this.activity.parentUIID != null || this.activity.parentUIID != undefined){
-				if (_module != "monitoring"){
-					var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(this.activity.parentUIID)
-				}else {
-					var parentAct = mm.getMonitor().ddm.getActivityByUIID(this.activity.parentUIID)
-				}
-				*/	
-				var styleObj = getAssociatedStyle();
-				act_pnl.setStyle('styleName',styleObj);
-				
-			//} else {
-		//		styleObj = getAssociatedStyle();
-		//		act_pnl.setStyle('styleName',styleObj);
-		//	}
-		//	
-		//}
+	
+		var styleObj = getAssociatedStyle();
+		act_pnl.setStyle('styleName', styleObj);
 		
     }
 	

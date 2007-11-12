@@ -347,7 +347,7 @@ class ThemeManager {
 				ACTPanelSO.setStyle('backgroundColor', 0xC2D5FE);
 				
                 //Visual Element
-			var ACTPanelVisualElement = new VisualElement('ACTPanel',ACTPanelSO);
+				var ACTPanelVisualElement = new VisualElement('ACTPanel',ACTPanelSO);
                 //add visual element to the default ACTPanelVisualElement
                 _theme.addVisualElement(ACTPanelVisualElement);
                 //------------------------------------------------------
@@ -644,12 +644,11 @@ class ThemeManager {
 			if (typeof(dataObj[prop])=='number' && String(prop)!='fontSize'){
 					var dataVal = DecToHex(dataObj[prop]);
 					so.setStyle(String(prop), 0+"\x"+dataVal);
-					trace("style parsed for "+String(prop)+ " is: "+0+"\x"+dataVal);
 			} else {
 				so.setStyle(String(prop), dataObj[prop]);
-				trace("style parsed for "+String(prop)+ " is: "+dataObj[prop]);
 			}
         }
+		
         return so;
     }    
 	

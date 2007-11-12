@@ -320,7 +320,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					if (!_pi.isPIExpanded()){
 						_canvasModel.setPIHeight(_pi.piFullHeight());
 					}
-				} else if (ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE && (ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE)){
+				} else if (ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE && (ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE)){
 					if (!_pi.isPIExpanded()){
 						_canvasModel.setPIHeight(_pi.piFullHeight());
 						

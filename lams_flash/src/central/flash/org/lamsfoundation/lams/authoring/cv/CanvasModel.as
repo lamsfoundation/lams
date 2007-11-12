@@ -218,7 +218,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		setSelectedItem(_activitiesDisplayed.get(branchingActivity.activityUIID));
 	}
 	
-	public function createNewSequenceActivity(parent){
+	public function createNewSequenceActivity(parent, orderID){
 		Debugger.log('Running...',Debugger.GEN,'createNewSequenceActivity','CanvasModel');
 		
 		var seqAct = new SequenceActivity(_cv.ddm.newUIID());
@@ -226,7 +226,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		seqAct.learningDesignID = _cv.ddm.learningDesignID;
 		seqAct.groupingSupportType = Activity.GROUPING_SUPPORT_OPTIONAL;
 		seqAct.activityCategoryID = Activity.CATEGORY_SYSTEM;
-		seqAct.orderID = 1;
+		seqAct.orderID = (orderID != null || orderID != undefined) ? orderID : 1;
 		seqAct.stopAfterActivity = true;
 		
 		if(parent != null) {
