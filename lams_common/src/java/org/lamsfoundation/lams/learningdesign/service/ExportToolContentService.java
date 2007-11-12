@@ -431,9 +431,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				ldFileName = FileUtil.getFullPath(contentDir,LEARNING_DESIGN_FILE_NAME);
 			Writer ldFile = new OutputStreamWriter(new FileOutputStream(ldFileName),"UTF-8"); 
 			
-			//get learning desing and serialize it to XML file.
+			// get learning desing and serialize it to XML file. Update the version to reflect the 
+			// version now, rather than the version when it was saved.
 			ILearningDesignService service =  getLearningDesignService();
 			LearningDesignDTO ldDto = service.getLearningDesignDTO(learningDesignId);
+			ldDto.setVersion(Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER));
 			
 			if(format == PACKAGE_FORMAT_IMS)
 				ldDto.setTitle(ldDto.getTitle().concat(IMS_FILE_NAME_EXT));

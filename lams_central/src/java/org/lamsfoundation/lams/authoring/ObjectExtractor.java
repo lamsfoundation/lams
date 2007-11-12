@@ -352,10 +352,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		    learningDesign.setOnlineInstructions(WDDXProcessor.convertToString(table,WDDXTAGS.ONLINE_INSTRUCTIONS));
 		if (keyExists(table, WDDXTAGS.HELP_TEXT))	
 		    learningDesign.setHelpText(WDDXProcessor.convertToString(table,WDDXTAGS.HELP_TEXT));
-//		if (keyExists(table, WDDXTAGS.VERSION))	
-//		    learningDesign.setVersion(WDDXProcessor.convertToString(table,WDDXTAGS.VERSION));
-		//don't receive version from flash anymore(it was hardcode). Get it from lams configuration database.
-		learningDesign.setVersion(Configuration.get(ConfigurationKeys.VERSION));
+		//don't receive version from flash anymore(it was hardcoded). Get it from lams configuration database.
+		learningDesign.setVersion(Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER));
 		
 		if (keyExists(table, WDDXTAGS.DURATION))	
 		    learningDesign.setDuration(WDDXProcessor.convertToLong(table,WDDXTAGS.DURATION));
