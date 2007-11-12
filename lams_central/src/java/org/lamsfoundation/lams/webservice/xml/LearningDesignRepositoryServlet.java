@@ -282,20 +282,11 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 			String lang 		= request.getParameter(CentralConstants.PARAM_LANG);
 			String modeStr 		= request.getParameter(CentralConstants.PARAM_MODE);
 
-			String firstName = "";
-			String lastName = "";
-			String email = "";
 			
-			try{
-				firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
-				lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
-				email  = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
-			} catch (NullPointerException e)
-			{
-			}
-			
-			
-			
+			String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
+			String lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
+			String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
+
 			if (serverId == null || datetime == null || hashValue == null
 					|| username == null || courseId == null || country == null
 					|| lang == null || modeStr == null) {
@@ -318,7 +309,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 			// get user map, user is created if this is their first use
 	
 			ExtUserUseridMap userMap = null;
-			if (firstName.equals("") && lastName.equals(""))
+			if (firstName==null && lastName==null)
 			{
 				userMap = integrationService.getExtUserUseridMap(serverMap, username);
 			}

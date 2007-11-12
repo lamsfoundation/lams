@@ -109,18 +109,13 @@ public class LoginRequestServlet extends HttpServlet {
 		String countryIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_COUNTRY);
 		String langIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
 
-		String firstName = "";
-		String lastName = "";
-		String email = "";
+	
 		
-		try{
-			firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
-			lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
-			email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
-		} catch (NullPointerException e)
-		{
-			log.info("Not using implicit logon");
-		}
+		
+		String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
+		String lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
+		String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
+	
 		
 		
 		if (extUsername == null || method == null || serverId == null || timestamp == null
@@ -134,7 +129,7 @@ public class LoginRequestServlet extends HttpServlet {
 		try {
 			ExtUserUseridMap userMap = null;
 			
-			if (firstName.equals("") && lastName.equals(""))
+			if (firstName==null && lastName==null)
 			{
 				userMap = getService().getExtUserUseridMap(serverMap, extUsername);
 			}
