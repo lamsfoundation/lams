@@ -37,6 +37,7 @@
 				<value>org/lamsfoundation/lams/usermanagement/RolePrivilege.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/User.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/UserOrganisation.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/UserOrganisationCollapsed.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/UserOrganisationRole.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/Workspace.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/WorkspaceFolder.hbm.xml</value>

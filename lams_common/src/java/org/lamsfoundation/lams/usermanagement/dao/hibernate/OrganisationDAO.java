@@ -45,8 +45,8 @@ public class OrganisationDAO extends BaseDAO implements IOrganisationDAO {
 		+ " and o.organisationState.organisationStateId = " + OrganisationState.ACTIVE
 		+ " order by name";
 	
-	private static final String GET_ACTIVE_COURSE_IDS_BY_USER = "select uo.organisation.organisationId"
-		+ " from UserOrganisation uo, Organisation o"
+	private static final String GET_ACTIVE_COURSE_IDS_BY_USER = "select uo.organisation.organisationId, uoc.collapsed"
+		+ " from Organisation o, UserOrganisation uo left join uo.userOrganisationCollapsed uoc"
 		+ " where uo.organisation.organisationId = o.organisationId"
 		+ " and o.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
 		+ " and o.organisationState.organisationStateId = " + OrganisationState.ACTIVE
@@ -64,8 +64,8 @@ public class OrganisationDAO extends BaseDAO implements IOrganisationDAO {
 		+ " and o1.organisationState.organisationStateId = " + OrganisationState.ARCHIVED + ")"
 		+ " order by o1.name";
 	
-	private static final String GET_ARCHIVED_COURSE_IDS_BY_USER = "select distinct o1.organisationId"
-		+ " from UserOrganisation uo1, Organisation o1, Organisation o2"
+	private static final String GET_ARCHIVED_COURSE_IDS_BY_USER = "select distinct o1.organisationId, uoc.collapsed"
+		+ " from UserOrganisation uo1, Organisation o1, Organisation o2 left join uo1.userOrganisationCollapsed uoc"
 		+ " where (uo1.user.userId = :userId"
 		+ " and uo1.organisation.organisationId = o1.organisationId"
 		+ " and o1.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE

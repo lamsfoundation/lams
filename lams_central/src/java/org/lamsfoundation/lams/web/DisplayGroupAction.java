@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -63,6 +64,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author jliew
  * 
  * @struts.action path="/displayGroup" validate="false"
+ * @struts.action-forward name="groupHeader" path="/groupHeader.jsp"
+ * @struts.action-forward name="groupContents" path="/groupContents.jsp"
  * @struts.action-forward name="group" path="/group.jsp"
  */
 public class DisplayGroupAction extends Action {
@@ -77,13 +80,16 @@ public class DisplayGroupAction extends Action {
 			HttpServletRequest request, 
 			HttpServletResponse response) throws Exception {
 		
+		String display = WebUtil.readStrParam(request, "display", false);
 		stateId = WebUtil.readIntParam(request, "stateId", false);
 		Integer orgId = WebUtil.readIntParam(request, "orgId", false);
+		
 		Organisation org = null;
 		if (orgId != null) {
 			org = (Organisation)getService().findById(Organisation.class, orgId);
 		}
 		
+		String forwardPath = "group";
 		if (org != null) {
 			boolean allowSorting = false;
 			List<Integer> roles = new ArrayList<Integer>();
@@ -95,18 +101,29 @@ public class DisplayGroupAction extends Action {
 					allowSorting = true;
 				}
 			}
-			IndexOrgBean iob = createOrgBean(org, roles, request.getRemoteUser(), request.isUserInRole(Role.SYSADMIN));
+			
+			IndexOrgBean iob;
+			if (StringUtils.equals(display, "contents")) {
+				iob = new IndexOrgBean(org.getOrganisationId(), org.getName(), org.getOrganisationType().getOrganisationTypeId());
+				iob = populateContentsOrgBean(iob, org, roles, request.getRemoteUser(), request.isUserInRole(Role.SYSADMIN));
+				forwardPath = "groupContents";
+			} else if (StringUtils.equals(display, "header")) {
+				iob = createHeaderOrgBean(org, roles, request.getRemoteUser(), request.isUserInRole(Role.SYSADMIN), false);
+				forwardPath = "groupHeader";
+			} else {
+				iob = createHeaderOrgBean(org, roles, request.getRemoteUser(), request.isUserInRole(Role.SYSADMIN), true);
+			}
+			
 			request.setAttribute("orgBean", iob);
 			request.setAttribute("allowSorting", allowSorting);
 		}
 		
-		return mapping.findForward("group");
+		return mapping.findForward(forwardPath);
 	}
 
 	@SuppressWarnings({"unchecked"})
-	private IndexOrgBean createOrgBean(Organisation org, List<Integer> roles, String username, boolean isSysAdmin)
+	private IndexOrgBean createHeaderOrgBean(Organisation org, List<Integer> roles, String username, boolean isSysAdmin, boolean includeContents)
 		throws SQLException, NamingException {
-		User user = (User)getService().findByProperty(User.class, "login", username).get(0);
 		IndexOrgBean orgBean = new IndexOrgBean(org.getOrganisationId(), org.getName(), org.getOrganisationType().getOrganisationTypeId());
 
 		// set org links
@@ -136,7 +153,18 @@ public class DisplayGroupAction extends Action {
 			orgBean.setArchivedDate(org.getArchivedDate());
 		}
 		
-		// set lesson beans
+		if (includeContents) {
+			orgBean = populateContentsOrgBean(orgBean, org, roles, username, isSysAdmin);
+		}
+		
+		return orgBean;
+	}
+	
+	private IndexOrgBean populateContentsOrgBean(IndexOrgBean orgBean, Organisation org, List<Integer> roles, String username, boolean isSysAdmin)
+		throws SQLException, NamingException {
+		User user = (User)getService().findByProperty(User.class, "login", username).get(0);
+		
+		//	set lesson beans
 		List<IndexLessonBean> lessonBeans = null;
 		try {
 			lessonBeans = getLessonBeans(user.getUserId(), org.getOrganisationId(), roles, org.getOrderedLessonIds());
@@ -166,7 +194,7 @@ public class DisplayGroupAction extends Action {
 						classRoles.add(userOrganisationRole.getRole().getRoleId());
 					}
 					if(contains(roles,Role.ROLE_GROUP_MANAGER)) classRoles.add(Role.ROLE_GROUP_MANAGER);
-					childOrgBeans.add(createOrgBean(organisation,classRoles,username,isSysAdmin));
+					childOrgBeans.add(createHeaderOrgBean(organisation,classRoles,username,isSysAdmin,true));
 				}
 			}
 			Collections.sort(childOrgBeans);

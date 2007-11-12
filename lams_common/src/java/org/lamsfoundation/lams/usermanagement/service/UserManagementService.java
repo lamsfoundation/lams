@@ -40,7 +40,6 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -51,6 +50,7 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
+import org.lamsfoundation.lams.usermanagement.dto.CollapsedOrgDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -951,11 +951,35 @@ public class UserManagementService implements IUserManagementService {
 	}
 	
 	public List getActiveCourseIdsByUser(Integer userId, boolean isSysadmin) {
-		return organisationDAO.getActiveCourseIdsByUser(userId, isSysadmin);
+		List list = organisationDAO.getActiveCourseIdsByUser(userId, isSysadmin);
+		return populateCollapsedOrgDTOs(list, isSysadmin);
 	}
 	
 	public List getArchivedCourseIdsByUser(Integer userId, boolean isSysadmin) {
-		return organisationDAO.getArchivedCourseIdsByUser(userId, isSysadmin);
+		List list = organisationDAO.getArchivedCourseIdsByUser(userId, isSysadmin);
+		return populateCollapsedOrgDTOs(list, isSysadmin);
+	}
+	
+	private List populateCollapsedOrgDTOs(List list, boolean isSysadmin) {
+		ArrayList<CollapsedOrgDTO> dtoList = new ArrayList<CollapsedOrgDTO>();
+		for (Object obj : list) {
+			// sysadmins get all orgs collapsed; saves storing boolean for every org,
+			// and saves loading time for the sysadmin
+			if (isSysadmin) {
+				dtoList.add(new CollapsedOrgDTO((Integer)obj, Boolean.TRUE));
+			} else {
+				Object[] array = (Object[])obj;
+				if (array.length > 1) {
+					log.debug(array[0]+" "+array[1]);
+					if (array[1] != null) {
+						dtoList.add(new CollapsedOrgDTO((Integer)array[0], (Boolean)array[1]));
+					} else {
+						dtoList.add(new CollapsedOrgDTO((Integer)array[0], Boolean.FALSE));
+					}
+				}
+			}
+		}
+		return dtoList;
 	}
 
 }

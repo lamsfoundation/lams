@@ -29,73 +29,13 @@
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-1.1.4.pack.js"></script>
+	<c:if test="${empty tab}">
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery.dimensions.pack.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/interface.js"></script>
+	<script language="JavaScript" type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
+	</c:if>
 	<script language="javascript" type="text/javascript">
 		<!--
-			<c:if test="${empty tab}">
-				jQuery(document).ready(function(){
-					jQuery("div.j-display-group").each(function(){
-						jQuery(this).load("displayGroup.do", {stateId: 1, orgId: this.id}, function() {
-							jQuery("a.disabled-sequence-name-link, a.sequence-name-link", this).ToolTip({
-								className: 'sequence-description-tooltip',
-								position: 'mouse',
-								delay: 300
-							});
-							jQuery("a.disabled-sequence-name-link, a.sequence-name-link", this).each(function(i, element) {
-								var title = jQuery(element).attr("title");
-								if (title!=null) {
-									var newTitle = title.replace(/\r\n/g,"<BR>").replace(/\n/g,"<BR>")
-									jQuery(element).attr("title", newTitle);
-								}
-							});
-						});
-					});
-					jQuery("body").click(function(event) {
-						if (jQuery(event.target).is("a.j-group-header")){
-							var course = jQuery(event.target).parent("h2").parent("div.left-buttons").parent("div.row").next("div.j-course-contents");
-							if (jQuery.browser.msie) {
-								if (jQuery.browser.version == '6.0') {
-									course.slideToggle("fast");
-								}
-							} else {
-								course.toggle("fast");
-							}
-							return false;
-						}
-					});
-				});
-				
-				function makeSortable(element, acceptClass) {
-					jQuery(element).Sortable({
-						accept: acceptClass,
-						axis: "vertically",
-						containment: [jQuery(element).offset().left,
-							jQuery(element).offset().top,
-							jQuery(element).width(),
-							jQuery(element).height()],
-						onStop: function() {
-							var ids = [];
-							jQuery(this).parent().children("p").each(function(i, element) {
-								ids.push(element.id);
-							});
-							var jLessonsId = jQuery(this).parent().attr("id");
-							var dashIndex = jLessonsId.indexOf("-");
-							var orgId = (dashIndex>0 ? jLessonsId.substring(0, dashIndex) : jLessonsId);
-							$.ajax({
-								url: "servlet/saveLessonOrder",
-								data: {orgId: orgId, 
-									ids: ids.join(",")
-								},
-								error: function(a,b) {
-									refresh();
-								}
-							});
-						}
-					});
-				}
-			</c:if>
-								
 			function refresh(){
 				document.location.reload();
 			}
@@ -186,9 +126,21 @@
 								</div>
 							</div>
 							<c:if test="${empty tab}">
-								<c:forEach items="${courseIds}" var="courseId">
-									<div id="<c:out value="${courseId}"/>" class="j-display-group"></div>
+								<c:forEach items="${collapsedOrgDTOs}" var="dto">
+									<div id="<c:out value="${dto.orgId}"/>" class="course-bg">
+										<script>
+											initLoadGroup(jQuery("#<c:out value="${dto.orgId}"/>"),
+												1,
+												<c:if test="${dto.collapsed}">'header',</c:if>
+												<c:if test="${!dto.collapsed}">'group',</c:if>
+												<c:out value="${dto.orgId}"/>
+											);
+										</script>
+									</div>
 								</c:forEach>
+								<c:if test="${empty collapsedOrgDTOs}">
+									<p class="align-left"><fmt:message key="msg.groups.empty" /></p>
+								</c:if>
 							</c:if>
 							<c:if test="${tab eq 'profile'}">
 								<tiles:insert attribute="profile" />

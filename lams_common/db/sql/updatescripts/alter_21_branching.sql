@@ -182,5 +182,14 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 delete from lams_configuration where config_key='LamsHome';
 delete from lams_configuration where config_key='FileManagerDir';
 
--- LDEV-1250
+-- LDEV-1251, sortable lessons
 alter table lams_organisation add column ordered_lesson_ids text;
+
+-- LDEV-1252, collapsible courses
+CREATE TABLE lams_user_organisation_collapsed (
+       user_organisation_id BIGINT(20) NOT NULL
+     , collapsed TINYINT(1) NOT NULL DEFAULT 1
+     , PRIMARY KEY (user_organisation_id)
+     , CONSTRAINT FK_lams_user_organisation_collapsed_1 FOREIGN KEY (user_organisation_id)
+                  REFERENCES lams_user_organisation (user_organisation_id)
+)TYPE=InnoDB;

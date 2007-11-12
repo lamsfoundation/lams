@@ -89,8 +89,8 @@ public class IndexAction extends Action {
 		
 		String tab = WebUtil.readStrParam(request, "tab", true);
 		if (StringUtils.equals(tab, "profile")) {
-			List courseIds = getService().getArchivedCourseIdsByUser(loggedInUser.getUserId(), request.isUserInRole(Role.SYSADMIN));
-			request.setAttribute("courseIds", courseIds);
+			List collapsedOrgDTOs = getService().getArchivedCourseIdsByUser(loggedInUser.getUserId(), request.isUserInRole(Role.SYSADMIN));
+			request.setAttribute("collapsedOrgDTOs", collapsedOrgDTOs);
 			return mapping.findForward("profile");
 		} else if (StringUtils.equals(tab, "editprofile")) {
 			return mapping.findForward("editprofile");
@@ -108,8 +108,8 @@ public class IndexAction extends Action {
 			return mapping.findForward("community");
 		}
 		
-		List courseIds = getService().getActiveCourseIdsByUser(loggedInUser.getUserId(), request.isUserInRole(Role.SYSADMIN));
-		request.setAttribute("courseIds", courseIds);
+		List collapsedOrgDTOs = getService().getActiveCourseIdsByUser(loggedInUser.getUserId(), request.isUserInRole(Role.SYSADMIN));
+		request.setAttribute("collapsedOrgDTOs", collapsedOrgDTOs);
 		
 		return mapping.findForward("main");
 	}

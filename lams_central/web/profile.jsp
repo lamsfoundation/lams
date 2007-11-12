@@ -7,20 +7,12 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod" %>
 
-<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-1.2.1.min.js"></script>
-<script language="javascript" type="text/javascript">
-	$(function(){
-		$("div.display-group").each(function(){
-			$(this).load("displayGroup.do", {stateId: 3, orgId: this.id});
-		});
-		$("body").click(function(event) {
-			if ($(event.target).is("a.group-header")){
-				$(event.target).parent("h2").parent("div.left-buttons").parent("div.row").next("div.course-contents").toggle("fast");
-				return false;
-			}
-		});
-	});
-</script>
+<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-1.1.4.pack.js"></script>
+<c:if test="${not empty collapsedOrgDTOs}">
+<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery.dimensions.pack.js"></script>
+<script language="JavaScript" type="text/javascript" src="includes/javascript/interface.js"></script>
+<script language="JavaScript" type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
+</c:if>
 	
 <div style="clear:both;"></div>
 
@@ -92,9 +84,18 @@
 <h2 class="space-top"><fmt:message key="title.archived.groups" />
 </h2>
 
-<c:forEach items="${courseIds}" var="courseId">
-	<div id="<c:out value="${courseId}"/>" class="display-group"></div>
+<c:forEach items="${collapsedOrgDTOs}" var="dto">
+	<div id="<c:out value="${dto.orgId}"/>" class="course-bg">
+		<script>
+			initLoadGroup(jQuery("#<c:out value="${dto.orgId}"/>"),
+				3,
+				<c:if test="${dto.collapsed}">'header',</c:if>
+				<c:if test="${!dto.collapsed}">'group',</c:if>
+				<c:out value="${dto.orgId}"/>
+			);
+		</script>
+	</div>
 </c:forEach>
-<c:if test="${empty courseIds}">
+<c:if test="${empty collapsedOrgDTOs}">
 	<p class="align-left"><fmt:message key="msg.groups.empty" /></p>
 </c:if>

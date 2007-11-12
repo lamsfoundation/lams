@@ -41,7 +41,13 @@
 
 
     <!-- Associations -->
-  
+    <!-- bi-directional one-to-one association with UserOrganisationCollapsed -->
+	<one-to-one
+        name="userOrganisationCollapsed"
+        class="org.lamsfoundation.lams.usermanagement.UserOrganisationCollapsed"
+        cascade="all"
+    >
+    </one-to-one>
     <!-- bi-directional many-to-one association to User -->
     <many-to-one
         name="user"

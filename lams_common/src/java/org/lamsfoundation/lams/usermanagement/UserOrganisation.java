@@ -46,6 +46,8 @@ public class UserOrganisation implements Serializable {
     /** persistent field */
     private Organisation organisation;
 
+    private UserOrganisationCollapsed userOrganisationCollapsed;
+    
     /** persistent field */
     private Set userOrganisationRoles;
 
@@ -109,6 +111,21 @@ public class UserOrganisation implements Serializable {
         this.organisation = organisation;
     }
 
+    /**
+     * 			@hibernate.one-to-one
+     * 				name="userOrganisationCollapsed"
+     * 				class="org.lamsfoundation.lams.usermanagement.UserOrganisationCollapsed"
+     * 				cascade="all"
+     * 
+     */
+    public UserOrganisationCollapsed getUserOrganisationCollapsed() {
+    	return this.userOrganisationCollapsed;
+    }
+    
+    public void setUserOrganisationCollapsed(UserOrganisationCollapsed uoc) {
+    	this.userOrganisationCollapsed = uoc;
+    }
+    
     /** 
      *            @hibernate.set
      *             lazy="false"
