@@ -1,4 +1,4 @@
-				
+	<!--				
 				function initLoadGroup(element, stateId, display, orgId) {
 					jQuery(element).load(
 						"displayGroup.do",
@@ -107,4 +107,4 @@
 						}
 					});
 				}
-				
+	//-->				

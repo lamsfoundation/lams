@@ -39,7 +39,7 @@
 			function refresh(){
 				document.location.reload();
 			}
-		//->
+		//-->
 	</script>
 </lams:head>
 <body class="my-courses">
@@ -129,12 +129,14 @@
 								<c:forEach items="${collapsedOrgDTOs}" var="dto">
 									<div id="<c:out value="${dto.orgId}"/>" class="course-bg">
 										<script>
+											<!--
 											initLoadGroup(jQuery("#<c:out value="${dto.orgId}"/>"),
 												1,
 												<c:if test="${dto.collapsed}">'header',</c:if>
 												<c:if test="${!dto.collapsed}">'group',</c:if>
 												<c:out value="${dto.orgId}"/>
 											);
+											//-->
 										</script>
 									</div>
 								</c:forEach>
