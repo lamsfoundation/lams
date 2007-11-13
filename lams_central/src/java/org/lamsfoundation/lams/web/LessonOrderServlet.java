@@ -81,6 +81,7 @@ public class LessonOrderServlet extends HttpServlet {
 					roles.add(roleId);
 					if (roleId.equals(Role.ROLE_GROUP_MANAGER) || roleId.equals(Role.ROLE_MONITOR)) {
 						allowSorting = true;
+						break;
 					}
 				}
 				if (!allowSorting) {
@@ -97,7 +98,7 @@ public class LessonOrderServlet extends HttpServlet {
 						Long l = new Long(Long.parseLong(id));
 						if (!contains(lessons, l)) {
 							log.warn("Lesson with id " + l + " doesn't belong in org with id " + orgId);
-							response.sendError(HttpServletResponse.SC_FORBIDDEN);
+							response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 							return;
 						}
 					} catch(NumberFormatException e) {
