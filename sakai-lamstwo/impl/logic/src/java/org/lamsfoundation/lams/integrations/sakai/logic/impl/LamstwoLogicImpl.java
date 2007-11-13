@@ -383,10 +383,10 @@ public class LamstwoLogicImpl implements LamstwoLogic {
 			Document document = db.parse(is);			
 			
 			learningDesigns = "[" + convertToTigraFormat(document.getDocumentElement()) + "]";
-			
+
 			// replace sequence id with javascript method
-			String pattern = "'(\\d+)'";
-			String replacement = "'javascript:selectSequence($1)'";
+			String pattern = ",'(\\d+)'";
+			String replacement = ",'javascript:selectSequence($1)'";
 			learningDesigns = learningDesigns.replaceAll(pattern, replacement);	
 			
 			// TODO better error handling
