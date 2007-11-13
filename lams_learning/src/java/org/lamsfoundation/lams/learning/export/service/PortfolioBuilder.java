@@ -137,7 +137,6 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 				complexPortfolio.setHeadingNoPage(true);
 			}
 		}
-		if ( activity.isSequenceActivity() && activity.getParentActivity() != null && activity.getParentActivity().isBranchingActivity() ) 
 
 		currentPortfolioList = (ArrayList<ActivityPortfolio>) activityListStack.pop();
 		if ( complexPortfolio != null )
