@@ -386,6 +386,9 @@ class Canvas extends CanvasHelper {
 			actToAdd.parentUIID = taParent;
 			canvasModel.removeActivity(actToAdd.activityUIID);
 			canvasModel.removeActivity(taParent);
+			var sequenceAct:Activity;
+			if((sequenceAct = canvasModel.getCanvas().ddm.getActivityByUIID(taParent)).isSequenceActivity())
+				canvasModel.removeActivity(sequenceAct.parentUIID);
 		}
 		
 		canvasModel.setDirty();

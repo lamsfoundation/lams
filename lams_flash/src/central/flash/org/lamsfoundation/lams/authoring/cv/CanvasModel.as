@@ -305,6 +305,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			optAct.parentUIID = parent.activityUIID;
 		}
 		
+		if(isSequence) {
+			createNewSequenceActivity(optAct, 0);
+			createNewSequenceActivity(optAct, 1);
+			optAct.noSequences = 2;
+		}
+		
 		_cv.ddm.addActivity(optAct);
 		
 		setDirty();

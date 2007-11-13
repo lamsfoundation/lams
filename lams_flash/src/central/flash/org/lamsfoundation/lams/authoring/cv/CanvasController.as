@@ -154,36 +154,55 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					if(ca.activity.activityUIID != optionalOnCanvas[i].activity.activityUIID ){
 						
 						if(ca.hitTest(optionalOnCanvas[i])){
+							
 							if(optionalOnCanvas[i].locked == true){
 								activitySnapBack(ca);
 								var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('act_lock_chk') : Dictionary.getValue('act_seq_lock_chk');
 								LFMessage.showMessageAlert(msg);
 							} else {
+								
 								if(ca.activity.isGateActivity() && !optionalOnCanvas[i].activity.isSequenceBased){
 									activitySnapBack(ca);
 									var msg:String = Dictionary.getValue('cv_gateoptional_hit_chk');
 									LFMessage.showMessageAlert(msg);
+								} else if(_canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(ca.activity.activityUIID).hasTrans) {
+									activitySnapBack(ca);
+									var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity', [ca.activity.title]);
+									LFMessage.showMessageAlert(msg);
+								} else if(_canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID).hasBranches) {
+									activitySnapBack(ca);
+									var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity_no_branches', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity_no_branches', [ca.activity.title]);
+									LFMessage.showMessageAlert(msg);
+								} else if(optionalOnCanvas[i].activity.isSequenceBased && optionalOnCanvas[i].activity.noSequences <= 0) {
+									activitySnapBack(ca);
+									var msg:String = Dictionary.getValue('ta_iconDrop_optseq_error_msg');
+									LFMessage.showMessageAlert(msg);
 								} else {
-									if(_canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(ca.activity.activityUIID).hasTrans) {
-										activitySnapBack(ca);
-										var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity', [ca.activity.title]);
-										LFMessage.showMessageAlert(msg);
-									} else if(_canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID).hasBranches) {
-										activitySnapBack(ca);
-										var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity_no_branches', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity_no_branches', [ca.activity.title]);
-										LFMessage.showMessageAlert(msg);
-									} else if(optionalOnCanvas[i].activity.isSequenceBased && optionalOnCanvas[i].activity.noSequences <= 0) {
-										activitySnapBack(ca);
-										var msg:String = Dictionary.getValue('ta_iconDrop_optseq_error_msg');
-										LFMessage.showMessageAlert(msg);
+									Debugger.log("sequence based: " + optionalOnCanvas[i].activity.isSequenceBased, Debugger.CRITICAL, "activityRelease", "CanvasController");
+									if(optionalOnCanvas[i].activity.isSequenceBased) {
+										// test mouse ptr 
+										var dropTarget:Object = eval(ca._droptarget);
+										
+										if(dropTarget._parent instanceof CanvasSequenceActivity) {
+											_canvasModel.addParentToActivity(dropTarget._parent.activity.activityUIID, ca, false);
+											CanvasSequenceActivity(dropTarget._parent).updateChildren();
+										} else {
+											activitySnapBack(ca);
+											var msg:String = Dictionary.getValue('activityDrop_optSequence_error_msg');
+											LFMessage.showMessageAlert(msg);
+										}
+										
 									} else {
 										_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca, false);
 										var newChildren:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(optionalOnCanvas[i].activity.activityUIID);
 										optionalOnCanvas[i].updateChildren(newChildren);
 									}
 								}
-							}						
+								
+							}	
+							
 						}
+						
 					}
 				}
 			}

@@ -47,9 +47,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	public static var ICON_WIDTH:Number = 25;
 	public static var ICON_HEIGHT:Number = 25;
 	
-	private var CHILD_OFFSET_X : Number = 2;
-	private var CHILD_OFFSET_Y : Number = 50.5;
-	private var CHILD_INCRE : Number = 60;
+	private var CHILD_OFFSET_X : Number = 5;
+	private var CHILD_OFFSET_Y : Number = 5;
+	private var CHILD_INCRE : Number = 55.5;
 	
 	//this is set by the init object
 	private var _canvasController:CanvasController;
@@ -89,8 +89,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	private var emptyIcon_mc:MovieClip;
 	
 	private var clickTarget_mc:MovieClip;
-	
-	private var canvasActivity_mc:MovieClip;
 	
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
@@ -166,10 +164,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		
 		for(var i=0; i<_children.length; i++) {
 			if(_module == "monitoring")
-				children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorView, _module:"monitoring", learnerContainer:learnerContainer});
+				children_mc[i] = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorView, _module:"monitoring", learnerContainer:learnerContainer, _sequenceChild:true});
 			else
-				children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView});
+				children_mc[i] = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView, _sequenceChild:true});
+		
+			//set the positioning co-ords
+			children_mc[i].activity.xCoord = CHILD_OFFSET_X + (i * CHILD_INCRE);
+			children_mc[i].activity.yCoord = CHILD_OFFSET_Y;
+			
+			children_mc[i]._visible = true;
+		
 		}
+		
+		var _newVisibleWidth = (_children.length*CHILD_INCRE) + (CHILD_OFFSET_X*2);
+		if(_newVisibleWidth > CanvasSequenceActivity.TOOL_ACTIVITY_WIDTH)
+			_visibleWidth = _newVisibleWidth;
 		
 		setStyles();
 		
@@ -195,7 +204,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	
 	private function showAssets(isVisible:Boolean){
 		icon_mc._visible = isVisible;
-		canvasActivity_mc._visible = isVisible;
 		clickTarget_mc._visible = isVisible;
 		fade_mc._visible = isVisible;
 	}
@@ -219,48 +227,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		//var MARGIN = 5;
 		
 		if(isSelected){
-			//draw a selected border
-		/**	var tgt_mc;
-			tgt_mc = canvasActivity_mc;
-			
-			Debugger.log("tgt_mc:"+tgt_mc,4,'setSelected','CanvasActivity');
-				
-			//vars
-			var tl_x = tgt_mc._x - MARGIN; 											//top left x
-			var tl_y = tgt_mc._y - MARGIN;											//top left y
-			var tr_x = tgt_mc._x + tgt_mc._width + MARGIN;							//top right x
-			var tr_y = tl_y;														//top right y
-			var br_x = tr_x;														//bottom right x
-			var br_y = tgt_mc._y + tgt_mc._height + MARGIN;							//bottom right y
-			var bl_x = tl_x;														//biottom left x															
-			var bl_y = br_y;														//bottom left y
-				
-			if(_selected_mc){
-				_selected_mc.removeMovieClip();
-			}
-			
-			_selected_mc = _base_mc.createEmptyMovieClip('_selected_mc',_base_mc.getNextHighestDepth());
-				
-			var dashStyle:mx.styles.CSSStyleDeclaration = _tm.getStyleObject("CAHighlightBorder");
-			var color:Number = dashStyle.getStyle("color");
-				
-			Draw.dashTo(_selected_mc,tl_x,tl_y,tr_x,tr_y,2,3,2,color);
-			Draw.dashTo(_selected_mc,tr_x,tr_y,br_x,br_y,2,3,2,color);
-			Draw.dashTo(_selected_mc,br_x,br_y,bl_x,bl_y,2,3,2,color);
-			Draw.dashTo(_selected_mc,bl_x,bl_y,tl_x,tl_y,2,3,2,color);
-			*/			
+					
 			_isSelected = isSelected;
 					
 		} else {
-			//hide the selected border
-			//_selected_mc.removeMovieClip();
 		}
 		
 	}
 	
 	private function setUpActIcon(icon_mc):Void{
 		icon_mc._x = (_visibleWidth / 2) - (icon_mc._width / 2);
-		icon_mc._y = (_visibleHeight / 2) - (icon_mc._height / 2) - 6;
+		icon_mc._y = (_visibleHeight / 2) - (icon_mc._height / 2);
 	}
 	
 	/**
@@ -290,11 +267,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		
 		clickTarget_mc._visible = true;
 		fade_mc._visible = false;
-			
-		if(_activity.isReadOnly() && getDDM().editOverrideLock == 1){
-			fade_mc._visible = true;
-		}
-
+		
 		if(_children.length <= 0) {
 			emptyIcon_mc._visible = true;
 			
@@ -305,18 +278,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 			theIcon_mc._visible = true;
 		}
 		
-		//canvasActivity_mc._width = _visibleWidth;
-		//canvasActivity_mc._height = _visibleHeight;
-		
-		//chose the background mc
-		canvasActivity_mc._visible = false;
-		
-		act_pnl._width = _visibleWidth - 3.5;
-		act_pnl._height = _visibleHeight - 3.5;
+		act_pnl.setSize(_visibleWidth, _visibleHeight);
 		
 		clickTarget_mc._width = _visibleWidth;
 		clickTarget_mc._height = _visibleHeight;
 		
+		fade_mc._width = _visibleWidth;
+		fade_mc._height = _visibleHeight;
+		
+		if(_activity.isReadOnly() && getDDM().editOverrideLock == 1){
+			fade_mc._visible = true;
+		}
+
 		_visible = true;
 		
 		_x = _activity.xCoord;
@@ -338,7 +311,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 					
 					if (_module == "monitoring"){
 						_monitorController.activityDoubleClick(this, "MonitorTabView");
-					}else {
+					} else {
 						_canvasController.activityDoubleClick(this);
 					}
 				}
@@ -458,6 +431,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		} else {
 			return _canvasView.ddm;
 		}
+	}
+	
+	public function get children():Array {
+		return children_mc;
 	}
 
 }

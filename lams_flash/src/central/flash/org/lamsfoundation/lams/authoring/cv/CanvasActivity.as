@@ -44,6 +44,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
   
 	public static var TOOL_ACTIVITY_WIDTH:Number = 123.1;
 	public static var TOOL_ACTIVITY_HEIGHT:Number = 50.5;
+	public static var TOOL_MIN_ACTIVITY_WIDTH:Number = 65;
+	public static var TOOL_MIN_ACTIVITY_HEIGHT:Number = 44;
+	
 	public static var GATE_ACTIVITY_HEIGHT:Number =28;
 	public static var GATE_ACTIVITY_WIDTH:Number = 28;
 	public static var ICON_WIDTH:Number = 25;
@@ -112,6 +115,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _branchView:CanvasBranchView;
 	private var _setupBranchView:Boolean;
 	
+	private var _sequenceChild:Boolean;
+	
 	private var _ddm:DesignDataModel;
 	
 	function CanvasActivity(_connector){
@@ -128,11 +133,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			_visibleHeight = CanvasActivity.GATE_ACTIVITY_HEIGHT;
 			_visibleWidth = CanvasActivity.GATE_ACTIVITY_WIDTH;
 		}else if(_activity.isGroupActivity()){
-			_visibleHeight = CanvasActivity.TOOL_ACTIVITY_HEIGHT;
-			_visibleWidth = CanvasActivity.TOOL_ACTIVITY_WIDTH;
+			_visibleHeight = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_HEIGHT : CanvasActivity.TOOL_ACTIVITY_HEIGHT;
+			_visibleWidth = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH : CanvasActivity.TOOL_ACTIVITY_WIDTH;
 		}else{
-			_visibleHeight = CanvasActivity.TOOL_ACTIVITY_HEIGHT;
-			_visibleWidth = CanvasActivity.TOOL_ACTIVITY_WIDTH;
+			_visibleHeight = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_HEIGHT : CanvasActivity.TOOL_ACTIVITY_HEIGHT;
+			_visibleWidth = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH :CanvasActivity.TOOL_ACTIVITY_WIDTH;
 		}
 		
 		_base_mc = this;
@@ -172,6 +177,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 		
 		setStyles();
+		
 		MovieClipUtils.doLater(Proxy.create(this,draw));
 	}
 	
@@ -206,44 +212,45 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	public function setSelected(isSelected){
 		Debugger.log(_activity.title+" isSelected:"+isSelected,4,'setSelected','CanvasActivity');
 		var MARGIN = 5;
-		if(isSelected){
+		if(isSelected) {
 			//draw a selected border
 			var tgt_mc;
-			if(_activity.isGateActivity()){
+			if(_activity.isGateActivity())
 				tgt_mc = stopSign_mc;			
-			}else if(_activity.groupingUIID > 0){
+			else if(_activity.groupingUIID > 0)
 				tgt_mc = canvasActivityGrouped_mc;
-			}else{
+			else
 				tgt_mc = canvasActivity_mc;
-			}
+				
 			Debugger.log("tgt_mc:"+tgt_mc,4,'setSelected','CanvasActivity');
-				//vars
-				var tl_x = tgt_mc._x - MARGIN; 											//top left x
-				var tl_y = tgt_mc._y - MARGIN;											//top left y
-				var tr_x = tgt_mc._x + tgt_mc._width + MARGIN;							//top right x
-				var tr_y = tl_y;														//top right y
-				var br_x = tr_x;														//bottom right x
-				var br_y = tgt_mc._y + tgt_mc._height + MARGIN;							//bottom right y
-				var bl_x = tl_x;														//biottom left x															
-				var bl_y = br_y;														//bottom left y
 				
+			//vars
+			var tl_x = tgt_mc._x - MARGIN; 											//top left x
+			var tl_y = tgt_mc._y - MARGIN;											//top left y
+			var tr_x = tgt_mc._x + tgt_mc._width + MARGIN;							//top right x
+			var tr_y = tl_y;														//top right y
+			var br_x = tr_x;														//bottom right x
+			var br_y = tgt_mc._y + tgt_mc._height + MARGIN;							//bottom right y
+			var bl_x = tl_x;														//biottom left x															
+			var bl_y = br_y;														//bottom left y
 				
-				if(_selected_mc){
-					_selected_mc.removeMovieClip();
-				}
-				_selected_mc = _base_mc.createEmptyMovieClip('_selected_mc',_base_mc.getNextHighestDepth());
+			
+			if(_selected_mc){
+				_selected_mc.removeMovieClip();
+			}
+			_selected_mc = _base_mc.createEmptyMovieClip('_selected_mc',_base_mc.getNextHighestDepth());
 				
-				var dashStyle:mx.styles.CSSStyleDeclaration = _tm.getStyleObject("CAHighlightBorder");
-				var color:Number = dashStyle.getStyle("color");
+			var dashStyle:mx.styles.CSSStyleDeclaration = _tm.getStyleObject("CAHighlightBorder");
+			var color:Number = dashStyle.getStyle("color");
 				
-				Draw.dashTo(_selected_mc,tl_x,tl_y,tr_x,tr_y,2,3,2,color);
-				Draw.dashTo(_selected_mc,tr_x,tr_y,br_x,br_y,2,3,2,color);
-				Draw.dashTo(_selected_mc,br_x,br_y,bl_x,bl_y,2,3,2,color);
-				Draw.dashTo(_selected_mc,bl_x,bl_y,tl_x,tl_y,2,3,2,color);
+			Draw.dashTo(_selected_mc,tl_x,tl_y,tr_x,tr_y,2,3,2,color);
+			Draw.dashTo(_selected_mc,tr_x,tr_y,br_x,br_y,2,3,2,color);
+			Draw.dashTo(_selected_mc,br_x,br_y,bl_x,bl_y,2,3,2,color);
+			Draw.dashTo(_selected_mc,bl_x,bl_y,tl_x,tl_y,2,3,2,color);
 						
-				_isSelected = isSelected;
+			_isSelected = isSelected;
 					
-		}else{
+		} else {
 			//hide the selected border
 			_selected_mc.removeMovieClip();
 		}
@@ -261,8 +268,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 	
 	private function setUpActIcon(icon_mc):Void{
-		icon_mc._x = (CanvasActivity.TOOL_ACTIVITY_WIDTH / 2) - (icon_mc._width / 2);
-		icon_mc._y = (CanvasActivity.TOOL_ACTIVITY_HEIGHT / 2) - (icon_mc._height / 2) - 6;
+		icon_mc._x = (_visibleWidth / 2) - (icon_mc._width / 2);
+		icon_mc._y = (_visibleHeight / 2) - (icon_mc._height / 2);
+		icon_mc._y -= (!_sequenceChild) ? 6 : 0;
 	}
 	
 	private function drawLearners():Void {
@@ -396,16 +404,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			//write text
 			title_lbl.text = _activity.title;
 			
-			clickTarget_mc._width = TOOL_ACTIVITY_WIDTH;
-			clickTarget_mc._height = TOOL_ACTIVITY_HEIGHT;
+			clickTarget_mc._width = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH : TOOL_ACTIVITY_WIDTH;
+			clickTarget_mc._height = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_HEIGHT : TOOL_ACTIVITY_HEIGHT;
 			
 		}
 
 		//position
 		Debugger.log('setting position:',Debugger.CRITICAL,'draw','CanvasActivity');
-		if(!_branchConnector) {
-			Debugger.log('not branch:',Debugger.CRITICAL,'draw','CanvasActivity');
 		
+		if(!_branchConnector) {
 			_x = _activity.xCoord;
 			_y = _activity.yCoord;
 		} else {
@@ -420,7 +427,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			}
 		}
 		
-		Debugger.log('canvasActivity_mc._visible'+canvasActivity_mc._visible,4,'draw','CanvasActivity');
 		_visible = true;
 		
 		if (_activity.runOffline){

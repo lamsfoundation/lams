@@ -176,7 +176,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		
 		CHILD_OFFSET_X = 4;
 		CHILD_OFFSET_Y = 48;
-		CHILD_INCRE = 50;
+		CHILD_INCRE = 57;
+		
 		removeAllChildren();
 		
 		children_mc = new Array();
@@ -193,6 +194,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 				children_mc[i].activity.yCoord = CHILD_OFFSET_Y + (i * CHILD_INCRE);
 			
 				children_mc[i]._visible = true;
+				if(_visibleWidth < children_mc[i].getVisibleWidth()) _visibleWidth = children_mc[i].getVisibleWidth();
 			}
 		}
 		
@@ -302,8 +304,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			container_pnl._height = CHILD_OFFSET_Y + CHILD_INCRE;
 		}
 		
-		if(_type == SEQ_TYPE)
+		if(_type == SEQ_TYPE) {
 			container_pnl._height += 10;
+			container_pnl._width = _visibleWidth + 6;
+			header_pnl._width = _visibleWidth - 6;
+		}
 		
 		_x = _activity.xCoord;
 		_y = _activity.yCoord;

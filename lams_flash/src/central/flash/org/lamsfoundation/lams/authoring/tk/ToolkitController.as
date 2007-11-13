@@ -77,8 +77,8 @@ class ToolkitController extends AbstractController {
 		for(var i=0; i<optionalOnCanvas.length; i++){
 			var optionalX:Number = optionalOnCanvas[i].activity.xCoord;
 			var optionalY:Number = optionalOnCanvas[i].activity.yCoord;
-			var optionalWidth:Number = optionalOnCanvas[i]._width
-			var optionalHeight:Number = optionalOnCanvas[i]._height
+			var optionalWidth:Number = optionalOnCanvas[i]._width;
+			var optionalHeight:Number = optionalOnCanvas[i]._height;
 			
 			if(iconMouseX >= optionalX && iconMouseX <= (optionalX + optionalWidth)){
 				if(iconMouseY >= optionalY && iconMouseY <= (optionalY + optionalHeight)){
@@ -94,7 +94,29 @@ class ToolkitController extends AbstractController {
 						var msg:String = Dictionary.getValue('ta_iconDrop_optseq_error_msg');
 						LFMessage.showMessageAlert(msg);
 					} else {
-						cv.setDroppedTemplateActivity(ta, optionalOnCanvas[i].activity.activityUIID);
+						if(optionalOnCanvas[i].activity.isSequenceBased) {
+							// test mouse ptr 
+							var _children:Array = optionalOnCanvas[i].children;
+							var sequenceDropUIID:Number = null;
+							var mouseX = iconMouseX - optionalX;
+							var mouseY = iconMouseY - optionalY;
+							
+							for(var j=0; j<_children.length; j++) {
+								if(mouseX >= _children[j].activity.xCoord && 
+								   mouseX <= (_children[j].activity.xCoord + _children[j]._width) &&
+								   mouseY >= _children[j].activity.yCoord && 
+								   mouseY <= (_children[j].activity.yCoord + _children[j]._height))
+									sequenceDropUIID = _children[j].activity.activityUIID;
+							}
+							
+							if(sequenceDropUIID != null) {
+								cv.setDroppedTemplateActivity(ta, sequenceDropUIID);
+							} else {
+								var msg:String = Dictionary.getValue('activityDrop_optSequence_error_msg');
+								LFMessage.showMessageAlert(msg);
+							}
+										
+						} else { cv.setDroppedTemplateActivity(ta, optionalOnCanvas[i].activity.activityUIID); }
 					}
 				}					
 			}			
