@@ -24,6 +24,8 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.action;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,6 +33,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -39,7 +42,6 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Action class to display a sequence activity.
@@ -51,8 +53,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts:action path="/SequenceActivity" name="activityForm"
  *                validate="false" scope="request"
  * 
- * @struts:action-forward name="empty" path=".sequenceActivityEmpty"
- * 
  */
 public class SequenceActivityAction extends ActivityAction {
 	
@@ -60,12 +60,14 @@ public class SequenceActivityAction extends ActivityAction {
 	/**
 	 * Gets an sequence activity from the request (attribute) and forwards to
 	 * either the first activity in the sequence activity or the "empty" JSP.
+	 * @throws UnsupportedEncodingException 
+	 * @throws LearnerServiceException 
 	 */
 	public ActionForward execute(
 			ActionMapping mapping,
 			ActionForm actionForm,
 			HttpServletRequest request,
-			HttpServletResponse response) {
+			HttpServletResponse response) throws LearnerServiceException, UnsupportedEncodingException {
 
 		ActivityForm form = (ActivityForm)actionForm;
 		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
@@ -88,16 +90,15 @@ public class SequenceActivityAction extends ActivityAction {
 			learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(), firstActivityInSequence);
 			forward = actionMappings.getActivityForward(firstActivityInSequence, learnerProgress, true);
 			LearningWebUtil.putActivityInRequest(request, firstActivityInSequence, learnerService);
+			LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
+	        return forward;
 		} else {
-			request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());
-			request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
-			request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());
-			request.setAttribute(AttributeNames.PARAM_LEARNER_PROGRESS_ID, learnerProgress.getLearnerProgressId());
-			forward = mapping.findForward("empty");
+		    // No activities exist in the sequence, so go to the next activity.
+	        return LearningWebUtil.completeActivity(request, response,
+			    		actionMappings, learnerProgress, activity, 
+			    		learnerId, learnerService, true);
 		}
 
-		LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
-        return forward;
        	
 	}
 	
