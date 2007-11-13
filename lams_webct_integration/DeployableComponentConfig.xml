@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployablecomponents>
+ <!-- Out Bound Deployable Component Config XML File -->
+ <!-- Add components as shown in the following <component> block below -->
+
+    <component>
+        <version>0.0.7</version>
+        <powerlinks-version>1.0</powerlinks-version>
+        <id>lams.integration</id>
+        <!-- valid types include sso siapi and proxytools -->
+        <type>sso</type>
+        <classname>org.lamsfoundation.integration.webct.AuthorModule</classname>
+        <author>Luke Foxton</author>
+        <description>LAMS-WebCt integration module</description>
+        <settings-structure>
+            <settings-group name="lamsIntegrationModule"
+                            type="service"
+                            label="LAMS Integration Module">
+
+				<!-- REQUIRED ELEMENTS -->
+				<setting-element name="controlflag"
+						 label="security.authNModule.controlFlag"
+						 data-type="String"
+						 presentation-type="ComboBox"
+						 inheritable="true"
+						 optional="false"
+						 read-only="false"
+						 >
+						 <setting-value key="sufficient" default="true"  label="security.authNModule.controlFlag.sufficient"/>
+						 <setting-value key="required" default="false"  label="security.authNModule.controlFlag.required"/>
+						 <setting-value key="requisite" default="false"  label="security.authNModule.controlFlag.requisite"/>
+						 <setting-value key="optional" default="false"  label="security.authNModule.controlFlag.optional"/>
+				</setting-element>
+
+				<setting-element name="order"
+						 label="security.authNModule.order"
+						 data-type="Integer"
+						 presentation-type="TextField"
+						 inheritable="true"
+						 optional="false"
+						 read-only="false"
+						 default-value="1">
+				</setting-element>
+
+				<setting-element name="mode"
+						 label="security.authNModule.mode"
+						 data-type="String"
+						 presentation-type="ComboBox"
+						 inheritable="true"
+						 optional="false"
+						 read-only="false"
+						 >
+					<setting-value key="outgoing" default="true"  label="security.authNModule.mode.outgoing"/>
+					<setting-value key="incoming" default="false"  label="security.authNModule.mode.incoming"/>
+				</setting-element>
+			
+				<setting-element name="operationalTimeout"
+						 label="security.authNModule.operationalTimeout"
+						 data-type="Integer"
+						 presentation-type="TextField"
+						 inheritable="true"
+						 optional="false"
+						 read-only="false"
+						 default-value="10">
+				</setting-element>
+				
+				
+				<setting-element name="openInNewWindow"
+					 label="security.authNModule.openInNewWindow"
+					 data-type="Boolean"
+					 presentation-type="RadioGroup"
+					 inheritable="true"
+					 optional="false"
+					 read-only="false">
+					 <setting-value key="true" default="false" label="true"/>
+					 <setting-value key="false" default="true" label="false"/>
+				</setting-element>
+						
+				<setting-element name="assistedConfig"
+					 label="Assisted Config"
+					 data-type="Boolean"
+					 presentation-type="RadioGroup"
+					 inheritable="true"
+					 optional="false"
+					 read-only="false">
+					 <setting-value key="true" default="false" label="true"/>
+					 <setting-value key="false" default="true" label="false"/>
+				</setting-element>
+
+				<setting-element name="assistedConfigButtonName"
+						 label="Assisted Config Button Name"
+						 data-type="String"
+						 presentation-type="TextField"
+						 inheritable="true"
+						 optional="false"
+						 read-only="false"
+						 default-value="Configure Proxy Tool">
+				</setting-element>
+				
+				<setting-element name="urlpattern"
+							 label="security.authNModule.urlpattern"
+							 data-type="String"
+							 presentation-type="TextField"
+							 inheritable="true"
+							 optional="false"
+							 read-only="false"
+							 default-value="lamsfoundation">
+				</setting-element>
+
+		<!-- MODULE-SPECIFIC ELEMENTS -->	
+				<setting-element name="lamsServerUrl" 
+								 label="LAMS Server URL" 
+								 data-type="String" 
+								 presentation-type="TextField" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="false" 
+								 default-value="http://localhost:8080/lams/" />
+
+				<setting-element name="lamsServerId" 
+								 label="LAMS Server ID" 
+								 data-type="String" 
+								 presentation-type="TextField" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="false" 
+								 default-value="" />
+								 
+				<setting-element name="lamsServerSecretKey" 
+								 label="LAMS Server Secret Key" 
+								 data-type="String" 
+								 presentation-type="TextField" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="false" 
+								 default-value="" />
+								 
+								 
+				<setting-element name="webctRequestSource" 
+								 label="WebCt Request Source" 
+								 data-type="String" 
+								 presentation-type="TextField" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="false" 
+								 default-value="webct" />
+
+            </settings-group>
+        </settings-structure>
+    </component>
+
+</deployablecomponents>
+   
+
+
+
+
+
+
+

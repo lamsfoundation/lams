@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>LAMS: Start Lesson</title>
+
+<script language="JavaScript" type="text/javascript">
+<!--
+	#include( 'web/lib/tigra/tree.js' )
+	#include( 'web/lib/tigra/tree_tpl.js' ) 
+	
+	var authorWin = null;
+
+    function openAuthor()
+    {
+    	authorUrl = '${authorUrl}'; 
+    	authorUrl += "&notifyCloseURL="
+    	if(authorWin && authorWin.open && !authorWin.closed){
+    		try {
+            	authorWin.focus();
+            }catch(e){
+		        // popups blocked by a 3rd party
+		   	}
+        }
+        else{
+            try {
+            	authorWin = window.open(authorUrl,'aWindow','width=800,height=600,resizable');
+            	authorWin.focus();
+            }catch(e){
+		        // popups blocked by a 3rd party
+		    }
+        }
+    }
+    
+    function refreshSeqList()
+    {
+    	//document.getElementById("sequence_id").value="0";
+    	document.location.reload();
+    }
+    
+    function doCreate()
+    {
+    	if (document.getElementById("sequence_id").value=="0")
+    	{
+    		alert('Please select a sequence before clicking next.');
+    		return false;
+    	}
+    	else
+    	{
+    		return true;
+    	}
+    }
+    
+    function selectSequence(id) 
+    {
+		//document.workspace_form.nextButton.class= "button"; 
+		//document.getElementById("nextButton").disabled = false;
+		//document.getElementById("nextButton").type = "submit";  
+		//document.getElementById("disabledNextButton").type = "hidden";
+		
+		//var b = document.getElementById("disabledNextButton")
+		//b.parentNode.removeChild(b);
+
+		//document.getElementById("nextButton").style.visibility = "visible";  
+		
+		
+		//document.getElementById("nextButton").class = "button"; 	
+    	document.getElementById("sequence_id").value=id;
+	}
+    
+//-->
+</script>
+
+
+</head>
+<body>
+<h3>Create LAMS Lesson</h3>
+
+<br>
+<br>
+
+<form name="create_form" id="create_form" action="learnerMonitor.vm" method="post">
+	<input type="hidden" name="sequence_id" id="sequence_id"  value='0'>
+	
+	
+	
+	
+	<table border='0'>
+		<tr>
+			<td><b>Title</b></td>
+			<td><input id="title" type="text" name="title" value=""></td>
+		</tr>
+		<tr>
+			<td><b>Description</b></td>
+			<td><textarea name="description" rows="12" cols="35"></textarea></td>
+		</tr>
+		<tr>
+			<td><b>Lesson Visibility</b></td>
+			<td><input type="Radio" name="isAvailable" value="true" checked>Show Lesson <br>
+	            <input type="Radio" name="isAvailable" value="false">Hide Lesson </td>
+		</tr>
+		
+	</table>
+	<br><br>
+	
+	<table border='0'>
+		<tr>
+			<td><b>Select Sequence</b></td>
+			<td>
+				<script language="JavaScript" type="text/javascript">
+            	<!-- 
+            	 	var TREE_ITEMS = ${learningDesigns};            		
+					var tree = new tree(TREE_ITEMS, TREE_TPL);	
+				//-->
+				</script>
+			</td>
+		</tr>
+		<tr>
+			<td><input type="button" name="author" onClick="openAuthor();" value="Open Author"></td>
+		</tr>
+	</table>	
+
+	<input type="button" name="action" onClick="refreshSeqList();" value="Refresh">                                      
+	<input type="submit" name="create" onClick="return doCreate();" value="Create Lesson"/>
+</form>
+
+
+
+
+
+</body>
+</html>
