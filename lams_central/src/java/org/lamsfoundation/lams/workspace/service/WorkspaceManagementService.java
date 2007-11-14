@@ -178,23 +178,26 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @throws IOException
 	 */
 	public String deleteFolder(Integer folderID, Integer userID)throws IOException{		
-	    FlashMessage flashMessage = null;
-	    
 		WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,folderID);
 		User user = (User)userMgmtService.findById(User.class,userID);
+	    FlashMessage flashMessage = null;
 		if(user!=null){
-			if(!getPermissions(workspaceFolder,user).equals(WorkspaceFolder.OWNER_ACCESS)){
-				flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_DELETE,userID);
-			}else{
-				if(workspaceFolder!=null){
-					flashMessage = deleteFolderContents(workspaceFolder, userID);
-				}else
-					flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists(MSG_KEY_DELETE,folderID);
-			}
+		    flashMessage = deleteFolder(workspaceFolder, user, isSysAuthorAdmin(user));
 		}else
 			flashMessage = FlashMessage.getNoSuchUserExists(MSG_KEY_DELETE,userID);
 			
 		return flashMessage.serializeMessage();
+	}
+	
+	private FlashMessage deleteFolder(WorkspaceFolder workspaceFolder, User user, boolean isSysAuthorAdmin) throws IOException {
+		if(!getPermissions(workspaceFolder,user).equals(WorkspaceFolder.OWNER_ACCESS)){
+			return FlashMessage.getUserNotAuthorized(MSG_KEY_DELETE,user.getUserId());
+		}else{
+			if(workspaceFolder!=null){
+				return deleteFolderContents(workspaceFolder, user, isSysAuthorAdmin);
+			}else
+				return FlashMessage.getNoSuchWorkspaceFolderExsists(MSG_KEY_DELETE,workspaceFolder.getWorkspaceFolderId());
+		}
 	}
 	/**
 	 * This method will try to delete the <code>folder</code>. If the folder is not empty
@@ -204,11 +207,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * If all resources inside that <code>folder</code> are successfully deleted, then
 	 * the folder will be deleted and a FlashMessage will be returned indicating it was 
 	 * successfully deleted.
-	 * TODO: put all flash messages in a message resource file so it can be
-	 * internationalised
 	 * @param folder
 	 */
-	private FlashMessage deleteFolderContents(WorkspaceFolder folder, Integer userID) throws IOException
+	private FlashMessage deleteFolderContents(WorkspaceFolder folder, User user, boolean isSysAuthorAdmin) throws IOException
 	{
 	    FlashMessage flashMessage = null;
 		boolean isDeleteSuccessful = true;
@@ -224,7 +225,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 				while (subFolderIterator.hasNext())
 				{
 					WorkspaceFolder subFolder = (WorkspaceFolder)subFolderIterator.next();
-					deleteFolder(subFolder.getWorkspaceFolderId(), userID);					
+					flashMessage = deleteFolder(subFolder, user, isSysAuthorAdmin);					
+					if ( flashMessage.getMessageType() != FlashMessage.OBJECT_MESSAGE )
+						return flashMessage;
 				}
 			}
 			else
@@ -246,17 +249,13 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 				while (j.hasNext())
 				{
 					LearningDesign learningDesign = (LearningDesign)j.next();
-					//have to ensure that the user has permission to delete the learning design
-					//method taken from deleteLearningDesign
-					//code has been duplicated because it is not desirable to return a string.
-					Long learningDesignID = learningDesign.getLearningDesignId();
 					if (learningDesign != null) {
-						if (learningDesign.getUser().getUserId().equals(userID))
+						if (isSysAuthorAdmin || learningDesign.getUser().getUserId().equals(user.getUserId()))
 						{
 							if (learningDesign.getReadOnly().booleanValue()) {
 								isDeleteSuccessful = false;
 								flashMessage = new FlashMessage(MSG_KEY_DELETE,
-																messageService.getMessage("delete.learningdesign.error",new Object[]{learningDesignID})
+																messageService.getMessage("delete.learningdesign.error",new Object[]{learningDesign.getLearningDesignId()})
 																, FlashMessage.ERROR);
 							}
 							else
@@ -268,7 +267,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 					}
 				}
 				
-				baseDAO.update(folder); //this call will delete the files and learningdesigns which were removed from the collection above.
+				baseDAO.update(folder); //this call will delete the files and learning designs which were removed from the collection above.
 				
 			}
 			
@@ -381,7 +380,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		} else if (workspaceFolder.getUserID().equals(user.getUserId())) {
 			log.debug(user.getLogin()+" has owner access to "+workspaceFolder.getName());
 			permission = WorkspaceFolder.OWNER_ACCESS;
-		} else if (userMgmtService.hasRoleInOrganisation(user, Role.ROLE_AUTHOR_ADMIN)){
+		} else if (isSysAuthorAdmin(user)){
 			log.debug(user.getLogin()+" has owner access to "+workspaceFolder.getName());
 			permission = WorkspaceFolder.OWNER_ACCESS;
 		} else if(user.hasMemberAccess(workspaceFolder)) {
@@ -394,6 +393,12 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		
 		return permission;
 	}
+	
+	private boolean isSysAuthorAdmin(User user) {
+		return userMgmtService.hasRoleInOrganisation(user, Role.ROLE_AUTHOR_ADMIN) || 
+			   userMgmtService.hasRoleInOrganisation(user, Role.ROLE_SYSADMIN);
+	}
+	
 	/** This method checks if the given workspaceFolder is a subFolder of the
 	 * given rootFolder. Returns false if they are the same folder. */
 /*	private boolean isSubFolder(WorkspaceFolder workspaceFolder,WorkspaceFolder rootFolder){
@@ -679,14 +684,14 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @return String The acknowledgement/error message in WDDX format for FLASH
 	 * @throws IOException
 	 */
-	public String deleteLearningDesign(Long learningDesignID, Integer userID)throws IOException{
-	    FlashMessage flashMessage = null;
+	public String deleteLearningDesign(Long learningDesignID, Integer userID) throws IOException{
 		User user = (User)baseDAO.find(User.class,userID);
+	    FlashMessage flashMessage = null;
 		if(user!=null){
 			LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignID);
 		
 			if(learningDesign!=null){
-				if(learningDesign.getUser().getUserId().equals(user.getUserId())){
+				if(learningDesign.getUser().getUserId().equals(user.getUserId()) || isSysAuthorAdmin(user)){
 					if(learningDesign.getReadOnly().booleanValue()){
 						flashMessage = new FlashMessage(MSG_KEY_DELETE,
 														messageService.getMessage("learningdesign.readonly",new Object[]{learningDesignID}),
@@ -696,11 +701,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 						flashMessage = new FlashMessage(MSG_KEY_DELETE,messageService.getMessage("learningdesign.delete",new Object[]{learningDesignID}));
 					}
 				}else
-					flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_DELETE,userID);
+					flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_DELETE,user.getUserId());
 		}else
 			flashMessage = FlashMessage.getNoSuchLearningDesignExists(MSG_KEY_DELETE,learningDesignID);
 		}else
-			flashMessage = FlashMessage.getNoSuchUserExists(MSG_KEY_DELETE,userID);
+			flashMessage = FlashMessage.getNoSuchUserExists(MSG_KEY_DELETE,user.getUserId());
 		
 		return flashMessage.serializeMessage();
 	}
