@@ -5,7 +5,7 @@
     <package-name>.LRN LAMS2.x Integration</package-name>
     <pretty-plural>.LRN LAMS2.x Integration</pretty-plural>
     <initial-install-p>f</initial-install-p>
-    <singleton-p>t</singleton-p>
+    <singleton-p>f</singleton-p>
     
     <version name="0.1d" url="http://openacs.org/repository/apm/packages/lams2int0.1d.apm">
         <owner url="mailto:ernieg@melcoe.mq.edu.au">Ernie Ghiglione</owner>
