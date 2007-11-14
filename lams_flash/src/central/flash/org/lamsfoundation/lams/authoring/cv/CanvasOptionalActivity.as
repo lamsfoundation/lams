@@ -28,10 +28,11 @@ import org.lamsfoundation.lams.authoring. *;
 import org.lamsfoundation.lams.authoring.cv. *;
 import org.lamsfoundation.lams.monitoring.mv. *;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
-//import org.lamsfoundation.lams.authoring.cv.DesignDataModel;
 import org.lamsfoundation.lams.common.style. *;
+
 import mx.controls. *;
-import mx.managers. *
+import mx.managers. *;
+
 /**
 * CanvasOptionalActivity
 * This is the UI / view representation of a complex (Optional) activity
@@ -44,6 +45,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var CHILD_OFFSET_X:Number = 8;
 	private var CHILD_OFFSET_Y:Number = 57;
 	private var CHILD_INCRE:Number = 60;
+	
+	private var PANEL_OFFSET_X:Number = null;
+	
+	private var CONTAINER_PANEL_W:Number = 142.8;
 	
 	private var newContainerXCoord:Number; 
 	private var newContainerYCoord:Number;
@@ -72,6 +77,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var container_pnl:Panel;
 	private var header_pnl:Panel;
 	private var act_pnl:Panel;
+	
 	private var title_lbl:Label;
 	private var actCount_lbl:Label;
 	
@@ -106,10 +112,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		optionalActivity_mc = this;
 		
 		_visible = false;
+		
 		_tm = ThemeManager.getInstance ();
 		_dictionary = Dictionary.getInstance();
+		
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
+		
 		_ca = new ComplexActivity(_activity.activityUIID)
 		_activity.activityCategoryID = Activity.CATEGORY_SYSTEM;
 		
@@ -140,9 +149,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		actMaxOptions = _ca.maxOptions;
 		
 		showStatus(false);
-		
-		CHILD_OFFSET_X = 8;
-		CHILD_OFFSET_Y = 57;
 		
 		removeAllChildren();
 		
@@ -176,12 +182,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		
 		CHILD_OFFSET_X = 4;
 		CHILD_OFFSET_Y = 48;
+		PANEL_OFFSET_X = CHILD_OFFSET_X;
+		
 		CHILD_INCRE = 57;
 		
 		removeAllChildren();
 		
 		children_mc = new Array();
-		
+		var _newVisibleWidth:Number = null;
+				
 		for(var i=0; i < _children.length; i++) {
 			if(_children[i].isSequenceActivity()) {
 				if(fromModuleTab == "monitorMonitorTab")
@@ -194,9 +203,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 				children_mc[i].activity.yCoord = CHILD_OFFSET_Y + (i * CHILD_INCRE);
 			
 				children_mc[i]._visible = true;
-				if(_visibleWidth < children_mc[i].getVisibleWidth()) _visibleWidth = children_mc[i].getVisibleWidth();
+				
+				if(_visibleWidth < children_mc[i].getVisibleWidth())  {
+					_newVisibleWidth = children_mc[i].getVisibleWidth();
+					PANEL_OFFSET_X = (CHILD_OFFSET_X*2);
+				}
+				
+				if(_newVisibleWidth != null) _visibleWidth = _newVisibleWidth;
 			}
 		}
+		
+		// set width for children
+		for(var i=0; i<children_mc.length; i++)
+			if(_newVisibleWidth > children_mc[i].getVisibleWidth()) children_mc[i].setSize(_visibleWidth, null);
 		
 		ComplexActivity(_activity).noSequences = _children.length;
 		
@@ -210,6 +229,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	
 	public function updateChildren(newChildren:Array):Void {
 		_visible = false;
+		_visibleWidth = CONTAINER_PANEL_W;
 		_children = newChildren;
 		
 		init();
@@ -271,15 +291,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			if (isLearnerCurrentAct){
 					
 				if (learner_X > (_activity.xCoord + 112)){
-					learner_X = _activity.xCoord + learnerOffset_X 
-					learner_Y = 27
+					learner_X = _activity.xCoord + learnerOffset_X ;
+					learner_Y = 27;
 					hasPlus = true;
 					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
+					
 					return;
 				}
 					
 				learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus});
-				learner_X = learner_X+10
+				learner_X = learner_X+10;
 			}
 		}
 	}
@@ -287,7 +308,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	
 	private function draw (){
 		
-		var numOfChildren = _children.length
+		var numOfChildren = _children.length;
 		panelHeight = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
 		
 		setStyles();
@@ -305,9 +326,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		}
 		
 		if(_type == SEQ_TYPE) {
-			container_pnl._height += 10;
-			container_pnl._width = _visibleWidth + 6;
-			header_pnl._width = _visibleWidth - 6;
+			container_pnl._height += 3;
+			container_pnl._width = _visibleWidth + PANEL_OFFSET_X;
+			header_pnl._width = _visibleWidth - 6 + PANEL_OFFSET_X;
+			
+			clickTarget_mc._width = _visibleWidth + PANEL_OFFSET_X;
+			
+			padlockClosed_mc._x = header_pnl._width + header_pnl._x - padlockClosed_mc._width - 5;
+			padlockOpen_mc._x = padlockClosed_mc._x;
 		}
 		
 		_x = _activity.xCoord;

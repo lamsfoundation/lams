@@ -42,7 +42,7 @@ import mx.utils.*
 */  
 class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieClip implements ICanvasActivity{
   
-	public static var TOOL_ACTIVITY_WIDTH:Number = 136;
+	public static var TOOL_ACTIVITY_WIDTH:Number = 138;
 	public static var TOOL_ACTIVITY_HEIGHT:Number = 55.5;
 	public static var ICON_WIDTH:Number = 25;
 	public static var ICON_HEIGHT:Number = 25;
@@ -176,7 +176,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		
 		}
 		
-		var _newVisibleWidth = (_children.length*CHILD_INCRE) + (CHILD_OFFSET_X*2);
+		var _newVisibleWidth = (_children.length*CHILD_INCRE) + (CHILD_OFFSET_X*2) + 6;
 		if(_newVisibleWidth > CanvasSequenceActivity.TOOL_ACTIVITY_WIDTH)
 			_visibleWidth = _newVisibleWidth;
 		
@@ -435,6 +435,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	
 	public function get children():Array {
 		return children_mc;
+	}
+	
+	public function setSize(w:Number, h:Number):Void {
+		_visibleWidth = w;
+		
+		draw();
 	}
 
 }

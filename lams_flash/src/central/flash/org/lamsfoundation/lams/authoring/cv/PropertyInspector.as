@@ -490,6 +490,8 @@ class PropertyInspector extends PropertyInspectorControls {
 			if(o.noSequences < noSeqAct_cmb.value) {
 				for(var i=0; i<(noSeqAct_cmb.value - o.noSequences); i++)
 					_canvasModel.createNewSequenceActivity(oa, o.noSequences+(i-1));
+					
+				_canvasModel.setDirty();
 			} else {
 				var itemsToRemove:Array = CanvasOptionalActivity(_canvasModel.selectedItem).getLastItems((o.noSequences - noSeqAct_cmb.value));
 				Debugger.log("itemsToRemove len: " + itemsToRemove.length,Debugger.CRITICAL, "updateOptionalSequenceData", "PropertyInspector");
