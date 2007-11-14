@@ -244,14 +244,19 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
 	}
 	
 	/**
-     * Validate the sequence activity. All sequence activities must have at least child activity and the default 
-     * activity must be set as this is the first activity in the sequence. One sequence activity exists for each 
-     * branch in a branching activity, so this ensures all branches have a valid child activity.
+     * Validate the sequence activity. If the sequence is part of an optional activity then there must be children. 
+     * If a sequence is part of branching then it may be empty but if there is any child activities then the 
+     * default activity (the first activity in the sequence) must be set.
      * @return error message key
      */
     public Vector validateActivity(MessageService messageService) {
     	Vector listOfValidationErrors = new Vector();
-    	if ( getActivities() == null || getActivities().size() == 0 || getDefaultActivity() == null )  {
+    	if ( getActivities() == null || getActivities().size() == 0 ) {
+    		Activity parent = getParentActivity();
+    		if ( parent != null && parent.isOptionsActivity()) {
+    			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY), this.getActivityUIID()));
+    		}
+       	} else if ( getDefaultActivity() == null )  {
 			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY), this.getActivityUIID()));
     	}
     	return listOfValidationErrors;
