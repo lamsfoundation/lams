@@ -35,6 +35,7 @@
 								saveCollapsed(orgId, "true");
 							}
 						}
+						makeAllUnsortable();
 					});
 				}
 				
@@ -74,6 +75,35 @@
 						if (title!=null) {
 							var newTitle = title.replace(/\r\n/g,"<BR>").replace(/\n/g,"<BR>")
 							jQuery(element).attr("title", newTitle);
+						}
+					});
+				}
+				
+				function makeOrgSortable(orgId) {
+					var org = jQuery("div.course-bg#"+orgId);
+					if (jQuery("div.j-lessons", org).size() > 0) {
+						var jLessons = jQuery("div.j-lessons#"+orgId+"-lessons");
+						makeSortable(jLessons, "j-single-lesson");
+						jQuery("div.j-subgroup-lessons", org).each(function() {
+							makeSortable(jQuery(this), "j-single-subgroup-lesson");
+						});
+						jQuery("div.mycourses-right-buttons", jLessons).html(getSortingEnabledText());
+					}
+				}
+				
+				function makeAllUnsortable() {
+					jQuery("div.course-bg").each(function() {
+						var orgId = this.id;
+						if (jQuery("div.j-lessons", this).size() > 0) {
+							var jLessons = jQuery("div.j-lessons#"+orgId+"-lessons")
+							var link = jQuery("div.mycourses-right-buttons", jLessons);
+							if (link.html().indexOf(getSortingEnabledText()) >= 0) {
+								jLessons.SortableDestroy();
+								link.html("<a onclick=\"makeOrgSortable("+orgId+")\">"+getEnableSortingText()+"</a>");
+								jQuery("div.j-subgroup-lessons", this).each(function() {
+									jQuery(this).SortableDestroy();
+								});
+							}
 						}
 					});
 				}

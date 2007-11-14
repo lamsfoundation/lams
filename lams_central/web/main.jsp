@@ -36,6 +36,14 @@
 	</c:if>
 	<script language="javascript" type="text/javascript">
 		<!--
+			function getEnableSortingText() {
+				return '<fmt:message key="label.enable.lesson.sorting"/>';
+			}
+			
+			function getSortingEnabledText() {
+				return '<fmt:message key="label.lesson.sorting.enabled"/>';
+			}
+			
 			function refresh(){
 				document.location.reload();
 			}
