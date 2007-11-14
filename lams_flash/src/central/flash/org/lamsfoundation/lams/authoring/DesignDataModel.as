@@ -750,11 +750,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			for(var i=0; i<classActs.length; i++){
 					
 				var classAct = classActs[i].toData();
-				Debugger.log("is SeqAct: " + Activity(classActs[i]).isSequenceActivity(), Debugger.CRITICAL, "toData", "DDM");
-				Debugger.log("seq child length: " + getComplexActivityChildren(Activity(classActs[i]).activityUIID).length, Debugger.CRITICAL, "toData", "DDM");
-				if(Activity(classActs[i]).isSequenceActivity() && getComplexActivityChildren(Activity(classActs[i]).activityUIID).length <= 0) classAct = null;
-				
-				Debugger.log("classAct: " + classAct, Debugger.CRITICAL, "toData", "DDM");
+				//if(Activity(classActs[i]).isSequenceActivity() && getComplexActivityChildren(Activity(classActs[i]).activityUIID).length <= 0) classAct = null;
 				
 				if(classAct != null)
 					design.activities.push(classAct);

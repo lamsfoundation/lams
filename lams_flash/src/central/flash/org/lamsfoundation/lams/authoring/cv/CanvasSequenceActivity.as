@@ -168,6 +168,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 			else
 				children_mc[i] = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView, _sequenceChild:true});
 		
+			if(i == 0)
+				SequenceActivity(_activity).firstActivityUIID = children_mc[i].activity.activityUIID;
 			//set the positioning co-ords
 			children_mc[i].activity.xCoord = CHILD_OFFSET_X + (i * CHILD_INCRE);
 			children_mc[i].activity.yCoord = CHILD_OFFSET_Y;
