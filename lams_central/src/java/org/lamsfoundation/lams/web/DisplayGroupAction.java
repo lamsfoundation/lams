@@ -308,8 +308,10 @@ public class DisplayGroupAction extends Action {
 	// get lesson beans where user is learner (if isStaff=true, gets lessons where user is staff)
 	private Map<Long, IndexLessonBean> getLessonsByOrgAndUser(Integer userId, Integer orgId, boolean isStaff) 
 		throws SQLException, NamingException {
-		String learnerQuery = "select l.lesson_id, l.name, l.description, l.lesson_state_id "
-			+ " from lams_lesson l, lams_learning_design ld, lams_group g, lams_user_group ug, lams_grouping gi"
+		// TODO refactor using hibernate named query
+		String learnerQuery = "select l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag "
+			+ " from (lams_lesson l, lams_learning_design ld, lams_group g, lams_user_group ug, lams_grouping gi)"
+			+ " left join lams_learner_progress lp on lp.user_id=ug.user_id and lp.lesson_id=l.lesson_id"
 			+ " where l.learning_design_id=ld.learning_design_id"
 			+ " and ld.copy_type_id!=" + LearningDesign.COPY_TYPE_PREVIEW
 			+ " and l.organisation_id=?"
@@ -339,8 +341,9 @@ public class DisplayGroupAction extends Action {
 				String name = rs.getString(2);
 				String description = rs.getString(3);
 				int state = rs.getInt(4);
+				boolean lessonCompleted = rs.getBoolean(5);
 				IndexLessonBean bean = new IndexLessonBean(
-					new Long(id), name, description, new Integer(state)
+					new Long(id), name, description, new Integer(state), lessonCompleted
 				);
 				map.put(new Long(id), bean);
 			}

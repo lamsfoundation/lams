@@ -41,6 +41,7 @@ public class IndexLessonBean implements Comparable{
 	private String description;
 	private String url;
 	private Integer state;
+	private boolean completed;
 	private List<IndexLinkBean> links;
 
 	public IndexLessonBean(String name, String url) {
@@ -48,19 +49,21 @@ public class IndexLessonBean implements Comparable{
 		this.url = url;
 	}
 	
-	public IndexLessonBean(Long id, String name, String description, Integer state) {
+	public IndexLessonBean(Long id, String name, String description, Integer state, boolean completed) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.state = state;
+		this.completed = completed;
 	}
 	
-	public IndexLessonBean(Long id, String name, String description, String url, Integer state, List<IndexLinkBean> links) {
+	public IndexLessonBean(Long id, String name, String description, String url, Integer state, boolean completed, List<IndexLinkBean> links) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.url = url;
 		this.state = state;
+		this.completed = completed;
 		this.links = links;
 	}
 	/**
@@ -113,5 +116,11 @@ public class IndexLessonBean implements Comparable{
 	}
 	public void setState(Integer state) {
 		this.state = state;
+	}
+	public boolean getCompleted() {
+		return completed;
+	}
+	public void setCompleted(boolean completed) {
+		this.completed = completed;
 	}
 }
