@@ -45,7 +45,7 @@ public class Alter21Integration {
 		if (args.length < 3)
 		{
 			System.out.println("Usage: java Alter21Integration DB_NAME DB_USERNAME DB_PASSWORD");
-			System.out.println("Make sure mysql-connector-java-3.x.x-bin.jar is in your classpath.")
+			System.out.println("Make sure mysql-connector-java-3.x.x-bin.jar is in your classpath.");
 			System.exit(1);
 		}
 		
