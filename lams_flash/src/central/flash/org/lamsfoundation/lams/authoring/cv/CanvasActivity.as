@@ -129,7 +129,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		//let it wait one frame to set up the components.
 		//this has to be set b4 the do later :)
-		if(_activity.isGateActivity() || _connector){
+		if((_activity.isGateActivity() || _connector) && !_sequenceChild){
 			_visibleHeight = CanvasActivity.GATE_ACTIVITY_HEIGHT;
 			_visibleWidth = CanvasActivity.GATE_ACTIVITY_WIDTH;
 		}else if(_activity.isGroupActivity()){
@@ -362,6 +362,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			stopSign_mc._visible = true;
 			stopSign_mc._x = 0;
 			stopSign_mc._y = 0;
+			
+			if(_sequenceChild) {
+				theIcon_mc = stopSign_mc;
+				setUpActIcon(theIcon_mc);
+				
+				theIcon_mc._visible = true;
+				canvasActivity_mc._visible = true;
+				
+				clickTarget_mc._width = CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH;
+				clickTarget_mc._height = CanvasActivity.TOOL_MIN_ACTIVITY_HEIGHT;
+			}
+			
 		} else if(_branchConnector) {
 			branchSign_mc._visible = true;
 			branchSign_mc._x = 0;
