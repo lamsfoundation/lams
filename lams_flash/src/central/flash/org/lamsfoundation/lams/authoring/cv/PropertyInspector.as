@@ -488,22 +488,36 @@ class PropertyInspector extends PropertyInspectorControls {
 			var o = ComplexActivity(oa);
 			
 			if(o.noSequences < noSeqAct_cmb.value) {
-				for(var i=0; i<(noSeqAct_cmb.value - o.noSequences); i++)
-					_canvasModel.createNewSequenceActivity(oa, o.noSequences+(i-1));
-					
-				_canvasModel.setDirty();
+				addSequenceItems(oa, Number(noSeqAct_cmb.value - o.noSequences));
 			} else {
 				var itemsToRemove:Array = CanvasOptionalActivity(_canvasModel.selectedItem).getLastItems((o.noSequences - noSeqAct_cmb.value));
-				Debugger.log("itemsToRemove len: " + itemsToRemove.length,Debugger.CRITICAL, "updateOptionalSequenceData", "PropertyInspector");
-				
-				for(var i=0; i<itemsToRemove.length; i++)
-					_canvasModel.getCanvas().ddm.removeActivity(itemsToRemove[i]);
-				
-				_canvasModel.setDirty();
+				removeSequenceItems(itemsToRemove);
 			}
 			
-			this.onEnterFrame = onUpdateOptionalSequenceData;
 		}
+	}
+	
+	private function removeSequenceItems(itemsToRemove, overwrite:Boolean):Void {
+		for(var i=0; i<itemsToRemove.length; i++) {
+					if(_canvasModel.getCanvas().ddm.getComplexActivityChildren(itemsToRemove[i]).length > 0 && !overwrite) {
+						LFMessage.showMessageConfirm(Dictionary.getValue('pi_optSequence_remove_msg'), Proxy.create(this, removeSequenceItems, itemsToRemove, true), null, null, null, Dictionary.getValue('pi_optSequence_remove_msg_title'));
+					} else { 
+						_canvasModel.getCanvas().ddm.removeActivity(itemsToRemove[i]); 
+					}
+		}
+		
+		_canvasModel.setDirty();
+		this.onEnterFrame = onUpdateOptionalSequenceData;
+	}
+	
+	private function addSequenceItems(oa:Activity, count:Number):Void {
+		var o = ComplexActivity(oa);
+		
+		for(var i=0; i<count; i++)
+			_canvasModel.createNewSequenceActivity(oa, o.noSequences+(i-1));
+					
+		_canvasModel.setDirty();
+		this.onEnterFrame = onUpdateOptionalSequenceData;
 	}
 	
 	private function onUpdateOptionalSequenceData() {
@@ -513,7 +527,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		CanvasOptionalActivity(_canvasModel.selectedItem).updateChildren(newChildren);
 		
 		setModified();
-	
+		noSeqAct_cmb.selectedIndex = newChildren.length;
 		_canvasModel.activeView.getController().clearBusy()	
 			
 	}
