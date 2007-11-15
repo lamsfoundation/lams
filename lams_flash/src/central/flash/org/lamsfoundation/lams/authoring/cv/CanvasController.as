@@ -129,8 +129,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
 			_canvasModel.isDragging = false;
+			var sequenceActivity:Activity = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
 			
-			if (ca.activity.parentUIID != null && _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID).activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE){
+			if (ca.activity.parentUIID != null && 
+				sequenceActivity.activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE){
+				
 				for (var i=0; i<optionalOnCanvas.length; i++){
 					if (ca.activity.parentUIID == optionalOnCanvas[i].activity.activityUIID){
 						if (optionalOnCanvas[i].locked == false){
@@ -143,10 +146,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 							} else {
 								activitySnapBack(ca);
 							}
+							
 						}
 					}
 				}
 				
+			} else if(ca.activity.parentUIID != null && 
+						sequenceActivity.isSequenceActivity()) {
+				for (var i=0; i<optionalOnCanvas.length; i++) {
+					if (sequenceActivity.parentUIID == optionalOnCanvas[i].activity.activityUIID)
+						if (optionalOnCanvas[i].locked == false)
+							activitySnapBack(ca);
+				}
 			} else {
 			
 				//if we are on the optional Activity remove this activity from canvas and assign it a parentID of optional activity and place it in the optional activity window.
@@ -205,19 +216,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 						
 					}
 				}
+				
 			}
 			
 			//if we are on the bin - trash it
 			isActivityOnBin(ca);
 			
 			//get a view if ther is not one
-			if(!_canvasView){
+			if(!_canvasView)
 				_canvasView =  CanvasView(getView());
-			}
 			
 			// restricting (x, y) position to positive plane only
 			Debugger.log("ca x: " + ca._x, Debugger.CRITICAL, "activityRelease", "CanvasController");
 			Debugger.log("ca y: " + ca._y, Debugger.CRITICAL, "activityRelease", "CanvasController");
+			
 			if(ca._x < 0) ca._x = 0;
 			if(ca._y < 0) ca._y = 0;
 			if(ca._x > _canvasView.gridLayer._width - ca.getVisibleWidth()) ca._x = _canvasView.gridLayer._width - ca.getVisibleWidth();
@@ -280,9 +292,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			Debugger.log('ca.activity.xCoord:'+ca.activity.xCoord,Debugger.GEN,'activityRelease','CanvasController');
 			
-			
 		} else {
-			if (_canvasModel.isTransitionToolActive()){
+			if (_canvasModel.isTransitionToolActive()) {
 				_canvasModel.getCanvas().stopTransitionTool();
 				_canvasModel.activeView.removeTempTrans();
 				
@@ -416,22 +427,29 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			_canvasModel.getCanvas().stopTransitionTool();
 			app.controlKeyPressed = ""
 			
-	   }else{
+	   } else {
 			if(_canvasModel.isDragging){
 				ca.stopDrag();
 				
 				//if we are on the bin - trash it
 				isActivityOnBin(ca);
 				
-				if(ca._x < 0) ca._x = 0;
-				if(ca._y < 0) ca._y = 0;
-				if(ca._x > _canvasView.gridLayer._width - ca.getVisibleWidth()) ca._x = _canvasView.gridLayer._width - ca.getVisibleWidth();
-				if(ca._y > _canvasView.gridLayer._height - ca.getVisibleHeight()) ca._y = _canvasView.gridLayer._height - ca.getVisibleHeight();
-			
-				// give it the new co-ords and 'drop' it
-				ca.activity.xCoord = ca._x;
-				ca.activity.yCoord = ca._y;
+				var tgt:String = new String(ca._parent);
+				
+				if(tgt.indexOf("childActivities_mc")) {
+					activitySnapBack(ca);
+				} else {
+					if(ca._x < 0) ca._x = 0;
+					if(ca._y < 0) ca._y = 0;
+					if(ca._x > _canvasView.gridLayer._width - ca.getVisibleWidth()) ca._x = _canvasView.gridLayer._width - ca.getVisibleWidth();
+					if(ca._y > _canvasView.gridLayer._height - ca.getVisibleHeight()) ca._y = _canvasView.gridLayer._height - ca.getVisibleHeight();
+					
+					// give it the new co-ords and 'drop' it
+					ca.activity.xCoord = ca._x;
+					ca.activity.yCoord = ca._y;
+				}
 			}
+				
 		}
 	}
     

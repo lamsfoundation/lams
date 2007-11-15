@@ -190,6 +190,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	
 	public function updateChildren():Void {
 		_visible = false;
+		_visibleWidth = CanvasSequenceActivity.TOOL_ACTIVITY_HEIGHT;
 		init();
 	}
 	
