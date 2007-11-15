@@ -230,7 +230,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	public function updateChildren(newChildren:Array):Void {
 		_visible = false;
 		_visibleWidth = CONTAINER_PANEL_W;
-		_children = newChildren;
+		if(newChildren != null) _children = newChildren;
 		
 		init();
 	}

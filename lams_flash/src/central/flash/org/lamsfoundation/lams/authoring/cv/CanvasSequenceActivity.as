@@ -178,7 +178,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		
 		}
 		
-		var _newVisibleWidth = (_children.length*CHILD_INCRE) + (CHILD_OFFSET_X*2) + 6;
+		var _newVisibleWidth:Number = (_children.length*CHILD_INCRE) + (CHILD_OFFSET_X*2) + 6;
 		if(_newVisibleWidth > CanvasSequenceActivity.TOOL_ACTIVITY_WIDTH)
 			_visibleWidth = _newVisibleWidth;
 		

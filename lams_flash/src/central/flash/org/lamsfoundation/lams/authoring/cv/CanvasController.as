@@ -190,9 +190,39 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 									LFMessage.showMessageAlert(msg);
 								} else {
 									Debugger.log("sequence based: " + optionalOnCanvas[i].activity.isSequenceBased, Debugger.CRITICAL, "activityRelease", "CanvasController");
+									
+									var optionalX:Number = optionalOnCanvas[i].activity.xCoord;
+									var optionalY:Number = optionalOnCanvas[i].activity.yCoord;
+									var iconMouseX = _xmouse - _canvasModel.getPosition().x;
+									var iconMouseY = _ymouse - _canvasModel.getPosition().y;
+									
 									if(optionalOnCanvas[i].activity.isSequenceBased) {
+										
 										// test mouse ptr 
-										var dropTarget:Object = eval(ca._droptarget);
+										var _children:Array = optionalOnCanvas[i].children;
+										var selectedSequence:MovieClip = null;
+										var mouseX = iconMouseX - optionalX;
+										var mouseY = iconMouseY - optionalY;
+										
+										for(var j=0; j<_children.length; j++) {
+											if(mouseX >= _children[j].activity.xCoord && 
+											   mouseX <= (_children[j].activity.xCoord + _children[j]._width) &&
+											   mouseY >= _children[j].activity.yCoord && 
+											   mouseY <= (_children[j].activity.yCoord + _children[j]._height))
+												selectedSequence = _children[j];
+										}
+										
+										if(selectedSequence != null) {
+											_canvasModel.addParentToActivity(selectedSequence.activity.activityUIID, ca, false);
+											CanvasSequenceActivity(selectedSequence).updateChildren();
+											CanvasOptionalActivity(_canvasModel.activitiesDisplayed.get(selectedSequence.activity.parentUIID)).updateChildren();
+										} else {
+											activitySnapBack(ca);
+											var msg:String = Dictionary.getValue('activityDrop_optSequence_error_msg');
+											LFMessage.showMessageAlert(msg);
+										}
+										
+										/**var dropTarget:Object = eval(ca._droptarget);
 										
 										if(dropTarget._parent instanceof CanvasSequenceActivity) {
 											_canvasModel.addParentToActivity(dropTarget._parent.activity.activityUIID, ca, false);
@@ -202,6 +232,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 											var msg:String = Dictionary.getValue('activityDrop_optSequence_error_msg');
 											LFMessage.showMessageAlert(msg);
 										}
+										*/
 										
 									} else {
 										_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca, false);
