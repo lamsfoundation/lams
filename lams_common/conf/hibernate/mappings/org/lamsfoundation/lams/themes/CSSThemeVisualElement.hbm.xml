@@ -21,6 +21,9 @@
         table="lams_css_theme_ve"
     </meta>
 
+	<!--  Cache it so that is available to the user records -->
+	<cache usage="transactional" />
+
     <id
         name="id"
         type="java.lang.Long"
