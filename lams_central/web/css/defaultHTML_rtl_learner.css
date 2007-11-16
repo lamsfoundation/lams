@@ -124,11 +124,28 @@ table.alternative-color td {
 	background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 0px
 }
 
-
-
 table.alternative-color td.first, table.alternative-color th.first {
 	border-right: none;
 	padding-right: 20px;
+}
+
+/* jquery tablesorter pager plugin */
+table.alternative-color thead tr .header {
+	background-color: #e6eeee;
+	background-image: url(../images/css/bg.gif);
+	background-repeat: no-repeat;
+	background-position: center right;
+    cursor: pointer;
+    width: auto;
+    padding-right: 15px;
+}
+
+table.alternative-color thead tr .headerSortUp {
+	background-image: url(../images/css/asc.gif);
+}
+
+table.alternative-color thead tr .headerSortDown {
+	background-image: url(../images/css/desc.gif);
 }
 
 /*layout of the forum tables with the colored table heading cell */
