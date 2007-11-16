@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.tool.scribe.web.servlets;
 
 import java.util.Iterator;
+import java.util.TreeMap;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -47,9 +48,7 @@ import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeException;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class ExportServlet extends AbstractExportPortfolioServlet {
@@ -70,25 +69,33 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 					.getScribeService(getServletContext());
 		}
 
+		String basePath = request.getScheme() + "://" + request.getServerName()
+		+ ":" + request.getServerPort() + request.getContextPath();
 		try {
 			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
 				request.getSession().setAttribute(AttributeNames.ATTR_MODE,
 						ToolAccessMode.LEARNER);
 				doLearnerExport(request, response, directoryName, cookies);
+				writeResponseToFile(basePath + "/pages/export/learner.jsp",
+						directoryName, FILENAME, cookies);
 			} else if (StringUtils.equals(mode, ToolAccessMode.TEACHER
 					.toString())) {
 				request.getSession().setAttribute(AttributeNames.ATTR_MODE,
 						ToolAccessMode.TEACHER);
 				doTeacherExport(request, response, directoryName, cookies);
+				writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp",
+						directoryName, FILENAME, cookies);
 			}
 		} catch (ScribeException e) {
 			logger.error("Cannot perform export for scribe tool.");
+		} finally {
+			// clear any session objects
+			request.getSession().removeAttribute("scribeUserDTO");
+			request.getSession().removeAttribute("scribeSessionDTO");
+			request.getSession().removeAttribute("scribeDTO");
+			request.getSession().removeAttribute("otherScribeSessions");
 		}
 
-		String basePath = request.getScheme() + "://" + request.getServerName()
-				+ ":" + request.getServerPort() + request.getContextPath();
-		writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp",
-				directoryName, FILENAME, cookies);
 
 		return FILENAME;
 	}
@@ -97,7 +104,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			HttpServletResponse response, String directoryName, Cookie[] cookies)
 			throws ScribeException {
 
-		logger.debug("doExportTeacher: toolContentID:" + toolSessionID);
+		logger.debug("doLearnerExport: toolContentID:" + toolSessionID);
 
 		// check if toolContentID available
 		if (toolSessionID == null) {
@@ -110,54 +117,37 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				.getSessionBySessionId(toolSessionID);
 
 		// get the scribe user
-		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
-				AttributeNames.USER);
+		ScribeUser scribeUser = scribeService.getUserByUserIdAndSessionId(userID, toolSessionID);
 
-		ScribeUser scribeUser = scribeService.getUserByUserIdAndSessionId(
-				new Long(user.getUserID()), toolSessionID);
+		Scribe scribe = scribeSession.getScribe();
+		ScribeDTO scribeDTO = new ScribeDTO(scribeSession.getScribe());
+		request.getSession().setAttribute("scribeDTO", scribeDTO);
+		
+		ScribeSessionDTO sessionDTO = ScribeUtils.createSessionDTO(scribeSession);
+		request.getSession().setAttribute("scribeSessionDTO", sessionDTO);
 
-		// construct session DTO.
-		ScribeSessionDTO sessionDTO = new ScribeSessionDTO(scribeSession);
-		
-		int numberOfVotes = 0;
-		for (Iterator iter = scribeSession.getScribeUsers().iterator(); iter.hasNext();) {
-			ScribeUser elem = (ScribeUser) iter.next();
-			
-			if(elem.isReportApproved()) {
-				numberOfVotes++;
-			}
-				
-		}
-		
-		int numberOfLearners = scribeSession.getScribeUsers().size();
-		
-		sessionDTO.setNumberOfLearners(numberOfLearners);
-		sessionDTO.setNumberOfVotes(numberOfVotes);
-		sessionDTO.setVotePercentage(ScribeUtils.calculateVotePercentage(numberOfVotes, numberOfLearners));
-		
-		// if reflectOnActivity is enabled add userDTO.
-		if (scribeSession.getScribe().isReflectOnActivity()) {
-			ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
-
-			// get the entry.
-			NotebookEntry entry = scribeService.getEntry(toolSessionID,
-					CoreNotebookConstants.NOTEBOOK_TOOL,
+		ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
+		if (scribeUser.isFinishedActivity()) {
+			// get the notebook entry.
+			NotebookEntry notebookEntry = scribeService.getEntry(scribeSession
+					.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
 					ScribeConstants.TOOL_SIGNATURE, scribeUser.getUserId()
 							.intValue());
-
-			if (entry != null) {
-				scribeUserDTO.finishedReflection = true;
-				scribeUserDTO.notebookEntry = entry.getEntry();
-			} else {
-				scribeUserDTO.finishedReflection = false;
+			if (notebookEntry != null) {
+				scribeUserDTO.notebookEntry = notebookEntry.getEntry();
 			}
-			sessionDTO.getUserDTOs().add(scribeUserDTO);
+		}
+		request.getSession().setAttribute("scribeUserDTO", scribeUserDTO);
+
+		if ( scribe.isShowAggregatedReports() ) {
+
+			TreeMap<String, ScribeSessionDTO> otherScribeSessions = ScribeUtils.getReportDTOs(scribeSession);
+			if ( otherScribeSessions.size() > 0 ) {
+				request.getSession().setAttribute("otherScribeSessions", otherScribeSessions.values());
+			}
+
 		}
 		
-		ScribeDTO scribeDTO = new ScribeDTO(scribeSession.getScribe());
-		scribeDTO.getSessionDTOs().add(sessionDTO);
-
-		request.getSession().setAttribute("scribeDTO", scribeDTO);
 	}
 
 	private void doTeacherExport(HttpServletRequest request,

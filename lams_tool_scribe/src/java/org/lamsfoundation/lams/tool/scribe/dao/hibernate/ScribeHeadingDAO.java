@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.tool.scribe.model.ScribeReportEntry;
 public class ScribeHeadingDAO extends BaseDAO implements IScribeHeadingDAO {
 
 	private static final String SQL_DELETE_REPORT="from " + ScribeReportEntry.class.getName() + " as r where r.scribeHeading.uid=?"; 
+	@SuppressWarnings("unchecked")
 	public boolean deleteReport(Long headingUid) {
 		List<ScribeReportEntry> reports = this.getHibernateTemplate().find(SQL_DELETE_REPORT,new Object[]{headingUid});
 		if(reports.isEmpty())

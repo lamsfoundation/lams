@@ -9,18 +9,6 @@
 	}
 </script>
 
-<c:if
-	test="${scribeUserDTO.finishedActivity and scribeDTO.reflectOnActivity}">
-	<div>
-		<h4>
-			${scribeDTO.reflectInstructions}
-		</h4>
-		<p>
-			${scribeUserDTO.notebookEntry}
-		</p>
-	</div>
-</c:if>
-
 <div class="space-bottom">
 	<html:form action="/learning" method="post" onsubmit="disableFinishButton()">
 		<html:hidden property="scribeUserUID" value="${scribeUserDTO.uid}" />

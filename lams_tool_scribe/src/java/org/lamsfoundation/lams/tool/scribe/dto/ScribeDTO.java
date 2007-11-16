@@ -66,7 +66,8 @@ public class ScribeDTO {
 	
 	public boolean autoSelectScribe;
 	
-	
+	public boolean showAggregatedReports;
+
 	
 	public ScribeDTO(Scribe scribe) {
 		toolContentID = scribe.getToolContentId();
@@ -77,6 +78,8 @@ public class ScribeDTO {
 		contentInUse = scribe.isContentInUse();
 		reflectInstructions = scribe.getReflectInstructions();
 		reflectOnActivity = scribe.isReflectOnActivity();
+		autoSelectScribe = scribe.isAutoSelectScribe();
+		showAggregatedReports = scribe.isShowAggregatedReports();
 
 		// Adding attachments
 		for (Iterator i = scribe.getScribeAttachments().iterator(); i.hasNext();) {
@@ -201,5 +204,13 @@ public class ScribeDTO {
 
 	public void setAutoSelectScribe(boolean autoSelectScribe) {
 		this.autoSelectScribe = autoSelectScribe;
+	}
+
+	public boolean isShowAggregatedReports() {
+		return showAggregatedReports;
+	}
+
+	public void setShowAggregatedReports(boolean showAggregatedReports) {
+		this.showAggregatedReports = showAggregatedReports;
 	}
 }

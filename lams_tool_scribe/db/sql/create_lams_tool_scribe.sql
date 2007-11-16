@@ -10,7 +10,7 @@ drop table if exists tl_lascrb11_user;
 create table tl_lascrb11_attachment (uid bigint not null auto_increment, file_version_id bigint, file_type varchar(255), file_name varchar(255), file_uuid bigint, create_date datetime, scribe_uid bigint, primary key (uid));
 create table tl_lascrb11_heading (uid bigint not null auto_increment, heading text, scribe_uid bigint, display_order integer, primary key (uid));
 create table tl_lascrb11_report_entry (uid bigint not null auto_increment, entry_text text, scribe_heading_uid bigint, scribe_session_uid bigint, primary key (uid));
-create table tl_lascrb11_scribe (uid bigint not null auto_increment, create_date datetime, update_date datetime, create_by bigint, title varchar(255), instructions text, run_offline bit, lock_on_finished bit, auto_select_scribe bit, reflect_on_activity bit, reflect_instructions text, online_instructions text, offline_instructions text, content_in_use bit, define_later bit, tool_content_id bigint, primary key (uid));
+create table tl_lascrb11_scribe (uid bigint not null auto_increment, create_date datetime, update_date datetime, create_by bigint, title varchar(255), instructions text, run_offline bit, lock_on_finished bit, auto_select_scribe bit, reflect_on_activity bit, reflect_instructions text, online_instructions text, offline_instructions text, content_in_use bit, define_later bit, tool_content_id bigint, aggregated_reports bit default 0, primary key (uid));
 create table tl_lascrb11_session (uid bigint not null auto_increment, version integer not null, session_end_date datetime, session_start_date datetime, status integer, session_id bigint, session_name varchar(250), scribe_uid bigint, appointed_scribe_uid bigint, force_complete bit, report_submitted bit, primary key (uid));
 create table tl_lascrb11_user (uid bigint not null auto_increment, user_id bigint, last_name varchar(255), login_name varchar(255), first_name varchar(255), finishedActivity bit, scribe_session_uid bigint, report_approved bit, started_activity bit, primary key (uid));
 alter table tl_lascrb11_attachment add index FK57953706B3FA1495 (scribe_uid), add constraint FK57953706B3FA1495 foreign key (scribe_uid) references tl_lascrb11_scribe (uid);
@@ -33,7 +33,8 @@ INSERT INTO tl_lascrb11_scribe (
 	content_in_use,
 	define_later,
 	reflect_on_activity,
-	auto_select_scribe) 
+	auto_select_scribe,
+	aggregated_reports) 
 VALUES(
 	1,
 	"Scribe",
@@ -46,7 +47,8 @@ VALUES(
 	0,
 	0,
 	0,
-	1
+	1,
+	0
 );
 
 INSERT INTO tl_lascrb11_heading(

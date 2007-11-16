@@ -26,6 +26,9 @@ package org.lamsfoundation.lams.tool.scribe.web.actions;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,6 +45,7 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scribe.dto.ScribeDTO;
+import org.lamsfoundation.lams.tool.scribe.dto.ScribeReportEntryDTO;
 import org.lamsfoundation.lams.tool.scribe.dto.ScribeSessionDTO;
 import org.lamsfoundation.lams.tool.scribe.dto.ScribeUserDTO;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
@@ -169,6 +173,8 @@ public class LearningAction extends LamsDispatchAction {
 		// check force complete
 		if (scribeSession.isForceComplete()) {
 			// go to report page
+			if ( scribeSession.getScribe().isShowAggregatedReports() )
+				setupOtherGroupReportDTO(request, scribeSession, scribeUser);
 			return mapping.findForward("report");
 		}
 
@@ -447,35 +453,22 @@ public class LearningAction extends LamsDispatchAction {
 
 		scribeService.saveOrUpdateScribeUser(scribeUser);
 
+		if ( session.getScribe().isShowAggregatedReports() )
+			setupOtherGroupReportDTO(request, session, scribeUser);
+
 		return mapping.findForward("report");
 	}
 
 	// Private methods.
 
+	/** Set up all the DTO relating to this session. Doesn't set up the DTO containing the reports of the other groups. */
 	private void setupDTOs(HttpServletRequest request,
 			ScribeSession scribeSession, ScribeUser scribeUser) {
 
 		ScribeDTO scribeDTO = new ScribeDTO(scribeSession.getScribe());
 		request.setAttribute("scribeDTO", scribeDTO);
 
-		ScribeSessionDTO sessionDTO = new ScribeSessionDTO(scribeSession);
-
-		int numberOfVotes = 0;
-		for (Iterator iter = scribeSession.getScribeUsers().iterator(); iter
-				.hasNext();) {
-			ScribeUser user = (ScribeUser) iter.next();
-			if (user.isReportApproved()) {
-				numberOfVotes++;
-			}
-		}
-
-		int numberOfLearners = scribeSession.getScribeUsers().size();
-
-		sessionDTO.setNumberOfVotes(numberOfVotes);
-		sessionDTO.setNumberOfLearners(numberOfLearners);
-		sessionDTO.setVotePercentage(ScribeUtils.calculateVotePercentage(
-				numberOfVotes, numberOfLearners));
-
+		ScribeSessionDTO sessionDTO = ScribeUtils.createSessionDTO(scribeSession);
 		request.setAttribute("scribeSessionDTO", sessionDTO);
 
 		ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
@@ -491,4 +484,17 @@ public class LearningAction extends LamsDispatchAction {
 		}
 		request.setAttribute("scribeUserDTO", scribeUserDTO);
 	}
+	
+	/** Create a map of the reports (in ScribeSessionDTO format) for all the other groups/sessions, where the key
+	 * is the group/session name. The code ensures that the session name is unique, adding the session id if necessary.
+	 * It will only include the finalized reports. */
+	private void setupOtherGroupReportDTO(HttpServletRequest request,
+			ScribeSession scribeSession, ScribeUser scribeUser) {
+		TreeMap<String, ScribeSessionDTO> otherScribeSessions = ScribeUtils.getReportDTOs(scribeSession);
+		if ( otherScribeSessions.size() > 0 ) {
+			request.setAttribute("otherScribeSessions", otherScribeSessions.values());
+		}
+	}
+
+
 }

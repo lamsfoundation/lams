@@ -57,6 +57,8 @@ public class AuthoringForm extends ActionForm {
 	
 	boolean autoSelectScribe;
 	
+	boolean showAggregatedReports;
+	
 	FormFile onlineFile; 
 
 	FormFile offlineFile;
@@ -200,5 +202,13 @@ public class AuthoringForm extends ActionForm {
 
 	public void setHeadingIndex(Integer headingIndex) {
 		this.headingIndex = headingIndex;
+	}
+
+	public boolean isShowAggregatedReports() {
+		return showAggregatedReports;
+	}
+
+	public void setShowAggregatedReports(boolean showAggregatedReports) {
+		this.showAggregatedReports = showAggregatedReports;
 	}
 }

@@ -88,6 +88,8 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	
 	private Set scribeHeadings;
 	
+	private boolean showAggregatedReports;
+	
 	//*********** NON Persisit fields
 	private IToolContentHandler toolContentHandler;
 
@@ -365,6 +367,19 @@ public class Scribe implements java.io.Serializable, Cloneable {
 		this.scribeHeadings = scribeHeadings;
 	}
 
+	/**
+	 * @hibernate.property column="aggregated_reports" length="1"
+	 * 
+	 */
+
+	public boolean isShowAggregatedReports() {
+		return this.showAggregatedReports;
+	}
+
+	public void setShowAggregatedReports(boolean showAggregatedReports) {
+		this.showAggregatedReports = showAggregatedReports;
+	}
+	
 	/**
 	 * toString
 	 * 

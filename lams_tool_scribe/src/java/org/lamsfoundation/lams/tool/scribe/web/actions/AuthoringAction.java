@@ -540,6 +540,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		scribe.setReflectOnActivity(authForm.isReflectOnActivity());
 		scribe.setReflectInstructions(authForm.getReflectInstructions());
 		scribe.setAutoSelectScribe(authForm.isAutoSelectScribe());
+		scribe.setShowAggregatedReports(authForm.isShowAggregatedReports());
 	}
 
 	/**
@@ -557,6 +558,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.setReflectOnActivity(scribe.isReflectOnActivity());
 		authForm.setReflectInstructions(scribe.getReflectInstructions());
 		authForm.setAutoSelectScribe(scribe.isAutoSelectScribe());
+		authForm.setShowAggregatedReports(scribe.isShowAggregatedReports());
 	}
 
 	/**

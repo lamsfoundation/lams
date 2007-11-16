@@ -3,6 +3,15 @@
 <!-- ========== Advanced Tab ========== -->
 
 <p class="small-space-top">
+	<html:checkbox property="showAggregatedReports" value="1"
+		styleClass="noBorder" styleId="showAggregatedReports"></html:checkbox>
+
+	<label for="showAggregatedReports">
+		<fmt:message key="advanced.showAggregatedReports" />
+	</label>
+</p>
+
+<p class="small-space-top">
 	<html:checkbox property="reflectOnActivity" value="1"
 		styleClass="noBorder" styleId="reflectOnActivity"></html:checkbox>
 
@@ -32,6 +41,7 @@
 		<fmt:message key="advanced.selectInMonitor" />
 	</label>
 </p>
+
 <script type="text/javascript">
 <!--
 //automatically turn on refect option if there are text input in refect instruction area
