@@ -1,5 +1,16 @@
 <%@ include file="/taglibs.jsp"%>
 
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-1.1.4.pack.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pager.js"></script>
+<script>
+	<!--
+	jQuery(document).ready(function() {
+		jQuery("table").tablesorter({widthFixed:true, sortList:[[0,0]]}).tablesorterPager({container: jQuery("#pager")});
+	});
+	//-->
+</script>
+
 <form>
 <h2 class="align-left">
 	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
@@ -30,19 +41,26 @@
 	</logic:notEqual>
 </p>
 <table class="alternative-color" width=100% cellspacing="0" >
+<thead>
 <tr>
 	<th><fmt:message key="admin.user.login"/></th>
-	<th><fmt:message key="admin.user.name"/></th>
+	<th><fmt:message key="admin.user.first_name"/></th>
+	<th><fmt:message key="admin.user.last_name"/></th>
 	<th><fmt:message key="admin.user.roles"/></th>
 	<th><fmt:message key="admin.user.actions"/></th>
 </tr>
+</thead>
+<tbody>
 <logic:iterate id="userManageBean" name="UserManageForm" property="userManageBeans">
 	<tr>
 		<td>
 			<bean:write name="userManageBean" property="login" />
 		</td>
 		<td>
-			<bean:write name="userManageBean" property="title" /> <bean:write name="userManageBean" property="firstName" /> <bean:write name="userManageBean" property="lastName" />
+			<bean:write name="userManageBean" property="firstName" />
+		</td>
+		<td>
+			<bean:write name="userManageBean" property="lastName" />
 		</td>
 		<td>
 		    <small>
@@ -59,5 +77,22 @@
 		</td>		
 	</tr>
 </logic:iterate>
+</tbody>
 </table>
 </form>
+
+<div id="pager" class="pager">
+	<form>
+		<img src="<lams:LAMSURL/>/images/first.png" class="first"/>
+		<img src="<lams:LAMSURL/>/images/prev.png" class="prev">
+		<input type="text" class="pagedisplay" disabled="disabled"/>
+		<img src="<lams:LAMSURL/>/images/next.png" class="next">
+		<img src="<lams:LAMSURL/>/images/last.png" class="last">
+		<select class="pagesize">
+			<option selected="selected"  value="10">10&nbsp;&nbsp;</option>
+			<option value="20">20</option>
+			<option value="30">30</option>
+			<option  value="40">40</option>
+		</select>
+	</form>
+</div>

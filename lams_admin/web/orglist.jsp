@@ -1,5 +1,17 @@
 <%@ include file="/taglibs.jsp"%>
 
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-1.1.4.pack.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pager.js"></script>
+<script>
+	<!--
+	jQuery(document).ready(function() {
+		jQuery("table").tablesorter({widthFixed:true, sortList:[[1,0]], textExtraction:'complex'})
+			.tablesorterPager({container: jQuery("#pager")});
+	});
+	//-->
+</script>
+
 <form>
 <logic:equal name="OrgManageForm" property="type" value="1">
 	<h2>
@@ -41,6 +53,7 @@
 	</p>
 </logic:equal>
 <table class=alternative-color width=100%>
+<thead>
 <tr>
 	<th>Id</th>
 	<th><fmt:message key="admin.organisation.name"/></th>
@@ -49,6 +62,8 @@
 	<th><fmt:message key="admin.organisation.locale"/></th>
 	<th><fmt:message key="admin.organisation.status"/></th>
 </tr>
+</thead>
+<tbody>
 <logic:iterate id="orgManageBean" name="OrgManageForm" property="orgManageBeans" indexId="idx">
 	<tr>
 		<td><bean:write name="orgManageBean" property="organisationId" /></td>
@@ -74,5 +89,22 @@
 		</td>
 	</tr>
 </logic:iterate>
+</tbody>
 </table>
 </form>
+
+<div id="pager" class="pager">
+	<form>
+		<img src="<lams:LAMSURL/>/images/first.png" class="first"/>
+		<img src="<lams:LAMSURL/>/images/prev.png" class="prev">
+		<input type="text" class="pagedisplay" disabled="disabled"/>
+		<img src="<lams:LAMSURL/>/images/next.png" class="next">
+		<img src="<lams:LAMSURL/>/images/last.png" class="last">
+		<select class="pagesize">
+			<option selected="selected"  value="10">10&nbsp;&nbsp;</option>
+			<option value="20">20</option>
+			<option value="30">30</option>
+			<option  value="40">40</option>
+		</select>
+	</form>
+</div>
