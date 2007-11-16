@@ -65,6 +65,8 @@ ADD COLUMN default_activity_id BIGINT(20)
 INSERT INTO lams_learning_activity_type VALUES (10, 'BRANCHING_CHOSEN');
 INSERT INTO lams_learning_activity_type VALUES (11, 'BRANCHING_GROUP');
 INSERT INTO lams_learning_activity_type VALUES (12, 'BRANCHING_TOOL');
+INSERT INTO lams_learning_activity_type VALUES (13, 'OPTIONS_WITH_SEQUENCES');
+
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
 	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 

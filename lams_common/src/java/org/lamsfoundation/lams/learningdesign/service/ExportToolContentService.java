@@ -593,18 +593,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			else if(actDto.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE) || actDto.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
 													  || actDto.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE))
 				att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF + IMS_TAG_GATE + "-" + actDto.getActivityID());
-			else if(actDto.getActivityTypeID() == Activity.SEQUENCE_ACTIVITY_TYPE
-					|| actDto.getActivityTypeID() == Activity.PARALLEL_ACTIVITY_TYPE
-					|| actDto.getActivityTypeID() == Activity.OPTIONS_ACTIVITY_TYPE) {
-				
-				if(actDto.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE))
+			else if (actDto.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE)
+					|| actDto.getActivityTypeID().equals(Activity.OPTIONS_WITH_SEQUENCES_TYPE))
 					att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_OPTIONAL + "-" + actDto.getActivityID());
-				else if(actDto.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE))
+			else if(actDto.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE))
 					att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_PARALLEL + "-" + actDto.getActivityID());
-				else if(actDto.getActivityTypeID().equals(Activity.SEQUENCE_ACTIVITY_TYPE))
+			else if(actDto.getActivityTypeID().equals(Activity.SEQUENCE_ACTIVITY_TYPE))
 					att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_SEQUENCE + "-" + actDto.getActivityID());
-				
-			} else 
+			 else 
 				att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF +  actDto.getToolSignature() + "-" + actDto.getToolContentID());
 			
 			ref.setAttribute(att);
@@ -2035,6 +2031,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			case Activity.PARALLEL_ACTIVITY_TYPE:
 				break;
 			case Activity.OPTIONS_ACTIVITY_TYPE:
+			case Activity.OPTIONS_WITH_SEQUENCES_TYPE:
 				((OptionsActivity)act).setMaxNumberOfOptions(actDto.getMaxOptions());
 				((OptionsActivity)act).setMinNumberOfOptions(actDto.getMinOptions());
 				((OptionsActivity)act).setOptionsInstructions(actDto.getOptionsInstructions());

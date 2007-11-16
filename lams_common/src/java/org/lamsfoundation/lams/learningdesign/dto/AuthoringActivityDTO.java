@@ -238,83 +238,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/*****************************************************************************
 	 * Constructors
 	 *****************************************************************************/
-	public AuthoringActivityDTO(Long activityID, Integer activityUIID,
-			String description, String title, String helpText, Integer xcoord,
-			Integer ycoord, Long parentActivityID, Integer parentUIID,
-			Integer activityTypeId, Long groupingID, Integer groupingUIID,
-			Integer orderID, Boolean defineLater, Long learningDesignID,
-			Long learningLibraryID, Date createDateTime, Boolean runOffline,
-			String languageFile,
-			Integer maxOptions, Integer minOptions,
-			String optionsInstructions, String toolSignature, Long toolID, Long toolContentID,
-			Integer activityCategoryID, Integer gateActivityLevelID,
-			Boolean gateOpen, Long gateStartTimeOffset, Long gateEndTimeOffset,
-			Date gateStartDateTime, Date gateEndDateTime,
-			String libraryActivityUiImage, Long createGroupingID,
-			Integer createGroupingUIID, Long libraryActivityID,
-			Boolean applyGrouping,Integer groupingSupportType,
-			Integer groupingType,GroupingDTO groupingDTO, 
-			Boolean readOnly, Boolean initialised, Boolean stopAfterActivity,
-			ArrayList<Integer> inputActivities, Integer toolActivityUIID, Integer defaultActivityUIID,
-			Integer startXCoord, Integer startYCoord, Integer endXCoord, Integer endYCoord) {
-		super();
-		this.activityID = activityID;
-		this.activityUIID = activityUIID;
-		this.description = description;
-		this.activityTitle = title;
-		this.helpText = helpText;
-		this.xCoord = xcoord;
-		this.yCoord = ycoord;
-		this.parentActivityID = parentActivityID;
-		this.parentUIID = parentUIID;
-		this.activityTypeID = activityTypeId;
-		this.groupingID = groupingID;
-		this.groupingUIID = groupingUIID;
-		this.orderID = orderID;
-		this.defineLater = defineLater;
-		this.learningDesignID = learningDesignID;
-		this.learningLibraryID = learningLibraryID;
-		this.createDateTime = createDateTime;
-		this.runOffline = runOffline;
-		this.languageFile = languageFile;
-		this.maxOptions = maxOptions;
-		this.minOptions = minOptions;
-		this.optionsInstructions = optionsInstructions;
-		this.toolSignature = toolSignature;
-		this.toolID = toolID;
-		this.toolContentID = toolContentID;
-		this.activityCategoryID = activityCategoryID;
-		this.gateActivityLevelID = gateActivityLevelID;
-		this.gateOpen = gateOpen;
-		this.gateStartTimeOffset = gateStartTimeOffset;
-		this.gateEndTimeOffset = gateEndTimeOffset;
-		this.gateStartDateTime = gateStartDateTime;
-		this.gateEndDateTime = gateEndDateTime;
-		this.libraryActivityUIImage = libraryActivityUiImage;
-		this.createGroupingID = createGroupingID;
-		this.createGroupingUIID = createGroupingUIID;
-		this.libraryActivityID = libraryActivityID;
-		this.applyGrouping = applyGrouping;
-		this.groupingSupportType = groupingSupportType;
-		this.groupingType = groupingType;
-		//this.groupingDTO = groupingDTO;
-		this.readOnly = readOnly;
-		this.initialised = initialised;
-		this.stopAfterActivity=stopAfterActivity;
-		this.toolActivityUIID=toolActivityUIID;
-		this.inputActivities=inputActivities;
-		// Complex Activity field
-		this.defaultActivityUIID = defaultActivityUIID;
-		// Branching Activity fields
-		this.startXCoord = startXCoord;
-		this.startYCoord = startYCoord;
-		this.endXCoord = endXCoord;
-		this.endYCoord = endYCoord;
-
-	}
 	public AuthoringActivityDTO(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings){
-		processActivityType(activity, branchMappings);
-
 		this.activityID = activity.getActivityId();
 		this.activityUIID = activity.getActivityUIID();
 		this.description = activity.getDescription();
@@ -327,7 +251,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 								null;
 		this.parentUIID = activity.getParentUIID();
 		this.activityTypeID = activity.getActivityTypeId();
-		
+	
 		this.groupingID = activity.getGrouping()!=null?
 						  activity.getGrouping().getGroupingId():
 						  null;
@@ -358,6 +282,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.inputActivities = activity.getInputActivityUIIDs();
 		this.toolActivityUIID = activity.getToolInputActivityUIID();
 
+		processActivityType(activity, branchMappings);
 	}
 	
 	
@@ -788,6 +713,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		if(!activityTypeId.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
 			this.activityTypeID = activityTypeId;
 	}
+
 	/**
 	 * @param activityUIID The activityUIID to set.
 	 */

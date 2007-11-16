@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.learningdesign.GroupBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
@@ -108,6 +109,8 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 						return getActivityByActivityId(activityId,GroupBranchingActivity.class);
 					case Activity.TOOL_BRANCHING_ACTIVITY_TYPE: 
 						return getActivityByActivityId(activityId,ToolBranchingActivity.class);
+					case Activity.OPTIONS_WITH_SEQUENCES_TYPE: 
+						return getActivityByActivityId(activityId,OptionsWithSequencesActivity.class);
 					default: break; 
 				}
 			}

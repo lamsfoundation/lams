@@ -269,6 +269,11 @@
 			    <property name="optionsInstructions" type="java.lang.String" column="options_instructions" length="65535">
     			    <meta attribute="field-description">@hibernate.property column="options_instructions" length="65535"</meta>    
 			    </property>
+			    
+			    <subclass name="org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity" discriminator-value="13">
+					<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+				</subclass>
+			    
 			</subclass>
 			
 			<subclass name="org.lamsfoundation.lams.learningdesign.SequenceActivity" discriminator-value="8">

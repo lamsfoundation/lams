@@ -79,6 +79,7 @@ INSERT INTO lams_learning_activity_type VALUES (9, 'GATE_SYSTEM');
 INSERT INTO lams_learning_activity_type VALUES (10, 'BRANCHING_CHOSEN');
 INSERT INTO lams_learning_activity_type VALUES (11, 'BRANCHING_GROUP');
 INSERT INTO lams_learning_activity_type VALUES (12, 'BRANCHING_TOOL');
+INSERT INTO lams_learning_activity_type VALUES (13, 'OPTIONS_WITH_SEQUENCES');
 
 INSERT INTO lams_gate_activity_level VALUES (1, 'LEARNER');
 INSERT INTO lams_gate_activity_level VALUES (2, 'GROUP');

@@ -62,6 +62,10 @@ public abstract class Activity implements Serializable,Nullable {
 	 * available for a LearningDesign. As new types of activities 
 	 * are added, these constants must be updated, as well as 
 	 * ActivityDAO.getActivityByActivityId()
+	 * 
+	 * OPTIONS_WITH_SEQUENCES_TYPE is set up just to support Flash. 
+	 * The server treads OptionsActivity and OptionalSequenceActivity
+	 * the same.
 	 */
 	/* *****************************************************************/
 	public static final int TOOL_ACTIVITY_TYPE = 1;
@@ -76,6 +80,7 @@ public abstract class Activity implements Serializable,Nullable {
 	public static final int CHOSEN_BRANCHING_ACTIVITY_TYPE = 10;
 	public static final int GROUP_BRANCHING_ACTIVITY_TYPE = 11;
 	public static final int TOOL_BRANCHING_ACTIVITY_TYPE = 12;
+	public static final int OPTIONS_WITH_SEQUENCES_TYPE = 13;
 	/******************************************************************/
 	
 	/**
@@ -365,6 +370,10 @@ public abstract class Activity implements Serializable,Nullable {
 				break;
 			case TOOL_BRANCHING_ACTIVITY_TYPE:
 				activity = new ToolBranchingActivity();
+				activity.setActivityCategoryID(CATEGORY_SYSTEM);
+				break;
+			case OPTIONS_WITH_SEQUENCES_TYPE:
+				activity = new OptionsWithSequencesActivity();
 				activity.setActivityCategoryID(CATEGORY_SYSTEM);
 				break;
 			default:
@@ -854,7 +863,7 @@ public abstract class Activity implements Serializable,Nullable {
 
 	public boolean isOptionsActivity()
 	{
-		return getActivityTypeId().intValue()== OPTIONS_ACTIVITY_TYPE;
+		return getActivityTypeId().intValue()== OPTIONS_ACTIVITY_TYPE || getActivityTypeId().intValue()==OPTIONS_WITH_SEQUENCES_TYPE ;
 	}
 
 	public boolean isComplexActivity()
@@ -862,6 +871,7 @@ public abstract class Activity implements Serializable,Nullable {
 		return getActivityTypeId().intValue()== SEQUENCE_ACTIVITY_TYPE || 
 			   getActivityTypeId().intValue()== PARALLEL_ACTIVITY_TYPE ||
 			   getActivityTypeId().intValue()== OPTIONS_ACTIVITY_TYPE ||
+			   getActivityTypeId().intValue()== OPTIONS_WITH_SEQUENCES_TYPE ||
 			   getActivityTypeId().intValue()== CHOSEN_BRANCHING_ACTIVITY_TYPE ||
 			   getActivityTypeId().intValue()== GROUP_BRANCHING_ACTIVITY_TYPE ||
 			   getActivityTypeId().intValue()== TOOL_BRANCHING_ACTIVITY_TYPE;
