@@ -164,10 +164,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					if (sequenceActivity.parentUIID == optionalOnCanvas[i].activity.activityUIID) {
 						if(_tempSelectedItem.activity.parentUIID == sequenceActivity.activityUIID) {
 							ca.depthHistory = ca.getDepth();
-							ca.swapDepths(_tempSelectedItem);
+							ca.swapDepths(DepthManager.kTop);
 							
 							_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
-							_tempSelectedItem.depthHistory = null;
 						} else {
 							ca.depthHistory = ca.getDepth();
 							ca.swapDepths(DepthManager.kTop);
@@ -180,7 +179,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					
 					if(selectedParentActivity.parentUIID == optionalOnCanvas[i].activity.activityUIID) {
 						_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
-						_tempSelectedItem.depthHistory = null;
 					}
 				}
 				

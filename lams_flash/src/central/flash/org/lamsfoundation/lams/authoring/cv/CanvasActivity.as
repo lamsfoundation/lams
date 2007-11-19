@@ -213,6 +213,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	public function setSelected(isSelected){
 		Debugger.log(_activity.title+" isSelected:"+isSelected,4,'setSelected','CanvasActivity');
 		var MARGIN = 5;
+		
 		if(isSelected) {
 			//draw a selected border
 			var tgt_mc;
