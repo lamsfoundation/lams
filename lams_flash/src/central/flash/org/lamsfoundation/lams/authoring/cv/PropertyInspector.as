@@ -497,16 +497,16 @@ class PropertyInspector extends PropertyInspectorControls {
 		}
 	}
 	
-	private function removeSequenceItems(itemsToRemove, overwrite:Boolean):Void {
+	private function removeSequenceItems(itemsToRemove:Array, overwrite:Boolean):Void {
 		for(var i=0; i<itemsToRemove.length; i++) {
-					if(_canvasModel.getCanvas().ddm.getComplexActivityChildren(itemsToRemove[i]).length > 0 && !overwrite) {
-						LFMessage.showMessageConfirm(Dictionary.getValue('pi_optSequence_remove_msg'), Proxy.create(this, removeSequenceItems, itemsToRemove, true), null, null, null, Dictionary.getValue('pi_optSequence_remove_msg_title'));
+					if(itemsToRemove[i].actChildren.length > 0 && !overwrite) {
+						LFMessage.showMessageConfirm(Dictionary.getValue('pi_optSequence_remove_msg'), Proxy.create(this, removeSequenceItems, itemsToRemove, true), Proxy.create(this, onUpdateOptionalSequenceData), null, null, Dictionary.getValue('pi_optSequence_remove_msg_title'));
+						return;
 					} else { 
-						_canvasModel.getCanvas().ddm.removeActivity(itemsToRemove[i]); 
+						_canvasModel.getCanvas().ddm.removeComplexActivity(itemsToRemove[i].activity.activityUIID, itemsToRemove[i].actChildren, true);
 					}
 		}
 		
-		_canvasModel.setDirty();
 		this.onEnterFrame = onUpdateOptionalSequenceData;
 	}
 	
@@ -515,8 +515,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		
 		for(var i=0; i<count; i++)
 			_canvasModel.createNewSequenceActivity(oa, o.noSequences+(i-1));
-					
-		_canvasModel.setDirty();
+		
 		this.onEnterFrame = onUpdateOptionalSequenceData;
 	}
 	
@@ -527,8 +526,11 @@ class PropertyInspector extends PropertyInspectorControls {
 		CanvasOptionalActivity(_canvasModel.selectedItem).updateChildren(newChildren);
 		
 		setModified();
+		
 		noSeqAct_cmb.selectedIndex = newChildren.length;
-		_canvasModel.activeView.getController().clearBusy()	
+		
+		_canvasModel.activeView.getController().clearBusy();
+		_canvasModel.setDirty();
 			
 	}
 	

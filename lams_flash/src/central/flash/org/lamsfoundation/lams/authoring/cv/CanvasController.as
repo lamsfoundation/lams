@@ -213,7 +213,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 										}
 										
 										if(selectedSequence != null) {
+											ca.activity.orderID = _canvasModel.getCanvas().ddm.getNextSequenceOrderID(selectedSequence.activity.activityUIID);
 											_canvasModel.addParentToActivity(selectedSequence.activity.activityUIID, ca, false);
+											
+											if(ca.activity.orderID > 1) _canvasModel.createSequenceTransition(selectedSequence.activity, ca.activity);
+											
 											CanvasSequenceActivity(selectedSequence).updateChildren();
 											CanvasOptionalActivity(_canvasModel.activitiesDisplayed.get(selectedSequence.activity.parentUIID)).updateChildren();
 										} else {
@@ -221,18 +225,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 											var msg:String = Dictionary.getValue('activityDrop_optSequence_error_msg');
 											LFMessage.showMessageAlert(msg);
 										}
-										
-										/**var dropTarget:Object = eval(ca._droptarget);
-										
-										if(dropTarget._parent instanceof CanvasSequenceActivity) {
-											_canvasModel.addParentToActivity(dropTarget._parent.activity.activityUIID, ca, false);
-											CanvasSequenceActivity(dropTarget._parent).updateChildren();
-										} else {
-											activitySnapBack(ca);
-											var msg:String = Dictionary.getValue('activityDrop_optSequence_error_msg');
-											LFMessage.showMessageAlert(msg);
-										}
-										*/
 										
 									} else {
 										_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca, false);

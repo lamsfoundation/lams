@@ -158,6 +158,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 			refresh();
 		}
 		
+		if(_children.length > 0)
+			SequenceActivity(_activity).empty = false;
+		
 		removeAllChildren();
 		
 		children_mc = new Array();
@@ -175,6 +178,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 			children_mc[i].activity.yCoord = CHILD_OFFSET_Y;
 			
 			children_mc[i]._visible = true;
+			
+			Debugger.log("orderID: " + _children[i].orderID, Debugger.CRITICAL, "init", "CanvasSequenceActivity");
 		
 		}
 		
@@ -438,6 +443,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	
 	public function get children():Array {
 		return children_mc;
+	}
+	
+	public function get actChildren():Array {
+		return _children;
 	}
 	
 	public function setSize(w:Number, h:Number):Void {

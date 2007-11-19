@@ -192,6 +192,30 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	}
 	
 	/**
+	 * Removes the complex activity (and children) from only DDM (no canvas items)
+	 * @usage   
+	 * @param   activityUIID 
+	 * @return  
+	 */
+	public function removeComplexActivity(activityUIID:Number, _children:Array, removeTrans:Boolean):Void{
+		
+		for(var i=0; i<_children.length; i++) {
+			var _nChildren:Array = getComplexActivityChildren(_children[i].activityUIID);
+			if(_nChildren.length > 0) {
+				removeComplexActivity(_children[i].activityUIID, _nChildren, removeTrans);
+			} else {
+				removeActivity(_children[i].activityUIID);
+				if(removeTrans) removeTransitionByConnection(_children[i].activityUIID);
+			}
+				
+		}
+		
+		removeActivity(activityUIID);
+		if(removeTrans) removeTransitionByConnection(_children[i].activityUIID);
+		
+	}
+	
+	/**
 	 * Adds a transition to the DDM
 	 * @usage   
 	 * @param   transition 
@@ -1558,6 +1582,16 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 */
 	public function get saveMode ():Number {
 		return _saveMode;
+	}
+	
+	public function getNextSequenceOrderID(activityUIID:Number):Number {
+		var _children:Array = getComplexActivityChildren(activityUIID);
+		_children.sortOn('orderID', Array.NUMERIC | Array.DESCENDING);
+		
+		if(_children.length > 0)
+			return _children[0].orderID+1;
+		else
+			return 0;
 	}
 
 	

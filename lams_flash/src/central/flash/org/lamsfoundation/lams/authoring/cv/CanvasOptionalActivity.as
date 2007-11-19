@@ -136,6 +136,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 				initSequenceType();
 				break;
 			default:
+				Debugger.log("No valid type.", Debugger.CRITICAL, "init", "CanvasOptionalActivity");
 		}
 	}
 	
@@ -157,7 +158,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		for (var i=0; i < _children.length; i++)		{
 			if(fromModuleTab == "monitorMonitorTab"){
 				children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
-			}else {
+			} else {
 				children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView});
 			}
 			
@@ -230,6 +231,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	public function updateChildren(newChildren:Array):Void {
 		_visible = false;
 		_visibleWidth = CONTAINER_PANEL_W;
+		
 		if(newChildren != null) _children = newChildren;
 		
 		init();
@@ -245,7 +247,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		var retArr:Array = new Array();
 		
 		for(var j=i; j>0; j--)
-			retArr.push(Number(children_mc[children_mc.length - j].activity.activityUIID));
+			retArr.push(children_mc[children_mc.length - j]);
 		
 		return retArr;
 	}

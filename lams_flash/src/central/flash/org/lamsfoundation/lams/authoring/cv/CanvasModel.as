@@ -151,6 +151,32 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	}
 	
 	/**
+	 * Create a transition between two activities in a Sequence Activity (in Optional).
+	 * 
+	 * @usage   
+	 * @param   sequence   
+	 * @param   toActivity 
+	 * @return  
+	 */
+	
+	public function createSequenceTransition(sequence:Activity, toActivity:Activity):Void {
+		var fromActivity:Activity
+		var _children:Array = _cv.ddm.getComplexActivityChildren(sequence.activityUIID);
+		_children.sortOn('orderID', Array.NUMERIC);
+		
+		var _index:Number = toActivity.orderID - 2;
+		if(_index >= 0) {
+			fromActivity = _children[_index];
+		 
+			addActivityToTransition(fromActivity);
+			addActivityToTransition(toActivity);
+			resetTransitionTool();
+		}
+		
+		 setDirty();
+	}
+	
+	/**
 	 * Creates a new gate activity at the specified location
 	 * @usage   
 	 * @param   gateTypeID 
@@ -377,7 +403,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	
 	public function removeComplexActivityChildren(children){
 		for (var k=0; k<children.length; k++){
-			Debugger.log('Removing Child ' + children[k].activity.activityUIID+ 'from : '+ children[k].activity.parentUIID,Debugger.GEN,'removeComplexActivityChildren','CanvasModel');
+			Debugger.log('Removing Child ' + children[k].activityUIID+ 'from : '+ children[k].parentUIID,Debugger.GEN,'removeComplexActivityChildren','CanvasModel');
 		
 			children[k].parentUIID = null;
 			
@@ -388,7 +414,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 				removeActivity(children[k].activityUIID);
 			}
 			
-			_cv.ddm.removeActivity(children[k].activityUIID);
+			_cv.removeActivity(children[k].activityUIID);
 		}
 	}
 	

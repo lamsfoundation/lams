@@ -384,12 +384,19 @@ class Canvas extends CanvasHelper {
 		
 		//select the new thing
 		if (taParent != undefined || taParent != null){
-			actToAdd.parentUIID = taParent;
-			canvasModel.removeActivity(actToAdd.activityUIID);
-			canvasModel.removeActivity(taParent);
-			var sequenceAct:Activity;
-			if((sequenceAct = canvasModel.getCanvas().ddm.getActivityByUIID(taParent)).isSequenceActivity())
+			var sequenceAct:Activity = canvasModel.getCanvas().ddm.getActivityByUIID(taParent);
+			if(sequenceAct.isSequenceActivity()) {
+				actToAdd.orderID = canvasModel.getCanvas().ddm.getNextSequenceOrderID(sequenceAct.activityUIID);
+				if(actToAdd.orderID > 1) canvasModel.createSequenceTransition(sequenceAct, actToAdd);
+											
 				canvasModel.removeActivity(sequenceAct.parentUIID);
+			}
+			
+			actToAdd.parentUIID = taParent;
+			
+			canvasModel.removeActivity(taParent);
+			canvasModel.removeActivity(actToAdd.activityUIID);
+			
 		}
 		
 		canvasModel.setDirty();
