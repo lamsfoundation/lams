@@ -44,6 +44,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	private var _pi:PropertyInspector;
 	private var app:Application;
 	private var _isBusy:Boolean;
+	private var _tempSelectedItem:Object;
 	
 	/**
 	* Constructor
@@ -60,11 +61,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		_pi = new PropertyInspector();
 		app = Application.getInstance();
 		_isBusy = false;
+		_tempSelectedItem = null;
 	}
    
     public function activityClick(ca:Object):Void{
+		_tempSelectedItem = _canvasModel.selectedItem;
 		_canvasModel.selectedItem = null;
 	    
+		
 		Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID + ' orderID: ' + ca.activity.orderID,Debugger.GEN,'activityClick','CanvasController');
 	    Debugger.log('Check if transition tool active :'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityClick','CanvasController');
 	    
@@ -83,7 +87,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	    }else{
 			
 		   //just select the activity
-			var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID)
+			var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
 			
 			if(ca.activity.parentUIID != null && (parentAct.isParallelActivity() || 
 			    ca.activity.isOptionalSequenceActivity(parentAct))) {
@@ -129,8 +133,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
 			_canvasModel.isDragging = false;
-			var sequenceActivity:Activity = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
 			
+			var sequenceActivity:Activity = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
+			var selectedParentActivity:Activity = _canvasModel.getCanvas().ddm.getActivityByUIID(_tempSelectedItem.activity.parentUIID);
+					
 			if (ca.activity.parentUIID != null && 
 				sequenceActivity.activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE){
 				
@@ -153,11 +159,31 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				
 			} else if(ca.activity.parentUIID != null && 
 						sequenceActivity.isSequenceActivity()) {
+				
 				for (var i=0; i<optionalOnCanvas.length; i++) {
-					if (sequenceActivity.parentUIID == optionalOnCanvas[i].activity.activityUIID)
+					if (sequenceActivity.parentUIID == optionalOnCanvas[i].activity.activityUIID) {
+						if(_tempSelectedItem.activity.parentUIID == sequenceActivity.activityUIID) {
+							ca.depthHistory = ca.getDepth();
+							ca.swapDepths(_tempSelectedItem);
+							
+							_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
+							_tempSelectedItem.depthHistory = null;
+						} else {
+							ca.depthHistory = ca.getDepth();
+							ca.swapDepths(DepthManager.kTop);
+						}
+							
 						if (optionalOnCanvas[i].locked == false)
 							activitySnapBack(ca);
+							
+					}
+					
+					if(selectedParentActivity.parentUIID == optionalOnCanvas[i].activity.activityUIID) {
+						_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
+						_tempSelectedItem.depthHistory = null;
+					}
 				}
+				
 			} else {
 			
 				//if we are on the optional Activity remove this activity from canvas and assign it a parentID of optional activity and place it in the optional activity window.
@@ -310,6 +336,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			clearAllSelections(optionalOnCanvas, parallelOnCanvas);
 			
+			_tempSelectedItem = null;
 			_canvasModel.selectedItem = ca;	
 			_canvasModel.setDirty();
 			

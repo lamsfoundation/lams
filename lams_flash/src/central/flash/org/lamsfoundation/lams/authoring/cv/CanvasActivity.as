@@ -116,6 +116,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _setupBranchView:Boolean;
 	
 	private var _sequenceChild:Boolean;
+	private var _depthHistory:Number;
 	
 	private var _ddm:DesignDataModel;
 	
@@ -215,7 +216,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		if(isSelected) {
 			//draw a selected border
 			var tgt_mc;
-			if(_activity.isGateActivity())
+			if(_activity.isGateActivity() && !_sequenceChild)
 				tgt_mc = stopSign_mc;			
 			else if(_activity.groupingUIID > 0)
 				tgt_mc = canvasActivityGrouped_mc;
@@ -238,7 +239,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			if(_selected_mc){
 				_selected_mc.removeMovieClip();
 			}
-			_selected_mc = _base_mc.createEmptyMovieClip('_selected_mc',_base_mc.getNextHighestDepth());
+			
+			_selected_mc = _base_mc.createEmptyMovieClip('_selected_mc', _base_mc.getNextHighestDepth());
 				
 			var dashStyle:mx.styles.CSSStyleDeclaration = _tm.getStyleObject("CAHighlightBorder");
 			var color:Number = dashStyle.getStyle("color");
@@ -251,6 +253,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			_isSelected = isSelected;
 					
 		} else {
+			if(depthHistory != null)
+				this.swapDepths(depthHistory);
+			
 			//hide the selected border
 			_selected_mc.removeMovieClip();
 		}
@@ -694,6 +699,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		_setupBranchView = a;
 	}
 	
+	public function get depthHistory():Number {
+		return _depthHistory;
+	}
+	
+	public function set depthHistory(a:Number):Void {
+		_depthHistory = a;
+	}
+	
 	private function getDDM():DesignDataModel {
 		if(_module == "monitoring") {
 			return _monitorView.ddm;
@@ -701,5 +714,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			return _canvasView.ddm;
 		}
 	}
+	
 
 }

@@ -178,9 +178,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 			children_mc[i].activity.yCoord = CHILD_OFFSET_Y;
 			
 			children_mc[i]._visible = true;
-			
-			Debugger.log("orderID: " + _children[i].orderID, Debugger.CRITICAL, "init", "CanvasSequenceActivity");
-		
 		}
 		
 		var _newVisibleWidth:Number = (_children.length*CHILD_INCRE) + (CHILD_OFFSET_X*2) + 6;
@@ -363,7 +360,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		}
 	}
 	
-	
 	/**
 	 * 
 	 * @usage   
@@ -419,7 +415,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		return styleObj;
 	}
 
-
 	/**
 	 * Get the CSSStyleDeclaration objects for each component and applies them
 	 * directly to the instanced
@@ -453,6 +448,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		_visibleWidth = w;
 		
 		draw();
+	}
+	
+	public function get container():MovieClip {
+		return childActivities_mc;
 	}
 
 }
