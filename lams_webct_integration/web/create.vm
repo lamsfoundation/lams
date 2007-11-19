@@ -1,7 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+#set( $currentLCID = $session.getCurrentLCID() )
+#set( $pt_id = $request.getParameter( $id_param_name ) )
+#set( $url = 'ptLaunch.dowebct' )
+## check if we're in MyWebCT or a section
+#set( $isInstRole = 0 )
+#set( $isMyWebCT = 0 )
+#if( $currentLCID == $session.getInstitutionID() )
+    #set( $isMyWebCT = 1 )
+    #set( $id_param_name = 'tid' )
+
+    ## check if it's an Institution role
+    #set( $roles = $context.getRoleIDs($session, $currentLCID) )
+    #foreach( $role in $roles )
+        #set( $isInstRole = 1 )
+    #end
+#else
+    #set( $id_param_name = 'id' )
+#end
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">	
 <head>
 <title>LAMS: Start Lesson</title>
 
@@ -11,6 +30,7 @@
 	#include( 'web/lib/tigra/tree_tpl.js' ) 
 	
 	var authorWin = null;
+	var previewWin = null;
 
     function openAuthor()
     {
@@ -35,11 +55,11 @@
     
     function refreshSeqList()
     {
-    	//document.getElementById("sequence_id").value="0";
+    	document.getElementById("sequence_id").value="0";
     	document.location.reload();
     }
     
-    function doCreate()
+    function doStartLesson()
     {
     	if (document.getElementById("sequence_id").value=="0")
     	{
@@ -48,26 +68,37 @@
     	}
     	else
     	{
+    		document.getElementById("form_action").value="start_lesson";
     		return true;
     	}
     }
     
+    function openPreview()
+    {
+
+    	if (document.getElementById("sequence_id").value=="0")
+    	{
+    		alert('Please select a sequence before clicking next.');
+    		return false;
+    	}
+    	
+		url = '${url}?sequence_id=' +document.getElementById("sequence_id").value+ '&${id_param_name}=${pt_id}&page_id=${page_id}&form_action=preview';
+	   	
+	   	alert(url);
+	   	window.open(url,'LAMS-Preview','height=600,width=800,resizable');
+
+  		return true;
+  
+    }
+
+    
     function selectSequence(id) 
     {
-		//document.workspace_form.nextButton.class= "button"; 
-		//document.getElementById("nextButton").disabled = false;
-		//document.getElementById("nextButton").type = "submit";  
-		//document.getElementById("disabledNextButton").type = "hidden";
-		
-		//var b = document.getElementById("disabledNextButton")
-		//b.parentNode.removeChild(b);
-
-		//document.getElementById("nextButton").style.visibility = "visible";  
-		
-		
-		//document.getElementById("nextButton").class = "button"; 	
     	document.getElementById("sequence_id").value=id;
 	}
+	
+	
+	
     
 //-->
 </script>
@@ -80,23 +111,23 @@
 <br>
 <br>
 
-<form name="create_form" id="create_form" action="learnerMonitor.vm" method="post">
+<form name="create_form" id="create_form" action="$url" method="post">
 	<input type="hidden" name="sequence_id" id="sequence_id"  value='0'>
-	
-	
-	
+	<input type="hidden" name="$id_param_name" value="$pt_id"/>
+	<input type="hidden" name="page_id" value="$page_id"/>
+	<input type="hidden" name="form_action" id="form_action" value=""/>
 	
 	<table border='0'>
 		<tr>
-			<td><b>Title</b></td>
+			<td valign="top"><b>Title</b></td>
 			<td><input id="title" type="text" name="title" value=""></td>
 		</tr>
 		<tr>
-			<td><b>Description</b></td>
+			<td valign="top"><b>Description</b></td>
 			<td><textarea name="description" rows="12" cols="35"></textarea></td>
 		</tr>
 		<tr>
-			<td><b>Lesson Visibility</b></td>
+			<td valign="top"><b>Lesson Visibility</b></td>
 			<td><input type="Radio" name="isAvailable" value="true" checked>Show Lesson <br>
 	            <input type="Radio" name="isAvailable" value="false">Hide Lesson </td>
 		</tr>
@@ -106,7 +137,7 @@
 	
 	<table border='0'>
 		<tr>
-			<td><b>Select Sequence</b></td>
+			<td valign="top"><b>Select Sequence</b></td>
 			<td>
 				<script language="JavaScript" type="text/javascript">
             	<!-- 
@@ -117,12 +148,13 @@
 			</td>
 		</tr>
 		<tr>
+			<td><input type="button" name="preview" onClick="openPreview();" value="Preview Selected"></td>
 			<td><input type="button" name="author" onClick="openAuthor();" value="Open Author"></td>
 		</tr>
 	</table>	
 
 	<input type="button" name="action" onClick="refreshSeqList();" value="Refresh">                                      
-	<input type="submit" name="create" onClick="return doCreate();" value="Create Lesson"/>
+	<input type="submit" name="create" onClick="return doStartLesson();" value="Start Lesson"/>
 </form>
 
 

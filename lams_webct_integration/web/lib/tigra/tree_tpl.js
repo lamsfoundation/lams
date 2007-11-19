@@ -31,6 +31,6 @@ var TREE_TPL = {
 	'icon_18' : '/webct/images/tigra_plusbottom.gif', // junction for closed node
 	'icon_19' : '/webct/images/tigra_plus.gif',       // junction for last closed node
 	'icon_26' : '/webct/images/tigra_minusbottom.gif',// junction for opened node
-	'icon_27' : '/webct/images/tigra_icons/minus.gif'       // junction for last opened node
+	'icon_27' : '/webct/images/tigra_minus.gif'       // junction for last opened node
 };
 

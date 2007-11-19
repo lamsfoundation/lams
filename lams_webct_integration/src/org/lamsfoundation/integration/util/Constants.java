@@ -54,5 +54,15 @@ public class Constants {
 	public static final String ELEM_LEARNING_DESIGN = "LearningDesign";
 	public static final String ATTR_NAME			= "name";
 	public static final String ATTR_RESOURCE_ID		= "resourceId";
+
+	public static final String SETTING_LAMS_SERVER_URL = "lamsServerUrl";
+	public static final String SETTING_SERVER_ID = "serverId";
+	public static final String SETTING_SECRET_KEY = "secretKey";
+	public static final String SETTING_REQUEST_SRC = "webctRequestSource";
+	public static final String SETTING_DB_NAME = "dbName";
+	public static final String SETTING_DB_HOST = "dbHost";
+	public static final String SETTING_DB_PORT = "dbPort";
+	public static final String SETTING_DB_USER = "dbUser";
+	public static final String SETTING_DB_PASS = "dbPass";
     
 }

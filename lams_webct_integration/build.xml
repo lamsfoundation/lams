@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="deploy" name="LAMS/WebCt Integration" basedir="./">
+	
+	<property file="build.properties" />
 	<property name="project" value="BlackboardPlugin"/>
 	<property name="product" value="lams2-webct-integration"/>
 	<property name="version" value="1.0.0"/>
@@ -11,6 +13,12 @@
 	<property name="build.lib" value="${build}/lib"/>
 	<property name="build.webinf" value="${build}/WEB-INF"/>
 
+	<property name="dbUrl" value="jdbc:sqlserver://${dbHost}:${dbPort}" />
+	<property name="dbDriver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
+	<property name="dbDriverClassPath" value="lib/sqljdbc.jar" />
+	<property name="sqlDir" value="${basedir}/db/sql" />
+	
+	
 	<property name="lib" value="${basedir}/lib"/>
 	<property name="src" value="${basedir}/src/org/"/>
 	<property name="web" value="${basedir}/web"/>
@@ -58,18 +66,26 @@
 		</javac>
    	
    		<copy todir="${build}" overwrite="true">
-   			
    			<fileset dir="${basedir}">
    			      <include name="DeployableComponentConfig.xml"/>
    			</fileset>
+   			<filterset>
+   				<filter token="dbHost" value="${dbHost}" />
+   				<filter token="dbPort" value="${dbPort}" />
+   				<filter token="dbName" value="${dbName}" />
+   				<filter token="dbUser" value="${dbUser}" />
+   				<filter token="dbPass" value="${dbPass}" />
+   				<filter token="lamsServerUrl" value="${lamsServerUrl}" />
+   				<filter token="serverId" value="${serverId}" />
+   				<filter token="secretKey" value="${secretKey}" />
+   				<filter token="reqSrc" value="${reqSrc}" />
+   			</filterset>
+   			
    		</copy>	
    	
    		<copy todir="${build.web}" overwrite="true">
    			<fileset dir="${web}" />
-   	   	</copy>
-   	
-   		
-		
+   	   	</copy>	
 	</target>
 	
 	<!-- ================================================================ -->
@@ -88,7 +104,36 @@
    			<fileset dir="${lib}">
    				<include name="commons-codec-1.3.jar" />
    				<include name="authmoduledata_ce_1.4.jar" />
+   				<include name="sqljdbc.jar" />
    			</fileset>
 		</copy>
 	</target>
+		
+		
+	<target name="create-table">
+		<sql 
+			driver="${dbDriver}"
+			classpath="${dbDriverClassPath}"
+			url="${dbUrl}"
+			userid="${dbUser}"
+			password="${dbPass}"
+			encoding="utf8"
+		>
+			<transaction src="${sqlDir}/createTable.sql" />
+		</sql>	
+	</target>
+	
+	<target name="delete-table">
+			<sql 
+				driver="${dbDriver}"
+				classpath="${dbDriverClassPath}"
+				url="${dbUrl}"
+				userid="${dbUser}"
+				password="${dbPass}"
+				encoding="utf8"
+			>
+				<transaction src="${sqlDir}/deleteTable.sql" />
+			</sql>	
+	</target>
+
 </project>

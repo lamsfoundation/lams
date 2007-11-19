@@ -4,12 +4,12 @@
  <!-- Add components as shown in the following <component> block below -->
 
     <component>
-        <version>0.0.7</version>
+        <version>0.0.12</version>
         <powerlinks-version>1.0</powerlinks-version>
         <id>lams.integration</id>
         <!-- valid types include sso siapi and proxytools -->
         <type>sso</type>
-        <classname>org.lamsfoundation.integration.webct.AuthorModule</classname>
+        <classname>org.lamsfoundation.integration.webct.LamsModule</classname>
         <author>Luke Foxton</author>
         <description>LAMS-WebCt integration module</description>
         <settings-structure>
@@ -108,6 +108,53 @@
 				</setting-element>
 
 		<!-- MODULE-SPECIFIC ELEMENTS -->	
+				
+ 
+				<setting-element name="dbHost" 
+								 label="SQL Server Host" 
+								 data-type="String" 
+								 presentation-type="TextField" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="true" 
+								 default-value="@dbHost@" />
+				
+				<setting-element name="dbPort" 
+								 label="SQL Server Port" 
+								 data-type="String" 
+								 presentation-type="TextField" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="true" 
+								 default-value="@dbPort@" />
+				
+				<setting-element name="dbName" 
+								 label="SQL Server Port" 
+								 data-type="String" 
+								 presentation-type="TextField" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="true" 
+								 default-value="@dbName@" />
+
+				<setting-element name="dbUser" 
+								 label="SQL Server User" 
+								 data-type="String" 
+								 presentation-type="TextField" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="true" 
+								 default-value="@dbUser@" />
+				
+				<setting-element name="dbPass" 
+								 label="SQL Server Password" 
+								 data-type="String" 
+								 presentation-type="Password" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="true" 
+								 default-value="@dbPass@" />
+
 				<setting-element name="lamsServerUrl" 
 								 label="LAMS Server URL" 
 								 data-type="String" 
@@ -115,25 +162,25 @@
 								 inheritable="true" 
 								 optional="false" 
 								 read-only="false" 
-								 default-value="http://localhost:8080/lams/" />
+								 default-value="@lamsServerUrl@" />
 
-				<setting-element name="lamsServerId" 
+				<setting-element name="serverId" 
 								 label="LAMS Server ID" 
 								 data-type="String" 
 								 presentation-type="TextField" 
 								 inheritable="true" 
 								 optional="false" 
 								 read-only="false" 
-								 default-value="" />
+								 default-value="@serverId@" />
 								 
-				<setting-element name="lamsServerSecretKey" 
+				<setting-element name="secretKey" 
 								 label="LAMS Server Secret Key" 
 								 data-type="String" 
-								 presentation-type="TextField" 
+								 presentation-type="Password" 
 								 inheritable="true" 
 								 optional="false" 
 								 read-only="false" 
-								 default-value="" />
+								 default-value="@secretKey@" />
 								 
 								 
 				<setting-element name="webctRequestSource" 
@@ -143,7 +190,7 @@
 								 inheritable="true" 
 								 optional="false" 
 								 read-only="false" 
-								 default-value="webct" />
+								 default-value="@reqSrc@" />
 
             </settings-group>
         </settings-structure>

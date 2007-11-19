@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+#set( $currentLCID = $session.getCurrentLCID() )
+#set( $pt_id = $request.getParameter( $id_param_name ) )
+#set( $url = 'ptLaunch.dowebct' )
+## check if we're in MyWebCT or a section
+#set( $isInstRole = 0 )
+#set( $isMyWebCT = 0 )
+#if( $currentLCID == $session.getInstitutionID() )
+    #set( $isMyWebCT = 1 )
+    #set( $id_param_name = 'tid' )
+
+    ## check if it's an Institution role
+    #set( $roles = $context.getRoleIDs($session, $currentLCID) )
+    #foreach( $role in $roles )
+        #set( $isInstRole = 1 )
+    #end
+#else
+    #set( $id_param_name = 'id' )
+#end
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<script language="JavaScript" type="text/javascript">
+<!--
+	var learnerWin = null;
+	var learnerUrl = null;
+	
+	function openLearner(lsID)
+	{
+		learnerUrl = '$learnerUrl' + '&lsid=' + lsID; 
+		if(learnerWin && learnerWin.open && !learnerWin.closed){
+	        try {
+	        	learnerWin.focus();
+	        }catch(e){
+	        	// popups blocked by a 3rd party
+	        }
+	    }
+	    else{
+	        try {
+	            learnerWin = window.open(learnerUrl,'lWin','width=800,height=600,resizable=1');
+	            learnerWin.focus();
+	        }catch(e){
+	        	// popups blocked by a 3rd party
+	        }
+	    }
+	}
+//-->
+
+</script>
+</head>
+<body>
+<b>LAMS Lessons Running</b>
+<br>
+<br>
+<table border='0' cellpadding="10">	
+#foreach ($lesson in $lessons)
+	<tr>
+		<td valign='top'><b>$lesson.getTitle()</b></td>
+		<td valign='top'>$lesson.getDescription()</td>
+		<td valign='top'>
+			<input type="button" name="action" onClick="openLearner($lesson.getLessonId());" value="Open Lesson">
+		</td>
+	</tr>
+
+#end
+</table>
+</body>
+</html>

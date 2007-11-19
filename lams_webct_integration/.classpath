@@ -10,5 +10,7 @@
 	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/authmoduledata_ce_1.4.jar"/>
+	<classpathentry kind="lib" path="lib/sqljdbc.jar"/>
+	<classpathentry kind="lib" path="lib/mssqlserver4v65.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

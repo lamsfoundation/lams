@@ -37,7 +37,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.lang.StringBuffer;
-
+import java.sql.Date;
 import org.apache.commons.codec.binary.Hex;
 import org.lamsfoundation.integration.util.Constants;
 import org.w3c.dom.Document;
@@ -245,7 +245,7 @@ public class LamsSecurityUtil {
 				String firstName,
 				String lastName,
 				String email, 
-				long ldId, 
+				String ldId, 
 				String title, 
 				String desc) 
     {
@@ -268,7 +268,7 @@ public class LamsSecurityUtil {
 			+ "&username="	+ URLEncoder.encode(username, "utf8")
 			+ "&hashValue=" + hash
 			+ "&courseId=" 	+ URLEncoder.encode(courseId, "utf8")
-			+ "&ldId="		+ new Long(ldId).toString()
+			+ "&ldId="		+ ldId
 			+ "&country="	+ country
 			+ "&lang=" 		+ lang
 			+ "&method="	+ "start"
@@ -337,6 +337,56 @@ public class LamsSecurityUtil {
 			return error;
 		} 	
 	}
+    
+    
+    public static String generatePreviewUrl(
+    		String serverAddr, 
+			String serverId, 
+			String secretKey,
+			String reqSrc,
+			String username, 
+			String courseId, 
+			String lang, 
+			String country,
+			String firstName,
+			String lastName,
+			String email 
+			) throws Exception
+    {
+    	String url="";
+    	
+    	
+    	// If lams.properties could not be read, throw exception
+        if(serverAddr == null || serverId == null || reqSrc==null){
+            throw new Exception("Configuration Exception " + serverAddr + ", " + serverId);
+        }
+
+		String timestamp = new Long(System.currentTimeMillis()).toString();
+		String hash = generateAuthenticationHash(timestamp, username, serverId, secretKey);
+
+		try {
+			url = serverAddr + "/services/xml/LessonManager?" 
+				+ "&uid=" 			+ URLEncoder.encode(username, "UTF8") 
+				+ "&ts=" 			+ timestamp  
+				+ "&sid=" 			+ serverId  
+				+ "&hash=" 			+ hash 
+				+ "&courseid=" 		+ URLEncoder.encode(courseId, "UTF8") 
+				+ "&country=" 		+ country
+				+ "&lang=" 			+ lang
+				+ "&requestSrc="	+ URLEncoder.encode(reqSrc, "UTF8")
+				+ "&firstName=" 	+ firstName 
+				+ "&lastName="		+ lastName
+				+ "&email="			+ email
+				+ "&method=preview";
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException();
+		}
+		
+		logger.info("LAMS Req: " + url);
+		System.out.println("PREVIEW: " + url);
+
+		return url;
+    }
     
     
     /**
