@@ -436,7 +436,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 		
         authoringService.saveLearningDesign(copiedLearningDesign);
         
-        Lesson lesson = createNewLesson(lessonName,lessonDescription,user,learnerExportAvailable,copiedLearningDesign);
+        // Make all efforts to make sure it has a title
+        String title = lessonName != null ? lessonName : copiedLearningDesign.getTitle();
+        title = title != null ? title : "Unknown Lesson";
+        
+        Lesson lesson = createNewLesson(title,lessonDescription,user,learnerExportAvailable,copiedLearningDesign);
         auditAction(AUDIT_LESSON_CREATED_KEY, new Object[] {lessonName, copiedLearningDesign.getTitle(), learnerExportAvailable});
         return lesson;
     }
@@ -453,16 +457,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	    	// parse WDDX values
 	    	
 	    	String title = WDDXProcessor.convertToString("lessonName", table.get("lessonName"));
-	    	if ( title == null ) title = "lesson"; // TODO Use getMessage 
-	    	
     		String desc = WDDXProcessor.convertToString("lessonDescription", table.get("lessonDescription"));
-    		if ( desc == null ) desc = "description";  // TODO Use getMessage 
-    		
     		int copyType = WDDXProcessor.convertToInt("copyType", table.get("copyType"));
-    			
     		Integer organisationId = WDDXProcessor.convertToInteger("organisationID", table.get("organisationID"));
     		long ldId = WDDXProcessor.convertToLong(AttributeNames.PARAM_LEARNINGDESIGN_ID, table.get(AttributeNames.PARAM_LEARNINGDESIGN_ID));
-    		
     		boolean learnerExportAvailable = WDDXProcessor.convertToBoolean("learnerExportPortfolio", table.get("learnerExportPortfolio"));
 	    	
     		// initialize lesson
