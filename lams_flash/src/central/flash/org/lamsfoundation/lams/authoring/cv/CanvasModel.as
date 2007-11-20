@@ -413,6 +413,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			fromActivity = _cv.ddm.getActivityByUIID(transitionObj.into.fromUIID);
 		} else if(transitionObj.into == null && transitionObj.out != null) {
 			ComplexActivity(sequence).firstActivityUIID = transitionObj.out.toUIID
+		} else if(transitionObj.out == null && transitionObj.into == null) {
+			ComplexActivity(sequence).firstActivityUIID = null;
 		}
 		
 		_cv.ddm.removeTransitionByConnection(ca.activity.activityUIID);

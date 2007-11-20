@@ -180,7 +180,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 							if (ca._x > optionalOnCanvas[i].getVisibleWidth() || 
 								ca._x < -ca.getVisibleWidth() ||
 								ca._y < -ca.getVisibleHeight() - sequenceActivity.yCoord ||
-								ca._y > optionalOnCanvas[i].getVisibleHeight() - sequenceActivity.yCoord) {
+								ca._y > optionalOnCanvas[i].getVisibleHeight()) {
 								
 								ca.activity.xCoord = (_xmouse - _canvasModel.getPosition().x) - (_canvasModel.getCanvas().taWidth/2);
 								ca.activity.yCoord = (_ymouse - _canvasModel.getPosition().y) - (_canvasModel.getCanvas().taHeight/2);
