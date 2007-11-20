@@ -1587,11 +1587,12 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function getNextSequenceOrderID(activityUIID:Number):Number {
 		var _children:Array = getComplexActivityChildren(activityUIID);
 		_children.sortOn('orderID', Array.NUMERIC | Array.DESCENDING);
+		Debugger.log("children length: " + _children.length, Debugger.CRITICAL, "getNextSequenceOrderID", "DDM");
 		
 		if(_children.length > 0)
 			return _children[0].orderID+1;
 		else
-			return 0;
+			return 1;
 	}
 
 	

@@ -74,6 +74,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	
 	private var _lastBranchActionType:Number;
 	
+	private var _doRefresh:Boolean;
+	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -95,6 +97,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		_autoSaveWait = false;
 		_connectionActivities = new Array();
 		_defaultGroupingTypeID = Grouping.RANDOM_GROUPING;
+		
+		_doRefresh = true;
 		
 		 //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);

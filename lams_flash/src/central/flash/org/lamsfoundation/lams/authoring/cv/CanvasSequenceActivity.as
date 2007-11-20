@@ -110,6 +110,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		_tm = ThemeManager.getInstance();
 		_ccm = CustomContextMenu.getInstance();
 		_ddm = getDDM();
+		_children = new Array();
 		
 		//Get reference to application and design data model
 		app = ApplicationParent.getInstance();
@@ -149,7 +150,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		}
 		
 		_canvasModel = CanvasModel(_canvasController.getModel());
-		_children = _ddm.getComplexActivityChildren(_activity.activityUIID);
+		
+		if(ComplexActivity(_activity).firstActivityUIID != null)
+			_children.push(_ddm.getActivityByUIID(ComplexActivity(_activity).firstActivityUIID));
 		
 		showAssets(false);
 		
@@ -158,13 +161,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 			refresh();
 		}
 		
-		if(_children.length > 0)
-			SequenceActivity(_activity).empty = false;
-		
 		removeAllChildren();
-		
 		children_mc = new Array();
 		
+		if(_children.length > 0) {
+			SequenceActivity(_activity).empty = false;
+			drawChildActivity(_children[_children.length-1]);
+		}
+		
+			
+		/**
 		for(var i=0; i<_children.length; i++) {
 			if(_module == "monitoring")
 				children_mc[i] = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorView, _module:"monitoring", learnerContainer:learnerContainer, _sequenceChild:true});
@@ -185,6 +191,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 			
 			children_mc[i]._visible = true;
 		}
+		*/
 		
 		var _newVisibleWidth:Number = (_children.length*CHILD_INCRE) + (CHILD_OFFSET_X*2) + 6;
 		if(_newVisibleWidth > CanvasSequenceActivity.TOOL_ACTIVITY_WIDTH)
@@ -195,10 +202,33 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		MovieClipUtils.doLater(Proxy.create(this, draw));
 	}
 	
+	private function drawChildActivity(a:Activity):Void {
+		var childActivity:MovieClip;
+		if(_module == "monitoring")
+			childActivity = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+a.activityUIID, childActivities_mc.getNextHighestDepth(), {_activity:a , _monitorController:_monitorController, _monitorView:_monitorView, _module:"monitoring", learnerContainer:learnerContainer, _sequenceChild:true});
+		else
+			childActivity = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+a.activityUIID, childActivities_mc.getNextHighestDepth(), {_activity:a , _canvasController:_canvasController, _canvasView:_canvasView, _sequenceChild:true});
+
+		//set the positioning co-ords
+		childActivity.activity.xCoord = CHILD_OFFSET_X + ((_children.length-1) * CHILD_INCRE);
+		childActivity.activity.yCoord = CHILD_OFFSET_Y;
+		childActivity._visible = true;	
+		
+		children_mc.push(childActivity);
+		Debugger.log("children length: " + _children.length, Debugger.CRITICAL, "drawChildActivity", "CanvasSequenceActivity");
+		
+		var transitionObj:Object = _canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(childActivity.activity.activityUIID)
+		if(transitionObj.hasTrans && transitionObj.out != null) {
+			_children.push(_canvasModel.getCanvas().ddm.getActivityByUIID(transitionObj.out.toUIID))
+			drawChildActivity(_children[_children.length-1]);
+		}
+	}
 	
 	public function updateChildren():Void {
 		_visible = false;
 		_visibleWidth = CanvasSequenceActivity.TOOL_ACTIVITY_HEIGHT;
+		_children = new Array();
+		
 		init();
 	}
 	
@@ -459,5 +489,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	public function get container():MovieClip {
 		return childActivities_mc;
 	}
-
+	
+	public function get lastActivity():Activity {
+		return _children[_children.length-1];
+	}
 }

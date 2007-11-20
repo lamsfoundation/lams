@@ -98,6 +98,7 @@ class ToolkitController extends AbstractController {
 							// test mouse ptr 
 							var _children:Array = optionalOnCanvas[i].children;
 							var sequenceDropUIID:Number = null;
+							var sequence = null;
 							var mouseX = iconMouseX - optionalX;
 							var mouseY = iconMouseY - optionalY;
 							
@@ -105,12 +106,15 @@ class ToolkitController extends AbstractController {
 								if(mouseX >= _children[j].activity.xCoord && 
 								   mouseX <= (_children[j].activity.xCoord + _children[j]._width) &&
 								   mouseY >= _children[j].activity.yCoord && 
-								   mouseY <= (_children[j].activity.yCoord + _children[j]._height))
+								   mouseY <= (_children[j].activity.yCoord + _children[j]._height)) {
 									sequenceDropUIID = _children[j].activity.activityUIID;
+									sequence = _children[j];
+									break;
+								}
 							}
 							
-							if(sequenceDropUIID != null) {
-								cv.setDroppedTemplateActivity(ta, sequenceDropUIID);
+							if(sequenceDropUIID != null && sequence != null) {
+								cv.setDroppedTemplateActivity(ta, sequenceDropUIID, sequence);
 							} else {
 								var msg:String = Dictionary.getValue('activityDrop_optSequence_error_msg');
 								LFMessage.showMessageAlert(msg);

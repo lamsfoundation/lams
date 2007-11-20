@@ -297,7 +297,7 @@ class Canvas extends CanvasHelper {
 	 * @param   ta TemplateActivity
 	 * @return  
 	 */
-	public function setDroppedTemplateActivity(ta:TemplateActivity, taParent:Number):Void{
+	public function setDroppedTemplateActivity(ta:TemplateActivity, taParent:Number, sequence:CanvasSequenceActivity):Void{
 		
 		var actToCopy:Activity = ta.mainActivity;
 		//loosly typed this var as it might be any type of activity
@@ -385,10 +385,12 @@ class Canvas extends CanvasHelper {
 		//select the new thing
 		if (taParent != undefined || taParent != null){
 			var sequenceAct:Activity = canvasModel.getCanvas().ddm.getActivityByUIID(taParent);
-			if(sequenceAct.isSequenceActivity()) {
+			if(sequenceAct.isSequenceActivity() && sequence != null) {
 				actToAdd.orderID = canvasModel.getCanvas().ddm.getNextSequenceOrderID(sequenceAct.activityUIID);
-				if(actToAdd.orderID > 1) canvasModel.createSequenceTransition(sequenceAct, actToAdd);
-											
+				
+				if(actToAdd.orderID > 1) canvasModel.createSequenceTransition(sequence.lastActivity, actToAdd);
+				else ComplexActivity(sequenceAct).firstActivityUIID = actToAdd.activityUIID;							
+				
 				canvasModel.removeActivity(sequenceAct.parentUIID);
 			}
 			

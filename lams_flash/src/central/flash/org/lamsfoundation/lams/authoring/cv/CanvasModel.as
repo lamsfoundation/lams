@@ -63,6 +63,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		
 	}
 	
+	public function haltRefresh(a:Boolean):Void {
+		_doRefresh = !a;
+	}
+	
 	public function setDirty(){
 		_isDirty = true;
 		
@@ -72,7 +76,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			LFMenuBar.getInstance().enableExport(true);
 		}
 
-		refreshDesign();
+		if(_doRefresh) refreshDesign();
 	}
 	
 	public function lockAllComplexActivities():Void{
@@ -159,22 +163,24 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	 * @return  
 	 */
 	
-	public function createSequenceTransition(sequence:Activity, toActivity:Activity):Void {
-		var fromActivity:Activity
+	public function createSequenceTransition(fromActivity:Activity, toActivity:Activity):Void {
+	/**	var fromActivity:Activity;
 		var _children:Array = _cv.ddm.getComplexActivityChildren(sequence.activityUIID);
 		_children.sortOn('orderID', Array.NUMERIC);
 		
+		Debugger.log("toActivity orderID " + toActivity.orderID, Debugger.CRITICAL, "createSequenceTransition", "CanvasModel");
 		var _index:Number = toActivity.orderID - 2;
 		if(_index >= 0) {
 			fromActivity = _children[_index];
-		 
+			Debugger.log("fromActivity " + fromActivity.activityUIID, Debugger.CRITICAL, "createSequenceTransition", "CanvasModel");
+		*/
 			addActivityToTransition(fromActivity);
 			addActivityToTransition(toActivity);
 			resetTransitionTool();
-		}
+		//}
 		
 		 setDirty();
-	}
+	 }
 	
 	/**
 	 * Creates a new gate activity at the specified location
@@ -376,6 +382,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	public function removeOptionalCA(ca:Object, parentID){
 		//lets do a test to see if we got the canvas
 		Debugger.log('Removed Child '+ca.activity.activityUIID+ 'from : '+ca.activity.parentUIID,Debugger.GEN,'removeOptionalCA','CanvasModel');
+		haltRefresh(true);
 		
 		ca.activity.parentUIID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityUIID : null;
 		ca.activity.orderID = null;
@@ -384,20 +391,39 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		removeActivity(ca.activity.activityUIID);
 		removeActivity(parentID);
 		
+		haltRefresh(false);
 		setDirty();
 		
 	}
 	
 	public function removeOptionalSequenceCA(ca:Object, parentID){
+		haltRefresh(true);
+		
+		var sequence:Activity = _cv.ddm.getActivityByUIID(ca.activity.parentUIID);
+		var transitionObj:Object = _cv.ddm.getTransitionsForActivityUIID(ca.activity.activityUIID);
+		var toActivity:Activity = null;
+		var fromActivity:Activity = null;
 		
 		ca.activity.parentUIID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityUIID : null;
 		ca.activity.orderID = null;
 		ca.activity.parentActivityID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityID : null;
 		
-		getCanvas().ddm.removeTransitionByConnection(ca.activity.activityUIID);
+		if(transitionObj.into != null && transitionObj.out != null) {
+			toActivity = _cv.ddm.getActivityByUIID(transitionObj.out.toUIID);
+			fromActivity = _cv.ddm.getActivityByUIID(transitionObj.into.fromUIID);
+		} else if(transitionObj.into == null && transitionObj.out != null) {
+			ComplexActivity(sequence).firstActivityUIID = transitionObj.out.toUIID
+		}
+		
+		_cv.ddm.removeTransitionByConnection(ca.activity.activityUIID);
+		
+		if(toActivity != null) createSequenceTransition(fromActivity, toActivity);
+		
+		_cv.ddm.getComplexActivityChildren(sequence.activityUIID);
 		
 		removeActivity(parentID);
 		
+		haltRefresh(false);
 		setDirty();
 	}
 	 
@@ -406,11 +432,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	*/
 	public function removeComplexActivity(ca){
 		Debugger.log('Removing Complex Activity: ' + ca.activity.activityUIID,Debugger.GEN,'removeComplexActivity','CanvasModel');
+		haltRefresh(true);
 		
 		// recursively remove all children
 		removeComplexActivityChildren(ca.actChildren);
 		removeActivityOnBin(ca.activity.activityUIID);
 		
+		haltRefresh(false);
 		setDirty();
 	}
 	

@@ -255,13 +255,23 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 										}
 										
 										if(selectedSequence != null) {
-											ca.activity.orderID = _canvasModel.getCanvas().ddm.getNextSequenceOrderID(selectedSequence.activity.activityUIID);
-											_canvasModel.addParentToActivity(selectedSequence.activity.activityUIID, ca, false);
+											Debugger.log("ca " + ca.activity.activityUIID, Debugger.CRITICAL, "activityRelease", "CanvasController");
 											
-											if(ca.activity.orderID > 1) _canvasModel.createSequenceTransition(selectedSequence.activity, ca.activity);
+											ca.activity.orderID = _canvasModel.getCanvas().ddm.getNextSequenceOrderID(selectedSequence.activity.activityUIID);
+											Debugger.log("orderID " + _canvasModel.getCanvas().ddm.getNextSequenceOrderID(selectedSequence.activity.activityUIID), Debugger.CRITICAL, "activityRelease", "CanvasController");
+											
+											if(ca.activity.orderID > 1) _canvasModel.createSequenceTransition(CanvasSequenceActivity(selectedSequence).lastActivity, ca.activity);
+											else ComplexActivity(selectedSequence.activity).firstActivityUIID = ca.activity.activityUIID;							
+											
+											_canvasModel.addParentToActivity(selectedSequence.activity.activityUIID, ca, false);
+					
+											
+											Debugger.log("ca " + ca.activity.activityUIID, Debugger.CRITICAL, "activityRelease", "CanvasController");
+											Debugger.log("orderID " + ca.activity.orderID, Debugger.CRITICAL, "activityRelease", "CanvasController");
 											
 											CanvasSequenceActivity(selectedSequence).updateChildren();
 											CanvasOptionalActivity(_canvasModel.activitiesDisplayed.get(selectedSequence.activity.parentUIID)).updateChildren();
+											
 										} else {
 											activitySnapBack(ca);
 											var msg:String = Dictionary.getValue('activityDrop_optSequence_error_msg');
