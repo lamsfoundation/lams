@@ -22,6 +22,8 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
+<title>LAMS: Learner</title>
+<link rel="stylesheet" href="/webct/css/styles.jsp?locale=en_US&Id=9778001&colorSetId=A" type="text/css" />
 <script language="JavaScript" type="text/javascript">
 <!--
 	var learnerWin = null;
@@ -50,7 +52,7 @@
 
 </script>
 </head>
-<body>
+<body class="listingpage">
 <b>LAMS Lessons Running</b>
 <br>
 <br>

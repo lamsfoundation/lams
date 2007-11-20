@@ -409,6 +409,94 @@ public class LamsModule extends AuthenticationModule
         	}
         	return true;
         }
+        else if(action.equals("modify_lesson"))
+        {
+        	try{
+	        	LamsLessonDaoJDBC lessonDao = new LamsLessonDaoJDBC(settings);
+	        	LamsLesson modLesson = lessonDao.getDBLesson(request.getParameter("lsID"));
+	        	
+	        	
+	        	params.put("lsID", request.getParameter("lsID"));
+	        	params.put("title", modLesson.getTitle());
+	        	params.put("description", modLesson.getDescription());
+	        	params.put("start", modLesson.getStartDate());
+	        	params.put("end", modLesson.getEndDate());
+	        	
+	
+	        	if (modLesson.getHidden()) 
+	        	{
+	        		params.put("hidden", "true");
+	        		params.put("notHidden", "false");
+	        	}
+	        	else
+	        	{
+	        		params.put("hidden", "false");
+	        		params.put("notHidden", "true");
+	        	}
+	        	
+	        	
+	        	if (modLesson.getSchedule())
+	        	{
+	        		params.put("schedule", "true");
+	        		params.put("notSchedule", "false");
+	        	}
+	        	else
+	        	{
+	        		params.put("schedule", "false");
+	        		params.put("notSchedule", "true");
+	        	}
+	        	
+	        	
+	        	html = this.generatePage("web/modify.vm", params);
+        	}
+        	catch (Exception e)
+        	{
+        		log.error("Error creating LAMS lesson modify page: ", e);
+        		throw new LoginException("Error creating LAMS lesson modify page: " + e.getMessage());
+        	}
+        	
+        }
+        else if(action.equals("modify_proc"))
+        {
+        	LamsLessonDaoJDBC lessonDao = new LamsLessonDaoJDBC(settings);
+        	
+        	
+        	try{
+	        	LamsLesson modLesson = lessonDao.getDBLesson(request.getParameter("lsID"));
+	        	
+	        	modLesson.setTitle(request.getParameter("title"));
+	        	modLesson.setDescription(request.getParameter("description"));
+	        	modLesson.setHidden(request.getParameter("isAvailable").equals("true"));
+	        	modLesson.setSchedule(request.getParameter("schedule").equals("true"));
+	        	
+	        	
+	        	//TODO: DO SOMETHING ABOUT DATES
+	        	//Date start = new Date(0);
+	        	//Date end = new Date(0);
+	        	
+	        	boolean success = lessonDao.updateLesson(modLesson);
+	        	
+	
+	        	if (success)
+	        	{
+	        		params.put("successMessage", "LAMS lesson updated successfully.");
+	        	}
+	        	else
+	        	{
+	        		params.put("successMessage", "Unable to update LAMS lesson.");
+	        	}
+
+        		html = this.generatePage("web/lessonCreated.vm", params);
+        	
+        	
+        	}
+        	catch (Exception e)
+        	{
+        		log.error("Error creating LAMS lesson created page: ", e);
+        		throw new LoginException("Error creating LAMS lesson created page: " + e.getMessage());
+        	}
+        	
+        }
         
         
         super.setResponseContent(html);

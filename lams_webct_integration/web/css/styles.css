@@ -1,0 +1,1500 @@
+/* GENERAL GENERAL GENERAL GENERAL GENERAL   */
+body {height:100%;}
+/* Default typeface & type size spec */
+td,th,body,p,a,ul,li,ul ul {font-family: Verdana,Arial,Helvetica,sans-serif; font-size: 13px;}
+h1 {font-size:110%; font-weight:bold; margin:0px;}
+h2 {font-size:100%; font-weight:bold; margin:0px; }
+h3 {font-size:100%; font-weight:bold; margin:0px; }
+h2.form {margin:0px; display:inline;}
+h3.form {margin:0px; display:inline;}
+/* Standard highlight/alert color/treatment*/
+.hilite {background-color: #ffc;}
+.alert {color:#f00;}
+/* Help text treatment*/
+div.helptext {margin:6px 0px 3px;}
+/*general style for sizing and styling text*/
+.textsmall, .textsmall a {font-size: 80%; font-weight: normal;}
+.textsmall2 {font-size: 90%; font-weight: normal;}
+td.smalltext, .smalltext {font-size:70% !important;}
+.big {font-weight:bold; font-size:16px; font-family:arial,helvetica;}
+.boldme, .boldme a {font-weight:bold;}
+tr.alignMiddle td, td.alignMiddle, .alignMiddle {vertical-align:middle;}
+.normalfont {font-weight:normal !important;}
+/*used for the close window links on popup windows*/
+.closewindow {
+padding:3px 3px 4px 12px;
+background:#e4eaef;
+position:relative;
+left:-10px;
+margin:0px -10px 0px 0px;
+}
+.closewindow a {display:block; width:100%; color:#000000;}
+/*standard styles for hiding and showing items*/
+.hideme {display:none;}
+.showme {display:block;}
+.hideme2 {position:relative; display:none;}
+.silent {visibility:hidden; volume:silent;}
+.hideoff {
+position:absolute;
+top:0px;
+left:-1000px;
+width:1px;
+height:1px;
+overflow:hidden;
+}
+/*style applied to the icon of hidden objects or tools*/
+img.hidden{opacity: 0.4; filter:alpha(opacity=40) gray; -moz-opacity:0.4;}
+/*used in many places to add some spacing around a paragraph*/
+.paragraphwide {margin:6px 0px; padding:3px 0px;}
+/*used a few places to create extra padding*/
+.padme {padding:4px;}
+.padme2 {padding:8px;}
+/*style for empty page content*/
+.emptylist, table.emptylist td, tr.emptylist td {margin:8px 0px; font-size:110%; padding:15px; background-color:#eeeeee;}
+/* empty lists: this is the drop-shadow effect for the helptext that appears on "empty" pages */
+div.emptycontainer {width:100%; margin:6px 0px;}
+div.emptyshadow {background-color:#aaaaaa; position:relative; right:-6px; bottom:-6px; margin:0 6px 20px 0px;}
+div.emptytext {position:relative; left:-6px; top:-6px; background-color:#f1f1f1; border: 1px solid #a9a9a9; padding:10px 10px 15px 10px; text-align:left; color:#000000;}
+div.emptytext h1 {color:#000000;font-size:100%; margin: 6px 0px 0px 12px;}
+div.emptytext p {width:80%; margin: 6px 0px 12px 12px; padding:0px;}
+div.emptytext ul {width:80%; margin: 6px 0px 12px 12px; padding:0px; list-style-type:none;}
+div.emptytext li {line-height:120%; margin:6px 0px;}
+div.emptytext a {color:black;}
+div.emptytext h2, .taskpage div.emptytext h2 {padding:6px 3px 0px 3px; border:0px;}
+/* used for success confirmation div */
+.success {
+border:1px solid #f90;
+background-color:#ff9;
+padding:3px 3px 3px 20px;
+margin:6px 0px 0px 0px;
+background-image:url(/webct/images/small_success.gif);
+background-repeat:no-repeat;
+background-position:3px 5px;
+color:#000;
+}
+.errordiv {color:red;}
+.errordiv2 {
+color:red;
+border:1px solid #f00;
+background-color:#ffc;
+padding:3px 3px 3px 20px;
+margin:6px 0px 0px 0px;
+background-image:url(/webct/images/small_error.gif);
+background-repeat:no-repeat;
+background-position:3px 5px;
+}
+/* END GENERAL */
+/*_______________________________________________________________________*/
+/* FORMS FORMS FORMS FORMS FORMS */
+form {margin:0px;}
+/* All form elements (e.g. keeps text entry boxes reasonable size in Netscape) */
+input,textarea,select {font-size: 100%; font-family: Verdana,Arial,Helvetica,sans-serif;}
+select {vertical-align:middle;}
+form.checkbox{margin:0; padding:0; border:0;}
+/* read-only form fields. -- "readonly" is a class, not the readonly attribute */
+input.readonly {border-width:0px;}
+/* used on select fields to maintain consistent width */
+.cselect {width : 15em;}
+.cselect2 {width : 18.4em;}
+/*main style for all input buttons at the bottom of task pages*/
+input.task {
+display:inline !important;
+color:#555;
+background-color: #ddd;
+border: 1px solid #888;
+font-weight:bold;
+font-size: 13px;
+padding: 0px 7px 0px 7px !important;
+text-decoration:none;
+vertical-align:middle;
+margin:0px;
+overflow: visible;
+height:21px;
+}
+/* textarea and textblock styles
+Note: For desc the height is always 120 more than the applet if it is used in the editor applet code.
+*/
+.desc {width:400px; height:120px; vertical-align:middle;}
+.descApplet {width:574px; height:300px; vertical-align:middle;}
+.descForm {width:400px; height:120px; vertical-align:middle;}
+input.title {width:400px;vertical-align:middle;}
+.titlewide {width:500px;vertical-align:middle;}
+.text{width:250px;vertical-align:middle;}
+.textwide{width:500px;vertical-align:middle;}
+input.browse{width:314px;vertical-align:middle;}
+/* END FORMS */
+/*_______________________________________________________________________*/
+/* LINKS LINKS LINKS LINKS LINKS */
+A {text-decoration:underline;}
+a.nounder, a.nounder:active{text-decoration:none;}
+a.nounder:hover{text-decoration:none;}
+/*class for most icons including the contextual menu trigger. works on gray background too! */
+a.inline2:link, a.inline2:visited, a.inline2:active,
+a.inline:link, a.inline:visited, a.inline:active,
+a.go:link, a.go:visited, a.go:active {background:#EAEAEA url(/webct/images/button2_fade.jpg);border: 1px solid #F1F1F1;padding:1px;}
+a.inline2:hover, a.inline:hover, a.go:hover {background:#F1F1F1 url(/webct/images/button_over.jpg);padding:1px;}
+.inline2 img, .inline img, .go img {vertical-align:middle;border:0px;}
+/*used on color selection pages to add some space under the inline icon*/
+.inlinepad img {margin-bottom:5px;}
+/*standard styles for all page level controls*/
+a.action, a.action:link, a.action:visited, a.action:active{
+display:inline !important;
+color:#000;
+background-color: #ddd;
+border: 1px solid #888;
+font-weight:bold;
+padding: 1px 8px 2px 8px !important;
+text-decoration:none;
+cursor:pointer;
+margin:0;
+white-space:nowrap;
+background: url(/webct/images/button2_fade.jpg);
+}
+a.action:hover{
+color:#444;
+background-color: #fff;
+border: 1px solid #555;
+background: url(/webct/images/button_over.jpg);
+}
+a.action img, a.action:link img, a.action:hover img, a.actionlight mig, a.actionlight:link img, a.actionlight:hover img {vertical-align:middle; border:none;margin-right:0px;}
+/*lignt version of action (not bold)*/
+a.actionlight {
+display:inline;
+color:#000;
+background-color: #ddd;
+border: 1px solid #888;
+padding: 1px 8px 2px 8px;
+text-align:center;
+text-decoration:none;
+white-space:nowrap;
+vertical-align:middle;
+background: url(/webct/images/button2_fade.jpg);
+}
+a.actionlight:hover{
+color:#444;
+background-color: #fff;
+border: 1px solid #555;
+background: url(/webct/images/button_over.jpg);
+}
+/*buttons that are not available for use*/
+a.actiondisabled, a.actiondisabled:link, a.actiondisabled:visited, a.actiondisabled:active{
+display:inline !important;
+color:#a9a9a9;
+background-color: #ddd;
+border: 1px solid #aaa;
+font-weight:bold;
+padding: 1px 8px 2px 8px;
+text-decoration:none;
+cursor:pointer;
+white-space:nowrap;
+margin:0;
+}
+a.actionlightdisabled, a.actionlightdisabled:link, a.actionlightdisabled:visited, a.actionlightdisabled:active{
+display:inline !important;
+color:#a9a9a9;
+background-color: #ddd;
+border: 1px solid #aaa;
+padding: 1px 8px 2px 8px;
+text-align:center;
+text-decoration:none;
+cursor:pointer;
+white-space:nowrap;
+vertical-align:middle;
+}
+/*buttons that need to wrap*/
+a.actionblock, a.actionblock:link, a.actionblock:visited, a.actionblock:active{
+display:block;
+margin-top:0px;
+width:160px;
+color:#000;
+background-color: #ddd;
+border: 1px solid #888;
+font-weight:bold;
+padding: 1px 8px 2px 8px !important;
+text-decoration:none;
+vertical-align:middle;
+background: url(/webct/images/button3_fade.jpg);
+}
+a.actionblock:hover{
+color:#444;
+background-color: #fff;
+border: 1px solid #555;
+background: url(/webct/images/button_over.jpg);
+}
+/* styles for editing formulas in Gradebook */
+a.actionpad, a.actionpad:link, a.actionpad:visited, a.actionpad:active{margin-right:15px;}
+a.pad {width:30px; margin:0px; padding:3px 6px;}
+a.fpad { margin:0px; padding:3px 3px;}
+/* END LINKS */
+/*_______________________________________________________________________*/
+/* TABLES TABLES TABLES TABLES TABLES TABLES */
+/* remove inherited borders from nested tables marked .clear */
+.clear,table.clear td,tr.clear,tr.clear td,table.clear {border:none !important; background-color : transparent !important;}
+/* remove all padding from a table */
+table.nopad tr, table.nopad th, tr.nopad {padding:0px;}
+th {text-align:left;}
+/* vertical rules for data tables */
+tr.data td, tr.data th, td.data, th.data {border-left:1px solid #999;}
+tr.data {border-right:1px solid #999;}
+tr.data td.left{text-align : left; vertical-align : top;}
+tr.data td.right {vertical-align : top;}
+.rightborderbold {border-right: 1px dotted #979797;}
+.rightborder {border-right:2px solid #000000;}
+/* used for move controls in data tables */
+.move, tr.subcell td.move, tr.subcell2 td.move {
+background-color:#efefef!important;
+border-right:1px solid #bdbdbd;
+text-align:center;
+padding-right:3px;
+padding-left:3px;
+font-size:70% !important;
+font-weight:normal !important;
+}
+th.move2, td.move2 {border-right:1px solid #aaaaaa; text-align:center; padding-right:3px; padding-left:3px;font-size:80% !important;font-weight:normal !important;}
+/* dividers lines */
+tr.divider2 td, tr.divider2 th, td.divider2, .divider2 {border-bottom:1px solid #bdbdbd;}
+tr.divider td, tr.divider th, td.divider, th.divider {border-bottom: 1px solid #797979;}
+tr.dividerl td, tr.dividerl th, td.dividerl, th.dividerl {border-bottom: 1px solid #ddd;}
+tr.dividertop td {border-top:1px solid #dedede !important;}
+/* fixed table cell widths for gradebook */
+.cellwidth {width:110px;}
+/* used in gradebook to keep cell widths fixed*/
+.hideoverflow{position:relative; width:108px; overflow:hidden; white-space:nowrap;}
+.hideheight{height:16px;}
+/* hilite bar */
+tr.hilite td {border-bottom:1px solid #666;}
+/* used for action menu frame and scrom top frame*/
+tr.dynheaderbottom td{background-color: #eaeaea;border-bottom : 2px solid #A9A9A9;border-top : 0px solid White;}
+/* make sure sort links in table headers are right color */
+tr.headcell th A,tr.headcell th A:link,tr.headcell th A:visited {color:black;}
+tr.headcell td A,tr.headcell td A:link,tr.headcell td A:visited {color:black;}
+tr.headcell td, tr.headcell th, .headcell {color:#394859 !important;text-decoration:none !important;font-weight:bold;background-color:#dedede !important;}
+tr.subcell td, tr.subcell th, .subcell {background-color:#ededed;font-weight:normal;color:black;text-decoration:none;vertical-align:middle;}
+tr.subcell td img {vertical-align:middle; border:none;}
+tr.subcell td select {vertical-align:middle;}
+tr.subcell2 td, tr.subcell2 th, .subcell2 {background-color:#e4eaef;font-weight:normal;color:black;text-decoration:none;}
+tr.footcell td, tr.footcell th, .footcell {background-color:#c9d2dc;border-left:1px solid #ffffff;}
+/* END TABLES */
+/*_______________________________________________________________________*/
+/* TABLEBODY STYLES USED FOR ALL DATA TABLES*/
+/* data table */
+.tablebody {background-color: #ffffff !important; border: 1px solid #999; width:100%; border-collapse:collapse; margin:6px 0px 0px 0px;}
+.tablebody td, .tablebody th, .tablebodyhier th {padding:3px; color:#000000;}
+/*header area*/
+.tablebody thead td.data, .tablebody thead th.data {border-left:1px solid #000000 !important;}
+.tablebody thead td, .tablebody thead th {text-decoration:none !important;font-weight:bold; vertical-align:top; border:none!important;}
+.tablebody thead td a, .tablebody thead th a {font-weight:bold; text-decoration:underline;}
+.tablebody thead td img, .tablebody thead th img, .tablebody thead th a img, .tablebody thead td a img, {vertical-align:middle; border:none;}
+.tablebody thead td input, .tablebody thead th input {vertical-align:middle;}
+/* data table body */
+.tablebody tbody td, .tablebody tbody th {border-bottom:1px solid #bdbdbd; vertical-align:top;}
+.tablebody tbody td, .tablebody tbody th, .tablebody tbody td a, .tablebody tbody td span.helptext {color:#000000;}
+.tablebody tbody td img {vertical-align:middle; border:none;margin-right:2px;}
+.tablebody tbody td h2, .tablebody tbody td h3 {padding:0px;border:0px;display:inline;}
+.tablebody tbody td input {vertical-align:middle;}
+/* footer area*/
+.tablebody tfoot td {font-weight:normal; text-decoration:none; vertical-align:middle;}
+.tablebody tfoot td a:link, .tablebody tfoot td a:visited, .tablebody tfoot td a:active, .tablebody thead td a:link, .tablebody thead td a:visited, .tablebody thead td a:active {
+font-weight:normal;
+color:#000099;
+background-color:#ddd;
+padding: 2px 4px 2px 4px;
+margin: 0px 0px 0px 0px !important;
+text-decoration:none !important;
+white-space:nowrap;
+border: 1px solid #888;
+}
+.tablebody tfoot td a:hover, .tablebody thead td a:hover {background-color: #fff; border: 1px solid #333;}
+/* below styles offer clean slate, so the .go class can take effect */
+.tablebody tfoot td a.go:link, .tablebody tfoot td a.go:visited, .tablebody tfoot td a.go:active {
+background-color:#ddd;
+padding: 0px;
+margin: 0px 0px 0px 0px !important;
+border: 1px solid #888;
+}
+.tablebody tfoot td a.go:hover {background-color: #fff; border: 1px solid #333;}
+/* below styles offer clean slate to the insert link*/
+.tablebody tfoot td.move a  {padding: 0px;margin: 0px 0px 0px 0px !important;border: 0px;}
+.tablebody tfoot td img {vertical-align:middle; border:none;}
+.tablebody tfoot td select {vertical-align:middle;}
+/*tablebody3 that has vertical dividers add this to tablebody in the class*/
+table.tablebody3 td, table.tablebody3 th {padding-left:3px; padding-right:2px;}
+.tablebody3 {border-left:none;}
+.tablebody3 thead th, .tablebody3 thead td {
+border-left:1px solid #999 !important;
+height:22px;
+border-bottom:1px solid #999 !important;
+padding:0px 4px 0px 2px;
+}
+.tablebody3 thead th.insert, .tablebody3 tbody td.insert, .tablebody3 tfoot td.insert {
+background-color:#ededed !important;
+border-right:1px solid #ccc;
+border-left:1px solid #999;
+width:50px !important;
+font-size:8px;
+font-weight:normal;
+color:#333;
+text-align:right;
+padding:0px 2px 0px 2px;
+}
+.tablebody3 tbody td {
+height:22px;
+border-left:1px solid #999999;
+border-bottom:1px solid #CCCCCC;
+vertical-align:middle;
+padding:0px 4px 0px 2px;
+}
+.tablebody3 tfoot span {
+border: 1px solid #999999;
+vertical-align:middle;
+padding:0px;
+}
+.tablebody3 tfoot td {
+height:22px;
+border-left:1px solid #999999;
+vertical-align:middle;
+padding:1px 4px 1px 6px;
+}
+.tablebody3 thead td.subhead {font-weight:normal;}
+/*tablebodyhier for tables that have hierarchical lists in the cells add to tablebody in class*/
+.tablebodyhier, tablebodyhier td table {border-collapse:collapse;}
+.tablebodyhier td {padding:3px;}
+.tablebodyhier tbody td {padding:0px 2px 0px 1px !important;}
+.tablebodyhier tbody td table td {padding:0px;}
+td.notoppad, .tablebodyhier td.notoppad {padding-top:0px; padding-bottom:0px;}
+td.tee {background-image:url(/webct/images/om_menu_line2.gif); background-repeat:repeat-y; background-position:0px 0px;}
+/*special case tables added to tablebody in class*/
+.tablenobot {border-bottom : 0px solid #fff;}
+.tablebodyGB  {background-color: #fff !important; border: 1px solid #999; width:100%;}
+.tablebodyNoMarg {margin:0px;}
+.tableborder {border : 1px solid #cfcfcf; background-color : white;}
+/* END TABLEBODY STYLES */
+/*_______________________________________________________________________*/
+/* TABS TABS TABS TABS TABS TABS TABS TABS */
+/* Tabs (application-level navigation) */
+.activesupertab {font-family: Verdana, Arial, Helvetica, sans-serif; font-weight:bold !important; color:#000 !important; text-decoration:none !important; vertical-align:middle;}
+a.activesupertab:link, a.activesupertab:hover, a.activesupertab:active, a.activesupertab:visited {
+font-weight:bold !important;
+color:#000 !important;
+text-decoration:none !important;
+vertical-align:middle;
+font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+.idlesupertab {font-family: Verdana, Arial, Helvetica, sans-serif;  font-weight: bold; color: #ccc; text-decoration: none;}
+a.idlesupertab:hover {color: white; text-decoration: none;}
+tr.tablessarea td, td.tablessarea {background-image: url("/webct/images/back_A_0_transp.gif");}
+.activesubtab {font-family: Verdana, Arial, Helvetica, sans-serif; font-weight: bold; color: #000000; text-decoration: none;}
+.supertabactive {background-image: url("/webct/images/back_A_1.gif");}
+.supertabactive h1 {font-size:100%; color:black;}
+.supertabidle {background-image: url("/webct/images/back_A_0.gif");}
+/* tool level subtabs used in many tools*/
+/*encloses whole tabset to align it correctly on page*/
+.tabset {
+width:101%;
+position:relative;
+left:-10px;
+margin:10px -10px 0px 0px !important;
+padding:0px;
+}
+.tabsetleftmargin {
+border-bottom:2px solid #999;
+width:10px;
+padding-left:8px!important;
+}
+.tlsubtabactive {
+border-top:2px solid #999;
+border-left:2px solid #999;
+border-right:1px solid #999;
+padding:4px 8px;
+text-align:center;
+font-weight:bold;
+white-space:nowrap;
+/*border-bottom:1px solid #fff;*/
+background-image:url(/webct/images/ctx_tab_active.gif);
+background-repeat:no-repeat;
+}
+.tlsubtabidle {
+background-color:#ededed;
+border-top:1px solid #999;
+border-left:1px solid #999;
+border-bottom:2px solid #999;
+padding:4px 8px;
+text-align:center;
+color:#2d2680;
+white-space:nowrap;
+background-image:url(/webct/images/ctx_tab_idle.gif);
+background-position:bottom;
+background-repeat:repeat-x;
+}
+.tlsubtabidle a, .tlsubtabover a{color:#2d2680;}
+.tlsubtabactive a, .tlsubtabidle a, .tlsubtabhover a{display:inline; text-decoration:none !important;}
+.tlsubtabover {
+background-color:#dedede;
+border-top:1px solid #999;
+border-left:1px solid #999;
+border-bottom:2px solid #999;
+padding:4px 8px;
+text-align:center;
+color:#2d2680;
+white-space:nowrap;
+}
+.tlsubtabnone {
+border-bottom:2px solid #999;
+border-left:1px solid #999;
+text-align:right;
+vertical-align:middle;
+}
+/* styles to control images in subtabs */
+.tlsubtabactive img, .tlsubtabidle img, .tlsubtabover img, .tlsubtabnone img {vertical-align:middle; border:none;}
+.tlsubtabnone select {vertical-align:middle;}
+/* used in the context manager tabs that collapse and expand*/
+td.collTab a img {background-color:#cccccc; vertical-align:bottom; border-top:1px solid #bbbbbb; border-left:1px solid #bbbbbb;}
+td.collTab {border-bottom:2px solid #999999; vertical-align:bottom;}
+a.hideTab  {display:none!important;}
+a.showTab {display:inline!important;}
+/*used in ecms contentBrowser*/
+a.sidetabidle {
+display:block;
+border:2px solid #cecece;
+padding:5px 0px 5px 5px;
+margin:0px 0px 0px 0px;
+text-decoration:none;
+font-size:100%;
+line-height:95%;
+text-align:center;
+color:#000;
+position:relative;
+right:0px;
+}
+a.sidetabactive {
+display:block;
+border-left:2px solid #000;
+border-bottom:2px solid #000;
+border-top:2px solid #000;
+background:#EDEDED;
+padding:5px 0px 5px 5px;
+margin:0px 0px 0px 0px;
+text-decoration:none;
+font-size:100%;
+line-height:95%;
+position:relative;
+right:-2px;
+text-align:center;
+color:#000;
+}
+a.sidetabidle img, a.sidetabactive img {vertical-align:middle;display:block;border:0px;}
+a.sidetabidle div, a.sidetabactive div {text-align:center;}
+.sidetabidle div img, .sidetabactive div img {border:0px; margin:0 auto;}
+.activesearchsubbutton {
+text-decoration:none;
+border:1px solid #000;
+background:#fff;
+font-weight:normal;
+font-size:80%;
+padding: 1px 10px !important;
+text-align:center;
+}
+.idlesearchsubbutton {
+text-decoration:none;
+border:1px solid #ededed;
+background:#ededed;
+font-weight:normal;
+font-size:80%;
+padding: 1px 10px !important;
+text-align:center;
+}
+/* END TABS */
+/*_______________________________________________________________________*/
+/* STYLES FOR LEFT FRAME COURSE TOOLBAR*/
+.menubg{background-color: #eee;}
+/*standard course toolbar buttons*/
+.flylinkct {
+display:block;
+padding:2px 3px 1px 2px;
+border-bottom:1px solid #798CA1;
+text-decoration:none;
+vertical-align:middle;
+white-space:nowrap;
+}
+.flylinkct a, .flylinkcthigh a, .flylinkctover a {text-decoration:none;}
+a.flylinkct:hover, .flylinkctmo, .flylinkct a:hover {
+display:block;
+padding:2px 3px 1px 2px;
+border-bottom:1px solid #798CA1;
+text-decoration:none;
+vertical-align:middle;
+white-space:nowrap;
+}
+.flylinkctover {
+display:block;
+padding:0px 1px 0px 0px;
+border:2px solid #000;
+text-decoration:none;
+vertical-align:middle;
+white-space:nowrap;
+}
+/*for the menu legend*/
+.flylinkctleg {
+display:block;
+padding:2px 3px 5px 2px;
+text-decoration:none;
+vertical-align:middle;
+color:#000 !important;
+}
+/*style for the course map*/
+.opencm{
+display:block;
+border-left:1px solid #798CA1;
+border-right:1px solid #798CA1;
+border-bottom:1px solid #fff;
+height:98%;
+text-align:center;
+vertical-align:middle;
+width: 24px;
+voice-family: "\"}\"";
+voice-family: inherit;
+width: 20px;
+}
+.closedcm{
+display:block;
+background-color:#fff;
+padding:0px 0px 0px 1px;
+margin:0px;
+border-left:2px solid #798CA1;
+border-bottom:1px solid #798CA1;
+height:98%;
+text-align:center;
+vertical-align:middle;
+width: 24px;
+voice-family: "\"}\"";
+voice-family: inherit;
+width: 20px;
+}
+.closedcmspan{display:block; vertical-align:middle;}
+.expmenu{
+background-color:#fff;
+padding:2px;
+padding-left:4px;
+border-left:2px solid #798CA1;
+border-bottom:2px solid #798CA1;
+border-top:none;
+border-right:1px solid #798CA1;
+margin-left:0px;
+}
+/*styles for menu items displayed horizonally*/
+.flylinkctlines {border-top:1px solid #798CA1;border-left:1px solid #798CA1;}
+.flylinkctlines2 {border-right:1px solid #798CA1;}
+/*tools area buttons (grey)*/
+.flylink2 {
+background-color:#ccc;
+display:block;
+padding:2px 3px 1px 2px;
+border-bottom:1px solid #798CA1;
+text-decoration:none;
+vertical-align:middle;
+color:#000099;
+white-space:nowrap;
+}
+.flylink2:hover {background-color:#efefef;border-bottom:1px solid #444;}
+/* pallette headers */
+.flytitle {display:block;white-space:nowrap;background: #000 url(/webct/ctb/images/menu_back.gif) repeat-x;}
+.flytitle2 {white-space:nowrap;background: #000 url(/webct/ctb/images/menu_back.gif) repeat-x;}
+.flytitletext{
+font-weight:bold;
+color:#fff;
+padding:4px;
+background: url(/webct/ctb/images/menu_back_left.gif) no-repeat;
+text-decoration:none;
+}
+.flytitle a, flytitletext a {font-weight:bold;color:#ffffff;text-decoration:none;}
+.flytitletext2{font-weight:bold;color:#fff;text-decoration:none;}
+/* applied to pallette button divs */
+.pallettebuttons{border-right: 1px solid #666 !important;border-left: 1px solid #666;}
+/* pullout bar for menu */
+.flypull {
+position:absolute;
+top:0px;
+padding:0px;
+display:block;
+width:18px;
+height:96%;
+vertical-align:middle;
+background-color: #eee;
+}
+/*style for top frame to match the color of the menu*/
+.subtabrow {background-color:#eee;}
+/* style for overall div of whole course menu */
+.flytable{width:auto;}
+/*style given to the hidden indicator in the course menu*/
+.hiddenletter{display:inline;font-size:105%;font-weight:bold;}
+/* END STYLES FOR LEFT FRAME COURSE TOOLBAR*/
+/*_______________________________________________________________________*/
+/* CONTEXTUAL MENUS  CONTEXTUAL MENUS  CONTEXTUAL MENUS  CONTEXTUAL MENUS*/
+/*standard style for any contextual menu link*/
+.contextlink {
+text-decoration:none !important;
+font-weight:normal;
+background-color:#cecece;
+padding:1px 4px 2px 2px;
+border:1px solid #cecece;
+white-space:nowrap;
+display:block;
+color:#000;
+}
+a.contextlink:hover {background-color:#f8fafd;border:1px solid #333;}
+/*style for onMousedown event for contextual menus*/
+a.contextlinkover {
+text-decoration:none !important;
+font-weight:normal;
+background-color:#fff;
+padding:1px 4px 2px 2px;
+border:1px solid #ffcc33;
+display:block;
+white-space:nowrap;
+color:#000;
+}
+/*style for top bar of contextual menus*/
+.contextmenubar {
+text-align:right !important;
+background-color:#999;
+padding:1px;
+display:block;
+}
+/*style div that contains contextual menu*/
+.contextdiv{
+position:absolute;
+visibility:hidden;
+left:0;
+top:0;
+text-align:left;
+z-index:10;
+border:2px solid #000!important;
+width:auto;
+text-align:left;
+}
+/*style div that divides contextual menu options into groups.
+Every contextlink has to be paced inside a div with this style applied to it.
+contextmenubar has to remain outside of contextblock*/
+.contextblock {padding:2px 3px 2px 3px;background:#cecece;border-bottom:1px solid #999;}
+/*used for the move controls on contextual menus*/
+.ctbright{display:block; text-align:center;}
+/*get the images inside a contextual menu to center align*/
+.contextlink img {border:none!important; vertical-align:middle;}
+/*styles for the move controls on contetual menus*/
+.moveBoxTable{padding:0px; margin:0px;}
+.moveBox{background-color:#cecece; text-align:center;}
+.moveBoxover{background-color:#e0e0e0; text-align:center;}
+.moveText{padding:3px;}
+/* END CONTEXTUAL MENUS*/
+/*_______________________________________________________________________*/
+/*ADD CONTENT LINK STYLES*/
+/*given to span*/
+.addlist {background-color:#fafafa;width:240px;display:block;}
+.addlist a{text-decoration : none !important;}
+/*given to span that contains area that is initially hidden*/
+.adddrop {
+display:none;
+font-size:90%;
+background-color:#fafafa;
+border-bottom:1px solid #444;
+border-right:1px solid #444;
+border-left:1px solid #444;
+text-align:left;
+clear:left;
+margin:15px;
+}
+/*Used for contextlink after it is expanded in an adddrop menu*/
+.contextlinkexp {
+text-decoration : none !important;
+font-weight:normal;
+background-color:#ffc;
+padding: 1px 4px 2px 2px;
+border-left : 1px solid #000;
+border-top : 2px solid #000;
+border-right : 1px solid #000;
+border-bottom : 1px solid #cccc63;
+display:block;
+white-space:nowrap;
+}
+/*span for instructions that sit inside of an adddrop area*/
+.adddropinstruct {display:block; width:170px;}
+/*style for the expanded adddrop*/
+.adddrophigh {
+font-size:90%;
+background-color:#ffc;
+border-bottom:2px solid #000;
+border-right:1px solid #444;
+border-left:1px solid #444;
+font-size:90%;
+padding:7px;
+clear:left;
+padding-bottom:20px;
+color:#000;
+}
+.adddrophigh select {margin-top:5px;margin-bottom:10px;}
+.topmarg {padding-top:8px;}
+.adddrophigh.adddropinstruct {margin-bottom:10px;}
+.adddrophigh.adddropbutton {margin-bottom:12px;}
+/*puts the close button on the far right*/
+.pushright{position:absolute;left:203px;}
+/*END ADD CONTENT LINK STYLES*/
+/*_______________________________________________________________________*/
+/*BREADCRUMB STYLES BREADCRUMB STYLES BREADCRUMB STYLES BREADCRUMB STYLES*/
+.breadcrumbs {
+padding:4px 12px 4px 8px !important;
+font-weight:bold;
+position:relative;
+left:-10px;
+margin:0px -10px 0px 0px;
+background:url(/webct/images/dot_back_4.gif);
+background-position:bottom;
+background-repeat:repeat-x;
+background-color:#fff;
+color:#000;
+}
+td.breadcrumbtd div {
+font-weight:bold;
+background-color:#fff !important;
+color:#000 !important;
+border:none !important;
+}
+td.breadcrumbtd {background-color:#fff !important;}
+.breadcrumbs span, td.breadcrumbtd div span {color:#696969 !important; font-weight:normal;}
+.breadcrumbs a:link, .breadcrumbs a:active, .breadcrumbs a:visited, .breadcrumbs a, td.breadcrumbtd div a  {color:#696969 !important; font-weight:normal !important;}
+.breadcrumbs a:hover{color:#000 !important;}
+.breadcrumbs img, .breadcrumbs a img {vertical-align:middle; border:none;margin-right:3px;}
+.breadcrumbs img#divider {vertical-align:middle;border:none;margin-right:0px;}
+.breadcrumbs a.back, .breadcrumbs a.back:link, .breadcrumbs a.back:visited, .breadcrumbs a.back:active {
+text-decoration:none;
+background:#eaeaea url(/webct/images/button2_fade.jpg);
+font-weight:bold !important;
+padding:0px 5px 0px 5px;
+margin-right:4px;
+border: 1px solid #f1f1f1;
+}
+.breadcrumbs a.back:hover {background:#f1f1f1 url(/webct/images/button_over.jpg);color:#000000 !important;}
+/*END BREADCRUMB STYLES*/
+/*_______________________________________________________________________*/
+/*TOGGLE STYLES TOGGLE STYLES TOGGLE STYLES TOGGLE STYLES*/
+/* used on small icon in top frame and in mail for toggling menu frame*/
+a.toggle:link img, a.toggle:visited img, a.toggle:active img {background-color: transparent; border: 1px solid #cecece;}
+a.toggle:hover img {
+background-color: white !important;
+border-left: 1px solid #888;
+border-top: 1px solid #888;
+border-right: 1px solid white;
+border-bottom: 1px solid white;
+}
+/*main toggle style for most toggle buttons*/
+a.toggon:link, A.toggon:visited, A.toggon:active {
+color:black;
+background-color: #dedede;
+border: 1px solid #dedede;
+font-weight:normal;
+padding: 2px 3px;
+text-decoration:none;
+display:inline;
+}
+a.toggon:hover {background-color: #fff; border: 1px solid #fff;}
+a.toggoff:link, A.toggoff:visited, A.toggoff:active, .toggoff {
+color:#4f4f4f;
+background-color: #fff;
+border: 1px solid #888;
+padding: 1px 8px 2px 8px;
+text-decoration:none;
+display:inline !important;
+font-weight:bold;
+}
+a.toggoff img, .toggoff img, .toggoffdiv img, a.toggon img {margin-right:0px !important;}
+/*used in content browser (file manager) for the 2 main buttons on the left */
+.activebutton {
+text-decoration:none;
+border:2px solid #000;
+background:#fff;
+font-weight:normal;
+padding: 1px 4px;
+display:block;
+text-align:center;
+}
+a.idlebutton:link, a.idlebutton:visited, a.idlebutton:active {
+text-decoration:none;
+border:2px solid #ededed;
+background:#ededed;
+font-weight:normal;
+padding: 1px 4px;
+display:block;
+text-align:center;
+}
+a.idlebutton:hover{background:#fff;}
+/*used in mail and assessments for live toggles that sit above table*/
+a.idletoggle:link, a.idletoggle:visited, a.idletoggle:active {
+color:black;
+background-color: #ededed;
+border: 1px solid #ededed;
+font-weight:normal;
+padding: 2px 3px;
+text-decoration:none;
+display:inline;
+}
+a.idletoggle:hover {background-color: #fff; border: 1px solid #fff;}
+a.activetoggle:link, a.activetoggle:visited, a.activetoggle:active {
+color:#4f4f4f;
+background-color: #fff;
+border: 1px solid #888;
+padding: 1px 8px 2px 8px;
+text-decoration:none;
+display:inline !important;
+font-weight:bold;
+}
+.activetogglediv {
+color:#4f4f4f;
+background-color: #fff;
+border: 1px solid black  !important;
+font-weight:normal;
+padding: 1px 8px 2px 8px;
+display:inline;
+text-decoration:none;
+text-align:center;
+}
+.activetogglediv a {text-decoration:none;}
+/* next two styles are used in admin/ecms to toggle between the browse and query controls in the nav frame */
+.querybuttondiv {
+padding:6px;
+white-space:nowrap;
+background:#ededed url(/webct/images/dot_back_2.gif);
+position:relative;
+left:-10px;
+margin:0px -10px 6px 0px;
+}
+.browsebuttondiv {
+padding:6px;
+white-space:nowrap;
+background:#ededed url(/webct/images/dot_back_2.gif);
+margin:0px;
+}
+/*END TOGGLE STYLES*/
+/*_______________________________________________________________________*/
+/* ADMIN NAVBAR STYLES ADMIN NAVBAR STYLES ADMIN NAVBAR STYLES */
+/* the org level lists the levels you can choose from when navigating "down" or "into" the hierarchy */
+table.orglevel {margin:0px; border:1px solid #a9a9a9; width:100%;}
+table.orglevel td {background-color:#fff; padding:0px 1px 1px; vertical-align:top;}
+table.orglevel a:link, table.orglevel a:visited, .orglevel a:active {display:block; text-decoration:underline; color:#444; padding:1px 2px 4px; width:100%; height:100%;}
+table.orglevel a:hover, table.navlevel a:hover {background-color: #ffc;}
+table.orglevel tr.orghead td, table.orglevel tr.orghead td.tee {font-weight:bold; background-color:#ededed; padding:0px 1px;}
+/* the currentlevel table acts as a header that lists the current level */
+table.currentlevel {margin:0px; border:1px solid #666666; width:100%;}
+table.currentlevel td {
+font-weight:bold;
+color:white;
+background-color:#666666;
+padding:2px 1px;
+vertical-align:top!important;
+}
+table.currentlevel td.lineback {background-image:url(/webct/images/menu_line_back.gif); background-repeat:no-repeat; background-position:1px 10px;}
+/* the navlevel table lists the org levels into which you have already navigated...
+you can click on these to take you back up the hierarchy */
+table.navlevel {margin-left:3%; width:97%; border-collapse:collapse; border-top:1px solid #a9a9a9; border-right:1px solid #a9a9a9; border-left:1px solid #a9a9a9;}
+table.navlevel td {padding:0px 1px; border-bottom:1px solid #a9a9a9; background-color:#cecece; vertical-align:top!important;}
+table.navlevel td a:link, table.navlevel td a:visited, table.navlevel td a:active {display:block; text-decoration: underline; padding:1px 2px 4px; width:100%; height:100%;}
+/* directorytree lists files and folders. used primarily in content/file manager */
+table.directorytree {margin:0px; padding:0px 0px 3px; border-collapse:collapse; border:1px solid #a9a9a9; width:100%;}
+table.directorytree td {background-color:#FFFFFF; padding:0px; color:#000000;}
+table.directorytree td a {color:#000000;}
+/*styles used by the xtree script*/
+.contexthead {
+display:block;font-weight:bold;
+color:white;
+background-color:#666666;
+border:1px solid #666666;
+width:100%;
+}
+.webfx-tree-container {margin: 0px; padding: 0px; font: icon; white-space: nowrap;}
+.webfx-tree-item {padding: 0px;	font: icon;	white-space: nowrap;}
+.webfx-tree-item a, .webfx-tree-item a:active, .webfx-tree-item a:hover {margin-left: 0px; padding: 1px 2px 10px 0px;}
+.webfx-tree-item img {vertical-align: middle; border: 0px;}
+.webfx-tree-icon {width: 16px; height: 16px; margin: 0px 4px 0px 0px;}
+a.webfx-tree-item-active:link, a.webfx-tree-item-active:active, a.webfx-tree-item-active:hover, a.webfx-tree-item-active:visited  {background: #dedede; padding: 0px;}
+.grayback{background-color:#ededed; margin:0px;}
+/* this new iteration of admin navbar styles is designed for list markup
+it is currently used in the "copy section content" pop-up, and in the future, should replace the above styles*/
+div.navscroll {height:260px;overflow:auto;padding:2px 1px;}
+/* the orglist displays a list of child learning contexts */
+ul.orglist {
+list-style-type:none;
+margin:0px;
+padding:0px;
+border:1px solid #a2acbf;
+background-color:#FFFFFF;
+}
+ul.orglist li, ul.navlist li {
+margin:0px;
+padding:2px 1px;
+background-image:url(/webct/images/om_menu_line.gif);
+background-repeat:repeat-y;
+background-position:4px 0px;
+}
+ul.orglist li a {color:#444444;}
+ul.orglist li span, ul.orglist li a:link, ul.orglist li a:visited, .orglist li a:active {
+display:block;
+background-image:url(/webct/images/om_menu_tee.gif);
+background-repeat:no-repeat;
+background-position:3px 0px;
+padding:0px 0px 2px 22px!important;
+}
+ul.orglist a:hover, ul.navlevel a:hover {background-color: #FFFFCC;}
+ul.orglist li.last {
+background-image:url(/webct/images/om_menu_last.gif);
+background-repeat:no-repeat;
+padding-bottom:6px;
+}
+ul.orglist li.last a, ul.orglist li.last span {background-image:none !important;}
+/* the currentlevel li acts as a header that lists the current level */
+ul.orglist li.currentlevel {
+background-color:#333399;
+background-image:url(/webct/images/menu_line_back.gif)!important;
+background-position:4px 12px;
+padding:2px 1px;
+background-repeat:no-repeat;
+}
+ul.orglist li.currentlevel h2 {
+color:white;
+padding-left:22px;
+background-image:url(/webct/images/om_menu_tee_node.gif)!important;
+background-repeat:no-repeat;
+background-position:3px -2px;
+margin:0px;
+}
+/* the orghead li is a header that displays the "type" of child learning contexts in the list */
+ul.orglist li.orghead {
+background-color:#dddddd;
+padding-left:22px!important;
+}
+ul.orglist li.emptycontext {background-image:none; padding:20px;}
+/* .navlist lists the org levels into which you have already navigated...
+you can click	on these to take you back up the hierarchy */
+ul.navlist {
+list-style-type:none;
+padding:0px;
+margin:0px 0px 0px 16px!important;
+background-color:#CAD7EE!important;
+border-right:1px solid #a2acbf; border-left:1px solid #a2acbf;
+}
+ul.navlist li {border-top:1px solid #a2acbf;}
+ul.navlist li a:link, ul.navlist li a:visited, ul.navlist li a:active {
+display:block;
+background-image:url(/webct/images/om_menu_tee_node.gif);
+background-repeat:no-repeat;
+background-position:3px -2px;
+padding:0px 0px 2px 22px!important;
+}
+ul.navlist li a:hover {background-color:#ffffcc;}
+/* END ADMIN NAVBAR STYLES */
+/*_______________________________________________________________________*/
+/* HELP STYLES HELP STYLES HELP STYLES HELP STYLES HELP STYLES*/
+/* Code (fixed-width, preformatted) styles */
+.inlinecode{font-family:courier;}
+.code{font-family:courier;margin-top:1em;margin-bottom:1em;}
+/* table styles */
+table.helpgrid {border-top:1px solid #666; border-left:1px solid #666;margin-top:12px;}
+table.helpgrid td,table.helpgrid th {border-bottom:1px solid #666; border-right:1px solid #666;padding:6px;vertical-align:top;}
+.helpheadcell,tr.helpheadcell td,tr.helpheadcell th {background-color: #ddd;}
+.helpsubcell,tr.helpsubcell td,tr.helpsubcell th {background-color: #eee;}
+.helpshadecell,tr.helpshadecell td,tr.helpshadecell th {background-color:#eee;}
+/* Page headers*/
+.pageheader { FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; font-size:13px; font-weight:bold; color:#000; }
+.subheader { FONT-FAMILY: Verdana , Arial, Helvetica, sans-serif; font-size:12px; font-weight:bold; color:#666; }
+.tracked {background-color: #FF6;}
+/* metadata */
+.docmeta {display:none; speak:none;}
+/* page structure */
+.prolog {color: #333; display:block; margin-bottom:0.5em; padding:6px; background-color:#eee; border:1px solid #ccc;}
+span.title {font: 18px "Trebuchet MS",Times,serif; font-weight:bold; display:block; margin-bottom:1em;}
+p.para {padding:0em; margin:0.6em 0em;}
+.task,.concept {font-size:11px; padding:16px; color:#666; margin-bottom:4em;}
+/*don't know if span.title is used elsewhere in the app, so to be safe, creating a new
+almost identical rule for h1.title (SCR92566) */
+h1.title {font: 18px "Trebuchet MS",Times,serif; font-weight:bold; display:block; margin-bottom:1em;}
+/*list styles*/
+.lowerroman {list-style-type:lower-roman;}
+.loweralpha {list-style-type:lower-alpha;}
+.upperroman {list-style-type:upper-roman;}
+.upperalpha {list-style-type:upper-alpha;}
+.disc {list-style-type:disc;}
+/*Space before list items is determined by nesting level and item type (ordered or unordered)*/
+ul {margin-top:0.7em; margin-bottom: 1em;}
+ul li {margin-top: 0.75em;}
+li ul li {margin-top:0.5em;}
+li li ul li {margin-top:0.25em;}
+ol {margin-top:0.7em; margin-bottom: 1em;}
+ol li {margin-top: 1.25em;}
+li ol li {margin-top:0.75em;}
+li li ol li {margin-top:0.5em;}
+ul.sublist {margin-top:0.4em; margin-bottom:0em;}
+li.sublistitem {}
+/* inline elements within help content */
+.filename {font-weight:bold; color:#666;}
+.toolname {font-weight:bold; color:#666;}
+.docref {font-style:italic; color:gray;}
+.button {font-weight:bold;}
+.icon {font-weight:bold; color:#666;}
+.keystroke {font-family:courier; font-variant:small-caps;}
+.info {margin-top:0.75em; margin-bottom:1.5em; border:1px dashed #ccc; background-color:#f8f8f8; padding:8px;}
+div.prolog div.info {border:none; background:none;}
+.example,.warning,.tip,.important {display:block;}
+.notetable{margin-top:1em; margin-bottom: 1em;}
+.exampletable{margin-top:1em; margin-bottom: 1em;}
+.warningtable{margin-top:1em; margin-bottom: 1em;}
+.tiptable{margin-top:1em; margin-bottom: 1em;}
+.importanttable{margin-top:1em; margin-bottom: 1em;}
+/* Less vertical space if it appears in a list item */
+li.notetable{margin-top:0.5em; margin-bottom: 0.5em;}
+li.exampletable{margin-top:0.5em; margin-bottom: 0.5em;}
+li.warningtable{margin-top:0.5em; margin-bottom: 0.5em;}
+li.tiptable{margin-top:0.5em; margin-bottom: 0.5em;}
+li.importanttable{margin-top:0.5em; margin-bottom: 0.5em;}
+.notetitle {padding-right:10px;vertical-align:top;font-weight:bold; margin-right:0.5em;}
+.exampletitle {padding-right:10px;vertical-align:top;font-weight:bold; margin-right:0.5em;}
+.warningtitle {padding-right:10px;vertical-align:top;color:#F66; font-weight:bold; margin-right:0.5em;}
+.tiptitle {padding-right:10px;vertical-align:top;color:#006600; font-weight:bold; margin-right:0.5em;}
+.importanttitle {padding-right:10px;vertical-align:top;color:#F66; font-weight:bold; margin-right:0.5em;}
+/* remove extra borders that appear in nested note-type tables (SCR69984)*/
+.notetable TR TD, .exampletable TR TD, .warningtable TR TD, .tiptable TR TD, .importanttable TR TD{border: none;}
+.screenname {font-style:italic;}
+.screentext {font-style:italic;}
+.sectionheading {font-weight:bold; font-style:italic;}
+/*See Also*/
+.seealsoheading {font: 16px "Trebuchet MS",Times,serif; font-weight:bold; display:block; margin-top:2em; margin-bottom:1em;}
+.seealsolink {margin-left: 15px; margin-top: 2px;}
+/* END HELP STYLES */
+/*_______________________________________________________________________*/
+/* PAGETYPE STYLES PAGETYPE STYLES PAGETYPE STYLES PAGETYPE STYLES PAGETYPE STYLES*/
+/* "pagetitlediv" is used for page title*/
+.pagetitlediv {margin:0px 0px 0px 0px; padding:3px 0px;}
+/* this style manages table inside "pagetitlediv" should there be need to use one for multi-column layout*/
+.pagetitlediv table {border-collapse:collapse;}
+.pagetitlediv table td {vertical-align:middle; padding:3px 3px 3px 0px;}
+.pagetitlediv table td h1, .pagetitlediv table td img, .pagetitlediv img, .pagetitlediv h1 img {display:inline; vertical-align:middle;}
+.pagetitlediv table td h1, .pagetitlediv h1 {padding-right:5px;}
+/* "subtitlediv" is used for a secondary page title, such as those in admin that appear beneath an active tab*/
+.subtitlediv {margin:6px 0px 0px 0px; padding:3px 0px;}
+.subtitlediv h2 {font-size:100%;}
+/* "togglediv" is used to house assorted toggles */
+.togglediv {
+margin:0px 0px 0px 0px;
+padding:1px;
+white-space:nowrap;
+background: #FFF;
+border:1px solid #dedede;
+border-bottom:1px solid #FFF;
+width:100%;
+}
+.togglediv table {padding:0px;border-collapse:collapse;border:0px !important;width:100%;}
+.togglediv table td {padding:3px;color:#000;white-space:nowrap;}
+.togglediv table td img, .togglediv table td div img, .togglediv table td select, .togglediv select {vertical-align:middle;}
+/* "pagingdiv" houses paging controls*/
+.pagingdiv {width:100%;margin:6px 0px 0px 0px;text-align:right;}
+.pagingdiv img, .pagingdiv select {vertical-align:middle;}
+/* "actionbuttondiv" is used to contain page level controls */
+.actionbuttondiv {display:block; width:98%; margin:6px 0px 6px 0px;padding:6px 6px 0px 6px;background:#ededed url(../images/dot_back_2.gif); float:left; _padding-bottom:2px;}
+.actionbuttondiv a img {vertical-align:middle; float:none;}
+.actionbuttondiv a.actionlight, .actionbuttondiv a.actionlightdisabled, .actionbuttondiv span.actionright {float:right; margin-bottom:5px !important; margin-left:5px;}
+.actionbuttondiv a.action, .actionbuttondiv a.actiondisabled {margin-right:5px !important; margin-bottom:5px !important; float:left;}
+/*clear float for any item that may appear under the actionbuttondiv */
+.orgtable, .tablebody, .folderlist, .mytablebody, input, br, .actionbuttondiv, .simpletable, .emptytable, .togglediv, .controlset, .inventorytable, .tablebodyhier, .pagetitlediv, .allmydiscussions, .navcontainer, .discussioncategory, .listdata, body.taskpage h2, body.listingpage h2, .tabset, .emptycontainer, .helptext, .subtitlediv, .taskcategorynotop, .addlist {clear:left};
+/* "actionbuttondivtable" is used to contain page level controls in a table*/
+.actionbuttondivtable {
+margin:6px 0px 6px 0px;
+padding:1px 1px 2px 2px;
+background: url(/webct/images/dot_back_2.gif);
+}
+.actionbuttondivtable table {
+padding:0px;
+border-collapse:collapse;
+border:0px !important;
+width:100%;
+}
+.actionbuttondivtable table td {padding:5px; color:#000000;}
+.actionbuttondivtable table td a {line-height:160%;_line-height:100% !important;}
+.actionbuttondivtable table td img {vertical-align:middle;}
+.overtabs {margin:0px 10px 0px 10px;}
+/*TASKPAGES/LISTINGPAGES*/
+.listingpage {margin:0px 10px 10px 10px;height:100%;}
+.taskpage {margin:0px 10px 10px 10px;height:100%;}
+/* taskpop is used on a body tag in a popup*/
+.taskpop {margin:10px 6px; background-color:#ededed;}
+/*can be used for some types of tables with multiple rows on task pages*/
+.tasktable {margin-top:6px; width:100%; border-collapse:collapse;}
+.tasktable td {padding:3px;}
+/* "tasktablecol" is used for 2 column tables*/
+/* "taskpagetitlediv" is used for page title in task pages*/
+.taskpagetitlediv {margin:6px 0px 0px 0px; padding:3px 0px 3px 0px;}
+/* "taskcategory" is used for settings category which groups subcategories*/
+.listingpage div.taskcategory  {font-weight:bold; padding:6px 3px 0px 3px; border-top:2px solid #999;}
+.listingpage div.taskcategorynotop  {font-weight:bold; padding:6px 3px 0px 3px;}
+/* taskpage h2.notop and .taskpage h3.notop are same as taskcategorynotop */
+.taskpage h2.notop, .taskpage h3.notop {padding:6px 3px 0px 3px; border:0px;}
+/* .taskpage h2 and .taskpage h3 are same as taskcategory */
+.taskpage h2, .taskpage h3 {padding:6px 3px 0px 3px; border-top:2px solid #999999;}
+.taskpage .settingcontrols h3 {padding:0px; border:0px; font-weight:normal;}
+/* "taskmore" is used for the more options bar on task pages*/
+.taskmore  {background-color:#ededed;font-weight:bold;padding:3px 3px;margin:6px 0px 0px 0px;}
+/* taskpage h2.taskmore is same as taskmore */
+.taskpage h2.taskmore {background-color:#ededed;padding:3px 3px;margin:6px 0px 0px 0px;border:0px;}
+.taskpage h2.taskmore a {color:black;}
+.taskpage h2.taskmore a img {margin-right:3px;vertical-align:middle;}
+/* "tasksubcategory" is used for settings category which groups two or more controls*/
+.tasksubcategory  {border-top:1px solid #dedede; font-weight:bold; padding:6px 3px 0px 3px;}
+/* same as above but for when you don't want a border on the top*/
+.tasksubcategorynotop  {font-weight:bold; padding:3px 3px 0px 3px;}
+/* "singlecontrol" is used for orphan controls, usually single checkbox*/
+.singlecontrol  {border-top:1px solid #dedede; font-weight:normal; padding:3px;}
+/* "settingcontrols" is used to indent controls. */
+.settingcontrols {padding:2px;border-collapse:collapse;border:0px !important;margin:0px 0px 6px 24px;}
+/* "controlset" groups two or more controls within a settingcontrols */
+.controlset {border:1px solid #dedede !important; padding:2px; display:inline-block;}
+/* "taskbuttondiv" is used on a div containing "save", "cancel" etc buttons at the botom of the page */
+.taskbuttondiv {margin: 12px 0px 0px 0px; padding:3px 6px 6px 6px; background:url(/webct/images/dot_back_2.gif);}
+.taskbuttondiv img {vertical-align:middle; border:none;}
+.taskbuttondivwhite {margin: 3px 0px 0px 0px; padding:3px 6px 6px 6px;}
+.taskbuttondivdark {margin: 12px 0px 0px 0px; padding:3px 6px 6px 6px; background:url(/webct/images/dot_back_3.gif);}
+/* "titledesc" is used to wrap a 2-column table*/
+.titledesc {background:#ededed; margin-top:6px; width:100%;}
+.titledesc table, .titledesc table td {padding:6px; border-collapse:collapse; border:0px !important; color:#000;}
+.titledesc table tr td span.helptext {color:#000000 !important;}
+.titledesc td, tr.titledesc td {padding:6px;border-top:1px solid #fff;border-bottom:1px solid #fff;vertical-align:top;}
+.titledesc td span, tr.titledesc td span{font-weight:normal;}
+/* "tasklist" is used on task pages for listing controls, options, attachments, etc. */
+ul.tasklist, ul.tasklist ul {list-style-type:none; margin:0px 0px 6px 24px; padding:0px;}
+ul.tasklist li {margin:0px; padding:3px 0px;}
+ul.tasklist li img, ul.tasklist li input {vertical-align:middle;}
+.simplelist {margin:6px 0px; list-style-type:none; padding:0px;}
+.simplelist li {padding:2px; margin:0px; vertical-align:middle;}
+.simplelist li img, .simplelist li input {vertical-align:middle;}
+/*h2.sidebar and h3.sidebar are used for search and assignment sidebars */
+h2.sidebar,  h3.sidebar  {
+padding:6px 3px 0px 3px;
+border-top:2px solid #fefefe;
+}
+/*ORGANIZER PAGES*/
+/* Used for Organizer tables */
+.orgtable {margin-top:6px;padding:0px;width:100%;border-collapse:collapse;}
+.orgtable td {padding:8px;}
+/*INVENTORY PAGES*/
+/* Used for Organizer tables */
+.inventorytable{width:100%;border-bottom : 1px solid #A9A9A9;border-collapse:collapse;}
+.inventorytable td{padding:4px 4px 8px 12px;}
+/* "simpletable" is used for helper tables to layout grid-like controls. Removes inherited borders and such. */
+.simpletable, .simpletable td, tr.simpletable td {padding:0px;border-collapse:collapse;}
+.simpletable td {padding:4px; vertical-align:top;}
+.simpletable td h2 {font-weight:normal; padding:0px; margin:0px; border:0px;}
+.simpletable td.title, div.titledesc table td.title {font-weight:bold; width:20%; vertical-align:top;}
+.simpletable td.title h2 {font-weight:bold;}
+/* END PAGETYPE STYLES */
+/*_______________________________________________________________________*/
+/* DISCUSSIONS STYLES DISCUSSIONS STYLES DISCUSSIONS STYLES DISCUSSIONS STYLES*/
+/* styles for the category table on a discussion listing page*/
+table.discussioncategory  {
+border:1px solid #bbb;
+border-collapse:collapse;
+margin:6px 0px;
+width:100%;
+background-color:#fff;
+}
+table.discussioncategory td  {vertical-align:top; padding:4px 3px;}
+table.discussioncategory tr.subcell  {background-color:#efefef;}
+table.discussioncategory tr.subcell  {background-color:#efefef;}
+table.discussioncategory tr.subcell td a, table.discussioncategory tr td, table.discussioncategory tr td a, table.discussioncategory tr td span.helptext{color:#000;}
+table.discussioncategory tr.subcell td h2 {color:#000; display:inline;}
+table.discussioncategory td h3	{display:inline; font-weight:normal;}
+table.allmydiscussions {border-spacing:6px; margin:6px 10%; width:80%;}
+table.allmydiscussions tr td {
+background-color:#efefef;
+padding:8px 3px;
+width:50%;
+text-align:center;
+vertical-align:middle;
+}
+table.allmydiscussions tr td a, table.allmydiscussions tr td {color:#000000;}
+.descript {padding-top:4px;font-size:85%;}
+/* style for the message table in a discussion thread*/
+table.message {border:1px solid #bbb; border-collapse:collapse;width:100%;}
+table.message thead td, table.message tbody td, table.message tfoot td {padding:6px; vertical-align:middle;}
+table.message thead td, table.message tbody td, table.message tfoot td, table.message tbody td span.helptext {color:#000000;}
+table.message  thead td, table.message  thead th  {
+border-bottom:1px solid #ddd;
+background-color:#ededed;
+padding:2px 4px;
+vertical-align:middle;
+}
+table.message input {vertical-align:middle;}
+table.message  tbody td  {border-bottom:1px solid #ddd; background-color:#fff;}
+table.message  tfoot td  {background-color:#ededed;}
+table.message  tfoot td table  {border:0px !important; border-collapse:collapse;}
+table.message  tfoot td table td {
+border:0px !important;
+font-style:normal;
+font-size:85%;
+text-align:left;
+padding:3px 3px 3px 6px;
+}
+table.message  tfoot td table td a {font-size:100%;}
+.prevnextdiv {text-align:right;padding:4px;}
+/*detail styles used for the description at the top of composite object pages*/
+.topicdetails {margin-top:6px; padding-left:4px;}
+.topicdetails img {vertical-align:middle; filter:alpha(opacity=60); -moz-opacity:0.60; margin-right:4px;}
+.topicdetailsdiv {margin:0px 0px 12px 0px; padding:3px 3px 3px 24px; font-size:85%;}
+.topicdetailsdiv table {border:1px solid #FFFFFF !important;}
+.topicdetailsdiv table td {vertical-align:top;padding-right:6px;border-left:1px solid #dedede;}
+.topicdetailsdiv table td span {color:gray;}
+.topicdetailsdiv table td p{margin:0px 0px 3px 0px;font-size:85%;}
+.topicdetailsdiv table td a {font-size:100%;}
+/* END DISCUSSIONS STYLES */
+/*_______________________________________________________________________*/
+/* CALENDAR STYLES CALENDAR STYLES CALENDAR STYLES CALENDAR STYLES*/
+/* "mini pop-up" calendar styles */
+table.calendar {border-top:1px solid #999; border-left:1px solid #999; background-color:white; width:100%;}
+table.calendar td {background-color:white; border-right:1px solid #999; border-bottom:1px solid #999; padding:2px; text-align:right;}
+table.calendar td a {display:block; width:100%;}
+table.calendar td a:hover {background-color:#cad7ee;}
+table.calendar td a.boldme {font-weight:bold;}
+table.calendar td.today {background-color:#ffc;}
+table.calendar td.offday, table.calendar td.offday a {background-color:#eee; color:#444; text-decoration:none;}
+table.calendar th {background-color:#ddd; color:black; font-weight:bold; text-align:center; border-right:1px solid #999999; border-bottom:1px solid #999; padding:2px;}
+/* end of new calendar styles */
+/* "big" month view calendar styles */
+table.calMonth {border-top:1px solid #999999; border-left:1px solid #999999; border-collapse:collapse; background-color:#ffffff;}
+table.calMonth td {border-right:1px solid #999999; border-bottom:1px solid #999999; padding:2px; color:#000000;}
+table.calMonth td a {color:#000000;}
+table.calMonth td a.boldme {font-weight:bold;}
+table.calMonth td.today {background-color:#ffffcc;}
+table.calMonth td.offday, table.calMonth td.offday a {background-color:#eeeeee; color:#444444; text-decoration:none;}
+table.calMonth th {background-color:#dddddd; color:black; font-weight:bold; text-align:center; border-right:1px solid #999999; border-bottom:1px solid #999999; padding:2px;}
+tr.calMonth td {background-color:#eeeeee; color:black; font-weight:bold; padding:2px;}
+table.calMonth table td {border:none; padding:2px; border-collapse:collapse; vertical-align:top;}
+tr.daynumber td { height:22px;padding:0px; border-bottom:none; font-weight:bold; text-align:right; vertical-align:top;}
+tr.daynumber td a:link, tr.daynumber td a:visited, tr.daynumber td a:active {padding:2px 3px; border-left:1px solid #bdbdbd; border-bottom:1px solid #bdbdbd;}
+tr.daynumber td a:hover {background-color:#cad7ee;}
+table.calMonth td.viewweek, table.calMonth th.viewweek {background-color:#dddddd !important;}
+table.calMonth td.viewweek a, table.calMonth th.viewweek a {color:#000000;}
+/* end of "big" month view calendar styles */
+/* beginning of calendar day and week styles */
+table.calendarlist {border-collapse:collapse; width:100%;}
+table.calendarlist td.dailyentry {padding:6px; border-top:1px solid #dddddd;}
+table.calendarlist p {margin:2px 0px 5px 24px;}
+table.calendarlist h2 {margin:0px;}
+table.calendarlist h2 a {padding:3px!important; display:block; width:100%; /*font-weight:normal; color:black;*/}
+table.calendarlist h2 a:hover {background:#cad7ee;}
+table.calendarlist h3 {padding:3px; display:inline; margin-right:3px;}
+table.calendarlist h3 a img, .calendarlist h3 img {vertical-align:top; border:none;}
+table.calendarlist h3 a {font-weight:normal; font-style:normal;}
+table.calendarlist p.coursename {font-size:85%; color:#444444; line-height:120%;}
+table.calendarlist p.entrytime {margin:2px 0px 5px 10px;}
+table.calendarlist tr.currentday td {background-color:#ffffcc!important;}
+table.calendarlist td.weekbuttons {background-image:url(/webct/images/dot_back_2.gif);}
+table.calendarlist tr.weekheader td {background-color:#ededed; border-top:2px solid white!important; padding:0px;}
+/* end of calendar day and week styles */
+/* Calendar entry titles */
+.private { font-style:italic;}
+.nocourse {font-style:italic; font-weight:bold;}
+.dateheader {font-size:85%; font-weight: bold;}
+/* END CALENDAR STYLES */
+/*_______________________________________________________________________*/
+/* LOGIN STYLES LOGIN STYLES LOGIN STYLES LOGIN STYLES */
+body.loginbg {background-color:#EEEEEE; margin:0px;}
+body.loginbg p.paragraph, body.loginbg div.paragraph, .paragraph {margin:6px 0px; padding:3px 0px; width:70%;}
+.loginback {background-color:#aaaaaa; margin:15px; width:40%; float:left;}
+.loginfront {position:relative; top:-4px; left:-4px; background-color:#ffffff; border:1px solid #aaaaaa; float:left; width:100%;}
+.loginfront td table {margin:10px;}
+.loginfront td table td {padding:2px 0px;}
+.loginhead {background-color:#003399; color:white; margin:0px; padding:3px 10px;}
+.loginhead h2 {background-color:#003399; color:white; margin:0px;}
+.logintext {margin:0px 15px 15px; float:left; width:40%;}
+.logintext p, .loginfront p {margin:6px 0px;}
+.logintext h2 {margin:15px 0px 9px;}
+/* END LOGIN STYLES */
+/*_______________________________________________________________________*/
+/* OTHER OTHER OTHER OTHER OTHER OTHER OTHER OTHER */
+/*used in assessments and gradebook to adjust checkbox for netscape browsers*/
+.checkit{_margin-top:-10px; margin-bottom:-5px; _margin-bottom:0; padding:0px;}
+/*used in Assessment Navigation frame*/
+.assessNav {background-color:#ededed !important; border-left:1px solid #bbb; height:100%; margin:0px;}
+.assessNav table {margin-bottom:12px;}
+.assessNav table th {background-color:#d2d2d2;}
+/*used in question database for the gradeinclude pages*/
+table.previewColumn td {padding:10px; border:1px solid #bdbdbd;}
+table.previewColumn p {margin:0px 0px 15px 0px;}
+.matchcoltop {border-top:1px solid #bdbdbd; border-left:1px solid #bdbdbd; border-right:1px solid #bdbdbd;}
+.matchcol {border-left:1px solid #bdbdbd; border-right:1px solid #bdbdbd; border-bottom:1px solid #bdbdbd;}
+input.match {width:100%;}
+textarea.match {width:100%; height:50px;}
+table#datatable td {padding:5px 3px; vertical-align:top; border-bottom:1px solid #bdbdbd;}
+/* used for preview matching question */
+.matchColumn, .matchChoice {border:1px solid #bdbdbd; width:auto; border-collapse:collapse; margin:4px 0px 4px 24px;}
+.matchColumn td {border-left:1px solid #bdbdbd; padding:4px; vertical-align:top;}
+.matchChoice td {border-top:1px solid #bdbdbd; vertical-align:top; padding:4px;}
+/*used on Content Manager Search Results page*/
+.contenttypediv {margin:6px 0px 0px 0px;padding:3px 0px 3px 0px;font-weight:bold;}
+/* used in top frame for grey bar */
+tr.contextbar td{background-color: #eaeaea;border-bottom : 2px solid #A9A9A9;border-top : 2px solid #EFEFEF;}
+.contextbardark{
+background-color: #CECECE !important;
+border-bottom : 1px solid #A0A0A0 !important;
+border-top : 1px solid #EFEFEF !important;
+border-left : 1px solid #898989 !important;
+}
+/* used on all tooloverview pages */
+.indentoverview{margin-top:3px; margin-bottom:3px; padding-left:25px;}
+/* used for the color picker page for the swatch sample*/
+.swatch{background-color:#fff;width:80px;height:80px;border:1px solid #000;}
+.swatch2{
+background-color:#fff;
+width:30px;
+height:30px;
+border:1px solid #000;
+display:inline;
+text-align:middle;
+}
+.swatch2 img{text-align:middle;}
+.colorpick {
+position:absolute;
+visibility:hidden;
+left:0;
+top:0;
+z-index:10;
+background-color:#efefef;
+border:2px solid #000;
+display:inline;
+width:auto;
+height:auto;
+}
+/* various admin styles */
+ul.settingslist {list-style-type:none; margin:0px 0px; padding:6px 0px 0px 9px;}
+ul.settingslist li {border-bottom:1px solid #ddd; margin:2px 0px; padding:0px 1px 4px 1px; white-space:normal !important;}
+ul.settingslist li img {vertical-align:middle;}
+ul.settingslist li.divider {border-bottom:1px solid #797979; padding:4px 2px; font-weight:bold;}
+ul.rolelist {list-style-type:none; margin:0px;}
+ul.rolelist li {padding:2px 0px; vertical-align:middle;}
+ul.rolelist li input {margin:0px; vertical-align:middle;}
+table.settingstable td {padding-right:14px;}
+/* end of admin styles */
+/* following classes are used for tabbed assessment submission pages */
+table.attempt td, table.tablebody table.attempt td {vertical-align:top; padding:0px 3px 4px!important; border:none;}
+tr.submitrow td {border-top:1px solid #bdbdbd; padding:3px;}
+.submitrow h2 {font-weight:normal; padding-right:3px; display:inline;}
+tr.submitrow td.submeta, .submeta {color:#333; border-left:1px solid #bdbdbd; width:5%; vertical-align:top; padding:3px 6px;}
+tr.questionrow td {border-top:1px solid #bdbdbd; padding:3px;}
+tr.questionrow td h2 {color:#000000;display:inline;border:0px;padding:0px;}
+/* used on customize color page as style for the logo row*/
+.serverbar {background-color:#fff;vertical-align:middle;color:#000000;}
+tr.serverbar td{font-size:150%; border-top: 2px solid #000000; border-bottom: 2px solid #000000;}
+tr.serverbar td.serverleft{border-left: 2px solid #000000;}
+tr.serverbar td.serverright{border-right: 2px solid #000000;}
+tr.serverbar td a{color:#000000;}
+/* gradebook: this style governs the appearance of the names and records of unenrolled users */
+tr.unenrolled td, tr.unenrolled td a {color:#a52a2a;}
+/*subtab style for Content Manager*/
+a.subbutton:link, a.subbutton:active, a.subbutton:visited {
+background-color:#ededed;
+display:block;
+padding:0px 5px 0px 4px;
+border:2px solid #ededed;
+font-size:13px;
+font-weight:normal;
+text-decoration:none;
+color:#555;
+white-space:nowrap;
+vertical-align:middle;
+}
+a.subbutton:hover {background-color:#fff;border:2px solid #fff;color:#000;
+}
+a.subbuttonhere:link, a.subbuttonhere:active, a.subbuttonhere:visited, a.subbuttonhere:hover {
+background-color:#fff;
+display:block;
+padding:0px 5px 0px 4px;
+border:2px solid #000;
+font-size:13px;
+font-weight:normal;
+text-decoration:none;
+white-space:nowrap;
+color:#000;
+vertical-align:middle;
+}
+/*end subtab style for Content Manager*/
+/* used in the body tag of the mywebct pages */
+.nomargin {margin:0px;}
+/* used in reports and tracking to style the "header labels" over the select boxes, and the cross navigational menu list */
+.trackingheader {background-color:#efefef; padding:2px; border:1px solid #cecece; width:98%; font-size:85%;}
+.trackselect {width:100%;}
+.menuheader {background-color:#dedede;}
+.otherreports {background-color:#efefef; padding:3px; border:1px solid #cecece;}
+/*tracking styles used in tracking reports*/
+tr.totals {font-weight: bold;}
+span.reminder{font-weight:normal; font-style:italic; color:#060606;}
+table.report a {font-weight: bold;}
+span.report-error {color: red;}
+/*end tracking styles*/
+/*ecms style for little bar showing remaining space*/
+td.spaceusage {padding-right:0px !important;}
+td.spaceusage span {font-size:85%; color:#888;}
+td.spaceusage p {border:1px solid #dedede; margin:2px 0px 2px 2px; background-color:white; padding:1px !important; width:104px;font-size:2px;}
+td.spaceusage p img {background-color:#bbb; margin:0px !important; height:6px; border:none;}
+/*end space usage styles*/
+/*used in restoreOptions .jsp*/
+fieldset {border:0px;margin-bottom:0px;padding-bottom:0px;padding-left:0px;padding-right:0px;}
+fieldset#main {border-width:0px;margin-left:0px;margin-right:0px;padding-left:0px;padding-right:0px;margin-bottom:0px;}
+/* used on the entry page, to position the slogan underneath the large webct logo */
+.entryslogan {padding:3px 0px 3px 44px; font-size:85%; position:relative; bottom:19px;}
+/* Content Browser styles*/
+.cbpop {background:#cecece; margin:0px 10px 0px 10px; color:#000;}
+.cbpop h1{color:#000000;}
+/* breadcrumbs for content browser*/
+.cbbreadcrumbs {
+padding:4px 12px 4px 8px !important;
+font-weight:bold;
+background:url(/webct/images/dot_back_4.gif);
+background-position:bottom;
+background-repeat:repeat-x;
+}
+.cbbreadcrumbs span {color:#696969 !important;font-weight:normal;}
+.cbbreadcrumbs a:active, .cbbreadcrumbs a:visited, .cbbreadcrumbs a:link {color:#696969 !important; font-weight:normal;}
+.cbbreadcrumbs a:hover{color:#000 !important;font-weight:normal;}
+.cbbreadcrumbs img, .cbbreadcrumbs a img {vertical-align:middle; border:none;margin-right:3px;}
+.cbbreadcrumbs img#divider {vertical-align:middle;border:none;margin-right:0px;}
+.cbbreadcrumbs a.back:link, .cbbreadcrumbs a.back:visited, .cbbreadcrumbs a.back:active, {
+text-decoration:none;
+font-weight:bold !important;
+padding:0px 6px 1px 6px;
+}
+.cbbreadcrumbs a.back:hover {color:#000000 !important;}
+.cbdisplay {
+background:#ededed;
+padding-left:12px;
+padding-right:12px;
+padding-bottom:12px;
+border:2px solid #000;
+}
+.cbtaskstrip {margin:4px 0px 0px 0px;background:#ededed url(/webct/images/dot_back_3.gif);}
+tr.cbtaskstrip td {padding:6px 6px 6px 6px;}
+tr.cboptionstrip td {padding:4px 4px 4px 4px;border-bottom: 1px solid #ddd;}
+.cbfilter {text-align:right;white-space:nowrap;padding:4px 4px 4px 4px;}
+.cbfilter img, .cbfilter a, .cbfilter select {vertical-align:middle;}
+.cblist {padding-right:0px;padding-left:4px;padding-bottom:4px;text-align:right;}
+/* used for mywebct pages*/
+.brandingbar {height:32px;}
+/* used for browser checker pages */
+body.browsecheck {margin:0px 10px;}
+body.browsecheck p {margin:6px 0px;}
+div.scriptcheck {background-color:white; margin:20px 0px;}
+div.scriptcheck p {margin:6px 0px; width:70%;}
+/* end of browser checker styles */
+/* used on the pin authentication pages (for epacks) */
+div.pinhelp {margin:6px 12px; padding:12px; background-color:#eee; color:#3c3c3c; border:1px solid #bdbdbd;}
+div.pinhelp ol, div.pinhelp ul {margin:4px 12px 18px 24px;}
+div.pinhelp li {margin:6px 0px; padding:0px;}
+div.pinhelp h2 {margin:6px 0px 0px;}
+.marginvert {margin:10px 0px;}
+.inlineitem {display:inline; padding-right:4px;}
+/*used in gradebook for legend descriptions*/
+.descriptiondiv{background-color:#fafad2; padding:3px; margin:6px 0px 0px 0px; font-size:85%; color:#000000;}
+/*used for the global links cell in the top frame*/
+.globallinks{padding-top:5px; text-align:right; vertical-align:top; white-space:nowrap;}

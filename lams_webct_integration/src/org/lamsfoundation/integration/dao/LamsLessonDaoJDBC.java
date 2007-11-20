@@ -1,11 +1,8 @@
 package org.lamsfoundation.integration.dao;
 
-import java.util.Date;
 import java.util.Map;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -14,7 +11,6 @@ import org.apache.log4j.Logger;
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
 
 import org.lamsfoundation.integration.util.Constants;
-import org.lamsfoundation.integration.webct.LamsModule;
 import org.lamsfoundation.integration.webct.LamsLesson;
 
 
@@ -118,7 +114,7 @@ public class LamsLessonDaoJDBC {
 			 		"[start_date_time]," +
 			 		"[end_date_time] " +
 			 		"FROM [webctdatabase].[dbo].[LAMS_LESSON] " +
-			 		"WHERE (learning_context_id=" +learningContextId+ ")" +
+			 		"WHERE (learning_context_id=" +learningContextId+ ") " +
 			 		"AND   (pt_id=" +ptId+ ")";
 			
 			System.out.println("SQL INSERT: " +query);
@@ -220,6 +216,52 @@ public class LamsLessonDaoJDBC {
 		
 	}
 	
+	public boolean updateLesson(LamsLesson lesson)
+	{
+		
+		
+		Connection connection;
+		int rows = 0;
+		try
+		{
+			connection = getConnection();
+			Statement stmt = connection.createStatement();
+			
+			String update="UPDATE [webctdatabase].[dbo].[LAMS_LESSON]" +
+					" SET [pt_id] = " +lesson.getPtId()+
+				    ",[learning_context_id] = " +lesson.getLearningContextId()+
+				    ",[sequence_id] = " + lesson.getSequenceId()+
+				    ",[owner_id] = \'" + lesson.getOwnerId()+ "\'" +
+				    ",[owner_first_name] = \'" +lesson.getOwnerFirstName()+ "\'" +
+				    ",[owner_last_name] = \'" + lesson.getOwnerLastName()+ "\'" +
+				    ",[title] = \'" +lesson.getTitle()+ "\'" +
+				    ",[description] = \'" +lesson.getDescription()+ "\'" +
+				    ",[hidden] = \'" +lesson.getHidden()+ "\'" + 
+				    ",[schedule] = \'" +lesson.getSchedule()+ "\'" +
+				    ",[start_date_time] = \'" +lesson.getStartDate()+ "\'" +
+				    ",[end_date_time] = \'" +lesson.getEndDate()+ "\' " +
+				    "WHERE [lesson_id] = " + lesson.getLessonId();
+	          	
+			System.out.println("UPDATE: " + update);
+			
+			rows = stmt.executeUpdate(update);
+			stmt.close();
+			
+			connection.commit();
+			connection.close();
+			
+			
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+			log.error("Error updating LAMS lesson to database.", e);
+		}
+		
+		return rows>0;
+	
+	}
+	
 	
 	public boolean deleteDbLesson(long lsId)
 	{
@@ -249,6 +291,67 @@ public class LamsLessonDaoJDBC {
 		
 		return rows>0;
 		
+	}
+	
+	public LamsLesson getDBLesson(String lsId) throws Exception
+	{
+		LamsLesson lesson = new LamsLesson();;
+		Connection connection;
+		try
+		{
+			connection = getConnection();
+			Statement stmt = connection.createStatement();
+			
+			String query = "SELECT [lesson_id]," +
+			 		"[pt_id]," +
+			 		"[learning_context_id]," +
+			 		"[sequence_id]," +
+			 		"[owner_id]," +
+			 		"[owner_first_name]," +
+			 		"[owner_last_name]," +
+			 		"[title]," +
+			 		"[description]," +
+			 		"[hidden]," +
+			 		"[schedule]," +
+			 		"[start_date_time]," +
+			 		"[end_date_time] " +
+			 		"FROM [webctdatabase].[dbo].[LAMS_LESSON] " +
+			 		"WHERE (lesson_id=" +lsId+ ")";
+			
+			System.out.println("GET LESSON: " +query);
+			
+			ResultSet rs = stmt.executeQuery(query);	
+			
+			rs.next();
+		    
+		    lesson.setLessonId(rs.getLong("lesson_id"));
+		    lesson.setPtId(rs.getLong("pt_id"));
+		    lesson.setLearningContextId(rs.getLong("learning_context_id"));
+		    lesson.setSequenceId(rs.getLong("sequence_id"));
+		    lesson.setTitle(rs.getString("title"));
+		    lesson.setDescription(rs.getString("description"));
+		    lesson.setOwnerId(rs.getString("owner_id"));
+		    lesson.setOwnerFirstName(rs.getString("owner_first_name"));
+		    lesson.setOwnerLastName(rs.getString("owner_last_name"));
+		    lesson.setHidden(rs.getBoolean("hidden"));
+		    lesson.setSchedule(rs.getBoolean("schedule"));
+		    lesson.setStartDate(rs.getDate("start_date_time"));
+		    lesson.setEndDate(rs.getDate("end_date_time"));
+		
+			stmt.close();
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+			log.error("Failed to get LAMS lesson.", e);
+			throw new Exception ("Failed to get LAMS lesson.");
+		}
+		catch (Exception e)
+		{
+			throw new Exception ("Failed to get LAMS lesson.");
+		}
+		return lesson;
 	}
 	
 	

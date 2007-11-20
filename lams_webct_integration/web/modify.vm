@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+#set( $currentLCID = $session.getCurrentLCID() )
+#set( $pt_id = $request.getParameter( $id_param_name ) )
+#set( $url = 'ptLaunch.dowebct' )
+## check if we're in MyWebCT or a section
+#set( $isInstRole = 0 )
+#set( $isMyWebCT = 0 )
+#if( $currentLCID == $session.getInstitutionID() )
+    #set( $isMyWebCT = 1 )
+    #set( $id_param_name = 'tid' )
+
+    ## check if it's an Institution role
+    #set( $roles = $context.getRoleIDs($session, $currentLCID) )
+    #foreach( $role in $roles )
+        #set( $isInstRole = 1 )
+    #end
+#else
+    #set( $id_param_name = 'id' )
+#end
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">	
+<head>
+<title>LAMS: Start Lesson</title>
+
+<script language="JavaScript" type="text/javascript">
+<!--
+	function validateLesson()
+	{
+		document.getElementById("form_action").value="modify_proc";
+		return true;
+	}
+	
+	function back()
+	{
+		document.getElementById("form_action").value="";
+	}
+//-->
+</script>
+
+
+</head>
+<body>
+<h3>LAMS: Modify LAMS</h3>
+<link rel="stylesheet" href="/webct/css/styles.jsp?locale=en_US&Id=9778001&colorSetId=A" type="text/css" />
+
+<br>
+<br>
+
+<form name="modify_form" id="modify_form" action="$url" method="post">
+	<input type="hidden" name="lsID" id="lsID"  value='$lsID'>
+	<input type="hidden" name="$id_param_name" value="$pt_id"/>
+	<input type="hidden" name="page_id" value="$page_id"/>
+	<input type="hidden" name="form_action" id="form_action" value=""/>
+	
+	<table border='0'>
+		<tr>
+			<td valign="top"><b>Title</b></td>
+			<td><input id="title" type="text" name="title" value="$title"></td>
+		</tr>
+		<tr>
+			<td valign="top"><b>Description</b></td>
+			<td><textarea name="description" rows="12" cols="35">$description</textarea></td>
+		</tr>
+		<tr>
+			<td valign="top"><b>Lesson Visibility</b></td>
+			<td><input type="Radio" name="isAvailable" value="$hidden" checked>Show Lesson <br>
+	            <input type="Radio" name="isAvailable" value="$notHidden">Hide Lesson </td>
+		</tr>
+		<tr>
+			<td valign="top"><b>Schedule Lesson</b></td>
+			<td><input type="Radio" name="schedule" value="$hidden" checked>Show Lesson <br>
+	            <input type="Radio" name="schedule" value="$notHidden">Hide Lesson </td>
+		</tr>
+		
+	</table>
+	<br><br>                                
+	<input type="submit" name="create" onClick="return validateLesson();" value="Modify Lesson"/>
+	<input type="submit" name="back" onClick="back();" value="Back"/>
+</form>
+
+</body>
+</html>
