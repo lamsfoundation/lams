@@ -84,7 +84,6 @@
     	
 		url = '${url}?sequence_id=' +document.getElementById("sequence_id").value+ '&${id_param_name}=${pt_id}&page_id=${page_id}&form_action=preview';
 	   	
-	   	alert(url);
 	   	window.open(url,'LAMS-Preview','height=600,width=800,resizable');
 
   		return true;

@@ -247,7 +247,8 @@ public class LamsSecurityUtil {
 				String email, 
 				String ldId, 
 				String title, 
-				String desc) 
+				String desc,
+				String method) 
     {
 		long error = -1;
 		if (serverId == null || serverAddr == null || secretKey == null ) {
@@ -271,7 +272,7 @@ public class LamsSecurityUtil {
 			+ "&ldId="		+ ldId
 			+ "&country="	+ country
 			+ "&lang=" 		+ lang
-			+ "&method="	+ "start"
+			+ "&method="	+ method
 			+ "&title="		+ URLEncoder.encode(title, "utf8").trim()
 			+ "&desc="		+ URLEncoder.encode(desc, "utf8").trim();
 			
@@ -338,7 +339,7 @@ public class LamsSecurityUtil {
 		} 	
 	}
     
-    
+    /*
     public static String generatePreviewUrl(
     		String serverAddr, 
 			String serverId, 
@@ -350,7 +351,10 @@ public class LamsSecurityUtil {
 			String country,
 			String firstName,
 			String lastName,
-			String email 
+			String email,
+			String title,
+			String description,
+			String ldID
 			) throws Exception
     {
     	String url="";
@@ -377,6 +381,9 @@ public class LamsSecurityUtil {
 				+ "&firstName=" 	+ firstName 
 				+ "&lastName="		+ lastName
 				+ "&email="			+ email
+				+ "&title=" 		+ title
+				+ "&description=" 	+ description
+				+ "&ldId=" 			+ ldID
 				+ "&method=preview";
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException();
@@ -386,7 +393,7 @@ public class LamsSecurityUtil {
 		System.out.println("PREVIEW: " + url);
 
 		return url;
-    }
+    }*/
     
     
     /**

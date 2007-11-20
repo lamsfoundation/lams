@@ -185,7 +185,7 @@ public class LamsModule extends AuthenticationModule
         
         String action = request.getParameter("form_action");
         
-        if(action==null || action.trim().length()==0 ||action.equals("preview"))
+        if(action==null || action.trim().length()==0)
         {
         	
         	try{
@@ -251,23 +251,6 @@ public class LamsModule extends AuthenticationModule
             	authorUrl = generateRequestURL(user, lcID, "author");
             	params.put("authorUrl", authorUrl);
             	
-            	
-            	
-            	String previewUrl = LamsSecurityUtil.generatePreviewUrl(
-            			lamsServerUrl, 
-            			lamsServerId, 
-            			lamsServerSecretKey,
-            			webctRequestSource,
-            			user.getUserId(), 
-            			"" +lcID, 
-            			"en", 
-            			"US", 
-            			user.getFirstname(), 
-            			user.getLastname(), 
-            			user.getEmail());
-            	params.put("previewUrl", previewUrl);
-
-            	
             	// get the learning designs to display the workspace tree
             	learningDesigns = getLearningDesigns(user, lcID);
             	params.put("learningDesigns", learningDesigns);
@@ -330,7 +313,8 @@ public class LamsModule extends AuthenticationModule
         			user.getEmail(), 
         			seqID, 
         			title, 
-        			description);
+        			description,
+        			"start");
         	
         	
         	if (lsID==-1)
@@ -381,6 +365,49 @@ public class LamsModule extends AuthenticationModule
         		log.error("Error creating LAMS lesson created page: ", e);
         		throw new LoginException("Error creating LAMS lesson created page: " + e.getMessage());
         	}
+        }
+        else if(action.equals("preview"))
+        {
+        	String title = request.getParameter("title");
+        	String description = request.getParameter("description");
+        	String ldID = request.getParameter("sequence_id");
+        	
+        	if (ldID==null ||  ldID.equals(""))
+        	{
+        		throw new LoginException("Bad preview request.");
+        	}
+        	
+        	if (title==null) {title="";}
+        	if (description==null) {description="";}
+        	
+        	try{
+	        	long pvID = LamsSecurityUtil.startLesson(
+	        			lamsServerUrl, 
+	        			lamsServerId, 
+	        			lamsServerSecretKey,
+	        			webctRequestSource, 
+	        			user.getUserId(), 
+	        			"" + lcID, 
+	        			"en", 
+	        			"US", 
+	        			user.getFirstname(), 
+	        			user.getLastname(), 
+	        			user.getEmail(), 
+	        			ldID, 
+	        			title, 
+	        			description,
+	        			"preview");	
+	        	
+	        	String previewUrl = generateRequestURL(user, lcID, "learner") + "&lsid=" +pvID;
+	        	System.out.println("PREVIEW URL: " + previewUrl);
+	        	super.setRedirectUrl(previewUrl);
+        	}
+        	catch (Exception e)
+        	{
+        		log.error("Error generating LAMS preview", e);
+        		throw new LoginException("Error generating LAMS preview");
+        	}
+        	return true;
         }
         
         
