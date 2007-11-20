@@ -144,7 +144,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					if (ca.activity.parentUIID == optionalOnCanvas[i].activity.activityUIID){
 						if (optionalOnCanvas[i].locked == false){
 							
-							if (ca._x > 142 || ca._x < -129 || ca._y < -55 || ca._y > optionalOnCanvas[i].getpanelHeight){
+							if (ca._x > 142 || 
+								ca._x < -129 || 
+								ca._y < -55 || 
+								ca._y > optionalOnCanvas[i].panelHeight) {
 								//give it the new co-ords and 'drop' it
 								ca.activity.xCoord = (_xmouse - _canvasModel.getPosition().x) - (_canvasModel.getCanvas().taWidth/2);
 								ca.activity.yCoord = (_ymouse - _canvasModel.getPosition().y) - (_canvasModel.getCanvas().taHeight/2);
@@ -162,6 +165,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				
 				for (var i=0; i<optionalOnCanvas.length; i++) {
 					if (sequenceActivity.parentUIID == optionalOnCanvas[i].activity.activityUIID) {
+						
 						if(_tempSelectedItem.activity.parentUIID == sequenceActivity.activityUIID) {
 							ca.depthHistory = ca.getDepth();
 							ca.swapDepths(DepthManager.kTop);
@@ -172,8 +176,22 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 							ca.swapDepths(DepthManager.kTop);
 						}
 							
-						if (optionalOnCanvas[i].locked == false)
-							activitySnapBack(ca);
+						if (optionalOnCanvas[i].locked == false) {
+							if (ca._x > optionalOnCanvas[i].getVisibleWidth() || 
+								ca._x < -ca.getVisibleWidth() ||
+								ca._y < -ca.getVisibleHeight() - sequenceActivity.yCoord ||
+								ca._y > optionalOnCanvas[i].getVisibleHeight() - sequenceActivity.yCoord) {
+								
+								ca.activity.xCoord = (_xmouse - _canvasModel.getPosition().x) - (_canvasModel.getCanvas().taWidth/2);
+								ca.activity.yCoord = (_ymouse - _canvasModel.getPosition().y) - (_canvasModel.getCanvas().taHeight/2);
+								
+								_canvasModel.removeOptionalSequenceCA(ca, optionalOnCanvas[i].activity.activityUIID);
+								
+							} else {
+								activitySnapBack(ca);
+							}
+						
+						}
 							
 					}
 					

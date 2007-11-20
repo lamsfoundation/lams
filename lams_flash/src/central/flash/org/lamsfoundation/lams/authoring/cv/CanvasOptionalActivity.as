@@ -68,7 +68,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var _activity:Activity;
 	private var _children:Array;
 	private var children_mc:Array;
-	private var panelHeight:Number;
+	private var _panelHeight:Number;
 	private var actMinOptions:Number;
 	private var actMaxOptions:Number;
 	private var noSeqActivities:Number;
@@ -311,7 +311,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private function draw (){
 		
 		var numOfChildren = _children.length;
-		panelHeight = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
+		_panelHeight = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
 		
 		setStyles();
 		
@@ -437,8 +437,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		return children_mc;
 	}
 	
-	public function get getpanelHeight():Number {
-		return panelHeight;
+	public function get panelHeight():Number {
+		return _panelHeight;
 	}
 	
 	private function getAssociatedStyle():Object{

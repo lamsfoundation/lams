@@ -387,6 +387,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		setDirty();
 		
 	}
+	
+	public function removeOptionalSequenceCA(ca:Object, parentID){
+		
+		ca.activity.parentUIID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityUIID : null;
+		ca.activity.orderID = null;
+		ca.activity.parentActivityID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityID : null;
+		
+		getCanvas().ddm.removeTransitionByConnection(ca.activity.activityUIID);
+		
+		removeActivity(parentID);
+		
+		setDirty();
+	}
 	 
 	/**
 	*Called by the controller when a complex activity is dropped on bin.

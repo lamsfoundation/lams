@@ -173,6 +173,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		
 			if(i == 0)
 				SequenceActivity(_activity).firstActivityUIID = children_mc[i].activity.activityUIID;
+			
+			var transitionObj:Object = _canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(children_mc[i].activity.activityUIID)
+			if(!transitionObj.hasTrans)
+				if(i<_children.length-1)
+					_canvasModel.createSequenceTransition(_activity, children_mc[i].activity.activityUIID);
+			
 			//set the positioning co-ords
 			children_mc[i].activity.xCoord = CHILD_OFFSET_X + (i * CHILD_INCRE);
 			children_mc[i].activity.yCoord = CHILD_OFFSET_Y;
