@@ -143,7 +143,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				for (var i=0; i<optionalOnCanvas.length; i++){
 					if (ca.activity.parentUIID == optionalOnCanvas[i].activity.activityUIID){
 						if (optionalOnCanvas[i].locked == false){
-							
 							if (ca._x > 142 || 
 								ca._x < -129 || 
 								ca._y < -55 || 
@@ -176,11 +175,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 							ca.swapDepths(DepthManager.kTop);
 						}
 							
+						Debugger.log("vHeight: " + optionalOnCanvas[i].getVisibleHeight(), Debugger.CRITICAL, "activityRelease", "CanvasController");
+						Debugger.log("ca._y: " + ca._y, Debugger.CRITICAL, "activityRelease", "CanvasController");
+						Debugger.log("yCoord: " + sequenceActivity.yCoord, Debugger.CRITICAL, "activityRelease", "CanvasController");
+						
+						Debugger.log("ca.getVisibleHeight(): " + ca.getVisibleHeight(), Debugger.CRITICAL, "activityRelease", "CanvasController");
+						
 						if (optionalOnCanvas[i].locked == false) {
 							if (ca._x > optionalOnCanvas[i].getVisibleWidth() || 
 								ca._x < -ca.getVisibleWidth() ||
 								ca._y < -ca.getVisibleHeight() - sequenceActivity.yCoord ||
-								ca._y > optionalOnCanvas[i].getVisibleHeight()) {
+								ca._y > optionalOnCanvas[i].getVisibleHeight() - sequenceActivity.yCoord) {
 								
 								ca.activity.xCoord = (_xmouse - _canvasModel.getPosition().x) - (_canvasModel.getCanvas().taWidth/2);
 								ca.activity.yCoord = (_ymouse - _canvasModel.getPosition().y) - (_canvasModel.getCanvas().taHeight/2);
@@ -255,19 +260,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 										}
 										
 										if(selectedSequence != null) {
-											Debugger.log("ca " + ca.activity.activityUIID, Debugger.CRITICAL, "activityRelease", "CanvasController");
-											
 											ca.activity.orderID = _canvasModel.getCanvas().ddm.getNextSequenceOrderID(selectedSequence.activity.activityUIID);
-											Debugger.log("orderID " + _canvasModel.getCanvas().ddm.getNextSequenceOrderID(selectedSequence.activity.activityUIID), Debugger.CRITICAL, "activityRelease", "CanvasController");
 											
 											if(ca.activity.orderID > 1) _canvasModel.createSequenceTransition(CanvasSequenceActivity(selectedSequence).lastActivity, ca.activity);
 											else ComplexActivity(selectedSequence.activity).firstActivityUIID = ca.activity.activityUIID;							
 											
 											_canvasModel.addParentToActivity(selectedSequence.activity.activityUIID, ca, false);
-					
-											
-											Debugger.log("ca " + ca.activity.activityUIID, Debugger.CRITICAL, "activityRelease", "CanvasController");
-											Debugger.log("orderID " + ca.activity.orderID, Debugger.CRITICAL, "activityRelease", "CanvasController");
 											
 											CanvasSequenceActivity(selectedSequence).updateChildren();
 											CanvasOptionalActivity(_canvasModel.activitiesDisplayed.get(selectedSequence.activity.parentUIID)).updateChildren();

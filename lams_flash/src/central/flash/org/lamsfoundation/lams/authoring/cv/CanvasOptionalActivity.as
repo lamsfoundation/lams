@@ -338,6 +338,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			padlockOpen_mc._x = padlockClosed_mc._x;
 		}
 		
+		_visibleHeight = container_pnl._height;
 		_x = _activity.xCoord;
 		_y = _activity.yCoord;
 
