@@ -383,7 +383,7 @@ public class ProgressEngine
      */
     private boolean isParallelWaitActivity(Activity nextActivity)
     {
-        return nextActivity.getActivityTypeId().intValue()==ParallelWaitActivity.PARALLEL_WAIT_ACTIVITY_TYPE;
+        return nextActivity.getActivityTypeId()!=null && nextActivity.getActivityTypeId().intValue()==ParallelWaitActivity.PARALLEL_WAIT_ACTIVITY_TYPE;
     }
 
 	public void setActivityDAO(IActivityDAO activityDAO) {
