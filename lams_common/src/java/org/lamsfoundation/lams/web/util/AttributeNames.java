@@ -66,6 +66,8 @@ public class AttributeNames {
     
     public static final String PARAM_LIB = "library";
     
+    public static final String PARAM_OFFLINE = "offline";
+    
     public static final String ATTR_MODE = "mode";
     public static final String ATTR_USERNAME = "username";
     public static final String ATTR_UPDATE_PROGRESS_BAR = "updateProgressBar";

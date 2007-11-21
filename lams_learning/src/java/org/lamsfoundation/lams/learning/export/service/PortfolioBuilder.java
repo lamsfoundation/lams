@@ -164,10 +164,10 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 			
 			ToolActivity toolActivity = (ToolActivity) activity;
 			Tool tool = toolActivity.getTool();	
-			if (accessMode == ToolAccessMode.LEARNER)
-				exportUrlForTool = tool.getExportPortfolioLearnerUrl();
-			else 
+			if (accessMode == ToolAccessMode.TEACHER)
 				exportUrlForTool = tool.getExportPortfolioClassUrl();
+			else 
+				exportUrlForTool = tool.getExportPortfolioLearnerUrl();
 			
 			/*
 			 * Append parameters to the export url.
@@ -187,6 +187,7 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 				{
 					exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_TOOL_CONTENT_ID, toolActivity.getToolContentId().toString());
 				}
+				exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_OFFLINE, activity.getRunOffline().toString());
 			}
 
 			ActivityPortfolio p = createActivityPortfolio(activity);
@@ -248,6 +249,7 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 			}
 			exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId().toString());
 			exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_LESSON_ID, lesson.getLessonId().toString());
+			exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_OFFLINE, activity.getRunOffline().toString());
 		}
 		return exportUrlForTool;
 	}

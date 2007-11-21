@@ -29,19 +29,25 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
@@ -61,6 +67,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * to the method writeResponseToFile which is responsible for making
  * the HttpURLConnection to that url and write the response to disk.
  * 
+ * If the tool wants to do something special for activities run offline
+ * then it needs to implement doOfflineExport. Otherwise a default
+ * offline message will be displayed.
+ * 
  * If needed, the tool should be able to generate as many files
  * as needed (to fit in with the hierarchical structure)
  * although only the name of the main HTML file should be returned. 
@@ -75,10 +85,13 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 	
 	private static final String EXPORT_ERROR_MSG = "This activity does not support portfolio export";
 	private static final String EXPORT_ERROR_FILENAME = "portfolioExportNotSupported.html";
+
 	protected Long userID = null;
 	protected Long toolSessionID = null;
 	protected Long toolContentID = null;
 	protected String mode = null;
+	protected boolean isOffline = false;
+	protected String activityTitle = null;
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException, IOException {
@@ -88,7 +101,7 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 		
 		
 		Cookie[] cookies = request.getCookies();		
-		
+
 		directoryName = WebUtil.readStrParam(request, AttributeNames.PARAM_DIRECTORY_NAME); 
 		
 		//put the path together again, since the given directory was a relative one.
@@ -118,7 +131,12 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 				log.debug("Export is conducted in mode: " + mode);
 			}
 					
-			mainFileName = doExport(request, response, absoluteDirectoryPath, cookies);
+		    isOffline = WebUtil.readBooleanParam(request, AttributeNames.PARAM_OFFLINE);
+		    
+		    if ( isOffline ) 
+		    	mainFileName = doOfflineExport(request, response, absoluteDirectoryPath, cookies);
+		    else 
+		    	mainFileName = doExport(request, response, absoluteDirectoryPath, cookies);
 			
 			if (log.isDebugEnabled()) {
 				log.debug("The name of main html file is "+mainFileName);
@@ -154,6 +172,33 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 	 */
 	abstract protected String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies);
 	
+	/**
+	 * This method allows the tool to call all necessary export pages
+	 * for when an activity is run offline. A default implementation is
+	 * given so that if the tool doesn't want to do anything special, it can
+	 * allow the default page to be displayed. 
+	 * special then it should implement this method.
+	 * @param directoryName
+	 * @return
+	 */
+	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+	
+		String url = Configuration.get(ConfigurationKeys.SERVER_URL) + "/learning/exportPortfolio/offline.jsp";
+
+		// Can't put it on the request easily, as the title doesn't seem to be written out correctly even though
+		// we have encoded it. Can't put it in the ordinary session as we will be calling a URL in the learner web-app
+		// from a tool web-app.
+		HttpSession sharedsession = SessionManager.getSession(); 
+		if(sharedsession != null){
+			sharedsession.setAttribute("epActivityTitle", activityTitle);
+			writeResponseToFile(url,directoryName, "index.html", cookies);
+			sharedsession.removeAttribute("epActivityTitle");
+		} else {
+			writeResponseToFile(url,directoryName, "index.html", cookies);
+		}
+		return "index.html";	
+	}
+
 	private String checkDirectoryName(String directoryName)
 	{
 		String validDirectoryName;
@@ -164,6 +209,7 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 		
 		return validDirectoryName;
 	}
+	
 	
 	/**
 	 * Sets up the HttpURLCOnnection, it will read the response from

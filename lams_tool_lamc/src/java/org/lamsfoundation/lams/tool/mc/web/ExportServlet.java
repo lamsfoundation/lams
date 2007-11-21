@@ -76,6 +76,26 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 		return FILENAME;
 	}
    
+	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+        if (toolContentID == null && toolSessionID == null) {
+            logger.error("Tool content Id or and session Id are null. Unable to activity title");
+       } else {
+        	IMcService mcService = McServiceProxy.getMcService(getServletContext());
+        	McContent content = null;
+            if ( toolContentID != null ) {
+            	content=mcService.retrieveMc(toolContentID);
+            } else {
+            	McSession session=mcService.retrieveMcSession(toolSessionID);
+            	if ( session != null )
+            		content = session.getMcContent();
+            }
+            if ( content != null ) {
+            	activityTitle = content.getTitle();
+            }
+        }
+        return super.doOfflineExport(request, response, directoryName, cookies);
+	}
+
 	/**
 	 * learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	 * 

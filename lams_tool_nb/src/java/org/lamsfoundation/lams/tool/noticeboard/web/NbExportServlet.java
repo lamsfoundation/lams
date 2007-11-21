@@ -28,8 +28,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
+import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.servlet.ExportPortfolioServletException;
@@ -42,6 +47,29 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class NbExportServlet extends AbstractExportPortfolioServlet {
 	
 	private final String FILENAME = "nb_main.html";
+	private static Logger logger = Logger.getLogger(NbExportServlet.class);
+
+	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+        if (toolContentID == null && toolSessionID == null)
+        {
+            String error = "Tool content Id or and session Id are null. Unable to set activity title";
+            logger.error(error);
+        } else {
+        	INoticeboardService service = NoticeboardServiceProxy.getNbService(getServletContext());
+        	NoticeboardContent content = null;
+            if ( toolContentID != null ) {
+            	content = service.retrieveNoticeboard(toolContentID);
+            } else {
+            	NoticeboardSession session=service.retrieveNoticeboardSession(toolSessionID);
+            	if ( session != null )
+            		content = session.getNbContent();
+            }
+            if ( content != null ) {
+            	activityTitle = content.getTitle();
+            }
+        }
+        return super.doOfflineExport(request, response, directoryName, cookies);
+	}
 	
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{

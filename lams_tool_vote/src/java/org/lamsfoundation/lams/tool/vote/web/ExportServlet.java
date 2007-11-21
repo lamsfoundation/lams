@@ -86,6 +86,26 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 		return FILENAME;
 	}
     
+	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+        if (toolContentID == null && toolSessionID == null) {
+            logger.error("Tool content Id or and session Id are null. Unable to activity title");
+        } else {
+        	IVoteService service = VoteServiceProxy.getVoteService(getServletContext());
+
+        	VoteContent content = null;
+            if ( toolContentID != null ) {
+            	content = service.retrieveVote(toolContentID);
+            } else {
+            	VoteSession session=service.retrieveVoteSession(toolSessionID);
+            	if ( session != null )
+            		content = session.getVoteContent();
+            }
+            if ( content != null ) {
+            	activityTitle = content.getTitle();
+            }
+        }
+        return super.doOfflineExport(request, response, directoryName, cookies);
+	}
 	public boolean learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
 		boolean generateCharts = false;

@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
@@ -94,6 +95,28 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		return FILENAME;
 	}
+	
+	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+        if (toolContentID == null && toolSessionID == null) {
+            logger.error("Tool content Id or and session Id are null. Unable to activity title");
+        } else {
+        	IResourceService service = ResourceServiceProxy.getResourceService(getServletContext());
+        	Resource content = null;
+            if ( toolContentID != null ) {
+            	content = service.getResourceByContentId(toolContentID);
+            } else {
+            	ResourceSession session=service.getResourceSessionBySessionId(toolSessionID);
+            	if ( session != null )
+            		content = session.getResource();
+            }
+            if ( content != null ) {
+            	activityTitle = content.getTitle();
+            }
+        }
+        return super.doOfflineExport(request, response, directoryName, cookies);
+	}
+
+
 
 	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
 			throws ResourceApplicationException {

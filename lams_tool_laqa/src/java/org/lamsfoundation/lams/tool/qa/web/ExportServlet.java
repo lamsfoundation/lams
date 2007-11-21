@@ -69,6 +69,26 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
 		return FILENAME;
 	}
     
+	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+        if (toolContentID == null && toolSessionID == null) {
+            logger.error("Tool content Id or and session Id are null. Unable to activity title");
+        } else {
+        	IQaService service = QaServiceProxy.getQaService(getServletContext());
+        	QaContent content = null;
+            if ( toolContentID != null ) {
+            	content=service.retrieveQa(toolContentID);
+            } else {
+            	QaSession session=service.retrieveQaSession(toolSessionID);
+            	if ( session != null )
+            		content = session.getQaContent();
+            }
+            if ( content != null ) {
+            	activityTitle = content.getTitle();
+            }
+        }
+        return super.doOfflineExport(request, response, directoryName, cookies);
+	}
+
 	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
 	    logger.debug("starting learner mode...");
