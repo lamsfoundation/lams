@@ -169,30 +169,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 			drawChildActivity(_children[_children.length-1]);
 		}
 		
-			
-		/**
-		for(var i=0; i<_children.length; i++) {
-			if(_module == "monitoring")
-				children_mc[i] = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorView, _module:"monitoring", learnerContainer:learnerContainer, _sequenceChild:true});
-			else
-				children_mc[i] = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView, _sequenceChild:true});
-		
-			if(i == 0)
-				SequenceActivity(_activity).firstActivityUIID = children_mc[i].activity.activityUIID;
-			
-			var transitionObj:Object = _canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(children_mc[i].activity.activityUIID)
-			if(!transitionObj.hasTrans)
-				if(i<_children.length-1)
-					_canvasModel.createSequenceTransition(_activity, children_mc[i].activity.activityUIID);
-			
-			//set the positioning co-ords
-			children_mc[i].activity.xCoord = CHILD_OFFSET_X + (i * CHILD_INCRE);
-			children_mc[i].activity.yCoord = CHILD_OFFSET_Y;
-			
-			children_mc[i]._visible = true;
-		}
-		*/
-		
 		var _newVisibleWidth:Number = (_children.length*CHILD_INCRE) + (CHILD_OFFSET_X*2) + 6;
 		if(_newVisibleWidth > CanvasSequenceActivity.TOOL_ACTIVITY_WIDTH)
 			_visibleWidth = _newVisibleWidth;
@@ -215,6 +191,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		childActivity._visible = true;	
 		
 		children_mc.push(childActivity);
+		a.orderID = _children.length;
+		
 		Debugger.log("children length: " + _children.length, Debugger.CRITICAL, "drawChildActivity", "CanvasSequenceActivity");
 		
 		var transitionObj:Object = _canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(childActivity.activity.activityUIID)

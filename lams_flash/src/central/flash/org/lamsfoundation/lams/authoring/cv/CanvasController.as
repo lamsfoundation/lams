@@ -65,9 +65,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
    
     public function activityClick(ca:Object):Void{
-		_tempSelectedItem = _canvasModel.selectedItem;
-		_canvasModel.selectedItem = null;
-	    
+		
 		
 		Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID + ' orderID: ' + ca.activity.orderID,Debugger.GEN,'activityClick','CanvasController');
 	    Debugger.log('Check if transition tool active :'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityClick','CanvasController');
@@ -96,7 +94,27 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				ca.startDrag(false);
 				_canvasModel.isDragging = true;
 			}
+			
+			
+			if(_tempSelectedItem.activity.parentUIID == parentAct.activityUIID && _tempSelectedItem != ca) {
+				ca.depthHistory = ca.getDepth();
+				ca.swapDepths(DepthManager.kTop);
+						
+				_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
+			} else {
+				ca.depthHistory = ca.getDepth();
+				ca.swapDepths(DepthManager.kTop);
+			}
+			
+			var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
+			for (var i=0; i<optionalOnCanvas.length; i++)
+				if(parentAct.parentUIID == optionalOnCanvas[i].activity.activityUIID && _tempSelectedItem != ca)
+					_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
+					
 		}
+		
+		_tempSelectedItem = _canvasModel.selectedItem;
+		_canvasModel.selectedItem = null;
 	   
     }
    
@@ -165,22 +183,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				for (var i=0; i<optionalOnCanvas.length; i++) {
 					if (sequenceActivity.parentUIID == optionalOnCanvas[i].activity.activityUIID) {
 						
-						if(_tempSelectedItem.activity.parentUIID == sequenceActivity.activityUIID) {
-							ca.depthHistory = ca.getDepth();
-							ca.swapDepths(DepthManager.kTop);
-							
-							_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
-						} else {
-							ca.depthHistory = ca.getDepth();
-							ca.swapDepths(DepthManager.kTop);
-						}
-							
-						Debugger.log("vHeight: " + optionalOnCanvas[i].getVisibleHeight(), Debugger.CRITICAL, "activityRelease", "CanvasController");
-						Debugger.log("ca._y: " + ca._y, Debugger.CRITICAL, "activityRelease", "CanvasController");
-						Debugger.log("yCoord: " + sequenceActivity.yCoord, Debugger.CRITICAL, "activityRelease", "CanvasController");
-						
-						Debugger.log("ca.getVisibleHeight(): " + ca.getVisibleHeight(), Debugger.CRITICAL, "activityRelease", "CanvasController");
-						
 						if (optionalOnCanvas[i].locked == false) {
 							if (ca._x > optionalOnCanvas[i].getVisibleWidth() || 
 								ca._x < -ca.getVisibleWidth() ||
@@ -191,17 +193,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 								ca.activity.yCoord = (_ymouse - _canvasModel.getPosition().y) - (_canvasModel.getCanvas().taHeight/2);
 								
 								_canvasModel.removeOptionalSequenceCA(ca, optionalOnCanvas[i].activity.activityUIID);
-								
 							} else {
-								activitySnapBack(ca);
+								if(!_canvasModel.moveOptionalSequenceCA(ca, sequenceActivity))
+									activitySnapBack(ca);
 							}
 						
 						}
-							
-					}
-					
-					if(selectedParentActivity.parentUIID == optionalOnCanvas[i].activity.activityUIID) {
-						_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
 					}
 				}
 				

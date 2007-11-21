@@ -250,7 +250,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		setSelectedItem(_activitiesDisplayed.get(branchingActivity.activityUIID));
 	}
 	
-	public function createNewSequenceActivity(parent, orderID){
+	public function createNewSequenceActivity(parent, orderID, stopAfterActivity:Boolean){
 		Debugger.log('Running...',Debugger.GEN,'createNewSequenceActivity','CanvasModel');
 		
 		var seqAct = new SequenceActivity(_cv.ddm.newUIID());
@@ -259,7 +259,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		seqAct.groupingSupportType = Activity.GROUPING_SUPPORT_OPTIONAL;
 		seqAct.activityCategoryID = Activity.CATEGORY_SYSTEM;
 		seqAct.orderID = (orderID != null || orderID != undefined) ? orderID : 1;
-		seqAct.stopAfterActivity = true;
+		seqAct.stopAfterActivity = (stopAfterActivity != null) ? stopAfterActivity : true;
 		
 		if(parent != null) {
 			seqAct.parentActivityID = parent.activityID;
@@ -338,8 +338,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		}
 		
 		if(isSequence) {
-			createNewSequenceActivity(optAct, 0);
-			createNewSequenceActivity(optAct, 1);
+			createNewSequenceActivity(optAct, 0, false);
+			createNewSequenceActivity(optAct, 1, false);
 			optAct.noSequences = 2;
 		}
 		
@@ -398,35 +398,132 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	
 	public function removeOptionalSequenceCA(ca:Object, parentID){
 		haltRefresh(true);
-		
-		var sequence:Activity = _cv.ddm.getActivityByUIID(ca.activity.parentUIID);
-		var transitionObj:Object = _cv.ddm.getTransitionsForActivityUIID(ca.activity.activityUIID);
-		var toActivity:Activity = null;
-		var fromActivity:Activity = null;
-		
+
 		ca.activity.parentUIID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityUIID : null;
 		ca.activity.orderID = null;
 		ca.activity.parentActivityID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityID : null;
+		
+		unhookOptionalSequenceCA(ca);
+		removeActivity(parentID);
+		
+		haltRefresh(false);
+		setDirty();
+	}
+	
+	private function unhookOptionalSequenceCA(ca:Object) {
+		var transitionObj:Object = _cv.ddm.getTransitionsForActivityUIID(ca.activity.activityUIID);
+		var sequence:Activity = _cv.ddm.getActivityByUIID(ca.activity.parentUIID);
+		
+		var toActivity:Activity = null;
+		var fromActivity:Activity = null;
 		
 		if(transitionObj.into != null && transitionObj.out != null) {
 			toActivity = _cv.ddm.getActivityByUIID(transitionObj.out.toUIID);
 			fromActivity = _cv.ddm.getActivityByUIID(transitionObj.into.fromUIID);
 		} else if(transitionObj.into == null && transitionObj.out != null) {
-			ComplexActivity(sequence).firstActivityUIID = transitionObj.out.toUIID
+			ComplexActivity(sequence).firstActivityUIID = transitionObj.out.toUIID;
 		} else if(transitionObj.out == null && transitionObj.into == null) {
 			ComplexActivity(sequence).firstActivityUIID = null;
 		}
 		
 		_cv.ddm.removeTransitionByConnection(ca.activity.activityUIID);
+		if(toActivity != null && fromActivity != null) createSequenceTransition(fromActivity, toActivity);
 		
-		if(toActivity != null) createSequenceTransition(fromActivity, toActivity);
+	}
+	
+	public function moveOptionalSequenceCA(ca:Object, parent:Activity):Boolean {
+		var minDiff:Number = null;
+		var selectedIndex:Number = null;
 		
-		_cv.ddm.getComplexActivityChildren(sequence.activityUIID);
+		var oChildren:Array = _cv.ddm.getComplexActivityChildren(parent.activityUIID);
+		oChildren.sortOn('orderID', Array.NUMERIC);
 		
-		removeActivity(parentID);
+		for(var i=0; i<oChildren.length; i++) {
+			var diff:Number = oChildren[i].xCoord - ca._x;
+			
+			if((minDiff == null || diff < minDiff) && diff > 0 && ca.activity.xCoord > ca._x) {
+				minDiff = diff;
+				selectedIndex = i;
+			} else if((minDiff == null || diff > minDiff) && diff < 0 && ca.activity.xCoord < ca._x) {
+				minDiff = diff;
+				selectedIndex = i;
+			}
+		}
 		
+		Debugger.log("selectedIndex: " + selectedIndex, Debugger.CRITICAL, "moveOptionalSequenceCA", "CanvasModel");
+		
+		if(oChildren[selectedIndex] != ca.activity) {
+			// remove ca from sequence
+			Debugger.log("selectedIndex order: " + Activity(oChildren[selectedIndex]).orderID, Debugger.CRITICAL, "moveOptionalSequenceCA", "CanvasModel");
+			Debugger.log("ca order: " + ca.activity.orderID, Debugger.CRITICAL, "moveOptionalSequenceCA", "CanvasModel");
+		
+			//var _dir:Number = (Activity(oChildren[selectedIndex]).orderID < ca.activity.orderID) ? 0 : 1;
+			var _dir:Number = (ca.activity.xCoord > ca._x) ? 0 : 1;
+			
+			unhookOptionalSequenceCA(ca);
+			addOptionalSequenceCA(ca, oChildren[selectedIndex], _dir);
+			
+			return true;
+		} 
+		
+		return false;
+	}
+	 
+	private function addOptionalSequenceCA(ca:Object, nextOrPrevActivity:Activity, _dir:Number):Void {
+		haltRefresh(true);
+		
+		Debugger.log("ca: " + ca.activity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
+		
+		var sequence:Activity = _cv.ddm.getActivityByUIID(nextOrPrevActivity.parentUIID);
+		var transitionObj:Object = _cv.ddm.getTransitionsForActivityUIID(nextOrPrevActivity.activityUIID);
+		
+		var targetActivity:Activity = null;
+		
+		var transition:Transition = (_dir == 0) ? transitionObj.into : transitionObj.out;
+		Debugger.log("transition length: " + transitionObj.myTransitions.length, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
+		
+		if(transition != null) {
+			targetActivity = (_dir == 0) ? _cv.ddm.getActivityByUIID(transition.fromUIID) :  _cv.ddm.getActivityByUIID(transition.toUIID);
+		} else {
+			ComplexActivity(sequence).firstActivityUIID = (_dir == 0) ? ca.activity.activityUIID : nextOrPrevActivity.activityUIID;
+		}
+		
+		Debugger.log("targetActivity order: " + targetActivity.orderID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
+		Debugger.log("transition toUIID: " + transition.toUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
+		Debugger.log("transition fromUIID: " + transition.fromUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
+		
+		Debugger.log("target UIID: " +targetActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
+		Debugger.log("nextOrPrevActivity: " + nextOrPrevActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
+		Debugger.log("direction: " + _dir, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
+		
+		//_cv.ddm.removeTransitionByConnection(ca.activity.activityUIID);
+		
+		if(targetActivity != null) {
+			var fromActivity:Activity = (_dir == 0) ? targetActivity : nextOrPrevActivity;
+			var toActivity:Activity = (_dir == 0) ? nextOrPrevActivity : targetActivity;
+			
+			Debugger.log("fromActivity: " + fromActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
+			Debugger.log("toActivity: " + toActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
+			
+			_cv.ddm.removeTransition(transition.transitionUIID);
+			createSequenceTransition(fromActivity, ca.activity);
+			createSequenceTransition(ca.activity, toActivity);
+			
+		} else {
+			var fromActivity:Activity = (_dir == 0) ? ca.activity : nextOrPrevActivity;
+			var toActivity:Activity = (_dir == 0) ? nextOrPrevActivity : ca.activity;
+			
+			Debugger.log("fromActivity: " + fromActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
+			Debugger.log("toActivity: " + toActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
+		
+			createSequenceTransition(fromActivity, toActivity);
+		}
+
+		removeActivity(sequence.parentUIID);
 		haltRefresh(false);
+
 		setDirty();
+		
 	}
 	 
 	/**
