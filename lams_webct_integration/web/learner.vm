@@ -53,20 +53,34 @@
 </script>
 </head>
 <body class="listingpage">
-<b>LAMS Lessons Running</b>
+<h1>LAMS Lessons Running</h1>
 <br>
-<br>
-<table border='0' cellpadding="10">	
+
+#if( $lessons.size() > 0 )
+<table width='100%' border='1' cellpadding='10' style="padding:10px 10px 10px 10px;" class="tablebody">	
+<thead>
+<tr>
+	<th>Title</th>
+	<th>Description</th>
+	<th>Actions</th>
+</tr>
+</thead>
+<tbody>
+
 #foreach ($lesson in $lessons)
 	<tr>
 		<td valign='top'><b>$lesson.getTitle()</b></td>
 		<td valign='top'>$lesson.getDescription()</td>
 		<td valign='top'>
-			<input type="button" name="action" onClick="openLearner($lesson.getLessonId());" value="Open Lesson">
+			<a class="actionlight" href="javascript:openLearner($lesson.getLessonId())">Open Lesson</a>
 		</td>
 	</tr>
-
 #end
+	</tbody>
 </table>
+
 </body>
+#else
+    <i>No LAMS lessons running.</i>
+#end
 </html>

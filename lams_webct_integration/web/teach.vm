@@ -99,15 +99,24 @@
 		document.getElementById("lsID").value=lsID;
 	}
 	
+	function modifyLesson( lsID, form_action)
+	{
+		setLsId( lsID, form_action);
+		formSubmit();
+	}
+	
 	function deleteLesson( lsID, form_action)
 	{
 		var answer = confirm("Do you really want to delete this lesson? Once deleted you cant get it back.")
 		if (answer){
 			setLsId( lsID, form_action);
+			formSubmit();
 		}
-		else{
-			return false;
-		}
+	}
+	
+	function formSubmit()
+	{
+		document.teach_form.submit();
 	}
 
 	
@@ -116,38 +125,50 @@
 </script>
 </head>
 <body class="listingpage">
-<h3>LAMS Teaching</h3>
+
+<h1>LAMS Teaching</h1>
 <br>
 <form enctype="application/x-www-form-urlencoded" name="teach_form" id="teach_form" action="$url" method="post">
 	<input type="hidden" name="$id_param_name" value="$pt_id"/>
 	<input type="hidden" name="page_id" value="$page_id"/>
 	<input type="hidden" name="form_action" id="form_action" value="create_lesson"/>
 	<input type="hidden" name="lsID" id="lsID" value="0"/>
-	<input type="submit" name="create" value="Create LAMS Lesson"/>
-<br>
-<b>Lessons Running</b>
-<br>
-<br>
-<table border='0' cellpadding='10'>	
-#foreach ($lesson in $lessons)
+	<div class="actionbuttondiv"><a class="action" href="javascript:formSubmit()">Create LAMS Lesson</a></div>
+	<br><br>
+	<hr>
+	<br>
+	<h3>LAMS Lessons Running</h3>
+	<br>
+	
+#if( $lessons.size() > 0 )	
+	<table width='100%' border='1' cellpadding='10' style="padding:10px 10px 10px 10px;" class="tablebody">	
+	<thead>
 	<tr>
-		<td valign='top'><b>$lesson.getTitle()</b></td>
-		<td valign='top'>$lesson.getDescription()</td>
-		<td valign='top'>
-			<input type="button" name="action" onClick="openLearner($lesson.getLessonId());" value="Open Learner">
-		</td>
-		<td valign='top'>
-			<input type="button" name="action" onClick="openMonitor($lesson.getLessonId());" value="Open Monitor">
-		</td>
-		<td valign='top'>
-			<input type="submit" name="action" onClick="setLsId($lesson.getLessonId(),'modify_lesson');" value="Modify">
-		</td>
-		<td valign='top'>
-			<input type="submit" name="action" onClick="return deleteLesson($lesson.getLessonId(),'delete_lesson');" value="Delete">
-		</td>
+		<th width="30%">Title</th>
+		<th width="30%">Description</th>
+		<th width="40%">Actions</th>
 	</tr>
+	</thead>
+	<tbody>
+	#foreach ($lesson in $lessons)
+		<tr>
+			<td valign='top'><b>$lesson.getTitle()</b></td>
+			<td valign='top'><i>$lesson.getDescription()</i></td>
+	
+			<td>
+				<a class="actionlight" href="javascript:openLearner($lesson.getLessonId())">Open Learner</a>
+				<a class="actionlight" href="javascript:openMonitor($lesson.getLessonId())">Open Monitor</a>
+				<a class="actionlight" href="javascript:modifyLesson($lesson.getLessonId(),'modify_lesson')">Modify</a>
+				<a class="actionlight" href="javascript:deleteLesson($lesson.getLessonId(),'delete_lesson')">Delete</a>
+			</td>
+	
+		</tr>
+	#end
+	
+	</table>
+#else
+    <i>No LAMS lessons running.</i>
 #end
-</table>
 </form>
 
 

@@ -25,30 +25,49 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">	
 <head>
-<title>LAMS: Start Lesson</title>
+<title>LAMS: Modify Lesson</title>
 
 <script language="JavaScript" type="text/javascript">
 <!--
 	function validateLesson()
 	{
-		document.getElementById("form_action").value="modify_proc";
-		return true;
+		if (document.getElementById("form_action").value==null || document.getElementById("title").value=='')
+		{
+			alert("Value required for lesson title.");
+		}
+		else
+		{
+			document.getElementById("form_action").value="modify_proc";
+			formSubmit();
+		}
 	}
 	
 	function back()
 	{
 		document.getElementById("form_action").value="";
+		formSubmit();
+	}
+	
+	function doCancel()
+	{
+		document.getElementById("lsID").value='';
+		document.getElementById("form_action").value='';
+		formSubmit();
+	}
+	
+	function formSubmit()
+	{
+		document.modify_form.submit();
 	}
 //-->
 </script>
 
-
-</head>
-<body>
-<h3>LAMS: Modify LAMS</h3>
 <link rel="stylesheet" href="/webct/css/styles.jsp?locale=en_US&Id=9778001&colorSetId=A" type="text/css" />
+</head>
 
-<br>
+<body class="listingpage">
+<h1>Modify LAMS Lesson</h3>
+
 <br>
 
 <form name="modify_form" id="modify_form" action="$url" method="post">
@@ -59,7 +78,7 @@
 	
 	<table border='0'>
 		<tr>
-			<td valign="top"><b>Title</b></td>
+			<td valign="top"><b><font color=red>*</font>Title</b></td>
 			<td><input id="title" type="text" name="title" value="$title"></td>
 		</tr>
 		<tr>
@@ -78,9 +97,15 @@
 		</tr>
 		
 	</table>
-	<br><br>                                
-	<input type="submit" name="create" onClick="return validateLesson();" value="Modify Lesson"/>
-	<input type="submit" name="back" onClick="back();" value="Back"/>
+	<br>
+	<hr>
+	<br>
+	<div class="actionbuttondiv">		
+		<a class="action" href="javascript:validateLesson()">Modify Lesson</a>
+		<a class="action" href="javascript:doCancel()">Cancel</a>
+	</div>
+	<br>
+	<font color=red>* Required field</font>                                   
 </form>
 
 </body>

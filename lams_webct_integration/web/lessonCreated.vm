@@ -23,16 +23,28 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <link rel="stylesheet" href="/webct/css/styles.jsp?locale=en_US&Id=9778001&colorSetId=A" type="text/css" />
+
+<script language="JavaScript" type="text/javascript">
+<!--
+function formSubmit()
+	{
+		document.return_form.submit();
+	}
+//-->
+</script>
+
 </head>
-<body>
-<b>$successMessage</b>
+<body class="listingpage">
+<br>
+$successMessage
 <br><br>
 	
-<form name="create_form" id="success_form" action="$url" method="post">
+<form name="return_form" id="return_form" action="$url" method="post">
 	<input type="hidden" name="$id_param_name" value="$pt_id"/>
 	<input type="hidden" name="page_id" value="$page_id"/>
 	<input type="hidden" name="form_action" value=""/>
-	<input type="submit" name="create"  value="Return to Teach"/>
+	
+	<a class="actionlight" href="javascript:formSubmit()">Return to LAMS Teaching</a>
 </form>
 
 </body>

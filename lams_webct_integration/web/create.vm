@@ -64,13 +64,16 @@
     {
     	if (document.getElementById("sequence_id").value=="0")
     	{
-    		alert('Please select a sequence before clicking next.');
-    		return false;
+    		alert('Please select a sequence before starting the lesson.');
     	}
+    	else if (document.getElementById("form_action").value==null || document.getElementById("title").value=='')
+		{
+			alert("Value required for lesson title.");
+		}
     	else
     	{
     		document.getElementById("form_action").value="start_lesson";
-    		return true;
+    		formSubmit();
     	}
     }
     
@@ -79,17 +82,20 @@
 
     	if (document.getElementById("sequence_id").value=="0")
     	{
-    		alert('Please select a sequence before clicking next.');
-    		return false;
+    		alert('Please select a sequence before clicking preview.');
     	}
+    	else
+    	{
     	
-		url = '${url}?sequence_id=' +document.getElementById("sequence_id").value+ '&${id_param_name}=${pt_id}&page_id=${page_id}&form_action=preview';
-	   	
-	   	window.open(url,'LAMS-Preview','height=600,width=800,resizable');
-
-  		return true;
-  
+			url = '${url}?sequence_id=' +document.getElementById("sequence_id").value+ '&${id_param_name}=${pt_id}&page_id=${page_id}&form_action=preview';
+	   		window.open(url,'LAMS-Preview','height=600,width=800,resizable');
+  		}
     }
+    
+    function formSubmit()
+	{
+		document.create_form.submit();
+	}
 
     
     function selectSequence(id) 
@@ -97,18 +103,20 @@
     	document.getElementById("sequence_id").value=id;
 	}
 	
-	
-	
-    
+	function doCancel()
+	{
+		document.getElementById("sequence_id").value='0';
+		document.getElementById("form_action").value='';
+		formSubmit();
+	}
 //-->
 </script>
 
 
 </head>
-<body>
-<h3>Create LAMS Lesson</h3>
+<body class="listingpage">
+<h1>Create LAMS Lesson</h1>
 
-<br>
 <br>
 
 <form name="create_form" id="create_form" action="$url" method="post">
@@ -117,9 +125,9 @@
 	<input type="hidden" name="page_id" value="$page_id"/>
 	<input type="hidden" name="form_action" id="form_action" value=""/>
 	
-	<table border='0'>
+	<table border='0' cellspacing-'10'>
 		<tr>
-			<td valign="top"><b>Title</b></td>
+			<td valign="top"><b><font color=red>*</font>Title</b></td>
 			<td><input id="title" type="text" name="title" value=""></td>
 		</tr>
 		<tr>
@@ -133,11 +141,16 @@
 		</tr>
 		
 	</table>
-	<br><br>
+	<br>
+	<hr>
+	<br>
 	
 	<table border='0'>
 		<tr>
 			<td valign="top"><b>Select Sequence</b></td>
+			<td>
+				&nbsp;&nbsp;
+			</td>
 			<td>
 				<script language="JavaScript" type="text/javascript">
             	<!-- 
@@ -146,19 +159,22 @@
 				//-->
 				</script>
 			</td>
-		</tr>
-		<tr>
-			<td><input type="button" name="preview" onClick="openPreview();" value="Preview Selected"></td>
-			<td><input type="button" name="author" onClick="openAuthor();" value="Open Author"></td>
-		</tr>
-	</table>	
-
-	<input type="button" name="action" onClick="refreshSeqList();" value="Refresh">                                      
-	<input type="submit" name="create" onClick="return doStartLesson();" value="Start Lesson"/>
+	</table>
+	<br>
+	<a class="actionlight" href="javascript:openAuthor()">Open Author</a>&nbsp;
+	<a class="actionlight" href="refreshSeqList()">Refresh Workspace </a>&nbsp;
+	<a class="actionlight" href="javascript:openPreview()">Preview Selected</a>&nbsp;
+	
+	<br><br>
+	<hr>
+	<br>
+	<div class="actionbuttondiv">		
+		<a class="action" href="javascript:doStartLesson()">Start LAMS Lesson</a>
+		<a class="action" href="javascript:doCancel()">Cancel</a>
+	</div> 
+	<br>
+	<font color=red>* Required field</font>                                    
 </form>
-
-
-
 
 
 </body>
