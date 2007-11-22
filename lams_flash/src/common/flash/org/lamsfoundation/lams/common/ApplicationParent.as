@@ -258,12 +258,16 @@ class ApplicationParent {
     static function get dialogue():MovieClip {
         //Return root if valid otherwise raise a big system error as app. will not work without it
         if(_instance._dialogueContainer_mc != undefined) {
-            return _instance._dialogueContainer_mc;
+            return _instance.dialogueContainer;
         } else {
             //TODO DI 11/05/05 Raise error if mc hasn't been created
 			
         }
     }
+	
+	public function set dialogueContainer(a:MovieClip):Void{
+		_dialogueContainer_mc = a;
+	}
 	
 	public function get dialogueContainer():MovieClip {
 		if(_dialogueContainer_mc == undefined) _dialogueContainer_mc = _appRoot_mc.createEmptyMovieClip('_dialogueContainer_mc', DIALOGUE_DEPTH);

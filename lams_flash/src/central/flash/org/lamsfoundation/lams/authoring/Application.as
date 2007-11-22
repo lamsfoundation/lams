@@ -366,7 +366,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc', APP_ROOT_DEPTH);
         
 		//Create screen elements
-        _dialogueContainer_mc = _container_mc.createEmptyMovieClip('_dialogueContainer_mc',DIALOGUE_DEPTH);
+        dialogueContainer = _container_mc.createEmptyMovieClip('_dialogueContainer_mc',DIALOGUE_DEPTH);
         _cursorContainer_mc = _container_mc.createEmptyMovieClip('_cursorContainer_mc',CURSOR_DEPTH);			
 		_toolbarContainer_mc = _container_mc.createEmptyMovieClip('_toolbarContainer_mc',TOOLBAR_DEPTH);
 		_pi_mc = _container_mc.createEmptyMovieClip('_pi_mc',PI_DEPTH);

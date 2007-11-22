@@ -76,7 +76,7 @@ class org.lamsfoundation.lams.common.ui.Dialog {
 			target = ApplicationParent.getInstance().dialog;
 			Debugger.log("target 2:" + target, Debugger.CRITICAL, "createAlertDialog", "Dialog");
 		} else {
-			target = ApplicationParent.getInstance().dialogueContainer;
+			target = ApplicationParent.dialogue;
 			Debugger.log("target 3:" + target, Debugger.CRITICAL, "createAlertDialog", "Dialog");
 		}
 		
