@@ -29,8 +29,6 @@ import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.common.dict.*; 
 import org.lamsfoundation.lams.common.mvc.*;
-import org.lamsfoundation.lams.authoring.Activity;
-import org.lamsfoundation.lams.common.ToolTip;
 
 import mx.managers.*;
 import mx.containers.*;
@@ -40,52 +38,45 @@ import mx.controls.*;
 
 class org.lamsfoundation.lams.monitoring.mv.IndexButton extends mx.core.UIObject {
 	
+	public static var _tabID:Number = 2;
+	private var _className = "IndexButton";
+	
+	private var _bgPanel:MovieClip;
+	private var btnWidth:Number;
 	private var idxLabel:Label;
+	
+	private var _tm:ThemeManager;
+	private var mm:MonitorModel;
 	    
-	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
-    private var dispatchEvent:Function;     
-    public var addEventListener:Function;
-    public var removeEventListener:Function;
-	
-	function IndexButton() {
-		
-		init();
-		setPosition();
-		
-		//Init for event delegation
-        mx.events.EventDispatcher.initialize(this);
-	}
-	
 	/**
 	* Called to Indexbutton. Called by LearnerIndexView
 	*/
 	public function init(m:Observable,c:Controller){
-		this.createClassObject(mx.controls.Label, "idxLabel", this.getNextHighestDepth(), {text:"", autoSize: "center"});
+		//Invoke superconstructor, which sets up MVC relationships.
+		mm = MonitorModel(m);
 		
+		btnWidth = 48;
+		
+		_bgPanel._width = btnWidth;
+		this.createClassObject(mx.controls.Label, "idxLabel", this.getNextHighestDepth(), {text:"", _width: 43, autoSize: "right"});
 		this.onRollOver = Delegate.create(this, onMouseOver);
 		this.onPress = Delegate.create(this, indexClicked);
+    }
 		
-		MovieClipUtils.doLater(Proxy.create(this, draw)); 
-    }   
-	
-	
-	public function draw():Void {
-		
-		Debugger.log("draw invoked", Debugger.CRITICAL, "draw", "IndexButton");
-	}
-	
 	public function onMouseOver(): Void {
 		Debugger.log("onMouseOver event triggered", Debugger.GEN, "onMouseOver", "IndexButton");
-		// TODO: some cool mouse over effect
+		// TODO: some cool mouse over effects
 	}
 	
 	public function indexClicked(): Void {
-		Debugger.log("onMousePress event triggered by "+label.text, Debugger.CRITICAL, "indexClicked", "IndexButton");
+		mm.currentLearnerIndex = Number(label.text);
 	}
+
 	
-	public function setPosition() {
-		idxLabel._x = this._x + this._width/2 - idxLabel._width/2;
-		idxLabel._y = this._y;
+	public function setSize():Void {
+		this._width = btnWidth;
+		idxLabel._width = btnWidth - 5;
+		_bgPanel._width = btnWidth;
 	}
 	
 	public function set label(a:String):Void {

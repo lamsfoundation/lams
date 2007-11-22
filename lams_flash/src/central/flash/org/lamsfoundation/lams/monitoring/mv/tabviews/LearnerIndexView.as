@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
- 
+
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.style.*;
@@ -33,12 +33,9 @@ import org.lamsfoundation.lams.common.ApplicationParent;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.ComplexActivity;
 import org.lamsfoundation.lams.authoring.cv.CanvasActivity;
+import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.ToolTip;
 import org.lamsfoundation.lams.authoring.Transition;
-
-
-//import org.lamsfoundation.lams.common.*
-//import org.lamsfoundation.lams.monitoring.Application;
 
 import mx.managers.*;
 import mx.containers.*;
@@ -52,16 +49,17 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	private var _className = "LearnerIndexView";
 	
 	private var _tm:ThemeManager;
-	
 	private var _tip:ToolTip;
 	
 	private var mm:MonitorModel;
-	
 	private var _learnerIndexView:LearnerIndexView;
 	
 	//IndexButton
 	private var _indexButton:IndexButton;
 	private var _indexButton_mc:MovieClip;
+	private var _buttonsPanel_mc:MovieClip;
+	
+	private var buttonsDrawn:Boolean;
 	
 	private var dispatchEvent:Function; 
 	public var addEventListener:Function;
@@ -72,8 +70,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	*/
 	function LearnerIndexView(){
 		Debugger.log("LearnerIndexView Constructor", Debugger.CRITICAL, "LearnerIndexView", "LearnerIndexView");
-		_learnerIndexView = this;
-		
+
 		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
 		
@@ -89,129 +86,90 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		//Invoke superconstructor, which sets up MVC relationships.
 		super (m, c);
 		mm = MonitorModel(model)
-		
-		setPosition(mm);
+
+		_learnerIndexView = this;
+		mm.learnerIndexView = this;
+
+		buttonsDrawn = false;
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
-		mm.getMonitor().getMV().getMonitorLearnerScp()._visible = false;
     }
 
 	public function update (o:Observable,infoObj:Object):Void {
-		Debugger.log("LearnerIndexView update", Debugger.CRITICAL, "update", "LearnerIndexView");
+		Debugger.log("LearnerIndexView update", Debugger.GEN, "update", "LearnerIndexView");
 		var mm:MonitorModel = MonitorModel(o);
 
 		switch (infoObj.updateType){
-			case 'POSITION' :
-				setPosition(mm);
-				break;
-			case 'SIZE' :
-				setSize(mm);
-				break;
 			case 'TABCHANGE' :
 				if (infoObj.tabID == _tabID && !mm.locked){
+					if (!buttonsDrawn && getNumButtons()>1){
+						setupButtons();
+					}
 					this._visible = true;
 				}else {
 					this._visible = false;
 				}
 				break;
+			case 'POSITION' :
+				if (infoObj.tabID == _tabID && !mm.locked){
+					setPosition(mm);
+				}
+				break;
+			case 'SIZE' :	
+				if (infoObj.tabID == _tabID && !mm.locked){
+					setSize(mm);
+				}
+				break;	
 			default :
 				Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorTabView');
 		}
 	}
-	
-
+		
 	private function draw(){
-		Debugger.log("LearnerIndexView draw", Debugger.CRITICAL, "draw", "LearnerIndexView");
-
-		var s:Object = mm.getSize();
-
-		mm.learnerIndexView = this;
-
-		//var idx1:MovieClip = this.attachMovie("indexButton", "indexButton1", this.getNextHighestDepth(), {_x:0, _y:0});
-		var idx1:MovieClip = this.attachMovie("IndexButton", "indexButton1", this.getNextHighestDepth()); //, {idxLabel.text: "ttest"}
-		var idx2:MovieClip = this.attachMovie("indexButton", "indexButton2", this.getNextHighestDepth());
-		var idx3:MovieClip = this.attachMovie("indexButton", "indexButton3", this.getNextHighestDepth());
-	
-		_indexButton = IndexButton(idx1);
-		_indexButton.label = "1";
-		
-		_indexButton = IndexButton(idx2);
-		_indexButton.label = "2";
-		
-		_indexButton = IndexButton(idx3);
-		_indexButton.label = "3";
-		
-		Debugger.log("_indexButton.label: "+_indexButton.label, Debugger.CRITICAL, "draw", "LearnerIndexView");
-		Debugger.log("_indexButton: "+_indexButton, Debugger.CRITICAL, "draw", "LearnerIndexView");
-		//_indexButton.init();
-		
-		//_index
-		//var tstLabel:Label = idx1.attachMovie("Label", "tstLabel", idx1.getNextHighestDepth());
-		//idx1.createTextField("txt1", idx1.getNextHighestDepth(), -1000, -1000, 0, 0);
-		//txt1.text = "TEST";
-		//var EP_btn_label:String = Dictionary.getValue('learner_exportPortfolio_btn');
-
-		//_nameLayer_mc.attachMovie("Button", "learnerName"+learner.getLearnerId()+"_btn", _nameLayer_mc.getNextHighestDepth(),{label:EP_btn_label, _x:z.w-110, _y:ACT_Y+2, styleName:styleObj} )	
-
-		idx1._x = 0;
-		idx2._x = 100;
-		idx3._x = 200;
-		
-		//var ib1:IndexButton = new IndexButton();
-		
-		//var idxbtn1:MovieClip = idx1.createClassObject(IndexButton, "idxbtn1", this.getNextHighestDepth());
-		//Debugger.log("idxbtn1.getDepth(): "+idxbtn1.getDepth(), Debugger.CRITICAL, "draw", "LearnerIndexView");
-		
-		//idxbtn1._x = 243;
-		//idx1.attachMovie("ib1", "ib1", idx1.getNextHighestDepth());
-		
-		//var tstMovie:MovieClip = new MovieClip();
-		//idx1.createEmptyMovieClip("idx1emc", this.getNextHighestDepth());
-		//idx1emc.
-		//idx1.attachMovie(tstMovie, "tst)
-		
-		//setupLabels();
-		
+				
 		dispatchEvent({type:'load',target:this});
 	}
 	
-	public function setupLabels():Void {
-		
-		
-		//_indexButton = IndexButton(idx1);
-		//_indexButton.init()
-		//learnerIndexView_mc = _monitorPanels_mc.attachMovie("LearnerIndexView", "learnerIndexView_mc", _monitorPanels_mc.getNextHighestDepth());
-		//learnerIndexView = LearnerIndexView(learnerIndexView_mc);
-		//learnerIndexView.init(mm, undefined);
+	public function getNumButtons(): Number {
+		return Math.ceil(mm.getSequence().noStartedLearners/mm.learnersPerPage);
 	}
 	
-	public function getNumLearners(mm:MonitorModel): Number {
-		var s:MonitorModel = MonitorModel(getModel());
-		Debugger.log("Num learners: "+s.getlearnerTabActArr().length, Debugger.CRITICAL, "getNumLearners", "LearnerIndexView");
+	public function setupButtons():Void {
 		
-		return s.getlearnerTabActArr().length;
+		var btnWidth:Number = 48;
+		var numButtons:Number = getNumButtons();
+		
+		_buttonsPanel_mc = this.createEmptyMovieClip("_buttonsPanel_mc", DepthManager.kTop);
+			
+		for (var i=1; i<=numButtons; i++) {	
+			var idxBtn:MovieClip = _buttonsPanel_mc.attachMovie("IndexButton", "indexButton"+i, _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth});	
+			_indexButton = IndexButton(idxBtn);
+			_indexButton.init(mm);
+			_indexButton.label = i;
+			Debugger.log("idxBtn._width: "+idxBtn._width, Debugger.CRITICAL, "setupButtons", "LearnerIndexView");
+			if (i > 1)
+				idxBtn._x = (i-1)*btnWidth-1;
+			else
+				idxBtn._x = (i-1)*btnWidth;
+		}
+		buttonsDrawn = true;
 	}
 
-	private function setPosition(mm:MonitorModel):Void{
+	private function setPosition(mm:MonitorModel):Void{		
 		Debugger.log("LearnerIndexView setPosition", Debugger.CRITICAL, "setPosition", "LearnerIndexView");
 		var p:Object = mm.getPosition(); 
 		
 		this._x = p.x;
 		this._y = 0;
-		
 	}
 	
 	private function setSize(mm:MonitorModel):Void{
-		Debugger.log("LearnerIndexView setSize", Debugger.CRITICAL, "setSize", "LearnerIndexView");
-		//var s:Object = mm.getSize();
+		Debugger.log("setSize invoked", Debugger.CRITICAL, "setSize", "LearnerIndexView");
 		
-		//TODO fixes width of learnerIndexView components, but there's prob a better way
-		var s:Object = MonitorModel(getModel()).getSize(); 
-
-		//bg_pnl.setSize(s.w, bg_pnl.height);
-		//bar_pnl.setSize(s.w-20, bar_pnl.height);
-		//mm.endGate.tt_btn.setSize(s.w, bg_pnl.height);
-	}	
+		Debugger.log("PNT 1: "+mm.learnerIndexView._width, Debugger.CRITICAL, "setSize", "LearnerIndexView");
+		this._width = Stage.width;
+		Debugger.log("PNT 2: "+mm.learnerIndexView.width, Debugger.CRITICAL, "setSize", "LearnerIndexView");
+	}
 
 	public function getController():MonitorController{
 		var c:Controller = super.getController();
