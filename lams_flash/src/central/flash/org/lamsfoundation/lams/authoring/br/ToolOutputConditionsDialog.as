@@ -248,7 +248,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		var branches:Array = app.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(_branchingActivity.activityUIID).toolBased;
 		
 		for(var i=0; i<branches.length; i++) {
-			if(branches[i].condition.toolActivity.activityUIID == _toolActivity.activityUIID) {
+			if(branches[i].condition.toolActivity.activityUIID == _toolActivity.activityUIID && 
+				branches[i].condition.branchingActivity == _branchingActivity.activityUIID) {
 				addCondition(branches[i].condition);
 				if(_condition_item_dgd.length==1) setDefinition(branches[i].condition.name);
 			}
@@ -269,8 +270,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private function addButton_onPress():Void {
 		if(validateCondition(_selectedDefinition))
-			if(Boolean(_opt_greaterThan_cb.value)) addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _start_value_stp.value, null));
-			else addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _start_value_stp.value, _end_value_stp.value));
+			if(Boolean(_opt_greaterThan_cb.value)) addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, _start_value_stp.value, null));
+			else addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, _start_value_stp.value, _end_value_stp.value));
 	}
 	
 	private function clearAllButton_onPress(evt:Object, c:Boolean):Void {
@@ -466,8 +467,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				_condition_to_lbl.visible = false;
 				
 				if(_condition_item_dgd.dataProvider.length <= 0) {
-					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, _toolActivity, true));
-					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, _toolActivity, false));
+					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, _toolActivity, _branchingActivity, true));
+					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, _toolActivity, _branchingActivity, false));
 				}
 				
 				break;

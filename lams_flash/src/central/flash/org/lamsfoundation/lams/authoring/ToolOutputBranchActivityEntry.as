@@ -39,6 +39,7 @@ class ToolOutputBranchActivityEntry extends BranchActivityEntry {
 		this.branchingActivity = branchingActivity;
 		
 		this.condition = condition;
+		this.condition.branchingActivity = branchingActivity;
 	}
 
 	public function toData():Object {

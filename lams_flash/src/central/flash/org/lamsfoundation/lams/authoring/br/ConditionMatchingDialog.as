@@ -96,6 +96,7 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 	public function loadLists() {
 		Debugger.log("Loading Lists: branch length: " + branches.length, Debugger.CRITICAL, "loadLists", "ConditionMatchingDialog");
 		Debugger.log("Loading Lists: branching act: " + _branchingActivity.activityUIID, Debugger.CRITICAL, "loadLists", "ConditionMatchingDialog");
+		Debugger.log("Loading Lists: conditions length: " + conditions.length, Debugger.CRITICAL, "loadLists", "ConditionMatchingDialog");
 		
 		conditions_lst.dataProvider = conditions;
 		conditions_lst.sortItemsBy("conditionUIID", Array.NUMERIC);
@@ -124,7 +125,8 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 		Debugger.log("Loading Lists: mappings length: " + mappings.length, Debugger.CRITICAL, "loadLists", "ConditionMatchingDialog");
 		
 		for(var i=0; i < mappings.length; i++) {
-			if(mappings[i].condition.toolActivity.activityUIID == _branchingActivity.toolActivityUIID) {
+			if(mappings[i].condition.toolActivity.activityUIID == _branchingActivity.toolActivityUIID &&
+				mappings[i].condition.branchingActivity.activityUIID == _branchingActivity.activityUIID) {
 				match_dgd.addItem(mappings[i]);
 				removeCondition(mappings[i].condition);
 			}

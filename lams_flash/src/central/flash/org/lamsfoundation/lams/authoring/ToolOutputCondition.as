@@ -43,7 +43,7 @@ class ToolOutputCondition   {
 	private var _endValue:Object;
 	private var _exactMatchValue:Object;
 	
-	private var _branchingActivity:Activity;
+	private var _branchingActivity:BranchingActivity;
 	private var _toolActivity:ToolActivity;
 	
 	function ToolOutputCondition(conditionID:Number, conditionUIID:Number, name:String, type:String, startValue:Object, endValue:Object, exactMatchValue:Object, displayName:String){
@@ -59,7 +59,7 @@ class ToolOutputCondition   {
 		_display_name = displayName;
 	}
 	
-	public static function createBoolCondition(UIID:Number, definition:ToolOutputDefinition, toolActivity:ToolActivity, value:Boolean):ToolOutputCondition {
+	public static function createBoolCondition(UIID:Number, definition:ToolOutputDefinition, toolActivity:ToolActivity, branchingActivity:BranchingActivity, value:Boolean):ToolOutputCondition {
 		var condition:ToolOutputCondition = new ToolOutputCondition();
 		condition.conditionUIID = UIID;
 		
@@ -69,12 +69,13 @@ class ToolOutputCondition   {
 			condition.displayName = definition.type + " (" + String(value) + ") ";
 			condition.exactMatchValue = value;
 			condition.toolActivity = toolActivity;
+			condition.branchingActivity = branchingActivity;
 		}
 		
 		return condition;
 	}
 	
-	public static function createLongCondition(UIID:Number, displayName:String, definition:ToolOutputDefinition, toolActivity:ToolActivity, startValue:Number, endValue:Number):ToolOutputCondition {
+	public static function createLongCondition(UIID:Number, displayName:String, definition:ToolOutputDefinition, toolActivity:ToolActivity, branchingActivity:BranchingActivity, startValue:Number, endValue:Number):ToolOutputCondition {
 		var condition:ToolOutputCondition = new ToolOutputCondition();
 		condition.conditionUIID = UIID;
 		
@@ -91,6 +92,7 @@ class ToolOutputCondition   {
 			}
 			
 			condition.toolActivity = toolActivity;
+			condition.branchingActivity = branchingActivity;
 		}
 		
 		return condition;
@@ -209,6 +211,14 @@ class ToolOutputCondition   {
 	
 	public function get toolActivity():ToolActivity {
 		return _toolActivity;
+	}
+	
+	public function set branchingActivity(a:BranchingActivity) {
+		_branchingActivity = a;
+	}
+	
+	public function get branchingActivity():BranchingActivity {
+		return _branchingActivity;
 	}
 
 

@@ -994,7 +994,8 @@ class PropertyInspectorControls extends MovieClip {
 		Debugger.log("Loading Lists: mappings length: " + mappings.length, Debugger.CRITICAL, "loadLists", "ConditionMatchingDialog");
 		
 		for(var i=0; i < mappings.length; i++) {
-			if(mappings[i].condition.toolActivity.activityUIID == UIID) {
+			if(mappings[i].condition.toolActivity.activityUIID == UIID &&
+				mappings[i].condition.branchingActivity.activityUIID == _canvasModel.selectedItem.activity.activityUIID) {
 				toolActs_cmb.selectedIndex = index;
 				branchToolInputChange(_canvasModel.selectedItem, toolActs_cmb.dataProvider[index].data);
 			}
@@ -1226,7 +1227,7 @@ class PropertyInspectorControls extends MovieClip {
 	
 	private function ConditionMatchDialogLoaded(evt:Object) {
 		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
-		var conditions:Array = _canvasModel.getCanvas().ddm.getAllConditionsForToolOutput(BranchingActivity(_canvasModel.selectedItem.activity).toolActivityUIID);
+		var conditions:Array = _canvasModel.getCanvas().ddm.getAllConditionsForToolOutput(BranchingActivity(_canvasModel.selectedItem.activity));
 		
 		evt.target.scrollContent.branchingActivity = BranchingActivity(_canvasModel.selectedItem.activity);
 		evt.target.scrollContent.conditions = conditions;

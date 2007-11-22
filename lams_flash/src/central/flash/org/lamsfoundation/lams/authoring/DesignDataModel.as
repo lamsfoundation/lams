@@ -1117,13 +1117,15 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function getAllConditions():Array {
 		return _outputConditions.values();
 	}
-	public function getAllConditionsForToolOutput(toolActivityUIID:Number):Array {
+	
+	public function getAllConditionsForToolOutput(branchingActivity:BranchingActivity):Array {
 		var conditions:Array = getAllConditions();
 		var rConditions:Array = new Array();
 		
 		for(var i=0; i<conditions.length; i++) {
-			if(conditions[i].toolActivity.activityUIID = toolActivityUIID)
-				rConditions.push(conditions[i]);
+			if(conditions[i].toolActivity.activityUIID == branchingActivity.toolActivityUIID &&
+				conditions[i].branchingActivity.activityUIID == branchingActivity.activityUIID)
+					rConditions.push(conditions[i]);
 		}
 		
 		return rConditions;
@@ -1173,7 +1175,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				mappingsToRemove.push(Array(mappings.groupBased));
 			
 			for(var j=0; j<mappings.toolBased.length; j++)
-				if(mappings.toolBased[j].condition.toolActivity.activityUIID != BranchingActivity(tActs[i]).toolActivityUIID)
+				if(mappings.toolBased[j].condition.toolActivity.activityUIID != BranchingActivity(tActs[i]).toolActivityUIID &&
+					mappings.toolBased[j].condition.branchingActivity.activityUIID == BranchingActivity(tActs[i]).activityUIID)
 					mappingsToRemove.push(mappings.toolBased[j]);
 		}
 		
