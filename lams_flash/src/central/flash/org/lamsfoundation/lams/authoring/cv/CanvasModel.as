@@ -399,11 +399,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	public function removeOptionalSequenceCA(ca:Object, parentID){
 		haltRefresh(true);
 
+		unhookOptionalSequenceCA(ca);
+		
 		ca.activity.parentUIID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityUIID : null;
 		ca.activity.orderID = null;
 		ca.activity.parentActivityID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityID : null;
 		
-		unhookOptionalSequenceCA(ca);
 		removeActivity(parentID);
 		
 		haltRefresh(false);
@@ -416,14 +417,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		
 		var toActivity:Activity = null;
 		var fromActivity:Activity = null;
+		var parentAct:SequenceActivity = SequenceActivity(sequence);
 		
 		if(transitionObj.into != null && transitionObj.out != null) {
 			toActivity = _cv.ddm.getActivityByUIID(transitionObj.out.toUIID);
 			fromActivity = _cv.ddm.getActivityByUIID(transitionObj.into.fromUIID);
-		} else if(transitionObj.into == null && transitionObj.out != null) {
-			ComplexActivity(sequence).firstActivityUIID = transitionObj.out.toUIID;
-		} else if(transitionObj.out == null && transitionObj.into == null) {
-			ComplexActivity(sequence).firstActivityUIID = null;
+		} else if(transitionObj.out != null) {
+			parentAct.firstActivityUIID = transitionObj.out.toUIID;
+		} else if(transitionObj.out == null && transitionObj.into == null){
+			parentAct.firstActivityUIID = null;
 		}
 		
 		_cv.ddm.removeTransitionByConnection(ca.activity.activityUIID);
@@ -451,20 +453,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		}
 		
 		Debugger.log("selectedIndex: " + selectedIndex, Debugger.CRITICAL, "moveOptionalSequenceCA", "CanvasModel");
-		
-		if(oChildren[selectedIndex] != ca.activity) {
-			// remove ca from sequence
-			Debugger.log("selectedIndex order: " + Activity(oChildren[selectedIndex]).orderID, Debugger.CRITICAL, "moveOptionalSequenceCA", "CanvasModel");
-			Debugger.log("ca order: " + ca.activity.orderID, Debugger.CRITICAL, "moveOptionalSequenceCA", "CanvasModel");
-		
-			//var _dir:Number = (Activity(oChildren[selectedIndex]).orderID < ca.activity.orderID) ? 0 : 1;
-			var _dir:Number = (ca.activity.xCoord > ca._x) ? 0 : 1;
+		if(selectedIndex != null) {
+			if(oChildren[selectedIndex] != ca.activity) {
+				// remove ca from sequence
+				Debugger.log("selectedIndex order: " + Activity(oChildren[selectedIndex]).orderID, Debugger.CRITICAL, "moveOptionalSequenceCA", "CanvasModel");
+				Debugger.log("ca order: " + ca.activity.orderID, Debugger.CRITICAL, "moveOptionalSequenceCA", "CanvasModel");
 			
-			unhookOptionalSequenceCA(ca);
-			addOptionalSequenceCA(ca, oChildren[selectedIndex], _dir);
-			
-			return true;
-		} 
+				//var _dir:Number = (Activity(oChildren[selectedIndex]).orderID < ca.activity.orderID) ? 0 : 1;
+				var _dir:Number = (ca.activity.xCoord > ca._x) ? 0 : 1;
+				
+				unhookOptionalSequenceCA(ca);
+				addOptionalSequenceCA(ca, oChildren[selectedIndex], _dir);
+				
+				return true;
+			} 
+		}
 		
 		return false;
 	}
@@ -485,7 +488,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		if(transition != null) {
 			targetActivity = (_dir == 0) ? _cv.ddm.getActivityByUIID(transition.fromUIID) :  _cv.ddm.getActivityByUIID(transition.toUIID);
 		} else {
-			ComplexActivity(sequence).firstActivityUIID = (_dir == 0) ? ca.activity.activityUIID : nextOrPrevActivity.activityUIID;
+			if(_dir == 0) ComplexActivity(sequence).firstActivityUIID = ca.activity.activityUIID;
 		}
 		
 		Debugger.log("targetActivity order: " + targetActivity.orderID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
@@ -969,7 +972,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
 			var parentAct;
 			if((parentAct = _cv.ddm.activities.get(ddm_activity.parentUIID)) != null)
-				if(parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE)
+				if(parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE && !parentAct.isOptionalSequenceActivity(_cv.ddm.activities.get(parentAct.parentUIID)))
 					return r = "NEW_SEQ_CHILD";
 			
 			return r = "CHILD";

@@ -66,12 +66,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    
     public function activityClick(ca:Object):Void{
 		
+		_tempSelectedItem = _canvasModel.selectedItem;
+		_canvasModel.selectedItem = null;
 		
 		Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID + ' orderID: ' + ca.activity.orderID,Debugger.GEN,'activityClick','CanvasController');
 	    Debugger.log('Check if transition tool active :'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityClick','CanvasController');
 	    
 		//if transition tool active
-	    if(_canvasModel.isTransitionToolActive()){
+	    if(_canvasModel.isTransitionToolActive()) {
 		    
 			var transitionTarget = createValidTransitionTarget(ca, true);
 		    if(transitionTarget instanceof LFError){
@@ -82,11 +84,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasModel.activeView.initDrawTempTrans();
 			}
 			
-	    }else{
-			
-		   //just select the activity
-			var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
-			
+	    } else {
+				
 			if(ca.activity.parentUIID != null && (parentAct.isParallelActivity() || 
 			    ca.activity.isOptionalSequenceActivity(parentAct))) {
 				_canvasModel.isDragging = false;
@@ -95,26 +94,28 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasModel.isDragging = true;
 			}
 			
+		    var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
+			var parentSelectedAct = _canvasModel.getCanvas().ddm.getActivityByUIID(_tempSelectedItem.activity.parentUIID);
+			var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
 			
-			if(_tempSelectedItem.activity.parentUIID == parentAct.activityUIID && _tempSelectedItem != ca) {
-				ca.depthHistory = ca.getDepth();
-				ca.swapDepths(DepthManager.kTop);
-						
-				_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
-			} else {
+			if(_tempSelectedItem != null) {
+			
+				// clear currently selected activity
+				for (var i=0; i<optionalOnCanvas.length; i++) {
+					if(parentSelectedAct.parentUIID == optionalOnCanvas[i].activity.activityUIID) {
+						_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
+						_tempSelectedItem.depthHistory = null;
+					}
+				}
+
+			}
+			
+			if(parentAct.isOptionalSequenceActivity(_canvasModel.getCanvas().ddm.getActivityByUIID(parentAct.parentUIID))) {
 				ca.depthHistory = ca.getDepth();
 				ca.swapDepths(DepthManager.kTop);
 			}
 			
-			var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
-			for (var i=0; i<optionalOnCanvas.length; i++)
-				if(parentAct.parentUIID == optionalOnCanvas[i].activity.activityUIID && _tempSelectedItem != ca)
-					_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
-					
 		}
-		
-		_tempSelectedItem = _canvasModel.selectedItem;
-		_canvasModel.selectedItem = null;
 	   
     }
    
@@ -357,8 +358,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			clearAllSelections(optionalOnCanvas, parallelOnCanvas);
 			
-			_tempSelectedItem = null;
-			_canvasModel.selectedItem = ca;	
+			_canvasModel.selectedItem = ca;
 			_canvasModel.setDirty();
 			
 			Debugger.log('ca.activity.xCoord:'+ca.activity.xCoord,Debugger.GEN,'activityRelease','CanvasController');
@@ -404,9 +404,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	 */
 	public function activityDoubleClick(ca:Object):Void{
 	    Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick','CanvasController');
+		
 		var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID)
+		
 		_canvasModel.getCanvas().stopActiveTool();
 		_canvasModel.getCanvas().stopTransitionTool();	
+		
 		if(!isActivityReadOnly(ca, Dictionary.getValue("cv_element_readOnly_action_mod"))) {
 			if(_canvasModel.getCanvas().ddm.readOnly && !_canvasModel.getCanvas().ddm.editOverrideLock){
 				// throw alert warning
