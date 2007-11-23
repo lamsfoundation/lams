@@ -49,6 +49,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	public static var GATE_ACTIVITY_HEIGHT:Number =28;
 	public static var GATE_ACTIVITY_WIDTH:Number = 28;
+	public static var BRANCH_ICON_HEIGHT:Number = 30;
+	public static var BRANCH_ICON_WIDTH:Number = 30;
 	public static var ICON_WIDTH:Number = 25;
 	public static var ICON_HEIGHT:Number = 25;
 	
@@ -93,6 +95,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var branchIcon_mc:MovieClip;
 	private var stopSign_mc:MovieClip;
 	private var branchSign_mc:MovieClip;
+	private var start_branch_icon_mc:MovieClip;
+	private var finish_branch_icon_mc:MovieClip;
 	
 	private var clickTarget_mc:MovieClip;
 	
@@ -130,10 +134,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		//let it wait one frame to set up the components.
 		//this has to be set b4 the do later :)
-		if((_activity.isGateActivity() || _connector) && !_sequenceChild){
+		if((_activity.isGateActivity()) && !_sequenceChild){
 			_visibleHeight = CanvasActivity.GATE_ACTIVITY_HEIGHT;
 			_visibleWidth = CanvasActivity.GATE_ACTIVITY_WIDTH;
-		}else if(_activity.isGroupActivity()){
+		} else if(_branchConnector) {
+			_visibleHeight = CanvasActivity.BRANCH_ICON_HEIGHT;
+			_visibleWidth = CanvasActivity.BRANCH_ICON_WIDTH;
+		} else if(_activity.isGroupActivity()){
 			_visibleHeight = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_HEIGHT : CanvasActivity.TOOL_ACTIVITY_HEIGHT;
 			_visibleWidth = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH : CanvasActivity.TOOL_ACTIVITY_WIDTH;
 		}else{
@@ -185,6 +192,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function showAssets(isVisible:Boolean){
 		groupIcon_mc._visible = isVisible;
 		branchIcon_mc._visible = isVisible;
+		start_branch_icon_mc._visible = isVisible;
+		finish_branch_icon_mc._visible = isVisible;
 		title_lbl._visible = isVisible;
 		icon_mc._visible = isVisible;
 		stopSign_mc._visible = isVisible;
@@ -381,9 +390,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			}
 			
 		} else if(_branchConnector) {
-			branchSign_mc._visible = true;
-			branchSign_mc._x = 0;
-			branchSign_mc._y = 0;
+			start_branch_icon_mc._visible = true;
+			start_branch_icon_mc._x = 1;
+			start_branch_icon_mc._y = 1;
+			
+			finish_branch_icon_mc._visible = true;
+			finish_branch_icon_mc._x = 1;
+			finish_branch_icon_mc._x = 1;
 		} else {
 			
 			//chose the icon:

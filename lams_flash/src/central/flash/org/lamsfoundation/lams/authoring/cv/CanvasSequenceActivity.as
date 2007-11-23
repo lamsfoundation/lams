@@ -49,7 +49,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	
 	private var CHILD_OFFSET_X : Number = 5;
 	private var CHILD_OFFSET_Y : Number = 5;
-	private var CHILD_INCRE : Number = 55.5;
+	private var CHILD_INCRE : Number = 59.5;
 	
 	//this is set by the init object
 	private var _canvasController:CanvasController;
@@ -189,7 +189,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		//set the positioning co-ords
 		childActivity.activity.xCoord = CHILD_OFFSET_X + ((_children.length-1) * CHILD_INCRE);
 		childActivity.activity.yCoord = CHILD_OFFSET_Y;
-		childActivity._visible = true;	
+		childActivity._visible = true;
+		
+		if(childActivity.activity.activityUIID == _canvasModel.selectedItem.activity.activityUIID)
+			childActivity.setSelected(true);
 		
 		children_mc.push(childActivity);
 		a.orderID = _children.length;
@@ -308,6 +311,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		
 		_x = _activity.xCoord;
 		_y = _activity.yCoord;
+		
+		/**
+		Debugger.log("tempSelectedItem: " + _canvasController.tempSelectedItem.activity.activityUIID, Debugger.CRITICAL, "CanvasSequenceActivity");
+		if(this.activity.activityUIID == _canvasController.tempSelectedItem.activity.activityUIID)
+			this.setSelected(true);
+		*/
 		
 		if(_activity.runOffline){
 			bgNegative = "true"

@@ -855,4 +855,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		evt.target.scrollContent.setupContent();
 	}
 	
+	public function get tempSelectedItem():Object {
+		return _tempSelectedItem;
+	}
 }
