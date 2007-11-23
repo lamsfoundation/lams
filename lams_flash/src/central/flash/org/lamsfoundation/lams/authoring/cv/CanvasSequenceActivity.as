@@ -103,6 +103,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	private var bgNegative:String = "original";
 	private var authorMenu:ContextMenu;
 	
+	private var _depthHistory:Number;
 	private var _ddm:DesignDataModel;
 	
 	function CanvasSequenceActivity(){
@@ -242,16 +243,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	}
 	
 	public function setSelected(isSelected){
-		Debugger.log(_activity.title+" isSelected:"+isSelected,4,'setSelected','CanvasActivity');
-		//var MARGIN = 5;
+		Debugger.log(_activity.title+" isSelected:"+isSelected,4,'setSelected','CanvasSequenceActivity');
 		
-		if(isSelected){
-					
-			_isSelected = isSelected;
-					
-		} else {
-		}
-		
+		_isSelected = isSelected;
+		setStyles();
 	}
 	
 	private function setUpActIcon(icon_mc):Void{
@@ -322,56 +317,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	}
 	
 	private function localOnPress():Void{
-			var now:Number = new Date().getTime();
-			
-			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
-				if (app.controlKeyPressed != "transition"){
-					_doubleClicking = true;
-					
-					if (_module == "monitoring"){
-						_monitorController.activityDoubleClick(this, "MonitorTabView");
-					} else {
-						_canvasController.activityDoubleClick(this);
-					}
-				}
-				
-				app.controlKeyPressed = "";
-				
-			}else{
-				
-				_doubleClicking = false;
-				
-				if (_module == "monitoring"){
-					_monitorController.activityClick(this);
-				}else {
-					_canvasController.activityClick(this);
-				}			
-				
-			}
-			
-			_dcStartTime = now;
+
+		if (_module == "monitoring"){
+		} else {
+			_canvasModel.selectedItem = this;
+		}	
 	
 	}
 	
 	private function localOnRelease():Void{
-		if(!_doubleClicking){
-			
-			if (_module == "monitoring"){
-				_monitorController.activityRelease(this);
-			}else {
-				_canvasController.activityRelease(this);
-			}
-			
-		}
-		
 	}
 	
 	private function localOnReleaseOutside():Void{
-		if (_module == "monitoring"){
-			_monitorController.activityReleaseOutside(this);
-		}else {
-			_canvasController.activityReleaseOutside(this);
-		}
 	}
 	
 	/**
@@ -423,8 +380,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	
 	private function getAssociatedStyle():Object{
 		var styleObj:Object = new Object();
-		
-		styleObj = _tm.getStyleObject('ACTPanel' + String(_activity.orderID%6));
+		styleObj = (!_isSelected) ? _tm.getStyleObject('ACTPanel' + String(_activity.orderID%6)) : _tm.getStyleObject('OptHeadPanel');
 				
 		return styleObj;
 	}
@@ -436,10 +392,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	 * @return  
 	 */
 	private function setStyles() {
-	
 		var styleObj = getAssociatedStyle();
 		act_pnl.setStyle('styleName', styleObj);
-		
+		if(_isSelected) act_pnl.setStyle('borderStyle', 'none');
     }
 	
 	private function getDDM():DesignDataModel {
@@ -471,4 +426,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	public function get lastActivity():Activity {
 		return _children[_children.length-1];
 	}
+	
+	public function get depthHistory():Number {
+		return _depthHistory;
+	}
+	
+	public function set depthHistory(a:Number):Void {
+		_depthHistory = a;
+	}
+
 }

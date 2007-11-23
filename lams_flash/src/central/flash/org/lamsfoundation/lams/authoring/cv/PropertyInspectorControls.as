@@ -1301,12 +1301,13 @@ class PropertyInspectorControls extends MovieClip {
 			//todo check if this is the right place to set edited content, should it be ddm?
 			_canvasModel.selectedItem.activity.title = title_txt.text;
 			
-		}else if(tgt.indexOf("desc_txt") != -1){
+		} else if(tgt.indexOf("desc_txt") != -1){
 			_canvasModel.selectedItem.activity.description= desc_txt.text;
 		}
 		
 		_canvasModel.selectedItem.refresh();
-		if (_canvasModel.selectedItem.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || _canvasModel.selectedItem.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
+		
+		if (_canvasModel.selectedItem.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || _canvasModel.selectedItem.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE) {
 			_canvasModel.selectedItem.init();
 		}
 		

@@ -437,6 +437,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		var minDiff:Number = null;
 		var selectedIndex:Number = null;
 		
+		Debugger.log("ca y: " + ca._y, Debugger.CRITICAL, "moveOptionalSequenceCA", "CanvasModel");
+		Debugger.log("parent y: " + parent.yCoord, Debugger.CRITICAL, "moveOptionalSequenceCA", "CanvasModel");
+		
+		if(ca._y > ca._parent._parent.getVisibleHeight() || ca._y < -ca.getVisibleHeight())
+			return false;
+		
 		var oChildren:Array = _cv.ddm.getComplexActivityChildren(parent.activityUIID);
 		oChildren.sortOn('orderID', Array.NUMERIC);
 		

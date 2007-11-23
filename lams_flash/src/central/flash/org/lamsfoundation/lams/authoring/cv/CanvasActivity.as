@@ -254,9 +254,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			_isSelected = isSelected;
 					
 		} else {
-			if(depthHistory != null)
-				this.swapDepths(depthHistory);
-			
+
 			//hide the selected border
 			_selected_mc.removeMovieClip();
 		}

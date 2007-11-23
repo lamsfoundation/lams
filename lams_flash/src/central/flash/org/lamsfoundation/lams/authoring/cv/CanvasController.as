@@ -103,6 +103,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				// clear currently selected activity
 				for (var i=0; i<optionalOnCanvas.length; i++) {
 					if(parentSelectedAct.parentUIID == optionalOnCanvas[i].activity.activityUIID) {
+						_tempSelectedItem._parent._parent.swapDepths(_tempSelectedItem._parent._parent.depthHistory);
+						_tempSelectedItem._parent._parent.depthHistory = null;
+						
 						_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
 						_tempSelectedItem.depthHistory = null;
 					}
@@ -111,6 +114,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			}
 			
 			if(parentAct.isOptionalSequenceActivity(_canvasModel.getCanvas().ddm.getActivityByUIID(parentAct.parentUIID))) {
+				ca._parent._parent.depthHistory = ca._parent._parent.getDepth();
+				ca._parent._parent.swapDepths(DepthManager.kTop);
+						
 				ca.depthHistory = ca.getDepth();
 				ca.swapDepths(DepthManager.kTop);
 			}

@@ -73,7 +73,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		_canvasModel.setPIHeight(piHeightHide);
 		_canvasModel.addEventListener('viewUpdate',this);
 		
-		for(var i=0; i<=10; i++)
+		for(var i=1; i<=10; i++)
 			noSeqAct_cmb.addItem(i);
 
 		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
@@ -359,6 +359,26 @@ class PropertyInspector extends PropertyInspectorControls {
 			title_txt.text = StringUtils.cleanNull(cca.title);
 			desc_txt.text = StringUtils.cleanNull(cca.description);
 			
+		} else if(CanvasSequenceActivity(cm.selectedItem) != null) {
+			var cs = CanvasSequenceActivity(cm.selectedItem);
+			var sequenceActivity = SequenceActivity(cs.activity);
+			
+			cover_pnl.visible = false;
+			delimitLine._visible = false;
+			
+			showSequenceProperties(sequenceActivity);
+			
+			showGeneralControls(true, !sequenceActivity.readOnly);
+			showBranchControls(false);
+			
+			showGeneralInfo(false);
+			showOptionalControls(false);
+			showGroupingControls(false);
+			showBranchingControls(false);
+			showToolActivityControls(false);
+			showGateControls(false);
+			showAppliedGroupingControls(false);
+			
 		} else if(CanvasTransition(cm.selectedItem) != null) {
 			var ct = CanvasTransition(cm.selectedItem);
 			var t:Transition = ct.transition;
@@ -463,7 +483,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		if(ca.noSequences == undefined)
 			noSeqAct_cmb.selectedIndex = 0;
 		else
-			noSeqAct_cmb.selectedIndex = ca.noSequences;
+			noSeqAct_cmb.selectedIndex = (ca.noSequences > 0) ? ca.noSequences - 1 : 0;
 	}
 	
 	private function updateOptionalData(){
@@ -527,7 +547,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		
 		setModified();
 		
-		noSeqAct_cmb.selectedIndex = newChildren.length;
+		noSeqAct_cmb.selectedIndex = (newChildren.length > 0) ? newChildren.length - 1 : 0;
 		
 		_canvasModel.activeView.getController().clearBusy();
 		_canvasModel.setDirty();
@@ -593,11 +613,16 @@ class PropertyInspector extends PropertyInspectorControls {
 	}
 	
 	private function showBranchProperties(b:Branch){
-		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_activity_type_sequence');
+		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_activity_type_sequence', [Dictionary.getValue('branch_btn')]);
 		title_txt.text = b.sequenceActivity.title;
 		
 		_pi_defaultBranch_cb.selected = (b.sequenceActivity.activityUIID == _canvasModel.activeView.activity.defaultBranch.sequenceActivity.activityUIID) ? true : false;
 		_pi_defaultBranch_cb.enabled = !_pi_defaultBranch_cb.selected;
+	}
+	
+	private function showSequenceProperties(s:SequenceActivity) {
+		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_activity_type_sequence', [Dictionary.getValue('optional_btn')]);
+		title_txt.text = s.title;
 	}
 	
 	/**

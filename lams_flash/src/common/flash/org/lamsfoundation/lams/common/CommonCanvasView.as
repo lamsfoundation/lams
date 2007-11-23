@@ -82,7 +82,7 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 		
 		if(m != null) {
 			
-			var ca = CanvasActivity(m.selectedItem);
+			var ca = ICanvasActivity(m.selectedItem);
 			var a:Activity = ca.activity;	
 			var module = (model instanceof MonitorModel) ? MonitorModel(model).getMonitor() : CanvasModel(model).getCanvas();
 			
