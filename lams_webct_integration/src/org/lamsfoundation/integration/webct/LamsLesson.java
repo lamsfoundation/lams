@@ -1,7 +1,7 @@
 package org.lamsfoundation.integration.webct;
 
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 
 /**
@@ -23,8 +23,8 @@ public class LamsLesson {
 	private String ownerLastName;	// webct user second name
 	private boolean hidden; 		// only visible to owner if true
 	private boolean schedule;
-	private Date startDate;
-	private Date endDate;
+	private Timestamp startTimestamp;
+	private Timestamp endTimestamp;
 	
 	
 	
@@ -57,8 +57,8 @@ public class LamsLesson {
 					String ownerLastName, 
 					boolean hidden, 
 					boolean schedule,
-					Date startDate, 
-					Date endDate)
+					Timestamp startTimestamp, 
+					Timestamp endTimestamp)
 	{
 		this.lessonId = lessonId;
 		this.ptId = ptId;
@@ -71,8 +71,8 @@ public class LamsLesson {
 		this.ownerLastName = ownerLastName;
 		this.hidden = hidden;
 		this.schedule = schedule;
-		this.startDate = startDate;
-		this.endDate = endDate;
+		this.startTimestamp = startTimestamp;
+		this.endTimestamp = endTimestamp;
 	}
 	
 	
@@ -125,17 +125,17 @@ public class LamsLesson {
 	public void setSchedule(boolean schedule) {
 		this.schedule = schedule;
 	}
-	public Date getStartDate() {
-		return startDate;
+	public Timestamp getStartTimestamp() {
+		return startTimestamp;
 	}
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
+	public void setStartTimestamp(Timestamp startTimestamp) {
+		this.startTimestamp = startTimestamp;
 	}
-	public Date getEndDate() {
-		return endDate;
+	public Timestamp getEndTimestamp() {
+		return endTimestamp;
 	}
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
+	public void setEndTimestamp(Timestamp endTimestamp) {
+		this.endTimestamp = endTimestamp;
 	}
 
 	public long getLearningContextId() {
@@ -179,8 +179,8 @@ public class LamsLesson {
 	        + "ownerLastName = " + this.ownerLastName + TAB
 	        + "hidden = " + this.hidden + TAB
 	        + "schedule = " + this.schedule + TAB
-	        + "startDate = " + this.startDate + TAB
-	        + "endDate = " + this.endDate + TAB
+	        + "startTimestamp = " + this.startTimestamp + TAB
+	        + "endTimestamp = " + this.endTimestamp + TAB
 	        + " )";
 	
 	    return retValue;

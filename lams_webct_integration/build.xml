@@ -79,13 +79,26 @@
    				<filter token="serverId" value="${serverId}" />
    				<filter token="secretKey" value="${secretKey}" />
    				<filter token="reqSrc" value="${reqSrc}" />
+   				<filter token="imgUrl" value="${imgUrl}" />
    			</filterset>
    			
-   		</copy>	
+   		</copy>
    	
    		<copy todir="${build.web}" overwrite="true">
-   			<fileset dir="${web}" />
+   	   			<fileset dir="${web}" />
    	   	</copy>	
+   	
+		<copy todir="${build}/web/lib/tigra" overwrite="true">
+			
+			<fileset dir="${basedir}/web/lib/tigra">
+				<include name="tree_tpl.js"/>
+		   	</fileset>
+			<filterset>
+				<filter token="imgUrl" value="${imgUrl}" />
+			</filterset>
+		</copy>
+   	
+   		
 	</target>
 	
 	<!-- ================================================================ -->
@@ -107,6 +120,8 @@
    				<include name="sqljdbc.jar" />
    			</fileset>
 		</copy>
+	
+		
 	</target>
 		
 		

@@ -29,6 +29,8 @@
 
 <script language="JavaScript" type="text/javascript">
 <!--
+	#include( 'web/lib/jquery/jquery-1.2.1.js' ) 
+	
 	function validateLesson()
 	{
 		if (document.getElementById("form_action").value==null || document.getElementById("title").value=='')
@@ -78,22 +80,25 @@
 	
 	<table border='0'>
 		<tr>
-			<td valign="top"><b><font color=red>*</font>Title</b></td>
+			<td valign="top"><b><font color=red>*</font>Title:</b></td>
 			<td><input id="title" type="text" name="title" value="$title"></td>
 		</tr>
 		<tr>
-			<td valign="top"><b>Description</b></td>
+			<td valign="top"><b>Description:</b></td>
 			<td><textarea name="description" rows="12" cols="35">$description</textarea></td>
 		</tr>
 		<tr>
-			<td valign="top"><b>Lesson Visibility</b></td>
+			<td valign="top"><b>Lesson Visibility:</b></td>
 			<td><input type="Radio" name="isAvailable" value="$hidden" checked>Show Lesson <br>
 	            <input type="Radio" name="isAvailable" value="$notHidden">Hide Lesson </td>
 		</tr>
 		<tr>
-			<td valign="top"><b>Schedule Lesson</b></td>
-			<td><input type="Radio" name="schedule" value="$hidden" checked>Show Lesson <br>
-	            <input type="Radio" name="schedule" value="$notHidden">Hide Lesson </td>
+			<td valign="top"><b>Schedule Lesson:</b></td>
+			<td>
+				<input type="Radio" name="schedule" value="true" checked>Yes<br>
+	            <input type="Radio" name="schedule" value="false">No
+	        </td>
+	        
 		</tr>
 		
 	</table>

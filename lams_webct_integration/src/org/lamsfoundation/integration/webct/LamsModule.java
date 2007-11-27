@@ -8,38 +8,24 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Properties;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
+import java.sql.Date;
+import java.sql.Timestamp;
 
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import com.webct.platform.sdk.context.gen.*;
-import com.webct.platform.sdk.context.client.*;
+
+
 import com.webct.platform.sdk.security.authentication.module.AuthenticationModule;
-import com.webct.platform.sdk.proxytool.common.ProcessCallback;
-import com.webct.platform.sdk.security.authentication.module.WebCTSSOContext;
-import com.webct.platform.sdk.context.client.ContextSDK;
-import com.webct.platform.sdk.context.gen.SessionVO;
-import com.webct.platform.sdk.context.gen.LearningCtxtVO;
 import com.webct.platform.sdkext.authmoduledata.*;
-import com.webct.platform.sdk.context.gen.SessionVO;
 
-//-------- Velocity imports --------------
-import java.io.StringWriter; 
-import java.rmi.RemoteException;
-import java.sql.Date;
 
 import org.apache.velocity.VelocityContext; 
 import org.apache.velocity.Template; 
 import org.apache.velocity.app.VelocityEngine; 
-import org.apache.velocity.exception.*;
-//import org.apache.axis.AxisFault;
-
-import java.net.URL;
 import org.apache.log4j.Logger;
 
 import org.lamsfoundation.integration.webct.LamsSecurityUtil;
@@ -229,7 +215,10 @@ public class LamsModule extends AuthenticationModule
         			// test
         			//List lessons = lessonDao.getDBLessons(1);
         			
-        			List lessons = lessonDao.getDBLessons(lcID.longValue(), Long.parseLong(ptid));
+            		java.util.Date today = new java.util.Date();
+            	    Timestamp now = new Timestamp(today.getTime());
+            		
+            		List lessons = lessonDao.getDBLessonsForLearner(lcID.longValue(), Long.parseLong(ptid), now);
         			
         			params.put("lessons", lessons);
         			
@@ -306,8 +295,8 @@ public class LamsModule extends AuthenticationModule
         			webctRequestSource, 
         			user.getUserId(), 
         			"" + seqID, 
-        			"en", 
-        			"US", 
+        			Constants.DEFAULT_LANGUAGE, 
+        			Constants.DEFAULT_COUNTRY, 
         			user.getFirstname(), 
         			user.getLastname(), 
         			user.getEmail(), 
@@ -323,7 +312,30 @@ public class LamsModule extends AuthenticationModule
         	}
         	else
         	{
-            	LamsLessonDaoJDBC lessonDao = new LamsLessonDaoJDBC(settings);
+        		Timestamp start = null;
+        		Timestamp end = null;
+        			
+        		if (request.getParameter("schedule").equals("true"))
+        		{
+        			if (request.getParameter("dateStart")!=null && !request.getParameter("dateStart").equals(""))
+            		{
+        				start = getTimeStamp(request.getParameter("dateStart"), 
+        							 request.getParameter("startHour"), 
+        							 request.getParameter("startMin"), 
+        							 request.getParameter("startAMPM"));
+            		}
+        			
+        			if (request.getParameter("dateEnd")!=null && !request.getParameter("dateEnd").equals(""))
+            		{
+        			
+        				end = getTimeStamp(request.getParameter("dateEnd"), 
+							 	request.getParameter("endHour"), 
+							 	request.getParameter("endMin"), 
+							 	request.getParameter("endAMPM"));
+            		}
+        		}
+        		
+        		LamsLessonDaoJDBC lessonDao = new LamsLessonDaoJDBC(settings);
             	LamsLesson lesson = new LamsLesson(
             			lsID, 
             			Long.parseLong(ptid),
@@ -334,10 +346,10 @@ public class LamsModule extends AuthenticationModule
     					user.getUserId(), 
     					user.getFirstname(),
     					user.getLastname(), 
-    					false, 
-    					false,
-    					new Date(0), 
-    					new Date(0)
+    					request.getParameter("isAvailable").equals("false"), 
+    					request.getParameter("schedule").equals("true"),
+    					start, 
+    					end
             			);
             	
             	try{
@@ -388,8 +400,8 @@ public class LamsModule extends AuthenticationModule
 	        			webctRequestSource, 
 	        			user.getUserId(), 
 	        			"" + lcID, 
-	        			"en", 
-	        			"US", 
+	        			Constants.DEFAULT_LANGUAGE, 
+	        			Constants.DEFAULT_COUNTRY, 
 	        			user.getFirstname(), 
 	        			user.getLastname(), 
 	        			user.getEmail(), 
@@ -419,8 +431,8 @@ public class LamsModule extends AuthenticationModule
 	        	params.put("lsID", request.getParameter("lsID"));
 	        	params.put("title", modLesson.getTitle());
 	        	params.put("description", modLesson.getDescription());
-	        	params.put("start", modLesson.getStartDate());
-	        	params.put("end", modLesson.getEndDate());
+	        	params.put("start", modLesson.getStartTimestamp());
+	        	params.put("end", modLesson.getEndTimestamp());
 	        	
 	
 	        	if (modLesson.getHidden()) 
@@ -469,10 +481,6 @@ public class LamsModule extends AuthenticationModule
 	        	modLesson.setHidden(request.getParameter("isAvailable").equals("true"));
 	        	modLesson.setSchedule(request.getParameter("schedule").equals("true"));
 	        	
-	        	
-	        	//TODO: DO SOMETHING ABOUT DATES
-	        	//Date start = new Date(0);
-	        	//Date end = new Date(0);
 	        	
 	        	boolean success = lessonDao.updateLesson(modLesson);
 	        	
@@ -551,8 +559,8 @@ public class LamsModule extends AuthenticationModule
         						webctRequestSource, 
         						user.getUserId(), 
         						"" + lcID, 
-        						"en", 
-        						"AU",         						
+        						Constants.DEFAULT_LANGUAGE, 
+        						Constants.DEFAULT_COUNTRY,         						
         						user.getFirstname(),
         						user.getLastname(),
         						user.getEmail(),
@@ -583,8 +591,8 @@ public class LamsModule extends AuthenticationModule
             					lamsServerSecretKey, 
             					user.getUserId(), 
             					"" + lcID, 
-            					"en", 
-            					"AU", 
+            					Constants.DEFAULT_LANGUAGE, 
+            					Constants.DEFAULT_COUNTRY, 
             					user.getFirstname(),
         						user.getLastname(),
         						user.getEmail(),
@@ -604,7 +612,29 @@ public class LamsModule extends AuthenticationModule
         }
     }
     
-    
+    public Timestamp getTimeStamp(String date, String hours, String minutes, String ampm)
+    {
+    	
+    	String dateSplit[] = date.split("/");
+    	
+    	date = dateSplit[2] + "-" + dateSplit[1] + "-" + dateSplit[0];
+    	
+    	if (ampm.equals("PM"))
+    	{
+    		int hoursInt = Integer.parseInt(hours);
+    		hoursInt += 12;
+    		hours = "" + hoursInt;
+    	}
+    	
+    	String timestampStr = date + " " + hours + ":" + minutes + ":" + "00";
+    	System.out.println("TIMESTAMP: " + timestampStr);
+    	
+    	
+    	Timestamp t = Timestamp.valueOf(timestampStr);
+    	System.out.println("TIMESTAMP To String: " + t.toString());
+    	return t;
+    	
+    }
     public boolean logout() throws LoginException
     {
         return super.logout();

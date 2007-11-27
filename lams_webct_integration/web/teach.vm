@@ -144,9 +144,13 @@
 	<table width='100%' border='1' cellpadding='10' style="padding:10px 10px 10px 10px;" class="tablebody">	
 	<thead>
 	<tr>
-		<th width="30%">Title</th>
-		<th width="30%">Description</th>
-		<th width="40%">Actions</th>
+		<th>Title</th>
+		<th>Description</th>
+		<th>Hidden</th>
+		<th>Scheduled</th>
+		<th>Start</th>
+		<th>End</th>
+		<th>Actions</th>
 	</tr>
 	</thead>
 	<tbody>
@@ -154,8 +158,24 @@
 		<tr>
 			<td valign='top'><b>$lesson.getTitle()</b></td>
 			<td valign='top'><i>$lesson.getDescription()</i></td>
+			<td valign='top'><i>$lesson.getHidden()</i></td>
+			<td valign='top'><i>$lesson.getSchedule()</i></td>
+			
+			#set( $start = '' )
+			#set( $end = '' )
+			
+			#if( $lesson.getSchedule() )		
+				#set( $start = $lesson.getStartTimestamp() )
+				#set( $end = $lesson.getEndTimestamp() )
+				<td valign='top'><i>$start.toString()</i></td>
+				<td valign='top'><i>$end.toString()</i></td>
+			#else
+   				<td valign='top' align='center'></td>
+   				<td valign='top' align='center'></td>
+			#end
+		
 	
-			<td>
+			<td valign='top'>
 				<a class="actionlight" href="javascript:openLearner($lesson.getLessonId())">Open Learner</a>
 				<a class="actionlight" href="javascript:openMonitor($lesson.getLessonId())">Open Monitor</a>
 				<a class="actionlight" href="javascript:modifyLesson($lesson.getLessonId(),'modify_lesson')">Modify</a>

@@ -19,7 +19,7 @@ CREATE TABLE [dbo].[LAMS_LESSON](
 	[hidden] [bit] NOT NULL CONSTRAINT [DF_LAMS_LESSON_hidden]  DEFAULT ((0)),
 	[schedule] [bit] NOT NULL CONSTRAINT [DF_LAMS_LESSON_schedule]  DEFAULT ((0)),
 	[start_date_time] [datetime] NULL,
-	[end_date_time] [nchar](10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[end_date_time] [datetime] NULL,
  CONSTRAINT [PK_LAMS_LESSON] PRIMARY KEY CLUSTERED 
 (
 	[lesson_id] ASC

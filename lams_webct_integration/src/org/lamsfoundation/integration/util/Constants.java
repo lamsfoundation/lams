@@ -29,6 +29,9 @@ package org.lamsfoundation.integration.util;
  */
 public class Constants {
     
+	public static final String DEFAULT_LANGUAGE="en";
+	public static final String DEFAULT_COUNTRY="US";
+	
     public static final String PARAM_USER_ID = "uid";
     public static final String PARAM_SERVER_ID = "sid";
     public static final String PARAM_TIMESTAMP = "ts";

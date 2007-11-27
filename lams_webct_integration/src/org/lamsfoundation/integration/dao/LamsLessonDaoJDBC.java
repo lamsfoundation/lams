@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -134,8 +135,85 @@ public class LamsLessonDaoJDBC {
 			    lesson.setOwnerLastName(rs.getString("owner_last_name"));
 			    lesson.setHidden(rs.getBoolean("hidden"));
 			    lesson.setSchedule(rs.getBoolean("schedule"));
-			    lesson.setStartDate(rs.getDate("start_date_time"));
-			    lesson.setEndDate(rs.getDate("end_date_time"));
+			    lesson.setStartTimestamp(rs.getTimestamp("start_date_time"));
+			    lesson.setEndTimestamp(rs.getTimestamp("end_date_time"));
+			
+			    lessons.add(lesson);
+			}
+		
+			stmt.close();
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			log.error("Failed to get a list of LAMS lessons.", e);
+			throw new Exception ("Failed to get a list of LAMS lessons.");
+		}
+		return lessons;
+	}
+	
+	public ArrayList getDBLessonsForLearner(long learningContextId, 
+				long ptId,
+				Timestamp now) throws Exception
+	{
+		ArrayList lessons = new ArrayList();
+		Connection connection;
+		try
+		{
+			connection = getConnection();
+			Statement stmt = connection.createStatement();
+			
+			String query = "SELECT [lesson_id]," +
+			 		"[learning_context_id]," +
+			 		"[sequence_id]," +
+			 		"[owner_id]," +
+			 		"[owner_first_name]," +
+			 		"[owner_last_name]," +
+			 		"[title]," +
+			 		"[description]," +
+			 		"[hidden]," +
+			 		"[schedule]," +
+			 		"[start_date_time]," +
+			 		"[end_date_time] " +
+			 		"FROM [webctdatabase].[dbo].[LAMS_LESSON] " +
+			 		"WHERE " +
+			 		"(" +
+				 			"(learning_context_id=" +learningContextId+ ") " +
+				 			"AND (pt_id=" +ptId+ ") " +
+				 			"AND (hidden='false') " +
+				 			"AND (" +
+					 			"(schedule='false') " +
+					 			"OR (" +
+					 					"(start_date_time <= '" +now.toString()+ "') " +
+					 					"AND (end_date_time >='" +now.toString()+ "\')" +
+					 				")" +
+					 			"OR (" +
+					 					"(start_date_time <= '" +now.toString()+ "') " +
+					 					"AND (end_date_time IS null)" +
+					 				")" +
+					 		")" +
+					 ")";
+
+			
+			System.out.println("SQL INSERT: " +query);
+			
+			ResultSet rs = stmt.executeQuery(query);	
+			
+			while (rs.next()) 
+			{
+			    LamsLesson lesson = new LamsLesson();
+			    lesson.setLessonId(rs.getLong("lesson_id"));
+			    lesson.setLearningContextId(rs.getLong("learning_context_id"));
+			    lesson.setSequenceId(rs.getLong("sequence_id"));
+			    lesson.setTitle(rs.getString("title"));
+			    lesson.setDescription(rs.getString("description"));
+			    lesson.setOwnerId(rs.getString("owner_id"));
+			    lesson.setOwnerFirstName(rs.getString("owner_first_name"));
+			    lesson.setOwnerLastName(rs.getString("owner_last_name"));
+			    lesson.setHidden(rs.getBoolean("hidden"));
+			    lesson.setSchedule(rs.getBoolean("schedule"));
+			    lesson.setStartTimestamp(rs.getTimestamp("start_date_time"));
+			    lesson.setEndTimestamp(rs.getTimestamp("end_date_time"));
 			
 			    lessons.add(lesson);
 			}
@@ -162,6 +240,24 @@ public class LamsLessonDaoJDBC {
 		
 		if (lesson.getHidden()) {hidden=1;}
 		if (lesson.getSchedule()) {schedule=1;}
+		
+		String startTimeStamp = "null";
+		if (lesson.getStartTimestamp()!=null)
+		{
+			startTimeStamp = "\'" +lesson.getStartTimestamp();
+			startTimeStamp = startTimeStamp.replaceAll("-", "") + "\'";
+		}
+			
+		String endTimeStamp = "null";
+		if (lesson.getEndTimestamp()!=null)
+		{	
+			endTimeStamp = "\'" + lesson.getEndTimestamp();
+			endTimeStamp = endTimeStamp.replaceAll("-", "") + "\'";
+		}
+		
+		System.out.println("START: " +startTimeStamp);
+		System.out.println("END: " +endTimeStamp);
+		
 		
 		try
 		{
@@ -195,8 +291,8 @@ public class LamsLessonDaoJDBC {
 			"\'" +lesson.getDescription()+ "\'," +
 			"" +hidden+ ","+
 			"" +schedule+ "," +
-			"\'" +lesson.getStartDate()+ "\'," +
-			"\'" +lesson.getEndDate()+ "\')";
+			"" +startTimeStamp+ "," +
+			"" +endTimeStamp+ ")";
 			
 			System.out.println("SQL INSERT: " +insert);
 
@@ -227,6 +323,15 @@ public class LamsLessonDaoJDBC {
 			connection = getConnection();
 			Statement stmt = connection.createStatement();
 			
+			String startTimeStamp = "null";
+			if (lesson.getStartTimestamp()!=null)
+				startTimeStamp = lesson.getStartTimestamp().toString().replaceAll("-", "");
+			
+			String endTimeStamp = "null";
+			if (lesson.getEndTimestamp()!=null)
+				endTimeStamp = lesson.getEndTimestamp().toString().replaceAll("-", "");
+			
+			
 			String update="UPDATE [webctdatabase].[dbo].[LAMS_LESSON]" +
 					" SET [pt_id] = " +lesson.getPtId()+
 				    ",[learning_context_id] = " +lesson.getLearningContextId()+
@@ -238,10 +343,10 @@ public class LamsLessonDaoJDBC {
 				    ",[description] = \'" +lesson.getDescription()+ "\'" +
 				    ",[hidden] = \'" +lesson.getHidden()+ "\'" + 
 				    ",[schedule] = \'" +lesson.getSchedule()+ "\'" +
-				    ",[start_date_time] = \'" +lesson.getStartDate()+ "\'" +
-				    ",[end_date_time] = \'" +lesson.getEndDate()+ "\' " +
+				    ",[start_date_time] = \'" +startTimeStamp+ "\'" +
+				    ",[end_date_time] = \'" +endTimeStamp+ "\' " +
 				    "WHERE [lesson_id] = " + lesson.getLessonId();
-	          	
+			
 			System.out.println("UPDATE: " + update);
 			
 			rows = stmt.executeUpdate(update);
@@ -335,8 +440,8 @@ public class LamsLessonDaoJDBC {
 		    lesson.setOwnerLastName(rs.getString("owner_last_name"));
 		    lesson.setHidden(rs.getBoolean("hidden"));
 		    lesson.setSchedule(rs.getBoolean("schedule"));
-		    lesson.setStartDate(rs.getDate("start_date_time"));
-		    lesson.setEndDate(rs.getDate("end_date_time"));
+		    lesson.setStartTimestamp(rs.getTimestamp("start_date_time"));
+		    lesson.setEndTimestamp(rs.getTimestamp("end_date_time"));
 		
 			stmt.close();
 			connection.close();

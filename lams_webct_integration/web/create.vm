@@ -25,14 +25,31 @@
 <title>LAMS: Start Lesson</title>
 <link rel="stylesheet" href="/webct/css/styles.jsp?locale=en_US&Id=9778001&colorSetId=A" type="text/css" />
 
+<style type="text/css">
+		<!--
+		#include( 'web/lib/jquery/css/jquery-calendar.css' )
+		-->
+</style>
+
 <script language="JavaScript" type="text/javascript">
 <!--
 	#include( 'web/lib/tigra/tree.js' )
 	#include( 'web/lib/tigra/tree_tpl.js' ) 
+	#include( 'web/lib/jquery/jquery-1.2.1.js' ) 
+	#include( 'web/lib/jquery/jquery-calendar.js' ) 
+
 	
 	var authorWin = null;
 	var previewWin = null;
 
+
+	$(document).ready(function(){
+		$('#dateStart').calendar();
+		$('#dateEnd').calendar();
+	});
+
+    
+    
     function openAuthor()
     {
     	authorUrl = '${authorUrl}'; 
@@ -69,6 +86,18 @@
     	else if (document.getElementById("form_action").value==null || document.getElementById("title").value=='')
 		{
 			alert("Value required for lesson title.");
+		}
+		else if (document.create_form.schedule[0].checked == true)
+		{	
+			if (document.getElementById("dateStart").value==null || document.getElementById("dateStart").value=='')
+			{
+				alert("You must select a start date if you want to schedule the lesson.");
+			}
+			else
+			{
+				document.getElementById("form_action").value="start_lesson";
+    			formSubmit();
+			}
 		}
     	else
     	{
@@ -125,29 +154,120 @@
 	<input type="hidden" name="page_id" value="$page_id"/>
 	<input type="hidden" name="form_action" id="form_action" value=""/>
 	
-	<table border='0' cellspacing-'10'>
+	<table border='0' >
 		<tr>
-			<td valign="top"><b><font color=red>*</font>Title</b></td>
+			<td valign="top"><b><font color=red>*</font>Title:</b></td>
 			<td><input id="title" type="text" name="title" value=""></td>
 		</tr>
 		<tr>
-			<td valign="top"><b>Description</b></td>
+			<td valign="top"><b>Description:</b></td>
 			<td><textarea name="description" rows="12" cols="35"></textarea></td>
 		</tr>
 		<tr>
-			<td valign="top"><b>Lesson Visibility</b></td>
-			<td><input type="Radio" name="isAvailable" value="true" checked>Show Lesson <br>
-	            <input type="Radio" name="isAvailable" value="false">Hide Lesson </td>
+			<td valign="top"><b>Lesson Visibility:</b></td>
+			<td>
+				<input type="Radio" name="isAvailable" value="true" checked>Show Lesson <br>
+	            <input type="Radio" name="isAvailable" value="false">Hide Lesson 
+	        </td>
 		</tr>
-		
 	</table>
+	<br>
+	<table border='0' >
+		<tr>
+			<td valign="top"><b>Schedule Lesson:</b></td>
+			<td valign="top">
+				<input type="Radio" id="schedule" name="schedule" value="true">Yes<br>
+	            <input type="Radio" id="schedule" name="schedule" value="false" checked>No
+	        </td>
+	        <td>	
+	        	&nbsp;&nbsp;&nbsp;&nbsp;
+	        </td>
+	        <td valign="top">
+				Start date:<br>
+					<input type="text" id="dateStart" name="dateStart"  value="" /><br><br>
+				End date:<br>
+					<input type="text" id="dateEnd" name="dateEnd" value="" /> 			
+	        </td>
+	        <td valign="top">
+				&nbsp;Start time: <br>
+				&nbsp;<select name="startHour">
+						<option value ="01">01</option>
+						<option value ="02">02</option>
+						<option value ="03">03</option>
+						<option value ="04">04</option>
+						<option value ="05">05</option>
+						<option value ="06">06</option>
+						<option value ="07">07</option>
+						<option value ="08">08</option>
+						<option value ="09" selected>09</option>
+						<option value ="10">10</option>
+						<option value ="11">11</option>
+						<option value ="12">12</option>
+					</select>&nbsp;:
+					<select name="startMin">
+						<option value ="00" selected>00</option>
+						<option value ="05">05</option>
+						<option value ="10">10</option>
+						<option value ="15">15</option>
+						<option value ="20">20</option>
+						<option value ="25">25</option>
+						<option value ="30">30</option>
+						<option value ="35">35</option>
+						<option value ="40">40</option>
+						<option value ="45">45</option>
+						<option value ="50">50</option>
+						<option value ="55">55</option>
+					</select>&nbsp;&nbsp;
+					<select name="startAMPM">
+						<option value ="AM" selected>AM</option>
+						<option value ="PM">PM</option>
+					</select> <br><br>
+				&nbsp;End time:<br>
+				&nbsp;<select name="endHour">
+						<option value ="01">01</option>
+						<option value ="02">02</option>
+						<option value ="03">03</option>
+						<option value ="04">04</option>
+						<option value ="05">05</option>
+						<option value ="06">06</option>
+						<option value ="07">07</option>
+						<option value ="08">08</option>
+						<option value ="09" selected>09</option>
+						<option value ="10">10</option>
+						<option value ="11">11</option>
+						<option value ="12">12</option>
+					</select>&nbsp;:
+					<select name="endMin">
+						<option value ="00" selected>00</option>
+						<option value ="05">05</option>
+						<option value ="10">10</option>
+						<option value ="15">15</option>
+						<option value ="20">20</option>
+						<option value ="25">25</option>
+						<option value ="30">30</option>
+						<option value ="35">35</option>
+						<option value ="40">40</option>
+						<option value ="45">45</option>
+						<option value ="50">50</option>
+						<option value ="55">55</option>
+					</select>&nbsp;&nbsp;
+					<select name="endAMPM">
+						<option value ="AM" selected>AM</option>
+						<option value ="PM">PM</option>
+					</select>  
+                                                          					
+	        </td>
+		</tr>
+	</table>
+	
+	
 	<br>
 	<hr>
 	<br>
 	
 	<table border='0'>
 		<tr>
-			<td valign="top"><b>Select Sequence</b></td>
+			<td valign="top"><b><font color=red>*</font>Select Sequence:</b></td>
 			<td>
 				&nbsp;&nbsp;
 			</td>

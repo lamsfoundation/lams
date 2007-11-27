@@ -4,7 +4,7 @@
  <!-- Add components as shown in the following <component> block below -->
 
     <component>
-        <version>0.0.12</version>
+        <version>0.0.13</version>
         <powerlinks-version>1.0</powerlinks-version>
         <id>lams.integration</id>
         <!-- valid types include sso siapi and proxytools -->
@@ -191,6 +191,15 @@
 								 optional="false" 
 								 read-only="false" 
 								 default-value="@reqSrc@" />
+								 
+				<setting-element name="imagesUrl" 
+								 label="Images Url" 
+								 data-type="String" 
+								 presentation-type="TextField" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="false" 
+								 default-value="@imgUrl@" />
 
             </settings-group>
         </settings-structure>
