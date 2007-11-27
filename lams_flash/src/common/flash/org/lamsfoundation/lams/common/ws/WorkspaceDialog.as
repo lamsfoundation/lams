@@ -250,7 +250,7 @@ class WorkspaceDialog extends MovieClip{
 	 * @param   event
 	 */
 	public function viewUpdate(event:Object):Void{
-		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		Debugger.log('Received an Event dispatcher UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		//Update view from info object
        var wm:WorkspaceModel = event.target;
 	   //set a permenent ref to the model for ease (sorry mvc guru)
@@ -331,7 +331,7 @@ class WorkspaceDialog extends MovieClip{
 	}
 	
 	/**
-	 * Just opens the fodler node - DOES NOT FIRE EVENT - so is used after updatting the child folder
+	 * Just opens the folder node - DOES NOT FIRE EVENT - so is used after updatting the child folder
 	 * @usage   
 	 * @param   nodeToOpen 
 	 * @param   wm       
@@ -970,7 +970,7 @@ class WorkspaceDialog extends MovieClip{
 		_resultDTO.resourceLicenseID = licenseID_cmb.value.licenseID;
 
         dispatchEvent({type:'okClicked',target:this});
-	   
+		_workspaceController.clearBusy();
         //closeThisDialogue();
 		
 	}
