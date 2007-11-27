@@ -507,8 +507,13 @@ class CanvasHelper {
 	}
 	
 	public function closeBranchView() {
-		canvasModel.activeView = canvasView;
-		canvasModel.currentBranchingActivity = null;
+		var parentBranching:CanvasActivity = null;
+		if(canvasModel.activeView.activity.parentUIID != null)
+			parentBranching = CanvasActivity(canvasModel.activitiesDisplayed.get(_ddm.getActivityByUIID(canvasModel.activeView.activity.parentUIID).parentUIID));
+		
+		canvasModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.branchView : canvasView;
+		canvasModel.currentBranchingActivity = (parentBranching.activity.isBranchingActivity()) ? parentBranching : null;
+		
 	}
 	
 	/**
