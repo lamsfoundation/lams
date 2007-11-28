@@ -97,7 +97,6 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 				String username = getUsername();
 				WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
 				UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
-				LdapService ldapService = (LdapService) ctx.getBean("ldapService");
 				User user = service.getUserByLogin(username);
 
 				log.debug("===> authenticating user: " + username);
@@ -105,6 +104,7 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 				if (user == null) {
 					// provision a new user by checking ldap server
 					if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_PROVISIONING_ENABLED)) {
+						LdapService ldapService = (LdapService) ctx.getBean("ldapService");
 						log.debug("===> LDAP provisioning is enabled, checking username against LDAP server...");
 						LDAPAuthenticator ldap = new LDAPAuthenticator();
 						isValid = ldap.authenticate(username, inputPassword);
