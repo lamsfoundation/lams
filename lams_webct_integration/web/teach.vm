@@ -144,13 +144,12 @@
 	<table width='100%' border='1' cellpadding='10' style="padding:10px 10px 10px 10px;" class="tablebody">	
 	<thead>
 	<tr>
-		<th>Title</th>
-		<th>Description</th>
-		<th>Hidden</th>
-		<th>Scheduled</th>
-		<th>Start</th>
-		<th>End</th>
-		<th>Actions</th>
+		<th width="20%">Title</th>
+		<th width="30%">Description</th>
+		<th width="20%">Status</th>
+
+		
+		<th width="30%">Actions</th>
 	</tr>
 	</thead>
 	<tbody>
@@ -158,6 +157,39 @@
 		<tr>
 			<td valign='top'><b>$lesson.getTitle()</b></td>
 			<td valign='top'><i>$lesson.getDescription()</i></td>
+			
+			#set( $start = '' )
+			#set( $end = '' )
+			#set( $endStr = '' )
+			
+			<td valign='top'>
+				<i>
+				#if ( $lesson.getSchedule() )
+					#set( $start = $lesson.getStartTimestamp() )
+					#set( $end = $lesson.getEndTimestamp() )
+					#set( $endStr = $end.toString() )
+					
+					#if( $endStr != '' )
+						Scheduled from:<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;$start.toString() to<br>	
+						&nbsp;&nbsp;&nbsp;&nbsp;$endStr	
+					#else
+						Scheduled from:<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;$start.toString()
+					#end
+					
+					#if( $lesson.getHidden() )
+						<br>&nbsp;&nbsp;&nbsp;&nbsp;(Hidden)
+					#end
+				#elseif( $lesson.getHidden() )
+					Hidden
+				#else
+					Running
+				#end
+				</i>
+			</td>
+			
+			<!--
 			<td valign='top'><i>$lesson.getHidden()</i></td>
 			<td valign='top'><i>$lesson.getSchedule()</i></td>
 			
@@ -173,7 +205,7 @@
    				<td valign='top' align='center'></td>
    				<td valign='top' align='center'></td>
 			#end
-		
+			-->
 	
 			<td valign='top'>
 				<a class="actionlight" href="javascript:openLearner($lesson.getLessonId())">Open Learner</a>

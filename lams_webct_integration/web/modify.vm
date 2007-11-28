@@ -27,9 +27,17 @@
 <head>
 <title>LAMS: Modify Lesson</title>
 
+<style type="text/css">
+		<!--
+		#include( 'web/lib/jquery/css/jquery-calendar.css' )
+		-->
+</style>
+
 <script language="JavaScript" type="text/javascript">
 <!--
 	#include( 'web/lib/jquery/jquery-1.2.1.js' ) 
+	#include( 'web/lib/jquery/jquery-calendar.js' ) 
+	
 	
 	function validateLesson()
 	{
@@ -37,11 +45,49 @@
 		{
 			alert("Value required for lesson title.");
 		}
+		else if (document.modify_form.schedule[0].checked == true)
+		{	
+			if (document.getElementById("dateStart").value==null || document.getElementById("dateStart").value=='')
+			{
+				alert("You must select a start date if you want to schedule the lesson.");
+			}
+			else
+			{
+				document.getElementById("form_action").value="modify_proc";
+    			formSubmit();
+			}
+		}
 		else
 		{
 			document.getElementById("form_action").value="modify_proc";
 			formSubmit();
 		}
+	}
+	
+	$(document).ready(function(){
+		var today = new Date();
+		today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+		
+		$('.calendarRange').calendar({minDate: today, fieldSettings: customRange, onSelect:dateSelected});
+	});
+
+	function dateSelected() {
+		var schedule = document.modify_form.schedule[0]
+		var dontschedule = document.modify_form.schedule[1]
+		schedule.checked = true;
+		dontschedule.checked = false;
+	}
+
+	function getDate(value) {
+		fields = value.split('/');
+		return (fields.length < 3 ? null :
+			new Date(parseInt(fields[2], 10), parseInt(fields[1], 10) - 1, parseInt(fields[0], 10)));
+	}
+	
+	function customRange(input) 
+    {
+		return {minDate: (input.id == 'dateEnd' ? getDate($('#dateStart').val()) : null),
+				maxDate: (input.id == 'dateStart' ? getDate($('#dateEnd').val()) : null)};
 	}
 	
 	function back()
@@ -61,6 +107,7 @@
 	{
 		document.modify_form.submit();
 	}
+	
 //-->
 </script>
 
@@ -89,19 +136,101 @@
 		</tr>
 		<tr>
 			<td valign="top"><b>Lesson Visibility:</b></td>
-			<td><input type="Radio" name="isAvailable" value="$hidden" checked>Show Lesson <br>
-	            <input type="Radio" name="isAvailable" value="$notHidden">Hide Lesson </td>
+			<td><input type="Radio" name="isAvailable" value="true" $nothidden>Show Lesson <br>
+	            <input type="Radio" name="isAvailable" value="false" $hidden>Hide Lesson </td>
 		</tr>
+	</table>
+	
+	<br>
+	
+
+	<table border='0' >
 		<tr>
 			<td valign="top"><b>Schedule Lesson:</b></td>
-			<td>
-				<input type="Radio" name="schedule" value="true" checked>Yes<br>
-	            <input type="Radio" name="schedule" value="false">No
+			<td valign="top">
+				<input type="Radio" id="schedule" name="schedule" value="true" $schedule>Yes<br>
+	            <input type="Radio" id="schedule" name="schedule" value="false" $notschedule>No
 	        </td>
-	        
+	        <td>	
+	        	&nbsp;&nbsp;&nbsp;&nbsp;
+	        </td>
+	        <td valign="top">
+				Start date:<br>
+					<input type="text" class="calendarRange" id="dateStart" name="dateStart"  value="$startStr" /><br><br>
+				End date:<br>
+					<input type="text" class="calendarRange" id="dateEnd" name="dateEnd" value="$endStr" /> 			
+	        </td>
+	        <td valign="top">
+				&nbsp;Start time: <br>
+				&nbsp;<select name="startHour">
+						<option value ="01" $stHrCk1>01</option>
+						<option value ="02" $stHrCk2>02</option>
+						<option value ="03" $stHrCk3>03</option>
+						<option value ="04" $stHrCk4>04</option>
+						<option value ="05" $stHrCk5>05</option>
+						<option value ="06" $stHrCk6>06</option>
+						<option value ="07" $stHrCk7>07</option>
+						<option value ="08" $stHrCk8>08</option>
+						<option value ="09" $stHrCk9>09</option>
+						<option value ="10" $stHrCk10>10</option>
+						<option value ="11" $stHrCk11>11</option>
+						<option value ="12" $stHrCk12>12</option>
+					</select>&nbsp;:
+					<select name="startMin">
+						<option value ="00" $stMnCk0>00</option>
+						<option value ="05" $stMnCk5>05</option>
+						<option value ="10" $stMnCk10>10</option>
+						<option value ="15" $stMnCk15>15</option>
+						<option value ="20" $stMnCk20>20</option>
+						<option value ="25" $stMnCk25>25</option>
+						<option value ="30" $stMnCk30>30</option>
+						<option value ="35" $stMnCk35>35</option>
+						<option value ="40" $stMnCk40>40</option>
+						<option value ="45" $stMnCk45>45</option>
+						<option value ="50" $stMnCk50>50</option>
+						<option value ="55" $stMnCk55>55</option>
+					</select>&nbsp;&nbsp;
+					<select name="startAMPM">
+						<option value ="AM" $stAmCk0>AM</option>
+						<option value ="PM" $stAmCk1>PM</option>
+					</select> <br><br>
+				&nbsp;End time:<br>
+				&nbsp;<select name="endHour">
+						<option value ="01" $edHrCk1>01</option>
+						<option value ="02" $edHrCk2>02</option>
+						<option value ="03" $edHrCk3>03</option>
+						<option value ="04" $edHrCk4>04</option>
+						<option value ="05" $edHrCk5>05</option>
+						<option value ="06" $edHrCk6>06</option>
+						<option value ="07" $edHrCk7>07</option>
+						<option value ="08" $edHrCk8>08</option>
+						<option value ="09" $edHrCk9>09</option>
+						<option value ="10" $edHrCk10>10</option>
+						<option value ="11" $edHrCk11>11</option>
+						<option value ="12" $edHrCk12>12</option>
+					</select>&nbsp;:
+					<select name="endMin">
+						<option value ="00" $edMnCk0>00</option>
+						<option value ="05" $edMnCk5>05</option>
+						<option value ="10" $edMnCk10>10</option>
+						<option value ="15" $edMnCk15>15</option>
+						<option value ="20" $edMnCk20>20</option>
+						<option value ="25" $edMnCk25>25</option>
+						<option value ="30" $edMnCk30>30</option>
+						<option value ="35" $edMnCk35>35</option>
+						<option value ="40" $edMnCk40>40</option>
+						<option value ="45" $edMnCk45>45</option>
+						<option value ="50" $edMnCk50>50</option>
+						<option value ="55" $edMnCk55>55</option>
+					</select>&nbsp;&nbsp;
+					<select name="endAMPM">
+						<option value ="AM" $edAmCk0>AM</option>
+						<option value ="PM" $edAmCk1>PM</option>
+					</select>                                         					
+	        </td>
 		</tr>
-		
 	</table>
+	
 	<br>
 	<hr>
 	<br>

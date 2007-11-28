@@ -44,12 +44,31 @@
 
 
 	$(document).ready(function(){
-		$('#dateStart').calendar();
-		$('#dateEnd').calendar();
+		var today = new Date();
+		today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+		
+		$('.calendarRange').calendar({minDate: today, fieldSettings: customRange, onSelect:dateSelected});
 	});
 
-    
-    
+	function dateSelected() {
+		var schedule = document.create_form.schedule[0];
+		var dontschedule = document.create_form.schedule[1];
+		schedule.checked = true;
+		dontschedule.checked = false;
+	}
+
+	function getDate(value) {
+		fields = value.split('/');
+		return (fields.length < 3 ? null :
+			new Date(parseInt(fields[2], 10), parseInt(fields[1], 10) - 1, parseInt(fields[0], 10)));
+	}
+
+    function customRange(input) 
+    {
+		return {minDate: (input.id == 'dateEnd' ? getDate($('#dateStart').val()) : null),
+				maxDate: (input.id == 'dateStart' ? getDate($('#dateEnd').val()) : null)};
+	}
+   
     function openAuthor()
     {
     	authorUrl = '${authorUrl}'; 
@@ -184,9 +203,9 @@
 	        </td>
 	        <td valign="top">
 				Start date:<br>
-					<input type="text" id="dateStart" name="dateStart"  value="" /><br><br>
+					<input type="text" class="calendarRange" id="dateStart" name="dateStart"  value="" /><br><br>
 				End date:<br>
-					<input type="text" id="dateEnd" name="dateEnd" value="" /> 			
+					<input type="text" class="calendarRange" id="dateEnd" name="dateEnd" value="" /> 			
 	        </td>
 	        <td valign="top">
 				&nbsp;Start time: <br>

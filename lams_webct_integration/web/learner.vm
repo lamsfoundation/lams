@@ -48,6 +48,11 @@
 	        }
 	    }
 	}
+	
+	function formSubmit()
+	{
+		document.learner_form.submit();
+	}
 //-->
 
 </script>
@@ -60,9 +65,9 @@
 <table width='100%' border='1' cellpadding='10' style="padding:10px 10px 10px 10px;" class="tablebody">	
 <thead>
 <tr>
-	<th>Title</th>
-	<th>Description</th>
-	<th>Actions</th>
+	<th width="20%">Title</th>
+	<th width="60%">Description</th>
+	<th width="20%">Actions</th>
 </tr>
 </thead>
 <tbody>
@@ -78,6 +83,19 @@
 #end
 	</tbody>
 </table>
+<br>
+<form name="learner_form" id="create_form" action="$url" method="post">
+	<input type="hidden" name="sequence_id" id="sequence_id"  value='0'>
+	<input type="hidden" name="$id_param_name" value="$pt_id"/>
+	<input type="hidden" name="page_id" value="$page_id"/>
+	<input type="hidden" name="form_action" id="form_action" value=""/>
+
+	<div class="actionbuttondiv">
+		<a class="action" href="javascript:formSubmit()">Refresh List</a>
+	</div>
+</form>
+
+
 
 </body>
 #else

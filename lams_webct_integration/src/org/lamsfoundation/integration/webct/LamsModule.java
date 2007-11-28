@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Properties;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
-import java.sql.Date;
+import java.util.Calendar;
 import java.sql.Timestamp;
 
 import javax.security.auth.login.LoginException;
@@ -431,33 +431,60 @@ public class LamsModule extends AuthenticationModule
 	        	params.put("lsID", request.getParameter("lsID"));
 	        	params.put("title", modLesson.getTitle());
 	        	params.put("description", modLesson.getDescription());
-	        	params.put("start", modLesson.getStartTimestamp());
-	        	params.put("end", modLesson.getEndTimestamp());
 	        	
-	
-	        	if (modLesson.getHidden()) 
+	        	
+	        	if (modLesson.getStartTimestamp()!=null)
 	        	{
-	        		params.put("hidden", "true");
-	        		params.put("notHidden", "false");
+	        		Calendar calendarStart = Calendar.getInstance();      	
+	        		calendarStart.setTime(modLesson.getStartTimestamp());
+	        		params.put("startStr", + calendarStart.get(Calendar.DATE) + "/" + calendarStart.get(Calendar.MONTH) + "/" + calendarStart.get(Calendar.YEAR));
+	        		params.put("stHrCk" + calendarStart.get(Calendar.HOUR), "selected" );
+	        		params.put("stMnCk" + calendarStart.get(Calendar.MINUTE), "selected" );
+	        		params.put("stAmCk" + calendarStart.get(Calendar.AM_PM), "selected" );
 	        	}
 	        	else
 	        	{
-	        		params.put("hidden", "false");
-	        		params.put("notHidden", "true");
+	        		params.put("startStr", "");
+		        	params.put("stHrCk9", "selected" );
+		        	params.put("stMnCk0", "selected" );
+		        	params.put("stAmCk0", "selected" );
+	        	}
+	        	
+	        	if (modLesson.getEndTimestamp()!=null)
+	        	{
+	        		Calendar calendarEnd = Calendar.getInstance();
+	        		calendarEnd.setTime(modLesson.getEndTimestamp());
+		        	params.put("endStr", calendarEnd.get(Calendar.DATE) + "/" + calendarEnd.get(Calendar.MONTH) + "/" + calendarEnd.get(Calendar.YEAR));
+		        	params.put("edHrCk" + calendarEnd.get(Calendar.HOUR), "selected" );
+		        	params.put("edMnCk" + calendarEnd.get(Calendar.MINUTE), "selected" );
+		        	params.put("edAmCk" + calendarEnd.get(Calendar.AM_PM), "selected" );
+	        	}
+	        	else
+	        	{
+	        		params.put("endStr", "");
+		        	params.put("edHrCk9", "selected" );
+		        	params.put("edMnCk0", "selected" );
+		        	params.put("edAmCk0", "selected" );
+	        	}
+	
+	        	if (modLesson.getHidden()) 
+	        	{
+	        		params.put("hidden", "checked");
+	        	}
+	        	else
+	        	{
+	        		params.put("nothidden", "checked");
 	        	}
 	        	
 	        	
 	        	if (modLesson.getSchedule())
 	        	{
-	        		params.put("schedule", "true");
-	        		params.put("notSchedule", "false");
+	        		params.put("schedule", "checked");
 	        	}
 	        	else
 	        	{
-	        		params.put("schedule", "false");
-	        		params.put("notSchedule", "true");
+	        		params.put("notschedule", "checked");
 	        	}
-	        	
 	        	
 	        	html = this.generatePage("web/modify.vm", params);
         	}
@@ -478,8 +505,34 @@ public class LamsModule extends AuthenticationModule
 	        	
 	        	modLesson.setTitle(request.getParameter("title"));
 	        	modLesson.setDescription(request.getParameter("description"));
-	        	modLesson.setHidden(request.getParameter("isAvailable").equals("true"));
+	        	modLesson.setHidden(request.getParameter("isAvailable").equals("false"));
 	        	modLesson.setSchedule(request.getParameter("schedule").equals("true"));
+	        	
+	        	Timestamp start = null;
+        		Timestamp end = null;
+        			
+        		if (request.getParameter("schedule").equals("true"))
+        		{
+        			if (request.getParameter("dateStart")!=null && !request.getParameter("dateStart").equals(""))
+            		{
+        				start = getTimeStamp(request.getParameter("dateStart"), 
+        							 request.getParameter("startHour"), 
+        							 request.getParameter("startMin"), 
+        							 request.getParameter("startAMPM"));
+            		}
+        			
+        			if (request.getParameter("dateEnd")!=null && !request.getParameter("dateEnd").equals(""))
+            		{
+        			
+        				end = getTimeStamp(request.getParameter("dateEnd"), 
+							 	request.getParameter("endHour"), 
+							 	request.getParameter("endMin"), 
+							 	request.getParameter("endAMPM"));
+            		}
+        		}
+	        	
+        		modLesson.setStartTimestamp(start);
+	        	modLesson.setEndTimestamp(end);
 	        	
 	        	
 	        	boolean success = lessonDao.updateLesson(modLesson);
