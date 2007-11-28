@@ -36,6 +36,13 @@
 	</c:if>
 	<script language="javascript" type="text/javascript">
 		<!--
+			jQuery(document).ready(function(){
+				jQuery("div.course-bg").each(function(){
+					var display = jQuery.trim(jQuery(this).text());
+					initLoadGroup(this, <c:if test="${empty tab}">1</c:if><c:if test="${tab eq 'profile'}">3</c:if>, display);
+				});
+			});
+		
 			function getEnableSortingText() {
 				return '<fmt:message key="label.enable.lesson.sorting"/>';
 			}
@@ -135,17 +142,8 @@
 							</div>
 							<c:if test="${empty tab}">
 								<c:forEach items="${collapsedOrgDTOs}" var="dto">
-									<div id="<c:out value="${dto.orgId}"/>" class="course-bg">
-										<script>
-											<!--
-											initLoadGroup(jQuery("#<c:out value="${dto.orgId}"/>"),
-												1,
-												<c:if test="${dto.collapsed}">'header',</c:if>
-												<c:if test="${!dto.collapsed}">'group',</c:if>
-												<c:out value="${dto.orgId}"/>
-											);
-											//-->
-										</script>
+									<div id="<c:out value="${dto.orgId}"/>" style="display:none" class="course-bg">
+										<c:if test="${dto.collapsed}">header</c:if><c:if test="${!dto.collapsed}">group</c:if>
 									</div>
 								</c:forEach>
 								<c:if test="${empty collapsedOrgDTOs}">

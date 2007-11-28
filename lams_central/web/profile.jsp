@@ -85,15 +85,8 @@
 </h2>
 
 <c:forEach items="${collapsedOrgDTOs}" var="dto">
-	<div id="<c:out value="${dto.orgId}"/>" class="course-bg">
-		<script>
-			initLoadGroup(jQuery("#<c:out value="${dto.orgId}"/>"),
-				3,
-				<c:if test="${dto.collapsed}">'header',</c:if>
-				<c:if test="${!dto.collapsed}">'group',</c:if>
-				<c:out value="${dto.orgId}"/>
-			);
-		</script>
+	<div id="<c:out value="${dto.orgId}"/>" style="display:none" class="course-bg">
+		<c:if test="${dto.collapsed}">header</c:if><c:if test="${!dto.collapsed}">group</c:if>
 	</div>
 </c:forEach>
 <c:if test="${empty collapsedOrgDTOs}">

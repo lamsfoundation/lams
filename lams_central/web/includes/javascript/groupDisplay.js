@@ -1,15 +1,16 @@
 	<!--				
-				function initLoadGroup(element, stateId, display, orgId) {
+				function initLoadGroup(element, stateId, display) {
 					jQuery(element).load(
 						"displayGroup.do",
 						{
 							display: display,
 							stateId: stateId, 
-							orgId: orgId
+							orgId: jQuery(element).attr("id")
 						},
 						function() {
 							toggleGroupContents(element, stateId);
 							registerToolTip(element);
+							jQuery(element).css("display", "block");
 						}
 					);
 				}
