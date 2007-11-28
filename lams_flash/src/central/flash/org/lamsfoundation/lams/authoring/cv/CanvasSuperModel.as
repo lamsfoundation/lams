@@ -280,8 +280,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	}
 	
 	public function findParent(a:Activity, b:Activity):Boolean {
-		if(a.parentUIID == b.activityUIID)
+		if(a.activityUIID == b.activityUIID)
 			return true;
+		else if(a.isBranchingActivity())
+			return false;
 		else if(a.parentUIID == null)
 			return false;
 		else

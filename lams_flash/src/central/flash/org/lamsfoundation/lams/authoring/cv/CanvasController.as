@@ -352,14 +352,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			// refresh any branches connected to activities
 			//TODO: refresh the branches as you drag...
+			if(ca == _canvasModel.activeView.startHub || ca == _canvasModel.activeView.endHub) {
+				var sequences:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(ca.activity.activityUIID);
+				
+				for(var i=0; i<sequences.length; i++)
+					removeBranches(sequences[i].activityUIID);
 			
-			var myBranches = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
-			myBranches = myBranches.myBranches;
-			
-			for (var i=0; i<myBranches.length; i++){
-				Debugger.log('removing branch for redraw:'+myBranches[i].branchUIID,Debugger.GEN,'activityRelease','CanvasController');
-				var b = _canvasModel.branchesDisplayed.remove(myBranches[i].branchUIID);
-				b.removeMovieClip();
+			} else { 
+				removeBranches(ca.activity.activityUIID);
 			}
 			
 			clearAllSelections(optionalOnCanvas, parallelOnCanvas);
@@ -381,6 +381,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			_canvasModel.selectedItem = ca;
 			_canvasModel.setDirty();
+		}
+	}
+	
+	private function removeBranches(UIID):Void {
+		var myBranches = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(UIID);
+		
+		myBranches = myBranches.myBranches;
+				
+		for (var i=0; i<myBranches.length; i++){
+			Debugger.log('removing branch for redraw:'+myBranches[i].branchUIID,Debugger.GEN,'activityRelease','CanvasController');
+			var b = _canvasModel.branchesDisplayed.remove(myBranches[i].branchUIID);
+			b.removeMovieClip();
 		}
 	}
    

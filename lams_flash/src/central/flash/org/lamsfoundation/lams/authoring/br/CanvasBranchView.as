@@ -84,6 +84,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private var _learnerContainer_mc:MovieClip;
 	
 	private var _open:Boolean;
+	private var _isBranchChild:Boolean;
 	
 	/**
 	* Constructor
@@ -126,6 +127,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 		if(_cm != null) _cm.addEventListener('viewUpdate', Proxy.create(this, viewUpdate));
 		//if(_mm != null) _mm.addEventListener('viewUpdate', Proxy.create(this, viewUpdate));
+		
+		_isBranchChild = (_cm.activeView instanceof CanvasBranchView);
 		
 		MovieClipUtils.doLater(Proxy.create(this, draw)); 
     }   
@@ -338,8 +341,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		else
 			model.getMonitor().closeBranchView();
 		
+		Debugger.log("model.activeView :  " + model.activeView, Debugger.CRITICAL, "close", "CanvasBranchView");
+		
 		if(model instanceof CanvasModel)
-			model.getCanvas().addBin(model.activeView);
+			if(model.activeView instanceof CanvasBranchView) model.getCanvas().addBin(model.activeView.activityLayer);
+			else model.getCanvas().addBin(model.activeView);
 		
 		model.broadcastViewUpdate("SIZE");
 	}
@@ -348,8 +354,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	}
 	
 	private function addSequence(a:SequenceActivity, cm:CanvasModel):Boolean{
-		defaultSequenceActivity = a;
-		
+		if(a.parentUIID == activity.activityUIID)
+			defaultSequenceActivity = a;
+		else 
+			return false;
+			
 		return true;
 	}
 	
@@ -361,8 +370,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  Boolean - successfullit
 	 */
 	private function drawActivity(a:Activity, cm):Boolean {
-		Debugger.log("isActiveView: " + cm.isActiveView(this), Debugger.CRITICAL, "drawActivity", "CanvasBranchView");
-		if(!cm.isActiveView(this) && !cm.findParent(a, activity)) return false;
+		if(this.defaultSequenceActivity.activityUIID != a.parentUIID) return false;
 		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
@@ -435,7 +443,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 */
 	
 	private function hideActivity(a:Activity, cm):Boolean {
-		if(!cm.isActiveView(this) && !cm.findParent(a, activity)) return false;
+		if(this.defaultSequenceActivity.activityUIID != a.parentUIID) return false;
+		
 		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
@@ -460,7 +469,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  Boolean - successfull
 	 */
 	private function removeActivity(a:Activity, cm):Boolean{
-		if(!cm.isActiveView(this) && !cm.findParent(a, activity)) return false;
+		if(this.defaultSequenceActivity.activityUIID != a.parentUIID) return false;
 		
 		if(a.isBranchingActivity())
 			cm.activitiesDisplayed.get(a.activityUIID).branchView.removeMovieClip();
@@ -506,11 +515,10 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 		Debugger.log("branch: " + b, Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
 		Debugger.log("sequence: " + b.sequenceActivity.activityUIID, Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
-		Debugger.log("isActiveView: " + cm.isActiveView(this), Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
 		
-		Debugger.log("findParent: " + cm.findParent(b.sequenceActivity, activity), Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
+		if(!isActivityOnLayer(cm.activitiesDisplayed.get(b.targetUIID), this.activityLayer)) return false;
 		
-		if(!cm.isActiveView(this) && !cm.findParent(b.sequenceActivity, activity)) return false;
+		//if(!cm.isActiveView(this) && !cm.findParent(b.sequenceActivity, activity)) return false;
 		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
@@ -582,7 +590,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  
 	 */
 	private function removeBranch(b:Branch,cm){
-		if(!cm.isActiveView(this) && !cm.findParent(b.sequenceActivity, activity)) return false;
+		if(!cm.isActiveView(this)) return false;
+		
 		if(b.direction == BranchConnector.DIR_FROM_START) b.sequenceActivity.firstActivityUIID = null;
 		else if(b.direction == BranchConnector.DIR_TO_END) b.sequenceActivity.stopAfterActivity = true;
 		
@@ -633,16 +642,23 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
     * @param cm Canvas model object 
     */
 	private function setPosition(cm):Void{
-        var ba = cm.currentBranchingActivity;
+        var ba = cm.activitiesDisplayed.get(activity.activityUIID);
 		
-		var cx:Number = ba._x + ba.getVisibleWidth()/2;
-		var cy:Number = ba._y + ba.getVisibleHeight()/2;
-		
-		canvas_scp._x = -cx+hSpace;
-		canvas_scp._y = -cy+vSpace;
-		
-		close_mc._x = bkg_pnl._x + bkg_pnl.width - close_mc._width - 10;
-		close_mc._y = bkg_pnl._y + 10;
+		if(ba != null) {
+			var cx:Number = ba._x + ba.getVisibleWidth()/2;
+			var cy:Number = ba._y + ba.getVisibleHeight()/2;
+			
+			Debugger.log("current: " + ba.activity.activityUIID, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
+			
+			if(_isBranchChild) 
+				Debugger.log("bc cx: " + cx + " // bc cy: " + cy, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
+			
+			canvas_scp._x = (_isBranchChild) ? -cx : -cx+hSpace;
+			canvas_scp._y = (_isBranchChild) ? -cy : -cy+vSpace;
+			
+			close_mc._x = bkg_pnl._x + bkg_pnl.width - close_mc._width - 10;
+			close_mc._y = bkg_pnl._y + 10;
+		}
 		
 	}
 	

@@ -1090,6 +1090,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				myBranches.push(br[i]);
 				hasBranches = true;
 			}
+			
 			if(target != null && hub != null){
 					break;
 			}else{

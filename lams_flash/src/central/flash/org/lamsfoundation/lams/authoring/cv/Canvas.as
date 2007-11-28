@@ -399,9 +399,8 @@ class Canvas extends CanvasHelper {
 			canvasModel.removeActivity(taParent);
 			canvasModel.removeActivity(actToAdd.activityUIID);
 			
+			canvasModel.setDirty();
 		}
-		
-		canvasModel.setDirty();
 		
 	}
 
