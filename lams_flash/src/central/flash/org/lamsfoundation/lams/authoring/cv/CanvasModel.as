@@ -361,7 +361,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	public function addParentToActivity(parentID, ca:Object, doRemoveParent:Boolean){
 		ca.activity.parentUIID = parentID;
 		
-		Debugger.log('ParentId of '+ca.activity.activityUIID+ 'Is : '+ca.activity.parentUIID,Debugger.GEN,'addParentToActivity','CanvasModel');
+		Debugger.log('ParentId of '+ca.activity.activityUIID+ ' ==> '+ca.activity.parentUIID,Debugger.GEN,'addParentToActivity','CanvasModel');
 		
 		removeActivity(ca.activity.activityUIID);
 		if(doRemoveParent) removeActivity(parentID);
@@ -807,11 +807,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 				return new LFError(Dictionary.getValue('cv_trans_target_act_missing'),"addActivityToTransition",this);
 			}
 			
-			var branch = _cv.ddm.getBranchesForActivityUIID(toAct);
-			if(branch.target != null && branch.target.direction != BranchConnector.DIR_SINGLE) {
-				return new LFError("Can't create transition between activities in different branches", "addActivityToTransition", this);
-			}
-				
 			//check there is not already a transition to or from this activity:
 			var transitionsArray:Array = _cv.ddm.transitions.values();
 				
@@ -832,8 +827,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 				
 			}
 			
-			var branchesArray:Array = _cv.ddm.branches.values();
+			var branch = _cv.ddm.getBranchesForActivityUIID(toAct);
+			if(branch.target != null && branch.target.direction != BranchConnector.DIR_SINGLE) {
+				return new LFError("Can't create transition between activities in different branches", "addActivityToTransition", this);
+			}
 			
+			var branchesArray:Array = _cv.ddm.branches.values();
 			for(var i=0; i<branchesArray.length; i++) {
 				if(branchesArray[i].targetUIID == toAct && branchesArray[i].direction == BranchConnector.DIR_TO_END) {
 					return new LFError("Cannot connect a new transition a closed sequence");
@@ -900,7 +899,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			return new LFError("Branch Connector must be drawn from the Hub to an Activity");
 		} else if(_cv.ddm.getTransitionsForActivityUIID(toAct.activityUIID).into != null) {
 			return new LFError("Cannot create start-branch connection to Activity with inward Transition.", "createBranchStartConnector", this);
-		} else if(branchesSize > 0) {
+		} else if(branchesSize > 0 && isLoopingLD(toAct.activityUIID, sequence.firstActivityUIID)) {
 			return new LFError("Cannot create start-branch connection to Activity in a already connected Sequence.", "createBranchStartConnector", this);
 		} else {
 			var b = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, toAct.activityUIID, activeView.startHub.activity.activityUIID, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
@@ -930,12 +929,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		} else if(_cv.ddm.getBranchesForActivityUIID(sequence.activityUIID).myBranches.length <= 0) {
 			return new LFError("Cannot create end-branch connection to an unconnected Sequence.", "createBranchStartConnector", this);
 		} else {
-			return new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_TO_END, fromAct.activityUIID, activeView.endHub.activity.activityUIID, sequence, _cv.ddm.learningDesignID);
-		
+			Debugger.log("looping: " + isLoopingLD(fromAct, _cv.ddm.getActivityByUIID(sequence.firstActivityUIID)), Debugger.CRITICAL, "createBranchStartConnector", "CanvasModel");
+			
+			var condition:Boolean = (sequence.firstActivityUIID != null && isLoopingLD(fromAct.activityUIID, sequence.firstActivityUIID));
+			Debugger.log("condition: " + condition, Debugger.CRITICAL, "createBranchStartConnector", "CanvasModel");
+			
+			if(condition || sequence.firstActivityUIID == fromAct.activityUIID)
+				return new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_TO_END, fromAct.activityUIID, activeView.endHub.activity.activityUIID, sequence, _cv.ddm.learningDesignID);
+			else
+				return new LFError("Cannot create end-branch connection to an unconnected Sequence.", "createBranchStartConnector", this);
 		}
 	}
 	
 	private function createActivitylessBranch():Object{
+		if(_cv.ddm.getBranchesForActivityUIID(activeView.startHub.activity.activityUIID).activityless != null)
+			return new LFError("Cannot add more than one Activityless branch.", null);
 		
 		var b = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_SINGLE, activeView.startHub.activity.activityUIID,  null, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
 		b.sequenceActivity.isDefault = false;
@@ -949,8 +957,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		// move first activity
 		var ca = _activitiesDisplayed.get(activityUIID);
 		
+		Debugger.log("sequence uiid: " + sequence.activityUIID, Debugger.CRITICAL, "moveActivitiesToBranchSequence", "CanvasModel");
+		Debugger.log("ca.activity.parentUIID: " + ca.activity.parentUIID, Debugger.CRITICAL, "moveActivitiesToBranchSequence", "CanvasModel");
+		
 		if(sequence.activityUIID != ca.activity.parentUIID) {
-			addParentToActivity(sequence.activityUIID, ca, true);
+			addParentToActivity(sequence.activityUIID, ca, false);
 		} else {
 			return true;
 		}

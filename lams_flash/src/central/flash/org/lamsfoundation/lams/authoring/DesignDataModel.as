@@ -1082,6 +1082,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var hub = new Array();
 		var target = null;
 		var sequence = null;
+		var activityless = null;
 		
 		var hasBranches:Boolean = false;
 		
@@ -1104,6 +1105,11 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				if(br[i].sequenceActivity.activityUIID == UIID){
 					sequence = br[i].sequenceActivity;
 				}
+				
+				if(target != null && target.direction == BranchConnector.DIR_SINGLE) {
+					activityless = target;
+					break;
+				}
 			}
 		}
 		
@@ -1112,6 +1118,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		branchObj.sequence = sequence;
 		branchObj.hub = hub;
 		branchObj.hasBranches = hasBranches;
+		branchObj.activityless = activityless;
 		return branchObj;
 	}
 	

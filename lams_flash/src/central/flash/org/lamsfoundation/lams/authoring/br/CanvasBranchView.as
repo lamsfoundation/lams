@@ -370,10 +370,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  Boolean - successfullit
 	 */
 	private function drawActivity(a:Activity, cm):Boolean {
-		if(this.defaultSequenceActivity.activityUIID != a.parentUIID) return false;
+		if(this.activity.activityUIID != cm.getCanvas().ddm.getActivityByUIID(a.parentUIID).parentUIID) 
+			return false;
 		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
+		
 		var fromModuleTab:String = null;
 		var _module = null;
 		
@@ -383,6 +385,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		}
 		
 		Debugger.log('I am in drawActivity and Activity typeID :'+a.activityTypeID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasBranchView');
+		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity()){
 			Debugger.log('controller cbc :'+MonitorController(cbc), Debugger.CRITICAL, 'drawActivity','CanvasBranchView');
@@ -443,9 +446,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 */
 	
 	private function hideActivity(a:Activity, cm):Boolean {
-		if(this.defaultSequenceActivity.activityUIID != a.parentUIID) return false;
-		
-		
+		if(this.activity.activityUIID != cm.getCanvas().ddm.getActivityByUIID(a.parentUIID).parentUIID) 
+			return false;
+			
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
 		
@@ -469,7 +472,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  Boolean - successfull
 	 */
 	private function removeActivity(a:Activity, cm):Boolean{
-		if(this.defaultSequenceActivity.activityUIID != a.parentUIID) return false;
+		if(this.activity.activityUIID != cm.getCanvas().ddm.getActivityByUIID(a.parentUIID).parentUIID) 
+			return false;
 		
 		if(a.isBranchingActivity())
 			cm.activitiesDisplayed.get(a.activityUIID).branchView.removeMovieClip();
@@ -496,7 +500,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t, controller:cbc, _canvasBranchView:cbv});
 		
 		cm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
-		Debugger.log('drawn a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'drawTransition','CanvasView');
+		Debugger.log('drawn a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'drawTransition','CanvasBranchView');
 		
 		var parentID = cm.getCanvas().ddm.getActivityByUIID(t.fromUIID).parentUIID;
 		cm.moveActivitiesToBranchSequence(t.toUIID, cm.getCanvas().ddm.getActivityByUIID(parentID));
@@ -512,11 +516,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  
 	 */
 	private function drawBranch(b:Branch, cm):Boolean{
-		
-		Debugger.log("branch: " + b, Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
-		Debugger.log("branch target :  " + b.targetUIID, Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
-		
-		Debugger.log("sequence: " + b.sequenceActivity.activityUIID, Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
 		
 		if(!isActivityOnLayer(cm.activitiesDisplayed.get(b.targetUIID), this.activityLayer)) 
 			if((b.direction == BranchConnector.DIR_SINGLE && b.targetUIID == activity.activityUIID))
@@ -566,6 +565,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t, controller:cbc, _canvasBranchView:cbv, _visible:false});
 		
 		cm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
+		
 		Debugger.log('drawn (hidden) a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'hideTransition','CanvasView');
 		
 		return true;
