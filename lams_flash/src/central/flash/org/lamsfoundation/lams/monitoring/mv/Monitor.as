@@ -362,28 +362,39 @@ class Monitor {
 	
 	public function getProgressData(seq:Object){
 		var seqId:Number = seq.getSequenceID();
-		trace('getting progress data for Sequence: '+seqId);
-		
+		Debugger.log('getting progress data for Sequence: '+seqId, Debugger.GEN, "getProgressData", "Monitor");
 		var callback:Function = Proxy.create(this, saveProgressData);
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAllLearnersProgress&lessonID=' + seqId, callback, false);
 	}
 	
+	public function getInitialLearnersProgress(seq:Object) { // Not used atm but leaving here in case we ever want to implement batch loading
+		var seqId:Number = seq.getSequenceID();
+		Debugger.log('getting initial progress data for Sequence: '+seqId, Debugger.CRITICAL, "getInitialLearnersProgress", "Monitor");
+		var callback:Function = Proxy.create(this, saveProgressData);	
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getInitialLearnersProgress&lessonID=' + seqId,callback, false);
+	}
+	
+	public function getAdditionalLearnersProgress(seq:Object) { // Not used atm but leaving here in case we ever want to implement batch loading
+		var seqId:Number = seq.getSequenceID();
+		Debugger.log('getting additional progress data for Sequence: '+seqId, Debugger.CRITICAL, "getInitialLearnersProgress", "Monitor");
+		var callback:Function = Proxy.create(this, saveProgressData);
+		//Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAdditionalLearnersProgress&lessonID='+seqId+'&lastUserID='+learnerProgressList[learnersProgressList.length-1].userName,callback,false);
+	}
+	
 	private function saveProgressData(progressDTO:Object){
-		trace('returning progress data...'+progressDTO.length);
+		Debugger.log("saveProgressData invoked", Debugger.GEN, "saveProgressData", "Monitor");
 		var allLearners = new Array();
-		for(var i=0; i< progressDTO.length; i++){
-			
+		for(var i=0; i< progressDTO.length; i++){	
 			var prog:Object = progressDTO[i];
 			var lessonProgress:Progress = new Progress();
 			lessonProgress.populateFromDTO(prog);
-			//trace('pushing lesson with id: ' + lessonModel.getLessonID());
 			allLearners.push(lessonProgress);
 		}
 			
 		//sets these in the monitor model in a hashtable by learnerID
 		monitorModel.setLessonProgressData(allLearners);	
 		dispatchEvent({type:'load',target:this});		
-		trace('progress data saved...');
+		Debugger.log("Progress data saved...", Debugger.GEN, "saveProgressData", "Monitor");
 	}
 	
 	public function getCELiteral(taskType:Number):String{

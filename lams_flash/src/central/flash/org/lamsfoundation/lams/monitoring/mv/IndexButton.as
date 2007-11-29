@@ -36,31 +36,36 @@ import mx.events.*;
 import mx.utils.*;
 import mx.controls.*;
 
-class org.lamsfoundation.lams.monitoring.mv.IndexButton extends mx.core.UIObject {
+class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 	
 	public static var _tabID:Number = 2;
 	private var _className = "IndexButton";
 	
 	private var _bgPanel:MovieClip;
 	private var btnWidth:Number;
+	
+	private var idxLabel_mc:MovieClip;
 	private var idxLabel:Label;
+	private var _labelText:String;
 	
 	private var _tm:ThemeManager;
 	private var mm:MonitorModel;
-	    
+	
 	/**
 	* Called to Indexbutton. Called by LearnerIndexView
 	*/
-	public function init(m:Observable,c:Controller){
-		//Invoke superconstructor, which sets up MVC relationships.
+	public function init(m:Observable, c:Controller){
+
 		mm = MonitorModel(m);
-		
-		btnWidth = 48;
+		btnWidth = 45;
 		
 		_bgPanel._width = btnWidth;
-		this.createClassObject(mx.controls.Label, "idxLabel", this.getNextHighestDepth(), {text:"", _width: 43, autoSize: "right"});
-		this.onRollOver = Delegate.create(this, onMouseOver);
-		this.onPress = Delegate.create(this, indexClicked);
+		
+		idxLabel_mc = this.attachMovie("Label", "idxLabel", this.getNextHighestDepth(), {text:_labelText, _width: 40, autoSize: "right"});
+		idxLabel = Label(idxLabel_mc);
+		
+		_bgPanel.onRollOver = Delegate.create(this, onMouseOver);
+		_bgPanel.onPress = Delegate.create(this, indexClicked);
     }
 		
 	public function onMouseOver(): Void {
@@ -73,10 +78,11 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends mx.core.UIObject
 	}
 
 	
-	public function setSize():Void {
-		this._width = btnWidth;
-		idxLabel._width = btnWidth - 5;
-		_bgPanel._width = btnWidth;
+	public function setSize(_btnWidth:Number):Void {
+		this._width = _btnWidth;
+		
+		idxLabel._width = _btnWidth - 5;
+		_bgPanel._width = _btnWidth;
 	}
 	
 	public function set label(a:String):Void {

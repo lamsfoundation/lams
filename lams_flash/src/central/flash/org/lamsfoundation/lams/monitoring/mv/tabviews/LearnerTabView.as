@@ -62,12 +62,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private var ACT_Y:Number = 40;
 	private var xOffSet:Number = 10;
 	private var actWidth:Number = 120;
-	private var actLenght:Number = 0;
-	private var count:Number = 0;
 	private var activeLearner:Number;
 	private var prevLearner:Number;
 	private var learnersDrawn:Number;
-	private var learnerListArr:Array = new Array();
+	private var learnerListArr:Array;
 
 	private var _tm:ThemeManager;
 	private var _tip:ToolTip;
@@ -86,6 +84,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	
 	private var refresh_btn:Button;
 	private var help_btn:Button;
+	private var panelLowered:Boolean;
 	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -106,12 +105,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	}
 
 	/**
-	* Called to initialise Canvas  . CAlled by the Canvas container
+	* Called to initialise Canvas. Called by the Canvas container
 	*/
 	public function init(m:Observable,c:Controller){
 		//Invoke superconstructor, which sets up MVC relationships.
 		super (m, c);
 		mm = MonitorModel(model)
+		
+		learnerListArr = new Array();
+		panelLowered = false;
 		
         //Set up parameters for the grid
 		H_GAP = 10;
@@ -141,13 +143,14 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					if (infoObj.tabID == _tabID && !mm.locked){
 						hideMainExp(mm);
 						mm.broadcastViewUpdate("JOURNALSSHOWHIDE", true);
-
+						adjustLearnerPanel(mm);
+						
 						if (mm.activitiesDisplayed.isEmpty()){
 							mm.getMonitor().openLearningDesign(mm.getSequence());
 						} else if(mm.getIsProgressChangedLearner()) {
-							reloadProgress(false);
+							reloadProgress(mm, false);
 						} else if(learnersDrawn != mm.allLearnersProgress.length){
-							reloadProgress(true);
+							reloadProgress(mm, true);
 						}
 						
 						mm.getMonitor().getMV().getMonitorLearnerScp()._visible = true;
@@ -158,6 +161,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					}
 					break;
 				case 'PROGRESS' :
+					Debugger.log("Progress event received", Debugger.CRITICAL, "update", "LearnerTabView");
 					if (infoObj.tabID == _tabID){
 						if(!mm.locked){
 							mm.getMonitor().getProgressData(mm.getSequence());
@@ -165,11 +169,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 							ApplicationParent.extCall("reloadWindow", null);
 						}
 					}
-					break;	
-					
+					break;
 				case 'RELOADPROGRESS' :	
+					Debugger.log("Reload Progress event received", Debugger.CRITICAL, "update", "LearnerTabView");
 					if (infoObj.tabID == _tabID && !mm.locked){
-						reloadProgress(true);
+						//adjustLearnerPanel(mm);
+						reloadProgress(mm, true);
 					}
 					break;	
 				case 'DRAW_ACTIVITY' :
@@ -188,14 +193,17 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					}
 					break;
 				case 'DRAW_DESIGN' :
+					adjustLearnerPanel(mm);
 					if (infoObj.tabID == _tabID && !mm.locked){
+						if (mm.isDesignDrawn) {
+							clearCanvas(mm);
+						}
 						drawAllLearnersDesign(mm, infoObj.tabID);
 					}
 					break;
 				default :
 					Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorTabView');
 			}
-
 	}
 	
 	/**
@@ -248,55 +256,72 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	
 	/**
 	 * Reloads the learner Progress and 
-	 * @Param isChanged Boolean Value to pass it to setIsProgressChanged in monitor model so 		that it sets it to true if refresh button is clicked and sets it to fasle as soon as latest data is loaded and design is redrawn.
+	 * @Param isChanged Boolean Value to pass it to setIsProgressChanged in monitor model so that it sets it to true if refresh button is clicked and sets it to fasle as soon as latest data is loaded and design is redrawn.
 	 * @usage   
 	 * @return  nothing
 	 */
-	private function reloadProgress(isChanged:Boolean){
-		
-			learnersDrawn = 0;
-			learnerListArr = new Array();
-			
-			ACT_X = 0;
-			ACT_Y = 35;
-			
-			this._activityLayer_mc.removeMovieClip();
-			this._nameLayer_mc.removeMovieClip();
-			
-			this._nameLayer_mc = this.createEmptyMovieClip("_nameLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
-			this._activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
-
-			if (isChanged == false){
-				mm.setIsProgressChangedLearner(false);
-				mm.setIsProgressChangedSequence(true);
-			} else {
-				mm.setIsProgressChangedLesson(true);
-				mm.setIsProgressChangedSequence(true);
-			}
-			
-			mm.transitionsDisplayed.clear();
-			mm.activitiesDisplayed.clear();
+	private function reloadProgress(mm:MonitorModel, isChanged:Boolean){
+			clearCanvas(mm, isChanged);
 			
 			mm.getMonitor().getProgressData(mm.getSequence());
+	}
+	
+	public function adjustLearnerPanel(mm):Void {
+		if (mm.numIndexButtons > 1 && !panelLowered) {
+			mm.getMonitor().getMV().getMonitorLearnerScp()._y = mm.getMonitor().getMV().getMonitorLearnerScp()._y + 20;
+			panelLowered = true;
+		}
+	}
+	
+	public function clearCanvas(mm:MonitorModel, isChanged:Boolean):Void {
+		learnersDrawn = 0;
 			
+		ACT_X = 0;
+		ACT_Y = 35;
+		
+		if (learnerListArr == null || learnerListArr == undefined){ 
+			learnerListArr = new Array();
+		}
+		this._activityLayer_mc.removeMovieClip();
+		this._nameLayer_mc.removeMovieClip();
+			
+		this._nameLayer_mc = this.createEmptyMovieClip("_nameLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
+		this._activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
+		
+		if (isChanged == false){
+			mm.setIsProgressChangedLearner(false);
+			mm.setIsProgressChangedSequence(true);
+		} else {
+			mm.setIsProgressChangedLesson(true);
+			mm.setIsProgressChangedSequence(true);
+		}
+			
+		mm.transitionsDisplayed.clear();
+		mm.activitiesDisplayed.clear();
+		
+		mm.isDesignDrawn = false;
 	}
 	
 	private function drawAllLearnersDesign(mm:MonitorModel, tabID:Number){
-		mm.isDesignDrawn = false;
 		
-		for(var i=0; i<mm.allLearnersProgress.length; i++){
+		var idx:Number = 0;	
+		var learnersPerPage:Number = mm.learnersPerPage;
+
+		for (var i= (mm.currentLearnerIndex-1)*learnersPerPage; i<= (learnersPerPage*mm.currentLearnerIndex)-1; i++) {
+			if (mm.allLearnersProgress[i] != undefined) {
+				learnersDrawn = i+1;
+				ACT_X = 0;
+				ACT_Y = (idx*80)+35;
 			
-			learnersDrawn = i+1;
-			ACT_X = 0;
-			ACT_Y = (i*80)+35;
+				mm.drawDesign(tabID, mm.allLearnersProgress[i]);
 			
-			mm.drawDesign(tabID, mm.allLearnersProgress[i]);
-			
-			setSize(mm);
+				setSize(mm);
+				idx++;
+			}
 		}
 		
-		mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
-		
+		//mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true); //unnecessary
+		mm.isDesignDrawn = true;
 	}
 	
 	/**
@@ -315,8 +340,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	}
 	
 	private function printLearner(mm:MonitorModel, learner:Object){
-		
 		var z:Object = mm.getSize();
+
 		var styleObj = _tm.getStyleObject('button');
 		var EP_btn_label:String = Dictionary.getValue('learner_exportPortfolio_btn')
 		
@@ -364,8 +389,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		tempObj.learnerName = learnerName_txt;
 		tempObj.learnerButton = learnerExp_btn;
 		learnerListArr.push(tempObj);
-		
-		count++;
+		Debugger.log("learnerListArr.length: "+learnerListArr.length, Debugger.GEN, "printLearner", "LearnerTabView");
 	}
 
 	public function showToolTip(btnObj, btnTT:String):Void{
@@ -502,26 +526,27 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     * Sets the size of the canvas on stage, called from update
     */
 	private function setSize(mm:MonitorModel):Void{
-        var s:Object = mm.getSize();
+		var s:Object = mm.getSize();
 		
-		var scpWidth:Number = mm.getMonitor().getMV().getMonitorLearnerScp()._width;
+		//var scpWidth:Number = mm.getMonitor().getMV().getMonitorLearnerScp()._width;
+		var scpWidth:Number = Stage.width;
 		var scpHeight:Number = mm.getMonitor().getMV().getMonitorLearnerScp()._height;
 		
 		var newWidth:Number;
 		
 		newWidth = (_activityLayer_mc._width < scpWidth) ? scpWidth - 6 : _activityLayer_mc._width;
-
+		
 		for (var i=0; i<learnerListArr.length; i++){
 			learnerListArr[i].learnerName._width = newWidth;
 			learnerListArr[i].learnerButton._x = newWidth-110;
 		}
-		
 		var learnerListHeight:Number = ((learnerListArr.length)*80)+35;
 		
 		bkg_pnl._visible = false;
 		bkg_pnl.setSize(_activityLayer_mc._width, learnerListHeight);
 		
-		mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
+		//mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
+		mm.getMonitor().getMV().getMonitorLearnerScp().invalidate();
 }
 	
 	 /**

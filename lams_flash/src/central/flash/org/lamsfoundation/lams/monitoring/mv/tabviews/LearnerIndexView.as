@@ -48,18 +48,18 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	public static var _tabID:Number = 2;
 	private var _className = "LearnerIndexView";
 	
+	private var _bgPanel:MovieClip;
+	
 	private var _tm:ThemeManager;
 	private var _tip:ToolTip;
 	
 	private var mm:MonitorModel;
-	private var _learnerIndexView:LearnerIndexView;
 	
 	//IndexButton
 	private var _indexButton:IndexButton;
 	private var _indexButton_mc:MovieClip;
 	private var _buttonsPanel_mc:MovieClip;
-	
-	private var buttonsDrawn:Boolean;
+	private var displayedButtons:Array;
 	
 	private var dispatchEvent:Function; 
 	public var addEventListener:Function;
@@ -75,6 +75,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		_tip = new ToolTip();
 		
 		this._visible = false;
+		displayedButtons = new Array();
 				
         //Init for event delegation
         mx.events.EventDispatcher.initialize(this);
@@ -86,11 +87,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		//Invoke superconstructor, which sets up MVC relationships.
 		super (m, c);
 		mm = MonitorModel(model)
-
-		_learnerIndexView = this;
 		mm.learnerIndexView = this;
-
-		buttonsDrawn = false;
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
     }
@@ -101,9 +98,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 
 		switch (infoObj.updateType){
 			case 'TABCHANGE' :
-				if (infoObj.tabID == _tabID && !mm.locked){
-					if (!buttonsDrawn && getNumButtons()>1){
-						setupButtons();
+				if (infoObj.tabID == _tabID && !mm.locked && mm.numIndexButtons>1) {
+					if (mm.numIndexButtons > displayedButtons.length) {
+						Debugger.log("Setting up buttons [mm.numIndexButtons > displayedButtons.length]", Debugger.CRITICAL, "update", "LearnerIndexView");
+						setupButtons(mm);
 					}
 					this._visible = true;
 				}else {
@@ -119,9 +117,18 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 				if (infoObj.tabID == _tabID && !mm.locked){
 					setSize(mm);
 				}
-				break;	
+				break;
+			case 'DRAW_DESIGN' :
+				if (infoObj.tabID == _tabID && !mm.locked && mm.numIndexButtons>1){
+					if (mm.numIndexButtons > displayedButtons.length) {
+						Debugger.log("Setting up buttons [mm.numIndexButtons > displayedButtons.length]", Debugger.CRITICAL, "update", "LearnerIndexView");
+						setupButtons(mm);
+					}
+					this._visible = true;
+				}
+				break;
 			default :
-				Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorTabView');
+				Debugger.log('unknown update type :' + infoObj.updateType,Debugger.GEN,'update','org.lamsfoundation.lams.MonitorTabView');
 		}
 	}
 		
@@ -130,45 +137,44 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		dispatchEvent({type:'load',target:this});
 	}
 	
-	public function getNumButtons(): Number {
-		return Math.ceil(mm.getSequence().noStartedLearners/mm.learnersPerPage);
-	}
-	
-	public function setupButtons():Void {
+	public function setupButtons(mm:MonitorModel):Void {
+		var btnWidth:Number = 45;
 		
-		var btnWidth:Number = 48;
-		var numButtons:Number = getNumButtons();
+		if (displayedButtons.length > 0 ) {
+			removeButtons();
+		} 
 		
 		_buttonsPanel_mc = this.createEmptyMovieClip("_buttonsPanel_mc", DepthManager.kTop);
-			
-		for (var i=1; i<=numButtons; i++) {	
-			var idxBtn:MovieClip = _buttonsPanel_mc.attachMovie("IndexButton", "indexButton"+i, _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth});	
+				
+		for (var i=1; i<=mm.numIndexButtons; i++) {	
+			var idxBtn:MovieClip = _buttonsPanel_mc.attachMovie("IndexButton", "idxBtn"+i, _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth, _labelText: String(i)});	
 			_indexButton = IndexButton(idxBtn);
-			_indexButton.init(mm);
-			_indexButton.label = i;
-			Debugger.log("idxBtn._width: "+idxBtn._width, Debugger.CRITICAL, "setupButtons", "LearnerIndexView");
+			_indexButton.init(mm, undefined);
+			displayedButtons.push(idxBtn);
 			if (i > 1)
 				idxBtn._x = (i-1)*btnWidth-1;
 			else
 				idxBtn._x = (i-1)*btnWidth;
 		}
-		buttonsDrawn = true;
+	}
+	
+	public function removeButtons(){
+		Debugger.log("Removing Index Buttons", Debugger.GEN, "removeButtons", "LearnerIndexView");
+		while (displayedButtons.length != 0) {
+			var idxBtn:MovieClip = MovieClip(displayedButtons.pop());
+			_buttonsPanel_mc.removeMovieClip(idxBtn);
+		}
 	}
 
 	private function setPosition(mm:MonitorModel):Void{		
-		Debugger.log("LearnerIndexView setPosition", Debugger.CRITICAL, "setPosition", "LearnerIndexView");
 		var p:Object = mm.getPosition(); 
 		
 		this._x = p.x;
 		this._y = 0;
 	}
 	
-	private function setSize(mm:MonitorModel):Void{
-		Debugger.log("setSize invoked", Debugger.CRITICAL, "setSize", "LearnerIndexView");
-		
-		Debugger.log("PNT 1: "+mm.learnerIndexView._width, Debugger.CRITICAL, "setSize", "LearnerIndexView");
-		this._width = Stage.width;
-		Debugger.log("PNT 2: "+mm.learnerIndexView.width, Debugger.CRITICAL, "setSize", "LearnerIndexView");
+	public function setSize(mm:MonitorModel):Void{
+		_bgPanel._width = mm.getSize().w;
 	}
 
 	public function getController():MonitorController{

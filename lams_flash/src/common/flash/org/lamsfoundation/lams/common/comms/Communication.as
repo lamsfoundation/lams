@@ -33,9 +33,6 @@ import org.lamsfoundation.lams.common.dict.*
 * 
 */
 class org.lamsfoundation.lams.common.comms.Communication {
-    
-    
-
 
 
 	private static var FRIENDLY_ERROR_CODE:Number = 1;  //Server error codes
@@ -110,7 +107,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
     * @returns Void
     */
     public function getRequest(requestURL:String,handler:Function,isFullURL:Boolean):Void{	
-		
+
 		Cursor.showCursor(ApplicationParent.C_HOURGLASS);
 
 		//Create XML response object 

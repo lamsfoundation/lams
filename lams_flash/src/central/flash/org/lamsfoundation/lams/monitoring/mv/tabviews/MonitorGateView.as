@@ -133,19 +133,17 @@ import mx.controls.*;
     * layout visual elements on the MonitorTabView on initialisation
     */
 	private function draw(){
-
 		_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", DepthManager.kTop);
 		
 		var s:Object = mm.getSize();
 		
-		mm.endGate(this);
 		mm.endGate = this;
 		
 		mm.endGate.tt_btn.onRollOver = Proxy.create(this,this['showToolTip'], "finish_learner_tooltip");
 		mm.endGate.tt_btn.onRollOut =  Proxy.create(this,this['hideToolTip']);
 				
 		setStyles();
-		
+
 		dispatchEvent({type:'load',target:this});
 	}
 	
@@ -165,13 +163,13 @@ import mx.controls.*;
 	}
 	
 	private function showEndGateData(mm:MonitorModel):Void{
+		Debugger.log("p1 in draw segd", Debugger.CRITICAL, "showEndGateData", "MonitorGateView");
 		var mc = getController();
 		var finishedLearners:Number = 0; 
 		var totalLearners:Number = mm.allLearnersProgress.length;
 		
 		doorClosed._visible = true;
 		finishedLearnersList = new Array();
-		
 		
 		for (var i=0; i<mm.allLearnersProgress.length; i++){
 			if (mm.allLearnersProgress[i].isLessonComplete()){
@@ -188,6 +186,7 @@ import mx.controls.*;
 		}
 		
 		lessonEnd_lbl.text = "<b>"+Dictionary.getValue('title_sequencetab_endGate')+"</b> "+finishedLearners+" of "+ totalLearners;
+		Debugger.log("p2 in draw segd", Debugger.CRITICAL, "showEndGateData", "MonitorGateView");
 	}
 			
 	/**

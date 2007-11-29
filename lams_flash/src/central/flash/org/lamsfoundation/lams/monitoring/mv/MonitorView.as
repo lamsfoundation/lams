@@ -76,8 +76,8 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     private var _gridLayer_mc:MovieClip;
     private var _lessonTabLayer_mc:MovieClip;
 	private var _monitorTabLayer_mc:MovieClip;
-	private var _monitorGateLayer_mc:MovieClip;
 	private var _learnerTabLayer_mc:MovieClip;
+	private var _monitorPanels_mc:MovieClip;
 	private var _todoTabLayer_mc:MovieClip;
 	private var _editOnFlyLayer_mc:MovieClip;
 	private var refresh_btn:Button;
@@ -106,6 +106,9 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	//LearnerTabView
 	private var learnerTabView:LearnerTabView;
 	private var learnerTabView_mc:MovieClip;
+	//LearnerIndexView
+	private var learnerIndexView:LearnerIndexView;
+	private var learnerIndexView_mc:MovieClip;
 	
 	private var _monitorController:MonitorController;
 	
@@ -113,6 +116,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private var monitorTabLoaded;
 	private var monitorGateLoaded;
 	private var learnerTabLoaded;
+	private var learnerIndexLoaded;
 	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -132,6 +136,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		monitorTabLoaded = false;
 		monitorGateLoaded = false;
 		learnerTabLoaded = false;
+		learnerIndexLoaded = false;
 		
 		//Init for event delegation
         mx.events.EventDispatcher.initialize(this);
@@ -162,9 +167,12 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 			else if(tgt.indexOf('monitorTabView_mc') != -1) { monitorTabLoaded = true; }
 			else if(tgt.indexOf('monitorGateView_mc') != -1) { monitorGateLoaded = true; }
 			else if(tgt.indexOf('learnerTabView_mc') != -1) { learnerTabLoaded = true; }
+			else if(tgt.indexOf('learnerIndexView_mc') != -1) { learnerIndexLoaded = true; }
 			else Debugger.log('not recognised instance ' + evt.target,Debugger.GEN,'tabLoaded','MonitorView');
 		
-			if(lessonTabLoaded && monitorTabLoaded && learnerTabLoaded && monitorGateLoaded) { dispatchEvent({type:'tload',target:this}); }
+			if(lessonTabLoaded && monitorTabLoaded && learnerTabLoaded && monitorGateLoaded && learnerIndexLoaded) { 
+				dispatchEvent({type:'tload',target:this}); 
+			}
 			
         }else {
             //Raise error for unrecognized event
@@ -210,8 +218,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     * Sets the size of the canvas on stage, called from update
     */
 	private function showData(mm:MonitorModel):Void{
-        var s:Object = mm.getSequence();
-		
+        var s:Object = mm.getSequence();		
 	}
 	
 	private function exportShowHide(v:Boolean):Void{
@@ -234,7 +241,6 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     * layout visual elements on the canvas on initialisation
     */
 	private function draw(){
-		trace("Height of learnerMenuBar: "+learnerMenuBar._height)
 		var mcontroller = getController();
 		
 		//get the content path for Tabs
@@ -285,6 +291,8 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		
 		var mm:Observable = getModel();
 		
+		_monitorPanels_mc = this.createEmptyMovieClip('_monitorPanels_mc', DepthManager.kTop);
+		
 		// Inititialsation for Lesson Tab View 
 		lessonTabView_mc = _lessonTabLayer_mc.attachMovie("LessonTabView", "lessonTabView_mc",DepthManager.kTop)
 		lessonTabView = LessonTabView(lessonTabView_mc);
@@ -298,7 +306,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		monitorTabView.addEventListener('load',Proxy.create(this,tabLoaded));
 		
 		// Inititialsation for Monitor Gate View 	
-		monitorGateView_mc = this.attachMovie("endGate", "monitorGateView_mc", DepthManager.kTop, {_x: 0, _y: 0});
+		monitorGateView_mc = _monitorPanels_mc.attachMovie("endGate", "monitorGateView_mc", _monitorPanels_mc.getNextHighestDepth(), {_x: 0, _y: 0});
 		monitorGateView = MonitorGateView(monitorGateView_mc);
 		monitorGateView.init(mm, undefined);
 		monitorGateView.addEventListener('load',Proxy.create(this,tabLoaded));
@@ -308,11 +316,18 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		learnerTabView = LearnerTabView(learnerTabView_mc);
 		learnerTabView.init(mm, undefined);
 		learnerTabView.addEventListener('load',Proxy.create(this,tabLoaded));
-				
+		
+		// Inititialsation for Learner Index View
+		learnerIndexView_mc = _monitorPanels_mc.attachMovie("LearnerIndexView", "learnerIndexView_mc", _monitorPanels_mc.getNextHighestDepth());
+		learnerIndexView = LearnerIndexView(learnerIndexView_mc);
+		learnerIndexView.init(mm, undefined);
+		learnerIndexView.addEventListener('load',Proxy.create(this,tabLoaded));
+		
 		mm.addObserver(lessonTabView);
 		mm.addObserver(monitorTabView);
 		mm.addObserver(monitorGateView);
 		mm.addObserver(learnerTabView);
+		mm.addObserver(learnerIndexView);
 	}
 	
 	public function showToolTip(btnObj, btnTT:String):Void{
@@ -379,6 +394,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		monitorSequence_scp.setSize(s.w-monitorSequence_scp._x, s.h-40.7);
 		monitorLearner_scp.setSize(s.w-monitorLearner_scp._x, s.h-monitorLearner_scp._y);
 		monitorGateView_mc.setSize(s.w, 40.7);
+		learnerIndexView.setSize(mm);
 		
 		viewJournals_btn._x = s.w - 260;
 		exportPortfolio_btn._x = s.w - 260;
@@ -393,6 +409,16 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     */
 	private function setPosition(mm:MonitorModel):Void{
         var p:Object = mm.getPosition();
+		/*Debugger.log("mm.getSequence().noStartedLearners: "+mm.getSequence().noStartedLearners, Debugger.CRITICAL, "setPosition", "MonitorView");
+		Debugger.log("mm.learnersPerPage: "+mm.learnersPerPage, Debugger.CRITICAL, "setPosition", "MonitorView");
+		if (Math.ceil(mm.getSequence().noStartedLearners/mm.learnersPerPage) > 1) {*/
+			//monitorLearner_scp._y = monitorLearner_scp._y+20; 
+			/*Debugger.log("if", Debugger.CRITICAL, "setPosition", "MonitorView");
+			
+		}
+		else {
+			Debugger.log("else", Debugger.CRITICAL, "setPosition", "MonitorView");
+		}*/
         this._x = p.x;
         this._y = p.y;
 	}
@@ -427,6 +453,10 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	}
 	public function getMonitorLearnerScp():MovieClip{
 		return monitorLearner_scp;
+	}
+	
+	public function getLearnerIndexPanel():MovieClip { 
+		return learnerIndexView_mc;
 	}
 
 	/*

@@ -73,10 +73,10 @@ class LearnerActivity extends MovieClip {
 	private var actLabel:String;
 	private var learner:Progress;
 	private var clickTarget_mc:MovieClip;
-	private var completed_mc:MovieClip;
-	private var current_mc:MovieClip;
-	private var todo_mc:MovieClip;
-	private var attempted_mc:MovieClip;
+	//private var completed_mc:MovieClip;
+	//private var current_mc:MovieClip;
+	//private var todo_mc:MovieClip;
+	//private var attempted_mc:MovieClip;
 	private var canvasActivity_mc:MovieClip;
 	private var title_lbl:MovieClip;
 	private var groupIcon_mc:MovieClip;
@@ -91,6 +91,7 @@ class LearnerActivity extends MovieClip {
 	
 	private var _line_bottom:MovieClip;
 	private var _line_top:MovieClip;
+	private var icon_mc:MovieClip;
 	
 	private var _complex:Boolean;
 	
@@ -162,11 +163,7 @@ class LearnerActivity extends MovieClip {
 	}
 	
 	private function showAssets(isVisible:Boolean){
-		completed_mc._visible = isVisible;
-		current_mc._visible = isVisible;
 		canvasActivity_mc._visible = isVisible;
-		todo_mc._visible = isVisible;
-		attempted_mc._visible = isVisible
 		title_lbl._visible = true;
 	}
 	
@@ -179,6 +176,7 @@ class LearnerActivity extends MovieClip {
 		showAssets(false);
 		learner = controller.getModel().progressData;
 		actStatus = null;
+		this.removeMovieClip(icon_mc);
 		draw();
 	}
 	
@@ -200,20 +198,27 @@ class LearnerActivity extends MovieClip {
 	
 		clickTarget_mc._visible = true;
 		
-		switch (actStatus){
-		    case 'completed_mc' :
-				completed_mc._visible = true;
-		        break;
-            case 'current_mc' :
-				current_mc._visible = true;
-				break;
-            case 'attempted_mc' :
-			    attempted_mc._visible = true;
-                break;
-			default :
-				todo_mc._visible = true;
+		if (!stopSign_mc) {
+			switch (actStatus){
+				case 'completed_mc' :
+					icon_mc = this.attachMovie("completed_mc", "completed_mc" + _activity.activityID, this.getNextHighestDepth(), {_x: 58 , _y: -7});
+					//completed_mc._visible = true;
+					break;
+				case 'current_mc' :
+					icon_mc = this.attachMovie("current_mc", "current_mc" + _activity.activityID, this.getNextHighestDepth(), {_x: 58 , _y: -7});
+					//current_mc._visible = true;
+					break;
+				case 'attempted_mc' :
+					icon_mc = this.attachMovie("attempted_mc", "attempted_mc" + _activity.activityID, this.getNextHighestDepth(), {_x: 58 , _y: -7});
+					//attempted_mc._visible = true;
+					break;
+				//case 'attempted_mc' 
+				default :
+					icon_mc = this.attachMovie("todo_mc", "todo_mc" + _activity.activityID, this.getNextHighestDepth(), {_x: 58 , _y: -7});
+					//todo_mc._visible = true;
+			}
 		}
-			
+		
 		//write text
 		trace("Title passed for Gate Activity: "+actLabel)
 		if (actLabel == undefined){
@@ -230,7 +235,6 @@ class LearnerActivity extends MovieClip {
 			
 		}
 		title_lbl.text = toolTitle;
-		
 		
 	}
 	

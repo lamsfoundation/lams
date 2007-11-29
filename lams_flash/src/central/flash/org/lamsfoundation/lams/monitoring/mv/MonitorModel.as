@@ -92,6 +92,7 @@ class MonitorModel extends Observable{
 	private var _isDesignDrawn:Boolean;
 	private var _showLearners:Boolean;
 	private var _endGate:MovieClip;
+	private var _learnerIndexView:MovieClip;
 	
 	//these are hashtables of mc refs MOVIECLIPS (like CanvasActivity or CanvasTransition)
 	//each on contains a reference to the emelment in the ddm (activity or transition)
@@ -115,6 +116,9 @@ class MonitorModel extends Observable{
 	private var _UserLoadCheckIntervalID:Number;         //Interval ID for periodic check on User Load status
 	private var _userLoadCheckCount = 0;				// instance counter for number of times we have checked to see if users are loaded	
 	
+	private var _currentLearnerIndex:Number;
+	private var _learnersPerPage:Number;
+	private var _numLearners:Number;
 	
 	private var dispatchEvent:Function;       
     public var addEventListener:Function;  
@@ -130,6 +134,9 @@ class MonitorModel extends Observable{
 		isDesignDrawn = true;
 		_staffLoaded = false;
 		_learnersLoaded = false;
+		
+		_currentLearnerIndex = 1;
+		_learnersPerPage = 10;
 		
 		_activeView = null;
 		
@@ -197,7 +204,8 @@ class MonitorModel extends Observable{
 		// create new Sequence from DTO
 		var seq:Sequence = new Sequence(_seq);
 		setSequence(seq);
-		
+		//setNumLearners(_seq.numberStartedLearners);
+		//Debugger.log("_seq.numberStartedLearners: "+_seq.numberStartedLearners, Debugger.CRITICAL, "loadSequence", "MonitorModel");
 		return true;
 	}
 	
@@ -225,7 +233,7 @@ class MonitorModel extends Observable{
 		var callback:Function = Proxy.create(_monitor, _monitor.reloadLessonToMonitor);
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=unsuspendLesson&lessonID=' + String(_activeSeq.ID) + '&userID=' + _root.userID,callback, false);
 	}
-
+	
 	public function setLessonProgressData(learnerProg:Array){
 		//clear the old lot of Learner Progress data
 		_learnersProgress.clear();
@@ -424,6 +432,36 @@ class MonitorModel extends Observable{
 
 	}
 	
+	public function set currentLearnerIndex(idx:Number):Void {
+		_currentLearnerIndex = idx;
+		
+		//Set flag for notify observers
+		setChanged();
+        
+		//build and send update object
+		infoObj = {};
+		infoObj.tabID = 2;
+		infoObj.updateType = "DRAW_DESIGN";
+		notifyObservers(infoObj);
+	}
+	
+	public function get currentLearnerIndex():Number {
+		return _currentLearnerIndex;
+	}
+	
+	public function set learnersPerPage(num:Number):Void {
+		_learnersPerPage = num;
+	}
+	
+	public function get learnersPerPage():Number {
+		return _learnersPerPage;
+	}
+	
+	public function get numIndexButtons(): Number {
+		var numIdxBtns:Number = Math.ceil(Math.max(getSequence().noStartedLearners,_learnersProgress.size())/learnersPerPage);
+		Debugger.log("numIdxBtns: "+numIdxBtns, Debugger.CRITICAL, "numIndexButtons", "MonitorModel");
+		return numIdxBtns;
+	}
 	
 	public function getlearnerTabActArr():Array{
 		return learnerTabActArr;
@@ -444,7 +482,6 @@ class MonitorModel extends Observable{
 	}
 	
 	public function addNewBranch(sequence:SequenceActivity, branchingActivity:BranchingActivity, isDefault:Boolean):Void {
-		Debugger.log("ok now i should be invoked", Debugger.CRITICAL, "addNewBranch", "MonitorModel");
 		Debugger.log("sequence.firstActivityUIID: "+sequence.firstActivityUIID, Debugger.CRITICAL, "addNewBranch", "MonitorModel");
 				
 		if(sequence.firstActivityUIID != null) {
@@ -492,11 +529,11 @@ class MonitorModel extends Observable{
 			var transitionKeyToCheck:Number = ddmTransition_keys[i];
 			var ddmTransition:Transition = _activeSeq.getLearningDesignModel().transitions.get(transitionKeyToCheck);
 			
-				if (ddmTransition.fromUIID == activity.activityUIID){
-					var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(ddmTransition.toUIID);
-					
-					orderDesign(ddm_activity, order);
-				}
+			if (ddmTransition.fromUIID == activity.activityUIID){
+				var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(ddmTransition.toUIID);
+				
+				orderDesign(ddm_activity, order);
+			}
 				
 		}
 		
@@ -528,6 +565,7 @@ class MonitorModel extends Observable{
 	 */
 	public function drawDesign(tabID:Number, learner:Object){
 		ddmActivity_keys = _activeSeq.getLearningDesignModel().activities.keys();
+		
 		var indexArray:Array = setDesignOrder();
 		
 		if (learner != null || learner != undefined){
@@ -541,8 +579,9 @@ class MonitorModel extends Observable{
 		var dataObj:Object;
 		Debugger.log("ddm_activity keys: "+ddmActivity_keys.length, Debugger.GEN, "drawDesign", "MonitorModel");
 			
+		//var tmpNum:Number = (getSelectedTab() == 2 ) ? indexArray.length/5 : indexArray;
 		//loop through 
-		for(var i=0;i< indexArray.length; i++){
+		for(var i=0;i<(indexArray.length); i++){
 			var keyToCheck:Number = indexArray[i].activityUIID;
 			var ddm_activity:Activity = Activity(_activeSeq.getLearningDesignModel().activities.get(keyToCheck));
 			
@@ -570,7 +609,7 @@ class MonitorModel extends Observable{
 		trIndexArray = ddmTransition_keys;
 		
 		//loop through 
-		for(var i=0;i<trIndexArray.length;i++){
+		for(var i=0;i<(trIndexArray.length);i++){
 			var transitionKeyToCheck:Number = trIndexArray[i];
 			var ddmTransition:Transition = _activeSeq.getLearningDesignModel().transitions.get(transitionKeyToCheck);
 			broadcastViewUpdate("DRAW_TRANSITION", ddmTransition, tabID);
@@ -794,7 +833,6 @@ class MonitorModel extends Observable{
 		Debugger.log("visible: " + visible, Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
 		
 		if(ba.branchView != null) {
-			Debugger.log("INIF openBranchActivityContent", Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
 			activeView = (visible) ? ba.branchView : activeView;
 			// for monitoring activeView = ba.branchView
 			ba.branchView.setOpen(visible);
@@ -803,7 +841,6 @@ class MonitorModel extends Observable{
 			setDirty();
 			
 		} else { 
-			Debugger.log("INELSE openBranchActivityContent", Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
 			_monitor.openBranchView(currentBranchingActivity, visible); }
 	}
 	
@@ -996,6 +1033,14 @@ class MonitorModel extends Observable{
 	
 	public function get endGate():MovieClip{
 		return _endGate;
+	}
+	
+	public function set learnerIndexView(a:MovieClip){
+		_learnerIndexView = a;
+	}
+	
+	public function get learnerIndexView():MovieClip{
+		return _learnerIndexView;
 	}
 
 	public function set locked(a:Boolean){
