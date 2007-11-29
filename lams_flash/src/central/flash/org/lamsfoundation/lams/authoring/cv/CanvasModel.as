@@ -361,7 +361,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	public function addParentToActivity(parentID, ca:Object, doRemoveParent:Boolean){
 		ca.activity.parentUIID = parentID;
 		
-		Debugger.log('ParentId of '+ca.activity.activityUIID+ 'Is : '+ca.activity.parentUIID,Debugger.GEN,'addActivityToTransition','CanvasModel');
+		Debugger.log('ParentId of '+ca.activity.activityUIID+ 'Is : '+ca.activity.parentUIID,Debugger.GEN,'addParentToActivity','CanvasModel');
 		
 		removeActivity(ca.activity.activityUIID);
 		if(doRemoveParent) removeActivity(parentID);
@@ -711,12 +711,27 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		Debugger.log('Adding Activity.UIID:'+activity.activityUIID,Debugger.GEN,'addActivityToBranch','CanvasModel');
 		_connectionActivities.push(activity);
 		
-		var fromAct = _connectionActivities[0].activityUIID
-		var toAct = _connectionActivities[1].activityUIID
+		var fromAct = _connectionActivities[0].activityUIID;
+		var toAct = _connectionActivities[1].activityUIID;
 		
 		//check we have 2 valid acts to create the transition.
 		if(fromAct == toAct){
-			return new LFError("You cannot create a Branch between the same Activities","addActivityToTransition",this);
+			// create activityless branch
+			var b:Object = (activeView.fingerprint == activeView.endHub) ? createActivitylessBranch() : new LFError("Trying to create branch in wrong direction.");
+			
+			if(b instanceof LFError) {
+				return b;
+			} else if(b != null){
+				var success:Object = _cv.ddm.addBranch(Branch(b));
+			}
+			
+			//flag the model as dirty and trigger a refresh
+			_cv.stopTransitionTool();
+			
+			setDirty();
+			
+			return true;
+			
 		}
 		
 		if(_connectionActivities.length == 2){
@@ -736,7 +751,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 				
 			//add it to the DDM
 			if(b instanceof LFError) {
-				b.sequenceActivity.stopAfterActivity = false;
+				//b.sequenceActivity.stopAfterActivity = false;
 				return b;
 			} else if(b != null){
 				var success:Object = _cv.ddm.addBranch(Branch(b));
@@ -793,7 +808,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			}
 			
 			var branch = _cv.ddm.getBranchesForActivityUIID(toAct);
-			if(branch.target != null) {
+			if(branch.target != null && branch.target.direction != BranchConnector.DIR_SINGLE) {
 				return new LFError("Can't create transition between activities in different branches", "addActivityToTransition", this);
 			}
 				
@@ -889,6 +904,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			return new LFError("Cannot create start-branch connection to Activity in a already connected Sequence.", "createBranchStartConnector", this);
 		} else {
 			var b = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, toAct.activityUIID, activeView.startHub.activity.activityUIID, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
+			b.sequenceActivity.isDefault = false;
 			
 			createNewSequenceActivity(activeView.activity);
 			return b;
@@ -917,6 +933,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			return new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_TO_END, fromAct.activityUIID, activeView.endHub.activity.activityUIID, sequence, _cv.ddm.learningDesignID);
 		
 		}
+	}
+	
+	private function createActivitylessBranch():Object{
+		
+		var b = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_SINGLE, activeView.startHub.activity.activityUIID,  null, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
+		b.sequenceActivity.isDefault = false;
+		
+		createNewSequenceActivity(activeView.activity);
+			
+		return b;
 	}
 
 	public function moveActivitiesToBranchSequence(activityUIID:Number, sequence:SequenceActivity):Boolean {

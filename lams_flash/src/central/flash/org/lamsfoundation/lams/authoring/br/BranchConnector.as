@@ -33,6 +33,7 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 	
 	public static var DIR_FROM_START:Number = 0;
 	public static var DIR_TO_END:Number = 1;
+	public static var DIR_SINGLE:Number = 2;
 	
 	private var _branch:Branch;
 
@@ -46,10 +47,14 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 	}
 	
 	public function init():Void{
-		_drawnLineStyle = 0xEA00FF;
+		_drawnLineStyle = 0xAFCE63; //0xEA00FF;
 		//arrow_mc.setStyle("backgroundColor", "0xEA00FF");
 		arrow_mc.setStyle("backgroundColor", "0xAFCE63");
-		draw();
+		
+		if(branch.direction == DIR_SINGLE)
+			drawActivityless();
+		else
+			draw();
 	}
 	
 	/**
@@ -74,6 +79,22 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 		
 		createConnection(fromAct_mc, toAct_mc, _startPoint, _endPoint, fromOTC, toOTC);
 			
+	}
+	
+	private function drawActivityless():Void {
+		var fromAct_mc = model.activeView.startHub;	
+		var toAct_mc = model.activeView.endHub;
+		
+		var fromOTC:Object = getFromOTC(fromAct_mc);
+		var toOTC:Object = getToOTC(toAct_mc);
+		
+		_startPoint = new Point(fromAct_mc._x + fromOTC.x,fromAct_mc._y + fromOTC.y);
+		_endPoint = new Point(toAct_mc._x + toOTC.x, toAct_mc._y + toOTC.y)
+		
+		Debugger.log("sp x: " + _startPoint.x + " y: " + _startPoint.y, Debugger.CRITICAL, "drawActivityless", "BranchConnector");
+		Debugger.log("ep x: " + _endPoint.x + " y: " + _endPoint.y, Debugger.CRITICAL, "drawActivityless", "BranchConnector");
+		
+		createConnection(fromAct_mc, toAct_mc, _startPoint, _endPoint, fromOTC, toOTC);
 	}
 	
 	public function get branch():Branch{

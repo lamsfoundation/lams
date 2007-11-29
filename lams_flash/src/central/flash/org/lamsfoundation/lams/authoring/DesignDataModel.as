@@ -774,7 +774,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			for(var i=0; i<classActs.length; i++){
 					
 				var classAct = classActs[i].toData();
-				//if(Activity(classActs[i]).isSequenceActivity() && getComplexActivityChildren(Activity(classActs[i]).activityUIID).length <= 0) classAct = null;
+				//if(Activity(classActs[i]).isSequenceActivity() && getComplexActivityChildren(Activity(classActs[i]).activityUIID).length <= 0 && SequenceActivity(classActs[i]).emptyDefault) classAct = null;
 				
 				if(classAct != null)
 					design.activities.push(classAct);

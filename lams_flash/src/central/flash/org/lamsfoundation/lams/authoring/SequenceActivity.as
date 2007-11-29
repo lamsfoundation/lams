@@ -37,11 +37,13 @@ import org.lamsfoundation.lams.common.Config;
 class SequenceActivity extends ComplexActivity {
 	
 	private var _empty:Boolean;
+	private var _default:Boolean;
 	
 	function SequenceActivity(activityUIID:Number){
 		super(activityUIID);
 		_activityTypeID = SEQUENCE_ACTIVITY_TYPE;
 		_empty = true;
+		_default = false;
 	}
 	
 	/**
@@ -62,6 +64,9 @@ class SequenceActivity extends ComplexActivity {
 	 * @return  the DTO
 	 */
 	public function toData():Object{
+		if(_empty && _default)
+			return null;
+			
 		var dto:Object = super.toData();
 		dto.defaultActivityUIID = (_firstActivityUIID == null) ? Config.NUMERIC_NULL_VALUE : _firstActivityUIID;
 
@@ -86,6 +91,14 @@ class SequenceActivity extends ComplexActivity {
 	
 	public function get empty():Boolean{
 		return _empty;
+	}
+	
+	public function set isDefault(b:Boolean):Void {
+		_default = b;
+	}
+	
+	public function get isDefault():Boolean {
+		return _default;
 	}
 
 }

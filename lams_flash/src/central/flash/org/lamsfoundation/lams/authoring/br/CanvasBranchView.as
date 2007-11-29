@@ -514,11 +514,14 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private function drawBranch(b:Branch, cm):Boolean{
 		
 		Debugger.log("branch: " + b, Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
+		Debugger.log("branch target :  " + b.targetUIID, Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
+		
 		Debugger.log("sequence: " + b.sequenceActivity.activityUIID, Debugger.CRITICAL, "drawBranch", "CanvasBranchView");
 		
-		if(!isActivityOnLayer(cm.activitiesDisplayed.get(b.targetUIID), this.activityLayer)) return false;
-		
-		//if(!cm.isActiveView(this) && !cm.findParent(b.sequenceActivity, activity)) return false;
+		if(!isActivityOnLayer(cm.activitiesDisplayed.get(b.targetUIID), this.activityLayer)) 
+			if((b.direction == BranchConnector.DIR_SINGLE && b.targetUIID == activity.activityUIID))
+				continue;
+			else return false;
 		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
@@ -528,16 +531,19 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		}
 		
 		if(b.direction == BranchConnector.DIR_FROM_START) b.sequenceActivity.firstActivityUIID = b.targetUIID;
+		
 		var newBranch_mc:MovieClip = branchLayer.createChildAtDepth("BranchConnector",DepthManager.kTop,{_branch:b, controller:cbc, _canvasBranchView:cbv});
 		cm.branchesDisplayed.put(b.branchUIID,newBranch_mc);
 		
 		Debugger.log('drawn a branch:'+b.branchUIID+','+newBranch_mc,Debugger.GEN,'drawBranch','CanvasView');
 		
-		if(b.direction != BranchConnector.DIR_TO_END) {
+		if(b.direction == BranchConnector.DIR_FROM_START) {
 			cm.moveActivitiesToBranchSequence(b.targetUIID, b.sequenceActivity);
 		} else {
 			b.sequenceActivity.stopAfterActivity = false;
 		}
+		
+		b.sequenceActivity.isDefault = false;
 		
 		return true;
 	}
@@ -704,6 +710,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	public function set defaultSequenceActivity(a:SequenceActivity):Void{
 		_defaultSequenceActivity = a;
+		_defaultSequenceActivity.isDefault = true;
 	}
 	
 	public function get branchLayer():MovieClip {

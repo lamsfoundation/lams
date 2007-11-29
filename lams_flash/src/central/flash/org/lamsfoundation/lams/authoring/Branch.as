@@ -41,6 +41,8 @@ class Branch extends Transition {
 	public function Branch(activityUIID:Number, _dir:Number, targetUIID:Number, hubUIID:Number, sequenceActivity:SequenceActivity, learningDesignID:Number){
 		if(_dir == BranchConnector.DIR_FROM_START)
 			super(null, hubUIID, targetUIID, learningDesignID);
+		else if(_dir == BranchConnector.DIR_SINGLE)
+			super(null, targetUIID, targetUIID, learningDesignID);
 		else
 			super(null, targetUIID, hubUIID, learningDesignID);
 		
@@ -88,6 +90,10 @@ class Branch extends Transition {
 	
 	public function get isEnd():Boolean {
 		return (_direction == BranchConnector.DIR_TO_END);
+	}
+	
+	public function get isActivityless():Boolean {
+		return (_direction == BranchConnector.DIR_SINGLE);
 	}
 }
 
