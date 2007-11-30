@@ -60,10 +60,10 @@
 		<input class="button" type="button" value='<fmt:message key="admin.reset"/>' onclick="resetFields();" />
 	</td>
 </tr>
-<%@ page import="java.util.List" %>
+
 <logic:notEmpty name="userList">
 	<tr>
-		<td colspan=5><c:out value="${fullSize}"/> users found.<%= ((List)request.getAttribute("userList")).size() %></td>
+		<td colspan=5><c:out value="${fullSize}"/> users found.</td>
 	</tr>
 	<c:forEach var="user" items="${userList}" begin="${start}" end="${start+resultsSection-1}" varStatus="status">
 		<tr>
