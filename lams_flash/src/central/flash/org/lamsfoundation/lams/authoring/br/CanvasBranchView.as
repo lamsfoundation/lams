@@ -416,8 +416,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
 			
-			var newActivity_mc = (_module != "monitoring") ? activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _canvasController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly()})
-															: activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _monitorController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly(), fromModuleTab:fromModuleTab, learnerContainer:_learnerContainer_mc});
+			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _canvasController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly()})
+															: activityLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _monitorController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly(), fromModuleTab:fromModuleTab, learnerContainer:_learnerContainer_mc});
 			
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasBranchView');

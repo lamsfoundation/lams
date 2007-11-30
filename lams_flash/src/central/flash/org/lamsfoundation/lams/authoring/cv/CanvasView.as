@@ -294,7 +294,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		}
 		else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
-			var newActivity_mc = activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv,_locked:a.isReadOnly()});
+			var newActivity_mc = activityLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv,_locked:a.isReadOnly()});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 		}
@@ -367,6 +367,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	 * @return  
 	 */
 	private function drawTransition(t:Transition,cm:CanvasModel):Boolean{
+		Debugger.log("drawing transition..." , Debugger.CRITICAL, "drawTransition", "CanvasVieW");
+		Debugger.log("not activity on layer 1: " + !isActivityOnLayer(cm.activitiesDisplayed.get(t.fromUIID), this.activityLayer) , Debugger.CRITICAL, "drawTransition", "CanvasVieW");
+		Debugger.log("not activity on layer 2: " + !isActivityOnLayer(cm.activitiesDisplayed.get(t.toUIID), this.activityLayer) , Debugger.CRITICAL, "drawTransition", "CanvasVieW");
+		
 		if(!isActivityOnLayer(cm.activitiesDisplayed.get(t.fromUIID), this.activityLayer) && !isActivityOnLayer(cm.activitiesDisplayed.get(t.toUIID), this.activityLayer)) return false;
 		
 		var cvv = CanvasView(this);
