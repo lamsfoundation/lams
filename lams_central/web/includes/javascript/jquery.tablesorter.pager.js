@@ -174,6 +174,14 @@
 						setPageSize(table,parseInt($(this).val()));
 						return false;
 					});
+					// allow navigation to custom page
+					$(config.cssPageDisplay,pager).change(function() {
+						var inputPage = $(this).val();
+						inputPage = inputPage.substr(0, inputPage.indexOf(config.seperator));
+						config.page = inputPage-1;
+						moveToPage(table);
+						return false;
+					});
 				});
 			};
 			

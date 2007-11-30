@@ -94,10 +94,10 @@
 </form>
 
 <div id="pager" class="pager">
-	<form>
+	<form onsubmit="return false;">
 		<img src="<lams:LAMSURL/>/images/first.png" class="first"/>
 		<img src="<lams:LAMSURL/>/images/prev.png" class="prev">
-		<input type="text" class="pagedisplay" disabled="disabled"/>
+		<input type="text" class="pagedisplay"/>
 		<img src="<lams:LAMSURL/>/images/next.png" class="next">
 		<img src="<lams:LAMSURL/>/images/last.png" class="last">
 		<select class="pagesize">
@@ -105,6 +105,8 @@
 			<option value="20">20</option>
 			<option value="30">30</option>
 			<option  value="40">40</option>
+			<option  value="50">50</option>
+			<option  value="100">100</option>
 		</select>
 	</form>
 </div>
