@@ -116,8 +116,8 @@
 </form-bean>
 
 <form-bean name="ConfigForm" type="org.apache.struts.action.DynaActionForm">
-	<form-property name="cKey" type="java.lang.String[]" />
-	<form-property name="cValue" type="java.lang.String[]" />
+	<form-property name="key" type="java.lang.String[]" />
+	<form-property name="value" type="java.lang.String[]" />
 	<form-property name="method" type="java.lang.String" />
 </form-bean>
 
@@ -148,6 +148,11 @@
 <form-bean name="CleanupForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="numDays" type="java.lang.Integer" />
 </form-bean>
+
+<form-bean
+      name="ImportGroupsForm"
+      type="org.lamsfoundation.lams.admin.web.ImportExcelForm"
+    />
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -282,6 +287,21 @@
         path="/sysadminstart.do"
         redirect="false"
       />
+      <forward
+        name="import"
+        path="/importexcel.do"
+        redirect="false"
+      />
+      <forward
+        name="status"
+        path="/import/status.jsp"
+        redirect="false"
+      />
+      <forward
+        name="results"
+        path="/importuserresult.do"
+        redirect="false"
+      />
     </action>
     <action
       path="/cleanup"
@@ -298,7 +318,7 @@
       />
       <forward
         name="sysadmin"
-        path=".sysadmin"
+        path="/sysadminstart.do"
         redirect="false"
       />
     </action>
@@ -376,6 +396,11 @@
       <forward
         name="sysadmin"
         path="/sysadminstart.do"
+        redirect="false"
+      />
+      <forward
+        name="importv1"
+        path="/importv1.do"
         redirect="false"
       />
     </action>
@@ -530,6 +555,25 @@
       />
     </action>
     <action
+      path="/importgroups"
+      type="org.lamsfoundation.lams.admin.web.action.ImportGroupsAction"
+      name="ImportGroupsForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="importGroups"
+        path=".importGroups"
+        redirect="false"
+      />
+      <forward
+        name="sysadmin"
+        path="/sysadminstart.do"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/joblist"
       type="org.lamsfoundation.lams.admin.web.ScheduledJobListAction"
       unknown="false"
@@ -538,6 +582,18 @@
       <forward
         name="list"
         path=".joblist"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/importuserresult"
+      type="org.lamsfoundation.lams.admin.web.action.ImportUserResultAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="importresult"
+        path=".importresult"
         redirect="false"
       />
     </action>
@@ -585,6 +641,23 @@
       <forward
         name="userorg"
         path="/userorg.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/ldap"
+      type="org.lamsfoundation.lams.admin.web.action.LdapConfigAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="ldap"
+        path=".ldap"
+        redirect="false"
+      />
+      <forward
+        name="sysadmin"
+        path="/sysadminstart.do"
         redirect="false"
       />
     </action>

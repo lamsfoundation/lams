@@ -6,5 +6,8 @@
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-central.jar"/>
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
+	<classpathentry kind="lib" path="/usr/local/jboss-4.0.2/server/default/lib/javax.servlet.jar"/>
+	<classpathentry kind="lib" path="/usr/local/jboss-4.0.2/server/default/lib/javax.servlet.jsp.jar"/>
+	<classpathentry kind="lib" path="/usr/local/jboss-4.0.2/server/default/lib/jboss-j2ee.jar"/>
 	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>

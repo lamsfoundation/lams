@@ -17,6 +17,7 @@
 		classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/integrationContext.xml
 		classpath:/org/lamsfoundation/lams/admin/adminApplicationContext.xml
+		classpath:/org/lamsfoundation/lams/usermanagement/ldapContext.xml
 	</param-value>
 </context-param>
 
@@ -65,10 +66,6 @@
 <filter-mapping>
 	<filter-name>HibernateFilter</filter-name>
 	<url-pattern>/*</url-pattern>
-</filter-mapping>
-<filter-mapping>
-	<filter-name>HibernateFilter</filter-name>
-	<url-pattern>*.jsp</url-pattern>
 </filter-mapping>
 
   <listener>

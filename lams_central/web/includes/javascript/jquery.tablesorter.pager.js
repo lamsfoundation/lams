@@ -178,7 +178,11 @@
 					$(config.cssPageDisplay,pager).change(function() {
 						var inputPage = $(this).val();
 						inputPage = inputPage.substr(0, inputPage.indexOf(config.seperator));
-						config.page = inputPage-1;
+						if(isNaN(inputPage)) {
+							config.page = 0;
+						} else {
+							config.page = inputPage-1;
+						}
 						moveToPage(table);
 						return false;
 					});
