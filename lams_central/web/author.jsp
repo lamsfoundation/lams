@@ -114,27 +114,20 @@ function doConfirm(arg){
 }
 
 function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolbar){
-	// refocus code commented out as we want to replace contents due to tool's session issues. Code will be 
-	// wanted again the future.
-	//if(thePopUp && thePopUp.open && !thePopUp.closed){
-	//		thePopUp.focus();
-			
-	//}else{
-	//	thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
-	//}
-
+	var found = false;
 	for(var i=0; i<pWins.length; i++) {
 		if(pWins[i] != null && !pWins[i].closed && pWins[i].open) {
 			if(pWins[i].name == title) {
-				window.blur();
-				pWins[i].focus();
-				return;	
+			 	pWins[i].focus();
+			
+				// setTimeout("pWins["+i+"].focus();", 1000); // tried incase firefox was stealing focus after popup loaded but makes no difference 
+				found = true;	
 			}
 		}
 	}
-	
-	pWins[iWins] = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
-	iWins++;
+	if(found == false) {
+		pWins.push(window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar));
+	}
 }
 
 function openPopUpFS(args){
