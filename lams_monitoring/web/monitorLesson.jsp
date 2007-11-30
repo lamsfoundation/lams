@@ -42,7 +42,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		// Use for handling popup windows
   	 	var pWins = new Array();
-  	 	var iWins = 0;
 	
 		var isInternetExplorer = navigator.appName.indexOf("Microsoft") != -1;
 		
@@ -75,14 +74,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		}	
 		
 		function openPopUpFS(args){
-			var params = args.split(",");		
+			var params = args.split(",");
 			var urlparams = args.split("&");
 			
-			var activityID = urlparams[1];
-
+			// Internet Explorer (7) doesn't like having the equals '=' sign in title param of 
+			// the window.open call (bottom of openPopUp method) so we need to remove it
+			var activityAndID = urlparams[1];  // activityID=123...
+			var tmpArr = activityAndID.split("=");
+			var activityID = tmpArr[1];
+			
 			// assigned the args
 			var url = params[0];
-			var title = params[1] + "_" + activityID;
+			var title = params[1] + "_activityID_" + activityID;
 			var h = params[2];
 			var w = params[3];
 			var resize = params[4];
@@ -99,28 +102,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		}
 	
 		function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolbar){
-	// refocus code commented out as we want to replace contents due to tool's session issues. Code will be 
-	// wanted again the future.
-	//if(thePopUp && thePopUp.open && !thePopUp.closed){
-	//		thePopUp.focus();
-			
-	//}else{
-	//	thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
-	//}		
 			var found = false;
-			
 			for(var i=0; i<pWins.length; i++) {
 				if(pWins[i] != null && !pWins[i].closed && pWins[i].open) {
 					if(pWins[i].name == title) {
 					 	pWins[i].focus();
+					
+						// setTimeout("pWins["+i+"].focus();", 1000); // tried incase firefox was stealing focus after popup loaded but makes no difference 
 						found = true;	
 					}
 				}
 			}
-			
-			if(!found) {
-				pWins[iWins] = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
-				iWins++;
+			if(found == false) {
+				pWins.push(window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar));
 			}
 		}
 		
