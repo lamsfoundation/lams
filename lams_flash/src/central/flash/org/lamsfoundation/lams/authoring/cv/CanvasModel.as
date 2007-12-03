@@ -945,8 +945,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		if(_cv.ddm.getBranchesForActivityUIID(activeView.startHub.activity.activityUIID).activityless != null)
 			return new LFError("Cannot add more than one Activityless branch.", null);
 		
-		var b = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_SINGLE, activeView.startHub.activity.activityUIID,  null, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
-		b.sequenceActivity.isDefault = false;
+		var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_SINGLE, activeView.startHub.activity.activityUIID,  null, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
+		SequenceActivity(b.sequenceActivity).isDefault = false;
+		Debugger.log("sequence: " + b.sequenceActivity.activityUIID, Debugger.CRITICAL, "createActivitylessBranch", "CanvasModel");
+		Debugger.log("isDefault: " + b.sequenceActivity.isDefault, Debugger.CRITICAL, "createActivitylessBranch", "CanvasModel");
 		
 		createNewSequenceActivity(activeView.activity);
 			

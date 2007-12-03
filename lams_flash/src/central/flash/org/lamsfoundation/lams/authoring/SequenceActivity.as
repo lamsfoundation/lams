@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.Config;
+import org.lamsfoundation.lams.common.util.Debugger;
 
 /*
 * This class represents the sequence activity.

@@ -181,7 +181,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
                 setSize(_model);
                 break;
 			case 'ADD_SEQUENCE':
-				addSequence(event.data, _model);
+				var result = addSequence(event.data, _model);
+				Debugger.log("addSequence: " + result, Debugger.CRITICAL, "viewUpdate", "CanvasModel");
 				break;
             case 'DRAW_ACTIVITY_SEQ':
                 drawActivity(event.data, _model);
@@ -354,10 +355,18 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	}
 	
 	private function addSequence(a:SequenceActivity, cm:CanvasModel):Boolean{
-		if(a.parentUIID == activity.activityUIID)
+		if(a.parentUIID == activity.activityUIID) {
 			defaultSequenceActivity = a;
-		else 
+			var sequenceObj = new Object();
+			sequenceObj.activity = a;
+			
+			cm.activitiesDisplayed.put(a.activityUIID, sequenceObj);
+			
+		} else { 
 			return false;
+		}
+		
+		Debugger.log("default sequence: " + defaultSequenceActivity.activityUIID, Debugger.CRITICAL, "addSequence", "CanvasBranchView");
 			
 		return true;
 	}
