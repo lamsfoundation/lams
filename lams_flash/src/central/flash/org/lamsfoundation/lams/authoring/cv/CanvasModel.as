@@ -1015,8 +1015,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
 			var parentAct;
 			if((parentAct = _cv.ddm.activities.get(ddm_activity.parentUIID)) != null)
-				if(parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE && !parentAct.isOptionalSequenceActivity(_cv.ddm.activities.get(parentAct.parentUIID)))
+				if(parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE && !parentAct.isOptionalSequenceActivity(_cv.ddm.activities.get(parentAct.parentUIID))) {
+					SequenceActivity(parentAct).empty = false;
 					return r = "NEW_SEQ_CHILD";
+				}
 			
 			return r = "CHILD";
 		}
