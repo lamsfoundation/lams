@@ -85,6 +85,16 @@ class SequenceActivity extends ComplexActivity {
 		return sa;
 	}
 	
+	public function set firstActivityUIID(a:Number):Void {
+		_firstActivityUIID = a;
+		
+		if(a != null)
+			_empty = false;
+		else
+			_empty = true;
+		
+	}
+	
 	public function set empty(b:Boolean):Void{
 		_empty = b;
 	}
