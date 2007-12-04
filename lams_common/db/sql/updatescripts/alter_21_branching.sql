@@ -100,6 +100,17 @@ VALUES (8, 12, 'Tool Output Based Branching', 'Select between multiple sequence 
 ALTER TABLE lams_tool ADD COLUMN admin_url TEXT;
 ALTER TABLE lams_system_tool ADD COLUMN admin_url TEXT;
 
+-- LDEV-1251, sortable lessons
+alter table lams_organisation add column ordered_lesson_ids text;
+
+-- LDEV-1252, collapsible courses
+CREATE TABLE lams_user_organisation_collapsed (
+       user_organisation_id BIGINT(20) NOT NULL
+     , collapsed TINYINT(1) NOT NULL DEFAULT 1
+     , PRIMARY KEY (user_organisation_id)
+     , CONSTRAINT FK_lams_user_organisation_collapsed_1 FOREIGN KEY (user_organisation_id)
+                  REFERENCES lams_user_organisation (user_organisation_id)
+)TYPE=InnoDB;
 
 -- LDEV-1301
 ALTER TABLE lams_configuration 
@@ -107,6 +118,9 @@ ADD COLUMN description_key VARCHAR(255)
 , ADD COLUMN header_name VARCHAR(50)
 , ADD COLUMN format VARCHAR(30)
 , ADD COLUMN required TINYINT NOT NULL DEFAULT 0;
+
+delete from lams_configuration where config_key='LamsHome';
+delete from lams_configuration where config_key='FileManagerDir';
 
 update lams_configuration set description_key='config.server.url', header_name='config.header.system', format='STRING', required=1 where config_key='ServerURL';
 update lams_configuration set description_key='config.server.url.context.path', header_name='config.header.system', format='STRING', required=1 where config_key='ServerURLContextPath';
@@ -142,56 +156,116 @@ update lams_configuration set description_key='config.default.html.theme', heade
 update lams_configuration set description_key='config.allow.direct.lesson.launch', header_name='config.header.features', format='BOOLEAN', required=1 where config_key='AllowDirectLessonLaunch';
 update lams_configuration set description_key='config.community.enable', header_name='config.header.features', format='BOOLEAN', required=1 where config_key='LAMS_Community_enable';
 update lams_configuration set description_key='config.allow.live.edit', header_name='config.header.features', format='BOOLEAN', required=1 where config_key='AllowLiveEdit';
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPProvisioningEnabled','false', 'config.ldap.provisioning.enabled', 'config.header.ldap', 'BOOLEAN', 1);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPProviderURL','ldap://192.168.111.15', 'config.ldap.provider.url', 'config.header.ldap', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPSecurityAuthentication','simple', 'config.ldap.security.authentication', 'config.header.ldap', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPPrincipalDNPrefix','cn=', 'config.ldap.principal.dn.prefix', 'config.header.ldap', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPPrincipalDNSuffix',',ou=Users,dc=melcoe,dc=mq,dc=edu,dc=au', 'config.ldap.principal.dn.suffix', 'config.header.ldap', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPSecurityProtocol','', 'config.ldap.security.protocol', 'config.header.ldap', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPTruststorePath','', 'config.ldap.truststore.path', 'config.header.ldap', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPTruststorePassword','', 'config.ldap.truststore.password', 'config.header.ldap', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPLoginAttr','uid', 'config.ldap.login.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPFNameAttr','givenName', 'config.ldap.fname.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPLNameAttr','sn', 'config.ldap.lname.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPEmailAttr','mail', 'config.ldap.email.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPAddr1Attr','postalAddress', 'config.ldap.addr1.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPAddr2Attr','', 'config.ldap.addr2.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPAddr3Attr','', 'config.ldap.addr3.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPCityAttr','l', 'config.ldap.city.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPStateAttr','st', 'config.ldap.state.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPPostcodeAttr','postalCode', 'config.ldap.postcode.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPCountryAttr','', 'config.ldap.country.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPDayPhoneAttr','telephoneNumber', 'config.ldap.day.phone.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPEveningPhoneAttr','homePhone', 'config.ldap.evening.phone.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPFaxAttr','facsimileTelephoneNumber', 'config.ldap.fax.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPMobileAttr','mobile', 'config.ldap.mobile.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPLocaleAttr','preferredLanguage', 'config.ldap.locale.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPDisabledAttr','!accountStatus', 'config.ldap.disabled.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPOrgAttr','deetITSchoolCode', 'config.ldap.org.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPRolesAttr','memberOf', 'config.ldap.roles.attr', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPLearnerMap','Student;SchoolSupportStaff;Teacher;SeniorStaff;Principal', 'config.ldap.learner.map', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPMonitorMap','SchoolSupportStaff;Teacher;SeniorStaff;Principal', 'config.ldap.monitor.map', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPAuthorMap','Teacher;SeniorStaff;Principal', 'config.ldap.author.map', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPGroupAdminMap','Teacher;SeniorStaff', 'config.ldap.group.admin.map', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPGroupManagerMap','Principal', 'config.ldap.group.manager.map', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPUpdateOnLogin', 'true', 'config.ldap.update.on.login', 'config.header.ldap', 'BOOLEAN', 1);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPOrgField', 'code', 'config.ldap.org.field', 'config.header.ldap.attributes', 'STRING', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPOnlyOneOrg', 'true', 'config.ldap.only.one.org', 'config.header.ldap', 'BOOLEAN', 1);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPEncryptPasswordFromBrowser', 'true', 'config.ldap.encrypt.password.from.browser', 'config.header.ldap', 'BOOLEAN', 1);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LDAPSearchResultsPageSize', '100', 'config.ldap.search.results.page.size', 'config.header.ldap', 'LONG', 0);
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) values ('LearnerProgressBatchSize', '20', 'config.learner.progress.batch.size', 'config.header.look.feel', 'LONG', 1);
 
-delete from lams_configuration where config_key='LamsHome';
-delete from lams_configuration where config_key='FileManagerDir';
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPProvisioningEnabled','false', 'config.ldap.provisioning.enabled', 'config.header.ldap', 'BOOLEAN', 1);
 
--- LDEV-1251, sortable lessons
-alter table lams_organisation add column ordered_lesson_ids text;
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPProviderURL','ldap://192.168.111.15', 'config.ldap.provider.url', 'config.header.ldap', 'STRING', 0);
 
--- LDEV-1252, collapsible courses
-CREATE TABLE lams_user_organisation_collapsed (
-       user_organisation_id BIGINT(20) NOT NULL
-     , collapsed TINYINT(1) NOT NULL DEFAULT 1
-     , PRIMARY KEY (user_organisation_id)
-     , CONSTRAINT FK_lams_user_organisation_collapsed_1 FOREIGN KEY (user_organisation_id)
-                  REFERENCES lams_user_organisation (user_organisation_id)
-)TYPE=InnoDB;
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPSecurityAuthentication','simple', 'config.ldap.security.authentication', 'config.header.ldap', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPPrincipalDNPrefix','cn=', 'config.ldap.principal.dn.prefix', 'config.header.ldap', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPPrincipalDNSuffix',',ou=Users,dc=melcoe,dc=mq,dc=edu,dc=au', 'config.ldap.principal.dn.suffix', 'config.header.ldap', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPSecurityProtocol','', 'config.ldap.security.protocol', 'config.header.ldap', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPTruststorePath','', 'config.ldap.truststore.path', 'config.header.ldap', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPTruststorePassword','', 'config.ldap.truststore.password', 'config.header.ldap', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPLoginAttr','uid', 'admin.user.login', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPFNameAttr','givenName', 'admin.user.first_name', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPLNameAttr','sn', 'admin.user.last_name', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPEmailAttr','mail', 'admin.user.email', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPAddr1Attr','postalAddress', 'admin.user.address_line_1', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPAddr2Attr','', 'admin.user.address_line_2', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPAddr3Attr','', 'admin.user.address_line_3', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPCityAttr','l', 'admin.user.city', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPStateAttr','st', 'admin.user.state', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPPostcodeAttr','postalCode', 'admin.user.postcode', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPCountryAttr','', 'admin.user.country', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPDayPhoneAttr','telephoneNumber', 'admin.user.day_phone', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPEveningPhoneAttr','homePhone', 'admin.user.evening_phone', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPFaxAttr','facsimileTelephoneNumber', 'admin.user.fax', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPMobileAttr','mobile', 'admin.user.mobile_phone', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPLocaleAttr','preferredLanguage', 'admin.organisation.locale', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPDisabledAttr','!accountStatus', 'sysadmin.disabled', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPOrgAttr','schoolCode', 'admin.course', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPRolesAttr','memberOf', 'admin.user.roles', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPLearnerMap','Student;SchoolSupportStaff;Teacher;SeniorStaff;Principal', 'config.ldap.learner.map', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPMonitorMap','SchoolSupportStaff;Teacher;SeniorStaff;Principal', 'config.ldap.monitor.map', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPAuthorMap','Teacher;SeniorStaff;Principal', 'config.ldap.author.map', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPGroupAdminMap','Teacher;SeniorStaff', 'config.ldap.group.admin.map', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPGroupManagerMap','Principal', 'config.ldap.group.manager.map', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPUpdateOnLogin', 'true', 'config.ldap.update.on.login', 'config.header.ldap', 'BOOLEAN', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPOrgField', 'code', 'config.ldap.org.field', 'config.header.ldap.attributes', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPOnlyOneOrg', 'true', 'config.ldap.only.one.org', 'config.header.ldap', 'BOOLEAN', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPEncryptPasswordFromBrowser', 'true', 'config.ldap.encrypt.password.from.browser', 'config.header.ldap', 'BOOLEAN', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPSearchResultsPageSize', '100', 'config.ldap.search.results.page.size', 'config.header.ldap', 'LONG', 0);
+
+
