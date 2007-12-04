@@ -67,7 +67,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private var _monitorSequence_mc:MovieClip;
 	private var monitorSequence_scp:MovieClip;
 	private var _monitorLearner_mc:MovieClip
-	private var monitorLearner_scp:MovieClip;
+	private var monitorLearner_scp:ScrollPane;
 	private var monitorTabs_tb:MovieClip;
 	private var learnerMenuBar:MovieClip;
     private var bkg_pnl:MovieClip;
@@ -155,7 +155,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		bkg_pnl._visible = false;
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
-		
+
     }    
 	
 	private function tabLoaded(evt:Object){
@@ -409,16 +409,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     */
 	private function setPosition(mm:MonitorModel):Void{
         var p:Object = mm.getPosition();
-		/*Debugger.log("mm.getSequence().noStartedLearners: "+mm.getSequence().noStartedLearners, Debugger.CRITICAL, "setPosition", "MonitorView");
-		Debugger.log("mm.learnersPerPage: "+mm.learnersPerPage, Debugger.CRITICAL, "setPosition", "MonitorView");
-		if (Math.ceil(mm.getSequence().noStartedLearners/mm.learnersPerPage) > 1) {*/
-			//monitorLearner_scp._y = monitorLearner_scp._y+20; 
-			/*Debugger.log("if", Debugger.CRITICAL, "setPosition", "MonitorView");
-			
-		}
-		else {
-			Debugger.log("else", Debugger.CRITICAL, "setPosition", "MonitorView");
-		}*/
+
         this._x = p.x;
         this._y = p.y;
 	}
@@ -451,7 +442,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	public function getMonitorSequenceScp():MovieClip{
 		return monitorSequence_scp;
 	}
-	public function getMonitorLearnerScp():MovieClip{
+	public function getMonitorLearnerScp():ScrollPane{
 		return monitorLearner_scp;
 	}
 	

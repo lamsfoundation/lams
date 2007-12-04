@@ -119,6 +119,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 				}
 				break;
 			case 'DRAW_DESIGN' :
+			Debugger.log("LearnerIndexView DRAW_DESIGN evt update received", Debugger.CRITICAL, "update", "LearnerTavView");
 				if (infoObj.tabID == _tabID && !mm.locked && mm.numIndexButtons>1){
 					if (mm.numIndexButtons > displayedButtons.length) {
 						Debugger.log("Setting up buttons [mm.numIndexButtons > displayedButtons.length]", Debugger.CRITICAL, "update", "LearnerIndexView");

@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.Branch;
 import org.lamsfoundation.lams.authoring.BranchingActivity;
@@ -564,6 +565,9 @@ class MonitorModel extends Observable{
 	 * @return  
 	 */
 	public function drawDesign(tabID:Number, learner:Object){
+		
+		var eventArr:Array = new Array();
+		
 		ddmActivity_keys = _activeSeq.getLearningDesignModel().activities.keys();
 		
 		var indexArray:Array = setDesignOrder();
@@ -571,17 +575,16 @@ class MonitorModel extends Observable{
 		if (learner != null || learner != undefined){
 			var drawLearner:Object = new Object();
 			drawLearner = learner;
-			
-			//indexArray = setDesignOrder();
 		}
 		
 		//go through the design and get the activities and transitions 
 		var dataObj:Object;
 		Debugger.log("ddm_activity keys: "+ddmActivity_keys.length, Debugger.GEN, "drawDesign", "MonitorModel");
 			
-		//var tmpNum:Number = (getSelectedTab() == 2 ) ? indexArray.length/5 : indexArray;
 		//loop through 
-		for(var i=0;i<(indexArray.length); i++){
+		Debugger.log("indexArray.length: "+indexArray.length, Debugger.CRITICAL, "drawDesign", "MonitorModel");
+		
+		for(var i=0; i<indexArray.length; i++){
 			var keyToCheck:Number = indexArray[i].activityUIID;
 			var ddm_activity:Activity = Activity(_activeSeq.getLearningDesignModel().activities.get(keyToCheck));
 			
@@ -590,47 +593,50 @@ class MonitorModel extends Observable{
 			}
 			
 			if(ddm_activity.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE){
-				broadcastViewUpdate("ADD_SEQUENCE", ddm_activity);
+				eventArr.push(createViewUpdate("ADD_SEQUENCE", ddm_activity));
 			} else if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
 				var parentAct;
 				if((parentAct = _activeSeq.getLearningDesignModel().activities.get(ddm_activity.parentUIID)) != null)
 					if(parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE)
-						broadcastViewUpdate("DRAW_ACTIVITY_SEQ", ddm_activity, tabID, drawLearner);
+						eventArr.push(createViewUpdate("DRAW_ACTIVITY_SEQ", ddm_activity, tabID, drawLearner));
 			} else {
-				broadcastViewUpdate("DRAW_ACTIVITY", ddm_activity, tabID, drawLearner);
+				eventArr.push(createViewUpdate("DRAW_ACTIVITY", ddm_activity, tabID, drawLearner));
 			}
 		}
 		
-		//now check the transitions:
-		ddmTransition_keys = _activeSeq.getLearningDesignModel().transitions.keys();
-				
-		//chose which array we are going to loop over
-		var trIndexArray:Array;
-		trIndexArray = ddmTransition_keys;
-		
-		//loop through 
-		for(var i=0;i<(trIndexArray.length);i++){
-			var transitionKeyToCheck:Number = trIndexArray[i];
-			var ddmTransition:Transition = _activeSeq.getLearningDesignModel().transitions.get(transitionKeyToCheck);
-			broadcastViewUpdate("DRAW_TRANSITION", ddmTransition, tabID);
-		}
-		
-		//now check the transitions:
-		var ddmBranch_keys:Array = _activeSeq.getLearningDesignModel().branches.keys();
-		
-		//chose which array we are going to loop over
-		var brIndexArray:Array;
-		brIndexArray = ddmBranch_keys;
-		
-		//loop through and do comparison
-		for(var i=0;i<brIndexArray.length;i++){
-			var branchKeyToCheck:Number = brIndexArray[i];
+		if(selectedTab != LearnerTabView._tabID) {
+			//now check the transitions:
+			ddmTransition_keys = _activeSeq.getLearningDesignModel().transitions.keys();
+					
+			//chose which array we are going to loop over
+			var trIndexArray:Array = ddmTransition_keys;
 
-			var ddmBranch:Branch = _activeSeq.getLearningDesignModel().branches.get(branchKeyToCheck);
-			broadcastViewUpdate("DRAW_BRANCH",ddmBranch);
+			//loop through 
+			for (var i=0; i<trIndexArray.length; i++) {	
+				var transitionKeyToCheck:Number = trIndexArray[i];
+				var ddmTransition:Transition = _activeSeq.getLearningDesignModel().transitions.get(transitionKeyToCheck);
+				eventArr.push(createViewUpdate("DRAW_TRANSITION", ddmTransition, tabID));
+			}
+
+			//now check the transitions:
+			var ddmBranch_keys:Array = _activeSeq.getLearningDesignModel().branches.keys();
+			
+			//chose which array we are going to loop over
+			var brIndexArray:Array;
+			brIndexArray = ddmBranch_keys;
+			
+			//loop through and do comparison
+			for(var i=0;i<brIndexArray.length;i++){
+				var branchKeyToCheck:Number = brIndexArray[i];
+
+				var ddmBranch:Branch = _activeSeq.getLearningDesignModel().branches.get(branchKeyToCheck);
+				eventArr.push(createViewUpdate("DRAW_BRANCH",ddmBranch));
+			}
 		}
-		
+
 		isDesignDrawn = true;
+		
+		broadcastViewUpdate("DRAW_ALL", eventArr, tabID);
 	}
 	
 	public function setDialogOpen(dialogOpen:String){
@@ -647,8 +653,22 @@ class MonitorModel extends Observable{
 		infoObj.data = data;
 		infoObj.tabID = tabID;
 		infoObj.learner = learner;
+		
 		notifyObservers(infoObj);
 		
+	}
+	
+	public function createViewUpdate(updateType, data, tabID, learner):Object {
+		setChanged();
+		
+		//send an update
+		infoObj = {};
+		infoObj.updateType = updateType;
+		infoObj.data = data;
+		infoObj.tabID = tabID;
+		infoObj.learner = learner;
+		
+		return infoObj;
 	}
 	
 	public function changeTab(tabID:Number){
@@ -662,7 +682,7 @@ class MonitorModel extends Observable{
 		notifyObservers(infoObj);
 		
 	}
-	
+
 	public function refreshAllData(learningDesignDTO:Object){
 		var ddm:DesignDataModel = new DesignDataModel();
 		ddm.setDesign(learningDesignDTO);

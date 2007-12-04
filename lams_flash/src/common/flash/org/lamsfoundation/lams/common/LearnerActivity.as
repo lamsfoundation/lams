@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.common.style.*;
 
@@ -236,6 +237,8 @@ class LearnerActivity extends MovieClip {
 		}
 		title_lbl.text = toolTitle;
 		
+		if(_view instanceof LearnerTabView)
+			LearnerTabView(_view).drawNext();
 	}
 	
 	public function showToolTip(btnObj, btnTT:String):Void{

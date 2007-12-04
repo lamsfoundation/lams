@@ -86,6 +86,14 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private var help_btn:Button;
 	private var panelLowered:Boolean;
 	
+	private var drawCount:Number;
+	private var maxCount:Number;
+	private var evtArr:Array;
+	
+	private var currentLearnerIndex:Number;
+	private var maxLearnerIndex:Number;
+	private var learnersDrawnIndex:Number;
+	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -121,7 +129,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
 		mm.getMonitor().getMV().getMonitorLearnerScp()._visible = false;
-    }    
+    }
 	
 	/**
 	 * Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
@@ -129,10 +137,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	 * @param   event
 	 */
 	public function update (o:Observable,infoObj:Object):Void{
-			
-		   var mm:MonitorModel = MonitorModel(o);
+			Debugger.log("update has been called", Debugger.CRITICAL, "update", "LearnerTabView");
+			var mm:MonitorModel = MonitorModel(o);
 		   
-		   switch (infoObj.updateType){
+			switch (infoObj.updateType){
 				case 'POSITION' :
 					setPosition(mm);
 					break;
@@ -193,6 +201,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					}
 					break;
 				case 'DRAW_DESIGN' :
+					Debugger.log("DRAW_DESIGN evt update received", Debugger.CRITICAL, "update", "LearnerTavView");
 					adjustLearnerPanel(mm);
 					if (infoObj.tabID == _tabID && !mm.locked){
 						if (mm.isDesignDrawn) {
@@ -201,9 +210,37 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 						drawAllLearnersDesign(mm, infoObj.tabID);
 					}
 					break;
+				case 'DRAW_ALL' :
+					if (infoObj.tabID == _tabID && !mm.locked){
+						evtArr = infoObj.data;
+						drawAll();
+					}
+					break;
 				default :
-					Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorTabView');
+					Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LearnerTabView');
 			}
+	}
+	
+	private function drawAll(){
+		drawCount = 0;
+		
+		maxCount = evtArr.length;
+		
+		Debugger.log("drawing all activities: " + maxCount, Debugger.CRITICAL, "drawAll", "LearnerTabView");
+		
+		drawNext();
+	}
+	
+	public function drawNext():Void {
+		if(drawCount < maxCount) {
+			Debugger.log("drawing: " + evtArr[drawCount].updateType, Debugger.CRITICAL, "drawNext", "LearnerTabView");
+			update(mm, evtArr[drawCount])
+		} else {
+			drawNextLearner();
+			return;
+		}
+		
+		drawCount++;
 	}
 	
 	/**
@@ -303,25 +340,37 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	}
 	
 	private function drawAllLearnersDesign(mm:MonitorModel, tabID:Number){
-		
-		var idx:Number = 0;	
 		var learnersPerPage:Number = mm.learnersPerPage;
+		currentLearnerIndex = (mm.currentLearnerIndex-1)*learnersPerPage;
+		maxLearnerIndex = (learnersPerPage*mm.currentLearnerIndex)-1;
+		learnersDrawnIndex = 0;
+		//mm.allLearnersProgress.sortOn("learnerLastName", Array.DESCENDING);
+		
+		drawNextLearner();
 
-		for (var i= (mm.currentLearnerIndex-1)*learnersPerPage; i<= (learnersPerPage*mm.currentLearnerIndex)-1; i++) {
-			if (mm.allLearnersProgress[i] != undefined) {
-				learnersDrawn = i+1;
+	}
+	
+	private function drawNextLearner(){
+		Debugger.log("drawing next learner: " + currentLearnerIndex, Debugger.CRITICAL, "drawNextLearner", "LearnerTabView")
+		
+		if(currentLearnerIndex <= maxLearnerIndex) {
+			Debugger.log("learner progress: " + mm.allLearnersProgress[currentLearnerIndex], Debugger.CRITICAL, "drawNextLearner", "LearnerTabView")
+		
+			if (mm.allLearnersProgress[currentLearnerIndex] != undefined) {
+				learnersDrawn = currentLearnerIndex+1;
+				
 				ACT_X = 0;
-				ACT_Y = (idx*80)+35;
-			
-				mm.drawDesign(tabID, mm.allLearnersProgress[i]);
-			
-				setSize(mm);
-				idx++;
+				ACT_Y = (learnersDrawnIndex*80)+35;
+				
+				learnersDrawnIndex++;
+				mm.drawDesign(_tabID, mm.allLearnersProgress[currentLearnerIndex]);
 			}
+		} else {
+			setSize(mm);
+			mm.isDesignDrawn = true;
 		}
 		
-		//mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true); //unnecessary
-		mm.isDesignDrawn = true;
+		currentLearnerIndex++;
 	}
 	
 	/**
@@ -419,7 +468,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		var ltv = LearnerTabView(this);
 		var mc = getController();
-		var newActivity_mc = null;
+		var newActivity_mc:MovieClip = null;
 		
 		Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is now be drawn',Debugger.CRITICAL,'drawActivity','LearnerTabView');
 		
@@ -453,7 +502,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		var actItems:Number = mm.activitiesDisplayed.size();
 		
 		if (actItems < mm.getActivityKeys().length) 
-			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
+			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc); 
 		
 		return true;
 	}
@@ -528,8 +577,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private function setSize(mm:MonitorModel):Void{
 		var s:Object = mm.getSize();
 		
+		var actkeys = mm.getSequence().getLearningDesignModel().activities.keys();
+		Debugger.log("actkeys.length: "+actkeys.length, Debugger.CRITICAL, "setSize", "LearnerTabView");
+		
+		var ddmBranch_keys:Array = mm.getSequence().getLearningDesignModel().branches.keys();
+		Debugger.log("ddmBranch_keys.length: "+ddmBranch_keys.length, Debugger.CRITICAL, "setSize", "LearnerTabView");
+		
 		//var scpWidth:Number = mm.getMonitor().getMV().getMonitorLearnerScp()._width;
-		var scpWidth:Number = Stage.width;
+		var scpWidth:Number = (actkeys.length)*130;
+
 		var scpHeight:Number = mm.getMonitor().getMV().getMonitorLearnerScp()._height;
 		
 		var newWidth:Number;

@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.authoring.cv.ICanvasActivity;
 import org.lamsfoundation.lams.learner.ls.LessonController;
 import org.lamsfoundation.lams.learner.Application;
 import org.lamsfoundation.lams.monitoring.mv.MonitorController;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
 import org.lamsfoundation.lams.common.style. *;
 import mx.controls. *;
 import mx.managers. *
@@ -305,6 +306,8 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		_visible = true;
 		
+		if(_view instanceof LearnerTabView)
+			LearnerTabView(_view).drawNext();
 	}
 	
 	public function showToolTip(btnObj, btnTT:String):Void{

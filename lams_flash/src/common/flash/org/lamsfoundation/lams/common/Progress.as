@@ -149,6 +149,10 @@ class Progress {
 		return _learnerLName;
 	}
 	
+	public function get learnerLastName():String {
+		return _learnerLName;
+	}
+	
 	public function isLessonComplete():Boolean{
 		return _lessonComplete;
 	}

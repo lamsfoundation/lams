@@ -217,6 +217,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 						
 					}
 					break;
+				case 'DRAW_ALL' :
+					if (infoObj.tabID == _tabID && !mm.locked){
+						drawAll(infoObj.data, mm);
+					}
+					break;
 				case 'SET_ACTIVE' :
 					Debugger.log('setting active :' + infoObj.updateType + " event.data: " + infoObj.data + " condition: " + (infoObj.data == this),Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorTabView');
 					transparentCover._visible = (infoObj.data == this) ? false : true;
@@ -369,6 +374,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		mm.getMonitor().getMV().getMonitorSequenceScp().redraw(true);
 		
 		return true;
+	}
+	
+	private function drawAll(objArr:Array, mm:MonitorModel){
+		for (var i=0; i<objArr.length; i++){
+			update(mm,objArr[i]);
+		}
 	}
 	
 	/**
