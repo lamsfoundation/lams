@@ -65,8 +65,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private var lastScreenHeight:Number = 300;
 
 	private var grid_mc:Object;
-	private var hSpace:Number = 30;
-	private var vSpace:Number = 30;
+	public static var hSpace:Number = 30;
+	public static var vSpace:Number = 30;
 
 	private var currentActivity_x:Number;
 	private var currentActivity_y:Number;
@@ -775,4 +775,10 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		if(_mm != null) return _mm;
 		return null;
 	}
+	
+	public function get ddm():DesignDataModel {
+		if(model instanceof CanvasModel) return CanvasModel(model).ddm
+		else return MonitorModel(model).ddm;
+	}
+
 }

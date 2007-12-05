@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.ui. *;
 import org.lamsfoundation.lams.authoring. *;
 import org.lamsfoundation.lams.authoring.cv. *;
+import org.lamsfoundation.lams.authoring.br.CanvasBranchView;
 import org.lamsfoundation.lams.monitoring.mv. *;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.common.style. *;
@@ -60,6 +61,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
+	private var _canvasBranchView:CanvasBranchView;
 	private var _monitorController:MonitorController;
 	private var _monitorTabView:MonitorTabView;
 	private var _ca = ComplexActivity;
@@ -159,7 +161,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			if(fromModuleTab == "monitorMonitorTab"){
 				children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
 			} else {
-				children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView});
+				children_mc[i] = (_canvasBranchView != null) ? childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _canvasController:_canvasController, _canvasBranchView:_canvasBranchView})
+									: childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView});
 			}
 			
 			//set the positioning co-ords
@@ -193,11 +196,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		var _newVisibleWidth:Number = null;
 				
 		for(var i=0; i < _children.length; i++) {
+			Debugger.log("opt child act: " + _children[i].activityUIID, Debugger.CRITICAL, "initActivityType", "CanvasOptionalActivity");
+			
 			if(_children[i].isSequenceActivity()) {
 				if(fromModuleTab == "monitorMonitorTab")
 					children_mc[i] = childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
 				else
-					children_mc[i] = childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView});
+					children_mc[i] = (_canvasBranchView != null) ? childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasBranchView:_canvasBranchView})
+																  : childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView});
 			
 				//set the positioning co-ords
 				children_mc[i].activity.xCoord = CHILD_OFFSET_X;

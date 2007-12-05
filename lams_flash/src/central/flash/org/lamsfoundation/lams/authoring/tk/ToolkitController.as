@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.authoring.cv.*
+import org.lamsfoundation.lams.authoring.br.CanvasBranchView
 import org.lamsfoundation.lams.authoring.tk.*
 /**
 * Controller for the toolkit
@@ -64,6 +65,11 @@ class ToolkitController extends AbstractController {
 		
 		var iconMouseX = _xmouse - cv.model.getPosition().x;
 		var iconMouseY = _ymouse - cv.model.getPosition().y;
+		
+		if(cv.getCanvasModel().activeView instanceof CanvasBranchView) {
+			iconMouseX -= CanvasBranchView.hSpace;
+			iconMouseY -= CanvasBranchView.vSpace;
+		}
 		
 		Debugger.log("iconMouseX: "+iconMouseX+" iconMouseY: "+iconMouseY, Debugger.GEN, "iconDrop", "ToolkitController");
 		

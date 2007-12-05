@@ -1165,4 +1165,8 @@ class MonitorModel extends Observable{
 			return findParent(_activeSeq.getLearningDesignModel().getActivityByUIID(a.parentUIID), b);
     }
 	
+	public function get ddm():DesignDataModel {
+		return _monitor.ddm;
+	}
+	
 }

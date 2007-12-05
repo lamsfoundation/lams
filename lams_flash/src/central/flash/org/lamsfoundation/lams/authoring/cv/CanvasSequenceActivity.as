@@ -152,6 +152,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		
 		_canvasModel = CanvasModel(_canvasController.getModel());
 		
+		Debugger.log("firstActivityUIID:  " + ComplexActivity(_activity).firstActivityUIID, Debugger.CRITICAL, "init", "CanvasSequenceActivity");
+		
 		if(ComplexActivity(_activity).firstActivityUIID != null)
 			_children.push(_ddm.getActivityByUIID(ComplexActivity(_activity).firstActivityUIID));
 		
@@ -181,6 +183,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	
 	private function drawChildActivity(a:Activity):Void {
 		var childActivity:MovieClip;
+		
+		Debugger.log("activity: " + a.activityUIID, Debugger.CRITICAL, "drawChildActivity", "CanvasSequenceActivity");
+		
 		if(_module == "monitoring")
 			childActivity = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+a.activityUIID, childActivities_mc.getNextHighestDepth(), {_activity:a , _monitorController:_monitorController, _monitorView:_monitorView, _module:"monitoring", learnerContainer:learnerContainer, _sequenceChild:true});
 		else
@@ -409,6 +414,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	private function getDDM():DesignDataModel {
 		if(_module == "monitoring") {
 			return _monitorView.ddm;
+		} else if(_canvasBranchView != null){
+			return _canvasBranchView.ddm;
 		} else {
 			return _canvasView.ddm;
 		}

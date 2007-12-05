@@ -152,6 +152,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		}
 	    
 		_canvasModel.getCanvas().stopActiveTool();
+		
 		var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
 		var parallelOnCanvas:Array  = _canvasModel.findParallelActivities();
 		 
@@ -161,7 +162,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			var sequenceActivity:Activity = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
 			var selectedParentActivity:Activity = _canvasModel.getCanvas().ddm.getActivityByUIID(_tempSelectedItem.activity.parentUIID);
-					
+			
+			var iconMouseX = _xmouse - _canvasModel.getPosition().x;
+			var iconMouseY = _ymouse - _canvasModel.getPosition().y;
+			
+			if(_canvasModel.activeView instanceof CanvasBranchView) {
+				iconMouseX -= CanvasBranchView.hSpace;
+				iconMouseY -= CanvasBranchView.vSpace;
+			}
+			
 			if (ca.activity.parentUIID != null && 
 				sequenceActivity.activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE){
 				
@@ -172,9 +181,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 								ca._x < -129 || 
 								ca._y < -55 || 
 								ca._y > optionalOnCanvas[i].panelHeight) {
+								
 								//give it the new co-ords and 'drop' it
-								ca.activity.xCoord = (_xmouse - _canvasModel.getPosition().x) - (_canvasModel.getCanvas().taWidth/2);
-								ca.activity.yCoord = (_ymouse - _canvasModel.getPosition().y) - (_canvasModel.getCanvas().taHeight/2);
+								ca.activity.xCoord = iconMouseX - (_canvasModel.getCanvas().taWidth/2);
+								ca.activity.yCoord = iconMouseY - (_canvasModel.getCanvas().taHeight/2);
+								
 								_canvasModel.removeOptionalCA(ca, optionalOnCanvas[i].activity.activityUIID);
 							} else {
 								activitySnapBack(ca);
@@ -185,7 +196,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				}
 				
 			} else if(ca.activity.parentUIID != null && 
-						sequenceActivity.isSequenceActivity()) {
+						sequenceActivity.isOptionalSequenceActivity(_canvasModel.getCanvas().ddm.getActivityByUIID(sequenceActivity.parentUIID))) {
 				
 				for (var i=0; i<optionalOnCanvas.length; i++) {
 					if (sequenceActivity.parentUIID == optionalOnCanvas[i].activity.activityUIID) {
@@ -196,8 +207,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 								ca._y < -ca.getVisibleHeight() - sequenceActivity.yCoord ||
 								ca._y > optionalOnCanvas[i].getVisibleHeight() - sequenceActivity.yCoord) {
 								
-								ca.activity.xCoord = (_xmouse - _canvasModel.getPosition().x) - (_canvasModel.getCanvas().taWidth/2);
-								ca.activity.yCoord = (_ymouse - _canvasModel.getPosition().y) - (_canvasModel.getCanvas().taHeight/2);
+								ca.activity.xCoord = iconMouseX - (_canvasModel.getCanvas().taWidth/2);
+								ca.activity.yCoord = iconMouseY - (_canvasModel.getCanvas().taHeight/2);
 								
 								_canvasModel.removeOptionalSequenceCA(ca, optionalOnCanvas[i].activity.activityUIID);
 							} else {
@@ -210,7 +221,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				}
 				
 			} else {
-			
+				Debugger.log("normal optional case", Debugger.CRITICAL, "activityRelease", "CanvasController");
+						
 				//if we are on the optional Activity remove this activity from canvas and assign it a parentID of optional activity and place it in the optional activity window.
 				for (var i=0; i<optionalOnCanvas.length; i++){
 					if(ca.activity.activityUIID != optionalOnCanvas[i].activity.activityUIID ){
@@ -244,8 +256,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 									
 									var optionalX:Number = optionalOnCanvas[i].activity.xCoord;
 									var optionalY:Number = optionalOnCanvas[i].activity.yCoord;
-									var iconMouseX = _xmouse - _canvasModel.getPosition().x;
-									var iconMouseY = _ymouse - _canvasModel.getPosition().y;
 									
 									if(optionalOnCanvas[i].activity.isSequenceBased) {
 										
@@ -265,6 +275,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 										
 										if(selectedSequence != null) {
 											ca.activity.orderID = _canvasModel.getCanvas().ddm.getNextSequenceOrderID(selectedSequence.activity.activityUIID);
+											
+											Debugger.log("ca orderID: " + ca.activity.orderID, Debugger.CRITICAL, "activityRelease", "CanvasController");
 											
 											if(ca.activity.orderID > 1) _canvasModel.createSequenceTransition(CanvasSequenceActivity(selectedSequence).lastActivity, ca.activity);
 											else ComplexActivity(selectedSequence.activity).firstActivityUIID = ca.activity.activityUIID;							

@@ -62,44 +62,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
         EventDispatcher.initialize(this);
 		
 	}
-	
-	public function haltRefresh(a:Boolean):Void {
-		_doRefresh = !a;
-	}
-	
-	public function setDirty(){
-		_isDirty = true;
-		
-		if(getCanvas().ddm.learningDesignID == undefined){
-			LFMenuBar.getInstance().enableExport(false);
-		} else {
-			LFMenuBar.getInstance().enableExport(true);
-		}
 
-		if(_doRefresh) refreshDesign();
-	}
-	
-	public function lockAllComplexActivities():Void{
-		Debugger.log("Locking all Complex Activities", Debugger.GEN, "lockAllComplexActivities", "CanvasModel");
-		var k:Array = _activitiesDisplayed.values();
-		for (var i=0; i<k.length; i++){
-			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
-				k[i].locked = true;
-			}
-		}
-	}
-	
-	
-	public function unlockAllComplexActivities():Void{
-		Debugger.log("Unlocking all Complex Activities", Debugger.GEN, "unlockAllComplexActivities", "CanvasModel");
-		var k:Array = _activitiesDisplayed.values();
-		for (var i=0; i<k.length; i++){
-			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
-				k[i].locked = (k[i].activity.readOnly) ? true : false;
-			}
-		}
-	}
-	
 	/**
 	 * Craetes a [trans][gate act][trans] combo from an existing transition.
 	 * NOT used anymore as we dont want to allow users to think they can click transitions
@@ -190,16 +153,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	 * @return  
 	 */
 	public function createNewGate(gateTypeID, pos:Point, parent){
-		Debugger.log('gateTypeID:'+gateTypeID,Debugger.GEN,'createNewGate','CanvasModel');
 		var gateAct = new GateActivity(_cv.ddm.newUIID(), gateTypeID);
 		gateAct.learningDesignID = _cv.ddm.learningDesignID;
 		
 		gateAct.title = Dictionary.getValue('gate_btn');
 		gateAct.yCoord = pos.y;
 		gateAct.xCoord = pos.x;
-		
-		Debugger.log('gateAct.yCoord:'+gateAct.yCoord,Debugger.GEN,'createGateTransition','CanvasModel');
-		Debugger.log('gateAct.xCoord:'+gateAct.xCoord,Debugger.GEN,'createGateTransition','CanvasModel');
 
 		if(parent != null) {
 			gateAct.parentActivityID = parent.activityID;
@@ -222,8 +181,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	 * @return  
 	 */
 	public function createNewBranchActivity(branchTypeID, pos:Point, parent){
-		Debugger.log('Running...',Debugger.GEN,'createNewBranchActivity','CanvasModel');
-		
 		var branchingActivity = new BranchingActivity(_cv.ddm.newUIID(), branchTypeID);
 		branchingActivity.title = Dictionary.getValue('branching_act_title');
 		branchingActivity.learningDesignID = _cv.ddm.learningDesignID;
@@ -978,220 +935,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	
 	public function setDesignTitle(){
 		broadcastViewUpdate("POSITION_TITLEBAR", null);
-	}
-	
-	////////////////////////////////////////////////////////////////////////////////////////////
-	///////////////////////       REFRESHING DESIGNS       /////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	
-	/**
-	 * Compares 2 activities, decides if they are new, the same or to be deleted
-	 * @usage   
-	 * @param   ddm_activity Design Data Model activity
-	 * @param   cm_activity  Canvas Model activity
-	 * @return  
-	 */
-	private function compareActivities(ddm_activity:Activity,cm_activity:Activity):Object{
-		Debugger.log('Comparing ddm_activity:'+ddm_activity.title+'('+ddm_activity.activityUIID+') WITH cm_activity:'+cm_activity.title+'('+cm_activity.activityUIID+')',Debugger.GEN,'compareActivities','CanvasModel');
-		var r:Object = new Object();
-		
-		//check if act has been removed from canvas
-		if(ddm_activity == null || ddm_activity == undefined){
-			return r = "DELETE";
-		}
-		
-		//if they are the same (ref should point to same act) then nothing to do.
-		//if the ddm does not have an act displayed then we need to remove it from the cm
-		//if the ddm has an act that cm does not ref, then we need to add it.
-			
-		if(ddm_activity === cm_activity){
-			return r = "SAME";
-		}
-		
-		//check if the activity has a parent, if so then we dont need to check it
-		Debugger.log('Checking parent activity IDs, parentUIID:'+ddm_activity.parentUIID+'parentID:'+ddm_activity.parentActivityID,Debugger.GEN,'refreshDesign','CanvasModel');
-		if(ddm_activity.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE){
-			return r = "SEQ";
-		}
-		
-		if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
-			var parentAct;
-			if((parentAct = _cv.ddm.activities.get(ddm_activity.parentUIID)) != null)
-				if(parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE && !parentAct.isOptionalSequenceActivity(_cv.ddm.activities.get(parentAct.parentUIID))) {
-					SequenceActivity(parentAct).empty = false;
-					return r = "NEW_SEQ_CHILD";
-				}
-			
-			return r = "CHILD";
-		}
-		
-		//check for a new act in the dmm
-		if(cm_activity == null || cm_activity == undefined){
-			return r = "NEW";
-		}
-	}
-	
-	/**
-	 * Compares 2 transitions, decides if they are new, the same or to be deleted
-	 * @usage   
-	 * @param   ddm_transition 
-	 * @param   cm_transition  
-	 * @return  
-	 */
-	private function compareTransitions(ddm_transition:Transition, cm_transition:Transition):Object{
-		Debugger.log('Comparing ddm_transition:'+ddm_transition.title + '(' +ddm_transition.transitionUIID+') WITH cm_transition:' + cm_transition.title + '(' + cm_transition.transitionUIID +')' ,Debugger.GEN,'compareTransitions','CanvasModel');
-		return compareConnections(ddm_transition, cm_transition);
-	}
-	
-	private function compareBranches(ddm_branch:Branch, cm_branch:Branch):Object{
-		Debugger.log('Comparing ddm_branch:'+ddm_branch.title + '(' +ddm_branch.branchUIID+') WITH cm_branch:' + cm_branch.title + '(' + cm_branch.branchUIID +')' ,Debugger.GEN,'compareBranches','CanvasModel');
-		return compareConnections(ddm_branch, cm_branch);
-	}
-	
-	private function compareConnections(ddm_connect, cm_connect):Object{
-		var r:Object = new Object();
-		if(ddm_connect === cm_connect){
-			return r = "SAME";
-		}
-		
-		//check for a new connection in the dmm
-		if(cm_connect == null){
-			return r = "NEW";
-		}
-		
-		//check if connection has been removed from canvas
-		if(ddm_connect == null){
-			return r = "DELETE";
-		}
-	}
-	
-	/**
-	 * Compares the design in the CanvasModel (what is displayed on the screen) 
-	 * against the design in the DesignDataModel and updates the Canvas Model accordingly.
-	 * NOTE: Design elements are added to the DDM here, but removed in the View
-	 * 
-	 * @usage   
-	 * @return  
-	 */
-	private function refreshDesign(){
-	
-		Debugger.log('Running',Debugger.GEN,'refreshDesign','CanvasModel');
-		
-		//go through the design and see what has changed, compare DDM to canvasModel
-		var ddmActivity_keys:Array = _cv.ddm.activities.keys();
-		Debugger.log('ddmActivity_keys.length:'+ddmActivity_keys.length,Debugger.GEN,'refreshDesign','CanvasModel');
-		
-		var cmActivity_keys:Array = _activitiesDisplayed.keys();
-		Debugger.log('cmActivity_keys.length:'+cmActivity_keys.length,Debugger.GEN,'refreshDesign','CanvasModel');
-
-		var longest = Math.max(ddmActivity_keys.length, cmActivity_keys.length);
-		
-		//chose which array we are going to loop over
-		var indexArray:Array;
-		
-		if(ddmActivity_keys.length == longest){
-			indexArray = ddmActivity_keys;
-		}else{
-			indexArray = cmActivity_keys;
-		}
-		
-		//loop through and do comparison
-		for(var i=0;i<longest;i++){
-			//check DDM against CM, DDM is king.
-			var keyToCheck:Number = indexArray[i];
-			
-			var ddm_activity:Activity = _cv.ddm.activities.get(keyToCheck);
-			var cm_activity:Activity = _activitiesDisplayed.get(keyToCheck).activity;
-			
-			/**if they are the same (ref should point to same act) then nothing to do.
-			*  if the ddm does not have an act displayed then we need to remove it from the cm
-			*  if the ddm has an act that cm does not ref, then we need to add it.
-			**/
-			
-			var r_activity:Object = compareActivities(ddm_activity, cm_activity);
-			
-			Debugger.log('r_activity:'+r_activity,Debugger.GEN,'refreshDesign','CanvasModel');
-			if(r_activity == "NEW"){
-				//draw this activity
-				//NOTE!: we are passing in a ref to the activity in the ddm so if we change any props of this, we are changing the ddm
-				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity);
-
-			}else if(r_activity == "NEW_SEQ_CHILD"){
-				broadcastViewUpdate("DRAW_ACTIVITY_SEQ",ddm_activity);
-			}else if(r_activity == "DELETE"){
-				//remove this activity
-				if(cm_activity.parentUIID == null){
-					broadcastViewUpdate("REMOVE_ACTIVITY", cm_activity);
-				}
-			}else if(r_activity == "CHILD"){
-				//dont ask the view to draw the activity if it is a child act				
-				Debugger.log('Found a child activity, not drawing. activityID:'+ddm_activity.activityID+'parentID:'+ddm_activity.parentActivityID,Debugger.GEN,'refreshDesign','CanvasModel');
-			}else if(r_activity == "SEQ"){
-				broadcastViewUpdate("ADD_SEQUENCE", ddm_activity);
-			}
-		}
-		
-		//now check the transitions:
-		var ddmTransition_keys:Array = _cv.ddm.transitions.keys();
-		var cmTransition_keys:Array = _transitionsDisplayed.keys();
-		var trLongest = Math.max(ddmTransition_keys.length, cmTransition_keys.length);
-		
-		//chose which array we are going to loop over
-		var trIndexArray:Array;
-		
-		if(ddmTransition_keys.length == trLongest){
-			trIndexArray = ddmTransition_keys;
-		}else{
-			trIndexArray = cmTransition_keys;
-		}
-		
-		//loop through and do comparison
-		for(var i=0;i<trIndexArray.length;i++){
-			
-			var transitionKeyToCheck:Number = trIndexArray[i];
-
-			var ddmTransition:Transition = _cv.ddm.transitions.get(transitionKeyToCheck);
-			var cmTransition:Transition = _transitionsDisplayed.get(transitionKeyToCheck).transition;
-			var r_transition:Object = compareTransitions(ddmTransition, cmTransition);
-			
-			if(r_transition == "NEW"){
-				//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
-				broadcastViewUpdate("DRAW_TRANSITION",ddmTransition);
-			}else if(r_transition == "DELETE"){
-				broadcastViewUpdate("REMOVE_TRANSITION",cmTransition);
-			}
-		}
-		
-		//now check the transitions:
-		var ddmBranch_keys:Array = _cv.ddm.branches.keys();
-		var cmBranch_keys:Array = _branchesDisplayed.keys();
-		var brLongest = Math.max(ddmBranch_keys.length, cmBranch_keys.length);
-		
-		//chose which array we are going to loop over
-		var brIndexArray:Array;
-		
-		if(ddmBranch_keys.length == brLongest){
-			brIndexArray = ddmBranch_keys;
-		}else{
-			brIndexArray = cmBranch_keys;
-		}
-		
-		//loop through and do comparison
-		for(var i=0;i<brIndexArray.length;i++){
-			
-			var branchKeyToCheck:Number = brIndexArray[i];
-
-			var ddmBranch:Branch = _cv.ddm.branches.get(branchKeyToCheck);
-			var cmBranch:Branch = _branchesDisplayed.get(branchKeyToCheck).branch;
-			var r_branch:Object = compareBranches(ddmBranch, cmBranch);
-			
-			if(r_branch == "NEW"){
-				//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
-				broadcastViewUpdate("DRAW_BRANCH", ddmBranch);
-			}else if(r_branch == "DELETE"){
-				broadcastViewUpdate("REMOVE_BRANCH",cmBranch);
-			}
-		}
 	}
 	
 	public function getModTransitionsForActivityUIID(UIID:Number):Object {
