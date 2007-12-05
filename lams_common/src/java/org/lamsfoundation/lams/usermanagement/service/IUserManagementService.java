@@ -400,4 +400,52 @@ public interface IUserManagementService {
 	public List getActiveCourseIdsByUser(Integer userId, boolean isSysadmin);
 	
 	public List getArchivedCourseIdsByUser(Integer userId, boolean isSysadmin);
+	
+	/**
+	 * Search users across login, first name, last name and email fields using the search term.
+	 * Filters out disabled users.
+	 * @param term
+	 * @return list of Users
+	 */
+	public List searchUserSingleTerm(String term);
+	
+	/**
+	 * Search users across login, first name, last name and email fields using the search term.
+	 * Filters out disabled users, and users that are members of filteredOrg.
+	 * @param term
+	 * @param filteredOrgId
+	 * @return list of Users
+	 */
+	public List searchUserSingleTerm(String term, Integer filteredOrgId);
+	
+	/**
+	 * Search user members in orgId across login, first name, last name and email fields using the search term.
+	 * Filters out disabled users, and users that are members of filteredOrg.
+	 * @param term
+	 * @param orgId
+	 * @param filteredOrgId
+	 * @return list of Users
+	 */
+	public List searchUserSingleTerm(String term, Integer orgId, Integer filteredOrgId);
+	
+	/**
+	 * Get all users, except for disabled users.
+	 * @return list of Users
+	 */
+	public List getAllUsers();
+	
+	/**
+	 * Get all users, except for disabled users and users that are members of filteredOrg.
+	 * @param optionalOrgId
+	 * @return list of Users
+	 */
+	public List getAllUsers(Integer filteredOrgId);
+	
+	/**
+	 * Get all users in orgId, except for users that are members of filteredOrg.
+	 * @param orgId
+	 * @param filteredOrgId
+	 * @return list of Users
+	 */
+	public List getUsersFromOrganisation(Integer orgId, Integer filteredOrgId);
 }

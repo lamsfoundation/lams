@@ -24,10 +24,6 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -39,15 +35,9 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
-import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Jun-Dir Liew
@@ -100,57 +90,12 @@ public class UserOrgAction extends Action {
 		}
 		Integer orgType = organisation.getOrganisationType().getOrganisationTypeId();
 		request.setAttribute("orgType",orgType);
-				
-		// get list of users in org
-		Integer userId = ((UserDTO)SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
-		List users = new ArrayList<User>();
-		Organisation orgOfCourseAdmin = (orgType.equals(OrganisationType.CLASS_TYPE)) ? parentOrg : organisation;
-		if(request.isUserInRole(Role.SYSADMIN) 
-				|| service.isUserGlobalGroupAdmin()){
-			users = service.findAll(User.class);
-		}else if(service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.GROUP_ADMIN)
-				|| service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.GROUP_MANAGER)){
-			if(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers()){
-				users = service.findAll(User.class);
-			}else if(orgType.equals(OrganisationType.CLASS_TYPE)){
-				users = service.getUsersFromOrganisation(parentOrg.getOrganisationId());
-			}else if(orgType.equals(OrganisationType.COURSE_TYPE)){
-				users = service.getUsersFromOrganisation(orgId);
-			}
-		}else{
-			request.setAttribute("errorName","UserOrgAction");
-			request.setAttribute("errorMessage",messageService.getMessage("error.authorisation"));
-			return mapping.findForward("error");
-		}
-		users = removeDisabledUsers(users);
-		Collections.sort(users);
-		request.setAttribute("userlist",users);
 		
 		// create form object
 		DynaActionForm userOrgForm = (DynaActionForm)form;
 		userOrgForm.set("orgId",orgId);
 		userOrgForm.set("orgName",orgName);
-				
-		// create list of userids, members of this org
-		List<User> memberUsers = service.getUsersFromOrganisation(orgId);
-		String[] userIds = new String[memberUsers.size()];
-		for(int i=0; i<userIds.length; i++){
-			userIds[i] = memberUsers.get(i).getUserId().toString();
-		}
-		userOrgForm.set("userIds",userIds);
 
 		return mapping.findForward("userorg");
 	}
-	
-	private List removeDisabledUsers(List userList) {
-		List filteredList = new ArrayList();
-		for(int i=0; i<userList.size(); i++) {
-			User u = (User)userList.get(i);
-			if(!u.getDisabledFlag()) {
-				filteredList.add(u);
-			}
-		}
-		return filteredList;
-	}
-
 }
