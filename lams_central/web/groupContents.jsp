@@ -3,20 +3,21 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
+<c:set var="hasLessonToSort">false</c:set>
+
 <div class="j-course-contents">
 		
 	<div class="sequence-name">
 		<div id="<c:out value="${orgBean.id}"/>-lessons" class="j-lessons">
-		<c:if test="${not empty orgBean.lessons}">
-			<c:if test="${allowSorting}">
-			<div class="mycourses-right-buttons">
+		<c:if test="${allowSorting}">
+			<div class="mycourses-right-buttons" style="display:none;">
 				<a onclick="makeOrgSortable(<c:out value="${orgBean.id}"/>)">
 					<fmt:message key="label.enable.lesson.sorting"/>
 				</a>
 			</div>
-			</c:if>
 		</c:if>
 		<c:forEach var="lesson" items="${orgBean.lessons}">
+			<c:set var="hasLessonToSort">true</c:set>
 			<p id="<c:out value="${lesson.id}"/>" class="j-single-lesson">
 				<c:if test="${empty lesson.url}">
 					<a title="<c:out value="${lesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${lesson.name}" /></a> 
@@ -57,6 +58,7 @@
 		
 		<div class="sequence-name">
 			<div id="<c:out value="${childOrg.id}"/>" class="j-subgroup-lessons"><c:forEach var="childLesson" items="${childOrg.lessons}">
+				<c:set var="hasLessonToSort">true</c:set>
 				<p id="<c:out value="${childLesson.id}"/>" class="j-single-subgroup-lesson">
 					<c:if test="${empty childLesson.url}">
 						<a title="<c:out value="${childLesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${childLesson.name}" /></a>
@@ -81,3 +83,9 @@
 	</c:forEach>
 	
 </div>
+
+<c:if test="${allowSorting}"><c:if test="${hasLessonToSort eq 'true'}">
+<script>
+	jQuery("div.mycourses-right-buttons").show();
+</script>
+</c:if></c:if>
