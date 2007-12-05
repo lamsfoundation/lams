@@ -21,7 +21,7 @@ import org.lamsfoundation.integration.webct.LamsLesson;
  * @author luke foxton
  *
  */
-public class LamsLessonDaoJDBC {
+public class LamsLessonDaoMsSqlJDBC implements ILamsLessonDao{
 	
 	private Map settings;
 	
@@ -32,20 +32,20 @@ public class LamsLessonDaoJDBC {
 	private String dbUser;
 	private String dbPass;
 	
-	private static final Logger log = Logger.getLogger(LamsLessonDaoJDBC.class);
+	private static final Logger log = Logger.getLogger(LamsLessonDaoMsSqlJDBC.class);
 	
 	
 	/**
 	 * Empty constructor
 	 */
-	public LamsLessonDaoJDBC() {
+	public LamsLessonDaoMsSqlJDBC() {
 	}
 
 	/**
 	 * Constructor using the lamswebct Powerlink settings hashmap
 	 * @param settings lamswebct Powerlink settings hashmap
 	 */
-	public LamsLessonDaoJDBC(Map settings) {
+	public LamsLessonDaoMsSqlJDBC(Map settings) {
 		this.settings = settings;
 		
 		dbHost = (String)settings.get(Constants.SETTING_DB_HOST);
@@ -61,7 +61,7 @@ public class LamsLessonDaoJDBC {
 	/**
 	 * Full constructor
 	 */
-	public LamsLessonDaoJDBC(String dbHost, String dbPort,
+	public LamsLessonDaoMsSqlJDBC(String dbHost, String dbPort,
 			String dbName, String dbUser, String dbPass) {
 		this.dbHost = dbHost;
 		this.dbPort = dbPort;

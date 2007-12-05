@@ -4,7 +4,7 @@
  <!-- Add components as shown in the following <component> block below -->
 
     <component>
-        <version>0.0.13</version>
+        <version>0.0.28</version>
         <powerlinks-version>1.0</powerlinks-version>
         <id>lams.integration</id>
         <!-- valid types include sso siapi and proxytools -->
@@ -61,6 +61,7 @@
 						 inheritable="true"
 						 optional="false"
 						 read-only="false"
+						 not-applicable-lc-types="Domain;Institution;Division;Campus;Course;Section"
 						 default-value="10">
 				</setting-element>
 				
@@ -108,34 +109,45 @@
 				</setting-element>
 
 		<!-- MODULE-SPECIFIC ELEMENTS -->	
-				
- 
-				<setting-element name="dbHost" 
+
+				<setting-element name="dbUrl" 
 								 label="SQL Server Host" 
 								 data-type="String" 
 								 presentation-type="TextField" 
 								 inheritable="true" 
 								 optional="false" 
 								 read-only="true" 
-								 default-value="@dbHost@" />
+								 default-value="@dbUrl@" />
 				
-				<setting-element name="dbPort" 
-								 label="SQL Server Port" 
-								 data-type="String" 
-								 presentation-type="TextField" 
-								 inheritable="true" 
-								 optional="false" 
-								 read-only="true" 
-								 default-value="@dbPort@" />
-				
+				<!--  
 				<setting-element name="dbName" 
 								 label="SQL Server Port" 
 								 data-type="String" 
 								 presentation-type="TextField" 
 								 inheritable="true" 
 								 optional="false" 
-								 read-only="true" 
+								 read-only="true"
 								 default-value="@dbName@" />
+				-->
+				
+				<setting-element name="dbDriver" 
+								 label="Database driver jar" 
+								 data-type="String" 
+								 presentation-type="TextField" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="true"
+								 default-value="@dbDriver@" />
+				
+								 
+				<setting-element name="dbTable" 
+								 label="Datbase table name" 
+								 data-type="String" 
+								 presentation-type="TextField" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="true"
+								 default-value="@dbTable@" />
 
 				<setting-element name="dbUser" 
 								 label="SQL Server User" 
@@ -152,7 +164,7 @@
 								 presentation-type="Password" 
 								 inheritable="true" 
 								 optional="false" 
-								 read-only="true" 
+								 read-only="true"
 								 default-value="@dbPass@" />
 
 				<setting-element name="lamsServerUrl" 
@@ -189,7 +201,7 @@
 								 presentation-type="TextField" 
 								 inheritable="true" 
 								 optional="false" 
-								 read-only="false" 
+								 read-only="false"
 								 default-value="@reqSrc@" />
 								 
 				<setting-element name="imagesUrl" 
@@ -200,7 +212,76 @@
 								 optional="false" 
 								 read-only="false" 
 								 default-value="@imgUrl@" />
-
+							 
+				<setting-element name="authorRoles" 
+								 label="LAMS Author Roles" 
+								 data-type="String_Array" 
+								 presentation-type="CheckList" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="false">
+					 				<setting-value key="CDES" default="true" label="Course Designer"/>
+					 				<setting-value key="CINS" default="false" label="Course Instructor"/>
+					 				<setting-value key="SIND" default="false" label="Designer Instructor"/>
+					 				<setting-value key="DADM" default="false" label="Domain Admin"/>
+					 				<setting-value key="DDES" default="false" label="Domain Designer"/>
+					 				<setting-value key="KADM" default="false" label="Group Admin"/>
+					 				<setting-value key="KDES" default="false" label="Group Designer"/>
+					 				<setting-value key="IADM" default="false" label="Institutional Admin"/>
+					 				<setting-value key="IDES" default="false" label="Institutional Designer"/>
+					 				<setting-value key="SDES" default="true" label="Section Designer"/>
+					 				<setting-value key="SINS" default="false" label="Section Instructor"/>
+					 				<setting-value key="STEA" default="false" label="Teaching Assistant"/>
+					 				<setting-value key="SMEN" default="false" label="Mentor"/>		
+				</setting-element>
+				
+				<setting-element name="monitorRoles" 
+								 label="LAMS Monitoring Roles" 
+								 data-type="String_Array" 
+								 presentation-type="CheckList" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="false">
+					 				<setting-value key="CDES" default="false" label="Course Designer"/>
+					 				<setting-value key="CINS" default="true" label="Course Instructor"/>
+					 				<setting-value key="SIND" default="false" label="Designer Instructor"/>
+					 				<setting-value key="DADM" default="false" label="Domain Admin"/>
+					 				<setting-value key="DDES" default="false" label="Domain Designer"/>
+					 				<setting-value key="KADM" default="false" label="Group Admin"/>
+					 				<setting-value key="KDES" default="false" label="Group Designer"/>
+					 				<setting-value key="IADM" default="false" label="Institutional Admin"/>
+					 				<setting-value key="IDES" default="false" label="Institutional Designer"/>
+					 				<setting-value key="SDES" default="false" label="Section Designer"/>
+					 				<setting-value key="SINS" default="true" label="Section Instructor"/>
+					 				<setting-value key="STEA" default="true" label="Teaching Assistant"/>
+					 				<setting-value key="SMEN" default="false" label="Mentor"/>	
+				</setting-element>	
+							 
+				<setting-element name="learnerRoles" 
+								 label="LAMS Learner Roles" 
+								 data-type="String_Array" 
+								 presentation-type="CheckList" 
+								 inheritable="true" 
+								 optional="false" 
+								 read-only="false" 
+								 default-value="@imgUrl@">
+								 	<setting-value key="SAUD" default="true" label="Auditor"/>
+					 				<setting-value key="CDES" default="false" label="Course Designer"/>
+					 				<setting-value key="CINS" default="true" label="Course Instructor"/>
+					 				<setting-value key="SIND" default="false" label="Designer Instructor"/>
+					 				<setting-value key="DADM" default="false" label="Domain Admin"/>
+					 				<setting-value key="DDES" default="false" label="Domain Designer"/>
+					 				<setting-value key="KADM" default="false" label="Group Admin"/>
+					 				<setting-value key="KDES" default="false" label="Group Designer"/>
+					 				<setting-value key="IADM" default="false" label="Institutional Admin"/>
+					 				<setting-value key="IDES" default="false" label="Institutional Designer"/>
+					 				<setting-value key="SDES" default="false" label="Section Designer"/>
+					 				<setting-value key="SINS" default="true" label="Section Instructor"/>
+					 				<setting-value key="SSTU" default="true" label="Student"/>
+					 				<setting-value key="STEA" default="true" label="Teaching Assistant"/>
+					 				<setting-value key="SMEN" default="false" label="Mentor"/>	
+				</setting-element>
+            
             </settings-group>
         </settings-structure>
     </component>

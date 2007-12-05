@@ -51,6 +51,35 @@
 			{
 				alert("You must select a start date if you want to schedule the lesson.");
 			}
+			else if (document.getElementById("dateStart").value==document.getElementById("dateEnd").value)
+			{
+				var startHour = parseInt(document.getElementById("startHour").value, 10);
+				if (document.getElementById("startAMPM").value=="PM")
+				{
+					startHour = startHour + 12;
+				}
+				var startMin = parseInt(document.getElementById("startMin").value, 10);
+
+				var endHour = parseInt(document.getElementById("endHour").value, 10);
+				if (document.getElementById("endAMPM").value=="PM")
+				{
+					endHour = endHour + 12;
+				}
+				var endMin = parseInt(document.getElementById("endMin").value, 10);
+
+				var start = new Date("2000", "1", "1", startHour, startMin,"0");
+				var end = new Date("2000", "1", "1", endHour, endMin, "0");
+				
+				if (start>=end)
+				{
+					alert("Start date and time must be before end date and time.");
+				}
+				else
+				{
+					document.getElementById("form_action").value="start_lesson";
+    				formSubmit();
+				}
+			}
 			else
 			{
 				document.getElementById("form_action").value="modify_proc";
@@ -71,6 +100,12 @@
 		$('.calendarRange').calendar({minDate: today, fieldSettings: customRange, onSelect:dateSelected});
 	});
 
+	function customRange(input) 
+    {
+		return {minDate: (input.id == 'dateEnd' ? getDate($('#dateStart').val()) : null),
+				maxDate: (input.id == 'dateStart' ? getDate($('#dateEnd').val()) : null)};
+	}
+
 	function dateSelected() {
 		var schedule = document.modify_form.schedule[0]
 		var dontschedule = document.modify_form.schedule[1]
@@ -82,12 +117,6 @@
 		fields = value.split('/');
 		return (fields.length < 3 ? null :
 			new Date(parseInt(fields[2], 10), parseInt(fields[1], 10) - 1, parseInt(fields[0], 10)));
-	}
-	
-	function customRange(input) 
-    {
-		return {minDate: (input.id == 'dateEnd' ? getDate($('#dateStart').val()) : null),
-				maxDate: (input.id == 'dateStart' ? getDate($('#dateEnd').val()) : null)};
 	}
 	
 	function back()
@@ -128,16 +157,16 @@
 	<table border='0'>
 		<tr>
 			<td valign="top"><b><font color=red>*</font>Title:</b></td>
-			<td><input id="title" type="text" name="title" value="$title"></td>
+			<td><input id="title" type="text" name="title" tabindex="1" value="$title"></td>
 		</tr>
 		<tr>
 			<td valign="top"><b>Description:</b></td>
-			<td><textarea name="description" rows="12" cols="35">$description</textarea></td>
+			<td><textarea name="description"  tabindex="2" rows="12" cols="35">$description</textarea></td>
 		</tr>
 		<tr>
 			<td valign="top"><b>Lesson Visibility:</b></td>
-			<td><input type="Radio" name="isAvailable" value="true" $nothidden>Show Lesson <br>
-	            <input type="Radio" name="isAvailable" value="false" $hidden>Hide Lesson </td>
+			<td><input type="Radio" tabindex="3" name="isAvailable" value="true" $nothidden>Show Lesson <br>
+	            <input type="Radio" tabindex="4" name="isAvailable" value="false" $hidden>Hide Lesson </td>
 		</tr>
 	</table>
 	
@@ -148,21 +177,21 @@
 		<tr>
 			<td valign="top"><b>Schedule Lesson:</b></td>
 			<td valign="top">
-				<input type="Radio" id="schedule" name="schedule" value="true" $schedule>Yes<br>
-	            <input type="Radio" id="schedule" name="schedule" value="false" $notschedule>No
+				<input type="Radio" id="schedule" name="schedule" value="true" tabindex="5" $schedule>Yes<br>
+	            <input type="Radio" id="schedule" name="schedule" value="false" tabindex="6" $notschedule>No
 	        </td>
 	        <td>	
 	        	&nbsp;&nbsp;&nbsp;&nbsp;
 	        </td>
 	        <td valign="top">
 				Start date:<br>
-					<input type="text" class="calendarRange" id="dateStart" name="dateStart"  value="$startStr" /><br><br>
+					<input type="text" class="calendarRange" id="dateStart" name="dateStart"  value="$startStr" tabindex="7" /><br><br>
 				End date:<br>
-					<input type="text" class="calendarRange" id="dateEnd" name="dateEnd" value="$endStr" /> 			
+					<input type="text" class="calendarRange" id="dateEnd" name="dateEnd" value="$endStr" tabindex="11" /> 			
 	        </td>
 	        <td valign="top">
 				&nbsp;Start time: <br>
-				&nbsp;<select name="startHour">
+				&nbsp;<select name="startHour" id="startHour" tabindex="8">
 						<option value ="01" $stHrCk1>01</option>
 						<option value ="02" $stHrCk2>02</option>
 						<option value ="03" $stHrCk3>03</option>
@@ -176,7 +205,7 @@
 						<option value ="11" $stHrCk11>11</option>
 						<option value ="12" $stHrCk12>12</option>
 					</select>&nbsp;:
-					<select name="startMin">
+					<select name="startMin" id="startMin" tabindex="9">
 						<option value ="00" $stMnCk0>00</option>
 						<option value ="05" $stMnCk5>05</option>
 						<option value ="10" $stMnCk10>10</option>
@@ -190,12 +219,12 @@
 						<option value ="50" $stMnCk50>50</option>
 						<option value ="55" $stMnCk55>55</option>
 					</select>&nbsp;&nbsp;
-					<select name="startAMPM">
+					<select name="startAMPM" id="startAMPM" tabindex="10">
 						<option value ="AM" $stAmCk0>AM</option>
 						<option value ="PM" $stAmCk1>PM</option>
 					</select> <br><br>
 				&nbsp;End time:<br>
-				&nbsp;<select name="endHour">
+				&nbsp;<select name="endHour" id="endHour" tabindex="12">
 						<option value ="01" $edHrCk1>01</option>
 						<option value ="02" $edHrCk2>02</option>
 						<option value ="03" $edHrCk3>03</option>
@@ -209,7 +238,7 @@
 						<option value ="11" $edHrCk11>11</option>
 						<option value ="12" $edHrCk12>12</option>
 					</select>&nbsp;:
-					<select name="endMin">
+					<select name="endMin" id="endMin" tabindex="13">
 						<option value ="00" $edMnCk0>00</option>
 						<option value ="05" $edMnCk5>05</option>
 						<option value ="10" $edMnCk10>10</option>
@@ -223,7 +252,7 @@
 						<option value ="50" $edMnCk50>50</option>
 						<option value ="55" $edMnCk55>55</option>
 					</select>&nbsp;&nbsp;
-					<select name="endAMPM">
+					<select name="endAMPM" id="endAMPM" tabindex="14">
 						<option value ="AM" $edAmCk0>AM</option>
 						<option value ="PM" $edAmCk1>PM</option>
 					</select>                                         					
@@ -235,8 +264,8 @@
 	<hr>
 	<br>
 	<div class="actionbuttondiv">		
-		<a class="action" href="javascript:validateLesson()">Modify Lesson</a>
-		<a class="action" href="javascript:doCancel()">Cancel</a>
+		<a class="action" href="javascript:validateLesson()" tabindex="15">Modify Lesson</a>
+		<a class="action" href="javascript:doCancel()" tabindex="16">Cancel</a>
 	</div>
 	<br>
 	<font color=red>* Required field</font>                                   

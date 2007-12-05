@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="lib/authmoduledata_ce_1.4.jar"/>
 	<classpathentry kind="lib" path="lib/sqljdbc.jar"/>
 	<classpathentry kind="lib" path="lib/mssqlserver4v65.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-3.1.12-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

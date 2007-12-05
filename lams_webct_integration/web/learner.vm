@@ -91,7 +91,7 @@
 	<input type="hidden" name="form_action" id="form_action" value=""/>
 
 	<div class="actionbuttondiv">
-		<a class="action" href="javascript:formSubmit()">Refresh List</a>
+		<a class="action" href="javascript:formSubmit()" tabindex="1">Refresh List</a>
 	</div>
 </form>
 

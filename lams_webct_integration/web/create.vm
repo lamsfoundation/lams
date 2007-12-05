@@ -112,6 +112,35 @@
 			{
 				alert("You must select a start date if you want to schedule the lesson.");
 			}
+			else if (document.getElementById("dateStart").value==document.getElementById("dateEnd").value)
+			{
+				var startHour = parseInt(document.getElementById("startHour").value, 10);
+				if (document.getElementById("startAMPM").value=="PM")
+				{
+					startHour = startHour + 12;
+				}
+				var startMin = parseInt(document.getElementById("startMin").value, 10);
+
+				var endHour = parseInt(document.getElementById("endHour").value, 10);
+				if (document.getElementById("endAMPM").value=="PM")
+				{
+					endHour = endHour + 12;
+				}
+				var endMin = parseInt(document.getElementById("endMin").value, 10);
+
+				var start = new Date("2000", "1", "1", startHour, startMin,"0");
+				var end = new Date("2000", "1", "1", endHour, endMin, "0");
+				
+				if (start>=end)
+				{
+					alert("Start date and time must be before end date and time.");
+				}
+				else
+				{
+					document.getElementById("form_action").value="start_lesson";
+    				formSubmit();
+				}
+			}			
 			else
 			{
 				document.getElementById("form_action").value="start_lesson";
@@ -176,17 +205,17 @@
 	<table border='0' >
 		<tr>
 			<td valign="top"><b><font color=red>*</font>Title:</b></td>
-			<td><input id="title" type="text" name="title" value=""></td>
+			<td><input id="title" type="text" name="title" value="" tabindex="1"></td>
 		</tr>
 		<tr>
 			<td valign="top"><b>Description:</b></td>
-			<td><textarea name="description" rows="12" cols="35"></textarea></td>
+			<td><textarea name="description" rows="12" cols="35" tabindex="2"></textarea></td>
 		</tr>
 		<tr>
 			<td valign="top"><b>Lesson Visibility:</b></td>
 			<td>
-				<input type="Radio" name="isAvailable" value="true" checked>Show Lesson <br>
-	            <input type="Radio" name="isAvailable" value="false">Hide Lesson 
+				<input type="Radio" name="isAvailable" value="true" tabindex="3" checked>Show Lesson <br>
+	            <input type="Radio" name="isAvailable" value="false" tabindex="4">Hide Lesson 
 	        </td>
 		</tr>
 	</table>
@@ -195,21 +224,21 @@
 		<tr>
 			<td valign="top"><b>Schedule Lesson:</b></td>
 			<td valign="top">
-				<input type="Radio" id="schedule" name="schedule" value="true">Yes<br>
-	            <input type="Radio" id="schedule" name="schedule" value="false" checked>No
+				<input type="Radio" id="schedule" name="schedule" value="true" tabindex="5">Yes<br>
+	            <input type="Radio" id="schedule" name="schedule" value="false" tabindex="6" checked>No
 	        </td>
 	        <td>	
 	        	&nbsp;&nbsp;&nbsp;&nbsp;
 	        </td>
 	        <td valign="top">
 				Start date:<br>
-					<input type="text" class="calendarRange" id="dateStart" name="dateStart"  value="" /><br><br>
+					<input type="text" class="calendarRange" id="dateStart" name="dateStart"  value="" tabindex="7"/><br><br>
 				End date:<br>
-					<input type="text" class="calendarRange" id="dateEnd" name="dateEnd" value="" /> 			
+					<input type="text" class="calendarRange" id="dateEnd" name="dateEnd" value="" tabindex="11" /> 			
 	        </td>
 	        <td valign="top">
 				&nbsp;Start time: <br>
-				&nbsp;<select name="startHour">
+				&nbsp;<select name="startHour" id="startHour" tabindex="8">
 						<option value ="01">01</option>
 						<option value ="02">02</option>
 						<option value ="03">03</option>
@@ -223,7 +252,7 @@
 						<option value ="11">11</option>
 						<option value ="12">12</option>
 					</select>&nbsp;:
-					<select name="startMin">
+					<select name="startMin" id="startMin" tabindex="9">
 						<option value ="00" selected>00</option>
 						<option value ="05">05</option>
 						<option value ="10">10</option>
@@ -237,12 +266,12 @@
 						<option value ="50">50</option>
 						<option value ="55">55</option>
 					</select>&nbsp;&nbsp;
-					<select name="startAMPM">
+					<select name="startAMPM" id="startAMPM" tabindex="10">
 						<option value ="AM" selected>AM</option>
 						<option value ="PM">PM</option>
 					</select> <br><br>
 				&nbsp;End time:<br>
-				&nbsp;<select name="endHour">
+				&nbsp;<select name="endHour" id="endHour" tabindex="13">
 						<option value ="01">01</option>
 						<option value ="02">02</option>
 						<option value ="03">03</option>
@@ -256,7 +285,7 @@
 						<option value ="11">11</option>
 						<option value ="12">12</option>
 					</select>&nbsp;:
-					<select name="endMin">
+					<select name="endMin" id="endMin" tabindex="13">
 						<option value ="00" selected>00</option>
 						<option value ="05">05</option>
 						<option value ="10">10</option>
@@ -270,7 +299,7 @@
 						<option value ="50">50</option>
 						<option value ="55">55</option>
 					</select>&nbsp;&nbsp;
-					<select name="endAMPM">
+					<select name="endAMPM" id="endAMPM" tabindex="14">
 						<option value ="AM" selected>AM</option>
 						<option value ="PM">PM</option>
 					</select>  
@@ -300,16 +329,16 @@
 			</td>
 	</table>
 	<br>
-	<a class="actionlight" href="javascript:openAuthor()">Open Author</a>&nbsp;
-	<a class="actionlight" href="refreshSeqList()">Refresh Workspace </a>&nbsp;
-	<a class="actionlight" href="javascript:openPreview()">Preview Selected</a>&nbsp;
+	<a class="actionlight" href="javascript:openAuthor()" tabindex="15">Open Author</a>&nbsp;
+	<a class="actionlight" href="javascript:refreshSeqList()" tabindex="16">Refresh Workspace </a>&nbsp;
+	<a class="actionlight" href="javascript:openPreview()" tabindex="17">Preview Selected</a>&nbsp;
 	
 	<br><br>
 	<hr>
 	<br>
 	<div class="actionbuttondiv">		
-		<a class="action" href="javascript:doStartLesson()">Start LAMS Lesson</a>
-		<a class="action" href="javascript:doCancel()">Cancel</a>
+		<a class="action" href="javascript:doStartLesson()" tabindex="18">Start LAMS Lesson</a>
+		<a class="action" href="javascript:doCancel()" tabindex="19">Cancel</a>
 	</div> 
 	<br>
 	<font color=red>* Required field</font>                                    

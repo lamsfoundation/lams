@@ -133,12 +133,17 @@
 	<input type="hidden" name="page_id" value="$page_id"/>
 	<input type="hidden" name="form_action" id="form_action" value="create_lesson"/>
 	<input type="hidden" name="lsID" id="lsID" value="0"/>
-	<div class="actionbuttondiv"><a class="action" href="javascript:formSubmit()">Create LAMS Lesson</a></div>
-	<br><br>
-	<hr>
-	<br>
+	#if ( $canAuthor )
+		<div class="actionbuttondiv"><a class="action" tabindex="1" href="javascript:formSubmit()">Create LAMS Lesson</a></div>
+	
+		<br><br>
+		<hr>
+		<br>
+	#end
 	<h3>LAMS Lessons Running</h3>
 	<br>
+		
+	
 	
 #if( $lessons.size() > 0 )	
 	<table width='100%' border='1' cellpadding='10' style="padding:10px 10px 10px 10px;" class="tablebody">	
@@ -208,10 +213,14 @@
 			-->
 	
 			<td valign='top'>
-				<a class="actionlight" href="javascript:openLearner($lesson.getLessonId())">Open Learner</a>
-				<a class="actionlight" href="javascript:openMonitor($lesson.getLessonId())">Open Monitor</a>
-				<a class="actionlight" href="javascript:modifyLesson($lesson.getLessonId(),'modify_lesson')">Modify</a>
-				<a class="actionlight" href="javascript:deleteLesson($lesson.getLessonId(),'delete_lesson')">Delete</a>
+				#if ( $canMonitor )
+					<a class="actionlight" href="javascript:openLearner($lesson.getLessonId())">Open Learner</a>
+					<a class="actionlight" href="javascript:openMonitor($lesson.getLessonId())">Open Monitor</a>
+				#end
+				#if ( $canAuthor )
+					<a class="actionlight" href="javascript:modifyLesson($lesson.getLessonId(),'modify_lesson')">Modify</a>
+					<a class="actionlight" href="javascript:deleteLesson($lesson.getLessonId(),'delete_lesson')">Delete</a>
+				#end
 			</td>
 	
 		</tr>

@@ -1,8 +1,6 @@
 package org.lamsfoundation.integration.webct;
 
 import java.io.StringWriter;
-import java.net.URLEncoder;
-import java.net.URL;
 import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,7 +27,9 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.log4j.Logger;
 
 import org.lamsfoundation.integration.webct.LamsSecurityUtil;
-import org.lamsfoundation.integration.dao.LamsLessonDaoJDBC;
+import org.lamsfoundation.integration.dao.ILamsLessonDao;
+import org.lamsfoundation.integration.dao.LamsLessonDaoMySqlJDBC;
+
 import org.lamsfoundation.integration.util.Constants;
 
 
@@ -48,15 +48,10 @@ public class LamsModule extends AuthenticationModule
     private String lamsServerId;
     private String lamsServerSecretKey;
     private String webctRequestSource;
+    private Long lcID;
+    UserVO user;
 
-    
-
-    
     private static final Logger log = Logger.getLogger(LamsModule.class);
-    
-    
-    
-    private static final String GUTENBERG_QUERY_URL = "http://www.gutenberg.org/catalog/world/results";
     
     
     public LamsModule()
@@ -99,17 +94,15 @@ public class LamsModule extends AuthenticationModule
     	
 
     	
-    	Map settings = super.getSettings();
+    	this.settings = super.getSettings();
     	//user = super.getUserId();
 		lamsServerUrl = (String)settings.get(Constants.SETTING_LAMS_SERVER_URL);
         lamsServerId = (String)settings.get(Constants.SETTING_SERVER_ID);
         lamsServerSecretKey = (String)settings.get(Constants.SETTING_SECRET_KEY);
         webctRequestSource = (String)settings.get(Constants.SETTING_REQUEST_SRC);
-    	
-
-		UserVO user = null;
-		List roles;
-		Long lcID = super.getCurrentLearningContextId();
+		
+        List roles;
+		this.lcID = super.getCurrentLearningContextId();
 		
 		request = super.getRequest();
 		Map params = new HashMap();            
@@ -134,40 +127,28 @@ public class LamsModule extends AuthenticationModule
 		params.put("pt_id", ptid);
 		params.put("page_id", request.getParameter("page_id"));
 
-	    
-		boolean isTeacher = false;
-		boolean isStudent = false;
-		try {
-    		user = UserService.getInstance().getUser(super.getUserId(), lcID);
-    		roles = user.getUserRoles();
-    		Iterator it = roles.iterator();
-    		while (it.hasNext())
-    		{
-    			String role = it.next().toString().trim();
-    			
-    			System.out.println("ROLE: " + role);
-    			if (role.equals(UserRole.COURSE_INSTRUCTOR_ROLE.toString()) || role.equals(UserRole.SECTION_INSTRUCTOR_ROLE.toString()) )
-    			{
-    				isTeacher=true;
-    			}
-    			else if (role.equals(UserRole.STUDENT_ROLE.toString()))
-    			{
-    				isStudent=true;
-    			}			
-    		}
-    		if (!isStudent && !isTeacher)
-    		{
-				throw new LoginException("User's role does not have access to these pages.");
-			}	
-		}
-		catch (VistaDataException e)
-		{
-			log.error("Problem getting user info:", e);
-        	e.printStackTrace();
-        	return false;
-		}
 		
-        
+		try{
+	    	this.user = UserService.getInstance().getUser(super.getUserId(), lcID);
+	    }
+	    catch (VistaDataException e)
+	    {
+	    	e.printStackTrace();
+	    	throw new LoginException("Problem getting user details from WebCt: " + e.getMessage());
+	    }
+	    	
+	    boolean canAuthor = hasLamsRole("authorRoles");
+		boolean canMonitor = hasLamsRole("monitorRoles");
+		boolean canLearner = hasLamsRole("learnerRoles") || canMonitor;
+		if (!canAuthor && !canLearner && !canMonitor)
+		{
+			throw new LoginException("User's role does not have access to these pages.");
+		}
+		params.put("canAuthor", new Boolean(canAuthor));
+		params.put("canMonitor", new Boolean(canMonitor));
+		params.put("canLearner", new Boolean(canLearner));
+		
+		boolean isTeacher = canAuthor || canMonitor;
         
         String action = request.getParameter("form_action");
         
@@ -187,7 +168,7 @@ public class LamsModule extends AuthenticationModule
             	// generate teacher page
         		// ie list of running lessons, and a create new lesson button
         		try{
-        			LamsLessonDaoJDBC lessonDao = new LamsLessonDaoJDBC(settings);
+        			ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
         			List lessons = lessonDao.getDBLessons(lcID.longValue(), Long.parseLong(ptid));
 
         			monitorUrl = generateRequestURL(user, lcID, "monitor");
@@ -201,6 +182,7 @@ public class LamsModule extends AuthenticationModule
             	}
             	catch (Exception e)
             	{
+            		e.printStackTrace();
             		log.error("Error creating LAMS teach page", e);
             		throw new LoginException("Error creating LAMS teach page");
             	}
@@ -210,7 +192,7 @@ public class LamsModule extends AuthenticationModule
             	// generate student page
             	// ie list of running lessons
             	try{
-            		LamsLessonDaoJDBC lessonDao = new LamsLessonDaoJDBC(settings);
+            		ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
 
         			// test
         			//List lessons = lessonDao.getDBLessons(1);
@@ -259,7 +241,7 @@ public class LamsModule extends AuthenticationModule
         	String successMessage="LAMS lesson deleted.";
         	
         	String lsID = request.getParameter("lsID");
-        	LamsLessonDaoJDBC lessonDao = new LamsLessonDaoJDBC(settings);
+        	ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
 
         	boolean success = lessonDao.deleteDbLesson(Long.parseLong(lsID));
 
@@ -335,7 +317,7 @@ public class LamsModule extends AuthenticationModule
             		}
         		}
         		
-        		LamsLessonDaoJDBC lessonDao = new LamsLessonDaoJDBC(settings);
+        		ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
             	LamsLesson lesson = new LamsLesson(
             			lsID, 
             			Long.parseLong(ptid),
@@ -424,7 +406,7 @@ public class LamsModule extends AuthenticationModule
         else if(action.equals("modify_lesson"))
         {
         	try{
-	        	LamsLessonDaoJDBC lessonDao = new LamsLessonDaoJDBC(settings);
+        		ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
 	        	LamsLesson modLesson = lessonDao.getDBLesson(request.getParameter("lsID"));
 	        	
 	        	
@@ -497,7 +479,7 @@ public class LamsModule extends AuthenticationModule
         }
         else if(action.equals("modify_proc"))
         {
-        	LamsLessonDaoJDBC lessonDao = new LamsLessonDaoJDBC(settings);
+        	ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
         	
         	
         	try{
@@ -688,6 +670,80 @@ public class LamsModule extends AuthenticationModule
     	return t;
     	
     }
+    
+    /**
+     * Checks if the user has the lams role
+     * @param roleType
+     * @return
+     */
+    public boolean hasLamsRole(String lamsRoleType)
+    {
+    	boolean hasLameRole = false;
+    	String learnerRoles[] = (String[])settings.get(lamsRoleType);
+    	
+    	System.out.print("ROLES: ");
+    	for(int i = 0; i<learnerRoles.length; i++)
+        {
+            String role = learnerRoles[i];
+            System.out.print( role + ", ");
+            if (hasSpecificRole(role))
+            {
+            	hasLameRole = true;
+            }
+        }
+    	System.out.print("\n");
+    	return hasLameRole;
+    	
+    	/*
+    	for(Iterator it = learnerRoles.iterator(); it.hasNext();)
+        {
+            String role = (String)it.next();
+            if (hasSpecificRole(role))
+            {
+            	hasLameRole = true;
+            }
+        }
+    	return hasLameRole;
+		*/
+    }
+    
+    /**
+     * Checks if a user's role list contains a specific role
+     * @param roleParam the role to be checked
+     * @return true if the user has teh specified role
+     */
+    public boolean hasSpecificRole(String roleParam)
+    {
+    	UserVO user = null;
+    	try
+    	{
+    		user = UserService.getInstance().getUser(super.getUserId(), lcID);
+    	}
+    	catch (Exception e)
+    	{
+    		
+    		e.printStackTrace();
+    	}
+    	
+    	List roles = user.getUserRoles();
+		Iterator it = roles.iterator();
+    	
+		boolean hasRole = false;
+		
+    	while (it.hasNext())
+		{
+			String role = it.next().toString().trim();
+			if (role.equals(roleParam))
+			{
+				hasRole=true;
+			}
+		}
+    	
+    	return hasRole;
+    
+    }
+    
+    
     public boolean logout() throws LoginException
     {
         return super.logout();

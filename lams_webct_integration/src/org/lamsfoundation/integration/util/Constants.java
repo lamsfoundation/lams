@@ -67,5 +67,8 @@ public class Constants {
 	public static final String SETTING_DB_PORT = "dbPort";
 	public static final String SETTING_DB_USER = "dbUser";
 	public static final String SETTING_DB_PASS = "dbPass";
+	public static final String SETTING_DB_URL = "dbUrl";
+	public static final String SETTING_DB_DRIVER = "dbDriver";
+	public static final String SETTING_DB_TABLE = "dbTable";
     
 }

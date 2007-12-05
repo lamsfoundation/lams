@@ -409,8 +409,13 @@ public class LamsSecurityUtil {
 		if (node.getNodeName().equals(Constants.ELEM_FOLDER)) {
 			sb.append("['");
 			
-			StringBuffer attribute= new StringBuffer(node.getAttributes().getNamedItem(
-					Constants.ATTR_NAME).getNodeValue().replaceAll("'", "\\'"));
+			String attributeStr = node.getAttributes().getNamedItem(Constants.ATTR_NAME).getNodeValue();
+			//attributeStr = attributeStr.replaceAll("'", "\\'");
+			//attributeStr = attributeStr.replaceAll("\"", "\\\"");
+			attributeStr = replace(attributeStr, '\'', "\\'");
+			attributeStr = replace(attributeStr, '"', "\\\"");
+			
+			StringBuffer attribute= new StringBuffer(attributeStr);
 			
 			sb.append(attribute.append("',").append("null").append(','));
 					
@@ -429,10 +434,14 @@ public class LamsSecurityUtil {
 				Constants.ELEM_LEARNING_DESIGN)) {
 			sb.append('[');
 			
-			StringBuffer attrName = new StringBuffer(node.getAttributes().getNamedItem(
-							Constants.ATTR_NAME).getNodeValue().replaceAll("'", "\\'"));
-			StringBuffer attrResId = new StringBuffer(node.getAttributes().getNamedItem(
-					Constants.ATTR_RESOURCE_ID).getNodeValue().replaceAll("'", "\\'"));			
+			String attributeStr = node.getAttributes().getNamedItem(Constants.ATTR_NAME).getNodeValue();
+			attributeStr = replace(attributeStr, '\'', "\\'");
+			attributeStr = replace(attributeStr, '"', "\\\"");
+			StringBuffer attrName = new StringBuffer(attributeStr);
+			String attrResIdStr = node.getAttributes().getNamedItem(Constants.ATTR_RESOURCE_ID).getNodeValue();
+			attrResIdStr = replace(attrResIdStr, '\'', "\\'");
+			attrResIdStr = replace(attrResIdStr, '"', "\\\"");
+			StringBuffer attrResId = new StringBuffer(attrResIdStr);		
 			
 			sb.append('\'')
 				.append(attrName
@@ -445,6 +454,23 @@ public class LamsSecurityUtil {
 		}
 		return sb.toString();
 	}
+    
+    public static String replace(String line, char oldChar, String newStr)
+    {   
+      String result="";		   
+      if(line != null)  
+      {      
+          for (int j=0; j< line.length(); j++)      
+          {         
+                   if ( line.charAt(j) == oldChar )          
+                   { result += newStr; }         
+                   else       
+                   { result += line.charAt(j); }      
+          }   
+       }  
+       return result;
+    }
+
 
     //generate authentication hash code to validate parameters
     public static String generateAuthenticationHash(String datetime, String login, String method, String serverId, String secretkey) {     
