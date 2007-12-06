@@ -8,6 +8,11 @@
 							orgId: jQuery(element).attr("id")
 						},
 						function() {
+							if (display == 'header') {
+								jQuery("span.j-group-icon", element).html("<img src='images/tree_closed.gif'/>");
+							} else if (display == 'group') {
+								jQuery("span.j-group-icon", element).html("<img src='images/tree_open.gif'/>");
+							}
 							toggleGroupContents(element, stateId);
 							registerToolTip(element);
 							jQuery(element).css("display", "block");
@@ -16,13 +21,15 @@
 				}
 			
 				function toggleGroupContents(element, stateId) {
-					jQuery("a.j-group-header", element).click(function() {
-						var row = jQuery(this).parent("h2").parent("div.left-buttons").parent("div.row");
+					jQuery("a.j-group-header, span.j-group-icon", element).click(function() {
+						var row = jQuery("div.row", element);
 						var orgId = jQuery(row).parent("div.course-bg").attr("id");
 						var course = jQuery(row).next("div.j-course-contents");
+						var groupIcon = jQuery("span.j-group-icon", element);
 						if (jQuery(course).html() == null) {
 							loadGroupContents(orgId, stateId);
 							saveCollapsed(orgId, "false");
+							jQuery(groupIcon).html("<img src='images/tree_open.gif'/>");
 						} else {
 							var display = course.css("display");
 							if (jQuery.browser.msie && jQuery.browser.version == '6.0') {
@@ -32,8 +39,10 @@
 							}
 							if (display == "none") {
 								saveCollapsed(orgId, "false");
+								jQuery(groupIcon).html("<img src='images/tree_open.gif'/>");
 							} else if (display == "block") {
 								saveCollapsed(orgId, "true");
+								jQuery(groupIcon).html("<img src='images/tree_closed.gif'/>");
 							}
 						}
 						makeAllUnsortable();
