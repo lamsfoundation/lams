@@ -108,6 +108,15 @@ public class IndexAction extends Action {
 			return mapping.findForward("community");
 		}
 		
+		if (request.isUserInRole(Role.SYSADMIN)) {
+			// don't load group ids for sysadmins, unless 'groups' parameter is set
+			String groups = WebUtil.readStrParam(request, "groups", true);
+			if (StringUtils.isBlank(groups)) {
+				request.setAttribute("showGroups", false);
+				return mapping.findForward("main");
+			}
+		}
+		
 		List collapsedOrgDTOs = getService().getActiveCourseIdsByUser(loggedInUser.getUserId(), request.isUserInRole(Role.SYSADMIN));
 		request.setAttribute("collapsedOrgDTOs", collapsedOrgDTOs);
 		

@@ -147,7 +147,14 @@
 									</div>
 								</c:forEach>
 								<c:if test="${empty collapsedOrgDTOs}">
-									<p class="align-left"><fmt:message key="msg.groups.empty" /></p>
+									<c:if test="${not empty showGroups}">
+										<div align="center" style="padding:30px;">
+											<a onclick="document.location.href='index.do?groups=show';"><fmt:message key="label.show.groups"/></a>
+										</div>
+									</c:if>
+									<c:if test="${empty showGroups}">
+										<p class="align-left"><fmt:message key="msg.groups.empty" /></p>
+									</c:if>
 								</c:if>
 							</c:if>
 							<c:if test="${tab eq 'profile'}">
