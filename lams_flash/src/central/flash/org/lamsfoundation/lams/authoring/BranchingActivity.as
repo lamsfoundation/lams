@@ -49,10 +49,10 @@ class BranchingActivity extends ComplexActivity {
 		super(activityUIID);
 		_activityTypeID = activityTypeID;
 		
-		_startXCoord = DEFAULT_STARTX;
-		_startYCoord = DEFAULT_STARTY;
-		_endXCoord = DEFAULT_ENDX;
-		_endYCoord = DEFAULT_ENDY;
+		//_startXCoord = DEFAULT_STARTX;
+		//_startYCoord = DEFAULT_STARTY;
+		//_endXCoord = DEFAULT_ENDX;
+		//_endYCoord = DEFAULT_ENDY;
 		
 		_toolActivityUIID == null;
 		_defaultBranch = null;
@@ -103,6 +103,7 @@ class BranchingActivity extends ComplexActivity {
 	}
 	
 	public function set startXCoord(a:Number):Void{
+		Debugger.log("setting x coord: " + a, Debugger.CRITICAL, "startXCoord", "BranchingActivity");
 		_startXCoord = Math.round(a);
 	}
 	

@@ -44,15 +44,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
   
 	public static var TOOL_ACTIVITY_WIDTH:Number = 123.1;
 	public static var TOOL_ACTIVITY_HEIGHT:Number = 50.5;
+	
 	public static var TOOL_MIN_ACTIVITY_WIDTH:Number = 65;
 	public static var TOOL_MIN_ACTIVITY_HEIGHT:Number = 44;
 	
 	public static var GATE_ACTIVITY_HEIGHT:Number =28;
 	public static var GATE_ACTIVITY_WIDTH:Number = 28;
+	
 	public static var BRANCH_ICON_HEIGHT:Number = 30;
 	public static var BRANCH_ICON_WIDTH:Number = 30;
+	
 	public static var ICON_WIDTH:Number = 25;
 	public static var ICON_HEIGHT:Number = 25;
+	
+	public static var HUB_CONNECTOR_MARGIN:Number = 25;
 	
 	//this is set by the init object
 	private var _canvasController:CanvasController;
@@ -447,14 +452,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			_x = _activity.xCoord;
 			_y = _activity.yCoord;
 		} else {
+			var _canvasSize:Object;
+			if(_module == "monitoring")
+				_canvasSize = mm.getSize();
+			else
+				_canvasSize = _canvasModel.getSize();
+			
 			if(_canvasBranchView.isStart(this)) {
 				Debugger.log('start branch:' + _canvasBranchView.activity.startXCoord + ":" + _canvasBranchView.activity.startYCoord, Debugger.CRITICAL,'draw','CanvasActivity');
-				_x = _canvasBranchView.activity.startXCoord;
-				_y = _canvasBranchView.activity.startYCoord;
+				_x = (_canvasBranchView.activity.startXCoord != null) ? _canvasBranchView.activity.startXCoord : _x;
+				_y = (_canvasBranchView.activity.startYCoord != null) ? _canvasBranchView.activity.startYCoord : _y;
 			} else if(_canvasBranchView.isEnd(this)) {
 				Debugger.log('end branch:' + _canvasBranchView.activity.endXCoord + ":" + _canvasBranchView.activity.endYCoord,Debugger.CRITICAL,'draw','CanvasActivity');
-				_x = _canvasBranchView.activity.endXCoord;
-				_y = _canvasBranchView.activity.endYCoord;
+				_x = (_canvasBranchView.activity.endXCoord != null) ? _canvasBranchView.activity.endXCoord : _x;
+				_y = (_canvasBranchView.activity.endYCoord != null) ? _canvasBranchView.activity.endYCoord : _y;
 			}
 		}
 		
@@ -729,5 +740,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 	}
 	
+	public function hit():Void {
+		onPress();
+		onRelease();
+	}
 
 }

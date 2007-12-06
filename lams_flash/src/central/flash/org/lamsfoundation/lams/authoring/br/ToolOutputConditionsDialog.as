@@ -67,6 +67,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private var _opt_greaterThan_cb:CheckBox;
 	private var _opt_greaterThan_lbl:Label;
 	
+	private var _opt_lessThan_cb:CheckBox;
+	private var _opt_lessThan_lbl:Label;
+	
 	private var add_btn:Button;
 	private var close_btn:Button;
 	private var cancel_btn:Button;
@@ -133,6 +136,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		clear_all_btn.addEventListener('click', Delegate.create(this, clearAllButton_onPress));
 		
 		_opt_greaterThan_cb.addEventListener('click', Delegate.create(this, onGreaterThanSelect));
+		_opt_lessThan_cb.addEventListener('click', Delegate.create(this, onLessThanSelect));
 		
 		_toolOutputDefin_cmb.addEventListener('change', Delegate.create(this, itemChanged));
 		
@@ -179,7 +183,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		clear_all_btn.label = Dictionary.getValue("to_conditions_dlg_clear_all_btn_lbl");
 		remove_item_btn.label = Dictionary.getValue("to_conditions_dlg_remove_item_btn_lbl");
 		
-		_opt_greaterThan_lbl.text = "Greater than (>)";
+		_opt_greaterThan_lbl.text = Dictionary.getValue("to_conditions_dlg_gt_lbl"); // "Greater than (>)";
+		_opt_lessThan_lbl.text = Dictionary.getValue("to_conditions_dlg_lt_lbl"); // "Less than (<)";
 	
 		//Set the text for buttons
         close_btn.label = Dictionary.getValue('al_done');
@@ -212,6 +217,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		_condition_from_lbl.setStyle('styleName', styleObj);
 		_condition_to_lbl.setStyle('styleName', styleObj);
 		_opt_greaterThan_lbl.setStyle('styleName', styleObj);
+		_opt_lessThan_lbl.setStyle('styleName', styleObj);
 		
 		styleObj = themeManager.getStyleObject('picombo');
 		_toolOutputDefin_cmb.setStyle('styleName', styleObj);
@@ -246,10 +252,16 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		delete this.onEnterFrame;
 		
 		var branches:Array = app.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(_branchingActivity.activityUIID).toolBased;
+		Debugger.log("branches length: " + branches.length, Debugger.CRITICAL, "initSetup", "ToolOutputConditionsDialog");
 		
 		for(var i=0; i<branches.length; i++) {
+			
 			if(branches[i].condition.toolActivity.activityUIID == _toolActivity.activityUIID && 
-				branches[i].condition.branchingActivity == _branchingActivity.activityUIID) {
+				branches[i].condition.branchingActivity.activityUIID == _branchingActivity.activityUIID) {
+					
+				Debugger.log("moving condition: " + branches[i].condition.type, Debugger.CRITICAL, "initSetup", "ToolOutputConditionsDialog");
+			
+				
 				addCondition(branches[i].condition);
 				if(_condition_item_dgd.length==1) setDefinition(branches[i].condition.name);
 			}
@@ -270,8 +282,12 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private function addButton_onPress():Void {
 		if(validateCondition(_selectedDefinition))
-			if(Boolean(_opt_greaterThan_cb.value)) addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, _start_value_stp.value, null));
-			else addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, _start_value_stp.value, _end_value_stp.value));
+			if(Boolean(_opt_greaterThan_cb.value)) 
+				addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, _start_value_stp.value, null));
+			else if(Boolean(_opt_lessThan_cb.value))
+				addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, null, _start_value_stp.value));
+			else 
+				addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, _start_value_stp.value, _end_value_stp.value));
 	}
 	
 	private function clearAllButton_onPress(evt:Object, c:Boolean):Void {
@@ -325,6 +341,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value", [String(condition.startValue), String(condition.endValue)]), data: condition});
 				else if(condition.startValue != null && condition.endValue == null)
 					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_max", [String(condition.startValue)]), data: condition});
+				else if(condition.startValue == null && condition.endValue != null)
+					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_min", [String(condition.endValue)]), data: condition});
 				else
 					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_exact", [String(condition.exactMatchValue)]), data: condition});
 				
@@ -354,7 +372,13 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 		switch(selectedDefinition.type) {
 			case ToolOutputDefinition.LONG:
-				return (Boolean(_opt_greaterThan_cb.value)) ? validateLongCondition(_start_value_stp.value, null) : validateLongCondition(_start_value_stp.value, _end_value_stp.value)
+				if(Boolean(_opt_greaterThan_cb.value)) {
+					return validateLongCondition(_start_value_stp.value, null);
+				} else if(Boolean(_opt_lessThan_cb.value)) {
+					return validateLongCondition(null, _start_value_stp.value);
+				} else {
+					return validateLongCondition(_start_value_stp.value, _end_value_stp.value);
+				}
 				break;
 			case ToolOutputDefinition.BOOL:
 				return true;
@@ -372,6 +396,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 			return false;
 		}
 		
+		// TODO: Update error messages to be more meaningful
 		for(var i=0; i<_condition_item_dgd.dataProvider.length; i++) {
 			var condition:ToolOutputCondition = ToolOutputCondition(_condition_item_dgd.dataProvider[i].data);
 			
@@ -385,12 +410,21 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				} else if(start_value < condition.exactMatchValue && end_value == null) {
 					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_end_value")]), null);
 					return false;
+				} else if(end_value > condition.exactMatchValue && start_value == null) {
+					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_end_value")]), null);
+					return false;
 				}
 			} else { 
 				if(start_value >= condition.startValue && start_value <= condition.endValue && start_value != null) {
 					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_start_value")]), null);
 					return false;
 				} else if(end_value >= condition.startValue && end_value <= condition.endValue && end_value != null) {
+					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_end_value")]), null);
+					return false;
+				} else if(end_value <= condition.endValue && start_value == null && condition.endValue != null) {
+					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_start_value")]), null);
+					return false;
+				} else if(start_value >= condition.startValue && end_value == null && condition.startValue != null) {
 					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_end_value")]), null);
 					return false;
 				}
@@ -427,7 +461,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 			case ToolOutputDefinition.LONG:
 				
 				_start_value_stp.visible = true;
-				_end_value_stp.visible = !_opt_greaterThan_cb.value;
+				_end_value_stp.visible = (!_opt_greaterThan_cb.value || !_opt_lessThan_cb.value);
 				
 				_start_value_stp.minimum = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
 				_end_value_stp.minimum = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
@@ -439,6 +473,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				
 				_opt_greaterThan_cb.visible = true;
 				_opt_greaterThan_lbl.visible = true;
+				
+				_opt_lessThan_cb.visible = true;
+				_opt_lessThan_lbl.visible = true;
 				
 				add_btn.visible = true;
 				clear_all_btn.enabled = true;
@@ -457,6 +494,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				
 				_opt_greaterThan_cb.visible = false;
 				_opt_greaterThan_lbl.visible = false;
+				
+				_opt_lessThan_cb.visible = false;
+				_opt_lessThan_lbl.visible = false;
 				
 				add_btn.visible = false;
 				clear_all_btn.enabled = false;
@@ -502,6 +542,15 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private function onGreaterThanSelect(evt:Object):Void {
 		_end_value_stp.visible = !evt.target.value;
 		_condition_to_lbl.visible = !evt.target.value;
+		
+		_opt_lessThan_cb.enabled = !evt.target.value;
+	}
+	
+	private function onLessThanSelect(evt:Object):Void {
+		_end_value_stp.visible = !evt.target.value;
+		_condition_to_lbl.visible = !evt.target.value;
+		
+		_opt_greaterThan_cb.enabled = !evt.target.value;
 	}
 
 	public static function getOutputType(type:String):String {

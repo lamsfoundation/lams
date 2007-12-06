@@ -279,13 +279,29 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 		Debugger.log('adding hubs for branch activity:' + _canvasBranchingActivity,Debugger.CRITICAL,'setupConenctorHubs','org.lamsfoundation.lams.CanvasBranchView');
 		
+		var _canvasSize:Object = model.getSize();
+		
+		var _startx = CanvasActivity.HUB_CONNECTOR_MARGIN;
+		var _starty = ((_canvasSize.h - 2*CanvasBranchView.vSpace)/2) - CanvasActivity.BRANCH_ICON_HEIGHT;
+		
+		var _endx = (_canvasSize.w - 2*CanvasBranchView.hSpace) - CanvasActivity.HUB_CONNECTOR_MARGIN - CanvasActivity.BRANCH_ICON_WIDTH;
+		var _endy = ((_canvasSize.h - 2*CanvasBranchView.vSpace)/2) - CanvasActivity.BRANCH_ICON_HEIGHT;
+
 		// start-point connector hub
-		cHubStart_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _canvasController:getController(), _canvasBranchView:_canvasBranchView, _x: activity.startXCoord , _y: activity.startYCoord, branchConnector:true})
+		cHubStart_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _canvasController:getController(), _canvasBranchView:_canvasBranchView, _x: _startx , _y: _starty, branchConnector:true})
 												  : activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _monitorController:getController(), _canvasBranchView:_canvasBranchView, _x: activity.startXCoord , _y: activity.startYCoord, branchConnector:true});
 		// end-point connector hub
-		cHubEnd_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _canvasController:CanvasController(getController()), _canvasBranchView:_canvasBranchView, _x: activity.endXCoord , _y: activity.endYCoord, branchConnector:true})
+		cHubEnd_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _canvasController:CanvasController(getController()), _canvasBranchView:_canvasBranchView, _x: _endx , _y: _endy, branchConnector:true})
 												: activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _monitorController:MonitorController(getController()), _canvasBranchView:_canvasBranchView, _x: activity.endXCoord , _y: activity.endYCoord, branchConnector:true});
-
+		this.onEnterFrame = hitConnectorHubs;
+		
+	}
+	
+	private function hitConnectorHubs() {
+		delete this.onEnterFrame;
+		
+		startHub.hit();
+		endHub.hit();
 	}
 	
 	private function loadSequenceActivities() {
@@ -780,5 +796,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		if(model instanceof CanvasModel) return CanvasModel(model).ddm
 		else return MonitorModel(model).ddm;
 	}
+
+	
 
 }
