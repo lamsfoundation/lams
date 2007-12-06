@@ -1021,6 +1021,8 @@ My Courses Pages
 
 /* my courses grey buttons in the green bar */
 
+.mycourses-left-buttons {float:right; padding-left:10px;}
+
 .mycourses-right-buttons {float:left; padding-left:15px;  margin-top:6px; height:24px; font-size:11px;}
 
 #content a.add-lesson-button {

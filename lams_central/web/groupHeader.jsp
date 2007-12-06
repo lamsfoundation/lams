@@ -4,7 +4,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <div class="row">
-	<div class="left-buttons">
+	<div class="mycourses-left-buttons">
 		<h2><span class="j-group-icon" style="vertical-align:middle;"></span>&nbsp;<a class="j-group-header"><c:out value="${orgBean.name}" /></a>
 			<c:if test="${not empty orgBean.archivedDate}"><small>(<fmt:message key="label.archived"/> <lams:Date value="${orgBean.archivedDate}"/>)</small></c:if>
 		</h2>
