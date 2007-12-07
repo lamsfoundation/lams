@@ -416,15 +416,23 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				}
 			} else { 
 				if(start_value >= condition.startValue && start_value <= condition.endValue && start_value != null) {
+					Debugger.log("1", Debugger.CRITICAL, "validateLongCondition", "ToolOutputConditionsDialog");
+		
 					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_start_value")]), null);
 					return false;
 				} else if(end_value >= condition.startValue && end_value <= condition.endValue && end_value != null) {
+					Debugger.log("2", Debugger.CRITICAL, "validateLongCondition", "ToolOutputConditionsDialog");
+		
 					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_end_value")]), null);
 					return false;
-				} else if(end_value <= condition.endValue && start_value == null && condition.endValue != null) {
+				} else if(end_value >= condition.endValue && start_value == null && condition.endValue != null) {
+					Debugger.log("3", Debugger.CRITICAL, "validateLongCondition", "ToolOutputConditionsDialog");
+		
 					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_start_value")]), null);
 					return false;
-				} else if(start_value >= condition.startValue && end_value == null && condition.startValue != null) {
+				} else if(start_value <= condition.startValue && end_value == null && condition.startValue != null) {
+					Debugger.log("4", Debugger.CRITICAL, "validateLongCondition", "ToolOutputConditionsDialog");
+		
 					LFMessage.showMessageAlert(Dictionary.getValue("to_condition_invalid_value_range", [Dictionary.getValue("to_condition_end_value")]), null);
 					return false;
 				}
