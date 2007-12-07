@@ -378,15 +378,16 @@ class Canvas extends CanvasHelper {
 
 		_ddm.addActivity(actToAdd);
 		
-		//refresh the design
-		canvasModel.setDirty();
-		canvasModel.selectedItem = (canvasModel.activitiesDisplayed.get(actToAdd.activityUIID));
+		
+		canvasModel.haltRefresh(true);
 		
 		//select the new thing
 		if (taParent != undefined || taParent != null){
 			var sequenceAct:Activity = canvasModel.getCanvas().ddm.getActivityByUIID(taParent);
 			if(sequenceAct.isSequenceActivity() && sequence != null) {
 				actToAdd.orderID = canvasModel.getCanvas().ddm.getNextSequenceOrderID(sequenceAct.activityUIID);
+				
+				Debugger.log("sequence.lastActivity: " + sequence.lastActivity, Debugger.CRITICAL, "setDroppedTemplateActivity", "Canvas");
 				
 				if(actToAdd.orderID > 1) canvasModel.createSequenceTransition(sequence.lastActivity, actToAdd);
 				else ComplexActivity(sequenceAct).firstActivityUIID = actToAdd.activityUIID;							
@@ -401,6 +402,13 @@ class Canvas extends CanvasHelper {
 			
 			canvasModel.setDirty();
 		}
+		
+		canvasModel.haltRefresh(false);
+		
+		//refresh the design
+		canvasModel.setDirty();
+		canvasModel.selectedItem = (canvasModel.activitiesDisplayed.get(actToAdd.activityUIID));
+		
 		
 	}
 
