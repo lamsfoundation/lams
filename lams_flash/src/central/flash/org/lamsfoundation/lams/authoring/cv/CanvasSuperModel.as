@@ -219,8 +219,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		
 		//check for a new act in the dmm
 		if(cm_activity == null || cm_activity == undefined){
+			if(ddm_activity.isOptionalActivity())
+				setOptionalType(ComplexActivity(ddm_activity));
 			return r = "NEW";
 		}
+	}
+	
+	private function setOptionalType(optional:ComplexActivity):Void {
+		var _optChildren:Array = _cv.ddm.getComplexActivityChildren(optional.activityUIID);
+		for(var i=0; i<_optChildren.length; i++)
+			optional.isSequenceBased = _optChildren[i].isSequenceActivity();
+			
+		if(optional.isSequenceBased)
+			optional.noSequences = _optChildren.length;
 	}
 	
 	/**
