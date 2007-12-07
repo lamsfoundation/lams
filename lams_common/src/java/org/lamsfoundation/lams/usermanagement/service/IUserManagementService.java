@@ -448,4 +448,12 @@ public interface IUserManagementService {
 	 * @return list of Users
 	 */
 	public List getUsersFromOrganisation(Integer orgId, Integer filteredOrgId);
+	
+	/**
+	 * Tests whether user can edit the given org's details.
+	 * @param userId
+	 * @param orgId
+	 * @return boolean
+	 */
+	public boolean canEditGroup(Integer userId, Integer orgId);
 }

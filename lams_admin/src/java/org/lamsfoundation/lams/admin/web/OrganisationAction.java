@@ -28,9 +28,9 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -41,10 +41,13 @@ import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Fei Yang
@@ -60,8 +63,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  */
 public class OrganisationAction extends LamsDispatchAction {
 
-	private static Logger log = Logger.getLogger(OrganisationAction.class);
-
 	private static IUserManagementService service;
 	private static MessageService messageService;
 	private static List<SupportedLocale> locales; 
@@ -73,39 +74,64 @@ public class OrganisationAction extends LamsDispatchAction {
 		DynaActionForm orgForm = (DynaActionForm)form;
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
 		
-		if(!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) { 
-			if (orgForm.get("typeId")!=null && orgForm.get("typeId").equals(OrganisationType.COURSE_TYPE)
-					|| orgForm.get("typeId")==null) {
-				// only sysadmin and global group admin can create/edit groups
-				messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
-				request.setAttribute("errorName", "OrganisationAction");
-				request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
-				return mapping.findForward("error");
+		HttpSession session = SessionManager.getSession();
+		if (session != null) {
+			UserDTO userDto = (UserDTO)session.getAttribute(AttributeNames.USER);
+			if (userDto != null) {
+				Integer userId = userDto.getUserID();
+				// sysadmin, global group admin, group manager, group admin can edit group
+				if (service.canEditGroup(userId, orgId)) {
+					//	edit existing organisation
+					if (orgId != null){
+						Organisation org = (Organisation)service.findById(Organisation.class,orgId);
+						BeanUtils.copyProperties(orgForm,org);
+						orgForm.set("parentId",org.getParentOrganisation().getOrganisationId());
+						orgForm.set("parentName",org.getParentOrganisation().getName());
+						orgForm.set("typeId",org.getOrganisationType().getOrganisationTypeId());
+						orgForm.set("stateId",org.getOrganisationState().getOrganisationStateId());
+						SupportedLocale locale = org.getLocale();
+						orgForm.set("localeId",locale != null ? locale.getLocaleId() : null);
+					}
+					request.getSession().setAttribute("locales",locales);
+					request.getSession().setAttribute("status",status);
+					return mapping.findForward("organisation");
+				}
 			}
 		}
 		
-		if(orgId != null){//editing existing organisation
-			Organisation org = (Organisation)service.findById(Organisation.class,orgId);
-			BeanUtils.copyProperties(orgForm,org);
-			log.debug("Struts Populated orgId:"+(Integer)orgForm.get("orgId"));
-			orgForm.set("parentId",org.getParentOrganisation().getOrganisationId());
-			orgForm.set("parentName",org.getParentOrganisation().getName());
-			orgForm.set("typeId",org.getOrganisationType().getOrganisationTypeId());
-			orgForm.set("stateId",org.getOrganisationState().getOrganisationStateId());
-			SupportedLocale locale = org.getLocale();
-			orgForm.set("localeId",locale != null ? locale.getLocaleId() : null);
-		} else {
-			// creating new organisation
-			orgForm.set("orgId", null);
-			Integer parentId = WebUtil.readIntParam(request,"parentId",true);
-			if (parentId!=null) {
-				Organisation parentOrg = (Organisation)service.findById(Organisation.class,parentId);
-				orgForm.set("parentName", parentOrg.getName());
+		return error(mapping, request);
+	}
+	
+	public ActionForward create(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response) throws Exception{
+		service = AdminServiceProxy.getService(getServlet().getServletContext());
+		initLocalesAndStatus();
+		DynaActionForm orgForm = (DynaActionForm)form;
+		
+		if(!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
+			// only sysadmins and global group admins can create groups
+			if (orgForm.get("typeId")!=null && orgForm.get("typeId").equals(OrganisationType.COURSE_TYPE)
+					|| orgForm.get("typeId")==null) {
+				return error(mapping, request);
 			}
+		}
+		
+		// creating new organisation
+		orgForm.set("orgId", null);
+		Integer parentId = WebUtil.readIntParam(request,"parentId",true);
+		if (parentId!=null) {
+			Organisation parentOrg = (Organisation)service.findById(Organisation.class,parentId);
+			orgForm.set("parentName", parentOrg.getName());
 		}
 		request.getSession().setAttribute("locales",locales);
 		request.getSession().setAttribute("status",status);
 		return mapping.findForward("organisation");
+	}
+	
+	private ActionForward error(ActionMapping mapping, HttpServletRequest request) {
+		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+		request.setAttribute("errorName", "OrganisationAction");
+		request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
+		return mapping.findForward("error");
 	}
 
 	/*public ActionForward remove(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response){

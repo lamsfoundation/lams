@@ -1045,4 +1045,17 @@ public class UserManagementService implements IUserManagementService {
 			+ " order by uo.user.login";
 		return baseDAO.find(query);
 	}
+	
+	public boolean canEditGroup(Integer userId, Integer orgId) {
+		if (isUserSysAdmin() || isUserGlobalGroupAdmin()) return true;
+		Organisation org = (Organisation)findById(Organisation.class, orgId);
+		if (org != null) {
+			if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
+				Integer parentOrgId = org.getParentOrganisation().getOrganisationId();
+				return (isUserInRole(userId, parentOrgId, Role.GROUP_ADMIN)
+						|| (isUserInRole(userId, parentOrgId, Role.GROUP_MANAGER))); 
+			}
+		}
+		return false;
+	}
 }

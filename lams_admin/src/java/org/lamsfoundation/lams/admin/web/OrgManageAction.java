@@ -154,8 +154,9 @@ public class OrgManageAction extends Action {
 		orgManageForm.setOrgManageBeans(orgManageBeans);
 		request.setAttribute("OrgManageForm",orgManageForm);
 		// let the jsp know whether to display links
-		request.setAttribute("createOrEditGroup",request.isUserInRole(Role.SYSADMIN)
+		request.setAttribute("createGroup",request.isUserInRole(Role.SYSADMIN)
 				|| service.isUserGlobalGroupAdmin());
+		request.setAttribute("editGroup", service.canEditGroup(userId, orgId));
 		request.setAttribute("manageGlobalRoles", request.isUserInRole(Role.SYSADMIN));
 		return mapping.findForward("orglist");
 	}

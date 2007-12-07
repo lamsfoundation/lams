@@ -19,9 +19,9 @@
 	</h2>
 	<p>&nbsp;</p>
 	<p align="right">
-	<logic:equal name="createOrEditGroup" value="true">
+	<logic:equal name="createGroup" value="true">
 		<c:url var="editaction" value="organisation.do">
-			<c:param name="method" value="edit" />
+			<c:param name="method" value="create" />
 			<c:param name="typeId" value="2" />
 			<c:param name="parentId" value="${OrgManageForm.parentId}" />
 		</c:url>
@@ -40,14 +40,14 @@
 	</h2>
 	<p>&nbsp;</p>
 	<c:url var="editaction" value="organisation.do">
-		<c:param name="method" value="edit" />
+		<c:param name="method" value="create" />
 		<c:param name="typeId" value="3" />
 		<c:param name="parentId" value="${OrgManageForm.parentId}" />
 	</c:url>
 	<p align="right">
 		<input class="button" type="button" value='<fmt:message key="admin.class.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' />
 		<input class="button" type="button" value='<fmt:message key="admin.user.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
-		<logic:equal name="createOrEditGroup" value="true">
+		<logic:equal name="editGroup" value="true">
 			<input class="button" type="button" value='<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
 		</logic:equal>
 	</p>
