@@ -313,7 +313,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			
 			if(SequenceActivity(sequenceActs[i]).activityUIID == activity.firstActivityUIID) {
 				// (monitoring) entering this if statement
-				defaultSequenceActivity = SequenceActivity(sequenceActs[i]);
 				model.addNewBranch(SequenceActivity(sequenceActs[i]), activity, true);
 			} else {
 				model.addNewBranch(SequenceActivity(sequenceActs[i]), activity, false);
@@ -372,7 +371,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	private function addSequence(a:SequenceActivity, cm:CanvasModel):Boolean{
 		if(a.parentUIID == activity.activityUIID) {
-			defaultSequenceActivity = a;
+			if(a.firstActivityUIID == null)
+				defaultSequenceActivity = a;
+			
 			var sequenceObj = new Object();
 			sequenceObj.activity = a;
 			

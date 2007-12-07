@@ -613,6 +613,8 @@ class PropertyInspector extends PropertyInspectorControls {
 	}
 	
 	private function showBranchProperties(b:Branch){
+		Debugger.log("branch sequence: " + b.sequenceActivity.activityUIID, Debugger.CRITICAL, "showBranchProperties", "PropertyInspector");
+		
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_activity_type_sequence', [Dictionary.getValue('branch_btn')]);
 		title_txt.text = b.sequenceActivity.title;
 		
