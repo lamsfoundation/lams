@@ -100,36 +100,34 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	}
 	
 	public function init():Void{
-		
-		
-		
+
 		//set up some handlers:
 		clickTarget_mc.onPress = Proxy.create(this,localOnPress);
 		clickTarget_mc.onRelease = Proxy.create(this,localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create(this,localOnReleaseOutside);
 
-		_ddm.getComplexActivityChildren(_activity.activityUIID);
-		
 		showStatus(false);
 		
 		var child1:Activity;
 		var child2:Activity;
+		
 		if(_children[0].orderID < _children[1].orderID){
 			child1 = _children[0];
 			child2 = _children[1];
-			
 		}else{
 			child1 = _children[1];
 			child2 = _children[0];
-		
 		}
+		
 		//set the positioning co-ords
-			newContainerXCoord = container_pnl._width/2
-			newContainerYCoord = container_pnl._height/2
-			child1.xCoord = CHILD_OFFSET_X //+ (newContainerXCoord-CHILD_OFFSET_X);
-			child1.yCoord = CHILD1_OFFSET_Y;
-			child2.xCoord = CHILD_OFFSET_X //+ (newContainerXCoord-CHILD_OFFSET_X);
-			child2.yCoord = CHILD2_OFFSET_Y //+ newContainerYCoord;
+		newContainerXCoord = container_pnl._width/2
+		newContainerYCoord = container_pnl._height/2
+			
+		child1.xCoord = CHILD_OFFSET_X //+ (newContainerXCoord-CHILD_OFFSET_X);
+		child1.yCoord = CHILD1_OFFSET_Y;
+		child2.xCoord = CHILD_OFFSET_X //+ (newContainerXCoord-CHILD_OFFSET_X);
+		child2.yCoord = CHILD2_OFFSET_Y //+ newContainerYCoord;
+		
 		//so now it is placed on in the IDE and we just call init
 		if (fromModuleTab == "monitorMonitorTab"){
 			child1_mc.init({activity:child1,_monitorController:_monitorController,_monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
@@ -140,7 +138,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 			child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
 			
 		}
-		
 		
 		//let it wait one frame to set up the components.
 		MovieClipUtils.doLater(Proxy.create(this,draw));

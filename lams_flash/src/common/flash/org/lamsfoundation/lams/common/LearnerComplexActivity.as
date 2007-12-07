@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.learner.Application;
 import org.lamsfoundation.lams.monitoring.mv.MonitorController;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
 import org.lamsfoundation.lams.common.style. *;
+
 import mx.controls. *;
 import mx.managers. *
 /**
@@ -98,13 +99,13 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		complexActivity_mc = this;
 		activeSequence = null;
 		
-		_ddm = new DesignDataModel();
 		app = ApplicationParent.getInstance();
 	
 		_visible = false;
 		
-		_tm = ThemeManager.getInstance ();
+		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
+		
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
 		

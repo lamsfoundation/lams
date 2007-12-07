@@ -258,10 +258,11 @@ class ApplicationParent {
     static function get dialogue():MovieClip {
         //Return root if valid otherwise raise a big system error as app. will not work without it
         if(_instance.dialogueContainer != undefined) {
-            return _instance.dialogueContainer;
+           
+		   return _instance.dialogueContainer;
         } else {
             //TODO DI 11/05/05 Raise error if mc hasn't been created
-			
+			Debugger.log("dialogue undefined: " + _instance, Debugger.CRITICAL, "dialogue", "ApplicationParent");
         }
     }
 	
@@ -270,8 +271,8 @@ class ApplicationParent {
 	}
 	
 	public function get dialogueContainer():MovieClip {
-		Debugger.log("check application root: " + _appRoot_mc, Debugger.CRITICAL, "dialogueContainer", "ApplicationParent");
-		if(_dialogueContainer_mc == undefined || _dialogueContainer_mc == null) _dialogueContainer_mc = _appRoot_mc.createEmptyMovieClip('_dialogueContainer_mc', DIALOGUE_DEPTH);
+		Debugger.log("check application root: " + _root, Debugger.CRITICAL, "dialogueContainer", "ApplicationParent");
+		if(_dialogueContainer_mc == undefined || _dialogueContainer_mc == null) _dialogueContainer_mc = _root.createEmptyMovieClip('_dialogueContainer_mc', DIALOGUE_DEPTH);
 		return _dialogueContainer_mc;
 	}
 	
