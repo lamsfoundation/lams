@@ -192,8 +192,8 @@ class PropertyInspectorControls extends MovieClip {
 		runOffline_chk.label = Dictionary.getValue('pi_runoffline');
 				
 		//Complex Activity
-		min_lbl.text = Dictionary.getValue('pi_min_act');
-		max_lbl.text = Dictionary.getValue('pi_max_act');
+		//min_lbl.text = Dictionary.getValue('pi_min_act');
+		//max_lbl.text = Dictionary.getValue('pi_max_act');
 		
 		noSeqAct_lbl.text = Dictionary.getValue('pi_no_seq_act');
 		
@@ -356,19 +356,13 @@ class PropertyInspectorControls extends MovieClip {
 	} 
 	
 	private function showOptionalSequenceControls(v:Boolean, e:Boolean){
-		desc_lbl.visible = v;
-		desc_txt.visible = v;
 		noSeqAct_lbl.visible = v;
 		noSeqAct_cmb.visible = v;
 		
 		if(e != null) {
 			noSeqAct_cmb.enabled = e;
 			noSeqAct_lbl.enabled = e;
-			desc_lbl.enabled = e;
-			desc_txt.enabled = e;
 		}
-		
-		grouping_lbl.visible = false;
 
 	}
 	
@@ -401,34 +395,42 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	private function checkEnableOptionalControls(e:Boolean):Void {
-		
+		if(e != null) {
+			minAct_stp.enabled = e;
+			maxAct_stp.enabled = e;
+		} else {
+			minAct_stp.enabled = true;
+			maxAct_stp.enabled = true;
+		}
+			
 		if(CanvasOptionalActivity(_canvasModel.selectedItem).type == CanvasOptionalActivity.SEQ_TYPE) {
 			if(e != null)
 				noSeqAct_cmb.enabled = e;
 			else
 				noSeqAct_cmb.enabled = true;
+				
 			
-			MovieClipUtils.doLater(Proxy.create(this,showOptionalControlsLater, true));
-		} else {
-			if(e != null) {
-				minAct_stp.enabled = e;
-				maxAct_stp.enabled = e;
-			} else {
-				minAct_stp.enabled = true;
-				maxAct_stp.enabled = true;
-			}
+			MovieClipUtils.doLater(Proxy.create(this, showOptionalControlsLater, true));
 			
+		} else {	
 			MovieClipUtils.doLater(Proxy.create(this, showOptionalControlsLater, false));
 		}
-		
 	
 	}
 	
 	private function showOptionalControlsLater(isSequence:Boolean):Void {
-		if(isSequence)
+		if(isSequence) {
+			min_lbl.text = Dictionary.getValue('pi_min_act', [Dictionary.getValue('pi_seq')]);
+			max_lbl.text = Dictionary.getValue('pi_max_act', [Dictionary.getValue('pi_seq')]);
+			
 			MovieClipUtils.doLater(Proxy.create(this, showOptionalSequenceControls, true));
-		else
 			MovieClipUtils.doLater(Proxy.create(this, showOptionalActivityControls, true));
+		} else {
+			min_lbl.text = Dictionary.getValue('pi_min_act', [Dictionary.getValue('pi_act')]);
+			max_lbl.text = Dictionary.getValue('pi_max_act', [Dictionary.getValue('pi_act')]);
+			
+			MovieClipUtils.doLater(Proxy.create(this, showOptionalActivityControls, true));
+		}
 	}
 	
 	private function showGateControls(v:Boolean, e:Boolean){

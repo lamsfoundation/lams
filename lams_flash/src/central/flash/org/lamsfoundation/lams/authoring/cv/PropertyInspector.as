@@ -452,9 +452,10 @@ class PropertyInspector extends PropertyInspectorControls {
 	}
 	
 	private function showOptionalActivityProperties(ca:ComplexActivity){
-		if(ca.isSequenceBased) return showOptionalSequenceActivityProperties(ca);
+		if(ca.isSequenceBased) showOptionalSequenceActivityProperties(ca);
 	
-		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_optional_title');
+		toolDisplayName_lbl.text = (!ca.isSequenceBased) ? "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_optional_title')
+														: toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('opt_activity_seq_title');
 		
 		runOffline_chk.selected = ca.runOffline;
 		defineLater_chk.selected = ca.defineLater;
@@ -475,10 +476,10 @@ class PropertyInspector extends PropertyInspectorControls {
 	}
 	
 	private function showOptionalSequenceActivityProperties(ca:ComplexActivity){
-		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('opt_activity_seq_title');
+		//toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('opt_activity_seq_title');
 		
-		runOffline_chk.selected = ca.runOffline;
-		defineLater_chk.selected = ca.defineLater;
+		//runOffline_chk.selected = ca.runOffline;
+		//defineLater_chk.selected = ca.defineLater;
 		
 		if(ca.noSequences == undefined)
 			noSeqAct_cmb.selectedIndex = 0;
