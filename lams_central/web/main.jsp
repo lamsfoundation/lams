@@ -37,10 +37,12 @@
 	<script language="javascript" type="text/javascript">
 		<!--
 			jQuery(document).ready(function(){
+				<c:if test="${not empty collapsedOrgDTOs}">
 				jQuery("div.course-bg").each(function(){
 					var display = jQuery.trim(jQuery(this).text());
 					initLoadGroup(this, <c:if test="${empty tab}">1</c:if><c:if test="${tab eq 'profile'}">3</c:if>, display);
 				});
+				</c:if>
 			});
 		
 			function getEnableSortingText() {
@@ -148,9 +150,12 @@
 								</c:forEach>
 								<c:if test="${empty collapsedOrgDTOs}">
 									<c:if test="${not empty showGroups}">
-										<div align="center" style="padding:30px;">
+										<!-- div align="center" style="padding:30px;">
 											<a onclick="document.location.href='index.do?groups=show';"><fmt:message key="label.show.groups"/></a>
-										</div>
+										</div-->
+										<div class="course-bg"><div class="row"><div class="mycourses-right-buttons">
+											<a class="show-all-groups-button" onclick="document.location.href='index.do?groups=show';"><fmt:message key="label.show.groups"/></a>
+										</div></div></div>
 									</c:if>
 									<c:if test="${empty showGroups}">
 										<p class="align-left"><fmt:message key="msg.groups.empty" /></p>

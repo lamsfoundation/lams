@@ -1049,6 +1049,25 @@ My Courses Pages
 	border-bottom: 0px;
 }
 
+#content a.show-all-groups-button {
+	background: url('../images/css/show_all_groups.jpg') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 16px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+}
+
+#content a:hover.show-all-groups-button {
+	background: url('../images/css/show_all_groups.jpg') no-repeat 0px 0px;
+	color: #47bc23;
+	padding: 5px 12px 6px 16px;
+	text-decoration: none;
+	text-align:left;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+}
+
 /* my courses individual course boxes */
 
 .course-bg {  /*---- box around the green tabbed items -- */
