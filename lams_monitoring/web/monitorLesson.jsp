@@ -169,22 +169,22 @@ String actColour = Configuration.get(ConfigurationKeys.AUTHORING_ACTS_COLOUR);
 String allowDirectLessonLaunch = Configuration.get(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH);
 String allowEditOnFly = Configuration.get(ConfigurationKeys.ALLOW_EDIT_ON_FLY);
 String version = Configuration.get(ConfigurationKeys.VERSION);
+String numLearnersProgress = Configuration.get(ConfigurationKeys.LEARNER_PROGRESS_BATCH_SIZE);
 %>
-
 	<%-- lessonID is passed in as request parameters by addLesson.jsp in lams_central. --%>
-	<c:set var="monitorurl_params">?loadFile=monitoring/lams_monitoring.swf&loadLibrary=monitoring/lams_monitoring_library.swf&userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&version=<%=version%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&actColour=<%= actColour %>&lessonLaunch=<%=allowDirectLessonLaunch%>&editOnFly=<%=allowEditOnFly%></c:set>
+	<c:set var="monitorurl_params">?loadFile=monitoring/lams_monitoring.swf&loadLibrary=monitoring/lams_monitoring_library.swf&userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&version=<%=version%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&actColour=<%= actColour %>&lessonLaunch=<%=allowDirectLessonLaunch%>&editOnFly=<%=allowEditOnFly%>&pb=<%=numLearnersProgress%></c:set>
 	<c:set var="monitorurl_js">../lams_preloader<c:out value="${monitorurl_params}"/></c:set>
 	<c:set var="monitorurl_nojs">../lams_preloader.swf<c:out value="${monitorurl_params}"/></c:set>
 
-	<script type="text/javascript">
+ 	<script type="text/javascript">
 		AC_FL_RunContent('classid', 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000', 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0','width','100%','height','100%','align','left','src','<c:out value="${monitorurl_js}" escapeXml="false"/>','quality','high','scale','noscale','bgcolor','#FFFFFF','name','monitor', 'id', 'monitor', 'allowscriptaccess','sameDomain', 'swliveconnect', true, 'type', 'application/x-shockwave-flash', 'pluginspage','http://www.macromedia.com/go/getflashplayer','movie', '<c:out value="${monitorurl_js}" escapeXml="false"/>' );
 	</script>
 
-	<noscript>
+	<noscript> 
 		<!-- URL's used in the movie-->
 		<!-- text used in the movie-->
 		<!--Library-->
-		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+ 		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
 		 codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0" name="monitoring"
 		 width="100%" height="100%" align="left" id="monitoring">
 		  <param name="allowScriptAccess" value="sameDomain" />
@@ -208,5 +208,6 @@ String version = Configuration.get(ConfigurationKeys.VERSION);
 			  pluginspage="http://www.macromedia.com/go/getflashplayer" />
 		</object>
 	</noscript>
+	
 </BODY>
 </lams:html>
