@@ -100,9 +100,9 @@ public class RandomGrouping extends Grouping
      * This method creates a deep copy of the Grouping 
      * @return RandomGrouping The deep copied Grouping object
      */
-    public Grouping createCopy(){
+    public Grouping createCopy(int uiidOffset){
     	RandomGrouping randomGrouping = new RandomGrouping();    	
-    	copyGroupingFields(randomGrouping);
+    	copyGroupingFields(randomGrouping,  uiidOffset);
     	
     	randomGrouping.setNumberOfGroups(this.getNumberOfGroups());
     	randomGrouping.setLearnersPerGroup(this.getLearnersPerGroup());

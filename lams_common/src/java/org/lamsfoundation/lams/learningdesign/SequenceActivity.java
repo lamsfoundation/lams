@@ -141,9 +141,9 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
      * Makes a copy of the SequenceActivity for authoring, preview and monitoring environment
      * @return SequenceActivity Returns a deep-copy of the originalActivity
      */
-    public Activity createCopy(){
+    public Activity createCopy(int uiidOffset){
     	SequenceActivity newSequenceActivity = new SequenceActivity();
-    	copyToNewComplexActivity(newSequenceActivity);
+    	copyToNewComplexActivity(newSequenceActivity, uiidOffset);
     	newSequenceActivity.defaultActivity = this.defaultActivity;
     	newSequenceActivity.systemTool = this.systemTool;
     	
@@ -153,9 +153,12 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
 			while ( iter.hasNext() ) {
 				BranchActivityEntry oldEntry = (BranchActivityEntry) iter.next();
 				BranchActivityEntry newEntry = new BranchActivityEntry(null, 
-						oldEntry.getEntryUIID(), newSequenceActivity, oldEntry.getBranchingActivity(), oldEntry.getGroup());
+						LearningDesign.addOffset(oldEntry.getEntryUIID(), uiidOffset), newSequenceActivity, 
+						oldEntry.getBranchingActivity(), oldEntry.getGroup());
 				if ( oldEntry.getCondition() != null ) {
-					newEntry.setCondition(oldEntry.getCondition().clone());
+					BranchCondition newCondition = oldEntry.getCondition().clone(uiidOffset);
+					newEntry.setCondition(newCondition);
+					
 				}
 				newSequenceActivity.getBranchEntries().add(newEntry);
 			}

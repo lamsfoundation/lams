@@ -134,11 +134,11 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
      * Makes a copy of the BranchingActivity for authoring, preview and monitoring environment 
      * @return BranchingActivity Returns a deep-copy of the originalActivity
      */
-    public Activity createCopy(){
+    public Activity createCopy(int uiidOffset){
     	
     	GroupBranchingActivity newBranchingActivity = new GroupBranchingActivity();
     	copyBranchingFields(newBranchingActivity);
-    	copyToNewComplexActivity(newBranchingActivity);
+    	copyToNewComplexActivity(newBranchingActivity, uiidOffset);
     	return newBranchingActivity;
     }
 

@@ -150,12 +150,12 @@ public class GroupingActivity extends SimpleActivity implements Serializable, IS
      * 
      * @return GroupActivity, which is copy of this activity. 
      */
-    public Activity createCopy(){
+    public Activity createCopy(int uiidOffset){
     	GroupingActivity groupingActivity = new GroupingActivity();
-    	copyToNewActivity(groupingActivity);
-    	groupingActivity.setCreateGroupingUIID(this.createGroupingUIID);
+    	copyToNewActivity(groupingActivity, uiidOffset);
+    	groupingActivity.setCreateGroupingUIID(LearningDesign.addOffset(this.createGroupingUIID, uiidOffset));
     	Grouping currentGrouping = this.getCreateGrouping();
-    	Grouping newGrouping = currentGrouping.createCopy();
+    	Grouping newGrouping = currentGrouping.createCopy(uiidOffset);
     	groupingActivity.setCreateGrouping(newGrouping);
     	return groupingActivity;    	
     }
@@ -202,9 +202,9 @@ public class GroupingActivity extends SimpleActivity implements Serializable, IS
 		this.systemTool = systemTool;
 	}
  
-    protected void copyToNewActivity(GroupingActivity newActivity ) {
+    protected void copyToNewActivity(GroupingActivity newActivity, int uiidOffset ) {
 
-    	super.copyToNewActivity(newActivity);
+    	super.copyToNewActivity(newActivity, uiidOffset);
     	newActivity.setSystemTool(this.getSystemTool());
     }
 

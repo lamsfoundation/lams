@@ -128,9 +128,9 @@ public class SynchGateActivity extends GateActivity implements Serializable {
      * Makes a copy of the SynchGateActivity for authoring, preview and monitoring enviornment 
      * @return SynchGateActivity Returns a deep-copy of the originalActivity
      */    
-    public Activity createCopy() {
+    public Activity createCopy(int uiidOffset) {
     	SynchGateActivity newSynchGateActivity = new SynchGateActivity();
-    	copyToNewActivity(newSynchGateActivity);
+    	copyToNewActivity(newSynchGateActivity, uiidOffset);
     	newSynchGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
     	newSynchGateActivity.setGateOpen(new Boolean(false));
     	return newSynchGateActivity;    	

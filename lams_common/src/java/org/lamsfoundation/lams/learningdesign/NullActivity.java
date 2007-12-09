@@ -42,7 +42,7 @@ public class NullActivity extends Activity {
 	 * subclass as the activity being copied 
 	 * @return deep copy of this object
 	 */
-   public Activity createCopy() {
+   public Activity createCopy(int uiidOffset) {
    		return new NullActivity();
    }
 

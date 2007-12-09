@@ -130,9 +130,9 @@ public class PermissionGateActivity extends GateActivity implements Serializable
      * Makes a copy of the PermissionGateActivity for authoring, preview and monitoring enviornment 
      * @return PermissionGateActivity Returns a deep-copy of the originalActivity
      */
-    public Activity createCopy(){
+    public Activity createCopy(int uiidOffset){
     	PermissionGateActivity newPermissionGateActivity = new PermissionGateActivity();
-    	copyToNewActivity(newPermissionGateActivity);
+    	copyToNewActivity(newPermissionGateActivity, uiidOffset);
     	newPermissionGateActivity.setGateOpen(new Boolean(false));
     	newPermissionGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
     	return newPermissionGateActivity;

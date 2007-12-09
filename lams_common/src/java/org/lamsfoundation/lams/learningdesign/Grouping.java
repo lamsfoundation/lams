@@ -121,7 +121,7 @@ public abstract class Grouping implements Serializable
 	 *  
 	 * @return deep copy of this object
 	 */
-    public abstract Grouping createCopy();
+    public abstract Grouping createCopy(int uiidOffset);
 
     /** 
      * Copy all the groups within this grouping to the newGrouping object.
@@ -129,15 +129,16 @@ public abstract class Grouping implements Serializable
      * mappings, updating the group but not the activity. Used by createCopy()
      * implementations.
      */
-    protected void copyGroupingFields(Grouping newGrouping){
+    protected void copyGroupingFields(Grouping newGrouping, int  uiidOffset){
       	newGrouping.setMaxNumberOfGroups(this.getMaxNumberOfGroups());
-      	newGrouping.setGroupingUIID(this.getGroupingUIID());
+      	newGrouping.setGroupingUIID(LearningDesign.addOffset(this.getGroupingUIID(), uiidOffset));
    
     	if ( this.getGroups() != null && this.getGroups().size() > 0 ) {
 			Iterator iter = this.getGroups().iterator();
 			while ( iter.hasNext() ) {
 				Group oldGroup = (Group) iter.next();
 		    	Group newGroup = oldGroup.createCopy(newGrouping);
+		    	newGroup.setGroupUIID(LearningDesign.addOffset(newGroup.getGroupUIID(), uiidOffset));
 		    	newGrouping.getGroups().add(newGroup);
 			}
     	}

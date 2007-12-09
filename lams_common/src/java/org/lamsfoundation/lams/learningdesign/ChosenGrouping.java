@@ -47,10 +47,10 @@ public class ChosenGrouping extends Grouping
      * This method creates a deep copy of the Grouping 
      * @return ChosenGrouping The deep copied Grouping object
      */
-    public Grouping createCopy()
+    public Grouping createCopy(int uiidOffset)
     {
     	ChosenGrouping chosenGrouping = new ChosenGrouping();
-    	copyGroupingFields(chosenGrouping);
+    	copyGroupingFields(chosenGrouping, uiidOffset);
     	return chosenGrouping;
     }
 

@@ -131,11 +131,11 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
      * Makes a copy of the BranchingActivity for authoring, preview and monitoring environment 
      * @return BranchingActivity Returns a deep-copy of the originalActivity
      */
-    public Activity createCopy(){
+    public Activity createCopy(int uiidOffset){
     	
     	ChosenBranchingActivity newBranchingActivity = new ChosenBranchingActivity();
     	copyBranchingFields(newBranchingActivity);
-    	copyToNewComplexActivity(newBranchingActivity);
+    	copyToNewComplexActivity(newBranchingActivity, uiidOffset);
     	
     	return newBranchingActivity;
     }

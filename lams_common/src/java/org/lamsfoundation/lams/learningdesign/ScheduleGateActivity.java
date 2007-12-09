@@ -190,9 +190,9 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      * Makes a copy of the ScheduleGateActivity for authoring, preview and monitoring enviornment 
      * @return ScheduleGateActivity Returns a deep-copy of the originalActivity
      */
-    public Activity createCopy(){
+    public Activity createCopy(int uiidOffset){
     	ScheduleGateActivity newScheduleGateActivity = new ScheduleGateActivity();
-    	copyToNewActivity(newScheduleGateActivity);
+    	copyToNewActivity(newScheduleGateActivity, uiidOffset);
     	newScheduleGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
     	newScheduleGateActivity.setGateOpen(new Boolean(false));
     	

@@ -550,5 +550,9 @@ public class LearningDesign implements Serializable {
 		return new FolderContentDTO();
 	}
 		
+   public static Integer addOffset(Integer uiid, int uiidOffset) {
+    	return uiid != null && uiidOffset > 0 ? new Integer(uiid.intValue() + uiidOffset) : uiid;
+   	}
+
 
 }

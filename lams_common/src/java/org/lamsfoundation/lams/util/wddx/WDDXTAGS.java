@@ -213,8 +213,8 @@ public interface WDDXTAGS {
 	public static final String CONDITION_END_VALUE = "endValue";
 	public static final String CONDITION_EXACT_MATCH_VALUE = "exactMatchValue";
 
-	
-
-	
+	/** LD Import specific tags */
+	public static final String LEARNING_DESIGN_TO_IMPORT_ID="learningDesignIDToImport";
+	public static final String CREATE_NEW_LEARNING_DESIGN="createNewLearningDesign";
 	
 }

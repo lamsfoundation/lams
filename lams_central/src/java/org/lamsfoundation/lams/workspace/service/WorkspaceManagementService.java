@@ -578,7 +578,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 				LearningDesign design = (LearningDesign)iterator.next();
 				authoringService.copyLearningDesign(design,
 													new Integer(LearningDesign.COPY_TYPE_NONE),
-													user,targetWorkspaceFolder, false);
+													user,targetWorkspaceFolder, false, null);
 			}
 		}
 	}

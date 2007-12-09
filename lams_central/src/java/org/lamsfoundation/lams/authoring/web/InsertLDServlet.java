@@ -23,63 +23,78 @@
 /* $$Id$$ */ 
 package org.lamsfoundation.lams.authoring.web;
 
+import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.dto.StoreLearningDesignResultsDTO;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.web.servlet.AbstractStoreWDDXPacketServlet;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+
 /**
- * Store a learning design.
+ * Insert a learning design into another learning design. This is a copy and paste type of copy - it just dumps the contents (with modified 
+ * activity ui ids) in the main learning design. It doesn't wrap up the contents in a sequence activity. Always sets the type to COPY_TYPE_NONE.
  * 
  * @author Fiona Malikoff
  *
- * @web:servlet name="storeLD"
- * @web:servlet-mapping url-pattern="/servlet/authoring/storeLearningDesignDetails"
+ * @web:servlet name="insertLearningDesign"
+ * @web:servlet-mapping url-pattern="/servlet/authoring/insertLearningDesign"
  */
-public class StoreLDServlet extends AbstractStoreWDDXPacketServlet {
+public class InsertLDServlet extends AbstractStoreWDDXPacketServlet {
 
-	private static final long serialVersionUID = -2298959991408815691L;
-	private static Logger log = Logger.getLogger(StoreLDServlet.class);
+//	private static final long serialVersionUID = -2298959991408815691L;
+	private static Logger log = Logger.getLogger(InsertLDServlet.class);
+
+	private Integer getUserId() {
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		return user != null ? user.getUserID() : null;
+	}
 
 	public IAuthoringService getAuthoringService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 		return (IAuthoringService) webContext.getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);		
 	}
 
-	protected String process(String designDetails, HttpServletRequest request) 
+	protected String process(String wddxPacket, HttpServletRequest request) 
 		throws Exception
 		{
 			String returnPacket = null;
 			IAuthoringService authoringService = getAuthoringService();
-			
+
 			try {
-				
-				Long learningDesignID = authoringService.storeLearningDesignDetails(designDetails);
-				Vector<AuthoringActivityDTO> activityDTOS = authoringService.getToolActivities(learningDesignID);
-				Vector<ValidationErrorDTO> validationDTOS = authoringService.validateLearningDesign(learningDesignID);
-				FlashMessage flashMessage = null;
-				if ( validationDTOS != null &&validationDTOS.size()>0) {
-					flashMessage = new FlashMessage(getMessageKey(designDetails, request), 
-							new StoreLearningDesignResultsDTO(Boolean.FALSE,validationDTOS, activityDTOS, learningDesignID), FlashMessage.OBJECT_MESSAGE);
-				} else {
-					flashMessage = new FlashMessage(getMessageKey(designDetails, request), 
-							new StoreLearningDesignResultsDTO(Boolean.TRUE, activityDTOS, learningDesignID));			
-				}
-				returnPacket = flashMessage.serializeMessage();
+				Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
+
+			    Long originalLearningDesignID = WDDXProcessor.convertToLong(table,WDDXTAGS.LEARNING_DESIGN_ID);
+			    Long designToImportID = WDDXProcessor.convertToLong(table,WDDXTAGS.LEARNING_DESIGN_TO_IMPORT_ID);
+			    boolean createNewLearningDesign = WDDXProcessor.convertToBoolean(table,WDDXTAGS.CREATE_NEW_LEARNING_DESIGN);
+			    Integer folderID = WDDXProcessor.convertToInteger(table,WDDXTAGS.WORKSPACE_FOLDER_ID);
+			    String title = WDDXProcessor.convertToString(table,WDDXTAGS.TITLE);
+
+			    LearningDesign updatedLearningDesign = authoringService.insertLearningDesign(originalLearningDesignID, designToImportID, getUserId(), 
+			    		 createNewLearningDesign, title, folderID);
+				return new FlashMessage(getMessageKey(wddxPacket, request), updatedLearningDesign.getLearningDesignId()).serializeMessage();
 				
 			} catch ( Exception e) {
-				log.error("Authoring error. input packet was "+designDetails,e);
-				FlashMessage flashMessage = new FlashMessage(getMessageKey(designDetails, request),
+				log.error("Authoring error. input packet was "+wddxPacket,e);
+				FlashMessage flashMessage = new FlashMessage(getMessageKey(wddxPacket, request),
 						authoringService.getMessageService().getMessage("invalid.wddx.packet",new Object[]{e.getMessage()}),
 						FlashMessage.ERROR);
 				returnPacket = flashMessage.serializeMessage();
@@ -88,7 +103,7 @@ public class StoreLDServlet extends AbstractStoreWDDXPacketServlet {
 		}
 	
 	protected String getMessageKey(String designDetails, HttpServletRequest request) {
-		return IAuthoringService.STORE_LD_MESSAGE_KEY;
+		return IAuthoringService.INSERT_LD_MESSAGE_KEY;
 	}
 
 }

@@ -101,27 +101,27 @@ public class TestActivityDAO extends AbstractCommonTestCase {
 	}*/
 	public void testCreateToolActivityCopy(){
 		ToolActivity ta = (ToolActivity) activityDAO.getActivityByActivityId(new Long(20));
-		Activity newToolActivity = ta.createCopy();						
+		Activity newToolActivity = ta.createCopy(0);						
 		activityDAO.insert(newToolActivity);
 		assertNotNull(newToolActivity.getActivityId());
 	}
 	public void testCreateGroupingActivityCopy(){
 		GroupingActivity ga = (GroupingActivity) activityDAO.getActivityByActivityId(new Long(23));
 		Activity newGroupingActivity = null;
-		newGroupingActivity = ga.createCopy();			
+		newGroupingActivity = ga.createCopy(0);			
 		activityDAO.insert(newGroupingActivity);
 		assertNotNull(newGroupingActivity.getActivityId());
 	}
 	public void testCreateOptionsActivityCopy(){
 		OptionsActivity oa = (OptionsActivity) activityDAO.getActivityByActivityId(new Long(12));
 		Activity optionsActivity =null;
-		optionsActivity = oa.createCopy();
+		optionsActivity = oa.createCopy(0);
 		activityDAO.insert(optionsActivity);
 		assertNotNull(optionsActivity.getActivityId());		
 	}
 	public void testCreateParallelActivityCopy(){
 		ParallelActivity pa = (ParallelActivity) activityDAO.getActivityByActivityId(new Long(13));
-		Activity parallelActivity = pa.createCopy();
+		Activity parallelActivity = pa.createCopy(0);
 		activityDAO.insert(parallelActivity);
 		assertNotNull(parallelActivity.getActivityId());
 	}

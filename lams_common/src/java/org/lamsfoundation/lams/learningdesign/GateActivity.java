@@ -250,9 +250,9 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 		this.systemTool = systemTool;
 	}
  
-    protected void copyToNewActivity(GateActivity newActivity ) {
+    protected void copyToNewActivity(GateActivity newActivity, int uiidOffset) {
 
-    	super.copyToNewActivity(newActivity);
+    	super.copyToNewActivity(newActivity, uiidOffset);
     	newActivity.setSystemTool(this.getSystemTool());
     }
 

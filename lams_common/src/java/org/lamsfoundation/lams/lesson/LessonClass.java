@@ -92,7 +92,7 @@ public class LessonClass extends Grouping {
      * This method creates a deep copy of the LessonClass 
      * @return LessonClass The deep copied LessonClass object
      */
-    public Grouping createCopy()
+    public Grouping createCopy(int uiidOffset)
     {
     	LessonClass lessonClass = new LessonClass();
     	lessonClass.staffGroup = this.staffGroup;

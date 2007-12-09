@@ -116,20 +116,20 @@ public class Transition implements Serializable {
 	}
 
 	/**
-	 * Makes a copy of the Transition for authoring, preview and monitoring enviornment
+	 * Makes a copy of the Transition for authoring, preview and monitoring environment
 	 * 
 	 * @param originalTransition The transition to be deep-copied
 	 * @return Transition Returns a deep-copy o fthe originalTransition
 	 */
-	public static Transition createCopy(Transition originalTransition){
+	public static Transition createCopy(Transition originalTransition, int uiidOffset){
 		Transition newTransition = new Transition();
 		
-		newTransition.setTransitionUIID(originalTransition.getTransitionUIID());
+		newTransition.setTransitionUIID(LearningDesign.addOffset(originalTransition.getTransitionUIID(),uiidOffset));
 		newTransition.setDescription(originalTransition.getDescription());
 		newTransition.setTitle(originalTransition.getTitle());
 		newTransition.setCreateDateTime(new Date());
-		newTransition.setToUIID(originalTransition.getToUIID());
-		newTransition.setFromUIID(originalTransition.getFromUIID());		
+		newTransition.setToUIID(LearningDesign.addOffset(originalTransition.getToUIID(),uiidOffset));
+		newTransition.setFromUIID(LearningDesign.addOffset(originalTransition.getFromUIID(),uiidOffset));		
 		return newTransition;
 	}
 

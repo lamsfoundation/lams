@@ -204,8 +204,9 @@ public class BranchCondition implements Comparable {
     }
     
     /** Create a new BranchCondition based on itself, leaving conditionId as null */
-    public BranchCondition clone() {
-    	return new BranchCondition(null, conditionUIID, orderId, name, displayName, type, startValue, endValue, exactMatchValue);
+    public BranchCondition clone(int uiidOffset) {
+    	Integer newConditionUIID = LearningDesign.addOffset(conditionUIID, uiidOffset);
+    	return new BranchCondition(null, newConditionUIID, orderId, name, displayName, type, startValue, endValue, exactMatchValue);
     }
 
 	public int compareTo(Object arg0) {

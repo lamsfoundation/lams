@@ -150,9 +150,9 @@ public class ToolActivity extends SimpleActivity implements Serializable
      * 
      * @return ToolActivity Returns a deep-copy of the originalActivity
      */
-    public Activity createCopy(){    	
+    public Activity createCopy(int uiidOffset){    	
     	ToolActivity newToolActivity = new ToolActivity();
-    	copyToNewActivity(newToolActivity);
+    	copyToNewActivity(newToolActivity, uiidOffset);
 		newToolActivity.setTool(this.getTool());
 		newToolActivity.setToolContentId(this.getToolContentId());    	
     	return newToolActivity;

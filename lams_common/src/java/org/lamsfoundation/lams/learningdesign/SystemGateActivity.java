@@ -128,9 +128,9 @@ public class SystemGateActivity extends PermissionGateActivity implements Serial
      * Makes a copy of the SystemGateActivity for authoring, preview and monitoring enviornment 
      * @return SystemGateActivity Returns a deep-copy of the originalActivity
      */    
-    public Activity createCopy() {
+    public Activity createCopy(int uiidOffset) {
     	SystemGateActivity newSysGateActivity = new SystemGateActivity();
-    	copyToNewActivity(newSysGateActivity);
+    	copyToNewActivity(newSysGateActivity, uiidOffset);
     	newSysGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
     	newSysGateActivity.setGateOpen(new Boolean(false));
     	return newSysGateActivity;    	

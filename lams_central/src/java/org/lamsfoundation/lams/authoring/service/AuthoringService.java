@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.authoring.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +39,7 @@ import java.util.SortedMap;
 import java.util.Vector;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.id.Configurable;
@@ -705,30 +707,76 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		if(workspaceFolder==null)
 			throw new WorkspaceFolderException(messageService.getMessage("no.such.workspace.exist",new Object[]{workspaceFolderID}));
 		
-		return copyLearningDesign(originalDesign,copyType,user,workspaceFolder, setOriginalDesign);
+		return copyLearningDesign(originalDesign,copyType,user,workspaceFolder, setOriginalDesign,null);
 	}
 	
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer, org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.usermanagement.WorkspaceFolder)
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer, org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.usermanagement.WorkspaceFolder, java.lang.Boolean, java.lang.String)
      */
-    public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, WorkspaceFolder workspaceFolder, boolean setOriginalDesign)
+    public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, WorkspaceFolder workspaceFolder, 
+    							boolean setOriginalDesign, String newDesignName)
     	throws LearningDesignException
     {
-    	LearningDesign newLearningDesign  = LearningDesign.createLearningDesignCopy(originalLearningDesign,copyType, setOriginalDesign);
+    	String newTitle = newDesignName;
+    	if ( newTitle == null ) {
+    		newTitle = getUniqueNameForLearningDesign(originalLearningDesign.getTitle(), workspaceFolder!=null?workspaceFolder.getWorkspaceFolderId():null);
+    	}
+    	
+    	LearningDesign newLearningDesign  = LearningDesign.createLearningDesignCopy(originalLearningDesign,copyType,setOriginalDesign);
+    	newLearningDesign.setTitle(newTitle);
     	newLearningDesign.setUser(user);    	
     	newLearningDesign.setWorkspaceFolder(workspaceFolder);    	
+    	newLearningDesign.setEditOverrideLock(false);  // clear the live edit flag
     	learningDesignDAO.insert(newLearningDesign);
-    	HashMap<Integer, Activity> newActivities = updateDesignActivities(originalLearningDesign,newLearningDesign); 
-    	updateDesignTransitions(originalLearningDesign,newLearningDesign, newActivities);
+    	
+    	HashMap<Integer, Activity> newActivities = updateDesignActivities(originalLearningDesign,newLearningDesign,0); 
+    	updateDesignTransitions(originalLearningDesign,newLearningDesign, newActivities,0);
     	// set first activity assumes that the transitions are all set up correctly.
     	newLearningDesign.setFirstActivity(newLearningDesign.calculateFirstActivity());
     	newLearningDesign.setLearningDesignUIID(originalLearningDesign.getLearningDesignUIID());
-    	
-    	copyLearningDesignToolContent(newLearningDesign, originalLearningDesign, copyType);
-    	
-        return newLearningDesign;
+    	return newLearningDesign;
     }
     
+    /**
+     * @throws UserException 
+     * @throws WorkspaceFolderException 
+     * @throws IOException 
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#insertLearningDesign(java.lang.Long, java.lang.Long, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.Integer)
+     */
+     public LearningDesign insertLearningDesign(Long originalDesignID, Long designToImportID, Integer userID, boolean createNewLearningDesign, String newDesignName, Integer workspaceFolderID) throws UserException, WorkspaceFolderException, IOException {
+
+		User user = (User)baseDAO.find(User.class,userID);
+		if(user==null)
+			throw new UserException(messageService.getMessage("no.such.user.exist",new Object[]{userID}));
+
+ 		LearningDesign mainDesign = learningDesignDAO.getLearningDesignById(originalDesignID);
+		if(mainDesign==null)
+			throw new LearningDesignException(messageService.getMessage("no.such.learningdesign.exist",new Object[]{originalDesignID}));
+
+    	if ( createNewLearningDesign) {
+    		WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderID);
+    		if(workspaceFolder==null)
+    			throw new WorkspaceFolderException(messageService.getMessage("no.such.workspace.exist",new Object[]{workspaceFolderID}));
+
+    		mainDesign = copyLearningDesign(mainDesign, LearningDesign.COPY_TYPE_NONE, user, workspaceFolder, false, newDesignName );
+    	}
+    	
+
+		LearningDesign designToImport = learningDesignDAO.getLearningDesignById(designToImportID);
+		if(designToImport==null)
+			throw new LearningDesignException(messageService.getMessage("no.such.learningdesign.exist",new Object[]{designToImportID}));
+
+    	// now dump the import design into our main sequence. Leave the first activity ui id for the design as it is.
+    	int uiidOffset = mainDesign.getMaxID().intValue();
+    	HashMap<Integer, Activity> newActivities = updateDesignActivities(designToImport,mainDesign,uiidOffset); 
+    	updateDesignTransitions(designToImport,mainDesign, newActivities,uiidOffset);
+    	mainDesign.setMaxID(LearningDesign.addOffset(designToImport.getMaxID(),uiidOffset));
+    	mainDesign.setValidDesign(Boolean.FALSE);
+    	learningDesignDAO.update(mainDesign);
+    	
+    	return mainDesign;
+
+    }
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesignToolContent(org.lamsfoundation.lams.learningdesign.LearningDesign, org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer)
      */
@@ -737,60 +785,74 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
         for (Iterator i = design.getActivities().iterator(); i.hasNext();)
         {
             Activity currentActivity = (Activity) i.next();
-            if (currentActivity.isToolActivity())
+            if (currentActivity.isToolActivity()) 
             {
-                try {
-                	ToolActivity toolActivity = (ToolActivity) currentActivity;
-                	// copy the content, but don't set the define later flags if it is preview
-                    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, copyType.intValue() != LearningDesign.COPY_TYPE_PREVIEW);
-                    toolActivity.setToolContentId(newContentId);
-                    
-                    // clear read only field
-                    toolActivity.setReadOnly(false);
-                    
-                } catch (DataMissingException e) {
-                    String error = "Unable to initialise the lesson. Data is missing for activity "+currentActivity.getActivityUIID()
-                            +" in learning design "+originalLearningDesign.getLearningDesignId()
-                            +" default content may be missing for the tool. Error was "
-                            +e.getMessage();
-                    log.error(error,e);
-                    throw new LearningDesignException(error,e);
-                } catch (ToolException e) {
-                    String error = "Unable to initialise the lesson. Tool encountered an error copying the data is missing for activity "
-                            +currentActivity.getActivityUIID()
-                            +" in learning design "+originalLearningDesign.getLearningDesignId()
-                            +" default content may be missing for the tool. Error was "
-                            +e.getMessage();
-                    log.error(error,e);
-                    throw new LearningDesignException(error,e);
-                }
-
+                copyActivityToolContent(currentActivity, design.getCopyTypeID(), originalLearningDesign.getLearningDesignId());
             }
         }
         
         return design;
     }
+
+	/**
+	 * @param originalLearningDesign
+	 * @param copyType
+	 * @param currentActivity
+	 */
+	private void copyActivityToolContent(Activity activity,	Integer ldCopyType, Long originalLearningDesignId) {
+		try {
+			ToolActivity toolActivity = (ToolActivity) activity;
+			// copy the content, but don't set the define later flags if it is preview
+		    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, ldCopyType != LearningDesign.COPY_TYPE_PREVIEW);
+		    toolActivity.setToolContentId(newContentId);
+		    
+		    // clear read only field
+		    toolActivity.setReadOnly(false);
+		    
+		} catch (DataMissingException e) {
+		    String error = "Unable to copy a design / initialise the lesson. Data is missing for activity "+activity.getActivityUIID()
+		            +" in learning design "+originalLearningDesignId
+		            +" default content may be missing for the tool. Error was "
+		            +e.getMessage();
+		    log.error(error,e);
+		    throw new LearningDesignException(error,e);
+		} catch (ToolException e) {
+		    String error = "Unable to copy a design / initialise the lesson. Tool encountered an error copying the data is missing for activity "
+		            +activity.getActivityUIID()
+		            +" in learning design "+originalLearningDesignId
+		            +" default content may be missing for the tool. Error was "
+		            +e.getMessage();
+		    log.error(error,e);
+		    throw new LearningDesignException(error,e);
+		}
+	}
     
     /**
      * Updates the Activity information in the newLearningDesign based 
      * on the originalLearningDesign. This any grouping details.
      * 
+     * As new activities are created, the UIID is incremented by the uiidOffset. If we are just copying a sequence this will 
+     * be set to 0. But if we are importing a sequence into another sequence, this will be an offset value so we new ids guaranteed
+     * to be outside of the range of the main sequence (this may mean gaps in the uiids but that doesn't matter).
+     * 
      * @param originalLearningDesign The LearningDesign to be copied
      * @param newLearningDesign The copy of the originalLearningDesign
      * @return Map of all the new activities, where the key is the UIID value. This is used as an input to updateDesignTransitions
      */
-    private HashMap<Integer, Activity> updateDesignActivities(LearningDesign originalLearningDesign, LearningDesign newLearningDesign){
+    private HashMap<Integer, Activity> updateDesignActivities(LearningDesign originalLearningDesign, LearningDesign newLearningDesign, int uiidOffset){
     	HashMap<Integer, Activity> newActivities = new HashMap<Integer, Activity>(); // key is UIID   
     	HashMap<Integer, Grouping> newGroupings = new HashMap<Integer, Grouping>();    // key is UIID
     	
 		// as we create the activities, we need to record any "first child" UIID's for the sequence activity to process later
 		Map<Integer,SequenceActivity> firstChildUIIDToSequence = new HashMap<Integer,SequenceActivity>();
 
+		
     	Set oldParentActivities = originalLearningDesign.getParentActivities();
     	if ( oldParentActivities != null ) {
 	    	Iterator iterator = oldParentActivities.iterator();    	
 	    	while(iterator.hasNext()){
-	    		processActivity((Activity)iterator.next(), newLearningDesign, newActivities, newGroupings, null);
+	    		processActivity((Activity)iterator.next(), newLearningDesign, newActivities, newGroupings, null,  
+	    				originalLearningDesign.getLearningDesignId(), uiidOffset);
 	    	}
     	}
     	
@@ -799,9 +861,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     	// Go back and find all the grouped activities and assign them the new groupings, based on the UIID. Can't
     	// be done as we go as the grouping activity may be processed after the grouped activity.
     	for ( Activity activity : activities) {
-    		Integer groupingUIID = activity.getGroupingUIID();
-    		if ( groupingUIID != null ) {
-   				activity.setGrouping(newGroupings.get(groupingUIID));
+    		if ( activity.getGroupingUIID() != null ) {
+   				activity.setGrouping(newGroupings.get(activity.getGroupingUIID())); 
     		}
     	}
     	
@@ -812,12 +873,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     			ComplexActivity newComplex = (ComplexActivity) activity;
     			Activity oldDefaultActivity = newComplex.getDefaultActivity();
     			if ( oldDefaultActivity != null ) {
-    				Activity newDefaultActivity = newActivities.get(oldDefaultActivity.getActivityUIID());
+    				Activity newDefaultActivity = newActivities.get(LearningDesign.addOffset(oldDefaultActivity.getActivityUIID(), uiidOffset)); 
     				newComplex.setDefaultActivity(newDefaultActivity);
     			}
     		}
 
-    		if ( activity.isSequenceActivity() ) {
+    		if ( activity.isSequenceActivity() ) { 
     			SequenceActivity newSequenceActivity = (SequenceActivity) activity;
             	// Need to check if the sets are not null as these are new objects and Hibernate may not have backed them with collections yet.
 	    		if ( newSequenceActivity.getBranchEntries() != null && newSequenceActivity.getBranchEntries().size() > 0 ) {
@@ -827,12 +888,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    				// the condition was copied by the sequence activity copy
 	    				BranchActivityEntry entry = (BranchActivityEntry) beIter.next();
 	    				BranchingActivity oldBranchingActivity = entry.getBranchingActivity();
-	    				entry.setBranchingActivity((BranchingActivity) newActivities.get(oldBranchingActivity.getActivityUIID()));
+	    				entry.setBranchingActivity((BranchingActivity) newActivities.get(LearningDesign.addOffset(oldBranchingActivity.getActivityUIID(), uiidOffset)));
 	    				Group oldGroup = entry.getGroup();
 	    				if ( oldGroup != null ) {
 	    					Grouping oldGrouping = oldGroup.getGrouping();
-	    					Grouping newGroouping = newGroupings.get(oldGrouping.getGroupingUIID());
-	    					entry.setGroup(newGroouping.getGroup(oldGroup.getGroupUIID()));
+	    					Grouping newGroouping = newGroupings.get(LearningDesign.addOffset(oldGrouping.getGroupingUIID(), uiidOffset));
+	    					entry.setGroup(newGroouping.getGroup(LearningDesign.addOffset(oldGroup.getGroupUIID(), uiidOffset)));
 	    				}
 	    			}
 	    		}
@@ -843,7 +904,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     			Iterator inputIter =  activity.getInputActivities().iterator();
     			while (inputIter.hasNext()) {
 					Activity elem = (Activity) inputIter.next();
-					newInputActivities.add(newActivities.get(elem.getActivityUIID()));
+					newInputActivities.add(newActivities.get(LearningDesign.addOffset(elem.getActivityUIID(), uiidOffset)));
 				}
     			activity.getInputActivities().clear();
     			activity.getInputActivities().addAll(newInputActivities);
@@ -853,15 +914,19 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     	// The activities collection in the learning design may already exist (as we have already done a save on the design).
     	// If so, we can't just override the existing collection as the cascade causes an error.
     	// newLearningDesign.getActivities() will create a new TreeSet(new ActivityOrderComparator()) if there isn't an existing set
-   		newLearningDesign.getActivities().clear();
+    	// If the uiidOffset is > 0, then we are adding activities, so we don't want to clear first.
+    	if ( uiidOffset == 0 ) {
+    		newLearningDesign.getActivities().clear();
+    	}
    		newLearningDesign.getActivities().addAll(activities);
    		
    		return newActivities;
    		
     }
-    
+
     /** As part of updateDesignActivities(), process an activity and, via recursive calls, the activity's child activities. Need to keep track
-     * of any new groupings created so we can go back and update the grouped activities with their new groupings at the end.
+     * of any new groupings created so we can go back and update the grouped activities with their new groupings at the end. Also copies the 
+     * tool content.
      * 
      * @param activity Activity to process. May not be null.
      * @param newLearningDesign The new learning design. May not be null.
@@ -869,20 +934,27 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param newGroupings Temporary set of new groupings. Key is the grouping UUID. May not be null.
      * @param parentActivity This activity's parent activity (if one exists). May be null.
      */
-    private void processActivity(Activity activity, LearningDesign newLearningDesign, Map<Integer, Activity> newActivities, Map<Integer, Grouping> newGroupings, Activity parentActivity) {
-		Activity newActivity = getActivityCopy(activity, newGroupings);
+    private void processActivity(Activity activity, LearningDesign newLearningDesign, Map<Integer, Activity> newActivities, Map<Integer, Grouping> newGroupings, 
+    		Activity parentActivity, Long originalLearningDesignId, int uiidOffset) {
+		Activity newActivity = getActivityCopy(activity, newGroupings, uiidOffset);
+		newActivity.setActivityUIID( newActivity.getActivityUIID() );
 		newActivity.setLearningDesign(newLearningDesign);
+		newActivity.setReadOnly(false);
 		if ( parentActivity != null ) {
 			newActivity.setParentActivity(parentActivity);
 			newActivity.setParentUIID(parentActivity.getActivityUIID());
 		}
 		newActivities.put(newActivity.getActivityUIID(),newActivity);
-		
+
+        if (newActivity.isToolActivity()) {
+            copyActivityToolContent(newActivity, newLearningDesign.getCopyTypeID(), originalLearningDesignId);
+        }
+
 		Set oldChildActivities = getChildActivities((Activity)activity);
 		if ( oldChildActivities != null ) {
 			Iterator childIterator = oldChildActivities.iterator();
 			while(childIterator.hasNext()){
-				processActivity((Activity)childIterator.next(), newLearningDesign, newActivities, newGroupings, newActivity);
+				processActivity((Activity)childIterator.next(), newLearningDesign, newActivities, newGroupings, newActivity, originalLearningDesignId, uiidOffset);
 			}
 		}
     }
@@ -894,13 +966,13 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param originalLearningDesign The LearningDesign to be copied 
      * @param newLearningDesign The copy of the originalLearningDesign
      */
-    public void updateDesignTransitions(LearningDesign originalLearningDesign, LearningDesign newLearningDesign, HashMap<Integer, Activity> newActivities){
+    public void updateDesignTransitions(LearningDesign originalLearningDesign, LearningDesign newLearningDesign, HashMap<Integer, Activity> newActivities, int uiidOffset){
     	HashSet newTransitions = new HashSet();
     	Set oldTransitions = originalLearningDesign.getTransitions();
     	Iterator iterator = oldTransitions.iterator();
     	while(iterator.hasNext()){
     		Transition transition = (Transition)iterator.next();
-    		Transition newTransition = Transition.createCopy(transition);    		
+    		Transition newTransition = Transition.createCopy(transition, uiidOffset);    		
     		Activity toActivity = null;
         	Activity fromActivity=null;
     		if(newTransition.getToUIID()!=null) {
@@ -920,8 +992,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     	
     	// The transitions collection in the learning design may already exist (as we have already done a save on the design).
     	// If so, we can't just override the existing collection as the cascade causes an error.
+    	// If the uiidOffset is > 0, then we are adding transitions (rather than replacing), so we don't want to clear first.
     	if ( newLearningDesign.getTransitions() != null ) {
-    		newLearningDesign.getTransitions().clear();
+    		if ( uiidOffset == 0 ) {
+    			newLearningDesign.getTransitions().clear();
+    		}
     		newLearningDesign.getTransitions().addAll(newTransitions);
     	} else {
         	newLearningDesign.setTransitions(newTransitions);
@@ -935,12 +1010,13 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param newGroupings Temporary set of new groupings. Key is the grouping UUID. May not be null.
      * @return Activity The new deep-copied Activity object
      */
-    private Activity getActivityCopy(final Activity activity, Map<Integer, Grouping> newGroupings){
+    private Activity getActivityCopy(final Activity activity, Map<Integer, Grouping> newGroupings, int uiidOffset){
     	if ( Activity.GROUPING_ACTIVITY_TYPE == activity.getActivityTypeId().intValue() ) {
-    		GroupingActivity newGroupingActivity = (GroupingActivity) activity.createCopy();
+    		GroupingActivity newGroupingActivity = (GroupingActivity) activity.createCopy(uiidOffset);
     		// now we need to manually add the grouping to the session, as we can't easily
     		// set up a cascade
     		Grouping grouping = newGroupingActivity.getCreateGrouping();
+    		grouping.setGroupingUIID(grouping.getGroupingUIID());
     		if ( grouping != null ) {
     			groupingDAO.insert(grouping);
     			newGroupings.put(grouping.getGroupingUIID(), grouping);
@@ -948,10 +1024,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     		return newGroupingActivity;
     	}
     	else 
-    		return activity.createCopy();    	
+    		return activity.createCopy(uiidOffset);    	
     } 
     /**
-     * Returns a set of child activities for the given parent activitity
+     * Returns a set of child activities for the given parent activity
      * 
      * @param parentActivity The parent activity 
      * @return HashSet Set of the activities that belong to the parentActivity 
@@ -1178,6 +1254,40 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		return flashMessage.serializeMessage();
 	}
 	
+	/**
+	 * Get a unique name for a learning design, based on the names of the learning designs in the folder. 
+	 * If the learning design has duplicated name in same folder, then the new name will have a timestamp.
+	 * The new name format will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1.  
+	 * Warning - this may be quite intensive as it gets all the learning designs in a folder.
+	 * @param originalLearningDesign
+	 * @param workspaceFolder
+	 * @param copyType
+	 * @return
+	 */
+	public String getUniqueNameForLearningDesign(String originalTitle, Integer workspaceFolderId) {
 
+		String newName = originalTitle;
+        if(workspaceFolderId != null ){
+			List<String> ldTitleList = learningDesignDAO.getLearningDesignTitlesByWorkspaceFolder(workspaceFolderId);
+			int idx = 1;
+			
+			Calendar calendar = Calendar.getInstance();
+			int mth = calendar.get(Calendar.MONTH) + 1;
+			String mthStr = new Integer(mth).toString();
+			if(mth < 10)
+				mthStr = "0" + mthStr;
+			int day = calendar.get(Calendar.DAY_OF_MONTH);
+			String dayStr = new Integer(day).toString();
+			if(day < 10)
+				dayStr = "0" + dayStr;
+			String nameMid = dayStr + mthStr + calendar.get(Calendar.YEAR);
+			while ( ldTitleList.contains(newName) ) {
+				newName = originalTitle + "_" + nameMid + "_" + idx;
+				idx++;
+			}
+        }
+		return newName;
+	}
+    
 
 }

@@ -37,6 +37,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -99,7 +102,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		String wddxPacket;
 		IAuthoringService authoringService = getAuthoringService();
 		try {	
-			Long toolContentID = new Long(WebUtil.readLongParam(request,"toolContentID"));
+			Long toolContentID = WebUtil.readLongParam(request,"toolContentID",false);
 			
 			wddxPacket = authoringService.getToolOutputDefinitions(toolContentID);
 			
@@ -116,7 +119,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		String wddxPacket;
 		IAuthoringService authoringService = getAuthoringService();
 		try {
-			Long learningDesignID = new Long(WebUtil.readLongParam(request,"learningDesignID"));
+			Long learningDesignID = WebUtil.readLongParam(request,"learningDesignID",false);
 			
 			wddxPacket = authoringService.getLearningDesignDetails(learningDesignID);
 		} catch (Exception e) {
@@ -133,7 +136,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		String wddxPacket;
 		IAuthoringService authoringService = getAuthoringService();
 		try {
-			Long learningDesignID = new Long(WebUtil.readLongParam(request,"learningDesignID"));
+			Long learningDesignID = WebUtil.readLongParam(request,"learningDesignID",false);
 			
 			wddxPacket = authoringService.finishEditOnFly(learningDesignID, getUserId());
 			
@@ -199,7 +202,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		String wddxPacket;
 		IAuthoringService authoringService = getAuthoringService();
 		try {
-		    Long toolID = new Long(WebUtil.readLongParam(request,"toolID"));
+		    Long toolID = WebUtil.readLongParam(request,"toolID",false);
 		    wddxPacket = authoringService.getToolContentID(toolID);
 		} catch (Exception e) {
 			wddxPacket = handleException(e, "getAllLearningLibraryDetails", authoringService).serializeMessage();
@@ -218,7 +221,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		String wddxPacket;
 		IAuthoringService authoringService = getAuthoringService();
 		try {
-		    long toolContentID = WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID);
+		    long toolContentID = WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID,false);
 		    wddxPacket = authoringService.copyToolContent(toolContentID);
 		} catch (Exception e) {
 			wddxPacket = handleException(e, "copyToolContent", authoringService).serializeMessage();

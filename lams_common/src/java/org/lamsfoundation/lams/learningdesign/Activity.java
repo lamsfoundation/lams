@@ -1008,14 +1008,16 @@ public abstract class Activity implements Serializable,Nullable {
 	
 	/** Create a deep copy of the this activity. It should return the same
 	 * subclass as the activity being copied. Generally doesn't copy the "link" type
-	 * fields like transitions, learning design, etc
+	 * fields like transitions, learning design, etc.
+	 * @param uiidOffset - this should be added to UIID fields in any new objects. Used
+	 * when importing a design into another design.
 	 * @return deep copy of this object
 	 */
-   public abstract Activity createCopy();
+   public abstract Activity createCopy(int uiidOffset);
 
-   protected void copyToNewActivity(Activity newActivity ) {
+   protected void copyToNewActivity(Activity newActivity, int uiidOffset ) {
 
-	   	newActivity.setActivityUIID(this.getActivityUIID());
+	   	newActivity.setActivityUIID(LearningDesign.addOffset(this.getActivityUIID(),uiidOffset));
 	   	newActivity.setDescription(this.getDescription());
 	   	newActivity.setTitle(this.getTitle());
 	   	newActivity.setHelpText(this.getHelpText());
@@ -1028,7 +1030,7 @@ public abstract class Activity implements Serializable,Nullable {
 	   	newActivity.setActivityCategoryID(this.getActivityCategoryID());
 			
 	   	newActivity.setGrouping(this.getGrouping());
-	   	newActivity.setGroupingUIID(this.getGroupingUIID());
+	   	newActivity.setGroupingUIID(LearningDesign.addOffset(this.getGroupingUIID(),uiidOffset));
 	
 	   	newActivity.setDefineLater(this.getDefineLater());    	
 	   	newActivity.setCreateDateTime(new Date()); 
@@ -1041,6 +1043,9 @@ public abstract class Activity implements Serializable,Nullable {
 	   	newActivity.setOrderId(this.getOrderId());
 	   	newActivity.setReadOnly(this.getReadOnly());
 	   	newActivity.setStopAfterActivity(this.isStopAfterActivity());
+
+	   	newActivity.setParentActivity(this.getParentActivity());
+	   	newActivity.setParentUIID(LearningDesign.addOffset(this.getParentUIID(), uiidOffset));
 
 	   	if ( this.getInputActivities()!=null && this.getInputActivities().size() > 0 ) {
 		   	newActivity.setInputActivities(new HashSet());
@@ -1087,5 +1092,5 @@ public abstract class Activity implements Serializable,Nullable {
 		}
 		return null;
 	}
-
+	
 }

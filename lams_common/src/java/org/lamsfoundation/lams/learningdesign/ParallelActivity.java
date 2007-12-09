@@ -120,10 +120,10 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
      * Makes a copy of the ParallelActivity for authoring, preview and monitoring enviornment 
      * @return ParallelActivity Returns a deep-copy of the originalActivity
      */
-    public Activity createCopy(){
+    public Activity createCopy(int uiidOffset){
     	
     	ParallelActivity newParallelActivity = new ParallelActivity();
-    	copyToNewComplexActivity(newParallelActivity);
+    	copyToNewComplexActivity(newParallelActivity, uiidOffset);
     	return newParallelActivity;
     }
 

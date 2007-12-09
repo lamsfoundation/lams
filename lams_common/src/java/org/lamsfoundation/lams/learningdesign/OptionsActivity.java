@@ -132,9 +132,9 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
               activities);
       super.activityStrategy = new OptionsActivityStrategy(this);
     }
-    public Activity createCopy(){
+    public Activity createCopy(int uiidOffset){
     	OptionsActivity newOptionsActivity = new OptionsActivity();
-    	copyToNewComplexActivity(newOptionsActivity);
+    	copyToNewComplexActivity(newOptionsActivity, uiidOffset);
 
     	/** OptionsActivity Specific Attributes */
     	newOptionsActivity.setMaxNumberOfOptions(this.getMaxNumberOfOptions());

@@ -388,52 +388,13 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             WorkspaceFolder workspaceFolder,
             int copyType) { 
     
-//    		if the learning design has duplicated name in same folder, then rename it with timestamp.
-    	// the new name format will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1.  
-    	String newName = originalLearningDesign.getTitle();
-        if(workspaceFolder != null && copyType == LearningDesign.COPY_TYPE_LESSON){
-			boolean dupName;
-			List<LearningDesign> ldList = learningDesignDAO.getAllLearningDesignsInFolder(workspaceFolder.getWorkspaceFolderId());
-			int idx = 1;
-			
-			//contruct middle part of name by timestamp
-			Calendar calendar = Calendar.getInstance();
-			int mth = calendar.get(Calendar.MONTH) + 1;
-			String mthStr = new Integer(mth).toString();
-			if(mth < 10)
-				mthStr = "0" + mthStr;
-			int day = calendar.get(Calendar.DAY_OF_MONTH);
-			String dayStr = new Integer(day).toString();
-			if(day < 10)
-				dayStr = "0" + dayStr;
-			String nameMid = dayStr + mthStr + calendar.get(Calendar.YEAR);
-			while(true){
-				dupName = false;
-				for(LearningDesign eld :ldList){
-					if(StringUtils.equals(eld.getTitle(),newName)){
-						dupName = true;
-						break;
-					}
-				}
-				if(!dupName)
-					break;
-				newName = originalLearningDesign.getTitle() + "_" + nameMid + "_" + idx;
-				idx++;
-			}
-        }
-            	
          //copy the current learning design
         LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
                                                                                   new Integer(copyType),
                                                                                   user,
                                                                                   workspaceFolder,
-                                                                                  true);
-        
-        // clear the live edit flag
-        copiedLearningDesign.setEditOverrideLock(false);
-        
-        copiedLearningDesign.setTitle(newName);
-		
+                                                                                  true,
+                                                                                  null);
         authoringService.saveLearningDesign(copiedLearningDesign);
         
         // Make all efforts to make sure it has a title

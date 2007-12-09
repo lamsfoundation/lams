@@ -231,8 +231,8 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 		return activityStrategy;
 	}
 	
-	protected void copyToNewComplexActivity(ComplexActivity newComplex) {
-		copyToNewActivity(newComplex);
+	protected void copyToNewComplexActivity(ComplexActivity newComplex, int uiidOffset) {
+		copyToNewActivity(newComplex, uiidOffset);
 		newComplex.setDefaultActivity(this.getDefaultActivity());
 	}
 

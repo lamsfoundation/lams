@@ -136,11 +136,11 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
      * Makes a copy of the BranchingActivity for authoring, preview and monitoring enviornment 
      * @return BranchingActivity Returns a deep-copy of the originalActivity
      */
-    public Activity createCopy(){
+    public Activity createCopy(int uiidOffset){
     	
     	ToolBranchingActivity newBranchingActivity = new ToolBranchingActivity();
     	copyBranchingFields(newBranchingActivity);
-    	copyToNewComplexActivity(newBranchingActivity);
+    	copyToNewComplexActivity(newBranchingActivity, uiidOffset);
     	return newBranchingActivity;
     }
 

@@ -47,6 +47,7 @@ public interface IAuthoringService {
 	
 	/** Message key returned by the storeLearningDesignDetails() method */
 	public static final String STORE_LD_MESSAGE_KEY = "storeLearningDesignDetails";
+	public static final String INSERT_LD_MESSAGE_KEY = "insertLearningDesign";
 	public static final String START_EDIT_ON_FLY_MESSAGE_KEY = "startEditOnFly";
 
 	/**
@@ -73,7 +74,8 @@ public interface IAuthoringService {
 	 * @param setOriginalDesign If true, then sets the originalLearningDesign field in the new design
 	 * @return LearningDesign The new copy of learning design.
 	 */
-	public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, WorkspaceFolder workspaceFolder, boolean setOriginalDesign);
+	public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, 
+			WorkspaceFolder workspaceFolder, boolean setOriginalDesign, String newDesignName);
 	
 	/**
 	 * Create a copy of learning design as per the requested learning design
@@ -94,9 +96,25 @@ public interface IAuthoringService {
 	 * @return new LearningDesign   
 	 */	
 	public LearningDesign copyLearningDesign(Long originalLearningDesignID,Integer copyType,
-											 Integer userID, Integer workspaceFolder, boolean setOriginalDesign)throws UserException, LearningDesignException,
-											 										 WorkspaceFolderException, IOException;
+											 Integer userID, Integer workspaceFolder, boolean setOriginalDesign)
+			throws UserException, LearningDesignException, WorkspaceFolderException, IOException;
 	
+    /** 
+     * Insert a learning design into another learning design. This is a copy and paste type of copy - it just dumps the contents (with modified 
+     * activity ui ids) in the main learning design. It doesn't wrap up the contents in a sequence activity. Always sets the type to COPY_TYPE_NONE.
+     * @param originalDesignID The design to be "modified". Required.
+     * @param designToImportID The design to be imported into originalLearningDesign. Required.
+     * @param userId Current User. Required.
+     * @param createNewLearningDesign If true, then a copy of the originalLearningDesign is made and the copy modified. If it is false, then 
+     * the originalLearningDesign is modified. Required.
+     * @param newDesignName New name for the design if a new design is being create. Optional. 
+     * @param workspaceFolderID The folder in which to put the new learning design if createNewLearningDesign = true. May be null if createNewLearningDesign = false
+     * @return New / updated learning design
+     */ 
+     public LearningDesign insertLearningDesign(Long originalDesignID, Long designToImportID, Integer userID, 
+    		 boolean createNewLearningDesign, String newDesignName, Integer workspaceFolderID) throws UserException, LearningDesignException,
+				 WorkspaceFolderException, IOException;
+
 	/**
 	 * @return List Returns the list of all the available LearningDesign's   
 	 * */
@@ -298,5 +316,17 @@ public interface IAuthoringService {
 
 	/** Get the message service, which gives access to the I18N text */
 	public MessageService getMessageService();
-	
+
+	/**
+	 * Get a unique name for a learning design, based on the names of the learning designs in the folder. 
+	 * If the learning design has duplicated name in same folder, then the new name will have a timestamp.
+	 * The new name format will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1.  
+	 * Warning - this may be quite intensive as it gets all the learning designs in a folder.
+	 * @param originalLearningDesign
+	 * @param workspaceFolder
+	 * @param copyType
+	 * @return
+	 */
+	public String getUniqueNameForLearningDesign(String originalTitle, Integer workspaceFolderId);
+
 }
