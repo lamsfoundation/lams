@@ -346,7 +346,10 @@ public class BranchCondition implements Comparable {
 				return false; 
 			}
 
-			if ( typedStartValue != null && ( typedEndValue == null || typedEndValue.compareTo(typedStartValue) >= 0 ) ) {
+			if ( typedStartValue == null && typedEndValue != null ) 
+				return true;
+			
+			else if ( typedEndValue == null || typedEndValue.compareTo(typedStartValue) >= 0 ) {
 				return true;
 			}
 		}

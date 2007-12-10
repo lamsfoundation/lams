@@ -53,9 +53,6 @@ public class ToolOutputDefinitionDTO {
 
 		this.startValue = startValue;
 		this.endValue = endValue;
-		if ( startValue != null && endValue == null ) {
-			endValue = BranchConditionDTO.MAX_FOR_FLASH;
-		}
 
 		this.complexDefinition = complexDefinition;
 	}
@@ -68,9 +65,6 @@ public class ToolOutputDefinitionDTO {
 
 		this.startValue = (definition.getStartValue() != null) ? definition.getStartValue().toString() : null;
 		this.endValue = (definition.getEndValue() != null) ? definition.getEndValue().toString() : null;
-		if ( startValue != null && endValue == null ) {
-			endValue = BranchConditionDTO.MAX_FOR_FLASH;
-		}
 
 		this.complexDefinition = (definition.getComplexDefinition() != null) ? definition.getComplexDefinition().toString() : null;
 	}
