@@ -1399,9 +1399,6 @@ public class ObjectExtractor implements IObjectExtractor {
 		    }
 
 		    String endValue = WDDXProcessor.convertToString(conditionTable,WDDXTAGS.CONDITION_END_VALUE);
-		    if ( BranchConditionDTO.MAX_FOR_FLASH.equals(endValue) ) {
-		    	endValue = null;
-		    }
 		    
 		    if ( condition == null ) {
     			condition = new BranchCondition(null, conditionUIID, 
