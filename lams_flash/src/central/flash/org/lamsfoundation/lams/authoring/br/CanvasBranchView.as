@@ -624,7 +624,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private function removeBranch(b:Branch,cm){
 		if(!cm.isActiveView(this)) return false;
 		
-		if(b.direction == BranchConnector.DIR_FROM_START) b.sequenceActivity.firstActivityUIID = null;
+		
+		if(b.direction == BranchConnector.DIR_SINGLE) cm.getCanvas().ddm.removeActivity(b.sequenceActivity.activityUIID);
+		else if(b.direction == BranchConnector.DIR_FROM_START) b.sequenceActivity.firstActivityUIID = null;
 		else if(b.direction == BranchConnector.DIR_TO_END) b.sequenceActivity.stopAfterActivity = true;
 		
 		var r = cm.branchesDisplayed.remove(b.branchUIID);
