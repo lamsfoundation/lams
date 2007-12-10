@@ -567,7 +567,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	
 	public function addNewBranch(sequence:SequenceActivity, branchingActivity:BranchingActivity, isDefault:Boolean):Void {
 		
-		if(sequence.firstActivityUIID != null) {
+		if(sequence.firstActivityUIID == null && _cv.ddm.getComplexActivityChildren(sequence.activityUIID).length <= 0) {
+		
+			var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_SINGLE, branchingActivity.activityUIID, null, sequence, _cv.ddm.learningDesignID);
+			_cv.ddm.addBranch(b);
+		
+		} else if(sequence.firstActivityUIID != null) {
 			var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, _cv.ddm.getActivityByUIID(sequence.firstActivityUIID).activityUIID, branchingActivity.activityUIID, sequence, _cv.ddm.learningDesignID);
 			_cv.ddm.addBranch(b);
 		
