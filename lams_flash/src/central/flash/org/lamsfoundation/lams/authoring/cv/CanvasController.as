@@ -639,10 +639,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			if(bc.hitTest(_canvasModel.getCanvas().bin) && !isBranchTargetReadOnly(bc, Dictionary.getValue("cv_element_readOnly_action_del"))){
 				var branchesToDelete:Array;
 				if(bc.branch.direction == BranchConnector.DIR_FROM_START) {
+					if(_canvasModel.activeView.activity.firstActivityUIID == bc.branch.sequenceActivity.activityUIID)
+						_canvasModel.activeView.activity.defaultBranch = _canvasModel.getCanvas().ddm.findNewDefaultBranch(_canvasModel.activeView.activity, bc.branch);
+					
 					branchesToDelete = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(bc.branch.sequenceActivity.activityUIID);
 					for(var i=0; i<branchesToDelete.myBranches.length; i++) {
 						_canvasModel.getCanvas().removeBranch(branchesToDelete.myBranches[i].branchUIID);
 					}
+					
 				} else if(bc.branch.direction == BranchConnector.DIR_SINGLE) {
 					_canvasModel.getCanvas().removeActivity(bc.branch.sequenceActivity.activityUIID);
 				} else {

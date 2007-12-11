@@ -281,7 +281,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		}
 	}
 	
-	private function findNewDefaultBranch(activity:BranchingActivity, branch:Branch):Branch {
+	public function findNewDefaultBranch(activity:BranchingActivity, branch:Branch):Branch {
 		var children:Array = getComplexActivityChildren(activity.activityUIID);
 		
 		for(var i=0; i<children.length; i++) {
