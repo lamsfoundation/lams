@@ -625,14 +625,14 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		if(!cm.isActiveView(this)) return false;
 		
 		
-		if(b.direction == BranchConnector.DIR_SINGLE) cm.getCanvas().ddm.removeActivity(b.sequenceActivity.activityUIID);
-		else if(b.direction == BranchConnector.DIR_FROM_START) b.sequenceActivity.firstActivityUIID = null;
-		else if(b.direction == BranchConnector.DIR_TO_END) b.sequenceActivity.stopAfterActivity = true;
+		if(b.direction == BranchConnector.DIR_SINGLE) { continue;
+		} else if(b.direction == BranchConnector.DIR_FROM_START) { b.sequenceActivity.firstActivityUIID = null;
+		} else if(b.direction == BranchConnector.DIR_TO_END) { b.sequenceActivity.stopAfterActivity = true; }
 		
 		var r = cm.branchesDisplayed.remove(b.branchUIID);
 		r.removeMovieClip();
-		var s:Boolean = (r==null) ? false : true;
 		
+		var s:Boolean = (r==null) ? false : true;
 		return s;
 	}
 

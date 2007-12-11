@@ -282,7 +282,6 @@ class CanvasHelper {
 		canvasModel.selectedItem = null;
 	}
 	
-	
 	/**
 	 * Show auto-save confirmation message
 	 * 

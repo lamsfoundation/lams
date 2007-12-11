@@ -272,8 +272,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var keyArray:Array = _branches.keys();
 		for(var i=0; i<keyArray.length; i++){
 			var branch:Branch = Branch(_branches.get(keyArray[i]));
-			if(branch.targetUIID == connectUIID) {
-				if(activity.firstActivityUIID == branch.sequenceActivity.activityUIID && branch.isStart)
+			if(branch.targetUIID == connectUIID || branch.sequenceActivity.activityUIID == connectUIID) {
+				if(activity.firstActivityUIID == branch.sequenceActivity.activityUIID && (branch.isStart || branch.isActivityless))
 					activity.defaultBranch = findNewDefaultBranch(activity, branch);
 				
 				removeBranch(branch.branchUIID);
@@ -288,7 +288,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			if(SequenceActivity(children[i]) != branch.sequenceActivity) {
 				var branches:Array = getBranchesForActivityUIID(SequenceActivity(children[i]).activityUIID).myBranches;
 				for(var j=0; j<branches.length; j++) {
-					if(branches[j].isStart)
+					if(branches[j].isStart || branches[j].isActivityless)
 						return Branch(branches[j]);
 				}
 			}

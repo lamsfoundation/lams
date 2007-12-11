@@ -643,6 +643,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					for(var i=0; i<branchesToDelete.myBranches.length; i++) {
 						_canvasModel.getCanvas().removeBranch(branchesToDelete.myBranches[i].branchUIID);
 					}
+				} else if(bc.branch.direction == BranchConnector.DIR_SINGLE) {
+					_canvasModel.getCanvas().removeActivity(bc.branch.sequenceActivity.activityUIID);
 				} else {
 					_canvasModel.getCanvas().removeBranch(bc.branch.branchUIID);
 				}
