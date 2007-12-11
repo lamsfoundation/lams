@@ -43,7 +43,6 @@ class ComplexActivity extends Activity{
 	
 	private var _firstActivityUIID:Number;
 	
-	private var _isSequenceBased:Boolean;
 	private var _noSequences:Number;
 	
 	function ComplexActivity(activityUIID:Number){
@@ -164,11 +163,7 @@ class ComplexActivity extends Activity{
 	}
 
 	public function get isSequenceBased():Boolean{
-		return _isSequenceBased;
-	}
-	
-	public function set isSequenceBased(a:Boolean):Void{
-		_isSequenceBased = a;
+		return (_activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE);
 	}
 	
 	public function get noSequences():Number{

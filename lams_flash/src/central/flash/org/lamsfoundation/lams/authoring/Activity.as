@@ -88,6 +88,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public static var CHOSEN_BRANCHING_ACTIVITY_TYPE:Number = 10;
 	public static var GROUP_BRANCHING_ACTIVITY_TYPE:Number = 11;
 	public static var TOOL_BRANCHING_ACTIVITY_TYPE:Number = 12;
+	public static var OPTIONS_WITH_SEQUENCES_TYPE:Number = 13; 
 	
 	/******************************************************************/
 	
@@ -251,7 +252,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	}
 	
 	public function isOptionalSequenceActivity(parent:Activity):Boolean {
-		return (this.isSequenceActivity() && parent.isOptionalActivity());
+		return (this.isSequenceActivity() && parent.activityTypeID == OPTIONS_WITH_SEQUENCES_TYPE);
 	}
 	
 	public function isParallelActivity():Boolean{

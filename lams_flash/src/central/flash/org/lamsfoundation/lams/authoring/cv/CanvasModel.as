@@ -279,13 +279,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		var optAct = new ComplexActivity(_cv.ddm.newUIID());
 		
 		optAct.learningDesignID = _cv.ddm.learningDesignID;
-		optAct.activityTypeID = Activity.OPTIONAL_ACTIVITY_TYPE;
+		optAct.activityTypeID = (!isSequence) ? Activity.OPTIONAL_ACTIVITY_TYPE : Activity.OPTIONS_WITH_SEQUENCES_TYPE;
 		optAct.title = (!isSequence) ? Dictionary.getValue('opt_activity_title') : Dictionary.getValue('opt_activity_seq_title');
 		optAct.groupingSupportType = Activity.GROUPING_SUPPORT_OPTIONAL;
 		optAct.activityCategoryID = Activity.CATEGORY_SYSTEM;
 		optAct.yCoord = pos.y;
 		optAct.xCoord = pos.x;
-		optAct.isSequenceBased = (isSequence) ? isSequence : false;
 		
 		Debugger.log('Optional Activitys Y Coord is :'+optAct.yCoord,Debugger.GEN,'createNewOptionalActivity','CanvasModel');
 		

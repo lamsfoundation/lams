@@ -732,6 +732,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		_depthHistory = a;
 	}
 	
+	public function get actChildren():Array {
+		return getDDM().getComplexActivityChildren(activity.activityUIID)
+	}
+	
 	private function getDDM():DesignDataModel {
 		if(_module == "monitoring") {
 			return _monitorView.ddm;

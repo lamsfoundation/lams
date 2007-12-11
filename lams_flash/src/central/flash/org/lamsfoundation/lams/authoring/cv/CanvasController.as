@@ -560,7 +560,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	private function isActivityOnBin(ca:Object):Void{
 		if (ca.hitTest(_canvasModel.getCanvas().bin)) {
 			if(!isActivityReadOnly(ca, Dictionary.getValue("cv_element_readOnly_action_del")) && !ca.branchConnector && !isActivityProtected(ca)) {
-				if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+				if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.isBranchingActivity()){
+					Debugger.log("removing complex act that hit bin" , Debugger.CRITICAL, "isActivityOnBin", "CanvasController");
 					_canvasModel.removeComplexActivity(ca);
 				} else {
 					_canvasModel.removeActivityOnBin(ca.activity.activityUIID);

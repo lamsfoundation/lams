@@ -486,7 +486,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				
 				_activities.put(newGateActivity.activityUIID,newGateActivity);
 			
-			} else if(dto.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || dto.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+			} else if(dto.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || dto.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || dto.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE){
 				
 				//TODO: Test this!
 				var cAct:ComplexActivity= new ComplexActivity(dto.activityUIID);
