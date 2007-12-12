@@ -1184,7 +1184,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		}
 		
 		for(i=0; i<tActs.length; i++) {
-			var mappings:Object = getBranchMappingsByActivityUIIDAndType(gActs[i].activityUIID);
+			var mappings:Object = getBranchMappingsByActivityUIIDAndType(tActs[i].activityUIID);
 			
 			Debugger.log("tacts mappings len tool:" + mappings.toolBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
 			Debugger.log("tacts mappings len group:" + mappings.groupBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
