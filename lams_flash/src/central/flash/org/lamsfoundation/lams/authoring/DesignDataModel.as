@@ -373,6 +373,10 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		if(r==null){
 			return new LFError("Removing branch failed:"+branchUIID,"removeBranch",this,null);
 		}else{
+			var mappings:Object = getBranchMappingsByActivityUIIDAndType(r.sequenceActivity.activityUIID)
+			Debugger.log("removing " + mappings.length + " entries", Debugger.GEN, "removeBranch", "DesignDataModel");
+			
+			removeEntries(mappings.all);
 			
 			Debugger.log('Removed:'+r.branchUIID,Debugger.GEN,'removeBranch','DesignDataModel');
 			dispatchEvent({type:'ddmUpdate',target:this});
@@ -1004,7 +1008,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		myMappings.all = new Array();
 		
 		for(var i=0; i<bMappings.length; i++)
-			if(bMappings[i].branchingActivity.activityUIID == activityUIID) {
+			if(bMappings[i].branchingActivity.activityUIID == activityUIID || bMappings[i].sequenceActivity.activityUIID == activityUIID) {
 				if(bMappings[i] instanceof GroupBranchActivityEntry)	
 					myMappings.groupBased.push(bMappings[i]);
 				else if(bMappings[i] instanceof ToolOutputBranchActivityEntry)

@@ -640,8 +640,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		Debugger.log("branchRelease Transition:" + bc.branch.branchUIID, Debugger.GEN, "branchRelease", "CanvasController");
 		if(_canvasModel.isDragging){
 			bc.stopDrag();
+			
 			if(bc.hitTest(_canvasModel.getCanvas().bin) && !isBranchTargetReadOnly(bc, Dictionary.getValue("cv_element_readOnly_action_del"))){
 				var branchesToDelete:Array;
+				
 				if(bc.branch.direction == BranchConnector.DIR_FROM_START) {
 					if(_canvasModel.activeView.activity.firstActivityUIID == bc.branch.sequenceActivity.activityUIID)
 						_canvasModel.activeView.activity.defaultBranch = _canvasModel.getCanvas().ddm.findNewDefaultBranch(_canvasModel.activeView.activity, bc.branch);
