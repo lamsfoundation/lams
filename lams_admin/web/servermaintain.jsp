@@ -36,18 +36,16 @@
 		<td><fmt:message key="sysadmin.disabled" />:</td>
 		<td><html:checkbox property="disabled" /></td>
 	</tr>
+	<logic:notEqual name="ServerOrgMapForm" property="orgId" value="-1">
 	<tr>
 		<td><fmt:message key="sysadmin.organisation" />:</td>
 		<td>
 			<html:select property="orgId" >
 				<html:options collection="orgs" property="organisationId" labelProperty="name"/> 
 			</html:select> &nbsp; 
-			<fmt:message key="label.or" /> &nbsp;
-			<html:checkbox property="newOrg" onclick="changeStatus(this)" /> 
-			<fmt:message key="sysadmin.organisation.create" />
-			<html:text property="orgName" disabled="true" size="20"/> *
 		</td>
 	</tr>
+	</logic:notEqual>
 	<tr>
 		<td><fmt:message key="sysadmin.userinfoUrl" />:</td>
 		<td><html:text property="userinfoUrl" size="70"/> *</td>

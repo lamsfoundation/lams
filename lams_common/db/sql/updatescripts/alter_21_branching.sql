@@ -270,3 +270,6 @@ values ('LDAPSearchResultsPageSize', '100', 'config.ldap.search.results.page.siz
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LearnerProgressBatchSize', '10', 'config.learner.progress.batch.size', 'config.header.look.feel', 'LONG', 1);
+
+-- LDEV-1284 integration organisation no longer mandatory
+alter table lams_ext_server_org_map modify column orgid bigint(20);

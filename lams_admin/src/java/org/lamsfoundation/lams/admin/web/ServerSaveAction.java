@@ -115,7 +115,8 @@ public class ServerSaveAction extends Action {
 		}else{
 			Integer orgId = (Integer)serverOrgMapForm.get("orgId");
 			if(orgId.equals(-1)){
-				errors.add("orgId",new ActionMessage("error.required", messageService.getMessage("sysadmin.organisation")));
+				// LDEV-1284 no need for integration organisation anymore
+				// errors.add("orgId",new ActionMessage("error.required", messageService.getMessage("sysadmin.organisation")));
 			}else{
 				org = (Organisation)userService.findById(Organisation.class, orgId);
 			}

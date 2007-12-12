@@ -213,11 +213,9 @@
     <many-to-one
         name="organisation"
         class="org.lamsfoundation.lams.usermanagement.Organisation"
-        not-null="true"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
-            not-null="true"
            @hibernate.column name="orgid"         
         </meta>
         <column name="orgid" />
