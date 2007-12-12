@@ -55,13 +55,15 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 	* Called to Indexbutton. Called by LearnerIndexView
 	*/
 	public function init(m:Observable, c:Controller){
-
+		super (m, c);
 		mm = MonitorModel(m);
-		btnWidth = 45;
 		
+		_tm = ThemeManager.getInstance();
+		
+		btnWidth = 45;
 		_bgPanel._width = btnWidth;
 		
-		idxLabel_mc = this.attachMovie("Label", "idxLabel", this.getNextHighestDepth(), {text:_labelText, _width: 40, autoSize: "right"});
+		idxLabel_mc = this.attachMovie("Label", "idxLabel", this.getNextHighestDepth(), {text:_labelText, _width: 45, autoSize: "center"});
 		idxLabel = Label(idxLabel_mc);
 		
 		_bgPanel.onRollOver = Delegate.create(this, onMouseOver);
@@ -74,14 +76,38 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 	}
 	
 	public function indexClicked(): Void {
-		mm.currentLearnerIndex = Number(label.text);
+		var buttonText:String = String(label.text)
+		if (buttonText == "<<") {
+			Debugger.log("<< clicked", Debugger.GEN, "indexClicked", "IndexButton");
+			mm.updateIndexButtons("<<");
+		} else if (buttonText == ">>") {
+			Debugger.log(">> clicked", Debugger.GEN, "indexClicked", "IndexButton");
+			Debugger.log("mm: "+mm, Debugger.GEN, "indexClicked", "IndexButton");
+			mm.updateIndexButtons(">>");
+			Debugger.log("updateIndexButtons has been called", Debugger.CRITICAL, "indexClicked", "IndexButton");
+		} else if (buttonText == "Go") {
+			if(!isNaN(mm.learnerIndexView.getIdxTextField().text)) { // if the text field contains a number
+				var idx:Number = Number(mm.learnerIndexView.getIdxTextField().text);
+				if (idx >= 1 && idx <= mm.numIndexButtons) { // if the selected index exists
+					mm.currentLearnerIndex = idx;
+				}
+				else
+					LFMessage.showMessageAlert("The page index must be a number between 1 and "+ mm.numIndexButtons, null);
+			} 
+			else
+				LFMessage.showMessageAlert("The page index must be a number between 1 and "+ mm.numIndexButtons, null);
+		}
+		else {
+			//mm.updateIndexButtons();
+			mm.currentLearnerIndex = Number(label.text);
+		}
 	}
 
 	
 	public function setSize(_btnWidth:Number):Void {
 		this._width = _btnWidth;
 		
-		idxLabel._width = _btnWidth - 5;
+		idxLabel._width = _btnWidth;
 		_bgPanel._width = _btnWidth;
 	}
 	

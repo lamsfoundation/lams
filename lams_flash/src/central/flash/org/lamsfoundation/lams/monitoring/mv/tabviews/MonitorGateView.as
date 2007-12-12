@@ -213,13 +213,9 @@ import mx.controls.*;
 		lessonEnd_lbl.setStyle('styleName',styleObj);
 	}
 	
-	private function setSize(mm:MonitorModel):Void{
-
-		//var s:Object = mm.getSize();
+	public function setSize(mm:MonitorModel):Void{
+		var s:Object = mm.getSize();
 		
-		//TODO fixes width of endgate components, but there's prob a better way
-		var s:Object = MonitorModel(getModel()).getSize(); 
-
 		bg_pnl.setSize(s.w, bg_pnl.height);
 		bar_pnl.setSize(s.w-20, bar_pnl.height);
 		mm.endGate.tt_btn.setSize(s.w, bg_pnl.height);

@@ -264,7 +264,7 @@ class MonitorController extends AbstractController {
 	private function reloadProgress(ref, URLToSend){
 		var callback:Function = Proxy.create(ref, getProgressData);
 		Application.getInstance().getComms().getRequest(URLToSend,callback, false);
-						
+		//_monitorModel.updateIndexButtons();
 		
 	}
 	private function activitySnapBack(act:Object){

@@ -94,6 +94,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private var maxLearnerIndex:Number;
 	private var learnersDrawnIndex:Number;
 	
+	private var hAdjustment:Boolean;
+	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -122,6 +124,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		learnerListArr = new Array();
 		panelLowered = false;
+		hAdjustment = false;
 		
         //Set up parameters for the grid
 		H_GAP = 10;
@@ -157,7 +160,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 							mm.getMonitor().openLearningDesign(mm.getSequence());
 						} else if(mm.getIsProgressChangedLearner()) {
 							reloadProgress(mm, false);
-						} else if(learnersDrawn != mm.allLearnersProgress.length){
+						} else if(learnersDrawn != mm.allLearnersProgress.length){ //could be error here with learnersDrawn
 							reloadProgress(mm, true);
 						}
 						
@@ -181,7 +184,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 				case 'RELOADPROGRESS' :	
 					Debugger.log("Reload Progress event received", Debugger.CRITICAL, "update", "LearnerTabView");
 					if (infoObj.tabID == _tabID && !mm.locked){
-						//adjustLearnerPanel(mm);
 						reloadProgress(mm, true);
 					}
 					break;	
@@ -201,7 +203,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					}
 					break;
 				case 'DRAW_DESIGN' :
-					Debugger.log("DRAW_DESIGN evt update received", Debugger.CRITICAL, "update", "LearnerTavView");
+					Debugger.log("DRAW_DESIGN received",Debugger.CRITICAL,"update","LearnerTabView");
 					adjustLearnerPanel(mm);
 					if (infoObj.tabID == _tabID && !mm.locked){
 						if (mm.isDesignDrawn) {
@@ -215,6 +217,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 						evtArr = infoObj.data;
 						drawAll();
 					}
+					setSize(mm);
 					break;
 				default :
 					Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LearnerTabView');
@@ -303,16 +306,32 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			mm.getMonitor().getProgressData(mm.getSequence());
 	}
 	
-	public function adjustLearnerPanel(mm):Void {
+	public function adjustLearnerPanel(mm:MonitorModel):Void {
+		var _scroll:ScrollPane = mm.getMonitor().getMV().getMonitorLearnerScp();
+		var s:Object = mm.getSize();
+		
 		if (mm.numIndexButtons > 1 && !panelLowered) {
-			mm.getMonitor().getMV().getMonitorLearnerScp()._y = mm.getMonitor().getMV().getMonitorLearnerScp()._y + 20;
-			panelLowered = true;
+			if (hAdjustment) {
+				_scroll.setSize(s.w-_scroll._x, s.h - 20);
+				hAdjustment = false;
+			}
+			
+			_scroll._y += 20;
+			
+			panelLowered = true;	
+		}
+		else if (mm.numIndexButtons <= 1 && !hAdjustment) {
+			//s.h += 20
+			_scroll.setSize(s.w-_scroll._x, s.h);
+			hAdjustment = true;
 		}
 	}
 	
 	public function clearCanvas(mm:MonitorModel, isChanged:Boolean):Void {
+		Debugger.log("in clearCanvas", Debugger.CRITICAL, "clearCanvas", "LearnerTabView");
 		learnersDrawn = 0;
-			
+		learnersDrawnIndex = 0;
+		
 		ACT_X = 0;
 		ACT_Y = 35;
 		
@@ -344,7 +363,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		currentLearnerIndex = (mm.currentLearnerIndex-1)*learnersPerPage;
 		maxLearnerIndex = (learnersPerPage*mm.currentLearnerIndex)-1;
 		learnersDrawnIndex = 0;
-		//mm.allLearnersProgress.sortOn("learnerLastName", Array.DESCENDING);
 		
 		drawNextLearner();
 
@@ -366,7 +384,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 				mm.drawDesign(_tabID, mm.allLearnersProgress[currentLearnerIndex]);
 			}
 		} else {
-			setSize(mm);
 			mm.isDesignDrawn = true;
 		}
 		
@@ -578,31 +595,28 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		var s:Object = mm.getSize();
 		
 		var actkeys = mm.getSequence().getLearningDesignModel().activities.keys();
-		Debugger.log("actkeys.length: "+actkeys.length, Debugger.CRITICAL, "setSize", "LearnerTabView");
-		
 		var ddmBranch_keys:Array = mm.getSequence().getLearningDesignModel().branches.keys();
-		Debugger.log("ddmBranch_keys.length: "+ddmBranch_keys.length, Debugger.CRITICAL, "setSize", "LearnerTabView");
+		var scpWidth:Number = Math.max((actkeys.length)*130, s.w);
 		
-		//var scpWidth:Number = mm.getMonitor().getMV().getMonitorLearnerScp()._width;
-		var scpWidth:Number = (actkeys.length)*130;
-
-		var scpHeight:Number = mm.getMonitor().getMV().getMonitorLearnerScp()._height;
-		
-		var newWidth:Number;
-		
-		newWidth = (_activityLayer_mc._width < scpWidth) ? scpWidth - 6 : _activityLayer_mc._width;
+		var newWidth:Number = (_activityLayer_mc._width < scpWidth) ? scpWidth - 6 : _activityLayer_mc._width;
 		
 		for (var i=0; i<learnerListArr.length; i++){
 			learnerListArr[i].learnerName._width = newWidth;
 			learnerListArr[i].learnerButton._x = newWidth-110;
 		}
-		var learnerListHeight:Number = ((learnerListArr.length)*80)+35;
-		
+		var learnerListHeight:Number = s.h - 25;
+		if (learnersDrawnIndex != undefined) {
+			Debugger.log("learnersDrawnIndex: "+learnersDrawnIndex, Debugger.CRITICAL, "setSize", "LearnerTabView");
+			learnerListHeight = Math.max(((learnersDrawnIndex)*80)+35, s.h - 25);
+			Debugger.log("new height learnerListHeight: "+learnerListHeight, Debugger.CRITICAL, "setSize", "LearnerTabView");
+		}
+	
 		bkg_pnl._visible = false;
-		bkg_pnl.setSize(_activityLayer_mc._width, learnerListHeight);
 		
-		//mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
-		mm.getMonitor().getMV().getMonitorLearnerScp().invalidate();
+		bkg_pnl.setSize(_activityLayer_mc._width + 6, learnerListHeight);
+		Debugger.log("_activityLayer_mc._width: "+_activityLayer_mc._width, Debugger.CRITICAL, "setSize", "LearnerTabView");
+		
+		mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
 }
 	
 	 /**

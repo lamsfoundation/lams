@@ -311,23 +311,23 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		monitorGateView.init(mm, undefined);
 		monitorGateView.addEventListener('load',Proxy.create(this,tabLoaded));
 		
-		// Inititialsation for Learner Tab View 
-		learnerTabView_mc = _learnerTabLayer_mc.attachMovie("LearnerTabView", "learnerTabView_mc",DepthManager.kTop)
-		learnerTabView = LearnerTabView(learnerTabView_mc);
-		learnerTabView.init(mm, undefined);
-		learnerTabView.addEventListener('load',Proxy.create(this,tabLoaded));
-		
 		// Inititialsation for Learner Index View
 		learnerIndexView_mc = _monitorPanels_mc.attachMovie("LearnerIndexView", "learnerIndexView_mc", _monitorPanels_mc.getNextHighestDepth());
 		learnerIndexView = LearnerIndexView(learnerIndexView_mc);
 		learnerIndexView.init(mm, undefined);
 		learnerIndexView.addEventListener('load',Proxy.create(this,tabLoaded));
 		
+		// Inititialsation for Learner Tab View 
+		learnerTabView_mc = _learnerTabLayer_mc.attachMovie("LearnerTabView", "learnerTabView_mc",DepthManager.kTop)
+		learnerTabView = LearnerTabView(learnerTabView_mc);
+		learnerTabView.init(mm, undefined);
+		learnerTabView.addEventListener('load',Proxy.create(this,tabLoaded));
+				
 		mm.addObserver(lessonTabView);
 		mm.addObserver(monitorTabView);
 		mm.addObserver(monitorGateView);
-		mm.addObserver(learnerTabView);
 		mm.addObserver(learnerIndexView);
+		mm.addObserver(learnerTabView);
 	}
 	
 	public function showToolTip(btnObj, btnTT:String):Void{
@@ -389,12 +389,22 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
 		bkg_pnl.setSize(s.w,s.h);
+		Debugger.log("s.h: "+s.h, Debugger.CRITICAL, "setSize", "MonitorView");
+		
 		bkgHeader_pnl.setSize(s.w, bkgHeader_pnl._height);
-		monitorLesson_scp.setSize(s.w-monitorLesson_scp._x, s.h-monitorLesson_scp._y);
-		monitorSequence_scp.setSize(s.w-monitorSequence_scp._x, s.h-40.7);
-		monitorLearner_scp.setSize(s.w-monitorLearner_scp._x, s.h-monitorLearner_scp._y);
-		monitorGateView_mc.setSize(s.w, 40.7);
+
+		//monitorLesson_scp.setSize(s.w-monitorLesson_scp._x, s.h-monitorLesson_scp._y);
+		monitorLesson_scp.setSize(s.w-monitorLesson_scp._x, s.h);
+		Debugger.log("s.w-monitorLesson_scp._x: "+s.w-monitorLesson_scp._x, Debugger.CRITICAL, "setSize", "MonitorView");
+		Debugger.log("s.h-monitorLesson_scp._y: "+s.h-monitorLesson_scp._y, Debugger.CRITICAL, "setSize", "MonitorView");
+		
+		monitorSequence_scp.setSize(s.w-monitorSequence_scp._x, s.h-40.7); // endGate height = 40.7
+		monitorGateView.setSize(mm);
 		learnerIndexView.setSize(mm);
+		//monitorLearner_scp.setSize(s.w-monitorLearner_scp._x, s.h-monitorLearner_scp._y);
+		monitorLearner_scp.setSize(s.w-monitorLearner_scp._x, s.h-20);
+		Debugger.log("s.w: "+s.w, Debugger.CRITICAL, "setSize", "MonitorView");
+		Debugger.log("monitorLearner_scp._x: "+monitorLearner_scp._x, Debugger.CRITICAL, "setSize", "MonitorView");
 		
 		viewJournals_btn._x = s.w - 260;
 		exportPortfolio_btn._x = s.w - 260;

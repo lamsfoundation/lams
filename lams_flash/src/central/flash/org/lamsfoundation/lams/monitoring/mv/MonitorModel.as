@@ -120,10 +120,17 @@ class MonitorModel extends Observable{
 	private var _currentLearnerIndex:Number;
 	private var _learnersPerPage:Number;
 	private var _numLearners:Number;
+	private var _firstDisplayedIndexButton:Number;
+	private var _lastDisplayedIndexButton:Number;
+	private var _numDisplayedIdxButtons:Number
+	private var _numPreferredIndexButtons:Number;
+	private var lastIndexInitialised:Boolean;
 	
 	private var dispatchEvent:Function;       
     public var addEventListener:Function;  
     public var removeEventListener:Function;
+	
+	//private var _config:Config;
 	
 	/**
 	* Constructor.
@@ -135,16 +142,19 @@ class MonitorModel extends Observable{
 		isDesignDrawn = true;
 		_staffLoaded = false;
 		_learnersLoaded = false;
+		lastIndexInitialised = false;
 		
 		_currentLearnerIndex = 1;
+		_numPreferredIndexButtons = 10; // to be displayed at a time
 		_learnersPerPage = 10;
+		_firstDisplayedIndexButton = 1;
 		
 		_activeView = null;
 		
 		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
 		_transitionsDisplayed = new Hashtable("_transitionsDisplayed");
 		_branchesDisplayed = new Hashtable("_branchesDisplayed");
-		_learnersProgress = new Hashtable("_learnersProgress")
+		_learnersProgress = new Hashtable("_learnersProgress");
 
 		_orgResources = new Array();
 		learnerTabActArr = new Array();
@@ -205,8 +215,6 @@ class MonitorModel extends Observable{
 		// create new Sequence from DTO
 		var seq:Sequence = new Sequence(_seq);
 		setSequence(seq);
-		//setNumLearners(_seq.numberStartedLearners);
-		//Debugger.log("_seq.numberStartedLearners: "+_seq.numberStartedLearners, Debugger.CRITICAL, "loadSequence", "MonitorModel");
 		return true;
 	}
 	
@@ -239,6 +247,7 @@ class MonitorModel extends Observable{
 		//clear the old lot of Learner Progress data
 		_learnersProgress.clear();
 		learnerTabActArr = new Array();
+		
 		learnerTabActArr = learnerProg;
 		
 		for(var i=0; i<learnerProg.length;i++){
@@ -434,6 +443,7 @@ class MonitorModel extends Observable{
 	}
 	
 	public function set currentLearnerIndex(idx:Number):Void {
+		Debugger.log("in currentLearnerIndex idx: "+idx, Debugger.CRITICAL, "currentLearnerIndex", "MonitorModel");
 		_currentLearnerIndex = idx;
 		
 		//Set flag for notify observers
@@ -464,6 +474,59 @@ class MonitorModel extends Observable{
 		return numIdxBtns;
 	}
 	
+	public function updateIndexButtons(s:String):Void {
+		if (s == ">>") {
+			var diff:Number = numIndexButtons - lastDisplayedIndexButton;
+			var minButtons:Number = Math.min(diff, _numPreferredIndexButtons);
+			_lastDisplayedIndexButton += minButtons; 
+			_firstDisplayedIndexButton = _lastDisplayedIndexButton - Math.min(numIndexButtons, _numPreferredIndexButtons) + 1;
+			sendButtonUpdate();
+		}
+		else if (s == "<<") {
+			_firstDisplayedIndexButton -= _numPreferredIndexButtons;
+			if (_firstDisplayedIndexButton < 1) 
+				_firstDisplayedIndexButton = 1;
+			_lastDisplayedIndexButton = numIndexButtons > _numPreferredIndexButtons ? (_firstDisplayedIndexButton + _numPreferredIndexButtons - 1) : numIndexButtons;
+			sendButtonUpdate();
+		}
+		else { // Refresh or Go clicked
+			Debugger.log("Refresh or Go clicked", Debugger.CRITICAL, "updateIndexButtons", "MonitorModel");
+			if (_lastDisplayedIndexButton < _numPreferredIndexButtons)
+				_lastDisplayedIndexButton = Math.min(numIndexButtons, _numPreferredIndexButtons);
+		}
+	}
+	
+	public function sendButtonUpdate():Void {
+		//Set flag for notify observers
+		setChanged();
+        
+		//build and send update object
+		infoObj = {};
+		infoObj.tabID = 2;
+		infoObj.updateType = "DRAW_BUTTONS";
+		notifyObservers(infoObj);
+	}
+
+	public function get numDisplayedIdxButtons():Number {
+		return _numDisplayedIdxButtons = _lastDisplayedIndexButton - _firstDisplayedIndexButton + 1;
+	}
+	
+	public function get firstDisplayedIndexButton():Number {
+		return _firstDisplayedIndexButton;
+	}
+	
+	public function get lastDisplayedIndexButton():Number {
+		if (!lastIndexInitialised) {
+			_lastDisplayedIndexButton = Math.min(numIndexButtons, _numPreferredIndexButtons);
+			lastIndexInitialised = true;
+		}
+		return _lastDisplayedIndexButton;
+	}
+	
+	public function get numPreferredIndexButtons():Number {
+		return _numPreferredIndexButtons;
+	}
+
 	public function getlearnerTabActArr():Array{
 		return learnerTabActArr;
 	}
@@ -1104,6 +1167,7 @@ class MonitorModel extends Observable{
 	}
 	
 	public function get allLearnersProgress():Array{
+		learnerTabActArr.sortOn(["_learnerLName", "_learnerFName"], Array.CASEINSENSITIVE); 
 		return learnerTabActArr;
 	}
 	
