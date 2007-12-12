@@ -373,12 +373,15 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		if(r==null){
 			return new LFError("Removing branch failed:"+branchUIID,"removeBranch",this,null);
 		}else{
-			var mappings:Object = getBranchMappingsByActivityUIIDAndType(r.sequenceActivity.activityUIID)
-			Debugger.log("removing " + mappings.length + " entries", Debugger.GEN, "removeBranch", "DesignDataModel");
-			
-			removeEntries(mappings.all);
+			if(!r.isEnd) {
+				var mappings:Object = getBranchMappingsByActivityUIIDAndType(r.sequenceActivity.activityUIID)
+				Debugger.log("removing " + mappings.length + " entries", Debugger.GEN, "removeBranch", "DesignDataModel");
+				
+				removeEntries(mappings.all);
+			}
 			
 			Debugger.log('Removed:'+r.branchUIID,Debugger.GEN,'removeBranch','DesignDataModel');
+			
 			dispatchEvent({type:'ddmUpdate',target:this});
 		}
 	}
