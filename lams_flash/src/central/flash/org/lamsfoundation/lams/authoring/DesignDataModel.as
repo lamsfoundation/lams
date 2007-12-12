@@ -997,18 +997,23 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function getBranchMappingsByActivityUIIDAndType(activityUIID:Number):Object {
 		var bMappings:Array = _branchMappings.values();
 		var myMappings:Object = new Object();
+		
 		myMappings.groupBased = new Array();
 		myMappings.toolBased = new Array();
 		myMappings.uncategorised = new Array();
+		myMappings.all = new Array();
 		
-		for(var i=0; i<bMappings.length; i++) {
-			if(bMappings[i] instanceof GroupBranchActivityEntry)	
+		for(var i=0; i<bMappings.length; i++)
+			if(bMappings[i].branchingActivity.activityUIID == activityUIID) {
+				if(bMappings[i] instanceof GroupBranchActivityEntry)	
 					myMappings.groupBased.push(bMappings[i]);
-			else if(bMappings[i] instanceof ToolOutputBranchActivityEntry)
-				myMappings.toolBased.push(bMappings[i]);
-			else 
-				myMappings.uncategorised.push(bMappings[i]);
-		}
+				else if(bMappings[i] instanceof ToolOutputBranchActivityEntry)
+					myMappings.toolBased.push(bMappings[i]);
+				else 
+					myMappings.uncategorised.push(bMappings[i]);
+				
+				myMappings.all.push(bMappings[i]);
+			}
 		
 		return myMappings;
 	}
@@ -1209,7 +1214,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 	}
 	
-	private function removeEntries(e:Array) {
+	public function removeEntries(e:Array) {
 		for(var i=0; i<e.length; i++)
 			if(e[i] instanceof Array)
 				removeEntries(e[i]);
