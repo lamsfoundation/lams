@@ -12,7 +12,7 @@ CREATE TABLE `lams_ext_server_org_map` (
   `userinfo_url` text NOT NULL,
   `timeout_url` text NOT NULL,
   `disabled` bit(1) NOT NULL,
-  `orgid` bigint(20) NOT NULL,
+  `orgid` bigint(20),
   PRIMARY KEY  (`sid`),
   UNIQUE KEY `serverid` (`serverid`),
   UNIQUE KEY `prefix` (`prefix`),
