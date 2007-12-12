@@ -36,15 +36,15 @@
 
     <layout class="org.apache.log4j.PatternLayout">
       <!-- The default pattern: Date Priority [Category] Message\n -->
-      <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c] %m%n"/>
+      <param name="ConversionPattern" value="%d{ISO8601} %-5p [%c] %m%n"/>
 
       <!-- The full pattern: Date MS Priority [Category] (Thread:NDC) Message\n
-      <param name="ConversionPattern" value="%d{ABSOLUTE} %-5r %-5p [%c] (%t:%x) %m%n"/>
+      <param name="ConversionPattern" value="%d{ISO8601} %-5r %-5p [%c] (%t:%x) %m%n"/>
        -->
     </layout>	    
   </appender>
 
-    <!-- A size based file rolling appender
+  <!-- A size based file rolling appender
   <appender name="FILE" class="org.jboss.logging.appender.RollingFileAppender">
      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
     <param name="File" value="${jboss.server.home.dir}/log/server.log"/>
@@ -53,7 +53,7 @@
     <param name="MaxBackupIndex" value="1"/>
     <param name="Threshold" value="INFO"/>
     <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c] %m%n"/>
+      <param name="ConversionPattern" value="%d{ISO8601} %-5p [%c] %m%n"/>
     </layout>	    
   </appender>
   -->
@@ -69,7 +69,7 @@
 
       <layout class="org.apache.log4j.PatternLayout">
          <!-- The default pattern: Date Priority [Category] Message\n -->
-         <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/>
+         <param name="ConversionPattern" value="%d{ISO8601} %-5p [%c{1}] %m%n"/>
       </layout>
    </appender>
 
@@ -96,7 +96,7 @@
      <param name="SMTPHost" value="localhost"/>
      <param name="BufferSize" value="10"/>
      <layout class="org.apache.log4j.PatternLayout">
-       <param name="ConversionPattern" value="[%d{ABSOLUTE},%c{1}] %m%n"/>
+       <param name="ConversionPattern" value="[%d{ISO8601},%c{1}] %m%n"/>
      </layout>
    </appender>
    -->
@@ -144,7 +144,7 @@
   <!-- LAMS Setup              -->
   <!-- ======================= -->
   
-  <appender name="AUDITFILE" class="org.jboss.logging.appender.DailyRollingFileAppender">
+    <appender name="AUDITFILE" class="org.jboss.logging.appender.DailyRollingFileAppender">
     <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
     <param name="File" value="${jboss.server.home.dir}/log/audit.log"/>
     <param name="Append" value="true"/>
@@ -154,11 +154,11 @@
     <param name="DatePattern" value="'.'yyyy-MM-dd"/>
 
     <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%d{ABSOLUTE} [%t:%x] %-5p %c - %m%n"/>
+      <param name="ConversionPattern" value="%d{ISO8601} [%t:%x] %-5p %c - %m%n"/>
 
     </layout>	    
   </appender>
-  
+ 
   <appender name="LAMSFILE" class="org.jboss.logging.appender.RollingFileAppender">
     <param name="File" value="${jboss.server.home.dir}/log/lams.log"/>
     <param name="Append" value="true"/>
@@ -166,7 +166,7 @@
     <param name="MaxBackupIndex" value="20"/>
     <layout class="org.apache.log4j.PatternLayout">
       <!-- Date [Thread:NDC] LEVEL Category - Message\n -->
-      <param name="ConversionPattern" value="%d{ABSOLUTE} [%t:%x] %-5p %c - %m%n"/>
+      <param name="ConversionPattern" value="%d{ISO8601} [%t:%x] %-5p %c - %m%n"/>
     </layout>	    
   </appender>
 
@@ -174,7 +174,7 @@
     <param name="Target" value="System.out"/>
     <layout class="org.apache.log4j.PatternLayout">
       <!-- Date Priority Category - Message\n -->
-      <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/>
+      <param name="ConversionPattern" value="%d{ISO8601} %-5p [%c{1}] %m%n"/>
     </layout>
   </appender>
 
@@ -185,7 +185,7 @@
     <param name="MaxBackupIndex" value="20"/>
     <layout class="org.apache.log4j.PatternLayout">
 		<!-- Date [Thread] Priority Category - Message\n -->
-		<param name="ConversionPattern" value="%d{ABSOLUTE} [%t] %-5p %c - %m%n"/>
+		<param name="ConversionPattern" value="%d{ISO8601} [%t] %-5p %c - %m%n"/>
     </layout>	    
   </appender>
   
@@ -199,7 +199,7 @@
     <priority value="INFO"/>
     <appender-ref ref="AUDITFILE"/>
   </category>
-
+  
   <category name="org.hibernate" additivity="false">
     <priority value="INFO"/>
     <appender-ref ref="HIBERNATEFILE"/>
@@ -216,7 +216,7 @@
    <category name="org.apache">
       <priority value="INFO"/>
    </category>
-   
+
    <!--  To avoid LDEV-881 exception info -->
    <category name="org.apache.catalina.core">
       <priority value="ERROR"/>
