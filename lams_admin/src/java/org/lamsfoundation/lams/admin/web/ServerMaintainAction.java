@@ -87,7 +87,9 @@ public class ServerMaintainAction extends LamsDispatchAction {
 			ExtServerOrgMap map = AdminServiceProxy.getIntegrationService(getServlet().getServletContext())
 				.getExtServerOrgMap(sid);
 			BeanUtils.copyProperties(serverOrgMapForm,map);
-			serverOrgMapForm.set("orgId", map.getOrganisation().getOrganisationId());
+			if (map.getOrganisation() != null) {
+				serverOrgMapForm.set("orgId", map.getOrganisation().getOrganisationId());
+			}
 		}
 		return mapping.findForward("servermaintain");
 	}

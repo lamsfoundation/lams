@@ -204,9 +204,6 @@ public class IntegrationService implements IIntegrationService{
 		map.setExtUsername(extUsername);
 		map.setUser(user);
 		service.save(map);
-		// every integration user is added to the group for their 3rd party server;
-		// becomes the 'public' folder for that server
-		addMemberships(user, serverMap.getOrganisation());
 		return map;
 	}
 	
@@ -246,9 +243,6 @@ public class IntegrationService implements IIntegrationService{
 		map.setExtUsername(extUsername);
 		map.setUser(user);
 		service.save(map);
-		// every integration user is added to the group for their 3rd party server;
-		// becomes the 'public' folder for that server
-		addMemberships(user, serverMap.getOrganisation());
 		return map;
 		
 	}
