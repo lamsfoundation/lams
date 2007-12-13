@@ -213,6 +213,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					}
 					break;
 				case 'DRAW_ALL' :
+					adjustLearnerPanel(mm);
 					if (infoObj.tabID == _tabID && !mm.locked){
 						evtArr = infoObj.data;
 						drawAll();
@@ -314,8 +315,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		if (mm.numIndexButtons > 1 && !panelLowered) {
 			if (hAdjustment) {
-				//_scroll.setSize(s.w-_scroll._x, s.h - 20);
-				_scroll.setSize(s.w-_scroll._x, s.h);
+				_scroll.setSize(s.w-_scroll._x, s.h - 20);
+				//_scroll.setSize(s.w-_scroll._x, s.h);
 				hAdjustment = false;
 			}
 			
@@ -607,17 +608,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			learnerListArr[i].learnerName._width = newWidth;
 			learnerListArr[i].learnerButton._x = newWidth-110;
 		}
-		var learnerListHeight:Number = s.h - 25;
-		if (learnersDrawnIndex != undefined) {
-			Debugger.log("learnersDrawnIndex: "+learnersDrawnIndex, Debugger.CRITICAL, "setSize", "LearnerTabView");
-			learnerListHeight = Math.max(((learnersDrawnIndex)*80)+35, s.h - 25);
-			Debugger.log("new height learnerListHeight: "+learnerListHeight, Debugger.CRITICAL, "setSize", "LearnerTabView");
-		}
-		
+
 		bkg_pnl._visible = false;
-		
-		bkg_pnl.setSize(_activityLayer_mc._width + 6, learnerListHeight);
-		Debugger.log("_activityLayer_mc._width: "+_activityLayer_mc._width, Debugger.CRITICAL, "setSize", "LearnerTabView");
+		bkg_pnl.setSize(_activityLayer_mc._width + 6, 0); // fixes scroll display issue though 0 height is questionable
 		
 		mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
 }

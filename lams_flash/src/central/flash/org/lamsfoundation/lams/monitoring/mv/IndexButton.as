@@ -76,13 +76,13 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 	}
 	
 	public function indexClicked(): Void {
+		Selection.setFocus(mm.getMonitor().getMV().getMonitorLearnerScp()); // take focus off idx textfield as it interferes << and >> button clicks
 		var buttonText:String = String(label.text)
 		if (buttonText == "<<") {
 			Debugger.log("<< clicked", Debugger.GEN, "indexClicked", "IndexButton");
 			mm.updateIndexButtons("<<");
 		} else if (buttonText == ">>") {
 			Debugger.log(">> clicked", Debugger.GEN, "indexClicked", "IndexButton");
-			Debugger.log("mm: "+mm, Debugger.GEN, "indexClicked", "IndexButton");
 			mm.updateIndexButtons(">>");
 			Debugger.log("updateIndexButtons has been called", Debugger.CRITICAL, "indexClicked", "IndexButton");
 		} else if (buttonText == "Go") {
@@ -98,9 +98,9 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 				LFMessage.showMessageAlert("The page index must be a number between 1 and "+ mm.numIndexButtons, null);
 		}
 		else {
-			//mm.updateIndexButtons();
 			mm.currentLearnerIndex = Number(label.text);
 		}
+		
 	}
 
 	

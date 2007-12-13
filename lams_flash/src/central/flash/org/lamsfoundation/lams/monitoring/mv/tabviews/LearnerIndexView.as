@@ -81,6 +81,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	//private var labelBackground;
 		
 	private var buttonsShown:Boolean;
+	private var drawButtons:Boolean; // buttons to the right of last index button
 	
 	private var direction:String;
 
@@ -96,6 +97,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		nextPosition = 0;
 		btnWidth = 45;
 		buttonsShown = false;
+		drawButtons = true;
 		defaultString = "Enter Page Number";
 		
 		this._visible = false;
@@ -150,6 +152,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 			case 'DRAW_DESIGN' :
 				if (infoObj.tabID == _tabID && !mm.locked && mm.numIndexButtons>1) {
 					if (!buttonsShown || newButtonsNeeded(mm)) {
+						drawButtons = true;
 						setupButtons(mm);
 						this._visible = true;						
 					}
@@ -157,9 +160,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 						updatePageLabel();
 				}
 				break;
-			case 'DRAW_BUTTONS' :
+			case 'DRAW_BUTTONS' : // this event is only fired when << or >> buttons clicked as it doesn't redraw learnertabview contents
 				if (infoObj.tabID == _tabID && !mm.locked && mm.numIndexButtons>1) {
+					//if ((mm.numIndexButtons > displayedButtons.length)) {
 					if (!buttonsShown || (mm.numIndexButtons > displayedButtons.length)) {
+						drawButtons = false;
 						setupButtons(mm);
 						this._visible = true;
 					}
@@ -200,21 +205,26 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	
 	public function setupButtons(mm:MonitorModel):Void {
 		rangeLabel.text = "Page " + mm.currentLearnerIndex + " of " + mm.numIndexButtons;
-		if (displayedButtons.length > 0 ) {
+		if ((displayedButtons.length > 0) && (drawButtons == true)) {
 			Debugger.log("[displayedButtons.length > 0] => removing buttons", Debugger.CRITICAL, "setupButtons", "LearnerIndexView");
 			removeButtons();
-		} 
-		_buttonsPanel_mc = this.createEmptyMovieClip("_buttonsPanel_mc", DepthManager.kTop);
+		}
 		
-		addRangeLabel(mm);
-		addIndexButtons(mm);
-		addNavigationButtons(mm);
-		addIndexTextField(mm);
-		addGoButton(mm);
+		if (drawButtons == true) {
+			_buttonsPanel_mc = this.createEmptyMovieClip("_buttonsPanel_mc", DepthManager.kTop);
+			addRangeLabel(mm);
+		}
+			addIndexButtons(mm); // if drawButtons = false, just rename labels
+			
+		if (drawButtons == true) {
+			addNavigationButtons(mm);
+			addIndexTextField(mm);
+			addGoButton(mm);
 		
-		buttonsShown = true;
-		direction = null;
-		nextPosition = 0;
+			buttonsShown = true;
+			direction = null;
+			nextPosition = 0;
+		}
 	}
 	
 	public function removeButtons(){
@@ -227,13 +237,14 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 			var idxBtn:MovieClip = MovieClip(displayedButtons.pop());
 			_buttonsPanel_mc.removeMovieClip(idxBtn);
 		}
+
 		_buttonsPanel_mc.removeMovieClip(backBtn);
 		_buttonsPanel_mc.removeMovieClip(nextBtn);
-				
+			
 		//need to remove the text field from the background
 		textFieldBackground_mc.removeMovieClip(idxTextField);
 		_buttonsPanel_mc.removeMovieClip(textFieldBackground_mc);
-		
+	
 		_buttonsPanel_mc.removeMovieClip(goBtn);
 	}
 	
@@ -253,14 +264,23 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		Debugger.log("mm.numIndexButtons: "+mm.numIndexButtons, Debugger.GEN, "addIndexButton", "LearnerIndexView");
 		Debugger.log("mm.firstDisplayedIndexButton: "+mm.firstDisplayedIndexButton, Debugger.GEN, "addIndexButton", "LearnerIndexView");
 		Debugger.log("mm.lastDisplayedIndexButton: "+mm.lastDisplayedIndexButton, Debugger.GEN, "addIndexButton", "LearnerIndexView");
-
+		var count:Number = 0;
+		
 		for (var i=mm.firstDisplayedIndexButton; i<=mm.lastDisplayedIndexButton; i++) {	
-			var idxBtn:MovieClip = _buttonsPanel_mc.attachMovie("IndexButton", "idxBtn"+i, _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth, _labelText: String(i)});	
-			_indexButton = IndexButton(idxBtn);
-			_indexButton.init(mm, undefined);
-			displayedButtons.push(idxBtn);
-			idxBtn._x = nextPosition;
-			nextPosition += btnWidth;
+			if (drawButtons == true) {
+				var idxBtn:MovieClip = _buttonsPanel_mc.attachMovie("IndexButton", "idxBtn"+i, _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth, _labelText: String(i)});	
+				_indexButton = IndexButton(idxBtn);
+				_indexButton.init(mm, undefined);
+				displayedButtons.push(idxBtn);
+				idxBtn._x = nextPosition;
+				nextPosition += btnWidth;
+			} else {
+				_indexButton = IndexButton(displayedButtons[count]);
+				//displayedButtons[count]._labelText = String(i);
+				displayedButtons[count].label = String(i);
+				nextPosition += btnWidth
+				count++;
+			}
 		}
 	}
 	
