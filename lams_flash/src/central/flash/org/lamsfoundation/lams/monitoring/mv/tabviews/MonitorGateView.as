@@ -163,7 +163,6 @@ import mx.controls.*;
 	}
 	
 	private function showEndGateData(mm:MonitorModel):Void{
-		Debugger.log("p1 in draw segd", Debugger.CRITICAL, "showEndGateData", "MonitorGateView");
 		var mc = getController();
 		var finishedLearners:Number = 0; 
 		var totalLearners:Number = mm.allLearnersProgress.length;
@@ -186,7 +185,6 @@ import mx.controls.*;
 		}
 		
 		lessonEnd_lbl.text = "<b>"+Dictionary.getValue('title_sequencetab_endGate')+"</b> "+finishedLearners+" of "+ totalLearners;
-		Debugger.log("p2 in draw segd", Debugger.CRITICAL, "showEndGateData", "MonitorGateView");
 	}
 			
 	/**

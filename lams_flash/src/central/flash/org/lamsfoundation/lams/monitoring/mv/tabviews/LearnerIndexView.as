@@ -120,6 +120,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		mm = MonitorModel(model)
 		mm.learnerIndexView = this;
 		
+		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
     }
 
@@ -141,7 +142,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 					setPosition(mm);
 				}
 				break;
-			case 'SIZE' :	
+			case 'SIZE' :
 				if (infoObj.tabID == _tabID && !mm.locked){
 					setSize(mm);
 				}
@@ -159,7 +160,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 			case 'DRAW_BUTTONS' :
 				if (infoObj.tabID == _tabID && !mm.locked && mm.numIndexButtons>1) {
 					if (!buttonsShown || (mm.numIndexButtons > displayedButtons.length)) {
-					//if (!buttonsShown || newButtonsNeeded(mm)) {
 						setupButtons(mm);
 						this._visible = true;
 					}

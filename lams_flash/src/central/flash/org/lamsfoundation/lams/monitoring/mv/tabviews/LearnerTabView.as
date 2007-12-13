@@ -125,7 +125,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		learnerListArr = new Array();
 		panelLowered = false;
 		hAdjustment = false;
-		
+
         //Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
@@ -307,12 +307,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	}
 	
 	public function adjustLearnerPanel(mm:MonitorModel):Void {
+		
+		Debugger.log("adjustLearnerPanel called", Debugger.CRITICAL, "adjustLearnerPanel", "LearnerTabView");
 		var _scroll:ScrollPane = mm.getMonitor().getMV().getMonitorLearnerScp();
 		var s:Object = mm.getSize();
 		
 		if (mm.numIndexButtons > 1 && !panelLowered) {
 			if (hAdjustment) {
-				_scroll.setSize(s.w-_scroll._x, s.h - 20);
+				//_scroll.setSize(s.w-_scroll._x, s.h - 20);
+				_scroll.setSize(s.w-_scroll._x, s.h);
 				hAdjustment = false;
 			}
 			
@@ -321,10 +324,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			panelLowered = true;	
 		}
 		else if (mm.numIndexButtons <= 1 && !hAdjustment) {
-			//s.h += 20
 			_scroll.setSize(s.w-_scroll._x, s.h);
 			hAdjustment = true;
 		}
+	
 	}
 	
 	public function clearCanvas(mm:MonitorModel, isChanged:Boolean):Void {
@@ -610,7 +613,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			learnerListHeight = Math.max(((learnersDrawnIndex)*80)+35, s.h - 25);
 			Debugger.log("new height learnerListHeight: "+learnerListHeight, Debugger.CRITICAL, "setSize", "LearnerTabView");
 		}
-	
+		
 		bkg_pnl._visible = false;
 		
 		bkg_pnl.setSize(_activityLayer_mc._width + 6, learnerListHeight);
