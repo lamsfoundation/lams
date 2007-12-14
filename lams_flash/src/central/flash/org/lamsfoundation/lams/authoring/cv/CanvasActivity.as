@@ -164,6 +164,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 	
 	public function init(initObj):Void{
+		Debugger.log("init called.", Debugger.CRITICAL, "init", "CanvasActivity");
+
 		if(initObj){
 			_module = initObj._module;
 			if (_module == "monitoring"){
@@ -174,10 +176,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				_canvasView = initObj._canvasView;
 				_canvasController = initObj._canvasController;
 			}
+			
 			_activity = initObj.activity;
 		}
 		
 		_canvasModel = CanvasModel(_canvasController.getModel());
+		mm = MonitorModel(_monitorController.getModel());
+		
+		Debugger.log("mm: " + mm, Debugger.CRITICAL, "init", "CanvasActivity");
+		Debugger.log("_activity: " + _activity.activityUIID, Debugger.CRITICAL, "init", "CanvasActivity");
+
+		
 		showAssets(false);
 		
 		if (_activity.selectActivity == "false"){
@@ -366,6 +375,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			drawLearners();
 		
 		Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
+		
 		setStyles();
 		
 		var theIcon_mc:MovieClip;

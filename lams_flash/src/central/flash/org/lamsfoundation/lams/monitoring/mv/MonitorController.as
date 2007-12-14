@@ -40,6 +40,7 @@ import mx.behaviors.*
 import mx.core.*
 import mx.events.*
 import mx.effects.*
+import mx.managers.DepthManager;
 
 import org.lamsfoundation.lams.authoring.cv.CanvasModel;
 
@@ -75,7 +76,34 @@ class MonitorController extends AbstractController {
 			
 			Debugger.log('activityClick CanvasActivity:'+act.Learner.getUserName(),Debugger.GEN,'activityClick','MonitorController');
 		}else {
+			var _tempSelectedItem = _monitorModel.selectedItem;
+		
+			var parentAct = _monitorModel.getMonitor().ddm.getActivityByUIID(act.activity.parentUIID);
+			var parentSelectedAct = _monitorModel.getMonitor().ddm.getActivityByUIID(_monitorModel.selectedItem.activity.parentUIID);
+			
+			if(_tempSelectedItem != null) {
+			
+				// clear currently selected activity
+				if(_monitorModel.getMonitor().ddm.getActivityByUIID(parentSelectedAct.parentUIID).activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE) {
+						_tempSelectedItem._parent._parent.swapDepths(_tempSelectedItem._parent._parent.depthHistory);
+						_tempSelectedItem._parent._parent.depthHistory = null;
+						
+						_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
+						_tempSelectedItem.depthHistory = null;
+				}
+
+			}
+			
+			if(_monitorModel.getMonitor().ddm.getActivityByUIID(parentAct.parentUIID).activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE) {
+				act._parent._parent.depthHistory = act._parent._parent.getDepth();
+				act._parent._parent.swapDepths(DepthManager.kTop);
+						
+				act.depthHistory = act.getDepth();
+				act.swapDepths(DepthManager.kTop);
+			}
+			
 			_monitorModel.selectedItem = act;
+
 		}
     }
    
@@ -264,8 +292,9 @@ class MonitorController extends AbstractController {
 	private function reloadProgress(ref, URLToSend){
 		var callback:Function = Proxy.create(ref, getProgressData);
 		Application.getInstance().getComms().getRequest(URLToSend,callback, false);
+		//_monitorModel.updateIndexButtons();
+		
 	}
-	
 	private function activitySnapBack(act:Object){
 		act._x = act.xCoord;
 		act._y = act.yCoord;

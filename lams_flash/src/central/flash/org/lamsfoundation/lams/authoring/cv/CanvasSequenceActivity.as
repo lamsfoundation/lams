@@ -196,7 +196,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		childActivity.activity.yCoord = CHILD_OFFSET_Y;
 		childActivity._visible = true;
 		
-		if(childActivity.activity.activityUIID == _canvasModel.selectedItem.activity.activityUIID)
+		if(childActivity.activity.activityUIID == getModel().selectedItem.activity.activityUIID)
 			childActivity.setSelected(true);
 		
 		children_mc.push(childActivity);
@@ -204,9 +204,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		
 		Debugger.log("children length: " + _children.length, Debugger.CRITICAL, "drawChildActivity", "CanvasSequenceActivity");
 		
-		var transitionObj:Object = _canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(childActivity.activity.activityUIID)
+		var transitionObj:Object = getDDM().getTransitionsForActivityUIID(childActivity.activity.activityUIID)
 		if(transitionObj.hasTrans && transitionObj.out != null) {
-			_children.push(_canvasModel.getCanvas().ddm.getActivityByUIID(transitionObj.out.toUIID))
+			_children.push(getDDM().getActivityByUIID(transitionObj.out.toUIID))
 			drawChildActivity(_children[_children.length-1]);
 		}
 	}
@@ -331,12 +331,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	}
 	
 	private function localOnPress():Void{
-
-		if (_module == "monitoring"){
-		} else {
-			_canvasModel.selectedItem = this;
-		}	
-	
+		getModel().selectedItem = this;
 	}
 	
 	private function localOnRelease():Void{
@@ -419,6 +414,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		} else {
 			return _canvasView.ddm;
 		}
+	}
+	
+	private function getModel() {
+		if(_module == "monitoring")
+			return mm;
+		else
+			return _canvasModel;
 	}
 	
 	public function get children():Array {

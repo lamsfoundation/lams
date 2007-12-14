@@ -244,7 +244,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		transitionLayer = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
 		//branchLayer = this.createEmptyMovieClip("_branchLayer_mc", this.getNextHighestDepth());
 		
-		activityComplexLayer = this.createEmptyMovieClip("_activityComplexLayer_mc", this.getNextHighestDepth());
 		activityLayer = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 		
 		// creates learner icon on initial draw
@@ -355,10 +354,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			newActivity_mc = activityLayer.createChildAtDepth("CanvasGateActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc, _monitorView:mtv, _module:"monitoring"});
 		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			newActivity_mc = activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kBottom,{_activity:a,_children:children, _monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});
-		} else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+			newActivity_mc = activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children, _monitorController:mc, _monitorTabView:mtv, fromModuleTab:"monitorMonitorTab", learnerContainer:_learnerContainer_mc});
+		} else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONS_WITH_SEQUENCES_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			newActivity_mc = activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kBottom,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv, fromModuleTab:"monitorMonitorTab",learnerContainer:_learnerContainer_mc});	
+			newActivity_mc = activityLayer.createChildAtDepth("CanvasOptionalActivity", DepthManager.kBottom, {_activity:a, _children:children, _monitorController:mc, _monitorTabView:mtv, fromModuleTab:"monitorMonitorTab", learnerContainer:_learnerContainer_mc});	
 		} else if(a.isBranchingActivity()){	
 			var newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kBottom,{_activity:a,_monitorController:mc, _monitorView:mtv, _module:"monitoring", learnerContainer:_learnerContainer_mc, setupBranchView:false});
 		} else {

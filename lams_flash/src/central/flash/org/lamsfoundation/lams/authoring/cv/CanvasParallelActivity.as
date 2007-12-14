@@ -43,14 +43,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private var CHILD_OFFSET_X:Number = 8;
 	private var CHILD1_OFFSET_Y:Number = 45 //67.5;
 	private var CHILD2_OFFSET_Y:Number = 108 //130.5;
+	
 	private var newContainerXCoord:Number; 
 	private var newContainerYCoord:Number;
 	
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
+	
 	private var _monitorController:MonitorController;
 	private var _monitorTabView:MonitorTabView;
+	
 	private var _tm:ThemeManager;
 	
 	//Set by the init obj
@@ -73,9 +76,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private var _ddm:DesignDataModel;
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
-	private var child1_mc:MovieClip;
-	private var child2_mc:MovieClip;
+	
+	private var child1_mc:CanvasActivity;
+	private var child2_mc:CanvasActivity;
+	
 	private var _locked:Boolean = false;
+	
 	private var _visibleHeight:Number;
 	private var _visibleWidth:Number;
 	
@@ -91,8 +97,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	function CanvasParallelActivity(){
 		Debugger.log("_activity:"+_activity.title+'uiID:'+_activity.activityUIID+' children:'+_children.length,Debugger.GEN,'Constructor','CanvasParallelActivity');
 		_visible = false;
+		
 		_tm = ThemeManager.getInstance();
 		_ddm = new DesignDataModel()
+		
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
 		
@@ -120,8 +128,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		}
 		
 		//set the positioning co-ords
-		newContainerXCoord = container_pnl._width/2
-		newContainerYCoord = container_pnl._height/2
+		newContainerXCoord = container_pnl._width/2;
+		newContainerYCoord = container_pnl._height/2;
 			
 		child1.xCoord = CHILD_OFFSET_X //+ (newContainerXCoord-CHILD_OFFSET_X);
 		child1.yCoord = CHILD1_OFFSET_Y;
@@ -129,11 +137,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		child2.yCoord = CHILD2_OFFSET_Y //+ newContainerYCoord;
 		
 		//so now it is placed on in the IDE and we just call init
-		if (fromModuleTab == "monitorMonitorTab"){
-			child1_mc.init({activity:child1,_monitorController:_monitorController,_monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
-			child2_mc.init({activity:child2,_monitorController:_monitorController,_monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
-				
+		Debugger.log("fromModuleTab: " + fromModuleTab, Debugger.CRITICAL, "init", "CanvasParallelActivity");
+		
+		if(fromModuleTab == "monitorMonitorTab"){
+			Debugger.log("initialising for monitor: " + child1.activityUIID + " " + child2.activityUIID, Debugger.CRITICAL, "init", "CanvasParallelActivity");
+			
+			//child1_mc = childActivities_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:child1 ,_monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+			//child2_mc = childActivities_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:child2 ,_monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+
+			child1_mc.init({activity:child1, _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+			child2_mc.init({activity:child2, _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+			
+			Debugger.log("child_mc(s) " + child1_mc + " " + child2_mc, Debugger.CRITICAL, "init", "CanvasParallelActivity");
+			
 		}else {
+			
 			child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
 			child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
 			
@@ -208,6 +226,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	
 	private function drawLearners():Void {
 		var mm:MonitorModel = MonitorModel(_monitorController.getModel());
+		
 		var learner_X = _activity.xCoord + learnerOffset_X;
 		var learner_Y = _activity.yCoord + learnerOffset_Y;
 			
@@ -244,11 +263,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 			drawLearners()
 			
 		//position the container (this)
-		_x = _activity.xCoord //- newContainerXCoord;
-		_y = _activity.yCoord
+		_x = _activity.xCoord; //- newContainerXCoord;
+		_y = _activity.yCoord;
 	
-		setLocking()
-		setStyles()
+		setLocking();
+		setStyles();
+		
 		_visible = true;
 					
 	}

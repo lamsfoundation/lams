@@ -271,9 +271,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		var cvc = getController();
 		
 		var setupBranchView:Boolean = (cm.lastBranchActionType == CanvasModel.OPEN_FROM_FILE) ? true : false;
-		Debugger.log('setupBranchView:' + setupBranchView, Debugger.CRITICAL, 'drawActivity','CanvasView');
 		
+		Debugger.log('setupBranchView:' + setupBranchView, Debugger.CRITICAL, 'drawActivity','CanvasView');
 		Debugger.log('I am in drawActivity and Activity typeID :'+a.activityTypeID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
+		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity()){
 			var newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasView:cvv});
