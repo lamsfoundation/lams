@@ -1,9 +1,9 @@
 <%@ include file="/taglibs.jsp"%>
 
-<h2>
-	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :
-	<fmt:message key="cache.title"/>
-</h2>
+<h4>
+	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+</h4>
+<h1><fmt:message key="cache.title"/></h1>
 <br/>
 <p><fmt:message key="cache.explanation1"/></p>
 <p><fmt:message key="cache.explanation2"/></p>

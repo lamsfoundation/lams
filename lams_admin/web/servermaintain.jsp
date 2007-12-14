@@ -1,12 +1,12 @@
 <%@ include file="/taglibs.jsp"%>
 
-<h2>
+<h4>
 	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :
-	<a href="serverlist.do"><fmt:message key="sysadmin.maintain.external.servers" /></a> :
-	<fmt:message key="sysadmin.maintain.server.edit"/>
-</h2>
+	<a href="serverlist.do"><fmt:message key="sysadmin.maintain.external.servers" /></a>
+</h4>
 <lams:help style="no-tabs" page="LAMS+v2.0+Integration+Setup+Step-by-Step+Guide"/>
-<br />
+<h1><fmt:message key="sysadmin.maintain.server.edit"/></h1>
+
 <html:errors/>
 <br />
 <html:form action="serversave.do" method="post">

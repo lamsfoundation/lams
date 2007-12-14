@@ -1,10 +1,8 @@
 <%@ include file="/taglibs.jsp"%>
 
-<form>
-<h2>
-	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-	: <fmt:message key="admin.list.disabled.users"/></h2>
-<p>&nbsp;</p>
+<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
+<h1><fmt:message key="admin.list.disabled.users"/></h1>
+
 <table class="alternative-color" width=100% cellspacing="0">
 <tr>
 	<th></th>
@@ -37,4 +35,3 @@
 	</tr>
 </logic:iterate>
 </table>
-</form>

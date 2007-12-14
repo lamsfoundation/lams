@@ -3,7 +3,7 @@
 <html-el:form action="/usersave.do" method="post">
 <html-el:hidden property="userId" />
 <html-el:hidden property="orgId" />
-<h2 class="align-left">
+<h4 class="align-left">
 	<logic:notEmpty name="UserForm" property="orgId">
 		<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
 		<logic:notEmpty name="pOrgId">
@@ -18,15 +18,16 @@
 		<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 		: <a href="usersearch.do"><fmt:message key="admin.user.find" /></a>
 	</logic:empty>
+</h4>
+
+<h1>
 	<logic:notEmpty name="UserForm" property="userId">
-		: <fmt:message key="admin.user.edit"/>
+		<fmt:message key="admin.user.edit"/>
 	</logic:notEmpty>
 	<logic:empty name="UserForm" property="userId">
-		: <fmt:message key="admin.user.create"/>
+		<fmt:message key="admin.user.create"/>
 	</logic:empty>
-</h2>
-
-<p>&nbsp;</p>
+</h1>
 
 <div align="center"><html-el:errors/></div>
 

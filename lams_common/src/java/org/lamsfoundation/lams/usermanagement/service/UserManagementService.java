@@ -900,6 +900,14 @@ public class UserManagementService implements IUserManagementService {
 			return new Integer(0);
 	}
 	
+	public Integer getCountRoleForOrg(Integer orgId, Integer roleId) {
+		Integer count = roleDAO.getCountRoleForOrg(roleId, orgId);
+		if(count != null)
+			return count;
+		else
+			return new Integer(0);
+	}
+	
 	public CSSThemeVisualElement getDefaultFlashTheme() {
 		String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
 		List list = findByProperty(CSSThemeVisualElement.class, "name", flashName);

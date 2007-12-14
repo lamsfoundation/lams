@@ -11,12 +11,9 @@
 	}
 </script>
 
-<h2>
-	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-	: <fmt:message key="sysadmin.ldap.configuration"/></h2>
-
+<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
 <lams:help style="no-tabs" page="LDAP+Configuration"/>
-<br/>
+<h1><fmt:message key="sysadmin.ldap.configuration"/></h1>
 
 <h3><fmt:message key="heading.ldap.synchronise"/></h3>
 <p>

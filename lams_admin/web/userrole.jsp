@@ -3,7 +3,7 @@
 <html-el:form action="/userrolessave.do" method="post">
 <html-el:hidden property="userId" />
 <html-el:hidden property="orgId" />
-<h2 align="left">
+<h4 align="left">
 	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
 	<logic:notEmpty name="pOrgId">
 		: <a href="orgmanage.do?org=<c:out value="${pOrgId}" />"><c:out value="${parentName}" /></a>
@@ -17,10 +17,9 @@
 			: <a href="usermanage.do?org=<bean:write name="UserRolesForm" property="orgId" />"><fmt:message key="admin.global.roles.manage" /></a>
 		</logic:equal>
 	</logic:empty>
-	: <fmt:message key="admin.user.assign.roles"/>
-</h2>
+</h5>
 
-<p>&nbsp;</p>
+<h1><fmt:message key="admin.user.assign.roles"/></h1>
 
 <p><fmt:message key="msg.roles.mandatory"/></p>
 

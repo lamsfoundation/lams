@@ -8,7 +8,7 @@ function toggleCheckboxes(roleIndex, object){
 }
 </script>
 
-<h2>
+<h4>
 	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
     <logic:notEmpty name="pOrgId">
         : <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a>
@@ -20,9 +20,9 @@ function toggleCheckboxes(roleIndex, object){
 	<logic:equal name="UserOrgRoleForm" property="orgId" value="1">
 		: <a href="usermanage.do?org=<bean:write name="UserOrgRoleForm" property="orgId" />"><fmt:message key="admin.global.roles.manage" /></a>
 	</logic:equal>
-	: <fmt:message key="admin.user.assign.roles" />
-</h2>
-<p>&nbsp;</p>
+</h4>
+
+<h1><fmt:message key="admin.user.assign.roles" /></h1>
 
 <p><fmt:message key="msg.roles.mandatory.users"/></p>
 

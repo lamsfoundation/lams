@@ -52,6 +52,11 @@ public class RoleDAO extends BaseDAO implements IRoleDAO
 			+ " from "+UserOrganisationRole.class.getName()+" userOrganisationRole"
 			+ " where userOrganisationRole.role.roleId = :roleId";
 
+	 private final static String COUNT_ROLE_FOR_ORG = "select count(distinct uor.userOrganisation.user)"
+		 	+ " from "+UserOrganisationRole.class.getName()+" uor"
+		 	+ " where uor.role.roleId = :roleId"
+		 	+ " and uor.userOrganisation.organisation.organisationId = :orgId";
+	 
     public User getUserByOrganisationAndRole(final Integer userId, final Integer roleId, final Organisation organisation)
     {
         HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
@@ -87,7 +92,21 @@ public class RoleDAO extends BaseDAO implements IRoleDAO
     	
     }
     
-    
+    public Integer getCountRoleForOrg(final Integer roleId, final Integer orgId)
+    {
+    	 HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+
+    	 return (Integer) hibernateTemplate.execute(new HibernateCallback() {
+             public Object doInHibernate(Session session)
+                     throws HibernateException {
+     	    	Query query = session.createQuery(COUNT_ROLE_FOR_ORG);
+     	    	query.setInteger("roleId", roleId.intValue());
+     	    	query.setInteger("orgId", orgId.intValue());
+     	    	Object value = query.uniqueResult();
+     	    	return new Integer (((Number)value).intValue()); 
+             }
+         });
+    }
     
 
 }

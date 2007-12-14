@@ -11,14 +11,9 @@ function loading(){
 }
 </script>
 
-<h2>
-	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-	: <fmt:message key="sysadmin.import.groups.title" />
-</h2>
-
+<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
 <lams:help style="no-tabs" page="<%= IImportService.IMPORT_GROUPS_HELP_PAGE %>"/>
-
-<p>&nbsp;</p>
+<h1><fmt:message key="sysadmin.import.groups.title" /></h1>
 
 <div id="loading" style="display:none">
 	<h3><fmt:message key="msg.please.wait"/></h3>

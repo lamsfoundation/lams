@@ -2,10 +2,10 @@
 <%@ include file="/taglibs.jsp"%>
 
 <form action="http://lamscommunity.org/registration" method="get">
-	<h2 class="align-left">
-		<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :  
-		<fmt:message key="sysadmin.register.server" />
-	</h2>
+	<h4 class="align-left">
+		<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+	</h4>
+	<h1><fmt:message key="sysadmin.register.server" /></h1>
 	<br/>
 	
 	<table class="alternative-color" width=100% cellspacing="0">

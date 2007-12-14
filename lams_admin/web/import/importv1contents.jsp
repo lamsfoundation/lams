@@ -18,14 +18,9 @@ function loading(){
 }
 </script>
 
-<h2>
-	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-	: <fmt:message key="admin.importv1.title" />
-</h2>
-
+<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
 <lams:help style="no-tabs" page="<%= IImportService.IMPORTV1_HELP_PAGE %>"/>
-
-<p>&nbsp;</p>
+<h1><fmt:message key="admin.importv1.title" /></h1>
 
 <div id="loading" style="display:none">
 	<h3><fmt:message key="msg.importv1.please.wait"/></h3>

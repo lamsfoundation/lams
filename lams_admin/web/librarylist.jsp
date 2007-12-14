@@ -1,6 +1,8 @@
 <%@ include file="/taglibs.jsp"%>
 
-<h2><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> : <fmt:message key="sysadmin.library.management" /></h2>
+<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
+<h1><fmt:message key="sysadmin.library.management" /></h1>
+
 <logic:messagesPresent>
 <p class="warning">
         <html:messages id="error">

@@ -11,35 +11,82 @@
 	//-->
 </script>
 
-<form>
-<h2 class="align-left">
+
+<h4>
 	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
-	<logic:equal name="orgType" value="1">
-		: <fmt:message key="admin.global.roles.manage" />
-	</logic:equal>
 	<logic:equal name="orgType" value="2">
 		: <a href="orgmanage.do?org=<bean:write name="UserManageForm" property="orgId" />"><bean:write name="UserManageForm" property="orgName"/></a>
-		: <fmt:message key="admin.user.manage" />
 	</logic:equal>
 	<logic:equal name="orgType" value="3">
 		: <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a>
-		: <a href="usermanage.do?org=<bean:write name="UserManageForm" property="orgId" />"><bean:write name="UserManageForm" property="orgName"/></a>
-		: <fmt:message key="admin.user.manage" />
+		: <a href="orgmanage.do?org=<bean:write name="UserManageForm" property="orgId" />"><bean:write name="UserManageForm" property="orgName"/></a>
 	</logic:equal>
+</h4>
+
+<h1>
+	<logic:equal name="orgType" value="1">
+		<fmt:message key="admin.global.roles.manage" />
+	</logic:equal>
+	<logic:notEqual name="orgType" value="1">
+		<c:out value="${heading}" />
+	</logic:notEqual>
+</h1>
+
+<logic:notEqual name="orgType" value="1">
+<table cellspacing="7" style="margin-left:5px; padding-top:10px; width:60%">
+	<tr>
+		<td align="right"><fmt:message key="label.learners"/>:</td>
+		<td><c:out value="${LEARNER}"/></td>
+		<td align="right"><fmt:message key="label.group.managers"/>:</td>
+		<td width="10%"><c:out value="${GROUP_MANAGER}"/></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.monitors"/>:</td>
+		<td><c:out value="${MONITOR}"/></td>
+		<td align="right"><fmt:message key="label.group.admins"/>:</td>
+		<td><c:out value="${GROUP_ADMIN}"/></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.authors"/>:</td>
+		<td><c:out value="${AUTHOR}"/></td>
+		<td align="right"></td>
+		<td></td>
+	</tr>
+</table>
+</logic:notEqual>
 	
-</h2>
+<logic:equal name="orgType" value="1">
+<table cellspacing="7" style="margin-left:5px; padding-top:10px; width:60%">
+	<tr>
+		<td align="right"><fmt:message key="label.sysadmins"/>:</td>
+		<td><c:out value="${SYSADMIN}"/></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.group.admins"/>:</td>
+		<td><c:out value="${GROUP_ADMIN}"/></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.author.admins"/>:</td>
+		<td><c:out value="${AUTHOR_ADMIN}"/></td>
+	</tr>
+</table>
+</logic:equal>
 
-<p>&nbsp;</p>
+<form>
+	
+<p style="margin-left:5px;">
+	<input class="button" type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' />
+</p>
 
-<p class="align-right">
+<div style="float:right;">
 	<logic:equal name="UserManageForm" property="courseAdminCanAddNewUsers" value="true">
 		<input class="button" type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit&orgId=<bean:write name="UserManageForm" property="orgId"/>' />
 	</logic:equal>
-	<input class="button" type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' />
-	<logic:notEqual name="UserManageForm" property="orgId" value="1">
-		<input class="button" type="button" value='<fmt:message key="admin.edit" /> <bean:write name="UserManageForm" property="orgName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${UserManageForm.orgId}"/>' />
-	</logic:notEqual>
+</div>
+<p style="margin-left:5px; padding-top:10px;">
+	<c:out value="${numUsers}"/>
 </p>
+
 <table class="alternative-color" width=100% cellspacing="0" >
 <thead>
 <tr>
@@ -92,9 +139,9 @@
 			<option selected="selected"  value="10">10&nbsp;&nbsp;</option>
 			<option value="20">20</option>
 			<option value="30">30</option>
-			<option  value="40">40</option>
-			<option  value="50">50</option>
-			<option  value="100">100</option>
+			<option value="40">40</option>
+			<option value="50">50</option>
+			<option value="100">100</option>
 		</select>
 	</form>
 </div>

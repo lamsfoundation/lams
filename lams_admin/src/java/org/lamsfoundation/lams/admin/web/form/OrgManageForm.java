@@ -20,9 +20,12 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-package org.lamsfoundation.lams.admin.web;
+package org.lamsfoundation.lams.admin.web.form;
 
 import java.util.List;
+
+import org.apache.struts.action.ActionForm;
+import org.lamsfoundation.lams.admin.web.OrgManageBean;
 
 /**
  * @version
@@ -34,9 +37,11 @@ import java.util.List;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  *
  * Created at 20:56:24 on 2006-6-5
+ * 
+ * @struts.form name="OrgManageForm"
  */
 
-public class OrgListDTO {
+public class OrgManageForm extends ActionForm {
 
 	private static final long serialVersionUID = -3960695533993640297L;
 
@@ -47,7 +52,17 @@ public class OrgListDTO {
 	private Integer parentId;
 	
 	private String parentName;
+	
+	private Integer stateId;
 
+	public Integer getStateId() {
+		return stateId;
+	}
+	
+	public void setStateId(Integer stateId) {
+		this.stateId = stateId;
+	}
+	
 	public Integer getType() {
 		return type;
 	}

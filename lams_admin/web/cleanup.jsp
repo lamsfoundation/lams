@@ -2,10 +2,8 @@
 <%@ page import="org.lamsfoundation.lams.util.FileUtil" %>
 <%@ page import="org.lamsfoundation.lams.util.TempDirectoryFilter" %>
 
-<h2>
-	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-	: <fmt:message key="sysadmin.batch.temp.file.delete"/></h2>
-<p>&nbsp;</p>
+<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
+<h1><fmt:message key="sysadmin.batch.temp.file.delete"/></h1>
 
 <p><html:errors /></p>
 

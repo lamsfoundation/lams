@@ -12,7 +12,7 @@
 </logic:notEmpty>
 
 <logic:equal name="method" value="disable">
-<h2><fmt:message key="admin.user.disable"/></h2>
+<h1><fmt:message key="admin.user.disable"/></h1>
 <p>&nbsp;</p>
 <p>
 	<fmt:message key="msg.disable.user.1"/>&nbsp;&nbsp;

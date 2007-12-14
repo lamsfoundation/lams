@@ -109,7 +109,7 @@ p {
 }
 </style>
 
-<h2 class="align-left">
+<h4 class="align-left">
 	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
     <logic:notEmpty name="pOrgId">
         : <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a>
@@ -121,10 +121,9 @@ p {
 	<logic:equal name="UserOrgForm" property="orgId" value="1">
 		: <a href="usermanage.do?org=<bean:write name="UserOrgForm" property="orgId" />"><fmt:message key="admin.global.roles.manage" /></a>
 	</logic:equal>
-    : <fmt:message key="admin.user.add"/>
-</h2>
+</h4>
 
-<p>&nbsp;</p>
+<h1><fmt:message key="admin.user.add"/></h1>
 
 <div align="center"><html-el:errors/></div>
 

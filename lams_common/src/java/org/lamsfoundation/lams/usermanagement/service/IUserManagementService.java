@@ -378,6 +378,14 @@ public interface IUserManagementService {
 	public Integer getCountRoleForSystem(Integer roleId);
 	
 	/**
+	 * Count then umber of users with a particular role in a given org.
+	 * @param orgId
+	 * @param roleId
+	 * @return
+	 */
+	public Integer getCountRoleForOrg(Integer orgId, Integer roleId);
+	
+	/**
 	 * Get default flash theme of server.
 	 * @return default flash theme object
 	 */

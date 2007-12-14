@@ -2,11 +2,10 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="fck-editor" prefix="fck"%>
 
-<h2>
-	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :
-	<fmt:message key="sysadmin.maintain.loginpage"/>
-</h2>
-<br/>
+<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+</h4>
+<h1><fmt:message key="sysadmin.maintain.loginpage"/></h1>
+
 <html:errors />
 <br />
 <html:form action="/loginsave.do?method=save" enctype="multipart/form-data" method="post">

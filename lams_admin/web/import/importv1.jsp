@@ -8,14 +8,9 @@ function loading(){
 }
 </script>
 
-<h2>
-	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-	: <fmt:message key="admin.importv1.title" />
-</h2>
-
+<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
 <lams:help style="no-tabs" page="<%= IImportService.IMPORTV1_HELP_PAGE %>"/>
-
-<p>&nbsp;</p>
+<h1><fmt:message key="admin.importv1.title" /></h1>
 
 <div id="loading" style="display:none">
 	<h3>Please wait while importing...</h3>
@@ -24,6 +19,7 @@ function loading(){
 
 <div id="instructions">
 
+<p>
 <ul>
 	<li><fmt:message key="msg.importv1.1"/>
 		<ul><li><p><a href="file/lams1_user_org_export.sql">lams1_user_org_export.sql</a></p></li></ul>
@@ -35,6 +31,7 @@ function loading(){
 	<fmt:message key="msg.importv1.4"/></p></li>
 	<li><p><fmt:message key="msg.importv1.5"/></p></li>
 </ul>
+</p>
 
 <p>&nbsp;</p>
 

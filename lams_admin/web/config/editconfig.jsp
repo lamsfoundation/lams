@@ -2,12 +2,9 @@
 <%@ page import="org.lamsfoundation.lams.config.ConfigurationItem" %>
 <%@ include file="/taglibs.jsp"%>
 
-<h2 class="align-left">
-		<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :  
-		<fmt:message key="sysadmin.config.settings.edit" />
-	</h2>
-	<lams:help style="no-tabs" page="<%= Configuration.CONFIGURATION_HELP_PAGE %>"/>
-	<br/>
+<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
+<lams:help style="no-tabs" page="<%= Configuration.CONFIGURATION_HELP_PAGE %>"/>
+<h1><fmt:message key="sysadmin.config.settings.edit" /></h1>
 
 <div align="center">
 <c:if test="${not empty error}">

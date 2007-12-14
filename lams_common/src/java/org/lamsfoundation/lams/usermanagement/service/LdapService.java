@@ -26,11 +26,8 @@ package org.lamsfoundation.lams.usermanagement.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;

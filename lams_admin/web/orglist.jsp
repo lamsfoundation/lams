@@ -12,84 +12,186 @@
 	//-->
 </script>
 
-<form>
 <logic:equal name="OrgManageForm" property="type" value="1">
-	<h2>
+	<h4>
 		<a href="orgmanage.do?org=<bean:write name="OrgManageForm" property="parentId"/>"><fmt:message key="admin.course.manage" /></a>
-	</h2>
-	<p>&nbsp;</p>
-	<p align="right">
-	<logic:equal name="createGroup" value="true">
-		<c:url var="editaction" value="organisation.do">
-			<c:param name="method" value="create" />
-			<c:param name="typeId" value="2" />
-			<c:param name="parentId" value="${OrgManageForm.parentId}" />
-		</c:url>
-		<input class="button" type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' />
-	</logic:equal>
-	<logic:equal name="manageGlobalRoles" value="true">
-		<input class="button" type="button" value='<fmt:message key="admin.global.roles.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
-	</logic:equal>
-	</p>
+	</h4>
+	<h1><fmt:message key="admin.course.manage" /></h1>
+	
+	<form>
+	
+	<div style="float:right;">
+		<input class="button" type="button" value='Find Users' onclick=javascript:document.location='usersearch.do' />
+		<logic:equal name="manageGlobalRoles" value="true">
+			<input class="button" type="button" value='<fmt:message key="admin.global.roles.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+		</logic:equal>
+	</div>
+	<p style="margin-left:5px; padding-top:10px;"><c:out value="${numUsers}"/></p>
+	<div style="float:right;">
+		<logic:equal name="createGroup" value="true">
+			<c:url var="editaction" value="organisation.do">
+				<c:param name="method" value="create" />
+				<c:param name="typeId" value="2" />
+				<c:param name="parentId" value="${OrgManageForm.parentId}" />
+			</c:url>
+			<input class="button" type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' />
+		</logic:equal>
+	</div>
+	</form>
+	<html:form style="margin-left:5px; padding-top:10px;" action="orgmanage.do" method="post">
+		<input type="hidden" name="org" value="<bean:write name="OrgManageForm" property="parentId"/>" />
+		<fmt:message key="label.show"/> <html:select property="stateId" onchange="document.OrgManageForm.submit();">
+			<html:option value="1"><fmt:message key="organisation.state.ACTIVE"/></html:option>
+			<html:option value="2"><fmt:message key="organisation.state.HIDDEN"/></html:option>
+			<html:option value="3"><fmt:message key="organisation.state.ARCHIVED"/></html:option>
+		</html:select> <fmt:message key="label.groups"/>:
+	</html:form>
 </logic:equal>
+
 <logic:equal name="OrgManageForm" property="type" value="2">
-	<h2>
+	<h4>
 		<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
 		: <a href="orgmanage.do?org=<bean:write name="OrgManageForm" property="parentId"/>"><bean:write name="OrgManageForm" property="parentName"/></a>
-		: <fmt:message key="admin.class.manage" />
-	</h2>
-	<p>&nbsp;</p>
-	<c:url var="editaction" value="organisation.do">
-		<c:param name="method" value="create" />
-		<c:param name="typeId" value="3" />
-		<c:param name="parentId" value="${OrgManageForm.parentId}" />
-	</c:url>
-	<p align="right">
-		<input class="button" type="button" value='<fmt:message key="admin.class.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' />
-		<input class="button" type="button" value='<fmt:message key="admin.user.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
-		<logic:equal name="editGroup" value="true">
-			<input class="button" type="button" value='<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
-		</logic:equal>
+	</h4>
+	<h1><bean:write name="OrgManageForm" property="parentName"/></h1>
+	
+	<table cellspacing="7" style="margin-left:5px; padding-top:10px; width:100%">
+		<tr>
+			<td align="right"><fmt:message key="admin.organisation.name"/>:</td>
+			<td><c:out value="${org.name}" /></td>
+			<td align="right"><fmt:message key="admin.organisation.status"/>:</td>
+			<td width="10%"><c:out value="${org.organisationState.description}" /></td>
+		</tr>
+		<tr>
+			<td align="right"><fmt:message key="admin.organisation.code"/>:</td>
+			<td><c:out value="${org.code}" /></td>
+			<td align="right"><fmt:message key="admin.can.add.user"/>:</td>
+			<td><c:out value="${org.courseAdminCanAddNewUsers}" /></td>
+		</tr>
+		<tr>
+			<td align="right"><fmt:message key="admin.organisation.description"/>:</td>
+			<td><c:out value="${org.description}" /></td>
+			<td align="right"><fmt:message key="admin.can.browse.user"/>:</td>
+			<td><c:out value="${org.courseAdminCanBrowseAllUsers}" /></td>
+		</tr>
+		<tr>
+			<td align="right"><fmt:message key="admin.organisation.locale"/>:</td>
+			<td><c:out value="${org.locale.description}" /></td>
+			<td align="right"><fmt:message key="admin.can.change.status"/>:</td>
+			<td><c:out value="${org.courseAdminCanChangeStatusOfCourse}" /></td>
+		</tr>
+	</table>
+	
+	<form>
+	
+	<p style="margin-left:5px;">
+	<logic:equal name="editGroup" value="true">
+		<input class="button" type="button" value='<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
+	</logic:equal>
 	</p>
+	
+	<div style="float:right;">
+		<input class="button" type="button" value='<fmt:message key="admin.user.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+	</div>
+	<p style="margin-left:5px; padding-top:10px;"><c:out value="${numUsers}"/></p>
+	
+	<div style="float:right;">
+		<c:url var="createSubgroupLink" value="organisation.do">
+			<c:param name="method" value="create" />
+			<c:param name="typeId" value="3" />
+			<c:param name="parentId" value="${OrgManageForm.parentId}" />
+		</c:url>
+		<input class="button" type="button" value='<fmt:message key="admin.class.add"/>' onclick=javascript:document.location='<c:out value="${createSubgroupLink}"/>' />
+	</div>
+	</form>
+	<html:form style="margin-left:5px; padding-top:10px;" action="orgmanage.do" method="post">
+		<input type="hidden" name="org" value="<bean:write name="OrgManageForm" property="parentId"/>" />
+		<fmt:message key="label.show"/> <html:select property="stateId" onchange="document.OrgManageForm.submit();">
+			<html:option value="1"><fmt:message key="organisation.state.ACTIVE"/></html:option>
+			<html:option value="2"><fmt:message key="organisation.state.HIDDEN"/></html:option>
+			<html:option value="3"><fmt:message key="organisation.state.ARCHIVED"/></html:option>
+		</html:select> <fmt:message key="label.subgroups"/>:
+	</html:form>
 </logic:equal>
+
+<logic:equal name="OrgManageForm" property="type" value="3">
+	<h4>
+		<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
+		: <a href="orgmanage.do?org=<c:out value="${parentGroupId}"/>"><c:out value="${parentGroupName}"/></a>
+		: <a href="orgmanage.do?org=<bean:write name="OrgManageForm" property="parentId"/>"><bean:write name="OrgManageForm" property="parentName"/></a>
+	</h4>
+	<h1><bean:write name="OrgManageForm" property="parentName"/></h1>
+	
+	<table cellspacing="7" style="margin-left:5px; padding-top:10px; width:100%">
+		<tr>
+			<td align="right"><fmt:message key="admin.organisation.name"/>:</td>
+			<td><c:out value="${org.name}" /></td>
+			<td align="right"><fmt:message key="admin.organisation.status"/>:</td>
+			<td width="10%"><c:out value="${org.organisationState.description}" /></td>
+		</tr>
+		<tr>
+			<td align="right"><fmt:message key="admin.organisation.code"/>:</td>
+			<td><c:out value="${org.code}" /></td>
+			<td align="right"><fmt:message key="admin.can.add.user"/>:</td>
+			<td><c:out value="${org.courseAdminCanAddNewUsers}" /></td>
+		</tr>
+		<tr>
+			<td align="right"><fmt:message key="admin.organisation.description"/>:</td>
+			<td><c:out value="${org.description}" /></td>
+			<td align="right"><fmt:message key="admin.can.browse.user"/>:</td>
+			<td><c:out value="${org.courseAdminCanBrowseAllUsers}" /></td>
+		</tr>
+		<tr>
+			<td align="right"><fmt:message key="admin.organisation.locale"/>:</td>
+			<td><c:out value="${org.locale.description}" /></td>
+			<td align="right"><fmt:message key="admin.can.change.status"/>:</td>
+			<td><c:out value="${org.courseAdminCanChangeStatusOfCourse}" /></td>
+		</tr>
+	</table>
+	
+	<form>
+	
+	<p style="margin-left:5px;">
+	<logic:equal name="editGroup" value="true">
+		<input class="button" type="button" value='<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
+	</logic:equal>
+	</p>
+	
+	<div style="float:right;">
+		<input class="button" type="button" value='<fmt:message key="admin.user.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+	</div>
+	<p style="margin-left:5px; padding-top:10px;"><c:out value="${numUsers}"/></p>
+	
+	</form>
+</logic:equal>
+
+<c:if test="${not empty OrgManageForm.orgManageBeans}">
+<form>
 <table class=alternative-color width=100%>
-<thead>
-<tr>
-	<th>Id</th>
-	<th><fmt:message key="admin.organisation.name"/></th>
-	<th><fmt:message key="admin.organisation.code"/></th>
-	<th><fmt:message key="admin.organisation.description"/></th>
-	<th><fmt:message key="admin.organisation.locale"/></th>
-	<th><fmt:message key="admin.organisation.status"/></th>
-</tr>
-</thead>
-<tbody>
-<logic:iterate id="orgManageBean" name="OrgManageForm" property="orgManageBeans" indexId="idx">
+	<thead>
 	<tr>
-		<td><bean:write name="orgManageBean" property="organisationId" /></td>
-		<td>
-			<logic:equal name="OrgManageForm" property="type" value="1">
-				<a href="orgmanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>"><bean:write name="orgManageBean" property="name" /></a>
-			</logic:equal>
-			<logic:equal name="OrgManageForm" property="type" value="2">
-				<a href="usermanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>"><bean:write name="orgManageBean" property="name" /></a>
-			</logic:equal>
-		</td>
-		<td>
-			<bean:write name="orgManageBean" property="code" />
-		</td>
-		<td>
-			<bean:write name="orgManageBean" property="description" />
-		</td>
-		<td>
-			<c:out value="${orgManageBean.locale.description}"/>
-		</td>
-		<td>
-			<fmt:message key="organisation.state.${orgManageBean.status}"/>
-		</td>
+		<th>Id</th>
+		<th><fmt:message key="admin.organisation.name"/></th>
+		<th><fmt:message key="admin.organisation.code"/></th>
+		<th><fmt:message key="admin.organisation.description"/></th>
 	</tr>
-</logic:iterate>
-</tbody>
+	</thead>
+	<tbody>
+		<logic:iterate id="orgManageBean" name="OrgManageForm" property="orgManageBeans" indexId="idx">
+		<tr>
+			<td><bean:write name="orgManageBean" property="organisationId" /></td>
+			<td>
+				<a href="orgmanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>"><bean:write name="orgManageBean" property="name" /></a>
+			</td>
+			<td>
+				<bean:write name="orgManageBean" property="code" />
+			</td>
+			<td>
+				<bean:write name="orgManageBean" property="description" />
+			</td>
+		</tr>
+		</logic:iterate>
+	</tbody>
 </table>
 </form>
 
@@ -104,9 +206,12 @@
 			<option selected="selected"  value="10">10&nbsp;&nbsp;</option>
 			<option value="20">20</option>
 			<option value="30">30</option>
-			<option  value="40">40</option>
-			<option  value="50">50</option>
-			<option  value="100">100</option>
+			<option value="40">40</option>
+			<option value="50">50</option>
+			<option value="100">100</option>
 		</select>
 	</form>
 </div>
+</c:if>
+
+

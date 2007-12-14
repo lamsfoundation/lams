@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -130,16 +131,40 @@ public class UserManageAction extends Action {
 		userManageForm.setUserManageBeans(userManageBeans);
 		request.setAttribute("UserManageForm", userManageForm);
 		
+		// heading
+		String[] args = { orgName };
+		request.setAttribute("heading", messageService.getMessage("heading.manage.group.users", args));
+		
+		// count roles in the org
+		HashMap<String, Integer> roleCount = new HashMap<String, Integer>();
+		if (orgId.equals(rootOrgId)) {
+			roleCount.put(Role.SYSADMIN, Role.ROLE_SYSADMIN);
+			roleCount.put(Role.AUTHOR_ADMIN, Role.ROLE_AUTHOR_ADMIN);
+			roleCount.put(Role.GROUP_ADMIN, Role.ROLE_GROUP_ADMIN);
+		} else {
+			roleCount.put(Role.LEARNER, Role.ROLE_LEARNER);
+			roleCount.put(Role.MONITOR, Role.ROLE_MONITOR);
+			roleCount.put(Role.AUTHOR, Role.ROLE_AUTHOR);
+			roleCount.put(Role.GROUP_MANAGER, Role.ROLE_GROUP_MANAGER);
+			roleCount.put(Role.GROUP_ADMIN, Role.ROLE_GROUP_ADMIN);
+		}
+		for (String role : roleCount.keySet()) {
+			Integer count = service.getCountRoleForOrg(orgId, roleCount.get(role));
+			request.setAttribute(role.replace(' ', '_'), count);
+		}
+		
+		// count users in the org
+		// TODO use hql that does a count instead of getting whole objects
+		Integer numUsers = Integer.valueOf(service.getUsersFromOrganisation(orgId).size());
+		args[0] = numUsers.toString();
+		request.setAttribute("numUsers", messageService.getMessage("label.users.in.group", args));
+		
 		return mapping.findForward("userlist");
 	}
 	
 	private ActionForward forwardError(ActionMapping mapping, HttpServletRequest request, String key) {
 		request.setAttribute("errorName","UserManageAction");
-		if (key.equals("error.org.invalid")) {
-			request.setAttribute("errorMessage",messageService.getMessage("error.org.invalid"));
-		} else if (key.equals("error.authorisation")) {
-			request.setAttribute("errorMessage",messageService.getMessage("error.authorisation"));
-		}
+		request.setAttribute("errorMessage",messageService.getMessage(key));
 		return mapping.findForward("error");
 	}
 

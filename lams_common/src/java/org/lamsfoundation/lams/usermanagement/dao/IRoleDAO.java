@@ -51,5 +51,13 @@ public interface IRoleDAO extends IBaseDAO
 	  * @return
 	  */
     public Integer getCountRoleForSystem(final Integer roleId);
+    
+    /**
+     * Get number of users with roleId in orgId.
+     * @param roleId
+     * @param orgId
+     * @return
+     */
+    public Integer getCountRoleForOrg(final Integer roleId, final Integer orgId);
 
 }
