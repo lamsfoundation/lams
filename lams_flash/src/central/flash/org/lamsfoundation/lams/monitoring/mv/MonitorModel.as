@@ -146,8 +146,9 @@ class MonitorModel extends Observable{
 		
 		_currentLearnerIndex = 1;
 		_numPreferredIndexButtons = 10; // to be displayed at a time
-		_learnersPerPage = 10;
+		_learnersPerPage = (_root.pb == undefined) ? 10 : _root.pb;
 		_firstDisplayedIndexButton = 1;
+		Debugger.log("progress batch number: "+_root.pb,Debugger.CRITICAL,"MonitorModel","MonitorModel");
 		
 		_activeView = null;
 		
