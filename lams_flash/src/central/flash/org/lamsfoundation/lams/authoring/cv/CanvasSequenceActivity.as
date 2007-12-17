@@ -150,7 +150,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 			_activity = initObj.activity;
 		}
 		
-		_canvasModel = CanvasModel(_canvasController.getModel());
+		if(_canvasController != null)
+			_canvasModel = CanvasModel(_canvasController.getModel());
 		
 		Debugger.log("firstActivityUIID:  " + ComplexActivity(_activity).firstActivityUIID, Debugger.CRITICAL, "init", "CanvasSequenceActivity");
 		

@@ -109,7 +109,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		Debugger.log("Locking all Complex Activities", Debugger.GEN, "lockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
 		for (var i=0; i<k.length; i++){
-			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE){
 				k[i].locked = true;
 			}
 		}
@@ -120,7 +120,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		Debugger.log("Unlocking all Complex Activities", Debugger.GEN, "unlockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
 		for (var i=0; i<k.length; i++){
-			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE){
 				k[i].locked = (k[i].activity.readOnly) ? true : false;
 			}
 		}

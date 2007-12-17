@@ -247,7 +247,7 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 	public function get activityLayers():Array {
 		var arr = new Array();
 		arr.push(activityLayer);
-		arr.push(activityComplexLayer);
+		if(activityComplexLayer != null) arr.push(activityComplexLayer);
 		
 		return arr;
 	}

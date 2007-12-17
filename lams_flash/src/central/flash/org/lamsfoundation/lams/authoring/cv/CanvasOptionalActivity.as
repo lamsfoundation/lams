@@ -130,6 +130,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	}
 	
 	public function init():Void {
+		Debugger.log("type: " + _type, Debugger.CRITICAL, "init", "CanvasOptionalActivity");
 		switch(_type) {
 			case ACT_TYPE:
 				initActivityType();
@@ -196,15 +197,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		var _newVisibleWidth:Number = null;
 				
 		for(var i=0; i < _children.length; i++) {
-			Debugger.log("opt child act: " + _children[i].activityUIID, Debugger.CRITICAL, "initActivityType", "CanvasOptionalActivity");
+			Debugger.log("opt child act: " + _children[i].activityUIID, Debugger.CRITICAL, "initSequenceType", "CanvasOptionalActivity");
 			
 			if(_children[i].isSequenceActivity()) {
-				if(fromModuleTab == "monitorMonitorTab")
+				if(fromModuleTab == "monitorMonitorTab") {
 					children_mc[i] = childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
-				else
+				} else {
 					children_mc[i] = (_canvasBranchView != null) ? childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasBranchView:_canvasBranchView})
-																  : childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView});
-			
+																	: childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView});
+				}
 				//set the positioning co-ords
 				children_mc[i].activity.xCoord = CHILD_OFFSET_X;
 				children_mc[i].activity.yCoord = CHILD_OFFSET_Y + (i * CHILD_INCRE);
