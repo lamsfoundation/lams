@@ -237,8 +237,19 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 		_transparentCover_mc = a;
 	}
 	
-	public function isActivityOnLayer(a:MovieClip, layer:MovieClip) {
-		return (a._parent == layer);
+	public function isActivityOnLayer(a:MovieClip, layers:Array) {
+		for(var i=0; i<layers.length; i++)
+			if(a._parent == layers[i]) return true;
+			
+		return false;
+	}
+	
+	public function get activityLayers():Array {
+		var arr = new Array();
+		arr.push(activityLayer);
+		arr.push(activityComplexLayer);
+		
+		return arr;
 	}
 
 }

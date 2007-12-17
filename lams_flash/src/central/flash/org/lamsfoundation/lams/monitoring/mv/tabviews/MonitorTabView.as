@@ -442,7 +442,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		var mtv = MonitorTabView(this);
 		var mc = getController();
 		
-		if(!isActivityOnLayer(mm.activitiesDisplayed.get(t.fromUIID), this.activityLayer) && !isActivityOnLayer(mm.activitiesDisplayed.get(t.toUIID), this.activityLayer)) return false;
+		if(!isActivityOnLayer(mm.activitiesDisplayed.get(t.fromUIID), this.activityLayers) && !isActivityOnLayer(mm.activitiesDisplayed.get(t.toUIID), this.activityLayers)) return false;
 		
 		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_monitorController:mc,_monitorTabView:mtv});
 		

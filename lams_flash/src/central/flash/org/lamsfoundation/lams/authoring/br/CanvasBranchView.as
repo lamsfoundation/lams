@@ -442,8 +442,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONS_WITH_SEQUENCES_TYPE){
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
 			
-			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _canvasController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly()})
-															: activityLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _monitorController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly(), fromModuleTab:fromModuleTab, learnerContainer:_learnerContainer_mc});
+			var newActivity_mc = (_module != "monitoring") ? activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _canvasController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly()})
+															: activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _monitorController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly(), fromModuleTab:fromModuleTab, learnerContainer:_learnerContainer_mc});
 			
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasBranchView');
@@ -519,7 +519,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  
 	 */
 	private function drawTransition(t:Transition, cm):Boolean{
-		if(!isActivityOnLayer(cm.activitiesDisplayed.get(t.fromUIID), this.activityLayer) && !isActivityOnLayer(cm.activitiesDisplayed.get(t.toUIID), this.activityLayer)) return false;
+		if(!isActivityOnLayer(cm.activitiesDisplayed.get(t.fromUIID), this.activityLayers) && !isActivityOnLayer(cm.activitiesDisplayed.get(t.toUIID), this.activityLayer)) return false;
 		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
@@ -543,7 +543,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 */
 	private function drawBranch(b:Branch, cm):Boolean{
 		
-		if(!isActivityOnLayer(cm.activitiesDisplayed.get(b.targetUIID), this.activityLayer)) 
+		if(!isActivityOnLayer(cm.activitiesDisplayed.get(b.targetUIID), this.activityLayers)) 
 			if((b.direction == BranchConnector.DIR_SINGLE && b.targetUIID == activity.activityUIID))
 				continue;
 			else return false;
@@ -799,7 +799,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		if(model instanceof CanvasModel) return CanvasModel(model).ddm
 		else return MonitorModel(model).ddm;
 	}
-
 	
 
 }
