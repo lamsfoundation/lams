@@ -85,18 +85,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			}
 			
 	    } else {
-				
-			if(ca.activity.parentUIID != null && (parentAct.isParallelActivity() || 
-			    ca.activity.isOptionalSequenceActivity(parentAct))) {
+			var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
+			var parentSelectedAct = _canvasModel.getCanvas().ddm.getActivityByUIID(_tempSelectedItem.activity.parentUIID);
+			var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
+			
+			if(ca.activity.parentUIID != null && 
+				(parentAct.isParallelActivity() || ca.activity.isOptionalSequenceActivity(parentAct))) {
 				_canvasModel.isDragging = false;
+				return;
 			} else {
 				ca.startDrag(false);
 				_canvasModel.isDragging = true;
 			}
-			
-		    var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
-			var parentSelectedAct = _canvasModel.getCanvas().ddm.getActivityByUIID(_tempSelectedItem.activity.parentUIID);
-			var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
 			
 			if(_tempSelectedItem != null) {
 			
