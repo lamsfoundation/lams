@@ -96,6 +96,10 @@ public class UserOrgAction extends Action {
 		userOrgForm.set("orgId",orgId);
 		userOrgForm.set("orgName",orgName);
 
+		String[] args = { "0" };
+		request.setAttribute("numExistUsers", messageService.getMessage("label.number.of.users", args));
+		request.setAttribute("numPotentialUsers", messageService.getMessage("label.number.of.potential.users", args));
+		
 		return mapping.findForward("userorg");
 	}
 }

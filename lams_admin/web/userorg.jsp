@@ -20,11 +20,13 @@
 	});
 	
 	function updateExistingTotal() {
-		jQuery("span#totalUsers").text(jQuery("li", "#existing").size());
+		var size = jQuery("li", "#existing").size();
+		jQuery("span#totalUsers").text('<fmt:message key="label.number.of.users"><fmt:param>'+size+'</fmt:param></fmt:message>');
 	}
 	
 	function updatePotentialTotal() {
-		jQuery("span#potentialUsers").text(jQuery("li", "#potential").size());
+		var size = jQuery("li", "#potential").size();
+		jQuery("span#potentialUsers").text('<fmt:message key="label.number.of.potential.users"><fmt:param>'+size+'</fmt:param></fmt:message>');
 	}
 	
 	function bindRemoveLink() {
@@ -132,7 +134,7 @@ p {
 </logic:equal>
 
 <h3><fmt:message key="heading.users"/></h3>
-<div class="floatRight"><span id="totalUsers">0</span> <fmt:message key="label.number.of.users"/></div>
+<div class="floatRight"><span id="totalUsers"><c:out value="${numExistUsers}"/></span></div>
 <p>
 	 <fmt:message key="msg.click.remove.user"/>
 </p>
@@ -147,7 +149,7 @@ p {
 <p>
 	<fmt:message key="msg.click.add.user"/>
 </p>
-<div class="floatRight"><span id="potentialUsers">0</span> <fmt:message key="label.number.of.potential.users"/></div>
+<div class="floatRight"><span id="potentialUsers"><c:out value="${numPotentialUsers}"/></span></div>
 <form onsubmit="return loadSearchResults(0);">
 	<p>
 		<fmt:message key="admin.search"/>: <input id="term" type="text"/> or <a onclick="loadSearchResults(1);"><fmt:message key="msg.show.all.potential.users"/></a>
