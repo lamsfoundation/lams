@@ -12,6 +12,21 @@
 	//-->
 </script>
 
+<style>
+table.infoDisplay {
+	margin-left:5px; padding-top:10px; width:100%;
+}
+p {
+	margin-left:5px;
+}
+.floatRight {
+	float:right;
+}
+.indentPad {
+	margin-left:5px; padding-top:10px;
+}
+</style>
+
 <logic:equal name="OrgManageForm" property="type" value="1">
 	<h4>
 		<a href="orgmanage.do?org=<bean:write name="OrgManageForm" property="parentId"/>"><fmt:message key="admin.course.manage" /></a>
@@ -20,14 +35,14 @@
 	
 	<form>
 	
-	<div style="float:right;">
+	<div class="floatRight">
 		<input class="button" type="button" value='Find Users' onclick=javascript:document.location='usersearch.do' />
 		<logic:equal name="manageGlobalRoles" value="true">
 			<input class="button" type="button" value='<fmt:message key="admin.global.roles.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
 		</logic:equal>
 	</div>
-	<p style="margin-left:5px; padding-top:10px;"><c:out value="${numUsers}"/></p>
-	<div style="float:right;">
+	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
+	<div class="floatRight">
 		<logic:equal name="createGroup" value="true">
 			<c:url var="editaction" value="organisation.do">
 				<c:param name="method" value="create" />
@@ -38,7 +53,7 @@
 		</logic:equal>
 	</div>
 	</form>
-	<html:form style="margin-left:5px; padding-top:10px;" action="orgmanage.do" method="post">
+	<html:form styleClass="indentPad" action="orgmanage.do" method="post">
 		<input type="hidden" name="org" value="<bean:write name="OrgManageForm" property="parentId"/>" />
 		<fmt:message key="label.show"/> <html:select property="stateId" onchange="document.OrgManageForm.submit();">
 			<html:option value="1"><fmt:message key="organisation.state.ACTIVE"/></html:option>
@@ -55,7 +70,7 @@
 	</h4>
 	<h1><bean:write name="OrgManageForm" property="parentName"/></h1>
 	
-	<table cellspacing="7" style="margin-left:5px; padding-top:10px; width:100%">
+	<table cellspacing="7" class="infoDisplay">
 		<tr>
 			<td align="right"><fmt:message key="admin.organisation.name"/>:</td>
 			<td><c:out value="${org.name}" /></td>
@@ -84,18 +99,18 @@
 	
 	<form>
 	
-	<p style="margin-left:5px;">
+	<p>
 	<logic:equal name="editGroup" value="true">
 		<input class="button" type="button" value='<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
 	</logic:equal>
 	</p>
 	
-	<div style="float:right;">
+	<div class="floatRight">
 		<input class="button" type="button" value='<fmt:message key="admin.user.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
 	</div>
-	<p style="margin-left:5px; padding-top:10px;"><c:out value="${numUsers}"/></p>
+	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
 	
-	<div style="float:right;">
+	<div class="floatRight">
 		<c:url var="createSubgroupLink" value="organisation.do">
 			<c:param name="method" value="create" />
 			<c:param name="typeId" value="3" />
@@ -104,7 +119,7 @@
 		<input class="button" type="button" value='<fmt:message key="admin.class.add"/>' onclick=javascript:document.location='<c:out value="${createSubgroupLink}"/>' />
 	</div>
 	</form>
-	<html:form style="margin-left:5px; padding-top:10px;" action="orgmanage.do" method="post">
+	<html:form styleClass="indentPad" action="orgmanage.do" method="post">
 		<input type="hidden" name="org" value="<bean:write name="OrgManageForm" property="parentId"/>" />
 		<fmt:message key="label.show"/> <html:select property="stateId" onchange="document.OrgManageForm.submit();">
 			<html:option value="1"><fmt:message key="organisation.state.ACTIVE"/></html:option>
@@ -122,7 +137,7 @@
 	</h4>
 	<h1><bean:write name="OrgManageForm" property="parentName"/></h1>
 	
-	<table cellspacing="7" style="margin-left:5px; padding-top:10px; width:100%">
+	<table cellspacing="7" class="infoDisplay">
 		<tr>
 			<td align="right"><fmt:message key="admin.organisation.name"/>:</td>
 			<td><c:out value="${org.name}" /></td>
@@ -151,16 +166,16 @@
 	
 	<form>
 	
-	<p style="margin-left:5px;">
+	<p>
 	<logic:equal name="editGroup" value="true">
 		<input class="button" type="button" value='<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
 	</logic:equal>
 	</p>
 	
-	<div style="float:right;">
+	<div class="floatRight">
 		<input class="button" type="button" value='<fmt:message key="admin.user.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
 	</div>
-	<p style="margin-left:5px; padding-top:10px;"><c:out value="${numUsers}"/></p>
+	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
 	
 	</form>
 </logic:equal>

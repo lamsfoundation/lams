@@ -11,6 +11,17 @@
 	//-->
 </script>
 
+<style>
+table.infoDisplay {
+	margin-left:5px; padding-top:10px; width:60%;
+}
+p {
+	margin-left:5px;
+}
+.floatRight {
+	float:right;
+}
+</style>
 
 <h4>
 	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
@@ -33,7 +44,7 @@
 </h1>
 
 <logic:notEqual name="orgType" value="1">
-<table cellspacing="7" style="margin-left:5px; padding-top:10px; width:60%">
+<table cellspacing="7" class="infoDisplay">
 	<tr>
 		<td align="right"><fmt:message key="label.learners"/>:</td>
 		<td><c:out value="${LEARNER}"/></td>
@@ -56,7 +67,7 @@
 </logic:notEqual>
 	
 <logic:equal name="orgType" value="1">
-<table cellspacing="7" style="margin-left:5px; padding-top:10px; width:60%">
+<table cellspacing="7" class="infoDisplay">
 	<tr>
 		<td align="right"><fmt:message key="label.sysadmins"/>:</td>
 		<td><c:out value="${SYSADMIN}"/></td>
@@ -74,16 +85,16 @@
 
 <form>
 	
-<p style="margin-left:5px;">
+<p>
 	<input class="button" type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' />
 </p>
 
-<div style="float:right;">
+<div class="floatRight">
 	<logic:equal name="UserManageForm" property="courseAdminCanAddNewUsers" value="true">
 		<input class="button" type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit&orgId=<bean:write name="UserManageForm" property="orgId"/>' />
 	</logic:equal>
 </div>
-<p style="margin-left:5px; padding-top:10px;">
+<p style="padding-top:10px;">
 	<c:out value="${numUsers}"/>
 </p>
 
