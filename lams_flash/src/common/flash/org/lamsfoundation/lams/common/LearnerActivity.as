@@ -74,16 +74,17 @@ class LearnerActivity extends MovieClip {
 	private var actLabel:String;
 	private var learner:Progress;
 	private var clickTarget_mc:MovieClip;
-	//private var completed_mc:MovieClip;
-	//private var current_mc:MovieClip;
-	//private var todo_mc:MovieClip;
-	//private var attempted_mc:MovieClip;
+	private var completed_mc:MovieClip;
+	private var current_mc:MovieClip;
+	private var todo_mc:MovieClip;
+	private var attempted_mc:MovieClip;
 	private var canvasActivity_mc:MovieClip;
 	private var title_lbl:MovieClip;
 	private var groupIcon_mc:MovieClip;
 	private var stopSign_mc:MovieClip;	
 	private var sentFrom:String;
-	private var canvasActivityGrouped_mc:MovieClip;	private var _dcStartTime:Number = 0;
+	private var canvasActivityGrouped_mc:MovieClip;
+	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
 	private var _visibleWidth:Number;
 	private var _visibleHeight:Number;
@@ -92,12 +93,14 @@ class LearnerActivity extends MovieClip {
 	
 	private var _line_bottom:MovieClip;
 	private var _line_top:MovieClip;
-	private var icon_mc:MovieClip;
 	
 	private var _complex:Boolean;
 	
 	function LearnerActivity(){
-		Debugger.log("_activity:"+_activity.title,4,'Constructor','Activity');
+		Debugger.log("_activity:"+_activity.title,4,'Constructor','LearnerActivity');
+		Debugger.log("actStatus:"+ actStatus,4,'Constructor','LearnerActivity');
+		Debugger.log("learner:"+ learner,4,'Constructor','LearnerActivity');
+		
 		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
 		//Get reference to application and design data model
@@ -127,11 +130,11 @@ class LearnerActivity extends MovieClip {
 		var _autosize:String;
 		
 		if(initObj){
-			
 				_view = initObj._view;
 				_controller = initObj._controller;
 				_activity = initObj._activity;
 				learner = initObj.learner;
+				//actStatus = initObj.actStatus;
 		}
 		
 		if(_complex){
@@ -158,13 +161,18 @@ class LearnerActivity extends MovieClip {
 		}
 		
 		Debugger.log('initialising activity : ' + _activity.activityID ,Debugger.CRITICAL,'init','org.lamsfoundation.lams.LearnerActivity');
+		Debugger.log("actStatus:"+ actStatus, 4,'init','LearnerActivity');
 		
-		MovieClipUtils.doLater(Proxy.create(this,draw));
+		this.onEnterFrame = draw; // MovieClipUtils.doLater(Proxy.create(this, draw));
 
 	}
 	
 	private function showAssets(isVisible:Boolean){
+		completed_mc._visible = isVisible;
+		current_mc._visible = isVisible;
 		canvasActivity_mc._visible = isVisible;
+		todo_mc._visible = isVisible;
+		attempted_mc._visible = isVisible
 		title_lbl._visible = true;
 	}
 	
@@ -175,9 +183,9 @@ class LearnerActivity extends MovieClip {
 	 */
 	public function refresh():Void{
 		showAssets(false);
-		learner = controller.getModel().progressData;
+		learner = (model instanceof LessonModel) ? model.progressData : learner;
 		actStatus = null;
-		this.removeMovieClip(icon_mc);
+		
 		draw();
 	}
 	
@@ -188,40 +196,32 @@ class LearnerActivity extends MovieClip {
 	 * @return  
 	 */
 	private function draw(){
+		delete this.onEnterFrame;
 		
 		var toolTitle:String
 		if (actStatus == null || actStatus == undefined){
 			actStatus = Progress.compareProgressData(learner, _activity.activityID);
 		}
 		
-		//title_lbl._visible = true;
-		Debugger.log('activity status : ' + actStatus ,Debugger.CRITICAL,'draw','org.lamsfoundation.lams.LearnerActivity');
+		Debugger.log("activity: " + _activity.activityID + " // activity status : " + actStatus, Debugger.CRITICAL,'draw','org.lamsfoundation.lams.LearnerActivity');
 	
 		clickTarget_mc._visible = true;
 		
-		if (!stopSign_mc) {
-			switch (actStatus){
-				case 'completed_mc' :
-					icon_mc = this.attachMovie("completed_mc", "completed_mc" + _activity.activityID, this.getNextHighestDepth(), {_x: 58 , _y: -7});
-					//completed_mc._visible = true;
-					break;
-				case 'current_mc' :
-					icon_mc = this.attachMovie("current_mc", "current_mc" + _activity.activityID, this.getNextHighestDepth(), {_x: 58 , _y: -7});
-					//current_mc._visible = true;
-					break;
-				case 'attempted_mc' :
-					icon_mc = this.attachMovie("attempted_mc", "attempted_mc" + _activity.activityID, this.getNextHighestDepth(), {_x: 58 , _y: -7});
-					//attempted_mc._visible = true;
-					break;
-				//case 'attempted_mc' 
-				default :
-					icon_mc = this.attachMovie("todo_mc", "todo_mc" + _activity.activityID, this.getNextHighestDepth(), {_x: 58 , _y: -7});
-					//todo_mc._visible = true;
-			}
+		switch (actStatus){
+		    case 'completed_mc' :
+				completed_mc._visible = true;
+		        break;
+            case 'current_mc' :
+				current_mc._visible = true;
+				break;
+            case 'attempted_mc' :
+			    attempted_mc._visible = true;
+                break;
+			default :
+				todo_mc._visible = true;
 		}
-		
+			
 		//write text
-		trace("Title passed for Gate Activity: "+actLabel)
 		if (actLabel == undefined){
 			toolTitle = _activity.title
 			if (toolTitle.length > 19){
@@ -237,8 +237,9 @@ class LearnerActivity extends MovieClip {
 		}
 		title_lbl.text = toolTitle;
 		
-		if(_view instanceof LearnerTabView)
+		if(_view instanceof LearnerTabView && !_complex)
 			LearnerTabView(_view).drawNext();
+		
 	}
 	
 	public function showToolTip(btnObj, btnTT:String):Void{
@@ -337,6 +338,13 @@ class LearnerActivity extends MovieClip {
 		}
 	}
 	
+	public function get model(){
+		if(app.module == 'learner')
+			return LessonModel(_controller.getModel());
+		else
+			return MonitorModel(_controller.getModel());
+	}
+	
 	public function getAppData():Object{
 		return controller.appData;
 	}
@@ -370,10 +378,8 @@ class LearnerActivity extends MovieClip {
 		setActivity(a);
 	}
 	
-	
 	public function getActivity():Activity{
 		return _activity;
-
 	}
 	
 	public function setActivity(a:Activity){
@@ -382,6 +388,10 @@ class LearnerActivity extends MovieClip {
 
 	public function get activityStatus():String{
 		return actStatus;
+	}
+	
+	public function set activityStatus(a:String){
+		actStatus = a;
 	}
 	
 	public function get learnerID():Number{
