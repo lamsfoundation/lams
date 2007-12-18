@@ -89,11 +89,11 @@ public class UserBasicListAction extends Action {
 							// get users
 							List users = new ArrayList();
 							if (request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin()) {
-								users = service.getAllUsers(group.getOrganisationId());
+								users = service.getAllUsers(org.getOrganisationId());
 							} else if (service.isUserInRole(userId, group.getOrganisationId(), Role.GROUP_ADMIN)
 									|| service.isUserInRole(userId, group.getOrganisationId(), Role.GROUP_MANAGER)) {
 								if (group.getCourseAdminCanBrowseAllUsers()){
-									users = service.getAllUsers(group.getOrganisationId());
+									users = service.getAllUsers(org.getOrganisationId());
 								} else if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
 									users = service.getUsersFromOrganisation(group.getOrganisationId(), orgId);
 								}
