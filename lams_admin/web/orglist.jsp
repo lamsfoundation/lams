@@ -6,7 +6,7 @@
 <script>
 	<!--
 	jQuery(document).ready(function() {
-		jQuery("table").tablesorter({widthFixed:true, sortList:[[1,0]], textExtraction:'complex'})
+		jQuery("table.alternative-color").tablesorter({widthFixed:true, sortList:[[1,0]], textExtraction:'complex'})
 			.tablesorterPager({container: jQuery("#pager")});
 	});
 	//-->

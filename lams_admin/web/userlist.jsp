@@ -6,7 +6,7 @@
 <script>
 	<!--
 	jQuery(document).ready(function() {
-		jQuery("table").tablesorter({widthFixed:true, sortList:[[0,0]]}).tablesorterPager({container: jQuery("#pager")});
+		jQuery("table.alternative-color").tablesorter({widthFixed:true, sortList:[[0,0]]}).tablesorterPager({container: jQuery("#pager")});
 	});
 	//-->
 </script>
