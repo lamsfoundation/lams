@@ -45,7 +45,6 @@ import mx.managers. *
 */
 class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 {
-	//class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieClip {
 	private var CHILD_OFFSET_X : Number = 8;
 	private var CHILD_OFFSET_Y : Number = 57;
 	private var CHILD_INCRE : Number = 60;

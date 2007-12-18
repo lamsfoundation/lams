@@ -258,10 +258,10 @@ class LessonView extends AbstractView {
 		} else if(a.isGateActivity()){
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerGateActivity", "LearnerGateActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, actLabel:activityTitle, learner:lm.progressData, _complex:false});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
-		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE ||  (a.isBranchingActivity() && _root.mode == 'preview')){
+		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONS_WITH_SEQUENCES_TYPE || (a.isBranchingActivity() && _root.mode == 'preview')){
 			//get the children
 			var children:Array = lm.learningDesignModel.getComplexActivityChildren(a.activityUIID);
-			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is is parellel (complex) activity',Debugger.CRITICAL,'drawActivity','LessonView');
+			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is is complex (parallel, optional, branching) activity',Debugger.CRITICAL,'drawActivity','LessonView');
 		
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerComplexActivity", "LearnerComplexActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_children:children,_controller:lc,_view:lv, _x:(progress_scp._width/2)-ACT_X_OFFSET, _y:ACT_Y, learner:lm.progressData});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
