@@ -68,7 +68,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('ServerPageDirection','LTR', 'config.server.page.direction', 'config.header.look.feel', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('DictionaryDateCreated','2007-05-24', 'config.dictionary.date.created', 'config.header.versions', 'STRING', 1);
+values ('DictionaryDateCreated','2007-12-17', 'config.dictionary.date.created', 'config.header.versions', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('HelpURL','http://wiki.lamsfoundation.org/display/lamsdocs/', 'config.help.url', 'config.header.system', 'STRING', 1);
