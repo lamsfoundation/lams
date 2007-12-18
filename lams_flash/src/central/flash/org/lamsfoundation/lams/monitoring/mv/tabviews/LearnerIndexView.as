@@ -82,6 +82,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		
 	private var buttonsShown:Boolean;
 	private var drawButtons:Boolean; // buttons to the right of last index button
+	private var navigationButtonsDrawn:Boolean;
 	
 	private var direction:String;
 
@@ -97,6 +98,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		nextPosition = 0;
 		btnWidth = 45;
 		buttonsShown = false;
+		navigationButtonsDrawn = false;
 		drawButtons = true;
 		defaultString = "Enter Page Number";
 		
@@ -176,9 +178,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	}
 	
 	private function newButtonsNeeded(mm:MonitorModel):Boolean {
-		if ((mm.numIndexButtons > displayedButtons.length) && (displayedButtons.length < mm.numPreferredIndexButtons)) {
-			mm.updateIndexButtons(); // need to update mm.lastDisplayedIndexButton because it will need to be redrawn
-			return true;	
+		if (mm.numIndexButtons > displayedButtons.length) {
+			if (displayedButtons.length < mm.numPreferredIndexButtons || !navigationButtonsDrawn) {
+				mm.updateIndexButtons(); // need to update mm.lastDisplayedIndexButton because it will need to be redrawn
+				return true;	
+			}
 		}
 		return false;
 	}
@@ -213,11 +217,17 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		if (drawButtons == true) {
 			_buttonsPanel_mc = this.createEmptyMovieClip("_buttonsPanel_mc", DepthManager.kTop);
 			addRangeLabel(mm);
+			if (mm.numIndexButtons > mm.numPreferredIndexButtons) {
+				addBackNavigationButton(mm);
+			}
 		}
 			addIndexButtons(mm); // if drawButtons = false, just rename labels
 			
 		if (drawButtons == true) {
-			addNavigationButtons(mm);
+			if (mm.numIndexButtons > mm.numPreferredIndexButtons) {
+				addForwardNavigationButton(mm);
+				navigationButtonsDrawn = true;
+			}
 			addIndexTextField(mm);
 			addGoButton(mm);
 		
@@ -233,13 +243,19 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		
 		//labelBackground_mc.removeMovieClip(rangeLabel);
 		_buttonsPanel_mc.removeMovieClip(rangeLabel);
+		
+		if (mm.numIndexButtons > mm.numPreferredIndexButtons)
+			_buttonsPanel_mc.removeMovieClip(backBtn);
+		
 		while (displayedButtons.length != 0) {
 			var idxBtn:MovieClip = MovieClip(displayedButtons.pop());
 			_buttonsPanel_mc.removeMovieClip(idxBtn);
 		}
-
-		_buttonsPanel_mc.removeMovieClip(backBtn);
-		_buttonsPanel_mc.removeMovieClip(nextBtn);
+		
+		if (mm.numIndexButtons > mm.numPreferredIndexButtons) {
+			_buttonsPanel_mc.removeMovieClip(nextBtn);
+			navigationButtonsDrawn = false;
+		}
 			
 		//need to remove the text field from the background
 		textFieldBackground_mc.removeMovieClip(idxTextField);
@@ -257,6 +273,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		rangeLabel.autoSize = "center"
 		rangeLabel.text = "Page " + mm.currentLearnerIndex + " of " + mm.numIndexButtons;
 		nextPosition += rangeLabel._width;
+	}
+	
+	private function addBackNavigationButton(mm:MonitorModel):Void {
+		// add back navigation button
+		backBtn = _buttonsPanel_mc.attachMovie("IndexButton", "backBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth-5, _labelText: "<<"});	
+		_indexButton = IndexButton(backBtn);
+		_indexButton.init(mm, undefined);
+		backBtn._x = nextPosition;
+		nextPosition += (btnWidth-5);
 	}
 	
 	private function addIndexButtons(mm:MonitorModel):Void {
@@ -284,14 +309,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		}
 	}
 	
-	private function addNavigationButtons(mm:MonitorModel):Void {
-		// add navigation buttons
-		backBtn = _buttonsPanel_mc.attachMovie("IndexButton", "backBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth-5, _labelText: "<<"});	
-		_indexButton = IndexButton(backBtn);
-		_indexButton.init(mm, undefined);
-		backBtn._x = nextPosition;
-		nextPosition += (btnWidth-5);
-		
+	private function addForwardNavigationButton(mm:MonitorModel):Void {
 		nextBtn = _buttonsPanel_mc.attachMovie("IndexButton", "nextBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth-5, _labelText: ">>"});
 		_indexButton = IndexButton(nextBtn);
 		_indexButton.init(mm, undefined);
