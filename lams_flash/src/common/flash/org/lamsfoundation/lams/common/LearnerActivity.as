@@ -160,10 +160,7 @@ class LearnerActivity extends MovieClip {
 			//loadIcon();
 		}
 		
-		Debugger.log('initialising activity : ' + _activity.activityID ,Debugger.CRITICAL,'init','org.lamsfoundation.lams.LearnerActivity');
-		Debugger.log("actStatus:"+ actStatus, 4,'init','LearnerActivity');
-		
-		this.onEnterFrame = draw; // MovieClipUtils.doLater(Proxy.create(this, draw));
+		MovieClipUtils.doLater(Proxy.create(this, draw));
 
 	}
 	
@@ -196,7 +193,6 @@ class LearnerActivity extends MovieClip {
 	 * @return  
 	 */
 	private function draw(){
-		delete this.onEnterFrame;
 		
 		var toolTitle:String
 		if (actStatus == null || actStatus == undefined){

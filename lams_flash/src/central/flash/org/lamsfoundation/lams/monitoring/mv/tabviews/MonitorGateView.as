@@ -125,7 +125,7 @@ import mx.controls.*;
 					}
 					break;
 				default :
-					Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorTabView');
+					Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorGateView');
 		}
 	}
 		

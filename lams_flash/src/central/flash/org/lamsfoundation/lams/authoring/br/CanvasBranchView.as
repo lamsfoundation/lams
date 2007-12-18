@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.common.CommonCanvasView;
 import org.lamsfoundation.lams.common.ApplicationParent;
 import org.lamsfoundation.lams.monitoring.mv.MonitorModel;
 import org.lamsfoundation.lams.monitoring.mv.MonitorController;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView;
 
 import mx.controls.*;
 import mx.containers.*;
@@ -146,7 +147,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @param   event
 	 */
 	public function update (o:Observable, infoObj:Object):Void{
-			
 		   var mm:MonitorModel = MonitorModel(o);
 		   infoObj.target = mm;
 		   
@@ -211,6 +211,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			case 'SELECTED_ITEM':
                 highlightActivity(_model);
                 break;
+			case 'DRAW_ALL' :
+				Debugger.log("received draw all. " + event.tabID + " locked: " + MonitorModel(_model).locked, Debugger.CRITICAL, "viewUpdate", "CanvasBranchView");
+				if (!MonitorModel(_model).locked){
+					drawAll(event.data, _model);
+				}
+				break;
 			case 'SET_ACTIVE':
 				Debugger.log('setting activie :' + event.updateType + " event.data: " + event.data + " condition: " + (event.data == this),Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasBranchView');
 				transparentCover._visible = (event.data == this) ? false : true;
@@ -396,7 +402,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  Boolean - successfullit
 	 */
 	private function drawActivity(a:Activity, cm):Boolean {
-		if(this.activity.activityUIID != cm.getCanvas().ddm.getActivityByUIID(a.parentUIID).parentUIID) 
+		if(this.activity.activityUIID != ddm.getActivityByUIID(a.parentUIID).parentUIID) 
 			return false;
 		
 		var cbv = CanvasBranchView(this);
@@ -462,6 +468,14 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		return true;
 	}
 	
+	private function drawAll(objArr:Array, model:Observable){
+		Debugger.log("drawing all: " + objArr.length + " model: " + model, Debugger.CRITICAL, "drawAll", "CanvasBranchView");
+				
+		for (var i=0; i<objArr.length; i++){
+			update(model, objArr[i]);
+		}
+	}
+	
 	/**
 	 * Add to canvas stage but keep hidden from view.
 	 * 
@@ -472,7 +486,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 */
 	
 	private function hideActivity(a:Activity, cm):Boolean {
-		if(this.activity.activityUIID != cm.getCanvas().ddm.getActivityByUIID(a.parentUIID).parentUIID) 
+		if(this.activity.activityUIID != ddm.getActivityByUIID(a.parentUIID).parentUIID) 
 			return false;
 			
 		var cbv = CanvasBranchView(this);
@@ -498,7 +512,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  Boolean - successfull
 	 */
 	private function removeActivity(a:Activity, cm):Boolean{
-		if(this.activity.activityUIID != cm.getCanvas().ddm.getActivityByUIID(a.parentUIID).parentUIID) 
+		if(this.activity.activityUIID != ddm.getActivityByUIID(a.parentUIID).parentUIID) 
 			return false;
 		
 		if(a.isBranchingActivity())
@@ -641,6 +655,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
     */
 	private function setSize(cm):Void{
 		var ba = cm.currentBranchingActivity;
+		Debugger.log("currentBranchActivity: " + ba, Debugger.CRITICAL, "setSize", "CanvasBranchView");
 		
 		var s:Object = cm.getSize();
 		
@@ -668,21 +683,26 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			
 		canvas_scp.redraw(true);
 		
-		setPosition(cm);
+		setPosition(cm, cx, cy);
 	}
 	
 	/**
     * Sets the position of the canvas on stage, called from update
     * @param cm Canvas model object 
     */
-	private function setPosition(cm):Void{
-        var ba = cm.activitiesDisplayed.get(activity.activityUIID);
+	private function setPosition(cm, cx, cy){
+      //  var ba = (_ba != null || _ba == undefined) ? cm.activitiesDisplayed.get(activity.activityUIID) : _ba;
 		
-		if(ba != null) {
-			var cx:Number = ba._x + ba.getVisibleWidth()/2;
-			var cy:Number = ba._y + ba.getVisibleHeight()/2;
+		Debugger.log("cm: " + cm.activitiesDisplayed, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
+		Debugger.log("act UIID: " + activity.activityUIID, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
+		
+		Debugger.log("cx: " + cx, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
+		
+		if(cx != null && cy != null) {
+			//var cx:Number = ba._x + ba.getVisibleWidth()/2;
+			//var cy:Number = ba._y + ba.getVisibleHeight()/2;
 			
-			Debugger.log("current: " + ba.activity.activityUIID, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
+			//Debugger.log("current: " + ba.activity.activityUIID, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
 			
 			if(_isBranchChild) 
 				Debugger.log("bc cx: " + cx + " // bc cy: " + cy, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
@@ -773,8 +793,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			Debugger.log("monitor controller: " + c, Debugger.CRITICAL,'getController','CanvasBranchView');
 			return MonitorController(c);
 		}
-
-		//return (c instanceof CanvasController) ? CanvasController(c) : MonitorController(c);
 	}
 	
 	/**
