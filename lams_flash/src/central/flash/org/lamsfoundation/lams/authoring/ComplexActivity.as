@@ -58,7 +58,7 @@ class ComplexActivity extends Activity{
 	 */
 	public function populateFromDTO(dto:Object){
 		super.populateFromDTO(dto);
-		if(_activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
+		if(_activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || _activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE){
 			_maxOptions = dto.maxOptions;
 			_minOptions = dto.minOptions;
 			//TODO: This is missing in the Library packet - tell mai.

@@ -658,12 +658,12 @@ class MonitorModel extends Observable{
 				Debugger.log("isDrawnDesign: "+isDesignDrawn, Debugger.GEN, "drawDesign", "MonitorModel");
 			}
 			
-			if(ddm_activity.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE){
+			if(ddm_activity.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE && selectedTab != LearnerTabView._tabID){
 				eventArr.push(createViewUpdate("ADD_SEQUENCE", ddm_activity));
 			} else if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
 				var parentAct;
 				if((parentAct = _activeSeq.getLearningDesignModel().activities.get(ddm_activity.parentUIID)) != null)
-					if(parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE)
+					if(parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE && selectedTab != LearnerTabView._tabID)
 						eventArr.push(createViewUpdate("DRAW_ACTIVITY_SEQ", ddm_activity, tabID, drawLearner));
 			} else {
 				eventArr.push(createViewUpdate("DRAW_ACTIVITY", ddm_activity, tabID, drawLearner));
