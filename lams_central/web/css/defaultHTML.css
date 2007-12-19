@@ -1008,6 +1008,8 @@ My Courses Pages
 
 .mycourses-right-buttons {float:right; padding-right:20px;  margin-top:11px; height:24px; font-size:11px}
 
+#content a.sorting { border-bottom: none; cursor: pointer; }
+
 #content a.add-lesson-button {
 	background: url('../images/css/add_lesson.jpg') no-repeat 0px 0px;
 	color: #666;

@@ -11,8 +11,8 @@
 		<div id="<c:out value="${orgBean.id}"/>-lessons" class="j-lessons">
 		<c:if test="${allowSorting}">
 			<div class="mycourses-right-buttons" style="display:none;">
-				<a onclick="makeOrgSortable(<c:out value="${orgBean.id}"/>)">
-					<fmt:message key="label.enable.lesson.sorting"/>
+				<a class="sorting" onclick="makeOrgSortable(<c:out value="${orgBean.id}"/>)" title="<fmt:message key="label.enable.lesson.sorting"/>">
+					<img src="<lams:LAMSURL/>/images/css/sorting_disabled.gif">
 				</a>
 			</div>
 		</c:if>
