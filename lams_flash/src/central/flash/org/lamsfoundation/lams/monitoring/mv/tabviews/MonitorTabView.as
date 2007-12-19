@@ -277,11 +277,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			mm.getMonitor().closeBranchView();
 			
 			//Remove all the movies drawn on the transition and activity movieclip holder
+			
 			this._learnerContainer_mc.removeMovieClip();
 			this.transitionLayer.removeMovieClip();
-			
 			this.activityLayer.removeMovieClip();
-			
 			this.transparentCover.removeMovieClip();
 			
 			//Recreate both Transition holder and Activity holder Movieclips
@@ -302,10 +301,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 				mm.setIsProgressChangedLearner(true);
 			}
 			
+			mm.branchesDisplayed.clear();
 			mm.transitionsDisplayed.clear();
 			mm.activitiesDisplayed.clear();
 			
 			mm.getMonitor().getProgressData(mm.getSequence());
+			
 	}
 	
 	/**
@@ -315,7 +316,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	 * @param   activityUIID 
 	 * @return  
 	 */
-	private function removeActivity(a:Activity,mm:MonitorModel){
+	private function removeActivity(a:Activity, mm:MonitorModel){
 		//dispatch an event to show the design  has changed
 		var r = mm.activitiesDisplayed.remove(a.activityUIID);
 		r.removeMovieClip();

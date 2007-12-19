@@ -389,14 +389,9 @@ class MonitorModel extends Observable{
 	 * @usage   
 	 * @return  
 	 */
-	public function clearDesign(tabID:Number, learner:Object){
-		if (learner != null || learner != undefined){
-			var drawLearner:Object = new Object();
-			drawLearner = learner;
-		}
-	
-		//porobbably need to get a bit more granular
+	public function clearDesign(){
 		Debugger.log('Running',Debugger.GEN,'clearDesign','MonitorModel');
+		
 		var mmActivity_keys:Array = _activitiesDisplayed.keys();
 		var longest = mmActivity_keys.length;
 		
@@ -415,6 +410,7 @@ class MonitorModel extends Observable{
 		
 		var mmTransition_keys:Array = _transitionsDisplayed.keys();
 		var transLongest = mmTransition_keys.length;
+		
 		//chose which array we are going to loop over
 		var transIndexArray:Array;
 		transIndexArray = mmTransition_keys;
@@ -548,16 +544,22 @@ class MonitorModel extends Observable{
 	
 	public function addNewBranch(sequence:SequenceActivity, branchingActivity:BranchingActivity, isDefault:Boolean):Void {
 		Debugger.log("sequence.firstActivityUIID: "+sequence.firstActivityUIID, Debugger.CRITICAL, "addNewBranch", "MonitorModel");
+		
+		if(sequence.firstActivityUIID == null && app.getMonitor().ddm.getComplexActivityChildren(sequence.activityUIID).length <= 0) {
+		
+			var b:Branch = new Branch(app.getMonitor().ddm.newUIID(), BranchConnector.DIR_SINGLE, branchingActivity.activityUIID, null, sequence, app.getMonitor().ddm.learningDesignID);
+			app.getMonitor().ddm.addBranch(b);
 				
-		if(sequence.firstActivityUIID != null) {
+		} else if(sequence.firstActivityUIID != null) {
+			
 			var b:Branch = new Branch(app.getMonitor().ddm.newUIID(), BranchConnector.DIR_FROM_START, app.getMonitor().ddm.getActivityByUIID(sequence.firstActivityUIID).activityUIID, branchingActivity.activityUIID, sequence, app.getMonitor().ddm.learningDesignID);
 			app.getMonitor().ddm.addBranch(b);
 		
 			Debugger.log("sequence.stopAfterActivity: "+sequence.stopAfterActivity, Debugger.CRITICAL, "addNewBranch", "MonitorModel");
+			
 			// TODO: review
 			if(!sequence.stopAfterActivity) {
 				b = new Branch(app.getMonitor().ddm.newUIID(), BranchConnector.DIR_TO_END, app.getMonitor().ddm.getActivityByUIID(this.getLastActivityUIID(sequence.firstActivityUIID)).activityUIID, branchingActivity.activityUIID, sequence, app.getMonitor().ddm.learningDesignID);
-			
 				app.getMonitor().ddm.addBranch(b);
 			}
 			
@@ -700,12 +702,21 @@ class MonitorModel extends Observable{
 
 		isDesignDrawn = true;
 		
-		broadcastViewUpdate("DRAW_ALL", eventArr, tabID);
+		callDesignEvents(tabID, eventArr);
 	}
 	
 	public function setDialogOpen(dialogOpen:String){
 		_dialogOpen = dialogOpen;
 		broadcastViewUpdate(_dialogOpen, null, null);
+	}
+	
+	private function callDesignEvents(tabID, eventArr):Void {
+		if(tabID != LearnerTabView._tabID)
+			for(var i=0; i<eventArr.length; i++)
+				broadcastViewUpdate(eventArr[i].updateType, eventArr[i].data, eventArr[i].tabID, eventArr[i].learner);
+			else
+				broadcastViewUpdate("DRAW_ALL", eventArr, tabID);
+		
 	}
 	
 	public function broadcastViewUpdate(updateType, data, tabID, learner){
