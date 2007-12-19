@@ -77,8 +77,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
 	
-	private var child1_mc:CanvasActivity;
-	private var child2_mc:CanvasActivity;
+	private var child1_mc:MovieClip;
+	private var child2_mc:MovieClip;
 	
 	private var _locked:Boolean = false;
 	
