@@ -81,14 +81,14 @@ public class checkmysqlversion
 		catch (SQLException e)
 		{
 			System.out.println(e.getMessage());
-			System.out.println("Upgrade failed. MySQL check failed.\n");
+			System.out.println("\nMySQL check failed. Please check your root password.\n");
 			System.exit(1); 
 		}
 	
 		catch (Exception e)
         {
             System.out.println(e.getMessage());
-            System.out.println("Upgrade failed. Unknown failure checking MySQL version.\n");
+            System.out.println("\nUnknown failure checking MySQL version.\n");
             e.printStackTrace();
             System.exit(1);
 		}

@@ -22,20 +22,6 @@
 
 /* $$Id$$ */
 
-/**
- * updater.nsi is actually an updater/installer/language-pack. There are 2 
- * possibilites:
- * 1) ifLAMS 2.x is installed and this is a newer version, the updater will be 
- *    run
- 
- 
- * 2) If there is no LAMS 2.x installation, a full install will take place
- *
- * Builds to win_installer\build\LAMS-updater-$VERSION.exe
- * You must change the $VERSION to comply with this version (Line 49 approx)
- * Change the LANGUAGE_PACK_VERSION To the date you compile YYYY-MM-DD
- * Change the DATE_TIME_STAMP to the same as can be found in lams_common\db\sql\insert_windows_config_data.sql
- */
 
 # includes
 !include "TextFunc.nsh"
@@ -52,10 +38,10 @@
 # constants
 !define VERSION "2.1 Beta"
 ;!define PREVIOUS_VERSION "2.0.2"
-;!define LANGUAGE_PACK_VERSION "2007-06-01"
-;!define LANGUAGE_PACK_VERSION_INT "20070601"
+!define LANGUAGE_PACK_VERSION "2007-12-17"
+!define LANGUAGE_PACK_VERSION_INT "20071217"
 !define DATE_TIME_STAMP "200712201000"
-!define SERVER_VERSION_NUMBER "${VERSION}.${DATE_TIME_STAMP}"
+!define SERVER_VERSION_NUMBER "2.0.99.200712181312"
 !define BASE_VERSION "2.0"
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
@@ -79,7 +65,7 @@ InstProgressFlags smooth
 !define MUI_ABORTWARNING
 
 # set welcome page
-!define MUI_WELCOMEPAGE_TITLE "LAMS ${VERSION} Install/Update Wizard"
+!define MUI_WELCOMEPAGE_TITLE "LAMS ${VERSION} Install Wizard"
 !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of LAMS ${VERSION}.\r\n\r\n\
     LAMS 2.1 Beta has been released for users to explore the new Branching features coming in LAMS 2.1.\r\n\r\n\
     Do NOT use this installer to set up production server for LAMS.\r\n\r\n\  
@@ -103,7 +89,7 @@ InstProgressFlags smooth
 
 # installer screen progression
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "${BASE_DEV_DIR}\license.txt"
+!insertmacro MUI_PAGE_LICENSE "..\license.txt"
 !insertmacro MUI_PAGE_COMPONENTS
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE DirectoryLeave
 !insertmacro MUI_PAGE_DIRECTORY
@@ -186,9 +172,9 @@ Var TIMESTAMP           ; timestamp
 
 ##############################
 
-SectionGroup "LAMS ${VERSION} Full Install" fullInstall
+SectionGroup /e "LAMS ${VERSION} Full Install" fullInstall
     Section "JBoss 4.0.2" jboss
-
+        SectionIn RO
         DetailPrint "Setting up JBoss 4.0.2"
         SetOutPath $INSTDIR
         File /a /r /x all /x minimal /x robyn /x log /x tmp /x work /x jsMath.war /x *.bak ${SOURCE_JBOSS_HOME}
@@ -200,7 +186,7 @@ SectionGroup "LAMS ${VERSION} Full Install" fullInstall
     SectionEnd
 
     Section "LAMS ${VERSION}" lams
-
+        SectionIn RO
         Detailprint "Installing LAMS ${VERSION}"
         
         SetOutPath $INSTDIR
@@ -225,8 +211,8 @@ SectionGroup "LAMS ${VERSION} Full Install" fullInstall
         File /a "${BUILD}\lams-stop.exe"
         File /a "${BUILD}\lams-backup.exe"
         File /a "${BUILD}\lams-restore.exe"
-        File /a "${BASE_DEV_DIR}\license.txt"
-        File /a "${BASE_DEV_DIR}\license-wrapper.txt"
+        File /a "..\license.txt"
+        File /a "..\license-wrapper.txt"
         File /a "..\readme.txt"
         Call SetupStartMenu
         
@@ -239,6 +225,7 @@ SectionGroup "LAMS ${VERSION} Full Install" fullInstall
     SectionEnd
     
     Section  "Install as Service" service
+        SectionIn RO
         DetailPrint "Setting up lams ${VERSION} as a service."
         SetOutPath "$INSTDIR\jboss-4.0.2\bin"
         File /a "${BASE_DEV_DIR}\wrapper-windows-x86-32-3.2.3\bin\wrapper.exe"
@@ -319,7 +306,7 @@ Function .onInit
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "final.ini"
     
     # set jsmath exploded size (assumes 4KB cluster size on destination hdd)
-    SectionSetSize ${jsmathe} 81816
+    ;SectionSetSize ${jsmathe} 81816
     
 FunctionEnd
 
@@ -446,7 +433,7 @@ Function PreMySQLConfig
     ${endif}
     
     !insertmacro MUI_INSTALLOPTIONS_WRITE "mysql.ini" "Field 3" "State" "$MYSQL_DIR"
-    !insertmacro MUI_HEADER_TEXT "Setting Up MySQL Database Access (2/4)" "Choose a MySQL database and user account for LAMS.  if unsure, use the defaults."
+    !insertmacro MUI_HEADER_TEXT "Setting Up MySQL Database Access (2/4)" "Choose a MySQL database and user account for LAMS.  If unsure, use the defaults."
     !insertmacro MUI_INSTALLOPTIONS_DISPLAY "mysql.ini"
 
 FunctionEnd
@@ -469,7 +456,7 @@ Function PreLAMSConfig
 
     !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 2" "State" "$JDK_DIR"
     !insertmacro MUI_INSTALLOPTIONS_WRITE "lams.ini" "Field 4" "State" "$INSTDIR\repository"
-    !insertmacro MUI_HEADER_TEXT "Setting Up LAMS (1/4)" "Configure the LAMS Server.  if unsure, use the defaults."
+    !insertmacro MUI_HEADER_TEXT "Setting Up LAMS (1/4)" "Configure the LAMS Server.  If unsure, use the defaults."
     !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams.ini"
 
 FunctionEnd
@@ -503,7 +490,7 @@ FunctionEnd
 
 
 Function PreWildfireConfig
-        !insertmacro MUI_HEADER_TEXT "Setting Up Wildfire Chat Server (4/4)" "Configure Wildfire, chat server for LAMS.  if unsure, use the default."
+        !insertmacro MUI_HEADER_TEXT "Setting Up Wildfire Chat Server (4/4)" "Configure Wildfire, chat server for LAMS.  If unsure, use the default."
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "wildfire.ini"
 FunctionEnd
 
@@ -595,8 +582,8 @@ Function DeployConfig
     File "..\templates\run.bat"
     File "..\templates\wrapper.conf"
     File "..\templates\index.html"
-    File "..\templates\update_lams_configuration.sql"
     File "..\conf\login-config.xml"
+    File "..\templates\update_lams_configuration.sql"
       
     # create installer.properties
     ClearErrors
@@ -920,9 +907,7 @@ Function RemoveTempFiles
     Delete "$TEMP\installer.properties"
     Delete "$INSTDIR\wrapper.conf"
     Delete "$TEMP\index.html"
-    Delete "$TEMP\update_lams_configuration.sql"
     Delete "$TEMP\login-config.xml"
-    Delete "$INSTDIR\update_lams_configuration.sql"
     RMDIR /r "$WINTEMP\lams"
 FunctionEnd
 
@@ -942,6 +927,7 @@ Function .onInstFailed
     Delete "$INSTDIR\lams-restore.exe"
     Delete "$INSTDIR\lams_uninstall.exe"
     Delete "$INSTDIR\license.txt"
+    Delete "$INSTDIR\license-wrapper.txt"
     Delete "$INSTDIR\readme.txt"
 
         strcpy $0 $MYSQL_DIR
