@@ -19,7 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.webct.platform.sdk.security.authentication.module.AuthenticationModule;
 import com.webct.platform.sdkext.authmoduledata.*;
-
+import com.webct.platform.sdk.context.gen.LearningCtxtVO;
+import com.webct.platform.sdk.context.gen.SessionVO;
+import com.webct.platform.sdk.context.client.ContextSDK;
+import com.webct.platform.sdkext.authmoduledata.LearningContextService;
 
 import org.apache.velocity.VelocityContext; 
 import org.apache.velocity.Template; 
@@ -43,6 +46,9 @@ public class LamsModule extends AuthenticationModule
 	public static final String VERSION = "1.0.0";
 	public static final String JARSTR = "lams2-webct-integration-" + VERSION + ".jar";
     private HttpServletRequest request = null;
+    private SessionVO _sessionVO;    
+    private LearningCtxtVO _currentLearningContext;    
+    private ContextSDK _contextSDK;
     private Map settings = null;
     private String lamsServerUrl;
     private String lamsServerId;
@@ -76,6 +82,17 @@ public class LamsModule extends AuthenticationModule
     
     public boolean login() throws LoginException
     {
+    	
+    	try{
+    		this._contextSDK = new ContextSDK();
+    		this._sessionVO = _contextSDK.getCurrentSession();
+    	}
+    	catch (Exception e)
+    	{
+    		e.printStackTrace();
+    		throw new LoginException("Problem getting context sdk object: " + e.getMessage());
+    	}
+    	
     	return true;
     }
     	
@@ -92,28 +109,16 @@ public class LamsModule extends AuthenticationModule
     		return false;
     	}
     	
-
-    	
-    	this.settings = super.getSettings();
-    	//user = super.getUserId();
-		lamsServerUrl = (String)settings.get(Constants.SETTING_LAMS_SERVER_URL);
-        lamsServerId = (String)settings.get(Constants.SETTING_SERVER_ID);
-        lamsServerSecretKey = (String)settings.get(Constants.SETTING_SECRET_KEY);
-        webctRequestSource = (String)settings.get(Constants.SETTING_REQUEST_SRC);
-		
-        List roles;
-		this.lcID = super.getCurrentLearningContextId();
-		
-		request = super.getRequest();
-		Map params = new HashMap();            
+    	Map params = new HashMap();            
         String html=null;
         String authorUrl = null;
         String learningDesigns = null;
         String learnerUrl = "";
         String monitorUrl = "";
-		
-		String ptid = request.getParameter("id");
-		if(ptid==null)
+        this.request = super.getRequest();
+        
+    	String ptid = request.getParameter("id");
+    	if(ptid==null)
 	    {
 	        // the id param was null, so PT was probably called from My WebCT
 	        ptid = request.getParameter("tid");
@@ -126,16 +131,33 @@ public class LamsModule extends AuthenticationModule
 		}
 		params.put("pt_id", ptid);
 		params.put("page_id", request.getParameter("page_id"));
-
+		
 		
 		try{
-	    	this.user = UserService.getInstance().getUser(super.getUserId(), lcID);
+			this.lcID = super.getCurrentLearningContextId();
+			this.user = UserService.getInstance().getUser(super.getUserId(), lcID);
 	    }
 	    catch (VistaDataException e)
 	    {
 	    	e.printStackTrace();
 	    	throw new LoginException("Problem getting user details from WebCt: " + e.getMessage());
 	    }
+    	
+    	
+    	
+    	this.settings = super.getSettings(new Long(user.getInstitutionLCId()));
+
+    	
+		this.lamsServerUrl = (String)settings.get(Constants.SETTING_LAMS_SERVER_URL);
+		this.lamsServerId = (String)settings.get(Constants.SETTING_SERVER_ID);
+		this.lamsServerSecretKey = (String)settings.get(Constants.SETTING_SECRET_KEY);
+		this.webctRequestSource = (String)settings.get(Constants.SETTING_REQUEST_SRC);
+        //System.out.println("TESTING:");
+        //System.out.println((String)settings.get("glcid"));
+        //System.out.println(lamsServerUrl);
+        //System.out.println(lamsServerId);
+        //System.out.println(lamsServerSecretKey);
+        //System.out.println(webctRequestSource);
 	    	
 	    boolean canAuthor = hasLamsRole("authorRoles");
 		boolean canMonitor = hasLamsRole("monitorRoles");
@@ -224,10 +246,19 @@ public class LamsModule extends AuthenticationModule
             	
             	// get the learning designs to display the workspace tree
             	learningDesigns = getLearningDesigns(user, lcID);
-            	params.put("learningDesigns", learningDesigns);
             	
-            	html = this.generatePage("web/create.vm", params);
-        	
+            	if (learningDesigns == null || learningDesigns.equals("") || learningDesigns.equals("error"))
+            	{
+            		// LAMS server is probably down
+            		params.put("successMessage", "Could not connect to LAMS server, LAMS server may be down." +
+            				"<br><br>Please contact your system administrator.");
+            		html = this.generatePage("web/success.vm", params);
+            	}
+            	else
+            	{
+            		params.put("learningDesigns", learningDesigns);
+            		html = this.generatePage("web/create.vm", params);
+            	}
         	}
         	catch (Exception e)
         	{
@@ -254,7 +285,7 @@ public class LamsModule extends AuthenticationModule
         	params.put("successMessage", successMessage);
         	
         	try{
-        		html = this.generatePage("web/lessonCreated.vm", params);
+        		html = this.generatePage("web/success.vm", params);
 
         	}
         	catch (Exception e)
@@ -276,7 +307,7 @@ public class LamsModule extends AuthenticationModule
         			lamsServerSecretKey,
         			webctRequestSource, 
         			user.getUserId(), 
-        			"" + seqID, 
+        			"" + lcID, 
         			Constants.DEFAULT_LANGUAGE, 
         			Constants.DEFAULT_COUNTRY, 
         			user.getFirstname(), 
@@ -323,8 +354,8 @@ public class LamsModule extends AuthenticationModule
             			Long.parseLong(ptid),
             			lcID.longValue(), 
     					Long.parseLong(seqID), 
-    					title,
-    					description, 
+    					LamsSecurityUtil.replace(title, '\'', "\\'"),
+    					LamsSecurityUtil.replace(description, '\'', "\\'"), 
     					user.getUserId(), 
     					user.getFirstname(),
     					user.getLastname(), 
@@ -350,7 +381,7 @@ public class LamsModule extends AuthenticationModule
         	params.put("successMessage", successMessage);
         	
         	try{
-        		html = this.generatePage("web/lessonCreated.vm", params);
+        		html = this.generatePage("web/success.vm", params);
         	
         	
         	}
@@ -393,7 +424,7 @@ public class LamsModule extends AuthenticationModule
 	        			"preview");	
 	        	
 	        	String previewUrl = generateRequestURL(user, lcID, "learner") + "&lsid=" +pvID;
-	        	System.out.println("PREVIEW URL: " + previewUrl);
+	        	//System.out.println("PREVIEW URL: " + previewUrl);
 	        	super.setRedirectUrl(previewUrl);
         	}
         	catch (Exception e)
@@ -419,7 +450,20 @@ public class LamsModule extends AuthenticationModule
 	        	{
 	        		Calendar calendarStart = Calendar.getInstance();      	
 	        		calendarStart.setTime(modLesson.getStartTimestamp());
-	        		params.put("startStr", + calendarStart.get(Calendar.DATE) + "/" + calendarStart.get(Calendar.MONTH) + "/" + calendarStart.get(Calendar.YEAR));
+	        		
+	        		String dayStr = "" + calendarStart.get(Calendar.DATE);
+	        		if (dayStr.length()<=1)
+	        		{
+	        			dayStr = "0" + dayStr;
+	        		}
+	        		
+	        		String monthStr = "" + (calendarStart.get(Calendar.MONTH) + 1);
+	        		if (monthStr.length()<=1)
+	        		{
+	        			monthStr = "0" + monthStr;
+	        		}
+	        		
+	        		params.put("startStr", dayStr + "/" + monthStr + "/" + calendarStart.get(Calendar.YEAR));
 	        		params.put("stHrCk" + calendarStart.get(Calendar.HOUR), "selected" );
 	        		params.put("stMnCk" + calendarStart.get(Calendar.MINUTE), "selected" );
 	        		params.put("stAmCk" + calendarStart.get(Calendar.AM_PM), "selected" );
@@ -436,7 +480,20 @@ public class LamsModule extends AuthenticationModule
 	        	{
 	        		Calendar calendarEnd = Calendar.getInstance();
 	        		calendarEnd.setTime(modLesson.getEndTimestamp());
-		        	params.put("endStr", calendarEnd.get(Calendar.DATE) + "/" + calendarEnd.get(Calendar.MONTH) + "/" + calendarEnd.get(Calendar.YEAR));
+	        		
+	        		String dayStr = "" + calendarEnd.get(Calendar.DATE);
+	        		if (dayStr.length()<=1)
+	        		{
+	        			dayStr = "0" + dayStr;
+	        		}
+	        		
+	        		String monthStr = "" + (calendarEnd.get(Calendar.MONTH)+1);
+	        		if (monthStr.length()<=1)
+	        		{
+	        			monthStr = "0" + monthStr;
+	        		}
+	        		
+		        	params.put("endStr", dayStr + "/" + monthStr + "/" + calendarEnd.get(Calendar.YEAR));
 		        	params.put("edHrCk" + calendarEnd.get(Calendar.HOUR), "selected" );
 		        	params.put("edMnCk" + calendarEnd.get(Calendar.MINUTE), "selected" );
 		        	params.put("edAmCk" + calendarEnd.get(Calendar.AM_PM), "selected" );
@@ -484,9 +541,8 @@ public class LamsModule extends AuthenticationModule
         	
         	try{
 	        	LamsLesson modLesson = lessonDao.getDBLesson(request.getParameter("lsID"));
-	        	
-	        	modLesson.setTitle(request.getParameter("title"));
-	        	modLesson.setDescription(request.getParameter("description"));
+	        	modLesson.setTitle(LamsSecurityUtil.replace(request.getParameter("title"), '\'', "\\'"));
+	        	modLesson.setDescription(LamsSecurityUtil.replace(request.getParameter("description"), '\'', "\\'"));
 	        	modLesson.setHidden(request.getParameter("isAvailable").equals("false"));
 	        	modLesson.setSchedule(request.getParameter("schedule").equals("true"));
 	        	
@@ -529,7 +585,7 @@ public class LamsModule extends AuthenticationModule
 	        		params.put("successMessage", "Unable to update LAMS lesson.");
 	        	}
 
-        		html = this.generatePage("web/lessonCreated.vm", params);
+        		html = this.generatePage("web/success.vm", params);
         	
         	
         	}
@@ -603,13 +659,13 @@ public class LamsModule extends AuthenticationModule
         
         	
         	log.info("LAMS AUTHOR REQUEST: " + authorUrl);
-        	System.out.println("LAMS AUTHOR REQUEST: " + authorUrl);
+        	//System.out.println("LAMS AUTHOR REQUEST: " + authorUrl);
             return authorUrl;
         }
         catch (Exception e)
         {
         	log.error("Problem generating request url:", e);
-        	System.out.println("Problem generating request url: " + e.getMessage() );
+        	//System.out.println("Problem generating request url: " + e.getMessage() );
         	e.printStackTrace();
         	throw new LoginException("Problem getting author url:" + e.getMessage());
         }
@@ -634,14 +690,14 @@ public class LamsModule extends AuthenticationModule
             					"1");
             
             log.info("LAMS LEARNING DESIGNS: " + learningDesigns);
-        	System.out.println("LAMS LEARNING DESIGN: " + learningDesigns);
+        	//System.out.println("LAMS LEARNING DESIGN: " + learningDesigns);
             return learningDesigns;
         
         }
         catch (Exception e)
         {
         	log.error("Problem getting learning desings:", e);
-        	System.out.println("Problem getting learning desings: " + e.getMessage() );
+        	//System.out.println("Problem getting learning desings: " + e.getMessage() );
         	e.printStackTrace();
         	throw new LoginException("Problem getting learning desings: " + e.getMessage());
         }
@@ -662,11 +718,11 @@ public class LamsModule extends AuthenticationModule
     	}
     	
     	String timestampStr = date + " " + hours + ":" + minutes + ":" + "00";
-    	System.out.println("TIMESTAMP: " + timestampStr);
+    	//System.out.println("TIMESTAMP: " + timestampStr);
     	
     	
     	Timestamp t = Timestamp.valueOf(timestampStr);
-    	System.out.println("TIMESTAMP To String: " + t.toString());
+    	//System.out.println("TIMESTAMP To String: " + t.toString());
     	return t;
     	
     }
@@ -681,30 +737,60 @@ public class LamsModule extends AuthenticationModule
     	boolean hasLameRole = false;
     	String learnerRoles[] = (String[])settings.get(lamsRoleType);
     	
-    	System.out.print("ROLES: ");
+    	//System.out.print("ROLES: ");
     	for(int i = 0; i<learnerRoles.length; i++)
         {
             String role = learnerRoles[i];
-            System.out.print( role + ", ");
+            //System.out.print( role + ", ");
             if (hasSpecificRole(role))
             {
             	hasLameRole = true;
             }
         }
-    	System.out.print("\n");
+    	//System.out.print("\n");
     	return hasLameRole;
     	
+    	
     	/*
-    	for(Iterator it = learnerRoles.iterator(); it.hasNext();)
-        {
-            String role = (String)it.next();
-            if (hasSpecificRole(role))
-            {
-            	hasLameRole = true;
-            }
-        }
+    	
+    	boolean hasLameRole = false;
+   
+    	System.out.println(settings.get(lamsRoleType).toString());
+    	System.out.println((String)settings.get(lamsRoleType));
+
+    	
+    	//String learnerRoles[] = ((String)settings.get(lamsRoleType)).split("|");
+    	
+    	String learnerRoles = settings.get(lamsRoleType).toString();
+    	
+    	UserVO user = null;
+    	try
+    	{
+    		user = UserService.getInstance().getUser(super.getUserId(), this.lcID);
+    	}
+    	catch (Exception e)
+    	{
+    		e.printStackTrace();
+    	}
+    	
+    	List roles = user.getUserRoles();
+		Iterator it = roles.iterator();
+    	
+		
+		
+    	while (it.hasNext())
+		{
+			String role = it.next().toString().trim();
+			if (learnerRoles.indexOf(role) != -1)
+			{
+				hasLameRole=true;
+			}
+		}
+    	
     	return hasLameRole;
-		*/
+    	*/
+    	
+ 
     }
     
     /**
@@ -724,7 +810,7 @@ public class LamsModule extends AuthenticationModule
     		
     		e.printStackTrace();
     	}
-    	
+
     	List roles = user.getUserRoles();
 		Iterator it = roles.iterator();
     	

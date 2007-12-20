@@ -26,7 +26,7 @@
 	<property name="src" value="${basedir}/src/org/"/>
 	<property name="web" value="${basedir}/web"/>
 	<property name="webinf" value="${basedir}/WEB-INF"/>
-	<property name="deploy.dir" value="C:/bea813/weblogic81/config/WebCTDomain/deployablecomponents/lams2" />
+	<property name="deploy.dir" value="${webctDomainDir}/deployablecomponents/lams2" />
 	<property name="jarfile" value="${build}/${product}-${version}.jar"/>
 	
 	

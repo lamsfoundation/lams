@@ -127,7 +127,7 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 			 		" WHERE (learning_context_id=" +learningContextId+ ") " +
 			 		"AND   (pt_id=" +ptId+ ")";
 			
-			System.out.println("SQL INSERT: " +query);
+			//System.out.println("SQL INSERT: " +query);
 			
 			ResultSet rs = stmt.executeQuery(query);	
 			
@@ -205,7 +205,7 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 					 ")";
 
 			
-			System.out.println("SQL INSERT: " +query);
+			//System.out.println("SQL INSERT: " +query);
 			
 			ResultSet rs = stmt.executeQuery(query);	
 			
@@ -243,7 +243,7 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 	{
 		Connection connection;
 		
-		System.out.println(lesson.toString());
+		//System.out.println(lesson.toString());
 		
 		int hidden=0;
 		int schedule=0;
@@ -270,8 +270,8 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 		(
 		*/
 		
-		System.out.println("START: " +startTimeStamp);
-		System.out.println("END: " +endTimeStamp);
+		//System.out.println("START: " +startTimeStamp);
+		//System.out.println("END: " +endTimeStamp);
 		
 		
 		try
@@ -308,8 +308,6 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 			"" +schedule+ "," +
 			"" +startTimeStamp+ "," +
 			"" +endTimeStamp+ ")";
-			
-			System.out.println("SQL INSERT: " +insert);
 
 			int rows = stmt.executeUpdate(insert);
 			
@@ -378,7 +376,7 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 				    ",end_date_time = " +endTimeStamp+ " " + 
 				    "WHERE lesson_id = " + lesson.getLessonId();
 			
-			System.out.println("UPDATE: " + update);
+			//System.out.println("UPDATE: " + update);
 			
 			rows = stmt.executeUpdate(update);
 			stmt.close();
@@ -415,7 +413,7 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 			Statement stmt = connection.createStatement();
 			
 			String delete="DELETE FROM "+dbTable+" WHERE lesson_id=" +lsId;
-			System.out.println("DELETE: " + delete);
+			//System.out.println("DELETE: " + delete);
 			
 			rows = stmt.executeUpdate(delete);
 			stmt.close();
@@ -461,7 +459,7 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 			 		"FROM " +dbTable+
 			 		" WHERE (lesson_id=" +lsId+ ")";
 			
-			System.out.println("GET LESSON: " +query);
+			//System.out.println("GET LESSON: " +query);
 			
 			ResultSet rs = stmt.executeQuery(query);	
 			

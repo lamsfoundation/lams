@@ -4,16 +4,16 @@
  <!-- Add components as shown in the following <component> block below -->
 
     <component>
-        <version>0.0.28</version>
+        <version>0.0.3</version>
         <powerlinks-version>1.0</powerlinks-version>
-        <id>lams.integration</id>
+        <id>lams.integration.module</id>
         <!-- valid types include sso siapi and proxytools -->
         <type>sso</type>
         <classname>org.lamsfoundation.integration.webct.LamsModule</classname>
         <author>Luke Foxton</author>
-        <description>LAMS-WebCt integration module</description>
+        <description>LAMS Integration Module</description>
         <settings-structure>
-            <settings-group name="lamsIntegrationModule"
+            <settings-group name="lams_integration_module"
                             type="service"
                             label="LAMS Integration Module">
 
@@ -48,7 +48,7 @@
 						 presentation-type="ComboBox"
 						 inheritable="true"
 						 optional="false"
-						 read-only="false"
+						 read-only="true"
 						 >
 					<setting-value key="outgoing" default="true"  label="security.authNModule.mode.outgoing"/>
 					<setting-value key="incoming" default="false"  label="security.authNModule.mode.incoming"/>
@@ -61,8 +61,8 @@
 						 inheritable="true"
 						 optional="false"
 						 read-only="false"
-						 not-applicable-lc-types="Domain;Institution;Division;Campus;Course;Section"
-						 default-value="10">
+						 default-value="10"
+						 not-applicable-lc-types="Division;Domain;Campus;Course;Section">
 				</setting-element>
 				
 				
@@ -72,42 +72,12 @@
 					 presentation-type="RadioGroup"
 					 inheritable="true"
 					 optional="false"
-					 read-only="false">
+					 read-only="false"
+					 not-applicable-lc-types="Division;Domain;Campus;Course;Section">
 					 <setting-value key="true" default="false" label="true"/>
 					 <setting-value key="false" default="true" label="false"/>
 				</setting-element>
-						
-				<setting-element name="assistedConfig"
-					 label="Assisted Config"
-					 data-type="Boolean"
-					 presentation-type="RadioGroup"
-					 inheritable="true"
-					 optional="false"
-					 read-only="false">
-					 <setting-value key="true" default="false" label="true"/>
-					 <setting-value key="false" default="true" label="false"/>
-				</setting-element>
-
-				<setting-element name="assistedConfigButtonName"
-						 label="Assisted Config Button Name"
-						 data-type="String"
-						 presentation-type="TextField"
-						 inheritable="true"
-						 optional="false"
-						 read-only="false"
-						 default-value="Configure Proxy Tool">
-				</setting-element>
-				
-				<setting-element name="urlpattern"
-							 label="security.authNModule.urlpattern"
-							 data-type="String"
-							 presentation-type="TextField"
-							 inheritable="true"
-							 optional="false"
-							 read-only="false"
-							 default-value="lamsfoundation">
-				</setting-element>
-
+		
 		<!-- MODULE-SPECIFIC ELEMENTS -->	
 
 				<setting-element name="dbUrl" 
@@ -116,37 +86,28 @@
 								 presentation-type="TextField" 
 								 inheritable="true" 
 								 optional="false" 
-								 read-only="true" 
+								 read-only="false" 
+								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
 								 default-value="@dbUrl@" />
-				
-				<!--  
-				<setting-element name="dbName" 
-								 label="SQL Server Port" 
-								 data-type="String" 
-								 presentation-type="TextField" 
-								 inheritable="true" 
-								 optional="false" 
-								 read-only="true"
-								 default-value="@dbName@" />
-				-->
-				
+
 				<setting-element name="dbDriver" 
 								 label="Database driver jar" 
 								 data-type="String" 
 								 presentation-type="TextField" 
 								 inheritable="true" 
 								 optional="false" 
-								 read-only="true"
+								 read-only="false"
+								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
 								 default-value="@dbDriver@" />
-				
-								 
+ 
 				<setting-element name="dbTable" 
 								 label="Datbase table name" 
 								 data-type="String" 
 								 presentation-type="TextField" 
 								 inheritable="true" 
 								 optional="false" 
-								 read-only="true"
+								 read-only="false"
+								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
 								 default-value="@dbTable@" />
 
 				<setting-element name="dbUser" 
@@ -155,7 +116,8 @@
 								 presentation-type="TextField" 
 								 inheritable="true" 
 								 optional="false" 
-								 read-only="true" 
+								 read-only="false" 
+								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
 								 default-value="@dbUser@" />
 				
 				<setting-element name="dbPass" 
@@ -164,7 +126,8 @@
 								 presentation-type="Password" 
 								 inheritable="true" 
 								 optional="false" 
-								 read-only="true"
+								 read-only="false"
+								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
 								 default-value="@dbPass@" />
 
 				<setting-element name="lamsServerUrl" 
@@ -174,8 +137,10 @@
 								 inheritable="true" 
 								 optional="false" 
 								 read-only="false" 
+								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
 								 default-value="@lamsServerUrl@" />
 
+				
 				<setting-element name="serverId" 
 								 label="LAMS Server ID" 
 								 data-type="String" 
@@ -183,6 +148,7 @@
 								 inheritable="true" 
 								 optional="false" 
 								 read-only="false" 
+								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
 								 default-value="@serverId@" />
 								 
 				<setting-element name="secretKey" 
@@ -192,6 +158,7 @@
 								 inheritable="true" 
 								 optional="false" 
 								 read-only="false" 
+								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
 								 default-value="@secretKey@" />
 								 
 								 
@@ -202,6 +169,7 @@
 								 inheritable="true" 
 								 optional="false" 
 								 read-only="false"
+								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
 								 default-value="@reqSrc@" />
 								 
 				<setting-element name="imagesUrl" 
@@ -210,7 +178,8 @@
 								 presentation-type="TextField" 
 								 inheritable="true" 
 								 optional="false" 
-								 read-only="false" 
+								 read-only="true"
+								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
 								 default-value="@imgUrl@" />
 							 
 				<setting-element name="authorRoles" 
@@ -219,16 +188,11 @@
 								 presentation-type="CheckList" 
 								 inheritable="true" 
 								 optional="false" 
+								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
 								 read-only="false">
 					 				<setting-value key="CDES" default="true" label="Course Designer"/>
 					 				<setting-value key="CINS" default="false" label="Course Instructor"/>
 					 				<setting-value key="SIND" default="false" label="Designer Instructor"/>
-					 				<setting-value key="DADM" default="false" label="Domain Admin"/>
-					 				<setting-value key="DDES" default="false" label="Domain Designer"/>
-					 				<setting-value key="KADM" default="false" label="Group Admin"/>
-					 				<setting-value key="KDES" default="false" label="Group Designer"/>
-					 				<setting-value key="IADM" default="false" label="Institutional Admin"/>
-					 				<setting-value key="IDES" default="false" label="Institutional Designer"/>
 					 				<setting-value key="SDES" default="true" label="Section Designer"/>
 					 				<setting-value key="SINS" default="false" label="Section Instructor"/>
 					 				<setting-value key="STEA" default="false" label="Teaching Assistant"/>
@@ -241,16 +205,11 @@
 								 presentation-type="CheckList" 
 								 inheritable="true" 
 								 optional="false" 
+								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
 								 read-only="false">
 					 				<setting-value key="CDES" default="false" label="Course Designer"/>
 					 				<setting-value key="CINS" default="true" label="Course Instructor"/>
 					 				<setting-value key="SIND" default="false" label="Designer Instructor"/>
-					 				<setting-value key="DADM" default="false" label="Domain Admin"/>
-					 				<setting-value key="DDES" default="false" label="Domain Designer"/>
-					 				<setting-value key="KADM" default="false" label="Group Admin"/>
-					 				<setting-value key="KDES" default="false" label="Group Designer"/>
-					 				<setting-value key="IADM" default="false" label="Institutional Admin"/>
-					 				<setting-value key="IDES" default="false" label="Institutional Designer"/>
 					 				<setting-value key="SDES" default="false" label="Section Designer"/>
 					 				<setting-value key="SINS" default="true" label="Section Instructor"/>
 					 				<setting-value key="STEA" default="true" label="Teaching Assistant"/>
@@ -264,17 +223,12 @@
 								 inheritable="true" 
 								 optional="false" 
 								 read-only="false" 
+								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
 								 default-value="@imgUrl@">
 								 	<setting-value key="SAUD" default="true" label="Auditor"/>
 					 				<setting-value key="CDES" default="false" label="Course Designer"/>
 					 				<setting-value key="CINS" default="true" label="Course Instructor"/>
 					 				<setting-value key="SIND" default="false" label="Designer Instructor"/>
-					 				<setting-value key="DADM" default="false" label="Domain Admin"/>
-					 				<setting-value key="DDES" default="false" label="Domain Designer"/>
-					 				<setting-value key="KADM" default="false" label="Group Admin"/>
-					 				<setting-value key="KDES" default="false" label="Group Designer"/>
-					 				<setting-value key="IADM" default="false" label="Institutional Admin"/>
-					 				<setting-value key="IDES" default="false" label="Institutional Designer"/>
 					 				<setting-value key="SDES" default="false" label="Section Designer"/>
 					 				<setting-value key="SINS" default="true" label="Section Instructor"/>
 					 				<setting-value key="SSTU" default="true" label="Student"/>

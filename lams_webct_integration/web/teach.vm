@@ -128,7 +128,7 @@
 
 <h1>LAMS Teaching</h1>
 <br>
-<form enctype="application/x-www-form-urlencoded" name="teach_form" id="teach_form" action="$url" method="post">
+<form enctype="application/x-www-form-urlencoded" name="teach_form" id="teach_form" action="$url" method="get">
 	<input type="hidden" name="$id_param_name" value="$pt_id"/>
 	<input type="hidden" name="page_id" value="$page_id"/>
 	<input type="hidden" name="form_action" id="form_action" value="create_lesson"/>

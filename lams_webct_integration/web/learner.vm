@@ -84,8 +84,11 @@
 	</tbody>
 </table>
 <br>
-<form name="learner_form" id="create_form" action="$url" method="post">
-	<input type="hidden" name="sequence_id" id="sequence_id"  value='0'>
+#else
+    <i>No LAMS lessons running.</i>
+    <br>
+#end
+<form name="learner_form" id="learner_form" action="$url" method="post">
 	<input type="hidden" name="$id_param_name" value="$pt_id"/>
 	<input type="hidden" name="page_id" value="$page_id"/>
 	<input type="hidden" name="form_action" id="form_action" value=""/>
@@ -94,11 +97,5 @@
 		<a class="action" href="javascript:formSubmit()" tabindex="1">Refresh List</a>
 	</div>
 </form>
-
-
-
 </body>
-#else
-    <i>No LAMS lessons running.</i>
-#end
 </html>

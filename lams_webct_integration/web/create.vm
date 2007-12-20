@@ -98,6 +98,31 @@
     
     function doStartLesson()
     {
+    	var dateStartStr = document.getElementById("dateStart").value;
+    	var dateEndStr = document.getElementById("dateEnd").value;
+    	var dateStartArr = dateStartStr.split("/");
+    	var dateEndArr = dateEndStr .split("/");
+
+    	
+    	var startHour = parseInt(document.getElementById("startHour").value, 10);
+		if (document.getElementById("startAMPM").value=="PM")
+		{
+			startHour = startHour + 12;
+		}
+		var startMin = parseInt(document.getElementById("startMin").value, 10);
+
+		var endHour = parseInt(document.getElementById("endHour").value, 10);
+		if (document.getElementById("endAMPM").value=="PM")
+		{
+			endHour = endHour + 12;
+		}
+		var endMin = parseInt(document.getElementById("endMin").value, 10);
+
+
+		var start = new Date(parseInt(dateStartArr[2], 10), parseInt(dateStartArr[1], 10) - 1, parseInt(dateStartArr[0], 10), startHour, startMin,"0");
+		var end = new Date(parseInt(dateEndArr[2], 10), parseInt(dateEndArr[1], 10) - 1, parseInt(dateEndArr[0], 10), endHour, endMin, "0");
+    	var today = new Date();
+    	
     	if (document.getElementById("sequence_id").value=="0")
     	{
     		alert('Please select a sequence before starting the lesson.');
@@ -108,39 +133,30 @@
 		}
 		else if (document.create_form.schedule[0].checked == true)
 		{	
-			if (document.getElementById("dateStart").value==null || document.getElementById("dateStart").value=='')
+			
+			re = new RegExp("^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$", "g");
+			re2 = new RegExp("^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$", "g");
+			
+			if (dateStartStr==null || dateStartStr=='')
 			{
 				alert("You must select a start date if you want to schedule the lesson.");
 			}
-			else if (document.getElementById("dateStart").value==document.getElementById("dateEnd").value)
+			else if (!re.test(dateStartStr))
 			{
-				var startHour = parseInt(document.getElementById("startHour").value, 10);
-				if (document.getElementById("startAMPM").value=="PM")
-				{
-					startHour = startHour + 12;
-				}
-				var startMin = parseInt(document.getElementById("startMin").value, 10);
-
-				var endHour = parseInt(document.getElementById("endHour").value, 10);
-				if (document.getElementById("endAMPM").value=="PM")
-				{
-					endHour = endHour + 12;
-				}
-				var endMin = parseInt(document.getElementById("endMin").value, 10);
-
-				var start = new Date("2000", "1", "1", startHour, startMin,"0");
-				var end = new Date("2000", "1", "1", endHour, endMin, "0");
-				
-				if (start>=end)
-				{
-					alert("Start date and time must be before end date and time.");
-				}
-				else
-				{
-					document.getElementById("form_action").value="start_lesson";
-    				formSubmit();
-				}
-			}			
+				alert("Incorrect format for start date, must follow the form: dd/mm/yyyy");
+			}
+			else if (!re2.test(dateEndStr)  && dateEndStr.length>0)
+			{
+				alert("Incorrect format for end date, must follow the form: dd/mm/yyyy");
+			}
+			else if (start<today)
+			{
+				alert("Cannot start a lesson in the past. Current time: " + today.toLocaleString());
+			}	
+			else if (start>=end)
+			{
+				alert("Start date and time must be before end date and time.");
+			}		
 			else
 			{
 				document.getElementById("form_action").value="start_lesson";
@@ -209,7 +225,7 @@
 		</tr>
 		<tr>
 			<td valign="top"><b>Description:</b></td>
-			<td><textarea name="description" rows="12" cols="35" tabindex="2"></textarea></td>
+			<td><textarea name="description" rows="6" cols="50" tabindex="2"></textarea></td>
 		</tr>
 		<tr>
 			<td valign="top"><b>Lesson Visibility:</b></td>
