@@ -48,6 +48,8 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 	private var idxLabel:Label;
 	private var _labelText:String;
 	
+	private var matchesArr:Array;
+	
 	private var _tm:ThemeManager;
 	private var mm:MonitorModel;
 	
@@ -80,29 +82,56 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 		var buttonText:String = String(label.text)
 		if (buttonText == "<<") {
 			Debugger.log("<< clicked", Debugger.GEN, "indexClicked", "IndexButton");
+			mm.drawIndexButtons = false;
 			mm.updateIndexButtons("<<");
 		} else if (buttonText == ">>") {
 			Debugger.log(">> clicked", Debugger.GEN, "indexClicked", "IndexButton");
+			mm.drawIndexButtons = false;
 			mm.updateIndexButtons(">>");
-			Debugger.log("updateIndexButtons has been called", Debugger.CRITICAL, "indexClicked", "IndexButton");
 		} else if (buttonText == "Go") {
+			mm.learnerIndexView.textFieldContents = String(mm.learnerIndexView.getIdxTextField().text); // backup the string incase need to remove textfield
 			if(!isNaN(mm.learnerIndexView.getIdxTextField().text)) { // if the text field contains a number
 				var idx:Number = Number(mm.learnerIndexView.getIdxTextField().text);
 				if (idx >= 1 && idx <= mm.numIndexButtons) { // if the selected index exists
+					mm.drawIndexButtons = false;
 					mm.currentLearnerIndex = idx;
+					if (!mm.inSearchView)
+						mm.oldIndex = mm.currentLearnerIndex;
 				}
 				else
-					LFMessage.showMessageAlert("The page index must be a number between 1 and "+ mm.numIndexButtons, null);
+					LFMessage.showMessageAlert("The page number must be between 1 and "+ mm.numIndexButtons, null);
 			} 
-			else
-				LFMessage.showMessageAlert("The page index must be a number between 1 and "+ mm.numIndexButtons, null);
+			else if (mm.learnerIndexView.getIdxTextField().text == "") {
+				LFMessage.showMessageAlert("Please enter a search query or page number between 1 and "+ mm.numIndexButtons, null);
+			}
+			else {
+				var mc:MonitorController = mm.getMonitor().getMV().getController();
+				matchesArr = mc.searchForLearners(String(mm.learnerIndexView.getIdxTextField().text));
+				if (matchesArr.length > 0) {
+					mm.drawIndexButtons = true;
+					mm.searchResults = matchesArr;
+					var toggleBtn:MovieClip = mm.getMonitor().getMV().getLearnerIndexPanel().toggleBtn;
+					toggleBtn._visible = true;
+				} else {
+					LFMessage.showMessageAlert(mm.learnerIndexView.getIdxTextField().text + " was not found.", null);
+				}
+			}
+		}
+		else if (buttonText == "Index View") {
+			mm.drawIndexButtons = true;
+			mm.inSearchView = false;
+			mm.setLessonProgressData(mm.progressArrBackup);
+			
+			//mm.currentLearnerIndex = mm.oldIndex;
 		}
 		else {
+			mm.drawIndexButtons = false;
 			mm.currentLearnerIndex = Number(label.text);
+			if (!mm.inSearchView)
+				mm.oldIndex = mm.currentLearnerIndex;
 		}
 		
 	}
-
 	
 	public function setSize(_btnWidth:Number):Void {
 		this._width = _btnWidth;

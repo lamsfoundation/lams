@@ -86,6 +86,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private var help_btn:Button;
 	private var panelLowered:Boolean;
 	
+	private var activitiesDrawn:Number;
+	private var mostRowActivities:Number;
 	private var drawCount:Number;
 	private var maxCount:Number;
 	private var evtArr:Array;
@@ -129,6 +131,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
         //Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
+		
+		activitiesDrawn = 0;
+		mostRowActivities = 0;
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
 		mm.getMonitor().getMV().getMonitorLearnerScp()._visible = false;
@@ -238,8 +243,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	public function drawNext():Void {
 		if(drawCount < maxCount) {
 			Debugger.log("drawing: " + evtArr[drawCount].updateType, Debugger.CRITICAL, "drawNext", "LearnerTabView");
+			activitiesDrawn++;
 			update(mm, evtArr[drawCount])
+			setSize(mm);
 		} else {
+			//setSize(mm);
+			activitiesDrawn = 0;
 			drawNextLearner();
 			return;
 		}
@@ -596,14 +605,14 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     * Sets the size of the canvas on stage, called from update
     */
 	private function setSize(mm:MonitorModel):Void{
-		var s:Object = mm.getSize();
+		//var s:Object = mm.getSize(); // when taken from monitor model wasn't setting size properly with 1 learner
 		
-		var actkeys = mm.getSequence().getLearningDesignModel().activities.keys();
-		var ddmBranch_keys:Array = mm.getSequence().getLearningDesignModel().branches.keys();
-		var scpWidth:Number = Math.max((actkeys.length)*130, s.w);
-		
+		if (mostRowActivities < activitiesDrawn)
+			mostRowActivities = activitiesDrawn;
+			
+		var scpWidth:Number = Math.max((mostRowActivities)*130 + 6, mm.getMonitor().getMV().getMonitorLearnerScp()._width);
+
 		var newWidth:Number = (_activityLayer_mc._width < scpWidth) ? scpWidth - 6 : _activityLayer_mc._width;
-		
 		for (var i=0; i<learnerListArr.length; i++){
 			learnerListArr[i].learnerName._width = newWidth;
 			learnerListArr[i].learnerButton._x = newWidth-110;

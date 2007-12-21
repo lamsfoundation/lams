@@ -399,8 +399,8 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		monitorGateView.setSize(mm);
 		Debugger.log("MonitorViews.w: "+s.w, Debugger.CRITICAL, "setSize", "MonitorView");
 		learnerIndexView.setSize(mm);
-		(mm.numIndexButtons > 1) ? monitorLearner_scp.setSize(s.w-monitorLearner_scp._x, s.h-20) : monitorLearner_scp.setSize(s.w-monitorLearner_scp._x, s.h);
-		
+		(mm.numIndexButtons > 1 || mm.inSearchView) ? monitorLearner_scp.setSize(s.w-monitorLearner_scp._x, s.h-20) : monitorLearner_scp.setSize(s.w-monitorLearner_scp._x, s.h);
+				
 		viewJournals_btn._x = s.w - 260;
 		exportPortfolio_btn._x = s.w - 260;
 		editFly_btn._x = s.w - 360;

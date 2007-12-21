@@ -292,9 +292,8 @@ class MonitorController extends AbstractController {
 	private function reloadProgress(ref, URLToSend){
 		var callback:Function = Proxy.create(ref, getProgressData);
 		Application.getInstance().getComms().getRequest(URLToSend,callback, false);
-		//_monitorModel.updateIndexButtons();
-		
 	}
+	
 	private function activitySnapBack(act:Object){
 		act._x = act.xCoord;
 		act._y = act.yCoord;
@@ -576,6 +575,28 @@ class MonitorController extends AbstractController {
 		myObj.ttHolder = Application.tooltip;
 		return myObj;
 		
+	}
+	
+	/**
+	* Searches for learners by name, and returns an array of learners whose full names contain the search string (case insensitive).
+	* 
+	* @param searchStr	The learner name to search
+	* @return matches   Array of Learners whose names contain the search string
+	*/
+	public function searchForLearners(searchStr:String):Array {
+		Debugger.log("searchForLearners invoked, searching for "+searchStr, Debugger.CRITICAL, "searchForLearners", "MonitorController");
+
+		var len:Number = _monitorModel.progressArrBackup.length;
+			
+		var matches:Array = new Array();
+		for (var i = 0; i < len; i++) {
+			var fullName:String = _monitorModel.progressArrBackup[i].getFullName();
+			if (fullName.toLowerCase().indexOf(searchStr.toLowerCase()) != -1){
+				Debugger.log("Match Found With: "+ fullName, Debugger.CRITICAL, "searchForLearners", "MonitorController");
+				matches.push(_monitorModel.progressArrBackup[i]);
+			}
+		}
+		return matches;
 	}
 	
 	/**

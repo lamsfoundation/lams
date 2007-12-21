@@ -92,6 +92,7 @@ class MonitorModel extends Observable{
 	// state data
 	private var _isDesignDrawn:Boolean;
 	private var _showLearners:Boolean;
+	private var _inSearchView:Boolean;
 	private var _endGate:MovieClip;
 	private var _learnerIndexView:MovieClip;
 	
@@ -118,6 +119,7 @@ class MonitorModel extends Observable{
 	private var _userLoadCheckCount = 0;				// instance counter for number of times we have checked to see if users are loaded	
 	
 	private var _currentLearnerIndex:Number;
+	private var _oldIndex:Number;
 	private var _learnersPerPage:Number;
 	private var _numLearners:Number;
 	private var _firstDisplayedIndexButton:Number;
@@ -125,6 +127,11 @@ class MonitorModel extends Observable{
 	private var _numDisplayedIdxButtons:Number
 	private var _numPreferredIndexButtons:Number;
 	private var lastIndexInitialised:Boolean;
+	private var _drawButtons:Boolean;
+	
+	private var _matchesArr:Array;
+	private var backupLearnersProgArr:Array;
+	private var _searchResultsBackup:Array;
 	
 	private var dispatchEvent:Function;       
     public var addEventListener:Function;  
@@ -140,9 +147,11 @@ class MonitorModel extends Observable{
 		
 		_showLearners = true;
 		isDesignDrawn = true;
+		_drawButtons = true;
 		_staffLoaded = false;
 		_learnersLoaded = false;
 		lastIndexInitialised = false;
+		_inSearchView = false;
 		
 		_currentLearnerIndex = 1;
 		_numPreferredIndexButtons = 10; // to be displayed at a time
@@ -466,8 +475,12 @@ class MonitorModel extends Observable{
 	}
 	
 	public function get numIndexButtons(): Number {
-		var numIdxBtns:Number = Math.ceil(Math.max(getSequence().noStartedLearners,_learnersProgress.size())/learnersPerPage);
-		Debugger.log("numIdxBtns: "+numIdxBtns, Debugger.CRITICAL, "numIndexButtons", "MonitorModel");
+		var numIdxBtns:Number;
+		if (inSearchView) {
+			numIdxBtns = Math.ceil(_learnersProgress.size()/learnersPerPage);
+		} else {
+			numIdxBtns = Math.ceil(Math.max(getSequence().noStartedLearners,_learnersProgress.size())/learnersPerPage);
+		}
 		return numIdxBtns;
 	}
 	
@@ -488,8 +501,17 @@ class MonitorModel extends Observable{
 		}
 		else { // Refresh or Go clicked
 			Debugger.log("Refresh or Go clicked", Debugger.CRITICAL, "updateIndexButtons", "MonitorModel");
-			if (_lastDisplayedIndexButton < _numPreferredIndexButtons)
-				_lastDisplayedIndexButton = Math.min(numIndexButtons, _numPreferredIndexButtons);
+			Debugger.log("MonitorModel inSearchView: "+inSearchView, Debugger.GEN, "updateIndexButtons", "MonitorModel");
+			if (_inSearchView ) {
+				if (numIndexButtons < currentLearnerIndex) {
+					_firstDisplayedIndexButton = 1;
+					_lastDisplayedIndexButton = Math.min(numIndexButtons,_numPreferredIndexButtons);
+				} else
+					_lastDisplayedIndexButton = Math.min(numIndexButtons,_numPreferredIndexButtons);
+			}
+			else if (_lastDisplayedIndexButton < _numPreferredIndexButtons) {
+				_lastDisplayedIndexButton = Math.min(numIndexButtons,_numPreferredIndexButtons);
+			}
 		}
 	}
 	
@@ -503,7 +525,15 @@ class MonitorModel extends Observable{
 		infoObj.updateType = "DRAW_BUTTONS";
 		notifyObservers(infoObj);
 	}
-
+	
+	public function set drawIndexButtons(drawButtons:Boolean):Void {
+		_drawButtons = drawButtons;
+	}
+	
+	public function get drawIndexButtons():Boolean {
+		return _drawButtons;
+	}
+	
 	public function get numDisplayedIdxButtons():Number {
 		return _numDisplayedIdxButtons = _lastDisplayedIndexButton - _firstDisplayedIndexButton + 1;
 	}
@@ -523,7 +553,34 @@ class MonitorModel extends Observable{
 	public function get numPreferredIndexButtons():Number {
 		return _numPreferredIndexButtons;
 	}
-
+	
+	public function set searchResults(matchesArr:Array) {
+		//_oldIndex = _currentLearnerIndex;
+		Debugger.log("_inSearchView: "+_inSearchView, Debugger.CRITICAL, "searchResults", "MonitorModel");
+		if (!_inSearchView) {
+			_currentLearnerIndex = 1;
+			_inSearchView = true;
+		}
+		setLessonProgressData(matchesArr);
+		_searchResultsBackup = matchesArr;
+	}
+	
+	public function set oldIndex(idx:Number):Void {
+		_oldIndex = idx;
+	}
+	
+	public function get oldIndex():Number {
+		return _oldIndex;
+	}
+	
+	public function set inSearchView(inSearchView:Boolean):Void {
+		_inSearchView = inSearchView;
+	}
+	
+	public function get inSearchView():Boolean {
+		return _inSearchView;
+	}
+	
 	public function getlearnerTabActArr():Array{
 		return learnerTabActArr;
 	}
@@ -1184,6 +1241,18 @@ class MonitorModel extends Observable{
 	public function get allLearnersProgress():Array{
 		learnerTabActArr.sortOn(["_learnerLName", "_learnerFName"], Array.CASEINSENSITIVE); 
 		return learnerTabActArr;
+	}
+	
+	public function backupLearnersProgress(learnersProgArr:Array):Void {
+		backupLearnersProgArr = learnersProgArr;
+	}
+	
+	public function get progressArrBackup():Array {
+		return backupLearnersProgArr;
+	}
+	
+	public function get searchResultsBackup():Array {
+		return _searchResultsBackup;
 	}
 	
 	public function getActivityKeys():Array{

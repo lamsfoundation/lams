@@ -392,7 +392,8 @@ class Monitor {
 		}
 			
 		//sets these in the monitor model in a hashtable by learnerID
-		monitorModel.setLessonProgressData(allLearners);	
+		monitorModel.setLessonProgressData(allLearners);
+		monitorModel.backupLearnersProgress(monitorModel.allLearnersProgress);
 		dispatchEvent({type:'load',target:this});		
 		Debugger.log("Progress data saved...", Debugger.GEN, "saveProgressData", "Monitor");
 	}
@@ -459,7 +460,6 @@ class Monitor {
 		
 		var cx:Number = ba._x + ba.getVisibleWidth()/2;
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
-		
 		var isVisible:Boolean = (visible == null) ? true : visible;
 		
 		var _branchView_mc:MovieClip = MovieClip(monitorView.getMonitorTabView()).createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
