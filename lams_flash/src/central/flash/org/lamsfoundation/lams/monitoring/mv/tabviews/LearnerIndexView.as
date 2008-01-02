@@ -132,6 +132,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		switch (infoObj.updateType){
 			case 'TABCHANGE' :
 				if (infoObj.tabID == _tabID && !mm.locked && mm.numIndexButtons>1) {
+					mm.resetLearnerIndexBar();
+					_textFieldContents = defaultString;
 					setupButtons(mm);
 					this._visible = true;
 				}else {
