@@ -366,7 +366,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		idxTextField._editable = true;
 		idxTextField.type = "input";
 		idxTextField.autosize = "center"
-		idxTextField.text = (_textFieldContents == undefined) ? defaultString : _textFieldContents;
+		if (!mm.resetSearchTextField)
+			idxTextField.text = (_textFieldContents == undefined) ? defaultString : _textFieldContents;
+		else {
+			idxTextField.text = defaultString;
+			mm.resetSearchTextField = false;
+		}
 		nextPosition += idxTextField._width;
 		
 		idxTextField.onSetFocus = Delegate.create(this, textFieldHasFocus);

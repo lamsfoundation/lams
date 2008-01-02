@@ -317,10 +317,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	}
 	
 	public function adjustLearnerPanel(mm:MonitorModel):Void {
-		
 		Debugger.log("adjustLearnerPanel called", Debugger.CRITICAL, "adjustLearnerPanel", "LearnerTabView");
 		var _scroll:ScrollPane = mm.getMonitor().getMV().getMonitorLearnerScp();
 		var s:Object = mm.getSize();
+		
+		if (mm.inSearchView){
+			_scroll.setSize(s.w-_scroll._x, s.h - 20);
+		}
 		
 		if (mm.numIndexButtons > 1 && !panelLowered) {
 			if (hAdjustment) {
@@ -372,13 +375,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	}
 	
 	private function drawAllLearnersDesign(mm:MonitorModel, tabID:Number){
+		activitiesDrawn = 0;
 		var learnersPerPage:Number = mm.learnersPerPage;
 		currentLearnerIndex = (mm.currentLearnerIndex-1)*learnersPerPage;
 		maxLearnerIndex = (learnersPerPage*mm.currentLearnerIndex)-1;
 		learnersDrawnIndex = 0;
 		
 		drawNextLearner();
-
 	}
 	
 	private function drawNextLearner(){

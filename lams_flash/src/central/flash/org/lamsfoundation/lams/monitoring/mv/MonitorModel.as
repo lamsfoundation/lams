@@ -93,6 +93,7 @@ class MonitorModel extends Observable{
 	private var _isDesignDrawn:Boolean;
 	private var _showLearners:Boolean;
 	private var _inSearchView:Boolean;
+	private var _resetSearchTextField:Boolean;
 	private var _endGate:MovieClip;
 	private var _learnerIndexView:MovieClip;
 	
@@ -152,6 +153,7 @@ class MonitorModel extends Observable{
 		_learnersLoaded = false;
 		lastIndexInitialised = false;
 		_inSearchView = false;
+		_resetSearchTextField = false;
 		
 		_currentLearnerIndex = 1;
 		_numPreferredIndexButtons = 10; // to be displayed at a time
@@ -448,6 +450,10 @@ class MonitorModel extends Observable{
 
 	}
 	
+	public function set currentLearnerIndexNoRedraw(idx:Number):Void {
+		_currentLearnerIndex = idx;
+	}
+	
 	public function set currentLearnerIndex(idx:Number):Void {
 		Debugger.log("in currentLearnerIndex idx: "+idx, Debugger.CRITICAL, "currentLearnerIndex", "MonitorModel");
 		_currentLearnerIndex = idx;
@@ -563,6 +569,23 @@ class MonitorModel extends Observable{
 		}
 		setLessonProgressData(matchesArr);
 		_searchResultsBackup = matchesArr;
+	}
+	
+	// invoked on refresh
+	public function resetLearnerIndexBar():Void {
+		_drawButtons = true;
+		if (_inSearchView)
+			_currentLearnerIndex = 1;
+		_inSearchView = false;
+		_resetSearchTextField = true;
+	}
+	
+	public function set resetSearchTextField(resetTextField:Boolean):Void {
+		_resetSearchTextField = resetTextField;
+	}
+	
+	public function get resetSearchTextField():Boolean {
+		return _resetSearchTextField;
 	}
 	
 	public function set oldIndex(idx:Number):Void {

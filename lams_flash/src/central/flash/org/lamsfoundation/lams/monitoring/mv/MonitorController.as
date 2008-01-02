@@ -416,6 +416,8 @@ class MonitorController extends AbstractController {
 				_monitorModel.activeView.removeMovieClip();
 				_monitorModel.getMonitor.closeBranchView();
 			}
+			if (_monitorModel.getSelectedTab() == 2)
+				_monitorModel.resetLearnerIndexBar();
 			
 			_app.reloadLearningDesign(_monitorModel.getSequence(), Proxy.create(_monitorModel, _monitorModel.refreshAllData));
 		}else if(tgt.indexOf("help_btn") != -1){

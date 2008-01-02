@@ -120,9 +120,11 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 		else if (buttonText == "Index View") {
 			mm.drawIndexButtons = true;
 			mm.inSearchView = false;
+			mm.resetSearchTextField = true;
+
+			//mm.currentLearnerIndexNoRedraw = 1;
 			mm.setLessonProgressData(mm.progressArrBackup);
-			
-			//mm.currentLearnerIndex = mm.oldIndex;
+		
 		}
 		else {
 			mm.drawIndexButtons = false;
