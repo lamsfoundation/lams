@@ -39,7 +39,12 @@ import org.lamsfoundation.lams.integration.UserInfoFetchException;
  */
 public interface IIntegrationService {
 	
-	ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, String extCourseId, String countryIsoCode, String langIsoCode);
+	ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, 
+			String extCourseId, String countryIsoCode, String langIsoCode);
+	
+	ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, 
+			String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode,
+			String parentOrgId, Boolean isTeacher, Boolean prefix);
 	
 	ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException;
 	
@@ -55,7 +60,15 @@ public interface IIntegrationService {
 			String country,
 			String email) 
 			throws UserInfoFetchException; 
-
+	
+	ExtUserUseridMap getImplicitExtUserUseridMap(
+			ExtServerOrgMap serverMap, 
+			String extUsername,
+			String password,
+			String firstName, 
+			String lastName,
+			String email) 
+			throws UserInfoFetchException;
 	
 	List getAllExtServerOrgMaps();
 	

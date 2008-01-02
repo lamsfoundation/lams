@@ -18,30 +18,50 @@ public interface Register extends java.rmi.Remote {
     		String hash) throws java.rmi.RemoteException;
     
     public boolean addUserToGroup(
-			String username, 
+    		String username, 
 			String serverId, 
 			String datetime, 
 			String hash,
+			String courseId,
+			String courseName,
+			String countryIsoCode,
+			String langIsoCode,
 			Boolean isTeacher) throws java.rmi.RemoteException;
     
     public boolean addUserToGroupLessons(
-			String username, 
-			String serverId, 
-			String datetime, 
-			String hash) throws java.rmi.RemoteException;
-    
-    public boolean addUserToSubgroup(
-			String username,
-			String orgid,
+    		String username, 
 			String serverId, 
 			String datetime, 
 			String hash,
+			String courseId,
+			String courseName,
+			String countryIsoCode,
+			String langIsoCode,
+			Boolean asStaff) throws java.rmi.RemoteException;
+    
+    public boolean addUserToSubgroup(
+    		String username,
+			String serverId, 
+			String datetime, 
+			String hash,
+			String courseId,
+			String courseName,
+			String countryIsoCode,
+			String langIsoCode,
+			String subgroupId,
+			String subgroupName,
 			Boolean isTeacher) throws java.rmi.RemoteException;
     
     public boolean addUserToSubgroupLessons(
-			String username,
-			String orgId,
+    		String username,
 			String serverId, 
 			String datetime, 
-			String hash) throws java.rmi.RemoteException;
+			String hash,
+			String courseId,
+			String courseName,
+			String countryIsoCode,
+			String langIsoCode,
+			String subgroupId,
+			String subgroupName,
+			Boolean asStaff) throws java.rmi.RemoteException;
 }

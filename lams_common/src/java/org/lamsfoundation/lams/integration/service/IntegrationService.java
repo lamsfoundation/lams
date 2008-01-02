@@ -87,29 +87,46 @@ public class IntegrationService implements IIntegrationService{
 		}
 	}
 	
-	public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, String extCourseId, String countryIsoCode, String langIsoCode){
+	// wrapper method for compatibility with original integration modules
+	public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, 
+			String extCourseId, String countryIsoCode, String langIsoCode){
+		return getExtCourseClassMap(serverMap, userMap, 
+				extCourseId, extCourseId, countryIsoCode, langIsoCode, 
+				service.getRootOrganisation().getOrganisationId().toString(), true, true);		
+	}
+	
+	// newer method which accepts course name, a parent org id, a flag for whether user should get 
+	// 'teacher' roles, and a flag for whether to use a prefix in the org's name
+	public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, 
+			String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode, 
+			String parentOrgId, Boolean isTeacher, Boolean prefix){
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put("courseid", extCourseId);
 		properties.put("extServerOrgMap.sid", serverMap.getSid());
 		List list = service.findByProperties(ExtCourseClassMap.class, properties);
 		if(list==null || list.size()==0){
-			return createExtCourseClassMap(serverMap, userMap.getUser(), extCourseId, countryIsoCode, langIsoCode);
+			return createExtCourseClassMap(serverMap, userMap.getUser(), 
+					extCourseId, extCourseName, countryIsoCode, langIsoCode, parentOrgId, isTeacher, prefix);
 		}else{
 			ExtCourseClassMap map = (ExtCourseClassMap)list.get(0);
 			User user = userMap.getUser();
 			Organisation org = map.getOrganisation();
 			if(service.getUserOrganisation(user.getUserId(), org.getOrganisationId())==null){
-				addMemberships(user, org);
+				addMemberships(user, org, isTeacher);
 			}
 			return map;
 		}
-		
 	}
 	
-	private void addMemberships(User user, Organisation org){
+	private void addMemberships(User user, Organisation org, Boolean isTeacher){
 		UserOrganisation uo = new UserOrganisation(user,org);
 		service.save(uo);
-		Integer[] roles = new Integer[]{Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_LEARNER};
+		Integer[] roles;
+		if (isTeacher) {
+			roles = new Integer[] { Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_LEARNER };
+		} else {
+			roles = new Integer[] { Role.ROLE_LEARNER };
+		}
 		for(Integer roleId:roles){
 			UserOrganisationRole uor = new UserOrganisationRole(uo,(Role)service.findById(Role.class,roleId));
 			service.save(uor);
@@ -136,14 +153,36 @@ public class IntegrationService implements IIntegrationService{
 	}
 	
 	public ExtUserUseridMap getImplicitExtUserUseridMap(
-									ExtServerOrgMap serverMap, 
-									String extUsername,
-									String firstName, 
-									String lastName,
-									String language,
-									String country,
-									String email) 
-									throws UserInfoFetchException 
+			ExtServerOrgMap serverMap, 
+			String extUsername,
+			String password,
+			String firstName, 
+			String lastName,
+			String email) 
+			throws UserInfoFetchException 
+	{
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put("extServerOrgMap.sid", serverMap.getSid());
+		properties.put("extUsername", extUsername);
+		List list = service.findByProperties(ExtUserUseridMap.class, properties);
+		if(list==null || list.size()==0){
+			String[] defaultLangCountry = LanguageUtil.getDefaultLangCountry();
+			String[] userData = { "",firstName,lastName,"","","","","","","","",email,defaultLangCountry[1],defaultLangCountry[0] };
+			return createExtUserUseridMap(serverMap, extUsername, password, userData, false);
+		}else{
+			return (ExtUserUseridMap)list.get(0);
+		}
+	}
+	
+	public ExtUserUseridMap getImplicitExtUserUseridMap(
+			ExtServerOrgMap serverMap, 
+			String extUsername,
+			String firstName, 
+			String lastName,
+			String language,
+			String country,
+			String email) 
+			throws UserInfoFetchException 
 	{
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put("extServerOrgMap.sid", serverMap.getSid());
@@ -155,18 +194,12 @@ public class IntegrationService implements IIntegrationService{
 			return (ExtUserUseridMap)list.get(0);
 		}
 	}
-
-	private ExtCourseClassMap createExtCourseClassMap(ExtServerOrgMap serverMap, User user, String extCourseId, String countryIsoCode, String langIsoCode) {
-		Organisation org = new Organisation();
-		// TODO group name could be more human readable, need name as well as id from 3rd party server?
-		org.setName(buildName(serverMap.getPrefix(), extCourseId));
-		org.setDescription(extCourseId);
-		org.setParentOrganisation(service.getRootOrganisation());
-		org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.COURSE_TYPE));
-		org.setOrganisationState((OrganisationState)service.findById(OrganisationState.class,OrganisationState.ACTIVE));
-		org.setLocale(LanguageUtil.getSupportedLocale(langIsoCode, countryIsoCode));
-		service.saveOrganisation(org, user.getUserId());
-		addMemberships(user,org);
+	
+	private ExtCourseClassMap createExtCourseClassMap(ExtServerOrgMap serverMap, User user, 
+			String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode, 
+			String parentOrgId, Boolean isTeacher, Boolean prefix) {
+		Organisation org = createOrganisation(serverMap, user, extCourseId, extCourseName, countryIsoCode, langIsoCode, parentOrgId, prefix);
+		addMemberships(user,org,isTeacher);
 		ExtCourseClassMap map = new ExtCourseClassMap();
 		map.setCourseid(extCourseId);
 		map.setExtServerOrgMap(serverMap);
@@ -174,12 +207,38 @@ public class IntegrationService implements IIntegrationService{
 		service.save(map);
 		return map;
 	}
+	
+	private Organisation createOrganisation(ExtServerOrgMap serverMap, User user, 
+			String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode, 
+			String parentOrgId, Boolean prefix) {
+		Organisation org = new Organisation();
+		org.setName( prefix ? buildName(serverMap.getPrefix(), extCourseName) : extCourseName );
+		org.setDescription(extCourseId);
+		org.setOrganisationState((OrganisationState)service.findById(OrganisationState.class,OrganisationState.ACTIVE));
+		org.setLocale(LanguageUtil.getSupportedLocale(langIsoCode, countryIsoCode));
 
-	private ExtUserUseridMap createExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException {
-		String[] userData = getUserDataFromExtServer(serverMap, extUsername);
+		// determine whether org will be a group or subgroup
+		Organisation parent = (Organisation)service.findById(Organisation.class, Integer.valueOf(parentOrgId));
+		if (parent != null) {
+			org.setParentOrganisation(parent);
+			if (!parent.getOrganisationId().equals(service.getRootOrganisation().getOrganisationId())) {
+				org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.CLASS_TYPE));
+			} else {
+				org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.COURSE_TYPE));
+			}
+		} else {
+			// default
+			org.setParentOrganisation(service.getRootOrganisation());
+			org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.COURSE_TYPE));
+		}
+		return service.saveOrganisation(org, user.getUserId());
+	}
+	
+	// flexible method to specify username and password
+	private ExtUserUseridMap createExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String password, String[] userData, boolean prefix) throws UserInfoFetchException {
 		User user = new User();
-		user.setLogin(buildName(serverMap.getPrefix(),extUsername));
-		user.setPassword(HashUtil.sha1(RandomPasswordGenerator.nextPassword(10)));
+		user.setLogin( prefix ? buildName(serverMap.getPrefix(),extUsername) : extUsername );
+		user.setPassword(password);
 		user.setTitle(userData[0]);
         user.setFirstName(userData[1]);
         user.setLastName(userData[2]);
@@ -207,6 +266,14 @@ public class IntegrationService implements IIntegrationService{
 		return map;
 	}
 	
+	// compatibility method to support integrations
+	private ExtUserUseridMap createExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException {
+		String[] userData = getUserDataFromExtServer(serverMap, extUsername);
+		String password = HashUtil.sha1(RandomPasswordGenerator.nextPassword(10));
+		return createExtUserUseridMap(serverMap, extUsername, password, userData, true);
+	}
+	
+	// compatibility method
 	public ExtUserUseridMap createImplicitExtUserUseridMap(ExtServerOrgMap serverMap, 
 			String extUsername,
 			String firstName, 
@@ -215,36 +282,9 @@ public class IntegrationService implements IIntegrationService{
 			String country,
 			String email) throws UserInfoFetchException
 	{
-		
-		User user = new User();
-		user.setLogin(buildName(serverMap.getPrefix(),extUsername));
-		user.setPassword(HashUtil.sha1(RandomPasswordGenerator.nextPassword(10)));
-		user.setTitle("");
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setAddressLine1("");
-        user.setCity("");
-        user.setState("");
-        user.setPostcode("");
-        user.setCountry("");
-        user.setDayPhone("");
-        user.setMobilePhone("");
-        user.setFax("");
-        user.setEmail(email);
-        user.setAuthenticationMethod((AuthenticationMethod)service.findById(AuthenticationMethod.class, AuthenticationMethod.DB));
-        user.setCreateDate(new Date());
-        user.setDisabledFlag(false);
-        user.setLocale(LanguageUtil.getSupportedLocale(language, country));
-		user.setFlashTheme(service.getDefaultFlashTheme());
-		user.setHtmlTheme(service.getDefaultHtmlTheme());
-		service.save(user);
-		ExtUserUseridMap map = new ExtUserUseridMap();
-		map.setExtServerOrgMap(serverMap);
-		map.setExtUsername(extUsername);
-		map.setUser(user);
-		service.save(map);
-		return map;
-		
+		String[] userData = { "",firstName,lastName,"","","","","","","","",email, country, language };
+		String password = HashUtil.sha1(RandomPasswordGenerator.nextPassword(10));
+		return createExtUserUseridMap(serverMap, extUsername, password, userData, true);
 	}
 	
 

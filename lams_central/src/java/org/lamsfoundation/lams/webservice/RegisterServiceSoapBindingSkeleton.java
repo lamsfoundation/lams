@@ -69,6 +69,10 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "serverId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "datetime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "courseId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "courseName"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "countryIsoCode"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "langIsoCode"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "isTeacher"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "boolean"), java.lang.Boolean.class, false, false),
         };
         _oper = new org.apache.axis.description.OperationDesc("addUserToGroup", _params, new javax.xml.namespace.QName("", "addUserToGroupReturn"));
@@ -90,7 +94,12 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "serverId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "datetime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
-            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "courseId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "courseName"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "countryIsoCode"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "langIsoCode"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "asStaff"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "boolean"), java.lang.Boolean.class, false, false),
         };
         _oper = new org.apache.axis.description.OperationDesc("addUserToGroupLessons", _params, new javax.xml.namespace.QName("", "addUserToGroupLessonsReturn"));
         _oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
@@ -109,10 +118,15 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
         org.apache.axis.description.ParameterDesc [] _params;
         _params = new org.apache.axis.description.ParameterDesc [] {
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
-            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "orgId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "serverId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "datetime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
-            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "courseId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "courseName"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "countryIsoCode"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "langIsoCode"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "subgroupId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "subgroupName"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "isTeacher"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "boolean"), java.lang.Boolean.class, false, false),
         };
         _oper = new org.apache.axis.description.OperationDesc("addUserToSubgroup", _params, new javax.xml.namespace.QName("", "addUserToSubgroupReturn"));
@@ -132,10 +146,16 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
         org.apache.axis.description.ParameterDesc [] _params;
         _params = new org.apache.axis.description.ParameterDesc [] {
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
-            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "orgId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "serverId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "datetime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
-            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "courseId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "courseName"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "countryIsoCode"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "langIsoCode"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "subgroupId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "subgroupName"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "asStaff"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "boolean"), java.lang.Boolean.class, false, false),
         };
         _oper = new org.apache.axis.description.OperationDesc("addUserToSubgroupLessons", _params, new javax.xml.namespace.QName("", "addUserToSubgroupLessonsReturn"));
         _oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
@@ -162,23 +182,33 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
         return ret;
     }
     
-    public boolean addUserToGroup(String username, String serverId, String datetime, String hash, Boolean isTeacher) throws java.rmi.RemoteException {
-		boolean ret = impl.addUserToGroup(username, serverId, datetime, hash, isTeacher);
+    public boolean addUserToGroup(String username, String serverId, String datetime, String hash, 
+    		String courseId, String courseName, String countryIsoCode, String langIsoCode, Boolean isTeacher) throws java.rmi.RemoteException {
+		boolean ret = impl.addUserToGroup(username, serverId, datetime, hash, 
+				courseId, courseName, countryIsoCode, langIsoCode, isTeacher);
 		return ret;
 	}
 	
-	public boolean addUserToGroupLessons(String username, String serverId, String datetime, String hash) throws java.rmi.RemoteException {
-		boolean ret = impl.addUserToGroupLessons(username, serverId, datetime, hash);
+	public boolean addUserToGroupLessons(String username, String serverId, String datetime, String hash,
+			String courseId, String courseName, String countryIsoCode, String langIsoCode, Boolean asStaff) throws java.rmi.RemoteException {
+		boolean ret = impl.addUserToGroupLessons(username, serverId, datetime, hash, 
+				courseId, courseName, countryIsoCode, langIsoCode, asStaff);
 		return ret;
 	}
 
-	public boolean addUserToSubgroup(String username, String orgId, String serverId, String datetime, String hash, Boolean isTeacher) throws java.rmi.RemoteException {
-		boolean ret = impl.addUserToSubgroup(username, orgId, serverId, datetime, hash, isTeacher);
+	public boolean addUserToSubgroup(String username, String serverId, String datetime, String hash, 
+			String courseId, String courseName, String countryIsoCode, String langIsoCode, String subgroupId, String subgroupName, Boolean isTeacher) throws java.rmi.RemoteException {
+		boolean ret = impl.addUserToSubgroup(username, serverId, datetime, hash, 
+				courseId, courseName, countryIsoCode, langIsoCode, 
+				subgroupId, subgroupName, isTeacher);
 		return ret;
 	}
 	
-	public boolean addUserToSubgroupLessons(String username, String orgId, String serverId, String datetime, String hash) throws java.rmi.RemoteException {
-		boolean ret = impl.addUserToSubgroupLessons(username, orgId, serverId, datetime, hash);
+	public boolean addUserToSubgroupLessons(String username, String serverId, String datetime, String hash,
+			String courseId, String courseName, String countryIsoCode, String langIsoCode, String subgroupId, String subgroupName, Boolean asStaff) throws java.rmi.RemoteException {
+		boolean ret = impl.addUserToSubgroupLessons(username, serverId, datetime, hash, 
+				courseId, courseName, countryIsoCode, langIsoCode, 
+				subgroupId, subgroupName, asStaff);
 		return ret;
 	}
 }
