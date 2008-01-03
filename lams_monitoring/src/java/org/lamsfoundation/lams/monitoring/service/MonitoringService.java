@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.monitoring.service;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
@@ -43,7 +42,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
@@ -708,7 +706,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 
         Date lessonStartTime = new Date();
         //initialize tool sessions if necessary
-        Set activities = requestedLesson.getLearningDesign().getActivities();
+        LearningDesign design = requestedLesson.getLearningDesign();
+        boolean designModified = false;
+        Set activities = design.getActivities();
         for (Iterator i = activities.iterator(); i.hasNext();)
         {
             Activity activity = (Activity) i.next();
@@ -723,23 +723,33 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
                 activity = runGateScheduler(gateActivity,lessonStartTime,requestedLesson.getLessonName()); 
             }
 			if ( activity.isBranchingActivity() && activity.getGrouping() == null) {
+				Integer currentMaxId = design.getMaxID();
 				// all branching activities must have a grouping, as the learner will be allocated to a group linked to a sequence (branch)
 				Grouping grouping = new ChosenGrouping(null, null, null);
+				grouping.setGroupingUIID(currentMaxId);
 				grouping.getActivities().add(activity);
 				activity.setGrouping(grouping);
+				activity.setGroupingUIID(currentMaxId);
+				activity.setApplyGrouping(Boolean.TRUE);
 				groupingDAO.insert(grouping);
 
 				activity.setGrouping(grouping);
 				if ( log.isDebugEnabled() ) {
 					log.debug( "startLesson: Created chosen grouping "+grouping+" for branching activity "+activity);
 				}
+				design.setMaxID(new Integer(currentMaxId.intValue()+1));
+				designModified = true;
 			}
 
             activity.setInitialised(Boolean.TRUE);
             activityDAO.update(activity);
             
-        //update lesson status
         }
+        
+        if ( designModified )
+        	learningDesignDAO.update(design);
+        
+        //update lesson status
         requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
         requestedLesson.setStartDateTime(lessonStartTime);
         lessonDAO.updateLesson(requestedLesson);
@@ -1689,23 +1699,36 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     /** 
      * Is this activity inside a branch?
      */
-    private boolean isInBranch(Activity activity) {
+    private boolean isInBranch(Activity activity, Set<Long> processedActivityIds) {
     	
     	Activity parent = activity.getParentActivity();
-    	
+
     	if ( parent == null )
     		return false;
     	
     	if ( parent.isBranchingActivity() )
     		return true;
     	
-    	return isInBranch(parent);
+    	// double check that we haven't already processed this activity. Should never happen but if it does it
+    	// would cause an infinite loop.
+    	Set<Long> processedActivityIdsTemp = processedActivityIds;
+    	if ( processedActivityIdsTemp == null ) {
+    		processedActivityIdsTemp = new HashSet<Long>();
+    	} else {
+    		if ( processedActivityIdsTemp.contains(activity.getActivityId()))
+    			return false;
+    	}
+    	processedActivityIdsTemp.add(activity.getActivityId());
+    	
+    	return isInBranch(parent, processedActivityIdsTemp);
     }
     
     /**
-     * If the activity is not grouped, then it create lams tool session for 
-     * all the learners in the lesson. After the creation of lams tool session, 
-     * it delegates to the tool instances to create tool's own tool session. 
+     * If the activity is not grouped and not in a branch, then it create 
+     * lams tool session for all the learners in the lesson. After the creation 
+     * of lams tool session, it delegates to the tool instances to create tool's own tool session. 
+     * Can't create it for a grouped activity or an activity in a branch
+     * as it may not be applicable to all users.
      * <p>
      * @param activity the tool activity that all tool session reference to.
      * @param lesson the target lesson that these tool sessions belongs to.
@@ -1713,9 +1736,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     private void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson) 
     {
-    	// TODO: also need to check if it is inside a branch. If so, don't create
-    	// the tool session as it will only apply to some users in the lesson.
-    	if ( ! activity.getApplyGrouping().booleanValue() || isInBranch(activity) ) {
+    	if ( ! activity.getApplyGrouping().booleanValue() || ! isInBranch(activity, null) ) {
     		activity.setToolSessions(new HashSet());
     		try {
     		
