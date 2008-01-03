@@ -162,15 +162,8 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         return (Forum) forumDao.getById(forumUid);
     }
 
-	public Forum getForumByContentId(Long contentID)  throws PersistenceException {
-//    	String str = messageService.getMessage("label.authoring.heading.basic");
-//    	System.out.println(str);
-    	
-		Forum forum = (Forum) forumDao.getByContentId(contentID);
-		if(forum == null){
-			log.error("Could not find the content by given ID:"+contentID);
-		}
-		return forum; 
+	public Forum getForumByContentId(Long contentID)  throws PersistenceException {    	
+		return (Forum) forumDao.getByContentId(contentID);
 	}
 
     public void deleteForumAttachment(Long attachmentId) throws PersistenceException {
