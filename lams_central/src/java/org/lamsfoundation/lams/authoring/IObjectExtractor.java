@@ -27,13 +27,15 @@ package org.lamsfoundation.lams.authoring;
 import java.util.Hashtable;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
 public interface IObjectExtractor {
 
 	public static final String OBJECT_EXTRACTOR_SPRING_BEANNAME = "ObjectExtractor";
 
-	public abstract LearningDesign extractSaveLearningDesign(Hashtable table)
+	public abstract LearningDesign extractSaveLearningDesign(Hashtable table, WorkspaceFolder workspaceFolder, User user)
 			throws WDDXProcessorConversionException, ObjectExtractorException;
 
 	public void setMode(Integer mode);

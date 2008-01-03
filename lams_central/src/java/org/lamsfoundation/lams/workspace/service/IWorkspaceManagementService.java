@@ -349,4 +349,18 @@ public interface IWorkspaceManagementService {
 	 */
 	public String getUserOrganisation(Integer userID, Integer organisationId) throws IOException;
 
+
+	/**
+	 * This method checks whether the user is authorized to create 
+	 * a new folder or learning design or modify the existing contents under the given WorkspaceFolder.
+	 * 
+	 * @param folderID The <code>workspace_folder_id</code> of the <code>WorkspaceFolder<code>
+	 * 				   under which the User wants to create/copy folder, file, update learning design, etc
+	 * @param userID The <code>User</code> being checked
+	 * @return boolean A boolean value indicating whether or not the <code>User</code> is authorized
+	 * @throws UserException
+	 * @throws WorkspaceFolderException
+	 */
+	public boolean isUserAuthorizedToModifyFolderContents(Integer folderID, Integer userID)throws UserException, WorkspaceFolderException;
+
 }

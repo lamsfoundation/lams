@@ -39,6 +39,8 @@ import java.util.SortedMap;
 import java.util.Vector;
 import java.util.Date;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -46,6 +48,7 @@ import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.UUIDHexGenerator;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
+import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.authoring.service.EditOnFlyProcessor;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -92,6 +95,8 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.Configuration;
@@ -100,6 +105,10 @@ import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 
@@ -126,6 +135,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	protected MessageService messageService;
 	protected ILessonService lessonService;
 	protected IMonitoringService monitoringService;
+	protected IWorkspaceManagementService workspaceManagementService;
 	
 	protected ToolContentIDGenerator contentIDGenerator;
 	
@@ -241,7 +251,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	}
 
 
-    /**
+	public void setWorkspaceManagementService(IWorkspaceManagementService workspaceManagementService) {
+		this.workspaceManagementService = workspaceManagementService;
+	}
+
+	/**
      * @param contentIDGenerator The contentIDGenerator to set.
      */
     public void setContentIDGenerator(ToolContentIDGenerator contentIDGenerator)
@@ -288,6 +302,19 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	 * Utility/Service Methods
 	 * *******************************************/
 	
+	/**
+     * Helper method to retrieve the user data. Gets the id from the user details
+     * in the shared session
+     * @return the user id
+     */
+    public static Integer getUserId()
+    {
+        HttpSession ss = SessionManager.getSession();
+        UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
+        return learner != null ? learner.getUserID() : null;
+    }
+    
+
 	 /**
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getToolOutputDefinitions(java.lang.Long)
 	 */
@@ -707,6 +734,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		if(workspaceFolder==null)
 			throw new WorkspaceFolderException(messageService.getMessage("no.such.workspace.exist",new Object[]{workspaceFolderID}));
 		
+		if ( ! workspaceManagementService.isUserAuthorizedToModifyFolderContents(workspaceFolder.getWorkspaceFolderId(), user.getUserId()) ) {
+			throw new UserAccessDeniedException("User with user_id of " + user.getUserId() 
+					+" is not authorized to copy a learning design into the workspace folder "+workspaceFolder.getWorkspaceFolderId());
+		}
+
 		return copyLearningDesign(originalDesign,copyType,user,workspaceFolder, setOriginalDesign,null);
 	}
 	
@@ -715,7 +747,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      */
     public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, WorkspaceFolder workspaceFolder, 
     							boolean setOriginalDesign, String newDesignName)
-    	throws LearningDesignException
+    	
     {
     	String newTitle = newDesignName;
     	if ( newTitle == null ) {
@@ -757,10 +789,19 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     		WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderID);
     		if(workspaceFolder==null)
     			throw new WorkspaceFolderException(messageService.getMessage("no.such.workspace.exist",new Object[]{workspaceFolderID}));
+    		if ( ! workspaceManagementService.isUserAuthorizedToModifyFolderContents(workspaceFolder.getWorkspaceFolderId(), user.getUserId()) ) {
+    			throw new UserAccessDeniedException("User with user_id of " + user.getUserId() 
+    					+" is not authorized to store a copy a learning design into the workspace folder "+workspaceFolder.getWorkspaceFolderId());
+    		}
 
     		mainDesign = copyLearningDesign(mainDesign, LearningDesign.COPY_TYPE_NONE, user, workspaceFolder, false, newDesignName );
+    	} else {
+    		// updating the existing design so check the rights to the folder containing the design.
+    		if ( ! workspaceManagementService.isUserAuthorizedToModifyFolderContents(mainDesign.getWorkspaceFolder().getWorkspaceFolderId(), user.getUserId()) ) {
+    			throw new UserAccessDeniedException("User with user_id of " + user.getUserId() 
+    					+" is not authorized to store a learning design into the workspace folder "+mainDesign.getWorkspaceFolder().getWorkspaceFolderId());
+    		}
     	}
-    	
 
 		LearningDesign designToImport = learningDesignDAO.getLearningDesignById(designToImportID);
 		if(designToImport==null)
@@ -1054,8 +1095,27 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	public Long storeLearningDesignDetails(String wddxPacket) throws Exception {
 
 		Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
+		Integer workspaceFolderID = WDDXProcessor.convertToInteger(table, WDDXTAGS.WORKSPACE_FOLDER_ID);
+
+		User user = null;
+		Integer userID = getUserId();
+		if( userID != null ) {
+			user = (User)baseDAO.find(User.class,userID);
+		}
+		if ( user == null ) {
+			throw new UserException("UserID missing or user not found.");
+		}
+
+		WorkspaceFolder workspaceFolder = null;
+		if (workspaceFolderID != null )	{
+			if ( ! workspaceManagementService.isUserAuthorizedToModifyFolderContents(workspaceFolderID, userID) ) {
+				throw new UserException("User with user_id of " + userID +" is not authorized to store a design in this workspace folder "+workspaceFolderID);
+			}
+			workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderID);
+		}
+
 		IObjectExtractor extractor = (IObjectExtractor) beanFactory.getBean(IObjectExtractor.OBJECT_EXTRACTOR_SPRING_BEANNAME);
-		LearningDesign design = extractor.extractSaveLearningDesign(table);	
+		LearningDesign design = extractor.extractSaveLearningDesign(table, workspaceFolder, user);	
 		
 		if(extractor.getMode().intValue() == 1)
 			copyLearningDesignToolContent(design, design, design.getCopyTypeID());

@@ -53,6 +53,7 @@
 		<property name="learningDesignService"><ref bean="learningDesignService"/></property>
 		<property name="lessonService"><ref bean="lessonService"/></property>
 		<property name="monitoringService"><ref bean="monitoringService"/></property>
+		<property name="workspaceManagementService"><ref bean="workspaceManagementService"/></property>
 	</bean>
 	
 	<bean id="authoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

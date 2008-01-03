@@ -68,7 +68,6 @@ import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
-import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
@@ -294,7 +293,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.authoring.IObjectExtractor#extractSaveLearningDesign(java.util.Hashtable)
 	 */
-	public LearningDesign extractSaveLearningDesign(Hashtable table) throws WDDXProcessorConversionException, ObjectExtractorException {
+	public LearningDesign extractSaveLearningDesign(Hashtable table, WorkspaceFolder workspaceFolder, User user) throws WDDXProcessorConversionException, ObjectExtractorException {
 
 		learningDesign = null;
 	
@@ -315,6 +314,10 @@ public class ObjectExtractor implements IObjectExtractor {
 			throw new ObjectExtractorException("Unable to save learning design.  Learning design is read-only");
 		}
 		learningDesign.setCopyTypeID(copyTypeID);
+
+		learningDesign.setWorkspaceFolder(workspaceFolder);			
+		learningDesign.setUser(user);
+	
 
 		// Pull out all the existing groups. there isn't an easy way to pull them out of the db requires an outer join across
 		// three objects (learning design -> grouping activity -> grouping) so put both the existing ones and the new ones
@@ -372,17 +375,6 @@ public class ObjectExtractor implements IObjectExtractor {
 			learningDesign.setCreateDateTime(modificationDate);
 	    learningDesign.setLastModifiedDateTime(modificationDate);
 
-		Integer userId = getUserId();
-
-		if( userId != null ) {
-			User user = (User)baseDAO.find(User.class,userId);
-			if(user!=null) {
-				learningDesign.setUser(user);
-			} else {
-				throw new ObjectExtractorException("userID missing");
-			}
-		}
-	
 		if (keyExists(table, WDDXTAGS.LICENCE_ID))
 		{		
 			Long licenseID = WDDXProcessor.convertToLong(table,WDDXTAGS.LICENCE_ID);
@@ -395,19 +387,6 @@ public class ObjectExtractor implements IObjectExtractor {
 		}	
 		if (keyExists(table, WDDXTAGS.LICENSE_TEXT))
 		    learningDesign.setLicenseText(WDDXProcessor.convertToString(table,WDDXTAGS.LICENSE_TEXT));				
-
-		if (keyExists(table, WDDXTAGS.WORKSPACE_FOLDER_ID))
-		{
-			Integer workspaceFolderID = WDDXProcessor.convertToInteger(table, WDDXTAGS.WORKSPACE_FOLDER_ID);
-			if( workspaceFolderID!=null ){
-				WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderID);
-				learningDesign.setWorkspaceFolder(workspaceFolder);			
-			}
-			else
-			{
-			    learningDesign.setWorkspaceFolder(null);
-			}
-		}
 
 		if (keyExists(table, WDDXTAGS.ORIGINAL_DESIGN_ID))
 		{
@@ -1218,18 +1197,6 @@ public class ObjectExtractor implements IObjectExtractor {
 		return mode;
 	}
 	
-	/**
-     * Helper method to retrieve the user data. Gets the id from the user details
-     * in the shared session
-     * @return the user id
-     */
-    public static Integer getUserId()
-    {
-        HttpSession ss = SessionManager.getSession();
-        UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
-        return learner != null ? learner.getUserID() : null;
-    }
-    
 	/**
 	 * Parses the mappings used for branching. They map groups to the sequence activities
 	 * that form a branch within a branching activity.

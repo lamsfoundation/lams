@@ -53,6 +53,7 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -484,7 +485,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public String copyFolder(Integer folderID,Integer targetFolderID,Integer userID)throws IOException{
 	    FlashMessage flashMessage = null;
 		try{
-			if(isUserAuthorized(targetFolderID,userID)){
+			if(isUserAuthorizedToModifyFolderContents(targetFolderID,userID)){
 				WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,folderID);
 				if(workspaceFolder!=null){
 					WorkspaceFolder newFolder = createFolder(targetFolderID,workspaceFolder.getName(),userID);
@@ -539,7 +540,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 
 	/**
 	 * This method checks whether the user is authorized to create 
-	 * a new folder under the given WorkspaceFolder.
+	 * a new folder or learning design under the given WorkspaceFolder.
 	 * 
 	 * @param folderID The <code>workspace_folder_id</code> of the <code>WorkspaceFolder<code>
 	 * 				   under which the User wants to create/copy folder
@@ -548,7 +549,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @throws UserException
 	 * @throws WorkspaceFolderException
 	 */
-	private boolean isUserAuthorized(Integer folderID, Integer userID)throws UserException, WorkspaceFolderException{
+	public boolean isUserAuthorizedToModifyFolderContents(Integer folderID, Integer userID)throws UserException, WorkspaceFolderException{
 		boolean authorized = false;
 		User user = (User)baseDAO.find(User.class,userID);
 		if(user!=null){
@@ -566,7 +567,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		return authorized;
 	}
 
-	public void copyRootContent(WorkspaceFolder workspaceFolder,WorkspaceFolder targetWorkspaceFolder, Integer userID)throws UserException{
+	public void copyRootContent(WorkspaceFolder workspaceFolder,WorkspaceFolder targetWorkspaceFolder, Integer userID)
+		throws UserException, LearningDesignException, UserAccessDeniedException, WorkspaceFolderException{
 		User user = (User)baseDAO.find(User.class,userID);
 		if(user==null)
 			throw new UserException(messageService.getMessage("no.such.user",new Object[]{userID}));
@@ -756,7 +758,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public String moveFolder(Integer currentFolderID,Integer targetFolderID,Integer userID)throws IOException{
 	    FlashMessage flashMessage = null;
 		try{
-			if(isUserAuthorized(targetFolderID,userID)){
+			if(isUserAuthorizedToModifyFolderContents(targetFolderID,userID)){
 				WorkspaceFolder currentFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,currentFolderID);
 				if(currentFolder!=null){
 					WorkspaceFolder targetFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,targetFolderID);
@@ -1233,7 +1235,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 									 Integer userID) throws IOException {
 	    FlashMessage flashMessage = null;
 		try{
-			if(isUserAuthorized(targetWorkspaceFolderID,userID)){
+			if(isUserAuthorizedToModifyFolderContents(targetWorkspaceFolderID,userID)){
 				LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignID);
 				if (learningDesign != null) {
 					WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,targetWorkspaceFolderID);
@@ -1298,7 +1300,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			WorkspaceFolder folder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderID);
 			if(folder!=null){
 				WorkspaceFolder parent = folder.getParentWorkspaceFolder();
-				if(parent!=null && isUserAuthorized(workspaceFolderID,userID)){
+				if(parent!=null && isUserAuthorizedToModifyFolderContents(workspaceFolderID,userID)){
 					if(!ifNameExists(parent,newName)){
 						folder.setName(newName);
 						baseDAO.update(folder);
@@ -1340,7 +1342,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		try{
 			if(design!=null){
 				folderID =  design.getWorkspaceFolder().getWorkspaceFolderId();
-				if(isUserAuthorized(folderID,userID)){
+				if(isUserAuthorizedToModifyFolderContents(folderID,userID)){
 					design.setTitle(title);
 					learningDesignDAO.update(design);
 					flashMessage = new FlashMessage(MSG_KEY_RENAME,title);

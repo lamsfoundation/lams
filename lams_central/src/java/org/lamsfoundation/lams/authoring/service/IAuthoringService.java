@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.MessageService;
@@ -75,7 +76,7 @@ public interface IAuthoringService {
 	 * @return LearningDesign The new copy of learning design.
 	 */
 	public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, 
-			WorkspaceFolder workspaceFolder, boolean setOriginalDesign, String newDesignName);
+			WorkspaceFolder workspaceFolder, boolean setOriginalDesign, String newDesignName) ;
 	
 	/**
 	 * Create a copy of learning design as per the requested learning design
