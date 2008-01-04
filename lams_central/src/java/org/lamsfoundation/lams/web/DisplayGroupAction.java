@@ -28,7 +28,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +55,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.IndexUtils;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -167,7 +167,8 @@ public class DisplayGroupAction extends Action {
 		//	set lesson beans
 		List<IndexLessonBean> lessonBeans = null;
 		try {
-			lessonBeans = getLessonBeans(user.getUserId(), org.getOrganisationId(), roles, org.getOrderedLessonIds());
+			Map<Long, IndexLessonBean> map = populateLessonBeans(user.getUserId(), org.getOrganisationId(), roles);
+			lessonBeans = IndexUtils.sortLessonBeans(org.getOrderedLessonIds(), map);
 		} catch (Exception e) {
 			log.error("Failed retrieving user's lessons from database: " + e, e);
 		}
@@ -201,37 +202,6 @@ public class DisplayGroupAction extends Action {
 			orgBean.setChildIndexOrgBeans(childOrgBeans);
 		}
 		return orgBean;
-	}
-	
-	// get lesson beans and sort them
-	private List<IndexLessonBean> getLessonBeans(Integer userId, Integer orgId, List<Integer> roles, String orderedLessonIds) 
-		throws SQLException, NamingException {
-		Map<Long, IndexLessonBean> map = populateLessonBeans(userId, orgId, roles);
-		ArrayList<IndexLessonBean> orderedList = new ArrayList<IndexLessonBean>();
-		
-		if (orderedLessonIds != null) {
-			List<String> idList = Arrays.asList(orderedLessonIds.split(","));
-		
-			// sort mapped lesson beans according to orderedLessonIds
-			for (String idString : idList) {
-				try {
-					Long id = new Long(Long.parseLong(idString));
-					if (map.containsKey(id)) {
-						orderedList.add(map.get(id));
-						map.remove(id);
-					}
-				} catch (NumberFormatException e) {
-					continue;
-				}
-			}
-		}
-		
-		// append lesson beans not mentioned in orderedLessonIds
-		if (!map.values().isEmpty()) {
-			orderedList.addAll(map.values());
-		}
-		
-		return orderedList;
 	}
 	
 	// create lesson beans

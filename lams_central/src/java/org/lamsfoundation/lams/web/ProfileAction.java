@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.IndexUtils;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -114,6 +115,7 @@ public class ProfileAction extends LamsDispatchAction {
 				lesson.getLessonName(), 
 				"javascript:openLearner("+lesson.getLessonID()+")"
 			);
+			lessonBean.setId(lesson.getLessonID());
 			log.debug("Lesson: "+lesson.getLessonName());
 			
 			// insert or update bean if it is a course
@@ -135,18 +137,41 @@ public class ProfileAction extends LamsDispatchAction {
 				IndexOrgBean orgBean = new IndexOrgBean(org.getOrganisationId(), org.getName(), orgTypeId);
 				List<IndexOrgBean> childOrgBeans = parentOrgBean.getChildIndexOrgBeans();
 				if (childOrgBeans.contains(orgBean)) {
+					// use existing org bean
 					orgBean = getOrgBean(org.getName(), childOrgBeans);
+					childOrgBeans.remove(orgBean);
+					orgBean.addLesson(lessonBean);
+					childOrgBeans.add(orgBean);
+					parentOrgBean.setChildIndexOrgBeans(childOrgBeans);
+				} else {
+					// using new org bean
+					orgBean.addLesson(lessonBean);
+					parentOrgBean.addChildOrgBean(orgBean);
 				}
-				// add lesson to class bean
-				orgBean.addLesson(lessonBean);
-				// set the parent bean
-				parentOrgBean.addChildOrgBean(orgBean);
 				orgBeansMap.put(parentOrgId, parentOrgBean);
 			}
 		}
 		
-		ArrayList beans = new ArrayList(orgBeansMap.values());
+		// sort group and subgroup names
+		ArrayList<IndexOrgBean> beans = new ArrayList<IndexOrgBean>(orgBeansMap.values());
 		Collections.sort(beans);
+		for (IndexOrgBean b : beans) {
+			Collections.sort(b.getChildIndexOrgBeans());
+		}
+		
+		// sort lessons inside each org bean
+		for (Object o : beans) {
+			IndexOrgBean bean = (IndexOrgBean)o;
+			Organisation org = (Organisation)service.findById(Organisation.class, bean.getId());
+			
+			// put lesson beans into id-indexed map
+			HashMap<Long, IndexLessonBean> map = new HashMap<Long, IndexLessonBean>();
+			for (IndexLessonBean lbean : bean.getLessons()) {
+				map.put(lbean.getId(), lbean);
+			}
+
+			bean.setLessons(IndexUtils.sortLessonBeans(org.getOrderedLessonIds(), map));
+		}
 		
 		request.setAttribute("beans", beans);
 		request.setAttribute("tab", "profile");

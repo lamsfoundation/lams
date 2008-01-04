@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+
 /**
  * @version
  *
@@ -144,6 +146,14 @@ public class IndexOrgBean implements Comparable {
 	public int compareTo(Object indexOrgBean){
     	IndexOrgBean b = (IndexOrgBean)indexOrgBean;
 	    return name.compareTo(b.getName());
+    }
+	
+	public boolean equals(Object other) {
+        if ( !(other instanceof IndexOrgBean) ) return false;
+        IndexOrgBean castOther = (IndexOrgBean) other;
+        return new EqualsBuilder()
+            .append(this.getId(), castOther.getId())
+            .isEquals();
     }
 	
 	public void addLesson(IndexLessonBean lesson) {
