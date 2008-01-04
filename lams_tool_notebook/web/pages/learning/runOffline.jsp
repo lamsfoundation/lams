@@ -12,10 +12,6 @@
 	</h1>
 
 	<p>
-		${notebookDTO.instructions}
-	</p>
-
-	<p>
 		<fmt:message key="message.runOfflineSet" />
 	</p>
 
