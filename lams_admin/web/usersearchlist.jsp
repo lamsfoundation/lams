@@ -1,69 +1,75 @@
 <%@ include file="/taglibs.jsp"%>
 
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-1.1.4.pack.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pager.js"></script>
 <script language="JavaScript" type="text/javascript">
-	function resetFields() {
-		document.UserSearchForm.sUserId.value = '';
-		document.UserSearchForm.sLogin.value = '';
-		document.UserSearchForm.sFirstName.value = '';
-		document.UserSearchForm.sLastName.value = '';
-	}
+	<!--
+	jQuery(document).ready(function() {
+		jQuery("table.tablesorter-admin").tablesorter({widthFixed:true, sortList:[[0,0]], headers:{0:{sorter:'integer'},5:{sorter:false}}})
+			.tablesorterPager({container: jQuery("#pager")});
+	});
+	//-->
 </script>
 
 <h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> </h4>
 <h1><fmt:message key="admin.user.find"/></h1>
 
 <logic:notEqual name="isSysadmin" value="false">
-<html-el:form action="/usersearch.do" method="post">
-<html-el:hidden property="searched" />
+<html:form action="/usersearch.do" method="post">
+<html:hidden property="searched" />
+
 <div align="center">
-	<html-el:errors />
-	<html-el:messages id="results" message="true">
+	<html:errors />
+	<html:messages id="results" message="true">
 		<bean:write name="results" />
-	</html-el:messages>
-	<p align="right">
-		<input class="button" type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit' />
-	</p>
+	</html:messages>
 </div>
-<table class="alternative-color" cellspacing="0">
+
+<p align="right">
+	<input class="button" type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit' />
+</p>
+<table cellspacing="6">
+	<tr>
+		<td align="right"><fmt:message key="admin.search" />:&nbsp;</td>
+		<td><html:text property="term" size="20" /></td>
+	</tr>
+	<tr>
+		<td align="right"><fmt:message key="label.show.all.users"/>:&nbsp;</td>
+		<td><html:checkbox property="showAll" /></td>
+	</tr>
+	<tr>
+		<td colspan="2" align="center"><html:submit styleClass="button" /></td>
+	</tr>
+</table>
+
+<br/>
+
+<logic:notEmpty name="userList">
+<p><c:out value="${numUsers}" /></p>
+</logic:notEmpty>
+
+<table class="tablesorter-admin">
+<thead>
 <tr>
 	<th><fmt:message key="admin.user.userid"/></th>
 	<th><fmt:message key="admin.user.login"/></th>
 	<th><fmt:message key="admin.user.first_name"/></th>
 	<th><fmt:message key="admin.user.last_name"/></th>
+	<th><fmt:message key="admin.user.email"/></th>
 	<th><fmt:message key="admin.user.actions"/></th>
 </tr>
-<tr>
-	<td><html-el:text property="sUserId" size="5" /></td>
-	<td><html-el:text property="sLogin" size="10" /></td>
-	<td><html-el:text property="sFirstName" size="10" /></td>
-	<td><html-el:text property="sLastName" size="10" /></td>
-	<td></td>
-</tr>
-
-<tr>
-	<td colspan=5>
-		<html:checkbox property="showAll">&nbsp;<fmt:message key="label.show.all.users"/></html:checkbox>&nbsp;&nbsp;&nbsp;
-		<html:select property="resultsSection" style="width:40px">
-			<html:option value="10 ">10</html:option>
-			<html:option value="20 ">20</html:option>
-			<html:option value="30 ">30</html:option>
-			<html:option value="40 ">40</html:option>
-			<html:option value="50 ">50</html:option>
-			<html:option value="all">All</html:option>
-		</html:select>&nbsp;<fmt:message key="label.results.per.page"/>
-	</td>
-<tr>
-	<td colspan=5 align="center">
-		<html-el:submit styleClass="button"><fmt:message key="admin.search"/></html-el:submit>
-		<input class="button" type="button" value='<fmt:message key="admin.reset"/>' onclick="resetFields();" />
-	</td>
-</tr>
-
+</thead>
+<tbody>
+<script language="JavaScript" type="text/javascript">
+<!--
+if (jQuery.browser.msie) {
+	document.write('<tr><td/><td/><td/><td/><td/><td/></tr>');
+}
+//-->
+</script>
 <logic:notEmpty name="userList">
-	<tr>
-		<td colspan=5><c:out value="${fullSize}"/> users found.</td>
-	</tr>
-	<c:forEach var="user" items="${userList}" begin="${start}" end="${start+resultsSection-1}" varStatus="status">
+	<c:forEach var="user" items="${userList}">
 		<tr>
 			<td>
 				<c:out value="${user.userId}"/>
@@ -78,6 +84,9 @@
 				<c:out value="${user.lastName}"/>
 			</td>
 			<td>
+				<c:out value="${user.email}"/>
+			</td>
+			<td>
 				<a href="user.do?method=edit&userId=<c:out value="${user.userId}"/>"><fmt:message key="admin.edit"/></a>
 				&nbsp;
 				<a href="user.do?method=remove&userId=<c:out value="${user.userId}"/>"><fmt:message key="admin.user.delete"/></a>
@@ -86,27 +95,30 @@
 			</td>
 		</tr>
 	</c:forEach>
-	<tr>
-		<td colspan=5 align="center">
-			<c:forEach var="index" varStatus="status" begin="0" end="${fullSize-1}" step="${resultsSection}">
-				<c:if test="${start == index}"><c:out value="${status.count}"/>&nbsp;</c:if>
-				<c:if test="${start != index}">
-					<c:url var="pageLink" value="usersearch.do">
-						<c:param name="start" value="${index}" />
-						<c:param name="uid" value="${uid}" />
-						<c:param name="l" value="${login}" />
-						<c:param name="fn" value="${firstName}" />
-						<c:param name="ln" value="${lastName}" />
-						<c:param name="sa" value="${showAll}" />
-						<c:param name="rs" value="${resultsSection}" />
-					</c:url>
-					<a href="<c:out value="${pageLink}"/>"><c:out value="${status.count}"/></a>&nbsp;
-				</c:if>
-			</c:forEach>
-		</td>
-	</tr>
 </logic:notEmpty>
+</tbody>
 
 </table>
-</html-el:form>
+</html:form>
+
+<br/>
+
+<div id="pager" class="pager">
+	<form onsubmit="return false;">
+		<img src="<lams:LAMSURL/>/images/first.png" class="first"/>
+		<img src="<lams:LAMSURL/>/images/prev.png" class="prev">
+		<input type="text" class="pagedisplay"/>
+		<img src="<lams:LAMSURL/>/images/next.png" class="next">
+		<img src="<lams:LAMSURL/>/images/last.png" class="last">
+		<select class="pagesize">
+			<option selected="selected"  value="10">10&nbsp;&nbsp;</option>
+			<option value="20">20</option>
+			<option value="30">30</option>
+			<option value="40">40</option>
+			<option value="50">50</option>
+			<option value="100">100</option>
+		</select>
+	</form>
+</div>
+
 </logic:notEqual>

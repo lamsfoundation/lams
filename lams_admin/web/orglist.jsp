@@ -6,7 +6,7 @@
 <script>
 	<!--
 	jQuery(document).ready(function() {
-		jQuery("table.alternative-color").tablesorter({widthFixed:true, sortList:[[1,0]], textExtraction:'complex'})
+		jQuery("table.tablesorter-admin").tablesorter({widthFixed:true, sortList:[[1,0]], textExtraction:'complex'})
 			.tablesorterPager({container: jQuery("#pager")});
 	});
 	//-->
@@ -182,7 +182,7 @@ p {
 
 <c:if test="${not empty OrgManageForm.orgManageBeans}">
 <form>
-<table class=alternative-color width=100%>
+<table class=tablesorter-admin width=100%>
 	<thead>
 	<tr>
 		<th>Id</th>

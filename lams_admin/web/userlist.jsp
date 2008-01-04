@@ -6,7 +6,8 @@
 <script>
 	<!--
 	jQuery(document).ready(function() {
-		jQuery("table.alternative-color").tablesorter({widthFixed:true, sortList:[[0,0]]}).tablesorterPager({container: jQuery("#pager")});
+		jQuery("table.tablesorter-admin").tablesorter({widthFixed:true, sortList:[[0,0]], headers:{4:{sorter:false}}})
+			.tablesorterPager({container: jQuery("#pager")});
 	});
 	//-->
 </script>
@@ -98,7 +99,7 @@ p {
 	<c:out value="${numUsers}"/>
 </p>
 
-<table class="alternative-color" width=100% cellspacing="0" >
+<table class="tablesorter-admin" width=100% cellspacing="0" >
 <thead>
 <tr>
 	<th><fmt:message key="admin.user.login"/></th>

@@ -130,8 +130,28 @@ table.alternative-color td.first, table.alternative-color th.first {
 }
 
 /* jquery tablesorter pager plugin */
-table.alternative-color thead tr .header {
-	background-color: #e6eeee;
+table.tablesorter-admin td {
+	text-align: center;
+	padding:5px;
+	padding-left: 20px;
+	font-size: 11px;
+	border-bottom: 1px solid #efefef;
+	vertical-align: top; 
+	background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 0px
+}
+
+table.tablesorter-admin th {
+	background-color: #e7f3cf;
+	height: 30px;
+	color: #47bc23;
+	padding-left: 15px;
+	border-top: 1px solid #cacdd1;
+	border-left: 1px solid #cacdd1;
+	border-right: 1px solid #fff;
+	font-size: 12px;
+}
+
+table.tablesorter-admin thead tr .header {
 	background-image: url(../images/css/bg.gif);
 	background-repeat: no-repeat;
 	background-position: center right;
@@ -140,11 +160,11 @@ table.alternative-color thead tr .header {
     padding-right: 15px;
 }
 
-table.alternative-color thead tr .headerSortUp {
+table.tablesorter-admin thead tr .headerSortUp {
 	background-image: url(../images/css/asc.gif);
 }
 
-table.alternative-color thead tr .headerSortDown {
+table.tablesorter-admin thead tr .headerSortDown {
 	background-image: url(../images/css/desc.gif);
 }
 
