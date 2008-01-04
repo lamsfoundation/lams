@@ -65,6 +65,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="totalQuestionCount" />
 
 		<div id="content">
+
+			<h1>
+				<fmt:message key="activity.title" />
+			</h1>
 			<p>
 				<fmt:message key="label.learning.forceOfflineMessage" />
 			</p>
