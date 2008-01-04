@@ -39,6 +39,7 @@ import mx.controls.*;
 class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 	
 	public static var _tabID:Number = 2;
+	
 	private var _className = "IndexButton";
 	
 	private var _bgPanel:MovieClip;
@@ -47,6 +48,7 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 	private var idxLabel_mc:MovieClip;
 	private var idxLabel:Label;
 	private var _labelText:String;
+	private var _btnType:String; // Go, Previous, Numeric, Next, IndexView
 	
 	private var matchesArr:Array;
 	
@@ -88,7 +90,7 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 			Debugger.log(">> clicked", Debugger.GEN, "indexClicked", "IndexButton");
 			mm.drawIndexButtons = false;
 			mm.updateIndexButtons(">>");
-		} else if (buttonText == Dictionary.getValue('mv_search_go_btn_lbl')) { // 'Go' button
+		} else if (_btnType == "Go") { // 'Go' button
 			mm.learnerIndexView.textFieldContents = String(mm.learnerIndexView.getIdxTextField().text); // backup the string incase need to remove textfield
 			if(!isNaN(mm.learnerIndexView.getIdxTextField().text)) { // if the text field contains a number
 				var idx:Number = Number(mm.learnerIndexView.getIdxTextField().text);
@@ -118,7 +120,7 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 				}
 			}
 		}
-		else if (buttonText == Dictionary.getValue('mv_search_index_view_btn_lbl')) { // the 'Index View' button
+		else if (_btnType == "IndexView") { // the 'Index View' button
 			mm.drawIndexButtons = true;
 			mm.inSearchView = false;
 			mm.resetSearchTextField = true;
@@ -148,5 +150,9 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 	
 	public function get label():Label {
 		return idxLabel;
+	}
+	
+	public function set btnType(_t:String):Void {
+		_btnType = _t;
 	}
 }

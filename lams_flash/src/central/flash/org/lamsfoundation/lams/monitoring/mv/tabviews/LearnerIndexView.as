@@ -270,6 +270,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		backBtn = _buttonsPanel_mc.attachMovie("IndexButton", "backBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth-5, _labelText: "<<"});	
 		_indexButton = IndexButton(backBtn);
 		_indexButton.init(mm, undefined);
+		_indexButton.btnType = "Previous";
 		backBtn._x = nextPosition;
 		nextPosition += (btnWidth-5);
 	}
@@ -291,6 +292,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 					var idxBtn:MovieClip = _buttonsPanel_mc.attachMovie("IndexButton", "idxBtn"+i, _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth, _labelText: String(i)});	
 					_indexButton = IndexButton(idxBtn);
 					_indexButton.init(mm, undefined);
+					_indexButton.btnType = "Numeric";
 					displayedButtons.push(idxBtn);
 					idxBtn._x = nextPosition;
 					nextPosition += btnWidth;
@@ -309,6 +311,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		nextBtn = _buttonsPanel_mc.attachMovie("IndexButton", "nextBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth-5, _labelText: ">>"});
 		_indexButton = IndexButton(nextBtn);
 		_indexButton.init(mm, undefined);
+		_indexButton.btnType = "Next";
 		nextBtn._x = nextPosition;
 		nextPosition += (btnWidth-5);
 	}
@@ -347,6 +350,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		goBtn = _buttonsPanel_mc.attachMovie("IndexButton", "goBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth, _labelText: Dictionary.getValue('mv_search_go_btn_lbl')});
 		_indexButton = IndexButton(goBtn);
 		_indexButton.init(mm, undefined);
+		_indexButton.btnType = "Go";
 		goBtn._x = nextPosition;
 		nextPosition += (btnWidth);
 	}
@@ -355,6 +359,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		indexViewBtn = _buttonsPanel_mc.attachMovie("IndexButton", "indexViewBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: (btnWidth * 2), _labelText: Dictionary.getValue('mv_search_index_view_btn_lbl')});
 		_indexButton = IndexButton(indexViewBtn);
 		_indexButton.init(mm, undefined);
+		_indexButton.btnType = "IndexView";
 		indexViewBtn._x = nextPosition;
 		nextPosition += (btnWidth * 2);
 	}
