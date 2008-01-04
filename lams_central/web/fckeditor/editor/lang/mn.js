@@ -1,20 +1,24 @@
 ﻿/*
- * FCKeditor - The text editor for internet
- * Copyright (C) 2003-2006 Frederico Caldeira Knabben
- * 
- * Licensed under the terms of the GNU Lesser General Public License:
- * 		http://www.opensource.org/licenses/lgpl-license.php
- * 
- * For further information visit:
- * 		http://www.fckeditor.net/
- * 
- * "Support Open Source software. What about a donation today?"
- * 
- * File Name: mn.js
- * 	Mongolian language file.
- * 
- * File Authors:
- * 		Lkamtseren ODONBAATAR (odonbaatarl@yahoo.com)
+ * FCKeditor - The text editor for Internet - http://www.fckeditor.net
+ * Copyright (C) 2003-2007 Frederico Caldeira Knabben
+ *
+ * == BEGIN LICENSE ==
+ *
+ * Licensed under the terms of any of the following licenses at your
+ * choice:
+ *
+ *  - GNU General Public License Version 2 or later (the "GPL")
+ *    http://www.gnu.org/licenses/gpl.html
+ *
+ *  - GNU Lesser General Public License Version 2.1 or later (the "LGPL")
+ *    http://www.gnu.org/licenses/lgpl.html
+ *
+ *  - Mozilla Public License Version 1.1 or later (the "MPL")
+ *    http://www.mozilla.org/MPL/MPL-1.1.html
+ *
+ * == END LICENSE ==
+ *
+ * Mongolian language file.
  */
 
 var FCKLang =
@@ -41,6 +45,7 @@ InsertLinkLbl		: "Линк",
 InsertLink			: "Линк Оруулах/Засварлах",
 RemoveLink			: "Линк авч хаях",
 Anchor				: "Insert/Edit Anchor",	//MISSING
+AnchorDelete		: "Remove Anchor",	//MISSING
 InsertImageLbl		: "Зураг",
 InsertImage			: "Зураг Оруулах/Засварлах",
 InsertFlashLbl		: "Flash",	//MISSING
@@ -66,6 +71,7 @@ RightJustify		: "Баруун талд байрлуулах",
 BlockJustify		: "Блок хэлбэрээр байрлуулах",
 DecreaseIndent		: "Догол мөр нэмэх",
 IncreaseIndent		: "Догол мөр хасах",
+Blockquote			: "Blockquote",	//MISSING
 Undo				: "Хүчингүй болгох",
 Redo				: "Өмнөх үйлдлээ сэргээх",
 NumberedListLbl		: "Дугаарлагдсан жагсаалт",
@@ -99,20 +105,27 @@ SelectionField	: "Selection Field",	//MISSING
 ImageButton		: "Image Button",	//MISSING
 
 FitWindow		: "Maximize the editor size",	//MISSING
+ShowBlocks		: "Show Blocks",	//MISSING
 
 // Context Menu
 EditLink			: "Холбоос засварлах",
 CellCM				: "Cell",	//MISSING
 RowCM				: "Row",	//MISSING
 ColumnCM			: "Column",	//MISSING
-InsertRow			: "Мөр оруулах",
+InsertRowAfter		: "Insert Row After",	//MISSING
+InsertRowBefore		: "Insert Row Before",	//MISSING
 DeleteRows			: "Мөр устгах",
-InsertColumn		: "Багана оруулах",
+InsertColumnAfter	: "Insert Column After",	//MISSING
+InsertColumnBefore	: "Insert Column Before",	//MISSING
 DeleteColumns		: "Багана устгах",
-InsertCell			: "Нүх оруулах",
+InsertCellAfter		: "Insert Cell After",	//MISSING
+InsertCellBefore	: "Insert Cell Before",	//MISSING
 DeleteCells			: "Нүх устгах",
 MergeCells			: "Нүх нэгтэх",
-SplitCell			: "Нүх тусгайрлах",
+MergeRight			: "Merge Right",	//MISSING
+MergeDown			: "Merge Down",	//MISSING
+HorizontalSplitCell	: "Split Cell Horizontally",	//MISSING
+VerticalSplitCell	: "Split Cell Vertically",	//MISSING
 TableDelete			: "Delete Table",	//MISSING
 CellProperties		: "Хоосон зайн шинж чанар",
 TableProperties		: "Хүснэгт",
@@ -225,7 +238,7 @@ DlgLnkURL			: "URL",
 DlgLnkAnchorSel		: "Холбоос сонгох",
 DlgLnkAnchorByName	: "Холбоосын нэрээр",
 DlgLnkAnchorById	: "Элемэнт Id-гаар",
-DlgLnkNoAnchors		: "<Баримт бичиг холбоосгүй байна>",
+DlgLnkNoAnchors		: "(Баримт бичиг холбоосгүй байна)",
 DlgLnkEMail			: "E-Mail Хаяг",
 DlgLnkEMailSubject	: "Message Subject",
 DlgLnkEMailBody		: "Message-ийн агуулга",
@@ -258,6 +271,7 @@ DlgLnkPopTop		: "Дээд байрлал",
 DlnLnkMsgNoUrl		: "Линк URL-ээ төрөлжүүлнэ үү",
 DlnLnkMsgNoEMail	: "Е-mail хаягаа төрөлжүүлнэ үү",
 DlnLnkMsgNoAnchor	: "Холбоосоо сонгоно уу",
+DlnLnkMsgInvPopName	: "The popup name must begin with an alphabetic character and must not contain spaces",	//MISSING
 
 // Color Dialog
 DlgColorTitle		: "Өнгө сонгох",
@@ -317,6 +331,9 @@ DlgCellBackColor	: "Фонны өнгө",
 DlgCellBorderColor	: "Хүрээний өнгө",
 DlgCellBtnSelect	: "Сонго...",
 
+// Find and Replace Dialog
+DlgFindAndReplaceTitle	: "Find and Replace",	//MISSING
+
 // Find Dialog
 DlgFindTitle		: "Хайх",
 DlgFindFindBtn		: "Хайх",
@@ -332,14 +349,14 @@ DlgReplaceReplAllBtn	: "Бүгдийг нь Солих",
 DlgReplaceWordChk		: "Тэнцэх бүтэн үг",
 
 // Paste Operations / Dialog
-PasteErrorPaste	: "Таны browser-ын хамгаалалтын тохиргоо editor-д автоматаар буулгах үйлдэлийг зөвшөөрөхгүй байна. (Ctrl+V) товчны хослолыг ашиглана уу.",
 PasteErrorCut	: "Таны browser-ын хамгаалалтын тохиргоо editor-д автоматаар хайчлах үйлдэлийг зөвшөөрөхгүй байна. (Ctrl+X) товчны хослолыг ашиглана уу.",
 PasteErrorCopy	: "Таны browser-ын хамгаалалтын тохиргоо editor-д автоматаар хуулах үйлдэлийг зөвшөөрөхгүй байна. (Ctrl+C) товчны хослолыг ашиглана уу.",
 
 PasteAsText		: "Plain Text-ээс буулгах",
 PasteFromWord	: "Word-оос буулгах",
 
-DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",	//MISSING
+DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<strong>Ctrl+V</strong>) and hit <strong>OK</strong>.",	//MISSING
+DlgPasteSec		: "Because of your browser security settings, the editor is not able to access your clipboard data directly. You are required to paste it again in this window.",	//MISSING
 DlgPasteIgnoreFont		: "Ignore Font Face definitions",	//MISSING
 DlgPasteRemoveStyles	: "Remove Styles definitions",	//MISSING
 DlgPasteCleanBox		: "Clean Up Box",	//MISSING
@@ -374,8 +391,11 @@ DlgSpellManyChanges		: "Spell check complete: %1 words changed",	//MISSING
 IeSpellDownload			: "Spell checker not installed. Do you want to download it now?",	//MISSING
 
 // Button Dialog
-DlgButtonText	: "Text (Value)",	//MISSING
-DlgButtonType	: "Type",	//MISSING
+DlgButtonText		: "Text (Value)",	//MISSING
+DlgButtonType		: "Type",	//MISSING
+DlgButtonTypeBtn	: "Button",	//MISSING
+DlgButtonTypeSbm	: "Submit",	//MISSING
+DlgButtonTypeRst	: "Reset",	//MISSING
 
 // Checkbox and Radio Button Dialogs
 DlgCheckboxName		: "Name",	//MISSING
@@ -424,6 +444,7 @@ DlgHiddenValue	: "Value",	//MISSING
 // Bulleted List Dialog
 BulletedListProp	: "Bulleted List Properties",	//MISSING
 NumberedListProp	: "Numbered List Properties",	//MISSING
+DlgLstStart			: "Start",	//MISSING
 DlgLstType			: "Type",	//MISSING
 DlgLstTypeCircle	: "Circle",	//MISSING
 DlgLstTypeDisc		: "Disc",	//MISSING
@@ -446,6 +467,15 @@ DlgDocLangDirLTR	: "Left to Right (LTR)",	//MISSING
 DlgDocLangDirRTL	: "Right to Left (RTL)",	//MISSING
 DlgDocLangCode		: "Language Code",	//MISSING
 DlgDocCharSet		: "Character Set Encoding",	//MISSING
+DlgDocCharSetCE		: "Central European",	//MISSING
+DlgDocCharSetCT		: "Chinese Traditional (Big5)",	//MISSING
+DlgDocCharSetCR		: "Cyrillic",	//MISSING
+DlgDocCharSetGR		: "Greek",	//MISSING
+DlgDocCharSetJP		: "Japanese",	//MISSING
+DlgDocCharSetKR		: "Korean",	//MISSING
+DlgDocCharSetTR		: "Turkish",	//MISSING
+DlgDocCharSetUN		: "Unicode (UTF-8)",	//MISSING
+DlgDocCharSetWE		: "Western European",	//MISSING
 DlgDocCharSetOther	: "Other Character Set Encoding",	//MISSING
 
 DlgDocDocType		: "Document Type Heading",	//MISSING
@@ -472,15 +502,15 @@ DlgDocPreview		: "Preview",	//MISSING
 // Templates Dialog
 Templates			: "Templates",	//MISSING
 DlgTemplatesTitle	: "Content Templates",	//MISSING
-DlgTemplatesSelMsg	: "Please select the template to open in the editor<br>(the actual contents will be lost):",	//MISSING
+DlgTemplatesSelMsg	: "Please select the template to open in the editor<br />(the actual contents will be lost):",	//MISSING
 DlgTemplatesLoading	: "Loading templates list. Please wait...",	//MISSING
 DlgTemplatesNoTpl	: "(No templates defined)",	//MISSING
+DlgTemplatesReplace	: "Replace actual contents",	//MISSING
 
 // About Dialog
 DlgAboutAboutTab	: "About",	//MISSING
 DlgAboutBrowserInfoTab	: "Browser Info",	//MISSING
 DlgAboutLicenseTab	: "License",	//MISSING
 DlgAboutVersion		: "Хувилбар",
-DlgAboutLicense		: "GNU цөөн ерөнхий нийтийн лицензийн ангилалд багтсан зөвшөөрөлтэй",
 DlgAboutInfo		: "Мэдээллээр туслах"
-}
+};

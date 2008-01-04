@@ -1,22 +1,24 @@
 ﻿/*
- * FCKeditor - The text editor for internet
- * Copyright (C) 2003-2006 Frederico Caldeira Knabben
- * 
- * Licensed under the terms of the GNU Lesser General Public License:
- * 		http://www.opensource.org/licenses/lgpl-license.php
- * 
- * For further information visit:
- * 		http://www.fckeditor.net/
- * 
- * "Support Open Source software. What about a donation today?"
- * 
- * File Name: da.js
- * 	Danish language file.
- * 
- * File Authors:
- * 		Jørgen Nordstrøm (jn@FirstWeb.dk)
- * 		Jesper Michelsen (jm@i-deVision.dk)
- * 		Bo Brandt (bbr@dynamicweb.dk)
+ * FCKeditor - The text editor for Internet - http://www.fckeditor.net
+ * Copyright (C) 2003-2007 Frederico Caldeira Knabben
+ *
+ * == BEGIN LICENSE ==
+ *
+ * Licensed under the terms of any of the following licenses at your
+ * choice:
+ *
+ *  - GNU General Public License Version 2 or later (the "GPL")
+ *    http://www.gnu.org/licenses/gpl.html
+ *
+ *  - GNU Lesser General Public License Version 2.1 or later (the "LGPL")
+ *    http://www.gnu.org/licenses/lgpl.html
+ *
+ *  - Mozilla Public License Version 1.1 or later (the "MPL")
+ *    http://www.mozilla.org/MPL/MPL-1.1.html
+ *
+ * == END LICENSE ==
+ *
+ * Danish language file.
  */
 
 var FCKLang =
@@ -43,6 +45,7 @@ InsertLinkLbl		: "Hyperlink",
 InsertLink			: "Indsæt/rediger hyperlink",
 RemoveLink			: "Fjern hyperlink",
 Anchor				: "Indsæt/rediger bogmærke",
+AnchorDelete		: "Remove Anchor",	//MISSING
 InsertImageLbl		: "Indsæt billede",
 InsertImage			: "Indsæt/rediger billede",
 InsertFlashLbl		: "Flash",
@@ -68,6 +71,7 @@ RightJustify		: "Højrestillet",
 BlockJustify		: "Lige margener",
 DecreaseIndent		: "Formindsk indrykning",
 IncreaseIndent		: "Forøg indrykning",
+Blockquote			: "Blockquote",	//MISSING
 Undo				: "Fortryd",
 Redo				: "Annuller fortryd",
 NumberedListLbl		: "Talopstilling",
@@ -101,20 +105,27 @@ SelectionField	: "Indsæt liste",
 ImageButton		: "Indsæt billedknap",
 
 FitWindow		: "Maksimer editor vinduet",
+ShowBlocks		: "Show Blocks",	//MISSING
 
 // Context Menu
 EditLink			: "Rediger hyperlink",
 CellCM				: "Celle",
 RowCM				: "Række",
 ColumnCM			: "Kolonne",
-InsertRow			: "Indsæt række",
+InsertRowAfter		: "Insert Row After",	//MISSING
+InsertRowBefore		: "Insert Row Before",	//MISSING
 DeleteRows			: "Slet række",
-InsertColumn		: "Indsæt kolonne",
+InsertColumnAfter	: "Insert Column After",	//MISSING
+InsertColumnBefore	: "Insert Column Before",	//MISSING
 DeleteColumns		: "Slet kolonne",
-InsertCell			: "Indsæt celle",
+InsertCellAfter		: "Insert Cell After",	//MISSING
+InsertCellBefore	: "Insert Cell Before",	//MISSING
 DeleteCells			: "Slet celle",
 MergeCells			: "Flet celler",
-SplitCell			: "Opdel celle",
+MergeRight			: "Merge Right",	//MISSING
+MergeDown			: "Merge Down",	//MISSING
+HorizontalSplitCell	: "Split Cell Horizontally",	//MISSING
+VerticalSplitCell	: "Split Cell Vertically",	//MISSING
 TableDelete			: "Slet tabel",
 CellProperties		: "Egenskaber for celle",
 TableProperties		: "Egenskaber for tabel",
@@ -227,7 +238,7 @@ DlgLnkURL			: "URL",
 DlgLnkAnchorSel		: "Vælg et anker",
 DlgLnkAnchorByName	: "Efter anker navn",
 DlgLnkAnchorById	: "Efter element Id",
-DlgLnkNoAnchors		: "<Ingen bogmærker dokumentet>",
+DlgLnkNoAnchors		: "(Ingen bogmærker dokumentet)",
 DlgLnkEMail			: "E-mailadresse",
 DlgLnkEMailSubject	: "Emne",
 DlgLnkEMailBody		: "Brødtekst",
@@ -260,6 +271,7 @@ DlgLnkPopTop		: "Position fra toppen",
 DlnLnkMsgNoUrl		: "Indtast hyperlink URL!",
 DlnLnkMsgNoEMail	: "Indtast e-mailaddresse!",
 DlnLnkMsgNoAnchor	: "Vælg bogmærke!",
+DlnLnkMsgInvPopName	: "The popup name must begin with an alphabetic character and must not contain spaces",	//MISSING
 
 // Color Dialog
 DlgColorTitle		: "Vælg farve",
@@ -319,6 +331,9 @@ DlgCellBackColor	: "Baggrundsfarve",
 DlgCellBorderColor	: "Rammefarve",
 DlgCellBtnSelect	: "Vælg...",
 
+// Find and Replace Dialog
+DlgFindAndReplaceTitle	: "Find and Replace",	//MISSING
+
 // Find Dialog
 DlgFindTitle		: "Find",
 DlgFindFindBtn		: "Find",
@@ -334,7 +349,6 @@ DlgReplaceReplAllBtn	: "Erstat alle",
 DlgReplaceWordChk		: "Kun hele ord",
 
 // Paste Operations / Dialog
-PasteErrorPaste	: "Din browsers sikkerhedsindstillinger tillader ikke editoren at indsætte tekst automatisk!<br>Brug i stedet tastaturet til at indsætte teksten (Ctrl+V).",
 PasteErrorCut	: "Din browsers sikkerhedsindstillinger tillader ikke editoren at klippe tekst automatisk!<br>Brug i stedet tastaturet til at klippe teksten (Ctrl+X).",
 PasteErrorCopy	: "Din browsers sikkerhedsindstillinger tillader ikke editoren at kopiere tekst automatisk!<br>Brug i stedet tastaturet til at kopiere teksten (Ctrl+C).",
 
@@ -342,6 +356,7 @@ PasteAsText		: "Indsæt som ikke-formateret tekst",
 PasteFromWord	: "Indsæt fra Word",
 
 DlgPasteMsg2	: "Indsæt i feltet herunder (<STRONG>Ctrl+V</STRONG>) og klik <STRONG>OK</STRONG>.",
+DlgPasteSec		: "Because of your browser security settings, the editor is not able to access your clipboard data directly. You are required to paste it again in this window.",	//MISSING
 DlgPasteIgnoreFont		: "Ignorer font definitioner",
 DlgPasteRemoveStyles	: "Ignorer typografi",
 DlgPasteCleanBox		: "Slet indhold",
@@ -376,8 +391,11 @@ DlgSpellManyChanges		: "Stavekontrol færdig: %1 ord ændret",
 IeSpellDownload			: "Stavekontrol ikke installeret.<br>Vil du hente den nu?",
 
 // Button Dialog
-DlgButtonText	: "Tekst",
-DlgButtonType	: "Type",
+DlgButtonText		: "Tekst",
+DlgButtonType		: "Type",
+DlgButtonTypeBtn	: "Button",	//MISSING
+DlgButtonTypeSbm	: "Submit",	//MISSING
+DlgButtonTypeRst	: "Reset",	//MISSING
 
 // Checkbox and Radio Button Dialogs
 DlgCheckboxName		: "Navn",
@@ -426,6 +444,7 @@ DlgHiddenValue	: "Værdi",
 // Bulleted List Dialog
 BulletedListProp	: "Egenskaber for punktopstilling",
 NumberedListProp	: "Egenskaber for talopstilling",
+DlgLstStart			: "Start",	//MISSING
 DlgLstType			: "Type",
 DlgLstTypeCircle	: "Cirkel",
 DlgLstTypeDisc		: "Udfyldt cirkel",
@@ -448,6 +467,15 @@ DlgDocLangDirLTR	: "Fra venstre mod højre (LTR)",
 DlgDocLangDirRTL	: "Fra højre mod venstre (RTL)",
 DlgDocLangCode		: "Landekode",
 DlgDocCharSet		: "Tegnsæt kode",
+DlgDocCharSetCE		: "Central European",	//MISSING
+DlgDocCharSetCT		: "Chinese Traditional (Big5)",	//MISSING
+DlgDocCharSetCR		: "Cyrillic",	//MISSING
+DlgDocCharSetGR		: "Greek",	//MISSING
+DlgDocCharSetJP		: "Japanese",	//MISSING
+DlgDocCharSetKR		: "Korean",	//MISSING
+DlgDocCharSetTR		: "Turkish",	//MISSING
+DlgDocCharSetUN		: "Unicode (UTF-8)",	//MISSING
+DlgDocCharSetWE		: "Western European",	//MISSING
 DlgDocCharSetOther	: "Anden tegnsæt kode",
 
 DlgDocDocType		: "Dokumenttype kategori",
@@ -477,12 +505,12 @@ DlgTemplatesTitle	: "Indholdsskabeloner",
 DlgTemplatesSelMsg	: "Vælg den skabelon, som skal åbnes i editoren.<br>(Nuværende indhold vil blive overskrevet!):",
 DlgTemplatesLoading	: "Henter liste over skabeloner...",
 DlgTemplatesNoTpl	: "(Der er ikke defineret nogen skabelon!)",
+DlgTemplatesReplace	: "Replace actual contents",	//MISSING
 
 // About Dialog
 DlgAboutAboutTab	: "Om",
 DlgAboutBrowserInfoTab	: "Generelt",
 DlgAboutLicenseTab	: "Licens",
 DlgAboutVersion		: "version",
-DlgAboutLicense		: "Licens under vilkår for GNU Lesser General Public License",
 DlgAboutInfo		: "For yderlig information gå til"
-}
+};
