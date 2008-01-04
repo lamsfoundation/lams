@@ -109,6 +109,7 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 				matchesArr = mc.searchForLearners(String(mm.learnerIndexView.getIdxTextField().text));
 				if (matchesArr.length > 0) {
 					mm.drawIndexButtons = true;
+					mm.currentLearnerIndexNoRedraw = 1;
 					mm.searchResults = matchesArr;
 					var toggleBtn:MovieClip = mm.getMonitor().getMV().getLearnerIndexPanel().toggleBtn;
 					toggleBtn._visible = true;
@@ -121,13 +122,12 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 			mm.drawIndexButtons = true;
 			mm.inSearchView = false;
 			mm.resetSearchTextField = true;
-
-			//mm.currentLearnerIndexNoRedraw = 1;
+			mm.currentLearnerIndexNoRedraw = mm.oldIndex;
 			mm.setLessonProgressData(mm.progressArrBackup);
-		
 		}
 		else {
 			mm.drawIndexButtons = false;
+			mm.indexSelected = true;
 			mm.currentLearnerIndex = Number(label.text);
 			if (!mm.inSearchView)
 				mm.oldIndex = mm.currentLearnerIndex;

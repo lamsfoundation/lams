@@ -188,42 +188,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		//var styleObj = _tm.getStyleObject('IndexBar');
 	}
 	
-	/*public function setupButtons(mm:MonitorModel):Void {
-		rangeLabel.text = "Page " + mm.currentLearnerIndex + " of " + mm.numIndexButtons;
-		if ((displayedButtons.length > 0) && (drawButtons == true)) {
-			removeButtons();
-		}
-		
-		if (drawButtons == true) {
-			_buttonsPanel_mc = this.createEmptyMovieClip("_buttonsPanel_mc", DepthManager.kTop);
-			addRangeLabel(mm);
-			if (mm.numIndexButtons > mm.numPreferredIndexButtons) {
-				addBackNavigationButton(mm);
-			}
-		}
-			addIndexButtons(mm); // if drawButtons = false, just rename labels
-			
-		if (drawButtons == true) {
-			if (mm.numIndexButtons > mm.numPreferredIndexButtons) {
-				addForwardNavigationButton(mm);
-				navigationButtonsDrawn = true;
-			}
-			addIndexTextField(mm);
-			addGoButton(mm);
-			addToggleViewButton(mm);
-		
-			buttonsShown = true;
-			direction = null;
-		}
-		//if (mm.inSearchView)
-		//	toggleBtn._visible = true;
-		
-		nextPosition = 0;
-	}*/
 	public function setupButtons(mm:MonitorModel):Void {
 		
 		rangeLabel.text = "Page " + mm.currentLearnerIndex + " of " + mm.numIndexButtons;
-		
+		Debugger.log("displayedButtons.length: "+displayedButtons.length, Debugger.CRITICAL, "setupButtons", "LearnerIndexView");
 		if (!navigationButtonsDrawn	&& mm.numIndexButtons > displayedButtons.length && displayedButtons.length == mm.numPreferredIndexButtons)
 			mm.drawIndexButtons = true;	
 			

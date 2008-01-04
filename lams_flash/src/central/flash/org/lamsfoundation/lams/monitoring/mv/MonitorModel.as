@@ -93,6 +93,7 @@ class MonitorModel extends Observable{
 	private var _isDesignDrawn:Boolean;
 	private var _showLearners:Boolean;
 	private var _inSearchView:Boolean;
+	private var _indexSelected:Boolean;
 	private var _resetSearchTextField:Boolean;
 	private var _endGate:MovieClip;
 	private var _learnerIndexView:MovieClip;
@@ -124,6 +125,7 @@ class MonitorModel extends Observable{
 	private var _learnersPerPage:Number;
 	private var _numLearners:Number;
 	private var _firstDisplayedIndexButton:Number;
+	private var _oldFirstDisplayedIndexButton:Number;
 	private var _lastDisplayedIndexButton:Number;
 	private var _numDisplayedIdxButtons:Number
 	private var _numPreferredIndexButtons:Number;
@@ -154,11 +156,14 @@ class MonitorModel extends Observable{
 		lastIndexInitialised = false;
 		_inSearchView = false;
 		_resetSearchTextField = false;
+		_indexSelected = false;
 		
 		_currentLearnerIndex = 1;
+		_oldIndex = 1;
 		_numPreferredIndexButtons = 10; // to be displayed at a time
 		_learnersPerPage = (_root.pb == undefined) ? 10 : _root.pb;
 		_firstDisplayedIndexButton = 1;
+		_oldFirstDisplayedIndexButton = 1;
 		Debugger.log("progress batch number: "+_root.pb,Debugger.CRITICAL,"MonitorModel","MonitorModel");
 		
 		_activeView = null;
@@ -496,29 +501,36 @@ class MonitorModel extends Observable{
 			var minButtons:Number = Math.min(diff, _numPreferredIndexButtons);
 			_lastDisplayedIndexButton += minButtons; 
 			_firstDisplayedIndexButton = _lastDisplayedIndexButton - Math.min(numIndexButtons, _numPreferredIndexButtons) + 1;
+			if (!_inSearchView)
+				_oldFirstDisplayedIndexButton = _firstDisplayedIndexButton;
 			sendButtonUpdate();
 		}
 		else if (s == "<<") {
 			_firstDisplayedIndexButton -= _numPreferredIndexButtons;
 			if (_firstDisplayedIndexButton < 1) 
 				_firstDisplayedIndexButton = 1;
+			if (!_inSearchView)
+				_oldFirstDisplayedIndexButton = _firstDisplayedIndexButton;
 			_lastDisplayedIndexButton = numIndexButtons > _numPreferredIndexButtons ? (_firstDisplayedIndexButton + _numPreferredIndexButtons - 1) : numIndexButtons;
 			sendButtonUpdate();
 		}
-		else { // Refresh or Go clicked
-			Debugger.log("Refresh or Go clicked", Debugger.CRITICAL, "updateIndexButtons", "MonitorModel");
-			Debugger.log("MonitorModel inSearchView: "+inSearchView, Debugger.GEN, "updateIndexButtons", "MonitorModel");
-			if (_inSearchView ) {
-				if (numIndexButtons < currentLearnerIndex) {
-					_firstDisplayedIndexButton = 1;
-					_lastDisplayedIndexButton = Math.min(numIndexButtons,_numPreferredIndexButtons);
-				} else
-					_lastDisplayedIndexButton = Math.min(numIndexButtons,_numPreferredIndexButtons);
+		else { // 'Refresh', 'Go' or 'Index View' or numeric index button clicked
+			if (_indexSelected) {
+				_indexSelected = false;
 			}
-			else if (_lastDisplayedIndexButton < _numPreferredIndexButtons) {
+			else if (_inSearchView) {
+				_firstDisplayedIndexButton = 1; // index View
 				_lastDisplayedIndexButton = Math.min(numIndexButtons,_numPreferredIndexButtons);
 			}
+			else {
+				_firstDisplayedIndexButton = (_oldFirstDisplayedIndexButton > 0) ? _oldFirstDisplayedIndexButton : 1;
+				_lastDisplayedIndexButton = _firstDisplayedIndexButton + Math.min(numIndexButtons,_numPreferredIndexButtons) - 1;
+			}
 		}
+	}
+	
+	public function set indexSelected(idxSelected:Boolean) {
+		_indexSelected = idxSelected;
 	}
 	
 	public function sendButtonUpdate():Void {
@@ -561,12 +573,10 @@ class MonitorModel extends Observable{
 	}
 	
 	public function set searchResults(matchesArr:Array) {
-		//_oldIndex = _currentLearnerIndex;
-		Debugger.log("_inSearchView: "+_inSearchView, Debugger.CRITICAL, "searchResults", "MonitorModel");
 		if (!_inSearchView) {
 			_currentLearnerIndex = 1;
-			_inSearchView = true;
 		}
+		_inSearchView = true;
 		setLessonProgressData(matchesArr);
 		_searchResultsBackup = matchesArr;
 	}
@@ -576,6 +586,7 @@ class MonitorModel extends Observable{
 		_drawButtons = true;
 		if (_inSearchView)
 			_currentLearnerIndex = 1;
+		_oldFirstDisplayedIndexButton = 1;
 		_inSearchView = false;
 		_resetSearchTextField = true;
 	}
