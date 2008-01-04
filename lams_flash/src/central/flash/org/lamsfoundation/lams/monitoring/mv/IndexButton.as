@@ -88,7 +88,7 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 			Debugger.log(">> clicked", Debugger.GEN, "indexClicked", "IndexButton");
 			mm.drawIndexButtons = false;
 			mm.updateIndexButtons(">>");
-		} else if (buttonText == "Go") {
+		} else if (buttonText == Dictionary.getValue('mv_search_go_btn_lbl')) { // 'Go' button
 			mm.learnerIndexView.textFieldContents = String(mm.learnerIndexView.getIdxTextField().text); // backup the string incase need to remove textfield
 			if(!isNaN(mm.learnerIndexView.getIdxTextField().text)) { // if the text field contains a number
 				var idx:Number = Number(mm.learnerIndexView.getIdxTextField().text);
@@ -99,10 +99,10 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 						mm.oldIndex = mm.currentLearnerIndex;
 				}
 				else
-					LFMessage.showMessageAlert("The page number must be between 1 and "+ mm.numIndexButtons, null);
+					LFMessage.showMessageAlert(Dictionary.getValue('mv_search_invalid_input_msg', [mm.numIndexButtons]), null);
 			} 
 			else if (mm.learnerIndexView.getIdxTextField().text == "") {
-				LFMessage.showMessageAlert("Please enter a search query or page number between 1 and "+ mm.numIndexButtons, null);
+				LFMessage.showMessageAlert(Dictionary.getValue('mv_search_error_msg', [mm.numIndexButtons]), null);
 			}
 			else {
 				var mc:MonitorController = mm.getMonitor().getMV().getController();
@@ -111,14 +111,14 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 					mm.drawIndexButtons = true;
 					mm.currentLearnerIndexNoRedraw = 1;
 					mm.searchResults = matchesArr;
-					var toggleBtn:MovieClip = mm.getMonitor().getMV().getLearnerIndexPanel().toggleBtn;
-					toggleBtn._visible = true;
+					var indexViewBtn:MovieClip = mm.getMonitor().getMV().getLearnerIndexPanel().indexViewBtn;
+					indexViewBtn._visible = true;
 				} else {
-					LFMessage.showMessageAlert(mm.learnerIndexView.getIdxTextField().text + " was not found.", null);
+					LFMessage.showMessageAlert(Dictionary.getValue('mv_search_not_found_msg', [mm.learnerIndexView.getIdxTextField().text]), null);
 				}
 			}
 		}
-		else if (buttonText == "Index View") {
+		else if (buttonText == Dictionary.getValue('mv_search_index_view_btn_lbl')) { // the 'Index View' button
 			mm.drawIndexButtons = true;
 			mm.inSearchView = false;
 			mm.resetSearchTextField = true;

@@ -71,7 +71,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	private var backBtn:MovieClip;
 	private var nextBtn:MovieClip;
 	private var goBtn:MovieClip;
-	private var toggleBtn:MovieClip;
+	private var indexViewBtn:MovieClip;
 	private var textFieldBackground_mc:MovieClip;
 	private var labelBackground_mc:MovieClip;
 	private var idxTextField:TextField;
@@ -97,7 +97,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		btnWidth = 45;
 		buttonsShown = false;
 		navigationButtonsDrawn = false;
-		defaultString = "Enter search query or page no.";
+		defaultString = Dictionary.getValue("mv_search_default_txt");
 		
 		this._visible = false;
 		displayedButtons = new Array();
@@ -161,7 +161,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 			case 'DRAW_BUTTONS' : // this event is only fired when << or >> buttons clicked as it doesn't redraw learnertabview contents
 				if (infoObj.tabID == _tabID && !mm.locked && mm.numIndexButtons>1) {
 					if (!buttonsShown || (mm.numIndexButtons > displayedButtons.length)) {
-						//drawButtons = false;
 						setupButtons(mm); // this only renames the index buttons as drawbuttons equals false
 						this._visible = true;
 					}
@@ -189,14 +188,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	}
 	
 	public function setupButtons(mm:MonitorModel):Void {
-		
-		rangeLabel.text = "Page " + mm.currentLearnerIndex + " of " + mm.numIndexButtons;
+		rangeLabel.text = Dictionary.getValue('mv_search_current_page_lbl', [mm.currentLearnerIndex, mm.numIndexButtons]);
 		Debugger.log("displayedButtons.length: "+displayedButtons.length, Debugger.CRITICAL, "setupButtons", "LearnerIndexView");
 		if (!navigationButtonsDrawn	&& mm.numIndexButtons > displayedButtons.length && displayedButtons.length == mm.numPreferredIndexButtons)
 			mm.drawIndexButtons = true;	
 			
-		var dib = mm.drawIndexButtons; // false on refresh should be true
-		Debugger.log("setupButtons dib: "+dib, Debugger.CRITICAL, "setupButtons", "LearnerIndexView");
 		if ((displayedButtons.length > 0) && (mm.drawIndexButtons)) {
 			removeButtons();
 		}
@@ -207,7 +203,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 			addIndexTextField(mm);
 			addGoButton(mm);
 			if (mm.inSearchView) {
-				addToggleViewButton(mm);
+				addIndexViewButton(mm);
 			}
 		}
 		
@@ -235,7 +231,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	public function removeButtons(){
 		Debugger.log("Removing Index Buttons", Debugger.GEN, "removeButtons", "LearnerIndexView");
 		
-		//labelBackground_mc.removeMovieClip(rangeLabel);
 		_buttonsPanel_mc.removeMovieClip(rangeLabel);
 		
 		if (mm.numIndexButtons > mm.numPreferredIndexButtons)
@@ -256,7 +251,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		_buttonsPanel_mc.removeMovieClip(textFieldBackground_mc);
 	
 		_buttonsPanel_mc.removeMovieClip(goBtn);
-		_buttonsPanel_mc.removeMovieClip(toggleBtn);
+		_buttonsPanel_mc.removeMovieClip(indexViewBtn);
 	}
 	
 	private function addRangeLabel(mm:MonitorModel):Void {
@@ -266,7 +261,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		rangeLabel._x = 0;
 		rangeLabel._width = 90;
 		rangeLabel.autoSize = "center"
-		rangeLabel.text = "Page " + mm.currentLearnerIndex + " of " + mm.numIndexButtons;
+		rangeLabel.text = Dictionary.getValue('mv_search_current_page_lbl', [mm.currentLearnerIndex, mm.numIndexButtons]);
 		nextPosition += rangeLabel._width;
 	}
 	
@@ -286,14 +281,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		Debugger.log("mm.lastDisplayedIndexButton: "+mm.lastDisplayedIndexButton, Debugger.GEN, "addIndexButton", "LearnerIndexView");
 		var count:Number = 0;
 
-		Debugger.log("displayedButtons[displayedButtons.length-1].label.text: "+displayedButtons[displayedButtons.length-1].label.text, Debugger.GEN, "addIndexButton", "LearnerIndexView");
-
 		if (mm.inSearchView && (mm.firstDisplayedIndexButton == mm.lastDisplayedIndexButton)) {
 			// do nothing
 			// won't draw numbered index buttons if in search view and there's only one page of results
 		}
 		else {
-			Debugger.log("this should be false mm.drawIndexButtons: "+mm.drawIndexButtons, Debugger.GEN, "addIndexButton", "LearnerIndexView");
 			for (var i=mm.firstDisplayedIndexButton; i<=mm.lastDisplayedIndexButton; i++) {	
 				if (mm.drawIndexButtons) {
 					var idxBtn:MovieClip = _buttonsPanel_mc.attachMovie("IndexButton", "idxBtn"+i, _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth, _labelText: String(i)});	
@@ -326,9 +318,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		_buttonsPanel_mc.attachMovie("textFieldBackground", "textFieldBackground_mc", _buttonsPanel_mc.getNextHighestDepth(), {_x: nextPosition, _y: 0});
 
 		var textFieldBackground = _buttonsPanel_mc["textFieldBackground_mc"];
-		textFieldBackground._width = 150;
+		textFieldBackground._width = 175;
 		
-		textFieldBackground.createTextField("idxTextField", textFieldBackground.getNextHighestDepth(), 0, 0, 150, 20);
+		textFieldBackground.createTextField("idxTextField", textFieldBackground.getNextHighestDepth(), 0, 0, 175, 20);
 		
 		idxTextField = textFieldBackground["idxTextField"];
 		idxTextField._visible = true;
@@ -352,18 +344,18 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	}
 	
 	private function addGoButton(mm:MonitorModel):Void {
-		goBtn = _buttonsPanel_mc.attachMovie("IndexButton", "goBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth, _labelText: "Go"});
+		goBtn = _buttonsPanel_mc.attachMovie("IndexButton", "goBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth, _labelText: Dictionary.getValue('mv_search_go_btn_lbl')});
 		_indexButton = IndexButton(goBtn);
 		_indexButton.init(mm, undefined);
 		goBtn._x = nextPosition;
 		nextPosition += (btnWidth);
 	}
 	
-	private function addToggleViewButton(mm:MonitorModel):Void {
-		toggleBtn = _buttonsPanel_mc.attachMovie("IndexButton", "toggleBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: (btnWidth * 2), _labelText: "Index View"});
-		_indexButton = IndexButton(toggleBtn);
+	private function addIndexViewButton(mm:MonitorModel):Void {
+		indexViewBtn = _buttonsPanel_mc.attachMovie("IndexButton", "indexViewBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: (btnWidth * 2), _labelText: Dictionary.getValue('mv_search_index_view_btn_lbl')});
+		_indexButton = IndexButton(indexViewBtn);
 		_indexButton.init(mm, undefined);
-		toggleBtn._x = nextPosition;
+		indexViewBtn._x = nextPosition;
 		nextPosition += (btnWidth * 2);
 	}
 
@@ -400,7 +392,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		return idxTextField;
 	}
 	
-	public function getToggleBtn():MovieClip {
-		return toggleBtn;
+	public function getIndexViewBtn():MovieClip {
+		return indexViewBtn;
 	}
 }
