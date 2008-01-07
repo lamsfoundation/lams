@@ -93,7 +93,6 @@ class Toolkit {
 		Debugger.log('Running',4,'getToolkitActivities','Toolkit');
 		
 		var callback:Function = Proxy.create(this,setToolkitLibraries);
-		//Application.getInstance().getComms().getRequest('flashxml/all_library_details.xml',callback,false);
 		//Application.getInstance().getComms().getRequest('http://dolly.uklams.net/lams/lams_authoring/liblist.xml',callback,true);
 		//TODO: sort out with the aussies what is going on with this structure
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getAllLearningLibraryDetails',callback);

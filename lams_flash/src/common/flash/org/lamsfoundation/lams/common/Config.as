@@ -119,7 +119,6 @@ class Config {
     * Set the default configuration properties 
     */
     private function loadServerDefaults(){
-        //createFromCode();
         //serverDefaultsLoaded(_configData);
 		
         var callBack = Proxy.create(this,serverDefaultsLoaded);
@@ -127,60 +126,7 @@ class Config {
         _comms.getRequest('flashxml/configData.xml',callBack)
         //_comms.loadXML('lams_authoring/configData.xml',callBack,true,true);
     }
-    
-    /**
-    * TODO - Only to be used whilst testing with dummy data
-    */
-    private function createFromCode(){
-        _configData = {};
-        //TODO - DI 16/05/05 Get these from server eventually,stub for now
-        _configData.version = '1.1';
-        _configData.language = 'en';
-        _configData.theme = 'default';
-
-        //Set up languages
-        var languages:Array = [];
         
-        //English
-        var en:Object = {};
-        en.label = 'English';
-        en.data = 'en';
-        languages.push(en);
-
-        //French
-        var fr:Object = {};
-        fr.label = 'Français';
-        fr.data = 'fr';
-        languages.push(fr);
-        
-        _configData.languages = languages;
-
-        //Set up themes
-        var themes:Array = [];
-        
-        //Default
-        var defaultTheme:Object = {};
-        defaultTheme.label = 'Default';
-        defaultTheme.data = 'default';
-        themes.push(defaultTheme);
-
-        //Lime
-        var limeTheme:Object = {};
-        limeTheme.label = 'Lime';
-        limeTheme.data = 'lime';
-        themes.push(limeTheme);
-
-        //Ruby
-        var rubyTheme:Object = {};
-        rubyTheme.label = 'Ruby';
-        rubyTheme.data = 'ruby';
-        themes.push(rubyTheme);
-
-        
-        _configData.themes = themes;
-        
-    }
-    
     /**
     * Called when the default config. items have been loaded from server.  Overwrites server defaults with 
     * local where applicable.

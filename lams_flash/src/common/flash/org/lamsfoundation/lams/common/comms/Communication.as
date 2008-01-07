@@ -99,7 +99,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
     * @usage -  var myObject.test = function (deserializedObject) {
     *               //Code to process object here....
     *           }
-    *           commsInstance.getRequest('http://dolly.uklams.net/lams/lams_authoring/all_library_details.xml',myObject.test,true)   
+    *           commsInstance.getRequest('http://dolly.uklams.net/lams/lams_authoring/all_library_details.xml',myObject.test,true) //Note: all_library_details.xml has been deleted from cvs
     * 
     * @param requestURL:String  URL on the server for request script
     * @param handler:Function   callback function to call with the response object

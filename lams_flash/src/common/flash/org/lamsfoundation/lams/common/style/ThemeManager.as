@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.authoring.*
 * Manages themes throughout LAMS using the Flash event delegation model.  Themes are comprised of Visual elements  
 * which contains styles. 
 * E.g., 
-*   Theme:              'default' or 'lime'
+*   Theme:              'default'
 *   Visual element      'LFWindow' or 'Button' 
 *   StyleObject         contains style attributes such as 'ThemeColor', 'Color', 'borderStyle' etc.
 * 
