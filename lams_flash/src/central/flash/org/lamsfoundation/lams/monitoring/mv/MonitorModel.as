@@ -132,6 +132,8 @@ class MonitorModel extends Observable{
 	private var lastIndexInitialised:Boolean;
 	private var _drawButtons:Boolean;
 	
+	private var _doRefresh:Boolean;
+	
 	private var _matchesArr:Array;
 	private var backupLearnersProgArr:Array;
 	private var _searchResultsBackup:Array;
@@ -1349,6 +1351,14 @@ class MonitorModel extends Observable{
 	
 	public function get ddm():DesignDataModel {
 		return _monitor.ddm;
+	}
+	
+	public function haltRefresh(a:Boolean):Void {
+		_doRefresh = !a;
+	}
+	
+	public function get isDirty():Boolean {
+		return _isDirty;
 	}
 	
 }
