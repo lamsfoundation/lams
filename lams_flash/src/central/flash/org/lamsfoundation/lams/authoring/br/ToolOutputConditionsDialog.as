@@ -551,14 +551,14 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		_end_value_stp.visible = !evt.target.value;
 		_condition_to_lbl.visible = !evt.target.value;
 		
-		_opt_lessThan_cb.enabled = !evt.target.value;
+		_opt_lessThan_cb.selected = false;;
 	}
 	
 	private function onLessThanSelect(evt:Object):Void {
 		_end_value_stp.visible = !evt.target.value;
 		_condition_to_lbl.visible = !evt.target.value;
 		
-		_opt_greaterThan_cb.enabled = !evt.target.value;
+		_opt_greaterThan_cb.selected = false;
 	}
 
 	public static function getOutputType(type:String):String {

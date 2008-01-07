@@ -466,14 +466,18 @@ class PropertyInspectorControls extends MovieClip {
 	private function showBranchingControls(v:Boolean, e:Boolean){
 		branchType_lbl.visible = v;
 		branchType_cmb.visible = v;
+		
 		hideAllSteppers(false);
 		
 		var _activityTypeID:Number = _canvasModel.selectedItem.activity.activityTypeID;
 		
 		if(_activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE) {
+			
 			showGroupBasedBranchingControls(v, e);
 			showAppliedGroupingControls(v, e);
+			
 		} else if(_activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) {
+			
 			showToolBasedBranchingControls(v, e);
 			
 			if(toolActs_cmb.visible) {
@@ -1107,8 +1111,9 @@ class PropertyInspectorControls extends MovieClip {
 	
 	private function showGroupBasedBranchingControls(v:Boolean, e:Boolean) {
 		if(!v) { 
-			_group_match_btn.visible = false; 
+			_group_match_btn.visible = false;
 			_define_monitor_cb.visible = false; 
+			
 			return; 
 		}		
 		
