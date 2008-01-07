@@ -43,17 +43,17 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 	private var _className = "IndexButton";
 	
 	private var _bgPanel:MovieClip;
-	private var btnWidth:Number;
 	
 	private var idxLabel_mc:MovieClip;
 	private var idxLabel:Label;
 	private var _labelText:String;
-	private var _btnType:String; // Go, Previous, Numeric, Next, IndexView
+	private var _btnType:String; // "Go", "Previous", "Numeric", "Next", "IndexView"
 	
 	private var matchesArr:Array;
 	
 	private var _tm:ThemeManager;
 	private var mm:MonitorModel;
+	private var lblWidth:Number;
 	
 	/**
 	* Called to Indexbutton. Called by LearnerIndexView
@@ -64,9 +64,7 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 		
 		_tm = ThemeManager.getInstance();
 		
-		btnWidth = 45;
-		_bgPanel._width = btnWidth;
-		
+		//lblWidth = StringUtils.getButtonWidthForStr(Dictionary.getValue(_labelText));
 		idxLabel_mc = this.attachMovie("Label", "idxLabel", this.getNextHighestDepth(), {text:_labelText, _width: 45, autoSize: "center"});
 		idxLabel = Label(idxLabel_mc);
 		

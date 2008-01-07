@@ -78,6 +78,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	private var _textFieldContents:String;
 	private var defaultString:String;
 	private var rangeLabel;
+	private var btnSpacing:Number;
+	private var txtFieldSpacing:Number;
+	private var untranslatedWidth:Number;
 		
 	private var buttonsShown:Boolean;
 	private var navigationButtonsDrawn:Boolean;
@@ -94,10 +97,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		_tip = new ToolTip();
 		
 		nextPosition = 0;
-		btnWidth = 45;
+		btnWidth = 40;
+		btnSpacing = 20;
+		txtFieldSpacing = 5;
 		buttonsShown = false;
 		navigationButtonsDrawn = false;
 		defaultString = Dictionary.getValue("mv_search_default_txt");
+		untranslatedWidth = StringUtils.getButtonWidthForStr('?');
 		
 		this._visible = false;
 		displayedButtons = new Array();
@@ -233,6 +239,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		
 		_buttonsPanel_mc.removeMovieClip(rangeLabel);
 		
+		//need to remove the text field from the background
+		textFieldBackground_mc.removeMovieClip(idxTextField);
+		_buttonsPanel_mc.removeMovieClip(textFieldBackground_mc);
+		
 		if (mm.numIndexButtons > mm.numPreferredIndexButtons)
 			_buttonsPanel_mc.removeMovieClip(backBtn);
 		
@@ -246,10 +256,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 			navigationButtonsDrawn = false;
 		}
 			
-		//need to remove the text field from the background
-		textFieldBackground_mc.removeMovieClip(idxTextField);
-		_buttonsPanel_mc.removeMovieClip(textFieldBackground_mc);
-	
 		_buttonsPanel_mc.removeMovieClip(goBtn);
 		_buttonsPanel_mc.removeMovieClip(indexViewBtn);
 	}
@@ -259,20 +265,24 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		var idxLabel_mc:MovieClip = _buttonsPanel_mc.attachMovie("Label", "rangeLabel", _buttonsPanel_mc.getNextHighestDepth());
 		rangeLabel = _buttonsPanel_mc["rangeLabel"];
 		rangeLabel._x = 0;
-		rangeLabel._width = 90;
 		rangeLabel.autoSize = "center"
 		rangeLabel.text = Dictionary.getValue('mv_search_current_page_lbl', [mm.currentLearnerIndex, mm.numIndexButtons]);
+		var generatedWidth:Number = StringUtils.getButtonWidthForStr(String(rangeLabel.text));
+		rangeLabel._width = (generatedWidth <= untranslatedWidth) ? 90 : generatedWidth + btnSpacing;
+		
 		nextPosition += rangeLabel._width;
 	}
 	
 	private function addBackNavigationButton(mm:MonitorModel):Void {
 		// add back navigation button
-		backBtn = _buttonsPanel_mc.attachMovie("IndexButton", "backBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth-5, _labelText: "<<"});	
+		var generatedWidth:Number = StringUtils.getButtonWidthForStr('<<');
+		var backIdxBtnWidth:Number = (generatedWidth <= untranslatedWidth) ? btnWidth : generatedWidth + btnSpacing;
+		backBtn = _buttonsPanel_mc.attachMovie("IndexButton", "backBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: backIdxBtnWidth, _labelText: "<<"});	
 		_indexButton = IndexButton(backBtn);
 		_indexButton.init(mm, undefined);
 		_indexButton.btnType = "Previous";
 		backBtn._x = nextPosition;
-		nextPosition += (btnWidth-5);
+		nextPosition += (backIdxBtnWidth);
 	}
 	
 	private function addIndexButtons(mm:MonitorModel):Void {
@@ -300,7 +310,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 
 					_indexButton = IndexButton(displayedButtons[count]);
 					displayedButtons[count].label = String(i);
-					nextPosition += btnWidth
+					displayedButtons[count]._width = btnWidth;
+					nextPosition += btnWidth;
 					count++;
 				}
 			}
@@ -308,12 +319,14 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	}
 		
 	private function addForwardNavigationButton(mm:MonitorModel):Void {
-		nextBtn = _buttonsPanel_mc.attachMovie("IndexButton", "nextBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth-5, _labelText: ">>"});
+		var generatedWidth:Number = StringUtils.getButtonWidthForStr('>>');
+		var forwardIdxBtnWidth:Number = (generatedWidth <= untranslatedWidth) ? btnWidth : generatedWidth + btnSpacing;
+		nextBtn = _buttonsPanel_mc.attachMovie("IndexButton", "nextBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: forwardIdxBtnWidth, _labelText: ">>"});
 		_indexButton = IndexButton(nextBtn);
 		_indexButton.init(mm, undefined);
 		_indexButton.btnType = "Next";
 		nextBtn._x = nextPosition;
-		nextPosition += (btnWidth-5);
+		nextPosition += (forwardIdxBtnWidth);
 	}
 	
 	private function addIndexTextField(mm:MonitorModel):Void {
@@ -321,9 +334,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		_buttonsPanel_mc.attachMovie("textFieldBackground", "textFieldBackground_mc", _buttonsPanel_mc.getNextHighestDepth(), {_x: nextPosition, _y: 0});
 
 		var textFieldBackground = _buttonsPanel_mc["textFieldBackground_mc"];
-		textFieldBackground._width = 175;
-		
-		textFieldBackground.createTextField("idxTextField", textFieldBackground.getNextHighestDepth(), 0, 0, 175, 20);
+		var generatedWidth:Number = StringUtils.getButtonWidthForStr(defaultString);
+		textFieldBackground._width = (generatedWidth <= untranslatedWidth) ? 175 : generatedWidth + txtFieldSpacing;
+
+		textFieldBackground.createTextField("idxTextField", textFieldBackground.getNextHighestDepth(), 0, 0, textFieldBackground._width, 20);
 		
 		idxTextField = textFieldBackground["idxTextField"];
 		idxTextField._visible = true;
@@ -347,21 +361,25 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	}
 	
 	private function addGoButton(mm:MonitorModel):Void {
-		goBtn = _buttonsPanel_mc.attachMovie("IndexButton", "goBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: btnWidth, _labelText: Dictionary.getValue('mv_search_go_btn_lbl')});
+		var generatedWidth:Number = StringUtils.getButtonWidthForStr(Dictionary.getValue('mv_search_go_btn_lbl'));
+		var goBtnWidth:Number = (generatedWidth <= untranslatedWidth) ? btnWidth : generatedWidth + btnSpacing;
+		goBtn = _buttonsPanel_mc.attachMovie("IndexButton", "goBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: goBtnWidth, _labelText: Dictionary.getValue('mv_search_go_btn_lbl')});
 		_indexButton = IndexButton(goBtn);
 		_indexButton.init(mm, undefined);
 		_indexButton.btnType = "Go";
 		goBtn._x = nextPosition;
-		nextPosition += (btnWidth);
+		nextPosition += (goBtnWidth);
 	}
 	
 	private function addIndexViewButton(mm:MonitorModel):Void {
-		indexViewBtn = _buttonsPanel_mc.attachMovie("IndexButton", "indexViewBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: (btnWidth * 2), _labelText: Dictionary.getValue('mv_search_index_view_btn_lbl')});
+		var generatedWidth:Number = StringUtils.getButtonWidthForStr(Dictionary.getValue('mv_search_index_view_btn_lbl'));
+		var indexViewBtnWidth:Number = (generatedWidth <= untranslatedWidth) ? 84 : generatedWidth + btnSpacing;
+		indexViewBtn = _buttonsPanel_mc.attachMovie("IndexButton", "indexViewBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: indexViewBtnWidth, _labelText: Dictionary.getValue('mv_search_index_view_btn_lbl')});
 		_indexButton = IndexButton(indexViewBtn);
 		_indexButton.init(mm, undefined);
 		_indexButton.btnType = "IndexView";
 		indexViewBtn._x = nextPosition;
-		nextPosition += (btnWidth * 2);
+		nextPosition += indexViewBtnWidth;
 	}
 
 	private function setPosition(mm:MonitorModel):Void{		
