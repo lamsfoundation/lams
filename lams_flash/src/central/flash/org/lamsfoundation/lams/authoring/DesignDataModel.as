@@ -554,6 +554,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		for(var i=0; i<design.branchMappings.length;i++){
 			var mdto = design.branchMappings[i];
 			var newMappingEntry:BranchActivityEntry;
+			
+			Debugger.log("Branch Mapping groupUIID: " + mdto.groupUIID, Debugger.CRITICAL, "setDesign", "DDM");
+			
 			if(mdto.groupUIID != null) {
 				newMappingEntry = new GroupBranchActivityEntry(mdto.entryID, mdto.entryUIID, getGroupByUIID(mdto.groupUIID), SequenceActivity(getActivityByUIID(mdto.sequenceActivityUIID)), BranchingActivity(getActivityByUIID(mdto.branchingActivityUIID)));
 			} else if(mdto.condition != null) {
@@ -804,18 +807,17 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		design.branchMappings = new Array();
 		var classMappingEntries = _branchMappings.values();
 		
-		if(classMappingEntries.length > 0) {
-			for(var i=0; i<classMappingEntries.length; i++) {
+		if(classMappingEntries.length > 0)
+			for(var i=0; i<classMappingEntries.length; i++)
 				if((classMappingEntries[i].branchingActivity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE 
 						&& classMappingEntries[i].group != null) ||
 					(classMappingEntries[i].branchingActivity.activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE 
 						&& classMappingEntries[i].condition != null 
-						&& classMappingEntries[i].condition.toolActivity.activityUIID == classMappingEntries[i].branchingActivity.toolActivityUIID)) {
+						&& classMappingEntries[i].condition.toolActivity.activityUIID == classMappingEntries[i].branchingActivity.toolActivityUIID) || 
+					(classMappingEntries[i].branchingActivity.activityTypeID == Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE
+						&& classMappingEntries[i].group != null))
 					design.branchMappings.push(classMappingEntries[i].toData());
-				}
-			}
-		}
-		
+					
 		return design;
 	}
 	
