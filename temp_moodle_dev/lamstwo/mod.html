@@ -43,7 +43,8 @@ if (!isset($form->create_sequence_url)) {
 <!-- ?php print_groupmode_setting($form); ? -->
 
 <?php
-	if ($_GET['update']){
+
+	if (isset($_GET['update'])){
 		echo '<div id="step1" align="center" style="display:none">';
 	}else{
 		echo '<div id="step1" align="center">';
@@ -92,7 +93,7 @@ if (!isset($form->create_sequence_url)) {
 </div>
 
 <?php
-	if ($_GET['update']){
+	if (isset($_GET['update'])){
 		echo '<div id="step2" align="center">';
 	}else{
 		echo '<div id="step2" align="center" style="display:none">';
@@ -101,8 +102,8 @@ if (!isset($form->create_sequence_url)) {
 <table cellpadding="5">
 <tr>
 	<td align="left">
-		<b><?php if($_GET['update']) print_string("update","lamstwo"); else print_string("confirm", "lamstwo") ?></b><br />
-		<p><?php if($_GET['update']) print_string("updateExplanation","lamstwo"); else print_string("confirmExplanation", "lamstwo") ?></p>
+		<b><?php if(isset($_GET['update'])) print_string("update","lamstwo"); else print_string("confirm", "lamstwo") ?></b><br />
+		<p><?php if(isset($_GET['update'])) print_string("updateExplanation","lamstwo"); else print_string("confirmExplanation", "lamstwo") ?></p>
 	</td>
 </tr>	
 <tr>
@@ -147,7 +148,7 @@ if (!isset($form->create_sequence_url)) {
 								<td align="left">
 									<?php 
 										$disabled = '';
-										if ($_GET['update']!=null) {
+									   if (!isset($_GET['update'])){
 											$disabled = "disabled='disabled'";
 										}
 									?>
@@ -252,7 +253,7 @@ if (!isset($form->create_sequence_url)) {
 	<td align="center">
 		<input type="submit" id="cancel" name=cancel value="<?php  print_string("cancel") ?>">
 		<input type="button" id="prev" name="prev" value="<?php print_string("prev", "lamstwo") ?>" onClick="javascript:prevStep()" disabled="<?php echo $_GET['update']!=null ?>" />
-		<input type="submit" id="save2" name="save" value="<?php if($_GET['update']) print_string("savechanges");else print_string("startnow", "lamstwo") ?>" onClick="javascript:return validate()" />
+		<input type="submit" id="save2" name="save" value="<?php if(isset($_GET['update'])) print_string("savechanges");else print_string("startnow", "lamstwo") ?>" onClick="javascript:return validate()" />
 	</td>
 </tr>
 </table>

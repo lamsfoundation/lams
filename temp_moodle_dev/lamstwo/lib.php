@@ -255,7 +255,7 @@ function lamstwo_get_sequences_rest($username,$courseid,$country,$lang) {
 
       $xml = utf8_encode($xml);
 
-      $domdoc = new XML();
+      $domdoc = new LAMSTWO_XML();
       $domdoc->parseXML($xml);
       $root = $domdoc->firstChild;
       return lamstwo_process_node($root) . ']';
@@ -277,6 +277,8 @@ function lamstwo_get_sequences_rest($username,$courseid,$country,$lang) {
  */
 function lamstwo_process_node($node) {
 
+	 $output = '';
+	 
 	 if ($node->nodeName == 'Folder') {
 
 	    $folder_name = preg_replace("/'/", "$1\'", $node->getAttribute('name'));

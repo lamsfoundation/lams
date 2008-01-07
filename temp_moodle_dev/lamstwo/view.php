@@ -31,6 +31,7 @@ add_to_log($course->id, "lamstwo", "view", "view.php?id=$cm->id", "$lamstwo->id"
 //if ($course->category) {
 //    $navigation = "<A HREF=\"../../course/view.php?id=$course->id\">$course->shortname</A> ->";
 //}
+$strchoices = get_string("modulenameplural", "lamstwo");
 print_header_simple(format_string($lamstwo->name), "",
         "<a href=\"index.php?id=$course->id\">$strchoices</a> -> ".format_string($lamstwo->name), "", "", true,
         update_module_button($cm->id, $course->id, get_string("lesson","lamstwo")), navmenu($course, $cm));

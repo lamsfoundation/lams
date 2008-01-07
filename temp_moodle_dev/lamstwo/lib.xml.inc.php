@@ -21,14 +21,19 @@
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
+
+	Modify on 07-Jan-2008 to avoid collision with constants introduced by other 
+   	PHP libraries added in Moodle 1.9.x
+
+
 	***************************************************************************/	
 
 	// Define element type constants
-	define('XML_ELEMENT_NODE', 1);
-	define('XML_TEXT_NODE', 3);
-	define('XML_CDATA_SECTION_NODE', 4);
-	define('XML_COMMENT_NODE', 8);
-	define('XML_DOCUMENT_NODE', 9);
+	define('LAMSTWO_XML_ELEMENT_NODE', 1);
+	define('LAMSTWO_XML_TEXT_NODE', 3);
+	define('LAMSTWO_XML_CDATA_SECTION_NODE', 4);
+	define('LAMSTWO_XML_COMMENT_NODE', 8);
+	define('LAMSTWO_XML_DOCUMENT_NODE', 9);
 
 	// Define exceptions codes
 	define('XML_INDEX_SIZE_ERR', 1);
@@ -288,7 +293,7 @@
 		function XML_Element($tagName) {
 			$this->XML_Node();
 			$this->nodeName = $tagName;
-			$this->nodeType = XML_ELEMENT_NODE;
+			$this->nodeType = LAMSTWO_XML_ELEMENT_NODE;
 		}
 
 		// Retrieves an attribute value by name
@@ -472,7 +477,7 @@
 
 			$this->nodeName = '#comment';
 			$this->nodeValue = $comment;
-			$this->nodeType = XML_COMMENT_NODE;
+			$this->nodeType = LAMSTWO_XML_COMMENT_NODE;
 		}
 
 		function toString($pretty = false, $tabs = '') {
@@ -506,7 +511,7 @@
 			
 			$this->nodeName = '#text';
 			$this->nodeValue = $text;
-			$this->nodeType = XML_TEXT_NODE;
+			$this->nodeType = LAMSTWO_XML_TEXT_NODE;
 		}
 
 		function splitText($offset) {
@@ -541,7 +546,7 @@
 		function XML_CDATASection($data) {
 			$this->nodeName = '#cdata-section';
 			$this->nodeValue = $data;
-			$this->nodeType = XML_CDATA_SECTION_NODE;
+			$this->nodeType = LAMSTWO_XML_CDATA_SECTION_NODE;
 		}
 
 		function toString($pretty = false, $tabs = '') {
@@ -571,7 +576,7 @@
 		function XML_Document() {
 			$this->XML_Node();
 			$this->nodeName = '#document';
-			$this->nodeType = XML_DOCUMENT_NODE;
+			$this->nodeType = LAMSTWO_XML_DOCUMENT_NODE;
 		}
 
 		function &createCDATASection($data) {
@@ -651,10 +656,10 @@
 	 *
 	 * @package phpdomxml
 	 */
-	class XML extends XML_Document {
+	class LAMSTWO_XML extends XML_Document {
 
 		// Constructor
-		function XML($url = '') {
+		function LAMSTWO_XML($url = '') {
 
 			// call parent's constructor
 			$this->XML_Document();
