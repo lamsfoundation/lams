@@ -157,6 +157,7 @@
 		    AND (lams_user_group.user_id = :userId)
 		    AND ({lesson}.learning_design_id = lams_learning_design.learning_design_id)
 		    AND (lams_learning_design.copy_type_id=2)
+		    AND (lams_group.group_id != lams_grouping.staff_group_id)
 		    AND ({lesson}.organisation_id = :organisationId)
 	</sql-query>
 
@@ -175,6 +176,7 @@
 		    AND (lams_user_group.user_id = :userId)
 		    AND ({lesson}.learning_design_id = lams_learning_design.learning_design_id)
 		    AND (lams_learning_design.copy_type_id=2)
+		    AND (lams_group.group_id != lams_grouping.staff_group_id)
 	</sql-query>
 	
 	<sql-query name="activeLearners">
