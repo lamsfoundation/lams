@@ -78,7 +78,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </p>
 
 <p>
-	<html:checkbox property="lockWhenFinished" value="1" styleId="lockWhenFinished"
+	<html:checkbox property="lockWhenFinished" value="0" styleId="lockWhenFinished"
 		styleClass="noBorder">
 	</html:checkbox>
 	<label for="lockWhenFinished">
