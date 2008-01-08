@@ -31,12 +31,12 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Expression;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -102,7 +102,6 @@ public class LessonDAO extends BaseDAO implements ILessonDAO
     
      /**
      * Gets all lessons that are active for a learner.
-     * TODO remove when the dummy interface is no longer needed. Replaced with getActiveLessonsForLearner(user,org)
      * @param learner a User that identifies the learner.
      * @return a List with all active lessons in it.
      */
@@ -276,6 +275,30 @@ public class LessonDAO extends BaseDAO implements ILessonDAO
             return query.uniqueResult();
            }
        });
+   }
+   
+   /**
+    * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonsByOrgAndUserWithCompletedFlag(Integer, Integer, boolean)
+    */
+   public List getLessonsByOrgAndUserWithCompletedFlag(final Integer userId, final Integer orgId, final boolean isStaff)
+   {
+	   List dtos = null;
+   	
+       HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+       dtos = (List)hibernateTemplate.execute(
+           new HibernateCallback() {
+               public Object doInHibernate(Session session) throws HibernateException {
+       	    	Query query = session.getNamedQuery( 
+       	    		isStaff ? "staffLessonsByOrgAndUserWithCompletedFlag" : "learnerLessonsByOrgAndUserWithCompletedFlag"
+       	    	);
+       	    	query.setInteger("userId", userId.intValue());
+       	    	query.setInteger("orgId", orgId.intValue());
+       	    	List result = query.list();
+                   return result;
+               }
+           }
+       );
+       return dtos;
    }
 
 }

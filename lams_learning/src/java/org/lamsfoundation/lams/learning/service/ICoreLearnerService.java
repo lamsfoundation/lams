@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.learning.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -38,6 +39,7 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.IndexLessonBean;
 /**
  *
  * All Learner service methods that are available within the core. These methods may require
@@ -279,4 +281,12 @@ public interface ICoreLearnerService extends ILearnerService
      */
     public SequenceActivity selectBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId, Long branchId) throws LearnerServiceException;
 
+    /**
+     * Returns map of lessons in an organisation for a particular learner or staff user.
+     * @param userId user's id
+     * @param orgId org's id
+     * @param isStaff return lessons where user is staff, or where user is learner
+     * @return map of lesson beans used in the index page
+     */
+    public Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, boolean isStaff);
 }

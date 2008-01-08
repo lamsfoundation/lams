@@ -39,11 +39,11 @@ import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
@@ -68,6 +68,7 @@ import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.IndexLessonBean;
 /**
  * This class is a facade over the Learning middle tier.
  * @author chris, Jacky Fang
@@ -939,5 +940,30 @@ public class LearnerService implements ICoreLearnerService
 	public void setProgressEngine(ProgressEngine progressEngine) {
 		this.progressEngine = progressEngine;
 	}
+	
+	
+	public Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, boolean isStaff)
+    {
+		HashMap<Long, IndexLessonBean> map = new HashMap<Long, IndexLessonBean>();
+        List list = this.lessonDAO.getLessonsByOrgAndUserWithCompletedFlag(userId, orgId, isStaff);
+        if (list != null) {
+        	Iterator iterator = list.iterator();
+        	while (iterator.hasNext()) {
+        		Object[] tuple = (Object[])iterator.next();
+        		Long lessonId = (Long)tuple[0];
+        		String lessonName = (String)tuple[1];
+        		String lessonDescription = (String)tuple[2];
+        		Integer lessonState = (Integer)tuple[3];
+        		Boolean lessonCompleted = (Boolean)tuple[4];
+    			IndexLessonBean bean = new IndexLessonBean(
+    				lessonId, lessonName, lessonDescription, lessonState, (
+    					lessonCompleted == null ? false : lessonCompleted.booleanValue()
+    				)
+    			);
+    			map.put(new Long(lessonId), bean);
+    		}
+        }
+        return map;	
+    }
 
 }
