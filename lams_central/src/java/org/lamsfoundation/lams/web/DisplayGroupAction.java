@@ -40,8 +40,11 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.index.IndexLessonBean;
+import org.lamsfoundation.lams.index.IndexLinkBean;
+import org.lamsfoundation.lams.index.IndexOrgBean;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.LessonService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -66,7 +69,7 @@ public class DisplayGroupAction extends Action {
 
 	private static Logger log = Logger.getLogger(DisplayGroupAction.class);
 	private static IUserManagementService service;
-	private static ICoreLearnerService learnerService;
+	private static LessonService lessonService;
 	private Integer stateId = OrganisationState.ACTIVE;
 	
 	@SuppressWarnings({"unchecked"})
@@ -204,7 +207,7 @@ public class DisplayGroupAction extends Action {
 		throws SQLException, NamingException {
 		
 		// iterate through user's lessons where they are learner
-		Map<Long, IndexLessonBean> map = getLearnerService().getLessonsByOrgAndUserWithCompletedFlag(userId, orgId, false);
+		Map<Long, IndexLessonBean> map = getLessonService().getLessonsByOrgAndUserWithCompletedFlag(userId, orgId, false);
 		for (IndexLessonBean bean : map.values()) {
 			List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
 			String url = null;
@@ -229,7 +232,7 @@ public class DisplayGroupAction extends Action {
 		}
 		
 		// iterate through user's lessons where they are staff, and add staff links to the beans in the map.
-		Map<Long, IndexLessonBean> staffMap = getLearnerService().getLessonsByOrgAndUserWithCompletedFlag(userId, orgId, true);
+		Map<Long, IndexLessonBean> staffMap = getLessonService().getLessonsByOrgAndUserWithCompletedFlag(userId, orgId, true);
 		for (IndexLessonBean bean : staffMap.values()) {
 			if (map.containsKey(bean.getId())) {
 				bean = map.get(bean.getId());
@@ -270,12 +273,12 @@ public class DisplayGroupAction extends Action {
 		return service;
 	}
 	
-	private ICoreLearnerService getLearnerService(){
-		if(learnerService==null){
+	private LessonService getLessonService(){
+		if(lessonService==null){
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
+			lessonService = (LessonService) ctx.getBean("lessonService");
 		}
-		return learnerService;
+		return lessonService;
 	}
 }
  

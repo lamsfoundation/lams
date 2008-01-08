@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.lamsfoundation.lams.web.IndexLessonBean;
+import org.lamsfoundation.lams.index.IndexLessonBean;
  
 /**
  * @author jliew

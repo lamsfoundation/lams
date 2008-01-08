@@ -26,7 +26,9 @@ package org.lamsfoundation.lams.lesson.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -256,4 +258,13 @@ public interface ILessonService {
 	 * system activities such as branching.
 	 */
 	public Integer getCountLearnersHaveCompletedActivity(Activity activity) throws LessonServiceException;
+	
+	/**
+     * Returns map of lessons in an organisation for a particular learner or staff user.
+     * @param userId user's id
+     * @param orgId org's id
+     * @param isStaff return lessons where user is staff, or where user is learner
+     * @return map of lesson beans used in the index page
+     */
+    public Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, boolean isStaff);
 }

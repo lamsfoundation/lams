@@ -25,13 +25,16 @@
 package org.lamsfoundation.lams.lesson.service;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouper;
@@ -47,8 +50,6 @@ import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
-import org.lamsfoundation.lams.tool.ToolSession;
-import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.MessageService;
 
@@ -637,4 +638,27 @@ public class LessonService implements ILessonService
 		public Integer getCountLearnersHaveCompletedActivity(Activity activity) throws LessonServiceException {
 			return learnerProgressDAO.getNumUsersCompletedActivity(activity);
 		}
+		
+		public Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, boolean isStaff) {
+			HashMap<Long, IndexLessonBean> map = new HashMap<Long, IndexLessonBean>();
+	        List list = this.lessonDAO.getLessonsByOrgAndUserWithCompletedFlag(userId, orgId, isStaff);
+	        if (list != null) {
+	        	Iterator iterator = list.iterator();
+	        	while (iterator.hasNext()) {
+	        		Object[] tuple = (Object[])iterator.next();
+	        		Long lessonId = (Long)tuple[0];
+	        		String lessonName = (String)tuple[1];
+	        		String lessonDescription = (String)tuple[2];
+	        		Integer lessonState = (Integer)tuple[3];
+	        		Boolean lessonCompleted = (Boolean)tuple[4];
+	    			IndexLessonBean bean = new IndexLessonBean(
+	    				lessonId, lessonName, lessonDescription, lessonState, (
+	    					lessonCompleted == null ? false : lessonCompleted.booleanValue()
+	    				)
+	    			);
+	    			map.put(new Long(lessonId), bean);
+	    		}
+	        }
+	        return map;	
+	    }
 }

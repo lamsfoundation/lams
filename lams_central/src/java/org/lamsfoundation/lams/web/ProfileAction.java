@@ -37,6 +37,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.index.IndexLessonBean;
+import org.lamsfoundation.lams.index.IndexOrgBean;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.Organisation;

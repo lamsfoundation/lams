@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-package org.lamsfoundation.lams.web;
+package org.lamsfoundation.lams.index;
 
 /**
  * @version
