@@ -193,6 +193,9 @@
 				<include name="license.txt" />
 				<include name="release_notes.txt" />
 			</fileset>
+			<fileset dir="${basedir}/web/lib/tigra">
+				<include name="tree_tpl.js" />
+			</fileset>
 		</copy>
 		
 		<zip destfile="${package}/${product}-${version}.zip"
