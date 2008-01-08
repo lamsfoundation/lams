@@ -185,7 +185,7 @@ public class ImportService implements IImportService {
 		int startRow = sheet.getFirstRowNum();
 		int endRow = sheet.getLastRowNum();
 		
-		log.debug("sheet rows: "+startRow+".."+endRow);
+		log.debug("Parsing spreadsheet rows "+startRow+" through "+endRow);
 		
 		HSSFRow row;
 		Organisation org = null;
@@ -201,12 +201,12 @@ public class ImportService implements IImportService {
 			
 			// an empty row signifies a new group
 			if (emptyRow) {
-				log.debug("emptyRow: "+emptyRow);
+				log.debug("Row "+i+" is empty.");
 				parentOrg = service.getRootOrganisation();
 				continue;
 			}
 			if (hasError) {
-				log.debug("hasError: "+hasError);
+				log.debug("Row "+i+" has an error which has been sent to the browser.");
 				results.add(rowResult);
 				continue;
 			} else {
@@ -223,7 +223,7 @@ public class ImportService implements IImportService {
 				results.add(rowResult);
 			}
 		}
-		log.debug("found "+results.size()+" orgs in spreadsheet.");
+		log.debug("Found "+results.size()+" orgs in spreadsheet.");
 		return results;
 	}
 	
@@ -422,12 +422,11 @@ public class ImportService implements IImportService {
 		setupImportStatus(sessionId, endRow-startRow);
 		UserDTO userDTO = (UserDTO)SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
 		
-		log.debug("sheet rows: "+startRow+".."+endRow);
+		log.debug("Parsing spreadsheet rows "+startRow+" through "+endRow);
 		
 		HSSFRow row;
 		User user = null;
 		for (int i = startRow + 1; i < endRow + 1; i++) {
-			log.debug("starting row: "+i);
 			emptyRow = true;
 			hasError = false;
 			rowResult = new ArrayList<String>();
@@ -435,11 +434,11 @@ public class ImportService implements IImportService {
 			user = parseUser(row, i);
 			
 			if (emptyRow) {
-				log.debug("emptyRow: "+emptyRow);
+				log.debug("Row "+i+" is empty.");
 				break;
 			}
 			if (hasError) {
-				log.debug("hasError: "+hasError);
+				log.debug("Row "+i+" has an error which has been sent to the browser.");
 				results.add(rowResult);
 				updateImportStatus(sessionId, results.size());
 				continue;
@@ -447,17 +446,19 @@ public class ImportService implements IImportService {
 				try {
 					service.save(user);
 					writeAuditLog(user, userDTO);
-					log.debug("saved user: "+user.getUserId());
+					log.debug("Row "+i+" saved user: "+user.getLogin());
 				} catch (Exception e) {
 					log.debug(e);
 					rowResult.add(messageService.getMessage("error.fail.add"));
 				}
-				log.debug("rowResult size: "+rowResult.size());
+				if (rowResult.size() > 0 && log.isDebugEnabled()) {
+					log.debug("Row "+i+" has "+rowResult.size() + " messages.");
+				}
 				results.add(rowResult);
 				updateImportStatus(sessionId, results.size());
 			}
 		}
-		log.debug("found "+results.size()+" users in spreadsheet.");
+		log.debug("Found "+results.size()+" users in spreadsheet.");
 		return results;
 	}
 	
@@ -481,14 +482,13 @@ public class ImportService implements IImportService {
 		int startRow = sheet.getFirstRowNum();
 		int endRow = sheet.getLastRowNum();
 		
-		log.debug("sheet rows: "+startRow+".."+endRow);
+		log.debug("Parsing spreadsheet rows "+startRow+" through "+endRow);
 		
 		setupImportStatus(sessionId, endRow-startRow);
 		
 		HSSFRow row;
 		List<String> roles;
 		for (int i = startRow + 1; i < endRow + 1; i++) {
-			log.debug("starting row: "+i);
 			emptyRow = true;
 			hasError = false;
 			rowResult = new ArrayList<String>();
@@ -499,11 +499,11 @@ public class ImportService implements IImportService {
 			roles = parseRolesCell(row.getCell(ROLES));
 			
 			if (emptyRow) {
-				log.debug("emptyRow: "+emptyRow);
+				log.debug("Row "+i+" is empty.");
 				break;
 			}
 			if (hasError) {
-				log.debug("hasError: "+hasError);
+				log.debug("Row "+i+" has an error which has been sent to the browser.");
 				results.add(rowResult);
 				updateImportStatus(sessionId, results.size());
 				continue;
@@ -514,12 +514,14 @@ public class ImportService implements IImportService {
 					log.error("Unable to assign roles to user: "+login, e);
 					rowResult.add(messageService.getMessage("error.fail.add"));
 				}
-				log.debug("rowResult size: "+rowResult.size());
+				if (rowResult.size() > 0 && log.isDebugEnabled()) {
+					log.debug("Row "+i+" has "+rowResult.size() + " messages.");
+				}
 				results.add(rowResult);
 				updateImportStatus(sessionId, results.size());
 			}
 		}
-		log.debug("found "+results.size()+" users in spreadsheet.");
+		log.debug("Found "+results.size()+" users in spreadsheet.");
 		return results;
 	}
 	
@@ -568,7 +570,9 @@ public class ImportService implements IImportService {
 		
 		if (!hasError) {
 			service.setRolesForUserOrganisation(user, org.getOrganisationId(), roles);
-			log.debug("added: "+login+" to: "+org.getName()+" with roles: "+roles);
+			if (log.isDebugEnabled()) {
+				log.debug("added: "+login+" to: "+org.getName()+" with roles: "+roles);
+			}
 		}
 	}
 	
@@ -726,13 +730,13 @@ public class ImportService implements IImportService {
 				} else {
 					return null;
 				}
-				log.debug("string cell value: '"+cell.getStringCellValue().trim()+"'");
+				// log.debug("string cell value: '"+cell.getStringCellValue().trim()+"'");
 				return cell.getStringCellValue().trim();
 			} catch(Exception e) {
 				cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
 				double d = cell.getNumericCellValue();
 				emptyRow = false;
-				log.debug("numeric cell value: '"+d+"'");
+				// log.debug("numeric cell value: '"+d+"'");
 				return (new Long(new Double(d).longValue()).toString());
 			}
 		}
@@ -744,8 +748,13 @@ public class ImportService implements IImportService {
 		if (authMethodName==null || authMethodName=="") {
 			return (AuthenticationMethod)service.findById(AuthenticationMethod.class, AuthenticationMethod.DB);
 		} else {
-			list = service.findByProperty(AuthenticationMethod.class, "authenticationMethodName", authMethodName);
-			return (list==null || list.isEmpty() ? null : (AuthenticationMethod)list.get(0));
+			try {
+				Integer authMethodId = new Integer(authMethodName);
+				return (AuthenticationMethod)service.findById(AuthenticationMethod.class, authMethodId);
+			} catch (NumberFormatException e) {
+				list = service.findByProperty(AuthenticationMethod.class, "authenticationMethodName", authMethodName);
+				return ( list==null || list.isEmpty() ? null : (AuthenticationMethod)list.get(0));
+			}
 		}
 	}
 	
@@ -758,20 +767,20 @@ public class ImportService implements IImportService {
 				if (cell.getStringCellValue()!= null || cell.getStringCellValue().trim().length()!= 0) {
 					emptyRow = false;
 				} else {
-					log.debug("role cell is null");
+					log.debug("Couldn't find any roles in spreadsheet column index " + ROLES);
 					return null;
 				}
 				roleDescription = cell.getStringCellValue().trim();
 			} catch(Exception e) {
-				log.debug("role cell exception");
+				log.error("Caught exception when reading roles in spreadsheet: " + e.getMessage());
 				return null;
 			}
 			List<String> roles = new ArrayList<String>();
 			int fromIndex = 0;
 			int index = roleDescription.indexOf(SEPARATOR, fromIndex);
 			while (index != -1) {
-				log.debug("using role name: "+roleDescription.substring(fromIndex, index));
 				String role = addRoleId(roleDescription, fromIndex, index);
+				log.debug("Found role: "+role);
 				if (role==null) {
 					return null;
 				} else {
@@ -780,8 +789,8 @@ public class ImportService implements IImportService {
 				fromIndex = index + 1;
 				index = roleDescription.indexOf(SEPARATOR, fromIndex);
 			}
-			log.debug("using rolee name: "+roleDescription.substring(fromIndex, roleDescription.length()));
 			String role = addRoleId(roleDescription, fromIndex, roleDescription.length());
+			log.debug("Found last role: "+role);
 			if (role==null) {
 				return null;
 			} else {
@@ -797,7 +806,6 @@ public class ImportService implements IImportService {
 		List list = service.findByProperty(Role.class, "name", roleDescription.substring(fromIndex, index));
 		Role role = (list==null || list.isEmpty() ? null : (Role)list.get(0));
 		if (role!=null) {
-			log.debug("role: "+role.getName());
 			return role.getRoleId().toString();
 		} else {
 			return null;		// if we can't translate the name to a role, return null
