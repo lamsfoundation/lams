@@ -85,6 +85,7 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 		catch (Exception e)
 		{
 			e.printStackTrace();
+			log.error("Problem getting database connection.", e);
 		}
 		
 		
