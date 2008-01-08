@@ -1,6 +1,6 @@
 FCKConfig.ToolbarSets["Default"] = [
 	['Source','-','FitWindow', 'Preview','PasteWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','OrderedList','UnorderedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyFull','TextColor','BGColor'], 
-	['Image','Link','Table','Rule','Smiley','SpecialChar','UniversalKey','FontFormat','FontName','FontSize','About']
+	['Image','Link','Table','Rule','Smiley','SpecialChar','FontFormat','FontName','FontSize','About']
 ] ;
 
 FCKConfig.ToolbarSets["Default-Learner"] = [
