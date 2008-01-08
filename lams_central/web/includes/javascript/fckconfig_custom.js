@@ -11,7 +11,7 @@ FCKConfig.ToolbarSets["Default-Learner"] = [
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
 	['About'],
 	['TextColor','BGColor'],
-	['Table','Rule','Smiley','SpecialChar','UniversalKey'],
+	['Table','Rule','Smiley','SpecialChar'],
 	['FontFormat','FontName','FontSize']
 ] ;
 
