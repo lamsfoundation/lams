@@ -160,9 +160,18 @@
   	</target>
 			
 	<target name="create-install-package" depends="package" description="creates jar file">
+		
+		<delete includeEmptyDirs="true" quiet="true">
+			<fileset dir="${package.lib}"/>
+			<fileset dir="${package.deploy}"/>
+			<fileset dir="${package.db}"/>
+		</delete>
+		
+		
 		<mkdir dir="${package.dir}"/>
 		<mkdir dir="${package.lib}"/>
 		<mkdir dir="${package.deploy}"/>
+		<mkdir dir="${package.db}"/>
 		
 		<copy todir="${package.lib}" overwrite="false">
    			<fileset dir="${lib}">
