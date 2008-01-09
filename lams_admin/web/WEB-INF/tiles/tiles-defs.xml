@@ -88,12 +88,17 @@
 	
 	<definition name=".orglist" path="/template.jsp">
 		<put name="title" value="admin.organisation.management"/>
-		<put name="content" value="orglist.jsp" />	
+		<put name="content" value="organisation/list.jsp" />	
+	</definition>
+
+	<definition name=".organisationCourseAdmin" path="/template.jsp">
+		<put name="title" value="admin.organisation.entry"/>
+		<put name="content" value="organisation/courseAdminEdit.jsp" />	
 	</definition>
 
 	<definition name=".organisation" path="/template.jsp">
 		<put name="title" value="admin.organisation.entry"/>
-		<put name="content" value="organisation.jsp" />	
+		<put name="content" value="organisation/createOrEdit.jsp" />	
 	</definition>
 
 	<definition name=".joblist" path="/template.jsp">

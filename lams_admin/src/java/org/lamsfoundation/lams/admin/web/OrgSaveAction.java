@@ -82,15 +82,16 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class OrgSaveAction extends Action {
 	
 	private static Logger log = Logger.getLogger(OrgSaveAction.class);
-
 	private static IUserManagementService service;
+	private MessageService messageService;
 
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
 		
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
+		if(service==null) service = AdminServiceProxy.getService(getServlet().getServletContext());
+		if(messageService==null) messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
 		DynaActionForm orgForm = (DynaActionForm)form;
 		Integer orgId = (Integer)orgForm.get("orgId");
 		Organisation org;
@@ -118,14 +119,20 @@ public class OrgSaveAction extends Action {
 			OrganisationState state = (OrganisationState)service.findById(OrganisationState.class,(Integer)orgForm.get("stateId"));
 
 			if(orgId!=0){
-				org = (Organisation)service.findById(Organisation.class,orgId);
-				// set archived date only when it first changes to become archived
-				if (state.getOrganisationStateId().equals(OrganisationState.ARCHIVED)
-						&& !org.getOrganisationState().getOrganisationStateId().equals(OrganisationState.ARCHIVED)) {
-					org.setArchivedDate(new Date());
+				if(service.canEditGroup(user.getUserID(), orgId)) {
+					org = (Organisation)service.findById(Organisation.class,orgId);
+					// set archived date only when it first changes to become archived
+					if (state.getOrganisationStateId().equals(OrganisationState.ARCHIVED)
+							&& !org.getOrganisationState().getOrganisationStateId().equals(OrganisationState.ARCHIVED)) {
+						org.setArchivedDate(new Date());
+					}
+					writeAuditLog(org, orgForm, state, locale);
+					BeanUtils.copyProperties(org,orgForm);
+				} else {
+					request.setAttribute("errorName", "UserAction");
+					request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
+					return mapping.findForward("error");
 				}
-				writeAuditLog(org, orgForm, state, locale);
-				BeanUtils.copyProperties(org,orgForm);
 			}else{
 				org = new Organisation();
 				BeanUtils.copyProperties(org,orgForm);
@@ -135,7 +142,9 @@ public class OrgSaveAction extends Action {
 			}
 			org.setLocale(locale);
 			org.setOrganisationState(state);
-			log.debug("orgId:"+org.getOrganisationId()+" locale:"+org.getLocale()+" create date:"+org.getCreateDate());
+			if (log.isDebugEnabled()) {
+				log.debug("orgId: "+org.getOrganisationId()+" create date: "+org.getCreateDate());
+			}
 			org = service.saveOrganisation(org, user.getUserID());
 			
 			request.setAttribute("org",orgForm.get("parentId"));

@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 				validate="false"
  * 
  * @struts:action-forward name="organisation" path=".organisation"
+ * @struts:action-forward name="organisationCourseAdmin" path=".organisationCourseAdmin"
  * @struts:action-forward name="orglist" path="/orgmanage.do"
  */
 public class OrganisationAction extends LamsDispatchAction {
@@ -94,7 +95,11 @@ public class OrganisationAction extends LamsDispatchAction {
 					}
 					request.getSession().setAttribute("locales",locales);
 					request.getSession().setAttribute("status",status);
-					return mapping.findForward("organisation");
+					if (service.isUserSysAdmin() || service.isUserGlobalGroupAdmin()) {
+						return mapping.findForward("organisation");
+					} else {
+						return mapping.findForward("organisationCourseAdmin");
+					}
 				}
 			}
 		}

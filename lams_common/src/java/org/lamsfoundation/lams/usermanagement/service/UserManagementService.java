@@ -1058,11 +1058,12 @@ public class UserManagementService implements IUserManagementService {
 		if (isUserSysAdmin() || isUserGlobalGroupAdmin()) return true;
 		Organisation org = (Organisation)findById(Organisation.class, orgId);
 		if (org != null) {
+			Integer groupId = orgId;
 			if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-				Integer parentOrgId = org.getParentOrganisation().getOrganisationId();
-				return (isUserInRole(userId, parentOrgId, Role.GROUP_ADMIN)
-						|| (isUserInRole(userId, parentOrgId, Role.GROUP_MANAGER))); 
+				groupId = org.getParentOrganisation().getOrganisationId();
 			}
+			return (isUserInRole(userId, groupId, Role.GROUP_ADMIN)
+					|| (isUserInRole(userId, groupId, Role.GROUP_MANAGER))); 
 		}
 		return false;
 	}
