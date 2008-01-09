@@ -1736,7 +1736,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     private void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson) 
     {
-    	if ( ! activity.getApplyGrouping().booleanValue() || ! isInBranch(activity, null) ) {
+    	if ( activity.getApplyGrouping().equals(Boolean.FALSE) && ! isInBranch(activity, null) ) {
     		activity.setToolSessions(new HashSet());
     		try {
     		
@@ -2106,10 +2106,20 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 				}
 				BranchingActivity branchingActivity = (BranchingActivity) getActivityById(parentActivity.getActivityId());
 				grouping = branchingActivity.getGrouping();
-				
+
+				// Need the learning design to get the next uiid - which is needed if 
+				// Live Edit is done, or Flash can't match the branch to the groups properly.
+				LearningDesign design = branchingActivity.getLearningDesign();
+
 				group = lessonService.createGroup(grouping, branch.getTitle());
-				group.allocateBranchToGroup(null, branch, (BranchingActivity)branchingActivity);
+				Integer nextUIID = new Integer(design.getMaxID().intValue()+1);
+				group.setGroupUIID(nextUIID);
+				nextUIID = new Integer(nextUIID.intValue()+1);
+				group.allocateBranchToGroup(nextUIID, branch, (BranchingActivity)branchingActivity);
 				groupingDAO.update(group);
+				
+				design.setMaxID(new Integer(nextUIID.intValue()+1));
+				learningDesignDAO.update(design);
 				
 			} else {
 				grouping = group.getGrouping();
@@ -2180,6 +2190,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 			BranchingActivity branchingActivity = (BranchingActivity) getActivityById(parentActivity.getActivityId());
 			Grouping grouping = branchingActivity.getGrouping();
 
+			LearningDesign design = branchingActivity.getLearningDesign();
+			Integer nextUIID = new Integer(design.getMaxID().intValue()+1);
+
 			for ( String groupIDString: groupIDs) {
 				Long groupID = Long.parseLong(groupIDString);
 
@@ -2196,10 +2209,13 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 					throw new MonitoringServiceException(error);
 				}
 				
-				group.allocateBranchToGroup(null, branch, branchingActivity);
+				group.allocateBranchToGroup(nextUIID, branch, branchingActivity);
 				groupingDAO.update(group);
 			}
 				
+			design.setMaxID(new Integer(nextUIID.intValue()+1));
+			learningDesignDAO.update(design);
+
 		} 
 		
 		/** Remove group / branch mapping. Cannot be done if any users in the group have started the branch. 

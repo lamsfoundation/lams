@@ -25,8 +25,6 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -41,7 +39,6 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityTitleComparator;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
