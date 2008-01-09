@@ -352,22 +352,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		//dimentions of container (this)
 		setLocking();
 			
-		if(fromModuleTab == "monitorMonitorTab") //{
+		if(fromModuleTab == "monitorMonitorTab")
 			drawLearners();
-		//} else {
-			//_canvasView.model.releaseNextFromBranchingQueue();
-		//}
-			
 		
 		Debugger.log ("I am in Draw :" + _activity.title + 'uiID:' + _activity.activityUIID + ' children:' + _children.length, Debugger.GEN, 'Draw', 'CanvasOptionalActivity');
+		
 		_visible = true;
 		
-		if(fromModuleTab == "monitorMonitorTab")
-			continue;
-			//mm.drawNext();
-		else
-			_canvasView.model.drawNext();
-
 	}
 	
 	private function setLocking():Void{

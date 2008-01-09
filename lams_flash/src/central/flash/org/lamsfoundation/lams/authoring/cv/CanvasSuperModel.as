@@ -78,12 +78,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	private var _refreshQueueCount:Number;
 	private var _branchingQueue:Array;
 	
-	private var drawCount:Number;
-	private var maxCount:Number;
-	
-	private var eventArr:Array;
-		
-	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -308,7 +302,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	private function refreshDesign(){
 	
 		Debugger.log('Running',Debugger.GEN,'refreshDesign','CanvasModel');
-		eventArr = new Array();
+		var eventArr:Array = new Array();
 		
 		if(activeRefresh) {
 			_refreshQueueCount++;
@@ -433,43 +427,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			}
 		}
 		
-		stopRefresh();
 		
 		broadcastViewUpdate("DRAW_ALL", eventArr);
+		stopRefresh();
 		
 		if(_refreshQueueCount > 0) {
 			_refreshQueueCount = 0;
 			refreshDesign();
 		}
 		
-	}
-	
-	private function drawAll(){
-		drawCount = 0;
-		
-		maxCount = eventArr.length;
-		
-		Debugger.log("drawing all activities: " + maxCount, Debugger.CRITICAL, "drawAll", "CanvasSuperModel");
-		
-		drawNext();
-	}
-	
-	public function drawNext():Void {
-		if(drawCount < maxCount) {
-			Debugger.log("drawing: " + eventArr[drawCount].updateType, Debugger.CRITICAL, "drawNext", "LearnerTabView");
-			
-			broadcastViewUpdate(eventArr[drawCount].updateType, eventArr[drawCount].data);
-			
-		} else {
-			if(_refreshQueueCount > 0) {
-				_refreshQueueCount = 0;
-				refreshDesign();
-			}
-			
-			return;
-		}
-		
-		drawCount++;
 	}
 	
 	public function createViewUpdate(updateType, data):Object {

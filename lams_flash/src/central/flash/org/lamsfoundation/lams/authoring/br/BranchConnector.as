@@ -78,7 +78,7 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 											  : new Point(toAct_mc.getActivity().xCoord + toOTC.x, toAct_mc.getActivity().yCoord + toOTC.y);
 		
 		createConnection(fromAct_mc, toAct_mc, _startPoint, _endPoint, fromOTC, toOTC);
-			
+		
 	}
 	
 	private function drawActivityless():Void {
