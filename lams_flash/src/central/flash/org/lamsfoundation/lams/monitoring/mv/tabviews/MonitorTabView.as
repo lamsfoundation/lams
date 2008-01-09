@@ -546,9 +546,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		return mm.getMonitor().ddm;
 	}
 	
+	/**
 	public function get model():MonitorModel {
 		return mm;
 	}
+	*/
 	
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned
