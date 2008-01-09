@@ -1,14 +1,10 @@
 <%@ include file="/taglibs.jsp"%>
 
-<h2>
-	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-	: <fmt:message key="admin.user.import" />
-</h2>
+<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
+<h1><fmt:message key="admin.user.import" /></h1>
 
-<p>&nbsp;</p>
-
+<p><c:out value="${successful}" /></p>
 <p>
-<c:out value="${successful}" /><br />
 <logic:iterate name="results" id="messages" indexId="index">
 	<logic:notEmpty name="messages">
 		Row <c:out value="${index+2}" />:
