@@ -189,8 +189,8 @@ public class ImportService implements IImportService {
 		
 		HSSFRow row;
 		Organisation org = null;
+		int successful = 0;
 		for (int i = startRow + 1; i < endRow + 1; i++) {
-			log.debug("starting row: "+i);
 			emptyRow = true;
 			hasError = false;
 			rowResult = new ArrayList<String>();
@@ -211,6 +211,7 @@ public class ImportService implements IImportService {
 				continue;
 			} else {
 				org = service.saveOrganisation(org, getCurrentUserId());
+				successful++;
 				rowResult.add(org.getOrganisationId().toString());
 				rowResult.add(org.getName());
 				rowResult.add(org.getParentOrganisation().getOrganisationId().toString());
@@ -224,6 +225,7 @@ public class ImportService implements IImportService {
 			}
 		}
 		log.debug("Found "+results.size()+" orgs in spreadsheet.");
+		writeSuccessAuditLog(successful, null, "audit.successful.organisation.import");
 		return results;
 	}
 	
@@ -426,6 +428,7 @@ public class ImportService implements IImportService {
 		
 		HSSFRow row;
 		User user = null;
+		int successful = 0;
 		for (int i = startRow + 1; i < endRow + 1; i++) {
 			emptyRow = true;
 			hasError = false;
@@ -440,25 +443,29 @@ public class ImportService implements IImportService {
 			if (hasError) {
 				log.debug("Row "+i+" has an error which has been sent to the browser.");
 				results.add(rowResult);
+				writeErrorsAuditLog(i+1, rowResult, userDTO);
 				updateImportStatus(sessionId, results.size());
 				continue;
 			} else {
 				try {
 					service.save(user);
+					successful++;
 					writeAuditLog(user, userDTO);
 					log.debug("Row "+i+" saved user: "+user.getLogin());
 				} catch (Exception e) {
 					log.debug(e);
 					rowResult.add(messageService.getMessage("error.fail.add"));
 				}
-				if (rowResult.size() > 0 && log.isDebugEnabled()) {
-					log.debug("Row "+i+" has "+rowResult.size() + " messages.");
+				if (rowResult.size() > 0) {
+					if (log.isDebugEnabled()) log.debug("Row "+i+" has "+rowResult.size() + " messages.");
+					writeErrorsAuditLog(i+1, rowResult, userDTO);
 				}
 				results.add(rowResult);
 				updateImportStatus(sessionId, results.size());
 			}
 		}
 		log.debug("Found "+results.size()+" users in spreadsheet.");
+		writeSuccessAuditLog(successful, userDTO, "audit.successful.user.import");
 		return results;
 	}
 	
@@ -485,9 +492,11 @@ public class ImportService implements IImportService {
 		log.debug("Parsing spreadsheet rows "+startRow+" through "+endRow);
 		
 		setupImportStatus(sessionId, endRow-startRow);
+		UserDTO userDTO = (UserDTO)SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
 		
 		HSSFRow row;
 		List<String> roles;
+		int successful = 0;
 		for (int i = startRow + 1; i < endRow + 1; i++) {
 			emptyRow = true;
 			hasError = false;
@@ -505,23 +514,27 @@ public class ImportService implements IImportService {
 			if (hasError) {
 				log.debug("Row "+i+" has an error which has been sent to the browser.");
 				results.add(rowResult);
+				writeErrorsAuditLog(i+1, rowResult, userDTO);
 				updateImportStatus(sessionId, results.size());
 				continue;
 			} else {
 				try {
 					saveUserRoles(isSysadmin(sessionId), login, orgId, roles, row);
+					successful++;
 				} catch (Exception e) {
 					log.error("Unable to assign roles to user: "+login, e);
 					rowResult.add(messageService.getMessage("error.fail.add"));
 				}
-				if (rowResult.size() > 0 && log.isDebugEnabled()) {
-					log.debug("Row "+i+" has "+rowResult.size() + " messages.");
+				if (rowResult.size() > 0) {
+					if (log.isDebugEnabled()) log.debug("Row "+i+" has "+rowResult.size() + " messages.");
+					writeErrorsAuditLog(i+1, rowResult, userDTO);
 				}
 				results.add(rowResult);
 				updateImportStatus(sessionId, results.size());
 			}
 		}
 		log.debug("Found "+results.size()+" users in spreadsheet.");
+		writeSuccessAuditLog(successful, userDTO, "audit.successful.role.import");
 		return results;
 	}
 	
@@ -899,5 +912,27 @@ public class ImportService implements IImportService {
 		args[1] = org.getOrganisationType().getName();
 		String message = messageService.getMessage("audit.organisation.create", args);
 		auditService.log(AdminConstants.MODULE_NAME, message);
+	}
+	
+	private void writeErrorsAuditLog(int row, List<String> list, UserDTO userDTO) {
+		for (String s : list) {
+			writeErrorAuditLog(row, s, userDTO);
+		}
+	}
+	
+	private void writeErrorAuditLog(int row, String error, UserDTO userDTO) {
+		String[] args = { Integer.toString(row), error };
+		String message = messageService.getMessage("audit.spreadsheet.error", args);
+		auditService.log(userDTO, AdminConstants.MODULE_NAME, message);
+	}
+	
+	private void writeSuccessAuditLog(int successful, UserDTO userDTO, String key) {
+		String[] args = { Integer.toString(successful) };
+		String message = messageService.getMessage(key, args);
+		if (userDTO == null) {
+			auditService.log(AdminConstants.MODULE_NAME, message);
+		} else {
+			auditService.log(userDTO, AdminConstants.MODULE_NAME, message);
+		}
 	}
 }
