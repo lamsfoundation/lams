@@ -221,9 +221,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
                 highlightActivity(_model);
                 break;
 			case 'DRAW_ALL' :
-				if (!MonitorModel(_model).locked){
-					drawAll(event.data, _model);
-				}
+				drawAll(event.data, _model);
 				break;
 			case 'SET_ACTIVE':
 				Debugger.log('setting activie :' + event.updateType + " event.data: " + event.data + " condition: " + (event.data == this),Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasBranchView');
@@ -291,6 +289,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			//Dispatch load event 
 			dispatchEvent({type:'load',target:this});
 		}
+		
+		if(model.isDirty)
+			model.refreshDesign();
+			
+		//model.releaseNextFromBranchingQueue();
 	}
 	
 	private function setupConnectorHubs() {
@@ -326,6 +329,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var sequenceActs:Array = (model instanceof CanvasModel) ? _cm.getCanvas().ddm.getComplexActivityChildren(activity.activityUIID) : _mm.getMonitor().ddm.getComplexActivityChildren(activity.activityUIID);
 		Debugger.log("Sequence Activities length: " + sequenceActs.length, Debugger.CRITICAL, "loadSequenceActivities", "CanvasBranchView");
 		
+		model.haltRefresh(true);
+		
 		for(var i=0; i<sequenceActs.length;  i++) {
 			Debugger.log('firstActivityUIID:' + activity.firstActivityUIID, Debugger.CRITICAL, "loadSequenceActivities", "CanvasBranchView");
 			
@@ -338,8 +343,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			
 		}
 		
+		
 		if(defaultSequenceActivity == null)
 			createInitialSequenceActivity();
+		
+		model.haltRefresh(false);
 
 	}
 	
@@ -465,8 +473,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			
 			var newActivity_mc = (_module != "monitoring") ? activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _canvasController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly()})
 															: activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children, _monitorController:cbc,_canvasBranchView:cbv,_locked:a.isReadOnly(), fromModuleTab:fromModuleTab, learnerContainer:_learnerContainer_mc});
-			
+			cm.addToBranchingQueue(newActivity_mc);
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
+			
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasBranchView');
 		}
 		else if(a.isBranchingActivity()) {	
@@ -487,7 +496,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		Debugger.log("drawing all: " + objArr.length + " model: " + model, Debugger.CRITICAL, "drawAll", "CanvasBranchView");
 				
 		for (var i=0; i<objArr.length; i++){
-			update(model, objArr[i]);
+			viewUpdate(objArr[i]);
 		}
 	}
 	

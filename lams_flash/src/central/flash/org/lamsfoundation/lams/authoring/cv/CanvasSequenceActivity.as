@@ -330,6 +330,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 			setStyles();
 		}
 		
+		if(_module == "monitoring")
+			continue;
+			//mm.drawNext();
+		else
+			_canvasModel.drawNext();
 	}
 	
 	private function localOnPress():Void{

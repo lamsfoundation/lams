@@ -270,7 +270,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		setStyles();
 		
 		_visible = true;
-					
+		
+		if(fromModuleTab == "monitorMonitorTab")
+			continue;
+			//mm.drawNext();
+		else
+			_canvasView.model.drawNext();
 	}
 	
 	private function setStyles():Void {

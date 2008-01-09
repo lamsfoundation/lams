@@ -541,6 +541,8 @@ class CanvasHelper {
 		
 		var _branchView_mc:MovieClip = target.createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
 		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
+		
+		//canvasModel.addToBranchingQueue(branchView);
 		branchView.init(canvasModel, undefined);
 		
 		//Add listener to view so that we know when it's loaded

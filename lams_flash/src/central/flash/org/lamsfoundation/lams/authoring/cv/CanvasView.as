@@ -141,6 +141,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 				Debugger.log('setting activie :' + event.updateType + " event.data: " + event.data + " condition: " + (event.data == this),Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
 				transparentCover._visible = (event.data == this) ? false : true;
 				break;
+			case 'DRAW_ALL' :
+				drawAll(event.data, cm);
+				break;
             default :
                 Debugger.log('unknown update type :' + event.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
 		}
@@ -181,6 +184,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		
         //Dispatch load event 
         dispatchEvent({type:'load',target:this});
+	}
+	
+	private function drawAll(objArr:Array, model:Observable){
+		Debugger.log("drawing all: " + objArr.length + " model: " + model, Debugger.CRITICAL, "drawAll", "CanvasView");
+				
+		for (var i=0; i<objArr.length; i++){
+			viewUpdate(objArr[i]);
+		}
 	}
 	
 	private function setDesignTitle(cm:CanvasModel){
@@ -270,7 +281,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		var cvv = CanvasView(this);
 		var cvc = getController();
 		
-		var setupBranchView:Boolean = (cm.lastBranchActionType == CanvasModel.OPEN_FROM_FILE) ? true : false;
+		var setupBranchView:Boolean = (cm.lastBranchActionType == CanvasModel.OPEN_FROM_FILE) ? false /* true */ : false;
 		
 		Debugger.log('setupBranchView:' + setupBranchView, Debugger.CRITICAL, 'drawActivity','CanvasView');
 		Debugger.log('I am in drawActivity and Activity typeID :'+a.activityTypeID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
@@ -296,7 +307,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONS_WITH_SEQUENCES_TYPE){
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
 			var newActivity_mc = activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv,_locked:a.isReadOnly()});
+			
+			//cm.addToBranchingQueue(newActivity_mc);
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
+			
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 		}
 		else if(a.isBranchingActivity()){	
@@ -485,6 +499,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	
 	public function get ddm():DesignDataModel {
 		return _cm.getCanvas().ddm;
+	}
+	
+	public function get model():CanvasModel {
+		return _cm;
 	}
 
 	/**

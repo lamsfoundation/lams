@@ -31,7 +31,6 @@ import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.dict.*;
 import mx.events.*;
 
-
 /**
  *
  * @author
@@ -75,6 +74,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	private var _lastBranchActionType:Number;
 	
 	private var _doRefresh:Boolean;
+	private var _activeRefresh:Boolean;
+	private var _refreshQueueCount:Number;
+	private var _branchingQueue:Array;
+	
+	private var drawCount:Number;
+	private var maxCount:Number;
+	
+	private var eventArr:Array;
+		
 	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -100,9 +108,44 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		
 		_doRefresh = true;
 		
+		_branchingQueue = new Array();
+		
 		 //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
 		
+	}
+	
+	public function addToBranchingQueue(a:CanvasBranchView):Void {
+		Debugger.log("adding to branching queue: " + a, Debugger.CRITICAL, "addToBranchingQueue", "CanvasSuperModel");
+		
+		_branchingQueue.push(a);
+		
+		Debugger.log("branching queue length: " + _branchingQueue.length, Debugger.CRITICAL, "addToBranchingQueue", "CanvasSuperModel");
+		
+		if(_branchingQueue.length == 1) {
+			a.init(this, undefined);
+			setupBranchingObserver(a);
+		}
+	}
+	
+	public function releaseNextFromBranchingQueue():Void {
+		if(_branchingQueue.length > 0) {
+			_branchingQueue.shift();
+		
+		if(_branchingQueue[0] instanceof CanvasBranchView) {
+				CanvasBranchView(_branchingQueue[0]).init(this, undefined); 
+				setupBranchingObserver(CanvasBranchView(_branchingQueue[0]));
+			} else {
+				CanvasOptionalActivity(_branchingQueue[0]).init();
+			}
+		}
+	}
+	
+	private function setupBranchingObserver(a:CanvasBranchView):Void {
+		//Add listener to view so that we know when it's loaded
+        a.addEventListener('load', Proxy.create(_cv, _cv.viewLoaded));
+		
+		this.addObserver(a);
 	}
 	
 	public function lockAllComplexActivities():Void{
@@ -114,7 +157,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			}
 		}
 	}
-	
 	
 	public function unlockAllComplexActivities():Void{
 		Debugger.log("Unlocking all Complex Activities", Debugger.GEN, "unlockAllComplexActivities", "CanvasModel");
@@ -153,7 +195,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		_activeTool = "none";
 	}
 	
-	
 	/**
 	 * Resets the transition tool to its starting state, e.g. if one chas been created or the user released the mouse over an unsuitable clip
 	 * @usage   
@@ -171,7 +212,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		}
 	}
 	
-		
 	////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////       REFRESHING DESIGNS       /////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -268,6 +308,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	private function refreshDesign(){
 	
 		Debugger.log('Running',Debugger.GEN,'refreshDesign','CanvasModel');
+		eventArr = new Array();
+		
+		if(activeRefresh) {
+			_refreshQueueCount++;
+			return;
+		}
+		
+		startRefresh();
 		
 		//go through the design and see what has changed, compare DDM to canvasModel
 		var ddmActivity_keys:Array = _cv.ddm.activities.keys();
@@ -306,20 +354,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			if(r_activity == "NEW"){
 				//draw this activity
 				//NOTE!: we are passing in a ref to the activity in the ddm so if we change any props of this, we are changing the ddm
-				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity);
+				eventArr.push(createViewUpdate("DRAW_ACTIVITY",ddm_activity));
 
 			}else if(r_activity == "NEW_SEQ_CHILD"){
-				broadcastViewUpdate("DRAW_ACTIVITY_SEQ",ddm_activity);
+				eventArr.push(createViewUpdate("DRAW_ACTIVITY_SEQ",ddm_activity));
 			}else if(r_activity == "DELETE"){
 				//remove this activity
 				if(cm_activity.parentUIID == null){
-					broadcastViewUpdate("REMOVE_ACTIVITY", cm_activity);
+					eventArr.push(createViewUpdate("REMOVE_ACTIVITY", cm_activity));
 				}
 			}else if(r_activity == "CHILD"){
 				//dont ask the view to draw the activity if it is a child act				
 				Debugger.log('Found a child activity, not drawing. activityID:'+ddm_activity.activityID+'parentID:'+ddm_activity.parentActivityID,Debugger.GEN,'refreshDesign','CanvasModel');
 			}else if(r_activity == "SEQ"){
-				broadcastViewUpdate("ADD_SEQUENCE", ddm_activity);
+				eventArr.push(createViewUpdate("ADD_SEQUENCE", ddm_activity));
 			}
 		}
 		
@@ -348,9 +396,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			
 			if(r_transition == "NEW"){
 				//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
-				broadcastViewUpdate("DRAW_TRANSITION",ddmTransition);
+				eventArr.push(createViewUpdate("DRAW_TRANSITION", ddmTransition));
 			}else if(r_transition == "DELETE"){
-				broadcastViewUpdate("REMOVE_TRANSITION",cmTransition);
+				eventArr.push(createViewUpdate("REMOVE_TRANSITION", cmTransition));
 			}
 		}
 		
@@ -379,11 +427,61 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			
 			if(r_branch == "NEW"){
 				//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
-				broadcastViewUpdate("DRAW_BRANCH", ddmBranch);
+				eventArr.push(createViewUpdate("DRAW_BRANCH", ddmBranch));
 			}else if(r_branch == "DELETE"){
-				broadcastViewUpdate("REMOVE_BRANCH",cmBranch);
+				eventArr.push(createViewUpdate("REMOVE_BRANCH",cmBranch));
 			}
 		}
+		
+		stopRefresh();
+		
+		broadcastViewUpdate("DRAW_ALL", eventArr);
+		
+		if(_refreshQueueCount > 0) {
+			_refreshQueueCount = 0;
+			refreshDesign();
+		}
+		
+	}
+	
+	private function drawAll(){
+		drawCount = 0;
+		
+		maxCount = eventArr.length;
+		
+		Debugger.log("drawing all activities: " + maxCount, Debugger.CRITICAL, "drawAll", "CanvasSuperModel");
+		
+		drawNext();
+	}
+	
+	public function drawNext():Void {
+		if(drawCount < maxCount) {
+			Debugger.log("drawing: " + eventArr[drawCount].updateType, Debugger.CRITICAL, "drawNext", "LearnerTabView");
+			
+			broadcastViewUpdate(eventArr[drawCount].updateType, eventArr[drawCount].data);
+			
+		} else {
+			if(_refreshQueueCount > 0) {
+				_refreshQueueCount = 0;
+				refreshDesign();
+			}
+			
+			return;
+		}
+		
+		drawCount++;
+	}
+	
+	public function createViewUpdate(updateType, data):Object {
+		setChanged();
+		
+		//send an update
+		infoObj = {};
+		infoObj.target = this;
+		infoObj.updateType = updateType;
+		infoObj.data = data;
+		
+		return infoObj;
 	}
 	
 	/**
@@ -393,8 +491,25 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
         dispatchEvent({type:'viewUpdate',target:this,updateType:_updateType,data:_data});
     }
 	
+	public function startRefresh():Void {
+		_activeRefresh = true;
+		_refreshQueueCount = 0;
+	}
+	
+	public function stopRefresh():Void {
+		_activeRefresh = false;
+	}
+	
+	public function get activeRefresh():Boolean {
+		return _activeRefresh;
+	}
+	
 	public function haltRefresh(a:Boolean):Void {
 		_doRefresh = !a;
+	}
+	
+	public function get isDirty() {
+		return _isDirty;
 	}
 	
 	public function setDirty(){

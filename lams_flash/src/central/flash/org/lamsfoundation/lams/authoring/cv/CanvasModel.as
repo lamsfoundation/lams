@@ -1147,5 +1147,5 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		
 		_lastBranchActionType = null;
 	}
-	
+
 }
