@@ -63,6 +63,12 @@ import org.w3c.dom.Node;
  * <li>FileUpload: Send a new file to the server (must be sent with a POST)
  * </ul>
  *
+ * This servlet has been modified for LAMS to support the lams_www/secure/[design folder] format. The design folder is
+ * a folder with a unique numeric name. Whenever a new design is created (using "New" in the client), a new design
+ * folder name is assigned. The [design folder] is passed in as DesignFolder and the CurrentFolder is the folder within 
+ * the DesignFolder (but not the type folder). This support the multi-level folders that are available in the File browser
+ * but is different to the LAMSUploadServlet.
+ * 
  * @author Simone Chiaretta (simo@users.sourceforge.net) 
  * @author Mitchell Seaton
  * 
@@ -124,24 +130,18 @@ public class LAMSConnectorServlet extends HttpServlet {
 		String commandStr=request.getParameter("Command");
 		String typeStr=request.getParameter("Type");
 		String currentFolderStr=request.getParameter("CurrentFolder");
+		String designFolder=request.getParameter("DesignFolder");
 		
 		// create content directory if non-existant
-		String currentDirPath=realBaseDir + currentFolderStr;
+		String currentDirPath=realBaseDir + designFolder + typeStr +"/" + currentFolderStr;
 		String validCurrentDirPath = currentDirPath.replace('/', File.separatorChar);
 		
-		String currentWebPath= lamsContextPath + AuthoringConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR + currentFolderStr + typeStr + "/";
-		
-		File currentContentDir=new File(validCurrentDirPath);
-		if(!currentContentDir.exists()){
-			currentContentDir.mkdir();
-		}
-		
-		// create content type directory if non-existant
-		validCurrentDirPath += typeStr;
+		String currentWebPath= lamsContextPath + AuthoringConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR 
+			+ designFolder + typeStr +"/" + currentFolderStr;
 		
 		File currentDir=new File(validCurrentDirPath);
 		if(!currentDir.exists()){
-			currentDir.mkdir();
+			currentDir.mkdirs();
 		}
 		
 		Document document=null;
@@ -235,8 +235,9 @@ public class LAMSConnectorServlet extends HttpServlet {
 		String commandStr=request.getParameter("Command");
 		String typeStr=request.getParameter("Type");
 		String currentFolderStr=request.getParameter("CurrentFolder");
+		String designFolder=request.getParameter("DesignFolder");
 		
-		String currentDirPath=realBaseDir + currentFolderStr + typeStr;
+		String currentDirPath=realBaseDir + designFolder + typeStr +"/" + currentFolderStr;
 		String validCurrentDirPath = currentDirPath.replace("/", File.separator);
 		
 		if (debug) System.out.println(currentDirPath);

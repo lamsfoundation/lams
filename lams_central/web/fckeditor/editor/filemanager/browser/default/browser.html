@@ -40,7 +40,8 @@ function GetUrlParam( paramName )
 }
 
 var oConnector = new Object() ;
-oConnector.CurrentFolder	= GetUrlParam( 'CurrentFolder' ) ;
+oConnector.CurrentFolder	= '/';
+oConnector.DesignFolder 	= GetUrlParam( 'CurrentFolder' );
 
 var sConnUrl = GetUrlParam( 'Connector' ) ;
 
@@ -64,8 +65,9 @@ oConnector.SendCommand = function( command, params, callBackFunction )
 {
 	var sUrl = this.ConnectorUrl + 'Command=' + command ;
 	sUrl += '&Type=' + this.ResourceType ;
-	sUrl += '&CurrentFolder=' + encodeURIComponent( GetUrlParam( 'CurrentFolder' ) ) ;
-
+	sUrl += '&CurrentFolder=' + encodeURIComponent( oConnector.CurrentFolder ) ;
+	sUrl += '&DesignFolder=' + encodeURIComponent( oConnector.DesignFolder );
+	
 	if ( params ) sUrl += '&' + params ;
 
 	// Add a random salt to avoid getting a cached version of the command execution

@@ -33,7 +33,8 @@ function SetCurrentFolder( resourceType, folderPath )
 	var sUrl = oConnector.ConnectorUrl + 'Command=FileUpload' ;
 	sUrl += '&Type=' + resourceType ;
 	sUrl += '&CurrentFolder=' + encodeURIComponent( folderPath ) ;
-
+	sUrl += '&DesignFolder=' + oConnector.DesignFolder ;
+	
 	document.getElementById('frmUpload').action = sUrl ;
 }
 

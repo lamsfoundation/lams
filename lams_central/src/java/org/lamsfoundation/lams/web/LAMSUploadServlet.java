@@ -33,17 +33,16 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 
-
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource; 
-import javax.xml.transform.stream.StreamResult; 
-
 /**
  * Servlet to upload files.<br>
  *
  * This servlet accepts just file uploads, eventually with a parameter specifying file type
+ *
+ * This servlet has been modified for LAMS to support the lams_www/secure/[design folder] format. The design folder is
+ * a folder with a unique numeric name. Whenever a new design is created (using "New" in the client), a new design
+ * folder name is assigned. The [design folder] is passed in as the CurrentFolder. This servlet supports the image and link
+ * windows, not the browse window.
+ * 
  *
  * @author Simone Chiaretta (simo@users.sourceforge.net)
  * @author Mitchell Seaton
