@@ -84,7 +84,7 @@
 				password="${dbPass}"
 				encoding="utf8"
 			>
-				<transaction src="${sqlDir}/createTable_${dbType}.sql" />
+				<transaction src="db/sql/createTable_${dbType}.sql" />
 			</sql>	
 	</target>
 	
@@ -97,7 +97,7 @@
 				password="${dbPass}"
 				encoding="utf8"
 			>
-				<transaction src="${sqlDir}/deleteTable_${dbType}.sql" />
+				<transaction src="db/sql/deleteTable_${dbType}.sql" />
 			</sql>	
 	</target>
 	
