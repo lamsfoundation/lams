@@ -175,6 +175,11 @@ public class LessonManagerServlet extends HttpServlet {
 				element = getAllStudentProgress(document, serverId, datetime, hashValue, 
 					username, lsId, courseId);
 
+			}  else if (method.equals(CentralConstants.METHOD_SINGLE_STUDENT_PROGRESS)) {
+				lsId = new Long(lsIdStr);				
+				element = getSingleStudentProgress(document, serverId, datetime, hashValue, 
+					username, lsId, courseId);
+
 			}  else if (method.equals(CentralConstants.METHOD_IMPORT)) {
 
 				// ldId = new Long(ldIdStr);
@@ -311,7 +316,7 @@ public class LessonManagerServlet extends HttpServlet {
 			throw new RemoteException(e.getMessage(), e);
 		}
 	}
-
+	
 	public Element getAllStudentProgress(Document document, String serverId, String datetime,
 			String hashValue, String username, long lsId, String courseID)
 			throws RemoteException
@@ -378,6 +383,70 @@ public class LessonManagerServlet extends HttpServlet {
 	    			}
 	    			
 	    			element.appendChild(learnerProgElem);
+				}
+	    	}
+			else{
+	    		throw new Exception("Lesson with lessonID: " + lsId + " could not be found for learner progresses");
+	    	}
+			
+			return element;
+			
+		} catch (Exception e) {
+			throw new RemoteException(e.getMessage(), e);
+		}
+		
+	}
+	
+	public Element getSingleStudentProgress(Document document, String serverId, String datetime,
+			String hashValue, String username, long lsId, String courseID)
+			throws RemoteException
+	{
+		try {
+			ExtServerOrgMap serverMap = integrationService
+					.getExtServerOrgMap(serverId);
+			Authenticator
+					.authenticate(serverMap, datetime, username, hashValue);
+			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(
+					serverMap, username);
+			Lesson lesson = lessonService.getLesson(lsId);
+
+			Element element = document.createElement(CentralConstants.ELEM_LESSON_PROGRESS);
+			element.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);
+			
+			String prefix = serverMap.getPrefix();
+			
+
+			if(lesson!=null)
+			{	
+				int activitiesTotal = lesson.getLearningDesign().getActivities().size();
+				Iterator iterator = lesson.getLearnerProgresses().iterator();
+				
+				while(iterator.hasNext()){
+	    			LearnerProgress learnProg = (LearnerProgress)iterator.next();
+	    			LearnerProgressDTO learnerProgress = learnProg.getLearnerProgressData();	    			
+    				
+    				if (learnerProgress.getUserName().equals(prefix + "_" + userMap.getExtUsername()))
+	    			{
+	    				Element learnerProgElem = document.createElement(CentralConstants.ELEM_LEARNER_PROGRESS);
+		    			
+		    			int completedActivities = learnerProgress.getCompletedActivities().length;
+		    			int attemptedActivities = learnerProgress.getAttemptedActivities().length;
+		    			
+		    			if(learnerProgElem.getNodeType()== Node.ELEMENT_NODE)
+		    			{
+			    			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_COMPLETE , "" + learnerProgress.getLessonComplete());
+			    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITY_COUNT , "" + activitiesTotal);
+			    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_COMPLETED , "" + completedActivities);
+			    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_ATTEMPTED , "" + attemptedActivities);
+			    			//learnerProgElem.setAttribute(CentralConstants.ATTR_CURRENT_ACTIVITY , currActivity);
+			    			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + userMap.getSid());
+			    			learnerProgElem.setAttribute(CentralConstants.ATTR_COURSE_ID, courseID);
+			    			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, username);
+			    			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);	
+		    			}
+		    			
+		    			element.appendChild(learnerProgElem);
+	    			}
 				}
 	    	}
 			else{

@@ -67,6 +67,8 @@ public class CentralConstants {
 	
 	public static final String METHOD_STUDENT_PROGRESS = "studentProgress";
 	
+	public static final String METHOD_SINGLE_STUDENT_PROGRESS = "singleStudentProgress";
+	
 	public static final String PARAM_MODE = "mode";
 	
 	public static final String PARAM_FILEPATH = "filePath";
