@@ -49,7 +49,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	private var _className = "LearnerIndexView";
 	
 	private var _bgPanel:MovieClip;
-	
+
 	private var _tm:ThemeManager;
 	private var _tip:ToolTip;
 	
@@ -81,6 +81,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	private var btnSpacing:Number;
 	private var txtFieldSpacing:Number;
 	private var untranslatedWidth:Number;
+	private var fontWidthVariance:Number;
 		
 	private var buttonsShown:Boolean;
 	private var navigationButtonsDrawn:Boolean;
@@ -92,7 +93,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	*/
 	function LearnerIndexView(){
 		Debugger.log("LearnerIndexView Constructor", Debugger.CRITICAL, "LearnerIndexView", "LearnerIndexView");
-
 		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
 		
@@ -100,11 +100,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		btnWidth = 40;
 		btnSpacing = 20;
 		txtFieldSpacing = 5;
+		fontWidthVariance = 1.15; // Tahoma font requires greater width
 		buttonsShown = false;
 		navigationButtonsDrawn = false;
 		defaultString = Dictionary.getValue("mv_search_default_txt");
-		untranslatedWidth = StringUtils.getButtonWidthForStr('?');
-		
+		untranslatedWidth = Math.ceil(StringUtils.getButtonWidthForStr('?') * fontWidthVariance); 		
 		this._visible = false;
 		displayedButtons = new Array();
 		
@@ -158,6 +158,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 				break;
 			case 'DRAW_DESIGN' :
 				if (infoObj.tabID == _tabID && !mm.locked && (mm.numIndexButtons>1 || mm.inSearchView)) {
+					setStyles();
 					mm.updateIndexButtons();
 					setupButtons(mm);
 					this._visible = true;						
@@ -167,6 +168,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 			case 'DRAW_BUTTONS' : // this event is only fired when << or >> buttons clicked as it doesn't redraw learnertabview contents
 				if (infoObj.tabID == _tabID && !mm.locked && mm.numIndexButtons>1) {
 					if (!buttonsShown || (mm.numIndexButtons > displayedButtons.length)) {
+						setStyles();
 						setupButtons(mm); // this only renames the index buttons as drawbuttons equals false
 						this._visible = true;
 					}
@@ -187,10 +189,20 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	 * directly to the instance
 	 */
 	private function setStyles():Void{
-		var styleObj = _tm.getStyleObject('IdxBar');
-		//bkg_pnl.setStyle('styleName',styleObj);
-		
-		//var styleObj = _tm.getStyleObject('IndexBar');
+		var styleObj = _tm.getStyleObject('IndexBar');
+		var _bgPanelColor:Color = new Color(_bgPanel);
+		drawOutline();
+	}
+	
+	public function drawOutline():Void {
+		var outline_mc = this.createEmptyMovieClip("outline_mc", _bgPanel.getNextHighestDepth());
+		var outline = this['outline_mc'];
+	
+		outline.lineStyle(0, 0x000000, 100);
+		outline.lineTo(10000, 0);  // TODO: base this on mm.getSize().w or Stage._width instead of 10000
+		outline.lineTo(10000, 20); // similarly
+		outline.lineTo(0, 20);
+		outline.lineTo(0, 0);
 	}
 	
 	public function setupButtons(mm:MonitorModel):Void {
@@ -264,10 +276,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		// Label that displays 'Page # of #'
 		var idxLabel_mc:MovieClip = _buttonsPanel_mc.attachMovie("Label", "rangeLabel", _buttonsPanel_mc.getNextHighestDepth());
 		rangeLabel = _buttonsPanel_mc["rangeLabel"];
+		
+		// style info
+		var styleObj = _tm.getStyleObject('IndexButton');
+		rangeLabel.setStyle('styleName', styleObj);
+		
 		rangeLabel._x = 0;
 		rangeLabel.autoSize = "center"
 		rangeLabel.text = Dictionary.getValue('mv_search_current_page_lbl', [mm.currentLearnerIndex, mm.numIndexButtons]);
-		var generatedWidth:Number = StringUtils.getButtonWidthForStr(String(rangeLabel.text));
+		var generatedWidth:Number = Math.ceil(StringUtils.getButtonWidthForStr(String(rangeLabel.text)) * fontWidthVariance);
 		rangeLabel._width = (generatedWidth <= untranslatedWidth) ? 90 : generatedWidth + btnSpacing;
 		
 		nextPosition += rangeLabel._width;
@@ -307,7 +324,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 					idxBtn._x = nextPosition;
 					nextPosition += btnWidth;
 				} else {
-
 					_indexButton = IndexButton(displayedButtons[count]);
 					displayedButtons[count].label = String(i);
 					displayedButtons[count]._width = btnWidth;
@@ -334,17 +350,30 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		_buttonsPanel_mc.attachMovie("textFieldBackground", "textFieldBackground_mc", _buttonsPanel_mc.getNextHighestDepth(), {_x: nextPosition, _y: 0});
 
 		var textFieldBackground = _buttonsPanel_mc["textFieldBackground_mc"];
-		var generatedWidth:Number = StringUtils.getButtonWidthForStr(defaultString);
+
+		var textFieldColor:Color = new Color(textFieldBackground);
+
+		var generatedWidth:Number = Math.round(StringUtils.getButtonWidthForStr(defaultString) * fontWidthVariance);
 		textFieldBackground._width = (generatedWidth <= untranslatedWidth) ? 175 : generatedWidth + txtFieldSpacing;
 
 		textFieldBackground.createTextField("idxTextField", textFieldBackground.getNextHighestDepth(), 0, 0, textFieldBackground._width, 20);
 		
 		idxTextField = textFieldBackground["idxTextField"];
+
 		idxTextField._visible = true;
 		idxTextField.enabled = true;
 		idxTextField._editable = true;
 		idxTextField.type = "input";
 		idxTextField.autosize = "center"
+		
+		// style info
+		var styleObj = _tm.getStyleObject('IndexTextField');
+		var txtFmt:TextFormat = new TextFormat();
+		txtFmt.font = styleObj.fontFamily;
+		txtFmt.size = styleObj.fontSize;
+		txtFmt.color = styleObj.color;
+		idxTextField.setNewTextFormat(txtFmt);
+
 		if (!mm.resetSearchTextField)
 			idxTextField.text = (_textFieldContents == undefined) ? defaultString : _textFieldContents;
 		else {
@@ -361,7 +390,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	}
 	
 	private function addGoButton(mm:MonitorModel):Void {
-		var generatedWidth:Number = StringUtils.getButtonWidthForStr(Dictionary.getValue('mv_search_go_btn_lbl'));
+		var generatedWidth:Number = Math.ceil(StringUtils.getButtonWidthForStr(Dictionary.getValue('mv_search_go_btn_lbl')) * fontWidthVariance);
 		var goBtnWidth:Number = (generatedWidth <= untranslatedWidth) ? btnWidth : generatedWidth + btnSpacing;
 		goBtn = _buttonsPanel_mc.attachMovie("IndexButton", "goBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: goBtnWidth, _labelText: Dictionary.getValue('mv_search_go_btn_lbl')});
 		_indexButton = IndexButton(goBtn);
@@ -372,14 +401,18 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	}
 	
 	private function addIndexViewButton(mm:MonitorModel):Void {
-		var generatedWidth:Number = StringUtils.getButtonWidthForStr(Dictionary.getValue('mv_search_index_view_btn_lbl'));
-		var indexViewBtnWidth:Number = (generatedWidth <= untranslatedWidth) ? 84 : generatedWidth + btnSpacing;
+		var generatedWidth:Number = Math.round(StringUtils.getButtonWidthForStr(Dictionary.getValue('mv_search_index_view_btn_lbl')) * fontWidthVariance);
+		var indexViewBtnWidth:Number = (generatedWidth <= untranslatedWidth) ? 93 : generatedWidth + btnSpacing;
 		indexViewBtn = _buttonsPanel_mc.attachMovie("IndexButton", "indexViewBtn", _buttonsPanel_mc.getNextHighestDepth(), {_width: indexViewBtnWidth, _labelText: Dictionary.getValue('mv_search_index_view_btn_lbl')});
 		_indexButton = IndexButton(indexViewBtn);
 		_indexButton.init(mm, undefined);
 		_indexButton.btnType = "IndexView";
 		indexViewBtn._x = nextPosition;
+		Debugger.log("addIndexButton1_nextPosition: "+nextPosition, Debugger.CRITICAL, "addIndexButton", "LearnerIndexView");
+		Debugger.log("addIndexButton1_indexViewBtnWidth: "+indexViewBtnWidth, Debugger.CRITICAL, "addIndexButton", "LearnerIndexView");
 		nextPosition += indexViewBtnWidth;
+		Debugger.log("addIndexButton2_nextPosition: "+nextPosition, Debugger.CRITICAL, "addIndexButton", "LearnerIndexView");
+		nextPosition--;
 	}
 
 	private function setPosition(mm:MonitorModel):Void{		
@@ -390,7 +423,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	}
 	
 	public function setSize(mm:MonitorModel):Void{
-		_bgPanel._width = mm.getSize().w;
+		var panelOffset:Number = mm.getSize().w/100;
+		_bgPanel._width = Math.round(mm.getSize().w + panelOffset);
 	}
 
 	public function getController():MonitorController{

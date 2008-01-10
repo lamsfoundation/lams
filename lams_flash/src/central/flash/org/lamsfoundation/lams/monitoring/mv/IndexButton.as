@@ -64,9 +64,9 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 		
 		_tm = ThemeManager.getInstance();
 		
-		//lblWidth = StringUtils.getButtonWidthForStr(Dictionary.getValue(_labelText));
 		idxLabel_mc = this.attachMovie("Label", "idxLabel", this.getNextHighestDepth(), {text:_labelText, _width: 45, autoSize: "center"});
 		idxLabel = Label(idxLabel_mc);
+		setStyles();
 		
 		_bgPanel.onRollOver = Delegate.create(this, onMouseOver);
 		_bgPanel.onPress = Delegate.create(this, indexClicked);
@@ -133,6 +133,15 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 				mm.oldIndex = mm.currentLearnerIndex;
 		}
 		
+	}
+	
+	/**
+	 * Get the CSSStyleDeclaration objects for each component and apply them
+	 * directly to the instance
+	 */
+	private function setStyles():Void{
+		var styleObj = _tm.getStyleObject('IndexButton');
+		idxLabel.setStyle('styleName', styleObj);
 	}
 	
 	public function setSize(_btnWidth:Number):Void {
