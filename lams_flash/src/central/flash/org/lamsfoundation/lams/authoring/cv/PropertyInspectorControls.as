@@ -502,7 +502,7 @@ class PropertyInspectorControls extends MovieClip {
 			showAppliedGroupingControls(false);
 			showToolBasedBranchingControls(false);
 		}
-			
+		
 		if(e != null) {
 			branchType_lbl.enabled = e;
 			branchType_cmb.enabled = e;
@@ -511,6 +511,10 @@ class PropertyInspectorControls extends MovieClip {
 			_tool_output_match_btn.enabled = e;
 			
 			toolActs_cmb.enabled = e;
+		}
+		
+		if(_canvasModel.getCanvas().ddm.editOverrideLock) {
+			branchType_cmb.enabled = false;
 		}
 	}
 	
@@ -978,8 +982,8 @@ class PropertyInspectorControls extends MovieClip {
 					selectToolActivityItem(i, toolActs_cmb.dataProvider[i].data);
 			}
 				
-			
 		} else {
+			
 			_canvasModel.selectedItem.activity.groupingUIID = null;
 			_canvasModel.selectedItem.activity.toolActivityUIID = null;
 			
