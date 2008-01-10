@@ -49,34 +49,41 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private static var STP_MAX:Number = 9999;
 	private static var STP_MIN:Number = 0;
 	
+	private static var OPTION_GTE:Number = 0;
+	private static var OPTION_LTE:Number = 1;
+	private static var OPTION_RANGE:Number = 2;
+	
+	private static var TOOL_OUTPUTS_URL_POSTFIX:String = "outputs";
+	
 	//References to components + clips 
     private var _container:MovieClip;  //The container window that holds the dialog
     
 	private var _definitions:Array;
 	private var _conditions:Array;
+	
 	private var _selectedDefinition:ToolOutputDefinition;
 	private var _selectedIndex:Number;
+	
+	private var _selectedOption:Object;
+	private var _selectedOptionIndex:Number;
+	
 	private var _toolContentID:Number;
 	
 	private var _toolOutputDefin_cmb:ComboBox;
+	private var _toolOutputLongOptions_cmb:ComboBox;
+	
 	private var _condition_item_dgd:DataGrid;
 	
 	private var _start_value_stp:NumericStepper;
 	private var _end_value_stp:NumericStepper;
-	
-	private var _opt_greaterThan_cb:CheckBox;
-	private var _opt_greaterThan_lbl:Label;
-	
-	private var _opt_lessThan_cb:CheckBox;
-	private var _opt_lessThan_lbl:Label;
 	
 	private var add_btn:Button;
 	private var close_btn:Button;
 	private var cancel_btn:Button;
 	private var remove_item_btn:Button;
 	private var clear_all_btn:Button;
+	private var help_btn:Button;
 	
-	private var _condition_range_lbl:Label;
 	private var _condition_from_lbl:Label;
 	private var _condition_to_lbl:Label;
 	
@@ -102,7 +109,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     public var addEventListener:Function;
     public var removeEventListener:Function;
     
-	
 	function ToolOutputConditionsDialog(){
 		_itemCount = 0;
 		this._visible = false;
@@ -132,13 +138,12 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
         cancel_btn.addEventListener('click', Delegate.create(this, cancel));
 		
 		add_btn.addEventListener('click',Delegate.create(this, addButton_onPress));
+		help_btn.addEventListener('click',Delegate.create(this, helpButton_onPress));
 		remove_item_btn.addEventListener('click', Delegate.create(this, removeItemButton_onPress));
 		clear_all_btn.addEventListener('click', Delegate.create(this, clearAllButton_onPress));
 		
-		_opt_greaterThan_cb.addEventListener('click', Delegate.create(this, onGreaterThanSelect));
-		_opt_lessThan_cb.addEventListener('click', Delegate.create(this, onLessThanSelect));
-		
 		_toolOutputDefin_cmb.addEventListener('change', Delegate.create(this, itemChanged));
+		_toolOutputLongOptions_cmb.addEventListener('change', Delegate.create(this, optionChanged));
 		
 		_condition_item_dgd.addEventListener('cellEdit', Delegate.create(this, itemEdited));
 		_condition_item_dgd.addEventListener('cellFocusIn', Delegate.create(this, itemSelected));
@@ -175,16 +180,13 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     }
 	
 	private function setLabels(){
-		_condition_range_lbl.text = Dictionary.getValue("to_conditions_dlg_range_lbl");
 		_condition_from_lbl.text = Dictionary.getValue("to_conditions_dlg_from_lbl");
 		_condition_to_lbl.text = Dictionary.getValue("to_conditions_dlg_to_lbl");
 		
 		add_btn.label = Dictionary.getValue("to_conditions_dlg_add_btn_lbl");
+		help_btn.label = Dictionary.getValue("to_conditions_dlg_help_btn_lbl");
 		clear_all_btn.label = Dictionary.getValue("to_conditions_dlg_clear_all_btn_lbl");
 		remove_item_btn.label = Dictionary.getValue("to_conditions_dlg_remove_item_btn_lbl");
-		
-		_opt_greaterThan_lbl.text = Dictionary.getValue("to_conditions_dlg_gt_lbl"); // "Greater than (>)";
-		_opt_lessThan_lbl.text = Dictionary.getValue("to_conditions_dlg_lt_lbl"); // "Less than (<)";
 	
 		//Set the text for buttons
         close_btn.label = Dictionary.getValue('al_done');
@@ -205,6 +207,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		cancel_btn.setStyle('styleName', styleObj);
 		
 		add_btn.setStyle('styleName', styleObj);
+		help_btn.setStyle('styleName', styleObj);
 		remove_item_btn.setStyle('styleName', styleObj);
 		clear_all_btn.setStyle('styleName', styleObj);
        
@@ -213,37 +216,56 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
         //Apply label style 
         styleObj = themeManager.getStyleObject('label');
-		_condition_range_lbl.setStyle('styleName', styleObj);
 		_condition_from_lbl.setStyle('styleName', styleObj);
 		_condition_to_lbl.setStyle('styleName', styleObj);
-		_opt_greaterThan_lbl.setStyle('styleName', styleObj);
-		_opt_lessThan_lbl.setStyle('styleName', styleObj);
 		
 		styleObj = themeManager.getStyleObject('picombo');
 		_toolOutputDefin_cmb.setStyle('styleName', styleObj);
+		_toolOutputLongOptions_cmb.setStyle('styleName', styleObj);
 		
 		styleObj = themeManager.getStyleObject('numericstepper');
 		_start_value_stp.setStyle('styleName', styleObj);
 		_end_value_stp.setStyle('styleName', styleObj);
     }
 	
+	private function showElements(b:Boolean):Void {
+		_toolOutputLongOptions_cmb.visible = b;
+	
+		_condition_item_dgd.visible = b;
+	
+		_start_value_stp.visible = b;
+		_end_value_stp.visible = b;
+	
+		add_btn.visible = b;
+		remove_item_btn.visible = b;
+		clear_all_btn.visible = b;
+	
+		_condition_from_lbl.visible = b;
+		_condition_to_lbl.visible = b;
+	}
+	
 	public function setupContent():Void {
+		_toolOutputLongOptions_cmb.addItem({label: Dictionary.getValue("to_conditions_dlg_options_item_header_lbl"), data: null});
+		_toolOutputLongOptions_cmb.addItem({label: Dictionary.getValue("to_conditions_dlg_gte_lbl"), data: OPTION_GTE});
+		_toolOutputLongOptions_cmb.addItem({label: Dictionary.getValue("to_conditions_dlg_lte_lbl"), data: OPTION_LTE});
+		_toolOutputLongOptions_cmb.addItem({label: Dictionary.getValue("to_conditions_dlg_range_lbl"), data: OPTION_RANGE});
 		
 		var column_name:DataGridColumn = new DataGridColumn("conditionName");
-		column_name.headerText = "Name";
+		column_name.headerText = Dictionary.getValue("to_conditions_dlg_condition_items_name_col_lbl");
 		column_name.editable = true;
 		column_name.width = _condition_item_dgd.width*0.4;
 		
 		var column_value:DataGridColumn = new DataGridColumn("conditionValue");
-		column_value.headerText = "Condition";
+		column_value.headerText = Dictionary.getValue("to_conditions_dlg_condition_items_value_col_lbl");
 		column_value.editable = false;
 		column_value.width = _condition_item_dgd.width*0.6;
 		
 		_condition_item_dgd.addColumn(column_name);
 		_condition_item_dgd.addColumn(column_value);
 		
-		// wait second frame for steppers to be setup
+		showElements(false);
 		
+		// wait second frame for steppers to be setup
 		this.onEnterFrame = initSetup;
 		
 	}
@@ -261,7 +283,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 					
 				Debugger.log("moving condition: " + branches[i].condition.type, Debugger.CRITICAL, "initSetup", "ToolOutputConditionsDialog");
 			
-				
 				addCondition(branches[i].condition);
 				if(_condition_item_dgd.length==1) setDefinition(branches[i].condition.name);
 			}
@@ -276,18 +297,23 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		var items:Array = _toolOutputDefin_cmb.dataProvider;
 		
 		for(var i=0; i < items.length; i++)
-			if(items[i].name == name) 
+			if(items[i].name == name)
 				_toolOutputDefin_cmb.selectedIndex = i;
 	}
 	
 	private function addButton_onPress():Void {
 		if(validateCondition(_selectedDefinition))
-			if(Boolean(_opt_greaterThan_cb.value)) 
+			if(_toolOutputLongOptions_cmb.selectedItem.data == OPTION_GTE) 
 				addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, _start_value_stp.value, null));
-			else if(Boolean(_opt_lessThan_cb.value))
+			else if(_toolOutputLongOptions_cmb.selectedItem.data == OPTION_LTE)
 				addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, null, _start_value_stp.value));
 			else 
 				addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, _start_value_stp.value, _end_value_stp.value));
+	}
+	
+	private function helpButton_onPress():Void {
+		var url:String = _toolActivity.helpURL + TOOL_OUTPUTS_URL_POSTFIX;
+		JsPopup.getInstance().launchPopupWindow(url, 'ToolActivityOutputsHelp_' + _toolActivity.activityUIID, 600, 800, true, true, false, false, false);
 	}
 	
 	private function clearAllButton_onPress(evt:Object, c:Boolean):Void {
@@ -372,9 +398,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 		switch(selectedDefinition.type) {
 			case ToolOutputDefinition.LONG:
-				if(Boolean(_opt_greaterThan_cb.value)) {
+				if(_toolOutputLongOptions_cmb.selectedItem.data == OPTION_GTE) {
 					return validateLongCondition(_start_value_stp.value, null);
-				} else if(Boolean(_opt_lessThan_cb.value)) {
+				} else if(_toolOutputLongOptions_cmb.selectedItem.data == OPTION_LTE) {
 					return validateLongCondition(null, _start_value_stp.value);
 				} else {
 					return validateLongCondition(_start_value_stp.value, _end_value_stp.value);
@@ -459,6 +485,35 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 			
 	}
 	
+	
+	private function optionChanged(evt:Object):Void {
+		Debugger.log("index: " + _toolOutputLongOptions_cmb.selectedIndex, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
+		
+		if(_selectedOptionIndex == _toolOutputLongOptions_cmb.selectedIndex && _selectedOptionIndex != null)
+			return;
+		
+		selectOption();
+	}
+	
+	private function selectOption():Void {
+		_selectedOption = _toolOutputLongOptions_cmb.dataProvider[_toolOutputLongOptions_cmb.selectedIndex];
+		
+		add_btn.enabled = true;
+				
+		if(_selectedOption.data == OPTION_GTE) {
+			showSteppers(true, false);
+		} else if(_selectedOption.data == OPTION_LTE) {
+			showSteppers(false, true);
+		} else if(_selectedOption.data == OPTION_RANGE) {
+			showSteppers(true, true);
+		} else {
+			showSteppers(false, false);
+			add_btn.enabled = false;
+		}
+		
+		_selectedOptionIndex = _toolOutputLongOptions_cmb.selectedIndex;
+	}
+	
 	private function selectDefinition():Void {
 		var ddm = app.getCanvas().ddm;
 		
@@ -467,9 +522,11 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 		switch(_selectedDefinition.type) {
 			case ToolOutputDefinition.LONG:
+				_condition_item_dgd.visible = true;
+				_toolOutputLongOptions_cmb.visible = true;
 				
-				_start_value_stp.visible = true;
-				_end_value_stp.visible = (!_opt_greaterThan_cb.value || !_opt_lessThan_cb.value);
+				add_btn.visible = true;
+				optionChanged();
 				
 				_start_value_stp.minimum = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
 				_end_value_stp.minimum = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
@@ -479,40 +536,18 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				_start_value_stp.value = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
 				_end_value_stp.value = (_selectedDefinition.endValue != null) ? Number(_selectedDefinition.endValue) : STP_MIN;
 				
-				_opt_greaterThan_cb.visible = true;
-				_opt_greaterThan_lbl.visible = true;
 				
-				_opt_lessThan_cb.visible = true;
-				_opt_lessThan_lbl.visible = true;
-				
-				add_btn.visible = true;
-				clear_all_btn.enabled = true;
-				remove_item_btn.enabled = true;
-				
-				_condition_range_lbl.visible = true;
-				_condition_from_lbl.visible = true;
-				_condition_to_lbl.visible = true;
+				clear_all_btn.visible = true;
+				remove_item_btn.visible = true;
 				
 				break;
 			
 			case ToolOutputDefinition.BOOL:
-				
-				_start_value_stp.visible = false;
-				_end_value_stp.visible = false;
-				
-				_opt_greaterThan_cb.visible = false;
-				_opt_greaterThan_lbl.visible = false;
-				
-				_opt_lessThan_cb.visible = false;
-				_opt_lessThan_lbl.visible = false;
+				_condition_item_dgd.visible = true;
+				_toolOutputLongOptions_cmb.visible = false;
 				
 				add_btn.visible = false;
-				clear_all_btn.enabled = false;
-				remove_item_btn.enabled = false;
-				
-				_condition_range_lbl.visible = false;
-				_condition_from_lbl.visible = false;
-				_condition_to_lbl.visible = false;
+				showSteppers(false, false);
 				
 				if(_condition_item_dgd.dataProvider.length <= 0) {
 					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, _toolActivity, _branchingActivity, true));
@@ -521,6 +556,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				
 				break;
 			default:
+				showElements(false);
+				_toolOutputLongOptions_cmb.selectedIndex = 0;
 				Debugger.log("type not found", Debugger.GEN, "itemChanged", "ToolOutputConditionsDialog");
 				
 		}
@@ -547,30 +584,41 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		var item = _condition_item_dgd.getItemAt(evt.itemIndex);
 	}
 	
-	private function onGreaterThanSelect(evt:Object):Void {
-		_end_value_stp.visible = !evt.target.value;
-		_condition_to_lbl.visible = !evt.target.value;
+	private function showSteppers(a:Boolean, b:Boolean):Void {
+		repositionSteppers(a,b);
 		
-		_opt_lessThan_cb.selected = false;;
+		_start_value_stp.visible = a;
+		_condition_from_lbl.visible = a;
+		_end_value_stp.visible = b;
+		_condition_to_lbl.visible = b;
+		
 	}
 	
-	private function onLessThanSelect(evt:Object):Void {
-		_end_value_stp.visible = !evt.target.value;
-		_condition_to_lbl.visible = !evt.target.value;
-		
-		_opt_greaterThan_cb.selected = false;
+	private function repositionSteppers(a:Boolean, b:Boolean):Void {
+		if(a&&b) {
+			_condition_from_lbl._x = 14;
+			_start_value_stp._x = _condition_from_lbl._x + _condition_from_lbl._width + 5;
+			_condition_to_lbl._x = _start_value_stp._x + _start_value_stp._width + 20;
+			_end_value_stp._x = _condition_to_lbl._x + _condition_to_lbl._width + 5;
+		} else if(a&&!b) {
+			_condition_from_lbl._x = 14;
+			_start_value_stp._x = _condition_from_lbl._x + _condition_from_lbl._width + 5;
+		} else if(!a&&b) {
+			_condition_to_lbl._x = 14;
+			_end_value_stp._x = _condition_to_lbl._x + _condition_to_lbl._width + 5;
+		}
 	}
 
 	public static function getOutputType(type:String):String {
 		switch(type) {
 			case ToolOutputDefinition.BOOL:
-				return "boolean";
+				return Dictionary.getValue("to_conditions_dlg_defin_bool_type");
 				break;
 			case ToolOutputDefinition.LONG:
-				return "long";
+				return Dictionary.getValue("to_conditions_dlg_defin_long_type");
 				break;
 			default:
-				return "undefined";
+				return "";
 		}
 	}
 	
@@ -605,18 +653,21 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		//Size the panel
         _bgpanel.setSize(w,h);
 
-		_condition_item_dgd._width = w - 2*_condition_item_dgd._x;
+		_condition_item_dgd.setSize(w - 2*_condition_item_dgd._x, h*0.45);
 		_condition_item_dgd.getColumnAt(0).width = _condition_item_dgd.width*0.4;
         _condition_item_dgd.getColumnAt(1).width = _condition_item_dgd.width*0.6;
         
-		_toolOutputDefin_cmb._width = w - 2*_toolOutputDefin_cmb._x;
+		_toolOutputDefin_cmb.setSize(w - 2*_toolOutputDefin_cmb._x - help_btn.width - 5, 22);
+		_toolOutputLongOptions_cmb.setSize(_toolOutputDefin_cmb._width, 22);
 		
 		//Buttons
+		add_btn._x = _toolOutputLongOptions_cmb._x + _toolOutputLongOptions_cmb._width - add_btn.width;
+		remove_item_btn.move(_condition_item_dgd._x + _condition_item_dgd._width - remove_item_btn.width, _condition_item_dgd._y + _condition_item_dgd._height + 5);
+		clear_all_btn.move(remove_item_btn._x - clear_all_btn.width - 5, remove_item_btn._y);
 		
-		remove_item_btn._x = _condition_item_dgd._x + _condition_item_dgd._width - remove_item_btn.width;
-		clear_all_btn._x = remove_item_btn._x - clear_all_btn.width - 5;
-		
-        close_btn.move(w-xOkOffset,h-yOkOffset);
+		help_btn._x = w - _toolOutputDefin_cmb._x - help_btn.width;
+        
+		close_btn.move(w-xOkOffset,h-yOkOffset);
 		cancel_btn.move(close_btn._x - cancel_btn.width - 5, h-yOkOffset);
 		
     }
@@ -625,6 +676,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     
 	public function set definitions(a:Array):Void {
 		_definitions = new Array();
+		
+		_definitions.push(new ToolOutputDefinition());
 		
 		for(var i=0; i< a.length; i++) {
 			var newTOD:ToolOutputDefinition = new ToolOutputDefinition();
@@ -635,7 +688,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 		_toolOutputDefin_cmb.dataProvider = _definitions;
 		_toolOutputDefin_cmb.labelFunction = function(itemObj) {
-			return (itemObj.description + " (" + ToolOutputConditionsDialog.getOutputType(itemObj.type) + ")");
+			
+			return (itemObj.type == null) ? Dictionary.getValue("to_conditions_dlg_defin_item_header_lbl") : Dictionary.getValue("to_conditions_dlg_defin_item_fn_lbl", [itemObj.description, ToolOutputConditionsDialog.getOutputType(itemObj.type)]);
 		}
 		
 		_toolOutputDefin_cmb.redraw(true);

@@ -1090,9 +1090,11 @@ class PropertyInspectorControls extends MovieClip {
 		
 		if(!v) { _tool_output_match_btn.visible = false; _conditions_setup_btn.visible = false; return; }
 		
-		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
+		/** TODO: sequences with branching parent loaded in ddm instead */
+		//var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
+		var sequences:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
 		
-		if(branches.myBranches.length > 0) {
+		if(sequences.length > 0) {
 			if(_canvasModel.selectedItem.activity.toolActivityUIID != null) {
 				_tool_output_match_btn.visible = v;
 				_conditions_setup_btn.visible = v;
