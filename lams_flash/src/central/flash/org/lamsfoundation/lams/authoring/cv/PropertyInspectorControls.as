@@ -1084,6 +1084,13 @@ class PropertyInspectorControls extends MovieClip {
 		setModified();
 	}
 	
+	private function hasConnectedSequences(s:Array):Boolean {
+		for(var i=0; i<s.length; i++)
+			if(SequenceActivity(s[i]).firstActivityUIID != null) return true;
+		
+		return false;
+	}
+	
 	private function showToolBasedBranchingControls(v:Boolean, e:Boolean) {
 		toolActs_cmb.visible = v;
 		branchToolActs_lbl.visible = v;
@@ -1094,7 +1101,8 @@ class PropertyInspectorControls extends MovieClip {
 		//var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
 		var sequences:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
 		
-		if(sequences.length > 0) {
+		
+		if(hasConnectedSequences(sequences)) {
 			if(_canvasModel.selectedItem.activity.toolActivityUIID != null) {
 				_tool_output_match_btn.visible = v;
 				_conditions_setup_btn.visible = v;
