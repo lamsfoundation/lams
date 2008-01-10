@@ -283,7 +283,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		Debugger.log('looking for:Folder_'+dto.workspaceFolderID+', parentWorkspaceFolderID:'+dto.parentWorkspaceFolderID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 		_global.breakpoint();
 		
-		
 		//if(_workspaceResources.containsKey(dto.workspaceFolderID)){
 		if(getWorkspaceResource('Folder_'+dto.workspaceFolderID)!=null){
 			nodeToUpdate = getWorkspaceResource('Folder_'+dto.workspaceFolderID);
@@ -501,7 +500,10 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			return false;
 		}
 		if(rData.permissionCode == MEMBERSHIP_ACCESS){
-			return false;
+			if (resourceType == "Folder")
+				return true;
+			else
+				return false;
 		}
 		if(rData.permissionCode == OWNER_ACCESS){
 			return true;
