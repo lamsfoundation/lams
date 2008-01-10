@@ -1009,13 +1009,16 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		myMappings.groupBased = new Array();
 		myMappings.toolBased = new Array();
+		myMappings.choosenBased = new Array();
 		myMappings.uncategorised = new Array();
 		myMappings.all = new Array();
 		
 		for(var i=0; i<bMappings.length; i++)
 			if(bMappings[i].branchingActivity.activityUIID == activityUIID || bMappings[i].sequenceActivity.activityUIID == activityUIID) {
-				if(bMappings[i] instanceof GroupBranchActivityEntry)	
+				if(bMappings[i] instanceof GroupBranchActivityEntry &&  bMappings[i].branchingActivity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE)	
 					myMappings.groupBased.push(bMappings[i]);
+				else if(bMappings[i] instanceof GroupBranchActivityEntry &&  bMappings[i].branchingActivity.activityTypeID == Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE)
+					myMappings.choosenBased.push(bMappings[i]);
 				else if(bMappings[i] instanceof ToolOutputBranchActivityEntry)
 					myMappings.toolBased.push(bMappings[i]);
 				else 
@@ -1174,10 +1177,13 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			
 			Debugger.log("gacts mappings len tool:" + mappings.toolBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
 			Debugger.log("gacts mappings len group:" + mappings.groupBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
+			Debugger.log("gacts mappings len choosen:" + mappings.choosenBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
 			
 			if(mappings.toolBased.length > 0)
 				mappingsToRemove.push(Array(mappings.toolBased));
 
+			if(mappings.choosenBased.length > 0)
+				mappingsToRemove.push(Array(mappings.choosenBased));
 			
 			for(var j=0; j<mappings.groupBased.length; j++)
 				if(mappings.groupBased[j].group.parentID != BranchingActivity(gActs[i]).groupingUIID)
@@ -1190,10 +1196,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			
 			Debugger.log("tacts mappings len tool:" + mappings.toolBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
 			Debugger.log("tacts mappings len group:" + mappings.groupBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
+			Debugger.log("tacts mappings len choosen:" + mappings.choosenBased.length, Debugger.CRITICAL, "hasRedundantBranchMappings", "DDM");
 			
 			if(mappings.groupBased.length > 0)
 				mappingsToRemove.push(Array(mappings.groupBased));
 			
+			if(mappings.choosenBased.length > 0)
+				mappingsToRemove.push(Array(mappings.choosenBased));
+				
 			for(var j=0; j<mappings.toolBased.length; j++)
 				if(mappings.toolBased[j].condition.toolActivity.activityUIID != BranchingActivity(tActs[i]).toolActivityUIID &&
 					mappings.toolBased[j].condition.branchingActivity.activityUIID == BranchingActivity(tActs[i]).activityUIID)
