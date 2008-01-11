@@ -51,6 +51,7 @@ public class FolderContentDTO {
 	public Vector versionDetails;
 	public Long licenseID; // applicable for designs only
 	public String licenseText; // applicable for designs only
+	public Boolean readOnly; // applicable for designs only
 	
 	public FolderContentDTO(){
 		
@@ -70,6 +71,7 @@ public class FolderContentDTO {
 		this.permissionCode = permissionCode;
 		this.licenseID = licenseID;
 		this.versionDetails = null;
+		this.readOnly = false;
 	}
 	public FolderContentDTO(LearningDesign design, Integer permissionCode){
 		this.name = design.getTitle();
@@ -82,6 +84,7 @@ public class FolderContentDTO {
 		this.licenseID = ( design.getLicense() != null ? design.getLicense().getLicenseID() : null);
 		this.licenseText = design.getLicenseText();
 		this.versionDetails = null;
+		this.readOnly = design.getReadOnly();
 	}
 	public FolderContentDTO(WorkspaceFolder workspaceFolder, Integer permissionCode){
 		this.name = workspaceFolder.getName();
@@ -93,6 +96,7 @@ public class FolderContentDTO {
 		this.permissionCode = permissionCode;
 		this.licenseID = null;
 		this.versionDetails = null;
+		this.readOnly = Boolean.FALSE;
 	}	
 	public FolderContentDTO(Integer permissionCode, WorkspaceFolderContent workspaceFolderContent,SortedSet details){
 		this.name =workspaceFolderContent.getName();
@@ -108,6 +112,7 @@ public class FolderContentDTO {
 		this.licenseID = null;
 		this.versionDetails = new Vector();
 		versionDetails.addAll(details);
+		this.readOnly = Boolean.FALSE;
 	}	
 
 	/**
@@ -175,5 +180,13 @@ public class FolderContentDTO {
 
 	public void setLicenseText(String licenseText) {
 		this.licenseText = licenseText;
+	}
+
+	public Boolean getReadOnly() {
+		return readOnly;
+	}
+
+	public void setReadOnly(Boolean readOnly) {
+		this.readOnly = readOnly;
 	}
 }
