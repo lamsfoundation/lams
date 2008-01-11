@@ -86,7 +86,13 @@ public class HelpTag extends TagSupport {
         	}
         	try {
         		
-	        	if(toolSignature != null && module != null) {
+        		Locale locale = (Locale) session.getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
+			    if ( locale != null ) {
+			    	language = locale.getLanguage();
+			    	country = locale.getCountry();
+			    }
+        		
+        		if(toolSignature != null && module != null) {
 	        		// retrieve help URL for tool
 		        	ILamsToolService toolService = (ILamsToolService) getContext().getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
 					IToolVO tool = toolService.getToolBySignature(toolSignature);
@@ -97,35 +103,27 @@ public class HelpTag extends TagSupport {
 						return SKIP_BODY;
 					
 					// construct link
-					
-					Locale locale = (Locale) session.getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
-				    if ( locale != null ) {
-				    	language = locale.getLanguage();
-				    	country = locale.getCountry();
-				    }
-				    
 				    fullURL = helpURL + module + "#" + toolSignature + module + "-" + language + country;
 					
-					// TODO Added to debug Chinese problem. To be removed.
-					if ( log.isDebugEnabled() ) {
-						log.debug("In help tag, url is "+fullURL);
-					}
-
 					writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.jpg\" border=\"0\" width=\"25\" height=\"25\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
-				   
+
+	        	
 	        	} else if(page != null){
-	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.jpg\" border=\"0\" width=\"25\" height=\"25\" onclick=\"window.open('" + Configuration.get(ConfigurationKeys.HELP_URL) + page + "', 'help')\"/>");
+	        		
+	        		String anchorPrefix = page.replaceAll("[+\\s]", "");
+	        		
+	        		fullURL = Configuration.get(ConfigurationKeys.HELP_URL) +page+ "#" +anchorPrefix+ "-" + language + country;
+
+	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.jpg\" border=\"0\" width=\"25\" height=\"25\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
+
 	        	} else {
 	        		log.error("HelpTag unable to write out due to unspecified values.");
 	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/css/warning.gif\" border=\"0\" width=\"20\" height=\"20\"/>");
-	    			
 	        	}
         	} catch (NullPointerException npe) {
     			log.error("HelpTag unable to write out due to NullPointerException. Most likely a required paramater was unspecified or incorrect.", npe);
     			// don't throw a JSPException as we want the system to still function.
-    			
-    			writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/css/warning.gif\" border=\"0\" width=\"20\" height=\"20\"/>");
-    			
+
     		}
         	
         	writer.println("</div>");
