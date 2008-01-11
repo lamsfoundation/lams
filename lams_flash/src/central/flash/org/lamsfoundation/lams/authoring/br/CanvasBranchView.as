@@ -21,6 +21,7 @@
  * ************************************************************************
  */
 import org.lamsfoundation.lams.common.Dialog;
+import org.lamsfoundation.lams.common.ToolTip;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.style.*;
@@ -48,6 +49,7 @@ import mx.utils.*;
 class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvasView {	
 	
 	private var _tm:ThemeManager;
+	private var _tip:ToolTip;
 	
 	private var _container:MovieClip;  //The container window that holds the dialog
     
@@ -98,6 +100,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		currentActivity_y = null;
 		
 		_tm = ThemeManager.getInstance();
+		_tip = new ToolTip();
+		
 		defaultSequenceActivity = null;
 		fingerprint = null;
 		_eventsEnabled = true;
@@ -276,6 +280,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 		close_mc.onRelease = Proxy.create(this, localOnRelease);
 		close_mc.onReleaseOutside = Proxy.create(this, localOnReleaseOutside);
+		close_mc.onRollOver = Proxy.create(this, this['showToolTip'], close_mc, "close_mc_tooltip");
+		close_mc.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
 		setupConnectorHubs();
 		loadSequenceActivities();
@@ -855,5 +861,31 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		else return MonitorModel(model).ddm;
 	}
 	
+	private function getXY():Object {
+		var pos:Object = new Object();
+		
+		pos.x = (model instanceof CanvasModel) ? org.lamsfoundation.lams.authoring.Application.CANVAS_X + hSpace : model.getMonitor().getMV().getMonitorSequenceScp()._x;
+		pos.y =  (model instanceof CanvasModel) ? org.lamsfoundation.lams.authoring.Application.CANVAS_Y + vSpace : model.getMonitor().getMV().getMonitorSequenceScp()._y;
+		
+		Debugger.log("pos x: " + pos.x + " pos y: " + pos.y, Debugger.CRITICAL, "getXY", "CanvasBranchView");
+		
+		return pos;
+	}
+	
+	public function showToolTip(mcObj, btnTT:String):Void{
+		var pos = getXY();
+		var Xpos = pos.x + mcObj._x - 20;
+		var Ypos = pos.y + mcObj._y - 20;
+		
+		var ttHolder = ApplicationParent.tooltip;
+		var ttMessage = Dictionary.getValue(btnTT);
+		
+		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos);
+		
+	}
+	
+	public function hideToolTip():Void{
+		_tip.CloseToolTip();
+	}
 
 }

@@ -255,7 +255,7 @@ class ToolkitView extends AbstractView {
 	}
 	
 	public function showToolTip(ttMsg:String, xpos:Number, ypos:Number, btnObj):Void{
-		var ttHolder = Application.tooltip;
+		var ttHolder = ApplicationParent.tooltip;
 		var ttMessage:String;
 		var Xpos:Number;
 		var Ypos:Number;

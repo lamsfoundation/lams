@@ -181,7 +181,7 @@ class MonitorModel extends Observable{
 		ddmTransition_keys = new Array();
 		
 		_resultDTO = new Object();
-		ttHolder = Application.tooltip;
+		ttHolder = ApplicationParent.tooltip;
 		monitor_y = Application.MONITOR_Y;
 		monitor_x = Application.MONITOR_X;
 		

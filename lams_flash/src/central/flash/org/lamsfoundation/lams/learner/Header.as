@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.Config;
+import org.lamsfoundation.lams.common.ApplicationParent;
 
 class Header extends MovieClip {
 	
@@ -147,7 +148,7 @@ class Header extends MovieClip {
 		
 		var Xpos = Application.HEADER_X+ 5;
 		var Ypos = Application.HEADER_Y+( btnObj._y+btnObj._height)+2;
-		var ttHolder = Application.tooltip;
+		var ttHolder = ApplicationParent.tooltip;
 		var ttMessage = Dictionary.getValue(btnTT);
 		var ttWidth = 150
 		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos, undefined, ttWidth);

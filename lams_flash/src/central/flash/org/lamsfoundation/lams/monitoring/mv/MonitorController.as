@@ -574,7 +574,7 @@ class MonitorController extends AbstractController {
 		var myObj:Object = new Object();
 		myObj.compX = Application.MONITOR_X
 		myObj.compY = Application.MONITOR_Y
-		myObj.ttHolder = Application.tooltip;
+		myObj.ttHolder = ApplicationParent.tooltip;
 		return myObj;
 		
 	}

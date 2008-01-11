@@ -150,7 +150,7 @@ import mx.controls.*;
 	public function showToolTip(btnTT:String):Void{
 		var Xpos = this._x + 5;
 		var Ypos = this._y + this._height;
-		var ttHolder = Application.tooltip;	
+		var ttHolder = ApplicationParent.tooltip;	
 		var ttMessage = Dictionary.getValue(btnTT);
 		Debugger.log("ttMessage"+ttMessage, Debugger.CRITICAL);
 

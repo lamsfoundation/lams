@@ -82,7 +82,6 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
     
     
     private var _dialogueContainer_mc:MovieClip;       //Dialog container
-    private var _tooltipContainer_mc:MovieClip;        //Tooltip container
     private var _cursorContainer_mc:MovieClip;         //Cursor container
     private var _container_mc:MovieClip;               //Main container
     
@@ -427,20 +426,6 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
         //Return root if valid otherwise raise a big system error as app. will not work without it
         if(_instance._dialogueContainer_mc != undefined) {
             return _instance._dialogueContainer_mc;
-        } else {
-            //TODO DI 11/05/05 Raise error if mc hasn't been created
-			
-        }
-    }	 /**
-    * Returns the tooltip conatiner mc
-    * 
-    * @usage    Import authoring package and then use
-	* 
-    */
-    static function get tooltip():MovieClip {
-        //Return root if valid otherwise raise a big system error as app. will not work without it
-        if(_instance._tooltipContainer_mc != undefined) {
-            return _instance._tooltipContainer_mc;
         } else {
             //TODO DI 11/05/05 Raise error if mc hasn't been created
 			

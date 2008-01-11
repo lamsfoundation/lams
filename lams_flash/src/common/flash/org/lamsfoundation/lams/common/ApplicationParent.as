@@ -78,7 +78,8 @@ class ApplicationParent {
 
 	private var _appRoot_mc:MovieClip;                 //Application root clip
 	private var _dialogueContainer_mc:MovieClip;       //Dialog container
-
+	private var _tooltipContainer_mc:MovieClip;        //Tooltip container
+    
 	// constructor
 	public function ApplicationParent(app:Object) {
 		_instance = ApplicationParent(app);
@@ -224,6 +225,22 @@ class ApplicationParent {
         //Return root if valid otherwise raise a big system error as app. will not work without it
         if(_instance._customCursor_mc != undefined) {
             return _instance._customCursor_mc;
+        } else {
+            //TODO DI 11/05/05 Raise error if mc hasn't been created
+			
+        }
+    }
+	
+	/**
+    * Returns the tooltip conatiner mc
+    * 
+    * @usage    Import authoring package and then use
+	* 
+    */
+    static function get tooltip():MovieClip {
+        //Return root if valid otherwise raise a big system error as app. will not work without it
+        if(_instance._tooltipContainer_mc != undefined) {
+            return _instance._tooltipContainer_mc;
         } else {
             //TODO DI 11/05/05 Raise error if mc hasn't been created
 			

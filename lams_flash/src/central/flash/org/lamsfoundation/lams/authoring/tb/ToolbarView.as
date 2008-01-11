@@ -379,7 +379,7 @@ class ToolbarView extends AbstractView {
 	public function showToolTip(btnObj, btnTT:String):Void{
 		var Xpos = Application.TOOLBAR_X+ btnObj._x;
 		var Ypos = (Application.TOOLBAR_Y+ btnObj._y+btnObj.height)+5;
-		var ttHolder = Application.tooltip;
+		var ttHolder = ApplicationParent.tooltip;
 		var ttMessage = Dictionary.getValue(btnTT);
 		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos);
 		

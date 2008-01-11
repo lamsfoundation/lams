@@ -63,7 +63,7 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 		_tm = ThemeManager.getInstance();
 		_childActivities = new Array();
 		//Tip = new ToolTip();
-		//ttHolder = Application.tooltip;
+		//ttHolder = ApplicationParent.tooltip;
 		//let it wait one frame to set up the components.
 		MovieClipUtils.doLater(Proxy.create(this,init));
     }  

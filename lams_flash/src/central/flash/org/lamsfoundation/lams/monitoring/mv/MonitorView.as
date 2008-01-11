@@ -342,7 +342,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		}
 		var Xpos = Application.MONITOR_X+ xpos;
 		var Ypos = (Application.MONITOR_Y+ btnObj._y+btnObj.height)+5;
-		var ttHolder = Application.tooltip;
+		var ttHolder = ApplicationParent.tooltip;
 		var ttMessage = Dictionary.getValue(btnTT);
 		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos);
 		

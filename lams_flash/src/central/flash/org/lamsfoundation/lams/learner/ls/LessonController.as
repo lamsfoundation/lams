@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.LearnerComplexActivity;
+import org.lamsfoundation.lams.common.ApplicationParent;
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
@@ -149,7 +150,7 @@ class LessonController extends AbstractController {
 		var myObj:Object = new Object();
 		myObj.compX = Application.LESSON_X
 		myObj.compY = Application.LESSON_Y
-		myObj.ttHolder = Application.tooltip;
+		myObj.ttHolder = ApplicationParent.tooltip;
 		return myObj;
 		
 	}

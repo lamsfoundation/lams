@@ -480,7 +480,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		var xpos:Number = scpWidth - 190;
 		var Xpos = xpos;
 		var Ypos = (Application.MONITOR_Y+ btnObj._y+btnObj.height)+5;
-		var ttHolder = Application.tooltip;
+		var ttHolder = ApplicationParent.tooltip;
 		var ttMessage = Dictionary.getValue(btnTT);
 		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos);
 		

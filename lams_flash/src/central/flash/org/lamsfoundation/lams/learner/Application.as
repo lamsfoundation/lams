@@ -91,8 +91,7 @@ class Application extends ApplicationParent {
 	//Application instance is stored as a static in the application class
     private static var _instance:Application = null;     
 	private var _container_mc:MovieClip;               //Main container
-	private var _tooltipContainer_mc:MovieClip;        //Tooltip container
-    private var _debugDialog:MovieClip;                //Reference to the debug dialog
+	private var _debugDialog:MovieClip;                //Reference to the debug dialog
 
 	/**
     * Application - Constructor
@@ -340,24 +339,6 @@ class Application extends ApplicationParent {
 			}
 		}
 	}
-     
-	 
-	/**
-    * Returns the tooltip conatiner mc
-    * 
-    * @usage    Import monioring package and then use
-	* 
-    */
-    static function get tooltip():MovieClip {
-		//Return root if valid otherwise raise a big system error as app. will not work without it
-        if(_instance._tooltipContainer_mc != undefined) {
-            return _instance._tooltipContainer_mc;
-        } else {
-            //TODO DI 11/05/05 Raise error if mc hasn't been created
-			
-        }
-    }
-    
 	
 	// onKey*** methods - TODO
 	
