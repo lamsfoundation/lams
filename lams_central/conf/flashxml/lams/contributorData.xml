@@ -46,19 +46,13 @@
 			<string>Eric Hsin</string></var></struct>
 	<struct>
 		<var name="value">
-			<string>Alexia Chang</string></var></struct></array></var><var name="German (Germany)"><array length="1"><struct><var name="value"><string>Ralf Hilgenstock</string></var></struct></array></var><var name="Spanish (Spain)"><array length="4"><struct><var name="value"><string>Carlos Marcelo</string></var></struct><struct><var name="value"><string>Ernie Ghiglione</string></var></struct>
+			<string>Alexia Chang</string></var></struct></array></var><var name="German (Germany)"><array length="1"><struct><var name="value"><string>Ralf Hilgenstock</string></var></struct></array></var><var name="Spanish (Spain)"><array length="3"><struct><var name="value"><string>Carlos Marcelo</string></var></struct><struct><var name="value"><string>Ernie Ghiglione</string></var></struct>
 	<struct>
 		<var name="value">
-			<string>Gregorio Rodríguez Gomez</string></var></struct>
-	<struct>
-		<var name="value">
-			<string>Carlos Marcelo</string></var></struct></array></var><var name="Welsh (United Kingdom)"><array length="2"><struct><var name="value"><string>Uned Gyfieithu, Coleg Abertawe  (Translation Unit, Swansea College)</string></var></struct><struct><var name="value"><string>Kristian Besley</string></var></struct></array></var><var name="Portuguese (Brazil)"><array length="6"><struct><var name="value"><string>Paulo Gouveia</string></var></struct><struct><var name="value"><string>Charles Niza</string></var></struct><struct><var name="value"><string>Orzenil Silva Junior</string></var></struct>
+			<string>Gregorio Rodríguez Gomez</string></var></struct></array></var><var name="Welsh (United Kingdom)"><array length="2"><struct><var name="value"><string>Uned Gyfieithu, Coleg Abertawe  (Translation Unit, Swansea College)</string></var></struct><struct><var name="value"><string>Kristian Besley</string></var></struct></array></var><var name="Portuguese (Brazil)"><array length="5"><struct><var name="value"><string>Paulo Gouveia</string></var></struct><struct><var name="value"><string>Charles Niza</string></var></struct><struct><var name="value"><string>Orzenil Silva Junior</string></var></struct>
 	<struct>
 		<var name="value">
 			<string>Narcio Soares</string></var></struct>
-	<struct>
-		<var name="value">
-			<string>Paulo Gouveia</string></var></struct>
 	<struct>
 		<var name="value">
 			<string>Wellington Oliveira</string></var></struct></array></var><var name="Maori (New Zealand)"><array length="1"><struct><var name="value"><string>Robin Ohia</string></var></struct></array></var>
