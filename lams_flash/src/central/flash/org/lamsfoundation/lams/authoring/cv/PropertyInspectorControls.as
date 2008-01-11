@@ -512,10 +512,6 @@ class PropertyInspectorControls extends MovieClip {
 			
 			toolActs_cmb.enabled = e;
 		}
-		
-		if(_canvasModel.getCanvas().ddm.editOverrideLock) {
-			branchType_cmb.enabled = false;
-		}
 	}
 	
 	/**

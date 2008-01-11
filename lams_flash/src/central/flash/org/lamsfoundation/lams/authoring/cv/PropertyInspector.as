@@ -589,6 +589,10 @@ class PropertyInspector extends PropertyInspectorControls {
 			}
 		}
 		
+		if(_canvasModel.getCanvas().ddm.editOverrideLock) {
+			branchType_cmb.enabled = false;
+		}
+		
 		if(_canvasModel.selectedItem.activity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE) {
 			showAppliedGroupingControls(true, !ba.readOnly);
 			showGroupBasedBranchingControls(true, !ba.readOnly);
