@@ -22,7 +22,6 @@
  */
 
 import org.lamsfoundation.lams.authoring.*;
-import org.lamsfoundation.lams.common.Config;
 import org.lamsfoundation.lams.common.util.Debugger;
 
 /*
@@ -69,7 +68,6 @@ class SequenceActivity extends ComplexActivity {
 			return null;
 			
 		var dto:Object = super.toData();
-		dto.defaultActivityUIID = (_firstActivityUIID == null) ? Config.NUMERIC_NULL_VALUE : _firstActivityUIID;
 
 		return dto;
 	}

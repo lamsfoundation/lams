@@ -22,6 +22,8 @@
  */
 
 import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.common.Config;
+import org.lamsfoundation.lams.common.util.Debugger;
 import org.lamsfoundation.lams.common.util.StringUtils;
 /*
 * This class represents all the complex activity types.  they are not much different, so we can handle them in one class.
@@ -83,6 +85,9 @@ class ComplexActivity extends Activity{
 			if(_minOptions){	dto.minOptions = _minOptions;		}
 			if(_optionsInstructions){	dto.optionsInstructions = _optionsInstructions;		}
 		}
+		
+		dto.defaultActivityUIID = (_firstActivityUIID == null) ? Config.NUMERIC_NULL_VALUE : _firstActivityUIID;
+		
 		return dto;
 	}
 	

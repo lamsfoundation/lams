@@ -54,6 +54,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private static var OPTION_RANGE:Number = 2;
 	
 	private static var TOOL_OUTPUTS_URL_POSTFIX:String = "outputs";
+	private static var HELP_BTN_LBL:String = "?";
 	
 	//References to components + clips 
     private var _container:MovieClip;  //The container window that holds the dialog
@@ -184,7 +185,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		_condition_to_lbl.text = Dictionary.getValue("to_conditions_dlg_to_lbl");
 		
 		add_btn.label = Dictionary.getValue("to_conditions_dlg_add_btn_lbl");
-		help_btn.label = Dictionary.getValue("to_conditions_dlg_help_btn_lbl");
+		help_btn.label = HELP_BTN_LBL;
 		clear_all_btn.label = Dictionary.getValue("to_conditions_dlg_clear_all_btn_lbl");
 		remove_item_btn.label = Dictionary.getValue("to_conditions_dlg_remove_item_btn_lbl");
 	

@@ -49,11 +49,6 @@ class BranchingActivity extends ComplexActivity {
 		super(activityUIID);
 		_activityTypeID = activityTypeID;
 		
-		//_startXCoord = DEFAULT_STARTX;
-		//_startYCoord = DEFAULT_STARTY;
-		//_endXCoord = DEFAULT_ENDX;
-		//_endYCoord = DEFAULT_ENDY;
-		
 		_toolActivityUIID == null;
 		_defaultBranch = null;
 		
@@ -67,12 +62,12 @@ class BranchingActivity extends ComplexActivity {
 	 */
 	public function populateFromDTO(dto:Object){
 		super.populateFromDTO(dto);
+		
 		_startXCoord = dto.startXCoord;
 		_startYCoord = dto.startYCoord;
 		_endXCoord = dto.endXCoord;
 		_endYCoord = dto.endYCoord;
 		_toolActivityUIID = dto.toolActivityUIID;
-		
 	}
 	
 	/**
@@ -89,7 +84,6 @@ class BranchingActivity extends ComplexActivity {
 		if(_endXCoord) dto.endXCoord = _endXCoord;
 		if(_endYCoord) dto.endYCoord = _endYCoord;
 		if(_toolActivityUIID) dto.toolActivityUIID = _toolActivityUIID;
-		if(_defaultBranch) dto.defaultActivityUIID = _defaultBranch.sequenceActivity.activityUIID;
 		
 		return dto;
 	}
