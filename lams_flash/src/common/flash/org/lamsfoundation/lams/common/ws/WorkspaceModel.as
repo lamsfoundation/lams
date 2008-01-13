@@ -278,7 +278,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 * @param   dto 
 	 * @return  
 	 */
-	public function setFolderContents(dto:Object, openFolder:Boolean){
+	public function setFolderContents(dto:Object, openFolder:Boolean){	
 		var nodeToUpdate:XMLNode;
 		Debugger.log('looking for:Folder_'+dto.workspaceFolderID+', parentWorkspaceFolderID:'+dto.parentWorkspaceFolderID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 		_global.breakpoint();
@@ -496,17 +496,22 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	public function isWritableResource(resourceType,resourceID){
 		var rData = getWorkspaceResource(resourceType+'_'+resourceID).attributes.data;
 		Debugger.log(resourceType+'_'+resourceID+'has permission code:'+rData.permissionCode,Debugger.GEN,'isWritableResource','org.lamsfoundation.lams.WorkspaceModel');
+		
 		if(rData.permissionCode == READ_ACCESS){
 			return false;
 		}
 		if(rData.permissionCode == MEMBERSHIP_ACCESS){
-			if (resourceType == "Folder")
+			if(!rData.readOnly) { //if the file folder is writable
+				if (resourceType == "Folder")
+					return true;
+			}
+			return false;
+		}
+		if(rData.permissionCode == OWNER_ACCESS){
+			if(!rData.readOnly)
 				return true;
 			else
 				return false;
-		}
-		if(rData.permissionCode == OWNER_ACCESS){
-			return true;
 		}
 		if(rData.permissionCode == NO_ACCESS){
 			return false;
