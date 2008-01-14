@@ -282,3 +282,6 @@ values ('LearnerProgressBatchSize', '10', 'config.learner.progress.batch.size', 
 
 -- LDEV-1284 integration organisation no longer mandatory
 alter table lams_ext_server_org_map modify column orgid bigint(20);
+
+-- LDEV-1473 learner progress url for branching and sequence system tools
+update lams_system_tool set learner_progress_url='monitoring/complexProgress.do' where system_tool_id > 5;

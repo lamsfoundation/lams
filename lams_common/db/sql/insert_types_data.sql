@@ -183,7 +183,7 @@ INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_di
 	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
 VALUES (6, 10, 'Monitor Chosen Branching', 'Select between multiple sequence activities, with the branch chosen in monitoring.', 
 	'learning/branching.do?method=performBranching', 'learning/branching.do?method=performBranching', 
-	'learning/branching.do?method=viewBranching&mode=teacher', NULL,
+	'monitoring/complexProgress.do', NULL,
 	'monitoring/branchingExportPortfolio?mode=teacher', 'monitoring/chosenBranching.do?method=assignBranch', 
 	'monitoring/chosenBranching.do?method=assignBranch', now());
 
@@ -192,7 +192,7 @@ INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_di
         export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
 VALUES (7, 11, 'Group Based Branching', 'Select between multiple sequence activities, with the branch chosen by an existing group.',
         'learning/branching.do?method=performBranching', 'learning/branching.do?method=performBranching',
-        'learning/branching.do?method=viewBranching&mode=teacher', NULL,
+        'monitoring/complexProgress.do', NULL,
         'monitoring/branchingExportPortfolio?mode=teacher', 'monitoring/groupedBranching.do?method=viewBranching',
         'monitoring/groupedBranching.do?method=assignBranch', now());
 
@@ -201,7 +201,7 @@ INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_di
         export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
 VALUES (8, 12, 'Tool Output Based Branching', 'Select between multiple sequence activities, with the branch chosen on results of another activity.',
         'learning/branching.do?method=performBranching', 'learning/branching.do?method=performBranching',
-        'learning/branching.do?method=viewBranching&mode=teacher', NULL, 
+        'monitoring/complexProgress.do', NULL, 
         'monitoring/branchingExportPortfolio?mode=teacher', 'monitoring/toolBranching.do?method=viewBranching',
         'monitoring/toolBranching.do?method=viewBranching', now());
 
@@ -210,7 +210,7 @@ INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_di
         export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
 VALUES (9, 8, 'Sequence', 'A sequence of activities',
         'learning/SequenceActivity.do', 'learning/SequenceActivity.do',
-        NULL, NULL, 
+        'monitoring/complexProgress.do', NULL, 
         'monitoring/sequenceExportPortfolio?mode=teacher', 'monitoring/sequence.do?method=viewSequence',
         'monitoring/sequence.do?method=viewSequence', now());
 
