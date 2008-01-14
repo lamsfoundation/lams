@@ -378,18 +378,21 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		if  ( workspaceFolder==null || user==null ) {
 			log.debug("no access due to null value(s) in user or workspaceFolder");
 			permission = WorkspaceFolder.NO_ACCESS;
-		} else if (workspaceFolder.getUserID().equals(user.getUserId())) {
-			log.debug(user.getLogin()+" has owner access to "+workspaceFolder.getName());
-			permission = WorkspaceFolder.OWNER_ACCESS;
-		} else if (isSysAuthorAdmin(user)){
-			log.debug(user.getLogin()+" has owner access to "+workspaceFolder.getName());
-			permission = WorkspaceFolder.OWNER_ACCESS;
-		} else if(user.hasMemberAccess(workspaceFolder)) {
-			log.debug(user.getLogin()+" has membership access to "+workspaceFolder.getName());
-			permission = WorkspaceFolder.MEMBERSHIP_ACCESS;
 		} else {
-			log.debug(user.getLogin()+" has no access to "+workspaceFolder.getName());
-			permission = WorkspaceFolder.NO_ACCESS;
+			if ( WorkspaceFolder.RUN_SEQUENCES.equals(workspaceFolder.getWorkspaceFolderType()) ) {
+				permission = WorkspaceFolder.READ_ACCESS;
+			} else if (workspaceFolder.getUserID().equals(user.getUserId())) {
+				permission = WorkspaceFolder.OWNER_ACCESS;
+			} else if (isSysAuthorAdmin(user)){
+				permission = WorkspaceFolder.OWNER_ACCESS;
+			} else if(user.hasMemberAccess(workspaceFolder)) {
+				permission = WorkspaceFolder.MEMBERSHIP_ACCESS;
+			} else {
+				permission = WorkspaceFolder.NO_ACCESS;
+			}
+			if ( log.isDebugEnabled() ) {
+				log.debug(user.getLogin()+" has "+permission+" access to "+workspaceFolder.getName());
+			}
 		}
 		
 		return permission;
