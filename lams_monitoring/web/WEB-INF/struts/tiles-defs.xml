@@ -53,4 +53,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<definition name=".viewSequence" extends=".baseDef" >
 		<put name="content" value="/viewSequence.jsp" />	
 	</definition>
+<!-- ============= Complex Activity Learner Progress Definitions ====================== -->
+	<definition name=".complexProgress" extends=".baseDef" >
+		<put name="content" value="/complexProgress.jsp" />	
+	</definition>
 </tiles-definitions>

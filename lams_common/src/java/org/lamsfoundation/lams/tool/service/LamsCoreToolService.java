@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -573,7 +572,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     /**
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolLearnerProgressURL(java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.usermanagement.User)
      */
-    public String getToolLearnerProgressURL(Long lessonID, Activity activity,User learner) throws LamsToolServiceException
+    public String getToolLearnerProgressURL(Long lessonID, Activity activity, User learner) throws LamsToolServiceException
     {
     	if ( activity.isToolActivity() ) {
     		ToolActivity toolActivity = (ToolActivity) activity;
@@ -583,7 +582,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     	} else if ( activity.isSystemToolActivity() ){
     		SystemTool sysTool = systemToolDAO.getSystemToolByActivityTypeId(activity.getActivityTypeId());
     		if ( sysTool != null ) {
-                return setupURLWithActivityLessonID(activity, lessonID, sysTool.getLearnerProgressUrl());
+                return setupURLWithActivityLessonUserID(activity, lessonID, learner.getUserId(), sysTool.getLearnerProgressUrl());
     		}
     	}
     	return null;
@@ -686,6 +685,16 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
         return WebUtil.appendParameterToURL(toolURL,
         		AttributeNames.PARAM_TOOL_SESSION_ID,
 				toolSession.getToolSessionId().toString());
+    }
+    
+    public String setupURLWithActivityLessonUserID(Activity activity, Long lessonID, Integer userID, String learnerURL) {
+        String url = setupURLWithActivityLessonID(activity, lessonID, learnerURL);
+        if ( url!=null && userID != null ) {
+        	url = WebUtil.appendParameterToURL(url,
+        		AttributeNames.PARAM_USER_ID,
+				userID.toString());
+        }
+        return url;
     }
     
     public String setupURLWithActivityLessonID(Activity activity, Long lessonID, String learnerURL) {

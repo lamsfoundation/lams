@@ -85,7 +85,6 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
@@ -93,6 +92,7 @@ import org.lamsfoundation.lams.util.audit.AuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -1416,12 +1416,22 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	Activity activity = activityDAO.getActivityByActivityId(activityID);
     	User learner = (User)baseDAO.find(User.class,learnerUserID);
     	
+    	String url = null;
     	if(activity==null || learner==null){
     		log.error("getLearnerActivityURL activity or user missing. Activity ID "+activityID+" activity " +activity+" userID "+learnerUserID+" user "+learner);   		
-    	} else if ( activity.isToolActivity() || activity.isSystemToolActivity() ){
-        	return lamsCoreToolService.getToolLearnerProgressURL(lessonID, activity,learner);
+    	} else if ( activity.isToolActivity() ){
+        	url = lamsCoreToolService.getToolLearnerProgressURL(lessonID, activity, learner);
+    	} else if (activity.isOptionsActivity() || activity.isParallelActivity()) {
+    		url = "monitoring/complexProgress.do?"
+    			+ AttributeNames.PARAM_ACTIVITY_ID + "=" + activityID + "&"
+    			+ AttributeNames.PARAM_LESSON_ID + "=" + lessonID + "&"
+    			+ AttributeNames.PARAM_USER_ID + "=" + learnerUserID;
+    	} else if (activity.isBranchingActivity()) {
+    		activity = (BranchingActivity)activity;
+    		url = lamsCoreToolService.getToolLearnerProgressURL(lessonID, activity, learner);
     	}
-    	return null;
+    	log.debug("url: "+url);
+    	return url;
     }	
 	/**
 	 * (non-Javadoc)

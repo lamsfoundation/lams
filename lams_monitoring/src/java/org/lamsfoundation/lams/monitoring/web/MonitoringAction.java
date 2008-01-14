@@ -721,8 +721,8 @@ public class MonitoringAction extends LamsDispatchAction
             HttpServletResponse response)throws IOException,LamsToolServiceException{
 
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Integer learnerUserID = new Integer(WebUtil.readIntParam(request,"userID")); 	
-    	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
+    	Integer learnerUserID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID)); 	
+    	Long activityID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_ACTIVITY_ID));
     	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
     	
     	String url = monitoringService.getLearnerActivityURL(lessonID,activityID,learnerUserID,getUserId());
