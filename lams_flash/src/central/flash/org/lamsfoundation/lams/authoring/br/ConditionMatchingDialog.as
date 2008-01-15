@@ -104,8 +104,14 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 		conditions_lst.hScrollPolicy = "on";
 		conditions_lst.maxHPosition = 200;
 		
-		branches_lst.dataProvider = branches;
-		branches_lst.labelField = "sequenceName";
+		if(branchesLoaded) {
+			branches_lst.dataProvider = branches;
+			branches_lst.labelField = "sequenceName";
+		} else {
+			branches_lst.dataProvider = sequences;
+			branches_lst.labelField = "title";
+		}
+		
 		branches_lst.hScrollPolicy = "on";
 		branches_lst.maxHPosition = 200;
 		
@@ -177,7 +183,12 @@ class ConditionMatchingDialog extends BranchMappingDialog {
         Debugger.log("clearing all unmapped conditions: " + conditions_lst.length, Debugger.CRITICAL, "cleanupUnmappedConditions", "ConditionMatchingDialog");
 		
 		for(var i=0; i < conditions_lst.length; i++) {
-			setupMatch(conditions_lst.getItemAt(i), _branchingActivity.defaultBranch);
+			if(_branchingActivity.defaultBranch != null)
+				setupMatch(conditions_lst.getItemAt(i), _branchingActivity.defaultBranch);
+			else if(_branchingActivity.firstActivityUIID != null)
+				setupMatch(conditions_lst.getItemAt(i), app.getCanvas().ddm.getActivityByUIID(_branchingActivity.firstActivityUIID));
+			else
+				Debugger.log("no default branch to map conditions too.", Debugger.CRITICAL, "cleanupUnmappedConditions", "ConditionMatchingDialog");
 		}
 		
 		conditions_lst.removeAll();
@@ -222,10 +233,11 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 		}
 	}
 	
-	private function setupMatch(condition:ToolOutputCondition, branch:Branch):Void {
+	private function setupMatch(condition:ToolOutputCondition, branch):Void {
 		Debugger.log("condition: " + condition + " branch: " + branch, Debugger.CRITICAL, "setupMatch", "ConditionMatchingDialog");
-		 
-		var toMatch:ToolOutputBranchActivityEntry = new ToolOutputBranchActivityEntry(null, app.getCanvas().ddm.newUIID(), condition, branch.sequenceActivity, _branchingActivity);
+		var _seq:SequenceActivity = (branch instanceof Branch) ? branch.sequenceActivity : branch; 
+		
+		var toMatch:ToolOutputBranchActivityEntry = new ToolOutputBranchActivityEntry(null, app.getCanvas().ddm.newUIID(), condition, _seq, _branchingActivity);
 		match_dgd.addItem(toMatch);
 		
 		app.getCanvas().ddm.addBranchMapping(toMatch);
@@ -254,6 +266,12 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 	}
 	
 	public function set branches(a:Array){
+		branchesLoaded = true;
+		_secondary = a;
+	}
+	
+	public function set sequences(a:Array){
+		branchesLoaded = false;
 		_secondary = a;
 	}
 	
@@ -262,7 +280,17 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 	}
 	
 	public function get branches():Array{
-		return _secondary;
+		if(branchesLoaded)
+			return _secondary;
+		else 
+			return null;
+	}
+	
+	public function get sequences():Array {
+		if(!branchesLoaded)
+			return _secondary;
+		else
+			return null;
 	}
 	
 	public function get conditions_lst():List {

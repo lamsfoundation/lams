@@ -101,8 +101,14 @@ class GroupMatchingDialog extends BranchMappingDialog {
 		groups_lst.hScrollPolicy = "on";
 		groups_lst.maxHPosition = 200;
 		
-		branches_lst.dataProvider = branches;
-		branches_lst.labelField = "sequenceName";
+		if(branchesLoaded) {
+			branches_lst.dataProvider = branches;
+			branches_lst.labelField = "sequenceName";
+		} else {
+			branches_lst.dataProvider = sequences;
+			branches_lst.labelField = "title";
+		}
+		
 		branches_lst.hScrollPolicy = "on";
 		branches_lst.maxHPosition = 200;
 		
@@ -187,10 +193,12 @@ class GroupMatchingDialog extends BranchMappingDialog {
 		}
 	}
 	
-	private function setupMatch(group:Group, branch:Branch):Void {
+	private function setupMatch(group:Group, branch):Void {
 		Debugger.log("group: " + group + " branch: " + branch, Debugger.CRITICAL, "setupMatch", "GroupMatchingDialog");
-		 
-		var gbMatch:GroupBranchActivityEntry = new GroupBranchActivityEntry(null, app.getCanvas().ddm.newUIID(), group, branch.sequenceActivity, _branchingActivity);
+		
+		var _seq:SequenceActivity = (branch instanceof Branch) ? SequenceActivity(branch.sequenceActivity) : SequenceActivity(branch);
+		
+		var gbMatch:GroupBranchActivityEntry = new GroupBranchActivityEntry(null, app.getCanvas().ddm.newUIID(), group, _seq, _branchingActivity);
 		match_dgd.addItem(gbMatch);
 		
 		app.getCanvas().ddm.addBranchMapping(gbMatch);
@@ -219,6 +227,12 @@ class GroupMatchingDialog extends BranchMappingDialog {
 	}
 	
 	public function set branches(a:Array){
+		branchesLoaded = true;
+		_secondary = a;
+	}
+	
+	public function set sequences(a:Array){
+		branchesLoaded = false;
 		_secondary = a;
 	}
 	
@@ -227,7 +241,17 @@ class GroupMatchingDialog extends BranchMappingDialog {
 	}
 	
 	public function get branches():Array{
-		return _secondary;
+		if(branchesLoaded)
+			return _secondary;
+		else 
+			return null;
+	}
+	
+	public function get sequences():Array {
+		if(!branchesLoaded)
+			return _secondary;
+		else
+			return null;
 	}
 	
 	public function get groups_lst():List {

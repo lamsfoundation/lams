@@ -391,8 +391,16 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	}
 	
 	private function removeAllItems(c:Boolean):Void {
+		var _item:ToolOutputDefinition = _toolOutputDefin_cmb.dataProvider[_toolOutputDefin_cmb.selectedIndex];
+		
+		if(_item.type == null) {
+			returnDefinitionState();
+			return;
+		}
+		
 		clearAllButton_onPress(null, true);
-		if(c) selectDefinition();
+		if(c) selectDefinition(true);
+		
 	}
 	
 	private function validateCondition(selectedDefinition:ToolOutputDefinition):Boolean {
@@ -479,7 +487,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		Debugger.log("has mappings: " + app.getCanvas().ddm.hasBranchMappingsForConditionSet(_condition_item_dgd.dataProvider), Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
 		Debugger.log("dp length: " + _condition_item_dgd.dataProvider.length, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
 		
-		if(app.getCanvas().ddm.hasBranchMappingsForConditionSet(_condition_item_dgd.dataProvider) && evt != null) {
+		_toolOutputLongOptions_cmb.selectedIndex = 0;
+		
+		if(app.getCanvas().ddm.hasBranchMappingsForConditionSet(_condition_item_dgd.dataProvider) && evt != null && _toolOutputDefin_cmb.selectedIndex != 0) {
 			LFMessage.showMessageConfirm(Dictionary.getValue("branch_mapping_dlg_condition_linked_msg", [Dictionary.getValue("branch_mapping_dlg_condition_linked_all")]), Proxy.create(this, removeAllItems, true), Proxy.create(this, returnDefinitionState), Dictionary.getValue("al_continue"), null);
 		} else if(evt != null) removeAllItems(true);
 		else selectDefinition();

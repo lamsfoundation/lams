@@ -1038,7 +1038,7 @@ class PropertyInspectorControls extends MovieClip {
 	private function onAppliedGroupingChange(evt:Object){
 		var a = _canvasModel.selectedItem;
 		
-		//get the groupingUIID of the grouping Actviity we have selected.
+		// get the groupingUIID of the grouping Actviity we have selected.
 		var newGroupingUIID = evt.target.value.createGroupingUIID;
 		a.activity.groupingUIID = newGroupingUIID;
 		if (a.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
@@ -1077,10 +1077,13 @@ class PropertyInspectorControls extends MovieClip {
 		ca.activity.toolActivityUIID = (toolActivityUIID != 0) ? toolActivityUIID : null;
 		ca.refresh();
 			
-		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
-		_conditions_setup_btn.visible = ((ca.activity.toolActivityUIID != null) && (branches.myBranches.length > 0)) ? true : false;
-		_tool_output_match_btn.visible = ((ca.activity.toolActivityUIID != null) && (branches.myBranches.length > 0)) ? true : false;
-			
+		var sequences:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
+	
+		if(hasConnectedSequences(sequences)) {
+			_conditions_setup_btn.visible = (ca.activity.toolActivityUIID != null) ? true : false;
+			_tool_output_match_btn.visible = (ca.activity.toolActivityUIID != null) ? true : false;
+		}
+		
 		setModified();
 	}
 	
@@ -1097,10 +1100,7 @@ class PropertyInspectorControls extends MovieClip {
 		
 		if(!v) { _tool_output_match_btn.visible = false; _conditions_setup_btn.visible = false; return; }
 		
-		/** TODO: sequences with branching parent loaded in ddm instead */
-		//var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(_canvasModel.selectedItem.activity.activityUIID);
 		var sequences:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
-		
 		
 		if(hasConnectedSequences(sequences)) {
 			if(_canvasModel.selectedItem.activity.toolActivityUIID != null) {
@@ -1226,8 +1226,12 @@ class PropertyInspectorControls extends MovieClip {
 		
 		evt.target.scrollContent.branchingActivity = BranchingActivity(_canvasModel.selectedItem.activity);
 		evt.target.scrollContent.groups = grouping.getGroups(_canvasModel.getCanvas().ddm);
-		evt.target.scrollContent.branches = getValidBranches(branches.myBranches);
 		
+		if(branches.myBranches.length > 0)
+			evt.target.scrollContent.branches = getValidBranches(branches.myBranches);
+		else
+			evt.target.scrollContent.sequences = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
+			
 		evt.target.scrollContent.loadLists();
 		
 	}
@@ -1248,8 +1252,12 @@ class PropertyInspectorControls extends MovieClip {
 		
 		evt.target.scrollContent.branchingActivity = BranchingActivity(_canvasModel.selectedItem.activity);
 		evt.target.scrollContent.conditions = conditions;
-		evt.target.scrollContent.branches = getValidBranches(branches.myBranches);
 		
+		if(branches.myBranches.length > 0)
+			evt.target.scrollContent.branches = getValidBranches(branches.myBranches);
+		else
+			evt.target.scrollContent.sequences = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
+			
 		evt.target.scrollContent.loadLists();
 	}
 	

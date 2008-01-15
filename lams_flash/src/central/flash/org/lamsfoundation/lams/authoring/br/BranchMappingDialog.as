@@ -65,6 +65,8 @@ class BranchMappingDialog extends MovieClip implements Dialog {
 	
 	private var match_dgd:DataGrid;		// Group-Branch Matching listbox
     
+	private var branches_loaded:Boolean;
+	
     private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
 	public var app:Application;
@@ -88,6 +90,7 @@ class BranchMappingDialog extends MovieClip implements Dialog {
         EventDispatcher.initialize(this);
 		
 		app = Application.getInstance();
+		branches_loaded = false;
 		
         //Create a clip that will wait a frame before dispatching init to give components time to setup
         this.onEnterFrame = init;
@@ -200,6 +203,14 @@ class BranchMappingDialog extends MovieClip implements Dialog {
 	
 	public function set secondary(a:Array){
 		_secondary = a;
+	}
+	
+	public function get branchesLoaded():Boolean {
+		return branches_loaded;
+	}
+	
+	public function set branchesLoaded(a:Boolean):Void {
+		branches_loaded = a;
 	}
 
 }
