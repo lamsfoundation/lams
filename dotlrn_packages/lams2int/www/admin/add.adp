@@ -173,8 +173,7 @@
 <tr>
         <td align="left">
                 <b>Confirm the lesson details</b><br />
-                <p>By pressing on the Start button you can begin the lesson straight away.</br>
-You can also schedule the lesson to start at a particular date and time.</p>
+                <p>By pressing on the Start button you can begin the lesson straight away.</br></p>
         </td>
 </tr>   
 <tr>
