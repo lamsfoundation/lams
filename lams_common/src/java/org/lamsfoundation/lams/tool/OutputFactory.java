@@ -23,6 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
@@ -35,6 +36,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.lamsfoundation.lams.learningdesign.BranchCondition;
 
 /**
  * This class forms the basic implementation of an output definition and output value factory, which is the class in a tool that 
@@ -178,7 +180,6 @@ public abstract class OutputFactory {
 		return definition;
 	}
 
-	//The mark for a user's last attempt at answering the question(s).
 	/** Build a tool definition designed for a range of integer values. 
 	 * It will get the definition's description from the I18N file using the getDescription() method and
 	 * set the type to OUTPUT_LONG. */
@@ -210,13 +211,27 @@ public abstract class OutputFactory {
 	}
 
 	/** Build a tool definition designed for a single boolean value, which is likely to be a test such as
-	 * user has answered all questions correctly.
-	 * It will get the definition's description from the I18N file using the getDescription() method and
-	 * set the type to OUTPUT_BOOLEAN. */
+	 * user has answered all questions correctly. It will get the definition's description from the I18N file using the getDescription() method and
+	 * set the type to OUTPUT_BOOLEAN. A Boolean tool definition should have default condition name for the
+	 * true and false conditions. The code will automatically look for two strings in the I18N file 
+	 * output.desc.<description>.true and output.desc.<description>.false */
 	protected ToolOutputDefinition buildBooleanOutputDefinition(String definitionName) {
-		return buildDefinition(definitionName, OutputType.OUTPUT_BOOLEAN, null, null, null);
-	}
+		ToolOutputDefinition definition =  buildDefinition(definitionName, OutputType.OUTPUT_BOOLEAN, null, null, null);
 
+		List<BranchCondition> defaultConditions = new ArrayList<BranchCondition>();
+		defaultConditions.add(new BranchCondition(null, null, new Integer(1), definitionName, 
+				getDescription(definitionName+".true"), 
+				OutputType.OUTPUT_BOOLEAN.toString(), null, null, Boolean.TRUE.toString()));
+
+		defaultConditions.add(new BranchCondition(null, null, new Integer(2), definitionName, 
+				getDescription(definitionName+".false"), 
+				OutputType.OUTPUT_BOOLEAN.toString(), null, null, Boolean.FALSE.toString()));
+
+		definition.setDefaultConditions(defaultConditions);
+		
+		return definition;
+	}
+	
 	/** Build a tool definition designed for a single String value.
 	 * It will get the definition's description from the I18N file using the getDescription() method and
 	 * set the type to OUTPUT_STRING. */

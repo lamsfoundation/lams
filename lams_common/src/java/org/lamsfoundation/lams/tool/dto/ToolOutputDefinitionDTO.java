@@ -23,8 +23,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.dto;
 
+import java.util.ArrayList;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
+import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 
 /**
@@ -44,7 +46,8 @@ public class ToolOutputDefinitionDTO {
 	private String startValue;
 	private String endValue;
 	private String complexDefinition;
-	
+    private ArrayList defaultConditions;
+
 	public ToolOutputDefinitionDTO(String name, String description, String type, String startValue, String endValue, String complexDefinition) {
 		super();
 		this.name = name;
@@ -67,6 +70,13 @@ public class ToolOutputDefinitionDTO {
 		this.endValue = (definition.getEndValue() != null) ? definition.getEndValue().toString() : null;
 
 		this.complexDefinition = (definition.getComplexDefinition() != null) ? definition.getComplexDefinition().toString() : null;
+		
+		if ( definition.getDefaultConditions() != null && definition.getDefaultConditions().size() > 0 ) {
+			defaultConditions = new ArrayList();
+			for ( BranchCondition condition : definition.getDefaultConditions() ) {
+				defaultConditions.add(condition.getBranchConditionDTO(null));
+			}
+		}
 	}
 	
 	/**
@@ -115,6 +125,14 @@ public class ToolOutputDefinitionDTO {
 	 */
 	public String getComplexDefinition() {
 		return complexDefinition;
+	}
+
+	public ArrayList getDefaultConditions() {
+		return defaultConditions;
+	}
+
+	public void setDefaultConditions(ArrayList defaultConditions) {
+		this.defaultConditions = defaultConditions;
 	}
 
 	public String toString() {

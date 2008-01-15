@@ -23,10 +23,13 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool;
 
+import java.util.List;
+
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.BranchCondition;
 
 /**
  * Each tool that has outputs will define a set of output definitions. Some definitions will be 
@@ -58,6 +61,7 @@ public class ToolOutputDefinition implements Comparable {
     private Object startValue;
     private Object endValue;
     private Object complexDefinition;
+    private List<BranchCondition> defaultConditions;
     
     /** Name must be unique within the current tool content. This will be used to identify the output. 
      * If the definition is a predefined definition then the name will always be the same (e.g. LEARNER_MARK) but 
@@ -148,6 +152,16 @@ public class ToolOutputDefinition implements Comparable {
 	       .append(this.name, myClass.name)
 	       .append(this.type, myClass.type)
 	       .toComparison();
+	}
+	/** Default Conditions are sample conditions that should be presented to the user as a starting point
+	 * for using this OutputDefinition 
+	 * @return
+	 */
+	public List<BranchCondition> getDefaultConditions() {
+		return defaultConditions;
+	}
+	public void setDefaultConditions(List<BranchCondition> defaultConditions) {
+		this.defaultConditions = defaultConditions;
 	}
 
 
