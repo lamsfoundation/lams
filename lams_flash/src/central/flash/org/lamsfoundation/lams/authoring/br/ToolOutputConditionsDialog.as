@@ -561,8 +561,15 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				showSteppers(false, false);
 				
 				if(_condition_item_dgd.dataProvider.length <= 0) {
-					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, _toolActivity, _branchingActivity, true));
-					addCondition(ToolOutputCondition.createBoolCondition(ddm.newUIID(), _selectedDefinition, _toolActivity, _branchingActivity, false));
+					for(var i=0; i<_selectedDefinition.defaultConditions.length; i++) {
+						var condition:ToolOutputCondition = _selectedDefinition.defaultConditions[i];
+						condition.conditionUIID = ddm.newUIID();
+						condition.toolActivity = _toolActivity;
+						condition.branchingActivity = _branchingActivity;
+						
+						addCondition(condition);
+					}
+					
 				}
 				
 				break;

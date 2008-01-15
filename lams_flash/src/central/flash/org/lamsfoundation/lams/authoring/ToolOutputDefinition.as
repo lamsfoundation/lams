@@ -38,8 +38,10 @@ class ToolOutputDefinition  {
 	private var _type:String;
 	private var _startValue:Object;
 	private var _endValue:Object;
+	private var _defaultConditions:Array;
 	
 	function ToolOutputDefinition(){
+		_defaultConditions = new Array();
 	}
 	
 	public function populateFromDTO(dto:Object):Void {
@@ -48,6 +50,15 @@ class ToolOutputDefinition  {
 		_type = dto.type;
 		_startValue = dto.startValue;
 		_endValue = dto.endValue;
+		if(dto.defaultConditions) {
+			for(var i=0; i<dto.defaultConditions.length; i++) {
+				var bdto:ToolOutputCondition = new ToolOutputCondition();
+				bdto.populateFromDTO(dto.defaultConditions[i]);
+				
+				_defaultConditions.push(bdto);
+			}
+		}
+			
 	}
 	
 	public function toData():Object {
@@ -101,6 +112,9 @@ class ToolOutputDefinition  {
 	public function get endValue():Object {
 		return _endValue;
 	}
-
+	
+	public function get defaultConditions():Array {
+		return _defaultConditions;
+	}
 
 }
