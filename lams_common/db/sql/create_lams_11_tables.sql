@@ -142,6 +142,7 @@ CREATE TABLE lams_supported_locale (
      , country_iso_code VARCHAR(2)
      , description VARCHAR(255) NOT NULL
      , direction VARCHAR(3) NOT NULL
+	 , fckeditor_code VARCHAR(10)
      , PRIMARY KEY (locale_id)
 )TYPE=InnoDB;
 ALTER TABLE lams_supported_locale COMMENT='Describes the valid language/country combinations.'; 

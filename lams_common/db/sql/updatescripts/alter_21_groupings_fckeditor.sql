@@ -4,3 +4,6 @@
 
 update lams_learning_activity set system_tool_id = 1 where learning_activity_type_id = '2' and system_tool_id is null;
 
+-- See LDEV-1349
+alter table lams_supported_locale
+ADD COLUMN fckeditor_code VARCHAR(10);
