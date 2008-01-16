@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </c:set>
 
 <p>
-	<html:checkbox property="lockOnFinish" value="0" styleClass="noBorder" styleId="lockOnFinish">
+	<html:checkbox property="lockOnFinish" value="1" styleClass="noBorder" styleId="lockOnFinish">
 	</html:checkbox>
 	<label for="lockOnFinish">
 		<fmt:message key="label.vote.lockedOnFinish" />
