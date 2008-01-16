@@ -1,5 +1,5 @@
 ﻿/***************************************************************************
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * Copyright (C) 2008 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.*
 
 import mx.controls.*
+import mx.controls.gridclasses.DataGridColumn;
 import mx.utils.*
 import mx.managers.*
 import mx.events.*
@@ -57,8 +58,7 @@ class org.lamsfoundation.lams.authoring.cv.ValidationIssuesDialog extends MovieC
     private var fm:FocusManager;
     private var _tm:ThemeManager;
     private var toolDisplayName_lbl:Label;
-
-   
+	
 	//Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -78,61 +78,90 @@ class org.lamsfoundation.lams.authoring.cv.ValidationIssuesDialog extends MovieC
 		MovieClipUtils.doLater(Proxy.create(this,init));
 		
 	}
-	
-	public function init():Void{
+
+	public function init():Void {
+		 //Delete the enterframe dispatcher
+        delete this.onEnterFrame;
+		
 		_canvasModel = _container.canvasModel;
 		_canvasController = _container.canvasController;
 		_validationIssues = _container.validationIssues;
-	
+		
 		_canvasModel.addEventListener('viewUpdate',this);
-		
-		_container.addEventListener('click',this);
-		//get focus manager + set focus , focus manager is available to all components through getFocusManager
-        fm = _container.getFocusManager();
-        fm.enabled = true;
-        validationIssues_dgd.setFocus();
-		
-		setStyles();
-		done_btn.label = Dictionary.getValue('ld_val_done');
-		
-		//set up handlers
-		//TODO connect to the controller
 		validationIssues_dgd.addEventListener("change",this);
+		
+		done_btn.label = Dictionary.getValue('ld_val_done');
 		done_btn.addEventListener("click",this);
-
-		//set the 1st colum a bit smaller
-		validationIssues_dgd.dataProvider = _validationIssues;
-		validationIssues_dgd.removeAllColumns();
 		
-		validationIssues_dgd.columnNames = ["Activity", "Issue"];
+		//Assign Click (close button) and resize handlers
+        _container.addEventListener('click',this);
+        _container.addEventListener('size',this);
 		
-		validationIssues_dgd.getColumnAt(0).headerText = Dictionary.getValue("ld_val_activity_column");
-		validationIssues_dgd.getColumnAt(0).width = 110;
-		
-		validationIssues_dgd.getColumnAt(1).headerText = Dictionary.getValue("ld_val_issue_column");
-		
-		//fire event to say we have loaded
-		_container.contentLoaded();
+		// Should be called by canvasController?
+		setupContent();
 	}
 	
-	
-	
+	public function getRowHeight(column_value:DataGridColumn):Number {
+		var maxStrWidth:Number = 0;
+		for (var i = 0; i < _validationIssues.length; i++) {
+			maxStrWidth = Math.max(StringUtils.getButtonWidthForStr(_validationIssues[i].Issue), maxStrWidth);
+		}
+		
+		var numRows:Number = Math.ceil(maxStrWidth/(column_value.width-2*MARGIN));
+		var lineHeight:Number;
+		if (numRows == 1)
+			lineHeight = 25;
+		else
+			lineHeight = 20;
+		
+		var _rowHeight:Number = numRows * lineHeight;
+		return _rowHeight;
+	}
 
+	public function setupContent():Void {
+		var column_name:DataGridColumn = new DataGridColumn("Activity");
+		column_name.headerText = Dictionary.getValue("ld_val_activity_column");
+		column_name.editable = false;
+		column_name.width = Math.ceil((validationIssues_dgd.width - 15)*0.3);
+		column_name.cellRenderer = "MultiLineCell";
+		
+		var column_value:DataGridColumn = new DataGridColumn("Issue");
+		column_value.headerText = Dictionary.getValue("ld_val_issue_column");
+		column_value.editable = false;
+		column_value.width = Math.ceil((validationIssues_dgd.width - 15)*0.7);
+		column_value.cellRenderer = "MultiLineCell";
+		
+		validationIssues_dgd.rowHeight = getRowHeight(column_value);
+		
+		validationIssues_dgd.addColumn(column_name);
+		validationIssues_dgd.addColumn(column_value);
+
+		// wait second frame for steppers to be setup
+		validationIssues_dgd.dataProvider = _validationIssues;
+
+		_container.contentLoaded();
+					
+		this.onEnterFrame = initSetup;
+		//validationIssues_dgd.setSize(validationIssues_dgd.)
+		setSize(_width, _height);
+	}
+	
+	private function initSetup():Void {
+		delete this.onEnterFrame;
+
+		this._visible = true;
+
+	}
+	
 	/**
     * Main resize method, called by scrollpane container/parent
     */
     public function setSize(w:Number,h:Number){
-        //Debugger.log('setSize',Debugger.GEN,'setSize','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-        //Size the bkg_pnl
-		
-    //    body_pnl.setSize(w,h-bar_pnl.height);
-      //  bar_pnl.setSize(w);
 	  
-	  validationIssues_dgd.setSize(w,h - (done_btn._height + MARGIN*2));
-	  done_btn._x = (w - done_btn._width) - MARGIN;
-	  done_btn._y =  h - (done_btn._height + MARGIN);
-
-        
+		validationIssues_dgd.setSize(w,h - (done_btn._height + MARGIN*2));
+		done_btn._x = (w - done_btn._width) - MARGIN;
+		done_btn._y =  h - (done_btn._height + MARGIN);
+       
     }
 	
 	/**
@@ -147,8 +176,6 @@ class org.lamsfoundation.lams.authoring.cv.ValidationIssuesDialog extends MovieC
 		done_btn.setStyle('styleName',styleObj);
 		styleObj = _tm.getStyleObject('datagrid');
 		validationIssues_dgd.setStyle(styleObj);
-		
-		
     }
     
     //Gets+Sets
@@ -158,9 +185,7 @@ class org.lamsfoundation.lams.authoring.cv.ValidationIssuesDialog extends MovieC
     public function set container(value:MovieClip){
         _container = value;
     }
-	
-
-	
+		
    /**
 	 * Recieves the click events from the canvas views (inc Property Inspector) buttons.  Based on the target
 	 * the relevent method is called to action the user request
@@ -174,7 +199,6 @@ class org.lamsfoundation.lams.authoring.cv.ValidationIssuesDialog extends MovieC
 	}
 	
 	public function change(e):Void{
-		//Debugger.log(ObjectUtils.toString(e.target.selectedItem),Debugger.GEN,'change','ValidationIssuesDialog');
 		Debugger.log('e.target.selectedItem.data.uiid:'+e.target.selectedItem.uiid,Debugger.GEN,'change','ValidationIssuesDialog');
 		_canvasModel.setSelectedItemByUIID(e.target.selectedItem.uiid);
 	}
