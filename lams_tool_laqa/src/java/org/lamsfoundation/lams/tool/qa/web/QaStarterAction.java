@@ -329,7 +329,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
                     new Long(defaultContentIdStr).longValue(), true, qaService, qaGeneralAuthoringDTO, sessionMap);
             
             logger.debug("post retrive content :" + sessionMap);
-            qaAuthoringForm.setLockWhenFinished("1");
+
 		}
         else
         {
