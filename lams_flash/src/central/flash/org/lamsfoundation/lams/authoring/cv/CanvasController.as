@@ -404,6 +404,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		for (var i=0; i<myBranches.length; i++){
 			Debugger.log('removing branch for redraw:'+myBranches[i].branchUIID,Debugger.GEN,'activityRelease','CanvasController');
 			var b = _canvasModel.branchesDisplayed.remove(myBranches[i].branchUIID);
+			b.branchLabel.removeMovieClip();
 			b.removeMovieClip();
 		}
 	}
@@ -591,7 +592,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 		_canvasModel.selectedItem = bc;
 		_canvasModel.isDragging = true;
+		
 		bc.startDrag(false);
+		bc.branchLabel._visible = false;
 	   
 	}
 	
@@ -638,12 +641,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
     
     public function branchRelease(bc:BranchConnector):Void{
 		Debugger.log("branchRelease Transition:" + bc.branch.branchUIID, Debugger.GEN, "branchRelease", "CanvasController");
+		
 		if(_canvasModel.isDragging){
 			bc.stopDrag();
-			
+			bc.branchLabel._visible = true;
+		
 			if(bc.hitTest(_canvasModel.getCanvas().bin) && !isBranchTargetReadOnly(bc, Dictionary.getValue("cv_element_readOnly_action_del"))){
 				var branchesToDelete:Array;
-				
+				Debugger.log("branchRelease hittest:" + bc.branch.branchUIID, Debugger.GEN, "branchRelease", "CanvasController");
+		
 				if(bc.branch.direction == BranchConnector.DIR_FROM_START) {
 					if(_canvasModel.activeView.activity.firstActivityUIID == bc.branch.sequenceActivity.activityUIID)
 						_canvasModel.activeView.activity.defaultBranch = _canvasModel.getCanvas().ddm.findNewDefaultBranch(_canvasModel.activeView.activity, bc.branch);
@@ -662,7 +668,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			} else {
 				if (bc._x != bc.xPosition){
 					var t = _canvasModel.branchesDisplayed.remove(bc.branch.branchUIID);
+					
+					t.branchLabel.removeMovieClip();
 					t.removeMovieClip();
+					
 					_canvasModel.setDirty();
 				}
 			}

@@ -34,6 +34,13 @@ import org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView;
 
 class org.lamsfoundation.lams.authoring.cv.CanvasConnection extends MovieClip{  
 	
+	public static var Q1:String = "q1";
+	public static var Q2:String = "q2";
+	public static var Q3:String = "q3";
+	public static var Q4:String = "q4";
+	
+	private var _quadrant:String;
+	
 	private var _canvasController:CanvasController;
 	private var _monitorController:MonitorController;
 	
@@ -112,7 +119,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasConnection extends MovieClip{
 		arrow_mc._rotation = degs;
 		arrow_mc._visible = true;
 		
-		_midPoint = new Point(arrow_mc._x,arrow_mc._y);
+		_midPoint = new Point(arrow_mc._x, arrow_mc._y);
 		
 		xPos = this._x;
 				
@@ -128,44 +135,48 @@ class org.lamsfoundation.lams.authoring.cv.CanvasConnection extends MovieClip{
 	
 	private function getQuadrant(d:Number) {
 		if(d >= 0 && d < 90) {
-			return "q3";
+			return Q3;
 		} else if(d < 0 && d >= - 90) {
-			return "q2";
+			return Q2;
 		} else if(d < -90 && d >= -180) {
-			return  "q1";
+			return  Q1;
 		} else {
-			return "q4";
+			return Q4;
 		}
+	}
+	
+	public function quadrant():String {
+		return _quadrant;
 	}
 	
 	private function calcEdgePoint(_d:Number, x_offset:Number, y_offset:Number, _act_d:Number, point:Point):Point {
 		var _edgePoint:Point = new Point();
 		var d:Number = _d;
-		var quad:String = getQuadrant(d);
+		_quadrant = getQuadrant(d);
 	
-		switch(quad) {
-			case "q1":
+		switch(_quadrant) {
+			case Q1:
 				d = 180 + d;
 				
 				_edgePoint.y = (d >= _act_d) ? point.y - y_offset : point.y - (x_offset * calcTangent(d, false));
 				_edgePoint.x = (d >= _act_d) ? point.x - (y_offset * calcTangent(d, true)) : point.x - x_offset;;
 				
 				break;
-			case "q2":
+			case Q2:
 				d = Math.abs(d);
 				
 				_edgePoint.y = (d >= _act_d) ? point.y - y_offset : point.y - (x_offset * calcTangent(d, false));
 				_edgePoint.x = (d >= _act_d) ? point.x + (y_offset * calcTangent(d, true)) : point.x + x_offset;;
 				
 				break;
-			case "q3":
+			case Q3:
 			
 				_edgePoint.y = (d >= _act_d) ? point.y + y_offset : point.y + (x_offset * calcTangent(d, false));
 				_edgePoint.x = (d >= _act_d) ? point.x + (y_offset * calcTangent(d, true)) : point.x + x_offset;
 			
 					
 				break;
-			case "q4":
+			case Q4:
 				d = 180 - d;
 			
 				_edgePoint.y = (d >= _act_d) ? point.y + y_offset : point.y + (x_offset * calcTangent(d, false));

@@ -85,6 +85,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private var _fingerprint:MovieClip;
 	
 	private var _learnerContainer_mc:MovieClip;
+	private var _labelContainer_mc:MovieClip;
 	
 	private var _open:Boolean;
 	private var _isBranchChild:Boolean;
@@ -266,6 +267,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		activityLayer = content.createEmptyMovieClip("_activityLayer_mc", content.getNextHighestDepth());
 		
 		_learnerContainer_mc = content.createEmptyMovieClip("_learnerContainer_mc", content.getNextHighestDepth());
+		_labelContainer_mc = content.createEmptyMovieClip("_labelContainer_mc", content.getNextHighestDepth());
 		
 		transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
 		transparentCover.onPress = null;
@@ -370,10 +372,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		if(model instanceof CanvasModel) model.getCanvas().addBin(this.activityLayer);
 			
 		setSize(model);
-			
+		
 		mx.transitions.TransitionManager.start(this,
 					{type:mx.transitions.Zoom, 
 						direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
+						
 	}
 	
 	private function close():Void {
@@ -396,7 +399,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			else model.getCanvas().addBin(model.activeView);
 		
 		model.broadcastViewUpdate("SIZE");
-		
+
 	}
 	
 	public function localOnReleaseOutside():Void{
@@ -674,7 +677,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @param   cm  The canvas model
 	 * @return  
 	 */
-	private function removeBranch(b:Branch,cm){
+	private function removeBranch(b:Branch, cm){
 		Debugger.log("activeView: " + cm.isActiveView(this), Debugger.CRITICAL, "removeBranch", "CanvasBranchView");
 		
 		if(!cm.isActiveView(this)) return false;
@@ -685,6 +688,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		} else if(b.direction == BranchConnector.DIR_TO_END) { b.sequenceActivity.stopAfterActivity = true; }
 		
 		var r = cm.branchesDisplayed.remove(b.branchUIID);
+		r.branchLabel.removeMovieClip();
 		r.removeMovieClip();
 		
 		if(cm instanceof MonitorModel) cm.ddm.branches.remove(b.branchUIID);
@@ -724,7 +728,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			bin._y = (s.h - bin._height) - 10;
 		}
 			
-		canvas_scp.redraw(true);
+		//canvas_scp.redraw(true);
 		
 		setPosition(cm, cx, cy);
 	}
@@ -810,6 +814,10 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	public function set branchLayer(a:MovieClip):Void{
 		_branchLayer = a;
+	}
+	
+	public function get labelContainer():MovieClip {
+		return _labelContainer_mc;
 	}
 	
 	public function get fingerprint():MovieClip {

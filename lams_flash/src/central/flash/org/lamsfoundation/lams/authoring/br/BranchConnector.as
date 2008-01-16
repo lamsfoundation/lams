@@ -21,6 +21,7 @@
  * ************************************************************************
  */
 
+import org.lamsfoundation.lams.common.style.ThemeManager;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.*;
@@ -28,6 +29,9 @@ import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.authoring.br.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
+
+import mx.controls.Label;
+import mx.managers.DepthManager;
 
 class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnection {
 	
@@ -37,13 +41,21 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 	
 	private var _branch:Branch;
 
+	private var bcLabel_mc:MovieClip;
+	private var bcLabel:Label;
+
+	private var _tm:ThemeManager;
+	
 	function BranchConnector(){
 		super();
 		
 		Debugger.log("_branch.targetUIID:"+_branch.targetUIID,4,'Constructor','BranchConnector');
 		Debugger.log("_branch.direction:"+_branch.direction,4,'Constructor','BranchConnector');
 		
-		MovieClipUtils.doLater(Proxy.create(this,init));
+        //set the reference to the StyleManager
+        _tm = ThemeManager.getInstance();
+		
+		MovieClipUtils.doLater(Proxy.create(this, init));
 	}
 	
 	public function init():Void{
@@ -55,6 +67,9 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 			drawActivityless();
 		else
 			draw();
+		
+		if(branch.direction != DIR_TO_END)
+			createBranchLabel();
 	}
 	
 	/**
@@ -78,7 +93,6 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 											  : new Point(toAct_mc.getActivity().xCoord + toOTC.x, toAct_mc.getActivity().yCoord + toOTC.y);
 		
 		createConnection(fromAct_mc, toAct_mc, _startPoint, _endPoint, fromOTC, toOTC);
-		
 	}
 	
 	private function drawActivityless():Void {
@@ -95,6 +109,38 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 		Debugger.log("ep x: " + _endPoint.x + " y: " + _endPoint.y, Debugger.CRITICAL, "drawActivityless", "BranchConnector");
 		
 		createConnection(fromAct_mc, toAct_mc, _startPoint, _endPoint, fromOTC, toOTC);
+	}
+	
+	public function createBranchLabel():Void {
+		Debugger.log("arrow mc: " + arrow_mc._x + " " + arrow_mc._y, Debugger.CRITICAL, "createBranchLabel", "BranchConnector");
+		Debugger.log("quad: " + _quadrant, Debugger.CRITICAL, "createBranchLabel", "BranchConnector");
+		
+		if(bcLabel_mc != null)
+			bcLabel_mc.removeMovieClip();
+		
+		var _offset:Number = 10;
+		
+		var _xpos = (_quadrant == CanvasConnection.Q1 || _quadrant == CanvasConnection.Q4) ? arrow_mc._x + _offset : arrow_mc._x - _offset;
+		var _ypos = (_quadrant == CanvasConnection.Q1 || _quadrant == CanvasConnection.Q2) ? arrow_mc._y + _offset : arrow_mc._y - _offset - 22;
+		
+		bcLabel_mc = model.activeView.labelContainer.attachMovie("Label", "bcLabel" + _branch.branchUIID, model.activeView.labelContainer.getNextHighestDepth(), {_x: _xpos, _y: _ypos, text:_branch.sequenceName, _width: 40, _height: 22, autoSize: "center", _visible: false});
+		bcLabel = Label(bcLabel_mc);
+		bcLabel.setStyle('styleName', _tm.getStyleObject("label"));
+		
+		bcLabel._x -= bcLabel._width/2;
+		bcLabel._visible = true;
+	}
+	
+	public function updateBranchLabel():Void {
+		branchLabel = _branch.sequenceActivity.title;
+	}
+	
+	public function set branchLabel(a:String):Void {
+		bcLabel.text = a;
+	}
+	
+	public function get branchLabel():Label {
+		return bcLabel;
 	}
 	
 	public function get branch():Branch{
