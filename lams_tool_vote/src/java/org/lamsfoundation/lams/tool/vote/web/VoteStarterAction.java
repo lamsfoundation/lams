@@ -316,8 +316,6 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	            retrieveContent(request, voteService, voteAuthoringForm, voteGeneralAuthoringDTO, mapOptionsContent, 
 	                    new Long(defaultContentIdStr).longValue(), sessionMap);
 	            
-	    	    voteAuthoringForm.setLockOnFinish("1");
-	    	    voteGeneralAuthoringDTO.setLockOnFinish("1");
 			}
 			else
 			{
