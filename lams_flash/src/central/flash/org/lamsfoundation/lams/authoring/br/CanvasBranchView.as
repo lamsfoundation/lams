@@ -356,14 +356,14 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 		
 		if(defaultSequenceActivity == null)
-			createInitialSequenceActivity();
+			createInitialSequenceActivity(sequenceActs.length+1);
 		
 		model.haltRefresh(false);
 
 	}
 	
-	private function createInitialSequenceActivity() {
-		model.createNewSequenceActivity(activity);
+	private function createInitialSequenceActivity(num:Number) {
+		model.createNewSequenceActivity(activity, num, null, true);
 	}
 	
 	public function localOnRelease():Void{

@@ -207,11 +207,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		setSelectedItem(_activitiesDisplayed.get(branchingActivity.activityUIID));
 	}
 	
-	public function createNewSequenceActivity(parent, orderID, stopAfterActivity:Boolean){
+	public function createNewSequenceActivity(parent, orderID, stopAfterActivity:Boolean, isBranch:Boolean){
 		Debugger.log('Running...',Debugger.GEN,'createNewSequenceActivity','CanvasModel');
 		
 		var seqAct = new SequenceActivity(_cv.ddm.newUIID());
-		seqAct.title = Dictionary.getValue('sequence_act_title');
+		var title = (isBranch) ? Dictionary.getValue('branch_mapping_dlg_branch_col_lbl') : Dictionary.getValue('sequence_act_title');
+		seqAct.title =  Dictionary.getValue('sequence_act_title_new', [title, orderID]);
 		seqAct.learningDesignID = _cv.ddm.learningDesignID;
 		seqAct.groupingSupportType = Activity.GROUPING_SUPPORT_OPTIONAL;
 		seqAct.activityCategoryID = Activity.CATEGORY_SYSTEM;
@@ -866,7 +867,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			var b = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, toAct.activityUIID, activeView.startHub.activity.activityUIID, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
 			b.sequenceActivity.isDefault = false;
 			
-			createNewSequenceActivity(activeView.activity);
+			createNewSequenceActivity(activeView.activity, _cv.ddm.getComplexActivityChildren(sequence.parentUIID).length+1, null, true);
 			return b;
 		}
 	}
@@ -912,7 +913,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		Debugger.log("sequence: " + b.sequenceActivity.activityUIID, Debugger.CRITICAL, "createActivitylessBranch", "CanvasModel");
 		Debugger.log("isDefault: " + b.sequenceActivity.isDefault, Debugger.CRITICAL, "createActivitylessBranch", "CanvasModel");
 		
-		createNewSequenceActivity(activeView.activity);
+		createNewSequenceActivity(activeView.activity, _cv.ddm.getComplexActivityChildren(b.sequenceActivity.parentUIID).length+1, null, true);
 			
 		return b;
 	}
