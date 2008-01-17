@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView;
 import mx.controls.*;
 import mx.containers.*;
 import mx.managers.*;
+import mx.transitions.TransitionManager;
 import mx.utils.*;
 
 /**
@@ -88,6 +89,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private var _labelContainer_mc:MovieClip;
 	
 	private var _open:Boolean;
+	private var _isOpen:Boolean;
 	private var _isBranchChild:Boolean;
 	private var _eventsEnabled:Boolean;
 	
@@ -137,6 +139,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		//if(_mm != null) _mm.addEventListener('viewUpdate', Proxy.create(this, viewUpdate));
 		
 		_isBranchChild = (_cm.activeView instanceof CanvasBranchView);
+		_isOpen = false;
 		
 		MovieClipUtils.doLater(Proxy.create(this, draw)); 
     }   
@@ -262,12 +265,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		gridLayer = content.createEmptyMovieClip("_gridLayer_mc", content.getNextHighestDepth());
 		transitionLayer = content.createEmptyMovieClip("_transitionLayer_mc", content.getNextHighestDepth());
 		branchLayer = content.createEmptyMovieClip("_branchLayer_mc", content.getNextHighestDepth());
+		_labelContainer_mc = content.createEmptyMovieClip("_labelContainer_mc", content.getNextHighestDepth());
 		
 		activityComplexLayer = content.createEmptyMovieClip("_activityComplexLayer_mc", content.getNextHighestDepth());
 		activityLayer = content.createEmptyMovieClip("_activityLayer_mc", content.getNextHighestDepth());
 		
 		_learnerContainer_mc = content.createEmptyMovieClip("_learnerContainer_mc", content.getNextHighestDepth());
-		_labelContainer_mc = content.createEmptyMovieClip("_labelContainer_mc", content.getNextHighestDepth());
 		
 		transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
 		transparentCover.onPress = null;
@@ -367,21 +370,54 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		close();
 	}
 	
-	private function open():Void {
+	public function open():Void {
 		Debugger.log("calling open: " + _open, Debugger.CRITICAL, "open", " CanvasBranchView");
 		if(model instanceof CanvasModel) model.getCanvas().addBin(this.activityLayer);
 			
 		setSize(model);
 		
-		mx.transitions.TransitionManager.start(this,
-					{type:mx.transitions.Zoom, 
+		var tm:TransitionManager = new TransitionManager(this);
+		tm.startTransition({type:mx.transitions.Zoom, 
 						direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
-						
+		tm.addEventListener("allTransitionsInDone", finishedOpen);
+		
+
+	}
+	
+	public function finishedOpen(evt:Object):Void {
+		Debugger.log("evt target: " + evt.target, Debugger.CRITICAL, "finishedOpen", "CanvasBranchView");
+		Debugger.log("evt content: " + evt.target.content, Debugger.CRITICAL, "finishedOpen", "CanvasBranchView");
+		evt.target.content.isOpen = true;
+		evt.target.content.loadLabels();
+	}
+	
+	public function loadLabels():Void {
+		var bkeys:Array = model.branchesDisplayed.keys();
+		
+		for(var i=0; i<bkeys.length; i++) {
+			var bc = model.branchesDisplayed.get(bkeys[i]);
+			if(bc.branch.sequenceActivity.parentUIID == this.activity.activityUIID) {
+				if(bc.branch.direction != BranchConnector.DIR_TO_END)
+					bc.createBranchLabel();
+			}
+			
+		}
 	}
 	
 	private function close():Void {
 		if(model instanceof CanvasModel) model.getCanvas().hideBin();
 		model.selectedItem = null;
+		
+		var bkeys:Array = model.branchesDisplayed.keys();
+		
+		for(var i=0; i<bkeys.length; i++) {
+			var bc = model.branchesDisplayed.get(bkeys[i]);
+			if(bc.branch.sequenceActivity.parentUIID == this.activity.activityUIID) {
+				if(bc.branchLabel != null)
+					bc.branchLabel.removeMovieClip();
+			}
+			
+		}
 		
 		mx.transitions.TransitionManager.start(this,
 					{type:mx.transitions.Zoom, 
@@ -399,7 +435,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			else model.getCanvas().addBin(model.activeView);
 		
 		model.broadcastViewUpdate("SIZE");
-
+		_isOpen = false;
 	}
 	
 	public function localOnReleaseOutside():Void{
@@ -894,6 +930,14 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	public function hideToolTip():Void{
 		_tip.CloseToolTip();
+	}
+	
+	public function get isOpen():Boolean {
+		return _isOpen;
+	}
+	
+	public function set isOpen(a:Boolean):Void {
+		_isOpen = a;
 	}
 
 }

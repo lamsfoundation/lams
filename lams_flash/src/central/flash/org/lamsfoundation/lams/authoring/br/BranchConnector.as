@@ -68,8 +68,10 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 		else
 			draw();
 		
-		if(branch.direction != DIR_TO_END)
+		Debugger.log("is open: " + model.activeView.isOpen, Debugger.CRITICAL, "init", "BranchConnector");
+		if(branch.direction != DIR_TO_END && model.activeView.isOpen)
 			createBranchLabel();
+		
 	}
 	
 	/**
