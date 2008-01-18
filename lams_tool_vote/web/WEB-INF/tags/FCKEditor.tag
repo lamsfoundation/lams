@@ -8,7 +8,7 @@
 <%@ attribute name="contentFolderID" required="false" rtexprvalue="true"%>
 
 <c:set var="language">
-	<lams:user property="localeLanguage" />
+	<lams:user property="fckLanguageMapping" />
 </c:set>
 
 <c:if test="${empty toolbarSet}">
