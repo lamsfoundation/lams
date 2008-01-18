@@ -12,7 +12,7 @@
 	//-->
 </script>
 
-<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> </h4>
+<h4><a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a> </h4>
 <h1><fmt:message key="admin.user.find"/></h1>
 
 <logic:notEqual name="isSysadmin" value="false">
@@ -29,21 +29,11 @@
 <p align="right">
 	<input class="button" type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit' />
 </p>
-<table cellspacing="6">
-	<tr>
-		<td align="right"><fmt:message key="admin.search" />:&nbsp;</td>
-		<td><html:text property="term" size="20" /></td>
-	</tr>
-	<tr>
-		<td align="right"><fmt:message key="label.show.all.users"/>:&nbsp;</td>
-		<td><html:checkbox property="showAll" /></td>
-	</tr>
-	<tr>
-		<td colspan="2" align="center"><html:submit styleClass="button" /></td>
-	</tr>
-</table>
 
-<br/>
+<p align="right">
+	<fmt:message key="admin.search" />:&nbsp;<html:text property="term" size="20" /> 
+	or <a onclick="document.UserSearchForm.term.value='';document.UserSearchForm.submit();"><fmt:message key="label.show.all.users"/></a>
+</p>
 
 <logic:notEmpty name="userList">
 <p><c:out value="${numUsers}" /></p>

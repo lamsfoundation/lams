@@ -36,6 +36,7 @@ p {
 	<form>
 	
 	<div class="floatRight">
+		<input class="button" type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit' />
 		<input class="button" type="button" value='Find Users' onclick=javascript:document.location='usersearch.do' />
 		<logic:equal name="manageGlobalRoles" value="true">
 			<input class="button" type="button" value='<fmt:message key="admin.global.roles.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />

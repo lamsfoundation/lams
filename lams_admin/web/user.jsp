@@ -15,8 +15,7 @@
 		</logic:empty>
 	</logic:notEmpty>
 	<logic:empty name="UserForm" property="orgId">
-		<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		: <a href="usersearch.do"><fmt:message key="admin.user.find" /></a>
+		<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
 	</logic:empty>
 </h4>
 
