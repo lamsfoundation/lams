@@ -481,7 +481,8 @@ class PropertyInspectorControls extends MovieClip {
 			showToolBasedBranchingControls(v, e);
 			
 			if(toolActs_cmb.visible) {
-				toolActs_cmb.dataProvider = _canvasModel.getDownstreamToolActivities();
+				
+				toolActs_cmb.dataProvider = _canvasModel.getDownstreamActivities(ToolActivity);
 				
 				if(_canvasModel.selectedItem.activity.toolActivityUIID != null) {
 					var dp = toolActs_cmb.dataProvider;
@@ -806,16 +807,18 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	private function getGroupingActivitiesDP(){
-		var gActs = _canvasModel.getCanvas().ddm.getGroupingActivities();
+		var gActs:Array = _canvasModel.getDownstreamActivities(GroupingActivity);
+		Debugger.log("grouping acts len: " + gActs.length, Debugger.CRITICAL, "getGroupingActivitiesDP", "PIC");
+		
 		var gActsDP = new Array();
 		var ga = _canvasModel.selectedItem.activity;
 		var g = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
 		
-		gActsDP.push({label:Dictionary.getValue('pi_no_grouping'),data:null});
+		gActsDP.push({label:Dictionary.getValue('pi_no_grouping'), data:null});
 		
 		for(var i=0; i<gActs.length;i++){
-			if (ga.createGroupingUIID != gActs[i].createGroupingUIID){
-				gActsDP.push({label:gActs[i].title,data:gActs[i]});
+			if (ga.createGroupingUIID != gActs[i].data.createGroupingUIID){
+				gActsDP.push({label:gActs[i].label, data:gActs[i].data});
 			}
 		}
 		
@@ -973,7 +976,7 @@ class PropertyInspectorControls extends MovieClip {
 			showAppliedGroupingControls(false);
 		
 			if(toolActs_cmb.visible) {
-				toolActs_cmb.dataProvider = _canvasModel.getDownstreamToolActivities();
+				toolActs_cmb.dataProvider = _canvasModel.getDownstreamActivities(ToolActivity);
 				for(var i=0; i < toolActs_cmb.dataProvider.length; i++)
 					selectToolActivityItem(i, toolActs_cmb.dataProvider[i].data);
 			}

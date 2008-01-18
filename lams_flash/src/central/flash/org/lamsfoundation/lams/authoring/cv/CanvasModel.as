@@ -598,12 +598,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		return (transObj.out == null) ? activityUIID : getLastActivityUIID(transObj.out.toUIID);
 	}
 	
-	public function getDownstreamToolActivities():Array {
+	public function getDownstreamActivities(_class):Array {
 		var _activity;
 		var _activityUIID:Number = selectedItem.activity.activityUIID;
 		var tActivities:Array = new Array();
 		
-		tActivities.addItem({label: "--Selection--", data: 0});
+		if(_class == ToolActivity)
+			tActivities.addItem({label: "--Selection--", data: 0});	 // TODO: Label required
 		
 		while(_activityUIID != null) {
 			
@@ -612,10 +613,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			_activity = (transObj.into != null) ? _cv.ddm.getActivityByUIID(transObj.into.fromUIID) : null;
 			
 			if(_activity != null) {
-				if(_activity instanceof ToolActivity) {
-					tActivities.addItem({label: _activity.title, data: _activity.activityUIID});
+				if(_activity instanceof _class) {
+					if(_class == ToolActivity) tActivities.addItem({label: _activity.title, data: _activity.activityUIID});
+					else tActivities.addItem({label: _activity.title, data: _activity});
 				} else if(_activity instanceof ComplexActivity) {
-					getToolActivitiesFromComplex(_activity.activityUIID, tActivities);
+					if(!_activity.isOptionalActivity() && !_activity.isSequenceActivity())
+						getActivitiesFromComplexByClass(_activity.activityUIID, tActivities, _class);
 				}
 			}
 			
@@ -625,14 +628,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		return tActivities;
 	}
 	
-	private function getToolActivitiesFromComplex(complexUIID, toolActs:Array):Void {
+	private function getActivitiesFromComplexByClass(complexUIID, tActs:Array, _class):Void {
 		var children:Array = getCanvas().ddm.getComplexActivityChildren(complexUIID);
 		
 		for(var i=0; i<children.length; i++) {
-			if(children[i] instanceof ToolActivity)
-				toolActs.addItem({label: children[i].title, data: children[i].activityUIID});
+			if(children[i] instanceof _class)
+				if(_class == ToolActivity) tActs.addItem({label: children[i].title, data: children[i].activityUIID});
+				else tActs.addItem({label: children[i].title, data: children[i]});
 			else if(children[i] instanceof ComplexActivity)
-				getToolActivitiesFromComplex(children[i].activityUIID, toolActs);
+				if(!children[i].isOptionalActivity() && !children[i].isSequenceActivity())
+					getActivitiesFromComplexByClass(children[i].activityUIID, tActs, _class);
 		}
 
 	}
