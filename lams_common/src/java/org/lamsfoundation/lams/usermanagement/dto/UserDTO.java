@@ -38,6 +38,7 @@ public class UserDTO {
 	private String login;
 	private String localeLanguage;
 	private String localeCountry;
+	private String fckLanguageMapping;
 	private String direction;
     private String email;
    // private CSSThemeVisualElement theme;
@@ -59,7 +60,7 @@ public class UserDTO {
 	public UserDTO(Integer userID, String firstName, String lastName,
 			String login, String localeLanguage,  String localeCountry, String direction, 
 			String email, CSSThemeBriefDTO flashTheme, CSSThemeBriefDTO htmlTheme,
-			TimeZone timezone, Integer authenticationMethodId) {		
+			TimeZone timezone, Integer authenticationMethodId, String fckLanguageMapping) {		
 		this.userID = userID;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -72,6 +73,7 @@ public class UserDTO {
 		this.htmlTheme = htmlTheme;
 		this.timeZone = timezone;
 		this.authenticationMethodId = authenticationMethodId;
+		this.fckLanguageMapping = fckLanguageMapping;
 	}
 	
 	/**
@@ -180,8 +182,14 @@ public class UserDTO {
 			.append("htmlTheme", getHtmlTheme())
 			.append("timeZone", getTimeZone())
 			.append("authenticationMethodId", getAuthenticationMethodId())
+			.append("fckLanguageMapping", getFckLanguageMapping())
 			.toString();
 	}
+
+	public String getFckLanguageMapping() {
+		return fckLanguageMapping;
+	}
+
 
 //	public CSSThemeVisualElement getTheme() {
 //		return theme;

@@ -31,13 +31,17 @@ public class SupportedLocale implements Serializable,Comparable {
 
     /** persistent field */
     private String direction;
+    
+    /** persistent field */
+    private String fckLanguageMapping;
 
     /** full constructor */
-    public SupportedLocale(String languageIsoCode, String countryIsoCode, String description, String direction) {
+    public SupportedLocale(String languageIsoCode, String countryIsoCode, String description, String direction, String fckLanguageMapping) {
         this.languageIsoCode = languageIsoCode;
         this.countryIsoCode = countryIsoCode;
         this.description = description;
         this.direction = direction;
+        this.fckLanguageMapping = fckLanguageMapping;
     }
 
     /** default constructor */
@@ -131,12 +135,21 @@ public class SupportedLocale implements Serializable,Comparable {
 	            .append("countryIsoCode", getCountryIsoCode())
 	            .append("description", getDescription())
 	            .append("direction", getDirection())
+	            .append("fckLanguageMapping", getFckLanguageMapping())
 	            .toString();
 	}
 
 	public int compareTo(Object o) {
 		SupportedLocale locale = (SupportedLocale)o;
 		return description.compareTo(locale.getDescription());
+	}
+
+	public String getFckLanguageMapping() {
+		return fckLanguageMapping;
+	}
+
+	public void setFckLanguageMapping(String fckLanguageMapping) {
+		this.fckLanguageMapping = fckLanguageMapping;
 	}
 
 

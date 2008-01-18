@@ -702,15 +702,19 @@ public class User implements Serializable,Comparable {
     	String languageIsoCode = null;
     	String countryIsoCode = null;
     	String direction = null;
+    	String fckLanguageMapping = null;
     	if (locale != null) {
     		languageIsoCode = locale.getLanguageIsoCode();
     		countryIsoCode = locale.getCountryIsoCode();
     		direction = locale.getDirection();
+    		fckLanguageMapping = locale.getFckLanguageMapping();
+    	
     	} else {
     		String defaults[] = LanguageUtil.getDefaultLangCountry();
     		languageIsoCode = defaults[0];
     		countryIsoCode=defaults[1];
     		direction=LanguageUtil.getDefaultDirection();
+    		fckLanguageMapping = LanguageUtil.getSupportedLocale(languageIsoCode, countryIsoCode).getFckLanguageMapping();
     	}
     	
     	return new UserDTO(this.userId,
@@ -725,7 +729,8 @@ public class User implements Serializable,Comparable {
 							new CSSThemeBriefDTO(this.htmlTheme),
 							//TimeZone.getTimeZone("Australia/Sydney"),
 							TimeZone.getDefault(),
-							this.authenticationMethod.getAuthenticationMethodId());
+							this.authenticationMethod.getAuthenticationMethodId(),
+							fckLanguageMapping);
     }
 	
     public UserFlashDTO getUserFlashDTO() {
