@@ -195,8 +195,7 @@ class AboutDialog extends MovieClip implements Dialog {
 		setStyles();
 		loadLogo();
 		
-		Debugger.log("build no: " + ApplicationParent.SERIAL_NO, Debugger.GEN, "setup", "AboutDialog");
-		
+		Debugger.log("build no: " + ApplicationParent.SERIAL_NO, Debugger.GEN, "setup", "AboutDialog");		
 		
 		version_lbl.text = Dictionary.getValue('about_popup_version_lbl');
 		version_txt.htmlText = _root.version;
@@ -205,7 +204,7 @@ class AboutDialog extends MovieClip implements Dialog {
 		
 		var ref_lbl:String = Dictionary.getValue('stream_reference_lbl');
 		var stream_url:String = Dictionary.getValue('stream_url', [ref_lbl.toLowerCase()]);
-		var stream_url_atag:String = "<u><a href='http://" + stream_url + "' target='_blank'>" + stream_url + "</a></u>" 
+		var stream_url_atag:String = "<u><a href='" + stream_url + "' target='_blank'>" + stream_url + "</a></u>" 
 		
 		copyright_txt.htmlText = Dictionary.getValue('about_popup_copyright_lbl', [ref_lbl]);
 		trademark_txt.htmlText = Dictionary.getValue('about_popup_trademark_lbl', [ref_lbl, stream_url_atag]);
@@ -230,6 +229,7 @@ class AboutDialog extends MovieClip implements Dialog {
     * Main resize method, called by scrollpane container/parent
     */
     public function setSize(w:Number,h:Number):Void{
+
     }
     
 	
