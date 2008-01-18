@@ -109,6 +109,57 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		
 	}
 	
+	public function getDownstreamActivities(_class, isBranching:Boolean):Array {
+		var _activity;
+		var _activityUIID:Number = selectedItem.activity.activityUIID;
+		var tActivities:Array = new Array();
+		
+		if(isBranching)
+			tActivities.addItem({label: "--Selection--", data: 0});	 // TODO: Label required
+		
+		while(_activityUIID != null) {
+			
+			var transObj:Object = getCanvas().ddm.getTransitionsForActivityUIID(_activityUIID);
+		
+			_activity = (transObj.into != null) ? _cv.ddm.getActivityByUIID(transObj.into.fromUIID) : getParentActivity(_activity);
+			
+			if(_activity != null) {
+				if(_activity instanceof _class) {
+					if(isBranching) tActivities.addItem({label: _activity.title, data: _activity.activityUIID});
+					else tActivities.addItem({label: _activity.title, data: _activity});
+				} else if(_activity instanceof ComplexActivity) {
+					if(!isBranching && !_activity.isOptionalActivity() && !_activity.isSequenceActivity())
+						getActivitiesFromComplexByClass(_activity.activityUIID, tActivities, _class, isBranching);
+					else if(isBranching && !_activity.isOptionalActivity() && !_activity.isOptionsWithSequencesActivity())
+						getActivitiesFromComplexByClass(_activity.activityUIID, tActivities, _class, isBranching);
+						
+				}
+			}
+			
+			_activityUIID = _activity.activityUIID;
+		}
+
+		return tActivities;
+	}
+	
+	private function getActivitiesFromComplexByClass(complexUIID, tActs:Array, _class, isBranching:Boolean):Void {
+		var children:Array = getCanvas().ddm.getComplexActivityChildren(complexUIID);
+		
+		for(var i=0; i<children.length; i++) {
+			if(children[i] instanceof _class) {
+				if(isBranching) tActs.addItem({label: children[i].title, data: children[i].activityUIID});
+				else tActs.addItem({label: children[i].title, data: children[i]});
+			} else if(children[i] instanceof ComplexActivity) {
+				if(!isBranching && !children[i].isOptionalActivity() && !children[i].isSequenceActivity()) {
+					getActivitiesFromComplexByClass(children[i].activityUIID, tActs, _class);
+				} else if(isBranching && !children[i].isOptionalActivity() && !children[i].isOptionsWithSequencesActivity()) {
+					getActivitiesFromComplexByClass(children[i].activityUIID, tActs, _class);
+				}
+			}
+		}
+
+	}
+	
 	public function addToBranchingQueue(a:CanvasBranchView):Void {
 		Debugger.log("adding to branching queue: " + a, Debugger.CRITICAL, "addToBranchingQueue", "CanvasSuperModel");
 		
@@ -610,6 +661,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	
 	public function isActiveView(view:Object):Boolean {
 		return (activeView == view);
+	}
+	
+	public function getParentActivity(act):Activity {
+		return (Activity(act).parentUIID != null) ? _cv.ddm.getActivityByUIID(Activity(act).parentUIID) : null;
 	}
 	
 	public function findParent(a:Activity, b:Activity):Boolean {

@@ -22,10 +22,10 @@
  */
 
 import org.lamsfoundation.lams.common.*;
+import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.authoring.br.BranchConnector;
 import org.lamsfoundation.lams.authoring.br.CanvasBranchView;
-import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.dict.*;
@@ -596,50 +596,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		var transObj = _cv.ddm.getTransitionsForActivityUIID(activityUIID);
 		
 		return (transObj.out == null) ? activityUIID : getLastActivityUIID(transObj.out.toUIID);
-	}
-	
-	public function getDownstreamActivities(_class):Array {
-		var _activity;
-		var _activityUIID:Number = selectedItem.activity.activityUIID;
-		var tActivities:Array = new Array();
-		
-		if(_class == ToolActivity)
-			tActivities.addItem({label: "--Selection--", data: 0});	 // TODO: Label required
-		
-		while(_activityUIID != null) {
-			
-			var transObj:Object = getCanvas().ddm.getTransitionsForActivityUIID(_activityUIID);
-		
-			_activity = (transObj.into != null) ? _cv.ddm.getActivityByUIID(transObj.into.fromUIID) : null;
-			
-			if(_activity != null) {
-				if(_activity instanceof _class) {
-					if(_class == ToolActivity) tActivities.addItem({label: _activity.title, data: _activity.activityUIID});
-					else tActivities.addItem({label: _activity.title, data: _activity});
-				} else if(_activity instanceof ComplexActivity) {
-					if(!_activity.isOptionalActivity() && !_activity.isSequenceActivity())
-						getActivitiesFromComplexByClass(_activity.activityUIID, tActivities, _class);
-				}
-			}
-			
-			_activityUIID = _activity.activityUIID;
-		}
-
-		return tActivities;
-	}
-	
-	private function getActivitiesFromComplexByClass(complexUIID, tActs:Array, _class):Void {
-		var children:Array = getCanvas().ddm.getComplexActivityChildren(complexUIID);
-		
-		for(var i=0; i<children.length; i++) {
-			if(children[i] instanceof _class)
-				if(_class == ToolActivity) tActs.addItem({label: children[i].title, data: children[i].activityUIID});
-				else tActs.addItem({label: children[i].title, data: children[i]});
-			else if(children[i] instanceof ComplexActivity)
-				if(!children[i].isOptionalActivity() && !children[i].isSequenceActivity())
-					getActivitiesFromComplexByClass(children[i].activityUIID, tActs, _class);
-		}
-
 	}
 	
 	public function addActivityToConnection(ca:Object):Object{

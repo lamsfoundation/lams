@@ -251,8 +251,12 @@ class org.lamsfoundation.lams.authoring.Activity {
 		return (_activityTypeID == OPTIONAL_ACTIVITY_TYPE);
 	}
 	
+	public function isOptionsWithSequencesActivity():Boolean {
+		return (_activityTypeID == OPTIONS_WITH_SEQUENCES_TYPE);
+	}
+	
 	public function isOptionalSequenceActivity(parent:Activity):Boolean {
-		return (this.isSequenceActivity() && parent.activityTypeID == OPTIONS_WITH_SEQUENCES_TYPE);
+		return (this.isSequenceActivity() && parent.isOptionsWithSequencesActivity());
 	}
 	
 	public function isParallelActivity():Boolean{

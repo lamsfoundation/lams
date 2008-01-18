@@ -135,6 +135,79 @@ class PropertyInspector extends PropertyInspectorControls {
 		
 	}
 	
+	public function setupLabels(){
+		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b>"
+		
+		gateType_lbl.text = Dictionary.getValue('trans_dlg_gatetypecmb');
+		branchType_lbl.text = Dictionary.getValue("pi_branch_type");
+		branchToolActs_lbl.text = Dictionary.getValue("pi_branch_tool_acts_lbl");
+		
+		days_lbl.text = Dictionary.getValue('pi_days');
+		hours_lbl.text = Dictionary.getValue('pi_hours');
+		mins_lbl.text = Dictionary.getValue('pi_mins');
+		hoursEnd_lbl.text = Dictionary.getValue('pi_hours');
+		minsEnd_lbl.text = Dictionary.getValue('pi_mins');
+		startOffset_lbl.text = Dictionary.getValue('pi_start_offset');
+		endOffset_lbl.text = Dictionary.getValue('pi_end_offset');
+		
+		groupType_lbl.text = Dictionary.getValue('pi_group_type');
+		numGroups_lbl.text = Dictionary.getValue('pi_num_groups');
+		numLearners_lbl.text = Dictionary.getValue('pi_num_learners');
+		
+		//Properties tab
+		title_lbl.text = Dictionary.getValue('pi_lbl_title');
+		desc_lbl.text = Dictionary.getValue('pi_lbl_desc');
+		grouping_lbl.text = Dictionary.getValue('pi_lbl_group');
+		currentGrouping_lbl.text = Dictionary.getValue('pi_lbl_currentgroup');
+		defineLater_chk.label = Dictionary.getValue('pi_definelater');
+		runOffline_chk.label = Dictionary.getValue('pi_runoffline');
+				
+		//Complex Activity
+		//min_lbl.text = Dictionary.getValue('pi_min_act');
+		//max_lbl.text = Dictionary.getValue('pi_max_act');
+		
+		noSeqAct_lbl.text = Dictionary.getValue('pi_no_seq_act');
+		
+		_group_match_btn.label = Dictionary.getValue('pi_mapping_btn_lbl');
+		_group_naming_btn.label = Dictionary.getValue('pi_group_naming_btn_lbl');
+		_tool_output_match_btn.label = Dictionary.getValue('pi_mapping_btn_lbl');
+		_conditions_setup_btn.label = Dictionary.getValue('pi_condmatch_btn_lbl');
+
+		_define_monitor_cb.label = Dictionary.getValue('pi_define_monitor_cb_lbl');
+
+		// Branch 
+		_pi_defaultBranch_cb.label = Dictionary.getValue("pi_defaultBranch_cb_lbl");
+		
+		//populate the synch type combo:
+		gateType_cmb.dataProvider = Activity.getGateActivityTypes();
+		branchType_cmb.dataProvider = Activity.getBranchingActivityTypes();
+		groupType_cmb.dataProvider = Grouping.getGroupingTypesDataProvider();
+		
+		//Call to apply style to all the labels and input fields
+		setStyles();
+		setButtonSizes();
+		
+		//fire event to say we have loaded
+		delete this.onEnterFrame; 
+		
+		//hide all the controls at startup
+		delimitLine._visible = false;
+		_group_match_btn.visible = false;
+		
+		hideAllSteppers(false);
+		
+		showGroupingControls(false);
+		showGeneralControls(false);
+		showOptionalControls(false);
+		showToolActivityControls(false);
+		showGateControls(false);
+		showBranchingControls(false);
+		showAppliedGroupingControls(false);
+		showGeneralInfo(true);
+		
+		dispatchEvent({type:'load',target:this});
+	}
+	
 	public function localOnRelease():Void{
 		
 		if (_piIsExpended){
