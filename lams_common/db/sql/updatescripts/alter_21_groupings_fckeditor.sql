@@ -35,3 +35,12 @@ UPDATE lams_supported_locale SET fckeditor_code='zh' WHERE language_iso_code='zh
 UPDATE lams_supported_locale SET fckeditor_code='ja' WHERE language_iso_code='ja' AND country_iso_code='JP';
 UPDATE lams_supported_locale SET fckeditor_code='ms' WHERE language_iso_code='ms' AND country_iso_code='MY';
 
+-- See LDEV-273
+CREATE TABLE lams_password_request (
+       request_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , user_id BIGINT(20) NOT NULL
+     , request_key VARCHAR(32) NOT NULL
+     , request_date DATETIME NOT NULL
+     , PRIMARY KEY (request_id)
+)TYPE=InnoDB;
+CREATE UNIQUE INDEX IX_lams_psswd_rqst_key ON lams_password_request (request_key ASC);

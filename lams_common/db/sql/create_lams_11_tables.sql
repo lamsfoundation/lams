@@ -960,6 +960,14 @@ CREATE TABLE lams_user_organisation_collapsed (
                   REFERENCES lams_user_organisation (user_organisation_id)
 )TYPE=InnoDB;
 
+CREATE TABLE lams_password_request (
+       request_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , user_id BIGINT(20) NOT NULL
+     , request_key VARCHAR(32) NOT NULL
+     , request_date DATETIME NOT NULL
+     , PRIMARY KEY (request_id)
+)TYPE=InnoDB;
+CREATE UNIQUE INDEX IX_lams_psswd_rqst_key ON lams_password_request (request_key ASC);
 
 
 
