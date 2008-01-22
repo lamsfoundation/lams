@@ -152,6 +152,22 @@ public class IntegrationService implements IIntegrationService{
 		}
 	}
 	
+	public ExtUserUseridMap getExistingExtUserUseridMap(
+			ExtServerOrgMap serverMap, 
+			String extUsername) 
+			throws UserInfoFetchException 
+	{
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put("extServerOrgMap.sid", serverMap.getSid());
+		properties.put("extUsername", extUsername);
+		List list = service.findByProperties(ExtUserUseridMap.class, properties);
+		if(list==null || list.size()==0){
+			return null;
+		}else{
+			return (ExtUserUseridMap)list.get(0);
+		}
+	}
+	
 	public ExtUserUseridMap getImplicitExtUserUseridMap(
 			ExtServerOrgMap serverMap, 
 			String extUsername,

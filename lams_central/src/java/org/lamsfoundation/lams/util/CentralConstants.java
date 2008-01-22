@@ -54,6 +54,8 @@ public class CentralConstants {
 	public static final String PARAM_LANG = "lang";
 
 	public static final String PARAM_METHOD = "method";
+	
+	public static final String PARAM_PROGRESS_USER = "progressUser";
 
 	public static final String METHOD_START = "start";
 	

@@ -48,6 +48,8 @@ public interface IIntegrationService {
 	
 	ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException;
 	
+	ExtUserUseridMap getExistingExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException;
+	
 	ExtServerOrgMap getExtServerOrgMap(Integer sid);
 
 	ExtServerOrgMap getExtServerOrgMap(String serverId);
