@@ -474,7 +474,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 				//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
 				eventArr.push(createViewUpdate("DRAW_BRANCH", ddmBranch));
 			}else if(r_branch == "DELETE"){
-				eventArr.push(createViewUpdate("REMOVE_BRANCH",cmBranch));
+				eventArr.push(createViewUpdate("REMOVE_BRANCH", cmBranch));
 			}
 		}
 		

@@ -751,17 +751,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			}
 			
 			var branch = _cv.ddm.getBranchesForActivityUIID(toAct);
-			if(branch.target != null && branch.target.direction != BranchConnector.DIR_SINGLE) {
+			if(branch.target != null && branch.target.direction == BranchConnector.DIR_FROM_START) {
+				
 				return new LFError("Can't create transition between activities in different branches", "addActivityToTransition", this);
 			}
 			
 			var branchesArray:Array = _cv.ddm.branches.values();
 			for(var i=0; i<branchesArray.length; i++) {
 				if(branchesArray[i].targetUIID == toAct && branchesArray[i].direction == BranchConnector.DIR_TO_END) {
-					return new LFError("Cannot connect a new transition a closed sequence");
+					//return new LFError("Cannot connect a new transition a closed sequence");
+					
 				}
 				
-				if(branchesArray[i].targetUIID == fromAct && branchesArray[i].direction == BranchConnector.DIR_TO_END) {
+				if(branchesArray[i].targetUIID == fromAct && branchesArray[i].direction == BranchConnector.DIR_TO_END ) {
 					return new LFError("Cannot connect a new transition a closed sequence");
 				}
 			}
@@ -894,9 +896,33 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		
 		// get next activity from transition
 		var transObj = _cv.ddm.getTransitionsForActivityUIID(activityUIID);
+		var branches = _cv.ddm.getBranchesForActivityUIID(activityUIID);
+		
+		if(transObj.out == null && branches.target != null) {
+			if(branches.target.sequenceActivity.activityUIID != sequence.activityUIID && branches.target.direction == BranchConnector.DIR_TO_END) {
+				
+				Debugger.log("end branch found: " + branches.target.branchUIID, Debugger.CRITICAL, "moveActivitiesToBranchSequence", "CanvasModel");
+				Debugger.log("tar seq: " + branches.target.sequenceActivity.activityUIID + " = " + sequence.activityUIID, Debugger.CRITICAL, "moveActivitiesToBranchSequence", "CanvasModel");
+				
+				if(!branches.target.sequenceActivity.stopAfterActivity) {
+					
+					_cv.removeBranch(branches.target.branchUIID);
+					MovieClipUtils.doLater(Proxy.create(this, moveBranchToSequence, activityUIID, sequence));
+					
+					Debugger.log("stopAfterActivity: " + sequence.stopAfterActivity, Debugger.CRITICAL, "moveActivitiesToBranchSequence", "CanvasModel");
+				}
+				
+			}
+		}
 		
 		return (transObj.out == null) ? true : moveActivitiesToBranchSequence(transObj.out.toUIID, sequence);
 
+	}
+	
+	private function moveBranchToSequence(activityUIID:Number, sequence:SequenceActivity):Void {
+		var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_TO_END, activityUIID, sequence.parentUIID, sequence, _cv.ddm.learningDesignID);
+		_cv.ddm.addBranch(b);
+		setDirty();
 	}
 	
 	
