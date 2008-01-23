@@ -293,13 +293,10 @@ public class ObjectExtractor implements IObjectExtractor {
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.authoring.IObjectExtractor#extractSaveLearningDesign(java.util.Hashtable)
 	 */
-	public LearningDesign extractSaveLearningDesign(Hashtable table, WorkspaceFolder workspaceFolder, User user) throws WDDXProcessorConversionException, ObjectExtractorException {
+	public LearningDesign extractSaveLearningDesign(Hashtable table, LearningDesign existingLearningDesign, WorkspaceFolder workspaceFolder, User user) throws WDDXProcessorConversionException, ObjectExtractorException {
 
-		learningDesign = null;
-	
-		Long learningDesignId = WDDXProcessor.convertToLong(table, "learningDesignID");
-		//if the learningDesignID is not null, load the existing LearningDesign object from the database, otherwise create a new one.
-		learningDesign = learningDesignId!= null ? learningDesignDAO.getLearningDesignById(learningDesignId) : new LearningDesign();
+		// if the learningDesign already exists, update it,  otherwise create a new one.
+		learningDesign = existingLearningDesign!= null ? existingLearningDesign : new LearningDesign();
 	
 		// Check the copy type. Can only update it if it is COPY_TYPE_NONE (ie authoring copy)
 		Integer copyTypeID = WDDXProcessor.convertToInteger(table,WDDXTAGS.COPY_TYPE);

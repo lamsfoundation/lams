@@ -1085,6 +1085,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	 * It received a WDDX packet from flash, deserializes it
 	 * and then finally persists it to the database.
 	 * 
+	 * A user may update an existing learning design if they have user/owner rights to the 
+	 * folder or they are doing live edit. A user may create a new learning design only if they 
+	 * have user/owner rights to the folder.
+	 * 
 	 * Note: it does not validate the design - that must be done
 	 * separately.
 	 * 
@@ -1107,15 +1111,23 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		}
 
 		WorkspaceFolder workspaceFolder = null;
+		boolean authorised = false;
 		if (workspaceFolderID != null )	{
-			if ( ! workspaceManagementService.isUserAuthorizedToModifyFolderContents(workspaceFolderID, userID) ) {
-				throw new UserException("User with user_id of " + userID +" is not authorized to store a design in this workspace folder "+workspaceFolderID);
-			}
 			workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderID);
+			authorised = workspaceManagementService.isUserAuthorizedToModifyFolderContents(workspaceFolderID, userID);
+		}
+		
+		Long learningDesignId = WDDXProcessor.convertToLong(table, "learningDesignID");
+		LearningDesign existingLearningDesign = learningDesignId != null ? learningDesignDAO.getLearningDesignById(learningDesignId) : null;
+		if ( ! authorised && existingLearningDesign != null && Boolean.TRUE.equals(existingLearningDesign.getEditOverrideLock())) {
+			authorised = userID.equals(existingLearningDesign.getEditOverrideUser().getUserId()); 
+		}
+		if ( ! authorised ) {
+			throw new UserException("User with user_id of " + userID +" is not authorized to store a design in this workspace folder "+workspaceFolderID);
 		}
 
 		IObjectExtractor extractor = (IObjectExtractor) beanFactory.getBean(IObjectExtractor.OBJECT_EXTRACTOR_SPRING_BEANNAME);
-		LearningDesign design = extractor.extractSaveLearningDesign(table, workspaceFolder, user);	
+		LearningDesign design = extractor.extractSaveLearningDesign(table, existingLearningDesign, workspaceFolder, user);	
 		
 		if(extractor.getMode().intValue() == 1)
 			copyLearningDesignToolContent(design, design, design.getCopyTypeID());

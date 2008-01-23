@@ -35,7 +35,7 @@ public interface IObjectExtractor {
 
 	public static final String OBJECT_EXTRACTOR_SPRING_BEANNAME = "ObjectExtractor";
 
-	public abstract LearningDesign extractSaveLearningDesign(Hashtable table, WorkspaceFolder workspaceFolder, User user)
+	public abstract LearningDesign extractSaveLearningDesign(Hashtable table, LearningDesign existingLearningDesign, WorkspaceFolder workspaceFolder, User user)
 			throws WDDXProcessorConversionException, ObjectExtractorException;
 
 	public void setMode(Integer mode);
