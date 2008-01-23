@@ -310,15 +310,29 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		var parentAct:Activity = mm.getMonitor().ddm.getActivityByUIID(_activity.parentUIID)
 		
 		var xCoord = _activity.xCoord;
+		var yCoord;
 				
 		if (_activity.parentUIID != null) {
 			xCoord = (parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE) ? _activity.xCoord : parentAct.xCoord;
 
-			if(parentAct.activityTypeID != Activity.PARALLEL_ACTIVITY_TYPE && parentAct.activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE){
+			if(parentAct.activityTypeID != Activity.PARALLEL_ACTIVITY_TYPE 
+				&& parentAct.activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE) {
 				xCoord = parentAct.xCoord + _activity.xCoord;
 				learner_X = (learner_X != null) ? learner_X + parentAct.xCoord : null;
 				learner_Y = learner_Y + parentAct.yCoord;
-			} 
+			} else {
+				xCoord = parentAct.xCoord;
+				yCoord = parentAct.yCoord;
+				
+				parentAct = mm.getMonitor().ddm.getActivityByUIID(parentAct.parentUIID);
+				
+				if(parentAct.isOptionsWithSequencesActivity()) {
+					xCoord = parentAct.xCoord + xCoord;
+					learner_X = (learner_X != null) ? learner_X + xCoord : null;
+					learner_Y = learner_Y + parentAct.yCoord + yCoord;
+				}
+				
+			}
 					
 		}
 		
@@ -336,7 +350,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				// Add + icon to indicate that more users are currently at the Activity. 
 				// We are unable to display all the users across the Activity's panel.
 				Debugger.log("learner_X: " + learner_X + " ref: " + learnerContainer + " xcoord: " + xCoord, Debugger.CRITICAL, "drawLearners", "CanvasActivity");
-				if(learner_X > (xCoord + 112)) {
+				if(learner_X > (xCoord + getVisibleWidth() - 10)) {
 					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(), {_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:true, _clone:false });
 					return;
 				}
