@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
@@ -267,4 +268,14 @@ public interface ILessonService {
      * @return map of lesson beans used in the index page
      */
     public Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, boolean isStaff);
+    
+	/**
+     * Gets the learner's progress details for a particular lesson. Will return null if the user
+     * has not started the lesson.
+     * 
+     * @param learnerId user's id
+     * @param lessonId lesson's id
+     * @return learner's progress or null
+     */
+    public LearnerProgress getUserProgressForLesson(Integer learnerId, Long lessonId);
 }

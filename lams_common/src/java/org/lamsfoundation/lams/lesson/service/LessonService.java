@@ -661,4 +661,17 @@ public class LessonService implements ILessonService
 	        }
 	        return map;	
 	    }
+		
+		   
+		/**
+	     * Gets the learner's progress details for a particular lesson. Will return null if the user
+	     * has not started the lesson.
+	     * 
+	     * @param learnerId user's id
+	     * @param lessonId lesson's id
+	     * @return learner's progress or null
+	     */
+	    public LearnerProgress getUserProgressForLesson(Integer learnerId, Long lessonId) {
+	    	return learnerProgressDAO.getLearnerProgressByLearner(learnerId,lessonId);
+	    }
 }
