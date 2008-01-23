@@ -1058,9 +1058,11 @@ class PropertyInspectorControls extends MovieClip {
 		//	_define_monitor_cb.selected = _canvasModel.selectedItem.activity.defineLater;
 
 		var ca = _canvasModel.selectedItem;
-		var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
 		
-		if(branches.myBranches.length > 0 && ca.activity.groupingUIID != null) {
+		//var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
+		var sequences:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(ca.activity.activityUIID);
+		
+		if(hasConnectedSequences(sequences) && ca.activity.groupingUIID != null) {
 			var grouping:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(ca.activity.groupingUIID);
 			
 			if(grouping.learnersPerGroups > 0)
