@@ -100,8 +100,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var branchIcon_mc:MovieClip;
 	private var stopSign_mc:MovieClip;
 	private var branchSign_mc:MovieClip;
+	
 	private var start_branch_icon_mc:MovieClip;
 	private var finish_branch_icon_mc:MovieClip;
+	private var start_branch_icon_mc_rtl:MovieClip;
+	private var finish_branch_icon_mc_rtl:MovieClip;
 	
 	private var clickTarget_mc:MovieClip;
 	
@@ -208,6 +211,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		branchIcon_mc._visible = isVisible;
 		start_branch_icon_mc._visible = isVisible;
 		finish_branch_icon_mc._visible = isVisible;
+		start_branch_icon_mc_rtl._visible = isVisible;
+		finish_branch_icon_mc_rtl._visible = isVisible;
 		title_lbl._visible = isVisible;
 		icon_mc._visible = isVisible;
 		stopSign_mc._visible = isVisible;
@@ -419,13 +424,22 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			}
 			
 		} else if(_branchConnector) {
-			start_branch_icon_mc._visible = true;
+			start_branch_icon_mc._visible = (!ApplicationParent.isRTL());
 			start_branch_icon_mc._x = 1;
 			start_branch_icon_mc._y = 1;
 			
-			finish_branch_icon_mc._visible = true;
+			start_branch_icon_mc_rtl._visible = (ApplicationParent.isRTL());
+			start_branch_icon_mc_rtl._x = 31;
+			start_branch_icon_mc_rtl._y = 1;
+			
+			finish_branch_icon_mc._visible = (!ApplicationParent.isRTL());
 			finish_branch_icon_mc._x = 1;
-			finish_branch_icon_mc._x = 1;
+			finish_branch_icon_mc._y = 1;
+			
+			finish_branch_icon_mc_rtl._visible = (ApplicationParent.isRTL());
+			finish_branch_icon_mc_rtl._x = 31;
+			finish_branch_icon_mc_rtl._y = 1;
+			
 		} else {
 			
 			//chose the icon:
