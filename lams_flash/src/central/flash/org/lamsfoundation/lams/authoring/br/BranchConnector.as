@@ -71,7 +71,6 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 		Debugger.log("is open: " + model.activeView.isOpen, Debugger.CRITICAL, "init", "BranchConnector");
 		if(branch.direction != DIR_TO_END && model.activeView.isOpen)
 			createBranchLabel();
-		
 	}
 	
 	/**
@@ -125,7 +124,7 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 		var _xpos = (_quadrant == CanvasConnection.Q1 || _quadrant == CanvasConnection.Q4) ? arrow_mc._x + _offset : arrow_mc._x - _offset;
 		var _ypos = (_quadrant == CanvasConnection.Q1 || _quadrant == CanvasConnection.Q2) ? arrow_mc._y + _offset : arrow_mc._y - _offset - 22;
 		
-		bcLabel_mc = model.activeView.labelContainer.attachMovie("Label", "bcLabel" + _branch.branchUIID, model.activeView.labelContainer.getNextHighestDepth(), {_x: _xpos, _y: _ypos, text:_branch.sequenceName, _width: 40, _height: 22, autoSize: "center", _visible: false});
+		bcLabel_mc = this.attachMovie("Label", "bcLabel" + _branch.branchUIID, model.activeView.labelContainer.getNextHighestDepth(), {_x: _xpos, _y: _ypos, text:_branch.sequenceName, _width: 40, _height: 22, autoSize: "center", _visible: false});
 		bcLabel = Label(bcLabel_mc);
 		bcLabel.setStyle('styleName', _tm.getStyleObject("label"));
 		

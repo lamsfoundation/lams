@@ -44,6 +44,8 @@ class ApplicationParent {
 	public static var C_DEFAULT:String = "default";
 	public static var C_LICON:String = "c_licon";
 	
+	public static var RTL:String = "RTL";
+	
 	public static var TRANSITION:String = "transition";
 	
 	public static var SERIAL_NO = "0000-0000-0000-0001-AAAA";
@@ -308,5 +310,10 @@ class ApplicationParent {
 	public function set controlKeyPressed(key:String){
         _controlKeyPressed = key;
     }
+	
+	public static function isRTL():Boolean {
+		Debugger.log("root direction: " + _root.direction, Debugger.CRITICAL, "isRTL", "ApplicationParent");
+		return (_root.direction == ApplicationParent.RTL);
+	}
 	
 }

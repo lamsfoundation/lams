@@ -57,5 +57,4 @@ class CanvasBranchingConnector extends CanvasActivity {
 		}
 	}
 	
-	
 }

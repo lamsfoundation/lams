@@ -29,7 +29,12 @@ if(StringUtils.isEmpty(mode)){
 
 if(StringUtils.isEmpty(layout)){
 	_root.layout = "normal";
-	Debugger.log('Mode is not defined, using defualt:'+_root.mode,Debugger.CRITICAL,'main','ROOT');			
+	Debugger.log('Mode is not defined, using default:'+_root.mode,Debugger.CRITICAL,'main','ROOT');			
+}
+
+if(StringUtils.isEmpty(direction)){
+	_root.direction = "LTR";
+	Debugger.log('Direction is not defined, using default:'+_root.direction,Debugger.CRITICAL,'main','ROOT');		
 }
 
 if(StringUtils.isEmpty(learningDesignID)){
