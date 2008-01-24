@@ -140,7 +140,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<div id="message"></div>
 			<div id="button" style="visibility:hidden">
-				<p><a href='#' onclick='javascript:window.close()' class='button'><fmt:message key='label.finish.button'/></a></p>
+				<p><a href='#' onclick='javascript:window.close()' class='button'><fmt:message key='label.close.button'/></a></p>
 			</div>
 			
 		</div>  <!--closes content-->
