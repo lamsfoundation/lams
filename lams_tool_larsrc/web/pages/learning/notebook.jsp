@@ -39,7 +39,7 @@
 
 			<div class="space-bottom-top align-right">
 				<html:submit styleClass="button" styleId="finishButton">
-					<fmt:message key="label.finish" />
+					<fmt:message key="label.finished" />
 				</html:submit>
 			</div>
 		</div>
