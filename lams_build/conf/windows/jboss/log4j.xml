@@ -195,6 +195,12 @@
     <appender-ref ref="LAMSCONSOLE"/>
   </category>
   
+  <category name="org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter" additivity="false">
+    <priority value="INFO"/>
+    <appender-ref ref="LAMSFILE"/>
+    <appender-ref ref="LAMSCONSOLE"/>
+  </category>
+  
   <category name="org.lamsfoundation.lams.util.audit" additivity="false">
     <priority value="INFO"/>
     <appender-ref ref="AUDITFILE"/>

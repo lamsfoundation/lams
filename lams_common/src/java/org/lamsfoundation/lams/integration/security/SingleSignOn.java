@@ -50,15 +50,15 @@ public class SingleSignOn extends org.apache.catalina.authenticator.SingleSignOn
 		request.removeNote(Constants.REQ_SSOID_NOTE);
 
 		// Has a valid user already been authenticated?
-		if (log.isDebugEnabled())
-			log.debug("Process request for '" + request.getRequestURI() + "'");
+//		if (log.isDebugEnabled())
+//			log.debug("Process request for '" + request.getRequestURI() + "'");
 		Principal p = request.getUserPrincipal();
 		String username = null;
 		String password = null;
 		if (request.getUserPrincipal() != null) {
-			if (log.isDebugEnabled())
-				log.debug(" Principal '" + request.getUserPrincipal().getName()
-						+ "' has already been authenticated");
+//			if (log.isDebugEnabled())
+//				log.debug(" Principal '" + request.getUserPrincipal().getName()
+//						+ "' has already been authenticated");
 			getNext().invoke(request, response);
 			return;
 		} else {
@@ -71,8 +71,8 @@ public class SingleSignOn extends org.apache.catalina.authenticator.SingleSignOn
 		}
 
 		// Check for the single sign on cookie
-		if (log.isDebugEnabled())
-			log.debug(" Checking for SSO cookie");
+//		if (log.isDebugEnabled())
+//			log.debug(" Checking for SSO cookie");
 		Cookie cookie = null;
 		Cookie cookies[] = request.getCookies();
 		if (cookies == null)
@@ -84,26 +84,26 @@ public class SingleSignOn extends org.apache.catalina.authenticator.SingleSignOn
 			}
 		}
 		if (cookie == null) {
-			if (log.isDebugEnabled())
-				log.debug(" SSO cookie is not present");
+//			if (log.isDebugEnabled())
+//				log.debug(" SSO cookie is not present");
 			getNext().invoke(request, response);
 			return;
 		}
 
 		// Look up the cached Principal associated with this cookie value
-		if (log.isDebugEnabled())
-			log.debug(" Checking for cached principal for " + cookie.getValue());
+//		if (log.isDebugEnabled())
+//			log.debug(" Checking for cached principal for " + cookie.getValue());
 		// register principal from internal session. This principal is set
 		// in internal session by catalina FormAuthenticator
 		if (p != null) {
-			log.debug("principal - " + p.getName());
+//			log.debug("principal - " + p.getName());
 			register(cookie.getValue(), p, Constants.FORM_METHOD, username, password);
 		}
 		SingleSignOnEntry entry = lookup(cookie.getValue());
 		if (entry != null) {
-			if (log.isDebugEnabled())
-				log.debug(" Found cached principal '" + entry.getPrincipal().getName()
-						+ "' with auth type '" + entry.getAuthType() + "'");
+//			if (log.isDebugEnabled())
+//				log.debug(" Found cached principal '" + entry.getPrincipal().getName()
+//						+ "' with auth type '" + entry.getAuthType() + "'");
 			request.setNote(Constants.REQ_SSOID_NOTE, cookie.getValue());
 			// Only set security elements if reauthentication is not required
 			if (!getRequireReauthentication()) {
@@ -111,8 +111,8 @@ public class SingleSignOn extends org.apache.catalina.authenticator.SingleSignOn
 				request.setUserPrincipal(entry.getPrincipal());
 			}
 		} else {
-			if (log.isDebugEnabled())
-				log.debug(" No cached principal found, erasing SSO cookie");
+//			if (log.isDebugEnabled())
+//				log.debug(" No cached principal found, erasing SSO cookie");
 			cookie.setMaxAge(0);
 			response.addCookie(cookie);
 		}
