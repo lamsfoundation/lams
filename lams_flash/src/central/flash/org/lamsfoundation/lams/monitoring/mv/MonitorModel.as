@@ -62,6 +62,7 @@ class MonitorModel extends Observable{
 	private var selectedTab:Number;
 	private var _dialogOpen:String;		// the type of dialog currently open
 	
+	private var _inBranchView:Boolean;
 	private var _staffLoaded:Boolean;
 	private var _learnersLoaded:Boolean;
 	private var _isLessonProgressChanged:Boolean;
@@ -150,6 +151,7 @@ class MonitorModel extends Observable{
 	public function MonitorModel (monitor:Monitor){
 		_monitor = monitor;
 		
+		_inBranchView = false;
 		_showLearners = true;
 		isDesignDrawn = true;
 		_drawButtons = true;
@@ -388,15 +390,31 @@ class MonitorModel extends Observable{
 	public function isShowLearners():Boolean{
 		return _showLearners;
 	}
-
-
+	
+	public function getIsValidDropTarget(learnerActivityID:Number, activity:Object):Boolean {
+		var activityToCheck = activity;
+		var targetIsAccessible:Boolean = false; // must check if target is accessible, i.e. if inside branching, on the same branch
+		do {
+			var transObj:Object = app.getMonitor().ddm.getTransitionsForActivityUIID(activityToCheck.activityUIID);
+			var previousAct = app.getMonitor().ddm.getActivityByUIID(transObj.into.fromUIID);
+			if (previousAct.activityID == learnerActivityID) {
+				Debugger.log("Activity target is accessible", Debugger.CRITICAL, "getIsValidDropTarget", "MonitorModel");
+				targetIsAccessible = true;
+				break;
+			}
+			activityToCheck = previousAct;
+		} while (transObj.into.fromUIID != null);
+		
+		return targetIsAccessible;
+	}
+	
 	public function activitiesOnCanvas():Array{
 		var actAll:Array = new Array();
 		var k:Array = _activitiesDisplayed.values();
 		for (var i=0; i<k.length; i++){
 			actAll.push(k[i]);		
 		}
-		
+
 		return actAll;
 	}
 	/**
@@ -867,7 +885,14 @@ class MonitorModel extends Observable{
 		} else {
 			ApplicationParent.extCall("reloadWindow", null);
 		}
-		
+	}
+	
+	public function get inBranchView():Boolean {
+		return _inBranchView;
+	}
+	
+	public function set inBranchView(s:Boolean) {
+		_inBranchView = s;
 	}
 	
 	public function tabHelp(){

@@ -149,13 +149,12 @@ class MonitorController extends AbstractController {
 	 * Check the force complete order for validity
 	 * 
 	 * @usage   
-	 * @param   indexArray 	Top-level canvas member activities on the canvas
 	 * @param   index      	index position 
 	 * @param   isChild    
 	 * @return  
 	 */
 	
-	private function checkHit(cActivity:Object, learnerObj:Object, indexArray:Array):Boolean {
+	private function checkHit(cActivity:Object, learnerObj:Object):Boolean {
 		
 		var actUIIDToCompare = learnerObj.activity.activityUIID;
 		var parentUIIDToCompare = learnerObj.activity.parentUIID;
@@ -167,7 +166,7 @@ class MonitorController extends AbstractController {
 			if(actUIIDToCompare == cActivity.activity.activityUIID)
 				activitySnapBack(learnerObj);
 			else {
-				forceCompleteTransfer(learnerObj, cActivity, indexArray);
+				forceCompleteTransfer(learnerObj, cActivity);
 			}
 				
 		} else {
@@ -185,20 +184,25 @@ class MonitorController extends AbstractController {
 	 * @usage   
 	 * @param   learnerObj 
 	 * @param   cActivity  
-	 * @param   indexArray 
 	 * @return  
 	 */
-	
-	private function forceCompleteTransfer(learnerObj:Object, cActivity:Object, indexArray:Array):Void {
-		var activityUIIDToCheck:Number = (cActivity.activity.parentUIID != null) ? cActivity.activity.parentUIID : cActivity.activity.activityUIID;
-		var prevActivityID:Number = indexArray[checkLearnerCurrentActivity(indexArray,activityUIIDToCheck) - 1].activity.activityID;
-		var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+learnerObj.Learner.getLearnerId()+"&activityID="+prevActivityID;
-		
-		var fnOk:Function = Proxy.create(this, this.reloadProgress, this, URLToSend);
-		var fnCancel:Function = Proxy.create(this, this.activitySnapBack, learnerObj);
-		
-		LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_forcecomplete_toactivity',[learnerObj.Learner.getFullName(), cActivity.activity.title]), fnOk,fnCancel);
-		
+	private function forceCompleteTransfer(learnerObj:Object, cActivity:Object):Void {
+		var learnerActivityID:Number = learnerObj.Learner.getCurrentActivityId();
+		var activityToCheck = cActivity.activity; // initially the Activity where the learner icon has been dropped
+		var targetIsAccessible:Boolean = _monitorModel.getIsValidDropTarget(learnerActivityID, activityToCheck);
+
+		if (targetIsAccessible) {
+			var transObj:Object = _monitorModel.getMonitor().ddm.getTransitionsForActivityUIID(cActivity.activity.activityUIID);
+			var previousAct = _monitorModel.getMonitor().ddm.getActivityByUIID(transObj.into.fromUIID);
+			var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+learnerObj.Learner.getLearnerId()+"&activityID="+previousAct.activityID;
+			var fnOk:Function = Proxy.create(this, this.reloadProgress, this, URLToSend);
+			var fnCancel:Function = Proxy.create(this, this.activitySnapBack, learnerObj);
+			
+			_monitorModel.inBranchView = true;
+			
+			LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_forcecomplete_toactivity',[learnerObj.Learner.getFullName(), cActivity.activity.title]), fnOk,fnCancel);			
+		} else
+			LFMessage.showMessageAlert(learnerObj.Learner.getFullName() +" cannot be dropped at the chosen location.", null, null);
 	}
 	
 	/**
@@ -209,26 +213,8 @@ class MonitorController extends AbstractController {
 	 * @param   activityID      
 	 * @return  
 	 */
-	
 	private function checkifActivityNotComplete(learnerProgress:Progress, activityID:Number):Boolean {
 		return (Progress.compareProgressData(learnerProgress, activityID) != "completed_mc") ? true : false;
-	}
-	
-	/**
-	 * Return activity index
-	 * 
-	 * @usage   
-	 * @param   arr     
-	 * @param   actUIID 
-	 * @return  index 
-	 */
-	
-	private function checkLearnerCurrentActivity(arr:Array, actUIID:Number):Number{
-		for (var i=0; i<arr.length; i++){
-			if (arr[i].activity.activityUIID == actUIID){
-				return i;
-			}
-		}
 	}
 	
 	public function activityRelease(act:Object, forObj:String):Void{
@@ -256,7 +242,7 @@ class MonitorController extends AbstractController {
 							&& !cActivity.activity.isBranchingActivity())
 						cActivity = matchChildActivity(cActivity.children, dropTarget);
 					
-					hasHit = (cActivity.activity.activityUIID == dropTarget.activity.activityUIID) ? checkHit(cActivity, act, indexArray) : hasHit;
+					hasHit = (cActivity.activity.activityUIID == dropTarget.activity.activityUIID) ? checkHit(cActivity, act) : hasHit;
 				} 
 
 			}
@@ -307,7 +293,7 @@ class MonitorController extends AbstractController {
 			r.showErrorAlert();
 		} else if(r) {
 			LFMessage.showMessageAlert(r);
-			_monitorModel.broadcastViewUpdate("RELOADPROGRESS", null, _monitorModel.getSelectedTab())
+			_monitorModel.broadcastViewUpdate("RELOADPROGRESS", null, _monitorModel.getSelectedTab());
 		}
 	}
 	
@@ -413,6 +399,7 @@ class MonitorController extends AbstractController {
 			exportClassPortfolio();
 		}else if(tgt.indexOf("refresh_btn") != -1){
 			if(_monitorModel.activeView instanceof CanvasBranchView) {
+				_monitorModel.inBranchView = false;
 				_monitorModel.activeView.removeMovieClip();
 				_monitorModel.getMonitor.closeBranchView();
 			}

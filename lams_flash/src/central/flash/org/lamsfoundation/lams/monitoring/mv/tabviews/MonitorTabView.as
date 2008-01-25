@@ -147,7 +147,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 							}
 							
 							if(mm.getIsProgressChangedSequence()){
-								reloadProgress(false);
+								reloadProgress(o.hasChanged(), mm);
 							}
 						}
 						
@@ -169,7 +169,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 					break;
 				case 'RELOADPROGRESS' :	
 					if (infoObj.tabID == _tabID && !mm.locked){
-						reloadProgress(true)
+						reloadProgress(o.hasChanged(), mm);
 					}
 					break;	
 				case 'DRAW_ACTIVITY' :
@@ -271,11 +271,22 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	 * @return  nothing
 	 */
 	private function reloadProgress(isChanged:Boolean){
-			var s:Object = mm.getSize();
-			drawDesignCalled = undefined;
-			
+		var s:Object = mm.getSize();
+		var openBranchingActivity:Object = mm.currentBranchingActivity;
+		
+		drawDesignCalled = undefined;
+		
+		if(openBranchingActivity && mm.inBranchView == true) { // learner has been force-completed
+			showAssets(false);
+			mm.getMonitor().getProgressData(mm.getSequence());
+			mm.activeView.removeMovieClip();
+			mm.getMonitor().openBranchView(openBranchingActivity, true);
+		} 
+		else {
+
+			showAssets(true);
 			mm.getMonitor().closeBranchView();
-			
+		
 			//Remove all the movies drawn on the transition and activity movieclip holder
 			
 			this._learnerContainer_mc.removeMovieClip();
@@ -306,7 +317,14 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			mm.activitiesDisplayed.clear();
 			
 			mm.getMonitor().getProgressData(mm.getSequence());
-			
+		}
+	}
+	
+	public function showAssets(v:Boolean) {
+		this._learnerContainer_mc._visible = v;
+		this.transitionLayer._visible = v;
+		this.activityLayer._visible = v;
+		this.transparentCover._visible = v;
 	}
 	
 	/**
@@ -346,7 +364,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	 * @return  Boolean - successfullit
 	 */
 	private function drawActivity(a:Activity,mm:MonitorModel):Boolean{
-		
 		var mtv = MonitorTabView(this);
 		var mc = getController();
 		var newActivity_mc = null;
