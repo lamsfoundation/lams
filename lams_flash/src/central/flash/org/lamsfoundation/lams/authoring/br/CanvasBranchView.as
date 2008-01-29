@@ -122,7 +122,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	public function init(m:Observable, c:Controller){
 
 		super(m, c);
-        
+		
 		//Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
@@ -328,7 +328,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		// end-point connector hub
 		cHubEnd_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _canvasController:CanvasController(getController()), _canvasBranchView:_canvasBranchView, _x: hubEndDir_x , _y: _endy, branchConnector:true})
 												: activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _monitorController:MonitorController(getController()), _canvasBranchView:_canvasBranchView, _x: activity.endXCoord , _y: activity.endYCoord, branchConnector:true});
-		
+	
 		this.onEnterFrame = hitConnectorHubs;
 		
 	}
@@ -380,12 +380,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			
 		setSize(model);
 		
-		var tm:TransitionManager = new TransitionManager(this);
-		tm.startTransition({type:mx.transitions.Zoom, 
-						direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
-		tm.addEventListener("allTransitionsInDone", finishedOpen);
-		
-
+		if ((model instanceof CanvasModel) || (model instanceof MonitorModel && model.inBranchView == false)) {
+			var tm:TransitionManager = new TransitionManager(this);
+			tm.startTransition({type:mx.transitions.Zoom, 
+							direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
+			tm.addEventListener("allTransitionsInDone", finishedOpen);
+		}
 	}
 	
 	public function finishedOpen(evt:Object):Void {
@@ -409,9 +409,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	}
 	
 	private function close():Void {
-		if(model instanceof CanvasModel) model.getCanvas().hideBin();
-		model.selectedItem = null;
+		if(model instanceof CanvasModel) model.getCanvas().hideBin(); //typo
+			model.selectedItem = null;
 		
+		if (model instanceof MonitorModel)
+			model.inBranchView = false;
+			
 		var bkeys:Array = model.branchesDisplayed.keys();
 		
 		for(var i=0; i<bkeys.length; i++) {
@@ -429,8 +432,10 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 					 
 		if(model instanceof CanvasModel)
 			model.getCanvas().closeBranchView();
-		else
+		else {
+			model.getMonitor().getMV().getMonitorTabView().showAssets(true);
 			model.getMonitor().closeBranchView();
+		}
 		
 		Debugger.log("model.activeView :  " + model.activeView, Debugger.CRITICAL, "close", "CanvasBranchView");
 		
@@ -944,11 +949,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		_isOpen = a;
 	}
 	
-	public function getParentScrollVPosition():Number {
+	/*public function getParentScrollVPosition():Number {
 		return (_parent instanceof CanvasBranchView) ? CanvasBranchView(_parent).getScrollVPosition() : CanvasView(_parent).getScrollVPosition();
 	}
 	
 	public function getScrollVPosition():Number {
 		return canvas_scp.vPosition;
-	}
+	}*/
 }
