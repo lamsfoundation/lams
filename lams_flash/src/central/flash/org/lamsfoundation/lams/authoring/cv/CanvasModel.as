@@ -295,8 +295,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		}
 		
 		if(isSequence) {
-			createNewSequenceActivity(optAct, 0, false);
 			createNewSequenceActivity(optAct, 1, false);
+			createNewSequenceActivity(optAct, 2, false);
 			optAct.noSequences = 2;
 		}
 		

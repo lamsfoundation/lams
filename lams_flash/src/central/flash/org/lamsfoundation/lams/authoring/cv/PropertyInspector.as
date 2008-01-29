@@ -608,7 +608,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		var o = ComplexActivity(oa);
 		
 		for(var i=0; i<count; i++)
-			_canvasModel.createNewSequenceActivity(oa, o.noSequences+(i-1), false);
+			_canvasModel.createNewSequenceActivity(oa, o.noSequences+(i+1), false);
 		
 		this.onEnterFrame = onUpdateOptionalSequenceData;
 	}
