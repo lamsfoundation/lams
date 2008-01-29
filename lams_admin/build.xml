@@ -88,14 +88,26 @@
 			<fileset dir="${conf.web.dir}">
 				<include name="**/*.xml"/>
 				<include name="**/*.tld"/>
+				<exclude name="**/log4j.xml"/>				
 			</fileset>
 		</copy>
+		
+		<copy overwrite="yes" todir="${build.web}">
+			<fileset dir="${conf.web.dir}">
+				<include name="**/log4j.xml"/>
+			</fileset>
+			<filterset>
+				<filter token="application" value="${conf.application}"/>
+			</filterset>
+		</copy>
+		
 		<copy overwrite="yes" todir="${build.classes.java}/org/lamsfoundation/lams">
 				<fileset dir="${src.java.dir}/org/lamsfoundation/lams">
 						<include name="**/*.xml"/>
 						<include name="**/*.properties"/>
 				</fileset>
 		</copy>	
+		<!--<antcall target="setupLogFileName"/>-->
 	</target>
 
 	<!-- =================================================================== -->
