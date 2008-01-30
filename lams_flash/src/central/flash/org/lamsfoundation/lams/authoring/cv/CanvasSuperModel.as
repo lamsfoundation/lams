@@ -712,7 +712,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	}
 	
 	public function getParentActivity(act):Activity {
-		return (Activity(act).parentUIID != null) ? _cv.ddm.getActivityByUIID(Activity(act).parentUIID) : null;
+		 
+		var selectedAct:Activity = (act == null) ? _cv.ddm.getActivityByUIID(selectedItem.activity.activityUIID) : act;
+		var parentAct:Activity = _cv.ddm.getActivityByUIID(selectedAct.parentUIID);
+		
+		if(parentAct != null) {
+			if(parentAct.isSequenceActivity() && SequenceActivity(parentAct).firstActivityUIID != selectedAct.activityUIID)
+				return null;
+			
+			return parentAct;
+		}
+		
+		return null;
 	}
 	
 	public function findParent(a:Activity, b:Activity):Boolean {
