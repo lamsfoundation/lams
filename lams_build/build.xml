@@ -59,8 +59,7 @@
 	<!-- build sub-projects -->
 	<target name="build-subprojects" 
 		description="builds sub projects">
-		<ant antfile="../${lams_common}/build.xml" target="build-jar"
-			inheritAll="false" />
+		<ant antfile="../${lams_common}/build.xml" target="build-jar" inheritAll="false" />
 		<ant antfile="../${lams_contentrepository}/build.xml"
 			target="build-jar" inheritAll="false" />
 		<ant antfile="../${lams_central}/build.xml" target="build-war" inheritAll="false"/>
@@ -318,12 +317,20 @@
 		<copy overwrite="yes" todir="${jboss.server.instance}/conf/">
 			<fileset dir="${conf.jboss}/">
 				<include name="login-config.xml" />
-				<include name="log4j.xml" />
 				<include name="jboss-service.xml" />
 			</fileset>
 	        <filterset>
 	                <filter token="confdir" value="${jboss.server.instance}/conf"/>
 	        </filterset>
+		</copy>
+		
+		<copy overwrite="yes" todir="${jboss.server.instance}/conf/">
+			<fileset dir="${conf.jboss}/">
+				<include name="log4j.xml"/>
+			</fileset>
+			<filterset>
+				<filter token="application" value="${conf.application}"/>
+			</filterset>
 		</copy>
 
 		<copy overwrite="yes" todir="${jboss.ear.deploy}">
