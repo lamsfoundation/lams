@@ -332,7 +332,9 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	
 	public function showToolTip(btnObj, btnTT:String):Void{
 		var btnLabel = btnObj.label;
-		var xpos:Number;
+		var xpos:Number = btnObj._x;
+		
+		/**
 		if (btnLabel == "Help"){
 			xpos = bkgHeader_pnl.width - 165 //btnObj._x - 105
 		}else if (btnLabel == "Refresh"){
@@ -340,10 +342,13 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		}else{
 			xpos = btnObj._x
 		}
-		var Xpos = Application.MONITOR_X+ xpos;
-		var Ypos = (Application.MONITOR_Y+ btnObj._y+btnObj.height)+5;
+		*/
+		
+		var Xpos = Application.MONITOR_X + xpos;
+		var Ypos = (Application.MONITOR_Y + btnObj._y + btnObj.height) + 5;
 		var ttHolder = ApplicationParent.tooltip;
 		var ttMessage = Dictionary.getValue(btnTT);
+		
 		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos);
 		
 	}

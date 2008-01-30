@@ -917,8 +917,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private function getXY():Object {
 		var pos:Object = new Object();
 		
-		pos.x = (model instanceof CanvasModel) ? org.lamsfoundation.lams.authoring.Application.CANVAS_X + hSpace : model.getMonitor().getMV().getMonitorSequenceScp()._x;
-		pos.y =  (model instanceof CanvasModel) ? org.lamsfoundation.lams.authoring.Application.CANVAS_Y + vSpace : model.getMonitor().getMV().getMonitorSequenceScp()._y;
+		pos.x = (model instanceof CanvasModel) ? org.lamsfoundation.lams.authoring.Application.CANVAS_X + hSpace : org.lamsfoundation.lams.monitoring.Application.MONITOR_X + hSpace;
+		pos.y =  (model instanceof CanvasModel) ? org.lamsfoundation.lams.authoring.Application.CANVAS_Y + vSpace : org.lamsfoundation.lams.monitoring.Application.MONITOR_Y + vSpace;
 		
 		Debugger.log("pos x: " + pos.x + " pos y: " + pos.y, Debugger.CRITICAL, "getXY", "CanvasBranchView");
 		
