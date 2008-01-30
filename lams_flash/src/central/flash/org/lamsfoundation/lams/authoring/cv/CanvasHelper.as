@@ -104,6 +104,8 @@ class CanvasHelper {
 				canvasModel.getCanvas().addBin(evt.target);
 				
 				var autosave_config_interval = Config.getInstance().getItem(AUTOSAVE_CONFIG);
+				Debugger.log("autosave interval: " + autosave_config_interval, Debugger.CRITICAL, "viewLoaded", "CanvasHelper");
+				
 				if(autosave_config_interval > 0) {
 					if(CookieMonster.cookieExists(AUTOSAVE_TAG + _root.userID)) {
 						canvasModel.autoSaveWait = true;
@@ -221,12 +223,16 @@ class CanvasHelper {
 				}
 				
 				// auto-save existing ddm
+				Debugger.log("auto-saving...", Debugger.CRITICAL, "autoSave", "CanvasHelper");
+		
 				var res = CookieMonster.save(dto,tag,true);
 				
 				if(!res){
 					// error auto-saving
 					var msg:String = Dictionary.getValue('cv_autosave_err_msg');
 					LFMessage.showMessageAlert(msg);
+					
+					System.showSettings(1);
 				}
 			}
 		} else if(canvasModel.autoSaveWait) {
