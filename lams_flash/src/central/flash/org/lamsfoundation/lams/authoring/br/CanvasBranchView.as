@@ -612,7 +612,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  
 	 */
 	private function drawTransition(t:Transition, cm):Boolean{
-		if(!isActivityOnLayer(cm.activitiesDisplayed.get(t.fromUIID), this.activityLayers) && !isActivityOnLayer(cm.activitiesDisplayed.get(t.toUIID), this.activityLayer)) return false;
+		if(!isActivityOnLayer(cm.activitiesDisplayed.get(t.fromUIID), this.activityLayers) && !isActivityOnLayer(cm.activitiesDisplayed.get(t.toUIID), this.activityLayers)) 
+			return false;
 		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
@@ -705,7 +706,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @param   cm  The canvas model
 	 * @return  
 	 */
-	private function removeTransition(t:Transition,cm){
+	private function removeTransition(t:Transition, cm){
 		if(!cm.isActiveView(this)) return false;
 		
 		var r = cm.transitionsDisplayed.remove(t.transitionUIID);

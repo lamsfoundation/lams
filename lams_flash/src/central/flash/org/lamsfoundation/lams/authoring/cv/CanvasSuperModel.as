@@ -464,8 +464,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		}
 		
 		//now check the transitions:
-		var ddmTransition_keys:Array = _cv.ddm.transitions.keys();
+		var ddmTransition_keys:Array = _cv.ddm.getValidTransitionsKeys();
 		var cmTransition_keys:Array = _transitionsDisplayed.keys();
+		
 		var trLongest = Math.max(ddmTransition_keys.length, cmTransition_keys.length);
 		
 		//chose which array we are going to loop over

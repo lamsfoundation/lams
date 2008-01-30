@@ -1637,5 +1637,16 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			return 1;
 	}
 
+	public function getValidTransitionsKeys():Array {
+		var keys:Array = transitions.keys();
+		var keysToSend:Array = new Array();
+		
+		for(var i=0; i<keys.length; i++) {
+			if(!transitions.get(keys[i]).isOptionalSequenceTransition())
+				keysToSend.push(keys[i]);
+		}
+		
+		return keysToSend;
+	}
 	
 }

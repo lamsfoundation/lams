@@ -75,6 +75,18 @@ class Transition {
 		return a.isGateActivity();
 	}
 	
+	public function isOptionalSequenceTransition():Boolean {
+		return checkOptionalSequenceTransition(this.toUIID) && checkOptionalSequenceTransition(this.fromUIID);
+	}
+	
+	private function checkOptionalSequenceTransition(UIID):Boolean {
+		var ddm = Application.getInstance().getDesignDataModel();
+		var a:Activity = ddm.getActivityByUIID(UIID);
+		var p:Activity = ddm.getActivityByUIID(a.parentUIID);
+		
+		return p.isOptionalSequenceActivity(ddm.getActivityByUIID(p.parentUIID));
+	}
+	
 	
 	public function toData():Object{
 		var dto:Object = new Object();
