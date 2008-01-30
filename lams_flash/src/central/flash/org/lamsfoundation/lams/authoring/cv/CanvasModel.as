@@ -545,7 +545,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			return new LFError("Removing activity failed:"+activityUIID,"removeActivity",this,null);
 		}else{
 			Debugger.log('Removed:'+r.activityUIID,Debugger.GEN,'removeActivity','DesignDataModel');
-			
+				
 			r.removeMovieClip();
 			_cv.removeActivity(activityUIID);
 		}

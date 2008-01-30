@@ -247,6 +247,9 @@ class CanvasHelper {
 		
 		// remove transitions and/or branches connected to this activity being removed
 		_ddm.removeTransitionByConnection(activityUIID);
+		
+		canvasModel.clearGroupedActivities(activityUIID);
+		
 		if(canvasModel.activeView instanceof CanvasBranchView)
 			_ddm.removeBranchByConnection(activityUIID, CanvasBranchView(canvasModel.activeView).activity);
 		

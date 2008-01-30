@@ -183,9 +183,18 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var r:Object = _activities.remove(activityUIID);
 		if(r==null){
 			return new LFError("Removing activity failed:"+activityUIID,"removeActivity",this,null);
-		}else{
+		} else {
+			if(r.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE) {
+				var rg:Object = _groupings.remove(r.createGroupingUIID);
+				if(rg==null) {
+					return new LFError("Removing associated grouping failed:"+r.createGroupingUIID, "removeActivity", this, null);
+				} else {
+					Debugger.log('Removed grouping:'+rg.groupingUIID, Debugger.GEN,'removeActivity','DesignDataModel');
+				}
+			}
+				
 			Debugger.log('Removed:'+r.activityUIID,Debugger.GEN,'removeActivity','DesignDataModel');
-				dispatchEvent({type:'ddmUpdate',target:this});
+			dispatchEvent({type:'ddmUpdate',target:this});
 			
 			
 		}
