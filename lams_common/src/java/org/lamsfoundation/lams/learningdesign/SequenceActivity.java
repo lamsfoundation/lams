@@ -254,12 +254,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
      */
     public Vector validateActivity(MessageService messageService) {
     	Vector listOfValidationErrors = new Vector();
-    	if ( getActivities() == null || getActivities().size() == 0 ) {
-    		Activity parent = getParentActivity();
-    		if ( parent != null && parent.isOptionsActivity()) {
-    			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY), this.getActivityUIID()));
-    		}
-       	} else if ( getDefaultActivity() == null )  {
+    	if (  getActivities() != null && getActivities().size() >0 && getDefaultActivity() == null )  {
 			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY), this.getActivityUIID()));
     	}
     	return listOfValidationErrors;
