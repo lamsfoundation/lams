@@ -37,10 +37,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 	<script type="text/javascript">
 	<!--
+		var isInternetExplorer = navigator.appName.indexOf("Microsoft") != -1;
+	
+		function wizard_DoFSCommand(command, args) {
+			if (command == "closeWindow") {
+				closeWindow(args);
+			} else if (command == "closeWizard") {
+				closeWizard(args);
+			}
+		}
+		
 		function closeWizard() {
 			window.opener.location.reload();
-			window.close();
+			closeWindow();
 		}
+		
+		function closeWindow() {
+			if(isInternetExplorer) {
+				this.focus();
+				window.opener = this;
+				window.close();
+			} else {
+				window.location.href = "javascript: window.close()";
+			}
+		}
+		
 	//-->
 	</script>
 </lams:head>
