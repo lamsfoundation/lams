@@ -23,11 +23,13 @@
 /* $Id$ */
 package org.lamsfoundation.lams.learningdesign.service;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -62,13 +64,12 @@ public class LearningDesignValidator {
 	public Vector<ValidationErrorDTO> validate() {
 		errors = new Vector<ValidationErrorDTO>();		// initialises the list of validation messages.
 		
-		validateActivityTransitionRules(learningDesign.getParentActivities(), learningDesign.getTransitions());
-
-		Set activities = learningDesign.getActivities();
-		Iterator activityIterator = activities.iterator();
-		while (activityIterator.hasNext())
-		{
-			Activity activity = (Activity)activityIterator.next();
+		// check all activities have their necessary transitions. First check the 
+		// top level, then we need to check each branch inside a branching activity.
+		Set<Activity> topLevelActivities = (Set<Activity>) learningDesign.getParentActivities();
+		validateActivityTransitionRules(topLevelActivities, learningDesign.getTransitions());
+		
+		for ( Activity activity : (Set<Activity>) learningDesign.getActivities() ) {
 			checkIfGroupingRequired(activity);
 			validateGroupingIfGroupingIsApplied(activity);	
 			validateOptionalActivity(activity);
@@ -132,25 +133,34 @@ public class LearningDesignValidator {
 	 * for each activity with no input transition.
 	 * Similarly, the same concept applies for activities with no output transition.
 	 * 
-	 * @param topLevelActivities
-	 * @param transitions
+	 * @param activities A subset of the overall design. Will be just the top level activities.
+	 * @param transitions A transitions from the design
+	 * 
 	 */
-	private void validateActivityTransitionRules(Set topLevelActivities, Set transitions)
+	private void validateActivityTransitionRules(Set<Activity> activities, Set<Transition> transitions)
 	{
 		validateTransitions(transitions);
-		Vector<Activity> noInputTransition = new Vector<Activity>(); //a list to hold the activities which have no input transition
-		Vector<Activity> noOuputTransition = new Vector<Activity>(); //a list to hold the activities which have no output transition
-		int numOfTopLevelActivities = topLevelActivities.size();
-		Iterator activityIterator = topLevelActivities.iterator();
+		ArrayList<Activity> noInputTransition = new ArrayList<Activity>(); //a list to hold the activities which have no input transition
+		ArrayList<Activity> noOuputTransition = new ArrayList<Activity>(); //a list to hold the activities which have no output transition
+		int numOfTopLevelActivities = activities.size();
 		
-		while (activityIterator.hasNext())
+		// All the branching activities and optional activities we find are stored in this list, so we can process them at the end. 
+		// We don't want to process them straight away or the branch activity errors would be mixed up with the previous level's errors.
+		// We need the optional activities, as they may contain a branching activity.
+		ArrayList<ComplexActivity> complexActivitiesToProcess = null; 
+		
+		for ( Activity activity : activities ) 
 		{
-			Activity activity = (Activity)activityIterator.next();
 			checkActivityForTransition(activity, numOfTopLevelActivities);
-			if (activity.getTransitionFrom() == null)
+			if (activity.getTransitionFrom() == null) 
+			{
 				noOuputTransition.add(activity);
+			}
 			if (activity.getTransitionTo() == null)
+			{
 				noInputTransition.add(activity);
+			}
+			complexActivitiesToProcess = checkActivityForFurtherProcessing(complexActivitiesToProcess, activity);
 		}
 		
 		if (numOfTopLevelActivities > 0)
@@ -160,29 +170,84 @@ public class LearningDesignValidator {
 			
 			if (noInputTransition.size() > 1)
 			{
-				//there is more than one activity with no input transitions
-				Iterator noInputTransitionIterator = noInputTransition.iterator();
-				while (noInputTransitionIterator.hasNext())
-				{
-					Activity a = (Activity)noInputTransitionIterator.next();
-					errors.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE1_KEY), a.getActivityUIID()));
+
+				// put out an error for each activity, but skip the any activities that are the first activity in the branch as they shouldn't have an input transition.
+				for ( Activity a : noInputTransition) {
+						errors.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE1_KEY), a.getActivityUIID()));
 				}
 			}
-			
+
 			if (noOuputTransition.size() == 0)
 				errors.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE,messageService.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE2_KEY)));
+
 			if (noOuputTransition.size() > 1)
 			{
 				//there is more than one activity with no output transitions
-				Iterator noOutputTransitionIterator = noOuputTransition.iterator();
-				while (noOutputTransitionIterator.hasNext())
-				{
-					Activity a = (Activity)noOutputTransitionIterator.next();
+				for ( Activity a : noOuputTransition)
 					errors.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE1_KEY), a.getActivityUIID()));					
-				}
 			}
 		}
 	
+		processComplexActivitiesForTransitions(complexActivitiesToProcess);
+
+	}
+
+	private void processComplexActivitiesForTransitions(ArrayList<ComplexActivity> complexActivitiesToProcess) {
+
+		if ( complexActivitiesToProcess != null ) 
+		{
+			for ( ComplexActivity complex : complexActivitiesToProcess )
+				checkTransitionsInComplexActivity(complex);
+		}
+		
+	}
+	
+	private void checkTransitionsInComplexActivity(ComplexActivity complexActivity) 
+	{
+		// All the branching activities and optional activities we find are stored in this list, so we can process them at the end. 
+		// We don't want to process them straight away or the branch activity errors would be mixed up with the previous level's errors.
+		// We need the optional activities, as they may contain a branching activity.
+		ArrayList<ComplexActivity> complexActivitiesToProcess = null; 
+
+		if ( complexActivity.isBranchingActivity() ) {
+			for ( ComplexActivity sequence : (Set<ComplexActivity>) complexActivity.getActivities() ) {
+				for ( Activity activity : (Set<Activity>) sequence.getActivities() ) {
+					checkActivityForTransition(activity, sequence.getActivities().size());
+					complexActivitiesToProcess = checkActivityForFurtherProcessing(complexActivitiesToProcess, activity);
+				}
+			}
+		} else {
+			for ( Activity activity : (Set<Activity>) complexActivity.getActivities() ) {
+				complexActivitiesToProcess = checkActivityForFurtherProcessing(complexActivitiesToProcess, activity);
+			}
+		}
+
+		processComplexActivitiesForTransitions(complexActivitiesToProcess);
+	}
+
+	/**
+	 * @param complexActivitiesToProcess
+	 * @param activity
+	 * @return
+	 */
+	private ArrayList<ComplexActivity> checkActivityForFurtherProcessing(
+			ArrayList<ComplexActivity> complexActivitiesToProcess,
+			Activity activity) {
+		if ( activity.isComplexActivity() && ! activity.isParallelActivity() ) 
+		{
+			if ( complexActivitiesToProcess == null )
+				complexActivitiesToProcess = new ArrayList<ComplexActivity>();
+			complexActivitiesToProcess.add((ComplexActivity ) activity);
+		}
+		return complexActivitiesToProcess;
+	}
+
+	private boolean isFirstActivityInBranch(Activity a) {
+		ComplexActivity parentActivity = (ComplexActivity) a.getParentActivity();
+		if ( parentActivity == null || ! parentActivity.isSequenceActivity()) 
+			return false;
+		else 
+			return parentActivity.getDefaultActivity() != null && parentActivity.getDefaultActivity().equals(a);
 	}
 	
 	/**
@@ -227,9 +292,8 @@ public class LearningDesignValidator {
 		
 		if(numOfActivities > 1)
 		{
-			if (inputTransition == null && outputTransition == null)
+			if (inputTransition == null && outputTransition == null && ! isFirstActivityInBranch(activity) )
 				errors.add(new ValidationErrorDTO(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_KEY), activity.getActivityUIID()));
-			
 		}
 		if (numOfActivities == 1)
 		{	
