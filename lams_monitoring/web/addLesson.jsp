@@ -35,16 +35,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:css style="core"/>
 	<title><fmt:message key="monitor.title"/></title>
 	<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
-	<script type="text/javascript">
+	<script language="JavaScript" type="text/javascript">
 	<!--
-		var isInternetExplorer = navigator.appName.indexOf("Microsoft") != -1;
 	
+		var isInternetExplorer = navigator.appName.indexOf("Microsoft") != -1;
 		function wizard_DoFSCommand(command, args) {
+			var wizardObj = isInternetExplorer ? document.all.wizard : document.wizard;
 			if (command == "closeWindow") {
 				closeWindow(args);
 			} else if (command == "closeWizard") {
-				closeWizard(args);
+				closeWizard();
 			}
+		}
+		
+		// Hook for Internet Explorer.
+		if (navigator.appName && navigator.appName.indexOf("Microsoft") != -1 && navigator.userAgent.indexOf("Windows") != -1 && navigator.userAgent.indexOf("Windows 3.1") == -1) {
+			document.write('<script language=\"VBScript\"\>\n');
+			document.write('On Error Resume Next\n');
+			document.write('Sub wizard_FSCommand(ByVal command, ByVal args)\n');
+			document.write('	Call wizard_DoFSCommand(command, args)\n');
+			document.write('End Sub\n');
+			document.write('</script\>\n');
 		}
 		
 		function closeWizard() {
@@ -53,6 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		}
 		
 		function closeWindow() {
+		
 			if(isInternetExplorer) {
 				this.focus();
 				window.opener = this;
