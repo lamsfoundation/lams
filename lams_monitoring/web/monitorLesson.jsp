@@ -75,17 +75,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		function openPopUpFS(args){
 			var params = args.split(",");
-			var urlparams = args.split("&");
+			var urlparams = params[0].split("&");
 			
 			// Internet Explorer (7) doesn't like having the equals '=' sign in title param of 
 			// the window.open call (bottom of openPopUp method) so we need to remove it
-			var activityAndID = urlparams[1];  // activityID=123...
-			var tmpArr = activityAndID.split("=");
-			var activityID = tmpArr[1];
+			var lessonAndID = urlparams[1];  // lessonID=123...
+			var tmpArr = lessonAndID.split("=");
+			var lessonID = tmpArr[1];
 			
 			// assigned the args
 			var url = params[0];
-			var title = params[1] + "_activityID_" + activityID;
+			var title = params[1] + "_lessonID_" + lessonID;
 			var h = params[2];
 			var w = params[3];
 			var resize = params[4];
