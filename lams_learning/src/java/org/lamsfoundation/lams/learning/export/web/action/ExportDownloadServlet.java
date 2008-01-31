@@ -81,7 +81,7 @@ public class ExportDownloadServlet extends HttpServlet {
 			response.setContentLength(count);
 			out.flush();
 		} catch (IOException e) {
-		    log.error( "Exception occured writing out file:" + e.getMessage());		
+		    // Exception occured writing out file.		
 		    throw e;
 		} finally {
 		    try	{
@@ -89,7 +89,7 @@ public class ExportDownloadServlet extends HttpServlet {
 				if (out != null) out.close();
 			}
 			catch (IOException e) {
-			    log.error("Error Closing file. File already written out - no exception being thrown.",e);
+			    //Error Closing file. File already written out - no exception being thrown.
 			}
 		}
 		

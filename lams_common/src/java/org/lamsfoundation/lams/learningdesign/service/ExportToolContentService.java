@@ -499,7 +499,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 						log.debug("Create export Learning Design content target zip file. File name is " + targetContentZipFileName);
 						ZipFileUtil.createZipFile(targetContentZipFileName, ldContentDir, contentDir);
 				} else {
-					log.error("No such directory (or empty directory):" + ldContentDir);
+					log.debug("No such directory (or empty directory):" + ldContentDir);
 				}
 				
 			} catch (Exception e) {
