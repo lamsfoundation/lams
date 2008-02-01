@@ -149,8 +149,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	protected HashMap<Integer,Group> groups = new HashMap<Integer,Group>();
 	protected HashMap<Integer,BranchActivityEntry> branchEntries = new HashMap<Integer,BranchActivityEntry>();
 	protected HashMap<Integer,ComplexActivity> defaultActivityMap = new HashMap<Integer,ComplexActivity>();
-	/* can't delete as we go as they are linked to other items - keep a list and delete at the end. */
-	protected Set<Grouping> groupingsToDelete = new HashSet<Grouping>();
+	/* can't delete as we go as they are linked to other items and have no way of knowing from the packet which ones
+	 * will need to be deleted, so start off assuming all need to be deleted and remove the ones we want to keep. */
+	protected HashMap<Integer,Grouping> groupingsToDelete = new HashMap<Integer,Grouping>();
 	protected LearningDesign learningDesign = null;
 	protected Date modificationDate = null;
 	/* cache of system tools so we aren't going back to the db all the time */
@@ -448,6 +449,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		while (iter.hasNext()) {
 			Grouping grouping = (Grouping) iter.next();
 			groupings.put(grouping.getGroupingUIID(), grouping);
+			groupingsToDelete.put(grouping.getGroupingUIID(),grouping);
 		}
 	}
 	
@@ -474,7 +476,7 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	/** Delete the old unneeded groupings. Won't be done via a cascade */
 	private void deleteUnwantedGroupings() {
-		for ( Grouping grouping: groupingsToDelete) {
+		for ( Grouping grouping: groupingsToDelete.values()) {
 			groupingDAO.delete(grouping);	
 		}
 	}
@@ -555,13 +557,17 @@ public class ObjectExtractor implements IObjectExtractor {
 		}
 
 	    Grouping grouping = groupings.get(groupingUUID);
-	    // check that the grouping type is still okay - if not get rid of the old hibernate object.
-	    if ( grouping != null && ! grouping.getGroupingTypeId().equals(groupingTypeID) ) {
-	    	groupings.remove(grouping.getGroupingUIID());
-	    	groupingsToDelete.add(grouping);
-			grouping = null;
+	    // check that the grouping type is still okay - if it is we keep the grouping otherwise 
+	    // we get rid of the old hibernate object.
+	    if ( grouping != null ) {
+	    	if ( grouping.getGroupingTypeId().equals(groupingTypeID) ) {
+		    	groupingsToDelete.remove(groupingUUID);
+	    	} else {
+	    		groupings.remove(grouping.getGroupingUIID());
+	    		grouping = null;
+	    	}
 	    }
-	
+	    
 	    if (grouping == null) {
 	        Object object = Grouping.getGroupingInstance(groupingTypeID);
 			grouping = (Grouping)object;				
