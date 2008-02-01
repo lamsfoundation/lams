@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="deploy-files" name="LAMS/WebCt Integration Deployer" basedir="./">
 	
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 	
 	<property file="build.properties" />
 	<property file="db/conf/${dbType}.properties" />
@@ -19,9 +20,20 @@
 				<include name="authmoduledata_ce_1.4.jar"/>
 				<include name="commons-codec-1.3.jar"/>
 				<include name="mysql-connector-java-3.1.12-bin.jar"/>
-				<include name="xercesImpl.jar" />
 		   	</fileset>
 		</copy>
+		
+		<if>
+		 <equals arg1="${webctVersion_6.2}" arg2="true" />
+		 <then>
+		 	<copy todir="${deploy.dir}" overwrite="true">
+		 		<fileset dir="lib">
+		 			<include name="xercesImpl.jar" />
+		 		</fileset>
+		 	</copy>
+		 </then>
+		</if>
+		
 	</target>
 	
 	<target name="clean">

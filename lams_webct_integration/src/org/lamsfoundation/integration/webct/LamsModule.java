@@ -1,3 +1,26 @@
+/****************************************************************
+ * Copyright (C) 2007 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0 
+ * as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+
 package org.lamsfoundation.integration.webct;
 
 import java.io.StringWriter;
@@ -11,6 +34,7 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import java.util.Calendar;
 import java.sql.Timestamp;
+
 
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +69,7 @@ public class LamsModule extends AuthenticationModule
     
 	public static final String VERSION = "1.0.0";
 	public static final String JARSTR = "lams2-webct-integration-" + VERSION + ".jar";
+
     private HttpServletRequest request = null;
     private SessionVO _sessionVO;    
     private LearningCtxtVO _currentLearningContext;    
@@ -112,6 +137,7 @@ public class LamsModule extends AuthenticationModule
     	Map params = new HashMap();            
         String html=null;
         String authorUrl = null;
+        
         String learningDesigns = null;
         String learnerUrl = "";
         String monitorUrl = "";
@@ -152,12 +178,6 @@ public class LamsModule extends AuthenticationModule
 		this.lamsServerId = (String)settings.get(Constants.SETTING_SERVER_ID);
 		this.lamsServerSecretKey = (String)settings.get(Constants.SETTING_SECRET_KEY);
 		this.webctRequestSource = (String)settings.get(Constants.SETTING_REQUEST_SRC);
-        //System.out.println("TESTING:");
-        //System.out.println((String)settings.get("glcid"));
-        //System.out.println(lamsServerUrl);
-        //System.out.println(lamsServerId);
-        //System.out.println(lamsServerSecretKey);
-        //System.out.println(webctRequestSource);
 	    	
 	    boolean canAuthor = hasLamsRole("authorRoles");
 		boolean canMonitor = hasLamsRole("monitorRoles");
@@ -173,6 +193,9 @@ public class LamsModule extends AuthenticationModule
 		boolean isTeacher = canAuthor || canMonitor;
         
         String action = request.getParameter("form_action");
+        
+        
+        authorUrl = generateRequestURL(user, lcID, "author");
         
         if(action==null || action.trim().length()==0)
         {
@@ -199,12 +222,12 @@ public class LamsModule extends AuthenticationModule
         			params.put("learnerUrl", learnerUrl);
         			params.put("monitorUrl", monitorUrl);
         			params.put("liveEditUrl", authorUrl);
+        			params.put("authorUrl", authorUrl);
         			
         			html = this.generatePage("web/teach.vm", params);
             	}
             	catch (Exception e)
             	{
-            		e.printStackTrace();
             		log.error("Error creating LAMS teach page", e);
             		throw new LoginException("Error creating LAMS teach page");
             	}
@@ -240,9 +263,53 @@ public class LamsModule extends AuthenticationModule
         {
         	// goto create lesson form
         	try {
-            	// get the authorUrl for the author link
-            	authorUrl = generateRequestURL(user, lcID, "author");
-            	params.put("authorUrl", authorUrl);
+        		
+        		// prefilling the start time variable
+        		Calendar cal = Calendar.getInstance();
+        		int mins =  cal.get(Calendar.MINUTE);
+        		if (mins > 55)
+        			mins=55;
+        		mins = (mins / 5) * 5; // round to nearest 5 lower than mins
+        		
+        		String ampm = null;
+        		if (cal.get(Calendar.AM_PM)==1)
+        		{
+        			ampm="PM";
+        		}
+        		else
+        		{
+        			ampm="AM";
+        		}
+        		params.put("date", calendarToString(cal));
+        		params.put("sth" + cal.get(Calendar.HOUR), Constants.SELECTED);
+        		params.put("stm" + mins, Constants.SELECTED);
+        		params.put("st" + ampm, Constants.SELECTED);
+        		
+        		
+        		// prefilling the end time variable
+        		Calendar calend = Calendar.getInstance();
+        		calend.add(Calendar.MINUTE, 5);
+        		int endmins =  calend.get(Calendar.MINUTE);
+        		if (endmins > 55)
+        			endmins=55;
+        		endmins = (endmins / 5) * 5; // round to nearest 5 lower than mins
+        		
+        		String endampm = null;
+        		if (calend.get(Calendar.AM_PM)==1)
+        		{
+        			endampm="PM";
+        		}
+        		else
+        		{
+        			endampm="AM";
+        		}
+        		params.put("dateEnd", calendarToString(calend));
+        		params.put("eh" + calend.get(Calendar.HOUR), Constants.SELECTED);
+        		params.put("em" + endmins, Constants.SELECTED);
+        		params.put("e" + endampm, Constants.SELECTED);
+
+        		
+        		params.put("authorUrl", authorUrl);
             	
             	// get the learning designs to display the workspace tree
             	learningDesigns = getLearningDesigns(user, lcID);
@@ -328,25 +395,26 @@ public class LamsModule extends AuthenticationModule
         		Timestamp start = null;
         		Timestamp end = null;
         			
-        		if (request.getParameter("schedule").equals("true"))
+        		//if (request.getParameter("schedule").equals("true"))
+        		
+    			if (request.getParameter("dateStart")!=null && !request.getParameter("dateStart").equals(""))
         		{
-        			if (request.getParameter("dateStart")!=null && !request.getParameter("dateStart").equals(""))
-            		{
-        				start = getTimeStamp(request.getParameter("dateStart"), 
-        							 request.getParameter("startHour"), 
-        							 request.getParameter("startMin"), 
-        							 request.getParameter("startAMPM"));
-            		}
-        			
-        			if (request.getParameter("dateEnd")!=null && !request.getParameter("dateEnd").equals(""))
-            		{
-        			
-        				end = getTimeStamp(request.getParameter("dateEnd"), 
-							 	request.getParameter("endHour"), 
-							 	request.getParameter("endMin"), 
-							 	request.getParameter("endAMPM"));
-            		}
+    				start = getTimeStamp(request.getParameter("dateStart"), 
+    							 request.getParameter("startHour"), 
+    							 request.getParameter("startMin"), 
+    							 request.getParameter("startAMPM"));
         		}
+    			
+    			if (request.getParameter("dateEnd")!=null && !request.getParameter("dateEnd").equals("")
+    					&& request.getParameter("schedule").equals("true"))
+        		{
+    			
+    				end = getTimeStamp(request.getParameter("dateEnd"), 
+						 	request.getParameter("endHour"), 
+						 	request.getParameter("endMin"), 
+						 	request.getParameter("endAMPM"));
+        		}
+
         		
         		ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
             	LamsLesson lesson = new LamsLesson(
@@ -360,7 +428,7 @@ public class LamsModule extends AuthenticationModule
     					user.getFirstname(),
     					user.getLastname(), 
     					request.getParameter("isAvailable").equals("false"), 
-    					request.getParameter("schedule").equals("true"),
+    					true,
     					start, 
     					end
             			);
@@ -464,20 +532,33 @@ public class LamsModule extends AuthenticationModule
 	        		}
 	        		
 	        		params.put("startStr", dayStr + "/" + monthStr + "/" + calendarStart.get(Calendar.YEAR));
-	        		params.put("stHrCk" + calendarStart.get(Calendar.HOUR), "selected" );
-	        		params.put("stMnCk" + calendarStart.get(Calendar.MINUTE), "selected" );
-	        		params.put("stAmCk" + calendarStart.get(Calendar.AM_PM), "selected" );
+	        		params.put("stHrCk" + calendarStart.get(Calendar.HOUR), Constants.SELECTED );
+	        		params.put("stMnCk" + calendarStart.get(Calendar.MINUTE), Constants.SELECTED );
+	        		params.put("stAmCk" + calendarStart.get(Calendar.AM_PM), Constants.SELECTED );
 	        	}
 	        	else
 	        	{
-	        		params.put("startStr", "");
-		        	params.put("stHrCk9", "selected" );
-		        	params.put("stMnCk0", "selected" );
-		        	params.put("stAmCk0", "selected" );
+	        		// put the current time in the start field
+	        		Calendar cal = Calendar.getInstance();
+	        		int mins =  cal.get(Calendar.MINUTE);
+	        		if (mins > 55)
+	        			mins=55;
+	        		mins = (mins / 5) * 5; // round to nearest 5 lower than mins
+	        		
+	        		
+
+	        		params.put("startStr", this.calendarToString(cal));
+		        	params.put("stHrCk" + cal.get(Calendar.HOUR), Constants.SELECTED );
+		        	params.put("stMnCk" + mins, Constants.SELECTED );
+		        	params.put("stAmCk" + cal.get(Calendar.AM_PM), Constants.SELECTED );
 	        	}
 	        	
 	        	if (modLesson.getEndTimestamp()!=null)
 	        	{
+	        		// set the end time to the persited value
+	        		params.put("endDisabled", "");
+	        		params.put("schedule", Constants.CHECKED);
+
 	        		Calendar calendarEnd = Calendar.getInstance();
 	        		calendarEnd.setTime(modLesson.getEndTimestamp());
 	        		
@@ -493,17 +574,59 @@ public class LamsModule extends AuthenticationModule
 	        			monthStr = "0" + monthStr;
 	        		}
 	        		
+	        		
+	        		
 		        	params.put("endStr", dayStr + "/" + monthStr + "/" + calendarEnd.get(Calendar.YEAR));
-		        	params.put("edHrCk" + calendarEnd.get(Calendar.HOUR), "selected" );
-		        	params.put("edMnCk" + calendarEnd.get(Calendar.MINUTE), "selected" );
-		        	params.put("edAmCk" + calendarEnd.get(Calendar.AM_PM), "selected" );
+		        	params.put("endStrGenerated", dayStr + "/" + monthStr + "/" + calendarEnd.get(Calendar.YEAR));
+		        	params.put("edHrCk" + calendarEnd.get(Calendar.HOUR), Constants.SELECTED );
+		        	params.put("edMnCk" + calendarEnd.get(Calendar.MINUTE), Constants.SELECTED );
+		        	params.put("edAmCk" + calendarEnd.get(Calendar.AM_PM), Constants.SELECTED );
 	        	}
 	        	else
 	        	{
-	        		params.put("endStr", "");
-		        	params.put("edHrCk9", "selected" );
-		        	params.put("edMnCk0", "selected" );
-		        	params.put("edAmCk0", "selected" );
+	        		// prefilling the end time variable
+	        		
+	        		if (modLesson.getStartTimestamp()!= null)
+	        		{
+		        		// no end time find in db, so
+	        			// set the default end time to 5 minutes after the start
+	        			Calendar calend = Calendar.getInstance();
+		        		calend.setTime(modLesson.getStartTimestamp());
+		        		calend.add(Calendar.MINUTE, 5);
+		        		
+		        		int endmins =  calend.get(Calendar.MINUTE);
+		        		if (endmins > 55)
+		        			endmins=55;
+		        		endmins = (endmins / 5) * 5; // round to nearest 5 lower than mins
+		        		
+
+		        		params.put("endStr", "");
+		        		params.put("endStrGenerated", calendarToString(calend));
+		        		params.put("edHrCk" + calend.get(Calendar.HOUR), Constants.SELECTED);
+		        		params.put("edMnCk" + endmins, Constants.SELECTED);
+		        		params.put("edAmCk" + calend.get(Calendar.AM_PM), Constants.SELECTED);
+	        		}
+	        		else
+	        		{
+	        			// if there is no start time,
+	        			// set the defualt end time to 5 minutes after now
+	        			Calendar calend = Calendar.getInstance();
+	            		calend.add(Calendar.MINUTE, 5);
+	            		int endmins =  calend.get(Calendar.MINUTE);
+	            		if (endmins > 55)
+	            			endmins=55;
+	            		endmins = (endmins / 5) * 5; // round to nearest 5 lower than mins
+	            		
+	        			params.put("edHrCk" + calend.get(Calendar.HOUR), Constants.SELECTED );
+			        	params.put("edMnCk" + endmins, Constants.SELECTED );
+			        	params.put("edAmCk" + calend.get(Calendar.AM_PM), Constants.SELECTED );
+			        	params.put("endStr", this.calendarToString(calend));
+			        	params.put("endStrGenerated", this.calendarToString(calend));
+	        		}
+
+	        		params.put("endDisabled", Constants.DISABLED);
+	        		params.put("notschedule", Constants.CHECKED);
+
 	        	}
 	
 	        	if (modLesson.getHidden()) 
@@ -515,20 +638,12 @@ public class LamsModule extends AuthenticationModule
 	        		params.put("nothidden", "checked");
 	        	}
 	        	
-	        	
-	        	if (modLesson.getSchedule())
-	        	{
-	        		params.put("schedule", "checked");
-	        	}
-	        	else
-	        	{
-	        		params.put("notschedule", "checked");
-	        	}
-	        	
 	        	html = this.generatePage("web/modify.vm", params);
         	}
         	catch (Exception e)
         	{
+        		e.printStackTrace();
+        		
         		log.error("Error creating LAMS lesson modify page: ", e);
         		throw new LoginException("Error creating LAMS lesson modify page: " + e.getMessage());
         	}
@@ -544,38 +659,34 @@ public class LamsModule extends AuthenticationModule
 	        	modLesson.setTitle(LamsSecurityUtil.replace(request.getParameter("title"), '\'', "\\'"));
 	        	modLesson.setDescription(LamsSecurityUtil.replace(request.getParameter("description"), '\'', "\\'"));
 	        	modLesson.setHidden(request.getParameter("isAvailable").equals("false"));
-	        	modLesson.setSchedule(request.getParameter("schedule").equals("true"));
+	        	modLesson.setSchedule(true);
 	        	
 	        	Timestamp start = null;
         		Timestamp end = null;
         			
-        		if (request.getParameter("schedule").equals("true"))
-        		{
-        			if (request.getParameter("dateStart")!=null && !request.getParameter("dateStart").equals(""))
-            		{
+
+        		if (request.getParameter("dateStart")!=null && !request.getParameter("dateStart").equals(""))
+            	{
         				start = getTimeStamp(request.getParameter("dateStart"), 
         							 request.getParameter("startHour"), 
         							 request.getParameter("startMin"), 
         							 request.getParameter("startAMPM"));
-            		}
+            	}
         			
-        			if (request.getParameter("dateEnd")!=null && !request.getParameter("dateEnd").equals(""))
-            		{
+        		if (request.getParameter("dateEnd")!=null && !request.getParameter("dateEnd").equals(""))
+            	{
         			
         				end = getTimeStamp(request.getParameter("dateEnd"), 
 							 	request.getParameter("endHour"), 
 							 	request.getParameter("endMin"), 
 							 	request.getParameter("endAMPM"));
-            		}
-        		}
-	        	
+            	}
+
         		modLesson.setStartTimestamp(start);
 	        	modLesson.setEndTimestamp(end);
-	        	
-	        	
+
 	        	boolean success = lessonDao.updateLesson(modLesson);
 	        	
-	
 	        	if (success)
 	        	{
 	        		params.put("successMessage", "LAMS lesson updated successfully.");
@@ -749,48 +860,7 @@ public class LamsModule extends AuthenticationModule
         }
     	//System.out.print("\n");
     	return hasLameRole;
-    	
-    	
-    	/*
-    	
-    	boolean hasLameRole = false;
-   
-    	System.out.println(settings.get(lamsRoleType).toString());
-    	System.out.println((String)settings.get(lamsRoleType));
 
-    	
-    	//String learnerRoles[] = ((String)settings.get(lamsRoleType)).split("|");
-    	
-    	String learnerRoles = settings.get(lamsRoleType).toString();
-    	
-    	UserVO user = null;
-    	try
-    	{
-    		user = UserService.getInstance().getUser(super.getUserId(), this.lcID);
-    	}
-    	catch (Exception e)
-    	{
-    		e.printStackTrace();
-    	}
-    	
-    	List roles = user.getUserRoles();
-		Iterator it = roles.iterator();
-    	
-		
-		
-    	while (it.hasNext())
-		{
-			String role = it.next().toString().trim();
-			if (learnerRoles.indexOf(role) != -1)
-			{
-				hasLameRole=true;
-			}
-		}
-    	
-    	return hasLameRole;
-    	*/
-    	
- 
     }
     
     /**
@@ -834,6 +904,27 @@ public class LamsModule extends AuthenticationModule
     {
         return super.logout();
     }
+    
+    public String calendarToString(Calendar cal)
+    {
+    	int day = cal.get(Calendar.DAY_OF_MONTH);
+		int month = cal.get(Calendar.MONTH) + 1;
+		int year = cal.get(Calendar.YEAR);
+		String dayStr = "" + day;
+		String monthStr = "" + month;
+		if (day < 10)
+		{
+			dayStr = "0" + day;
+		}
+		if (month < 10)
+		{
+			monthStr = "0" + month;
+		}
+		return dayStr + "/" + monthStr + "/" + year;
+    	
+    }
+
+    
 }
 		
 	

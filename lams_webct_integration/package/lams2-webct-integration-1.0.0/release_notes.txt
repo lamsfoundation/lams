@@ -28,4 +28,5 @@ Known Issues
 * Need a separate HTTP server to store images used for workspace tree.
 * Role mapping settings are only displayed under the instution admin screens.
 * User details are not updated to LAMS on change.
+* Including xerces xml parser error. For CE 6.2 + version, you must include xercesImple.jar.
 
