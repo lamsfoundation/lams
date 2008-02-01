@@ -66,24 +66,36 @@
 		var end = new Date(parseInt(dateEndArr[2], 10), parseInt(dateEndArr[1], 10) - 1, parseInt(dateEndArr[0], 10), endHour, endMin, "0");
 		var today = new Date();
 		
+		re = new RegExp("^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$", "g");
+		re2 = new RegExp("^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$", "g");
+		
 		if (document.getElementById("form_action").value==null || document.getElementById("title").value=='')
 		{
 			alert("Value required for lesson title.");
 		}
-		else if (document.modify_form.schedule[0].checked == true)
+		else if (document.getElementById("dateStart").value==null || document.getElementById("dateStart").value=='')
+		{
+			alert("You must select a start date.");
+		}
+		else if (dateStartStr==null || dateStartStr=='')
+		{
+			alert("You must select a start date.");
+		}
+		else if (dateStartStr!='$startStr' && start<=today)
+		{
+			alert("Lesson cannot be modified to start in the past.");
+		}
+		else if (!re.test(dateStartStr))
+		{
+			alert("Incorrect format for start date, must follow the form: dd/mm/yyyy");
+		}
+		else if (document.modify_form.schedule[1].checked == true)
 		{	
-			re = new RegExp("^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$", "g");
-			re2 = new RegExp("^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$", "g");
-			
-			if (document.getElementById("dateStart").value==null || document.getElementById("dateStart").value=='')
+			if (dateEndStr==null || dateEndStr=='')
 			{
-				alert("You must select a start date if you want to schedule the lesson.");
+				alert("End date feild missing, if you want to have no end date for the lesson, select the 'Unlimited' option.");
 			}
-			else if (!re.test(dateStartStr))
-			{
-				alert("Incorrect format for start date, must follow the form: dd/mm/yyyy");
-			}
-			else if (!re2.test(dateEndStr)  && dateEndStr.length>0)
+			else if (!re2.test(dateEndStr))
 			{
 				alert("Incorrect format for end date, must follow the form: dd/mm/yyyy");
 			}
@@ -91,10 +103,10 @@
 			{
 				alert("Start date and time must be before end date and time.");
 			}
-			else if (start<today)
+			else if (document.getElementById("dateEnd").value!='$endStr' && end<=today)
 			{
-				alert("Cannot start a lesson in the past. Current time: " + today.toLocaleString());
-			}	
+				alert("Lesson cannot be modified to end in the past.");
+			}
 			else
 			{
 				document.getElementById("form_action").value="modify_proc";
@@ -120,12 +132,13 @@
 		return {minDate: (input.id == 'dateEnd' ? getDate($('#dateStart').val()) : null),
 				maxDate: (input.id == 'dateStart' ? getDate($('#dateEnd').val()) : null)};
 	}
+	
+	function customRange2(input) 
+    {
+		return {minDate: (input.id == 'dateEnd' ? getDate($('#dateStart').val()) : null)};
+	}
 
 	function dateSelected() {
-		var schedule = document.modify_form.schedule[0]
-		var dontschedule = document.modify_form.schedule[1]
-		schedule.checked = true;
-		dontschedule.checked = false;
 	}
 
 	function getDate(value) {
@@ -150,6 +163,32 @@
 	function formSubmit()
 	{
 		document.modify_form.submit();
+	}
+	
+	function toggleDisableEndDate(val)
+	{
+		var today = new Date();
+		today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+		
+		if (val=="1")
+		{
+			document.modify_form.dateEnd.value='$endStrGenerated';
+			$('.calendarRange').calendar({minDate: today, fieldSettings: customRange, onSelect:dateSelected});
+			document.modify_form.endHour.disabled=false;
+			document.modify_form.endMin.disabled=false;
+			document.modify_form.endAMPM.disabled=false;
+			document.modify_form.dateEnd.disabled=false;
+		}
+		
+		if (val=="2")
+		{
+			document.modify_form.dateEnd.value='';
+			$('.calendarRange').calendar({minDate: today, fieldSettings: customRange2, onSelect:dateSelected});
+			document.modify_form.endHour.disabled=true;
+			document.modify_form.endMin.disabled=true;
+			document.modify_form.endAMPM.disabled=true;
+			document.modify_form.dateEnd.disabled=true;
+		}
 	}
 	
 //-->
@@ -185,95 +224,100 @@
 		</tr>
 	</table>
 	
-	<br>
-	
-
-	<table border='0' >
+	<p>
+	<b>Dates available:</b>
+	</p>
+	<table border='0' cellpadding='7'>
 		<tr>
-			<td valign="top"><b>Schedule Lesson:</b></td>
-			<td valign="top">
-				<input type="Radio" id="schedule" name="schedule" value="true" tabindex="5" $schedule>Yes<br>
-	            <input type="Radio" id="schedule" name="schedule" value="false" tabindex="6" $notschedule>No
-	        </td>
-	        <td>	
-	        	&nbsp;&nbsp;&nbsp;&nbsp;
-	        </td>
-	        <td valign="top">
-				Start date:<br>
-					<input type="text" class="calendarRange" id="dateStart" name="dateStart"  value="$startStr" tabindex="7" /><br><br>
-				End date:<br>
-					<input type="text" class="calendarRange" id="dateEnd" name="dateEnd" value="$endStr" tabindex="11" /> 			
-	        </td>
-	        <td valign="top">
-				&nbsp;Start time: <br>
-				&nbsp;<select name="startHour" id="startHour" tabindex="8">
-						<option value ="01" $stHrCk1>01</option>
-						<option value ="02" $stHrCk2>02</option>
-						<option value ="03" $stHrCk3>03</option>
-						<option value ="04" $stHrCk4>04</option>
-						<option value ="05" $stHrCk5>05</option>
-						<option value ="06" $stHrCk6>06</option>
-						<option value ="07" $stHrCk7>07</option>
-						<option value ="08" $stHrCk8>08</option>
-						<option value ="09" $stHrCk9>09</option>
-						<option value ="10" $stHrCk10>10</option>
-						<option value ="11" $stHrCk11>11</option>
-						<option value ="12" $stHrCk12>12</option>
-					</select>&nbsp;:
-					<select name="startMin" id="startMin" tabindex="9">
-						<option value ="00" $stMnCk0>00</option>
-						<option value ="05" $stMnCk5>05</option>
-						<option value ="10" $stMnCk10>10</option>
-						<option value ="15" $stMnCk15>15</option>
-						<option value ="20" $stMnCk20>20</option>
-						<option value ="25" $stMnCk25>25</option>
-						<option value ="30" $stMnCk30>30</option>
-						<option value ="35" $stMnCk35>35</option>
-						<option value ="40" $stMnCk40>40</option>
-						<option value ="45" $stMnCk45>45</option>
-						<option value ="50" $stMnCk50>50</option>
-						<option value ="55" $stMnCk55>55</option>
-					</select>&nbsp;&nbsp;
-					<select name="startAMPM" id="startAMPM" tabindex="10">
-						<option value ="AM" $stAmCk0>AM</option>
-						<option value ="PM" $stAmCk1>PM</option>
-					</select> <br><br>
-				&nbsp;End time:<br>
-				&nbsp;<select name="endHour" id="endHour" tabindex="12">
-						<option value ="01" $edHrCk1>01</option>
-						<option value ="02" $edHrCk2>02</option>
-						<option value ="03" $edHrCk3>03</option>
-						<option value ="04" $edHrCk4>04</option>
-						<option value ="05" $edHrCk5>05</option>
-						<option value ="06" $edHrCk6>06</option>
-						<option value ="07" $edHrCk7>07</option>
-						<option value ="08" $edHrCk8>08</option>
-						<option value ="09" $edHrCk9>09</option>
-						<option value ="10" $edHrCk10>10</option>
-						<option value ="11" $edHrCk11>11</option>
-						<option value ="12" $edHrCk12>12</option>
-					</select>&nbsp;:
-					<select name="endMin" id="endMin" tabindex="13">
-						<option value ="00" $edMnCk0>00</option>
-						<option value ="05" $edMnCk5>05</option>
-						<option value ="10" $edMnCk10>10</option>
-						<option value ="15" $edMnCk15>15</option>
-						<option value ="20" $edMnCk20>20</option>
-						<option value ="25" $edMnCk25>25</option>
-						<option value ="30" $edMnCk30>30</option>
-						<option value ="35" $edMnCk35>35</option>
-						<option value ="40" $edMnCk40>40</option>
-						<option value ="45" $edMnCk45>45</option>
-						<option value ="50" $edMnCk50>50</option>
-						<option value ="55" $edMnCk55>55</option>
-					</select>&nbsp;&nbsp;
-					<select name="endAMPM" id="endAMPM" tabindex="14">
-						<option value ="AM" $edAmCk0>AM</option>
-						<option value ="PM" $edAmCk1>PM</option>
-					</select>                                         					
-	        </td>
+			<td><font color=red>*</font>Start Time:</td>
+			<td><input type="text" class="calendarRange" id="dateStart" name="dateStart"  value="$startStr" tabindex="7"/></td>
+			<td>
+				<select name="startHour" id="startHour" tabindex="8">
+					<option value ="01" $stHrCk1>01</option>
+					<option value ="02" $stHrCk2>02</option>
+					<option value ="03" $stHrCk3>03</option>
+					<option value ="04" $stHrCk4>04</option>
+					<option value ="05" $stHrCk5>05</option>
+					<option value ="06" $stHrCk6>06</option>
+					<option value ="07" $stHrCk7>07</option>
+					<option value ="08" $stHrCk8>08</option>
+					<option value ="09" $stHrCk9>09</option>
+					<option value ="10" $stHrCk10>10</option>
+					<option value ="11" $stHrCk11>11</option>
+					<option value ="12" $stHrCk12>12</option>
+				</select>&nbsp;:
+				<select name="startMin" id="startMin" tabindex="9">
+					<option value ="00" $stMnCk0>00</option>
+					<option value ="05" $stMnCk5>05</option>
+					<option value ="10" $stMnCk10>10</option>
+					<option value ="15" $stMnCk15>15</option>
+					<option value ="20" $stMnCk20>20</option>
+					<option value ="25" $stMnCk25>25</option>
+					<option value ="30" $stMnCk30>30</option>
+					<option value ="35" $stMnCk35>35</option>
+					<option value ="40" $stMnCk40>40</option>
+					<option value ="45" $stMnCk45>45</option>
+					<option value ="50" $stMnCk50>50</option>
+					<option value ="55" $stMnCk55>55</option>
+				</select>
+			</td>
+			<td>
+				<select name="startAMPM" id="startAMPM" tabindex="10">
+					<option value ="AM" $stAmCk0>AM</option>
+					<option value ="PM" $stAmCk1>PM</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>End Time:</td>
+			<td><input type="Radio" id="schedule" onClick="toggleDisableEndDate(2)" name="schedule" value="false" tabindex="5" $notschedule>&nbsp;Unlimited.</td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>
+				<input type="Radio" id="schedule" name="schedule" onClick="toggleDisableEndDate(1)" value="true" tabindex="6" $schedule>
+				<input type="text" class="calendarRange" id="dateEnd" name="dateEnd" value="$endStr" tabindex="11" $endDisabled/>
+			</td>
+			<td>
+				<select name="endHour" id="endHour" tabindex="12" $endDisabled>
+					<option value ="01" $edHrCk1>01</option>
+					<option value ="02" $edHrCk2>02</option>
+					<option value ="03" $edHrCk3>03</option>
+					<option value ="04" $edHrCk4>04</option>
+					<option value ="05" $edHrCk5>05</option>
+					<option value ="06" $edHrCk6>06</option>
+					<option value ="07" $edHrCk7>07</option>
+					<option value ="08" $edHrCk8>08</option>
+					<option value ="09" $edHrCk9>09</option>
+					<option value ="10" $edHrCk10>10</option>
+					<option value ="11" $edHrCk11>11</option>
+					<option value ="12" $edHrCk12>12</option>
+				</select>&nbsp;:
+				<select name="endMin" id="endMin" tabindex="13" $endDisabled>
+					<option value ="00" $edMnCk0>00</option>
+					<option value ="05" $edMnCk5>05</option>
+					<option value ="10" $edMnCk10>10</option>
+					<option value ="15" $edMnCk15>15</option>
+					<option value ="20" $edMnCk20>20</option>
+					<option value ="25" $edMnCk25>25</option>
+					<option value ="30" $edMnCk30>30</option>
+					<option value ="35" $edMnCk35>35</option>
+					<option value ="40" $edMnCk40>40</option>
+					<option value ="45" $edMnCk45>45</option>
+					<option value ="50" $edMnCk50>50</option>
+					<option value ="55" $edMnCk55>55</option>
+				</select>
+			</td>
+			<td><select name="endAMPM" id="endAMPM" tabindex="14" $endDisabled>
+					<option value ="AM" $edAmCk0>AM</option>
+					<option value ="PM" $edAmCk1>PM</option>
+				</select> 
+			</td>
 		</tr>
 	</table>
+
 	
 	<br>
 	<hr>

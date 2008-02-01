@@ -2,7 +2,8 @@ package org.lamsfoundation.integration.webct;
 
 
 import java.sql.Timestamp;
-
+import java.util.Date;
+import java.text.DateFormat;
 
 /**
  * Class for mapping LAMS lessons to the database
@@ -186,6 +187,37 @@ public class LamsLesson {
 	    return retValue;
 	}
 
+	public String getStartStr()
+	{
+		Timestamp t = this.getStartTimestamp();
+		if (t != null)
+		{
+			String ret =  DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(t.getTime()));
+			ret += " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(t.getTime()));
+			return ret;
+		}
+		else
+		{
+			return "";
+		} 
+	}
+	
+	public String getEndStr()
+	{
+		Timestamp t = this.getEndTimestamp();
+		if (t != null)
+		{
+			String ret = DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(t.getTime()));
+			ret += " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(t.getTime()));
+			return ret;
+		}
+		else
+		{
+			return "";
+		}
+	}
+	
+	
 	public long getId() {
 		return id;
 	}

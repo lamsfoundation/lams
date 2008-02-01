@@ -29,6 +29,11 @@ package org.lamsfoundation.integration.util;
  */
 public class Constants {
     
+	public static final String SELECTED = "selected";
+	public static final String CHECKED = "checked";
+	public static final String DISABLED = "disabled";
+	
+	
 	public static final String DEFAULT_LANGUAGE="en";
 	public static final String DEFAULT_COUNTRY="US";
 	

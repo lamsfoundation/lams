@@ -60,7 +60,7 @@ public class LamsSecurityUtil {
     
     static Logger logger = Logger.getLogger(LamsSecurityUtil.class);
     
-    
+
     /**
      * Generates login requests to LAMS for author, monitor and learner
      * 
@@ -147,8 +147,8 @@ public class LamsSecurityUtil {
 		try {
 			String serviceURL = serverAddr + "/services/xml/LearningDesignRepository?" 
 				+ "datetime=" 	+ timestamp
-				+ "&username="	+ URLEncoder.encode(username, "utf8")
-				+ "&serverId=" 	+ URLEncoder.encode(serverId, "utf8")
+				+ "&username="	+ URLEncoder.encode(username, "UTF8")
+				+ "&serverId=" 	+ URLEncoder.encode(serverId, "UTF8")
 				+ "&hashValue=" + hash
 				+ "&courseId=" 	+ URLEncoder.encode(courseId, "UTF8")
 				+ "&country="	+ country
@@ -263,18 +263,20 @@ public class LamsSecurityUtil {
 		
 			// (serverId, datetime, hashValue, username, ldId, courseId, title, desc, country, lang)
 
+	
+			
 			String serviceURL = serverAddr + "/services/xml/LessonManager?" 
-			+ "&serverId=" 	+ URLEncoder.encode(serverId, "utf8")
+			+ "&serverId=" 	+ URLEncoder.encode(serverId, "UTF8")
 			+ "&datetime=" 	+ timestamp
-			+ "&username="	+ URLEncoder.encode(username, "utf8")
+			+ "&username="	+ URLEncoder.encode(username, "UTF8")
 			+ "&hashValue=" + hash
-			+ "&courseId=" 	+ URLEncoder.encode(courseId, "utf8")
+			+ "&courseId=" 	+ URLEncoder.encode(courseId, "UTF8")
 			+ "&ldId="		+ ldId
 			+ "&country="	+ country
 			+ "&lang=" 		+ lang
 			+ "&method="	+ method
-			+ "&title="		+ URLEncoder.encode(title, "utf8").trim()
-			+ "&desc="		+ URLEncoder.encode(desc, "utf8").trim();
+			+ "&title="		+ URLEncoder.encode(title, "UTF8")
+			+ "&desc="		+ URLEncoder.encode(desc, "UTF8");
 			
 			
 			logger.info("LAMS START LESSON Req: " + serviceURL);

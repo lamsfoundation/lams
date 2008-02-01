@@ -42,7 +42,31 @@
 	var authorWin = null;
 	var previewWin = null;
 
-
+	function init()
+	{
+		var today = new Date();
+		today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+		
+		var dateEndStr = document.getElementById("dateEnd").value;
+		if (dateEndStr != '')
+		{
+			$('.calendarRange').calendar({minDate: today, fieldSettings: customRange, onSelect:dateSelected});
+			document.create_form.endHour.disabled=false;
+			document.create_form.endMin.disabled=false;
+			document.create_form.endAMPM.disabled=false;
+			document.create_form.dateEnd.disabled=false;
+		}
+		else
+		{
+			$('.calendarRange').calendar({minDate: today, fieldSettings: customRange2, onSelect:dateSelected});
+			document.create_form.endHour.disabled=true;
+			document.create_form.endMin.disabled=true;
+			document.create_form.endAMPM.disabled=true;
+			document.create_form.dateEnd.disabled=true;
+		}
+	}
+	
+	
 	$(document).ready(function(){
 		var today = new Date();
 		today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -51,10 +75,6 @@
 	});
 
 	function dateSelected() {
-		var schedule = document.create_form.schedule[0];
-		var dontschedule = document.create_form.schedule[1];
-		schedule.checked = true;
-		dontschedule.checked = false;
 	}
 
 	function getDate(value) {
@@ -67,6 +87,11 @@
     {
 		return {minDate: (input.id == 'dateEnd' ? getDate($('#dateStart').val()) : null),
 				maxDate: (input.id == 'dateStart' ? getDate($('#dateEnd').val()) : null)};
+	}
+	
+	function customRange2(input) 
+    {
+		return {minDate: (input.id == 'dateEnd' ? getDate($('#dateStart').val()) : null)};
 	}
    
     function openAuthor()
@@ -120,8 +145,12 @@
 
 
 		var start = new Date(parseInt(dateStartArr[2], 10), parseInt(dateStartArr[1], 10) - 1, parseInt(dateStartArr[0], 10), startHour, startMin,"0");
+		var startCheck = new Date(parseInt(dateStartArr[2], 10), parseInt(dateStartArr[1], 10) - 1, parseInt(dateStartArr[0], 10), startHour, startMin + 5,"0");
 		var end = new Date(parseInt(dateEndArr[2], 10), parseInt(dateEndArr[1], 10) - 1, parseInt(dateEndArr[0], 10), endHour, endMin, "0");
     	var today = new Date();
+    	
+    	re = new RegExp("^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$", "g");
+		re2 = new RegExp("^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$", "g");
     	
     	if (document.getElementById("sequence_id").value=="0")
     	{
@@ -131,25 +160,25 @@
 		{
 			alert("Value required for lesson title.");
 		}
-		else if (document.create_form.schedule[0].checked == true)
+		else if (dateStartStr==null || dateStartStr=='')
+		{
+			alert("You must select a start date.");
+		}
+		else if (!re.test(dateStartStr))
+		{
+			alert("Incorrect format for start date, must follow the form: dd/mm/yyyy");
+		}
+		else if (document.create_form.schedule[1].checked == true)
 		{	
-			
-			re = new RegExp("^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$", "g");
-			re2 = new RegExp("^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$", "g");
-			
-			if (dateStartStr==null || dateStartStr=='')
+			if (dateEndStr==null || dateEndStr=='')
 			{
-				alert("You must select a start date if you want to schedule the lesson.");
+				alert("End date feild missing, if you want to have no end date for the lesson, select the 'Unlimited' option.");
 			}
-			else if (!re.test(dateStartStr))
-			{
-				alert("Incorrect format for start date, must follow the form: dd/mm/yyyy");
-			}
-			else if (!re2.test(dateEndStr)  && dateEndStr.length>0)
+			else if (!re2.test(dateEndStr))
 			{
 				alert("Incorrect format for end date, must follow the form: dd/mm/yyyy");
-			}
-			else if (start<today)
+			} 
+			else if (startCheck<today)
 			{
 				alert("Cannot start a lesson in the past. Current time: " + today.toLocaleString());
 			}	
@@ -202,12 +231,38 @@
 		document.getElementById("form_action").value='';
 		formSubmit();
 	}
+	
+	function toggleDisableEndDate(val)
+	{
+		var today = new Date();
+		today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+		
+		if (val=="1")
+		{
+			document.create_form.dateEnd.value='$dateEnd';
+			$('.calendarRange').calendar({minDate: today, fieldSettings: customRange, onSelect:dateSelected});
+			document.create_form.endHour.disabled=false;
+			document.create_form.endMin.disabled=false;
+			document.create_form.endAMPM.disabled=false;
+			document.create_form.dateEnd.disabled=false;
+		}
+		
+		if (val=="2")
+		{
+			document.create_form.dateEnd.value='';
+			$('.calendarRange').calendar({minDate: today, fieldSettings: customRange2, onSelect:dateSelected});
+			document.create_form.endHour.disabled=true;
+			document.create_form.endMin.disabled=true;
+			document.create_form.endAMPM.disabled=true;
+			document.create_form.dateEnd.disabled=true;
+		}
+	}
 //-->
 </script>
 
 
 </head>
-<body class="listingpage">
+<body class="listingpage" onload="init()">
 <h1>Create LAMS Lesson</h1>
 
 <br>
@@ -236,93 +291,104 @@
 		</tr>
 	</table>
 	<br>
-	<table border='0' >
+	 
+	<p>
+	<b>Dates available:</b>
+	</p>
+	<table border='0' cellpadding='7'>
 		<tr>
-			<td valign="top"><b>Schedule Lesson:</b></td>
-			<td valign="top">
-				<input type="Radio" id="schedule" name="schedule" value="true" tabindex="5">Yes<br>
-	            <input type="Radio" id="schedule" name="schedule" value="false" tabindex="6" checked>No
-	        </td>
-	        <td>	
-	        	&nbsp;&nbsp;&nbsp;&nbsp;
-	        </td>
-	        <td valign="top">
-				Start date:<br>
-					<input type="text" class="calendarRange" id="dateStart" name="dateStart"  value="" tabindex="7"/><br><br>
-				End date:<br>
-					<input type="text" class="calendarRange" id="dateEnd" name="dateEnd" value="" tabindex="11" /> 			
-	        </td>
-	        <td valign="top">
-				&nbsp;Start time: <br>
-				&nbsp;<select name="startHour" id="startHour" tabindex="8">
-						<option value ="01">01</option>
-						<option value ="02">02</option>
-						<option value ="03">03</option>
-						<option value ="04">04</option>
-						<option value ="05">05</option>
-						<option value ="06">06</option>
-						<option value ="07">07</option>
-						<option value ="08">08</option>
-						<option value ="09" selected>09</option>
-						<option value ="10">10</option>
-						<option value ="11">11</option>
-						<option value ="12">12</option>
+			<td><font color=red>*</font>Start Time:</td>
+			<td><input type="text" class="calendarRange" id="dateStart" name="dateStart"  value="$date" tabindex="7"/></td>
+			<td>
+				<select name="startHour" id="startHour" tabindex="8">
+						<option value ="01" $sth1>01</option>
+						<option value ="02" $sth2>02</option>
+						<option value ="03" $sth3>03</option>
+						<option value ="04" $sth4>04</option>
+						<option value ="05" $sth5>05</option>
+						<option value ="06" $sth6>06</option>
+						<option value ="07" $sth7>07</option>
+						<option value ="08" $sth8>08</option>
+						<option value ="09" $sth9>09</option>
+						<option value ="10" $sth10>10</option>
+						<option value ="11" $sth11>11</option>
+						<option value ="12" $sth0>12</option>
 					</select>&nbsp;:
 					<select name="startMin" id="startMin" tabindex="9">
-						<option value ="00" selected>00</option>
-						<option value ="05">05</option>
-						<option value ="10">10</option>
-						<option value ="15">15</option>
-						<option value ="20">20</option>
-						<option value ="25">25</option>
-						<option value ="30">30</option>
-						<option value ="35">35</option>
-						<option value ="40">40</option>
-						<option value ="45">45</option>
-						<option value ="50">50</option>
-						<option value ="55">55</option>
-					</select>&nbsp;&nbsp;
-					<select name="startAMPM" id="startAMPM" tabindex="10">
-						<option value ="AM" selected>AM</option>
-						<option value ="PM">PM</option>
-					</select> <br><br>
-				&nbsp;End time:<br>
-				&nbsp;<select name="endHour" id="endHour" tabindex="13">
-						<option value ="01">01</option>
-						<option value ="02">02</option>
-						<option value ="03">03</option>
-						<option value ="04">04</option>
-						<option value ="05">05</option>
-						<option value ="06">06</option>
-						<option value ="07">07</option>
-						<option value ="08">08</option>
-						<option value ="09" selected>09</option>
-						<option value ="10">10</option>
-						<option value ="11">11</option>
-						<option value ="12">12</option>
-					</select>&nbsp;:
-					<select name="endMin" id="endMin" tabindex="13">
-						<option value ="00" selected>00</option>
-						<option value ="05">05</option>
-						<option value ="10">10</option>
-						<option value ="15">15</option>
-						<option value ="20">20</option>
-						<option value ="25">25</option>
-						<option value ="30">30</option>
-						<option value ="35">35</option>
-						<option value ="40">40</option>
-						<option value ="45">45</option>
-						<option value ="50">50</option>
-						<option value ="55">55</option>
-					</select>&nbsp;&nbsp;
-					<select name="endAMPM" id="endAMPM" tabindex="14">
-						<option value ="AM" selected>AM</option>
-						<option value ="PM">PM</option>
-					</select>  
-                                                          					
-	        </td>
+						<option value ="00" $stm0>00</option>
+						<option value ="05" $stm5>05</option>
+						<option value ="10" $stm10>10</option>
+						<option value ="15" $stm15>15</option>
+						<option value ="20" $stm20>20</option>
+						<option value ="25" $stm25>25</option>
+						<option value ="30" $stm30>30</option>
+						<option value ="35" $stm35>35</option>
+						<option value ="40" $stm40>40</option>
+						<option value ="45" $stm45>45</option>
+						<option value ="50" $stm50>50</option>
+						<option value ="55" $stm55>55</option>
+					</select> 
+			</td>
+			<td>
+				<select name="startAMPM" id="startAMPM" tabindex="10">
+						<option value ="AM" $stAM>AM</option>
+						<option value ="PM" $stPM>PM</option>
+				</select> 
+			</td>
+		</tr>
+		<tr>
+			<td>End Time:</td>
+			<td><input type="Radio" id="schedule" onClick="toggleDisableEndDate(2)" name="schedule" value="false" tabindex="5" checked>&nbsp;Unlimited.</td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>
+				<input type="Radio" id="schedule" name="schedule" onClick="toggleDisableEndDate(1)" value="true" tabindex="6">
+				<input type="text" class="calendarRange" id="dateEnd" name="dateEnd" value="" tabindex="11" />
+			</td>
+			<td>
+				<select name="endHour" id="endHour" tabindex="13" >
+						<option value ="01" $eh1>01</option>
+						<option value ="02" $eh2>02</option>
+						<option value ="03" $eh3>03</option>
+						<option value ="04" $eh4>04</option>
+						<option value ="05" $eh5>05</option>
+						<option value ="06" $eh6>06</option>
+						<option value ="07" $eh7>07</option>
+						<option value ="08" $eh8>08</option>
+						<option value ="09" $eh9>09</option>
+						<option value ="10" $eh10>10</option>
+						<option value ="11" $eh11>11</option>
+						<option value ="12" $eh0>12</option>
+				</select>&nbsp;:
+				<select name="endMin" id="endMin" tabindex="13" >
+						<option value ="00" $em0>00</option>
+						<option value ="05" $em5>05</option>
+						<option value ="10" $em10>10</option>
+						<option value ="15" $em15>15</option>
+						<option value ="20" $em20>20</option>
+						<option value ="25" $em25>25</option>
+						<option value ="30" $em30>30</option>
+						<option value ="35" $em35>35</option>
+						<option value ="40" $em40>40</option>
+						<option value ="45" $em45>45</option>
+						<option value ="50" $em50>50</option>
+						<option value ="55" $em55>55</option>
+				</select>
+			</td>
+			<td><select name="endAMPM" id="endAMPM" tabindex="14" >
+						<option value ="AM" $eAM>AM</option>
+						<option value ="PM" $ePM>PM</option>
+				</select> 
+			</td>
 		</tr>
 	</table>
+	
+	
+	
+	
 	
 	
 	<br>
