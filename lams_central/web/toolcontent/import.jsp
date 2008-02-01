@@ -13,11 +13,20 @@
 			function closeWin(){
 				window.close();
 			}
+			
+			function verifyFilenameLength() {
+				if (document.getElementById("UPLOAD_FILE").value.length == 0)	{
+					var msg = "<fmt:message key="title.import.error"/>";
+					alert(msg);
+					return (false);
+				}
+				return (true);
+			}
+			
 		</script>
 	</lams:head>
 
 	<body class="stripes">
-
 			<div id="content">
 			<h1>
 				<fmt:message key="title.import" />
@@ -35,8 +44,8 @@
 				<form action="<c:url value="/authoring/importToolContent.do"/>" method="post" enctype="multipart/form-data">
 					<p>
 						<fmt:message key="label.ld.zip.file" />
-						<input type="file" name="UPLOAD_FILE" />
-						<input type="submit" name="import" value="<fmt:message key="button.import" />" class="button" />
+						<input type="file" name="UPLOAD_FILE" id="UPLOAD_FILE"/>
+						<input type="submit" name="import" value="<fmt:message key="button.import" />" class="button" onclick="javascript:if (!verifyFilenameLength()) {return false;} "/>
 					</p>
 				</form>
 
