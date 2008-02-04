@@ -375,7 +375,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 		
 		if(isBranchingActivity())
 			if(_activityTypeID == GROUP_BRANCHING_ACTIVITY_TYPE)
-				dto.defineLater = _defineLater;
+				dto.defineLater = (_defineLater==null) ? false : _defineLater;
 			else
 				dto.defineLater = false;
 		else
