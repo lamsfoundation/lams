@@ -400,7 +400,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	private function refreshDesign(){
 	
 		Debugger.log('Running',Debugger.GEN,'refreshDesign','CanvasModel');
-		var eventArr:Array = new Array();
+		var evtsTable:Hashtable = new Hashtable("evtsTable");
 		
 		if(activeRefresh) {
 			_refreshQueueCount++;
@@ -420,17 +420,76 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		
 		//chose which array we are going to loop over
 		var indexArray:Array;
+		var compArray:Array;
 		
 		if(ddmActivity_keys.length == longest){
 			indexArray = ddmActivity_keys;
+			compArray = cmActivity_keys;
 		}else{
 			indexArray = cmActivity_keys;
+			compArray = ddmActivity_keys;
 		}
 		
+		refreshActivities(evtsTable, indexArray);
+		refreshActivities(evtsTable, compArray);
+		
+		//now check the transitions:
+		var ddmTransition_keys:Array = _cv.ddm.getValidTransitionsKeys();
+		var cmTransition_keys:Array = _transitionsDisplayed.keys();
+		
+		var trLongest = Math.max(ddmTransition_keys.length, cmTransition_keys.length);
+		
+		//chose which array we are going to loop over
+		var trIndexArray:Array;
+		var trCompArray:Array;
+		
+		if(ddmTransition_keys.length == trLongest){
+			trIndexArray = ddmTransition_keys;
+			trCompArray = cmTransition_keys;
+		}else{
+			trIndexArray = cmTransition_keys;
+			trCompArray = ddmTransition_keys;
+		}
+		
+		refreshTransitions(evtsTable, trIndexArray);
+		refreshTransitions(evtsTable, trCompArray);
+		
+		//now check the transitions:
+		var ddmBranch_keys:Array = _cv.ddm.branches.keys();
+		var cmBranch_keys:Array = _branchesDisplayed.keys();
+		
+		var brLongest = Math.max(ddmBranch_keys.length, cmBranch_keys.length);
+		
+		//chose which array we are going to loop over
+		var brIndexArray:Array;
+		var brCompArray:Array;
+		
+		if(ddmBranch_keys.length == brLongest){
+			brIndexArray = ddmBranch_keys;
+			brCompArray = cmBranch_keys;
+		}else{
+			brIndexArray = cmBranch_keys;
+			brCompArray = ddmBranch_keys;
+		}
+		
+		refreshBranches(evtsTable, brIndexArray);
+		refreshBranches(evtsTable, brCompArray);
+		
+		broadcastViewUpdate("DRAW_ALL", evtsTable.values());
+		stopRefresh();
+		
+		if(_refreshQueueCount > 0) {
+			_refreshQueueCount = 0;
+			refreshDesign();
+		}
+		
+	}
+	
+	private function refreshActivities(evtsTable:Hashtable, keys:Array):Void {
 		//loop through and do comparison
-		for(var i=0;i<longest;i++){
+		for(var i=0;i<keys.length;i++){
 			//check DDM against CM, DDM is king.
-			var keyToCheck:Number = indexArray[i];
+			var keyToCheck:Number = keys[i];
 			
 			var ddm_activity:Activity = _cv.ddm.activities.get(keyToCheck);
 			var cm_activity:Activity = _activitiesDisplayed.get(keyToCheck).activity;
@@ -442,46 +501,35 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			
 			var r_activity:Object = compareActivities(ddm_activity, cm_activity);
 			
-			Debugger.log('r_activity:'+r_activity,Debugger.GEN,'refreshDesign','CanvasModel');
+			Debugger.log('r_activity:'+r_activity,Debugger.GEN,'refreshActivities','CanvasModel');
+			
 			if(r_activity == "NEW"){
 				//draw this activity
 				//NOTE!: we are passing in a ref to the activity in the ddm so if we change any props of this, we are changing the ddm
-				eventArr.push(createViewUpdate("DRAW_ACTIVITY",ddm_activity));
+				
+				addModelEvent(evtsTable, ddm_activity.activityUIID, createViewUpdate("DRAW_ACTIVITY", ddm_activity));
 
 			}else if(r_activity == "NEW_SEQ_CHILD"){
-				eventArr.push(createViewUpdate("DRAW_ACTIVITY_SEQ",ddm_activity));
+				addModelEvent(evtsTable, ddm_activity.activityUIID, createViewUpdate("DRAW_ACTIVITY_SEQ",ddm_activity));
 			}else if(r_activity == "DELETE"){
 				//remove this activity
 				if(cm_activity.parentUIID == null){
-					eventArr.push(createViewUpdate("REMOVE_ACTIVITY", cm_activity));
+					addModelEvent(evtsTable, cm_activity.activityUIID, createViewUpdate("REMOVE_ACTIVITY", cm_activity));
 				}
 			}else if(r_activity == "CHILD"){
 				//dont ask the view to draw the activity if it is a child act				
-				Debugger.log('Found a child activity, not drawing. activityID:'+ddm_activity.activityID+'parentID:'+ddm_activity.parentActivityID,Debugger.GEN,'refreshDesign','CanvasModel');
+				Debugger.log('Found a child activity, not drawing. activityID:'+ddm_activity.activityID+'parentID:'+ddm_activity.parentActivityID,Debugger.GEN,'refreshActivities','CanvasModel');
 			}else if(r_activity == "SEQ"){
-				eventArr.push(createViewUpdate("ADD_SEQUENCE", ddm_activity));
+				addModelEvent(evtsTable, ddm_activity.activityUIID, createViewUpdate("ADD_SEQUENCE", ddm_activity));
 			}
 		}
-		
-		//now check the transitions:
-		var ddmTransition_keys:Array = _cv.ddm.getValidTransitionsKeys();
-		var cmTransition_keys:Array = _transitionsDisplayed.keys();
-		
-		var trLongest = Math.max(ddmTransition_keys.length, cmTransition_keys.length);
-		
-		//chose which array we are going to loop over
-		var trIndexArray:Array;
-		
-		if(ddmTransition_keys.length == trLongest){
-			trIndexArray = ddmTransition_keys;
-		}else{
-			trIndexArray = cmTransition_keys;
-		}
-		
+	}
+	
+	private function refreshTransitions(evtsTable:Hashtable, keys:Array):Void {
 		//loop through and do comparison
-		for(var i=0;i<trIndexArray.length;i++){
+		for(var i=0;i<keys.length;i++){
 			
-			var transitionKeyToCheck:Number = trIndexArray[i];
+			var transitionKeyToCheck:Number = keys[i];
 
 			var ddmTransition:Transition = _cv.ddm.transitions.get(transitionKeyToCheck);
 			var cmTransition:Transition = _transitionsDisplayed.get(transitionKeyToCheck).transition;
@@ -489,30 +537,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			
 			if(r_transition == "NEW"){
 				//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
-				eventArr.push(createViewUpdate("DRAW_TRANSITION", ddmTransition));
+				addModelEvent(evtsTable, ddmTransition.transitionUIID, createViewUpdate("DRAW_TRANSITION", ddmTransition));
 			}else if(r_transition == "DELETE"){
-				eventArr.push(createViewUpdate("REMOVE_TRANSITION", cmTransition));
+				addModelEvent(evtsTable, cmTransition.transitionUIID, createViewUpdate("REMOVE_TRANSITION", cmTransition));
 			}
 		}
-		
-		//now check the transitions:
-		var ddmBranch_keys:Array = _cv.ddm.branches.keys();
-		var cmBranch_keys:Array = _branchesDisplayed.keys();
-		var brLongest = Math.max(ddmBranch_keys.length, cmBranch_keys.length);
-		
-		//chose which array we are going to loop over
-		var brIndexArray:Array;
-		
-		if(ddmBranch_keys.length == brLongest){
-			brIndexArray = ddmBranch_keys;
-		}else{
-			brIndexArray = cmBranch_keys;
-		}
-		
+	}
+	
+	private function refreshBranches(evtsTable:Hashtable, keys:Array):Void {
 		//loop through and do comparison
-		for(var i=0;i<brIndexArray.length;i++){
+		for(var i=0;i<keys.length;i++){
 			
-			var branchKeyToCheck:Number = brIndexArray[i];
+			var branchKeyToCheck:Number = keys[i];
 
 			var ddmBranch:Branch = _cv.ddm.branches.get(branchKeyToCheck);
 			var cmBranch:Branch = _branchesDisplayed.get(branchKeyToCheck).branch;
@@ -520,21 +556,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			
 			if(r_branch == "NEW"){
 				//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
-				eventArr.push(createViewUpdate("DRAW_BRANCH", ddmBranch));
+				addModelEvent(evtsTable, ddmBranch.branchUIID, createViewUpdate("DRAW_BRANCH", ddmBranch));
 			}else if(r_branch == "DELETE"){
-				eventArr.push(createViewUpdate("REMOVE_BRANCH", cmBranch));
+				addModelEvent(evtsTable, cmBranch.branchUIID, createViewUpdate("REMOVE_BRANCH", cmBranch));
 			}
 		}
-		
-		
-		broadcastViewUpdate("DRAW_ALL", eventArr);
-		stopRefresh();
-		
-		if(_refreshQueueCount > 0) {
-			_refreshQueueCount = 0;
-			refreshDesign();
+	}
+	
+	private function addModelEvent(table:Hashtable, UIID:Number, infoObj:Object):Boolean {
+		if(!table.containsKey(UIID)) {
+			table.put(UIID, infoObj);
+			return true;
 		}
 		
+		return false;
 	}
 	
 	public function createViewUpdate(updateType, data):Object {

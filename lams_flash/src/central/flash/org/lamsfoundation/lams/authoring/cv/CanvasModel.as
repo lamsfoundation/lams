@@ -827,10 +827,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		} else if(branchesSize > 0 && isLoopingLD(toAct.activityUIID, sequence.firstActivityUIID)) {
 			return new LFError("Cannot create start-branch connection to Activity in a already connected Sequence.", "createBranchStartConnector", this);
 		} else {
+			
 			var b = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_FROM_START, toAct.activityUIID, activeView.startHub.activity.activityUIID, activeView.defaultSequenceActivity, _cv.ddm.learningDesignID);
 			b.sequenceActivity.isDefault = false;
 			
-			createNewSequenceActivity(activeView.activity, _cv.ddm.getComplexActivityChildren(sequence.parentUIID).length+1, null, true);
+			var sequences:Array = _cv.ddm.getComplexActivityChildren(sequence.parentUIID);
+			b.sequenceActivity.orderID = sequences.length;
+			b.setDefaultSequenceName();
+			
+			Debugger.log("sequences length (order id): " + sequences.length, Debugger.CRITICAL, "createBranchStartConnector", "CanvasModel");
+			
+			var orderID:Number = sequences.length+1;
+			
+			createNewSequenceActivity(activeView.activity, orderID, null, true);
 			return b;
 		}
 	}
@@ -876,9 +885,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		Debugger.log("sequence: " + b.sequenceActivity.activityUIID, Debugger.CRITICAL, "createActivitylessBranch", "CanvasModel");
 		Debugger.log("isDefault: " + b.sequenceActivity.isDefault, Debugger.CRITICAL, "createActivitylessBranch", "CanvasModel");
 		
-		createNewSequenceActivity(activeView.activity, _cv.ddm.getComplexActivityChildren(b.sequenceActivity.parentUIID).length+1, null, true);
+		createNewSequenceActivity(activeView.activity, b.sequenceActivity.orderID+1, null, true);
 			
 		return b;
+	}
+
+	public function migrateActivitiesToSequence(sequenceToMigrate:SequenceActivity, targetSequence:SequenceActivity):Boolean {
+		var activitiesToMigrate:Array = _cv.ddm.getComplexActivityChildren(sequenceToMigrate.activityUIID);
+		
+		for(var i=0; i<activitiesToMigrate.length; i++) {
+			addParentToActivity(targetSequence.activityUIID, _activitiesDisplayed.get(activitiesToMigrate[i].activityUIID), false); 
+		}
+		
+		return true;
 	}
 
 	public function moveActivitiesToBranchSequence(activityUIID:Number, sequence:SequenceActivity):Boolean {

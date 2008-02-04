@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.br.BranchConnector;
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.dict.*;
 
 
 class Branch extends Transition {
@@ -66,6 +67,11 @@ class Branch extends Transition {
 	
 	public function get sequenceActivity():SequenceActivity {
 		return _sequenceActivity;
+	}
+	
+	public function setDefaultSequenceName():Void {
+		var title = Dictionary.getValue('branch_mapping_dlg_branch_col_lbl');
+		_sequenceActivity.title =  Dictionary.getValue('sequence_act_title_new', [title, _sequenceActivity.orderID]);
 	}
 	
 	public function get sequenceName():String {

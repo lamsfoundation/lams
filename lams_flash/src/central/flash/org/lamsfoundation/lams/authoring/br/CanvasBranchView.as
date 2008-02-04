@@ -725,13 +725,19 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 */
 	private function removeBranch(b:Branch, cm){
 		Debugger.log("activeView: " + cm.isActiveView(this), Debugger.CRITICAL, "removeBranch", "CanvasBranchView");
+		Debugger.log("b.direction: " + b.direction, Debugger.CRITICAL, "removeBranch", "CanvasBranchView");
 		
 		if(!cm.isActiveView(this)) return false;
 		
-		
-		if(b.direction == BranchConnector.DIR_SINGLE) { continue;
-		} else if(b.direction == BranchConnector.DIR_FROM_START) { b.sequenceActivity.firstActivityUIID = null;
-		} else if(b.direction == BranchConnector.DIR_TO_END) { b.sequenceActivity.stopAfterActivity = true; }
+		if(b.direction == BranchConnector.DIR_SINGLE) { 
+			continue;
+		} else if(b.direction == BranchConnector.DIR_FROM_START) { 
+			//cm.moveActivitiesToBranchSequence(b.sequenceActivity.firstActivityUIID, defaultSequenceActivity);
+			cm.migrateActivitiesToSequence(b.sequenceActivity, defaultSequenceActivity);
+			cm.getCanvas().removeActivity(b.sequenceActivity.activityUIID); // b.sequenceActivity.firstActivityUIID = null;
+		} else if(b.direction == BranchConnector.DIR_TO_END) { 
+			b.sequenceActivity.stopAfterActivity = true; 
+		}
 		
 		var r = cm.branchesDisplayed.remove(b.branchUIID);
 		r.branchLabel.removeMovieClip();
