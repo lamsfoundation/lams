@@ -81,7 +81,8 @@ public class ExportDownloadServlet extends HttpServlet {
 			response.setContentLength(count);
 			out.flush();
 		} catch (IOException e) {
-		    // Exception occured writing out file.		
+		    // Exception occured writing out file - probably user cancelled on their end.	
+		    log.info( "Exception occured writing out file - probably just the user cancelling on their end." + e.getMessage(),e);		   	
 		    throw e;
 		} finally {
 		    try	{
