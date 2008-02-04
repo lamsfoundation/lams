@@ -230,15 +230,17 @@ class CanvasHelper {
 				if(!res){
 					// error auto-saving
 					var msg:String = Dictionary.getValue('cv_autosave_err_msg');
-					LFMessage.showMessageAlert(msg);
-					
-					System.showSettings(1);
+					LFMessage.showMessageAlert(msg, Proxy.create(this, openSystemSettings, 1));
 				}
 			}
 		} else if(canvasModel.autoSaveWait) {
 			discardAutoSaveDesign();
 		}
 		
+	}
+	
+	public function openSystemSettings(tabID:Number):Void {
+		System.showSettings(tabID);
 	}
 	
 	/**
