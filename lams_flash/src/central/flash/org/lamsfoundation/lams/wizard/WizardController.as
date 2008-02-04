@@ -23,8 +23,9 @@
 
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.util.*;
-import org.lamsfoundation.lams.wizard.*;
 import org.lamsfoundation.lams.common.ws.*;
+import org.lamsfoundation.lams.common.ApplicationParent;
+import org.lamsfoundation.lams.wizard.*;
 import mx.utils.*
 
 /**
@@ -86,13 +87,13 @@ class WizardController extends AbstractController {
 	
 	private function gocancel(evt:Object){
 		// close window
-		trace('CANCEL CLICKED');
-		getURL('javascript:window.close()');
+		//getURL('javascript:window.close()');
+		ApplicationParent.extCall("closeWindow", null);
 	}
 	
 	private function goclose(evt:Object){
-		trace('CLOSE WINDOW');
-		getURL('javascript:closeWizard()');
+		//getURL('javascript:closeWizard()');
+		ApplicationParent.extCall("closeWizard", null);
 	}
 	
 	private function goprev(evt:Object){
