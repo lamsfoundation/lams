@@ -138,6 +138,8 @@ class MonitorModel extends Observable{
 	private var backupLearnersProgArr:Array;
 	private var _searchResultsBackup:Array;
 	
+	private var _openBranchingActivity:Number;
+	
 	private var dispatchEvent:Function;       
     public var addEventListener:Function;  
     public var removeEventListener:Function;
@@ -1060,6 +1062,7 @@ class MonitorModel extends Observable{
 			activeView = (visible) ? ba.branchView : activeView;
 			
 			ba.branchView.setOpen(visible);
+			
 			ba.branchView.open();
 			
 			setDirty();
@@ -1392,6 +1395,14 @@ class MonitorModel extends Observable{
 	
 	public function get isDirty():Boolean {
 		return _isDirty;
+	}
+	
+	public function set openBranchingActivity(a:Number):Void {
+		_openBranchingActivity = a;
+	}
+	
+	public function get openBranchingActivity():Number {
+		return _openBranchingActivity;
 	}
 	
 }

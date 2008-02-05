@@ -214,7 +214,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 						drawDesignCalled = "called";
 						
 						mm.drawDesign(infoObj.tabID);
-						
 					}
 					break;
 				case 'DRAW_ALL' :
@@ -231,7 +230,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			}
 
 	}
-	
 	/**
     * layout visual elements on the MonitorTabView on initialisation
     */
@@ -272,10 +270,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	 */
 	private function reloadProgress(isChanged:Boolean){
 		var s:Object = mm.getSize();
-		var openBranchingActivity:Object = mm.currentBranchingActivity;
+		//var openBranchingActivity:Object = mm.currentBranchingActivity;
 		
 		drawDesignCalled = undefined;
 		
+		/**
 		if(openBranchingActivity && (mm.activeView instanceof CanvasBranchView)) { // learner has been force-completed
 			showAssets(false);
 			mm.getMonitor().getProgressData(mm.getSequence());
@@ -283,8 +282,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			mm.getMonitor().openBranchView(openBranchingActivity, true);
 		} 
 		else {
-
+		*/
 			showAssets(true);
+			mm.openBranchingActivity = mm.currentBranchingActivity.activity.activityUIID;
 			mm.getMonitor().closeBranchView();
 		
 			//Remove all the movies drawn on the transition and activity movieclip holder
@@ -317,7 +317,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			mm.activitiesDisplayed.clear();
 			
 			mm.getMonitor().getProgressData(mm.getSequence());
-		}
+		//}
 	}
 	
 	public function showAssets(v:Boolean) {
@@ -381,7 +381,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		} else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONS_WITH_SEQUENCES_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			newActivity_mc = activityLayer.createChildAtDepth("CanvasOptionalActivity", DepthManager.kTop, {_activity:a, _children:children, _monitorController:mc, _monitorTabView:mtv, fromModuleTab:"monitorMonitorTab", learnerContainer:_learnerContainer_mc});	
-		} else if(a.isBranchingActivity()){	
+		} else if(a.isBranchingActivity()){
 			newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity", DepthManager.kBottom, {_activity:a,_monitorController:mc, _monitorView:mtv, _module:"monitoring", learnerContainer:_learnerContainer_mc, setupBranchView:false});
 		} else {
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');

@@ -374,18 +374,19 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		close();
 	}
 	
-	public function open():Void {
+	public function open(doTransition:Boolean):Void {
 		Debugger.log("calling open: " + _open, Debugger.CRITICAL, "open", " CanvasBranchView");
 		if(model instanceof CanvasModel) model.getCanvas().addBin(this.activityLayer);
 			
 		setSize(model);
 		
-		if (!(model.activeView instanceof CanvasBranchView)) {
+		if(doTransition || doTransition == null) {
 			var tm:TransitionManager = new TransitionManager(this);
 			tm.startTransition({type:mx.transitions.Zoom, 
 							direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
 			tm.addEventListener("allTransitionsInDone", finishedOpen);
 		}
+		
 	}
 	
 	public function finishedOpen(evt:Object):Void {
