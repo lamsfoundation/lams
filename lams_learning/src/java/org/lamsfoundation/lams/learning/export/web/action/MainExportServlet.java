@@ -119,7 +119,9 @@ public class MainExportServlet extends HttpServlet {
 		    }
 		    
 		    portfolios = exportService.exportPortfolioForStudent(userId, lessonID, true, accessMode, cookies);
-		    exportFilename = ExportPortfolioConstants.EXPORT_LEARNER_PREFIX + " " + portfolios.getLessonName() + ".zip";
+		    String learnerName = portfolios.getLearnerName();
+		    String learnerLogin = learnerName.substring(learnerName.indexOf('(') + 1, learnerName.lastIndexOf(')'));
+		    exportFilename = ExportPortfolioConstants.EXPORT_LEARNER_PREFIX + " " + portfolios.getLessonName() + " " + learnerLogin +".zip";
 		}
 		else if(mode.equals(ToolAccessMode.TEACHER.toString()))
 		{
