@@ -1911,7 +1911,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		    {
 			    if (maxNomCount != null)
 			    {
-				    if (maxNomCount.equals("0"))
+				    if (maxNomCount.equals("0") || maxNomCount.contains("-"))
 				    {
 				        ActionMessage error = new ActionMessage("maxNomination.invalid");
 						errors.add(ActionMessages.GLOBAL_MESSAGE, error);				        
