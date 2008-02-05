@@ -74,12 +74,11 @@ class Canvas extends CanvasHelper {
 		
 		//Create the view
 		_canvasView_mc = _target_mc.createChildAtDepth("canvasView",DepthManager.kTop);		
-
+		
         //Cast toolkit view clip as ToolkitView and initialise passing in model
 		canvasView = CanvasView(_canvasView_mc);
 		canvasView.init(canvasModel,undefined,x,y,w,h);
-        
-        
+
         //Get reference to application and design data model
 		app = Application.getInstance();
 		

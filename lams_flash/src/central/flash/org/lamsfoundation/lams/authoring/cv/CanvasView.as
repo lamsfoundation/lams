@@ -157,7 +157,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		//get the content path for the sp
 		content = canvas_scp.content;
 		
-		bkg_pnl = content.createClassObject(Panel, "bkg_pnl", getNextHighestDepth());
+		bkg_pnl = content.createClassObject(Panel, "bkg_pnl", content.getNextHighestDepth());
 		gridLayer = content.createEmptyMovieClip("_gridLayer_mc", content.getNextHighestDepth());
 		transitionLayer = content.createEmptyMovieClip("_transitionLayer_mc", content.getNextHighestDepth());
 		
@@ -166,6 +166,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		
 		transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
 		transparentCover.onPress = null;
+		
+		branchContent = content.createEmptyMovieClip("_branch_content_mc", content.getNextHighestDepth());
 		
 		titleBar = _canvasView.attachMovie("DesignTitleBar", "titleBar", _canvasView.getNextHighestDepth())
 		
@@ -522,4 +524,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
     public function defaultController (model:Observable):Controller {
         return new CanvasController(model);
     }
+	
+	public function getScrollPaneVPosition():Number {
+		return canvas_scp.vPosition;
+	}
+	
+	public function getScrollPaneHPosition():Number {
+		return canvas_scp.hPosition;
+	}
 }

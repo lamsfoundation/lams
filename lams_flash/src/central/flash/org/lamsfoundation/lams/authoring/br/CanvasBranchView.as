@@ -274,7 +274,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 		transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
 		transparentCover.onPress = null;
-			
+		
+		branchContent = content.createEmptyMovieClip("_branch_content_mc", content.getNextHighestDepth());
+		
 		bkg_pnl.onRelease = function(){
 			Application.getInstance().getCanvas().getCanvasView().getController().canvasRelease(this);
 		}
@@ -804,8 +806,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			if(_isBranchChild) 
 				Debugger.log("bc cx: " + cx + " // bc cy: " + cy, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
 			
-			canvas_scp._x = (_isBranchChild) ? -cx : -cx + hSpace;
-			canvas_scp._y = (_isBranchChild) ? -cy : -cy + vSpace; //+ getParentScrollVPosition() ;
+			canvas_scp._x = (_isBranchChild) ? -cx : -cx + hSpace + cm.getCanvas().view.getScrollPaneHPosition();
+			canvas_scp._y = (_isBranchChild) ? -cy : -cy + vSpace + cm.getCanvas().view.getScrollPaneVPosition();
 			
 			close_mc._x = bkg_pnl._x + bkg_pnl.width - close_mc._width - 10;
 			close_mc._y = bkg_pnl._y + 10;

@@ -518,6 +518,7 @@ class CanvasHelper {
 	
 	public function closeBranchView() {
 		var parentBranching:CanvasActivity = null;
+		
 		if(canvasModel.activeView.activity.parentUIID != null)
 			parentBranching = CanvasActivity(canvasModel.activitiesDisplayed.get(_ddm.getActivityByUIID(canvasModel.activeView.activity.parentUIID).parentUIID));
 		
@@ -548,7 +549,8 @@ class CanvasHelper {
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
 		var isVisible:Boolean = (visible == null) ? true : visible;
 		
-		var target:MovieClip = (canvasModel.activeView instanceof CanvasBranchView) ? canvasModel.activeView.content : _canvasView_mc.content;
+		var target:MovieClip = (canvasModel.activeView instanceof CanvasBranchView) ? canvasModel.activeView.branchContent : _canvasView_mc.branchContent;
+		
 		
 		var _branchView_mc:MovieClip = target.createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
 		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
