@@ -57,7 +57,7 @@ class MonitorController extends AbstractController {
 	/**
 	* Constructor
 	*
-	* @param   cm   The model to modify.
+	* @param   mm   The model to modify.
 	*/
 	public function MonitorController (mm:Observable) {
 		super (mm);
@@ -65,17 +65,17 @@ class MonitorController extends AbstractController {
 		_monitorController = this;
 		_app = Application.getInstance();
 		_isBusy = false;
-		
 	}
 	
 	public function activityClick(act:Object, forObj:String):Void{
+		Debugger.log("act.activity.title: "+act.activity.title, Debugger.GEN, "activityClick", "MonitorController");
+		
 		if (forObj == "LearnerIcon"){
 			_monitorModel.isDragging = true;
 			
 			act.startDrag(false);
-			
-			Debugger.log('activityClick CanvasActivity:'+act.Learner.getUserName(),Debugger.GEN,'activityClick','MonitorController');
-		}else {
+		}
+		else {
 			var _tempSelectedItem = _monitorModel.selectedItem;
 		
 			var parentAct = _monitorModel.getMonitor().ddm.getActivityByUIID(act.activity.parentUIID);
@@ -85,11 +85,11 @@ class MonitorController extends AbstractController {
 			
 				// clear currently selected activity
 				if(_monitorModel.getMonitor().ddm.getActivityByUIID(parentSelectedAct.parentUIID).activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE) {
-						_tempSelectedItem._parent._parent.swapDepths(_tempSelectedItem._parent._parent.depthHistory);
-						_tempSelectedItem._parent._parent.depthHistory = null;
-						
-						_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
-						_tempSelectedItem.depthHistory = null;
+					_tempSelectedItem._parent._parent.swapDepths(_tempSelectedItem._parent._parent.depthHistory);
+					_tempSelectedItem._parent._parent.depthHistory = null;
+					
+					_tempSelectedItem.swapDepths(_tempSelectedItem.depthHistory);
+					_tempSelectedItem.depthHistory = null;
 				}
 
 			}
@@ -140,7 +140,6 @@ class MonitorController extends AbstractController {
 				Debugger.log("no match found: " + target , Debugger.CRITICAL, "matchChildActivity", "MonitorController");
 			}
 		}
-		
 		return null;
 	}
 	
@@ -159,8 +158,6 @@ class MonitorController extends AbstractController {
 		var actUIIDToCompare = learnerObj.activity.activityUIID;
 		var parentUIIDToCompare = learnerObj.activity.parentUIID;
 		
-		Debugger.log("completed: " + checkifActivityNotComplete(learnerObj.Learner, cActivity.activity.activityID), Debugger.CRITICAL, "checkHit", "MonitorController");
-		
 		//if learner is on the next or further activity - get new progress data.
 		if(checkifActivityNotComplete(learnerObj.Learner, cActivity.activity.activityID)) {
 			if(actUIIDToCompare == cActivity.activity.activityUIID)
@@ -171,10 +168,9 @@ class MonitorController extends AbstractController {
 				
 		} else {
 			activitySnapBack(learnerObj);
-			var msg:String = Dictionary.getValue('al_error_forcecomplete_invalidactivity',[learnerObj.Learner.getFullName(), cActivity.activity.title]) ;
+			var msg:String = Dictionary.getValue('al_error_forcecomplete_invalidactivity',[learnerObj.Learner.getFullName(), cActivity.activity.title]);
 			LFMessage.showMessageAlert(msg);
 		}
-		
 		return true;
 	}
    
@@ -187,22 +183,70 @@ class MonitorController extends AbstractController {
 	 * @return  
 	 */
 	private function forceCompleteTransfer(learnerObj:Object, cActivity:Object):Void {
+		
 		var learnerActivityID:Number = learnerObj.Learner.getCurrentActivityId();
 		var activityToCheck = cActivity.activity; // initially the Activity where the learner icon has been dropped
 		var targetIsAccessible:Boolean = _monitorModel.getIsValidDropTarget(learnerActivityID, activityToCheck);
+		var _parent:Object = _monitorModel.getMonitor().ddm.getActivityByUIID(cActivity.activity.parentUIID);
+		var _grandParent:Object = _monitorModel.getMonitor().ddm.getActivityByUIID(_parent.parentUIID);
+		
+		var learnerInside:Boolean = false;
+		var activityInside:Boolean = false;
+		var sameOptionalSequence:Boolean = false;
+				
+		var complexChildren:Array = _monitorModel.getMonitor().ddm.getComplexActivityChildren(_grandParent.activityUIID);
+		
+		if (_grandParent != null && _grandParent != undefined) { // if the droptarget is an activity within an optional sequence
+			// checks to see if the activity the learner is on and the dropTarget are part of the same 'Optional Sequence'
+			for (var j = 0; j < complexChildren.length; j++) {
+				var complexGrandChildren:Array = _monitorModel.getMonitor().ddm.getComplexActivityChildren(complexChildren[j].activityUIID);
+				for (var k = 0; k < complexGrandChildren.length; k++) {
+					
+					if (complexGrandChildren[k].activityID == learnerObj.Learner.getCurrentActivityId())
+						learnerInside = true;
 
-		if (targetIsAccessible) {
-			var transObj:Object = _monitorModel.getMonitor().ddm.getTransitionsForActivityUIID(cActivity.activity.activityUIID);
+					if (complexGrandChildren[k].activityID == activityToCheck.activityID)
+						activityInside = true
+
+					if (learnerInside && activityInside)
+						sameOptionalSequence = true;
+				}
+			}
+		}
+		
+		if (targetIsAccessible) { // target lies downstream from learner
+			var transObj:Object = _monitorModel.getMonitor().ddm.getTransitionsForActivityUIID(activityToCheck.activityUIID);
 			var previousAct = _monitorModel.getMonitor().ddm.getActivityByUIID(transObj.into.fromUIID);
 			var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+learnerObj.Learner.getLearnerId()+"&activityID="+previousAct.activityID;
 			var fnOk:Function = Proxy.create(this, this.reloadProgress, this, URLToSend);
 			var fnCancel:Function = Proxy.create(this, this.activitySnapBack, learnerObj);
-			
-			_monitorModel.inBranchView = true;
-			
 			LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_forcecomplete_toactivity',[learnerObj.Learner.getFullName(), cActivity.activity.title]), fnOk,fnCancel);			
-		} else
-			LFMessage.showMessageAlert(learnerObj.Learner.getFullName() +" cannot be dropped at the chosen location.", null, null);
+		} 
+		else if (CanvasBranchView(_monitorModel.activeView).isEnd(MovieClip(cActivity))){ // if the learner hit the 'end of branching' door icon
+			var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+learnerObj.Learner.getLearnerId()+"&activityID="+cActivity.activity.activityID;
+			var fnOk:Function = Proxy.create(this, this.reloadProgress, this, URLToSend);
+			var fnCancel:Function = Proxy.create(this, this.activitySnapBack, learnerObj);			
+			LFMessage.showMessageConfirm("Are you sure you want to force complete leaner '"+learnerObj.Learner.getFullName()+"' to the end of this branching sequence?", fnOk,fnCancel);			
+		}
+		else if (_parent.isOptionalSequenceActivity(_grandParent) && !sameOptionalSequence) { // if the learner hit an activity within an optional sequence and they were initially outside of the target optional sequence
+			var transObj:Object = _monitorModel.getMonitor().ddm.getTransitionsForActivityUIID(_grandParent.activityUIID);	
+			var previousAct = _monitorModel.getMonitor().ddm.getActivityByUIID(transObj.into.fromUIID);
+			var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+learnerObj.Learner.getLearnerId()+"&activityID="+previousAct.activityID;
+			var fnOk:Function = Proxy.create(this, this.reloadProgress, this, URLToSend);
+			var fnCancel:Function = Proxy.create(this, this.activitySnapBack, learnerObj);
+			LFMessage.showMessageConfirm("Are you sure you want to force complete leaner '"+learnerObj.Learner.getFullName()+"' to Optional Sequence?", fnOk,fnCancel);
+		}
+		else if (_parent.isOptionalActivity()) { // if the learner hit an activity within an optional activity
+			var transObj:Object = _monitorModel.getMonitor().ddm.getTransitionsForActivityUIID(_parent.activityUIID);
+			var previousAct = _monitorModel.getMonitor().ddm.getActivityByUIID(transObj.into.fromUIID);
+			var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+learnerObj.Learner.getLearnerId()+"&activityID="+previousAct.activityID;
+			var fnOk:Function = Proxy.create(this, this.reloadProgress, this, URLToSend);
+			var fnCancel:Function = Proxy.create(this, this.activitySnapBack, learnerObj);
+			LFMessage.showMessageConfirm("Are you sure you want to force complete leaner '"+learnerObj.Learner.getFullName()+"' to Optional Activity?", fnOk,fnCancel);
+		}
+		else {
+			LFMessage.showMessageAlert(learnerObj.Learner.getFullName() +" cannot be dropped on an activity that is in a different branch or sequence.", null, null);
+		}
 	}
 	
 	/**
@@ -217,9 +261,15 @@ class MonitorController extends AbstractController {
 		return (Progress.compareProgressData(learnerProgress, activityID) != "completed_mc") ? true : false;
 	}
 	
-	public function activityRelease(act:Object, forObj:String):Void{
-		
-		Debugger.log('activityRelease CanvasActivity:'+act.activity.activityID,Debugger.GEN,'activityRelease','MonitorController');
+	public function getLearnerIsInsideComplexActivity(_indexArray:Array, learnerObj:Object):Boolean {
+		for (var i = 0; i < _indexArray.length; i++) {
+			if (_indexArray[i].activity.activityID == learnerObj.Learner.getCurrentActivityId())
+				return false;
+		}
+		return true;
+	}
+	
+	public function activityRelease(act:Object, forObj:String):Void {
 		
 		if (forObj == "LearnerIcon"){
 			
@@ -229,22 +279,57 @@ class MonitorController extends AbstractController {
 			if(_monitorModel.isDragging){
 				act.stopDrag();
 			}
-			
+			// hittest learner icon and finish door
 			var dropTarget:Object = findParentActivity(eval(act._droptarget));
-				
-			//run a loop to check which activity has been hitted by the learner.
+			Debugger.log("dropTarget.activity.title: "+dropTarget.activity.title, Debugger.GEN, "activityRelease", "MonitorController");
+			
+			//run a loop to check which activity has been hit by the learner.
 			for (var i=0; i<indexArray.length; i++){ 
 				var cActivity = indexArray[i];
+				var learnerInsideComplexActivity:Boolean = getLearnerIsInsideComplexActivity(indexArray, act);
 				
 				if(dropTarget != null) {
-					if(dropTarget.activity.parentUIID != null 
-							&& cActivity.children != null
-							&& !cActivity.activity.isBranchingActivity())
-						cActivity = matchChildActivity(cActivity.children, dropTarget);
-					
-					hasHit = (cActivity.activity.activityUIID == dropTarget.activity.activityUIID) ? checkHit(cActivity, act) : hasHit;
-				} 
 
+					// Need to match the drop target activity with an activity on the canvas
+					// If the drop target is a child of an optional activity or the child of an optional sequence we must locate it
+					if(dropTarget.activity.parentUIID != null && cActivity.children != null && !cActivity.activity.isBranchingActivity()) {
+						var matchedAct = matchChildActivity(cActivity.children, dropTarget); // optional activites
+						if (matchedAct != null)
+							cActivity = matchedAct;
+						else if (learnerInsideComplexActivity) {
+							for (var j=0; j<cActivity.children.length; j++) { // if cActivity.children.length > 0, we have either an optional activity or an optional sequence
+								for (var k=0; k<cActivity.children[j].children.length; k++){ // if cActivity.children[j].children.length > 0 we have an optional sequence, for each sequence check its children activities
+									if (cActivity.children[j].children != null) { 
+										var matchedAct = matchChildActivity(cActivity.children[j].children, dropTarget);
+										if (matchedAct != null) {
+											cActivity = matchedAct;
+											hasHit = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+					}
+					
+					if (CanvasBranchView(_monitorModel.activeView).isEnd(MovieClip(dropTarget))) {
+						// the drop target is the exit door icon of a branching activity
+						hasHit = true;
+						forceCompleteTransfer(act, dropTarget);
+					}
+						
+					var _parent:Object = _monitorModel.getMonitor().ddm.getActivityByUIID(dropTarget.activity.parentUIID);
+					var _grandParent:Object = _monitorModel.getMonitor().ddm.getActivityByUIID(_parent.parentUIID);
+				
+					if (_parent.isOptionalSequenceActivity(_grandParent)) {
+						hasHit = true;
+						forceCompleteTransfer(act, dropTarget);
+					}
+					
+					if (cActivity.activity.activityUIID == dropTarget.activity.activityUIID) {
+						hasHit = checkHit(cActivity, act);
+					}
+				} 
 			}
 			
 			if (act.hitTest(_monitorModel.endGate)){
@@ -270,9 +355,7 @@ class MonitorController extends AbstractController {
 				var msg:String = Dictionary.getValue('al_error_forcecomplete_notarget',[act.Learner.getFullName()]) ;
 				LFMessage.showMessageAlert(msg);
 			} 
-
 		}
-		
 	}
 	
 	private function reloadProgress(ref, URLToSend){
@@ -399,7 +482,6 @@ class MonitorController extends AbstractController {
 			exportClassPortfolio();
 		}else if(tgt.indexOf("refresh_btn") != -1){
 			if(_monitorModel.activeView instanceof CanvasBranchView) {
-				_monitorModel.inBranchView = false;
 				_monitorModel.activeView.removeMovieClip();
 				_monitorModel.getMonitor.closeBranchView();
 			}

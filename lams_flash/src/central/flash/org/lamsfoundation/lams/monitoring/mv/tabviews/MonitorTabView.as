@@ -276,7 +276,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		
 		drawDesignCalled = undefined;
 		
-		if(openBranchingActivity && mm.inBranchView == true) { // learner has been force-completed
+		if(openBranchingActivity && (mm.activeView instanceof CanvasBranchView)) { // learner has been force-completed
 			showAssets(false);
 			mm.getMonitor().getProgressData(mm.getSequence());
 			mm.activeView.removeMovieClip();

@@ -380,7 +380,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			
 		setSize(model);
 		
-		if ((model instanceof CanvasModel) || (model instanceof MonitorModel && model.inBranchView == false)) {
+		if (!(model.activeView instanceof CanvasBranchView)) {
 			var tm:TransitionManager = new TransitionManager(this);
 			tm.startTransition({type:mx.transitions.Zoom, 
 							direction:0, duration:1, easing:mx.transitions.easing.Bounce.easeOut});
@@ -412,9 +412,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		if(model instanceof CanvasModel) model.getCanvas().hideBin(); //typo
 			model.selectedItem = null;
 		
-		if (model instanceof MonitorModel)
-			model.inBranchView = false;
-			
 		var bkeys:Array = model.branchesDisplayed.keys();
 		
 		for(var i=0; i<bkeys.length; i++) {

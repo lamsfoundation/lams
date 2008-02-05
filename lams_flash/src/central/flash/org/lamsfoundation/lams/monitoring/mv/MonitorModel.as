@@ -62,7 +62,6 @@ class MonitorModel extends Observable{
 	private var selectedTab:Number;
 	private var _dialogOpen:String;		// the type of dialog currently open
 	
-	private var _inBranchView:Boolean;
 	private var _staffLoaded:Boolean;
 	private var _learnersLoaded:Boolean;
 	private var _isLessonProgressChanged:Boolean;
@@ -151,7 +150,6 @@ class MonitorModel extends Observable{
 	public function MonitorModel (monitor:Monitor){
 		_monitor = monitor;
 		
-		_inBranchView = false;
 		_showLearners = true;
 		isDesignDrawn = true;
 		_drawButtons = true;
@@ -391,21 +389,37 @@ class MonitorModel extends Observable{
 		return _showLearners;
 	}
 	
+	/*
+	* If learner is in branching or optional sequence, checks to make sure the droptarget lies in the
+	* same path, and not part of a different branch/sequence. If learner is not in branching, checks 
+	* to make sure they don't drag to the optional child of a complex activity.
+	*/
 	public function getIsValidDropTarget(learnerActivityID:Number, activity:Object):Boolean {
 		var activityToCheck = activity;
-		var targetIsAccessible:Boolean = false; // must check if target is accessible, i.e. if inside branching, on the same branch
-		do {
-			var transObj:Object = app.getMonitor().ddm.getTransitionsForActivityUIID(activityToCheck.activityUIID);
-			var previousAct = app.getMonitor().ddm.getActivityByUIID(transObj.into.fromUIID);
-			if (previousAct.activityID == learnerActivityID) {
-				Debugger.log("Activity target is accessible", Debugger.CRITICAL, "getIsValidDropTarget", "MonitorModel");
-				targetIsAccessible = true;
-				break;
+		var isCBV:Boolean = activeView instanceof org.lamsfoundation.lams.authoring.br.CanvasBranchView;
+		var _parent:Object = getMonitor().ddm.getActivityByUIID(activity.parentUIID);
+		var _grandParent:Object = getMonitor().ddm.getActivityByUIID(_parent.parentUIID);
+	
+		if (isCBV || _parent.isOptionalSequenceActivity(_grandParent)) {
+			do {
+				var transObj:Object = app.getMonitor().ddm.getTransitionsForActivityUIID(activityToCheck.activityUIID);
+				var previousAct = app.getMonitor().ddm.getActivityByUIID(transObj.into.fromUIID);
+				if (previousAct.activityID == learnerActivityID) { // on same sequence or end or branching
+					Debugger.log("Activity target is accessible", Debugger.CRITICAL, "getIsValidDropTarget", "MonitorModel");
+					return true
+				}
+				activityToCheck = previousAct;
+			} while (transObj.into.fromUIID != null);
+			return false
+		}
+		else {
+			var _indexArray:Array = activitiesOnCanvas();
+			for (var i=0; i<_indexArray.length; i++) {
+				if (_indexArray[i].activity.activityID == activityToCheck.activityID) 
+					return true;
 			}
-			activityToCheck = previousAct;
-		} while (transObj.into.fromUIID != null);
-		
-		return targetIsAccessible;
+			return false;
+		}
 	}
 	
 	public function activitiesOnCanvas():Array{
@@ -417,6 +431,7 @@ class MonitorModel extends Observable{
 
 		return actAll;
 	}
+	
 	/**
 	 * Compares the design in the CanvasModel (what is displayed on the screen) 
 	 * against the design in the DesignDataModel and updates the Canvas Model accordingly.
@@ -654,6 +669,7 @@ class MonitorModel extends Observable{
 	}
 	
 	public function addNewBranch(sequence:SequenceActivity, branchingActivity:BranchingActivity, isDefault:Boolean):Void {
+				
 		Debugger.log("sequence.firstActivityUIID: "+sequence.firstActivityUIID, Debugger.CRITICAL, "addNewBranch", "MonitorModel");
 		
 		if(sequence.firstActivityUIID == null && app.getMonitor().ddm.getComplexActivityChildren(sequence.activityUIID).length <= 0) {
@@ -885,14 +901,6 @@ class MonitorModel extends Observable{
 		} else {
 			ApplicationParent.extCall("reloadWindow", null);
 		}
-	}
-	
-	public function get inBranchView():Boolean {
-		return _inBranchView;
-	}
-	
-	public function set inBranchView(s:Boolean) {
-		_inBranchView = s;
 	}
 	
 	public function tabHelp(){
