@@ -163,13 +163,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			var sequenceActivity:Activity = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
 			var selectedParentActivity:Activity = _canvasModel.getCanvas().ddm.getActivityByUIID(_tempSelectedItem.activity.parentUIID);
 			
-			var iconMouseX = _xmouse - _canvasModel.getPosition().x;
-			var iconMouseY = _ymouse - _canvasModel.getPosition().y;
-			
-			if(_canvasModel.activeView instanceof CanvasBranchView) {
-				iconMouseX -= CanvasBranchView.hSpace;
-				iconMouseY -= CanvasBranchView.vSpace;
-			}
+			var iconMouseX = _canvasModel.activeView.content._xmouse;
+			var iconMouseY = _canvasModel.activeView.content._ymouse;
 			
 			if (ca.activity.parentUIID != null && 
 				sequenceActivity.activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE){
@@ -262,6 +257,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 										// test mouse ptr 
 										var _children:Array = optionalOnCanvas[i].children;
 										var selectedSequence:MovieClip = null;
+										
 										var mouseX = iconMouseX - optionalX;
 										var mouseY = iconMouseY - optionalY;
 										

@@ -89,7 +89,7 @@ class ToolkitController extends AbstractController {
 			if(iconMouseX >= optionalX && iconMouseX <= (optionalX + optionalWidth)){
 				if(iconMouseY >= optionalY && iconMouseY <= (optionalY + optionalHeight)){
 					isCanvasDrop = false;
-					dragIcon_mc.removeMovieClip();
+					//dragIcon_mc.removeMovieClip();
 					
 					var ta:TemplateActivity = _toolkitModel.getSelectedTemplateActivity();
 					
@@ -105,8 +105,9 @@ class ToolkitController extends AbstractController {
 							var _children:Array = optionalOnCanvas[i].children;
 							var sequenceDropUIID:Number = null;
 							var sequence = null;
-							var mouseX = iconMouseX - optionalX;
-							var mouseY = iconMouseY - optionalY;
+							
+							var mouseX = cv.model.activeView.content._xmouse - optionalX;
+							var mouseY = cv.model.activeView.content._ymouse - optionalY;
 							
 							for(var j=0; j<_children.length; j++) {
 								if(mouseX >= _children[j].activity.xCoord && 
