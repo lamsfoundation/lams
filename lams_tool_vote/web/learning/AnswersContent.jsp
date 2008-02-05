@@ -55,7 +55,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			noSelected--;
 		}
 		
-		if((maxVotes != -1) && (noSelected + userEntry) > maxVotes){
+		if((noSelected + userEntry) > maxVotes){
 			clickedObj.checked = false;
 			noSelected--;
 			alertTooManyVotes(maxVotes);
@@ -72,13 +72,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			}
 		</c:if>
 
-		if((maxVotes != -1) && (noSelected + userEntry) > maxVotes){
+		if((noSelected + userEntry) > maxVotes){
 			alertTooManyVotes(maxVotes);
+			return false;
+		} else if((noSelected + userEntry) == 0){
+			alert("<fmt:message key="error.empty.selection"/>");
 			return false;
 		} else {
 			return true;
 		}
-		 
 	}
 
 	function alertTooManyVotes(maxVotes) {
