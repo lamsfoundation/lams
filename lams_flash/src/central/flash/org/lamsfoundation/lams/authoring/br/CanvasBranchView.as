@@ -806,8 +806,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			if(_isBranchChild) 
 				Debugger.log("bc cx: " + cx + " // bc cy: " + cy, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
 			
-			canvas_scp._x = (_isBranchChild) ? -cx : -cx + hSpace + cm.getCanvas().view.getScrollPaneHPosition();
-			canvas_scp._y = (_isBranchChild) ? -cy : -cy + vSpace + cm.getCanvas().view.getScrollPaneVPosition();
+			var hPosition:Number = (cm instanceof CanvasModel) ? cm.getCanvas().view.getScrollPaneHPosition() : cm.getMonitor().getMV().getMonitorSequenceScp().hPosition;
+			var vPosition:Number = (cm instanceof CanvasModel) ? cm.getCanvas().view.getScrollPaneVPosition() : cm.getMonitor().getMV().getMonitorSequenceScp().vPosition;
+			
+			canvas_scp._x = (_isBranchChild) ? -cx : -cx + hSpace + hPosition;
+			canvas_scp._y = (_isBranchChild) ? -cy : -cy + vSpace + vPosition;
 			
 			close_mc._x = bkg_pnl._x + bkg_pnl.width - close_mc._width - 10;
 			close_mc._y = bkg_pnl._y + 10;
