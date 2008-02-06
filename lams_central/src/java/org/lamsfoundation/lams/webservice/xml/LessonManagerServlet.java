@@ -138,6 +138,9 @@ public class LessonManagerServlet extends HttpServlet {
 			Document document = builder.newDocument();
 
 			Element element = null;
+			
+			if (hashValue==null || hashValue.equals(""))
+				throw new NullPointerException("Hash value missing in parameters");
 
 			if (method.equals(CentralConstants.METHOD_START)) {
 				ldId = new Long(ldIdStr);
@@ -221,7 +224,11 @@ public class LessonManagerServlet extends HttpServlet {
 		} catch (ParserConfigurationException e) {
 			log.error("Can not build XML document", e);
 			response.sendError(response.SC_INTERNAL_SERVER_ERROR);
-		} catch (Exception e) {
+		} catch (NullPointerException e) {
+			log.error("Missing parameters", e);
+			response.sendError(response.SC_INTERNAL_SERVER_ERROR);
+		}
+		catch (Exception e) {
 			log.error("Problem loading learning manager servlet request", e);
 			response.sendError(response.SC_INTERNAL_SERVER_ERROR);
 		}
