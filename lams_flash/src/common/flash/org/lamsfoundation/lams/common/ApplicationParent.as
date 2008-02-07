@@ -51,6 +51,7 @@ class ApplicationParent {
 	public static var SERIAL_NO = "0000-0000-0000-0001-AAAA";
 	public static var FLASH_TOOLSIGNATURE_GATE:String = "lagat11";
 	public static var FLASH_TOOLSIGNATURE_GROUP:String = "lagrp11";
+	public static var FLASH_TOOLSIGNATURE_BRANCHING:String = "labranch21";
 	
 	public static var NORMAL_MODE:String = "author";		// Normal Operation Mode
 	public static var EDIT_MODE:String = "editonfly";		// Edit-On-The-Fly Mode
@@ -152,6 +153,21 @@ class ApplicationParent {
 		
     }
 	
+	public function addLocaleToURL(url:String):String {
+		var locale:String = (_root.lang == "en") ? "" : _root.lang;
+		var newURL:String;
+		Debugger.log("ends with /: " + url.substr(url.length-1, url.length) == "/", Debugger.CRITICAL, "addLocaleToURL", "ApplicationPArent");
+		Debugger.log("str: " +url.substr(url.length-1, url.length), Debugger.CRITICAL, "addLocaleToURL", "ApplicationPArent");
+		Debugger.log("str 2: " + url.substr(0, url.length-1), Debugger.CRITICAL, "addLocaleToURL", "ApplicationPArent");
+		if(url.substr(url.length-1, url.length) == "/") {
+			newURL = url.substr(0, url.length-1) + locale + "/";
+		} else {
+			newURL = url + locale + "/";
+		}
+		
+		return newURL;
+	}
+	
 	/**
 	 * Retrieve the help url from config.
 	 * @param callback (optional) 
@@ -159,10 +175,11 @@ class ApplicationParent {
 	public function getHelpURL(callback:Function) {
 		var _callback:Function = callback;
 		if(callback == null || callback == undefined) {
-			_callback = Proxy.create(this,openHelp);	// default callback
-		}else {
+			_callback = Proxy.create(this, openHelp);	// default callback
+		} else {
 			Debugger.log('called from Monitor :',Debugger.CRITICAL,'getHelpURL','ApplicationParent');
 		}
+		
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getHelpURL',_callback, false);
 		
 	}
@@ -172,10 +189,7 @@ class ApplicationParent {
 	 * @param url generic help url
 	 */
 	public function openHelp(url:String) {
-		var locale:String = _root.lang + _root.country;
-		var target:String = this.module + '#' + this.module + '-' + locale;
-		
-		ApplicationParent.extCall("openURL", url + target);
+		ApplicationParent.extCall("openURL", url + this.module);
 	}
 	
 	 /**

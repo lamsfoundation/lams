@@ -874,37 +874,38 @@ b	 * @param   learningDesignID
 	public function getHelp(ca:CanvasActivity) {
 
 		if(ca.activity.helpURL != undefined || ca.activity.helpURL != null) {
-			Debugger.log("Opening help page with locale " + _root.lang + _root.country + ": " + ca.activity.helpURL,Debugger.GEN,'getHelp','Canvas');
-			var locale:String = _root.lang + _root.country;
+			Debugger.log("Opening help page with locale " + _root.lang + ": " + ca.activity.helpURL, Debugger.GEN, 'getHelp', 'Canvas');
 			
-			ApplicationParent.extCall("openURL", ca.activity.helpURL + app.module + "#" + ca.activity.toolSignature + app.module + "-" + locale);
+			app.getHelpURL(Proxy.create(this, openHelp, ca));
 		
 		} else {
 			if (ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
-				var callback:Function = Proxy.create(this, openGroupHelp);
+				var callback:Function = Proxy.create(this, openSystemToolHelp, Application.FLASH_TOOLSIGNATURE_GROUP);
 				app.getHelpURL(callback)
-			}else if (ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE){
-				var callback:Function = Proxy.create(this, openGateHelp);
-				app.getHelpURL(callback)
+			} else if (ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE){
+				var callback:Function = Proxy.create(this, openSystemToolHelp, Application.FLASH_TOOLSIGNATURE_GATE);
+				app.getHelpURL(callback);
+			} else if(ca.activity.isBranchingActivity()) {
+				var callback:Function = Proxy.create(this, openSystemToolHelp, Application.FLASH_TOOLSIGNATURE_BRANCHING);
+				app.getHelpURL(callback);
 			}else {
 				LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_helpURL_undefined', [ca.activity.toolDisplayName]));
 			}
 		}
 	}
 	
-	private function openGroupHelp(url:String){
-		var actToolSignature:String = Application.FLASH_TOOLSIGNATURE_GROUP
-		var locale:String = _root.lang + _root.country;
-		var target:String = actToolSignature + app.module + '#' + actToolSignature+ app.module + '-' + locale;
+	private function openHelp(url:String, ca:CanvasActivity){
+		var newURL:String = app.addLocaleToURL(url) + ca.activity.toolSignature;
+		if(newURL != ca.activity.helpURL) ca.activity.helpURL = newURL;
 		
-		ApplicationParent.extCall("openURL", url + target);
+		ApplicationParent.extCall("openURL", newURL + app.module);
 	}
 	
-	private function openGateHelp(url:String){
-		var actToolSignature:String = Application.FLASH_TOOLSIGNATURE_GATE
-		var locale:String = _root.lang + _root.country;
-		var target:String = actToolSignature + app.module + '#' + actToolSignature + app.module + '-' + locale;
-		ApplicationParent.extCall("openURL", url + target);
+	private function openSystemToolHelp(url:String, toolSignature:String){
+		var target:String = toolSignature + app.module;
+		var newURL:String = app.addLocaleToURL(url);
+		
+		ApplicationParent.extCall("openURL", newURL + target);
 	}
 	
 	public function get toolActivityWidth():Number{
