@@ -189,7 +189,7 @@ class ApplicationParent {
 	 * @param url generic help url
 	 */
 	public function openHelp(url:String) {
-		ApplicationParent.extCall("openURL", url + this.module);
+		ApplicationParent.extCall("openURL",  addLocaleToURL(url) + this.module);
 	}
 	
 	 /**
