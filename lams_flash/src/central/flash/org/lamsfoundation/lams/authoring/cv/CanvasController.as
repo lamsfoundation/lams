@@ -447,7 +447,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				   ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || 
 				   ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || 
 				   ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE || 
-				   ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+				   ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || 
+				   ca.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE){
 					if (!_pi.isPIExpanded()){
 						_canvasModel.setPIHeight(_pi.piFullHeight());
 					}
