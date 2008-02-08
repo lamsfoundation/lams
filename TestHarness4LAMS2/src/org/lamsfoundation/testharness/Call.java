@@ -240,10 +240,15 @@ public class Call {
 	}
 
 	private String getAbsoluteURL(String url){
-		if(test.getTestSuite().getHttpPort()!=80)
-			return HTTP+test.getTestSuite().getTargetServer()+COLON+test.getTestSuite().getHttpPort()+test.getTestSuite().getContextRoot()+url;
+		if(url.startsWith(HTTP))
+			return url;
+		
+		String withSlash = url.startsWith("/") ? url : "/" + url;
+		String context = url.startsWith(test.getTestSuite().getContextRoot()) ? "" : test.getTestSuite().getContextRoot();
+		if(test.getTestSuite().getHttpPort()!=80) 
+			return HTTP+test.getTestSuite().getTargetServer()+COLON+test.getTestSuite().getHttpPort()+context+withSlash;
 		else
-			return HTTP+test.getTestSuite().getTargetServer()+test.getTestSuite().getContextRoot()+url;
+			return HTTP+test.getTestSuite().getTargetServer()+context+withSlash;
 	}
 
 	protected static class CallRecord {

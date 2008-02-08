@@ -40,6 +40,7 @@ import org.xml.sax.SAXException;
 import com.allaire.wddx.WddxDeserializationException;
 import com.meterware.httpunit.Button;
 import com.meterware.httpunit.WebForm;
+import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebResponse;
 
 /**
@@ -78,6 +79,14 @@ public class MockLearner extends MockUser implements Runnable {
 	private static final String OPTIONAL_ACTIVITY_FLAG = "selectActivity";
 
 	private static final String ACTIVITY_FINISHED_FLAG = "passon.swf";
+	
+	private static final String FORUM_FINISH_SUBSTRING = "lafrum11/learning/finish.do";
+	private static final String FORUM_VIEW_TOPIC_SUBSTRING = "lafrum11/learning/viewTopic.do";
+	private static final String FORUM_REPLY_SUBSTRING = "lafrum11/learning/newReplyTopic.do";
+	private static final String FORUM_VIEW_FORUM_SUBSTRING = "lafrum11/learning/viewForum.do";
+	
+	private static final String LOAD_TOOL_ACTIVITY_SUBSTRING = "Load Tool Activity";
+	
 	
 	private boolean finished = false;
 
@@ -188,7 +197,6 @@ public class MockLearner extends MockUser implements Runnable {
 	 */
 	private WebResponse takeActivity(String toolURL) {
 		try {
-			delay();
 			WebResponse resp = (WebResponse) new Call(wc, test, "", toolURL).execute();
 			delay();
 			return handleActivity(resp);
@@ -201,6 +209,10 @@ public class MockLearner extends MockUser implements Runnable {
 		if (resp.getFrameNames().length == 2) {
 			return handleParallelActivity(resp);
 		}
+		
+		if ( resp.getText().indexOf("/lams/tool/laqa11/learning.do") != -1 ) 
+			log.debug(resp.getText());
+		
 		WebResponse nextResp;
 		WebForm[] forms = resp.getForms();
 		if ((forms != null) && (forms.length > 0)) {
@@ -209,25 +221,156 @@ public class MockLearner extends MockUser implements Runnable {
 		} else {
 			nextResp = handlePageWithoutForms(resp);
 		}
-		if (isAcitivityFinished(nextResp))
+		if (isActivityFinished(nextResp))
 			return nextResp;
 		else
 			return handleActivity(nextResp);
 
 	}
 
-	private boolean isAcitivityFinished(WebResponse resp) throws IOException {
-		return resp.getText().indexOf(ACTIVITY_FINISHED_FLAG) != -1;
+	private boolean isActivityFinished(WebResponse resp) throws IOException {
+		return resp != null && resp.getText().indexOf(ACTIVITY_FINISHED_FLAG) != -1;
 	}
 
-	private WebResponse handlePageWithoutForms(WebResponse resp) {
-		// TODO implement me
+	private WebResponse handlePageWithoutForms(WebResponse resp) throws SAXException, IOException {
+
+		String asText = resp.getText();
+
+		log.debug(asText);
+		// Is this a Forum activity? 
+		if ( asText.indexOf(FORUM_FINISH_SUBSTRING) != -1 ) 
+			return handleForum(resp);
+		
+		else if ( asText.indexOf(LOAD_TOOL_ACTIVITY_SUBSTRING) != -1 ) 
+			return handleLoadToolActivity(asText);
+
+		else
+			return findAnAbsoluteURLOnPage(asText);
+		
+			
+	}
+	
+	private WebResponse handleLoadToolActivity(String asText) throws SAXException, IOException {
+
+		String toolURL = TestUtil.extractString(asText, NEXT_URL_START_FLAG, NEXT_URL_END_FLAG);
+		return (WebResponse) new Call(wc, test, "Redirect to tool page", toolURL).execute();
+	}
+	
+	private WebResponse findAnAbsoluteURLOnPage(String respAsText) throws SAXException, IOException {
+		// Probably safest to get the last http address on the page, make sure we don't accidently
+		// go to http://www.w3c.org/
+		int index = respAsText.lastIndexOf("\"http");
+		while ( index != -1) {
+			int indexEnd = respAsText.indexOf("\"",index+1);
+			if ( indexEnd != -1 ) {
+				String httpString = respAsText.substring(index+1, indexEnd);
+				if ( httpString.indexOf("www.w3.org") == -1 && ! httpString.endsWith(".js") && ! httpString.endsWith(".css")) {
+					log.debug("Forwarding to discovered link "+httpString);
+					return (WebResponse) new Call(wc, test, "", httpString).execute();
+				}
+			}
+			index = index > 0 ? respAsText.lastIndexOf("\"http",index-1) : -1;
+		}
+		throw new TestHarnessException("Unable to find a link to go to on page"+respAsText);
+	}
+
+	private WebResponse handleForum(WebResponse resp) throws SAXException, IOException {
+
+		WebResponse replyResponse = null;
+
+		String replyURL = findURLInAHREF(resp,FORUM_VIEW_TOPIC_SUBSTRING);
+		if ( replyURL != null ) {
+			log.debug("Accessing the forum view topic screen using "+replyURL);
+			replyResponse = handleForumReply(replyURL);
+		}
+		
+		if ( replyResponse == null ) {
+			throw new TestHarnessException("No links found on the main forum page, or unable to do reply. "+resp.getText());
+		} 
+		
+		String finishURL = findURLInLocationHref(replyResponse, FORUM_FINISH_SUBSTRING);
+		if ( finishURL != null ) {
+			log.debug("Ending forum using url "+finishURL);
+			return (WebResponse) new Call(wc, test, "Finish Forum", finishURL).execute();
+		}
+		
+		throw new TestHarnessException("Unable to finish the forum. No finish link found. "+replyResponse.getText());
+	}
+
+	/**
+	 * @param link
+	 * @return
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	private WebResponse handleForumReply(String url) throws SAXException, IOException {
+		WebResponse resp= (WebResponse) new Call(wc, test, "View Topic Forum", url).execute();
+		String replyURL = findURLInAHREF(resp,FORUM_REPLY_SUBSTRING);
+		if ( replyURL != null ) {
+			resp = (WebResponse) new Call(wc, test, "Reply Topic Forum", replyURL).execute();
+			WebForm[] forms = resp.getForms();
+			if ((forms != null) && (forms.length > 0)) {
+				resp = handlePageWithForms(forms);
+			} else {
+				throw new TestHarnessException("No form found on the reply topic page - unable to do reply. "+resp.getText());
+			}
+		} else {
+			throw new TestHarnessException("No reply URL found - unable to do reply. "+resp.getText());
+		}
+		
+		// now we are back on the topic page, so go back to the main forum page.
+		String returnToForumURL = findURLInLocationHref(resp, FORUM_VIEW_FORUM_SUBSTRING);
+		if ( returnToForumURL != null ) {
+			log.debug("Returning to forum page "+returnToForumURL);
+			return (WebResponse) new Call(wc, test, "Return to Forum", returnToForumURL).execute();
+		}
+		throw new TestHarnessException("No button back to forum page found - stuck while doing reply. "+resp.getText());
+	}
+	
+	
+	private String findURLInAHREF(WebResponse resp, String linkSubstring) throws SAXException {
+		WebLink[] links = resp.getLinks();
+		if ( links != null ) {
+			for ( WebLink link: links) {
+				log.debug("Checking link "+link.getURLString());
+				if ( link.getURLString().indexOf(linkSubstring) != -1 ) 
+					return link.getURLString();
+			}
+		}
+		return null;
+	}
+	
+	private String findURLInLocationHref(WebResponse resp, String linkSubstring) throws SAXException, IOException {
+		String respAsText = resp.getText();
+		String lowercaseRespAsText = respAsText.toLowerCase();
+		int stringLength = lowercaseRespAsText.length();
+		
+		int index = lowercaseRespAsText.indexOf("location.href");
+		while ( index != -1) {
+			index++;
+			while ( index < stringLength && ! ( lowercaseRespAsText.charAt(index) == '\'' || lowercaseRespAsText.charAt(index) == '\"') ) {
+				index++;
+			}
+			if ( index < stringLength - 1 ) {
+				char quote = lowercaseRespAsText.charAt(index);
+				int indexEnd = lowercaseRespAsText.indexOf(quote,index+1);
+				String httpString = respAsText.substring(index+1, indexEnd);
+				log.debug("Discovered link "+httpString);
+				if ( httpString.indexOf(linkSubstring) != -1 ) {
+					log.debug("Matched to "+linkSubstring);
+					return httpString;
+				}
+			}
+			log.debug("Index was "+index);
+			index = index < stringLength && index > 0 ? lowercaseRespAsText.indexOf("location.href",index+1) : -1;
+			log.debug("New index is "+index);
+		}
 		return null;
 	}
 
 	private WebResponse handleParallelActivity(WebResponse resp) {
 		// TODO implement me
-		return null;
+		throw new TestHarnessException("Unable to handle parallel activities.");
 	}
 
 	private WebResponse handlePageWithForms(WebForm[] forms) throws IOException, SAXException {
@@ -272,6 +415,7 @@ public class MockLearner extends MockUser implements Runnable {
 
 	private String[] parseOutNextURLs(WebResponse resp) throws SAXException, IOException {
 		String text = resp.getText();
+		log.debug("Next URLS: "+text);
 		String passonSwfURL = TestUtil.extractString(text, SWF_URL_START_FLAG, SWF_URL_END_FLAG);
 		String toolURL = TestUtil.extractString(text, NEXT_URL_START_FLAG, NEXT_URL_END_FLAG);
 		
@@ -295,15 +439,25 @@ public class MockLearner extends MockUser implements Runnable {
 						String text = composeArbitraryText();
 						form.setParameter(param, text);
 						log.debug(username+ " input " + text + " for form field " + param);
+					} else if (form.isFileParameter(param)) {
+						File file = selectArbitraryFile(((LearnerTest) test).getFilesToUpload());
+						form.setParameter(param, file);
+						log.debug(username + " uploaded file "+ file.getName()+" for form field "+param);
 					} else if (form.isMultiValuedParameter(param)) {
 						String[] values = chooseArbitraryValues(form.getOptionValues(param));
 						form.setParameter(param, values);
 						log.debug(username+" set " + values.length + " value(s) for form field " + param);
 						log.debug(values);
-					} else if (form.isFileParameter(param)) {
-						File file = selectArbitraryFile(((LearnerTest) test).getFilesToUpload());
-						form.setParameter(param, file);
-						log.debug(username + " uploaded file "+ file.getName()+" for form field "+param);
+					} else { 
+						log.debug(param+" may be a radio button. Current value is "+form.getParameterValue(param));
+						if ( form.getParameterValue(param) == null ) {
+							String[] candidateValues = form.getOptionValues(param);
+							if ( candidateValues != null && candidateValues.length > 0 ) {
+									String value = candidateValues[TestUtil.generateRandomIndex(candidateValues.length)];
+									log.debug("Setting param to "+value);
+									form.setParameter(param, value);
+							}
+						} 
 					}
 				}else{
 					log.debug("disabled or hidden or readonly parameter "+param);
@@ -319,6 +473,14 @@ public class MockLearner extends MockUser implements Runnable {
 		return form;
 	}
 	
+	private String processButtons(Button[] buttons) {
+		StringBuffer buf = new StringBuffer(100);
+		for ( Button button : buttons ) {
+			buf.append(button.toString());
+			buf.append("; ");
+		}
+		return buf.toString();
+	}
 	
 	private Map<String, List<Button>> groupButtonsByName(Button[] btns, String buttonType ){
 		log.debug(btns.length);

@@ -24,20 +24,36 @@ Disclaimer :
 
 TODO list:
 
-1. Add support for any kind of activitis. 
+1. Add support for any kind of activities. 
    
    Currently only support activities which consists of pages only with only one 
-   "standard" form whose submit are not triggered by javascript. 
+   "standard" form whose javascript submissions can be tweaked to work even if the 
+   onSubmit method isn't called, and for activities (such as Forum) that have
+   specific coded support for their pages, or for a page with a simple single redirect.
+    
    These activities include:
    
-   1) noticeboard
-   2) grouping
-   3) notebook
-   4) multiple choice
+   * Forum (includes adding a single posting)
+   * Grouping
+   * Multiple Choice - all questions on one page only.
+   * Notebook
+   * Noticeboard
+   * Q and A - all questions on one page only. 
    
-   Not supported are parallel activities and activities which has pages without 
-   forms (such as Share Resources) or forms whose submission are triggered by 
-   javascript or with multiple forms ( such as Chat and Optional)
+   Note: they work for the default content. Changing settings on the advanced tab 
+   may give problems.
+   
+   Not supported:
+   * Parallel activities
+   * Chat, Optional - Multiple forms not supported.   
+   * Share Resources - no form
+   * Scribe is untested
+   * Submit Files - needs custom code to distinguish between upload and finish buttons
+   * Survey
+   * Vote - the javascript submission fails to pass the correct method name. This
+   requires tweaking the pages to set the dispatch method to the appropriate method
+   name by default.
+   
 
 2. Generate formal test report document
 

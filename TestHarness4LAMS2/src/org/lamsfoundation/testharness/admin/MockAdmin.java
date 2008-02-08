@@ -56,7 +56,6 @@ public class MockAdmin extends MockUser {
 
 	private static final String COURSE_FORM_FLAG = "OrganisationForm";
 	private static final String COURSE_NAME = "name";
-	private static final String COURSE_ID_START_FLAG = "orgId=";
 	private static final String COURSE_ID_PATTERN = "%orgId%";
 	private static final String USER_FORM_FLAG = "UserForm";
 	private static final String LOGIN = "login";
@@ -72,6 +71,7 @@ public class MockAdmin extends MockUser {
 	private static final String LEARNER_ROLE = "5";
 	private static final String USER_ID_START_FLAG = "userId=";
 	private static final char USER_ID_END_FLAG = '&';
+	private static final String LOGIN_TAKEN_ERROR ="Login is already taken.";
 	
 
 	public MockAdmin(AbstractTest test, String username, String password, String userId) {
@@ -99,13 +99,8 @@ public class MockAdmin extends MockUser {
 			WebTable table = tables[0];
 			String idAsString = null;
 			for (int i = table.getRowCount()-1; i >= 0; i--){
-				if(table.getCellAsText(i,0).indexOf(courseName)!=-1){//found the organisation created just now
-					TableCell cell = table.getTableCell(i+1,1);
-					WebLink link = cell.getLinks()[0];
-					String cellText = link.getAttribute("href");
-					log.debug(cellText);
-					int startIndex = cellText.indexOf(COURSE_ID_START_FLAG);
-					idAsString = cellText.substring(startIndex+COURSE_ID_START_FLAG.length());
+				if(table.getCellAsText(i,1).indexOf(courseName)!=-1){//found the organisation created just now
+					idAsString = table.getCellAsText(i,0);
 					break;
 				}
 			}
@@ -152,24 +147,27 @@ public class MockAdmin extends MockUser {
 				resp = (WebResponse)new Call(wc, test, username + " submit user creation form",fillForm(resp,0,params)).execute();
 
 				// add the roles
+				if ( resp.getText().indexOf(LOGIN_TAKEN_ERROR)!=-1) {
+					throw new TestHarnessException("Login "+name+" already taken.");
+				}
+				
 				log.info(username+" adding roles to user "+name);
 				params = new HashMap<String, Object>();
 				params.put(ROLES,users[i].roles);
 				resp = (WebResponse)new Call(wc, test, username + " submit user rolesform",fillForm(resp,0,params)).execute();
 				WebTable[] tables = resp.getTables();
-				if((tables==null)||(tables.length==0)){
+				if((tables==null)||(tables.length<2)){
 					log.debug(resp.getText());
 					throw new TestHarnessException(username + " failed to get an user table after submitting user role form");
 				}
 				
-				WebTable table = tables[0];
+				WebTable table = tables[1];
 				String idAsString = null;
 				for(int j = table.getRowCount()-1; j >= 0; j--){
 					log.debug("1:"+table.getCellAsText(j,0));
 					log.debug("4:"+table.getCellAsText(j,4));
-					log.debug("5:"+table.getCellAsText(j,5));
 					if(table.getCellAsText(j,0).indexOf(name)!=-1){
-						TableCell cell = table.getTableCell(j,5);
+						TableCell cell = table.getTableCell(j,4);
 						WebLink link = cell.getLinks()[0];
 						String cellText = link.getAttribute("href");
 						int startIndex = cellText.indexOf(USER_ID_START_FLAG);

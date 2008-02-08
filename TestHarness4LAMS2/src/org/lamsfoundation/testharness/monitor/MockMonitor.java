@@ -84,6 +84,10 @@ public class MockMonitor extends MockUser implements Runnable {
 	public String initLesson(String initLessonURL, String ldId, String userId, String name) {
 		try {
 			delay();
+			if ( userId == null ) {
+				throw new TestHarnessException("User id is missing. If you have set UserCreated (admin properties) to true, then you must set UserId in the monitor properties.");
+			}
+			log.debug("initLessonURL "+initLessonURL+" ldId "+ldId+" userId "+userId+" name "+name);
 			String url = initLessonURL.replace(LDID_PATTERN, ldId).replace(USER_ID_PATTERN, userId).replace(LESSON_NAME_PATTERN, name);
 			WebResponse resp = (WebResponse) new Call(wc, test, "Init Lesson", url).execute();
 			Hashtable hashtable = (Hashtable) TestUtil.deserialize(resp.getText());
