@@ -27,8 +27,15 @@
  	<html:form action="/learner" target="_self" onsubmit="disableFinishButton();" styleId="learnerForm"> 
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="mode" />
-		<input type="hidden" id="methodVar" name="method"">
-  	 
+		<c:choose>
+			<c:when test="${reflectOnActivity}">
+				<input type="hidden" id="methodVar" name="method" value="reflect"/>
+			</c:when>
+			<c:otherwise>
+				<input type="hidden" id="methodVar" name="method" value="finish"/>
+			</c:otherwise>
+		</c:choose>
+		  	 
 		<c:if test="${userFinished and reflectOnActivity}">
 			<div class="small-space-top">
 		    	<h2>${reflectInstructions}</h2>

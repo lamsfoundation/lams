@@ -63,7 +63,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<html:form action="/learning?validate=false"
 			enctype="multipart/form-data" method="POST" target="_self">
-			<html:hidden property="method" />
+			<c:choose>
+				<c:when test="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}">
+					<html:hidden property="method" value="getNextQuestion"/>
+				</c:when>
+				<c:otherwise>
+					<html:hidden property="method" value="submitAnswersContent"/>
+				</c:otherwise>
+			</c:choose>
+				
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
 			<html:hidden property="httpSessionID" />
