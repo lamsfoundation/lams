@@ -35,6 +35,7 @@ public class Portfolio {
     
 	private String exportID; 
     private String exportTmpDir;
+    private String contentFolderID;
     private String lessonName;
     private String lessonDescription;
     private ActivityPortfolio[] activityPortfolios;
@@ -67,18 +68,35 @@ public class Portfolio {
     public void setExportTmpDir(String exportTmpDir) {
         this.exportTmpDir = exportTmpDir;
     }
+    
+    /**
+     * @return Returns the 32-character content folder name.
+     */
+    public String getContentFolderID() {
+        return contentFolderID;
+    }
+    
+    /**
+     * @param contentFolderID The 32-character content folder name to set.
+     */
+    public void setContentFolderID(String contentFolderID) {
+        this.contentFolderID = contentFolderID;
+    }
+    
     public String getNotebookDir() {
     	return notebookDir;
     }
     public void setNotebookDir(String notebookDir) {
     	this.notebookDir = notebookDir;
     }
+    
     /**
      * @return Returns the toolPortfolios.
      */
     public ActivityPortfolio[] getActivityPortfolios() {
         return activityPortfolios;
     }
+    
     /**
      * @param toolPortfolios The toolPortfolios to set.
      */

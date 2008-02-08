@@ -24,10 +24,20 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.export.web.action;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -36,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioConstants;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
@@ -139,13 +150,19 @@ public class MainExportServlet extends HttpServlet {
 			exportService.generateMainPage(request, portfolios, cookies);	
 			
 			if(portfolios.getNotebookPortfolios() != null)
-				if(portfolios.getNotebookPortfolios().length > 0)
+				if(portfolios.getNotebookPortfolios().length > 0) 
 					exportService.generateNotebookPage(request, portfolios, cookies);
-			
+
+			//correct all image links in created htmls.
+			replaceImageFolderLinks(portfolios.getContentFolderID());
 			
 			//bundle the stylesheet with the package
 			CSSBundler bundler = new CSSBundler(request, cookies, exportTmpDir, exportService.getUserThemes());
 			bundler.bundleStylesheet();
+			
+			//bundle all user uploaded content and FCKEditor smileys with the package
+			ImageBundler imageBundler = new ImageBundler(exportTmpDir, portfolios.getContentFolderID());
+			imageBundler.bundleImages();
 			
 			// zip up the contents of the temp export folder using a constant name
 			String exportZipDir = exportService.zipPortfolio(ExportPortfolioConstants.EXPORT_TEMP_FILENAME, exportTmpDir);
@@ -172,6 +189,87 @@ public class MainExportServlet extends HttpServlet {
 		    //redirect the request to another page.
 		}
 		
+	}
+	
+	/**
+	 * Corrects links in all html files in temporary directory and its subdirectories.
+	 * 
+	 * @param contentFolderID 32-character content folder name
+	 */
+	private void replaceImageFolderLinks(String contentFolderID) {
+		File tempDir = new File(exportTmpDir);
+
+		// finds all the html extension files
+		Collection jspFiles = FileUtils.listFiles(tempDir, new String[] { "html" }, true); 
+
+		// iterates thru the collection and sends this 
+		for (Iterator it = jspFiles.iterator(); it.hasNext(); ) {
+		    Object element = it.next();
+		    log.debug("Correcting links in file " + element.toString());
+		    replaceImageFolderLinks(element.toString(), contentFolderID);
+		}
+	}
+	
+    /**
+     * Corrects links in current particular html file.
+     * 
+     * @param filename filename
+     * @param contentFolderID 32-character content folder name
+     */
+    private void replaceImageFolderLinks(String filename, String contentFolderID) {
+		try {
+		    // String to find
+		    String fckeditorpath = "/lams//www/secure/" + contentFolderID;
+		    String fckeditorsmiley = "/lams//fckeditor/editor/images/smiley";
+	
+		    // Replacing string
+		    String newfckeditorpath = "../" + contentFolderID;
+		    String newfckeditorsmiley = "../fckeditor/editor/images/smiley";
+	
+		    File fin = new File(filename);
+		    //Open and input stream
+		    FileInputStream fis = new FileInputStream(fin);
+	
+		    BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+		    
+		    // The pattern matches control characters
+		    Pattern p = Pattern.compile(fckeditorpath);
+		    Matcher m = p.matcher("");
+	
+		    Pattern p2 = Pattern.compile(fckeditorsmiley);
+		    Matcher m2 = p2.matcher("");
+	
+	
+		    String aLine = null;
+		    String output = "";
+		
+		    while((aLine = in.readLine()) != null) {
+		    	m.reset(aLine);
+			
+		    	// Replace the p matching pattern with the newfckeditorpath
+		    	String firstpass = m.replaceAll(newfckeditorpath);
+	
+		    	// Replace the p2 matching patterns with the newfckeditorsmiley
+		    	m2.reset(firstpass);
+		    	String result = m2.replaceAll(newfckeditorsmiley);
+			
+		    	output = output + result + "\n";
+		    }
+		    in.close();
+	
+		    // open output file
+	
+		    File fout = new File(filename);
+		    FileOutputStream fos = 
+			new FileOutputStream(fout);
+		    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(fos));
+		
+		    out.write(output);
+		    out.newLine();
+		    out.close();
+		} catch(IOException e) {
+			log.error("Unable to correct imagefolder links in file " + filename, e);
+		}
 	}
 
 }

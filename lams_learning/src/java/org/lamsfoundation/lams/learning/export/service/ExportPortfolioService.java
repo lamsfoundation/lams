@@ -297,6 +297,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		
 		Portfolio portfolio = new Portfolio(exportID);
 		portfolio.setExportTmpDir(tempDirectoryName);
+		portfolio.setContentFolderID(lesson.getLearningDesign().getContentFolderID());
 		portfolio.setLessonName(lesson.getLessonName());
 		portfolio.setLessonDescription(lesson.getLessonDescription());
 		portfolio.setLessonStartDate(lesson.getStartDateTime());
