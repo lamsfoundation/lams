@@ -308,25 +308,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	}
 	
 	/**
-	 * Assign activityID of Optional activity as a parentID to the ca (canvas activity) 
-	 * Which will draw child activities in Parent Optional Activity.
-	 * @usage   
-	 * @param   parentID (ActivityID of Optional Activity where canavas activity has been dropped.)
-	 * @param   ca       (reference of the canvas activity to which parentID is assigned)
-	 * @return  
-	 */
-	public function addParentToActivity(parentID, ca:Object, doRemoveParent:Boolean){
-		ca.activity.parentUIID = parentID;
-		
-		Debugger.log('ParentId of '+ca.activity.activityUIID+ ' ==> '+ca.activity.parentUIID,Debugger.GEN,'addParentToActivity','CanvasModel');
-		
-		removeActivity(ca.activity.activityUIID);
-		if(doRemoveParent) removeActivity(parentID);
-		
-		setDirty();
-	}
-	
-	/**
 	 * Removes the activity from the Canvas Model
 	 * @usage   
 	 * @param   activityUIID 
@@ -521,33 +502,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			}
 			
 			_cv.removeActivity(children[k].activityUIID);
-		}
-	}
-	
-	
-	public function removeActivity(activityUIID):Object{
-		//dispatch an event to show the design  has changed
-		
-		var r:Object = _activitiesDisplayed.remove(activityUIID);
-		if(r==null){
-			return new LFError("Removing activity failed:"+activityUIID,"removeActivity",this,null);
-		}else{
-			Debugger.log('Removed:'+r.activityUIID,Debugger.GEN,'removeActivity','DesignDataModel');
-			r.removeMovieClip();
-		}
-	}
-	
-	public function removeActivityOnBin(activityUIID):Object{
-		//dispatch an event to show the design  has changed
-				
-		var r:Object = _activitiesDisplayed.remove(activityUIID);
-		if(r==null){
-			return new LFError("Removing activity failed:"+activityUIID,"removeActivity",this,null);
-		}else{
-			Debugger.log('Removed:'+r.activityUIID,Debugger.GEN,'removeActivity','DesignDataModel');
-				
-			r.removeMovieClip();
-			_cv.removeActivity(activityUIID);
 		}
 	}
 	
