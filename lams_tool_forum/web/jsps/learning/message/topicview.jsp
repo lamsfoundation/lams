@@ -29,7 +29,7 @@
 						</c:if>
 						${author}						
 								-
-						<lams:Date value="${msgDto.message.created}" />
+						<lams:Date value="${msgDto.message.updated}" />
 					</c:if>
 				</td>
 			</tr>

@@ -643,6 +643,8 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 				if(!msg.getIsAuthored())
 					continue;
 				msg.setReplyNumber(0);
+				msg.setCreated(new Date());
+				msg.setUpdated(new Date());
 				msg.setLastReplyDate(new Date());
 				msg.setHideFlag(false);
 				msg.setForum(toContent);
