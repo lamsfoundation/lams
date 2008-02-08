@@ -81,14 +81,14 @@
 		<!-- MODULE-SPECIFIC ELEMENTS -->	
 
 				<setting-element name="dbUrl" 
-								 label="Database Server Host" 
+								 label="Database JDBC Url" 
 								 data-type="String" 
 								 presentation-type="TextField" 
 								 inheritable="true" 
 								 optional="false" 
 								 read-only="false" 
 								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
-								 default-value="@dbUrl@" />
+								 default-value="jdbc:mysql://localhost:3306/lams?characterEncoding=utf8" />
 
 				<setting-element name="dbDriver" 
 								 label="Database driver jar" 
@@ -98,7 +98,7 @@
 								 optional="false" 
 								 read-only="false"
 								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
-								 default-value="@dbDriver@" />
+								 default-value="com.mysql.jdbc.Driver" />
  
 				<setting-element name="dbTable" 
 								 label="Database table name" 
@@ -108,7 +108,7 @@
 								 optional="false" 
 								 read-only="false"
 								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
-								 default-value="@dbTable@" />
+								 default-value="webct_lams_lesson" />
 
 				<setting-element name="dbUser" 
 								 label="Database User" 
@@ -118,17 +118,17 @@
 								 optional="false" 
 								 read-only="false" 
 								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
-								 default-value="@dbUser@" />
+								 default-value="webct_lams_user" />
 				
 				<setting-element name="dbPass" 
-								 label="Database Password" 
+								 label="Database User Password" 
 								 data-type="String" 
 								 presentation-type="Password" 
 								 inheritable="true" 
 								 optional="false" 
 								 read-only="false"
 								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
-								 default-value="@dbPass@" />
+								 default-value="" />
 
 				<setting-element name="lamsServerUrl" 
 								 label="LAMS Server URL" 
@@ -138,7 +138,7 @@
 								 optional="false" 
 								 read-only="false" 
 								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
-								 default-value="@lamsServerUrl@" />
+								 default-value="http://localhost:8080/lams/" />
 
 				
 				<setting-element name="serverId" 
@@ -149,7 +149,7 @@
 								 optional="false" 
 								 read-only="false" 
 								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
-								 default-value="@serverId@" />
+								 default-value="webctlams" />
 								 
 				<setting-element name="secretKey" 
 								 label="LAMS Server Secret Key" 
@@ -159,7 +159,7 @@
 								 optional="false" 
 								 read-only="false" 
 								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
-								 default-value="@secretKey@" />
+								 default-value="" />
 								 
 								 
 				<setting-element name="webctRequestSource" 
@@ -170,7 +170,7 @@
 								 optional="false" 
 								 read-only="false"
 								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
-								 default-value="@reqSrc@" />
+								 default-value="Blackboard CE" />
 								 
 				<setting-element name="imagesUrl" 
 								 label="Images Url" 
@@ -180,7 +180,7 @@
 								 optional="false" 
 								 read-only="false"
 								 not-applicable-lc-types="Division;Domain;Campus;Course;Section"
-								 default-value="@imgUrl@" />
+								 default-value="http://localhost:8080/lams/images/treeicons/" />
 							 
 				<setting-element name="authorRoles" 
 								 label="LAMS Author Roles" 

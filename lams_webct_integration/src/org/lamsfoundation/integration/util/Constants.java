@@ -46,7 +46,7 @@ public class Constants {
     public static final String PARAM_LEARNING_SESSION_ID = "lsid";
     public static final String PARAM_LEARNING_DESIGN_ID = "ldid";
     public static final String PARAM_COURSE_ID = "course_id";
-
+    public static final String PARAM_IMG_URL = "imgUrl";
     
     public static final String SERVLET_LOGIN_REQUEST = "/lams/LoginRequest";
     public static final String SERVLET_ACTION_REQUEST = "/LamsActionRequest";
@@ -75,5 +75,6 @@ public class Constants {
 	public static final String SETTING_DB_URL = "dbUrl";
 	public static final String SETTING_DB_DRIVER = "dbDriver";
 	public static final String SETTING_DB_TABLE = "dbTable";
+	public static final String SETTING_IMG_URL = "imagesUrl";
     
 }

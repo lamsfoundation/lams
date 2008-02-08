@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS webct_lams_lesson;
-CREATE TABLE webct_lams_lesson
+DROP TABLE IF EXISTS ${dbTable};
+CREATE TABLE ${dbTable}
 (
 	id bigint NOT NULL auto_increment,
 	pt_id bigint NOT NULL,
@@ -18,5 +18,5 @@ CREATE TABLE webct_lams_lesson
   PRIMARY KEY (id),
   UNIQUE KEY (lesson_id)
 );
-CREATE UNIQUE INDEX webct_lams_lesson_lesson_id ON webct_lams_lesson (lesson_id ASC, pt_id ASC);
+CREATE UNIQUE INDEX ${dbTable}_lesson_id ON ${dbTable} (lesson_id ASC, pt_id ASC);
 COMMIT;

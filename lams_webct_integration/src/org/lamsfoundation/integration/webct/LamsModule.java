@@ -67,7 +67,7 @@ import org.lamsfoundation.integration.util.Constants;
 public class LamsModule extends AuthenticationModule
 {	
     
-	public static final String VERSION = "1.0.0";
+	public static final String VERSION = "1.0.1";
 	public static final String JARSTR = "lams2-webct-integration-" + VERSION + ".jar";
 
     private HttpServletRequest request = null;
@@ -263,6 +263,8 @@ public class LamsModule extends AuthenticationModule
         {
         	// goto create lesson form
         	try {
+        		
+        		params.put("imgUrl", (String)settings.get(Constants.SETTING_IMG_URL));
         		
         		// prefilling the start time variable
         		Calendar cal = Calendar.getInstance();
@@ -512,7 +514,7 @@ public class LamsModule extends AuthenticationModule
 	        	params.put("lsID", request.getParameter("lsID"));
 	        	params.put("title", modLesson.getTitle());
 	        	params.put("description", modLesson.getDescription());
-	        	
+
 	        	
 	        	if (modLesson.getStartTimestamp()!=null)
 	        	{

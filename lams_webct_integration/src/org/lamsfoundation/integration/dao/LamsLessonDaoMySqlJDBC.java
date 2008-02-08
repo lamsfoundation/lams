@@ -77,6 +77,7 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 		this.dbPass = (String)settings.get(Constants.SETTING_DB_PASS);
 		this.dbDriver = (String)settings.get(Constants.SETTING_DB_DRIVER);
 		this.dbTable = (String)settings.get(Constants.SETTING_DB_TABLE);
+		
 	}
 
 	/**
@@ -95,11 +96,6 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 	public Connection getConnection()
 	{
 	
-		//DriverManager.registerDriver(new SQLServerDriver());
-		//DriverManager.registerDriver(new Driver());
-		//Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPass);
-		//return connection;
-		
 		Connection conn = null;
 		try{
 			Class.forName(dbDriver).newInstance();
@@ -113,15 +109,7 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 		
 		
 		return conn;
-		/*
-		Driver driver = new Driver();
-		driver..setURL(dbUrl);
-		driver.setUser(dbUser);
-		driver.setPassword(dbPass);
-		//ds.setPortNumber(Integer.parseInt(dbPort)); 
-		//ds.setDatabaseName(dbName);
-		return ds.getConnection();
-		*/
+
 		
 	}
 	
@@ -277,27 +265,7 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 		
 		String startTimeStamp = convertTimestamp(lesson.getStartTimestamp());
 		String endTimeStamp = convertTimestamp(lesson.getEndTimestamp());
-		/*
-		String startTimeStamp = "null";
-		if (lesson.getStartTimestamp()!=null)
-		{
-			startTimeStamp = "\'" +lesson.getStartTimestamp();
-			startTimeStamp = startTimeStamp.replaceAll("-", "") + "\'";
-		}
-			
-		String endTimeStamp = "null";
-		if (lesson.getEndTimestamp()!=null)
-		{	
-			endTimeStamp = "\'" + lesson.getEndTimestamp();
-			endTimeStamp = endTimeStamp.replaceAll("-", "") + "\'";
-		}
-		(
-		*/
-		
-		//System.out.println("START: " +startTimeStamp);
-		//System.out.println("END: " +endTimeStamp);
-		
-		
+
 		try
 		{
 			connection = getConnection();
@@ -368,22 +336,6 @@ public class LamsLessonDaoMySqlJDBC implements ILamsLessonDao{
 			
 			String startTimeStamp = convertTimestamp(lesson.getStartTimestamp());
 			String endTimeStamp = convertTimestamp(lesson.getEndTimestamp());
-			/*
-			String startTimeStamp = "null";
-			if (lesson.getStartTimestamp()!=null)
-			{
-				startTimeStamp = "\'" +lesson.getStartTimestamp();
-				startTimeStamp = startTimeStamp.replaceAll("-", "") + "\'";
-			}
-				
-			String endTimeStamp = "null";
-			if (lesson.getEndTimestamp()!=null)
-			{	
-				endTimeStamp = "\'" + lesson.getEndTimestamp();
-				endTimeStamp = endTimeStamp.replaceAll("-", "") + "\'";
-			}
-			(
-			*/
 			
 			String update="UPDATE " +dbTable+
 					" SET pt_id = " +lesson.getPtId()+

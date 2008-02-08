@@ -5,7 +5,7 @@
 	<property file="db/conf/${dbType}.properties" />
 	<property name="project" value="BlackboardPlugin"/>
 	<property name="product" value="lams2-webct-integration"/>
-	<property name="version" value="1.0.0"/>
+	<property name="version" value="1.0.1"/>
 	
 	
 
@@ -32,9 +32,7 @@
 	<property name="jarfile" value="${build}/${jar}"/>
 	
 	<property name="package.dir" value="${package}/${product}-${version}/"/>
-	<property name="package.db" value="${package.dir}/db/"/>
-	<property name="package.deploy" value="${package.dir}/deploy/"/>
-	<property name="package.lib" value="${package.dir}/lib"/>
+
 	
 	<path id="project.classpath">
 		<!-- If Eclipse is not used, this should be ${build.classes} -->
@@ -162,18 +160,14 @@
 	<target name="create-install-package" depends="package" description="creates jar file">
 		
 		<delete includeEmptyDirs="true" quiet="true">
-			<fileset dir="${package.lib}"/>
-			<fileset dir="${package.deploy}"/>
-			<fileset dir="${package.db}"/>
+			<fileset dir="${package.dir}"/>
 		</delete>
 		
 		
 		<mkdir dir="${package.dir}"/>
-		<mkdir dir="${package.lib}"/>
-		<mkdir dir="${package.deploy}"/>
-		<mkdir dir="${package.db}"/>
+		<mkdir dir="${package.dir}/lams2"/>
 		
-		<copy todir="${package.lib}" overwrite="false">
+		<copy todir="${package.dir}/lams2" overwrite="true">
    			<fileset dir="${lib}">
    				<include name="commons-codec-1.3.jar" />
    				<include name="authmoduledata_ce_1.4.jar" />
@@ -182,31 +176,27 @@
    			</fileset>
 		</copy>
 		
-		<copy todir="${package.db}" overwrite="false">
-   			<fileset dir="db" />
-   				
+		<copy todir="${package.dir}/lams2" overwrite="true">
+   			<fileset dir="${build}">
+   				<include name="${jar}" />
+   			</fileset>
 		</copy>
-
-		<copy todir="${package.deploy}" overwrite="true">
-			<fileset dir="${build}">
-				<exclude name="lib" />
-				<exclude name="DeployableComponentConfig.xml" />
-				<exclude name="${jar}" />
-				<exclude name="CVS" />
+		
+		<copy todir="${package.dir}" overwrite="true">
+   			<fileset dir="${basedir}" >
+   				<include name="license.txt" />
+   				<include name="readme.txt" />
+   				<include name="release_notes.txt" />
 			</fileset>
 		</copy>
 		
 		<copy todir="${package.dir}" overwrite="true">
-			<fileset dir="${basedir}">
-				<include name="readme.txt" />
-				<include name="license.txt" />
-				<include name="release_notes.txt" />
-			</fileset>
-			<fileset dir="${basedir}/web/lib/tigra">
-				<include name="tree_tpl.js" />
+   			<fileset dir="${basedir}/db/sql/" >
+   				<include name="createTable_MySql.sql" />
 			</fileset>
 		</copy>
-		
+
+
 		<zip destfile="${package}/${product}-${version}.zip"
 		       basedir="${package.dir}"
 		       excludes="CVS"

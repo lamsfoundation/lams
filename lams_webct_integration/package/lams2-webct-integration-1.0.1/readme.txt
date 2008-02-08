@@ -14,7 +14,6 @@ Contents
 3. Installation
 4. Configuring WebCt Side
 5. Configuring LAMS Side
-6. Using the LAMS logo for the LAMS Link
 
 
 1. REQUIREMENTS
@@ -125,12 +124,4 @@ Installation of Powerlink
    8. The 'disabled' checkbox disables this integration, you can select this later if you wish to disable the connection.
    9. The User Information URL is arbitrary for LAMS/Blackboard CE integrations, so put a dummy URL in.
   10. You can specify a timeout page that LAMS will go to if there is an error.
-  
-  
-6. Using the LAMS logo for the LAMS Link
-========================================
-
-Any time you add a link to your WebCT homepage, you can specify an image to use for the link.
-
-The LAMS_logo.jpg is included with the package, and is suggested to be used for this purpose.
 
