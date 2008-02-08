@@ -1015,8 +1015,14 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	private function hasConnectedSequences(s:Array):Boolean {
-		for(var i=0; i<s.length; i++)
-			if(SequenceActivity(s[i]).firstActivityUIID != null) return true;
+		for(var i=0; i<s.length; i++) {
+			var seqAct:SequenceActivity = SequenceActivity(s[i]);
+			
+			if(seqAct.firstActivityUIID != null)
+				return true;
+			else if(seqAct.empty && !seqAct.isDefault)
+				return true;
+		}
 		
 		return false;
 	}
@@ -1028,6 +1034,8 @@ class PropertyInspectorControls extends MovieClip {
 		if(!v) { _tool_output_match_btn.visible = false; _conditions_setup_btn.visible = false; return; }
 		
 		var sequences:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
+		
+		Debugger.log("has connected seq: " + hasConnectedSequences(sequences), Debugger.CRITICAL, "showToolBasedBranchingControls", "PIC*");
 		
 		if(hasConnectedSequences(sequences)) {
 			if(_canvasModel.selectedItem.activity.toolActivityUIID != null) {
@@ -1191,9 +1199,16 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	private function getValidBranches(branches:Array):Array {
+		Debugger.log("validating br len: " + branches.length, Debugger.CRITICAL, "getvalidbranches", "PIC*");
+		
 		for(var i=0; i < branches.length; i++) {
-			if(branches[i].direction != BranchConnector.DIR_FROM_START)
+			Debugger.log("validating br: " + branches[i].sequenceActivity.title, Debugger.CRITICAL, "getvalidbranches", "PIC*");
+			Debugger.log("validating br dir: " + branches[i].direction, Debugger.CRITICAL, "getvalidbranches", "PIC*");
+			
+			if(branches[i].direction != BranchConnector.DIR_FROM_START && branches[i].direction != BranchConnector.DIR_SINGLE) {
 				branches.splice(i, 1);
+				i=i-1;
+			}
 		}
 		
 		return branches;
