@@ -1281,7 +1281,10 @@ class PropertyInspectorControls extends MovieClip {
 		else if (_canvasModel.selectedItem.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE)
 			_canvasModel.selectedItem.updateChildren();
 		else if(_canvasModel.selectedItem instanceof BranchConnector) {
-			_canvasModel.selectedItem.updateBranchLabel();
+			if(_canvasModel.selectedItem.branch.isEnd)
+				_canvasModel.branchesDisplayed.get(_canvasModel.getCanvas().ddm.getBranchesForActivityUIID(SequenceActivity(_canvasModel.selectedItem.branch.sequenceActivity).firstActivityUIID).target.branchUIID).updateBranchLabel();
+			else
+				_canvasModel.selectedItem.updateBranchLabel();
 		}
 		
 		setModified();

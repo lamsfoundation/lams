@@ -133,7 +133,9 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 	}
 	
 	public function updateBranchLabel():Void {
-		branchLabel = _branch.sequenceActivity.title;
+		if(branchLabel != null)
+			branchLabel = _branch.sequenceActivity.title;
+		
 	}
 	
 	public function set branchLabel(a:String):Void {

@@ -832,14 +832,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			b.sequenceActivity.isDefault = false;
 			
 			var sequences:Array = _cv.ddm.getComplexActivityChildren(sequence.parentUIID);
-			b.sequenceActivity.orderID = sequences.length;
-			b.setDefaultSequenceName();
+			//b.sequenceActivity.orderID = sequences.length;
+			//b.setDefaultSequenceName();
 			
-			Debugger.log("sequences length (order id): " + sequences.length, Debugger.CRITICAL, "createBranchStartConnector", "CanvasModel");
+			sequences.sortOn("orderID", Array.NUMERIC);
+			var orderID:Number = (sequences.length > 0) ? sequences[sequences.length-1].orderID : 0;
 			
-			var orderID:Number = sequences.length+1;
+			Debugger.log("sequences length (order id): " + orderID, Debugger.CRITICAL, "createBranchStartConnector", "CanvasModel");
 			
-			createNewSequenceActivity(activeView.activity, orderID, null, true);
+			createNewSequenceActivity(activeView.activity, orderID+1, null, true);
+			
 			return b;
 		}
 	}
@@ -883,13 +885,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		var sequences:Array = _cv.ddm.getComplexActivityChildren(b.sequenceActivity.parentUIID);
 		
 		SequenceActivity(b.sequenceActivity).isDefault = false;
-		b.sequenceActivity.orderID = sequences.length;
-		b.setDefaultSequenceName();
+		//b.sequenceActivity.orderID = sequences.length;
+		//b.setDefaultSequenceName();
 			
-		Debugger.log("sequence: " + b.sequenceActivity.activityUIID, Debugger.CRITICAL, "createActivitylessBranch", "CanvasModel");
-		Debugger.log("isDefault: " + b.sequenceActivity.isDefault, Debugger.CRITICAL, "createActivitylessBranch", "CanvasModel");
+		sequences.sortOn("orderID", Array.NUMERIC);
+		var orderID:Number = (sequences.length > 0) ? sequences[sequences.length-1].orderID : 0;
 		
-		createNewSequenceActivity(activeView.activity, sequences.length+1, null, true);
+		Debugger.log("orderID: " + orderID, Debugger.CRITICAL, "createActivitylessBranch", "CanvasModel");
+			
+		createNewSequenceActivity(activeView.activity, orderID+1, null, true);
 			
 		return b;
 	}
