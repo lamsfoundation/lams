@@ -16,7 +16,7 @@
 			
 			function verifyFilenameLength() {
 				if (document.getElementById("UPLOAD_FILE").value.length == 0)	{
-					var msg = "<fmt:message key="title.import.error"/>";
+					var msg = "<fmt:message key="button.select.importfile"/>";
 					alert(msg);
 					return (false);
 				}
