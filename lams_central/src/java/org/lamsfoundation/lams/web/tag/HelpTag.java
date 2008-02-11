@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.web.filter.LocaleFilter;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.HelpUtil;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -55,10 +56,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Fiona Malikoff
  */
 public class HelpTag extends TagSupport {
-
-    private static final String LAMSFOUNDATION_TEXT = "lamsfoundation";
-    private static final String LAMSDOCS = "lamsdocs";
-    private static final String ENGLISH_LANGUAGE = "en";
 
 	private static final Logger log = Logger.getLogger(HelpTag.class);
 	private String module = null;
@@ -75,8 +72,6 @@ public class HelpTag extends TagSupport {
 	
 	public int doStartTag() throws JspException {
 		try {
-		    String helpURL = null;
-		    String fullURL = null;
 		    
         	JspWriter writer = pageContext.getOut();
         	if (StringUtils.equals(style, "no-tabs")) {
@@ -86,27 +81,27 @@ public class HelpTag extends TagSupport {
         	}
         	try {
         		
+        		HttpSession session = ((HttpServletRequest) this.pageContext.getRequest()).getSession();
+        		Locale locale = (Locale) session.getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
+        		String languageCode = locale != null ? locale.getLanguage() : "";
+        		
         		if(toolSignature != null && module != null) {
+        			
 	        		// retrieve help URL for tool
 		        	ILamsToolService toolService = (ILamsToolService) getContext().getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
 					IToolVO tool = toolService.getToolBySignature(toolSignature);
+
+					String fullURL = HelpUtil.constructToolURL(tool.getHelpUrl(), toolSignature, module, languageCode );
 					
-					helpURL = tool.getHelpUrl();
-					
-					if(helpURL == null)
+					if(fullURL == null)
 						return SKIP_BODY;
-					
-					// construct link
-					helpURL = addLanguageToURL(helpURL);
-				    fullURL = helpURL + module + "#" + toolSignature + module;
 					
 					writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.jpg\" border=\"0\" width=\"25\" height=\"25\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
 
 	        	
 	        	} else if(page != null){
 	        		
-	        		helpURL =  addLanguageToURL(Configuration.get(ConfigurationKeys.HELP_URL));
-	        		fullURL = helpURL+page;
+	        		String fullURL = HelpUtil.constructPageURL(page, languageCode);
 
 	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.jpg\" border=\"0\" width=\"25\" height=\"25\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
 
@@ -129,22 +124,6 @@ public class HelpTag extends TagSupport {
     	return SKIP_BODY;
 	}
 
-	private String addLanguageToURL(String helpURL) {
-
-		HttpSession session = ((HttpServletRequest) this.pageContext.getRequest()).getSession();
-		Locale locale = (Locale) session.getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
-	    if ( locale != null ) {
-		    String language = locale.getLanguage();
-		    
-		    if ( ! ENGLISH_LANGUAGE.equals(language) && helpURL.indexOf(LAMSFOUNDATION_TEXT) != -1 ) {
-		    	// points to the LAMS Foundation site, so add the language to the path.
-		    	return helpURL.replace(LAMSDOCS, LAMSDOCS+language);
-		    }
-	    }
-
-	    return helpURL;
-	}
-	
 	public int doEndTag() {
 		return EVAL_PAGE;
 	}

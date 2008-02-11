@@ -70,7 +70,7 @@ public class TestLearningDesignDAO extends AbstractCommonTestCase {
 	}
 	public void testGetLearningDesignDTO() throws Exception{
 		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
-		LearningDesignDTO learningDesignDTO = new LearningDesignDTO(learningDesign,activityDAO,groupingDAO);		
+		LearningDesignDTO learningDesignDTO = new LearningDesignDTO(learningDesign,activityDAO,groupingDAO,"en");		
 		String str = WDDXProcessor.serialize(learningDesignDTO);
 		System.out.println(str);		
 	}	

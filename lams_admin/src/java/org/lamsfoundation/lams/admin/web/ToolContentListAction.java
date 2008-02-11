@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -40,6 +41,9 @@ import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -57,6 +61,12 @@ public class ToolContentListAction extends Action {
 	
 	//private static Logger log = Logger.getLogger(ToolContentListAction.class);
 	
+	private String getUserLanguage() {
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		return user != null ? user.getLocaleLanguage() : "";
+	}
+
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -73,7 +83,7 @@ public class ToolContentListAction extends Action {
 		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 		ILearningDesignService learningDesignService = (ILearningDesignService)ctx.getBean("learningDesignService");
 		
-		List learningLibraryDTOs = learningDesignService.getAllLearningLibraryDetails();
+		List learningLibraryDTOs = learningDesignService.getAllLearningLibraryDetails(getUserLanguage());
 		
 		ArrayList<LibraryActivityDTO> activeTools = filterActiveTools(learningLibraryDTOs);
 		request.setAttribute("activeTools", activeTools);

@@ -148,7 +148,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.transitions = new ArrayList();
 		this.branchMappings = new ArrayList();
 	}	
-	public LearningDesignDTO(LearningDesign learningDesign, ActivityDAO activityDAO, GroupingDAO groupingDAO){
+	public LearningDesignDTO(LearningDesign learningDesign, ActivityDAO activityDAO, GroupingDAO groupingDAO, String languageCode){
 		this.learningDesignID = learningDesign.getLearningDesignId();
 		this.learningDesignUIID = learningDesign.getLearningDesignUIID();
 		this.description = learningDesign.getDescription();
@@ -204,7 +204,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.lastModifiedDateTime = learningDesign.getLastModifiedDateTime();
 		this.branchMappings = new ArrayList(); // data will be set up by populateGroupings
 		this.groupings = populateGroupings(learningDesign,groupingDAO);
-		this.activities = populateActivities(learningDesign);
+		this.activities = populateActivities(learningDesign, languageCode);
 		this.transitions = populateTransitions(learningDesign);
 		
 	}
@@ -416,7 +416,7 @@ public class LearningDesignDTO extends BaseDTO{
 	    return groupingList;
 	}
 
-	public ArrayList populateActivities(LearningDesign design) {
+	public ArrayList populateActivities(LearningDesign design, String languageCode) {
 		//ArrayList childActivities = null;
 		//To use sorted set again: in getAuthoringActivityDTOSet() it will already be sorted, here is just double warranty
 		Set<AuthoringActivityDTO> dtoSet = new TreeSet<AuthoringActivityDTO>(new ActivityDTOOrderComparator());
@@ -426,7 +426,7 @@ public class LearningDesignDTO extends BaseDTO{
 			//getAuthoringActivityDTOSet() method will:
 			//for complex activity: It already populate its children activities.
 			//for other activity: only get itself DTO object.
-			dtoSet.addAll(object.getAuthoringActivityDTOSet(branchMappings));
+			dtoSet.addAll(object.getAuthoringActivityDTOSet(branchMappings, languageCode));
 		}		
 		return new ArrayList<AuthoringActivityDTO>(dtoSet);
 	}	

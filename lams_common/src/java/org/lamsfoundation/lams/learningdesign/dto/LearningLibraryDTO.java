@@ -65,23 +65,23 @@ public class LearningLibraryDTO extends BaseDTO {
 	} 
 	
 	
-	public LearningLibraryDTO(LearningLibrary learningLibrary){
+	public LearningLibraryDTO(LearningLibrary learningLibrary, String languageCode){
 		this.learningLibraryID = learningLibrary.getLearningLibraryId();
 		this.description = learningLibrary.getDescription();
 		this.title = learningLibrary.getTitle();
 		this.validFlag = learningLibrary.getValidLibrary();
 		this.createDateTime = learningLibrary.getCreateDateTime();
-		this.templateActivities = populateActivities(learningLibrary.getActivities().iterator());
+		this.templateActivities = populateActivities(learningLibrary.getActivities().iterator(), languageCode);
 	}
 	
-	public LearningLibraryDTO(LearningLibrary learningLibrary, List templateActivity)
+	public LearningLibraryDTO(LearningLibrary learningLibrary, List templateActivity, String languageCode)
 	{
 		this.learningLibraryID = learningLibrary.getLearningLibraryId();
 		this.description = learningLibrary.getDescription();
 		this.title = learningLibrary.getTitle();
 		this.validFlag = learningLibrary.getValidLibrary();	
 		this.createDateTime = learningLibrary.getCreateDateTime();
-		this.templateActivities = populateActivities(templateActivity.iterator());
+		this.templateActivities = populateActivities(templateActivity.iterator(), languageCode);
 	}
 	
 	
@@ -127,7 +127,7 @@ public class LearningLibraryDTO extends BaseDTO {
 	}
 	*/
 	
-	public Vector populateActivities(Iterator iterator)
+	public Vector populateActivities(Iterator iterator, String languageCode)
 	{
 	    Vector activities = new Vector();
 	    Vector childActivities = null;
@@ -140,12 +140,12 @@ public class LearningLibraryDTO extends BaseDTO {
 				childActivities = new Vector();
 				while(childIterator.hasNext()){
 					Activity activity =(Activity)childIterator.next();
-					childActivities.add(activity.getLibraryActivityDTO());					
+					childActivities.add(activity.getLibraryActivityDTO(languageCode));					
 				}				
-				activities.add(complexActivity.getLibraryActivityDTO());
+				activities.add(complexActivity.getLibraryActivityDTO(languageCode));
 				activities.addAll(childActivities);
 			}else{
-				activities.add(object.getLibraryActivityDTO());
+				activities.add(object.getLibraryActivityDTO(languageCode));
 			}			
 		}
 		return activities;

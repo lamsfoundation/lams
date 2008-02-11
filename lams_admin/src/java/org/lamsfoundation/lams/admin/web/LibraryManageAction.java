@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.Action;
@@ -17,8 +18,11 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -40,7 +44,13 @@ public class LibraryManageAction extends Action {
 	public static final String PARAM_LIBRARY_ID = "libraryID";
 	public static final String PARAM_ACTION = "action";
 	public static final String ERROR_MSG_NO_PRIVILEDGE = "error.no.sysadmin.priviledge";
-	
+
+	private String getUserLanguage() {
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		return user != null ? user.getLocaleLanguage() : "";
+	}
+
 	/**
 	 * Entry of STRUST action
 	 */
@@ -62,7 +72,7 @@ public class LibraryManageAction extends Action {
 		// ---------------------------
 		// Display all libraries
 		ILearningDesignService ldService = getLearningDesignService();
-		List<LearningLibraryDTO> lds = ldService.getAllLearningLibraryDetails(false);
+		List<LearningLibraryDTO> lds = ldService.getAllLearningLibraryDetails(false, getUserLanguage());
 		
 		//handle multiple activities library: only left on activity which has learning_libarayIid populated
 		for (LearningLibraryDTO libraryDTO : lds) {

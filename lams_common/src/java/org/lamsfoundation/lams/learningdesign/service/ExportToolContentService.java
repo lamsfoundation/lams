@@ -434,7 +434,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			// get learning desing and serialize it to XML file. Update the version to reflect the 
 			// version now, rather than the version when it was saved.
 			ILearningDesignService service =  getLearningDesignService();
-			LearningDesignDTO ldDto = service.getLearningDesignDTO(learningDesignId);
+			LearningDesignDTO ldDto = service.getLearningDesignDTO(learningDesignId, "");
 			ldDto.setVersion(Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER));
 			
 			if(format == PACKAGE_FORMAT_IMS)

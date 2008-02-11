@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.learningdesign.SystemGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.util.HelpUtil;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 /**
  * @author Manpreet Minhas
@@ -234,11 +235,13 @@ public class AuthoringActivityDTO extends BaseDTO{
 	private Integer endXCoord;
 	private Integer endYCoord;
 	
-
+	/** Used for I18N the URLS. Does not need to be sent to clients, so no getter exists. */
+	private String languageCode; 
+	
 	/*****************************************************************************
 	 * Constructors
 	 *****************************************************************************/
-	public AuthoringActivityDTO(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings){
+	public AuthoringActivityDTO(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings, String languageCode){
 		this.activityID = activity.getActivityId();
 		this.activityUIID = activity.getActivityUIID();
 		this.description = activity.getDescription();
@@ -282,6 +285,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.inputActivities = activity.getInputActivityUIIDs();
 		this.toolActivityUIID = activity.getToolInputActivityUIID();
 
+		this.languageCode = languageCode;
+		
 		processActivityType(activity, branchMappings);
 	}
 	
@@ -355,10 +360,12 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.monitoringURL = toolActivity.getTool().getMonitorUrl();
 		this.contributeURL = toolActivity.getTool().getContributeUrl();
 		this.moderationURL = toolActivity.getTool().getModerationUrl();
-		this.helpURL = toolActivity.getTool().getHelpUrl();
 		this.adminURL = toolActivity.getTool().getAdminUrl();
 		this.toolDisplayName = toolActivity.getTool().getToolDisplayName();
 		this.toolVersion = toolActivity.getTool().getToolVersion();
+		
+		this.helpURL = HelpUtil.constructToolURL(toolActivity.getTool().getHelpUrl(), toolSignature, "", languageCode);
+
 	}
 	private void addGateActivityAttributes(Object activity){
 		if(activity instanceof SynchGateActivity)

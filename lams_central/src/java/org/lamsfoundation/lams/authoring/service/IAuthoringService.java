@@ -133,7 +133,7 @@ public interface IAuthoringService {
 	 * @return String The requested LearningDesign in WDDX format
 	 * @throws Exception
 	 */
-	public String getLearningDesignDetails(Long learningDesignID)throws IOException;
+	public String getLearningDesignDetails(Long learningDesignID, String languageCode)throws IOException;
 	
 	/**
 	 * This method saves a new Learning Design to the database.
@@ -166,7 +166,7 @@ public interface IAuthoringService {
 	 * @param learningDesignId
 	 * @return
 	 */
-	public Vector<AuthoringActivityDTO> getToolActivities(Long learningDesignId);
+	public Vector<AuthoringActivityDTO> getToolActivities(Long learningDesignId, String languageCode);
 	
 	/**
 	 * This method returns a output definitions of the Tool
@@ -210,7 +210,7 @@ public interface IAuthoringService {
 	 * @return String The required information in WDDX format
 	 * @throws IOException
 	 */
-	public String getAllLearningLibraryDetails()throws IOException;
+	public String getAllLearningLibraryDetails(String languageCode)throws IOException;
 	
 	/**
 	 * Returns a string representing the new tool content id in 

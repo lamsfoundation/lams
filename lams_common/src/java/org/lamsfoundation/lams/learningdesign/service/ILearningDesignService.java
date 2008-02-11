@@ -41,9 +41,10 @@ public interface ILearningDesignService{
 	/**
 	 * Get the learning design DTO, suitable to send to Flash via WDDX 
 	 * @param learningDesignId
+	 * @param languageCode Two letter language code needed to I18N the help url
 	 * @return LearningDesignDTO
 	 */
-	public LearningDesignDTO getLearningDesignDTO(Long learningDesignID);
+	public LearningDesignDTO getLearningDesignDTO(Long learningDesignID, String languageCode);
 
 	/**
 	 * This method calls other validation methods which apply the validation 
@@ -59,14 +60,14 @@ public interface ILearningDesignService{
 	 * @return list of LearningLibraryDTO
 	 * @throws IOException
 	 */
-	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails() throws IOException;
+	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(String languageCode) throws IOException;
 	/**
 	 * Get the DTO list of all learning libraries whatever it is valid or not.
 	 * @param valid
 	 * @return
 	 * @throws IOException
 	 */
-	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(boolean valid) throws IOException;
+	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(boolean valid, String languageCode) throws IOException;
 	
 	/**
 	 * Set valid flag to learning library.

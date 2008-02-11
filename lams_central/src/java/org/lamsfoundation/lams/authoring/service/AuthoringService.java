@@ -334,12 +334,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	}
 	
 	/**
-	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesignDetails(java.lang.Long)
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesignDetails(java.lang.Long, java.lang.Long)
 	 */
-	public String getLearningDesignDetails(Long learningDesignID)throws IOException{
+	public String getLearningDesignDetails(Long learningDesignID, String languageCode)throws IOException{
 		FlashMessage flashMessage= null;
 
-		LearningDesignDTO learningDesignDTO = learningDesignService.getLearningDesignDTO(learningDesignID);
+		LearningDesignDTO learningDesignDTO = learningDesignService.getLearningDesignDTO(learningDesignID, languageCode);
 		
 		if(learningDesignDTO==null)
 			flashMessage = FlashMessage.getNoSuchLearningDesignExists("getLearningDesignDetails",learningDesignID);
@@ -1155,7 +1155,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		return listOfValidationErrorDTOs;
 	}
 	
-	public Vector<AuthoringActivityDTO> getToolActivities(Long learningDesignId) {
+	public Vector<AuthoringActivityDTO> getToolActivities(Long learningDesignId, String languageCode) {
 		LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignId);
 		Vector<AuthoringActivityDTO> listOfAuthoringActivityDTOs = new Vector<AuthoringActivityDTO>();
 		
@@ -1169,7 +1169,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
             		// but we don't need to in this case as it is only doing it for tool activities, and the extra parameter is only 
             		// used for branching activities
             		ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(currentActivity.getActivityId());
-            		AuthoringActivityDTO activityDTO = new AuthoringActivityDTO(toolActivity, null);
+            		AuthoringActivityDTO activityDTO = new AuthoringActivityDTO(toolActivity, null, languageCode);
             		listOfAuthoringActivityDTOs.add(activityDTO);
             	} catch (ToolException e) {
                         String error = ""
@@ -1224,8 +1224,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningLibraryDetails()
 	 */
-	public String getAllLearningLibraryDetails()throws IOException{
-		FlashMessage flashMessage = new FlashMessage("getAllLearningLibraryDetails",learningDesignService.getAllLearningLibraryDetails());
+	public String getAllLearningLibraryDetails(String languageCode)throws IOException{
+		FlashMessage flashMessage = new FlashMessage("getAllLearningLibraryDetails",learningDesignService.getAllLearningLibraryDetails(languageCode));
 		return flashMessage.serializeMessage();
 	}
 	

@@ -139,11 +139,12 @@ public class LearningDesignService implements ILearningDesignService{
 	/**
 	 * Get the learning design DTO, suitable to send to Flash via WDDX 
 	 * @param learningDesignId
+	 * @param languageCode Two letter language code needed to I18N the help url
 	 * @return LearningDesignDTO
 	 */
-	public LearningDesignDTO getLearningDesignDTO(Long learningDesignID) {
+	public LearningDesignDTO getLearningDesignDTO(Long learningDesignID, String languageCode) {
 		LearningDesign design = learningDesignID!=null ? learningDesignDAO.getLearningDesignById(learningDesignID) : null;
-		return design != null ? new LearningDesignDTO(design,activityDAO,groupingDAO) : null;
+		return design != null ? new LearningDesignDTO(design,activityDAO,groupingDAO, languageCode) : null;
 	}
 	
 	/**
@@ -165,11 +166,11 @@ public class LearningDesignService implements ILearningDesignService{
 		learningLibraryDAO.update(library);
 	}
 
-	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails()throws IOException{
+	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(String languageCode)throws IOException{
 		//only return valid learning library
-		return getAllLearningLibraryDetails(true);
+		return getAllLearningLibraryDetails(true, languageCode);
 	}
-	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(boolean valid)throws IOException{
+	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(boolean valid, String languageCode)throws IOException{
 		Iterator iterator= learningLibraryDAO.getAllLearningLibraries(valid).iterator();
 		ArrayList<LearningLibraryDTO> libraries = new ArrayList<LearningLibraryDTO>();
 		while(iterator.hasNext()){
@@ -181,7 +182,7 @@ public class LearningDesignService implements ILearningDesignService{
 				log.error("Learning Library with ID " + learningLibrary.getLearningLibraryId() + " does not have a template activity");
 			}
 			// convert library to DTO format
-			LearningLibraryDTO libraryDTO = learningLibrary.getLearningLibraryDTO(templateActivities);
+			LearningLibraryDTO libraryDTO = learningLibrary.getLearningLibraryDTO(templateActivities, languageCode);
 			internationaliseActivities(libraryDTO.getTemplateActivities());
 			libraries.add(libraryDTO);
 		}

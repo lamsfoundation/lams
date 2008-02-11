@@ -212,16 +212,16 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	    
 	}
 	
-	public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet(ArrayList<BranchActivityEntryDTO> branchMappings)
+	public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet(ArrayList<BranchActivityEntryDTO> branchMappings, String languageCode)
 	{
 		Set<AuthoringActivityDTO> dtoSet = new TreeSet<AuthoringActivityDTO>(new ActivityDTOOrderComparator());
-		dtoSet.add(new AuthoringActivityDTO(this, branchMappings)); //add parent activity
+		dtoSet.add(new AuthoringActivityDTO(this, branchMappings, languageCode)); //add parent activity
 		
 		//add the DTO for all child activities
 		for(Iterator i = this.getActivities().iterator();i.hasNext();) {
             Activity child = (Activity)i.next();
             
-            dtoSet.addAll(child.getAuthoringActivityDTOSet(branchMappings));
+            dtoSet.addAll(child.getAuthoringActivityDTOSet(branchMappings, languageCode));
 		}
 		
 		return dtoSet;

@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.util.HelpUtil;
 
 public class LibraryActivityDTO extends BaseDTO
 {
@@ -98,7 +99,10 @@ public class LibraryActivityDTO extends BaseDTO
 	private Date gateStartDateTime;	
 	private Date gateEndDateTime;
 		
-	public LibraryActivityDTO (Activity activity)
+	/** Used for I18N the URLS. Does not need to be sent to clients, so no getter exists. */
+	private String languageCode; 
+
+	public LibraryActivityDTO (Activity activity, String languageCode)
 	{
 	    this.activityTypeID = activity.getActivityTypeId();
 	    this.activityID = activity.getActivityId();
@@ -124,6 +128,8 @@ public class LibraryActivityDTO extends BaseDTO
 	    this.createDateTime = activity.getCreateDateTime();
 	    this.groupingSupportType = activity.getGroupingSupportType();
 	    this.languageFile = activity.getLanguageFile();
+	    
+	    this.languageCode = languageCode;
 	    processActivityType(activity);
 	    
 	}
@@ -186,7 +192,8 @@ public class LibraryActivityDTO extends BaseDTO
 			this.supportsContribute = new Boolean(tool.getSupportsContribute());
 			this.authoringURL = tool.getAuthorUrl();
 			this.adminURL = tool.getAdminUrl();
-			this.helpURL = tool.getHelpUrl();
+			
+			this.helpURL = HelpUtil.constructToolURL(tool.getHelpUrl(), toolSignature, "", languageCode);
 	    }
 	     
 	}

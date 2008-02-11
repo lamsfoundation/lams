@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.authoring.web;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.dto.StoreLearningDesignResultsDTO;
@@ -33,8 +34,11 @@ import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.servlet.AbstractStoreWDDXPacketServlet;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -51,6 +55,12 @@ public class StoreLDServlet extends AbstractStoreWDDXPacketServlet {
 	private static final long serialVersionUID = -2298959991408815691L;
 	private static Logger log = Logger.getLogger(StoreLDServlet.class);
 
+	private String getUserLanguage() {
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		return user != null ? user.getLocaleLanguage() : "";
+	}
+
 	public IAuthoringService getAuthoringService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 		return (IAuthoringService) webContext.getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);		
@@ -65,7 +75,7 @@ public class StoreLDServlet extends AbstractStoreWDDXPacketServlet {
 			try {
 				
 				Long learningDesignID = authoringService.storeLearningDesignDetails(designDetails);
-				Vector<AuthoringActivityDTO> activityDTOS = authoringService.getToolActivities(learningDesignID);
+				Vector<AuthoringActivityDTO> activityDTOS = authoringService.getToolActivities(learningDesignID, getUserLanguage());
 				Vector<ValidationErrorDTO> validationDTOS = authoringService.validateLearningDesign(learningDesignID);
 				FlashMessage flashMessage = null;
 				if ( validationDTOS != null &&validationDTOS.size()>0) {

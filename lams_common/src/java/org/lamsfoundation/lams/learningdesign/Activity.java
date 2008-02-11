@@ -995,15 +995,15 @@ public abstract class Activity implements Serializable,Nullable {
 
 	/** Get the authoring DTO for this activity. Overidden by ComplexActivity.
 	 */
-	public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet(ArrayList<BranchActivityEntryDTO> branchMappings)
+	public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet(ArrayList<BranchActivityEntryDTO> branchMappings, String languageCode)
 	{
 		Set<AuthoringActivityDTO> dtoSet = new TreeSet<AuthoringActivityDTO>(new ActivityDTOOrderComparator());
-		dtoSet.add(new AuthoringActivityDTO(this, branchMappings));
+		dtoSet.add(new AuthoringActivityDTO(this, branchMappings, languageCode));
 		return dtoSet;
 	}
 	
-	public LibraryActivityDTO getLibraryActivityDTO(){
-		return new LibraryActivityDTO(this);
+	public LibraryActivityDTO getLibraryActivityDTO(String languageCode){
+		return new LibraryActivityDTO(this, languageCode);
 	}
 	
 	/** Create a deep copy of the this activity. It should return the same

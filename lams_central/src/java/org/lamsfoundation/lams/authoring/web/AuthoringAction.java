@@ -76,6 +76,12 @@ public class AuthoringAction extends LamsDispatchAction{
 		return user != null ? user.getUserID() : null;
 	}
 	
+	private String getUserLanguage() {
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		return user != null ? user.getLocaleLanguage() : "";
+	}
+
 	/** Output the supplied WDDX packet. If the request parameter USE_JSP_OUTPUT
 	 * is set, then it sets the session attribute "parameterName" to the wddx packet string.
 	 * If  USE_JSP_OUTPUT is not set, then the packet is written out to the 
@@ -121,7 +127,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		try {
 			Long learningDesignID = WebUtil.readLongParam(request,"learningDesignID",false);
 			
-			wddxPacket = authoringService.getLearningDesignDetails(learningDesignID);
+			wddxPacket = authoringService.getLearningDesignDetails(learningDesignID, getUserLanguage());
 		} catch (Exception e) {
 			wddxPacket = handleException(e, "getLearningDesignDetails", authoringService).serializeMessage();
 		}
@@ -186,7 +192,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		String wddxPacket;
 		IAuthoringService authoringService = getAuthoringService();
 		try {
-			wddxPacket = authoringService.getAllLearningLibraryDetails();
+			wddxPacket = authoringService.getAllLearningLibraryDetails(getUserLanguage());
 		} catch (Exception e) {
 			wddxPacket = handleException(e, "getAllLearningLibraryDetails", authoringService).serializeMessage();
 		}
