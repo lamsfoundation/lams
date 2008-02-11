@@ -491,7 +491,8 @@ class Monitor {
 
 		if(ca.activity.helpURL != undefined || ca.activity.helpURL != null) {
 			Debugger.log("Opening help page: " + ca.activity.helpURL + app.module, Debugger.GEN, 'getHelp', 'Monitor');
-			app.getHelpURL(Proxy.create(this, openHelp, ca));
+			
+			ApplicationParent.extCall("openURL", ca.activity.helpURL + app.module);
 		} else {
 			if (ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
 				var callback:Function = Proxy.create(this, openSystemToolHelp, Application.FLASH_TOOLSIGNATURE_GROUP);
@@ -508,18 +509,9 @@ class Monitor {
 		}
 	}
 	
-	private function openHelp(url:String, ca:CanvasActivity){
-		var newURL:String = app.addLocaleToURL(url) + ca.activity.toolSignature;
-		if(newURL != ca.activity.helpURL)
-			ApplicationParent.extCall("openURL", newURL + app.module);
-		else
-			ApplicationParent.extCall("openURL", ca.activity.helpURL + app.module);
-			
-	}
-	
 	private function openSystemToolHelp(url:String, toolSignature:String){
 		var target:String = toolSignature + app.module;
-		url = app.addLocaleToURL(url);
+		url = ApplicationParent.addLocaleToURL(url);
 		
 		ApplicationParent.extCall("openURL", url + target);
 	}

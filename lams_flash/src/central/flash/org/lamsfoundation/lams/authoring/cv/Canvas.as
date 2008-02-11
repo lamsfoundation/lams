@@ -876,7 +876,7 @@ b	 * @param   learningDesignID
 		if(ca.activity.helpURL != undefined || ca.activity.helpURL != null) {
 			Debugger.log("Opening help page with locale " + _root.lang + ": " + ca.activity.helpURL, Debugger.GEN, 'getHelp', 'Canvas');
 			
-			app.getHelpURL(Proxy.create(this, openHelp, ca));
+			ApplicationParent.extCall("openURL", ca.activity.helpURL + app.module);
 		
 		} else {
 			if (ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
@@ -894,16 +894,9 @@ b	 * @param   learningDesignID
 		}
 	}
 	
-	private function openHelp(url:String, ca:CanvasActivity){
-		var newURL:String = app.addLocaleToURL(url) + ca.activity.toolSignature;
-		if(newURL != ca.activity.helpURL) ca.activity.helpURL = newURL;
-		
-		ApplicationParent.extCall("openURL", newURL + app.module);
-	}
-	
 	private function openSystemToolHelp(url:String, toolSignature:String){
 		var target:String = toolSignature + app.module;
-		var newURL:String = app.addLocaleToURL(url);
+		var newURL:String = ApplicationParent.addLocaleToURL(url);
 		
 		ApplicationParent.extCall("openURL", newURL + target);
 	}
