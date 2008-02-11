@@ -336,7 +336,7 @@ class PropertyInspector extends PropertyInspectorControls {
 				populateGroupingProperties(GroupingActivity(a));
 				showAppliedGroupingProperties(a);
 			
-			} else if(a.isOptionalActivity()) {
+			} else if(a.isOptionalActivity() || a.isOptionsWithSequencesActivity()) {
 				
 				showGeneralControls(true, !a.readOnly);
 				showGroupingControls(false);
@@ -525,9 +525,9 @@ class PropertyInspector extends PropertyInspectorControls {
 	}
 	
 	private function showOptionalActivityProperties(ca:ComplexActivity){
-		if(ca.isSequenceBased) showOptionalSequenceActivityProperties(ca);
+		if(ca.isOptionsWithSequencesActivity()) showOptionalSequenceActivityProperties(ca);
 	
-		toolDisplayName_lbl.text = (!ca.isSequenceBased) ? "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_optional_title')
+		toolDisplayName_lbl.text = (!ca.isOptionsWithSequencesActivity()) ? "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_optional_title')
 														: toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('opt_activity_seq_title');
 		
 		runOffline_chk.selected = ca.runOffline;
@@ -549,11 +549,6 @@ class PropertyInspector extends PropertyInspectorControls {
 	}
 	
 	private function showOptionalSequenceActivityProperties(ca:ComplexActivity){
-		//toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('opt_activity_seq_title');
-		
-		//runOffline_chk.selected = ca.runOffline;
-		//defineLater_chk.selected = ca.defineLater;
-		
 		if(ca.noSequences == undefined)
 			noSeqAct_cmb.selectedIndex = 0;
 		else

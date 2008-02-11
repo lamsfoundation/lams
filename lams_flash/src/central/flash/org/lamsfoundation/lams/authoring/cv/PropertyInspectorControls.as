@@ -328,8 +328,8 @@ class PropertyInspectorControls extends MovieClip {
 			minAct_stp.enabled = true;
 			maxAct_stp.enabled = true;
 		}
-			
-		if(CanvasOptionalActivity(_canvasModel.selectedItem).type == CanvasOptionalActivity.SEQ_TYPE) {
+		
+		if(_canvasModel.selectedItem.activity.isOptionsWithSequencesActivity()) {
 			if(e != null)
 				noSeqAct_cmb.enabled = e;
 			else

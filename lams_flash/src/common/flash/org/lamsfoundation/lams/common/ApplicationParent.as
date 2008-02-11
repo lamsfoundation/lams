@@ -153,12 +153,10 @@ class ApplicationParent {
 		
     }
 	
-	public function addLocaleToURL(url:String):String {
+	public static function addLocaleToURL(url:String):String {
 		var locale:String = (_root.lang == "en") ? "" : _root.lang;
 		var newURL:String;
-		Debugger.log("ends with /: " + url.substr(url.length-1, url.length) == "/", Debugger.CRITICAL, "addLocaleToURL", "ApplicationPArent");
-		Debugger.log("str: " +url.substr(url.length-1, url.length), Debugger.CRITICAL, "addLocaleToURL", "ApplicationPArent");
-		Debugger.log("str 2: " + url.substr(0, url.length-1), Debugger.CRITICAL, "addLocaleToURL", "ApplicationPArent");
+		
 		if(url.substr(url.length-1, url.length) == "/") {
 			newURL = url.substr(0, url.length-1) + locale + "/";
 		} else {
@@ -174,6 +172,7 @@ class ApplicationParent {
 	 */
 	public function getHelpURL(callback:Function) {
 		var _callback:Function = callback;
+		
 		if(callback == null || callback == undefined) {
 			_callback = Proxy.create(this, openHelp);	// default callback
 		} else {
