@@ -158,7 +158,7 @@ class Monitor {
 			
 			if(evt.target instanceof CanvasBranchView) {
 				evt.target.open();
-				monitorModel.setDirty();
+				monitorModel.setDirty(false);
 			} else if((monitorLockView != null || !locked) && monitorView != null) {
 				dispatchEvent({type:'load',target:this});
 			}
@@ -169,7 +169,7 @@ class Monitor {
     }
 	
 	private function tabsLoaded(evt:Object){
-        Debugger.log('tabsLoaded called',Debugger.GEN,'viewLoaded','Monitor');
+        Debugger.log('tabsLoaded called',Debugger.GEN,'tabsLoaded','Monitor');
 		
 		monitorModel.setSequence(app.sequence);
 		saveDataDesignModel(null);
@@ -423,6 +423,12 @@ class Monitor {
 			case '7' :
 				seqStat = "Contribution"
 				break;
+			/*case '8' :
+				seqStat = "System Gate"
+				break;
+			case '9' :
+				seqStat = "Teacher Chosen Branching"
+				break;*/
 			default:
 				seqStat = "Not yet set"
 		}
@@ -462,22 +468,38 @@ class Monitor {
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
 		var isVisible:Boolean = (visible == null) ? true : visible;
 		
-		var _branchView_mc:MovieClip = MovieClip(monitorView.getMonitorTabView()).createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
+		var target:MovieClip = (monitorModel.activeView instanceof CanvasBranchView) ? monitorModel.activeView.branchContent : monitorView.getMonitorTabView();
+		var _branchView_mc:MovieClip = target.createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
 		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
 		
-		monitorModel.addObserver(branchView);
 		branchView.init(monitorModel, monitorView.getController());
 		
 		//Add listener to view so that we know when it's loaded
         branchView.addEventListener('load', Proxy.create(this, viewLoaded));
 		
+		monitorModel.addObserver(branchView);
 		ba.branchView = branchView;
 		
+		var actToPush = monitorModel.getMonitor().ddm.getActivityByUIID(ba.activity.activityUIID);
+		Debugger.log("Pushing activity: "+actToPush.title+" to the stack", Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
+		Debugger.log("It has a UIID of: "+actToPush.activityUIID, Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
+		monitorModel.openBranchingActivities.push(ba.activity.activityUIID);
 	}
 	
 	public function closeBranchView() {
-		monitorModel.activeView = monitorView.getMonitorTabView();
-		monitorModel.currentBranchingActivity = null;
+		var parentBranching:CanvasActivity = null;
+		var isCBV:Boolean = false;
+		
+		if(monitorModel.activeView.activity.parentUIID != null) 
+			parentBranching = CanvasActivity(monitorModel.activitiesDisplayed.get(_ddm.getActivityByUIID(monitorModel.activeView.activity.parentUIID).parentUIID));
+
+		monitorModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.branchView : monitorView.getMonitorTabView();
+		monitorModel.currentBranchingActivity = (parentBranching.activity.isBranchingActivity()) ? parentBranching : null;
+		
+		var poppedActivityUIID:Number = monitorModel.openBranchingActivities.pop();
+		var poppedActivity = monitorModel.getMonitor().ddm.getActivityByUIID(poppedActivityUIID);
+		Debugger.log("Closing branching activity: "+poppedActivity.title, Debugger.CRITICAL, "closeBranchView", "Monitor");
+		Debugger.log("It had a UIID of: "+poppedActivityUIID, Debugger.CRITICAL, "openBranchActivityContent", "Monitor");
 	}
 	
 	/**

@@ -137,6 +137,7 @@ class MonitorModel extends Observable{
 	private var _matchesArr:Array;
 	private var backupLearnersProgArr:Array;
 	private var _searchResultsBackup:Array;
+	private var _openBranchingActivities:Array;
 	
 	private var _openBranchingActivity:Number;
 	
@@ -161,6 +162,7 @@ class MonitorModel extends Observable{
 		_inSearchView = false;
 		_resetSearchTextField = false;
 		_indexSelected = false;
+		_doRefresh = true;
 		
 		_currentLearnerIndex = 1;
 		_oldIndex = 1;
@@ -181,6 +183,7 @@ class MonitorModel extends Observable{
 		learnerTabActArr = new Array();
 		ddmActivity_keys = new Array();
 		ddmTransition_keys = new Array();
+		_openBranchingActivities = new Array();
 		
 		_resultDTO = new Object();
 		ttHolder = ApplicationParent.tooltip;
@@ -717,8 +720,9 @@ class MonitorModel extends Observable{
 		
 		if(activity.isBranchingActivity() || activity.isSequenceActivity()) {
 			var children:Array = _activeSeq.getLearningDesignModel().getComplexActivityChildren(activity.activityUIID);
-			for(var i=0; i<children.length; i++)
+			for(var i=0; i<children.length; i++) {
 				orderDesign(children[i], order);
+			}
 		}
 		
 		for(var i=0;i<ddmTransition_keys.length;i++){
@@ -1068,14 +1072,18 @@ class MonitorModel extends Observable{
 			setDirty();
 			
 		} else { 
-			_monitor.openBranchView(currentBranchingActivity, visible); }
+			_monitor.openBranchView(currentBranchingActivity, visible); 
+		}
 	}
 	
 
-	public function setDirty(){
+	public function setDirty(doClear:Boolean){
 		_isDirty = true;
-		clearDesign();
-		drawDesign();
+		
+		if(_doRefresh) {
+			if(doClear || doClear == undefined) clearDesign();
+			drawDesign();
+		}
 	}
 
 	public function setSize(width:Number,height:Number) {
@@ -1403,6 +1411,10 @@ class MonitorModel extends Observable{
 	
 	public function get openBranchingActivity():Number {
 		return _openBranchingActivity;
+	}
+	
+	public function get openBranchingActivities():Array {
+		return _openBranchingActivities;
 	}
 	
 }

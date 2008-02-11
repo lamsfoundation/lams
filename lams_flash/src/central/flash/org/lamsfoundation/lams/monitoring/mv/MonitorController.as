@@ -483,8 +483,8 @@ class MonitorController extends AbstractController {
 		}else if(tgt.indexOf("refresh_btn") != -1){
 			
 			if(_monitorModel.activeView instanceof CanvasBranchView) {
-				_monitorModel.activeView.removeMovieClip();
 				_monitorModel.getMonitor.closeBranchView();
+				_monitorModel.activeView.removeMovieClip();
 			}
 			
 			if (_monitorModel.getSelectedTab() == 2)
