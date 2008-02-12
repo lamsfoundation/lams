@@ -1132,8 +1132,14 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 					throw new MonitoringServiceException(e);
 				}
 				
+        }else if(activity.isBranchingActivity() || activity.isOptionsActivity() ){
+        	// Can force complete over a branching activity, but none of the branches are marked as done.
+        	// Ditto the two types of optional activities. 
+        	// Then if the user goes back to them, they will operate normally.
+        	learnerService.completeActivity(learner.getUserId(), activity, lessonId);
+        	
        	}else if(activity.isComplexActivity()){
-        		//for complex activities:SEQUENCE ACTIVITY,PARALLEL ACTIVITY,OPTIONS ACTIVITY
+        		// expect it to be a parallel activity
         		ComplexActivity complexActivity = (ComplexActivity) activity;
         		Set allActivities = complexActivity.getActivities();
         		Iterator iter = allActivities.iterator();
