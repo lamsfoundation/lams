@@ -52,9 +52,10 @@ class CanvasHelper {
 
 	//Views
 	private var canvasView:CanvasView;
-	private var canvasBranchView:CanvasBranchView;
 	private var _canvasView_mc:MovieClip;
-	private var _canvasBranchView_mc:MovieClip;
+	
+	private var canvasComplexView:CanvasComplexView;
+	private var _canvasComplexView_mc:MovieClip;
 	
 	// CookieMonster (SharedObjects)
     private var _cm:CookieMonster;
@@ -73,9 +74,11 @@ class CanvasHelper {
 	private var toolActHeight:Number = 50;
 	private var complexActWidth:Number = 143;
 	private var _isBusy:Boolean;
+	
 	private static var AUTOSAVE_CONFIG:String = "autosave";
 	private static var AUTOSAVE_TAG:String = "cv.ddm.autosave.user.";
-    private var _bin:MovieClip;	//bin
+   
+   private var _bin:MovieClip;	//bin
 	
 	private var _target_mc:MovieClip;
 	
@@ -100,6 +103,10 @@ class CanvasHelper {
 			if(evt.target instanceof CanvasBranchView) {
 				evt.target.open();
 				canvasModel.setDirty();
+			} else if(evt.target instanceof CanvasComplexView) {
+				// open complex view
+				evt.target._visible = true;
+				//evt.target.showComplexActivity();
 			} else {
 				canvasModel.getCanvas().addBin(evt.target);
 				
@@ -122,7 +129,6 @@ class CanvasHelper {
             Debugger.log('Event type not recognised : ' + evt.type,Debugger.CRITICAL,'viewLoaded','Canvas');
         }
     }
-	
 	
 	/**
 	 * Called by Comms after a design has been loaded, usually set as the call back of something like openDesignByID.
@@ -525,9 +531,13 @@ class CanvasHelper {
 		Debugger.log("parentUIID: " + canvasModel.activeView.activity.parentUIID, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
 		
 		Debugger.log("is parentBranching: " + parentBranching.activity.isBranchingActivity(), Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
+		Debugger.log("parent branchView: " + parentBranching.branchView, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
 		
 		canvasModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.branchView : canvasView;
 		canvasModel.currentBranchingActivity = (parentBranching.activity.isBranchingActivity()) ? parentBranching : null;
+		
+		Debugger.log("activeView: " + canvasModel.activeView, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
+		Debugger.log("currentBranchingActivity: " + canvasModel.currentBranchingActivity, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
 		
 	}
 	
@@ -552,7 +562,7 @@ class CanvasHelper {
 		var target:MovieClip = (canvasModel.activeView instanceof CanvasBranchView) ? canvasModel.activeView.branchContent : _canvasView_mc.branchContent;
 		
 		
-		var _branchView_mc:MovieClip = target.createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
+		var _branchView_mc:MovieClip = target.createChildAtDepth("canvasBranchView", target.getNextHighestDepth(), {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
 		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
 		
 		branchView.init(canvasModel, undefined);
@@ -564,6 +574,24 @@ class CanvasHelper {
 		
 		ba.branchView = branchView;
 		
+	}
+	
+	public function openComplexView(ca:Object):Void {
+		
+		var target:MovieClip = (canvasModel.activeView instanceof CanvasBranchView) ? canvasModel.activeView.complexViewer : _canvasView_mc.complexViewer;
+		
+		_canvasComplexView_mc = target.createChildAtDepth("canvasComplexView", DepthManager.kTop, {_x: 0, _y: 0, _complexActivity:ca, _visible:false});
+		canvasComplexView = CanvasComplexView(_canvasComplexView_mc);
+		
+		canvasComplexView.init(canvasModel, undefined);
+		canvasComplexView.addEventListener('load', Proxy.create(this, viewLoaded));
+		
+		canvasModel.addObserver(canvasComplexView);
+	}
+	
+	public function closeComplexView():Void {
+		canvasModel.removeObserver(canvasComplexView);
+		_canvasComplexView_mc.removeMovieClip();
 	}
 	
 	/**

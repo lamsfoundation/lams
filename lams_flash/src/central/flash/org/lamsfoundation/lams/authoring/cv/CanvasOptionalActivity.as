@@ -62,6 +62,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
 	private var _canvasBranchView:CanvasBranchView;
+	private var _canvasComplexView:CanvasComplexView;
 	private var _monitorController:MonitorController;
 	private var _monitorTabView:MonitorTabView;
 	private var _ca = ComplexActivity;

@@ -63,6 +63,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
 	private var _canvasBranchView:CanvasBranchView;
+	private var _canvasComplexView:CanvasComplexView;
 	
 	private var _monitorController:MonitorController;
 	private var _monitorView;

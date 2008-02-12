@@ -167,7 +167,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
 		transparentCover.onPress = null;
 		
-		branchContent = content.createEmptyMovieClip("_branch_content_mc", content.getNextHighestDepth());
+		complexViewer = content.createEmptyMovieClip("_complex_viewer_mc", content.getNextHighestDepth());
+		branchContent = content.createEmptyMovieClip("_branch_content_mc", DepthManager.kTop);
 		
 		titleBar = _canvasView.attachMovie("DesignTitleBar", "titleBar", _canvasView.getNextHighestDepth())
 		

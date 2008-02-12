@@ -56,6 +56,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	private var _canvasView:CanvasView;
 	
 	private var _canvasBranchView:CanvasBranchView;
+	private var _canvasComplexView:CanvasComplexView;
 	
 	private var _monitorController:MonitorController;
 	private var _monitorView;

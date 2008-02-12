@@ -50,6 +50,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
+	private var _canvasComplexView:CanvasComplexView;
 	
 	private var _monitorController:MonitorController;
 	private var _monitorTabView:MonitorTabView;

@@ -54,6 +54,7 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 	
 	private var _content_mc:MovieClip;
 	private var _branch_content_mc:MovieClip;
+	private var _complex_viewer_mc:MovieClip;
 	
 	private var _gridLayer_mc:MovieClip;
     private var _transitionLayer_mc:MovieClip;
@@ -204,6 +205,14 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 	
 	public function set branchContent(a:MovieClip):Void {
 		_branch_content_mc = a;
+	}
+	
+	public function get complexViewer():MovieClip {
+		return _complex_viewer_mc;
+	}
+	
+	public function set complexViewer(a:MovieClip):Void {
+		_complex_viewer_mc = a;
 	}
 	
 	public function get activityLayer():MovieClip {

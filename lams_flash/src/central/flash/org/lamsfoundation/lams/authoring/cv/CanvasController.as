@@ -452,11 +452,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					if (!_pi.isPIExpanded()){
 						_canvasModel.setPIHeight(_pi.piFullHeight());
 					}
+					
+					if(ca.activity.parentUIID != null) {
+						// open complex inside complex view
+						Debugger.log("open complex viewer: " + ca.activity.activityUIID, Debugger.CRITICAL, "activityDoubleClick", "CanvasController")
+						_canvasModel.getCanvas().openComplexView(ca);
+					}
+					
 				} else if (ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE && (ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE)){
 					if (!_pi.isPIExpanded()){
 						_canvasModel.setPIHeight(_pi.piFullHeight());
-						
 					}
+					
+					Debugger.log("open complex viewer: " + ca.activity.activityUIID, Debugger.CRITICAL, "activityDoubleClick", "CanvasController")
+					_canvasModel.getCanvas().openComplexView(ca);
+				
 				} else if(ca.activity.isBranchingActivity()) {
 					Debugger.log('activityDoubleClick CanvasBranchActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick','CanvasController');
 	   
@@ -473,6 +483,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					_canvasModel.getCanvas().ddm.validDesign = false;
 					_canvasModel.getCanvas().checkValidDesign();
 				}
+				
+				
 			}
 		}
     }
