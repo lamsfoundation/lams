@@ -415,7 +415,6 @@ public class MockLearner extends MockUser implements Runnable {
 
 	private String[] parseOutNextURLs(WebResponse resp) throws SAXException, IOException {
 		String text = resp.getText();
-		log.debug("Next URLS: "+text);
 		String passonSwfURL = TestUtil.extractString(text, SWF_URL_START_FLAG, SWF_URL_END_FLAG);
 		String toolURL = TestUtil.extractString(text, NEXT_URL_START_FLAG, NEXT_URL_END_FLAG);
 		
