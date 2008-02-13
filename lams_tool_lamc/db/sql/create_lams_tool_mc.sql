@@ -120,7 +120,7 @@ INSERT INTO tl_lamc11_content(uid, content_id , title, instructions, creation_da
 
 INSERT INTO tl_lamc11_que_content  (uid,question, mark, display_order,  mc_content_id) VALUES (1, 'A Sample question?', 1,1,1);
 	
-INSERT INTO tl_lamc11_options_content (uid,  correct_option,  displayOrder, mc_que_content_id,  mc_que_option_text) VALUES (1, 0, 1, 1,'Candidate Answer 1');
-INSERT INTO tl_lamc11_options_content (uid,  correct_option,  displayOrder, mc_que_content_id,  mc_que_option_text) VALUES (2, 1, 2, 1,'Candidate Answer 2');
+INSERT INTO tl_lamc11_options_content (uid,  correct_option,  displayOrder, mc_que_content_id,  mc_que_option_text) VALUES (1, 0, 1, 1,'Answer 1');
+INSERT INTO tl_lamc11_options_content (uid,  correct_option,  displayOrder, mc_que_content_id,  mc_que_option_text) VALUES (2, 1, 2, 1,'Answer 2');
 
 
