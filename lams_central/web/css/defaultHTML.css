@@ -112,7 +112,7 @@ ul {
 	margin-right: 30px;
 }
 
-li {
+ul li {
 	list-style-type: circle;
 	padding-bottom: 5px;
 }

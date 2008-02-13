@@ -110,7 +110,7 @@ ul {
 	margin-left: 30px;
 }
 
-li { list-style-type:circle;}
+ul li { list-style-type:circle;}
 
 #page { /*whole layout of page*/
 	margin: 25px auto;
