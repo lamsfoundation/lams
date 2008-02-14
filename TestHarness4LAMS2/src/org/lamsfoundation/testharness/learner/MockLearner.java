@@ -236,7 +236,6 @@ public class MockLearner extends MockUser implements Runnable {
 
 		String asText = resp.getText();
 
-		log.debug(asText);
 		// Is this a Forum activity? 
 		if ( asText.indexOf(FORUM_FINISH_SUBSTRING) != -1 ) 
 			return handleForum(resp);
