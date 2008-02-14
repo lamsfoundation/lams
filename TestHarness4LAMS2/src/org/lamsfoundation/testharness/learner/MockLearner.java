@@ -284,7 +284,7 @@ public class MockLearner extends MockUser implements Runnable {
 		}
 		
 		if ( replyResponse == null ) {
-			throw new TestHarnessException("No links found on the main forum page, or unable to do reply. "+resp.getText());
+			throw new TestHarnessException("No links found on the main forum page, or unable to do reply. "+resp.getText());			
 		} 
 		
 		String finishURL = findURLInLocationHref(replyResponse, FORUM_FINISH_SUBSTRING);
@@ -314,7 +314,8 @@ public class MockLearner extends MockUser implements Runnable {
 				throw new TestHarnessException("No form found on the reply topic page - unable to do reply. "+resp.getText());
 			}
 		} else {
-			throw new TestHarnessException("No reply URL found - unable to do reply. "+resp.getText());
+			// throw new TestHarnessException("No reply URL found - unable to do reply. "+resp.getText());
+			log.info("No reply URL found - unable to do reply. "+resp.getText());
 		}
 		
 		// now we are back on the topic page, so go back to the main forum page.
