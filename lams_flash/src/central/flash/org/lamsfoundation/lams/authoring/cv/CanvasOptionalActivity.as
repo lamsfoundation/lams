@@ -163,8 +163,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			if(fromModuleTab == "monitorMonitorTab"){
 				children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
 			} else {
-				children_mc[i] = (_canvasBranchView != null) ? childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _canvasController:_canvasController, _canvasBranchView:_canvasBranchView})
-									: childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView});
+				if(_canvasBranchView != null) {
+					children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _canvasController:_canvasController, _canvasBranchView:_canvasBranchView})
+				} else if(_canvasComplexView != null) {
+					children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _canvasController:_canvasController, _canvasComplexView:_canvasComplexView});
+				} else {
+					children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView});
+				}
 			}
 			
 			//set the positioning co-ords
@@ -202,10 +207,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			
 			if(_children[i].isSequenceActivity()) {
 				if(fromModuleTab == "monitorMonitorTab") {
-					children_mc[i] = (_canvasBranchView != null) ? childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_canvasBranchView, _module:"monitoring", learnerContainer:learnerContainer})
-																	: childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});				} else {
-					children_mc[i] = (_canvasBranchView != null) ? childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasBranchView:_canvasBranchView})
-																	: childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView});
+					 if(_canvasBranchView != null) {
+						 children_mc[i] = childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_canvasBranchView, _module:"monitoring", learnerContainer:learnerContainer})
+					 } else if(_canvasComplexView) {
+						 children_mc[i] = childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_canvasComplexView, _module:"monitoring", learnerContainer:learnerContainer})
+					 } else {
+						 children_mc[i] = childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+					 }				} else {
+					if(_canvasBranchView != null) {
+						children_mc[i] = childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasBranchView:_canvasBranchView});
+					} else if(_canvasComplexView != null) {
+						children_mc[i] = childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasComplexView:_canvasComplexView});
+					} else {
+						children_mc[i] = childActivities_mc.attachMovie("CanvasSequenceActivity", "CanvasSequenceActivity"+i, childActivities_mc.getNextHighestDepth(), {_activity:_children[i] , _canvasController:_canvasController, _canvasView:_canvasView});
+					}
 				}
 				//set the positioning co-ords
 				children_mc[i].activity.xCoord = CHILD_OFFSET_X;
@@ -347,8 +362,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		}
 		
 		_visibleHeight = container_pnl._height;
-		_x = _activity.xCoord;
-		_y = _activity.yCoord;
+		
+		if(!_canvasComplexView) {
+			_x = _activity.xCoord;
+			_y = _activity.yCoord;
+		}
 
 		//dimentions of container (this)
 		setLocking();

@@ -51,9 +51,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 	private var _mm:MonitorModel;
 	
     private var _canvasComplexView:CanvasComplexView;
-	private var _complexActivity:CanvasActivity;
 	
-	private var canvas_scp:ScrollPane;
+	private var _complexActivity:CanvasActivity;
+	private var _parentActivity:Object;
+	private var _prevActiveView;
+	
+	//private var canvas_scp:ScrollPane;
 	
 	private var lastScreenWidth:Number = 500;
 	private var lastScreenHeight:Number = 300;
@@ -126,7 +129,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
                 removeActivity(event.data,cm);
                 break;
 			case 'SELECTED_ITEM' :
-                highlightActivity(cm);
+					Debugger.log("selecting item: " + cm.selectedItem.activity.activityUIID, Debugger.CRITICAL, "viewUpdate", "CanvasComplexView");
+					Debugger.log("test parent: " + cm.findParent(cm.selectedItem.activity, _complexActivity.activity), Debugger.CRITICAL, "viewUpdate", "CanvasComplexView");
+					
+					var caComplex = activitiesDisplayed.get(_complexActivity.activity.activityUIID);
+					caComplex.refreshChildren();
+					
+					highlightActivity(cm);
+						
                 break;
 			case 'SET_ACTIVE' :
 				Debugger.log('setting active :' + event.updateType + " event.data: " + event.data + " condition: " + (event.data == this),Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
@@ -143,24 +153,52 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
     */
 	private function draw(){
 		//get the content path for the sp
-		content = canvas_scp.content;
-		content._alpha = 0;
-		bkg_pnl = content.createClassObject(Panel, "bkg_pnl", content.getNextHighestDepth(), {_alpha: 0});
+		content = this;
+		//content._alpha = 0;
+		//bkg_pnl = content.createClassObject(Panel, "bkg_pnl", content.getNextHighestDepth());
 		
-		transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: true, enabled: false, _alpha: 85});
-		transparentCover.onPress = null;
+		//transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
+		//transparentCover.onPress = null;
 		
+		activityComplexLayer = content.createEmptyMovieClip("_activityComplexLayer_mc", content.getNextHighestDepth());
 		activityLayer = content.createEmptyMovieClip("_activityLayer_mc", content.getNextHighestDepth());
 		
-		bkg_pnl.useHandCursor = false;
+		//bkg_pnl.useHandCursor = false;
 
 		setStyles();
-		setSize(model);
 		
         //Dispatch load event 
         dispatchEvent({type:'load',target:this});
 	}
-	   
+	
+	public function showActivity():Void {
+		drawActivity(_complexActivity.activity, model);
+		
+		// change position
+		var ca:MovieClip = activitiesDisplayed.get(_complexActivity.activity.activityUIID);
+
+		setSize(model, ca);
+		
+		this._visible = true;
+	}
+	
+	public function close():Void {
+		removeActivity(_complexActivity.activity, model);
+		
+		if(model instanceof CanvasModel) {
+			model.activeView = _prevActiveView;
+			model.currentBranchingActivity = (_prevActiveView.activity.isBranchingActivity()) ? _prevActiveView.activity : null;
+			
+			model.getCanvas().closeComplexView();
+		} else {
+			//model.getMonitor().getMV().getMonitorTabView().showAssets(true);
+			model.activeView = _prevActiveView;
+			model.currentBranchingActivity = (_prevActiveView.activity.isBranchingActivity()) ? _prevActiveView.activity : null;
+			
+			model.getMonitor().closeComplexView();
+		}
+	}
+	
 	/**
 	 * Draws new or replaces existing activity to canvas stage.
 	 * @usage   
@@ -168,49 +206,30 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 	 * @param   cm - Refernce to the model
 	 * @return  Boolean - successfullit
 	 */
-	private function drawActivity(a:Activity,cm:CanvasModel):Boolean{
+	private function drawActivity(a:Activity, cm):Boolean{
 		if(!cm.isActiveView(this)) return false;
 		
 		var ccv = CanvasComplexView(this);
 		var cvc = getController();
 		
-		var setupBranchView:Boolean = (cm.lastBranchActionType == CanvasModel.OPEN_FROM_FILE) ? false /* true */ : false;
-		
-		Debugger.log('setupBranchView:' + setupBranchView, Debugger.CRITICAL, 'drawActivity','CanvasComplexView');
-		Debugger.log('I am in drawActivity and Activity typeID :'+a.activityTypeID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasComplexView');
-		
 		//take action depending on act type
-		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity()){
-			var newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasComplexView:ccv});
-			activitiesDisplayed.put(a.activityUIID,newActivity_mc);
-			Debugger.log('Tool or gate activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasView');
-		}
-		else if (a.isGateActivity()){
-			var newActivity_mc = activityLayer.createChildAtDepth("CanvasGateActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasComplexView:ccv});
-			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
-			Debugger.log('Gate activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasView');
-		}
-		else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
+		if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
-			var newActivity_mc = activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasComplexView:ccv, _locked:a.isReadOnly()});
-			activitiesDisplayed.put(a.activityUIID,newActivity_mc);
+			
+			var newActivity_mc = activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_x: 0, _y: 0, _activity:a,_children:children,_canvasController:cvc,_canvasComplexView:ccv, _locked:a.isReadOnly()});
+			
+			activitiesDisplayed.put(a.activityUIID, newActivity_mc);
 			Debugger.log('Parallel activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 		}
 		else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONS_WITH_SEQUENCES_TYPE){
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
-			var newActivity_mc = activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasComplexView:ccv,_locked:a.isReadOnly()});
+			var newActivity_mc = activityComplexLayer.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_x: 0, _y: 0, _activity:a,_children:children,_canvasController:cvc,_canvasComplexView:ccv,_locked:a.isReadOnly()});
 			
-			activitiesDisplayed.put(a.activityUIID,newActivity_mc);
+			activitiesDisplayed.put(a.activityUIID, newActivity_mc);
 			
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
-		}
-		else if(a.isBranchingActivity()){	
-			var newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasComplexView:ccv, setupBranchView: setupBranchView});
-			activitiesDisplayed.put(a.activityUIID, newActivity_mc);
-			Debugger.log('Branching activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
-	
-		}else{
+		} else {
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','CanvasView');
 		}
 
@@ -236,22 +255,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
     /**
     * Sets the size of the canvas on stage, called from update
     */
-	private function setSize(cm):Void{
+	private function setSize(cm, ca:MovieClip):Void{
 		var s:Object = cm.getSize();
 		
-		var newWidth:Number = Math.max(s.w, lastScreenWidth);
-		var newHeight:Number = Math.max(s.h, lastScreenHeight);
+		//canvas_scp.setSize(ca._width, ca._height);
+		//bkg_pnl.setSize(ca._width, ca._height);
+		//transparentCover.setSize(s.w, s.h);
 		
-		canvas_scp.setSize(s.w,s.h);
-		bkg_pnl.setSize(newWidth, newHeight);
-		transparentCover.setSize(newWidth, newHeight);
-		
-		//position bin in canvas. TODO 
-		
-		canvas_scp.redraw(true);
-		
-		lastScreenWidth = newWidth;
-		lastScreenHeight = newHeight;
 	}
 	
 	/**
@@ -262,8 +272,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 	 */
 	private function setStyles() {
 		var styleObj = _tm.getStyleObject('CanvasPanel');
-		bkg_pnl.setStyle('styleName', styleObj);
-		transparentCover.setStyle('styleName', styleObj);
+		//bkg_pnl.setStyle('styleName', styleObj);
+		//transparentCover.setStyle('styleName', styleObj);
     }
 	
     /**
@@ -277,7 +287,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 	}
 	
 	public function get ddm():DesignDataModel {
-		return _cm.getCanvas().ddm;
+		if(model instanceof CanvasModel) return CanvasModel(model).ddm
+		else return MonitorModel(model).ddm;
 	}
 	
 	public function get model():Object {
@@ -311,11 +322,4 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
         return (model instanceof CanvasModel) ? new CanvasController(model) : new MonitorModel(model);
     }
 	
-	public function getScrollPaneVPosition():Number {
-		return canvas_scp.vPosition;
-	}
-	
-	public function getScrollPaneHPosition():Number {
-		return canvas_scp.hPosition;
-	}
 }

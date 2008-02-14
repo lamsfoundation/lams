@@ -105,8 +105,7 @@ class CanvasHelper {
 				canvasModel.setDirty();
 			} else if(evt.target instanceof CanvasComplexView) {
 				// open complex view
-				evt.target._visible = true;
-				//evt.target.showComplexActivity();
+				evt.target.showActivity();
 			} else {
 				canvasModel.getCanvas().addBin(evt.target);
 				
@@ -580,7 +579,24 @@ class CanvasHelper {
 		
 		var target:MovieClip = (canvasModel.activeView instanceof CanvasBranchView) ? canvasModel.activeView.complexViewer : _canvasView_mc.complexViewer;
 		
-		_canvasComplexView_mc = target.createChildAtDepth("canvasComplexView", DepthManager.kTop, {_x: 0, _y: 0, _complexActivity:ca, _visible:false});
+		var cx:Number;
+		var cy:Number;
+		
+		var parentAct:Activity = ddm.getActivityByUIID(ca.activity.parentUIID);
+		var grandParentActivity:MovieClip = canvasModel.activitiesDisplayed.get(parentAct.parentUIID);
+		var parentActivity:MovieClip = canvasModel.activitiesDisplayed.get(parentAct.activityUIID);
+			
+		if(parentAct.isSequenceActivity() && grandParentActivity instanceof CanvasOptionalActivity) {
+			cx = grandParentActivity._x +  parentAct.xCoord + ca._x;
+			cy = grandParentActivity._y + parentAct.yCoord + ca._y;
+		} else {
+			cx = parentActivity._x + ca._x;
+			cy = parentActivity._y + ca._y;
+		}
+		
+		Debugger.log("co ord x: " + cx +  " y: " + cy, Debugger.CRITICAL, "openComplexView", "CanvasHelper");
+		
+		_canvasComplexView_mc = target.createChildAtDepth("canvasComplexView", DepthManager.kTop, {_x: cx, _y: cy, _complexActivity:ca, _parentActivity:parentActivity, _visible:false, _prevActiveView: canvasModel.activeView});
 		canvasComplexView = CanvasComplexView(_canvasComplexView_mc);
 		
 		canvasComplexView.init(canvasModel, undefined);

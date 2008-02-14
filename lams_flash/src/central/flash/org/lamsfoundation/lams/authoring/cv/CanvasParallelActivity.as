@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.authoring.br.CanvasBranchView;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.common.style.*;
@@ -50,6 +51,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
+	private var _canvasBranchView:CanvasBranchView;
 	private var _canvasComplexView:CanvasComplexView;
 	
 	private var _monitorController:MonitorController;
@@ -145,16 +147,30 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 			
 			//child1_mc = childActivities_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:child1 ,_monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
 			//child2_mc = childActivities_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:child2 ,_monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
-
-			child1_mc.init({activity:child1, _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
-			child2_mc.init({activity:child2, _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+			if(_canvasBranchView != null) {
+				child1_mc.init({activity:child1, _monitorController:_monitorController, _monitorView:_canvasBranchView, _module:"monitoring", learnerContainer:learnerContainer});
+				child2_mc.init({activity:child2, _monitorController:_monitorController, _monitorView:_canvasBranchView, _module:"monitoring", learnerContainer:learnerContainer});
+			} else if(_canvasComplexView != null) {
+				child1_mc.init({activity:child1, _monitorController:_monitorController, _monitorView:_canvasComplexView, _module:"monitoring", learnerContainer:learnerContainer});
+				child2_mc.init({activity:child2, _monitorController:_monitorController, _monitorView:_canvasComplexView, _module:"monitoring", learnerContainer:learnerContainer});
+			} else {
+				child1_mc.init({activity:child1, _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+				child2_mc.init({activity:child2, _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+			}
 			
 			Debugger.log("child_mc(s) " + child1_mc + " " + child2_mc, Debugger.CRITICAL, "init", "CanvasParallelActivity");
 			
 		}else {
-			
-			child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
-			child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
+			if(_canvasBranchView != null) {
+				child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasBranchView:_canvasBranchView});
+				child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasBranchView:_canvasBranchView});
+			} else if(_canvasComplexView != null) {
+				child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasComplexView:_canvasComplexView});
+				child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasComplexView:_canvasComplexView});
+			} else {
+				child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
+				child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
+			}
 			
 		}
 		
@@ -264,8 +280,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 			drawLearners()
 			
 		//position the container (this)
-		_x = _activity.xCoord; //- newContainerXCoord;
-		_y = _activity.yCoord;
+		if(!_canvasComplexView) {
+			_x = _activity.xCoord;
+			_y = _activity.yCoord;
+		}
 	
 		setLocking();
 		setStyles();

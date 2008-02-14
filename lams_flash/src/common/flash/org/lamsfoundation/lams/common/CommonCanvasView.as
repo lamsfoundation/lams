@@ -116,6 +116,23 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 		}
 	}
 	
+	public function onTransparentCoverClick(evt:Object):Void {
+		
+		var m = (model instanceof MonitorModel) ? MonitorModel(model) : null;
+		m = (model instanceof CanvasModel) ? CanvasModel(model) : m;
+		
+		Debugger.log("running transparent click:  " + m.activeView instanceof CanvasComplexView, Debugger.CRITICAL, "onTransparentcoverClick", "CommonCanvasView");
+		
+		if(m.activeView instanceof CanvasComplexView) {
+			if(m instanceof CanvasModel) {
+				m.activeView.close();
+			} else {
+				//m.getMonitor().closeComplexView();
+			}
+			
+		}
+	}
+	
 	private function initDrawTempTrans(){
 		Debugger.log("Initialising drawing temp. Transition", Debugger.GEN, "initDrawTempTrans", "CommonCanvasView");
 		

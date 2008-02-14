@@ -947,6 +947,24 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		setDirty();
 	}
 
+	public function getCoords(ca:Activity, o:Object):Object {
+		var obj:Object = (o != null) ? o : new Object();
+		
+		if(obj.x != null && obj.y != null) {
+			obj.x += ca.xCoord;
+			obj.y += ca.yCoord;
+		} else {
+			obj.x = ca.xCoord;
+			obj.y = ca.yCoord;
+		}
+			
+		if(ca.parentUIID != null) {
+			return getCoords(_cv.ddm.getActivityByUIID(ca.parentUIID), obj);
+		} else {
+			return obj;
+		}
+	}
+
 	/**
 	 * 
 	 * @usage   

@@ -164,8 +164,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		activityComplexLayer = content.createEmptyMovieClip("_activityComplexLayer_mc", content.getNextHighestDepth());
 		activityLayer = content.createEmptyMovieClip("_activityLayer_mc", content.getNextHighestDepth());
 		
-		transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
-		transparentCover.onPress = null;
+		transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: true, _alpha: 50});
+		transparentCover.onPress = Proxy.create(this, onTransparentCoverClick);
 		
 		complexViewer = content.createEmptyMovieClip("_complex_viewer_mc", content.getNextHighestDepth());
 		branchContent = content.createEmptyMovieClip("_branch_content_mc", DepthManager.kTop);

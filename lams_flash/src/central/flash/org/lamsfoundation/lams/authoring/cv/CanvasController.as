@@ -304,7 +304,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				
 			}
 			
-			//if we are on the bin - trash it
+			// if we are on the bin - trash it
 			isActivityOnBin(ca);
 			
 			//get a view if ther is not one
@@ -315,26 +315,32 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			Debugger.log("ca x: " + ca._x, Debugger.CRITICAL, "activityRelease", "CanvasController");
 			Debugger.log("ca y: " + ca._y, Debugger.CRITICAL, "activityRelease", "CanvasController");
 			
-			if(ca._x < 0) ca._x = 0;
-			if(ca._y < 0) ca._y = 0;
-			if(ca._x > _canvasView.gridLayer._width - ca.getVisibleWidth()) ca._x = _canvasView.gridLayer._width - ca.getVisibleWidth();
-			if(ca._y > _canvasView.gridLayer._height - ca.getVisibleHeight()) ca._y = _canvasView.gridLayer._height - ca.getVisibleHeight();
-			
+			if(!(_canvasModel.activeView instanceof CanvasComplexView)) {
+				if(ca._x < 0) ca._x = 0;
+				if(ca._y < 0) ca._y = 0;
+				if(ca._x > _canvasView.gridLayer._width - ca.getVisibleWidth()) ca._x = _canvasView.gridLayer._width - ca.getVisibleWidth();
+				if(ca._y > _canvasView.gridLayer._height - ca.getVisibleHeight()) ca._y = _canvasView.gridLayer._height - ca.getVisibleHeight();
+				
 			//give it the new co-ords and 'drop' it
-			if(!ca.branchConnector) {
-				ca.activity.xCoord = ca._x;
-				ca.activity.yCoord = ca._y;
-				
-				if(ca.activity.isBranchingActivity()) ca.setPosition(ca._x, ca._y);
-				
-			} else {
-				if(_canvasModel.activeView.isStart(ca)) {
-					ca.activity.startXCoord = ca._x;
-					ca.activity.startYCoord = ca._y;
-				} else if(_canvasModel.activeView.isEnd(ca)) {
-					ca.activity.endXCoord = ca._x;
-					ca.activity.endYCoord = ca._y;
+			
+				if(!ca.branchConnector) {
+					ca.activity.xCoord = ca._x;
+					ca.activity.yCoord = ca._y;
+					
+					if(ca.activity.isBranchingActivity()) ca.setPosition(ca._x, ca._y);
+					
+				} else {
+					if(_canvasModel.activeView.isStart(ca)) {
+						ca.activity.startXCoord = ca._x;
+						ca.activity.startYCoord = ca._y;
+					} else if(_canvasModel.activeView.isEnd(ca)) {
+						ca.activity.endXCoord = ca._x;
+						ca.activity.endYCoord = ca._y;
+					}
 				}
+			} else {
+				ca._x = 0;
+				ca._y = 0;
 			}
 			
 			//refresh the transitions
@@ -447,13 +453,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				   ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || 
 				   ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || 
 				   ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE || 
+				   ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE ||
 				   ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || 
 				   ca.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE){
+					
 					if (!_pi.isPIExpanded()){
 						_canvasModel.setPIHeight(_pi.piFullHeight());
 					}
 					
-					if(ca.activity.parentUIID != null) {
+					if(ca.activity.parentUIID != null &&  (ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || 
+						ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE ||
+						ca.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE)) {
 						// open complex inside complex view
 						Debugger.log("open complex viewer: " + ca.activity.activityUIID, Debugger.CRITICAL, "activityDoubleClick", "CanvasController")
 						_canvasModel.getCanvas().openComplexView(ca);
@@ -539,6 +549,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			_canvasModel.resetTransitionTool();
 			_canvasModel.getCanvas().stopActiveTool();
 			_canvasModel.getCanvas().stopTransitionTool();
+			
 			app.controlKeyPressed = ""
 			
 	   } else {
@@ -549,18 +560,22 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				isActivityOnBin(ca);
 				
 				var tgt:String = new String(ca._parent);
-				
-				if(tgt.indexOf("childActivities_mc")) {
-					activitySnapBack(ca);
+				if(!(_canvasModel.activeView instanceof CanvasComplexView)) {
+					if(tgt.indexOf("childActivities_mc")) {
+						activitySnapBack(ca);
+					} else {
+						if(ca._x < 0) ca._x = 0;
+						if(ca._y < 0) ca._y = 0;
+						if(ca._x > _canvasView.gridLayer._width - ca.getVisibleWidth()) ca._x = _canvasView.gridLayer._width - ca.getVisibleWidth();
+						if(ca._y > _canvasView.gridLayer._height - ca.getVisibleHeight()) ca._y = _canvasView.gridLayer._height - ca.getVisibleHeight();
+						
+						// give it the new co-ords and 'drop' it
+						ca.activity.xCoord = ca._x;
+						ca.activity.yCoord = ca._y;
+					}
 				} else {
-					if(ca._x < 0) ca._x = 0;
-					if(ca._y < 0) ca._y = 0;
-					if(ca._x > _canvasView.gridLayer._width - ca.getVisibleWidth()) ca._x = _canvasView.gridLayer._width - ca.getVisibleWidth();
-					if(ca._y > _canvasView.gridLayer._height - ca.getVisibleHeight()) ca._y = _canvasView.gridLayer._height - ca.getVisibleHeight();
-					
-					// give it the new co-ords and 'drop' it
-					ca.activity.xCoord = ca._x;
-					ca.activity.yCoord = ca._y;
+					ca._x = 0;
+					ca._y = 0;
 				}
 			}
 				
