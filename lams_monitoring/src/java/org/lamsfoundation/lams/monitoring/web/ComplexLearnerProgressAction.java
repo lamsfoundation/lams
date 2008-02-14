@@ -40,6 +40,8 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
@@ -65,7 +67,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class ComplexLearnerProgressAction extends Action {
 
 	private static Logger log = Logger.getLogger(ComplexLearnerProgressAction.class);
-	
+
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -86,6 +88,7 @@ public class ComplexLearnerProgressAction extends Action {
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	
 		if (activity.isOptionsActivity() || activity.isBranchingActivity()) {
+			
 			HashMap<Long, Boolean> startedMap = new HashMap<Long, Boolean>();
 			HashMap<Long, String> urlMap = new HashMap<Long, String>();
 			
@@ -99,9 +102,11 @@ public class ComplexLearnerProgressAction extends Action {
 				List<User> users = monitoringService.getLearnersHaveAttemptedActivity(a);
 				startedMap.put(a.getActivityId(), ( users.contains(learner) ? true : false ) );
 				if (a.isSequenceActivity()) {
+					
 					request.setAttribute("hasSequenceActivity", true);
 					// map learner progress urls of each activity in the sequence
-					SequenceActivity sequenceActivity = (SequenceActivity)a;
+					// make sure have castable object, not a CGLIB class
+					SequenceActivity sequenceActivity = (SequenceActivity) monitoringService.getActivityById(a.getActivityId(), SequenceActivity.class); 
 					Set set = sequenceActivity.getActivities();
 					Iterator iterator = set.iterator();
 					while (iterator.hasNext()) {
