@@ -164,7 +164,7 @@ class GroupNamingDialog extends MovieClip implements Dialog {
 	
 	public function setupGrid():Void {
 		var column_name:DataGridColumn = new DataGridColumn("groupName");
-		column_name.headerText = "Group Name";
+		column_name.headerText = Dictionary.getValue("groupnaming_dialog_col_groupName_lbl");
 		column_name.editable = true;
 		
 		_group_naming_dgd.editable = true;
