@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +44,7 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
@@ -93,20 +95,25 @@ public class ComplexLearnerProgressAction extends Action {
 			HashMap<Long, String> urlMap = new HashMap<Long, String>();
 			
 			ComplexActivity complexActivity = (ComplexActivity)activity;
-			Set subActivities = complexActivity.getActivities();
-			Iterator i = subActivities.iterator();
+
+			Set subActivities = new TreeSet(new ActivityOrderComparator());
+			Iterator i = complexActivity.getActivities().iterator();
 			
 			// iterate through each optional or branching activity
 			while (i.hasNext()) {
-				Activity a = (Activity)i.next();
+				Activity aNext = (Activity)i.next();
+
+				// make sure have castable object, not a CGLIB class
+				Activity a = monitoringService.getActivityById(aNext.getActivityId()); 
+				subActivities.add(a);
+				
 				List<User> users = monitoringService.getLearnersHaveAttemptedActivity(a);
 				startedMap.put(a.getActivityId(), ( users.contains(learner) ? true : false ) );
 				if (a.isSequenceActivity()) {
 					
 					request.setAttribute("hasSequenceActivity", true);
 					// map learner progress urls of each activity in the sequence
-					// make sure have castable object, not a CGLIB class
-					SequenceActivity sequenceActivity = (SequenceActivity) monitoringService.getActivityById(a.getActivityId(), SequenceActivity.class); 
+					SequenceActivity sequenceActivity = (SequenceActivity) a;
 					Set set = sequenceActivity.getActivities();
 					Iterator iterator = set.iterator();
 					while (iterator.hasNext()) {
