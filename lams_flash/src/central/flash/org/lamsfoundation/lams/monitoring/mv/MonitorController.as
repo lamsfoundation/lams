@@ -391,7 +391,7 @@ class MonitorController extends AbstractController {
 			if (_monitorModel.getSelectedTab() == MonitorTabView._tabID)
 				_monitorModel.openBranchActivityContent(ca, true);
 		} 
-		if (!fromContextMenu){
+		if (!fromContextMenu && _monitorModel.getSelectedTab() == LearnerTabView._tabID){
 					
 			var _learnerID:Number;
 			var URLToSend:String;
