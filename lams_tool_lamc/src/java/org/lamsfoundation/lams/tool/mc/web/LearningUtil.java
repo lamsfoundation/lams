@@ -574,10 +574,10 @@ public class LearningUtil implements McAppConstants {
 			mapAttemptOrderAttempts.put(attemptOrderString, attemptMap);
 			
 			correctAttemptMap = new TreeMap(new McComparator());
-			mapAttemptOrderAttempts.put(attemptOrderString, correctAttemptMap);
+			mapAttemptOrderCorrectAttempts.put(attemptOrderString, correctAttemptMap);
 
 			incorrectAttemptMap = new TreeMap(new McComparator());
-			mapAttemptOrderAttempts.put(attemptOrderString, incorrectAttemptMap);
+			mapAttemptOrderIncorrectAttempts.put(attemptOrderString, incorrectAttemptMap);
 		}
 
 		int mapSize = attemptMap.size();
