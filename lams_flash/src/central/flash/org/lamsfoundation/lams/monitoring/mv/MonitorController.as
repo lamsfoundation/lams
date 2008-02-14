@@ -383,13 +383,15 @@ class MonitorController extends AbstractController {
 	public function activityReleaseOutside(ca:Object):Void{
 	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityReleaseOutside','MonitorController');
 	}
-   
+
 	public function activityDoubleClick(ca:Object, forTabView:String, learnerID:Number, fromContextMenu:Boolean):Void{
 		
 		Debugger.log("ca.activity.isBranchingActivity(): "+ca.activity.isBranchingActivity(), Debugger.GEN, "activityDoubleClick", "MonitorController");
 		if(ca.activity.isBranchingActivity() && !fromContextMenu) {
-			_monitorModel.openBranchActivityContent(ca, true);
-		} else {
+			if (_monitorModel.getSelectedTab() == MonitorTabView._tabID)
+				_monitorModel.openBranchActivityContent(ca, true);
+		} 
+		if (!fromContextMenu){
 					
 			var _learnerID:Number;
 			var URLToSend:String;
@@ -406,11 +408,11 @@ class MonitorController extends AbstractController {
 				}
 				
 				if (forTabView == "MonitorTabViewLearner"){
-					Debugger.log('activityDoubleClick CanvasActivity:'+ca.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
 					URLToSend = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activityID+'&userID='+_learnerID+'&lessonID='+_root.lessonID;
 				}else {
 					URLToSend = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_learnerID+'&lessonID='+_root.lessonID;
-				}
+				}	
+				Debugger.log('activityDoubleClick CanvasActivity:'+ca.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
 			}
 
 			Debugger.log('Opening url (ca.activityID) :'+URLToSend+" Opening url (ca.activityID)"+URLToSend,Debugger.CRITICAL,'openToolActivityContent','MonitorModel');
