@@ -83,7 +83,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			   	var td = _canvasModel.addActivityToConnection(transitionTarget);
 				_canvasModel.activeView.initDrawTempTrans();
 			}
-			
+		} else if(_canvasModel.activeView instanceof CanvasComplexView && ca != _canvasModel.activeView.openActivity && ca.locked) {
+			_canvasModel.activeView.close();
+			return;
 	    } else {
 			var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
 			var parentSelectedAct = _canvasModel.getCanvas().ddm.getActivityByUIID(_tempSelectedItem.activity.parentUIID);
@@ -144,7 +146,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    
     public function activityRelease(ca:Object):Void{
 	    Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','CanvasController');
-	    
+		
 		if (_canvasModel.isTransitionToolActive()){
 			_canvasModel.getCanvas().stopTransitionTool();
 			_canvasModel.activeView.removeTempTrans();	
@@ -339,8 +341,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					}
 				}
 			} else {
-				ca._x = 0;
-				ca._y = 0;
+				if(ca instanceof CanvasParallelActivity || ca instanceof CanvasOptionalActivity) {
+					ca._x = 0;
+					ca._y = 0;
+				} else {
+					activitySnapBack(ca);
+				}
 			}
 			
 			//refresh the transitions

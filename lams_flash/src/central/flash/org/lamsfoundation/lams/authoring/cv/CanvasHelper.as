@@ -585,13 +585,30 @@ class CanvasHelper {
 		var parentAct:Activity = ddm.getActivityByUIID(ca.activity.parentUIID);
 		var grandParentActivity:MovieClip = canvasModel.activitiesDisplayed.get(parentAct.parentUIID);
 		var parentActivity:MovieClip = canvasModel.activitiesDisplayed.get(parentAct.activityUIID);
+		
+		if(canvasModel.activeView instanceof CanvasComplexView) {
+			if(canvasModel.activeView.complexActivity == ca) {
+				return;
+			}
+				
+			target = canvasModel.activeView.complexViewer;
 			
-		if(parentAct.isSequenceActivity() && grandParentActivity instanceof CanvasOptionalActivity) {
-			cx = grandParentActivity._x +  parentAct.xCoord + ca._x;
-			cy = grandParentActivity._y + parentAct.yCoord + ca._y;
+			if(parentAct.isSequenceActivity() && grandParentActivity instanceof CanvasOptionalActivity) {
+				cx = parentAct.xCoord + ca._x;
+				cy = parentAct.yCoord + ca._y;
+			} else {
+				cx = ca._x;
+				cy = ca._y;
+			}
 		} else {
-			cx = parentActivity._x + ca._x;
-			cy = parentActivity._y + ca._y;
+		
+			if(parentAct.isSequenceActivity() && grandParentActivity instanceof CanvasOptionalActivity) {
+				cx = grandParentActivity._x +  parentAct.xCoord + ca._x;
+				cy = grandParentActivity._y + parentAct.yCoord + ca._y;
+			} else {
+				cx = parentActivity._x + ca._x;
+				cy = parentActivity._y + ca._y;
+			}
 		}
 		
 		Debugger.log("co ord x: " + cx +  " y: " + cy, Debugger.CRITICAL, "openComplexView", "CanvasHelper");
@@ -603,11 +620,6 @@ class CanvasHelper {
 		canvasComplexView.addEventListener('load', Proxy.create(this, viewLoaded));
 		
 		canvasModel.addObserver(canvasComplexView);
-	}
-	
-	public function closeComplexView():Void {
-		canvasModel.removeObserver(canvasComplexView);
-		_canvasComplexView_mc.removeMovieClip();
 	}
 	
 	/**
