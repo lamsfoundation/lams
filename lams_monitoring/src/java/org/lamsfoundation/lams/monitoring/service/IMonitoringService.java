@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -611,5 +612,7 @@ public interface IMonitoringService
 	 */
 	public List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
 
+	/** Get the record of the learner's progress for a particular lesson */
+	public LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId);
 	
 }

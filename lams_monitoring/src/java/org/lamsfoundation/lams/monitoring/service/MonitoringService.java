@@ -1432,10 +1432,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     			+ AttributeNames.PARAM_ACTIVITY_ID + "=" + activityID + "&"
     			+ AttributeNames.PARAM_LESSON_ID + "=" + lessonID + "&"
     			+ AttributeNames.PARAM_USER_ID + "=" + learnerUserID;
-    	} else if (activity.isBranchingActivity()) {
-    		activity = (BranchingActivity)activity;
+    	} else if (activity.isSystemToolActivity()) {
     		url = lamsCoreToolService.getToolLearnerProgressURL(lessonID, activity, learner);
-    	}
+    	} 
     	log.debug("url: "+url);
     	return url;
     }	
@@ -2332,6 +2331,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 		 */
 		public List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException {
 			return lessonService.getLearnersHaveAttemptedActivity(activity);
+		}
+		
+		public LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId) {
+			return learnerService.getProgress(learnerId, lessonId);
 		}
 
 }

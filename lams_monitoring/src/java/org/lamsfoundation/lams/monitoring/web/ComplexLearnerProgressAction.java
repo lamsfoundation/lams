@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +49,8 @@ import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.monitoring.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -82,65 +85,11 @@ public class ComplexLearnerProgressAction extends Action {
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 		Activity activity = monitoringService.getActivityById(activityID);
 		
-		IUserManagementService userService = (IUserManagementService)WebApplicationContextUtils
-			.getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("userManagementService");
-		User learner = (User)userService.findById(User.class, userID);
-		
 		HttpSession ss = SessionManager.getSession();
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	
-		if (activity.isOptionsActivity() || activity.isBranchingActivity()) {
-			
-			HashMap<Long, Boolean> startedMap = new HashMap<Long, Boolean>();
-			HashMap<Long, String> urlMap = new HashMap<Long, String>();
-			
-			ComplexActivity complexActivity = (ComplexActivity)activity;
+		if (activity.isParallelActivity()) {
 
-			Set subActivities = new TreeSet(new ActivityOrderComparator());
-			Iterator i = complexActivity.getActivities().iterator();
-			
-			// iterate through each optional or branching activity
-			while (i.hasNext()) {
-				Activity aNext = (Activity)i.next();
-
-				// make sure have castable object, not a CGLIB class
-				Activity a = monitoringService.getActivityById(aNext.getActivityId()); 
-				subActivities.add(a);
-				
-				List<User> users = monitoringService.getLearnersHaveAttemptedActivity(a);
-				startedMap.put(a.getActivityId(), ( users.contains(learner) ? true : false ) );
-				if (a.isSequenceActivity()) {
-					
-					request.setAttribute("hasSequenceActivity", true);
-					// map learner progress urls of each activity in the sequence
-					SequenceActivity sequenceActivity = (SequenceActivity) a;
-					Set set = sequenceActivity.getActivities();
-					Iterator iterator = set.iterator();
-					while (iterator.hasNext()) {
-						Activity child = (Activity)iterator.next();
-						users = monitoringService.getLearnersHaveAttemptedActivity(child);
-						boolean hasAttempted = users.contains(learner);
-						startedMap.put(child.getActivityId(), ( hasAttempted ? true : false ) );
-						if (hasAttempted) {
-							// learner progress url
-							urlMap.put(child.getActivityId(), 
-								monitoringService.getLearnerActivityURL(lessonID, child.getActivityId(), userID, user.getUserID()));
-						}
-					}
-				}
-			}
-			
-			// learner progress urls for children of the sequence activities
-			request.setAttribute("urlMap", urlMap);
-			// boolean flags for whether an activity is started
-			request.setAttribute("startedMap", startedMap);
-			// set of child activities
-			request.setAttribute("subActivities", subActivities);
-			// main activity title
-			request.setAttribute("activityTitle", activity.getTitle());
-			
-			return mapping.findForward("complexProgress");
-		} else if (activity.isParallelActivity()) {
 			ArrayList<String> urls = new ArrayList<String>();
 			ParallelActivity parallelActivity = (ParallelActivity)activity;
 			Set parallels = parallelActivity.getActivities();
@@ -153,8 +102,120 @@ public class ComplexLearnerProgressAction extends Action {
 			request.setAttribute("parallelUrls", urls);
 			return mapping.findForward("parallelProgress");
 		}
+
+		else {
+			
+			HashMap<Long, Byte> statusMap = new HashMap<Long, Byte>();
+			HashMap<Long, String> urlMap = new HashMap<Long, String>();
+			LearnerProgress learnerProgress = monitoringService.getLearnerProgress(userID, lessonID);
+			request.setAttribute("hasSequenceActivity", false);
+			List<ContributeActivityDTO> subActivities = new ArrayList<ContributeActivityDTO>();
+			
+			if (activity.isOptionsActivity() || activity.isBranchingActivity()) {
+			
+				ComplexActivity complexActivity = (ComplexActivity)activity;
+	
+				Iterator i = complexActivity.getActivities().iterator();
+				
+				// iterate through each optional or branching activity
+				while (i.hasNext()) {
+					Activity aNext = (Activity)i.next();
+	
+					// make sure have castable object, not a CGLIB class
+					Activity a = monitoringService.getActivityById(aNext.getActivityId()); 
+					ContributeActivityDTO dto = new ContributeActivityDTO(a);
+					subActivities.add(dto);
+
+					statusMap.put(a.getActivityId(), learnerProgress.getProgressState(a));
+
+					if (a.isSequenceActivity()) {
+						request.setAttribute("hasSequenceActivity", true);
+						// map learner progress urls of each activity in the sequence
+						SequenceActivity sequenceActivity = (SequenceActivity) a;
+						dto.setChildActivities(new Vector<ContributeActivityDTO> ());
+						processSequenceChildren(lessonID, userID,
+								monitoringService, user, statusMap, urlMap,
+								learnerProgress, sequenceActivity, dto, null);
+					}
+				}
+				
+			} else if ( activity.isSequenceActivity() ) {
+
+				SequenceActivity sequenceActivity = (SequenceActivity) activity;
+				processSequenceChildren(lessonID, userID,
+						monitoringService, user, statusMap, urlMap,
+						learnerProgress, sequenceActivity, null, subActivities);
+				
+			} else {
+				log.error("ComplexLearnerProgress trying to deal with a activity type it doesn't expect. Activity is "+activity);
+				return null;
+			}
+
+			// learner progress urls for children of the sequence activities
+			request.setAttribute("urlMap", urlMap);
+			// boolean flags for whether an activity is started
+			request.setAttribute("statusMap", statusMap);
+			// set of child activities
+			request.setAttribute("subActivities", subActivities);
+			// main activity title
+			request.setAttribute("activityTitle", activity.getTitle());
+	
+			return mapping.findForward("complexProgress");
+		}
 		
-		return null;
+	}
+
+	/**
+	 * Process the children of the sequence. Best done by traversing the transitions, with the first
+	 * activity being the default activity for the sequence.
+	 * 
+	 * If the page is for a SequenceActivity the subActivities list should be included as a parameter and 
+	 * parentContributeActivityDTO will be null.
+	 * 
+	 * If the page is for a Branching or Optional Sequence activity then subActivities will be null 
+	 * (as the sequence activities go in the subactivities list) but parentContributeActivityDTO should not
+	 * be null.
+	 * 
+	 * @param lessonID
+	 * @param userID
+	 * @param monitoringService
+	 * @param user
+	 * @param statusMap
+	 * @param urlMap
+	 * @param learnerProgress
+	 * @param sequenceActivity
+	 * @param subActivities 
+	 * @param parentContributeActivityDTO
+	 * @throws IOException
+	 */
+	private void processSequenceChildren(Long lessonID, Integer userID,
+			IMonitoringService monitoringService, UserDTO user,
+			HashMap<Long, Byte> statusMap, HashMap<Long, String> urlMap,
+			LearnerProgress learnerProgress, SequenceActivity sequenceActivity,
+			ContributeActivityDTO parentContributeActivityDTO, List<ContributeActivityDTO> subActivities)
+			throws IOException {
+		Activity child = sequenceActivity.getDefaultActivity();
+		while ( child != null ) {
+			Byte status = learnerProgress.getProgressState(child);
+			statusMap.put(child.getActivityId(),status); 
+			if (status.equals(LearnerProgress.ACTIVITY_ATTEMPTED) || status.equals(LearnerProgress.ACTIVITY_COMPLETED)) {
+				// learner progress url
+				urlMap.put(child.getActivityId(), 
+					monitoringService.getLearnerActivityURL(lessonID, child.getActivityId(), userID, user.getUserID()));
+			}
+			
+			ContributeActivityDTO dto = new ContributeActivityDTO(child);
+			if ( subActivities != null ) 
+				subActivities.add(dto);
+			if ( parentContributeActivityDTO != null ) 
+				parentContributeActivityDTO.getChildActivities().add(dto);
+			
+			if ( child.getTransitionFrom() != null ) {
+				child = child.getTransitionFrom().getToActivity();
+			} else {
+				child = null;
+			}
+		}
 	}
 }
  
