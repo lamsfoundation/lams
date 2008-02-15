@@ -387,12 +387,10 @@ class MonitorController extends AbstractController {
 	public function activityDoubleClick(ca:Object, forTabView:String, learnerID:Number, fromContextMenu:Boolean):Void{
 		
 		Debugger.log("ca.activity.isBranchingActivity(): "+ca.activity.isBranchingActivity(), Debugger.GEN, "activityDoubleClick", "MonitorController");
-		if(ca.activity.isBranchingActivity() && !fromContextMenu) {
-			if (_monitorModel.getSelectedTab() == MonitorTabView._tabID)
-				_monitorModel.openBranchActivityContent(ca, true);
+		if(!fromContextMenu && ca.activity.isBranchingActivity() && _monitorModel.getSelectedTab() == MonitorTabView._tabID) {
+			_monitorModel.openBranchActivityContent(ca, true);
 		} 
-		if (!fromContextMenu && _monitorModel.getSelectedTab() == LearnerTabView._tabID){
-					
+		else if (!fromContextMenu){
 			var _learnerID:Number;
 			var URLToSend:String;
 			setBusy();
