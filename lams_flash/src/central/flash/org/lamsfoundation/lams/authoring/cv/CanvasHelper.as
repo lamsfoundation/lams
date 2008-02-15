@@ -593,7 +593,11 @@ class CanvasHelper {
 				
 			target = canvasModel.activeView.complexViewer;
 			
-			if(parentAct.isSequenceActivity() && grandParentActivity instanceof CanvasOptionalActivity) {
+			Debugger.log("parentAct: " + parentAct.activityUIID, Debugger.CRITICAL, "openComplexView", "CanvasHelper");
+			Debugger.log("parentAct type: " + parentAct.activityTypeID, Debugger.CRITICAL, "openComplexView", "CanvasHelper");
+			Debugger.log("gpAct: " + grandParentActivity.activity.activityUIID, Debugger.CRITICAL, "openComplexView", "CanvasHelper");
+			
+			if(parentAct.isSequenceActivity() && canvasModel.activeView.openActivity instanceof CanvasOptionalActivity) {
 				cx = parentAct.xCoord + ca._x;
 				cy = parentAct.yCoord + ca._y;
 			} else {
