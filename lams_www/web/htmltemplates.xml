@@ -24,7 +24,7 @@
  *
  * See FCKConfig.TemplatesXmlPath in the configuration file.
 -->
-<Templates imagesBasePath=""../../../www/images/">
+<Templates imagesBasePath="../../../www/images/">
 	<Template title="Image and Title" image="template1.gif">
 		<Description>One main image with a title and text that surround the image.</Description>
 		<Html>
