@@ -341,11 +341,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					}
 				}
 			} else {
-				if(ca instanceof CanvasParallelActivity || ca instanceof CanvasOptionalActivity) {
+				if(ca instanceof CanvasOptionalActivity || ca instanceof CanvasParallelActivity) {
 					ca._x = 0;
 					ca._y = 0;
 				} else {
-					activitySnapBack(ca);
+					var sequenceActivity:Activity = _canvasModel.ddm.getActivityByUIID(ca.activity.parentUIID);
+			
+					if(sequenceActivity != null)
+						if(!_canvasModel.moveOptionalSequenceCA(ca, sequenceActivity))
+							activitySnapBack(ca);
+					else
+						activitySnapBack(ca);
+					
 				}
 			}
 			
@@ -601,6 +608,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					r = _canvasModel.ddm.removeActivity(ca.activity.activityUIID);
 				}	
 				
+				var seqActivity:Activity = Activity(_canvasModel.ddm.getActivityByUIID(r.parentUIID));
+				if(seqActivity.isOptionalSequenceActivity(_canvasModel.ddm.getActivityByUIID(seqActivity.parentUIID))) {
+					_canvasModel.removeOptionalSequenceCA(ca, r.parentUIID);
+					Debugger.log("is opt: " + ca.activity.activityUIID, Debugger.CRITICAL, "isActivityOnBin", "CanvasController");
+				}
+				
 				if(ca == _canvasModel.activeView.openActivity) {
 					// close current complex activity +  refresh parent
 					_canvasModel.activeView.close();
@@ -625,6 +638,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 						_canvasModel.activitiesDisplayed.get(ca.activity)
 					}
 				} else {
+					
 					// refresh current complex activity
 					 _canvasModel.activeView.updateActivity();
 				}

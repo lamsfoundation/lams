@@ -343,7 +343,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		ca.activity.orderID = null;
 		ca.activity.parentActivityID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityID : null;
 		
-		removeActivity(parentID);
+		if(!(activeView instanceof CanvasComplexView)) removeActivity(parentID);
 		
 		haltRefresh(false);
 		setDirty();
@@ -466,7 +466,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			createSequenceTransition(fromActivity, toActivity);
 		}
 
-		removeActivity(sequence.parentUIID);
+		if(activeView instanceof CanvasComplexView && activeView.openActivity.activity.activityUIID == sequence.parentUIID)
+			activeView.updateActivity();
+		else removeActivity(sequence.parentUIID);
+		
 		haltRefresh(false);
 
 		setDirty();
