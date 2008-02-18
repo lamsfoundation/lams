@@ -71,6 +71,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	private var grid_mc:Object;
 	public static var hSpace:Number = 30;
 	public static var vSpace:Number = 30;
+	
+	private var _binLayer_mc:MovieClip;
 
 	private var currentActivity_x:Number;
 	private var currentActivity_y:Number;
@@ -281,6 +283,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		transparentCover = content.createClassObject(Panel, "_transparentCover_mc", content.getNextHighestDepth(), {_visible: false, enabled: true, _alpha: 50});
 		transparentCover.onPress = Proxy.create(this, onTransparentCoverClick);
 		
+		binLayer = content.createEmptyMovieClip("_binLayer_mc", content.getNextHighestDepth());
+		
 		complexViewer = content.createEmptyMovieClip("_complex_viewer_mc", content.getNextHighestDepth());
 		branchContent = content.createEmptyMovieClip("_branch_content_mc", DepthManager.kTopmost);
 		
@@ -384,7 +388,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	public function open(doTransition:Boolean):Void {
 		Debugger.log("calling open: " + _open, Debugger.CRITICAL, "open", " CanvasBranchView");
-		if(model instanceof CanvasModel) model.getCanvas().addBin(this.activityLayer);
+		if(model instanceof CanvasModel) model.getCanvas().addBin(this.binLayer);
 			
 		setSize(model);
 		
@@ -444,7 +448,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		Debugger.log("model.activeView :  " + model.activeView, Debugger.CRITICAL, "finishedClose", "CanvasBranchView");
 		
 		if(model instanceof CanvasModel) {
-			if(model.activeView instanceof CanvasBranchView) model.getCanvas().addBin(model.activeView.activityLayer);
+			if(model.activeView instanceof CanvasBranchView) model.getCanvas().addBin(model.activeView.binLayer);
 			else model.getCanvas().addBin(model.activeView);
 		}
 		
@@ -966,5 +970,13 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	public function set isOpen(a:Boolean):Void {
 		_isOpen = a;
+	}
+	
+	public function get binLayer():MovieClip {
+		return _binLayer_mc;
+	}
+	
+	public function set binLayer(a:MovieClip):Void {
+		_binLayer_mc = a;
 	}
 }
