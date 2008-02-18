@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.CommonCanvasView;
 import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.authoring.br.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.monitoring.mv.MonitorModel;
 import org.lamsfoundation.lams.monitoring.mv.MonitorController;
@@ -125,16 +126,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
                 setSize(cm);
                 break;
             case 'DRAW_ACTIVITY':
-                drawActivity(event.data,cm);
+                drawActivity(event.data, cm);
                 break;
             case 'REMOVE_ACTIVITY':
-                removeActivity(event.data,cm);
+                removeActivity(event.data, cm);
                 break;
 			case 'SELECTED_ITEM' :
 					Debugger.log("selecting item: " + cm.selectedItem.activity.activityUIID, Debugger.CRITICAL, "viewUpdate", "CanvasComplexView");
 					Debugger.log("test parent: " + cm.findParent(cm.selectedItem.activity, _complexActivity.activity), Debugger.CRITICAL, "viewUpdate", "CanvasComplexView");
 					
-					//var caComplex = activitiesDisplayed.get(_complexActivity.activity.activityUIID);
 					_tempActivity.refreshChildren();
 					
 					highlightActivity(cm);
@@ -142,7 +142,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
                 break;
 			case 'SET_ACTIVE' :
 				Debugger.log('setting active :' + event.updateType + " event.data: " + event.data + " condition: " + (event.data == this),Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
-				_tempActivity.locked = !(event.data == this)
+				_tempActivity.locked = !(event.data == this);
 				_visible = true;
 				
 				break;
@@ -171,6 +171,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
         dispatchEvent({type:'load',target:this});
 	}
 	
+	public function updateActivity():Boolean {
+		if(_tempActivity != null) {
+			if(_tempActivity instanceof CanvasOptionalActivity) {
+				CanvasOptionalActivity(_tempActivity).updateChildren(model.ddm.getComplexActivityChildren(_tempActivity.activity.activityUIID))
+			}
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public function showActivity():Void {
 		if(drawActivity(_complexActivity.activity, model))
 			setSize(model);
@@ -183,7 +195,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 		
 		model.activeView = _prevActiveView;
 		model.currentBranchingActivity = (_prevActiveView.activity.isBranchingActivity()) ? _prevActiveView.activity : null;
-			
+
 		model.removeObserver(this);
 		this.removeMovieClip();
 	}

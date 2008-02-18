@@ -589,19 +589,61 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
     
 	private function isActivityOnBin(ca:Object):Void{
+		
 		if (ca.hitTest(_canvasModel.getCanvas().bin)) {
-			if(!isActivityReadOnly(ca, Dictionary.getValue("cv_element_readOnly_action_del")) && !ca.branchConnector && !isActivityProtected(ca)) {
+			if(_canvasModel.activeView instanceof CanvasComplexView) {
+				var r:Object;
+				
 				if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.isBranchingActivity()){
-					Debugger.log("removing complex act that hit bin" , Debugger.CRITICAL, "isActivityOnBin", "CanvasController");
-					if(ca.activity.isBranchingActivity())
-						_canvasModel.getCanvas().ddm.removeEntries(_canvasModel.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(ca.activity.activityUIID).all);
-					
-					_canvasModel.removeComplexActivity(ca);
+					_canvasModel.removeComplexActivityChildren(ca.actChildren);
+					r = _canvasModel.ddm.removeActivity(ca.activity.activityUIID);
 				} else {
-					_canvasModel.removeActivityOnBin(ca.activity.activityUIID);
+					r = _canvasModel.ddm.removeActivity(ca.activity.activityUIID);
+				}	
+				
+				if(ca == _canvasModel.activeView.openActivity) {
+					// close current complex activity +  refresh parent
+					_canvasModel.activeView.close();
+					
+					if(_canvasModel.activeView instanceof CanvasComplexView) { _canvasModel.activeView.updateActivity(); 
+					} else {
+						Debugger.log("r: " + r.parentUIID, Debugger.CRITICAL, "isActivityOnBin", "CanvasController");
+						
+						var parent = _canvasModel.activitiesDisplayed.get(r.parentUIID);
+						var gparent = _canvasModel.activitiesDisplayed.get( _canvasModel.ddm.getActivityByUIID(r.parentUIID).parentUIID);
+						
+						Debugger.log("parent: " + parent, Debugger.CRITICAL, "isActivityOnBin", "CanvasController");
+						Debugger.log("gparent: " + gparent, Debugger.CRITICAL, "isActivityOnBin", "CanvasController");
+						
+						if(parent != null)
+							parent.updateChildren(_canvasModel.ddm.getComplexActivityChildren(parent.activity.activityUIID));
+						else if(gparent != null)
+							parent.updateChildren(_canvasModel.ddm.getComplexActivityChildren(parent.activity.activityUIID));
+						else
+							return;
+						
+						_canvasModel.activitiesDisplayed.get(ca.activity)
+					}
+				} else {
+					// refresh current complex activity
+					 _canvasModel.activeView.updateActivity();
 				}
+			
 			} else {
-				activitySnapBack(ca);
+			
+				if(!isActivityReadOnly(ca, Dictionary.getValue("cv_element_readOnly_action_del")) && !ca.branchConnector && !isActivityProtected(ca)) {
+					if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.isBranchingActivity()){
+						Debugger.log("removing complex act that hit bin" , Debugger.CRITICAL, "isActivityOnBin", "CanvasController");
+						if(ca.activity.isBranchingActivity())
+							_canvasModel.getCanvas().ddm.removeEntries(_canvasModel.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(ca.activity.activityUIID).all);
+						
+						_canvasModel.removeComplexActivity(ca);
+					} else {
+						_canvasModel.removeActivityOnBin(ca.activity.activityUIID);
+					}
+				} else {
+					activitySnapBack(ca);
+				}
 			}
 		}
 	}

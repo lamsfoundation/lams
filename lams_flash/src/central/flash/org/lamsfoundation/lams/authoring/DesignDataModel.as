@@ -196,6 +196,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			Debugger.log('Removed:'+r.activityUIID,Debugger.GEN,'removeActivity','DesignDataModel');
 			dispatchEvent({type:'ddmUpdate',target:this});
 			
+			return r;
 			
 		}
 	}

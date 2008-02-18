@@ -158,8 +158,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		
 		Debugger.log("firstActivityUIID:  " + ComplexActivity(_activity).firstActivityUIID, Debugger.CRITICAL, "init", "CanvasSequenceActivity");
 		
-		if(ComplexActivity(_activity).firstActivityUIID != null)
-			_children.push(_ddm.getActivityByUIID(ComplexActivity(_activity).firstActivityUIID));
+		if(ComplexActivity(_activity).firstActivityUIID != null) {
+			var firstActivity:Activity = _ddm.getActivityByUIID(ComplexActivity(_activity).firstActivityUIID);
+			if(firstActivity != null) _children.push(firstActivity);
+			else ComplexActivity(_activity).firstActivityUIID = null;
+		}
 		
 		showAssets(false);
 		
