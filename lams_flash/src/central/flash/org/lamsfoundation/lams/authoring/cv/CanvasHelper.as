@@ -190,6 +190,8 @@ class CanvasHelper {
 				canvasModel.getCanvas().addBin(canvasModel.activeView);
 				
 				canvasModel.broadcastViewUpdate("SIZE");
+			} else if(canvasModel.activeView instanceof CanvasComplexView) {
+				canvasModel.activeView.close();
 			}
 			
 			canvasModel.selectedItem = null;
