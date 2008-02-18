@@ -361,9 +361,17 @@ public class LearnerService implements ICoreLearnerService
     /**
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#chooseActivity(org.lamsfoundation.lams.usermanagement.User, java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity)
      */
-    public LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity) 
+    public LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity, Boolean clearCompletedFlag) 
     {
     	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
+  
+    	// if we skip a sequence in an optional sequence, or have been force completed for branching / optional sequence
+    	// and we go back to the sequence later, then the LessonComplete flag must be reset so that it will step through
+    	// all the activities in the sequence - otherwise it will go to the "Completed" screen after the first activity in the sequence
+    	if ( clearCompletedFlag && activity.getParentActivity() != null && activity.getParentActivity().isSequenceActivity() 
+    			&& progress.isLessonComplete() && ! progress.getCompletedActivities().contains(activity) )  
+    		progress.setLessonComplete(false);
+    	
     	progressEngine.setActivityAttempted(progress, activity);
     	progress.setCurrentActivity(activity);
        	progress.setNextActivity(activity);

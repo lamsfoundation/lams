@@ -168,7 +168,7 @@ public class BranchingActivityAction extends LamsDispatchAction {
 				}
 				
 				// Set the branch as the current part of the sequence and display it
-				learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(), branch);
+				learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(), branch, true);
 				forward = actionMappings.getActivityForward(branch, learnerProgress, true);
 				LearningWebUtil.putLearnerProgressInRequest(request,learnerProgress);
 			}
@@ -221,7 +221,7 @@ public class BranchingActivityAction extends LamsDispatchAction {
 			}
 				
 			// Set the branch as the current part of the sequence and display it
-			learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(), branch);
+			learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(), branch, true);
 			forward = actionMappings.getActivityForward(branch, learnerProgress, true);
 			LearningWebUtil.putLearnerProgressInRequest(request,learnerProgress);
 		}

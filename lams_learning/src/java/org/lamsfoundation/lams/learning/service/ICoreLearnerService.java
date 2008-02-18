@@ -114,9 +114,11 @@ public interface ICoreLearnerService extends ILearnerService
      * @param learnerId the Learner's userID
      * @param lessonId the Lesson to get progress from.
      * @param activity the activity being attempted.
+     * @param clearCompletedFlag If the lesson is completed but this activity is unstarted, should we mark it as incomplete? Used for branching and
+     * optional sequences for skipped sequences (e.g. force completed branching)
      * @return LearnerProgress
      */
-    public LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity);
+    public LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity, Boolean clearCompletedFlag);
 
     
     /**

@@ -79,7 +79,7 @@ public class ChooseActivityAction extends ActivityAction {
 		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
 		if (activity != null) {
-			progress = learnerService.chooseActivity(learnerId, lesson.getLessonId(), activity);
+			progress = learnerService.chooseActivity(learnerId, lesson.getLessonId(), activity, false);
 		} else {
 			// Something has gone wrong - maybe due to Live Edit. Need to recalculate their current location.
 			progress = learnerService.joinLesson(learnerId, lesson.getLessonId());

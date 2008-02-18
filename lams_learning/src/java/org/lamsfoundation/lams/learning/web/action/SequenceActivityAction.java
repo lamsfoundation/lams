@@ -87,7 +87,7 @@ public class SequenceActivityAction extends ActivityAction {
         
         if ( firstActivityInSequence != null && ! firstActivityInSequence.isNull() ) {
 			// Set the first activity as the current activity and display it
-			learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(), firstActivityInSequence);
+			learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(), firstActivityInSequence, true);
 			forward = actionMappings.getActivityForward(firstActivityInSequence, learnerProgress, true);
 			LearningWebUtil.putActivityInRequest(request, firstActivityInSequence, learnerService);
 			LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
