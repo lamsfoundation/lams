@@ -345,14 +345,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					ca._x = 0;
 					ca._y = 0;
 				} else {
+					
 					var sequenceActivity:Activity = _canvasModel.ddm.getActivityByUIID(ca.activity.parentUIID);
 			
-					if(sequenceActivity != null)
-						if(!_canvasModel.moveOptionalSequenceCA(ca, sequenceActivity))
-							activitySnapBack(ca);
-					else
-						activitySnapBack(ca);
+					if(sequenceActivity.isOptionalSequenceActivity(_canvasModel.ddm.getActivityByUIID(sequenceActivity.parentUIID))) {
+						if (ca._x > optionalOnCanvas[i].getVisibleWidth() || 
+								ca._x < -ca.getVisibleWidth() ||
+								ca._y < -ca.getVisibleHeight() - sequenceActivity.yCoord ||
+								ca._y > optionalOnCanvas[i].getVisibleHeight() - sequenceActivity.yCoord) {
+						} else {
+							_canvasModel.moveOptionalSequenceCA(ca, sequenceActivity);
+						}
+					}
 					
+					activitySnapBack(ca);
 				}
 			}
 			
@@ -434,7 +440,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				ca._x = ca.activity.endXCoord;
 				ca._y = ca.activity.endYCoord;
 			}
-				
+			
 		} else {
 			ca._x = ca.activity.xCoord;
 			ca._y = ca.activity.yCoord;
