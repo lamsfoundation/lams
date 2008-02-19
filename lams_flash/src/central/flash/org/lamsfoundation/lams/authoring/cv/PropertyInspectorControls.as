@@ -1278,7 +1278,7 @@ class PropertyInspectorControls extends MovieClip {
 		
 		if (_canvasModel.selectedItem.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE)
 			_canvasModel.selectedItem.init();
-		else if (_canvasModel.selectedItem.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE)
+		else if (_canvasModel.selectedItem.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || _canvasModel.selectedItem.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE)
 			_canvasModel.selectedItem.updateChildren();
 		else if(_canvasModel.selectedItem instanceof BranchConnector) {
 			if(_canvasModel.selectedItem.branch.isEnd)

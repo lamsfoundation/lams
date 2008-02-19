@@ -184,8 +184,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 	}
 	
 	public function showActivity():Void {
-		if(drawActivity(_complexActivity.activity, model))
+		if(drawActivity(_complexActivity.activity, model)) {
+			model.selectedItem = _tempActivity;
 			setSize(model);
+		}
 		
 		this._visible = true;
 	}
