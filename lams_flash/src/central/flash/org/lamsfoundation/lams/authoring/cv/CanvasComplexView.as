@@ -199,6 +199,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 		model.currentBranchingActivity = (_prevActiveView.activity.isBranchingActivity()) ? _prevActiveView.activity : null;
 
 		model.removeObserver(this);
+		
+		_complexActivity.refresh();
+
 		this.removeMovieClip();
 	}
 	

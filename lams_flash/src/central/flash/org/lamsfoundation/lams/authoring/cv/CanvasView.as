@@ -458,7 +458,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		var grid_mc = Grid.drawGrid(gridLayer, Math.round(newWidth), Math.round(newHeight), V_GAP, H_GAP);
 		
 		//position bin in canvas. 
-		if(cm.activeView == this) {
+		if(cm.activeView == this || cm.activeView instanceof CommonCanvasView) {
 			var bin = cm.getCanvas().bin;
 			bin._x = (s.w - bin._width) - 20;
 			bin._y = (s.h - bin._height) - 20;
