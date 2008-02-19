@@ -150,11 +150,11 @@ public class LearnerAction extends LamsDispatchAction
     {
         //initialize service object
         ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-
+        Integer learner = null;
     	try {
 	
 	        //get user and lesson based on request.
-	        Integer learner = LearningWebUtil.getUserId();
+	        learner = LearningWebUtil.getUserId();
 	        long lessonID = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
 	
 	        
@@ -176,9 +176,7 @@ public class LearnerAction extends LamsDispatchAction
 			redirectToURL(mapping, response, url);
 	
     	} catch (Exception e ) {
-    		// handle exception
-    		if(log.isDebugEnabled())
- 	           log.debug("An error occurred while attempting to join the lesson.");
+           log.error("An error occurred while learner "+learner+" attempting to join the lesson.",e);
     		return mapping.findForward(ActivityMapping.ERROR);
     	}
     	
