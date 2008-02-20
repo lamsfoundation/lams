@@ -163,7 +163,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 		activityComplexLayer = content.createEmptyMovieClip("_activityComplexLayer_mc", content.getNextHighestDepth());
 		activityLayer = content.createEmptyMovieClip("_activityLayer_mc", content.getNextHighestDepth());
 		
-		_learnerContainer_mc = content.createEmptyMovieClip("_learnerContainer_mc", content.getNextHighestDepth());
+		_learnerContainer_mc = content.createEmptyMovieClip("_learnerContainer_mc", content.getNextHighestDepth(), {_x: 0, _y: 0});
 		
 		complexViewer = content.createEmptyMovieClip("_complex_viewer_mc", content.getNextHighestDepth());
 		branchContent = content.createEmptyMovieClip("_branch_content_mc", DepthManager.kTopmost);

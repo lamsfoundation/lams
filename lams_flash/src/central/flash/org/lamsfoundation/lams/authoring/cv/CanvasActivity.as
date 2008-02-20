@@ -320,27 +320,32 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		var yCoord;
 				
 		if (_activity.parentUIID != null) {
-			xCoord = (parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE) ? _activity.xCoord : parentAct.xCoord;
+			var actX = _activity.xCoord;
+			var parentX = (mm.activeView instanceof CanvasComplexView) ? mm.activeView.openActivity._x : parentAct.xCoord;
+			
+			xCoord = (parentAct.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE) ? actX : parentX;
 
 			if(parentAct.activityTypeID != Activity.PARALLEL_ACTIVITY_TYPE 
 				&& parentAct.activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE) {
-				xCoord = parentAct.xCoord + _activity.xCoord;
 				
-				if(learner_X != null)
-					learner_X = (mm instanceof CanvasComplexView) ? learner_X + parentAct.xCoord : null;
-					
-				learner_Y = learner_Y + parentAct.yCoord;
+				xCoord = parentX + actX;
+				
+				learner_X = (learner_X != null) ? learner_X + parentX : null;
+				learner_Y = (mm.activeView instanceof CanvasComplexView) ? learner_Y + mm.activeView.openActivity._y : learner_Y + parentAct.yCoord;
+
+				
 			} else {
-				xCoord = parentAct.xCoord;
-				yCoord = parentAct.yCoord;
+				xCoord = parentX;
+				yCoord = (mm.activeView instanceof CanvasComplexView) ? mm.activeView.openActivity._y : parentAct.yCoord;
 				
-				parentAct = mm.getMonitor().ddm.getActivityByUIID(parentAct.parentUIID);
+				var gparentAct:Activity = mm.getMonitor().ddm.getActivityByUIID(parentAct.parentUIID);
 				
-				if(parentAct.isOptionsWithSequencesActivity()) {
-					xCoord = parentAct.xCoord + xCoord;
+				if(gparentAct.isOptionsWithSequencesActivity()) {
+					xCoord = (mm.activeView instanceof CanvasComplexView) ? xCoord + parentAct.xCoord : gparentAct.xCoord + xCoord;
 					
 					learner_X = (learner_X != null) ? learner_X + xCoord : null;
-					learner_Y = learner_Y + parentAct.yCoord + yCoord;
+					learner_Y = (mm.activeView instanceof CanvasComplexView) ? learner_Y + parentAct.yCoord + yCoord : learner_Y + gparentAct.yCoord + yCoord;
+
 				}
 				
 			}
