@@ -50,6 +50,9 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 	private var model:Observable;
 	private var controller:Controller;
 	
+	private var _cm:CanvasModel;
+	private var _mm:MonitorModel;
+	
     private var bkg_pnl:Panel;
 	
 	private var _content_mc:MovieClip;
@@ -117,20 +120,16 @@ class org.lamsfoundation.lams.common.CommonCanvasView extends AbstractView {
 	}
 	
 	public function onTransparentCoverClick(evt:Object):Void {
+		var _model = getModel();
 		
-		var m = (model instanceof MonitorModel) ? MonitorModel(model) : null;
-		m = (model instanceof CanvasModel) ? CanvasModel(model) : m;
+		var m = (_model instanceof MonitorModel) ? MonitorModel(_model) : null;
+		m = (_model instanceof CanvasModel) ? CanvasModel(_model) : m;
 		
+		Debugger.log("active view:  " + m.activeView, Debugger.CRITICAL, "onTransparentcoverClick", "CommonCanvasView");
 		Debugger.log("running transparent click:  " + m.activeView instanceof CanvasComplexView, Debugger.CRITICAL, "onTransparentcoverClick", "CommonCanvasView");
 		
-		if(m.activeView instanceof CanvasComplexView) {
-			if(m instanceof CanvasModel) {
-				m.activeView.close();
-			} else {
-				//m.getMonitor().closeComplexView();
-			}
-			
-		}
+		if(m.activeView instanceof CanvasComplexView)
+			m.activeView.close();
 	}
 	
 	private function initDrawTempTrans(){

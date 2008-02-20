@@ -919,7 +919,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	* Overrides AbstractView.defaultController()
     */
     public function defaultController (model):Object {
-        return (model instanceof CanvasModel) ? new CanvasController(model) : new MonitorModel(model);
+        return (model instanceof CanvasModel) ? new CanvasController(model) : new MonitorController(model);
     }
 	
 	public function setOpen(a:Boolean):Void {

@@ -28,6 +28,8 @@ import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.cv.CanvasActivity;
+import org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity;
+import org.lamsfoundation.lams.authoring.cv.CanvasComplexView;
 import org.lamsfoundation.lams.authoring.br.CanvasBranchView;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.util.*;
@@ -51,11 +53,15 @@ class Monitor {
 	
 	// Model
 	private var monitorModel:MonitorModel;
+	
 	// View
 	private var monitorView:MonitorView;
 	private var monitorLockView:MonitorLockView;
 	private var monitorView_mc:MovieClip;
 	private var monitorLockView_mc:MovieClip;
+
+	private var canvasComplexView:CanvasComplexView;
+	private var _canvasComplexView_mc:MovieClip;
 
 	private var locked:Boolean;
 
@@ -154,11 +160,16 @@ class Monitor {
 		
 		if(evt.type=='load') {
 
-			monitorModel.activeView = evt.target;
-			
 			if(evt.target instanceof CanvasBranchView) {
+				monitorModel.activeView = evt.target;
+			
 				evt.target.open();
 				monitorModel.setDirty(false);
+			} else if(evt.target instanceof CanvasComplexView) {
+				monitorModel.activeView = evt.target;
+			
+				// open complex view
+				evt.target.showActivity();
 			} else if((monitorLockView != null || !locked) && monitorView != null) {
 				dispatchEvent({type:'load',target:this});
 			}
@@ -170,7 +181,8 @@ class Monitor {
 	
 	private function tabsLoaded(evt:Object){
         Debugger.log('tabsLoaded called',Debugger.GEN,'tabsLoaded','Monitor');
-		
+		monitorModel.activeView = MonitorView(evt.target).getMonitorTabView();
+			
 		monitorModel.setSequence(app.sequence);
 		saveDataDesignModel(null);
 		
@@ -392,6 +404,7 @@ class Monitor {
 		}
 			
 		//sets these in the monitor model in a hashtable by learnerID
+		monitorModel.activeView = monitorView.getMonitorTabView();
 		monitorModel.setLessonProgressData(allLearners);
 		monitorModel.backupLearnersProgress(monitorModel.allLearnersProgress);
 		dispatchEvent({type:'load',target:this});		
@@ -468,7 +481,7 @@ class Monitor {
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
 		var isVisible:Boolean = (visible == null) ? true : visible;
 		
-		var target:MovieClip = (monitorModel.activeView instanceof CanvasBranchView) ? monitorModel.activeView.branchContent : monitorView.getMonitorTabView();
+		var target:MovieClip = monitorModel.activeView.branchContent;
 		var _branchView_mc:MovieClip = target.createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
 		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
 		
@@ -501,6 +514,58 @@ class Monitor {
 		Debugger.log("Closing branching activity: "+poppedActivity.title, Debugger.CRITICAL, "closeBranchView", "Monitor");
 		Debugger.log("It had a UIID of: "+poppedActivityUIID, Debugger.CRITICAL, "openBranchActivityContent", "Monitor");
 	}
+	
+	public function openComplexView(ca:Object):Void {
+		
+		var target:MovieClip = (monitorModel.activeView instanceof CanvasBranchView) ? monitorModel.activeView.complexViewer : monitorView.getMonitorTabView().complexViewer;
+		
+		var cx:Number;
+		var cy:Number;
+		
+		var parentAct:Activity = ddm.getActivityByUIID(ca.activity.parentUIID);
+		var grandParentActivity:MovieClip = monitorModel.activitiesDisplayed.get(parentAct.parentUIID);
+		var parentActivity:MovieClip = monitorModel.activitiesDisplayed.get(parentAct.activityUIID);
+		
+		if(monitorModel.activeView instanceof CanvasComplexView) {
+			if(monitorModel.activeView.complexActivity == ca) {
+				return;
+			}
+				
+			target = monitorModel.activeView.complexViewer;
+			
+			Debugger.log("parentAct: " + parentAct.activityUIID, Debugger.CRITICAL, "openComplexView", "Monitor");
+			Debugger.log("parentAct type: " + parentAct.activityTypeID, Debugger.CRITICAL, "openComplexView", "Monitor");
+			Debugger.log("gpAct: " + grandParentActivity.activity.activityUIID, Debugger.CRITICAL, "openComplexView", "Monitor");
+			
+			if(parentAct.isSequenceActivity() && monitorModel.activeView.openActivity instanceof CanvasOptionalActivity) {
+				cx = parentAct.xCoord + ca._x;
+				cy = parentAct.yCoord + ca._y;
+			} else {
+				cx = ca._x;
+				cy = ca._y;
+			}
+		} else {
+		
+			if(parentAct.isSequenceActivity() && grandParentActivity instanceof CanvasOptionalActivity) {
+				cx = grandParentActivity._x +  parentAct.xCoord + ca._x;
+				cy = grandParentActivity._y + parentAct.yCoord + ca._y;
+			} else {
+				cx = parentActivity._x + ca._x;
+				cy = parentActivity._y + ca._y;
+			}
+		}
+		
+		Debugger.log("co ord x: " + cx +  " y: " + cy, Debugger.CRITICAL, "openComplexView", "Monitor");
+		
+		_canvasComplexView_mc = target.createChildAtDepth("canvasComplexView", DepthManager.kTop, {_x: cx, _y: cy, _complexActivity:ca, _parentActivity:parentActivity, _visible:false, _prevActiveView: monitorModel.activeView});
+		canvasComplexView = CanvasComplexView(_canvasComplexView_mc);
+		
+		canvasComplexView.init(monitorModel, undefined);
+		canvasComplexView.addEventListener('load', Proxy.create(this, viewLoaded));
+		
+		monitorModel.addObserver(canvasComplexView);
+	}
+	
 	
 	/**
 	 * Open the Help page for the selected Tool (Canvas) Activity

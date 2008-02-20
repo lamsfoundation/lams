@@ -161,7 +161,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		
 		for (var i=0; i < _children.length; i++)		{
 			if(fromModuleTab == "monitorMonitorTab"){
-				children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+				if(_canvasBranchView != null) {
+					children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_canvasBranchView, _module:"monitoring", learnerContainer:learnerContainer});
+				} else if(_canvasComplexView != null) {
+					children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_canvasComplexView, _module:"monitoring", learnerContainer:learnerContainer});
+				} else {
+					children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+				}
 			} else {
 				if(_canvasBranchView != null) {
 					children_mc[i] = childActivities_mc.attachMovie("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children[i] , _canvasController:_canvasController, _canvasBranchView:_canvasBranchView})
@@ -301,8 +307,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	
 	private function drawLearners():Void {
 		var mm:MonitorModel = MonitorModel(_monitorController.getModel());
-		var learner_X = _activity.xCoord + learnerOffset_X;
-		var learner_Y = _activity.yCoord + learnerOffset_Y;
+		
+		var learner_X = (mm.activeView instanceof CanvasComplexView) ? this._x + learnerOffset_X : _activity.xCoord + learnerOffset_X;
+		var learner_Y = (mm.activeView instanceof CanvasComplexView) ? this._y + learnerOffset_Y : _activity.yCoord + learnerOffset_Y;
 			
 		// get the length of learners from the Monitor Model and run a for loop.
 		for (var j=0; j<mm.allLearnersProgress.length; j++){
@@ -314,11 +321,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			var hasPlus:Boolean = false;
 			
 			if (isLearnerCurrentAct){
-					
-				if (learner_X > (_activity.xCoord + 112)){
-					learner_X = _activity.xCoord + learnerOffset_X ;
+				var actX:Number = (mm.activeView instanceof CanvasComplexView) ? this._x : _activity.xCoord;
+				
+				if (learner_X > (actX + 112)){
+					learner_X = actX + learnerOffset_X ;
 					learner_Y = 27;
 					hasPlus = true;
+					
 					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
 					
 					return;

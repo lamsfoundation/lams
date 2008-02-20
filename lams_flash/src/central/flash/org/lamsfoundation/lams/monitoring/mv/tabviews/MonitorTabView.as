@@ -234,6 +234,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
     * layout visual elements on the MonitorTabView on initialisation
     */
 	private function draw(){
+		content = this;
 		
 		bkg_pnl = this.attachMovie("Panel", "bkg_pnl", this.getNextHighestDepth());
 
@@ -247,8 +248,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		// creates learner icon on initial draw
 		_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", this.getNextHighestDepth());
 				
-		transparentCover = this.attachMovie("Panel", "_transparentCover_mc", this.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
-		transparentCover.onPress = null;
+		transparentCover = this.attachMovie("Panel", "_transparentCover_mc", this.getNextHighestDepth(), {_visible: false, enabled: true, _alpha: 50});
+		transparentCover.onPress = Proxy.create(this, onTransparentCoverClick);
+		
+		complexViewer = this.createEmptyMovieClip("_complex_viewer_mc", this.getNextHighestDepth());
+		branchContent = this.createEmptyMovieClip("_branch_content_mc", DepthManager.kTopmost);		
 		
 		var s:Object = mm.getSize();
 		
@@ -294,6 +298,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			this.activityLayer.removeMovieClip();
 			this.transparentCover.removeMovieClip();
 			
+			this.branchContent.removeMovieClip();
+			this.complexViewer.removeMovieClip();
+		
 			//Recreate both Transition holder and Activity holder Movieclips
 			transitionLayer = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
 			
@@ -301,8 +308,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			
 			_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", this.getNextHighestDepth());
 			
-			transparentCover = this.attachMovie("Panel", "_transparentCover_mc", this.getNextHighestDepth(), {_visible: false, enabled: false, _alpha: 50});
-			transparentCover.onPress = null;
+			transparentCover = this.attachMovie("Panel", "_transparentCover_mc", this.getNextHighestDepth(), {_visible: false, enabled: true, _alpha: 50});
+			transparentCover.onPress = Proxy.create(this, onTransparentCoverClick);
+		
+			complexViewer = this.createEmptyMovieClip("_complex_viewer_mc", this.getNextHighestDepth());
+			branchContent = this.createEmptyMovieClip("_branch_content_mc", DepthManager.kTopmost);		
 		
 			if (isChanged == false){
 				mm.setIsProgressChangedSequence(false);

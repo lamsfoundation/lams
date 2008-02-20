@@ -313,6 +313,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		var learner_X = _activity.xCoord + learnerOffset_X;
 		var learner_Y = _activity.yCoord + learnerOffset_Y;
+		
 		var parentAct:Activity = mm.getMonitor().ddm.getActivityByUIID(_activity.parentUIID)
 		
 		var xCoord = _activity.xCoord;
@@ -324,7 +325,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			if(parentAct.activityTypeID != Activity.PARALLEL_ACTIVITY_TYPE 
 				&& parentAct.activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE) {
 				xCoord = parentAct.xCoord + _activity.xCoord;
-				learner_X = (learner_X != null) ? learner_X + parentAct.xCoord : null;
+				
+				if(learner_X != null)
+					learner_X = (mm instanceof CanvasComplexView) ?  :  ? learner_X + parentAct.xCoord : null;
+					
 				learner_Y = learner_Y + parentAct.yCoord;
 			} else {
 				xCoord = parentAct.xCoord;
@@ -334,6 +338,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				
 				if(parentAct.isOptionsWithSequencesActivity()) {
 					xCoord = parentAct.xCoord + xCoord;
+					
 					learner_X = (learner_X != null) ? learner_X + xCoord : null;
 					learner_Y = learner_Y + parentAct.yCoord + yCoord;
 				}
@@ -356,6 +361,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				// Add + icon to indicate that more users are currently at the Activity. 
 				// We are unable to display all the users across the Activity's panel.
 				Debugger.log("learner_X: " + learner_X + " ref: " + learnerContainer + " xcoord: " + xCoord, Debugger.CRITICAL, "drawLearners", "CanvasActivity");
+				
 				if(learner_X > (xCoord + getVisibleWidth() - 10)) {
 					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(), {_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:true, _clone:false });
 					return;

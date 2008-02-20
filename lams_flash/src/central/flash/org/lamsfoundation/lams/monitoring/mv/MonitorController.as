@@ -393,11 +393,14 @@ class MonitorController extends AbstractController {
 		else if (!fromContextMenu){
 			var _learnerID:Number;
 			var URLToSend:String;
+			
 			setBusy();
 			
 			if(forTabView == "MonitorTabView"){
+				
 				URLToSend = _root.serverURL+_root.monitoringURL+'getActivityMonitorURL&activityID='+ca.activity.activityID+'&lessonID='+_root.lessonID;
 				URLToSend += '&contentFolderID='+MonitorModel(getModel()).getSequence().contentFolderID
+			
 			} else {
 				if(learnerID != null){
 					_learnerID = learnerID;
@@ -410,6 +413,7 @@ class MonitorController extends AbstractController {
 				}else {
 					URLToSend = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_learnerID+'&lessonID='+_root.lessonID;
 				}	
+				
 				Debugger.log('activityDoubleClick CanvasActivity:'+ca.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
 			}
 
@@ -425,7 +429,17 @@ class MonitorController extends AbstractController {
 					JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
 				}
 			} else {
-				JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
+				
+					if(ca.activity.parentUIID != null &&  (ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || 
+						ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE ||
+						ca.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE)) {
+						// open complex inside complex view
+						Debugger.log("open complex viewer: " + ca.activity.activityUIID, Debugger.CRITICAL, "activityDoubleClick", "MonitorController")
+						_monitorModel.getMonitor().openComplexView(ca);
+					} else {
+						JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
+					}
+					
 			}
 
 		   clearBusy();
@@ -481,12 +495,6 @@ class MonitorController extends AbstractController {
 		} else if(tgt.indexOf("exportPortfolio_btn") != -1){
 			exportClassPortfolio();
 		}else if(tgt.indexOf("refresh_btn") != -1){
-			
-			if(_monitorModel.activeView instanceof CanvasBranchView) {
-				_monitorModel.getMonitor.closeBranchView();
-				_monitorModel.activeView.removeMovieClip();
-			}
-			
 			if (_monitorModel.getSelectedTab() == 2)
 				_monitorModel.resetLearnerIndexBar();
 			

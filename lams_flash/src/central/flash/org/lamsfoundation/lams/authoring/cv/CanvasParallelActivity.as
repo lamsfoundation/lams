@@ -144,6 +144,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		
 		if(fromModuleTab == "monitorMonitorTab"){
 			Debugger.log("initialising for monitor: " + child1.activityUIID + " " + child2.activityUIID, Debugger.CRITICAL, "init", "CanvasParallelActivity");
+			Debugger.log("controller for monitor: " + _monitorController, Debugger.CRITICAL, "init", "CanvasParallelActivity");
 			
 			//child1_mc = childActivities_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:child1 ,_monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
 			//child2_mc = childActivities_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:child2 ,_monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
@@ -244,8 +245,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private function drawLearners():Void {
 		var mm:MonitorModel = MonitorModel(_monitorController.getModel());
 		
-		var learner_X = _activity.xCoord + learnerOffset_X;
-		var learner_Y = _activity.yCoord + learnerOffset_Y;
+		var learner_X = (mm.activeView instanceof CanvasComplexView) ? this._x + learnerOffset_X : _activity.xCoord + learnerOffset_X;
+		var learner_Y = (mm.activeView instanceof CanvasComplexView) ? this._y + learnerOffset_Y : _activity.yCoord + learnerOffset_Y;
 			
 		// get the length of learners from the Monitor Model and run a for loop.
 		for (var j=0; j<mm.allLearnersProgress.length; j++){
@@ -257,9 +258,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 			var hasPlus:Boolean = false;
 			
 			if (isLearnerCurrentAct){
+				var actX:Number = (mm.activeView instanceof CanvasComplexView) ? this._x : _activity.xCoord;
 					
-				if (learner_X > (_activity.xCoord + 112)){
-					learner_X = _activity.xCoord + learnerOffset_X 
+				if (learner_X > (actX + 112)){
+					learner_X = actX + learnerOffset_X 
 					learner_Y = 27
 					hasPlus = true;
 					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this._parent.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
