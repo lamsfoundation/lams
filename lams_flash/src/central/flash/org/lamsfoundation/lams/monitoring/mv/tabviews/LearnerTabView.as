@@ -155,7 +155,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 				case 'SIZE' :
 					setSize(mm);
 					break;
-				case 'TABCHANGE' :
+				case 'TABCHANGE' :								
 					if (infoObj.tabID == _tabID && !mm.locked){
 						hideMainExp(mm);
 						mm.broadcastViewUpdate("JOURNALSSHOWHIDE", true);
@@ -165,7 +165,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 							mm.getMonitor().openLearningDesign(mm.getSequence());
 						} else if(mm.getIsProgressChangedLearner()) {
 							reloadProgress(mm, false);
-						} else if(learnersDrawn != mm.allLearnersProgress.length){ //could be error here with learnersDrawn
+						} else { 
 							reloadProgress(mm, true);
 						}
 						
@@ -173,6 +173,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 						LFMenuBar.getInstance().setDefaults();
 						
 					} else {
+						if (mm.isDesignDrawn)
+							clearCanvas(mm);
+							
 						mm.getMonitor().getMV().getMonitorLearnerScp()._visible = false;
 					}
 					break;
