@@ -206,14 +206,6 @@ public class LearningAction extends Action {
 			forumService.updateForum(forum);
 		}
 		
-		//try to clone topics from :See bug LDEV-649 
-		Long contentId = forum.getContentId();
-		try {
-			forumService.cloneContentTopics(contentId, sessionId);
-		} catch (ObjectOptimisticLockingFailureException e) {
-			log.warn("Multiple learner get into forum simultaneously. Duplicated content root topics cloning skipped. contentId="+contentId+" sessionId="+ sessionId);
-		}
-		
 		//set some option flag to HttpSession
 		// if allowRichEditor = true then don't restrict the number of chars
 		// if isLimitedInput = false then don't restrict the number of chars

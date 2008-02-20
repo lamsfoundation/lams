@@ -177,6 +177,25 @@
             column="report_id"
         />
 
+        <set
+            name="sessionClones"
+            lazy="false"
+            inverse="false"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+
+            <key
+                column="authored_parent_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.forum.persistence.Message"
+            />
+
+        </set>
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Message.xml

@@ -73,6 +73,7 @@ create table tl_lafrum11_message (
    reply_number integer,
    hide_flag smallint,
    report_id bigint,
+   authored_parent_uid bigint,
    primary key (uid)
 )TYPE=InnoDB;
 create table tl_lafrum11_message_seq (
@@ -111,6 +112,7 @@ alter table tl_lafrum11_message add index FK4A6067E8131CE31E (forum_uid), add co
 alter table tl_lafrum11_message add index FK4A6067E824089E4D (parent_uid), add constraint FK4A6067E824089E4D foreign key (parent_uid) references tl_lafrum11_message (uid);
 alter table tl_lafrum11_message add index FK4A6067E89357B45B (forum_session_uid), add constraint FK4A6067E89357B45B foreign key (forum_session_uid) references tl_lafrum11_tool_session (uid);
 alter table tl_lafrum11_message add index FK4A6067E8647A7264 (modified_by), add constraint FK4A6067E8647A7264 foreign key (modified_by) references tl_lafrum11_forum_user (uid);
+alter table tl_lafrum11_message add index IX_msg_auth_parent (authored_parent_uid);
 alter table tl_lafrum11_message_seq add index FKD2C71F88FE939F2A (message_uid), add constraint FKD2C71F88FE939F2A foreign key (message_uid) references tl_lafrum11_message (uid);
 alter table tl_lafrum11_message_seq add index FKD2C71F8845213B4D (root_message_uid), add constraint FKD2C71F8845213B4D foreign key (root_message_uid) references tl_lafrum11_message (uid);
 alter table tl_lafrum11_tool_session add index FK5A04D7AE131CE31E (forum_uid), add constraint FK5A04D7AE131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);

@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -33,9 +34,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 
 /**
@@ -68,11 +66,14 @@ public class Message implements Cloneable{
 	private ForumUser modifiedBy;
 	private Set attachments;
 	private ForumReport report;
+	
+	private Set sessionClones;
 
 	private ForumToolContentHandler toolContentHandler;
 	
 	public Message(){
 		attachments = new TreeSet();
+		sessionClones = new HashSet();
 	}
 //  **********************************************************
   	//		Function method for Message
@@ -119,12 +120,44 @@ public class Message implements Cloneable{
   				}
   				msg.attachments = set;
   			}
+  			// do not clone the tool session data as cloning should be creating a "fresh" copy
+  			msg.sessionClones = new HashSet();
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + Forum.class + " failed");
 		}
   		
   		return msg;
   	}
+  	
+  	public Object updateClone(Message clone){
+  		
+  		clone.setBody(this.getBody());
+  		clone.setForum(this.getForum());
+  		clone.setHideFlag(this.isHideFlag());
+  		clone.setIsAnonymous(this.isAnonymous);
+  		clone.setIsAuthored(this.getIsAuthored());
+  		clone.setLastReplyDate(this.getLastReplyDate());
+  		clone.setModifiedBy(clone.getModifiedBy());
+  		clone.setReplyNumber(this.getReplyNumber());
+  		clone.setReport(this.getReport());
+  		clone.setSubject(this.getSubject());
+  		clone.setToolContentHandler(this.getToolContentHandler());
+  		clone.setUpdated(clone.getUpdated());
+ 
+  		// Update the attachments. Easiest way is to recopy them - which does NOT copy them in the content repository.
+  		clone.getAttachments().clear();
+		if(attachments != null){
+			Iterator iter = attachments.iterator();
+			while(iter.hasNext()){
+				Attachment file = (Attachment)iter.next();
+				Attachment newFile = (Attachment) file.clone();
+				clone.getAttachments().add(newFile);
+  			}
+ 		}
+  		
+  		return clone;
+  	}
+
 	/**
 	 * Updates the modification data for this entity.
 	 */
@@ -446,7 +479,28 @@ public class Message implements Cloneable{
 		this.report = report;
 	}
 	
-	public String toString() {
+	/**
+     * @return the set of all messages cloned from this message. See getAuthoredParent().
+     *
+     * @hibernate.set cascade="all-delete-orphan" inverse="false"
+     * @hibernate.collection-key column="authored_parent_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Message"
+     *
+     */
+	public Set getSessionClones() {
+		return sessionClones;
+	}
+
+    /*
+	 * @param sessionClones The sessionClones to set.
+     */
+    public void setSessionClones(Set sessionClones) {
+		this.sessionClones = sessionClones;
+	}
+
+
+    
+    public String toString() {
 		return new ToStringBuilder(this).
 			append("uid",uid).
 			append("subject",subject).

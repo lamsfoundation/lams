@@ -172,14 +172,17 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     }
 
     public Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException {
+    	return createRootTopic(forumId, getSessionBySessionId(sessionId), message);
+    }
+
+    public Message createRootTopic(Long forumId, ForumToolSession session, Message message) throws PersistenceException {
     	//get Forum and ForumToolSesion
     	if(message.getForum() == null){
     		Forum forum = forumDao.getById(forumId);
     		message.setForum(forum);
     	}
-    	//if topic created by author, sessionId will be null.
-    	if(sessionId != null){
-    		ForumToolSession session = getSessionBySessionId(sessionId);
+    	//if topic created by author, session will be null.
+    	if(session != null){
     		message.setToolSession(session);
     	}
     	
@@ -192,9 +195,20 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	    	msgSeq.setRootMessage(message);
 	    	messageSeqDao.save(msgSeq);
     	}
+        
+        // if this message had any cloned objects, they also need to be changed.
+        // this will only happen if an authored topic is changed via monitoring
+        if ( message.getSessionClones().size() > 0 ) {
+        	Iterator iter = message.getSessionClones().iterator();
+        	while ( iter.hasNext() ) {
+        		Message clone = (Message) iter.next();
+        		message.updateClone(clone);
+        	}
+        }
+
     	//create message in database
         messageDao.saveOrUpdate(message);
-        
+
         return message;
     }
 
@@ -414,11 +428,12 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		List list = messageDao.getTopicsFromAuthor(forumUid);
 		
 		TreeMap<Date,Message> map = new TreeMap<Date,Message>(new DateComparator());
-		//sorted by create date
+		// get all the topics skipping ones with a tool session (we may be editing in monitor) and sort by create date
 		Iterator iter = list.iterator();
 		while(iter.hasNext()){
 			Message topic = (Message) iter.next();
-			map.put(topic.getCreated(),topic);
+			if ( topic.getToolSession() == null ) 
+				map.put(topic.getCreated(),topic);
 		}
 		return MessageDTO.getMessageDTO(new ArrayList<Message>(map.values()));
 	}
@@ -478,32 +493,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		forumUserDao.save(currentUser);
 	}
 	
-	public void cloneContentTopics(Long contentID, Long sessionID) {
-		//only session does not have content topcis
-		ForumToolSession session = forumToolSessionDao.getBySessionId(sessionID);
-		
-		if(session.getStatus() != ForumConstants.STATUS_CONTENT_COPYED){
-			
-			log.debug("Clone tool content [" + contentID +"] topics for session [" + sessionID + "]");
-			
-			Forum forum = (Forum) forumDao.getByContentId(contentID);
-			Set<Message> contentTopcis = forum.getMessages();
-			
-			//only forum has content topics, clone happens 
-			if(contentTopcis != null && contentTopcis.size() > 0){
-				for(Message msg : contentTopcis){
-					if(msg.getIsAuthored() && msg.getToolSession() == null){
-						Message newMsg = Message.newInstance(msg, forumToolContentHandler);
-						createRootTopic(contentID, sessionID, newMsg);
-					}
-				}
-			}
-			//update status to avoid duplicate clone when next learner get in.
-			session.setStatus(ForumConstants.STATUS_CONTENT_COPYED);
-			forumToolSessionDao.saveOrUpdate(session);
-			
-		}
-	}
     //***************************************************************************************************************
     // Private methods
     //***************************************************************************************************************
@@ -648,7 +637,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 				msg.setLastReplyDate(new Date());
 				msg.setHideFlag(false);
 				msg.setForum(toContent);
-				createRootTopic(toContent.getUid(),null,msg);
+				createRootTopic(toContent.getUid(),(ForumToolSession) null,msg);
 			}
 		}
 
@@ -768,7 +757,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			for(Message item:items){
 				item.setCreatedBy(user);
 				item.setIsAuthored(true);
-				createRootTopic(toolContentObj.getUid(),null,item);
+				createRootTopic(toolContentObj.getUid(),(ForumToolSession) null,item);
 			}
 		} catch (ImportToolContentException e) {
 			throw new ToolException(e);
@@ -796,12 +785,25 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		session.setSessionName(toolSessionName);
 		Forum forum = forumDao.getByContentId(toolContentId);
 		session.setForum(forum);
-		forumToolSessionDao.saveOrUpdate(session);
-
-		//Update(29/08/2006): Do not clone author topic BUG: LDEV-649.
+		
 //		also clone author created topic from this forum tool content!!!
 //		this can avoid topic record information conflict when multiple sessions are against same tool content
 //		for example, the reply number maybe various for different sessions.
+		log.debug("Clone tool content [" + forum.getContentId() +"] topics for session [" + session.getSessionId() + "]");		
+		Set<Message> contentTopics = forum.getMessages();
+		if(contentTopics != null && contentTopics.size() > 0){
+			for(Message msg : contentTopics){
+				if(msg.getIsAuthored() && msg.getToolSession() == null){
+					Message newMsg = Message.newInstance(msg, forumToolContentHandler);
+					msg.getSessionClones().add(newMsg);
+					createRootTopic(forum.getContentId(), session, newMsg);
+				}
+			}
+		}
+		session.setStatus(ForumConstants.STATUS_CONTENT_COPYED);
+
+		forumToolSessionDao.saveOrUpdate(session);
+
 	}
 
 	public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
@@ -987,7 +989,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	    			message.setHideFlag(Boolean.FALSE);
 	    			message.setIsAnonymous(Boolean.FALSE);
 	    			
-	    			createRootTopic(toolContentObj.getUid(),null,message);
+	    			createRootTopic(toolContentObj.getUid(),(ForumToolSession) null,message);
 	    			
 	        	}
 	    	}
