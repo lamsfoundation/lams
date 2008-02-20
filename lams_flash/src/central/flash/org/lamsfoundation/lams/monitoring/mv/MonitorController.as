@@ -226,7 +226,7 @@ class MonitorController extends AbstractController {
 			var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+learnerObj.Learner.getLearnerId()+"&activityID="+cActivity.activity.activityID;
 			var fnOk:Function = Proxy.create(this, this.reloadProgress, this, URLToSend);
 			var fnCancel:Function = Proxy.create(this, this.activitySnapBack, learnerObj);			
-			LFMessage.showMessageConfirm("Are you sure you want to force complete leaner '"+learnerObj.Learner.getFullName()+"' to the end of this branching sequence?", fnOk,fnCancel);			
+			LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_forcecomplete_to_end_of_branching_seq',[learnerObj.Learner.getFullName()]), fnOk,fnCancel);			
 		}
 		else if (_parent.isOptionalSequenceActivity(_grandParent) && !sameOptionalSequence) { // if the learner hit an activity within an optional sequence and they were initially outside of the target optional sequence
 			var transObj:Object = _monitorModel.getMonitor().ddm.getTransitionsForActivityUIID(_grandParent.activityUIID);	
@@ -234,7 +234,7 @@ class MonitorController extends AbstractController {
 			var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+learnerObj.Learner.getLearnerId()+"&activityID="+previousAct.activityID;
 			var fnOk:Function = Proxy.create(this, this.reloadProgress, this, URLToSend);
 			var fnCancel:Function = Proxy.create(this, this.activitySnapBack, learnerObj);
-			LFMessage.showMessageConfirm("Are you sure you want to force complete leaner '"+learnerObj.Learner.getFullName()+"' to Optional Sequence?", fnOk,fnCancel);
+			LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_forcecomplete_toactivity',[learnerObj.Learner.getFullName(), _grandParent.title]), fnOk,fnCancel);			
 		}
 		else if (_parent.isOptionalActivity()) { // if the learner hit an activity within an optional activity
 			var transObj:Object = _monitorModel.getMonitor().ddm.getTransitionsForActivityUIID(_parent.activityUIID);
@@ -242,10 +242,10 @@ class MonitorController extends AbstractController {
 			var URLToSend:String = _root.monitoringURL+"forceComplete&lessonID="+_root.lessonID+"&learnerID="+learnerObj.Learner.getLearnerId()+"&activityID="+previousAct.activityID;
 			var fnOk:Function = Proxy.create(this, this.reloadProgress, this, URLToSend);
 			var fnCancel:Function = Proxy.create(this, this.activitySnapBack, learnerObj);
-			LFMessage.showMessageConfirm("Are you sure you want to force complete leaner '"+learnerObj.Learner.getFullName()+"' to Optional Activity?", fnOk,fnCancel);
+			LFMessage.showMessageConfirm(Dictionary.getValue('al_confirm_forcecomplete_toactivity',[learnerObj.Learner.getFullName(), _parent.title]), fnOk,fnCancel);			
 		}
 		else {
-			LFMessage.showMessageAlert(learnerObj.Learner.getFullName() +" cannot be dropped on an activity that is in a different branch or sequence.", null, null);
+			LFMessage.showMessageAlert(Dictionary.getValue('al_error_forcecomplete_to_different_seq',[learnerObj.Learner.getFullName()]), null, null);
 		}
 	}
 	

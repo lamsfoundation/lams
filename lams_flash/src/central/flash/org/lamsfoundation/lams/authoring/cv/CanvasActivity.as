@@ -327,7 +327,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				xCoord = parentAct.xCoord + _activity.xCoord;
 				
 				if(learner_X != null)
-					learner_X = (mm instanceof CanvasComplexView) ?  :  ? learner_X + parentAct.xCoord : null;
+					learner_X = (mm instanceof CanvasComplexView) ? learner_X + parentAct.xCoord : null;
 					
 				learner_Y = learner_Y + parentAct.yCoord;
 			} else {
