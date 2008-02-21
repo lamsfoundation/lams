@@ -29,12 +29,12 @@ import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.SequenceActivity;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.authoring.cv.ICanvasActivity;
-import org.lamsfoundation.lams.learner.ls.LessonModel;
-import org.lamsfoundation.lams.learner.ls.LessonController;
+import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.learner.Application;
 import org.lamsfoundation.lams.monitoring.mv.MonitorModel;
 import org.lamsfoundation.lams.monitoring.mv.MonitorController;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView;
 import org.lamsfoundation.lams.common.style. *;
 
 import mx.controls. *;
@@ -52,10 +52,13 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private var LABEL_W:Number = 130;
 	private var LABEL_H:Number = 22;
 	
+	private var count:Number;
+	
 	//this is set by the init object
 	private var _controller:AbstractController;
 	private var _view:AbstractView;
 	private var _tip:ToolTip;
+	
 	//Set by the init obj
 	private var _activity : Activity;
 	private var _children : Array;
@@ -101,7 +104,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		activeSequence = null;
 		
 		app = ApplicationParent.getInstance();
-	
+		
 		_visible = false;
 		
 		_tm = ThemeManager.getInstance();
@@ -150,8 +153,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		MovieClipUtils.doLater(Proxy.create(this, draw));
 	}
 	
-	private function drawChildren(children:Array, container:Array):Void {
-		var childCoordY=0;
+	private function drawChildren(children:Array, container:Array, _count:Number):Void {
+		count = (_count != null) ? _count : 0;
+		
+		var childCoordY:Number = 0;
 		
 		for(var i=0; i<children.length; i++) {
 			var progStatus:String = Progress.compareProgressData(learner, children[i].activityID);
@@ -163,21 +168,30 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			//set the positioning co-ords
 			//learnerAct.activityStatus = progStatus;
 			
-			learnerAct._y = (i*21);
-			childCoordY = this._y + ((i+1)*21)+29 ;
+			learnerAct._y = (count*21);
+			
+			childCoordY = this._y + ((count+1)*21) + 29;
+			
 			learnerAct._visible = true;
 			
 			Debugger.log('x: ' + learnerAct._x + ' y: ' +  learnerAct._y, Debugger.CRITICAL, 'drawChildren', 'LearnerComplexActivity');
         
-			var parentAct:Activity = Application(app).getLesson().model.learningDesignModel.getActivityByUIID(Activity(children[i]).parentUIID);
+			var parentAct:Activity = model.learningDesignModel.getActivityByUIID(Activity(children[i]).parentUIID);
 			
-			if(activity.isBranchingActivity() && parentAct.isSequenceActivity()) {
+			if((activity.isBranchingActivity() && parentAct.isSequenceActivity()) || (activity.isOptionsWithSequencesActivity() && parentAct.isSequenceActivity())) {
 				/** TODO: Use for Sequence in Optional */
+				Debugger.log("setting line visibility: " + i, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
 				learnerAct.lineTopVisible = (i != 0) ? false : true;
 				learnerAct.lineBottomVisible = (i == children.length-1) ? true : false;
 			}
 			
 			container.push(learnerAct);
+			count++;
+			
+			if(learnerAct.activity == activeSequence) {
+				var actOrder:Array = model.getDesignOrder(activeSequence.firstActivityUIID);
+				drawChildren(actOrder, container, count);
+			}
 		}
 		
 	}
@@ -222,7 +236,9 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 				&& Progress.compareProgressData(learner, _children[i].activityID) == 'completed_mc')
 				
 		}*/
+		
 		Debugger.log("refreshing children: " + children_mc.length, Debugger.CRITICAL, "checkIfSequenceActive", "LearnerComplexActivity");
+		
 		for(var i=0; i<children_mc.length; i++) {
 			children_mc[i].refresh();
 	
@@ -235,32 +251,38 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	}
 	
 	private function removeAllChildren():Void {
+		
+		Debugger.log("removing children len: " + children_mc.length, Debugger.CRITICAL, "removeAllChildren", "LearnerComplexActivity");
+		
 		for(var i=0; i<children_mc.length;i++){
-			children_mc[i].removeMovieClip();
+			Debugger.log("removing children: " + children_mc[i].activity.activityUIID, Debugger.CRITICAL, "removeAllChildren", "LearnerComplexActivity");
+			LearnerActivity(children_mc[i]).destroy();
 		}
+		
+		children_mc = new Array();
 	}
 	
 	/** TODO: Use for Sequence in Optional */
 	private function removeAllChildrenAndLoadSequences(activity:Activity):Void {
 		activeSequence = null;
+		removeAllChildren();
+		
 		children_mc = new Array();
 		
-		removeAllChildren();
 		drawChildren(_children, children_mc);
 		
 		MovieClipUtils.doLater(Proxy.create(this, draw));
 	}
 	
 	/** TODO: Use for Sequence in Optional */
-	private function removeAllChildrenAndInputSequence(activity:SequenceActivity):Void {
+	public function removeAllChildrenAndInputSequence(activity:SequenceActivity):Void {
 		activeSequence = activity;
-		children_mc = new Array();
-		
-		var actOrder:Array = Application(app).getLesson().model.getDesignOrder(activity.firstActivityUIID);
-		
+		redrawComplex();
+	}
+	
+	private function redrawComplex():Void {
 		removeAllChildren();
-		drawChildren(actOrder, children_mc);
-		
+		drawChildren(_children, children_mc);
 		MovieClipUtils.doLater(Proxy.create(this, draw));
 	}
 	
@@ -511,5 +533,9 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	public function get learnerID():Number{
 		return learner.getLearnerId();
+	}
+	
+	public function getActiveSequence():SequenceActivity {
+		return activeSequence;
 	}
 }

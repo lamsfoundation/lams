@@ -756,6 +756,16 @@ class MonitorModel extends Observable{
 		
 	}
 	
+	public function getDesignOrder(firstActivityUIID:Number):Array {
+		
+		var orderedActivityArr:Array = new Array();
+		var learnerFirstActivity:Activity = _activeSeq.getLearningDesignModel().activities.get(firstActivityUIID);
+		
+		orderDesign(learnerFirstActivity, orderedActivityArr);
+		
+		return orderedActivityArr;
+	}
+	
 	/**
 	 * get the design in the DesignDataModel and update the Monitor Model accordingly.
 	 * NOTE: Design elements are added to the DDM here.

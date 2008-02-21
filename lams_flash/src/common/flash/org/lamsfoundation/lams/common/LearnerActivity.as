@@ -103,8 +103,10 @@ class LearnerActivity extends MovieClip {
 		
 		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
+		
 		//Get reference to application and design data model
 		app = ApplicationParent.getInstance();
+		
 		//let it wait one frame to set up the components.
 		//this has to be set b4 the do later :)
 		if(_activity.isGateActivity()){
@@ -147,9 +149,9 @@ class LearnerActivity extends MovieClip {
 			_autosize = "center";
 		}
 		if (actLabel == undefined){
-			tooltipTitle =  _activity.title
+			tooltipTitle =  _activity.title;
 		}else {
-			tooltipTitle = actLabel
+			tooltipTitle = actLabel;
 		}
 		
 		title_lbl = this.attachMovie("Label", "Label"+_activity.activityID, this.getNextHighestDepth(), {_x:LABEL_X , _y:LABEL_Y, _width:LABEL_W, _height:LABEL_H, autoSize:_autosize, styleName:styleObj});
@@ -184,6 +186,12 @@ class LearnerActivity extends MovieClip {
 		actStatus = null;
 		
 		draw();
+	}
+	
+	public function destroy():Void {
+		title_lbl.removeMovieClip();
+		this._visible = false;
+		this.removeMovieClip();
 	}
 	
 	/**
@@ -303,6 +311,7 @@ class LearnerActivity extends MovieClip {
 			}
 			
 			_dcStartTime = now;
+			
 			hideToolTip();
 	
 	}
@@ -311,7 +320,22 @@ class LearnerActivity extends MovieClip {
 	private function onRelease():Void{
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','LearnerActivity');
-				trace("Activity ID is: "+this.activity.activityID)	
+			Debugger.log('Is sequence:'+this.activity.isSequenceActivity(),Debugger.GEN,'onRelease','LearnerActivity');
+				
+				if(this.activity.isSequenceActivity()) {
+					// insert sequence design into learner complex activity
+					Debugger.log('parent :'+this._parent._parent, Debugger.CRITICAL,'onRelease','LearnerActivity');
+					
+					var activeSequence = LearnerComplexActivity(this._parent._parent).getActiveSequence();
+					if(activeSequence == this.activity) {
+						// close current active sequence
+						LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(null);
+					} else {
+						// open sequence
+						LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(this.activity);
+					}
+				}
+				
 				controller.activityRelease(this);
 		}
 		
@@ -319,6 +343,7 @@ class LearnerActivity extends MovieClip {
 	
 	private function onReleaseOutside():Void{
 		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','LearnerActivity');
+		
 		controller.activityReleaseOutside(this);
 	}
 	

@@ -640,6 +640,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
         this._y = p.y;
 	}
 	
+	public function getModel():MonitorModel {
+		return MonitorModel(model);
+	}
 	
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned
@@ -657,6 +660,5 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     public function defaultController (model:Observable):Controller {
         return new MonitorController(model);
     }
-	
 	
 }
