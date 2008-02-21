@@ -514,7 +514,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		if(_selectedOption.data == OPTION_GTE) {
 			showSteppers(true, false);
 		} else if(_selectedOption.data == OPTION_LTE) {
-			showSteppers(false, true);
+			showSteppers(true, false);
 		} else if(_selectedOption.data == OPTION_RANGE) {
 			showSteppers(true, true);
 		} else {
@@ -604,6 +604,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private function showSteppers(a:Boolean, b:Boolean):Void {
 		repositionSteppers(a,b);
+		
+		_start_value_stp.value = _start_value_stp.minimum;
+		_end_value_stp.value = _end_value_stp.minimum;
 		
 		_start_value_stp.visible = a;
 		_condition_from_lbl.visible = a;
