@@ -418,6 +418,24 @@ class LessonModel extends Observable {
 		return orderedActivityArr;
 	}
 	
+	public function checkSequenceHasCurrentActivity(a:Activity, learner:Progress):Boolean {
+		var cChildren:Array = learningDesignModel.getComplexActivityChildren(a.activityUIID);
+		
+		if(cChildren.length > 0) {
+			for(var i=0; i<cChildren.length; i++) {
+				if(cChildren[i].activityID == learner.getCurrentActivityId()) 
+					return true;
+				else if(Progress.compareProgressData(learner, cChildren[i].activityID) == "attempted_mc")
+					if(checkSequenceHasCurrentActivity(cChildren[i], learner)) return true;
+					else continue;
+			}
+		} else {
+			return false;
+		}
+		
+		return false;
+	}
+	
 	public function setCurrentActivityOpen(ca:Object){
 		
 		if(_currentActivityOpen != null && ca != null){

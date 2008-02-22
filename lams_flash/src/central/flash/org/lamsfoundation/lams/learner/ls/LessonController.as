@@ -91,7 +91,7 @@ class LessonController extends AbstractController {
 			if(ca.activityStatus != undefined){
 				var URLToSend:String = 'learning/learner.do?method=forwardToLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_root.userID+'&lessonID='+_root.lessonID;
 				
-				if(ca.activityStatus == 'completed_mc' && (ca.activity.activityTypeID != Activity.OPTIONAL_ACTIVITY_TYPE || !ca.activity.isOptionsWithSequencesActivity())){
+				if(ca.activityStatus == 'completed_mc' && (ca.activity.activityTypeID != Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID != Activity.OPTIONS_WITH_SEQUENCES_TYPE)){
 					_lessonModel.getLesson().getActivityURL(URLToSend, true);
 				} else if(ca.activityStatus == 'attempted_mc' && _root.mode == 'preview') {
 					_lessonModel.getLesson().moveToActivity(_lessonModel.progressData.getCurrentActivityId(), ca.activity.activityID);
