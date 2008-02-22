@@ -787,8 +787,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		grid_mc = Grid.drawGrid(gridLayer,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
 		
 		//position bin in canvas.  
-		if((model.activeView == this || model.activeView instanceof CommonCanvasView) && isCanvasModel) {
-			var bin = model.getCanvas().bin;
+		var bin = model.getCanvas().bin;
+		if(bin._parent == this.binLayer) {
 			bin._x = (s.w - bin._width) - 10;
 			bin._y = (s.h - bin._height) - 10;
 		}
