@@ -278,4 +278,11 @@ public interface ILessonService {
      * @return learner's progress or null
      */
     public LearnerProgress getUserProgressForLesson(Integer learnerId, Long lessonId);
+    
+    /**
+     * Gets list of lessons which are originally based on the given learning design id.
+     * @param ldId
+     * @return list of lessons
+     */
+    public List getLessonsByOriginalLearningDesign(Long ldId);
 }

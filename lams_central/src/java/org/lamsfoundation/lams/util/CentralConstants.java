@@ -112,4 +112,10 @@ public class CentralConstants {
 	public static final String ATTR_RESOURCE_ID = "resourceId";
 	
 	public static final String EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME = "exportToolContentService";
+	
+	public static final String PARAM_LEARNER_SIZE = "learnerSize";
+	
+	public static final String ATTR_RESULT_CODE = "resultCode";
+	
+	public static final String ATTR_RESULT_TEXT = "resultText";
 }

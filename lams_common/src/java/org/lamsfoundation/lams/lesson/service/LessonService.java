@@ -674,4 +674,11 @@ public class LessonService implements ILessonService
 	    public LearnerProgress getUserProgressForLesson(Integer learnerId, Long lessonId) {
 	    	return learnerProgressDAO.getLearnerProgressByLearner(learnerId,lessonId);
 	    }
+	    
+	    /**
+		 * Gets list of lessons which are originally based on the given learning design id.
+		 */
+		public List getLessonsByOriginalLearningDesign(Long ldId) {
+			return this.lessonDAO.getLessonsByOriginalLearningDesign(ldId);
+		}
 }

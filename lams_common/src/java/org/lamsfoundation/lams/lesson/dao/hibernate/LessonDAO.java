@@ -62,6 +62,11 @@ public class LessonDAO extends BaseDAO implements ILessonDAO
 	private final static String FIND_LESSON_FOR_ACTIVITY =	"select lesson from "
 		+ Lesson.class.getName()+" lesson, "+ Activity.class.getName() + " activity "
 		+ " where activity.activityId=:activityId and activity.learningDesign=lesson.learningDesign";
+	private final static String LESSONS_WITH_ORIGINAL_LEARNING_DESIGN = "select l from "
+		+ Lesson.class.getName() + " l "
+		+ "where l.learningDesign.originalLearningDesign.learningDesignId = ? "
+		+ "and l.lessonStateId = " + Lesson.STARTED_STATE
+		+ " order by l.lessonName";
 
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces 
@@ -299,6 +304,15 @@ public class LessonDAO extends BaseDAO implements ILessonDAO
            }
        );
        return dtos;
+   }
+   
+   /**
+    * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonsByOriginalLearningDesign(Integer)
+    */
+   public List getLessonsByOriginalLearningDesign(final Long ldId)
+   {
+	   List lessons = this.getHibernateTemplate().find(LESSONS_WITH_ORIGINAL_LEARNING_DESIGN, ldId.longValue());
+	   return lessons;
    }
 
 }

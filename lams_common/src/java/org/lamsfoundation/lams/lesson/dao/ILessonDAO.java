@@ -138,4 +138,10 @@ public interface ILessonDAO extends IBaseDAO
      */
     public List getLessonsByOrgAndUserWithCompletedFlag(final Integer userId, final Integer orgId, final boolean isStaff);
 
+    /**
+     * Get lessons based on learning designs where the original learning design has the given id.
+     * @param ldId
+     * @return list of lessons
+     */
+    public List getLessonsByOriginalLearningDesign(final Long ldId);
 }
