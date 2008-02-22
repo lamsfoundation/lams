@@ -146,11 +146,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		}
 		
 		drawChildren(childrenArray, children_mc);
-		checkIfSequenceActive();
 		
 		childHolder_mc._visible = false;
 		
-		MovieClipUtils.doLater(Proxy.create(this, draw));
+		MovieClipUtils.doLater(Proxy.create(this, draw, Proxy.create(this, checkIfSequenceActive)));
 	}
 	
 	private function drawChildren(children:Array, container:Array, _count:Number):Void {
@@ -230,22 +229,39 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	/** TODO: Use for Sequence in Optional */
 	private function checkIfSequenceActive():Void {
-		/**for(var i=0; i<_children.length; i++) {
-			if(_children[i] == activeSequence
-				&& Progress.compareProgressData(learner, _children[i].activityID) == 'completed_mc')
-				
-		}*/
+		for(var i=0; i<children_mc.length; i++) {
+			
+			var isChildCurrent:Boolean = (Progress.compareProgressData(learner, children_mc[i].activity.activityID) == 'current_mc');
+			var isChildAttempted:Boolean = (Progress.compareProgressData(learner, children_mc[i].activity.activityID) == 'attempted_mc');
+			
+			if(isChildCurrent && children_mc[i].activity.isSequenceActivity()) {
+				// set activesequence if is current
+				if(children_mc[i].activity != activeSequence)
+					removeAllChildrenAndInputSequence(children_mc[i].activity);
+			} else if(isChildAttempted && children_mc[i].activity.isSequenceActivity()) {
+				// check children of sequence (level 1) for current activity
+				if(model.checkSequenceHasCurrentActivity(children_mc[i].activity, learner))
+					removeAllChildrenAndInputSequence(children_mc[i].activity);
+			}
+		}
 		
 		Debugger.log("refreshing children: " + children_mc.length, Debugger.CRITICAL, "checkIfSequenceActive", "LearnerComplexActivity");
 		
+		var closeBox:Boolean = true;
 		for(var i=0; i<children_mc.length; i++) {
+			if(children_mc[i].activityStatus != "completed_mc") closeBox = false;
 			children_mc[i].refresh();
-	
+			
 			/**if(activity.isBranchingActivity() 
 				&& children_mc[i].activity.isSequenceActivity() 
 				&& (children_mc[i].isAttempted || children_mc[i].isCompleted)) 
 				removeAllChildrenAndInputSequence(SequenceActivity(children_mc[i].activity));*/
 		
+		}	
+		
+		if(closeBox && locked) {
+			collapse();
+			controller.complexActivityRelease(this, false);
 		}
 	}
 	
@@ -277,6 +293,11 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	public function removeAllChildrenAndInputSequence(activity:SequenceActivity):Void {
 		activeSequence = activity;
 		redrawComplex();
+		
+		if(!locked) { 
+			expand();
+			controller.complexActivityRelease(this, false);
+		}
 	}
 	
 	private function redrawComplex():Void {
@@ -295,7 +316,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		return false;
 	}
 	
-	private function draw (){
+	private function draw (callback:Function){
 		var toolTitle:String;
 		if (actStatus == null || actStatus == undefined){
 			actStatus = Progress.compareProgressData(learner, _activity.activityID);
@@ -336,8 +357,12 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		_visible = true;
 		
+		if(callback != null)
+			callback();
+		
 		if(_view instanceof LearnerTabView)
 			LearnerTabView(_view).drawNext();
+			
 	}
 	
 	public function showToolTip(btnObj, btnTT:String):Void{
