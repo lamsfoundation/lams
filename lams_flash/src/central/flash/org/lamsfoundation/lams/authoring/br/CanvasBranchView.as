@@ -662,6 +662,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 				continue;
 			else
 				return false;
+		else if(b.direction == BranchConnector.DIR_SINGLE && b.targetUIID != activity.activityUIID)
+			return false;
 		
 		var cbv = CanvasBranchView(this);
 		var cbc = getController();
