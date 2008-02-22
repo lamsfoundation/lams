@@ -176,11 +176,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			
 			Debugger.log('x: ' + learnerAct._x + ' y: ' +  learnerAct._y, Debugger.CRITICAL, 'drawChildren', 'LearnerComplexActivity');
         
-			var parentAct:Activity = model.learningDesignModel.getActivityByUIID(Activity(children[i]).parentUIID);
+			var parentAct:Activity = (model instanceof LessonModel) ? model.learningDesignModel.getActivityByUIID(Activity(children[i]).parentUIID) : model.ddm.getActivityByUIID(Activity(children[i]).parentUIID);
 			
 			if((activity.isBranchingActivity() && parentAct.isSequenceActivity()) || (activity.isOptionsWithSequencesActivity() && parentAct.isSequenceActivity())) {
 				/** TODO: Use for Sequence in Optional */
-				Debugger.log("setting line visibility: " + i, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
 				learnerAct.lineTopVisible = (i != 0) ? false : true;
 				learnerAct.lineBottomVisible = (i == children.length-1) ? true : false;
 			}
