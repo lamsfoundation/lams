@@ -706,6 +706,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 				item.setReport(null);
 				item.setReplyNumber(0);
 				item.setParent(null);
+				item.setSessionClones(null);
 			}
 		}
 		toolContentObj.setMessages(authorItems);
@@ -757,6 +758,8 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			for(Message item:items){
 				item.setCreatedBy(user);
 				item.setIsAuthored(true);
+				item.setForum(toolContentObj);
+				item.setSessionClones(new HashSet());
 				createRootTopic(toolContentObj.getUid(),(ForumToolSession) null,item);
 			}
 		} catch (ImportToolContentException e) {
@@ -803,7 +806,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		session.setStatus(ForumConstants.STATUS_CONTENT_COPYED);
 
 		forumToolSessionDao.saveOrUpdate(session);
-
+		log.debug("tool session ["+session.getSessionId()+"] created.");
 	}
 
 	public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
