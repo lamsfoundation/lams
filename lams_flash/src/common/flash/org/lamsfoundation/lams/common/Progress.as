@@ -111,11 +111,6 @@ class Progress {
 			var clipName:String = "current_mc";
 			return clipName;
 		}
-		
-		if (learner.getCurrentActivityId() == null && learner.isLessonComplete){
-			var clipName:String = "completed_mc";
-			return clipName;
-		}
 	}
 	
 	public static function isLearnerCurrentActivity(learner:Object, activityID:Number):Boolean{
