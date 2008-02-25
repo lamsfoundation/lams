@@ -373,10 +373,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	 * @param   cm - Refernce to the model
 	 * @return  Boolean - successfullit
 	 */
-	private function drawActivity(a:Activity,mm:MonitorModel):Boolean{
+	private function drawActivity(a:Activity, mm:MonitorModel):Boolean{
 		var mtv = MonitorTabView(this);
 		var mc = getController();
 		var newActivity_mc = null;
+		
+		if(!mm.isActiveView(this)) return false;
 		
 		Debugger.log("activityTypeID: " + a.activityTypeID,Debugger.CRITICAL,'drawActivity','MonitorTabView');
 		

@@ -511,6 +511,7 @@ class Monitor {
 		
 		var poppedActivityUIID:Number = monitorModel.openBranchingActivities.pop();
 		var poppedActivity = monitorModel.getMonitor().ddm.getActivityByUIID(poppedActivityUIID);
+		
 		Debugger.log("Closing branching activity: "+poppedActivity.title, Debugger.CRITICAL, "closeBranchView", "Monitor");
 		Debugger.log("It had a UIID of: "+poppedActivityUIID, Debugger.CRITICAL, "openBranchActivityContent", "Monitor");
 	}
