@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.authoring.GateActivity;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.authoring.SequenceActivity;
 import org.lamsfoundation.lams.authoring.br.BranchConnector;
+import org.lamsfoundation.lams.authoring.cv.CanvasComplexView;
 import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.util.*;
@@ -764,6 +765,12 @@ class MonitorModel extends Observable{
 		orderDesign(learnerFirstActivity, orderedActivityArr);
 		
 		return orderedActivityArr;
+	}
+	
+	public function closeAllComplexViews():Void {
+		while(activeView instanceof CanvasComplexView) {
+			CanvasComplexView(activeView).close();
+		}
 	}
 	
 	/**

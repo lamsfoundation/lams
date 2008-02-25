@@ -383,6 +383,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	public function localOnRelease():Void{
 		Debugger.log("close called", Debugger.CRITICAL, "localOnRelease", "CanvasBranchView");
+		
+		model.closeAllComplexViews();
 		close();
 	}
 	

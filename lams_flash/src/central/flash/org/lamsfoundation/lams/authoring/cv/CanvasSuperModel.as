@@ -947,6 +947,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		setDirty();
 	}
 
+	public function closeAllComplexViews():Void {
+		while(activeView instanceof CanvasComplexView) {
+			CanvasComplexView(activeView).close();
+		}
+	}
+
 	public function getCoords(ca:Activity, o:Object):Object {
 		var obj:Object = (o != null) ? o : new Object();
 		
