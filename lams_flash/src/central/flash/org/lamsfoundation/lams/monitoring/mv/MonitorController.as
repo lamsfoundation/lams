@@ -380,6 +380,11 @@ class MonitorController extends AbstractController {
 		}
 	}
 	
+	public function transitionRelease(t:Object):Void {
+		Debugger.log('transitionRelease:'+t.transition.transitionUIID,Debugger.GEN,'transitionRelease','MonitorController');
+		Debugger.log('toUIID:'+t.transition.toUIID + " fromUIID: " + t.transition.fromUIID,Debugger.CRITICAL,'transitionRelease','MonitorController');
+	}
+	
 	public function activityReleaseOutside(ca:Object):Void{
 	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityReleaseOutside','MonitorController');
 	}

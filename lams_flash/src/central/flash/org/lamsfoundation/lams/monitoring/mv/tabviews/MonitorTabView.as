@@ -477,15 +477,18 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		var mc = getController();
 		
 		if(!isActivityOnLayer(mm.activitiesDisplayed.get(t.fromUIID), this.activityLayers) && !isActivityOnLayer(mm.activitiesDisplayed.get(t.toUIID), this.activityLayers)) return false;
-		
+		if(mm.transitionsDisplayed.containsKey(t.transitionUIID)) return false;
+				
 		var newTransition_mc:MovieClip = transitionLayer.createChildAtDepth("CanvasTransition",DepthManager.kTop,{_transition:t,_monitorController:mc,_monitorTabView:mtv});
 		
-		var trnsItems:Number = mm.transitionsDisplayed.size()
+		var trnsItems:Number = mm.transitionsDisplayed.size();
+		
 		if (trnsItems < mm.getTransitionKeys().length){
-			mm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
+			mm.transitionsDisplayed.put(t.transitionUIID, newTransition_mc);
 		}
 		
 		Debugger.log('drawn a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'drawTransition','MonitorTabView');
+		
 		return true;
 		
 	}

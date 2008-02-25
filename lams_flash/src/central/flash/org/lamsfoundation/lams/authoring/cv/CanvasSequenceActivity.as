@@ -155,6 +155,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		
 		if(_canvasController != null)
 			_canvasModel = CanvasModel(_canvasController.getModel());
+		else if(_monitorController != null)
+			mm = MonitorModel(_monitorController.getModel());
 		
 		Debugger.log("firstActivityUIID:  " + ComplexActivity(_activity).firstActivityUIID, Debugger.CRITICAL, "init", "CanvasSequenceActivity");
 		
@@ -180,6 +182,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		}
 		
 		var _newVisibleWidth:Number = (_children.length*CHILD_INCRE) + (CHILD_OFFSET_X*2) + 6;
+		
 		if(_newVisibleWidth > CanvasSequenceActivity.TOOL_ACTIVITY_WIDTH)
 			_visibleWidth = _newVisibleWidth;
 		

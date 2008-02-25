@@ -103,9 +103,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends CanvasConnec
 
 	private function onRelease():Void{
 		if(!_doubleClicking){
-			_canvasController.transitionRelease(this);
+			if(_canvasController != null) _canvasController.transitionRelease(this);
+			if(_monitorController != null) _monitorController.transitionRelease(this);
 		}
-		
 	}
 	
 	private function onReleaseOutside():Void{
