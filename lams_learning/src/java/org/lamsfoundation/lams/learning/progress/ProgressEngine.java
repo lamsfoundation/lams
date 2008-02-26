@@ -89,7 +89,12 @@ public class ProgressEngine
 
         if ( completedActivity.isStopAfterActivity() ) {
         	// special case - terminate the lesson here.
-        	populateCurrentCompletedActivityList(learnerProgress, completedActivityList);
+    		learnerProgress.setProgressState(completedActivity,  LearnerProgress.ACTIVITY_COMPLETED,activityDAO);
+        	for ( Activity parentActivity = completedActivity.getParentActivity() ; parentActivity != null; parentActivity = parentActivity.getParentActivity() ) {
+        		learnerProgress.setProgressState(parentActivity,  LearnerProgress.ACTIVITY_COMPLETED,activityDAO);
+        		completedActivityList.add(parentActivity.getActivityId());        	
+        	}
+            populateCurrentCompletedActivityList(learnerProgress, completedActivityList);
         	return setLessonComplete(learnerProgress);
         } else {
 	        Transition transition = completedActivity.getTransitionFrom();
@@ -349,6 +354,7 @@ public class ProgressEngine
 	 */
 	private LearnerProgress setLessonComplete(LearnerProgress learnerProgress) {
 		learnerProgress.setCurrentActivity(null);
+		learnerProgress.setNextActivity(null);
 		learnerProgress.setLessonComplete(true);
 		return learnerProgress;
 	}
