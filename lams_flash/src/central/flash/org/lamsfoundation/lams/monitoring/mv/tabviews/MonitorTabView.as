@@ -345,6 +345,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	 * @return  
 	 */
 	private function removeActivity(a:Activity, mm:MonitorModel){
+		if(!mm.isActiveView(this)) return false;
+		
 		//dispatch an event to show the design  has changed
 		var r = mm.activitiesDisplayed.remove(a.activityUIID);
 		r.removeMovieClip();
@@ -360,6 +362,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	 * @return  
 	 */
 	private function removeTransition(t:Transition,mm:MonitorModel){
+		if(!mm.isActiveView(this)) return false;
+		
 		var r = mm.transitionsDisplayed.remove(t.transitionUIID);
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;
