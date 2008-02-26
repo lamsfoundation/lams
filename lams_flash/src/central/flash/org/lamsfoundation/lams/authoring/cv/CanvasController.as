@@ -602,52 +602,40 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
     
 	private function isActivityOnBin(ca:Object):Void{
+		var r:Object = null;
+		var parentUIID:Number = ca.activity.parentUIID;
 		
-		if (ca.hitTest(_canvasModel.getCanvas().bin)) {
+		if(ca.hitTest(_canvasModel.getCanvas().bin)) {
 			if(_canvasModel.activeView instanceof CanvasComplexView) {
-				var r:Object;
-				
+				var seqActivity:Activity = Activity(_canvasModel.ddm.getActivityByUIID(parentUIID));
+				if(seqActivity.isOptionalSequenceActivity(_canvasModel.ddm.getActivityByUIID(seqActivity.parentUIID)))
+					_canvasModel.removeOptionalSequenceCA(ca, parentUIID);
+		
 				if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.isBranchingActivity()){
 					_canvasModel.removeComplexActivityChildren(ca.actChildren);
 					r = _canvasModel.ddm.removeActivity(ca.activity.activityUIID);
+					
 				} else {
 					r = _canvasModel.ddm.removeActivity(ca.activity.activityUIID);
 				}	
 				
-				var seqActivity:Activity = Activity(_canvasModel.ddm.getActivityByUIID(r.parentUIID));
-				if(seqActivity.isOptionalSequenceActivity(_canvasModel.ddm.getActivityByUIID(seqActivity.parentUIID))) {
-					_canvasModel.removeOptionalSequenceCA(ca, r.parentUIID);
-					Debugger.log("is opt: " + ca.activity.activityUIID, Debugger.CRITICAL, "isActivityOnBin", "CanvasController");
-				}
-				
-				if(ca == _canvasModel.activeView.openActivity) {
-					// close current complex activity +  refresh parent
+				var parent = _canvasModel.activitiesDisplayed.get(parentUIID);
+				var gparent = _canvasModel.activitiesDisplayed.get( _canvasModel.ddm.getActivityByUIID(parentUIID).parentUIID);
+
+				// close current complex activity +  refresh parent
+				if(ca == _canvasModel.activeView.openActivity)
 					_canvasModel.activeView.close();
-					
-					if(_canvasModel.activeView instanceof CanvasComplexView) { _canvasModel.activeView.updateActivity(); 
-					} else {
-						Debugger.log("r: " + r.parentUIID, Debugger.CRITICAL, "isActivityOnBin", "CanvasController");
-						
-						var parent = _canvasModel.activitiesDisplayed.get(r.parentUIID);
-						var gparent = _canvasModel.activitiesDisplayed.get( _canvasModel.ddm.getActivityByUIID(r.parentUIID).parentUIID);
-						
-						Debugger.log("parent: " + parent, Debugger.CRITICAL, "isActivityOnBin", "CanvasController");
-						Debugger.log("gparent: " + gparent, Debugger.CRITICAL, "isActivityOnBin", "CanvasController");
-						
-						if(parent != null)
-							parent.updateChildren(_canvasModel.ddm.getComplexActivityChildren(parent.activity.activityUIID));
-						else if(gparent != null)
-							parent.updateChildren(_canvasModel.ddm.getComplexActivityChildren(parent.activity.activityUIID));
-						else
-							return;
-						
-						_canvasModel.activitiesDisplayed.get(ca.activity)
-					}
-				} else {
-					
-					// refresh current complex activity
-					 _canvasModel.activeView.updateActivity();
-				}
+				
+				// refresh current complex activity
+				if(_canvasModel.activeView instanceof CanvasComplexView) 
+					_canvasModel.activeView.updateActivity();
+				else 
+					if(parent != null)
+						parent.updateChildren(_canvasModel.ddm.getComplexActivityChildren(parent.activity.activityUIID));
+					else if(gparent != null)
+						gparent.updateChildren(_canvasModel.ddm.getComplexActivityChildren(gparent.activity.activityUIID));
+					else
+						return;
 			
 			} else {
 			
