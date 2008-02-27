@@ -491,7 +491,7 @@ class Monitor {
         branchView.addEventListener('load', Proxy.create(this, viewLoaded));
 		
 		monitorModel.addObserver(branchView);
-		ba.branchView = branchView;
+		ba.activity.branchView = branchView;
 		
 		var actToPush = monitorModel.getMonitor().ddm.getActivityByUIID(ba.activity.activityUIID);
 		Debugger.log("Pushing activity: "+actToPush.title+" to the stack", Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
@@ -506,7 +506,7 @@ class Monitor {
 		if(monitorModel.activeView.activity.parentUIID != null) 
 			parentBranching = CanvasActivity(monitorModel.activitiesDisplayed.get(_ddm.getActivityByUIID(monitorModel.activeView.activity.parentUIID).parentUIID));
 
-		monitorModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.branchView : monitorView.getMonitorTabView();
+		monitorModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.activity.branchView : monitorView.getMonitorTabView();
 		monitorModel.currentBranchingActivity = (parentBranching.activity.isBranchingActivity()) ? parentBranching : null;
 		
 		var poppedActivityUIID:Number = monitorModel.openBranchingActivities.pop();

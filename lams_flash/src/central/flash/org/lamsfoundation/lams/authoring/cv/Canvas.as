@@ -392,7 +392,6 @@ class Canvas extends CanvasHelper {
 				else ComplexActivity(sequenceAct).firstActivityUIID = actToAdd.activityUIID;							
 				
 				if(!(canvasModel.activeView instanceof CanvasComplexView)) {
-					CanvasOptionalActivity(canvasModel.activitiesDisplayed.get(sequenceAct.parentUIID)).removeAllChildren();
 					canvasModel.removeActivity(sequenceAct.parentUIID); 
 				}
 			}

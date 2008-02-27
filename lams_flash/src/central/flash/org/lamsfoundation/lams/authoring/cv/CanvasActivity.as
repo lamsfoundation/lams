@@ -125,7 +125,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var bgNegative:String = "original";
 	private var authorMenu:ContextMenu;
 	
-	private var _branchView:CanvasBranchView;
 	private var _setupBranchView:Boolean;
 	
 	private var _sequenceChild:Boolean;
@@ -638,9 +637,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		_x = x;
 		_y = y;
 		
-		if(branchView != null) {
-			branchView._x = _x + getVisibleWidth()/2;
-			branchView._y = _y + getVisibleHeight()/2;
+		if(activity.branchView != null) {
+			activity.branchView._x = _x + getVisibleWidth()/2;
+			activity.branchView._y = _y + getVisibleHeight()/2;
 		}
 		
 	}
@@ -756,15 +755,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
     }
 	
 	private function destroy() {
-		branchView.removeMovieClip();
-	}
-	
-	public function get branchView():CanvasBranchView {
-		return _branchView;
-	}
-	
-	public function set branchView(a:CanvasBranchView):Void {
-		_branchView = a;
+		activity.branchView.removeMovieClip();
 	}
 	
 	public function get setupBranchView():Boolean {

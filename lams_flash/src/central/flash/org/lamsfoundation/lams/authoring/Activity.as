@@ -22,6 +22,7 @@
  */
 
 import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.authoring.br.CanvasBranchView;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.*
 import org.lamsfoundation.lams.common.util.*
@@ -166,7 +167,8 @@ class org.lamsfoundation.lams.authoring.Activity {
 	private var _readOnly:Boolean;
 	
 	private var _viewID:Boolean;
-	
+
+	private var _branchView:CanvasBranchView;
      
     //Constructor
 	 /**
@@ -784,4 +786,13 @@ class org.lamsfoundation.lams.authoring.Activity {
 		else
 			return null;
 	}
+	
+	public function get branchView():CanvasBranchView {
+		return _branchView;
+	}
+	
+	public function set branchView(a:CanvasBranchView):Void {
+		_branchView = a;
+	}
+	
 }

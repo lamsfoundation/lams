@@ -1079,12 +1079,12 @@ class MonitorModel extends Observable{
 		
 		Debugger.log("visible: " + visible, Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
 		
-		if(ba.branchView != null) {
-			activeView = (visible) ? ba.branchView : activeView;
+		if(ba.activity.branchView != null) {
+			activeView = (visible) ? ba.activity.branchView : activeView;
 			
-			ba.branchView.setOpen(visible);
+			ba.activity.branchView.setOpen(visible);
 			
-			ba.branchView.open();
+			ba.activity.branchView.open();
 			
 			setDirty();
 			

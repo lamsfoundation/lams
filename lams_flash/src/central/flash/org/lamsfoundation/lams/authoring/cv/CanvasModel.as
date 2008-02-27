@@ -343,8 +343,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		ca.activity.orderID = null;
 		ca.activity.parentActivityID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityID : null;
 		
-		CanvasOptionalActivity(_activitiesDisplayed.get(parentID)).removeAllChildren();
-		
 		if(!(activeView instanceof CanvasComplexView)) removeActivity(parentID);
 		
 		haltRefresh(false);
@@ -472,7 +470,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		if(activeView instanceof CanvasComplexView && activeView.openActivity.activity.activityUIID == sequence.parentUIID) {
 			activeView.updateActivity();
 		} else {
-			CanvasOptionalActivity(_activitiesDisplayed.get(sequence.parentUIID)).removeAllChildren();
 			removeActivity(sequence.parentUIID);
 		}
 		
@@ -1117,10 +1114,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		Debugger.log("visible: " + visible, Debugger.CRITICAL, "openBranchActivityContent", "CanvasModel");
 		Debugger.log("currentBranchingActivity UIID: " + currentBranchingActivity.activity.activityUIID, Debugger.CRITICAL, "openBranchActivityContent", "CanvasModel");
 		
-		if(ba.branchView != null || ba.branchView != undefined) {
-			activeView = (visible) ? ba.branchView : activeView;
-			ba.branchView.setOpen(visible);
-			ba.branchView.open();
+		if(ba.activity.branchView != null || ba.activity.branchView != undefined) {
+			activeView = (visible) ? ba.activity.branchView : activeView;
+			ba.activity.branchView.setOpen(visible);
+			ba.activity.branchView.open();
 		} else { _cv.openBranchView(currentBranchingActivity, visible); }
 		
 		_lastBranchActionType = null;

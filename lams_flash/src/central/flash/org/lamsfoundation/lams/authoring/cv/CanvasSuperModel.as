@@ -635,7 +635,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			_transitionsDisplayed.get(trans_keys[i]).removeMovieClip();
 		for(var i=0; i<act_keys.length; i++) {
 			if(_activitiesDisplayed.get(act_keys[i]).activity.isBranchingActivity())
-				_activitiesDisplayed.get(act_keys[i]).branchView.removeMovieClip();
+				_activitiesDisplayed.get(act_keys[i]).activity.branchView.removeMovieClip();
 			_activitiesDisplayed.get(act_keys[i]).removeMovieClip();
 			
 		}

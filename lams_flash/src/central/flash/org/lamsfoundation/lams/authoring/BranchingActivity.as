@@ -145,6 +145,5 @@ class BranchingActivity extends ComplexActivity {
 	public function get defaultBranch():Branch {
 		return _defaultBranch;
 	}
-	
 }
 

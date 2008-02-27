@@ -155,8 +155,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		
 		showStatus(false);
 		
-		removeAllChildren();
-		
+		removeAllChildren();		
 		
 		for (var i=0; i < _children.length; i++)		{
 			if(fromModuleTab == "monitorMonitorTab"){
@@ -254,9 +253,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		for(var j=0; j<children_mc.length; j++) {
 			var childActMC = (children_mc[j] instanceof CanvasActivity) ? CanvasActivity(children_mc[j]) : CanvasSequenceActivity(children_mc[j]);
 			if(childActMC instanceof CanvasSequenceActivity) childActMC.removeAllChildren();
-			else if(childActMC.activity.isBranchingActivity() && childActMC.branchView != null) {
-				Debugger.log("removing branch view: " + childActMC.activity.activityUIID, Debugger.CRITICAL, "removeAllChildren", "CanvasOptionalActivity");
-				childActMC.branchView.removeMovieClip();
+			else if(childActMC.activity.isBranchingActivity() && childActMC.activity.branchView != null) {
+				//childActMC.activity.branchView.removeMovieClip();
 			}
 			
 			childActMC.removeMovieClip();

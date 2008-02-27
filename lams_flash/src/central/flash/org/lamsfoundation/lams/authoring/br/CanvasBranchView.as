@@ -609,7 +609,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			return false;
 		
 		if(a.isBranchingActivity())
-			cm.activitiesDisplayed.get(a.activityUIID).branchView.removeMovieClip();
+			a.branchView.removeMovieClip();
 		
 		var r = cm.activitiesDisplayed.remove(a.activityUIID);
 		r.removeMovieClip();

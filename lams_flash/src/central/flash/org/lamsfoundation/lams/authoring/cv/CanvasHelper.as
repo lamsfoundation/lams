@@ -532,9 +532,9 @@ class CanvasHelper {
 		Debugger.log("parentUIID: " + canvasModel.activeView.activity.parentUIID, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
 		
 		Debugger.log("is parentBranching: " + parentBranching.activity.isBranchingActivity(), Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
-		Debugger.log("parent branchView: " + parentBranching.branchView, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
+		Debugger.log("parent branchView: " + parentBranching.activity.branchView, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
 		
-		canvasModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.branchView : canvasView;
+		canvasModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.activity.branchView : canvasView;
 		canvasModel.currentBranchingActivity = (parentBranching.activity.isBranchingActivity()) ? parentBranching : null;
 		
 		Debugger.log("activeView: " + canvasModel.activeView, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
@@ -571,7 +571,7 @@ class CanvasHelper {
 		
 		canvasModel.addObserver(branchView);
 		
-		ba.branchView = branchView;
+		ba.activity.branchView = branchView;
 		
 	}
 	
