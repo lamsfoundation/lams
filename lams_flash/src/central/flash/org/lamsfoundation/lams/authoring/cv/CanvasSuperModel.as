@@ -165,25 +165,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			tActivities.addItem({label: "--Selection--", data: 0});	 // TODO: Label required
 		
 		while(_activityUIID != null) {
-
+			
 			var transObj:Object = getCanvas().ddm.getTransitionsForActivityUIID(_activityUIID);
 		
 			_activity = (transObj.into != null) ? _cv.ddm.getActivityByUIID(transObj.into.fromUIID) : getParentActivity(_activity);
 			
-			if (_activity != null) {
+			if(_activity != null) {
 				if(_activity instanceof _class) {
 					if(isBranching) tActivities.addItem({label: _activity.title, data: _activity.activityUIID});
 					else tActivities.addItem({label: _activity.title, data: _activity});
 				} else if(_activity instanceof ComplexActivity) {
-					var _seqActivity = getCanvas().ddm.getActivityByUIID(selectedItem.activity.parentUIID);
-					
-					if(_activity.activityUIID != _seqActivity.activityUIID && _activity.activityUIID != _seqActivity.parentUIID) {
+					if(!isBranching && !_activity.isOptionalActivity() && !_activity.isSequenceActivity())
+						getActivitiesFromComplexByClass(_activity.activityUIID, tActivities, _class, isBranching);
+					else if(isBranching && !_activity.isOptionalActivity() && !_activity.isOptionsWithSequencesActivity())
+						getActivitiesFromComplexByClass(_activity.activityUIID, tActivities, _class, isBranching);
 						
-						if(!isBranching && !_activity.isOptionalActivity() && !_activity.isSequenceActivity())
-							getActivitiesFromComplexByClass(_activity.activityUIID, tActivities, _class, isBranching);
-						else if(isBranching && !_activity.isOptionalActivity() && !_activity.isOptionsWithSequencesActivity())
-							getActivitiesFromComplexByClass(_activity.activityUIID, tActivities, _class, isBranching);
-					}
 				}
 			}
 			
@@ -758,6 +754,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		if(parentAct != null) {
 			if(parentAct.isSequenceActivity() && SequenceActivity(parentAct).firstActivityUIID != selectedAct.activityUIID)
 				return null;
+			else if(parentAct.isSequenceActivity())
+				return getParentActivity(parentAct);
+			
+			var transObj:Object = getCanvas().ddm.getTransitionsForActivityUIID(parentAct.activityUIID);
+		
+			return (transObj.into != null) ? _cv.ddm.getActivityByUIID(transObj.into.fromUIID) : getParentActivity(parentAct);
+			
 			
 			return parentAct;
 		}
