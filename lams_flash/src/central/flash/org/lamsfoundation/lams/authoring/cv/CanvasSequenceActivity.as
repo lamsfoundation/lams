@@ -197,13 +197,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		
 		if(_module == "monitoring") {
 			if(_canvasBranchView != null)
-				childActivity = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+a.activityUIID, childActivities_mc.getNextHighestDepth(), {_activity:a , _monitorController:_monitorController, _canvasBranchView:_canvasBranchView, _module:"monitoring", learnerContainer:learnerContainer, _sequenceChild:true});
+				childActivity = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+a.activityUIID, childActivities_mc.getNextHighestDepth(), {_activity:a , _monitorController:_monitorController, _monitorView:_canvasBranchView, _module:"monitoring", learnerContainer:learnerContainer, _sequenceChild:true});
 			else if(_canvasComplexView != null)
-				childActivity = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+a.activityUIID, childActivities_mc.getNextHighestDepth(), {_activity:a , _monitorController:_monitorController, _canvasComplexView: _canvasComplexView, _module:"monitoring", learnerContainer:learnerContainer, _sequenceChild:true});
+				childActivity = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+a.activityUIID, childActivities_mc.getNextHighestDepth(), {_activity:a , _monitorController:_monitorController, __monitorView: _canvasComplexView, _module:"monitoring", learnerContainer:learnerContainer, _sequenceChild:true});
 			else
 				childActivity = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+a.activityUIID, childActivities_mc.getNextHighestDepth(), {_activity:a , _monitorController:_monitorController, _monitorView:_monitorView, _module:"monitoring", learnerContainer:learnerContainer, _sequenceChild:true});
 		} else {
-			childActivity = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+a.activityUIID, childActivities_mc.getNextHighestDepth(), {_activity:a , _canvasController:_canvasController, _canvasView:_canvasView, _sequenceChild:true});
+			if(_canvasBranchView != null)
+				childActivity = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+a.activityUIID, childActivities_mc.getNextHighestDepth(), {_activity:a , _canvasController:_canvasController, _canvasBranchView:_canvasBranchView, _sequenceChild:true});
+			else if(_canvasComplexView != null)
+				childActivity = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+a.activityUIID, childActivities_mc.getNextHighestDepth(), {_activity:a , _canvasController:_canvasController, _canvasComplexView:_canvasComplexView, _sequenceChild:true});
+			else
+				childActivity = childActivities_mc.attachMovie("CanvasActivityMin", "CanvasActivityMin"+a.activityUIID, childActivities_mc.getNextHighestDepth(), {_activity:a , _canvasController:_canvasController, _canvasView:_canvasView, _sequenceChild:true});
+			
 		}
 		//set the positioning co-ords
 		childActivity.activity.xCoord = CHILD_OFFSET_X + ((_children.length-1) * CHILD_INCRE);

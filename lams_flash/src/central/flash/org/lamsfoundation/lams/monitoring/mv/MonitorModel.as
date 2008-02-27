@@ -719,7 +719,7 @@ class MonitorModel extends Observable{
 	private function orderDesign(activity:Activity, order:Array):Void{
 		order.push(activity);
 		
-		if(activity.isBranchingActivity() || activity.isSequenceActivity()) {
+		if(activity.isBranchingActivity() || activity.isSequenceActivity() || activity.isOptionalActivity() || activity.isOptionsWithSequencesActivity()) {
 			var children:Array = _activeSeq.getLearningDesignModel().getComplexActivityChildren(activity.activityUIID);
 			for(var i=0; i<children.length; i++) {
 				orderDesign(children[i], order);

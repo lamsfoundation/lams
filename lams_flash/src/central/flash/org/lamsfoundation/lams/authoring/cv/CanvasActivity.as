@@ -474,7 +474,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			theIcon_mc._visible = true;
 		
 			//chose the background mc
-			if(_activity.groupingUIID > 0){
+			if(_activity.groupingUIID != null && _activity.groupingUIID > 0){
 				canvasActivityGrouped_mc._visible = true;
 				canvasActivity_mc._visible = false;
 			}else{
