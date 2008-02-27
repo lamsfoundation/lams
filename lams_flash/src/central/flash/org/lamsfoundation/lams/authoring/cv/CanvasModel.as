@@ -343,6 +343,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		ca.activity.orderID = null;
 		ca.activity.parentActivityID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityID : null;
 		
+		CanvasOptionalActivity(_activitiesDisplayed.get(parentID)).removeAllChildren();
+		
 		if(!(activeView instanceof CanvasComplexView)) removeActivity(parentID);
 		
 		haltRefresh(false);
@@ -453,6 +455,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			Debugger.log("toActivity: " + toActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
 			
 			_cv.ddm.removeTransition(transition.transitionUIID);
+			
 			createSequenceTransition(fromActivity, ca.activity);
 			createSequenceTransition(ca.activity, toActivity);
 			
@@ -466,9 +469,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			createSequenceTransition(fromActivity, toActivity);
 		}
 
-		if(activeView instanceof CanvasComplexView && activeView.openActivity.activity.activityUIID == sequence.parentUIID)
+		if(activeView instanceof CanvasComplexView && activeView.openActivity.activity.activityUIID == sequence.parentUIID) {
 			activeView.updateActivity();
-		else removeActivity(sequence.parentUIID);
+		} else {
+			CanvasOptionalActivity(_activitiesDisplayed.get(sequence.parentUIID)).removeAllChildren();
+			removeActivity(sequence.parentUIID);
+		}
 		
 		haltRefresh(false);
 
@@ -1111,7 +1117,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		Debugger.log("visible: " + visible, Debugger.CRITICAL, "openBranchActivityContent", "CanvasModel");
 		Debugger.log("currentBranchingActivity UIID: " + currentBranchingActivity.activity.activityUIID, Debugger.CRITICAL, "openBranchActivityContent", "CanvasModel");
 		
-		if(ba.branchView != null) {
+		if(ba.branchView != null || ba.branchView != undefined) {
 			activeView = (visible) ? ba.branchView : activeView;
 			ba.branchView.setOpen(visible);
 			ba.branchView.open();

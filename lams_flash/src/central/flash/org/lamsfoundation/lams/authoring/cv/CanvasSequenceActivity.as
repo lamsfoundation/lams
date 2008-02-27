@@ -174,7 +174,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		}
 		
 		removeAllChildren();
-		children_mc = new Array();
 		
 		if(_children.length > 0) {
 			SequenceActivity(_activity).empty = false;
@@ -241,8 +240,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 	}
 	
 	public function removeAllChildren():Void {
-		for(var j=0; j<children_mc.length; j++)
-			children_mc[j].removeMovieClip();
+		for(var j=0; j<children_mc.length; j++) {
+			var childActMC:CanvasActivity = CanvasActivity(children_mc[j]);
+			
+			if(childActMC.activity.isBranchingActivity() && childActMC.branchView != null) {
+				Debugger.log("removing branch view: " + childActMC.activity.activityUIID, Debugger.CRITICAL, "removeAllChildren", "CanvasSequenceActivity");
+				childActMC.branchView.removeMovieClip();
+			}
+			
+			childActMC.removeMovieClip();
+			
+		}
+		
+		children_mc = new Array();
+
 	}
 	
 	private function showAssets(isVisible:Boolean){

@@ -609,7 +609,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			if(_canvasModel.activeView instanceof CanvasComplexView) {
 				var seqActivity:Activity = Activity(_canvasModel.ddm.getActivityByUIID(parentUIID));
 				if(seqActivity.isOptionalSequenceActivity(_canvasModel.ddm.getActivityByUIID(seqActivity.parentUIID)))
-					_canvasModel.removeOptionalSequenceCA(ca, parentUIID);
+					_canvasModel.removeOptionalSequenceCA(ca, seqActivity.parentUIID);
 		
 				if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.isBranchingActivity()){
 					_canvasModel.removeComplexActivityChildren(ca.actChildren);

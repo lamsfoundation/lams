@@ -555,13 +555,11 @@ class CanvasHelper {
 	}
 	
 	public function openBranchView(ba, visible:Boolean){
-		
 		var cx:Number = ba._x + ba.getVisibleWidth()/2;
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
 		var isVisible:Boolean = (visible == null) ? true : visible;
 		
 		var target:MovieClip = (canvasModel.activeView instanceof CanvasBranchView) ? canvasModel.activeView.branchContent : _canvasView_mc.branchContent;
-		
 		
 		var _branchView_mc:MovieClip = target.createChildAtDepth("canvasBranchView", target.getNextHighestDepth(), {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
 		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
