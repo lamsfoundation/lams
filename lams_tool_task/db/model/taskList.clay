@@ -384,6 +384,12 @@
 <variant type-name-pattern="BIT"/>
 </data-type>
 </column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="show_comments_to_all" remarks="" uid="1bef877:1182ac6c3bb:-7ea9">
+<column-description/>
+<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
+<variant type-name-pattern="BIT"/>
+</data-type>
+</column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="is_child_task" remarks="" uid="1bef877:1182ac6c3bb:-7f5a">
 <column-description/>
 <data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">

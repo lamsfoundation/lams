@@ -43,6 +43,7 @@ public class TaskListItemForm extends ActionForm {
 	
 	private boolean isRequired;
 	private boolean isCommentsAllowed;
+	private boolean showCommentsToAll;
 	private boolean isChildTask;
 	
 	private String parentTaskName;
@@ -90,6 +91,13 @@ public class TaskListItemForm extends ActionForm {
 	}
 	public void setCommentsAllowed(boolean isCommentsAllowed) {
 		this.isCommentsAllowed = isCommentsAllowed;
+	}
+
+	public boolean getShowCommentsToAll() {
+		return showCommentsToAll;
+	}
+	public void setShowCommentsToAll(boolean showCommentsToAll) {
+		this.showCommentsToAll = showCommentsToAll;
 	}
 	
 	public boolean isChildTask() {

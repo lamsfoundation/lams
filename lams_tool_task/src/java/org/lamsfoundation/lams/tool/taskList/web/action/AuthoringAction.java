@@ -809,6 +809,7 @@ public class AuthoringAction extends Action {
 			form.setItemIndex(new Integer(itemIdx).toString());
 		form.setRequired(item.isRequired());
 		form.setCommentsAllowed(item.isCommentsAllowed());
+		form.setShowCommentsToAll(item.getShowCommentsToAll());
 		form.setChildTask(item.isChildTask());
 		form.setParentTaskName(item.getParentTaskName());
 		
@@ -870,6 +871,7 @@ public class AuthoringAction extends Action {
 		
 		item.setRequired(itemForm.isRequired());
 		item.setCommentsAllowed(itemForm.isCommentsAllowed());
+		item.setShowCommentsToAll(itemForm.getShowCommentsToAll());
 		item.setChildTask(itemForm.isChildTask());
 		item.setParentTaskName(itemForm.getParentTaskName());
 	}

@@ -1,8 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
 		"http://www.w3.org/TR/html4/loose.dtd">
-
 <%@ include file="/common/taglibs.jsp"%>
-
 
 <lams:html>
 	<lams:head>
@@ -49,11 +47,15 @@
 					<fmt:message key="label.authoring.basic.task.isRequired" />
 				</label>
 			</div>
+			
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />					
+	        <c:set var="sessionMapID" value="${formBean.sessionMapID}" />				
+		    <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 			<div class="space-top">
 				<html:checkbox property="commentsAllowed" styleClass="noBorder"	styleId="isCommentsAllowed"
-					onclick="document.taskListItemForm.selectedId[1].disabled = !document.taskListItemForm.selectedId[1].disabled;
-					document.taskListItemForm.selectedId[0].disabled = !document.taskListItemForm.selectedId[0].disabled;">
+					onclick="document.taskListItemForm.showCommentsToAll[0].disabled = !document.taskListItemForm.showCommentsToAll[0].disabled;
+					document.taskListItemForm.showCommentsToAll[1].disabled = !document.taskListItemForm.showCommentsToAll[1].disabled">
 				</html:checkbox>
 
 				<label for="isCommentsAllowed">
@@ -63,25 +65,30 @@
 					
 			<div class="space-top">
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	
-				<input type="radio" name="selectedId" value="${false} }" 
-					${1 == 2 ? "selected" : ""} styleId="showToMonitoring"/>
+				<input type="radio" name="showCommentsToAll" value="${false}" styleId="showToMonitoring"
+					<c:if test="${not formBean.showCommentsToAll}">checked="checked"</c:if>
+					<c:if test="${not formBean.commentsAllowed}">disabled="disabled"</c:if>/>
+					
 				<label for="showToMonitoring">
 					<fmt:message key="label.authoring.basic.task.show.only.to.monitoring" />
 				</label>
 			</div>
-
+			
 			<div class="space-top">
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	
-				<input type="radio" name="selectedId" value="${true} }" 
-					${1 == 2 ? "selected" : ""} styleId="showToLearners"  disabled = "${true}"/>
+				<input type="radio" name="showCommentsToAll" value="${true}" styleId="showToLearners"
+					<c:if test="${formBean.showCommentsToAll}">checked="checked"</c:if>
+					<c:if test="${not formBean.commentsAllowed}">disabled="disabled"</c:if>/>
+					
 				<label for="showToLearners">
 					<fmt:message key="label.authoring.basic.task.show.to.all.learners" />
 				</label>
 			</div>
-					
+			
 			<div class="space-top" ">
-				<html:checkbox property="childTask" styleClass="noBorder"
-					styleId="isChildTask" onclick="document.taskListItemForm.parentTaskName.disabled = !document.taskListItemForm.parentTaskName.disabled">
+				<html:checkbox property="childTask" styleClass="noBorder" 
+					disabled="${(fn:length(sessionMap.taskListList) == 0) || (fn:length(sessionMap.taskListList) == 1) && (formBean.itemIndex > -1)}"
+					styleId="isChildTask" onclick="document.taskListItemForm.parentTaskName.disabled = !document.taskListItemForm.parentTaskName.disabled;">
 				</html:checkbox>
 
 				<label for="isChildTask">
@@ -92,12 +99,8 @@
 				<label  for="parentTaskName">
 					<fmt:message key="label.authoring.basic.task.parent.task.name" />
 				</label>
-				
-				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+
 				<html:select property="parentTaskName" styleId="parentTaskName" style="width:150px" disabled="${!formBean.childTask}" >
-					
-	                <c:set var="sessionMapID" value="${formBean.sessionMapID}" />				
-				    <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 					<c:forEach var="taskListItem" items="${sessionMap.taskListList}">
 						<c:choose>
 							<c:when	test="${formBean.parentTaskName == taskListItem.title}">

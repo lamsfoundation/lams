@@ -56,6 +56,7 @@ public class TaskListItem  implements Cloneable{
 	
 	private boolean isRequired;
 	private boolean isCommentsAllowed;
+	private boolean showCommentsToAll;
 	private boolean isChildTask;
 	
 	private String parentTaskName;
@@ -216,6 +217,17 @@ public class TaskListItem  implements Cloneable{
 		}
 		public void setRequired(boolean isRequired) {
 			this.isRequired = isRequired;
+		}
+		
+		/**
+		 * @hibernate.property column="show_comments_to_all" 
+		 * @return
+		 */
+		public boolean getShowCommentsToAll() {
+			return showCommentsToAll;
+		}
+		public void setShowCommentsToAll(boolean showCommentsToAll) {
+			this.showCommentsToAll = showCommentsToAll;
 		}
 		
 		/**
