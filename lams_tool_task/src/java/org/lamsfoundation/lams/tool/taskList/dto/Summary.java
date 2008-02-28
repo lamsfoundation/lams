@@ -1,0 +1,157 @@
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0 
+ * as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.taskList.dto;
+
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
+
+/**
+ * List contains following element: <br>
+ * 
+ * <li>session_id</li>
+ * <li>session_name</li>
+ * <li>TaskListItem.uid</li>
+ * <li>TaskListItem.item_type</li>
+ * <li>TaskListItem.create_by_author</li>
+ * <li>TaskListItem.is_hide</li>
+ * <li>TaskListItem.title</li>
+ * <li>User.login_name</li>
+ * <li>count(taskList_item_uid)</li>
+ * @author Steve.Ni
+ * 
+ * @version $Revision$
+ */
+public class Summary {
+
+	private Long sessionId;
+	private String sessionName;
+	private Long itemUid;
+	private boolean itemCreateByAuthor;
+	private boolean itemHide;
+	private String itemTitle;
+	private String username;
+	private int viewNumber;
+	
+	//true: initial group item, false, belong to some group.
+	private boolean isInitGroup;
+	
+	public Summary(){}
+	/**
+	 * Contruction method for monitoring summary function. 
+	 * 
+	 * <B>Don't not set isInitGroup and viewNumber fields</B>
+	 * @param sessionName
+	 * @param item
+	 * @param isInitGroup
+	 */
+	public Summary(Long sessionId, String sessionName, TaskListItem item){
+		this.sessionId = sessionId;
+		this.sessionName = sessionName;
+		if(item != null){
+			this.itemUid = item.getUid();
+			this.itemCreateByAuthor = item.isCreateByAuthor();
+			this.itemHide = item.isHide();
+			this.itemTitle = item.getTitle();
+			this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
+		}else
+			this.itemUid = new Long(-1);
+	}
+	/**
+	 * Contruction method for export profolio function. 
+	 * 
+	 * <B>Don't not set sessionId and viewNumber fields</B>
+	 * @param sessionName
+	 * @param item
+	 * @param isInitGroup
+	 */
+	public Summary(String sessionName, TaskListItem item,boolean isInitGroup){
+		this.sessionName = sessionName;
+		if(item != null){
+			this.itemUid = item.getUid();
+			this.itemCreateByAuthor = item.isCreateByAuthor();
+			this.itemHide = item.isHide();
+			this.itemTitle = item.getTitle();
+			this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
+		}else
+			this.itemUid = new Long(-1);
+		this.isInitGroup = isInitGroup;
+	}
+	public boolean isItemCreateByAuthor() {
+		return itemCreateByAuthor;
+	}
+	public void setItemCreateByAuthor(boolean itemCreateByAuthor) {
+		this.itemCreateByAuthor = itemCreateByAuthor;
+	}
+	public boolean isItemHide() {
+		return itemHide;
+	}
+	public void setItemHide(boolean itemHide) {
+		this.itemHide = itemHide;
+	}
+	public String getItemTitle() {
+		return itemTitle;
+	}
+	public void setItemTitle(String itemTitle) {
+		this.itemTitle = itemTitle;
+	}
+	public Long getItemUid() {
+		return itemUid;
+	}
+	public void setItemUid(Long itemUid) {
+		this.itemUid = itemUid;
+	}
+	public Long getSessionId() {
+		return sessionId;
+	}
+	public void setSessionId(Long sessionId) {
+		this.sessionId = sessionId;
+	}
+	public String getSessionName() {
+		return sessionName;
+	}
+	public void setSessionName(String sessionName) {
+		this.sessionName = sessionName;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public int getViewNumber() {
+		return viewNumber;
+	}
+	public void setViewNumber(int viewNumber) {
+		this.viewNumber = viewNumber;
+	}
+
+	public boolean isInitGroup() {
+		return isInitGroup;
+	}
+
+	public void setInitGroup(boolean isInitGroup) {
+		this.isInitGroup = isInitGroup;
+	}
+	
+}

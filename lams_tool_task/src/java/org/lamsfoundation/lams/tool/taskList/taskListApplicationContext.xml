@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<bean id="lataskMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename"><value>org.lamsfoundation.lams.tool.taskList.ApplicationResources</value></property>
+	</bean>
+	<bean id="lataskMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource"><ref local="lataskMessageSource"/></property>										
+	</bean>
+    <!-- Hibernate SessionFactory -->
+    <bean id="lataskTaskListSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource"><ref bean="toolDataSource"/></property>
+		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
+
+        <!-- Must references all OR mapping files. -->
+        <property name="mappingResources">
+            <list>
+               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListUser.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/taskList/model/TaskList.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListItem.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListItemVisitLog.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListAttachment.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListSession.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- core beans -->
+    <bean id="lataskTaskListDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="lataskTaskListSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="lataskTaskListItemDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="lataskTaskListSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="lataskTaskListItemVisitDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListItemVisitDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="lataskTaskListSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="lataskTaskListAttachmentDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListAttachmentDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="lataskTaskListSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="lataskTaskListUserDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="lataskTaskListSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="lataskTaskListSessionDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListSessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="lataskTaskListSessionFactory"/>
+        </property>
+    </bean>
+
+
+    <!-- Managers -->
+	<bean id="lataskTaskListToolContentHandler" class="org.lamsfoundation.lams.tool.taskList.util.TaskListToolContentHandler">
+	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+	
+    <bean id="lataskTaskListManagerTarget" class="org.lamsfoundation.lams.tool.taskList.service.TaskListServiceImpl">
+        <property name="taskListDao">
+            <ref local="lataskTaskListDao"/>
+        </property>
+        <property name="taskListItemDao">
+            <ref local="lataskTaskListItemDao"/>
+        </property>
+        <property name="taskListItemVisitDao">
+            <ref local="lataskTaskListItemVisitDao"/>
+        </property>
+        <property name="taskListAttachmentDao">
+            <ref local="lataskTaskListAttachmentDao"/>
+        </property>
+        <property name="taskListUserDao">
+            <ref local="lataskTaskListUserDao"/>
+        </property>
+        <property name="taskListSessionDao">
+            <ref local="lataskTaskListSessionDao"/>
+        </property>
+        <property name="taskListToolContentHandler">
+            <ref local="lataskTaskListToolContentHandler"/>
+        </property>
+        <property name="repositoryService">
+            <ref bean="repositoryService"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
+   		<property name="auditService">
+   			<ref bean="auditService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService"><ref bean="lataskMessageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   		
+    </bean>
+
+    <bean id="lataskTaskListService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref local="lataskTaskListManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+			    <prop key="importToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                
+                <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
+				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
+
