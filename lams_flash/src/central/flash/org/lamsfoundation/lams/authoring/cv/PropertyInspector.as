@@ -130,6 +130,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		this.onEnterFrame = setupLabels;
 		
 		this.tabChildren = true;
+		
 		setTabIndex();
 		hideAllSteppers(false);
 		

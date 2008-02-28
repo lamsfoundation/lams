@@ -65,6 +65,7 @@ class PropertyInspectorControls extends MovieClip {
 	//Properties tab
     private var title_lbl:Label;
     private var title_txt:TextInput;
+	private var noselection_txt:TextInput;
     private var desc_lbl:Label;
     private var desc_txt:TextInput;
     private var piHeightHide:Number = 23;
@@ -1264,23 +1265,20 @@ class PropertyInspectorControls extends MovieClip {
 	 */
 	public function focusOut(e):Void{
 		var tgt:String = new String(e.target);
-		Debugger.log('focusOut tgt:'+tgt,Debugger.GEN,'focusOut','PropertyInspector');
-		
 		if(tgt.indexOf("title_txt") != -1){
 			//todo check if this is the right place to set edited content, should it be ddm?
 			_canvasModel.selectedItem.activity.title = title_txt.text;
-			
 		} else if(tgt.indexOf("desc_txt") != -1){
-			_canvasModel.selectedItem.activity.description= desc_txt.text;
+			_canvasModel.selectedItem.activity.description = desc_txt.text;
 		}
-		
+
 		_canvasModel.selectedItem.refresh();
 		
-		if (_canvasModel.selectedItem.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE)
+		if (_canvasModel.selectedItem.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE) {
 			_canvasModel.selectedItem.init();
-		else if (_canvasModel.selectedItem.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || _canvasModel.selectedItem.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE)
-			_canvasModel.selectedItem.updateChildren();
-		else if(_canvasModel.selectedItem instanceof BranchConnector) {
+		} else if (_canvasModel.selectedItem.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || _canvasModel.selectedItem.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE) {
+			//_canvasModel.selectedItem.updateChildren();
+		} else if(_canvasModel.selectedItem instanceof BranchConnector) {
 			if(_canvasModel.selectedItem.branch.isEnd)
 				_canvasModel.branchesDisplayed.get(_canvasModel.getCanvas().ddm.getBranchesForActivityUIID(SequenceActivity(_canvasModel.selectedItem.branch.sequenceActivity).firstActivityUIID).target.branchUIID).updateBranchLabel();
 			else

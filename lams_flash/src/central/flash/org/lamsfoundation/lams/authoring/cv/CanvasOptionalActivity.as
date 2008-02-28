@@ -274,6 +274,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		init();
 	}
 	
+	public function refresh():Void {
+		draw();
+	}
+	
 	public function refreshChildren():Void {
 		for(var i = 0; i < children_mc.length; i ++)		{
 			children_mc[i].setSelected(false);
