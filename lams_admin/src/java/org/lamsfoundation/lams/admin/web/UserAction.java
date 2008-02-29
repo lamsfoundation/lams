@@ -106,20 +106,23 @@ public class UserAction extends LamsDispatchAction {
 		
 		// test requestor's permission
 		Organisation org = null;
-		Boolean requestorHasRole = service.isUserGlobalGroupAdmin();
+		Boolean canEdit = service.isUserGlobalGroupAdmin();
 		if (orgId!=null) {
 			org = (Organisation)service.findById(Organisation.class,orgId);
-			if (!requestorHasRole) {
+			if (!canEdit) {
 				OrganisationType orgType = org.getOrganisationType();
 				Integer orgIdOfCourse = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) 
 					? org.getParentOrganisation().getOrganisationId() : orgId;
 				User requestor = (User)service.getUserByLogin(request.getRemoteUser());
-				requestorHasRole = service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_ADMIN)
-					|| service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER);
+				if (service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_ADMIN)
+					|| service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER)) {
+					Organisation course = (Organisation)service.findById(Organisation.class, orgIdOfCourse);
+					canEdit = course.getCourseAdminCanAddNewUsers();
+				}
 			}
 		}
 		
-		if (!(requestorHasRole || request.isUserInRole(Role.SYSADMIN))) {
+		if (!(canEdit || request.isUserInRole(Role.SYSADMIN))) {
 			request.setAttribute("errorName", "UserAction");
 			request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 			return mapping.findForward("error");

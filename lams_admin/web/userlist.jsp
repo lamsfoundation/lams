@@ -131,7 +131,13 @@ p {
 		<td>
 				<a href="userroles.do?userId=<bean:write name='userManageBean' property='userId' />&orgId=<bean:write name='UserManageForm' property='orgId'/>"><fmt:message key="admin.user.assign.roles"/></a>
 				&nbsp;
-				<a href="user.do?method=remove&userId=<bean:write name='userManageBean' property='userId' />&orgId=<bean:write name='UserManageForm' property='orgId'/>"><fmt:message key="admin.user.delete"/></a>
+				<logic:equal name="UserManageForm" property="courseAdminCanAddNewUsers" value="true">
+					<a href="user.do?method=edit&userId=<bean:write name='userManageBean' property='userId' />&orgId=<bean:write name='UserManageForm' property='orgId'/>"><fmt:message key="admin.edit" /></a>
+					&nbsp;
+				</logic:equal>
+				<logic:equal name="canDeleteUser" value="true">
+					<a href="user.do?method=remove&userId=<bean:write name='userManageBean' property='userId' />&orgId=<bean:write name='UserManageForm' property='orgId'/>"><fmt:message key="admin.user.delete"/></a>
+				</logic:equal>
 				<br/>
 		</td>		
 	</tr>

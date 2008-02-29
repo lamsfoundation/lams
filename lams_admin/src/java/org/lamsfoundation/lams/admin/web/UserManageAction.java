@@ -115,6 +115,7 @@ public class UserManageAction extends Action {
 				|| (service.isUserGlobalGroupAdmin() && !orgId.equals(rootOrgId))){
 			userManageForm.setCourseAdminCanAddNewUsers(true);
 			userManageForm.setCourseAdminCanBrowseAllUsers(true);
+			request.setAttribute("canDeleteUser", true);
 		}else if((service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.GROUP_ADMIN) 
 				|| service.isUserInRole(userId,orgOfCourseAdmin.getOrganisationId(),Role.GROUP_MANAGER))
 				&& !orgId.equals(rootOrgId)){
