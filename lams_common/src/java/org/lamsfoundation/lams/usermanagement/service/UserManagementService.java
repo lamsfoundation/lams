@@ -528,11 +528,13 @@ public class UserManagementService implements IUserManagementService {
             } else {
             	// update workspace/folder names
             	Workspace workspace = organisation.getWorkspace();
-            	workspace.setName(organisation.getName());
-            	WorkspaceFolder defaultFolder = workspace.getDefaultFolder();
-            	defaultFolder.setName(organisation.getName());
-            	WorkspaceFolder runSeqFolder = workspace.getDefaultRunSequencesFolder();
-            	runSeqFolder.setName(getRunSequencesFolderName(organisation.getName()));
+            	if (workspace != null) {
+            		workspace.setName(organisation.getName());
+            		WorkspaceFolder defaultFolder = workspace.getDefaultFolder();
+            		if (defaultFolder != null) defaultFolder.setName(organisation.getName());
+            		WorkspaceFolder runSeqFolder = workspace.getDefaultRunSequencesFolder();
+            		if (runSeqFolder != null) runSeqFolder.setName(getRunSequencesFolderName(organisation.getName()));
+            	}
             }
 
             return organisation; 	 
