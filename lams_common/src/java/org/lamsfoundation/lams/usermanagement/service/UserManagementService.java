@@ -459,12 +459,7 @@ public class UserManagementService implements IUserManagementService {
 		WorkspaceFolder workspaceFolder = new WorkspaceFolder(workspaceName,userID, createDateTime, createDateTime, WorkspaceFolder.NORMAL);
 		save(workspaceFolder);
 
-		String description = messageService.getMessage(SEQUENCES_FOLDER_NAME_KEY, new Object[] {workspaceName});
-		if ( description != null && description.startsWith("???") ) {
-			log.warn("Problem in the language file - can't find an entry for "+SEQUENCES_FOLDER_NAME_KEY+
-					". Creating folder as \"run sequences\" ");
-			description = "run sequences";
-		}
+		String description = getRunSequencesFolderName(workspaceName);
 		WorkspaceFolder workspaceFolder2 = new WorkspaceFolder(description,userID, createDateTime, createDateTime, WorkspaceFolder.RUN_SEQUENCES);
 		workspaceFolder2.setParentWorkspaceFolder(workspaceFolder);
 		save(workspaceFolder2);
@@ -492,7 +487,7 @@ public class UserManagementService implements IUserManagementService {
                     Date createDateTime = new Date(); 	 
                     organisation.setCreateDate(createDateTime);
                     organisation.setCreatedBy(creator);
-	 
+                    
                     if(organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)){ 	 
                             Workspace workspace = createWorkspaceForOrganisation(organisation.getName(), userID, createDateTime); 	 
                             organisation.setWorkspace(workspace); 	 
@@ -530,9 +525,27 @@ public class UserManagementService implements IUserManagementService {
                     				save(uo);
                     		}
                     } 
-            } 	 
-	 	 
+            } else {
+            	// update workspace/folder names
+            	Workspace workspace = organisation.getWorkspace();
+            	workspace.setName(organisation.getName());
+            	WorkspaceFolder defaultFolder = workspace.getDefaultFolder();
+            	defaultFolder.setName(organisation.getName());
+            	WorkspaceFolder runSeqFolder = workspace.getDefaultRunSequencesFolder();
+            	runSeqFolder.setName(getRunSequencesFolderName(organisation.getName()));
+            }
+
             return organisation; 	 
+    }
+    
+    private String getRunSequencesFolderName(String workspaceName) {
+    	String runSeqName = messageService.getMessage(SEQUENCES_FOLDER_NAME_KEY, new Object[] {workspaceName});
+		if ( runSeqName != null && runSeqName.startsWith("???") ) {
+			log.warn("Problem in the language file - can't find an entry for "+SEQUENCES_FOLDER_NAME_KEY+
+					". Creating folder as \"run sequences\" ");
+			runSeqName = "run sequences";
+		}
+		return runSeqName;
     }
 
 	@SuppressWarnings("unchecked")
