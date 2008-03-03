@@ -16,6 +16,7 @@
 		var omWin = null;
 		var pWin = null;
 		var copyrightWin = null;
+		var customWin = null;
 		
 		function closeAllChildren(){
 			if (authorWin && !authorWin.closed) authorWin.closeWindow();
@@ -270,6 +271,21 @@
 				}else{
 					copyrightWin = window.open('copyright.jsp','copyright','resizable,left='+left+',top='+top+',width=750,height=388,scrollbars');
 					copyrightWin.focus();
+				}
+			}
+		}
+		
+		function openCustom(url) {
+			var left = 0;
+			var top = 0;
+			if(isMac){
+				customWin = window.open(url,'custom','resizable,left='+left+',top='+top+',scrollbars');
+			}else{
+				if(customWin && !customWin.closed ){
+					customWin.focus();
+				}else{
+					customWin = window.open(url,'custom','resizable,left='+left+',top='+top+',scrollbars');
+					customWin.focus();
 				}
 			}
 		}

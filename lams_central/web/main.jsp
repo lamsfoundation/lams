@@ -6,6 +6,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
 
 <%JspRedirectStrategy.welcomePageStatusUpdate(request, response);%>
@@ -109,7 +110,14 @@
 	
 				<div class="${tabLeft}"></div>
 				<div class="${tabMiddle}">
-						<lams:TabName url="${headerlink.url}" highlight="${highlight}"><fmt:message key="${headerlink.name}" /></lams:TabName>
+						<c:choose>
+						<c:when test="${fn:startsWith(headerlink.name,'index')}">
+							<lams:TabName url="${headerlink.url}" highlight="${highlight}"><fmt:message key="${headerlink.name}" /></lams:TabName>
+						</c:when>
+						<c:otherwise>
+							<lams:TabName url="${headerlink.url}" highlight="${highlight}"><c:out value="${headerlink.name}" /></lams:TabName>						
+						</c:otherwise>
+						</c:choose>
 				</div>
 				<div class="${tabRight}"></div>
 			</div>

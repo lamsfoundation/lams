@@ -211,4 +211,8 @@ public class ConfigurationKeys {
 	
 	/** Number of learners to be displayed on the learner progress screen in monitoring. */
 	public static String LEARNER_PROGRESS_BATCH_SIZE = "LearnerProgressBatchSize";
+	
+	/** Custom tab for the main page */
+	public static String CUSTOM_TAB_LINK = "CustomTabLink";
+	public static String CUSTOM_TAB_TITLE = "CustomTabTitle";
 }

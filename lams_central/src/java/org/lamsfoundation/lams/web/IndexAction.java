@@ -137,6 +137,11 @@ public class IndexAction extends Action {
 				request.isUserInRole(Role.AUTHOR) || request.isUserInRole(Role.AUTHOR_ADMIN) || request.isUserInRole(Role.MONITOR))
 				headerLinks.add(new IndexLinkBean("index.community", "index.do?tab=community"));
 		
+		String customTabText = Configuration.get(ConfigurationKeys.CUSTOM_TAB_TITLE);
+		String customTabLink = Configuration.get(ConfigurationKeys.CUSTOM_TAB_LINK);
+		if ( customTabLink != null && customTabLink.trim().length() > 0 ) 
+			headerLinks.add(new IndexLinkBean(customTabText,"javascript:openCustom(\""+customTabLink+"\")"));
+		
 		log.debug("set headerLinks in request");
 		request.setAttribute("headerLinks", headerLinks);
 	}

@@ -213,3 +213,9 @@ values ('LDAPSearchResultsPageSize', '100', 'config.ldap.search.results.page.siz
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LearnerProgressBatchSize', '10', 'config.learner.progress.batch.size', 'config.header.look.feel', 'LONG', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('CustomTabLink','', 'config.custom.tab.link', 'config.header.look.feel', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('CustomTabTitle','', 'config.custom.tab.title', 'config.header.look.feel', 'STRING', 0);

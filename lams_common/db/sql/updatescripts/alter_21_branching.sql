@@ -285,3 +285,10 @@ alter table lams_ext_server_org_map modify column orgid bigint(20);
 
 -- LDEV-1473 learner progress url for branching and sequence system tools
 update lams_system_tool set learner_progress_url='monitoring/complexProgress.do' where system_tool_id > 5;
+
+-- LDEV-1563 custom tab
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('CustomTabLink','', 'config.custom.tab.link', 'config.header.look.feel', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('CustomTabTitle','', 'config.custom.tab.title', 'config.header.look.feel', 'STRING', 0);
