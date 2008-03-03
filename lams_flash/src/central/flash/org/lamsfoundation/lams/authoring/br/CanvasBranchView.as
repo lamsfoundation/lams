@@ -175,7 +175,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	public function viewUpdate(event:Object):Void{
 		Debugger.log('Received an Event dispatcher UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','CanvasBranchView');
 		
-		if(!_eventsEnabled && event.updateType != 'SET_ACTIVE') {
+		if(!_eventsEnabled && event.updateType != 'SET_ACTIVE' && event.updateType != 'SIZE') {
 			Debugger.log('Events disabled.'+event.target,4,'viewUpdate','CanvasBranchView');
 			return;
 		}
@@ -424,7 +424,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	}
 	
 	private function close():Void {
-		if(model instanceof CanvasModel) model.getCanvas().hideBin(); //typo
+		if(model instanceof CanvasModel) model.getCanvas().hideBin();
 		model.selectedItem = null;
 		
 		var bkeys:Array = model.branchesDisplayed.keys();
@@ -770,15 +770,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
     * Sets the size of the canvas on stage, called from update
     */
 	private function setSize(model):Void{
-		var ba = model.currentBranchingActivity;
-		Debugger.log("currentBranchActivity: " + ba, Debugger.CRITICAL, "setSize", "CanvasBranchView");
+		var thisCA:CanvasActivity = _canvasBranchingActivity;
 		
 		var s:Object = model.getSize();
 		
-		var cx:Number = ba._x + ba.getVisibleWidth()/2;
-		var cy:Number = ba._y + ba.getVisibleHeight()/2;
-		
-		var isCanvasModel = model instanceof CanvasModel;
+		var cx:Number = thisCA._x + thisCA.getVisibleWidth()/2;
+		var cy:Number = thisCA._y + thisCA.getVisibleHeight()/2;
 		
 		s.w -= 2*hSpace;
 		s.h -= 2*vSpace;
@@ -825,7 +822,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			
 			var hPosition:Number = (model instanceof CanvasModel) ? model.getCanvas().view.getScrollPaneHPosition() : model.getMonitor().getMV().getMonitorSequenceScp().hPosition;
 			var vPosition:Number = (model instanceof CanvasModel) ? model.getCanvas().view.getScrollPaneVPosition() : model.getMonitor().getMV().getMonitorSequenceScp().vPosition;
-			
+		
 			canvas_scp._x = (_isBranchChild) ? -cx : -cx + hSpace + hPosition;
 			canvas_scp._y = (_isBranchChild) ? -cy : -cy + vSpace + vPosition;
 			
