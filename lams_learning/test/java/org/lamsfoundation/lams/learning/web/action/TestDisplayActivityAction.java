@@ -167,7 +167,7 @@ public class TestDisplayActivityAction extends AbstractTestAction
     {
         //setup the session bean to display completion page.
         //LearnerProgress progress = testBean.getLearnerProgress();
-        learnerProgress.setLessonComplete(true);
+        learnerProgress.setLessonComplete(LearnerProgress.LESSON_END_OF_DESIGN_COMPLETE);
         //testBean.setLearnerProgress(progress);
         //httpSession.setAttribute(SessionBean.NAME,testBean);
         httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);

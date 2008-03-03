@@ -591,7 +591,8 @@ public class LessonService implements ILessonService
 					 Iterator iter = progresses.iterator();
 					 while ( iter.hasNext() ) {
 						 LearnerProgress progress = (LearnerProgress) iter.next();
-						 progress.setLessonComplete(false);
+						 if ( progress.getLessonComplete() == LearnerProgress.LESSON_END_OF_DESIGN_COMPLETE ) 
+							 progress.setLessonComplete(LearnerProgress.LESSON_NOT_COMPLETE);
 						 count++;
 					 }
 				 }

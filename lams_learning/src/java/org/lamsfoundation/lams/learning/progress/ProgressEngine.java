@@ -95,7 +95,7 @@ public class ProgressEngine
         		completedActivityList.add(parentActivity.getActivityId());        	
         	}
             populateCurrentCompletedActivityList(learnerProgress, completedActivityList);
-        	return setLessonComplete(learnerProgress);
+        	return setLessonComplete(learnerProgress, LearnerProgress.LESSON_IN_DESIGN_COMPLETE);
         } else {
 	        Transition transition = completedActivity.getTransitionFrom();
 	        if (transition != null)
@@ -132,6 +132,8 @@ public class ProgressEngine
         if (progress.getLesson().getLockedForEdit()) {
         	// special case - currently setting up the stop gates for live edit.
         	return clearProgressNowhereToGoNotCompleted(progress,"setUpStartPoint");
+        } else if (progress.isComplete() ) {
+        	return progress;
         } else if(ld.getFirstActivity()==null) {
             throw new ProgressException("Could not find first activity for " 
                                         +"learning design ["+ld.getTitle()+"], id["
@@ -192,7 +194,7 @@ public class ProgressEngine
     	  
     	progress.setCurrentActivity(null);
     	progress.setNextActivity(null);
-    	progress.setLessonComplete(false);
+    	progress.setLessonComplete(LearnerProgress.LESSON_NOT_COMPLETE);
     	return progress;
     }
     
@@ -340,7 +342,7 @@ public class ProgressEngine
         }
         //lesson is meant to be completed if there is no transition and no parent.
         else {
-        	learnerProgress = setLessonComplete(learnerProgress);
+        	learnerProgress = setLessonComplete(learnerProgress, LearnerProgress.LESSON_END_OF_DESIGN_COMPLETE);
         }
 
         return learnerProgress;
@@ -352,10 +354,10 @@ public class ProgressEngine
 	 * @param learnerProgress
 	 * @return updated learnerProgress
 	 */
-	private LearnerProgress setLessonComplete(LearnerProgress learnerProgress) {
+	private LearnerProgress setLessonComplete(LearnerProgress learnerProgress, byte completionStatus) {
 		learnerProgress.setCurrentActivity(null);
 		learnerProgress.setNextActivity(null);
-		learnerProgress.setLessonComplete(true);
+		learnerProgress.setLessonComplete(completionStatus);
 		return learnerProgress;
 	}
 

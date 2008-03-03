@@ -128,7 +128,7 @@ public class ActivityMapping implements Serializable
     {
         ActionForward actionForward = null;
 
-        if (progress.isLessonComplete())
+        if (progress.isComplete())
         {
             // If lesson complete forward to lesson complete action. This action will
             // cause a client request to clear ALL frames. Need to append the progress

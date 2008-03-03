@@ -75,6 +75,14 @@ public class LearnerProgress implements Serializable
     public static final byte PARALLEL_WAITING = 1;
     /** Parallel waiting state: All activities completed, break out of parallel frames */
     public static final byte PARALLEL_WAITING_COMPLETE = 2;
+    
+    /** Learner has not completed the lesson */
+    public static final byte LESSON_NOT_COMPLETE = 0;
+    /** Learner has completed the lesson in the normal manner. */
+    public static final byte LESSON_END_OF_DESIGN_COMPLETE = 1;
+    /** Learner has completed the lesson by reaching a "Stop After Activity" point */
+    public static final byte LESSON_IN_DESIGN_COMPLETE = 2;
+    
     //---------------------------------------------------------------------
     // attributes
     //---------------------------------------------------------------------
@@ -124,7 +132,7 @@ public class LearnerProgress implements Serializable
     /**
      * Indicates is the User has completed this lesson.
      */
-    private boolean lessonComplete;
+    private Byte lessonComplete;
     
     /**
      * Indicates the learner progress is in a incomplete parallel activity
@@ -150,6 +158,7 @@ public class LearnerProgress implements Serializable
     /** default constructor */
     public LearnerProgress()
     {
+    	this.lessonComplete = new Byte(LESSON_NOT_COMPLETE);
     }
     /**
      * Chain constructor to create new learner progress with minimum data.
@@ -169,6 +178,7 @@ public class LearnerProgress implements Serializable
         this.lesson = lesson;
         this.attemptedActivities = attemptedActivities;
         this.completedActivities = completedActivities;
+    	this.lessonComplete = new Byte(LESSON_NOT_COMPLETE);
     }
     //---------------------------------------------------------------------
     // Getters and Setters
@@ -356,22 +366,29 @@ public class LearnerProgress implements Serializable
     }
 
     /**
-     * Getter for property lessonComplete.
-     * @return Value of property lessonComplete.
+     * Has the user completed the lesson? We don't care how (ie at end of sequence or after a "stop after activity")
      */
-    public boolean isLessonComplete()
+    public boolean isComplete()
     {
 
-        return this.lessonComplete;
+        return lessonComplete == LESSON_END_OF_DESIGN_COMPLETE || lessonComplete == LESSON_IN_DESIGN_COMPLETE;
     }
 
+    /**
+     * The "real" value for lessonComplete.
+     * @return LESSON_NOT_COMPLETE, LESSON_END_OF_DESIGN_COMPLETE, LESSON_IN_DESIGN_COMPLETE
+     */
+    public Byte getLessonComplete()
+    {
+    	return lessonComplete;
+    }
+    
     /**
      * Setter for property lessonComplete.
      * @param lessonComplete New value of property lessonComplete.
      */
-    public void setLessonComplete(boolean lessonComplete)
+    public void setLessonComplete(Byte lessonComplete)
     {
-
         this.lessonComplete = lessonComplete;
     }
 
@@ -472,7 +489,7 @@ public class LearnerProgress implements Serializable
                                       this.currentActivity != null ? this.currentActivity.getActivityId() : null,
                                       this.createIdArrayFrom(this.attemptedActivities),
                                       this.createIdArrayFrom(this.completedActivities),
-                                      this.lessonComplete);
+                                      isComplete());
     }
     
     //---------------------------------------------------------------------

@@ -369,8 +369,8 @@ public class LearnerService implements ICoreLearnerService
     	// and we go back to the sequence later, then the LessonComplete flag must be reset so that it will step through
     	// all the activities in the sequence - otherwise it will go to the "Completed" screen after the first activity in the sequence
     	if ( clearCompletedFlag && activity.getParentActivity() != null && activity.getParentActivity().isSequenceActivity() 
-    			&& progress.isLessonComplete() && ! progress.getCompletedActivities().contains(activity) )  
-    		progress.setLessonComplete(false);
+    			&& progress.isComplete() && ! progress.getCompletedActivities().contains(activity) )  
+    		progress.setLessonComplete(LearnerProgress.LESSON_NOT_COMPLETE);
     	
     	progressEngine.setActivityAttempted(progress, activity);
     	progress.setCurrentActivity(activity);

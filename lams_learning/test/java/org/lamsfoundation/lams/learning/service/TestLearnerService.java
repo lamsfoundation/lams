@@ -315,7 +315,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
                                                         testProgress);
-        assertTrue("verify lesson complete",testProgress.isLessonComplete());
+        assertTrue("verify lesson complete",testProgress.isComplete());
         assertEquals("verify temp completed activities",1,testProgress.getCurrentCompletedActivitiesList().size());
     }
 
