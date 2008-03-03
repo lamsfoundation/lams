@@ -664,7 +664,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 					Debugger.log("seq uiid: " + branch.sequenceActivity.activityUIID, Debugger.CRITICAL, "clearAllBranches", "CanvasModel");
 					
 					if(_activitiesDisplayed.get(act_keys[i]).activity.parentUIID == branch.sequenceActivity.activityUIID) {
-						_activitiesDisplayed.remove(act_keys[i]);
+						var r = _activitiesDisplayed.remove(act_keys[i]);
+						r.removeMovieClip();
 					}
 		
 				}
@@ -948,12 +949,55 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		
 		Debugger.log('ParentId of '+ca.activity.activityUIID+ ' ==> '+ca.activity.parentUIID,Debugger.GEN,'addParentToActivity','CanvasModel');
 		
+		if(ca.activity.isBranchingActivity())
+			ca.activity.clear = true;
+		
 		removeActivity(ca.activity.activityUIID);
 		if(doRemoveParent) removeActivity(parentID);
 		
 		setDirty();
 	}
-
+	
+	public function clearBranchingActivity(ca:Object):Void {
+		
+			haltRefresh(true);
+			
+			// remove branches/sequences
+			var c:Array = _cv.ddm.getComplexActivityChildren(ca.activity.activityUIID);
+			
+			for(var i=0; i<c.length; i++) {
+				Debugger.log("title: " + c[i].title, Debugger.CRITICAL, "clearBranchingActivity", "CanvasSuperModel");
+				
+				if(ComplexActivity(c[i]).firstActivityUIID == null && _cv.ddm.getComplexActivityChildren(c[i].activityUIID).length <= 0
+						&& SequenceActivity(c[i]).isDefault)
+					_cv.removeActivity(c[i].activityUIID);
+				else
+					removeActivity(c[i].activityUIID);
+					
+				clearBranches(c[i].activityUIID);
+			}
+			
+			CanvasBranchView(ca.activity.branchView).removeMovieClip();
+			ca.activity.branchView = null;
+			
+			haltRefresh(false);
+			setDirty();
+				
+	}
+	
+	public function clearBranches(seqUIID:Number):Void {
+		var b:Object = _cv.ddm.getBranchesForActivityUIID(seqUIID);
+		for(var j=0; j<b.myBranches.length; j++) {
+			Debugger.log("br: " + b.myBranches[j].branchUIID, Debugger.CRITICAL, "clearBranches", "CanvasSuperModel");
+			
+			var r = branchesDisplayed.remove(b.myBranches[j].branchUIID);
+			r.removeMovieClip();
+				
+			_cv.ddm.removeBranch(b.myBranches[j].branchUIID);
+				
+		}
+	}
+	
 	public function closeAllComplexViews():Void {
 		while(activeView instanceof CanvasComplexView) {
 			CanvasComplexView(activeView).close();

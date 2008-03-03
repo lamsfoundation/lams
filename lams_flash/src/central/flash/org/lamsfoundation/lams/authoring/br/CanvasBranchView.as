@@ -424,7 +424,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	}
 	
 	private function close():Void {
-		if(model instanceof CanvasModel) model.getCanvas().hideBin();
+		if(model instanceof CanvasModel) model.getCanvas().hideBin(); //typo
+		
+		this.activity.clear = false;
 		model.selectedItem = null;
 		
 		var bkeys:Array = model.branchesDisplayed.keys();
@@ -548,6 +550,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasBranchView');
 		}
 		else if(a.isBranchingActivity()) {	
+			BranchingActivity(a).clear = activity.clear;
+			
 			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _canvasController:cbc,_canvasBranchView:cbv})
 															: activityLayer.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a, _monitorController:cbc,_canvasBranchView:cbv, _module:_module, learnerContainer:_learnerContainer_mc});
 															
@@ -822,7 +826,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			
 			var hPosition:Number = (model instanceof CanvasModel) ? model.getCanvas().view.getScrollPaneHPosition() : model.getMonitor().getMV().getMonitorSequenceScp().hPosition;
 			var vPosition:Number = (model instanceof CanvasModel) ? model.getCanvas().view.getScrollPaneVPosition() : model.getMonitor().getMV().getMonitorSequenceScp().vPosition;
-		
+			
 			canvas_scp._x = (_isBranchChild) ? -cx : -cx + hSpace + hPosition;
 			canvas_scp._y = (_isBranchChild) ? -cy : -cy + vSpace + vPosition;
 			

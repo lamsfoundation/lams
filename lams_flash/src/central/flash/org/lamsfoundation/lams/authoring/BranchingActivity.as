@@ -45,12 +45,16 @@ class BranchingActivity extends ComplexActivity {
 	private var _toolActivityUIID:Number;
 	private var _defaultBranch:Branch;
 	
+	private var _clear:Boolean;
+	
 	function BranchingActivity(activityUIID:Number, activityTypeID:Number){
 		super(activityUIID);
 		_activityTypeID = activityTypeID;
 		
 		_toolActivityUIID == null;
 		_defaultBranch = null;
+		
+		_clear = false;
 		
 	}
 	
@@ -144,6 +148,14 @@ class BranchingActivity extends ComplexActivity {
 	
 	public function get defaultBranch():Branch {
 		return _defaultBranch;
+	}
+	
+	public function get clear():Boolean {
+		return _clear;
+	}
+	
+	public function set clear(a:Boolean):Void {
+		_clear = a;
 	}
 }
 

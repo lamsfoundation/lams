@@ -87,10 +87,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			_canvasModel.activeView.close();
 			return;
 	    } else {
+			
 			var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
 			var parentSelectedAct = _canvasModel.getCanvas().ddm.getActivityByUIID(_tempSelectedItem.activity.parentUIID);
 			var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
-			
+ 
 			if(ca.activity.parentUIID != null && 
 				(parentAct.isParallelActivity() || ca.activity.isOptionalSequenceActivity(parentAct))) {
 				_canvasModel.isDragging = false;
@@ -169,7 +170,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			var iconMouseY = _canvasModel.activeView.content._ymouse;
 			
 			if (ca.activity.parentUIID != null && 
-				sequenceActivity.activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE){
+				sequenceActivity.activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE && 
+				ca.activity.activityUIID != _canvasModel.currentBranchingActivity.activity.activityUIID){
 				
 				for (var i=0; i<optionalOnCanvas.length; i++){
 					if (ca.activity.parentUIID == optionalOnCanvas[i].activity.activityUIID){
@@ -193,7 +195,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				}
 				
 			} else if(ca.activity.parentUIID != null && 
-						sequenceActivity.isOptionalSequenceActivity(_canvasModel.getCanvas().ddm.getActivityByUIID(sequenceActivity.parentUIID))) {
+						sequenceActivity.isOptionalSequenceActivity(_canvasModel.getCanvas().ddm.getActivityByUIID(sequenceActivity.parentUIID)) && 
+						ca.activity.activityUIID != _canvasModel.currentBranchingActivity.activity.activityUIID) {
 				
 				for (var i=0; i<optionalOnCanvas.length; i++) {
 					if (sequenceActivity.parentUIID == optionalOnCanvas[i].activity.activityUIID) {
@@ -231,7 +234,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 								var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('act_lock_chk') : Dictionary.getValue('act_seq_lock_chk');
 								LFMessage.showMessageAlert(msg);
 							} else {
-								
 								if(ca.activity.isGateActivity() && !optionalOnCanvas[i].activity.isSequenceBased){
 									activitySnapBack(ca);
 									var msg:String = Dictionary.getValue('cv_gateoptional_hit_chk');
@@ -240,11 +242,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 									activitySnapBack(ca);
 									var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity', [ca.activity.title]);
 									LFMessage.showMessageAlert(msg);
-								} else if(_canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID).hasBranches) {
-									activitySnapBack(ca);
-									var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity_no_branches', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity_no_branches', [ca.activity.title]);
-									LFMessage.showMessageAlert(msg);
-								} else if(optionalOnCanvas[i].activity.isSequenceBased && optionalOnCanvas[i].activity.noSequences <= 0) {
+								//} else if(_canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID).hasBranches) {
+								//	activitySnapBack(ca);
+								//	var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity_no_branches', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity_no_branches', [ca.activity.title]);
+								//	LFMessage.showMessageAlert(msg);
+								} else if(optionalOnCanvas[i].activity.isOptionsWithSequencesActivity() && optionalOnCanvas[i].activity.noSequences <= 0) {
 									activitySnapBack(ca);
 									var msg:String = Dictionary.getValue('ta_iconDrop_optseq_error_msg');
 									LFMessage.showMessageAlert(msg);
@@ -254,7 +256,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 									var optionalX:Number = optionalOnCanvas[i].activity.xCoord;
 									var optionalY:Number = optionalOnCanvas[i].activity.yCoord;
 									
-									if(optionalOnCanvas[i].activity.isSequenceBased) {
+									if(optionalOnCanvas[i].activity.isOptionsWithSequencesActivity()) {
 										
 										// test mouse ptr 
 										var _children:Array = optionalOnCanvas[i].children;
