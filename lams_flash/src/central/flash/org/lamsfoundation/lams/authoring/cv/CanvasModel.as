@@ -1114,8 +1114,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		currentBranchingActivity = ba;
 		
 		if(visible == null) visible = true;
+		
 		Debugger.log("visible: " + visible, Debugger.CRITICAL, "openBranchActivityContent", "CanvasModel");
 		Debugger.log("currentBranchingActivity UIID: " + currentBranchingActivity.activity.activityUIID, Debugger.CRITICAL, "openBranchActivityContent", "CanvasModel");
+		Debugger.log("branchView: " + ba.activity.branchView, Debugger.CRITICAL, "openBranchActivityContent", "CanvasModel");
 		
 		if(BranchingActivity(ba.activity).clear) {
 			clearBranchingActivity(ba);
@@ -1125,6 +1127,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			activeView = (visible) ? ba.activity.branchView : activeView;
 			ba.activity.branchView.setOpen(visible);
 			ba.activity.branchView.open();
+			
+			openBranchingActivities.push(ba);
 		} else { _cv.openBranchView(currentBranchingActivity, visible); }
 		
 		_lastBranchActionType = null;

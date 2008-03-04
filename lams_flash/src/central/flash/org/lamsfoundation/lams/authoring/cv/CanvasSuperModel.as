@@ -77,6 +77,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	private var _activeRefresh:Boolean;
 	private var _refreshQueueCount:Number;
 	private var _branchingQueue:Array;
+
+	private var _openBranchingActivities:Array;
+	private var _openBranchingActivity:Number;
 	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -103,6 +106,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		_doRefresh = true;
 		
 		_branchingQueue = new Array();
+		_openBranchingActivities = new Array();
 		
 		 //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
@@ -1105,6 +1109,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	
 	public function get ddm():DesignDataModel {
 		return _cv.ddm;
+	}
+	
+	public function set openBranchingActivity(a:Number):Void {
+		_openBranchingActivity = a;
+	}
+	
+	public function get openBranchingActivity():Number {
+		return _openBranchingActivity;
+	}
+	
+	public function get openBranchingActivities():Array {
+		return _openBranchingActivities;
 	}
 
 }

@@ -184,15 +184,22 @@ class CanvasHelper {
 			checkValidDesign();
 			checkReadOnlyDesign();
 			
-			if(canvasModel.activeView instanceof CanvasBranchView) {
-				canvasModel.activeView.removeMovieClip();
-				closeBranchView();
-				canvasModel.getCanvas().addBin(canvasModel.activeView);
-				
-				canvasModel.broadcastViewUpdate("SIZE");
-			} else if(canvasModel.activeView instanceof CanvasComplexView) {
-				canvasModel.activeView.close();
+			if(canvasModel.activeView instanceof CanvasComplexView) {
+				canvasModel.closeAllComplexViews();
 			}
+			
+			if(canvasModel.activeView instanceof CanvasBranchView) {
+				for(var i=0; i<canvasModel.openBranchingActivities.length; i++)
+					canvasModel.openBranchingActivities[i].activity.branchView.removeMovieClip();
+			
+				canvasModel.openBranchingActivities.clear();
+			}
+			
+			canvasModel.activeView = canvasView;
+			canvasModel.currentBranchingActivity = null;
+			
+			canvasModel.getCanvas().addBin(canvasModel.activeView);
+			canvasModel.broadcastViewUpdate("SIZE");
 			
 			canvasModel.selectedItem = null;
 			canvasModel.setDirty();
@@ -524,15 +531,18 @@ class CanvasHelper {
 	}
 	
 	public function closeBranchView() {
-		var parentBranching:CanvasActivity = null;
+		canvasModel.openBranchingActivities.pop();
+		var parentBranching:CanvasActivity = (canvasModel.openBranchingActivities.length > 0) ? CanvasActivity(canvasModel.openBranchingActivities[canvasModel.openBranchingActivities.length-1]) : null;
 		
-		if(canvasModel.activeView.activity.parentUIID != null)
-			parentBranching = CanvasActivity(canvasModel.activitiesDisplayed.get(_ddm.getActivityByUIID(canvasModel.activeView.activity.parentUIID).parentUIID));
+		//var poppedActivity = monitorModel.getMonitor().ddm.getActivityByUIID(poppedActivityUIID);
 		
-		Debugger.log("parentUIID: " + canvasModel.activeView.activity.parentUIID, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
+		//if(canvasModel.activeView.activity.parentUIID != null)
+		//	parentBranching = CanvasActivity(canvasModel.activitiesDisplayed.get(_ddm.getActivityByUIID(canvasModel.activeView.activity.parentUIID).parentUIID));
 		
-		Debugger.log("is parentBranching: " + parentBranching.activity.isBranchingActivity(), Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
-		Debugger.log("parent branchView: " + parentBranching.activity.branchView, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
+		//Debugger.log("parentUIID: " + canvasModel.activeView.activity.parentUIID, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
+		
+		//Debugger.log("is parentBranching: " + parentBranching.activity.isBranchingActivity(), Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
+		//Debugger.log("parent branchView: " + parentBranching.activity.branchView, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
 		
 		canvasModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.activity.branchView : canvasView;
 		canvasModel.currentBranchingActivity = (parentBranching.activity.isBranchingActivity()) ? parentBranching : null;
@@ -573,6 +583,7 @@ class CanvasHelper {
 		
 		ba.activity.branchView = branchView;
 		
+		canvasModel.openBranchingActivities.push(ba);
 	}
 	
 	public function openComplexView(ca:Object):Void {
