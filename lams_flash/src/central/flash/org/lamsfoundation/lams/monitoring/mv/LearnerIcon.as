@@ -96,7 +96,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 		if(initObj){
 			_monitorView = initObj._monitorView;
 			_monitorController = initObj._monitorController;
-			_activity = initObj.activity;
+			_activity = initObj._activity;
 			learner = initObj.learner;
 			learnerOffset_X = initObj._x;
 			learnerOffset_Y = initObj._y;
@@ -176,7 +176,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 		if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
 			if (app.controlKeyPressed != "transition"){
 				_doubleClicking = true;
-				Debugger.log('DoubleClicking: '+this.activity.activityID,Debugger.CRITICAL,'onPress','CanvasActivity For Monitoring');
+				Debugger.log('DoubleClicking: '+this.activity.activityID,Debugger.CRITICAL,'localOnPress','CanvasActivity For Monitoring');
 				var _learnerID:Number = learner.getLearnerId()
 				_monitorController.activityDoubleClick(_activity, "MonitorTabViewLearner", _learnerID);
 						
@@ -186,7 +186,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 
 			_doubleClicking = false;
 			Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity for monitoring');
-			_clone_mc = ApplicationParent.root.attachMovie("learnerIcon", _name + "_clone", DepthManager.kTop, {_activity:_activity, learner:learner, _monitorController:_monitorController, _x:_x + org.lamsfoundation.lams.monitoring.Application.MONITOR_X, _y:_y + org.lamsfoundation.lams.monitoring.Application.MONITOR_Y, _hasPlus:_hasPlus, _clone: true });
+			_clone_mc = org.lamsfoundation.lams.monitoring.Application.root.attachMovie("learnerIcon", String(_name + "_clone" + _activity.activityUIID), DepthManager.kTop, {_x:(this._x + org.lamsfoundation.lams.monitoring.Application.MONITOR_X), _y:(this._y + org.lamsfoundation.lams.monitoring.Application.MONITOR_Y), _activity:_activity, learner:learner, _monitorController:_monitorController, _hasPlus:_hasPlus, _clone: true });
 			_clone_mc._y = 	_root._ymouse - ICON_HEIGHT/2;
 			_clone_mc._x = 	_root._xmouse - ICON_WIDTH/2
 			_monitorController.activityClick(_clone_mc, "LearnerIcon");
@@ -233,8 +233,8 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 		return learnerOffset_Y;
 	}
 	
-	public function get Learner():Progress{
-		return getLearner();
+	public function get Learner():Progress {
+		return learner;
 	}
 	
 	public function set Learner(a:Progress){
