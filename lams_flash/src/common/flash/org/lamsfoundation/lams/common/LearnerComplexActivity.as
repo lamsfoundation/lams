@@ -295,8 +295,8 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		redrawComplex();
 		
 		if(!locked) { 
-			expand();
-			controller.complexActivityRelease(this, false);
+			localOnPress();
+			localOnRelease();
 		}
 	}
 	
