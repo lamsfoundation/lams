@@ -626,45 +626,46 @@ public function update (o:Observable,infoObj:Object):Void{
 			if (ca._parentActivityID == null){
 				requiredTaskList[listCount].contributeActivity.text = "  "+ca.title
 				requiredTaskList[listCount].contributeActivity.backgroundColor = 0xD5E6FF;
-			}else {
+				listCount++;
+			}
+			else {
 				requiredTaskList[listCount].contributeActivity.text = "\t"+ca.title
 				requiredTaskList[listCount].contributeActivity.backgroundColor = 0xF9F2DD;
+				listCount++;
+				
+				for(var i=0; i<array.length; i++){
+					var o:Object = array[i];
+					if (o instanceof ContributeActivity){
+						Debugger.log("it is a contribute activity", Debugger.CRITICAL, "drawIsRequiredTasks", "LessonTabView");
+						// normal CA entries
+						requiredTaskList[listCount] =_monitorReqTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow"+listCount, this._monitorReqTask_mc.getNextHighestDepth(), {_x:x, _y:19*listCount, buttonLabel:btnLabel})
+						reqTasks_scp.redraw(true);
+						requiredTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
+						requiredTaskList[listCount].goContribute._x = reqTasks_scp._width-50
+						
+						requiredTaskList[listCount].goContribute.onRelease = function (){
+							JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 600, 800, true, true, false, false, false);
+						}
+						
+						requiredTaskList[listCount].goContribute.onRollOver = Proxy.create(this,this['showToolTip'], requiredTaskList[listCount].goContribute, "goContribute_btn_tooltip", reqTasks_scp._y+requiredTaskList[listCount]._y+requiredTaskList[listCount]._height, reqTasks_scp._x);
+						requiredTaskList[listCount].goContribute.onRollOut = Proxy.create(this,this['hideToolTip']);
+						
+						var styleObj = _tm.getStyleObject('button');
+						requiredTaskList[listCount].goContribute.setStyle('styleName',styleObj); 
+						listCount++;
+					}
+				}
 			}
-			
-			listCount++
 		}
 		
 		for(var i=0; i<array.length; i++){
 			var o:Object = array[i];
 			
-			if(o instanceof ContributeActivity){
-				// normal CA entries
-				trace('write out entry with GO link'+o.taskURL);
-				requiredTaskList[listCount] =_monitorReqTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow"+listCount, this._monitorReqTask_mc.getNextHighestDepth(), {_x:x, _y:19*listCount, buttonLabel:btnLabel})
-				reqTasks_scp.redraw(true);
-				requiredTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
-				requiredTaskList[listCount].goContribute._x = reqTasks_scp._width-50
-				
-				requiredTaskList[listCount].goContribute.onRelease = function (){
-					trace("Contribute Type is: "+o.taskURL);
-					JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 600, 800, true, true, false, false, false);
-				}
-				
-				requiredTaskList[listCount].goContribute.onRollOver = Proxy.create(this,this['showToolTip'], requiredTaskList[listCount].goContribute, "goContribute_btn_tooltip", reqTasks_scp._y+requiredTaskList[listCount]._y+requiredTaskList[listCount]._height, reqTasks_scp._x);
-				requiredTaskList[listCount].goContribute.onRollOut = Proxy.create(this,this['hideToolTip']);
-				
-				var styleObj = _tm.getStyleObject('button');
-				requiredTaskList[listCount].goContribute.setStyle('styleName',styleObj); 
-				
-				listCount++;
-			
-			}else{
-				// child CA
+			if(!(o instanceof ContributeActivity)){
 				if(o.entries.length > 0){
 					// write child ca title (indented - x + 10 position)
 					drawIsRequiredTasks(o.child, o.entries, x);
 				}
-				
 			}
 		}
 		
