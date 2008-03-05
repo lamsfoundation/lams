@@ -436,12 +436,12 @@ class Monitor {
 			case '7' :
 				seqStat = "Contribution"
 				break;
-			/*case '8' :
+			case '8' :
 				seqStat = "System Gate"
 				break;
 			case '9' :
 				seqStat = "Teacher Chosen Branching"
-				break;*/
+				break;
 			default:
 				seqStat = "Not yet set"
 		}
