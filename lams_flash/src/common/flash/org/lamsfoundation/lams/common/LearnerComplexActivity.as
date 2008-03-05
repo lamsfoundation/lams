@@ -187,7 +187,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			count++;
 			
 			if(learnerAct.activity == activeSequence) {
-				var actOrder:Array = model.getDesignOrder(activeSequence.firstActivityUIID);
+				var actOrder:Array = model.getDesignOrder(activeSequence.firstActivityUIID, false);
 				drawChildren(actOrder, container, count);
 			}
 		}
@@ -248,6 +248,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		Debugger.log("refreshing children: " + children_mc.length, Debugger.CRITICAL, "checkIfSequenceActive", "LearnerComplexActivity");
 		
 		var closeBox:Boolean = true;
+		
 		for(var i=0; i<children_mc.length; i++) {
 			if(children_mc[i].activityStatus != "completed_mc") closeBox = false;
 			children_mc[i].refresh();

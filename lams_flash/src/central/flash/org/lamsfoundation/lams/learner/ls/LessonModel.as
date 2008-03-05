@@ -71,6 +71,8 @@ class LessonModel extends Observable {
 	
 	private var _activeSeq:Array;
 	
+	private var _eventsDisabled:Boolean;
+	
 	/**
 	* Constructor.
 	*/
@@ -84,6 +86,7 @@ class LessonModel extends Observable {
 		ddmActivity_keys = new Array();
 		ddmTransition_keys = new Array();
 		_activeSeq = new Array();
+		_eventsDisabled = false;
 		
 		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
 	}
@@ -371,17 +374,16 @@ class LessonModel extends Observable {
 				Debugger.log("progress: " + _progressStr + " for id: " + firstActivitySeq.activityID, Debugger.CRITICAL, "orderDesign", "LessonModel");
 			
 				if(_progressStr == "current_mc") {
-					for(var j=i-1; j>=0; j--) {
-						if(!orderDesignChildren(children, j, order, true)) return false;
+					for(var j=i; j>0; j--) {
+						if(!orderDesignChildren(children, j-1, order, true)) return false;
 					}
 					
 					_activeSeq[children[i].parentUIID] = Activity(children[i]);
 					
 					if(!orderDesign(firstActivitySeq, order, backtrack)) return false;
+					
 					broadcastViewUpdate("REMOVE_ACTIVITY_ALL");
-				}
-						
-				if(_activeSeq[children[i].parentUIID] == Activity(children[i])) {
+				} else if(_activeSeq[children[i].parentUIID] == Activity(children[i])) {
 					if(!orderDesign(firstActivitySeq, order, backtrack)) return false;
 					if(children[i].stopAfterActivity && !backtrack) return false;
 				}
@@ -404,7 +406,9 @@ class LessonModel extends Observable {
 		var learnerFirstActivity:Activity = learningDesignModel.activities.get(ddmfirstActivity_key);
 
 		// recursive method to order design
+		_eventsDisabled = false;
 		orderDesign(learnerFirstActivity, orderedActivityArr);
+		
 		return orderedActivityArr;
 		
 	}
@@ -414,7 +418,11 @@ class LessonModel extends Observable {
 		var learnerFirstActivity:Activity = learningDesignModel.activities.get(firstActivityUIID);
 
 		// recursive method to order design
+		_eventsDisabled = true;
 		orderDesign(learnerFirstActivity, orderedActivityArr);
+		
+		_eventsDisabled = false;
+		
 		return orderedActivityArr;
 	}
 	
@@ -518,6 +526,8 @@ class LessonModel extends Observable {
 	}
 	
 	public function broadcastViewUpdate(updateType, data){
+		if(_eventsDisabled) return;
+		
 		setChanged();
 		
 		//send an update
