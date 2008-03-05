@@ -184,7 +184,14 @@ class Canvas extends CanvasHelper {
 	 */
 	public function saveDesignToServer(workspaceResultDTO:Object):Boolean{
 		_global.breakpoint();
-
+		
+		if (canvasModel.activitiesDisplayed.size() < 1){
+			Cursor.showCursor(Application.C_DEFAULT);
+			var msg:String = Dictionary.getValue('al_empty_design');
+			LFMessage.showMessageAlert(msg);
+			return;
+		}
+		
 		//TODO: Set the results from wsp into design.
 		if(workspaceResultDTO != null){
 			if(workspaceResultDTO.selectedResourceID != null){
