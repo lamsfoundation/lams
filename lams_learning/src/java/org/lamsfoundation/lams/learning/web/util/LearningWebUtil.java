@@ -345,9 +345,13 @@ public class LearningWebUtil
 		activityURL.setActivityId(activity.getActivityId());
 		activityURL.setTitle(activity.getTitle());
 		activityURL.setDescription(activity.getDescription());
-		if (learnerProgress.getProgressState(activity) == LearnerProgress.ACTIVITY_COMPLETED) {
+		
+		byte status = learnerProgress.getProgressState(activity);
+		activityURL.setStatus(status);
+		if ( status == LearnerProgress.ACTIVITY_COMPLETED) {
 		    activityURL.setComplete(true);
 		}
+		
 		activityURL.setDefaultURL(defaultURL);
 		return activityURL;
 	}

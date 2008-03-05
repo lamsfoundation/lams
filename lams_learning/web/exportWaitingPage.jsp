@@ -98,7 +98,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 						downloadStarted = new Boolean(true);
 						msg = "<p><fmt:message key='export.portfolio.generation.complete.message'/></p>\n"
-						document.getElementById("button").style.visibility = "visible";
+
+						<c:if test="${not param.hideClose}">
+							document.getElementById("button").style.visibility = "visible";
+						</c:if>
 						document.getElementById("message").innerHTML = msg;
 						
 						window.location.href = url;
@@ -139,10 +142,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<h1><fmt:message key='export.portfolio.window.title'/></h1>
 
 			<div id="message"></div>
-			<div id="button" style="visibility:hidden">
-				<p><a href='#' onclick='javascript:window.close()' class='button'><fmt:message key='label.close.button'/></a></p>
-			</div>
-			
+				<div id="button" style="visibility:hidden">
+					<p><a href='#' onclick='javascript:window.close()' class='button'><fmt:message key='label.close.button'/></a></p>
+				</div>
 		</div>  <!--closes content-->
 
 

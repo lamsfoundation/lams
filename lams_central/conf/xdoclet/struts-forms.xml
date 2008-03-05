@@ -18,6 +18,7 @@
 	<form-property name="fax" type="java.lang.String" />
 	<form-property name="email" type="java.lang.String" />
 	<form-property name="localeId" type="java.lang.Integer" />
+	<form-property name="enableFlash" type="java.lang.Boolean" />
 </form-bean>
 
 <!--  uncomment to use wddxPost   

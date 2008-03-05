@@ -219,3 +219,6 @@ values ('CustomTabLink','', 'config.custom.tab.link', 'config.header.look.feel',
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('CustomTabTitle','', 'config.custom.tab.title', 'config.header.look.feel', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('EnableFlash','true', 'config.flash.enable', 'config.header.features', 'BOOLEAN', 1);

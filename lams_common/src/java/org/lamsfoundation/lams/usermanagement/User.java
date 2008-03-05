@@ -150,8 +150,11 @@ public class User implements Serializable,Comparable {
     /** persistent field */
     private Boolean changePassword;
     
+    /** persistent field */
+    private Boolean enableFlash;
+
     /** full constructor */
-    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String postcode, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement flashTheme, CSSThemeVisualElement htmlTheme, Set userOrganisations, String chatId, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons, Long portraitUuid, Boolean changePassword) {
+    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String postcode, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement flashTheme, CSSThemeVisualElement htmlTheme, Set userOrganisations, String chatId, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons, Long portraitUuid, Boolean changePassword, Boolean enableFlash) {
         this.login = login;
         this.password = password;
         this.title = title;
@@ -184,11 +187,13 @@ public class User implements Serializable,Comparable {
         this.lessons = lessons;
         this.portraitUuid = portraitUuid;
         this.changePassword = changePassword;
+        this.enableFlash = enableFlash;
     }
 
     /** default constructor */
     public User() {
     	this.changePassword = false;
+    	this.enableFlash = true;
     }
 
     /** minimal constructor */
@@ -206,6 +211,7 @@ public class User implements Serializable,Comparable {
         this.learningDesigns = learningDesigns;
         this.lessons = lessons;
         this.changePassword = false;
+    	this.enableFlash = true;
     }
 
     /** 
@@ -730,7 +736,8 @@ public class User implements Serializable,Comparable {
 							//TimeZone.getTimeZone("Australia/Sydney"),
 							TimeZone.getDefault(),
 							this.authenticationMethod.getAuthenticationMethodId(),
-							fckLanguageMapping);
+							fckLanguageMapping,
+							enableFlash);
     }
 	
     public UserFlashDTO getUserFlashDTO() {
@@ -838,4 +845,22 @@ public class User implements Serializable,Comparable {
     public void setChangePassword(Boolean changePassword) {
         this.changePassword = changePassword;
     }
+    
+    /** 
+     *            @hibernate.property
+     *             column="enable_flash"
+     *             length="1"
+     *             not-null="true"
+     *         
+     */
+    public Boolean getEnableFlash() {
+        return this.enableFlash;
+    }
+
+    public void setEnableFlash(Boolean enableFlash) {
+        this.enableFlash = enableFlash;
+    }
+
+
+
 }

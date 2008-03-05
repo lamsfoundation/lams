@@ -35,8 +35,10 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learning.progress.ProgressBuilder;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
@@ -46,6 +48,7 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
@@ -357,6 +360,20 @@ public class LearnerService implements ICoreLearnerService
     {
         return learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId).getLearnerProgressData();
     }
+
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getStructuredProgressDTOs(java.lang.Long, java.lang.Long)
+     */
+    public List<ActivityURL> getStructuredActivityURLs(Integer learnerId, Long lessonId) {
+    
+    	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
+    	Lesson lesson = progress.getLesson();
+
+    	ProgressBuilder builder = new ProgressBuilder(progress, activityDAO, activityMapping);
+    	builder.parseLearningDesign();
+    	return builder.getActivityList();
+    }
+    
 
     /**
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#chooseActivity(org.lamsfoundation.lams.usermanagement.User, java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity)

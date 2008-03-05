@@ -316,6 +316,7 @@ CREATE TABLE lams_user (
      , locale_id INTEGER
      , portrait_uuid BIGINT(20)
      , change_password TINYINT DEFAULT 0
+     , enable_flash TINYINT(1) DEFAULT 1
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)

@@ -46,6 +46,7 @@ public class UserDTO {
     private CSSThemeBriefDTO htmlTheme;
     private TimeZone timeZone;
     private Integer authenticationMethodId;
+    private Boolean enableFlash;
 
 //	public UserDTO(Integer userID, String firstName, String lastName,
 //			String login, String email, CSSThemeVisualElement theme) {		
@@ -60,7 +61,8 @@ public class UserDTO {
 	public UserDTO(Integer userID, String firstName, String lastName,
 			String login, String localeLanguage,  String localeCountry, String direction, 
 			String email, CSSThemeBriefDTO flashTheme, CSSThemeBriefDTO htmlTheme,
-			TimeZone timezone, Integer authenticationMethodId, String fckLanguageMapping) {		
+			TimeZone timezone, Integer authenticationMethodId, String fckLanguageMapping,
+			Boolean enableFlash) {		
 		this.userID = userID;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -74,6 +76,7 @@ public class UserDTO {
 		this.timeZone = timezone;
 		this.authenticationMethodId = authenticationMethodId;
 		this.fckLanguageMapping = fckLanguageMapping;
+		this.enableFlash = enableFlash;
 	}
 	
 	/**
@@ -183,11 +186,20 @@ public class UserDTO {
 			.append("timeZone", getTimeZone())
 			.append("authenticationMethodId", getAuthenticationMethodId())
 			.append("fckLanguageMapping", getFckLanguageMapping())
+			.append("enableFlash", getEnableFlash())
 			.toString();
 	}
 
 	public String getFckLanguageMapping() {
 		return fckLanguageMapping;
+	}
+
+	public Boolean getEnableFlash() {
+		return enableFlash;
+	}
+
+	public void setEnableFlash(Boolean enableFlash) {
+		this.enableFlash = enableFlash;
 	}
 
 

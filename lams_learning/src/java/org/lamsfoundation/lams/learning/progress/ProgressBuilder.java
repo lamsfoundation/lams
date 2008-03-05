@@ -1,0 +1,145 @@
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+/* $Id$ */
+
+package org.lamsfoundation.lams.learning.progress;
+
+import java.util.ArrayList;
+
+import org.apache.commons.collections.ArrayStack;
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.LearningDesignProcessor;
+import org.lamsfoundation.lams.learningdesign.SimpleActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.usermanagement.User;
+
+/** Creates a basic tree of the user's current progress - what is completed, urls to jump back to completed activities, etc */
+public class ProgressBuilder extends LearningDesignProcessor {
+
+    private static Logger log = Logger.getLogger(ProgressBuilder.class);
+
+	User user;
+	LearnerProgress progress;
+	ActivityMapping activityMapping;
+    ArrayList<ActivityURL> mainActivityList;
+	ArrayStack activityListStack;
+	ArrayList<ActivityURL> currentActivityList;
+	String forwardToLearnerURL;
+	
+	/** Create the builder. Supply all the data that will be needed to parse the design and build the portfolio entries. 
+	 * 
+	 * If accessMode == LEARNER then progress and user must not be null. This will create a list of portfolio objects for 
+	 * all activities that the LEARNER has completed or attempted.
+	 * 
+	 * If accessMode == AUTHOR then progress and user must not be null and a few hacks must be done to let the user skip ahead (to be done).
+	 * 
+	 * In all cases, all activities are included, whether they are started or not.
+	 * 
+	 * @param design
+	 * @param activityDAO
+	 * @param lamsCoreToolService
+	 * @param accessMode
+	 * @param lesson 
+	 * @param progress
+	 * @param user
+	 */
+	public ProgressBuilder(LearnerProgress progress, IActivityDAO activityDAO, ActivityMapping activityMapping) {
+		super(progress.getLesson().getLearningDesign(), activityDAO);
+		this.user = progress.getUser();
+		this.progress = progress;
+		this.activityMapping = activityMapping;
+
+		this.mainActivityList = new ArrayList<ActivityURL>();
+		this.currentActivityList = mainActivityList;
+		this.activityListStack = new ArrayStack(5);
+
+		// setup the basic call to the learner screen, ready just to put the activity id on the end. Saves calculating it for every activity
+		this.forwardToLearnerURL = "/learning/learner.do?method=forwardToLearner"
+			+"&userID="+user.getUserId()+"lessonID="+progress.getLesson().getLessonId()+"&activityID=";
+
+	}
+
+	/** Prepares to process children */
+	public void startComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
+		// Create a new current activity list, putting the old current one on the stack. 
+		activityListStack.push(currentActivityList);
+		currentActivityList = new ArrayList<ActivityURL>();
+	}
+
+	/** Creates an ActivityURL and sets up the list of its children. */
+	public void endComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
+		
+		ActivityURL complexActivityURL = createActivityURL(activity);
+
+		if ( complexActivityURL.getStatus()!=LearnerProgress.ACTIVITY_NOT_ATTEMPTED && currentActivityList.size()>0 ) {
+			complexActivityURL.setChildActivities(currentActivityList);
+		}
+
+		currentActivityList = (ArrayList<ActivityURL>) activityListStack.pop();
+		currentActivityList.add(complexActivityURL);
+	}
+
+	public void startSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
+		// everything done by endSimpleActivity
+	}
+
+	/** Creates an ActivityURL. */
+	public void endSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
+		
+		ActivityURL p = createActivityURL(activity);
+		currentActivityList.add(p);
+		
+	}
+	
+	/**
+	 * Creates a progress object with properties activityId, activityName, activityDescription and progress status.
+	 * 
+	 * @param activity
+	 * @return a progress object
+	 * @throws ProgressException 
+	 */
+	protected ActivityURL createActivityURL(Activity activity) throws LearningDesignProcessorException
+	{
+		if (activity == null)
+		{
+			String error="Cannot create activity progress for this activity as the activity is null.";
+			log.error(error);
+			throw new LearningDesignProcessorException(error);
+		}
+		return LearningWebUtil.getActivityURL( activityMapping, progress, activity, false);
+	}
+	
+	/** Get the list of all the activity progress DTOs, which in turn may contain other activity progress DTOs */
+	public ArrayList<ActivityURL> getActivityList() {
+		return mainActivityList;
+	}
+	
+	
+}

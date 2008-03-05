@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learning.service;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -93,6 +94,16 @@ public interface ICoreLearnerService extends ILearnerService
      */
     public LearnerProgress getProgress(Integer learnerId, Long lessonId);
     
+    /**
+     * Returns the current progress data, in the DTO format required by the jsp progress screen, of the User.
+     * @param learnerId the Learner's userID
+     * @param lessonId the Lesson to get progress from.
+     * @return progressList contains the learner's progress for the lesson.
+     * @throws LearnerServiceException in case of problems.
+     */
+    public List<ActivityURL> getStructuredActivityURLs(Integer learnerId, Long lessonId);
+    
+
     /**
      * Return the current progress data against progress id.
      * @param progressId

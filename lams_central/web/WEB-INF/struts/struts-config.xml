@@ -42,6 +42,7 @@
 	<form-property name="fax" type="java.lang.String" />
 	<form-property name="email" type="java.lang.String" />
 	<form-property name="localeId" type="java.lang.Integer" />
+	<form-property name="enableFlash" type="java.lang.Boolean" />
 </form-bean>
 
 <!--  uncomment to use wddxPost   
@@ -96,58 +97,6 @@
       />
     </action>
     <action
-      path="/authoring/importToolContent"
-      type="org.lamsfoundation.lams.authoring.web.ImportToolContentAction"
-      name="ImportAction"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="upload"
-        path="/toolcontent/import.jsp"
-        redirect="false"
-      />
-      <forward
-        name="success"
-        path="/toolcontent/importresult.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/profile"
-      type="org.lamsfoundation.lams.web.ProfileAction"
-      name="UserForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="view"
-        path=".profile"
-        redirect="false"
-      />
-      <forward
-        name="edit"
-        path=".editprofile"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/workspace"
-      type="org.lamsfoundation.lams.workspace.web.WorkspaceAction"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="/index.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/index"
       type="org.lamsfoundation.lams.web.IndexAction"
       unknown="false"
@@ -189,8 +138,8 @@
         redirect="false"
       />
       <forward
-        name="content"
-        path="/indexContent.jsp"
+        name="lessons"
+        path="/profile.do?method=lessons"
         redirect="false"
       />
     </action>
@@ -304,18 +253,91 @@
     <action
       path="/theme"
       type="org.lamsfoundation.lams.themes.web.ThemeAction"
-      name="ThemeAction"
-      scope="request"
       parameter="method"
       unknown="false"
       validate="false"
     >
     </action>
     <action
+      path="/authoring/importToolContent"
+      type="org.lamsfoundation.lams.authoring.web.ImportToolContentAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="upload"
+        path="/toolcontent/import.jsp"
+        redirect="false"
+      />
+      <forward
+        name="success"
+        path="/toolcontent/importresult.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/profile"
+      type="org.lamsfoundation.lams.web.ProfileAction"
+      name="UserForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="view"
+        path=".profile"
+        redirect="false"
+      />
+      <forward
+        name="lessons"
+        path=".lessons"
+        redirect="false"
+      />
+      <forward
+        name="edit"
+        path=".editprofile"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/workspace"
+      type="org.lamsfoundation.lams.workspace.web.WorkspaceAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/index.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/displayGroup"
+      type="org.lamsfoundation.lams.web.DisplayGroupAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="groupHeader"
+        path="/groupHeader.jsp"
+        redirect="false"
+      />
+      <forward
+        name="groupContents"
+        path="/groupContents.jsp"
+        redirect="false"
+      />
+      <forward
+        name="group"
+        path="/group.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/authoring/exportToolContent"
       type="org.lamsfoundation.lams.authoring.web.ExportToolContentAction"
-      name="ExportAction"
-      scope="request"
       unknown="false"
       validate="false"
     >
@@ -338,8 +360,6 @@
     <action
       path="/authoring/author"
       type="org.lamsfoundation.lams.authoring.web.AuthoringAction"
-      name="AuthoringAction"
-      scope="request"
       parameter="method"
       unknown="false"
       validate="false"
@@ -356,6 +376,18 @@
       <forward
         name="portrait"
         path=".portrait"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/loginas"
+      type="org.lamsfoundation.lams.web.LoginAsAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="usersearch"
+        path="/admin/usersearch.do"
         redirect="false"
       />
     </action>

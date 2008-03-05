@@ -7,6 +7,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod" %>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 
 <html:form action="/saveprofile.do" method="post">
 <html:hidden property="userId" />
@@ -16,6 +17,8 @@
 <logic:messagesPresent> 
 	<p class="warning"><html:errors/></p>
 </logic:messagesPresent>
+
+<c:set var="serverFlashEnabled"><%=Configuration.get(ConfigurationKeys.FLASH_ENABLE)%></c:set>
 
 <div style="clear:both;"></div>
 
@@ -93,6 +96,23 @@
 		<td class="align-right"><fmt:message key="label.fax"/>:</td>
 		<td><html:text property="fax" size="50" maxlength="64" /></td>
 	</tr>
+	<c:choose>
+		<c:when test="${serverFlashEnabled}"> 
+			<tr>
+			<td class="align-right"><fmt:message key="label.enable.flash"/>:</td>
+			<td><html:select property="enableFlash">
+				<html:option value="true"><fmt:message key="label.yes"/></html:option>
+				<html:option value="false"><fmt:message key="label.no"/></html:option>
+				</html:select>
+			</td>
+			</tr>
+		</c:when>
+		<c:otherwise>
+			<html:hidden property="enableFlash" />
+		</c:otherwise>
+	</c:choose>
+	</tr>
+		
 	<tr>
 		<td class="align-right"><fmt:message key="label.language"/>:</td>
 		<td>
@@ -190,6 +210,21 @@
 		<td class="align-right"><fmt:message key="label.fax"/>:</td>
 		<td><bean:write name="UserForm" property="fax" /></td>
 	</tr>
+	<c:choose>
+		<c:when test="${serverFlashEnabled}"> 
+			<tr>
+			<td class="align-right"><fmt:message key="label.enable.flash"/>:<bean:write name="UserForm" property="enableFlash" /></td>
+			<td><html:select property="enableFlash">
+				<html:option value="true"><fmt:message key="label.yes"/></html:option>
+				<html:option value="false"><fmt:message key="label.no"/></html:option>
+				</html:select>
+			</td>
+			</tr>
+		</c:when>
+		<c:otherwise>
+			<html:hidden property="enableFlash" />
+		</c:otherwise>
+	</c:choose>
 	<tr>
 		<td class="align-right"><fmt:message key="label.language"/>:</td>
 		<td>

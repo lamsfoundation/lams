@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +38,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -79,6 +81,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *                parameter="method" 
  *                validate="false"
  * @struts:action-forward name="displayActivity" path="/DisplayActivity.do" 
+ * @struts:action-forward name="displayProgress" path="/progress.jsp" 
  * ----------------XDoclet Tags--------------------
  * 
  */
@@ -486,18 +489,19 @@ public class LearnerAction extends LamsDispatchAction
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward forwardToLearnerActivityURL(ActionMapping mapping,
+    public ActionForward displayProgress(ActionMapping mapping,
                                                ActionForm form,
                                                HttpServletRequest request,
                                                HttpServletResponse response) throws IOException,
                                                                           	ServletException
     {
-        long activityId = WebUtil.readLongParam(request,AttributeNames.PARAM_ACTIVITY_ID);
-        if(log.isDebugEnabled())
-            log.debug("Forwarding to the url for learner activity..."+activityId);
-        
-        String url = getLearnerActivityURL(request, activityId);
-       	return redirectToURL(mapping, response, url);
+		Integer learnerId = LearningWebUtil.getUserId();
+	    Long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID );
+	    
+        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        List<ActivityURL> progressList = learnerService.getStructuredActivityURLs(learnerId, lessonId);
+        request.setAttribute("progressList", progressList);
+        return mapping.findForward("displayProgress");
     }
 	
     /**
@@ -589,5 +593,35 @@ public class LearnerAction extends LamsDispatchAction
 		}
 		return auditService;
 	}
+	
+    /**
+     * Gets the same url as getLearnerActivityURL() but forwards directly to the url, rather than 
+     * returning the url in a Flash packet.
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward forwardToLearnerActivityURL(ActionMapping mapping,
+                                               ActionForm form,
+                                               HttpServletRequest request,
+                                               HttpServletResponse response) throws IOException,
+                                                                          	ServletException
+    {
+        long activityId = WebUtil.readLongParam(request,AttributeNames.PARAM_ACTIVITY_ID);
+        if(log.isDebugEnabled())
+            log.debug("Forwarding to the url for learner activity..."+activityId);
+        
+        String url = getLearnerActivityURL(request, activityId);
+       	return redirectToURL(mapping, response, url);
+    }
+
     
 }

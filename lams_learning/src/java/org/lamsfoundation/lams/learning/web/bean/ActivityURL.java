@@ -24,9 +24,15 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.bean;
 
+import java.util.List;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 /**
  * Display bean for an activity. Holds the URL used to display the activity along
  * with title, description and a completion flag.
+ * 
+ * If used for the learner progress screen, the defaultURL will always be false.
  * 
  * @author daveg
  *
@@ -38,7 +44,9 @@ public class ActivityURL {
 	private String title;
 	private String description;
 	private boolean complete;
+	private byte status;
 	private boolean defaultURL;
+	private List<ActivityURL> childActivities;
 
 	public ActivityURL(){}
 	
@@ -87,4 +95,30 @@ public class ActivityURL {
 	public void setDefaultURL(boolean defaultURL) {
 		this.defaultURL = defaultURL;
 	}
+
+	public byte getStatus() {
+		return status;
+	}
+
+	public void setStatus(byte status) {
+		this.status = status;
+	}
+
+	/** Get a list of the urls for the child activities. Only used on the jsp progress display page */
+	public List<ActivityURL> getChildActivities() {
+		return childActivities;
+	}
+
+	public void setChildActivities(List<ActivityURL> childActivities) {
+		this.childActivities = childActivities;
+	}
+	
+	public String toString() {
+		return new ToStringBuilder(this)
+			.append("activityId", activityId)
+			.append("title", title)
+			.append("url", url)
+			.toString();
+	}
+
 }

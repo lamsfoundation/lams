@@ -19,35 +19,40 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ page language="java" pageEncoding="UTF-8"
-	contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+<%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<lams:html>
+	
+	<lams:head>
+		<lams:css/>
+		<title><fmt:message key="learner.title"/></title>
+	</lams:head>
 
-<c:set var="enableFlash"><lams:LearnerFlashEnabled/></c:set>
-<c:if test="${enableFlash}">
-<lams:Passon id="${activityForm.lessonID}"
-	progress="${activityForm.progressSummary}" />
-</c:if>
+	<script type="text/javascript">
+		function loadFrame(url) {
+			top.frames['contentFrame'].location.href = url;
+		}
+	</script>
+<body>
 
-<div id="content">
+<c:forEach var="activity" items="${progressList}" varStatus="status">
+	<c:if test="${status.first}">
+		<UL>
+	</c:if>
 
-	<h2>
-		<fmt:message key="message.lesson.finished" />
-	</h2>
-	<p class="space-bottom">
-		<fmt:message key="message.lesson.finishedCont" />
-	</p>
+	<lams:ProgressOutput activity="${activity}"/>
+	<c:if test="${status.last}">
+		</UL>
+	</c:if>
+</c:forEach>
 
-</div>
-<!--closes content-->
+</body>
+</lams:html>
 
-
-<div id="footer">
-</div>
-<!--closes footer-->
 
 

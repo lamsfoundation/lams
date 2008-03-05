@@ -36,18 +36,19 @@ if(protocol.startsWith("HTTPS")){
 	protocol = "http://";
 }
 String pathToRoot = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
-String pathToShare = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
 
 %>
+<c:set var="enableFlash"><lams:LearnerFlashEnabled/></c:set>
 
-<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}" version="${activityForm.version}" redirect="true"/>
+<c:if test="${enableFlash}">
+	<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}" version="${activityForm.version}" redirect="true"/>
+</c:if>
 
 <div id="content">
 
 	<c:if test="${!empty activityForm.activityURLs}">
 		
 		<script language="JavaScript" type="text/JavaScript"><!--
-			// onload method call commented out as the Flash passon movie calls doRedirect
 			function redirectPage() {
 				setTimeout("doRedirect()", 1000);
 			}
@@ -63,9 +64,15 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 				window.location.href = url;
 			}
 			
-				//window.onload = redirectPage;
 			//-->
 		</script>
+
+		<c:if test="${not enableFlash}">
+		<script language="JavaScript" type="text/JavaScript"><!--
+			window.onload = redirectPage;
+			//-->
+		</script>
+		</c:if>
 		
 		<p><fmt:message key="message.activity.loading"/></p>
 

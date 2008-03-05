@@ -292,3 +292,6 @@ values ('CustomTabLink','', 'config.custom.tab.link', 'config.header.look.feel',
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('CustomTabTitle','', 'config.custom.tab.title', 'config.header.look.feel', 'STRING', 0);
+
+-- LDEV-1005
+alter table lams_user add column enable_flash TINYINT(1) DEFAULT 1;

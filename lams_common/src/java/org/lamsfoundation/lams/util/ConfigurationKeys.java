@@ -215,4 +215,8 @@ public class ConfigurationKeys {
 	/** Custom tab for the main page */
 	public static String CUSTOM_TAB_LINK = "CustomTabLink";
 	public static String CUSTOM_TAB_TITLE = "CustomTabTitle";
+	
+	/** Disable Flash altogether for the learner interface (LDEV-1005) */
+	public static String FLASH_ENABLE = "EnableFlash";
+	
 }

@@ -62,10 +62,11 @@
 
 		<h1><c:out value="${optionsActivityForm.title}"/></h1>
 
-		<lams:Passon id="${optionsActivityForm.lessonID}" progress="${optionsActivityForm.progressSummary}"/>
+		<c:set var="enableFlash"><lams:LearnerFlashEnabled/></c:set>
+		<c:if test="${enableFlash}">
+			<lams:Passon id="${optionsActivityForm.lessonID}" progress="${optionsActivityForm.progressSummary}"/>
+		</c:if>
 		
-		<p>&nbsp;</p>
-
 		<c:if test="${not empty optionsActivityForm.description}">
 			<p><c:out value="${optionsActivityForm.description}"/></p>
 		</c:if>
