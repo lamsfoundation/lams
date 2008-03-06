@@ -1060,7 +1060,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		Debugger.log('ta:'+ta.title+'toolContentID:'+ta.toolContentID+" and learningLibraryID: "+ta.learningLibraryID,Debugger.GEN,'openToolActivityContent','CanvasModel');
 		//check if we have a toolContentID
 		
-		var defaultContentID:Number = Application.getInstance().getToolkit().getDefaultContentID(ta.toolContentID,ta.toolID);
+		var defaultContentID:Number = Application.getInstance().getToolkit().getDefaultContentID(ta.learningLibraryID, ta.toolID);
 		Debugger.log('ta:'+ta.title+'toolContentID:'+ta.toolContentID+', default content ID:'+defaultContentID,Debugger.GEN,'openToolActivityContent','CanvasModel');
 		if(ta.toolContentID == defaultContentID){
 			getNewToolContentID(ta);
