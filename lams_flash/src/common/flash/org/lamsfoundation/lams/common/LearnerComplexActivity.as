@@ -192,8 +192,32 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 					drawChildren(actOrder, container, count);
 				}
 			}
+			
+			
+			if(learnerAct.activity.isBranchingActivity() && !isLearnerModule()) {
+				Debugger.log('test: ' + (learnerAct.isAttempted || learnerAct.isCompleted), Debugger.CRITICAL, 'drawChildren', 'LearnerComplexActivity');
+        
+				if(learnerAct.isAttempted || learnerAct.isCompleted)
+					drawActiveBranch(learnerAct, container, count);
+			}
 		}
 		
+	}
+	
+	private function drawActiveBranch(learnerAct:LearnerActivity, container:Array, count:Number):Void {
+		var children:Array = model.ddm.getComplexActivityChildren(learnerAct.activity.activityUIID);
+		
+		for(var i=0; i<children.length; i++) {
+			var progressStr:String = Progress.compareProgressData(learner, children[i].activityID);
+			
+			if(progressStr == 'attempted_mc' || progressStr == 'completed_mc') {
+				var actOrder:Array = model.getDesignOrder(SequenceActivity(children[i]).firstActivityUIID, true);
+				actOrder.unshift(children[i]);
+				drawChildren(actOrder, container, count);
+				
+				return;
+			}
+		}
 	}
 	
 	private function showStatus(isVisible:Boolean) {

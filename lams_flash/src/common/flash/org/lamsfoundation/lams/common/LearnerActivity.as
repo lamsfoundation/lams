@@ -329,17 +329,16 @@ class LearnerActivity extends MovieClip {
 					var activeSequence = LearnerComplexActivity(this._parent._parent).getActiveSequence();
 					Debugger.log('activeSequence:'+activeSequence, Debugger.CRITICAL,'onRelease','LearnerActivity');
 					
-					if(activeSequence == this.activity) {
-						// close current active sequence
-						LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(null);
-					} else {
-						// open sequence
-						LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(this.activity);
+					if(LearnerComplexActivity(this._parent._parent).activity.activityUIID == this.activity.parentUIID) {
+						
+						if(activeSequence == this.activity) {
+							// close current active sequence
+							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(null);
+						} else {
+							// open sequence
+							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(this.activity);
+						}
 					}
-				} else if(this.activity.isBranchingActivity()) {
-					Debugger.log("hitting branching: " + this.activity.activityUIID, Debugger.CRITICAL,'onRelease','LearnerActivity');
-					
-					
 				}
 				
 				controller.activityRelease(this);
