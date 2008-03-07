@@ -193,6 +193,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 		_defineLater = false;
 		_readOnly = false;
 		_createDateTime = new Date();
+		_branchView = null;
 		
 	}
 	
@@ -787,12 +788,12 @@ class org.lamsfoundation.lams.authoring.Activity {
 			return null;
 	}
 	
-	public function get branchView():CanvasBranchView {
-		return _branchView;
+	public function get branchView():MovieClip {
+		return (_branchView instanceof CanvasBranchView) ? _branchView : null;
 	}
 	
-	public function set branchView(a:CanvasBranchView):Void {
-		_branchView = a;
+	public function set branchView(a:MovieClip):Void {
+		_branchView = (a != null) ? CanvasBranchView(a) : null;
 	}
 	
 }

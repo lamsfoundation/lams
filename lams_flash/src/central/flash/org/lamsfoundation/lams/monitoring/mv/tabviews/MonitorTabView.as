@@ -288,9 +288,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		else {
 		*/
 			showAssets(true);
-			mm.openBranchingActivity = mm.currentBranchingActivity.activity.activityUIID;
-			mm.getMonitor().closeBranchView();
-		
+			
+			mm.activeView = this;
+			mm.currentBranchingActivity = null;
+			
+			//mm.openBranchingActivity = mm.currentBranchingActivity.activity.activityUIID;
+			
 			//Remove all the movies drawn on the transition and activity movieclip holder
 			
 			this._learnerContainer_mc.removeMovieClip();
@@ -398,6 +401,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			newActivity_mc = activityLayer.createChildAtDepth("CanvasOptionalActivity", DepthManager.kTop, {_activity:a, _children:children, _monitorController:mc, _monitorTabView:mtv, fromModuleTab:"monitorMonitorTab", learnerContainer:_learnerContainer_mc});	
 		} else if(a.isBranchingActivity()){
+			a.branchView = null;
+			Debugger.log("setting branchView null: " + a.branchView,Debugger.CRITICAL,'drawActivity','MonitorTabView');
+		
 			newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity", DepthManager.kBottom, {_activity:a,_monitorController:mc, _monitorView:mtv, _module:"monitoring", learnerContainer:_learnerContainer_mc, setupBranchView:false});
 		} else {
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
