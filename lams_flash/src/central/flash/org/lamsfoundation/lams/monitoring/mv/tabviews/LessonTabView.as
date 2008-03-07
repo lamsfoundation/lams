@@ -615,20 +615,22 @@ public function update (o:Observable,infoObj:Object):Void{
 	 */
 	
 	private function drawIsRequiredTasks(ca:Object, array:Array, x:Number):Void{
-		
+		Debugger.log("array length: " + array.length, Debugger.CRITICAL, "drawIsRequiredTasks", "LessonTabView");
 		if(array.length > 0){
 			// write ca title / details to screen with x position
 			requiredTaskList[listCount] = _monitorReqTask_mc.attachMovie("contributeActivityRow", "contributeActivityRow"+listCount, this._monitorReqTask_mc.getNextHighestDepth(), {_x:x, _y:19*listCount})
 			reqTasks_scp.redraw(true);
+			
 			requiredTaskList[listCount].contributeActivity.background = true;
 			requiredTaskList[listCount].contributeActivity._width=reqTasks_scp._width-20
 			
+			Debugger.log("ca._parentActivityID: " + ca._parentActivityID, Debugger.CRITICAL, "drawIsRequiredTasks", "LessonTabView");
+		
 			if (ca._parentActivityID == null){
 				requiredTaskList[listCount].contributeActivity.text = "  "+ca.title
 				requiredTaskList[listCount].contributeActivity.backgroundColor = 0xD5E6FF;
 				listCount++;
-			}
-			else {
+			} else {
 				requiredTaskList[listCount].contributeActivity.text = "\t"+ca.title
 				requiredTaskList[listCount].contributeActivity.backgroundColor = 0xF9F2DD;
 				listCount++;
@@ -636,23 +638,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				for(var i=0; i<array.length; i++){
 					var o:Object = array[i];
 					if (o instanceof ContributeActivity){
-						Debugger.log("it is a contribute activity", Debugger.CRITICAL, "drawIsRequiredTasks", "LessonTabView");
-						// normal CA entries
-						requiredTaskList[listCount] =_monitorReqTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow"+listCount, this._monitorReqTask_mc.getNextHighestDepth(), {_x:x, _y:19*listCount, buttonLabel:btnLabel})
-						reqTasks_scp.redraw(true);
-						requiredTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
-						requiredTaskList[listCount].goContribute._x = reqTasks_scp._width-50
-						
-						requiredTaskList[listCount].goContribute.onRelease = function (){
-							JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 600, 800, true, true, false, false, false);
-						}
-						
-						requiredTaskList[listCount].goContribute.onRollOver = Proxy.create(this,this['showToolTip'], requiredTaskList[listCount].goContribute, "goContribute_btn_tooltip", reqTasks_scp._y+requiredTaskList[listCount]._y+requiredTaskList[listCount]._height, reqTasks_scp._x);
-						requiredTaskList[listCount].goContribute.onRollOut = Proxy.create(this,this['hideToolTip']);
-						
-						var styleObj = _tm.getStyleObject('button');
-						requiredTaskList[listCount].goContribute.setStyle('styleName',styleObj); 
-						listCount++;
+						drawContributeActivity(o, x);
 					}
 				}
 			}
@@ -660,8 +646,11 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		for(var i=0; i<array.length; i++){
 			var o:Object = array[i];
+			Debugger.log("o instanceof ContributeActivity: " + o instanceof ContributeActivity, Debugger.CRITICAL, "drawIsRequiredTasks", "LessonTabView");
 			
-			if(!(o instanceof ContributeActivity)){
+			if (o instanceof ContributeActivity){
+				 drawContributeActivity(o, x);
+			} else {
 				if(o.entries.length > 0){
 					// write child ca title (indented - x + 10 position)
 					drawIsRequiredTasks(o.child, o.entries, x);
@@ -670,6 +659,33 @@ public function update (o:Observable,infoObj:Object):Void{
 		}
 		
 		reqTasks_scp.redraw(true)
+	}
+	
+	private function drawContributeActivity(o:Object, x:Number) {
+		Debugger.log("it is a contribute activity", Debugger.CRITICAL, "drawContributeActivity", "LessonTabView");
+		Debugger.log("o : " + requiredTaskList[listCount-1]._o , Debugger.CRITICAL, "drawContributeActivity", "LessonTabView");
+		Debugger.log("equals : " + (requiredTaskList[listCount-1]._o == o) , Debugger.CRITICAL, "drawContributeActivity", "LessonTabView");
+		
+		if(requiredTaskList[listCount-1]._o == o) return;
+		
+		// normal CA entries
+		requiredTaskList[listCount] =_monitorReqTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow"+listCount, this._monitorReqTask_mc.getNextHighestDepth(), {_x:x, _y:19*listCount, buttonLabel:btnLabel, _o:o})
+		reqTasks_scp.redraw(true);
+		
+		requiredTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
+		requiredTaskList[listCount].goContribute._x = reqTasks_scp._width-50
+						
+		requiredTaskList[listCount].goContribute.onRelease = function (){
+			JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 600, 800, true, true, false, false, false);
+		}
+						
+		requiredTaskList[listCount].goContribute.onRollOver = Proxy.create(this,this['showToolTip'], requiredTaskList[listCount].goContribute, "goContribute_btn_tooltip", reqTasks_scp._y+requiredTaskList[listCount]._y+requiredTaskList[listCount]._height, reqTasks_scp._x);
+		requiredTaskList[listCount].goContribute.onRollOut = Proxy.create(this,this['hideToolTip']);
+						
+		var styleObj = _tm.getStyleObject('button');
+		requiredTaskList[listCount].goContribute.setStyle('styleName',styleObj); 
+		
+		listCount++;
 	}
 	
 	/**
