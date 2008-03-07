@@ -716,10 +716,10 @@ class MonitorModel extends Observable{
 		return (transObj.out == null) ? activityUIID : getLastActivityUIID(transObj.out.toUIID);
 	}
 	
-	private function orderDesign(activity:Activity, order:Array):Void{
+	private function orderDesign(activity:Activity, order:Array, omitComplex:Boolean):Void{
 		order.push(activity);
 		
-		if(activity.isBranchingActivity() || activity.isSequenceActivity() || activity.isOptionalActivity() || activity.isOptionsWithSequencesActivity()) {
+		if(!omitComplex && (activity.isBranchingActivity() || activity.isSequenceActivity() || activity.isOptionalActivity() || activity.isOptionsWithSequencesActivity())) {
 			var children:Array = _activeSeq.getLearningDesignModel().getComplexActivityChildren(activity.activityUIID);
 			for(var i=0; i<children.length; i++) {
 				orderDesign(children[i], order);
@@ -733,7 +733,7 @@ class MonitorModel extends Observable{
 			if (ddmTransition.fromUIID == activity.activityUIID){
 				var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(ddmTransition.toUIID);
 				
-				orderDesign(ddm_activity, order);
+				orderDesign(ddm_activity, order, omitComplex);
 			}
 				
 		}
@@ -757,12 +757,12 @@ class MonitorModel extends Observable{
 		
 	}
 	
-	public function getDesignOrder(firstActivityUIID:Number):Array {
+	public function getDesignOrder(firstActivityUIID:Number, omitComplex:Boolean):Array {
 		
 		var orderedActivityArr:Array = new Array();
 		var learnerFirstActivity:Activity = _activeSeq.getLearningDesignModel().activities.get(firstActivityUIID);
 		
-		orderDesign(learnerFirstActivity, orderedActivityArr);
+		orderDesign(learnerFirstActivity, orderedActivityArr, omitComplex);
 		
 		return orderedActivityArr;
 	}
