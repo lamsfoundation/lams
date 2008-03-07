@@ -107,11 +107,11 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	}
 
 	/** Prepares to process children */
-	public void startComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
+	public boolean startComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
 		// Create a new current activity list, putting the old current one on the stack. 
 		activityListStack.push(currentPortfolioList);
 		currentPortfolioList = new ArrayList<ActivityPortfolio>();
-		
+		return true;
 	}
 
 	/** Creates an ActivityPortfolio and sets up the list of its children. Doesn't create an entry if there are no children. */

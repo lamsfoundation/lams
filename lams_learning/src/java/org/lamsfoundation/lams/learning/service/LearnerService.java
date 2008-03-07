@@ -364,14 +364,20 @@ public class LearnerService implements ICoreLearnerService
     /**
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getStructuredProgressDTOs(java.lang.Long, java.lang.Long)
      */
-    public List<ActivityURL> getStructuredActivityURLs(Integer learnerId, Long lessonId) {
+    public Object[] getStructuredActivityURLs(Integer learnerId, Long lessonId) {
     
     	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
     	Lesson lesson = progress.getLesson();
 
     	ProgressBuilder builder = new ProgressBuilder(progress, activityDAO, activityMapping);
     	builder.parseLearningDesign();
-    	return builder.getActivityList();
+    	List<ActivityURL> list = builder.getActivityList();
+    	
+    	Object[] retValue = new Object[2];
+    	retValue[0] = list;
+    	retValue[1] = progress.getCurrentActivity() !=null ? progress.getCurrentActivity().getActivityId() : null;
+    	
+    	return retValue;
     }
     
 

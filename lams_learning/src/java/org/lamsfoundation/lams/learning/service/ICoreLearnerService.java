@@ -98,10 +98,10 @@ public interface ICoreLearnerService extends ILearnerService
      * Returns the current progress data, in the DTO format required by the jsp progress screen, of the User.
      * @param learnerId the Learner's userID
      * @param lessonId the Lesson to get progress from.
-     * @return progressList contains the learner's progress for the lesson.
+     * @return Array of two objects. [0] List<ActivityURL>, [1] Activity ID of the current activity
      * @throws LearnerServiceException in case of problems.
      */
-    public List<ActivityURL> getStructuredActivityURLs(Integer learnerId, Long lessonId);
+    public Object[] getStructuredActivityURLs(Integer learnerId, Long lessonId);
     
 
     /**

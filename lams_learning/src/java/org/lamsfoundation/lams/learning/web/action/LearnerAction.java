@@ -499,13 +499,15 @@ public class LearnerAction extends LamsDispatchAction
 	    Long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID );
 	    
         ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-        List<ActivityURL> progressList = learnerService.getStructuredActivityURLs(learnerId, lessonId);
-        request.setAttribute("progressList", progressList);
+        Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);;
+        request.setAttribute("progressList", (List<ActivityURL>)ret[0]);
+        request.setAttribute("currentActivityID", ret[1]);
+        
         return mapping.findForward("displayProgress");
     }
 	
     /**
-     * Forces a move to a destination Activity in the learning sequence.
+     * Forces a move to a destination Activity in the learning sequence, returning a WDDX packet
      * 
      * @param mapping An ActionMapping class that will be used by the Action class to tell
      * the ActionServlet where to send the end-user.
@@ -524,10 +526,61 @@ public class LearnerAction extends LamsDispatchAction
             HttpServletResponse response) throws IOException,
                                                  ServletException {
     	FlashMessage flashMessage = null;
-    	
-    	//initialize service object
-		ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 		ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+		ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+    	Long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+    	
+    	try {
+    		forceMoveShared(request, learnerService,lessonId);
+    		flashMessage = new FlashMessage("forceMove", activityMapping.getDisplayActivityAction(null));
+        } catch (Exception e) {
+        	flashMessage = handleException(e, "forceMove", learnerService);
+        }
+
+        PrintWriter writer = response.getWriter();
+        writer.println(flashMessage.serializeMessage());
+        return null;
+    	
+    }
+
+    /**
+     * Forces a move to a destination Activity in the learning sequence, redirecting to the new
+     * page rather than returning a WDDX packet.
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward forceMoveRedirect(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                                 ServletException {
+		ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+		ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+    	Long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+    	
+    	try {
+    		forceMoveShared(request, learnerService,lessonId);
+           	return redirectToURL(mapping, response, "/learning" + activityMapping.getDisplayActivityAction(lessonId));
+        } catch (Exception e) {
+        	log.error("Exception throw doing force move",e);
+        	throw new ServletException(e);
+        }
+    }
+
+    /**
+	 * @param request
+	 * @return
+	 */
+	private void forceMoveShared(HttpServletRequest request, ICoreLearnerService learnerService, Long lessonId) {
 
 		//getting requested object according to coming parameters
 		Integer learnerId = LearningWebUtil.getUserId();
@@ -552,35 +605,22 @@ public class LearnerAction extends LamsDispatchAction
         		toActivityId = null;
         	}
     		
-    	//force complete
-    	try {
-        	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
-            
-        	Activity fromActivity = null;
-        	Activity toActivity = null;
-        	
-        	if(fromActivityId != null)
-        		fromActivity = learnerService.getActivity(fromActivityId);
-        	
-        	if(toActivityId != null)
-        		toActivity = learnerService.getActivity(toActivityId);
-        	 
-        	learnerService.moveToActivity(learnerId, new Long(lessonId), fromActivity, toActivity);
-        	
-    		if ( log.isDebugEnabled() ) {
-    			log.debug("Force move for learner "+learnerId+" lesson "+lessonId+". ");
-    		}
-    		flashMessage = new FlashMessage("forceMove", activityMapping.getDisplayActivityAction(null));
-		} catch (Exception e) {
-			flashMessage = handleException(e, "forceMove", learnerService);
-		}
-		String message =  flashMessage.serializeMessage();
-		
-        PrintWriter writer = response.getWriter();
-        writer.println(message);
-        return null;
+        
+    	Activity fromActivity = null;
+    	Activity toActivity = null;
     	
-    }
+    	if(fromActivityId != null)
+    		fromActivity = learnerService.getActivity(fromActivityId);
+    	
+    	if(toActivityId != null)
+    		toActivity = learnerService.getActivity(toActivityId);
+    	 
+    	learnerService.moveToActivity(learnerId, lessonId, fromActivity, toActivity);
+    	
+		if ( log.isDebugEnabled() ) {
+			log.debug("Force move for learner "+learnerId+" lesson "+lessonId+". ");
+		}
+	}
     
 	/**
 	 * Get AuditService bean.

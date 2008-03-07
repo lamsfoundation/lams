@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.learningdesign.SimpleActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /** Creates a basic tree of the user's current progress - what is completed, urls to jump back to completed activities, etc */
@@ -51,7 +52,8 @@ public class ProgressBuilder extends LearningDesignProcessor {
     ArrayList<ActivityURL> mainActivityList;
 	ArrayStack activityListStack;
 	ArrayList<ActivityURL> currentActivityList;
-	String forwardToLearnerURL;
+	String forceLearnerURL;
+	boolean previewMode;
 	
 	/** Create the builder. Supply all the data that will be needed to parse the design and build the portfolio entries. 
 	 * 
@@ -80,30 +82,45 @@ public class ProgressBuilder extends LearningDesignProcessor {
 		this.currentActivityList = mainActivityList;
 		this.activityListStack = new ArrayStack(5);
 
-		// setup the basic call to the learner screen, ready just to put the activity id on the end. Saves calculating it for every activity
-		this.forwardToLearnerURL = "/learning/learner.do?method=forwardToLearner"
-			+"&userID="+user.getUserId()+"lessonID="+progress.getLesson().getLessonId()+"&activityID=";
+		Lesson lesson = progress.getLesson();
+		previewMode = lesson.isPreviewLesson();
+		if ( previewMode) {
+			// setup the basic call to the learner screen, ready just to put the activity id on the end. Saves calculating it for every activity
+			this.forceLearnerURL = "learner.do?method=forceMoveRedirect&lessonID="
+				+progress.getLesson().getLessonId()+"&destActivityID=";
+		}
+			
 
 	}
 
 	/** Prepares to process children */
-	public void startComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
+	public boolean startComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
 		// Create a new current activity list, putting the old current one on the stack. 
 		activityListStack.push(currentActivityList);
 		currentActivityList = new ArrayList<ActivityURL>();
+
+		if ( activity.isSequenceActivity() ) {
+			return ( progress.getProgressState(activity) != LearnerProgress.ACTIVITY_NOT_ATTEMPTED );
+		} 
+		return true;
 	}
 
+	
 	/** Creates an ActivityURL and sets up the list of its children. */
 	public void endComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
 		
 		ActivityURL complexActivityURL = createActivityURL(activity);
 
-		if ( complexActivityURL.getStatus()!=LearnerProgress.ACTIVITY_NOT_ATTEMPTED && currentActivityList.size()>0 ) {
+		// don't want to show a branch if it isn't being done
+		if ( complexActivityURL.getStatus()!=LearnerProgress.ACTIVITY_NOT_ATTEMPTED || ! (activity.isSequenceActivity() 
+				&& activity.getParentActivity() != null && activity.getParentActivity().isBranchingActivity()) ) {
 			complexActivityURL.setChildActivities(currentActivityList);
+			currentActivityList = (ArrayList<ActivityURL>) activityListStack.pop();
+			currentActivityList.add(complexActivityURL);
+		} else {
+			currentActivityList = (ArrayList<ActivityURL>) activityListStack.pop();
 		}
 
-		currentActivityList = (ArrayList<ActivityURL>) activityListStack.pop();
-		currentActivityList.add(complexActivityURL);
 	}
 
 	public void startSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
@@ -133,7 +150,11 @@ public class ProgressBuilder extends LearningDesignProcessor {
 			log.error(error);
 			throw new LearningDesignProcessorException(error);
 		}
-		return LearningWebUtil.getActivityURL( activityMapping, progress, activity, false);
+		ActivityURL activityURL =  LearningWebUtil.getActivityURL( activityMapping, progress, activity, false);
+		if ( activityURL.getStatus() == LearnerProgress.ACTIVITY_NOT_ATTEMPTED ) {
+			activityURL.setUrl( previewMode? forceLearnerURL+activity.getActivityId() : null);
+		}
+		return activityURL;
 	}
 	
 	/** Get the list of all the activity progress DTOs, which in turn may contain other activity progress DTOs */
