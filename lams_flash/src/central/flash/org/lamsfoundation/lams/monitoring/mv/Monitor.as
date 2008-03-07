@@ -494,8 +494,10 @@ class Monitor {
 		ba.activity.branchView = branchView;
 		
 		var actToPush = monitorModel.getMonitor().ddm.getActivityByUIID(ba.activity.activityUIID);
+		
 		Debugger.log("Pushing activity: "+actToPush.title+" to the stack", Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
 		Debugger.log("It has a UIID of: "+actToPush.activityUIID, Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
+		
 		monitorModel.openBranchingActivities.push(ba.activity.activityUIID);
 	}
 	

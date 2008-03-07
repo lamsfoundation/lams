@@ -1083,6 +1083,7 @@ class MonitorModel extends Observable{
 			activeView = (visible) ? ba.activity.branchView : activeView;
 			ba.activity.branchView.setOpen(visible);
 			ba.activity.branchView.open();
+			
 			setDirty();
 		} else { 
 			_monitor.openBranchView(currentBranchingActivity, visible); 

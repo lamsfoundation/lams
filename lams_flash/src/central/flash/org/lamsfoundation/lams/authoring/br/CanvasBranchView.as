@@ -728,7 +728,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  
 	 */
 	private function removeTransition(t:Transition, cm){
-		if(!cm.isActiveView(this)) return false;
+		if(!cm.isActiveView(this) || cm instanceof MonitorModel) return false;
 		
 		var r = cm.transitionsDisplayed.remove(t.transitionUIID);
 		r.removeMovieClip();

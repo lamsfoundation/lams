@@ -364,7 +364,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	 * @param   activityUIID 
 	 * @return  
 	 */
-	private function removeTransition(t:Transition,mm:MonitorModel){
+	private function removeTransition(t:Transition, mm:MonitorModel){
 		if(!mm.isActiveView(this)) return false;
 		
 		var r = mm.transitionsDisplayed.remove(t.transitionUIID);
@@ -402,8 +402,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			newActivity_mc = activityLayer.createChildAtDepth("CanvasOptionalActivity", DepthManager.kTop, {_activity:a, _children:children, _monitorController:mc, _monitorTabView:mtv, fromModuleTab:"monitorMonitorTab", learnerContainer:_learnerContainer_mc});	
 		} else if(a.isBranchingActivity()){
 			a.branchView = null;
-			Debugger.log("setting branchView null: " + a.branchView,Debugger.CRITICAL,'drawActivity','MonitorTabView');
-		
 			newActivity_mc = activityLayer.createChildAtDepth("CanvasActivity", DepthManager.kBottom, {_activity:a,_monitorController:mc, _monitorView:mtv, _module:"monitoring", learnerContainer:_learnerContainer_mc, setupBranchView:false});
 		} else {
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
