@@ -13,26 +13,6 @@
 
    <tag>
 
-      <description>Converts role name into form usable as message taskList key</description>
-      <display-name>Converts role name into form usable as message taskList key</display-name>
-      <icon>    
-      </icon>
-      <name>role</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.RoleTag</tag-class>
-      <body-content>empty</body-content>
-
-      <attribute>
-         <description>Converts role name into form usable as message taskList key</description>
-         <name>role</name>
-         <required>true</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
-
-   </tag>
-   <tag>
-
       <description>Output the Server URL as defined in the lams.xml configuration file.</description>
       <display-name>LAMS URL</display-name>
       <icon>    
@@ -92,6 +72,77 @@
    </tag>
    <tag>
 
+      <description>Get the configuration value for the specified key</description>
+      <display-name>Configuration value</display-name>
+      <icon>    
+      </icon>
+      <name>Configuration</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.ConfigurationTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Get the configuration value for the specified key</description>
+         <name>key</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
+      <display-name>generate unique ID</display-name>
+      <icon>    
+      </icon>
+      <name>generateID</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.GenerateIDTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
+         <name>id</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/</description>
+      <display-name>Base URL for the current web app</display-name>
+      <icon>    
+      </icon>
+      <name>WebAppURL</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.WebAppURLTag</tag-class>
+      <body-content>empty</body-content>
+
+   </tag>
+   <tag>
+
+      <description>Converts role name into form usable as message resources key</description>
+      <display-name>Converts role name into form usable as message resources key</display-name>
+      <icon>    
+      </icon>
+      <name>role</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.RoleTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Converts role name into form usable as message resources key</description>
+         <name>role</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
       <description>Help tag</description>
       <display-name>Help tag</display-name>
       <icon>    
@@ -136,26 +187,6 @@
    </tag>
    <tag>
 
-      <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
-      <display-name>generate unique ID</display-name>
-      <icon>    
-      </icon>
-      <name>generateID</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.GenerateIDTag</tag-class>
-      <body-content>empty</body-content>
-
-      <attribute>
-         <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
-         <name>id</name>
-         <required>false</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
-
-   </tag>
-   <tag>
-
       <description>Output details from the shared session UserDTO object</description>
       <display-name>user details</display-name>
       <icon>    
@@ -172,17 +203,6 @@
            <rtexprvalue>true</rtexprvalue>
 
       </attribute>
-
-   </tag>
-   <tag>
-
-      <description>Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/</description>
-      <display-name>Base URL for the current web app</display-name>
-      <icon>    
-      </icon>
-      <name>WebAppURL</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.WebAppURLTag</tag-class>
-      <body-content>empty</body-content>
 
    </tag>
    <tag>
@@ -476,5 +496,13 @@
 		<name>head</name>
 	    <path>/WEB-INF/tags/Head.tag</path>
 	</tag-file>  
+  	<tag-file>
+	    <name>ProgressOutput</name>
+		<path>/WEB-INF/tags/ProgressOutput.tag</path>
+   	</tag-file>  
+	<tag-file>
+	    <name>LearnerFlashEnabled</name>
+		<path>/WEB-INF/tags/LearnerFlashEnabled.tag</path>
+   	</tag-file>  
 
 </taglib>
