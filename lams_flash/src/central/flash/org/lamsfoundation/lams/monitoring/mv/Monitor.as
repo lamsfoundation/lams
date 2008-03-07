@@ -407,44 +407,47 @@ class Monitor {
 		monitorModel.activeView = monitorView.getMonitorTabView();
 		monitorModel.setLessonProgressData(allLearners);
 		monitorModel.backupLearnersProgress(monitorModel.allLearnersProgress);
+		
 		dispatchEvent({type:'load',target:this});		
+		
 		Debugger.log("Progress data saved...", Debugger.GEN, "saveProgressData", "Monitor");
 	}
 	
 	public function getCELiteral(taskType:Number):String{
-		trace("Type passed: "+taskType)
 		var seqStat:String;
+		
 		switch(String(taskType)){
 			case '1' :
-				seqStat = "Moderation"
+				seqStat = Dictionary.getValue("ls_seq_status_moderation"); // "Moderation"
 				break;
 			case '2' :
-				seqStat = "Define Later"
+				seqStat = Dictionary.getValue("ls_seq_status_define_later"); // "Define Later"
 				break;
 			case '3' :
-				seqStat = "Permission Gate"
+				seqStat = Dictionary.getValue("ls_seq_status_perm_gate"); // "Permission Gate"
 				break;
 			case '4' :
-				seqStat = "Syncronise Gate"
+				seqStat = Dictionary.getValue("ls_seq_status_synch_gate"); // "Syncronise Gate"
 				break;
 			case '5' :
-				seqStat = "Schedule Gate"
+				seqStat = Dictionary.getValue("ls_seq_status_sched_gate"); // "Schedule Gate"
 				break;
 			case '6' :
-				seqStat = "Choose Grouping"
+				seqStat = Dictionary.getValue("ls_seq_status_choose_grouping"); // "Choose Grouping"
 				break;
 			case '7' :
-				seqStat = "Contribution"
+				seqStat = Dictionary.getValue("ls_seq_status_contribution"); // "Contribution"
 				break;
 			case '8' :
-				seqStat = "System Gate"
+				seqStat = Dictionary.getValue("ls_seq_status_system_gate"); // "System Gate"
 				break;
 			case '9' :
-				seqStat = "Teacher Chosen Branching"
+				seqStat = Dictionary.getValue("ls_seq_status_teacher_branching"); // "Teacher Chosen Branching"
 				break;
 			default:
-				seqStat = "Not yet set"
+				seqStat = Dictionary.getValue("ls_seq_status_not_set"); // "Not yet set"
 		}
+		
 		return seqStat;
 	}
 	
