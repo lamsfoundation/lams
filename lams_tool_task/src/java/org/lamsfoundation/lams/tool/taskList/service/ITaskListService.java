@@ -242,5 +242,7 @@ public interface ITaskListService
 	 * @return
 	 */
 	TaskListUser getUser(Long uid);
+	
+	public void saveOrUpdateTaskListItem(TaskListItem item);
 }
 

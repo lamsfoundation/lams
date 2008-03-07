@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.taskList.model;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -66,7 +67,7 @@ public class TaskListItem  implements Cloneable{
 	//DTO fields:
 	private boolean complete;
 	
-	private List<TaskListItemAttachment> uploadedFileList;
+	private Set uploadedFileList;
 	private List<TaskListItemComment> comments;
 	
     public Object clone(){
@@ -267,10 +268,20 @@ public class TaskListItem  implements Cloneable{
 			this.parentTaskName = parentTaskName;
 		}
 		
-		public List<TaskListItemAttachment> getUploadedFileList() {
+		/**
+	     *
+	     * @hibernate.set   cascade="all-delete-orphan"
+	     * 					inverse="false"
+	     * @hibernate.collection-key column="taskList_item_uid"
+	     * @hibernate.collection-one-to-many
+	     * 			class="org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment"
+	     *
+	     * @return a set of Attachments to this TaskListItem.
+	     */
+		public Set getUploadedFileList() {
 			return uploadedFileList;
 		}
-		public void setUploadedFileList(List<TaskListItemAttachment> uploadedFileList) {
+		public void setUploadedFileList(Set uploadedFileList) {
 			this.uploadedFileList = uploadedFileList;
 		}
 		

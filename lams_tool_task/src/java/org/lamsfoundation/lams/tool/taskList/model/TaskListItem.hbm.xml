@@ -110,6 +110,14 @@
         />
 
         <property
+            name="showCommentsToAll"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="show_comments_to_all"
+        />
+
+        <property
             name="commentsAllowed"
             type="boolean"
             update="true"
@@ -132,6 +140,25 @@
             insert="true"
             column="parent_task_name"
         />
+
+        <set
+            name="uploadedFileList"
+            lazy="false"
+            inverse="false"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+
+            <key
+                column="taskList_item_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment"
+            />
+
+        </set>
 
         <!--
             To add non XDoclet property mappings, create a file named

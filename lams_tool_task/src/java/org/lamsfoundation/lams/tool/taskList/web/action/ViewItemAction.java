@@ -157,7 +157,7 @@ public class ViewItemAction extends Action {
 		
 		//init taskList item list
 		SortedSet<TaskListItemAttachment> attachmentList = getAttachmentList(sessionMap);
-		List<TaskListItemAttachment> dbAttachments = item.getUploadedFileList();
+		Set<TaskListItemAttachment> dbAttachments = item.getUploadedFileList();
 		attachmentList.clear();
 		if(dbAttachments != null){
 			for(TaskListItemAttachment comment : dbAttachments){
@@ -276,18 +276,16 @@ public class ViewItemAction extends Action {
 		
 		
 		//finally persist taskListPO again
-		TaskListItem item = (TaskListItem) sessionMap.get(TaskListConstants.ATTR_TASK_LIST_ITEM);
-		List<TaskListItemAttachment> dbAttachments = item.getUploadedFileList();
+		TaskListItem httpSessionItem = (TaskListItem) sessionMap.get(TaskListConstants.ATTR_TASK_LIST_ITEM);
+		TaskListItem dbItem = service.getTaskListItemByUid(httpSessionItem.getUid());
+		Set<TaskListItemAttachment> dbAttachments = dbItem.getUploadedFileList();
 		if(dbAttachments == null){
-			dbAttachments = new ArrayList<TaskListItemAttachment>();
-			item.setUploadedFileList(dbAttachments);
+			dbAttachments = new HashSet<TaskListItemAttachment>();
+			dbItem.setUploadedFileList(dbAttachments);
 		}
 		dbAttachments.add(att);
-		
-		//save content to DB
-		TaskList taskList = service.getTaskListBySessionId(sessionId);
-		service.saveOrUpdateTaskList(taskList);
-		
+		service.saveOrUpdateTaskListItem(dbItem);
+				
 		form.reset(mapping, request);
 		
 		return mapping.findForward(TaskListConstants.SUCCESS);
