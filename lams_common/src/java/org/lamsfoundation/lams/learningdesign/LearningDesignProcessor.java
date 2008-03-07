@@ -56,7 +56,7 @@ public abstract class LearningDesignProcessor {
 	}
 
 	/** A complex activity has been found. Do any processing needed at the start of the activity */
-	public abstract void startComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException ;
+	public abstract boolean startComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException ;
 	
 	/** Do any processing needed at the end of a complex activity */
 	public abstract void endComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException ;
@@ -97,26 +97,28 @@ public abstract class LearningDesignProcessor {
 	protected void handleComplexActivity( Activity activity ) throws LearningDesignProcessorException {
 		// ensure it is a real activity not a CGLIB proxy
 		ComplexActivity complex = (ComplexActivity) activityDAO.getActivityByActivityId(activity.getActivityId(),SimpleActivity.class);
-		startComplexActivity(complex);
+		boolean processChildren = startComplexActivity(complex);
 
-		if ( activity.isSequenceActivity() ) {
-			// sequence is a funny one - the child activities are linked by transitions rather
-	        // than ordered by order id
-			SequenceActivity sequenceActivity = (SequenceActivity) complex;
-			Activity child = sequenceActivity.getNextActivityByParent(new NullActivity());
-			while ( ! child.isNull() ) {
-				handleActivity(child);
-				child = sequenceActivity.getNextActivityByParent(child);
+		if ( processChildren ) {
+			if ( activity.isSequenceActivity() ) {
+				// sequence is a funny one - the child activities are linked by transitions rather
+		        // than ordered by order id
+				SequenceActivity sequenceActivity = (SequenceActivity) complex;
+				Activity child = sequenceActivity.getNextActivityByParent(new NullActivity());
+				while ( ! child.isNull() ) {
+					handleActivity(child);
+					child = sequenceActivity.getNextActivityByParent(child);
+				}
+				
+			} else {
+				// work through all the child activities for this activity, in order id
+				Set children = new TreeSet(new ActivityOrderComparator());
+		        children.addAll(complex.getActivities());
+		        Iterator i=children.iterator();
+		        while ( i.hasNext() ) {
+					handleActivity((Activity)i.next());
+		        }
 			}
-			
-		} else {
-			// work through all the child activities for this activity, in order id
-			Set children = new TreeSet(new ActivityOrderComparator());
-	        children.addAll(complex.getActivities());
-	        Iterator i=children.iterator();
-	        while ( i.hasNext() ) {
-				handleActivity((Activity)i.next());
-	        }
 		}
 		
 		endComplexActivity(complex);

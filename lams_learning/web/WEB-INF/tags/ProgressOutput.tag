@@ -38,6 +38,10 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <LI><c:choose>
+		<c:when test="${activity.activityId==currentActivityID}">
+			<c:set var="image" value="progress_current.gif"/>
+			<c:set var="colour" value="990000"/>
+		</c:when>
 		<c:when test="${activity.status==1}">
 			<c:set var="image" value="progress_completed.gif"/>
 			<c:set var="colour" value="003399"/>
@@ -53,7 +57,7 @@
 	</c:choose>
 	
 	<c:choose>
-	<c:when test="${activity.status<3 and not empty activity.url}">
+	<c:when test="${not empty activity.url}">
 		<img src="<lams:LAMSURL/>/images/${image}" width="10"/> <a href="#" onclick="javascript:loadFrame('${activity.url}');"><font color="#${colour}"><c:out value="${activity.title}"/></font></a>
 	</c:when>
 	<c:otherwise>
@@ -63,7 +67,7 @@
 
 	<c:forEach var="childActivity" items="${activity.childActivities}" varStatus="childstatus">
 		<c:if test="${childstatus.first}">
-			<BR><UL>
+			<BR><UL style="margin-right:0">
 		</c:if>
 		<lams:ProgressOutput activity="${childActivity}"/>
 		<c:if test="${childstatus.last}">

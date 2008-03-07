@@ -25,6 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <lams:html>
 	
@@ -33,26 +34,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<title><fmt:message key="learner.title"/></title>
 	</lams:head>
 
-	<script type="text/javascript">
-		function loadFrame(url) {
-			top.frames['contentFrame'].location.href = url;
-		}
-	</script>
-<body>
+	<c:choose>
+		<c:when test="${page_direction == 'RTL'}">
+			<frameset rows="*" cols="*,160">
+				<frame src="content.do?lessonID=<c:out value="${param.lessonID}"/>" name="contentFrame" scrolling="YES">
+				<frame src="controlFrame.jsp?lessonID=<c:out value="${param.lessonID}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if>" name="controlFrame" scrolling="NO">
+			</frameset>	
+		</c:when>
+		<c:otherwise>
+			<frameset rows="*" cols="160,*">
+				<frame src="controlFrame.jsp?lessonID=<c:out value="${param.lessonID}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if>" name="controlFrame" scrolling="NO">
+				<frame src="content.do?lessonID=<c:out value="${param.lessonID}"/>" name="contentFrame" scrolling="YES">
+			</frameset>
+		</c:otherwise>
+	</c:choose>
+	
+	<noframes>
+		<body>
+			<fmt:message key="message.activity.parallel.noFrames" />
+		</body>
+	</noframes>
 
-<c:forEach var="activity" items="${progressList}" varStatus="status">
-	<c:if test="${status.first}">
-		<UL style="margin-right:0">
-	</c:if>
-
-	<lams:ProgressOutput activity="${activity}"/>
-	<c:if test="${status.last}">
-		</UL>
-	</c:if>
-</c:forEach>
-
-</body>
 </lams:html>
-
-
-

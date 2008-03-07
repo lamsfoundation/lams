@@ -17,6 +17,7 @@
 				classpath:/org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/web/webApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/integrationContext.xml
+				classpath:/org/lamsfoundation/lams/usermanagement/ldapContext.xml
 				<!--  Needed to communicate with the tools -->
 				classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
@@ -153,23 +154,8 @@
 </listener>
 
    <servlet>
-      <servlet-name>editLD</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.authoring.web.EditOnFlyServlet</servlet-class>
-
-   </servlet>
-   <servlet>
-      <servlet-name>storeLD</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.authoring.web.StoreLDServlet</servlet-class>
-
-   </servlet>
-   <servlet>
       <servlet-name>dumpWDDX</servlet-name>
       <servlet-class>org.lamsfoundation.lams.web.ReportWddxStructureServlet</servlet-class>
-
-   </servlet>
-   <servlet>
-      <servlet-name>storeTheme</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.themes.web.StoreThemeServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -217,8 +203,8 @@
 
    </servlet>
    <servlet>
-      <servlet-name>storeNotebookEntry</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.notebook.web.StoreNBEntryServlet</servlet-class>
+      <servlet-name>updateCollapsedGroup</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.web.UpdateCollapsedGroupServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -240,6 +226,41 @@
    <servlet>
       <servlet-name>flashCrashDump</servlet-name>
       <servlet-class>org.lamsfoundation.lams.web.FlashCrashDumpServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>editLD</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.authoring.web.EditOnFlyServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>LessonJoinServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.webservice.xml.LessonJoinServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>storeLD</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.authoring.web.StoreLDServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>saveLessonOrder</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.web.LessonOrderServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>storeTheme</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.themes.web.StoreThemeServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>insertLearningDesign</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.authoring.web.InsertLDServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>storeNotebookEntry</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.notebook.web.StoreNBEntryServlet</servlet-class>
 
    </servlet>
 
@@ -363,28 +384,16 @@
 </servlet-mapping>
 
    <servlet-mapping>
-      <servlet-name>editLD</servlet-name>
-      <url-pattern>/eof/authoring/editLearningDesign</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>storeLD</servlet-name>
-      <url-pattern>/servlet/authoring/storeLearningDesignDetails</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
       <servlet-name>dumpWDDX</servlet-name>
       <url-pattern>/servlet/dumpWDDX</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>storeTheme</servlet-name>
-      <url-pattern>/themes/servlet/storeTheme</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>SimpleUploader</servlet-name>
       <url-pattern>/fckeditor/editor/filemanager/upload/simpleuploader</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>storeNotebookEntry</servlet-name>
-      <url-pattern>/servlet/notebook/storeNotebookEntry</url-pattern>
+      <servlet-name>updateCollapsedGroup</servlet-name>
+      <url-pattern>/servlet/updateCollapsedGroup</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>Connector</servlet-name>
@@ -393,6 +402,34 @@
    <servlet-mapping>
       <servlet-name>flashCrashDump</servlet-name>
       <url-pattern>/servlet/flashCrashDump</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>editLD</servlet-name>
+      <url-pattern>/eof/authoring/editLearningDesign</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>LessonJoinServlet</servlet-name>
+      <url-pattern>/services/xml/LessonJoin/*</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>storeLD</servlet-name>
+      <url-pattern>/servlet/authoring/storeLearningDesignDetails</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>saveLessonOrder</servlet-name>
+      <url-pattern>/servlet/saveLessonOrder</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>storeTheme</servlet-name>
+      <url-pattern>/themes/servlet/storeTheme</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>insertLearningDesign</servlet-name>
+      <url-pattern>/servlet/authoring/insertLearningDesign</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>storeNotebookEntry</servlet-name>
+      <url-pattern>/servlet/notebook/storeNotebookEntry</url-pattern>
    </servlet-mapping>
 
    <session-config>
@@ -540,6 +577,7 @@
 		    <url-pattern>/download/</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
+    		<role-name>LEARNER</role-name>
     		<role-name>AUTHOR</role-name>
     		<role-name>MONITOR</role-name>
     	    <role-name>GROUP MANAGER</role-name>

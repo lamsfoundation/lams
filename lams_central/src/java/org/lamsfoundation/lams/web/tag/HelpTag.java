@@ -73,9 +73,15 @@ public class HelpTag extends TagSupport {
 	public int doStartTag() throws JspException {
 		try {
 		    
+			int imgHeight = 25;
+			boolean div = true;
+			
         	JspWriter writer = pageContext.getOut();
         	if (StringUtils.equals(style, "no-tabs")) {
         		writer.println("<div class='help-no-tabs'>");
+        	} else if (StringUtils.equals(style, "small")) {
+           		imgHeight = 18;
+           		div = false;
         	} else {
         		writer.println("<div class='help'>");
         	}
@@ -96,18 +102,21 @@ public class HelpTag extends TagSupport {
 					if(fullURL == null)
 						return SKIP_BODY;
 					
-					writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.jpg\" border=\"0\" width=\"25\" height=\"25\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
+					writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.jpg\" border=\"0\" width=\""+
+							imgHeight+"\" height=\""+imgHeight+"\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
 
 	        	
 	        	} else if(page != null){
 	        		
 	        		String fullURL = HelpUtil.constructPageURL(page, languageCode);
 
-	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.jpg\" border=\"0\" width=\"25\" height=\"25\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
+	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.jpg\" border=\"0\" width=\""+
+	        				imgHeight+"\" height=\""+imgHeight+"\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
 
 	        	} else {
 	        		log.error("HelpTag unable to write out due to unspecified values.");
-	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/css/warning.gif\" border=\"0\" width=\"20\" height=\"20\"/>");
+	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/css/warning.gif\" border=\"0\" width=\""+
+	        				imgHeight+"\" height=\""+imgHeight+"\"/>");
 	        	}
         	} catch (NullPointerException npe) {
     			log.error("HelpTag unable to write out due to NullPointerException. Most likely a required paramater was unspecified or incorrect.", npe);
@@ -115,7 +124,8 @@ public class HelpTag extends TagSupport {
 
     		}
         	
-        	writer.println("</div>");
+        	if ( div )
+        		writer.println("</div>");
         	
 		} catch (IOException e) {
 			log.error("HelpTag unable to write out due to IOException.", e);

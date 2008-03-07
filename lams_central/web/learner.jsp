@@ -8,7 +8,18 @@
 
 <lams:html>
 <lams:head>
-	<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/main.jsp?lessonID=<c:out value="${lessonID}"/><c:if test="${mode != null}">&mode=<c:out value="${mode}"/></c:if>">
+
+<c:set var="enableFlash"><lams:LearnerFlashEnabled/></c:set>
+	
+<c:choose>
+	<c:when test="${enableFlash}">
+		<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/mainflash.jsp?lessonID=<c:out value="${lessonID}"/>&portfolioEnabled=<c:out value="${portfolioEnabled}"/>&title=<c:out value="${title}"/><c:if test="${mode != null}">&mode=<c:out value="${mode}"/></c:if>">
+	</c:when>
+	<c:otherwise>
+		<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/mainnoflash.jsp?lessonID=<c:out value="${lessonID}"/>&portfolioEnabled=<c:out value="${portfolioEnabled}"/>&title=<c:out value="${title}"/><c:if test="${mode != null}">&mode=<c:out value="${mode}"/></c:if>">
+	</c:otherwise>
+</c:choose>
+
 	<TITLE><fmt:message key="title.learner.window"/></TITLE>
 	<lams:css/>
 </lams:head>

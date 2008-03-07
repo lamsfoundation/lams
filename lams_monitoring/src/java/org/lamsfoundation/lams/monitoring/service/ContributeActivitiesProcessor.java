@@ -87,12 +87,12 @@ public class ContributeActivitiesProcessor extends LearningDesignProcessor {
 		return mainActivityList;
 	}
 
-	public void startComplexActivity(ComplexActivity activity) {
+	public boolean startComplexActivity(ComplexActivity activity) {
 		
 		// Create a new current activity list, putting the old current one on the stack. 
 		activityListStack.push(currentActivityList);
 		currentActivityList = new Vector<ContributeActivityDTO>();
-		
+		return true;
 	}
 
 	public void endComplexActivity(ComplexActivity activity) {

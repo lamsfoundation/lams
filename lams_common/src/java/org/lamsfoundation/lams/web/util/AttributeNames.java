@@ -63,6 +63,7 @@ public class AttributeNames {
     public static final String PARAM_LESSON_ID = "lessonID";
     public static final String PARAM_DIRECTORY_NAME = "directoryName";
     public static final String PARAM_FILENAME = "filename";
+    public static final String PARAM_EXPORT_PORTFOLIO_ENABLED = "portfolioEnabled";
     
     public static final String PARAM_LIB = "library";
     

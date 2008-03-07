@@ -129,6 +129,11 @@
         path="/DisplayActivity.do"
         redirect="false"
       />
+      <forward
+        name="displayProgress"
+        path="/progress.jsp"
+        redirect="false"
+      />
     </action>
     <action
       path="/CompleteActivity"
@@ -307,11 +312,6 @@
       unknown="false"
       validate="false"
     >
-      <forward
-        name="empty"
-        path=".sequenceActivityEmpty"
-        redirect="false"
-      />
     </action>
     <action
       path="/DisplayActivity"

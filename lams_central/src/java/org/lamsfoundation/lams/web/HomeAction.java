@@ -158,7 +158,9 @@ public class HomeAction extends DispatchAction {
 				
 				if(mode != null)
 					req.setAttribute(AttributeNames.PARAM_MODE, mode);
-
+				
+				req.setAttribute(AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED, lesson.getLearnerExportAvailable() != null ? lesson.getLearnerExportAvailable(): Boolean.TRUE);
+				req.setAttribute(AttributeNames.PARAM_TITLE, lesson.getLessonName());
 				String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 				req.setAttribute("serverUrl", serverUrl);
 				req.setAttribute(AttributeNames.PARAM_LESSON_ID,lessonId);

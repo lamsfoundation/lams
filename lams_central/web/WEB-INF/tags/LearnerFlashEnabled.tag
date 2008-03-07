@@ -38,7 +38,7 @@
 <c:set var="userEnableFlash"><lams:user property="enableFlash"/></c:set>
 
 <c:choose>
-	<c:when test="${param.mode=='preview' or (serverEnableFlash and userEnableFlash)}">true</c:when>
+	<c:when test="${serverEnableFlash and userEnableFlash}">true</c:when>
 	<c:otherwise>false</c:otherwise>
 </c:choose>
 	
