@@ -327,6 +327,8 @@ class LearnerActivity extends MovieClip {
 					Debugger.log('parent :'+this._parent._parent, Debugger.CRITICAL,'onRelease','LearnerActivity');
 					
 					var activeSequence = LearnerComplexActivity(this._parent._parent).getActiveSequence();
+					Debugger.log('activeSequence:'+activeSequence, Debugger.CRITICAL,'onRelease','LearnerActivity');
+					
 					if(activeSequence == this.activity) {
 						// close current active sequence
 						LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(null);
@@ -334,6 +336,10 @@ class LearnerActivity extends MovieClip {
 						// open sequence
 						LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(this.activity);
 					}
+				} else if(this.activity.isBranchingActivity()) {
+					Debugger.log("hitting branching: " + this.activity.activityUIID, Debugger.CRITICAL,'onRelease','LearnerActivity');
+					
+					
 				}
 				
 				controller.activityRelease(this);

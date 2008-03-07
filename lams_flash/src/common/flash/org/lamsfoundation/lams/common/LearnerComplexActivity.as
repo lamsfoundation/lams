@@ -187,8 +187,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			count++;
 			
 			if(learnerAct.activity == activeSequence) {
-				var actOrder:Array = model.getDesignOrder(activeSequence.firstActivityUIID, false);
-				drawChildren(actOrder, container, count);
+				if(activeSequence.firstActivityUIID != null) {
+					var actOrder:Array = model.getDesignOrder(activeSequence.firstActivityUIID, true);
+					drawChildren(actOrder, container, count);
+				}
 			}
 		}
 		
@@ -295,7 +297,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		activeSequence = activity;
 		redrawComplex();
 		
-		if(!locked) { 
+		if(!locked && isLearnerModule()) { 
 			localOnPress();
 			localOnRelease();
 		}
@@ -304,6 +306,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private function redrawComplex():Void {
 		removeAllChildren();
 		drawChildren(_children, children_mc);
+		
 		MovieClipUtils.doLater(Proxy.create(this, draw));
 	}
 	
@@ -434,10 +437,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		Debugger.log ('_doubleClicking:' + _doubleClicking + ', localOnRelease:' + this, Debugger.GEN, 'localOnRelease', 'LearnerOptionalActivity');
 			if (_locked && !_doubleClicking){
 				collapse();
-				controller.complexActivityRelease(this, _doubleClicking);
+				if(isLearnerModule()) controller.complexActivityRelease(this, _doubleClicking);
 			} else {
 				expand();
-				controller.complexActivityRelease(this,_doubleClicking);
+				if(isLearnerModule()) controller.complexActivityRelease(this,_doubleClicking);
 			}
 	}
 	
