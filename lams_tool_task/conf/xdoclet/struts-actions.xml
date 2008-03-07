@@ -112,25 +112,35 @@
 			parameter="downItem">
 			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
 		</action>
+		
+		<!-- ==========  Review Task  ========== -->
+		<action path="/reviewtask/reviewTask"
+			type="org.lamsfoundation.lams.tool.taskList.web.action.ViewItemAction"
+			name="taskListItemForm" 
+			scope="request" 
+			parameter="reviewTask" 
+			validate="false">
+			<forward name="success" path="/pages/reviewtask/reviewtask.jsp" />
+		</action>
+		
+		<action path="/reviewtask/addNewComment"
+			type="org.lamsfoundation.lams.tool.taskList.web.action.ViewItemAction"
+			parameter="addNewComment"
+			name="taskListItemForm" 
+			scope="request" 
+			validate="false">
+			<forward name="success" path="/pages/reviewtask/success.jsp" />
+		</action>
+		
+		<action path="/reviewtask/uploadFile"
+			type="org.lamsfoundation.lams.tool.taskList.web.action.ViewItemAction"
+			name="taskListItemForm" 
+			scope="request" 
+			validate="false"
+			parameter="uploadFile">
+			<forward name="success" path="/pages/reviewtask/reviewtask.jsp" />
+		</action>
 
-		
-		<!-- ==========  Display Item  ========== -->
-		<action path="/reviewItem"
-			type="org.lamsfoundation.lams.tool.taskList.web.action.ViewItemAction"
-			parameter="reviewItem">
-			<forward name="success" path="/pages/itemreview/mainframe.jsp" />
-		</action>
-		<action path="/nextInstruction"
-			type="org.lamsfoundation.lams.tool.taskList.web.action.ViewItemAction"
-			parameter="nextInstruction">
-			<forward name="success" path="/pages/itemreview/instructionsnav.jsp" />
-		</action>
-		<action path="/openUrlPopup"
-			type="org.lamsfoundation.lams.tool.taskList.web.action.ViewItemAction"
-			parameter="openUrlPopup">
-			<forward name="success" path="/pages/itemreview/openurl.jsp" />
-		</action>
-		
 		<!-- ========== BEGIN: Learning Definitions ============================== -->
 		<action path="/learning/start"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.LearningAction"
@@ -160,9 +170,9 @@
 			<forward name="success" path="/pages/learning/addtask.jsp" />
 		</action>
 		
-		<action path="/learning/saveOrUpdateItem"
+		<action path="/learning/saveNewTask"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.LearningAction"
-			parameter="saveOrUpdateItem"
+			parameter="saveNewTask"
 			name="taskListItemForm" 
 			scope="request" 
 			validate="false">

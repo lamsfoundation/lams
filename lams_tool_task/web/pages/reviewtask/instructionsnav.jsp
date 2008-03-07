@@ -23,16 +23,16 @@
 </c:choose>
 
 <lams:html>
-	<lams:head>
-		<title>${instructions.title}</title>
+<lams:head>
+	<title>${instructions.title}</title>
 
-		<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/header.jsp"%>
 
-		<%-- param has higher level for request attribute --%>
-		<c:if test="${not empty param.mode}">
-			<c:set var="mode" value="${param.mode}" />
-		</c:if>
-		<script language="JavaScript" type="text/JavaScript">
+	<%-- param has higher level for request attribute --%>
+	<c:if test="${not empty param.mode}">
+		<c:set var="mode" value="${param.mode}" />
+	</c:if>
+	<script language="JavaScript" type="text/JavaScript">
 		<!--
 				function finishIns(){
 				//learner and author(preview mode) will mark the finish
@@ -58,58 +58,45 @@
 				}
 		//-->
 		</script>
-	</lams:head>
-	<body>
+</lams:head>
+<body>
 
-		<div id="instructions">
-			<h2>
-				<fmt:message key="message.step.of">
-					<fmt:param value="${instructions.current}" />
-					<fmt:param value="${instructions.total}" />
-				</fmt:message>
-			</h2>
-<span class="right-buttons">
-				<c:choose>
-				
-				<c:when test="${instructions.current < instructions.total}">
-					<a href="#" id="NextInstruction"
-						onClick="javascript:nextIns(${instructions.current})"
-						class="button"> <fmt:message key='label.next.instruction' />
-					</a>
-				</c:when>
-				<c:when test="${reflectOn && runAuto}">
-					<a href="#" id="FinishInstruction"
-						onClick="javascript:continueReflect()" class="button"> <fmt:message
-							key='label.continue' /> </a>
-				</c:when>
-				<c:otherwise>
-					<a href="#" id="FinishInstruction" onClick="javascript:finishIns()"
-						class="button"> <fmt:message key='label.finish' /> </a>
-				</c:otherwise>
-			</c:choose>
-			</span>
+<div id="instructions">
+<h2><fmt:message key="message.step.of">
+	<fmt:param value="${instructions.current}" />
+	<fmt:param value="${instructions.total}" />
+</fmt:message></h2>
+<span class="right-buttons"> <c:choose>
 
-			<p>
+	<c:when test="${instructions.current < instructions.total}">
+		<a href="#" id="NextInstruction"
+			onClick="javascript:nextIns(${instructions.current})" class="button">
+		<fmt:message key='label.next.instruction' /> </a>
+	</c:when>
+	<c:when test="${reflectOn && runAuto}">
+		<a href="#" id="FinishInstruction"
+			onClick="javascript:continueReflect()" class="button"> <fmt:message
+			key='label.continue' /> </a>
+	</c:when>
+	<c:otherwise>
+		<a href="#" id="FinishInstruction" onClick="javascript:finishIns()"
+			class="button"> <fmt:message key='label.finish' /> </a>
+	</c:otherwise>
+</c:choose> </span>
 
-				<c:choose>
-					<c:when test="${instructions.instruction == null}">
-						<fmt:message key="msg.no.instruction" />
-					</c:when>
-					<c:otherwise>
+<p><c:choose>
+	<c:when test="${instructions.instruction == null}">
+		<fmt:message key="msg.no.instruction" />
+	</c:when>
+	<c:otherwise>
 					${instructions.instruction.description}
 				</c:otherwise>
-				</c:choose>
+</c:choose></p>
 
 
 
 
 
-			</p>
-
-
-
-
-
-		</div>
-	</body>
+</div>
+</body>
 </lams:html>

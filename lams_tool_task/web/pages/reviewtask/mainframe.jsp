@@ -18,10 +18,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt 
 --%>
-<%@ include file="/common/taglibs.jsp" %>
+<%@ include file="/common/taglibs.jsp"%>
 <frameset rows="95,*" frameborder="no">
-	<frame src="<c:url value="/pages/itemreview/initnav.jsp"/>?mode=${mode}&itemIndex=${itemIndex}&itemUid=${itemUid}&toolSessionID=${toolSessionID}&sessionMapID=${sessionMapID}" 
-	name=headerFrame" marginheight="0" scrolling="YES">
+	<frame
+		src="<c:url value="/pages/itemreview/initnav.jsp"/>?mode=${mode}&itemIndex=${itemIndex}&itemUid=${itemUid}&toolSessionID=${toolSessionID}&sessionMapID=${sessionMapID}"
+		name=headerFrame " marginheight="0" scrolling="YES">
 </frameset>
 
 
@@ -37,15 +38,16 @@ request using this page as target
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
             "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
-	<lams:head>
-	</lams:head>
-	<body class="stripes" bgcolor="#9DC5EC" border="1" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-		<c:redirect url="/nextInstruction.do">
-			<c:param name="mode" value="${mode}"/>
-			<c:param name="itemIndex" value="${itemIndex}"/>
-			<c:param name="itemUid" value="${itemUid}"/>
-			<c:param name="toolSessionID" value="${toolSessionID}"/>
-			<c:param name="sessionMapID" value="${sessionMapID}"/>
-		</c:redirect>
-	</body>
+<lams:head>
+</lams:head>
+<body class="stripes" bgcolor="#9DC5EC" border="1" leftmargin="0"
+	topmargin="0" marginwidth="0" marginheight="0">
+<c:redirect url="/nextInstruction.do">
+	<c:param name="mode" value="${mode}" />
+	<c:param name="itemIndex" value="${itemIndex}" />
+	<c:param name="itemUid" value="${itemUid}" />
+	<c:param name="toolSessionID" value="${toolSessionID}" />
+	<c:param name="sessionMapID" value="${sessionMapID}" />
+</c:redirect>
+</body>
 </lams:html>

@@ -83,8 +83,7 @@ public class AuthoringAction extends Action {
 	
 	private static Logger log = Logger.getLogger(AuthoringAction.class);
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws Exception{
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String param = mapping.getParameter();
 		//-----------------------TaskList Author function ---------------------------

@@ -1,7 +1,8 @@
 <%@ include file="/common/taglibs.jsp"%>
-<%@ page import="org.lamsfoundation.lams.contentrepository.client.IToolContentHandler"%>
+<%@ page
+	import="org.lamsfoundation.lams.contentrepository.client.IToolContentHandler"%>
 
-<c:set var="targetFileType"	value="<%=IToolContentHandler.TYPE_ONLINE%>" />
+<c:set var="targetFileTyp value="<%=IToolContentHandler.TYPE_ONLINE%>" / 
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="fileList" value="${sessionMap.instructionAttachmentList}" />
 

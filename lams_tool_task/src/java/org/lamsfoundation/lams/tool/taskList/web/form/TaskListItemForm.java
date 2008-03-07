@@ -24,6 +24,8 @@
 package org.lamsfoundation.lams.tool.taskList.web.form;
 
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
 /**
  *  TaskList Item  Form.
  *	@struts.form name="taskListItemForm"
@@ -47,6 +49,9 @@ public class TaskListItemForm extends ActionForm {
 	private boolean isChildTask;
 	
 	private String parentTaskName;
+	
+    private FormFile uploadedFile;
+    private TaskListItemComment comment;
 	
 	public String getDescription() {
 		return description;
@@ -112,5 +117,19 @@ public class TaskListItemForm extends ActionForm {
 	}
 	public void setParentTaskName(String parentTaskName) {
 		this.parentTaskName = parentTaskName;
+	}
+	
+	public FormFile getUploadedFile() {
+		return uploadedFile;
+	}
+	public void setUploadedFile(FormFile uploadedFile) {
+		this.uploadedFile = uploadedFile;
+	}
+	
+	public TaskListItemComment getComment() {
+		return comment;
+	}
+	public void setComment(TaskListItemComment comment) {
+		this.comment = comment;
 	}
 }

@@ -79,8 +79,7 @@ public class LearningAction extends Action {
 
 	private static Logger log = Logger.getLogger(LearningAction.class);
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		
 		String param = mapping.getParameter();
 		//-----------------------TaskList Learner function ---------------------------
@@ -95,11 +94,12 @@ public class LearningAction extends Action {
 		if(param.equals("finish")){
 			return finish(mapping, form, request, response);
 		}
+		
 		if (param.equals("addtask")) {
 			return addTask(mapping, form, request, response);
 		}
-        if (param.equals("saveOrUpdateItem")) {
-        	return saveOrUpdateItem(mapping, form, request, response);
+        if (param.equals("saveNewTask")) {
+        	return saveNewTask(mapping, form, request, response);
         }
         
 		//================ Reflection =======================
@@ -112,6 +112,7 @@ public class LearningAction extends Action {
 		
 		return  mapping.findForward(TaskListConstants.ERROR);
 	}
+	
 	/**
 	 * Initial page for add taskList item (single file or URL).
 	 * @param mapping
@@ -126,6 +127,7 @@ public class LearningAction extends Action {
 		itemForm.setSessionMapID(WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID));
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}
+	
 	/**
 	 * Read taskList data from database and put them into HttpSession. It will redirect to init.do directly after this
 	 * method run successfully. 
@@ -231,6 +233,7 @@ public class LearningAction extends Action {
 		
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}
+	
 	/**
 	 * Mark taskList item as complete status. 
 	 * @param mapping
@@ -304,7 +307,7 @@ public class LearningAction extends Action {
 	 * @param response
 	 * @return
 	 */
-	private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+	private ActionForward saveNewTask(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		//get back SessionMap
 		String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);

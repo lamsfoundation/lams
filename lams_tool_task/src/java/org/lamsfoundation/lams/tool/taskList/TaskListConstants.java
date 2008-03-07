@@ -72,9 +72,15 @@ public class TaskListConstants {
 	public static final String ATTR_FINISH_LOCK = "finishedLock";
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 	public static final String ATTR_RESOURCE_FORM = "taskListForm";
+	public static final String ATTR_TASKLIST_FORM = "taskListItemForm";
 	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 	public static final String ATTR_TITLE = "title";
 	public static final String ATTR_USER_FINISHED = "userFinished";
+	public static final String ATTR_TASK_LIST_ITEM = "taskListItem";
+	public static final String ATTR_TASK_LIST_ITEM_TITLE = "taskListItemTitle";
+	public static final String ATTR_TASK_LIST_ITEM_DESCRIPTION = "taskListItemDescription";
+	public static final String ATTR_TASK_LIST_ITEM_ATTACHMENT_LIST = "taskListItemAttachmentList";
+	public static final String ATTR_TASK_LIST_ITEM_COMMENT_LIST = "taskListItemCommentList";
 	
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";

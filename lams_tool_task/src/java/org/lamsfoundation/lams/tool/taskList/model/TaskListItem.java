@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.taskList.model;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -64,6 +65,9 @@ public class TaskListItem  implements Cloneable{
 	//***********************************************
 	//DTO fields:
 	private boolean complete;
+	
+	private List<TaskListItemAttachment> uploadedFileList;
+	private List<TaskListItemComment> comments;
 	
     public Object clone(){
     	TaskListItem obj = null;
@@ -261,6 +265,20 @@ public class TaskListItem  implements Cloneable{
 		}
 		public void setParentTaskName(String parentTaskName) {
 			this.parentTaskName = parentTaskName;
+		}
+		
+		public List<TaskListItemAttachment> getUploadedFileList() {
+			return uploadedFileList;
+		}
+		public void setUploadedFileList(List<TaskListItemAttachment> uploadedFileList) {
+			this.uploadedFileList = uploadedFileList;
+		}
+		
+		public List<TaskListItemComment> getComments() {
+			return comments;
+		}
+		public void setComments(List<TaskListItemComment> comments) {
+			this.comments = comments;
 		}
 
 }

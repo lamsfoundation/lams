@@ -9,7 +9,7 @@
 	<body>
 
 
-		<html:form action="/learning/saveOrUpdateItem" method="post" styleId="taskListItemForm">
+		<html:form action="/learning/saveNewTask" method="post" styleId="taskListItemForm">
 			<html:hidden property="mode"/>
 			<html:hidden property="sessionMapID"/>
 

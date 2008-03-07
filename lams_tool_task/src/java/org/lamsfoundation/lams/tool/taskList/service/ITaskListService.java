@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 
@@ -75,6 +76,18 @@ public interface ITaskListService
 	 * @throws UploadTaskListFileException
 	 */
 	TaskListAttachment uploadInstructionFile(FormFile file, String type) throws UploadTaskListFileException;
+	
+	
+	/**
+	 * Upload tasklistItem file to repository.
+	 * 
+	 * @param uploadFile
+	 * @param fileType
+	 * @param userLogin
+	 * @return
+	 * @throws UploadTaskListFileException
+	 */
+	TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, String fileType, String userLogin) throws UploadTaskListFileException; 
 	
 	//********** for user methods *************
 	/**

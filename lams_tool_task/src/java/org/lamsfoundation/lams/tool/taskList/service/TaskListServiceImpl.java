@@ -75,6 +75,8 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListAttachmentDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListDAO;
+import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemAttachmentDAO;
+import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemCommentDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemVisitDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListSessionDAO;
@@ -84,6 +86,7 @@ import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
@@ -102,10 +105,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * @author Dapeng.Ni 
  * 
  */
-public class TaskListServiceImpl implements
-                              ITaskListService,ToolContentManager, ToolSessionManager, ToolContentImport102Manager
-               
-{
+public class TaskListServiceImpl implements ITaskListService,ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
 	static Logger log = Logger.getLogger(TaskListServiceImpl.class.getName());
 	private TaskListDAO taskListDao;
 	private TaskListItemDAO taskListItemDao;
@@ -113,6 +113,8 @@ public class TaskListServiceImpl implements
 	private TaskListUserDAO taskListUserDao;
 	private TaskListSessionDAO taskListSessionDao;
 	private TaskListItemVisitDAO taskListItemVisitDao;
+	private TaskListItemAttachmentDAO taskListItemAttachmentDao;
+	private TaskListItemCommentDAO taskListItemCommentDAO;
 	//tool service
 	private TaskListToolContentHandler taskListToolContentHandler;
 	private MessageService messageService;
@@ -209,7 +211,6 @@ public class TaskListServiceImpl implements
 		}
 	}
 
-
 	public TaskList getTaskListByContentId(Long contentId) {
 		TaskList rs = taskListDao.getByContentId(contentId);
 		if(rs == null){
@@ -217,7 +218,6 @@ public class TaskListServiceImpl implements
 		}
 		return rs; 
 	}
-
 
 	public TaskList getDefaultContent(Long contentId) throws TaskListApplicationException {
     	if (contentId == null)
@@ -252,6 +252,25 @@ public class TaskListServiceImpl implements
 		file.setFileUuid(nodeKey.getUuid());
 		file.setFileVersionId(nodeKey.getVersion());
 		file.setFileName(uploadFile.getFileName());
+		
+		return file;
+	}
+	
+	public TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, String fileType, String userLogin) throws UploadTaskListFileException {
+		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
+			throw new UploadTaskListFileException(messageService.getMessage("error.msg.upload.file.not.found",new Object[]{uploadFile}));
+		
+		//upload file to repository
+		NodeKey nodeKey = processFile(uploadFile,fileType);
+		
+		//create new attachement
+		TaskListItemAttachment file = new TaskListItemAttachment();
+		file.setFileType(fileType);
+		file.setFileUuid(nodeKey.getUuid());
+		file.setFileVersionId(nodeKey.getVersion());
+		file.setFileName(uploadFile.getFileName());
+		file.setCreated(new Timestamp(new Date().getTime()));
+		file.setCreateBy(userLogin);
 		
 		return file;
 	}
@@ -293,7 +312,10 @@ public class TaskListServiceImpl implements
 
 	public void deleteTaskListAttachment(Long attachmentUid) {
 		taskListAttachmentDao.removeObject(TaskListAttachment.class, attachmentUid);
-		
+	}
+	
+	public void deleteTaskListItemAttachment(Long attachmentUid) {
+		taskListItemAttachmentDao.removeObject(TaskListItemAttachment.class, attachmentUid);
 	}
 
 

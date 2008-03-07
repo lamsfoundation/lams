@@ -6,7 +6,213 @@
 <schema alias="" name="LAMS" remarks="" uid="1e47441:118111fd0b1:-7fff">
 <schema-description/>
 <domain-list/>
-<table-list/>
+<table-list>
+<table alias="" name="tl_latask10_item_comment" remarks="" uid="17c04e0:1187758bd62:-7ff8">
+<table-description/>
+<table-figure-bounds height="-1" width="-1" x="-1" y="87"/>
+<column-list>
+<column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="17c04e0:1187758bd62:-7ff0">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="comment" remarks="" uid="17c04e0:1187758bd62:-7f76">
+<column-description/>
+<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="taskList_item_uid" remarks="" uid="17c04e0:1187758bd62:-7f71">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="create_by" remarks="" uid="17c04e0:1187758bd62:-7f6c">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="create_date" remarks="" uid="17c04e0:1187758bd62:-7f63">
+<column-description/>
+<data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+</column-list>
+<primary-key alias="" name="PK_TL_LATASK10_ITEM_COMMENT" remarks="" uid="17c04e0:1187758bd62:-7ff7">
+<primary-key-description/>
+<primary-key-column name="uid"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key alias="" name="FK_tl_latask10_item_comment_1" on-delete="" on-update="" referenced-key="PK_TL_LATASK10_ITEM_COMMENT" referenced-table="tl_latask10_item_comment" referenced-table-schema="LAMS" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="17c04e0:1187758bd62:-7e8e">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="uid" referenced-key-column-name="uid"/>
+</foreign-key>
+<foreign-key alias="" name="FK_tl_latask10_item_comment_2" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_latask10_user" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="17c04e0:1187758bd62:-7d66">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="create_by" referenced-key-column-name="uid"/>
+</foreign-key>
+<foreign-key alias="" name="FK_tl_latask10_item_comment_3" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_latask10_taskList_item" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="17c04e0:1187758bd62:-7d07">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="taskList_item_uid" referenced-key-column-name="uid"/>
+</foreign-key>
+</foreign-key-list>
+<index-list/>
+</table>
+<table alias="" name="tl_latask10_item_attachment" remarks="" uid="17c04e0:1187758bd62:-7ce8">
+<table-description/>
+<table-figure-bounds height="-1" width="-1" x="350" y="762"/>
+<column-list>
+<column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="17c04e0:1187758bd62:-7ce6">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="file_version_id" remarks="" uid="17c04e0:1187758bd62:-7ce5">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="file_type" remarks="" uid="17c04e0:1187758bd62:-7ce4">
+<column-description/>
+<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="file_name" remarks="" uid="17c04e0:1187758bd62:-7ce3">
+<column-description/>
+<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="file_uuid" remarks="" uid="17c04e0:1187758bd62:-7ce2">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="19" decimal-digits="0" default-value="" mandatory="false" name="create_date" remarks="" uid="17c04e0:1187758bd62:-7ce1">
+<column-description/>
+<data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="taskList_item_uid" remarks="" uid="17c04e0:1187758bd62:-7ce0">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="create_by" remarks="" uid="17c04e0:1187758bd62:-7cd7">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key alias="" name="PRIMARY" remarks="" uid="17c04e0:1187758bd62:-7cdf">
+<primary-key-description/>
+<primary-key-column name="uid"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key alias="" name="FK_tl_latask10_item_attachment_2" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_latask10_user" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="17c04e0:1187758bd62:-7c50">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="create_by" referenced-key-column-name="uid"/>
+</foreign-key>
+<foreign-key alias="" name="FK_tl_latask10_item_attachment_1" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_latask10_taskList_item" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="17c04e0:1187758bd62:-7c89">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="taskList_item_uid" referenced-key-column-name="uid"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index alias="" name="FK_NEW_174079138_1E7009430E79035" remarks="" uid="17c04e0:1187758bd62:-7cde" unique="false">
+<index-description/>
+<index-column name="taskList_item_uid" sort="ASC"/>
+</index>
+</index-list>
+</table>
+</table-list>
 </schema>
 <schema alias="" name="DEFAULT_SCHEMA" remarks="" uid="1e47441:118111fd0b1:-7ffe">
 <schema-description/>
@@ -14,7 +220,7 @@
 <table-list>
 <table alias="" name="tl_latask10_attachment" remarks="" uid="1e47441:118111fd0b1:-7ffd">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="27" y="403"/>
+<table-figure-bounds height="-1" width="-1" x="1376" y="70"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="1e47441:118111fd0b1:-7ffb">
 <column-description/>
@@ -112,7 +318,7 @@
 </table>
 <table alias="" name="tl_latask10_taskList" remarks="" uid="1e47441:118111fd0b1:-7fea">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="52" y="28"/>
+<table-figure-bounds height="-1" width="-1" x="970" y="12"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="1e47441:118111fd0b1:-7fe8">
 <column-description/>
@@ -260,7 +466,7 @@
 </table>
 <table alias="" name="tl_latask10_taskList_item" remarks="" uid="1e47441:118111fd0b1:-7fd4">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="521" y="596"/>
+<table-figure-bounds height="-1" width="-1" x="939" y="656"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="1e47441:118111fd0b1:-7fd2">
 <column-description/>
@@ -449,7 +655,7 @@
 </table>
 <table alias="" name="tl_latask10_item_log" remarks="" uid="1e47441:118111fd0b1:-7fbc">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="1314" y="703"/>
+<table-figure-bounds height="-1" width="-1" x="12" y="458"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="1e47441:118111fd0b1:-7fba">
 <column-description/>
@@ -537,7 +743,7 @@
 </table>
 <table alias="" name="tl_latask10_session" remarks="" uid="1e47441:118111fd0b1:-7fb2">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="1320" y="98"/>
+<table-figure-bounds height="-1" width="-1" x="1334" y="472"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="1e47441:118111fd0b1:-7fb0">
 <column-description/>
@@ -629,7 +835,7 @@
 </table>
 <table alias="" name="tl_latask10_user" remarks="" uid="1e47441:118111fd0b1:-7fa7">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="889" y="299"/>
+<table-figure-bounds height="-1" width="-1" x="427" y="79"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="1e47441:118111fd0b1:-7fa5">
 <column-description/>
