@@ -51,7 +51,7 @@ public class TaskListItemForm extends ActionForm {
 	private String parentTaskName;
 	
     private FormFile uploadedFile;
-    private TaskListItemComment comment;
+    private String comment;
 	
 	public String getDescription() {
 		return description;
@@ -126,10 +126,10 @@ public class TaskListItemForm extends ActionForm {
 		this.uploadedFile = uploadedFile;
 	}
 	
-	public TaskListItemComment getComment() {
+	public String getComment() {
 		return comment;
 	}
-	public void setComment(TaskListItemComment comment) {
+	public void setComment(String comment) {
 		this.comment = comment;
 	}
 }

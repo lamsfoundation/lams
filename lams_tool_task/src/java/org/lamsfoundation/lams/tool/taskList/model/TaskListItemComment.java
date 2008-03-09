@@ -36,7 +36,6 @@ public class TaskListItemComment {
 
 	private Long uid;
 	private String comment;
-	private TaskListItem taskListItem;
 	private TaskListUser createBy;
 	private Date createDate;
 	
@@ -50,18 +49,7 @@ public class TaskListItemComment {
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
-	/**
-	 * @hibernate.many-to-one  column="taskList_item_uid"
- 	 * cascade="none"
-	 * @return
-	 */
-	public TaskListItem getTaskListItem() {
-		return taskListItem;
-	}
-	public void setTaskListItem(TaskListItem item) {
-		this.taskListItem = item;
-	}
-	
+
 	/**
 	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
 	 * @return Returns the log Uid.

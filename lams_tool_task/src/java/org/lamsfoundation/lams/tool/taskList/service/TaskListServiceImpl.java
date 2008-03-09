@@ -256,7 +256,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		return file;
 	}
 	
-	public TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, String fileType, String userLogin) throws UploadTaskListFileException {
+	public TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, String fileType, TaskListUser user) throws UploadTaskListFileException {
 		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
 			throw new UploadTaskListFileException(messageService.getMessage("error.msg.upload.file.not.found",new Object[]{uploadFile}));
 		
@@ -270,16 +270,14 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		file.setFileVersionId(nodeKey.getVersion());
 		file.setFileName(uploadFile.getFileName());
 		file.setCreated(new Timestamp(new Date().getTime()));
-		file.setCreateBy(userLogin);
-		
+		file.setCreateBy(user);
+
 		return file;
 	}
-
 
 	public void createUser(TaskListUser taskListUser) {
 		taskListUserDao.saveObject(taskListUser);
 	}
-
 
 	public TaskListUser getUserByIDAndContent(Long userId, Long contentId) {
 		

@@ -129,7 +129,7 @@
 			name="taskListItemForm" 
 			scope="request" 
 			validate="false">
-			<forward name="success" path="/pages/reviewtask/success.jsp" />
+			<forward name="success" path="/pages/reviewtask/reviewtask.jsp" />
 		</action>
 		
 		<action path="/reviewtask/uploadFile"

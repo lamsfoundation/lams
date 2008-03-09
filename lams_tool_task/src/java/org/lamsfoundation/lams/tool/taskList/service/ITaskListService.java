@@ -87,7 +87,7 @@ public interface ITaskListService
 	 * @return
 	 * @throws UploadTaskListFileException
 	 */
-	TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, String fileType, String userLogin) throws UploadTaskListFileException; 
+	TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, String fileType, TaskListUser user) throws UploadTaskListFileException; 
 	
 	//********** for user methods *************
 	/**

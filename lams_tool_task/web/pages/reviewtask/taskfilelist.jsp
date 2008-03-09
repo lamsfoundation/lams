@@ -1,43 +1,34 @@
-<%@ include file="/common/taglibs.jsp"%>
-<%@ page
-	import="org.lamsfoundation.lams.contentrepository.client.IToolContentHandler"%>
-
-<c:set var="targetFileTyp value="<%=IToolContentHandler.TYPE_ONLINE%>" / 
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-<c:set var="fileList" value="${sessionMap.instructionAttachmentList}" />
-
-<%-- check whehter has target file type --%>
-<c:forEach var="file" items="${fileList}">
-	<c:if test="${targetFileType == file.fileType}">
-		<c:set var="hasFile" value="${true}" />
+<div>
+	<c:set var="fileList" value="${sessionMap.taskListItemAttachmentList}" />
+	 
+	<c:if test="${(fn:length(fileList) != 0)}">
+		<div class="field-name">
+			<fmt:message key="label.preview.filelist" />
+		</div>
 	</c:if>
-</c:forEach>
-
-<%-- Display target file type --%>
-<c:if test="${hasFile}">
+							
+	<%-- Display target file type --%>
 	<ul>
 		<c:forEach var="file" items="${fileList}">
-			<c:if test="${targetFileType == file.fileType}">
+			<c:if test="${sessionMap.taskListItem.showCommentsToAll || (sessionMap.userLogin == file.createBy.loginName)}">
+			
 				<li>
 					<c:out value="${file.fileName}" />
-					<c:set var="viewURL">
-						<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=false" />
-					</c:set>
-					<html:link href="javascript:launchPopup('${viewURL}','instructionfile')">
-						<fmt:message key="label.view"/>
-					</html:link>
-					
+												
+					<c:if test="${file.createBy != null}">
+						[${file.createBy.loginName}]
+					</c:if>
+													
 					<c:set var="downloadURL">
 						<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
 					</c:set>
 					<html:link href="${downloadURL}">
 						<fmt:message key="label.download" />
 					</html:link>
-					<html:link href="#"	onclick="deleteOnlineFile(${file.fileUuid},${file.fileVersionId})">
-						<fmt:message key="label.authoring.online.delete" />
-					</html:link>
+												
 				</li>
 			</c:if>
 		</c:forEach>
 	</ul>
-</c:if>
+	<br/>
+</div>

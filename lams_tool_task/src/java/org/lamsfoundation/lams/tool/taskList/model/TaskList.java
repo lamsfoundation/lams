@@ -93,9 +93,9 @@ public class TaskList implements Cloneable{
   		attachments = new HashSet();
   		taskListItems = new HashSet();
   	}
-//  **********************************************************
+  	//  **********************************************************
   	//		Function method for TaskList
-//  **********************************************************
+  	//  **********************************************************
 	public static TaskList newInstance(TaskList defaultContent, Long contentId, TaskListToolContentHandler taskListToolContentHandler) {
 		TaskList toContent = new TaskList();
 		defaultContent.toolContentHandler = taskListToolContentHandler;
@@ -118,6 +118,7 @@ public class TaskList implements Cloneable{
   		try{
   			taskList = (TaskList) super.clone();
   			taskList.setUid(null);
+  			//clone taskListItems
   			if(taskListItems != null){
   				Iterator iter = taskListItems.iterator();
   				Set set = new HashSet();

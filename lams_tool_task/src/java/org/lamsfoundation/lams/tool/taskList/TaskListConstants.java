@@ -99,5 +99,6 @@ public class TaskListConstants {
 	
 	public static final String ATTR_REFLECT_LIST = "reflectList";
 	public static final String ATTR_USER_UID = "userUid";
+	public static final String ATTR_USER_LOGIN = "userLogin";
 
 }

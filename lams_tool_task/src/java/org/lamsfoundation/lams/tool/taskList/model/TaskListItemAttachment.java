@@ -49,54 +49,57 @@ public class TaskListItemAttachment implements Cloneable{
     private String fileType;
     private String fileName;
     private Date created;
-    private String createBy;
+    private TaskListUser createBy;
     
-    //Default contruction method
-    public TaskListItemAttachment(){
-    	
-    }
-//  **********************************************************
-  	//		Function method for Attachment
-//  **********************************************************
-    public Object clone(){
-		Object obj = null;
-		try {
-			obj = super.clone();
-			((TaskListItemAttachment)obj).setUid(null);
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + TaskListItemAttachment.class + " failed");
-		}
-		
-		return obj;
-	}
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (!(o instanceof TaskListItemAttachment))
-			return false;
-
-		final TaskListItemAttachment genericEntity = (TaskListItemAttachment) o;
-
-      	return new EqualsBuilder()
-      	.append(this.uid,genericEntity.uid)
-      	.append(this.fileVersionId,genericEntity.fileVersionId)
-      	.append(this.fileName,genericEntity.fileName)
-      	.append(this.fileType,genericEntity.fileType)
-      	.append(this.created,genericEntity.created)
-      	.isEquals();
-	}
-
-	public int hashCode() {
-		return new HashCodeBuilder().append(uid).append(fileVersionId).append(fileName).append(fileType).append(created)
-				.toHashCode();
-	}
+//    //Default contruction method
+//    public TaskListItemAttachment(){
+//    	
+//    }
+//    //  **********************************************************
+//  	//		Function method for Attachment
+//    //  **********************************************************
+//    public Object clone(){
+//		Object obj = null;
+//		try {
+//			obj = super.clone();
+//			((TaskListItemAttachment)obj).setUid(null);
+//		} catch (CloneNotSupportedException e) {
+//			log.error("When clone " + TaskListItemAttachment.class + " failed");
+//		}
+//		
+//		return obj;
+//	}
+//	public boolean equals(Object o) {
+//		if (this == o)
+//			return true;
+//		if (!(o instanceof TaskListItemAttachment))
+//			return false;
+//
+//		final TaskListItemAttachment genericEntity = (TaskListItemAttachment) o;
+//
+//      	return new EqualsBuilder()
+//      	.append(this.uid,genericEntity.uid)
+//      	.append(this.fileVersionId,genericEntity.fileVersionId)
+//      	.append(this.fileName,genericEntity.fileName)
+//      	.append(this.fileType,genericEntity.fileType)
+//      	.append(this.created,genericEntity.created)
+//      	.append(this.createBy,genericEntity.createBy)
+//      	.isEquals();
+//	}
+//
+//	public int hashCode() {
+//		return new HashCodeBuilder().append(uid).append(fileVersionId).append(
+//				fileName).append(fileType).append(created).append(createBy)
+//				.toHashCode();
+//	}
 	
-//  **********************************************************
+	//  **********************************************************
   	//		get/set methods
-//  **********************************************************
-    /**
-     * @hibernate.id column="uid" generator-class="native"
-     */
+	//  **********************************************************
+	/**
+	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 * @return Returns the log Uid.
+	 */
     public Long getUid() {
         return uid;
     }
@@ -151,6 +154,7 @@ public class TaskListItemAttachment implements Cloneable{
 	public void setFileUuid(Long uuid) {
 		this.fileUuid = uuid;
 	}
+	
 	/**
 	 * @hibernate.property column="create_date"
 	 * @return
@@ -162,16 +166,17 @@ public class TaskListItemAttachment implements Cloneable{
 	public void setCreated(Date created) {
 		this.created = created;
 	}
-	
+
 	/**
-	 * @hibernate.property column="create_by"
+	 * @hibernate.many-to-one  column="create_by"
+ 	 * cascade="none"
 	 * @return
 	 */
-	public String getCreateBy() {
+	public TaskListUser getCreateBy() {
 		return createBy;
 	}
 
-	public void setCreateBy(String createBy) {
+	public void setCreateBy(TaskListUser createBy) {
 		this.createBy = createBy;
 	}
 }

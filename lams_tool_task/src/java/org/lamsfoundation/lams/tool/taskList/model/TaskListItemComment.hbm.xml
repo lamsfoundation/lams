@@ -34,16 +34,6 @@
         />
 
         <many-to-one
-            name="taskListItem"
-            class="org.lamsfoundation.lams.tool.taskList.model.TaskListItem"
-            cascade="none"
-            outer-join="auto"
-            update="true"
-            insert="true"
-            column="taskList_item_uid"
-        />
-
-        <many-to-one
             name="createBy"
             class="org.lamsfoundation.lams.tool.taskList.model.TaskListUser"
             cascade="none"

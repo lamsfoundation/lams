@@ -23,6 +23,7 @@
                <value>org/lamsfoundation/lams/tool/taskList/model/TaskListItem.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/taskList/model/TaskListItemVisitLog.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/taskList/model/TaskListItemAttachment.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListItemComment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/taskList/model/TaskListAttachment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/taskList/model/TaskListSession.hbm.xml</value>
             </list>

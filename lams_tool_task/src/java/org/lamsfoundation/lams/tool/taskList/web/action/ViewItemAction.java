@@ -29,8 +29,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -41,35 +39,27 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
-import org.lamsfoundation.lams.tool.taskList.model.TaskList;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
 import org.lamsfoundation.lams.tool.taskList.service.UploadTaskListFileException;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemAttachmentComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemCommentComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
-import org.lamsfoundation.lams.tool.taskList.web.form.TaskListForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
@@ -115,7 +105,6 @@ public class ViewItemAction extends Action {
 		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
 		TaskListItem item = getTaskListItem(request,sessionMap, mode);
 		Long sessionId = NumberUtils.createLong(request.getParameter(TaskListConstants.ATTR_TOOL_SESSION_ID));
-		Long sessionId2 =  new Long(request.getParameter(TaskListConstants.PARAM_TOOL_SESSION_ID));
 		
 		//mark this item access flag if it is learner
 		if(ToolAccessMode.LEARNER.toString().equals(mode)){
@@ -124,6 +113,9 @@ public class ViewItemAction extends Action {
 			//get back login user DTO
 			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 			service.setItemAccess(item.getUid(),new Long(user.getUserID().intValue()),sessionId);
+			
+			//put user login into session
+			sessionMap.put(TaskListConstants.ATTR_USER_LOGIN, user.getLogin());
 		}
 		
 		if(item == null){
@@ -139,6 +131,8 @@ public class ViewItemAction extends Action {
 		Long itemUid = NumberUtils.createLong(request.getParameter(TaskListConstants.PARAM_RESOURCE_ITEM_UID));
 		request.setAttribute(TaskListConstants.PARAM_RESOURCE_ITEM_UID,itemUid);
 		
+		sessionMap.put(TaskListConstants.PARAM_RESOURCE_ITEM_UID,itemUid);
+		
 		//basic information
 		sessionMap.put(TaskListConstants.ATTR_TASK_LIST_ITEM, item);
 		sessionMap.put(TaskListConstants.ATTR_TASK_LIST_ITEM_TITLE, item.getTitle());
@@ -147,7 +141,7 @@ public class ViewItemAction extends Action {
 		
 		//init taskList item list
 		SortedSet<TaskListItemComment> commentList = getCommentList(sessionMap);
-		List<TaskListItemComment> dbComments = item.getComments();
+		Set<TaskListItemComment> dbComments = item.getComments();
 		commentList.clear();
 		if(dbComments != null){
 			for(TaskListItemComment comment : dbComments){
@@ -177,63 +171,41 @@ public class ViewItemAction extends Action {
 	 * @return
 	 */
 	private ActionForward addNewComment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-//		//get back SessionMap
-//		String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
-//		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-//		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-//		
-//		Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
-//		
-//		String mode = request.getParameter(AttributeNames.ATTR_MODE);
-//		TaskListItemForm itemForm = (TaskListItemForm)form;
-//		ActionErrors errors = validateTaskListItem(itemForm);
-//		
-//		if(!errors.isEmpty()){
-//			this.addErrors(request,errors);
-//			return mapping.findForward("task");
-//		}
-//		
-//		//create a new TaskListItem
-//		TaskListItem item = new TaskListItem(); 
-//		ITaskListService service = getTaskListService();
-//		TaskListUser taskListUser = getCurrentUser(service,sessionId);
-//		item.setTitle(itemForm.getTitle());
-//		item.setDescription(itemForm.getDescription());
-//		item.setCreateDate(new Timestamp(new Date().getTime()));
-//		item.setCreateByAuthor(false);
-//		item.setCreateBy(taskListUser);
-//		
-//		//setting SequenceId
-//		SortedSet<TaskListItem> taskListList = getTaskListItemList(sessionMap);
-//		int maxSeq = 1;
-//		if(taskListList != null && taskListList.size() > 0){
-//			TaskListItem last = taskListList.last();
-//			maxSeq = last.getSequenceId()+1;
-//		}
-//		item.setSequenceId(maxSeq);
-//		
-//		//save and update session
-//		TaskListSession resSession = service.getTaskListSessionBySessionId(sessionId);
-//		if(resSession == null){
-//			log.error("Failed update TaskListSession by ID[" + sessionId + "]");
-//			return  mapping.findForward(TaskListConstants.ERROR);
-//		}
-//		Set<TaskListItem> items = resSession.getTaskListItems();
-//		if(items == null){
-//			items = new HashSet<TaskListItem>();
-//			resSession.setTaskListItems(items);
-//		}
-//		items.add(item);
-//		service.saveOrUpdateTaskListSession(resSession);
-//		
-//		//update session value
-//		SortedSet<TaskListItem> taskListItemList = getTaskListItemList(sessionMap);
-//		taskListItemList.add(item);
-//		
-//		//URL or file upload
-//		request.setAttribute(AttributeNames.ATTR_MODE,mode);
-//		itemForm.reset(mapping, request);		
-		return  mapping.findForward(TaskListConstants.SUCCESS);
+		TaskListItemForm taskListItemForm = (TaskListItemForm) form;
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(taskListItemForm.getSessionMapID());
+		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+		Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
+
+		String commentMessage = taskListItemForm.getComment();
+		if(commentMessage == null || StringUtils.isBlank(commentMessage))
+			return mapping.findForward(TaskListConstants.SUCCESS);
+		
+		TaskListItemComment comment = new TaskListItemComment();
+		comment.setComment(commentMessage);
+		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+		ITaskListService service = getTaskListService();
+		TaskListUser taskListUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
+		comment.setCreateBy(taskListUser);
+		comment.setCreateDate(new Timestamp(new Date().getTime()));
+		
+		//handle session value
+		SortedSet<TaskListItemComment> commentList = getCommentList(sessionMap);
+		commentList.add(comment);
+		
+		//finally persist taskListPO again
+		TaskListItem httpSessionItem = (TaskListItem) sessionMap.get(TaskListConstants.ATTR_TASK_LIST_ITEM);
+		TaskListItem dbItem = service.getTaskListItemByUid(httpSessionItem.getUid());
+		Set<TaskListItemComment> dbComments = dbItem.getComments();
+		if(dbComments == null){
+			dbComments = new HashSet<TaskListItemComment>();
+			dbItem.setComments(dbComments);
+		}
+		dbComments.add(comment);
+		service.saveOrUpdateTaskListItem(dbItem);
+				
+		form.reset(mapping, request);
+		
+		return mapping.findForward(TaskListConstants.SUCCESS);
 	}
 	
 	/**
@@ -265,15 +237,14 @@ public class ViewItemAction extends Action {
 			return mapping.findForward(TaskListConstants.SUCCESS);
 		}
 		
-		ITaskListService service = getTaskListService();
 		//upload to repository
+		ITaskListService service = getTaskListService();
 		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-		TaskListItemAttachment  att = service.uploadTaskListItemFile(file, IToolContentHandler.TYPE_ONLINE, user.getLogin());
+		TaskListUser taskListUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
+		TaskListItemAttachment  att = service.uploadTaskListItemFile(file, IToolContentHandler.TYPE_ONLINE, taskListUser);
 		//handle session value
-		 SortedSet<TaskListItemAttachment> attachmentList = getAttachmentList(sessionMap);
-		//add to attachmentList
+		SortedSet<TaskListItemAttachment> attachmentList = getAttachmentList(sessionMap);
 		attachmentList.add(att);
-		
 		
 		//finally persist taskListPO again
 		TaskListItem httpSessionItem = (TaskListItem) sessionMap.get(TaskListConstants.ATTR_TASK_LIST_ITEM);
@@ -303,19 +274,12 @@ public class ViewItemAction extends Action {
 	 * @return
 	 */
 	private TaskListItem getTaskListItem(HttpServletRequest request, SessionMap sessionMap, String mode) {
-		TaskListItem item = null;		
-		if(TaskListConstants.MODE_AUTHOR_SESSION.equals(mode)){
-			int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX),0);
-			//authoring: does not save item yet, so only has ItemList from session and identity by Index
-			List<TaskListItem>  taskListList = new ArrayList<TaskListItem>(getTaskListItemList(sessionMap));
-			item = taskListList.get(itemIdx);
-		}else{
-			Long itemUid = NumberUtils.createLong(request.getParameter(TaskListConstants.PARAM_RESOURCE_ITEM_UID));
-			
-			//	get back the taskList and item list and display them on page
-			ITaskListService service = getTaskListService();			
-			item = service.getTaskListItemByUid(itemUid);
-		}
+		Long itemUid = NumberUtils.createLong(request.getParameter(TaskListConstants.PARAM_RESOURCE_ITEM_UID));
+		
+		//	get back the taskList and item list and display them on page
+		ITaskListService service = getTaskListService();			
+		TaskListItem item = service.getTaskListItemByUid(itemUid);
+
 		return item;
 	}
 	
@@ -365,121 +329,5 @@ public class ViewItemAction extends Action {
 		}
 		return list;
 	}
-	
-//	/**
-//	 * Open url in popup window page.
-//	 * @param mapping
-//	 * @param form
-//	 * @param request
-//	 * @param response
-//	 * @return
-//	 */
-//	private ActionForward openUrlPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-//		String url = request.getParameter(TaskListConstants.PARAM_OPEN_URL_POPUP);
-//		String title = request.getParameter(TaskListConstants.PARAM_TITLE);
-//		request.setAttribute(TaskListConstants.PARAM_OPEN_URL_POPUP,url);
-//		request.setAttribute(TaskListConstants.PARAM_TITLE,title);
-//		return mapping.findForward(TaskListConstants.SUCCESS);
-//	}
-	
-//	/**
-//	 * Return next instrucion to page. It need four input parameters, mode, itemIndex or itemUid, and insIdx.
-//	 * @param mapping
-//	 * @param form
-//	 * @param request
-//	 * @param response
-//	 * @return
-//	 */
-//	private ActionForward nextInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-//		String mode = request.getParameter(AttributeNames.ATTR_MODE);
-//		
-//		String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-//		SessionMap sesionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
-//
-//		TaskListItem item = getTaskListItem(request, sesionMap, mode);
-//		if(item == null){
-//			return mapping.findForward(TaskListConstants.ERROR);
-//		}
-//		
-//		int currIns = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_CURRENT_INSTRUCTION_INDEX),0);
-//		
-//		Set instructions = item.getItemInstructions();
-//		InstructionNavDTO navDto = new InstructionNavDTO();
-//		//For Learner upload item, its instruction will display description/comment fields in ReosourceItem.
-//		if(!item.isCreateByAuthor()){
-//			List<TaskListItemInstruction> navItems = new ArrayList<TaskListItemInstruction>(1);
-//			//create a new instruction and put TaskListItem description into it: just for display use.
-//			TaskListItemInstruction ins = new TaskListItemInstruction();
-//			ins.setSequenceId(1);
-//			ins.setDescription(item.getDescription());
-//			navItems.add(ins);
-//			navDto.setAllInstructions(navItems);
-//			instructions.add(ins);
-//		}else{
-//			navDto.setAllInstructions(new ArrayList(instructions));
-//		}
-//		navDto.setTitle(item.getTitle());
-//		navDto.setType(item.getType());
-//		navDto.setTotal(instructions.size());
-//		if(instructions.size() > 0){
-//			navDto.setInstruction((TaskListItemInstruction) new ArrayList(instructions).get(currIns));
-//			navDto.setCurrent(currIns+1);
-//		}else{
-//			navDto.setCurrent(0);
-//			navDto.setInstruction(null);
-//		}
-//		
-//		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID,sessionMapID);
-//		request.setAttribute(TaskListConstants.ATTR_RESOURCE_INSTRUCTION,navDto);
-//		return mapping.findForward(TaskListConstants.SUCCESS);
-//	}
-//
-//
-//	/**
-//	 * Display main frame to display instrcution and item content.
-//	 * @param mapping
-//	 * @param form
-//	 * @param request
-//	 * @param response
-//	 * @return
-//	 */
-//	private ActionForward reviewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-//		String mode = request.getParameter(AttributeNames.ATTR_MODE);
-//		
-//		String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-//		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
-//		
-//		TaskListItem item = getTaskListItem(request,sessionMap, mode);
-//
-//		String idStr = request.getParameter(TaskListConstants.ATTR_TOOL_SESSION_ID);
-//		Long sessionId = NumberUtils.createLong(idStr);
-//		//mark this item access flag if it is learner
-//		if(ToolAccessMode.LEARNER.toString().equals(mode)){
-//			ITaskListService service = getTaskListService();			
-//			HttpSession ss = SessionManager.getSession();
-//			//get back login user DTO
-//			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-//			service.setItemAccess(item.getUid(),new Long(user.getUserID().intValue()),sessionId);
-//		}
-//		
-//		if(item == null){
-//			return mapping.findForward(TaskListConstants.ERROR);
-//		}
-//
-//		//these attribute will be use to instruction navigator page
-//		int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX));
-//		request.setAttribute(TaskListConstants.PARAM_ITEM_INDEX,itemIdx);
-//		Long itemUid = NumberUtils.createLong(request.getParameter(TaskListConstants.PARAM_RESOURCE_ITEM_UID));
-//		request.setAttribute(TaskListConstants.PARAM_RESOURCE_ITEM_UID,itemUid);
-//		request.setAttribute(TaskListConstants.ATTR_TOOL_SESSION_ID,sessionId);
-//		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID,sessionMapID);
-//		
-//		
-//		//TODO!!!!!!!!!!!!!!!!!!!!!!!!!
-////		sessionMap.put(TaskListConstants.ATTR_RESOURCE,taskList);
-//		
-//		return mapping.findForward(TaskListConstants.SUCCESS);
-//		
-//		
-//	}
+
 }

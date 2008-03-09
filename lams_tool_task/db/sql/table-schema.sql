@@ -33,9 +33,9 @@ create table tl_latask10_user (uid bigint not null auto_increment, user_id bigin
 alter table tl_latask10_attachment add index FK281134C2994F51CE (taskList_uid), add constraint FK281134C2994F51CE foreign key (taskList_uid) references tl_latask10_taskList (uid);
 alter table tl_latask10_item_log add index FK6CFEC3773324488D (taskList_item_uid), add constraint FK6CFEC3773324488D foreign key (taskList_item_uid) references tl_latask10_taskList_item (uid);
 alter table tl_latask10_item_log add index FK6CFEC377B20A10E1 (user_uid), add constraint FK6CFEC377B20A10E1 foreign key (user_uid) references tl_latask10_user (uid);
-alter table tl_latask10_item_attachment add index FK_tl_latask10_item_attachment_1 (taskList_item_uid), add constraint FK_tl_latask10_item_attachment_1 foreign key (taskList_item_uid) references tl_latask10_taskList (uid);
+alter table tl_latask10_item_attachment add index FK_tl_latask10_item_attachment_1 (taskList_item_uid), add constraint FK_tl_latask10_item_attachment_1 foreign key (taskList_item_uid) references tl_latask10_taskList_item (uid);
 alter table tl_latask10_item_attachment add index FK_tl_latask10_item_attachment_2 (create_by), add constraint FK_tl_latask10_item_attachment_2 foreign key (create_by) references tl_latask10_user (uid);
-alter table tl_latask10_item_comment add index FK_tl_latask10_item_comment_3 (taskList_item_uid), add constraint FK_tl_latask10_item_comment_3 foreign key (taskList_item_uid) references tl_latask10_taskList (uid);
+alter table tl_latask10_item_comment add index FK_tl_latask10_item_comment_3 (taskList_item_uid), add constraint FK_tl_latask10_item_comment_3 foreign key (taskList_item_uid) references tl_latask10_taskList_item (uid);
 alter table tl_latask10_item_comment add index FK_tl_latask10_item_comment_2 (create_by), add constraint FK_tl_latask10_item_comment_2 foreign key (create_by) references tl_latask10_user (uid);
 alter table tl_latask10_session add index FK3DC26357994F51CE (taskList_uid), add constraint FK3DC26357994F51CE foreign key (taskList_uid) references tl_latask10_taskList (uid);
 alter table tl_latask10_taskList add index FKE544722E5916D7F (create_by), add constraint FKE544722E5916D7F foreign key (create_by) references tl_latask10_user (uid);
