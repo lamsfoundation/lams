@@ -586,6 +586,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		if (keyExists(groupingDetails,WDDXTAGS.MAX_NUMBER_OF_GROUPS))
 		    grouping.setMaxNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.MAX_NUMBER_OF_GROUPS));
 
+		Set<Group> groupsToDelete = new HashSet<Group>(grouping.getGroups());
+
 		List groupsList = (Vector)groupingDetails.get(WDDXTAGS.GROUPS);
 		if ( groupsList != null && groupsList.size() > 0 ) {
 			Iterator iter = groupsList.iterator();
@@ -593,6 +595,23 @@ public class ObjectExtractor implements IObjectExtractor {
 				Hashtable groupDetails = (Hashtable)iter.next();
 				Group group = extractGroupObject(groupDetails, grouping);
 				groups.put(group.getGroupUIID(), group);
+				groupsToDelete.remove(group);
+			}
+		}
+		
+		if ( groupsToDelete.size() > 0 ) {
+			Iterator iter = groupsToDelete.iterator();
+			while ( iter.hasNext() ) {
+				Group group = (Group) iter.next();
+				if ( group.getBranchActivities() != null ) {
+					Iterator branchIter = group.getBranchActivities().iterator();
+					while ( branchIter.hasNext() ) {
+						BranchActivityEntry entry = (BranchActivityEntry) branchIter.next();
+						entry.setGroup(null);
+					}
+					group.getBranchActivities().clear();
+				}
+				grouping.getGroups().remove(group);
 			}
 		}
 		return grouping;
