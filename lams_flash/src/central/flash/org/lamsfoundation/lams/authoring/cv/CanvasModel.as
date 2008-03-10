@@ -905,6 +905,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			}
 		}
 		
+		// check if default sequence is empty
+		if(transObj.out == null)
+			if(_cv.ddm.getComplexActivityChildren(activeView.defaultSequenceActivity.activityUIID).length <= 0)
+				activeView.defaultSequenceActivity.empty = true;
+		
 		return (transObj.out == null) ? true : moveActivitiesToBranchSequence(transObj.out.toUIID, sequence);
 
 	}
@@ -912,6 +917,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	private function moveBranchToSequence(activityUIID:Number, sequence:SequenceActivity):Void {
 		var b:Branch = new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_TO_END, activityUIID, sequence.parentUIID, sequence, _cv.ddm.learningDesignID);
 		_cv.ddm.addBranch(b);
+		
 		setDirty();
 	}
 	
