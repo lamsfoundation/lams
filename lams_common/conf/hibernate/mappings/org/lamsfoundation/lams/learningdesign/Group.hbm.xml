@@ -131,7 +131,8 @@
     </many-to-one>
 
 	<!--  bi-directional many-to-one association to GroupBranchActivity -->
-   <set name="branchActivities" lazy="true" inverse="true" cascade="all-delete-orphan">
+	<!--  don't want all-delete-orphan as we will specifically delete the ones we don't want -->
+   <set name="branchActivities" lazy="true" inverse="true" cascade="all">
         <key><column name="group_id" /></key>
         <one-to-many class="org.lamsfoundation.lams.learningdesign.BranchActivityEntry"/>
     </set>
