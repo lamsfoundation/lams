@@ -136,11 +136,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 						mm.getMonitor().getMV().getMonitorSequenceScp()._visible = true;
 						hideMainExp(mm);
 						mm.broadcastViewUpdate("JOURNALSSHOWHIDE", false);
-
+						
 						if (mm.activitiesDisplayed.isEmpty() || mm.transitionsDisplayed.isEmpty()){
+							redrawCanvas(o.hasChanged());
 							mm.getMonitor().openLearningDesign(mm.getSequence());
 						} else {
-							
+
 							if (drawDesignCalled == undefined){
 								drawDesignCalled = "called";
 								mm.drawDesign(infoObj.tabID);
@@ -152,8 +153,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 						}
 						
 						LFMenuBar.getInstance().setDefaults();
-						
-					}else {
+					}
+					else {
 						mm.getMonitor().getMV().getMonitorSequenceScp()._visible = false;
 						//this._visible = false;
 					}
@@ -266,6 +267,54 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		mm.broadcastViewUpdate("EDITFLYSHOWHIDE", true);
 	}
 	
+	private function redrawCanvas(isChanged:Boolean):Void {
+		var s:Object = mm.getSize();
+		//var openBranchingActivity:Object = mm.currentBranchingActivity;
+		
+		drawDesignCalled = undefined;
+		
+		showAssets(true);
+		
+		//mm.openBranchingActivity = mm.currentBranchingActivity.activity.activityUIID;
+		mm.activeView = this;
+		mm.currentBranchingActivity = null;
+		//Remove all the movies drawn on the transition and activity movieclip holder
+		
+		this._learnerContainer_mc.removeMovieClip();
+		this.transitionLayer.removeMovieClip();
+		this.activityLayer.removeMovieClip();
+		this.transparentCover.removeMovieClip();
+		
+		this.branchContent.removeMovieClip();
+		this.complexViewer.removeMovieClip();
+	
+		//Recreate both Transition holder and Activity holder Movieclips
+		transitionLayer = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
+		
+		activityLayer = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
+		
+		_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", this.getNextHighestDepth());
+		
+		transparentCover = this.attachMovie("Panel", "_transparentCover_mc", this.getNextHighestDepth(), {_visible: false, enabled: true, _alpha: 50});
+		transparentCover.onPress = Proxy.create(this, onTransparentCoverClick);
+	
+		complexViewer = this.createEmptyMovieClip("_complex_viewer_mc", this.getNextHighestDepth());
+		branchContent = this.createEmptyMovieClip("_branch_content_mc", DepthManager.kTopmost);		
+	
+		if (isChanged == false){
+			mm.setIsProgressChangedSequence(false);
+			
+		} else {
+			mm.setIsProgressChangedLesson(true);
+			mm.setIsProgressChangedLearner(true);
+		}
+		
+		mm.branchesDisplayed.clear();
+		mm.transitionsDisplayed.clear();
+		mm.activitiesDisplayed.clear();
+		
+	}
+	
 	/**
 	 * Reloads the learner Progress and 
 	 * @Param isChanged Boolean Value to pass it to setIsProgressChanged in monitor model so that it sets it to true if refresh button is clicked and sets it to fasle as soon as latest data is loaded and design is redrawn.
@@ -273,71 +322,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	 * @return  nothing
 	 */
 	private function reloadProgress(isChanged:Boolean){
-		var s:Object = mm.getSize();
-		//var openBranchingActivity:Object = mm.currentBranchingActivity;
 		
-		drawDesignCalled = undefined;
-		
-		/**
-		if(openBranchingActivity && (mm.activeView instanceof CanvasBranchView)) { // learner has been force-completed
-			showAssets(false);
-			mm.getMonitor().getProgressData(mm.getSequence());
-			mm.activeView.removeMovieClip();
-			mm.getMonitor().openBranchView(openBranchingActivity, true);
-		} 
-		else {
-		*/
-			showAssets(true);
-			
-			mm.activeView = this;
-			mm.currentBranchingActivity = null;
-			
-			//mm.openBranchingActivity = mm.currentBranchingActivity.activity.activityUIID;
-			
-			//Remove all the movies drawn on the transition and activity movieclip holder
-			
-			this._learnerContainer_mc.removeMovieClip();
-			this.transitionLayer.removeMovieClip();
-			this.activityLayer.removeMovieClip();
-			this.transparentCover.removeMovieClip();
-			
-			this.branchContent.removeMovieClip();
-			this.complexViewer.removeMovieClip();
-		
-			//Recreate both Transition holder and Activity holder Movieclips
-			transitionLayer = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
-			
-			activityLayer = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
-			
-			_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", this.getNextHighestDepth());
-			
-			transparentCover = this.attachMovie("Panel", "_transparentCover_mc", this.getNextHighestDepth(), {_visible: false, enabled: true, _alpha: 50});
-			transparentCover.onPress = Proxy.create(this, onTransparentCoverClick);
-		
-			complexViewer = this.createEmptyMovieClip("_complex_viewer_mc", this.getNextHighestDepth());
-			branchContent = this.createEmptyMovieClip("_branch_content_mc", DepthManager.kTopmost);		
-		
-			if (isChanged == false){
-				mm.setIsProgressChangedSequence(false);
-				
-			} else {
-				mm.setIsProgressChangedLesson(true);
-				mm.setIsProgressChangedLearner(true);
-			}
-			
-			mm.branchesDisplayed.clear();
-			mm.transitionsDisplayed.clear();
-			mm.activitiesDisplayed.clear();
-			
-			mm.getMonitor().getProgressData(mm.getSequence());
-		//}
+		redrawCanvas(isChanged);
+		mm.getMonitor().getProgressData(mm.getSequence());
 	}
 	
 	public function showAssets(v:Boolean) {
 		this._learnerContainer_mc._visible = v;
 		this.transitionLayer._visible = v;
 		this.activityLayer._visible = v;
-		this.transparentCover._visible = v;
 	}
 	
 	/**
