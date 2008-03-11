@@ -630,16 +630,16 @@ public function update (o:Observable,infoObj:Object):Void{
 				requiredTaskList[listCount].contributeActivity.text = "  "+ca.title
 				requiredTaskList[listCount].contributeActivity.backgroundColor = 0xD5E6FF;
 				listCount++;
+				
 			} else {
 				requiredTaskList[listCount].contributeActivity.text = "\t"+ca.title
 				requiredTaskList[listCount].contributeActivity.backgroundColor = 0xF9F2DD;
 				listCount++;
-				
-				for(var i=0; i<array.length; i++){
-					var o:Object = array[i];
-					if (o instanceof ContributeActivity){
-						drawContributeActivity(o, x);
-					}
+			}
+			for(var i=0; i<array.length; i++){
+				var o:Object = array[i];
+				if (o instanceof ContributeActivity) {
+					drawContributeActivity(o, x);
 				}
 			}
 		}
@@ -648,9 +648,7 @@ public function update (o:Observable,infoObj:Object):Void{
 			var o:Object = array[i];
 			Debugger.log("o instanceof ContributeActivity: " + o instanceof ContributeActivity, Debugger.CRITICAL, "drawIsRequiredTasks", "LessonTabView");
 			
-			if (o instanceof ContributeActivity){
-				 drawContributeActivity(o, x);
-			} else {
+			if (!(o instanceof ContributeActivity)){
 				if(o.entries.length > 0){
 					// write child ca title (indented - x + 10 position)
 					drawIsRequiredTasks(o.child, o.entries, x);
