@@ -8,13 +8,13 @@
 
 <c:forEach var="comment" items="${sessionMap.taskListItemCommentList}">
 
-	<c:if test="${sessionMap.taskListItem.showCommentsToAll || (sessionMap.userLogin == comment.createBy.loginName)}">
+	<c:if test="${sessionMap.taskListItem.showCommentsToAll || (sessionMap.userLogin == comment.createBy.loginName) || (sessionMap.mode == 'teacher')}">
 	
 		<div>
 			<table cellspacing="0" class="forum">
 				<tr>
 					<th >
-						<fmt:message key="lable.topic.subject.by" />
+						<fmt:message key="lable.preview.by" />
 						<c:set var="author" value="${comment.createBy.loginName}" />
 						<c:if test="${empty author}">
 							<c:set var="author">
