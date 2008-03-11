@@ -60,7 +60,7 @@
 				
 				<!-- Comments Part -->
 				<br/><br/>
-				<%@ include file="topicview.jsp"%>
+				<%@ include file="commentlist.jsp"%>
 				
 				<table class="forms">
 					
