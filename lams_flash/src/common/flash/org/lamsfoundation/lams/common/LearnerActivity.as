@@ -104,6 +104,8 @@ class LearnerActivity extends MovieClip {
 		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
 		
+		_dcStartTime = (_parent._parent.getActiveComplex() == this.activity || _parent._parent.getActiveSequence() == this.activity) ? new Date().getTime() : 0;
+		 
 		//Get reference to application and design data model
 		app = ApplicationParent.getInstance();
 		
@@ -202,7 +204,7 @@ class LearnerActivity extends MovieClip {
 	 */
 	private function draw(){
 		
-		var toolTitle:String
+		var toolTitle:String;
 		if (actStatus == null || actStatus == undefined){
 			actStatus = Progress.compareProgressData(learner, _activity.activityID);
 		}
@@ -227,18 +229,19 @@ class LearnerActivity extends MovieClip {
 			
 		//write text
 		if (actLabel == undefined){
-			toolTitle = _activity.title
+			toolTitle = _activity.title;
 			if (toolTitle.length > 19){
-				toolTitle = toolTitle.substr(0, 17)+"..."
+				toolTitle = toolTitle.substr(0, 17)+"...";
 			}
 			//title_lbl.text = toolTitle;
 		}else {
-			toolTitle = actLabel
+			toolTitle = actLabel;
 			if (toolTitle.length > 19){
-				toolTitle = toolTitle.substr(0, 17)+"..."
+				toolTitle = toolTitle.substr(0, 17)+"...";
 			}
 			
 		}
+		
 		title_lbl.text = toolTitle;
 		
 		if(_view instanceof LearnerTabView && !_complex)
@@ -321,15 +324,18 @@ class LearnerActivity extends MovieClip {
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','LearnerActivity');
 			Debugger.log('Is sequence:'+this.activity.isSequenceActivity(),Debugger.GEN,'onRelease','LearnerActivity');
-				
+				var activeComplex = LearnerComplexActivity(this._parent._parent).getActiveComplex();
+				var activeSequence = LearnerComplexActivity(this._parent._parent).getActiveSequence();
+					
 				if(this.activity.isSequenceActivity()) {
 					// insert sequence design into learner complex activity
 					Debugger.log('parent :'+this._parent._parent, Debugger.CRITICAL,'onRelease','LearnerActivity');
 					
-					var activeSequence = LearnerComplexActivity(this._parent._parent).getActiveSequence();
 					Debugger.log('activeSequence:'+activeSequence, Debugger.CRITICAL,'onRelease','LearnerActivity');
 					
 					if(LearnerComplexActivity(this._parent._parent).activity.activityUIID == this.activity.parentUIID) {
+						
+						LearnerComplexActivity(this._parent._parent).setActiveComplex(null);
 						
 						if(activeSequence == this.activity) {
 							// close current active sequence
@@ -337,6 +343,19 @@ class LearnerActivity extends MovieClip {
 						} else {
 							// open sequence
 							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(this.activity);
+						}
+						
+					}
+				} else if(this.activity.isOptionsWithSequencesActivity() || this.activity.isOptionalActivity() || this.activity.isParallelActivity()) {
+					Debugger.log('activeComplex:'+activeComplex, Debugger.CRITICAL,'onRelease','LearnerActivity');
+					
+					if(LearnerComplexActivity(this._parent._parent).activity.activityUIID == this.activity.parentUIID || activeSequence.activityUIID == this.activity.parentUIID) {
+						if(activeComplex == this.activity) {
+							// close current active complex
+							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(null);
+						} else {
+							// open complex
+							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(this.activity);
 						}
 					}
 				}
@@ -393,8 +412,6 @@ class LearnerActivity extends MovieClip {
 	public function getVisibleHeight ():Number {
 		return _visibleHeight;
 	}
-
-	
 	
 	public function get activity():Activity{
 		return getActivity();
