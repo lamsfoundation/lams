@@ -388,18 +388,21 @@ public class LearnerService implements ICoreLearnerService
     {
     	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
   
-    	// if we skip a sequence in an optional sequence, or have been force completed for branching / optional sequence
-    	// and we go back to the sequence later, then the LessonComplete flag must be reset so that it will step through
-    	// all the activities in the sequence - otherwise it will go to the "Completed" screen after the first activity in the sequence
-    	if ( clearCompletedFlag && activity.getParentActivity() != null && activity.getParentActivity().isSequenceActivity() 
-    			&& progress.isComplete() && ! progress.getCompletedActivities().contains(activity) )  
-    		progress.setLessonComplete(LearnerProgress.LESSON_NOT_COMPLETE);
-    	
-    	progressEngine.setActivityAttempted(progress, activity);
-    	progress.setCurrentActivity(activity);
-       	progress.setNextActivity(activity);
+    	if (  ! progress.getCompletedActivities().contains(activity) ) {
+	    	// if we skip a sequence in an optional sequence, or have been force completed for branching / optional sequence
+	    	// and we go back to the sequence later, then the LessonComplete flag must be reset so that it will step through
+	    	// all the activities in the sequence - otherwise it will go to the "Completed" screen after the first activity in the sequence
+	    	if ( clearCompletedFlag && activity.getParentActivity() != null && activity.getParentActivity().isSequenceActivity() 
+	    			&& progress.isComplete() )  
+	    		progress.setLessonComplete(LearnerProgress.LESSON_NOT_COMPLETE);
+	    	
+	    	progressEngine.setActivityAttempted(progress, activity);
+	    	progress.setCurrentActivity(activity);
+	       	progress.setNextActivity(activity);
 
-    	learnerProgressDAO.saveLearnerProgress(progress);
+	       	learnerProgressDAO.saveLearnerProgress(progress);
+    	}
+    	
     	return progress;
     }
     
