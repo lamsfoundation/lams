@@ -230,11 +230,13 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 					
 					return i+1;
 				}
-			} else if(learnerAct.activity.isBranchingActivity() && !isLearnerModule()) {
+			} else if(learnerAct.activity.isBranchingActivity()) {
 				Debugger.log('test: ' + (learnerAct.isAttempted || learnerAct.isCompleted), Debugger.CRITICAL, 'drawChildren', 'LearnerComplexActivity');
         
 				if(learnerAct.isAttempted || learnerAct.isCompleted) {
-					drawActiveBranch(learnerAct, container);
+					if(!isLearnerModule()) {
+						drawActiveBranch(learnerAct, container);
+					}
 					
 					return i+1;
 				}
@@ -299,8 +301,18 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		learner = (model instanceof LessonModel) ? model.progressData : learner;
 		actStatus = null;
 		
+		checkIfBranchActive();
 		checkIfSequenceActive();
+		
 		draw();
+	}
+	
+	private function checkIfBranchActive():Void {
+		for(var i=0; i<children_mc.length; i++) {
+			var learnerAct = children_mc[i];
+			if(learnerAct.isAttempted || learnerAct.isCompleted && children_mc[i].activity.iBranchingActivity())
+				activeSequence = null;
+		}
 	}
 	
 	/** TODO: Use for Sequence in Optional */
@@ -346,6 +358,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		}
 		
 		children_mc = new Array();
+		delegates = new Array();
 	}
 	
 	/** TODO: Use for Sequence in Optional */

@@ -630,5 +630,13 @@ class LessonModel extends Observable {
 		return _lesson;
 	}
 	
+	public function findParent(a:Activity, b:Activity):Boolean {
+		if(a.parentUIID == b.activityUIID)
+			return true;
+		else if(a.parentUIID == null)
+			return false;
+		else
+			return findParent(_learningDesignModel.getActivityByUIID(a.parentUIID), b);
+    }
 
 }

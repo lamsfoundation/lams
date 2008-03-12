@@ -348,8 +348,8 @@ class LearnerActivity extends MovieClip {
 					}
 				} else if(this.activity.isOptionsWithSequencesActivity() || this.activity.isOptionalActivity() || this.activity.isParallelActivity()) {
 					Debugger.log('activeComplex:'+activeComplex, Debugger.CRITICAL,'onRelease','LearnerActivity');
-					
-					if(LearnerComplexActivity(this._parent._parent).activity.activityUIID == this.activity.parentUIID || activeSequence.activityUIID == this.activity.parentUIID) {
+					if(model.findParent(this.activity, LearnerComplexActivity(this._parent._parent).activity) || (activeSequence.activityUIID == this.activity.parentUIID)) {
+					//if(LearnerComplexActivity(this._parent._parent).activity.activityUIID == this.activity.parentUIID || activeSequence.activityUIID == this.activity.parentUIID) {
 						if(activeComplex == this.activity) {
 							// close current active complex
 							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(null);
