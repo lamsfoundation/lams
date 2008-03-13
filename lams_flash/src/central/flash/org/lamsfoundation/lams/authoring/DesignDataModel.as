@@ -1133,7 +1133,6 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				
 				if(target != null && target.direction == BranchConnector.DIR_SINGLE) {
 					activityless = target;
-					//break;
 				}
 			}
 		}

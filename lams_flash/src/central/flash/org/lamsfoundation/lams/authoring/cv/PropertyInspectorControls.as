@@ -1170,7 +1170,7 @@ class PropertyInspectorControls extends MovieClip {
 		if(validBranches.length > 0)
 			evt.target.scrollContent.branches = validBranches;
 		else
-			evt.target.scrollContent.sequences = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
+			evt.target.scrollContent.sequences = getValidSequences(_canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID));
 			
 		evt.target.scrollContent.loadLists();
 		
@@ -1198,7 +1198,7 @@ class PropertyInspectorControls extends MovieClip {
 		if(validBranches.length > 0)
 			evt.target.scrollContent.branches = validBranches;
 		else
-			evt.target.scrollContent.sequences = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
+			evt.target.scrollContent.sequences = getValidSequences(_canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID));
 			
 		evt.target.scrollContent.loadLists();
 	}
@@ -1217,6 +1217,22 @@ class PropertyInspectorControls extends MovieClip {
 		}
 		
 		return branches;
+	}
+	
+	private function getValidSequences(seqs:Array):Array {
+		Debugger.log("validating seqs len: " + seqs.length, Debugger.CRITICAL, "getvalidsequences", "PIC*");
+		
+		for(var i=0; i < seqs.length; i++) {
+			var sequence:SequenceActivity = SequenceActivity(seqs[i]);
+			Debugger.log("validating seq: " +sequence.title, Debugger.CRITICAL, "getvalidsequences", "PIC*");
+			Debugger.log("validating seq default + empty: " + (sequence.isDefault && sequence.empty), Debugger.CRITICAL, "getvalidsequences", "PIC*");
+			if(sequence.isDefault && sequence.empty) {
+				seqs.splice(i, 1);
+				i=i-1;
+			}
+		}
+		
+		return seqs;
 	}
 	
 	public function onDefaultBranchSelect(evt:Object):Void {

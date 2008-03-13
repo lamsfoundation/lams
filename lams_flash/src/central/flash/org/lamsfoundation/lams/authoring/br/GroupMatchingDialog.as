@@ -93,6 +93,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
 	
 	public function loadLists() {
 		Debugger.log("Loading Lists: branch length: " + branches.length, Debugger.CRITICAL, "loadLists", "GroupMatchingDialog");
+		Debugger.log("Loading Lists: sequences length: " + sequences.length, Debugger.CRITICAL, "loadLists", "GroupMatchingDialog");
 		Debugger.log("Loading Lists: branching act: " + _branchingActivity.activityUIID, Debugger.CRITICAL, "loadLists", "GroupMatchingDialog");
 		
 		groups_lst.dataProvider = groups;
