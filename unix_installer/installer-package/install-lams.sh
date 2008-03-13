@@ -1,5 +1,5 @@
 #!/bin/sh
-#   Copyright (C) 2006-2007 LAMS Foundation (http://lamsfoundation.org)
+#   Copyright (C) 2006-2008 LAMS Foundation (http://lamsfoundation.org)
 #   License Information: http://lamsfoundation.org/licensing/lams/2.0/
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -20,11 +20,11 @@
 #
 #   Author: Luke Foxton 
 
-# Installer shell script for LAMS 2.0.4
+# Installer shell script for LAMS
 
 # Usage: sudo ./install.sh
 
-LAMS_VERSION=2.0.4
+LAMS_VERSION=2.1-RC1
 MYSQL_VERSION_STR=5.
 JAVA_REQ_VERSION=1.5
 # Transform the required version string into a number that can be used in comparisons
@@ -57,7 +57,7 @@ checkJava()
         export JAVA_HOME=$JDK_DIR
         JAVA_EXE=$JAVA_HOME/bin/java
 
-	java -cp bin testJava	
+	$JAVA_HOME/bin/java -cp bin testJava	
 	if [  "$?" -ne  "0" ]
         then
 		echo "Install failed. Could not verify java installation, check your lams.properties file for the correct JDK_DIR entry, and that you have set your JAVA_HOME and PATH environment variables correctly."
@@ -168,7 +168,7 @@ createDatabase()
                         printf "\nInstall failed. Could not fill the LAMS database. If you are installing with a remote MySql server, please check that your SQL_HOST in lams.properties points to a MySql 5.x installation and that you have created a database with the name DB_NAME as in lams.properties and that the DB_USER has remote access granted. Check the readme for instructions on how to do this.\n\n"
                         installfailed
         fi
-	print "Done.\n\n"
+	printf "Done.\n\n"
 
 }
 
@@ -345,7 +345,7 @@ then
         	;;
 	*)      printf "\n\n"
         	installfailed
-        	;;
+		;;
 		esac
 fi
 
@@ -387,7 +387,7 @@ fi
 
 # UNCOMMENT FOR (2.1) Create news-unmodified.html and place it with news.html such that the upgrader can do a 
 # diff between the two files to determine whether it should update news.html or not.
-# cp assembly/lams.ear/lams-www.war/news.html ${DEFAULT_DIR}/deploy/lams.ear/lams-www.war/news-unmodified.html
+cp assembly/lams.ear/lams-www.war/news.html ${DEFAULT_DIR}/deploy/lams.ear/lams-www.war/news-unmodified.html
 
 # Configuring jboss with settings from lams.properties
 printf "Configuring JBoss with your settings.\n"
@@ -400,12 +400,25 @@ fi
 
 chmod 755 $JBOSS_DIR/bin/run-lams.sh
 
+if [ -f $JBOSS_DIR/bin/wrapper ]
+	then
+	chmod 755 $JBOSS_DIR/bin/wrapper
+fi
+
 # configure the wrapper
 printf "\nConfiguring the java Wrapper\n"
 configureWrapper
 
 # configure jboss
-mkdir ${DEFAULT_DIR}/lib
+if [ -d ${DEFAULT_DIR}/lib ]
+	then
+	printf "\n${DEFAULT_DIR}/lib exists.\n\n"
+else
+	mkdir ${DEFAULT_DIR}/lib
+fi
+
+
+
 cp $JBOSS_DIR/server/all/lib/jgroups.jar $JBOSS_DIR/server/all/lib/jboss-cache.jar ${DEFAULT_DIR}/lib
 cp assembly/lams-session.jar  assembly/lams-valve.jar ${DEFAULT_DIR}/lib
 if [  "$?" -ne  "0" ]
@@ -416,7 +429,12 @@ fi
 
 
 printf "Copying lams.properties to /etc.\n"	
-mkdir -p  /etc/lams2
+if [ -d /etc/lams2 ]
+	then
+	printf "\n/etc/lams2 exists.\n"
+else
+	mkdir -p  /etc/lams2
+fi
 cp lams.properties /etc/lams2/
 
 # changing JAVA_HOME back 

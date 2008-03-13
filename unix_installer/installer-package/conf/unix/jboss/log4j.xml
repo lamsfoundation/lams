@@ -36,10 +36,10 @@
 
     <layout class="org.apache.log4j.PatternLayout">
       <!-- The default pattern: Date Priority [Category] Message\n -->
-      <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c] %m%n"/>
+      <param name="ConversionPattern" value="%d{ISO8601} %-5p [%c] %m%n"/>
 
       <!-- The full pattern: Date MS Priority [Category] (Thread:NDC) Message\n
-      <param name="ConversionPattern" value="%d{ABSOLUTE} %-5r %-5p [%c] (%t:%x) %m%n"/>
+      <param name="ConversionPattern" value="%d{ISO8601} %-5r %-5p [%c] (%t:%x) %m%n"/>
        -->
     </layout>	    
   </appender>
@@ -53,7 +53,7 @@
     <param name="MaxBackupIndex" value="1"/>
     <param name="Threshold" value="INFO"/>
     <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c] %m%n"/>
+      <param name="ConversionPattern" value="%d{ISO8601} %-5p [%c] %m%n"/>
     </layout>	    
   </appender>
   -->
@@ -69,7 +69,7 @@
 
       <layout class="org.apache.log4j.PatternLayout">
          <!-- The default pattern: Date Priority [Category] Message\n -->
-         <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/>
+         <param name="ConversionPattern" value="%d{ISO8601} %-5p [%c{1}] %m%n"/>
       </layout>
    </appender>
 
@@ -96,7 +96,7 @@
      <param name="SMTPHost" value="localhost"/>
      <param name="BufferSize" value="10"/>
      <layout class="org.apache.log4j.PatternLayout">
-       <param name="ConversionPattern" value="[%d{ABSOLUTE},%c{1}] %m%n"/>
+       <param name="ConversionPattern" value="[%d{ISO8601},%c{1}] %m%n"/>
      </layout>
    </appender>
    -->
@@ -154,7 +154,7 @@
     <param name="DatePattern" value="'.'yyyy-MM-dd"/>
 
     <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%d{ABSOLUTE} [%t:%x] %-5p %c - %m%n"/>
+      <param name="ConversionPattern" value="%d{ISO8601} [%t:%x] %-5p %c - %m%n"/>
 
     </layout>	    
   </appender>
@@ -166,7 +166,7 @@
     <param name="MaxBackupIndex" value="20"/>
     <layout class="org.apache.log4j.PatternLayout">
       <!-- Date [Thread:NDC] LEVEL Category - Message\n -->
-      <param name="ConversionPattern" value="%d{ABSOLUTE} [%t:%x] %-5p %c - %m%n"/>
+      <param name="ConversionPattern" value="%d{ISO8601} [%t:%x] %-5p %c - %m%n"/>
     </layout>	    
   </appender>
 
@@ -174,7 +174,7 @@
     <param name="Target" value="System.out"/>
     <layout class="org.apache.log4j.PatternLayout">
       <!-- Date Priority Category - Message\n -->
-      <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/>
+      <param name="ConversionPattern" value="%d{ISO8601} %-5p [%c{1}] %m%n"/>
     </layout>
   </appender>
 
@@ -185,12 +185,18 @@
     <param name="MaxBackupIndex" value="20"/>
     <layout class="org.apache.log4j.PatternLayout">
 		<!-- Date [Thread] Priority Category - Message\n -->
-		<param name="ConversionPattern" value="%d{ABSOLUTE} [%t] %-5p %c - %m%n"/>
+		<param name="ConversionPattern" value="%d{ISO8601} [%t] %-5p %c - %m%n"/>
     </layout>	    
   </appender>
   
   <category name="org.lamsfoundation.lams" additivity="false">
     <priority value="DEBUG"/>
+    <appender-ref ref="LAMSFILE"/>
+    <appender-ref ref="LAMSCONSOLE"/>
+  </category>
+  
+  <category name="org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter" additivity="false">
+    <priority value="INFO"/>
     <appender-ref ref="LAMSFILE"/>
     <appender-ref ref="LAMSCONSOLE"/>
   </category>
@@ -218,7 +224,7 @@
    </category>
 
    <!--  To avoid LDEV-881 exception info -->
-   <category name="org.apache.catalina.session">
+   <category name="org.apache.catalina.core">
       <priority value="ERROR"/>
    </category>
 

@@ -30,15 +30,6 @@
 		</filterset>
 		</copy>
 
-		<copy overwrite="true" todir="${DEFAULT_DIR}/conf/" failonerror="true">
-			<fileset dir="${AUTH_CONF}/">
-				<include name="*.xml" />
-				<include name="*.dtd" />
-			</fileset>
-		<filterset>
-			<filter token="confdir" value="${DEFAULT_DIR}/conf" />
-		</filterset>
-		</copy>
 
 		<copy overwrite="true" todir="${DEPLOY_DIR}" failonerror="true">
 			<fileset dir="${JBOSS_CONF}/service">

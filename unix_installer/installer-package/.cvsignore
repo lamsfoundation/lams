@@ -1,0 +1,5 @@
+*.swp
+build
+build/*
+assembly
+assembly/*
