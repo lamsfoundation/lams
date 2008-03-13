@@ -1195,7 +1195,7 @@ class PropertyInspectorControls extends MovieClip {
 		
 		var validBranches:Array = getValidBranches(branches.myBranches);
 		
-		if(branches.myBranches.length > 0)
+		if(validBranches.length > 0)
 			evt.target.scrollContent.branches = validBranches;
 		else
 			evt.target.scrollContent.sequences = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
