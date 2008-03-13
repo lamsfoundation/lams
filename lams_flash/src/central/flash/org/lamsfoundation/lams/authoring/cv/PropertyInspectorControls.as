@@ -1165,8 +1165,10 @@ class PropertyInspectorControls extends MovieClip {
 		evt.target.scrollContent.branchingActivity = BranchingActivity(_canvasModel.selectedItem.activity);
 		evt.target.scrollContent.groups = grouping.getGroups(_canvasModel.getCanvas().ddm);
 		
-		if(branches.myBranches.length > 0)
-			evt.target.scrollContent.branches = getValidBranches(branches.myBranches);
+		var validBranches:Array = getValidBranches(branches.myBranches);
+		
+		if(validBranches.length > 0)
+			evt.target.scrollContent.branches = validBranches;
 		else
 			evt.target.scrollContent.sequences = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
 			
@@ -1191,8 +1193,10 @@ class PropertyInspectorControls extends MovieClip {
 		evt.target.scrollContent.branchingActivity = BranchingActivity(_canvasModel.selectedItem.activity);
 		evt.target.scrollContent.conditions = conditions;
 		
+		var validBranches:Array = getValidBranches(branches.myBranches);
+		
 		if(branches.myBranches.length > 0)
-			evt.target.scrollContent.branches = getValidBranches(branches.myBranches);
+			evt.target.scrollContent.branches = validBranches;
 		else
 			evt.target.scrollContent.sequences = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
 			
