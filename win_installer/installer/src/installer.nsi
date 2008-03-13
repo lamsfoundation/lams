@@ -1,5 +1,5 @@
 /****************************************************************
- * Copyright (C) 2006 LAMS Foundation (http://lamsfoundation.org)
+ * Copyright (C) 2008 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  *
@@ -20,8 +20,6 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
-
 
 # includes
 !include "TextFunc.nsh"
@@ -36,12 +34,11 @@
 !insertmacro LineFind
 
 # constants
-!define VERSION "2.1 Beta"
-;!define PREVIOUS_VERSION "2.0.2"
-!define LANGUAGE_PACK_VERSION "2007-12-17"
-!define LANGUAGE_PACK_VERSION_INT "20071217"
-!define DATE_TIME_STAMP "200712201000"
-!define SERVER_VERSION_NUMBER "2.0.99.200712181312"
+!define VERSION "2.1 RC1"
+!define LANGUAGE_PACK_VERSION "2008-03-15"
+!define LANGUAGE_PACK_VERSION_INT "20080315"
+!define DATE_TIME_STAMP "200803151000"
+!define SERVER_VERSION_NUMBER "2.0.99.200803121303"
 !define BASE_VERSION "2.0"
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
@@ -54,7 +51,7 @@
 Name "LAMS ${VERSION}"
 ;BrandingText "LAMS ${VERSION} -- built on ${__TIMESTAMP__}"
 BrandingText "LAMS ${VERSION} -- built on ${__DATE__} ${__TIME__}"
-OutFile "${BUILD}\LAMS-2.1-beta.exe"
+OutFile "${BUILD}\LAMS-2.1-RC1.exe"
 InstallDir "C:\lams"
 InstallDirRegKey HKLM "${REG_HEAD}" ""
 LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree" 
@@ -67,7 +64,7 @@ InstProgressFlags smooth
 # set welcome page
 !define MUI_WELCOMEPAGE_TITLE "LAMS ${VERSION} Install Wizard"
 !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of LAMS ${VERSION}.\r\n\r\n\
-    LAMS 2.1 Beta has been released for users to explore the new Branching features coming in LAMS 2.1.\r\n\r\n\
+    LAMS 2.1 RC1 has been released for users to explore the new Branching features coming in LAMS 2.1.\r\n\r\n\
     Do NOT use this installer to set up production server for LAMS.\r\n\r\n\  
     You cannot use this installer to upgrade an existing copy of LAMS 2.0.\r\n\r\n\ 
     Please ensure you have a copy of MySQL 5.x installed and running, and Java JDK version 1.5.x. or 1.6.x\r\n\r\n\
@@ -177,6 +174,7 @@ SectionGroup /e "LAMS ${VERSION} Full Install" fullInstall
         SectionIn RO
         DetailPrint "Setting up JBoss 4.0.2"
         SetOutPath $INSTDIR
+        
         File /a /r /x all /x minimal /x robyn /x log /x tmp /x work /x jsMath.war /x *.bak ${SOURCE_JBOSS_HOME}
         
         ; Copy jboss-cache.jar, jgroups.jar from server/all/lib to server/default/lib

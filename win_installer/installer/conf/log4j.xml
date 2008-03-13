@@ -160,7 +160,7 @@
   </appender>
  
   <appender name="LAMSFILE" class="org.jboss.logging.appender.RollingFileAppender">
-    <param name="File" value="${jboss.server.home.dir}/log/lams.log"/>
+    <param name="File" value="${jboss.server.home.dir}/log/@application@.log"/>
     <param name="Append" value="true"/>
     <param name="MaxFileSize" value="5MB"/>
     <param name="MaxBackupIndex" value="20"/>
@@ -190,6 +190,12 @@
   </appender>
   
   <category name="org.lamsfoundation.lams" additivity="false">
+    <priority value="DEBUG"/>
+    <appender-ref ref="LAMSFILE"/>
+    <appender-ref ref="LAMSCONSOLE"/>
+  </category>
+  
+  <category name="org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter" additivity="false">
     <priority value="INFO"/>
     <appender-ref ref="LAMSFILE"/>
     <appender-ref ref="LAMSCONSOLE"/>

@@ -1,7 +1,7 @@
-LAMS 2.1 Beta - Learning Activity Management System
+LAMS 2.1 RC1 - Learning Activity Management System
 ----------------------------------------------
 
-This is a pre-packaged copy of LAMS 2.1 Beta for Windows 2000, XP, or 2003.
+This is a pre-packaged copy of LAMS 2.1 RC1 for Windows 2000, XP, or 2003.
 It is designed for LAMS users to explore the new Branching and Optional
 Sequences features. We would love some feedback on things you like, things
 you don't like, or suggestions for improvements in the wording or icons on
