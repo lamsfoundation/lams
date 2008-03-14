@@ -51,51 +51,53 @@ public class TaskListItemAttachment implements Cloneable{
     private Date created;
     private TaskListUser createBy;
     
-//    //Default contruction method
-//    public TaskListItemAttachment(){
-//    	
-//    }
-//    //  **********************************************************
-//  	//		Function method for Attachment
-//    //  **********************************************************
-//    public Object clone(){
-//		Object obj = null;
-//		try {
-//			obj = super.clone();
-//			((TaskListItemAttachment)obj).setUid(null);
-//		} catch (CloneNotSupportedException e) {
-//			log.error("When clone " + TaskListItemAttachment.class + " failed");
-//		}
-//		
-//		return obj;
-//	}
-//	public boolean equals(Object o) {
-//		if (this == o)
-//			return true;
-//		if (!(o instanceof TaskListItemAttachment))
-//			return false;
-//
-//		final TaskListItemAttachment genericEntity = (TaskListItemAttachment) o;
-//
-//      	return new EqualsBuilder()
-//      	.append(this.uid,genericEntity.uid)
-//      	.append(this.fileVersionId,genericEntity.fileVersionId)
-//      	.append(this.fileName,genericEntity.fileName)
-//      	.append(this.fileType,genericEntity.fileType)
-//      	.append(this.created,genericEntity.created)
-//      	.append(this.createBy,genericEntity.createBy)
-//      	.isEquals();
-//	}
-//
-//	public int hashCode() {
-//		return new HashCodeBuilder().append(uid).append(fileVersionId).append(
-//				fileName).append(fileType).append(created).append(createBy)
-//				.toHashCode();
-//	}
+    //  **********************************************************
+  	//		Function method for TaskListItemAttachment
+    //  **********************************************************
+    public Object clone(){
+    	TaskListItemAttachment taskListItemAttachment = null;
+		try {
+			taskListItemAttachment = (TaskListItemAttachment) super.clone();
+			((TaskListItemAttachment)taskListItemAttachment).setUid(null);
+			
+  			//clone ReourceUser as well
+  			if(this.createBy != null){
+  				taskListItemAttachment.setCreateBy((TaskListUser) this.createBy.clone());
+  			}
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + TaskListItemAttachment.class + " failed");
+		}
+		
+		return taskListItemAttachment;
+	}
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof TaskListItemAttachment))
+			return false;
+
+		final TaskListItemAttachment genericEntity = (TaskListItemAttachment) o;
+
+      	return new EqualsBuilder()
+      	.append(this.uid,genericEntity.uid)
+      	.append(this.fileVersionId,genericEntity.fileVersionId)
+      	.append(this.fileName,genericEntity.fileName)
+      	.append(this.fileType,genericEntity.fileType)
+      	.append(this.created,genericEntity.created)
+      	.append(this.createBy,genericEntity.createBy)
+      	.isEquals();
+	}
+
+	public int hashCode() {
+		return new HashCodeBuilder().append(uid).append(fileVersionId).append(
+				fileName).append(fileType).append(created).append(createBy)
+				.toHashCode();
+	}
 	
 	//  **********************************************************
-  	//		get/set methods
+  	//		Get/Set methods
 	//  **********************************************************
+	
 	/**
 	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
 	 * @return Returns the log Uid.

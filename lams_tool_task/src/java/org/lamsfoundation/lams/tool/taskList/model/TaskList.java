@@ -85,6 +85,7 @@ public class TaskList implements Cloneable{
 
 	private List<TaskListAttachment> onlineFileList;
 	private List<TaskListAttachment> offlineFileList;
+	
 	/**
 	 * Default contruction method. 
 	 *
@@ -93,6 +94,7 @@ public class TaskList implements Cloneable{
   		attachments = new HashSet();
   		taskListItems = new HashSet();
   	}
+  	
   	//  **********************************************************
   	//		Function method for TaskList
   	//  **********************************************************
@@ -125,7 +127,7 @@ public class TaskList implements Cloneable{
   				while(iter.hasNext()){
   					TaskListItem item = (TaskListItem)iter.next(); 
   					TaskListItem newItem = (TaskListItem) item.clone();
-//  				just clone old file without duplicate it in repository
+  					//just clone old file without duplicate it in repository
 					set.add(newItem);
   				}
   				taskList.taskListItems = set;
@@ -137,7 +139,7 @@ public class TaskList implements Cloneable{
   				while(iter.hasNext()){
   					TaskListAttachment file = (TaskListAttachment)iter.next(); 
   					TaskListAttachment newFile = (TaskListAttachment) file.clone();
-//  				just clone old file without duplicate it in repository
+  					//just clone old file without duplicate it in repository
   					
 					set.add(newFile);
   				}
@@ -294,8 +296,6 @@ public class TaskList implements Cloneable{
 	public void setTitle(String title) {
 		this.title = title;
 	}
-
-	
 
 	/**
 	 * @return Returns the runOffline.

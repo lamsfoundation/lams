@@ -29,12 +29,12 @@
 				<td width="40px" align="center">
 					<c:if test="${not status.first}">
 						<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
-							border="0" title="<fmt:message key="label.up"/>"
+							border="0" title="<fmt:message key="label.authoring.up"/>"
 							onclick="upQuestion(${status.index},'${sessionMapID}')">
 						<c:if test="${status.last}">
 							<img
 								src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
-								border="0" title="<fmt:message key="label.down"/>">
+								border="0" title="<fmt:message key="label.authoring.down"/>">
 						</c:if>
 					</c:if>
 
@@ -42,11 +42,11 @@
 						<c:if test="${status.first}">
 							<img
 								src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
-								border="0" title="<fmt:message key="label.up"/>">
+								border="0" title="<fmt:message key="label.authoring.up"/>">
 						</c:if>
 
 						<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
-							border="0" title="<fmt:message key="label.down"/>"
+							border="0" title="<fmt:message key="label.authoring.down"/>"
 							onclick="downQuestion(${status.index},'${sessionMapID}')">
 					</c:if>
 				</td>

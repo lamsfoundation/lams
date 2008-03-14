@@ -124,12 +124,12 @@ public class ViewItemAction extends Action {
 		
 		//these attribute will be use to instruction navigator page		
 		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-		request.setAttribute(AttributeNames.ATTR_MODE,mode);
-		request.setAttribute(TaskListConstants.ATTR_TOOL_SESSION_ID,sessionId);
-		int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX));
-		request.setAttribute(TaskListConstants.PARAM_ITEM_INDEX,itemIdx);
+//		request.setAttribute(AttributeNames.ATTR_MODE,mode);
+//		request.setAttribute(TaskListConstants.ATTR_TOOL_SESSION_ID,sessionId);
+//		int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX));
+//		request.setAttribute(TaskListConstants.PARAM_ITEM_INDEX,itemIdx);
 		Long itemUid = NumberUtils.createLong(request.getParameter(TaskListConstants.PARAM_RESOURCE_ITEM_UID));
-		request.setAttribute(TaskListConstants.PARAM_RESOURCE_ITEM_UID,itemUid);
+//		request.setAttribute(TaskListConstants.PARAM_RESOURCE_ITEM_UID,itemUid);
 		
 		sessionMap.put(TaskListConstants.PARAM_RESOURCE_ITEM_UID,itemUid);
 		
@@ -138,6 +138,7 @@ public class ViewItemAction extends Action {
 		sessionMap.put(TaskListConstants.ATTR_TASK_LIST_ITEM_TITLE, item.getTitle());
 		sessionMap.put(TaskListConstants.ATTR_TASK_LIST_ITEM_DESCRIPTION,item.getDescription());
 		sessionMap.put(TaskListConstants.ATTR_TOOL_SESSION_ID,sessionId);
+		sessionMap.put(AttributeNames.ATTR_MODE,mode);
 		
 		//init taskList item list
 		SortedSet<TaskListItemComment> commentList = getCommentList(sessionMap);

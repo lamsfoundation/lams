@@ -24,7 +24,13 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.taskList.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 
 /**
  * List contains following element: <br>
@@ -32,7 +38,6 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
  * <li>session_id</li>
  * <li>session_name</li>
  * <li>TaskListItem.uid</li>
- * <li>TaskListItem.item_type</li>
  * <li>TaskListItem.create_by_author</li>
  * <li>TaskListItem.is_hide</li>
  * <li>TaskListItem.title</li>
@@ -44,19 +49,15 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
  */
 public class Summary {
 
-	private Long sessionId;
-	private String sessionName;
-	private Long itemUid;
-	private boolean itemCreateByAuthor;
-	private boolean itemHide;
-	private String itemTitle;
-	private String username;
-	private int viewNumber;
+	private boolean isMonitorVerificationRequired;
 	
-	//true: initial group item, false, belong to some group.
-	private boolean isInitGroup;
+	private List<TaskListUser> userNames;
+	private List<TaskListItem> taskListItems;
+	
+	private boolean[][] completeMap; 
 	
 	public Summary(){}
+	
 	/**
 	 * Contruction method for monitoring summary function. 
 	 * 
@@ -65,93 +66,39 @@ public class Summary {
 	 * @param item
 	 * @param isInitGroup
 	 */
-	public Summary(Long sessionId, String sessionName, TaskListItem item){
-		this.sessionId = sessionId;
-		this.sessionName = sessionName;
-		if(item != null){
-			this.itemUid = item.getUid();
-			this.itemCreateByAuthor = item.isCreateByAuthor();
-			this.itemHide = item.isHide();
-			this.itemTitle = item.getTitle();
-			this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
-		}else
-			this.itemUid = new Long(-1);
+	public Summary(List<TaskListItem> taskListItems, List<TaskListUser> userNames, boolean[][] completeMap, boolean isMonitorVerificationRequired){
+		this.userNames = userNames;
+		this.taskListItems = taskListItems;
+		this.completeMap = completeMap;
+		this.isMonitorVerificationRequired = isMonitorVerificationRequired;
 	}
-	/**
-	 * Contruction method for export profolio function. 
-	 * 
-	 * <B>Don't not set sessionId and viewNumber fields</B>
-	 * @param sessionName
-	 * @param item
-	 * @param isInitGroup
-	 */
-	public Summary(String sessionName, TaskListItem item,boolean isInitGroup){
-		this.sessionName = sessionName;
-		if(item != null){
-			this.itemUid = item.getUid();
-			this.itemCreateByAuthor = item.isCreateByAuthor();
-			this.itemHide = item.isHide();
-			this.itemTitle = item.getTitle();
-			this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
-		}else
-			this.itemUid = new Long(-1);
-		this.isInitGroup = isInitGroup;
+	
+	public List<TaskListUser> getUserNames() {
+		return userNames;
 	}
-	public boolean isItemCreateByAuthor() {
-		return itemCreateByAuthor;
+	public void setUserNames(List<TaskListUser> userNames) {
+		this.userNames = userNames;
 	}
-	public void setItemCreateByAuthor(boolean itemCreateByAuthor) {
-		this.itemCreateByAuthor = itemCreateByAuthor;
+	
+	public List<TaskListItem> getTaskListItems() {
+		return taskListItems;
 	}
-	public boolean isItemHide() {
-		return itemHide;
+	public void setTaskListItems(List<TaskListItem> taskListItems) {
+		this.taskListItems = taskListItems;
 	}
-	public void setItemHide(boolean itemHide) {
-		this.itemHide = itemHide;
+	
+	public boolean[][] getCompleteMap() {
+		return completeMap;
 	}
-	public String getItemTitle() {
-		return itemTitle;
+	public void setCompleteMap(boolean[][] completeMap) {
+		this.completeMap = completeMap;
 	}
-	public void setItemTitle(String itemTitle) {
-		this.itemTitle = itemTitle;
+	
+	public boolean isMonitorVerificationRequired() {
+		return isMonitorVerificationRequired;
 	}
-	public Long getItemUid() {
-		return itemUid;
-	}
-	public void setItemUid(Long itemUid) {
-		this.itemUid = itemUid;
-	}
-	public Long getSessionId() {
-		return sessionId;
-	}
-	public void setSessionId(Long sessionId) {
-		this.sessionId = sessionId;
-	}
-	public String getSessionName() {
-		return sessionName;
-	}
-	public void setSessionName(String sessionName) {
-		this.sessionName = sessionName;
-	}
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	public int getViewNumber() {
-		return viewNumber;
-	}
-	public void setViewNumber(int viewNumber) {
-		this.viewNumber = viewNumber;
-	}
-
-	public boolean isInitGroup() {
-		return isInitGroup;
-	}
-
-	public void setInitGroup(boolean isInitGroup) {
-		this.isInitGroup = isInitGroup;
+	public void setIsMonitorVerificationRequired(boolean isMonitorVerificationRequired) {
+		this.isMonitorVerificationRequired = isMonitorVerificationRequired;
 	}
 	
 }

@@ -159,7 +159,7 @@
 		<c:if test="${mode != 'teacher'}">
 			<p>
 				<a href="#" onclick="return checkNew()" class="button"> 
-					<fmt:message key="label.check.for.new" /> 
+					<fmt:message key="label.learning.check.for.new" /> 
 				</a>
 			</p>
 			<br><br>

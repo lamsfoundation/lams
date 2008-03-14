@@ -48,7 +48,6 @@ create table tl_latask10_taskList_item (
    create_by bigint,
    create_date datetime,
    create_by_author tinyint,
-   is_hide tinyint,
    is_required tinyint,
    is_comments_allowed tinyint,
    show_comments_to_all tinyint,
@@ -129,7 +128,7 @@ INSERT INTO `tl_latask10_taskList` (`uid`, `create_date`, `update_date`, `create
  `lock_when_finished`, `is_sequential_order`, `allow_contribute_tasks`, `is_monitor_verification_required`, `reflect_on_activity`) VALUES
   (1,NULL,NULL,NULL,'TaskList','0','Instructions ',null,null,0,0,${default_content_id},0,0,0,0,0);
   
-INSERT INTO `tl_latask10_taskList_item` (`uid`, `sequence_id`, `description`, `init_item`, `organization_xml`, `title`, `create_by`, `create_date`, `create_by_author`, `is_hide`, `is_required`, `is_comments_allowed`, `show_comments_to_all`, `is_child_task`, `parent_task_name`, `taskList_uid`, `session_uid`) VALUES 
-  (1,1,NULL,NULL,NULL,'Task number 1',null,NOW(),1,0,0,0,0,0,NULL,1,NULL);
+INSERT INTO `tl_latask10_taskList_item` (`uid`, `sequence_id`, `description`, `init_item`, `organization_xml`, `title`, `create_by`, `create_date`, `create_by_author`, `is_required`, `is_comments_allowed`, `show_comments_to_all`, `is_child_task`, `parent_task_name`, `taskList_uid`, `session_uid`) VALUES 
+  (1,1,NULL,NULL,NULL,'Task number 1',null,NOW(),1,0,0,0,0,NULL,1,NULL);
     
 SET FOREIGN_KEY_CHECKS=1;

@@ -25,6 +25,7 @@
 
 package org.lamsfoundation.lams.tool.taskList.web.servlet;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
-import org.lamsfoundation.lams.tool.taskList.dto.Summary;
+import org.lamsfoundation.lams.tool.taskList.dto.AttachmentDTO;
+import org.lamsfoundation.lams.tool.taskList.dto.ExportDTO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
@@ -45,6 +47,7 @@ import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
 import org.lamsfoundation.lams.tool.taskList.service.TaskListApplicationException;
 import org.lamsfoundation.lams.tool.taskList.service.TaskListServiceProxy;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListToolContentHandler;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -64,7 +67,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	private static Logger logger = Logger.getLogger(ExportServlet.class);
 
-	private final String FILENAME = "shared_taskList_main.html";
+	private final String FILENAME = "taskList_main.html";
 
 	private TaskListToolContentHandler handler;
 
@@ -114,8 +117,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
         return super.doOfflineExport(request, response, directoryName, cookies);
 	}
 
-
-
 	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
 			throws TaskListApplicationException {
 
@@ -144,15 +145,15 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 		
 		
-		List<Summary> group = service.exportBySessionId(toolSessionID,true);
-//		?????????????????????
-//		saveFileToLocal(group, directoryName);
+		List<ExportDTO> group = service.exportBySessionId(toolSessionID, learner.getLoginName());
+
+		saveFileToLocal(group, directoryName);
 		
 		List<List> groupList = new ArrayList<List>();
 		if(group.size() > 0)
 			groupList.add(group);
 		sessionMap.put(TaskListConstants.ATTR_TITLE, content.getTitle());
-		sessionMap.put(TaskListConstants.ATTR_SUMMARY_LIST, groupList);
+		sessionMap.put(TaskListConstants.ATTR_EXPORT_DTO_LIST, groupList);
 	}
 
 	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
@@ -173,46 +174,42 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new TaskListApplicationException(error);
 		}
-		List<List<Summary>> groupList = service.exportByContentId(toolContentID);
-		////?????????????????????
-//		if(groupList != null)
-//			for (List<Summary> list : groupList) {
-//				saveFileToLocal(list, directoryName);
-//			}
+		List<List<ExportDTO>> groupList = service.exportByContentId(toolContentID);
+
+		if(groupList != null)
+			for (List<ExportDTO> list : groupList) {
+				saveFileToLocal(list, directoryName);
+			}
 		// put it into HTTPSession
 		sessionMap.put(TaskListConstants.ATTR_TITLE, content.getTitle());
-		sessionMap.put(TaskListConstants.ATTR_SUMMARY_LIST, groupList);
+		sessionMap.put(TaskListConstants.ATTR_EXPORT_DTO_LIST, groupList);
 	}
 
-	/////????????????????????????????
-//    private void saveFileToLocal(List<Summary> list, String directoryName) {
-//    	handler = getToolContentHandler();
-//		for (Summary summary : list) {
-//			//for learning object, it just display "No offlice pakcage avaliable" information.
-//			if(summary.getItemType() == TaskListConstants.RESOURCE_TYPE_LEARNING_OBJECT 
-//				|| summary.getItemType() == TaskListConstants.RESOURCE_TYPE_URL)
-//				continue;
-//			try{
-//				int idx= 1;
-//				String userName = summary.getUsername();
-//				String localDir;
-//				while(true){
-//					localDir = FileUtil.getFullPath(directoryName,userName + "/" + idx);
-//					File local = new File(localDir);
-//					if(!local.exists()){
-//						local.mkdirs();
-//						break;
-//					}
-//					idx++;
-//				}
-//				summary.setAttachmentLocalUrl(userName + "/" + idx + "/" + summary.getFileUuid() + '.' + FileUtil.getFileExtension(summary.getFileName()));
-//				handler.saveFile(summary.getFileUuid(), FileUtil.getFullPath(directoryName, summary.getAttachmentLocalUrl()));
-//			} catch (Exception e) {
-//				logger.error("Export forum topic attachment failed: " + e.toString());
-//			}
-//		}
-//		
-//	}
+    private void saveFileToLocal(List<ExportDTO> exportDTOs, String directoryName) {
+    	handler = getToolContentHandler();
+		for (ExportDTO exportDTO : exportDTOs) {
+			for (AttachmentDTO attachment : exportDTO.getAttachmentDTOs()) {
+				try{
+					int idx= 1;
+					String userName = attachment.getCreatedBy();
+					String localDir;
+					while(true){
+						localDir = FileUtil.getFullPath(directoryName,userName + "/" + idx);
+						File local = new File(localDir);
+						if(!local.exists()){
+							local.mkdirs();
+							break;
+						}
+						idx++;
+					}
+					attachment.setAttachmentLocalUrl(userName + "/" + idx + "/" + attachment.getFileUuid() + '.' + FileUtil.getFileExtension(attachment.getFileName()));
+					handler.saveFile(attachment.getFileUuid(), FileUtil.getFullPath(directoryName, attachment.getAttachmentLocalUrl()));
+				} catch (Exception e) {
+					logger.error("Export forum topic attachment failed: " + e.toString());
+				}
+			}
+		}
+	}
 
 	private TaskListToolContentHandler getToolContentHandler() {
   	    if ( handler == null ) {

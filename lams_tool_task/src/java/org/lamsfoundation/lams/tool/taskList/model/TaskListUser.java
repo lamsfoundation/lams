@@ -54,6 +54,8 @@ public class TaskListUser implements Cloneable{
 	//the user access some reousrce item date time. Use in monitoring summary page
 	private Date accessDate;
 	
+	private boolean verified;
+	
 	public TaskListUser(){
 	}
 	public TaskListUser(UserDTO user, TaskListSession session){
@@ -216,5 +218,11 @@ public class TaskListUser implements Cloneable{
 		this.accessDate = accessDate;
 	}
 
+	public boolean getVerified() {
+		return verified;
+	}
+	public void setVerified(boolean verified) {
+		this.verified = verified;
+	}
 
 }

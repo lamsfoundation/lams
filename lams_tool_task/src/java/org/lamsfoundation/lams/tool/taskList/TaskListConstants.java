@@ -30,12 +30,6 @@ public class TaskListConstants {
 
 	public static final int COMPLETED = 1;
 	
-//	//taskList type;
-//	public static final short RESOURCE_TYPE_URL = 1;
-//	public static final short RESOURCE_TYPE_FILE = 2;
-//	public static final short RESOURCE_TYPE_WEBSITE = 3;
-//	public static final short RESOURCE_TYPE_LEARNING_OBJECT = 4;
-	
 	//for action forward name
 	public static final String SUCCESS = "success";
 	public static final String ERROR = "error";
@@ -67,7 +61,8 @@ public class TaskListConstants {
 	public static final String ATTR_RUN_AUTO = "runAuto";
 	public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
 	public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
-	public static final String ATTR_SUMMARY_LIST = "summaryList";
+	public static final String ATTR_SUMMARY = "summary";
+	public static final String ATTR_EXPORT_DTO_LIST = "exportDTOList";
 	public static final String ATTR_USER_LIST = "userList";
 	public static final String ATTR_FINISH_LOCK = "finishedLock";
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
@@ -84,12 +79,7 @@ public class TaskListConstants {
 	
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
-	public static final String ERROR_MSG_URL_BLANK = "error.resource.item.url.blank";
-	public static final String ERROR_MSG_DESC_BLANK = "error.resource.item.desc.blank";
-	public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
-	public static final String ERROR_MSG_INVALID_URL = "error.resource.item.invalid.url";
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
-	
 	
 	public static final String PAGE_EDITABLE = "isPageEditable";
 	public static final String MODE_AUTHOR_SESSION = "author_session";

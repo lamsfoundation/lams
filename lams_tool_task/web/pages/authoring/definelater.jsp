@@ -12,7 +12,7 @@
 			%>
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.author.title" /></title>
+	<title><fmt:message key="label.authoring.title" /></title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
 	<%@ include file="/common/fckeditorheader.jsp"%>

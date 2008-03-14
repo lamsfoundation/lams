@@ -45,6 +45,7 @@ import java.util.Vector;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
+import org.hibernate.collection.PersistentSet;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -81,6 +82,7 @@ import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemVisitDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListSessionDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListUserDAO;
+import org.lamsfoundation.lams.tool.taskList.dto.ExportDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
@@ -91,6 +93,7 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListToolContentHandler;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -130,6 +133,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	
 	private class ReflectDTOComparator implements Comparator<ReflectDTO>{
 		public int compare(ReflectDTO o1, ReflectDTO o2) {
+			
 			if(o1 != null && o2 != null){
 				return o1.getFullName().compareTo(o2.getFullName());
 			}else if(o1 != null)
@@ -342,70 +346,66 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		
 		return items;
 	}
-	public List<Summary> exportBySessionId(Long sessionId, boolean skipHide) {
+	public List<ExportDTO> exportBySessionId(Long sessionId,  String userLogin) {
 		TaskListSession session = taskListSessionDao.getSessionBySessionId(sessionId);
 		if(session == null){
 			log.error("Failed get TaskListSession by ID [" +sessionId + "]");
 			return null;
 		}
 		//initial taskList items list
-		List<Summary> itemList = new ArrayList();
+		List<ExportDTO> itemList = new ArrayList();
 		Set<TaskListItem> resList = session.getTaskList().getTaskListItems();
 		for(TaskListItem item:resList){
-			if(skipHide && item.isHide())
-				continue;
 			//if item is create by author
 			if(item.isCreateByAuthor()){
-				Summary sum = new Summary(session.getSessionName(),item,false);
-				itemList.add(sum);
+				ExportDTO exportDTO = new ExportDTO(session.getSessionName(), item, false, userLogin);
+				itemList.add(exportDTO);
 			}
 		}
 
 		//get this session's all taskList items
 		Set<TaskListItem> sessList =session.getTaskListItems();
 		for(TaskListItem item:sessList){
-			if(skipHide && item.isHide())
-				continue;
-			
 			//to skip all item create by author
 			if(!item.isCreateByAuthor()){
-				Summary sum = new Summary(session.getSessionName(),item,false);
-				itemList.add(sum);
+				ExportDTO exportDTO = new ExportDTO(session.getSessionName(), item, false, userLogin);
+				itemList.add(exportDTO);
 			}
 		}
 		
 		return itemList;
 	}
-	public List<List<Summary>> exportByContentId(Long contentId) {
+	
+	public List<List<ExportDTO>> exportByContentId(Long contentId) {
 		TaskList taskList = taskListDao.getByContentId(contentId);
-		List<List<Summary>> groupList = new ArrayList();
+		List<List<ExportDTO>> groupList = new ArrayList();
 		
 		//create init taskList items list
-		List<Summary> initList = new ArrayList();
+		List<ExportDTO> initList = new ArrayList();
 		groupList.add(initList);
 		Set<TaskListItem> resList = taskList.getTaskListItems();
 		for(TaskListItem item:resList){
 			if(item.isCreateByAuthor()){
-				Summary sum = new Summary(null,item,true);
-				initList.add(sum);
+				ExportDTO exportDTO = new ExportDTO(null,item,true);
+				initList.add(exportDTO);
 			}
 		}
 		
 		//session by session
 		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
 		for(TaskListSession session:sessionList){
-			List<Summary> group = new ArrayList<Summary>();
+			List<ExportDTO> group = new ArrayList<ExportDTO>();
 			//get this session's all taskList items
 			Set<TaskListItem> sessList =session.getTaskListItems();
 			for(TaskListItem item:sessList){
 				//to skip all item create by author
 				if(!item.isCreateByAuthor()){
-					Summary sum = new Summary(session.getSessionName(),item,false);
-					group.add(sum);
+					ExportDTO exportDTO = new ExportDTO(session.getSessionName(),item,false);
+					group.add(exportDTO);
 				}
 			}
 			if(group.size() == 0){
-				group.add(new Summary(session.getSessionName(),null,false));
+				group.add(new ExportDTO(session.getSessionName(),null,false));
 			}
 			groupList.add(group);
 		}
@@ -508,51 +508,103 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	public TaskListItem getTaskListItemByUid(Long itemUid) {
 		return taskListItemDao.getByUid(itemUid);
 	}
-	public List<List<Summary>> getSummary(Long contentId) {
-		List<List<Summary>> groupList = new ArrayList<List<Summary>>();
-		List<Summary> group = new ArrayList<Summary>();
-		
-		//get all item which is accessed by user
-		Map<Long,Integer> visitCountMap = taskListItemVisitDao.getSummary(contentId);
+	
+	public Summary getSummary(Long contentId) {
 		
 		TaskList taskList = taskListDao.getByContentId(contentId);
-		Set<TaskListItem> resItemList = taskList.getTaskListItems();
+		ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
+		itemList.addAll(taskList.getTaskListItems());
+		
+		ArrayList<TaskListUser> userList = new ArrayList<TaskListUser>();
+		
+//		service.isUserInRole(userId, group.getOrganisationId(), Role.GROUP_ADMIN)
+//		userManagementService.getAllUsers(filteredOrgId)
+//		userManagementService.is
+//		taskListUserDao.getBySessionID(contentId);
+//		TaskListUser user = taskListUserDao.getUserByUserIDAndContentID(userId, contentId);
+//		users.add(user);
 
-		//get all sessions in a taskList and retrieve all taskList items under this session
-		//plus initial taskList items by author creating (resItemList) 
 		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
-		for(TaskListSession session:sessionList){
-			//one new group for one session.
-			group = new ArrayList<Summary>();
-			//firstly, put all initial taskList item into this group.
-			for(TaskListItem item:resItemList){
-				Summary sum = new Summary(session.getSessionId(),session.getSessionName(),item);
-				//set viewNumber according visit log
-				if(visitCountMap.containsKey(item.getUid()))
-					sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
-				group.add(sum);
+		for(TaskListSession session:sessionList) {
+
+			Set<TaskListItem> newItems = session.getTaskListItems();
+			for(TaskListItem item : newItems) {
+				if (!itemList.contains(item)) itemList.add(item);
 			}
-			//get this session's all taskList items
-			Set<TaskListItem> sessItemList =session.getTaskListItems();
-			for(TaskListItem item : sessItemList){
-				//to skip all item create by author
-				if(!item.isCreateByAuthor()){
-					Summary sum = new Summary(session.getSessionId(),session.getSessionName(),item);
-					//set viewNumber according visit log
-					if(visitCountMap.containsKey(item.getUid()))
-						sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());					
-					group.add(sum);
+			
+//			userList.addAll(taskListUserDao.getBySessionID(session.getSessionId()));
+			List<TaskListUser> newUsers = taskListUserDao.getBySessionID(session.getSessionId());
+			for(TaskListUser user : newUsers) {
+				if (!userList.contains(user)) userList.add(user);
+			}
+		}
+		
+		boolean[][] complete = new boolean[userList.size()][itemList.size()];
+		for (int i = 0; i < userList.size(); i++) {
+			for (int j = 0; j < itemList.size(); j++) {
+				
+				TaskListUser user = userList.get(i);
+				TaskListItem item = itemList.get(j);
+				
+				TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(), user.getUserId());
+				if (visitLog !=null) {
+					complete[i][j] = visitLog.isComplete();	
+				} else {
+					complete[i][j] = false;
 				}
 			}
-			//so far no any item available, so just put session name info to Summary
-			if(group.size() == 0)
-				group.add(new Summary(session.getSessionId(),session.getSessionName(),null));
-			groupList.add(group);
-		} 
+		}
 		
-		return groupList;
-
+		Summary summary = new Summary(itemList, userList, complete, taskList.isMonitorVerificationRequired());
+		return summary;
 	}
+	
+//	public List<List<Summary>> getSummary(Long contentId) {
+//		List<List<Summary>> groupList = new ArrayList<List<Summary>>();
+//		List<Summary> group = new ArrayList<Summary>();
+//		
+//		//get all item which is accessed by user
+//		Map<Long,Integer> visitCountMap = taskListItemVisitDao.getSummary(contentId);
+//		
+//		TaskList taskList = taskListDao.getByContentId(contentId);
+//		Set<TaskListItem> resItemList = taskList.getTaskListItems();
+//
+//		//get all sessions in a taskList and retrieve all taskList items under this session
+//		//plus initial taskList items by author creating (resItemList) 
+//		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
+//		for(TaskListSession session:sessionList){
+//			//one new group for one session.
+//			group = new ArrayList<Summary>();
+//			//firstly, put all initial taskList item into this group.
+//			for(TaskListItem item:resItemList){
+//				Summary sum = new Summary(session.getSessionId(),session.getSessionName(),item);
+//				//set viewNumber according visit log
+//				if(visitCountMap.containsKey(item.getUid()))
+//					sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
+//				group.add(sum);
+//			}
+//			//get this session's all taskList items
+//			Set<TaskListItem> sessItemList =session.getTaskListItems();
+//			for(TaskListItem item : sessItemList){
+//				//to skip all item create by author
+//				if(!item.isCreateByAuthor()){
+//					Summary sum = new Summary(session.getSessionId(),session.getSessionName(),item);
+//					//set viewNumber according visit log
+//					if(visitCountMap.containsKey(item.getUid()))
+//						sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());					
+//					group.add(sum);
+//				}
+//			}
+//			//so far no any item available, so just put session name info to Summary
+//			if(group.size() == 0)
+//				group.add(new Summary(session.getSessionId(),session.getSessionName(),null));
+//			groupList.add(group);
+//		} 
+//		
+//		return groupList;
+//		return null;
+//
+//	}
 	public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId){
 		Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
 
@@ -584,27 +636,6 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		return userList;
 	}
 
-	public void setItemVisible(Long itemUid, boolean visible) {
-		TaskListItem item = taskListItemDao.getByUid(itemUid);
-		if ( item != null ) {
-			//createBy should be null for system default value.
-			Long userId = 0L;
-			String loginName = "No user"; 
-			if(item.getCreateBy() != null){
-				userId =  item.getCreateBy().getUserId();
-				loginName = item.getCreateBy().getLoginName();
-			}
-			if ( visible ) {
-				auditService.logShowEntry(TaskListConstants.TOOL_SIGNATURE,userId, 
-						loginName, item.toString());
-			} else {
-				auditService.logHideEntry(TaskListConstants.TOOL_SIGNATURE, userId,
-						loginName, item.toString());
-			}
-			item.setHide(!visible);
-			taskListItemDao.saveObject(item);
-		}
-	}
 	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText) {
 		return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "", entryText);
 	}
@@ -1048,7 +1079,6 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	    			item.setTitle((String) urlMap.get(ToolContentImport102Manager.CONTENT_TITLE));
 	    			item.setCreateBy(ruser);
 	    			item.setCreateByAuthor(true);
-	    			item.setHide(false);
 
 //	    			String taskListType = (String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_TYPE);
 //	    			if ( ToolContentImport102Manager.URL_RESOURCE_TYPE_URL.equals(taskListType) ) {
@@ -1134,7 +1164,5 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 		this.coreNotebookService = coreNotebookService;
 	}
-
-
 
 }

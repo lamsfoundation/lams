@@ -25,6 +25,10 @@
 package org.lamsfoundation.lams.tool.taskList.model;
 
 import java.util.Date;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.log4j.Logger;
 /**
  * TaskList
  * @author Andrey Balan
@@ -33,11 +37,56 @@ import java.util.Date;
  *
  */
 public class TaskListItemComment {
+	
+	private static final Logger log = Logger.getLogger(TaskListItemComment.class);
 
 	private Long uid;
 	private String comment;
 	private TaskListUser createBy;
 	private Date createDate;
+	
+    //  **********************************************************
+  	//		Function method for TaskListItemComment
+    //  **********************************************************
+    public Object clone(){
+    	TaskListItemComment taskListItemComment = null;
+		try {
+			taskListItemComment = (TaskListItemComment) super.clone();
+			((TaskListItemComment)taskListItemComment).setUid(null);
+			
+  			//clone ReourceUser as well
+  			if(this.createBy != null){
+  				taskListItemComment.setCreateBy((TaskListUser) this.createBy.clone());
+  			}
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + TaskListItemComment.class + " failed");
+		}
+		
+		return taskListItemComment;
+	}
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof TaskListItemComment))
+			return false;
+
+		final TaskListItemComment genericEntity = (TaskListItemComment) o;
+
+      	return new EqualsBuilder()
+      	.append(this.uid,genericEntity.uid)
+      	.append(this.comment,genericEntity.comment)
+      	.append(this.createBy,genericEntity.createBy)
+      	.isEquals();
+	}
+
+	public int hashCode() {
+		return new HashCodeBuilder().append(uid).append(comment)
+			.append(createBy).toHashCode();
+	}
+	
+	//  **********************************************************
+  	//		Get/Set methods
+	//  **********************************************************
 	
 	/**
 	 * @hibernate.property column="create_date"

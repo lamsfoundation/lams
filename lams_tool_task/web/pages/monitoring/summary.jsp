@@ -1,47 +1,160 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
-<c:set var="summaryList" value="${sessionMap.summaryList}"/>
+<c:set var="summary" value="${sessionMap.summary}"/>
+<script type="text/javascript">
 
-<c:if test="${empty summaryList}">
-	<div align="center">
-		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
-	</div>
-</c:if>
+	function viewItem(itemUid){
+		var myUrl = "<c:url value="/reviewtask/reviewTask.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&itemUid=" + itemUid;
+		launchPopup(myUrl,"LearnerView");
+	}
+	
+	function verifyUser(userUid){
+		document.location.href = "<c:url value="/monitoring/verifyUser.do"/>?sessionMapID=${sessionMapID}&userUid=" + userUid;
+		return false;
+	}
+	
+</script>
 
-<table cellpadding="0">
-	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
-		<c:set var="groupSize" value="${fn:length(group)}" />
-		<c:forEach var="item" items="${group}" varStatus="status">
-			<%-- display group name on first row--%>
-			<c:if test="${status.first}">
+<table cellpadding="0" class="alternative-color" >
+
+	<h1>
+		Overall Summary
+	</h1>
+
+	<tr>
+		<th width="30%">
+			USER
+		</th>
+		<c:forEach var="item" items="${summary.taskListItems}">
+			<th width="30px"  align="center">
+				${item.title}
+			</th>
+		</c:forEach>					
+		
+		<c:if test="${summary.monitorVerificationRequired}">
+			<th width="60px" align="center">
+				Complete Activity?
+			</th>
+		</c:if>			
+	</tr>
+
+
+	<c:forEach var="user" items="${summary.userNames}" varStatus="userStatus">
+	
+		<tr>
+			<td>
+				${user.loginName}
+			</td>
+			
+			<c:forEach var="item" items="${summary.taskListItems}" varStatus="itemStatus">
+				<td align="center">
+					<c:choose>
+						<c:when test="${summary.completeMap[userStatus.index][itemStatus.index]}">
+							<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">
+						</c:when>
+						
+						<c:otherwise>
+							<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">
+						</c:otherwise>
+					</c:choose>
+				</td>
+			</c:forEach>					
+						
+			<c:if test="${summary.monitorVerificationRequired}">
+				<td align="center">
+					<c:choose>
+						<c:when test="${1==0}">
+							<img src="<html:rewrite page='/includes/images/tick.gif'/>"	border="0">
+						</c:when>
+						
+						<c:otherwise>
+							<a href="javascript:;"
+								onclick="return verifyUser(${user.uid})"> [<fmt:message key="label.completed" /> for ${user.loginName}] 
+							</a>
+						</c:otherwise>
+					</c:choose>
+				</td>
+			</c:if>
+				
+		</tr>
+		
+			
+	</c:forEach>
+</table>
+
+<%-- 
+
+
+		<c:forEach var="item" items="${summary.taskListItems}" varStatus="itemStatus">
+			<c:if test="${userStatus.first}">
+			</c:if>
+						
+					
+		</c:forEach>						
+						
+							
+							<c:set var="lastTaskCompletion" value="${true}" />
+							<c:forEach var="item" items="${sessionMap.taskListList}">
+							
+								<c:set var="isAllowedByParent" value="${true}" />
+								<c:if test="${item.childTask}">
+									<c:forEach var="parent" items="${sessionMap.taskListList}">
+										<c:if test="${(parent.title == item.parentTaskName) && not parent.complete}">
+											<c:set var="isAllowedByParent" value="${false}" />
+										</c:if>
+									</c:forEach>
+								</c:if>
+								
+								<c:if test="${isAllowedByParent}">
+									<tr>
+										<td>
+											<c:choose>
+												<c:when test="${(not finishedLock) && (not taskList.sequentialOrder || lastTaskCompletion)}">
+													<a href="javascript:;" onclick="viewItem(${item.uid})">
+														${item.title} </a>
+												</c:when>
+					
+												<c:otherwise>
+													${item.title}
+												</c:otherwise>
+											</c:choose>
+				
+											<c:if test="${!item.createByAuthor && item.createBy != null}">
+													[${item.createBy.loginName}]
+											</c:if>
+											
+											<c:if test="${item.required}">
+												*
+											</c:if>
+										</td>
+										<td align="center">
+											<c:choose>
+												<c:when test="${item.complete}">
+													<img src="<html:rewrite page='/includes/images/tick.gif'/>"
+														border="0">
+												</c:when>
+												<c:otherwise>
+													<c:if test="${(mode != 'teacher') && (not finishedLock) && (not taskList.sequentialOrder || lastTaskCompletion)}">
+														<a href="javascript:;"
+															onclick="return completeItem(${item.uid})"> <fmt:message key="label.completed" /> 
+														</a>
+													</c:if>
+												</c:otherwise>
+											</c:choose>
+										</td>
+									</tr>
+
 				<tr>
-					<td colspan="5">
-						<B><fmt:message key="monitoring.label.group" /> ${item.sessionName}</B> 
-						<SPAN style="font-size: 12px;"> 
-							<c:if test="${firstGroup.index==0}">
-								<fmt:message key="monitoring.summary.note" />
-							</c:if> 
-						</SPAN>
-					</td>
-				</tr>
-				<tr>
-					<th width="18%" align="center">
-						<fmt:message key="monitoring.label.type" />
-					</th>
-					<th width="25%">
+					<th width="44%">
 						<fmt:message key="monitoring.label.title" />
 					</th>
-					<th width="20%">
+					<th width="34%">
 						<fmt:message key="monitoring.label.suggest" />
 					</th>
 					<th width="22%" align="center">
 						<fmt:message key="monitoring.label.number.learners" />
 					</th>
-					<th width="15%">
-						<!--hide/show-->
-					</th>
 				</tr>
-				<%-- End group title display --%>
 			</c:if>
 			<c:if test="${item.itemUid == -1}">
 				<tr>
@@ -54,22 +167,6 @@
 			</c:if>
 			<c:if test="${item.itemUid != -1}">
 				<tr>
-					<td>
-						<c:choose>
-							<c:when test="${item.itemType == 1}">
-								<fmt:message key="label.authoring.basic.resource.url" />
-							</c:when>
-							<c:when test="${item.itemType == 2}">
-								<fmt:message key="label.authoring.basic.resource.file" />
-							</c:when>
-							<c:when test="${item.itemType == 3}">
-								<fmt:message key="label.authoring.basic.resource.website" />
-							</c:when>
-							<c:when test="${item.itemType == 4}">
-								<fmt:message key="label.authoring.basic.resource.learning.object" />
-							</c:when>
-						</c:choose>
-					</td>
 					<td>
 						<a href="javascript:;" onclick="viewItem(${item.itemUid},'${sessionMapID}')">${item.itemTitle}</a>
 					</td>
@@ -91,20 +188,10 @@
 							</c:otherwise>
 						</c:choose>
 					</td>
-					<td align="center">
-						<c:choose>
-							<c:when test="${item.itemHide}">
-								<a href="<c:url value='/monitoring/showitem.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.show" /> </a>
-							</c:when>
-							<c:otherwise>
-								<a href="<c:url value='/monitoring/hideitem.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.hide" /> </a>
-							</c:otherwise>
-						</c:choose>
-					</td>
 				</tr>
 			</c:if>
 			
-				<%-- Reflection list  --%>
+
 				<c:if test="${sessionMap.taskList.reflectOnActivity && status.last}">
 					<c:set var="userList" value="${sessionMap.reflectList[item.sessionId]}"/>
 					<c:forEach var="user" items="${userList}" varStatus="refStatus">
@@ -149,3 +236,5 @@
 		
 	</c:forEach>
 </table>
+
+--%>

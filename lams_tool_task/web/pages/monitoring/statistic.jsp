@@ -2,7 +2,6 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
-
 <table cellspacing="3">
 	<c:if test="${empty summaryList}">
 		<div align="center">
@@ -22,13 +21,10 @@
 					</td>
 				</tr>
 				<tr>
-					<th width="20%" align="center">
-						<fmt:message key="monitoring.label.type" />
-					</th>
-					<th width="35%">
+					<th width="45%">
 						<fmt:message key="monitoring.label.title" />
 					</th>
-					<th width="25%">
+					<th width="35%">
 						<fmt:message key="monitoring.label.suggest" />
 					</th>
 					<th width="20%" align="center">
@@ -48,28 +44,12 @@
 			<c:if test="${item.itemUid != -1}">
 				<tr>
 					<td>
-						<c:choose>
-							<c:when test="${item.itemType == 1}">
-								<fmt:message key="label.authoring.basic.resource.url" />
-							</c:when>
-							<c:when test="${item.itemType == 2}">
-								<fmt:message key="label.authoring.basic.resource.file" />
-							</c:when>
-							<c:when test="${item.itemType == 3}">
-								<fmt:message key="label.authoring.basic.resource.website" />
-							</c:when>
-							<c:when test="${item.itemType == 4}">
-								<fmt:message key="label.authoring.basic.resource.learning.object" />
-							</c:when>
-						</c:choose>
-					</td>
-					<td>
 						${item.itemTitle}
 					</td>
 					<td>
 						<c:if test="${!item.itemCreateByAuthor}">
-										${item.username}
-									</c:if>
+							${item.username}
+						</c:if>
 					</td>
 					<td align="center">
 						<c:choose>
@@ -80,8 +60,8 @@
 								<a href="#" onclick="launchPopup('${listUrl}','listuser')"> ${item.viewNumber}<a>
 							</c:when>
 							<c:otherwise>
-											0
-										</c:otherwise>
+								0
+							</c:otherwise>
 						</c:choose>
 					</td>
 				</tr>

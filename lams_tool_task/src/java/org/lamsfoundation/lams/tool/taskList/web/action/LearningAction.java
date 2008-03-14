@@ -219,9 +219,7 @@ public class LearningAction extends Action {
 				//initial it to avoid session close error in proxy object. 
 				if(item.getCreateBy() != null)
 					item.getCreateBy().getLoginName();
-				if(!item.isHide()){
-					taskListItemList.add(item);
-				}
+				taskListItemList.add(item);
 			}
 		}
 		

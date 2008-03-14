@@ -58,7 +58,6 @@ public class TaskListItem  implements Cloneable{
 	
 	private String initialItem;
 	private String organizationXml;
-	private boolean isHide;
 	private boolean isCreateByAuthor;
 	
 	//general infomation
@@ -98,31 +97,31 @@ public class TaskListItem  implements Cloneable{
   			taskListItem = (TaskListItem) super.clone();
   			taskListItem.setUid(null);
 
-//  			//clone set of taskListItemsAttachment
-//  			if(uploadedFileList != null){
-//  				Iterator iter = uploadedFileList.iterator();
-//  				Set set = new HashSet();
-//  				while(iter.hasNext()){
-//  					TaskListItemAttachment file = (TaskListItemAttachment)iter.next(); 
-//  					TaskListItemAttachment newFile = (TaskListItemAttachment) file.clone();
-//  					//just clone old file without duplicate it in repository
-//					set.add(newFile);
-//  				}
-//  				taskListItem.uploadedFileList = set;
-//  			}
-//  			
-//  			//clone set of taskListItemsComment
-//  			if(comments != null){
-//  				Iterator iter = comments.iterator();
-//  				Set set = new HashSet();
-//  				while(iter.hasNext()){
-//  					TaskListItemComment comment = (TaskListItemComment)iter.next(); 
-//  					TaskListItemComment newComment = (TaskListItemComment) comment.clone();
-//  					//just clone old file without duplicate it in repository
-//					set.add(newComment);
-//  				}
-//  				taskListItem.comments = set;
-//  			}
+  			//clone set of taskListItemsAttachment
+  			if(uploadedFileList != null){
+  				Iterator iter = uploadedFileList.iterator();
+  				Set set = new HashSet();
+  				while(iter.hasNext()){
+  					TaskListItemAttachment file = (TaskListItemAttachment)iter.next(); 
+  					TaskListItemAttachment newFile = (TaskListItemAttachment) file.clone();
+  					//just clone old file without duplicate it in repository
+					set.add(newFile);
+  				}
+  				taskListItem.uploadedFileList = set;
+  			}
+  			
+  			//clone set of taskListItemsComment
+  			if(comments != null){
+  				Iterator iter = comments.iterator();
+  				Set set = new HashSet();
+  				while(iter.hasNext()){
+  					TaskListItemComment comment = (TaskListItemComment)iter.next(); 
+  					TaskListItemComment newComment = (TaskListItemComment) comment.clone();
+  					//just clone old file without duplicate it in repository
+					set.add(newComment);
+  				}
+  				taskListItem.comments = set;
+  			}
   			
   			//clone ReourceUser as well
   			if(this.createBy != null){
@@ -255,17 +254,6 @@ public class TaskListItem  implements Cloneable{
 	public void setCreateByAuthor(boolean isCreateByAuthor) {
 		this.isCreateByAuthor = isCreateByAuthor;
 	}
-	
-	/**
-	 * @hibernate.property column="is_hide" 
-	 * @return
-	 */
-	public boolean isHide() {
-		return isHide;
-	}
-	public void setHide(boolean isHide) {
-		this.isHide = isHide;
-	}
 	   
 	public void setComplete(boolean complete) {
 		this.complete=complete;
@@ -344,7 +332,7 @@ public class TaskListItem  implements Cloneable{
 	 * @hibernate.set   lazy="true"   
 	 *                  cascade="all"
 	 * 					inverse="false"
-	 *                  order-by="create_date desc"
+	 *                  order-by="create_date asc"
 	 * @hibernate.collection-key column="taskList_item_uid"
 	 * @hibernate.collection-one-to-many
 	 * 			class="org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment"
@@ -362,7 +350,7 @@ public class TaskListItem  implements Cloneable{
 	 * @hibernate.set   lazy="true"   
 	 *                  cascade="all"
 	 * 					inverse="false"
-	 *                  order-by="create_date desc"
+	 *                  order-by="create_date asc"
 	 * @hibernate.collection-key column="taskList_item_uid"
 	 * @hibernate.collection-one-to-many
 	 * 			class="org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment"

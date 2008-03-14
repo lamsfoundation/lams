@@ -3,7 +3,7 @@
 	"http://www.w3.org/TR/html4/loose.dtd">
 <c:set var="sessionMapID" value="${param.sessionMapID}"/>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
-<c:set var="summaryList" value="${sessionMap.summaryList}"/>
+<c:set var="exportDTOList" value="${sessionMap.exportDTOList}"/>
 <c:set var="mode" value="${sessionMap.mode}"/>
 <c:set var="title" value="${sessionMap.title}"/>
 
@@ -33,7 +33,7 @@
 	<h1>${title} </h1>
 
 		<table border="0" cellspacing="3" width="98%">
-			<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
+			<c:forEach var="group" items="${exportDTOList}" varStatus="firstGroup">
 				<c:set var="groupSize" value="${fn:length(group)}" />
 				<c:forEach var="item" items="${group}" varStatus="status">
 					<%-- display group name on first row--%>
@@ -54,13 +54,10 @@
 							<td>
 								<table border="0" cellspacing="3" width="98%">
 									<tr>
-										<th width="50">
-											<fmt:message key="monitoring.label.type" />
-										</th>
-										<th width="300">
+										<th width="325">
 											<fmt:message key="monitoring.label.title" />
 										</th>
-										<th width="150">
+										<th width="175">
 											<fmt:message key="monitoring.label.suggest" />
 										</th>
 										<th width="300" align="center">
@@ -85,50 +82,56 @@
 									<c:if test="${item.itemUid != -1}">
 										<tr>
 											<td>
-												<c:choose>
-													<c:when test="${item.itemType == 1}">
-														<fmt:message key="label.authoring.basic.resource.url" />
-													</c:when>
-													<c:when test="${item.itemType == 2}">
-														<fmt:message key="label.authoring.basic.resource.file" />
-													</c:when>
-													<c:when test="${item.itemType == 3}">
-														<fmt:message key="label.authoring.basic.resource.website" />
-													</c:when>
-													<c:when test="${item.itemType == 4}">
-														<fmt:message key="label.authoring.basic.resource.learning.object" />
-													</c:when>
-												</c:choose>
-											</td>
-											<td>
 												${item.itemTitle}
 											</td>
+											
 											<td>
 												${item.username}
 											</td>
+											
 											<td align="center">
-												<c:choose>
-													<c:when test="${item.itemType == 1}">
-														<a href="javascript:;" onclick="launchPopup('${item.url}','openurl');"> <fmt:message key="label.authoring.basic.resource.preview" /> </a>
-													</c:when>
-													<c:when test="${item.itemType == 2}">
-														<a href="${item.attachmentLocalUrl}"> <fmt:message key="label.download" /> </a>
-													</c:when>
-													<c:when test="${item.itemType == 3}">
-														<a href="${item.attachmentLocalUrl}"> <fmt:message key="label.download" /> </a>
-													</c:when>
-													<c:when test="${item.itemType == 4}">
-														<fmt:message key="export.label.no.learning.object" />
-													</c:when>
-												</c:choose>
+												<c:forEach var="comment" items="${item.commentDTOs}">
+												
+														<div>
+															<table cellspacing="0" class="forum">
+																<tr>
+																	<th >
+																		<fmt:message key="lable.preview.by" />
+																		${comment.createdBy}
+																				-				
+																		<lams:Date value="${comment.createDate}" />
+																	</th>
+																</tr>
+																
+																<tr>
+																	<td class="posted-by">
+																	</td>
+																</tr>
+													
+																<tr>
+																	<td>
+																		<c:out value="${comment.comment}" escapeXml="false" />
+																	</td>
+																</tr>
+																
+															</table>
+														</div>
+												</c:forEach>
+											
+												<ul>
+													<c:forEach var="file" items="${item.attachmentDTOs}">
+															<li>
+																<a href="${file.attachmentLocalUrl}"> 
+																	<c:out value="${file.fileName}" />
+																</a>
+																[${file.createdBy}]
+																
+															</li>
+													</c:forEach>
+												</ul>
 											</td>
-											<c:if test="${mode == 'teacher'}">
-												<td align="center">
-													<c:if test="${item.itemHide}">
-														<fmt:message key="monitoring.label.hidden" />
-													</c:if>
-												</td>
-											</c:if>
+											
+											
 										</tr>
 									</c:if>
 									<c:if test="${status.count == groupSize}">

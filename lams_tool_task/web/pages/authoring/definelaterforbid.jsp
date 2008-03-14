@@ -3,7 +3,7 @@
             "http://www.w3.org/TR/html4/loose.dtd">
 <html:html locale="true">
 <lams:head>
-	<title><fmt:message key="label.author.title" /></title>
+	<title><fmt:message key="label.authoring.title" /></title>
 
 	<%@ include file="/common/header.jsp"%>
 </lams:head>

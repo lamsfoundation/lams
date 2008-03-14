@@ -6,8 +6,8 @@
 
 <lams:html>
 	<lams:head>
-		 <%@ include file="/common/tabbedheader.jsp" %>
-	 <script>
+		<%@ include file="/common/tabbedheader.jsp" %>
+		<script>
 
 	        function init(){
                 selectTab(1); //select the default tab;
@@ -19,7 +19,7 @@
 	        } 
 	        
 		    function viewItem(itemUid,sessionMapID){
-				var myUrl = "<c:url value="/reviewItem.do"/>?mode=teacher&itemUid=" + itemUid + "&sessionMapID="+sessionMapID;
+				var myUrl = "<c:url value="/reviewtask/reviewTask.do"/>?mode=teacher&itemUid=" + itemUid + "&sessionMapID="+sessionMapID;
 				launchPopup(myUrl,"MonitoringReview");
 			}
 	    </script>		 

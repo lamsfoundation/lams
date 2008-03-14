@@ -866,7 +866,6 @@ public class AuthoringAction extends Action {
 		item.setTitle(itemForm.getTitle());
 		item.setDescription(itemForm.getDescription());
 		item.setCreateByAuthor(true);
-		item.setHide(false);
 		
 		item.setRequired(itemForm.isRequired());
 		item.setCommentsAllowed(itemForm.isCommentsAllowed());

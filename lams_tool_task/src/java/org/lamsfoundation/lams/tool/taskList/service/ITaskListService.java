@@ -30,6 +30,7 @@ import java.util.SortedSet;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.taskList.dto.ExportDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
@@ -183,27 +184,20 @@ public interface ITaskListService
 	 * @param contentId
 	 * @return
 	 */
-	List<List<Summary>> getSummary(Long contentId);
+	Summary getSummary(Long contentId);
 
 	List<TaskListUser> getUserListBySessionItem(Long sessionId, Long itemUid);
 
 	/**
-	 * Set a taskList item visible or not.
-	 * @param itemUid
-	 * @param visible true, item is visible. False, item is invisible.
-	 */
-	void setItemVisible(Long itemUid, boolean visible);
-
-	/**
-	 * Get taskList item <code>Summary</code> list according to sessionId and skipHide flag.
+	 * Get taskList item <code>Summary</code> list according to sessionId, and userLogin.
 	 *  
 	 * @param sessionId
-	 * @param skipHide true, don't get taskList item if its <code>isHide</code> flag is true.
-	 * 				  Otherwise, get all taskList item  
+	 * @param userLogin login of the user which portfolio is being exported
+	 *
 	 * @return
 	 */
-	public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
-	public List<List<Summary>> exportByContentId(Long contentId);
+	public List<ExportDTO> exportBySessionId(Long sessionId, String userLogin);
+	public List<List<ExportDTO>> exportByContentId(Long contentId);
 
 	/**
 	 * Create refection entry into notebook tool.
@@ -244,5 +238,6 @@ public interface ITaskListService
 	TaskListUser getUser(Long uid);
 	
 	public void saveOrUpdateTaskListItem(TaskListItem item);
+//	Summary getSummary(Long contentId, String null1);
 }
 

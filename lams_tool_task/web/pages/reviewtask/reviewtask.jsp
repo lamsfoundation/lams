@@ -24,11 +24,6 @@
        		myForm.action = "<c:url value='/reviewtask/addNewComment.do'/>";
        		myForm.submit();
     	}
-    	
-//    	function completeItem(itemUid){
-	//		document.location.href = "<c:url value="/learning/completeItem.do"/>?sessionMapID=${sessionMapID}&itemUid=" + itemUid;//&mode=${mode}
-		//	return false;
-		//}
 		
 		function completeItem(itemUid){
 			//learner and author(preview mode) will mark the finish

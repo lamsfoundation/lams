@@ -56,7 +56,7 @@ public class TaskListSession{
 //  **********************************************************
 	/**
 	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 * @return Returns the learnerID.
+	 * @return Returns the ID.
 	 */
 	public Long getUid() {
 		return uid;
