@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
+import org.lamsfoundation.lams.util.ChartUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -72,7 +73,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class ChartAction extends  Action {
     
-	static Logger logger = Logger.getLogger(ChartAction.class.getName());
+	static Logger logger = Logger.getLogger(ChartAction.class);
 	
 	private MessageResources resource;
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -95,27 +96,25 @@ public class ChartAction extends  Action {
 		}
 			
 		//Try to create chart
-        JFreeChart chart=null;
-    	if (type.equals("pie")){
-    	    chart = createPieChart (answer);    
-    	}else if (type.equals("bar")){
-    		chart = createBarChart (answer);    
-    	}
-    	
-        //send chart to response output stream
-        if (chart != null){
-            response.setContentType("image/png");
-            ChartUtilities.writeChartAsPNG(out, chart, 400, 300);
-            return null;
-        }else{
+		try {
+	    	if (type.equals(ChartUtil.CHART_TYPE_PIE)){
+	    		DefaultPieDataset data = createPieDataset (answer);
+	    	    ChartUtil.outputPieChart(response, out, resource.getMessage(MSG_PIECHART_TITLE,answer.getSequenceId()), data);
+	    	}else if (type.equals(ChartUtil.CHART_TYPE_BAR)){
+	    		DefaultCategoryDataset data = createBarDataset(answer);    
+	    		ChartUtil.outputBarChart( response, out, resource.getMessage(MSG_BARCHART_TITLE,answer.getSequenceId()), data, 
+	    				resource.getMessage(MSG_BARCHART_CATEGORY_AXIS_LABEL), resource.getMessage(MSG_BARCHART_VALUE_AXIS_LABEL) ); 
+	    	}
+		} catch ( IOException e ) {
+			logger.error("Error creating chart for sessionId "+sessionId,e);
 			response.getWriter().print(resource.getMessage(ERROR_MSG_CHART_ERROR));
-			return null;
-        }
-     
+		}
+		
+        return null;
     }
 
 
-    public JFreeChart createPieChart(AnswerDTO answer){
+    public DefaultPieDataset createPieDataset(AnswerDTO answer){
     
         DefaultPieDataset data= new DefaultPieDataset();
         
@@ -126,17 +125,13 @@ public class ChartAction extends  Action {
 			optIdx++;
   		}
           
-          if(answer.isAppendText())
+        if(answer.isAppendText())
           	 data.setValue(resource.getMessage(MSG_OPEN_RESPONSE), (Number)answer.getOpenResponse());
           
-        
-    	JFreeChart chart=null;
-   	    chart=ChartFactory.createPieChart3D(resource.getMessage(MSG_PIECHART_TITLE,answer.getSequenceId()) , data, true, true, false);
-
-   	    return chart;
+        return data;
     }
     
-    public JFreeChart createBarChart(AnswerDTO answer){
+    public DefaultCategoryDataset createBarDataset(AnswerDTO answer){
         
     	DefaultCategoryDataset data= new DefaultCategoryDataset();
       
@@ -150,14 +145,7 @@ public class ChartAction extends  Action {
         if(answer.isAppendText())
         	 data.setValue((Number)answer.getOpenResponse(), resource.getMessage(MSG_OPEN_RESPONSE), resource.getMessage(MSG_OPEN_RESPONSE));
         
-    	JFreeChart chart=null;
-    	
-    	
-   	    chart=ChartFactory.createBarChart3D(resource.getMessage(MSG_BARCHART_TITLE,answer.getSequenceId()), 
-   	    									resource.getMessage(MSG_BARCHART_CATEGORY_AXIS_LABEL), 
-   	    									resource.getMessage(MSG_BARCHART_VALUE_AXIS_LABEL), 
-   	    									data, PlotOrientation.VERTICAL, true, true, false);
-   	    return chart;
+   	    return data;
     }
 	//*************************************************************************************
 	// Private method 

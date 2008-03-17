@@ -36,8 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.vote.ExportPortfolioDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
@@ -48,6 +46,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
+import org.lamsfoundation.lams.util.ChartUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 /**
  * <p> Enables exporting portfolio for teacher and learner modes. </p> 
@@ -76,8 +75,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 		
 		if ( generateCharts ) {
 			logger.debug("writing out chart to directoryName: " + directoryName);
-			writeOutChart(request, response, VoteChartGenerator.CHART_TYPE_PIE,  directoryName);
-			writeOutChart(request, response, VoteChartGenerator.CHART_TYPE_BAR,  directoryName);
+			writeOutChart(request, response, ChartUtil.CHART_TYPE_PIE,  directoryName);
+			writeOutChart(request, response, ChartUtil.CHART_TYPE_BAR,  directoryName);
 			logger.debug("basePath: " + basePath);
 		}
 		
@@ -246,11 +245,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         try{
             OutputStream out = new FileOutputStream(directoryName +  File.separator + fileName);
             VoteChartGenerator  voteChartGenerator= new VoteChartGenerator();
-            JFreeChart chart = voteChartGenerator.createChart(request, chartType);    
-            if ( chart != null ) {
-                response.setContentType("image/png");
-            	ChartUtilities.writeChartAsPNG(out, chart, 400, 300);
-            }
+            voteChartGenerator.outputChart(request, response, chartType, out);
         }
         catch(FileNotFoundException e)
         {

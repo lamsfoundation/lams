@@ -24,8 +24,10 @@ package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -45,6 +47,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
+import org.lamsfoundation.lams.util.ChartUtil;
 
 /**
  * <p> Enables generation of JFreeCharts </p>
@@ -54,8 +57,6 @@ import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
  */
 public class VoteChartGenerator extends HttpServlet implements VoteAppConstants {
     static Logger logger = Logger.getLogger(VoteChartGenerator.class.getName());
-    public static final String CHART_TYPE_PIE = "pie";
-    public static final String CHART_TYPE_BAR = "bar";
     
     public VoteChartGenerator(){
     }
@@ -74,47 +75,35 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
             
             String currentSessionId=request.getParameter("currentSessionId");
             logger.debug("currentSessionId: " + currentSessionId);
-            logger.debug("getServletContext() is : " + getServletContext());
             
             if (currentSessionId != null)
             {
                 logger.debug("currentSessionId is specified, generating data for all sessions dto: ");
-
                 IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
-        		logger.debug("voteService: " + voteService);
         		
         		VoteSession voteSession=voteService.retrieveVoteSession(new Long(currentSessionId));
         		logger.debug("voteSession uid:" + voteSession.getUid());
         		
         		VoteContent voteContent=voteSession.getVoteContent(); 
-        		logger.debug("existing voteContent:" + voteContent);
 
                 VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
                 MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
                         voteSession.getUid().toString(), null, voteGeneralMonitoringDTO);
-                logger.debug("creating maps MAP_STANDARD_NOMINATIONS_CONTENT and MAP_STANDARD_RATES_CONTENT: " + currentSessionId);
-
-                logger.debug("post prepareChartData : MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
-        		logger.debug("post prepareChartData : MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
+                
+                if ( logger.isDebugEnabled() )  {
+                	logger.debug("creating maps MAP_STANDARD_NOMINATIONS_CONTENT and MAP_STANDARD_RATES_CONTENT: " + currentSessionId);
+                	logger.debug("post prepareChartData : MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
+                	logger.debug("post prepareChartData : MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
+                }
             }
-            
-            
-            JFreeChart chart=null;
             
             logger.debug("creating pie chart" + type);
-            chart=createChart(request, type);
-            
-            logger.debug("chart:" + chart);
-            if (chart != null)
-            {
-                response.setContentType("image/png");
-                ChartUtilities.writeChartAsPNG(out, chart, 400, 300);
-            }
+            outputChart(request, response, type, out);
                     
         }
         catch(Exception e)
         {
-            logger.error("error occurred generating chart: " + e);
+            logger.error("Error occurred generating chart",e);
         }
         finally
         {
@@ -123,19 +112,21 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
     }
     
     
-    public JFreeChart createChart(HttpServletRequest request, String type)
+    public void outputChart(HttpServletRequest request, HttpServletResponse response, String type, OutputStream out) throws IOException
     {
-    	if (type.equals(CHART_TYPE_PIE))
+    	if (type.equals(ChartUtil.CHART_TYPE_PIE))
     	{
-    	    return createPieChart (request);    
+    		DefaultPieDataset dataset = createPieDataset(request);
+    		ChartUtil.outputPieChart (response, out, SESSION_VOTES_CHART, dataset);    
     	}
     	else 
     	{
-    	    return createBarChart (request);    
+    		DefaultCategoryDataset dataset = createCategoryDataset(request);
+    		ChartUtil.outputBarChart (response, out, SESSION_VOTES_CHART, dataset, "Open Vote", "Percentage");    
     	}
     }
 
-    public JFreeChart createPieChart(HttpServletRequest request)
+    public DefaultPieDataset createPieDataset(HttpServletRequest request) throws IOException
     {
         logger.debug("starting createPieChart...");
         DefaultPieDataset data= new DefaultPieDataset();
@@ -144,7 +135,6 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
         Map mapVoteRatesContent=(Map)request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT);
         if ( mapNominationsContent == null || mapNominationsContent == null ) {
         	logger.debug("No voting data, unable to create pie chart");
-        	return null;
         }
 
         Iterator itMap = mapNominationsContent.entrySet().iterator();
@@ -154,18 +144,11 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
             String voteRate=(String) mapVoteRatesContent.get(pairs.getKey());
             data.setValue(pairs.getValue().toString(), new Double(voteRate));
 		}
-        
-    	JFreeChart chart=null;
-   	    chart=ChartFactory.createPieChart3D(SESSION_VOTES_CHART , data, true, true, false);
-   	   
-   	    if ( logger.isDebugEnabled() ) {
-   	    	logger.debug("chart: " + chart+" data: "+data) ;
-   	    }
-   	    
-   	    return chart;
+    	return data;
     }
     
-    public JFreeChart createBarChart(HttpServletRequest request)
+
+    public DefaultCategoryDataset createCategoryDataset(HttpServletRequest request)
     {
         logger.debug("starting createBarChart...");
         DefaultCategoryDataset data= new DefaultCategoryDataset();
@@ -174,7 +157,6 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
         Map mapVoteRatesContent=(Map)request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT);
         if ( mapNominationsContent == null || mapNominationsContent == null ) {
         	logger.debug("No voting data, unable to create pie chart");
-        	return null;
         }
 
         Iterator itMap = mapNominationsContent.entrySet().iterator();
@@ -184,16 +166,9 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
             String voteRate=(String) mapVoteRatesContent.get(pairs.getKey());
             data.setValue(new Double(voteRate), pairs.getValue().toString(), pairs.getValue().toString());
 		}
-        
-    	JFreeChart chart=null;
-   	    chart=ChartFactory.createBarChart3D(SESSION_VOTES_CHART , "Open Vote", "Percentage", 
-   	    									data, PlotOrientation.VERTICAL, true, true, false);
 
-   	    if ( logger.isDebugEnabled() ) {
-   	    	logger.debug("chart: " + chart+" data: "+data) ;
-   	    }
-
-   	    return chart;
+    	return data;
     }
     
+ 
 }
