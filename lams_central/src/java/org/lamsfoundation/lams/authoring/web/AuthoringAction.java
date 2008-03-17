@@ -113,7 +113,7 @@ public class AuthoringAction extends LamsDispatchAction{
 			wddxPacket = authoringService.getToolOutputDefinitions(toolContentID);
 			
 		} catch (Exception e) {
-			wddxPacket = handleException(e, "getToolOutputDefinitions", authoringService).serializeMessage();
+			wddxPacket = handleException(e, "getToolOutputDefinitions", authoringService, true).serializeMessage();
 		}
 		return outputPacket(mapping, request, response, wddxPacket, "definitions");
 	}
@@ -129,7 +129,7 @@ public class AuthoringAction extends LamsDispatchAction{
 			
 			wddxPacket = authoringService.getLearningDesignDetails(learningDesignID, getUserLanguage());
 		} catch (Exception e) {
-			wddxPacket = handleException(e, "getLearningDesignDetails", authoringService).serializeMessage();
+			wddxPacket = handleException(e, "getLearningDesignDetails", authoringService, true).serializeMessage();
 		}
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
@@ -147,7 +147,7 @@ public class AuthoringAction extends LamsDispatchAction{
 			wddxPacket = authoringService.finishEditOnFly(learningDesignID, getUserId());
 			
 		} catch (Exception e) {
-			wddxPacket = handleException(e, "getLearningDesignDetails", authoringService).serializeMessage();
+			wddxPacket = handleException(e, "getLearningDesignDetails", authoringService, true).serializeMessage();
 			return outputPacket(mapping, request, response, wddxPacket, "details");
 		}
 		
@@ -166,7 +166,7 @@ public class AuthoringAction extends LamsDispatchAction{
 			
 			wddxPacket = authoringService.getLearningDesignsForUser(userID);
 		} catch (Exception e) {
-			wddxPacket = handleException(e, "getLearningDesignsForUser", authoringService).serializeMessage();
+			wddxPacket = handleException(e, "getLearningDesignsForUser", authoringService, true).serializeMessage();
 		}
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
@@ -179,7 +179,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		try {		
 			wddxPacket = authoringService.getAllLearningDesignDetails();
 		} catch (Exception e) {
-			wddxPacket = handleException(e, "getAllLearningDesignDetails", authoringService).serializeMessage();
+			wddxPacket = handleException(e, "getAllLearningDesignDetails", authoringService, true).serializeMessage();
 		}
 		log.debug("getAllLearningDesignDetails: returning "+wddxPacket);
 		return outputPacket(mapping, request, response, wddxPacket, "details");
@@ -194,7 +194,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		try {
 			wddxPacket = authoringService.getAllLearningLibraryDetails(getUserLanguage());
 		} catch (Exception e) {
-			wddxPacket = handleException(e, "getAllLearningLibraryDetails", authoringService).serializeMessage();
+			wddxPacket = handleException(e, "getAllLearningLibraryDetails", authoringService, true).serializeMessage();
 		}
 		log.debug("getAllLearningLibraryDetails: returning "+wddxPacket);
 		return outputPacket(mapping, request, response, wddxPacket, "details");
@@ -211,7 +211,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		    Long toolID = WebUtil.readLongParam(request,"toolID",false);
 		    wddxPacket = authoringService.getToolContentID(toolID);
 		} catch (Exception e) {
-			wddxPacket = handleException(e, "getAllLearningLibraryDetails", authoringService).serializeMessage();
+			wddxPacket = handleException(e, "getAllLearningLibraryDetails", authoringService, true).serializeMessage();
 		}
 	    return outputPacket(mapping, request, response, wddxPacket, "details");   
 	    
@@ -230,7 +230,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		    long toolContentID = WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID,false);
 		    wddxPacket = authoringService.copyToolContent(toolContentID);
 		} catch (Exception e) {
-			wddxPacket = handleException(e, "copyToolContent", authoringService).serializeMessage();
+			wddxPacket = handleException(e, "copyToolContent", authoringService, true).serializeMessage();
 		}
 	    return outputPacket(mapping, request, response, wddxPacket, "details");   
 	    
@@ -283,9 +283,11 @@ public class AuthoringAction extends LamsDispatchAction{
 		try {
 			wddxPacket = authoringService.generateUniqueContentFolder();
 		} catch (FileUtilException fue) {
-			wddxPacket = handleException(fue, "createUniqueContentFolder", authoringService).serializeMessage();
+			// return a normal error, not a critical error as a critical error interrupts the display
+			// of the toolkit in the Flash client.
+			wddxPacket = handleException(fue, "createUniqueContentFolder", authoringService, false).serializeMessage();
 		} catch (Exception e) {
-			wddxPacket = handleException(e, "createUniqueContentFolder", authoringService).serializeMessage();
+			wddxPacket = handleException(e, "createUniqueContentFolder", authoringService, false).serializeMessage();
 		} 
     	 
     	PrintWriter writer = response.getWriter();
@@ -303,7 +305,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		try {
 			wddxPacket = authoringService.getHelpURL();
 		} catch (Exception e) {
-			wddxPacket = handleException(e, "getHelpURL", authoringService).serializeMessage();
+			wddxPacket = handleException(e, "getHelpURL", authoringService, true).serializeMessage();
 		} 
 		
 		PrintWriter writer = response.getWriter();
@@ -317,7 +319,7 @@ public class AuthoringAction extends LamsDispatchAction{
 	 * @param monitoringService
 	 * @return
 	 */
-	  private FlashMessage handleException(Exception e, String methodKey, IAuthoringService authoringService) {
+	  private FlashMessage handleException(Exception e, String methodKey, IAuthoringService authoringService, boolean useCriticalError) {
 		log.error("Exception thrown "+methodKey,e);
 		getAuditService().log(AuthoringAction.class.getName()+":"+methodKey, e.toString());
 
@@ -325,7 +327,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		msg[0] = e.getMessage();
 		return new FlashMessage(methodKey,
 			authoringService.getMessageService().getMessage("error.system.error", msg),
-			FlashMessage.CRITICAL_ERROR);
+			useCriticalError ? FlashMessage.CRITICAL_ERROR : FlashMessage.ERROR);
     }
 	  
 	/**
