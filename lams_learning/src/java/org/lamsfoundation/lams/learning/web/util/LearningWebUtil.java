@@ -129,8 +129,9 @@ public class LearningWebUtil
 		    Long learnerProgressId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_PROGRESS_ID, true);
 		    // temp hack until Flash side updates it call.
 		    if ( learnerProgressId == null ) {
-		    	log.error("Flash client still using progressId, instead of progressID in a learner call");
 		    	learnerProgressId = WebUtil.readLongParam(request,"progressId", true);
+		    	if ( learnerProgressId != null ) 
+			    	log.warn("Flash client still using progressId, instead of progressID in a learner call");
 		    }
 		    
 		    if ( learnerProgressId != null ) {		    	
