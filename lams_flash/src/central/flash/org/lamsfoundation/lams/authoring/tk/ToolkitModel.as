@@ -36,6 +36,8 @@ class ToolkitModel extends Observable {	private var _className:String = "Toolki
 	private var _isDirty:Boolean;
 	private var infoObj:Object;
 
+	private var toolkit:Toolkit;
+
 	/**
 	* View state data
 	*/
@@ -46,12 +48,14 @@ class ToolkitModel extends Observable {	private var _className:String = "Toolki
 	* Container for the Libraries. There maybe many template actvities per learning library. 
 	* Currently (1.1) there is only ever one.
 	*/
-	private var _toolkitLearningLibraries:Hashtable;
+	private var _toolkitLearningLibraries:Hashtable;	private var _dispatchEvent:Boolean;
 	/**
 	* Constructor.
 	*/
-	public function ToolkitModel(){		Debugger.log('Running',4,'Constructor','ToolkitModel');
+	public function ToolkitModel(_toolkit:Toolkit){		Debugger.log('Running',4,'Constructor','ToolkitModel');
 		_toolkitLearningLibraries = new Hashtable();
+		toolkit = _toolkit;
+		_dispatchEvent = false;
 	}
 		/**
 	* Sets the data for the toolkit (ToolkitLibraries). Called by the toolkit container.  Sends the update to the view. (LIBRARIES_UPDATED
@@ -70,21 +74,41 @@ class ToolkitModel extends Observable {	private var _className:String = "Toolki
 		//populate the hashtable.
 		for(var i=0; i<tls.length;i++){			_toolkitLearningLibraries.put(tls[i].learningLibraryID,tls[i]);
 		}
+		
 		Debugger.log('Added '+tls.length+' Libraries to _toolkitLearningLibraries',4,'setToolkitLibraryActivities','ToolkitModel');
 		
+		if(_dispatchEvent) {
+			//SET A DIRTY FLAG
+			setChanged();
+			//notify the view there has been a change
+			infoObj = {};
+			infoObj.updateType = "LIBRARIES_UPDATED";
+			//notify observer's this is "this" as if by magic
+			notifyObservers(infoObj);
+		}
 		
-		
-		
-		//SET A DIRTY FLAG
-		setChanged();
-		//notify the view there has been a change
-		infoObj = {};
-		infoObj.updateType = "LIBRARIES_UPDATED";
-		//notify observer's this is "this" as if by magic
-		notifyObservers(infoObj);
-		
+		_dispatchEvent = false;
+			
 		Debugger.log('Finished, about to return updateOk',4,'setToolkitLibraryActivities','ToolkitModel');
 		return updateOk;
+	}
+	
+	public function broadcastLibraryUpdate() {
+		Debugger.log("tll size: " + _toolkitLearningLibraries.size(), Debugger.CRITICAL, "braodcastLibraryUpdate", "ToolkitModel");
+		if (_toolkitLearningLibraries.size() > 0) {
+			//SET A DIRTY FLAG
+			setChanged();
+			//notify the view there has been a change
+			infoObj = {};
+			infoObj.updateType = "LIBRARIES_UPDATED";
+			//notify observer's this is "this" as if by magic
+
+			notifyObservers(infoObj);
+		} 
+		else {
+			_dispatchEvent = true;
+			toolkit.getToolkitLibraries();
+		}
 	}
 	/**
 	* Gets toolkit data

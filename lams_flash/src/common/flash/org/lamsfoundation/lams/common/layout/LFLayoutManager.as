@@ -101,7 +101,7 @@ class LFLayoutManager implements ILayoutManager{
 	}
 	
 	public function setEmptyLayoutItem(a:LFLayoutItem) {
-		Debugger.log("Adding Layout Item: " + a.componentName, Debugger.GEN, "addLayoutItem", "LFLayoutManager");
+		Debugger.log("Adding Layout Item: " + a.componentName, Debugger.GEN, "setEmptyLayoutItem", "LFLayoutManager");
 		_layoutItems.put(a.componentName, null);
 	}
 	

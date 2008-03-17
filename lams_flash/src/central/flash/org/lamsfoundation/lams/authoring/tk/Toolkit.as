@@ -51,7 +51,7 @@ class Toolkit {
         mx.events.EventDispatcher.initialize(this);
         
 		//Create the model
-		toolkitModel = new ToolkitModel();
+		toolkitModel = new ToolkitModel(this);
 		
 		//Create the view
 		toolkitView_mc = target_mc.createChildAtDepth("toolkitView",DepthManager.kTop);		
@@ -306,6 +306,10 @@ class Toolkit {
 
 	public function get view():MovieClip{
 		return toolkitView;
+	}
+	
+	public function get model():ToolkitModel {
+		return toolkitModel;
 	}
 
     function get className():String { 

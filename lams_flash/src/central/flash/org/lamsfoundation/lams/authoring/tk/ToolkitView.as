@@ -57,6 +57,8 @@ class ToolkitView extends AbstractView {
 	private var _dragging:Boolean;
 	private var _scrollPanelWidthDiff:Number;            //Difference in width between scrollpane and panel
 
+	private var _toolkitLoaded:Boolean;
+
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -71,7 +73,8 @@ class ToolkitView extends AbstractView {
 		_tm = ThemeManager.getInstance();
 		_dictionary = Dictionary.getInstance();
 		_tip = new ToolTip();
-		_dictionary.addEventListener('init',Proxy.create(this,setupLabels));		//Debugger.log('Running',4,'Constructor','ToolkitView');
+		_dictionary.addEventListener('init',Proxy.create(this,setupLabels));
+		_toolkitLoaded = false;		//Debugger.log('Running',4,'Constructor','ToolkitView');
 	}
 		/**
 	* Initialisation - sets up the mvc relations ship Abstract view.
@@ -218,7 +221,8 @@ class ToolkitView extends AbstractView {
 	*
 	* @param   o   		The model object that is broadcasting an update.
 	*/
-	private function updateLibraries(o:Observable){		//Debugger.log('Running',4,'updateLibraries','ToolkitView');
+	private function updateLibraries(o:Observable){		Debugger.log('Running:: toolkitLoaded: ' + _toolkitLoaded, Debugger.CRITICAL, 'updateLibraries', 'ToolkitView');
+		if(_toolkitLoaded) return;
 
 		var yPos:Number = 0;
 		
@@ -226,7 +230,7 @@ class ToolkitView extends AbstractView {
 		toolkitLibraries_sp.contentPath = "empty_mc";
 		
 		var tkv = ToolkitView(this);
-		var tkm = ToolkitModel(o);
+		var tkm:ToolkitModel = getModel();
 		//get the hashtable
 		var myLibs:Hashtable = tkm.getToolkitLibraries();	
 		//loop through the libraries
@@ -250,7 +254,9 @@ class ToolkitView extends AbstractView {
 			yPos += templateActivity_mc._height;
 						
 			
-		}		//toolkitLibraries_sp.refreshPane();		
+		}
+		_toolkitLoaded = true;
+		//toolkitLibraries_sp.refreshPane();		
 		
 	}
 	

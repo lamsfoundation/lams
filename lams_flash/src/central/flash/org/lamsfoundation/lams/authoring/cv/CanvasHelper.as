@@ -684,12 +684,13 @@ class CanvasHelper {
 	}
 	
 	private function setNewContentFolderID(o:Object) {
+		app.toolkit.model.broadcastLibraryUpdate();
+		
 		if(o instanceof LFError){
 			o.showMessageConfirm();
 		}else{
 			if(StringUtils.isNull(_ddm.contentFolderID)) { _ddm.contentFolderID = String(o); }
 		}
-		
 	}
 	
 	/**
