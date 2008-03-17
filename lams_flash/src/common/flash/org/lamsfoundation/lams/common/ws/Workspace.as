@@ -41,6 +41,7 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	public static var MODE_SAVEAS:String = "SAVEAS";
 	public static var MODE_OPEN:String = "OPEN";
 	public static var MODE_READONLY:String = "READONLY";
+	public static var MODE_INSERT:String = "INSERT";
 	
 	//Model
 	private var workspaceModel:WorkspaceModel;
@@ -277,10 +278,10 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	 * Usually used by the canvas.
     * 
     */
-    public function userSelectItem(callback){
+    public function userSelectItem(callback, mode){
 		_onOKCallBack = callback;
 		//var fn:Function = Delegate.create(this,itemSelected);
-		workspaceModel.currentMode = "OPEN";
+		workspaceModel.currentMode = (mode != null) ? mode : "OPEN";
 		workspaceModel.openDesignBySelection();
     }
 	
@@ -288,9 +289,9 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	* Shows the workspace browsing dialogue to open a design for use in Monitoring
 	* read-only mode
 	*/
-	public function userSelectDesign(callback){
+	public function userSelectDesign(callback, mode){
 		_onOKCallBack = callback;
-		workspaceModel.currentMode = "READONLY";
+		workspaceModel.currentMode = (mode != null) ? mode : "READONLY";
 		workspaceModel.openDesignBySelection();
 	}
 	

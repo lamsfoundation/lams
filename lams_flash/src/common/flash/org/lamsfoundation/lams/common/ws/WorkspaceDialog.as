@@ -283,7 +283,7 @@ class WorkspaceDialog extends MovieClip{
 				refreshFolder(event.data, wm);
 				break;
 			case 'SHOW_TAB' :
-				showTab(event.data,wm);
+				showTab(event.data, wm);
 				break;
 			case 'UPDATED_PROP_DETAILS' :
 				populatePropDetails(event.data, wm);
@@ -394,7 +394,7 @@ class WorkspaceDialog extends MovieClip{
 	}
 	
 	private function removeProps(wm:WorkspaceModel):Void{
-		if (wm.currentMode == Workspace.MODE_OPEN){
+		if (wm.currentMode == Workspace.MODE_OPEN || wm.currentMode == Workspace.MODE_INSERT){
 				switchView_tab.removeItemAt(1)
 		}	
 		
@@ -604,7 +604,7 @@ class WorkspaceDialog extends MovieClip{
 			setLocationContentVisible(true);
 			setPropertiesContentVisible(false);
 			//setTabIndex("LOCATION");
-			if(wm.currentMode=="OPEN"){
+			if(wm.currentMode==Workspace.MODE_OPEN){
 				licenseID_cmb.enabled = true;
 			}
 			_currentTab = LOCATION_TAB;
@@ -614,7 +614,7 @@ class WorkspaceDialog extends MovieClip{
 		}else if(tabToSelect == "PROPERTIES"){
 			setLocationContentVisible(false);
 			setPropertiesContentVisible(true);
-			if(wm.currentMode=="OPEN"){
+			if(wm.currentMode==Workspace.MODE_OPEN){
 				licenseID_cmb.enabled = false;
 			}
 			//setTabIndex("PROPERTIES");
@@ -622,12 +622,14 @@ class WorkspaceDialog extends MovieClip{
 		}
 		
 		//set the right label on the 'doit' button
-		if(wm.currentMode=="OPEN"){
+		if(wm.currentMode==Workspace.MODE_OPEN){
 			ok_btn.label = Dictionary.getValue('ws_dlg_open_btn');
 			//licenseID_cmb.enabled = false;
-		}else if(wm.currentMode=="SAVE" || wm.currentMode=="SAVEAS"){
+		}else if(wm.currentMode == Workspace.MODE_INSERT){
+			ok_btn.label = Dictionary.getValue("ws_dlg_insert_btn");
+		}else if(wm.currentMode==Workspace.MODE_SAVE || wm.currentMode==Workspace.MODE_SAVEAS){
 			ok_btn.label = Dictionary.getValue('ws_dlg_save_btn');
-		}else if(wm.currentMode=="READONLY"){
+		}else if(wm.currentMode==Workspace.MODE_READONLY){
 			ok_btn.label = "Create" //Dictionary.getValue('ws_dlg_create_btn');
 		}else{
 			Debugger.log('Dont know what mode the Workspace is in!',Debugger.CRITICAL,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
@@ -759,7 +761,7 @@ class WorkspaceDialog extends MovieClip{
 		
 		Debugger.log('_workspaceModel.currentMode: ' + _workspaceModel.currentMode,Debugger.GEN,'ok','org.lamsfoundation.lams.WorkspaceDialog');
 		var tempTitle = StringUtils.replace(resourceTitle_txi.text, " ", "");
-		if(_workspaceModel.currentMode=="SAVE" || _workspaceModel.currentMode=="SAVEAS"){
+		if(_workspaceModel.currentMode==Workspace.MODE_SAVE || _workspaceModel.currentMode==Workspace.MODE_SAVEAS){
 			if (tempTitle == "" || tempTitle == undefined){
 				Cursor.showCursor(ApplicationParent.C_DEFAULT);
 				

@@ -140,11 +140,14 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 			
 			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_save'), instanceName:"saveItem"});
 			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_saveas'), instanceName:"saveItemAs"});
+			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_insertdesign'), instanceName:"insertDesignItem", enabled:false});
+			
+			file_menu.addMenuItem({type:"separator"});
+			
 			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_import'), instanceName:"importItem"});
 			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_export'), instanceName:"exportItem", enabled:false});
 			
 			file_menu.addMenuItem({type:"separator"});
-			
 			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_exit'), instanceName:"exitItem"});
 				
 		} else {
@@ -299,6 +302,10 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 				Debugger.log('Clicked File > Save As',Debugger.GEN,'fileMenuClicked','LFMenuBar');
                 org.lamsfoundation.lams.authoring.Application(app).getCanvas().saveDesignToServerAs(Workspace.MODE_SAVEAS);
                 break;
+			case eventObj.menu.insertDesignItem:
+				Debugger.log('Clicked File > Insert...',Debugger.GEN,'fileMenuClicked','LFMenuBar');
+                org.lamsfoundation.lams.authoring.Application(app).getCanvas().openDesignBySelection(Workspace.MODE_INSERT);
+				break;
 			case eventObj.menu.importItem:
 				Debugger.log('Clicked File > Import',Debugger.GEN,'fileMenuClicked','LFMenuBar');
 				org.lamsfoundation.lams.authoring.Application(app).getCanvas().launchImportWindow();
@@ -444,8 +451,12 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         }
     }
     
+	public function enableInsertDesign(enable:Boolean){
+		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(6), enable);
+	}
+	
 	public function enableExport(enable:Boolean){
-		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(7), enable);
+		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(9), enable);
 	}
 	
 	public function enableSave(enable:Boolean){

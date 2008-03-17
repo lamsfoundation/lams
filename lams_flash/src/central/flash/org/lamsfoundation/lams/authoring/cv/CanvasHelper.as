@@ -157,7 +157,9 @@ class CanvasHelper {
 			canvasModel.setDesignTitle();
 			canvasModel.lastBranchActionType = CanvasModel.OPEN_FROM_FILE;
 			canvasModel.setDirty();
+			
 			LFMenuBar.getInstance().enableExport(!canvasModel.autoSaveWait);
+			LFMenuBar.getInstance().enableInsertDesign(!canvasModel.autoSaveWait);
 		
 		}else{
 			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		

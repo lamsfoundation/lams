@@ -206,20 +206,21 @@ class Canvas extends CanvasHelper {
 		}
 		
 		var mode:String = Application.getInstance().getWorkspace().getWorkspaceModel().currentMode;
+		
+		
 		_ddm.saveMode = (mode == Workspace.MODE_SAVEAS) ? 1 : 0;
-		
+			
 		Debugger.log('SAVE MODE:'+_ddm.saveMode,Debugger.CRITICAL,'saveDesignToServer','Canvas');
-		
+			
 		if(_ddm.hasRedundantBranchMappings(false)) {
 			Cursor.showCursor(Application.C_DEFAULT);
 			LFMessage.showMessageConfirm(Dictionary.getValue("redundant_branch_mappings_msg"), Proxy.create(_ddm, _ddm.removeRedundantBranchMappings, Proxy.create(this, saveDesignToServer, workspaceResultDTO)), null, Dictionary.getValue("al_continue"), null);
 		} else {
-		
 			var dto:Object = _ddm.getDesignForSaving();
 			var callback:Function = Proxy.create(this,onStoreDesignResponse);
-			
+				
 			Application.getInstance().getComms().sendAndReceive(dto,"servlet/authoring/storeLearningDesignDetails",callback,false);
-		}	
+		}
 		
 		return true;
 	}
@@ -267,6 +268,8 @@ class Canvas extends CanvasHelper {
 			ApplicationParent.extCall("setSaved", "true");
 			
 			LFMenuBar.getInstance().enableExport(true);
+			LFMenuBar.getInstance().enableInsertDesign(true);
+			
 			Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
 			
 			
@@ -464,19 +467,19 @@ class Canvas extends CanvasHelper {
 	* Opens a design using workspace and user to select design ID
 	* passes the callback function to recieve selected ID
 	*/
-	public function openDesignBySelection(){
+	public function openDesignBySelection(mode:String){
         //Work space opens dialog and user will select view
-		if(_ddm.modified){
-			LFMessage.showMessageConfirm(Dictionary.getValue('cv_design_unsaved'), Proxy.create(this,doOpenDesignBySelection), null);
+		if(_ddm.modified || (mode == Workspace.MODE_INSERT && _ddm.modified && (_ddm.learningDesignID != null))) {
+			LFMessage.showMessageConfirm(Dictionary.getValue('cv_design_unsaved'), Proxy.create(this,doOpenDesignBySelection, mode), null);
 		} else {
-			doOpenDesignBySelection();
+			doOpenDesignBySelection(mode);
 		}
 	}
     
-	public function doOpenDesignBySelection():Void{
+	public function doOpenDesignBySelection(mode:String):Void{
 		var callback:Function = Proxy.create(this, openDesignById);
 		var ws = Application.getInstance().getWorkspace();
-        ws.userSelectItem(callback);
+        ws.userSelectItem(callback, mode);
 	}
 	
 	/**
@@ -488,12 +491,44 @@ class Canvas extends CanvasHelper {
     public function openDesignById(workspaceResultDTO:Object){
 		Application.getInstance().getWorkspace().getWV().clearDialog();
 		ObjectUtils.toString(workspaceResultDTO);
+		
 		var designId:Number = workspaceResultDTO.selectedResourceID;
-
-        var callback:Function = Proxy.create(this,setDesign);
-		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designId,callback, false);
-	
+		var mode:String = Application.getInstance().getWorkspace().getWorkspaceModel().currentMode;
+		
+		if(mode != Workspace.MODE_INSERT) {
+			var callback:Function = Proxy.create(this,setDesign);
+			Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designId,callback, false);
+		} else {
+			var dataToSend:Object = getInsertPacket(workspaceResultDTO, false); 							// for now only using Case 1 Insert Learning Design Servlet See Authoring Flash To Java Communications
+			var callback:Function = Proxy.create(this, onInsertDesignResponse);
+				
+			Application.getInstance().getComms().sendAndReceive(dataToSend,"servlet/authoring/insertLearningDesign", callback, false);
+		}
     }
+	
+	private function getInsertPacket(workspaceResultDTO:Object, createNewDesign:Boolean):Object {
+		var packet = new Object();
+		packet.learningDesignID = _ddm.learningDesignID;
+		packet.learningDesignIDToImport = workspaceResultDTO.selectedResourceID;
+		packet.createNewLearningDesign = createNewDesign;
+		
+		if(createNewDesign) {
+			packet.workspaceFolderID = workspaceResultDTO.targetWorkspaceFolderID;
+			packet.title = workspaceResultDTO.resourceName;
+		}
+		
+		return packet;
+	}
+	
+	public function onInsertDesignResponse(r):Void {
+		
+		if(r instanceof LFError){
+			Cursor.showCursor(Application.C_DEFAULT);
+			r.showErrorAlert();
+		} else {
+			openDesignByImport(r);
+		}
+	}
 	
 	/**
 	 * Request imported design from server
@@ -504,7 +539,7 @@ b	 * @param   learningDesignID
 	 */
 	
 	public function openDesignByImport(learningDesignID:Number){
-		var callback:Function = Proxy.create(this,setDesign, true);
+		var callback:Function = Proxy.create(this, setDesign, true);
         canvasModel.importing = true;
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+learningDesignID,callback, false);
 		

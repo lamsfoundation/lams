@@ -621,8 +621,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		
 		if(getCanvas().ddm.learningDesignID == undefined){
 			LFMenuBar.getInstance().enableExport(false);
+			LFMenuBar.getInstance().enableInsertDesign(false);
 		} else {
 			LFMenuBar.getInstance().enableExport(true);
+			LFMenuBar.getInstance().enableInsertDesign(true);
 		}
 
 		if(_doRefresh) refreshDesign();

@@ -106,10 +106,10 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 		
 		if(branchesLoaded) {
 			branches_lst.dataProvider = branches;
-			branches_lst.labelField = "sequenceName";
+			branches_lst.labelFunction = formatBranchLabel;
 		} else {
 			branches_lst.dataProvider = sequences;
-			branches_lst.labelField = "title";
+			branches_lst.labelFunction = formatBranchLabel;
 		}
 		
 		branches_lst.hScrollPolicy = "on";
@@ -138,6 +138,12 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 			}
 		}
 		
+	}
+	
+	private function formatBranchLabel(data:Object):String {
+		var branchingActivity:BranchingActivity = ConditionMatchingDialog(this._parent).branchingActivity;
+		if(data instanceof SequenceActivity) return (data.activityUIID == branchingActivity.firstActivityUIID) ? Dictionary.getValue("branch_mapping_dlg_branch_item_default", [data.title]) : data.title;
+		else return (data.sequenceActivity.activityUIID == branchingActivity.firstActivityUIID) ? Dictionary.getValue("branch_mapping_dlg_branch_item_default", [data.sequenceName]) : data.sequenceName;
 	}
 	
 	private function removeCondition(c:ToolOutputCondition) {
@@ -311,6 +317,10 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 	
 	public function set branchingActivity(a:BranchingActivity) {
 		_branchingActivity = a;
+	}
+	
+	public function get branchingActivity():BranchingActivity {
+		return _branchingActivity;
 	}
 
 }
