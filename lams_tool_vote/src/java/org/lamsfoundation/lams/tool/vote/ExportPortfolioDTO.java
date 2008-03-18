@@ -41,6 +41,7 @@ public class ExportPortfolioDTO implements Comparable
     protected String userExceptionNoToolSessions;
     
     protected Map mapStandardNominationsHTMLedContent;
+    protected Map mapStandardNominationsContent;
     protected Map mapStandardUserCount;
     protected Map mapStandardRatesContent;
     
@@ -158,4 +159,12 @@ public class ExportPortfolioDTO implements Comparable
             String userExceptionNoToolSessions) {
         this.userExceptionNoToolSessions = userExceptionNoToolSessions;
     }
+
+	public Map getMapStandardNominationsContent() {
+		return mapStandardNominationsContent;
+	}
+
+	public void setMapStandardNominationsContent(Map mapStandardNominationsContent) {
+		this.mapStandardNominationsContent = mapStandardNominationsContent;
+	}
 }
