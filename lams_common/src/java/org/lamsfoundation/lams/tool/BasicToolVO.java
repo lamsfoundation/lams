@@ -113,6 +113,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	/** Name of the file (including the package) that contains the text strings for
 	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
 	private String languageFile;
+	
+	/** Does this tool produce output definitions / conditions */
+	private Boolean supportsOutputs;
 
     /** full constructor */
     public BasicToolVO(Long toolId, 
@@ -138,7 +141,8 @@ public class BasicToolVO implements Serializable, IToolVO {
                 Integer groupingSupportTypeId,
                 String toolIdentifier, 
                 String toolVersion, 
-                String languageFile) 
+                String languageFile,
+                boolean supportsOutputs) 
     {
 		this.supportsGrouping=supportsGrouping;
 		this.learnerUrl=learnerUrl;
@@ -163,6 +167,7 @@ public class BasicToolVO implements Serializable, IToolVO {
 		this.toolIdentifier=toolIdentifier;
 		this.toolVersion=toolVersion;
 		this.languageFile=languageFile;
+		this.supportsOutputs=supportsOutputs;
     }
 
     /** default constructor */
@@ -492,6 +497,17 @@ public class BasicToolVO implements Serializable, IToolVO {
 		this.valid = valid;
 	}
     
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.IToolVO#isSupportsOutputs()
+	 */
+	public boolean isSupportsOutputs() {
+		return supportsGrouping;
+	}
+
+	public void setSupportsOutputs(boolean supportsOutputs) {
+		this.supportsOutputs = supportsOutputs;
+	}
+
     public String toString() {
         return new ToStringBuilder(this)
             .append("toolId", getToolId())

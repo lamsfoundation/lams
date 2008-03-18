@@ -372,6 +372,21 @@
         </meta>    
     </property>
     
+    <property
+        name="supportsOutputs"
+        type="java.lang.Boolean"
+        column="supports_outputs"
+        not-null="true"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="supports_outputs"
+            length="1"
+            not-null="true"
+        </meta>    
+    </property>    
+
     <!-- Associations -->
   
     <!-- bi-directional one-to-many association to Activity -->

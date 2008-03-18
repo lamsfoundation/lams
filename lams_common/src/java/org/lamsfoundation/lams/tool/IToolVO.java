@@ -89,4 +89,6 @@ public interface IToolVO {
 
 	public abstract boolean isValid();
 
+	public abstract boolean isSupportsOutputs();
+	
 }

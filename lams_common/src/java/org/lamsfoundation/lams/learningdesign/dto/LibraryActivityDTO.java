@@ -81,6 +81,7 @@ public class LibraryActivityDTO extends BaseDTO
 	private Boolean supportsContribute;	
 	private String authoringURL;
 	private String adminURL;
+	private Boolean supportsOutputs;
 	
 	/* Grouping Activities */
 	
@@ -192,7 +193,7 @@ public class LibraryActivityDTO extends BaseDTO
 			this.supportsContribute = new Boolean(tool.getSupportsContribute());
 			this.authoringURL = tool.getAuthorUrl();
 			this.adminURL = tool.getAdminUrl();
-			
+			this.supportsOutputs = tool.getSupportsOutputs();
 			this.helpURL = HelpUtil.constructToolURL(tool.getHelpUrl(), toolSignature, "", languageCode);
 	    }
 	     
@@ -534,6 +535,14 @@ public class LibraryActivityDTO extends BaseDTO
 	
 	public void setToolSignature(String toolSignature) {
 		this.toolSignature = toolSignature;
+	}
+
+	public Boolean getSupportsOutputs() {
+		return supportsOutputs;
+	}
+
+	public void setSupportsOutputs(Boolean supportsOutputs) {
+		this.supportsOutputs = supportsOutputs;
 	}
 
 

@@ -120,6 +120,9 @@ public class Tool implements Serializable {
 	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
 	private String languageFile;
 
+	/** Does this tool produce output definitions / conditions */
+	private Boolean supportsOutputs;
+
 	/** 
 	 * Entries for an tool in a language property file 
 	 */
@@ -150,7 +153,8 @@ public class Tool implements Serializable {
                 Date createDateTime,
                 String toolIdentifier,
                 String toolVersion,
-                String languageFile) 
+                String languageFile,
+                boolean supportsOutputs) 
     {
         this.toolId = toolId;
         this.learnerUrl = learnerUrl;
@@ -177,6 +181,7 @@ public class Tool implements Serializable {
         this.toolIdentifier = toolIdentifier;
         this.toolVersion = toolVersion;
         this.languageFile = languageFile;
+        this.supportsOutputs = supportsOutputs;
     }
 
     /** default constructor */
@@ -590,6 +595,23 @@ public class Tool implements Serializable {
 		this.languageFile = languageFile;
 	}
 
+   /**
+     * @hibernate.property column="supports_outputs" length="1"
+     * @return Returns the supportsOutputs.
+     */
+    public boolean getSupportsOutputs()
+    {
+        return supportsOutputs;
+    }
+    
+    /**
+     * @param supportsRunOffline The supportsRunOffline to set.
+     */
+    public void setSupportsOutputs(boolean supportsOutputs)
+    {
+        this.supportsOutputs = supportsOutputs;
+    }
+    
     public String toString() {
         return new ToStringBuilder(this)
             .append("toolId", getToolId())
@@ -639,7 +661,8 @@ public class Tool implements Serializable {
     			this.groupingSupportTypeId,
     			this.toolIdentifier, 
     			this.toolVersion, 
-    			this.languageFile);
+    			this.languageFile,
+    			this.supportsOutputs);
     	return vo;
     }
 

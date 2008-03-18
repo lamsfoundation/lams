@@ -468,6 +468,7 @@ CREATE TABLE lams_tool (
      , classpath_addition VARCHAR(255)
      , context_file VARCHAR(255)
      , admin_url TEXT
+     , supports_outputs TINYINT(1) DEFAULT 0
      , UNIQUE UQ_lams_tool_sig (tool_signature)
      , UNIQUE UQ_lams_tool_class_name (service_name)
      , PRIMARY KEY (tool_id)

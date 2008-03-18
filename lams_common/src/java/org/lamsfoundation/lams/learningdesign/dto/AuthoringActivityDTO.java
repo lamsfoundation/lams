@@ -238,6 +238,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/** Used for I18N the URLS. Does not need to be sent to clients, so no getter exists. */
 	private String languageCode; 
 	
+	private Boolean supportsOutputs;
+	
 	/*****************************************************************************
 	 * Constructors
 	 *****************************************************************************/
@@ -363,6 +365,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.adminURL = toolActivity.getTool().getAdminUrl();
 		this.toolDisplayName = toolActivity.getTool().getToolDisplayName();
 		this.toolVersion = toolActivity.getTool().getToolVersion();
+		this.supportsOutputs = toolActivity.getTool().getSupportsOutputs();
 		
 		this.helpURL = HelpUtil.constructToolURL(toolActivity.getTool().getHelpUrl(), toolSignature, "", languageCode);
 
@@ -1034,5 +1037,15 @@ public class AuthoringActivityDTO extends BaseDTO{
 	}
 	public void setToolActivityUIID(Integer toolActivityUIID) {
 		this.toolActivityUIID = toolActivityUIID;
+	}
+
+
+
+	public Boolean getSupportsOutputs() {
+		return supportsOutputs;
+	}
+
+	public void setSupportsOutputs(Boolean supportsOutputs) {
+		this.supportsOutputs = supportsOutputs;
 	}
 }
