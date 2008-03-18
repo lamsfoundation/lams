@@ -99,6 +99,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	private var groupIcon_mc:MovieClip;
 	private var branchIcon_mc:MovieClip;
+	private var optionalIcon_mc:MovieClip;
 	private var stopSign_mc:MovieClip;
 	private var branchSign_mc:MovieClip;
 	
@@ -209,6 +210,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function showAssets(isVisible:Boolean){
 		groupIcon_mc._visible = isVisible;
 		branchIcon_mc._visible = isVisible;
+		optionalIcon_mc._visible = isVisible;
 		start_branch_icon_mc._visible = isVisible;
 		finish_branch_icon_mc._visible = isVisible;
 		start_branch_icon_mc_rtl._visible = isVisible;
@@ -456,16 +458,31 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			//chose the icon:
 			if(_activity.isGroupActivity()){
 				groupIcon_mc._visible = true;
+				optionalIcon_mc.visible = false;
 				icon_mc._visible = false;
 				theIcon_mc = groupIcon_mc;
 			} else if(_activity.isBranchingActivity()){
 				branchIcon_mc._visible = true;
 				groupIcon_mc._visible = false;
+				optionalIcon_mc.visible = false;
 				icon_mc._visible = false;
 				theIcon_mc = branchIcon_mc;
+			} else if(_activity.isOptionalActivity()){
+				branchIcon_mc._visible = false;
+				groupIcon_mc._visible = false;
+				optionalIcon_mc.visible = true;
+				icon_mc._visible = false;
+				theIcon_mc = optionalIcon_mc;
+			} else if(_activity.isOptionsWithSequencesActivity()){
+				branchIcon_mc._visible = false;
+				groupIcon_mc._visible = false;
+				optionalIcon_mc.visible = true;
+				icon_mc._visible = false;
+				theIcon_mc = optionalIcon_mc;
 			} else {
 				groupIcon_mc._visible = false;
 				branchIcon_mc._visible = false;
+				optionalIcon_mc.visible = false;
 				icon_mc._visible = true;
 				theIcon_mc = icon_mc;
 			}
