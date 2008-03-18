@@ -426,7 +426,7 @@ class LessonModel extends Observable {
 		return orderedActivityArr;
 	}
 	
-	public function checkSequenceHasCurrentActivity(a:Activity, learner:Progress):Boolean {
+	public function checkComplexHasCurrentActivity(a:Activity, learner:Progress):Boolean {
 		var cChildren:Array = learningDesignModel.getComplexActivityChildren(a.activityUIID);
 		
 		if(cChildren.length > 0) {
@@ -434,7 +434,7 @@ class LessonModel extends Observable {
 				if(cChildren[i].activityID == learner.getCurrentActivityId()) 
 					return true;
 				else if(Progress.compareProgressData(learner, cChildren[i].activityID) == "attempted_mc")
-					if(checkSequenceHasCurrentActivity(cChildren[i], learner)) return true;
+					if(checkComplexHasCurrentActivity(cChildren[i], learner)) return true;
 					else continue;
 			}
 		} else {

@@ -65,7 +65,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private var _children : Array;
 	
 	//refs to screen items:
-	private var container_pnl:Panel;
+	private var container_pnl:MovieClip;
 	private var title_lbl:MovieClip;
 	private var labelHolder_mc:MovieClip;
 	//locals
@@ -98,6 +98,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private var app:ApplicationParent;
 	
 	private var _nested:Boolean;
+	private var _level:Number;
 	
 	private var activeSequence:SequenceActivity;
 	private var activeComplex:ComplexActivity;
@@ -117,6 +118,9 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
+		
+		if(!_nested)
+			_level = 0;
 		
 		init();
 	}
@@ -243,8 +247,8 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			} else if(learnerAct.activity == activeComplex) {
 				var _children:Array = (model instanceof LessonModel) ? model.learningDesignModel.getComplexActivityChildren(activeComplex.activityUIID) : model.ddm.getComplexActivityChildren(activeComplex.activityUIID);
 				Debugger.log("children length: " + _children.length, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
-			
-				learnerAct = LearnerComplexActivity(childHolder_mc.createChildAtDepth("LearnerComplexActivity_Nested", DepthManager.kTop, {_activity:children[i], _children:_children, _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _nested:true, _x:0, _y:childCoordY+21}));
+
+				learnerAct = LearnerComplexActivity(childHolder_mc.createChildAtDepth("LearnerComplexActivity_Nested", DepthManager.kTop, {_activity:children[i], _children:_children, _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _nested:true, _level: _level+1, _x:0, _y:childCoordY+21}));
 				container.push(learnerAct);
 						
 				return i+1;
@@ -311,12 +315,13 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		for(var i=0; i<children_mc.length; i++) {
 			var learnerAct = children_mc[i];
 			if(learnerAct.isAttempted || learnerAct.isCompleted && children_mc[i].activity.iBranchingActivity())
-				activeSequence = null;
+				activeSequence = null;			// ?
 		}
 	}
 	
 	/** TODO: Use for Sequence in Optional */
 	private function checkIfSequenceActive():Void {
+		var closeBox:Boolean = true;
 		for(var i=0; i<children_mc.length; i++) {
 			
 			var isChildCurrent:Boolean = (Progress.compareProgressData(learner, children_mc[i].activity.activityID) == 'current_mc');
@@ -326,21 +331,25 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 				// set activesequence if is current
 				if(children_mc[i].activity != activeSequence)
 					removeAllChildrenAndInputSequence(children_mc[i].activity);
+			} else if(isChildCurrent && (children_mc[i].activity.isOptionsWithSequencesActivity() || children_mc[i].activity.isOptionalActivity() || children_mc[i].activity.isParallelActivity())) {
+				if(children_mc[i].activity != activeComplex)
+					removeAllChildrenAndInputComplex(children_mc[i].activity);
 			} else if(isChildAttempted && children_mc[i].activity.isSequenceActivity()) {
 				// check children of sequence (level 1) for current activity
-				if(model.checkSequenceHasCurrentActivity(children_mc[i].activity, learner) && (children_mc[i].activity != activeSequence))
+				if(model.checkComplexHasCurrentActivity(children_mc[i].activity, learner) && (children_mc[i].activity != activeSequence))
 					removeAllChildrenAndInputSequence(children_mc[i].activity);
+			} else if(isChildAttempted && (children_mc[i].activity.isOptionsWithSequencesActivity() || children_mc[i].activity.isOptionalActivity() || children_mc[i].activity.isParallelActivity())) {
+				if(model.checkComplexHasCurrentActivity(children_mc[i].activity, learner) && (children_mc[i].activity != activeComplex))
+					removeAllChildrenAndInputComplex(children_mc[i].activity);
+			} else if(children_mc[i].activityStatus == "completed_mc") {
+				if(children_mc[i].activity == activeSequence) removeAllChildrenAndInputSequence(null);
+				else if(children_mc[i].activity == activeComplex) removeAllChildrenAndInputComplex(null);
+			} else {
+				closeBox = false;
 			}
-		}
-		
-		Debugger.log("refreshing children: " + children_mc.length, Debugger.CRITICAL, "checkIfSequenceActive", "LearnerComplexActivity");
-		
-		var closeBox:Boolean = true;
-		
-		for(var i=0; i<children_mc.length; i++) {
-			if(children_mc[i].activityStatus != "completed_mc") closeBox = false;
+			
 			children_mc[i].refresh();
-		}	
+		}
 		
 		if(closeBox && locked) {
 			collapse();
@@ -378,8 +387,8 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		redrawComplex();
 		
 		if(!locked && isLearnerModule()) { 
-			localOnPress();
-			localOnRelease();
+			localOnPress(true);
+			expand();
 		}
 	}
 	
@@ -388,8 +397,8 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		redrawComplex();
 		
 		if(!locked && isLearnerModule()) { 
-			localOnPress();
-			localOnRelease();
+			localOnPress(true);
+			expand();
 		}
 	}
 	
@@ -398,6 +407,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		createChildren(_children, children_mc);
 		clearDelegates();
+		
 	}
 	
 	private function hasCurrentChild(){
@@ -445,9 +455,14 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		containerPanelHeader.title_lbl.text = toolTitle;
 		
-		if(_nested) container_pnl.setStyle("backgroundColor", 0x888888);
-		else container_pnl.setStyle("backgroundColor", 0x4289FF);
-
+		var bgcolor = new Color(this.container_pnl.panel);
+		var border_color = new Color(this.container_pnl.bg);
+		
+		var styleObject = _tm.getStyleObject("progressBar");
+		
+		bgcolor.setRGB(styleObject.colors[_level%styleObject.colors.length].backgroundColor);
+		border_color.setRGB(styleObject.colors[_level%styleObject.colors.length].borderColor);
+		
 		//position the container (this)
 		container_pnl._height = (_nested) ? getChildrenHeight() : 16 + getChildrenHeight();
 		
@@ -501,20 +516,20 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		hideToolTip();
 	}
 
-	private function localOnPress():Void{
+	private function localOnPress(noDoubleClick:Boolean):Void{
 		hideToolTip();
 		
 		this.swapDepths(this._parent.getNextHighestDepth());
 		// check double-click
 		
-		var now : Number = new Date ().getTime ();
+		var now:Number = new Date().getTime();
 		if ((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY)	{
 			Debugger.log ('DoubleClicking:' + this, Debugger.GEN, 'localOnPress', 'LearnerOptionalActivity');
 			_doubleClicking = true;
 			
 			//if we double click on the glass mask - then open the container to allow the usr to see the activities inside.
 			draw();
-			controller.activityDoubleClick(this);
+			if(!noDoubleClick) controller.activityDoubleClick(this);
 		
 		} else {
 			Debugger.log ('SingleClicking:+' + this, Debugger.GEN, 'localOnPress', 'LearnerOptionalActivity');
@@ -666,6 +681,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	public function get nested():Boolean {
 		return _nested;
+	}
+	
+	public function get level():Number {
+		return _level;
 	}
 	
 	public function destroy():Void {
