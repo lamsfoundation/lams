@@ -97,12 +97,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasModel.isDragging = false;
 				return;
 			} else {
+				ca.depthHistory = ca.getDepth();
+				ca.swapDepths(DepthManager.kTopmost);
 				ca.startDrag(false);
 				_canvasModel.isDragging = true;
 			}
 			
 			if(_tempSelectedItem != null) {
-			
 				// clear currently selected activity
 				for (var i=0; i<optionalOnCanvas.length; i++) {
 					if(parentSelectedAct.parentUIID == optionalOnCanvas[i].activity.activityUIID) {
@@ -147,7 +148,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    
     public function activityRelease(ca:Object):Void{
 	    Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','CanvasController');
-		
+
 		if (_canvasModel.isTransitionToolActive()){
 			_canvasModel.getCanvas().stopTransitionTool();
 			_canvasModel.activeView.removeTempTrans();	
@@ -161,6 +162,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		 
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
+			ca.swapDepths(ca.depthHistory);
+			ca.depthHistory = null;
 			_canvasModel.isDragging = false;
 			
 			var sequenceActivity:Activity = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
