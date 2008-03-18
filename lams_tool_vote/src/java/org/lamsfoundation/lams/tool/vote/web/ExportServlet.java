@@ -62,7 +62,6 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 	
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{
-	    logger.debug("dispathcing doExport");
 	    String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
 
 	    boolean generateCharts = false;
@@ -74,10 +73,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 		}
 		
 		if ( generateCharts ) {
-			logger.debug("writing out chart to directoryName: " + directoryName);
 			writeOutChart(request, response, ChartUtil.CHART_TYPE_PIE,  directoryName);
 			writeOutChart(request, response, ChartUtil.CHART_TYPE_BAR,  directoryName);
-			logger.debug("basePath: " + basePath);
 		}
 		
 		writeResponseToFile(basePath+"/export/exportportfolio.jsp",directoryName,FILENAME,cookies);
@@ -110,14 +107,9 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 		boolean generateCharts = false;
 	    ExportPortfolioDTO exportPortfolioDTO= new ExportPortfolioDTO();
 	    
-	    logger.debug("starting learner mode...");
 	    exportPortfolioDTO.setPortfolioExportMode("learner");
         
     	IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
-    	logger.debug("voteService:" + voteService);
-        
-    	logger.debug("userID:" + userID);
-    	logger.debug("toolSessionID:" + toolSessionID);
     	
         if (userID == null || toolSessionID == null)
         {
@@ -127,21 +119,16 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         }
         
         VoteSession voteSession=voteService.retrieveVoteSession(toolSessionID);
-        logger.debug("retrieving voteSession: " + voteSession);
-        logger.debug("voteSession uid: " + voteSession.getUid());
         
         // If the learner hasn't voted yet, then they won't exist in the session.
         // Yet we might be asked for their page, as the activity has been commenced. 
         // So need to do a "blank" page in that case
         VoteQueUsr learner = voteService.getVoteUserBySession(userID,voteSession.getUid());
-        logger.debug("learner: " + learner);
         
         if ( learner != null && learner.isFinalScreenRequested() ) {
         	generateCharts = true;
         	
         	VoteContent content=voteSession.getVoteContent();
-	        logger.debug("content: " + content);
-	        logger.debug("content id: " + content.getVoteContentId());
 	        
 	        if (content == null)
 	        {
@@ -151,19 +138,17 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 	        }
 	
 	        VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
-	        logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
 	        
 	    	VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
 	    	voteMonitoringAction.refreshSummaryData(request, content, voteService, true, true, 
 	    	        toolSessionID.toString(), userID.toString() , true, null, voteGeneralMonitoringDTO, exportPortfolioDTO);
-	    	logger.debug("post refreshSummaryData, exportPortfolioDTO now: " + exportPortfolioDTO);
 	    	
 	    	
 	    	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), 
 	    	        voteSession.getUid(), exportPortfolioDTO);
 	    	    	
 	    	// VoteChartGenerator.create{Pie|Bar}Chart expects these to be session attributes
-	    	request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, exportPortfolioDTO.getMapStandardNominationsHTMLedContent());
+	    	request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, exportPortfolioDTO.getMapStandardNominationsContent());
 	    	request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, exportPortfolioDTO.getMapStandardRatesContent());
 	    	
 	    	//	voteMonitoringAction.prepareReflectionData(request, content, voteService, userID.toString(),true);
@@ -172,24 +157,17 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 	    	 exportPortfolioDTO.setUserExceptionNoToolSessions("false");
 	     }
         
-    	logger.debug("final exportPortfolioDTO: " + exportPortfolioDTO);
-    	logger.debug("final exportPortfolioDTO userExceptionNoToolSessions: " + exportPortfolioDTO.getUserExceptionNoToolSessions() );
     	request.getSession().setAttribute(EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
-
-    	logger.debug("ending learner mode: ");
 
     	return generateCharts;
     }
     
     public boolean teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
-        logger.debug("starting teacher mode...");
 	    ExportPortfolioDTO exportPortfolioDTO= new ExportPortfolioDTO();
         exportPortfolioDTO.setPortfolioExportMode("teacher");
         
         IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
-        logger.debug("voteService:" + voteService);
-        logger.debug("toolContentID:" + toolContentID);
        
         if (toolContentID==null)
         {
@@ -199,7 +177,6 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         }
 
         VoteContent content=voteService.retrieveVote(toolContentID);
-        logger.debug("content: " + content);
         
         if (content == null)
         {
@@ -211,20 +188,16 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
         VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
         
-        logger.debug("starting refreshSummaryData.");
         voteMonitoringAction.refreshSummaryData(request, content, voteService, true, false, null, null, false, null, voteGeneralMonitoringDTO, exportPortfolioDTO);
-        logger.debug("post refreshSummaryData, exportPortfolioDTO now: " + exportPortfolioDTO);
         
-        logger.debug("teacher uses content id: " + content.getVoteContentId());
     	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), null, exportPortfolioDTO);
-    	logger.debug("post prepareChartDataForExportTeacher");
+    	// VoteChartGenerator.create{Pie|Bar}Chart expects these to be session attributes
+    	request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, exportPortfolioDTO.getMapStandardNominationsContent());
+    	request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, exportPortfolioDTO.getMapStandardRatesContent());
 
-        logger.debug("final exportPortfolioDTO: " + exportPortfolioDTO);
-        logger.debug("final exportPortfolioDTO userExceptionNoToolSessions: " + exportPortfolioDTO.getUserExceptionNoToolSessions() );
         request.getSession().setAttribute(EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
         
         voteMonitoringAction.prepareReflectionData(request, content, voteService, null, true, "All");
-        logger.debug("ending teacher mode: ");
 
         // always generate the charts
         return true;
@@ -237,10 +210,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
      * @param directoryName
      */
     public void writeOutChart(HttpServletRequest request, HttpServletResponse response, String chartType, String directoryName) {
-        logger.debug("File.separator: " + File.separator) ;
         String fileName=chartType + ".png";
-        logger.debug("output image fileName: " + fileName) ;
-        logger.debug("full folder name:" + directoryName + File.separator + fileName);
         
         try{
             OutputStream out = new FileOutputStream(directoryName +  File.separator + fileName);
@@ -249,11 +219,11 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         }
         catch(FileNotFoundException e)
         {
-            logger.debug("exception creating chart: " + e) ;
+            logger.error("Exception creating chart: ",e) ;
         }
         catch(IOException e)
         {
-            logger.debug("exception creating chart: " + e) ;
+            logger.error("exception creating chart: ",e) ;
         }
       }
 }

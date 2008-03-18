@@ -1246,6 +1246,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		    exportPortfolioDTO.setMapStandardNominationsHTMLedContent(mapStandardNominationsHTMLedContent);
 		    exportPortfolioDTO.setMapStandardRatesContent(mapStandardRatesContent);
 		    exportPortfolioDTO.setMapStandardUserCount(mapStandardUserCount);
+		    exportPortfolioDTO.setMapStandardNominationsContent(mapStandardNominationsContent);
 		}
 		logger.debug("ending prepareChartDataForExportTeacher, exportPortfolioDTO: " + exportPortfolioDTO);
 	}	
