@@ -51,6 +51,7 @@ class ToolActivity extends Activity{
 	private var _supportsDefineLater:Boolean;
 	private var _supportsModeration:Boolean;
 	private var _supportsRunOffline:Boolean;
+	private var _supportsOutputs:Boolean;
 	
 	private var _toolOutputDefinitions:Hashtable;
 	
@@ -165,6 +166,8 @@ class ToolActivity extends Activity{
 			_supportsContribute = dto.supportsContribute;
 			_supportsDefineLater = dto.supportsDefineLater;
 			_supportsModeration = dto.supportsRunOffline
+			_supportsOutputs = dto.supportsOutputs;
+			
 			activityToolContentID = _toolContentID;
 			
 			//maybe return isValid();
@@ -239,6 +242,7 @@ class ToolActivity extends Activity{
 		n.supportsContribute = _supportsContribute;
 		n.supportsDefineLater = _supportsDefineLater;
 		n.supportsModeration = _supportsRunOffline;
+		n.supportsOutputs = _supportsOutputs;
 		
 		return n;
 		
@@ -421,7 +425,25 @@ class ToolActivity extends Activity{
 		return _supportsRunOffline;
 	}
 
-/**
+	/**
+	 * 
+	 * @usage   
+	 * @param   newsupportsRunOffline 
+	 * @return  
+	 */
+	public function set supportsOutputs (newsupportsOutputs:Boolean):Void {
+		_supportsOutputs = newsupportsOutputs;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get supportsOutputs ():Boolean {
+		return _supportsOutputs;
+	}
+
+	/**
 	 * 
 	 * @usage   
 	 * @param   newmonitoringUrl 

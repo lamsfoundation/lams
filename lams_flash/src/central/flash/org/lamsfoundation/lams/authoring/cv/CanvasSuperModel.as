@@ -176,8 +176,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			
 			if(_activity != null) {
 				if(_activity instanceof _class) {
-					if(isBranching) tActivities.addItem({label: _activity.title, data: _activity.activityUIID});
-					else tActivities.addItem({label: _activity.title, data: _activity});
+					Debugger.log("activity supports Outputs: " + ToolActivity(_activity).supportsOutputs, Debugger.CRITICAL, "getDownstreamActivities", "CanvasSuperModel");
+					
+					if(isBranching) {
+						if(ToolActivity(_activity).supportsOutputs) tActivities.addItem({label: _activity.title, data: _activity.activityUIID});
+					} else { tActivities.addItem({label: _activity.title, data: _activity}); }
 				} else if(_activity instanceof ComplexActivity) {
 					if(!isBranching && !_activity.isOptionalActivity() && !_activity.isSequenceActivity())
 						getActivitiesFromComplexByClass(_activity.activityUIID, tActivities, _class, isBranching);
@@ -198,8 +201,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		
 		for(var i=0; i<children.length; i++) {
 			if(children[i] instanceof _class) {
-				if(isBranching) tActs.addItem({label: children[i].title, data: children[i].activityUIID});
-				else tActs.addItem({label: children[i].title, data: children[i]});
+				if(isBranching) {
+					if(ToolActivity(children[i]).supportsOutputs) tActs.addItem({label: children[i].title, data: children[i].activityUIID});
+				} else { tActs.addItem({label: children[i].title, data: children[i]}); }
 			} else if(children[i] instanceof ComplexActivity) {
 				if(!isBranching && !children[i].isOptionalActivity() && !children[i].isSequenceActivity()) {
 					getActivitiesFromComplexByClass(children[i].activityUIID, tActs, _class);
