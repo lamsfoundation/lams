@@ -97,8 +97,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasModel.isDragging = false;
 				return;
 			} else {
-				ca.depthHistory = ca.getDepth();
-				ca.swapDepths(DepthManager.kTopmost);
+				if (ca.activity.isOptionalActivity() || ca.activity.isOptionsWithSequencesActivity()) {
+					ca.depthHistory = ca.getDepth();
+					ca.swapDepths(DepthManager.kTopmost);
+				}
 				ca.startDrag(false);
 				_canvasModel.isDragging = true;
 			}
@@ -162,8 +164,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		 
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
-			ca.swapDepths(ca.depthHistory);
-			ca.depthHistory = null;
+			if (ca.activity.isOptionalActivity() || ca.activity.isOptionsWithSequencesActivity()) {
+				ca.swapDepths(ca.depthHistory);
+				ca.depthHistory = null;
+			}
 			_canvasModel.isDragging = false;
 			
 			var sequenceActivity:Activity = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID);
