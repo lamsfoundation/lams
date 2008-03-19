@@ -154,7 +154,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			childrenArray = _children;
 		}
 		
-		createChildren(childrenArray, children_mc);
+		createChildren(childrenArray);
 		clearDelegates();
 		
 		childHolder_mc._visible = (!_nested) ? false : true;
@@ -175,17 +175,19 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		MovieClipUtils.doLater(Proxy.create(this, clearDelegates));
 	}
 
-	private function createChildren(children:Array, container:Array, callback:Function, index:Number):Void {
+	private function createChildren(children:Array, index:Number):Void {
 		
-		var rIndex:Number = drawChildren(children, container, index);
+		var rIndex:Number = drawChildren(children, index);
 		
-		if(rIndex != null) delegates.push(Proxy.create(this, createChildren, children, container, callback, rIndex));
+		if(rIndex != null) delegates.push(Proxy.create(this, createChildren, children, rIndex));
 	
 		return;
 	}
 	
-	private function drawChildren(children:Array, container:Array, index:Number):Number {
+	private function drawChildren(children:Array, index:Number):Number {
 		var childCoordY:Number = 0;
+		
+		Debugger.log("draw children: " + children.length + " :: index: " + index, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
 		
 		var _idx=0;
 		if(index != null) _idx = index; 
@@ -195,11 +197,14 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			
 			var progStatus:String = Progress.compareProgressData(learner, children[i].activityID);
 			
-			Debugger.log("container length: " + container.length, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
+			Debugger.log("children_mc length: " + children_mc.length, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
 			
-			if(container.length > 0)
-				childCoordY = (container[container.length-1] instanceof LearnerComplexActivity) ? container[container.length-1]._y + container[container.length-1].getChildrenHeight() : container[container.length-1]._y + 21; // (count*21);
+			if(children_mc.length > 0)
+				childCoordY = (children_mc[children_mc.length-1] instanceof LearnerComplexActivity) ? children_mc[children_mc.length-1]._y + children_mc[children_mc.length-1].getChildrenHeight() : children_mc[children_mc.length-1]._y + 21; // (count*21);
 			
+			//if(children_mc[children_mc.length-1].activity.activityUIID == children[i].activityUIID)
+			//	return null;
+				
 			Debugger.log("progStatus: " + progStatus, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
 			Debugger.log("childCoordY: " + childCoordY, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
 			
@@ -208,8 +213,8 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			Debugger.log('attaching child movieL ' + learnerAct,Debugger.CRITICAL,'drawChildren','LearnerComplexActivity');
 			
 			//set the positioning co-ords
-			if(container.length > 0)
-				learnerAct._y = (container[container.length-1].nested) ? container[container.length-1]._y + container[container.length-1].getChildrenHeight() :  container[container.length-1]._y + 21;
+			if(children_mc.length > 0)
+				learnerAct._y = (children_mc[children_mc.length-1].nested) ? children_mc[children_mc.length-1]._y + children_mc[children_mc.length-1].getChildrenHeight() :  children_mc[children_mc.length-1]._y + 21;
 			else
 				learnerAct._y = 0;
 			
@@ -225,12 +230,12 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 				learnerAct.lineBottomVisible = (i == children.length-1) ? true : false;
 			}
 			
-			container.push(learnerAct);
+			children_mc.push(learnerAct);
 			
 			if(learnerAct.activity == activeSequence) {
 				if(activeSequence.firstActivityUIID != null) {
 					var actOrder:Array = model.getDesignOrder(activeSequence.firstActivityUIID, true);
-					createChildren(actOrder, container, null, null, false);
+					createChildren(actOrder, null);
 					
 					return i+1;
 				}
@@ -239,7 +244,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
         
 				if(learnerAct.isAttempted || learnerAct.isCompleted) {
 					if(!isLearnerModule()) {
-						drawActiveBranch(learnerAct, container);
+						drawActiveBranch(learnerAct);
 					}
 					
 					return i+1;
@@ -249,7 +254,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 				Debugger.log("children length: " + _children.length, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
 
 				learnerAct = LearnerComplexActivity(childHolder_mc.createChildAtDepth("LearnerComplexActivity_Nested", DepthManager.kTop, {_activity:children[i], _children:_children, _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _nested:true, _level: _level+1, _x:0, _y:childCoordY+21}));
-				container.push(learnerAct);
+				children_mc.push(learnerAct);
 						
 				return i+1;
 			}
@@ -260,7 +265,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 	}
 	
-	private function drawActiveBranch(learnerAct:LearnerActivity, container:Array):Void {
+	private function drawActiveBranch(learnerAct:LearnerActivity):Void {
 		var children:Array = model.ddm.getComplexActivityChildren(learnerAct.activity.activityUIID);
 		
 		for(var i=0; i<children.length; i++) {
@@ -270,7 +275,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 				var actOrder:Array = model.getDesignOrder(SequenceActivity(children[i]).firstActivityUIID, true);
 				actOrder.unshift(children[i]);
 				
-				createChildren(actOrder, container);
+				createChildren(actOrder);
 				
 				return;
 			}
@@ -314,7 +319,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private function checkIfBranchActive():Void {
 		for(var i=0; i<children_mc.length; i++) {
 			var learnerAct = children_mc[i];
-			if(learnerAct.isAttempted || learnerAct.isCompleted && children_mc[i].activity.iBranchingActivity())
+			if((learnerAct.isAttempted || learnerAct.isCompleted) && children_mc[i].activity.iBranchingActivity())
 				activeSequence = null;			// ?
 		}
 	}
@@ -322,6 +327,9 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	/** TODO: Use for Sequence in Optional */
 	private function checkIfSequenceActive():Void {
 		var closeBox:Boolean = true;
+		var tempActiveSequence = activeSequence;
+		var tempActiveComplex = activeComplex;
+		
 		for(var i=0; i<children_mc.length; i++) {
 			
 			var isChildCurrent:Boolean = (Progress.compareProgressData(learner, children_mc[i].activity.activityID) == 'current_mc');
@@ -330,25 +338,40 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			if(isChildCurrent && children_mc[i].activity.isSequenceActivity()) {
 				// set activesequence if is current
 				if(children_mc[i].activity != activeSequence)
-					removeAllChildrenAndInputSequence(children_mc[i].activity);
+					activeSequence = children_mc[i].activity;
 			} else if(isChildCurrent && (children_mc[i].activity.isOptionsWithSequencesActivity() || children_mc[i].activity.isOptionalActivity() || children_mc[i].activity.isParallelActivity())) {
 				if(children_mc[i].activity != activeComplex)
-					removeAllChildrenAndInputComplex(children_mc[i].activity);
-			} else if(isChildAttempted && children_mc[i].activity.isSequenceActivity()) {
+					activeComplex = children_mc[i].activity;
+			}
+			
+			if(isChildAttempted && children_mc[i].activity.isSequenceActivity()) {
 				// check children of sequence (level 1) for current activity
 				if(model.checkComplexHasCurrentActivity(children_mc[i].activity, learner) && (children_mc[i].activity != activeSequence))
-					removeAllChildrenAndInputSequence(children_mc[i].activity);
+					activeSequence = children_mc[i].activity;
 			} else if(isChildAttempted && (children_mc[i].activity.isOptionsWithSequencesActivity() || children_mc[i].activity.isOptionalActivity() || children_mc[i].activity.isParallelActivity())) {
 				if(model.checkComplexHasCurrentActivity(children_mc[i].activity, learner) && (children_mc[i].activity != activeComplex))
-					removeAllChildrenAndInputComplex(children_mc[i].activity);
-			} else if(children_mc[i].activityStatus == "completed_mc") {
-				if(children_mc[i].activity == activeSequence) removeAllChildrenAndInputSequence(null);
-				else if(children_mc[i].activity == activeComplex) removeAllChildrenAndInputComplex(null);
+					activeComplex = children_mc[i].activity;
+			}
+			
+			if(children_mc[i].activityStatus == "completed_mc") {
+				if(children_mc[i].activity == activeSequence) 
+					activeSequence = null;
+				else if(children_mc[i].activity == activeComplex)  
+					activeComplex = null;
 			} else {
 				closeBox = false;
 			}
 			
 			children_mc[i].refresh();
+		}
+		
+		if(tempActiveSequence != activeSequence || tempActiveComplex != activeComplex) {
+			updateComplex();
+		} else if(tempActiveSequence != null || tempActiveComplex != null) {
+			if(!locked && isLearnerModule()) { 
+				localOnPress(true);
+				expand();
+			}
 		}
 		
 		if(closeBox && locked) {
@@ -377,24 +400,23 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		children_mc = new Array();
 		
-		createChildren(_children, children_mc);
+		createChildren(_children);
 		clearDelegates();
 	}
 	
 	/** TODO: Use for Sequence in Optional */
 	public function removeAllChildrenAndInputSequence(activity:SequenceActivity):Void {
 		activeSequence = activity;
-		redrawComplex();
-		
-		if(!locked && isLearnerModule()) { 
-			localOnPress(true);
-			expand();
-		}
+		updateComplex();
 	}
 	
 	public function removeAllChildrenAndInputComplex(activity:ComplexActivity):Void {
 		activeComplex = activity;
-		redrawComplex();
+		updateComplex();
+	}
+	
+	public function updateComplex():Void {
+		redrawComplex(true);
 		
 		if(!locked && isLearnerModule()) { 
 			localOnPress(true);
@@ -402,11 +424,11 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		}
 	}
 	
-	private function redrawComplex():Void {
+	private function redrawComplex(clear:Boolean):Void {
 		removeAllChildren();
 		
-		createChildren(_children, children_mc);
-		clearDelegates();
+		createChildren(_children);
+		if(clear) clearDelegates();
 		
 	}
 	
