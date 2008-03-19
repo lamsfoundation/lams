@@ -295,6 +295,8 @@ values ('CustomTabTitle','', 'config.custom.tab.title', 'config.header.look.feel
 
 -- LDEV-1005
 alter table lams_user add column enable_flash TINYINT(1) DEFAULT 1;
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('EnableFlash','true', 'config.flash.enable', 'config.header.features', 'BOOLEAN', 1);
 
 -- LDEV-1579
 alter table lams_tool add column supports_outputs TINYINT(1) DEFAULT 0;
