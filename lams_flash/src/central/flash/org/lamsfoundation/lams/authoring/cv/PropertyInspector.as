@@ -169,9 +169,9 @@ class PropertyInspector extends PropertyInspectorControls {
 		
 		noSeqAct_lbl.text = Dictionary.getValue('pi_no_seq_act');
 		
-		_group_match_btn.label = Dictionary.getValue('pi_mapping_btn_lbl');
+		_group_match_btn.label = Dictionary.getValue('pi_group_matching_btn_lbl');
 		_group_naming_btn.label = Dictionary.getValue('pi_group_naming_btn_lbl');
-		_tool_output_match_btn.label = Dictionary.getValue('pi_mapping_btn_lbl');
+		_tool_output_match_btn.label = Dictionary.getValue('pi_tool_output_matching_btn_lbl');
 		_conditions_setup_btn.label = Dictionary.getValue('pi_condmatch_btn_lbl');
 
 		_define_monitor_cb.label = Dictionary.getValue('pi_define_monitor_cb_lbl');
