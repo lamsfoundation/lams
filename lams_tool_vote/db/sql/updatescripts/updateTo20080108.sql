@@ -11,6 +11,8 @@ WHERE content_id = (
 
 UPDATE lams_tool SET modified_date_time = NOW() WHERE tool_signature = 'lavote11';
 
+update lams_tool set supports_outputs = 1 where tool_signature = "lavote11";
+
 -- update the tool version - special code that should only be executed if the upgrade is being done manually.
 -- if it is being done via the tool deployer then it will update the version automatically.
 -- UPDATE lams_tool SET tool_version = "20080108" WHERE tool_signature = "lavote11";

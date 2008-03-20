@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.vote.service;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
@@ -32,6 +33,7 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
@@ -288,5 +290,6 @@ public interface IVoteService
     public void persistFile(VoteContent content, VoteUploadedFile file) throws VoteApplicationException;
     
     public List retrieveVoteUploadedFiles(VoteContent Vote) throws VoteApplicationException;
+    
 }
 

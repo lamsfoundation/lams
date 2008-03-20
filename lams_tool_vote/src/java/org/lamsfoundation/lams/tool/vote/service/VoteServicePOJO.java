@@ -62,7 +62,6 @@ import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
-import org.lamsfoundation.lams.tool.vote.util.VoteToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
@@ -128,8 +127,9 @@ public class VoteServicePOJO implements
     private ILamsToolService 		toolService;
 	private IExportToolContentService exportContentService;
 
-	private ICoreNotebookService coreNotebookService;
-    private IToolContentHandler voteToolContentHandler = null;
+	private ICoreNotebookService 	coreNotebookService;
+    private IToolContentHandler		voteToolContentHandler = null;
+	private VoteOutputFactory 		voteOutputFactory;
     
     public VoteServicePOJO(){}
     
@@ -1695,15 +1695,6 @@ public class VoteServicePOJO implements
 		}
 	}
 
-	/** Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions that are always
-	 * available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created for a particular activity
-	 * such as the answer to the third question contains the word Koala and hence the need for the toolContentId
-	 * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-	 */
-	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
-		return new TreeMap<String, ToolOutputDefinition>();
-	}
-
 	/**
      * Implemented as part of the tool contract. Sets the defineLater to true on this content.
      * setAsDefineLater(Long toolContentID) throws DataMissingException, ToolException
@@ -2007,24 +1998,6 @@ public class VoteServicePOJO implements
 
     }
     
-	/** 
-	 * Get the tool output for the given tool output names.
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long, java.lang.Long)
-	 */
-	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
-			Long toolSessionId, Long learnerId) {
-		return new TreeMap<String,ToolOutput>();
-	}
-
-	/** 
-	 * Get the tool output for the given tool output name.
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long, java.lang.Long)
-	 */
-	public ToolOutput getToolOutput(String name, Long toolSessionId,
-			Long learnerId) {
-		return null;
-	}
-
     public IToolVO getToolBySignature(String toolSignature) throws VoteApplicationException
     {
     	logger.debug("attempt retrieving tool with signature : " + toolSignature);
@@ -2223,6 +2196,37 @@ public class VoteServicePOJO implements
 	
 
 	
+	/** Get the definitions for possible output for an activity, based on the toolContentId. Currently we have one definition, which is whether
+	 * or not the user has selected a particular answer
+     */
+	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+		VoteContent content = retrieveVote(toolContentId);
+		if ( content == null ) {
+			long defaultToolContentId = getToolDefaultContentIdBySignature(MY_SIGNATURE);
+			content = retrieveVote(defaultToolContentId);
+		}
+		return getVoteOutputFactory().getToolOutputDefinitions(content);
+	}
+ 
+	/** 
+	 * Get the tool output for the given tool output names.
+	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long, java.lang.Long)
+	 */
+	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
+			Long toolSessionId, Long learnerId) {
+		return voteOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
+	}
+
+	/** 
+	 * Get the tool output for the given tool output name.
+	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long, java.lang.Long)
+	 */
+	public ToolOutput getToolOutput(String name, Long toolSessionId,
+			Long learnerId) {
+		return voteOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
+	}
+
+
 	/* ===============Methods implemented from ToolContentImport102Manager =============== */
 	
 
@@ -2363,8 +2367,7 @@ public class VoteServicePOJO implements
                                                          e);
         }
     }
-	
-	
+
 	
 	/**
 	 * @return Returns the logger.
@@ -2649,4 +2652,12 @@ public class VoteServicePOJO implements
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
         this.coreNotebookService = coreNotebookService;
     }
+
+	public VoteOutputFactory getVoteOutputFactory() {
+		return voteOutputFactory;
+	}
+
+	public void setVoteOutputFactory(VoteOutputFactory voteOutputFactory) {
+		this.voteOutputFactory = voteOutputFactory;
+	}
 }

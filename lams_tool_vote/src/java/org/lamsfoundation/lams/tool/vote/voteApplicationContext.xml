@@ -63,7 +63,12 @@
 	
 
 	<!-- end of tool beans -->
-
+	
+	<bean id="voteOutputFactory" class="org.lamsfoundation.lams.tool.vote.service.VoteOutputFactory">
+		<property name="loadedMessageSourceService"><ref bean="loadedMessageSourceService"/></property>
+		<property name="languageFilename"><value>org.lamsfoundation.lams.tool.vote.ApplicationResources</value></property>
+	</bean>
+	
 	<bean id="voteService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 			<property name="target">
@@ -81,6 +86,7 @@
 					<property name="voteToolContentHandler"><ref bean="voteToolContentHandler"/></property>		
 			   		<property name="exportContentService"><ref bean="exportToolContentService"/></property>						
 			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>								   		
+			   		<property name="voteOutputFactory"><ref bean="voteOutputFactory"/></property>								   		
 				</bean>
 			</property>
 			<property name="transactionAttributes">
