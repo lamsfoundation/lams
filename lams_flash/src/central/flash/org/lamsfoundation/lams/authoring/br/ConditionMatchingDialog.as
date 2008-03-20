@@ -115,16 +115,16 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 		branches_lst.hScrollPolicy = "on";
 		branches_lst.maxHPosition = 200;
 		
-		var column_sequence:DataGridColumn = new DataGridColumn("sequenceName");
-		column_sequence.headerText = Dictionary.getValue("branch_mapping_dlg_branch_col_lbl");
-		column_sequence.width = match_dgd.width/2;
-		
 		var column_condition:DataGridColumn = new DataGridColumn("displayName");
 		column_condition.headerText = Dictionary.getValue("branch_mapping_dlg_condition_col_lbl");
 		column_condition.width = match_dgd.width/2;
 		
-		match_dgd.addColumn(column_sequence);
+		var column_sequence:DataGridColumn = new DataGridColumn("sequenceName");
+		column_sequence.headerText = Dictionary.getValue("branch_mapping_dlg_branch_col_lbl");
+		column_sequence.width = match_dgd.width/2;
+		
 		match_dgd.addColumn(column_condition);
+		match_dgd.addColumn(column_sequence);
 		
 		var mappings:Array = app.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(_branchingActivity.activityUIID).toolBased;
 		

@@ -112,17 +112,17 @@ class GroupMatchingDialog extends BranchMappingDialog {
 		
 		branches_lst.hScrollPolicy = "on";
 		branches_lst.maxHPosition = 200;
+				
+		var column_name:DataGridColumn = new DataGridColumn("groupName");
+		column_name.headerText = Dictionary.getValue("branch_mapping_dlg_group_col_lbl");
+		column_name.width = match_dgd.width/2;
 		
 		var column_sequence:DataGridColumn = new DataGridColumn("sequenceName");
 		column_sequence.headerText = Dictionary.getValue("branch_mapping_dlg_branch_col_lbl");
 		column_sequence.width = match_dgd.width/2;
 		
-		var column_name:DataGridColumn = new DataGridColumn("groupName");
-		column_name.headerText = Dictionary.getValue("branch_mapping_dlg_group_col_lbl");
-		column_name.width = match_dgd.width/2;
-		
-		match_dgd.addColumn(column_sequence);
 		match_dgd.addColumn(column_name);
+		match_dgd.addColumn(column_sequence);
 		
 		var mappings:Array = app.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(_branchingActivity.activityUIID).groupBased;
 		
