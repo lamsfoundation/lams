@@ -427,10 +427,14 @@ class LessonModel extends Observable {
 	}
 	
 	public function checkComplexHasCurrentActivity(a:Activity, learner:Progress):Boolean {
+		Debugger.log("learner current: " + learner.getCurrentActivityId(), Debugger.CRITICAL, "checkComplexHasCurrentActivity", "LessonModel");
+		
 		var cChildren:Array = learningDesignModel.getComplexActivityChildren(a.activityUIID);
 		
 		if(cChildren.length > 0) {
 			for(var i=0; i<cChildren.length; i++) {
+				Debugger.log("child activityID : "+ cChildren[i].activityID, Debugger.CRITICAL, "checkComplexHasCurrentActivity", "LessonModel");
+		
 				if(cChildren[i].activityID == learner.getCurrentActivityId()) 
 					return true;
 				else if(Progress.compareProgressData(learner, cChildren[i].activityID) == "attempted_mc")
