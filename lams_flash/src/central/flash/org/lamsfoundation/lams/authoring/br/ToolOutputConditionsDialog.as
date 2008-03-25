@@ -109,8 +109,10 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
     public var removeEventListener:Function;
-    
+	
 	function ToolOutputConditionsDialog(){
+	
+	
 		_itemCount = 0;
 		this._visible = false;
 		
@@ -254,6 +256,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		var column_name:DataGridColumn = new DataGridColumn("conditionName");
 		column_name.headerText = Dictionary.getValue("to_conditions_dlg_condition_items_name_col_lbl");
 		column_name.editable = true;
+		
 		column_name.width = _condition_item_dgd.width*0.4;
 		
 		var column_value:DataGridColumn = new DataGridColumn("conditionValue");
@@ -526,7 +529,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	}
 	
 	private function selectDefinition():Void {
-		var ddm = app.getCanvas().ddm;
 		
 		_selectedDefinition = _toolOutputDefin_cmb.dataProvider[_toolOutputDefin_cmb.selectedIndex];
 		Debugger.log("select definition: " + _selectedDefinition.description, Debugger.CRITICAL, "selectDefinition", "ToolOutputConditionsDialog");
@@ -534,19 +536,27 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		switch(_selectedDefinition.type) {
 			case ToolOutputDefinition.LONG:
 				_condition_item_dgd.visible = true;
-				_toolOutputLongOptions_cmb.visible = true;
+							
+				if(_selectedDefinition.defaultConditions.length > 0) {
+					add_btn.visible = false;
+					_toolOutputLongOptions_cmb.visible = false;
 				
-				add_btn.visible = true;
-				optionChanged();
+					showSteppers(false, false);
+					addDefaultConditions(_selectedDefinition.defaultConditions);
+				} else {
+					add_btn.visible = true;
+					_toolOutputLongOptions_cmb.visible = true;
 				
-				_start_value_stp.minimum = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
-				_end_value_stp.minimum = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
-				_start_value_stp.maximum = (_selectedDefinition.endValue != null) ? Number(_selectedDefinition.endValue) : STP_MAX;
-				_end_value_stp.maximum = (_selectedDefinition.endValue != null) ? Number(_selectedDefinition.endValue) : STP_MAX;
+					optionChanged();
 				
-				_start_value_stp.value = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
-				_end_value_stp.value = (_selectedDefinition.endValue != null) ? Number(_selectedDefinition.endValue) : STP_MIN;
-				
+					_start_value_stp.minimum = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
+					_end_value_stp.minimum = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
+					_start_value_stp.maximum = (_selectedDefinition.endValue != null) ? Number(_selectedDefinition.endValue) : STP_MAX;
+					_end_value_stp.maximum = (_selectedDefinition.endValue != null) ? Number(_selectedDefinition.endValue) : STP_MAX;
+					
+					_start_value_stp.value = (_selectedDefinition.startValue != null) ? Number(_selectedDefinition.startValue) : STP_MIN;
+					_end_value_stp.value = (_selectedDefinition.endValue != null) ? Number(_selectedDefinition.endValue) : STP_MIN;
+				}
 				
 				clear_all_btn.visible = true;
 				remove_item_btn.visible = true;
@@ -560,17 +570,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				add_btn.visible = false;
 				showSteppers(false, false);
 				
-				if(_condition_item_dgd.dataProvider.length <= 0) {
-					for(var i=0; i<_selectedDefinition.defaultConditions.length; i++) {
-						var condition:ToolOutputCondition = _selectedDefinition.defaultConditions[i];
-						condition.conditionUIID = ddm.newUIID();
-						condition.toolActivity = _toolActivity;
-						condition.branchingActivity = _branchingActivity;
-						
-						addCondition(condition);
-					}
-					
-				}
+				addDefaultConditions(_selectedDefinition.defaultConditions);
 				
 				break;
 			default:
@@ -582,6 +582,22 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 		_selectedIndex = _toolOutputDefin_cmb.selectedIndex;
 		
+	}
+	
+	private function addDefaultConditions(defaultConditions:Array):Void {
+		var ddm = app.getCanvas().ddm;
+		
+		if(_condition_item_dgd.dataProvider.length <= 0) {
+			for(var i=0; i<defaultConditions.length; i++) {
+				var condition:ToolOutputCondition = defaultConditions[i];
+				condition.conditionUIID = ddm.newUIID();
+				condition.toolActivity = _toolActivity;
+				condition.branchingActivity = _branchingActivity;
+						
+				addCondition(condition);
+			}
+					
+		}
 	}
 	
 	private function returnDefinitionState() {
