@@ -58,10 +58,11 @@ class WizardModel extends Observable{
 	
 	// wizard main
 	private var _wizard:Wizard;
-		
-		
+	
 	private var _org:Organisation;
 	private var _lessonID:Number;
+	
+	private var selectedTab:Number;
 	
 	// state data
 	private var _staffLoaded:Boolean;
@@ -211,14 +212,12 @@ class WizardModel extends Observable{
 			
 			var user:User = User(organisation.getUser(u.userID));
 			if(user != null){
-				trace('adding role to existing user: ' + user.getFirstName() + ' ' + user.getLastName());
 				user.addRole(role);
 			} else {
 				user = new User();
 				user.populateFromDTO(u);
 				user.addRole(role);
 				
-				trace('adding user: ' + user.getFirstName() + ' ' + user.getLastName() + ' ' + user.getUserId());
 				organisation.addUser(user);
 			}
 		}
@@ -326,23 +325,32 @@ class WizardModel extends Observable{
 	 */
 	public function setSelectedTreeNode (newselectedTreeNode:XMLNode):Void {
 		_selectedOrgTreeNode = newselectedTreeNode;
-		trace('branch: ' + _selectedOrgTreeNode.attributes.isBranch);
-		//if(!_selectedOrgTreeNode.attributes.isBranch){
-			// get the organisations (node) users by role
-			//var roles:Array = new Array(LEARNER_ROLE, MONITOR_ROLE, COURSE_MANAGER_ROLE);
-			setOrganisation(new Organisation(_selectedOrgTreeNode.attributes.data));
-			resetUserFlags();
-			// polling method - waiting for all users to load before displaying users in UI
-			checkUsersLoaded();
+		setOrganisation(new Organisation(_selectedOrgTreeNode.attributes.data));
+		resetUserFlags();
+		
+		// polling method - waiting for all users to load before displaying users in UI
+		checkUsersLoaded();
 			
-			// load users
-			requestLearners(_selectedOrgTreeNode.attributes.data);
-			requestStaff(_selectedOrgTreeNode.attributes.data);
-			
-			trace(staffLoaded);
-			trace(learnersLoaded);
-		//}
-
+		// load users
+		requestLearners(_selectedOrgTreeNode.attributes.data);
+		requestStaff(_selectedOrgTreeNode.attributes.data);
+	}
+	
+	public function setLocationTab(tabID:Number){
+		Debugger.log("tabID:" + tabID, Debugger.CRITICAL, "setLocationTab", "WizardModel");
+		selectedTab = tabID;
+		
+		setChanged();
+		
+		//send an update
+		infoObj = {};
+		infoObj.updateType = "TABCHANGE";
+		infoObj.tabID = tabID;
+		notifyObservers(infoObj);
+	}
+	
+	public function getLocationTab():Number{
+		return selectedTab;
 	}
 	
 	public function getLessonClassData():Object{
@@ -350,17 +358,19 @@ class WizardModel extends Observable{
 		var r:Object = resultDTO;
 		var staff:Object = new Object();
 		var learners:Object = new Object();
+		
 		if(r){
-			trace('getting lesson class data...');
-			trace('org resource id: ' + r.organisationID);
 			if(lessonID){classData.lessonID = lessonID;}
 			if(r.organisationID){classData.organisationID = r.organisationID;}
+			
 			classData.staff = staff;
 			classData.learners = learners;
+			
 			if(r.staffGroupName){classData.staff.groupName = r.staffGroupName;}
 			if(r.selectedStaff){staff.users = r.selectedStaff;}
 			if(r.learnersGroupName){classData.learners.groupName = r.learnersGroupName;}
 			if(r.selectedLearners){classData.learners.users = r.selectedLearners;}
+			
 			return classData;
 		} else {
 			return null;

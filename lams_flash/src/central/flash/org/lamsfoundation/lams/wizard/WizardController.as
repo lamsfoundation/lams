@@ -23,9 +23,12 @@
 
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.util.*;
+
+import org.lamsfoundation.lams.wizard.*;
+import org.lamsfoundation.lams.wizard.steps.*;
 import org.lamsfoundation.lams.common.ws.*;
 import org.lamsfoundation.lams.common.ApplicationParent;
-import org.lamsfoundation.lams.wizard.*;
+
 import mx.utils.*
 
 /**
@@ -52,7 +55,20 @@ class WizardController extends AbstractController {
 	
 	// add control methods
 	
-
+	/**
+	 * Event listener for when when tab is clicked
+	 * 
+	 * @usage   
+	 * @param   evt 
+	 * @return  
+	 */
+	public function change(evt):Void{
+		Debugger.log("hitting change: " + evt.target.selectedIndex, Debugger.CRITICAL, "change", "WizardController");
+		Debugger.log("wizard model: " + _wizardModel, Debugger.CRITICAL, "change", "WizardController");
+		
+		_wizardModel.setLocationTab(evt.target.selectedIndex);
+	}
+	
 	public function click(evt):Void{
 		Debugger.log('click evt.target.label:'+evt.target.label,Debugger.CRITICAL,'click','WizardController');
 		var tgt:String = new String(evt.target);
@@ -81,7 +97,6 @@ class WizardController extends AbstractController {
 		var wizView:WizardView = getView();
 		if(wizView.validateStep(_wizardModel)){
 			_wizardModel.stepID++;
-			trace('new step ID: ' + _wizardModel.stepID);
 		}
     }
 	
@@ -216,12 +231,12 @@ class WizardController extends AbstractController {
 	
 	public function setBusy(){
 		_isBusy = true;
-		getView().disableButtons();
+		WizardView(getView()).disableButtons();
 	}
 	
 	public function clearBusy(){
 		_isBusy = false;
-		getView().enableButtons();
+		WizardView(getView()).enableButtons(_wizardModel);
 	}
 	
 }
