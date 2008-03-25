@@ -141,7 +141,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 		for (var m=0; m<parallelOnCanvas.length; m++){
 			for(var n=0; n < parallelOnCanvas[m].actChildren.length; n++){
-				parallelOnCanvas[m].actChildren[n].selectActivity = "false";
+				parallelOnCanvas[m].actChildren[n].setSelected(false);
 			}
 			parallelOnCanvas[m].refreshChildren();
 		}
