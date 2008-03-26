@@ -204,13 +204,14 @@ class WizardView extends AbstractView {
 				break;
 			case 'USERS_LOADED' :
 				_wizardOrgView.loadLearners(wm.organisation.getLearners(), true);
-				_wizardOrgView.loadStaff(wm.organisation.getMonitors(), true);
+				_wizardOrgView.loadStaff(wm.organisation.getMonitors(), false);
+				_wizardOrgView.selectStaffMember(_root.userID, true);
 				_wizardOrgView.enableUsers((resultDTO.selectedJointLessonID == null));
 				_wizardController.clearBusy();
 				Debugger.log("controller: " + _wizardController, Debugger.CRITICAL, "update", "WizardView");
 				break;
 			case 'STAFF_RELOAD' :
-				_wizardOrgView.loadStaff(wm.organisation.getMonitors(), true);
+				_wizardOrgView.loadStaff(wm.organisation.getMonitors(), false);
 				break;
 			case 'LEARNER_RELOAD' :
 				_wizardOrgView.loadLearners(wm.organisation.getLearners(), true);

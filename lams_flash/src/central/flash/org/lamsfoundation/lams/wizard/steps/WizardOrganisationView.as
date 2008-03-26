@@ -265,6 +265,21 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 	}
 	
 	/**
+	* Select/deselect checkbox of a chosen staff member
+	* @param 	userID userID of staff member
+	* @param _selected true if we want to have the checkbox ticked, false otherwise
+	*/
+	public function selectStaffMember(userID:Number, _selected:Boolean):Void {
+		for (var i=0; i<_staffList.length; i++) {
+			if (_staffList[i].data.userID == userID) {
+				var listItem:MovieClip = MovieClip(_staffList[i]);
+				listItem.user_cb.selected = _selected;
+				break;
+			}
+		}
+	}
+	
+	/**
 	 * Sets up the treeview with whatever data is in the treeDP
 	 * TODO - extend this to make it recurse all the way down the tree
 	 * @usage   
