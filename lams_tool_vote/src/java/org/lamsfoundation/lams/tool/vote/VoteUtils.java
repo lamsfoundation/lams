@@ -259,7 +259,17 @@ public abstract class VoteUtils implements VoteAppConstants {
         logger.debug("trimmed noHtmlNoNewLineStr: " + noHtmlNoNewLineStr.trim());
         if (noHtmlNoNewLineStr.trim().length()==0)
         {
-            logger.debug("nomination text is just composed of html markup, returning html formatted text");
+            logger.debug("nomination text is just composed of html markup, try getting just a src entry for a picture otherwise give up.");
+            htmlText = htmlText.toLowerCase();
+            int index = htmlText.indexOf("src");
+            if ( index > -1 ) {
+            	index = htmlText.indexOf("\"",index);
+            	if ( index > -1 && index < htmlText.length()) {
+            		int indexStop = htmlText.indexOf("\"", index+1);
+	            	if ( indexStop > -1) 
+	            		return htmlText.substring(index+1, indexStop-1);
+            	}
+            }
             if (htmlText.length() > 50)
                 return htmlText.substring(0,51);
             else
