@@ -723,6 +723,8 @@ public class AuthoringUtil implements VoteAppConstants {
         String allowTextEntry = request.getParameter("allowText");
         logger.debug("allowTextEntry: " + allowTextEntry);
 
+        String showResults = request.getParameter("showResults");
+
 		String reflect=request.getParameter(REFLECT);
 		logger.debug("reflect: " + reflect);
 
@@ -751,7 +753,7 @@ public class AuthoringUtil implements VoteAppConstants {
         boolean lockedOnFinishBoolean=false;
         boolean allowTextBoolean=false;
         boolean reflectBoolean=false;
-        
+        boolean showResultsBoolean=false;
             
         if ((lockOnFinish != null) && (lockOnFinish.equalsIgnoreCase("1")))
             lockedOnFinishBoolean=true;
@@ -762,6 +764,8 @@ public class AuthoringUtil implements VoteAppConstants {
         if ((reflect != null) && (reflect.equalsIgnoreCase("1")))
             reflectBoolean=true;
 
+        if ( showResults != null && showResults.equalsIgnoreCase("1"))
+        	showResultsBoolean=true;
         
         long userId=0;
         if (toolUser != null)
@@ -817,6 +821,7 @@ public class AuthoringUtil implements VoteAppConstants {
         	logger.debug("setting other content values...");
          	voteContent.setLockOnFinish(lockedOnFinishBoolean);
          	voteContent.setAllowText(allowTextBoolean);
+         	voteContent.setShowResults(showResultsBoolean);
          	voteContent.setReflect(reflectBoolean);
          	voteContent.setReflectionSubject(reflectionSubject);
          	voteContent.setMaxNominationCount(maxNomcount);
@@ -1351,7 +1356,9 @@ public class AuthoringUtil implements VoteAppConstants {
         String allowTextEntry = request.getParameter("allowText");
         logger.debug("allowTextEntry: " + allowTextEntry);
 
-		String reflect=request.getParameter(REFLECT);
+        String showResults = request.getParameter("showResults");
+
+        String reflect=request.getParameter(REFLECT);
 		logger.debug("reflect: " + reflect);
 
         String reflectionSubject=voteAuthoringForm.getReflectionSubject();
@@ -1371,7 +1378,7 @@ public class AuthoringUtil implements VoteAppConstants {
         
         boolean setCommonContent=true; 
         if ( (lockOnFinish == null) || 
-             (allowTextEntry == null) || (reflect == null) ||
+             (allowTextEntry == null) || (showResults == null) || (reflect == null) ||
              (reflectionSubject == null) || (maxNomcount == null))
             
         {
@@ -1382,7 +1389,7 @@ public class AuthoringUtil implements VoteAppConstants {
         boolean lockOnFinishBoolean=false;
         boolean allowTextEntryBoolean=false;
         boolean reflectBoolean=false;
-
+        boolean showResultsBoolean=false;
         
         if ((lockOnFinish != null) && (lockOnFinish.equalsIgnoreCase("1")))
             lockOnFinishBoolean=true;            
@@ -1393,7 +1400,9 @@ public class AuthoringUtil implements VoteAppConstants {
         if ((reflect != null) && (reflect.equalsIgnoreCase("1")))
             reflectBoolean=true;
             
-            
+        if ( showResults != null && showResults.equalsIgnoreCase("1"))
+        	showResultsBoolean=true;
+        
         logger.debug("lockOnFinishBoolean: " + lockOnFinishBoolean);
         logger.debug("allowTextEntryBoolean: " + allowTextEntryBoolean);
         logger.debug("reflectBoolean: " + reflectBoolean);
@@ -1447,6 +1456,7 @@ public class AuthoringUtil implements VoteAppConstants {
         	logger.debug("setting other content values...");
          	voteContent.setLockOnFinish(lockOnFinishBoolean);
          	voteContent.setAllowText(allowTextEntryBoolean);
+         	voteContent.setShowResults(showResultsBoolean);
          	voteContent.setReflect(reflectBoolean);
          	voteContent.setMaxNominationCount(maxNomcount);
          	

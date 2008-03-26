@@ -126,7 +126,6 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         VoteQueUsr learner = voteService.getVoteUserBySession(userID,voteSession.getUid());
         
         if ( learner != null && learner.isFinalScreenRequested() ) {
-        	generateCharts = true;
         	
         	VoteContent content=voteSession.getVoteContent();
 	        
@@ -148,8 +147,14 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 	    	        voteSession.getUid(), exportPortfolioDTO);
 	    	    	
 	    	// VoteChartGenerator.create{Pie|Bar}Chart expects these to be session attributes
-	    	request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, exportPortfolioDTO.getMapStandardNominationsContent());
-	    	request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, exportPortfolioDTO.getMapStandardRatesContent());
+	    	if ( voteSession.getVoteContent().isShowResults() ) {
+	    		generateCharts = true;
+	    		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, exportPortfolioDTO.getMapStandardNominationsContent());
+	    		request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, exportPortfolioDTO.getMapStandardRatesContent());
+	    		exportPortfolioDTO.setShowResults(Boolean.TRUE.toString());
+	    	}  else {
+	        	exportPortfolioDTO.setShowResults(Boolean.FALSE.toString());
+	    	}
 	    	
 	    	//	voteMonitoringAction.prepareReflectionData(request, content, voteService, userID.toString(),true);
 	     } else {
@@ -194,6 +199,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
     	// VoteChartGenerator.create{Pie|Bar}Chart expects these to be session attributes
     	request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, exportPortfolioDTO.getMapStandardNominationsContent());
     	request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, exportPortfolioDTO.getMapStandardRatesContent());
+    	exportPortfolioDTO.setShowResults(Boolean.TRUE.toString());
 
         request.getSession().setAttribute(EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
         

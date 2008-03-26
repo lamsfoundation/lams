@@ -455,14 +455,13 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		return redoQuestions(mapping, form, request, response);
 	}
 
-    
     public ActionForward learnerFinished(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{   
-        logger.debug("dispatching learnerFinished");
+    	logger.debug("dispatching learnerFinished");
 		logger.debug("requested learner finished, the learner should be directed to next activity.");
 
 		VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO= new VoteGeneralLearnerFlowDTO();
@@ -525,6 +524,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
         
         voteQueUsr.setResponseFinalised(true);
+        if ( ! voteSession.getVoteContent().isShowResults() ) {
+        	// if not isShowResults then we will have skipped the final screen.
+        	voteQueUsr.setFinalScreenRequested(true);
+        }
         voteService.updateVoteUser(voteQueUsr);
         logger.debug("user's response is finalised:" + voteQueUsr);
     	
@@ -1049,6 +1052,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	String allowTextEntry=request.getParameter(ALLOW_TEXT_ENTRY);
     	logger.debug("allowTextEntry: " + allowTextEntry);
     	voteLearningForm.setAllowTextEntry(allowTextEntry);
+    	
+    	String showResults=request.getParameter(SHOW_RESULTS);
+    	voteLearningForm.setShowResults(showResults);
     	
     	String lockOnFinish=request.getParameter(LOCK_ON_FINISH);
     	logger.debug("lockOnFinish: " + lockOnFinish);

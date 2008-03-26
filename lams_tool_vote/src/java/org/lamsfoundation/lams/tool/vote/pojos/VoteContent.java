@@ -96,6 +96,7 @@ public class VoteContent implements Serializable {
     /** nullable persistent field */
     private String onlineInstructions;
 
+    private boolean showResults;
    
     /** persistent field */
     private Set voteQueContents;
@@ -109,8 +110,8 @@ public class VoteContent implements Serializable {
     /** full constructor */
     public VoteContent(Long voteContentId, String content, String title, String instructions, boolean defineLater, boolean runOffline, 
             Date creationDate, Date updateDate, boolean allowText,boolean reflect, String reflectionSubject,
-            String maxNominationCount, long createdBy, boolean lockOnFinish, boolean contentInUse, String offlineInstructions, 
-            String onlineInstructions, Set voteQueContents, Set voteSessions, 
+            String maxNominationCount, long createdBy, boolean lockOnFinish, boolean contentInUse, String offlineInstructions,
+            String onlineInstructions, boolean showResults, Set voteQueContents, Set voteSessions, 
 			Set voteAttachments) {
         this.voteContentId = voteContentId;
         this.content=content;
@@ -129,6 +130,7 @@ public class VoteContent implements Serializable {
         this.contentInUse = contentInUse;
         this.offlineInstructions = offlineInstructions;
         this.onlineInstructions = onlineInstructions;
+        this.showResults = showResults;
         this.voteQueContents = voteQueContents;
         this.voteSessions = voteSessions;
         this.voteAttachments = voteAttachments;
@@ -178,6 +180,7 @@ public class VoteContent implements Serializable {
     				 vote.isContentInUse(),
     				 vote.getOfflineInstructions(),
     				 vote.getOnlineInstructions(),
+    				 vote.isShowResults(),
          			 new TreeSet(),
                      new TreeSet(),
                      new TreeSet()
@@ -475,4 +478,12 @@ public class VoteContent implements Serializable {
     public void setReflectionSubject(String reflectionSubject) {
         this.reflectionSubject = reflectionSubject;
     }
+
+	public boolean isShowResults() {
+		return showResults;
+	}
+
+	public void setShowResults(boolean showResults) {
+		this.showResults = showResults;
+	}
 }

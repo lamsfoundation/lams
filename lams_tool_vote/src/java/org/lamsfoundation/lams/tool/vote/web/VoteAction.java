@@ -767,6 +767,11 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
         voteAuthoringForm.setAllowText(allowText);
         voteGeneralAuthoringDTO.setAllowText(allowText);
         
+        String showResults=request.getParameter(SHOW_RESULTS);
+        logger.debug("showResults: " + showResults);
+        voteAuthoringForm.setShowResults(showResults);
+        voteGeneralAuthoringDTO.setShowResults(showResults);
+
         String maxNominationCount=request.getParameter(MAX_NOMINATION_COUNT);
         logger.debug("maxNominationCount: " + maxNominationCount);
         voteAuthoringForm.setMaxNominationCount(maxNominationCount);

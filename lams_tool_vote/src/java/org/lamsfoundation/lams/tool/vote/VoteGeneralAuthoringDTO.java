@@ -62,6 +62,7 @@ public class VoteGeneralAuthoringDTO implements Comparable
 	protected String offlineInstructions;
 	
 	protected String allowText;
+	protected String showResults;
 	protected String lockOnFinish;
 	protected String maxNominationCount;
 	
@@ -532,6 +533,7 @@ public class VoteGeneralAuthoringDTO implements Comparable
             .append("reflect: ", reflect)            
             .append("isDefineLater: ", isDefineLater)
             .append("allowText: ", allowText)
+            .append("showResults: ", showResults)
             .append("lockOnFinish: ", lockOnFinish)
             .append("maxNominationCount: ", maxNominationCount)
             .append("activityTitle: ", activityTitle)
@@ -715,4 +717,10 @@ public class VoteGeneralAuthoringDTO implements Comparable
     public void setResponseId(String responseId) {
         this.responseId = responseId;
     }
+	public String getShowResults() {
+		return showResults;
+	}
+	public void setShowResults(String showResults) {
+		this.showResults = showResults;
+	}
 }

@@ -49,6 +49,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	
 	protected String lockOnFinish;
 	protected String allowText;
+	protected String showResults;
 	
 	protected String reflect;
 	protected String reflectionSubject;
@@ -191,6 +192,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		this.reflect=null;
 		this.lockOnFinish=null;
 		this.allowText=null;
+		this.showResults=null;
 		this.maxNominationCount=null;
 		
 		this.summaryMonitoring=null;
@@ -207,6 +209,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	{
 		this.lockOnFinish		 ="0";
 		this.allowText			 ="0";
+		this.showResults		 ="0";
 		this.reflect			 ="0";
 	}
 
@@ -885,6 +888,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
             .append("isDefineLater: ", isDefineLater)
             .append("toolContentID: ", toolContentID)
             .append("allowText: ", allowText)
+            .append("showResults: ", showResults)
             .append("lockOnFinish: ", lockOnFinish)
             .append("reflect: ", reflect)
             .append("defaultContentId: ", defaultContentId)
@@ -999,4 +1003,12 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     public void setEditableNominationIndex(String editableNominationIndex) {
         this.editableNominationIndex = editableNominationIndex;
     }
+
+	public String getShowResults() {
+		return showResults;
+	}
+
+	public void setShowResults(String showResults) {
+		this.showResults = showResults;
+	}
 }

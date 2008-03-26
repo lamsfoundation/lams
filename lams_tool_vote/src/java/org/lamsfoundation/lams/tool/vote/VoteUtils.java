@@ -216,6 +216,8 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    
 	    voteAuthoringForm.setAllowText(defaultVoteContent.isAllowText()?"1":"0");
 	    voteAuthoringForm.setAllowTextEntry(defaultVoteContent.isAllowText()?"1":"0");
+
+	    voteAuthoringForm.setShowResults(defaultVoteContent.isShowResults()?"1":"0");
 	    
 	    voteAuthoringForm.setLockOnFinish(defaultVoteContent.isLockOnFinish()?"1":"0");
 	    voteAuthoringForm.setReflect(defaultVoteContent.isReflect()?"1":"0");
@@ -597,6 +599,10 @@ public abstract class VoteUtils implements VoteAppConstants {
 		voteAuthoringForm.setAllowText(allowText);
 		voteGeneralAuthoringDTO.setAllowText(allowText);
 		
+		String showResults=request.getParameter("showResults");
+		voteAuthoringForm.setShowResults(showResults);
+		voteGeneralAuthoringDTO.setShowResults(showResults);
+
 		String maxNominationCount=request.getParameter("maxNominationCount");
 		logger.debug("maxNominationCount: " + maxNominationCount);
 		voteAuthoringForm.setMaxNominationCount(maxNominationCount);

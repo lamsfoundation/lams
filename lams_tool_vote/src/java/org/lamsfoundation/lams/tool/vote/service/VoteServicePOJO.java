@@ -2231,28 +2231,29 @@ public class VoteServicePOJO implements
 	
 
     /**
-     * Import the data for a 1.0.2 Chat
+     * Import the data for a 1.0.2 Vote
      */
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
     {
     	Date now = new Date();
     	VoteContent toolContentObj = new VoteContent();
-    	toolContentObj.setContentInUse(Boolean.FALSE.booleanValue());
+    	toolContentObj.setContentInUse(false);
     	toolContentObj.setCreatedBy(user.getUserID().longValue());
     	toolContentObj.setCreationDate(now);
-    	toolContentObj.setDefineLater(Boolean.FALSE.booleanValue());
+    	toolContentObj.setDefineLater(false);
     	toolContentObj.setInstructions(WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
     	toolContentObj.setOfflineInstructions(null);
     	toolContentObj.setOnlineInstructions(null);
     	toolContentObj.setReflectionSubject(null);
-    	toolContentObj.setReflect(Boolean.FALSE.booleanValue());
-    	toolContentObj.setRunOffline(Boolean.FALSE.booleanValue());
+    	toolContentObj.setReflect(false);
+    	toolContentObj.setRunOffline(false);
     	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
     	
     	toolContentObj.setContent(null);
     	toolContentObj.setUpdateDate(now);
     	toolContentObj.setVoteContentId(toolContentId);
-    	toolContentObj.setLockOnFinish(Boolean.FALSE.booleanValue());
+    	toolContentObj.setLockOnFinish(false);
+    	toolContentObj.setShowResults(true);
     	
 		try {
 			Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_VOTE_ALLOW_POLL_NOMINATIONS);

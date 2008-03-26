@@ -53,6 +53,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	
 	protected String maxNominationCount;
 	protected String allowTextEntry;
+	protected String showResults;
 	protected String lockOnFinish;
 	protected String activityRunOffline;
 	protected String activityRetries;
@@ -821,4 +822,10 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setReflection(String reflection) {
         this.reflection = reflection;
     }
+	public String getShowResults() {
+		return showResults;
+	}
+	public void setShowResults(String showResults) {
+		this.showResults = showResults;
+	}
 }

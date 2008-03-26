@@ -65,6 +65,7 @@ public interface VoteAppConstants {
     public static final String MAX_NOMINATION_COUNT						="maxNominationCount";
     public static final String ALLOW_TEXT								="allowText";
     public static final String ALLOW_TEXT_ENTRY							="allowTextEntry";
+    public static final String SHOW_RESULTS								="showResults";
     public static final String LOCK_ON_FINISH							="lockOnFinish";
     public static final String REPORT_VIEW_ONLY							="reportViewOnly";
     public static final String USER_ENTRY								="userEntry";

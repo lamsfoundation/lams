@@ -65,6 +65,8 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
 	
     protected String allowTextEntry;
 	
+    protected String showResults;
+
     protected String lockOnFinish;
 	
     protected String notebookEntriesVisible;
@@ -338,6 +340,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
             .append("learningMode: ", learningMode)
 			.append("maxNominationCount: ", maxNominationCount)
 			.append("allowTextEntry: ", allowTextEntry)
+			.append("showResults: ", showResults)
 			.append("lockOnFinish: ", lockOnFinish)
 			.append("toolContentID: ", toolContentID)
 			.append("toolContentUID: ", toolContentUID)
@@ -570,5 +573,11 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
     public void setUserName(String userName) {
         this.userName = userName;
     }
+	public String getShowResults() {
+		return showResults;
+	}
+	public void setShowResults(String showResults) {
+		this.showResults = showResults;
+	}
     
 }

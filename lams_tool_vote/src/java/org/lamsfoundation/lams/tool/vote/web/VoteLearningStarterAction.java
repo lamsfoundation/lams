@@ -637,7 +637,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    voteLearningForm.setActivityRunOffline(new Boolean(voteContent.isRunOffline()).toString());
 	    voteLearningForm.setMaxNominationCount(voteContent.getMaxNominationCount());
 	    voteLearningForm.setAllowTextEntry(new Boolean(voteContent.isAllowText()).toString());
-	    logger.debug("allow text entry is: " + voteLearningForm.getAllowTextEntry());
+	    voteLearningForm.setShowResults(new Boolean(voteContent.isShowResults()).toString());
 	    voteLearningForm.setLockOnFinish(new Boolean(voteContent.isLockOnFinish()).toString());
 	    
 	    voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());

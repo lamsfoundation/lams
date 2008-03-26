@@ -39,6 +39,7 @@ public class ExportPortfolioDTO implements Comparable
 {
     protected String portfolioExportMode;
     protected String userExceptionNoToolSessions;
+    protected String showResults;
     
     protected Map mapStandardNominationsHTMLedContent;
     protected Map mapStandardNominationsContent;
@@ -166,5 +167,13 @@ public class ExportPortfolioDTO implements Comparable
 
 	public void setMapStandardNominationsContent(Map mapStandardNominationsContent) {
 		this.mapStandardNominationsContent = mapStandardNominationsContent;
+	}
+
+	public String getShowResults() {
+		return showResults;
+	}
+
+	public void setShowResults(String showResults) {
+		this.showResults = showResults;
 	}
 }

@@ -34,9 +34,14 @@ public class VoteImportContentVersionFilter extends ToolContentVersionFilter{
 	 * Import 2.0RC1 version content to 2.0RC2 version. Added lock on finish
 	 * field.
 	 */
-	
 	public void up20061102To20061113(){
-		// Change name to suit the version you give the tool.
 		this.removeField(VoteContent.class, "voteChangable");
 	}
+
+	/** Version 2.1 added a showResults column and this should default to true. 20080108 was an pre-release version
+	 * of 2.1, but using 20080108 will cover the prerelease 2.1 + 2.0.4 created import files. */
+	public void up20080108To20080326(){
+		this.addField(VoteContent.class, "showResults", true);
+	}
+
 }
