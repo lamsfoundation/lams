@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--  This configuration uses a local datasource and does not use the cache. -->
+
+<beans>
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	<!-- Local DataSource that works in any environment -->
+	<bean id="localDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
+		<property name="url"><value>jdbc:mysql://localhost/lams?characterEncoding=utf8</value></property>
+		<property name="username"><value>lams</value></property>
+		<property name="password"><value>lamsdemo</value></property>
+	</bean>
+
+<!-- Hibernate SessionFactory -->
+	  <bean id="wikiSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource"><ref local="localDataSource"/></property>
+		<property name="mappingResources">
+			<list>	
+				<value>org/lams/lams/tool/wiki/WikiContent.hbm.xml</value>
+				<value>org/lams/lams/tool/wiki/WikiSession.hbm.xml</value>
+				<value>org/lams/lams/tool/wiki/WikiUser.hbm.xml</value>
+				<value>org/lams/lams/tool/wiki/WikiAttachment.hbm.xml</value> 
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.c3p0.minPoolSize">5</prop>
+				<prop key="hibernate.c3p0.maxPoolSize">20</prop>
+				<prop key="hibernate.c3p0.timeout">1800</prop>
+				<prop key="hibernate.c3p0.max_statement">50</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- If we really use multiple SessionFactory, we have to change to JTA Transaction Manager -->
+	<!-- bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager"/-->
+	<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory"><ref local="wikiSessionFactory"/></property>
+	</bean>
+
+	
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+	<bean id="wikiService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name ="target">
+			<bean class="org.lams.lams.tool.wiki.service.WikiServicePOJO">
+				<property name="wikiContentDAO"><ref bean="wikiContentDAO"/></property>
+				<property name="wikiSessionDAO"><ref bean="wikiSessionDAO"/></property>
+				<property name="wikiUserDAO"><ref bean="wikiUserDAO"/></property>
+				<property name="wikiAttachmentDAO"><ref bean="wikiAttachmentDAO"/></property>
+				<property name="toolService"><ref bean="lamsToolService"/></property>
+			<!-- 	<property name="learnerService"><ref bean="learnerService"/></property> -->
+				</bean>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean> 
+
+
+
+	<!--  DAO classes -->
+	<bean id="wikiContentDAO" class="org.lams.lams.tool.wiki.dao.hibernate.WikiContentDAO">
+		<property name="sessionFactory"><ref local="wikiSessionFactory"/></property>
+	</bean>  
+
+	<bean id="wikiSessionDAO" class="org.lams.lams.tool.wiki.dao.hibernate.WikiSessionDAO">
+		<property name="sessionFactory"><ref local="wikiSessionFactory"/></property>
+	</bean>
+	
+	<bean id="wikiUserDAO" class="org.lams.lams.tool.wiki.dao.hibernate.WikiUserDAO">
+		<property name="sessionFactory"><ref local="wikiSessionFactory"/></property>
+	</bean>
+	
+	<bean id="wikiAttachmentDAO" class="org.lams.lams.tool.wiki.dao.hibernate.WikiAttachmentDAO">
+		<property name="sessionFactory"><ref local="wikiSessionFactory"/></property>
+	</bean>
+	
+</beans>

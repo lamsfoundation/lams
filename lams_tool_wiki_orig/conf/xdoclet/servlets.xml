@@ -1,0 +1,48 @@
+	<servlet>
+	    <servlet-name>action</servlet-name>
+	    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+	    <init-param>
+	      <param-name>config</param-name>
+	      <param-value>/WEB-INF/struts-config.xml</param-value>
+	    </init-param>
+	    <init-param>
+	      <param-name>debug</param-name>
+	      <param-value>999</param-value>
+	    </init-param>
+	    <init-param>
+	      <param-name>detail</param-name>
+	      <param-value>2</param-value>
+	    </init-param>
+	    <init-param>
+	      <param-name>validate</param-name>
+	      <param-value>true</param-value>
+	    </init-param>
+	    <load-on-startup>1</load-on-startup>
+    </servlet>
+ 
+<!--  The download servlet, reused from the content repository jar -->
+	<servlet>
+		<servlet-name>download</servlet-name>
+		<display-name>Instructions Download</display-name>
+		<description>Instructions Download</description>		
+		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
+	    <init-param>
+	      <param-name>toolContentHandlerBeanName</param-name>
+	      <param-value>wikiToolContentHandler</param-value>
+	    </init-param>
+	    <load-on-startup>3</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>exportPortfolio</servlet-name>
+		<display-name>Export Portfolio</display-name>
+		<description>Export Portfolio</description>		
+		<servlet-class>org.lams.lams.tool.wiki.web.WikiExportServlet</servlet-class>
+	</servlet>
+	
+	
+	
+
+
+
+    
