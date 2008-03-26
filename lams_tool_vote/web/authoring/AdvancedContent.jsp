@@ -51,6 +51,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </p>
 
 <p>
+	<html:checkbox property="showResults" value="1" styleClass="noBorder" styleId="showResults">
+	</html:checkbox>
+	<label for="showResults">
+		<fmt:message key="label.show.results" />
+	</label>
+</p>
+
+
+<p>
 	<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect">
 	</html:checkbox>
 	<label for="reflect">

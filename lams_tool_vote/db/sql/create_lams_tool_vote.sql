@@ -17,6 +17,7 @@ CREATE TABLE tl_lavote11_content (
      , lock_on_finish TINYINT(1) NOT NULL DEFAULT 1
      , retries TINYINT(1) NOT NULL DEFAULT 0
      , reflectionSubject TEXT
+     , show_results TINYINT(1) NOT NULL DEFAULT 1
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 

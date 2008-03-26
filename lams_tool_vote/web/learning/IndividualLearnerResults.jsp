@@ -41,6 +41,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
 		{
+			if (actionMethod == 'learnerFinished') {
+				document.getElementById("finishButton").disabled = true;
+			}
 			document.VoteLearningForm.dispatch.value=actionMethod; 
 			document.VoteLearningForm.submit();
 		}
@@ -94,10 +97,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<fmt:message key="label.retake" />
 				</html:submit>
 
-				<html:submit property="viewAllResults" styleClass="button"
-					onclick="submitMethod('viewAllResults');">
-					<fmt:message key="label.overAllResults" />
-				</html:submit>
+				<c:choose>
+
+				<c:when test="${VoteLearningForm.showResults=='true'}">
+					<html:submit property="viewAllResults" styleClass="button"
+						onclick="submitMethod('viewAllResults');">
+						<fmt:message key="label.overAllResults" />
+					</html:submit>
+				</c:when>
+				
+				<c:when test="${voteGeneralLearnerFlowDTO.reflection != 'true'}">
+					<html:submit property="learnerFinished" styleId="finishButton"
+						onclick="javascript:submitMethod('learnerFinished');"
+						styleClass="button">
+						<fmt:message key="label.finished" />
+					</html:submit>
+				</c:when>
+
+				<c:otherwise>
+					<html:submit property="forwardtoReflection"
+						onclick="javascript:submitMethod('forwardtoReflection');"
+						styleClass="button">
+						<fmt:message key="label.continue" />
+					</html:submit>
+				</c:otherwise>
+				</c:choose>
+				
 			</div>
 		</html:form>
 

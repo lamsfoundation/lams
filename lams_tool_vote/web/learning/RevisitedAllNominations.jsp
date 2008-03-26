@@ -37,13 +37,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:css />
 	<script type="text/javascript"
 		src="${lams}includes/javascript/common.js"></script>
-	<title><fmt:message key="activity.title" />
-	</title>
+	<title><fmt:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
 		{
-			if (actionMethod == 'learnerFinished') {
+			if (actionMethod == "learnerFinished") {
 				document.getElementById("finishButton").disabled = true;
 			}
 			document.VoteLearningForm.dispatch.value=actionMethod; 
@@ -73,157 +72,44 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="lockOnFinish" />
 			<html:hidden property="reportViewOnly" />
 			<html:hidden property="userEntry" />
+			<html:hidden property="showResults" />
 
+			<c:if test="${VoteLearningForm.showResults == 'true'}">
+				<jsp:include page="/learning/RevisitedDisplay.jsp" />
+			</c:if>
+							
+			<c:if test="${VoteLearningForm.showResults != 'true'}">
+				<jsp:include page="/learning/RevisitedNoDisplay.jsp" />
+			</c:if>
 
-			<h2>
-				<fmt:message key="label.progressiveResults" />
-			</h2>
+				<h2>
+						<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />												
+				</h2>
 
-			<!--present  a mini summary table here -->
+				<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
+					escapeXml="false" />
+			
+				<c:if test="${voteGeneralLearnerFlowDTO.lockOnFinish == 'true' }">					
+				<br>
+						<html:button property="forwardtoReflection" styleClass="button"
+							onclick="submitMethod('forwardtoReflection');"> 
+							<fmt:message key="label.edit" />
+						</html:button>
+				</c:if>													
 
-			<table cellspacing="0" class="alternative-color">
-				<tr>
-					<th>
-						<fmt:message key="label.nomination" />
-					</th>
-					<th>
-						<fmt:message key="label.total.votes" />
-					</th>
-				</tr>
+			<div class="space-bottom-top">
 
-				<c:forEach var="currentNomination"
-					items="${voteGeneralLearnerFlowDTO.mapStandardNominationsHTMLedContent}">
-					<c:set var="currentNominationKey" scope="request"
-						value="${currentNomination.key}" />
-					<tr>
-						<td class="space">
-							<c:out value="${currentNomination.value}" escapeXml="false" />
-						</td>
+				<html:submit property="redoQuestionsOk" styleClass="button"
+					onclick="submitMethod('redoQuestionsOk');">
+					<fmt:message key="label.retake" />
+				</html:submit>
 
-						<td>
-
-							<c:forEach var="currentUserCount"
-								items="${voteGeneralLearnerFlowDTO.mapStandardUserCount}">
-								<c:set var="currentUserKey" scope="request"
-									value="${currentUserCount.key}" />
-								<c:if test="${currentNominationKey == currentUserKey}">
-
-									<c:if test="${currentUserCount.value != '0' }">
-										<c:forEach var="currentQuestionUid"
-											items="${voteGeneralLearnerFlowDTO.mapStandardQuestionUid}">
-											<c:set var="currentQuestionUidKey" scope="request"
-												value="${currentQuestionUid.key}" />
-											<c:if test="${currentQuestionUidKey == currentUserKey}">
-
-												<c:forEach var="currentSessionUid"
-													items="${voteGeneralLearnerFlowDTO.mapStandardToolSessionUid}">
-													<c:set var="currentSessionUidKey" scope="request"
-														value="${currentSessionUid.key}" />
-													<c:if
-														test="${currentSessionUidKey == currentQuestionUidKey}">
-
-														<c:if test="${currentNomination.value != 'Open Vote'}">
-															<c:set scope="request" var="viewURL">
-																<lams:WebAppURL />monitoring.do?method=getVoteNomination&questionUid=${currentQuestionUid.value}&sessionUid=${currentSessionUid.value}
-												</c:set>
-
-															<c:out value="${currentUserCount.value}" />
-
-														</c:if>
-														<c:if test="${currentNomination.value == 'Open Vote'}">
-															<c:out value="${currentUserCount.value}" />
-														</c:if>
-													</c:if>
-												</c:forEach>
-											</c:if>
-										</c:forEach>
-									</c:if>
-									<c:if test="${currentUserCount.value == '0' }">
-										<c:out value="${currentUserCount.value}" />
-									</c:if>
-								</c:if>
-							</c:forEach>
-
-							<c:forEach var="currentRate"
-								items="${voteGeneralLearnerFlowDTO.mapStandardRatesContent}">
-								<c:set var="currentRateKey" scope="request"
-									value="${currentRate.key}" />
-								<c:if test="${currentNominationKey == currentRateKey}"> 				
-																	 &nbsp(<c:out value="${currentRate.value}" />
-									<fmt:message key="label.percent" />) 
-								</c:if>
-							</c:forEach>
-						</td>
-					</tr>
-				</c:forEach>
-
-			</table>
-
-			<div>
-				<div class="float-right">
-
-					<c:set scope="request" var="viewURL">
-						<html:rewrite page="/chartGenerator?type=pie" />
-					</c:set>
-
-					<img src="<c:out value="${tool}"/>images/piechart.gif" width=30
-						title="<fmt:message key='label.tip.displayPieChart'/>"
-						onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')"
-						height="30" border="0" style="cursor: pointer;">
-
-					<c:set scope="request" var="viewURL">
-						<html:rewrite page="/chartGenerator?type=bar" />
-					</c:set>
-
-					<img src="<c:out value="${tool}"/>images/columnchart.gif" width=30
-						title="<fmt:message key='label.tip.displayBarChart'/>"
-						onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')"
-						height=30 border="0" style="cursor: pointer;">
-				</div>
-				<strong> <fmt:message key="label.learner.nominations" /> </strong>
-
-				<c:forEach var="entry"
-					items="${requestScope.listGeneralCheckedOptionsContent}">
-					<div>
-						<c:out value="${entry}" escapeXml="false" />
-					</div>
-				</c:forEach>
-				<div>
-					<c:out value="${VoteLearningForm.userEntry}" />
-				</div>
-
-				
-					<h2>
-							<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />												
-					</h2>
-
-					<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
-						escapeXml="false" />
-				
-					<c:if test="${voteGeneralLearnerFlowDTO.lockOnFinish == 'true' }">					
-					<br>
-							<html:button property="forwardtoReflection" styleClass="button"
-								onclick="submitMethod('forwardtoReflection');"> 
-								<fmt:message key="label.edit" />
-							</html:button>
-					</c:if>													
-				
-				
-				
-
-				<div class="space-bottom-top">
-
-					<html:submit property="redoQuestionsOk" styleClass="button"
-						onclick="submitMethod('redoQuestionsOk');">
-						<fmt:message key="label.retake" />
-					</html:submit>
-
-					<html:submit property="learnerFinished" styleId="finishButton"
-						onclick="javascript:submitMethod('learnerFinished');"
-						styleClass="button">
-						<fmt:message key="label.finished" />
-					</html:submit>
-				</div>
+				<html:submit property="learnerFinished" styleId="finishButton"
+					onclick="javascript:submitMethod('learnerFinished');"
+					styleClass="button">
+					<fmt:message key="label.finished" />
+				</html:submit>
+			</div>
 		</html:form>
 
 	</div>

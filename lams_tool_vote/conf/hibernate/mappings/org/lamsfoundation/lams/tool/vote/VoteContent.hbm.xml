@@ -151,6 +151,14 @@
         length="5"
     />
 
+   <property
+        name="showResults"
+        type="boolean"
+        access="property"
+        column="show_results"
+        length="1"        
+   />
+
 
     	 <set
             name="voteQueContents"

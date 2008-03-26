@@ -24,13 +24,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
- 				
-			<table  class="forms">
+ 			<table  class="forms">
+
+ 	<c:if test="${exportPortfolioDto.showResults == 'true'}">
+ 	
 						<tr>
 							<td NOWRAP valign=top class="align-left">
 								<table>
 
-									<c:if test="${(exportPortfolioDto.portfolioExportMode == 'learner')}">
+									<c:if test="${exportPortfolioDto.portfolioExportMode == 'learner'}">
 										<tr>
 									 		<th NOWRAP colspan=2>  <fmt:message key="label.class.summary"/>  </th>
 										</tr>
@@ -78,7 +80,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  						 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.attemptTime"/> </b></td>
 											  			</tr>				 
 													
-								 			
 													<c:forEach var="currentDto" items="${exportPortfolioDto.listUserEntries}">
 								  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 													  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
@@ -206,7 +207,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						 		<td NOWRAP> &nbsp&nbsp </td>
 							</tr>
 
-
+		</c:if> 
 
 							<tr>
 								<td NOWRAP valign=top class="align-left">
