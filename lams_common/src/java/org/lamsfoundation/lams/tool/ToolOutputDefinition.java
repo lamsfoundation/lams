@@ -61,6 +61,7 @@ public class ToolOutputDefinition implements Comparable {
     private Object startValue;
     private Object endValue;
     private Object complexDefinition;
+    private Boolean showConditionNameOnly;
     private List<BranchCondition> defaultConditions;
     
     /** Name must be unique within the current tool content. This will be used to identify the output. 
@@ -162,6 +163,16 @@ public class ToolOutputDefinition implements Comparable {
 	}
 	public void setDefaultConditions(List<BranchCondition> defaultConditions) {
 		this.defaultConditions = defaultConditions;
+	}
+	/** 
+	 * Should Flash show the definition of the branch conditions (e.g. Range from blah to blah) or just the name of the condition.
+	 * Set to true if the definition relates to an internal parameter and will mean nothing to the user
+	 */
+	public Boolean isShowConditionNameOnly() {
+		return showConditionNameOnly;
+	}
+	public void setShowConditionNameOnly(Boolean showConditionNameOnly) {
+		this.showConditionNameOnly = showConditionNameOnly;
 	}
 
 

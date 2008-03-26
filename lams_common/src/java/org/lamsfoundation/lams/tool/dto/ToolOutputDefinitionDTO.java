@@ -46,9 +46,10 @@ public class ToolOutputDefinitionDTO {
 	private String startValue;
 	private String endValue;
 	private String complexDefinition;
+    private Boolean showConditionNameOnly;
     private ArrayList defaultConditions;
 
-	public ToolOutputDefinitionDTO(String name, String description, String type, String startValue, String endValue, String complexDefinition) {
+	public ToolOutputDefinitionDTO(String name, String description, String type, String startValue, String endValue, String complexDefinition, Boolean showConditionNameOnly) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -58,6 +59,8 @@ public class ToolOutputDefinitionDTO {
 		this.endValue = endValue;
 
 		this.complexDefinition = complexDefinition;
+
+		this.showConditionNameOnly = showConditionNameOnly;
 	}
 	
 	public ToolOutputDefinitionDTO(ToolOutputDefinition definition) {
@@ -70,7 +73,8 @@ public class ToolOutputDefinitionDTO {
 		this.endValue = (definition.getEndValue() != null) ? definition.getEndValue().toString() : null;
 
 		this.complexDefinition = (definition.getComplexDefinition() != null) ? definition.getComplexDefinition().toString() : null;
-		
+	
+		this.showConditionNameOnly = definition.isShowConditionNameOnly();
 		if ( definition.getDefaultConditions() != null && definition.getDefaultConditions().size() > 0 ) {
 			defaultConditions = new ArrayList();
 			for ( BranchCondition condition : definition.getDefaultConditions() ) {
@@ -133,6 +137,13 @@ public class ToolOutputDefinitionDTO {
 
 	public void setDefaultConditions(ArrayList defaultConditions) {
 		this.defaultConditions = defaultConditions;
+	}
+
+	public Boolean getShowConditionNameOnly() {
+		return showConditionNameOnly;
+	}
+	public void setShowConditionNameOnly(Boolean showConditionNameOnly) {
+		this.showConditionNameOnly = showConditionNameOnly;
 	}
 
 	public String toString() {

@@ -169,7 +169,7 @@ public abstract class OutputFactory {
 	/** Generic method for building a tool output definition. It will get the definition's description 
 	 * from the I18N file using the getDescription() method.
 	 * Only use if the other buildBlahDefinitions do not suit your needs. */
-	protected ToolOutputDefinition buildDefinition(String definitionName, OutputType type, Object startValue, Object endValue, Object complexValue) {
+	protected ToolOutputDefinition buildDefinition(String definitionName, OutputType type, Object startValue, Object endValue, Object complexValue, Boolean showConditionNameOnly) {
 		ToolOutputDefinition definition = new ToolOutputDefinition();
 		definition.setName(definitionName);
 		definition.setDescription(getDescription(definitionName));
@@ -177,6 +177,7 @@ public abstract class OutputFactory {
 		definition.setStartValue( startValue );
 		definition.setEndValue( endValue );
 		definition.setComplexDefinition( complexValue );
+		definition.setShowConditionNameOnly( showConditionNameOnly );
 		return definition;
 	}
 
@@ -184,14 +185,14 @@ public abstract class OutputFactory {
 	 * It will get the definition's description from the I18N file using the getDescription() method and
 	 * set the type to OUTPUT_LONG. */
 	protected ToolOutputDefinition buildRangeDefinition(String definitionName, Long startValue, Long endValue) {
-		return buildDefinition(definitionName, OutputType.OUTPUT_LONG, startValue, endValue, null);
+		return buildDefinition(definitionName, OutputType.OUTPUT_LONG, startValue, endValue, null, Boolean.FALSE);
 	}
 	
 	/** Build a tool definition designed for a range of string values. 
 	 * It will get the definition's description from the I18N file using the getDescription() method and
 	 * set the type to OUTPUT_LONG. */
 	protected ToolOutputDefinition buildRangeDefinition(String definitionName, String startValue, String endValue) {
-		return buildDefinition(definitionName, OutputType.OUTPUT_STRING, startValue, endValue, null);
+		return buildDefinition(definitionName, OutputType.OUTPUT_STRING, startValue, endValue, null, Boolean.FALSE);
 	}
 
 	/** Build a tool definition designed for a single double value, which is likely to be a statistic number of 
@@ -199,7 +200,7 @@ public abstract class OutputFactory {
 	 * It will get the definition's description from the I18N file using the getDescription() method and
 	 * set the type to OUTPUT_LONG. */
 	protected ToolOutputDefinition buildLongOutputDefinition(String definitionName) {
-		return buildDefinition(definitionName, OutputType.OUTPUT_LONG, null, null, null);
+		return buildDefinition(definitionName, OutputType.OUTPUT_LONG, null, null, null, Boolean.FALSE);
 	}
 
 	/** Build a tool definition designed for a single double value, which is likely to be a statistic such as average
@@ -207,7 +208,7 @@ public abstract class OutputFactory {
 	 * It will get the definition's description from the I18N file using the getDescription() method and
 	 * set the type to OUTPUT_DOUBLE. */
 	protected ToolOutputDefinition buildDoubleOutputDefinition(String definitionName) {
-		return buildDefinition(definitionName, OutputType.OUTPUT_DOUBLE, null, null, null);
+		return buildDefinition(definitionName, OutputType.OUTPUT_DOUBLE, null, null, null, Boolean.FALSE);
 	}
 
 	/** Build a tool definition designed for a single boolean value, which is likely to be a test such as
@@ -216,7 +217,7 @@ public abstract class OutputFactory {
 	 * true and false conditions. The code will automatically look for two strings in the I18N file 
 	 * output.desc.<description>.true and output.desc.<description>.false */
 	protected ToolOutputDefinition buildBooleanOutputDefinition(String definitionName) {
-		ToolOutputDefinition definition =  buildDefinition(definitionName, OutputType.OUTPUT_BOOLEAN, null, null, null);
+		ToolOutputDefinition definition =  buildDefinition(definitionName, OutputType.OUTPUT_BOOLEAN, null, null, null, Boolean.FALSE);
 
 		List<BranchCondition> defaultConditions = new ArrayList<BranchCondition>();
 		defaultConditions.add(new BranchCondition(null, null, new Integer(1), definitionName, 
@@ -236,14 +237,14 @@ public abstract class OutputFactory {
 	 * It will get the definition's description from the I18N file using the getDescription() method and
 	 * set the type to OUTPUT_STRING. */
 	protected ToolOutputDefinition buildStringOutputDefinition(String definitionName) {
-		return buildDefinition(definitionName, OutputType.OUTPUT_STRING, null, null, null);
+		return buildDefinition(definitionName, OutputType.OUTPUT_STRING, null, null, null, Boolean.FALSE);
 	}
 
 	/** Build a tool definition for a complex value output. 
 	 * It will get the definition's description from the I18N file using the getDescription() method and
 	 * set the type to OUTPUT_COMPLEX. */
 	protected ToolOutputDefinition buildComplexOutputDefinition(String definitionName) {
-		return buildDefinition(definitionName, OutputType.OUTPUT_COMPLEX, null, null, null);
+		return buildDefinition(definitionName, OutputType.OUTPUT_COMPLEX, null, null, null, Boolean.FALSE);
 	}
 
 }
