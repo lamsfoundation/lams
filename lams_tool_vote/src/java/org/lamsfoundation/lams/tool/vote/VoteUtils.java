@@ -257,10 +257,9 @@ public abstract class VoteUtils implements VoteAppConstants {
         }
         
         logger.debug("trimmed noHtmlNoNewLineStr: " + noHtmlNoNewLineStr.trim());
-        if (noHtmlNoNewLineStr.trim().equals(""))
+        if (noHtmlNoNewLineStr.trim().length()==0)
         {
-            logger.debug("nomination text is just composed of html markup..." +
-            		"returning html formatted text");
+            logger.debug("nomination text is just composed of html markup, returning html formatted text");
             if (htmlText.length() > 50)
                 return htmlText.substring(0,51);
             else

@@ -24,10 +24,8 @@
 package org.lamsfoundation.lams.tool.vote.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -37,6 +35,7 @@ import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -80,7 +79,7 @@ public class VoteOutputFactory extends OutputFactory {
 					if ( displayOrder > max ) max = displayOrder;
 					String displayOrderAsString = new Long(displayOrder).toString();
 					defaultConditions.add(new BranchCondition(null, null, new Integer(1), OUTPUT_NAME_NOMINATION_SELECTION, 
-							nomination.getQuestion(), 
+							VoteUtils.stripHTML(nomination.getQuestion()), 
 							OutputType.OUTPUT_LONG.toString(),
 							displayOrderAsString, 
 							displayOrderAsString, 
@@ -88,6 +87,7 @@ public class VoteOutputFactory extends OutputFactory {
 				}
 				definition.setStartValue(new Long(min));
 				definition.setEndValue(new Long(max));
+				definition.setShowConditionNameOnly(Boolean.TRUE);
 
 				definitionMap.put(OUTPUT_NAME_NOMINATION_SELECTION, definition);
 				
