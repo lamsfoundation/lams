@@ -250,23 +250,24 @@ class LearnersDialog extends MovieClip implements Dialog{
 	 */
 	
 	public function loadLearners(users:Array):Void{
-		trace('loading Learners...');
+		Debugger.log("loadLearners invoked", Debugger.GEN, "loadLearners", "LearnersDialog");
 		_learnerList = clearScp(_learnerList);
 		_learner_mc = learner_scp.content;
+		
+		var usersArr:Array = new Array(); // contains User objects
 
-		trace('list length: ' + users.length);
 		for(var i=0; i<users.length; i++){
 			var user:User = new User(users[i]);
-			trace(_learner_mc);
+			usersArr.push(user);
+		}
+		usersArr.sortOn(["_firstName", "_lastName"], Array.CASEINSENSITIVE);
+		
+		for(var i=0; i<usersArr.length; i++){
 			_learnerList[i] = this._learner_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._learner_mc.getNextHighestDepth());
-			_learnerList[i].fullName.text = user.getFirstName() + " " + user.getLastName() + " (" + user.getUsername() + ")";
+			_learnerList[i].fullName.text = usersArr[i].getFirstName() + " " + usersArr[i].getLastName() + " (" + usersArr[i].getUsername() + ")";
 			_learnerList[i]._x = USERS_X;
 			_learnerList[i]._y = USER_OFFSET * i;
 			var listItem:MovieClip = MovieClip(_learnerList[i]);
-			//listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:true})
-			trace('new row: ' + _learnerList[i]);
-			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
-
 		}
 		learner_scp.redraw(true);
 	}
