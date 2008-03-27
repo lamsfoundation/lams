@@ -537,6 +537,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			clickTarget_mc._width = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH : TOOL_ACTIVITY_WIDTH;
 			clickTarget_mc._height = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_HEIGHT : TOOL_ACTIVITY_HEIGHT;
 			
+			if(activity.isBranchingActivity()) {
+				clickTarget_mc._width = TOOL_BRANCHING_WIDTH;
+				clickTarget_mc._height = TOOL_BRANCHING_HEIGHT;
+			}
 		}
 
 		//position
