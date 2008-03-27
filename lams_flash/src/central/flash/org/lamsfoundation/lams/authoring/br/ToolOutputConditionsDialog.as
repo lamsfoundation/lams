@@ -253,24 +253,34 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		_toolOutputLongOptions_cmb.addItem({label: Dictionary.getValue("to_conditions_dlg_lte_lbl"), data: OPTION_LTE});
 		_toolOutputLongOptions_cmb.addItem({label: Dictionary.getValue("to_conditions_dlg_range_lbl"), data: OPTION_RANGE});
 		
-		var column_name:DataGridColumn = new DataGridColumn("conditionName");
-		column_name.headerText = Dictionary.getValue("to_conditions_dlg_condition_items_name_col_lbl");
-		column_name.editable = true;
-		
-		column_name.width = _condition_item_dgd.width*0.4;
-		
-		var column_value:DataGridColumn = new DataGridColumn("conditionValue");
-		column_value.headerText = Dictionary.getValue("to_conditions_dlg_condition_items_value_col_lbl");
-		column_value.editable = false;
-		column_value.width = _condition_item_dgd.width*0.6;
-		
-		_condition_item_dgd.addColumn(column_name);
-		_condition_item_dgd.addColumn(column_value);
+		addConditionItemColumns(false);
 		
 		showElements(false);
 		
 		// wait second frame for steppers to be setup
 		this.onEnterFrame = initSetup;
+		
+	}
+	
+	private function addConditionItemColumns(hideValueColumn:Boolean):Void {
+		_condition_item_dgd.removeAllColumns();
+		
+		var column_name:DataGridColumn = new DataGridColumn("conditionName");
+		column_name.headerText = Dictionary.getValue("to_conditions_dlg_condition_items_name_col_lbl");
+		column_name.editable = true;
+		
+		column_name.width = (hideValueColumn) ?  _condition_item_dgd.width : _condition_item_dgd.width*0.4;
+		
+		_condition_item_dgd.addColumn(column_name);
+		
+		if(!hideValueColumn) {
+			var column_value:DataGridColumn = new DataGridColumn("conditionValue");
+			column_value.headerText = Dictionary.getValue("to_conditions_dlg_condition_items_value_col_lbl");
+			column_value.editable = false;
+			column_value.width = _condition_item_dgd.width*0.6;
+			
+			_condition_item_dgd.addColumn(column_value);
+		}
 		
 	}
 	
@@ -533,6 +543,12 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		_selectedDefinition = _toolOutputDefin_cmb.dataProvider[_toolOutputDefin_cmb.selectedIndex];
 		Debugger.log("select definition: " + _selectedDefinition.description, Debugger.CRITICAL, "selectDefinition", "ToolOutputConditionsDialog");
 		
+		if(_selectedDefinition.showConditionNameOnly)
+			addConditionItemColumns(true);
+		else if(_condition_item_dgd.getColumnAt(1) == null)
+			addConditionItemColumns(false);
+			
+			
 		switch(_selectedDefinition.type) {
 			case ToolOutputDefinition.LONG:
 				_condition_item_dgd.visible = true;
@@ -691,9 +707,14 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
         _bgpanel.setSize(w,h);
 
 		_condition_item_dgd.setSize(w - 2*_condition_item_dgd._x, h*0.45);
-		_condition_item_dgd.getColumnAt(0).width = _condition_item_dgd.width*0.4;
-        _condition_item_dgd.getColumnAt(1).width = _condition_item_dgd.width*0.6;
-        
+		
+		if(_condition_item_dgd.getColumnAt(1) != null) {
+			_condition_item_dgd.getColumnAt(0).width = _condition_item_dgd.width*0.4;
+			_condition_item_dgd.getColumnAt(1).width = _condition_item_dgd.width*0.6;
+		} else {
+			_condition_item_dgd.getColumnAt(0).width = _condition_item_dgd.width;
+		}
+		
 		_toolOutputDefin_cmb.setSize(w - 2*_toolOutputDefin_cmb._x - help_btn.width - 5, 22);
 		_toolOutputLongOptions_cmb.setSize(_toolOutputDefin_cmb._width, 22);
 		

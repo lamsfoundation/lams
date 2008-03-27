@@ -39,6 +39,7 @@ class ToolOutputDefinition  {
 	private var _startValue:Object;
 	private var _endValue:Object;
 	private var _defaultConditions:Array;
+	private var _showConditionNameOnly:Boolean;
 	
 	function ToolOutputDefinition(){
 		_defaultConditions = new Array();
@@ -58,6 +59,8 @@ class ToolOutputDefinition  {
 				_defaultConditions.push(bdto);
 			}
 		}
+		
+		_showConditionNameOnly = dto.showConditionNameOnly;
 			
 	}
 	
@@ -115,6 +118,10 @@ class ToolOutputDefinition  {
 	
 	public function get defaultConditions():Array {
 		return _defaultConditions;
+	}
+	
+	public function get showConditionNameOnly():Boolean {
+		return _showConditionNameOnly;
 	}
 
 }
