@@ -41,9 +41,12 @@ import mx.utils.*
 * CanvasActivity - 
 */  
 class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip implements ICanvasActivity{
-  
+
 	public static var TOOL_ACTIVITY_WIDTH:Number = 123.1;
 	public static var TOOL_ACTIVITY_HEIGHT:Number = 50.5;
+	
+	public static var TOOL_BRANCHING_WIDTH:Number = 166.0;
+	public static var TOOL_BRANCHING_HEIGHT:Number = 101.0;
 	
 	public static var TOOL_MIN_ACTIVITY_WIDTH:Number = 65;
 	public static var TOOL_MIN_ACTIVITY_HEIGHT:Number = 44;
@@ -92,6 +95,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	private var icon_mc:MovieClip;
 	private var icon_mcl:MovieClipLoader;
+	
+	private var diagram_mc:CanvasBranchingDiagram;
 	
 	private var bkg_pnl:MovieClip;
 	private var act_pnl:MovieClip;
@@ -152,6 +157,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		} else if(_activity.isGroupActivity()){
 			_visibleHeight = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_HEIGHT : CanvasActivity.TOOL_ACTIVITY_HEIGHT;
 			_visibleWidth = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH : CanvasActivity.TOOL_ACTIVITY_WIDTH;
+		} else if(_activity.isBranchingActivity()) {
+			_visibleHeight = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_HEIGHT : CanvasActivity.TOOL_BRANCHING_HEIGHT;
+			_visibleWidth = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH :CanvasActivity.TOOL_BRANCHING_WIDTH;
 		}else{
 			_visibleHeight = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_HEIGHT : CanvasActivity.TOOL_ACTIVITY_HEIGHT;
 			_visibleWidth = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH :CanvasActivity.TOOL_ACTIVITY_WIDTH;
@@ -190,7 +198,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		Debugger.log("mm: " + mm, Debugger.CRITICAL, "init", "CanvasActivity");
 		Debugger.log("_activity: " + _activity.activityUIID, Debugger.CRITICAL, "init", "CanvasActivity");
 
-		
 		showAssets(false);
 		
 		if (_activity.selectActivity == "false"){
@@ -200,6 +207,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		if(!_activity.isGateActivity() && !_activity.isGroupActivity() && !_activity.isBranchingActivity() || _branchConnector){
 			loadIcon();
+		} else if(_activity.isBranchingActivity()) {
+			loadDiagram();
 		}
 		
 		setStyles();
@@ -235,6 +244,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		setStyles();
 		
 		setupBranchView = false;
+		
+		if(diagram_mc != null)
+			diagram_mc.refresh();
 		
 		draw();
 		setSelected(_isSelected);
@@ -291,6 +303,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			_selected_mc.removeMovieClip();
 		}
 		
+	}
+	
+	private function loadDiagram():Void {
+		diagram_mc = CanvasBranchingDiagram(this.attachMovie("CanvasBranchingDiagram", "diagram_mc", this.getNextHighestDepth(), {_ddm: getDDM(), _branchingActivity: activity, _visible: false}));
+
+		// swap depths if transparent layer visible
+		if(fade_mc._visible) {
+			diagram_mc.swapDepths(fade_mc);
+		}
 	}
 	
 	private function loadIcon():Void{
@@ -462,11 +483,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				icon_mc._visible = false;
 				theIcon_mc = groupIcon_mc;
 			} else if(_activity.isBranchingActivity()){
-				branchIcon_mc._visible = true;
+				Debugger.log("empty: " + diagram_mc.empty, Debugger.CRITICAL, "draw", "CanvasActivity");
+				
+				branchIcon_mc._visible = diagram_mc.empty;
 				groupIcon_mc._visible = false;
 				optionalIcon_mc.visible = false;
 				icon_mc._visible = false;
-				theIcon_mc = branchIcon_mc;
+				
+				if(!diagram_mc.empty)
+					diagram_mc._visible = true;
+				else
+					theIcon_mc = branchIcon_mc;
+					
 			} else if(_activity.isOptionalActivity()){
 				branchIcon_mc._visible = false;
 				groupIcon_mc._visible = false;
@@ -798,6 +826,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function getDDM():DesignDataModel {
 		if(_module == "monitoring") {
 			return _monitorView.ddm;
+		} else if(_canvasBranchView != null){
+			return _canvasBranchView.ddm;
 		} else {
 			return _canvasView.ddm;
 		}
