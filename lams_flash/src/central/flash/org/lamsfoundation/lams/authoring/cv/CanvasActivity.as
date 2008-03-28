@@ -97,6 +97,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var icon_mcl:MovieClipLoader;
 	
 	private var diagram_mc:CanvasBranchingDiagram;
+	private var showDiagram:Boolean;
 	
 	private var bkg_pnl:MovieClip;
 	private var act_pnl:MovieClip;
@@ -157,12 +158,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		} else if(_activity.isGroupActivity()){
 			_visibleHeight = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_HEIGHT : CanvasActivity.TOOL_ACTIVITY_HEIGHT;
 			_visibleWidth = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH : CanvasActivity.TOOL_ACTIVITY_WIDTH;
-		} else if(_activity.isBranchingActivity()) {
-			_visibleHeight = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_HEIGHT : CanvasActivity.TOOL_BRANCHING_HEIGHT;
-			_visibleWidth = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH :CanvasActivity.TOOL_BRANCHING_WIDTH;
+		} else if(_activity.isBranchingActivity() && showDiagram) {
+			_visibleHeight = CanvasActivity.TOOL_BRANCHING_HEIGHT;
+			_visibleWidth = CanvasActivity.TOOL_BRANCHING_WIDTH;
 		}else{
 			_visibleHeight = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_HEIGHT : CanvasActivity.TOOL_ACTIVITY_HEIGHT;
-			_visibleWidth = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH :CanvasActivity.TOOL_ACTIVITY_WIDTH;
+			_visibleWidth = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH : CanvasActivity.TOOL_ACTIVITY_WIDTH;
 		}
 		
 		_base_mc = this;
@@ -207,7 +208,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		if(!_activity.isGateActivity() && !_activity.isGroupActivity() && !_activity.isBranchingActivity() || _branchConnector){
 			loadIcon();
-		} else if(_activity.isBranchingActivity()) {
+		} else if(_activity.isBranchingActivity() && showDiagram) {
 			loadDiagram();
 		}
 		
@@ -485,12 +486,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			} else if(_activity.isBranchingActivity()){
 				Debugger.log("empty: " + diagram_mc.empty, Debugger.CRITICAL, "draw", "CanvasActivity");
 				
-				branchIcon_mc._visible = diagram_mc.empty;
+				branchIcon_mc._visible = (diagram_mc.empty != null) ? diagram_mc.empty : true;
 				groupIcon_mc._visible = false;
 				optionalIcon_mc.visible = false;
 				icon_mc._visible = false;
 				
-				if(!diagram_mc.empty)
+				if(!branchIcon_mc._visible)
 					diagram_mc._visible = true;
 				else
 					theIcon_mc = branchIcon_mc;
