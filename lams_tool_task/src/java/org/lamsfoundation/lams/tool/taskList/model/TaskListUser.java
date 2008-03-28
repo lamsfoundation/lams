@@ -46,6 +46,7 @@ public class TaskListUser implements Cloneable{
 	private String lastName;
 	private String loginName;
 	private boolean sessionFinished;
+	private boolean isVerifiedByMonitor;
 	
 	private TaskListSession session;
 	private TaskList taskList;
@@ -53,8 +54,6 @@ public class TaskListUser implements Cloneable{
 	//=============== NON Persisit value: for display use ===========
 	//the user access some reousrce item date time. Use in monitoring summary page
 	private Date accessDate;
-	
-	private boolean verified;
 	
 	public TaskListUser(){
 	}
@@ -218,11 +217,15 @@ public class TaskListUser implements Cloneable{
 		this.accessDate = accessDate;
 	}
 
-	public boolean getVerified() {
-		return verified;
+	/**
+	 * @hibernate.property column="is_verified_by_monitor"
+	 * @return
+	 */
+	public boolean isVerifiedByMonitor() {
+		return isVerifiedByMonitor;
 	}
-	public void setVerified(boolean verified) {
-		this.verified = verified;
+	public void setVerifiedByMonitor(boolean isVerifiedByMonitor) {
+		this.isVerifiedByMonitor = isVerifiedByMonitor;
 	}
 
 }

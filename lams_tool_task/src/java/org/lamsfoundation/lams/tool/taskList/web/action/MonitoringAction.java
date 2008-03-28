@@ -40,11 +40,13 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
+import org.lamsfoundation.lams.tool.taskList.dto.TaskSummary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
@@ -68,16 +70,16 @@ public class MonitoringAction extends Action {
 			return summary(mapping, form, request, response);
 		}
 		
-		if(param.equals("verifyUser")){
-			return verifyUser(mapping, form, request, response);
+		if (param.equals("summaryTask")) {
+			return summaryTask(mapping, form, request, response);
+		}
+		
+		if(param.equals("setVerifiedByMonitor")){
+			return setVerifiedByMonitor(mapping, form, request, response);
 		}
 
 		if (param.equals("listuser")) {
 			return listuser(mapping, form, request, response);
-		}
-		
-		if (param.equals("viewReflection")) {
-			return viewReflection(mapping, form, request, response);
 		}
 		
 		return mapping.findForward(TaskListConstants.ERROR);
@@ -87,7 +89,7 @@ public class MonitoringAction extends Action {
 		ITaskListService service = getTaskListService();
 		
 		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,contentId);
+		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
 		
 		//initial Session Map 
 		SessionMap sessionMap = new SessionMap();
@@ -99,7 +101,6 @@ public class MonitoringAction extends Action {
 		TaskList taskList = service.getTaskListByContentId(contentId);
 		taskList.toDTO();
 		
-		Map<Long,Set<ReflectDTO> >relectList = service.getReflectList(contentId);
 		Summary summary = service.getSummary(contentId);
 		
 		//cache into sessionMap
@@ -107,28 +108,48 @@ public class MonitoringAction extends Action {
 		sessionMap.put(TaskListConstants.PAGE_EDITABLE, taskList.isContentInUse());
 		sessionMap.put(TaskListConstants.ATTR_RESOURCE, taskList);
 		sessionMap.put(TaskListConstants.ATTR_TOOL_CONTENT_ID, contentId);
-		sessionMap.put(TaskListConstants.ATTR_REFLECT_LIST, relectList);
 		
+		return mapping.findForward(TaskListConstants.SUCCESS);
+	}
+	
+	private ActionForward summaryTask(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		ITaskListService service = getTaskListService();
+		
+		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+		Long taskListItemId = WebUtil.readLongParam(request, TaskListConstants.ATTR_TASK_LIST_ITEM_UID);
+//		request.setAttribute(TaskListConstants.ATTR_TASK_LIST_ITEM_UID, contentId);
+		
+		TaskSummary taskSummary = service.getTaskSummary(contentId, taskListItemId);
+		request.setAttribute(TaskListConstants.ATTR_TASK_SUMMARY, taskSummary);
+		request.setAttribute("taskSummary", taskSummary);
+						
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}
 	
 	/**
 	 * Mark taskList item as complete status. 
+	 * 
 	 * @param mapping
 	 * @param form
 	 * @param request
 	 * @param response
 	 * @return
 	 */
-	private ActionForward verifyUser(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+	private ActionForward setVerifiedByMonitor(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 
 		Long uid = WebUtil.readLongParam(request, TaskListConstants.ATTR_USER_UID); 
-		Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-		
 		ITaskListService service = getTaskListService();
 		TaskListUser user = service.getUser(uid);
+		user.setVerifiedByMonitor(true);
+		service.createUser(user);
+
+		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 		
-		return  mapping.findForward(TaskListConstants.SUCCESS);
+		ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(TaskListConstants.SUCCESS));
+		redirect.addParameter(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
+		redirect.addParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+		return  redirect;
 	}
 
 	private ActionForward listuser(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
@@ -143,31 +164,6 @@ public class MonitoringAction extends Action {
 		request.setAttribute(TaskListConstants.ATTR_USER_LIST, list);
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}
-	
-	private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		
-		Long uid = WebUtil.readLongParam(request, TaskListConstants.ATTR_USER_UID); 
-		Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-		
-		ITaskListService service = getTaskListService();
-		TaskListUser user = service.getUser(uid);
-		NotebookEntry notebookEntry = service.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL, TaskListConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		
-		TaskListSession session = service.getTaskListSessionBySessionId(sessionID);
-		
-		ReflectDTO refDTO = new ReflectDTO(user);
-		if(notebookEntry == null){
-			refDTO.setFinishReflection(false);
-			refDTO.setReflect(null);
-		}else{
-			refDTO.setFinishReflection(true);
-			refDTO.setReflect(notebookEntry.getEntry());
-		}
-		refDTO.setReflectInstrctions(session.getTaskList().getReflectInstructions());
-		
-		request.setAttribute("userDTO", refDTO);
-		return mapping.findForward("success");
-	}	
 
 	// *************************************************************************************
 	// Private method

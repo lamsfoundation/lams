@@ -9,7 +9,7 @@
 <table-list>
 <table alias="" name="tl_latask10_item_comment" remarks="" uid="17c04e0:1187758bd62:-7ff8">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="-1" y="87"/>
+<table-figure-bounds height="-1" width="-1" x="17" y="84"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="17c04e0:1187758bd62:-7ff0">
 <column-description/>
@@ -829,7 +829,7 @@
 </table>
 <table alias="" name="tl_latask10_user" remarks="" uid="1e47441:118111fd0b1:-7fa7">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="427" y="79"/>
+<table-figure-bounds height="-1" width="-1" x="414" y="74"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="1e47441:118111fd0b1:-7fa5">
 <column-description/>
@@ -889,6 +889,12 @@
 <variant type-name-pattern="BIGINT UNSIGNED"/>
 <variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
 <variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="is_verified_by_monitor" remarks="" uid="a556cf:118e3b313f8:-7ff6">
+<column-description/>
+<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
+<variant type-name-pattern="BIT"/>
 </data-type>
 </column>
 </column-list>

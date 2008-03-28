@@ -104,6 +104,7 @@ create table tl_latask10_user (
    session_finished smallint,
    session_uid bigint,
    taskList_uid bigint,
+   is_verified_by_monitor tinyint,
    primary key (uid)
 );
 alter table tl_latask10_attachment add index FK_NEW_174079138_1E7009430E79035 (taskList_uid), add constraint FK_NEW_174079138_1E7009430E79035 foreign key (taskList_uid) references tl_latask10_taskList (uid);

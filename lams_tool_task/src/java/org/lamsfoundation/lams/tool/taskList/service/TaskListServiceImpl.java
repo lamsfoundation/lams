@@ -85,10 +85,13 @@ import org.lamsfoundation.lams.tool.taskList.dao.TaskListUserDAO;
 import org.lamsfoundation.lams.tool.taskList.dto.ExportDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
+import org.lamsfoundation.lams.tool.taskList.dto.TaskSummary;
+import org.lamsfoundation.lams.tool.taskList.dto.TaskSummaryItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
@@ -107,6 +110,10 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * 
  * @author Dapeng.Ni 
  * 
+ */
+/**
+ * @author Administrator
+ *
  */
 public class TaskListServiceImpl implements ITaskListService,ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
 	static Logger log = Logger.getLogger(TaskListServiceImpl.class.getName());
@@ -493,22 +500,13 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		return nextUrl;
 	}
 
-//	public int checkMiniView(Long toolSessionId, Long userUid) {
-//		int miniView = taskListItemVisitDao.getUserViewLogCount(toolSessionId,userUid);
-//		TaskListSession session = taskListSessionDao.getSessionBySessionId(toolSessionId);
-//		if(session == null){
-//			log.error("Failed get session by ID [" + toolSessionId + "]");
-//			return 0;
-//		}
-//		int reqView = session.getTaskList().getMiniViewTaskListNumber();
-//		
-//		return (reqView - miniView);
-//	}
-
 	public TaskListItem getTaskListItemByUid(Long itemUid) {
 		return taskListItemDao.getByUid(itemUid);
 	}
 	
+	/** 
+	 * {@inheritDoc}
+	 */
 	public Summary getSummary(Long contentId) {
 		
 		TaskList taskList = taskListDao.getByContentId(contentId);
@@ -517,14 +515,10 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		
 		ArrayList<TaskListUser> userList = new ArrayList<TaskListUser>();
 		
-//		service.isUserInRole(userId, group.getOrganisationId(), Role.GROUP_ADMIN)
-//		userManagementService.getAllUsers(filteredOrgId)
-//		userManagementService.is
-//		taskListUserDao.getBySessionID(contentId);
-//		TaskListUser user = taskListUserDao.getUserByUserIDAndContentID(userId, contentId);
-//		users.add(user);
-
+		//retrieve all the sessions associated with this taskList
 		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
+		//create the list containing all taskListItems  
+		//create the user list of all whom were started this task
 		for(TaskListSession session:sessionList) {
 
 			Set<TaskListItem> newItems = session.getTaskListItems();
@@ -532,79 +526,90 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 				if (!itemList.contains(item)) itemList.add(item);
 			}
 			
-//			userList.addAll(taskListUserDao.getBySessionID(session.getSessionId()));
 			List<TaskListUser> newUsers = taskListUserDao.getBySessionID(session.getSessionId());
 			for(TaskListUser user : newUsers) {
 				if (!userList.contains(user)) userList.add(user);
 			}
 		}
 		
+		//Fill up the copmletion table
 		boolean[][] complete = new boolean[userList.size()][itemList.size()];
+		//Fill up the array of visitNumbers
+		int[] visitNumbers = new int[itemList.size()];
 		for (int i = 0; i < userList.size(); i++) {
+			TaskListUser user = userList.get(i);
+			
 			for (int j = 0; j < itemList.size(); j++) {
-				
-				TaskListUser user = userList.get(i);
 				TaskListItem item = itemList.get(j);
 				
+				//retreiving TaskListItemVisitLog for current taskList and user
 				TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(), user.getUserId());
 				if (visitLog !=null) {
 					complete[i][j] = visitLog.isComplete();	
+					if (visitLog.isComplete()) visitNumbers[j]++;
 				} else {
 					complete[i][j] = false;
 				}
 			}
 		}
 		
-		Summary summary = new Summary(itemList, userList, complete, taskList.isMonitorVerificationRequired());
+		Summary summary = new Summary(itemList, userList, complete, visitNumbers, taskList.isMonitorVerificationRequired());
 		return summary;
 	}
 	
-//	public List<List<Summary>> getSummary(Long contentId) {
-//		List<List<Summary>> groupList = new ArrayList<List<Summary>>();
-//		List<Summary> group = new ArrayList<Summary>();
-//		
-//		//get all item which is accessed by user
-//		Map<Long,Integer> visitCountMap = taskListItemVisitDao.getSummary(contentId);
-//		
-//		TaskList taskList = taskListDao.getByContentId(contentId);
-//		Set<TaskListItem> resItemList = taskList.getTaskListItems();
-//
-//		//get all sessions in a taskList and retrieve all taskList items under this session
-//		//plus initial taskList items by author creating (resItemList) 
-//		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
-//		for(TaskListSession session:sessionList){
-//			//one new group for one session.
-//			group = new ArrayList<Summary>();
-//			//firstly, put all initial taskList item into this group.
-//			for(TaskListItem item:resItemList){
-//				Summary sum = new Summary(session.getSessionId(),session.getSessionName(),item);
-//				//set viewNumber according visit log
-//				if(visitCountMap.containsKey(item.getUid()))
-//					sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
-//				group.add(sum);
-//			}
-//			//get this session's all taskList items
-//			Set<TaskListItem> sessItemList =session.getTaskListItems();
-//			for(TaskListItem item : sessItemList){
-//				//to skip all item create by author
-//				if(!item.isCreateByAuthor()){
-//					Summary sum = new Summary(session.getSessionId(),session.getSessionName(),item);
-//					//set viewNumber according visit log
-//					if(visitCountMap.containsKey(item.getUid()))
-//						sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());					
-//					group.add(sum);
-//				}
-//			}
-//			//so far no any item available, so just put session name info to Summary
-//			if(group.size() == 0)
-//				group.add(new Summary(session.getSessionId(),session.getSessionName(),null));
-//			groupList.add(group);
-//		} 
-//		
-//		return groupList;
-//		return null;
-//
-//	}
+	/** 
+	 * {@inheritDoc}
+	 */
+	public TaskSummary getTaskSummary(Long contentId, Long taskListItemUid) {
+		
+		TaskListItem taskListItem = taskListItemDao.getByUid(taskListItemUid);
+		
+		ArrayList<TaskListUser> userList = new ArrayList<TaskListUser>();
+
+		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
+		//create the user list of all whom were started this task 
+		for(TaskListSession session:sessionList) {
+			List<TaskListUser> newUsers = taskListUserDao.getBySessionID(session.getSessionId());
+			for(TaskListUser user : newUsers) {
+				if (!userList.contains(user)) userList.add(user);
+			}
+		}
+		
+		TaskSummaryItem[] taskSummaryItems = new TaskSummaryItem[userList.size()];
+		for (int i = 0; i < userList.size(); i++) {
+			TaskListUser user = userList.get(i);
+			taskSummaryItems[i] = new TaskSummaryItem();
+			taskSummaryItems[i].setUser(user);
+			
+			TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(taskListItem.getUid(), user.getUserId());
+			//If TaskListItemVisitLog exists then fill up taskSummaryItem otherwise put false in a completed field
+			if (visitLog !=null) {
+				taskSummaryItems[i].setCompleted(visitLog.isComplete());
+				if (visitLog.isComplete()) taskSummaryItems[i].setDate(visitLog.getAccessDate());
+				
+				//fill up with comments and attachments made by this user
+				Set<TaskListItemComment> itemComments = taskListItem.getComments();
+				for(TaskListItemComment comment : itemComments) {
+					if (user.equals(comment.getCreateBy())) taskSummaryItems[i].getComments().add(comment);
+				}
+
+				Set<TaskListItemAttachment> itemAttachments = taskListItem.getUploadedFileList();
+				for(TaskListItemAttachment attachment : itemAttachments) {
+					if (user.equals(attachment.getCreateBy())) taskSummaryItems[i].getAttachments().add(attachment);
+				}
+
+			} else {
+				taskSummaryItems[i].setCompleted(false);
+			}
+		}
+		
+		TaskSummary taskSummary = new TaskSummary(taskListItem, taskSummaryItems);
+		return taskSummary;
+	}
+
+	/** 
+	 * {@inheritDoc}
+	 */
 	public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId){
 		Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
 

@@ -55,6 +55,7 @@ public class Summary {
 	private List<TaskListItem> taskListItems;
 	
 	private boolean[][] completeMap; 
+	private int[] visitNumbers;
 	
 	public Summary(){}
 	
@@ -66,10 +67,11 @@ public class Summary {
 	 * @param item
 	 * @param isInitGroup
 	 */
-	public Summary(List<TaskListItem> taskListItems, List<TaskListUser> userNames, boolean[][] completeMap, boolean isMonitorVerificationRequired){
+	public Summary(List<TaskListItem> taskListItems, List<TaskListUser> userNames, boolean[][] completeMap, int[] visitNumbers, boolean isMonitorVerificationRequired){
 		this.userNames = userNames;
 		this.taskListItems = taskListItems;
 		this.completeMap = completeMap;
+		this.visitNumbers = visitNumbers;
 		this.isMonitorVerificationRequired = isMonitorVerificationRequired;
 	}
 	
@@ -92,6 +94,13 @@ public class Summary {
 	}
 	public void setCompleteMap(boolean[][] completeMap) {
 		this.completeMap = completeMap;
+	}
+	
+	public int[] getVisitNumbers() {
+		return visitNumbers;
+	}
+	public void setVisitNumbers(int[] visitNumbers) {
+		this.visitNumbers = visitNumbers;
 	}
 	
 	public boolean isMonitorVerificationRequired() {

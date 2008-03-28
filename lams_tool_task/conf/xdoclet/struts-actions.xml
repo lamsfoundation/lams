@@ -208,22 +208,22 @@
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
 		
-		<action path="/monitoring/verifyUser"
+		<action path="/monitoring/summaryTask"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
-			parameter="verifyUser">
-			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
+			parameter="summaryTask" >
+			<forward name="success" path="/pages/monitoring/summaryTask.jsp" />
+		</action>
+		
+		<action path="/monitoring/setVerifiedByMonitor"
+			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
+			parameter="setVerifiedByMonitor">
+			<forward name="success" redirect="true" path="/monitoring/summary.do" />
 		</action>
 		
 		<action path="/monitoring/listuser"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
 			parameter="listuser" >
 			<forward name="success" path="/pages/monitoring/userlist.jsp" />
-		</action>
-	
-		<action path="/monitoring/viewReflection"
-			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
-			parameter="viewReflection">
-			<forward name="success" path="/pages/monitoring/notebook.jsp" />
 		</action>
 		
 		<!-- ========== BEGIN: Common ============================== -->

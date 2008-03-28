@@ -62,6 +62,7 @@ public class TaskListConstants {
 	public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
 	public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
 	public static final String ATTR_SUMMARY = "summary";
+	public static final String ATTR_TASK_SUMMARY = "taskSummary";
 	public static final String ATTR_EXPORT_DTO_LIST = "exportDTOList";
 	public static final String ATTR_USER_LIST = "userList";
 	public static final String ATTR_FINISH_LOCK = "finishedLock";
@@ -71,6 +72,7 @@ public class TaskListConstants {
 	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 	public static final String ATTR_TITLE = "title";
 	public static final String ATTR_USER_FINISHED = "userFinished";
+	public static final String ATTR_USER_VERIFIED_BY_MONITOR = "userVerifiedByMonitor";
 	public static final String ATTR_TASK_LIST_ITEM = "taskListItem";
 	public static final String ATTR_TASK_LIST_ITEM_TITLE = "taskListItemTitle";
 	public static final String ATTR_TASK_LIST_ITEM_DESCRIPTION = "taskListItemDescription";
@@ -89,6 +91,7 @@ public class TaskListConstants {
 	
 	public static final String ATTR_REFLECT_LIST = "reflectList";
 	public static final String ATTR_USER_UID = "userUid";
+	public static final String ATTR_TASK_LIST_ITEM_UID = "taskListItemUid";
 	public static final String ATTR_USER_LOGIN = "userLogin";
 
 }

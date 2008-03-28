@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.taskList.dto.ExportDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
+import org.lamsfoundation.lams.tool.taskList.dto.TaskSummary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
@@ -180,11 +181,20 @@ public interface ITaskListService
 	TaskListItem getTaskListItemByUid(Long itemUid);
 
 	/**
-	 * Return monitoring summary list. The return value is list of taskList summaries for each groups.
-	 * @param contentId
+	 * Return monitoring summary for the specified TaskList. 
+	 * @param contentId specified TaskList uid
 	 * @return
 	 */
 	Summary getSummary(Long contentId);
+	
+	/**
+	 * Return monitoring task summary for the specified TaskListItem.
+	 * 
+	 * @param contentId toolContenId
+	 * @param taskListItemUid specified TaskListItem uid
+	 * @return
+	 */
+	TaskSummary getTaskSummary(Long contentId, Long taskListItemUid);
 
 	List<TaskListUser> getUserListBySessionItem(Long sessionId, Long itemUid);
 

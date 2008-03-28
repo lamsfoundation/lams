@@ -222,10 +222,14 @@
 		<c:if test="${(mode != 'teacher') && isRequiredTasksCompleted}">
 			<div class="space-bottom-top align-right">
 				<c:choose>
+					<c:when	test="${!sessionMap.userVerifiedByMonitor}">
+						<fmt:message key="label.learning.wait.for.monitor.verification" />
+					</c:when>
+				
 					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<html:button property="FinishButton"
 							onclick="return continueReflect()" styleClass="button">
-							<fmt:message key="label.continue" />
+							
 						</html:button>
 					</c:when>
 					
@@ -238,6 +242,9 @@
 				</c:choose>
 			</div>
 		</c:if>
+
+
+
 
 	</div>
 	<!--closes content-->
