@@ -1130,6 +1130,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		}
 		
 		if(ba.activity.branchView != null) {
+			ba.activity.branchView.prevActiveView = activeView;
 			activeView = (visible) ? ba.activity.branchView : activeView;
 			ba.activity.branchView.setOpen(visible);
 			ba.activity.branchView.open();

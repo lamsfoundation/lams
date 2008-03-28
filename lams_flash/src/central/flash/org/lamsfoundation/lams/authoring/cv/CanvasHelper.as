@@ -186,11 +186,9 @@ class CanvasHelper {
 			checkValidDesign();
 			checkReadOnlyDesign();
 			
-			if(canvasModel.activeView instanceof CanvasComplexView) {
+			if(canvasModel.activeView != null) {
 				canvasModel.closeAllComplexViews();
-			}
-			
-			if(canvasModel.activeView instanceof CanvasBranchView) {
+
 				for(var i=0; i<canvasModel.openBranchingActivities.length; i++)
 					canvasModel.openBranchingActivities[i].activity.branchView.removeMovieClip();
 			
@@ -532,21 +530,15 @@ class CanvasHelper {
 		return newToolActivity;
 	}
 	
-	public function closeBranchView() {
+	public function closeBranchView(prevActiveView) {
 		canvasModel.openBranchingActivities.pop();
 		var parentBranching:CanvasActivity = (canvasModel.openBranchingActivities.length > 0) ? CanvasActivity(canvasModel.openBranchingActivities[canvasModel.openBranchingActivities.length-1]) : null;
+
+		if(prevActiveView != null) 
+			canvasModel.activeView = prevActiveView;
+		else
+			canvasModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.activity.branchView : canvasView;
 		
-		//var poppedActivity = monitorModel.getMonitor().ddm.getActivityByUIID(poppedActivityUIID);
-		
-		//if(canvasModel.activeView.activity.parentUIID != null)
-		//	parentBranching = CanvasActivity(canvasModel.activitiesDisplayed.get(_ddm.getActivityByUIID(canvasModel.activeView.activity.parentUIID).parentUIID));
-		
-		//Debugger.log("parentUIID: " + canvasModel.activeView.activity.parentUIID, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
-		
-		//Debugger.log("is parentBranching: " + parentBranching.activity.isBranchingActivity(), Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
-		//Debugger.log("parent branchView: " + parentBranching.activity.branchView, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
-		
-		canvasModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.activity.branchView : canvasView;
 		canvasModel.currentBranchingActivity = (parentBranching.activity.isBranchingActivity()) ? parentBranching : null;
 		
 		Debugger.log("activeView: " + canvasModel.activeView, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
@@ -573,7 +565,9 @@ class CanvasHelper {
 		
 		var target:MovieClip = (canvasModel.activeView instanceof CanvasBranchView) ? canvasModel.activeView.branchContent : _canvasView_mc.branchContent;
 		
-		var _branchView_mc:MovieClip = target.createChildAtDepth("canvasBranchView", target.getNextHighestDepth(), {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
+		Debugger.log("canvasModel.activeView: "+ canvasModel.activeView, Debugger.CRITICAL, "openBranchView", "CanvasHelper");
+		
+		var _branchView_mc:MovieClip = target.createChildAtDepth("canvasBranchView", target.getNextHighestDepth(), {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible, _prevActiveView: canvasModel.activeView});	
 		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
 		
 		branchView.init(canvasModel, undefined);

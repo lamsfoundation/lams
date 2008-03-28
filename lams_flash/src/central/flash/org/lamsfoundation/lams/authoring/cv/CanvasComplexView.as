@@ -349,4 +349,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 		return _complexActivity;
 	}
 	
+	public function get prevActiveView():MovieClip {
+		return _prevActiveView;
+	}
+	
 }

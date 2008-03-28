@@ -59,6 +59,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
     private var _canvasBranchView:CanvasBranchView;
 	private var _canvasBranchingActivity:CanvasActivity;
+	private var _prevActiveView;
 	
 	private var canvas_scp:ScrollPane;
 	
@@ -384,7 +385,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	public function localOnRelease():Void{
 		Debugger.log("close called", Debugger.CRITICAL, "localOnRelease", "CanvasBranchView");
 		
-		model.closeAllComplexViews();
+		model.closeAllComplexViews(this);
 		close();
 	}
 	
@@ -447,18 +448,21 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 		TransitionManager.start(this, {type:mx.transitions.Zoom, direction:1, duration:0.5, easing:mx.transitions.easing.Strong.easeIn});
 		
+		Debugger.log("_prevActiveView: "+ _prevActiveView, Debugger.CRITICAL, "close", "CanvasBranchView");
+		
 		if(model instanceof CanvasModel) {
-			model.getCanvas().closeBranchView();
+			model.getCanvas().closeBranchView(_prevActiveView);
 		} else {
 			model.getMonitor().getMV().getMonitorTabView().showAssets(true);
-			model.getMonitor().closeBranchView();
+			model.getMonitor().closeBranchView(_prevActiveView);
 		}
 		
 		Debugger.log("model.activeView :  " + model.activeView, Debugger.CRITICAL, "finishedClose", "CanvasBranchView");
 		
-		if(model instanceof CanvasModel) {
-			if(model.activeView instanceof CanvasBranchView) model.getCanvas().addBin(model.activeView.binLayer);
-			else model.getCanvas().addBin(model.activeView);
+		var targetView = findBinTargetView(_prevActiveView);
+		if(model instanceof CanvasModel && targetView != null) {
+			if(targetView instanceof CanvasBranchView) model.getCanvas().addBin(targetView.binLayer);
+			else model.getCanvas().addBin(targetView);
 		}
 		
 		model.broadcastViewUpdate("SIZE");
@@ -468,6 +472,14 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 		Debugger.log("closing branch view... : " + model.activeView.activity.activityUIID, Debugger.CRITICAL, "close", "CanvasBranchView");
 		
+	}
+	
+	private function findBinTargetView(targetView):MovieClip {
+		if(targetView instanceof CanvasComplexView) {
+			return findBinTargetView(targetView.prevActiveView);
+		} else {
+			return targetView;
+		}
 	}
 	
 	public function localOnReleaseOutside():Void{
@@ -988,5 +1000,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	public function set binLayer(a:MovieClip):Void {
 		_binLayer_mc = a;
+	}
+	
+	public function set prevActiveView(a:MovieClip):Void {
+		_prevActiveView = a;
 	}
 }

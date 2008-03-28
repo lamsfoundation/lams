@@ -1008,9 +1008,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		}
 	}
 	
-	public function closeAllComplexViews():Void {
-		while(activeView instanceof CanvasComplexView) {
-			CanvasComplexView(activeView).close();
+	public function closeAllComplexViews(stopTarget:MovieClip):Void {
+		var tempActiveView = activeView;
+		
+		while(tempActiveView != null) {
+			if(tempActiveView instanceof CanvasComplexView)
+				CanvasComplexView(tempActiveView).close();
+			
+			if(tempActiveView == stopTarget) return;
+			tempActiveView = tempActiveView._prevActiveView;
 		}
 	}
 
