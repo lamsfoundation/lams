@@ -65,6 +65,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO
 	private final static String LESSONS_WITH_ORIGINAL_LEARNING_DESIGN = "select l from "
 		+ Lesson.class.getName() + " l "
 		+ "where l.learningDesign.originalLearningDesign.learningDesignId = ? "
+		+ "and l.learningDesign.copyTypeID != " + LearningDesign.COPY_TYPE_PREVIEW + " "
 		+ "and l.lessonStateId = " + Lesson.STARTED_STATE
 		+ " order by l.lessonName";
 
