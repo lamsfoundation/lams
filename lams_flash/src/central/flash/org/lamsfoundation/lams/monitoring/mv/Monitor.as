@@ -485,7 +485,7 @@ class Monitor {
 		var isVisible:Boolean = (visible == null) ? true : visible;
 		
 		var target:MovieClip = monitorModel.activeView.branchContent;
-		var _branchView_mc:MovieClip = target.createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible});	
+		var _branchView_mc:MovieClip = target.createChildAtDepth("canvasBranchView", DepthManager.kTop, {_x: cx, _y: cy, _canvasBranchingActivity:ba, _open:isVisible, _prevActiveView: monitorModel.activeView});	
 		var branchView:CanvasBranchView = CanvasBranchView(_branchView_mc);
 		
 		branchView.init(monitorModel, monitorView.getController());
@@ -504,14 +504,18 @@ class Monitor {
 		monitorModel.openBranchingActivities.push(ba.activity.activityUIID);
 	}
 	
-	public function closeBranchView() {
+	public function closeBranchView(prevActiveView) {
 		var parentBranching:CanvasActivity = null;
 		var isCBV:Boolean = false;
 		
 		if(monitorModel.activeView.activity.parentUIID != null) 
 			parentBranching = CanvasActivity(monitorModel.activitiesDisplayed.get(_ddm.getActivityByUIID(monitorModel.activeView.activity.parentUIID).parentUIID));
 
-		monitorModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.activity.branchView : monitorView.getMonitorTabView();
+		if(prevActiveView != null)
+			monitorModel.activeView = prevActiveView;
+		else
+			monitorModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.activity.branchView : monitorView.getMonitorTabView();
+		
 		monitorModel.currentBranchingActivity = (parentBranching.activity.isBranchingActivity()) ? parentBranching : null;
 		
 		var poppedActivityUIID:Number = monitorModel.openBranchingActivities.pop();

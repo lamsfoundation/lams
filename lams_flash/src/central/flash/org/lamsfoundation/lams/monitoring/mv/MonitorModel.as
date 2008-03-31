@@ -1080,6 +1080,7 @@ class MonitorModel extends Observable{
 		Debugger.log("visible: " + visible, Debugger.CRITICAL, "openBranchActivityContent", "MonitorModel");
 		
 		if(ba.activity.branchView != null) {
+			ba.activity.branchView.prevActiveView = activeView;
 			activeView = (visible) ? ba.activity.branchView : activeView;
 			ba.activity.branchView.setOpen(visible);
 			ba.activity.branchView.open();
