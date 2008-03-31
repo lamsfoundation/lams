@@ -521,9 +521,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 			//chose the background mc
 			if(_activity.groupingUIID != null && _activity.groupingUIID > 0){
+				if(_sequenceChild)  {
+					fade_mc._height = 37;
+					act_pnl._height = 37.5;
+				}
 				canvasActivityGrouped_mc._visible = true;
+				
 				canvasActivity_mc._visible = false;
 			}else{
+				if(_sequenceChild) {
+					fade_mc._height = 40;
+					act_pnl._height = 40.5;
+				}
+				
 				canvasActivity_mc._visible = true;
 				canvasActivityGrouped_mc._visible = false;
 			}
@@ -538,7 +548,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			clickTarget_mc._width = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_WIDTH : TOOL_ACTIVITY_WIDTH;
 			clickTarget_mc._height = (_sequenceChild) ? CanvasActivity.TOOL_MIN_ACTIVITY_HEIGHT : TOOL_ACTIVITY_HEIGHT;
 			
-			if(activity.isBranchingActivity()) {
+			if(activity.isBranchingActivity() && !_sequenceChild && showDiagram) {
 				clickTarget_mc._width = TOOL_BRANCHING_WIDTH;
 				clickTarget_mc._height = TOOL_BRANCHING_HEIGHT;
 			}
