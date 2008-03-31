@@ -307,36 +307,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		
 	}
 	
-	/**
-	 * Removes the activity from the Canvas Model
-	 * @usage   
-	 * @param   activityUIID 
-	 * @return  
-	 */
-	 
-	 /**
-	*Called by the view when a template activity icon is dropped
-	*/
-	public function removeOptionalCA(ca:Object, parentID){
-		//lets do a test to see if we got the canvas
-		Debugger.log('Removed Child '+ca.activity.activityUIID+ 'from : '+ca.activity.parentUIID,Debugger.GEN,'removeOptionalCA','CanvasModel');
-		haltRefresh(true);
-		
-		ca.activity.parentUIID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityUIID : null;
-		ca.activity.orderID = null;
-		ca.activity.parentActivityID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityID : null;
-		
-		if(ca.activity.isBranchingActivity())
-			ca.activity.clear = true;
-		
-		removeActivity(ca.activity.activityUIID);
-		removeActivity(parentID);
-		
-		haltRefresh(false);
-		setDirty();
-		
-	}
-	
 	public function removeOptionalSequenceCA(ca:Object, parentID){
 		haltRefresh(true);
 
@@ -345,6 +315,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		ca.activity.parentUIID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityUIID : null;
 		ca.activity.orderID = null;
 		ca.activity.parentActivityID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityID : null;
+		
+		if(ca.activity.isBranchingActivity())
+			ca.activity.clear = true;
 		
 		if(!(activeView instanceof CanvasComplexView)) removeActivity(parentID);
 		
@@ -1127,18 +1100,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		
 		if(BranchingActivity(ba.activity).clear) {
 			clearBranchingActivity(ba);
-		}
-		
-		if(ba.activity.branchView != null) {
+			MovieClipUtils.doLater(Proxy.create(_cv, _cv.openBranchView, currentBranchingActivity, visible));
+		} else if(ba.activity.branchView != null) {
 			ba.activity.branchView.prevActiveView = activeView;
 			activeView = (visible) ? ba.activity.branchView : activeView;
 			ba.activity.branchView.setOpen(visible);
 			ba.activity.branchView.open();
 			
 			openBranchingActivities.push(ba);
-		} else { _cv.openBranchView(currentBranchingActivity, visible); }
+		} else { 
+			_cv.openBranchView(currentBranchingActivity, visible); }
 		
-		_lastBranchActionType = null;
+			_lastBranchActionType = null;
 	}
 
 }

@@ -932,6 +932,37 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		}
 	}
 	
+		
+	/**
+	 * Removes the activity from the Canvas Model
+	 * @usage   
+	 * @param   activityUIID 
+	 * @return  
+	 */
+	 
+	/**
+	*Called by the view when a template activity icon is dropped
+	*/
+	public function removeOptionalCA(ca:Object, parentID){
+		//lets do a test to see if we got the canvas
+		Debugger.log('Removed Child '+ca.activity.activityUIID+ 'from : '+ca.activity.parentUIID,Debugger.GEN,'removeOptionalCA','CanvasModel');
+		haltRefresh(true);
+		
+		ca.activity.parentUIID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityUIID : null;
+		ca.activity.orderID = null;
+		ca.activity.parentActivityID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityID : null;
+		
+		if(ca.activity.isBranchingActivity())
+			ca.activity.clear = true;
+		
+		removeActivity(ca.activity.activityUIID);
+		removeActivity(parentID);
+		
+		haltRefresh(false);
+		setDirty();
+		
+	}
+	
 	public function removeActivityOnBin(activityUIID):Object{
 		//dispatch an event to show the design  has changed
 				
