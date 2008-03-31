@@ -23,26 +23,25 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.taskList.service;
 
+/**
+ * @author Andrey Balan
+ */
 public class TaskListApplicationException extends Exception{
 
 	public TaskListApplicationException() {
 		super();
-		
 	}
 
 	public TaskListApplicationException(String message, Throwable cause) {
 		super(message, cause);
-		
 	}
 
 	public TaskListApplicationException(String message) {
 		super(message);
-		
 	}
 
 	public TaskListApplicationException(Throwable cause) {
 		super(cause);
-		
 	}
 
 }

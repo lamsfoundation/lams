@@ -24,16 +24,13 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.tool.taskList.util;
 
-
-
-
 /**
  * Contains helper methods used by the Action Servlets
  * 
  * @author Anthony Sukkar
- *
  */
 public class TaskListWebUtils {
 
 // We leave this blank for future use
+	
 }

@@ -37,30 +37,27 @@ public class TaskListToolContentHandler extends ToolContentHandler {
     //sharedtaskList
     private static char[] repositoryId = {'l','a','m','s','-','s','h','a','r','e','d','r','e','s','o','u','r','c','e','s'};
 
-    /**
-     * 
-     */
     public TaskListToolContentHandler() {
         super();
     }
 
-    /* (non-Javadoc)
-     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
-     */
+	/**
+	 * {@inheritDoc}
+	 */
     public String getRepositoryWorkspaceName() {
         return repositoryWorkspaceName;
     }
 
-    /* (non-Javadoc)
-     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
-     */
+	/**
+	 * {@inheritDoc}
+	 */
     public String getRepositoryUser() {
         return repositoryUser;
     }
 
-    /* (non-Javadoc)
-     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
-     */
+	/**
+	 * {@inheritDoc}
+	 */
     public char[] getRepositoryId() {
         return repositoryId;
     }

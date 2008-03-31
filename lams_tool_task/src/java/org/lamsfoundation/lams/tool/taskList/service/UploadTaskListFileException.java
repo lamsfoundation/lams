@@ -23,26 +23,27 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.taskList.service;
 
+/**
+ * Exception that is thrown during TaskListFile uploading.
+ * 
+ * @author Administrator
+ */
 public class UploadTaskListFileException extends Exception{
 
 	public UploadTaskListFileException() {
 		super();
-		
 	}
 
 	public UploadTaskListFileException(String message, Throwable cause) {
 		super(message, cause);
-		
 	}
 
 	public UploadTaskListFileException(String message) {
 		super(message);
-		
 	}
 
 	public UploadTaskListFileException(Throwable cause) {
 		super(cause);
-		
 	}
 
 }

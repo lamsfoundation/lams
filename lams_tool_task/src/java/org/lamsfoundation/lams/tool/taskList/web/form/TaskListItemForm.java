@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.taskList.web.form;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
 /**
  *  TaskList Item  Form.
  *	@struts.form name="taskListItemForm"

@@ -26,7 +26,6 @@
 package org.lamsfoundation.lams.tool.taskList.web.servlet;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,9 +37,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
-import org.lamsfoundation.lams.tool.taskList.dto.AttachmentDTO;
-import org.lamsfoundation.lams.tool.taskList.dto.ExportDTO;
+import org.lamsfoundation.lams.tool.taskList.dto.TaskSummary;
+import org.lamsfoundation.lams.tool.taskList.dto.TaskSummaryItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
@@ -59,6 +59,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * package.
  * 
  * @author Steve.Ni
+ * @author Andrey Balan
  * 
  * @version $Revision$
  */
@@ -71,9 +72,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	private TaskListToolContentHandler handler;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
 
-//		initial sessionMap
+		//initial sessionMap
 		SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		
@@ -97,6 +101,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		return FILENAME;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
         if (toolContentID == null && toolSessionID == null) {
             logger.error("Tool content Id or and session Id are null. Unable to activity title");
@@ -117,7 +124,17 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
         return super.doOfflineExport(request, response, directoryName, cookies);
 	}
 
-	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
+	/**
+	 * Internal method to make an export for specified learner.
+	 * 
+	 * @param request
+	 * @param response
+	 * @param directoryName
+	 * @param cookies
+	 * @param sessionMap
+	 * @throws TaskListApplicationException
+	 */
+	private void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
 			throws TaskListApplicationException {
 
 		ITaskListService service = TaskListServiceProxy.getTaskListService(getServletContext());
@@ -144,19 +161,25 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new TaskListApplicationException(error);
 		}
 		
+		List<TaskSummary> taskSummaries = service.exportForLearner(toolSessionID, learner);
 		
-		List<ExportDTO> group = service.exportBySessionId(toolSessionID, learner.getLoginName());
-
-		saveFileToLocal(group, directoryName);
+		saveFileToLocal(taskSummaries, directoryName);
 		
-		List<List> groupList = new ArrayList<List>();
-		if(group.size() > 0)
-			groupList.add(group);
 		sessionMap.put(TaskListConstants.ATTR_TITLE, content.getTitle());
-		sessionMap.put(TaskListConstants.ATTR_EXPORT_DTO_LIST, groupList);
+		sessionMap.put(TaskListConstants.ATTR_TASK_SUMMARY_LIST, taskSummaries);
 	}
 
-	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
+	/**
+	 * Internal method to make an export for the whole TaskList.
+	 * 
+	 * @param request
+	 * @param response
+	 * @param directoryName
+	 * @param cookies
+	 * @param sessionMap
+	 * @throws TaskListApplicationException
+	 */
+	private void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
 			throws TaskListApplicationException {
 		ITaskListService service = TaskListServiceProxy.getTaskListService(getServletContext());
 
@@ -174,43 +197,59 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new TaskListApplicationException(error);
 		}
-		List<List<ExportDTO>> groupList = service.exportByContentId(toolContentID);
-
-		if(groupList != null)
-			for (List<ExportDTO> list : groupList) {
-				saveFileToLocal(list, directoryName);
-			}
+		
+		List<TaskSummary> taskSummaries = service.exportForTeacher(toolContentID);
+		
+		saveFileToLocal(taskSummaries, directoryName);
+		
 		// put it into HTTPSession
 		sessionMap.put(TaskListConstants.ATTR_TITLE, content.getTitle());
-		sessionMap.put(TaskListConstants.ATTR_EXPORT_DTO_LIST, groupList);
+		sessionMap.put(TaskListConstants.ATTR_TASK_SUMMARY_LIST, taskSummaries);
 	}
 
-    private void saveFileToLocal(List<ExportDTO> exportDTOs, String directoryName) {
+    /**
+     * Create download links for every attachment. 
+     * 
+     * @param taskSummaries
+     * @param directoryName
+     */
+    private void saveFileToLocal(List<TaskSummary> taskSummaries, String directoryName) {
     	handler = getToolContentHandler();
-		for (ExportDTO exportDTO : exportDTOs) {
-			for (AttachmentDTO attachment : exportDTO.getAttachmentDTOs()) {
-				try{
-					int idx= 1;
-					String userName = attachment.getCreatedBy();
-					String localDir;
-					while(true){
-						localDir = FileUtil.getFullPath(directoryName,userName + "/" + idx);
-						File local = new File(localDir);
-						if(!local.exists()){
-							local.mkdirs();
-							break;
+    	
+    	//save all the attachments
+		for (TaskSummary taskSummary : taskSummaries) {
+			for (TaskSummaryItem taskSummaryItem : taskSummary.getTaskSummaryItems()) {
+				for (TaskListItemAttachment attachment : taskSummaryItem.getAttachments()) {
+					try{
+						int idx= 1;
+						String userName = attachment.getCreateBy().getLoginName();
+						String localDir;
+						while(true){
+							localDir = FileUtil.getFullPath(directoryName,userName + "/" + idx);
+							File local = new File(localDir);
+							if(!local.exists()){
+								local.mkdirs();
+								break;
+							}
+							idx++;
 						}
-						idx++;
+						attachment.setAttachmentLocalUrl(userName + "/" + idx + "/" + attachment.getFileUuid() + '.' + FileUtil.getFileExtension(attachment.getFileName()));
+						handler.saveFile(attachment.getFileUuid(), FileUtil.getFullPath(directoryName, attachment.getAttachmentLocalUrl()));
+					} catch (Exception e) {
+						logger.error("Export forum topic attachment failed: " + e.toString());
 					}
-					attachment.setAttachmentLocalUrl(userName + "/" + idx + "/" + attachment.getFileUuid() + '.' + FileUtil.getFileExtension(attachment.getFileName()));
-					handler.saveFile(attachment.getFileUuid(), FileUtil.getFullPath(directoryName, attachment.getAttachmentLocalUrl()));
-				} catch (Exception e) {
-					logger.error("Export forum topic attachment failed: " + e.toString());
 				}
 			}
 		}
+
+//    	//save two pictures describing either the taskLisiItem is done or not
+//		handler.saveFile(attachment.getFileUuid(), FileUtil.getFullPath(directoryName, "images/completeitem.gif"));
+//		handler.saveFile(attachment.getFileUuid(), FileUtil.getFullPath(directoryName, "images/incompleteitem.gif"));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	private TaskListToolContentHandler getToolContentHandler() {
   	    if ( handler == null ) {
     	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());

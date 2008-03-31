@@ -23,20 +23,14 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.taskList.model;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.taskList.util.TaskListToolContentHandler;
 
 /**
  * TaskList
@@ -71,7 +65,7 @@ public class TaskListItem  implements Cloneable{
 	private String parentTaskName;
 	
 	//Set of uploaded files
-	private Set uploadedFileList;
+	private Set attachments;
 	//Set of user comments
 	private Set comments;
 	
@@ -83,7 +77,7 @@ public class TaskListItem  implements Cloneable{
 	 *
 	 */
   	public TaskListItem(){
-  		uploadedFileList = new HashSet();
+  		attachments = new HashSet();
   		comments = new HashSet();
   	}
   	
@@ -98,8 +92,8 @@ public class TaskListItem  implements Cloneable{
   			taskListItem.setUid(null);
 
   			//clone set of taskListItemsAttachment
-  			if(uploadedFileList != null){
-  				Iterator iter = uploadedFileList.iterator();
+  			if(attachments != null){
+  				Iterator iter = attachments.iterator();
   				Set set = new HashSet();
   				while(iter.hasNext()){
   					TaskListItemAttachment file = (TaskListItemAttachment)iter.next(); 
@@ -107,7 +101,7 @@ public class TaskListItem  implements Cloneable{
   					//just clone old file without duplicate it in repository
 					set.add(newFile);
   				}
-  				taskListItem.uploadedFileList = set;
+  				taskListItem.attachments = set;
   			}
   			
   			//clone set of taskListItemsComment
@@ -339,11 +333,11 @@ public class TaskListItem  implements Cloneable{
 	 *
 	 * @return a set of Attachments to this TaskListItem.
 	 */
-	public Set getUploadedFileList() {
-		return uploadedFileList;
+	public Set getAttachments() {
+		return attachments;
 	}
-	public void setUploadedFileList(Set uploadedFileList) {
-		this.uploadedFileList = uploadedFileList;
+	public void setAttachments(Set attachments) {
+		this.attachments = attachments;
 	}
 	
 	/**

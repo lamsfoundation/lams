@@ -28,9 +28,9 @@ import java.util.Comparator;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
  
 /**
+ * Comparator for <code>TaskListItemAttachment</code>.
  * 
  * @author Andrey Balan
- * 
  */
 public class TaskListItemAttachmentComparator  implements Comparator<TaskListItemAttachment> {
 	

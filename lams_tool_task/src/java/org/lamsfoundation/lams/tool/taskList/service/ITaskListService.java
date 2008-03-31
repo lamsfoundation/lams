@@ -30,7 +30,6 @@ import java.util.SortedSet;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.taskList.dto.ExportDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskSummary;
@@ -42,22 +41,25 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 
 /**
- * @author Dapeng.Ni
+ * Interface that defines the contract that all TaskLisk service providers must follow.
  * 
- * Interface that defines the contract that all ShareTaskLisk2 service provider must follow.
+ * @author Dapeng.Ni
+ * @author Andrey Balan
  */
 public interface ITaskListService 
 {
-	
 	/**
 	 * Get <code>TaskList</code> by toolContentID.
+	 * 
 	 * @param contentId
 	 * @return
 	 */
 	TaskList getTaskListByContentId(Long contentId);
+	
 	/**
 	 * Get a cloned copy of  tool default tool content (TaskList) and assign the toolContentId of that copy as the 
 	 * given <code>contentId</code> 
+	 * 
 	 * @param contentId
 	 * @return
 	 * @throws TaskListApplicationException
@@ -66,12 +68,15 @@ public interface ITaskListService
 	
 	/**
 	 * Get list of taskList items by given taskListUid. These taskList items must be created by author.
+	 * 
 	 * @param taskListUid
 	 * @return
 	 */
 	List getAuthoredItems(Long taskListUid);
+	
 	/**
 	 * Upload instruciton file into repository.
+	 * 
 	 * @param file
 	 * @param type
 	 * @return
@@ -96,8 +101,10 @@ public interface ITaskListService
 	 * Create a new user in database.
 	 */
 	void createUser(TaskListUser taskListUser);
+	
 	/**
 	 * Get user by given userID and toolContentID.
+	 * 
 	 * @param long1
 	 * @return
 	 */
@@ -105,24 +112,47 @@ public interface ITaskListService
 
 	/**
 	 * Get user by sessionID and UserID
+	 * 
 	 * @param long1
 	 * @param sessionId
 	 * @return
 	 */
 	TaskListUser getUserByIDAndSession(Long long1, Long sessionId); 
+	
+	/**
+	 * Get user list by sessionId and itemUid
+	 * 
+	 * @param sessionId
+	 * @param uid
+	 * @return
+	 */
+	List<TaskListUser> getUserListBySessionItem(Long sessionId, Long itemUid);
 
+	/**
+	 * Get user by UID
+	 * 
+	 * @param uid
+	 * @return
+	 */
+	TaskListUser getUser(Long uid);
 
 	//********** Repository methods ***********************
 	/**
-	 * Delete file from repository.
+	 * Delete file from the repository.
+	 * 
+	 * @param fileUuid
+	 * @param fileVersionId
+	 * @throws TaskListApplicationException
 	 */
 	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws TaskListApplicationException ;
 
 	/**
 	 * Save or update taskList into database.
+	 * 
 	 * @param TaskList
 	 */
 	void saveOrUpdateTaskList(TaskList TaskList);
+	
 	/**
 	 * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not
 	 * delete the file from repository.
@@ -130,26 +160,76 @@ public interface ITaskListService
 	 * @param attachmentUid
 	 */
 	void deleteTaskListAttachment(Long attachmentUid);
+	
 	/**
 	 * Delete resoruce item from database.
+	 * 
 	 * @param uid
 	 */
 	void deleteTaskListItem(Long uid);
 	
 	/**
-	 * Return all reource items within the given toolSessionID.
+	 * Return all resource items within the given toolSessionID.
+	 * 
 	 * @param sessionId
 	 * @return
 	 */
 	List<TaskListItem> getTaskListItemsBySessionId(Long sessionId);
+	
 	/**
 	 * Get taskList which is relative with the special toolSession.
+	 * 
 	 * @param sessionId
 	 * @return
 	 */
 	TaskList getTaskListBySessionId(Long sessionId);
+	
+	/**
+	 * Get taskList with the specified itemUid.
+	 * 
+	 * @param itemUid
+	 * @return
+	 */
+	TaskListItem getTaskListItemByUid(Long itemUid);
+	
+	/**
+	 * Save/update current TaskListItem.
+	 * 
+	 * @param item current TaskListItem
+	 * @return
+	 */
+	public void saveOrUpdateTaskListItem(TaskListItem item);
+	
+	/**
+	 * Fill in taskListItemList's complete flags.
+	 * 
+	 * @param taskListItemList
+	 * @param user
+	 */
+	void retrieveComplete(SortedSet<TaskListItem> taskListItemList, TaskListUser user);
+	
+	/**
+	 * Mark taskListItem as completed.
+	 * 
+	 * @param taskListItemUid
+	 * @param userId
+	 * @param sessionId
+	 */
+	void setItemComplete(Long taskListItemUid, Long userId , Long sessionId);
+	
+	
+	/**
+	 * Creates a new TaskListItemVisitLog describing access to specifeid taskListItem.
+	 * 
+	 * @param taskListItemUid Uid of the specified taskListItem
+	 * @param userId Id of a user who accessed this taskListItem
+	 * @param sessionId id of a session during which it occured
+	 */
+	void setItemAccess(Long taskListItemUid, Long userId, Long sessionId);
+	
 	/**
 	 * Get taskList toolSession by toolSessionId
+	 * 
 	 * @param sessionId
 	 * @return
 	 */
@@ -157,60 +237,23 @@ public interface ITaskListService
 
 	/**
 	 * Save or update taskList session.
+	 * 
 	 * @param resSession
 	 */
 	void saveOrUpdateTaskListSession(TaskListSession resSession);
 	
-	void retrieveComplete(SortedSet<TaskListItem> taskListItemList, TaskListUser user);
-	void setItemComplete(Long taskListItemUid, Long userId , Long sessionId);
-	void setItemAccess(Long taskListItemUid, Long userId, Long sessionId);
-//	/**
-//	 * the reqired number minus the count of view of the given user.
-//	 * @param userUid
-//	 * @return
-//	 */
-//	int checkMiniView(Long toolSessionId, Long userId);
 	/**
 	 * If success return next activity's url, otherwise return null.
+	 * 
 	 * @param toolSessionId
 	 * @param userId
 	 * @return
 	 */
 	String finishToolSession(Long toolSessionId, Long userId)  throws TaskListApplicationException;
 
-	TaskListItem getTaskListItemByUid(Long itemUid);
-
-	/**
-	 * Return monitoring summary for the specified TaskList. 
-	 * @param contentId specified TaskList uid
-	 * @return
-	 */
-	Summary getSummary(Long contentId);
-	
-	/**
-	 * Return monitoring task summary for the specified TaskListItem.
-	 * 
-	 * @param contentId toolContenId
-	 * @param taskListItemUid specified TaskListItem uid
-	 * @return
-	 */
-	TaskSummary getTaskSummary(Long contentId, Long taskListItemUid);
-
-	List<TaskListUser> getUserListBySessionItem(Long sessionId, Long itemUid);
-
-	/**
-	 * Get taskList item <code>Summary</code> list according to sessionId, and userLogin.
-	 *  
-	 * @param sessionId
-	 * @param userLogin login of the user which portfolio is being exported
-	 *
-	 * @return
-	 */
-	public List<ExportDTO> exportBySessionId(Long sessionId, String userLogin);
-	public List<List<ExportDTO>> exportByContentId(Long contentId);
-
 	/**
 	 * Create refection entry into notebook tool.
+	 * 
 	 * @param sessionId
 	 * @param notebook_tool
 	 * @param tool_signature
@@ -218,8 +261,10 @@ public interface ITaskListService
 	 * @param entryText
 	 */
 	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText);
+	
 	/**
 	 * Get reflection entry from notebook tool.
+	 * 
 	 * @param sessionId
 	 * @param idType
 	 * @param signature
@@ -235,19 +280,49 @@ public interface ITaskListService
 	
 	/**
 	 * Get Reflect DTO list grouped by sessionID.
+	 * 
 	 * @param contentId
 	 * @return
 	 */
 	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId);
 
+
+	//********** Export methods ***********************
+	
 	/**
-	 * Get user by UID
-	 * @param uid
+	 * Make an export for the specified learner.
+	 *  
+	 * @param sessionId
+	 * @param learner user which portfolio is being exported
+	 *
 	 * @return
 	 */
-	TaskListUser getUser(Long uid);
+	public List<TaskSummary> exportForLearner(Long contentUid, TaskListUser learner);
 	
-	public void saveOrUpdateTaskListItem(TaskListItem item);
-//	Summary getSummary(Long contentId, String null1);
+	/**
+	 * Make an export for the whole TaskList.
+	 * 
+	 * @param contentUid
+	 * @return
+	 */
+	public List<TaskSummary> exportForTeacher(Long contentUid);
+	
+	/**
+	 * Return summary for the specified TaskList. Used in monitoring.
+	 * 
+	 * @param contentId specified TaskList uid
+	 * @return
+	 */
+	Summary getSummary(Long contentId);
+	
+	/**
+	 * Return task summary for the specified TaskListItem. Used in monitoring.
+	 * 
+	 * @param contentId toolContenId
+	 * @param taskListItemUid specified TaskListItem uid
+	 * @return
+	 */
+	TaskSummary getTaskSummary(Long contentId, Long taskListItemUid);
+
 }
 

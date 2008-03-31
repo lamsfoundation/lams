@@ -51,6 +51,9 @@ public class TaskListItemAttachment implements Cloneable{
     private Date created;
     private TaskListUser createBy;
     
+	//*************** NON Persist Field (only for exporting) ********************
+    private String attachmentLocalUrl;
+    
     //  **********************************************************
   	//		Function method for TaskListItemAttachment
     //  **********************************************************
@@ -144,7 +147,6 @@ public class TaskListItemAttachment implements Cloneable{
         this.fileName = name;
     }
 
-
 	/**
 	 * @hibernate.property column="file_uuid"
 	 * @return
@@ -181,4 +183,11 @@ public class TaskListItemAttachment implements Cloneable{
 	public void setCreateBy(TaskListUser createBy) {
 		this.createBy = createBy;
 	}
+	
+    public String getAttachmentLocalUrl() {
+        return attachmentLocalUrl;
+    }
+    public void setAttachmentLocalUrl(String attachmentLocalUrl) {
+        this.attachmentLocalUrl = attachmentLocalUrl;
+    }
 }

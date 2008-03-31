@@ -152,7 +152,7 @@ public class ViewItemAction extends Action {
 		
 		//init taskList item list
 		SortedSet<TaskListItemAttachment> attachmentList = getAttachmentList(sessionMap);
-		Set<TaskListItemAttachment> dbAttachments = item.getUploadedFileList();
+		Set<TaskListItemAttachment> dbAttachments = item.getAttachments();
 		attachmentList.clear();
 		if(dbAttachments != null){
 			for(TaskListItemAttachment comment : dbAttachments){
@@ -250,10 +250,10 @@ public class ViewItemAction extends Action {
 		//finally persist taskListPO again
 		TaskListItem httpSessionItem = (TaskListItem) sessionMap.get(TaskListConstants.ATTR_TASK_LIST_ITEM);
 		TaskListItem dbItem = service.getTaskListItemByUid(httpSessionItem.getUid());
-		Set<TaskListItemAttachment> dbAttachments = dbItem.getUploadedFileList();
+		Set<TaskListItemAttachment> dbAttachments = dbItem.getAttachments();
 		if(dbAttachments == null){
 			dbAttachments = new HashSet<TaskListItemAttachment>();
-			dbItem.setUploadedFileList(dbAttachments);
+			dbItem.setAttachments(dbAttachments);
 		}
 		dbAttachments.add(att);
 		service.saveOrUpdateTaskListItem(dbItem);

@@ -80,9 +80,16 @@ public class TaskSummaryItem {
 	public List<TaskListItemComment> getComments() {
 		return comments;
 	}
+	public void setComments(List<TaskListItemComment> comments) {
+		this.comments = comments;
+	}
+	
 	public List<TaskListItemAttachment> getAttachments() {
 		return attachments;
 	}
-
+	public void setAttachments(List<TaskListItemAttachment> attachments) {
+		this.attachments = attachments;
+	}
+	
 }
  

@@ -38,10 +38,15 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListToolContentHandler;
 
 /**
- * TaskList
+ * The main entity class of TaskList tool. Contains all the data related to the whole tool.
+ * 
  * @author Dapeng Ni
+ * @author Andrey Balan
  *
  * @hibernate.class  table="tl_latask10_taskList"
+ */
+/**
+ * @author Administrator
  *
  */
 public class TaskList implements Cloneable{
@@ -88,7 +93,6 @@ public class TaskList implements Cloneable{
 	
 	/**
 	 * Default contruction method. 
-	 *
 	 */
   	public TaskList(){
   		attachments = new HashSet();
@@ -98,6 +102,7 @@ public class TaskList implements Cloneable{
   	//  **********************************************************
   	//		Function method for TaskList
   	//  **********************************************************
+  	
 	public static TaskList newInstance(TaskList defaultContent, Long contentId, TaskListToolContentHandler taskListToolContentHandler) {
 		TaskList toContent = new TaskList();
 		defaultContent.toolContentHandler = taskListToolContentHandler;
@@ -114,6 +119,7 @@ public class TaskList implements Cloneable{
 		}
 		return toContent;
 	}
+	
   	public Object clone(){
   		
   		TaskList taskList = null;
@@ -155,6 +161,7 @@ public class TaskList implements Cloneable{
   		
   		return taskList;
   	}
+  	
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;
@@ -195,6 +202,9 @@ public class TaskList implements Cloneable{
 		this.setUpdated(new Date(now));
 	}
 
+	/**
+	 * Method to support exporting.
+	 */
 	public void toDTO(){
 		onlineFileList = new ArrayList<TaskListAttachment>();
 		offlineFileList = new ArrayList<TaskListAttachment>();
@@ -208,9 +218,11 @@ public class TaskList implements Cloneable{
 			}
 		}
 	}
+	
 	//**********************************************************
-	// get/set methods
+	// Get/set methods
 	//**********************************************************
+	
 	/**
 	 * Returns the object's creation date
 	 *
@@ -250,7 +262,9 @@ public class TaskList implements Cloneable{
 	}
 
     /**
-     * @return Returns the userid of the user who created the Share taskList.
+     * Returns id of a user created the taskList.
+     * 
+     * @return id of a user
      *
      * @hibernate.many-to-one
      *      cascade="save-update"
@@ -262,25 +276,38 @@ public class TaskList implements Cloneable{
     }
 
     /**
-     * @param createdBy The userid of the user who created this Share taskList.
+     * Sets id of a user created the taskList.
+     * 
+     * @param createdBy id of a user
      */
     public void setCreatedBy(TaskListUser createdBy) {
         this.createdBy = createdBy;
     }
 
-    /**
-     * @hibernate.id column="uid" generator-class="native"
-     */
+	/**
+	 * Returns <code>TaskList</code> id.
+	 * 
+	 * @return tasklist id
+	 * 
+	 * @hibernate.id column="uid" generator-class="native"
+	 */
 	public Long getUid() {
 		return uid;
 	}
 
+	/**
+	 * Sets <code>TaskList</code> id.
+	 * 
+	 * @param uid tasklist id
+	 */
 	public void setUid(Long uid) {
 		this.uid = uid;
 	}
 
 	/**
-	 * @return Returns the title.
+	 * Returns the tasklist title.
+	 * 
+	 * @return tasklist title.
 	 *
 	 * @hibernate.property
 	 * 		column="title"
@@ -291,34 +318,39 @@ public class TaskList implements Cloneable{
 	}
 
 	/**
-	 * @param title The title to set.
+	 * Sets the tasklist title
+	 * 
+	 * @param title tasklist title
 	 */
 	public void setTitle(String title) {
 		this.title = title;
 	}
 
 	/**
-	 * @return Returns the runOffline.
+	 *  Returns either the tasklist should run offline.
+	 * 
+	 * @return runOffline flag
 	 *
 	 * @hibernate.property 
 	 * 		column="run_offline"
-	 *
 	 */
 	public boolean getRunOffline() {
 		return runOffline;
 	}
     
 	/**
+	 * Sets if the tasklist should run offline.
+	 * 
 	 * @param runOffline The forceOffLine to set.
-	 *
-	 *
 	 */
 	public void setRunOffline(boolean forceOffline) {
 		this.runOffline = forceOffline;
 	}
 
     /**
-     * @return Returns the instructions set by the teacher.
+     * Returns tasklist instructions set by teacher.
+     * 
+     * @return tasklist instructions set by teacher
      *
      * @hibernate.property
      * 		column="instructions"
@@ -328,12 +360,19 @@ public class TaskList implements Cloneable{
         return instructions;
     }
 
+    /**
+     * Sets tasklist instructions. Usually done by teacher.
+     * 
+     * @param instructions tasklist instructions
+     */
     public void setInstructions(String instructions) {
         this.instructions = instructions;
     }
 
     /**
-     * @return Returns the onlineInstructions set by the teacher.
+     * Returns tasklist onlineInstructions set by teacher.
+     * 
+     * @return tasklist onlineInstructions set by teacher
      *
      * @hibernate.property
      * 		column="online_instructions"
@@ -343,12 +382,19 @@ public class TaskList implements Cloneable{
         return onlineInstructions;
     }
 
+    /**
+     * Sets tasklist instructions. Usually done by teacher.
+     * 
+     * @param onlineInstructions tasklist onlineInstructions
+     */
     public void setOnlineInstructions(String onlineInstructions) {
         this.onlineInstructions = onlineInstructions;
     }
 
     /**
-     * @return Returns the onlineInstructions set by the teacher.
+     * Returns tasklist offlineInstructions set by teacher.
+     * 
+     * @return tasklist offlineInstructions set by teacher
      *
      * @hibernate.property
      * 		column="offline_instructions"
@@ -358,11 +404,19 @@ public class TaskList implements Cloneable{
         return offlineInstructions;
     }
 
+    /**
+     * Sets tasklist offlineInstructions. Usually done by teacher.
+     * 
+     * @param instructions tasklist offlineInstructions
+     */
     public void setOfflineInstructions(String offlineInstructions) {
         this.offlineInstructions = offlineInstructions;
     }
 
 	/**
+	 * Returns a set of Attachments belong to this tasklist.
+     *
+     * @return a set of Attachments belong to this tasklist.
      *
      * @hibernate.set   lazy="true"
      * 					cascade="all"
@@ -371,22 +425,24 @@ public class TaskList implements Cloneable{
      * @hibernate.collection-key column="taskList_uid"
      * @hibernate.collection-one-to-many
      * 			class="org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment"
-     *
-     * @return a set of Attachments to this Message.
      */
 	public Set getAttachments() {
 		return attachments;
 	}
 
-    /*
-	 * @param attachments The attachments to set.
+    /**
+     * Sets a set of Attachments belong to this tasklist
+     * 
+     * @param attachments The attachments to set
      */
     public void setAttachments(Set attachments) {
 		this.attachments = attachments;
 	}
 
 	/**
+	 * Return set of TaskListItems
 	 * 
+	 * @return set of TaskListItems
 	 * 
 	 * @hibernate.set lazy="true"
 	 *                inverse="false"
@@ -394,97 +450,157 @@ public class TaskList implements Cloneable{
 	 *                order-by="sequence_id asc"
 	 * @hibernate.collection-key column="taskList_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.taskList.model.TaskListItem"
-	 * 
-	 * @return
 	 */
 	public Set getTaskListItems() {
 		return taskListItems;
 	}
+	
+	/**
+	 * Sets set of TaskListItems.
+	 * 
+	 * @param taskListItems set of TaskListItems
+	 */
 	public void setTaskListItems(Set taskListItems) {
 		this.taskListItems= taskListItems;
 	}
 
-
 	/**
+	 * Checks whether this tasklist is in use.
+	 *
+	 * @return 
+	 * 
 	 * @hibernate.property  column="content_in_use"
-	 * @return
 	 */
 	public boolean isContentInUse() {
 		return contentInUse;
 	}
 
+	/**
+	 * Sets whether this tasklist in use or not.
+	 * 
+	 * @param contentInUse whether this tasklist in use or not
+	 */
 	public void setContentInUse(boolean contentInUse) {
 		this.contentInUse = contentInUse;
 	}
+	
 	/**
+	 * Returns whether this tasklist should be defined later.
+	 * 
+	 * @return whether this tasklist should be defined later
+	 * 
 	 * @hibernate.property column="define_later"
-	 * @return
 	 */
 	public boolean isDefineLater() {
 		return defineLater;
 	}
 
+	/**
+	 * Sets whether this tasklist should be defined later or not.
+	 * 
+	 * @param defineLater boolean described whether this tasklist should be defined later or not
+	 */
 	public void setDefineLater(boolean defineLater) {
 		this.defineLater = defineLater;
 	}
+	
 	/**
+	 * Returns ContentId
+	 * 
+	 * @return ContentId
+	 * 
 	 * @hibernate.property column="content_id" unique="true" 
-	 * @return
 	 */
 	public Long getContentId() {
 		return contentId;
 	}
 
+	/**
+	 * Sets ContentId.
+	 * 
+	 * @param contentId ContentId
+	 */
 	public void setContentId(Long contentId) {
 		this.contentId = contentId;
 	}
 	
     /**
-     * @return Returns the lockWhenFinished.
+     * Returns if the tasklist should be locked after being finished or not.
+     * 
+     * @return if the tasklist should be locked after being finished or not
      *
      * @hibernate.property
      * 		column="lock_when_finished"
-     *
      */
     public boolean getLockWhenFinished() {
         return lockWhenFinished;
     }
+    
     /**
-     * @param lockWhenFinished Set to true to lock the taskList for finished users.
+     * Set if the tasklist should be locked after being finished or not.
+     * 
+     * @param lockWhenFinished boolean describing should the tasklist be locked after being finished or not
      */
     public void setLockWhenFinished(boolean lockWhenFinished) {
         this.lockWhenFinished = lockWhenFinished;
     }
 	
 	/**
+	 * Returns if learners are allowed to contribute tasks.
+	 *
+	 * @return whether learners are allowed to contribute tasks
+	 * 
 	 * @hibernate.property column="allow_contribute_tasks"
-	 * @return
 	 */
 	public boolean isAllowContributeTasks() {
 		return allowContributeTasks;
 	}
+	
+	/**
+	 * Sets whether learners are allowed to contribute tasks.
+	 * 
+	 * @param allowContributeTasks boolean describing whether learners are allowed to contribute tasks
+	 */
 	public void setAllowContributeTasks(boolean allowContributeTasks) {
 		this.allowContributeTasks = allowContributeTasks;
 	}
 	
 	/**
+	 * Returns whether the learners should be verified by monitor before they can finish tasklist.
+	 * 
+	 * @return whether the learners should be verified by monitor before they can finish tasklist
+	 * 
 	 * @hibernate.property column="is_monitor_verification_required"
-	 * @return
 	 */
 	public boolean isMonitorVerificationRequired() {
 		return monitorVerificationRequired;
 	}
+	
+	/**
+	 * Sets whether the learners should be verified by monitor before they can finish tasklist.
+	 * 
+	 * @param monitorVerificationRequired boolean describing whether the learners should be verified by monitor before they can finish tasklist
+	 */
 	public void setMonitorVerificationRequired(boolean monitorVerificationRequired) {
 		this.monitorVerificationRequired = monitorVerificationRequired;
 	}
 	
 	/**
+	 * Returns if the tasks should be done in a sequential order.
+	 * 
+	 * @return if the tasks should be done in a sequential order
+	 * 
 	 * @hibernate.property column="is_sequential_order"
-	 * @return
 	 */
 	public boolean isSequentialOrder() {
 		return sequentialOrder;
 	}
+	
+	/**
+	 * Sets if the tasks should be done in a sequential order.
+	 * 
+	 * @param sequentialOrder if the tasks should be done in a sequential order
+	 */
 	public void setSequentialOrder(boolean sequentialOrder) {
 		this.sequentialOrder = sequentialOrder;
 	}

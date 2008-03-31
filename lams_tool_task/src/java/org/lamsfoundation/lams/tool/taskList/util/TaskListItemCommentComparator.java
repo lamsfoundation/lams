@@ -28,9 +28,9 @@ import java.util.Comparator;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
 
 /**
+ * Comparator for <code>TaskListItemComment</code>.
  * 
  * @author Andrey Balan
- * 
  */
 public class TaskListItemCommentComparator  implements Comparator<TaskListItemComment>  {
 	

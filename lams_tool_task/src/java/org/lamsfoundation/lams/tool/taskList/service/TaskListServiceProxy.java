@@ -31,43 +31,36 @@ import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-
-
-
 /**
- * @author Dapeng.Ni
- *  
  * <p>This class act as the proxy between web layer and service layer. It is
  * designed to decouple the presentation logic and business logic completely.
  * In this way, the presentation tier will no longer be aware of the changes in
  * service layer. Therefore we can feel free to switch the business logic
  * implementation.</p>
+ * 
+ * @author Dapeng.Ni
  */
-public class TaskListServiceProxy
-{
+public class TaskListServiceProxy {
+	
     /**
      * Return the domain service object. It will delegate to the Spring
      * helper method to retrieve the proper bean from Spring bean factory.
      * @param servletContext the servletContext for current application
      * @return Shared taskList service object.
      */
-    public static final ITaskListService getTaskListService(ServletContext servletContext)
-    {
+    public static final ITaskListService getTaskListService(ServletContext servletContext) {
         return (ITaskListService)getTaskListDomainService(servletContext);
     }
     
-    public static final ToolSessionManager getSessionManager(ServletContext servletContext)
-    {
+    public static final ToolSessionManager getSessionManager(ServletContext servletContext) {
         return (ToolSessionManager)getTaskListDomainService(servletContext);
     }
     
-    public static final ToolContentManager getContentManager(ServletContext servletContext)
-    {
+    public static final ToolContentManager getContentManager(ServletContext servletContext) {
         return (ToolContentManager)getTaskListDomainService(servletContext);
     }
 
-    private static Object getTaskListDomainService(ServletContext servletContext)
-    {
+    private static Object getTaskListDomainService(ServletContext servletContext) {
         WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
         return wac.getBean(TaskListConstants.RESOURCE_SERVICE);
     }

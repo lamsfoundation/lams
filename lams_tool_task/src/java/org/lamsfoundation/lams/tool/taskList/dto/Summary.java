@@ -24,12 +24,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.taskList.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 
 /**

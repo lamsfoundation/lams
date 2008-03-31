@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
  * @hibernate.class  table="tl_latask10_item_comment"
  *
  */
-public class TaskListItemComment {
+public class TaskListItemComment  implements Cloneable{
 	
 	private static final Logger log = Logger.getLogger(TaskListItemComment.class);
 

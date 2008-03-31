@@ -23,12 +23,9 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.taskList.dto;  
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 
 /**
  * DTO object intented to be used in a task summary page (monitoring). Contains
@@ -41,9 +38,9 @@ public class TaskSummary {
 
 	private TaskListItem taskListItem;
 	
-	private TaskSummaryItem[] taskSummaryItems;
+	private List<TaskSummaryItem> taskSummaryItems;
 
-	public TaskSummary(TaskListItem taskListItem, TaskSummaryItem[] taskSummaryItems) {
+	public TaskSummary(TaskListItem taskListItem, List<TaskSummaryItem> taskSummaryItems) {
 		this.taskListItem = taskListItem;
 		
 		this.taskSummaryItems = taskSummaryItems;
@@ -60,10 +57,12 @@ public class TaskSummary {
 		this.taskListItem = taskListItem;
 	}
 	
-	public TaskSummaryItem[] getTaskSummaryItems() {
+	public List<TaskSummaryItem> getTaskSummaryItems() {
 		return taskSummaryItems;
 	}
-
+	public List<TaskSummaryItem> setTaskSummaryItems(List<TaskSummaryItem> taskSummaryItems) {
+		return this.taskSummaryItems = taskSummaryItems;
+	}
 	
 }
  
