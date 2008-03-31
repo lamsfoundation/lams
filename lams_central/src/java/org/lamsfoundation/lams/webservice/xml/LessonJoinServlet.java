@@ -303,6 +303,8 @@ public class LessonJoinServlet extends HttpServlet {
 				} catch (NumberFormatException e) {
 					return name + " 2";
 				}
+			} else {
+				return name + " 2";
 			}
 		}
 		return name;
