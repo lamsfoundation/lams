@@ -104,7 +104,7 @@
 						<c:param name="toolSessionID" value="${toolSessionDto.sessionID}" />
 					</c:url>
 					<html:link href="javascript:launchPopup('${viewuserurl}')" styleClass="button">
-						<fmt:message key="lable.topic.title.mark" />
+						<fmt:message key="label.topic.title.mark" />
 					</html:link>
 				</td>
 			</tr>
@@ -126,7 +126,7 @@
 						<html:hidden property="mode" value="teacher"/>
 						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
 						<html:submit property="viewWiki" styleClass="button">
-							<fmt:message key="label.monitoring.summary.view.forum" />
+							<fmt:message key="label.monitoring.summary.view.wiki" />
 						</html:submit>
 					</html:form>
 				</div>
@@ -135,7 +135,7 @@
 					<html:form action="/monitoring/viewAllMarks" target="_blank">
 						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
 						<html:submit property="Mark" styleClass="button">
-							<fmt:message key="lable.topic.title.mark" />
+							<fmt:message key="label.topic.title.mark" />
 						</html:submit>
 					</html:form>
 				</div>

@@ -384,7 +384,7 @@ public class MonitoringAction extends Action {
 		if (wiki == null) {
 			ActionErrors errors = new ActionErrors();
 			errors.add("activity.globel", new ActionMessage(
-					"error.fail.get.forum"));
+					"error.fail.get.wiki"));
 			this.addErrors(request, errors);
 			return mapping.getInputForward();
 		}
@@ -419,7 +419,7 @@ public class MonitoringAction extends Action {
 		if (wiki == null) {
 			ActionErrors errors = new ActionErrors();
 			errors.add("instruction.globel", new ActionMessage(
-					"error.fail.get.forum"));
+					"error.fail.get.wiki"));
 			this.addErrors(request, errors);
 			return mapping.getInputForward();
 		}

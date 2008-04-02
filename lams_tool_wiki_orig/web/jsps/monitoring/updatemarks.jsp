@@ -57,7 +57,7 @@
 			</td>
 		<tr>
 			<td class="field-name" width="100">
-				<fmt:message key="lable.topic.title.mark" />* 
+				<fmt:message key="label.topic.title.mark" />* 
 			</td>
 			<td>
 				<html:text property="mark"/>
@@ -66,7 +66,7 @@
 		<tr>
 			<td colspan="2">
 				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />		
-				<span  class="field-name"><fmt:message key="lable.topic.title.comment" /><BR></span>
+				<span  class="field-name"><fmt:message key="label.topic.title.comment" /><BR></span>
 				<lams:FCKEditor id="comment"
 					value="${formBean.comment}"
 					toolbarSet="Default-Learner"></lams:FCKEditor>
@@ -74,7 +74,7 @@
 		</tr>
 		<tr>
 			<td colspan="2">
-				<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="button" />
+				<input type="submit" value="<fmt:message key="label.update.mark"/>" class="button" />
 				&nbsp;&nbsp;
 				<c:if test="${sessionMap.updateMode == 'listMarks'}">
 					<c:set var="cancelUrl">

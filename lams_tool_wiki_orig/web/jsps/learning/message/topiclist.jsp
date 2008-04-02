@@ -4,16 +4,16 @@
 	<tbody>
 		<tr>
 			<th width="">
-				<fmt:message key="lable.topic.title.subject" />
+				<fmt:message key="label.topic.title.wiki" />
 			</th>
 			<th width="100px">
-				<fmt:message key="lable.topic.title.startedby" />
+				<fmt:message key="label.topic.title.createdby" />
 			</th>
 			<th width="60px">
-				<fmt:message key="lable.topic.title.replies" />
+				<fmt:message key="label.topic.title.replies" />
 			</th>
 			<th width="25%">
-				<fmt:message key="lable.topic.title.update" />
+				<fmt:message key="label.topic.title.update" />
 			</th>
 		</tr>
 		<c:forEach items="${topicList}" var="topic">

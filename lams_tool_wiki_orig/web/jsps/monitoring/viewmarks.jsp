@@ -68,7 +68,7 @@
 	
 			<tr>
 				<td class="field-name" width="30%">
-					<fmt:message key="lable.topic.title.mark" />
+					<fmt:message key="label.topic.title.mark" />
 					:
 				</td>
 				<td colspan="4">
@@ -84,7 +84,7 @@
 			</tr>
 			<tr>
 				<td class="field-name" width="30%">
-					<fmt:message key="lable.topic.title.comment" />
+					<fmt:message key="label.topic.title.comment" />
 					:
 				</td>
 				<td colspan="4">
@@ -103,7 +103,7 @@
 					<html:form action="/monitoring/editMark" method="post">
 						<html:hidden property="sessionMapID" value="${sessionMapID}"/>
 						<html:hidden property="topicID" value="${topic.message.uid}"/>
-						<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="button" />
+						<input type="submit" value="<fmt:message key="label.update.mark"/>" class="button" />
 					</html:form>
 				</td>
 			</tr>

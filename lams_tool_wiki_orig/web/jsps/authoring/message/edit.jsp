@@ -30,7 +30,7 @@
 				value="${sessionScope[formBean.sessionMapID]}" />
 
 			<div class="field-name">
-				<fmt:message key="message.label.subject" />
+				<fmt:message key="message.label.wikiTitle" />
 				*
 			</div>
 			<div class="small-space-bottom">
@@ -39,7 +39,7 @@
 			</div>
 
 			<div class="field-name">
-				<fmt:message key="message.label.body" />
+				<fmt:message key="message.label.pageContent" />
 				*
 			</div>
 			<c:set var="formBean"

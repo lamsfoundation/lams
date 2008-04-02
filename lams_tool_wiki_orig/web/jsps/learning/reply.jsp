@@ -26,7 +26,7 @@
 				escapeXml='false' /></th>
 		</tr>
 		<tr>
-			<td class="posted-by"><fmt:message key="lable.topic.subject.by" />
+			<td class="posted-by"><fmt:message key="label.topic.wiki.by" />
 			<c:if test="${empty originalMessage.author}">
 				<fmt:message key="label.default.user.name" />
 			</c:if> <c:out value='${originalMessage.author}' /> - <lams:Date

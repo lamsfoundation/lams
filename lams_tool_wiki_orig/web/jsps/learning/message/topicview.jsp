@@ -12,7 +12,7 @@
 							<c:out value="${msgDto.message.subject}" />
 						</c:when>
 						<c:otherwise>
-							<fmt:message key="topic.message.subject.hidden" />
+							<fmt:message key="topic.message.wikiTitle.hidden" />
 						</c:otherwise>
 					</c:choose>
 				</th>
@@ -20,7 +20,7 @@
 			<tr>
 				<td class="posted-by">
 					<c:if test='${(sessionMap.mode == "teacher") || (not hidden)}'>
-						<fmt:message key="lable.topic.subject.by" />
+						<fmt:message key="label.topic.wiki.by" />
 						<c:set var="author" value="${msgDto.author}" />
 						<c:if test="${empty author}">
 							<c:set var="author">
@@ -40,7 +40,7 @@
 						<c:out value="${msgDto.message.body}" escapeXml="false" />
 					</c:if>
 					<c:if test='${hidden}'>
-						<fmt:message key="topic.message.body.hidden" />
+						<fmt:message key="topic.message.pageContent.hidden" />
 					</c:if>
 				</td>
 			</tr>
@@ -74,7 +74,7 @@
 				<tr>
 					<td>
 						<span class="field-name"><fmt:message
-								key="lable.topic.title.mark" />
+								key="label.topic.title.mark" />
 						</span>
 						<BR>
 						${msgDto.mark}
@@ -83,7 +83,7 @@
 				<tr>
 					<td>
 						<span class="field-name"><fmt:message
-								key="lable.topic.title.comment" />
+								key="label.topic.title.comment" />
 						</span>
 						<BR>
 						<c:choose>
@@ -108,7 +108,7 @@
 							</c:set>
 						
 							<html:link href="${updateMark}" styleClass="button">
-								<fmt:message key="lable.topic.title.mark" />
+								<fmt:message key="label.topic.title.mark" />
 							</html:link>
 							<!--  call the hide action -->
 							<c:choose>

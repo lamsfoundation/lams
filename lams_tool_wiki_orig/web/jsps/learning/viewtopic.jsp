@@ -23,7 +23,7 @@
 			<html:button property="backToWiki"
 				onclick="javascript:location.href='${backToWiki}';"
 				styleClass="button">
-				<fmt:message key="label.back.to.forum" />
+				<fmt:message key="label.back.to.wiki" />
 			</html:button>
 
 		</div>
@@ -48,7 +48,7 @@
 			<html:button property="backToWiki"
 				onclick="javascript:location.href='${backToWiki}';"
 				styleClass="button">
-				<fmt:message key="label.back.to.forum" />
+				<fmt:message key="label.back.to.wiki" />
 			</html:button>
 
 		</div>

@@ -47,7 +47,7 @@
 			<html:button property="newtopic"
 				onclick="javascript:location.href='${newtopic}';"
 				disabled="${sessionMap.finishedLock}" styleClass="${buttonClass}">
-				<fmt:message key="label.newtopic" />
+				<fmt:message key="label.newwiki" />
 			</html:button>
 		</c:if>
 		

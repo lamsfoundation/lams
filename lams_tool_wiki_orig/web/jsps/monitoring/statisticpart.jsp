@@ -27,13 +27,13 @@
 				<table>
 					<tr>
 						<th scope="col" width="50%">
-							<fmt:message key="lable.topic.title.subject" />
+							<fmt:message key="label.topic.title.wiki" />
 						</th>
 						<th scope="col" width="25%">
-							<fmt:message key="lable.topic.title.message.number" />
+							<fmt:message key="label.topic.title.message.number" />
 						</th>
 						<th scope="col" width="25%">
-							<fmt:message key="lable.topic.title.average.mark" />
+							<fmt:message key="label.topic.title.average.mark" />
 						</th>
 					</tr>
 					<c:forEach items="${sessionTopicList}" var="topic">
@@ -60,7 +60,7 @@
 
 		<tr>
 			<td class="field-name" width="30%">
-				<fmt:message key="lable.monitoring.statistic.total.message" />
+				<fmt:message key="label.monitoring.statistic.total.message" />
 			</td>
 			<td>
 				<c:out value="${sessionTotalMessage}" />

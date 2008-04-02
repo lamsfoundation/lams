@@ -123,6 +123,6 @@ INSERT INTO tl_lawiki10_wiki (uid,title,instructions,online_instructions,offline
 VALUES(1,"Wiki","Instructions",null,null,${default_content_id},0,0,0,0,0,1,0,1,0,1,0,1,5000,0);
 
 INSERT INTO `tl_lawiki10_message` (`uid`, `create_date`, `last_reply_date`, `update_date`, `create_by`, `modified_by`, `subject`, `body`, `is_authored`, `is_anonymous`, `wiki_session_uid`, `parent_uid`, `wiki_uid`, `reply_number`, `hide_flag`, `report_id`) VALUES 
-  (1,NOW(),NOW(),NOW(),null,null,'Topic Heading','Topic message',1,0,NULL,NULL,1,0,0,NULL);
+  (1,NOW(),NOW(),NOW(),null,null,'Wiki Page','Wiki content',1,0,NULL,NULL,1,0,0,NULL);
   
 SET FOREIGN_KEY_CHECKS=1;

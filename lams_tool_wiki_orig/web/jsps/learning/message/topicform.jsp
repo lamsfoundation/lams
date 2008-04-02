@@ -3,7 +3,7 @@
 <table cellpadding="0">
 	<tr>
 		<td>
-			<span  class="field-name"><fmt:message key="message.label.subject" /></span><BR>		
+			<span  class="field-name"><fmt:message key="message.label.wikiTitle" /></span><BR>		
 			<html:text size="30" tabindex="1" property="message.subject" />
 			<br>
 			<html:errors property="message.subject" />
@@ -11,7 +11,7 @@
 	</tr>
 	<tr>
 		<td>
-			<span  class="field-name"><fmt:message key="message.label.body" />*</span><BR>
+			<span  class="field-name"><fmt:message key="message.label.pageContent" />*</span><BR>
 			<%@include file="bodyarea.jsp"%>
 		</td>
 	</tr>

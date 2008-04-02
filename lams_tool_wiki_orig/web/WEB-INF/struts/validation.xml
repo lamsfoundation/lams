@@ -22,7 +22,7 @@
 
 	<form name = "messageForm">
 			<field property="message.subject" depends="required, maxlength">
-				<arg0 key="message.label.subject"/>
+				<arg0 key="message.label.wikiTitle"/>
 				<arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
 					<var>
 						<var-name>maxlength</var-name>
@@ -30,7 +30,7 @@
 					</var>
 			</field>
             <field property="message.body" depends="required">
-				<arg0 key="message.label.body"/>
+				<arg0 key="message.label.pageContent"/>
 			</field>
 
 		</form>

@@ -74,11 +74,11 @@ public class MessageForm extends ValidatorForm {
         ActionErrors errors = new ActionErrors(); 
         try{
             if (StringUtils.isBlank(message.getSubject())) {
-               ActionMessage error = new ActionMessage("error.subject.required");
+               ActionMessage error = new ActionMessage("error.wikiTitle.required");
                errors.add("message.subject", error);
             }
             if (StringUtils.isBlank(message.getBody())) {
-            	ActionMessage error = new ActionMessage("error.body.required");
+            	ActionMessage error = new ActionMessage("error.pageContent.required");
             	errors.add("message.body", error);
             }
             

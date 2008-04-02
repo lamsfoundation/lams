@@ -42,7 +42,7 @@
 								<b> <c:out value="${msgDto.message.subject}" /> </b>
 							</c:when>
 							<c:otherwise>
-								<fmt:message key="topic.message.subject.hidden" />
+								<fmt:message key="topic.message.wikiTitle.hidden" />
 							</c:otherwise>
 						</c:choose>
 					</th>
@@ -50,7 +50,7 @@
 				<tr>
 					<td class="first posted-by">
 						<c:if test='${(mode == "teacher") || (not hidden)}'>
-							<fmt:message key="lable.topic.subject.by" />
+							<fmt:message key="label.topic.wiki.by" />
 							<c:set var="author" value="${msgDto.author}"/>
 							<c:if test="${empty author}">
 								<c:set var="author">
@@ -69,7 +69,7 @@
 							<c:out value="${msgDto.message.body}" escapeXml="false" />
 						</c:if>
 						<c:if test='${hidden}'>
-							<fmt:message key="topic.message.body.hidden" />
+							<fmt:message key="topic.message.pageContent.hidden" />
 						</c:if>
 					</td>
 				</tr>
@@ -87,7 +87,7 @@
 				<c:if test="${(msgDto.released && msgDto.isAuthor)|| mode=='teacher'}">
 					<tr>
 						<td>
-							<span class="field-name" ><fmt:message key="lable.topic.title.mark"/></span>
+							<span class="field-name" ><fmt:message key="label.topic.title.mark"/></span>
 							<BR>
 							<c:choose>
 								<c:when test="${empty msgDto.mark}">
@@ -101,7 +101,7 @@
 					</tr>
 					<tr>
 						<td>
-							<span class="field-name" ><fmt:message key="lable.topic.title.comment"/></span>
+							<span class="field-name" ><fmt:message key="label.topic.title.comment"/></span>
 							<BR>
 							<c:choose>
 								<c:when test="${empty msgDto.comment}">

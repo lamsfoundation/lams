@@ -3,7 +3,7 @@
 
 	
 			<div class="field-name title-space-top">
-				<fmt:message key="message.label.subject" />
+				<fmt:message key="message.label.title" />
 			</div>
 			
 			
@@ -11,7 +11,7 @@
 			<html:errors property="message.subject" />
 		
 			<div class="field-name title-space-top">
-				<fmt:message key="message.label.body" />*
+				<fmt:message key="message.label.pageContent" />*
 			</div>
 			
 			<%@include file="bodyarea.jsp"%>

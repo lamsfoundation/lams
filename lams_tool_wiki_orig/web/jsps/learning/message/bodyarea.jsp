@@ -14,7 +14,7 @@
 		<BR>
 		<%-- If limitChars == 0, then we don't want to limit the characters at all. --%>
 		<c:if test="${sessionMap.limitedChars > 0}">
-			<fmt:message key="lable.char.left" />:  
+			<fmt:message key="label.char.left" />:  
 			<span id="charleftDiv"></span>
 			<input type="hidden" name="limitCount" id="limitCount" />
 			<script type="text/javascript">

@@ -71,7 +71,7 @@
 	<a
 		href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');"
 		class="button-add-item"> <fmt:message
-			key="label.authoring.create.new.topic" /> </a>
+			key="label.authoring.create.new.wiki" /> </a>
 </p>
 
 <p>

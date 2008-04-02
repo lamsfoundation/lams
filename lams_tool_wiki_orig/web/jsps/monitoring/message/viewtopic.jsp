@@ -11,7 +11,7 @@
 
 		<tr>
 			<td class="first posted-by">
-				<fmt:message key="lable.topic.subject.by" />
+				<fmt:message key="label.topic.wiki.by" />
 				<c:set var="author" value="${topic.author}"/>
 				<c:if test="${empty author}">
 					<c:set var="author">
