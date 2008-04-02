@@ -134,7 +134,7 @@
         />
 
         <set
-            name="uploadedFileList"
+            name="attachments"
             lazy="true"
             inverse="false"
             cascade="all"

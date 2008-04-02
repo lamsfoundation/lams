@@ -27,15 +27,28 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 
+/**
+ * DAO interface for <code>TaskListItem</code>.
+ * 
+ * @author Andrey Balan
+ * @see org.lamsfoundation.lams.tool.taskList.model.TaskListItem
+ */
 public interface TaskListItemDAO extends DAO {
 	
 	/**
 	 * Return all taskList items which is uploaded by author in given taskListUid.
+	 * 
 	 * @param taskListUid
-	 * @return
+	 * @return all taskList items which is uploaded by author in given taskListUid
 	 */
 	List getAuthoringItems(Long taskListUid);
 
+	/**
+	 * Return taskListItem with the specified taskListItemUid.
+	 * 
+	 * @param taskListItemUid specified taskListItemUid
+	 * @return taskListItem with the specified taskListItemUid
+	 */
 	TaskListItem getByUid(Long taskListItemUid);
 
 }

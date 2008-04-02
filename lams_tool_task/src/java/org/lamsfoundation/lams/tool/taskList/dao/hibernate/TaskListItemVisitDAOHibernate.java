@@ -32,6 +32,12 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 
+/**
+ * Hibernate implementation of <code>TaskListItemVisitDAO</code>.
+ * 
+ * @author Andrey Balan
+ * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListItemVisitDAO
+ */
 public class TaskListItemVisitDAOHibernate extends BaseDAOHibernate implements TaskListItemVisitDAO{
 	
 	private static final String FIND_BY_ITEM_AND_USER = "from " + TaskListItemVisitLog.class.getName()
@@ -40,18 +46,21 @@ public class TaskListItemVisitDAOHibernate extends BaseDAOHibernate implements T
 	private static final String FIND_BY_ITEM_BYSESSION = "from " + TaskListItemVisitLog.class.getName()
 			+ " as r where r.sessionId = ? and r.taskListItem.uid=?";
 	
-	private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from " + TaskListItemVisitLog.class.getName() 
-			+ " as r where  r.sessionId=? and  r.user.userId =?";
-
-	private static final String FIND_SUMMARY = "select v.taskListItem.uid, count(v.taskListItem) from  "
-		+ TaskListItemVisitLog.class.getName() + " as v , "
-		+ TaskListSession.class.getName() + " as s, "
-		+ TaskList.class.getName() + "  as r "
-		+" where v.sessionId = s.sessionId "
-		+" and s.taskList.uid = r.uid "
-		+" and r.contentId =? "
-		+" group by v.sessionId, v.taskListItem.uid ";
+//	private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from " + TaskListItemVisitLog.class.getName() 
+//			+ " as r where  r.sessionId=? and  r.user.userId =?";
+//
+//	private static final String FIND_SUMMARY = "select v.taskListItem.uid, count(v.taskListItem) from  "
+//		+ TaskListItemVisitLog.class.getName() + " as v , "
+//		+ TaskListSession.class.getName() + " as s, "
+//		+ TaskList.class.getName() + "  as r "
+//		+" where v.sessionId = s.sessionId "
+//		+" and s.taskList.uid = r.uid "
+//		+" and r.contentId =? "
+//		+" group by v.sessionId, v.taskListItem.uid ";
 	
+    /**
+     * {@inheritDoc}
+     */
 	public TaskListItemVisitLog getTaskListItemLog(Long itemUid,Long userId){
 		List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER,new Object[]{userId,itemUid});
 		if(list == null || list.size() ==0)
@@ -59,27 +68,30 @@ public class TaskListItemVisitDAOHibernate extends BaseDAOHibernate implements T
 		return (TaskListItemVisitLog) list.get(0);
 	}
 
-	public int getUserViewLogCount(Long toolSessionId ,Long userUid) {
-		List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER,new Object[]{toolSessionId, userUid});
-		if(list == null || list.size() ==0)
-			return 0;
-		return ((Number) list.get(0)).intValue();
-	}
+//	public int getUserViewLogCount(Long toolSessionId ,Long userUid) {
+//		List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER,new Object[]{toolSessionId, userUid});
+//		if(list == null || list.size() ==0)
+//			return 0;
+//		return ((Number) list.get(0)).intValue();
+//	}
+//
+//	public Map<Long,Integer> getSummary(Long contentId) {
+//
+//		// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
+//		List<Object[]> result =  getHibernateTemplate().find(FIND_SUMMARY,contentId);
+//		Map<Long,Integer>  summaryList = new HashMap<Long,Integer> (result.size());
+//		for(Object[] list : result){
+//			if ( list[1] != null ) {
+//				summaryList.put((Long)list[0],new Integer(((Number)list[1]).intValue()));
+//			} 
+//		}
+//		return summaryList;
+//		
+//	}
 
-	public Map<Long,Integer> getSummary(Long contentId) {
-
-		// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
-		List<Object[]> result =  getHibernateTemplate().find(FIND_SUMMARY,contentId);
-		Map<Long,Integer>  summaryList = new HashMap<Long,Integer> (result.size());
-		for(Object[] list : result){
-			if ( list[1] != null ) {
-				summaryList.put((Long)list[0],new Integer(((Number)list[1]).intValue()));
-			} 
-		}
-		return summaryList;
-		
-	}
-
+    /**
+     * {@inheritDoc}
+     */
 	public List<TaskListItemVisitLog> getTaskListItemLogBySession(Long sessionId, Long itemUid) {
 		
 		return getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION,new Object[]{sessionId,itemUid});

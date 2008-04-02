@@ -21,15 +21,18 @@
  */  
  
 /* $Id$ */  
-package org.lamsfoundation.lams.tool.taskList.dao;  
+package org.lamsfoundation.lams.tool.taskList.dao.hibernate;  
 
+import org.lamsfoundation.lams.tool.taskList.dao.TaskListAttachmentDAO;
+import org.lamsfoundation.lams.tool.taskList.dao.TaskListConditionDAO;
+ 
 /**
- * DAO interface for <code>TaskListItemAttachment</code>.
- * 
+ * Hibernate implementation of <code>TaskListConditionDAO</code>.
+ *
  * @author Andrey Balan
- * @see org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment
+ * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListConditionDAO
  */
-public interface TaskListItemAttachmentDAO extends DAO {
+public class TaskListConditionDAOHibernate extends BaseDAOHibernate implements TaskListConditionDAO{
 
 }
  

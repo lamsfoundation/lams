@@ -28,13 +28,21 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListUserDAO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 
-
+/**
+ * Hibernate implementation of <code>TaskListUserDAO</code>.
+ * 
+ * @author Andrey Balan
+ * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListUserDAO
+ */
 public class TaskListUserDAOHibernate extends BaseDAOHibernate implements TaskListUserDAO{
 	
 	private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + TaskListUser.class.getName() + " as u where u.userId =? and u.taskList.contentId=?";
 	private static final String FIND_BY_USER_ID_SESSION_ID = "from " + TaskListUser.class.getName() + " as u where u.userId =? and u.session.sessionId=?";
 	private static final String FIND_BY_SESSION_ID = "from " + TaskListUser.class.getName() + " as u where u.session.sessionId=?";
 
+    /**
+     * {@inheritDoc}
+     */
 	public TaskListUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
 		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID,new Object[]{userID,sessionId});
 		if(list == null || list.size() == 0)
@@ -42,6 +50,9 @@ public class TaskListUserDAOHibernate extends BaseDAOHibernate implements TaskLi
 		return (TaskListUser) list.get(0);
 	}
 
+    /**
+     * {@inheritDoc}
+     */
 	public TaskListUser getUserByUserIDAndContentID(Long userId, Long contentId) {
 		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID,new Object[]{userId,contentId});
 		if(list == null || list.size() == 0)
@@ -49,9 +60,11 @@ public class TaskListUserDAOHibernate extends BaseDAOHibernate implements TaskLi
 		return (TaskListUser) list.get(0);
 	}
 
+    /**
+     * {@inheritDoc}
+     */
 	public List<TaskListUser> getBySessionID(Long sessionId) {
 		return this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
 	}
-
-
+	
 }

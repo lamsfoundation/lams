@@ -23,6 +23,12 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.taskList.dao;  
  
+/**
+ * DAO interface for <code>TaskListItemComment</code>.
+ * 
+ * @author Andrey Balan
+ * @see org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment
+ */
 public interface TaskListItemCommentDAO   extends DAO {
 
 }

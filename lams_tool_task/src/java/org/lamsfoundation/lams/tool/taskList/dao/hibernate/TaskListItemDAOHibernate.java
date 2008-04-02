@@ -28,15 +28,26 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemDAO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 
+/**
+ * Hibernate implementation of <code>TaskListItemDAO</code>.
+ * 
+ * @author Andrey Balan
+ * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListItemDAO
+ */
 public class TaskListItemDAOHibernate extends BaseDAOHibernate implements TaskListItemDAO{
 	
 	private static final String FIND_AUTHORING_ITEMS = "from " + TaskListItem.class.getName() + " where taskList_uid = ? order by sequence_Id asc";
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	public List getAuthoringItems(Long taskListUid) {
-		
 		return this.getHibernateTemplate().find(FIND_AUTHORING_ITEMS,taskListUid); 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public TaskListItem getByUid(Long taskListItemUid) {
 		return (TaskListItem) this.getObject(TaskListItem.class,taskListItemUid);
 	}

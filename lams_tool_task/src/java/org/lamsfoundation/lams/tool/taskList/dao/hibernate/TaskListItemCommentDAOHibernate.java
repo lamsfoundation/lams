@@ -25,6 +25,12 @@ package org.lamsfoundation.lams.tool.taskList.dao.hibernate;
 
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemCommentDAO;
 
+/**
+ * Hibernate implementation of <code>TaskListItemCommentDAO</code>.
+ * 
+ * @author Andrey Balan
+ * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListItemCommentDAO
+ */
 public class TaskListItemCommentDAOHibernate extends BaseDAOHibernate implements TaskListItemCommentDAO{
 
 

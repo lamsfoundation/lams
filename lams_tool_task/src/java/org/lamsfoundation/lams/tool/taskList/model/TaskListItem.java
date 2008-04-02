@@ -213,7 +213,8 @@ public class TaskListItem  implements Cloneable{
 	public void setTitle(String title) {
 		this.title = title;
 	}
-		/**
+	
+	/**
      * @hibernate.many-to-one
      *     cascade="none"
      * 		column="create_by"
@@ -256,13 +257,21 @@ public class TaskListItem  implements Cloneable{
 		return complete;
 	}
 	
-	/**
-	 * @hibernate.property  column="sequence_id" 
-	 * @return
+    /**
+	 * Returns taskListItem sequence number. 
+	 * 
+	 * @return taskListItem sequence number
+	 * 
+	 * @hibernate.property column="sequence_id"
 	 */
 	public int getSequenceId() {
 		return sequenceId;
 	}
+    /**
+     * Sets taskListItem sequence number. 
+     * 
+     * @param sequenceId taskListItem sequence number
+     */
 	public void setSequenceId(int sequenceId) {
 		this.sequenceId = sequenceId;
 	}

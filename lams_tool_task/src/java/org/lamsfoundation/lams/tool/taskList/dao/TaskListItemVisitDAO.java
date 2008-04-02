@@ -28,20 +28,30 @@ import java.util.Map;
 
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
 
+/**
+ * DAO interface for <code>TaskListItemVisit</code>.
+ * 
+ * @author Andrey Balan
+ * @see org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisit
+ */
 public interface TaskListItemVisitDAO extends DAO {
 
-	
-	public TaskListItemVisitLog getTaskListItemLog(Long itemUid,Long userId);
-
-	public int getUserViewLogCount(Long sessionId, Long userUid);
 	/**
-	 * Return list which contains key pair which key is taskList item uid, value is number view.
+	 * Returns TaskListItemVisitLog which corresponds to specified taskListItemUid and userId.
 	 * 
-	 * @param contentId
-	 * @return
+	 * @param itemUid specified taskListItemUid
+	 * @param userId specified userId
+	 * @return TaskListItemVisitLog wich corresponds to specified taskListItemUid and userId
 	 */
-	public Map<Long,Integer> getSummary(Long contentId);
+	public TaskListItemVisitLog getTaskListItemLog(Long itemUid,Long userId);
 	
+	/**
+	 * Return list of taskListItemVisitLogs which corresponds to specified sessionId and itemUid
+	 * 
+	 * @param sessionId specified sessionId
+	 * @param itemUid specified itemUid
+	 * @return list of taskListItemVisitLogs which corresponds to specified sessionId and itemUid
+	 */
 	public List<TaskListItemVisitLog> getTaskListItemLogBySession(Long sessionId,Long itemUid);
 
 }

@@ -23,6 +23,12 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.taskList.dao;
 
+/**
+ * DAO interface for <code>TaskListAttachment</code>.
+ * 
+ * @author Andrey Balan
+ * @see org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment
+ */
 public interface TaskListAttachmentDAO extends DAO {
 
 }

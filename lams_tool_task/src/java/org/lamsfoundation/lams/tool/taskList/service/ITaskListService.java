@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskSummary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
@@ -323,6 +324,11 @@ public interface ITaskListService
 	 * @return
 	 */
 	TaskSummary getTaskSummary(Long contentId, Long taskListItemUid);
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void deleteTaskListCondition(Long conditionUid);
 
 }
 

@@ -74,6 +74,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListAttachmentDAO;
+import org.lamsfoundation.lams.tool.taskList.dao.TaskListConditionDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemAttachmentDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemCommentDAO;
@@ -87,6 +88,7 @@ import org.lamsfoundation.lams.tool.taskList.dto.TaskSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskSummaryItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
@@ -115,6 +117,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	private TaskListDAO taskListDao;
 	private TaskListItemDAO taskListItemDao;
 	private TaskListAttachmentDAO taskListAttachmentDao;
+	private TaskListConditionDAO taskListConditionDAO;
 	private TaskListUserDAO taskListUserDao;
 	private TaskListSessionDAO taskListSessionDao;
 	private TaskListItemVisitDAO taskListItemVisitDao;
@@ -268,6 +271,13 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	 */
 	public void deleteTaskListAttachment(Long attachmentUid) {
 		taskListAttachmentDao.removeObject(TaskListAttachment.class, attachmentUid);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void deleteTaskListCondition(Long conditionUid) {
+		taskListConditionDAO.removeObject(TaskListCondition.class, conditionUid);
 	}
 	
 	/**
@@ -689,6 +699,9 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	}
 	public void setTaskListAttachmentDao(TaskListAttachmentDAO taskListAttachmentDao) {
 		this.taskListAttachmentDao = taskListAttachmentDao;
+	}
+	public void setTaskListConditionDao(TaskListConditionDAO taskListConditionDAO) {
+		this.taskListConditionDAO = taskListConditionDAO;
 	}
 	public void setTaskListDao(TaskListDAO taskListDao) {
 		this.taskListDao = taskListDao;

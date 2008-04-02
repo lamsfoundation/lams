@@ -26,6 +26,7 @@
                <value>org/lamsfoundation/lams/tool/taskList/model/TaskListItemComment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/taskList/model/TaskListAttachment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/taskList/model/TaskListSession.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListCondition.hbm.xml</value>
             </list>
         </property>
     </bean>
@@ -48,6 +49,12 @@
     </bean>
 
    <bean id="lataskTaskListAttachmentDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListAttachmentDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="lataskTaskListSessionFactory"/>
+        </property>
+    </bean>
+    
+    <bean id="lataskTaskListConditionDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListConditionDAOHibernate">
         <property name="sessionFactory">
             <ref local="lataskTaskListSessionFactory"/>
         </property>
@@ -83,6 +90,9 @@
         </property>
         <property name="taskListAttachmentDao">
             <ref local="lataskTaskListAttachmentDao"/>
+        </property>
+        <property name="taskListConditionDao">
+            <ref local="lataskTaskListConditionDao"/>
         </property>
         <property name="taskListUserDao">
             <ref local="lataskTaskListUserDao"/>

@@ -25,7 +25,12 @@
 
 package org.lamsfoundation.lams.tool.taskList.web.servlet;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 
@@ -55,13 +60,10 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * Export portfolio servlet to export all shared taskList into offline HTML
- * package.
+ * Export portfolio servlet to export taskList into offline HTML package.
  * 
  * @author Steve.Ni
  * @author Andrey Balan
- * 
- * @version $Revision$
  */
 public class ExportServlet extends AbstractExportPortfolioServlet {
 	private static final long serialVersionUID = -4529093489007108143L;
@@ -74,6 +76,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	/**
 	 * {@inheritDoc}
+	 * @throws IOException 
 	 */
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
 
@@ -133,9 +136,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	 * @param cookies
 	 * @param sessionMap
 	 * @throws TaskListApplicationException
+	 * @throws IOException 
 	 */
-	private void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
-			throws TaskListApplicationException {
+	private void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap) throws TaskListApplicationException{
 
 		ITaskListService service = TaskListServiceProxy.getTaskListService(getServletContext());
 
@@ -178,9 +181,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	 * @param cookies
 	 * @param sessionMap
 	 * @throws TaskListApplicationException
+	 * @throws IOException 
 	 */
-	private void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
-			throws TaskListApplicationException {
+	private void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap) throws TaskListApplicationException {
 		ITaskListService service = TaskListServiceProxy.getTaskListService(getServletContext());
 
 		// check if toolContentId exists in db or not
@@ -212,6 +215,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
      * 
      * @param taskSummaries
      * @param directoryName
+     * @throws IOException 
      */
     private void saveFileToLocal(List<TaskSummary> taskSummaries, String directoryName) {
     	handler = getToolContentHandler();
@@ -245,7 +249,62 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 //    	//save two pictures describing either the taskLisiItem is done or not
 //		handler.saveFile(attachment.getFileUuid(), FileUtil.getFullPath(directoryName, "images/completeitem.gif"));
 //		handler.saveFile(attachment.getFileUuid(), FileUtil.getFullPath(directoryName, "images/incompleteitem.gif"));
+		
+		
+//		String directoryPath = directoryName + File.separatorChar + "images";
+//		File dir = new File(directoryPath);
+//		if (!dir.mkdirs())  {
+//			logger.error("Unable to create directory for export portfolio: " + directoryPath);
+//		}
+//		
+//		 
+//		
+//		String completeItemName = "completeitem.gif";
+//		File completeItemFile = new File(directoryPath + completeItemName);
+//		copyFile(directoryPath + completeItemName, completeItemFile);
+//		
+//		String incompleteItemName = "incompleteitem.gif";
+//		File incompleteItemFile = new File(directoryPath + completeItemName);
+//		copyFile(directoryPath + incompleteItemName, incompleteItemFile);
 	}
+    
+//	private void copyFile(String filePath, File file) throws IOException {
+//		
+//		FileInputStream is = new FileInputStream(file);
+//		OutputStream os = null;
+//		try {
+//			int bufLen = 1024; // 1 Kbyte
+//			byte[] buf = new byte[1024]; // output buffer
+//			os = new FileOutputStream(filePath);
+//
+//			BufferedInputStream in = new BufferedInputStream(is);
+//			int len = 0;
+//		    while((len = in.read(buf,0,bufLen)) != -1){
+//		    	os.write(buf,0,len);
+//		    }	
+//			
+//		} catch ( IOException e ) {
+//			String message = "Unable to write out file needed for export portfolio. File was "+filePath;	
+//			logger.error(message,e);
+//			throw e;
+//			
+//		} finally {
+//
+//			try {
+//				if ( is != null ) is.close();
+//			} catch (IOException e1) {
+//				String message = "Unable to close input export portfolio file due to IOException";
+//				logger.warn(message,e1);
+//			}
+//
+//			try {
+//				if ( os != null ) os.close();
+//			} catch (IOException e2) {
+//				String message = "Unable to close output export portfolio file due to IOException";
+//				logger.warn(message,e2);
+//			}
+//		}
+//	}
 
 	/**
 	 * {@inheritDoc}

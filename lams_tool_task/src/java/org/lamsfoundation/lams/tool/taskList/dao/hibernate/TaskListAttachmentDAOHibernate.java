@@ -25,6 +25,13 @@ package org.lamsfoundation.lams.tool.taskList.dao.hibernate;
 
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListAttachmentDAO;
 
+/**
+ * Hibernate implementation of <code>TaskListAttachmentDAO</code>.
+ *
+ * @author Steve.Ni
+ * @author Andrey Balan
+ * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListAttachmentDAO
+ */
 public class TaskListAttachmentDAOHibernate extends BaseDAOHibernate implements TaskListAttachmentDAO{
 
 }

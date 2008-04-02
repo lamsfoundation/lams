@@ -27,11 +27,37 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 
+/**
+ * DAO interface for <code>TaskListUser</code>.
+ * 
+ * @author Andrey Balan
+ * @see org.lamsfoundation.lams.tool.taskList.model.TaskListUser
+ */
 public interface TaskListUserDAO extends DAO {
 
+	/**
+	 * Returns user with the specified userID and sessionId.
+	 * 
+	 * @param userID specified userID
+	 * @param sessionId specified sessionId
+	 * @return user with the specified userID and sessionId
+	 */
 	TaskListUser getUserByUserIDAndSessionID(Long userID, Long sessionId);
 
+	/**
+	 * Returns user with the specified userID and contentId.
+	 * 
+	 * @param userId specified userID
+	 * @param contentId specified contentId
+	 * @return user with the specified userID and contentId
+	 */
 	TaskListUser getUserByUserIDAndContentID(Long userId, Long contentId);
 
+	/**
+	 * Returns list of users corresponds to specified sessionId.
+	 * 
+	 * @param sessionId specified sessionId
+	 * @return list of users corresponds to specified sessionId
+	 */
 	List<TaskListUser> getBySessionID(Long sessionId);
 }

@@ -42,14 +42,14 @@ public class BaseDAOHibernate extends HibernateDaoSupport implements DAO {
     protected final Log log = LogFactory.getLog(getClass());
 
     /**
-     * @see com.edgenius.paradise.dao.DAO#saveObject(java.lang.Object)
+     * {@inheritDoc}
      */
     public void saveObject(Object o) {
         getHibernateTemplate().saveOrUpdate(o);
     }
 
     /**
-     * @see com.edgenius.paradise.dao.DAO#getObject(java.lang.Class, java.io.Serializable)
+     * {@inheritDoc}
      */
     public Object getObject(Class clazz, Serializable id) {
         Object o = getHibernateTemplate().get(clazz, id);
@@ -57,14 +57,14 @@ public class BaseDAOHibernate extends HibernateDaoSupport implements DAO {
     }
 
     /**
-     * @see com.edgenius.paradise.dao.DAO#getObjects(java.lang.Class)
+     * {@inheritDoc}
      */
     public List getObjects(Class clazz) {
         return getHibernateTemplate().loadAll(clazz);
     }
 
     /**
-     * @see com.edgenius.paradise.dao.DAO#removeObject(java.lang.Class, java.io.Serializable)
+     * {@inheritDoc}
      */
     public void removeObject(Class clazz, Serializable id) {
         getHibernateTemplate().delete(getObject(clazz, id));

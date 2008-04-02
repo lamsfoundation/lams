@@ -27,15 +27,42 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 
+/**
+ * DAO interface for <code>TaskListSession</code>.
+ * 
+ * @author Andrey Balan
+ * @see org.lamsfoundation.lams.tool.taskList.model.TaskListSession
+ */
 public interface TaskListSessionDAO extends DAO {
 
+	/**
+	 * Returns <code>TaskListSession</code> with the specified sessionId
+	 * 
+	 * @param sessionId specified sessionId
+	 * @return TaskListSession with the specified sessionId
+	 */
 	TaskListSession getSessionBySessionId(Long sessionId);
 
+	/**
+	 * Returns <code>TaskListSession</code> wich corresponds to the tool with the specified toolContentId
+	 * 
+	 * @param toolContentId specified toolContentId
+	 * @return TaskListSession wich corresponds to the tool with the specified toolContentId
+	 */
 	List<TaskListSession> getByContentId(Long toolContentId);
 
+	/**
+	 * Delete specified session.
+	 * 
+	 * @param session specified session
+	 */
 	void delete(TaskListSession session);
 
+	/**
+	 * Delete session with the specified toolSessionId.
+	 * 
+	 * @param toolSessionId specified toolSessionId
+	 */
 	void deleteBySessionId(Long toolSessionId);
-
 
 }

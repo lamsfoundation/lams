@@ -25,12 +25,35 @@ package org.lamsfoundation.lams.tool.taskList.dao;
 
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 
+/**
+ * DAO interface for <code>TaskList</code>.
+ * 
+ * @author Andrey Balan
+ * @see org.lamsfoundation.lams.tool.taskList.model.TaskList
+ */
 public interface TaskListDAO  extends DAO {
 
+	/**
+	 * Returns <code>TaskList</code> with the specified contentId.
+	 * 
+	 * @param contentId specified contentId
+	 * @return TaskList with the specified contentId
+	 */
 	TaskList getByContentId(Long contentId);
 
+	/**
+	 * Returns <code>TaskList</code> with the specified taskListUid.
+	 * 
+	 * @param taskListUid specified taskListUid
+	 * @return TaskList with the specified taskListUid
+	 */
 	TaskList getByUid(Long taskListUid);
 
+	/**
+	 * Delete specified taskList.
+	 * 
+	 * @param taskList specified taskList
+	 */
 	void delete(TaskList taskList);
 
 }
