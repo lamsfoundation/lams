@@ -222,7 +222,7 @@
 		<c:if test="${(mode != 'teacher') && isRequiredTasksCompleted}">
 			<div class="space-bottom-top align-right">
 				<c:choose>
-					<c:when	test="${!sessionMap.userVerifiedByMonitor}">
+					<c:when	test="${taskList.monitorVerificationRequired && !sessionMap.userVerifiedByMonitor}">
 						<fmt:message key="label.learning.wait.for.monitor.verification" />
 					</c:when>
 				
