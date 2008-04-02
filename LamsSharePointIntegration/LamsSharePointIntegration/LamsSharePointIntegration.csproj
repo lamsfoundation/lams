@@ -50,7 +50,6 @@
     <Compile Include="Src\LAMSLessonListEventHandler.cs" />
     <Compile Include="Src\LAMSSecurityUtil.cs">
     </Compile>
-    <None Include="Src\LAMSUserInformationHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="TEMPLATE\FEATURES\LamsSharePointIntegration\elements.xml" />
@@ -69,12 +68,6 @@
     </Content>
     <Content Include="TEMPLATE\FEATURES\LamsSharePointIntegration\LessonsList\schema.xml" />
     <Content Include="TEMPLATE\FEATURES\LamsSharePointIntegration\ListTemplates\LessonsList.xml" />
-    <Content Include="TEMPLATE\FEATURES\LamsSharePointIntegration\PageTemplates\LAMSLearning.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="TEMPLATE\FEATURES\LamsSharePointIntegration\PageTemplates\LAMSTeaching.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="TEMPLATE\IMAGES\LamsSharePointIntegration\favicon.ico" />
     <Content Include="TEMPLATE\IMAGES\LamsSharePointIntegration\lams_logo.gif" />
     <Content Include="TEMPLATE\IMAGES\LamsSharePointIntegration\treeicons\base.gif" />
@@ -91,9 +84,6 @@
     <Content Include="TEMPLATE\IMAGES\LamsSharePointIntegration\treeicons\plusbottom.gif" />
     <Content Include="TEMPLATE\LAYOUTS\LamsSharePointIntegration\jquery\jquery-1.2.3.pack.js" />
     <Content Include="TEMPLATE\LAYOUTS\LamsSharePointIntegration\LAMSIntegrationSettings.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="TEMPLATE\LAYOUTS\LamsSharePointIntegration\LAMSLandingRedirect.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Solution\manifest.xml" />
@@ -116,7 +106,6 @@
     <None Include="Package\InstallSolutionPackage.cmd" />
     <None Include="TEMPLATE\LAYOUTS\LamsSharePointIntegration\LAMSAjaxServletRequester.ashx">
     </None>
-    <None Include="TEMPLATE\LAYOUTS\LamsSharePointIntegration\LAMSUserInformation.ashx" />
     <None Include="Solution\Cab.ddf" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -129,6 +118,9 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>cd $(ProjectDir)
+cd Package
+CreateSolutionPackage.cmd
+cd ..
 Install.bat
 </PostBuildEvent>
   </PropertyGroup>

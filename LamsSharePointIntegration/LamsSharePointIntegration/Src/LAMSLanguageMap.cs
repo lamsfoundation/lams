@@ -153,7 +153,7 @@ namespace LamsSharePointIntegration
                     ret[0] = "pl";
                     ret[1] = "PL";
                     return ret;
-                    break;
+ 
                 case RUSSIAN:
                     ret[0] = "ru";
                     ret[1] = "RU";
@@ -163,7 +163,7 @@ namespace LamsSharePointIntegration
                     ret[0] = "es";
                     ret[1] = "ES";
                     return ret;
-                    break;
+
                 case SWEDISH:
                     ret[0] = "sv";
                     ret[1] = "SE";

@@ -75,7 +75,7 @@ namespace LamsSharePointIntegration
             {
                 lessonId = LAMSSecurityUtil.startLesson(user, siteWeb, sequenceId, title, description, "start");
             }
-            catch (System.Net.WebException e)
+            catch (System.Net.WebException)
             {
                 properties.ErrorMessage = "Request to LAMS server to start lesson failed. Please Contact System Administrator";
                 properties.Cancel = true;
