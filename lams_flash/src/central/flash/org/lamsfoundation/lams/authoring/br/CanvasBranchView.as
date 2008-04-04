@@ -399,8 +399,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	public function open(doTransition:Boolean):Void {
 		Debugger.log("calling open: " + _open, Debugger.CRITICAL, "open", " CanvasBranchView");
 		if(model instanceof CanvasModel) model.getCanvas().addBin(this.binLayer);
-		//if(_prevActiveView instanceof CanvasComplexView && _prevActiveView.prevActiveView instanceof CanvasBranchView)
-		//	_prevActiveView.prevActiveView.complexViewer.swapDepths(_prevActiveView.prevActiveView.closeButton);
 			
 		setSize(model);
 		
@@ -439,9 +437,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	private function close():Void {
 		if(model instanceof CanvasModel) model.getCanvas().hideBin(); //typo
-	//	if(_prevActiveView instanceof CanvasComplexView && _prevActiveView.prevActiveView instanceof CanvasBranchView)
-	//		_prevActiveView.prevActiveView.complexViewer.swapDepths(_prevActiveView.prevActiveView.closeButton);
-		
 		this.activity.clear = false;
 		
 		Debugger.log("this._canvasBranchingActivity: "+ this._canvasBranchingActivity, Debugger.CRITICAL, "close", "CanvasBranchView");
@@ -471,8 +466,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 			model.getMonitor().getMV().getMonitorTabView().showAssets(true);
 			model.getMonitor().closeBranchView(_prevActiveView);
 		}
-		
-		Debugger.log("model.activeView :  " + model.activeView, Debugger.CRITICAL, "finishedClose", "CanvasBranchView");
 		
 		var targetView = findBinTargetView(_prevActiveView);
 		Debugger.log("model.activeView :  " + targetView, Debugger.CRITICAL, "finishedClose", "CanvasBranchView");
@@ -814,11 +807,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var s:Object = model.getSize();
 		
 		var pos:Object = getXYPos(thisCA, true, 0, 0);
-		Debugger.log("pos x: " + pos.x, Debugger.CRITICAL, "setSize", "CanvasBranchView");
-		Debugger.log("pos y: " + pos.y, Debugger.CRITICAL, "setSize", "CanvasBranchView");
 		
-		var cx:Number = pos.x; //thisCA._x + thisCA.getVisibleWidth()/2;
-		var cy:Number = pos.y; // thisCA._y + thisCA.getVisibleHeight()/2;
+		var cx:Number = pos.x;
+		var cy:Number = pos.y;
 		
 		s.w -= 2*hSpace;
 		s.h -= 2*vSpace;
@@ -844,9 +835,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	private function getXYPos(ca, centerPos:Boolean, xOffset:Number, yOffset:Number):Object {
 		var pos = new Object();
-		Debugger.log("ca: " + ca, Debugger.CRITICAL, "getXYPos", "CanvasBranchView");
-		Debugger.log("xoffset: " + xOffset, Debugger.CRITICAL, "getXYPos", "CanvasBranchView");
-		Debugger.log("yoffset: " + yOffset, Debugger.CRITICAL, "getXYPos", "CanvasBranchView");
 		
 		pos.x = (!centerPos) ? ca._x + xOffset : (ca._x + ca.getVisibleWidth()/2) + xOffset;
 		pos.y = (!centerPos) ? ca._y + yOffset : (ca._y + ca.getVisibleHeight()/2) + yOffset;
@@ -855,26 +843,19 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		if(parentAct._parent == model.activeView.activityLayer || parentAct._parent == model.activeView.activityComplexLayer)
 			return pos;
 		
-		Debugger.log("complexActivity.activity.activityUIID: " + CanvasComplexView(_prevActiveView).openActivity.activity.activityUIID, Debugger.CRITICAL, "getXYPos", "CanvasBranchView");
-		Debugger.log("ca.activity.parentUIID: " + ca.activity.parentUIID, Debugger.CRITICAL, "getXYPos", "CanvasBranchView");
-		Debugger.log("parentAct: " + parentAct, Debugger.CRITICAL, "getXYPos", "CanvasBranchView");
-		
 		if(_prevActiveView instanceof CanvasComplexView && ca.activity.parentUIID == CanvasComplexView(_prevActiveView).openActivity.activity.activityUIID) {
-			Debugger.log("complex inst: " + _prevActiveView.complexActivity.activity.activityUIID, Debugger.CRITICAL, "getXYPos", "CanvasBranchView");
-		
+			
 			return getXYPos(_prevActiveView.openActivity, false, pos.x, pos.y);
 		} else if(ca == _prevActiveView.openActivity) {
+			
 			return pos;
 		} else if(parentAct instanceof CanvasActivity || parentAct instanceof CanvasOptionalActivity) {
-			Debugger.log("canvas/optional par: " + parentAct, Debugger.CRITICAL, "getXYPos", "CanvasBranchView");
-		
+			
 			return getXYPos(parentAct, false, pos.x, pos.y);
 		} else if(ca.isSequenceChild) {
-			Debugger.log("seq par: " + ca._parent._parent, Debugger.CRITICAL, "getXYPos", "CanvasBranchView");
 			
 			return getXYPos(ca._parent._parent, false, pos.x, pos.y);
 		} else {
-			Debugger.log("returning normal: " + pos, Debugger.CRITICAL, "getXYPos", "CanvasBranchView");
 			
 			return pos;
 		}
@@ -885,18 +866,10 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
     * @param cm Canvas model object 
     */
 	private function setPosition(model, cx, cy){
-      //  var ba = (_ba != null || _ba == undefined) ? cm.activitiesDisplayed.get(activity.activityUIID) : _ba;
-		
 		Debugger.log("model: " + model.activitiesDisplayed, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
 		Debugger.log("act UIID: " + activity.activityUIID, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
 		
-		Debugger.log("cx: " + cx, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
-		
 		if(cx != null && cy != null) {
-			//var cx:Number = ba._x + ba.getVisibleWidth()/2;
-			//var cy:Number = ba._y + ba.getVisibleHeight()/2;
-			
-			//Debugger.log("current: " + ba.activity.activityUIID, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
 			_x = cx;
 			_y = cy;
 			
