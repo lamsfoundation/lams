@@ -32,6 +32,7 @@ class ToolOutputDefinition  {
 	
 	public static var LONG:String = "OUTPUT_LONG";
 	public static var BOOL:String = "OUTPUT_BOOLEAN";
+	public static var USER_DEFINED:String = "OUTPUT_USER_DEFINED";
 	
 	private var _name:String;
 	private var _description:String;

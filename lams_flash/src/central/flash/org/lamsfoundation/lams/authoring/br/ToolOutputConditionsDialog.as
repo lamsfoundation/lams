@@ -84,6 +84,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private var remove_item_btn:Button;
 	private var clear_all_btn:Button;
 	private var help_btn:Button;
+	private var refresh_btn:Button;
 	
 	private var _condition_from_lbl:Label;
 	private var _condition_to_lbl:Label;
@@ -144,6 +145,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		help_btn.addEventListener('click',Delegate.create(this, helpButton_onPress));
 		remove_item_btn.addEventListener('click', Delegate.create(this, removeItemButton_onPress));
 		clear_all_btn.addEventListener('click', Delegate.create(this, clearAllButton_onPress));
+		refresh_btn.addEventListener('click', Delegate.create(this, refreshButton_onPress));
 		
 		_toolOutputDefin_cmb.addEventListener('change', Delegate.create(this, itemChanged));
 		_toolOutputLongOptions_cmb.addEventListener('change', Delegate.create(this, optionChanged));
@@ -190,6 +192,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		help_btn.label = HELP_BTN_LBL;
 		clear_all_btn.label = Dictionary.getValue("to_conditions_dlg_clear_all_btn_lbl");
 		remove_item_btn.label = Dictionary.getValue("to_conditions_dlg_remove_item_btn_lbl");
+		refresh_btn.label = "Refresh"; ///Dictionary.getValue("to_conditions_dlg_remove_item_btn_lbl");
 	
 		//Set the text for buttons
         close_btn.label = Dictionary.getValue('al_done');
@@ -213,6 +216,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		help_btn.setStyle('styleName', styleObj);
 		remove_item_btn.setStyle('styleName', styleObj);
 		clear_all_btn.setStyle('styleName', styleObj);
+		refresh_btn.setStyle('styleName', styleObj);
        
 		styleObj = themeManager.getStyleObject('CanvasPanel');
 		_bgpanel.setStyle('styleName', styleObj);
@@ -242,6 +246,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		add_btn.visible = b;
 		remove_item_btn.visible = b;
 		clear_all_btn.visible = b;
+		refresh_btn.visible = b;
 	
 		_condition_from_lbl.visible = b;
 		_condition_to_lbl.visible = b;
@@ -313,6 +318,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		for(var i=0; i < items.length; i++)
 			if(items[i].name == name)
 				_toolOutputDefin_cmb.selectedIndex = i;
+
 	}
 	
 	private function addButton_onPress():Void {
@@ -358,12 +364,24 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		if(!app.getCanvas().ddm.hasBranchMappingsForCondition(_selectedItem.conditionUIID) || c) {
 			removeCondition(_selectedItem.conditionUIID, _condition_item_dgd.selectedIndex);
 		} else {
-			LFMessage.showMessageConfirm(Dictionary.getValue("branch_mapping_dlg_condition_linked_msg", [Dictionary.getValue("branch_mapping_dlg_condition_linked_single")]), Proxy.create(this, removeItemButton_onPress, evt, true), null, "continue", null, "");
+			LFMessage.showMessageConfirm(Dictionary.getValue("branch_mapping_dlg_condition_linked_msg", [Dictionary.getValue("branch_mapping_dlg_condition_linked_single")]), Proxy.create(this, removeItemButton_onPress, evt, true), null, Dictionary.getValue("al_continue"), null, "");
 		}
 		
 		if(c)
 			app.getCanvas().ddm.removeBranchMappingsByCondition(_selectedItem.conditionUIID);
 		
+	}
+	
+	private function refreshButton_onPress(evt:Object):Void {
+		if(_selectedDefinition != null) {
+			if(_selectedDefinition.defaultConditions.length > 0) {
+				LFMessage.showMessageConfirm(Dictionary.getValue("to_conditions_dlg_condition_items_update_defaultConditions"), Proxy.create(this, updateWithDefaultConditions), null, Dictionary.getValue("al_continue"), null, "");
+			} else if(_selectedDefinition.type == ToolOutputDefinition.USER_DEFINED) {
+				// TODO: 2.1.x
+				// show alert message - 0 default conditions all mappings will be removed
+				//LFMessage.showMessageConfirm(Dictionary.getValue("branch_mapping_dlg_defaultConditions_zero"), Proxy.create(this, removeAllItems), null, "continue", null, "");
+			}
+		}
 	}
 	
 	/**
@@ -396,6 +414,13 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 		app.getCanvas().ddm.addOutputCondition(condition);
 		
+	}
+	
+	private function updateWithDefaultConditions():Void {
+		if(_selectedDefinition != null) {
+			removeAllItems(false);
+			addDefaultConditions(_selectedDefinition.defaultConditions);
+		}
 	}
 	
 	private function removeCondition(conditionUIID:Number, index:Number):Void {
@@ -552,15 +577,25 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		switch(_selectedDefinition.type) {
 			case ToolOutputDefinition.LONG:
 				_condition_item_dgd.visible = true;
-							
+				
 				if(_selectedDefinition.defaultConditions.length > 0) {
 					add_btn.visible = false;
+					remove_item_btn.visible = false;
+					clear_all_btn.visible = false;
+					
+					refresh_btn.visible = true;
+					
 					_toolOutputLongOptions_cmb.visible = false;
 				
 					showSteppers(false, false);
 					addDefaultConditions(_selectedDefinition.defaultConditions);
 				} else {
 					add_btn.visible = true;
+					remove_item_btn.visible = true;
+					clear_all_btn.visible = true;
+					
+					refresh_btn.visible = false;
+					
 					_toolOutputLongOptions_cmb.visible = true;
 				
 					optionChanged();
@@ -574,9 +609,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 					_end_value_stp.value = (_selectedDefinition.endValue != null) ? Number(_selectedDefinition.endValue) : STP_MIN;
 				}
 				
-				clear_all_btn.visible = true;
-				remove_item_btn.visible = true;
-				
 				break;
 			
 			case ToolOutputDefinition.BOOL:
@@ -584,10 +616,18 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				_toolOutputLongOptions_cmb.visible = false;
 				
 				add_btn.visible = false;
+				remove_item_btn.visible = false;
+				clear_all_btn.visible = false;
+				
+				refresh_btn.visible = false;
+				
 				showSteppers(false, false);
 				
 				addDefaultConditions(_selectedDefinition.defaultConditions);
 				
+				break;
+			case ToolOutputDefinition.USER_DEFINED:
+				// TODO: 2.1.x
 				break;
 			default:
 				showElements(false);
@@ -722,6 +762,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		add_btn._x = _toolOutputLongOptions_cmb._x + _toolOutputLongOptions_cmb._width - add_btn.width;
 		remove_item_btn.move(_condition_item_dgd._x + _condition_item_dgd._width - remove_item_btn.width, _condition_item_dgd._y + _condition_item_dgd._height + 5);
 		clear_all_btn.move(remove_item_btn._x - clear_all_btn.width - 5, remove_item_btn._y);
+		refresh_btn.move(_condition_item_dgd._x + _condition_item_dgd._width - refresh_btn.width, _condition_item_dgd._y + _condition_item_dgd._height + 5);
 		
 		help_btn._x = w - _toolOutputDefin_cmb._x - help_btn.width;
         
