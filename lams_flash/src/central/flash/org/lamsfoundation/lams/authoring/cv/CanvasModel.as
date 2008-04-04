@@ -1098,10 +1098,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		Debugger.log("currentBranchingActivity UIID: " + currentBranchingActivity.activity.activityUIID, Debugger.CRITICAL, "openBranchActivityContent", "CanvasModel");
 		Debugger.log("branchView: " + ba.activity.branchView, Debugger.CRITICAL, "openBranchActivityContent", "CanvasModel");
 		
-		if(BranchingActivity(ba.activity).clear) {
+		if(BranchingActivity(ba.activity).clear)
 			clearBranchingActivity(ba);
-			MovieClipUtils.doLater(Proxy.create(_cv, _cv.openBranchView, currentBranchingActivity, visible));
-		} else if(ba.activity.branchView != null) {
+			
+		if(ba.activity.branchView != null) {
 			ba.activity.branchView.prevActiveView = activeView;
 			activeView = (visible) ? ba.activity.branchView : activeView;
 			ba.activity.branchView.setOpen(visible);
@@ -1109,9 +1109,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			
 			openBranchingActivities.push(ba);
 		} else { 
-			_cv.openBranchView(currentBranchingActivity, visible); }
+			_cv.openBranchView(currentBranchingActivity, visible); 
+		}
 		
-			_lastBranchActionType = null;
+		_lastBranchActionType = null;
 	}
 
 }

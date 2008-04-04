@@ -245,12 +245,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		}
 	}
 	
-	public function removeAllChildren():Void {
+	public function removeAllChildren(removeBranchView:Boolean):Void {
 		for(var j=0; j<children_mc.length; j++) {
 			var childActMC:CanvasActivity = CanvasActivity(children_mc[j]);
 			
-			if(childActMC.activity.isBranchingActivity() && childActMC.activity.branchView != null) {
-				//childActMC.activity.branchView.removeMovieClip();
+			if(childActMC.activity.isBranchingActivity() && childActMC.activity.branchView != null && removeBranchView) {
+				childActMC.activity.branchView.removeMovieClip();
 			}
 			
 			childActMC.removeMovieClip();

@@ -531,7 +531,7 @@ class CanvasHelper {
 	}
 	
 	public function closeBranchView(prevActiveView) {
-		canvasModel.openBranchingActivities.pop();
+		var branchingAct:CanvasActivity = CanvasActivity(canvasModel.openBranchingActivities.pop());
 		var parentBranching:CanvasActivity = (canvasModel.openBranchingActivities.length > 0) ? CanvasActivity(canvasModel.openBranchingActivities[canvasModel.openBranchingActivities.length-1]) : null;
 
 		if(prevActiveView != null) 
@@ -539,7 +539,11 @@ class CanvasHelper {
 		else
 			canvasModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.activity.branchView : canvasView;
 		
+		
 		canvasModel.currentBranchingActivity = (parentBranching.activity.isBranchingActivity()) ? parentBranching : null;
+		
+		if(canvasModel.activeView instanceof CanvasComplexView)
+			CanvasComplexView(canvasModel.activeView).branchingToClear.push(branchingAct);
 		
 		Debugger.log("activeView: " + canvasModel.activeView, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
 		Debugger.log("currentBranchingActivity: " + canvasModel.currentBranchingActivity, Debugger.CRITICAL, "closeBranchView", "CanvasHelper");
@@ -563,7 +567,7 @@ class CanvasHelper {
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
 		var isVisible:Boolean = (visible == null) ? true : visible;
 		
-		var target:MovieClip = (canvasModel.activeView instanceof CanvasBranchView) ? canvasModel.activeView.branchContent : _canvasView_mc.branchContent;
+		var target:MovieClip = canvasModel.activeView.branchContent; //(canvasModel.activeView instanceof CanvasBranchView) ? canvasModel.activeView.branchContent : _canvasView_mc.branchContent;
 		
 		Debugger.log("canvasModel.activeView: "+ canvasModel.activeView, Debugger.CRITICAL, "openBranchView", "CanvasHelper");
 		
@@ -584,7 +588,7 @@ class CanvasHelper {
 	
 	public function openComplexView(ca:Object):Void {
 		
-		var target:MovieClip = (canvasModel.activeView instanceof CanvasBranchView) ? canvasModel.activeView.complexViewer : _canvasView_mc.complexViewer;
+		var target:MovieClip = canvasModel.activeView.complexViewer; // (canvasModel.activeView instanceof CanvasBranchView || canvasModel) ? canvasModel.activeView.complexViewer : _canvasView_mc.complexViewer;
 		
 		var cx:Number;
 		var cy:Number;

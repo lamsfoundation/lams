@@ -527,7 +527,7 @@ class Monitor {
 	
 	public function openComplexView(ca:Object):Void {
 		
-		var target:MovieClip = (monitorModel.activeView instanceof CanvasBranchView) ? monitorModel.activeView.complexViewer : monitorView.getMonitorTabView().complexViewer;
+		var target:MovieClip = monitorModel.activeView.complexViewer; //(monitorModel.activeView instanceof CanvasBranchView) ? monitorModel.activeView.complexViewer : monitorView.getMonitorTabView().complexViewer;
 		
 		var cx:Number;
 		var cy:Number;

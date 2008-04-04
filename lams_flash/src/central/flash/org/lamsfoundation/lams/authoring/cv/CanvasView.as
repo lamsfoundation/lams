@@ -533,4 +533,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 	public function getScrollPaneHPosition():Number {
 		return canvas_scp.hPosition;
 	}
+	
+	public function get scrollpane():MovieClip {
+		return canvas_scp;
+	}
 }

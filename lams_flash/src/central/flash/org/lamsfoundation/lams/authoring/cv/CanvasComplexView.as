@@ -66,6 +66,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 	private var lastScreenHeight:Number = 300;
 	
 	private var activitiesDisplayed:Hashtable;
+	private var _branchingToClear:Array;
 	
 	/**
 	* Constructor
@@ -73,7 +74,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 	function CanvasComplexView(){
 		_canvasComplexView = this;
 		_tm = ThemeManager.getInstance();
-		
+		_branchingToClear = new Array();
 		//activitiesDisplayed = new Hashtable("activitiesDisplayed");
 		
         //Init for event delegation
@@ -198,11 +199,23 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 	public function close():Void {
 		removeActivity(_complexActivity.activity, model);
 		
+		Debugger.log("setting new activeview: " + _prevActiveView, Debugger.CRITICAL, "close", "CanvasComplexView");
+		
 		model.activeView = _prevActiveView;
 		model.currentBranchingActivity = (_prevActiveView.activity.isBranchingActivity()) ? _prevActiveView.activity : null;
 
 		model.removeObserver(this);
 		
+		for(var i=0; i<branchingToClear.length; i++) {
+			// clearing opened branching views
+			Debugger.log("clearing branching view: " + branchingToClear[i].activity.activityUIID, Debugger.CRITICAL, "close", "CanvasComplexView");
+			model.clearBranchingActivity(branchingToClear[i]);
+		}
+		
+		if(_tempActivity instanceof CanvasOptionalActivity)
+			_tempActivity.removeAllChildren();
+			
+		_tempActivity.removeMovieClip();
 		_complexActivity.refresh();
 
 		this.removeMovieClip();
@@ -351,6 +364,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 	
 	public function get prevActiveView():MovieClip {
 		return _prevActiveView;
+	}
+	
+	public function get branchingToClear():Array {
+		return _branchingToClear;
 	}
 	
 }

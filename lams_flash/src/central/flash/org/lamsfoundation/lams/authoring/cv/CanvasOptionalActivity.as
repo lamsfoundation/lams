@@ -249,12 +249,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		MovieClipUtils.doLater(Proxy.create(this, draw));
 	}
 	
-	public function removeAllChildren():Void {
+	public function removeAllChildren(removeBranchView:Boolean):Void {
 		for(var j=0; j<children_mc.length; j++) {
 			var childActMC = (children_mc[j] instanceof CanvasActivity) ? CanvasActivity(children_mc[j]) : CanvasSequenceActivity(children_mc[j]);
-			if(childActMC instanceof CanvasSequenceActivity) childActMC.removeAllChildren();
-			else if(childActMC.activity.isBranchingActivity() && childActMC.activity.branchView != null) {
-				//childActMC.activity.branchView.removeMovieClip();
+			if(childActMC instanceof CanvasSequenceActivity) childActMC.removeAllChildren(removeBranchView);
+			else if(childActMC.activity.isBranchingActivity() && childActMC.activity.branchView != null && removeBranchView) {
+				childActMC.activity.branchView.removeMovieClip();
 			}
 			
 			childActMC.removeMovieClip();

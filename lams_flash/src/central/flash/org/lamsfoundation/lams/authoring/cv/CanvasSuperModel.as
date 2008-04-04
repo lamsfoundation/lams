@@ -990,8 +990,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		
 		Debugger.log('ParentId of '+ca.activity.activityUIID+ ' ==> '+ca.activity.parentUIID,Debugger.GEN,'addParentToActivity','CanvasModel');
 		
-		if(ca.activity.isBranchingActivity())
+		if(ca.activity.isBranchingActivity()) {
 			ca.activity.clear = true;
+		} else if(ca.activity.isOptionalActivity() || ca.activity.isOptionsWithSequencesActivity()) {
+			Debugger.log("clearing sub branching acts: " + ca.actChildren.length, Debugger.CRITICAL, "addParentToActivity", "CanvasSuperModel");
+			for(var i=0; i<ca.actChildren.length; i++) {				Debugger.log("clearing: " + ca.actChildren[i].activity.isBranchingActivity(), Debugger.CRITICAL, "addParentToActivity", "CanvasSuperModel");
+				Debugger.log("clearing: " + ca.actChildren[i].activity.activityUIID, Debugger.CRITICAL, "addParentToActivity", "CanvasSuperModel");
+				if(ca.actChildren[i].isBranchingActivity()) ca.actChildren[i].clear = true;
+			}
+		}
 		
 		removeActivity(ca.activity.activityUIID);
 		if(doRemoveParent) removeActivity(parentID);

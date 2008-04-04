@@ -709,6 +709,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		_isSelected = v;
 	}
 	
+	public function get isSequenceChild():Boolean{
+		return _sequenceChild;
+	}
+	
 	public function get activity():Activity{
 		return getActivity();
 	}
