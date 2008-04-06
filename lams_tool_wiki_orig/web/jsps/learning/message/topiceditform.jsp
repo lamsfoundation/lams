@@ -3,7 +3,7 @@
 
 	
 			<div class="field-name title-space-top">
-				<fmt:message key="message.label.title" />
+				<fmt:message key="message.label.wikiTitle" />
 			</div>
 			
 			

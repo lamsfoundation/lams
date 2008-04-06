@@ -7,7 +7,7 @@
 		<tr>
 			<th scope="col" width="50%"><fmt:message key="label.topic.title.wiki"/></th>
 			<th scope="col" width="20%"><fmt:message key="label.topic.title.createdby"/></th>
-			<th scope="col" width="30%"><fmt:message key="label.topic.title.update"/></th>
+			<th scope="col" width="30%"><fmt:message key="label.topic.title.lastUpdate"/></th>
 		</tr>
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 		<c:forEach items="${sessionMap.topicList}" var="topic" varStatus="status">

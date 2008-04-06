@@ -10,10 +10,10 @@
 				<fmt:message key="label.topic.title.createdby" />
 			</th>
 			<th width="60px">
-				<fmt:message key="label.topic.title.replies" />
+				<fmt:message key="label.topic.title.updates" />
 			</th>
 			<th width="25%">
-				<fmt:message key="label.topic.title.update" />
+				<fmt:message key="label.topic.title.lastUpdate" />
 			</th>
 		</tr>
 		<c:forEach items="${topicList}" var="topic">

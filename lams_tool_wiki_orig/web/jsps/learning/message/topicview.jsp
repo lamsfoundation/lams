@@ -138,25 +138,13 @@
 						<!--  Edit Button -->
 						<c:if test="${not hidden}">
 							<c:if
-								test='${(sessionMap.mode == "teacher") || (msgDto.isAuthor && not sessionMap.finishedLock && sessionMap.allowEdit && (empty msgDto.mark))}'>
+								test='${(sessionMap.mode == "teacher") || (not sessionMap.finishedLock && sessionMap.allowEdit && (empty msgDto.mark))}'>
 								<c:set var="edittopic">
 									<html:rewrite
 										page="/learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}" />
 								</c:set>
 								<html:link href="${edittopic}" styleClass="button">
 									<fmt:message key="label.edit" />
-								</html:link>
-							</c:if>
-					
-							<!--  Reply Button -->
-							<c:if
-								test="${(not sessionMap.finishedLock) && (not sessionMap.noMorePosts)}">
-								<c:set var="replytopic">
-									<html:rewrite
-										page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}" />
-								</c:set>
-								<html:link href="${replytopic}" styleClass="button">
-									<fmt:message key="label.reply" />
 								</html:link>
 							</c:if>
 						</c:if>
