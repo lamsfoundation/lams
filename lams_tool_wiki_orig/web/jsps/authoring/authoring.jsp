@@ -1,5 +1,5 @@
 <%@ include file="/includes/taglibs.jsp"%>
-<%@ page import="org.lams.lams.tool.wiki.util.WikiConstants"%>
+<%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>
 
 <html:form action="authoring/update" method="post"
 	styleId="authoringForm" enctype="multipart/form-data">

@@ -15,19 +15,19 @@
 
     <form-bean
       name="messageForm"
-      type="org.lams.lams.tool.wiki.web.forms.MessageForm"
+      type="org.lamsfoundation.lams.tool.wiki.web.forms.MessageForm"
     />
     <form-bean
       name="wikiForm"
-      type="org.lams.lams.tool.wiki.web.forms.WikiForm"
-    />
-    <form-bean
-      name="markForm"
-      type="org.lams.lams.tool.wiki.web.forms.MarkForm"
+      type="org.lamsfoundation.lams.tool.wiki.web.forms.WikiForm"
     />
     <form-bean
       name="reflectionForm"
-      type="org.lams.lams.tool.wiki.web.forms.ReflectionForm"
+      type="org.lamsfoundation.lams.tool.wiki.web.forms.ReflectionForm"
+    />
+    <form-bean
+      name="markForm"
+      type="org.lamsfoundation.lams.tool.wiki.web.forms.MarkForm"
     />
 
    <form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm" />
@@ -54,7 +54,7 @@
 
    		<!-- ========== Action Mapping Definitions ============================== -->
 		<action path="/defineLater"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			name="wikiForm" 
 			scope="request" 
 			validate="false"
@@ -64,7 +64,7 @@
 		</action>
 		<!-- ========== BEGIN: Authroing Definitions ============================== -->
 		<action path="/authoring"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			name="wikiForm" 
 			scope="request" 
 			parameter="initPage" 
@@ -72,7 +72,7 @@
 			<forward name="success" path="tiles:/authoring/wiki/main" />
 		</action>
 		<action path="/authoring/update"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			name="wikiForm" 
 			scope="request" 			parameter="updateContent" 
 			validate="false">
@@ -81,7 +81,7 @@
 		</action>
 
 		<action path="/authoring/uploadOnline"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			name="wikiForm" 
 			scope="request" 
 			parameter="uploadOnlineFile" 
@@ -89,7 +89,7 @@
 			<forward name="success" path="tiles:/authoring/wiki/main" />
 		</action>
 		<action path="/authoring/uploadOffline"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			name="wikiForm" 
 			scope="request" 
 			validate="false"
@@ -97,7 +97,7 @@
 			<forward name="success" path="tiles:/authoring/wiki/main" />
 		</action>
 		<action path="/authoring/deleteOnline"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			name="wikiForm" 
 			scope="request" 
 			validate="false"
@@ -105,7 +105,7 @@
 			<forward name="success" path="/jsps/authoring/parts/instructionfilelist.jsp" />
 		</action>
 		<action path="/authoring/deleteOffline"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			name="wikiForm" 
 			scope="request" 
 			validate="false"
@@ -114,7 +114,7 @@
 		</action>
 		<!--  ================= topics  =================  -->	
 		<action path="/authoring/newTopic"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			name="messageForm" 
 			validate="false"
 			scope="request"
@@ -122,7 +122,7 @@
 			<forward name="success" path="/jsps/authoring/message/create.jsp" />
 		</action>
 		<action path="/authoring/createTopic"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			name="messageForm" 
 			validate="true"
 			input="/jsps/authoring/message/create.jsp" 
@@ -131,12 +131,12 @@
 			<forward name="success" path="/jsps/authoring/message/topiclist.jsp" />
 		</action>
 		<action path="/authoring/deleteTopic"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			parameter="deleteTopic">
 			<forward name="success" path="/jsps/authoring/message/topiclist.jsp" />
 		</action>
 		<action path="/authoring/viewTopic"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			name="messageForm" 
 			validate="false"
 			parameter="viewTopic"
@@ -144,7 +144,7 @@
 			<forward name="success" path="/jsps/authoring/message/view.jsp" />
 		</action>
 		<action path="/authoring/editTopic"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			name="messageForm" 
 			validate="false"
 			parameter="editTopic"
@@ -153,12 +153,12 @@
 			<forward name="forbidden" path="/jsps/authoring/message/forbiddenedit.jsp" />
 		</action>
 		<action path="/authoring/deleteAttachment"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			parameter="deleteAttachment">
 			<forward name="success" path="/jsps/authoring/parts/msgattachment.jsp" />
 		</action>
 		<action path="/authoring/updateTopic"
-			type="org.lams.lams.tool.wiki.web.actions.AuthoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
 			name="messageForm" 
 			validate="true"
 			input="/jsps/authoring/message/edit.jsp" 
@@ -170,26 +170,26 @@
 		<!-- ========== END: Authroing Definitions ============================== -->
 		<!-- ========== BEGIN: Learning Definitions ============================== -->
 		<action path="/learning/viewWiki"
-			type="org.lams.lams.tool.wiki.web.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
 			parameter="viewWiki" scope="request" name="emptyForm">
 			<forward name="success" path="tiles:/learning/wiki/viewWiki" />
 			<forward name="defineLater" path="tiles:/learning/wiki/defineLater" />
 			<forward name="runOffline" path="tiles:/learning/wiki/runOffline" />
 		</action>
 		<action path="/learning/viewTopic"
-			type="org.lams.lams.tool.wiki.web.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
 			parameter="viewTopic" scope="request">
 			<forward name="success" path="tiles:/learning/wiki/viewTopic" />
 		</action>
 		<action path="/learning/newTopic"
-			type="org.lams.lams.tool.wiki.web.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
 			name="messageForm" 
 			validate="false" 
 			parameter="newTopic" scope="request">
 			<forward name="success" path="tiles:/learning/wiki/newTopic" />
 		</action>
 		<action path="/learning/createTopic"
-			type="org.lams.lams.tool.wiki.web.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
 			name="messageForm" 
 			validate="true" 
 			input="tiles:/learning/wiki/newTopic" 
@@ -198,7 +198,7 @@
 			<forward name="success" path="tiles:/learning/wiki/viewWiki" />
 		</action>
 		<action path="/learning/newReplyTopic"
-			type="org.lams.lams.tool.wiki.web.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
 			name="messageForm" 
 			validate="false" 
 			parameter="newReplyTopic" 
@@ -206,7 +206,7 @@
 			<forward name="success" path="tiles:/learning/wiki/replyTopic" />
 		</action>
 		<action path="/learning/replyTopic"
-			type="org.lams.lams.tool.wiki.web.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
 			name="messageForm" 
 			validate="true" 
 			input="tiles:/learning/wiki/replyTopic" 
@@ -215,7 +215,7 @@
 			<forward name="success" path="tiles:/learning/wiki/viewTopic" />
 		</action>
 		<action path="/learning/editTopic"
-			type="org.lams.lams.tool.wiki.web.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
 			name="messageForm" 
 			validate="false" 
 			parameter="editTopic" 
@@ -223,7 +223,7 @@
 			<forward name="success" path="tiles:/learning/wiki/editTopic" />
 		</action>
 		<action path="/learning/updateTopic"
-			type="org.lams.lams.tool.wiki.web.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
 			name="messageForm" 
 			validate="true" 
 			input="tiles:/learning/wiki/editTopic"
@@ -232,24 +232,24 @@
 			<forward name="success" path="tiles:/learning/wiki/viewTopic" />
 		</action>
 		<action path="/learning/deleteAttachment"
-			type="org.lams.lams.tool.wiki.web.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
 			parameter="deleteAttachment">
 			<forward name="success" path="/jsps/learning/message/msgattachment.jsp" />
 		</action>
 		<action path="/learning/updateMessageHideFlag"
-			type="org.lams.lams.tool.wiki.web.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
 			parameter="updateMessageHideFlag" 
 			scope="request">
 			<forward name="success" path="tiles:/learning/wiki/viewTopic" />
 		</action>	
 		<action path="/learning/finish"
-			type="org.lams.lams.tool.wiki.web.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
 			input="tiles:/learning/wiki/viewWiki" 
 			parameter="finish">
 		</action>
 		<!--  ========= Reflection =============== -->
 		<action path="/learning/newReflection"
-			type="org.lams.lams.tool.wiki.web.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
 			name="reflectionForm" 
 			validate="false" 
 			parameter="newReflection" 
@@ -258,7 +258,7 @@
 			<forward name="success" path="tiles:/learning/reflection" />
 		</action>
 		<action path="/learning/submitReflection"
-			type="org.lams.lams.tool.wiki.web.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
 			name="reflectionForm" 
 			validate="false" 
 			input="tiles:/learning/reflection"
@@ -269,24 +269,24 @@
 		<!-- ========== END: Learning  Definitions ============================== -->
 		<!-- ========== START: Monitoring  Definitions ============================== -->
 		<action path="/monitoring" 
-			type="org.lams.lams.tool.wiki.web.actions.MonitoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.MonitoringAction"
 		    scope="request"
 		    parameter="init" >
 			<forward name="load" path="tiles:/monitoring/wiki/main" redirect="false" />	        
 		</action>
 		<action path="/monitoring/statistic" 
-			type="org.lams.lams.tool.wiki.web.actions.MonitoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.MonitoringAction"
 		    scope="request"
 		    parameter="statistic" >
 			<forward name="success" path="/jsps/monitoring/statisticpart.jsp"/>	        
 		</action>
 		<action path="/monitoring/releaseMark" 
-			type="org.lams.lams.tool.wiki.web.actions.MonitoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.MonitoringAction"
 		    scope="request"
 		    parameter="releaseMark" >
 		</action>
 		<action path="/monitoring/downloadMarks"
-			type="org.lams.lams.tool.wiki.web.actions.MonitoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.MonitoringAction"
 			input="tiles:/monitoring/wiki/listContentUsers"
 			name="emptyForm"
 			scope="request"
@@ -295,7 +295,7 @@
 			<forward name="success" path="tiles:/monitoring/wiki/listContentUsers" />
 		</action>
 		<action path="/monitoring/viewAllMarks"
-			type="org.lams.lams.tool.wiki.web.actions.MonitoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.MonitoringAction"
 			name="emptyForm"
 			scope="request"
 			validate="false"
@@ -304,7 +304,7 @@
 		</action>
 		<!--  EDIT MARK		 -->
 		<action path="/monitoring/viewUserMark"
-			type="org.lams.lams.tool.wiki.web.actions.MonitoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.MonitoringAction"
 			name="emptyForm"
 			scope="request"
 			validate="false"
@@ -312,7 +312,7 @@
 			<forward name="success" path="tiles:/monitoring/wiki/viewMark" />
 		</action>
 		<action path="/monitoring/editMark"
-			type="org.lams.lams.tool.wiki.web.actions.MonitoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.MonitoringAction"
 			name="markForm"
 			scope="request"
 			validate="false"			
@@ -320,7 +320,7 @@
 			<forward name="success" path="tiles:/monitoring/wiki/editUserMark" />
 		</action>
 		<action path="/monitoring/updateMark"
-			type="org.lams.lams.tool.wiki.web.actions.MonitoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.MonitoringAction"
 			input="tiles:/monitoring/wiki/editUserMark"
 			name="markForm"
 			scope="request"
@@ -330,17 +330,17 @@
 			<forward name="viewTopic" path="/learning/viewTopic.do" />
 		</action>
 		<action path="/monitoring/viewTopic"
-			type="org.lams.lams.tool.wiki.web.actions.MonitoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.MonitoringAction"
 			parameter="viewTopic">
 			<forward name="success" path="tiles:/monitoring/wiki/viewTopic" />
 		</action>
 		<action path="/monitoring/viewTopicTree"
-			type="org.lams.lams.tool.wiki.web.actions.MonitoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.MonitoringAction"
 			parameter="viewTopicTree">
 			<forward name="success" path="tiles:/monitoring/wiki/viewTopicTree" />
 		</action>
 		<action path="/monitoring/viewReflection"
-			type="org.lams.lams.tool.wiki.web.actions.MonitoringAction"
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.MonitoringAction"
 			parameter="viewReflection">
 			<forward name="success" path="tiles:/monitoring/wiki/viewReflection" />
 		</action>
@@ -355,14 +355,14 @@
 			parameter="tiles:/blank" />
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"
-			type="org.lams.lams.tool.wiki.web.actions.ClearSessionAction">
+			type="org.lamsfoundation.lams.tool.wiki.web.actions.ClearSessionAction">
 		</action>				
 
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
-  <message-resources parameter="org.lams.lams.tool.wiki.ApplicationResources" />
+  <message-resources parameter="org.lamsfoundation.lams.tool.wiki.ApplicationResources" />
 
   <!-- Put custom struts plugin here -->
 <plug-in className="org.apache.struts.validator.ValidatorPlugIn">

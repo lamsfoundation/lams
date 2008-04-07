@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<%@ page import="org.lams.lams.tool.wiki.util.WikiConstants"%>
+<%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>
 <input type="hidden" name="currentTab" id="currentTab" />
 <div id="header">
 

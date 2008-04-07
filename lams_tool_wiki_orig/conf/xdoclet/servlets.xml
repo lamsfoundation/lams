@@ -1,6 +1,6 @@
 <servlet>
 		<servlet-name>exportPortfolio</servlet-name>
-		<servlet-class>org.lams.lams.tool.wiki.web.actions.ExportServlet</servlet-class>
+		<servlet-class>org.lamsfoundation.lams.tool.wiki.web.actions.ExportServlet</servlet-class>
 </servlet>
 
 <servlet>

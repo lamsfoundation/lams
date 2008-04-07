@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<%@ page import="org.lams.lams.tool.wiki.util.WikiConstants"%>
+<%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>
 <%@ page import="java.util.HashSet"%>
 <%@ page import="java.util.Set"%>
 

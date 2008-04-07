@@ -78,7 +78,7 @@
 			</fileset>
 		</copy>
 	</target>
-
+	
 	<target name="generate-hbm" depends="compile-java">
 		<echo>+------------------------------------------+</echo>
 		<echo>| generating hibernate metadata            |</echo>
@@ -191,7 +191,7 @@
 			<formatter type="xml"/>
 			<batchtest todir="${build.report}">
 				<fileset dir="${src.test.dir}">
-	                 <include name="org/lams/lams/tool/wiki/**/*.*"/>
+	                 <include name="org/lamsfoundation/lams/tool/wiki/**/*.*"/>
 				</fileset>
 			</batchtest>
 			<classpath>
@@ -390,11 +390,11 @@
 			toolActivityInsertScriptPath="${build.deploy}/sql/activity_insert.sql" 
 			toolLibraryInsertScriptPath="${build.deploy}/sql/library_insert.sql" 
 			toolInsertScriptPath="${build.deploy}/sql/tool_insert.sql" 
-			toolApplicationContextPath="/org/lams/lams/tool/wiki/wikiApplicationContext.xml"
+			toolApplicationContextPath="/org/lamsfoundation/lams/tool/wiki/wikiApplicationContext.xml"
 			lamsEarPath="${jboss.deploy}"
 			toolContext="${toolContext}"
 			toolWebUri="${product}.war"
-			languageFilesPackage="org.lams.lams.tool.wiki">
+			languageFilesPackage="org.lamsfoundation.lams.tool.wiki">
 
 			<!-- language files go as a fileset. Not nice but can't work out how to embed them in a tag. -->
 			<fileset dir="${build.deploy}/language">
