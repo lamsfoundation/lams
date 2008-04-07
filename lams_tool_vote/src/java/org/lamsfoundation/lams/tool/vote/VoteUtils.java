@@ -252,7 +252,7 @@ public abstract class VoteUtils implements VoteAppConstants {
         {
             if (!htmlTokens[i].trim().equals(""))
             {
-                noHtmlNoNewLineStr= noHtmlNoNewLineStr + " " + htmlTokens[i];
+                noHtmlNoNewLineStr = noHtmlNoNewLineStr.length() > 0 ? noHtmlNoNewLineStr + " " + htmlTokens[i] : htmlTokens[i];
             }
         }
         
@@ -266,8 +266,17 @@ public abstract class VoteUtils implements VoteAppConstants {
             	index = htmlText.indexOf("\"",index);
             	if ( index > -1 && index < htmlText.length()) {
             		int indexStop = htmlText.indexOf("\"", index+1);
-	            	if ( indexStop > -1) 
-	            		return htmlText.substring(index+1, indexStop-1);
+	            	if ( indexStop > -1) {
+	            		String srcEntry = htmlText.substring(index+1, indexStop);
+            			// get rid of any leading path and just get the filename;
+	            		index = srcEntry.lastIndexOf("/");
+	            		if ( index == srcEntry.length()-1 )
+	            			index = srcEntry.lastIndexOf("/", index);
+	            		if ( index > -1 ) {
+	            			srcEntry = srcEntry.substring(index+1);
+	            		}
+	            		return srcEntry;
+	            	}
             	}
             }
             if (htmlText.length() > 50)

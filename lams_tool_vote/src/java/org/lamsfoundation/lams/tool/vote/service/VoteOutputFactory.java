@@ -59,8 +59,6 @@ public class VoteOutputFactory extends OutputFactory {
 			
 			if ( content.getMaxNominationCount() != null && ! content.getMaxNominationCount().equals("1") ) {
 				log.error("Unable to build output definitions for Voting if the user can have more than one nomination. Vote "+content);
-			} else if ( content.isAllowText() ) {
-				log.error("Unable to build output definitions for Voting if the user can enter free text. Vote "+content);
 			} else {
 			
 				ToolOutputDefinition definition = buildLongOutputDefinition(OUTPUT_NAME_NOMINATION_SELECTION);
@@ -70,6 +68,17 @@ public class VoteOutputFactory extends OutputFactory {
 				List<BranchCondition> defaultConditions = definition.getDefaultConditions();
 				int min = 1;
 				int max = 1;
+				
+				
+				if ( content.isAllowText() ) {
+					min = 0;
+					defaultConditions.add(new BranchCondition(null, null, new Integer(0), OUTPUT_NAME_NOMINATION_SELECTION, 
+							getI18NText("label.open.vote", false), 
+							OutputType.OUTPUT_LONG.toString(),
+							"0", 
+							"0", 
+							null));
+				}
 				
 				Iterator iter = content.getVoteQueContents().iterator();
 				while ( iter.hasNext() ) {
@@ -136,11 +145,13 @@ public class VoteOutputFactory extends OutputFactory {
 
 				Iterator iter = voteAttempts.iterator();
 				while ( iter.hasNext() ) {
-					VoteUsrAttempt attempt = (VoteUsrAttempt) iter.next();					
-					// VoteQueContentId == 1 indicates that it is a free text entry
-					if ( attempt.getVoteQueContentId().longValue() != 1) {
+					VoteUsrAttempt attempt = (VoteUsrAttempt) iter.next();		
+					if ( attempt.getVoteQueContentId().longValue() == 1 ) {
+						// VoteQueContentId == 1 indicates that it is a free text entry
+						return new ToolOutput(OUTPUT_NAME_NOMINATION_SELECTION, getI18NText(OUTPUT_NAME_NOMINATION_SELECTION, true), new Long(0));
+					} else {
 						VoteQueContent nomination = attempt.getVoteQueContent();
-						return new ToolOutput(OUTPUT_NAME_NOMINATION_SELECTION, getDescription(OUTPUT_NAME_NOMINATION_SELECTION), new Long(nomination.getDisplayOrder()));
+						return new ToolOutput(OUTPUT_NAME_NOMINATION_SELECTION, getI18NText(OUTPUT_NAME_NOMINATION_SELECTION, true), new Long(nomination.getDisplayOrder()));
 					}
 				}
 			}
