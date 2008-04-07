@@ -106,7 +106,7 @@ public class MCOutputFactory extends OutputFactory {
 	private ToolOutput getLearnerMark(McQueUsr queUser) {
 		Long mark = queUser != null ? queUser.getLastAttemptTotalMark() : new Long(0);
 		return new ToolOutput(MCOutputFactory.OUTPUT_NAME_LEARNER_MARK, 
-				getDescription(MCOutputFactory.OUTPUT_NAME_LEARNER_MARK), mark);
+				getI18NText(MCOutputFactory.OUTPUT_NAME_LEARNER_MARK, true), mark);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class MCOutputFactory extends OutputFactory {
 	private ToolOutput getLearnerAllCorrect(IMcService mcService, McQueUsr queUser) {
 		boolean allCorrect = allQuestionsCorrect(mcService, queUser);
 		return new ToolOutput(MCOutputFactory.OUTPUT_NAME_LEARNER_ALL_CORRECT, 
-				getDescription(MCOutputFactory.OUTPUT_NAME_LEARNER_ALL_CORRECT), allCorrect);
+				getI18NText(MCOutputFactory.OUTPUT_NAME_LEARNER_ALL_CORRECT, true), allCorrect);
 	}
 
 	// written to cope with more than one correct option for each question but only tested with

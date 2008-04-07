@@ -76,9 +76,9 @@ public abstract class OutputFactory {
 	protected Logger log = Logger.getLogger(OutputFactory.class);
 
 	private MessageService toolMessageService;
-
 	private ILoadedMessageSourceService loadedMessageSourceService;
 	private String languageFilename;
+	private MessageSource msgSource = null; // derived from toolMessageService, loadedMessageSourceService, languageFilename
 	protected final String KEY_PREFIX = "output.desc."; 
 	
 	/** Create a map of the tool output definitions, suitable for returning from the method 
@@ -96,7 +96,7 @@ public abstract class OutputFactory {
 	public abstract SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject) throws ToolException;
 
 	/** Tool specific toolMessageService, such as the forumMessageService in the Forum tool */
-	public MessageService getToolMessageService() {
+	private MessageService getToolMessageService() {
 		return toolMessageService;
 	}
 
@@ -108,7 +108,7 @@ public abstract class OutputFactory {
 	/** Set the common loadedMessageSourceService, based on the bean defined in the common Spring context.
 	 * If toolMessageService is not set, then the languageFilename 
 	 * and loadedMessageSourceService should be set. */
-	public ILoadedMessageSourceService getLoadedMessageSourceService() {
+	private ILoadedMessageSourceService getLoadedMessageSourceService() {
 		return loadedMessageSourceService;
 	}
 
@@ -129,41 +129,55 @@ public abstract class OutputFactory {
 	}
 
 	/** 
-	 * Get the I18N description for this definitionName. If the tool has supplied a messageService, then this
-	 * is used to look up the key and hence get the description. Otherwise if the tool has supplied a I18N 
+	 * Get the I18N description for this key. If the tool has supplied a messageService, then this
+	 * is used to look up the key and hence get the text. Otherwise if the tool has supplied a I18N 
 	 * languageFilename then it is accessed via the shared toolActMessageService. If neither are supplied or 
-	 * the key is not found, then any "." in the name are converted to space and this is used as the description.
+	 * the key is not found, then any "." in the name are converted to space and this is used as the return value.
 	 * 
-	 * The key must be in the format output.desc.[definition name]. For example a 
+	 * This is normally used to get the description for a definition, in whic case the key should be in the format 
+	 * output.desc.[definition name], key = definition name and addPrefix = true. For example a 
 	 * definition name of "learner.mark" becomes output.desc.learner.mark.
+	 * 
+	 * If you want to use this to get an arbitrary string from the I18N files, then set addPrefix = false and the
+	 * output.desc will not be added to the beginning.
 	 */
-	protected String getDescription(String definitionName) {
-		MessageSource msgSource = null;
-		if ( getToolMessageService() != null ) {
-			msgSource = getToolMessageService().getMessageSource();
-		}
-		if ( msgSource == null && getLoadedMessageSourceService() != null && getLanguageFilename() != null) {
-				msgSource = getLoadedMessageSourceService().getMessageService(getLanguageFilename());
-		}
-		if ( msgSource == null ) {
-			log.warn("Unable to internationalise the description for the output definition "+definitionName+" as no MessageSource is available. "+
-					"The tool's OutputDefinition factory needs to set either (a) messageSource or (b) loadedMessageSourceService and languageFilename.");
-		}
-		 
-		String description = null;
-		if ( msgSource != null ) {
-			String key = KEY_PREFIX + definitionName;
+	protected String getI18NText(String key, boolean addPrefix) {
+		String translatedText = null;
+
+		MessageSource tmpMsgSource = getMsgSource();
+		if ( tmpMsgSource != null ) { 
+			if ( addPrefix ) key = KEY_PREFIX + key;
 			Locale locale = LocaleContextHolder.getLocale();
 			try { 
-				description = msgSource.getMessage(key,null,locale);
+				translatedText = tmpMsgSource.getMessage(key,null,locale);
 			} catch ( NoSuchMessageException e ) {
+				log.warn("Unable to internationalise the text for key "+key+" as no matching key found in the msgSource");
 			}
-		} 
-		if ( description == null || description.length() == 0 ) {
-			description = definitionName.replace('.', ' ');
+		} else {
+			log.warn("Unable to internationalise the text for key "+key+" as no matching key found in the msgSource. The tool's OutputDefinition factory needs to set either (a) messageSource or (b) loadedMessageSourceService and languageFilename.");
 		}
 		
-		return description;
+		if ( translatedText == null || translatedText.length() == 0 ) {
+			translatedText = key.replace('.', ' ');
+		}
+		
+		return translatedText;
+	}
+
+	/**
+	 * Get the MsgSource, combining getToolMessageService() and getLoadedMessageSourceService(). Caches the result so it only needs to be calculated once (most tools will require
+	 * more than one call to this code!
+	 */
+	private MessageSource getMsgSource() {
+		if ( msgSource == null ) {
+			if ( getToolMessageService() != null ) {
+				msgSource = getToolMessageService().getMessageSource();
+			}
+			if ( msgSource == null && getLoadedMessageSourceService() != null && getLanguageFilename() != null) {
+					msgSource = getLoadedMessageSourceService().getMessageService(getLanguageFilename());
+			}
+		}
+		return msgSource;
 	}
 
 	/** Generic method for building a tool output definition. It will get the definition's description 
@@ -172,7 +186,7 @@ public abstract class OutputFactory {
 	protected ToolOutputDefinition buildDefinition(String definitionName, OutputType type, Object startValue, Object endValue, Object complexValue, Boolean showConditionNameOnly) {
 		ToolOutputDefinition definition = new ToolOutputDefinition();
 		definition.setName(definitionName);
-		definition.setDescription(getDescription(definitionName));
+		definition.setDescription(getI18NText(definitionName, true));
 		definition.setType(type);
 		definition.setStartValue( startValue );
 		definition.setEndValue( endValue );
@@ -221,11 +235,11 @@ public abstract class OutputFactory {
 
 		List<BranchCondition> defaultConditions = new ArrayList<BranchCondition>();
 		defaultConditions.add(new BranchCondition(null, null, new Integer(1), definitionName, 
-				getDescription(definitionName+".true"), 
+				getI18NText(definitionName+".true", true), 
 				OutputType.OUTPUT_BOOLEAN.toString(), null, null, Boolean.TRUE.toString()));
 
 		defaultConditions.add(new BranchCondition(null, null, new Integer(2), definitionName, 
-				getDescription(definitionName+".false"), 
+				getI18NText(definitionName+".false", true), 
 				OutputType.OUTPUT_BOOLEAN.toString(), null, null, Boolean.FALSE.toString()));
 
 		definition.setDefaultConditions(defaultConditions);

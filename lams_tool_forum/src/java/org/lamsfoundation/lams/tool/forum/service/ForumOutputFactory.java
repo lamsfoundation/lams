@@ -78,6 +78,6 @@ public class ForumOutputFactory extends OutputFactory {
 
 	private ToolOutput getNumPosts(IForumService forumService, Long learnerId, Long toolSessionId) {
 		int num = forumService.getTopicsNum(learnerId, toolSessionId);		
-		return new ToolOutput(OUTPUT_NAME_LEARNER_NUM_POSTS, "", new Long(num));
+		return new ToolOutput(OUTPUT_NAME_LEARNER_NUM_POSTS, getI18NText(OUTPUT_NAME_LEARNER_NUM_POSTS, true), new Long(num));
 	}
 }
