@@ -113,7 +113,7 @@ public class WikiForm extends ActionForm {
     public void reset(ActionMapping mapping, HttpServletRequest request){
     	wiki.setAllowEdit(false);
     	wiki.setAllowAnonym(false);
-    	wiki.setAllowRichEditor(false);
+    	//wiki.setAllowRichEditor(false);
     	wiki.setLimitedInput(false);
     	wiki.setLockWhenFinished(false);
     	wiki.setAllowNewTopic(false);

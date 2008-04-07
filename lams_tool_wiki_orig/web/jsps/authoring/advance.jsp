@@ -32,15 +32,6 @@
 </p>
 
 <p>
-	<html:checkbox property="wiki.allowRichEditor" styleId="richEditor"
-		styleClass="noBorder">
-	</html:checkbox>
-	<label for="richEditor">
-		<fmt:message key="label.authoring.advance.use.richeditor" />
-	</label>
-</p>
-
-<p>
 	<html:checkbox property="wiki.limitedInput" styleId="limitedInput"	styleClass="noBorder">
 	</html:checkbox>
 	<label for="limitedInput">
@@ -144,26 +135,16 @@
 
 <script type="text/javascript">
 			var limit = document.getElementById("limitedInput");
-			var rich = document.getElementById("richEditor");
 			var limitChar = document.getElementById("limitedChar");
 
 			limit.onclick= initAdvanced;
 			function initAdvanced(){
 				if(limit.checked){
 					limitChar.disabled=false;
-					rich.checked=false;
 				}else{
 					limitChar.disabled=true;
 				}
 				
-			}
-			rich.onclick = function(){
-				if(this.checked){
-					limitChar.disabled=true;
-					limit.checked=false;
-				}else{
-					limitChar.disabled=false;
-				}
 			}
 			initAdvanced();
 			limitChar.onblur=function(){

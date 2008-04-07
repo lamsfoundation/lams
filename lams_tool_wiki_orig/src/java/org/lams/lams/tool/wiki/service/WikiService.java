@@ -912,7 +912,7 @@ public class WikiService implements IWikiService,ToolContentManager,ToolSessionM
 	    	toolContentObj.setAllowAnonym(Boolean.FALSE);
 	    	toolContentObj.setAllowEdit(Boolean.TRUE); // this is the default value
 	    	toolContentObj.setAllowNewTopic(Boolean.TRUE);
-	    	toolContentObj.setAllowRichEditor(Boolean.FALSE);
+	    	//toolContentObj.setAllowRichEditor(Boolean.FALSE);
 	    	toolContentObj.setAllowUpload(Boolean.TRUE); // this is the default value
 	    	toolContentObj.setContentId(toolContentId);
 	    	toolContentObj.setContentInUse(Boolean.FALSE);

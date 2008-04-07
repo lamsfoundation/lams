@@ -14,7 +14,7 @@
 	
 	
 		<h2>
-			<fmt:message key="title.message.edit" />
+			<fmt:message key="title.wiki.edit" />
 		</h2>
 		
 		<html:errors property="error" />

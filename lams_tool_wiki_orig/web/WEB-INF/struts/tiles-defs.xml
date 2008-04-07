@@ -72,7 +72,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</definition>
 	
 	<definition name="tiles:/learning/wiki/viewTopic" extends="tiles:learner:layout">
-    	<put name="pageTitleKey" value="title.message.view.topic"/>
+    	<put name="pageTitleKey" value="title.wiki.view.topic"/>
     	<put name="body" value="/jsps/learning/viewtopic.jsp"/>
 	</definition>
 	
@@ -87,7 +87,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     </definition>
     
     <definition name="tiles:/learning/wiki/editTopic" extends="tiles:learner:layout">
-    	<put name="pageTitleKey" value="title.message.edit"/>
+    	<put name="pageTitleKey" value="title.wiki.edit"/>
     	<put name="body" value="/jsps/learning/edit.jsp"/>
 	</definition>
     <definition name="tiles:/learning/reflection" extends="tiles:learner:layout">

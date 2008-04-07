@@ -446,16 +446,6 @@ public class Wiki implements Cloneable{
 	public void setAllowEdit(boolean allowEdit) {
 		this.allowEdit = allowEdit;
 	}
-	/**
-	 * @hibernate.property column="allow_rich_editor"
-	 * @return
-	 */
-	public boolean isAllowRichEditor() {
-		return allowRichEditor;
-	}
-	public void setAllowRichEditor(boolean allowRichEditor) {
-		this.allowRichEditor = allowRichEditor;
-	}
 	
 	public static Wiki newInstance(Wiki fromContent, Long contentId, WikiToolContentHandler wikiToolContentHandler){
 		Wiki toContent = new Wiki();

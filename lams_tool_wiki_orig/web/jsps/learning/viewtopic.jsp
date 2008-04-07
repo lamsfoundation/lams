@@ -28,7 +28,7 @@
 
 		</div>
 		<h2>
-			<fmt:message key="title.message.view.topic" />
+			<fmt:message key="title.wiki.view.topic" />
 		</h2>
 
 	</div>

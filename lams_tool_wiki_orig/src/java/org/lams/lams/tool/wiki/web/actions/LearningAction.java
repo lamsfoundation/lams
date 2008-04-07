@@ -211,8 +211,10 @@ public class LearningAction extends Action {
 		// if isLimitedInput = false then don't restrict the number of chars
 		// Indicate don't restrict number of chars by allowNumber = 0
 		Long wikiId = wiki.getUid();
-		Boolean allowRichEditor = new Boolean(wiki.isAllowRichEditor());
-		int allowNumber = wiki.isLimitedInput() || wiki.isAllowRichEditor() ? wiki.getLimitedChar() : 0;
+		//Boolean allowRichEditor = new Boolean(wiki.isAllowRichEditor());
+		Boolean allowRichEditor = new Boolean(true);
+		//int allowNumber = wiki.isLimitedInput() || wiki.isAllowRichEditor() ? wiki.getLimitedChar() : 0;
+		int allowNumber = wiki.getLimitedChar();
 		
 		// get notebook entry
 		String entryText = new String();
