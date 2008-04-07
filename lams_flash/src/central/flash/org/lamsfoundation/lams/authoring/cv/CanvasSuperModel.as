@@ -184,7 +184,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 				} else if(_activity instanceof ComplexActivity) {
 					if(!isBranching && !_activity.isOptionalActivity() && !_activity.isSequenceActivity())
 						getActivitiesFromComplexByClass(_activity.activityUIID, tActivities, _class, isBranching);
-					else if(isBranching && !_activity.isOptionalActivity() && !_activity.isOptionsWithSequencesActivity())
+					else if(isBranching && !_activity.isOptionalActivity() && !_activity.isOptionsWithSequencesActivity() && !_activity.isBranchingActivity())
 						getActivitiesFromComplexByClass(_activity.activityUIID, tActivities, _class, isBranching);
 						
 				}
