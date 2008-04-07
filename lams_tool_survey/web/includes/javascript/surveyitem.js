@@ -17,7 +17,7 @@
 		    	instructionTargetDiv,
 		    	url,
 		    	{
-		    		method:'get',
+		    		method:'post',
 		    		parameters:param,
 		    		onComplete:removeInstructionComplete,
 		    		evalScripts:true
@@ -34,7 +34,7 @@
 		    	instructionTargetDiv,
 		    	url,
 		    	{
-		    		method:'get',
+		    		method:'post',
 		    		parameters:param,
 		    		onComplete:addInstructionComplete,
 		    		evalScripts:true

@@ -1,7 +1,7 @@
 	/*
 	 This is Resource Item instrcution area.
 	 */
-    var instructionTargetDiv = "instructionArea";
+	var instructionTargetDiv = "instructionArea";
     var itemAttachmentTargetDiv = "itemAttachmentArea";
 // Please set these 2 variables in JSP file for using tag reason:
 //    var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
@@ -11,16 +11,22 @@
 		//Element.remove(id);
  		var url= removeInstructionUrl;
 	    var reqIDVar = new Date();
-	    var param = Form.serialize("instructionForm")+"&removeIdx="+idx+"&reqID="+reqIDVar.getTime();
+	   
+	   var param = $("instructionForm").serialize(true); // Form.serialize('instructionForm');
+	   // param('instructionItemDesc' + idx) = 
+	    param.removeIdx = idx;
+	    param.reqID = reqIDVar.getTime();
+	    
 	    removeInstructionLoading();
 	    var myAjax = new Ajax.Updater(
 		    	instructionTargetDiv,
 		    	url,
 		    	{
-		    		method:'get',
+		    		method:'post',
 		    		parameters:param,
 		    		onComplete:removeInstructionComplete,
-		    		evalScripts:true
+		    		evalScripts:true,
+		    		contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
 		    	}
 	    );
 	}
@@ -35,7 +41,7 @@
 		    	itemAttachmentTargetDiv,
 		    	url,
 		    	{
-		    		method:'get',
+		    		method:'post',
 		    		parameters:param,
 		    		onComplete:removeItemAttachmentComplete,
 		    		evalScripts:true
@@ -51,10 +57,10 @@
 		    	instructionTargetDiv,
 		    	url,
 		    	{
-		    		method:'get',
+		    		method:'post',
 		    		parameters:param,
 		    		onComplete:addInstructionComplete,
-		    		evalScripts:true
+		    		evalScripts:true 
 		    	}
 	    );
 	}
