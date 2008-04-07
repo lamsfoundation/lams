@@ -25,12 +25,14 @@ package org.lamsfoundation.lams.tool.taskList.web.form;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.upload.FormFile;
+
 /**
- *  TaskList Item  Form.
- *	@struts.form name="taskListItemForm"
- * @author Steve.Ni
+ * Form responsible for representing <code>TaskListItem</code> objects on a view layer.
  * 
- * @version $Revision$
+ * @author Steve.Ni
+ * @author Andrey Balan
+ * 
+ * @struts.form name="taskListItemForm"
  */
 public class TaskListItemForm extends ActionForm {
 	private String itemIndex;
@@ -52,82 +54,206 @@ public class TaskListItemForm extends ActionForm {
     private FormFile uploadedFile;
     private String comment;
 	
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
+	/**
+	 * Returns TaskListItem title.
+	 * 
+	 * @return TaskListItem title
+	 */
 	public String getTitle() {
 		return title;
 	}
+	/**
+	 * Sets TaskListItem title.
+	 * 
+	 * @param title TaskListItem title
+	 */
 	public void setTitle(String title) {
 		this.title = title;
 	}
+    
+	/**
+	 * Returns TaskListItem description.
+	 * 
+	 * @return TaskListItem description
+	 */
+	public String getDescription() {
+		return description;
+	}
+	/**
+	 * Sets TaskListItem description.
+	 * 
+	 * @param description TaskListItem description
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	/**
+	 * Returns TaskListItem order index.
+	 * 
+	 * @return TaskListItem order index
+	 */
 	public String getItemIndex() {
 		return itemIndex;
 	}
+	/**
+	 * Sets TaskListItem order index.
+	 * 
+	 * @param itemIndex TaskListItem order index
+	 */
 	public void setItemIndex(String itemIndex) {
 		this.itemIndex = itemIndex;
 	}
+	
+	/**
+	 * Returns current SessionMapID.
+	 * 
+	 * @return current SessionMapID
+	 */
 	public String getSessionMapID() {
 		return sessionMapID;
 	}
+	/**
+	 * Sets current SessionMapID.
+	 * 
+	 * @param sessionMapID current SessionMapID
+	 */
 	public void setSessionMapID(String sessionMapID) {
 		this.sessionMapID = sessionMapID;
 	}
+	
+	/**
+	 * Returns working mode.
+	 * 
+	 * @return working mode
+	 */
 	public String getMode() {
 		return mode;
 	}
+	/**
+	 * Returns working mode.
+	 * 
+	 * @param mode working mode
+	 */
 	public void setMode(String mode) {
 		this.mode = mode;
 	}
 	
+	/**
+	 * Returns whether this <code>TaskLiskItem</code> is required to finish activity.
+	 * 
+	 * @return true if the <code>TaskLiskItem</code> is required to finish activity, false otherwise.
+	 */
 	public boolean isRequired() {
 		return isRequired;
 	}
+	/**
+	 * Sets whether this <code>TaskLiskItem</code> is required to finish activity.
+	 * 
+	 * @param isRequired true if the <code>TaskLiskItem</code> is required to finish activity, false otherwise.
+	 */
 	public void setRequired(boolean isRequired) {
 		this.isRequired = isRequired;
 	}
 	
+	/**
+	 * Returns whether comments are allowed in this <code>TaskLiskItem</code>.
+	 * 
+	 * @return true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
+	 */
 	public boolean isCommentsAllowed() {
 		return isCommentsAllowed;
 	}
+	/**
+	 * Sets whether comments are allowed in this <code>TaskLiskItem</code>.
+	 * 
+	 * @param isCommentsAllowed true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
+	 */
 	public void setCommentsAllowed(boolean isCommentsAllowed) {
 		this.isCommentsAllowed = isCommentsAllowed;
 	}
 
+	/**
+	 * Returns whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>.
+	 * 
+	 * @return true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false otherwise.
+	 */
 	public boolean getShowCommentsToAll() {
 		return showCommentsToAll;
 	}
+	/**
+	 * Sets whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code> or not.
+	 * 
+	 * @param showCommentsToAll true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false otherwise.
+	 */
 	public void setShowCommentsToAll(boolean showCommentsToAll) {
 		this.showCommentsToAll = showCommentsToAll;
 	}
 	
+	/**
+	 * Returns whether this <code>TaskLiskItem</code> is a child task.
+	 * 
+	 * @return true if this <code>TaskLiskItem</code> is a child task, false otherwise.
+	 */
 	public boolean isChildTask() {
 		return isChildTask;
 	}
+	/**
+	 * Sets whether this <code>TaskLiskItem</code> is a child task or not.
+	 * 
+	 * @param isChildTask true if this <code>TaskLiskItem</code> is a child task, false otherwise.
+	 */
 	public void setChildTask(boolean isChildTask) {
 		this.isChildTask = isChildTask;
 	}
 	
+	/**
+	 * If the <code>TaskLiskItem</code> is a child task then it has a parent. So this method returns its title.
+	 * 
+	 * @return parent's title
+	 */
 	public String getParentTaskName() {
 		return parentTaskName;
 	}
+	/**
+	 * If the <code>TaskLiskItem</code> is a child task then it has a parent. So this method sets its title.
+	 * 
+	 * @param parentTaskName parent's title
+	 */
 	public void setParentTaskName(String parentTaskName) {
 		this.parentTaskName = parentTaskName;
 	}
 	
+	/**
+	 * Returns attachment for this <code>TaskLiskItem</code>.
+	 * 
+	 * @return attachment for this <code>TaskLiskItem</code>
+	 */
 	public FormFile getUploadedFile() {
 		return uploadedFile;
 	}
+	/**
+	 * Sets attachment for this <code>TaskLiskItem</code>.
+	 * 
+	 * @param uploadedFile attachment for this <code>TaskLiskItem</code>
+	 */
 	public void setUploadedFile(FormFile uploadedFile) {
 		this.uploadedFile = uploadedFile;
 	}
 	
+	/**
+	 * Returns comment for this <code>TaskLiskItem</code>.
+	 * 
+	 * @return comment for this <code>TaskLiskItem</code>
+	 */
 	public String getComment() {
 		return comment;
 	}
+	/**
+	 * Sets comment for this <code>TaskLiskItem</code>.
+	 * 
+	 * @param comment comment for this <code>TaskLiskItem</code>
+	 */
 	public void setComment(String comment) {
 		this.comment = comment;
 	}

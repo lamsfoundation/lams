@@ -41,6 +41,7 @@ public class TaskListConstants {
 	public static final String PARAM_FILE_VERSION_ID = "fileVersionId";
 	public static final String PARAM_FILE_UUID = "fileUuid";
 	public static final String PARAM_ITEM_INDEX = "itemIndex";
+	public static final String PARAM_SEQUENCE_ID = "sequenceId";
 	public static final String PARAM_RESOURCE_ITEM_UID = "itemUid";
 	public static final String PARAM_CURRENT_INSTRUCTION_INDEX = "insIdx";
 	public static final String PARAM_RUN_OFFLINE = "runOffline";
@@ -51,8 +52,10 @@ public class TaskListConstants {
 	public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
 	public static final String ATTR_TOOL_SESSION_ID = "toolSessionID"; 
 	public static final String ATTR_RESOURCE_ITEM_LIST = "taskListList";
+	public static final String ATTR_CONDITION_LIST = "conditionList";
 	public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
 	public static final String ATTR_DELETED_RESOURCE_ITEM_LIST = "deleteTaskListList";
+	public static final String ATTR_DELETED_CONDITION_LIST = "deleteConditionList";
 	public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
 	public static final String ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST =  "deletedItemAttachmmentList";;
 	public static final String ATT_LEARNING_OBJECT = "cpPackage";
@@ -81,6 +84,9 @@ public class TaskListConstants {
 	
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
+	public static final String ERROR_MSG_NAME_BLANK = "error.condition.name.blank";
+	public static final String ERROR_MSG_NO_TASK_LIST_ITEMS = "error.condition.no.tasklistitems.selected";
+	public static final String ERROR_MSG_NAME_DUPLICATED = "error.condition.duplicated.name";
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
 	
 	public static final String PAGE_EDITABLE = "isPageEditable";

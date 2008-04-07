@@ -14,7 +14,6 @@
 		<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="taskListItemForm" focus="title" >
 
 			<html:hidden property="sessionMapID" />
-			<input type="hidden" name="itemType" id="itemType" value="1" />
 			<html:hidden property="itemIndex" />
 			<h2 class="no-space-left">
 				<fmt:message key="label.authoring.basic.add.task" />

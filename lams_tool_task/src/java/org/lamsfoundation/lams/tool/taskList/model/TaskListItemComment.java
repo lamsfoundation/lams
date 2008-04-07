@@ -46,8 +46,9 @@ public class TaskListItemComment  implements Cloneable{
 	private Date createDate;
 	
     //  **********************************************************
-  	//		Function method for TaskListItemComment
+  	//				Function method for TaskListItemComment
     //  **********************************************************
+	
     public Object clone(){
     	TaskListItemComment taskListItemComment = null;
 		try {
@@ -85,7 +86,7 @@ public class TaskListItemComment  implements Cloneable{
 	}
 	
 	//  **********************************************************
-  	//		Get/Set methods
+  	//					Get/Set methods
 	//  **********************************************************
 	
 	/**

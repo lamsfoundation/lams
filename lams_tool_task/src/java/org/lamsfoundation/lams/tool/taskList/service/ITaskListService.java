@@ -170,6 +170,13 @@ public interface ITaskListService
 	void deleteTaskListItem(Long uid);
 	
 	/**
+	 * Delete tasklist condition from the database.
+	 * 
+	 * @param uid
+	 */
+	void deleteTaskListCondition(Long uid);
+	
+	/**
 	 * Return all resource items within the given toolSessionID.
 	 * 
 	 * @param sessionId
@@ -324,11 +331,6 @@ public interface ITaskListService
 	 * @return
 	 */
 	TaskSummary getTaskSummary(Long contentId, Long taskListItemUid);
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void deleteTaskListCondition(Long conditionUid);
 
 }
 

@@ -3,9 +3,9 @@ package org.lamsfoundation.lams.tool.taskList.dto;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 
 /**
+ * DTO object used for representing reflection.
  * 
  * @author Dapeng Ni
- *
  */
 public class ReflectDTO {
 	private Long userUid;

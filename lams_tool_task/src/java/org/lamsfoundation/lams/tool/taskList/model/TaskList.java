@@ -73,6 +73,8 @@ public class TaskList implements Cloneable{
 	private String onlineInstructions;
 	private String offlineInstructions;
 	private Set attachments;
+	//conditions
+	private Set conditions;
 	
 	//general infomation
 	private Date created;
@@ -96,6 +98,7 @@ public class TaskList implements Cloneable{
 	 */
   	public TaskList(){
   		attachments = new HashSet();
+  		conditions = new HashSet();
   		taskListItems = new HashSet();
   	}
   	
@@ -150,6 +153,19 @@ public class TaskList implements Cloneable{
 					set.add(newFile);
   				}
   				taskList.attachments = set;
+  			}
+  			//clone conditions
+  			if(conditions != null){
+  				Iterator iter = conditions.iterator();
+  				Set set = new HashSet();
+  				while(iter.hasNext()){
+  					TaskListCondition condition = (TaskListCondition)iter.next(); 
+  					TaskListCondition newCondition = (TaskListCondition) condition.clone();
+  					//just clone old file without duplicate it in repository
+  					
+					set.add(newCondition);
+  				}
+  				taskList.conditions = set;
   			}
   			//clone ReourceUser as well
   			if(this.createdBy != null){
@@ -437,6 +453,32 @@ public class TaskList implements Cloneable{
      */
     public void setAttachments(Set attachments) {
 		this.attachments = attachments;
+	}
+    
+	/**
+	 * Returns a set of conditions belong to this tasklist.
+     *
+     * @return a set of conditions belong to this tasklist.
+     *
+     * @hibernate.set   lazy="true"
+     * 					cascade="all"
+     * 					inverse="false"
+     * 					order-by="sequence_id asc"
+     * @hibernate.collection-key column="taskList_uid"
+     * @hibernate.collection-one-to-many
+     * 			class="org.lamsfoundation.lams.tool.taskList.model.TaskListCondition"
+     */
+	public Set getConditions() {
+		return conditions;
+	}
+
+    /**
+     * Sets a set of Conditions belong to this tasklist
+     * 
+     * @param conditions set of conditions to set
+     */
+    public void setConditions(Set conditions) {
+		this.conditions = conditions;
 	}
 
 	/**

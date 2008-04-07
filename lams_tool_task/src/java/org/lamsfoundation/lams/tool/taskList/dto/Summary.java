@@ -59,7 +59,7 @@ public class Summary {
 	/**
 	 * Contruction method for monitoring summary function. 
 	 * 
-	 * <B>Don't not set isInitGroup and viewNumber fields</B>
+	 * <B>Don't set isInitGroup and viewNumber fields</B>
 	 * @param sessionName
 	 * @param item
 	 * @param isInitGroup

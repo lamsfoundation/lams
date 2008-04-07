@@ -50,13 +50,28 @@ public class TaskSummary {
   	//		Get/Set methods
 	//  **********************************************************
 	
+	/**
+	 * Returns TaskListItem described by this current TaskSummary.
+	 * 
+	 * @return TaskListItem described by this current TaskSummary
+	 */
 	public TaskListItem getTaskListItem() {
 		return taskListItem;
 	}
+	/**
+	 * Sets TaskListItem described by this current TaskSummary.
+	 * 
+	 * @param taskListItem TaskListItem described by this current TaskSummary
+	 */
 	public void setTaskListItem(TaskListItem taskListItem) {
 		this.taskListItem = taskListItem;
 	}
 	
+	/**
+	 * Returns list of TaskSummaryItem, each one for every TaskListItem.
+	 * 
+	 * @return 
+	 */
 	public List<TaskSummaryItem> getTaskSummaryItems() {
 		return taskSummaryItems;
 	}

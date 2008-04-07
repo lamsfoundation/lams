@@ -1,5 +1,7 @@
 		<!-- ========== Action Mapping Definitions ============================== -->
+		
 		<!-- ========== BEGIN: Authroing Definitions ============================== -->
+		
 		<action path="/authoring/start"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringAction"
 			name="taskListForm" 
@@ -26,7 +28,6 @@
 			<forward name="success" path="/pages/authoring/authoring.jsp" />
 			<forward name="definelater" path="/pages/authoring/definelater.jsp" />
 		</action>
-		
 		<action path="/authoring/update"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringAction"
 			name="taskListForm" 
@@ -36,7 +37,9 @@
 			<forward name="author" path="/pages/authoring/authoring.jsp" />
 			<forward name="monitor" path="/pages/authoring/definelater.jsp" />
 		</action>
+		
 		<!-- ==========  Instrcutions File: online/offline ========== -->
+		
 		<action path="/authoring/uploadOnlineFile"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringAction"
 			name="taskListForm" 
@@ -69,7 +72,9 @@
 			parameter="deleteOfflineFile">
 			<forward name="success" path="/pages/authoring/parts/instructionfilelist.jsp" />
 		</action>
-		<!-- ==========  TaskList Item : URL ========== -->
+		
+		<!-- ==========  Add taskListItem methods ========== -->
+		
 		<action path="/authoring/newItemInit"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringAction"
 			name="taskListItemForm" 
@@ -78,7 +83,6 @@
 			parameter="newItemInit">
 			<forward name="task" path="/pages/authoring/parts/addtask.jsp" />
 		</action>
-		
 		<action path="/authoring/editItemInit"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringAction"
 			name="taskListItemForm" 
@@ -87,7 +91,6 @@
 			validate="false">
 			<forward name="task" path="/pages/authoring/parts/addtask.jsp" />
 		</action>
-		
 		<action path="/authoring/saveOrUpdateItem"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringAction"
 			parameter="saveOrUpdateItem"
@@ -113,7 +116,59 @@
 			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
 		</action>
 		
+		<!-- ==========  Add taskListCondition methods ========== -->
+		
+		<action path="/authoring/showConditions"
+			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringTaskListConditionAction"
+			name="taskListForm" 
+			scope="request" 
+			parameter="showConditions" 
+			validate="false">
+			<forward name="success" path="/pages/authoring/conditions.jsp" />
+		</action>
+		<action path="/authoring/newConditionInit"
+			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringTaskListConditionAction"
+			name="taskListConditionForm" 
+			scope="request" 
+			validate="false"			
+			parameter="newConditionInit">
+			<forward name="addcondition" path="/pages/authoring/parts/addcondition.jsp" />
+		</action>
+		<action path="/authoring/editCondition"
+			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringTaskListConditionAction"
+			name="taskListConditionForm" 
+			scope="request" 
+			parameter="editCondition" 
+			validate="false">
+			<forward name="addcondition" path="/pages/authoring/parts/addcondition.jsp" />
+		</action>
+		<action path="/authoring/saveOrUpdateCondition"
+			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringTaskListConditionAction"
+			parameter="saveOrUpdateCondition"
+			name="taskListConditionForm" 
+			scope="request" 
+			validate="false">
+			<forward name="addcondition" path="/pages/authoring/parts/addcondition.jsp" />
+			<forward name="success" path="/pages/authoring/parts/conditionlist.jsp" />
+		</action>
+		<action path="/authoring/removeCondition"
+			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringTaskListConditionAction"
+			parameter="removeCondition">
+			<forward name="success" path="/pages/authoring/parts/conditionlist.jsp" />
+		</action>
+		<action path="/authoring/upCondition"
+			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringTaskListConditionAction"
+			parameter="upCondition">
+			<forward name="success" path="/pages/authoring/parts/conditionlist.jsp" />
+		</action>
+		<action path="/authoring/downCondition"
+			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringTaskListConditionAction"
+			parameter="downCondition">
+			<forward name="success" path="/pages/authoring/parts/conditionlist.jsp" />
+		</action>
+		
 		<!-- ==========  Review Task  ========== -->
+		
 		<action path="/reviewtask/reviewTask"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.ViewItemAction"
 			name="taskListItemForm" 
@@ -122,7 +177,6 @@
 			validate="false">
 			<forward name="success" path="/pages/reviewtask/reviewtask.jsp" />
 		</action>
-		
 		<action path="/reviewtask/addNewComment"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.ViewItemAction"
 			parameter="addNewComment"
@@ -131,7 +185,6 @@
 			validate="false">
 			<forward name="success" path="/pages/reviewtask/reviewtask.jsp" />
 		</action>
-		
 		<action path="/reviewtask/uploadFile"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.ViewItemAction"
 			name="taskListItemForm" 
@@ -142,6 +195,7 @@
 		</action>
 
 		<!-- ========== BEGIN: Learning Definitions ============================== -->
+		
 		<action path="/learning/start"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.LearningAction"
 			parameter="start" >
@@ -160,7 +214,6 @@
 			parameter="finish" >
 			<forward name="success" path="/pages/learning/finish.jsp" />
 		</action>
-		
 		<action path="/learning/addtask"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.LearningAction"
 			parameter="addtask"
@@ -169,7 +222,6 @@
 			validate="false">
 			<forward name="success" path="/pages/learning/addtask.jsp" />
 		</action>
-		
 		<action path="/learning/saveNewTask"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.LearningAction"
 			parameter="saveNewTask"
@@ -181,6 +233,7 @@
 		</action>
 		
 		<!--  ========= Reflection =============== -->
+		
 		<action path="/learning/newReflection"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.LearningAction"
 			name="reflectionForm" 
@@ -190,7 +243,6 @@
 			scope="request">
 			<forward name="success" path="/pages/learning/notebook.jsp" />
 		</action>
-		
 		<action path="/learning/submitReflection"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.LearningAction"
 			name="reflectionForm" 
@@ -199,27 +251,25 @@
 			parameter="submitReflection" 
 			scope="request">
 			<forward name="success" path="/pages/learning/finish.jsp" />
-
 		</action>
+		
 		<!-- ========== BEGIN: Monitoring Definitions ============================== -->
+		
 		<action path="/monitoring/summary"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
 			parameter="summary" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
-		
 		<action path="/monitoring/summaryTask"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
 			parameter="summaryTask" >
 			<forward name="success" path="/pages/monitoring/summaryTask.jsp" />
 		</action>
-		
 		<action path="/monitoring/setVerifiedByMonitor"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
 			parameter="setVerifiedByMonitor">
 			<forward name="success" redirect="true" path="/monitoring/summary.do" />
 		</action>
-		
 		<action path="/monitoring/listuser"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
 			parameter="listuser" >
@@ -227,6 +277,7 @@
 		</action>
 		
 		<!-- ========== BEGIN: Common ============================== -->
+		
 		<action path="/clearsession"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.ClearSessionAction">
 		</action>

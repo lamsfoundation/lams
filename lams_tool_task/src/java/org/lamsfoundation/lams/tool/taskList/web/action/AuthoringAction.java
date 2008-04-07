@@ -57,11 +57,13 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
 import org.lamsfoundation.lams.tool.taskList.service.TaskListApplicationException;
 import org.lamsfoundation.lams.tool.taskList.service.UploadTaskListFileException;
+import org.lamsfoundation.lams.tool.taskList.util.TaskListConditionComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
@@ -74,10 +76,14 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-
 /**
+ * The main action in author mode. All the authoring operations are located in
+ * here. Except for operations dealing with TaskListCondition that are located
+ * in <code>AuthoringTaskListConditionAction</code> action.
+ * 
  * @author Steve.Ni
- * @version $Revision$
+ * @author Andrey Balan
+ * @see org.lamsfoundation.lams.tool.taskList.web.action.AuthoringTaskListConditionAction
  */
 public class AuthoringAction extends Action {
 	
@@ -86,7 +92,8 @@ public class AuthoringAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String param = mapping.getParameter();
-		//-----------------------TaskList Author function ---------------------------
+		
+		//----------------------- solid taskList methods ---------------------------
 		if(param.equals("start")){
 			ToolAccessMode mode = getAccessMode(request);
 			//teacher mode "check for new" button enter.
@@ -111,7 +118,6 @@ public class AuthoringAction extends Action {
 	  	if (param.equals("initPage")) {
        		return initPage(mapping, form, request, response);
         }
-
 	  	if (param.equals("updateContent")) {
        		return updateContent(mapping, form, request, response);
         }
@@ -127,7 +133,8 @@ public class AuthoringAction extends Action {
         if (param.equals("deleteOfflineFile")) {
         	return deleteOfflineFile(mapping, form, request, response);
         }
-        //----------------------- Add taskList item function ---------------------------
+        
+        //----------------------- Add taskListItem methods ---------------------------
         if (param.equals("newItemInit")) {
         	return newItemlInit(mapping, form, request, response);
         }
@@ -146,175 +153,13 @@ public class AuthoringAction extends Action {
         if (param.equals("downItem")) {
         	return downItem(mapping, form, request, response);
         }
-
+        
         return mapping.findForward(TaskListConstants.ERROR);
 	}
-
-	/**
-	 * Remove taskList item from HttpSession list and update page display. As authoring rule, all persist only happen when 
-	 * user submit whole page. So this remove is just impact HttpSession values.
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		
-//		get back sessionMAP
-		String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
-		
-		int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX),-1);
-		if(itemIdx != -1){
-			SortedSet<TaskListItem> taskListList = getTaskListItemList(sessionMap);
-			List<TaskListItem> rList = new ArrayList<TaskListItem>(taskListList);
-			TaskListItem item = rList.remove(itemIdx);
-			taskListList.clear();
-			taskListList.addAll(rList);
-			//add to delList
-			List delList = getDeletedTaskListItemList(sessionMap);
-			delList.add(item);
-		}	
-		
-		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-		return mapping.findForward(TaskListConstants.SUCCESS);
-	}
 	
-	/**
-	 * Move up current item.
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward upItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		return switchItem(mapping, request, true);
-	}
-	
-	/**
-	 * Move down current item.
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward downItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		return switchItem(mapping, request, false);
-	}
-
-	private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
-//		get back sessionMAP
-		String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
-		
-		int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX),-1);
-		if(itemIdx != -1){
-			SortedSet<TaskListItem> taskListList = getTaskListItemList(sessionMap);
-			List<TaskListItem> rList = new ArrayList<TaskListItem>(taskListList);
-			//get current and the target item, and switch their sequnece
-			TaskListItem item = rList.get(itemIdx);
-			TaskListItem repItem;
-			if(up)
-				repItem = rList.get(--itemIdx);
-			else
-				repItem = rList.get(++itemIdx);
-			int upSeqId = repItem.getSequenceId();
-			repItem.setSequenceId(item.getSequenceId());
-			item.setSequenceId(upSeqId);
-			
-			//put back list, it will be sorted again
-			taskListList.clear();
-			taskListList.addAll(rList);
-		}	
-		
-		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-		return mapping.findForward(TaskListConstants.SUCCESS);
-	}
-
-	
-	/**
-	 * Display edit page for existed taskList item.
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		
-//		get back sessionMAP
-		String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
-		
-		int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX),-1);
-		TaskListItem item = null;
-		if(itemIdx != -1){
-			SortedSet<TaskListItem> taskListList = getTaskListItemList(sessionMap);
-			List<TaskListItem> rList = new ArrayList<TaskListItem>(taskListList);
-			item = rList.get(itemIdx);
-			if(item != null){
-				populateItemToForm(itemIdx, item,(TaskListItemForm) form,request);
-			}
-		}		
-		
-		return (item==null) ? null : mapping.findForward("task"); 
-	}
-	/**
-	 * Display empty page for new taskList item.
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-		((TaskListItemForm)form).setSessionMapID(sessionMapID);
-		
-		return mapping.findForward("task");
-	}
-	/**
-	 * This method will get necessary information from taskList item form and save or update into 
-	 * <code>HttpSession</code> TaskListItemList. Notice, this save is not persist them into database,  
-	 * just save <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring 
-	 * page is being persisted.
-	 *  
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws ServletException
-	 */
-	private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response){
-		TaskListItemForm itemForm = (TaskListItemForm)form;
-		ActionErrors errors = validateTaskListItem(itemForm);
-		
-		if(!errors.isEmpty()){
-			this.addErrors(request,errors);
-			return mapping.findForward("task");
-		}
-		
-		try {
-			extractFormToTaskListItem(request, itemForm);
-		} catch (Exception e) {
-			//any upload exception will display as normal error message rather then throw exception directly
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(TaskListConstants.ERROR_MSG_UPLOAD_FAILED,e.getMessage()));
-			if(!errors.isEmpty()){
-				this.addErrors(request,errors);
-				return mapping.findForward("task");
-			}
-		}
-		//set session map ID so that itemlist.jsp can get sessionMAP
-		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
-		//return null to close this window
-		return mapping.findForward(TaskListConstants.SUCCESS);
-	}
+	//**********************************************************
+	// 				Solid taskList methods
+	//**********************************************************
 
 	/**
 	 * Read taskList data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -322,14 +167,13 @@ public class AuthoringAction extends Action {
 	 *  
 	 * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
 	 * @throws ServletException 
-	 * 
 	 */
 	private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		
-		//save toolContentID into HTTPSession
+		// save toolContentID into HTTPSession
 		Long contentId = new Long(WebUtil.readLongParam(request,TaskListConstants.PARAM_TOOL_CONTENT_ID));
 		
-//		get back the taskList and item list and display them on page
+		// get back the taskList and item list and display them on page
 		ITaskListService service = getTaskListService();
 
 		List<TaskListItem> items = null;
@@ -368,6 +212,11 @@ public class AuthoringAction extends Action {
 			throw new ServletException(e);
 		}
 		
+		//initialize conditions list
+		SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
+		conditionList.clear();
+		conditionList.addAll(taskList.getConditions());
+		
 		//init it to avoid null exception in following handling
 		if(items == null)
 			items = new ArrayList<TaskListItem>();
@@ -394,8 +243,7 @@ public class AuthoringAction extends Action {
 		sessionMap.put(TaskListConstants.ATTR_RESOURCE_FORM, taskListForm);
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}
-
-
+	
 	/**
 	 * Display same entire authoring page content from HttpSession variable.
 	 * @param mapping
@@ -405,8 +253,7 @@ public class AuthoringAction extends Action {
 	 * @return
 	 * @throws ServletException 
 	 */
-	private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws ServletException {
+	private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
 		TaskListForm existForm = (TaskListForm) sessionMap.get(TaskListConstants.ATTR_RESOURCE_FORM);
@@ -424,6 +271,7 @@ public class AuthoringAction extends Action {
 		else
 			return mapping.findForward(TaskListConstants.DEFINE_LATER);
 	}
+	
 	/**
 	 * This method will persist all inforamtion in this authoring page, include all taskList item, information etc.
 	 * 
@@ -434,8 +282,7 @@ public class AuthoringAction extends Action {
 	 * @return
 	 * @throws ServletException 
 	 */
-	private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+	private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,	HttpServletResponse response) throws Exception {
 		TaskListForm taskListForm = (TaskListForm)(form);
 		
 		//get back sessionMAP
@@ -560,6 +407,20 @@ public class AuthoringAction extends Action {
 			iter.remove();
 		}
 		
+		//Handle taskList conditions
+		SortedSet conditions = getTaskListConditionList(sessionMap);
+		taskListPO.setConditions(conditions);
+    	//delete instructino file from database.
+    	List delTaskListConditionList = getDeletedTaskListConditionList(sessionMap);
+    	iter = delTaskListConditionList.iterator();
+    	while(iter.hasNext()){
+    		TaskListCondition condition = (TaskListCondition) iter.next();
+    		iter.remove();
+    		if(condition.getUid() != null)
+    			service.deleteTaskListCondition(condition.getUid());
+    	}
+		
+		
 		//**********************************************
 		//finally persist taskListPO again
 		service.saveOrUpdateTaskList(taskListPO);
@@ -575,7 +436,7 @@ public class AuthoringAction extends Action {
     	else
     		return mapping.findForward("monitor");
 	}
-
+	
 	/**
 	 * Handle upload online instruction files request. 
 	 * @param mapping
@@ -585,10 +446,11 @@ public class AuthoringAction extends Action {
 	 * @return
 	 * @throws UploadTaskListFileException 
 	 */
-	public ActionForward uploadOnline(ActionMapping mapping, ActionForm form,
+	private ActionForward uploadOnline(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws UploadTaskListFileException {
 		return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE,request);
 	}
+	
 	/**
 	 * Handle upload offline instruction files request.
 	 * @param mapping
@@ -598,10 +460,11 @@ public class AuthoringAction extends Action {
 	 * @return
 	 * @throws UploadTaskListFileException 
 	 */
-	public ActionForward uploadOffline(ActionMapping mapping, ActionForm form,
+	private ActionForward uploadOffline(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws UploadTaskListFileException {
 		return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE,request);
 	}
+	
 	/**
 	 * Common method to upload online or offline instruction files request.
 	 * @param mapping
@@ -659,6 +522,7 @@ public class AuthoringAction extends Action {
 		return mapping.findForward(TaskListConstants.SUCCESS);
 
 	}
+	
 	/**
 	 * Delete offline instruction file from current TaskList authoring page.
 	 * @param mapping
@@ -667,10 +531,11 @@ public class AuthoringAction extends Action {
 	 * @param response
 	 * @return
 	 */
-	public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form,
+	private ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		return deleteFile(mapping,request, response,form, IToolContentHandler.TYPE_OFFLINE);
 	}
+	
 	/**
 	 * Delete online instruction file from current TaskList authoring page.
 	 * @param mapping
@@ -679,7 +544,7 @@ public class AuthoringAction extends Action {
 	 * @param response
 	 * @return
 	 */
-	public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form,
+	private ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		return deleteFile(mapping, request, response,form, IToolContentHandler.TYPE_ONLINE);
 	}
@@ -721,8 +586,180 @@ public class AuthoringAction extends Action {
 		return mapping.findForward(TaskListConstants.SUCCESS);
 
 	}
+	
+	//**********************************************************
+	// 				Add taskListItem methods
+	//**********************************************************
+	
+	/**
+	 * Display empty page for new taskList item.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
+		((TaskListItemForm)form).setSessionMapID(sessionMapID);
+		
+		return mapping.findForward("task");
+	}
+	
+	/**
+	 * Display edit page for existed taskList item.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+		//	get back sessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		
+		int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX),-1);
+		TaskListItem item = null;
+		if(itemIdx != -1){
+			SortedSet<TaskListItem> taskListList = getTaskListItemList(sessionMap);
+			List<TaskListItem> rList = new ArrayList<TaskListItem>(taskListList);
+			item = rList.get(itemIdx);
+			if(item != null){
+				populateItemToForm(itemIdx, item,(TaskListItemForm) form,request);
+			}
+		}		
+		
+		return (item==null) ? null : mapping.findForward("task"); 
+	}
+	
+	/**
+	 * This method will get necessary information from taskList item form and save or update into 
+	 * <code>HttpSession</code> TaskListItemList. Notice, this save is not persist them into database,  
+	 * just save <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring 
+	 * page is being persisted.
+	 *  
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 */
+	private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response){
+		TaskListItemForm itemForm = (TaskListItemForm)form;
+		ActionErrors errors = validateTaskListItem(itemForm);
+		
+		if(!errors.isEmpty()){
+			this.addErrors(request,errors);
+			return mapping.findForward("task");
+		}
+		
+		try {
+			extractFormToTaskListItem(request, itemForm);
+		} catch (Exception e) {
+			//any upload exception will display as normal error message rather then throw exception directly
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(TaskListConstants.ERROR_MSG_UPLOAD_FAILED,e.getMessage()));
+			if(!errors.isEmpty()){
+				this.addErrors(request,errors);
+				return mapping.findForward("task");
+			}
+		}
+		//set session map ID so that itemlist.jsp can get sessionMAP
+		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
+		//return null to close this window
+		return mapping.findForward(TaskListConstants.SUCCESS);
+	}
+	
+	/**
+	 * Remove taskList item from HttpSession list and update page display. As authoring rule, all persist only happen when 
+	 * user submit whole page. So this remove is just impact HttpSession values.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+		//	get back sessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		
+		int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX),-1);
+		if(itemIdx != -1){
+			SortedSet<TaskListItem> taskListList = getTaskListItemList(sessionMap);
+			List<TaskListItem> rList = new ArrayList<TaskListItem>(taskListList);
+			TaskListItem item = rList.remove(itemIdx);
+			taskListList.clear();
+			taskListList.addAll(rList);
+			//add to delList
+			List delList = getDeletedTaskListItemList(sessionMap);
+			delList.add(item);
+		}	
+		
+		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+		return mapping.findForward(TaskListConstants.SUCCESS);
+	}
+	
+	/**
+	 * Move up current item.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward upItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		return switchItem(mapping, request, true);
+	}
+	
+	/**
+	 * Move down current item.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward downItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		return switchItem(mapping, request, false);
+	}
+
+	private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
+//		get back sessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		
+		int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX),-1);
+		if(itemIdx != -1){
+			SortedSet<TaskListItem> taskListList = getTaskListItemList(sessionMap);
+			List<TaskListItem> rList = new ArrayList<TaskListItem>(taskListList);
+			//get current and the target item, and switch their sequnece
+			TaskListItem item = rList.get(itemIdx);
+			TaskListItem repItem;
+			if(up)
+				repItem = rList.get(--itemIdx);
+			else
+				repItem = rList.get(++itemIdx);
+			int upSeqId = repItem.getSequenceId();
+			repItem.setSequenceId(item.getSequenceId());
+			item.setSequenceId(upSeqId);
+			
+			//put back list, it will be sorted again
+			taskListList.clear();
+			taskListList.addAll(rList);
+		}	
+		
+		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+		return mapping.findForward(TaskListConstants.SUCCESS);
+	}
+
 	//*************************************************************************************
-	// Private method 
+	// 							Private methods for internal needs  
 	//*************************************************************************************
 	/**
 	 * Return TaskListService bean.
@@ -757,7 +794,28 @@ public class AuthoringAction extends Action {
 			sessionMap.put(TaskListConstants.ATTR_RESOURCE_ITEM_LIST,list);
 		}
 		return list;
-	}	
+	}
+	/**
+	 * List save current taskList items.
+	 * @param request
+	 * @return
+	 */
+	private SortedSet<TaskListCondition> getTaskListConditionList(SessionMap sessionMap) {
+		SortedSet<TaskListCondition> list = (SortedSet<TaskListCondition>) sessionMap.get(TaskListConstants.ATTR_CONDITION_LIST);
+		if(list == null){
+			list = new TreeSet<TaskListCondition>(new TaskListConditionComparator());
+			sessionMap.put(TaskListConstants.ATTR_CONDITION_LIST,list);
+		}
+		return list;
+	}
+	/**
+	 * List save deleted taskList items, which could be persisted or non-persisted items. 
+	 * @param request
+	 * @return
+	 */
+	private List getDeletedTaskListConditionList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap,TaskListConstants.ATTR_DELETED_CONDITION_LIST);
+	}
 	/**
 	 * List save deleted taskList items, which could be persisted or non-persisted items. 
 	 * @param request
@@ -814,9 +872,9 @@ public class AuthoringAction extends Action {
 		
 		//FOR requirment from LDEV-754
 		//add extra blank line for instructions
-//		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
-//			instructions.add("");
-//		}
+		//		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
+		//			instructions.add("");
+		//		}
 	}
 	
 	/**
@@ -905,10 +963,10 @@ public class AuthoringAction extends Action {
 	
 	private ActionMessages validate(TaskListForm taskListForm, ActionMapping mapping, HttpServletRequest request) {
 		ActionMessages errors = new ActionMessages();
-//		if (StringUtils.isBlank(taskListForm.getTaskList().getTitle())) {
-//			ActionMessage error = new ActionMessage("error.resource.item.title.blank");
-//			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-//		}
+		//		if (StringUtils.isBlank(taskListForm.getTaskList().getTitle())) {
+		//			ActionMessage error = new ActionMessage("error.resource.item.title.blank");
+		//			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+		//		}
 		
 		//define it later mode(TEACHER) skip below validation.
 		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
@@ -920,6 +978,5 @@ public class AuthoringAction extends Action {
 		
 		return errors;
 	}
-
 
 }

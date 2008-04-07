@@ -128,7 +128,7 @@
 </div>
 
 <p class="small-space-bottom">
-	<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=1"/>');" class="button-add-item">
+	<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}"/>');" class="button-add-item">
 	<fmt:message key="label.authoring.basic.add.task" /></a> 
 </p>
 
