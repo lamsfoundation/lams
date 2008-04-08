@@ -247,6 +247,19 @@ public abstract class OutputFactory {
 		return definition;
 	}
 	
+	/** Build a tool definition designed for a set of boolean conditions. It will get the definition's description from the 
+	 * I18N file using the getDescription() method and set the type to OUTPUT_SET_BOOLEAN. The tool's factory should then 
+	 * set up a series of conditions, each of type OUTPUT_BOOLEAN. Sets showConditionNameOnly to true so that the user
+	 * in authoring doesn't see the internal definitions, just the condition name.
+	 */
+	protected ToolOutputDefinition buildBooleanSetOutputDefinition(String definitionName) {
+		ToolOutputDefinition definition =  buildDefinition(definitionName, OutputType.OUTPUT_SET_BOOLEAN, null, null, null, Boolean.TRUE);
+		List<BranchCondition> defaultConditions = new ArrayList<BranchCondition>();
+		definition.setDefaultConditions(defaultConditions);
+		return definition;
+	}
+	
+
 	/** Build a tool definition designed for a single String value.
 	 * It will get the definition's description from the I18N file using the getDescription() method and
 	 * set the type to OUTPUT_STRING. */

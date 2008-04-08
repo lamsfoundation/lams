@@ -25,9 +25,11 @@ package org.lamsfoundation.lams.tool;
 
 /**
  * Output Types define the type of object that will be returned as output.
- * OUTPUT_NUMERIC includes both integers and floating point numbers.
+ * OUTPUT_NUMERIC includes both integers and floating point numbers. If we have an output definition for
+ * a set of OUTPUT_BOOLEAN conditions, then the definition will be OUTPUT_SET_BOOLEAN, but each condition
+ * will be OUTPUT_BOOLEAN.
  */
 public enum OutputType {
 
-	OUTPUT_LONG, OUTPUT_DOUBLE, OUTPUT_BOOLEAN, OUTPUT_STRING, OUTPUT_COMPLEX
+	OUTPUT_LONG, OUTPUT_DOUBLE, OUTPUT_BOOLEAN, OUTPUT_STRING, OUTPUT_COMPLEX, OUTPUT_SET_BOOLEAN
 }
