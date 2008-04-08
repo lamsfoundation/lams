@@ -45,6 +45,8 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 public class VoteOutputFactory extends OutputFactory {
 
 	protected static final String OUTPUT_NAME_NOMINATION_SELECTION = "learner.selection";
+	protected static final int FREE_TEXT_DISPLAY_ORDER_FOR_NOMINATION_SELECTION = 0;
+	protected static final String FREE_TEXT_CONDITION_FOR_NOMINATION_SELECTION = OUTPUT_NAME_NOMINATION_SELECTION+"0";
 	
 	/** 
 	 * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
@@ -61,45 +63,38 @@ public class VoteOutputFactory extends OutputFactory {
 				log.error("Unable to build output definitions for Voting if the user can have more than one nomination. Vote "+content);
 			} else {
 			
-				ToolOutputDefinition definition = buildLongOutputDefinition(OUTPUT_NAME_NOMINATION_SELECTION);
+				ToolOutputDefinition definition = buildBooleanSetOutputDefinition(OUTPUT_NAME_NOMINATION_SELECTION);
 				if ( definition.getDefaultConditions() == null )
 					definition.setDefaultConditions(new ArrayList<BranchCondition>());
 				
 				List<BranchCondition> defaultConditions = definition.getDefaultConditions();
-				int min = 1;
-				int max = 1;
-				
+				String trueString = Boolean.TRUE.toString();
+				int conditionOrderId = 1;
 				
 				if ( content.isAllowText() ) {
-					min = 0;
-					defaultConditions.add(new BranchCondition(null, null, new Integer(0), OUTPUT_NAME_NOMINATION_SELECTION, 
+					defaultConditions.add(new BranchCondition(null, null, new Integer(conditionOrderId++), FREE_TEXT_CONDITION_FOR_NOMINATION_SELECTION, 
 							getI18NText("label.open.vote", false), 
-							OutputType.OUTPUT_LONG.toString(),
-							"0", 
-							"0", 
-							null));
+							OutputType.OUTPUT_BOOLEAN.toString(),
+							null, 
+							null, 
+							trueString));
 				}
 				
 				Iterator iter = content.getVoteQueContents().iterator();
 				while ( iter.hasNext() ) {
 					VoteQueContent nomination = (VoteQueContent) iter.next();
 					int displayOrder = nomination.getDisplayOrder();
-					if ( displayOrder < min ) min = displayOrder;
-					if ( displayOrder > max ) max = displayOrder;
-					String displayOrderAsString = new Long(displayOrder).toString();
-					defaultConditions.add(new BranchCondition(null, null, new Integer(1), OUTPUT_NAME_NOMINATION_SELECTION, 
+					String name = OUTPUT_NAME_NOMINATION_SELECTION+new Integer(displayOrder).toString();
+					defaultConditions.add(new BranchCondition(null, null, new Integer(conditionOrderId++),  name, 
 							VoteUtils.stripHTML(nomination.getQuestion()), 
-							OutputType.OUTPUT_LONG.toString(),
-							displayOrderAsString, 
-							displayOrderAsString, 
-							null));
+							OutputType.OUTPUT_BOOLEAN.toString(),
+							null, 
+							null, 
+							trueString));
 				}
-				definition.setStartValue(new Long(min));
-				definition.setEndValue(new Long(max));
 				definition.setShowConditionNameOnly(Boolean.TRUE);
 
 				definitionMap.put(OUTPUT_NAME_NOMINATION_SELECTION, definition);
-				
 			}
 		} else {
 			log.error("Unable to build output definitions for Vote as no tool content object supplied.");
@@ -110,55 +105,116 @@ public class VoteOutputFactory extends OutputFactory {
 
 	public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IVoteService voteService, Long toolSessionId, Long learnerId) {
 		
-		VoteSession session = voteService.findVoteSessionById(toolSessionId);
-		VoteQueUsr queUser = voteService.getVoteUserBySession(learnerId, session.getUid());
-
-		TreeMap<String,ToolOutput> output = new TreeMap<String, ToolOutput>();
-		if ( names == null || names.contains(OUTPUT_NAME_NOMINATION_SELECTION) ) {
-			output.put(OUTPUT_NAME_NOMINATION_SELECTION, getDisplayOrderOfVoteQueContent(queUser) );
+		TreeMap<String,ToolOutput> output = null;
+		if ( names == null ) {
+			output = createAllDisplayOrderOutputs(voteService, toolSessionId, learnerId);
+		} else {
+			output = new TreeMap<String, ToolOutput>();
+			for ( String name: names) {
+				ToolOutput newOutput = getToolOutput(name, voteService, toolSessionId, learnerId);
+				if ( newOutput != null )
+					output.put(name, newOutput);
+			}
 		}
 		return output;
 	}
 
 	public ToolOutput getToolOutput(String name, IVoteService voteService, Long toolSessionId, Long learnerId) {
-		if ( name != null ) {
+		if ( name != null && name.startsWith(OUTPUT_NAME_NOMINATION_SELECTION)) {
 			VoteSession session = voteService.findVoteSessionById(toolSessionId);
 			VoteQueUsr queUser = voteService.getVoteUserBySession(learnerId, session.getUid());
 
-			if ( name.equals(OUTPUT_NAME_NOMINATION_SELECTION) ) {
-				return getDisplayOrderOfVoteQueContent(queUser);
-			} 
+			return new ToolOutput(name, getI18NText(OUTPUT_NAME_NOMINATION_SELECTION, true), checkDisplayOrderOfVoteQueContent(name, queUser));
 		}
 		return null;
 	}
 	
 	/**
-	 * Get the selected nomination for this user.
+	 * Check the display order embedded in the condition name. The name MUST start with OUTPUT_NAME_NOMINATION_SELECTION.
 	 */
-	private ToolOutput getDisplayOrderOfVoteQueContent(VoteQueUsr queUser) {
+	private boolean checkDisplayOrderOfVoteQueContent(String name, VoteQueUsr queUser) {
+		
+		String displayOrderString = name.substring(OUTPUT_NAME_NOMINATION_SELECTION.length());
+		if ( name.length() <= OUTPUT_NAME_NOMINATION_SELECTION.length()) {
+			log.error("Unable to convert the display order to an int for tool output "+ OUTPUT_NAME_NOMINATION_SELECTION+". Returning false. Name doesn't contain the display order."+name);
+			return false;
+		}
+
+		int displayOrder = 0;
+		try {
+			displayOrder = new Integer(displayOrderString).intValue();
+		} catch ( NumberFormatException e) {
+			log.error("Unable to convert the display order to an int for tool output "+ OUTPUT_NAME_NOMINATION_SELECTION+". Returning false. Number format exception thrown. Condition name was:"+name,e);
+			return false;
+		}
 		
 		if ( queUser != null ) {
 			Set voteAttempts = queUser.getVoteUsrAttempts();
 			if ( voteAttempts.size() > 0 ) {
 				if ( voteAttempts.size() > 1)
-					log.error("Attempting to match on nomination, but more than one nomination selected for this user. Taking first nomination which isn't a free text entry. User "+queUser);
+					log.error("Attempting to match on nomination, but more than one nomination selected for this user. Will try to match on the given display order. User "+queUser);
 
 				Iterator iter = voteAttempts.iterator();
 				while ( iter.hasNext() ) {
 					VoteUsrAttempt attempt = (VoteUsrAttempt) iter.next();		
-					if ( attempt.getVoteQueContentId().longValue() == 1 ) {
+					if ( attempt.getVoteQueContentId().longValue() == 1 && displayOrder == FREE_TEXT_DISPLAY_ORDER_FOR_NOMINATION_SELECTION) {
 						// VoteQueContentId == 1 indicates that it is a free text entry
-						return new ToolOutput(OUTPUT_NAME_NOMINATION_SELECTION, getI18NText(OUTPUT_NAME_NOMINATION_SELECTION, true), new Long(0));
+						return true;
 					} else {
 						VoteQueContent nomination = attempt.getVoteQueContent();
-						return new ToolOutput(OUTPUT_NAME_NOMINATION_SELECTION, getI18NText(OUTPUT_NAME_NOMINATION_SELECTION, true), new Long(nomination.getDisplayOrder()));
+						return nomination.getDisplayOrder() == displayOrder;
 					}
 				}
 			}
 		}
-		return null;
+		return false;
 	}
 
+	/**
+	 * Check the display order embedded in the condition name. The name MUST start with OUTPUT_NAME_NOMINATION_SELECTION.
+	 */
+	private TreeMap<String,ToolOutput> createAllDisplayOrderOutputs(IVoteService voteService, Long toolSessionId, Long learnerId) {
+		
+		TreeMap<String,ToolOutput> output = null;
+
+		VoteSession session = voteService.findVoteSessionById(toolSessionId);
+		VoteContent content = session.getVoteContent();
+		VoteQueUsr queUser = voteService.getVoteUserBySession(learnerId, session.getUid());
+		String i18nDescription =  getI18NText(OUTPUT_NAME_NOMINATION_SELECTION, true);
+		
+		// create a false condition for all of them to start with, then create a true for the ones that are correct.
+		if ( content.isAllowText() ) {
+			boolean found = false;
+			if ( queUser != null ) {
+				Set voteAttempts = queUser.getVoteUsrAttempts();
+				Iterator iter = voteAttempts.iterator();
+				while ( iter.hasNext() && !found ) {
+					VoteUsrAttempt attempt = (VoteUsrAttempt) iter.next();		
+					found = ( attempt.getVoteQueContentId().longValue() == 1 );
+				}
+			} 
+			output.put(FREE_TEXT_CONDITION_FOR_NOMINATION_SELECTION, new ToolOutput(FREE_TEXT_CONDITION_FOR_NOMINATION_SELECTION, i18nDescription, found));
+		}
+		
+		Iterator contentIter = content.getVoteQueContents().iterator();
+		while ( contentIter.hasNext() ) {
+			VoteQueContent nomination = (VoteQueContent) contentIter.next();
+			int displayOrder = nomination.getDisplayOrder();
+			String name = OUTPUT_NAME_NOMINATION_SELECTION+new Integer(displayOrder).toString();
+			boolean found = false;
+			if ( queUser != null ) {
+				Set voteAttempts = queUser.getVoteUsrAttempts();
+				Iterator iter = voteAttempts.iterator();
+				while ( iter.hasNext() && !found ) {
+					VoteUsrAttempt attempt = (VoteUsrAttempt) iter.next();		
+					found = ( attempt.getVoteQueContent().getDisplayOrder() == displayOrder );
+				}
+			}
+			output.put(name, new ToolOutput(name, i18nDescription, found));
+		}
+
+		return output;
+	}
 
 
 }
