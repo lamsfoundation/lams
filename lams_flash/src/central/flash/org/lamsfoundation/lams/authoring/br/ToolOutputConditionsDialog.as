@@ -317,7 +317,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		var items:Array = _toolOutputDefin_cmb.dataProvider;
 		
 		for(var i=0; i < items.length; i++)
-			if(name.substring(0, name.indexOf(DEFINITION_DELIMITER)) == items[i].name)
+			if(name == items[i].name)
+				_toolOutputDefin_cmb.selectedIndex = i;
+			else if(items[i].type == ToolOutputDefinition.USER_DEFINED && name.substring(0, name.indexOf(DEFINITION_DELIMITER)) == items[i].name)
 				_toolOutputDefin_cmb.selectedIndex = i;
 
 	}
