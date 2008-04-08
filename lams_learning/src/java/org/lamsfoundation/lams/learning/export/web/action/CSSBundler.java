@@ -24,13 +24,9 @@
 
 package org.lamsfoundation.lams.learning.export.web.action;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,27 +37,25 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.web.filter.LocaleFilter;
 
-public class CSSBundler {
+public class CSSBundler extends Bundler {
 
-	private static Logger log = Logger.getLogger(CSSBundler.class);
 	private static final String RTL_DIR = "rtl";	// right-to-left direction
 
 	Map<String,File> filesToCopy = null;
-	List<String> directoriesRequired = null;
 	HttpServletRequest request  = null;
 	Cookie[] cookies  = null;
 	String outputDirectory  = null;
 	String centralPath  = null;
 	boolean rtl = false;
 	Collection<CSSThemeVisualElement> themes = null;
-
+	List<String> directoriesRequired;
+	
 	/**
  	 * @param centralPath the directory path to the lams-central.war. Assumes that it is an expanded war.
 	 */
@@ -155,7 +149,7 @@ public class CSSBundler {
 		setupImageList();
 		
 		// now copy all those files
-		createDirectories();
+		createDirectories(directoriesRequired);
 		for ( Map.Entry fileEntry : filesToCopy.entrySet() ) {
 			copyFile((String)fileEntry.getKey(), (File)fileEntry.getValue());
 		}
@@ -219,59 +213,6 @@ public class CSSBundler {
 				}
 			}
 		}
-
-	}
-	
-	private void createDirectories() {
-		
-		for ( String directoryPath: directoriesRequired) {
-			File dir = new File(directoryPath);
-			if ( ! dir.mkdirs() )  {
-				log.error("Unable to create directory for export portfolio: "+directoryPath);
-			}
-		}
-	}
-
-	private void copyFile(String filePath, File file) throws IOException {
-		
-		FileInputStream is = new FileInputStream(file);
-		OutputStream os = null;
-		try {
-			
-			int bufLen = 1024; // 1 Kbyte
-			byte[] buf = new byte[1024]; // output buffer
-			os = new FileOutputStream(filePath);
-
-			BufferedInputStream in = new BufferedInputStream(is);
-			int len = 0;
-		    while((len = in.read(buf,0,bufLen)) != -1){
-		    	os.write(buf,0,len);
-		    }	
-			
-		} catch ( IOException e ) {
-			String message = "Unable to write out file needed for export portfolio. File was "+filePath;	
-			log.error(message,e);
-			throw e;
-			
-		} finally {
-
-			try {
-				if ( is != null )
-					is.close();
-			} catch (IOException e1) {
-				String message = "Unable to close input export portfolio file due to IOException";
-				log.warn(message,e1);
-			}
-
-			try {
-				if ( os != null )
-					os.close();
-			} catch (IOException e2) {
-				String message = "Unable to close output export portfolio file due to IOException";
-				log.warn(message,e2);
-			}
-		}
-		
 
 	}
 }

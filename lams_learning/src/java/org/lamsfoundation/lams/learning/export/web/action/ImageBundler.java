@@ -41,14 +41,16 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 
 /**
  * Auxiliary class for supporting portfolio export. Copying all images and files
- * uploaded by user into export temporary folder.
+ * uploaded by user into export temporary folder, plus the FCKEditor smileys, plus
+ * a few misc common images.
  * 
  * @author AndreyB
  * 
  */
-public class ImageBundler {
+public class ImageBundler extends Bundler {
 
 	private static Logger log = Logger.getLogger(ImageBundler.class);
+	private static String[] miscImages = new String[] {"fred.gif", "cross.gif", "error.jpg", "spacer.gif", "tick.gif", "tree_closed.gif", "tree_open.gif" };
 
 	Map<String,File> filesToCopy = null;
 	List<String> directoriesRequired = null;
@@ -56,7 +58,6 @@ public class ImageBundler {
 	String contentFolderId = null;
 	String lamsWwwPath  = null;
 	String lamsCentralPath  = null;
-
 	/**
 	 * @param outputDirectory directory for the export
 	 * @param contentFolderId the 32-character content folder name
@@ -96,13 +97,16 @@ public class ImageBundler {
 		File central = new File(lamsCentralPath);
 		if ( lamsCentralPath != null && central.canRead() && central.isDirectory() ) {
 			log.debug("Copying FCKeditor smileys from path " + lamsCentralPath);
-			
 			// build up a list of images to copy
 			setupFCKEditorSmileysList();
+
+			// build up a list of the misc images to copy
+			setupMiscImages();
 		}
+
 		
 		// now copy all those files
-		createDirectories();
+		createDirectories(directoriesRequired);
 		for ( Map.Entry fileEntry : filesToCopy.entrySet() ) {
 			copyFile((String)fileEntry.getKey(), (File)fileEntry.getValue());
 		}
@@ -176,58 +180,27 @@ public class ImageBundler {
 			}
 		}
 	}
-	
-	private void createDirectories() {
+
+	/**
+	 * Creates list of misc image files that should be exported.
+	 */
+	private void setupMiscImages() {
+		String imageDirectory = lamsCentralPath+File.separatorChar+"images";
+		String outputImageDirectory = outputDirectory+File.separatorChar+"images";
 		
-		for ( String directoryPath: directoriesRequired) {
-			File dir = new File(directoryPath);
-			if ( ! dir.mkdirs() )  {
-				log.error("Unable to create directory for export portfolio: "+directoryPath);
+		directoriesRequired.add(outputImageDirectory);
+
+		for ( String imageName: miscImages) {
+			String inputFilename = imageDirectory + File.separatorChar + imageName;
+			String outputFilename = outputImageDirectory + File.separatorChar + imageName;
+			
+			File image = new File(inputFilename);
+			if ( ! image.canRead() || image.isDirectory() ) {
+				log.error("Unable to copy image "+inputFilename+" as file does not exist or cannot be read as a file.");
+			} else {
+				filesToCopy.put(outputFilename,image);
 			}
 		}
-	}
-
-	private void copyFile(String filePath, File file) throws IOException {
-		
-		FileInputStream is = new FileInputStream(file);
-		OutputStream os = null;
-		try {
-			
-			int bufLen = 1024; // 1 Kbyte
-			byte[] buf = new byte[1024]; // output buffer
-			os = new FileOutputStream(filePath);
-
-			BufferedInputStream in = new BufferedInputStream(is);
-			int len = 0;
-		    while((len = in.read(buf,0,bufLen)) != -1){
-		    	os.write(buf,0,len);
-		    }	
-			
-		} catch ( IOException e ) {
-			String message = "Unable to write out file needed for export portfolio. File was "+filePath;	
-			log.error(message,e);
-			throw e;
-			
-		} finally {
-
-			try {
-				if ( is != null )
-					is.close();
-			} catch (IOException e1) {
-				String message = "Unable to close input export portfolio file due to IOException";
-				log.warn(message,e1);
-			}
-
-			try {
-				if ( os != null )
-					os.close();
-			} catch (IOException e2) {
-				String message = "Unable to close output export portfolio file due to IOException";
-				log.warn(message,e2);
-			}
-		}
-		
-
 	}
 }
 
