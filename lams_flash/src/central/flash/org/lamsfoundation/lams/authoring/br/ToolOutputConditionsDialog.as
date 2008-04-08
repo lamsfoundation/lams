@@ -55,6 +55,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private static var TOOL_OUTPUTS_URL_POSTFIX:String = "outputs";
 	private static var HELP_BTN_LBL:String = "?";
+	private static var DEFINITION_DELIMITER:String = "#";
 	
 	//References to components + clips 
     private var _container:MovieClip;  //The container window that holds the dialog
@@ -192,7 +193,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		help_btn.label = HELP_BTN_LBL;
 		clear_all_btn.label = Dictionary.getValue("to_conditions_dlg_clear_all_btn_lbl");
 		remove_item_btn.label = Dictionary.getValue("to_conditions_dlg_remove_item_btn_lbl");
-		refresh_btn.label = "Refresh"; ///Dictionary.getValue("to_conditions_dlg_remove_item_btn_lbl");
+		refresh_btn.label = Dictionary.getValue("refresh_btn");
 	
 		//Set the text for buttons
         close_btn.label = Dictionary.getValue('al_done');
@@ -316,7 +317,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		var items:Array = _toolOutputDefin_cmb.dataProvider;
 		
 		for(var i=0; i < items.length; i++)
-			if(items[i].name == name)
+			if(name.substring(0, name.indexOf(DEFINITION_DELIMITER)) == items[i].name)
 				_toolOutputDefin_cmb.selectedIndex = i;
 
 	}
@@ -379,7 +380,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 			} else if(_selectedDefinition.type == ToolOutputDefinition.USER_DEFINED) {
 				// TODO: 2.1.x
 				// show alert message - 0 default conditions all mappings will be removed
-				//LFMessage.showMessageConfirm(Dictionary.getValue("branch_mapping_dlg_defaultConditions_zero"), Proxy.create(this, removeAllItems), null, "continue", null, "");
+				LFMessage.showMessageConfirm(Dictionary.getValue("branch_mapping_dlg_condtion_items_update_defaultConditions_zero"), Proxy.create(this, removeAllItems), null, Dictionary.getValue("al_continue"), null, "");
 			}
 		}
 	}
@@ -406,6 +407,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				
 				break;
 			case ToolOutputDefinition.BOOL: 
+				_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.exactMatchValue), data: condition});
+				break;
+			case ToolOutputDefinition.USER_DEFINED:
 				_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.exactMatchValue), data: condition});
 				break;
 			default: 
@@ -454,6 +458,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				}
 				break;
 			case ToolOutputDefinition.BOOL:
+				return true;
+			case ToolOutputDefinition.USER_DEFINED:
 				return true;
 			default: 
 				return false;
@@ -516,14 +522,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	}
 	
 	private function itemChanged(evt:Object):Void {
-		Debugger.log("type: " + _selectedDefinition.type, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
-		Debugger.log("index: " + _toolOutputDefin_cmb.selectedIndex, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
-		
 		if(_selectedIndex == _toolOutputDefin_cmb.selectedIndex)
 			return;
-		
-		Debugger.log("has mappings: " + app.getCanvas().ddm.hasBranchMappingsForConditionSet(_condition_item_dgd.dataProvider), Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
-		Debugger.log("dp length: " + _condition_item_dgd.dataProvider.length, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
 		
 		_toolOutputLongOptions_cmb.selectedIndex = 0;
 		
@@ -536,8 +536,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	
 	private function optionChanged(evt:Object):Void {
-		Debugger.log("index: " + _toolOutputLongOptions_cmb.selectedIndex, Debugger.CRITICAL, "itemChanged", "ToolOutputConditionsDialog");
-		
 		if(_selectedOptionIndex == _toolOutputLongOptions_cmb.selectedIndex && _selectedOptionIndex != null)
 			return;
 		
@@ -627,7 +625,19 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				
 				break;
 			case ToolOutputDefinition.USER_DEFINED:
-				// TODO: 2.1.x
+				_condition_item_dgd.visible = true;
+				_toolOutputLongOptions_cmb.visible = false;
+				
+				add_btn.visible = false;
+				remove_item_btn.visible = false;
+				clear_all_btn.visible = false;
+				
+				refresh_btn.visible = true;
+				
+				showSteppers(false, false);
+				
+				addDefaultConditions(_selectedDefinition.defaultConditions);
+				
 				break;
 			default:
 				showElements(false);
@@ -710,6 +720,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 			case ToolOutputDefinition.LONG:
 				return Dictionary.getValue("to_conditions_dlg_defin_long_type");
 				break;
+			case ToolOutputDefinition.USER_DEFINED:
+				return Dictionary.getValue("to_conditions_dlg_defin_user_defined_type");
 			default:
 				return "";
 		}
