@@ -378,9 +378,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 			if(_selectedDefinition.defaultConditions.length > 0) {
 				LFMessage.showMessageConfirm(Dictionary.getValue("to_conditions_dlg_condition_items_update_defaultConditions"), Proxy.create(this, updateWithDefaultConditions), null, Dictionary.getValue("al_continue"), null, "");
 			} else if(_selectedDefinition.type == ToolOutputDefinition.USER_DEFINED) {
-				// TODO: 2.1.x
 				// show alert message - 0 default conditions all mappings will be removed
-				LFMessage.showMessageConfirm(Dictionary.getValue("branch_mapping_dlg_condtion_items_update_defaultConditions_zero"), Proxy.create(this, removeAllItems), null, Dictionary.getValue("al_continue"), null, "");
+				LFMessage.showMessageAlert(Dictionary.getValue("branch_mapping_dlg_condtion_items_update_defaultConditions_zero"), null);
 			}
 		}
 	}
