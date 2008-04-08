@@ -20,9 +20,9 @@
 		<div id="content">
 			<p><fmt:message key="msg.LAMS.copyright.statement.2"/></p>
 			<p><fmt:message key="msg.LAMS.copyright.statement.3"/></p>
-			<p><A HREF="http://www.gnu.org/licenses/gpl.txt"  target='copyright2'
-					onClick="window.open('http://www.gnu.org/licenses/gpl.txt','copyright2','resizable,width=650,height=650,scrollbars');return false;">
-						http://www.gnu.org/licenses/gpl.txt
+			<p><A HREF="http://www.gnu.org/licenses/gpl2.txt"  target='copyright2'
+					onClick="window.open('http://www.gnu.org/licenses/gpl2.txt','copyright2','resizable,width=650,height=650,scrollbars');return false;">
+						http://www.gnu.org/licenses/gpl2.txt
 					</a>
 			</p>
 		</div>
