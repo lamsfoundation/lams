@@ -45,8 +45,8 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 public class VoteOutputFactory extends OutputFactory {
 
 	protected static final String OUTPUT_NAME_NOMINATION_SELECTION = "learner.selection";
-	protected static final int FREE_TEXT_DISPLAY_ORDER_FOR_NOMINATION_SELECTION = 0;
-	protected static final String FREE_TEXT_CONDITION_FOR_NOMINATION_SELECTION = OUTPUT_NAME_NOMINATION_SELECTION+"0";
+	protected static final int FREE_TEXT_NOM_SELECTION = 0;
+	protected static final String FREE_TEXT_NOM_SELECTION_STR = "0";
 	
 	/** 
 	 * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
@@ -72,7 +72,8 @@ public class VoteOutputFactory extends OutputFactory {
 				int conditionOrderId = 1;
 				
 				if ( content.isAllowText() ) {
-					defaultConditions.add(new BranchCondition(null, null, new Integer(conditionOrderId++), FREE_TEXT_CONDITION_FOR_NOMINATION_SELECTION, 
+					defaultConditions.add(new BranchCondition(null, null, new Integer(conditionOrderId++),
+							buildConditionName(OUTPUT_NAME_NOMINATION_SELECTION,FREE_TEXT_NOM_SELECTION_STR),
 							getI18NText("label.open.vote", false), 
 							OutputType.OUTPUT_BOOLEAN.toString(),
 							null, 
@@ -84,7 +85,7 @@ public class VoteOutputFactory extends OutputFactory {
 				while ( iter.hasNext() ) {
 					VoteQueContent nomination = (VoteQueContent) iter.next();
 					int displayOrder = nomination.getDisplayOrder();
-					String name = OUTPUT_NAME_NOMINATION_SELECTION+new Integer(displayOrder).toString();
+					String name = buildConditionName(OUTPUT_NAME_NOMINATION_SELECTION,new Integer(displayOrder).toString());
 					defaultConditions.add(new BranchCondition(null, null, new Integer(conditionOrderId++),  name, 
 							VoteUtils.stripHTML(nomination.getQuestion()), 
 							OutputType.OUTPUT_BOOLEAN.toString(),
@@ -134,15 +135,15 @@ public class VoteOutputFactory extends OutputFactory {
 	 */
 	private boolean checkDisplayOrderOfVoteQueContent(String name, VoteQueUsr queUser) {
 		
-		String displayOrderString = name.substring(OUTPUT_NAME_NOMINATION_SELECTION.length());
-		if ( name.length() <= OUTPUT_NAME_NOMINATION_SELECTION.length()) {
+		String[] dcNames = splitConditionName(name);
+		if ( dcNames[1].length() <= OUTPUT_NAME_NOMINATION_SELECTION.length()) {
 			log.error("Unable to convert the display order to an int for tool output "+ OUTPUT_NAME_NOMINATION_SELECTION+". Returning false. Name doesn't contain the display order."+name);
 			return false;
 		}
 
 		int displayOrder = 0;
 		try {
-			displayOrder = new Integer(displayOrderString).intValue();
+			displayOrder = new Integer(dcNames[1]).intValue();
 		} catch ( NumberFormatException e) {
 			log.error("Unable to convert the display order to an int for tool output "+ OUTPUT_NAME_NOMINATION_SELECTION+". Returning false. Number format exception thrown. Condition name was:"+name,e);
 			return false;
@@ -157,7 +158,7 @@ public class VoteOutputFactory extends OutputFactory {
 				Iterator iter = voteAttempts.iterator();
 				while ( iter.hasNext() ) {
 					VoteUsrAttempt attempt = (VoteUsrAttempt) iter.next();		
-					if ( attempt.getVoteQueContentId().longValue() == 1 && displayOrder == FREE_TEXT_DISPLAY_ORDER_FOR_NOMINATION_SELECTION) {
+					if ( attempt.getVoteQueContentId().longValue() == 1 && displayOrder == FREE_TEXT_NOM_SELECTION) {
 						// VoteQueContentId == 1 indicates that it is a free text entry
 						return true;
 					} else {
@@ -193,14 +194,15 @@ public class VoteOutputFactory extends OutputFactory {
 					found = ( attempt.getVoteQueContentId().longValue() == 1 );
 				}
 			} 
-			output.put(FREE_TEXT_CONDITION_FOR_NOMINATION_SELECTION, new ToolOutput(FREE_TEXT_CONDITION_FOR_NOMINATION_SELECTION, i18nDescription, found));
+			String name = buildConditionName(OUTPUT_NAME_NOMINATION_SELECTION,FREE_TEXT_NOM_SELECTION_STR);
+			output.put(name, new ToolOutput(name, i18nDescription, found));
 		}
 		
 		Iterator contentIter = content.getVoteQueContents().iterator();
 		while ( contentIter.hasNext() ) {
 			VoteQueContent nomination = (VoteQueContent) contentIter.next();
 			int displayOrder = nomination.getDisplayOrder();
-			String name = OUTPUT_NAME_NOMINATION_SELECTION+new Integer(displayOrder).toString();
+			String name = buildConditionName(OUTPUT_NAME_NOMINATION_SELECTION,new Integer(displayOrder).toString());
 			boolean found = false;
 			if ( queUser != null ) {
 				Set voteAttempts = queUser.getVoteUsrAttempts();

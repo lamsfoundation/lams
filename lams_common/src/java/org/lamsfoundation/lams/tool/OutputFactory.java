@@ -80,6 +80,7 @@ public abstract class OutputFactory {
 	private String languageFilename;
 	private MessageSource msgSource = null; // derived from toolMessageService, loadedMessageSourceService, languageFilename
 	protected final String KEY_PREFIX = "output.desc."; 
+	protected final String CONDITION_NAME_SEPARATOR = "#";
 	
 	/** Create a map of the tool output definitions, suitable for returning from the method 
 	 * getToolOutputDefinitions() in the ToolContentManager interface. The class for the toolContentObject
@@ -274,4 +275,25 @@ public abstract class OutputFactory {
 		return buildDefinition(definitionName, OutputType.OUTPUT_COMPLEX, null, null, null, Boolean.FALSE);
 	}
 
+	/** 
+	 * Build a condition name based on a definition name. For user customised conditions, the 
+	 * conditions name MUST start with the definition name for Flash to be able to match conditions to definition
+	 * in the authoring interface, but then each condition name needs to be unique, hence "uniquePart".
+	 * @param definitionName: Must not be null
+	 * @param uniquePart: May be null if the condition names are to be the same as the definition name.
+	 * @return combined string
+	 */
+	protected String buildConditionName(String definitionName, String uniquePart) {
+		return uniquePart != null && uniquePart.length() > 0 ? definitionName + CONDITION_NAME_SEPARATOR + uniquePart : definitionName;
+	}
+
+	/** 
+	 * Given a condition name built with buildConditionName, split is back into its definition name and unique part.
+	 * @param conditionName: Must not be null
+	 * @return String[definition name, unique part]
+	 */
+	protected String[] splitConditionName(String conditionName) {
+		int index = conditionName.indexOf(CONDITION_NAME_SEPARATOR);
+		return new String[] { conditionName.substring(0,index), conditionName.substring(index) };
+	}
 }
