@@ -308,6 +308,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 			}
 		}
 
+		_condition_item_dgd.sortItemsBy("orderID", Array.NUMERIC);
+
 		itemChanged(null);
 		
 		this._visible = true;
@@ -398,20 +400,20 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		switch(condition.type) {
 			case ToolOutputDefinition.LONG :
 				if(condition.startValue != null && condition.endValue != null)
-					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value", [String(condition.startValue), String(condition.endValue)]), data: condition});
+					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value", [String(condition.startValue), String(condition.endValue)]), data: condition, orderID: condition.orderID});
 				else if(condition.startValue != null && condition.endValue == null)
-					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_max", [String(condition.startValue)]), data: condition});
+					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_max", [String(condition.startValue)]), data: condition, orderID: condition.orderID});
 				else if(condition.startValue == null && condition.endValue != null)
-					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_min", [String(condition.endValue)]), data: condition});
+					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_min", [String(condition.endValue)]), data: condition, orderID: condition.orderID});
 				else
-					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_exact", [String(condition.exactMatchValue)]), data: condition});
+					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_exact", [String(condition.exactMatchValue)]), data: condition, orderID: condition.orderID});
 				
 				break;
 			case ToolOutputDefinition.BOOL: 
-				_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.exactMatchValue), data: condition});
+				_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.exactMatchValue), data: condition, orderID: condition.orderID});
 				break;
 			case ToolOutputDefinition.USER_DEFINED:
-				_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.exactMatchValue), data: condition});
+				_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.exactMatchValue), data: condition, orderID: condition.orderID});
 				break;
 			default: 
 				Debugger.log("No type found", Debugger.GEN, "addCondition", "ToolOutputConditionsDialog");
@@ -653,6 +655,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	private function addDefaultConditions(defaultConditions:Array):Void {
 		var ddm = app.getCanvas().ddm;
+		
+		defaultConditions.sortOn("orderID", Array.NUMERIC);
 		
 		if(_condition_item_dgd.dataProvider.length <= 0) {
 			for(var i=0; i<defaultConditions.length; i++) {
