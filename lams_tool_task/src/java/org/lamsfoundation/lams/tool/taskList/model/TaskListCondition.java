@@ -192,9 +192,8 @@ public class TaskListCondition implements Cloneable{
 	 * @hibernate.set lazy="true"
 	 * 				  inverse="true"
 	 * 				  cascade="none"
-	 *                order-by="sequence_id asc"
      * 				  table = "tl_latask10_condition_taskList_item"
-     * @hibernate.collection-key column="uid"
+     * @hibernate.collection-key column="condition_uid"
      * @hibernate.collection-many-to-many class="org.lamsfoundation.lams.tool.taskList.model.TaskListItem"
 	 */
 	public Set getTaskListItems() {

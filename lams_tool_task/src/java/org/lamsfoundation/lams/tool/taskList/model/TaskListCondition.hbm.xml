@@ -40,11 +40,10 @@
             inverse="true"
             cascade="none"
             sort="unsorted"
-            order-by="sequence_id asc"
         >
 
             <key
-                column="uid"
+                column="condition_uid"
             >
             </key>
 

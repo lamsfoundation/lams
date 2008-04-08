@@ -124,7 +124,7 @@ create table tl_latask10_user (
 alter table tl_latask10_attachment add index FK_NEW_174079138_1E7009430E79035 (taskList_uid), add constraint FK_NEW_174079138_1E7009430E79035 foreign key (taskList_uid) references tl_latask10_taskList (uid);
 alter table tl_latask10_condition add index FK_tl_latask10_condition_1 (taskList_uid), add constraint FK_tl_latask10_condition_1 foreign key (taskList_uid) references tl_latask10_taskList (uid);
 alter table tl_latask10_condition_taskList_item add index FK_tl_latask10_taskList_item_condition_1 (condition_uid), add constraint FK_tl_latask10_taskList_item_condition_1 foreign key (condition_uid) references tl_latask10_condition (condition_uid);
-alter table tl_latask10_condition_taskList_item add index FK_tl_latask10_taskList_item_condition_2 (uid), add constraint FK_tl_latask10_taskList_item_condition_2 foreign key (uid) references tl_latask10_taskList (uid);
+alter table tl_latask10_condition_taskList_item add index FK_tl_latask10_taskList_item_condition_2 (uid), add constraint FK_tl_latask10_taskList_item_condition_2 foreign key (uid) references tl_latask10_taskList_item (uid);
 alter table tl_latask10_taskList add index FK_NEW_174079138_89093BF758092FB (create_by), add constraint FK_NEW_174079138_89093BF758092FB foreign key (create_by) references tl_latask10_user (uid);
 alter table tl_latask10_taskList_item add index FK_NEW_174079138_F52D1F93758092FB (create_by), add constraint FK_NEW_174079138_F52D1F93758092FB foreign key (create_by) references tl_latask10_user (uid);
 alter table tl_latask10_taskList_item add index FK_NEW_174079138_F52D1F9330E79035 (taskList_uid), add constraint FK_NEW_174079138_F52D1F9330E79035 foreign key (taskList_uid) references tl_latask10_taskList (uid);

@@ -465,8 +465,7 @@ public class TaskList implements Cloneable{
      * 					inverse="false"
      * 					order-by="sequence_id asc"
      * @hibernate.collection-key column="taskList_uid"
-     * @hibernate.collection-one-to-many
-     * 			class="org.lamsfoundation.lams.tool.taskList.model.TaskListCondition"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.taskList.model.TaskListCondition"
      */
 	public Set getConditions() {
 		return conditions;
