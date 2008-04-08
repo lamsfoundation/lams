@@ -14,6 +14,15 @@
 </p>
 
 <p>
+	<html:checkbox property="wiki.allowNewWikiPage" styleClass="noBorder"
+		styleId="allowNewWikiPage">
+	</html:checkbox>
+	<label for="allowNewWikiPage">
+		<fmt:message key="label.authoring.advance.allow.new.wiki.page" />
+	</label>
+</p>
+
+<p>
 	<html:checkbox property="wiki.allowEdit" styleClass="noBorder"
 		styleId="allowEdit">
 	</html:checkbox>
