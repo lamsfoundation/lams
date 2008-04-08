@@ -50,7 +50,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 public class ImageBundler extends Bundler {
 
 	private static Logger log = Logger.getLogger(ImageBundler.class);
-	private static String[] miscImages = new String[] {"fred.gif", "cross.gif", "error.jpg", "spacer.gif", "tick.gif", "tree_closed.gif", "tree_open.gif" };
+	private static String[] miscImages = new String[] {"cross.gif", "error.jpg", "spacer.gif", "tick.gif", "tree_closed.gif", "tree_open.gif" };
 
 	Map<String,File> filesToCopy = null;
 	List<String> directoriesRequired = null;
