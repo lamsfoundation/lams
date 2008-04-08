@@ -136,8 +136,8 @@ public class VoteOutputFactory extends OutputFactory {
 	private boolean checkDisplayOrderOfVoteQueContent(String name, VoteQueUsr queUser) {
 		
 		String[] dcNames = splitConditionName(name);
-		if ( dcNames[1].length() <= OUTPUT_NAME_NOMINATION_SELECTION.length()) {
-			log.error("Unable to convert the display order to an int for tool output "+ OUTPUT_NAME_NOMINATION_SELECTION+". Returning false. Name doesn't contain the display order."+name);
+		if ( dcNames[1] == null || dcNames[1].length() == 0) {
+			log.error("Unable to convert the display order to an int for tool output "+ OUTPUT_NAME_NOMINATION_SELECTION+". Returning false. Name doesn't contain the display order. Condition name was: "+name);
 			return false;
 		}
 
@@ -145,7 +145,7 @@ public class VoteOutputFactory extends OutputFactory {
 		try {
 			displayOrder = new Integer(dcNames[1]).intValue();
 		} catch ( NumberFormatException e) {
-			log.error("Unable to convert the display order to an int for tool output "+ OUTPUT_NAME_NOMINATION_SELECTION+". Returning false. Number format exception thrown. Condition name was:"+name,e);
+			log.error("Unable to convert the display order to an int for tool output "+ OUTPUT_NAME_NOMINATION_SELECTION+". Returning false. Number format exception thrown. Condition name was: "+name,e);
 			return false;
 		}
 		
@@ -163,7 +163,8 @@ public class VoteOutputFactory extends OutputFactory {
 						return true;
 					} else {
 						VoteQueContent nomination = attempt.getVoteQueContent();
-						return nomination.getDisplayOrder() == displayOrder;
+						if (nomination.getDisplayOrder() == displayOrder )
+							return true;
 					}
 				}
 			}

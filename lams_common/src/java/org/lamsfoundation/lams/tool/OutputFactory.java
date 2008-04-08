@@ -294,6 +294,13 @@ public abstract class OutputFactory {
 	 */
 	protected String[] splitConditionName(String conditionName) {
 		int index = conditionName.indexOf(CONDITION_NAME_SEPARATOR);
-		return new String[] { conditionName.substring(0,index), conditionName.substring(index) };
+		if ( index > -1 ) {
+			if ( index+1<conditionName.length())
+				return new String[] { conditionName.substring(0,index), conditionName.substring(index+1) };
+			else
+				return new String[] { conditionName.substring(0,index), "" };
+		} else {
+			return new String[] { conditionName, ""};
+		}
 	}
 }
