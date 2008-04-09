@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.collections.set.SynchronizedSortedSet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -377,6 +378,38 @@ public class AuthoringAction extends Action {
 		//copy back
 		taskListPO.setAttachments(attPOSet);
 		//************************* Handle taskList items *******************
+
+    	//handle taskList item attachment file:
+    	List delItemAttList = getDeletedItemAttachmentList(sessionMap);
+		iter = delItemAttList.iterator();
+		while(iter.hasNext()){
+			TaskListItem delAtt = (TaskListItem) iter.next();
+			iter.remove();
+		}
+		
+		//Handle taskList conditions. Also delete conditions that don't contain any taskLIstItems.
+		SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
+		SortedSet<TaskListCondition> conditionListWithoutEmptyElements = new TreeSet<TaskListCondition>(conditionList);
+		List delTaskListConditionList = getDeletedTaskListConditionList(sessionMap);
+		for (TaskListCondition condition:conditionList) {
+			if (condition.getTaskListItems().size() == 0) {
+				conditionListWithoutEmptyElements.remove(condition);
+				delTaskListConditionList.add(condition);
+			}
+		}
+		conditionList.clear();
+		conditionList.addAll(conditionListWithoutEmptyElements);
+		taskListPO.setConditions(conditionList);
+		
+    	//delete TaskListConditions from database.
+    	iter = delTaskListConditionList.iterator();
+    	while(iter.hasNext()){
+    		TaskListCondition condition = (TaskListCondition) iter.next();
+    		iter.remove();
+    		if(condition.getUid() != null)
+    			service.deleteTaskListCondition(condition.getUid());
+    	}
+    	
 		//Handle taskList items
 		Set itemList = new LinkedHashSet();
 		SortedSet topics = getTaskListItemList(sessionMap);
@@ -390,7 +423,10 @@ public class AuthoringAction extends Action {
     		}
     	}
     	taskListPO.setTaskListItems(itemList);
-    	//delete instructino file from database.
+    	
+    	// delete TaskListItems from database. This should be done after
+		// TaskListConditions have been deleted from the database. This is due
+		// to prevent errors with foreign keys.
     	List delTaskListItemList = getDeletedTaskListItemList(sessionMap);
     	iter = delTaskListItemList.iterator();
     	while(iter.hasNext()){
@@ -399,31 +435,13 @@ public class AuthoringAction extends Action {
     		if(item.getUid() != null)
     			service.deleteTaskListItem(item.getUid());
     	}
-    	//handle taskList item attachment file:
-    	List delItemAttList = getDeletedItemAttachmentList(sessionMap);
-		iter = delItemAttList.iterator();
-		while(iter.hasNext()){
-			TaskListItem delAtt = (TaskListItem) iter.next();
-			iter.remove();
-		}
-		
-		//Handle taskList conditions
-		SortedSet conditions = getTaskListConditionList(sessionMap);
-		taskListPO.setConditions(conditions);
-    	//delete instructino file from database.
-    	List delTaskListConditionList = getDeletedTaskListConditionList(sessionMap);
-    	iter = delTaskListConditionList.iterator();
-    	while(iter.hasNext()){
-    		TaskListCondition condition = (TaskListCondition) iter.next();
-    		iter.remove();
-    		if(condition.getUid() != null)
-    			service.deleteTaskListCondition(condition.getUid());
-    	}
 		
 		
 		//**********************************************
 		//finally persist taskListPO again
 		service.saveOrUpdateTaskList(taskListPO);
+		
+		
 		
 		//initialize attachmentList again
 		attachmentList = getAttachmentList(sessionMap);
@@ -580,7 +598,7 @@ public class AuthoringAction extends Action {
 				iter.remove();
 			}
 		}
-
+		
 		request.setAttribute(TaskListConstants.ATTR_FILE_TYPE_FLAG, type);
 		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		return mapping.findForward(TaskListConstants.SUCCESS);
@@ -697,6 +715,14 @@ public class AuthoringAction extends Action {
 			//add to delList
 			List delList = getDeletedTaskListItemList(sessionMap);
 			delList.add(item);
+			
+			//delete tasklistitems that still may be contained in Conditions 
+			SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
+			for (TaskListCondition condition:conditionList) {
+				Set<TaskListItem> itemList = condition.getTaskListItems();
+				if (itemList.contains(item)) itemList.remove(item);
+			}
+			
 		}	
 		
 		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
