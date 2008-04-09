@@ -126,6 +126,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	//tool service
 	private TaskListToolContentHandler taskListToolContentHandler;
 	private MessageService messageService;
+	TaskListOutputFactory taskListOutputFactory;
 	//system services
 	private IRepositoryService repositoryService;
 	private ILamsToolService toolService;
@@ -693,6 +694,12 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	}
 	public void setMessageService(MessageService messageService) {
 		this.messageService = messageService;
+	}
+	public TaskListOutputFactory getTaskListOutputFactory() {
+		return taskListOutputFactory;
+	}
+	public void setTaskListOutputFactory(TaskListOutputFactory taskListOutputFactory) {
+		this.taskListOutputFactory = taskListOutputFactory;
 	}
 	public void setRepositoryService(IRepositoryService repositoryService) {
 		this.repositoryService = repositoryService;

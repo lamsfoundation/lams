@@ -31,6 +31,11 @@
         </property>
     </bean>
 
+	<!-- OutputFactory -->
+	<bean id="taskListOutputFactory" class="org.lamsfoundation.lams.tool.taskList.service.TaskListOutputFactory">  
+    	<property name="toolMessageService"><ref bean="lataskMessageService"/></property>  
+	</bean> 
+
     <!-- core beans -->
     <bean id="lataskTaskListDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListDAOHibernate">
         <property name="sessionFactory">
@@ -122,7 +127,8 @@
    			<ref bean="exportToolContentService"/>
    		</property>
    		<property name="messageService"><ref bean="lataskMessageService"/></property>
-		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   		
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   
+		<property name="taskListOutputFactory"><ref bean="taskListOutputFactory"/></property> 		
     </bean>
 
     <bean id="lataskTaskListService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

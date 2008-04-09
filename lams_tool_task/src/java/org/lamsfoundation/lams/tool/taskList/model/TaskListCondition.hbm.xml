@@ -37,7 +37,7 @@
             name="taskListItems"
             table="tl_latask10_condition_tl_item"
             lazy="true"
-            inverse="true"
+            inverse="false"
             cascade="none"
             sort="unsorted"
         >
@@ -49,6 +49,7 @@
 
             <many-to-many
                 class="org.lamsfoundation.lams.tool.taskList.model.TaskListItem"
+                column="uid"
                 outer-join="auto"
              />
 
