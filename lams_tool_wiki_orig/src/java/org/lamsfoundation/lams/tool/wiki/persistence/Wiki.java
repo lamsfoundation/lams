@@ -57,7 +57,6 @@ public class Wiki implements Cloneable{
 	private boolean runOffline;
 	private boolean allowAnonym;
 	private boolean allowEdit;
-	private boolean allowNewTopic;
 	private boolean allowNewWikiPage;
 	private boolean allowUpload;
 	private int maximumReply;
@@ -480,16 +479,6 @@ public class Wiki implements Cloneable{
 	}
 	public void setToolContentHandler(WikiToolContentHandler toolContentHandler) {
 		this.toolContentHandler = toolContentHandler;
-	}
-	/**
-	 * @hibernate.property column="allow_new_topic"
-	 * @return
-	 */	
-	public boolean isAllowNewTopic() {
-		return allowNewTopic;
-	}
-	public void setAllowNewTopic(boolean allowNewTopic) {
-		this.allowNewTopic = allowNewTopic;
 	}
 	/**
 	 * @hibernate.property column="allow_new_wiki_page"

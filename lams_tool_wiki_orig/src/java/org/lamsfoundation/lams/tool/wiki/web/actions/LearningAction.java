@@ -231,8 +231,7 @@ public class LearningAction extends Action {
 		sessionMap.put(WikiConstants.ATTR_USER_FINISHED, wikiUser.isSessionFinished());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_EDIT, wiki.isAllowEdit());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_UPLOAD,wiki.isAllowUpload());
-		//sessionMap.put(WikiConstants.ATTR_ALLOW_NEW_TOPICS,wiki.isAllowNewTopic());
-		sessionMap.put(WikiConstants.ATTR_ALLOW_NEW_TOPICS,wiki.isAllowNewWikiPage());
+		sessionMap.put(WikiConstants.ATTR_ALLOW_NEW_WIKI_PAGES,wiki.isAllowNewWikiPage());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_RICH_EDITOR,allowRichEditor);
 		sessionMap.put(WikiConstants.ATTR_LIMITED_CHARS,new Integer(allowNumber));
 		sessionMap.put(WikiConstants.ATTR_REFLECTION_ON,wiki.isReflectOnActivity());

@@ -61,7 +61,6 @@ public interface WikiConstants {
 
 	public static final String ATTR_ALLOW_EDIT = "allowEdit";
 	public static final String ATTR_ALLOW_UPLOAD = "allowUpload";
-	public static final String ATTR_ALLOW_NEW_TOPICS = "allowNewTopics";
 	public static final String ATTR_ALLOW_NEW_WIKI_PAGES = "allowNewWikiPages";
 	public static final String ATTR_ALLOW_RICH_EDITOR = "allowRichEditor";
 	public static final String ATTR_LIMITED_CHARS = "limitedChars";

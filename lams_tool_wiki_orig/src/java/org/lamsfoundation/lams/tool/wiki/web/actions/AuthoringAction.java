@@ -908,7 +908,7 @@ public class AuthoringAction extends Action {
 //				errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 //			}
 			boolean allowNewWikiPage = form.getWiki().isAllowNewWikiPage();
-//			define it later mode(TEACHER): need read out AllowNewTopic flag rather than get from HTML form
+//			define it later mode(TEACHER): need read out AllowNewWikiPage flag rather than get from HTML form
 			//becuase defineLater does not include this field
 			if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){
 				wikiService = getWikiManager();

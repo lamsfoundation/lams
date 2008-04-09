@@ -43,7 +43,7 @@
 			<c:set var="buttonClass" value="disabled" />
 		</c:if>
 	
-		<c:if	test='${sessionMap.mode != "teacher" && sessionMap.allowNewTopics}'>
+		<c:if	test='${sessionMap.mode != "teacher" && sessionMap.allowNewWikiPages}'>
 			<html:button property="newtopic"
 				onclick="javascript:location.href='${newtopic}';"
 				disabled="${sessionMap.finishedLock}" styleClass="${buttonClass}">
