@@ -48,14 +48,6 @@ public class TaskListConditionForm extends ActionForm {
 	
 	public TaskListConditionForm() {
 		super();
-	    LabelValueBean[] lvBeans = new LabelValueBean[4];
-
-	    lvBeans[0] = new LabelValueBean("Alpha", "A");
-	    lvBeans[1] = new LabelValueBean("Beta", "B");
-	    lvBeans[2] = new LabelValueBean("Charlie", "C");
-	    lvBeans[3] = new LabelValueBean("Delta", "D");
-	    
-		this.possibleItems = lvBeans;
 	}
 	
 	/**

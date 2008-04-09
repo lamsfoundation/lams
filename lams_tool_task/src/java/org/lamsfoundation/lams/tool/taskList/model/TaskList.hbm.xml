@@ -112,6 +112,26 @@
         </set>
 
         <set
+            name="conditions"
+            lazy="true"
+            inverse="false"
+            cascade="all"
+            sort="unsorted"
+            order-by="sequence_id asc"
+        >
+
+            <key
+                column="taskList_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.taskList.model.TaskListCondition"
+            />
+
+        </set>
+
+        <set
             name="taskListItems"
             lazy="true"
             inverse="false"

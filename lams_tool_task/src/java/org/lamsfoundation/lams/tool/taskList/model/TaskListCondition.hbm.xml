@@ -35,7 +35,7 @@
 
         <set
             name="taskListItems"
-            table="tl_latask10_condition_taskList_item"
+            table="tl_latask10_condition_tl_item"
             lazy="true"
             inverse="true"
             cascade="none"

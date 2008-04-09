@@ -45,10 +45,6 @@ import org.lamsfoundation.lams.tool.taskList.util.TaskListToolContentHandler;
  *
  * @hibernate.class  table="tl_latask10_taskList"
  */
-/**
- * @author Administrator
- *
- */
 public class TaskList implements Cloneable{
 	
 	private static final Logger log = Logger.getLogger(TaskList.class);

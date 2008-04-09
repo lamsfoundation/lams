@@ -144,9 +144,9 @@ public class TaskListCondition implements Cloneable{
 	//**********************************************************
 
 	/**
-	 * Returns <code>TaskList</code> id.
+	 * Returns <code>TaskListCondition</code> id.
 	 * 
-	 * @return tasklist id
+	 * @return tasklistCondition id
 	 * 
 	 * @hibernate.id column="condition_uid" generator-class="native"
 	 */
@@ -157,7 +157,7 @@ public class TaskListCondition implements Cloneable{
 	/**
 	 * Sets <code>TaskList</code> id.
 	 * 
-	 * @param uid tasklist id
+	 * @param uid tasklistCondition id
 	 */
 	public void setUid(Long uid) {
 		this.uid = uid;
@@ -192,7 +192,7 @@ public class TaskListCondition implements Cloneable{
 	 * @hibernate.set lazy="true"
 	 * 				  inverse="true"
 	 * 				  cascade="none"
-     * 				  table = "tl_latask10_condition_taskList_item"
+     * 				  table = "tl_latask10_condition_tl_item"
      * @hibernate.collection-key column="condition_uid"
      * @hibernate.collection-many-to-many class="org.lamsfoundation.lams.tool.taskList.model.TaskListItem"
 	 */

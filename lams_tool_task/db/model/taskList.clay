@@ -279,7 +279,7 @@
 </foreign-key-list>
 <index-list/>
 </table>
-<table alias="" name="tl_latask10_condition_taskList_item" remarks="" uid="e0dfc7:1190824a25d:-7eff">
+<table alias="" name="tl_latask10_condition_tl_item" remarks="" uid="e0dfc7:1190824a25d:-7eff">
 <table-description/>
 <table-figure-bounds height="-1" width="-1" x="880" y="762"/>
 <column-list>
@@ -310,7 +310,7 @@
 </data-type>
 </column>
 </column-list>
-<primary-key alias="" name="PK_TL_LATASK10_CONDITION_TASKLIST_ITEM" remarks="" uid="e0dfc7:1190824a25d:-7efe">
+<primary-key alias="" name="PK_TL_LATASK10_CONDITION_TL_ITEM" remarks="" uid="e0dfc7:1190824a25d:-7efe">
 <primary-key-description/>
 </primary-key>
 <unique-key-list/>
