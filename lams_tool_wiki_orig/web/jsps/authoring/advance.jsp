@@ -90,6 +90,7 @@
 	<fmt:message key="label.authoring.advance.num.edits" />
 </p>
 
+<!--
 <p>
 	<html:radio property="wiki.allowNewTopic" value="true"
 		styleId="allowNewTopic1" styleClass="noBorder">
@@ -107,6 +108,7 @@
 		<fmt:message key="label.authoring.advance.number.reply" />
 	</label>
 </p>
+-->
 
 <p>
 	<fmt:message key="label.authoring.advance.minimum.reply" />

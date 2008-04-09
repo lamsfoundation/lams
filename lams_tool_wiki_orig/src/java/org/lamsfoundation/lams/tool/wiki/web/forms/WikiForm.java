@@ -117,6 +117,7 @@ public class WikiForm extends ActionForm {
     	wiki.setLimitedInput(false);
     	wiki.setLockWhenFinished(false);
     	wiki.setAllowNewTopic(false);
+    	wiki.setAllowNewWikiPage(false);
     	wiki.setAllowUpload(false);
     	wiki.setReflectOnActivity(false);
     }

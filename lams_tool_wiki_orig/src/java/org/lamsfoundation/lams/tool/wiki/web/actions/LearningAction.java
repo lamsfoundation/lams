@@ -231,7 +231,8 @@ public class LearningAction extends Action {
 		sessionMap.put(WikiConstants.ATTR_USER_FINISHED, wikiUser.isSessionFinished());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_EDIT, wiki.isAllowEdit());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_UPLOAD,wiki.isAllowUpload());
-		sessionMap.put(WikiConstants.ATTR_ALLOW_NEW_TOPICS,wiki.isAllowNewTopic());
+		//sessionMap.put(WikiConstants.ATTR_ALLOW_NEW_TOPICS,wiki.isAllowNewTopic());
+		sessionMap.put(WikiConstants.ATTR_ALLOW_NEW_TOPICS,wiki.isAllowNewWikiPage());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_RICH_EDITOR,allowRichEditor);
 		sessionMap.put(WikiConstants.ATTR_LIMITED_CHARS,new Integer(allowNumber));
 		sessionMap.put(WikiConstants.ATTR_REFLECTION_ON,wiki.isReflectOnActivity());
@@ -562,7 +563,7 @@ public class LearningAction extends Action {
 		WikiToolSession session = wikiService.getSessionBySessionId(sessionId);
 		Wiki wiki = session.getWiki();
 		if(wiki != null){
-			if(!wiki.isAllowNewTopic()){
+			if(!wiki.isAllowNewWikiPage()){
 				int posts = wikiService.getTopicsNum(wikiUser.getUserId(), sessionId);
 				if(wiki.getMaximumReply() != 0 && (posts >= wiki.getMaximumReply()))
 					sessionMap.put(WikiConstants.ATTR_NO_MORE_POSTS, Boolean.TRUE);
@@ -752,7 +753,7 @@ public class LearningAction extends Action {
 		HttpSession ss = SessionManager.getSession();
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		Long userID = new Long(user.getUserID().longValue());
-		if(!wiki.getRunOffline() && !wiki.isAllowNewTopic()){
+		if(!wiki.getRunOffline() && !wiki.isAllowNewWikiPage()){
 			int postNum = wikiService.getTopicsNum(userID,sessionId);
 			if(postNum < wiki.getMinimumReply()){
 				//create error

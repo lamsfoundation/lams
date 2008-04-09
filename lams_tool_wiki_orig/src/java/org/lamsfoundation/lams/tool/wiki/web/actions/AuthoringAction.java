@@ -907,21 +907,21 @@ public class AuthoringAction extends Action {
 //				ActionMessage error = new ActionMessage("error.title.empty");
 //				errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 //			}
-			boolean allowNewTopic = form.getWiki().isAllowNewTopic();
+			boolean allowNewWikiPage = form.getWiki().isAllowNewWikiPage();
 //			define it later mode(TEACHER): need read out AllowNewTopic flag rather than get from HTML form
 			//becuase defineLater does not include this field
 			if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){
 				wikiService = getWikiManager();
 				Wiki wikiPO = wikiService.getWikiByContentId(form.getToolContentID());
 				if(wikiPO != null)
-					allowNewTopic = wikiPO.isAllowNewTopic();
+					allowNewWikiPage = wikiPO.isAllowNewWikiPage();
 				else{
 					//failure tolerance
 					log.error("ERROR: Can not found Wiki by toolContentID:"+ form.getToolContentID());
-					allowNewTopic = true;
+					allowNewWikiPage = true;
 				}
 			}
-			if(!allowNewTopic){
+			if(!allowNewWikiPage){
 				List topics = getTopicList(sessionMap);
 				if(topics.size() == 0){
 					ActionMessage error = new ActionMessage("error.must.have.topic");
@@ -938,7 +938,7 @@ public class AuthoringAction extends Action {
 					errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 				}
 			}*/
-			if(!form.getWiki().isAllowNewTopic()){
+			if(!form.getWiki().isAllowNewWikiPage()){
 				if(form.getWiki().getMaximumReply() !=0 
 						&& (form.getWiki().getMaximumReply() < form.getWiki().getMinimumReply())){
 					ActionMessage error = new ActionMessage("error.min.less.max");
