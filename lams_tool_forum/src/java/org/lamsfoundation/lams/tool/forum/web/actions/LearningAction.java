@@ -188,24 +188,7 @@ public class LearningAction extends Action {
 		//lock on finish
 		ForumUser forumUser = getCurrentUser(request,sessionId);
 		boolean lock =  forum.getLockWhenFinished() && forumUser.isSessionFinished();
-
-		//add define later support
-		if(forum.isDefineLater()){
-			return mapping.findForward("defineLater");
-		}
-		
-		//add run offline support
-		if(forum.getRunOffline()){
-			return mapping.findForward("runOffline");
-		}
 				
-		//set contentInUse flag to true!
-		if ( ! forum.isContentInUse() ) {
-			forum.setContentInUse(true);
-			forum.setDefineLater(false);
-			forumService.updateForum(forum);
-		}
-		
 		//set some option flag to HttpSession
 		// if allowRichEditor = true then don't restrict the number of chars
 		// if isLimitedInput = false then don't restrict the number of chars
@@ -239,6 +222,21 @@ public class LearningAction extends Action {
 		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE,forum.getTitle());
 		sessionMap.put(ForumConstants.ATTR_FORUM_INSTRCUTION,forum.getInstructions());
 		
+		//add define later support
+		if(forum.isDefineLater()){
+			return mapping.findForward("defineLater");
+		}
+		
+		//set contentInUse flag to true!
+		forum.setContentInUse(true);
+		forum.setDefineLater(false);
+		forumService.updateForum(forum);
+		
+		//add run offline support
+		if(forum.getRunOffline()){
+			return mapping.findForward("runOffline");
+		}
+				
 		// get all root topic to display on init page
 		List rootTopics = forumService.getRootTopics(sessionId);
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
