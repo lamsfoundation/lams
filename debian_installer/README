@@ -55,3 +55,21 @@ Instructions - lams2
 	it) - this will create a source package in the parent folder
 15.	sudo dpkg-buildpackage -b (add '-kxxxxxxxx' if you want to sign it) - this
 	will create the binary .deb in the parent folder
+	
+
+Reference
+---------
+Debian new maintainer's guide:
+http://www.debian.org/doc/manuals/maint-guide/
+
+Official Debian packaging policy:
+http://www.debian.org/doc/debian-policy/
+
+Nice diagrams indicating how maintenance scripts are used:
+http://women.debian.org/wiki/English/MaintainerScripts
+
+Debconf tutorial:
+http://www.fifi.org/doc/debconf-doc/tutorial.html
+
+Filesystem hierarchy standard:
+http://www.pathname.com/fhs/
