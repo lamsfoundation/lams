@@ -23,6 +23,15 @@
 </p>
 
 <p>
+	<html:checkbox property="wiki.allowAttachImage" styleClass="noBorder"
+		styleId="allowAttachImage">
+	</html:checkbox>
+	<label for="allowAttachImage">
+		<fmt:message key="label.authoring.advance.allow.attach.image" />
+	</label>
+</p>
+
+<p>
 	<html:checkbox property="wiki.allowEdit" styleClass="noBorder"
 		styleId="allowEdit">
 	</html:checkbox>

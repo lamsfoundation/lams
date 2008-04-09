@@ -37,6 +37,7 @@ create table tl_lawiki10_wiki (
    allow_edit smallint,
    allow_rich_editor smallint,
    allow_new_wiki_page smallint,
+   allow_attach_image smallint,
    allow_upload smallint, 
    maximum_reply integer, 
    minimum_reply integer,
@@ -119,8 +120,8 @@ alter table tl_lawiki10_tool_session add index FK_NEW_1983840333_5A04D7AE131CE31
 
 
 INSERT INTO tl_lawiki10_wiki (uid,title,instructions,online_instructions,offline_instructions,content_id,allow_anonym,run_offline,lock_on_finished,content_in_use,define_later,allow_edit,allow_rich_editor,
- allow_new_wiki_page,allow_upload,maximum_reply, minimum_reply,limited_input_flag,limited_of_chars,reflect_on_activity) 
-VALUES(1,"Wiki","Instructions",null,null,${default_content_id},0,0,0,0,0,1,0,1,0,1,0,1,5000,0);
+ allow_new_wiki_page,allow_attach_image,allow_upload,maximum_reply, minimum_reply,limited_input_flag,limited_of_chars,reflect_on_activity) 
+VALUES(1,"Wiki","Instructions",null,null,${default_content_id},0,0,0,0,0,1,0,1,1,0,1,0,1,5000,0);
 
 INSERT INTO `tl_lawiki10_message` (`uid`, `create_date`, `last_reply_date`, `update_date`, `create_by`, `modified_by`, `subject`, `body`, `is_authored`, `is_anonymous`, `wiki_session_uid`, `parent_uid`, `wiki_uid`, `reply_number`, `hide_flag`, `report_id`) VALUES 
   (1,NOW(),NOW(),NOW(),null,null,'Wiki Page','Wiki content',1,0,NULL,NULL,1,0,0,NULL);

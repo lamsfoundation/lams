@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.tool.wiki.util.WikiToolContentHandler;
 
 /**
  * Wiki
- * @author conradb
+ * @author dcarlier, forum base code by conradb
  *
  * @hibernate.class  table="tl_lawiki10_wiki"
  *
@@ -58,6 +58,7 @@ public class Wiki implements Cloneable{
 	private boolean allowAnonym;
 	private boolean allowEdit;
 	private boolean allowNewWikiPage;
+	private boolean allowAttachImage;
 	private boolean allowUpload;
 	private int maximumReply;
 	private int minimumReply;
@@ -489,6 +490,16 @@ public class Wiki implements Cloneable{
 	}
 	public void setAllowNewWikiPage(boolean allowNewWikiPage) {
 		this.allowNewWikiPage = allowNewWikiPage;
+	}
+	/**
+	 * @hibernate.property column="allow_attach_image"
+	 * @return
+	 */	
+	public boolean isAllowAttachImage() {
+		return allowAttachImage;
+	}
+	public void setAllowAttachImage(boolean allowAttachImage) {
+		this.allowAttachImage = allowAttachImage;
 	}
 	/**
 	 * @hibernate.property column="allow_upload"
