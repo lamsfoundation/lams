@@ -218,7 +218,7 @@ public class Group implements Serializable,Nullable,Comparable {
      * @hibernate.set lazy="true" inverse="true" cascade="none"
      * 				  table = "lams_user_group"
      * @hibernate.collection-key column="group_id"
-     * @hibernate.collection-many-to-many
+     * @hibernate.collection-many-to-many column="user_id"
      *            class="org.lamsfoundation.lams.usermanagement.User"
      */
     public Set getUsers() {
