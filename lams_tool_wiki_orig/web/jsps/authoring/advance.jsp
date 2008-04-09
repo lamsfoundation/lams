@@ -83,8 +83,12 @@
 </script>
 
 <h2>
-	<fmt:message key="message.posting.limiting" />
+	<fmt:message key="label.authoring.advance.editing.limits.heading" />
 </h2>
+
+<p>
+	<fmt:message key="label.authoring.advance.num.edits" />
+</p>
 
 <p>
 	<html:radio property="wiki.allowNewTopic" value="true"
