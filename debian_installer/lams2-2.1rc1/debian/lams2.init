@@ -1,0 +1,122 @@
+#!/bin/sh
+#
+#		Written by Miquel van Smoorenburg <miquels@cistron.nl>.
+#		Modified for Debian 
+#		by Ian Murdock <imurdock@gnu.ai.mit.edu>.
+#
+# Version:	@(#)skeleton  1.9  26-Feb-2001  miquels@cistron.nl
+#
+
+# Attempt to locate JAVA_HOME, code borrowed from jabref package
+if [ -z $JAVA_HOME ]
+then
+	t=/usr/lib/jvm/java-1.5.0-sun && test -d $t && export JAVA_HOME=$t
+	t=/usr/lib/jvm/java-6-sun && test -d $t && export JAVA_HOME=$t
+fi
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:${JAVA_HOME}/bin
+JAVA=${JAVA_HOME}/bin/java
+JBOSS_HOME=/usr/share/jboss-4.0.2
+NAME=lams2
+DESC="LAMS 2 Server"
+
+test -x $JAVA || exit 0
+
+# Read an optional running configuration file
+if [ "x$RUN_CONF" = "x" ]; then
+    RUN_CONF="${JBOSS_HOME}/bin/run.conf"
+fi
+if [ -r "$RUN_CONF" ]; then
+    . "$RUN_CONF"
+fi
+
+JAVA_OPTS="$JAVA_OPTS -Dprogram.name=$PROGNAME"
+
+# Setup the java endorsed dirs
+JBOSS_ENDORSED_DIRS="$JBOSS_HOME/lib/endorsed"
+
+# Setup the classpath
+runjar="$JBOSS_HOME/bin/run.jar"
+if [ ! -f "$runjar" ]; then
+    die "Missing required file: $runjar"
+fi
+JBOSS_BOOT_CLASSPATH="$runjar"
+
+# Include the JDK javac compiler for JSP pages. The default is for a Sun JDK
+# compatible distribution which JAVA_HOME points to
+if [ "x$JAVAC_JAR" = "x" ]; then
+    JAVAC_JAR="$JAVA_HOME/lib/tools.jar"
+fi
+
+if [ "x$JBOSS_CLASSPATH" = "x" ]; then
+    JBOSS_CLASSPATH="$JBOSS_BOOT_CLASSPATH:$JAVAC_JAR"
+else
+    JBOSS_CLASSPATH="$JBOSS_CLASSPATH:$JBOSS_BOOT_CLASSPATH:$JAVAC_JAR"
+fi
+
+
+DAEMON_OPTS="$JAVA_OPTS \
+      -Djava.endorsed.dirs=$JBOSS_ENDORSED_DIRS \
+      -classpath $JBOSS_CLASSPATH \
+      org.jboss.Main"
+
+
+#set -e
+
+start() {
+        start-stop-daemon --start --quiet --background --make-pidfile \
+                --pidfile /var/run/$NAME.pid --chuid lams:lams \
+                --exec $JAVA -- $DAEMON_OPTS
+
+}
+
+stop() {
+        start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid
+                
+}
+
+case "$1" in
+  start)
+	echo "Starting $DESC: "
+	start
+	;;
+  stop)
+	echo "Stopping $DESC: "
+	stop
+	;;
+  status)
+        if [ -e /var/run/$NAME.pid ]; then
+            if [ -r /var/run/$NAME.pid ]; then
+                pid=`cat /var/run/"$NAME".pid`
+                if [ "X$pid" = "X" ]; then
+                    echo "$DESC is not running."
+                    exit 1
+                else
+                    echo "$DESC is running ($pid)."
+                    exit 0
+                fi
+            fi
+        fi
+        ;;
+  restart|force-reload)
+	#
+	#	If the "reload" option is implemented, move the "force-reload"
+	#	option to the "reload" entry above. If not, "force-reload" is
+	#	just the same as "restart".
+	#
+	echo -n "Restarting $DESC: "
+	#set +e
+	stop
+	#set -e
+	sleep 10
+	start	
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start|stop|restart|force-reload|status}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
+

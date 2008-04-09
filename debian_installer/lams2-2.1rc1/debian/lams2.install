@@ -1,0 +1,15 @@
+jboss/jboss-service.xml	/usr/share/jboss-4.0.2/server/default/conf/
+jboss/log4j.xml	/usr/share/jboss-4.0.2/server/default/conf/
+jboss/login-config.xml	/usr/share/jboss-4.0.2/server/default/conf/
+jboss/service/local-service.xml	/usr/share/jboss-4.0.2/server/default/deploy/
+jboss/service/mysql-ds.xml	/usr/share/jboss-4.0.2/server/default/deploy/
+jboss/tomcat/context.xml	/usr/share/jboss-4.0.2/server/default/deploy/jbossweb-tomcat55.sar/
+jboss/tomcat/jboss-service.xml	/usr/share/jboss-4.0.2/server/default/deploy/jbossweb-tomcat55.sar/META-INF/
+jboss/tomcat/server.xml	/usr/share/jboss-4.0.2/server/default/deploy/jbossweb-tomcat55.sar/
+jboss/tomcat/web.xml	/usr/share/jboss-4.0.2/server/default/deploy/jbossweb-tomcat55.sar/conf/
+lams.ear	/usr/share/jboss-4.0.2/server/default/deploy/
+lams.ear/lams-session.jar	/usr/share/jboss-4.0.2/server/default/lib/
+lams.ear/lams-valve.jar	/usr/share/jboss-4.0.2/server/default/lib/
+lams.sql	/usr/share/jboss-4.0.2/server/default/
+lams2.cnf	/etc/mysql/conf.d/
+index.html	/usr/share/jboss-4.0.2/server/default/deploy/jbossweb-tomcat55.sar/ROOT.war/

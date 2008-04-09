@@ -1,0 +1,57 @@
+Debian Packaging
+================
+
+Steps for doing a full rebuild of debianised lams2 and jboss4 packages.
+
+
+Prerequisites
+-------------
+ * a Debian or Debian based system
+ * packages:
+ 	* dh_make
+ 	* dpkg-dev
+ 	* debconf
+ 	* debhelper
+ * for lams2:
+ 	* a copy of lams.ear
+ 	* a dump of the lams database
+ 	* a copy of lams_build/conf/unix/jboss/ directory
+
+
+Instructions - lams-jboss4
+--------------------------
+1.	download jboss-4.0.2.zip
+2.	unzip the contents to /path/to/packaging/
+4.	cd /path/to/packaging/
+5.	mv jboss-4.0.2 lams-jboss4-4.0.2
+6.	cd lams-jboss4-4.0.2
+7.	dh_make --createorig
+8.	answer the wizard questions (choose the first or default options)
+9.	rm -rf debian
+10.	copy the debian folder from this cvs project into the current directory
+11.	sudo dpkg-buildpackage -S -sa (add '-kxxxxxxxx' if you have a gpg key to sign
+	it) - this will create a source package in the parent folder
+12.	sudo dpkg-buildpackage -b (add '-kxxxxxxxx' if you want to sign it) - this
+	will create the binary .deb in the parent folder
+	
+
+Instructions - lams2
+--------------------
+1.	checkout/export lams_* projects as normal (use the project alias 'all')
+2.	set lams_build to 'unix', and the path to your jboss folder
+3.	create the lams database and lams/lamsdemo user with access to it
+4.	do a full build (ant rebuild-db; ant assemble-ear; ant deploy-ear;
+	ant deploy-tools; ant copyfiles)
+5.	cd /path/to/packaging/
+6.	mkdir lams2-2.1rc1 (adjust the version as necessary)
+7.	cd lams2-2.1rc1
+8.	cp -pr /path/to/jboss-4.0.2/server/default/deploy/lams.ear/ .
+9.	cp -pr /path/to/lams_build/conf/unix/jboss/ .
+10.	copy index.html and lams2.cnf from this cvs project into the current directory
+11.	dh_make --createorig
+12.	rm -rf debian
+13.	copy the debian folder from this cvs project into the current directory
+14.	sudo dpkg-buildpackage -S -sa (add '-kxxxxxxxx' if you have a gpg key to sign
+	it) - this will create a source package in the parent folder
+15.	sudo dpkg-buildpackage -b (add '-kxxxxxxxx' if you want to sign it) - this
+	will create the binary .deb in the parent folder
