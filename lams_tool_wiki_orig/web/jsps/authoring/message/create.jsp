@@ -43,15 +43,6 @@
 				<html:errors property="message.body" />
 			</div>
 
-			<div class="field-name">
-				<fmt:message key="message.label.attachment" />
-			</div>
-
-			<div class="small-space-bottom">
-				<html:file tabindex="3" property="attachmentFile" /><BR>
-				<html:errors property="message.attachment" />
-			</div>
-
 			<lams:ImgButtonWrapper>
 				<a href="#" onclick="getElementById('topicFormId').submit();"
 					class="button-add-item"> <fmt:message key="button.add" /> </a>

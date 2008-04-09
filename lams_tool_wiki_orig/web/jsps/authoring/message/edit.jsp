@@ -51,17 +51,6 @@
 					contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
 				<html:errors property="message.body" />
 			</div>
-			
-			<div class="field-name">
-				<fmt:message key="message.label.attachment" />
-			</div>
-			<c:set var="itemAttachment"
-				value="<%=request
-										.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-										
-			<div id="itemAttachmentArea" class="small-space-bottom">
-				<%@ include file="/jsps/authoring/parts/msgattachment.jsp"%>
-			</div>
 
 			<lams:ImgButtonWrapper>
 				<a href="#" onclick="getElementById('topicFormId').submit();"
