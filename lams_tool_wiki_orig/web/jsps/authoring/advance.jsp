@@ -92,7 +92,7 @@
 
 <p>
 	<html:radio property="wiki.allowNewTopic" value="true"
-		onclick="allowNewTopic()" styleId="allowNewTopic1" styleClass="noBorder">
+		styleId="allowNewTopic1" styleClass="noBorder">
 	</html:radio>
 	<label for="allowNewTopic1">
 		<fmt:message key="label.authoring.advance.allow.new.topics" />
@@ -101,7 +101,7 @@
 
 <p>
 	<html:radio property="wiki.allowNewTopic" value="false"
-		onclick="allowNewTopic()" styleId="allowNewTopic2" styleClass="noBorder">
+		styleId="allowNewTopic2" styleClass="noBorder">
 	</html:radio>
 	<label for="allowNewTopic2">
 		<fmt:message key="label.authoring.advance.number.reply" />
@@ -172,23 +172,11 @@
 					alert('<fmt:message key="js.error.title"/>\n'+errors);
 				
 			}
-			function allowNewTopic(){
-				var allowNew = document.getElementsByName("wiki.allowNewTopic");
-				var min= document.getElementById("minimumReply");
-				var max= document.getElementById("maximumReply");
-				
-				//disable reply limited drop list
-				if(allowNew[0].checked){
-					min.disabled=true;
-					max.disabled=true;
-				}
-				//enable reply limited drop list
-				if(allowNew[1].checked){
-					min.disabled=false;
-					max.disabled=false;
-				}
-			}
-			allowNewTopic();
+			
+			var min = document.getElementById("minimumReply");
+			var max = document.getElementById("maximumReply");
+			min.disabled=false;
+			max.disabled=false;
 			
 			function checkReflection(){
 				var ropt = document.getElementById("reflectOn");
