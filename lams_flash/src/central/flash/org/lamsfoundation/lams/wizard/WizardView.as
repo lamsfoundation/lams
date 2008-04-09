@@ -719,6 +719,7 @@ class WizardView extends AbstractView {
 	}
 	
 	public function setDescription(desc:String){
+		wizDesc_txt.wordWrap = true;
 		wizDesc_txt.text = desc;
 	}
 	

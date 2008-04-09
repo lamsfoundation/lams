@@ -137,7 +137,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 		var selectedStaff:Array = new Array();
 			
 		if(snode == null){
-			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg3_1'), null, null);
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg3_1'), null);
 			return false;
 		} else {
 			// add selected users to dto
@@ -191,7 +191,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 			_parent.resultDTO.canJoinJointLessons = courseOrg.attributes.data.canJoinJointLessons;
 			
 		}else{
-			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg3_2'), null, null);
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg3_2'), null);
 		}
 		
 		return valid;
