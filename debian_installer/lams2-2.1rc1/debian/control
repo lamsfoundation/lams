@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 5)
 Standards-Version: 3.7.2
 
 Package: lams2
-Architecture: any
+Architecture: all
 Depends: sun-java5-jdk|sun-java6-jdk, lams-jboss4 (>=4.0.2), debconf (>=0.5), mysql-server-5.0, mysql-client, adduser
 Replaces: lams-jboss4
 Description: Learning Activity Management System (LAMS) 2

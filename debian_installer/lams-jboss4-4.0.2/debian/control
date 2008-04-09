@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 5)
 Standards-Version: 3.7.2
 
 Package: lams-jboss4
-Architecture: any
+Architecture: all
 Depends: java2-runtime, java-compiler
 Description: JBoss 4.0 Application Server
  This version is the recommended version for use with
