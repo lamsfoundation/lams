@@ -1421,6 +1421,10 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_branches = a;
 	}
 	
+	public function get groupings():Hashtable{
+		return _groupings;
+	}
+	
 	public function get branchMappings():Hashtable {
 		return _branchMappings;
 	}

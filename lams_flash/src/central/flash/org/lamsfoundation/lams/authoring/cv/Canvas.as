@@ -217,9 +217,17 @@ class Canvas extends CanvasHelper {
 			LFMessage.showMessageConfirm(Dictionary.getValue("redundant_branch_mappings_msg"), Proxy.create(_ddm, _ddm.removeRedundantBranchMappings, Proxy.create(this, saveDesignToServer, workspaceResultDTO)), null, Dictionary.getValue("al_continue"), null);
 		} else {
 			var dto:Object = _ddm.getDesignForSaving();
-			var callback:Function = Proxy.create(this,onStoreDesignResponse);
+			var groupingUIID:Number = null;
+			if((groupingUIID = validateGroupings()) != null) {
+				// return error message
+				Cursor.showCursor(Application.C_DEFAULT);
+				LFMessage.showMessageAlert('Group names must be unique. Please review the Grouping Activity: &apos;' + _ddm.getGroupingActivityByGroupingUIID(groupingUIID).title + '&apos;', null);
+				return false;
+			} else {
+				var callback:Function = Proxy.create(this,onStoreDesignResponse);
 				
-			Application.getInstance().getComms().sendAndReceive(dto,"servlet/authoring/storeLearningDesignDetails",callback,false);
+				Application.getInstance().getComms().sendAndReceive(dto,"servlet/authoring/storeLearningDesignDetails",callback,false);
+			}
 		}
 		
 		return true;
@@ -298,6 +306,30 @@ class Canvas extends CanvasHelper {
 			checkReadOnlyDesign();
 			Cursor.showCursor(Application.C_DEFAULT);
 		}
+	}
+	
+	public function validateGroupings():Number {
+		var keys:Array = _ddm.groupings.keys();
+		var currentGrouping:Grouping = null;
+		
+		for(var i=0; i<keys.length; i++) {
+			currentGrouping = _ddm.groupings.get(keys[i])
+			var groups:Array = currentGrouping.getGroups(_ddm);
+			groups.sortOn("groupName", Array.UNIQUESORT | Array.ASCENDING);
+			
+			var group:Group = null;
+			if(groups.length > 0)
+				group = groups[0];
+			
+			for(var j=1; j<groups.length; j++) {
+				if(group.groupName == groups[j].groupName)
+					return currentGrouping.groupingUIID;
+				else
+					group = groups[j];
+			}
+		}
+		
+		return null;
 	}
 	
 	/**
