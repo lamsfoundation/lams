@@ -169,11 +169,16 @@ public class RandomGrouper extends Grouper implements Serializable
     {
     	String prefix = getPrefix();
     	int size = randomGrouping.getGroups().size();
-        for(int i=1;i<=numOfGroupsTobeCreated;i++)
+        for(int numCreated=0,groupIndex=size+1;numCreated<numOfGroupsTobeCreated;groupIndex++)
         {
-        	String groupName = prefix + " " + new Integer(size + i).toString();  
-            randomGrouping.getGroups().add(Group.createLearnerGroup(randomGrouping,groupName,
-                                                                    new HashSet()));
+        	String groupName = prefix + " " + new Integer(groupIndex).toString();  
+        	// if the name of the group already exists, then createLearnerGroup will return null
+        	// the name may exist if people have been creating and then removing groups in authoring.
+        	Group newGroup = Group.createLearnerGroup(randomGrouping,groupName,new HashSet());
+        	if ( newGroup != null ) {
+        		randomGrouping.getGroups().add(newGroup);
+        		numCreated++;
+        	}
         }
     }
 
