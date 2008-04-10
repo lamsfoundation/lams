@@ -245,67 +245,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				}
 			}
 		}
-
-//    	//save two pictures describing either the taskLisiItem is done or not
-//		handler.saveFile(attachment.getFileUuid(), FileUtil.getFullPath(directoryName, "images/completeitem.gif"));
-//		handler.saveFile(attachment.getFileUuid(), FileUtil.getFullPath(directoryName, "images/incompleteitem.gif"));
-		
-		
-//		String directoryPath = directoryName + File.separatorChar + "images";
-//		File dir = new File(directoryPath);
-//		if (!dir.mkdirs())  {
-//			logger.error("Unable to create directory for export portfolio: " + directoryPath);
-//		}
-//		
-//		 
-//		
-//		String completeItemName = "completeitem.gif";
-//		File completeItemFile = new File(directoryPath + completeItemName);
-//		copyFile(directoryPath + completeItemName, completeItemFile);
-//		
-//		String incompleteItemName = "incompleteitem.gif";
-//		File incompleteItemFile = new File(directoryPath + completeItemName);
-//		copyFile(directoryPath + incompleteItemName, incompleteItemFile);
 	}
     
-//	private void copyFile(String filePath, File file) throws IOException {
-//		
-//		FileInputStream is = new FileInputStream(file);
-//		OutputStream os = null;
-//		try {
-//			int bufLen = 1024; // 1 Kbyte
-//			byte[] buf = new byte[1024]; // output buffer
-//			os = new FileOutputStream(filePath);
-//
-//			BufferedInputStream in = new BufferedInputStream(is);
-//			int len = 0;
-//		    while((len = in.read(buf,0,bufLen)) != -1){
-//		    	os.write(buf,0,len);
-//		    }	
-//			
-//		} catch ( IOException e ) {
-//			String message = "Unable to write out file needed for export portfolio. File was "+filePath;	
-//			logger.error(message,e);
-//			throw e;
-//			
-//		} finally {
-//
-//			try {
-//				if ( is != null ) is.close();
-//			} catch (IOException e1) {
-//				String message = "Unable to close input export portfolio file due to IOException";
-//				logger.warn(message,e1);
-//			}
-//
-//			try {
-//				if ( os != null ) os.close();
-//			} catch (IOException e2) {
-//				String message = "Unable to close output export portfolio file due to IOException";
-//				logger.warn(message,e2);
-//			}
-//		}
-//	}
-
 	/**
 	 * {@inheritDoc}
 	 */

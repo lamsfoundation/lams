@@ -34,28 +34,38 @@
 		}
 	}
 
-	function editItem(idx,sessionMapID){
-		 var reqIDVar = new Date();
+	function editItem(idx, sessionMapID){
+		var reqIDVar = new Date();
 		var url = "<c:url value="/authoring/editItemInit.do?itemIndex="/>" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
 		showMessage(url);
 	}
 	//The panel of taskList list panel
 	var taskListListTargetDiv = "taskListListArea";
-	function deleteItem(idx,sessionMapID){
-		var url = "<c:url value="/authoring/removeItem.do"/>";
-	    var reqIDVar = new Date();
-		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
-		deleteItemLoading();
-	    var myAjax = new Ajax.Updater(
-		    	taskListListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteItemComplete,
-		    		evalScripts:true
-		    	}
-	    );
+	function deleteItem(idx, sessionMapID){
+		var deletionConfirmed = true;
+		
+		var containsConditions = document.getElementById("conditionTable").rows.length > 0;
+		if (containsConditions) {
+			deletionConfirmed = confirm('<fmt:message key="warning.msg.authoring.deletion.affect.conditions"></fmt:message>');
+ 		}
+		
+		if (deletionConfirmed) {
+			var url = "<c:url value="/authoring/removeItem.do"/>";
+		    var reqIDVar = new Date();
+			var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+			deleteItemLoading();
+		    var myAjax = new Ajax.Updater(
+			    	taskListListTargetDiv,
+			    	url,
+			    	{
+			    		method:'get',
+			    		parameters:param,
+			    		onComplete:deleteItemComplete,
+			    		evalScripts:true
+			    	}
+		    );
+ 		}
+		
 	}
 	function deleteItemLoading(){
 		showBusy(taskListListTargetDiv);
@@ -64,7 +74,7 @@
 		hideBusy(taskListListTargetDiv);
 	}
 	
-	function upQuestion(idx,sessionMapID){
+	function upQuestion(idx, sessionMapID){
 		var url = "<c:url value="/authoring/upItem.do"/>";
 	    var reqIDVar = new Date();
 		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
@@ -80,7 +90,7 @@
 		    	}
 	    );
 	}
-	function downQuestion(idx,sessionMapID){
+	function downQuestion(idx, sessionMapID){
 		var url = "<c:url value="/authoring/downItem.do"/>";
 	    var reqIDVar = new Date();
 		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;

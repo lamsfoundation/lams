@@ -58,11 +58,11 @@
 						<td align="center">
 							<c:choose>
 								<c:when test="${taskSummaryItem.completed}">
-									<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">
+									<img src="../images/tick.gif"	border="0">
 								</c:when>
 									
 								<c:otherwise>
-									<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">
+									<img src="../images/cross.gif" border="0">
 								</c:otherwise>
 							</c:choose>
 						</td>
