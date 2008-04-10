@@ -301,3 +301,15 @@ values ('EnableFlash','true', 'config.flash.enable', 'config.header.features', '
 -- LDEV-1579
 alter table lams_tool add column supports_outputs TINYINT(1) DEFAULT 0;
 
+-- LDEV-1598
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('AuthoringScreenSize','800x600', 'config.authoring.screen.size', 'config.header.look.feel', 'STRING', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('MonitorScreenSize','800x600', 'config.monitor.screen.size', 'config.header.look.feel', 'STRING', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LearnerScreenSize','800x600', 'config.learner.screen.size', 'config.header.look.feel', 'STRING', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('AdminScreenSize','800x600', 'config.admin.screen.size', 'config.header.look.feel', 'STRING', 1);

@@ -61,7 +61,7 @@ public class ConfigurationTag extends TagSupport {
 	public int doStartTag() throws JspException {
        	JspWriter writer = pageContext.getOut();
    		try {
-			writer.println(Configuration.get(getKey()));
+			writer.print(Configuration.get(getKey()));
 		} catch (IOException e) {
 			log.error("Error in configuration tag",e);
 			throw new JspException(e);

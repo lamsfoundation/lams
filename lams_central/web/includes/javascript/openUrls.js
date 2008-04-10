@@ -21,7 +21,6 @@
 		function closeAllChildren(){
 			if (authorWin && !authorWin.closed) authorWin.closeWindow();
 			if (learnWin && !learnWin.closed) learnWin.close();
-			//if (monitorLessonWin && !monitorLessonWin.closed) monitorLessonWin.close();
 			if (monitorLessonWin && !monitorLessonWin.closed) monitorLessonWin.closeWindow();
 			if (addLessonWin && !addLessonWin.closed) addLessonWin.close();
 			if (epWin && !epWin.closed) epWin.close();
@@ -54,9 +53,10 @@
 
 		function openAuthor()
 		{
+			
 			if(isMac)
 			{
-				authorWin = window.open('home.do?method=author','aWindow','width=796,height=570,resizable');
+				authorWin = window.open('home.do?method=author','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
 			}
 			else
 			{
@@ -67,7 +67,7 @@
 				}
 				else
 				{
-					authorWin = window.open('home.do?method=author','aWindow','width=796,height=570,resizable');
+					authorWin = window.open('home.do?method=author','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
 					authorWin.focus();
 				}
 			}
@@ -77,7 +77,7 @@
 		{
 			if(isMac)
 			{
-				monitorLessonWin = window.open('../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID,'mWindow','width=796,height=570,resizable');
+				monitorLessonWin = window.open('../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID,'mWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
 			}
 			else
 			{
@@ -87,7 +87,7 @@
 				}
 				else
 				{
-					monitorLessonWin = window.open('../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID,'mWindow','width=796,height=570,resizable');
+					monitorLessonWin = window.open('../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID,'mWindow', 'width=' + authoring_width + ',height=' + authoring_height + ',resizable');
 					monitorLessonWin.focus();
 				}
 			}
@@ -109,11 +109,11 @@
 			{
 				if(belowMinRes)
 				{
-					monitorLessonWin = window.open('home.do?method=monitorLesson&lessonID='+lessonID,'mWindow','width=796,height=575,resizable,scrollbars');
+					monitorLessonWin = window.open('home.do?method=monitorLesson&lessonID='+lessonID,'mWindow','width=' + monitor_width + ',height=' + monitor_height + ',resizable,scrollbars');
 				}
 				else
 				{
-					monitorLessonWin = window.open('home.do?method=monitorLesson&lessonID='+lessonID,'mWindow','width=779,height=575,resizable,scrollbars');
+					monitorLessonWin = window.open('home.do?method=monitorLesson&lessonID='+lessonID,'mWindow','width=' + monitor_width + ',height=' + monitor_height + ',resizable,scrollbars');
 				}
 			}
 			else
@@ -123,7 +123,7 @@
 					monitorLessonWin.location = 'home.do?method=monitorLesson&lessonID='+lessonID;
 					monitorLessonWin.focus();
 				}else{
-					monitorLessonWin = window.open('home.do?method=monitorLesson&lessonID='+lessonID,'mWindow','width=779,height=575,resizable,resizable,scrollbars');
+					monitorLessonWin = window.open('home.do?method=monitorLesson&lessonID='+lessonID,'mWindow','width=' + monitor_width + ',height=' + monitor_height + ',resizable,resizable,scrollbars');
 				}
 			}
 		}
@@ -159,7 +159,7 @@
 		{
 			if(isMac)
 			{
-				learnWin = window.open('home.do?method=learner&lessonID='+lessonId,'lWindow','width=796,height=570,resizable,status=yes');
+				learnWin = window.open('home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
 			}
 			else
 			{
@@ -170,7 +170,7 @@
 				}
 				else
 				{
-					learnWin = window.open('home.do?method=learner&lessonID='+lessonId,'lWindow','width=796,height=570,resizable,status=yes');
+					learnWin = window.open('home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
 				}
 			}
 		}
@@ -198,14 +198,16 @@
 		
 		function openSysadmin()
 		{
-			var height = 650;
-			var width = 850;
+			var height = sys_admin_height;
+			var width = sys_admin_width;
 			var left = 0;
 			var top = 0;
+			
 			if(self.screen){
 				top = self.screen.height/2-height/2;
 				left = self.screen.width/2-width/2;
 			}
+			
 			if(isMac)
 			{
 				sysadminWin = window.open('admin/sysadminstart.do','saWindow','left='+left+',top='+top+',width='+width+',height='+height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');

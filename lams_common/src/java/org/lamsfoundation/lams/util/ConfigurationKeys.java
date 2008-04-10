@@ -219,4 +219,10 @@ public class ConfigurationKeys {
 	/** Disable Flash altogether for the learner interface (LDEV-1005) */
 	public static String FLASH_ENABLE = "EnableFlash";
 	
+	/** Configurable screen sizes for authoring, monitor, learner and admin (LDEV-1598) */
+	public static String AUTHORING_SCREEN_SIZE = "AuthoringScreenSize";
+	public static String MONITOR_SCREEN_SIZE = "MonitorScreenSize";
+	public static String LEARNER_SCREEN_SIZE = "LearnerScreenSize";
+	public static String ADMIN_SCREEN_SIZE = "AdminScreenSize";
+	
 }
