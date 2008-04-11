@@ -121,6 +121,9 @@ ol {
 	margin-left: 30px;
 }
 
+li.no-list-type  {
+	list-style-type: none;
+}
 #page { /*whole layout of page*/
 	margin: 25px auto;
 	width: 707px;

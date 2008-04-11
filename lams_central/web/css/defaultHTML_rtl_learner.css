@@ -104,6 +104,9 @@ ol {
 
 ul li { list-style-type:circle;}
 
+li.no-list-type  {
+	list-style-type: none;
+}
 /*layout of the table with the alternate color for the table heading cell */
 table.alternative-color {
  	 width:100%; 
