@@ -218,10 +218,10 @@ class Canvas extends CanvasHelper {
 		} else {
 			var dto:Object = _ddm.getDesignForSaving();
 			var groupingUIID:Number = null;
+			
 			if((groupingUIID = validateGroupings()) != null) {
-				// return error message
 				Cursor.showCursor(Application.C_DEFAULT);
-				LFMessage.showMessageAlert('Group names must be unique. Please review the Grouping Activity: &apos;' + _ddm.getGroupingActivityByGroupingUIID(groupingUIID).title + '&apos;', null);
+				LFMessage.showMessageAlert(Dictionary.getValue('grouping_invalid_with_common_names_msg', [_ddm.getGroupingActivityByGroupingUIID(groupingUIID).title]), null);
 				return false;
 			} else {
 				var callback:Function = Proxy.create(this,onStoreDesignResponse);
@@ -308,28 +308,32 @@ class Canvas extends CanvasHelper {
 		}
 	}
 	
-	public function validateGroupings():Number {
+	private function validateGroupings():Number {
 		var keys:Array = _ddm.groupings.keys();
 		var currentGrouping:Grouping = null;
 		
 		for(var i=0; i<keys.length; i++) {
 			currentGrouping = _ddm.groupings.get(keys[i])
 			var groups:Array = currentGrouping.getGroups(_ddm);
-			groups.sortOn("groupName", Array.UNIQUESORT | Array.ASCENDING);
-			
-			var group:Group = null;
-			if(groups.length > 0)
-				group = groups[0];
-			
-			for(var j=1; j<groups.length; j++) {
-				if(group.groupName == groups[j].groupName)
+			for(var j=0; j<groups.length; j++) {
+				if(!validateGroups(groups[j], groups))
 					return currentGrouping.groupingUIID;
-				else
-					group = groups[j];
 			}
 		}
 		
 		return null;
+	}
+	
+	private function validateGroups(group:Group, groups:Array):Boolean {
+		Debugger.log("groupname: "+ group.groupName, Debugger.CRITICAL, "validateGroupings", "Canvas");
+		for(var j=0; j<groups.length; j++) {
+			Debugger.log("groupname j: "+ groups[j].groupName, Debugger.CRITICAL, "validateGroupings", "Canvas");
+			
+			if(group.groupName == groups[j].groupName && group.groupUIID != groups[j].groupUIID)
+				return false;
+		}
+		
+		return true;
 	}
 	
 	/**
