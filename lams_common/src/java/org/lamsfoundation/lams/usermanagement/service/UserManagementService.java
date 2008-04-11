@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
@@ -421,7 +422,7 @@ public class UserManagementService implements IUserManagementService {
 		List results = baseDAO.findByProperty(User.class,"login",login);
 		return results.isEmpty() ? null : (User)results.get(0);
 	}
-
+	
 	public void updatePassword(String login, String password) {
 		try{
 			User user = getUserByLogin(login);
@@ -1081,5 +1082,10 @@ public class UserManagementService implements IUserManagementService {
 					|| (isUserInRole(userId, groupId, Role.GROUP_MANAGER))); 
 		}
 		return false;
+	}
+	
+	public ForgotPasswordRequest getForgotPasswordRequest(String key) {
+		List results = baseDAO.findByProperty(ForgotPasswordRequest.class,"requestKey",key);
+		return results.isEmpty() ? null : (ForgotPasswordRequest)results.get(0);
 	}
 }

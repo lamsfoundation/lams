@@ -137,16 +137,17 @@ j_security_login_page
 				   <a href="<lams:LAMSURL/>/www/help/troubleshoot-<%=Configuration.get(ConfigurationKeys.SERVER_LANGUAGE)%>.pdf">
 				   	<fmt:message key="label.help"/>
 				   </a>
+				   &nbsp;
+				   <a href="<lams:LAMSURL/>forgotPassword.jsp">
+                    <fmt:message key="label.forgot.password"/>
+                   </a>
 				</p>   
 				</div><!--closes right col-->
 	 
 	  <div class="clear"></div><!-- forces the CSS to display the columns-->
 	
 	  </div>  <!--closes content-->
-		
-		
-		
-		
+
 		<div id="footer">
 		
 		<p>			<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>
@@ -158,7 +159,6 @@ j_security_login_page
 	  </div><!--closes footer-->
 		
 	</div><!--closes page-->
-
 
 </body>
 

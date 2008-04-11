@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -269,6 +270,7 @@ public interface IUserManagementService {
 	 */
 	public User getUserByLogin(String login);
 	
+	
 	/**
 	 * @param login user's login
 	 * @param password new password
@@ -464,4 +466,11 @@ public interface IUserManagementService {
 	 * @return boolean
 	 */
 	public boolean canEditGroup(Integer userId, Integer orgId);
+	
+	/**
+	 * Gets a forgot password request from the db with the given key
+	 * @param key
+	 * @return
+	 */
+	public ForgotPasswordRequest getForgotPasswordRequest(String key);
 }
