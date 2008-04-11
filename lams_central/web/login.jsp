@@ -134,12 +134,12 @@ j_security_login_page
 					 </p>
 				</form>	
 				<p class="login-button">
-				   <a href="<lams:LAMSURL/>/www/help/troubleshoot-<%=Configuration.get(ConfigurationKeys.SERVER_LANGUAGE)%>.pdf">
-				   	<fmt:message key="label.help"/>
-				   </a>
-				   &nbsp;
 				   <a href="<lams:LAMSURL/>forgotPassword.jsp">
                     <fmt:message key="label.forgot.password"/>
+                   </a>
+				   &nbsp;
+				   <a href="<lams:LAMSURL/>/www/help/troubleshoot-<%=Configuration.get(ConfigurationKeys.SERVER_LANGUAGE)%>.pdf">
+                    <fmt:message key="label.help"/>
                    </a>
 				</p>   
 				</div><!--closes right col-->

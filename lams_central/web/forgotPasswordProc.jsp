@@ -3,6 +3,8 @@
 <%@page import="org.lamsfoundation.lams.util.MessageService" %>
 <%@page import="org.springframework.web.context.WebApplicationContext" %>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -10,25 +12,8 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <%
-
-String message="";
-
+String languageKey = request.getParameter("languageKey");
 String stateStr = request.getParameter("state");
-int state = Integer.parseInt(stateStr);
-
-WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
-MessageService messageService = (MessageService)ctx.getBean("centralMessageService");
-
-switch (state)
-{
-case 100: message = "<font color='red'>" + messageService.getMessage("error.support.email.not.set") + "</font>"; break;
-case 101: message = "<font color='red'>" + messageService.getMessage("error.email.does.not.match") + "</font>"; break;
-case 102: message = "<font color='red'>" + messageService.getMessage("error.user.not.found") + "</font>"; break;
-case 103: message = "<font color='red'>" + messageService.getMessage("error.password.request.expired") + "</font>"; break;
-case 104: message = messageService.getMessage("forgot.password.email.sent"); break;
-case 105: message = messageService.getMessage("heading.password.changed.screen"); break;
-}
-
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -39,25 +24,43 @@ case 105: message = messageService.getMessage("heading.password.changed.screen")
     <title><fmt:message key="title.forgot.password"/></title>
     <link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-<script language="javascript" type="text/javascript">
-        function toHome() {window.location="<lams:LAMSURL/>index.do";};
-</script>
 </lams:head>
 
+<script language="javascript" type="text/javascript">
+        function toHome() 
+        {
+            var isSuccess = <%=stateStr%>;
+            if (isSuccess == "1")
+            {
+                window.location="<lams:LAMSURL/>index.do";
+            }
+            else
+            {
+                window.location="<lams:LAMSURL/>forgotPassword.jsp";
+            }
+        };
+</script>
 
 <body class="stripes" >
-<br>
-<table class="body"><tr><td align="center">
-<div id="content">
-    <div id="title" align="left">
-                    <h1><fmt:message key="label.forgot.password.confirm"/></h1>
-    </div>
-    <br>
-    <%=message %>
-    <br><br>
-    <html:button property="cancel" styleClass="button" onclick="javascript:toHome();"><fmt:message key="label.ok"/></html:button>
+    <div id="page"><!--main box 'page'-->
+
+    
+    <h1 class="no-tabs-below"><fmt:message key="label.forgot.password.confirm"/></h1>
+    
+    <div id="header-no-tabs"></div>
+    <div id="content" align="center">
+	    <table border="0" class="body"><tr><td>
+		    <%if (stateStr.equals("0")){out.print("<font color='Red'>");}%>
+		    <fmt:message key="<%=languageKey %>"/>
+		    <%if (stateStr.equals("0")){out.print("</font>");}%>
+	    </td></tr></table>
+	    <br><br>
+	    <html:button property="cancel" styleClass="button" onclick="javascript:toHome();"><fmt:message key="label.ok"/></html:button>
+	</div>
+    
+    <div id="footer"><div id="footer"></div><!--closes footer-->
+    
 </div>
-</td></tr></table>
 </body> 
 
 </lams:html>          

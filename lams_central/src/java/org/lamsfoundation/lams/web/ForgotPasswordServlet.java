@@ -44,16 +44,17 @@ public class ForgotPasswordServlet extends HttpServlet
 	private static Logger log = Logger.getLogger(ForgotPasswordServlet.class);
 	
 	// states
-	public static int SMTP_SERVER_NOT_SET 		= 100;
-	public static int EMAIL_DOES_NOT_MATCH 		= 101;
-	public static int USER_NOT_FOUND 			= 102;
-	public static int PASSWORD_REQUEST_EXPIRED 	= 103;
-	public static int SUCCESS_REQUEST_EMAIL 	= 104;
-	public static int SUCCESS_CHANGE_PASS 		= 105;
+	public static String SMTP_SERVER_NOT_SET 		= "error.support.email.not.set";
+	public static String EMAIL_DOES_NOT_MATCH 		= "error.email.does.not.match";
+	public static String USER_NOT_FOUND 			= "error.user.not.found";
+	public static String PASSWORD_REQUEST_EXPIRED 	= "error.password.request.expired";
+	public static String SUCCESS_REQUEST_EMAIL 		= "forgot.password.email.sent";
+	public static String SUCCESS_CHANGE_PASS 		= "heading.password.changed.screen";
 	
 	public static int MILLISECONDS_IN_A_DAY 	= 86400000;
 	
-	private static String STATE = "?state=";
+	private static String STATE = "&state=";
+	private static String LANGUAGE_KEY = "&languageKey=";
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response) 
 		throws ServletException, IOException 
@@ -79,11 +80,24 @@ public class ForgotPasswordServlet extends HttpServlet
 		
 	}
 	
+	/**
+	 * Handles the first step of the forgot login process, sending the email to the user.
+	 * An email is sent with a link and key attached to identify the forgot login request
+	 * @param login
+	 * @param email
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	public void handleEmailRequest(String login, String email, HttpServletResponse response)
 		throws ServletException, IOException
 	{
+
+		int success=0;
+		String languageKey = "";
 		
-		String state = STATE;
+		
+		
 		boolean err = false;
 		
 		if (login==null||login.equals("")||email==null||email.equals(""))
@@ -99,8 +113,8 @@ public class ForgotPasswordServlet extends HttpServlet
 		
 		if (SMPTServer==null||SMPTServer.equals("")||supportEmail==null||supportEmail.equals(""))
 		{
-			// Validate
-			state += this.SMTP_SERVER_NOT_SET;
+			// Validate SMTP not set up
+			languageKey = this.SMTP_SERVER_NOT_SET;
 		}
 		else
 		{
@@ -138,7 +152,8 @@ public class ForgotPasswordServlet extends HttpServlet
 							email,
 							body
 							);
-						  state += this.SUCCESS_REQUEST_EMAIL;
+						  languageKey = this.SUCCESS_REQUEST_EMAIL;
+						  success = 1;
 					}
 					catch (AddressException e) 
 			        {
@@ -163,18 +178,22 @@ public class ForgotPasswordServlet extends HttpServlet
 				else
 				{
 					// validate email does not match user
-					state += this.EMAIL_DOES_NOT_MATCH;
+					languageKey = this.EMAIL_DOES_NOT_MATCH;
 				}
 				
 			}
 			else
 			{
 				// validate user is not found
-				state += this.USER_NOT_FOUND;
+				languageKey = this.USER_NOT_FOUND;
 			}
 		}
 
-		response.sendRedirect(Configuration.get("ServerURL") + "forgotPasswordProc.jsp" + state);
+		response.sendRedirect(Configuration.get("ServerURL") + "forgotPasswordProc.jsp?" + 
+				STATE + 
+				success + 
+				LANGUAGE_KEY + 
+				languageKey);
 
 	}
 	
@@ -185,7 +204,8 @@ public class ForgotPasswordServlet extends HttpServlet
 	public void handlePasswordChange(String newPassword, String key, HttpServletResponse response)
 		throws ServletException, IOException
 	{
-		String state = STATE;
+		int success=0;
+		String languageKey = "";
 		
 		if (key==null||key.equals("")||newPassword==null||newPassword.equals(""))
 		{
@@ -205,15 +225,20 @@ public class ForgotPasswordServlet extends HttpServlet
 		{
 			User user = (User)userService.findById(User.class, fp.getUserId());
 			userService.updatePassword(user.getLogin(), newPassword);
-			state += this.SUCCESS_CHANGE_PASS;
+			languageKey = this.SUCCESS_CHANGE_PASS;
+			success = 1;
 		}
 		else
 		{
 			// validate password request expired
-			state += this.PASSWORD_REQUEST_EXPIRED;
+			languageKey = this.PASSWORD_REQUEST_EXPIRED;
 		}
 		
-		response.sendRedirect(Configuration.get("ServerURL") + "forgotPasswordProc.jsp" + state);
+		response.sendRedirect(Configuration.get("ServerURL") + "forgotPasswordProc.jsp?" + 
+				STATE + 
+				success + 
+				LANGUAGE_KEY + 
+				languageKey);
 	}
 	
 	/**
@@ -232,9 +257,5 @@ public class ForgotPasswordServlet extends HttpServlet
 		
 		return ((String) uuidGen.generate(null, null)).toLowerCase();
 	}
-	
-	
-	
-	
 	
 }
