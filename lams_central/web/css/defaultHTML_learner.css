@@ -96,6 +96,12 @@ ul {
 
 ul li { list-style-type:circle;}
 
+ol {
+	margin-left: 25px;
+	margin-right: 30px;
+}
+
+
 /*layout of the table with the alternate color for the table heading cell */
 table.alternative-color {
  	 width:100%; 
