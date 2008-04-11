@@ -325,9 +325,7 @@ class Canvas extends CanvasHelper {
 	}
 	
 	private function validateGroups(group:Group, groups:Array):Boolean {
-		Debugger.log("groupname: "+ group.groupName, Debugger.CRITICAL, "validateGroupings", "Canvas");
 		for(var j=0; j<groups.length; j++) {
-			Debugger.log("groupname j: "+ groups[j].groupName, Debugger.CRITICAL, "validateGroupings", "Canvas");
 			
 			if(group.groupName == groups[j].groupName && group.groupUIID != groups[j].groupUIID)
 				return false;
