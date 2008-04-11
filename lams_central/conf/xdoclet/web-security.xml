@@ -2,11 +2,38 @@
 	<security-constraint>
 	   	<web-resource-collection>
 	    	<web-resource-name>Secure Content</web-resource-name>
-    		<url-pattern>*.jsp</url-pattern>
+    		<url-pattern>/addLesson.jsp</url-pattern>
+            <url-pattern>/admin.jsp</url-pattern>
+            <url-pattern>/author.jsp</url-pattern>
+            <url-pattern>/authoringConfirm.jsp</url-pattern>
+            <url-pattern>/community.jsp</url-pattern>
+            <url-pattern>/editprofile.jsp</url-pattern>
+            <url-pattern>/footer.jsp</url-pattern>
+            <url-pattern>/group.jsp</url-pattern>
+            <url-pattern>/groupContents.jsp</url-pattern>
+            <url-pattern>/groupHeader.jsp</url-pattern>
+            <url-pattern>/header.jsp</url-pattern>
+            <url-pattern>/index.jsp</url-pattern>
+            <url-pattern>/lams_shared_library.jsp</url-pattern>
+            <url-pattern>/launchlearner.jsp</url-pattern>
+            <url-pattern>/learner.jsp</url-pattern>
+            <url-pattern>/lessons.jsp</url-pattern>
+            <url-pattern>/main.jsp</url-pattern>
+            <url-pattern>/monitorLesson.jsp</url-pattern>
+            <url-pattern>/msgContent.jsp</url-pattern>
+            <url-pattern>/passwordChangeContent.jsp</url-pattern>
+            <url-pattern>/passwordChangeOkContent.jsp</url-pattern>
+            <url-pattern>/portrait.jsp</url-pattern>
+            <url-pattern>/profile.jsp</url-pattern>
+            <url-pattern>/sysadmin.jsp</url-pattern>
+            <url-pattern>/template.jsp</url-pattern>
+            
     		<url-pattern>*.html</url-pattern>
     		<url-pattern>*.do</url-pattern>
     		<url-pattern>/servlet/*</url-pattern>
     		<url-pattern>/fckeditor/*</url-pattern>
+    		<url-pattern>/toolcontent/*</url-pattern>
+    		<url-pattern>/development/*</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>

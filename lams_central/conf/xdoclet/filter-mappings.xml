@@ -68,9 +68,14 @@
      <url-pattern>/fckeditor/*</url-pattern>
    </filter-mapping>
 
-    <filter-mapping>
+   <filter-mapping>
     <filter-name>hibernateFilter</filter-name>
      <url-pattern>/LoginRequest</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+    <filter-name>hibernateFilter</filter-name>
+     <url-pattern>/ForgotPasswordRequest</url-pattern>
    </filter-mapping>
      
    <filter-mapping>
