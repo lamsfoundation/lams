@@ -116,27 +116,15 @@ public class TaskListCondition implements Cloneable{
 	 */
   	public Object clone(){
   		
-  		TaskListCondition taskList = null;
+  		TaskListCondition condition = null;
   		try{
-  			taskList = (TaskListCondition) super.clone();
-  			taskList.setUid(null);
-  			//clone taskListItems
-  			if(taskListItems != null){
-  				Iterator iter = taskListItems.iterator();
-  				Set set = new HashSet();
-  				while(iter.hasNext()){
-  					TaskListItem item = (TaskListItem)iter.next(); 
-  					TaskListItem newItem = (TaskListItem) item.clone();
-  					//just clone old file without duplicate it in repository
-					set.add(newItem);
-  				}
-  				taskList.taskListItems = set;
-  			}
+  			condition = (TaskListCondition) super.clone();
+  			condition.setUid(null);
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + TaskListCondition.class + " failed");
 		}
   		
-  		return taskList;
+  		return condition;
   	}
   	
 	//**********************************************************
@@ -196,6 +184,8 @@ public class TaskListCondition implements Cloneable{
      * @hibernate.collection-key column="condition_uid"
      * @hibernate.collection-many-to-many column="uid" class="org.lamsfoundation.lams.tool.taskList.model.TaskListItem"
 	 */
+	 
+	 //TODO maybe th reason of a problem cascade="all"!!!
 	public Set getTaskListItems() {
 		return taskListItems;
 	}

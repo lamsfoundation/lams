@@ -46,9 +46,9 @@ public class TaskListItemVisitDAOHibernate extends BaseDAOHibernate implements T
 	private static final String FIND_BY_ITEM_BYSESSION = "from " + TaskListItemVisitLog.class.getName()
 			+ " as r where r.sessionId = ? and r.taskListItem.uid=?";
 	
-//	private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from " + TaskListItemVisitLog.class.getName() 
-//			+ " as r where  r.sessionId=? and  r.user.userId =?";
-//
+	private static final String FIND_TASKS_COMPLETED_COUNT_BY_USER = "select count(*) from " + TaskListItemVisitLog.class.getName() 
+			+ " as r where r.complete=true and r.sessionId=? and  r.user.userId =?";
+
 //	private static final String FIND_SUMMARY = "select v.taskListItem.uid, count(v.taskListItem) from  "
 //		+ TaskListItemVisitLog.class.getName() + " as v , "
 //		+ TaskListSession.class.getName() + " as s, "
@@ -68,13 +68,16 @@ public class TaskListItemVisitDAOHibernate extends BaseDAOHibernate implements T
 		return (TaskListItemVisitLog) list.get(0);
 	}
 
-//	public int getUserViewLogCount(Long toolSessionId ,Long userUid) {
-//		List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER,new Object[]{toolSessionId, userUid});
-//		if(list == null || list.size() ==0)
-//			return 0;
-//		return ((Number) list.get(0)).intValue();
-//	}
-//
+    /**
+     * {@inheritDoc}
+     */
+	public int getTasksCompletedCountByUser(Long toolSessionId ,Long userUid) {
+		List list = getHibernateTemplate().find(FIND_TASKS_COMPLETED_COUNT_BY_USER, new Object[]{toolSessionId, userUid});
+		if(list == null || list.size() ==0)
+			return 0;
+		return ((Number) list.get(0)).intValue();
+	}
+
 //	public Map<Long,Integer> getSummary(Long contentId) {
 //
 //		// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long

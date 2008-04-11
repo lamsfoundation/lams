@@ -126,7 +126,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	//tool service
 	private TaskListToolContentHandler taskListToolContentHandler;
 	private MessageService messageService;
-	TaskListOutputFactory taskListOutputFactory;
+	private TaskListOutputFactory taskListOutputFactory;
 	//system services
 	private IRepositoryService repositoryService;
 	private ILamsToolService toolService;
@@ -154,12 +154,12 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	/**
 	 * {@inheritDoc}
 	 */
-	public TaskList getDefaultContent(Long contentId) throws TaskListApplicationException {
+	public TaskList getDefaultContent(Long contentId) throws TaskListException {
     	if (contentId == null)
     	{
     		String error=messageService.getMessage("error.msg.default.content.not.find");
     	    log.error(error);
-    	    throw new TaskListApplicationException(error);
+    	    throw new TaskListException(error);
     	}
     	
     	TaskList defaultContent = getDefaultTaskList();
@@ -249,12 +249,12 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	/**
 	 * {@inheritDoc}
 	 */
-	public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws TaskListApplicationException {
+	public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws TaskListException {
 		ITicket ticket = getRepositoryLoginTicket();
 		try {
 			repositoryService.deleteVersion(ticket, fileUuid,fileVersionId);
 		} catch (Exception e) {
-			throw new TaskListApplicationException(
+			throw new TaskListException(
 					"Exception occured while deleting files from"
 							+ " the repository " + e.getMessage());
 		}
@@ -357,7 +357,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	/**
 	 * {@inheritDoc}
 	 */
-	public String finishToolSession(Long toolSessionId, Long userId) throws TaskListApplicationException {
+	public String finishToolSession(Long toolSessionId, Long userId) throws TaskListException {
 		TaskListUser user = taskListUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 		user.setSessionFinished(true);
 		taskListUserDao.saveObject(user);
@@ -370,9 +370,9 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		try {
 			nextUrl = this.leaveToolSession(toolSessionId,userId);
 		} catch (DataMissingException e) {
-			throw new TaskListApplicationException(e);
+			throw new TaskListException(e);
 		} catch (ToolException e) {
-			throw new TaskListApplicationException(e);
+			throw new TaskListException(e);
 		}
 		return nextUrl;
 	}
@@ -427,11 +427,6 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		}
 	}
 
-
-
-
-
-	
 	/** 
 	 * {@inheritDoc}
 	 */
@@ -483,6 +478,13 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		
 		Summary summary = new Summary(itemList, userList, complete, visitNumbers, taskList.isMonitorVerificationRequired());
 		return summary;
+	}
+	
+	/** 
+	 * {@inheritDoc}
+	 */
+	public int getNumTasksCompletedByUser(Long toolSessionId, Long userUid) {
+		return getTaskListItemVisitDao().getTasksCompletedCountByUser(toolSessionId, userUid);
 	}
 	
 	/** 
@@ -771,7 +773,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
  		if(toolContentObj == null) {
  			try {
 				toolContentObj = getDefaultTaskList();
-			} catch (TaskListApplicationException e) {
+			} catch (TaskListException e) {
 				throw new DataMissingException(e.getMessage());
 			}
  		}
@@ -834,14 +836,24 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 			throw new ToolException(e);
 		}
 	}
-
-	  /** Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions that are always
-     * available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created for a particular activity
-     * such as the answer to the third question contains the word Koala and hence the need for the toolContentId
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     */
+	
+	/**
+	 * Get the definitions for possible output for an activity, based on the
+	 * toolContentId. These may be definitions that are always available for the
+	 * tool (e.g. number of marks for Multiple Choice) or a custom definition
+	 * created for a particular activity such as the answer to the third
+	 * question contains the word Koala and hence the need for the toolContentId
+	 * 
+	 * @return SortedMap of ToolOutputDefinitions with the key being the name of
+	 *         each definition
+	 * @throws TaskListException 
+	 */
 	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
-		return new TreeMap<String, ToolOutputDefinition>();
+		TaskList taskList = getTaskListByContentId(toolContentId);
+		if ( taskList == null ) {
+			taskList = getDefaultTaskList();
+		}
+		return getTaskListOutputFactory().getToolOutputDefinitions(taskList);
 	}
  
 	/** 
@@ -859,7 +871,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		if ( taskList == null ) {
 			try {
 				taskList = getDefaultTaskList();
-			} catch (TaskListApplicationException e) {
+			} catch (TaskListException e) {
 				throw new ToolException(e);
 			}
 		}
@@ -980,16 +992,15 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long, java.lang.Long)
 	 */
 	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,	Long toolSessionId, Long learnerId) {
-		return new TreeMap<String,ToolOutput>();
+		return taskListOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
 	}
 
 	/** 
 	 * Get the tool output for the given tool output name.
 	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long, java.lang.Long)
 	 */
-	public ToolOutput getToolOutput(String name, Long toolSessionId,
-			Long learnerId) {
-		return null;
+	public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
+		return taskListOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
 	}
 
 	//*******************************************************************************
@@ -1020,27 +1031,26 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	// Private methods
 	//*****************************************************************************
     
-	private TaskList getDefaultTaskList() throws TaskListApplicationException {
+	private TaskList getDefaultTaskList() throws TaskListException {
     	Long defaultTaskListId = getToolDefaultContentIdBySignature(TaskListConstants.TOOL_SIGNATURE);
     	TaskList defaultTaskList = getTaskListByContentId(defaultTaskListId);
-    	if(defaultTaskList == null)
-    	{
+    	if(defaultTaskList == null)	{
     	    String error=messageService.getMessage("error.msg.default.content.not.find");
     	    log.error(error);
-    	    throw new TaskListApplicationException(error);
+    	    throw new TaskListException(error);
     	}
     	
     	return defaultTaskList;
 	}
 	
-    private Long getToolDefaultContentIdBySignature(String toolSignature) throws TaskListApplicationException {
+    private Long getToolDefaultContentIdBySignature(String toolSignature) throws TaskListException {
         Long contentId = null;
     	contentId=new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));    
     	if (contentId == null)
     	{
     		String error=messageService.getMessage("error.msg.default.content.not.find");
     	    log.error(error);
-    	    throw new TaskListApplicationException(error);
+    	    throw new TaskListException(error);
     	}
 	    return contentId;
     }
@@ -1048,7 +1058,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
     /**
      * Process an uploaded file.
      * 
-     * @throws TaskListApplicationException 
+     * @throws TaskListException 
      * @throws FileNotFoundException
      * @throws IOException
      * @throws RepositoryCheckedException
@@ -1140,7 +1150,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	 * @return file node
 	 * @throws ImscpApplicationException
 	 */
-	private IVersionedNode getFile(Long uuid, Long versionId, String relativePath) throws TaskListApplicationException {
+	private IVersionedNode getFile(Long uuid, Long versionId, String relativePath) throws TaskListException {
 		
 		ITicket tic = getRepositoryLoginTicket();
 		
@@ -1154,7 +1164,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 			
 			error = error+"AccessDeniedException: "+e.getMessage()+" Unable to retry further.";
 			log.error(error);
-			throw new TaskListApplicationException(error,e);
+			throw new TaskListException(error,e);
 			
 		} catch (Exception e) {
 			
@@ -1163,7 +1173,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 			+" path " + relativePath+"."
 			+" Exception: "+e.getMessage();
 			log.error(error);
-			throw new TaskListApplicationException(error,e);
+			throw new TaskListException(error,e);
 			
 		} 
 	}
@@ -1177,19 +1187,19 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	 * upload/download files from the content repository.
 	 * 
 	 * @return ITicket The ticket for repostory access
-	 * @throws TaskListApplicationException
+	 * @throws TaskListException
 	 */
-	private ITicket getRepositoryLoginTicket() throws TaskListApplicationException {
+	private ITicket getRepositoryLoginTicket() throws TaskListException {
 		ICredentials credentials = new SimpleCredentials(taskListToolContentHandler.getRepositoryUser(), taskListToolContentHandler.getRepositoryId());
 		try {
 			ITicket ticket = repositoryService.login(credentials, taskListToolContentHandler.getRepositoryWorkspaceName());
 			return ticket;
 		} catch (AccessDeniedException ae) {
-			throw new TaskListApplicationException("Access Denied to repository." + ae.getMessage());
+			throw new TaskListException("Access Denied to repository." + ae.getMessage());
 		} catch (WorkspaceNotFoundException we) {
-			throw new TaskListApplicationException("Workspace not found." + we.getMessage());
+			throw new TaskListException("Workspace not found." + we.getMessage());
 		} catch (LoginException e) {
-			throw new TaskListApplicationException("Login failed." + e.getMessage());
+			throw new TaskListException("Login failed." + e.getMessage());
 		}
 	}
 }

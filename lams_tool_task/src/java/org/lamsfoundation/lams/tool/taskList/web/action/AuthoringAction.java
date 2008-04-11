@@ -62,7 +62,7 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
-import org.lamsfoundation.lams.tool.taskList.service.TaskListApplicationException;
+import org.lamsfoundation.lams.tool.taskList.service.TaskListException;
 import org.lamsfoundation.lams.tool.taskList.service.UploadTaskListFileException;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListConditionComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
@@ -387,6 +387,24 @@ public class AuthoringAction extends Action {
 			iter.remove();
 		}
 		
+		
+		
+		//Handle taskList items
+		Set itemList = new LinkedHashSet();
+		SortedSet topics = getTaskListItemList(sessionMap);
+    	iter = topics.iterator();
+    	while(iter.hasNext()){
+    		TaskListItem item = (TaskListItem) iter.next();
+    		if(item != null){
+				//This flushs user UID info to message if this user is a new user. 
+				item.setCreateBy(taskListUser);
+				itemList.add(item);
+    		}
+    	}
+    	taskListPO.setTaskListItems(itemList);
+    	
+    	
+		
 		//Handle taskList conditions. Also delete conditions that don't contain any taskLIstItems.
 		SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
 		SortedSet<TaskListCondition> conditionListWithoutEmptyElements = new TreeSet<TaskListCondition>(conditionList);
@@ -406,23 +424,39 @@ public class AuthoringAction extends Action {
     	while(iter.hasNext()){
     		TaskListCondition condition = (TaskListCondition) iter.next();
     		iter.remove();
+    		
     		if(condition.getUid() != null)
     			service.deleteTaskListCondition(condition.getUid());
     	}
     	
+    	
 		//Handle taskList items
-		Set itemList = new LinkedHashSet();
-		SortedSet topics = getTaskListItemList(sessionMap);
-    	iter = topics.iterator();
-    	while(iter.hasNext()){
-    		TaskListItem item = (TaskListItem) iter.next();
-    		if(item != null){
-				//This flushs user UID info to message if this user is a new user. 
-				item.setCreateBy(taskListUser);
-				itemList.add(item);
-    		}
+    	SortedSet<TaskListCondition> conditions = getTaskListConditionList(sessionMap);
+    	for (TaskListCondition condition:conditions) {
+    		
+    		
+    		Set itemList2 = new LinkedHashSet();
+    		Set topics2 = condition.getTaskListItems();
+        	iter = topics2.iterator();
+        	while(iter.hasNext()){
+        		TaskListItem item2 = (TaskListItem) iter.next();
+        		if(item2 != null){
+    				//This flushs user UID info to message if this user is a new user. 
+    				item2.setCreateBy(taskListUser);
+    				itemList2.add(item2);
+        		}
+        	}
+        	condition.setTaskListItems(itemList2);
+        	
+        	
     	}
-    	taskListPO.setTaskListItems(itemList);
+    	
+
+    	
+    	
+    	
+    	
+
     	
     	// delete TaskListItems from database. This should be done after
 		// TaskListConditions have been deleted from the database. This is due
@@ -907,7 +941,7 @@ public class AuthoringAction extends Action {
 	 * Extract web from content to taskList item.
 	 * @param request
 	 * @param itemForm
-	 * @throws TaskListApplicationException 
+	 * @throws TaskListException 
 	 */
 	private void extractFormToTaskListItem(HttpServletRequest request, TaskListItemForm itemForm) 
 		throws Exception {

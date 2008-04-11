@@ -26,21 +26,21 @@ package org.lamsfoundation.lams.tool.taskList.service;
 /**
  * @author Andrey Balan
  */
-public class TaskListApplicationException extends Exception{
+public class TaskListException extends RuntimeException{
 
-	public TaskListApplicationException() {
+	public TaskListException() {
 		super();
 	}
 
-	public TaskListApplicationException(String message, Throwable cause) {
+	public TaskListException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public TaskListApplicationException(String message) {
+	public TaskListException(String message) {
 		super(message);
 	}
 
-	public TaskListApplicationException(Throwable cause) {
+	public TaskListException(Throwable cause) {
 		super(cause);
 	}
 

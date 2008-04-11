@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
-import org.lamsfoundation.lams.tool.taskList.service.TaskListApplicationException;
+import org.lamsfoundation.lams.tool.taskList.service.TaskListException;
 import org.lamsfoundation.lams.tool.taskList.service.TaskListServiceProxy;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListToolContentHandler;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -92,7 +92,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				sessionMap.put(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
 				teacher(request, response, directoryName, cookies,sessionMap);
 			}
-		} catch (TaskListApplicationException e) {
+		} catch (TaskListException e) {
 			logger.error("Cannot perform export for taskList tool.");
 		}
 
@@ -135,17 +135,17 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	 * @param directoryName
 	 * @param cookies
 	 * @param sessionMap
-	 * @throws TaskListApplicationException
+	 * @throws TaskListException
 	 * @throws IOException 
 	 */
-	private void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap) throws TaskListApplicationException{
+	private void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap) throws TaskListException{
 
 		ITaskListService service = TaskListServiceProxy.getTaskListService(getServletContext());
 
 		if (userID == null || toolSessionID == null) {
 			String error = "Tool session Id or user Id is null. Unable to continue";
 			logger.error(error);
-			throw new TaskListApplicationException(error);
+			throw new TaskListException(error);
 		}
 
 		TaskListUser learner = service.getUserByIDAndSession(userID,toolSessionID);
@@ -153,7 +153,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		if (learner == null) {
 			String error = "The user with user id " + userID + " does not exist.";
 			logger.error(error);
-			throw new TaskListApplicationException(error);
+			throw new TaskListException(error);
 		}
 
 		TaskList content = service.getTaskListBySessionId(toolSessionID);
@@ -161,7 +161,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		if (content == null) {
 			String error = "The content for this activity has not been defined yet.";
 			logger.error(error);
-			throw new TaskListApplicationException(error);
+			throw new TaskListException(error);
 		}
 		
 		List<TaskSummary> taskSummaries = service.exportForLearner(toolSessionID, learner);
@@ -180,17 +180,17 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	 * @param directoryName
 	 * @param cookies
 	 * @param sessionMap
-	 * @throws TaskListApplicationException
+	 * @throws TaskListException
 	 * @throws IOException 
 	 */
-	private void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap) throws TaskListApplicationException {
+	private void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap) throws TaskListException {
 		ITaskListService service = TaskListServiceProxy.getTaskListService(getServletContext());
 
 		// check if toolContentId exists in db or not
 		if (toolContentID == null) {
 			String error = "Tool Content Id is missing. Unable to continue";
 			logger.error(error);
-			throw new TaskListApplicationException(error);
+			throw new TaskListException(error);
 		}
 
 		TaskList content = service.getTaskListByContentId(toolContentID);
@@ -198,7 +198,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		if (content == null) {
 			String error = "Data is missing from the database. Unable to Continue";
 			logger.error(error);
-			throw new TaskListApplicationException(error);
+			throw new TaskListException(error);
 		}
 		
 		List<TaskSummary> taskSummaries = service.exportForTeacher(toolContentID);

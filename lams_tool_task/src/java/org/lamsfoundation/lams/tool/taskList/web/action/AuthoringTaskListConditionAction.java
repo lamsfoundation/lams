@@ -53,7 +53,7 @@ import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
-import org.lamsfoundation.lams.tool.taskList.service.TaskListApplicationException;
+import org.lamsfoundation.lams.tool.taskList.service.TaskListException;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListConditionComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListConditionForm;
@@ -435,7 +435,7 @@ public class AuthoringTaskListConditionAction extends Action {
 	 * Extract form content to taskListContent.
 	 * @param request
 	 * @param form
-	 * @throws TaskListApplicationException 
+	 * @throws TaskListException 
 	 */
 	private void extractFormToTaskListCondition(HttpServletRequest request, TaskListConditionForm form) throws Exception {
 		/* BE CAREFUL: This method will copy necessary info from request form to a old or new TaskListItem instance.

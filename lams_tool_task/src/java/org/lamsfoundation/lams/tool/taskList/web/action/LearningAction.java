@@ -58,7 +58,7 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
-import org.lamsfoundation.lams.tool.taskList.service.TaskListApplicationException;
+import org.lamsfoundation.lams.tool.taskList.service.TaskListException;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
@@ -291,7 +291,7 @@ public class LearningAction extends Action {
 			
 			nextActivityUrl = service.finishToolSession(sessionId,userID);
 			request.setAttribute(TaskListConstants.ATTR_NEXT_ACTIVITY_URL,nextActivityUrl);
-		} catch (TaskListApplicationException e) {
+		} catch (TaskListException e) {
 			log.error("Failed get next activity url:" + e.getMessage());
 		}
 		

@@ -53,5 +53,15 @@ public interface TaskListItemVisitDAO extends DAO {
 	 * @return list of taskListItemVisitLogs which corresponds to specified sessionId and itemUid
 	 */
 	public List<TaskListItemVisitLog> getTaskListItemLogBySession(Long sessionId,Long itemUid);
+	
+
+	/**
+	 * 
+	 * 
+	 * @param toolSessionId
+	 * @param userUid
+	 * @return
+	 */
+	public int getTasksCompletedCountByUser(Long toolSessionId ,Long userUid); 
 
 }

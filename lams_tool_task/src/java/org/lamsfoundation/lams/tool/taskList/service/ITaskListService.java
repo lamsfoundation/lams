@@ -26,10 +26,14 @@ package org.lamsfoundation.lams.tool.taskList.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskSummary;
@@ -47,8 +51,16 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
  * @author Dapeng.Ni
  * @author Andrey Balan
  */
-public interface ITaskListService 
-{
+public interface ITaskListService {
+	
+	
+	/**
+	 * @param toolSessionId
+	 * @param userUid
+	 * @return
+	 */
+	public int getNumTasksCompletedByUser(Long toolSessionId, Long userUid);
+	
 	/**
 	 * Get <code>TaskList</code> by toolContentID.
 	 * 
@@ -63,9 +75,9 @@ public interface ITaskListService
 	 * 
 	 * @param contentId
 	 * @return
-	 * @throws TaskListApplicationException
+	 * @throws TaskListException
 	 */
-	TaskList getDefaultContent(Long contentId) throws TaskListApplicationException;
+	TaskList getDefaultContent(Long contentId) throws TaskListException;
 	
 	/**
 	 * Get list of taskList items by given taskListUid. These taskList items must be created by author.
@@ -143,9 +155,9 @@ public interface ITaskListService
 	 * 
 	 * @param fileUuid
 	 * @param fileVersionId
-	 * @throws TaskListApplicationException
+	 * @throws TaskListException
 	 */
-	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws TaskListApplicationException ;
+	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws TaskListException ;
 
 	/**
 	 * Save or update taskList into database.
@@ -257,7 +269,7 @@ public interface ITaskListService
 	 * @param userId
 	 * @return
 	 */
-	String finishToolSession(Long toolSessionId, Long userId)  throws TaskListApplicationException;
+	String finishToolSession(Long toolSessionId, Long userId)  throws TaskListException;
 
 	/**
 	 * Create refection entry into notebook tool.
@@ -331,6 +343,6 @@ public interface ITaskListService
 	 * @return
 	 */
 	TaskSummary getTaskSummary(Long contentId, Long taskListItemUid);
-
+	
 }
 

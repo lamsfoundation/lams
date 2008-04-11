@@ -137,6 +137,7 @@ public class TaskList implements Cloneable{
   				}
   				taskList.taskListItems = set;
   			}
+  			
   			//clone attachment
   			if(attachments != null){
   				Iterator iter = attachments.iterator();
@@ -157,7 +158,22 @@ public class TaskList implements Cloneable{
   				while(iter.hasNext()){
   					TaskListCondition condition = (TaskListCondition)iter.next(); 
   					TaskListCondition newCondition = (TaskListCondition) condition.clone();
-  					//just clone old file without duplicate it in repository
+  					
+  		  			//picking up all the taskListItems that condition had
+  		  			if(condition.getTaskListItems() != null){
+  		  				Set set2 = new HashSet();
+  		  				newCondition.setTaskListItems(set2);
+//		  				Iterator iter2 = taskListItems.iterator();  		  				
+//  		  				while(iter.hasNext()){
+//  		  					TaskListItem item = (TaskListItem)iter.next(); 
+//  		  					TaskListItem newItem = (TaskListItem) item.clone();
+//  		  					//just clone old file without duplicate it in repository
+//  							set.add(newItem);
+//  		  				}
+  		  				
+  		  			}
+  					
+  					
   					
 					set.add(newCondition);
   				}
