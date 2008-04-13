@@ -15,6 +15,19 @@ FCKConfig.ToolbarSets["Default-Learner"] = [
 	['FontFormat','FontName','FontSize']
 ] ;
 
+FCKConfig.ToolbarSets["Custom-Learner"] = [
+	['Preview','PasteWord'],
+	['Undo','Redo'],
+	['Bold','Italic','Underline', '-','Subscript','Superscript'],
+	['OrderedList','UnorderedList','-','Outdent','Indent'],
+	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
+	['Image','Link'],
+	['About'],
+	['TextColor','BGColor'],
+	['Table','Rule','Smiley','SpecialChar'],
+	['FontFormat','FontName','FontSize']
+] ;
+
 FCKConfig.EditorAreaCSS = FCKConfig.BasePath + '../../css/defaultHTML_learner.css' ;
 FCKConfig.SkinPath = FCKConfig.BasePath + 'skins/office2003/' ;
 FCKConfig.FirefoxSpellChecker = true;
