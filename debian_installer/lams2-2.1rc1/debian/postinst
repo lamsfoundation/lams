@@ -69,11 +69,11 @@ case "$1" in
             if [ ! -d /var/lib/mysql/lams/ ] ; then
                 mysql -e "create database $db_name default charset utf8;" \
                     -u root -p$db_root_pass || true
-                mysql -e "grant all privileges on $db_name.* to $db_user@localhost identified by '$db_pass';" \
-                    -u root -p$db_root_pass || true
-                mysql -e "revoke process,super on *.* from $db_user@localhost;" -u root -p$db_root_pass || true
-                mysql $db_name < /usr/share/jboss-4.0.2/server/default/lams.sql -u root -p$db_root_pass || true
             fi
+            mysql -e "grant all privileges on $db_name.* to $db_user@localhost identified by '$db_pass';" \
+                -u root -p$db_root_pass || true
+            mysql -e "revoke process,super on *.* from $db_user@localhost;" -u root -p$db_root_pass || true
+            mysql $db_name < /usr/share/jboss-4.0.2/server/default/lams.sql -u root -p$db_root_pass || true
             # Configure ServerURL and admin username/password
             mysql $db_name -e "update lams_configuration \
                 set config_value='$server_url' where config_key='ServerURL'" \
@@ -105,11 +105,11 @@ case "$1" in
         else
             if [ ! -d /var/lib/mysql/lams/ ] ; then
                 mysql -e "create database $db_name default charset utf8;" -u root || true
-                mysql -e "grant all privileges on $db_name.* to $db_user@localhost identified by '$db_pass';" \
-                    -u root || true
-                mysql -e "revoke process,super on *.* from $db_user@localhost;" -u root || true
-                mysql $db_name < /usr/share/jboss-4.0.2/server/default/lams.sql -u root || true 
             fi
+            mysql -e "grant all privileges on $db_name.* to $db_user@localhost identified by '$db_pass';" \
+                -u root || true
+            mysql -e "revoke process,super on *.* from $db_user@localhost;" -u root || true
+            mysql $db_name < /usr/share/jboss-4.0.2/server/default/lams.sql -u root || true 
             # Configure ServerURL and admin username/password
             mysql $db_name -e "update lams_configuration \
                 set config_value='$server_url' \
@@ -151,7 +151,9 @@ case "$1" in
         if [ ! -d /var/lib/lams/ ] ; then
             mkdir -p /var/lib/lams/
         fi
-        mv lams-www.war /var/lib/lams/
+        if [ ! -d /var/lib/lams/lams-www.war ]; then
+            mv lams-www.war /var/lib/lams/
+        fi
         ln -s /var/lib/lams/lams-www.war
 
         # Add user and group
