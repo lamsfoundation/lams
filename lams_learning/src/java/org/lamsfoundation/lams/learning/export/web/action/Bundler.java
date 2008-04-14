@@ -52,7 +52,7 @@ public class Bundler {
 		
 		for ( String directoryPath: directoriesRequired) {
 			File dir = new File(directoryPath);
-			if ( ! dir.mkdirs() )  {
+			if ( ! dir.exists() && ! dir.mkdirs() )  {
 				log.error("Unable to create directory for export portfolio: "+directoryPath);
 			}
 		}
