@@ -62,7 +62,6 @@ DAEMON_OPTS="$JAVA_OPTS \
 
 
 #set -e
-
 start() {
         start-stop-daemon --start --quiet --background --make-pidfile \
                 --pidfile /var/run/$NAME.pid --chuid lams:lams \
@@ -72,17 +71,18 @@ start() {
 
 stop() {
         start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid
-                
 }
 
 case "$1" in
   start)
-	echo "Starting $DESC: "
+	echo "$DESC is starting up."
 	start
 	;;
   stop)
-	echo "Stopping $DESC: "
+	echo -n "Stopping $DESC... "
 	stop
+	rm -f /var/run/$NAME.pid
+	echo "stopped."
 	;;
   status)
         if [ -e /var/run/$NAME.pid ]; then
@@ -97,6 +97,7 @@ case "$1" in
                 fi
             fi
         fi
+	echo "$DESC is not running."
         ;;
   restart|force-reload)
 	#
