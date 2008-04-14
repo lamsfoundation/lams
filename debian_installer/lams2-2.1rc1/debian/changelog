@@ -1,3 +1,10 @@
+lams2 (2.1rc1-2) unstable; urgency=low
+
+  * updated init script to remove pid file after stopping
+  * updated postinst
+
+ -- LAMS Development Team <lamsdev@melcoe.mq.edu.au>  Mon, 14 Apr 2008 15:43:10 +1000
+
 lams2 (2.1rc1-1) unstable; urgency=low
 
   * Initial release 
