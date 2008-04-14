@@ -23,7 +23,7 @@ Description: Enter a password for LAMS' MySQL user:
 Template: lams2/server_host
 Type: string
 Default: localhost
-Description: Enter the domain name or IP addres for your LAMS server:
+Description: Enter the domain name or IP address for your LAMS server:
  This is used to construct links and callbacks used by LAMS - it is mandatory
  for LAMS to be fully functional.  If possible, enter the value that
  users will put in their browsers when accessing LAMS (i.e. not an
