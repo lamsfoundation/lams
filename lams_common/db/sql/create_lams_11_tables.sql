@@ -338,6 +338,7 @@ ALTER TABLE lams_user MODIFY COLUMN chat_id VARCHAR(255)
       COMMENT 'ID used for Jabber';
 CREATE UNIQUE INDEX UQ_lams_user_login ON lams_user (login ASC);
 CREATE INDEX login ON lams_user (login ASC);
+CREATE INDEX email ON lams_user (email ASC);
 
 CREATE TABLE lams_learning_design (
        learning_design_id BIGINT(20) NOT NULL AUTO_INCREMENT
