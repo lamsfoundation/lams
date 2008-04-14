@@ -37,6 +37,7 @@ import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -139,14 +140,16 @@ public class GateAction extends LamsDispatchAction
         }
 
         if ( activity != null ) {
-	        
-            Integer totalNumActiveLearners =  learnerService.getCountActiveLearnersByLesson(lesson.getLessonId());
 	        //knock the gate
-	        boolean gateOpen = learnerService.knockGate(activityId,learner,forceGate);
+	        GateActivityDTO gate = learnerService.knockGate(activityId,learner,forceGate);
+
+	        if ( gate == null ) {
+	    		throw new LearnerServiceException("Gate missing. gate id ["+activityId+"]");
+	        }
 
 	        //if the gate is closed, ask the learner to wait ( updating the cached learner progress on the way )
-	        if ( ! gateOpen)  {
-	            ActionForward forward = findViewByGateType(mapping, (DynaActionForm)form, activity, totalNumActiveLearners, lesson);
+	        if ( ! gate.getGateOpen() )  {
+	            ActionForward forward = findViewByGateType(mapping, (DynaActionForm)form, gate, lesson);
 	    		LearningWebUtil.setupProgressInRequest((DynaActionForm)form, request, learnerProgress);
 	            return forward;
 	        }
@@ -169,101 +172,36 @@ public class GateAction extends LamsDispatchAction
      * class to tell the ActionServlet where to send the end-user.
      * @param gateForm The ActionForm class that will contain any data submitted
      * by the end-user via a form.
-     * @param permissionGate the gate acitivty object
+     * @param permissionGate the gate activity object
      * @param totalNumActiveLearners total number of active learners in the lesson (may not all be logged in)
      * @return An ActionForward class that will be returned to the ActionServlet 
      * 		   indicating where the user is to go next.
      */
     private ActionForward findViewByGateType(ActionMapping mapping, 
                                              DynaActionForm gateForm, 
-                                             Activity gate,
-                                             Integer totalNumActiveLearners,
+                                             GateActivityDTO gate,
                                              Lesson lesson)
     {
-        //dispatch the view according to the type of the gate.
-       	if ( gate != null ) {
-       		gateForm.set("totalLearners",totalNumActiveLearners);
-       		gateForm.set("previewLesson",lesson.isPreviewLesson());
-       		gateForm.set(AttributeNames.PARAM_ACTIVITY_ID,gate.getActivityId());
-       		gateForm.set(AttributeNames.PARAM_LESSON_ID, lesson.getLessonId());
-	        if(gate.isSynchGate())
-	            return viewSynchGate(mapping,gateForm,(SynchGateActivity)gate);
-	        else if(gate.isScheduleGate())
-	            return viewScheduleGate(mapping,gateForm,(ScheduleGateActivity)gate);
-	        else if(gate.isPermissionGate() || gate.isSystemGate())
-	            return viewPermissionGate(mapping,gateForm,(PermissionGateActivity)gate);
-	        else
-	            throw new LearnerServiceException("Invalid gate activity. " +
-	            		"gate id ["+gate.getActivityId()+"] - the type ["+
-	            		gate.getActivityTypeId()+"] is not a gate type");
-      	} else {
-    		throw new LearnerServiceException("Gate activity missing. " +
-        		"gate id ["+gate.getActivityId()+"]");
-    	}
-    }
-
-    /**
-     * Set up the form attributes specific to the permission gate and navigate
-     * to the permission gate view.
-     * @param mapping An ActionMapping class that will be used by the Action 
-     * class to tell the ActionServlet where to send the end-user.
-     * @param gateForm The ActionForm class that will contain any data submitted
-     * by the end-user via a form.
-     * @param permissionGate the gate activity object
-     * @return An ActionForward class that will be returned to the ActionServlet 
-     * 		   indicating where the user is to go next.
-     */
-    private ActionForward viewPermissionGate(ActionMapping mapping,
-                                             DynaActionForm gateForm,
-                                             PermissionGateActivity permissionGate)
-    {
-        gateForm.set("gate",permissionGate);
-        return mapping.findForward(VIEW_PERMISSION_GATE);
-    }
-
-    /**
-     * Set up the form attributes specific to the schedule gate and navigate
-     * to the schedule gate view.
-     * 
-     * @param mapping An ActionMapping class that will be used by the Action 
-     * class to tell the ActionServlet where to send the end-user.
-     * @param gateForm The ActionForm class that will contain any data submitted
-     * by the end-user via a form.
-     * @param permissionGate the gate acitivty object
-     * @return An ActionForward class that will be returned to the ActionServlet 
-     * 		   indicating where the user is to go next.
-     */
-    private ActionForward viewScheduleGate(ActionMapping mapping, 
-                                           DynaActionForm gateForm,
-                                           ScheduleGateActivity scheduleGate)
-    {
-        gateForm.set("gate",scheduleGate);
-        gateForm.set("waitingLearners",new Integer(scheduleGate.getWaitingLearners().size()));
-        gateForm.set("startingTime",scheduleGate.getGateStartDateTime());
-        gateForm.set("endingTime",scheduleGate.getGateEndDateTime());
-        
-        return mapping.findForward(VIEW_SCHEDULE_GATE);
-    }
-
-    /**
-     * Set up the form attributes specific to the synch gate and navigate
-     * to the synch gate view.
-     * 
-     * @param mapping An ActionMapping class that will be used by the Action 
-     * class to tell the ActionServlet where to send the end-user.
-     * @param gateForm The ActionForm class that will contain any data submitted
-     * by the end-user via a form.
-     * @param permissionGate the gate acitivty object
-     * @return An ActionForward class that will be returned to the ActionServlet 
-     * 		   indicating where the user is to go next.
-     */
-    private ActionForward viewSynchGate(ActionMapping mapping,
-                                        DynaActionForm gateForm,
-                                        SynchGateActivity synchgate)
-    {
-        gateForm.set("gate",synchgate);
-        gateForm.set("waitingLearners",new Integer(synchgate.getWaitingLearners().size()));
-        return mapping.findForward(VIEW_SYNCH_GATE);
+   		gateForm.set("totalLearners",new Integer(gate.getExpectedLearners().size()));
+        gateForm.set("waitingLearners",new Integer(gate.getWaitingLearners().size()));
+   		gateForm.set("previewLesson",lesson.isPreviewLesson());
+   		gateForm.set(AttributeNames.PARAM_ACTIVITY_ID,gate.getActivityId());
+   		gateForm.set(AttributeNames.PARAM_LESSON_ID, lesson.getLessonId());
+        gateForm.set("gate",gate);
+        if(gate.isSynchGate())  {
+            return mapping.findForward(VIEW_SYNCH_GATE);
+        } else if(gate.isScheduleGate()) {
+        	ScheduleGateActivity scheduleGate = (ScheduleGateActivity)gate.getGateActivity();
+            gateForm.set("startingTime",scheduleGate.getGateStartDateTime());
+            gateForm.set("endingTime",scheduleGate.getGateEndDateTime());
+            return mapping.findForward(VIEW_SCHEDULE_GATE);
+        } else if(gate.isPermissionGate() || gate.isSystemGate()) {
+            return mapping.findForward(VIEW_PERMISSION_GATE);
+        } else {
+            throw new LearnerServiceException("Invalid gate activity. " +
+            		"gate id ["+gate.getActivityId()+"] - the type ["+
+            		gate.getActivityTypeId()+"] is not a gate type");
+        }
     }
 
 }

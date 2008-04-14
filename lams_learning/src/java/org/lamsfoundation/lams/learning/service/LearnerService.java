@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.learning.progress.ProgressBuilder;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
@@ -620,7 +621,7 @@ public class LearnerService implements ICoreLearnerService
     /**
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#knockGate(java.lang.Long, org.lamsfoundation.lams.usermanagement.User)
      */
-    public boolean knockGate(Long gateActivityId, User knocker, boolean forceGate) {
+    public GateActivityDTO knockGate(Long gateActivityId, User knocker, boolean forceGate) {
     	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateActivityId, GateActivity.class);
     	if ( gate != null ) {
     		return knockGate(gate,knocker, forceGate);
@@ -633,13 +634,11 @@ public class LearnerService implements ICoreLearnerService
     /**
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#knockGate(org.lamsfoundation.lams.learningdesign.GateActivity, org.lamsfoundation.lams.usermanagement.User)
      */
-    public boolean knockGate(GateActivity gate, User knocker, boolean forceGate)
+    public GateActivityDTO knockGate(GateActivity gate, User knocker, boolean forceGate)
     {
     		Lesson lesson = getLessonByActivity(gate);
+    		List lessonLearners = getLearnersForGate(gate, lesson);
     		
-    		//get all learners who have started the lesson
-        	List lessonLearners = getActiveLearnersByLesson(lesson.getLessonId());
-        	
         	boolean gateOpen = false;
         	
         	if ( forceGate ) {
@@ -657,10 +656,59 @@ public class LearnerService implements ICoreLearnerService
 	        //update gate including updating the waiting list and gate status in
 	        //the database.
 	        activityDAO.update(gate);
-	        return gateOpen;
+	        return new GateActivityDTO(gate, lessonLearners);
 	        
     }
+
+	/**
+	 * Get all the learners who may come through this gate.
+	 * For a Group Based branch and the Teacher Grouped branch, it is the group of users in 
+	 * the Branch's group, but only the learners who have started the lesson.
+	 * Otherwise we just get all learners who have started the lesson.
+	 * @param gate
+	 * @param lesson
+	 * @return List of User
+	 */
+	private List getLearnersForGate(GateActivity gate, Lesson lesson) {
+
+		List lessonLearners = null;
+		Activity branchActivity = gate.getParentBranch();
+		while ( branchActivity != null &&  
+			! ( branchActivity.getParentActivity().isChosenBranchingActivity() || branchActivity.getParentActivity().isGroupBranchingActivity()) )  {
+			branchActivity = branchActivity.getParentBranch();
+		}
+		
+		if ( branchActivity !=null ) {
+			// set up list based on branch - all members of a group attached to the branch are destined for the gate
+			SequenceActivity branchSequence = (SequenceActivity) activityDAO.getActivityByActivityId(branchActivity.getActivityId(), SequenceActivity.class);
+			Set branchEntries = branchSequence.getBranchEntries();
+			Iterator entryIterator = branchEntries.iterator();
+			while (entryIterator.hasNext()) {
+				BranchActivityEntry branchActivityEntry = (BranchActivityEntry) entryIterator.next();
+				Group group = branchActivityEntry.getGroup();
+				if ( group != null ) {
+					List groupLearners = lessonService.getActiveLessonLearnersByGroup(lesson.getLessonId(), group.getGroupId());
+					if ( lessonLearners == null )
+						lessonLearners = groupLearners;
+					else 
+						lessonLearners.addAll(groupLearners);
+				}
+			}
+
+		} else {
+			lessonLearners = getActiveLearnersByLesson(lesson.getLessonId());
+		}
+		return lessonLearners;
+	}
     
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getWaitingGateLearners(org.lamsfoundation.lams.learningdesign.GateActivity)
+     */
+    public List getLearnersForGate(GateActivity gate)
+    {
+		return getLearnersForGate(gate, getLessonByActivity(gate));
+    }
+
     /**
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getLearnerActivityURL(java.lang.Integer, java.lang.Long)
      */

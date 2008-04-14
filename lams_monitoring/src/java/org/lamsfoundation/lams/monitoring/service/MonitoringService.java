@@ -46,6 +46,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
@@ -1100,7 +1101,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         	
         }else if ( activity.isGateActivity() ) {
         	GateActivity gate = (GateActivity) activity;
-        	if(learnerService.knockGate(gate,learner,false)){
+        	GateActivityDTO dto = learnerService.knockGate(gate,learner,false);
+        	if ( dto.getGateOpen() ){
         		//the gate is opened, continue to next activity to complete
         		learnerService.completeActivity(learner.getUserId(),activity,lessonId);
        			if ( log.isDebugEnabled()) {
@@ -1711,33 +1713,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     //---------------------------------------------------------------------
     // Helper Methods - start lesson
     //---------------------------------------------------------------------
-    /** 
-     * Is this activity inside a branch?
-     */
-    private boolean isInBranch(Activity activity, Set<Long> processedActivityIds) {
-    	
-    	Activity parent = activity.getParentActivity();
-
-    	if ( parent == null )
-    		return false;
-    	
-    	if ( parent.isBranchingActivity() )
-    		return true;
-    	
-    	// double check that we haven't already processed this activity. Should never happen but if it does it
-    	// would cause an infinite loop.
-    	Set<Long> processedActivityIdsTemp = processedActivityIds;
-    	if ( processedActivityIdsTemp == null ) {
-    		processedActivityIdsTemp = new HashSet<Long>();
-    	} else {
-    		if ( processedActivityIdsTemp.contains(activity.getActivityId()))
-    			return false;
-    	}
-    	processedActivityIdsTemp.add(activity.getActivityId());
-    	
-    	return isInBranch(parent, processedActivityIdsTemp);
-    }
-    
+     
     /**
      * If the activity is not grouped and not in a branch, then it create 
      * lams tool session for all the learners in the lesson. After the creation 
@@ -1751,7 +1727,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     private void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson) 
     {
-    	if ( activity.getApplyGrouping().equals(Boolean.FALSE) && ! isInBranch(activity, null) ) {
+    	if ( activity.getApplyGrouping().equals(Boolean.FALSE) && activity.getParentBranch() == null ) {
     		activity.setToolSessions(new HashSet());
     		try {
     		

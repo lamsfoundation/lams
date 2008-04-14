@@ -123,6 +123,14 @@ public class LessonService implements ILessonService
     }
 
 	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.lesson.service.ILessonService#getActiveLessonLearnersByGroup(java.lang.Long, java.lang.Long)
+	 */
+	public List getActiveLessonLearnersByGroup(Long lessonId, Long groupId)
+    {
+        return lessonDAO.getActiveLearnerByLessonAndGroup(lessonId, groupId);
+    }
+
+	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.lesson.service.ILessonService#getCountActiveLessonLearners(java.lang.Long)
 	 */
 	public Integer getCountActiveLessonLearners(Long lessonId)

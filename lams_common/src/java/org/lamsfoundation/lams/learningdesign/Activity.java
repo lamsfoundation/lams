@@ -1093,4 +1093,37 @@ public abstract class Activity implements Serializable,Nullable {
 		return null;
 	}
 	
+    /** 
+     * Is this activity inside a branch? If so, return turn branch activity (ie the sequence, not the
+     * branching activity. Returns null if not in a branch.
+     */
+    public Activity getParentBranch() {
+    	if ( isSequenceActivity() && getParentActivity() != null && getParentActivity().isBranchingActivity()) {
+    		// I'm a branch, so start the process off with my parent!
+    		return getParentBranch(getParentActivity(), new HashSet<Long>());
+    	} else {
+    		return getParentBranch(this, new HashSet<Long>());
+    	}
+    }
+
+    private Activity getParentBranch(Activity activity, Set<Long> processedActivityIds) {
+    	
+    	Activity parent = activity.getParentActivity();
+
+    	if ( parent == null )
+    		return null;
+    	
+    	if ( parent.isBranchingActivity() )
+    		return activity;
+    	
+    	// double check that we haven't already processed this activity. Should never happen but if it does it
+    	// would cause an infinite loop.
+   		if ( processedActivityIds.contains(activity.getActivityId()))
+   			return null;
+
+   		processedActivityIds.add(activity.getActivityId());
+    	
+    	return getParentBranch(parent, processedActivityIds);
+    }
+
 }

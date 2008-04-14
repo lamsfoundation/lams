@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.learning.service;
 import java.util.List;
 
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -229,9 +230,9 @@ public interface ICoreLearnerService extends ILearnerService
      * 			   synch gate, schedule gate or permission gate.
      * @param knocker the learner who wants to go through the gate.
      * @param forceGate if forceGate==true and the lesson is a preview lesson then the gate is opened straight away.
-     * @return true if the gate is now open
+     * @return Updated gate details
      */
-    public boolean knockGate(Long gateActivityId, User knocker, boolean forceGate);
+    public GateActivityDTO knockGate(Long gateActivityId, User knocker, boolean forceGate);
 
     /**
      * Check up the gate status to go through the gate. This also updates the gate.
@@ -243,9 +244,19 @@ public interface ICoreLearnerService extends ILearnerService
      * 			   as it might be out of date or not attached to the session
      * @param knocker the learner who wants to go through the gate.
      * @param forceGate if forceGate==true and the lesson is a preview lesson then the gate is opened straight away.
-     * @return true if the gate is now open
+     * @return Updated gate details
      */
-    public boolean knockGate(GateActivity gateActivity, User knocker, boolean forceGate);
+    public GateActivityDTO knockGate(GateActivity gateActivity, User knocker, boolean forceGate);
+    
+	/**
+	 * Get all the learners who may come through this gate.
+	 * For a Group Based branch and the Teacher Grouped branch, it is the group of users in 
+	 * the Branch's group, but only the learners who have started the lesson.
+	 * Otherwise we just get all learners who have started the lesson.
+	 * @param gate activity 
+	 * @return List of User
+	 */
+   public List getLearnersForGate(GateActivity gate);
     
     /** 
      * Get the learner url for a particular activity.

@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.learning.service;
 
 import org.lamsfoundation.lams.learning.progress.ProgressException;
+import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -348,9 +349,9 @@ public class TestLearnerService extends AbstractLamsTestCase
         //get sync gate
         GateActivity synchGate = (GateActivity)learnerService.getActivity(new Long(TEST_SYNCHGATE_ACTIVITY_ID));
         
-        boolean gateOpen = learnerService.knockGate(synchGate.getActivityId(),testUser,false);
+        GateActivityDTO gateDTO = learnerService.knockGate(synchGate.getActivityId(),testUser,false);
         
-        assertTrue("gate is closed",!gateOpen);
+        assertTrue("gate is closed",!gateDTO.getGateOpen());
         synchGate = (GateActivity)learnerService.getActivity(new Long(TEST_SYNCHGATE_ACTIVITY_ID));
         
         assertEquals("one learner is waiting",1,synchGate.getWaitingLearners().size());
@@ -363,8 +364,8 @@ public class TestLearnerService extends AbstractLamsTestCase
         //get sync gate
         GateActivity synchGate = (GateActivity)learnerService.getActivity(new Long(TEST_SYNCHGATE_ACTIVITY_ID));
 
-        boolean gateOpen = learnerService.knockGate(synchGate.getActivityId(),testUser2,false);
-        assertTrue("gate is closed",gateOpen);
+        GateActivityDTO gateDTO = learnerService.knockGate(synchGate.getActivityId(),testUser2,false);
+        assertTrue("gate is open",gateDTO.getGateOpen());
 
         synchGate = (GateActivity)learnerService.getActivity(new Long(TEST_SYNCHGATE_ACTIVITY_ID));
 

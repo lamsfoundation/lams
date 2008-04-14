@@ -63,6 +63,9 @@ public interface ILessonService {
 	/** Get all the learners who have started the lesson. They may not be currently online.*/
 	public abstract List getActiveLessonLearners(Long lessonId);
 
+	/** Get all the learners who have started the lesson and are part of a given group. They may not be currently online.*/
+	public abstract List getActiveLessonLearnersByGroup(Long lessonId, Long groupId);
+
 	/** 
 	 * Get the count of all the learners who have started the lesson. They may not be currently online.
 	 */
