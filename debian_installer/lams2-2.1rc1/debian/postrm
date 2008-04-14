@@ -48,9 +48,9 @@ case "$1" in
 
         # Drop the database
         if [ "$db_root_pass" != "" ] ; then
-            mysql -e "drop database if exists lams" -u lams -plamsdbpasswd || true
+            mysql -e "drop database if exists lams" -u root -p$db_root_pass || true
         else
-            mysql -e "drop database if exists lams" -u lams || true
+            mysql -e "drop database if exists lams" -u root || true
         fi
     ;;
 
