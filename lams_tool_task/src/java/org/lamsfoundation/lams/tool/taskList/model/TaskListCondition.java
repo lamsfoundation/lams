@@ -184,8 +184,6 @@ public class TaskListCondition implements Cloneable{
      * @hibernate.collection-key column="condition_uid"
      * @hibernate.collection-many-to-many column="uid" class="org.lamsfoundation.lams.tool.taskList.model.TaskListItem"
 	 */
-	 
-	 //TODO maybe th reason of a problem cascade="all"!!!
 	public Set getTaskListItems() {
 		return taskListItems;
 	}

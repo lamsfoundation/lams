@@ -25,9 +25,11 @@ package org.lamsfoundation.lams.tool.taskList.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -90,7 +92,7 @@ public class TaskList implements Cloneable{
 	private List<TaskListAttachment> offlineFileList;
 	
 	/**
-	 * Default contruction method. 
+	 * Default contructor. 
 	 */
   	public TaskList(){
   		attachments = new HashSet();
@@ -125,6 +127,7 @@ public class TaskList implements Cloneable{
   		try{
   			taskList = (TaskList) super.clone();
   			taskList.setUid(null);
+  			
   			//clone taskListItems
   			if(taskListItems != null){
   				Iterator iter = taskListItems.iterator();
@@ -151,35 +154,43 @@ public class TaskList implements Cloneable{
   				}
   				taskList.attachments = set;
   			}
+  			
   			//clone conditions
   			if(conditions != null){
-  				Iterator iter = conditions.iterator();
-  				Set set = new HashSet();
-  				while(iter.hasNext()){
-  					TaskListCondition condition = (TaskListCondition)iter.next(); 
+  				
+  	  			// create map of pairs: sequenceId that corresponds to appropreate
+  				// taskListItem. Will need then for making ties beetween conditions'
+  				// taskListItems and real ones.
+  	  			HashMap<Integer, TaskListItem> taskListItemsSeq = new HashMap<Integer, TaskListItem>();
+  	  			for(Object itemObject:taskListItems) {
+  	  				TaskListItem item = (TaskListItem) itemObject;
+  	  				taskListItemsSeq.put(item.getSequenceId(), item);
+  	  			}
+
+  				Set newConditions = new HashSet();
+  				Iterator conds = conditions.iterator();
+  				while(conds.hasNext()){
+  					TaskListCondition condition = (TaskListCondition)conds.next(); 
   					TaskListCondition newCondition = (TaskListCondition) condition.clone();
   					
   		  			//picking up all the taskListItems that condition had
   		  			if(condition.getTaskListItems() != null){
-  		  				Set set2 = new HashSet();
-  		  				newCondition.setTaskListItems(set2);
-//		  				Iterator iter2 = taskListItems.iterator();  		  				
-//  		  				while(iter.hasNext()){
-//  		  					TaskListItem item = (TaskListItem)iter.next(); 
-//  		  					TaskListItem newItem = (TaskListItem) item.clone();
-//  		  					//just clone old file without duplicate it in repository
-//  							set.add(newItem);
-//  		  				}
+  		  				Set condTaskListItems = new HashSet();
   		  				
+		  				Iterator iterCondItems = condition.getTaskListItems().iterator();  		  				
+  		  				while(iterCondItems.hasNext()){
+  		  					TaskListItem item = (TaskListItem)iterCondItems.next();
+  		  					
+  		  					condTaskListItems.add(taskListItemsSeq.get(item.getSequenceId()));
+  		  				}
+  		  				newCondition.setTaskListItems(condTaskListItems);
   		  			}
-  					
-  					
-  					
-					set.add(newCondition);
+					newConditions.add(newCondition);
   				}
-  				taskList.conditions = set;
+  				taskList.conditions = newConditions;
   			}
-  			//clone ReourceUser as well
+  			
+  			//clone ResourceUser as well
   			if(this.createdBy != null){
   				taskList.setCreatedBy((TaskListUser) this.createdBy.clone());
   			}

@@ -38,7 +38,7 @@
             table="tl_latask10_condition_tl_item"
             lazy="true"
             inverse="false"
-            cascade="all"
+            cascade="none"
             sort="unsorted"
         >
 

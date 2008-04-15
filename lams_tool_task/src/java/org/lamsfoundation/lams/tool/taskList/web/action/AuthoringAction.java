@@ -430,26 +430,26 @@ public class AuthoringAction extends Action {
     	}
     	
     	
-		//Handle taskList items
-    	SortedSet<TaskListCondition> conditions = getTaskListConditionList(sessionMap);
-    	for (TaskListCondition condition:conditions) {
-    		
-    		
-    		Set itemList2 = new LinkedHashSet();
-    		Set topics2 = condition.getTaskListItems();
-        	iter = topics2.iterator();
-        	while(iter.hasNext()){
-        		TaskListItem item2 = (TaskListItem) iter.next();
-        		if(item2 != null){
-    				//This flushs user UID info to message if this user is a new user. 
-    				item2.setCreateBy(taskListUser);
-    				itemList2.add(item2);
-        		}
-        	}
-        	condition.setTaskListItems(itemList2);
-        	
-        	
-    	}
+//		//Handle taskList items
+//    	SortedSet<TaskListCondition> conditions = getTaskListConditionList(sessionMap);
+//    	for (TaskListCondition condition:conditions) {
+//    		
+//    		
+//    		Set itemList2 = new LinkedHashSet();
+//    		Set topics2 = condition.getTaskListItems();
+//        	iter = topics2.iterator();
+//        	while(iter.hasNext()){
+//        		TaskListItem item2 = (TaskListItem) iter.next();
+//        		if(item2 != null){
+//    				//This flushs user UID info to message if this user is a new user. 
+//    				item2.setCreateBy(taskListUser);
+//    				itemList2.add(item2);
+//        		}
+//        	}
+//        	condition.setTaskListItems(itemList2);
+//        	
+//        	
+//    	}
     	
 
     	
@@ -475,7 +475,7 @@ public class AuthoringAction extends Action {
 		//finally persist taskListPO again
 		service.saveOrUpdateTaskList(taskListPO);
 		
-		
+		service.getTaskListByContentId(taskListPO.getContentId());
 		
 		//initialize attachmentList again
 		attachmentList = getAttachmentList(sessionMap);

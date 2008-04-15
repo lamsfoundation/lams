@@ -30,7 +30,8 @@ language_file,
 classpath_addition,
 context_file,
 create_date_time,
-modified_date_time
+modified_date_time,
+supports_outputs
 )
 VALUES
 (
@@ -60,5 +61,6 @@ NULL,
 'lams-tool-latask10.jar',
 '/org/lamsfoundation/lams/tool/taskList/taskListApplicationContext.xml',
 NOW(),
-NOW()
+NOW(),
+1
 )

@@ -265,9 +265,7 @@ public class LearningAction extends Action {
 		//get back SessionMap
 		String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		
-		//get mode and ToolSessionID from sessionMAP
-		ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+
 		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		
 		//auto run mode, when use finish the only one taskList item, mark it as complete then finish this activity as well.

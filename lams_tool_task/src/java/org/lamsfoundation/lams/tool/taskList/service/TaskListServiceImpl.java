@@ -490,6 +490,40 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	/** 
 	 * {@inheritDoc}
 	 */
+	public boolean checkCondition(String conditionName, Long toolSessionId, Long userUid) {
+		TaskListUser user = taskListUserDao.getUserByUserIDAndSessionID(userUid, toolSessionId);
+		TaskList taskList = taskListSessionDao.getSessionBySessionId(toolSessionId).getTaskList();
+		Set<TaskListCondition> conditions = taskList.getConditions();
+		TaskListCondition condition = null;
+		for (TaskListCondition cond:conditions) {
+			if (cond.getName().equals(conditionName)) {
+				condition = cond;
+				break;
+			}
+		}
+
+		boolean result = false;
+		if (condition != null) {
+			Iterator it = condition.getTaskListItems().iterator();
+			while(it.hasNext()) {
+				TaskListItem item = (TaskListItem) it.next();
+				
+				TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(), user.getUid());
+				if (visitLog != null) {
+					result &= visitLog.isComplete();
+				} else {
+					result = false;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/** 
+	 * {@inheritDoc}
+	 */
 	public TaskSummary getTaskSummary(Long contentId, Long taskListItemUid) {
 		
 		TaskListItem taskListItem = taskListItemDao.getByUid(taskListItemUid);

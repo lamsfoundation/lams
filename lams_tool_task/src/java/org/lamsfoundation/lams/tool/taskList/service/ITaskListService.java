@@ -55,11 +55,26 @@ public interface ITaskListService {
 	
 	
 	/**
+	 * Returns number of tasks completed by user. Used in <code>TaskListOutputFactory</code>.
+	 * 
 	 * @param toolSessionId
 	 * @param userUid
 	 * @return
 	 */
 	public int getNumTasksCompletedByUser(Long toolSessionId, Long userUid);
+	
+
+	/**
+	 * Checks current condition for matching. This condition belongs to the
+	 * taskList from this particular toolSession.Used in
+	 * <code>TaskListOutputFactory</code>.
+	 * 
+	 * @param conditionName name of a condition
+	 * @param toolSessionId session Id contains particular taskList
+	 * @param userUid user for whom this condition is being checked
+	 * @return
+	 */
+	public boolean checkCondition(String conditionName, Long toolSessionId,	Long userUid);
 	
 	/**
 	 * Get <code>TaskList</code> by toolContentID.
