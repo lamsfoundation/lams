@@ -2281,6 +2281,10 @@
 <index-description></index-description>
 <index-column name="login" sort="ASC"/>
 </index>
+<index alias="" name="email" remarks="" uid="463940:1194f45836a:-7fc1" unique="false">
+<index-description></index-description>
+<index-column name="email" sort="ASC"/>
+</index>
 </index-list>
 </table>
 <table alias="" name="lams_user_organisation" remarks="" uid="7725df:115cb718d5c:-7bf0">
@@ -3251,11 +3255,11 @@ It will be used for the IMS LD import/export.</column-description>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="false" name="supports_outputs" remarks="" uid="776368:118bf867979:-7fbf">
 <column-description></column-description>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant type-name-pattern="TINYINT"/>
 <variant type-name-pattern="TINYINT UNSIGNED"/>
 <variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
 <variant type-name-pattern="TINYINT ZEROFILL"/>
-<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
