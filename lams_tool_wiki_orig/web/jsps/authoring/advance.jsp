@@ -41,6 +41,15 @@
 </p>
 
 <p>
+	<html:checkbox property="wiki.allowRevertPage" styleClass="noBorder"
+		styleId="allowRevertPage">
+	</html:checkbox>
+	<label for="allowRevertPage">
+		<fmt:message key="label.authoring.advance.allow.revert.page" />
+	</label>
+</p>
+
+<p>
 	<html:checkbox property="wiki.allowUpload" styleClass="noBorder"
 		styleId="allowUpload">
 	</html:checkbox>

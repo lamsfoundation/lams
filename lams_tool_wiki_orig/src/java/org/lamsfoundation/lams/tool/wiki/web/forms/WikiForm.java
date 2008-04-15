@@ -116,6 +116,7 @@ public class WikiForm extends ActionForm {
     	wiki.setAllowNewWikiPage(false);
     	wiki.setAllowAttachImage(false);
     	wiki.setAllowInsertLink(false);
+    	wiki.setAllowRevertPage(false);
     	wiki.setAllowUpload(false);
     	wiki.setReflectOnActivity(false);
     }

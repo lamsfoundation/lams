@@ -59,6 +59,7 @@ public class Wiki implements Cloneable{
 	private boolean allowNewWikiPage;
 	private boolean allowAttachImage;
 	private boolean allowInsertLink;
+	private boolean allowRevertPage;
 	private boolean allowUpload;
 	private int maximumReply;
 	private int minimumReply;
@@ -479,9 +480,19 @@ public class Wiki implements Cloneable{
 		this.allowInsertLink = allowInsertLink;
 	}
 	/**
+	 * @hibernate.property column="allow_revert_page"
+	 * @return
+	 */	
+	public boolean isAllowRevertPage() {
+		return allowRevertPage;
+	}
+	public void setAllowRevertPage(boolean allowRevertPage) {
+		this.allowRevertPage = allowRevertPage;
+	}
+	/**
 	 * @hibernate.property column="allow_upload"
 	 * @return
-	 */
+	 */	
 	public boolean isAllowUpload() {
 		return allowUpload;
 	}

@@ -63,6 +63,7 @@ public interface WikiConstants {
 	public static final String ATTR_ALLOW_NEW_WIKI_PAGES = "allowNewWikiPages";
 	public static final String ATTR_ALLOW_ATTACH_IMAGES = "allowAttachImages";
 	public static final String ATTR_ALLOW_INSERT_LINKS = "allowInsertLinks";
+	public static final String ATTR_ALLOW_REVERT_PAGES = "allowRevertPages";
 	public static final String ATTR_ALLOW_RICH_EDITOR = "allowRichEditor";
 
 	public static final String ONLINE_ATTACHMENT = "online_att";
