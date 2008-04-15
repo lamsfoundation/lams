@@ -920,7 +920,6 @@ public class WikiService implements IWikiService,ToolContentManager,ToolSessionM
 	    	toolContentObj.setCreated(now);
 	    	toolContentObj.setDefineLater(Boolean.FALSE);		    	
 	    	toolContentObj.setInstructions(WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	    	toolContentObj.setLimitedChar(5000); // this is the default value
    	    	toolContentObj.setReflectOnActivity(Boolean.FALSE);
 	    	toolContentObj.setReflectInstructions(null);
 

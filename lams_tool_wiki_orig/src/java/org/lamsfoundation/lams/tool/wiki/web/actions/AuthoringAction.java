@@ -932,12 +932,6 @@ public class AuthoringAction extends Action {
 			if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){
 				return errors;
 			}
-			/*if(!form.getWiki().isAllowRichEditor() && form.getWiki().isLimitedInput()){
-				if(form.getWiki().getLimitedChar() <=0){
-					ActionMessage error = new ActionMessage("error.limit.char.less.zero");
-					errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-				}
-			}*/
 			if(!form.getWiki().isAllowNewWikiPage()){
 				if(form.getWiki().getMaximumReply() !=0 
 						&& (form.getWiki().getMaximumReply() < form.getWiki().getMinimumReply())){

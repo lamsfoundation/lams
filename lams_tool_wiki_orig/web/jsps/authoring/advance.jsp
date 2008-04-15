@@ -50,16 +50,6 @@
 </p>
 
 <p>
-	<html:checkbox property="wiki.limitedInput" styleId="limitedInput"	styleClass="noBorder">
-	</html:checkbox>
-	<label for="limitedInput">
-		<fmt:message key="label.authoring.advance.limited.input" />
-	</label>
-
-	<html:text property="wiki.limitedChar" styleId="limitedChar" />
-</p>
-
-<p>
 	<html:checkbox property="wiki.reflectOnActivity" styleClass="noBorder"	styleId="reflectOn">
 	</html:checkbox>
 	<label for="reflectOn">
@@ -138,37 +128,6 @@
 </p>
 
 <script type="text/javascript">
-			var limit = document.getElementById("limitedInput");
-			var limitChar = document.getElementById("limitedChar");
-
-			limit.onclick= initAdvanced;
-			function initAdvanced(){
-				if(limit.checked){
-					limitChar.disabled=false;
-				}else{
-					limitChar.disabled=true;
-				}
-				
-			}
-			initAdvanced();
-			limitChar.onblur=function(){
-				var min = 0;
-				var errors = '';
-				var num = parseFloat(this.value);
-				if(isNaN(num)) 
-					errors = '<fmt:message key="js.error.invalid.number"/>\n';
-				else if (num <= min)
-					errors = '<fmt:message key="js.error.min.number"/>';
-				if(errors)
-					alert('<fmt:message key="js.error.title"/>\n'+errors);
-				
-			}
-			
-			var min = document.getElementById("minimumReply");
-			var max = document.getElementById("maximumReply");
-			min.disabled=false;
-			max.disabled=false;
-			
 			function checkReflection(){
 				var ropt = document.getElementById("reflectOn");
 				var rins = document.getElementById("reflectInstructions");

@@ -75,8 +75,6 @@ public class Wiki implements Cloneable{
 	
 	private Set messages;
 	private Set attachments;
-	private int limitedChar;
-    private boolean limitedInput;
     
 	private boolean reflectOnActivity;
 	private String reflectInstructions;
@@ -443,26 +441,6 @@ public class Wiki implements Cloneable{
 		toContent = (Wiki) fromContent.clone();
 		toContent.setContentId(contentId);
 		return toContent;
-	}
-	/**
-	 * @hibernate.property column="limited_of_chars"
-	 * @return
-	 */
-	public int getLimitedChar() {
-		return limitedChar;
-	}
-	public void setLimitedChar(int limitedChar) {
-		this.limitedChar = limitedChar;
-	}
-	/**
-	 * @hibernate.property column="limited_input_flag"
-	 * @return
-	 */
-	public boolean isLimitedInput() {
-		return limitedInput;
-	}
-	public void setLimitedInput(boolean limitedInput) {
-		this.limitedInput = limitedInput;
 	}
 	public WikiToolContentHandler getToolContentHandler() {
 		return toolContentHandler;

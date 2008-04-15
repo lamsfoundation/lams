@@ -206,15 +206,8 @@ public class LearningAction extends Action {
 			wikiService.updateWiki(wiki);
 		}
 		
-		//set some option flag to HttpSession
-		// if allowRichEditor = true then don't restrict the number of chars
-		// if isLimitedInput = false then don't restrict the number of chars
-		// Indicate don't restrict number of chars by allowNumber = 0
 		Long wikiId = wiki.getUid();
-		//Boolean allowRichEditor = new Boolean(wiki.isAllowRichEditor());
 		Boolean allowRichEditor = new Boolean(true);
-		//int allowNumber = wiki.isLimitedInput() || wiki.isAllowRichEditor() ? wiki.getLimitedChar() : 0;
-		int allowNumber = wiki.getLimitedChar();
 		
 		// get notebook entry
 		String entryText = new String();
@@ -234,7 +227,6 @@ public class LearningAction extends Action {
 		sessionMap.put(WikiConstants.ATTR_ALLOW_ATTACH_IMAGES,wiki.isAllowAttachImage());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_INSERT_LINKS,wiki.isAllowInsertLink());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_RICH_EDITOR,allowRichEditor);
-		sessionMap.put(WikiConstants.ATTR_LIMITED_CHARS,new Integer(allowNumber));
 		sessionMap.put(WikiConstants.ATTR_REFLECTION_ON,wiki.isReflectOnActivity());
 		sessionMap.put(WikiConstants.ATTR_REFLECTION_INSTRUCTION,wiki.getReflectInstructions());
 		sessionMap.put(WikiConstants.ATTR_REFLECTION_ENTRY, entryText);

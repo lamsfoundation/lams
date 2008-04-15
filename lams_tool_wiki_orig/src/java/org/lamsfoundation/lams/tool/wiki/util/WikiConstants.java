@@ -64,7 +64,6 @@ public interface WikiConstants {
 	public static final String ATTR_ALLOW_ATTACH_IMAGES = "allowAttachImages";
 	public static final String ATTR_ALLOW_INSERT_LINKS = "allowInsertLinks";
 	public static final String ATTR_ALLOW_RICH_EDITOR = "allowRichEditor";
-	public static final String ATTR_LIMITED_CHARS = "limitedChars";
 
 	public static final String ONLINE_ATTACHMENT = "online_att";
 	public static final String OFFLINE_ATTACHMENT = "offline_att";
