@@ -106,7 +106,8 @@ public class MainExportServlet extends HttpServlet {
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException, IOException, ExportPortfolioException{
-	    
+
+		log.debug("Doing export portfolio");
 		Portfolio portfolios = null;
 		Long lessonID = null;
 		String role = null;
@@ -119,6 +120,12 @@ public class MainExportServlet extends HttpServlet {
 		IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(this.getServletContext());
 		
 		String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);
+
+		if ( log.isDebugEnabled() ) {
+			int numCookies = cookies != null ? cookies.length : 0;
+			log.debug("Export portfolio: mode "+mode+" # cookies "+new Integer(numCookies).toString());
+		}
+		
 		if (mode.equals(ToolAccessMode.LEARNER.toString()))
 		{
 			// TODO check if the user id is coming from the request then the current user should have monitoring privilege
