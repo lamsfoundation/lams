@@ -138,7 +138,7 @@
 						<!--  Edit Button -->
 						<c:if test="${not hidden}">
 							<c:if
-								test='${(sessionMap.mode == "teacher") || (not sessionMap.finishedLock && sessionMap.allowEdit && (empty msgDto.mark))}'>
+								test='${(sessionMap.mode == "teacher") || (not sessionMap.finishedLock && (empty msgDto.mark))}'>
 								<c:set var="edittopic">
 									<html:rewrite
 										page="/learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}" />

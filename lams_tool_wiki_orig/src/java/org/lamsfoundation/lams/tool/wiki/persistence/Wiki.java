@@ -56,7 +56,6 @@ public class Wiki implements Cloneable{
 	private boolean lockWhenFinished;
 	private boolean runOffline;
 	private boolean allowAnonym;
-	private boolean allowEdit;
 	private boolean allowNewWikiPage;
 	private boolean allowAttachImage;
 	private boolean allowInsertLink;
@@ -438,17 +437,6 @@ public class Wiki implements Cloneable{
 		this.contentId = contentId;
 	}
 
-	/**
-	 * @hibernate.property column="allow_edit"
-	 * @return
-	 */
-	public boolean isAllowEdit() {
-		return allowEdit;
-	}
-	public void setAllowEdit(boolean allowEdit) {
-		this.allowEdit = allowEdit;
-	}
-	
 	public static Wiki newInstance(Wiki fromContent, Long contentId, WikiToolContentHandler wikiToolContentHandler){
 		Wiki toContent = new Wiki();
 		fromContent.toolContentHandler = wikiToolContentHandler;

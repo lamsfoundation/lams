@@ -229,7 +229,6 @@ public class LearningAction extends Action {
 		sessionMap.put(AttributeNames.ATTR_MODE, mode);
 		sessionMap.put(WikiConstants.ATTR_FINISHED_LOCK, new Boolean(lock));
 		sessionMap.put(WikiConstants.ATTR_USER_FINISHED, wikiUser.isSessionFinished());
-		sessionMap.put(WikiConstants.ATTR_ALLOW_EDIT, wiki.isAllowEdit());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_UPLOAD,wiki.isAllowUpload());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_NEW_WIKI_PAGES,wiki.isAllowNewWikiPage());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_ATTACH_IMAGES,wiki.isAllowAttachImage());

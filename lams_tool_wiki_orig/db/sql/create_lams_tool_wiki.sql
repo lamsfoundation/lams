@@ -34,7 +34,6 @@ create table tl_lawiki10_wiki (
    content_in_use smallint,
    define_later smallint,
    content_id bigint unique,
-   allow_edit smallint,
    allow_rich_editor smallint,
    allow_new_wiki_page smallint,
    allow_attach_image smallint,
@@ -120,9 +119,9 @@ alter table tl_lawiki10_message_seq add index FK_NEW_1983840333_D2C71F8845213B4D
 alter table tl_lawiki10_tool_session add index FK_NEW_1983840333_5A04D7AE131CE31E (wiki_uid), add constraint FK_NEW_1983840333_5A04D7AE131CE31E foreign key (wiki_uid) references tl_lawiki10_wiki (uid);
 
 
-INSERT INTO tl_lawiki10_wiki (uid,title,instructions,online_instructions,offline_instructions,content_id,allow_anonym,run_offline,lock_on_finished,content_in_use,define_later,allow_edit,allow_rich_editor,
+INSERT INTO tl_lawiki10_wiki (uid,title,instructions,online_instructions,offline_instructions,content_id,allow_anonym,run_offline,lock_on_finished,content_in_use,define_later,allow_rich_editor,
  allow_new_wiki_page,allow_attach_image,allow_insert_link,allow_upload,maximum_reply, minimum_reply,limited_input_flag,limited_of_chars,reflect_on_activity) 
-VALUES(1,"Wiki","Instructions",null,null,${default_content_id},0,0,0,0,0,1,0,1,1,0,0,0,0,1,5000,0);
+VALUES(1,"Wiki","Instructions",null,null,${default_content_id},0,0,0,0,0,0,1,1,0,0,0,0,1,5000,0);
 
 INSERT INTO `tl_lawiki10_message` (`uid`, `create_date`, `last_reply_date`, `update_date`, `create_by`, `modified_by`, `subject`, `body`, `is_authored`, `is_anonymous`, `wiki_session_uid`, `parent_uid`, `wiki_uid`, `reply_number`, `hide_flag`, `report_id`) VALUES 
   (1,NOW(),NOW(),NOW(),null,null,'Wiki Page','Wiki content',1,0,NULL,NULL,1,0,0,NULL);

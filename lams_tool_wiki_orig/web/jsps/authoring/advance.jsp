@@ -40,16 +40,6 @@
 	</label>
 </p>
 
-
-<p>
-	<html:checkbox property="wiki.allowEdit" styleClass="noBorder"
-		styleId="allowEdit">
-	</html:checkbox>
-	<label for="allowEdit">
-		<fmt:message key="label.authoring.advance.allow.edit" />
-	</label>
-</p>
-
 <p>
 	<html:checkbox property="wiki.allowUpload" styleClass="noBorder"
 		styleId="allowUpload">

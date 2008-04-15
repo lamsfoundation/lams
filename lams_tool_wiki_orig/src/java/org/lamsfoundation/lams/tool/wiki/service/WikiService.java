@@ -910,7 +910,6 @@ public class WikiService implements IWikiService,ToolContentManager,ToolSessionM
 	    	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 
 	    	toolContentObj.setAllowAnonym(Boolean.FALSE);
-	    	toolContentObj.setAllowEdit(Boolean.TRUE); // this is the default value
 	    	toolContentObj.setAllowNewWikiPage(Boolean.FALSE); // this is the default value
 	    	toolContentObj.setAllowAttachImage(Boolean.TRUE); // this is the default value
 	    	toolContentObj.setAllowInsertLink(Boolean.FALSE); // this is the default value
