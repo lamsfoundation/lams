@@ -154,7 +154,7 @@ case "$1" in
         if [ ! -d /var/lib/lams/lams-www.war ]; then
             mv lams-www.war /var/lib/lams/
         fi
-        ln -s /var/lib/lams/lams-www.war
+        ln -s /var/lib/lams/lams-www.war 2>/dev/null || true
 
         # Add user and group
         adduser --system --group --no-create-home lams 2> /dev/null
