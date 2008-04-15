@@ -32,6 +32,16 @@
 </p>
 
 <p>
+	<html:checkbox property="wiki.allowInsertLink" styleClass="noBorder"
+		styleId="allowInsertLink">
+	</html:checkbox>
+	<label for="allowInsertLink">
+		<fmt:message key="label.authoring.advance.allow.insert.link" />
+	</label>
+</p>
+
+
+<p>
 	<html:checkbox property="wiki.allowEdit" styleClass="noBorder"
 		styleId="allowEdit">
 	</html:checkbox>
