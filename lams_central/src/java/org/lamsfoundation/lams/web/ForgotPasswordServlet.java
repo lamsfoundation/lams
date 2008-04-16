@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Calendar;
 import java.util.Properties;
 import java.util.List;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -54,11 +55,13 @@ public class ForgotPasswordServlet extends HttpServlet
 	public static String SUCCESS_CHANGE_PASS 		= "heading.password.changed.screen";
 	public static String EMAIL_NOT_FOUND			= "error.email.not.found";
 	public static String MULTIPLE_EMAILS			= "error.multiple.emails";
+	public static String EMAIL_FAILED				= "error.email.not.sent";
 	
-	public static int MILLISECONDS_IN_A_DAY 	= 86400000;
+	private static int MILLISECONDS_IN_A_DAY 	= 86400000;
 	
 	private static String STATE = "&state=";
 	private static String LANGUAGE_KEY = "&languageKey=";
+	private static String EMAIL_SENT = "&emailSent=";
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response) 
 		throws ServletException, IOException 
@@ -81,7 +84,7 @@ public class ForgotPasswordServlet extends HttpServlet
 			}
 
 
-			handleEmailRequest(findByEmail, param, response);
+			handleEmailRequest(findByEmail, param.trim(), response);
 		}
 		else if (method.equals("requestPasswordChange"))
 		{
@@ -122,7 +125,7 @@ public class ForgotPasswordServlet extends HttpServlet
 
 		String SMPTServer = Configuration.get("SMTPServer");
 		String supportEmail = Configuration.get("LamsSupportEmail");
-		
+		User user = null;
 
 		if (SMPTServer==null||SMPTServer.equals("")||supportEmail==null||supportEmail.equals(""))
 		{
@@ -134,10 +137,7 @@ public class ForgotPasswordServlet extends HttpServlet
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
 			IUserManagementService userService = (IUserManagementService) ctx.getBean("userManagementService");
 			MessageService messageService = (MessageService)ctx.getBean("centralMessageService");
-	
 
-			User user = null;
-			
 			// get the user by email or login
 			if (!findByEmail)
 			{
@@ -207,32 +207,45 @@ public class ForgotPasswordServlet extends HttpServlet
 				catch (AddressException e) 
 		        {
 					// failure handling
-					log.debug(e);
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					log.error("Problem sending email to: " +user.getLogin()+ " with email: " + user.getEmail(), e);
+					//response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					languageKey = EMAIL_FAILED;
+					success = 0;
 		        } 
 		        catch (MessagingException e) 
 		        {
 		        	// failure handling 
-		        	log.debug(e);
-		        	response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		        	log.error("Problem sending email to: " +user.getLogin()+ " with email: " + user.getEmail(), e);
+		        	//response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		        	languageKey = EMAIL_FAILED;
+		        	success = 0;
 		        }
 				catch (Exception e)
 				{
 					// failure handling
-					log.debug(e);	
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					log.error("Problem sending email to: " +user.getLogin()+ " with email: " + user.getEmail(), e);	
+					languageKey = EMAIL_FAILED;
+					success = 0;
+					//response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				}
+				
+				
 			}
 		
 		}
 			
-	
-
-		response.sendRedirect(Configuration.get("ServerURL") + "forgotPasswordProc.jsp?" + 
+		String redirectStr = Configuration.get("ServerURL") + "forgotPasswordProc.jsp?" + 
 			STATE + 
 			success + 
 			LANGUAGE_KEY + 
-			languageKey);
+			languageKey;
+		
+		if (success==1 && user.getEmail()!=null)
+		{
+			redirectStr += EMAIL_SENT +java.net.URLEncoder.encode(user.getEmail(), "UTF-8");
+		}
+
+		response.sendRedirect(redirectStr);
 
 	}
 	
@@ -245,7 +258,7 @@ public class ForgotPasswordServlet extends HttpServlet
 	{
 		int success=0;
 		String languageKey = "";
-		
+
 		if (key==null||key.equals("")||newPassword==null||newPassword.equals(""))
 		{
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -278,7 +291,8 @@ public class ForgotPasswordServlet extends HttpServlet
 				STATE + 
 				success + 
 				LANGUAGE_KEY + 
-				languageKey);
+				languageKey 
+		);
 	}
 	
 	/**
