@@ -21,44 +21,75 @@
         
         function toHome() {window.location="<lams:LAMSURL/>index.do";};
         
-        
         function validateForm()
         {
-            var login = document.getElementById("login").value;
-            var email = document.getElementById("email").value;
-            var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-            
-            if (login == null || login=="" || email == null || email =="")
+            if (document.forgotForm.selectType[0].checked)
             {
-                alert('<fmt:message key="error.forgot.password.fields" />');
+                var login = document.forgotForm.login.value;
+                if (login == null || login=="")
+	            {
+	                alert('<fmt:message key="error.forgot.password.username" />');
+	                return false;
+	            }
+	            else
+	            {
+	                document.forgotForm.submit();
+	            }
             }
-            else if (!filter.test(email)) 
+            else if (document.forgotForm.selectType[1].checked)
             {
-                alert('<fmt:message key="error.valid.email.required" />');
-                return false;
+                var email = document.forgotForm.email.value;
+                var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                
+                if (email == null || email=="")
+                {
+                    alert('<fmt:message key="error.forgot.password.email" />');
+                    return false;
+                }
+                else if (!filter.test(email)) 
+                {
+                    alert('<fmt:message key="error.valid.email.required" />');
+                    return false;
+                }
+                else
+                {
+                    document.forgotForm.submit();
+                }
+            }
+        }
+        
 
-            }
-            else
+        function radioSelected()
+        {
+            if (document.forgotForm.selectType[0].checked)
             {
-                document.forgotForm.submit();
+                document.forgotForm.login.disabled = false;
+                document.forgotForm.email.disabled = true;
+            }
+            else if (document.forgotForm.selectType[1].checked)
+            {
+                document.forgotForm.login.disabled = true;
+                document.forgotForm.email.disabled = false;
             }
         }
         
         function submitenter(myfield,e)
-		{
-			var keycode;
-			if (window.event) keycode = window.event.keyCode;
-			else if (e) keycode = e.which;
-			else return true;
-			
-			if (keycode == 13)
-			{
-			   validateForm();
-			   return false;
-			}
-			else
-			   return true;
-		}
+        {
+            var keycode;
+            if (window.event) keycode = window.event.keyCode;
+            else if (e) keycode = e.which;
+            else return true;
+            
+            if (keycode == 13)
+            {
+               validateForm();
+               return false;
+            }
+            else
+               return true;
+        }
+		
+
         
         
 //-->        
@@ -66,7 +97,7 @@
 </lams:head>
 
 
-<body class="stripes" >
+<body class="stripes" onload="radioSelected();">
 
 	<div id="page"><!--main box 'page'-->
 	<form action="<lams:LAMSURL/>/ForgotPasswordRequest" method="get" name="forgotForm">
@@ -82,21 +113,21 @@
 		            <table border="0">
 		                <tr>
 		                    <td class="align-right" width="35%">
-		                        <fmt:message key="label.username"/>:
-		                    </td>
+	                            <fmt:message key="label.forgot.password.username"/> &nbsp; 
+	                            <input type="radio" name="selectType" value="radioUsername" onclick="radioSelected();" checked>
 		                    <td class="align-left" width="65%">
 		                        <input type="text" name="login" id="login" size="50" maxlength="50" tabindex="1" onKeyPress="return submitenter(this,event)" />
 		                    </td>
 		                </tr>
 		                <tr>
-		                    <td class="align-right" width="35%">
-		                        <fmt:message key="label.email"/>:
-		                    </td>
-		                    <td class="align-left" width="65%">
-		                        <input type="text" name="email" id="email" size="50" maxlength="50" tabindex="2" onKeyPress="return submitenter(this,event)" />
-		                        
-		                    </td>
-		                </tr>
+                            <td class="align-right" width="35%">
+                                <fmt:message key="label.forgot.password.email"/> &nbsp;
+                                <input type="radio" name="selectType" value="radioEmail" onclick="radioSelected();">
+                            </td>
+                            <td class="align-left" width="65%">
+                                <input type="text" name="email" id="email" size="50" maxlength="50" tabindex="1" onKeyPress="return submitenter(this,event)" />
+                            </td>
+                        </tr>
 		                
 		                <tr>
 		                    <td>&nbsp;</td>

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Calendar;
 import java.util.Properties;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -45,11 +46,12 @@ public class ForgotPasswordServlet extends HttpServlet
 	
 	// states
 	public static String SMTP_SERVER_NOT_SET 		= "error.support.email.not.set";
-	public static String EMAIL_DOES_NOT_MATCH 		= "error.email.does.not.match";
 	public static String USER_NOT_FOUND 			= "error.user.not.found";
 	public static String PASSWORD_REQUEST_EXPIRED 	= "error.password.request.expired";
 	public static String SUCCESS_REQUEST_EMAIL 		= "forgot.password.email.sent";
 	public static String SUCCESS_CHANGE_PASS 		= "heading.password.changed.screen";
+	public static String EMAIL_NOT_FOUND			= "error.email.not.found";
+	public static String MULTIPLE_EMAILS			= "error.multiple.emails";
 	
 	public static int MILLISECONDS_IN_A_DAY 	= 86400000;
 	
@@ -63,14 +65,26 @@ public class ForgotPasswordServlet extends HttpServlet
 		
 		if (method.equals("requestEmail"))
 		{
-			String login = request.getParameter("login");
-			String email = request.getParameter("email");
-			handleEmailRequest(login, email, response);
+			String selectType = request.getParameter("selectType");
+			Boolean findByEmail = false;
+			String param = "";
+			if (selectType.equals("radioEmail"))
+			{
+				findByEmail = true;
+				param = request.getParameter("email");
+			}
+			else
+			{
+				param = request.getParameter("login");
+			}
+
+
+			handleEmailRequest(findByEmail, param, response);
 		}
 		else if (method.equals("requestPasswordChange"))
 		{
-			String newPassword 			= request.getParameter("newPassword");
-			String key 					= request.getParameter("key"); 
+			String newPassword = request.getParameter("newPassword");
+			String key = request.getParameter("key"); 
 			handlePasswordChange(newPassword, key, response);
 		}
 		else
@@ -83,24 +97,22 @@ public class ForgotPasswordServlet extends HttpServlet
 	/**
 	 * Handles the first step of the forgot login process, sending the email to the user.
 	 * An email is sent with a link and key attached to identify the forgot login request
-	 * @param login
-	 * @param email
+	 * @param findByEmail true if the forgot login request was for an email, false if it was for a login
+	 * @param param the param for which the user password will be searched
 	 * @param response
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	public void handleEmailRequest(String login, String email, HttpServletResponse response)
+	public void handleEmailRequest(Boolean findByEmail, String param, HttpServletResponse response)
 		throws ServletException, IOException
 	{
 
 		int success=0;
 		String languageKey = "";
 		
-		
-		
 		boolean err = false;
 		
-		if (login==null||login.equals("")||email==null||email.equals(""))
+		if (param==null||param.equals(""))
 		{
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
@@ -109,8 +121,7 @@ public class ForgotPasswordServlet extends HttpServlet
 		String SMPTServer = Configuration.get("SMTPServer");
 		String supportEmail = Configuration.get("LamsSupportEmail");
 		
-		
-		
+
 		if (SMPTServer==null||SMPTServer.equals("")||supportEmail==null||supportEmail.equals(""))
 		{
 			// Validate SMTP not set up
@@ -122,78 +133,104 @@ public class ForgotPasswordServlet extends HttpServlet
 			IUserManagementService userService = (IUserManagementService) ctx.getBean("userManagementService");
 			MessageService messageService = (MessageService)ctx.getBean("centralMessageService");
 	
-			if (userService.getUserByLogin(login)!=null)
+
+			User user = null;
+			
+			// get the user by email or login
+			if (!findByEmail)
 			{
-				User user = userService.getUserByLogin(login);
-				
-				if (user.getEmail().equals(email))
+				if (userService.getUserByLogin(param)!=null)
 				{
-					// generate a key for the request
-					String key = generateUniqueKey();
-					
-					// all good, save the request in the db
-					ForgotPasswordRequest fp = new ForgotPasswordRequest();
-					fp.setRequestDate(new Date());
-					fp.setUserId(user.getUserId());
-					fp.setRequestKey(key);
-					userService.save(fp);
-					
-					// Constructing the body of the email
-					String body = messageService.getMessage("forgot.password.email.body")
-						+ "\n\n"
-						+ Configuration.get("ServerURL")
-						+ "forgotPasswordChange.jsp?key="
-						+ key;
-	
-					// send the email
-					try{
-						  Emailer.sendFromSupportEmail(
-							messageService.getMessage("forgot.password.email.subject"),
-							email,
-							body
-							);
-						  languageKey = this.SUCCESS_REQUEST_EMAIL;
-						  success = 1;
-					}
-					catch (AddressException e) 
-			        {
-						// failure handling
-						log.debug(e);
-						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			        } 
-			        catch (MessagingException e) 
-			        {
-			        	// failure handling 
-			        	log.debug(e);
-			        	response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			        }
-					catch (Exception e)
-					{
-						// failure handling
-						log.debug(e);	
-						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					}
-	
+					user = userService.getUserByLogin(param);
 				}
 				else
 				{
-					// validate email does not match user
-					languageKey = this.EMAIL_DOES_NOT_MATCH;
+					// validate user is not found
+					languageKey = this.USER_NOT_FOUND;
+					err = true;
 				}
-				
 			}
 			else
 			{
-				// validate user is not found
-				languageKey = this.USER_NOT_FOUND;
+				List users = userService.getAllUsersWithEmail(param);
+				
+				if (users.size()==1)
+				{
+					user = (User)users.get(0);
+				}
+				else if (users.size()==0)
+				{
+					// validate no user with email found
+					languageKey = this.EMAIL_NOT_FOUND;
+					err = true;
+				}
+				else
+				{
+					// validate multiple users with email found
+					languageKey = this.MULTIPLE_EMAILS;
+					err = true;
+				}
 			}
+			
+
+			if (!err)
+			{
+				// generate a key for the request
+				String key = generateUniqueKey();
+				
+				// all good, save the request in the db
+				ForgotPasswordRequest fp = new ForgotPasswordRequest();
+				fp.setRequestDate(new Date());
+				fp.setUserId(user.getUserId());
+				fp.setRequestKey(key);
+				userService.save(fp);
+				
+				// Constructing the body of the email
+				String body = messageService.getMessage("forgot.password.email.body")
+					+ "\n\n"
+					+ Configuration.get("ServerURL")
+					+ "forgotPasswordChange.jsp?key="
+					+ key;
+	
+				// send the email
+				try{
+					  Emailer.sendFromSupportEmail(
+						messageService.getMessage("forgot.password.email.subject"),
+						user.getEmail(),
+						body
+						);
+					  languageKey = this.SUCCESS_REQUEST_EMAIL;
+					  success = 1;
+				}
+				catch (AddressException e) 
+		        {
+					// failure handling
+					log.debug(e);
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		        } 
+		        catch (MessagingException e) 
+		        {
+		        	// failure handling 
+		        	log.debug(e);
+		        	response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		        }
+				catch (Exception e)
+				{
+					// failure handling
+					log.debug(e);	
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				}
+			}
+		
 		}
+			
+	
 
 		response.sendRedirect(Configuration.get("ServerURL") + "forgotPasswordProc.jsp?" + 
-				STATE + 
-				success + 
-				LANGUAGE_KEY + 
-				languageKey);
+			STATE + 
+			success + 
+			LANGUAGE_KEY + 
+			languageKey);
 
 	}
 	

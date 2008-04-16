@@ -452,6 +452,15 @@ public interface IUserManagementService {
 	public List getAllUsers(Integer filteredOrgId);
 	
 	/**
+	 * Get all users with the given Email. Email must not be empty
+	 * Use a regex check to make sure the string is in correct xxx@xxx.xxx form, 
+	 * see lams-central/web/forgotPassword.jsp javascript methods
+	 * * @param email a non empty email string
+	 * @return list of Users
+	 */
+	public List getAllUsersWithEmail(String email);
+	
+	/**
 	 * Get all users in orgId, except for users that are members of filteredOrg.
 	 * @param orgId
 	 * @param filteredOrgId

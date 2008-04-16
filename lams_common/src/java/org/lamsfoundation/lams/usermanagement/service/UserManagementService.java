@@ -1035,7 +1035,7 @@ public class UserManagementService implements IUserManagementService {
 			+ " (uo.user.login like '%" + term + "%'"
 			+ " or uo.user.firstName like '%" + term + "%'"
 			+ " or uo.user.lastName like '%" + term + "%'"
-			+ " or uo.user.email like '%" + term + "%')"
+			+ " or uo.user.email like 'u.email like)"
 			+ " and uo.user.disabledFlag=0"
 			+ " and uo.organisation.organisationId=" + orgId
 			+ " and uo.user.userId not in"
@@ -1057,6 +1057,11 @@ public class UserManagementService implements IUserManagementService {
 			+ " (select uo.user.userId from UserOrganisation uo"
 			+ " where uo.organisation.organisationId=" + filteredOrgId +")"
 			+ " order by u.login";
+		return baseDAO.find(query);
+	}
+	
+	public List getAllUsersWithEmail(String email) {
+		String query = "from User u where u.email=\'" + email + "\' order by u.login";
 		return baseDAO.find(query);
 	}
 	
