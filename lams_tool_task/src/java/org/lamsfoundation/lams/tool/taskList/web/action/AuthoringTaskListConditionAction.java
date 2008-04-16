@@ -486,10 +486,14 @@ public class AuthoringTaskListConditionAction extends Action {
 	 */
 	private ActionErrors validateTaskListCondition(TaskListConditionForm conditionForm, HttpServletRequest request) {
 		ActionErrors errors = new ActionErrors();
-		if(StringUtils.isBlank(conditionForm.getName())) {
+		
+		String formConditionName = conditionForm.getName();
+		if(StringUtils.isBlank(formConditionName)) {
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(TaskListConstants.ERROR_MSG_NAME_BLANK));
+		} else if (StringUtils.contains(formConditionName, '#')){
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(TaskListConstants.ERROR_MSG_NAME_CONTAINS_WRONG_SYMBOL));
 		} else {
-			String formConditionName = conditionForm.getName();
+			
 			String formConditionSequenceId = conditionForm.getSequenceId();
 			
 			String sessionMapID = conditionForm.getSessionMapID();

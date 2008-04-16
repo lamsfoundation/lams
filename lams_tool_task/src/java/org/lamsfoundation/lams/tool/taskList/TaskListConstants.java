@@ -85,6 +85,7 @@ public class TaskListConstants {
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
 	public static final String ERROR_MSG_NAME_BLANK = "error.condition.name.blank";
+	public static final String ERROR_MSG_NAME_CONTAINS_WRONG_SYMBOL = "error.condition.name.contains.wrong.symbol";
 	public static final String ERROR_MSG_NO_TASK_LIST_ITEMS = "error.condition.no.tasklistitems.selected";
 	public static final String ERROR_MSG_NAME_DUPLICATED = "error.condition.duplicated.name";
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
