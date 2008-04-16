@@ -162,7 +162,7 @@ public class TaskList implements Cloneable{
   				// taskListItem. Will need then for making ties beetween conditions'
   				// taskListItems and real ones.
   	  			HashMap<Integer, TaskListItem> taskListItemsSeq = new HashMap<Integer, TaskListItem>();
-  	  			for(Object itemObject:taskListItems) {
+  	  			for(Object itemObject:taskList.taskListItems) {
   	  				TaskListItem item = (TaskListItem) itemObject;
   	  				taskListItemsSeq.put(item.getSequenceId(), item);
   	  			}

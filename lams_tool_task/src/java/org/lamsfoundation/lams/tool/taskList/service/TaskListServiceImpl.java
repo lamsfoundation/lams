@@ -502,20 +502,25 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 			}
 		}
 
-		boolean result = false;
+		boolean result = true;
 		if (condition != null) {
 			Iterator it = condition.getTaskListItems().iterator();
 			while(it.hasNext()) {
 				TaskListItem item = (TaskListItem) it.next();
 				
-				TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(), user.getUid());
+				TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(), userUid);
 				if (visitLog != null) {
+					//result is being calculated depending on visitLog value
 					result &= visitLog.isComplete();
 				} else {
+					//user hadn't complete this task. So this means the condition isn't met.
 					result = false;
 					break;
 				}
 			}
+		} else {
+			//there is no such a condition
+			result = false;
 		}
 		
 		return result;
