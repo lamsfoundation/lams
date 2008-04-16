@@ -21,10 +21,12 @@ import org.hibernate.Hibernate;
 import org.hibernate.id.Configurable;
 
 
+import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.Emailer;
@@ -262,6 +264,7 @@ public class ForgotPasswordServlet extends HttpServlet
 		{
 			User user = (User)userService.findById(User.class, fp.getUserId());
 			userService.updatePassword(user.getLogin(), newPassword);
+			userService.auditPasswordChanged(user, CentralConstants.MODULE_NAME);
 			languageKey = this.SUCCESS_CHANGE_PASS;
 			success = 1;
 		}
