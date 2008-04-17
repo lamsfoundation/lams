@@ -32,11 +32,17 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.util.Date;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
+import org.hibernate.id.Configurable;
+import org.hibernate.id.IdentifierGenerator;
+import org.hibernate.id.UUIDHexGenerator;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import javax.mail.internet.MimeUtility;
 
@@ -586,5 +592,22 @@ public class FileUtil {
 			}
 
 			return filename;
+		}
+		
+		/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#generateUniqueContentFolder() */
+		public static String generateUniqueContentFolder() throws FileUtilException, IOException {
+			
+			String newUniqueContentFolderID = null;
+			Properties props = new Properties();
+			
+			IdentifierGenerator uuidGen = new UUIDHexGenerator();
+			( (Configurable) uuidGen).configure(Hibernate.STRING, props, null);
+			
+			// lowercase to resolve OS issues
+			newUniqueContentFolderID = ((String) uuidGen.generate(null, null)).toLowerCase();
+			
+			FlashMessage flashMessage = new FlashMessage("createUniqueContentFolder", newUniqueContentFolderID);
+			
+			return flashMessage.serializeMessage();
 		}
 }

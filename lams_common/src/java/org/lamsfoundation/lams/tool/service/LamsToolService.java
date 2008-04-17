@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.service;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,6 +35,8 @@ import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.FileUtilException;
 
 
 /**
@@ -97,5 +100,11 @@ public class LamsToolService implements ILamsToolService
 
 	public void setToolSessionDAO(IToolSessionDAO toolSessionDAO) {
 		this.toolSessionDAO = toolSessionDAO;
+	}
+	
+	public String generateUniqueContentFolder() throws FileUtilException, IOException {
+		
+		return FileUtil.generateUniqueContentFolder();
+		
 	}
 }

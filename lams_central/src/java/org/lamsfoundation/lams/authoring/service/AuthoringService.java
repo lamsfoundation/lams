@@ -1298,18 +1298,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#generateUniqueContentFolder() */
 	public String generateUniqueContentFolder() throws FileUtilException, IOException {
 		
-		String newUniqueContentFolderID = null;
-		Properties props = new Properties();
-		
-		IdentifierGenerator uuidGen = new UUIDHexGenerator();
-		( (Configurable) uuidGen).configure(Hibernate.STRING, props, null);
-		
-		// lowercase to resolve OS issues
-		newUniqueContentFolderID = ((String) uuidGen.generate(null, null)).toLowerCase();
-		
-		FlashMessage flashMessage = new FlashMessage("createUniqueContentFolder", newUniqueContentFolderID);
-		
-		return flashMessage.serializeMessage();
+		return FileUtil.generateUniqueContentFolder();
 	}
 	
 	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getHelpURL() */

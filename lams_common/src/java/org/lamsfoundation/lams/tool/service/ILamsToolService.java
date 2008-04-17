@@ -22,11 +22,13 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.service;
 
+import java.io.IOException;
 import java.util.Set;
 
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.FileUtilException;
 
 
 /**
@@ -55,4 +57,6 @@ public interface ILamsToolService
     public IToolVO getToolBySignature(final String toolSignature);
     
     public long getToolDefaultContentIdBySignature(final String toolSignature);
+
+    public String generateUniqueContentFolder() throws FileUtilException, IOException;
 }
