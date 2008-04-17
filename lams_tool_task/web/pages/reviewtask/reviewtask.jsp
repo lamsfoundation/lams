@@ -65,7 +65,7 @@
 								<div class="field-name">
 									<fmt:message key="label.preview.leave.your.comment" />
 								</div>
-								<html:textarea property="comment" rows="3" style="width: 99%;"/>
+								<lams:STRUTS-textarea property="comment" rows="3" style="width: 99%;"/>
 							</td>
 						</tr>
 						

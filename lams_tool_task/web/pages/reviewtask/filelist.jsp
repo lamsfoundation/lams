@@ -10,7 +10,7 @@
 	<%-- Display target file type --%>
 	<ul>
 		<c:forEach var="file" items="${fileList}">
-			<c:if test="${sessionMap.taskListItem.showCommentsToAll || (sessionMap.userLogin == file.createBy.loginName) || (sessionMap.mode == 'teacher')}">
+			<c:if test="${sessionMap.taskListItem.showCommentsToAll || (sessionMap.userLogin == file.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'preview')}">
 			
 				<li>
 					<c:out value="${file.fileName}" />
