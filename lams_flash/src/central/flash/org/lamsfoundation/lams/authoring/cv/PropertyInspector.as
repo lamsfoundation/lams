@@ -560,6 +560,12 @@ class PropertyInspector extends PropertyInspectorControls {
 		var oa = _canvasModel.selectedItem.activity;
 		var	o = ComplexActivity(oa);
 		
+		if(minAct_stp.value > CanvasOptionalActivity(_canvasModel.selectedItem).actChildren.length)
+			minAct_stp.value = CanvasOptionalActivity(_canvasModel.selectedItem).actChildren.length;
+		
+		if(maxAct_stp.value > CanvasOptionalActivity(_canvasModel.selectedItem).actChildren.length)
+			maxAct_stp.value = CanvasOptionalActivity(_canvasModel.selectedItem).actChildren.length;
+		
 		o.minOptions = minAct_stp.value;
 		o.maxOptions = maxAct_stp.value;
 		
