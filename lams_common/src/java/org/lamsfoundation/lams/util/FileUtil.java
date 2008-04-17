@@ -594,7 +594,6 @@ public class FileUtil {
 			return filename;
 		}
 		
-		/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#generateUniqueContentFolder() */
 		public static String generateUniqueContentFolder() throws FileUtilException, IOException {
 			
 			String newUniqueContentFolderID = null;
