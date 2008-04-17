@@ -165,7 +165,9 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         _container_mc = container_mc;
         _UILoaded = false;
         
-		loader.start(DefaultLayoutManager.COMPONENT_NO);
+		_root.preloader.setStartValue(50);
+		_root.preloader.setEndValue(100);
+		_root.preloader.start(DefaultLayoutManager.COMPONENT_NO);
 		
 		_customCursor_mc = _container_mc.createEmptyMovieClip('_customCursor_mc', CCURSOR_DEPTH);			
 		
@@ -193,7 +195,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     private function configLoaded(){
         //Now that the config class is ready setup the UI and data, call to setupData() first in 
 		//case UI element constructors use objects instantiated with setupData()
-        loader.complete();
+        _root.preloader.complete();
 		setupData();
 		checkDataLoaded();
 		
@@ -374,7 +376,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 
 			_layout.manager.addLayoutItem(new LFLayoutItem(evt.target.className, evt.target));
 			
-			loader.complete();
+			_root.preloader.complete();
             
             //If all of them are loaded set UILoad accordingly
 			if(_layout.manager.completedLayout){
@@ -438,7 +440,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         onResize();
 		
 		// Remove the loading screen
-		loader.stop();
+		_root.preloader.stop();
+		_root._visible = true;
 		
 		if(SHOW_DEBUGGER){
 			showDebugger();

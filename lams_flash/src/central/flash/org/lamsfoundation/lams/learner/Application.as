@@ -275,7 +275,6 @@ class Application extends ApplicationParent {
     * work with the application
     */
     private function start(){
-		trace('starting...');
 		
         //Fire off a resize to set up sizes
         onResize();

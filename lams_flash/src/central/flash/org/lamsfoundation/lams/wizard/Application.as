@@ -131,7 +131,9 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
         _container_mc = container_mc;
         _UILoaded = false;
         
-		loader.start(COMPONENT_NO);
+		_root.preloader.setStartValue(50);
+		_root.preloader.setEndValue(100);
+		_root.preloader.start(COMPONENT_NO);
 		
 		_customCursor_mc = _container_mc.createEmptyMovieClip('_customCursor_mc', CCURSOR_DEPTH);			
 		
@@ -157,7 +159,7 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
         //Now that the config class is ready setup the UI and data, call to setupData() first in 
 		//case UI element constructors use objects instantiated with setupData()
         
-		loader.complete();
+		_root.preloader.complete();
 		setupData();
 		checkDataLoaded();
 		
@@ -277,7 +279,7 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
                 default:
             }
             
-			loader.complete();
+			_root.preloader.complete();
 			
             //If all of them are loaded set UILoad accordingly
 			if(_wizardLoaded){
@@ -318,7 +320,8 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
         onResize();
 		
 		//Remove the loading screen
-		loader.stop();
+		_root.preloader.stop();
+		_root._visible = true;
 		
 		if(SHOW_DEBUGGER){
 			showDebugger();

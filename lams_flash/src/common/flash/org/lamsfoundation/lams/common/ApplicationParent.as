@@ -130,7 +130,7 @@ class ApplicationParent {
     */
     private function onDictionaryLoad(evt:Object){
         if(evt.type=='load'){
-			loader.complete();
+			_root.preloader.complete();
             _dictionaryLoaded = true;
 			Debugger.log('Dictionary loaded :',Debugger.CRITICAL,'onDictionaryLoad','Application');			
         } else {
@@ -144,7 +144,7 @@ class ApplicationParent {
     */
     private function onThemeLoad(evt:Object) {
         if(evt.type=='load'){
-			loader.complete();
+			_root.preloader.complete();
             _themeLoaded = true;
 			Debugger.log('!Theme loaded :',Debugger.CRITICAL,'onThemeLoad','Application');		
         } else {
@@ -262,8 +262,8 @@ class ApplicationParent {
         }
     }
 	
-	public function get loader():LFLoader{
-		if(_root.loader != undefined) { return _root.loader; }
+	public function get loader():MovieClip{
+		if(_root.preloader != undefined) { return _root.preloader; }
 		else {
 		}
 	}	

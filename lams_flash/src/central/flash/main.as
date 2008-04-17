@@ -7,7 +7,6 @@ this._lockroot = true;
 //Temp values to be removed / repplaced at deployment
 /**/
 if(StringUtils.isEmpty(serverURL)){
-	//_root.serverURL = "http://dolly.uklams.net:8080/lams/";
 	_root.serverURL = "http://localhost:8080/lams/";
 	Debugger.log('serverURL is not defined, using defualt:'+_root.serverURL ,Debugger.CRITICAL,'main','ROOT');			
 }
@@ -75,10 +74,9 @@ if(StringUtils.isEmpty(isMac)) {
 	_root.isMac = false;
 }				
 
-//Set stage alignment to top left and prent scaling
+//Set stage alignment to top left and prevent scaling
 Stage.align = "TL";
 Stage.scaleMode = "noScale";
-
 
 //Start the application, passing in the top level clip, i.e. _root
 var app:Application = Application.getInstance();
@@ -94,10 +92,5 @@ receive_lc.setImportDesign = function(learningDesignID, refresh) {
 };
 var success = receive_lc.connect("importUpdate_lc_" + uniqueID);
 
-
 //Make app listener for stage resize events
 Stage.addListener(app);
-
-
-
-
