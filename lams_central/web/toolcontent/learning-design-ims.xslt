@@ -37,8 +37,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</title>
 					<!-- ================================== lams LD ================================== -->
 					<xsl:for-each select="/*/*">
-						<xsl:if test="(count(ancestor::*) =1) and (name(.) !='activities') and (name(.) != 'transitions')">
+						<xsl:if test="(count(ancestor::*) =1) and (name(.) !='activities') and (name(.) != 'transitions') and name(.) !='title' and name(.) !='groupings' and name(.) !='branchMappings'">
 								<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+						</xsl:if>
+						<xsl:if test="(count(ancestor::*) =1) and (name(.) = 'groupings')">
+							<xsl:call-template name="groupings"/>
+						</xsl:if>
+						<xsl:if test="(count(ancestor::*) =1) and (name(.) = 'branchMappings')">
+							<xsl:call-template name="branchMappings"/>
 						</xsl:if>
 					</xsl:for-each>
 
@@ -94,13 +100,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="group"/>
 	</xsl:template>
 	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="gate">
-		<xsl:if test="(activityTypeID = 3) or (activityTypeID = 4) or (activityTypeID = 5)">
+		<xsl:if test="(activityTypeID = 3) or (activityTypeID = 4) or (activityTypeID = 5) or (activityTypeID = 9)">
 			<xsl:call-template name="gate"/>
 		</xsl:if>
 		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="gate"/>
 	</xsl:template>
 	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="complex">
-		<xsl:if test="(activityTypeID = 6) or (activityTypeID = 7) or (activityTypeID = 8)">
+		<xsl:if test="(activityTypeID = 6) or (activityTypeID = 7) or (activityTypeID = 8) or (activityTypeID = 10) or (activityTypeID = 11) or (activityTypeID = 12) or (activityTypeID = 13)">
 			<xsl:call-template name="complex"/>
 		</xsl:if>
 		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="complex"/>
@@ -140,6 +146,44 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</lams:lams-tool-activity>
 		</learning-activity>
 	</xsl:template>
+	
+	<xsl:template name="groupings">
+		<lams:lams-groupings>
+			<xsl:for-each select="*">
+				<xsl:call-template name="grouping"/>
+			</xsl:for-each>
+		</lams:lams-groupings>
+	</xsl:template>
+		
+	<xsl:template name="grouping">
+		<lams:lams-grouping>
+			<xsl:for-each select="node() | @*">
+					<xsl:if test="name(.) != 'groups'">
+						<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+					</xsl:if>
+					<xsl:if test="name(.) = 'groups'">
+						<xsl:call-template name="groups"/>
+					</xsl:if>
+			</xsl:for-each>
+		</lams:lams-grouping>
+	</xsl:template>
+
+	<xsl:template name="groups">
+		<lams:groups>
+		<xsl:for-each select="org.lamsfoundation.lams.learningdesign.dto.GroupDTO">
+ 			<xsl:call-template name="actualGroup"/>
+		</xsl:for-each>
+		</lams:groups>
+	</xsl:template>
+
+	<xsl:template name="actualGroup">
+		<lams:lams-group>
+			<xsl:for-each select="node() | @*">
+				<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+			</xsl:for-each>
+		</lams:lams-group>
+	</xsl:template>
+	
 	<!-- ================================== lams Gate activities ================================== -->
 	<xsl:template name="gate">
 		<learning-activity xsl:use-attribute-sets="gateIdentifier">
@@ -173,7 +217,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<xsl:if test="(activityTypeID = 2)">
 						<learning-activity-ref  xsl:use-attribute-sets="groupRef"/>
 					</xsl:if>
-					<xsl:if test="(activityTypeID = 6) or (activityTypeID = 7) or (activityTypeID = 8)">
+					<xsl:if test="(activityTypeID = 3) or (activityTypeID = 4) or (activityTypeID = 5) or (activityTypeID = 9)">
+						<learning-activity-ref  xsl:use-attribute-sets="gateRef"/>
+					</xsl:if>
+					<xsl:if test="(activityTypeID = 6) or (activityTypeID = 7) or (activityTypeID = 8) or (activityTypeID = 10) or (activityTypeID = 11) or (activityTypeID = 12) or (activityTypeID = 13) ">
 						<learning-activity-ref  xsl:use-attribute-sets="complexRef"/>
 					</xsl:if>
 				</xsl:if>
@@ -185,6 +232,36 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</lams:lams-complex-activity>
 		</activity-structure>
 	</xsl:template>
+	<!-- ================================== lams Branch Mappings and Conditions ================================== -->
+	<xsl:template name="branchMappings">
+		<lams:lams-branchMappings>
+			<xsl:for-each select="*">
+				<xsl:call-template name="branchActivityEntry"/>
+			</xsl:for-each>
+		</lams:lams-branchMappings>
+	</xsl:template>
+		
+	<xsl:template name="branchActivityEntry">
+		<lams:lams-branchActivityEntry>
+			<xsl:for-each select="node() | @*">
+					<xsl:if test="name(.) != 'condition'">
+						<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+					</xsl:if>
+					<xsl:if test="name(.) = 'condition'">
+						<xsl:call-template name="condition"/>
+					</xsl:if>
+			</xsl:for-each>
+		</lams:lams-branchActivityEntry>
+	</xsl:template>
+
+	<xsl:template name="condition">
+		<lams:lams-condition>
+			<xsl:for-each select="node() | @*">
+				<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+			</xsl:for-each>
+		</lams:lams-condition>
+	</xsl:template>
+	
 	<!-- ================================== lams Transitions ================================== -->
 	<xsl:template match="transitions">
 		<activity-structure identifier="A-sequence" structure-type="sequence">
@@ -270,16 +347,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</xsl:attribute-set>
 	
 	<xsl:attribute-set name="complexAttr">
-		<xsl:attribute name="identifier">S-<xsl:if test="activityTypeID=6">PARALLEL</xsl:if><xsl:if test="activityTypeID=7">OPTIONS</xsl:if><xsl:if test="activityTypeID=8">SEQUENCE</xsl:if>-<xsl:value-of select="activityID"/></xsl:attribute>
+		<xsl:attribute name="identifier">S-<xsl:if test="activityTypeID=6">PARALLEL</xsl:if><xsl:if test="activityTypeID=7">SELECTION</xsl:if><xsl:if test="activityTypeID=8">SEQUENCE</xsl:if><xsl:if test="activityTypeID=10">BRANCHING</xsl:if><xsl:if test="activityTypeID=11">BRANCHING</xsl:if><xsl:if test="activityTypeID=12">BRANCHING</xsl:if><xsl:if test="activityTypeID=13">SELECTION</xsl:if>-<xsl:value-of select="activityID"/></xsl:attribute>
 		<xsl:attribute name="structure-type">
 			<xsl:if test="activityTypeID=6">PARALLEL</xsl:if>
-			<xsl:if test="activityTypeID=7">OPTIONS</xsl:if>
+			<xsl:if test="activityTypeID=7">SELECTION</xsl:if>
 			<xsl:if test="activityTypeID=8">SEQUENCE</xsl:if>
+			<xsl:if test="activityTypeID=10">SEQUENCE</xsl:if>
+			<xsl:if test="activityTypeID=11">SEQUENCE</xsl:if>
+			<xsl:if test="activityTypeID=12">SEQUENCE</xsl:if>
+			<xsl:if test="activityTypeID=13">SELECTION</xsl:if>
 		</xsl:attribute>
 	</xsl:attribute-set>
 	
 	<xsl:attribute-set name="complexRef">
-		<xsl:attribute name="ref">S-<xsl:if test="activityTypeID=6">PARALLEL</xsl:if><xsl:if test="activityTypeID=7">OPTIONS</xsl:if><xsl:if test="activityTypeID=8">SEQUENCE</xsl:if>-<xsl:value-of select="activityID"/></xsl:attribute>
+		<xsl:attribute name="ref">S-<xsl:if test="activityTypeID=6">PARALLEL</xsl:if><xsl:if test="activityTypeID=7">SELECTION</xsl:if><xsl:if test="activityTypeID=8">SEQUENCE</xsl:if><xsl:if test="activityTypeID=10">BRANCHING</xsl:if><xsl:if test="activityTypeID=11">BRANCHING</xsl:if><xsl:if test="activityTypeID=12">BRANCHING</xsl:if><xsl:if test="activityTypeID=13">SELECTION</xsl:if>-<xsl:value-of select="activityID"/></xsl:attribute>
 	</xsl:attribute-set>
 	
 	

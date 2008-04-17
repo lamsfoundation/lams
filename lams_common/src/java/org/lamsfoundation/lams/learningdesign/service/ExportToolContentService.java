@@ -37,7 +37,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -48,7 +47,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -113,8 +111,6 @@ import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ToolOutputBranchActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
-import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter.AddedField;
-import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter.RemovedField;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
@@ -124,7 +120,6 @@ import org.lamsfoundation.lams.tool.dao.ISystemToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolImportSupportDAO;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.util.Configuration;
@@ -133,9 +128,6 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.VersionUtil;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.springframework.beans.BeansException;
@@ -198,13 +190,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	//this is not IMS standard tag, temporarily use to gather all tools node list
 	private static final String IMS_TAG_TRANSITIONS = "transitions";
 
-	// this is not IMS standard tag, temp use to ref grouping/gate activities 
+	// this is not IMS standard tag, term used to ref grouping/gate activities 
 	private static final String IMS_TAG_GROUPING = "group";
 	private static final String IMS_TAG_GATE = "gate";
 	
-	private static final String IMS_TAG_OPTIONAL = "OPTIONS";
+	private static final String IMS_TAG_OPTIONAL = "SELECTION";
 	private static final String IMS_TAG_PARALLEL = "PARALLEL";
 	private static final String IMS_TAG_SEQUENCE = "SEQUENCE";
+	private static final String IMS_TAG_BRANCHING = "BRANCHING";
 	
 	//temporarily file for IMS XSLT file
 	private static final String XSLT_PARAM_RESOURCE_FILE = "resourcesFile";
@@ -482,7 +475,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				if(format == PACKAGE_FORMAT_IMS){
 					handleIMS(rootDir, activity,resChildren);
 				}
-			} //end all acitivites export
+			} //end all activities export
 			
 			try {
 				//handle IMS format
@@ -503,7 +496,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				}
 				
 			} catch (Exception e) {
-				log.error(e);
+				log.error("Error thrown while creating IMS LD XML", e);
 				throw new ExportToolContentException(e);
 			}
 			
@@ -591,7 +584,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			if(actDto.getActivityTypeID().equals(Activity.GROUPING_ACTIVITY_TYPE))
 				att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF + IMS_TAG_GROUPING + "-" + actDto.getActivityID());
 			else if(actDto.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE) || actDto.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
-													  || actDto.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE))
+					|| actDto.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE) || actDto.getActivityTypeID().equals(Activity.SYSTEM_GATE_ACTIVITY_TYPE))
 				att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF + IMS_TAG_GATE + "-" + actDto.getActivityID());
 			else if (actDto.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE)
 					|| actDto.getActivityTypeID().equals(Activity.OPTIONS_WITH_SEQUENCES_TYPE))
@@ -600,7 +593,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 					att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_PARALLEL + "-" + actDto.getActivityID());
 			else if(actDto.getActivityTypeID().equals(Activity.SEQUENCE_ACTIVITY_TYPE))
 					att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_SEQUENCE + "-" + actDto.getActivityID());
-			 else 
+			else if(actDto.getActivityTypeID().equals(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE) || actDto.getActivityTypeID().equals(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
+					|| actDto.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE) )
+				att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_BRANCHING + "-" + actDto.getActivityID());
+			else 
 				att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF +  actDto.getToolSignature() + "-" + actDto.getToolContentID());
 			
 			ref.setAttribute(att);
