@@ -18,7 +18,6 @@
     <link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 <script language="javascript" type="text/javascript">
 <!--        
-        
         function toHome() {window.location="<lams:LAMSURL/>index.do";};
         
         function validateForm()
@@ -39,8 +38,9 @@
             else if (document.forgotForm.selectType[1].checked)
             {
                 var email = document.forgotForm.email.value;
-                var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-                
+                //var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                var filter = /^(.)+\@(.)+\.(.)+/;
+               
                 if (email == null || email=="")
                 {
                     alert('<fmt:message key="error.forgot.password.email" />');
@@ -107,7 +107,9 @@
 		<div id="header-no-tabs"></div>
 		<div id="content">
 		            <table border="0"><tr><td>
-		            <fmt:message key="label.forgot.password.instructions"/>
+		            <fmt:message key="label.forgot.password.instructions.1"/>
+		            <br><br>
+		            <fmt:message key="label.forgot.password.instructions.2"/>
 		            </td></tr></table>
 		            
 		            <table border="0">

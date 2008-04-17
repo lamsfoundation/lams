@@ -14,6 +14,7 @@
 <%
 String languageKey = request.getParameter("languageKey");
 String stateStr = request.getParameter("state");
+String emailStr = request.getParameter("emailSent");
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -52,7 +53,16 @@ String stateStr = request.getParameter("state");
 	    <table border="0" class="body"><tr><td>
 		    <%if (stateStr.equals("0")){out.print("<font color='Red'>");}%>
 		    <fmt:message key="<%=languageKey %>"/>
-		    <%if (stateStr.equals("0")){out.print("</font>");}%>
+		    <%
+		    if (stateStr.equals("0"))
+		    {
+		    	out.print("</font>");
+		    }
+		    else if (emailStr!=null && !emailStr.equals(""))
+		    {
+		    	out.print(emailStr);
+		    }
+		    %>
 	    </td></tr></table>
 	    <br><br>
 	    <html:button property="cancel" styleClass="button" onclick="javascript:toHome();"><fmt:message key="label.ok"/></html:button>
