@@ -280,31 +280,31 @@ public class MonitoringAction extends Action {
 						row = sheet.createRow(0);
 						cell = row.createCell((short) idx);
 						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-						cell.setCellValue("Subject");
+						cell.setCellValue(getMessageService().getMessage("lable.topic.title.subject"));
 						sheet.setColumnWidth((short) idx, (short) 8000);
 						++idx;
 
 						cell = row.createCell((short) idx);
 						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-						cell.setCellValue("Author");
+						cell.setCellValue(getMessageService().getMessage("lable.topic.title.author"));
 						sheet.setColumnWidth((short) idx, (short) 8000);
 						++idx;
 
 						cell = row.createCell((short) idx);
 						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-						cell.setCellValue("Date");
+						cell.setCellValue(getMessageService().getMessage("label.download.marks.heading.date"));
 						sheet.setColumnWidth((short) idx, (short) 8000);
 						++idx;
 
 						cell = row.createCell((short) idx);
 						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-						cell.setCellValue("Marks");
+						cell.setCellValue(getMessageService().getMessage("label.download.marks.heading.marks"));
 						sheet.setColumnWidth((short) idx, (short) 8000);
 						++idx;
 
 						cell = row.createCell((short) idx);
 						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-						cell.setCellValue("Comments");
+						cell.setCellValue(getMessageService().getMessage("label.download.marks.heading.comments"));
 						sheet.setColumnWidth((short) idx, (short) 8000);
 						++idx;
 					}
