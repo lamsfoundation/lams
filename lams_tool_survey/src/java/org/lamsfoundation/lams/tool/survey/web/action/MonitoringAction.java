@@ -268,11 +268,13 @@ public class MonitoringAction extends Action {
 				//survey title
 				row = sheet.createRow(idx++);
 				cell = row.createCell((short) 0);
+				cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 				cell.setCellValue(survey.getTitle());
 				
 				//survey instruction
 				row = sheet.createRow(idx++);
 				cell = row.createCell((short) 0);
+				cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 				cell.setCellValue(survey.getInstructions());
 				
 				//display 2 empty row
@@ -286,8 +288,10 @@ public class MonitoringAction extends Action {
 				//display session name
 				row = sheet.createRow(idx++);
 				cell = row.createCell((short) 0);
+				cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 				cell.setCellValue(resource.getMessage(MSG_LABEL_SESSION_NAME));
 				cell = row.createCell((short) 1);
+				cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 				cell.setCellValue(session.getSessionName());
 				
 				//begin to display question and its answers
@@ -306,8 +310,10 @@ public class MonitoringAction extends Action {
 					//display question content
 					row = sheet.createRow(idx++);
 					cell = row.createCell((short) 0);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					cell.setCellValue(resource.getMessage(MSG_LABEL_QUESTION) + " " + questionIdx);
 					cell = row.createCell((short) 1);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					cell.setCellValue(question.getDescription());
 
 					
@@ -316,6 +322,7 @@ public class MonitoringAction extends Action {
 					
 					row = sheet.createRow(idx++);
 					cell = row.createCell((short) 0);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					cell.setCellValue(resource.getMessage(MSG_LABEL_POSSIBLE_ANSWERS));
 					
 					int optionIdx = 0;
@@ -325,6 +332,7 @@ public class MonitoringAction extends Action {
 						cell = row.createCell((short) 0);
 						cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
 						cell = row.createCell((short) 1);
+						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 						cell.setCellValue(option.getDescription());
 					}
 					if(question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY){
@@ -333,6 +341,7 @@ public class MonitoringAction extends Action {
 						cell = row.createCell((short) 0);
 						cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
 						cell = row.createCell((short) 1);
+						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 						cell.setCellValue(resource.getMessage(MSG_LABEL_OPEN_RESPONSE));
 					}
 					
@@ -349,6 +358,7 @@ public class MonitoringAction extends Action {
 					int cellIdx = 0;
 					row = sheet.createRow(idx++);
 					cell = row.createCell((short) cellIdx);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					cell.setCellValue(resource.getMessage(MSG_LABEL_LEARNER));
 					//increase one more option number if there are open entry option
 					int optionsNum = options.size();
@@ -382,6 +392,7 @@ public class MonitoringAction extends Action {
 						//for textEntry option
 						if(question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY){
 							cell = row.createCell((short) ++cellIdx);
+							cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 							if(answer.getAnswer() != null){
 								cell.setCellValue(answer.getAnswer().getAnswerText());
 							}

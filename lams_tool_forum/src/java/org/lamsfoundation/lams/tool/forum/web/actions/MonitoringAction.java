@@ -258,6 +258,7 @@ public class MonitoringAction extends Action {
 		try {
 			// create an empty excel file
 			HSSFWorkbook wb = new HSSFWorkbook();
+			
 			HSSFSheet sheet = wb.createSheet("Marks");
 			sheet.setColumnWidth((short) 0, (short) 5000);
 			HSSFRow row = null;
@@ -278,26 +279,31 @@ public class MonitoringAction extends Action {
 						first = false;
 						row = sheet.createRow(0);
 						cell = row.createCell((short) idx);
+						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 						cell.setCellValue("Subject");
 						sheet.setColumnWidth((short) idx, (short) 8000);
 						++idx;
 
 						cell = row.createCell((short) idx);
+						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 						cell.setCellValue("Author");
 						sheet.setColumnWidth((short) idx, (short) 8000);
 						++idx;
 
 						cell = row.createCell((short) idx);
+						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 						cell.setCellValue("Date");
 						sheet.setColumnWidth((short) idx, (short) 8000);
 						++idx;
 
 						cell = row.createCell((short) idx);
+						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 						cell.setCellValue("Marks");
 						sheet.setColumnWidth((short) idx, (short) 8000);
 						++idx;
 
 						cell = row.createCell((short) idx);
+						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 						cell.setCellValue("Comments");
 						sheet.setColumnWidth((short) idx, (short) 8000);
 						++idx;
@@ -306,16 +312,20 @@ public class MonitoringAction extends Action {
 					idx = 0;
 					row = sheet.createRow(fileCount);
 					cell = row.createCell((short) idx++);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					cell.setCellValue(dto.getMessage().getSubject());
 
 					cell = row.createCell((short) idx++);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					cell.setCellValue(dto.getAuthor());
 
 					cell = row.createCell((short) idx++);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					cell.setCellValue(DateFormat.getInstance().format(
 							dto.getMessage().getCreated()));
 
 					cell = row.createCell((short) idx++);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 
 					if (dto.getMessage() != null
 							&& dto.getMessage().getReport() != null
@@ -326,6 +336,7 @@ public class MonitoringAction extends Action {
 						cell.setCellValue("");
 
 					cell = row.createCell((short) idx++);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					if (dto.getMessage() != null
 							&& dto.getMessage().getReport() != null)
 						cell.setCellValue(dto.getMessage().getReport()
