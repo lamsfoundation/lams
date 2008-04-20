@@ -621,6 +621,31 @@ INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organis
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (220,79,5);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (221,79,2);
 
+
+-- hu_HU
+-- need a new workspace_id and the name changes for each user.
+insert into lams_workspace_folder(workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(36,null,'Hungarian Workspace',36,now(),now(),1);
+insert into lams_workspace (workspace_id, default_fld_id, name) values (36,36,'Hungarian Test');
+
+insert into lams_user(user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,city,state,country,
+day_phone,evening_phone,mobile_phone,fax,email,disabled_flag,create_date,authentication_method_id,workspace_id, flash_theme_id,html_theme_id,locale_id)
+values(36,'hungarian','hungarian','Dr','Hungarian','Test','36','Hungarian Ave',null,'Budapest',null,'Hungary',
+'0211111111','0211111112','0411111111','0211111113','hungary@xx.os',0,'20041223',1,36,1,2,13);
+
+-- need a new user_organisation_id for each row, user_id must match user_id created in the lams_user
+-- belongs to course Playpen, Class Everybody
+INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (80, 2, 36);
+INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (81, 3, 36);
+
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (222,80,3);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (223,80,5);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (224,80,2);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (225,81,4);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (226,81,5);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (227,81,2);
+
 SET FOREIGN_KEY_CHECKS=1;
 
 
