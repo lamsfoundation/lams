@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="update-deploy-tools" >
+	<!-- begin properties *******************************************************************************************-->
+	<!-- import properties from the specified file -->
+	
+	<property file="core.properties"/>
+	
+	<target name="update-core-database"  description="Runs some update scripts found in lams_common\db\sql\updatscripts" >
+		<sql driver="com.mysql.jdbc.Driver" 
+			classpath="${jboss.deploy}/mysql-connector-java-3.1.12-bin.jar" 
+			url="${db.url}" 
+			userid="${db.username}" 
+			password="${db.password}"
+			encoding="utf8"
+			onerror="continue">
+			<transaction src="${temp}/lams/sql/updateConfiguration.sql" />
+			<transaction src="${temp}/lams/sql/alter_21_branching.sql" />
+			<transaction src="${temp}/lams/sql/alter_21_engine.sql" />
+			<transaction src="${temp}/lams/sql/alter_21_groupings_fckeditor.sql" />
+		</sql>
+	</target>
+</project>

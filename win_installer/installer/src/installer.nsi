@@ -46,8 +46,8 @@
 !define BUILD "..\..\build\"
 
 # installer settings
-!define MUI_ICON "${BASE_DEV_DIR}\graphics\lams2.ico"
-!define MUI_UNICON "${BASE_DEV_DIR}\graphics\lams2.ico"
+!define MUI_ICON "..\graphics\lams2.ico"
+!define MUI_UNICON "..\graphics\lams2.ico"
 Name "LAMS ${VERSION}"
 ;BrandingText "LAMS ${VERSION} -- built on ${__TIMESTAMP__}"
 BrandingText "LAMS ${VERSION} -- built on ${__DATE__} ${__TIME__}"
@@ -86,7 +86,7 @@ InstProgressFlags smooth
 
 # installer screen progression
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "..\license.txt"
+!insertmacro MUI_PAGE_LICENSE "..\documents\license.txt"
 !insertmacro MUI_PAGE_COMPONENTS
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE DirectoryLeave
 !insertmacro MUI_PAGE_DIRECTORY
@@ -209,9 +209,9 @@ SectionGroup /e "LAMS ${VERSION} Full Install" fullInstall
         File /a "${BUILD}\lams-stop.exe"
         File /a "${BUILD}\lams-backup.exe"
         File /a "${BUILD}\lams-restore.exe"
-        File /a "..\license.txt"
-        File /a "..\license-wrapper.txt"
-        File /a "..\readme.txt"
+        File /a "..\documents\license.txt"
+        File /a "..\documents\license-wrapper.txt"
+        File /a "..\documents\readme.txt"
         Call SetupStartMenu
         
         ${if} $RETAIN_FILES == "1"
