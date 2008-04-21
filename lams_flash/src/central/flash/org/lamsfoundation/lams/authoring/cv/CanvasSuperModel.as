@@ -799,7 +799,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		return _piHeight;
 	}
 	
-	public function findOptionalActivities():Array{
+	public function findOptionalActivities(findAll:Boolean):Array{
 		var actOptional:Array = new Array();
 		var k:Array = _activitiesDisplayed.values();
 		
@@ -809,6 +809,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 				if(k[i].activity.parentUIID == null && (_activeView instanceof CanvasView))
 					actOptional.push(k[i]);
 				else if((_activeView instanceof CanvasBranchView) && findParent(k[i].activity, _activeView.activity))
+					actOptional.push(k[i]);
+				else if(findAll)
 					actOptional.push(k[i]);
 			}
 			
@@ -952,8 +954,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		ca.activity.orderID = null;
 		ca.activity.parentActivityID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityID : null;
 		
-		if(ca.activity.isBranchingActivity())
-			ca.activity.clear = true;
+		tagBranchingActivitiesForClearing(ca.activity);
 		
 		removeActivity(ca.activity.activityUIID);
 		removeActivity(parentID);
@@ -990,17 +991,28 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		
 		Debugger.log('ParentId of '+ca.activity.activityUIID+ ' ==> '+ca.activity.parentUIID,Debugger.GEN,'addParentToActivity','CanvasModel');
 		
-		if(ca.activity.isBranchingActivity()) {
-			ca.activity.clear = true;
-		} else if(ca.activity.isOptionalActivity() || ca.activity.isOptionsWithSequencesActivity()) {
-			for(var i=0; i<ca.actChildren.length; i++) {				if(ca.actChildren[i].isBranchingActivity()) ca.actChildren[i].clear = true;
-			}
-		}
+		tagBranchingActivitiesForClearing(ca);
 		
 		removeActivity(ca.activity.activityUIID);
 		if(doRemoveParent) removeActivity(parentID);
 		
 		setDirty();
+	}
+	
+	private function tagBranchingActivitiesForClearing(ca:Object):Void {
+		if(ca.activity.isBranchingActivity()) {
+			ca.activity.clear = true;
+			
+			var opts = findOptionalActivities(true);
+			for(var i=0; i<opts.length; i++)
+				if(findParent(opts[i].activity, ca.activity)) tagBranchingActivitiesForClearing(opts[i]);
+		
+		} else if(ca.activity.isOptionalActivity() || ca.activity.isOptionsWithSequencesActivity() || ca instanceof CanvasSequenceActivity) {
+			
+			for(var i=0; i<ca.children.length; i++)
+				tagBranchingActivitiesForClearing(ca.children[i]);
+		
+		}
 	}
 	
 	public function clearBranchingActivity(ca:Object):Void {

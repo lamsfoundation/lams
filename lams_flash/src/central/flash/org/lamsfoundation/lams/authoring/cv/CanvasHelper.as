@@ -476,16 +476,14 @@ class CanvasHelper {
 	 * @return  
 	 */
 	public function setPastedItem(o:Object){
-		if (o.data instanceof CanvasActivity){
+		if(o.data instanceof CanvasActivity){
 			Debugger.log('instance is CA',Debugger.GEN,'setPastedItem','Canvas');
-			var callback:Function = Proxy.create(this,setNewContentID, o);
+			var callback:Function = Proxy.create(this, setNewContentID, o);
 			Application.getInstance().getComms().getRequest('authoring/author.do?method=copyToolContent&toolContentID='+o.data.activity.toolContentID+'&userID='+_root.userID,callback, false);
-		
 		} else if(o.data instanceof ToolActivity){
 			Debugger.log('instance is Tool',Debugger.GEN,'setPastedItem','Canvas');
-			var callback:Function = Proxy.create(this,setNewContentID, o);
+			var callback:Function = Proxy.create(this, setNewContentID, o);
 			Application.getInstance().getComms().getRequest('authoring/author.do?method=copyToolContent&toolContentID='+o.toolContentID+'&userID='+_root.userID,callback, false);
-			
 		} else{
 			Debugger.log('Cant paste this item!',Debugger.GEN,'setPastedItem','Canvas');
 		}
@@ -502,7 +500,6 @@ class CanvasHelper {
 				return pasteItem(o.data, o, _newToolContentID);
 			}
 		}
-		
 	}
 	
 	private function pasteItem(toolToCopy:ToolActivity, o:Object, newToolContentID:Number):Object{
@@ -512,10 +509,15 @@ class CanvasHelper {
 		if (newToolContentID != null || newToolContentID != undefined){
 			newToolActivity.toolContentID = newToolContentID;
 		}
+		
 		newToolActivity.xCoord = o.data.activity.xCoord + 10
 		newToolActivity.yCoord = o.data.activity.yCoord + 10
+		
 		canvasModel.selectedItem = newToolActivity;
-			
+		
+		if(canvasModel.activeView instanceof CanvasBranchView)
+			newToolActivity.parentUIID = CanvasBranchView(canvasModel.activeView).defaultSequenceActivity.activityUIID;
+		
 		if(o.type == Application.CUT_TYPE){ 
 			Application.getInstance().setClipboardData(newToolActivity, Application.COPY_TYPE);
 			removeActivity(o.data.activity.activityUIID); 
@@ -538,7 +540,6 @@ class CanvasHelper {
 			canvasModel.activeView = prevActiveView;
 		else
 			canvasModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.activity.branchView : canvasView;
-		
 		
 		canvasModel.currentBranchingActivity = (parentBranching.activity.isBranchingActivity()) ? parentBranching : null;
 		

@@ -316,8 +316,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		ca.activity.orderID = null;
 		ca.activity.parentActivityID = (activeView instanceof CanvasBranchView) ? activeView.defaultSequenceActivity.activityID : null;
 		
-		if(ca.activity.isBranchingActivity())
-			ca.activity.clear = true;
+		tagBranchingActivitiesForClearing(ca);
 		
 		if(!(activeView instanceof CanvasComplexView)) removeActivity(parentID);
 		

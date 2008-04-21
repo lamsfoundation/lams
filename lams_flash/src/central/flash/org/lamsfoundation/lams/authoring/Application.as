@@ -605,7 +605,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	}
 	
 	public function paste():Void{
-		trace("testing paste");
 		_clipboardData.count++;
 		_canvas.setPastedItem(getClipboardData());
 	}
