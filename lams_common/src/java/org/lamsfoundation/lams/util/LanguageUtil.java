@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
@@ -138,23 +139,26 @@ public class LanguageUtil {
 	public static SupportedLocale getSupportedLocale(String langIsoCode, String countryIsoCode) {
 		SupportedLocale locale = null;
 		Map<String, Object> properties = new HashMap<String, Object>();
-		if(countryIsoCode.trim().length()>0 && langIsoCode.trim().length()>0){
-			properties.put("languageIsoCode", langIsoCode);
-			properties.put("countryIsoCode", countryIsoCode);
-		}else if(langIsoCode.trim().length()>0){
-			properties.put("languageIsoCode", langIsoCode);
-		}else if(countryIsoCode.trim().length()>0){
-			properties.put("countryIsoCode", countryIsoCode);
-		}else{
+		
+		if (StringUtils.isNotBlank(countryIsoCode)) {
+			properties.put("countryIsoCode", countryIsoCode.trim());
+		}
+		if (StringUtils.isNotBlank(langIsoCode)) {
+			properties.put("languageIsoCode", langIsoCode.trim());
+		}
+		
+		if (properties.isEmpty()) {
 			return getDefaultLocale();
-		}		
+		}
+		
 		List list = getService().findByProperties(SupportedLocale.class, properties);
-		if(list!=null && list.size()>0){
+		if (list != null && list.size() > 0){
 			Collections.sort(list);
 			locale = (SupportedLocale)list.get(0);
-		}else{
+		} else {
 			locale = getDefaultLocale();
 		}
+		
 		return locale;
 	}
 
