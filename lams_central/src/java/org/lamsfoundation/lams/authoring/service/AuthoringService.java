@@ -1299,7 +1299,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#generateUniqueContentFolder() */
 	public String generateUniqueContentFolder() throws FileUtilException, IOException {
 		
-		return FileUtil.generateUniqueContentFolder();
+		String newUniqueContentFolderID = FileUtil.generateUniqueContentFolderID();
+		
+		FlashMessage flashMessage = new FlashMessage("createUniqueContentFolder", newUniqueContentFolderID);
+		
+		return flashMessage.serializeMessage();
 	}
 	
 	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getHelpURL() */

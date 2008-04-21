@@ -42,7 +42,6 @@ import org.hibernate.Hibernate;
 import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.UUIDHexGenerator;
-import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import javax.mail.internet.MimeUtility;
 
@@ -594,7 +593,7 @@ public class FileUtil {
 			return filename;
 		}
 		
-		public static String generateUniqueContentFolder() throws FileUtilException, IOException {
+		public static String generateUniqueContentFolderID() {
 			
 			String newUniqueContentFolderID = null;
 			Properties props = new Properties();
@@ -605,8 +604,6 @@ public class FileUtil {
 			// lowercase to resolve OS issues
 			newUniqueContentFolderID = ((String) uuidGen.generate(null, null)).toLowerCase();
 			
-			FlashMessage flashMessage = new FlashMessage("createUniqueContentFolder", newUniqueContentFolderID);
-			
-			return flashMessage.serializeMessage();
+			return newUniqueContentFolderID;
 		}
 }

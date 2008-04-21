@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 
-
 /**
  * 
  * @author Jacky Fang
@@ -104,7 +103,7 @@ public class LamsToolService implements ILamsToolService
 	
 	public String generateUniqueContentFolder() throws FileUtilException, IOException {
 		
-		return FileUtil.generateUniqueContentFolder();
+		return FileUtil.generateUniqueContentFolderID();
 		
 	}
 }
