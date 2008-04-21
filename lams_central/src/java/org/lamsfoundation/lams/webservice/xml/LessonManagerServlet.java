@@ -581,8 +581,9 @@ public class LessonManagerServlet extends HttpServlet {
 	}
 	
 	/**
-	 * Calls LoginRequestDispatcher.addUserToLessonClass to add each user
-	 * to the lesson as learner or staff.
+	 * Adds each user in learnerIds and monitorIds as learner and staff to the
+	 * given lesson id; authenticates using the 3rd party server requestor's
+	 * username.
 	 * @param serverId
 	 * @param datetime
 	 * @param hashValue
