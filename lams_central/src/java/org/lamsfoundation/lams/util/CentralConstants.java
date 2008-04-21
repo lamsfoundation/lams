@@ -56,6 +56,16 @@ public class CentralConstants {
 	public static final String PARAM_METHOD = "method";
 	
 	public static final String PARAM_PROGRESS_USER = "progressUser";
+	
+	public static final String PARAM_MODE = "mode";
+	
+	public static final String PARAM_FILEPATH = "filePath";
+	
+	public static final String PARAM_LEARNER_SIZE = "learnerSize";
+	
+	public static final String PARAM_LEARNER_IDS = "learnerIds";
+	
+	public static final String PARAM_MONITOR_IDS = "monitorIds";
 
 	public static final String METHOD_START = "start";
 	
@@ -71,9 +81,7 @@ public class CentralConstants {
 	
 	public static final String METHOD_SINGLE_STUDENT_PROGRESS = "singleStudentProgress";
 	
-	public static final String PARAM_MODE = "mode";
-	
-	public static final String PARAM_FILEPATH = "filePath";
+	public static final String METHOD_JOIN_LESSON = "join";
 	
 	public static final String ATTR_COURSE_ID = "courseId";
 	
@@ -113,9 +121,10 @@ public class CentralConstants {
 	
 	public static final String EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME = "exportToolContentService";
 	
-	public static final String PARAM_LEARNER_SIZE = "learnerSize";
-	
 	public static final String ATTR_RESULT_CODE = "resultCode";
 	
 	public static final String ATTR_RESULT_TEXT = "resultText";
+	
+	public static final String ATTR_ADDED = "added";
+	
 }
