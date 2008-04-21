@@ -1,21 +1,17 @@
 package org.lamsfoundation.lams.webservice.xml;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.File;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.Iterator;
-import java.util.ArrayList;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,25 +31,23 @@ import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
+import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
-import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
-import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.lesson.service.LessonService;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -124,6 +118,8 @@ public class LessonManagerServlet extends HttpServlet {
 		String method 		= request.getParameter(CentralConstants.PARAM_METHOD);
 		String filePath		= request.getParameter(CentralConstants.PARAM_FILEPATH);
 		String progressUser = request.getParameter(CentralConstants.PARAM_PROGRESS_USER);
+		String learnerIds	= request.getParameter(CentralConstants.PARAM_LEARNER_IDS);
+		String monitorIds	= request.getParameter(CentralConstants.PARAM_MONITOR_IDS);
 
 
 		Long ldId = null;
@@ -168,6 +164,7 @@ public class LessonManagerServlet extends HttpServlet {
 				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
 
 			} else if (method.equals(CentralConstants.METHOD_DELETE)) {
+				lsId = new Long(lsIdStr);
 				Boolean deleted = deleteLesson(serverId, datetime, hashValue,
 						username, lsId);
 
@@ -193,11 +190,19 @@ public class LessonManagerServlet extends HttpServlet {
 				element = document.createElement(CentralConstants.ELEM_LEARNINGDESIGN);
 				element.setAttribute(CentralConstants.PARAM_LEARNING_DESIGN_ID, ldID.toString());
 
+			} else if (method.equals(CentralConstants.METHOD_JOIN_LESSON)) {
+				Boolean added = addUsersToLesson(serverId, datetime, username, hashValue, 
+						lsIdStr, courseId, country, lang, learnerIds, monitorIds, request);
+				log.debug("addUsersToLesson returned boolean value of: " + added);
+				
+				element = document.createElement(CentralConstants.ELEM_LESSON);
+				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lsIdStr);
+				element.setAttribute(CentralConstants.ATTR_ADDED, added.toString());
 				
 			}  else {
 				String msg = "Method :" + method + " is not recognised"; 
 				log.error(msg);
-				response.sendError(response.SC_BAD_REQUEST, msg);
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
 			}
 
 			document.appendChild(element);
@@ -214,23 +219,23 @@ public class LessonManagerServlet extends HttpServlet {
 			
 		} catch (NumberFormatException nfe) {
 			log.error("lsId or ldId is not an integer" + lsIdStr + ldIdStr, nfe);
-			response.sendError(response.SC_BAD_REQUEST, "lsId or ldId is not an integer");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "lsId or ldId is not an integer");
 		} catch (TransformerConfigurationException e) {
 			log.error("Can not convert XML document to string", e);
-			response.sendError(response.SC_INTERNAL_SERVER_ERROR);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} catch (TransformerException e) {
 			log.error("Can not convert XML document to string", e);
-			response.sendError(response.SC_INTERNAL_SERVER_ERROR );
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
 		} catch (ParserConfigurationException e) {
 			log.error("Can not build XML document", e);
-			response.sendError(response.SC_INTERNAL_SERVER_ERROR);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} catch (NullPointerException e) {
 			log.error("Missing parameters", e);
-			response.sendError(response.SC_INTERNAL_SERVER_ERROR);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 		catch (Exception e) {
 			log.error("Problem loading learning manager servlet request", e);
-			response.sendError(response.SC_INTERNAL_SERVER_ERROR);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 		
 		out.flush();
@@ -575,6 +580,98 @@ public class LessonManagerServlet extends HttpServlet {
 		
 	}
 	
+	/**
+	 * Calls LoginRequestDispatcher.addUserToLessonClass to add each user
+	 * to the lesson as learner or staff.
+	 * @param serverId
+	 * @param datetime
+	 * @param hashValue
+	 * @param lsIdStr
+	 * @param learnerIds
+	 * @param monitorIds
+	 * @param request
+	 * @return
+	 */
+	public Boolean addUsersToLesson(
+			String serverId, 
+			String datetime, 
+			String requestorUsername,
+			String hashValue, 
+			String lsIdStr,
+			String courseId,
+			String countryIsoCode,
+			String langIsoCode,
+			String learnerIds, 
+			String monitorIds, 
+			HttpServletRequest request) {
+		try {
+			if (learnerIds != null) {
+				log.debug(learnerIds);
+				String[] learnerIdArray = learnerIds.split(",");
+				for (String learnerId : learnerIdArray) {
+					log.debug(learnerId);
+					addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
+							LoginRequestDispatcher.METHOD_LEARNER, lsIdStr, learnerId, courseId, countryIsoCode, langIsoCode);
+				}
+			}
+			if (monitorIds != null) {
+				log.debug(monitorIds);
+				String[] monitorIdArray = monitorIds.split(",");
+				for (String monitorId : monitorIdArray) {
+					log.debug(monitorId);
+					addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
+							LoginRequestDispatcher.METHOD_MONITOR, lsIdStr, monitorId, courseId, countryIsoCode, langIsoCode);
+				}
+			}
+			return true;
+		} catch (UserInfoFetchException e) {
+			log.error(e, e);
+			return false;
+		} catch (AuthenticationException e) {
+			log.error(e, e);
+			return false;
+		}
+	}
+	
+	private void addUserToLesson(
+			HttpServletRequest request, 
+			String serverId, 
+			String datetime, 
+			String requestorUsername, 
+			String hashValue,
+			String method, 
+			String lsIdStr,
+			String username,
+			String courseId, 
+			String countryIsoCode, 
+			String langIsoCode) throws AuthenticationException, UserInfoFetchException {
+		ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
+		Authenticator.authenticate(serverMap, datetime, requestorUsername, hashValue);
+		ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
+		// adds user to group
+		ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId, countryIsoCode, langIsoCode);
+		
+		if (lessonService == null) {
+			lessonService = (ILessonService) WebApplicationContextUtils
+					.getRequiredWebApplicationContext(request.getSession().getServletContext())
+					.getBean("lessonService");
+		}
+		
+		User user = userMap.getUser();
+		if ( user == null ) {
+			String error = "Unable to add user to lesson class as user is missing from the user map";
+			log.error(error);
+			throw new UserInfoFetchException(error);
+		}
+		
+		if (LoginRequestDispatcher.METHOD_LEARNER.equals(method)) {
+			lessonService.addLearner(Long.parseLong(lsIdStr), user.getUserId());
+		} else if (LoginRequestDispatcher.METHOD_MONITOR.equals(method)) {
+			lessonService.addStaffMember(Long.parseLong(lsIdStr), user.getUserId());
+		}
+		
+	}
+	
 
 	private void createLessonClass(Lesson lesson, Organisation organisation,
 			User creator) {
@@ -588,39 +685,6 @@ public class LessonManagerServlet extends HttpServlet {
 
 	}
 	
-	// private IMonitoringService getMonitoringService() {
-	// if (monitoringService == null) {
-	// monitoringService = (IMonitoringService) WebApplicationContextUtils
-	// .getRequiredWebApplicationContext(getServletContext())
-	// .getBean("monitoringService");
-	// }
-	// return monitoringService;
-	// }
-	//
-	// private IntegrationService getIntegrationService() {
-	// if (integrationService == null) {
-	// integrationService = (IntegrationService) WebApplicationContextUtils
-	// .getRequiredWebApplicationContext(getServletContext())
-	// .getBean("integrationService");
-	// }
-	// return integrationService;
-	// }
-	//
-	// private IWorkspaceManagementService getService() {
-	// if (service == null) {
-	// service = (IWorkspaceManagementService) WebApplicationContextUtils
-	// .getRequiredWebApplicationContext(getServletContext())
-	// .getBean("workspaceManagementService");
-	// }
-	// return service;
-	// }
-	//
-	// private MessageService getMessageService() {
-	// if (msgService == null) {
-	// msgService = getService().getMessageService();
-	// }
-	// return msgService;
-	// }
 
 	/**
 	 * Initialization of the servlet. <br>
