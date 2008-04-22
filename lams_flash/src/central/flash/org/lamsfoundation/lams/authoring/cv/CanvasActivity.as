@@ -262,7 +262,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			var tgt_mc;
 			if(_activity.isGateActivity() && !_sequenceChild)
 				tgt_mc = stopSign_mc;			
-			else if(_activity.groupingUIID > 0)
+			else if(_activity.groupingUIID > 0 && !_activity.isBranchingActivity())
+				tgt_mc = canvasActivityGrouped_mc;
+			else if(_activity.groupingUIID > 0 && _activity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
 				tgt_mc = canvasActivityGrouped_mc;
 			else
 				tgt_mc = canvasActivity_mc;
@@ -520,15 +522,32 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			theIcon_mc._visible = true;
 		
 			//chose the background mc
-			if(_activity.groupingUIID != null && _activity.groupingUIID > 0){
-				if(_sequenceChild)  {
-					fade_mc._height = 37;
-					act_pnl._height = 37.5;
-				}
-				canvasActivityGrouped_mc._visible = true;
+			if(_activity.groupingUIID != null && _activity.groupingUIID > 0) {
 				
-				canvasActivity_mc._visible = false;
-			}else{
+				if(_activity.isBranchingActivity() && _activity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE) {
+					canvasActivityGrouped_mc._visible = true;
+					canvasActivity_mc._visible = false;
+					
+					if(_sequenceChild)  {
+						fade_mc._height = 37;
+						act_pnl._height = 37.5;
+					}
+				
+				} else if(!_activity.isBranchingActivity()) {
+					canvasActivityGrouped_mc._visible = true;
+					canvasActivity_mc._visible = false;
+					
+					if(_sequenceChild)  {
+						fade_mc._height = 37;
+						act_pnl._height = 37.5;
+					}
+				
+				} else {
+					canvasActivity_mc._visible = true;
+					canvasActivityGrouped_mc._visible = false;
+				}
+				
+			} else {
 				if(_sequenceChild) {
 					fade_mc._height = 40;
 					act_pnl._height = 40.5;
