@@ -54,6 +54,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.util.MessageResources;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
@@ -250,7 +251,7 @@ public class MonitoringAction extends Action {
 		
 		SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>  groupList = service.exportBySessionId(toolSessionID);
 		String errors = null;
-		MessageResources resource = this.getResources(request);
+		MessageService resource = getMessageService();
 		try {
 			//create an empty excel file
 			HSSFWorkbook wb = new HSSFWorkbook();
@@ -436,5 +437,13 @@ public class MonitoringAction extends Action {
 		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 				.getServletContext());
 		return (ISurveyService) wac.getBean(SurveyConstants.SURVEY_SERVICE);
-	}	
+	}
+	
+	/**
+	 * Return ResourceService bean.
+	 */
+	private MessageService getMessageService() {
+	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+	      return (MessageService) wac.getBean("lasurvMessageService");
+	}
 }
