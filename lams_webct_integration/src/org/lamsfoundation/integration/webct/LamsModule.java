@@ -55,6 +55,7 @@ import org.apache.log4j.Logger;
 
 import org.lamsfoundation.integration.webct.LamsSecurityUtil;
 import org.lamsfoundation.integration.dao.ILamsLessonDao;
+import org.lamsfoundation.integration.dao.LamsLessonDaoJDBC;
 import org.lamsfoundation.integration.dao.LamsLessonDaoMySqlJDBC;
 
 import org.lamsfoundation.integration.util.Constants;
@@ -213,7 +214,8 @@ public class LamsModule extends AuthenticationModule
             	// generate teacher page
         		// ie list of running lessons, and a create new lesson button
         		try{
-        			ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
+        			//ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
+        			ILamsLessonDao lessonDao = new LamsLessonDaoJDBC(settings);
         			List lessons = lessonDao.getDBLessons(lcID.longValue(), Long.parseLong(ptid));
 
         			monitorUrl = generateRequestURL(user, lcID, "monitor");
@@ -237,8 +239,8 @@ public class LamsModule extends AuthenticationModule
             	// generate student page
             	// ie list of running lessons
             	try{
-            		ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
-
+            		//ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
+            		ILamsLessonDao lessonDao = new LamsLessonDaoJDBC(settings);	
         			// test
         			//List lessons = lessonDao.getDBLessons(1);
         			
@@ -341,8 +343,8 @@ public class LamsModule extends AuthenticationModule
         	String successMessage="LAMS lesson deleted.";
         	
         	String lsID = request.getParameter("lsID");
-        	ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
-
+        	//ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
+        	ILamsLessonDao lessonDao = new LamsLessonDaoJDBC(settings);
         	boolean success = lessonDao.deleteDbLesson(Long.parseLong(lsID));
 
         	if (!success)
@@ -418,8 +420,9 @@ public class LamsModule extends AuthenticationModule
         		}
 
         		
-        		ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
-            	LamsLesson lesson = new LamsLesson(
+        		//ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
+    			ILamsLessonDao lessonDao = new LamsLessonDaoJDBC(settings);
+    			LamsLesson lesson = new LamsLesson(
             			lsID, 
             			Long.parseLong(ptid),
             			lcID.longValue(), 
@@ -507,8 +510,9 @@ public class LamsModule extends AuthenticationModule
         else if(action.equals("modify_lesson"))
         {
         	try{
-        		ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
-	        	LamsLesson modLesson = lessonDao.getDBLesson(request.getParameter("lsID"));
+        		//ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
+        		ILamsLessonDao lessonDao = new LamsLessonDaoJDBC(settings);
+        		LamsLesson modLesson = lessonDao.getDBLesson(request.getParameter("lsID"));
 	        	
 	        	
 	        	params.put("lsID", request.getParameter("lsID"));
@@ -653,8 +657,8 @@ public class LamsModule extends AuthenticationModule
         }
         else if(action.equals("modify_proc"))
         {
-        	ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
-        	
+        	//ILamsLessonDao lessonDao = new LamsLessonDaoMySqlJDBC(settings);
+        	ILamsLessonDao lessonDao = new LamsLessonDaoJDBC(settings);
         	
         	try{
 	        	LamsLesson modLesson = lessonDao.getDBLesson(request.getParameter("lsID"));

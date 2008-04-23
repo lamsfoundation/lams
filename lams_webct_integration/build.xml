@@ -226,6 +226,7 @@
 			userid="${dbUser}"
 			password="${dbPass}"
 			encoding="utf8"
+			onerror="continue"
 		>
 			<transaction src="${sqlDir}/createTable_${dbType}.sql" />
 		</sql>	
@@ -239,6 +240,7 @@
 				userid="${dbUser}"
 				password="${dbPass}"
 				encoding="utf8"
+   				onerror="continue"
 			>
 				<transaction src="${sqlDir}/deleteTable_${dbType}.sql" />
 			</sql>	
