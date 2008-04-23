@@ -191,13 +191,16 @@ public class LessonManagerServlet extends HttpServlet {
 				element.setAttribute(CentralConstants.PARAM_LEARNING_DESIGN_ID, ldID.toString());
 
 			} else if (method.equals(CentralConstants.METHOD_JOIN_LESSON)) {
+				Thread t = new Thread(new AddUsersToLessonThread(serverId, datetime, username, hashValue, 
+						lsIdStr, courseId, country, lang, learnerIds, monitorIds, request));
+				t.start();
+				/*
 				Boolean added = addUsersToLesson(serverId, datetime, username, hashValue, 
 						lsIdStr, courseId, country, lang, learnerIds, monitorIds, request);
 				log.debug("addUsersToLesson returned boolean value of: " + added);
-				
+				*/
 				element = document.createElement(CentralConstants.ELEM_LESSON);
 				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lsIdStr);
-				element.setAttribute(CentralConstants.ATTR_ADDED, added.toString());
 				
 			}  else {
 				String msg = "Method :" + method + " is not recognised"; 
@@ -580,99 +583,6 @@ public class LessonManagerServlet extends HttpServlet {
 		
 	}
 	
-	/**
-	 * Adds each user in learnerIds and monitorIds as learner and staff to the
-	 * given lesson id; authenticates using the 3rd party server requestor's
-	 * username.
-	 * @param serverId
-	 * @param datetime
-	 * @param hashValue
-	 * @param lsIdStr
-	 * @param learnerIds
-	 * @param monitorIds
-	 * @param request
-	 * @return
-	 */
-	public Boolean addUsersToLesson(
-			String serverId, 
-			String datetime, 
-			String requestorUsername,
-			String hashValue, 
-			String lsIdStr,
-			String courseId,
-			String countryIsoCode,
-			String langIsoCode,
-			String learnerIds, 
-			String monitorIds, 
-			HttpServletRequest request) {
-		try {
-			if (learnerIds != null) {
-				log.debug(learnerIds);
-				String[] learnerIdArray = learnerIds.split(",");
-				for (String learnerId : learnerIdArray) {
-					log.debug(learnerId);
-					addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
-							LoginRequestDispatcher.METHOD_LEARNER, lsIdStr, learnerId, courseId, countryIsoCode, langIsoCode);
-				}
-			}
-			if (monitorIds != null) {
-				log.debug(monitorIds);
-				String[] monitorIdArray = monitorIds.split(",");
-				for (String monitorId : monitorIdArray) {
-					log.debug(monitorId);
-					addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
-							LoginRequestDispatcher.METHOD_MONITOR, lsIdStr, monitorId, courseId, countryIsoCode, langIsoCode);
-				}
-			}
-			return true;
-		} catch (UserInfoFetchException e) {
-			log.error(e, e);
-			return false;
-		} catch (AuthenticationException e) {
-			log.error(e, e);
-			return false;
-		}
-	}
-	
-	private void addUserToLesson(
-			HttpServletRequest request, 
-			String serverId, 
-			String datetime, 
-			String requestorUsername, 
-			String hashValue,
-			String method, 
-			String lsIdStr,
-			String username,
-			String courseId, 
-			String countryIsoCode, 
-			String langIsoCode) throws AuthenticationException, UserInfoFetchException {
-		ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-		Authenticator.authenticate(serverMap, datetime, requestorUsername, hashValue);
-		ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-		// adds user to group
-		ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId, countryIsoCode, langIsoCode);
-		
-		if (lessonService == null) {
-			lessonService = (ILessonService) WebApplicationContextUtils
-					.getRequiredWebApplicationContext(request.getSession().getServletContext())
-					.getBean("lessonService");
-		}
-		
-		User user = userMap.getUser();
-		if ( user == null ) {
-			String error = "Unable to add user to lesson class as user is missing from the user map";
-			log.error(error);
-			throw new UserInfoFetchException(error);
-		}
-		
-		if (LoginRequestDispatcher.METHOD_LEARNER.equals(method)) {
-			lessonService.addLearner(Long.parseLong(lsIdStr), user.getUserId());
-		} else if (LoginRequestDispatcher.METHOD_MONITOR.equals(method)) {
-			lessonService.addStaffMember(Long.parseLong(lsIdStr), user.getUserId());
-		}
-		
-	}
-	
 
 	private void createLessonClass(Lesson lesson, Organisation organisation,
 			User creator) {
@@ -716,5 +626,135 @@ public class LessonManagerServlet extends HttpServlet {
 	
 	}
 	
+	private class AddUsersToLessonThread implements Runnable {
+		
+		private String serverId;
+		private String datetime;
+		private String username;
+		private String hashValue;
+		private String lsIdStr;
+		private String courseId;
+		private String country;
+		private String lang;
+		private String learnerIds;
+		private String monitorIds;
+		private HttpServletRequest request;
+		
+		public AddUsersToLessonThread(String serverId, 
+				String datetime, String username, String hashValue, 
+				String lsIdStr, String courseId, String country, String lang, 
+				String learnerIds, String monitorIds, HttpServletRequest request) {
+			this.serverId = serverId;
+			this.datetime = datetime;
+			this.username = username;
+			this.hashValue = hashValue;
+			this.lsIdStr = lsIdStr;
+			this.courseId = courseId;
+			this.country = country;
+			this.lang = lang;
+			this.learnerIds = learnerIds;
+			this.monitorIds = monitorIds;
+			this.request = request;
+		}
+		
+		public void run() {
+			addUsersToLesson(serverId, datetime, username, hashValue, 
+					lsIdStr, courseId, country, lang, learnerIds, monitorIds, request);
+		}
+		
+		/**
+		 * Adds each user in learnerIds and monitorIds as learner and staff to the
+		 * given lesson id; authenticates using the 3rd party server requestor's
+		 * username.
+		 * @param serverId
+		 * @param datetime
+		 * @param hashValue
+		 * @param lsIdStr
+		 * @param learnerIds
+		 * @param monitorIds
+		 * @param request
+		 * @return
+		 */
+		public Boolean addUsersToLesson(
+				String serverId, 
+				String datetime, 
+				String requestorUsername,
+				String hashValue, 
+				String lsIdStr,
+				String courseId,
+				String countryIsoCode,
+				String langIsoCode,
+				String learnerIds, 
+				String monitorIds, 
+				HttpServletRequest request) {
+			try {
+				if (learnerIds != null) {
+					String[] learnerIdArray = learnerIds.split(",");
+					for (String learnerId : learnerIdArray) {
+						addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
+								LoginRequestDispatcher.METHOD_LEARNER, lsIdStr, learnerId, courseId, countryIsoCode, langIsoCode);
+					}
+				}
+				if (monitorIds != null) {
+					String[] monitorIdArray = monitorIds.split(",");
+					for (String monitorId : monitorIdArray) {
+						addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
+								LoginRequestDispatcher.METHOD_MONITOR, lsIdStr, monitorId, courseId, countryIsoCode, langIsoCode);
+					}
+				}
+				return true;
+			} catch (UserInfoFetchException e) {
+				log.error(e, e);
+				return false;
+			} catch (AuthenticationException e) {
+				log.error(e, e);
+				return false;
+			}
+		}
+		
+		private void addUserToLesson(
+				HttpServletRequest request, 
+				String serverId, 
+				String datetime, 
+				String requestorUsername, 
+				String hashValue,
+				String method, 
+				String lsIdStr,
+				String username,
+				String courseId, 
+				String countryIsoCode, 
+				String langIsoCode) throws AuthenticationException, UserInfoFetchException {
+			
+			if (log.isDebugEnabled()) {
+				log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lsIdStr + "'.");
+			}
+			
+			ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
+			Authenticator.authenticate(serverMap, datetime, requestorUsername, hashValue);
+			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
+			// adds user to group
+			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId, countryIsoCode, langIsoCode);
+			
+			if (lessonService == null) {
+				lessonService = (ILessonService) WebApplicationContextUtils
+						.getRequiredWebApplicationContext(request.getSession().getServletContext())
+						.getBean("lessonService");
+			}
+			
+			User user = userMap.getUser();
+			if ( user == null ) {
+				String error = "Unable to add user to lesson class as user is missing from the user map";
+				log.error(error);
+				throw new UserInfoFetchException(error);
+			}
+			
+			if (LoginRequestDispatcher.METHOD_LEARNER.equals(method)) {
+				lessonService.addLearner(Long.parseLong(lsIdStr), user.getUserId());
+			} else if (LoginRequestDispatcher.METHOD_MONITOR.equals(method)) {
+				lessonService.addStaffMember(Long.parseLong(lsIdStr), user.getUserId());
+			}
+			
+		}
+	}
 	
 }
