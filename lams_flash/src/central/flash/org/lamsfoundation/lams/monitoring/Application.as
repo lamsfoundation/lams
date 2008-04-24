@@ -421,7 +421,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     
 	
 	public function MonitorActivityContent():Void{
-		var ca = _monitor.getMM().selectedItem
+		var ca = _monitor.getMM().selectedItem;
 		if(CanvasActivity(ca) != null){ 
 			_monitor.getMV().getController().activityDoubleClick(ca, "MonitorTabView", null, true);
 		} else {

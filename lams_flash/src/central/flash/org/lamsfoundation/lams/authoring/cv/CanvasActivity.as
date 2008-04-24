@@ -614,20 +614,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 
 	
 	private function onRollOver():Void{
-		if (_module == "monitoring"){
-			_ccm.showCustomCM(_ccm.loadMenu("activity", "monitoring"))
-		}else {
-			_ccm.showCustomCM(_ccm.loadMenu("activity", "authoring"))
-		}
+		loadCustomContextMenu("activity");
 	}
 	
 	private function onRollOut():Void{
-		if (_module == "monitoring"){
-			_ccm.showCustomCM(_ccm.loadMenu("canvas", "monitoring"))
-		}else {
-			_ccm.showCustomCM(_ccm.loadMenu("canvas", "authoring"))
-		}
+		loadCustomContextMenu("canvas");
 	}	
+	
+	private function loadCustomContextMenu(type:String):Void {
+		if (_module == "monitoring"){
+			_ccm.showCustomCM(_ccm.loadMenu(type, "monitoring"))
+		}else {
+			_ccm.showCustomCM(_ccm.loadMenu(type, "authoring"))
+		}
+	}
 	
 	private function onPress():Void{
 			// check double-click
@@ -668,10 +668,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 	
 	private function onRelease():Void{
+		loadCustomContextMenu("activity");
+		
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
 			Debugger.log('_module:'+_module,Debugger.GEN,'onRelease','CanvasActivity');
-			
 			
 			if (_module == "monitoring"){
 				_monitorController.activityRelease(this);

@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.authoring.Activity;
+import org.lamsfoundation.lams.authoring.BranchingActivity;
 import org.lamsfoundation.lams.authoring.cv.ICanvasActivity;
 import org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity;
 import org.lamsfoundation.lams.authoring.br.CanvasBranchView;
@@ -704,6 +705,19 @@ class MonitorController extends AbstractController {
         } else {
             //TODO DI 25/05/05 raise wrong event type error 
         }
-		
     }
+	
+	public function viewBranchConditionMappingsDialogLoaded(evt:Object) {
+		if(evt.type == 'contentLoaded'){
+			//set up UI
+			//note this function registers the dialog to recieve view updates
+			var branchingActivity:BranchingActivity = BranchingActivity(_monitorModel.selectedItem.activity);
+			
+			evt.target.scrollContent.branchingActivity = branchingActivity;
+			evt.target.scrollContent.mappings = _monitorModel.ddm.getBranchMappingsByActivityUIIDAndType(branchingActivity.activityUIID).toolBased;
+			evt.target.scrollContent.loadLists();
+	    } else {
+            //TODO DI 25/05/05 raise wrong event type error 
+        }
+	}
 }

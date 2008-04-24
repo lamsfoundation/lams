@@ -200,6 +200,13 @@ class Monitor {
 		
 	}
 
+	public function viewToolOutputConditions() {
+		var controller:MonitorController = monitorView.getController();
+		
+		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('ccm_monitor_view_mappings'), closeButton:true, scrollContentPath:'ViewBranchConditionMappingsDialog'});
+		dialog.addEventListener('contentLoaded', Delegate.create(controller, controller.viewBranchConditionMappingsDialogLoaded));
+		
+	}
 
 	/**
     * Called when Users loaded for role type
