@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.style.*
 
+import org.lamsfoundation.lams.authoring.Activity
 import org.lamsfoundation.lams.authoring.BranchingActivity
 import org.lamsfoundation.lams.monitoring.*
 
@@ -119,23 +120,26 @@ class org.lamsfoundation.lams.monitoring.ViewBranchConditionMappingsDialog exten
 	}
 	
 	public function loadLists() {
-		var column_condition:DataGridColumn = new DataGridColumn("displayName");
-		column_condition.headerText = Dictionary.getValue("branch_mapping_dlg_condition_col_lbl");
-		column_condition.width = conditions_dgd.width/2;
+		var column_first:DataGridColumn;
+		if(_branchingActivity.activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) {
+			column_first = new DataGridColumn("displayName");
+			column_first.headerText = Dictionary.getValue("branch_mapping_dlg_condition_col_lbl");
+		} else {
+			column_first = new DataGridColumn("groupName");
+			column_first.headerText = Dictionary.getValue("branch_mapping_dlg_group_col_lbl");
+		} 
+		
+		column_first.width = conditions_dgd.width/2;
 		
 		var column_sequence:DataGridColumn = new DataGridColumn("sequenceName");
 		column_sequence.headerText = Dictionary.getValue("branch_mapping_dlg_branch_col_lbl");
 		column_sequence.width = conditions_dgd.width/2;
 		
-		conditions_dgd.addColumn(column_condition);
+		conditions_dgd.addColumn(column_first);
 		conditions_dgd.addColumn(column_sequence);
 		
-		for(var i=0; i < _mappings.length; i++) {
-			if(_mappings[i].condition.toolActivity.activityUIID == _branchingActivity.toolActivityUIID &&
-				_mappings[i].condition.branchingActivity.activityUIID == _branchingActivity.activityUIID) {
-				conditions_dgd.addItem(_mappings[i]);
-			}
-		}
+		for(var i=0; i<_mappings.length; i++)
+			conditions_dgd.addItem(_mappings[i]);
 		
 	}
     

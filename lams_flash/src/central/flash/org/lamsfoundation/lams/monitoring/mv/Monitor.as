@@ -203,7 +203,9 @@ class Monitor {
 	public function viewToolOutputConditions() {
 		var controller:MonitorController = monitorView.getController();
 		
-		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('ccm_monitor_view_mappings'), closeButton:true, scrollContentPath:'ViewBranchConditionMappingsDialog'});
+		var dialog_title:String = (monitorModel.selectedItem.activity.activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) ? Dictionary.getValue('ccm_monitor_view_condition_mappings') : Dictionary.getValue('ccm_monitor_view_group_mappings');
+		
+		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:dialog_title, closeButton:true, scrollContentPath:'ViewBranchConditionMappingsDialog'});
 		dialog.addEventListener('contentLoaded', Delegate.create(controller, controller.viewBranchConditionMappingsDialogLoaded));
 		
 	}

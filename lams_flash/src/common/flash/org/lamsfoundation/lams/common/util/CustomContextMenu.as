@@ -88,6 +88,8 @@ class CustomContextMenu {
 		
 		var monitorCB:Boolean;
 		
+		var mappings_cxt_mnu_lbl:String = null;
+		
 		var myCopy:Array = new Array();
 		var menuArr:Array = new Array();
 		
@@ -106,13 +108,14 @@ class CustomContextMenu {
 			authorC = false;
 			monitorC = true;
 		
-			monitorCB = (org.lamsfoundation.lams.monitoring.Application.getInstance().getMonitor().model.selectedItem.activity.activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) ? true : false; 
+			monitorCB = (org.lamsfoundation.lams.monitoring.Application.getInstance().getMonitor().model.selectedItem.activity.isBranchingActivity()) ? true : false; 
+			mappings_cxt_mnu_lbl = (org.lamsfoundation.lams.monitoring.Application.getInstance().getMonitor().model.selectedItem.activity.activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) ? Dictionary.getValue('ccm_monitor_view_condition_mappings') : Dictionary.getValue('ccm_monitor_view_group_mappings');
 		}
 		
 		menuArr[0] = [Dictionary.getValue('ccm_open_activitycontent'), getOpenEditActivityContent, false, v, authorC];
 		menuArr[1] = [Dictionary.getValue('ccm_copy_activity'), getCopy, false, v, authorC];
 		menuArr[2] = [Dictionary.getValue('ccm_monitor_activity'), MonitorActivityContent, false, v, monitorC];
-		menuArr[3] = [Dictionary.getValue('ccm_monitor_view_mappings'), viewToolOutputConditions, false, true, monitorCB];
+		menuArr[3] = [mappings_cxt_mnu_lbl, viewToolOutputConditions, false, true, monitorCB];
 		menuArr[4] = [Dictionary.getValue('ccm_monitor_activityhelp'),getMonitorHelp, false, v, monitorC];
 		menuArr[5] = [Dictionary.getValue('ccm_paste_activity'),getPaste, false, v, authorC];
 		menuArr[6] = [Dictionary.getValue('ccm_pi'),getPI, true, true, authorC];

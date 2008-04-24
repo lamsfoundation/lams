@@ -714,7 +714,7 @@ class MonitorController extends AbstractController {
 			var branchingActivity:BranchingActivity = BranchingActivity(_monitorModel.selectedItem.activity);
 			
 			evt.target.scrollContent.branchingActivity = branchingActivity;
-			evt.target.scrollContent.mappings = _monitorModel.ddm.getBranchMappingsByActivityUIIDAndType(branchingActivity.activityUIID).toolBased;
+			evt.target.scrollContent.mappings = _monitorModel.ddm.getBranchMappingsByActivityUIIDAndType(branchingActivity.activityUIID).all;
 			evt.target.scrollContent.loadLists();
 	    } else {
             //TODO DI 25/05/05 raise wrong event type error 
