@@ -35,7 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<script type="text/javascript">
 		function loadFrame(url) {
-			top.frames['contentFrame'].location.href = url;
+			parent.frames['contentFrame'].location.href = url;
 		}
 	</script>
 <body>

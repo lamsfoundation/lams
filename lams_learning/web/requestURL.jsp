@@ -37,7 +37,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 		<script language="JavaScript" type="text/JavaScript"><!--
 			function doRedirect() {
-				top.frames['contentFrame'].location.href = "<c:out value='${url}' escapeXml='false' />";
+				var contentFrame = parent.frames['contentFrame'];
+				
+				if (contentFrame == null) {
+					// This means we are in a parallel activity.
+					// We need to move two levels up to reach 'contentFrame'
+					contentFrame = parent.parent.frames['contentFrame'];
+				}	
+			
+				contentFrame.location.href = "<c:out value='${url}' escapeXml='false' />";
 			}
 			window.onload = doRedirect;
 			//-->
