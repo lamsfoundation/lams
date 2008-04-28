@@ -242,6 +242,11 @@ class LearnerActivity extends MovieClip {
 			
 		}
 		
+		if(_parent._parent.level > 0) {
+			for(var i=0; i<_parent._parent.level; i++)
+				toolTitle = "-" + toolTitle;
+		}
+		
 		title_lbl.text = toolTitle;
 		
 		if(_view instanceof LearnerTabView && !_complex)
