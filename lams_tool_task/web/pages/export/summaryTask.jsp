@@ -77,7 +77,7 @@
 								<ul>
 									<c:forEach var="comment" items="${taskSummaryItem.comments}">
 										<li>
-											<c:out value="${comment.comment}"></c:out>
+											<c:out value="${comment.comment}" escapeXml="false"></c:out>
 										</li>
 									</c:forEach>
 									
