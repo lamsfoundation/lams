@@ -924,7 +924,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	            // String ldPath = ZipFileUtil.expandZip(file.getInputStream(),filename);
             	String ldPath = ZipFileUtil.expandZip(new FileInputStream(designFile) ,filename);
 	            
-	            ldId = importLearningDesignV2(ldPath,importer,workspaceFolderUid,toolsErrorMsgs);
+    			File fullFilePath = new File(FileUtil.getFullPath(ldPath,LEARNING_DESIGN_FILE_NAME));
+    			if ( fullFilePath.canRead() ) {
+    				ldId = importLearningDesignV2(ldPath,importer,workspaceFolderUid,toolsErrorMsgs);
+    			} else { 
+                	badFileType(ldErrorMsgs, filename,"Learning design file not found.");
+    			}
             } else {
             	badFileType(ldErrorMsgs, filename,"Unexpected extension");
             }
