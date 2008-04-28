@@ -107,6 +107,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class ObjectExtractor implements IObjectExtractor {
 	
+	private static final Integer DEFAULT_COORD = new Integer(10); // default coordinate used if the entry from Flash is 0 or less.
+
 	protected IBaseDAO baseDAO = null;
 	protected ILearningDesignDAO learningDesignDAO = null;
 	protected IActivityDAO activityDAO =null;
@@ -860,10 +862,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	        activity.setTitle(WDDXProcessor.convertToString(activityDetails,WDDXTAGS.ACTIVITY_TITLE));
 	    if (keyExists(activityDetails, WDDXTAGS.HELP_TEXT))
 	        activity.setHelpText(WDDXProcessor.convertToString(activityDetails,WDDXTAGS.HELP_TEXT));
-	    if (keyExists(activityDetails, WDDXTAGS.XCOORD))
-	        activity.setXcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.XCOORD));
-	    if (keyExists(activityDetails, WDDXTAGS.YCOORD))
-	        activity.setYcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.YCOORD));
+
+	    activity.setXcoord( getCoord(activityDetails, WDDXTAGS.XCOORD));
+	    activity.setYcoord( getCoord(activityDetails, WDDXTAGS.YCOORD));
 
 	    if (keyExists(activityDetails, WDDXTAGS.GROUPING_UIID))
 	    {
@@ -921,6 +922,14 @@ public class ObjectExtractor implements IObjectExtractor {
 		return activity;
 	}
 
+	private Integer getCoord(Hashtable details, String wddxtag) throws WDDXProcessorConversionException {
+		Integer coord = null;
+		if ( keyExists(details, wddxtag) ) {
+			coord = WDDXProcessor.convertToInteger(details, wddxtag);
+		}
+		return coord == null || coord >= 0 ? coord : DEFAULT_COORD;
+	}
+	
 	private void clearGrouping(Activity activity) {
 		activity.setGrouping(null);
 		activity.setGroupingUIID(null);
@@ -975,10 +984,10 @@ public class ObjectExtractor implements IObjectExtractor {
 			branchingActivity.setSystemTool(getSystemTool(SystemTool.TOOL_BASED_BRANCHING));
 		}
 
-		branchingActivity.setStartXcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.START_XCOORD));
-		branchingActivity.setStartYcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.START_YCOORD));
-		branchingActivity.setEndXcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.END_XCOORD));
-		branchingActivity.setEndYcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.END_YCOORD));
+		branchingActivity.setStartXcoord(getCoord(activityDetails, WDDXTAGS.START_XCOORD));
+		branchingActivity.setStartYcoord(getCoord(activityDetails, WDDXTAGS.START_YCOORD));
+		branchingActivity.setEndXcoord(getCoord(activityDetails, WDDXTAGS.END_XCOORD));
+		branchingActivity.setEndYcoord(getCoord(activityDetails, WDDXTAGS.END_YCOORD));
 	}	
 	
 	private void buildGroupingActivity(GroupingActivity groupingActivity,Hashtable activityDetails) 
