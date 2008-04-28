@@ -476,7 +476,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			children[k].parentUIID = null;
 			
 			// TODO: use method to determine is complex by type
-			if(children[k].activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || children[k].activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || children[k].activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE ) {
+			if(children[k].activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || children[k].activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE || children[k].activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || children[k].activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE || children[k].isBranchingActivity()) {
 				this.removeComplexActivityChildren(_cv.ddm.getComplexActivityChildren(children[k].activityUIID));
 			} else {
 				removeActivity(children[k].activityUIID);
