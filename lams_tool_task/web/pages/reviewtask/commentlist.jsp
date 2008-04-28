@@ -8,7 +8,7 @@
 
 <c:forEach var="comment" items="${sessionMap.taskListItemCommentList}">
 
-	<c:if test="${sessionMap.taskListItem.showCommentsToAll || (sessionMap.userLogin == comment.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'preview')}">
+	<c:if test="${sessionMap.taskListItem.showCommentsToAll || (sessionMap.userLogin == comment.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'author')}">
 	
 		<div>
 			<table cellspacing="0" class="forum">
