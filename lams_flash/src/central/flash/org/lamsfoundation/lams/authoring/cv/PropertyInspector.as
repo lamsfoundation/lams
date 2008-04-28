@@ -49,6 +49,7 @@ class PropertyInspector extends PropertyInspectorControls {
     public var addEventListener:Function;
     public var removeEventListener:Function;
 	
+	private static var MAX_TITLE_CHARS:Number = 60;
 	
 	/**
 	 * Constructor
@@ -78,6 +79,9 @@ class PropertyInspector extends PropertyInspectorControls {
 
 		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
+		
+		// set character limit on title field
+		title_txt.maxChars = MAX_TITLE_CHARS;
 		
 		//set up handlers
 		title_txt.addEventListener("focusOut",this);
