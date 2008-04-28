@@ -62,13 +62,23 @@
 	<c:set var="accessMode" value="author" scope="request"/>
 </c:if>
 
+<c:set var="saveUnableMsgKey" value="authoring.msg.no.tasks.save" scope="request"/>
+
 <!-- begin tab content -->
 <script type="text/javascript">
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
        	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&contentFolderID=${contentFolderID}'/>";
 	}
     function doSubmit_Form_Only() {
-    	document.getElementById("${formID}").submit();
+        	var table = document.getElementById("itemTable");
+    	var length2 = table.rows;
+    	var length = length2.length;
+
+		if( length == 0 ) {
+        	alert("<fmt:message key='${saveUnableMsgKey}'/>")
+		} else {
+	        document.getElementById("${formID}").submit();    		
+		}
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){

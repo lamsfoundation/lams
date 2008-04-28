@@ -153,7 +153,7 @@
 			</c:forEach>
 		</table>
 		
-		<fmt:message key="label.learning.required.tasks" />
+		* - <fmt:message key="label.learning.required.tasks" />
 		<br><br>
 
 		<c:if test="${mode != 'teacher'}">
