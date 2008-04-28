@@ -57,7 +57,7 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 	var shadow:Boolean = false;
 	var interval;
 	
-	var delay:Number = 1;
+	var delay:Number = 0.5;
 	
 	// Class Constructor
 	// ----------------------------------------------------------------------------------------
