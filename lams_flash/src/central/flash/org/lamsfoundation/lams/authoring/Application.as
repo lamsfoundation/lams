@@ -22,6 +22,7 @@
  */
 
 import org.lamsfoundation.lams.authoring.*       	//Design Data model n stuffimport org.lamsfoundation.lams.authoring.*       	//Design Data model n stuff
+import org.lamsfoundation.lams.authoring.br.CanvasBranchView 
 import org.lamsfoundation.lams.authoring.tk.*       //Toolkit
 import org.lamsfoundation.lams.authoring.tb.*       //Toolbar
 import org.lamsfoundation.lams.authoring.cv.*       //Canvas
@@ -584,10 +585,12 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	
 	public function copy():Void{
 		var ca = _canvas.model.selectedItem
-		if (CanvasActivity(ca) != null){
+		if (ca != null){
 			if (ca.activity.parentUIID == null || ca.activity.parentUIID == undefined){
 				setClipboardData(ca, COPY_TYPE);
-			}else {
+			} else if(_canvas.model.activeView instanceof CanvasBranchView && canvas.ddm.getActivityByUIID(ca.activity.parentUIID).parentUIID == canvas.model.activeView.activity.activityUIID) {
+				setClipboardData(ca, COPY_TYPE);
+			} else {
 				LFMessage.showMessageAlert(Dictionary.getValue('cv_activity_copy_invalid'));
 			}
 		}else{

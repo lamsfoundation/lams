@@ -476,7 +476,7 @@ class CanvasHelper {
 	 * @return  
 	 */
 	public function setPastedItem(o:Object){
-		if(o.data instanceof CanvasActivity){
+		if(o.data instanceof CanvasActivity && o.data.activity.activityCategoryID != Activity.CATEGORY_SYSTEM){
 			Debugger.log('instance is CA',Debugger.GEN,'setPastedItem','Canvas');
 			var callback:Function = Proxy.create(this, setNewContentID, o);
 			Application.getInstance().getComms().getRequest('authoring/author.do?method=copyToolContent&toolContentID='+o.data.activity.toolContentID+'&userID='+_root.userID,callback, false);
@@ -485,6 +485,7 @@ class CanvasHelper {
 			var callback:Function = Proxy.create(this, setNewContentID, o);
 			Application.getInstance().getComms().getRequest('authoring/author.do?method=copyToolContent&toolContentID='+o.toolContentID+'&userID='+_root.userID,callback, false);
 		} else{
+			LFMessage.showMessageAlert(Dictionary.getValue('al_activity_paste_invalid'));
 			Debugger.log('Cant paste this item!',Debugger.GEN,'setPastedItem','Canvas');
 		}
 	}
