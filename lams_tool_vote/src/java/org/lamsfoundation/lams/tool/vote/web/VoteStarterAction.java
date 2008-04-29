@@ -214,9 +214,9 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 			logger.debug("request is for define later module. either direct or by monitoring module");
 			voteAuthoringForm.setActiveModule(DEFINE_LATER);
 			voteGeneralAuthoringDTO.setActiveModule(DEFINE_LATER);
-			voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
 			voteAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
-			voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
+			voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 		}
 		 
 		initialiseAttributes(request, voteGeneralAuthoringDTO, voteService);
