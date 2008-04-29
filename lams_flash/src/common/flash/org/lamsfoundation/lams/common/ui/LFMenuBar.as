@@ -469,7 +469,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(2), false);
 		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(3), false);
 		
-		view_menu.setMenuItemEnabled(view_menu.getMenuItemAt(0), false);
+		view_menu.setMenuItemEnabled(view_menu.getMenuItemAt(0), true);
 	}
 	
     /**
