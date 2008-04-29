@@ -21,7 +21,7 @@ FCKConfig.ToolbarSets["Custom-Learner"] = [
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['OrderedList','UnorderedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
-	['Image','Link'],
+	['WikiLink','Image','Link'],
 	['About'],
 	['TextColor','BGColor'],
 	['Table','Rule','Smiley','SpecialChar'],
@@ -36,3 +36,4 @@ FCKConfig.DefaultLinkTarget = "_blank";
 FCKConfig.TemplatesXmlPath = FCKConfig.BasePath + '../../www/htmltemplates.xml';
 FCKConfig.FontFormats	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 FCKConfig.EnterMode = 'div' ;
+FCKConfig.Plugins.Add('wikilink', 'en', FCKConfig.BasePath + '../../fckeditor/editor/plugins/');

@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
+		<title>WikiLink Properties</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta content="noindex, nofollow" name="robots">
+		<style type="text/css">
+			select {width: 100%}
+		</style>
+		<script language="javascript">
+
+var oEditor = window.parent.InnerDialogLoaded() ;
+var FCKLang = oEditor.FCKLang ;
+var FCKWikiLinks = oEditor.FCKWikiLinks ;
+
+window.onload = function ()
+{
+	// First of all, translate the dialog box texts
+	oEditor.FCKLanguageManager.TranslatePage( document ) ;
+
+	document.wikiform.newWikiLink.disabled = true;
+
+	// Show the "Ok" button.
+	window.parent.SetOkButton( true ) ;
+}
+
+function Ok()
+{
+	var linkText = document.getElementById('linkName').value ;
+	var existingWikiSelected = document.getElementById('existingWikiRadioButton').checked ;
+	var newWikiSelected = document.getElementById('newWikiRadioButton').checked ;
+
+	if ( existingWikiSelected ) {
+		var existingWikiList = document.getElementById('existingWikiDropDownMenu') ;
+		var wikiToLink = existingWikiList.options[existingWikiList.selectedIndex].text;
+	}
+	else if ( newWikiSelected ) {
+		var wikiToLink = document.getElementById('newWikiLink').value ;
+	}
+
+	if ( linkText.length == 0 )
+	{
+		alert( FCKLang.WikiLinkErrNoName ) ;
+		return false ;
+	}
+	
+	if ( !wikiToLink )
+	{
+		alert( FCKLang.WikiLinkErrNoWiki ) ;
+		return false;
+	}
+	
+	FCKWikiLinks.InsertWikiLink( linkText, wikiToLink );
+	
+	return true ;
+}
+
+function enableSelection()
+{
+	var existingWikiSelected = document.getElementById('existingWikiRadioButton').checked ;
+	var newWikiSelected = document.getElementById('newWikiRadioButton').checked ;
+	
+	if ( existingWikiSelected ) {
+		document.wikiform.newWikiLink.disabled = true;
+		document.wikiform.existingWikiDropDownMenu.disabled = false;
+	}
+	else if ( newWikiSelected ) {
+		document.wikiform.existingWikiDropDownMenu.disabled = true;
+		document.wikiform.newWikiLink.disabled = false;
+	}
+}
+		</script>
+	</head>
+	<body scroll="no" style="OVERFLOW: hidden">
+	<form name="wikiform" action="">
+		<table height="100%" cellSpacing="0" cellPadding="0" width="100%" border="0">
+			<tr>
+				<td>
+					<table cellSpacing="3" cellPadding="3" align="center" border="0">
+						<tr>
+							<td colspan="2">
+								<span fckLang="WikiLinkText"></span>
+							</td>
+							<td>
+								<input id="linkName" type="text">
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span fckLang="WikiLinkExisting"></span>
+							</td>
+							<td>
+								<input type="radio" id="existingWikiRadioButton" name="wikilinkgroup" selected="true" checked 		onchange="enableSelection();">
+							</td>
+							<td>
+								<select name="existingWikiDropDownMenu" id="existingWikiDropDownMenu">
+									<option value="noSelection"></option>var existingWikiList = document.getElementById('existingWikiDropDownMenu') ;
+									<option value="Wiki1">Wiki 1</option>
+									<option value="Wiki2">Wiki 2</option>
+									<option value="Wiki3">Wiki 3</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span fckLang="WikiLinkNew"></span>
+							</td>
+							<td>
+								<input type="radio" id="newWikiRadioButton" name="wikilinkgroup" onchange="enableSelection();">
+							</td>
+							<td>
+								<input id="newWikiLink" type="text">
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</form>
+	</body>
+</html>
