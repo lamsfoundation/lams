@@ -6,44 +6,27 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+
 /**
  * JSP tag. It converts text from \n or \r\n to &lt;BR&gt; before rendering.
- *  @jsp.tag name="out"
- * 		body-content="empty"
- * 		display-name="converts text from \n or \r\n to &lt;BR&gt; before rendering"
- * 		description="converts text from \n or \r\n to &lt;BR&gt; before rendering"
- * @jsp.
+ * 
+ * @jsp.tag name="out" body-content="empty" 
+ * 			display-name="Converts text from \n or \r\n to &lt;BR&gt; before rendering" 
+ *          description="Converts text from \n or \r\n to &lt;BR&gt; before rendering"
+ * 
  * @author steven
- *
  */
-public class MultiLinesOutputTag extends SimpleTagSupport{
-//	private static String os = (String) System.getProperties().get("os.name");
-	
+public class MultiLinesOutputTag extends SimpleTagSupport {
+
 	private String value;
-	
-	private boolean escapeXml;
-	
+	private boolean escapeHtml;
+
 	@Override
 	public void doTag() throws JspException, IOException {
-		if(StringUtils.isEmpty(value))
-			getJspContext().getOut().write(value);
-		
-		//change back
-//		if(os.toLowerCase().indexOf("win") != -1)
-//			value = value.replaceAll("\r\n","<BR>");
-//		else
-		
-		if (escapeXml) {
-			String[] lines = value.split("\n");
-			value = new String();
-			for(String line: lines) {
-				value += StringEscapeUtils.escapeXml(line) + "<br>";
-			}			
-		} else {
-			value = value.replaceAll("\n","<BR>");
+		if (escapeHtml) {
+			value = StringEscapeUtils.escapeHtml(value);
 		}
-
+		value = value.replaceAll("\n", "<br>");
 		getJspContext().getOut().write(value.toString());
 	}
 
@@ -58,16 +41,15 @@ public class MultiLinesOutputTag extends SimpleTagSupport{
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
+
 	/**
-	 * @jsp.attribute required="false" rtexprvalue="true" description="escape xml characters?
-	 * 
+	 * @jsp.attribute required="false" rtexprvalue="true" description="escape html characters"
 	 */
-	public boolean getEscapeXml() {
-	    return this.escapeXml;
+	public boolean getEscapeHtml() {
+		return this.escapeHtml;
 	}
-	
-	public void setEscapeXml(boolean escapeXml) {
-	    this.escapeXml = escapeXml;
+
+	public void setEscapeHtml(boolean escapeHtml) {
+		this.escapeHtml = escapeHtml;
 	}
 }
