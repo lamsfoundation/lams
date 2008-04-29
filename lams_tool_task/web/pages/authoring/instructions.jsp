@@ -100,7 +100,7 @@
 			<div class="field-name-alternative-color">
 				<fmt:message key="label.authoring.offline.instruction" />
 			</div>
-			<html:textarea property="taskList.offlineInstructions" rows="3" cols="75" />
+			<lams:STRUTS-textarea property="taskList.offlineInstructions" rows="3" cols="75" />
 		</td>
 	</tr>
 	<tr>
