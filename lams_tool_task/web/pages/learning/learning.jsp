@@ -198,7 +198,7 @@
 						</p>
 					</c:when>
 					<c:otherwise>
-						<p> <lams:out escapeXml="true" value="${sessionMap.reflectEntry}" />  </p>				
+						<p> <lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />  </p>				
 					</c:otherwise>
 				</c:choose>
 				
