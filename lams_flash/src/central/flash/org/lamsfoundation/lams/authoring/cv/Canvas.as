@@ -802,7 +802,7 @@ b	 * @param   learningDesignID
 		if(_ddm.validDesign){
 			Debugger.log('Launching Preview Window (initialising)',Debugger.GEN,'launchPreviewWindow','Canvas');
 			var callback:Function = Proxy.create(this,onInitPreviewResponse); 
-			Application.getInstance().getComms().sendAndReceive(_ddm.getDataForPreview(Dictionary.getValue('preview_btn'),"started%20automatically"),"monitoring/initializeLesson",callback,false)
+			Application.getInstance().getComms().sendAndReceive(_ddm.getDataForPreview(Dictionary.getValue('preview_btn'), Dictionary.getValue("preview_lesson_desc")), "monitoring/initializeLesson", callback, false)
 		}
 	}
 
