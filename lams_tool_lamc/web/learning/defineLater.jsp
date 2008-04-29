@@ -34,30 +34,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html>
 <lams:head>
 	<html:base />
-	<lams:headItems />
+	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
 </lams:head>
 
-<body>
-	<div id="page-learner">
-	
-	<h1 class="no-tabs-below">&nbsp;</h1>
-	
-	<div id="header-no-tabs-learner"></div>
-	
-	<div id="content-learner">
-		<lams:DefineLater defineLaterMessageKey="error.defineLater"/>		
+<body class="stripes">
+
+	<div id="content">
+		<lams:DefineLater defineLaterMessageKey="error.defineLater" />
 	</div>
-	
-	<div id="footer-learner"></div>
-</div>
+
+	<div id="footer"></div>
+
 </body>
 </lams:html>
-
-
-
-
-
-
-
-
