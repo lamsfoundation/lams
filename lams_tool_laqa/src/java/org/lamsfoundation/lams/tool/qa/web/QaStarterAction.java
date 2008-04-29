@@ -223,7 +223,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		{
 			logger.debug("request is for define later module either direcly from define later url or monitoring url");
 			qaGeneralAuthoringDTO.setActiveModule(DEFINE_LATER);
-			qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
+			qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 			qaGeneralAuthoringDTO.setShowAuthoringTabs(new Boolean(false).toString());
 			qaAuthoringForm.setActiveModule(DEFINE_LATER);			
 			requestedModule=DEFINE_LATER;

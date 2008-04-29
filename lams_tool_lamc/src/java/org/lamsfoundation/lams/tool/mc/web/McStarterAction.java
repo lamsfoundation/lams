@@ -218,7 +218,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		{
 			logger.debug("request is for define later module either direcly from define later url or monitoring url");
 			mcGeneralAuthoringDTO.setActiveModule(DEFINE_LATER);
-			mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
+			mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 			mcGeneralAuthoringDTO.setShowAuthoringTabs(new Boolean(false).toString());
 			mcAuthoringForm.setActiveModule(DEFINE_LATER);			
 			requestedModule=DEFINE_LATER;

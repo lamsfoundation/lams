@@ -215,7 +215,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 			voteAuthoringForm.setActiveModule(DEFINE_LATER);
 			voteGeneralAuthoringDTO.setActiveModule(DEFINE_LATER);
 			
-			voteAuthoringForm.setDefineLaterInEditMode(new Boolean(false).toString());
+			voteAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
 			voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
 		}
 		 
