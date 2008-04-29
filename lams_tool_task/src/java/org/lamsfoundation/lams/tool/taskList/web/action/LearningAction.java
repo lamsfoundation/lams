@@ -181,13 +181,12 @@ public class LearningAction extends Action {
 		
 		//basic information
 		sessionMap.put(TaskListConstants.ATTR_TITLE,taskList.getTitle());
-//		sessionMap.put(TaskListConstants.ATTR_RESOURCE_INSTRUCTION,taskList.getInstructions());
 		sessionMap.put(TaskListConstants.ATTR_FINISH_LOCK,lock);
 		sessionMap.put(TaskListConstants.ATTR_USER_FINISHED, taskListUser !=null && taskListUser.isSessionFinished());
 		sessionMap.put(TaskListConstants.ATTR_USER_VERIFIED_BY_MONITOR, taskListUser.isVerifiedByMonitor());
-		
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
 		sessionMap.put(AttributeNames.ATTR_MODE,mode);
+		
 		//reflection information
 		sessionMap.put(TaskListConstants.ATTR_REFLECTION_ON,taskList.isReflectOnActivity());
 		sessionMap.put(TaskListConstants.ATTR_REFLECTION_INSTRUCTION,taskList.getReflectInstructions());

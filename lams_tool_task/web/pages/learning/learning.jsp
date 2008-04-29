@@ -23,7 +23,7 @@
 	<script type="text/javascript">
 	<!--
 		function checkNew(){
-			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}";
+			document.location.href = "<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}";
  		    return false;
 		}
 		function viewItem(itemUid){
@@ -78,6 +78,7 @@
 
 
 	<div id="content">
+	
 		<h1>
 			${taskList.title}
 		</h1>
@@ -139,11 +140,8 @@
 										border="0">
 								</c:when>
 								<c:otherwise>
-									<c:if test="${(mode != 'teacher') && (not finishedLock) && (not taskList.sequentialOrder || lastTaskCompletion)}">
-										<a href="javascript:;"
-											onclick="return completeItem(${item.uid})"> <fmt:message key="label.completed" /> 
-										</a>
-									</c:if>
+									<img src="<html:rewrite page='/includes/images/cross.gif'/>"
+										border="0">
 								</c:otherwise>
 							</c:choose>
 						</td>
@@ -221,6 +219,7 @@
 
 		<c:if test="${(mode != 'teacher') && isRequiredTasksCompleted}">
 			<div class="space-bottom-top align-right">
+
 				<c:choose>
 					<c:when	test="${taskList.monitorVerificationRequired && !sessionMap.userVerifiedByMonitor}">
 						<fmt:message key="label.learning.wait.for.monitor.verification" />
