@@ -44,6 +44,15 @@
 		// remove the Agree button.
 		document.getElementById("agreeButton").innerHTML = "";
 	}
+	
+	function confirmForceComplete() {
+		var message = "<fmt:message key='message.confirmForceComplete'/>";
+		if (confirm(message)) {
+			return true;			
+		} else {
+			return false;
+		}
+	}
 </script>
 
 <div id="content">
@@ -103,7 +112,7 @@
 	<hr>
 
 	<div class="space-bottom-top">
-		<html:form action="learning">
+		<html:form action="learning" onsubmit="return confirmForceComplete();">
 			<html:hidden property="dispatch" value="forceCompleteActivity" />
 			<html:hidden property="scribeUserUID" value="${scribeUserDTO.uid}" />
 			<html:hidden property="mode" />
