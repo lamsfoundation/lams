@@ -43,10 +43,6 @@
 			var myUrl = "<c:url value="/reviewItem.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&itemUid=" + itemUid;
 			launchPopup(myUrl,"LearnerView");
 		}
-		function completeItem(itemUid){
-			document.location.href = "<c:url value="/learning/completeItem.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=" + itemUid;
-			return false;
-		}
 		function finishSession(){
 			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
@@ -117,11 +113,8 @@
 									border="0">
 							</c:when>
 							<c:otherwise>
-								<c:if test="${mode != 'teacher' && (not finishedLock)}">
-									<a href="javascript:;"
-										onclick="return completeItem(${item.uid})"> <fmt:message
-											key="label.completed" /> </a>
-								</c:if>
+								<img src="<html:rewrite page='/includes/images/cross.gif'/>"
+									border="0">
 							</c:otherwise>
 						</c:choose>
 					</td>
