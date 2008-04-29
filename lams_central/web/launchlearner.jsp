@@ -12,6 +12,7 @@
 	<title><fmt:message key="index.welcome" /></title>
 	<lams:css style="tabbed"/>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
+	<script language="javascript" type="text/javascript" src="loadVars.jsp"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
 </lams:head>
 
