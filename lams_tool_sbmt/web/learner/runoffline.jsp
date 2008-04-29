@@ -35,26 +35,29 @@
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
-				<h2>${sessionMap.reflectInstructions}</h2>
-				
+				<h2>
+					${sessionMap.reflectInstructions}
+				</h2>
+
 				<c:choose>
 					<c:when test="${empty learner.reflect}">
 						<p>
-							<em>
-								<fmt:message key="message.no.reflection.available" />
+							<em> <fmt:message key="message.no.reflection.available" />
 							</em>
 						</p>
 					</c:when>
 					<c:otherwise>
-						<p> <lams:out escapeXml="true" value="${learner.reflect}" />  </p>				
+						<p>
+							<lams:out escapeHtml="true" value="${learner.reflect}" />
+						</p>
 					</c:otherwise>
 				</c:choose>
-				
+
 				<html:button property="notebookButton"
 					onclick="javascript:notebook();" styleClass="button">
-					<fmt:message key="label.edit" />					
-				</html:button>				
-								
+					<fmt:message key="label.edit" />
+				</html:button>
+
 			</div>
 		</c:if>
 

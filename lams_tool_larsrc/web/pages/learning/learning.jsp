@@ -180,7 +180,7 @@
 				<iframe
 					onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
 					id="reourceInputArea" name="reourceInputArea"
-					style="width:0px;height:0px;border:0px;display:none"
+					style="width: 0px; height: 0px; border: 0px; display: none"
 					frameborder="no" scrolling="no">
 				</iframe>
 
@@ -213,30 +213,33 @@
 			</c:choose>
 			<%-- end mode != teacher --%>
 		</c:if>
-		
-		
+
+
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
-				<h2>${sessionMap.reflectInstructions}</h2>
-			
+				<h2>
+					${sessionMap.reflectInstructions}
+				</h2>
+
 				<c:choose>
 					<c:when test="${empty sessionMap.reflectEntry}">
 						<p>
-							<em>
-								<fmt:message key="message.no.reflection.available" />
+							<em> <fmt:message key="message.no.reflection.available" />
 							</em>
 						</p>
 					</c:when>
 					<c:otherwise>
-						<p> <lams:out escapeXml="true" value="${sessionMap.reflectEntry}" />  </p>				
+						<p>
+							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
+						</p>
 					</c:otherwise>
 				</c:choose>
-				
+
 				<c:if test="${mode != 'teacher'}">
 					<html:button property="FinishButton"
 						onclick="return continueReflect()" styleClass="button">
 						<fmt:message key="label.edit" />
-					</html:button>											
+					</html:button>
 				</c:if>
 			</div>
 		</c:if>

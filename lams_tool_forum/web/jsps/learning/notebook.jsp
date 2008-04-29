@@ -8,7 +8,8 @@
 	}
 </script>
 
-<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();">
+<html:form action="/learning/submitReflection" method="post"
+	onsubmit="disableFinishButton();">
 	<html:hidden property="userID" />
 	<html:hidden property="sessionMapID" />
 
@@ -19,20 +20,18 @@
 
 		<%@ include file="/common/messages.jsp"%>
 
-
 		<p>
 			<lams:out value="${sessionMap.reflectInstructions}" />
 		</p>
 
-		<html:textarea cols="52" rows="6" property="entryText" styleClass="text-area" />
+		<html:textarea cols="52" rows="6" property="entryText"
+			styleClass="text-area" />
 
 		<div class="space-bottom-top align-right">
 			<html:submit styleClass="button" styleId="finishButton">
 				<fmt:message key="label.finish" />
 			</html:submit>
-			</div>
-		
+		</div>
 
 	</div>
 </html:form>
-

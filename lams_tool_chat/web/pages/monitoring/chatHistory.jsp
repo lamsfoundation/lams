@@ -32,7 +32,7 @@ function closeEditPane() {
 
 <c:choose>
 	<c:when test="${empty session.messageDTOs}">
-		<fmt:message key="message.noChatMessages"/>
+		<fmt:message key="message.noChatMessages" />
 	</c:when>
 	<c:otherwise>
 		<div class="space-left space-right">
@@ -43,12 +43,11 @@ function closeEditPane() {
 				</c:if>
 
 				<div class="message"
-					onclick="javascript:toggleEditPane('u${message.uid}')"
-					style="${hiddenStyle}">
+					onclick="javascript:toggleEditPane('u${message.uid}')" style="">
 					<div class="messageFrom">
 						${message.from}
 					</div>
-					<lams:out value="${message.body}" escapeXml="true"></lams:out>
+					<lams:out escapeHtml="true" value="${message.body}"></lams:out>
 					<img src="images/edit.gif" alt="edit" />
 				</div>
 
@@ -61,11 +60,11 @@ function closeEditPane() {
 						<c:choose>
 							<c:when test="${message.hidden}">
 								<input id="cb${message.uid}" name="messageHidden"
-									type="checkbox" checked="checked" class="noBorder"/>
+									type="checkbox" checked="checked" class="noBorder" />
 							</c:when>
 							<c:otherwise>
 								<input id="cb${message.uid}" name="messageHidden"
-									type="checkbox" class="noBorder"/>
+									type="checkbox" class="noBorder" />
 							</c:otherwise>
 						</c:choose>
 
@@ -76,7 +75,8 @@ function closeEditPane() {
 
 						<html:textarea property="messageBody" value="${message.body}"
 							style="width:95%" rows="3" />
-						<br /><br />
+						<br />
+						<br />
 
 						<html:submit styleClass="button">
 							<fmt:message>button.save</fmt:message>

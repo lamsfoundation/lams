@@ -47,7 +47,7 @@
 								<div class="message">
 									<span class="messageFrom"> ${message.from} </span>
 									<br />
-									<lams:out value="${message.body}" escapeXml="true"></lams:out>
+									<lams:out escapeHtml="true" value="${message.body}"></lams:out>
 								</div>
 							</c:forEach>
 

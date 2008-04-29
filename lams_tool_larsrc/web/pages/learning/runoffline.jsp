@@ -31,28 +31,31 @@
 		<p>
 			<fmt:message key="run.offline.message" />
 		</p>
-		
+
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
-				<h2>${sessionMap.reflectInstructions}</h2>
-			
+				<h2>
+					${sessionMap.reflectInstructions}
+				</h2>
+
 				<c:choose>
 					<c:when test="${empty sessionMap.reflectEntry}">
 						<p>
-							<em>
-								<fmt:message key="message.no.reflection.available" />
+							<em> <fmt:message key="message.no.reflection.available" />
 							</em>
 						</p>
 					</c:when>
 					<c:otherwise>
-						<p> <lams:out escapeXml="true" value="${sessionMap.reflectEntry}" />  </p>				
+						<p>
+							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
+						</p>
 					</c:otherwise>
 				</c:choose>
-				
+
 				<html:button property="FinishButton"
 					onclick="return continueReflect()" styleClass="button">
 					<fmt:message key="label.edit" />
-				</html:button>											
+				</html:button>
 			</div>
 		</c:if>
 

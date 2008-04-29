@@ -3,26 +3,26 @@
 <html:form action="/learning" method="post">
 	<html:hidden property="chatUserUID" value="${chatUserDTO.uid}" />
 	<html:hidden property="dispatch" value="openNotebook" />
-	
+
 	<c:if
 		test="${chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
 		<div class="space-top">
 			<h2>
 				${chatDTO.reflectInstructions}
 			</h2>
-			
+
 			<p>
 				<c:choose>
 					<c:when test="${not empty chatUserDTO.notebookEntry}">
-						<lams:out value="${chatUserDTO.notebookEntry}" escapeXml="true" />
+						<lams:out escapeHtml="true" value="${chatUserDTO.notebookEntry}" />
 					</c:when>
-					
+
 					<c:otherwise>
-						<em><fmt:message key="message.no.reflection.available" /></em>  
+						<em><fmt:message key="message.no.reflection.available" /> </em>
 					</c:otherwise>
-				</c:choose>		
+				</c:choose>
 			</p>
-			
+
 			<html:submit styleClass="button">
 				<fmt:message key="button.edit" />
 			</html:submit>
@@ -39,7 +39,8 @@
 	}
 </script>
 
-<html:form action="/learning" method="post" onsubmit="disableFinishButton();">
+<html:form action="/learning" method="post"
+	onsubmit="disableFinishButton();">
 	<html:hidden property="chatUserUID" value="${chatUserDTO.uid}" />
 	<div class="space-bottom-top align-right">
 		<c:choose>

@@ -5,7 +5,8 @@
 <lams:html>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <lams:head>
-	<title><fmt:message key="label.learning.title" /></title>
+	<title><fmt:message key="label.learning.title" />
+	</title>
 	<%@ include file="/common/header.jsp"%>
 
 	<script type="text/javascript">
@@ -93,59 +94,60 @@
 		</c:forEach>
 
 		<c:if test="${not sessionMap.finishedLock}">
-			 <html:button
-				property="RetakeButton" onclick="return retakeSurvey(-1)"
-				styleClass="button">
+			<html:button property="RetakeButton"
+				onclick="return retakeSurvey(-1)" styleClass="button">
 				<fmt:message key="label.retake.survey" />
-			</html:button> 
+			</html:button>
 		</c:if>
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
-				<h2>${sessionMap.reflectInstructions}</h2>
-			
+				<h2>
+					${sessionMap.reflectInstructions}
+				</h2>
+
 				<c:choose>
 					<c:when test="${empty sessionMap.reflectEntry}">
 						<p>
-							<em>
-								<fmt:message key="message.no.reflection.available" />
+							<em> <fmt:message key="message.no.reflection.available" />
 							</em>
 						</p>
 					</c:when>
 					<c:otherwise>
-						<p> <lams:out escapeXml="true" value="${sessionMap.reflectEntry}" />  </p>				
+						<p>
+							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
+						</p>
 					</c:otherwise>
 				</c:choose>
-				
+
 				<html:button property="ContinueButton"
 					onclick="return continueReflect()" styleClass="button">
 					<fmt:message key="label.edit" />
-				</html:button>											
+				</html:button>
 			</div>
 		</c:if>
 
 		<c:if test="${sessionMap.mode != 'teacher'}">
-		<table>
-			<tr>
-				<td>
-					<span class="right-buttons"> <c:choose>
-							<c:when
-								test="${sessionMap.reflectOn}">
-								<html:button property="ContinueButton"
-									onclick="return continueReflect()" styleClass="button">
-									<fmt:message key="label.continue" />
-								</html:button>
-							</c:when>
-							<c:otherwise>
-								<html:button property="FinishButton" styleId="finishButton"
-									onclick="return finishSession()" styleClass="button">
-									<fmt:message key="label.finished" />
-								</html:button>
-							</c:otherwise>
-						</c:choose> </span>
-				</td>
-			</tr>
-		</table>
+			<table>
+				<tr>
+					<td>
+						<span class="right-buttons"> <c:choose>
+								<c:when test="${sessionMap.reflectOn}">
+									<html:button property="ContinueButton"
+										onclick="return continueReflect()" styleClass="button">
+										<fmt:message key="label.continue" />
+									</html:button>
+								</c:when>
+								<c:otherwise>
+									<html:button property="FinishButton" styleId="finishButton"
+										onclick="return finishSession()" styleClass="button">
+										<fmt:message key="label.finished" />
+									</html:button>
+								</c:otherwise>
+							</c:choose> </span>
+					</td>
+				</tr>
+			</table>
 		</c:if>
 	</div>
 	<!--closes content-->

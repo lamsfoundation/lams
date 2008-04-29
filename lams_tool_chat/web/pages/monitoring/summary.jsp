@@ -46,8 +46,10 @@
 					<c:otherwise>
 						<c:forEach var="message" items="${session.messageDTOs}">
 							<div class="message">
-								<div class="messageFrom"> ${message.from} </div>
-								<lams:out value="${message.body}" escapeXml="true"></lams:out>
+								<div class="messageFrom">
+									${message.from}
+								</div>
+								<lams:out escapeHtml="true" value="${message.body}"></lams:out>
 							</div>
 						</c:forEach>
 
@@ -101,7 +103,8 @@
 									<c:param name="uid" value="${user.uid}" />
 								</c:url>
 
-								<html:link href="javascript:launchPopup('${fn:escapeXml(openNotebook)}')">
+								<html:link
+									href="javascript:launchPopup('${fn:escapeXml(openNotebook)}')">
 									<fmt:message key="link.view" />
 								</html:link>
 							</c:if>
