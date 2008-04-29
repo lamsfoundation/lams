@@ -30,10 +30,6 @@
 			var myUrl = "<c:url value="/reviewtask/reviewTask.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&itemUid=" + itemUid;
 			launchPopup(myUrl,"LearnerView");
 		}
-		function completeItem(itemUid){
-			document.location.href = "<c:url value="/learning/completeItem.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=" + itemUid;
-			return false;
-		}
 		function finishSession(){
 			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
