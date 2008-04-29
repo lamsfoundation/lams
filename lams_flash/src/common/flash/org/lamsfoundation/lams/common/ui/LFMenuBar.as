@@ -218,17 +218,6 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         
 		file_menu.addMenuItem({type:"separator"});
 		file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_exit'), instanceName:"exitItem"});
-        
-		
-		/*=================
-            EDIT MENU
-        =================*/
-        edit_menu = _mb.addMenu(Dictionary.getValue("mnu_edit"));
-        
-        // "new" is the linkage id of the movie clip to be used as the icon for the "New" menu item.
-		edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_cut'), instanceName:"cutItem", enabled:false});
-        edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_copy'), instanceName:"copyItem", enabled:false});
-        edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_paste'), instanceName:"pasteItem", enabled:false});
 		
 		/*=================
             VIEW MENU
@@ -245,7 +234,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         go_menu = _mb.addMenu(Dictionary.getValue('mnu_go'));
 		
         go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_lesson'), instanceName:"goLessonTab"});
-        go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_schedule'), instanceName:"goScheduleTab"});
+        go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_sequence'), instanceName:"goSequenceTab"});
         go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_learners'), instanceName:"goLearnerTab"});
 		
 		/*=================
@@ -258,7 +247,6 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         //set up listeners
         // register the listeners with the separate menus
         file_menu.addEventListener("change", Delegate.create(this,fileMenuClicked));
-        edit_menu.addEventListener("change", Delegate.create(this,editMenuClicked));
         view_menu.addEventListener("change", Delegate.create(this,viewMenuClicked));
 		go_menu.addEventListener("change", Delegate.create(this,goMenuClicked));
 		help_menu.addEventListener("change", Delegate.create(this, helpMenuClicked));
@@ -373,7 +361,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 			case eventObj.menu.goLessonTab : 
 				tab.selectedIndex = 0;
 				break;
-			case eventObj.menu.goScheduleTab : 
+			case eventObj.menu.goSequenceTab : 
 				tab.selectedIndex = 1;
 				break;
 			case eventObj.menu.goLearnerTab : 
