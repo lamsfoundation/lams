@@ -1,77 +1,100 @@
 <%@ include file="/includes/taglibs.jsp"%>
+<%@ taglib uri="tags-function" prefix="fn" %>
 
-<table cellpadding="0">
+<table cellspacing="0">
+	
 	<tr>
-		<td class="field-name" width="30%">
-			<fmt:message key="instructions.onlineInstructions" />
-		</td>
-		<td>
-			<c:out value="${formBean.onlineInstructions}" escapeXml="false" />
+		<td colspan="3">
+			<div class="field-name">
+				<fmt:message key="instructions.onlineInstructions" /> :
+			</div>	
+			<div style="padding-left: 20px;">
+				<c:out value="${formBean.onlineInstructions}" escapeXml="false" />
+			</div>
 		</td>
 	</tr>
-
-	<tr>
-		<td class="field-name" width="30%">
-			<fmt:message key="instructions.offlineInstructions" />
-		</td>
-		<td>
-			<c:out value="${formBean.offlineInstructions}" escapeXml="false" />
-		</td>
-	</tr>
-</table>
-
-<c:forEach var="attachment" items="${formBean.attachmentsList}" varStatus="status">
-	<c:if test="${status.first}">
-		<hr />
-
-		<h2>
-			<fmt:message key="label.attachments" />
-		</h2>
-
-		<table>
-			<tr>
-				<th>
-					<fmt:message key="label.filename" />
-				</th>
-				<th>
-					<fmt:message key="label.type" />
-				</th>
-				<th>
-					&nbsp;
-				</th>
-				<th>
-					&nbsp;
-				</th>
-			</tr>
-	</c:if>
 	
-		<bean:define id="view">/download/?uuid=<bean:write name="attachment" property="uuid" />&preferDownload=false</bean:define>
-		<bean:define id="download">/download/?uuid=<bean:write name="attachment" property="uuid" />&preferDownload=true</bean:define>
-	
+	<c:if test="${fn:length(formBean.attachmentsList) > 0}">
 		<tr>
-			<td>
-				<c:out value="${attachment.filename}" />
+			<td  colspan="3" class="field-name-alternative-color">
+				<fmt:message key="label.attachments" />
 			</td>
-			<td>
-				<c:choose>
-					<c:when test="${attachment.onlineFile}">
-					<fmt:message key="instructions.type.online" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="instructions.type.offline" />
-				</c:otherwise>
-				</c:choose>
-			</td>
-			<td>
-				<a href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")' class="button"> <fmt:message key="link.view" /> </a>
-			</td>
-			<td>
-				<html:link page="<%=download%>" styleClass="button">
-					<fmt:message key="link.download" />
-				</html:link>
+		</tr>		
+	</c:if>
+		
+	<c:forEach var="file" items="${formBean.attachmentsList}">
+		<c:if test="${file.onlineFile}">
+			<tr >
+				<td width="7%" style="padding-left: 30px;">			
+					<c:out value="${file.filename}" />
+				</td>
+				
+				<td width="3%" align="left">
+					<c:set var="viewURL">
+						<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false" />
+					</c:set>
+					<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')" class="button"> <fmt:message key="link.view" /> </a> &nbsp;
+				</td>
+				
+				<td width="5%" align="left">
+					<c:set var="downloadURL">
+						<html:rewrite page="/download/?uuid=${file.uuid}&versionID=${file.versionId}&preferDownload=true" />
+					</c:set>
+					<a href="<c:out value='${downloadURL}' escapeXml='false'/>" class="button"> <fmt:message key="link.download" /> </a>
+				</td>
+			</tr>
+		</c:if>
+	</c:forEach>
+
+	
+	<tr>
+		<td colspan="3">
+			<hr />
+		</td>
+	</tr>
+	
+	<tr>
+		<td colspan="3">
+			<div class="field-name">
+				<fmt:message key="instructions.offlineInstructions" /> :
+			</div>	
+			<div style="padding-left: 20px;">
+				<c:out value="${formBean.offlineInstructions}" escapeXml="false" />
+			</div>
+		</td>
+	</tr>
+	
+	<c:if test="${fn:length(formBean.attachmentsList) > 0}">
+		<tr>
+			<td  colspan="3" class="field-name-alternative-color">
+				<fmt:message key="label.attachments" />
 			</td>
 		</tr>
-	<c:if test="${status.last}">
-		</table>
-	</c:if>
+	</c:if>		
+		
+	<c:forEach var="file" items="${taskList.offlineFileList}">
+		<c:if test="${not file.onlineFile}">
+			<tr >
+				<td width="7%" style="padding-left: 30px;">			
+					<c:out value="${file.filename}" />
+				</td>
+				
+				<td width="3%" align="left">
+					<c:set var="viewURL">
+						<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false" />
+					</c:set>
+					<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')" class="button"> <fmt:message key="link.view" /> </a> &nbsp;
+				</td>
+				
+				<td width="5%" align="left">
+					<c:set var="downloadURL">
+						<html:rewrite page="/download/?uuid=${file.uuid}&versionID=${file.versionId}&preferDownload=true" />
+					</c:set>
+					<a href="<c:out value='${downloadURL}' escapeXml='false'/>" class="button"> <fmt:message key="link.download" /> </a>
+				</td>
+			</tr>
+		</c:if>
 	</c:forEach>
+	
+</table>
+
