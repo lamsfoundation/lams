@@ -55,9 +55,11 @@ public class IndexUtils {
 			}
 		}
 		
-		// append lesson beans not mentioned in orderedLessonIds
+		// prepend lesson beans not mentioned in orderedLessonIds
 		if (!map.values().isEmpty()) {
-			orderedList.addAll(map.values());
+			for (Object obj : map.values()) {
+				orderedList.add(0, (IndexLessonBean)obj);
+			}
 		}
 		
 		return orderedList;

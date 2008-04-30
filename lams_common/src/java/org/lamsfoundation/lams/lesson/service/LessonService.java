@@ -25,12 +25,12 @@
 package org.lamsfoundation.lams.lesson.service;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
@@ -649,7 +649,7 @@ public class LessonService implements ILessonService
 		}
 		
 		public Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, boolean isStaff) {
-			HashMap<Long, IndexLessonBean> map = new HashMap<Long, IndexLessonBean>();
+			TreeMap<Long, IndexLessonBean> map = new TreeMap<Long, IndexLessonBean>();
 	        List list = this.lessonDAO.getLessonsByOrgAndUserWithCompletedFlag(userId, orgId, isStaff);
 	        if (list != null) {
 	        	Iterator iterator = list.iterator();
