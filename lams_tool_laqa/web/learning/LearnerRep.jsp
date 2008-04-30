@@ -120,7 +120,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				
 				<c:if test="${generalLearnerFlowDTO.existMultipleUserResponses == 'true'}">				
-					<h2>
+					<h2> 
 						<fmt:message key="label.other.answers" />
 					</h2>
 					
@@ -131,6 +131,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									value="${currentDto.questionUid}" />
 			
 								<div class="shading-bg">
+						<p>
+							<strong> <fmt:message key="label.question" /> : </strong>
+							<c:out value="${currentDto.question}" escapeXml="false" />
+						</p>
+
 			
 									<c:forEach var="questionAttemptData"
 										items="${currentDto.questionAttempts}">
@@ -277,6 +282,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									value="${currentDto.questionUid}" />
 			
 								<div class="shading-bg">
+						<p>
+							<strong> <fmt:message key="label.question" /> : </strong>
+							<c:out value="${currentDto.question}" escapeXml="false" />
+						</p>
+
 			
 									<c:forEach var="questionAttemptData"
 										items="${currentDto.questionAttempts}">
