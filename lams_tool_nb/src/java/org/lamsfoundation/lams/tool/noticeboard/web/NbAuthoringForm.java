@@ -273,11 +273,14 @@ public class NbAuthoringForm extends ActionForm {
 	{
 		nbContent.setTitle(getTitle());
 	    nbContent.setContent(getContent());
-		nbContent.setOnlineInstructions(getOnlineInstructions());
-		nbContent.setOfflineInstructions(getOfflineInstructions());
-		nbContent.setReflectOnActivity(getReflectOnActivity());
-		nbContent.setReflectInstructions(getReflectInstructions());
-		nbContent.setDateUpdated(new Date(System.currentTimeMillis()));
+	    if (defineLater == null || defineLater.isEmpty()) {
+	    	// ie. If defineLater is null or empty, this means we are in authoring
+			nbContent.setOnlineInstructions(getOnlineInstructions());
+			nbContent.setOfflineInstructions(getOfflineInstructions());
+			nbContent.setReflectOnActivity(getReflectOnActivity());
+			nbContent.setReflectInstructions(getReflectInstructions());
+			nbContent.setDateUpdated(new Date(System.currentTimeMillis()));
+	    }
 	}
 	
 	public String getCurrentTab() {

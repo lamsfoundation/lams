@@ -63,6 +63,7 @@
 			<html:hidden property="contentFolderID" />
 			<html:hidden property="currentTab" styleId="currentTab" />
 			<html:hidden property="sessionMapID" />
+			<html:hidden property="defineLater" />
 
 			<c:set var="formBean"
 				value="<%=request
