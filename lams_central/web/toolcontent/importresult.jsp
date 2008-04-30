@@ -51,7 +51,7 @@
 					</div>
 			</c:otherwise>
 		</c:choose>
-		<div class="right-buttons"><a href="importToolContent.do?method=import" class="button"><fmt:message key="button.select.importfile" /></a>
+		<div class="right-buttons"><a href="importToolContent.do?method=import" class="button"><fmt:message key="button.select.another.importfile" /></a>
 		<a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a></div>
 		<p>&nbsp;</p>
 		
