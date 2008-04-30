@@ -160,7 +160,8 @@ public class AuthoringAction extends LamsDispatchAction {
 				.get(KEY_TOOL_CONTENT_ID));
 
 		// update chat content using form inputs.
-		updateChat(chat, authForm);
+		ToolAccessMode mode = (ToolAccessMode) map.get(KEY_MODE);
+		updateChat(chat, authForm, mode);
 
 		// remove attachments marked for deletion.
 		Set<ChatAttachment> attachments = chat.getChatAttachments();
@@ -259,13 +260,13 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 
 		ActionMessages errors = new ActionMessages();
-		FileValidatorUtil.validateFileSize(file, true, errors );
-		if(!errors.isEmpty()){
+		FileValidatorUtil.validateFileSize(file, true, errors);
+		if (!errors.isEmpty()) {
 			request.setAttribute(ChatConstants.ATTR_SESSION_MAP, map);
 			this.saveErrors(request, errors);
 			return mapping.findForward("success");
 		}
-			
+
 		if (file.getFileName().length() != 0) {
 			// upload file to repository
 			ChatAttachment newAtt = chatService.uploadFileToContent((Long) map
@@ -360,18 +361,22 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * Updates Chat content using AuthoringForm inputs.
 	 * 
 	 * @param authForm
+	 * @param mode
 	 * @return
 	 */
-	private void updateChat(Chat chat, AuthoringForm authForm) {
+	private void updateChat(Chat chat, AuthoringForm authForm,
+			ToolAccessMode mode) {
 		chat.setTitle(authForm.getTitle());
 		chat.setInstructions(authForm.getInstructions());
-		chat.setOfflineInstructions(authForm.getOfflineInstruction());
-		chat.setOnlineInstructions(authForm.getOnlineInstruction());
-		chat.setLockOnFinished(authForm.isLockOnFinished());
-		chat.setReflectOnActivity(authForm.isReflectOnActivity());
-		chat.setReflectInstructions(authForm.getReflectInstructions());
-		chat.setFilteringEnabled(authForm.isFilteringEnabled());
-		chat.setFilterKeywords(authForm.getFilterKeywords());
+		if (mode.isAuthor()) {
+			chat.setOfflineInstructions(authForm.getOfflineInstruction());
+			chat.setOnlineInstructions(authForm.getOnlineInstruction());
+			chat.setLockOnFinished(authForm.isLockOnFinished());
+			chat.setReflectOnActivity(authForm.isReflectOnActivity());
+			chat.setReflectInstructions(authForm.getReflectInstructions());
+			chat.setFilteringEnabled(authForm.isFilteringEnabled());
+			chat.setFilterKeywords(authForm.getFilterKeywords());
+		}
 	}
 
 	/**

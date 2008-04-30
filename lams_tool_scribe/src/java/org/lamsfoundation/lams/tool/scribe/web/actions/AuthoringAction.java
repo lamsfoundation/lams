@@ -177,7 +177,8 @@ public class AuthoringAction extends LamsDispatchAction {
 				.get(KEY_TOOL_CONTENT_ID));
 
 		// update scribe content using form inputs.
-		updateScribe(scribe, authForm);
+		ToolAccessMode mode = (ToolAccessMode) map.get(KEY_MODE);
+		updateScribe(scribe, authForm, mode);
 
 		// remove attachments marked for deletion.
 		Set<ScribeAttachment> attachments = scribe.getScribeAttachments();
@@ -201,43 +202,42 @@ public class AuthoringAction extends LamsDispatchAction {
 		List<ScribeHeading> updatedHeadings = getHeadingList(map);
 		Set currentHeadings = scribe.getScribeHeadings();
 		for (ScribeHeading heading : updatedHeadings) {
-			//it is update
-			if(heading.getUid() != null){
+			// it is update
+			if (heading.getUid() != null) {
 				Iterator iter = currentHeadings.iterator();
-				while(iter.hasNext()){
+				while (iter.hasNext()) {
 					ScribeHeading currHeading = (ScribeHeading) iter.next();
-					if(heading.getUid().equals(currHeading.getUid())){
-						//update fields
+					if (heading.getUid().equals(currHeading.getUid())) {
+						// update fields
 						currHeading.setHeadingText(heading.getHeadingText());
 						currHeading.setDisplayOrder(heading.getDisplayOrder());
 						break;
 					}
 				}// go to next heading from page
-			}else{
+			} else {
 				currentHeadings.add(heading);
 			}
 		}
-		//remove deleted heading. 
+		// remove deleted heading.
 		Iterator iter = currentHeadings.iterator();
-		while(iter.hasNext()){
+		while (iter.hasNext()) {
 			ScribeHeading currHeading = (ScribeHeading) iter.next();
-			//skip new added heading
-			if(currHeading.getUid() == null)
+			// skip new added heading
+			if (currHeading.getUid() == null)
 				continue;
-			boolean find =false;
+			boolean find = false;
 			for (ScribeHeading heading : updatedHeadings) {
-				if(currHeading.getUid().equals(heading.getUid())){
+				if (currHeading.getUid().equals(heading.getUid())) {
 					find = true;
 					break;
 				}
 			}
-			if(!find){
-				//delete current heading's report first
+			if (!find) {
+				// delete current heading's report first
 				scribeService.deleteHeadingReport(currHeading.getUid());
 				iter.remove();
 			}
 		}
-		
 
 		// set the update date
 		scribe.setUpdateDate(new Date());
@@ -424,16 +424,16 @@ public class AuthoringAction extends LamsDispatchAction {
 
 			savedFiles = getAttList(KEY_ONLINE_FILES, map);
 		}
-		
-		//validate file max size
+
+		// validate file max size
 		ActionMessages errors = new ActionMessages();
-		FileValidatorUtil.validateFileSize(file, true, errors );
-		if(!errors.isEmpty()){
+		FileValidatorUtil.validateFileSize(file, true, errors);
+		if (!errors.isEmpty()) {
 			request.setAttribute(ScribeConstants.ATTR_SESSION_MAP, map);
 			this.saveErrors(request, errors);
 			return mapping.findForward("success");
 		}
-		
+
 		if (file.getFileName().length() != 0) {
 
 			// upload file to repository
@@ -530,17 +530,21 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * Updates Scribe content using AuthoringForm inputs.
 	 * 
 	 * @param authForm
+	 * @param mode
 	 * @return
 	 */
-	private void updateScribe(Scribe scribe, AuthoringForm authForm) {
+	private void updateScribe(Scribe scribe, AuthoringForm authForm,
+			ToolAccessMode mode) {
 		scribe.setTitle(authForm.getTitle());
 		scribe.setInstructions(authForm.getInstructions());
-		scribe.setOfflineInstructions(authForm.getOnlineInstruction());
-		scribe.setOnlineInstructions(authForm.getOfflineInstruction());
-		scribe.setReflectOnActivity(authForm.isReflectOnActivity());
-		scribe.setReflectInstructions(authForm.getReflectInstructions());
-		scribe.setAutoSelectScribe(authForm.isAutoSelectScribe());
-		scribe.setShowAggregatedReports(authForm.isShowAggregatedReports());
+		if (mode.isAuthor()) {
+			scribe.setOfflineInstructions(authForm.getOnlineInstruction());
+			scribe.setOnlineInstructions(authForm.getOfflineInstruction());
+			scribe.setReflectOnActivity(authForm.isReflectOnActivity());
+			scribe.setReflectInstructions(authForm.getReflectInstructions());
+			scribe.setAutoSelectScribe(authForm.isAutoSelectScribe());
+			scribe.setShowAggregatedReports(authForm.isShowAggregatedReports());
+		}
 	}
 
 	/**
