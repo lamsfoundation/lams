@@ -63,6 +63,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:out value="${generalLearnerFlowDTO.activityTitle}"
 				escapeXml="false" />
 		</h1>
+
+			<c:if test="${(generalLearnerFlowDTO.lockWhenFinished == 'true')  && (generalLearnerFlowDTO.showOtherAnswers == 'true') }">
+				<div class="warning space-bottom">
+					<fmt:message key="label.responses.locked" />								
+				</div>
+
+			</c:if>
+
+
 		<html:form action="/learning?validate=false"
 			enctype="multipart/form-data" method="POST" target="_self">
 			<html:hidden property="method" value="storeAllResults"/>
@@ -125,12 +134,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<div class="last-item">
 
 			</div>
-
-			<c:if test="${(generalLearnerFlowDTO.lockWhenFinished == 'true')  && (generalLearnerFlowDTO.showOtherAnswers == 'true') }">
-				<p>
-					<fmt:message key="label.responses.locked" />
-				</p>
-			</c:if>
 
 
 			<div class="space-bottom-top small-space-top">
