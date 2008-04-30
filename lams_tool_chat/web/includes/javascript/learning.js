@@ -83,8 +83,8 @@ function UpdateRosterDisplay() {
 		}
 	}
 	
-	// IE hack to ensure onclick event work when rosterDiv is updated.  Only being used when in moderator mode.
-	if (navigator.appName == "Microsoft Internet Explorer" && MODE == "moderator") {
+	// IE hack to ensure onclick event work when rosterDiv is updated.  Only being used when in teacher mode.
+	if (navigator.appName == "Microsoft Internet Explorer" && MODE == "teacher") {
 		rosterDiv.parentNode.innerHTML = rosterDiv.parentNode.innerHTML;
 		// following commands are ignored by IE unless we use a delay
 		var t1 = setTimeout("scrollMessageDisplay()", 5);
@@ -103,12 +103,27 @@ function Roster() {
 }
 var roster = new Roster();
 function selectUser(userDiv) {
-	if (MODE == "moderator") {
+	if (MODE == "teacher") {
 		var newIndex = userDiv.id.substring(userDiv.id.indexOf("-") + 1, userDiv.id.length);
 		if (roster.currentIndex == newIndex) {
 			roster.currentIndex = null;
 		} else {
 			roster.currentIndex = newIndex;
+		}
+		
+		// update "send message to" display
+		var sendToUserSpan = document.getElementById("sendToUser");
+		var sendToEveryoneSpan = document.getElementById("sendToEveryone");
+		if (roster.currentIndex == null) {
+			sendToEveryoneSpan.style.display = "inline";
+			sendToUserSpan.style.display = "none";
+		} else {
+			sendToEveryoneSpan.style.display = "none";
+			sendToUserSpan.style.display = "inline";
+			var nick = roster.users[roster.currentIndex].nick;
+			var nickElem = createElem("span", null, {color:getColour(nick)}, nick);
+			sendToUserSpan.innerHTML = ""; // clear previous user name
+			sendToUserSpan.appendChild(nickElem);
 		}
 		roster.updateDisplay();
 	}
@@ -139,7 +154,7 @@ function sendMsg(aForm) {
 		return false;  // do not send empty messages.
 	}
 	var aMsg = new JSJaCMessage();
-	if (MODE == "moderator" && !(roster.currentIndex === null)) {
+	if (MODE == "teacher" && !(roster.currentIndex === null)) {
 		var toNick = roster.users[roster.currentIndex].nick;
 		aMsg.setTo(CONFERENCEROOM + "/" + toNick);
 		aMsg.setType("chat");
@@ -223,7 +238,7 @@ function handlePresence(presence) {
 	roster.updateDisplay();
 }
 function handleConnected() {
-	if (LEARNER_FINISHED == "true" && LOCK_ON_FINISHED == "true") {
+	if (MODE == "learner" && LEARNER_FINISHED == "true" && LOCK_ON_FINISHED == "true") {
 		// disable sending messages.
 		document.getElementById("msgArea").disabled = "disabled";
 		var sendButton = document.getElementById("sendButton");
@@ -312,3 +327,4 @@ function checkEnter(e) { 			//e is event object passed from function invocation
 		return true;
 	}
 }
+

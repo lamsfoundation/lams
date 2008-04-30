@@ -80,9 +80,8 @@ public class LearningAction extends LamsDispatchAction {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		// 'toolSessionID' and 'mode' paramters are expected to be present.
-		String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE,
-				false);
-		checkMode(mode);
+		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,
+				AttributeNames.PARAM_MODE, false);
 
 		Long toolSessionID = WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -112,7 +111,7 @@ public class LearningAction extends LamsDispatchAction {
 			return mapping.findForward("defineLater");
 		}
 
-		request.setAttribute("MODE", mode);
+		request.setAttribute("MODE", mode.toString());
 
 		// Create the room if it doesnt exist
 		log.debug(chatSession.isRoomCreated());
@@ -266,16 +265,5 @@ public class LearningAction extends LamsDispatchAction {
 		}
 
 		return finishActivity(mapping, form, request, response);
-	}
-
-	private void checkMode(String mode) {
-		if (!mode.equals("moderator")
-				&& !mode.equals(ToolAccessMode.AUTHOR.toString())
-				&& !mode.equals(ToolAccessMode.LEARNER.toString())
-				&& !mode.equals(ToolAccessMode.TEACHER.toString())) {
-			String errorMsg = "[" + mode + "] is not a legal mode";
-			log.error(errorMsg);
-			throw new IllegalArgumentException(errorMsg);
-		}
 	}
 }

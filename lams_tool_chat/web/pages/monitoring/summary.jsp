@@ -131,7 +131,7 @@
 						<div>
 							<html:hidden property="toolSessionID"
 								value="${session.sessionID}" />
-							<html:hidden property="mode" value="moderator" />
+							<html:hidden property="mode" value="teacher" />
 							<html:submit styleClass="button">
 								<fmt:message>summary.openChat</fmt:message>
 							</html:submit>
