@@ -224,11 +224,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:if>
 
 					<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}">
+					<span class="right-buttons">
 						<html:submit property="learnerFinished" styleId="finishButton"
 							onclick="javascript:submitMethod('learnerFinished');"
 							styleClass="button">
 							<fmt:message key="label.finished" />
 						</html:submit>
+						</span>
 					</c:if>
 
 					<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}">
