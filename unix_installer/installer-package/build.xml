@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="Unix-Build-Script" default="build" basedir=".">
+<project name="Unix-Installer-Build-Script" default="build" basedir=".">
 
- 	<property name="VERSION" value="2.1-RC1" />
+ 	<property name="VERSION" value="2.1" />
  	<property name="PACKAGE-ROOT" value="build/lams-unix-installer-${VERSION}" />
 	<property name="db.username" value="lams" />
 	<property name="db.password" value="lamsdemo" />
@@ -30,6 +30,9 @@
 		<mkdir dir="${PACKAGE-ROOT}/doc" />
 		
 		<!-- copy files to new created folders -->
+		
+        
+
 		<exec executable="cp" failonerror="true">
 			<arg line="-r" />
 		    <arg line="ant" />
@@ -38,49 +41,23 @@
 		    <arg line="bin" />
 			<arg line="conf" />
 		    <arg line="database" />
-		    <arg line="install-lams.sh" />		
-			<arg line="wrapper" />		
+			<arg line="doc" />
+			<arg line="repository" />
+			<arg line="sql-scripts" />
+			<arg line="wrapper" />   
+		    <arg line="install-lams.sh" />			
 			<arg line="readme" />
 			<arg line="license" />
 			<arg line="lams.properties" />
 			<arg line="${PACKAGE-ROOT}" />
 		</exec>
 		
-		<exec executable="cp" failonerror="true">
-			<arg line="doc/setLamsConfiguration.sql" />
-		    <arg line="${PACKAGE-ROOT}/doc" />
+		<!-- Remove all the CVS directories -->
+		<exec executable="/bin/bash" failonerror="true">
+			<arg value="-c" />
+			<arg value="./createPackage.sh" />
 		</exec>
 		
-		<exec executable="cp" failonerror="true">
-			<arg line="sql-scripts/create-database.sql" />
-		    <arg line="${PACKAGE-ROOT}/sql-scripts" />
-		</exec>
-	
-		<exec executable="cp" failonerror="true">
-			<arg line="bin/checkmysql.class" />
-			<arg line="bin/testJava.class" />
-			<arg line="bin/run-lams.sh" />
-			<arg line="${PACKAGE-ROOT}/bin" />	
-		</exec>
-
-		<!-- create ${PACKAGE-ROOT}.tar.gz and place it in the build directory -->
-		
-		<!--
-		<exec executable="tar" failonerror="true">
-                        <arg line="cCf" />
-                        <arg line="${PACKAGE-ROOT}.tar" />
-                        <arg line="${PACKAGE-ROOT}" />
-                </exec>
-
-		
-
-		<tar longfile="gnu" destfile="${PACKAGE-ROOT}.tar" basedir="build" excludes="*.tar.gz, *.tar.gz.bak"/>
-		
-		
-		<gzip zipfile="${PACKAGE-ROOT}.tar.gz" src="${PACKAGE-ROOT}.tar" />
-		
-		<delete failonerror="false" file="${PACKAGE-ROOT}.tar" />
-		-->
 	</target>
 	
 	<!-- clean the installation, the .bak file will remain in the build dir -->

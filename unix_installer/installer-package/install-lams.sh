@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #   Copyright (C) 2006-2008 LAMS Foundation (http://lamsfoundation.org)
 #   License Information: http://lamsfoundation.org/licensing/lams/2.0/
 #
@@ -24,7 +24,6 @@
 
 # Usage: sudo ./install.sh
 
-LAMS_VERSION=2.1-RC1
 MYSQL_VERSION_STR=5.
 JAVA_REQ_VERSION=1.5
 # Transform the required version string into a number that can be used in comparisons
@@ -54,8 +53,8 @@ installexit()
 checkJava()
 {
 	ORIG_JAVA_HOME=$JAVA_HOME
-        export JAVA_HOME=$JDK_DIR
-        JAVA_EXE=$JAVA_HOME/bin/java
+    export JAVA_HOME=$JDK_DIR
+    JAVA_EXE=$JAVA_HOME/bin/java
 
 	$JAVA_HOME/bin/java -cp bin testJava	
 	if [  "$?" -ne  "0" ]
@@ -376,7 +375,7 @@ printf "\nDatabase Created.\n\n"
 
 # Copying the main lams files
 printf "Copying lams.ear directory to ${DEFAULT_DIR}/deploy.\n"
-cp -rv assembly/lams.ear ${DEFAULT_DIR}/deploy
+cp -r assembly/lams.ear ${DEFAULT_DIR}/deploy
 
 printf "\nDone.\n\n"
 if [  "$?" -ne  "0" ]
@@ -405,6 +404,9 @@ if [ -f $JBOSS_DIR/bin/wrapper ]
 	chmod 755 $JBOSS_DIR/bin/wrapper
 fi
 
+# Add the sample lessons to the repository as of 2.1
+cp -r repository/* $REPOSITORY_DIR
+
 # configure the wrapper
 printf "\nConfiguring the java Wrapper\n"
 configureWrapper
@@ -416,7 +418,6 @@ if [ -d ${DEFAULT_DIR}/lib ]
 else
 	mkdir ${DEFAULT_DIR}/lib
 fi
-
 
 
 cp $JBOSS_DIR/server/all/lib/jgroups.jar $JBOSS_DIR/server/all/lib/jboss-cache.jar ${DEFAULT_DIR}/lib

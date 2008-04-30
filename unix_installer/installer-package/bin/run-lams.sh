@@ -1,4 +1,5 @@
-#   Copyright (C) 2005-2007 LAMS Foundation (http://lamsfoundation.org)
+#!/bin/bash
+#   Copyright (C) 2005-2008 LAMS Foundation (http://lamsfoundation.org)
 #   License Information: http://lamsfoundation.org/licensing/lams/2.0/
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -21,7 +22,7 @@
 # run script for LAMS unix version 2.0.2 and higher
 
 export JAVA_HOME="@JAVA_HOME@"
-export JAVA_OPTS="-server -Xms256m -Xmx512m -XX:MaxPermSize=256m"
+export JAVA_OPTS="-server -Xms512m -Xmx512m -XX:MaxPermSize=512m"
 
 echo " "
 echo "LAMS will take a few minutes to startup..."

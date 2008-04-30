@@ -1,0 +1,16 @@
+<HTML>
+
+ <HEAD>
+   <TITLE>LAMS Tutorial: Introduction to LAMS Authoring</TITLE>
+ </HEAD>
+
+<BODY background="blueline.gif">
+ <CENTER>
+    <TABLE BORDER=1><TR><TD>
+      <EMBED SRC="authorintro.swf" WIDTH=600 HEIGHT=530 quality=low loop=false TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash">
+	</EMBED>
+   </TD></TR></TABLE>
+ </CENTER>
+</BODY>
+
+</HTML>
