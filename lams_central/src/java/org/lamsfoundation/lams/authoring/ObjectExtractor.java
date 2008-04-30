@@ -31,6 +31,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.servlet.http.HttpSession;
@@ -38,6 +39,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
@@ -419,7 +421,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		}
 
 	/** Link SequenceActivities up with their firstActivity entries and BranchingActivities with their
-	 * default branch.
+	 * default branch. Also tidy up the order ids for sequence activities so that they are in the same
+	 * order as the transitions - needed for the IMSLD export conversion to work. Not all 
+	 * the transitions may be drawn yet, so number off the others best we can.
 	 * @throws WDDXProcessorConversionException */
 	private void progressDefaultChildActivities() throws WDDXProcessorConversionException {
 		
@@ -434,6 +438,35 @@ public class ObjectExtractor implements IObjectExtractor {
 			    	throw new WDDXProcessorConversionException(msg);
 				} else {
 					complex.setDefaultActivity(defaultActivity);
+
+					// fix up the order ids for SequenceActivities
+					if ( complex.isSequenceActivity() ) {
+						Set unprocessedChildren = new TreeSet(new ActivityOrderComparator());
+						unprocessedChildren.addAll(complex.getActivities());
+						
+						unprocessedChildren.remove(defaultActivity);
+						defaultActivity.setOrderId(1);
+
+						int nextOrderId = 2;
+						Activity nextActivity = defaultActivity.getTransitionFrom() != null ? defaultActivity.getTransitionFrom().getToActivity() : null;
+						while ( nextActivity != null ) {
+							boolean removed = unprocessedChildren.remove(nextActivity);
+							if ( ! removed ) {
+								log.error("Next activity should be a child of the current sequence, but it isn't. Could we have a loop in the transitions? Aborting the ordering of ids based on transitions. Sequence activity "+complex+" next activity "+nextActivity);
+								break;
+							}
+							nextActivity.setOrderId(nextOrderId++);
+							nextActivity = nextActivity.getTransitionFrom() != null ? nextActivity.getTransitionFrom().getToActivity() : null;
+						}
+						
+						if ( unprocessedChildren.size() > 0 ) {
+							Iterator iter = unprocessedChildren.iterator();
+							while (iter.hasNext()) {
+								nextActivity = (Activity) iter.next();
+								nextActivity.setOrderId(nextOrderId++);
+							}
+						}
+					}
 				}
 			}
 			
