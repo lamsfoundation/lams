@@ -273,7 +273,7 @@ public class NbAuthoringForm extends ActionForm {
 	{
 		nbContent.setTitle(getTitle());
 	    nbContent.setContent(getContent());
-	    if (defineLater == null || defineLater.isEmpty()) {
+	    if (defineLater == null || defineLater.length() == 0) {
 	    	// ie. If defineLater is null or empty, this means we are in authoring
 			nbContent.setOnlineInstructions(getOnlineInstructions());
 			nbContent.setOfflineInstructions(getOfflineInstructions());
