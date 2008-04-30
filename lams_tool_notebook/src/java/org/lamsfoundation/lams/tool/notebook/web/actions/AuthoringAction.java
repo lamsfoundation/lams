@@ -76,7 +76,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
 
 	private static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
-	
+
 	private static final String KEY_MODE = "mode";
 
 	private static final String KEY_ONLINE_FILES = "onlineFiles";
@@ -161,7 +161,8 @@ public class AuthoringAction extends LamsDispatchAction {
 				.get(KEY_TOOL_CONTENT_ID));
 
 		// update notebook content using form inputs.
-		updateNotebook(notebook, authForm);
+		ToolAccessMode mode = (ToolAccessMode) map.get(KEY_MODE);
+		updateNotebook(notebook, authForm, mode);
 
 		// remove attachments marked for deletion.
 		Set<NotebookAttachment> attachments = notebook.getNotebookAttachments();
@@ -259,16 +260,15 @@ public class AuthoringAction extends LamsDispatchAction {
 			savedFiles = getAttList(KEY_ONLINE_FILES, map);
 		}
 
-		
-		//validate file max size
+		// validate file max size
 		ActionMessages errors = new ActionMessages();
-		FileValidatorUtil.validateFileSize(file, true, errors );
-		if(!errors.isEmpty()){
+		FileValidatorUtil.validateFileSize(file, true, errors);
+		if (!errors.isEmpty()) {
 			request.setAttribute(NotebookConstants.ATTR_SESSION_MAP, map);
 			this.saveErrors(request, errors);
 			return mapping.findForward("success");
 		}
-		
+
 		if (file.getFileName().length() != 0) {
 
 			// upload file to repository
@@ -364,15 +364,19 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * Updates Notebook content using AuthoringForm inputs.
 	 * 
 	 * @param authForm
+	 * @param mode
 	 * @return
 	 */
-	private void updateNotebook(Notebook notebook, AuthoringForm authForm) {
+	private void updateNotebook(Notebook notebook, AuthoringForm authForm,
+			ToolAccessMode mode) {
 		notebook.setTitle(authForm.getTitle());
 		notebook.setInstructions(authForm.getInstructions());
-		notebook.setOfflineInstructions(authForm.getOnlineInstruction());
-		notebook.setOnlineInstructions(authForm.getOfflineInstruction());
-		notebook.setLockOnFinished(authForm.isLockOnFinished());
-		notebook.setAllowRichEditor(authForm.isAllowRichEditor());
+		if (mode.isAuthor()) { // Teacher cannot modify following
+			notebook.setOfflineInstructions(authForm.getOnlineInstruction());
+			notebook.setOnlineInstructions(authForm.getOfflineInstruction());
+			notebook.setLockOnFinished(authForm.isLockOnFinished());
+			notebook.setAllowRichEditor(authForm.isAllowRichEditor());
+		}
 	}
 
 	/**
