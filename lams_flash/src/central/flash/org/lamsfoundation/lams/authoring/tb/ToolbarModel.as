@@ -77,7 +77,7 @@ class ToolbarModel extends Observable {
 			buttonArr[6] 	= ["optional_btn", "icon_optional"];
 			buttonArr[7] 	= ["flow_btn", "icon_flow"];
 			buttonArr[8] 	= ["group_btn", "icon_group"];
-			buttonArr[9] 	= ["preview_btn", "icon_preview"];
+			buttonArr[9] 	= ["preview_btn", "icon_preview", "preview_btn_click_target"];
 			buttonArr[10] 	= ["optional_act_btn", "icon_optional"];
 			buttonArr[11] 	= ["optional_seq_btn", "icon_optional"];
 			buttonArr[12] 	= ["gate_btn", "icon_gate"];
@@ -115,7 +115,8 @@ class ToolbarModel extends Observable {
 	
 	public function setDefaultState(){
 		Debugger.log('setDefaultState is called: ',Debugger.GEN,'setDefaultState','Toolbar');
-		setButtonState("preview_btn", false)
+		setButtonState("preview_btn", false);
+		setButtonState("preview_btn_click_target", true);
 	}
 
 	/**
@@ -125,14 +126,15 @@ class ToolbarModel extends Observable {
 	 * @param   btnState 
 	 * @return  
 	 */
-	public function setButtonState(btnName:String, btnState:Boolean){
+	public function setButtonState(btnName:String, btnState:Boolean, btnVisible:Boolean){
 		Debugger.log('button name in setButtonState is : '+btnName, Debugger.GEN,'setButtonState','ToolbarModel');		
 		
 		setChanged();
 		infoObj = {};
 		infoObj.updateType = "BUTTON";
-		infoObj.button = btnName
-		infoObj.buttonstate = btnState
+		infoObj.button = btnName;
+		infoObj.buttonstate = btnState;
+		infoObj.buttonvisible = btnVisible;
 		notifyObservers(infoObj);
 		
 	}

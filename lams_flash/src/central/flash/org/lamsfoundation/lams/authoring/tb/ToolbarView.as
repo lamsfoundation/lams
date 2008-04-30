@@ -63,6 +63,8 @@ class ToolbarView extends AbstractView {
 	
 	private var group_btn:Button;
 	private var preview_btn:Button;
+	private var preview_btn_click_target:Button;
+	
 	private var cancel_btn:Button;
 	
 	private var _toolbarMenu:Array;
@@ -166,6 +168,8 @@ class ToolbarView extends AbstractView {
 		group_btn.addEventListener("click", controller);
 		branch_btn.addEventListener("click", controller);
 		preview_btn.addEventListener("click", controller);
+		preview_btn_click_target.addEventListener("click", controller);
+		
 		apply_changes_btn.addEventListener("click", controller);
 		cancel_btn.addEventListener("click", controller);
 		
@@ -212,6 +216,9 @@ class ToolbarView extends AbstractView {
 		
 		preview_btn.onRollOver = Proxy.create(this,this['showToolTip'], preview_btn, "preview_btn_tooltip");
 		preview_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		preview_btn_click_target.onRollOver = Proxy.create(this,this['showToolTip'], preview_btn, "preview_btn_tooltip");
+		preview_btn_click_target.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
 		apply_changes_btn.onRollOver = Proxy.create(this,this['showToolTip'], apply_changes_btn, "apply_changes_btn_tooltip");
 		apply_changes_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
@@ -264,7 +271,7 @@ class ToolbarView extends AbstractView {
 		gate_btn.tabIndex = 212
 		branch_btn.tabIndex = 213
 		group_btn.tabIndex = 214
-		preview_btn.tabIndex = 215	
+		preview_btn.tabIndex = 215
 		cancel_btn.tabIndex = 216
 	}
 	
@@ -289,6 +296,13 @@ class ToolbarView extends AbstractView {
 				_toolbarMenu[i] = this.attachMovie("Button", menuList[i][0], this.getNextHighestDepth(), {label:btnLabel, icon:menuList[i][1] });
 				_toolbarMenu[i].setSize(btnWidth, 25);
 			
+				if(menuList[i][2] != null) {
+					_toolbarMenu[i].clickTarget = new Object();
+					_toolbarMenu[i].clickTarget.btn = this.attachMovie("Button", menuList[i][2], this.getNextHighestDepth(), {label:"", icon:menuList[i][1], _alpha: 0});
+					_toolbarMenu[i].clickTarget.btn.setSize(btnWidth, 25);
+				}
+				
+			
 			} else {
 				_toolbarMenu[i] = null;
 			}
@@ -297,16 +311,16 @@ class ToolbarView extends AbstractView {
 				
 				if (i == 0){
 					_toolbarMenu[i]._x  = btnOffset_X;
-					
 				} else {
-					_toolbarMenu[i]._x = getToolbarButtonXPos(_toolbarMenu, i-1, 1); //(_toolbarMenu[i-1]._x+_toolbarMenu[i-1].width)+btnOffset_X
+					_toolbarMenu[i]._x = getToolbarButtonXPos(_toolbarMenu, i-1, 1);
 				}
 				
 				_toolbarMenu[i]._y = btnOffset_Y;
-			
+				
 				if ((i >= menuList.length-4) && (i < menuList.length-2)) {
 					_toolbarMenu[i]._x = this.optional_btn._x;
 					_toolbarMenu[i]._y = (_toolbarMenu[i-1]._y+_toolbarMenu[i-1].height)+btnOffset_Y;
+					
 				}
 				
 				if (i >= menuList.length-2){
@@ -316,6 +330,11 @@ class ToolbarView extends AbstractView {
 				
 				if (i == menuList.length){
 					btn_text.removeTextField();
+				}
+				
+				if(_toolbarMenu[i].clickTarget != null) {
+					_toolbarMenu[i].clickTarget.btn._x = _toolbarMenu[i]._x;
+					_toolbarMenu[i].clickTarget.btn._y = _toolbarMenu[i]._y;
 				}
 				
 			}
@@ -374,6 +393,7 @@ class ToolbarView extends AbstractView {
 	private function setState(tm:ToolbarModel, infoObj:Object):Void{
 		Debugger.log('button name in setButtonState is : '+infoObj.button, Debugger.GEN,'setState','ToolbarView');		
 		this[infoObj.button].enabled = infoObj.buttonstate;
+		this[infoObj.button].visible = (infoObj.buttonvisible != null) ? infoObj.buttonvisible : true ;
 	}
 	
 	public function showToolTip(btnObj, btnTT:String):Void{
@@ -381,6 +401,10 @@ class ToolbarView extends AbstractView {
 		var Ypos = (Application.TOOLBAR_Y+ btnObj._y+btnObj.height)+5;
 		var ttHolder = ApplicationParent.tooltip;
 		var ttMessage = Dictionary.getValue(btnTT);
+		
+		if(btnObj == preview_btn && !btnObj.enabled)
+			ttMessage = Dictionary.getValue(btnTT + "_disabled");
+		
 		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos);
 		
 	}
@@ -431,6 +455,7 @@ class ToolbarView extends AbstractView {
 		branch_btn.setStyle('styleName',styleObj);
 		group_btn.setStyle('styleName', styleObj);
 		preview_btn.setStyle('styleName',styleObj);
+		preview_btn_click_target.setStyle('stylename', styleObj);
 		cancel_btn.setStyle('styleName',styleObj);
 		
 		styleObj = _tm.getStyleObject('BGPanel');

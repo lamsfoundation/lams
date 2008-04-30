@@ -136,8 +136,8 @@ class Toolbar {
 			Application.getInstance().canvas.checkValidDesign();
 	}
 	
-	public function setButtonState(btnName:String, btnState:Boolean){
-		toolbarModel.setButtonState(btnName, btnState);
+	public function setButtonState(btnName:String, btnState:Boolean, btnVisible:Boolean){
+		toolbarModel.setButtonState(btnName, btnState, btnVisible);
 	}
     
     function get className():String{
