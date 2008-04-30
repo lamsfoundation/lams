@@ -368,7 +368,7 @@ public class AuthoringAction extends LamsDispatchAction {
 			ToolAccessMode mode) {
 		chat.setTitle(authForm.getTitle());
 		chat.setInstructions(authForm.getInstructions());
-		if (mode.isAuthor()) {
+		if (mode.isAuthor()) { // Teacher cannot modify following
 			chat.setOfflineInstructions(authForm.getOfflineInstruction());
 			chat.setOnlineInstructions(authForm.getOnlineInstruction());
 			chat.setLockOnFinished(authForm.isLockOnFinished());

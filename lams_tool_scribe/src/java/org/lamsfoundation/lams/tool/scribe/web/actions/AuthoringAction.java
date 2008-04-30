@@ -537,7 +537,7 @@ public class AuthoringAction extends LamsDispatchAction {
 			ToolAccessMode mode) {
 		scribe.setTitle(authForm.getTitle());
 		scribe.setInstructions(authForm.getInstructions());
-		if (mode.isAuthor()) {
+		if (mode.isAuthor()) { // Teacher cannot modify following
 			scribe.setOfflineInstructions(authForm.getOnlineInstruction());
 			scribe.setOnlineInstructions(authForm.getOfflineInstruction());
 			scribe.setReflectOnActivity(authForm.isReflectOnActivity());
