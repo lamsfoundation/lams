@@ -217,50 +217,59 @@ public class MonitoringAction extends LamsDispatchAction {
 			HSSFWorkbook wb = new HSSFWorkbook();
 			HSSFSheet sheet = wb.createSheet("Marks");
 			sheet.setColumnWidth((short)0,(short)5000);
-			HSSFRow row,row1=null,row2=null,row3=null,row4=null;
+			HSSFRow row;
 			HSSFCell cell;
+			
 			Iterator iter = userFilesMap.values().iterator();
 			Iterator dtoIter; 
-			boolean first = true;
-			int idx = 0;
-			int fileCount = 0;
+			
+			short idx = (short) 0;
+			
+			row = sheet.createRow(idx++);
+			cell = row.createCell((short) 2);
+			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell.setCellValue(getMessageService().getMessage("label.learner.fileName"));
+			
+			cell = row.createCell((short) 3);
+			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell.setCellValue(getMessageService().getMessage("label.learner.fileDescription"));
+			
+			cell = row.createCell((short) 4);
+			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell.setCellValue(getMessageService().getMessage("label.learner.marks"));
+			
+			cell = row.createCell((short) 5);
+			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell.setCellValue(getMessageService().getMessage("label.learner.comments"));
+			
 			while(iter.hasNext()){
 				List list = (List) iter.next();
 				dtoIter = list.iterator();
-				first = true;
 				
 				while(dtoIter.hasNext()){
 					FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
-					if(first){
-						row = sheet.createRow(idx++);
-						cell = row.createCell((short) 0);
-						cell.setCellValue(dto.getOwner().getFirstName()+" "+dto.getOwner().getLastName());
-						sheet.addMergedRegion(new Region(idx-1,(short)0,idx-1, (short)1));
-						first = false;
-						row1 = sheet.createRow(idx+1);
-						cell = row1.createCell((short) 0);
-						cell.setCellValue("File name");
-						row2 = sheet.createRow(idx+2);
-						cell = row2.createCell((short) 0);
-						cell.setCellValue("File description");
-						row3 = sheet.createRow(idx+3);
-						cell = row3.createCell((short) 0);
-						cell.setCellValue("Marks");
-						row4 = sheet.createRow(idx+4);
-						cell = row4.createCell((short) 0);
-						cell.setCellValue("Comments");
-						idx += 6;
-						fileCount = 0;
-					}
-					++fileCount;
-					sheet.setColumnWidth((short)fileCount,(short)8000);
-					cell = row1.createCell((short) fileCount);
+					row = sheet.createRow(idx++);
+					
+					short count = 0;
+					
+					cell = row.createCell((short) count++);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+					cell.setCellValue(dto.getOwner().getFirstName()+" "+dto.getOwner().getLastName());
+					
+					++count;
+					
+					sheet.setColumnWidth((short) count,(short)8000);
+					
+					cell = row.createCell((short) count++);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					cell.setCellValue(dto.getFilePath());
 					
-					cell = row2.createCell((short) fileCount);
+					cell = row.createCell((short) count++);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					cell.setCellValue(dto.getFileDescription());
 					
-					cell = row3.createCell((short) fileCount);
+					cell = row.createCell((short) count++);
+					
 					if(dto.getMarks() != null){
 						String marks = "";
 						try {
@@ -273,12 +282,15 @@ public class MonitoringAction extends LamsDispatchAction {
 					}else
 						cell.setCellValue("");
 					
-					cell = row4.createCell((short) fileCount);
+					cell = row.createCell((short) count++);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					cell.setCellValue(dto.getComments());
 				}
 			}
+			
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			wb.write(bos);
+			
 			//construct download file response header
 			String fileName = "marks" + sessionID+".xls";
 			String mineType = "application/vnd.ms-excel";
