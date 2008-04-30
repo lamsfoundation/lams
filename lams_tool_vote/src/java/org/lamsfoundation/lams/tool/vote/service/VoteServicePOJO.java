@@ -517,8 +517,14 @@ public class VoteServicePOJO implements
     {
         try
         {
-        	Set potentialLearners = toolService.getAllPotentialLearners(voteSessionId.longValue());
-        	return potentialLearners != null ? potentialLearners.size() : 0;
+        	VoteSession session = voteSessionDAO.getVoteSessionByUID(voteSessionId);
+        	if ( session != null ) {
+	        	Set potentialLearners = toolService.getAllPotentialLearners(session.getVoteSessionId().longValue());
+	        	return potentialLearners != null ? potentialLearners.size() : 0;
+        	} else {
+        		logger.error("Unable to find vote session record id="+voteSessionId+". Returning 0 users.");
+        		return 0;
+        	}
         }
         catch (LamsToolServiceException e)
         {
