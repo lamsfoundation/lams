@@ -241,6 +241,7 @@ public class WorkspaceFolder implements Serializable {
     public String toString() {
         return new ToStringBuilder(this)
             .append("workspaceFolderId", getWorkspaceFolderId())
+            .append("name", getName())
             .toString();
     }
 
