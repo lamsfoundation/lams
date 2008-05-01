@@ -12,6 +12,20 @@
 		<c:out value="${sessionMap.instruction}" escapeXml="false" />
 	</div>
 
+	<c:if test="${sessionMap.lockedWhenFinished}">
+	      <div class="info space-bottom">
+	   <c:choose>
+	    <c:when test = "${sessionMap.finishedLock}">
+		<fmt:message key="label.responses.locked.reminder" />								
+	    </c:when>
+	    <c:otherwise>
+		<fmt:message key="label.responses.locked" />								
+	    </c:otherwise>
+	   </c:choose>
+	      </div>
+	</c:if>
+
+
 	<%@ include file="/common/messages.jsp"%>
 
 	<%@ include file="/jsps/learning/message/topiclist.jsp"%>
