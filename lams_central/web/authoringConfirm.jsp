@@ -12,6 +12,18 @@
 	<lams:css />
 	<script type="text/javascript">
 			  function closeWindow() {
+				// refresh the parent window if the parent window is a monitoring window
+			  	if ( window.opener && ! window.opener.closed ) {
+			  		if ( window.opener.name.indexOf("MonitorLearnerActivity") >= 0 ) {
+					  	var monitoringURL = window.opener.location;
+					  	window.opener.location.href = monitoringURL;
+					  	
+					  	if ( window.opener.selectedTabID ) {
+						  	alert("Selected tab id "+window.opener.selectedTabID);
+					  		window.opener.selectTab(window.opener.selectedTabID);
+					  	}
+					}
+				}
 				//just for depress alert window when call window.close()
 	        	//only available for IE browser			  
 				var userAgent=navigator.userAgent;
