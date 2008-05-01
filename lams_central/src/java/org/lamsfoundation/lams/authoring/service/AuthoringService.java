@@ -786,27 +786,31 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		if(mainDesign==null)
 			throw new LearningDesignException(messageService.getMessage("no.such.learningdesign.exist",new Object[]{originalDesignID}));
 
+		LearningDesign designToImport = learningDesignDAO.getLearningDesignById(designToImportID);
+		if(designToImport==null)
+			throw new LearningDesignException(messageService.getMessage("no.such.learningdesign.exist",new Object[]{designToImportID}));
+
     	if ( createNewLearningDesign) {
     		WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderID);
     		if(workspaceFolder==null)
     			throw new WorkspaceFolderException(messageService.getMessage("no.such.workspace.exist",new Object[]{workspaceFolderID}));
     		if ( ! workspaceManagementService.isUserAuthorizedToModifyFolderContents(workspaceFolder.getWorkspaceFolderId(), user.getUserId()) ) {
     			throw new UserAccessDeniedException("User with user_id of " + user.getUserId() 
-    					+" is not authorized to store a copy a learning design into the workspace folder "+workspaceFolder.getWorkspaceFolderId());
+    					+" is not authorized to store a copy a learning design into the workspace folder "+workspaceFolder);
     		}
 
     		mainDesign = copyLearningDesign(mainDesign, LearningDesign.COPY_TYPE_NONE, user, workspaceFolder, false, newDesignName );
     	} else {
-    		// updating the existing design so check the rights to the folder containing the design.
-    		if ( ! workspaceManagementService.isUserAuthorizedToModifyFolderContents(mainDesign.getWorkspaceFolder().getWorkspaceFolderId(), user.getUserId()) ) {
+    		// updating the existing design so check the rights to the folder containing the design. If this is in live edit mode
+    		boolean authorised = workspaceManagementService.isUserAuthorizedToModifyFolderContents(mainDesign.getWorkspaceFolder().getWorkspaceFolderId(), user.getUserId());
+    		if ( ! authorised ) {
+    			authorised = mainDesign.getEditOverrideLock() != null && mainDesign.getEditOverrideLock().booleanValue() && userID.equals(mainDesign.getEditOverrideUser().getUserId()); 
+    		}
+    		if ( ! authorised ) {
     			throw new UserAccessDeniedException("User with user_id of " + user.getUserId() 
-    					+" is not authorized to store a learning design into the workspace folder "+mainDesign.getWorkspaceFolder().getWorkspaceFolderId());
+    					+" is not authorized to update a learning design into the workspace folder "+mainDesign.getWorkspaceFolder());
     		}
     	}
-
-		LearningDesign designToImport = learningDesignDAO.getLearningDesignById(designToImportID);
-		if(designToImport==null)
-			throw new LearningDesignException(messageService.getMessage("no.such.learningdesign.exist",new Object[]{designToImportID}));
 
     	// now dump the import design into our main sequence. Leave the first activity ui id for the design as it is.
     	int uiidOffset = mainDesign.getMaxID().intValue();
