@@ -64,6 +64,7 @@ public interface ForumConstants {
 	public static final String ATTR_ALLOW_NEW_TOPICS = "allowNewTopics";
 	public static final String ATTR_ALLOW_RICH_EDITOR = "allowRichEditor";
 	public static final String ATTR_LIMITED_CHARS = "limitedChars";
+        public static final String ATTR_LOCK_WHEN_FINISHED = "lockedWhenFinished";
 
 	public static final String ONLINE_ATTACHMENT = "online_att";
 	public static final String OFFLINE_ATTACHMENT = "offline_att";
