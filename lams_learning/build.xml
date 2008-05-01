@@ -321,6 +321,20 @@
 		<copy file="${build.lib}/${product}.jar"
 				todir="${jboss.deploy}"/>
 	</target>
+	
+	<!-- explode-war : for convenience during development.  Explodes lams-learning.war in the lams.ear folder -->
+	<target name="explode-war" depends="" description="explode war package to a war folder">
+		<!-- rename war file to avoid name conflict -->
+		<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war" />
+		<!-- explode the war -->
+		<unjar src="${jboss.deploy}/temp-${product}.war" dest="${jboss.deploy}/${product}.war" />
+		<!-- delete temp war file -->
+		<delete>
+			<fileset dir="${jboss.deploy}">
+				<include name="temp-${product}.war" />
+			</fileset>
+		</delete>
+	</target>
 
 	<!-- ================================= -->
 	<!--  target: synchronize-jsp          -->            
