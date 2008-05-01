@@ -65,7 +65,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</h1>
 
 			<c:if test="${(generalLearnerFlowDTO.lockWhenFinished == 'true')  && (generalLearnerFlowDTO.showOtherAnswers == 'true') }">
-				<div class="warning space-bottom">
+				<div class="info space-bottom">
 					<fmt:message key="label.responses.locked" />								
 				</div>
 
