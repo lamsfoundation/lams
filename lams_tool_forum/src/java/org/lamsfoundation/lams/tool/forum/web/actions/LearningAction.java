@@ -209,6 +209,7 @@ public class LearningAction extends Action {
 		sessionMap.put(ForumConstants.FORUM_ID, forumId);
 		sessionMap.put(AttributeNames.ATTR_MODE, mode);
 		sessionMap.put(ForumConstants.ATTR_FINISHED_LOCK, new Boolean(lock));
+		sessionMap.put(ForumConstants.ATTR_LOCK_WHEN_FINISHED, forum.getLockWhenFinished());
 		sessionMap.put(ForumConstants.ATTR_USER_FINISHED, forumUser.isSessionFinished());
 		sessionMap.put(ForumConstants.ATTR_ALLOW_EDIT, forum.isAllowEdit());
 		sessionMap.put(ForumConstants.ATTR_ALLOW_UPLOAD,forum.isAllowUpload());
