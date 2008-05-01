@@ -152,6 +152,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 				
 		} else {
 			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_apply_changes'), instanceName:"saveItem"});
+			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_insertdesign'), instanceName:"insertDesignItem", enabled:true});
 			
 			file_menu.addMenuItem({type:"separator"});
 			

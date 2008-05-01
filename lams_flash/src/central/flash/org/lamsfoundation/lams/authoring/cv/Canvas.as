@@ -169,6 +169,7 @@ class Canvas extends CanvasHelper {
 		
 
 	}
+	
 	/**
 	 * Updates the design with the detsils form the workspace :
 	 * 	* <code>
@@ -182,7 +183,7 @@ class Canvas extends CanvasHelper {
 	 * @usage   
 	 * @return  
 	 */
-	public function saveDesignToServer(workspaceResultDTO:Object):Boolean{
+	public function saveDesignToServer(workspaceResultDTO:Object, callback:Function):Boolean{
 		_global.breakpoint();
 		
 		if (canvasModel.activitiesDisplayed.size() < 1){
@@ -224,7 +225,7 @@ class Canvas extends CanvasHelper {
 				LFMessage.showMessageAlert(Dictionary.getValue('grouping_invalid_with_common_names_msg', [_ddm.getGroupingActivityByGroupingUIID(groupingUIID).title]), null);
 				return false;
 			} else {
-				var callback:Function = Proxy.create(this,onStoreDesignResponse);
+				var callback:Function = Proxy.create(this,onStoreDesignResponse, callback);
 				
 				Application.getInstance().getComms().sendAndReceive(dto,"servlet/authoring/storeLearningDesignDetails",callback,false);
 			}
@@ -240,7 +241,7 @@ class Canvas extends CanvasHelper {
 	 * @param   r //the validation response
 	 * @return  
 	 */
-	public function onStoreDesignResponse(r):Void{
+	public function onStoreDesignResponse(r, callback:Function):Void{
 		Application.getInstance().getWorkspace().getWV().clearDialog();
 		
 		if(r instanceof LFError){
@@ -305,6 +306,8 @@ class Canvas extends CanvasHelper {
 			checkValidDesign();
 			checkReadOnlyDesign();
 			Cursor.showCursor(Application.C_DEFAULT);
+			
+			if(callback) callback();
 		}
 	}
 	
@@ -504,14 +507,16 @@ class Canvas extends CanvasHelper {
 	public function openDesignBySelection(mode:String){
         //Work space opens dialog and user will select view
 		if(_ddm.modified || (mode == Workspace.MODE_INSERT && _ddm.modified && (_ddm.learningDesignID != null))) {
-			LFMessage.showMessageConfirm(Dictionary.getValue('cv_design_unsaved'), Proxy.create(this,doOpenDesignBySelection, mode), null);
+			if(_ddm.editOverrideLock) LFMessage.showMessageConfirm(Dictionary.getValue('cv_design_unsaved_live_edit'), Proxy.create(this, doOpenDesignBySelection, mode, true), null);
+			else LFMessage.showMessageConfirm(Dictionary.getValue('cv_design_unsaved'), Proxy.create(this,doOpenDesignBySelection, mode), null);
 		} else {
 			doOpenDesignBySelection(mode);
 		}
 	}
     
-	public function doOpenDesignBySelection(mode:String):Void{
-		var callback:Function = Proxy.create(this, openDesignById);
+	public function doOpenDesignBySelection(mode:String, autoSave:Boolean):Void{
+		var callback:Function = Proxy.create(this, openDesignById, autoSave);
+		
 		var ws = Application.getInstance().getWorkspace();
         ws.userSelectItem(callback, mode);
 	}
@@ -522,7 +527,12 @@ class Canvas extends CanvasHelper {
 	 * @param   designId 
 	 * @return  
 	 */
-    public function openDesignById(workspaceResultDTO:Object){
+    public function openDesignById(workspaceResultDTO:Object, autoSave:Boolean){
+		if(autoSave) {
+			saveDesignToServer(null, Proxy.create(this, openDesignById, workspaceResultDTO, false));
+			return;
+		}
+		
 		Application.getInstance().getWorkspace().getWV().clearDialog();
 		ObjectUtils.toString(workspaceResultDTO);
 		

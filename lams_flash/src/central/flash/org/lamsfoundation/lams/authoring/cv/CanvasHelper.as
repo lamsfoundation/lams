@@ -143,6 +143,7 @@ class CanvasHelper {
 		if(clearCanvas(true)){
 			
 			_ddm.setDesign(designData);
+			if(_ddm.editOverrideLock && !_ddm.validDesign) Application.getInstance().getToolbar().setButtonState("cancel_btn", false, true);
 			
 			if(canvasModel.importing){ 
 				Application.getInstance().getWorkspace().getWorkspaceModel().clearWorkspaceCache(_ddm.workspaceFolderID);
