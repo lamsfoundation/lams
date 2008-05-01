@@ -18,10 +18,10 @@
 					  	var monitoringURL = window.opener.location;
 					  	window.opener.location.href = monitoringURL;
 					  	
-					  	if ( window.opener.selectedTabID ) {
-						  	alert("Selected tab id "+window.opener.selectedTabID);
-					  		window.opener.selectTab(window.opener.selectedTabID);
-					  	}
+				//	  	if ( window.opener.selectedTabID ) {
+				//		  	alert("Selected tab id "+window.opener.selectedTabID);
+				//	  		window.opener.doSelectTab(window.opener.selectedTabID);
+				//	  	}
 					}
 				}
 				//just for depress alert window when call window.close()
