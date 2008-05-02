@@ -11,26 +11,24 @@
 <lams:head>
 	<lams:css />
 	<script type="text/javascript">
-			  function closeWindow() {
-				// refresh the parent window if the parent window is a monitoring window
-			  	if ( window.opener && ! window.opener.closed ) {
-			  		if ( window.opener.name.indexOf("MonitorLearnerActivity") >= 0 ) {
-					  	var monitoringURL = window.opener.location;
-					  	window.opener.location.href = monitoringURL;
-					  	
-				//	  	if ( window.opener.selectedTabID ) {
-				//		  	alert("Selected tab id "+window.opener.selectedTabID);
-				//	  		window.opener.doSelectTab(window.opener.selectedTabID);
-				//	  	}
-					}
-				}
-				//just for depress alert window when call window.close()
-	        	//only available for IE browser			  
-				var userAgent=navigator.userAgent;
-	        	if(userAgent.indexOf('MSIE') != -1)
-		        	window.opener = "authoring"
-		    	window.close();
-   	          }  				
+		function closeWindow() {
+			// refresh the parent window if the parent window is a monitoring window
+			if ( window.opener && ! window.opener.closed && window.opener.name.indexOf("MonitorLearnerActivity") >= 0 ) {
+				var monitoringURL = window.opener.location;
+				var currentTab = window.opener.selectedTabID;
+				if ( currentTab ) 
+					monitoringURL = monitoringURL+"&currentTab="+currentTab;
+
+				window.opener.location.href = monitoringURL;
+			}
+
+			//just for depress alert window when call window.close()
+			//only available for IE browser			  
+			var userAgent=navigator.userAgent;
+			if(userAgent.indexOf('MSIE') != -1)
+				window.opener = "authoring"
+			window.close();
+		}  				
 		</script>
 </lams:head>
 <body class="stripes">

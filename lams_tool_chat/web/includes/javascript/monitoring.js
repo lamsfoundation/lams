@@ -1,7 +1,10 @@
 
 function init() {
-	// open the first tab 
-	selectTab(1);	
+	if (initialTabId) {
+		selectTab(initialTabId);
+	} else {
+		selectTab(1);
+	}
 }
 
 function doSelectTab(tabId) {

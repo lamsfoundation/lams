@@ -8,6 +8,9 @@
 		<lams:Tab id="3" key="button.editActivity" />
 		<lams:Tab id="4" key="button.statistics" />
 	</lams:Tabs>
+	<script type="text/javascript">
+		var initialTabId = "${requestScope.monitoringDTO.currentTab}";
+	</script>
 </div>
 
 <div id="content">

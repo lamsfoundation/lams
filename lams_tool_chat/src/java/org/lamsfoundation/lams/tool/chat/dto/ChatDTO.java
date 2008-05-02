@@ -64,6 +64,8 @@ public class ChatDTO {
 
 	public Set<ChatSessionDTO> sessionDTOs = new TreeSet<ChatSessionDTO>();;
 	
+	public Long currentTab;
+	
 	public ChatDTO(Chat chat) {
 		toolContentId = chat.getToolContentId();
 		title = chat.getTitle();
@@ -196,5 +198,13 @@ public class ChatDTO {
 
 	public void setLockOnFinish(boolean lockOnFinish) {
 		this.lockOnFinish = lockOnFinish;
+	}
+
+	public Long getCurrentTab() {
+		return currentTab;
+	}
+
+	public void setCurrentTab(Long currentTab) {
+		this.currentTab = currentTab;
 	}
 }
