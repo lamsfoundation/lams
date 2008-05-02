@@ -98,6 +98,8 @@ public class MonitoringAction extends Action {
 		//save contentFolderID into session
 		sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
+		request.setAttribute("initialTabId",WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
+
 		TaskList taskList = service.getTaskListByContentId(contentId);
 		taskList.toDTO();
 		

@@ -10,7 +10,12 @@
 		<script>
 
 	        function init(){
-                selectTab(1); //select the default tab;
+	        	var initialTabId = "${initialTabId}";
+			 	if (initialTabId) {
+					selectTab(initialTabId);
+				} else {
+					selectTab(1);
+				}
 	        }     
 	        
 	        function doSelectTab(tabId) {

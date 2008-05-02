@@ -9,7 +9,12 @@
 <script type="text/javascript">
      //<![CDATA[
 	function init(){
-		selectTab(1);
+		var initialTabId = "${initialTabId}";
+		if (initialTabId) {
+			selectTab(initialTabId);
+		} else {
+			selectTab(1);
+		}
 	}  
         
 	function doSelectTab(tabId) {

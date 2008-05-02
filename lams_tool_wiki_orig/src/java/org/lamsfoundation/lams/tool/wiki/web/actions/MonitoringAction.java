@@ -204,6 +204,8 @@ public class MonitoringAction extends Action {
 			HttpServletResponse response) {
 		Long toolContentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 
+		request.setAttribute("initialTabId",WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
+
 		wikiService = getWikiService();
 		List sessionsList = wikiService.getSessionsByContentId(toolContentID);
 
