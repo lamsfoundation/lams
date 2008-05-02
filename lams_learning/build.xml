@@ -239,6 +239,7 @@
 			</webinf>
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
+				<include name="common/*"/>
 				<include name="css/*"/>
 				<include name="exportPortfolio/*"/>
 				<include name="notebook/*"/>
