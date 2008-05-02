@@ -38,6 +38,8 @@ public class NotebookUserDTO implements Comparable{
 	
 	public String lastName;
 	
+	public boolean finishedActivity;
+	
 	public NotebookEntryDTO entryDTO;
 
 	public Long entryUID;
@@ -47,6 +49,7 @@ public class NotebookUserDTO implements Comparable{
 		this.loginName = user.getLoginName();
 		this.firstName = user.getFirstName();
 		this.lastName = user.getLastName();
+		this.finishedActivity = user.isFinishedActivity();
 		this.entryUID = user.getEntryUID();
 		this.entryDTO = new NotebookEntryDTO(entry);
 	}
@@ -56,6 +59,7 @@ public class NotebookUserDTO implements Comparable{
 		this.loginName = user.getLoginName();
 		this.firstName = user.getFirstName();
 		this.lastName = user.getLastName();
+		this.finishedActivity = user.isFinishedActivity();
 		this.entryUID = user.getEntryUID();		
 	}
 
@@ -115,5 +119,13 @@ public class NotebookUserDTO implements Comparable{
 
 	public void setEntryUID(Long entryUID) {
 		this.entryUID = entryUID;
+	}
+
+	public boolean isFinishedActivity() {
+		return finishedActivity;
+	}
+
+	public void setFinishedActivity(boolean finishedActivity) {
+		this.finishedActivity = finishedActivity;
 	}
 }

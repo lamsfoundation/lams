@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.notebook.dto.NotebookDTO;
+import org.lamsfoundation.lams.tool.notebook.dto.NotebookUserDTO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
@@ -116,6 +117,7 @@ public class LearningAction extends LamsDispatchAction {
 		notebookDTO.title = notebook.getTitle();
 		notebookDTO.instructions = notebook.getInstructions();
 		notebookDTO.allowRichEditor = notebook.isAllowRichEditor();
+		notebookDTO.lockOnFinish = notebook.isLockOnFinished();
 		
 		request.setAttribute("notebookDTO", notebookDTO);
 
@@ -153,6 +155,7 @@ public class LearningAction extends LamsDispatchAction {
 		} else {
 			request.setAttribute("contentEditable", true);
 		}
+		request.setAttribute("finishedActivity", notebookUser.isFinishedActivity());
 
 		return mapping.findForward("notebook");
 	}
