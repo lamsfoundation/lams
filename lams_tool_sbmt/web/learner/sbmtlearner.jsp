@@ -6,8 +6,7 @@
 
 <lams:html>
 <lams:head>
-	<title><fmt:message key="tool.display.name" />
-	</title>
+	<title><fmt:message key="tool.display.name" /></title>
 	<html:base />
 	<%@ include file="/common/header.jsp"%>
 
@@ -60,6 +59,19 @@
 		<p>
 			<c:out value="${sessionMap.instruction}" escapeXml="false" />
 		</p>
+
+		<c:if test="${sessionMap.lockOnFinish and sessionMap.mode == 'learner'}">
+			<div class="info">
+				<c:choose>
+					<c:when test="${sessionMap.userFinished}">
+						<fmt:message key="message.activityLocked" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="message.warnLockOnFinish" />
+					</c:otherwise>
+				</c:choose>
+			</div>
+		</c:if>
 
 		<%@include file="/common/messages.jsp"%>
 		<c:if test="${sessionMap.limitUpload}">
