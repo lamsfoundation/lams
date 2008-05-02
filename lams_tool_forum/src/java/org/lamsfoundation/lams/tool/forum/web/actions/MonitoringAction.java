@@ -186,6 +186,7 @@ public class MonitoringAction extends Action {
    	 	this.viewInstructions(mapping, form, request, response);
    	 	this.viewActivity(mapping, form, request, response);
    	 	this.statistic(mapping, form, request, response);
+   	 	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
       	return mapping.findForward("load");
 	}
 	

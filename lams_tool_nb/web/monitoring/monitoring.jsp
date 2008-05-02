@@ -43,6 +43,7 @@
 
 			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" scope="request"/>
 			<html:hidden property="method" />
+			<html:hidden property="currentTab" styleId="currentTab" />
 
 			<c:set var="monitoringURL">
 				<html:rewrite page="/monitoring.do" />

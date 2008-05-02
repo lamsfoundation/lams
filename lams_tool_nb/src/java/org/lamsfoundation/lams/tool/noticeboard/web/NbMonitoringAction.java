@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author mtruong
@@ -152,7 +153,8 @@ public class NbMonitoringAction extends LamsDispatchAction {
         request.setAttribute("reflectOnActivity", content.getReflectOnActivity());
         request.setAttribute("reflections", reflections);
         
-   		monitorForm.setCurrentTab(SUMMARY_TABID);
+        String currentTab = WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB,true);
+   		monitorForm.setCurrentTab(currentTab != null? currentTab : SUMMARY_TABID);
         request.setAttribute(FORM, monitorForm);
    		return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }

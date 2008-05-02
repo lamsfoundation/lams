@@ -8,8 +8,14 @@
 
 <script type="text/javascript">
      //<![CDATA[
+    var initialTabId = "${initialTabId}";
+     
 	function init(){
-		selectTab(1);
+		if (initialTabId) {
+			selectTab(initialTabId);
+		} else {
+			selectTab(1);
+		}
 	}  
         
 	function doSelectTab(tabId) {
