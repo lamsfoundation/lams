@@ -339,6 +339,14 @@ hr {border:0px;
 	border: 1px solid #3c78b5;
 }
 
+.group-box {
+	padding:8px 10px 10px 40px;
+	margin-top: 20px;
+	margin-left: 0px;
+	margin-right: 0px;
+	font-weight: normal;
+	border: 1px solid #ccc;
+}
 
 /*************************************************
 Page layout

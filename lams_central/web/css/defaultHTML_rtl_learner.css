@@ -333,17 +333,25 @@ hr {border:0px;
 
 .info {
 	color: #000000;
-	padding:8px 10px 10px 40px;
+	padding:8px 40px 10px 5px;
 	margin-top: 25px;
 	margin-left: auto;
 	margin-right: auto;
 	text-align: right;
 	font-weight: normal;
-	background: url('../images/css/edit.gif') no-repeat #d8e4f1 10px 8px;
+	background: url('../images/css/edit.gif') no-repeat #d8e4f1 right 10px;
 	width: 70%;
 	border: 1px solid #3c78b5;
 }
 
+.group-box {
+	padding:8px 40px 10px 10px;
+	margin-top: 20px;
+	margin-left: 0px;
+	margin-right: 0px;
+	font-weight: normal;
+	border: 1px solid #ccc;
+}
 
 /*************************************************
 Page layout
