@@ -1,130 +1,124 @@
-  
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-	
-	<script language="JavaScript" type="text/JavaScript"><!--
-		function selectActivity(activityId) {
-			// find the activity in the form
-			var form = document.forms[0];
-			// use form.elements because we are guaranteed an array is returned
-			var elements = form.elements;
-			for (var i = 0; i < elements.length; i++) {
-				// now check if we have the right element
-				if (elements[i].name == "activityId") {
-					var thisActivityBtn = elements[i];
-					var thisActivityId = thisActivityBtn.value;
-					if (activityId == thisActivityId) {
-						thisActivityBtn.checked = true;
-						break;
-					}
-				}
-			}
-		}
-		function submitChoose() {
-			var validated = false;
-			
-			var form = document.forms[0];
-			var elements = form.elements;
-			for (var i = 0; i < elements.length; i++) {
-				if (elements[i].name == "activityID") {
-					if (elements[i].checked) {
-						validated = true;
-						break;
-					}
-				}
-			}
-			if (!validated) {
-				//TODO: this should come from messages
-				alert("<fmt:message key="message.activity.options.noActivitySelected" />");
-			}
-			else {
-				form.submit();
-			}
-		}
-		function submitFinish() {
-			var form = document.forms[1];
-			/*var activityId = form.activityId.value;
-			var method = form.method.value;
-			alert(method+" "+activityId);*/
-			form.submit();
-		}
-		//-->
-	</script>
-	
-	<html:form action="/ChooseActivity" method="POST">
-	<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
-	
-	<div id="content">
+<%@ include file="/common/taglibs.jsp"%>
 
-		<h1><c:out value="${optionsActivityForm.title}"/></h1>
+<c:set var="enableFlash">
+	<lams:LearnerFlashEnabled />
+</c:set>
+<c:if test="${enableFlash}">
+	<lams:Passon id="${optionsActivityForm.lessonID}"
+		progress="${optionsActivityForm.progressSummary}" />
+</c:if>
 
-		<c:set var="enableFlash"><lams:LearnerFlashEnabled/></c:set>
-		<c:if test="${enableFlash}">
-			<lams:Passon id="${optionsActivityForm.lessonID}" progress="${optionsActivityForm.progressSummary}"/>
-		</c:if>
+<script language="JavaScript" type="text/JavaScript"><!--
+	function validate() {
+		var validated = false;
 		
-		<c:if test="${not empty optionsActivityForm.description}">
-			<p><c:out value="${optionsActivityForm.description}"/></p>
-		</c:if>
-		<p><fmt:message key="message.activity.options.activityCount">
+		var form = document.forms[0];
+		var elements = form.elements;
+		for (var i = 0; i < elements.length; i++) {
+			if (elements[i].name == "activityID") {
+				if (elements[i].checked) {
+					validated = true;
+					break;
+				}
+			}
+		}
+		if (!validated) {
+			alert("<fmt:message key="message.activity.options.noActivitySelected" />");
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+	//-->
+</script>
+
+<div id="content">
+	<h1>
+		<c:out value="${optionsActivityForm.title}" />
+	</h1>
+
+	<c:if test="${not empty optionsActivityForm.description}">
+		<p>
+			<c:out value="${optionsActivityForm.description}" />
+		</p>
+	</c:if>
+
+	<div class="group-box">
+
+		<p>
+			<fmt:message key="message.activity.options.activityCount">
 				<fmt:param value="${optionsActivityForm.minimum}" />
 				<fmt:param value="${optionsActivityForm.maximum}" />
 			</fmt:message>
 		</p>
 
-		<table class="alternative-color" cellspacing="0">
-			<c:forEach items="${optionsActivityForm.activityURLs}" var="activityURL" varStatus="loop">
-				<tr onclick="selectActivity(<c:out value="${activityURL.activityId}" />)">
-					<td width="2%">
-						<c:choose>
-							<c:when test="${activityURL.complete}">
-								<%--html:img page="/images/tick.gif" /--%>
-							</c:when>
-							<c:otherwise>
-								<input type="radio" name="activityID"
-									value="<c:out value="${activityURL.activityId}"/>" />
-							</c:otherwise>
-						</c:choose>
-					</td>
-					<td >
-						<c:out value="${activityURL.title}"/>
-					</td>
-				</tr>
-			</c:forEach> 
-		</table>
+		<html:form action="/ChooseActivity" method="post"
+			onsubmit="return validate();">
+			<input type="hidden" name="lams_token"
+				value="<c:out value='${lams_token}' />" >
 
-		<p><font size="1"><fmt:message key="message.activity.options.note" /></font></p>
-		<p>&nbsp;</p>
+			<table class="alternative-color" cellspacing="0">
+				<c:forEach items="${optionsActivityForm.activityURLs}"
+					var="activityURL" varStatus="loop">
+					<tr>
+						<td width="2%">
+							<c:if test="${not activityURL.complete}">
+								<input type="radio" name="activityID" class="noBorder"
+									id="activityID-${activityURL.activityId}"
+									value="${activityURL.activityId}">
+							</c:if>
+						</td>
+						<td>
+							<c:choose>
+								<c:when test="${not activityURL.complete}">
+									<label for="activityID-${activityURL.activityId}">
+										<c:out value="${activityURL.title}" />
+									</label>
+								</c:when>
+								<c:otherwise>
+									<c:out value="${activityURL.title}" />
+								</c:otherwise>
+							</c:choose>
+						</td>
+					</tr>
+				</c:forEach>
+			</table>
 
-		<table><tr><td>
-		<div class="left-buttons">
-			<a href="#" class="button" id="chooseBtn" onClick="submitChoose()"><fmt:message key="label.activity.options.choose" /></a>
-		</div>
-		<c:if test="${optionsActivityForm.finished}">
-			<div class="right-buttons">
-				<a href="#" class="button" id="finishBtn" onClick="submitFinish()"><fmt:message key="label.finish.button" /></a>
+			<div class="align-right small-space-bottom">
+				<html:submit styleClass="button">
+					<fmt:message key="label.activity.options.choose" />
+				</html:submit>
 			</div>
-		</c:if>
-		</td></tr></table>
 
-	</html:form>
+		</html:form>
+	</div>
 
-	<html:form action="/CompleteActivity" method="POST">
-		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
-		<input type="hidden" name="activityID" value="<c:out value='${optionsActivityForm.activityID}' />" />
-		<input type="hidden" name="lessonID" value="<c:out value='${optionsActivityForm.lessonID}' />" /> 
-		<input type="hidden" name="progressID" value="<c:out value='${optionsActivityForm.progressID}' />" /> 
-		
-	</html:form>
+	<p class="info">
+		<fmt:message key="message.activity.options.note" />
+	</p>
 
-	</div>  <!--closes content-->
+	<c:if test="${optionsActivityForm.finished}">
+		<html:form action="/CompleteActivity" method="post">
+			<input type="hidden" name="lams_token"
+				value="<c:out value='${lams_token}' />">
+			<input type="hidden" name="activityID"
+				value="<c:out value='${optionsActivityForm.activityID}' />">
+			<input type="hidden" name="lessonID"
+				value="<c:out value='${optionsActivityForm.lessonID}' />">
+			<input type="hidden" name="progressID"
+				value="<c:out value='${optionsActivityForm.progressID}' />">
 
+			<div class="align-right space-bottom-top">
+				<html:submit styleClass="button">
+					<fmt:message key="label.finish.button" />
+				</html:submit>
+			</div>
 
-	<div id="footer">
-	</div><!--closes footer-->
+		</html:form>
+	</c:if>
 
+</div>
+<!--closes content-->
 
+<div id="footer"></div>

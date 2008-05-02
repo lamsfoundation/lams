@@ -19,13 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-tiles" prefix="tiles"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ include file="/common/taglibs.jsp"%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <lams:html xhtml="true">
