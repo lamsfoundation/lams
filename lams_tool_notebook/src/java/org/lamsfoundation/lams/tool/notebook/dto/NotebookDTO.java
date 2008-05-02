@@ -63,6 +63,8 @@ public class NotebookDTO {
 
 	public Set<NotebookSessionDTO> sessionDTOs = new TreeSet<NotebookSessionDTO>();
 	
+	public Long currentTab;
+	
 	/* Constructors */
 	public NotebookDTO(){}
 	
@@ -192,5 +194,13 @@ public class NotebookDTO {
 
 	public void setLockOnFinish(boolean lockOnFinish) {
 		this.lockOnFinish = lockOnFinish;
+	}
+
+	public Long getCurrentTab() {
+		return currentTab;
+	}
+
+	public void setCurrentTab(Long currentTab) {
+		this.currentTab = currentTab;
 	}
 }

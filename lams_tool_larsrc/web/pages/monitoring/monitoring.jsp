@@ -8,9 +8,14 @@
 	<lams:head>
 		 <%@ include file="/common/tabbedheader.jsp" %>
 	 <script>
+			var initialTabId = "${initialTabId}";
 
-	        function init(){
-                selectTab(1); //select the default tab;
+		   function init(){
+			 	if (initialTabId) {
+					selectTab(initialTabId);
+				} else {
+					selectTab(1);
+				}
 	        }     
 	        
 	        function doSelectTab(tabId) {

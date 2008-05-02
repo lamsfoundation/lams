@@ -62,6 +62,8 @@ public class MonitoringAction extends Action {
 			HttpServletResponse response) throws IOException, ServletException {
 		String param = mapping.getParameter();
 
+		request.setAttribute("initialTabId",WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
+		
 		if (param.equals("summary")) {
 			return summary(mapping, form, request, response);
 		}

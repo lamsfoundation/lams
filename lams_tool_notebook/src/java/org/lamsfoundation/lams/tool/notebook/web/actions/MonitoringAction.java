@@ -80,6 +80,9 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		NotebookDTO notebookDT0 = new NotebookDTO(notebook);
 
+		Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true);
+		notebookDT0.setCurrentTab(currentTab);
+
 		request.setAttribute("notebookDTO", notebookDT0);
 		request.setAttribute("contentFolderID", contentFolderID);
 		return mapping.findForward("success");
