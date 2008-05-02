@@ -70,7 +70,7 @@
 
         <property
             name="runOffline"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="run_offline"
@@ -79,7 +79,7 @@
 
         <property
             name="lockOnFinished"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="lock_on_finished"
@@ -88,7 +88,7 @@
 
         <property
             name="allowRichEditor"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="allow_rich_editor"
@@ -115,7 +115,7 @@
 
         <property
             name="contentInUse"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="content_in_use"
@@ -124,7 +124,7 @@
 
         <property
             name="defineLater"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="define_later"
@@ -142,7 +142,7 @@
 
         <set
             name="notebookAttachments"
-            lazy="false"
+            lazy="true"
             inverse="false"
             cascade="all-delete-orphan"
             sort="unsorted"

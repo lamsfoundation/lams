@@ -297,7 +297,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	}
 
 	/**
-	 * @hibernate.set lazy="false" inverse="false" cascade="all-delete-orphan"
+	 * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
 	 * @hibernate.collection-key column="notebook_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.notebook.model.NotebookAttachment"
 	 * 

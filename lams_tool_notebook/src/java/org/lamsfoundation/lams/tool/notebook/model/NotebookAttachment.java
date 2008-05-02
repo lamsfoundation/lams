@@ -72,15 +72,13 @@ public class NotebookAttachment implements java.io.Serializable, Cloneable {
 	public NotebookAttachment() {
 	}
 
-	/** full constructor */
-	public NotebookAttachment(Long fileVersionId, String fileType, String fileName,
-			Long fileUuid, Date createDate, Notebook notebook) {
+	/** Constructor setting up all the properties except for notebook one*/
+	public NotebookAttachment(Long fileVersionId, String fileType, String fileName,	Long fileUuid, Date createDate) {
 		this.fileVersionId = fileVersionId;
 		this.fileType = fileType;
 		this.fileName = fileName;
 		this.fileUuid = fileUuid;
 		this.createDate = createDate;
-		this.notebook = notebook;
 	}
 
 	// Property accessors

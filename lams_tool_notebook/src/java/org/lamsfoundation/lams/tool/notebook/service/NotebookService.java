@@ -414,12 +414,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager,
 
 		NodeKey nodeKey = processFile(file, type);
 
-		NotebookAttachment attachment = new NotebookAttachment();
-		attachment.setFileType(type);
-		attachment.setFileUuid(nodeKey.getUuid());
-		attachment.setFileVersionId(nodeKey.getVersion());
-		attachment.setFileName(file.getFileName());
-
+		NotebookAttachment attachment = new NotebookAttachment(nodeKey.getVersion(), type, file.getFileName(), nodeKey.getUuid(), new Date());
 		return attachment;
 	}
 
