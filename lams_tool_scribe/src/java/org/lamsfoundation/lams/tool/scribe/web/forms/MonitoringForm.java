@@ -39,6 +39,7 @@ public class MonitoringForm extends ActionForm {
 	Long toolContentID;
 	String contentFolderID;
 	Long appointedScribeUID;
+	Long currentTab;
 
 	public String getDispatch() {
 		return dispatch;
@@ -69,5 +70,11 @@ public class MonitoringForm extends ActionForm {
 	}
 	public void setToolContentID(Long toolContentID) {
 		this.toolContentID = toolContentID;
+	}
+	public Long getCurrentTab() {
+		return currentTab;
+	}
+	public void setCurrentTab(Long currentTab) {
+		this.currentTab = currentTab;
 	}
 }

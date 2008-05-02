@@ -81,6 +81,8 @@ public class MonitoringAction extends LamsDispatchAction {
 				AttributeNames.PARAM_CONTENT_FOLDER_ID);
 		MonitoringForm monForm = (MonitoringForm)form;
 		monForm.setContentFolderID(contentFolderID);
+
+		monForm.setCurrentTab(WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
 		
 		// set up scribeService
 		if (scribeService == null) {

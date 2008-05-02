@@ -17,6 +17,7 @@
 						<html:hidden property="toolSessionID" value="${session.sessionID}" />
 						<html:hidden property="dispatch" value="appointScribe" />
 						<html:hidden property="contentFolderID" />
+						<html:hidden property="currentTab" styleId="currentTab" />
 
 						<fmt:message key="heading.selectScribe" />
 

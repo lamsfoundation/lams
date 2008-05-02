@@ -51,6 +51,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
@@ -136,6 +137,9 @@ public class MonitoringAction extends LamsDispatchAction {
 		AuthoringDTO authorDto = new AuthoringDTO(persistContent);
 		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
 		request.setAttribute(SbmtConstants.PAGE_EDITABLE, persistContent.isContentInUse());
+		
+		DynaActionForm smbtMonitoringForm = (DynaActionForm) form;
+		smbtMonitoringForm.set("currentTab", WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
 		
 		return mapping.findForward("success");
     }

@@ -1,7 +1,12 @@
 
 function init() {
-	// open the first tab 
-	selectTab(1);	
+    var tag = document.getElementById("currentTab");
+   	if(tag != null && tag.value != "") {
+   		selectTab(tag.value);
+   	}
+    else {
+        selectTab(1); //select the default tab;
+    }
 }
 
 function doSelectTab(tabId) {
