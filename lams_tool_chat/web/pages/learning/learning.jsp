@@ -44,6 +44,22 @@
 		<c:out value="${chatDTO.instructions}" escapeXml="false" />
 	</p>
 
+
+	<c:if test="${chatDTO.lockOnFinish and MODE == 'learner'}">
+		<div class="info">
+			<c:choose>
+				<c:when test="${chatUserDTO.finishedActivity}">
+					<fmt:message key="message.activityLocked"/> 
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="message.warnLockOnFinish" />
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</c:if>
+
+	&nbsp;	
+	
 	<div id="chat_content">
 
 		<form name="sendForm" action="" onSubmit="return sendMsg(this);">
@@ -77,8 +93,6 @@
 							<td valign="middle" width="105px">
 								<input id="sendButton" class="button" type="submit"
 									value='<fmt:message>button.send</fmt:message>' />
-
-
 
 							</td>
 						</tr>
