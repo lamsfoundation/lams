@@ -511,6 +511,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		attachment.setFileUuid(nodeKey.getUuid());
 		attachment.setFileVersionId(nodeKey.getVersion());
 		attachment.setFileName(file.getFileName());
+		attachment.setCreateDate(new Date());
 
 		return attachment;
 	}
