@@ -94,8 +94,4 @@
 		</tr>
 	</c:forEach>
 	
-	
 </table>
-			
-
-

@@ -49,10 +49,18 @@ public class TaskListAttachment implements Cloneable{
     private String fileName;
     private Date created;
     
-    //Default contruction method
-    public TaskListAttachment(){
-    	
+    //Default contructor
+    public TaskListAttachment(){    	
     }
+    
+	public TaskListAttachment(Long fileUuid, Long fileVersionId, String fileType, String fileName, Date created) {
+		this.fileUuid = fileUuid;
+		this.fileVersionId = fileVersionId;
+		this.fileType = fileType;
+		this.fileName = fileName;
+		this.created = created;
+	}
+    
 //  **********************************************************
   	//		Function method for Attachment
 //  **********************************************************
@@ -160,4 +168,5 @@ public class TaskListAttachment implements Cloneable{
 	public void setCreated(Date created) {
 		this.created = created;
 	}
+
 }

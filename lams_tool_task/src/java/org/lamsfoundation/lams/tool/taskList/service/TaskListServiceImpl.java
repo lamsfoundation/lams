@@ -192,6 +192,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		file.setFileUuid(nodeKey.getUuid());
 		file.setFileVersionId(nodeKey.getVersion());
 		file.setFileName(uploadFile.getFileName());
+		file.setCreated(new Date());
 		
 		return file;
 	}
