@@ -11,19 +11,15 @@
 		<c:forEach items="${sessionMap.topicList}" var="topic" varStatus="status">
 			<tr>
 				<td>
-					
-					<c:if test="${topic.hasAttachment}">
-						<img src="<html:rewrite page="/images/paperclip.gif" />" class="space-right float-right">
-					</c:if>
-					
 					<c:set var="viewtopic">
 						<html:rewrite page="/authoring/viewTopic.do?sessionMapID=${sessionMapID}&topicIndex=${status.index}&create=${topic.message.updated.time}" />
 					</c:set> 
 					<html:link href="javascript:showMessage('${viewtopic}')">
 						<c:out value="${topic.message.subject}" />
 					</html:link>
-				
-					
+					<c:if test="${topic.hasAttachment}">
+						<img src="<html:rewrite page="/images/paperclip.gif" />">
+					</c:if>
 				</td>
 			</tr>
 		</c:forEach>

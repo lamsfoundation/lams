@@ -29,19 +29,15 @@
 
 			<c:if test="${not empty topic.message.attachments}">
 				<tr>
-					<td>
-						<ul>
+					<td><img src="<html:rewrite page="/images/paperclip.gif"/>" class="space-left float-left">
 							<c:forEach var="file" items="${topic.message.attachments}">
-								<li>
 									<c:set var="downloadURL">
 										<html:rewrite
 											page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
 									</c:set>
 									<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
 										<c:out value="${file.fileName}" /> </a>
-								</li>
 							</c:forEach>
-						</ul>
 					</td>
 				</tr>
 			</c:if>
