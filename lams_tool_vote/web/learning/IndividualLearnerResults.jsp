@@ -56,6 +56,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}"
 				escapeXml="false" />
 		</h1>
+		
+		<c:if test="${VoteLearningForm.lockOnFinish}">
+				<div class="info space-bottom">
+					<fmt:message key="message.warnLockOnFinish" />
+				</div>
+		</c:if>	
+			
 		<html:form action="/learning?validate=false"
 			enctype="multipart/form-data" method="POST" target="_self">
 			<html:hidden property="dispatch" />
@@ -69,6 +76,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="reportViewOnly" />
 			<html:hidden property="userEntry" />
 
+			
 			<p>
 				<strong> <fmt:message key="label.learning.reportMessage" />
 				</strong>
