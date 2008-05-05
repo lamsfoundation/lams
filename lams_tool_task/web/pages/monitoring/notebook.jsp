@@ -27,7 +27,7 @@
 							<lams:out value="${userDTO.reflect}"/>
 						</c:when>
 						<c:otherwise>
-							<fmt:message key="message.not.avaliable" />
+							<fmt:message key="message.no.reflection.available" />
 						</c:otherwise>
 					</c:choose>
 				</td>
