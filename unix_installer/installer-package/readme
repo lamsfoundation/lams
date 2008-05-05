@@ -1,18 +1,18 @@
-LAMS 2.1 - Learning Activity Management System Installer
+LAMS 2.1 RC1 - Learning Activity Management System Installer
 --------------------------------------------------------------------------------
 
-This is an installer package for LAMS 2.1. Please read this 
+This is an installer package for LAMS 2.1 RC1. Please read this 
 document carefully before installing. Please also ensure that you have read
 and understood the terms of the license agreement.
 
-LAMS 2.1 has been released for users to explore the new Branching
+LAMS 2.1 RC1 has been released for users to explore the new Branching
 features coming in LAMS 2.1.
 
 Do NOT use this installer to set up production server for LAMS.
 
 You cannot use this installer to upgrade an existing copy of LAMS 2.0.
 
-For release notes goto: http://wiki.lamsfoundation.org/display/lams/2.1_RC1
+For release notes goto: http://wiki.lamsfoundation.org/display/lams/2.1RC1
 
 CONTENTS
 ========
@@ -84,6 +84,10 @@ wrapper-linux-ppc-64-3.2.3	Linux	PPC
 wrapper-linux-x86-32-3.2.3	Linux	i386 	
 wrapper-linux-x86-64-3.2.3	Linux	IA64 	
 
+NOTE: If you are installing an production server, It is strongly recommended that
+you remove the jmx-console web applications as they can be a security risk. To do 
+so, remove the jboss-4.0.2/server/default/management directory and the 
+jboss-4.0.2/server/default/jmx-console.war diectory.
 
 3. Languages and Locales
 ========================
@@ -265,4 +269,3 @@ LAMS 2.0 bug tracker
 LAMS Foundation					
 	
 	http://www.lamsfoundation.org
-

@@ -23,7 +23,9 @@
 # Installer shell script for LAMS
 
 # Usage: sudo ./install.sh
-
+	
+# The version of this lams installer
+LAMS_VERSION=2.1
 MYSQL_VERSION_STR=5.
 JAVA_REQ_VERSION=1.5
 # Transform the required version string into a number that can be used in comparisons
