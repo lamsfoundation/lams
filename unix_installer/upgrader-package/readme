@@ -46,6 +46,10 @@ settings. The default settings are in the lams.properties file already so you
 need not change a lot. Pay particular attention to the Installation Options 
 section and the Essential settings section.
 
+Take note that the majority of the projects in lams.ear for instance 
+lams-central.war and lams-common.jar, if you have made changes to any projects,
+ensure that you back them up so you can re-apply them after the update.
+
 Before you run the script, you need to ensure that your $JAVA_HOME is set to 
 your java 1.5 or higher directory, also you will need to set the $PATH variable 
 to include the path to the java binaries. The steps to do this are listed below.
