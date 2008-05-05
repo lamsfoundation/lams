@@ -19,17 +19,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
 <%@ include file="/common/taglibs.jsp"%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
-<lams:html xhtml="true">
+<lams:html>
 
 	<lams:head>
 		<title><fmt:message key="${label.branching.title}"/></title>
 		<lams:css/>
 		<c:set var="formAction">/branching.do?method=performBranching&type=${BranchingForm.map.type}&activityID=${BranchingForm.map.activityID}&progressID=${BranchingForm.map.progressID}</c:set>
 		<c:if test="${BranchingForm.map.previewLesson == true}">
-			<c:set var="formAction"><c:out value="${formAction}"/>&force=true</c:set>
+			<c:set var="formAction"><c:out value="${formAction}"/>&amp;force=true</c:set>
 		</c:if>
 		<META HTTP-EQUIV="Refresh" CONTENT="300;URL=<lams:WebAppURL/>${formAction}">
 		<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
