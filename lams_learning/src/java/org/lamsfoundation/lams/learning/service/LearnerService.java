@@ -612,7 +612,10 @@ public class LearnerService implements ICoreLearnerService
 		if ( lesson.isPreviewLesson() ) {
 			ArrayList<User> learnerList = new ArrayList<User>();
 			learnerList.add(learner);
-			lessonService.performGrouping(grouping, group!=null?group.getGroupId():null, learnerList);
+			if ( group != null && group.getGroupId() != null )
+				lessonService.performGrouping(grouping, group!=null?group.getGroupId():null, learnerList);
+			else 
+				lessonService.performGrouping(grouping, group.getGroupName(), learnerList);
 			groupingDone = true;
 		}
 		return groupingDone;
@@ -994,6 +997,13 @@ public class LearnerService implements ICoreLearnerService
     		} else {
 				Group group = lessonService.createGroup(grouping, selectedBranch.getTitle());
 				group.allocateBranchToGroup(null, selectedBranch, branchingActivity);
+				if ( ! forceGrouping(lesson, grouping, group, learner) ) {
+		    		String error = "selectBranch: learner "+learnerId+" cannot be added to the group "+group+" for the branch "
+		    			+selectedBranch+" for the lesson "+lesson.getLessonName()+" preview is "+lesson.isPreviewLesson()
+		    			+". This will only work if preview is true.";
+		    		log.error(error);
+		    		throw new LearnerServiceException(error);
+				}
     		}
 			groupingDAO.update(grouping);
 			
