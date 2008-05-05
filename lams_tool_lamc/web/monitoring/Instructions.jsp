@@ -96,7 +96,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		 	<c:set var="isOfflineListEmpty" value="${false}" />
 		</c:if>
 	</c:forEach>
-	<c:if test="${not isOnlineListEmpty}">
+	<c:if test="${not isOfflineListEmpty}">
 		<tr>
 			<td  colspan="3" class="field-name-alternative-color">
 				<fmt:message key="label.attachments" />
