@@ -19,118 +19,113 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <%@ include file="/common/taglibs.jsp"%>
+<html:errors />
 
-
-		<table class="forms">
-          		<tr> 
-					<td NOWRAP colspan=2 valign=top>
-                   		<b> <fmt:message key="label.onlineInstructions.col" /> </b> 
-                   		<c:out value="${mcGeneralMonitoringDTO.onlineInstructions}" escapeXml="false" />						
-					</td> 
-				</tr>
+<table cellspacing="0">
+	
+	<tr>
+		<td colspan="3">
+			<div class="field-name">
+				<fmt:message key="label.onlineInstructions.col" /> :
+			</div>	
+			<div style="padding-left: 20px;">
+				<c:out value="${mcGeneralMonitoringDTO.onlineInstructions}" escapeXml="false" />
+			</div>
+		</td>
+	</tr>
+	
+	<c:set var="isOnlineListEmpty" value="${true}" />	
+	<c:forEach var="file" items="${mcGeneralMonitoringDTO.attachmentList}">
+		<c:if test="${file.fileOnline}">
+		 	<c:set var="isOnlineListEmpty" value="${false}" />
+		</c:if>
+	</c:forEach>
+	<c:if test="${not isOnlineListEmpty}">
+		<tr>
+			<td  colspan="3" class="field-name-alternative-color">
+				<fmt:message key="label.attachments" />
+			</td>
+		</tr>		
+	</c:if>
+		
+	<c:forEach var="file" items="${mcGeneralMonitoringDTO.attachmentList}">
+		<c:if test="${file.fileOnline}"> 	
+			<tr >
+				<td width="7%" style="padding-left: 30px;">			
+					<c:out value="${file.fileName}" />
+				</td>
 				
+				<td width="3%" align="left">
+					<c:set var="viewURL">
+						<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false" />
+					</c:set>
+					<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')" class="button"> <fmt:message key="label.view" /> </a> &nbsp;
+				</td>
 				
+				<td width="5%" align="left">
+					<c:set var="downloadURL">
+						<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true" />
+					</c:set>
+					<a href="<c:out value='${downloadURL}' escapeXml='false'/>" class="button"> <fmt:message key="label.download" /> </a>
+				</td>
+			</tr>
+		</c:if>
+	</c:forEach>
+
+	
+	<tr>
+		<td colspan="3">
+			<hr />
+		</td>
+	</tr>
+	
+	<tr>
+		<td colspan="3">
+			<div class="field-name">
+				<fmt:message key="label.offlineInstructions.col" /> :
+			</div>	
+			<div style="padding-left: 20px;">
+				<c:out value="${mcGeneralMonitoringDTO.offlineInstructions}" escapeXml="false" />
+			</div>
+		</td>
+	</tr>
+
+	<c:set var="isOfflineListEmpty" value="${true}" />	
+	<c:forEach var="file" items="${mcGeneralMonitoringDTO.attachmentList}">
+		<c:if test="${not file.fileOnline}">
+		 	<c:set var="isOfflineListEmpty" value="${false}" />
+		</c:if>
+	</c:forEach>
+	<c:if test="${not isOnlineListEmpty}">
+		<tr>
+			<td  colspan="3" class="field-name-alternative-color">
+				<fmt:message key="label.attachments" />
+			</td>
+		</tr>
+	</c:if>		
+		
+	<c:forEach var="file" items="${mcGeneralMonitoringDTO.attachmentList}">
+		<c:if test="${not file.fileOnline}"> 
+			<tr >
+				<td width="7%" style="padding-left: 30px;">			
+					<c:out value="${file.fileName}" />
+				</td>
 				
-				<tr>
-					<td NOWRAP colspan=2 valign=top>
-				<table class="forms">
-					<tr><td align=center>
-
-							<table  width="100%" align=center  border="0" cellspacing="0" cellpadding="0">
-								<tr>
-									<td>
-										<table width="70%" class="align-left">
-
-       									<c:forEach var="attachment" items="${mcGeneralMonitoringDTO.attachmentList}">
-											<c:if test="${attachment.fileOnline == true }"> 			
-								            	<bean:define id="view">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=false</bean:define>
-												<bean:define id="download">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=true</bean:define>
-						                        <bean:define id="uuid" name="attachment" property="uuid" />
-						                        
-						                        <tr>
-									            	<td> <bean:write name="attachment" property="fileName"/>  </td>
-										            <td>
-											        	<table>
-												        	<tr>
-												            	<td>
-												                	<a href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")' class="button">
-												                   		<fmt:message key="label.view" />
-												                    </a>
-																	&nbsp&nbsp
-													            	<html:link page="<%=download%>" styleClass="button">
-													                	<fmt:message key="label.download" />
-													                </html:link>
-													            </td>
-												           	</tr>
-											            </table>
-										           	</td>
-									   	     	</tr>
-											</c:if> 											   	     	
-										</c:forEach>
-										</table>
-								 	</td>
-								</tr>
-							</table>
-
-							 	</td>
-							</tr>
-				</table>
-					</td> 				
-				</tr>
+				<td width="3%" align="left">
+					<c:set var="viewURL">
+						<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false" />
+					</c:set>
+					<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')" class="button"> <fmt:message key="label.view" /> </a> &nbsp;
+				</td>
 				
-
-				<tr> 
-					<td colspan=2 NOWRAP> 
-                   		<b> <fmt:message key="label.offlineInstructions.col" /> </b>	<c:out value="${mcGeneralMonitoringDTO.offlineInstructions}" escapeXml="false" />												
-					</td> 
-				</tr>
-
-
-				<tr>
-					<td NOWRAP colspan=2 valign=top>
-				<table class="forms">
-					<tr><td align=center>
-
-							<table  width="100%" align=center  border="0" cellspacing="0" cellpadding="0">
-								<tr>
-									<td>
-										<table width="70%" class="align-left">
-
-       									<c:forEach var="attachment" items="${mcGeneralMonitoringDTO.attachmentList}">
-											<c:if test="${attachment.fileOnline == false}"> 			
-								            	<bean:define id="view">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=false</bean:define>
-												<bean:define id="download">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=true</bean:define>
-						                        <bean:define id="uuid" name="attachment" property="uuid" />
-						                        
-						                        <tr>
-									            	<td> <bean:write name="attachment" property="fileName"/>  </td>
-										            <td>
-											        	<table>
-												        	<tr>
-												            	<td>
-												                	<a href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")' class="button">
-												                   		<fmt:message key="label.view" />
-												                    </a>
-																	&nbsp&nbsp
-													            	<html:link page="<%=download%>" styleClass="button">
-													                	<fmt:message key="label.download" />
-													                </html:link>
-													            </td>
-												           	</tr>
-											            </table>
-										           	</td>
-									   	     	</tr>
-										</c:if> 											   	     	
-										</c:forEach>
-										</table>
-								 	</td>
-								</tr>
-							</table>
-
-							 	</td>
-							</tr>
-				</table>
-					</td> 				
-				</tr>
-
-			</table>	  	
+				<td width="5%" align="left">
+					<c:set var="downloadURL">
+						<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true" />
+					</c:set>
+					<a href="<c:out value='${downloadURL}' escapeXml='false'/>" class="button"> <fmt:message key="label.download" /> </a>
+				</td>
+			</tr>
+		</c:if>
+	</c:forEach>
+	
+</table>

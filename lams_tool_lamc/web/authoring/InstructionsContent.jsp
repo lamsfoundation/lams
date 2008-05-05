@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<div class="field-name">
 				<fmt:message key="label.onlineInstructions.col"></fmt:message>
 			</div>
-			<html:textarea property="onlineInstructions" rows="3" cols="75"></html:textarea>
+			<lams:STRUTS-textarea property="onlineInstructions" rows="3" cols="75" />
 		</td>
 	</tr>
 
@@ -96,7 +96,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<div class="field-name-alternative-color">
 				<fmt:message key="label.offlineInstructions.col"></fmt:message>
 			</div>
-			<html:textarea property="offlineInstructions" rows="3" cols="75"></html:textarea>
+			<lams:STRUTS-textarea property="offlineInstructions" rows="3" cols="75" />
 		</td>
 	</tr>
 
