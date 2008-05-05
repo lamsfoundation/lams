@@ -11,7 +11,6 @@
 			var initialTabId = "${initialTabId}";
 	 
 	        function init(){
-	        	alert(initialTabId);
 			 	if (initialTabId) {
 					selectTab(initialTabId);
 				} else {
