@@ -323,7 +323,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		InstructionFiles existAtt;
 		while(iter.hasNext()){
 			existAtt = (InstructionFiles) iter.next();
-			if(StringUtils.equals(existAtt.getName(),att.getName())){
+			if (StringUtils.equals(existAtt.getName(), att.getName())
+					&& StringUtils.equals(existAtt.getType(), att.getType())) {
 				//if there is same name attachment, delete old one
 				deleteAttachmentList.add(existAtt);
 				iter.remove();

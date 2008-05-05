@@ -446,8 +446,8 @@ public class AuthoringAction extends LamsDispatchAction {
 			Iterator iter = savedFiles.iterator();
 			while (iter.hasNext()) {
 				currAtt = (ScribeAttachment) iter.next();
-				if (StringUtils.equals(currAtt.getFileName(), newAtt
-						.getFileName())) {
+				if (StringUtils.equals(currAtt.getFileName(), newAtt.getFileName())
+						&& StringUtils.equals(currAtt.getFileType(), newAtt.getFileType())) {
 					// move from this this list to deleted list.
 					getAttList(KEY_DELETED_FILES, map).add(currAtt);
 					iter.remove();

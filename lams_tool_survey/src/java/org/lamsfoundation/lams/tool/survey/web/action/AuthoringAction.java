@@ -677,7 +677,8 @@ public class AuthoringAction extends Action {
 		SurveyAttachment existAtt;
 		while(iter.hasNext()){
 			existAtt = (SurveyAttachment) iter.next();
-			if(StringUtils.equals(existAtt.getFileName(),att.getFileName())){
+			if(StringUtils.equals(existAtt.getFileName(),att.getFileName())
+					&& StringUtils.equals(existAtt.getFileType(),att.getFileType())){
 				//if there is same name attachment, delete old one
 				deleteAttachmentList.add(existAtt);
 				iter.remove();

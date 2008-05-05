@@ -561,7 +561,8 @@ public class AuthoringAction extends Action {
 		TaskListAttachment existAtt;
 		while(iter.hasNext()){
 			existAtt = (TaskListAttachment) iter.next();
-			if(StringUtils.equals(existAtt.getFileName(),att.getFileName())){
+			if(StringUtils.equals(existAtt.getFileName(),att.getFileName())
+					&& StringUtils.equals(existAtt.getFileType(),att.getFileType())){
 				//if there is same name attachment, delete old one
 				deleteAttachmentList.add(existAtt);
 				iter.remove();
