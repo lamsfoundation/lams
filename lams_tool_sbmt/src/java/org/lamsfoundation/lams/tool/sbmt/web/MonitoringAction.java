@@ -139,7 +139,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		request.setAttribute(SbmtConstants.PAGE_EDITABLE, persistContent.isContentInUse());
 		
 		DynaActionForm smbtMonitoringForm = (DynaActionForm) form;
-		smbtMonitoringForm.set("currentTab", WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
+//		smbtMonitoringForm.set("currentTab", WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
 		
 		return mapping.findForward("success");
     }

@@ -1,83 +1,94 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<table cellpadding="0" border="0">
-	<!-- Instructions Row -->
+<table cellspacing="0">
+	
 	<tr>
-		<td class="field-name" width="30%">
-			<fmt:message key="label.authoring.online.instruction" />
-			:
-		</td>
-		<td>
-			<c:out value="${authoring.onlineInstruction}" escapeXml="false" />
+		<td colspan="3">
+			<div class="field-name">
+				<fmt:message key="label.authoring.online.instruction" /> :
+			</div>	
+			<div style="padding-left: 20px;">
+				<c:out value="${authoring.onlineInstruction}" escapeXml="false" />
+			</div>
 		</td>
 	</tr>
+	
+	<c:if test="${not empty authoring.onlineFiles}">
+		<tr>
+			<td  colspan="3" class="field-name-alternative-color">
+				<fmt:message key="monitoring.instructions.attachments" />
+			</td>
+		</tr>		
+	</c:if>
+		
+	<c:forEach var="file" items="${authoring.onlineFiles}">
+		<tr >
+			<td width="7%" style="padding-left: 30px;">			
+				<c:out value="${file.name}" />
+			</td>
+			
+			<td width="3%" align="left">
+				<c:set var="viewURL">
+					<html:rewrite page="/download/?uuid=${file.uuID}&preferDownload=false" />
+				</c:set>
+				<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')" class="button"> <fmt:message key="label.view" /> </a> &nbsp;
+			</td>
+			
+			<td width="5%" align="left">
+				<c:set var="downloadURL">
+					<html:rewrite page="/download/?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true" />
+				</c:set>
+				<a href="<c:out value='${downloadURL}' escapeXml='false'/>" class="button"> <fmt:message key="label.download" /> </a>
+			</td>
+		</tr>
+	</c:forEach>
+
+	
 	<tr>
-		<td class="field-name-alternative-color">
-			<fmt:message key="label.authoring.online.filelist" />
-			:
-		</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<ul>
-			<c:forEach var="file" items="${authoring.onlineFiles}">
-				<li>
-					<c:out value="${file.name}" />
-					<html:link href="javascript:launchInstructionsPopup('download/?uuid=${file.uuID}&preferDownload=false')">
-						<fmt:message key="label.view" />
-					</html:link>
-					&nbsp;&nbsp;
-					<c:set var="downloadURL">
-							<html:rewrite page="/download/?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true" />
-					</c:set>
-					<html:link href="${downloadURL}">
-						<fmt:message key="label.download" />
-					</html:link>
-				</li>
-			</c:forEach>
-			</ul>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-		<hr size="1" style="width:550px"/>
-		</td>
-	</tr>
-	<tr>
-		<td class="field-name" width="30%">
-			<fmt:message key="label.authoring.offline.instruction" />
-			:
-		</td>
-		<td>
-			<c:out value="${authoring.offlineInstruction}" escapeXml="false" />
+		<td colspan="3">
+			<hr />
 		</td>
 	</tr>
+	
 	<tr>
-		<td class="field-name-alternative-color">
-			<fmt:message key="label.authoring.offline.filelist" />
-			:
-		</td>
-		<td></td>		
-	</tr>
-	<tr>
-		<td colspan="2">
-			<ul>
-				<c:forEach var="file" items="${authoring.offlineFiles}">
-					<li>
-						<c:out value="${file.name}" />
-						<html:link href="javascript:launchInstructionsPopup('download/?uuid=${file.uuID}&preferDownload=false')">
-							<fmt:message key="label.view" />
-						</html:link>&nbsp;&nbsp;
-						<c:set var="downloadURL">
-								<html:rewrite page="/download/?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true" />
-						</c:set>
-						<html:link href="${downloadURL}">
-							<fmt:message key="label.download" />
-						</html:link>
-					</li>
-				</c:forEach>
-			</ul>
+		<td colspan="3">
+			<div class="field-name">
+				<fmt:message key="label.authoring.offline.instruction" /> :
+			</div>	
+			<div style="padding-left: 20px;">
+				<c:out value="${authoring.offlineInstruction}" escapeXml="false" />
+			</div>
 		</td>
 	</tr>
+	
+	<c:if test="${not empty authoring.offlineFiles}">
+		<tr>
+			<td  colspan="3" class="field-name-alternative-color">
+				<fmt:message key="monitoring.instructions.attachments" />
+			</td>
+		</tr>
+	</c:if>		
+		
+	<c:forEach var="file" items="${authoring.offlineFiles}">
+		<tr >
+			<td width="7%" style="padding-left: 30px;">			
+				<c:out value="${file.name}" />
+			</td>
+			
+			<td width="3%" align="left">
+				<c:set var="viewURL">
+					<html:rewrite page="/download/?uuid=${file.uuID}&preferDownload=false" />
+				</c:set>
+				<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')" class="button"> <fmt:message key="label.view" /> </a> &nbsp;
+			</td>
+			
+			<td width="5%" align="left">
+				<c:set var="downloadURL">
+					<html:rewrite page="/download/?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true" />
+				</c:set>
+				<a href="<c:out value='${downloadURL}' escapeXml='false'/>" class="button"> <fmt:message key="label.download" /> </a>
+			</td>
+		</tr>
+	</c:forEach>
+	
 </table>
