@@ -127,6 +127,7 @@
 			<fileset dir="${jboss.deploy}/lams-monitoring.war.tmp">
 				<include name="*"/>
 				<include name="css/*"/>
+				<include name="branching/*"/>
 				<include name="gate/*"/>
 				<include name="grouping/*"/>
 				<include name="images/*"/>
@@ -150,6 +151,7 @@
 			<fileset dir="${jboss.deploy}/lams-learning.war.tmp">
 				<include name="*"/>
 				<include name="css/*"/>
+				<include name="branching/*"/>
 				<include name="exportPortfolio/*"/>
 				<include name="notebook/*"/>
 				<include name="gate/*"/>

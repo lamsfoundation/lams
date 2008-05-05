@@ -263,7 +263,7 @@ Function revertDatabase
    
         
     # convert '\' to '/' for Ant's benefit
-    Push "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear"
+    Push "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\"
     Push "\"
     Call StrSlash
     Pop $2
@@ -298,7 +298,7 @@ Function revertDatabase
     nsExec::ExecToStack $5
     Pop $3
     Pop $4
-    ${If} $3 == 1
+    ${If} $3 != 0
         detailprint "Problem Restoring database"
         goto error
     ${EndIf}
@@ -313,7 +313,7 @@ Function revertDatabase
     done:
         rmdir "$TEMP\apache-ant-1.6.5"
         delete "$TEMP\revert.xml"
-        delete "$TEMP\revert.properties"
+        ;delete "$TEMP\revert.properties"
 Functionend
 
 Function updateRegistry

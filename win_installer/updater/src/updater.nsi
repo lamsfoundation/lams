@@ -1100,6 +1100,9 @@ Function updateLamswww
     File "${SOURCE_LAMS_EAR}\lams-www.war\WEB-INF\tags\*"
     
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
+    File "${SOURCE_LAMS_EAR}\lams-www.war\copyright.jsp"
+    
+    SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
     File "${DOCUMENTS}\news-${PREVIOUS_VERSION}.html"
     ;if news and news-${PREVIOUS_VERSION} are the same
 
