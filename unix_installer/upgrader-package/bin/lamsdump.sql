@@ -1,1 +1,0 @@
-/usr/bin//mysqldump -ulamsuser -plamsdemo lamstest > /home/lfoxton/backup/lams.dump

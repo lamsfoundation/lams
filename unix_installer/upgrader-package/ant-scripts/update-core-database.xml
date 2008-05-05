@@ -14,10 +14,9 @@
 			encoding="utf8"
 			onerror="continue"
 			>
-			<transaction src="../sql-scripts/alter_203_editonfly.sql" />
-			<transaction src="../sql-scripts/alter_203_rams_theme.sql" />
-			<transaction src="../sql-scripts/alter_203_learner_progress.sql" />
-			<transaction src="../sql-scripts/alter_203_transition.sql" />
+			<transaction src="../sql-scripts/alter_21_branching.sql" />
+			<transaction src="../sql-scripts/alter_21_engine.sql" />
+			<transaction src="../sql-scripts/alter_21_groupings_fckeditor.sql" />
 		</sql>
 	</target>
 </project>

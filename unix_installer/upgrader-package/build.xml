@@ -38,29 +38,14 @@
 		    <arg line="ant-scripts" />
 		    <arg line="assembly" />
 			<arg line="conf" />
-			<arg line="language-pack" />
 			<arg line="sql-scripts" />
 			<arg line="tools" />
 			<arg line="license" />
+			<arg line="bin" />
 			<arg line="readme" />
 			<arg line="update-lams.sh" />
 			<arg line="lams.properties" />
 			<arg line="${PACKAGE-ROOT}" />
-		</exec>
-		
-		<exec executable="cp" failonerror="true">
-			<arg line="bin/backup.class" />
-			<arg line="bin/checkmysql.class" />
-			<arg line="bin/copyllid.class" />
-			<arg line="bin/getJbossDir.class" />
-			<arg line="bin/readProperty.class" />
-			<arg line="bin/testJava.class" />
-			<arg line="bin/UpdateLAMS202Chat.class" />      
-			<arg line="bin/run-lams.sh" />
-			<arg line="bin/shutdown.sh" />
-			<arg line="bin/lamsdump.sql" />
-			<arg line="bin/hibernate3.jar" />
-			<arg line="${PACKAGE-ROOT}/bin" />
 		</exec>
 		
 		<!-- Remove all the CVS directories -->
@@ -177,6 +162,11 @@
 
     </target>
 	
-	
+	<target name="compile-java" description="Compile custom java class">
+		<javac srcdir="java" 
+			classpath="../lams_build/lib/hibernate/hibernate3.jar:mysql-connector-java-3.1.12-bin.jar" 
+			destdir="bin"
+		/>
+	</target>
 	
 </project>

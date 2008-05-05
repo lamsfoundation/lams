@@ -22,9 +22,15 @@
 #   Updater shell script for LAMS
 
 # Usage: sudo ./update-lams.sh
-
+	
+# The version of this LAMS updater
+LAMS_VERSION=2.1
+LAMS_SERVER_VERSION=2.1.200804291000
+LAMS_LANGUAGE_VERSION=2008-04-29
 REQ_LAMS_VERSION=2.0.4
+
 JAVA_REQ_VERSION=1.5
+
 # Transform the required version string into a number that can be used in comparisons
 JAVA_REQ_VERSION=`echo $JAVA_REQ_VERSION | sed -e 's;\.;0;g'`
 
@@ -48,7 +54,7 @@ installexit()
     cp lams.properties docs/lams.properties.backup.exec
     cp docs/lams.properties.backup.orig lams.properties
     export JAVA_HOME=$ORIG_JAVA_HOME
-        exit 0
+    exit 0
 }
 
 
@@ -65,7 +71,17 @@ then
         y)
         printf "\nUsing lams.properties from /etc/lams2.\n"
         cp /etc/lams2/lams.properties .     
-
+		
+		
+		############## 2.1 Specific Code ##################
+		echo "# The version numbers for this LAMS updater" >> lams.properties
+		echo "LAMS_VERSION=2.1" >> lams.properties
+		echo "LAMS_SERVER_VERSION=2.1.200804291000" >> lams.properties
+		echo "LAMS_LANGUAGE_VERSION=2008-04-29" >> lams.properties
+		echo "" >> lams.properties
+		############## End 2.1 Specific Code ##################
+        
+        
         # backup the lams.properties
         cp lams.properties docs/lams.properties.backup.etc
         sleep 1
@@ -86,22 +102,22 @@ fi
 SQL_HOST=localhost
 SQL_URL=jdbc:mysql://$SQL_HOST/$DB_NAME?characterEncoding=utf8&autoReconnect=true
 
-# Checking that the lams.properties points to 'a' lams installation
+# Checking that the lams.properties points to a lams installation
 if [ ! -r "$JBOSS_DIR/server/default/deploy/lams.ear/lams.jar" ]
-                then
-                        printf "\nUpdate failed, Could not find lams.jar at JBOSS_DIR/server/default/deploy/lams.ear.\nPlease check that have LAMS $REQ_LAMS_VERSION is installed and your lams.properties file is correct before running this update.\n"
-                        installfailed
+then
+        printf "\nUpdate failed, Could not find lams.jar at JBOSS_DIR/server/default/deploy/lams.ear.\nPlease check that have LAMS $REQ_LAMS_VERSION is installed and your lams.properties file is correct before running this update.\n"
+        installfailed
 fi
 
 
 checkJava()
 {
     ORIG_JAVA_HOME=$JAVA_HOME
-        export JAVA_HOME=$JDK_DIR
-        JAVA_EXE=$JAVA_HOME/bin/java
+    export JAVA_HOME=$JDK_DIR
+    JAVA_EXE=$JAVA_HOME/bin/java
 
-    $JDK_DIR/bin/java -cp bin testJava  
-        if [  "$?" -ne  "0" ]
+    $JAVA_HOME/bin/java -cp bin testJava  
+    if [  "$?" -ne  "0" ]
         then
         echo "Update failed. Could not verify java installation, check your lams.properties file for the correct JDK_DIR entry, and that you have set your JAVA_HOME and PATH environment variables correctly"
         echo "Refer to the readme for help with setting up java for LAMS"
@@ -170,7 +186,7 @@ checkJava()
 checkMysql()
 {
     printf "Checking LAMS database...\n"
-        $JDK_DIR/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$SQL_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION"
+        $JAVA_HOME/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$SQL_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION"
 
     if [  "$?" -ne  "0" ]
         then
@@ -205,7 +221,7 @@ getMysqlHost()
         y)
     
         # append SQL_HOST and SQL_URL to lams.properties
-                echo "# Updater-generated properties, used instead of default localhost" >> lams.properties
+        echo "# Updater-generated properties, used instead of default localhost" >> lams.properties
         echo "SQL_HOST=$SQL_HOST" >> lams.properties
         echo "SQL_URL=jdbc:mysql://${SQL_HOST}/${DB_NAME}?characterEncoding=utf8&autoReconnect=true" >> lams.properties
         printf "\n"
@@ -377,29 +393,13 @@ then
         mkdir $LAMS_DIR/dump
 fi
 
-##### 2.0.4 Update Specific Java Program, DELETE for later updates
-#$JDK_DIR/bin/java -cp  bin:bin/hibernate3.jar:tools/lib/mysql-connector-java-3.1.12-bin.jar:tools/lib/commons-logging.jar UpdateLAMS202Chat "$SQL_URL" "$DB_USER" "$DB_PASS" "$LAMS_DIR/repository" > log/update-chat-204.log
-#if [  "$?" -ne  "0" ]
-#then
-#        echo "Update failed, problem while updating chat tool to 2.0.4. Check log/update-chat-204.log for details.\n"
-#        installfailed
-#fi
-#####
-
-##### 2.0.4 Update specific, updating lamsauthentication.xml
-#if [ -d "$EAR_DIR/jbossweb-tomcat55.sar" ]
-#then 
-#   printf "\nRemoving $DEPLOY_DIR/jbossweb-tomcat55.sar\n"
-#   rm -r "$EAR_DIR/jbossweb-tomcat55.sar"
-#fi
-#cp conf/lamsauthentication.xml $DEFAULT_DIR/conf
-#
-#ant/bin/ant -logfile log/update-conf.log -buildfile ant-scripts/update-204_jbossweb-tomcat55.sar.xml update-conf-204
-#if [  "$?" -ne  "0" ]
-#then
-#        echo "Update failed, problem while updating configuration files to 2.0.4. Check log/update-conf.log for details.\n"
-#        installfailed
-#fi
+##### 2.1 Update Specific Java Program, DELETE for later updates
+$JAVA_HOME/bin/java -cp  bin:tools/lib/mysql-connector-java-3.1.12-bin.jar Alter21Integration "$DB_NAME" "$DB_USER" "$DB_PASS" "$SQL_URL" > log/Alter21Integration.log
+if [  "$?" -ne  "0" ]
+then
+        echo "Update failed, problem while updating Integration tables. Check log/Alter21Integration.log for details.\n"
+        installfailed
+fi
 #####
 
 # copying lams.properties to /etc/lams2

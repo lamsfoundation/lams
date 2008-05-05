@@ -39,14 +39,17 @@
         <antcall target="configure-jboss" />
         <antcall target="copy-core-jars-wars" />
         <antcall target="update-core-database" />
-        <antcall target="update-mysql-ds" />
+        <!-- <target="update-mysql-ds" /> -->
         <antcall target="update-lams-www-war" />
-        <antcall target="overwrite-news.html" />
-        <antcall target="overwrite-news-unmodified.html" />
+        <!--<antcall target="overwrite-news.html" /> -->
+    	<!--<antcall target="overwrite-news-unmodified.html" /> -->
         <antcall target="explode-wars"/>
         <antcall target="create-tool-deployer" />
         <antcall target="deploy-tools"/>
         <antcall target="update-context-paths"/>
+    	<antcall target="update-custom-tool-contexts"/>
+    	<antcall target="update-2.1-specific"/>
+    	<antcall target="update-conf-files"/>
         <antcall target="compress-wars"/>
         <antcall target="language-pack" />
         <antcall target="remove-lams-temp" />
@@ -113,28 +116,34 @@
             </fileset>          
         </copy>
     
-        <!-- uncomment for 2.1 
         <copy todir="${DEPLOY_DIR}/lams.ear/lams-www.war/WEB-INF/tags" overwrite="true">
-                        <fileset dir="../assembly/lams.ear/lams-www.war/WEB-INF/tags">
-                                <include name="AuthoringButton.tag"/>
-                                <include name="ImgButton.tag"/>
-                                <include name="TabBody.tag"/>
-                                <include name="Tabs.tag"/>
-                <include name="Tab.tag"/>
-                <include name="FCKEditor.tag"/>
-                <include name="Passon.tag"/>
-                        </fileset>
-       </copy>
+            <fileset dir="../assembly/lams.ear/lams-www.war/WEB-INF/tags">
+				<include name="*.tag"/>
+   			</fileset>
+       	</copy>
         
         <copy todir="${DEPLOY_DIR}/lams.ear/lams-www.war/WEB-INF" overwrite="true">
             <fileset dir="../assembly/lams.ear/lams-www.war/WEB-INF">
                 <include name="lams.tld"/>
             </fileset>
         </copy> 
-        -->
+    	
+    	<copy todir="${DEPLOY_DIR}/lams.ear/lams-www.war/" overwrite="true">
+            <fileset dir="../assembly/lams.ear/lams-www.war/">
+                <include name="htmltemplates.xml"/>
+            	<include name="copyright.jsp"/>
+            </fileset>
+        </copy> 
+    	
+    	<copy todir="${DEPLOY_DIR}/lams.ear/lams-www.war/images" overwrite="true">
+            <fileset dir="../assembly/lams.ear/lams-www.war/images">
+                <include name="template*.gif"/>
+            </fileset>
+        </copy>
+
     </target>
 
-
+	<!--
     <target name="update-mysql-ds" description="Updates mysql-ds.xml to have the SQL url in the lams.properties">
         <copy todir="${DEPLOY_DIR}" overwrite="true">
             <fileset dir="../conf">
@@ -148,15 +157,16 @@
             </filterset>
         </copy>
     </target>
+	-->
 
     <target name="explode-wars" description="Explodes the lams-learning and lams-monitoring wars so their files can be altered by the tool deployer">
-        <ant antfile="../tools/update-deploy-tools.xml" output="../log/explode-wars.log" target="explode-wars">
+        <ant antfile="update-deploy-tools.xml" output="../log/explode-wars.log" target="explode-wars">
             <property name="jboss.deploy" value="${EAR_DIR}"/>
         </ant>
     </target>
 
     <target name="compress-wars" description="Compresses the lams-learning and lams-monitoring wars after their files have been altered by the tool deployer">
-        <ant antfile="../tools/update-deploy-tools.xml" output="../log/compress-wars.log" target="compress-wars">
+        <ant antfile="update-deploy-tools.xml" output="../log/compress-wars.log" target="compress-wars">
             <property name="jboss.deploy" value="${EAR_DIR}"/>
         </ant>
     </target>
@@ -297,12 +307,30 @@
         </ant>
         
     </target> 
-
-
+	
+	<target name="update-custom-tool-contexts">
+		<ant antfile="update-deploy-tools.xml" output="../log/update-custom-tool-contexts.log" target="update-custom-tool-contexts">
+            <property name="prop.path" value="lavote11"/>
+        </ant>
+	</target>
+	
+	<target name="update-2.1-specific" description="Update tasks specfic to the 2.1 Update">
+		<ant antfile="update-deploy-tools.xml" output="../log/update-application-xml.log" target="update-application-xml">
+            <property name="prop.path" value="lavote11"/>
+        </ant>
+	</target>
+	
+	
+	<target name="update-conf-files" description="Updates conf files">
+		<copy todir="${DEFAULT_DIR}/conf" overwrite="true">
+            <fileset dir="../conf">
+                <include name="*.xml"/>
+            </fileset>
+        </copy>
+	</target>
 
     <target name="language-pack" description="Runs the latest language pack included with the updater">
-        <ant antfile="../language-pack/language-pack.xml" output="../log/language-pack.log" target="update-languages" inheritAll="true">
-            <property file="../language-pack/lang.properties"/>
+        <ant antfile="language-pack.xml" output="../log/language-pack.log" target="update-languages" inheritAll="true">
         </ant>
     </target>
 
@@ -329,9 +357,7 @@
 
     <target name="copy-properties-to-etc" description="Copies properties files to etc, so they can be used in late updaters">
         <mkdir dir="/etc/lams2"/>
-
         <copy todir="/etc/lams2" file= "../lams.properties"/>
-        <copy todir="/etc/lams2" file= "lang.properties"/>
     </target>       
 
 </project>
