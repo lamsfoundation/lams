@@ -444,6 +444,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 		attachment.setFileUuid(nodeKey.getUuid());
 		attachment.setFileVersionId(nodeKey.getVersion());
 		attachment.setFileName(file.getFileName());
+		attachment.setCreateDate(new Date());
 
 		return attachment;
 	}
