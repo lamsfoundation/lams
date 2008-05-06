@@ -42,6 +42,19 @@
 			<c:out value="${sessionMap.instructions}" escapeXml="false" />
 		</p>
 
+		<c:if test="${sessionMap.lockOnFinish}">
+				<div class="info">
+					<c:choose>
+						<c:when test="${sessionMap.userFinished}">
+							<fmt:message key="message.activityLocked" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="message.warnLockOnFinish" />
+						</c:otherwise>
+					</c:choose>
+				</div>
+		</c:if>
+		
 		<c:forEach var="element" items="${sessionMap.questionList}">
 			<div class="shading-bg">
 				<c:set var="question" value="${element.value}" />

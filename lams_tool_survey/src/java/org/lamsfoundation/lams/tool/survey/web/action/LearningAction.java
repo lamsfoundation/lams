@@ -170,7 +170,8 @@ public class LearningAction extends Action {
 		//basic information
 		sessionMap.put(SurveyConstants.ATTR_TITLE,survey.getTitle());
 		sessionMap.put(SurveyConstants.ATTR_SURVEY_INSTRUCTION,survey.getInstructions());
-		sessionMap.put(SurveyConstants.ATTR_FINISH_LOCK,lock);
+		sessionMap.put(SurveyConstants.ATTR_FINISH_LOCK, lock);
+		sessionMap.put(SurveyConstants.ATTR_LOCK_ON_FINISH, survey.getLockWhenFinished());
 		sessionMap.put(SurveyConstants.ATTR_SHOW_ON_ONE_PAGE,survey.isShowOnePage());
 		sessionMap.put(SurveyConstants.ATTR_USER_FINISHED, surveyUser.isSessionFinished());
 		
