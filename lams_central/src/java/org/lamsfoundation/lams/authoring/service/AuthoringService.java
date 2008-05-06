@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Date;
 
@@ -1259,6 +1260,24 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		return flashMessage.serializeMessage();
 	}
 
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyMultipleToolContent(java.lang.Integer, java.util.List)
+	 */
+	public String copyMultipleToolContent(Integer userId, List<Long> toolContentIds) {
+		StringBuffer idMap = new StringBuffer();
+		for ( Long oldToolContentId : toolContentIds) {
+			if ( oldToolContentId != null ) {
+				Long newToolContentId = lamsCoreToolService.notifyToolToCopyContent(oldToolContentId);
+				idMap.append(oldToolContentId);
+				idMap.append('=');
+				idMap.append(newToolContentId);
+				idMap.append(',');
+			}
+		}
+		// return the id list, stripping off the trailing ,
+		return idMap.length() > 0 ? idMap.substring(0, idMap.length()-1) : "";
+	}
+    
 	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAvailableLicenses() */
 	public Vector getAvailableLicenses() {
 		List licenses = licenseDAO.findAll(License.class);
@@ -1358,6 +1377,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
         }
 		return newName;
 	}
-    
+
 
 }

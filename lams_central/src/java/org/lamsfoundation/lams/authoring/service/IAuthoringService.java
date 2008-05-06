@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.authoring.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -50,6 +52,7 @@ public interface IAuthoringService {
 	public static final String STORE_LD_MESSAGE_KEY = "storeLearningDesignDetails";
 	public static final String INSERT_LD_MESSAGE_KEY = "insertLearningDesign";
 	public static final String START_EDIT_ON_FLY_MESSAGE_KEY = "startEditOnFly";
+	public static final String COPY_TOOL_CONTENT_MESSAGE_KEY = "copyMultipleToolContent";
 
 	/**
 	 * Returns a populated LearningDesign object corresponding to the given learningDesignID
@@ -238,6 +241,24 @@ public interface IAuthoringService {
 	 * @return String The new tool content id in WDDX Format
 	 */
 	public String copyToolContent(Long toolContentID) throws IOException;
+	
+	/**
+	 * Calls an appropriate tools to copy the content indicated by toolContentIds. Batch 
+	 * version of String copyToolContent(Long toolContentID). Returns a map containing
+	 * the old and new ids, and this is converted to a WDDX format in the calling servlet.
+	 * 
+	 * The is called when the user copies and pastes a complex activity icon in authoring.
+	 * Authoring calls this method to copy all the contained tool activities' content
+	 * in one go.
+	 * 
+	 * It should only be called on a ToolActivity - never a Gate or Grouping or
+	 * Complex activity.
+	 * 
+	 * @param userId Id of the user requesting the copy
+	 * @param toolContentIDs The toolContentIDs indicating the content to copy
+	 * @return New Id map in format oldId1=newId1,oldId2=newId2,oldId3=newId3
+	 */
+	public String copyMultipleToolContent(Integer userId,List<Long> toolContentIds);
 	
 	/** Get the available licenses. This will include our supported Creative Common
 	 * licenses and an "OTHER" license which may be used for user entered license details.
