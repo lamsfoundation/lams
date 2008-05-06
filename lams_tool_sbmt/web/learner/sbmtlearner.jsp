@@ -75,11 +75,15 @@
 
 		<%@include file="/common/messages.jsp"%>
 		<c:if test="${sessionMap.limitUpload}">
-			<p>		
-			<fmt:message key="message.left.upload.limit">
-				<fmt:param value="${learner.limitUploadLeft}" />
-			</fmt:message>
-			</p>
+			<c:choose>
+			 <c:when test="${not sessionMap.userFinished || not sessionMap.lockOnFinish}">
+				<p>		
+				<fmt:message key="message.left.upload.limit">
+					<fmt:param value="${learner.limitUploadLeft}" />
+				</fmt:message>
+				</p>
+			</c:when>
+			</c:choose>
 		</c:if>
 		<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->
 		<c:choose>
