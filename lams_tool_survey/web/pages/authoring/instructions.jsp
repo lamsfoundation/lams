@@ -64,8 +64,7 @@
 			<div class="field-name">
 				<fmt:message key="label.authoring.online.instruction"></fmt:message>
 			</div>
-			<html:textarea property="survey.onlineInstructions" rows="3"
-				cols="75"></html:textarea>
+			<lams:STRUTS-textarea property="survey.onlineInstructions" rows="3" cols="75" />
 		</td>
 	</tr>
 	<tr>
@@ -102,8 +101,7 @@
 			<div class="field-name-alternative-color">
 				<fmt:message key="label.authoring.offline.instruction"></fmt:message>
 			</div>
-			<html:textarea property="survey.offlineInstructions" rows="3"
-				cols="75"></html:textarea>
+			<lams:STRUTS-textarea property="survey.offlineInstructions" rows="3" cols="75" />
 		</td>
 	</tr>
 	<tr>

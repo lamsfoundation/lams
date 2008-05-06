@@ -140,6 +140,7 @@ public class MonitoringAction extends Action {
 		
 		//get survey 
 		Survey survey = service.getSurveyByContentId(contentId);
+		survey.toDTO();
 		
 		//get statistic
 		SortedMap<SurveySession,Integer> statis = service.getStatistic(contentId);
