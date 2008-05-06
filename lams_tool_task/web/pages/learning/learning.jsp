@@ -78,6 +78,21 @@
 		<h1>
 			${taskList.title}
 		</h1>
+		
+		<c:if test="${mode == 'author' || mode == 'learner'}">
+			<c:if test="${taskList.lockWhenFinished}">
+		    	<div class="info space-bottom">
+			   		<c:choose>
+				    	<c:when test = "${finishedLock}">
+							<fmt:message key="label.learning.responses.locked.reminder" />								
+					    </c:when>
+					    <c:otherwise>
+							<fmt:message key="label.learning.responses.locked" />								
+					    </c:otherwise>
+				   </c:choose>
+				</div>
+			</c:if>
+	   </c:if>
 
 		<p>
 			${taskList.instructions}
