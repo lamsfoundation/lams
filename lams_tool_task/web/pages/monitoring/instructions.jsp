@@ -8,7 +8,7 @@
 	<tr>
 		<td colspan="3">
 			<div class="field-name">
-				<fmt:message key="label.authoring.online.instruction" /> :
+				<fmt:message key="label.authoring.online.instruction" /> 
 			</div>	
 			<div style="padding-left: 20px;">
 				<c:out value="${taskList.onlineInstructions}" escapeXml="false" />
@@ -56,7 +56,7 @@
 	<tr>
 		<td colspan="3">
 			<div class="field-name">
-				<fmt:message key="label.authoring.offline.instruction" /> :
+				<fmt:message key="label.authoring.offline.instruction" />
 			</div>	
 			<div style="padding-left: 20px;">
 				<c:out value="${taskList.offlineInstructions}" escapeXml="false" />

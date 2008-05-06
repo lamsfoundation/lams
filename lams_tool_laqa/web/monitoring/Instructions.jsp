@@ -26,7 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<tr>
 		<td colspan="3">
 			<div class="field-name">
-				<fmt:message key="label.onlineInstructions.col" /> :
+				<fmt:message key="label.onlineInstructions.col" />
 			</div>	
 			<div style="padding-left: 20px;">
 				<c:out value="${qaGeneralMonitoringDTO.onlineInstructions}" escapeXml="false" />
@@ -82,7 +82,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<tr>
 		<td colspan="3">
 			<div class="field-name">
-				<fmt:message key="label.offlineInstructions.col" /> :
+				<fmt:message key="label.offlineInstructions.col" />
 			</div>	
 			<div style="padding-left: 20px;">
 				<c:out value="${qaGeneralMonitoringDTO.offlineInstructions}" escapeXml="false" />

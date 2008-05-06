@@ -6,7 +6,7 @@
 	<tr>
 		<td colspan="3">
 			<div class="field-name">
-				<fmt:message key="instructions.onlineInstructions" /> :
+				<fmt:message key="instructions.onlineInstructions" />
 			</div>	
 			<div style="padding-left: 20px;">
 				<c:out value="${dto.onlineInstructions}" escapeXml="false" />
@@ -54,7 +54,7 @@
 	<tr>
 		<td colspan="3">
 			<div class="field-name">
-				<fmt:message key="instructions.offlineInstructions" /> :
+				<fmt:message key="instructions.offlineInstructions" />
 			</div>	
 			<div style="padding-left: 20px;">
 				<c:out value="${dto.offlineInstructions}" escapeXml="false" />
