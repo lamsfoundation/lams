@@ -59,8 +59,8 @@
 		<p>
 			<c:out value="${sessionMap.instruction}" escapeXml="false" />
 		</p>
-
-		<c:if test="${sessionMap.lockOnFinish and sessionMap.mode == 'learner'}">
+    <c:if test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
+		<c:if test="${sessionMap.lockOnFinish}">
 			<div class="info">
 				<c:choose>
 					<c:when test="${sessionMap.userFinished}">
@@ -72,6 +72,7 @@
 				</c:choose>
 			</div>
 		</c:if>
+	</c:if>
 
 		<%@include file="/common/messages.jsp"%>
 		<c:if test="${sessionMap.limitUpload}">
