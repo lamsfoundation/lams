@@ -60,6 +60,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				escapeXml="false" />
 		</h1>
 
+		
+		<c:if test="${VoteLearningForm.lockOnFinish and voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
+			<div class="info space-bottom">
+				<fmt:message key="message.activityLocked" />
+			</div>
+		</c:if>
+
 		<html:form action="/learning?validate=false"
 			enctype="multipart/form-data" method="POST" target="_self">
 			<html:hidden property="dispatch" />
