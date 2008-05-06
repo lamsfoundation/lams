@@ -42,7 +42,7 @@
 			<c:out value="${sessionMap.instructions}" escapeXml="false" />
 		</p>
 
-		<c:if test="${sessionMap.lockOnFinish}">
+		<c:if test="${sessionMap.lockOnFinish and sessionMap.mode != 'teacher'}">
 				<div class="info">
 					<c:choose>
 						<c:when test="${sessionMap.userFinished}">
