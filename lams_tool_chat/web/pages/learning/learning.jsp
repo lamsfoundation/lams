@@ -44,8 +44,8 @@
 		<c:out value="${chatDTO.instructions}" escapeXml="false" />
 	</p>
 
-
-	<c:if test="${chatDTO.lockOnFinish and MODE == 'learner'}">
+   <c:if test="${MODE == 'learner' || MODE == 'author'}">
+	<c:if test="${chatDTO.lockOnFinish}"> 
 		<div class="info">
 			<c:choose>
 				<c:when test="${chatUserDTO.finishedActivity}">
@@ -57,7 +57,7 @@
 			</c:choose>
 		</div>
 	</c:if>
-
+   </c:if>
 	&nbsp;	
 	
 	<div id="chat_content">
