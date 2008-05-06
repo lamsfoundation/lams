@@ -106,6 +106,7 @@ public interface WDDXTAGS {
 	/** ToolActivity specific tags*/
 	public static final String TOOL_ID="toolID";
 	public static final String TOOL_CONTENT_ID="toolContentID";
+	public static final String TOOL_CONTENT_IDS="toolContentIDs";
 	
 	/** GateActivity specific tags*/	
 	public static final String GATE_ACTIVITY_LEVEL_ID ="gateActivityLevelID";
