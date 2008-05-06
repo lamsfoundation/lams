@@ -12,6 +12,7 @@
 		<c:out value="${sessionMap.instruction}" escapeXml="false" />
 	</div>
 
+   <c:if test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
 	<c:if test="${sessionMap.lockedWhenFinished}">
 	      <div class="info space-bottom">
 	   <c:choose>
@@ -24,7 +25,7 @@
 	   </c:choose>
 	      </div>
 	</c:if>
-
+   </c:if>
 
 	<%@ include file="/common/messages.jsp"%>
 
