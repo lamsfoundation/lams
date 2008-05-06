@@ -76,6 +76,19 @@
 			${resource.instructions}
 		</p>
 
+		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
+				<div class="info">
+					<c:choose>
+						<c:when test="${sessionMap.userFinished}">
+							<fmt:message key="message.activityLocked" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="message.warnLockOnFinish" />
+						</c:otherwise>
+					</c:choose>
+				</div>
+		</c:if>
+
 		<%@ include file="/common/messages.jsp"%>
 
 		<table cellspacing="0" class="alternative-color">

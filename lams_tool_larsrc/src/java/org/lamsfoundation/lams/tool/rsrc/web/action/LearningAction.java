@@ -201,7 +201,8 @@ public class LearningAction extends Action {
 		//basic information
 		sessionMap.put(ResourceConstants.ATTR_TITLE,resource.getTitle());
 		sessionMap.put(ResourceConstants.ATTR_RESOURCE_INSTRUCTION,resource.getInstructions());
-		sessionMap.put(ResourceConstants.ATTR_FINISH_LOCK,lock);
+		sessionMap.put(ResourceConstants.ATTR_FINISH_LOCK, lock);
+		sessionMap.put(ResourceConstants.ATTR_LOCK_ON_FINISH, resource.getLockWhenFinished());
 		sessionMap.put(ResourceConstants.ATTR_USER_FINISHED, resourceUser !=null && resourceUser.isSessionFinished());
 		
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);

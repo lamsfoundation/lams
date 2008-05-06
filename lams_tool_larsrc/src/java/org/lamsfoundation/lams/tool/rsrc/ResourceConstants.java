@@ -72,6 +72,7 @@ public class ResourceConstants {
 	public static final String ATTR_USER_LIST = "userList";
 	public static final String ATTR_RESOURCE_INSTRUCTION = "instructions";
 	public static final String ATTR_FINISH_LOCK = "finishedLock";
+	public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 	public static final String ATTR_RESOURCE_FORM = "resourceForm";
 	public static final String ATTR_ADD_RESOURCE_TYPE = "addType";
