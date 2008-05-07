@@ -26,6 +26,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
@@ -194,11 +195,7 @@ public class LessonManagerServlet extends HttpServlet {
 				Thread t = new Thread(new AddUsersToLessonThread(serverId, datetime, username, hashValue, 
 						lsIdStr, courseId, country, lang, learnerIds, monitorIds, request));
 				t.start();
-				/*
-				Boolean added = addUsersToLesson(serverId, datetime, username, hashValue, 
-						lsIdStr, courseId, country, lang, learnerIds, monitorIds, request);
-				log.debug("addUsersToLesson returned boolean value of: " + added);
-				*/
+
 				element = document.createElement(CentralConstants.ELEM_LESSON);
 				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lsIdStr);
 				
@@ -691,15 +688,19 @@ public class LessonManagerServlet extends HttpServlet {
 				if (learnerIds != null) {
 					String[] learnerIdArray = learnerIds.split(",");
 					for (String learnerId : learnerIdArray) {
-						addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
+						if (StringUtils.isNotBlank(learnerId)) {
+							addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
 								LoginRequestDispatcher.METHOD_LEARNER, lsIdStr, learnerId, courseId, countryIsoCode, langIsoCode);
+						}
 					}
 				}
 				if (monitorIds != null) {
 					String[] monitorIdArray = monitorIds.split(",");
 					for (String monitorId : monitorIdArray) {
-						addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
+						if (StringUtils.isNotBlank(monitorId)) {
+							addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
 								LoginRequestDispatcher.METHOD_MONITOR, lsIdStr, monitorId, courseId, countryIsoCode, langIsoCode);
+						}
 					}
 				}
 				return true;
