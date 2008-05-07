@@ -20,7 +20,7 @@
 			<tr>
 				<td>
 					<c:set var="viewtopic">
-						<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}" />
+						<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
 					</c:set>
 					<html:link href="${viewtopic}">
 						<c:out value="${topic.message.subject}" />

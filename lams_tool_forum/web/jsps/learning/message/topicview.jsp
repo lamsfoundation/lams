@@ -101,7 +101,7 @@
 						<c:if test='${sessionMap.mode == "teacher"}'>
 							<c:set var="updateMark">
 								<html:rewrite
-									page="/monitoring/editMark.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&updateMode=viewForum" />
+									page="/monitoring/editMark.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&updateMode=viewForum&hideReflection=${sessionMap.hideReflection}" />
 							</c:set>
 						
 							<html:link href="${updateMark}" styleClass="button">
@@ -138,7 +138,7 @@
 								test='${(sessionMap.mode == "teacher") || (msgDto.isAuthor && not sessionMap.finishedLock && sessionMap.allowEdit && (empty msgDto.mark))}'>
 								<c:set var="edittopic">
 									<html:rewrite
-										page="/learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}" />
+										page="/learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
 								</c:set>
 								<html:link href="${edittopic}" styleClass="button">
 									<fmt:message key="label.edit" />
@@ -150,7 +150,7 @@
 								test="${(not sessionMap.finishedLock) && (not sessionMap.noMorePosts)}">
 								<c:set var="replytopic">
 									<html:rewrite
-										page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}" />
+										page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}" />
 								</c:set>
 								<html:link href="${replytopic}" styleClass="button">
 									<fmt:message key="label.reply" />

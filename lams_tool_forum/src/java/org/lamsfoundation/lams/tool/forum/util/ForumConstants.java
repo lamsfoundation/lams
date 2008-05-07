@@ -119,6 +119,7 @@ public interface ForumConstants {
 	public static final String MARK_UPDATE_FROM_USER = "listMarks";
 	public static final String MARK_UPDATE_FROM_FORUM = "viewForum";
 
+	public static final String ATTR_HIDE_REFLECTION = "hideReflection";
 
 
 	

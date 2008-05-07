@@ -38,7 +38,7 @@
 
 	<c:set var="refresh">
 		<html:rewrite
-			page="/learning/viewForum.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}" />
+			page="/learning/viewForum.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}&hideReflection=${sessionMap.hideReflection}" />
 	</c:set>
 
 	<c:set var="continue">
@@ -72,7 +72,7 @@
 		</html:button>
 	</div>
 
-	<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
+	<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and !sessionMap.hideReflection}">
 		<div class="small-space-top">
 			<h2>
 				${sessionMap.reflectInstructions}
@@ -91,11 +91,13 @@
 				</c:otherwise>
 			</c:choose>
 
-			<html:button property="continue"
-				onclick="javascript:location.href='${continue}';"
-				styleClass="button">
-				<fmt:message key="label.edit" />
-			</html:button>
+			<c:if test='${sessionMap.mode != "teacher"}'>
+				<html:button property="continue"
+					onclick="javascript:location.href='${continue}';"
+					styleClass="button">
+					<fmt:message key="label.edit" />
+				</html:button>
+			</c:if>
 		</div>
 	</c:if>
 

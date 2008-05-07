@@ -78,6 +78,9 @@
 							<fmt:message key="monitoring.user.reflection"/>
 						</th>
 					</c:if>
+					<th>
+						<fmt:message key="monitoring.marked.question"/>
+					</th>
 					<th>&nbsp;</th>
 				</tr>
 			</c:if>
@@ -97,6 +100,16 @@
 							<fmt:message key="label.view" />
 						</html:link>
 					</c:if>
+				</td>
+				<td>
+					<c:choose>
+					<c:when test="${user.anyPostsMarked}">
+						<img src="<lams:LAMSURL/>/images/tick.gif" alt="tick"/>
+					</c:when>
+					<c:otherwise>
+						<img src="<lams:LAMSURL/>/images/cross.gif" alt="cross"/>
+					</c:otherwise>
+					</c:choose>
 				</td>
 				<td>
 					<c:url value="/monitoring/viewUserMark.do" var="viewuserurl">
@@ -125,6 +138,7 @@
 					<html:form action="/learning/viewForum.do" target="_blank">
 						<html:hidden property="mode" value="teacher"/>
 						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
+						<html:hidden property="hideReflection" value="true"/>
 						<html:submit property="viewForum" styleClass="button">
 							<fmt:message key="label.monitoring.summary.view.forum" />
 						</html:submit>
@@ -150,6 +164,15 @@
 						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
 						<html:submit property="downloadMarks" styleClass="button">
 							<fmt:message key="message.download.marks" />
+						</html:submit>
+					</html:form>
+				</div>
+				<div style="float:left;padding:5px;margin-left:5px">
+					<html:form action="/monitoring">
+						<html:hidden property="contentFolderID" value="${contentFolderID}"/>
+						<html:hidden property="toolContentID" value="${toolContentID}" />
+						<html:submit property="init" styleClass="button">
+							<fmt:message key="label.refresh" />
 						</html:submit>
 					</html:form>
 				</div>

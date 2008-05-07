@@ -12,6 +12,7 @@ public class UserDTO {
 	private String reflectInstrctions;
 	private boolean finishReflection;
 	private String reflect;
+	private boolean anyPostsMarked;
 	
 	public UserDTO(){
 	}
@@ -73,5 +74,13 @@ public class UserDTO {
 
 	public void setFinishReflection(boolean finishReflection) {
 		this.finishReflection = finishReflection;
+	}
+
+	public boolean isAnyPostsMarked() {
+		return anyPostsMarked;
+	}
+
+	public void setAnyPostsMarked(boolean anyPostsMarked) {
+		this.anyPostsMarked = anyPostsMarked;
 	}
 }

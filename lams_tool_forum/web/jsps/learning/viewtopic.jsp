@@ -4,7 +4,7 @@
 <script type="text/javascript">
 	function refreshTopic(){
 		var reqIDVar = new Date();
-		location.href= "<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&reqUid=" />"+reqIDVar.getTime();;
+		location.href= "<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}&reqUid=" />"+reqIDVar.getTime();;
 	}
 </script>
 
@@ -18,7 +18,7 @@
 		<div class="right-buttons">
 			<c:set var="backToForum">
 				<html:rewrite
-					page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}" />
+					page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" />
 			</c:set>
 			<html:button property="backToForum"
 				onclick="javascript:location.href='${backToForum}';"
@@ -43,7 +43,7 @@
 		<div class="right-buttons">
 			<c:set var="backToForum">
 				<html:rewrite
-					page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}" />
+					page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" />
 			</c:set>
 			<html:button property="backToForum"
 				onclick="javascript:location.href='${backToForum}';"

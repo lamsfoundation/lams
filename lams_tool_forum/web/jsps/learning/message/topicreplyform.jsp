@@ -31,7 +31,7 @@
 			</html:submit>
 			<c:set var="backToTopic">
 				<html:rewrite
-					page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${message.created.time}" />
+					page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${message.created.time}&hideReflection=${sessionMap.hideReflection}" />
 			</c:set>
 			<html:button property="goback"
 				onclick="javascript:location.href='${backToTopic}';"

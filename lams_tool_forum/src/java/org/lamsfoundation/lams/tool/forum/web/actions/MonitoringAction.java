@@ -182,11 +182,19 @@ public class MonitoringAction extends Action {
 	}
 	
 	private ActionForward doTabs(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		//set back tool content ID
+    	String contentFolderID = WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID);
+    	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+
+		Long toolContentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentID);
+
+    	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
+
    	 	this.summary(mapping, form, request, response);
    	 	this.viewInstructions(mapping, form, request, response);
-   	 	this.viewActivity(mapping, form, request, response);
+   	 	this.viewActivity(mapping, form, request, response, toolContentID);
    	 	this.statistic(mapping, form, request, response);
-   	 	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
       	return mapping.findForward("load");
 	}
 	
@@ -221,18 +229,36 @@ public class MonitoringAction extends Action {
 			List userList = forumService.getUsersBySessionId(fts.getSessionId());
 			
 			//sort and create DTO list
+			List topicList = forumService.getAllTopicsFromSession(fts.getSessionId());
+			Map topicsByUser = getTopicsSortedByAuthor(topicList);
+
 			Set<UserDTO> dtoList = new TreeSet<UserDTO>(this.new UserDTOComparator());
 			Iterator iter = userList.iterator();
 			while(iter.hasNext()){
 				ForumUser user = (ForumUser) iter.next();
 				UserDTO userDTO = new UserDTO(user);
 				userDTO.setHasRefection(hasReflection);
+				
+				userDTO.setAnyPostsMarked(false);
+				userDTO.setNoOfPosts(0);
+
+				List<MessageDTO> messages = (List<MessageDTO>) topicsByUser.get(user);
+				if ( messages != null && messages.size() > 0 ) {
+					userDTO.setNoOfPosts(messages.size());
+					for ( MessageDTO message : messages ) {
+						if ( message.getMark() != null ) {
+							userDTO.setAnyPostsMarked(true);
+							break;
+						}
+					}
+				} 
 				dtoList.add(userDTO);
-				//userDTO.setNoOfPosts(noOfPosts)
 			}
+			
 			sessionUsersMap.put(sessionDto, dtoList);
 		}
 
+		
 		// request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 		request.setAttribute("sessionUserMap", sessionUsersMap);
 		return mapping.findForward("success");
@@ -384,11 +410,7 @@ public class MonitoringAction extends Action {
 	 * @return
 	 */
 	private ActionForward viewActivity(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		Long toolContentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-		//set back tool content ID
-    	String contentFolderID = WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID);
-    	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+			HttpServletRequest request, HttpServletResponse response, Long toolContentID) {
     	
 		forumService = getForumService();
 		Forum forum = forumService.getForumByContentId(toolContentID);
@@ -405,7 +427,6 @@ public class MonitoringAction extends Action {
 			
 		boolean isForumEditable = ForumWebUtils.isForumEditable(forum);
 		request.setAttribute(ForumConstants.PAGE_EDITABLE, new Boolean(isForumEditable));
-		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentID);
 		request.setAttribute("title", title);
 		request.setAttribute("instruction", instruction);
 		return mapping.findForward("success");
@@ -709,6 +730,14 @@ public class MonitoringAction extends Action {
 		request.setAttribute(ForumConstants.ATTR_TOPIC, MessageDTO.getMessageDTO(msg));
 		request.setAttribute(ForumConstants.ATTR_USER, user);
 		
+		// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
+		// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
+		// Need to constantly past this value on, rather than hiding just the once, as the View Forum
+		// screen has a refresh button. Need to pass it through the view topic screen and dependent screens 
+		// as it has a link from the view topic screen back to View Forum screen.
+		boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
+		sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
+
 		return mapping.findForward("success");
 	}
 

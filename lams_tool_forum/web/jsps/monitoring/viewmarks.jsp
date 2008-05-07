@@ -38,7 +38,7 @@
 			<tr>
 				<td>
 					<c:set var="viewtopic">
-						<html:rewrite page="/monitoring/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}" />
+						<html:rewrite page="/monitoring/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
 					</c:set>
 					<html:link href="javascript:launchPopup('${viewtopic}','viewtopic');">
 						<c:out value="${topic.message.subject}" />
@@ -110,7 +110,7 @@
 		</c:forEach>
 		<tr>
 			<td>
-				<a href="javascript:window.close();" class="button"><fmt:message key="button.close"/></a>
+				<a href="javascript:closeAndRefreshParentMonitoringWindow()" class="button"><fmt:message key="button.close"/></a>
 			</td>
 		</tr>
 </c:forEach>

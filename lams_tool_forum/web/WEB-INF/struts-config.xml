@@ -271,6 +271,8 @@
 		<action path="/monitoring" 
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
 		    scope="request"
+			name="emptyForm"
+			validate="false"
 		    parameter="init" >
 			<forward name="load" path="tiles:/monitoring/forum/main" redirect="false" />	        
 		</action>

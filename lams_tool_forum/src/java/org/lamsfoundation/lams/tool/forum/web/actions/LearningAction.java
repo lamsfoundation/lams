@@ -197,15 +197,6 @@ public class LearningAction extends Action {
 		Boolean allowRichEditor = new Boolean(forum.isAllowRichEditor());
 		int allowNumber = forum.isLimitedInput() || forum.isAllowRichEditor() ? forum.getLimitedChar() : 0;
 		
-		// get notebook entry
-		String entryText = new String();
-		NotebookEntry notebookEntry = forumService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, 
-				ForumConstants.TOOL_SIGNATURE, forumUser.getUserId().intValue());
-		
-		if (notebookEntry != null) {
-			entryText = notebookEntry.getEntry();
-		}
-		
 		sessionMap.put(ForumConstants.FORUM_ID, forumId);
 		sessionMap.put(AttributeNames.ATTR_MODE, mode);
 		sessionMap.put(ForumConstants.ATTR_FINISHED_LOCK, new Boolean(lock));
@@ -216,13 +207,30 @@ public class LearningAction extends Action {
 		sessionMap.put(ForumConstants.ATTR_ALLOW_NEW_TOPICS,forum.isAllowNewTopic());
 		sessionMap.put(ForumConstants.ATTR_ALLOW_RICH_EDITOR,allowRichEditor);
 		sessionMap.put(ForumConstants.ATTR_LIMITED_CHARS,new Integer(allowNumber));
-		sessionMap.put(ForumConstants.ATTR_REFLECTION_ON,forum.isReflectOnActivity());
-		sessionMap.put(ForumConstants.ATTR_REFLECTION_INSTRUCTION,forum.getReflectInstructions());
-		sessionMap.put(ForumConstants.ATTR_REFLECTION_ENTRY, entryText);
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE,forum.getTitle());
 		sessionMap.put(ForumConstants.ATTR_FORUM_INSTRCUTION,forum.getInstructions());
-		
+
+		// Should we show the reflection or not? We shouldn't show it when the screen is accessed
+		// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
+		// Need to constantly past this value on, rather than hiding just the once, as the View Forum
+		// screen has a refresh button.
+		boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
+		sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
+
+		if ( hideReflection ) {
+			sessionMap.put(ForumConstants.ATTR_REFLECTION_ON,false);
+			sessionMap.put(ForumConstants.ATTR_REFLECTION_INSTRUCTION,"");
+			sessionMap.put(ForumConstants.ATTR_REFLECTION_ENTRY, "");
+		} else {
+			sessionMap.put(ForumConstants.ATTR_REFLECTION_ON,forum.isReflectOnActivity());
+			sessionMap.put(ForumConstants.ATTR_REFLECTION_INSTRUCTION,forum.getReflectInstructions());
+
+			NotebookEntry notebookEntry = forumService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, 
+					ForumConstants.TOOL_SIGNATURE, forumUser.getUserId().intValue());
+			sessionMap.put(ForumConstants.ATTR_REFLECTION_ENTRY, notebookEntry != null ? notebookEntry.getEntry() : "");
+		}
+
 		//add define later support
 		if(forum.isDefineLater()){
 			return mapping.findForward("defineLater");
@@ -406,6 +414,14 @@ public class LearningAction extends Action {
 		//transfer SessionMapID as well
 		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		
+		// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
+		// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
+		// Need to constantly past this value on, rather than hiding just the once, as the View Forum
+		// screen has a refresh button. Need to pass it through the view topic screen and dependent screens 
+		// as it has a link from the view topic screen back to View Forum screen.
+		boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
+		sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
+
 		return mapping.findForward("success");
 
 	}
@@ -509,7 +525,14 @@ public class LearningAction extends Action {
 		SessionMap sessionMap = getSessionMap(request, msgForm);
 		sessionMap.put(ForumConstants.ATTR_PARENT_TOPIC_ID, parentId);
 	
-		
+		// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
+		// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
+		// Need to constantly past this value on, rather than hiding just the once, as the View Forum
+		// screen has a refresh button. Need to pass it through the view topic screen and dependent screens 
+		// as it has a link from the view topic screen back to View Forum screen.
+		boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
+		sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
+
 		return mapping.findForward("success");
 	}
 
@@ -598,6 +621,14 @@ public class LearningAction extends Action {
 		SessionMap sessionMap = getSessionMap(request, msgForm);
 		sessionMap.put(ForumConstants.ATTR_TOPIC_ID, topicId);
 		
+		// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
+		// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
+		// Need to constantly past this value on, rather than hiding just the once, as the View Forum
+		// screen has a refresh button. Need to pass it through the view topic screen and dependent screens 
+		// as it has a link from the view topic screen back to View Forum screen.
+		boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
+		sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
+
 		return mapping.findForward("success");
 	}
 	/**

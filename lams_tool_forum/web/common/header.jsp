@@ -24,3 +24,11 @@
 
 <%@ include file="/common/fckeditorheader.jsp"%>
 
+<script type="text/javascript">
+	function closeAndRefreshParentMonitoringWindow() {
+		refreshParentMonitoringWindow();
+		window.close();
+	}  				
+</script>
+
+
