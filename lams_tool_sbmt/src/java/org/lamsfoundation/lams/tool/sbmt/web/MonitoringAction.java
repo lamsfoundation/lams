@@ -558,12 +558,26 @@ public class MonitoringAction extends LamsDispatchAction {
             sessionDto.setSessionName(sfs.getSessionName());
             
             boolean hasReflect = sfs.getContent().isReflectOnActivity();
+            Map<SubmitUser,FileDetailsDTO> userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
+            
             //construct LearnerDTO list
             List<SubmitUser> userList = submitFilesService.getUsersBySession(sessionID);
             List<SubmitUserDTO> learnerList = new ArrayList<SubmitUserDTO>();
             for(SubmitUser user : userList){
             	SubmitUserDTO learnerDto = new SubmitUserDTO(user);
             	learnerDto.setHasRefection(hasReflect);
+            	
+				learnerDto.setAnyFilesMarked(false);
+				List<FileDetailsDTO> files = (List<FileDetailsDTO>) userFilesMap.get(user);
+				if ( files != null && files.size() > 0 ) {
+					for ( FileDetailsDTO file : files ) {
+						if ( file.getMarks() != null && file.getMarks().trim().length() > 0) {
+							learnerDto.setAnyFilesMarked(true);
+							break;
+						}
+					}
+				}
+            	
             	learnerList.add(learnerDto);
             }
             sessionUserMap.put(sessionDto, learnerList);

@@ -105,6 +105,9 @@
 							<fmt:message key="monitoring.user.reflection"/>
 						</th>
 					</c:if>
+					<th>
+						<fmt:message key="monitoring.marked.question"/>
+					</th>
 					<th>&nbsp;</th>
 				</tr>
 			</c:if>		
@@ -122,6 +125,16 @@
 							<fmt:message key="label.view" />
 						</html:link>
 					</c:if>				
+				</td>
+				<td>
+					<c:choose>
+					<c:when test="${user.anyFilesMarked}">
+						<img src="<lams:LAMSURL/>/images/tick.gif" alt="tick"/>
+					</c:when>
+					<c:otherwise>
+						<img src="<lams:LAMSURL/>/images/cross.gif" alt="cross"/>
+					</c:otherwise>
+					</c:choose>
 				</td>
 				<td><html:link
 					href="javascript:viewMark(${user.userID},${sessionDto.sessionID});"

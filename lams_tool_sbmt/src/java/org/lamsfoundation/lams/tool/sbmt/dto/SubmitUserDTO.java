@@ -54,6 +54,8 @@ public class SubmitUserDTO implements Serializable{
 	private Long marks;	
 	private Date dateOfSubmission;
 	private Date dateMarksReleased;
+	private boolean anyFilesMarked;
+
 	
 	//submit file list
 	private List filesUploaded;
@@ -235,5 +237,11 @@ public class SubmitUserDTO implements Serializable{
 	}
 	public void setLimitUploadLeft(int limitUploadLeft) {
 		this.limitUploadLeft = limitUploadLeft;
+	}
+	public boolean isAnyFilesMarked() {
+		return anyFilesMarked;
+	}
+	public void setAnyFilesMarked(boolean anyFilesMarked) {
+		this.anyFilesMarked = anyFilesMarked;
 	}
 }
