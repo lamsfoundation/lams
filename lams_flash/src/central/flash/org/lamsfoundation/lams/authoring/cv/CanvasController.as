@@ -69,6 +69,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		_tempSelectedItem = _canvasModel.selectedItem;
 		_canvasModel.selectedItem = null;
 		
+		app.toolbar.view.getController().hideOptionPanels();
+		
 		Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID + ' orderID: ' + ca.activity.orderID,Debugger.GEN,'activityClick','CanvasController');
 	    Debugger.log('Check if transition tool active :'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityClick','CanvasController');
 	    
@@ -835,6 +837,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 		Debugger.log(_canvasModel.activeView + " " + _canvasModel.activeView instanceof CanvasBranchView,Debugger.GEN,'canvasRelease','CanvasController');
 		Debugger.log('_canvasModel.activeTool:'+_canvasModel.activeTool,Debugger.GEN,'canvasRelease','CanvasController');
+		
+		app.toolbar.view.getController().hideOptionPanels();
 		
 		_canvasModel.selectedItem = null;
 		

@@ -467,6 +467,12 @@ class ToolbarView extends AbstractView {
 
     }
 	
+	public function isOptionalPanelVisible():Boolean {
+		return optional_bkg_pnl.visible;
+	}
+	
+	public function isFlowPanelVisible():Boolean {		return flow_bkg_pnl.visible;	}
+	
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned
 	 * @usage   

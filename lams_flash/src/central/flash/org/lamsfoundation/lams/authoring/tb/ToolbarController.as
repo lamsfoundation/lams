@@ -64,6 +64,9 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 		Debugger.log('click evt.target.label:'+evt.target.label,Debugger.GEN,'click','ToolbarController');
 		var tgt:String = new String(evt.target);
 		
+		var optionPanelVisible:Boolean = _toolbarModel.getToolbar().view.isOptionalPanelVisible();
+		var flowPanelVisible:Boolean = _toolbarModel.getToolbar().view.isFlowPanelVisible();
+		
 		hideOptionPanels();
 		
 		if(tgt.indexOf("new") != -1){
@@ -87,7 +90,7 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 		}else if(tgt.indexOf("optional_seq") != -1){
 			_app.getCanvas().toggleOptionalSequenceActivity();
 		}else if(tgt.indexOf("optional") != -1){
-			if (!isOptActive){
+			if (!isOptActive && !optionPanelVisible){
 				var c:String = Cursor.getCurrentCursor();
 				if(c==Application.C_GATE){
 					_app.getCanvas().stopGateTool();
@@ -97,7 +100,7 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 				_toolbarModel.getToolbar().view.showHideOptAssets(true);
 			}
 		}else if(tgt.indexOf("flow") != -1){
-			if (!isflowActive){
+			if (!isflowActive && !flowPanelVisible){
 				var c:String = Cursor.getCurrentCursor();
 				
 				if(c==Application.C_GATE){
@@ -107,7 +110,6 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 				isflowActive = true;
 				_toolbarModel.getToolbar().view.showHideFlowAssets(true);
 			}
-						
 		}else if(tgt.indexOf("gate") != -1){
 			_app.getCanvas().toggleGateTool();
 						

@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.authoring.tk.*
 */
 class ToolkitController extends AbstractController {
 	private var _toolkitModel:ToolkitModel;
+	private var app:Application;;
 	/**
 	* Constructor
 	*
@@ -53,6 +54,9 @@ class ToolkitController extends AbstractController {
 		//_global.breakpoint();
 		_toolkitModel = ToolkitModel(model);
 		_toolkitModel.setSelectedTemplateActivity(templateActivity);
+		
+		app = Application.getInstance();
+		app.toolbar.view.getController().hideOptionPanels();
 	}
 	
 	/**
