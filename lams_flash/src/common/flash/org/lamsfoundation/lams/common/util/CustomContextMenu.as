@@ -46,7 +46,7 @@ class CustomContextMenu {
     public var removeEventListener:Function;
 	
 	//Constructor
-	public function CustomContextMenu() {
+	private function CustomContextMenu() {
 		
 		
 		//To hide builtin menu for root
@@ -122,14 +122,16 @@ class CustomContextMenu {
 		menuArr[7] = [Dictionary.getValue('ccm_author_activityhelp'),getHelp, false, v, authorC];
 		
 		for (var i=0; i<menuArr.length; i++){
-			var myObj:Object = new Object();
-			myObj.cmlabel = menuArr[i][0];
-			myObj.handler = menuArr[i][1]; 
-			myObj.isSeparator = menuArr[i][2]; 
-			myObj.isEnable= menuArr[i][3]; 
-			myObj.isVisible = menuArr[i][4]; 
+			if (menuArr[i][4]) {
+				var myObj:Object = new Object();
+				myObj.cmlabel = menuArr[i][0];
+				myObj.handler = menuArr[i][1]; 
+				myObj.isSeparator = menuArr[i][2]; 
+				myObj.isEnable= menuArr[i][3]; 
+				myObj.isVisible = menuArr[i][4]; 
 			
-			myCopy[i]= myObj;			
+				myCopy[i]= myObj;		
+			}
 		}
 		
 		return myCopy;
