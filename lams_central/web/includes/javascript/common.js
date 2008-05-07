@@ -74,3 +74,25 @@
 	   }
 	   return true;
 	}
+	
+	// refresh the parent window if the parent window is a tool monitoring window
+	function refreshParentMonitoringWindow() {
+		if ( window.opener && ! window.opener.closed && window.opener.name.indexOf("MonitorLearnerActivity") >= 0 ) {
+			var monitoringURL = String(window.opener.location);
+			var currentTab = window.opener.selectedTabID;
+			if ( currentTab ) {
+				var indexStart = monitoringURL.indexOf("&currentTab=");
+				if ( indexStart != -1 ) {
+					var indexEnd = monitoringURL.indexOf("&",indexStart+1);
+					if ( indexEnd == -1 ) {
+						monitoringURL = monitoringURL.substring(0,indexStart);
+					} else {
+						monitoringURL = monitoringURL.substring(0,indexStart)+monitoringURL.substring(indexEnd);
+					}
+				}
+				monitoringURL = monitoringURL+"&currentTab="+currentTab;
+			}
+			window.opener.location.href = monitoringURL;
+		}
+	}
+	
