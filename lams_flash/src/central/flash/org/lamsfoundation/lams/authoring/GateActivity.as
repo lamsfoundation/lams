@@ -92,6 +92,13 @@ class GateActivity extends Activity{
 	}
 	
 	
+	public function clone():GateActivity{
+		var dto:Object = toData();
+		var ga = new GateActivity();
+		ga.populateFromDTO(dto);
+		return ga;
+	}
+
 	
 	
 	/**

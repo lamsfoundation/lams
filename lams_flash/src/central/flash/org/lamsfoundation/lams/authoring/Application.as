@@ -346,7 +346,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
                 default:
             }
 			
-			_layout.manager.addLayoutItem(evt.target.className, evt.target);
+			_layout.manager.addLayoutItem(new LFLayoutItem(evt.target.className, evt.target));
 			
 			_root.preloader.complete();
 			
@@ -584,7 +584,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	}
 	
 	public function copy():Void{
-		var ca = _canvas.model.selectedItem
+		var ca = _canvas.model.selectedItem;
 		if (ca != null){
 			if (ca.activity.parentUIID == null || ca.activity.parentUIID == undefined){
 				setClipboardData(ca, COPY_TYPE);
@@ -598,7 +598,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		}
 	}
 	
-	public function openEditActivtiyContent():Void{
+	public function openEditActivityContent():Void{
 		var ca = _canvas.model.selectedItem
 		if (CanvasActivity(ca) != null){ 
 			_canvas.view.getController().activityDoubleClick(ca);

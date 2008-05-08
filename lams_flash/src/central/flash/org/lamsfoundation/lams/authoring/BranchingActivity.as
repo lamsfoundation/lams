@@ -92,6 +92,19 @@ class BranchingActivity extends ComplexActivity {
 		return dto;
 	}
 	
+	/**
+	 * Creates an exact copy of this ComplexActivity
+	 * @usage   
+	 * @return  the copy
+	 */
+	public function clone():BranchingActivity{
+		var dto:Object = toData();
+		var ba = new BranchingActivity();
+		ba.populateFromDTO(dto);
+		return ba;
+	}
+
+	
 	public function set type(a:Number):Void{
 		_activityTypeID = a;
 	}

@@ -70,6 +70,18 @@ class GroupingActivity extends Activity{
 		return dto;
 	}
 	
+	/**
+	 * Creates an exact copy of this ComplexActivity
+	 * @usage   
+	 * @return  the copy
+	 */
+	public function clone():GroupingActivity{
+		// TODO: new grouping object
+		var dto:Object = toData();
+		var ga = new GroupingActivity();
+		ga.populateFromDTO(dto);
+		return ga;
+	}
 
 	
 	//get and sets

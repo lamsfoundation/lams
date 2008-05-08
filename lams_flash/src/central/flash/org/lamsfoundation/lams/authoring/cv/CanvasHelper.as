@@ -487,10 +487,53 @@ class CanvasHelper {
 			Debugger.log('instance is Tool',Debugger.GEN,'setPastedItem','Canvas');
 			var callback:Function = Proxy.create(this, setNewContentID, o);
 			Application.getInstance().getComms().getRequest('authoring/author.do?method=copyToolContent&toolContentID='+o.toolContentID+'&userID='+_root.userID,callback, false);
+		} else if(o.data instanceof CanvasOptionalActivity || o.data instanceof CanvasParallelActivity){
+			Debugger.log('instance is Complex', Debugger.GEN,'setPastedItem','Canvas');
+			var callback:Function = Proxy.create(this, setNewContents, o);
+			Application.getInstance().getComms().sendAndReceive(getToolContentArray(o.data), 'servlet/authoring/copyMultipleToolContent?userID='+_root.userID, callback, false);
 		} else{
 			LFMessage.showMessageAlert(Dictionary.getValue('al_activity_paste_invalid'));
 			Debugger.log('Cant paste this item!',Debugger.GEN,'setPastedItem','Canvas');
 		}
+	}
+	
+	/**
+	 * Array of tool content IDs within the complex activity.
+	 * 
+	 * @param   ca Canvas object
+	 * @return  array of tool content IDs
+	 */
+	
+	private function getToolContentArray(ca):Object {
+		var o = new Object();
+		
+		o.toolContentIDs = getAllToolContentIDs(ca.activity.activityUIID);
+		Debugger.log('toolContentIDs: ' + o.toolContentIDs,Debugger.CRITICAL,'getToolContentArray','CanvasHelper');
+		
+		return o;
+	}
+	
+	private function getAllToolContentIDs(activityUIID:Number, appendStr:String):String {
+		var idString:String = new String();
+		if(appendStr != null) idString.concat(appendStr);
+		
+		var _children:Array = _ddm.getComplexActivityChildren(activityUIID);
+		Debugger.log('children length: ' + _children.length, Debugger.CRITICAL,'getAllToolContentIDs','CanvasHelper');
+		
+		for(var i=0; i<_children.length; i++) {
+			Debugger.log('tool id: ' + ToolActivity(_children[i]).toolContentID, Debugger.CRITICAL,'getAllToolContentIDs','CanvasHelper');
+			
+			if(ToolActivity(_children[i]).toolContentID != null) { 
+				if(idString.length <= 0) idString = idString.concat(ToolActivity(_children[i]).toolContentID);
+				else idString = idString.concat("," + ToolActivity(_children[i]).toolContentID);
+			} else {
+				idString = getAllToolContentIDs(_children[i].activityUIID, idString);
+			}
+			
+			Debugger.log('id string: ' + idString, Debugger.CRITICAL,'getAllToolContentIDs','CanvasHelper');
+		}
+		
+		return idString;
 	}
 	
 	private function setNewContentID(r, o){
@@ -499,41 +542,111 @@ class CanvasHelper {
 		}else{
 			_newToolContentID = r;
 			if (o.data instanceof CanvasActivity){
-				return pasteItem(o.data.activity, o, _newToolContentID);
+				return pasteToolItem(o.data.activity, o, _newToolContentID);
 			}else if(o.data instanceof ToolActivity){
-				return pasteItem(o.data, o, _newToolContentID);
+				return pasteToolItem(o.data, o, _newToolContentID);
 			}
 		}
 	}
 	
-	private function pasteItem(toolToCopy:ToolActivity, o:Object, newToolContentID:Number):Object{
+	private function setNewContents(r, o) {
+		Debugger.log("setting new contents: " + r, Debugger.CRITICAL, "setNewContents", "CanvasHelper");
+		var _newIDMap:Hashtable = new Hashtable("newIDMap");
+		
+		if(r instanceof LFError){
+			r.showMessageConfirm();
+		} else {
+			
+			var _newIDMapArray = String(r).split(",");
+			for(var i=0; i<_newIDMapArray.length; i++) {
+				var itemArray:Array = _newIDMapArray[i].split("=");
+				_newIDMap.put(itemArray[0], itemArray[1]);
+			}
+			
+			if (o.data instanceof CanvasOptionalActivity || o.data instanceof CanvasParallelActivity){
+				return pasteComplexItem(o.data.activity, o, _newIDMap);
+			} else if(o.data instanceof ComplexActivity){
+				return pasteComplexItem(o.data, o, _newIDMap);
+			}
+		}
+	}
+	
+	private function pasteComplexItem(complexToCopy:ComplexActivity, o:Object, toolContentIDMap:Hashtable, parentAct:ComplexActivity):Object {
+		Debugger.log("pasting new cocomplex: " + complexToCopy.title, Debugger.CRITICAL, "pasteComplexItem", "CanvasHelper");
+		
+		var newComplexActivity:ComplexActivity = complexToCopy.clone();
+		newComplexActivity.activityUIID = _ddm.newUIID();
+		
+		// TODO: improve for dropping into branching view
+		if(parentAct == null) {
+			newComplexActivity.xCoord = o.data.activity.xCoord + o.data.getVisibleWidth() + 10;
+			newComplexActivity.yCoord = o.data.activity.yCoord + 10;
+		} else {
+			newComplexActivity.parentUIID = parentAct.activityUIID;
+			newComplexActivity.parentActivityID = parentAct.activityID;
+		}
+		
+		if(parentAct == null) canvasModel.haltRefresh(true);
+		
+		copyChildren(complexToCopy, newComplexActivity, o, toolContentIDMap);
+		
+		if(parentAct == null) canvasModel.haltRefresh(false);
+		
+		return pasteActivityItem(newComplexActivity, o);
+	}
+	
+	private function copyChildren(activity:ComplexActivity, parentAct:ComplexActivity, o:Object, toolContentIDMap:Hashtable) {
+		Debugger.log("copying children of: " + activity.title, Debugger.CRITICAL, "copyChildren", "CanvasHelper");
+		
+		var children:Array = _ddm.getComplexActivityChildren(activity.activityUIID);
+		
+		for(var i=0; i<children.length; i++){
+			if(children[i] instanceof ToolActivity) pasteToolItem(children[i], o, toolContentIDMap.get(children[i].toolContentID), parentAct);
+			else if(children[i] instanceof ComplexActivity) pasteComplexItem(children[i], o, toolContentIDMap, parentAct);
+		}
+		
+	}
+	
+	private function pasteToolItem(toolToCopy:ToolActivity, o:Object, newToolContentID:Number, parentAct:ComplexActivity):Object{
 		//clone the activity
 		var newToolActivity:ToolActivity = toolToCopy.clone();
 		newToolActivity.activityUIID = _ddm.newUIID();
+		
 		if (newToolContentID != null || newToolContentID != undefined){
 			newToolActivity.toolContentID = newToolContentID;
 		}
 		
-		newToolActivity.xCoord = o.data.activity.xCoord + 10
-		newToolActivity.yCoord = o.data.activity.yCoord + 10
-		
-		canvasModel.selectedItem = newToolActivity;
-		
-		if(canvasModel.activeView instanceof CanvasBranchView)
-			newToolActivity.parentUIID = CanvasBranchView(canvasModel.activeView).defaultSequenceActivity.activityUIID;
-		
-		if(o.type == Application.CUT_TYPE){ 
-			Application.getInstance().setClipboardData(newToolActivity, Application.COPY_TYPE);
-			removeActivity(o.data.activity.activityUIID); 
+		if(parentAct == null) {
+			newToolActivity.xCoord = o.data.activity.xCoord + 10;
+			newToolActivity.yCoord = o.data.activity.yCoord + 10;
 		} else {
-			if(o.count <= 1) { newToolActivity.title = Dictionary.getValue('prefix_copyof')+newToolActivity.title; }
-			else { newToolActivity.title = Dictionary.getValue('prefix_copyof_count', [o.count])+newToolActivity.title; }
+			newToolActivity.parentUIID = parentAct.activityUIID;
+			newToolActivity.parentActivityID = parentAct.activityID;
 		}
 		
-		_ddm.addActivity(newToolActivity);
+		return pasteActivityItem(newToolActivity, o);
+		
+	}
+	
+	private function pasteActivityItem(activity:Activity, o:Object):Object {
+		canvasModel.selectedItem = activity;
+		
+		if(canvasModel.activeView instanceof CanvasBranchView)
+			activity.parentUIID = CanvasBranchView(canvasModel.activeView).defaultSequenceActivity.activityUIID;
+		
+		if(o.type == Application.CUT_TYPE){ 
+			Application.getInstance().setClipboardData(activity, Application.COPY_TYPE);
+			removeActivity(o.data.activity.activityUIID); 
+		} else {
+			// TODO: Fix for RTL
+			if(o.count <= 1) { activity.title = Dictionary.getValue('prefix_copyof')+activity.title; }
+			else { activity.title = Dictionary.getValue('prefix_copyof_count', [o.count])+activity.title; }
+		}
+		
+		_ddm.addActivity(activity);
 		canvasModel.setDirty();
 		
-		return newToolActivity;
+		return activity;
 	}
 	
 	public function closeBranchView(prevActiveView) {

@@ -87,7 +87,6 @@ class Transition {
 		return p.isOptionalSequenceActivity(ddm.getActivityByUIID(p.parentUIID));
 	}
 	
-	
 	public function toData():Object{
 		var dto:Object = new Object();
 		dto.transitionID = (_transitionID) ?  _transitionID : Config.NUMERIC_NULL_VALUE;
@@ -102,7 +101,14 @@ class Transition {
 		dto.learningDesignID = (_learningDesignID) ?  _learningDesignID : Config.NUMERIC_NULL_VALUE;
 		return dto;
 	}
-
+	
+	public function clone():Transition{
+		var dto:Object = toData();
+		var t = new Transition();
+		t.populateFromDTO(dto);
+		return t;
+	}
+	
 	public function set transitionID(a:Number):Void{
 		_transitionID = a;
 	}

@@ -205,6 +205,7 @@ class ToolActivity extends Activity{
 		
 		//parents properties:
 		n.objectType = _objectType;
+		
 		n.activityTypeID = _activityTypeID;
 		n.activityID = _activityID;
 		n.activityCategoryID = _activityCategoryID;
@@ -225,13 +226,10 @@ class ToolActivity extends Activity{
 		n.libraryActivityUIImage = _libraryActivityUIImage;
 		n.applyGrouping = _applyGrouping;
 		n.runOffline = _runOffline;
-		//now removed
-		//n.offlineInstructions = _offlineInstructions;
-		//n.onlineInstructions = _onlineInstructions;
 		n.defineLater = _defineLater;
 		n.createDateTime = _createDateTime;
 		n.groupingSupportType = _groupingSupportType;
-		
+
 		//class props
 		n.authoringURL = _authoringURL;
 		n.helpURL = _helpURL;
@@ -239,6 +237,7 @@ class ToolActivity extends Activity{
 		n.toolSignature = _toolSignature;
 		n.toolContentID = _toolContentID;
 		n.toolID = _toolID;
+		
 		n.supportsContribute = _supportsContribute;
 		n.supportsDefineLater = _supportsDefineLater;
 		n.supportsModeration = _supportsRunOffline;

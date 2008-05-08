@@ -154,7 +154,7 @@ class CustomContextMenu {
 	//---------------------------------
 	
 	public function getOpenEditActivityContent(){
-		org.lamsfoundation.lams.authoring.Application.getInstance().openEditActivtiyContent();
+		org.lamsfoundation.lams.authoring.Application.getInstance().openEditActivityContent();
 	}
 	
 	public function MonitorActivityContent(){

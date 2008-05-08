@@ -338,13 +338,13 @@ class org.lamsfoundation.lams.authoring.Activity {
 			_yCoord = dto.yCoord;
 			_xCoord = dto.xCoord;
 			_libraryActivityUIImage = dto.libraryActivityUIImage;
-			_applyGrouping = dto.applyGrouping;
-			_runOffline = dto.runOffline;
-			_defineLater = dto.defineLater;
+			_applyGrouping = (dto.applyGrouping) ? dto.applyGrouping : false;
+			_runOffline = (dto.runOffline) ? dto.runOffline : false;
+			_defineLater = (dto.defineLater) ? dto.defineLater : false;
 			_createDateTime = dto.createDateTime;
 			_groupingSupportType = dto.groupingSupportType;
-			_readOnly = dto.readOnly;
-			_stopAfterActivity = dto.stopAfterActivity;
+			_readOnly = (dto.readOnly) ? dto.readOnly : false;
+			_stopAfterActivity = (dto.stopAfterActivity) ? dto.stopAfterActivity : false;
 
 	}
 	
@@ -393,12 +393,13 @@ class org.lamsfoundation.lams.authoring.Activity {
 		return dto;
 	}
 	
-	public function clone():Activity{
+	public function clone(a:Activity):Activity{
 		var dto:Object = toData();
-		var n = new Activity(null);
+		
+		var n = (a != null) ? a : new Activity(null);
 		n.populateFromDTO(dto);
+		
 		return n;
-
 	}
 	
 	//getters and setters:

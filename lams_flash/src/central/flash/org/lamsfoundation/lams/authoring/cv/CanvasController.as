@@ -65,7 +65,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
    
     public function activityClick(ca:Object):Void{
-		
+	
 		_tempSelectedItem = _canvasModel.selectedItem;
 		_canvasModel.selectedItem = null;
 		
@@ -163,8 +163,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 		var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
 		var parallelOnCanvas:Array  = _canvasModel.findParallelActivities();
-		 
-	    if(_canvasModel.isDragging){
+		
+		Debugger.log("optional on canvas: " + optionalOnCanvas.length, Debugger.CRITICAL, "activityRelease", "CanvasController");
+		
+		
+	    if(_canvasModel.isDragging) {
 			ca.stopDrag();
 			if (ca.activity.isOptionalActivity() || ca.activity.isOptionsWithSequencesActivity()) {
 				ca.swapDepths(ca.depthHistory);
@@ -837,8 +840,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 		Debugger.log(_canvasModel.activeView + " " + _canvasModel.activeView instanceof CanvasBranchView,Debugger.GEN,'canvasRelease','CanvasController');
 		Debugger.log('_canvasModel.activeTool:'+_canvasModel.activeTool,Debugger.GEN,'canvasRelease','CanvasController');
-		
-		app.toolbar.view.getController().hideOptionPanels();
 		
 		_canvasModel.selectedItem = null;
 		

@@ -379,7 +379,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 			_root.preloader.complete();
             
             //If all of them are loaded set UILoad accordingly
-			if(_layout.manager.completedLayout){
+			if(_layout.manager.completedLayout()) {
                 _UILoaded = true;                
             } else {
 				_UILoaded = false;            
