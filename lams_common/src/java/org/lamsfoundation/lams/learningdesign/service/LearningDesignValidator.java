@@ -365,8 +365,10 @@ public class LearningDesignValidator {
 	}
 	
 	/**
-	 * If this activity is an GroupingActivity and the grouping has some groups, then the number of groups must no exceed the desired number
-	 * of groups..
+	 * If this activity is an GroupingActivity, the number of groups in the grouping records is greater than 0 and 
+	 * the grouping has some groups, then the actual number of groups must no exceed the desired number of groups. 
+	 * If the desired number of groups is 0 then don't check the number of actual groups as there is no semantic limit
+	 * to the number of groups. 
 	 * 
 	 * @param parentActivity
 	 */
@@ -389,7 +391,7 @@ public class LearningDesignValidator {
 					numGroupsInteger = grouping.getMaxNumberOfGroups();
 				}
 				int maxNumGroups = numGroupsInteger == null ? 0 : numGroupsInteger.intValue(); 
-				if ( grouping.getGroups() != null && grouping.getGroups().size() > maxNumGroups) {
+				if ( maxNumGroups > 0 && grouping.getGroups() != null && grouping.getGroups().size() > maxNumGroups) {
 					errors.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY), activity.getActivityUIID()));
 				}
 			}

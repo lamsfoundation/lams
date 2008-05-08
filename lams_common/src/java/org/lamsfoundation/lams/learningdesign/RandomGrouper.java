@@ -148,7 +148,7 @@ public class RandomGrouper extends Grouper implements Serializable
                                         List learners,
                                         boolean isInitialization)
     {
-        if(randomGrouping.getNumberOfGroups()!=null) {
+        if(randomGrouping.getNumberOfGroups()!=null && randomGrouping.getNumberOfGroups().intValue()>0) {
             return getNewGroupsByNumberOfGroups(randomGrouping, randomGrouping.getNumberOfGroups(), isInitialization);
         } else if(randomGrouping.getLearnersPerGroup()!=null && randomGrouping.getLearnersPerGroup().intValue()>0) {
             return getNewGroupsByLearnerPerGroup(randomGrouping,learners);

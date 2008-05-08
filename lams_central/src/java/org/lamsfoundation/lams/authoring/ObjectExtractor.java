@@ -700,10 +700,20 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 
 	private void createRandomGrouping(RandomGrouping randomGrouping,Hashtable groupingDetails) throws WDDXProcessorConversionException{
-	    if (keyExists(groupingDetails, WDDXTAGS.LEARNERS_PER_GROUP))
-	        randomGrouping.setLearnersPerGroup(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.LEARNERS_PER_GROUP));
-		if (keyExists(groupingDetails, WDDXTAGS.NUMBER_OF_GROUPS))
-		    randomGrouping.setNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.NUMBER_OF_GROUPS));
+		// the two settings are mutually exclusive. Flash takes care of this, but we'll code it here too just to make sure.
+		Integer numLearnersPerGroup = WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.LEARNERS_PER_GROUP);
+	    if (numLearnersPerGroup!=null && numLearnersPerGroup.intValue()>0) {
+	        randomGrouping.setLearnersPerGroup(numLearnersPerGroup);
+	        randomGrouping.setNumberOfGroups(null);
+	    } else {
+	    	Integer numGroups = WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.NUMBER_OF_GROUPS);
+	    	if (numGroups!=null && numGroups.intValue()>0) {
+	    		randomGrouping.setNumberOfGroups(numGroups);
+	    	} else {
+	    		randomGrouping.setNumberOfGroups(null);
+	    	}
+    		randomGrouping.setLearnersPerGroup(null);
+	    }
 	}
 	private void createChosenGrouping(ChosenGrouping chosenGrouping,Hashtable groupingDetails) throws WDDXProcessorConversionException{
 		//no extra properties as yet
