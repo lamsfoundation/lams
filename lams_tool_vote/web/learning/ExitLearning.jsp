@@ -88,22 +88,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:if test="${VoteLearningForm.showResults != 'true'}">
 				<jsp:include page="/learning/RevisitedNoDisplay.jsp" />
 			</c:if>
-
-				<h2>
-						<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />												
-				</h2>
-
-				<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
-					escapeXml="false" />
-			
+				<c:if test="${voteGeneralLearnerFlowDTO.reflection}">
+					<h2>
+							<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />												
+					</h2>
+	
+					<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
+						escapeXml="false" />
+				</c:if>
 
 				<c:if test="${voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
 				<br>
+					<c:if test="${voteGeneralLearnerFlowDTO.reflection}">
 						<html:button property="forwardtoReflection" styleClass="button"
 							onclick="submitMethod('forwardtoReflection');"> 
 							<fmt:message key="label.edit" />
 						</html:button>
-
+					</c:if>
 
 					<div class="space-bottom-top align-right">
 						<html:submit property="learnerFinished" styleClass="button" styleId="finishButton"
