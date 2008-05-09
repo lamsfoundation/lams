@@ -487,7 +487,7 @@ class CanvasHelper {
 			Debugger.log('instance is Tool',Debugger.GEN,'setPastedItem','Canvas');
 			var callback:Function = Proxy.create(this, setNewContentID, o);
 			Application.getInstance().getComms().getRequest('authoring/author.do?method=copyToolContent&toolContentID='+o.toolContentID+'&userID='+_root.userID,callback, false);
-		} else if(o.data instanceof CanvasOptionalActivity || o.data instanceof CanvasParallelActivity){
+		} else if(o.data instanceof CanvasOptionalActivity || o.data instanceof CanvasParallelActivity || (o.data instanceof CanvasActivity && o.data.activity.isBranchingActivity())){
 			Debugger.log('instance is Complex', Debugger.GEN,'setPastedItem','Canvas');
 			var callback:Function = Proxy.create(this, setNewContents, o);
 			Application.getInstance().getComms().sendAndReceive(getToolContentArray(o.data), 'servlet/authoring/copyMultipleToolContent?userID='+_root.userID, callback, false);
@@ -565,13 +565,15 @@ class CanvasHelper {
 			
 			if (o.data instanceof CanvasOptionalActivity || o.data instanceof CanvasParallelActivity){
 				return pasteComplexItem(o.data.activity, o, _newIDMap);
+			} else if(o.data instanceof CanvasActivity && o.data.activity.isBranchingActivity()) {
+				return pasteBranchingItem(o.data.activity, o, _newIDMap);
 			} else if(o.data instanceof ComplexActivity){
 				return pasteComplexItem(o.data, o, _newIDMap);
 			}
 		}
 	}
 	
-	private function pasteComplexItem(complexToCopy:ComplexActivity, o:Object, toolContentIDMap:Hashtable, parentAct:ComplexActivity):Object {
+	private function pasteComplexItem(complexToCopy:ComplexActivity, o:Object, toolContentIDMap:Hashtable, parentAct:ComplexActivity):ComplexActivity {
 		Debugger.log("pasting new cocomplex: " + complexToCopy.title, Debugger.CRITICAL, "pasteComplexItem", "CanvasHelper");
 		
 		var newComplexActivity:ComplexActivity = complexToCopy.clone();
@@ -592,22 +594,52 @@ class CanvasHelper {
 		
 		if(parentAct == null) canvasModel.haltRefresh(false);
 		
-		return pasteActivityItem(newComplexActivity, o);
+		pasteActivityItem(newComplexActivity, o);
+		
+		return newComplexActivity;
 	}
 	
-	private function copyChildren(activity:ComplexActivity, parentAct:ComplexActivity, o:Object, toolContentIDMap:Hashtable) {
-		Debugger.log("copying children of: " + activity.title, Debugger.CRITICAL, "copyChildren", "CanvasHelper");
+	private function pasteSequenceItem(sequenceToCopy:SequenceActivity, o:Object, toolContentIDMap:Hashtable, parentAct:ComplexActivity):SequenceActivity {
+		Debugger.log("pasting new sequence: " + sequenceToCopy.title, Debugger.CRITICAL, "pasteSequenceItem", "CanvasHelper");
+		if(sequenceToCopy.isDefault & sequenceToCopy.empty)
+			return null;
+			
+		var newSequenceActivity:SequenceActivity = sequenceToCopy.clone();
+		newSequenceActivity.activityUIID = _ddm.newUIID();
 		
-		var children:Array = _ddm.getComplexActivityChildren(activity.activityUIID);
+		newSequenceActivity.parentUIID = parentAct.activityUIID;
+		newSequenceActivity.parentActivityID = parentAct.activityID;
 		
-		for(var i=0; i<children.length; i++){
-			if(children[i] instanceof ToolActivity) pasteToolItem(children[i], o, toolContentIDMap.get(children[i].toolContentID), parentAct);
-			else if(children[i] instanceof ComplexActivity) pasteComplexItem(children[i], o, toolContentIDMap, parentAct);
+		copySequence(sequenceToCopy, newSequenceActivity, o, toolContentIDMap);
+		
+		pasteActivityItem(newSequenceActivity, o);
+		
+		
+		return newSequenceActivity;
+	}
+	
+	private function pasteBranchingItem(branchingToCopy:BranchingActivity, o:Object, toolContentIDMap:Hashtable, parentAct:ComplexActivity):BranchingActivity {
+		Debugger.log("pasting new branching: " + branchingToCopy.title, Debugger.CRITICAL, "pasteBranchingItem", "CanvasHelper");
+		
+		var newBranchingActivity:BranchingActivity = branchingToCopy.clone();
+		newBranchingActivity.activityUIID = _ddm.newUIID();
+		
+		if(parentAct == null) {
+			newBranchingActivity.xCoord = o.data.activity.xCoord + o.data.getVisibleWidth() + 10;
+			newBranchingActivity.yCoord = o.data.activity.yCoord + 10;
+		} else {
+			newBranchingActivity.parentUIID = parentAct.activityUIID;
+			newBranchingActivity.parentActivityID = parentAct.activityID;
 		}
 		
+		copyChildren(branchingToCopy, newBranchingActivity, o, toolContentIDMap);
+		
+		pasteActivityItem(newBranchingActivity, o);
+		
+		return newBranchingActivity;
 	}
 	
-	private function pasteToolItem(toolToCopy:ToolActivity, o:Object, newToolContentID:Number, parentAct:ComplexActivity):Object{
+	private function pasteToolItem(toolToCopy:ToolActivity, o:Object, newToolContentID:Number, parentAct:ComplexActivity):ToolActivity{
 		//clone the activity
 		var newToolActivity:ToolActivity = toolToCopy.clone();
 		newToolActivity.activityUIID = _ddm.newUIID();
@@ -624,14 +656,15 @@ class CanvasHelper {
 			newToolActivity.parentActivityID = parentAct.activityID;
 		}
 		
-		return pasteActivityItem(newToolActivity, o);
+		pasteActivityItem(newToolActivity, o);
 		
+		return newToolActivity;
 	}
 	
-	private function pasteActivityItem(activity:Activity, o:Object):Object {
+	private function pasteActivityItem(activity:Activity, o:Object) {
 		canvasModel.selectedItem = activity;
 		
-		if(canvasModel.activeView instanceof CanvasBranchView)
+		if(canvasModel.activeView instanceof CanvasBranchView && activity.parentUIID == null)
 			activity.parentUIID = CanvasBranchView(canvasModel.activeView).defaultSequenceActivity.activityUIID;
 		
 		if(o.type == Application.CUT_TYPE){ 
@@ -645,8 +678,65 @@ class CanvasHelper {
 		
 		_ddm.addActivity(activity);
 		canvasModel.setDirty();
+	}
+	
+	private function copySequence(sequenceToCopy, parentAct:SequenceActivity, o:Object, toolContentIDMap:Hashtable) {
+		Debugger.log("copy sequence: " + parentAct.activityUIID, Debugger.CRITICAL, "copySequence", "CanvasHelper");
 		
-		return activity;
+		var activityMap:Hashtable = new Hashtable("activityMap");
+		copyChildren(sequenceToCopy, parentAct, o, toolContentIDMap, activityMap);
+		
+		var activityMapKeys:Array = activityMap.keys();
+		
+		for(var i=0; i<activityMapKeys.length; i++) {
+			var fromActivityMapObj:Object = activityMap.get(activityMapKeys[i]);
+			var toActivityMapObj:Object = activityMap.get(fromActivityMapObj.transitionOut.toUIID);
+			var transitionCopy:Transition = copyTransition(fromActivityMapObj.transitionOut, fromActivityMapObj.activityCopy, toActivityMapObj.activityCopy);		
+		}
+		
+		return;
+	}
+	
+	private function copyChildren(activity:ComplexActivity, parentAct:ComplexActivity, o:Object, toolContentIDMap:Hashtable, activityMap:Hashtable) {
+		Debugger.log("copying children of: " + activity.title, Debugger.CRITICAL, "copyChildren", "CanvasHelper");
+		
+		var children:Array = _ddm.getComplexActivityChildren(activity.activityUIID);
+		var activityCopy:Activity;
+		
+		for(var i=0; i<children.length; i++){
+			if(children[i] instanceof ToolActivity) activityCopy = pasteToolItem(children[i], o, toolContentIDMap.get(children[i].toolContentID), parentAct);
+			else if(children[i] instanceof SequenceActivity) activityCopy = pasteSequenceItem(children[i], o, toolContentIDMap, parentAct);
+			else if(children[i] instanceof BranchingActivity) activityCopy = pasteBranchingItem(children[i], o, toolContentIDMap, parentAct);
+			else if(children[i] instanceof ComplexActivity) activityCopy = pasteComplexItem(children[i], o, toolContentIDMap, parentAct);
+		
+			if(activityMap != null) {
+				var transitions:Object = _ddm.getTransitionsForActivityUIID(children[i].activityUIID);
+				if(transitions.out != null || transitions.into != null) {
+					var dataObj:Object = new Object();
+					dataObj.transitionOut = transitions.out;
+					dataObj.transitionIn = transitions.into;
+					
+					dataObj.activity = children[i];
+					dataObj.activityCopy = activityCopy;
+					
+					activityMap.put(children[i].activityUIID, dataObj);
+				}
+				
+				if(activity.firstActivityUIID == children[i].activityUIID)
+					parentAct.firstActivityUIID = activityCopy.activityUIID;
+			}
+		}
+	}
+	
+	private function copyTransition(transitionToCopy:Transition, fromActivity:Activity, toActivity:Activity):Transition {
+		var transitionCopy:Transition = transitionToCopy.clone();
+		transitionCopy.transitionUIID = _ddm.newUIID();
+		transitionCopy.fromUIID = fromActivity.activityUIID;
+		transitionCopy.toUIID = toActivity.activityUIID;
+		
+		_ddm.addTransition(transitionCopy);
+		
+		return transitionCopy;
 	}
 	
 	public function closeBranchView(prevActiveView) {
