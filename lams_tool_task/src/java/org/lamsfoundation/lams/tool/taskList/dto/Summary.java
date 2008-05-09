@@ -33,16 +33,13 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
  * List contains following element: <br>
  * 
  * <li>session_id</li>
- * <li>session_name</li>
- * <li>TaskListItem.uid</li>
- * <li>TaskListItem.create_by_author</li>
- * <li>TaskListItem.is_hide</li>
- * <li>TaskListItem.title</li>
- * <li>User.login_name</li>
- * <li>count(taskList_item_uid)</li>
- * @author Steve.Ni
+ * <li>isMonitorVerificationRequired</li>
+ * <li>userNames</li>
+ * <li>taskListItems</li>
+ * <li>completeMap</li>
+ * <li>visitNumbers</li>
  * 
- * @version $Revision$
+ * @author Andrey Balan
  */
 public class Summary {
 
@@ -58,11 +55,6 @@ public class Summary {
 	
 	/**
 	 * Contruction method for monitoring summary function. 
-	 * 
-	 * <B>Don't set isInitGroup and viewNumber fields</B>
-	 * @param sessionName
-	 * @param item
-	 * @param isInitGroup
 	 */
 	public Summary(List<TaskListItem> taskListItems, List<TaskListUser> userNames, boolean[][] completeMap, int[] visitNumbers, boolean isMonitorVerificationRequired){
 		this.userNames = userNames;

@@ -700,30 +700,6 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		coreNotebookService.updateEntry(notebookEntry);
 	}
 	
-	/** 
-	 * {@inheritDoc}
-	 */
-	public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId){
-		Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
-
-		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
-		for(TaskListSession session:sessionList){
-			Long sessionId = session.getSessionId();
-			boolean hasRefection = session.getTaskList().isReflectOnActivity();
-			Set<ReflectDTO> list = new TreeSet<ReflectDTO>(this.new ReflectDTOComparator());
-			//get all users in this session
-			List<TaskListUser> users = taskListUserDao.getBySessionID(sessionId);
-			for(TaskListUser user : users){
-				ReflectDTO ref = new ReflectDTO(user);
-				ref.setHasRefection(hasRefection);
-				list.add(ref);
-			}
-			map.put(sessionId, list);
-		}
-		
-		return map;
-	}
-	
 	//*****************************************************************************
 	// Set methods for Spring Bean
 	//*****************************************************************************

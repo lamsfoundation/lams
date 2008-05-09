@@ -313,15 +313,6 @@ public interface ITaskListService {
 	 */
 	public void updateEntry(NotebookEntry notebookEntry);
 	
-	/**
-	 * Get Reflect DTO list grouped by sessionID.
-	 * 
-	 * @param contentId
-	 * @return
-	 */
-	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId);
-
-
 	//********** Export methods ***********************
 	
 	/**

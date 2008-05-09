@@ -69,17 +69,17 @@ public class MonitoringAction extends Action {
 		if (param.equals("summary")) {
 			return summary(mapping, form, request, response);
 		}
-		
 		if (param.equals("summaryTask")) {
 			return summaryTask(mapping, form, request, response);
 		}
-		
 		if(param.equals("setVerifiedByMonitor")){
 			return setVerifiedByMonitor(mapping, form, request, response);
 		}
-
 		if (param.equals("listuser")) {
 			return listuser(mapping, form, request, response);
+		}
+		if (param.equals("viewReflection")) {
+			return viewReflection(mapping, form, request, response);
 		}
 		
 		return mapping.findForward(TaskListConstants.ERROR);
@@ -165,6 +165,33 @@ public class MonitoringAction extends Action {
 		//set to request
 		request.setAttribute(TaskListConstants.ATTR_USER_LIST, list);
 		return mapping.findForward(TaskListConstants.SUCCESS);
+	}
+	
+	private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+		Long uid = WebUtil.readLongParam(request, TaskListConstants.ATTR_USER_UID); 
+		
+		ITaskListService service = getTaskListService();
+		TaskListUser user = service.getUser(uid);
+		Long sessionID = user.getSession().getSessionId();
+		NotebookEntry notebookEntry = service.getEntry(sessionID, 
+				CoreNotebookConstants.NOTEBOOK_TOOL, 
+				TaskListConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+		
+		TaskListSession session = service.getTaskListSessionBySessionId(sessionID);
+		
+		ReflectDTO refDTO = new ReflectDTO(user);
+		if(notebookEntry == null){
+			refDTO.setFinishReflection(false);
+			refDTO.setReflect(null);
+		}else{
+			refDTO.setFinishReflection(true);
+			refDTO.setReflect(notebookEntry.getEntry());
+		}
+		refDTO.setReflectInstrctions(session.getTaskList().getReflectInstructions());
+		
+		request.setAttribute("userDTO", refDTO);
+		return mapping.findForward("success");
 	}
 
 	// *************************************************************************************
