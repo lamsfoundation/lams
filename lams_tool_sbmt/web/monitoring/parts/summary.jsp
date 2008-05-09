@@ -116,16 +116,16 @@
 					<c:out value="${user.lastName}" />
 				</td>
 				<td><c:out value="${user.login}" /></td>
+				<c:if test="${user.hasRefection}">
 				<td>
-					<c:if test="${user.hasRefection}">
 						<c:set var="viewReflection">
 							<c:url value="/monitoring.do?method=viewReflection&toolSessionID=${sessionDto.sessionID}&userUid=${user.userUid}"/>
 						</c:set>
 						<html:link href="javascript:launchPopup('${viewReflection}')">
 							<fmt:message key="label.view" />
 						</html:link>
-					</c:if>				
 				</td>
+				</c:if>				
 				<td>
 					<c:choose>
 					<c:when test="${user.anyFilesMarked}">

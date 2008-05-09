@@ -91,16 +91,16 @@
 				<td>
 					<c:out value="${user.loginName}" />
 				</td>
+				<c:if test="${user.hasRefection}">
 				<td>
-					<c:if test="${user.hasRefection}">
 						<c:set var="viewReflection">
 							<c:url value="/monitoring/viewReflection.do?toolSessionID=${toolSessionDto.sessionID}&userUid=${user.userUid}"/>
 						</c:set>
 						<html:link href="javascript:launchPopup('${viewReflection}')">
 							<fmt:message key="label.view" />
 						</html:link>
-					</c:if>
 				</td>
+				</c:if>
 				<td>
 					<c:choose>
 					<c:when test="${user.anyPostsMarked}">
