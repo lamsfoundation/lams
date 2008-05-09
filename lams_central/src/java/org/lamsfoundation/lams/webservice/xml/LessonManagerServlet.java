@@ -433,41 +433,53 @@ public class LessonManagerServlet extends HttpServlet {
 			if(lesson!=null)
 			{	
 				int activitiesTotal = lesson.getLearningDesign().getActivities().size();
-				Iterator iterator = lesson.getLearnerProgresses().iterator();
 				
 				ExtUserUseridMap progressUserMap = integrationService.getExistingExtUserUseridMap(
 						serverMap, progressUser);
 				
-				if (progressUserMap!=null)
+				LearnerProgress learnProg = lessonService.getUserProgressForLesson(userMap.getUser().getUserId(), lsId);
+				
+				Element learnerProgElem = document.createElement(CentralConstants.ELEM_LEARNER_PROGRESS);
+				
+				// if learner progress exists, make a response, otherwise, return an empty learner progress element
+				if (learnProg != null)
 				{
-					while(iterator.hasNext()){
-		    			LearnerProgress learnProg = (LearnerProgress)iterator.next();
-		    			LearnerProgressDTO learnerProgress = learnProg.getLearnerProgressData();	    			
-	    				
-	    				if (learnerProgress.getUserName().equals(prefix + "_" + progressUserMap.getExtUsername()))
-		    			{
-		    				Element learnerProgElem = document.createElement(CentralConstants.ELEM_LEARNER_PROGRESS);
-			    			
-			    			int completedActivities = learnerProgress.getCompletedActivities().length;
-			    			int attemptedActivities = learnerProgress.getAttemptedActivities().length;
-			    			
-			    			if(learnerProgElem.getNodeType()== Node.ELEMENT_NODE)
-			    			{
-				    			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_COMPLETE , "" + learnerProgress.getLessonComplete());
-				    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITY_COUNT , "" + activitiesTotal);
-				    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_COMPLETED , "" + completedActivities);
-				    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_ATTEMPTED , "" + attemptedActivities);
-				    			//learnerProgElem.setAttribute(CentralConstants.ATTR_CURRENT_ACTIVITY , currActivity);
-				    			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + progressUserMap.getSid());
-				    			learnerProgElem.setAttribute(CentralConstants.ATTR_COURSE_ID, courseID);
-				    			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, progressUser);
-				    			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);	
-			    			}
-			    			
-			    			element.appendChild(learnerProgElem);
-		    			}
-					}
+					LearnerProgressDTO learnerProgress = learnProg.getLearnerProgressData();	
+					
+	    			
+	    			int completedActivities = learnerProgress.getCompletedActivities().length;
+	    			int attemptedActivities = learnerProgress.getAttemptedActivities().length;
+	    			
+	    			if(learnerProgElem.getNodeType()== Node.ELEMENT_NODE)
+	    			{
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_COMPLETE , "" + learnerProgress.getLessonComplete());
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITY_COUNT , "" + activitiesTotal);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_COMPLETED , "" + completedActivities);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_ATTEMPTED , "" + attemptedActivities);
+		    			//learnerProgElem.setAttribute(CentralConstants.ATTR_CURRENT_ACTIVITY , currActivity);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + progressUserMap.getSid());
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_COURSE_ID, courseID);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, progressUser);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);	
+	    			}
 				}
+				else
+				{
+					if(learnerProgElem.getNodeType()== Node.ELEMENT_NODE)
+	    			{
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_COMPLETE , "false");
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITY_COUNT , "" + activitiesTotal);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_COMPLETED , "0");
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_ATTEMPTED , "0");
+		    			//learnerProgElem.setAttribute(CentralConstants.ATTR_CURRENT_ACTIVITY , currActivity);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + progressUserMap.getSid());
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_COURSE_ID, courseID);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, progressUser);
+		    			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);	
+	    			}
+				}
+				
+				element.appendChild(learnerProgElem);
 	    	}
 			else{
 	    		throw new Exception("Lesson with lessonID: " + lsId + " could not be found for learner progresses");
@@ -691,7 +703,6 @@ public class LessonManagerServlet extends HttpServlet {
 						if (StringUtils.isNotBlank(learnerId)) {
 							addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
 								LoginRequestDispatcher.METHOD_LEARNER, lsIdStr, learnerId, courseId, countryIsoCode, langIsoCode);
-						}
 					}
 				}
 				if (monitorIds != null) {
