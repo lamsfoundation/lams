@@ -262,7 +262,7 @@ VALUES (22, 'vi', 'VN', 'Tiếng Việt', 'LTR', 'vi');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
 VALUES (23, 'zh', 'TW', 'Chinese (Taiwan)', 'LTR', 'zh');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (24, 'ja', 'JP', 'Japanese (Japan)', 'LTR', 'ja');
+VALUES (24, 'ja', 'JP', '日本語', 'LTR', 'ja');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
 VALUES (25, 'ms', 'MY', 'Malay (Malaysia)', 'LTR', 'ms');
 
