@@ -45,6 +45,10 @@ public class MessageDTO {
 	private String comment;
 	private boolean released;
 	
+	// number of posts the learner has made in this topic.
+	// used when this message is a root topic.
+	private int numOfPosts;   
+	
 	//2 fields use for export portfolio function
 	private String attachmentName;
 	private String attachmentLocalUrl;
@@ -190,5 +194,12 @@ public class MessageDTO {
 		this.attachmentName = attachmentName;
 	}
 
-	
+	public int getNumOfPosts() {
+		return numOfPosts;
+	}
+
+	public void setNumOfPosts(int numOfPosts) {
+		this.numOfPosts = numOfPosts;
+	}
+
 }

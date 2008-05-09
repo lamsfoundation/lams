@@ -102,6 +102,7 @@ public interface ForumConstants {
 	public static final String PARAM_UPDATE_MODE = "updateMode";
 
 	public static final String ATTR_NO_MORE_POSTS = "noMorePosts";
+	public static final String ATTR_NUM_OF_POSTS = "numOfPosts";
 
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 
@@ -114,12 +115,16 @@ public interface ForumConstants {
 	public static final String ATTR_REFLECTION_ON = "reflectOn";
 	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
 	public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
+
+	public static final String ATTR_MINIMUM_REPLY = "minimumReply";
+	public static final String ATTR_MAXIMUM_REPLY = "maximumReply";
 	
 	public static final String MARK_UPDATE_FROM_SESSION = "listAllMarks";
 	public static final String MARK_UPDATE_FROM_USER = "listMarks";
 	public static final String MARK_UPDATE_FROM_FORUM = "viewForum";
 
 	public static final String ATTR_HIDE_REFLECTION = "hideReflection";
+
 
 
 	

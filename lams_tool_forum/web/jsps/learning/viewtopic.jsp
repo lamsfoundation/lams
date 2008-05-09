@@ -14,6 +14,7 @@
 	<h1>
 		${sessionMap.title}
 	</h1>
+
 	<div>
 		<div class="right-buttons">
 			<c:set var="backToForum">
@@ -25,7 +26,6 @@
 				styleClass="button">
 				<fmt:message key="label.back.to.forum" />
 			</html:button>
-
 		</div>
 		<h2>
 			<fmt:message key="title.message.view.topic" />
@@ -33,7 +33,22 @@
 
 	</div>
 
-
+	<c:if
+		test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
+		<c:if
+			test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 or sessionMap.maximumReply ne 0)}">
+			<div class="info">
+				<fmt:message key="label.postingLimits.topic.reminder">
+					<fmt:param value="${sessionMap.minimumReply}" />
+					<fmt:param value="${sessionMap.maximumReply}" />
+					<fmt:param value="${numOfPosts}" />
+					<fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
+				</fmt:message>
+			</div>
+		</c:if>
+	</c:if>
+	<br>
+	
 	<%@ include file="message/topicview.jsp"%>
 	<c:set var="refreshTopicURL">
 	</c:set>
@@ -50,14 +65,10 @@
 				styleClass="button">
 				<fmt:message key="label.back.to.forum" />
 			</html:button>
-
 		</div>
 
 		<a href="javascript:refreshTopic();" class="button"> <fmt:message
 				key="label.refresh" /> </a>
-
-
-
 
 	</div>
 </div>

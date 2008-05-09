@@ -62,7 +62,6 @@
 						<c:if test='${hidden}'>
 							<fmt:message key="topic.message.attachment.hidden" />
 						</c:if>
-						</div>
 					</td>
 				</tr>
 			</c:if>
@@ -147,7 +146,7 @@
 					
 							<!--  Reply Button -->
 							<c:if
-								test="${(not sessionMap.finishedLock) && (not sessionMap.noMorePosts)}">
+								test="${(not sessionMap.finishedLock) && (not noMorePosts) && (sessionMap.mode ne 'teacher')}">
 								<c:set var="replytopic">
 									<html:rewrite
 										page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}" />

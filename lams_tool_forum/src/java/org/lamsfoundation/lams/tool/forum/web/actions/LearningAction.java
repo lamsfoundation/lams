@@ -68,7 +68,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -88,7 +87,7 @@ public class LearningAction extends Action {
 		String param = mapping.getParameter();
 		// --------------Forum Level ------------------
 		if (param.equals("viewForum")) {
-			return viewForm(mapping, form, request, response);
+			return viewForum(mapping, form, request, response);
 		}
 		if (param.equals("finish")) {
 			return finish(mapping, form, request, response);
@@ -146,7 +145,7 @@ public class LearningAction extends Action {
 	 * @throws Exception 
 	 * 
 	 */
-	private ActionForward viewForm(ActionMapping mapping, ActionForm form,
+	private ActionForward viewForum(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		//initial Session Map 
@@ -210,6 +209,8 @@ public class LearningAction extends Action {
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE,forum.getTitle());
 		sessionMap.put(ForumConstants.ATTR_FORUM_INSTRCUTION,forum.getInstructions());
+		sessionMap.put(ForumConstants.ATTR_MINIMUM_REPLY, forum.getMinimumReply());
+		sessionMap.put(ForumConstants.ATTR_MAXIMUM_REPLY, forum.getMaximumReply());
 
 		// Should we show the reflection or not? We shouldn't show it when the screen is accessed
 		// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
@@ -248,11 +249,22 @@ public class LearningAction extends Action {
 				
 		// get all root topic to display on init page
 		List rootTopics = forumService.getRootTopics(sessionId);
+		if (!forum.isAllowNewTopic()) {
+			// add the number post the learner has made for each topic.
+			updateNumOfPosts(rootTopics, forumUser);
+		}
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
 		
 		return mapping.findForward("success");
 	}
 
+	private void updateNumOfPosts(List rootTopics, ForumUser forumUser) {
+		for (Iterator iterator = rootTopics.iterator(); iterator.hasNext();) {
+			MessageDTO messageDTO = (MessageDTO) iterator.next();
+			int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), messageDTO.getMessage().getUid());
+			messageDTO.setNumOfPosts(numOfPosts);
+		}
+	}
 
 	/**
 	 * Learner click "finish" button in forum page, this method will turn on
@@ -400,16 +412,28 @@ public class LearningAction extends Action {
 	private ActionForward viewTopic(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		
-		Long rootTopicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
 		forumService = getForumManager();
+		
+		Long rootTopicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
+		
+		String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
+		
+		// get forum user and forum
+		ForumUser forumUser = getCurrentUser(request, (Long)sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
+		Forum forum = forumUser.getSession().getForum();
+		
 		// get root topic list
 		List<MessageDTO> msgDtoList = forumService.getTopicThread(rootTopicId);
 		updateMesssageFlag(msgDtoList);
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 		
-		String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
+		// check if we can still make posts in this topic
+		int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), ((MessageDTO)msgDtoList.get(0)).getMessage().getUid());
+		boolean noMorePosts = (numOfPosts >= forum.getMaximumReply())?Boolean.TRUE:Boolean.FALSE;
+		request.setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
+		request.setAttribute(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
 		
 		//transfer SessionMapID as well
 		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -581,13 +605,11 @@ public class LearningAction extends Action {
 		//check whether allow more posts for this user
 		ForumToolSession session = forumService.getSessionBySessionId(sessionId);
 		Forum forum = session.getForum();
-		if(forum != null){
-			if(!forum.isAllowNewTopic()){
-				int posts = forumService.getTopicsNum(forumUser.getUserId(), sessionId);
-				if(forum.getMaximumReply() != 0 && (posts >= forum.getMaximumReply()))
-					sessionMap.put(ForumConstants.ATTR_NO_MORE_POSTS, Boolean.TRUE);
-			}
-		}
+		int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), ((MessageDTO)msgDtoList.get(0)).getMessage().getUid());
+		boolean noMorePosts = (numOfPosts >= forum.getMaximumReply())?Boolean.TRUE:Boolean.FALSE;
+		request.setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
+		request.setAttribute(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
+		
 		sessionMap.remove(ForumConstants.ATTR_ORIGINAL_MESSAGE);
 		
 		return mapping.findForward("success");
@@ -711,6 +733,14 @@ public class LearningAction extends Action {
 		List msgDtoList = forumService.getTopicThread(rootTopicId);
 		updateMesssageFlag(msgDtoList);
 		
+		// check if we can still make posts in this topic
+		ForumUser forumUser = getCurrentUser(request, (Long)sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
+		Forum forum = forumUser.getSession().getForum();
+		int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), ((MessageDTO)msgDtoList.get(0)).getMessage().getUid());
+		boolean noMorePosts = (numOfPosts >= forum.getMaximumReply())?Boolean.TRUE:Boolean.FALSE;
+		request.setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
+		request.setAttribute(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
+		
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID,messageForm.getSessionMapID());
 
@@ -752,7 +782,6 @@ public class LearningAction extends Action {
 //			log.info(currentUser + "does not have permission to hide/show postings in forum: " + forum.getUid());
 //			log.info("Forum created by :" + forumCreatedBy.getUid() + ", Current User is: " + currentUser.getUid());
 //		}
-
 		
 		// echo back this topic thread into page
 		Long rootTopicId = forumService.getRootTopicId(msgId);
@@ -760,7 +789,7 @@ public class LearningAction extends Action {
 		updateMesssageFlag(msgDtoList);
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID,WebUtil.readStrParam(request,ForumConstants.ATTR_SESSION_MAP_ID));
-
+		
 		return mapping.findForward("success");
 	}
 
@@ -781,18 +810,24 @@ public class LearningAction extends Action {
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		Long userID = new Long(user.getUserID().longValue());
 		if(!forum.getRunOffline() && !forum.isAllowNewTopic()){
-			int postNum = forumService.getTopicsNum(userID,sessionId);
-			if(postNum < forum.getMinimumReply()){
-				//create error
-				ActionMessages errors = new ActionMessages();
-				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("error.less.mini.post",(forum.getMinimumReply() - postNum)));
-				saveErrors(request, errors);
-				
-				// get all root topic to display on init page
-				List rootTopics = forumService.getRootTopics(sessionId);
-				request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
-				request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID );
-				return false;
+			
+			List<MessageDTO> list = forumService.getRootTopics(sessionId);
+			for (MessageDTO msgDto: list) {
+				Long topicId = msgDto.getMessage().getUid();
+				int numOfPostsInTopic = forumService.getNumOfPostsByTopic(userID, topicId);
+				if (numOfPostsInTopic < forum.getMinimumReply()) {
+					//create error
+					ActionMessages errors = new ActionMessages();
+					errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("error.less.mini.post",(forum.getMinimumReply())));
+					saveErrors(request, errors);
+					
+					// get all root topic to display on init page
+					List rootTopics = forumService.getRootTopics(sessionId);
+					request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
+					request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID );
+					return false;
+				}
+
 			}
 		}
 		return true;

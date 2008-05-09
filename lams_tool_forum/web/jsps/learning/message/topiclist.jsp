@@ -15,6 +15,12 @@
 			<th width="25%">
 				<fmt:message key="lable.topic.title.update" />
 			</th>
+			<c:if
+				test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
+				<th>
+					&nbsp;
+				</th>
+			</c:if>
 		</tr>
 		<c:forEach items="${topicList}" var="topic">
 			<tr>
@@ -45,6 +51,12 @@
 				<td>
 					<lams:Date value="${topic.message.updated}"/>
 				</td>
+				<c:if
+					test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
+					<td>
+						${topic.numOfPosts} / ${sessionMap.minimumReply}
+					</td>
+				</c:if>
 			</tr>
 		</c:forEach>
 	</tbody>

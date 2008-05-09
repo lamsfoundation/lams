@@ -1,5 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"
+	scope="request" />
 
 <div id="content">
 
@@ -12,20 +13,32 @@
 		<c:out value="${sessionMap.instruction}" escapeXml="false" />
 	</div>
 
-   <c:if test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
-	<c:if test="${sessionMap.lockedWhenFinished}">
-	      <div class="info space-bottom">
-	   <c:choose>
-	    <c:when test = "${sessionMap.finishedLock}">
-		<fmt:message key="label.responses.locked.reminder" />								
-	    </c:when>
-	    <c:otherwise>
-		<fmt:message key="label.responses.locked" />								
-	    </c:otherwise>
-	   </c:choose>
-	      </div>
+	<c:if
+		test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
+		<c:if test="${sessionMap.lockedWhenFinished}">
+			<div class="info">
+				<c:choose>
+					<c:when test="${sessionMap.finishedLock}">
+						<fmt:message key="label.responses.locked.reminder" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.responses.locked" />
+					</c:otherwise>
+				</c:choose>
+			</div>
+		</c:if>
+
+		<c:if
+			test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 or sessionMap.maximumReply ne 0)}">
+			<div class="info">
+				<fmt:message key="label.postingLimits.forum.reminder">
+					<fmt:param value="${sessionMap.minimumReply}"></fmt:param>
+					<fmt:param value="${sessionMap.maximumReply}"></fmt:param>
+				</fmt:message>
+			</div>
+		</c:if>
+
 	</c:if>
-   </c:if>
 
 	<%@ include file="/common/messages.jsp"%>
 
@@ -72,7 +85,8 @@
 		</html:button>
 	</div>
 
-	<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and !sessionMap.hideReflection}">
+	<c:if
+		test="${sessionMap.userFinished and sessionMap.reflectOn and !sessionMap.hideReflection}">
 		<div class="small-space-top">
 			<h2>
 				${sessionMap.reflectInstructions}

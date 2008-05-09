@@ -212,6 +212,13 @@ public interface IForumService {
      * @return
      */
 	public int getTopicsNum(Long userID, Long sessionId);
+	/**
+	 * Returns the number of posts this user has made in this topic.
+	 * @param userId
+	 * @param topicId
+	 * @return
+	 */
+	public int getNumOfPostsByTopic(Long userId, Long topicId);	
 
 	//************************************************************************************
 	// Session Method

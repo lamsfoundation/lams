@@ -400,6 +400,10 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public int getTopicsNum(Long userID, Long sessionId) {
 		return messageDao.getTopicsNum(userID,sessionId);
 	}
+	
+	public int getNumOfPostsByTopic(Long userId, Long topicId) {
+		return messageSeqDao.getNumOfPostsByTopic(userId, topicId);
+	}
 
 	public ForumUser getUserByID(Long userId) {
 		return  forumUserDao.getByUserId(userId);
