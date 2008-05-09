@@ -431,7 +431,7 @@ public class LearningAction extends Action {
 		
 		// check if we can still make posts in this topic
 		int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), ((MessageDTO)msgDtoList.get(0)).getMessage().getUid());
-		boolean noMorePosts = (numOfPosts >= forum.getMaximumReply())?Boolean.TRUE:Boolean.FALSE;
+		boolean noMorePosts = (forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply() && (!forum.isAllowNewTopic()))?Boolean.TRUE:Boolean.FALSE;
 		request.setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
 		request.setAttribute(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
 		
@@ -606,7 +606,7 @@ public class LearningAction extends Action {
 		ForumToolSession session = forumService.getSessionBySessionId(sessionId);
 		Forum forum = session.getForum();
 		int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), ((MessageDTO)msgDtoList.get(0)).getMessage().getUid());
-		boolean noMorePosts = (numOfPosts >= forum.getMaximumReply())?Boolean.TRUE:Boolean.FALSE;
+		boolean noMorePosts = (forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply() && (!forum.isAllowNewTopic()))?Boolean.TRUE:Boolean.FALSE;
 		request.setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
 		request.setAttribute(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
 		
@@ -737,7 +737,7 @@ public class LearningAction extends Action {
 		ForumUser forumUser = getCurrentUser(request, (Long)sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
 		Forum forum = forumUser.getSession().getForum();
 		int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), ((MessageDTO)msgDtoList.get(0)).getMessage().getUid());
-		boolean noMorePosts = (numOfPosts >= forum.getMaximumReply())?Boolean.TRUE:Boolean.FALSE;
+		boolean noMorePosts = (forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply() && (!forum.isAllowNewTopic()))?Boolean.TRUE:Boolean.FALSE;
 		request.setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
 		request.setAttribute(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
 		
