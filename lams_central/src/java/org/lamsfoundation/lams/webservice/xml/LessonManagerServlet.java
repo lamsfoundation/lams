@@ -703,6 +703,7 @@ public class LessonManagerServlet extends HttpServlet {
 						if (StringUtils.isNotBlank(learnerId)) {
 							addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
 								LoginRequestDispatcher.METHOD_LEARNER, lsIdStr, learnerId, courseId, countryIsoCode, langIsoCode);
+						}
 					}
 				}
 				if (monitorIds != null) {
