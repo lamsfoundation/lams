@@ -62,7 +62,7 @@
 			<div class="field-name">
 				<fmt:message key="label.authoring.online.instruction" />
 			</div>
-			<html:textarea property="taskList.onlineInstructions" rows="3" cols="75" />
+			<lams:STRUTS-textarea property="taskList.onlineInstructions" rows="3" cols="75" />
 		</td>
 	</tr>
 	<tr>
