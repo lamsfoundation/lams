@@ -1054,7 +1054,7 @@ public class MonitoringUtil implements VoteAppConstants{
 	    
 	    double total=MonitoringUtil.calculateTotal(mapVoteRatesContent);
 	    logger.debug("updated mapIndex: " + mapIndex);
-	    double share=100d-total ; 
+	    double share=100-total ; 
 	    logger.debug("share: " + share);
 	    
 	    logger.debug("totalStandardVotesCount: " + totalStandardVotesCount);
@@ -1075,10 +1075,14 @@ public class MonitoringUtil implements VoteAppConstants{
 		}
 		logger.debug("final share: " + share);
 
-	    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
-	    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), "Open Vote");
-	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
-	    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
+		if(voteContent.isAllowText()) {
+		    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
+		    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), "Open Vote");
+		}
+		
+		mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
+		mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
+	    
 	    /**following  are needed just for proper iteration in the summary jsp*/
 		mapStandardQuestionUid.put(mapIndex.toString(),"1");
 		mapStandardToolSessionUid.put(mapIndex.toString(),"1");

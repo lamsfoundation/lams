@@ -75,7 +75,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="showResults" />
 
 			<h2>
-				AN <fmt:message key="label.progressiveResults" />
+				<fmt:message key="label.progressiveResults" />
 			</h2>
 
 			<!--present  a mini summary table here -->

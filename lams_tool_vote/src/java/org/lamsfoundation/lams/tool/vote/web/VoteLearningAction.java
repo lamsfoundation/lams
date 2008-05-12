@@ -812,7 +812,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 		logger.debug("retrieving voteService from session: " + voteService);
 
-    	repopulateRequestParameters(request,voteLearningForm);
+    	repopulateRequestParameters(request, voteLearningForm);
     	
         String toolSessionID=request.getParameter(TOOL_SESSION_ID);
         logger.debug("toolSessionID: " + toolSessionID);
