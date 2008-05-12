@@ -147,6 +147,10 @@ class CanvasHelper {
 			
 			if(canvasModel.importing){ 
 				Application.getInstance().getWorkspace().getWorkspaceModel().clearWorkspaceCache(_ddm.workspaceFolderID);
+				
+				_undoStack = new Array();
+				_redoStack = new Array();
+				
 				canvasModel.importing = false;
 			} else if(canvasModel.editing){
 				// TODO: stuff to do before design is displayed

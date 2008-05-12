@@ -101,8 +101,6 @@ class ComplexActivity extends Activity{
 		var ca = new ComplexActivity();
 		ca.populateFromDTO(dto);
 		
-		Debugger.log("ca.readOnly: " + ca.readOnly, Debugger.CRITICAL, "clone", "ComplexActivity");
-		
 		return ca;
 	}
 	
