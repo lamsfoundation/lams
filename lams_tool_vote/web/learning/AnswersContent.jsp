@@ -144,6 +144,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						escapeXml="false" />
 				</p>
 
+				<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCount > 1}">
+					<p>&nbsp;</p>
+					<p>
+						<fmt:message key="label.nominations.available">
+							<fmt:param>
+								<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}" />
+							</fmt:param>
+						</fmt:message>
+					</p>
+				</c:if>
+
 				<table class="shading-bg">
 
 					<c:forEach var="subEntry" varStatus="status"
