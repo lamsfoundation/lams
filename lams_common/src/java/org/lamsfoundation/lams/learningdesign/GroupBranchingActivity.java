@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
@@ -168,10 +169,18 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
    				listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING), this.getActivityUIID()));
    			} else {
 	  			for ( Group group : groups ) {
-	   				if ( group.getBranchActivities() == null || group.getBranchActivities().size() != 1 ) {
+   					boolean foundEntry = false;
+	   				if ( group.getBranchActivities() != null ) {
+	   					Iterator iter = group.getBranchActivities().iterator();
+	   					while (iter.hasNext() && ! foundEntry ) {
+							BranchActivityEntry entry = (BranchActivityEntry) iter.next();
+							foundEntry = entry.getBranchingActivity().equals(this);
+	   					}
+	   				}
+   					if ( ! foundEntry ) {
 	   					listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED), this.getActivityUIID()));
 	   					break;
-	   				}
+   					}
 	   			}
    			}
     	}
