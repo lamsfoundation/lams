@@ -637,7 +637,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 				if(!msg.getIsAuthored())
 					continue;
 				msg.setReplyNumber(0);
-				msg.setCreated(new Date());
+				// msg.setCreated(new Date());  // need to keep the original create date to maintain correct order
 				msg.setUpdated(new Date());
 				msg.setLastReplyDate(new Date());
 				msg.setHideFlag(false);
