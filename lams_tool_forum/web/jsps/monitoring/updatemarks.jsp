@@ -75,24 +75,27 @@
 		</tr>
 		<tr>
 			<td colspan="2">
-				<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="button" />
-				&nbsp;&nbsp;
-				<c:if test="${sessionMap.updateMode == 'listMarks'}">
-					<c:set var="cancelUrl">
-						<c:url value="/monitoring/viewUserMark.do"/>?userID=${user.uid}&toolSessionID=${sessionMap.toolSessionID}
-					</c:set>
-				</c:if>
-				<c:if test="${sessionMap.updateMode == 'listAllMarks'}">
-					<c:set var="cancelUrl">
-						<c:url value="/monitoring/viewAllMarks.do"/>?toolSessionID=${sessionMap.toolSessionID}
-					</c:set>
-				</c:if>
-				<c:if test="${sessionMap.updateMode == 'viewForum'}">
-					<c:set var="cancelUrl">
-						<c:url value="/learning/viewTopic.do"/>?sessionMapID=${formBean.sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}
-					</c:set>
-				</c:if>
-				<input type="button" onclick="location.href='${cancelUrl}';" class="button" value="<fmt:message key="button.cancel"/>">
+				<div style="float:left;padding:5px;">
+					<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="button" />
+				</div>
+				<div style="float:left;padding:5px;">
+					<c:if test="${sessionMap.updateMode == 'listMarks'}">
+						<c:set var="cancelUrl">
+							<c:url value="/monitoring/viewUserMark.do"/>?userID=${user.uid}&toolSessionID=${sessionMap.toolSessionID}
+						</c:set>
+					</c:if>
+					<c:if test="${sessionMap.updateMode == 'listAllMarks'}">
+						<c:set var="cancelUrl">
+							<c:url value="/monitoring/viewAllMarks.do"/>?toolSessionID=${sessionMap.toolSessionID}
+						</c:set>
+					</c:if>
+					<c:if test="${sessionMap.updateMode == 'viewForum'}">
+						<c:set var="cancelUrl">
+							<c:url value="/learning/viewTopic.do"/>?sessionMapID=${formBean.sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}
+						</c:set>
+					</c:if>
+					<input type="button" onclick="location.href='${cancelUrl}';" class="button" value="<fmt:message key="button.cancel"/>">
+				</div>
 			</td>
 		</tr>
 	</table>

@@ -167,14 +167,14 @@
 						</html:submit>
 					</html:form>
 				</div>
-				<div style="float:left;padding:5px;margin-left:5px">
-					<html:form action="/monitoring">
-						<html:hidden property="contentFolderID" value="${contentFolderID}"/>
-						<html:hidden property="toolContentID" value="${toolContentID}" />
-						<html:submit property="init" styleClass="button">
+				<div style="float:left;padding:9px">
+					<c:url value="/monitoring.do" var="refreshMonitoring">
+						<c:param name="contentFolderID" value="${contentFolderID}"/>
+						<c:param name="toolContentID" value="${toolContentID}" />
+					</c:url>
+					<html:link href="${refreshMonitoring}" styleClass="button">
 							<fmt:message key="label.refresh" />
-						</html:submit>
-					</html:form>
+					</html:link>
 				</div>
 			</td>
 		</tr>

@@ -100,17 +100,21 @@
 			</tr>
 			<tr>
 				<td colspan="5">
+					<div style="float:left;padding:5px;">
 					<html:form action="/monitoring/editMark" method="post">
 						<html:hidden property="sessionMapID" value="${sessionMapID}"/>
 						<html:hidden property="topicID" value="${topic.message.uid}"/>
 						<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="button" />
 					</html:form>
+					</div>
 				</td>
 			</tr>
 		</c:forEach>
 		<tr>
 			<td>
+				<div style="float:left;padding:5px;">
 				<a href="javascript:closeAndRefreshParentMonitoringWindow()" class="button"><fmt:message key="button.close"/></a>
+				</div>
 			</td>
 		</tr>
 </c:forEach>
