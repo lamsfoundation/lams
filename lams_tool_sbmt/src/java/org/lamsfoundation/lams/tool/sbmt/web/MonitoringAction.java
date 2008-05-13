@@ -29,10 +29,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -68,6 +70,7 @@ import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtWebUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -213,7 +216,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		submitFilesService = getSubmitFilesService();
 		//return FileDetailsDTO list according to the given sessionID
-		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
+		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
 		//construct Excel file format and download
 		String errors = null;
 		try {
@@ -273,19 +276,10 @@ public class MonitoringAction extends LamsDispatchAction {
 					cell.setCellValue(dto.getFileDescription());
 					
 					cell = row.createCell((short) count++);
-					
-					if(dto.getMarks() != null){
-						String marks = "";
-						try {
-							NumberFormat format = NumberFormat.getInstance();
-							format.setMaximumFractionDigits(1);
-							marks = format.format(NumberUtils.createFloat(dto.getMarks()));
-						} catch (Exception e) {
-						}
-						cell.setCellValue(marks);
-					}else
-						cell.setCellValue("");
-					
+
+					String marks = dto.getMarks();
+					cell.setCellValue(marks!=null?marks:"");
+
 					cell = row.createCell((short) count++);
 					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					cell.setCellValue(dto.getComments());
@@ -341,7 +335,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		submitFilesService = getSubmitFilesService();
 		//return FileDetailsDTO list according to the given userID and sessionID
-		List files = submitFilesService.getFilesUploadedByUser(userID,sessionID);
+		List files = submitFilesService.getFilesUploadedByUser(userID,sessionID,request.getLocale());
 		
 		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 		request.setAttribute("report",files);
@@ -367,7 +361,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		submitFilesService = getSubmitFilesService();
 		
 		List report = new ArrayList<FileDetailsDTO>();
-		report.add(submitFilesService.getFileDetails(detailID));
+		report.add(submitFilesService.getFileDetails(detailID,request.getLocale()));
 		
 		request.setAttribute("report",report);
 		request.setAttribute("updateMode", updateMode);
@@ -397,11 +391,11 @@ public class MonitoringAction extends LamsDispatchAction {
 		Long reportID= new Long(WebUtil.readLongParam(request,"reportID"));
 		
 		ActionMessages errors = new ActionMessages();  
-		//check whether the mark is validate
+		// Check whether the mark is valid. 
+		Float marks = null;
 		String markStr = request.getParameter("marks");
-		Long marks = null;
 		try {
-			marks = Long.parseLong(markStr);
+			marks = NumberUtil.getLocalisedFloat(markStr, request.getLocale());
 		} catch (Exception e) {
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.mark.invalid.number"));
 		}
@@ -410,7 +404,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		if(!errors.isEmpty()){
 			submitFilesService = getSubmitFilesService();
 			List report = new ArrayList<FileDetailsDTO>();
-			FileDetailsDTO fileDetail = submitFilesService.getFileDetails(detailID);
+			FileDetailsDTO fileDetail = submitFilesService.getFileDetails(detailID,request.getLocale());
 			//echo back the input, even they are wrong.
 			fileDetail.setComments(comments);
 			fileDetail.setMarks(markStr);
@@ -432,11 +426,11 @@ public class MonitoringAction extends LamsDispatchAction {
 		
 		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 		if(StringUtils.equals(updateMode, "listMark")){
-			List report = submitFilesService.getFilesUploadedByUser(userID,sessionID);
+			List report = submitFilesService.getFilesUploadedByUser(userID,sessionID,request.getLocale());
 			request.setAttribute("report",report);
 			return mapping.findForward("listMark");
 		}else{
-			Map report = submitFilesService.getFilesUploadedBySession(sessionID);
+			Map report = submitFilesService.getFilesUploadedBySession(sessionID,request.getLocale());
 			request.setAttribute("reports",report);
 			return mapping.findForward("listAllMarks");
 		}
@@ -457,7 +451,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		submitFilesService = getSubmitFilesService();
 		//return FileDetailsDTO list according to the given sessionID
-		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
+		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID,request.getLocale());
 		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 //		request.setAttribute("user",submitFilesService.getUserDetails(userID));
 		request.setAttribute("reports",userFilesMap);
@@ -511,7 +505,7 @@ public class MonitoringAction extends LamsDispatchAction {
 			String sessionName = sfs.getSessionName();
 				
 			//return FileDetailsDTO list according to the given sessionID
-			Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
+			Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID,request.getLocale());
 			Iterator iter = userFilesMap.values().iterator();
 			Iterator dtoIter; 
 			int notMarkedCount = 0;
@@ -558,7 +552,7 @@ public class MonitoringAction extends LamsDispatchAction {
             sessionDto.setSessionName(sfs.getSessionName());
             
             boolean hasReflect = sfs.getContent().isReflectOnActivity();
-            Map<SubmitUser,FileDetailsDTO> userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
+            Map<SubmitUser,FileDetailsDTO> userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID,request.getLocale());
             
             //construct LearnerDTO list
             List<SubmitUser> userList = submitFilesService.getUsersBySession(sessionID);

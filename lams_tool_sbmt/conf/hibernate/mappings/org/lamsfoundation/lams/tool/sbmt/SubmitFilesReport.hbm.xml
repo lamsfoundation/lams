@@ -36,11 +36,10 @@
 
         <property
             name="marks"
-            type="java.lang.Long"
+            type="java.lang.Float"
             update="true"
             insert="true"
             column="marks"
-            length="20"
         />
 
         <property

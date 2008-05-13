@@ -50,13 +50,13 @@ public class SubmitFilesReport implements Serializable,Cloneable{
     private String comments;
 
     /** nullable persistent field */
-    private Long marks;
+    private Float marks;
 
     /** nullable persistent field */
     private Date dateMarksReleased;
     
     /** full constructor */
-    public SubmitFilesReport(String comments, Long marks, Date dateMarksReleased) {
+    public SubmitFilesReport(String comments, Float marks, Date dateMarksReleased) {
         this.comments = comments;
         this.marks = marks;
         this.dateMarksReleased = dateMarksReleased;
@@ -88,13 +88,13 @@ public class SubmitFilesReport implements Serializable,Cloneable{
     }
 
     /** 
-     * @hibernate.property column="marks" length="20"
+     * @hibernate.property column="marks"
      */
-    public Long getMarks() {
+    public Float getMarks() {
         return this.marks;
     }
 
-    public void setMarks(Long marks) {
+    public void setMarks(Float marks) {
         this.marks = marks;
     }
 

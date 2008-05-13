@@ -43,14 +43,14 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 public class TestModel extends TestCase {
 	//report data
 	private static String commA ="commA";
-	private static Long markA = new Long(100);
+	private static Float markA = new Float(100);
 	private static Long repA = new Long(100);
 	private static int dayA = 10;
 	private static int mthA = 9;
 	private static int yearA = 2003;
 	
 	private static String commB ="commB";
-	private static Long markB = new Long(201);
+	private static Float markB = new Float(201);
 	private static Long repB = new Long(201);
 	private static int dayB = 11;
 	private static int mthB = 8;

@@ -272,7 +272,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new SubmitFilesException(error);
 		}
 
-		List fileList = sbmtService.getFilesUploadedByUser(new Integer(userID.intValue()),toolSessionID);
+		List fileList = sbmtService.getFilesUploadedByUser(new Integer(userID.intValue()),toolSessionID,request.getLocale());
 		//if mark not release, then set these message as null.
 		Iterator iter = fileList.iterator();
 		while(iter.hasNext()){
@@ -320,7 +320,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		for (SubmitFilesSession session : sessionList) {
 			SortedMap userFilesMap = new TreeMap(new LastNameAlphabeticComparator());
 			userFilesMap.putAll(sbmtService.getFilesUploadedBySession(session
-					.getSessionID()));
+					.getSessionID(),request.getLocale()));
 			allFileMap.putAll(userFilesMap);
 			report.put(session.getSessionName(), userFilesMap);
 		}

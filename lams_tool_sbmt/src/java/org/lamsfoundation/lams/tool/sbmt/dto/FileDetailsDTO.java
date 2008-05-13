@@ -26,13 +26,16 @@
 package org.lamsfoundation.lams.tool.sbmt.dto;
 
 import java.io.Serializable;
+import java.text.NumberFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.NumberUtil;
 
 /**
  * @author Manpreet Minhas
@@ -68,7 +71,12 @@ public class FileDetailsDTO implements Serializable{
 	private String exportedURL;  // the location of this file saved by the export function.      	
 	
 
-	public FileDetailsDTO(SubmissionDetails details){
+	/** 
+	 * @param details SubmissionDetails to be converted to the FileDetailsDTO
+	 * @param numberFormat NumberFormat based on the current locale, with which the marks will be converted from double to string. 
+	 * If null then a generic NumberFormat instance will be used.
+	 */
+	public FileDetailsDTO(SubmissionDetails details, NumberFormat numberFormat){
 		if(details == null){
 			log.warn("SubmissionDetails is null, failed to initial FileDetailDTO");
 			return;
@@ -90,7 +98,7 @@ public class FileDetailsDTO implements Serializable{
 			this.reportID = report.getReportID();
 			this.dateMarksReleased = report.getDateMarksReleased();		
 			this.comments = report.getComments();
-			this.marks = report.getMarks() != null? report.getMarks().toString():"";
+			this.marks = report.getMarks() != null? NumberUtil.formatLocalisedNumber(report.getMarks(), numberFormat,1) : "";
 		}
 	}
 

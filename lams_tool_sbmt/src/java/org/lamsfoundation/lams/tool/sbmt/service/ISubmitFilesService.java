@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -110,7 +111,7 @@ public interface ISubmitFilesService {
 	 * @param sessionID The <code>session_id</code> to be looked up
 	 * @return List The list of required objects.
 	 */
-	public List getFilesUploadedByUser(Integer userID, Long sessionID);
+	public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale);
 	/**
 	 * This method returns a SortedMap of all files that were submitted users within a
 	 * given <code>sessionID</code>.
@@ -118,11 +119,11 @@ public interface ISubmitFilesService {
 	 * @param sessionID The <code>session_id</code> to be looked up
 	 * @return SortedMap, the key is UserDTO, the value is a List of FileDetailsDTO objects 
 	 */
-	public SortedMap getFilesUploadedBySession(Long sessionID);
+	public SortedMap getFilesUploadedBySession(Long sessionID, Locale currentLocale);
 
-	public void updateMarks(Long reportID, Long marks, String comments);
+	public void updateMarks(Long reportID, Float marks, String comments);
 	
-	public FileDetailsDTO getFileDetails(Long detailID);
+	public FileDetailsDTO getFileDetails(Long detailID, Locale currentLocale);
 	/**
 	 * Get SubmitFilesSession instance according to the given session id.
 	 * @param sessionID

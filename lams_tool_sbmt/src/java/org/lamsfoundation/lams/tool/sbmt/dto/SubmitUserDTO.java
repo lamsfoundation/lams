@@ -51,7 +51,7 @@ public class SubmitUserDTO implements Serializable{
 	private String fileName;
 	private String fileDescription;
 	private String comments;	
-	private Long marks;	
+	private Float marks;	
 	private Date dateOfSubmission;
 	private Date dateMarksReleased;
 	private boolean anyFilesMarked;
@@ -142,13 +142,13 @@ public class SubmitUserDTO implements Serializable{
 	/**
 	 * @return Returns the marks.
 	 */
-	public Long getMarks() {
+	public Float getMarks() {
 		return marks;
 	}
 	/**
 	 * @param marks The marks to set.
 	 */
-	public void setMarks(Long marks) {
+	public void setMarks(Float marks) {
 		this.marks = marks;
 	}
 	/**

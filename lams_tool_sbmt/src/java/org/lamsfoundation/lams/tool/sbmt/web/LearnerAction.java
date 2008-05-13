@@ -140,7 +140,7 @@ public class LearnerAction extends DispatchAction {
 		//this must before getFileUploadByUser() method becuase getCurrentLearner() 
 		// will create session user if it does not exist.
 		SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
-		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
+		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID,request.getLocale());
 		
 //		check whehter finish lock is on/off
 		boolean lock = content.isLockOnFinished() && learner.isFinished();
@@ -208,7 +208,7 @@ public class LearnerAction extends DispatchAction {
 			Integer userID = user.getUserID();
 			
 			ISubmitFilesService submitFilesService = getService();
-			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
+			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID,request.getLocale());
 
 			SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 			ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -232,7 +232,7 @@ public class LearnerAction extends DispatchAction {
 		ISubmitFilesService submitFilesService = getService();
 
 		submitFilesService.uploadFileToSession(sessionID,uploadedFile,fileDescription,userID);
-		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
+		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID,request.getLocale());
 		SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 		ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 		setLearnerDTO(request,sessionMap, learner, filesUploaded, mode);

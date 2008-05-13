@@ -27,12 +27,14 @@ package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -655,14 +657,15 @@ public class SubmitFilesService implements ToolContentManager,
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getFilesUploadedByUserForContent(java.lang.Long, java.lang.Long)
 	 */
-	public List getFilesUploadedByUser(Integer userID, Long sessionID){
+	public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale){
 		List<SubmissionDetails> list = submissionDetailsDAO.getBySessionAndLearner(sessionID, userID);
 		SortedSet details = new TreeSet(this.new FileDtoComparator());
 		if(list ==null)
 			return new ArrayList(details);
 		
+		NumberFormat numberFormat = currentLocale != null ? NumberFormat.getInstance(currentLocale) : null;
 		for(SubmissionDetails submissionDetails : list){
-			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails);
+			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails, numberFormat);
 			details.add(detailDto);
 		}
 		return  new ArrayList(details);
@@ -672,12 +675,13 @@ public class SubmitFilesService implements ToolContentManager,
 	 * value is a list container, which contains all <code>FileDetailsDTO</code> object belong to
 	 * this user.
 	 */
-	public SortedMap getFilesUploadedBySession(Long sessionID) {
+	public SortedMap getFilesUploadedBySession(Long sessionID, Locale currentLocale) {
 		List list =  submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
 		if(list!=null){
 			SortedMap map = new TreeMap(new LastNameAlphabeticComparator());
 			Iterator iterator = list.iterator();
 			List userFileList;
+			NumberFormat numberFormat = currentLocale != null ? NumberFormat.getInstance(currentLocale) : null;
 			while(iterator.hasNext()){
 				SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
 				SubmitUser learner = submissionDetails.getLearner();
@@ -686,7 +690,7 @@ public class SubmitFilesService implements ToolContentManager,
 					return null;
 				}
 				
-				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails);
+				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails, numberFormat);
 				userFileList = (List) map.get(learner);
 				//if it is first time to this user, creating a new ArrayList for this user.
 				if(userFileList == null)
@@ -699,9 +703,10 @@ public class SubmitFilesService implements ToolContentManager,
 		else
 			return null;
 	}
-	public FileDetailsDTO getFileDetails(Long detailID){
+	
+	public FileDetailsDTO getFileDetails(Long detailID, Locale currentLocale){
 			SubmissionDetails details = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
-			return new FileDetailsDTO(details);			
+			return new FileDetailsDTO(details, currentLocale != null ? NumberFormat.getInstance(currentLocale) : null);			
 	}
 	/**
 	 * (non-Javadoc)
@@ -711,7 +716,7 @@ public class SubmitFilesService implements ToolContentManager,
 		return submitUserDAO.getUsersBySession(sessionID);
 	}
 
-	public void updateMarks(Long reportID, Long marks, String comments){
+	public void updateMarks(Long reportID, Float marks, String comments){
 		SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
 		if(report!=null){
 			report.setComments(comments);

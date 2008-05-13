@@ -148,7 +148,7 @@ public class ReflectAction extends Action{
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		Integer userID = user.getUserID();
 		
-		List list = submitFilesService.getFilesUploadedByUser(userID, sessionId);
+		List list = submitFilesService.getFilesUploadedByUser(userID, sessionId,request.getLocale());
 		int minUpload= (Integer) sessionMap.get(SbmtConstants.PARAM_MIN_UPLOAD);
 		if(minUpload > 0){
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("error.learning.minimum.upload.number.less"));

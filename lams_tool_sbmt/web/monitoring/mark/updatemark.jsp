@@ -34,7 +34,7 @@
 									<fmt:message key="label.learner.marks" />
 								</td>
 								<td>
-									<input type="text" name="marks" value=<c:out value="${fileInfo.marks}"  escapeXml="false"/>>
+									<input type="text" name="marks" value='<c:out value="${fileInfo.marks}"  escapeXml="false"/>'>
 								</td>
 							</tr>
 							<tr>
