@@ -334,12 +334,12 @@ public interface ITaskListService {
 	public List<TaskSummary> exportForTeacher(Long contentUid);
 	
 	/**
-	 * Return summary for the specified TaskList. Used in monitoring.
+	 * Return summary list for the specified TaskList. Used in monitoring.
 	 * 
 	 * @param contentId specified TaskList uid
 	 * @return
 	 */
-	Summary getSummary(Long contentId);
+	List<Summary> getSummary(Long contentId);
 	
 	/**
 	 * Return task summary for the specified TaskListItem. Used in monitoring.

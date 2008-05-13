@@ -431,54 +431,57 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	/** 
 	 * {@inheritDoc}
 	 */
-	public Summary getSummary(Long contentId) {
+	public List<Summary> getSummary(Long contentId) {
+		
+		List<Summary> summaryList = new ArrayList<Summary>();
+		
+		//retrieve all the sessions associated with this taskList
+		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
 		
 		TaskList taskList = taskListDao.getByContentId(contentId);
 		ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
 		itemList.addAll(taskList.getTaskListItems());
-		
-		ArrayList<TaskListUser> userList = new ArrayList<TaskListUser>();
-		
-		//retrieve all the sessions associated with this taskList
-		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
 		//create the list containing all taskListItems  
-		//create the user list of all whom were started this task
 		for(TaskListSession session:sessionList) {
 
 			Set<TaskListItem> newItems = session.getTaskListItems();
 			for(TaskListItem item : newItems) {
 				if (!itemList.contains(item)) itemList.add(item);
 			}
-			
-			List<TaskListUser> newUsers = taskListUserDao.getBySessionID(session.getSessionId());
-			for(TaskListUser user : newUsers) {
-				if (!userList.contains(user)) userList.add(user);
-			}
 		}
 		
-		//Fill up the copmletion table
-		boolean[][] complete = new boolean[userList.size()][itemList.size()];
-		//Fill up the array of visitNumbers
-		int[] visitNumbers = new int[itemList.size()];
-		for (int i = 0; i < userList.size(); i++) {
-			TaskListUser user = userList.get(i);
+		
+		//create the user list of all whom were started this task
+		for(TaskListSession session:sessionList) {
 			
-			for (int j = 0; j < itemList.size(); j++) {
-				TaskListItem item = itemList.get(j);
+			List<TaskListUser> userList = taskListUserDao.getBySessionID(session.getSessionId());
+			
+			//Fill up the copmletion table
+			boolean[][] complete = new boolean[userList.size()][itemList.size()];
+			//Fill up the array of visitNumbers
+			int[] visitNumbers = new int[itemList.size()];
+			for (int i = 0; i < userList.size(); i++) {
+				TaskListUser user = userList.get(i);
 				
-				//retreiving TaskListItemVisitLog for current taskList and user
-				TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(), user.getUserId());
-				if (visitLog !=null) {
-					complete[i][j] = visitLog.isComplete();	
-					if (visitLog.isComplete()) visitNumbers[j]++;
-				} else {
-					complete[i][j] = false;
+				for (int j = 0; j < itemList.size(); j++) {
+					TaskListItem item = itemList.get(j);
+					
+					//retreiving TaskListItemVisitLog for current taskList and user
+					TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(), user.getUserId());
+					if (visitLog !=null) {
+						complete[i][j] = visitLog.isComplete();	
+						if (visitLog.isComplete()) visitNumbers[j]++;
+					} else {
+						complete[i][j] = false;
+					}
 				}
 			}
+			
+			Summary summary = new Summary(session.getSessionId(), session.getSessionName(), itemList, userList, complete, visitNumbers, taskList.isMonitorVerificationRequired());
+			summaryList.add(summary);
 		}
-		
-		Summary summary = new Summary(itemList, userList, complete, visitNumbers, taskList.isMonitorVerificationRequired());
-		return summary;
+
+		return summaryList;
 	}
 	
 	/** 
@@ -640,7 +643,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 			taskSummary.setTaskSummaryItems(newTaskSummaryItems);
 
 			//get rid of TaskListItemComments and TaskListItemAttachments belong to another users
-			if (taskSummary.getTaskListItem().isCommentsAllowed() && !taskSummary.getTaskListItem().getShowCommentsToAll()) {
+			if (taskSummary.getTaskListItem().isCommentsFilesAllowed() && !taskSummary.getTaskListItem().getShowCommentsToAll()) {
 				TaskSummaryItem taskSummaryItem = taskSummary.getTaskSummaryItems().get(0);
 				
 				List<TaskListItemComment> newComments = new  ArrayList<TaskListItemComment>();

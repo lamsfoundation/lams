@@ -103,10 +103,10 @@ public class MonitoringAction extends Action {
 		TaskList taskList = service.getTaskListByContentId(contentId);
 		taskList.toDTO();
 		
-		Summary summary = service.getSummary(contentId);
+		List<Summary> summaryList = service.getSummary(contentId);
 		
 		//cache into sessionMap
-		sessionMap.put(TaskListConstants.ATTR_SUMMARY, summary);
+		sessionMap.put(TaskListConstants.ATTR_TASK_SUMMARY_LIST, summaryList);
 		sessionMap.put(TaskListConstants.PAGE_EDITABLE, taskList.isContentInUse());
 		sessionMap.put(TaskListConstants.ATTR_RESOURCE, taskList);
 		sessionMap.put(TaskListConstants.ATTR_TOOL_CONTENT_ID, contentId);

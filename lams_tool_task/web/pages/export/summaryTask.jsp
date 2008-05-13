@@ -11,7 +11,7 @@
 			</div>
 			<br/>
 				
-			<c:if test="${item.childTask || item.commentsAllowed}">
+			<c:if test="${item.childTask || item.commentsFilesAllowed}">
 				<ul>
 					<c:if test="${item.childTask}">
 						<li>
@@ -19,7 +19,7 @@
 						</li>
 					</c:if>
 						
-					<c:if test="${item.commentsAllowed}">
+					<c:if test="${item.commentsFilesAllowed}">
 						<li>
 							<fmt:message key="label.monitoring.tasksummary.comments.files.enabled" />
 						</li>
@@ -40,7 +40,7 @@
 						<fmt:message key="label.monitoring.tasksummary.time.and.date" />
 					</th>
 					
-					<c:if test="${item.commentsAllowed}">
+					<c:if test="${item.commentsFilesAllowed}">
 						<th width="45%" align="center">
 							<fmt:message key="label.monitoring.tasksummary.comments.files" />
 						</th>
@@ -71,7 +71,7 @@
 							<lams:Date value="${taskSummaryItem.date}" />
 						</td>
 									
-						<c:if test="${item.commentsAllowed}">
+						<c:if test="${item.commentsFilesAllowed}">
 							<td>
 							
 								<ul>
