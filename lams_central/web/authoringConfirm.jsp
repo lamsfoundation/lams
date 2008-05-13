@@ -10,17 +10,10 @@
 <lams:html>
 <lams:head>
 	<lams:css />
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
 	<script type="text/javascript">
 		function closeWindow() {
-			// refresh the parent window if the parent window is a monitoring window
-			if ( window.opener && ! window.opener.closed && window.opener.name.indexOf("MonitorLearnerActivity") >= 0 ) {
-				var monitoringURL = window.opener.location;
-				var currentTab = window.opener.selectedTabID;
-				if ( currentTab ) 
-					monitoringURL = monitoringURL+"&currentTab="+currentTab;
-
-				window.opener.location.href = monitoringURL;
-			}
+			refreshParentMonitoringWindow();
 
 			//just for depress alert window when call window.close()
 			//only available for IE browser			  
