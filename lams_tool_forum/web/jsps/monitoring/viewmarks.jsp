@@ -77,7 +77,7 @@
 							<fmt:message key="message.not.avaliable" />
 						</c:when>
 						<c:otherwise>
-							<c:out value="${topic.message.report.mark}" escapeXml="false" />
+							<fmt:formatNumber value="${topic.message.report.mark}"  maxFractionDigits="1"/>
 						</c:otherwise>
 					</c:choose>
 				</td>

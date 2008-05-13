@@ -61,7 +61,7 @@
 				<fmt:message key="lable.topic.title.mark" />* 
 			</td>
 			<td>
-				<html:text property="mark"/>
+				<html:text property="mark"><fmt:formatNumber value="${topic.message.report.mark}"  maxFractionDigits="1"/></html:text>
 			</td>
 		</tr>
 		<tr>

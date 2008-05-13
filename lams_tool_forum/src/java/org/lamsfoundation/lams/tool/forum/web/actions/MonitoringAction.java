@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -74,6 +75,7 @@ import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MarkForm;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -357,8 +359,7 @@ public class MonitoringAction extends Action {
 					if (dto.getMessage() != null
 							&& dto.getMessage().getReport() != null
 							&& dto.getMessage().getReport().getMark() != null)
-						cell.setCellValue(dto.getMessage().getReport()
-								.getMark().doubleValue());
+						cell.setCellValue(NumberUtil.formatLocalisedNumber(dto.getMessage().getReport().getMark(), request.getLocale(),1));
 					else
 						cell.setCellValue("");
 
@@ -433,7 +434,7 @@ public class MonitoringAction extends Action {
 	}
 
 	/**
-	 * View instruction inforamtion for a content.
+	 * View instruction information for a content.
 	 * 
 	 * @param mapping
 	 * @param form
@@ -720,7 +721,7 @@ public class MonitoringAction extends Action {
 		// echo back to web page
 		if (msg.getReport() != null) {
 			if (msg.getReport().getMark() != null)
-				markForm.setMark(msg.getReport().getMark().toString());
+				markForm.setMark(NumberUtil.formatLocalisedNumber(msg.getReport().getMark(),request.getLocale(),1));
 			else
 				markForm.setMark("");
 			markForm.setComment(msg.getReport().getComment());
@@ -755,17 +756,15 @@ public class MonitoringAction extends Action {
 		MarkForm markForm = (MarkForm) form;
 		
 		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, markForm.getSessionMapID());
-		String mark = markForm.getMark();
+		String markStr = markForm.getMark();
+		Float mark = null;
         ActionMessages errors = new ActionMessages();
-        if (StringUtils.isBlank(mark)) {
+        if (StringUtils.isBlank(markStr)) {
           ActionMessage error = new ActionMessage("error.valueReqd");
           errors.add("report.mark", error);
-        }else if(!NumberUtils.isNumber(mark)){
-        	ActionMessage error = new ActionMessage("error.mark.needNumber");
-        	errors.add("report.mark", error);
         }else {
         	try{
-        		Float.parseFloat(mark);
+        		mark = NumberUtil.getLocalisedFloat(markStr, request.getLocale());
         	}catch(Exception e){
               	ActionMessage error = new ActionMessage("error.mark.invalid.number");
             	errors.add("report.mark", error);
@@ -803,7 +802,7 @@ public class MonitoringAction extends Action {
 		if(toolSession.isMarkReleased())
 			report.setDateMarksReleased(new Date());
 		
-		report.setMark(new Float(Float.parseFloat(mark)));
+		report.setMark(mark);
 		report.setComment(markForm.getComment());
 		forumService.updateTopic(msg);
 		

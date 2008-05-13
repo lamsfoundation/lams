@@ -73,7 +73,7 @@
 								key="lable.topic.title.mark" />
 						</span>
 						<BR>
-						${msgDto.mark}
+						<fmt:formatNumber value="${msgDto.mark}"  maxFractionDigits="1"/>
 					</td>
 				</tr>
 				<tr>
