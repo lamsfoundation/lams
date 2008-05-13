@@ -50,7 +50,7 @@
 								<c:out value="${topic.message.replyNumber+1}" />
 							</td>
 							<td>
-								<c:out value="${topic.mark}" />
+								<fmt:formatNumber value="${topic.mark}"  maxFractionDigits="1"/>
 							</td>
 						</tr>
 					</c:forEach>
@@ -71,7 +71,7 @@
 				<fmt:message key="label.monitoring.statistic.average.mark" />
 			</td>
 			<td>
-				<c:out value="${sessionMarkAverage}" />
+				<fmt:formatNumber value="${sessionMarkAverage}"  maxFractionDigits="1"/>
 			</td>
 		</tr>
 	</table>
