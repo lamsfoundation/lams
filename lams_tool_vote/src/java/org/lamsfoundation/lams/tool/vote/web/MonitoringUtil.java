@@ -1047,7 +1047,6 @@ public class MonitoringUtil implements VoteAppConstants{
 		logger.debug("test1: mapStandardRatesContent: " + mapStandardRatesContent);
 		logger.debug("test1: mapStandardUserCount: " + mapStandardUserCount);
 		
-		Iterator itListQuestions = userEntries.iterator();
 	    int mapVoteRatesSize=mapVoteRatesContent.size();
 	    logger.debug("mapVoteRatesSize: " + mapVoteRatesSize);
 	    mapIndex=new Long(mapVoteRatesSize+1);
@@ -1088,7 +1087,9 @@ public class MonitoringUtil implements VoteAppConstants{
 		mapStandardQuestionUid.put(mapIndex.toString(),"1");
 		mapStandardToolSessionUid.put(mapIndex.toString(),"1");
 
-        
+        request.setAttribute(LIST_USER_ENTRIES_CONTENT, userEntries);
+        logger.debug("test2: mapUserEntriesContent: " + request.getSession().getAttribute(LIST_USER_ENTRIES_CONTENT));
+
 		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, mapStandardNominationsContent);
 		logger.debug("test2: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
 

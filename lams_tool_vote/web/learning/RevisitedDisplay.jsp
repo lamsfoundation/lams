@@ -126,6 +126,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')"
 						height=30 border="0" style="cursor: pointer;">
 				</div>
+				
+				<c:if test="${VoteLearningForm.allowTextEntry}">
+					<strong> <fmt:message key="label.open.votes"/> </strong>
+					<c:forEach var="vote"
+						items="${requestScope.listUserEntriesContent}">
+						<div>
+							<c:out value="${vote}" escapeXml="false" />
+						</div>
+					</c:forEach>
+					<div>&nbsp;</div>
+				</c:if>
+				
 				<strong> <fmt:message key="label.learner.nominations" /> </strong>
 
 				<c:forEach var="entry"

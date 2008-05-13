@@ -276,6 +276,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		logger.debug("userAttempts: "+ userAttempts);
 		request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
 		
+	    request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
+	    Set userEntries = voteService.getSessionUserEntriesSet(new Long(voteSession.getUid()));
+		
 	    logger.debug("voteSession uid:" + voteSession.getUid());
 	    logger.debug("calling prepareChartData:" +  voteContent.getVoteContentId() + " " +  voteSession.getUid());
 
@@ -283,7 +286,6 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
 	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO, getMessageService());
 	    logger.debug("end of  prepareChartData:" +  voteContent.getVoteContentId() + " " +  voteSession.getUid());
-		
 	    
 		voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
 		String reflectionSubject=VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
