@@ -22,7 +22,7 @@
 							${author}						
 					
 							-
-							<lams:Date value="${msgDto.message.created}"/>
+							<lams:Date value="${msgDto.message.updated}"/>
 				</td>
 			</tr>
 			<tr>

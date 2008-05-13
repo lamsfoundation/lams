@@ -21,7 +21,7 @@
 				${author}						
 				
 				-
-				<lams:Date value="${topic.message.created}"/>
+				<lams:Date value="${topic.message.updated}"/>
 
 			</td>
 		</tr>

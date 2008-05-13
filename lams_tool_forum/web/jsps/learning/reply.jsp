@@ -30,7 +30,7 @@
 			<c:if test="${empty originalMessage.author}">
 				<fmt:message key="label.default.user.name" />
 			</c:if> <c:out value='${originalMessage.author}' /> - <lams:Date
-				value="${originalMessage.message.created}" /></td>
+				value="${originalMessage.message.updated}" /></td>
 		</tr>
 		<tr>
 			<td><c:out value="${originalMessage.message.body}"
