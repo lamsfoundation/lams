@@ -586,7 +586,7 @@
 </table>
 <table alias="" name="tl_latask10_taskList_item" remarks="" uid="1e47441:118111fd0b1:-7fd4">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="283" y="662"/>
+<table-figure-bounds height="-1" width="-1" x="283" y="615"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="1e47441:118111fd0b1:-7fd2">
 <column-description/>
@@ -698,7 +698,31 @@
 <variant type-name-pattern="BIT"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="is_comments_allowed" remarks="" uid="1bef877:1182ac6c3bb:-7f5d">
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="is_comments_allowed" remarks="" uid="1d137a8:119e09aeb40:-7fe8">
+<column-description/>
+<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
+<variant type-name-pattern="BIT"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="is_comments_required" remarks="" uid="1d137a8:119e09aeb40:-7fe3">
+<column-description/>
+<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
+<variant type-name-pattern="BIT"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="is_files_allowed" remarks="" uid="1d137a8:119e09aeb40:-7fe2">
+<column-description/>
+<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
+<variant type-name-pattern="BIT"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="is_files_required" remarks="" uid="1d137a8:119e09aeb40:-7fe1">
+<column-description/>
+<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
+<variant type-name-pattern="BIT"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="is_comments_files_allowed" remarks="" uid="1bef877:1182ac6c3bb:-7f5d">
 <column-description/>
 <data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
 <variant type-name-pattern="BIT"/>

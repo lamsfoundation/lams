@@ -57,12 +57,17 @@ public class TaskListItem  implements Cloneable{
 	//general infomation
 	private Date createDate;
 	private TaskListUser createBy;
-	//advance
+	//advanced
 	private boolean isRequired;
 	private boolean isCommentsAllowed;
-	private boolean showCommentsToAll;
+	private boolean isCommentsRequired;
+	private boolean isFilesAllowed;
+	private boolean isFilesRequired;
 	private boolean isChildTask;
 	private String parentTaskName;
+	//advanced options that are not used now 
+	private boolean isCommentsFilesAllowed;
+	private boolean showCommentsToAll;
 	
 	//Set of uploaded files
 	private Set attachments;
@@ -79,6 +84,11 @@ public class TaskListItem  implements Cloneable{
   	public TaskListItem(){
   		attachments = new HashSet();
   		comments = new HashSet();
+  		
+  		// TODO doing this because it will be not visible on the authoring page.
+		// get rid of this when it'll be defined if it's needs or not finally.
+  		isCommentsFilesAllowed = true;
+  		showCommentsToAll = true;
   	}
   	
   	//  **********************************************************
@@ -286,18 +296,7 @@ public class TaskListItem  implements Cloneable{
 	public void setRequired(boolean isRequired) {
 		this.isRequired = isRequired;
 	}
-		
-	/**
-	 * @hibernate.property column="show_comments_to_all" 
-	 * @return
-	 */
-	public boolean getShowCommentsToAll() {
-		return showCommentsToAll;
-	}
-	public void setShowCommentsToAll(boolean showCommentsToAll) {
-		this.showCommentsToAll = showCommentsToAll;
-	}
-		
+	
 	/**
 	 * @hibernate.property column="is_comments_allowed" 
 	 * @return
@@ -307,6 +306,39 @@ public class TaskListItem  implements Cloneable{
 	}
 	public void setCommentsAllowed(boolean isCommentsAllowed) {
 		this.isCommentsAllowed = isCommentsAllowed;
+	}
+	
+	/**
+	 * @hibernate.property column="is_comments_required" 
+	 * @return
+	 */
+	public boolean isCommentsRequired() {
+		return isCommentsRequired;
+	}
+	public void setCommentsRequired(boolean isCommentsRequired) {
+		this.isCommentsRequired = isCommentsRequired;
+	}
+	
+	/**
+	 * @hibernate.property column="is_files_allowed" 
+	 * @return
+	 */
+	public boolean isFilesAllowed() {
+		return isFilesAllowed;
+	}
+	public void setFilesAllowed(boolean isFilesAllowed) {
+		this.isFilesAllowed = isFilesAllowed;
+	}
+	
+	/**
+	 * @hibernate.property column="is_files_required" 
+	 * @return
+	 */
+	public boolean isFilesRequired() {
+		return isFilesRequired;
+	}
+	public void setFilesRequired(boolean isFilesRequired) {
+		this.isFilesRequired = isFilesRequired;
 	}
 		
 	/**
@@ -329,6 +361,28 @@ public class TaskListItem  implements Cloneable{
 	}
 	public void setParentTaskName(String parentTaskName) {
 		this.parentTaskName = parentTaskName;
+	}
+	
+	/**
+	 * @hibernate.property column="show_comments_to_all" 
+	 * @return
+	 */
+	public boolean getShowCommentsToAll() {
+		return showCommentsToAll;
+	}
+	public void setShowCommentsToAll(boolean showCommentsToAll) {
+		this.showCommentsToAll = showCommentsToAll;
+	}
+		
+	/**
+	 * @hibernate.property column="is_comments_files_allowed" 
+	 * @return
+	 */
+	public boolean isCommentsFilesAllowed() {
+		return isCommentsFilesAllowed;
+	}
+	public void setCommentsFilesAllowed(boolean isCommentsFilesAllowed) {
+		this.isCommentsFilesAllowed = isCommentsFilesAllowed;
 	}
 		
 	/**

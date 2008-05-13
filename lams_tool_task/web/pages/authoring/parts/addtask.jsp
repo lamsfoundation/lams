@@ -50,7 +50,51 @@
 			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />					
 	        <c:set var="sessionMapID" value="${formBean.sessionMapID}" />				
 		    <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+		    
+		    <div class="space-top">
+				<html:checkbox property="commentsAllowed" styleClass="noBorder"	styleId="isCommentsAllowed"
+					onclick="document.taskListItemForm.commentsRequired.disabled = !document.taskListItemForm.commentsRequired.disabled;">
+				</html:checkbox>
 
+				<label for="isCommentsAllowed">
+					<fmt:message key="label.authoring.basic.task.isCommentsAllowed" />
+				</label>
+			</div>
+					
+			<div class="space-top">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+				<html:checkbox property="commentsRequired" styleClass="noBorder" styleId="isCommentsRequired" 
+					disabled="${not formBean.commentsAllowed}" >
+				</html:checkbox>
+					
+				<label for="isCommentsRequired">
+					<fmt:message key="label.authoring.basic.task.isCommentsRequired" />
+				</label>
+			</div>
+			
+		    <div class="space-top">
+				<html:checkbox property="filesAllowed" styleClass="noBorder" styleId="isFilesAllowed"
+					onclick="document.taskListItemForm.filesRequired.disabled = !document.taskListItemForm.filesRequired.disabled;">
+				</html:checkbox>
+
+				<label for="isFilesAllowed">
+					<fmt:message key="label.authoring.basic.task.isFilesAllowed" />
+				</label>
+			</div>
+					
+			<div class="space-top">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	
+				<html:checkbox property="filesRequired" styleClass="noBorder" styleId="isFilesRequired"  
+					disabled="${not formBean.filesAllowed}">
+				</html:checkbox>
+					
+				<label for="isFilesRequired">
+					<fmt:message key="label.authoring.basic.task.isFilesRequired" />
+				</label>
+			</div>
+		    
+<%-- 
 			<div class="space-top">
 				<html:checkbox property="commentsAllowed" styleClass="noBorder"	styleId="isCommentsAllowed"
 					onclick="document.taskListItemForm.showCommentsToAll[0].disabled = !document.taskListItemForm.showCommentsToAll[0].disabled;
@@ -58,7 +102,7 @@
 				</html:checkbox>
 
 				<label for="isCommentsAllowed">
-					<fmt:message key="label.authoring.basic.task.isCommentsAllowed" />
+					<fmt:message key="label.authoring.basic.task.isCommentsFilesAllowed" />
 				</label>
 			</div>
 					
@@ -83,6 +127,8 @@
 					<fmt:message key="label.authoring.basic.task.show.to.all.learners" />
 				</label>
 			</div>
+--%>			
+			
 			
 			<div class="space-top" ">
 				<html:checkbox property="childTask" styleClass="noBorder" 

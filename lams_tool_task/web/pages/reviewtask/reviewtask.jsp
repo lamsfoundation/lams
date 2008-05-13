@@ -51,7 +51,7 @@
 
 			<p>${sessionMap.taskListItemDescription}</p>
 
-			<c:if test="${sessionMap.taskListItem.commentsAllowed}">
+			<c:if test="${sessionMap.taskListItem.commentsFilesAllowed}">
 				
 				<!-- Comments Part -->
 				<br/><br/>

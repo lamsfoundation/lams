@@ -46,8 +46,14 @@ public class TaskListItemForm extends ActionForm {
 	
 	private boolean isRequired;
 	private boolean isCommentsAllowed;
-	private boolean showCommentsToAll;
+	private boolean isCommentsRequired;
+	private boolean isFilesAllowed;
+	private boolean isFilesRequired;
 	private boolean isChildTask;
+	
+	//commented out for now. Waiting for the final decision -- if it's gonna be used in Authoring.
+//	private boolean isCommentsFilesAllowed;
+//	private boolean showCommentsToAll;
 	
 	private String parentTaskName;
 	
@@ -172,23 +178,94 @@ public class TaskListItemForm extends ActionForm {
 	public void setCommentsAllowed(boolean isCommentsAllowed) {
 		this.isCommentsAllowed = isCommentsAllowed;
 	}
+	
+	/**
+	 * Returns whether comments are required to complete this <code>TaskLiskItem</code>.
+	 * 
+	 * @return true if comments are required to complete this <code>TaskLiskItem</code>, false otherwise.
+	 */
+	public boolean isCommentsRequired() {
+		return isCommentsRequired;
+	}
+	/**
+	 * Sets whether comments are required to complete this <code>TaskLiskItem</code>.
+	 * 
+	 * @param isCommentsAllowed true if comments are required to complete this <code>TaskLiskItem</code>, false otherwise.
+	 */
+	public void setCommentsRequired(boolean isCommentsRequired) {
+		this.isCommentsRequired = isCommentsRequired;
+	}
+	
+	/**
+	 * Returns whether files are allowed in this <code>TaskLiskItem</code>.
+	 * 
+	 * @return true if files are allowed in this <code>TaskLiskItem</code>, false otherwise.
+	 */
+	public boolean isFilesAllowed() {
+		return isFilesAllowed;
+	}
+	/**
+	 * Sets whether files are allowed in this <code>TaskLiskItem</code>.
+	 * 
+	 * @param isCommentsAllowed true if files are allowed in this <code>TaskLiskItem</code>, false otherwise.
+	 */
+	public void setFilesAllowed(boolean isFilesAllowed) {
+		this.isFilesAllowed = isFilesAllowed;
+	}
+	
 
+	
 	/**
-	 * Returns whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>.
+	 * Returns whether files are required to complete this <code>TaskLiskItem</code>.
 	 * 
-	 * @return true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false otherwise.
+	 * @return true if files are required to complete this <code>TaskLiskItem</code>, false otherwise.
 	 */
-	public boolean getShowCommentsToAll() {
-		return showCommentsToAll;
+	public boolean isFilesRequired() {
+		return isFilesRequired;
 	}
 	/**
-	 * Sets whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code> or not.
+	 * Sets whether files are required to complete this <code>TaskLiskItem</code>.
 	 * 
-	 * @param showCommentsToAll true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false otherwise.
+	 * @param isCommentsAllowed true if files are required to complete this <code>TaskLiskItem</code>, false otherwise.
 	 */
-	public void setShowCommentsToAll(boolean showCommentsToAll) {
-		this.showCommentsToAll = showCommentsToAll;
+	public void setFilesRequired(boolean isFilesRequired) {
+		this.isFilesRequired = isFilesRequired;
 	}
+	
+	//commented out for now. Waiting for the final decision -- if it's gonna be used in Authoring.
+//	/**
+//	 * Returns whether comments are allowed in this <code>TaskLiskItem</code>.
+//	 * 
+//	 * @return true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
+//	 */
+//	public boolean isCommentsFilesAllowed() {
+//		return isCommentsFilesAllowed;
+//	}
+//	/**
+//	 * Sets whether comments are allowed in this <code>TaskLiskItem</code>.
+//	 * 
+//	 * @param isCommentsAllowed true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
+//	 */
+//	public void setCommentsFilesAllowed(boolean isCommentsFilesAllowed) {
+//		this.isCommentsFilesAllowed = isCommentsFilesAllowed;
+//	}
+//
+//	/**
+//	 * Returns whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>.
+//	 * 
+//	 * @return true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false otherwise.
+//	 */
+//	public boolean getShowCommentsToAll() {
+//		return showCommentsToAll;
+//	}
+//	/**
+//	 * Sets whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code> or not.
+//	 * 
+//	 * @param showCommentsToAll true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false otherwise.
+//	 */
+//	public void setShowCommentsToAll(boolean showCommentsToAll) {
+//		this.showCommentsToAll = showCommentsToAll;
+//	}
 	
 	/**
 	 * Returns whether this <code>TaskLiskItem</code> is a child task.

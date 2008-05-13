@@ -927,15 +927,14 @@ public class AuthoringAction extends Action {
 			form.setItemIndex(new Integer(itemIdx).toString());
 		form.setRequired(item.isRequired());
 		form.setCommentsAllowed(item.isCommentsAllowed());
-		form.setShowCommentsToAll(item.getShowCommentsToAll());
+		form.setCommentsRequired(item.isCommentsRequired());
+		form.setFilesAllowed(item.isFilesAllowed());
+		form.setFilesRequired(item.isFilesRequired());
+		//commented out for now. Waiting for the final decision -- if it's gonna be used in Authoring.
+//		form.setCommentsFilesAllowed(item.isCommentsFilesAllowed());
+//		form.setShowCommentsToAll(item.getShowCommentsToAll());
 		form.setChildTask(item.isChildTask());
 		form.setParentTaskName(item.getParentTaskName());
-		
-		//FOR requirment from LDEV-754
-		//add extra blank line for instructions
-		//		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
-		//			instructions.add("");
-		//		}
 	}
 	
 	/**
@@ -971,16 +970,6 @@ public class AuthoringAction extends Action {
 			List<TaskListItem> rList = new ArrayList<TaskListItem>(taskListList);
 			item = rList.get(itemIdx);
 		}
-		/* Set following fields regards to the type:
-	    item.setFileUuid();
-		item.setFileVersionId();
-		item.setFileType();
-		item.setFileName();
-		
-		item.getInitialItem()
-		item.setImsSchema()
-		item.setOrganizationXml()
-		 */
 
 		item.setTitle(itemForm.getTitle());
 		item.setDescription(itemForm.getDescription());
@@ -988,7 +977,12 @@ public class AuthoringAction extends Action {
 		
 		item.setRequired(itemForm.isRequired());
 		item.setCommentsAllowed(itemForm.isCommentsAllowed());
-		item.setShowCommentsToAll(itemForm.getShowCommentsToAll());
+		item.setCommentsRequired(itemForm.isCommentsRequired());
+		item.setFilesAllowed(itemForm.isFilesAllowed());
+		item.setFilesRequired(itemForm.isFilesRequired());
+		//commented out for now. Waiting for the final decision -- if it's gonna be used in Authoring.
+//		item.setCommentsFilesAllowed(itemForm.isCommentsAllowed());
+//		item.setShowCommentsToAll(itemForm.getShowCommentsToAll());
 		item.setChildTask(itemForm.isChildTask());
 		item.setParentTaskName(itemForm.getParentTaskName());
 	}
