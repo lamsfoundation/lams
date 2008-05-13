@@ -85,6 +85,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
@@ -130,6 +131,8 @@ public class VoteServicePOJO implements
 	private ICoreNotebookService 	coreNotebookService;
     private IToolContentHandler		voteToolContentHandler = null;
 	private VoteOutputFactory 		voteOutputFactory;
+
+	private MessageService messageService;
     
     public VoteServicePOJO(){}
     
@@ -2667,4 +2670,17 @@ public class VoteServicePOJO implements
 	public void setVoteOutputFactory(VoteOutputFactory voteOutputFactory) {
 		this.voteOutputFactory = voteOutputFactory;
 	}
+	
+	/**
+     * @return Returns the MessageService.
+     */
+    public MessageService getMessageService() {
+        return messageService;
+    }
+    /**
+     * @param messageService The MessageService to set.
+     */
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
+    }
 }

@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -248,7 +249,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		    VoteSession voteSession=voteService.retrieveVoteSession(new Long(currentMonitoredToolSession));
     		logger.debug("voteSession uid:" + voteSession.getUid());
 		    MonitoringUtil.prepareChartData(request, voteService, voteMonitoringForm, voteContent.getVoteContentId().toString(), 
-		            voteSession.getUid().toString(), null, voteGeneralMonitoringDTO);
+		            voteSession.getUid().toString(), null, voteGeneralMonitoringDTO, getMessageService());
 		    
 		    logger.debug("post prepareChartData, voteGeneralMonitoringDTO:" + voteGeneralMonitoringDTO);
 
@@ -3829,5 +3830,12 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
         
         return reflectionsContainerDTO;
     }
+    
+    /**
+	 * Return ResourceService bean.
+	 */
+	private MessageService getMessageService() {
+	     return (MessageService) VoteServiceProxy.getMessageService(getServlet().getServletContext());
+	}
 }
     

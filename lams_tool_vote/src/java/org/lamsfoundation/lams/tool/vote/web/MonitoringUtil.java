@@ -53,6 +53,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * 
@@ -887,7 +888,7 @@ public class MonitoringUtil implements VoteAppConstants{
 	 */
 	public static void prepareChartData(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, 
 	        String toolContentID, String toolSessionUid, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO, 
-	        VoteGeneralMonitoringDTO voteGeneralMonitoringDTO)
+	        VoteGeneralMonitoringDTO voteGeneralMonitoringDTO, MessageService messageService)
 	{
 	    logger.debug("starting prepareChartData, voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
 	    logger.debug("starting prepareChartData, toolContentID: " + toolContentID);
@@ -1076,8 +1077,8 @@ public class MonitoringUtil implements VoteAppConstants{
 		logger.debug("final share: " + share);
 
 		if(voteContent.isAllowText()) {
-		    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
-		    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), "Open Vote");
+		    mapStandardNominationsContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
+		    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
 		}
 		
 		mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
@@ -1133,7 +1134,7 @@ public class MonitoringUtil implements VoteAppConstants{
 	 * @param toolSessionUid
 	 */
 	public static void prepareChartDataForExportTeacher(HttpServletRequest request, IVoteService voteService, 
-	        VoteMonitoringForm voteMonitoringForm, Long toolContentID, Long toolSessionUid, ExportPortfolioDTO exportPortfolioDTO)
+	        VoteMonitoringForm voteMonitoringForm, Long toolContentID, Long toolSessionUid, ExportPortfolioDTO exportPortfolioDTO, MessageService messageService)
 	{
 	    logger.debug("starting prepareChartDataForExportTeacher, toolContentID: " + toolContentID);
 	    logger.debug("starting prepareChartDataForExportTeacher, toolSessionUid: " + toolSessionUid);
@@ -1240,8 +1241,8 @@ public class MonitoringUtil implements VoteAppConstants{
 		logger.debug("final share: " + share);
 
         
-	    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
-	    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), "Open Vote");
+	    mapStandardNominationsContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
+	    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
 	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
 	    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
 	    

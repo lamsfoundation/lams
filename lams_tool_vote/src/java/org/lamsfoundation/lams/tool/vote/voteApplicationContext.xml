@@ -11,6 +11,12 @@
 <!-- ========================= GENERAL DEFINITIONS ========================= -->
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	<bean id="lavoteMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename"><value>org.lamsfoundation.lams.tool.vote.ApplicationResources</value></property>
+	</bean>
+	<bean id="lavoteMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource"><ref local="lavoteMessageSource"/></property>										
+	</bean>
 	
 	<!-- Hibernate SessionFactory -->
 	<bean id="voteSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
@@ -65,8 +71,7 @@
 	<!-- end of tool beans -->
 	
 	<bean id="voteOutputFactory" class="org.lamsfoundation.lams.tool.vote.service.VoteOutputFactory">
-		<property name="loadedMessageSourceService"><ref bean="loadedMessageSourceService"/></property>
-		<property name="languageFilename"><value>org.lamsfoundation.lams.tool.vote.ApplicationResources</value></property>
+		<property name="toolMessageService"><ref bean="lavoteMessageService"/></property>
 	</bean>
 	
 	<bean id="voteService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -86,7 +91,8 @@
 					<property name="voteToolContentHandler"><ref bean="voteToolContentHandler"/></property>		
 			   		<property name="exportContentService"><ref bean="exportToolContentService"/></property>						
 			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>								   		
-			   		<property name="voteOutputFactory"><ref bean="voteOutputFactory"/></property>								   		
+			   		<property name="voteOutputFactory"><ref bean="voteOutputFactory"/></property>
+			   		<property name="messageService"><ref bean="lavoteMessageService"/></property>
 				</bean>
 			</property>
 			<property name="transactionAttributes">

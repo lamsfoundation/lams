@@ -189,6 +189,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -370,7 +371,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    
  		VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
 	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
-	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
+	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO, getMessageService());
 
    	    logger.debug("fwd'ing to: " + EXIT_PAGE);
    	    return (mapping.findForward(EXIT_PAGE));
@@ -482,7 +483,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     		
      		VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
     	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
-    	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
+    	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO, getMessageService());
 
     	    
     	    String isContentLockOnFinish=voteLearningForm.getLockOnFinish();
@@ -750,5 +751,12 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		errors.add(Globals.ERROR_KEY, new ActionMessage(message));
 		logger.debug("add " + message +"  to ActionMessages:");
 		saveErrors(request,errors);	    	    
+	}
+	
+	/**
+	 * Return ResourceService bean.
+	 */
+	private MessageService getMessageService() {
+	     return (MessageService) VoteServiceProxy.getMessageService(getServlet().getServletContext());
 	}
 }  

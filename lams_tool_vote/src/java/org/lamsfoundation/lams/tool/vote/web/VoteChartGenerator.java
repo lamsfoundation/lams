@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.util.ChartUtil;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * <p> Enables generation of JFreeCharts </p>
@@ -80,7 +81,8 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
             {
                 logger.debug("currentSessionId is specified, generating data for all sessions dto: ");
                 IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
-        		
+        		MessageService messageService = VoteServiceProxy.getMessageService(getServletContext());
+                
         		VoteSession voteSession=voteService.retrieveVoteSession(new Long(currentSessionId));
         		logger.debug("voteSession uid:" + voteSession.getUid());
         		
@@ -88,7 +90,7 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
 
                 VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
                 MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
-                        voteSession.getUid().toString(), null, voteGeneralMonitoringDTO);
+                        voteSession.getUid().toString(), null, voteGeneralMonitoringDTO, messageService);
                 
                 if ( logger.isDebugEnabled() )  {
                 	logger.debug("creating maps MAP_STANDARD_NOMINATIONS_CONTENT and MAP_STANDARD_RATES_CONTENT: " + currentSessionId);

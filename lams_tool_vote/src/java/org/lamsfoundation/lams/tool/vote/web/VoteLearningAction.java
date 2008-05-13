@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * <p>Action class that controls the logic of tool behavior. </p>
@@ -280,7 +281,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
 	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(), 
-	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
+	            voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO, getMessageService());
 	    logger.debug("end of  prepareChartData:" +  voteContent.getVoteContentId() + " " +  voteSession.getUid());
 		
 	    
@@ -783,7 +784,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
     	logger.debug("calling  prepareChartData: " + toolContentID);
     	MonitoringUtil.prepareChartData(request, voteService, null, toolContentID.toString(), toolSessionUid.toString(), 
-    	        voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO);
+    	        voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO, getMessageService());
     	
     	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
 		voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
@@ -1068,6 +1069,13 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	logger.debug("userEntry: " + userEntry);
     	voteLearningForm.setUserEntry(userEntry);
     }
+    
+    /**
+	 * Return ResourceService bean.
+	 */
+	private MessageService getMessageService() {
+	     return (MessageService) VoteServiceProxy.getMessageService(getServlet().getServletContext());
+	}
 }
 
 

@@ -26,6 +26,7 @@ import javax.servlet.ServletContext;
 
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -62,10 +63,20 @@ public class VoteServiceProxy
         return (ToolContentManager)getVoteDomainService(servletContext);
     }
 
+    public static final MessageService getMessageService(ServletContext servletContext){
+		return (MessageService) getVoteMessageService(servletContext);
+	}
+    
     private static Object getVoteDomainService(ServletContext servletContext)
     {
         WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
         return wac.getBean("voteService");
+    }   
+    
+    private static Object getVoteMessageService(ServletContext servletContext)
+    {
+        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        return wac.getBean("lavoteMessageService");
     }
     
 }

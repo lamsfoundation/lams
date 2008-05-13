@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.util.ChartUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 /**
  * <p> Enables exporting portfolio for teacher and learner modes. </p> 
@@ -110,6 +111,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 	    exportPortfolioDTO.setPortfolioExportMode("learner");
         
     	IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
+    	MessageService messageService = VoteServiceProxy.getMessageService(getServletContext());
     	
         if (userID == null || toolSessionID == null)
         {
@@ -144,7 +146,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 	    	
 	    	
 	    	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), 
-	    	        voteSession.getUid(), exportPortfolioDTO);
+	    	        voteSession.getUid(), exportPortfolioDTO, messageService);
 	    	    	
 	    	// VoteChartGenerator.create{Pie|Bar}Chart expects these to be session attributes
 	    	if ( voteSession.getVoteContent().isShowResults() ) {
@@ -173,7 +175,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         exportPortfolioDTO.setPortfolioExportMode("teacher");
         
         IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
-       
+        MessageService messageService = VoteServiceProxy.getMessageService(getServletContext());
+        
         if (toolContentID==null)
         {
             String error="Tool Content Id is missing. Unable to continue";
@@ -195,7 +198,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         
         voteMonitoringAction.refreshSummaryData(request, content, voteService, true, false, null, null, false, null, voteGeneralMonitoringDTO, exportPortfolioDTO);
         
-    	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), null, exportPortfolioDTO);
+    	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), null, exportPortfolioDTO, messageService);
     	// VoteChartGenerator.create{Pie|Bar}Chart expects these to be session attributes
     	request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, exportPortfolioDTO.getMapStandardNominationsContent());
     	request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, exportPortfolioDTO.getMapStandardRatesContent());
@@ -231,5 +234,5 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         {
             logger.error("exception creating chart: ",e) ;
         }
-      }
+    }
 }
