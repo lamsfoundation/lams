@@ -17,112 +17,122 @@
 <body class="stripes">
 
 
-<div id="content">
+	<div id="content">
 
-<h1>
-	${title}
-</h1>
+	<h1>
+		${title}
+	</h1>
 
-<c:forEach var="entry" items="${ToolContentTopicList}">
-	<c:set var="sessionName" value="${entry.key}"/>
-	<h2>
-		${sessionName}
-	</h2>
-	
-	<c:set var="topicThread" value="${entry.value}"/>
-	<c:forEach var="msgDto" items="${topicThread}">
-		<c:set var="indentSize" value="${msgDto.level*3}" />
-		<c:set var="hidden" value="${msgDto.message.hideFlag}" />
-		<div style="margin-left:<c:out value="${indentSize}"/>em;">
-			<table cellspacing="0" class="forum">
-				<tr>
-					<th class="first">
-						<c:choose>
-							<c:when test='${(mode == "teacher") || (not hidden)}'>
-								<b> <c:out value="${msgDto.message.subject}" /> </b>
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="topic.message.subject.hidden" />
-							</c:otherwise>
-						</c:choose>
-					</th>
-				</tr>
-				<tr>
-					<td class="first posted-by">
-						<c:if test='${(mode == "teacher") || (not hidden)}'>
-							<fmt:message key="lable.topic.subject.by" />
-							<c:set var="author" value="${msgDto.author}"/>
-							<c:if test="${empty author}">
-								<c:set var="author">
-									<fmt:message key="label.default.user.name"/>
-								</c:set>
-							</c:if>
-							${author}						
-									-
-							<lams:Date value="${msgDto.message.updated}"/>
+		<c:forEach var="entry" items="${ToolContentTopicList}">
+			<c:set var="sessionName" value="${entry.key}"/>
+
+			<h2>
+				${sessionName}
+			</h2>
+
+			<c:set var="topicThread" value="${entry.value[0]}"/>
+			<c:forEach var="msgDto" items="${topicThread}">
+				<c:set var="indentSize" value="${msgDto.level*3}" />
+				<c:set var="hidden" value="${msgDto.message.hideFlag}" />
+				<div style="margin-left:<c:out value='${indentSize}'/>em;">
+					<table cellspacing="0" class="forum">
+						<tr>
+							<th class="first">
+								<c:choose>
+									<c:when test='${(mode == "teacher") || (not hidden)}'>
+										<b> <c:out value="${msgDto.message.subject}" /> </b>
+									</c:when>
+									<c:otherwise>
+										<fmt:message key="topic.message.subject.hidden" />
+									</c:otherwise>
+								</c:choose>
+							</th>
+						</tr>
+						<tr>
+							<td class="first posted-by">
+								<c:if test='${(mode == "teacher") || (not hidden)}'>
+									<fmt:message key="lable.topic.subject.by" />
+									<c:set var="author" value="${msgDto.author}"/>
+									<c:if test="${empty author}">
+										<c:set var="author">
+											<fmt:message key="label.default.user.name"/>
+										</c:set>
+									</c:if>
+									${author}						
+											-
+									<lams:Date value="${msgDto.message.updated}"/>
+								</c:if>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<c:if test='${(not hidden) || (hidden && mode == "teacher")}'>
+									<c:out value="${msgDto.message.body}" escapeXml="false" />
+								</c:if>
+								<c:if test='${hidden}'>
+									<fmt:message key="topic.message.body.hidden" />
+								</c:if>
+							</td>
+						</tr>
+
+						<c:if test="${not empty msgDto.message.attachments}">
+							<tr>
+								<td>
+									<c:forEach var="file" items="${msgDto.message.attachments}">
+										<a href="${msgDto.attachmentLocalUrl}"> <c:out value="${msgDto.attachmentName}" /> </a>
+									</c:forEach>
+								</td>
+							</tr>
 						</c:if>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<c:if test='${(not hidden) || (hidden && mode == "teacher")}'>
-							<c:out value="${msgDto.message.body}" escapeXml="false" />
+						<%-- display mark for teacher --%>
+						<c:if test="${(msgDto.released && msgDto.isAuthor)|| mode=='teacher'}">
+							<tr>
+								<td>
+									<span class="field-name" ><fmt:message key="lable.topic.title.mark"/></span>
+									<br>
+									<c:choose>
+										<c:when test="${empty msgDto.mark}">
+											<fmt:message key="message.not.avaliable"/>
+										</c:when>
+										<c:otherwise>
+											<fmt:formatNumber value="${msgDto.mark}"  maxFractionDigits="1"/>
+										</c:otherwise>
+									</c:choose>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<span class="field-name" ><fmt:message key="lable.topic.title.comment"/></span>
+									<br>
+									<c:choose>
+										<c:when test="${empty msgDto.comment}">
+											<fmt:message key="message.not.avaliable"/>
+										</c:when>
+										<c:otherwise>
+											<c:out value="${msgDto.comment}" escapeXml="false" />
+										</c:otherwise>
+									</c:choose>
+								</td>
+							</tr>
 						</c:if>
-						<c:if test='${hidden}'>
-							<fmt:message key="topic.message.body.hidden" />
-						</c:if>
-					</td>
-				</tr>
-	
-				<c:if test="${not empty msgDto.message.attachments}">
-					<tr>
-						<td>
-							<c:forEach var="file" items="${msgDto.message.attachments}">
-								<a href="${msgDto.attachmentLocalUrl}"> <c:out value="${msgDto.attachmentName}" /> </a>
-							</c:forEach>
-						</td>
-					</tr>
-				</c:if>
-				<%-- display mark for teacher --%>
-				<c:if test="${(msgDto.released && msgDto.isAuthor)|| mode=='teacher'}">
-					<tr>
-						<td>
-							<span class="field-name" ><fmt:message key="lable.topic.title.mark"/></span>
-							<BR>
-							<c:choose>
-								<c:when test="${empty msgDto.mark}">
-									<fmt:message key="message.not.avaliable"/>
-								</c:when>
-								<c:otherwise>
-									<fmt:formatNumber value="${msgDto.mark}"  maxFractionDigits="1"/>
-								</c:otherwise>
-							</c:choose>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<span class="field-name" ><fmt:message key="lable.topic.title.comment"/></span>
-							<BR>
-							<c:choose>
-								<c:when test="${empty msgDto.comment}">
-									<fmt:message key="message.not.avaliable"/>
-								</c:when>
-								<c:otherwise>
-									<c:out value="${msgDto.comment}" escapeXml="false" />
-								</c:otherwise>
-							</c:choose>
-						</td>
-					</tr>
-				</c:if>
-			</table>
-		</div>
-	</c:forEach>
-</c:forEach>
+					</table>
+				</div>
+			</c:forEach>
 
+			<c:set var="userDTOList" value="${entry.value[1]}"/>
+			<c:if test="${userDTOList ne null}">
+				<h3><fmt:message key="label.export.reflection" /></h3>
+				<c:forEach var="userDTO" items="${userDTOList}">
+					<h4>${userDTO.fullName}</h4>
+					<p>
+						<c:out value="${userDTO.reflect}" escapeXml="true" /> 
+					</p>	
+				</c:forEach>
+			</c:if>
+			
+		</c:forEach>
 
-</div>
-
-
+	</div>
 
 </body>
 </lams:html>

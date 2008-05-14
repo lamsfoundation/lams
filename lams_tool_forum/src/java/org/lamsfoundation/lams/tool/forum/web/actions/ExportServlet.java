@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +42,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
@@ -67,6 +70,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 	private final String FILENAME = "forum_main.html";
 	ForumToolContentHandler handler;
 	
+	private static IForumService forumService;
 	
 	private class StringComparator implements Comparator<String>{
 		public int compare(String o1, String o2) {
@@ -79,11 +83,16 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 		}
 	}
 	
+	@Override
+	public void init() throws ServletException {
+		forumService = ForumServiceProxy.getForumService(getServletContext());		
+		super.init();
+	}
+	
 	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
         if (toolContentID == null && toolSessionID == null) {
             logger.error("Tool content Id or and session Id are null. Unable to activity title");
        } else {
-            IForumService forumService = ForumServiceProxy.getForumService(getServletContext());
             Forum forum = null;
             if ( toolContentID != null ) {
             	forum = forumService.getForumByContentId(toolContentID);
@@ -102,7 +111,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{
 		
-//		initial sessionMap
+		// initial sessionMap
 		SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		
@@ -120,11 +129,9 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 		
 		return FILENAME;
 	}
+	
     public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
     {
-        
-        IForumService forumService = ForumServiceProxy.getForumService(getServletContext());
-        
         if (userID == null || toolSessionID == null)
         {
             String error = "Tool session Id or user Id is null. Unable to continue";
@@ -132,38 +139,47 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
             throw new ForumException(error);
         }
         
-        ForumUser learner = forumService.getUserByUserAndSession(userID,toolSessionID);
+        ForumUser forumUser = forumService.getUserByUserAndSession(userID,toolSessionID);
+        ForumToolSession session = forumUser.getSession();
+        Forum content = session.getForum();
         
-        if (learner == null)
+        if (forumUser == null)
         {
             String error="The user with user id " + userID + " does not exist in this session or session may not exist.";
             logger.error(error);
             throw new ForumException(error);
         }
         
-		// get root topic list and its children topics
-        List<MessageDTO> msgDtoList = getSessionTopicList(toolSessionID, directoryName, forumService);
-        //set author flag, to decide if display mark of topics.Only author allow see his own mark. 
+        // Get Messages
+		// Get root topic list and its children topics
+        List<MessageDTO> msgDtoList = getSessionTopicList(toolSessionID, directoryName);
+        // Set author flag, to decide if display mark of topics.Only author allow see his own mark. 
         setAuthorMark(msgDtoList);
         
-        ForumToolSession session = forumService.getSessionBySessionId(toolSessionID);
+        List<org.lamsfoundation.lams.tool.forum.dto.UserDTO> userDTOList = null;
+        if (content.isReflectOnActivity()) {
+	        // Get user reflection entries
+	        userDTOList = new ArrayList<org.lamsfoundation.lams.tool.forum.dto.UserDTO>();
+	   		userDTOList.add(getReflectionEntry(forumUser));
+    	}
         
-        //put all message into Map. Key is session name, value is list of all topics in this session.
-        Map sessionTopicMap = new TreeMap();
-        sessionTopicMap.put(session.getSessionName(), msgDtoList);
+   		// Store both in an object array
+        Object[] pair = {msgDtoList, userDTOList};   
+        
+        // Add array to Map
+        // put all message into Map. Key is session name, value is list of all topics in this session.
+        Map<String,Object[]> sessionTopicMap = new TreeMap<String,Object[]>();
+        sessionTopicMap.put(session.getSessionName(), pair);
         
 		sessionMap.put(ForumConstants.ATTR_TOOL_CONTENT_TOPICS, sessionTopicMap);
 		
-		//set forum title 
-		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE, session.getForum().getTitle());
+		// Set forum title 
+		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE, content.getTitle());
 		
     }
-
     
 	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
     {
-    	IForumService forumService = ForumServiceProxy.getForumService(getServletContext());
-       
         //check if toolContentId exists in db or not
         if (toolContentID==null)
         {
@@ -180,20 +196,36 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
             logger.error(error);
             throw new ForumException(error);
         }
-		//return FileDetailsDTO list according to the given sessionID
-        List sessionList = forumService.getSessionsByContentId(toolContentID);
-        Iterator iter = sessionList.iterator();
-        //put all message into Map. Key is session name, value is list of all topics in this session.
-        Map<String,List<MessageDTO>> topicsByUser = new TreeMap<String,List<MessageDTO>>(this.new StringComparator());
-        while(iter.hasNext()){
-        	ForumToolSession session = (ForumToolSession) iter.next();
-        	List<MessageDTO> sessionMsgDTO = getSessionTopicList(session.getSessionId(), directoryName, forumService);
-    		topicsByUser.put(session.getSessionName(),sessionMsgDTO);	
+		// Return FileDetailsDTO list according to the given sessionID
+        List<ForumToolSession> sessionList = forumService.getSessionsByContentId(toolContentID);
+        
+        // put all message into Map. Key is session name, value is list of all topics in this session.
+        Map<String,Object[]> topicsByUser = new TreeMap<String,Object[]>(this.new StringComparator());
+    	for(ForumToolSession session: sessionList) {
+    		// Get Messages
+        	List<MessageDTO> sessionMsgDTO = getSessionTopicList(session.getSessionId(), directoryName);
+        	
+        	List<org.lamsfoundation.lams.tool.forum.dto.UserDTO> userDTOList = null;
+	        if (content.isReflectOnActivity()) {
+	        	// Get user reflection entries
+	        	List<ForumUser> forumUserList = forumService.getUsersBySessionId(session.getSessionId());
+	        	userDTOList = new ArrayList<org.lamsfoundation.lams.tool.forum.dto.UserDTO>();
+	        	for (ForumUser forumUser : forumUserList) {
+	        		userDTOList.add(getReflectionEntry(forumUser));
+	        	}
+        	}
+        	
+        	// Store both in an object array
+        	Object[] pair = {sessionMsgDTO, userDTOList};
+        	
+        	// Add array to map
+    		topicsByUser.put(session.getSessionName(), pair);	
         }
         sessionMap.put(ForumConstants.ATTR_TOOL_CONTENT_TOPICS,topicsByUser);
         
-//      set forum title 
+        // Set forum title 
 		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE, content.getTitle());
+		
     }
 
 	/**
@@ -203,7 +235,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 	 * @param forumService
 	 * @return
 	 */
-	private List<MessageDTO> getSessionTopicList(Long toolSessionID, String directoryName, IForumService forumService) {
+	private List<MessageDTO> getSessionTopicList(Long toolSessionID, String directoryName) {
 		List<MessageDTO> rootTopics = forumService.getRootTopics(toolSessionID);
 		List<MessageDTO> msgDtoList = new ArrayList<MessageDTO>();
 		for(MessageDTO msgDto : rootTopics){
@@ -255,17 +287,17 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 	 * 
 	 * @param msgDtoList
 	 */
-	private void setAuthorMark(List msgDtoList) {
+	private void setAuthorMark(List<MessageDTO> msgDtoList) {
 		// set current user to web page, so that can display "edit" button
-		// correct. Only author alow to edit.
+		// correct. Only author allowed to edit.
 		HttpSession ss = SessionManager.getSession();
 		// get back login user DTO
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
 		Long currUserId = new Long(user.getUserID().intValue());
-		Iterator iter = msgDtoList.iterator();
+		Iterator<MessageDTO> iter = msgDtoList.iterator();
 		while (iter.hasNext()) {
-			MessageDTO dto = (MessageDTO) iter.next();
+			MessageDTO dto = iter.next();
 			if (dto.getMessage().getCreatedBy() != null
 					&& currUserId.equals(dto.getMessage().getCreatedBy()
 							.getUserId()))
@@ -274,5 +306,23 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 				dto.setAuthor(false);
 		}
 	}
-
+	
+	/**
+	 * Retrieves the reflection entry for the forumUser and stores it in a UserDTO  
+	 * @param forumUser
+	 * @param userDTOList
+	 */
+	private org.lamsfoundation.lams.tool.forum.dto.UserDTO getReflectionEntry(ForumUser forumUser) {
+		org.lamsfoundation.lams.tool.forum.dto.UserDTO userDTO = new org.lamsfoundation.lams.tool.forum.dto.UserDTO();
+		userDTO.setFullName(forumUser.getFirstName() + " " + forumUser.getLastName());
+		NotebookEntry notebookEntry = forumService.getEntry(forumUser.getSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, 
+				ForumConstants.TOOL_SIGNATURE, forumUser.getUserId().intValue());
+		
+		// check notebookEntry is not null
+		if (notebookEntry != null) {
+			userDTO.setReflect(notebookEntry.getEntry());
+			logger.debug("Could not find notebookEntry for ForumUser: " + forumUser.getUid());
+		}        		
+		 return userDTO;
+	}
 }
