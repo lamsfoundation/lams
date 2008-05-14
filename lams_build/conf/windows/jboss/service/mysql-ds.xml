@@ -51,6 +51,7 @@ http://www.mysql.com/downloads/api-jdbc-stable.html
     <jndi-name>jdbc/quartz-ds</jndi-name>
     <connection-url>jdbc:mysql://localhost:3306/@db.name@</connection-url>
     <driver-class>com.mysql.jdbc.Driver</driver-class>
+    <connection-property name="characterEncoding">utf8</connection-property>
     <!-- Set transaction isolation level to match db -->
     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>	
     <user-name>@db.username@</user-name>
