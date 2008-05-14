@@ -901,6 +901,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		String reflectionSubject=McUtils.replaceNewLines(mcContent.getReflectionSubject());
 		mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
 
+		mcGeneralLearnerFlowDTO.setLatestAttemptMark(mcQueUsr.getLastAttemptTotalMark());
 		
 		logger.debug("mcGeneralLearnerFlowDTO for jsp: " +  mcGeneralLearnerFlowDTO);
 		

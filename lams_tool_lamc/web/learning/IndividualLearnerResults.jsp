@@ -192,8 +192,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 			<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
-
-				<html:submit property="redoQuestions" styleClass="button">
+				<p>
+					<fmt:message key="label.learner.bestMark"/>
+					<c:out value="${mcGeneralLearnerFlowDTO.latestAttemptMark}"/> 
+					<fmt:message key="label.outof"/> 
+					<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}"/> 
+				</p>
+				
+				<html:submit property="redoQuestionsOk" styleClass="button">
 					<fmt:message key="label.redo.questions" />
 				</html:submit>
 
