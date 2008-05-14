@@ -75,23 +75,23 @@
 		</property>
 	</bean>    
 
-    <bean id="openScheduleGateJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <bean id="openScheduleGateJob" class="org.springframework.scheduling.quartz.JobDetailBean" singleton="false">
         <property name="jobClass">
             <value>org.lamsfoundation.lams.monitoring.quartz.job.OpenScheduleGateJob</value>
         </property>
     </bean>
 
-    <bean id="closeScheduleGateJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <bean id="closeScheduleGateJob" class="org.springframework.scheduling.quartz.JobDetailBean" singleton="false">
         <property name="jobClass">
             <value>org.lamsfoundation.lams.monitoring.quartz.job.CloseScheduleGateJob</value>
         </property>
     </bean>
-    <bean id="startScheduleLessonJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <bean id="startScheduleLessonJob" class="org.springframework.scheduling.quartz.JobDetailBean" singleton="false">
         <property name="jobClass">
             <value>org.lamsfoundation.lams.monitoring.quartz.job.StartScheduleLessonJob</value>
         </property>
     </bean>
-    <bean id="finishScheduleLessonJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <bean id="finishScheduleLessonJob" class="org.springframework.scheduling.quartz.JobDetailBean" singleton="false">
         <property name="jobClass">
             <value>org.lamsfoundation.lams.monitoring.quartz.job.FinishScheduleLessonJob</value>
         </property>
