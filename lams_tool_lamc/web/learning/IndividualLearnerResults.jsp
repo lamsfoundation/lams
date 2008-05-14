@@ -98,7 +98,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						test="${mcGeneralLearnerFlowDTO.userOverPassMark != 'true' && 
 									mcGeneralLearnerFlowDTO.passMarkApplicable == 'true' }">
 
-						<fmt:message key="label.notEnoughMarks" />
+						<fmt:message key="label.notEnoughMarks">
+							<fmt:param>
+								<c:if test="${mcGeneralLearnerFlowDTO.passMark != mcGeneralLearnerFlowDTO.totalMarksPossible}">
+									<fmt:message key="label.atleast" />
+								</c:if>
+								<c:out value="${mcGeneralLearnerFlowDTO.passMark}" />
+								<fmt:message key="label.outof" />
+								<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}" />
+							</fmt:param>
+						</fmt:message>
 
 					</c:if>
 				</c:if>
