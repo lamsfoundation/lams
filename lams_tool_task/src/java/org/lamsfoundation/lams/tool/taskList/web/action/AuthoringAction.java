@@ -930,9 +930,10 @@ public class AuthoringAction extends Action {
 		form.setCommentsRequired(item.isCommentsRequired());
 		form.setFilesAllowed(item.isFilesAllowed());
 		form.setFilesRequired(item.isFilesRequired());
-		//commented out for now. Waiting for the final decision -- if it's gonna be used in Authoring.
-//		form.setCommentsFilesAllowed(item.isCommentsFilesAllowed());
-//		form.setShowCommentsToAll(item.getShowCommentsToAll());
+		// The next 2 options always will be true (as it set in jsp). Waiting
+		// for the final decision -- if this options will be needed later.
+		form.setCommentsFilesAllowed(item.isCommentsFilesAllowed());
+		form.setShowCommentsToAll(item.getShowCommentsToAll());
 		form.setChildTask(item.isChildTask());
 		form.setParentTaskName(item.getParentTaskName());
 	}
@@ -980,9 +981,10 @@ public class AuthoringAction extends Action {
 		item.setCommentsRequired(itemForm.isCommentsRequired());
 		item.setFilesAllowed(itemForm.isFilesAllowed());
 		item.setFilesRequired(itemForm.isFilesRequired());
-		//commented out for now. Waiting for the final decision -- if it's gonna be used in Authoring.
-//		item.setCommentsFilesAllowed(itemForm.isCommentsAllowed());
-//		item.setShowCommentsToAll(itemForm.getShowCommentsToAll());
+		// The next 2 options always will be true (as it set in jsp). Waiting
+		// for the final decision -- if this options will be needed later.
+		item.setCommentsFilesAllowed(itemForm.isCommentsFilesAllowed());
+		item.setShowCommentsToAll(itemForm.getShowCommentsToAll());
 		item.setChildTask(itemForm.isChildTask());
 		item.setParentTaskName(itemForm.getParentTaskName());
 	}

@@ -51,9 +51,10 @@ public class TaskListItemForm extends ActionForm {
 	private boolean isFilesRequired;
 	private boolean isChildTask;
 	
-	//commented out for now. Waiting for the final decision -- if it's gonna be used in Authoring.
-//	private boolean isCommentsFilesAllowed;
-//	private boolean showCommentsToAll;
+	// The next 2 options always will be true (as it set in jsp). Waiting
+	// for the final decision -- if this options will be needed later.
+	private boolean isCommentsFilesAllowed;
+	private boolean showCommentsToAll;
 	
 	private String parentTaskName;
 	
@@ -232,40 +233,41 @@ public class TaskListItemForm extends ActionForm {
 		this.isFilesRequired = isFilesRequired;
 	}
 	
-	//commented out for now. Waiting for the final decision -- if it's gonna be used in Authoring.
-//	/**
-//	 * Returns whether comments are allowed in this <code>TaskLiskItem</code>.
-//	 * 
-//	 * @return true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
-//	 */
-//	public boolean isCommentsFilesAllowed() {
-//		return isCommentsFilesAllowed;
-//	}
-//	/**
-//	 * Sets whether comments are allowed in this <code>TaskLiskItem</code>.
-//	 * 
-//	 * @param isCommentsAllowed true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
-//	 */
-//	public void setCommentsFilesAllowed(boolean isCommentsFilesAllowed) {
-//		this.isCommentsFilesAllowed = isCommentsFilesAllowed;
-//	}
-//
-//	/**
-//	 * Returns whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>.
-//	 * 
-//	 * @return true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false otherwise.
-//	 */
-//	public boolean getShowCommentsToAll() {
-//		return showCommentsToAll;
-//	}
-//	/**
-//	 * Sets whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code> or not.
-//	 * 
-//	 * @param showCommentsToAll true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false otherwise.
-//	 */
-//	public void setShowCommentsToAll(boolean showCommentsToAll) {
-//		this.showCommentsToAll = showCommentsToAll;
-//	}
+	// The next 2 options always will be true (as it set in jsp). Waiting
+	// for the final decision -- if this options will be needed later.
+	/**
+	 * Returns whether comments are allowed in this <code>TaskLiskItem</code>.
+	 * 
+	 * @return true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
+	 */
+	public boolean isCommentsFilesAllowed() {
+		return isCommentsFilesAllowed;
+	}
+	/**
+	 * Sets whether comments are allowed in this <code>TaskLiskItem</code>.
+	 * 
+	 * @param isCommentsAllowed true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
+	 */
+	public void setCommentsFilesAllowed(boolean isCommentsFilesAllowed) {
+		this.isCommentsFilesAllowed = isCommentsFilesAllowed;
+	}
+
+	/**
+	 * Returns whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>.
+	 * 
+	 * @return true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false otherwise.
+	 */
+	public boolean getShowCommentsToAll() {
+		return showCommentsToAll;
+	}
+	/**
+	 * Sets whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code> or not.
+	 * 
+	 * @param showCommentsToAll true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false otherwise.
+	 */
+	public void setShowCommentsToAll(boolean showCommentsToAll) {
+		this.showCommentsToAll = showCommentsToAll;
+	}
 	
 	/**
 	 * Returns whether this <code>TaskLiskItem</code> is a child task.

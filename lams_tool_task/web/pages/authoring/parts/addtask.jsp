@@ -2,6 +2,18 @@
 		"http://www.w3.org/TR/html4/loose.dtd">
 <%@ include file="/common/taglibs.jsp"%>
 
+<script lang="javascript">
+
+	function uncheckIsFilesRequired() {
+		document.getElementById("isFilesRequired").checked=false;
+	}
+	
+	function uncheckIsCommentsRequired() {
+		document.getElementById("isCommentsRequired").checked=false;
+	}
+
+</script>
+
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
@@ -15,6 +27,10 @@
 
 			<html:hidden property="sessionMapID" />
 			<html:hidden property="itemIndex" />
+			
+			<html:hidden property="commentsFilesAllowed" value="${true}"/>
+			<html:hidden property="showCommentsToAll" value="${true}"/>
+			
 			<h2 class="no-space-left">
 				<fmt:message key="label.authoring.basic.add.task" />
 			</h2>
@@ -53,7 +69,7 @@
 		    
 		    <div class="space-top">
 				<html:checkbox property="commentsAllowed" styleClass="noBorder"	styleId="isCommentsAllowed"
-					onclick="document.taskListItemForm.commentsRequired.disabled = !document.taskListItemForm.commentsRequired.disabled;">
+					onclick="uncheckIsCommentsRequired(); document.taskListItemForm.commentsRequired.disabled = !document.taskListItemForm.commentsRequired.disabled;">
 				</html:checkbox>
 
 				<label for="isCommentsAllowed">
@@ -75,7 +91,7 @@
 			
 		    <div class="space-top">
 				<html:checkbox property="filesAllowed" styleClass="noBorder" styleId="isFilesAllowed"
-					onclick="document.taskListItemForm.filesRequired.disabled = !document.taskListItemForm.filesRequired.disabled;">
+					onclick="uncheckIsFilesRequired(); document.taskListItemForm.filesRequired.disabled = !document.taskListItemForm.filesRequired.disabled; ">
 				</html:checkbox>
 
 				<label for="isFilesAllowed">
@@ -86,7 +102,7 @@
 			<div class="space-top">
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	
 				<html:checkbox property="filesRequired" styleClass="noBorder" styleId="isFilesRequired"  
-					disabled="${not formBean.filesAllowed}">
+					disabled="${not formBean.filesAllowed}" >
 				</html:checkbox>
 					
 				<label for="isFilesRequired">

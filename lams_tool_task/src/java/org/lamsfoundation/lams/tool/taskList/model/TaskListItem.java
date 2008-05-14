@@ -84,11 +84,6 @@ public class TaskListItem  implements Cloneable{
   	public TaskListItem(){
   		attachments = new HashSet();
   		comments = new HashSet();
-  		
-  		// TODO doing this because it will be not visible on the authoring page.
-		// get rid of this when it'll be defined if it's needs or not finally.
-  		isCommentsFilesAllowed = true;
-  		showCommentsToAll = true;
   	}
   	
   	//  **********************************************************
@@ -166,7 +161,7 @@ public class TaskListItem  implements Cloneable{
 	//**********************************************************
 	
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid" 
 	 * @return Returns the uid.
 	 */
 	public Long getUid() {
