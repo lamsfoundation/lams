@@ -302,6 +302,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		Map userFilesMap = new HashMap();
 		userFilesMap.put(submitUserDTO, fileList);
 		
+		// Add flag to indicate whether to render user notebook entries
+		sessionMap.put(SbmtConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
+
 		//add session name to construct a new map
 		Map report = new TreeMap(this.new StringComparator());
 		report.put(sbmtService.getSessionById(toolSessionID).getSessionName(), userFilesMap);
@@ -349,6 +352,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			report.put(session.getSessionName(), userFilesMap);
 		}
 		
+		// Add flag to indicate whether to render user notebook entries
+		sessionMap.put(SbmtConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
+
 //		add session name to construct a new map
 		sessionMap.put("report", report);
 

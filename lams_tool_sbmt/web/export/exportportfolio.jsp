@@ -55,15 +55,17 @@
 								</td>
 							</tr>
 							
-							<tr>
-								<td>
-									<fmt:message key="title.reflection" />
-									:
-								</td>
-								<td>
-									<c:out value="${user.reflect}" escapeXml="true" />
-								</td>
-							</tr>
+							<c:if test="${reflectOn}" >
+								<tr>
+									<td>
+										<fmt:message key="title.reflection" />
+										:
+									</td>
+									<td>
+										<c:out value="${user.reflect}" escapeXml="true" />
+									</td>
+								</tr>
+							</c:if>
 							
 							<c:choose>
 							<c:when test="${empty submissionList}">
