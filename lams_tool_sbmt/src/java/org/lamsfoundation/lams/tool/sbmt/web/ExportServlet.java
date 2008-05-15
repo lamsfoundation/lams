@@ -37,9 +37,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,15 +51,18 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.NodeType;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
+import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -68,6 +73,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	private static Logger logger = Logger.getLogger(ExportServlet.class);
 
 	private final String FILENAME = "sbmt_main.html";
+	
+	private ISubmitFilesService sbmtService;
+	
+	@Override
+	public void init() throws ServletException {
+		sbmtService = SubmitFilesServiceProxy.getSubmitFilesService(getServletContext());
+		super.init();
+	}
 	
 	private class StringComparator implements Comparator<String>{
 		public int compare(String o1, String o2) {
@@ -81,19 +94,16 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 	public String doExport(HttpServletRequest request,
 			HttpServletResponse response, String directoryName, Cookie[] cookies) {
-		
-		ISubmitFilesService sbmtService = SubmitFilesServiceProxy
-				.getSubmitFilesService(getServletContext());
-
-		//		initial sessionMap
+		 
+		// initial sessionMap
 		SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		
 		Map map = null;
 		if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
-			map = learner(request, response, directoryName, cookies, sbmtService,sessionMap);
+			map = learner(request, response, directoryName, cookies, sessionMap);
 		} else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
-			map = teacher(request, response, directoryName, cookies, sbmtService,sessionMap);
+			map = teacher(request, response, directoryName, cookies, sessionMap);
 		}
 
 		String basePath = request.getScheme() + "://" + request.getServerName()
@@ -109,7 +119,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		
 		Iterator userIter = map.keySet().iterator();
 		while (userIter.hasNext()) {
-			SubmitUser user = (SubmitUser) userIter.next();
+			SubmitUserDTO user = (SubmitUserDTO) userIter.next();
 			List fileList = (List) map.get(user);
 
 			Iterator fileListIter = fileList.iterator();
@@ -241,7 +251,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 	
 	public Map learner(HttpServletRequest request,
-			HttpServletResponse response, String directoryName, Cookie[] cookies, ISubmitFilesService sbmtService, HashMap sessionMap) {
+			HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap) {
 		
 		if (userID == null || toolSessionID == null) {
 			String error = "Tool session Id or user Id is null. Unable to continue";
@@ -258,6 +268,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new SubmitFilesException(error);
 		}
+		SubmitUserDTO submitUserDTO = new SubmitUserDTO(learner);
 
 		SubmitFilesSession session = sbmtService.getSessionById(toolSessionID);
 		if (session == null) {
@@ -283,8 +294,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			}
 		}
 		
+		if (content.isReflectOnActivity()) {
+			// Get Reflection Entry 
+			submitUserDTO.setReflect(getReflectionEntry(learner.getSessionID(), learner.getUserID()));			
+		}
+		
 		Map userFilesMap = new HashMap();
-		userFilesMap.put(sbmtService.getSessionUser(toolSessionID, learner.getUserID()),fileList);
+		userFilesMap.put(submitUserDTO, fileList);
 		
 		//add session name to construct a new map
 		Map report = new TreeMap(this.new StringComparator());
@@ -294,7 +310,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
 	public Map teacher(HttpServletRequest request,
-			HttpServletResponse response, String directoryName, Cookie[] cookies, ISubmitFilesService sbmtService, HashMap sessionMap) {
+			HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap) {
 		
 		// check if toolContentId exists in db or not
 		if (toolContentID == null) {
@@ -321,6 +337,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			SortedMap userFilesMap = new TreeMap(new LastNameAlphabeticComparator());
 			userFilesMap.putAll(sbmtService.getFilesUploadedBySession(session
 					.getSessionID(),request.getLocale()));
+			
+			if (content.isReflectOnActivity()) {
+				// Iterate over all users in session and get reflection entry
+				for(SubmitUserDTO submitUserDTO: (Set<SubmitUserDTO>)userFilesMap.keySet()) {
+					submitUserDTO.setReflect(getReflectionEntry(session.getSessionID(), submitUserDTO.getUserID()));
+				}							
+			}
+			
 			allFileMap.putAll(userFilesMap);
 			report.put(session.getSessionName(), userFilesMap);
 		}
@@ -330,5 +354,22 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		return allFileMap;
 	}
+	
+    /**
+     * Retrieves the reflection entry for the submitUser and stores it in a UserDTO  
+     * @param submitUser
+     * @param notebookEntry
+     */
+	private String getReflectionEntry(Long toolSessionID, Integer userId) {
+       
+        NotebookEntry notebookEntry = sbmtService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, 
+                        SbmtConstants.TOOL_SIGNATURE, userId);
+        
+        if (notebookEntry != null) {
+        	return notebookEntry.getEntry();
+        }
+        
+        return null;
+    }
 
 }

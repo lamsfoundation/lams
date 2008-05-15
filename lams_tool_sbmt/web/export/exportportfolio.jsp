@@ -55,13 +55,23 @@
 								</td>
 							</tr>
 							
+							<tr>
+								<td>
+									<fmt:message key="title.reflection" />
+									:
+								</td>
+								<td>
+									<c:out value="${user.reflect}" escapeXml="true" />
+								</td>
+							</tr>
+							
 							<c:choose>
 							<c:when test="${empty submissionList}">
 								<tr>
 									<td colspan="2">
 										<fmt:message key="label.learner.noUpload" />
-								</td>
-							</tr>
+									</td>
+								</tr>
 							</c:when>
 							<c:otherwise>
 								<c:forEach items="${submissionList}" var="submission">
@@ -125,18 +135,17 @@
 											</c:choose>
 										</td>
 									</tr>
-									<tr>
-										<td>
-											&nbsp;
-										</td>
-										<td>
-											&nbsp;
-										</td>
-									</tr>
-	
 								</c:forEach>
 							</c:otherwise>
 							</c:choose>
+							<tr>
+								<td>
+									&nbsp;
+								</td>
+								<td>
+									&nbsp;
+								</td>
+							</tr>
 							<!--  End user entry -->
 							
 						</c:forEach>

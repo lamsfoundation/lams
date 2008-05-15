@@ -87,6 +87,7 @@ import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitUserDAO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtToolContentHandler;
@@ -689,14 +690,15 @@ public class SubmitFilesService implements ToolContentManager,
 					log.error("Could not find learer for special submission item:" + submissionDetails);
 					return null;
 				}
+				SubmitUserDTO submitUserDTO = new SubmitUserDTO(learner);
 				
 				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails, numberFormat);
-				userFileList = (List) map.get(learner);
+				userFileList = (List) map.get(submitUserDTO);
 				//if it is first time to this user, creating a new ArrayList for this user.
 				if(userFileList == null)
 					userFileList = new ArrayList();
 				userFileList.add(detailDto);
-				map.put(learner, userFileList);
+				map.put(submitUserDTO, userFileList);
 			}
 			return map;
 		}
