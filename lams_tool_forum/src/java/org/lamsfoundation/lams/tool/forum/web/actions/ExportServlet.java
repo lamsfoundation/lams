@@ -32,7 +32,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -56,6 +58,7 @@ import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -156,15 +159,15 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
         // Set author flag, to decide if display mark of topics.Only author allow see his own mark. 
         setAuthorMark(msgDtoList);
         
-        List<org.lamsfoundation.lams.tool.forum.dto.UserDTO> userDTOList = null;
+        Set<org.lamsfoundation.lams.tool.forum.dto.UserDTO> userDTOSet = null;
         if (content.isReflectOnActivity()) {
 	        // Get user reflection entries
-	        userDTOList = new ArrayList<org.lamsfoundation.lams.tool.forum.dto.UserDTO>();
-	   		userDTOList.add(getReflectionEntry(forumUser));
+	        userDTOSet = new TreeSet<org.lamsfoundation.lams.tool.forum.dto.UserDTO>(new LastNameAlphabeticComparator());
+	   		userDTOSet.add(getReflectionEntry(forumUser));
     	}
         
    		// Store both in an object array
-        Object[] pair = {msgDtoList, userDTOList};   
+        Object[] pair = {msgDtoList, userDTOSet};   
         
         // Add array to Map
         // put all message into Map. Key is session name, value is list of all topics in this session.
@@ -205,18 +208,18 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
     		// Get Messages
         	List<MessageDTO> sessionMsgDTO = getSessionTopicList(session.getSessionId(), directoryName);
         	
-        	List<org.lamsfoundation.lams.tool.forum.dto.UserDTO> userDTOList = null;
+        	Set<org.lamsfoundation.lams.tool.forum.dto.UserDTO> userDTOSet = null;
 	        if (content.isReflectOnActivity()) {
 	        	// Get user reflection entries
 	        	List<ForumUser> forumUserList = forumService.getUsersBySessionId(session.getSessionId());
-	        	userDTOList = new ArrayList<org.lamsfoundation.lams.tool.forum.dto.UserDTO>();
+	        	userDTOSet = new TreeSet<org.lamsfoundation.lams.tool.forum.dto.UserDTO>(new LastNameAlphabeticComparator());
 	        	for (ForumUser forumUser : forumUserList) {
-	        		userDTOList.add(getReflectionEntry(forumUser));
+	        		userDTOSet.add(getReflectionEntry(forumUser));
 	        	}
         	}
         	
         	// Store both in an object array
-        	Object[] pair = {sessionMsgDTO, userDTOList};
+        	Object[] pair = {sessionMsgDTO, userDTOSet};
         	
         	// Add array to map
     		topicsByUser.put(session.getSessionName(), pair);	
