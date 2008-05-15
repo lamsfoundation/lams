@@ -111,6 +111,7 @@ public interface WikiConstants {
 	public static final String ATTR_ORIGINAL_MESSAGE = "originalMessage";
 
 	public static final String ATTR_TOPIC_ID = "topicID";
+	public static final String ATTR_WIKI_ID = "wikiID";
 	public static final String ATTR_REFLECTION_ON = "reflectOn";
 	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
 	public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";

@@ -51,3 +51,11 @@
 	    </init-param>
 	    <load-on-startup>3</load-on-startup>
 	</servlet>
+	
+<servlet>
+	<servlet-name>WikiLinkHandler</servlet-name>
+	<display-name>WikiLinkHandler Servlet For FCKEditor</display-name>
+	<servlet-class>
+		org.lamsfoundation.lams.tool.wiki.web.WikiLinkHandlerServlet
+	</servlet-class>
+</servlet>
