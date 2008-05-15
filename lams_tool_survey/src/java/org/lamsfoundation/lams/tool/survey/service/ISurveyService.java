@@ -215,7 +215,7 @@ public interface ISurveyService
 	//******************************************************************************************
 	//  	Export portfolio methods
 	//******************************************************************************************
-	SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportByLeaner(SurveyUser learner);
+	SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportByLearner(SurveyUser learner);
 	SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportByContentId(Long toolContentID);
 	
 	//This export for exporting Excel format file in Survey monitoring summary page:

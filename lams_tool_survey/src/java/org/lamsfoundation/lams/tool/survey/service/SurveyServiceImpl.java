@@ -507,7 +507,7 @@ public class SurveyServiceImpl implements
 
 
 
-	public SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportByLeaner(SurveyUser learner) {
+	public SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportByLearner(SurveyUser learner) {
 		SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> summary = 
 				new TreeMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>(new SurveySessionComparator());
 		
