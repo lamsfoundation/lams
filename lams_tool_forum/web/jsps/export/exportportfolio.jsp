@@ -119,10 +119,10 @@
 				</div>
 			</c:forEach>
 
-			<c:set var="userDTOList" value="${entry.value[1]}"/>
-			<c:if test="${userDTOList ne null}">
+			<c:set var="userDTOSet" value="${entry.value[1]}"/>
+			<c:if test="${userDTOSet ne null}">
 				<h3><fmt:message key="label.export.reflection" /></h3>
-				<c:forEach var="userDTO" items="${userDTOList}">
+				<c:forEach var="userDTO" items="${userDTOSet}">
 					<h4>${userDTO.fullName}</h4>
 					<p>
 						<c:out value="${userDTO.reflect}" escapeXml="true" /> 
