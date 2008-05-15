@@ -22,7 +22,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.web;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -35,6 +37,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.struts.Globals;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -53,7 +59,10 @@ import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.McGeneralMonitoringDTO;
+import org.lamsfoundation.lams.tool.mc.McMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McQuestionContentDTO;
+import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
+import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
@@ -221,7 +230,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    {
 		    List listMcAllSessionsDTO = new LinkedList();
 		    logger.debug("generate DTO for All sessions: ");
-		    MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
+		    MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
 
 		    mcGeneralMonitoringDTO.setSelectionCase(new Long(2));
 		    request.setAttribute(SELECTION_CASE, new Long(2));
@@ -238,6 +247,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		    mcGeneralMonitoringDTO.setSelectionCase(new Long(1));
 		    request.setAttribute(SELECTION_CASE, new Long(1));
 	    }
+		
 		logger.debug("SELECTION_CASE: " + mcGeneralMonitoringDTO.getSelectionCase());
 		
 	    logger.debug("SELECTION_CASE: " + request.getAttribute(SELECTION_CASE));
@@ -4633,6 +4643,182 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
     	logger.debug("ending setupCommonScreenData, mcContent " + mcContent);
     }
+    
+    /**
+	 * ActionForward downloadMarks(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+	 * 
+	 * downloadMarks
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	public ActionForward downloadMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	throws IOException,ServletException
+	{
+		String currentMonitoredToolSession=request.getParameter("monitoredToolSessionId");
+	    McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
+		
+		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		String toolContentID = mcMonitoringForm.getToolContentID();
+		
+		McContent mcContent = mcService.retrieveMc(new Long(toolContentID));
+		
+		String errors = null;
+		 
+		try {
+			//create an empty excel file
+			HSSFWorkbook wb = new HSSFWorkbook();
+			HSSFSheet sheet = wb.createSheet("Marks");
+			
+			HSSFRow row;
+			HSSFCell cell;
+			
+			List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, mcContent, mcService);
+			List listMonitoredMarksContainerDTO=MonitoringUtil.buildGroupsMarkData(request, mcContent, mcService);
+		    
+			Map mapOptionsContent= new TreeMap(new McComparator());
+			mapOptionsContent.clear();
+			
+			logger.debug("setting existing content data from the db");
+			
+			Iterator queIterator= mcContent.getMcQueContents().iterator();
+			Long mapIndex=new Long(1);
+			
+			short idx = (short) 0;
+			
+			/*
+			while (queIterator.hasNext())
+			{
+			    McQuestionContentDTO mcContentDTO=new McQuestionContentDTO();
+			    
+				McQueContent mcQueContent=(McQueContent) queIterator.next();
+				if (mcQueContent != null)
+				{
+					logger.debug("question: " + mcQueContent.getQuestion());
+					
+					row = sheet.createRow(idx);
+					
+					cell = row.createCell((short) 1);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+					cell.setCellValue("Question " + idx);
+					
+					cell = row.createCell((short) 3);
+					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+					cell.setCellValue(mcQueContent.getQuestion());
+					
+					mapOptionsContent.put(mapIndex.toString(),mcQueContent.getQuestion());
+		    		
+		    		mapIndex=new Long(mapIndex.longValue()+1);
+				}
+			}
+			*/
+
+			Iterator marksIterator = listMonitoredMarksContainerDTO.iterator();
+			
+					while(marksIterator.hasNext()) {
+						
+						McSessionMarkDTO mcSessionMarkDTO = (McSessionMarkDTO) marksIterator.next();
+						Map usersMarksMap = mcSessionMarkDTO.getUserMarks();
+						
+						String currentSessionId = mcSessionMarkDTO.getSessionId();
+						String currentSessionName = mcSessionMarkDTO.getSessionName();
+						
+						if(currentMonitoredToolSession.equals("All") || currentMonitoredToolSession.equals(currentSessionId)) {
+						
+							row = sheet.createRow(idx++);
+							
+							cell = row.createCell((short) 0);
+							cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+							cell.setCellValue("Group");
+							
+							cell = row.createCell((short) 1);
+							cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+							cell.setCellValue(currentSessionName);
+							
+							row = sheet.createRow(idx++);
+							cell = row.createCell((short) 0);
+							cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+							cell.setCellValue("User");
+							
+							Iterator answersIterator = listMonitoredAnswersContainerDTO.iterator();
+							int count = 1;
+							while(answersIterator.hasNext()) {
+								McMonitoredAnswersDTO mcMonitoredAnswersDTO = (McMonitoredAnswersDTO) answersIterator.next();
+								
+								cell = row.createCell((short) count++);
+								cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+								cell.setCellValue("Question " + count + "(Mark:" + mcMonitoredAnswersDTO.getMark() + ")");
+							}
+						
+							cell = row.createCell((short) count++);
+							cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+							cell.setCellValue("Total");
+							
+							Iterator userMarkIterator = usersMarksMap.values().iterator();
+							
+							while(userMarkIterator.hasNext()) {
+								row = sheet.createRow(idx++);
+								count = 0;
+								
+								McUserMarkDTO userMark = (McUserMarkDTO) userMarkIterator.next();
+								String currentUserSessionId = userMark.getSessionId();
+								
+								cell = row.createCell((short) count++);
+								cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+								cell.setCellValue(userMark.getUserName());
+										
+								Integer[] marks = userMark.getMarks();
+								for(int i=0; i<marks.length; i++) {
+									cell = row.createCell((short) count++);
+									cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+									cell.setCellValue(marks[i]);
+								}
+										
+								cell = row.createCell((short) count++);
+								cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+								cell.setCellValue(userMark.getTotalMark());
+							}	
+						}	
+					}
+			
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			wb.write(bos);
+			
+			//construct download file response header
+			String fileName = "lams_mcq_" + currentMonitoredToolSession+".xls";
+			String mineType = "application/vnd.ms-excel";
+			String header = "attachment; filename=\"" + fileName + "\";";
+			response.setContentType(mineType);
+			response.setHeader("Content-Disposition",header);
+
+			byte[] data = bos.toByteArray();
+			response.getOutputStream().write(data,0,data.length);
+			response.getOutputStream().flush();
+			
+		} catch (Exception e) {
+			log.error(e);
+			errors = new ActionMessage("monitoring.download.error", e.toString()).toString();
+		}
+
+		if(errors != null){
+			try {
+				PrintWriter out = response.getWriter();
+				out.write(errors);
+				out.flush();
+			} catch (IOException e) {
+			}
+		}
+		
+		return null;
+	}
     
 }
     

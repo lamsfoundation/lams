@@ -128,7 +128,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>						
 				<c:if test="${mcGeneralMonitoringDTO.currentMonitoredToolSession !='All'}"> 						 
 					<jsp:include page="/monitoring/IndividualSessionSummary.jsp" />
-				</c:if>						
+				</c:if>
+				
+				<html:link href="#" onclick="javascript:submitMonitoringMethod('downloadMarks');" styleClass="button">
+					<fmt:message key="label.monitoring.downloadMarks.button" />
+				</html:link>					
 		</c:if>						
 		
 		
