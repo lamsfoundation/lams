@@ -85,6 +85,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
@@ -130,7 +131,9 @@ public class McServicePOJO implements
     private IExportToolContentService exportContentService;
 	
     private ICoreNotebookService coreNotebookService;
-    
+
+	private MessageService messageService;
+	
     public McServicePOJO(){}
     
     public void configureContentRepository() throws McApplicationException {
@@ -2441,6 +2444,19 @@ public class McServicePOJO implements
      */
     public void setAuditService(IAuditService auditService) {
         this.auditService = auditService;
+    }
+    
+	/**
+     * @return Returns the MessageService.
+     */
+    public MessageService getMessageService() {
+        return messageService;
+    }
+    /**
+     * @param messageService The MessageService to set.
+     */
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
     }
 
 }

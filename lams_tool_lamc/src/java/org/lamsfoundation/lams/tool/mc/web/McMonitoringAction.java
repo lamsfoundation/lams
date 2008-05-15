@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -4663,6 +4664,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	public ActionForward downloadMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	throws IOException,ServletException
 	{
+		MessageService messageService = getMessageService();
+		
 		String currentMonitoredToolSession=request.getParameter("monitoredToolSessionId");
 	    McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 		
@@ -4737,16 +4740,17 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 							
 							cell = row.createCell((short) 0);
 							cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-							cell.setCellValue("Group");
+							cell.setCellValue(messageService.getMessage("group.label"));
 							
 							cell = row.createCell((short) 1);
 							cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 							cell.setCellValue(currentSessionName);
 							
+							idx++;
 							row = sheet.createRow(idx++);
 							cell = row.createCell((short) 0);
 							cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-							cell.setCellValue("User");
+							cell.setCellValue(messageService.getMessage("label.user"));
 							
 							Iterator answersIterator = listMonitoredAnswersContainerDTO.iterator();
 							int count = 1;
@@ -4755,12 +4759,12 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 								
 								cell = row.createCell((short) count++);
 								cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-								cell.setCellValue("Question " + count + "(Mark:" + mcMonitoredAnswersDTO.getMark() + ")");
+								cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.question.mark", new Object[] {count-1, mcMonitoredAnswersDTO.getMark()}));
 							}
 						
 							cell = row.createCell((short) count++);
 							cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-							cell.setCellValue("Total");
+							cell.setCellValue(messageService.getMessage("label.total"));
 							
 							Iterator userMarkIterator = usersMarksMap.values().iterator();
 							
@@ -4786,7 +4790,10 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 								cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 								cell.setCellValue(userMark.getTotalMark());
 							}	
-						}	
+							
+							idx++;
+						}
+						
 					}
 			
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -4819,6 +4826,12 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		return null;
 	}
-    
+
+    /**
+	 * Return ResourceService bean.
+	 */
+	private MessageService getMessageService() {
+	     return (MessageService) McServiceProxy.getMessageService(getServlet().getServletContext());
+	}
 }
     

@@ -70,9 +70,16 @@
 	
 	<!-- end of data access and repository access beans -->
 
+	<bean id="lamcMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename"><value>org.lamsfoundation.lams.tool.mc.ApplicationResources</value></property>
+	</bean>
+	
+	<bean id="lamcMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource"><ref local="lamcMessageSource"/></property>										
+	</bean>
+
 	<bean id="mcOutputFactory" class="org.lamsfoundation.lams.tool.mc.service.MCOutputFactory">
-		<property name="loadedMessageSourceService"><ref bean="loadedMessageSourceService"/></property>
-		<property name="languageFilename"><value>org.lamsfoundation.lams.tool.mc.ApplicationResources</value></property>
+		<property name="toolMessageService"><ref bean="lamcMessageService"/></property>
 	</bean>
 	
 	<bean id="mcService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -93,7 +100,8 @@
 					<property name="auditService"><ref bean="auditService"/></property>					
 					<property name="exportContentService"><ref bean="exportToolContentService"/></property> 		
 			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>										
-			   		<property name="mcOutputFactory"><ref bean="mcOutputFactory"/></property>										
+			   		<property name="mcOutputFactory"><ref bean="mcOutputFactory"/></property>	
+			   		<property name="messageService"><ref bean="lamcMessageService"/></property>									
 				</bean>
 			</property>
 			<property name="transactionAttributes">

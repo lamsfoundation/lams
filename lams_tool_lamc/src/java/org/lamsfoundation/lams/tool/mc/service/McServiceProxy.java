@@ -26,6 +26,7 @@ import javax.servlet.ServletContext;
 
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -63,6 +64,11 @@ public class McServiceProxy
     {
         return (ToolContentManager)getMcDomainService(servletContext);
     }
+    
+    public static final MessageService getMessageService(ServletContext servletContext)
+    {
+		return (MessageService) getMcMessageService(servletContext);
+	}
 
     private static Object getMcDomainService(ServletContext servletContext)
     {
@@ -70,4 +76,9 @@ public class McServiceProxy
         return wac.getBean("mcService");
     }
     
+    private static Object getMcMessageService(ServletContext servletContext)
+    {
+        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        return wac.getBean("lamcMessageService");
+    }
 }
