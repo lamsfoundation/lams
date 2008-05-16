@@ -31,7 +31,7 @@
 									
 									<c:if test="${answersData.correct == 'true'}"> 		
 										&nbsp; (<fmt:message key="label.correct"/>)
-									</c:if>																		
+									</c:if>																
 								</td>	
 							</tr>
 						</c:forEach>		  	
@@ -51,7 +51,9 @@
 
 
 	 <h2>    <fmt:message key="label.studentMarks"/>  </h2>
-
+	 <c:if test="${portfolioExportDataFileName != null}">
+	 	<p><html:link href="${portfolioExportDataFileName }"><c:out value="${portfolioExportDataFileName}"/></html:link></p>
+	 </c:if>
 		<table class="forms">
 		
 			<c:forEach var="sessionMarksDto" items="${listMonitoredMarksContainerDto}">

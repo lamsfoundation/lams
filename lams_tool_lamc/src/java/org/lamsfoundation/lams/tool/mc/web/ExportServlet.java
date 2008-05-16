@@ -29,12 +29,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import java.io.File;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
@@ -208,6 +215,46 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 	    request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
 	    
 	    mcMonitoringAction.prepareReflectionData(request, content, mcService, null, true);
-        logger.debug("ending teacher mode: ");
+        
+	    writeOutSessionData(request, response, content, mcService, directoryName);
+	    
+	    logger.debug("ending teacher mode: ");
+    }
+    
+    /**
+     * creates create spreadsheet of class data
+     * @param request
+     * @param response
+     * @param directoryName
+     */
+    public void writeOutSessionData(HttpServletRequest request, HttpServletResponse response, McContent mcContent, IMcService mcService, String directoryName) {
+        String fileName="lams_mcq_All_" + toolContentID + ".xls";
+        MessageService messageService = McServiceProxy.getMessageService(getServletContext());
+        
+        try{
+            OutputStream out = new FileOutputStream(directoryName +  File.separator + fileName);
+            
+            String errors = null;
+            
+            McMonitoringAction mcMonitoringAction= new McMonitoringAction();
+            mcMonitoringAction.prepareSessionDataSpreadsheet(request, response, mcContent, mcService, messageService, "All", out);
+        
+            out.close();
+            
+            request.getSession().setAttribute(PORTFOLIO_EXPORT_DATA_FILENAME, fileName);
+        }
+        catch(FileNotFoundException e)
+        {
+            logger.error("Exception creating spreadsheet: ",e) ;
+        }
+        catch(IOException e)
+        {
+            logger.error("exception creating spreadsheet: ",e) ;
+        }
+        catch(Exception e)
+        {
+        	logger.error("exception creating spreadsheet: ",e) ;
+        }
+        
     }
 }
