@@ -26,7 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +57,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -86,6 +86,7 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.util.QuestionsComparator;
+import org.lamsfoundation.lams.tool.survey.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveySessionComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyToolContentHandler;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
@@ -128,18 +129,6 @@ public class SurveyServiceImpl implements
 	private IUserManagementService userManagementService; 
 	private IExportToolContentService exportContentService;
 	private ICoreNotebookService coreNotebookService;
-	
-	
-	private class ReflectDTOComparator implements Comparator<ReflectDTO>{
-		public int compare(ReflectDTO o1, ReflectDTO o2) {
-			if(o1 != null && o2 != null){
-				return o1.getFullName().compareTo(o2.getFullName());
-			}else if(o1 != null)
-				return 1;
-			else
-				return -1;
-		}
-	}
 	
 	//*******************************************************************************
 	// Service method
@@ -264,18 +253,27 @@ public class SurveyServiceImpl implements
 		return nextUrl;
 	}
 
-	public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId){
+	public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry){
 		Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
 
 		List<SurveySession> sessionList = surveySessionDao.getByContentId(contentId);
 		for(SurveySession session:sessionList){
 			Long sessionId = session.getSessionId();
 			boolean hasRefection = session.getSurvey().isReflectOnActivity();
-			Set<ReflectDTO> list = new TreeSet<ReflectDTO>(this.new ReflectDTOComparator());
+			Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
 			//get all users in this session
 			List<SurveyUser> users = surveyUserDao.getBySessionID(sessionId);
 			for(SurveyUser user : users){
 				ReflectDTO ref = new ReflectDTO(user);
+				
+				if (setEntry) {
+					NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, 
+							SurveyConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+					if (entry != null) {
+						ref.setReflect(entry.getEntry());
+					}
+				}
+				
 				ref.setHasRefection(hasRefection);
 				list.add(ref);
 			}

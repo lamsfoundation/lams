@@ -254,7 +254,7 @@ public interface ISurveyService
 	 * @param contentId
 	 * @return
 	 */
-	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId);
+	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
 
 
 }

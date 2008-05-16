@@ -146,7 +146,7 @@ public class MonitoringAction extends Action {
 		SortedMap<SurveySession,Integer> statis = service.getStatistic(contentId);
 		
 		//get refection list
-		Map<Long,Set<ReflectDTO> >relectList = service.getReflectList(contentId);
+		Map<Long,Set<ReflectDTO> >relectList = service.getReflectList(contentId, false);
 		
 		//cache into sessionMap
 		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, summary);

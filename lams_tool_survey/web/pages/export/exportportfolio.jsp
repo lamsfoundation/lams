@@ -104,8 +104,21 @@
 						<%-- End all answers for this question --%>
 						</c:forEach>
 						</table>
-				<%-- End question table --%>
+						<%-- End question table --%>
 					</c:forEach>
+					
+					<c:if test="${sessionMap.reflectOn}">
+						<%-- End all answers for this question --%>
+						<h3><fmt:message key="label.export.reflection" /></h3>
+						<c:set var="reflectDTOSet" value="${sessionMap.reflectList[toolSession.sessionId]}" />
+						<c:forEach var="reflectDTO" items="${reflectDTOSet}">
+							<h4>${reflectDTO.fullName}</h4>
+							<p>
+								<c:out value="${reflectDTO.reflect}" escapeXml="true" /> 
+							</p>						
+						</c:forEach>
+					</c:if>
+					
 				<%-- End session table --%>
 			</c:forEach>
 		<div id="footer"></div>

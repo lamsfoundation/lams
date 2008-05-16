@@ -25,20 +25,26 @@
 
 package org.lamsfoundation.lams.tool.survey.web.servlet;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeSet;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
+import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
@@ -46,6 +52,7 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
 import org.lamsfoundation.lams.tool.survey.service.SurveyApplicationException;
 import org.lamsfoundation.lams.tool.survey.service.SurveyServiceProxy;
+import org.lamsfoundation.lams.tool.survey.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -64,7 +71,15 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	private static Logger logger = Logger.getLogger(ExportServlet.class);
 
 	private final String FILENAME = "survey_main.html";
-
+	
+	private ISurveyService service;
+	
+	@Override
+	public void init() throws ServletException {
+		service = SurveyServiceProxy.getSurveyService(getServletContext());
+		super.init();
+	}
+	
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
 
 //		initial sessionMap
@@ -95,8 +110,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
         if (toolContentID == null && toolSessionID == null) {
             logger.error("Tool content Id or and session Id are null. Unable to activity title");
         } else {
-        	ISurveyService service = SurveyServiceProxy.getSurveyService(getServletContext());
-
+        	
         	Survey content = null;
             if ( toolContentID != null ) {
             	content = service.getSurveyByContentId(toolContentID);
@@ -114,8 +128,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
 			throws SurveyApplicationException {
-
-		ISurveyService service = SurveyServiceProxy.getSurveyService(getServletContext());
 
 		if (userID == null || toolSessionID == null) {
 			String error = "Tool session Id or user Id is null. Unable to continue";
@@ -138,16 +150,30 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new SurveyApplicationException(error);
 		}
+				
+		// Add flag to indicate whether to render user notebook entries
+		sessionMap.put(SurveyConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
 		
-		
-		 SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>  groupList = service.exportByLeaner(learner);
+		// Create reflectList if reflection is enabled.
+		if (content.isReflectOnActivity()) {
+			// Create reflectList, need to follow same structure used in teacher
+			// see surveyService.getReflectList();
+			Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();  
+			Set<ReflectDTO> reflectDTOSet = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
+			reflectDTOSet.add(getReflectionEntry(learner));
+			map.put(toolSessionID, reflectDTOSet);
+			
+			// Add reflectList to sessionMap
+			sessionMap.put(SurveyConstants.ATTR_REFLECT_LIST, map);
+		}
+        
+		SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>  groupList = service.exportByLearner(learner);
 		sessionMap.put(SurveyConstants.ATTR_TITLE, content.getTitle());
 		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
 	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
 			throws SurveyApplicationException {
-		ISurveyService service = SurveyServiceProxy.getSurveyService(getServletContext());
 
 		// check if toolContentId exists in db or not
 		if (toolContentID == null) {
@@ -163,11 +189,34 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new SurveyApplicationException(error);
 		}
-		 SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>  groupList = service.exportByContentId(toolContentID);
+		SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>  groupList = service.exportByContentId(toolContentID);
+
+		// Add flag to indicate whether to render user notebook entries
+		sessionMap.put(SurveyConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
 		
+		// Create reflectList if reflection is enabled.
+		if (content.isReflectOnActivity()) {
+			Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(content.getContentId(), true);
+			// Add reflectList to sessionMap
+			sessionMap.put(SurveyConstants.ATTR_REFLECT_LIST, reflectList);
+		}
+
 		// put it into HTTPSession
 		sessionMap.put(SurveyConstants.ATTR_TITLE, content.getTitle());
 		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
+	}
+	
+	private ReflectDTO getReflectionEntry(SurveyUser surveyUser) {
+		ReflectDTO reflectDTO = new ReflectDTO(surveyUser);
+		NotebookEntry notebookEntry = service.getEntry(surveyUser.getSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, 
+				SurveyConstants.TOOL_SIGNATURE, surveyUser.getUserId().intValue());
+		
+		// check notebookEntry is not null
+		if (notebookEntry != null) {
+			reflectDTO.setReflect(notebookEntry.getEntry());
+			logger.debug("Could not find notebookEntry for SurveyUser: " + surveyUser.getUid());
+		}        		
+		 return reflectDTO;
 	}
 
 }
