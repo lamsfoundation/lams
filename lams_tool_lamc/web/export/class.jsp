@@ -83,7 +83,7 @@
 								<c:if test="${currentUserSessionId == currentSessionId}"> 	
 									<tr>									  	 		
 					  	 				<td NOWRAP valign=top class="align-left"> 
-												<c:out value="${data.userName}"/> 
+												<c:out value="${data.fullName}"/> 
 										</td>	
 	
 										<c:forEach var="mark" items="${data.marks}">

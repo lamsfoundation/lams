@@ -40,6 +40,7 @@ public class McUserMarkDTO implements Comparable
     private String sessionName;
     private String queUsrId;
     private String userName;
+    private String fullName;
     private Integer[] marks; 
     private Long totalMark;
 
@@ -49,6 +50,7 @@ public class McUserMarkDTO implements Comparable
             .append("sessionId", sessionId)
             .append("queUsrId", queUsrId)
             .append("userName", userName)
+            .append("fullName", fullName)
             .append("marks", marks)            
             .append("totalMark", totalMark)            
             .toString();
@@ -73,25 +75,42 @@ public class McUserMarkDTO implements Comparable
     public String getQueUsrId() {
         return queUsrId;
     }
+    
     /**
      * @param queUsrId The queUsrId to set.
      */
     public void setQueUsrId(String queUsrId) {
         this.queUsrId = queUsrId;
     }
+    
     /**
      * @return Returns the userName.
      */
     public String getUserName() {
         return userName;
     }
+    
     /**
      * @param userName The userName to set.
      */
     public void setUserName(String userName) {
         this.userName = userName;
     }
-	
+    
+    /**
+     * @return Returns the userName.
+     */
+    public String getFullName() {
+        return fullName;
+    }
+    
+    /**
+     * @param userName The userName to set.
+     */
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+    
 	public int compareTo(Object o)
     {
 	    McUserMarkDTO mcUserMarkDTO = (McUserMarkDTO) o;
@@ -101,7 +120,6 @@ public class McUserMarkDTO implements Comparable
 		else
 			return (int) (new Long(queUsrId).longValue() - new Long(mcUserMarkDTO.queUsrId).longValue());
     }
-	
   
     /**
      * @return Returns the sessionId.

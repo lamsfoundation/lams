@@ -4747,13 +4747,20 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 							cell.setCellValue(currentSessionName);
 							
 							idx++;
+							int count = 0;
+							
 							row = sheet.createRow(idx++);
-							cell = row.createCell((short) 0);
+							
+							cell = row.createCell((short) count++);
 							cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-							cell.setCellValue(messageService.getMessage("label.user"));
+							cell.setCellValue(messageService.getMessage("label.learner"));
+							
+							cell = row.createCell((short) count++);
+							cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+							cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.username"));
 							
 							Iterator answersIterator = listMonitoredAnswersContainerDTO.iterator();
-							int count = 1;
+							
 							while(answersIterator.hasNext()) {
 								McMonitoredAnswersDTO mcMonitoredAnswersDTO = (McMonitoredAnswersDTO) answersIterator.next();
 								
@@ -4774,11 +4781,16 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 								
 								McUserMarkDTO userMark = (McUserMarkDTO) userMarkIterator.next();
 								String currentUserSessionId = userMark.getSessionId();
+
+								cell = row.createCell((short) count++);
+								cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+								cell.setCellValue(userMark.getFullName());
 								
 								cell = row.createCell((short) count++);
 								cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 								cell.setCellValue(userMark.getUserName());
-										
+								
+								
 								Integer[] marks = userMark.getMarks();
 								for(int i=0; i<marks.length; i++) {
 									cell = row.createCell((short) count++);

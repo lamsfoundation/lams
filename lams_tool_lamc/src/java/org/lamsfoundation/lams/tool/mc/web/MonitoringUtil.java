@@ -206,7 +206,8 @@ public class MonitoringUtil implements McAppConstants{
         	    McUserMarkDTO mcUserMarkDTO= new McUserMarkDTO();
         	    mcUserMarkDTO.setSessionId(mcSession.getMcSessionId().toString());
         	    mcUserMarkDTO.setSessionName(mcSession.getSession_name().toString());
-        	    mcUserMarkDTO.setUserName(mcQueUsr.getFullname());
+        	    mcUserMarkDTO.setFullName(mcQueUsr.getFullname());
+        	    mcUserMarkDTO.setUserName(mcQueUsr.getUsername());
         	    mcUserMarkDTO.setQueUsrId(mcQueUsr.getUid().toString());
         	    
             	// The marks for the user must be listed in the display order of the question.
