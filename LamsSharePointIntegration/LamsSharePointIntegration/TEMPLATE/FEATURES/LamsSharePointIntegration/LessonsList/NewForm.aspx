@@ -183,14 +183,16 @@
 	    function selectSequence(obj)
 	    {
 		    inputs = document.getElementsByTagName("input");
+		    document.getElementById("sequence_id").value = obj;
+		    
 		    for (var x=0; x<inputs.length; x++)
 		    {
 		        if (inputs[x].title == "Sequence ID")
 		        {
-		            inputs[x].type="hidden";
+		            //inputs[x].type="hidden";            
 		            inputs[x].value = obj;
-		            document.getElementById("sequence_id").value = obj;
-		            //inputs[x].disabled = true;
+		            inputs[x].style.display = 'none';
+	                //inputs[x].disabled = true;
 		        }
 		    }
 	    }
