@@ -880,6 +880,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 						mainObjectEle.setText(mainObject);
 						root.addContent(mainObjectEle);
 						
+						updateNamespaceForChildren(root, ns);
+						
 						//create a new tools.xml file with toolContentID.xml as name.
 						File imsToolFile = new File(FileUtil.getFullPath(xsltDir,activity.getToolContentID().toString()+".xml"));
 						XMLOutputter toolOutput = new XMLOutputter();
@@ -917,6 +919,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 	}
 
+	private void updateNamespaceForChildren(Element element, Namespace ns) {
+		List children = element.getChildren();
+		Iterator iter = children.iterator();
+		while ( iter.hasNext() ) {
+			Element child = (Element) iter.next();
+			child.setNamespace(ns);
+			if ( child.hasChildren() )
+				updateNamespaceForChildren(child, ns);
+		}
+	}
 	/**
 	 * @throws ExportToolContentException 
 	 * 
