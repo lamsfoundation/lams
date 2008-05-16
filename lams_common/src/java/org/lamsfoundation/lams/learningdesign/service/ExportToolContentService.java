@@ -182,11 +182,26 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private static final String IMS_TAG_FILE = "file";
 	private static final String IMS_ATTR_HREF = "href";
 	private static final String IMS_ATTR_REF = "ref";
+	private static final String IMS_TAG_PROPERTIES = "properties";
+	private static final String IMS_TAG_LOCPERS_PROPERTY = "locpers-property";
+	private static final String IMS_TAG_DATATYPE = "datatype";
+	private static final String IMS_ATTR_DATATYPE = "datatype";
+	private static final String IMS_TAG_INITIAL_VALUE = "initial-value";
+	private static final String IMS_TAG_CONDITIONS = "conditions";
+	private static final String IMS_TAG_IF = "if";
+	private static final String IMS_TAG_THEN = "then";
+	private static final String IMS_TAG_ELSE = "else";
+	private static final String IMS_TAG_IS = "is";
+	private static final String IMS_TAG_SHOW = "show";
+	private static final String IMS_TAG_HIDE = "hide";
+	private static final String IMS_TAG_PROPERTY_REF = "property-ref";
+	private static final String IMS_TAG_PROPERTY_VALUE = "property-value";
 
 	private static final String IMS_PREFIX_RESOURCE_IDENTIFIER = "R-";
 	private static final String IMS_PREFIX_ACTIVITY_REF = "A-";
 	private static final String IMS_PREFIX_COMPLEX_REF = "S-";
-	
+	private static final String IMS_PREFIX_PROPERTY_REF = "P-";
+
 	//this is not IMS standard tag, temporarily use to gather all tools node list
 	private static final String IMS_TAG_TRANSITIONS = "transitions";
 
@@ -204,10 +219,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private static final String IMS_RESOURCES_FILE_NAME = "resources.xml";
 	private static final String XSLT_PARAM_TRANSITION_FILE = "transitionsFile";
 	private static final String IMS_TRANSITION_FILE_NAME = "transitions.xml";
-
+	private static final String XSLT_PARAM_PROPERTIES_FILE = "propertiesFile";
+	private static final String IMS_PROPERTIES_FILE_NAME = "properties.xml";
+	private static final String XSLT_PARAM_CONDITIONS_FILE = "conditionsFile";
+	private static final String IMS_CONDITIONS_FILE_NAME = "conditions.xml";
+	
 	private static final String IMS_TOOL_NS_PREFIX = "http://www.lamsfoundation/xsd/lams_tool_";
 
-	private static final String IMS_TAG_LEARING_ACTIIVTY_REF = "learning-activity-ref";
+	private static final String IMS_TAG_LEARING_ACTIVITY_REF = "learning-activity-ref";
 
 	private static final String IMS_TOOL_MAIN_OBJECT = "mainObject";
 
@@ -566,54 +585,93 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		List<Element> transChildren = new ArrayList<Element>();
 		//create transitions DOM file
 		List<AuthoringActivityDTO> sortedActList = getSortedActivities(ldDto);
-		//remove activities inside complex activities, the IMS package does not need that.
-		//I don't want to disturb getSortedActivities() method, so that I removed them here.
-		Iterator<AuthoringActivityDTO> iter = sortedActList.iterator();
-		while(iter.hasNext()){
-			AuthoringActivityDTO activityDTO = iter.next();
-			if(activityDTO.getParentActivityID() != null)
-				iter.remove();
+
+		// Need to know what activities are branching activities, so we can set up conditions for their child sequences
+		// Can't just do it for all sequences as the sequence could be in an optional activity
+		Set<Long> branchingActivityIds = new HashSet<Long>();
+		for (AuthoringActivityDTO actDto : sortedActList) {
+			if ( actDto.getActivityTypeID().equals(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE) || actDto.getActivityTypeID().equals(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
+					|| actDto.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE) )
+				branchingActivityIds.add(actDto.getActivityID());
 		}
 		
+		Document propertiesDom = new Document();
+		Element propertiesRoot = new Element(IMS_TAG_PROPERTIES);
+		List<Element> propertiesChildren = new ArrayList<Element>();
+
+		Document conditionsDom = new Document();
+		Element conditionsRoot = new Element(IMS_TAG_CONDITIONS);
+		List<Element> conditionsChildren = new ArrayList<Element>();
+
 		for (AuthoringActivityDTO actDto : sortedActList) {
 			log.debug("Export IMS: Put actitivies " + actDto.getActivityTitle() + "[" +actDto.getToolContentID()+"] into Transition <learning-activity-ref> tag.");
-			Element ref = new Element(IMS_TAG_LEARING_ACTIIVTY_REF);
-			Attribute att = null;
 			
-			//
-			if(actDto.getActivityTypeID().equals(Activity.GROUPING_ACTIVITY_TYPE))
-				att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF + IMS_TAG_GROUPING + "-" + actDto.getActivityID());
-			else if(actDto.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE) || actDto.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
-					|| actDto.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE) || actDto.getActivityTypeID().equals(Activity.SYSTEM_GATE_ACTIVITY_TYPE))
-				att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF + IMS_TAG_GATE + "-" + actDto.getActivityID());
-			else if (actDto.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE)
-					|| actDto.getActivityTypeID().equals(Activity.OPTIONS_WITH_SEQUENCES_TYPE))
-					att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_OPTIONAL + "-" + actDto.getActivityID());
-			else if(actDto.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE))
-					att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_PARALLEL + "-" + actDto.getActivityID());
-			else if(actDto.getActivityTypeID().equals(Activity.SEQUENCE_ACTIVITY_TYPE))
-					att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_SEQUENCE + "-" + actDto.getActivityID());
-			else if(actDto.getActivityTypeID().equals(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE) || actDto.getActivityTypeID().equals(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
-					|| actDto.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE) )
-				att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_BRANCHING + "-" + actDto.getActivityID());
-			else 
-				att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF +  actDto.getToolSignature() + "-" + actDto.getToolContentID());
-			
-			ref.setAttribute(att);
-			transChildren.add(ref);
+			// All sequence activities are within braching or an optional sequence, so they don't go into the transition list.
+			if(actDto.getActivityTypeID().equals(Activity.SEQUENCE_ACTIVITY_TYPE)) {
+				String attributeValue = IMS_PREFIX_COMPLEX_REF + IMS_TAG_SEQUENCE + "-" + actDto.getActivityID();
+				if ( actDto.getParentActivityID() != null && branchingActivityIds.contains(actDto.getParentActivityID()) ) {
+					Element[] propertyConditions = generatePropertyCondition(actDto.getActivityID(),attributeValue);
+					propertiesChildren.add(propertyConditions[0]);
+					conditionsChildren.add(propertyConditions[1]);
+					conditionsChildren.add(propertyConditions[2]);
+					conditionsChildren.add(propertyConditions[3]);
+				} 					
+
+			} else if ( actDto.getParentActivityID() == null ) {
+				// Only want to add it to the list of transition activities if it is the top level, as this generates the initial sequence. 
+				Attribute att = null;
+
+				if(actDto.getActivityTypeID().equals(Activity.GROUPING_ACTIVITY_TYPE))
+					att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF + IMS_TAG_GROUPING + "-" + actDto.getActivityID());
+				else if(actDto.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE) || actDto.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
+						|| actDto.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE) || actDto.getActivityTypeID().equals(Activity.SYSTEM_GATE_ACTIVITY_TYPE))
+					att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF + IMS_TAG_GATE + "-" + actDto.getActivityID());
+				else if (actDto.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE)
+						|| actDto.getActivityTypeID().equals(Activity.OPTIONS_WITH_SEQUENCES_TYPE))
+						att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_OPTIONAL + "-" + actDto.getActivityID());
+				else if(actDto.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE))
+						att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_PARALLEL + "-" + actDto.getActivityID());
+				else if(actDto.getActivityTypeID().equals(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE) || actDto.getActivityTypeID().equals(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
+						|| actDto.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE) )
+					att = new Attribute(IMS_ATTR_REF, IMS_PREFIX_COMPLEX_REF + IMS_TAG_BRANCHING + "-" + actDto.getActivityID());
+				else 
+					att = new Attribute(IMS_ATTR_REF,IMS_PREFIX_ACTIVITY_REF +  actDto.getToolSignature() + "-" + actDto.getToolContentID());
+
+				Element ref = new Element(IMS_TAG_LEARING_ACTIVITY_REF);
+				ref.setAttribute(att);
+				transChildren.add(ref);
+			}
 		}
+
 		transRoot.setChildren(transChildren);
 		transDom.setRootElement(transRoot);
 		File transFile = new File(FileUtil.getFullPath(xsltDir,IMS_TRANSITION_FILE_NAME));
 		XMLOutputter transOutput = new XMLOutputter();
 		transOutput.output(transDom, new FileOutputStream(transFile));
 		log.debug("Export IMS: Transtion(<learning-activity-ref>) file generated sucess: " + transFile.getAbsolutePath());
-		
+
+		// create the properties file and conditions file - needed for gate showing gates when open and branches when determined
+		propertiesRoot.setChildren(propertiesChildren);
+		propertiesDom.setRootElement(propertiesRoot);
+		File propertiesFile = new File(FileUtil.getFullPath(xsltDir,IMS_PROPERTIES_FILE_NAME));
+		XMLOutputter propertiesOutput = new XMLOutputter();
+		propertiesOutput.output(propertiesDom, new FileOutputStream(propertiesFile));
+		log.debug("Export IMS: Properties file generated sucess: " + propertiesFile.getAbsolutePath());
+
+		conditionsRoot.setChildren(conditionsChildren);
+		conditionsDom.setRootElement(conditionsRoot);
+		File conditionsFile = new File(FileUtil.getFullPath(xsltDir,IMS_CONDITIONS_FILE_NAME));
+		XMLOutputter conditionsOutput = new XMLOutputter();
+		conditionsOutput.output(conditionsDom, new FileOutputStream(conditionsFile));
+		log.debug("Export IMS: Conditions file generated sucess: " + conditionsFile.getAbsolutePath());
+
 		//call XSLT to create ims XML file
 		//put parameters: transitions and resources file name
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(XSLT_PARAM_RESOURCE_FILE, IMS_RESOURCES_FILE_NAME);
 		params.put(XSLT_PARAM_TRANSITION_FILE, IMS_TRANSITION_FILE_NAME);
+		params.put(XSLT_PARAM_PROPERTIES_FILE, IMS_PROPERTIES_FILE_NAME);
+		params.put(XSLT_PARAM_CONDITIONS_FILE, IMS_CONDITIONS_FILE_NAME);
 		
 		//transform
 		log.debug("Export IMS: Starting transform IMS XML by XSLT...");
@@ -629,14 +687,70 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 		
 	}
-	
+
+	/** Generate the nodes for a property and the related conditions. The first element is the property, which goes
+	 * in the <properties> tag, the second through fourth elements are the if-then-else that makes up the condition
+	 * and goes in the <conditions> tag.
+	 * @param activityId
+	 * @return
+	 */
+	private Element[] generatePropertyCondition(Long activityId, String learningActivityRefName) {
+		Element[] returnArray = new Element[4];
+
+		String propertyName = IMS_PREFIX_PROPERTY_REF + "VISIBLE-"+activityId;
+		
+		// Setup the property first
+		Element locpersProperty = new Element(IMS_TAG_LOCPERS_PROPERTY);
+		locpersProperty.setAttribute(new Attribute(IMS_ATTR_IDENTIFIER, propertyName));
+		locpersProperty.setChildren(new ArrayList());
+		Element el = new Element(IMS_TAG_DATATYPE);
+		el.setAttribute(new Attribute(IMS_ATTR_DATATYPE, "boolean"));
+		locpersProperty.getChildren().add(el);
+		el = new Element(IMS_TAG_INITIAL_VALUE);
+		el.setText("false");
+		locpersProperty.getChildren().add(el);
+		returnArray[0] = locpersProperty;
+
+		// set up the if
+		Element ifthenelseElement = new Element(IMS_TAG_IF);
+		Element is = new Element(IMS_TAG_IS);
+		el = new Element(IMS_TAG_PROPERTY_REF);
+		el.setAttribute(new Attribute(IMS_ATTR_REF, propertyName));
+		is.getChildren().add(el);
+		el = new Element(IMS_TAG_PROPERTY_VALUE);
+		el.setText("true");
+		is.getChildren().add(el);
+		ifthenelseElement.getChildren().add(is);
+		returnArray[1] = ifthenelseElement;
+
+		// set up the then - show activity
+		ifthenelseElement = new Element(IMS_TAG_THEN);
+		Element showHideElement = new Element(IMS_TAG_SHOW);
+		Element activityRef = new Element(IMS_TAG_LEARING_ACTIVITY_REF);
+		activityRef.setAttribute(new Attribute(IMS_ATTR_REF, learningActivityRefName));
+		showHideElement.getChildren().add(activityRef);
+		ifthenelseElement.getChildren().add(showHideElement);
+		returnArray[2] = ifthenelseElement;
+
+		// set up the else - hide activity
+		ifthenelseElement = new Element(IMS_TAG_ELSE);
+		showHideElement = new Element(IMS_TAG_HIDE);
+		activityRef = new Element(IMS_TAG_LEARING_ACTIVITY_REF);
+		activityRef.setAttribute(new Attribute(IMS_ATTR_REF, learningActivityRefName));
+		showHideElement.getChildren().add(activityRef);
+		ifthenelseElement.getChildren().add(showHideElement);
+		returnArray[3] = ifthenelseElement;
+
+		return returnArray;
+	}
+	 
 	/**
 	 * This quite complex method will return a sorted acitivityDTO list according to current LD DTO.
 	 * <BR>
-	 * It considers the broken LD situation. A frist activity will always be first one, but others brokend sequence in this LD 
-	 * sorted by randomly. In one brokend seuqence, all acitivities will sorted by transition.   
+	 * It considers the broken LD situation. A first activity will always be first one, but others in the broken sequence in this LD 
+	 * sorted by randomly. In one broken sequence, all activities will sorted by transition.   
 	 * <BR>
-	 * The reason to use lots "for" is Activity DTO does not contain next transition information. It has to be iterator all transtions or activities.
+	 * The reason to use lots "for" is Activity DTO does not contain next transition information. It has to be iterator all transitions or activities.
 	 *  
 	 * @param ldDto
 	 * @return
@@ -647,15 +761,20 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		List<TransitionDTO> transList = ldDto.getTransitions();
 		
 		Long firstActId = ldDto.getFirstActivityID();
-		List<AuthoringActivityDTO> activities =ldDto.getActivities();
-		
-		//put first activity into sorted list
-		for (AuthoringActivityDTO activityDTO : activities) {
+		HashMap<Long,AuthoringActivityDTO> activities = new HashMap<Long,AuthoringActivityDTO>();
+
+		// Put first activity into sorted list and copy the rest of the activities into a working map so we can find them easily.
+		// They can be removed from the map as we go so we don't reprocess them.
+		Iterator iter = ldDto.getActivities().iterator();
+		while (iter.hasNext()) {
+			AuthoringActivityDTO activityDTO = (AuthoringActivityDTO) iter.next();
 			if(activityDTO.getActivityID().equals(firstActId)){
 				sortedActList.add(activityDTO);
-				break;
+			}else{
+				activities.put(activityDTO.getActivityID(), activityDTO);
 			}
 		}
+
 		List<Long> firstActList = new ArrayList<Long>();
 		
 		//try find a sorted transition list.
@@ -672,13 +791,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 						sortedList.add(transitionDTO);
 						actId = transitionDTO.getToActivityID();
 						
-						//put next activity inot sorted list
-						for (AuthoringActivityDTO activityDTO : activities) {
-							if(activityDTO.getActivityID().equals(actId)){
-								sortedActList.add(activityDTO);
-								break;
-							}
-						}
+						//put next activity into sorted list
+						AuthoringActivityDTO activityDTO = activities.get(actId);
+						if ( activityDTO != null ) {
+							sortedActList.add(activityDTO);
+							activities.remove(actId);
+						} 
 						find = true;
 						break;
 					}
@@ -690,10 +808,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				//already achieve one sequence end, but it still exist unsorted transition, it means
 				//this ld is broken one, there are at least two "first act" (there is no "transition to") 
 				if(!find){
-					for (AuthoringActivityDTO act: activities) {
+					for (AuthoringActivityDTO act: activities.values()) {
 						boolean isFirst = true;
 						for (TransitionDTO tranDto : transList) {
-							//there is some transtion to this act, it is not "head activity" then skip this act.
+							//there is some transition to this act, it is not "head activity" then skip this act.
 							if(tranDto.getToActivityID().equals(act.getActivityID())){
 								isFirst = false;
 								break;
@@ -701,15 +819,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 						}
 						//if it is "head activity" and it has not been used
 						if(isFirst && !firstActList.contains(act.getActivityID())){
-							firstActList.add(actId);
 							actId = act.getActivityID();
-							//put next activity inot sorted list
-							for (AuthoringActivityDTO activityDTO : activities) {
-								if(activityDTO.getActivityID().equals(actId)){
-									sortedActList.add(activityDTO);
-									break;
-								}
-							}
+							firstActList.add(actId);
+							//put next activity into sorted list
+							AuthoringActivityDTO activityDTO = activities.get(actId);
+							if ( activityDTO != null ) {
+								sortedActList.add(activityDTO);
+								activities.remove(actId);
+							} 
 							break;
 						}
 					}
@@ -718,21 +835,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 
 		//there are some sole activities exist in this LD,append them into sorted list end.
-		if(sortedActList.size() < activities.size()){
-			for (AuthoringActivityDTO activityDTO : activities){
-				boolean exist = false;
-				for (AuthoringActivityDTO sortedAct : sortedActList) {
-					if(sortedAct.getActivityID().equals(activityDTO.getActivityID())){
-						exist  = true;
-						break;
-					}
-				}
-				if(!exist)
-					sortedActList.add(activityDTO);
-				
-				if(sortedActList.size() == activities.size())
-					break;
-			}
+		if(activities.size()>0){
+			sortedActList.addAll(activities.values());
 		}
 		return sortedActList;
 	}

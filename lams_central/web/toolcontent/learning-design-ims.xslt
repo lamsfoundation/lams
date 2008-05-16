@@ -19,26 +19,28 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt 
 -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:lams="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"  xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:lams="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p1.xsd"  xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" version="1.0">
 	<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
 	<xsl:param name="lamsLanguage"/>
 	<xsl:param name="resourcesFile"/>
 	<xsl:param name="transitionsFile"/>
+	<xsl:param name="propertiesFile"/>
+	<xsl:param name="conditionsFile"/>
 	<xsl:template match="/">
-		<manifest xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" xsl:use-attribute-sets="ldIdentifier">
+		<manifest xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" xsl:use-attribute-sets="manifestIdentifier">
 			<metadata>
 				<schema>IMS Metadata</schema>
 				<schemaversion>1.2</schemaversion>
 			</metadata>
 			<organizations default="default">
-				<learning-design identifier="default" uri="" level="A" xmlns="http://www.imsglobal.org/xsd/imsld_v1p0" xmlns:lams="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd">
+				<learning-design xsl:use-attribute-sets="ldIdentifier" uri="" level="B" xmlns="http://www.imsglobal.org/xsd/imsld_v1p0" xmlns:lams="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p1.xsd" >
 					<title>
 						<xsl:value-of select="*/title"/>
 					</title>
 					<!-- ================================== lams LD ================================== -->
 					<xsl:for-each select="/*/*">
-						<xsl:if test="(count(ancestor::*) =1) and (name(.) !='activities') and (name(.) != 'transitions') and name(.) !='title' and name(.) !='groupings' and name(.) !='branchMappings'">
-								<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+						<xsl:if test="(count(ancestor::*) =1) and (name(.) !='activities') and (name(.) != 'transitions') and name(.) !='title' and name(.) !='groupings' and name(.) !='branchMappings' and name(.) !='readOnly' and name(.) !='maxID' and name(.) !='learningDesignID' and name(.) != 'editOverrideLock' and name(.) != 'copyTypeID'">
+								<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p1.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
 						</xsl:if>
 						<xsl:if test="(count(ancestor::*) =1) and (name(.) = 'groupings')">
 							<xsl:call-template name="groupings"/>
@@ -54,6 +56,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<title>Learner</title>
 							</learner>
 						</roles>
+						<properties>
+							<xsl:copy-of select="document($propertiesFile)/*/*"/>
+						</properties>
 						<activities>
 							<!-- ================================== lams activities ================================== -->
 							<xsl:apply-templates select="*//org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="tool"/>
@@ -75,6 +80,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</role-part>
 							</act>
 						</play>
+						<xsl:copy-of select="document($conditionsFile)"/>
 					</method>
 				</learning-design>
 			</organizations>
@@ -112,6 +118,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO" mode="complex"/>
 	</xsl:template>
 
+	<xsl:template name="activityNodeOutput">
+		<xsl:if test="name(.) !='learningDesignID' and name(.) != 'readOnly' and name(.) != 'initialised' and name(.) != 'languageCode' and name(.) != 'inputActivities'">
+			<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p1.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+		</xsl:if>
+		<xsl:if test="name(.) = 'inputActivities'">
+			<lams:inputActivities>
+			<xsl:for-each select="node()">
+				<xsl:if test="name(.)='int'">
+					<xsl:element name="lams:activityID" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p1.xsd"><xsl:value-of select="."/></xsl:element>
+				</xsl:if>
+			</xsl:for-each>
+			</lams:inputActivities>
+		</xsl:if>
+	</xsl:template>
 	<!-- ================================== lams Tool activities ================================== -->
 	<xsl:template name="tool">
 		<learning-activity xsl:use-attribute-sets="toolIdentifier">
@@ -124,7 +144,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</complete-activity>
 			<lams:lams-tool-activity>
 				<xsl:for-each select="node() | @*">
-					<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+					<xsl:call-template name="activityNodeOutput"/>
 				</xsl:for-each>
 			</lams:lams-tool-activity>
 		</learning-activity>
@@ -133,7 +153,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<xsl:template name="group">
 		<learning-activity xsl:use-attribute-sets="groupIdentifier">
 			<title>
-				<xsl:value-of select="activityTitle"/>
 			</title>
 			<environment-ref xsl:use-attribute-sets="groupEnvRef"/>
 			<complete-activity>
@@ -141,7 +160,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</complete-activity>
 			<lams:lams-tool-activity>
 				<xsl:for-each select="node() | @*">
-					<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+					<xsl:call-template name="activityNodeOutput"/>
 				</xsl:for-each>
 			</lams:lams-tool-activity>
 		</learning-activity>
@@ -159,7 +178,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<lams:lams-grouping>
 			<xsl:for-each select="node() | @*">
 					<xsl:if test="name(.) != 'groups'">
-						<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+						<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p1.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
 					</xsl:if>
 					<xsl:if test="name(.) = 'groups'">
 						<xsl:call-template name="groups"/>
@@ -179,7 +198,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<xsl:template name="actualGroup">
 		<lams:lams-group>
 			<xsl:for-each select="node() | @*">
-				<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+				<xsl:if test="name(.) !='userList'">
+					<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p1.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+				</xsl:if>
 			</xsl:for-each>
 		</lams:lams-group>
 	</xsl:template>
@@ -196,7 +217,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</complete-activity>
 			<lams:lams-tool-activity>
 				<xsl:for-each select="node() | @*">
-					<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+					<xsl:call-template name="activityNodeOutput"/>
 				</xsl:for-each>
 			</lams:lams-tool-activity>
 		</learning-activity>
@@ -227,7 +248,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</xsl:for-each>
 			<lams:lams-complex-activity>
 				<xsl:for-each select="node() | @*">
-					<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+					<xsl:call-template name="activityNodeOutput"/>
 				</xsl:for-each>
 			</lams:lams-complex-activity>
 		</activity-structure>
@@ -245,7 +266,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<lams:lams-branchActivityEntry>
 			<xsl:for-each select="node() | @*">
 					<xsl:if test="name(.) != 'condition'">
-						<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+						<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p1.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
 					</xsl:if>
 					<xsl:if test="name(.) = 'condition'">
 						<xsl:call-template name="condition"/>
@@ -257,31 +278,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<xsl:template name="condition">
 		<lams:lams-condition>
 			<xsl:for-each select="node() | @*">
-				<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
+				<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p1.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
 			</xsl:for-each>
 		</lams:lams-condition>
 	</xsl:template>
 	
-	<!-- ================================== lams Transitions ================================== -->
+	<!-- == lams Transitions - display the main structure using the transitions but don't write out the transitions as they could -->
+	<!-- == be deduced from the seqeunce order if we ever imported the data. New transition ids, uiids would then need to be generated. -->
 	<xsl:template match="transitions">
 		<activity-structure identifier="A-sequence" structure-type="sequence">
 			<title>LAMS Learning design sequence</title>
 			<!-- copy sorted transition learning-activity-ref -->
 			<xsl:copy-of select="document($transitionsFile)/*/*"/>
-			<lams:transitions>
-				<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.TransitionDTO"/>
-			</lams:transitions>
 		</activity-structure>
 	</xsl:template>
 	
-	<xsl:template match="org.lamsfoundation.lams.learningdesign.dto.TransitionDTO">
-		<lams:transition>
-			<xsl:for-each select="node() | @*">
-				<xsl:element name="lams:{local-name()}" namespace="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd"><xsl:copy-of select="@*"/><xsl:value-of select="."/></xsl:element>
-			</xsl:for-each>
-		</lams:transition>
-		<xsl:apply-templates select="org.lamsfoundation.lams.learningdesign.dto.TransitionDTO"/>
-	</xsl:template>
 	<!-- ================================== Tools' content  Environments ================================== -->
 	<xsl:template match="activities" mode="env">
 		<environments>
@@ -301,7 +312,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<xsl:value-of select="activityTitle"/>
 				</title>
 				<service  xsl:use-attribute-sets="serviceAttr">
-					<tool_interface xmlns="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p0.xsd">
+					<tool_interface xmlns="http://www.lamsfoundation.org/xsd/lams_ims_export_v1p1.xsd">
 						<tool_id>
 							<identifier type="URN">URN:LAMS:<xsl:value-of select="toolSignature"/>-<xsl:value-of select="toolContentID"/></identifier>
 						</tool_id>
@@ -318,10 +329,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</xsl:if>
 	</xsl:template>
 	<!-- ================================== some attributes ================================== -->	
+	<xsl:attribute-set name="manifestIdentifier">
+		<xsl:attribute name="identifier"><xsl:value-of select="/*/title"/>-manifest</xsl:attribute>
+	</xsl:attribute-set>
+	
 	<xsl:attribute-set name="ldIdentifier">
 		<xsl:attribute name="identifier"><xsl:value-of select="/*/title"/></xsl:attribute>
 	</xsl:attribute-set>
-	
+
 	<xsl:attribute-set name="toolIdentifier">
 		<xsl:attribute name="identifier">A-<xsl:value-of select="toolSignature"/>-<xsl:value-of select="toolContentID"/></xsl:attribute>
 	</xsl:attribute-set>
