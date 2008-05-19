@@ -79,9 +79,14 @@ class SequenceActivity extends ComplexActivity {
 	 */
 	public function clone():SequenceActivity{
 		var dto:Object = toData();
-		var sa = new SequenceActivity();
-		sa.populateFromDTO(dto);
-		return sa;
+		if(dto != null) {
+			var sa = new SequenceActivity();
+			sa.populateFromDTO(dto);
+			
+			return sa;
+		}
+		
+		return null;
 	}
 	
 	public function set firstActivityUIID(a:Number):Void {

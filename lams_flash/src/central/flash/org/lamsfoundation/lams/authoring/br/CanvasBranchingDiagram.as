@@ -182,7 +182,7 @@ class CanvasBranchingDiagram extends MovieClip  {
 			for(var i=0; i<sequences.length; i++) {
 				 var acts:Array = _ddm.getComplexActivityChildren(sequences[i].activityUIID);
 				 
-				 if(!SequenceActivity(sequences[i]).isDefault)
+				 if(!SequenceActivity(sequences[i]).isDefault && !SequenceActivity(sequences[i]).stopAfterActivity)
 					_branchingDetails.push({firstActivityUIID: SequenceActivity(sequences[i]).firstActivityUIID, noActivities: acts.length, hasEndBranch: !sequences[i].stopAfterActivity});
 			}
 		} 

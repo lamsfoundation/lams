@@ -618,7 +618,6 @@ class CanvasHelper {
 		
 		pasteActivityItem(newSequenceActivity, o);
 		
-		
 		return newSequenceActivity;
 	}
 	
@@ -706,6 +705,7 @@ class CanvasHelper {
 		
 		var children:Array = _ddm.getComplexActivityChildren(activity.activityUIID);
 		var activityCopy:Activity;
+		var defaultBranchCopy:Activity;
 		
 		for(var i=0; i<children.length; i++){
 			if(children[i] instanceof ToolActivity) activityCopy = pasteToolItem(children[i], o, toolContentIDMap.get(children[i].toolContentID), parentAct);
@@ -726,8 +726,14 @@ class CanvasHelper {
 					activityMap.put(children[i].activityUIID, dataObj);
 				}
 				
-				if(activity.firstActivityUIID == children[i].activityUIID)
+				if(activity.firstActivityUIID == children[i].activityUIID) {
 					parentAct.firstActivityUIID = activityCopy.activityUIID;
+				}
+				
+			} else if(activity.isBranchingActivity()) {
+				if(activity.firstActivityUIID == children[i].activityUIID) {
+					parentAct.firstActivityUIID = activityCopy.activityUIID;
+				}
 			}
 		}
 	}
