@@ -88,13 +88,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 			var ready=req.readyState;
 			var msg;
-		
+
 			if (ready==READY_STATE_COMPLETE){
-			
+			 
 				switch (req.status)
 				{
 					case 200: // status 200 OK
-						var url = "<lams:WebAppURL/>exportDownload?fileLocation="+req.responseText;
+						var url = "<lams:LAMSURL/>learning/exportDownload?fileLocation="+req.responseText;
 
 						downloadStarted = new Boolean(true);
 						msg = "<p><fmt:message key='export.portfolio.generation.complete.message'/></p>\n"
@@ -124,8 +124,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		}
 		
 		window.onload=function(){
-			sendRequest("<lams:WebAppURL/>portfolioExport?<c:out value="${pageContext.request.queryString}" escapeXml="false"/>");
+			// Safari is really picky about cross domain calls - if the server URL doesn't specify a port, then we mustn't
+			// specify a port here, and lams:WebAppURL always specifies the port.
+			sendRequest("<lams:LAMSURL/>learning/portfolioExport?<c:out value="${pageContext.request.queryString}" escapeXml="false"/>");
 		}  
+		
 	</script>
       <!--
     <link rel="stylesheet" type="text/css" href="styles.css">
