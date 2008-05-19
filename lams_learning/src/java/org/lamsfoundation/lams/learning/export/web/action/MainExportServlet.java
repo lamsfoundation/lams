@@ -189,7 +189,7 @@ public class MainExportServlet extends HttpServlet {
 			// return the relative (to server's temp dir) filelocation of the 
 			// zip file so that it can be picked up in exportWaitingPage.jsp
 			PrintWriter out = response.getWriter();
-			out.println(URLEncoder.encode(exportZipDir + File.separator + exportFilename, "UTF-8"));
+			out.print(URLEncoder.encode(exportZipDir + File.separator + exportFilename, "UTF-8"));
 		}
 		else
 		{
