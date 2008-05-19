@@ -23,38 +23,52 @@
 <asp:Content ID="Content5" ContentPlaceHolderId="PlaceHolderMain" runat="server">
     
     <script language="JavaScript" type="text/javascript" src="/_layouts/LamsSharePointIntegration/tigra/tree.js"></script>
-    <script language="JavaScript" type="text/javascript" src="/_layouts/LamsSharePointIntegration/jquery/jquery-1.2.3.pack.js"></script>
     <script language="JavaScript" type="text/javascript">
     <!-- 
         var authorUrl = "";
 	    var previewUrl = "";
 	    var learningDesignRepositoryStr = ""; 
 	    
-        $.ajax({
-            url : "/_layouts/LamsSharePointIntegration/LAMSAjaxServletRequester.ashx?&siteUrl=" + location.href,
-            data : { method: "author" },
-            success : function(string) {
-                authorUrl = string;
+	    // ajax object
+	    var xmlHttp;
+	    
+	    // Get the author url
+	    xmlHttp1 = getAjaxObject();
+        xmlHttp1.onreadystatechange = function() 
+        {
+            if (xmlHttp1.readyState == 4) 
+            { 
+                authorUrl = xmlHttp1.responseText;
             }
-        });
-
-        $.ajax({
-            url : "/_layouts/LamsSharePointIntegration/LAMSAjaxServletRequester.ashx?&siteUrl=" + location.href,
-            data : { method: "preview" },
-            success : function(string) {
-                previewUrl = string;
+        }
+        xmlHttp1.open("GET", "/_layouts/LamsSharePointIntegration/LAMSAjaxServletRequester.ashx?&method=author&siteUrl=" + location.href, true);
+        xmlHttp1.send(null); 
+	    
+	    
+	    // Get the preview url
+	    xmlHttp2 = getAjaxObject();
+        xmlHttp2.onreadystatechange = function() 
+        {
+            if (xmlHttp2.readyState == 4) 
+            { 
+                previewUrl = xmlHttp2.responseText;
             }
-        });
+        }
+        xmlHttp2.open("GET", "/_layouts/LamsSharePointIntegration/LAMSAjaxServletRequester.ashx?&method=preview&siteUrl=" + location.href, true);
+        xmlHttp2.send(null);
         
-        $.ajax({
-                url : "/_layouts/LamsSharePointIntegration/LAMSAjaxServletRequester.ashx?&siteUrl=" + location.href,
-                data : { method: "learningDesignRepository" },
-                async : false, 
-                success : function(string) {
-                    learningDesignRepositoryStr = eval(string);                                 
-                }
-            });
-    
+	    // Get the learning design repositroy javascript array string
+        xmlHttp3 = getAjaxObject();
+        xmlHttp3.onreadystatechange = function() 
+        {
+            if (xmlHttp3.readyState == 4) 
+            { // readyState, see below
+                learningDesignRepositoryStr = eval(xmlHttp3.responseText);
+            }
+        }
+        xmlHttp3.open("GET", "/_layouts/LamsSharePointIntegration/LAMSAjaxServletRequester.ashx?&method=learningDesignRepository&siteUrl=" + location.href, false);
+        xmlHttp3.send(null);
+	    
  	    var authorWin = null;
 	    var previewWin = null;
 	    var sequenceInput = null;
@@ -91,6 +105,40 @@
 	    'icon_26' : '/_layouts/images/LamsSharePointIntegration/treeicons/minusbottom.gif',// junction for opened node
 	    'icon_27' : '/_layouts/images/LamsSharePointIntegration/treeicons/minus.gif'       // junctioin for last opended node
         };
+        
+        // returns the correct ajax object for the browser
+        function getAjaxObject()
+        {
+            var ajavObj;
+            try
+            {
+                // Firefox, Opera 8.0+, Safari
+                ajaxObj=new XMLHttpRequest();
+            }
+            catch (e)
+            {
+                // Internet Explorer
+                try
+                {
+                    ajaxObj=new ActiveXObject("Msxml2.XMLHTTP");
+                }
+                catch (e)
+                {
+                    try
+                    {
+                        ajaxObj=new ActiveXObject("Microsoft.XMLHTTP");
+                    }
+                    catch (e)
+                    {
+                        alert("Your browser does not support AJAX!");
+                    }
+                }
+            }
+            return ajaxObj;
+        }
+        
+     
+        
         
         function initPage()
         {
@@ -236,7 +284,6 @@
                                 if (learningDesignRepositoryStr != null && learningDesignRepositoryStr != "")
 	                            {
 	                                var tree = new tree(learningDesignRepositoryStr, TREE_TPL);
-	                                
 	                            }
 	                            else
 	                            {
