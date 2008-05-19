@@ -98,7 +98,8 @@ public class Summary {
 	 * @param item
 	 * @param isInitGroup
 	 */
-	public Summary(String sessionName, ResourceItem item,boolean isInitGroup){
+	public Summary(Long sessionId, String sessionName, ResourceItem item,boolean isInitGroup){
+		this.sessionId = sessionId;
 		this.sessionName = sessionName;
 		if(item != null){
 			this.itemUid = item.getUid();

@@ -239,7 +239,7 @@ public interface IResourceService
 	 * @param contentId
 	 * @return
 	 */
-	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId);
+	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
 
 	/**
 	 * Get user by UID

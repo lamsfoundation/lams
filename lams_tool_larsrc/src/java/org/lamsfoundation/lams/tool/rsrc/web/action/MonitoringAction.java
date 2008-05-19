@@ -154,7 +154,7 @@ public class MonitoringAction extends Action {
 		Resource resource = service.getResourceByContentId(contentId);
 		resource.toDTO();
 		
-		Map<Long,Set<ReflectDTO> >relectList = service.getReflectList(contentId);
+		Map<Long,Set<ReflectDTO> >relectList = service.getReflectList(contentId, false);
 		
 		//cache into sessionMap
 		sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);

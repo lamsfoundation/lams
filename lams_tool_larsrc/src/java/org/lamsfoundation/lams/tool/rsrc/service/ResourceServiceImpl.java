@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,6 +63,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -94,6 +94,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
+import org.lamsfoundation.lams.tool.rsrc.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -135,17 +136,6 @@ public class ResourceServiceImpl implements
 	private IExportToolContentService exportContentService;
 	private ICoreNotebookService coreNotebookService;
 	
-	
-	private class ReflectDTOComparator implements Comparator<ReflectDTO>{
-		public int compare(ReflectDTO o1, ReflectDTO o2) {
-			if(o1 != null && o2 != null){
-				return o1.getFullName().compareTo(o2.getFullName());
-			}else if(o1 != null)
-				return 1;
-			else
-				return -1;
-		}
-	}
 	public IVersionedNode getFileNode(Long itemUid, String relPathString) throws ResourceApplicationException {
 		ResourceItem item = (ResourceItem) resourceItemDao.getObject(ResourceItem.class,itemUid);
 		if ( item == null )
@@ -355,7 +345,7 @@ public class ResourceServiceImpl implements
 				continue;
 			//if item is create by author
 			if(item.isCreateByAuthor()){
-				Summary sum = new Summary(session.getSessionName(),item,false);
+				Summary sum = new Summary(session.getSessionId(), session.getSessionName(),item,false);
 				itemList.add(sum);
 			}
 		}
@@ -368,7 +358,7 @@ public class ResourceServiceImpl implements
 			
 			//to skip all item create by author
 			if(!item.isCreateByAuthor()){
-				Summary sum = new Summary(session.getSessionName(),item,false);
+				Summary sum = new Summary(session.getSessionId(), session.getSessionName(),item,false);
 				itemList.add(sum);
 			}
 		}
@@ -385,7 +375,7 @@ public class ResourceServiceImpl implements
 		Set<ResourceItem> resList = resource.getResourceItems();
 		for(ResourceItem item:resList){
 			if(item.isCreateByAuthor()){
-				Summary sum = new Summary(null,item,true);
+				Summary sum = new Summary(null, null,item,true);
 				initList.add(sum);
 			}
 		}
@@ -399,12 +389,12 @@ public class ResourceServiceImpl implements
 			for(ResourceItem item:sessList){
 				//to skip all item create by author
 				if(!item.isCreateByAuthor()){
-					Summary sum = new Summary(session.getSessionName(),item,false);
+					Summary sum = new Summary(session.getSessionId(), session.getSessionName(),item,false);
 					group.add(sum);
 				}
 			}
 			if(group.size() == 0){
-				group.add(new Summary(session.getSessionName(),null,false));
+				group.add(new Summary(session.getSessionId(), session.getSessionName(),null,false));
 			}
 			groupList.add(group);
 		}
@@ -555,18 +545,27 @@ public class ResourceServiceImpl implements
 		return groupList;
 
 	}
-	public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId){
+	public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry){
 		Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
 
 		List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
 		for(ResourceSession session:sessionList){
 			Long sessionId = session.getSessionId();
 			boolean hasRefection = session.getResource().isReflectOnActivity();
-			Set<ReflectDTO> list = new TreeSet<ReflectDTO>(this.new ReflectDTOComparator());
+			Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
 			//get all users in this session
 			List<ResourceUser> users = resourceUserDao.getBySessionID(sessionId);
 			for(ResourceUser user : users){
 				ReflectDTO ref = new ReflectDTO(user);
+				
+				if (setEntry) {
+					NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, 
+							ResourceConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+					if (entry != null) {
+						ref.setReflect(entry.getEntry());
+					}
+				}
+				
 				ref.setHasRefection(hasRefection);
 				list.add(ref);
 			}

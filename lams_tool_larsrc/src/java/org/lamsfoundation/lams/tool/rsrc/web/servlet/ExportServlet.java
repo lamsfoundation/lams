@@ -29,15 +29,22 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
+import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
@@ -45,6 +52,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceServiceProxy;
+import org.lamsfoundation.lams.tool.rsrc.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
@@ -69,7 +77,15 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	private final String FILENAME = "shared_resources_main.html";
 
 	private ResourceToolContentHandler handler;
-
+	
+	private IResourceService service;
+	
+	@Override
+	public void init() throws ServletException {
+		service = ResourceServiceProxy.getResourceService(getServletContext());
+		super.init();
+	}
+	
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
 
 //		initial sessionMap
@@ -100,7 +116,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
         if (toolContentID == null && toolSessionID == null) {
             logger.error("Tool content Id or and session Id are null. Unable to activity title");
         } else {
-        	IResourceService service = ResourceServiceProxy.getResourceService(getServletContext());
+
         	Resource content = null;
             if ( toolContentID != null ) {
             	content = service.getResourceByContentId(toolContentID);
@@ -120,8 +136,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
 			throws ResourceApplicationException {
-
-		IResourceService service = ResourceServiceProxy.getResourceService(getServletContext());
 
 		if (userID == null || toolSessionID == null) {
 			String error = "Tool session Id or user Id is null. Unable to continue";
@@ -152,13 +166,29 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		List<List> groupList = new ArrayList<List>();
 		if(group.size() > 0)
 			groupList.add(group);
+		
+		// Add flag to indicate whether to render user notebook entries
+		sessionMap.put(ResourceConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
+		
+		// Create reflectList if reflection is enabled.
+		if (content.isReflectOnActivity()) {
+			// Create reflectList, need to follow same structure used in teacher
+			// see service.getReflectList();
+			Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();  
+			Set<ReflectDTO> reflectDTOSet = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
+			reflectDTOSet.add(getReflectionEntry(learner));
+			map.put(toolSessionID, reflectDTOSet);
+			
+			// Add reflectList to sessionMap
+			sessionMap.put(ResourceConstants.ATTR_REFLECT_LIST, map);
+		}
+		
 		sessionMap.put(ResourceConstants.ATTR_TITLE, content.getTitle());
 		sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
 	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
 			throws ResourceApplicationException {
-		IResourceService service = ResourceServiceProxy.getResourceService(getServletContext());
 
 		// check if toolContentId exists in db or not
 		if (toolContentID == null) {
@@ -175,10 +205,22 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new ResourceApplicationException(error);
 		}
 		List<List<Summary>> groupList = service.exportByContentId(toolContentID);
-		if(groupList != null)
+		if(groupList != null) {
 			for (List<Summary> list : groupList) {
 				saveFileToLocal(list, directoryName);
 			}
+		}
+		
+		// Add flag to indicate whether to render user notebook entries
+		sessionMap.put(ResourceConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
+		
+		// Create reflectList if reflection is enabled.
+		if (content.isReflectOnActivity()) {
+			Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(content.getContentId(), true);
+			// Add reflectList to sessionMap
+			sessionMap.put(ResourceConstants.ATTR_REFLECT_LIST, reflectList);
+		}
+		
 		// put it into HTTPSession
 		sessionMap.put(ResourceConstants.ATTR_TITLE, content.getTitle());
 		sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
@@ -219,5 +261,18 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     	      handler = (ResourceToolContentHandler) wac.getBean(ResourceConstants.TOOL_CONTENT_HANDLER_NAME);
     	    }
     	    return handler;
+	}
+	
+	private ReflectDTO getReflectionEntry(ResourceUser resourceUser) {
+		ReflectDTO reflectDTO = new ReflectDTO(resourceUser);
+		NotebookEntry notebookEntry = service.getEntry(resourceUser.getSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, 
+				ResourceConstants.TOOL_SIGNATURE, resourceUser.getUserId().intValue());
+		
+		// check notebookEntry is not null
+		if (notebookEntry != null) {
+			reflectDTO.setReflect(notebookEntry.getEntry());
+			logger.debug("Could not find notebookEntry for ResourceUser: " + resourceUser.getUid());
+		}        		
+		 return reflectDTO;
 	}
 }
