@@ -51,11 +51,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="selectedToolSessionId"/>							
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">
+				
+				<c:if test="${fn:length(requestScope.summaryToolSessions) > 2 }">
+					<%-- When grouping is not enabled, we have only 2 items in summaryToolSessions.  The main toolSession and 'All' --%>
 
-				<c:if test="${(generalLearnerFlowDTO.requestLearningReport != 'true')}"> 	
+					<c:if test="${(generalLearnerFlowDTO.requestLearningReport != 'true')}"> 	
 						<tr> 
 							<td NOWRAP width="60" valign=top align=center> <b> <fmt:message key="label.selectGroup"/> </b>
-									<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
+								<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
 									<c:forEach var="toolSessionName" items="${requestScope.summaryToolSessions}">
 										<c:forEach var="toolSessionId" items="${requestScope.summaryToolSessionsId}">
 											<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
@@ -81,10 +84,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											</c:if>							
 										</c:forEach>		  	
 									</c:forEach>		  	
-									</select>
+								</select>
 							</td> 
 						<tr>
-					</c:if>			
+					</c:if>
+				</c:if>			
 
 			<c:if test="${currentMonitoredToolSession != 'All'}"> 							
 					<jsp:include page="/monitoring/IndividualSessionSummary.jsp" />					

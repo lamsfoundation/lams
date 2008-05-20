@@ -55,8 +55,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="selectedToolSessionId"/>							
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">
+				
+					<c:if test="${fn:length(mcGeneralMonitoringDTO.summaryToolSessions) > 2 }">
+						<%-- When grouping is not enabled, we have only 2 items in summaryToolSessions.  The main toolSession and 'All' --%>
+								
 						<tr> 
-						<td NOWRAP  valign=top align=center>  <b> <fmt:message key="label.selectGroup"/> </b>
+							<td NOWRAP  valign=top align=center>  <b> <fmt:message key="label.selectGroup"/> </b>
 
 								<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
 								<c:forEach var="toolSessionEntry" items="${mcGeneralMonitoringDTO.summaryToolSessions}">
@@ -75,17 +79,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</c:forEach>		  	
 								</select>									
 							</td> 
-						<tr>					
-
-
+						</tr>
+					</c:if>					
 					
 		  	 		<c:set var="queIndex" scope="request" value="0"/>
 					<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
 					<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
 			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
-			  	 		<tr>
-			  	 			<td> &nbsp&nbsp&nbsp</td>
-			  	 		</tr>
+
 						<tr>			
 							<td NOWRAP valign=top class="align-left"><b>  <fmt:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
 								<c:out value="${currentDto.question}" escapeXml="false"/> &nbsp (<fmt:message key="label.mark"/> <c:out value="${currentDto.mark}"/> )
