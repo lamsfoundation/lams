@@ -923,6 +923,62 @@ Function update21Specific
         Abort
     ${endif}
     
+    
+    setoutpath "$TEMP\lams\"
+    File "${ANT}\update-mysql-ds-xml-2.1.xml"
+    File /a "${TEMPLATES}\mysql-ds.xml"
+    
+    FileOpen $0 "$TEMP\lams\update-mysql-ds.properties" w
+    IfErrors 0 +3
+        Detailprint "Problem opening update-mysql-ds.properties to write"
+        goto error
+    
+
+    # convert '\' to '/' for Ant's benefit
+    Push $INSTDIR
+    Push "\"
+    Call StrSlash
+    Pop $3        
+
+    FileWrite $0 "DEPLOYDIR=$3/jboss-4.0.2/server/default/deploy$\r$\n"
+    FileWrite $0 "DB_NAME=$DB_NAME$\r$\n"
+    FileWrite $0 "DB_USER=$DB_USER$\r$\n"
+    FileWrite $0 "DB_PASS=$DB_PASS$\r$\n"
+    FileWrite $0 "MYSQL_HOST=$MYSQL_HOST$\r$\n"
+    FileWrite $0 "MYSQL_PORT=$MYSQL_PORT"
+
+    Fileclose $0
+    IfErrors 0 +2
+        goto error
+
+    # Running the ant scripts to create deploy.xml for the normal tools 
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\update-mysql-ds.log -buildfile $TEMP\lams\update-mysql-ds-xml-2.1.xml copy-mysql-ds.xml-2.1'
+    DetailPrint $0
+    nsExec::ExecToStack $0
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    DetailPrint "Result: $1"
+    ${if} $0 == "fail"
+    ${orif} $0 == 1
+        goto error
+    ${endif}
+    push "$INSTDIR\update-logs\update-mysql-ds.log"
+    push "FAILED"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    StrCmp $3 yes 0 +2
+        goto error
+    
+    goto done
+    error:
+        DetailPrint "Problem while running 2.1 specific update scripts."
+        MessageBox MB_OK|MB_ICONSTOP "Problem while running 2.1 specific update scripts."
+        Abort "LAMS configuration failed."
+    done:
+    
+
     clearerrors
     Push "2007" #text to be replaced
     Push "2008" #replace with
@@ -934,44 +990,6 @@ Function update21Specific
         Detailprint "Problem updating index.html"
     end:
 FunctionEnd
-
-/*
-Function update203Specific
-    #extract the jar
-    Setoutpath "$TEMP\lams\"
-    File "${BUILD_DIR}\UpdateLAMS202Chat.class"
-    File "${BASE_PROJECT_DIR}\lams_build\lib\hibernate\hibernate3.jar"
-    
-    Detailprint "Updating the Chat tool"
-    
-   
-    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
-    ReadRegStr $2 HKLM "${REG_HEAD}" "dir_repository"
-    ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
-    # execute the chat update
-    Detailprint '"$3\bin\java.exe" -cp  ".;hibernate3.jar;lib\mysql-connector-java-3.1.12-bin.jar;lib\commons-logging.jar" UpdateLAMS202Chat "$1" "$DB_USER" "$DB_PASS" "$2"'
-    nsExec::ExecToStack '"$3\bin\java.exe" -cp  ".;hibernate3.jar;lib\mysql-connector-java-3.1.12-bin.jar;lib\commons-logging.jar" UpdateLAMS202Chat "$1" "$DB_USER" "$DB_PASS" "$2"'
-    pop $0
-    pop $1
-    ${if} $0 != '0'
-        Messagebox MB_OK|MB_ICONSTOP "Error while updating Chat tool $\r$\nError: $1"
-        Abort
-    ${endif}
-      
-    ;replacing the copyright notice on index.html
-    clearerrors
-    Push "2006" #text to be replaced
-    Push "2007" #replace with
-    Push all #replace all occurrences
-    Push all #replace all occurrences
-    Push "$INSTDIR\index.html" #file to replace in
-    Call AdvReplaceInFile
-    iferrors 0 end 
-        Detailprint "Problem updating index.html"
-    end:
-FunctionEnd
-*/
-
 
 Function setupant
     
@@ -1917,7 +1935,8 @@ Function readRegistry
     ${if} $MYSQL_HOST == ""
         strcpy $MYSQL_HOST "localhost"
     ${endif}
-    ; TODO Change after 2.1, get the port from the registry instead or hard coding it
+    
+    ; TODO Change for 2.2, get the port from the registry instead or hard coding it
     ;ReadRegStr $MYSQL_PORT HKLM "${REG_HEAD}" "mysql_port"
     strcpy $MYSQL_PORT 3360
     
@@ -2245,10 +2264,10 @@ Function copyllid
     setoutpath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$CSllid"
     file /a "${BASE_PROJECT_DIR}\lams_build\librarypackages\chatscribe\language\lams\*"
     
-    setoutpath "$INSTDIR\server\jboss-4.0.2\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$FSllid"
+    setoutpath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$FSllid"
     file /a "${BASE_PROJECT_DIR}\lams_build\librarypackages\forumscribe\language\lams\*"
     
-    setoutpath "$INSTDIR\server\jboss-4.0.2\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$RFllid"
+    setoutpath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$RFllid"
     file /a "${BASE_PROJECT_DIR}\lams_build\librarypackages\shareresourcesforum\language\lams\*"
     
 FunctionEnd

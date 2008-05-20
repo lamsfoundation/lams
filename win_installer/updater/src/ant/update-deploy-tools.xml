@@ -5,8 +5,6 @@
 	
 	<property file="${prop.path}/build.properties" />
 	<property file="tools.properties"/>
-	
-
 
 	<!-- =================================================================== -->
 	<!-- Generate the deploy package                                         -->
