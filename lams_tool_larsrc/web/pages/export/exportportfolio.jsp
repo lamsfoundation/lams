@@ -159,7 +159,7 @@
 							${reflectDTO.fullName}
 						</h4>
 						<p>
-							<c:out value="${reflectDTO.reflect}" escapeXml="true" />
+							<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
 						</p>
 					</c:forEach>
 				</c:if>

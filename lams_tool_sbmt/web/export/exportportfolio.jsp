@@ -62,7 +62,7 @@
 										:
 									</td>
 									<td>
-										<c:out value="${user.reflect}" escapeXml="true" />
+										<lams:out value="${user.reflect}" escapeHtml="true" />
 									</td>
 								</tr>
 							</c:if>

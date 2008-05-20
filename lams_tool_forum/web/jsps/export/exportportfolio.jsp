@@ -125,7 +125,7 @@
 				<c:forEach var="userDTO" items="${userDTOSet}">
 					<h4>${userDTO.fullName}</h4>
 					<p>
-						<c:out value="${userDTO.reflect}" escapeXml="true" /> 
+						<lams:out value="${userDTO.reflect}" escapeHtml="true" /> 
 					</p>	
 				</c:forEach>
 			</c:if>
