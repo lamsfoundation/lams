@@ -138,4 +138,13 @@ public class MultiLinesTextareaTag extends TextareaTag {
         
         return (data == null) ? "":data;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int doEndTag() throws JspException {
+    	int result = super.doEndTag();
+    	setOnchange(null);
+    	return result;
+    }
 }
