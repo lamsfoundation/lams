@@ -26,103 +26,100 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 				<table class="forms">
-
-						<c:if test="${statsTabActive != 'true'}"> 							
-							<tr> 
-								<td colspan=2 align=center>
-
-						 			<c:if test="${(voteGeneralMonitoringDTO.requestLearningReport != 'true')}"> 	
-										<table>			
-											<tr> 
-												<td align=center valign=top> <b> <fmt:message key="label.group"/> </b>
-														<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
-														<c:forEach var="toolSessionName" items="${voteGeneralMonitoringDTO.summaryToolSessions}">
-															<c:forEach var="toolSessionId" items="${voteGeneralMonitoringDTO.summaryToolSessionsId}">
-																<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
-															
-																	<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
-																
-																		<c:set var="SELECTED_SESSION" scope="request" value=""/>
-																		<c:if test="${requestScope.selectionCase == 2}"> 			
-																			<c:set var="currentMonitoredToolSession" scope="request" value="All"/>
-																		</c:if>						
-																		
-																		<c:if test="${toolSessionId.value == requestScope.currentMonitoredToolSession}"> 			
-																				<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
-																		</c:if>						
-																		
-																		<c:if test="${toolSessionId.value != 'All'}"> 		
-																			<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> <c:out value="${toolSessionName.value}"/>  </option>						
-																		</c:if>						
-																		
-																		<c:if test="${toolSessionId.value == 'All'}"> 	
-																			<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
-																		</c:if>						
-																</c:if>							
-															</c:forEach>		  	
-														</c:forEach>		  	
-														</select>
-													</td> 
-												<tr>
-											</table>
-									</c:if>		
-	
-								</td> 
-							</tr>
-						</c:if> 
 						
-						<c:if test="${statsTabActive == 'true'}"> 							
-							<tr> 
-								<td colspan=2 align=center>
-						 			<c:if test="${(voteGeneralMonitoringDTO.requestLearningReport != 'true')}"> 	
-										<table>			
-											<tr> 
-												<td align=center valign=top> <b> <fmt:message key="label.group"/> </b>
-														<select name="monitoredToolSessionIdStats" onchange="javascript:submitSession(this.value,'submitSession');">
-														<c:forEach var="toolSessionName" items="${voteGeneralMonitoringDTO.summaryToolSessions}">
-															<c:forEach var="toolSessionId" items="${voteGeneralMonitoringDTO.summaryToolSessionsId}">
-																<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
-															
-																	<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
+						<c:if test="${fn:length(voteGeneralMonitoringDTO.summaryToolSessions) > 2 }">
+							<%-- When grouping is not enabled, we have only 2 items in summaryToolSessions.  The main toolSession and 'All' --%>
+							
+							<c:if test="${statsTabActive != 'true'}"> 							
+								<tr> 
+									<td colspan=2 align=center>
+	
+							 			<c:if test="${(voteGeneralMonitoringDTO.requestLearningReport != 'true')}"> 	
+											<table>			
+												<tr> 
+													<td align=center valign=top> <b> <fmt:message key="label.group"/> </b>
+															<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
+															<c:forEach var="toolSessionName" items="${voteGeneralMonitoringDTO.summaryToolSessions}">
+																<c:forEach var="toolSessionId" items="${voteGeneralMonitoringDTO.summaryToolSessionsId}">
+																	<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
 																
-																		<c:set var="SELECTED_SESSION" scope="request" value=""/>
-																		<c:if test="${requestScope.selectionCase == 2}"> 			
-																			<c:set var="currentMonitoredToolSession" scope="request" value="All"/>
-																		</c:if>						
-																		
-																		<c:if test="${toolSessionId.value == requestScope.currentMonitoredToolSession}"> 			
-																				<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
-																		</c:if>						
-																		
-																		<c:if test="${toolSessionId.value != 'All'}"> 		
-																			<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> <c:out value="${toolSessionName.value}"/>  </option>						
-																		</c:if>						
-																		
-																		<c:if test="${toolSessionId.value == 'All'}"> 	
-																			<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
-																		</c:if>						
-																</c:if>							
+																		<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
+																	
+																			<c:set var="SELECTED_SESSION" scope="request" value=""/>
+																			<c:if test="${requestScope.selectionCase == 2}"> 			
+																				<c:set var="currentMonitoredToolSession" scope="request" value="All"/>
+																			</c:if>						
+																			
+																			<c:if test="${toolSessionId.value == requestScope.currentMonitoredToolSession}"> 			
+																					<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
+																			</c:if>						
+																			
+																			<c:if test="${toolSessionId.value != 'All'}"> 		
+																				<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> <c:out value="${toolSessionName.value}"/>  </option>						
+																			</c:if>						
+																			
+																			<c:if test="${toolSessionId.value == 'All'}"> 	
+																				<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
+																			</c:if>						
+																	</c:if>							
+																</c:forEach>		  	
 															</c:forEach>		  	
-														</c:forEach>		  	
-														</select>
-													</td> 
-												<tr>
-											</table>
-									</c:if>		
-								</td> 
-							</tr>
+															</select>
+														</td> 
+													<tr>
+												</table>
+										</c:if>		
+		
+									</td> 
+								</tr>
+							</c:if>
+						
+							<c:if test="${statsTabActive == 'true'}"> 							
+								<tr> 
+									<td colspan=2 align=center>
+							 			<c:if test="${(voteGeneralMonitoringDTO.requestLearningReport != 'true')}"> 	
+											<table>			
+												<tr> 
+													<td align=center valign=top> <b> <fmt:message key="label.group"/> </b>
+															<select name="monitoredToolSessionIdStats" onchange="javascript:submitSession(this.value,'submitSession');">
+															<c:forEach var="toolSessionName" items="${voteGeneralMonitoringDTO.summaryToolSessions}">
+																<c:forEach var="toolSessionId" items="${voteGeneralMonitoringDTO.summaryToolSessionsId}">
+																	<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
+																
+																		<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
+																	
+																			<c:set var="SELECTED_SESSION" scope="request" value=""/>
+																			<c:if test="${requestScope.selectionCase == 2}"> 			
+																				<c:set var="currentMonitoredToolSession" scope="request" value="All"/>
+																			</c:if>						
+																			
+																			<c:if test="${toolSessionId.value == requestScope.currentMonitoredToolSession}"> 			
+																					<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
+																			</c:if>						
+																			
+																			<c:if test="${toolSessionId.value != 'All'}"> 		
+																				<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> <c:out value="${toolSessionName.value}"/>  </option>						
+																			</c:if>						
+																			
+																			<c:if test="${toolSessionId.value == 'All'}"> 	
+																				<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
+																			</c:if>						
+																	</c:if>							
+																</c:forEach>		  	
+															</c:forEach>		  	
+															</select>
+														</td> 
+													<tr>
+												</table>
+										</c:if>		
+									</td> 
+								</tr>
+							</c:if> 
 						</c:if> 
-
-				
-
-						<tr>
-					 		<td NOWRAP colspan=2 > </td>
-						</tr>
 
 						<tr>
 					 		<td NOWRAP colspan=2 > <b>  <fmt:message key="label.groupName"/> </b><c:out value="${voteGeneralMonitoringDTO.groupName}"/>  </td>
 						</tr>
-
 
 	  					<tr>
 					 		<td NOWRAP> <b>  <fmt:message key="label.total.students"/> </b> </td>
