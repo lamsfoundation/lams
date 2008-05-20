@@ -95,6 +95,7 @@ class LearnerActivity extends MovieClip {
 	private var _line_top:MovieClip;
 	
 	private var _complex:Boolean;
+	private var _level:Number;
 	
 	function LearnerActivity(){
 		Debugger.log("_activity:"+_activity.title,4,'Constructor','LearnerActivity');
@@ -246,6 +247,10 @@ class LearnerActivity extends MovieClip {
 			for(var i=0; i<_parent._parent.level; i++)
 				toolTitle = "-" + toolTitle;
 		}
+		
+		if(level > 0)
+			for(var i=0; i<level; i++)
+				toolTitle = "-" + toolTitle;
 		
 		title_lbl.text = toolTitle;
 		
@@ -470,4 +475,7 @@ class LearnerActivity extends MovieClip {
 		return (actStatus == 'attempted_mc');
 	}
 	
+	public function get level():Number {
+		return _level;
+	}
 }

@@ -202,6 +202,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			var learnerAct;
 			
 			var progStatus:String = Progress.compareProgressData(learner, _children[i].activityID);
+			var parentAct:Activity = (model instanceof LessonModel) ? model.learningDesignModel.getActivityByUIID(Activity(_children[i]).parentUIID) : model.ddm.getActivityByUIID(Activity(_children[i]).parentUIID);
 			
 			Debugger.log("children_mc length: " + children_mc.length, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
 			
@@ -211,7 +212,8 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			Debugger.log("progStatus: " + progStatus, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
 			Debugger.log("childCoordY: " + childCoordY, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
 			
-			learnerAct = LearnerActivity(childHolder_mc.createChildAtDepth("LearnerActivity_forComplex", childHolder_mc.getNextHighestDepth(), {_activity:_children[i], _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _complex:true, xPos:this._x, yPos:childCoordY}));
+			var _newLevel:Number = (parentAct.isOptionalSequenceActivity(activity)) ? _level + 1 : _level;
+			learnerAct = LearnerActivity(childHolder_mc.createChildAtDepth("LearnerActivity_forComplex", childHolder_mc.getNextHighestDepth(), {_activity:_children[i], _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _complex:true, _level: _newLevel, xPos:this._x, yPos:childCoordY}));
 			
 			Debugger.log('attaching child movieL ' + learnerAct,Debugger.CRITICAL,'drawChildren','LearnerComplexActivity');
 			
@@ -225,8 +227,6 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			
 			Debugger.log('x: ' + learnerAct._x + ' y: ' +  learnerAct._y, Debugger.CRITICAL, 'drawChildren', 'LearnerComplexActivity');
         
-			var parentAct:Activity = (model instanceof LessonModel) ? model.learningDesignModel.getActivityByUIID(Activity(_children[i]).parentUIID) : model.ddm.getActivityByUIID(Activity(_children[i]).parentUIID);
-			
 			if((activity.isBranchingActivity() && parentAct.isSequenceActivity()) || (activity.isOptionsWithSequencesActivity() && parentAct.isSequenceActivity())) {
 				/** TODO: Use for Sequence in Optional */
 				learnerAct.lineTopVisible = (i != 0) ? false : true;
