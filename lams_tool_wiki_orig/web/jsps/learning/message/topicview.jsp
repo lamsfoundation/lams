@@ -4,7 +4,7 @@
 	<c:set var="indentSize" value="${msgDto.level*3}" />
 	<c:set var="hidden" value="${msgDto.message.hideFlag}" />
 	<div style="margin-left:<c:out value="${indentSize}"/>em;">
-		<table cellspacing="0" class="wiki">
+		<table cellspacing="0" class="forum">
 			<tr>
 				<th>
 					<c:choose>
