@@ -231,16 +231,8 @@ class LearnerActivity extends MovieClip {
 		//write text
 		if (actLabel == undefined){
 			toolTitle = _activity.title;
-			if (toolTitle.length > 19){
-				toolTitle = toolTitle.substr(0, 17)+"...";
-			}
-			//title_lbl.text = toolTitle;
 		}else {
 			toolTitle = actLabel;
-			if (toolTitle.length > 19){
-				toolTitle = toolTitle.substr(0, 17)+"...";
-			}
-			
 		}
 		
 		if(_parent._parent.level > 0) {
@@ -251,6 +243,10 @@ class LearnerActivity extends MovieClip {
 		if(level > 0)
 			for(var i=0; i<level; i++)
 				toolTitle = "-" + toolTitle;
+				
+		if (toolTitle.length > 18){
+				toolTitle = toolTitle.substr(0, 16)+"...";
+		}
 		
 		title_lbl.text = toolTitle;
 		
