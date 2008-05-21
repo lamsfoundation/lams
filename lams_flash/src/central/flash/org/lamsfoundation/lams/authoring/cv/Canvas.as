@@ -504,8 +504,13 @@ class Canvas extends CanvasHelper {
 	* Opens a design using workspace and user to select design ID
 	* passes the callback function to recieve selected ID
 	*/
-	public function openDesignBySelection(mode:String){
+	public function openDesignBySelection(mode:String, confirm:Boolean){
         //Work space opens dialog and user will select view
+		if(mode == Workspace.MODE_INSERT && !confirm) {
+			LFMessage.showMessageConfirm(Dictionary.getValue("cv_design_insert_warning"), Proxy.create(this, openDesignBySelection, mode, true), null)
+			return;
+		}
+		
 		if(_ddm.modified || (mode == Workspace.MODE_INSERT && _ddm.modified && (_ddm.learningDesignID != null))) {
 			if(_ddm.editOverrideLock) LFMessage.showMessageConfirm(Dictionary.getValue('cv_design_unsaved_live_edit'), Proxy.create(this, doOpenDesignBySelection, mode, true), null);
 			else LFMessage.showMessageConfirm(Dictionary.getValue('cv_design_unsaved'), Proxy.create(this,doOpenDesignBySelection, mode), null);
