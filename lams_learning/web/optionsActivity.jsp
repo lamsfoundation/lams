@@ -85,7 +85,7 @@
 				</c:forEach>
 			</table>
 
-			<div class="align-right small-space-bottom">
+			<div align="center" class="small-space-bottom">
 				<html:submit styleClass="button">
 					<fmt:message key="label.activity.options.choose" />
 				</html:submit>
