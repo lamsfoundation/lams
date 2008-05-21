@@ -70,8 +70,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private var actCount_lbl:Label;
 	private var childActivities_mc:MovieClip;
 	private var clickTarget_mc:MovieClip;
-	private var padlockClosed_mc:MovieClip;
-	private var padlockOpen_mc:MovieClip;
 	
 	private var learnerOffset_X:Number = 4;
 	private var learnerOffset_Y:Number = 3;
@@ -306,12 +304,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	
 	private function setLocking():Void{
 		if(_locked){
-			padlockClosed_mc._visible = true;
-			padlockOpen_mc._visible = false;
 			clickTarget_mc._height = 173;
 		}else{
-			padlockOpen_mc._visible = true;
-			padlockClosed_mc._visible = false;
 			clickTarget_mc._height = 30;
 		}
 	}

@@ -91,8 +91,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var childActivities_mc:MovieClip;
 	private var optionalActivity_mc:MovieClip;
 	private var clickTarget_mc:MovieClip;
-	private var padlockClosed_mc:MovieClip;
-	private var padlockOpen_mc:MovieClip;
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
 	
@@ -377,9 +375,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			header_pnl._width = _visibleWidth - 6 + PANEL_OFFSET_X;
 			
 			clickTarget_mc._width = _visibleWidth + PANEL_OFFSET_X;
-			
-			padlockClosed_mc._x = header_pnl._width + header_pnl._x - padlockClosed_mc._width - 5;
-			padlockOpen_mc._x = padlockClosed_mc._x;
 		}
 		
 		_visibleHeight = container_pnl._height;
@@ -403,12 +398,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	
 	private function setLocking():Void{
 		if (_locked){
-			padlockClosed_mc._visible = true;
-			padlockOpen_mc._visible = false;
 			clickTarget_mc._height = container_pnl._height;
 		}else{
-			padlockOpen_mc._visible = true;
-			padlockClosed_mc._visible = false;
 			clickTarget_mc._height = 45;
 		}
 	}
