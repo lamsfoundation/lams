@@ -129,10 +129,10 @@
 				<td>
 					<c:choose>
 					<c:when test="${user.anyFilesMarked}">
-						<img src="<lams:LAMSURL/>/images/tick.gif" alt="tick"/>
+						<fmt:message key="label.yes"/>
 					</c:when>
 					<c:otherwise>
-						<img src="<lams:LAMSURL/>/images/cross.gif" alt="cross"/>
+						<fmt:message key="label.no"/>
 					</c:otherwise>
 					</c:choose>
 				</td>
