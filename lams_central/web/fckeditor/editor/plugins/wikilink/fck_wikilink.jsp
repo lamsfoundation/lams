@@ -1,52 +1,52 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ page language="java" pageEncoding="UTF-8"
+	contentType="text/html;charset=utf-8"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
 
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<meta content="noindex, nofollow" name="robots">
-		<style type="text/css">
-			select {width: 100%}
-		</style>
-		
-<script language="JavaScript" type="text/javascript" src="../../../../includes/javascript/jquery-latest.pack.js"></script>
-<script language="JavaScript" type="text/javascript">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta content="noindex, nofollow" name="robots">
+<style type="text/css">
+select {
+	width: 100%
+}
+</style>
+
+<script type="text/javascript">
 <!--
-		
 var xmlDoc;
 var wikiArray;
 var oEditor = window.parent.InnerDialogLoaded() ;
 var FCKLang = oEditor.FCKLang ;
 var FCKWikiLinks = oEditor.FCKWikiLinks ;
 
-jQuery.ajax({
-    url : "<lams:LAMSURL/>/tool/lawiki10/WikiLinkHandler",
-    data : {toolSessionId: window.parent.InnerDialogLoaded().FCK.toolSessionId,
-    		sessionMapID: window.parent.InnerDialogLoaded().FCK.sessionMapID,
-    		wikiID: window.parent.InnerDialogLoaded().FCK.wikiID,
-    		method: 'getWikis'},
-    async : false, 
-    success : function(xml) {
-    	xmlDoc = xml;
+var xmlHttp = getAjaxObject();
+xmlHttp.onreadystatechange = function() 
+{ 
+    if(xmlHttp.readyState == 4) 
+    {
+    	var xmlDoc = xmlHttp.responseXML;
     	wikiArray = xmlDoc.getElementsByTagName('Wiki');
     }
-});
+ }
 
+var url="<lams:LAMSURL/>/tool/lawiki10/WikiLinkHandler?"
+	+ "&toolSessionId="+window.parent.InnerDialogLoaded().FCK.toolSessionId
+	+ "&sessionMapID="+window.parent.InnerDialogLoaded().FCK.sessionMapID
+	+ "&wikiID="+window.parent.InnerDialogLoaded().FCK.wikiID
+	+ "&method="+"getWikis";
 
-window.onload = function ()
-{
-	// First of all, translate the dialog box texts
-	oEditor.FCKLanguageManager.TranslatePage( document ) ;
-
-	document.wikiform.newWikiLink.disabled = true;
-
-	// Show the "Ok" button.
-	window.parent.SetOkButton( true ) ;
+try{
+	xmlHttp.open("GET",url,false);
+	xmlHttp.send(null);
 }
-
+catch(e)
+{
+	alert("An error occurred: " + e);
+}
 function addOption(dropDownMenu, wikiName, wikiURL) 
 {
 	var option = document.createElement("Option");
@@ -55,18 +55,27 @@ function addOption(dropDownMenu, wikiName, wikiURL)
 	dropDownMenu.options.add(option);
 }
 
+function init()
+{
+	// First of all, translate the dialog box texts
+	oEditor.FCKLanguageManager.TranslatePage( document ) ;
+
+	document.getElementById("newWikiLink").disabled = true;
+
+	//alert('<fmt:message key="error.forgot.password.email" />');
+	
+	// Show the "Ok" button.
+	window.parent.SetOkButton( true ) ;
+}
+
 function Ok()
 {
-	
 	var linkText = document.getElementById('linkName').value ;
 	var existingWikiSelected = document.getElementById('existingWikiRadioButton').checked ;
 	var newWikiSelected = document.getElementById('newWikiRadioButton').checked ;
-
-	var oEditor2 = window.parent.InnerDialogLoaded() ;
-	var FCKWikiLinks2 = oEditor2.FCKWikiLinks ;
-		
-
+	
 	var wikiUrl;
+
 	if ( linkText.length == 0 )
 	{
 		alert(FCKLang.WikiLinkErrNoName ) ;
@@ -74,8 +83,7 @@ function Ok()
 	}
 	
 	if ( existingWikiSelected ) {
-
-		var existingWikiList = document.wikiform.existingWikiDropDownMenu;
+		var existingWikiList = document.getElementById("existingWikiDropDownMenu");
 		wikiUrl = existingWikiList.options[existingWikiList.selectedIndex].value;
 
 		if ( wikiUrl.length == 0 )
@@ -86,13 +94,13 @@ function Ok()
 	}
 	else if ( newWikiSelected ) 
 	{
-		var wikiNameStr = document.wikiform.newWikiLink.value ;
-		
+		var wikiNameStr = document.getElementById("newWikiLink").value;
 		if ( wikiNameStr.length == 0 )
 		{
 			alert( FCKLang.WikiLinkErrNoWiki ) ;
 			return false;
 		}
+			
 		window.parent.jQuery.ajax({
             url : "<lams:LAMSURL/>/tool/lawiki10/WikiLinkHandler",
             data : {toolSessionId: window.parent.InnerDialogLoaded().FCK.toolSessionId,
@@ -103,13 +111,12 @@ function Ok()
            	async : false, 
             success : function(result) 
             {
-          	
             	wikiUrl = result;
             }
         });
 	}
 	
-	FCKWikiLinks2.InsertWikiLink( linkText, wikiUrl );
+	FCKWikiLinks.InsertWikiLink( linkText, wikiUrl );
 	return true ;
 }
 
@@ -119,79 +126,94 @@ function enableSelection()
 	var newWikiSelected = document.getElementById('newWikiRadioButton').checked ;
 	
 	if ( existingWikiSelected ) {
-		document.wikiform.newWikiLink.disabled = true;
-		document.wikiform.existingWikiDropDownMenu.disabled = false;
+		document.getElementById("newWikiLink").disabled = true;
+		document.getElementById("existingWikiDropDownMenu").disabled = false;
 	}
 	else if ( newWikiSelected ) {
-		document.wikiform.existingWikiDropDownMenu.disabled = true;
-		document.wikiform.newWikiLink.disabled = false;
+		document.getElementById("existingWikiDropDownMenu").disabled = true;
+		document.getElementById("newWikiLink").disabled = false;
 	}
+}
+
+function getAjaxObject()
+{
+    var ajavObj;
+    try
+    {
+        // Firefox, Opera 8.0+, Safari
+        ajaxObj=new XMLHttpRequest();
+    }
+    catch (e)
+    {
+        // Internet Explorer
+        try
+        {
+            ajaxObj=new ActiveXObject("Msxml2.XMLHTTP");
+        }
+        catch (e)
+        {
+            try
+            {
+                ajaxObj=new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            catch (e)
+            {
+                alert("Your browser does not support AJAX!");
+            }
+        }
+    }
+    return ajaxObj;
 }
 
 //-->
 </script>
-	</head>
-	<body scroll="no" style="OVERFLOW: hidden">
-	<form name="wikiform" action="">
-		<table height="100%" cellSpacing="0" cellPadding="0" width="100%" border="0">
+</head>
+<body scroll="no" style="OVERFLOW: hidden" onload="init()">
+<form name="wikiform" action="">
+<table height="100%" cellSpacing="0" cellPadding="0" width="100%"
+	border="0">
+	<tr>
+		<td>
+		<table cellSpacing="3" cellPadding="3" align="center" border="0">
 			<tr>
-				<td>
-					<table cellSpacing="3" cellPadding="3" align="center" border="0">
-						<tr>
-							<td colspan="2">
-								<span fckLang="WikiLinkText"></span>
-							</td>
-							<td>
-								<input id="linkName" type="text">
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<span fckLang="WikiLinkExisting"></span>
-							</td>
-							<td>
-								<input type="radio" id="existingWikiRadioButton" name="wikilinkgroup" selected="true" checked 		onchange="enableSelection();">
-							</td>
-							<td>
-								<select name="existingWikiDropDownMenu" id="existingWikiDropDownMenu">
-									<option value="noSelection">Please Select</option>
-									<script type='text/javascript'>
-									<!--
-										for (var wikiPage in wikiArray) 
-										{	
-											var wiki = wikiArray[wikiPage].attributes;
-											var attr = wikiArray[wikiPage].attributes;
-											if (attr!=null)
-											{
-												var attr = wikiArray[wikiPage].attributes;
-	                							var wikiName = attr.getNamedItem('name').nodeValue;
-	                							var wikiURL = attr.getNamedItem('url').nodeValue;
-	                							addOption(document.getElementById('existingWikiDropDownMenu'), wikiName, wikiURL);
-                							}
-                							
-										}
-										
-										
-									//-->		
-									</script>	
-								</select>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<span fckLang="WikiLinkNew"></span>
-							</td>
-							<td>
-								<input type="radio" id="newWikiRadioButton" name="wikilinkgroup" onchange="enableSelection();">
-							</td>
-							<td>
-								<input id="newWikiLink" name="newWikiLink" type="text">
-							</td>
-						</tr>
-					</table>
-				</td>
+				<td colspan="2"><span fckLang="WikiLinkText"></span></td>
+				<td><input id="linkName" type="text"></td>
 			</tr>
+			<tr>
+				<td><span fckLang="WikiLinkExisting"></span></td>
+				<td><input type="radio" id="existingWikiRadioButton"
+					name="wikilinkgroup" selected="true" checked
+					onchange="enableSelection();"></td>
+				<td><select name="existingWikiDropDownMenu" id="existingWikiDropDownMenu">
+						<option value="noSelection">Please Select</option>
+						<script type='text/javascript'>
+						<!--
+							var i;
+							for (i=0; i<wikiArray.length; ++i) 
+							{	
+								var wiki = wikiArray[i];
+								var attr = wiki.attributes;
+								if (attr!=null)
+								{
+	       							var wikiName = attr.getNamedItem('name').nodeValue;
+	       							var wikiURL = attr.getNamedItem('url').nodeValue;
+	       							addOption(document.getElementById('existingWikiDropDownMenu'), wikiName, wikiURL);
+	          					}						
+							}
+						//-->		
+						</script>
+				</select></td>
+			</tr>
+			<tr>
+				<td><span fckLang="WikiLinkNew"></span></td>
+				<td><input type="radio" id="newWikiRadioButton"
+					name="wikilinkgroup" onchange="enableSelection();"></td>
+				<td><input id="newWikiLink" name="newWikiLink" type="text">
+				</td>
 		</table>
-	</form>
-	</body>
+		</td>
+	</tr>
+</table>
+</form>
+</body>
 </html>

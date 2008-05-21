@@ -230,14 +230,16 @@ public class WikiLinkHandlerServlet extends HttpServlet {
 			wikiUser = new WikiUser(user,null);
 		}
 		
-		message.setCreatedBy(wikiUser);
-		message.setModifiedBy(wikiUser);
-
+		Message createdWiki;
 		
-		Message createdWiki = wikiService.createRootTopic(wikiID, toolSessionID, message);
-		
-		return createURL(sessionMap.getSessionID(), createdWiki.getUid().toString(), createdWiki.getCreated().getTime());
+		if(message != null){
+			message.setCreatedBy(wikiUser);
+			message.setModifiedBy(wikiUser);
+			createdWiki = wikiService.createRootTopic(wikiID, toolSessionID, message);
 			
+			return createURL(sessionMap.getSessionID(), createdWiki.getUid().toString(), createdWiki.getCreated().getTime());
+		}
+		return null; // TODO: Handle null return value
 	}
 	
 	public String createURL(String sessionID, String wikiID, long time) {
