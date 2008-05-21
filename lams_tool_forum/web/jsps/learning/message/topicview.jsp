@@ -40,7 +40,7 @@
 						<c:out value="${msgDto.message.body}" escapeXml="false" />
 					</c:if>
 					<c:if test='${hidden}'>
-						<fmt:message key="topic.message.body.hidden" />
+						<i><fmt:message key="topic.message.body.hidden" /> </i>
 					</c:if>
 				</td>
 			</tr>
