@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -230,12 +232,18 @@ public class ViewItemAction extends Action {
 	      return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
 	}
 	
+	private static Pattern wikipediaPattern = Pattern.compile("wikipedia", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+
 	private Object getReviewUrl(ResourceItem item, String sessionMapID) {
 		short type = item.getType();
 		String url = null;
 		switch (type) {
 		case ResourceConstants.RESOURCE_TYPE_URL:
-			if(item.isOpenUrlNewWindow()){
+			// See LDEV-1736 regarding wikipedia regex
+			Matcher matcher = wikipediaPattern.matcher(item.getUrl());
+			boolean wikipediaInURL = matcher.find();
+			
+			if(item.isOpenUrlNewWindow() || wikipediaInURL) {
 				try {
 					url = "/openUrlPopup.do?popupUrl=" + URLEncoder.encode(protocol(item.getUrl()), "UTF8") + "&title="
 							+ URLEncoder.encode(item.getTitle(), "UTF8");
