@@ -20,11 +20,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-					<c:if test="${groupingEnabled eq 'true'}">
 			  	 		<tr>
 			  	 			<td> <b> <fmt:message key="group.label"/> : </b> <c:out value="${currentSessionName}"/> </td>
 			  	 		</tr>
-			  	 	</c:if>
 
 
 					<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
