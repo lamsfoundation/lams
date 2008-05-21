@@ -76,13 +76,25 @@ public class VersionUtil {
 	public static boolean isSameOrLaterVersionAsServer(String versionString, boolean compareOnlyFirstPart) throws NumberFormatException {
 		Long[] serverVersion = extractSystemVersionParts();
 		Long[] compareVersion = extractVersionParts(versionString);
-		return  checkCompare(serverVersion[0],compareVersion[0]) && checkCompare(serverVersion[1],compareVersion[1]) &&
-				checkCompare(serverVersion[2],compareVersion[2]) &&
-				( compareOnlyFirstPart || checkCompare(serverVersion[3],compareVersion[3]));
-	}
+		int compareRes = checkVersionPart(serverVersion[0],compareVersion[0]);
+		if ( compareRes < 0) return false;
+		if ( compareRes > 0 ) return true;
 
-	private static boolean checkCompare(Long version1, Long version2) {
-		return (version1 == null && version2 == null ) || ( version1 != null && version2 != null && version1.compareTo(version2) >= 0 );
+		compareRes = checkVersionPart(serverVersion[1],compareVersion[1]);
+		if ( compareRes < 0) return false;
+		if ( compareRes > 0 ) return true;
+		
+		compareRes = checkVersionPart(serverVersion[2],compareVersion[2]);
+		if ( compareRes < 0) return false;
+		if ( compareRes > 0 ) return true;
+		
+		return ( compareOnlyFirstPart || checkVersionPart(serverVersion[3],compareVersion[3]) >= 0);
+	}
+	
+	private static int checkVersionPart(Long version1, Long version2) {
+		if (version1 == null && version2 == null ) return 0;
+		if ( version1 != null && version2 == null ) return 1;
+		return version1.compareTo(version2);
 	}
 
 }
