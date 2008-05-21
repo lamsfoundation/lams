@@ -359,7 +359,7 @@ public class MonitoringAction extends Action {
 					if (dto.getMessage() != null
 							&& dto.getMessage().getReport() != null
 							&& dto.getMessage().getReport().getMark() != null)
-						cell.setCellValue(NumberUtil.formatLocalisedNumber(dto.getMessage().getReport().getMark(), request.getLocale(),1));
+						cell.setCellValue(NumberUtil.formatLocalisedNumber(dto.getMessage().getReport().getMark(), request.getLocale(),2));
 					else
 						cell.setCellValue("");
 
@@ -509,7 +509,7 @@ public class MonitoringAction extends Action {
 				// summary to total mark
 				totalMsgMarkSum += msgMarkSum;
 				// set average mark to topic message DTO for display use
-				msgDto.setMark(getAverageFormat(msgMarkSum / (float) msgNum));
+				msgDto.setMark(msgMarkSum / (float) msgNum);
 				totalMsg += msgNum;
 			}
 
@@ -521,8 +521,7 @@ public class MonitoringAction extends Action {
 			sessionDto.setSessionName(session.getSessionName());
 
 			sessionTopicsMap.put(sessionDto, topicList);
-			sessionAvaMarkMap.put(session.getSessionId(),
-					getAverageFormat(averMark));
+			sessionAvaMarkMap.put(session.getSessionId(),averMark);
 			sessionTotalMsgMap.put(session.getSessionId(),
 					new Integer(totalMsg));
 		}
@@ -721,7 +720,7 @@ public class MonitoringAction extends Action {
 		// echo back to web page
 		if (msg.getReport() != null) {
 			if (msg.getReport().getMark() != null)
-				markForm.setMark(NumberUtil.formatLocalisedNumber(msg.getReport().getMark(),request.getLocale(),1));
+				markForm.setMark(NumberUtil.formatLocalisedNumber(msg.getReport().getMark(),request.getLocale(),2));
 			else
 				markForm.setMark("");
 			markForm.setComment(msg.getReport().getComment());
@@ -870,21 +869,6 @@ public class MonitoringAction extends Action {
 		return topicsByUser;
 	}
 
-	/**
-	 * Get formatted average mark.
-	 * 
-	 * @param aver
-	 * @return
-	 */
-	private Float getAverageFormat(float aver) {
-		try {
-			NumberFormat format = NumberFormat.getInstance();
-			format.setMaximumFractionDigits(1);
-			return format.parse(format.format(aver)).floatValue();
-		} catch (Exception e) {
-			return new Float(0);
-		}
-	}
 	/**
 	 * Return ResourceService bean.
 	 */

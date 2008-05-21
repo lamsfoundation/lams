@@ -98,7 +98,7 @@ public class FileDetailsDTO implements Serializable{
 			this.reportID = report.getReportID();
 			this.dateMarksReleased = report.getDateMarksReleased();		
 			this.comments = report.getComments();
-			this.marks = report.getMarks() != null? NumberUtil.formatLocalisedNumber(report.getMarks(), numberFormat,1) : "";
+			this.marks = report.getMarks() != null? NumberUtil.formatLocalisedNumber(report.getMarks(), numberFormat,2) : "";
 		}
 	}
 

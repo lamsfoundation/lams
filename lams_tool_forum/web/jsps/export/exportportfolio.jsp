@@ -95,7 +95,7 @@
 											<fmt:message key="message.not.avaliable"/>
 										</c:when>
 										<c:otherwise>
-											<fmt:formatNumber value="${msgDto.mark}"  maxFractionDigits="1"/>
+											<fmt:formatNumber value="${msgDto.mark}"  maxFractionDigits="2"/>
 										</c:otherwise>
 									</c:choose>
 								</td>
