@@ -52,7 +52,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">
 				
+				<c:set var="groupingEnabled" value="false" scope="request"/>
 				<c:if test="${fn:length(requestScope.summaryToolSessions) > 2 }">
+					<c:set var="groupingEnabled" value="true" scope="request"/>
 					<%-- When grouping is not enabled, we have only 2 items in summaryToolSessions.  The main toolSession and 'All' --%>
 
 					<c:if test="${(generalLearnerFlowDTO.requestLearningReport != 'true')}"> 	
