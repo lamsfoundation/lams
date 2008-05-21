@@ -104,8 +104,8 @@ class Transition {
 	
 	public function clone():Transition{
 		var dto:Object = toData();
-		var t = new Transition();
-		t.populateFromDTO(dto);
+		Debugger.log("cloning transition: " + dto.transitionUIID, Debugger.CRITICAL, "clone", "Transition");
+		var t = new Transition(dto.transitionUIID, dto.fromUIID, dto.toUIID, dto.learningDesignID);
 		return t;
 	}
 	
