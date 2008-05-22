@@ -1,5 +1,18 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<script type="text/javascript">
+<!--
+function confirmForceComplete() {
+		var message = "<fmt:message key='message.confirmForceComplete'/>";
+		if (confirm(message)) {
+			return true;			
+		} else {
+			return false;
+		}
+	}
+//-->
+</script>
+
 <c:set var="dto" value="${requestScope.monitoringDTO}" />
 <c:forEach var="session" items="${dto.sessionDTOs}">
 	<h2>
@@ -73,10 +86,10 @@
 			</c:forEach>
 
 			<c:if test="${session.forceComplete eq false}">
-				<html:form action="monitoring">
+				<html:form action="monitoring" onsubmit="return confirmForceComplete();">
 					<html:hidden property="dispatch" value="forceCompleteActivity" />
 					<html:hidden property="toolSessionID" value="${session.sessionID}" />
-					<html:hidden property="contentFolderID"/>
+					<html:hidden property="contentFolderID" />
 					<html:submit styleClass="button">
 						<fmt:message key="button.forceComplete" />
 					</html:submit>
