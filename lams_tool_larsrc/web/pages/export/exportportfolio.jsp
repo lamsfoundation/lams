@@ -25,6 +25,13 @@
 		}
 	</script>
 	<lams:css localLinkPath="../" />
+
+	<style type="text/css">
+		.rsrc-boldtext {
+			font-weight: bold;
+		}
+	</style>
+
 </lams:head>
 <body class="stripes">
 
@@ -72,6 +79,16 @@
 
 				<c:forEach var="item" items="${group}" varStatus="status">
 
+					<%-- Bold styling is to indicate an item created by the author --%>
+					<c:choose>
+						<c:when test="${item.itemCreateByAuthor}">
+							<c:set var="itemRowStyle" value="rsrc-boldtext" />
+						</c:when>
+						<c:otherwise>
+							<c:set var="itemRowStyle" value="" />
+						</c:otherwise>
+					</c:choose>
+
 					<c:if test="${item.itemUid == -1}">
 						<tr>
 							<td colspan="4">
@@ -84,7 +101,7 @@
 					</c:if>
 
 					<c:if test="${item.itemUid != -1}">
-						<tr>
+						<tr class="${itemRowStyle}">
 							<td>
 								<c:choose>
 									<c:when test="${item.itemType == 1}">
@@ -108,7 +125,7 @@
 							</td>
 
 							<td>
-								${item.username}
+								${item.username} ${item.itemCreateByAuthor}
 							</td>
 
 							<td align="center">
