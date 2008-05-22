@@ -118,45 +118,45 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:if> 
 
 						<tr>
-					 		<td NOWRAP colspan=2 > <b>  <fmt:message key="label.groupName"/> </b><c:out value="${voteGeneralMonitoringDTO.groupName}"/>  </td>
+					 		<td  colspan=2 > <b>  <fmt:message key="label.groupName"/> </b><c:out value="${voteGeneralMonitoringDTO.groupName}"/>  </td>
 						</tr>
 
 	  					<tr>
-					 		<td NOWRAP> <b>  <fmt:message key="label.total.students"/> </b> </td>
+					 		<td > <b>  <fmt:message key="label.total.students"/> </b> </td>
 					 		<td>  <c:out value="${voteGeneralMonitoringDTO.sessionUserCount}"/> </td>
 						</tr>
 
 	  					<tr>
-					 		<td NOWRAP> <b>  <fmt:message key="label.total.completed.students"/> </b> </td> 
-					 		<td NOWRAP>  <c:out value="${voteGeneralMonitoringDTO.completedSessionUserCount}"/> 
+					 		<td > <b>  <fmt:message key="label.total.completed.students"/> </b> </td> 
+					 		<td >  <c:out value="${voteGeneralMonitoringDTO.completedSessionUserCount}"/> 
 						 		&nbsp(<c:out value="${voteGeneralMonitoringDTO.completedSessionUserPercent}"/> <fmt:message key="label.percent"/>)
 					 		</td>
 						</tr>
 
 						<tr>
-					 		<td NOWRAP colspan=2 > </td>
+					 		<td  colspan=2 > </td>
 						</tr>
 	  				
 						<tr>
-					 		<td NOWRAP colspan=2> 
+					 		<td  colspan=2> 
 		                            <c:out value="${voteGeneralMonitoringDTO.activityInstructions}" escapeXml="false"/> 
 							</td>
 						</tr>
 						
 
 						<tr>
-					 		<td NOWRAP colspan=2 > </td>
+					 		<td  colspan=2 > </td>
 						</tr>
 						
 						
 						<tr>
-							<td NOWRAP valign=top class="align-left">
+							<td  valign=top class="align-left">
 							<table align=center>
 						
 							<c:if test="${statsTabActive != 'true'}"> 							
 								<tr> 
 									<td> </td>
-									<td NOWRAP valign=top class="align-left" >
+									<td  valign=top class="align-left" >
 										<c:set scope="request" var="viewURL">
 											<html:rewrite page="/chartGenerator?type=pie"/>
 										</c:set>
@@ -167,7 +167,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</tr>
 								<tr> 
 									<td> </td>
-									<td NOWRAP valign=top class="align-left" >
+									<td  valign=top class="align-left" >
 										<c:set scope="request" var="viewURL">
 											<html:rewrite page="/chartGenerator?type=bar"/>
 										</c:set>
@@ -179,20 +179,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</c:if> 								
 							
 									<tr>
-								 		<td NOWRAP> <b>  <fmt:message key="label.nomination"/> </b> </td>
-										<td NOWRAP> <b>  <fmt:message key="label.total.votes"/> </b> </td>
+								 		<td > <b>  <fmt:message key="label.nomination"/> </b> </td>
+										<td > <b>  <fmt:message key="label.total.votes"/> </b> </td>
 									</tr>
 									
 									<c:forEach var="currentNomination" items="${voteGeneralMonitoringDTO.mapStandardNominationsHTMLedContent}">
 							  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
 							  	 		 <tr>
-				  	 						<td NOWRAP valign=top class="align-left">
+				  	 						<td  valign=top class="align-left">
 												<c:out value="${currentNomination.value}" escapeXml="false"/>
 											 </td>
 			
 			
 			
-											<td NOWRAP valign=top class="align-left">				  	 		
+											<td  valign=top class="align-left">				  	 		
 									  	 		<c:forEach var="currentUserCount" items="${voteGeneralMonitoringDTO.mapStandardUserCount}">
 										  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
 									  				<c:if test="${currentNominationKey == currentUserKey}"> 				
@@ -247,32 +247,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 							<tr>
-						 		<td NOWRAP colspan=2 > </td>
+						 		<td  colspan=2 > </td>
 							</tr>
 						
 	
 			  				<c:if test="${existsOpenVotes == 'true'}"> 				
 								<tr>
-							 		<td NOWRAP colspan=2> <hr size="1"> </td>
+							 		<td  colspan=2> <hr size="1"> </td>
 								</tr>
 	
 								<tr>
-							 		<td NOWRAP colspan=2 > </td>
+							 		<td  colspan=2 > </td>
 								</tr>
 			  				
 								<tr>
-							 		<td NOWRAP colspan=2>
+							 		<td  colspan=2>
 						 			<table class="align-left">
 												<tr>
-											 		<th NOWRAP colspan=3>  <fmt:message key="label.openVotes"/>  </th>
+											 		<th  colspan=3>  <fmt:message key="label.openVotes"/>  </th>
 												</tr>
 	
 												<tr> 
-													 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.vote"/>  </b> </td>  														 
-													 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.user"/>  </b> </td>  
-							  						 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.attemptTime"/> </b></td>
+													 <td  valign=top class="align-left"> <b>   <fmt:message key="label.vote"/>  </b> </td>  														 
+													 <td  valign=top class="align-left"> <b>   <fmt:message key="label.user"/>  </b> </td>  
+							  						 <td  valign=top class="align-left"> <b>   <fmt:message key="label.attemptTime"/> </b></td>
 							 						 <c:if test="${statsTabActive != 'true'}"> 															  						 
-								  						 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.visible"/>  </b></td>								  						 
+								  						 <td  valign=top class="align-left"> <b>   <fmt:message key="label.visible"/>  </b></td>								  						 
 													 </c:if> 																					  						 
 									  			</tr>				 
 											
@@ -282,19 +282,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
 		  	 									  	 		<c:set var="currentUid" scope="request" value="${userData.uid}"/>
 														<tr> 
-																<td NOWRAP valign=top class="align-left"> 
+																<td  valign=top class="align-left"> 
 																	<c:out value="${currentDto.question}" escapeXml="false"/> 
 																	<c:if test="${userData.visible != 'true' }"> 			
 												                                 <i><fmt:message key="label.hidden"/> </i> 
 																	</c:if> 								
 																</td>
 																 
-																 <td NOWRAP valign=top class="align-left">    <c:out value="${userData.userName}"/>   </td>  
-																 <td NOWRAP valign=top class="align-left">    <lams:Date value="${userData.attemptTime}"/>  </td>																 
+																 <td  valign=top class="align-left">    <c:out value="${userData.userName}"/>   </td>  
+																 <td  valign=top class="align-left">    <lams:Date value="${userData.attemptTime}"/>  </td>																 
 																 
 																 
 										 						<c:if test="${statsTabActive != 'true'}"> 							
-																	 <td NOWRAP valign=top class="align-left">
+																	 <td  valign=top class="align-left">
 												 						<c:if test="${userData.visible == 'true' }"> 			
 													                                <html:submit property="hideOpenVote" 
 													                                             styleClass="linkbutton" 
