@@ -204,14 +204,6 @@ public interface ITaskListService {
 	void deleteTaskListCondition(Long uid);
 	
 	/**
-	 * Return all resource items within the given toolSessionID.
-	 * 
-	 * @param sessionId
-	 * @return
-	 */
-	List<TaskListItem> getTaskListItemsBySessionId(Long sessionId);
-	
-	/**
 	 * Get taskList which is relative with the special toolSession.
 	 * 
 	 * @param sessionId
@@ -241,7 +233,7 @@ public interface ITaskListService {
 	 * @param taskListItemList
 	 * @param user
 	 */
-	void retrieveComplete(SortedSet<TaskListItem> taskListItemList, TaskListUser user);
+	void retrieveComplete(Set<TaskListItem> taskListItemList, TaskListUser user);
 	
 	/**
 	 * Mark taskListItem as completed.

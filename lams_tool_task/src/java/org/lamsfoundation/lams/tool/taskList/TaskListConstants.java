@@ -81,6 +81,10 @@ public class TaskListConstants {
 	public static final String ATTR_TASK_LIST_ITEM_DESCRIPTION = "taskListItemDescription";
 	public static final String ATTR_TASK_LIST_ITEM_ATTACHMENT_LIST = "taskListItemAttachmentList";
 	public static final String ATTR_TASK_LIST_ITEM_COMMENT_LIST = "taskListItemCommentList";
+	public static final String ATTR_USER_UID = "userUid";
+	public static final String ATTR_TASK_LIST_ITEM_UID = "taskListItemUid";
+	public static final String ATTR_USER_LOGIN = "userLogin";
+	public static final String ATTR_TASK_LIST_ITEM_DTOS = "itemDTOs";
 	
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
@@ -95,10 +99,6 @@ public class TaskListConstants {
 	public static final String ATTR_REFLECTION_ON = "reflectOn";
 	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
 	public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
-	
 	public static final String ATTR_REFLECT_LIST = "reflectList";
-	public static final String ATTR_USER_UID = "userUid";
-	public static final String ATTR_TASK_LIST_ITEM_UID = "taskListItemUid";
-	public static final String ATTR_USER_LOGIN = "userLogin";
 
 }

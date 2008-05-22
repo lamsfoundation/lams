@@ -2,12 +2,13 @@
 		"http://www.w3.org/TR/html4/loose.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+
 <html>
 	<body class="stripes">
 
 		<script type="text/javascript">
-			document.location = "<c:url value="/pages/learning/learning.jsp?sessionMapID=${sessionMapID}&mode=${mode}"/>"
+			window.parent.location.href = "<c:url value="/learning/start.do?toolSessionID=${toolSessionID}&mode=${mode}"/>"
 		</script>
 	<body class="stripes">
 </html>
+

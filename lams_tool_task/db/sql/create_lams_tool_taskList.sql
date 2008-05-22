@@ -55,7 +55,7 @@ create table tl_latask10_taskList (
 create table tl_latask10_taskList_item (
    uid bigint not null auto_increment,
    sequence_id integer,
-   description varchar(255),
+   description text,
    init_item varchar(255),
    organization_xml text,
    title varchar(255),
@@ -97,7 +97,7 @@ create table tl_latask10_item_attachment (
 );
 create table tl_latask10_item_comment (
    uid bigint not null auto_increment,
-   comment varchar(255),
+   comment text,
    taskList_item_uid bigint,
    create_by bigint,
    create_date datetime,

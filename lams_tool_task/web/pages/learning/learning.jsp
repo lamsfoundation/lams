@@ -26,15 +26,18 @@
 			document.location.href = "<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}";
  		    return false;
 		}
-		function viewItem(itemUid){
-			var myUrl = "<c:url value="/reviewtask/reviewTask.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&itemUid=" + itemUid;
-			launchPopup(myUrl,"LearnerView");
+		
+		function completeItem(itemUid){
+			document.location.href = "<c:url value="/learning/completeItem.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=" + itemUid;
+			return false;
 		}
+		
 		function finishSession(){
 			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
+		
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
@@ -65,15 +68,16 @@
 			if (elem != null) {
 				elem.style.display="block";
 			}
-	}
+		}
 		
 	-->        
     </script>
 </lams:head>
 <body class="stripes">
 
-
 	<div id="content">
+	
+		<!--Task Information-->
 	
 		<h1>
 			${taskList.title}
@@ -98,69 +102,11 @@
 			${taskList.instructions}
 		</p>
 
-<!--		<%@ include file="/common/messages.jsp"%> -->
-
-		<table cellspacing="0" class="alternative-color">
-			<tr>
-				<th width="70%">
-					<fmt:message key="label.learning.tasks.to.do" />
-				</th>
-				<th align="center">
-					<fmt:message key="label.completed" />
-				</th>
-			</tr>
-			
-			<c:set var="lastTaskCompletion" value="${true}" />
-			<c:forEach var="item" items="${sessionMap.taskListList}">
-			
-				<c:set var="isAllowedByParent" value="${true}" />
-				<c:if test="${item.childTask}">
-					<c:forEach var="parent" items="${sessionMap.taskListList}">
-						<c:if test="${(parent.title == item.parentTaskName) && not parent.complete}">
-							<c:set var="isAllowedByParent" value="${false}" />
-						</c:if>
-					</c:forEach>
-				</c:if>
-				
-				<c:if test="${isAllowedByParent}">
-					<tr>
-						<td>
-							<c:choose>
-								<c:when test="${(not finishedLock) && (not taskList.sequentialOrder || lastTaskCompletion)}">
-									<a href="javascript:;" onclick="viewItem(${item.uid})">
-										${item.title} </a>
-								</c:when>
-	
-								<c:otherwise>
-									${item.title}
-								</c:otherwise>
-							</c:choose>
-
-							<c:if test="${!item.createByAuthor && item.createBy != null}">
-									[${item.createBy.loginName}]
-							</c:if>
-							
-							<c:if test="${item.required}">
-								*
-							</c:if>
-						</td>
-						<td align="center">
-							<c:choose>
-								<c:when test="${item.complete}">
-									<img src="<html:rewrite page='/includes/images/tick.gif'/>"
-										border="0">
-								</c:when>
-								<c:otherwise>
-									<img src="<html:rewrite page='/includes/images/cross.gif'/>"
-										border="0">
-								</c:otherwise>
-							</c:choose>
-						</td>
-					</tr>
-				</c:if>
-				<c:set var="lastTaskCompletion" value="${item.complete}" />				
-			</c:forEach>
-		</table>
+		<!--TaskListItems table-->
+		
+		<%@ include file="/pages/learning/parts/itemlist.jsp"%>
+		
+		<!--"Check for new" button-->
 		
 		* - <fmt:message key="label.learning.required.tasks" />
 		<br><br>
@@ -173,6 +119,8 @@
 			</p>
 			<br><br>
 		</c:if>
+		
+		<!--"Add new task" Area-->
 
 		<c:if test="${mode != 'teacher' && (not finishedLock)}">
 			<c:if test="${taskList.allowContributeTasks}">
@@ -193,6 +141,7 @@
 			</c:if>
 		</c:if>
 		
+		<!--Reflection-->
 		
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
@@ -220,10 +169,11 @@
 			</div>
 		</c:if>
 
+		<!--Bottom buttons-->
 
 		<c:set var="isRequiredTasksCompleted" value="${true}" />
-		<c:forEach var="item" items="${sessionMap.taskListList}">
-			<c:if test="${item.required && not item.complete}">
+		<c:forEach var="itemDTO" items="${sessionMap.itemDTOs}">
+			<c:if test="${itemDTO.taskListItem.required && not itemDTO.taskListItem.complete}">
 				<c:set var="isRequiredTasksCompleted" value="${false}" />
 			</c:if>
 		</c:forEach>
@@ -251,9 +201,6 @@
 				</c:choose>
 			</div>
 		</c:if>
-
-
-
 
 	</div>
 	<!--closes content-->

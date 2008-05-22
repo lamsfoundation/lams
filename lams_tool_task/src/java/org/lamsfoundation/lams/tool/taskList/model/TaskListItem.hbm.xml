@@ -27,7 +27,7 @@
 
         <property
             name="description"
-            type="java.lang.String"
+            type="text"
             update="true"
             insert="true"
             column="description"
@@ -102,19 +102,35 @@
         />
 
         <property
-            name="showCommentsToAll"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="show_comments_to_all"
-        />
-
-        <property
             name="commentsAllowed"
             type="boolean"
             update="true"
             insert="true"
             column="is_comments_allowed"
+        />
+
+        <property
+            name="commentsRequired"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="is_comments_required"
+        />
+
+        <property
+            name="filesAllowed"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="is_files_allowed"
+        />
+
+        <property
+            name="filesRequired"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="is_files_required"
         />
 
         <property
@@ -131,6 +147,22 @@
             update="true"
             insert="true"
             column="parent_task_name"
+        />
+
+        <property
+            name="showCommentsToAll"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="show_comments_to_all"
+        />
+
+        <property
+            name="commentsFilesAllowed"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="is_comments_files_allowed"
         />
 
         <set

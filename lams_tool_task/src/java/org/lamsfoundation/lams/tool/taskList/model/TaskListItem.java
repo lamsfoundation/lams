@@ -176,6 +176,7 @@ public class TaskListItem  implements Cloneable{
 
 	/**
 	 * @hibernate.property column="description"
+	 * 					   type="text"
 	 * @return
 	 */
 	public String getDescription() {
@@ -374,7 +375,9 @@ public class TaskListItem  implements Cloneable{
 	 * @return
 	 */
 	public boolean isCommentsFilesAllowed() {
-		return isCommentsFilesAllowed;
+		//true bacause we can not set it from the UI
+		//TODO get rid of this later
+		return true;
 	}
 	public void setCommentsFilesAllowed(boolean isCommentsFilesAllowed) {
 		this.isCommentsFilesAllowed = isCommentsFilesAllowed;

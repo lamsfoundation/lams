@@ -22,11 +22,7 @@
 		    	// end optional tab controller stuff
 		    	selectTab(tabId);
 	        } 
-	        
-		    function viewItem(itemUid,sessionMapID){
-				var myUrl = "<c:url value="/reviewtask/reviewTask.do"/>?mode=teacher&itemUid=" + itemUid + "&sessionMapID="+sessionMapID;
-				launchPopup(myUrl,"MonitoringReview");
-			}
+
 	    </script>		 
 	</lams:head>
 	<body class="stripes" onLoad="init()">

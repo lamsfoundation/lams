@@ -123,6 +123,7 @@ public class TaskListItemComment  implements Cloneable{
 	}
 	/**
 	 * @hibernate.property column="comment"
+	 * 					   type="text"
 	 * @return
 	 */
 	public String getComment() {

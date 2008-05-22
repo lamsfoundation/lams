@@ -306,26 +306,6 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<TaskListItem> getTaskListItemsBySessionId(Long sessionId) {
-		TaskListSession session = taskListSessionDao.getSessionBySessionId(sessionId);
-		if(session == null){
-			log.error("Failed get TaskListSession by ID [" +sessionId + "]");
-			return null;
-		}
-		//add taskList items from Authoring
-		TaskList taskList = session.getTaskList();
-		List<TaskListItem> items = new ArrayList<TaskListItem>(); 
-		items.addAll(taskList.getTaskListItems());
-		
-		//add taskList items from TaskListSession
-		items.addAll(session.getTaskListItems());
-		
-		return items;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public TaskList getTaskListBySessionId(Long sessionId){
 		TaskListSession session = taskListSessionDao.getSessionBySessionId(sessionId);
 		//to skip CGLib problem
@@ -382,7 +362,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	/**
 	 * {@inheritDoc}
 	 */
-	public void retrieveComplete(SortedSet<TaskListItem> taskListItemList, TaskListUser user) {
+	public void retrieveComplete(Set<TaskListItem> taskListItemList, TaskListUser user) {
 		for(TaskListItem item:taskListItemList){
 			TaskListItemVisitLog log = taskListItemVisitDao.getTaskListItemLog(item.getUid(),user.getUserId());
 			if(log == null)

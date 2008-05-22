@@ -40,7 +40,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.collections.set.SynchronizedSortedSet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -378,23 +377,11 @@ public class AuthoringAction extends Action {
 		//copy back
 		taskListPO.setAttachments(attPOSet);
 		//************************* Handle taskList items *******************
-
-    	//handle taskList item attachment file:
-    	List delItemAttList = getDeletedItemAttachmentList(sessionMap);
-		iter = delItemAttList.iterator();
-		while(iter.hasNext()){
-			TaskListItem delAtt = (TaskListItem) iter.next();
-			iter.remove();
-		}
-		
-		
 		
 		//Handle taskList items
 		Set itemList = new LinkedHashSet();
-		SortedSet topics = getTaskListItemList(sessionMap);
-    	iter = topics.iterator();
-    	while(iter.hasNext()){
-    		TaskListItem item = (TaskListItem) iter.next();
+		SortedSet<TaskListItem> items = getTaskListItemList(sessionMap);
+    	for(TaskListItem item : items){
     		if(item != null){
 				//This flushs user UID info to message if this user is a new user. 
 				item.setCreateBy(taskListUser);
@@ -402,9 +389,8 @@ public class AuthoringAction extends Action {
     		}
     	}
     	taskListPO.setTaskListItems(itemList);
+
     	
-    	
-		
 		//Handle taskList conditions. Also delete conditions that don't contain any taskLIstItems.
 		SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
 		SortedSet<TaskListCondition> conditionListWithoutEmptyElements = new TreeSet<TaskListCondition>(conditionList);
@@ -428,34 +414,6 @@ public class AuthoringAction extends Action {
     		if(condition.getUid() != null)
     			service.deleteTaskListCondition(condition.getUid());
     	}
-    	
-    	
-//		//Handle taskList items
-//    	SortedSet<TaskListCondition> conditions = getTaskListConditionList(sessionMap);
-//    	for (TaskListCondition condition:conditions) {
-//    		
-//    		
-//    		Set itemList2 = new LinkedHashSet();
-//    		Set topics2 = condition.getTaskListItems();
-//        	iter = topics2.iterator();
-//        	while(iter.hasNext()){
-//        		TaskListItem item2 = (TaskListItem) iter.next();
-//        		if(item2 != null){
-//    				//This flushs user UID info to message if this user is a new user. 
-//    				item2.setCreateBy(taskListUser);
-//    				itemList2.add(item2);
-//        		}
-//        	}
-//        	condition.setTaskListItems(itemList2);
-//        	
-//        	
-//    	}
-    	
-
-    	
-    	
-    	
-    	
 
     	
     	// delete TaskListItems from database. This should be done after
@@ -885,17 +843,6 @@ public class AuthoringAction extends Action {
 	private List getDeletedTaskListItemList(SessionMap sessionMap) {
 		return getListFromSession(sessionMap,TaskListConstants.ATTR_DELETED_RESOURCE_ITEM_LIST);
 	}
-	/**
-	 * If a taskList item has attahment file, and the user edit this item and change the attachment
-	 * to new file, then the old file need be deleted when submitting the whole authoring page.
-	 * Save the file uuid and version id into TaskListItem object for temporarily use.
-	 * @param request
-	 * @return
-	 */
-	private List getDeletedItemAttachmentList(SessionMap sessionMap) {
-		return getListFromSession(sessionMap,TaskListConstants.ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST);
-	}
-
 
 	/**
 	 * Get <code>java.util.List</code> from HttpSession by given name.

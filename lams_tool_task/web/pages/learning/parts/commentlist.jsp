@@ -1,15 +1,13 @@
-<%@ include file="/common/taglibs.jsp"%>
-
-<c:if test="${(fn:length(sessionMap.taskListItemCommentList) != 0)}">
+<c:set var="commentList" value="${item.comments}" />
+<c:if test="${not empty commentList}">
 	<div class="field-name">
 		<fmt:message key="label.preview.comments" />
 	</div>
 </c:if>
 
-<c:forEach var="comment" items="${sessionMap.taskListItemCommentList}">
+<c:forEach var="comment" items="${commentList}">
 
-	<c:if test="${sessionMap.taskListItem.showCommentsToAll || (sessionMap.userLogin == comment.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'author')}">
-	
+	<c:if test="${item.showCommentsToAll || (sessionMap.userLogin == comment.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'author')}">
 		<div>
 			<table cellspacing="0" class="forum">
 				<tr>

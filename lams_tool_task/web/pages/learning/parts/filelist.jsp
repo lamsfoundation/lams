@@ -1,7 +1,7 @@
 <div>
-	<c:set var="fileList" value="${sessionMap.taskListItemAttachmentList}" />
-	 
-	<c:if test="${(fn:length(fileList) != 0)}">
+	<c:set var="fileList" value="${item.attachments}" />
+	
+	<c:if test="${not empty fileList}">
 		<div class="field-name">
 			<fmt:message key="label.preview.filelist" />
 		</div>
@@ -10,7 +10,7 @@
 	<%-- Display target file type --%>
 	<ul>
 		<c:forEach var="file" items="${fileList}">
-			<c:if test="${sessionMap.taskListItem.showCommentsToAll || (sessionMap.userLogin == file.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'author')}">
+			<c:if test="${item.showCommentsToAll || (sessionMap.userLogin == file.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'author')}">
 			
 				<li>
 					<c:out value="${file.fileName}" />

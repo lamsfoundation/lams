@@ -26,12 +26,9 @@ package org.lamsfoundation.lams.tool.taskList.web.action;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -40,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
@@ -49,20 +45,28 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.struts.action.ActionRedirect;
+import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
+import org.lamsfoundation.lams.tool.taskList.dto.TasListItemDTO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
 import org.lamsfoundation.lams.tool.taskList.service.TaskListException;
+import org.lamsfoundation.lams.tool.taskList.service.UploadTaskListFileException;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -79,7 +83,7 @@ public class LearningAction extends Action {
 
 	private static Logger log = Logger.getLogger(LearningAction.class);
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, UploadTaskListFileException {
 		
 		String param = mapping.getParameter();
 		//-----------------------TaskList Learner function ---------------------------
@@ -102,6 +106,13 @@ public class LearningAction extends Action {
         	return saveNewTask(mapping, form, request, response);
         }
         
+        if (param.equals("addNewComment")) {
+        	return addNewComment(mapping, form, request, response);
+        }
+        if (param.equals("uploadFile")) {
+       		return uploadFile(mapping, form, request, response);
+        }
+        
 		//================ Reflection =======================
 		if (param.equals("newReflection")) {
 			return newReflection(mapping, form, request, response);
@@ -111,21 +122,6 @@ public class LearningAction extends Action {
 		}
 		
 		return  mapping.findForward(TaskListConstants.ERROR);
-	}
-	
-	/**
-	 * Initial page for add taskList item (single file or URL).
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward addTask(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		TaskListItemForm itemForm = (TaskListItemForm) form;
-		itemForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
-		itemForm.setSessionMapID(WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID));
-		return mapping.findForward(TaskListConstants.SUCCESS);
 	}
 	
 	/**
@@ -150,7 +146,7 @@ public class LearningAction extends Action {
 		request.setAttribute(AttributeNames.ATTR_MODE,mode);
 		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
 		
-//		get back the taskList and item list and display them on page
+		// get back the taskList and item list and display them on page
 		ITaskListService service = getTaskListService();
 		TaskListUser taskListUser = null;
 		if ( mode != null && mode.isTeacher() ) {
@@ -161,11 +157,10 @@ public class LearningAction extends Action {
 			taskListUser = getCurrentUser(service,sessionId);
 		}
 
-		List<TaskListItem> items = null;
-		TaskList taskList;
-		items = service.getTaskListItemsBySessionId(sessionId);
-		taskList = service.getTaskListBySessionId(sessionId);
-
+		TaskList taskList = service.getTaskListBySessionId(sessionId);
+		TreeSet<TaskListItem> items = new TreeSet<TaskListItem> (new TaskListItemComparator());
+		items.addAll(taskList.getTaskListItems());
+		
 		//check whehter finish lock is on/off
 		boolean lock = taskList.getLockWhenFinished() && taskListUser !=null && taskListUser.isSessionFinished();
 		
@@ -179,18 +174,71 @@ public class LearningAction extends Action {
 			}
 		}
 		
-		//basic information
-		sessionMap.put(TaskListConstants.ATTR_TITLE,taskList.getTitle());
-		sessionMap.put(TaskListConstants.ATTR_FINISH_LOCK,lock);
-		sessionMap.put(TaskListConstants.ATTR_USER_FINISHED, taskListUser !=null && taskListUser.isSessionFinished());
-		sessionMap.put(TaskListConstants.ATTR_USER_VERIFIED_BY_MONITOR, taskListUser.isVerifiedByMonitor());
-		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
-		sessionMap.put(AttributeNames.ATTR_MODE,mode);
 		
-		//reflection information
-		sessionMap.put(TaskListConstants.ATTR_REFLECTION_ON,taskList.isReflectOnActivity());
-		sessionMap.put(TaskListConstants.ATTR_REFLECTION_INSTRUCTION,taskList.getReflectInstructions());
-		sessionMap.put(TaskListConstants.ATTR_REFLECTION_ENTRY, entryText);
+		
+		//set complete flag for display purpose
+		if ( taskListUser !=null )
+			service.retrieveComplete(items, taskListUser);
+		
+		TreeSet<TasListItemDTO> itemDTOs = new TreeSet<TasListItemDTO>(new Comparator<TasListItemDTO>() {
+			public int compare(TasListItemDTO o1, TasListItemDTO o2) {
+				if (o1 != null && o2 != null) {
+					return o1.getTaskListItem().getSequenceId() - o2.getTaskListItem().getSequenceId();
+				} else if (o1 != null)
+					return 1;
+				else
+					return -1;
+			}
+		});
+		
+		boolean isPreviousTaskCompleted = true;
+		for(TaskListItem item : items) {
+			TasListItemDTO itemDTO = new TasListItemDTO(item);
+			
+			// checks if this item met all comment requirements 
+			boolean isCommentRequirementsMet = true; 
+			if (item.isCommentsRequired()) {
+				isCommentRequirementsMet = false;
+				Set<TaskListItemComment> comments = item.getComments();
+				for (TaskListItemComment comment : comments) {
+					if (taskListUser.getUserId().equals(comment.getCreateBy().getUserId())) isCommentRequirementsMet = true;
+				}
+			}
+			itemDTO.setCommentRequirementsMet(isCommentRequirementsMet);
+
+			// checks if this item met all attachment requirements
+			boolean isAttachmentRequirementsMet = true; 
+			if (item.isFilesRequired()) {
+				isAttachmentRequirementsMet = false;
+				Set<TaskListItemAttachment> attachments = item.getAttachments();
+				for (TaskListItemAttachment attachment : attachments) {
+					if (taskListUser.getUserId().equals(attachment.getCreateBy().getUserId())) isAttachmentRequirementsMet = true;
+				}
+			}
+			itemDTO.setAttachmentRequirementsMet(isAttachmentRequirementsMet);
+			
+			// checks if this item is allowed by its parent
+			boolean isAllowedByParent = true; 
+			if (item.isChildTask()) {
+				for (TaskListItem parentItem : items) {
+					if (parentItem.getTitle().equals(item.getParentTaskName()) && !parentItem.isComplete()) isAllowedByParent = false;
+				}
+			}
+			itemDTO.setAllowedByParent(isAllowedByParent);
+			
+			//checks whether this TaskListItem shoud be displayed open or close
+			boolean isDisplayedOpen = true; 
+			if ((item.getDescription() != null) && (item.getDescription().length() > 1000)) {
+				isDisplayedOpen = false;
+			}
+			itemDTO.setDisplayedOpen(isDisplayedOpen);
+			
+			// sets whether the previous TaskListItem was completed
+			itemDTO.setPreviousTaskCompleted(isPreviousTaskCompleted);
+			isPreviousTaskCompleted = item.isComplete();
+			
+			itemDTOs.add(itemDTO);
+		}
 		
 		//add define later support
 		if(taskList.isDefineLater()){
@@ -209,25 +257,21 @@ public class LearningAction extends Action {
 		}else
 			sessionMap.put(TaskListConstants.PARAM_RUN_OFFLINE, false);
 				
-		//init taskList item list
-		SortedSet<TaskListItem> taskListItemList = getTaskListItemList(sessionMap);
-		taskListItemList.clear();
-		if(items != null){
-			//remove hidden items.
-			for(TaskListItem item : items){
-				//becuase in webpage will use this login name. Here is just 
-				//initial it to avoid session close error in proxy object. 
-				if(item.getCreateBy() != null)
-					item.getCreateBy().getLoginName();
-				taskListItemList.add(item);
-			}
-		}
-		
-		//set complete flag for display purpose
-		if ( taskListUser !=null )
-			service.retrieveComplete(taskListItemList, taskListUser);
-		
 		sessionMap.put(TaskListConstants.ATTR_RESOURCE,taskList);
+		
+		//basic information
+		sessionMap.put(TaskListConstants.ATTR_TITLE, taskList.getTitle());
+		sessionMap.put(TaskListConstants.ATTR_FINISH_LOCK, lock);
+		sessionMap.put(TaskListConstants.ATTR_USER_FINISHED, taskListUser !=null && taskListUser.isSessionFinished());
+		sessionMap.put(TaskListConstants.ATTR_USER_VERIFIED_BY_MONITOR, taskListUser.isVerifiedByMonitor());
+		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+		sessionMap.put(AttributeNames.ATTR_MODE, mode);
+		sessionMap.put(TaskListConstants.ATTR_TASK_LIST_ITEM_DTOS, itemDTOs);
+		
+		//reflection information
+		sessionMap.put(TaskListConstants.ATTR_REFLECTION_ON, taskList.isReflectOnActivity());
+		sessionMap.put(TaskListConstants.ATTR_REFLECTION_INSTRUCTION, taskList.getReflectInstructions());
+		sessionMap.put(TaskListConstants.ATTR_REFLECTION_ENTRY, entryText);
 		
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}
@@ -243,12 +287,15 @@ public class LearningAction extends Action {
 	private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String mode = request.getParameter(AttributeNames.ATTR_MODE);
 		String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
 		
 		doComplete(request);
 		
-		request.setAttribute(AttributeNames.ATTR_MODE,mode);
-		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID,sessionMapID);
-		return  mapping.findForward(TaskListConstants.SUCCESS);
+		ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(TaskListConstants.SUCCESS));
+		redirect.addParameter(AttributeNames.ATTR_MODE, mode);
+		redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+		return  redirect;
 	}
 	
 	/**
@@ -296,6 +343,21 @@ public class LearningAction extends Action {
 	}
 	
 	/**
+	 * Initial page for add taskList item (single file or URL).
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward addTask(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		TaskListItemForm itemForm = (TaskListItemForm) form;
+		itemForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
+		itemForm.setSessionMapID(WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID));
+		return mapping.findForward(TaskListConstants.SUCCESS);
+	}
+	
+	/**
 	 * Save new user task into database.
 	 * @param mapping
 	 * @param form
@@ -307,22 +369,20 @@ public class LearningAction extends Action {
 		//get back SessionMap
 		String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		
-		Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
-		
-		String mode = request.getParameter(AttributeNames.ATTR_MODE);
 		TaskListItemForm itemForm = (TaskListItemForm)form;
 		ActionErrors errors = validateTaskListItem(itemForm);
 		
 		if(!errors.isEmpty()){
 			this.addErrors(request,errors);
+			request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 			return mapping.findForward("task");
 		}
 		
 		//create a new TaskListItem
 		TaskListItem item = new TaskListItem(); 
 		ITaskListService service = getTaskListService();
+		Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
 		TaskListUser taskListUser = getCurrentUser(service,sessionId);
 		item.setTitle(itemForm.getTitle());
 		item.setDescription(itemForm.getDescription());
@@ -331,36 +391,123 @@ public class LearningAction extends Action {
 		item.setCreateBy(taskListUser);
 		
 		//setting SequenceId
-		SortedSet<TaskListItem> taskListList = getTaskListItemList(sessionMap);
-		int maxSeq = 1;
-		if(taskListList != null && taskListList.size() > 0){
-			TaskListItem last = taskListList.last();
-			maxSeq = last.getSequenceId()+1;
+		TaskList taskList = (TaskList) sessionMap.get(TaskListConstants.ATTR_RESOURCE);
+		Set<TaskListItem> taskListItems = taskList.getTaskListItems();
+		int maxSeq = 0;
+		for (TaskListItem dbItem : taskListItems) {
+			if (dbItem.getSequenceId() > maxSeq) maxSeq = dbItem.getSequenceId();
 		}
+		maxSeq++;
 		item.setSequenceId(maxSeq);
 		
-		//save and update session
-		TaskListSession resSession = service.getTaskListSessionBySessionId(sessionId);
-		if(resSession == null){
-			log.error("Failed update TaskListSession by ID[" + sessionId + "]");
-			return  mapping.findForward(TaskListConstants.ERROR);
-		}
-		Set<TaskListItem> items = resSession.getTaskListItems();
-		if(items == null){
-			items = new HashSet<TaskListItem>();
-			resSession.setTaskListItems(items);
-		}
-		items.add(item);
-		service.saveOrUpdateTaskListSession(resSession);
+		taskListItems.add(item);
+		service.saveOrUpdateTaskList(taskList);
+
+		//redirect
+		String mode = request.getParameter(AttributeNames.ATTR_MODE);
+		request.setAttribute(AttributeNames.ATTR_MODE, mode);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+		return mapping.findForward(TaskListConstants.SUCCESS);
+	}
+	
+	
+	/**
+	 * Adds new user commment.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward addNewComment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		TaskListItemForm taskListItemForm = (TaskListItemForm) form;
+		String mode = request.getParameter(AttributeNames.ATTR_MODE);
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(taskListItemForm.getSessionMapID());
+		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+		Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
+
+		String commentMessage = taskListItemForm.getComment();
+		if(commentMessage == null || StringUtils.isBlank(commentMessage))
+			return mapping.findForward(TaskListConstants.SUCCESS);
 		
-		//update session value
-		SortedSet<TaskListItem> taskListItemList = getTaskListItemList(sessionMap);
-		taskListItemList.add(item);
+		TaskListItemComment comment = new TaskListItemComment();
+		comment.setComment(commentMessage);
+		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+		ITaskListService service = getTaskListService();
+		TaskListUser taskListUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
+		comment.setCreateBy(taskListUser);
+		comment.setCreateDate(new Timestamp(new Date().getTime()));
 		
-		//URL or file upload
-		request.setAttribute(AttributeNames.ATTR_MODE,mode);
-		itemForm.reset(mapping, request);		
-		return  mapping.findForward(TaskListConstants.SUCCESS);
+		//persist TaskListItem changes in DB 
+		Long itemUid =  new Long(request.getParameter(TaskListConstants.PARAM_RESOURCE_ITEM_UID));
+		TaskListItem dbItem = service.getTaskListItemByUid(itemUid);
+		Set<TaskListItemComment> dbComments = dbItem.getComments();
+		dbComments.add(comment);
+		service.saveOrUpdateTaskListItem(dbItem);
+				
+		//to make available new changes be visible in jsp page
+		sessionMap.put(TaskListConstants.ATTR_TASK_LIST_ITEM, dbItem);
+		
+//		form.reset(mapping, request);
+		
+		ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(TaskListConstants.SUCCESS));
+		redirect.addParameter(AttributeNames.ATTR_MODE, mode);
+		redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+		return  redirect;
+	}
+	
+	/**
+	 * Uploads specified file to repository and associates it with current TaskListItem.
+	 * @param mapping
+	 * @param form
+	 * @param type
+	 * @param request
+	 * @return
+	 * @throws UploadTaskListFileException 
+	 */
+	private ActionForward uploadFile(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UploadTaskListFileException {
+		
+		TaskListItemForm taskListItemForm = (TaskListItemForm) form;
+		String mode = request.getParameter(AttributeNames.ATTR_MODE);
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(taskListItemForm.getSessionMapID());
+		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+		Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
+
+		FormFile file = (FormFile) taskListItemForm.getUploadedFile();
+		
+		if(file == null || StringUtils.isBlank(file.getFileName()))
+			return mapping.findForward(TaskListConstants.SUCCESS);
+		
+		//validate file size
+		ActionMessages errors = new ActionMessages();
+		FileValidatorUtil.validateFileSize(file, true, errors );
+		if(!errors.isEmpty()){
+			this.saveErrors(request, errors);
+			return mapping.findForward(TaskListConstants.SUCCESS);
+		}
+		
+		//upload to repository
+		ITaskListService service = getTaskListService();
+		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+		TaskListUser taskListUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
+		TaskListItemAttachment  att = service.uploadTaskListItemFile(file, IToolContentHandler.TYPE_ONLINE, taskListUser);
+		
+		//persist TaskListItem changes in DB 
+		Long itemUid =  new Long(request.getParameter(TaskListConstants.PARAM_RESOURCE_ITEM_UID));
+		TaskListItem dbItem = service.getTaskListItemByUid(itemUid);
+		Set<TaskListItemAttachment> dbAttachments = dbItem.getAttachments();
+		dbAttachments.add(att);
+		service.saveOrUpdateTaskListItem(dbItem);
+		
+		//to make available new changes be visible in jsp page
+		sessionMap.put(TaskListConstants.ATTR_TASK_LIST_ITEM, dbItem);
+		
+//		form.reset(mapping, request);
+		
+		ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(TaskListConstants.SUCCESS));
+		redirect.addParameter(AttributeNames.ATTR_MODE, mode);
+		redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+		return  redirect;
 	}
 	
 	/**
@@ -444,62 +591,6 @@ public class LearningAction extends Action {
 	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 	      return (ITaskListService) wac.getBean(TaskListConstants.RESOURCE_SERVICE);
 	}
-	/**
-	 * List save current taskList items.
-	 * @param request
-	 * @return
-	 */
-	private SortedSet<TaskListItem> getTaskListItemList(SessionMap sessionMap) {
-		SortedSet<TaskListItem> list = (SortedSet<TaskListItem>) sessionMap.get(TaskListConstants.ATTR_RESOURCE_ITEM_LIST);
-		if(list == null){
-			list = new TreeSet<TaskListItem>(new TaskListItemComparator());
-			sessionMap.put(TaskListConstants.ATTR_RESOURCE_ITEM_LIST,list);
-		}
-		return list;
-	}	
-	/**
-	 * Get <code>java.util.List</code> from HttpSession by given name.
-	 * 
-	 * @param request
-	 * @param name
-	 * @return
-	 */
-	private List getListFromSession(SessionMap sessionMap,String name) {
-		List list = (List) sessionMap.get(name);
-		if(list == null){
-			list = new ArrayList();
-			sessionMap.put(name,list);
-		}
-		return list;
-	}
-
-//	/**
-//	 * Return <code>ActionForward</code> according to taskList item type.
-//	 * @param type
-//	 * @param mapping
-//	 * @return
-//	 */
-//	private ActionForward findForward(short type, ActionMapping mapping) {
-//		ActionForward forward;
-//		switch (type) {
-//		case TaskListConstants.RESOURCE_TYPE_URL:
-//			forward = mapping.findForward("url");
-//			break;
-//		case TaskListConstants.RESOURCE_TYPE_FILE:
-//			forward = mapping.findForward("file");
-//			break;
-//		case TaskListConstants.RESOURCE_TYPE_WEBSITE:
-//			forward = mapping.findForward("website");
-//			break;
-//		case TaskListConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-//			forward = mapping.findForward("learningobject");
-//			break;
-//		default:
-//			forward = null;
-//			break;
-//		}
-//		return forward;
-//	}
 
 	private TaskListUser getCurrentUser(ITaskListService service, Long sessionId) {
 		//try to get form system session
@@ -552,16 +643,8 @@ public class LearningAction extends Action {
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		
 		Long sessionId =  (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
-		service.setItemComplete(taskListItemUid,new Long(user.getUserID().intValue()),sessionId);
-		
-		//set taskList item complete tag
-		SortedSet<TaskListItem> taskListItemList = getTaskListItemList(sessionMap);
-		for(TaskListItem item:taskListItemList){
-			if(item.getUid().equals(taskListItemUid)){
-				item.setComplete(true);
-				break;
-			}
-		}
+		service.setItemComplete(taskListItemUid, new Long(user.getUserID().intValue()), sessionId);
+		sessionMapID = "4";
 	}
 
 }

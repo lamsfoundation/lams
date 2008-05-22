@@ -49,6 +49,10 @@
         <mkdir dir="${build.classes.test}"/>
         <mkdir dir="${build.report}"/>
 	</target>
+	
+	<target name="MINE" description="MINE" depends="delete-exploded-tool-folder, deploy-tool, explode-tool">
+		<echo>MINE</echo>
+	</target>
 
 
 	<target name="clean" description="Delete all generated files">
