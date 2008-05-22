@@ -125,7 +125,7 @@
 							</td>
 
 							<td>
-								${item.username} ${item.itemCreateByAuthor}
+								${item.username}
 							</td>
 
 							<td align="center">
