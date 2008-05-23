@@ -392,4 +392,16 @@ public abstract class Grouping implements Serializable
 		return null;
 	}
 
+	/** Is this grouping used for branching? That is, is there a grouped branching activity that uses this grouping? 
+	 * If so, that has implications for the changes allowed at runtime.
+	 */
+	public boolean isUsedForBranching() {
+		Iterator actIter = getActivities().iterator();
+		while (actIter.hasNext()) {
+			Activity act = (Activity) actIter.next();
+			if ( act.isBranchingActivity() ) 
+				return true;
+		}
+		return false;
+	}
 }
