@@ -46,6 +46,7 @@ create table tl_latask10_taskList (
    content_id bigint unique,
    lock_when_finished tinyint,
    is_sequential_order tinyint,
+   minimum_number_tasks_complete integer,
    allow_contribute_tasks tinyint,
    is_monitor_verification_required tinyint,
    reflect_instructions varchar(255), 
@@ -145,10 +146,11 @@ alter table tl_latask10_user add index FK_NEW_174079138_30113BFC309ED320 (taskLi
 
 
 
-INSERT INTO `tl_latask10_taskList` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, 
- `instructions`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, 
- `lock_when_finished`, `is_sequential_order`, `allow_contribute_tasks`, `is_monitor_verification_required`, `reflect_on_activity`) VALUES
-  (1,NULL,NULL,NULL,'TaskList','0','Instructions ',null,null,0,0,${default_content_id},0,0,0,0,0);
+INSERT INTO `tl_latask10_taskList` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `instructions`,
+	`online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `lock_when_finished`, 
+	`minimum_number_tasks_complete`, `is_sequential_order`, `allow_contribute_tasks`, `is_monitor_verification_required`, 
+	`reflect_on_activity`) VALUES
+  (1,NULL,NULL,NULL,'TaskList','0','Instructions ',null,null,0,0,${default_content_id},0,0,0,0,0,0);
   
 INSERT INTO `tl_latask10_taskList_item` (`uid`, `sequence_id`, `description`, `init_item`, `organization_xml`, `title`, `create_by`, `create_date`, `create_by_author`, `is_required`, `is_comments_allowed`, `is_comments_required`, `is_files_allowed`, `is_files_required`, `is_comments_files_allowed`, `show_comments_to_all`, `is_child_task`, `parent_task_name`, `taskList_uid`, `session_uid`) VALUES 
   (1,1,NULL,NULL,NULL,'Task number 1',null,NOW(),1,0,0,0,0,0,0,1,0,NULL,1,NULL);

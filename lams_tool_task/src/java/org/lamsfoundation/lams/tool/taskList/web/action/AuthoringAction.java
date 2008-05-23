@@ -428,6 +428,9 @@ public class AuthoringAction extends Action {
     			service.deleteTaskListItem(item.getUid());
     	}
 		
+		//if MinimumNumberTasksComplete is bigger than available items, then set it topics size
+		if(taskListPO.getMinimumNumberTasksComplete() > items.size())
+			taskListPO.setMinimumNumberTasksComplete(items.size());
 		
 		//**********************************************
 		//finally persist taskListPO again

@@ -61,6 +61,7 @@ public class TaskList implements Cloneable{
 	//advance
 	private boolean lockWhenFinished;
 	private boolean sequentialOrder;
+	private int minimumNumberTasksComplete; 
 	private boolean allowContributeTasks;
 	private boolean monitorVerificationRequired;
 
@@ -667,6 +668,27 @@ public class TaskList implements Cloneable{
 	 */
 	public void setSequentialOrder(boolean sequentialOrder) {
 		this.sequentialOrder = sequentialOrder;
+	}
+	
+	
+	/**
+	 * Returns the minimum number of tasks needed to be completed to finish this activity.
+	 * 
+	 * @return the minimum number of tasks needed to be completed to finish this activity
+	 * 
+	 * @hibernate.property column="minimum_number_tasks_complete"
+	 */
+	public int getMinimumNumberTasksComplete() {
+		return minimumNumberTasksComplete;
+	}
+	
+	/**
+	 * Sets the minimum number of tasks needed to be completed to finish this activity.
+	 * 
+	 * @param sequentialOrder the minimum number of tasks needed to be completed to finish this activity
+	 */
+	public void setMinimumNumberTasksComplete(int minimumNumberTasksComplete) {
+		this.minimumNumberTasksComplete = minimumNumberTasksComplete;
 	}
 	
 	/**

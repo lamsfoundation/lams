@@ -61,7 +61,7 @@ public interface ITaskListService {
 	 * @param userUid
 	 * @return
 	 */
-	public int getNumTasksCompletedByUser(Long toolSessionId, Long userUid);
+	int getNumTasksCompletedByUser(Long toolSessionId, Long userUid);
 	
 
 	/**
@@ -74,7 +74,7 @@ public interface ITaskListService {
 	 * @param userUid user for whom this condition is being checked
 	 * @return
 	 */
-	public boolean checkCondition(String conditionName, Long toolSessionId,	Long userUid);
+	boolean checkCondition(String conditionName, Long toolSessionId,	Long userUid);
 	
 	/**
 	 * Get <code>TaskList</code> by toolContentID.
@@ -225,7 +225,7 @@ public interface ITaskListService {
 	 * @param item current TaskListItem
 	 * @return
 	 */
-	public void saveOrUpdateTaskListItem(TaskListItem item);
+	void saveOrUpdateTaskListItem(TaskListItem item);
 	
 	/**
 	 * Fill in taskListItemList's complete flags.
@@ -277,6 +277,15 @@ public interface ITaskListService {
 	 * @return
 	 */
 	String finishToolSession(Long toolSessionId, Long userId)  throws TaskListException;
+	
+	/**
+	 * Checks how many tasks more user should complete to be able to finish this activity.
+	 * 
+	 * @param toolSessionId
+	 * @param userUid
+	 * @return
+	 */
+	int checkMinimumNumberTasksComplete(Long toolSessionId, Long userUid);
 
 	/**
 	 * Create refection entry into notebook tool.
@@ -287,7 +296,7 @@ public interface ITaskListService {
 	 * @param userId
 	 * @param entryText
 	 */
-	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText);
+	Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText);
 	
 	/**
 	 * Get reflection entry from notebook tool.
@@ -298,12 +307,12 @@ public interface ITaskListService {
 	 * @param userID
 	 * @return
 	 */
-	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
+	NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 
 	/**
 	 * @param notebookEntry
 	 */
-	public void updateEntry(NotebookEntry notebookEntry);
+	void updateEntry(NotebookEntry notebookEntry);
 	
 	//********** Export methods ***********************
 	
@@ -315,7 +324,7 @@ public interface ITaskListService {
 	 *
 	 * @return
 	 */
-	public List<TaskSummary> exportForLearner(Long contentUid, TaskListUser learner);
+	List<TaskSummary> exportForLearner(Long contentUid, TaskListUser learner);
 	
 	/**
 	 * Make an export for the whole TaskList.
@@ -323,7 +332,7 @@ public interface ITaskListService {
 	 * @param contentUid
 	 * @return
 	 */
-	public List<TaskSummary> exportForTeacher(Long contentUid);
+	List<TaskSummary> exportForTeacher(Long contentUid);
 	
 	/**
 	 * Return summary list for the specified TaskList. Used in monitoring.

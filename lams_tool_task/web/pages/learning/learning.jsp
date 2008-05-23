@@ -101,6 +101,8 @@
 		<p>
 			${taskList.instructions}
 		</p>
+		
+		<%@ include file="/common/messages.jsp"%>
 
 		<!--TaskListItems table-->
 		

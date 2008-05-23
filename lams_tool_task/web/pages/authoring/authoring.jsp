@@ -32,6 +32,10 @@
 	    	if (tabId != 4)	window.parent.hideConditionMessage();
 	    	
 	    	selectTab(tabId);
+	    	
+	    	//for advanceTab
+	    	if(tabId == 2)
+	    		changeMinTasksComplete(-1);
         } 
 
         function doUploadOnline() {
@@ -45,6 +49,38 @@
         	myForm.action = "<c:url value='/authoring/uploadOfflineFile.do'/>";
         	myForm.submit();
         }
+        
+        function changeMinTasksComplete(initVal){
+			var tb = document.getElementById("itemTable");
+			var num = tb.getElementsByTagName("tr");
+			var sel = document.getElementById("minimumNumberTasksComplete");
+			var newField = sel.options;
+			var len = sel.length;
+			
+			//when first enter, it should get value from TaskList
+			var selIdx=initVal < 0?-1:initVal;
+			for (var idx=0;idx<len;idx++)
+			{
+				if(newField[0].selected && selIdx == -1 ){
+					selIdx = newField[0].value;
+				}
+				sel.removeChild(newField[0]);
+			}
+		
+			for(var i=0;i<=num.length;i++){
+				var opt = document.createElement("option");
+				var optT =document.createTextNode(i);
+				opt.value=i;
+				//get back user choosen value
+				if(selIdx > 0 && selIdx==i){
+					opt.selected = true;
+				}else{
+					opt.selected = false;
+				}
+				opt.appendChild(optT);
+				sel.appendChild(opt);
+			}
+		}
     </script>
 </lams:head>
 
@@ -111,6 +147,11 @@
 <div id="footer"></div>
 <!-- end page div -->
 </div>
+
+<script type="text/javascript">
+	changeMinTasksComplete(${formBean.taskList.minimumNumberTasksComplete});
+</script>
+
 
 </body>
 </lams:html>

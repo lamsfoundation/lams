@@ -141,4 +141,14 @@
 		</c:if>
 		
 	</c:forEach>
+	
+	<c:if test="${taskList.minimumNumberTasksComplete > 0}">
+		<tr>
+			<td colspan="3" align="left">
+				<fmt:message key="label.learning.notification.you.must.complete.tasks.1" /> 
+				<b>${taskList.minimumNumberTasksComplete}</b>
+				<fmt:message key="label.learning.notification.you.must.complete.tasks.2" />
+			</td>
+		</tr>
+	</c:if>
 </table>

@@ -357,6 +357,18 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		}
 		return nextUrl;
 	}
+	
+	public int checkMinimumNumberTasksComplete(Long toolSessionId, Long userUid) {
+		int miniView = taskListItemVisitDao.getTasksCompletedCountByUser(toolSessionId, userUid);
+		TaskListSession session = taskListSessionDao.getSessionBySessionId(toolSessionId);
+		if(session == null){
+			log.error("Failed get session by ID [" + toolSessionId + "]");
+			return 0;
+		}
+		int reqView = session.getTaskList().getMinimumNumberTasksComplete();
+		
+		return (reqView - miniView);
+	}
 
 
 	/**

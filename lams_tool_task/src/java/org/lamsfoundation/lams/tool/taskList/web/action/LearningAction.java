@@ -324,7 +324,9 @@ public class LearningAction extends Action {
 		}else
 			request.setAttribute(TaskListConstants.ATTR_RUN_AUTO,false);
 		
-
+		if(!validateBeforeFinish(request, sessionMapID))
+			return mapping.getInputForward();
+		
 		ITaskListService service = getTaskListService();
 		// get sessionId from HttpServletRequest
 		String nextActivityUrl = null ;
@@ -523,6 +525,9 @@ public class LearningAction extends Action {
 		//get session value
 		String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
 
+		if(!validateBeforeFinish(request, sessionMapID))
+			return mapping.getInputForward();
+		
 		ReflectionForm refForm = (ReflectionForm) form;
 		HttpSession ss = SessionManager.getSession();
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -626,6 +631,31 @@ public class LearningAction extends Action {
 		
 		return errors;
 	}
+	
+	private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		Long userID = new Long(user.getUserID().longValue());
+		
+		ITaskListService service = getTaskListService();
+		int miniViewFlag = service.checkMinimumNumberTasksComplete(sessionId, userID);
+		//if current user view less than reqired view count number, then just return error message.
+		//if it is runOffline content, then need not check minimum view count
+		Boolean runOffline = (Boolean) sessionMap.get(TaskListConstants.PARAM_RUN_OFFLINE);
+		if(miniViewFlag > 0 && !runOffline){
+			ActionErrors errors = new ActionErrors();
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("lable.learning.minimum.view.number.less",miniViewFlag));
+			this.addErrors(request,errors);
+			return false;
+		}
+		
+		return true;
+	}
+	
+	
 	/**
 	 * Set complete flag for given taskList item.
 	 * @param request

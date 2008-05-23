@@ -209,6 +209,14 @@
         />
 
         <property
+            name="minimumNumberTasksComplete"
+            type="int"
+            update="true"
+            insert="true"
+            column="minimum_number_tasks_complete"
+        />
+
+        <property
             name="reflectInstructions"
             type="java.lang.String"
             update="true"
