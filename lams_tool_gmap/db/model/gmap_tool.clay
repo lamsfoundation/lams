@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<clay-model clay-version="1.4.0">
+<database-model alias="" author="" begin-script="" end-script="" name="gmap_tool" remarks="" sql-dialect-id="jp.azzurri.clay.dialect.HSQLDB_1_7_0_Dialect" uid="1c1a234:11a0e02249f:-7f17" version="1.0">
+<database-model-description/>
+<schema-list/>
+</database-model>
+</clay-model>

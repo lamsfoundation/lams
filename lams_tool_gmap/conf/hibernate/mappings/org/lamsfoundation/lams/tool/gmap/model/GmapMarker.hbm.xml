@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.gmap.model.GmapMarker"
+        table="tl_lagmap10_marker"
+    >
+
+        <id
+            name="uid"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-GmapMarker.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="longitude"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="longitude"
+        />
+
+        <property
+            name="latitude"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="latitude"
+        />
+
+        <property
+            name="address"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="address"
+        />
+
+        <property
+            name="colour"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="colour"
+        />
+
+        <property
+            name="markerDisplayCharacter"
+            type="char"
+            update="true"
+            insert="true"
+            column="marker_display_charater"
+        />
+
+        <property
+            name="infoWindowMessage"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="info_window_message"
+        />
+
+        <property
+            name="mouseoverText"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="mouseover_text"
+        />
+
+        <property
+            name="created"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="create_date"
+        />
+
+        <property
+            name="updated"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="update_date"
+        />
+
+        <property
+            name="authored"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="is_authored"
+        />
+
+        <many-to-one
+            name="toolSession"
+            class="org.lamsfoundation.lams.tool.gmap.model.GmapSession"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="gmap_session_uid"
+        />
+
+        <many-to-one
+            name="gmap"
+            class="org.lamsfoundation.lams.tool.gmap.model.Gmap"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="gmap_uid"
+        />
+
+        <many-to-one
+            name="createdBy"
+            class="org.lamsfoundation.lams.tool.gmap.model.GmapUser"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="create_by"
+        />
+
+        <many-to-one
+            name="modifiedBy"
+            class="org.lamsfoundation.lams.tool.gmap.model.GmapUser"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="modified_by"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-GmapMarker.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
+</hibernate-mapping>

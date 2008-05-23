@@ -1,0 +1,13 @@
+-- CVS ID: $Id$
+ 
+SET FOREIGN_KEY_CHECKS=0;
+DROP TABLE IF EXISTS tl_lagmap10_user;
+DROP TABLE IF EXISTS tl_lagmap10_attachment;
+DROP TABLE IF EXISTS tl_lagmap10_session;
+DROP TABLE IF EXISTS tl_lagmap10_gmap;
+SET FOREIGN_KEY_CHECKS=1;
+
+
+
+
+
