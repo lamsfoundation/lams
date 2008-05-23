@@ -6,7 +6,7 @@
 		</div>
 		
 		
-		<html:text size="30" tabindex="1" property="message.subject" />
+		<html:text size="30" tabindex="1" property="message.subject" maxlength="60" />
 		<html:errors property="message.subject" />
 		
 		<div class="field-name title-space-top">
