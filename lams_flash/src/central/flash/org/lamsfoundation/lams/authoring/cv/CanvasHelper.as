@@ -690,11 +690,17 @@ class CanvasHelper {
 		copyChildren(sequenceToCopy, parentAct, o, toolContentIDMap, activityMap);
 		
 		var activityMapKeys:Array = activityMap.keys();
+		Debugger.log("activityMapKeys len: " + activityMapKeys.length, Debugger.CRITICAL, "copySequence", "CanvasHelper");
 		
 		for(var i=0; i<activityMapKeys.length; i++) {
 			var fromActivityMapObj:Object = activityMap.get(activityMapKeys[i]);
 			var toActivityMapObj:Object = activityMap.get(fromActivityMapObj.transitionOut.toUIID);
-			var transitionCopy:Transition = copyTransition(fromActivityMapObj.transitionOut, fromActivityMapObj.activityCopy, toActivityMapObj.activityCopy);		
+			
+			Debugger.log("fromActivityMapObj: " + fromActivityMapObj, Debugger.CRITICAL, "copySequence", "CanvasHelper");
+			Debugger.log("toActivityMapObj: " + toActivityMapObj, Debugger.CRITICAL, "copySequence", "CanvasHelper");
+			
+			if(fromActivityMapObj != null && toActivityMapObj != null)
+				var transitionCopy:Transition = copyTransition(fromActivityMapObj.transitionOut, fromActivityMapObj.activityCopy, toActivityMapObj.activityCopy);		
 		}
 		
 		return;
@@ -702,6 +708,8 @@ class CanvasHelper {
 	
 	private function copyChildren(activity:ComplexActivity, parentAct:ComplexActivity, o:Object, toolContentIDMap:Hashtable, activityMap:Hashtable) {
 		Debugger.log("copying children of: " + activity.title, Debugger.CRITICAL, "copyChildren", "CanvasHelper");
+		Debugger.log("tool content id map size: " + toolContentIDMap.size(), Debugger.CRITICAL, "copyChildren", "CanvasHelper");
+		
 		
 		var children:Array = _ddm.getComplexActivityChildren(activity.activityUIID);
 		var activityCopy:Activity;
@@ -714,11 +722,11 @@ class CanvasHelper {
 			else if(children[i] instanceof ComplexActivity) activityCopy = pasteComplexItem(children[i], o, toolContentIDMap, parentAct);
 		
 			if(activityMap != null) {
-				var transitions:Object = _ddm.getTransitionsForActivityUIID(children[i].activityUIID);
-				if(transitions.out != null || transitions.into != null) {
+				var myTransitions:Object = _ddm.getTransitionsForActivityUIID(children[i].activityUIID);
+				if(myTransitions.out != null || myTransitions.into != null) {
 					var dataObj:Object = new Object();
-					dataObj.transitionOut = transitions.out;
-					dataObj.transitionIn = transitions.into;
+					dataObj.transitionOut = myTransitions.out;
+					dataObj.transitionIn = myTransitions.into;
 					
 					dataObj.activity = children[i];
 					dataObj.activityCopy = activityCopy;
@@ -739,6 +747,8 @@ class CanvasHelper {
 	}
 	
 	private function copyTransition(transitionToCopy:Transition, fromActivity:Activity, toActivity:Activity):Transition {
+		Debugger.log("copying transition: " + transitionToCopy, Debugger.CRITICAL, "copyTransition", "CanvasHelper");
+		
 		var transitionCopy:Transition = transitionToCopy.clone();
 		transitionCopy.transitionUIID = _ddm.newUIID();
 		transitionCopy.fromUIID = fromActivity.activityUIID;
