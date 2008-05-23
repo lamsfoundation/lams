@@ -32,32 +32,53 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
        <html:base/>
 	   <lams:css/>
       <title><c:out value="${title}"/></title>
-	<c:if test="${empty maxNumberOfGroups}">
-		<c:set var="maxNumberOfGroups" value="99"/>
-	</c:if>
 
 	<script type="text/javascript">
 	<!-- 
+		<c:choose>
+		<c:when test="${empty maxNumberOfGroups}">
+			var maxNumberOfGroups = 0;
+		</c:when>
+		<c:otherwise>
+			var maxNumberOfGroups = ${maxNumberOfGroups};
+		</c:otherwise>
+		</c:choose>
+		
+		<c:choose>
+		<c:when test="${empty mayDelete}">
+			var mayDelete = false;
+		</c:when>
+		<c:otherwise>
+			var mayDelete = ${mayDelete};
+		</c:otherwise>
+		</c:choose>
+
+		<c:choose>
+		<c:when test="${empty usedForBranching}">
+			var usedForBranching = true;
+		</c:when>
+		<c:otherwise>
+			var usedForBranching = ${usedForBranching};
+		</c:otherwise>
+		</c:choose>
+
 		function init(){
 			getGroupsAndNonmembers();
 		}
 
 		function ajustButtonStatus(){
-			// if the maximum number of groups reached, disable the add group fields
-			if(document.getElementById("groups").length >= <c:out value="${maxNumberOfGroups}"/> ){
-				document.getElementById("newgroupname").disabled=true;
-				document.getElementById("groupadd").disabled=true;
-			} else {
-				document.getElementById("newgroupname").disabled=false;
-				document.getElementById("groupadd").disabled=false;
-			}
-
+			if (usedForBranching) {
+				document.getElementById("groupremove").style.visibility = "hidden";
+				document.getElementById("groupadd").style.visibility = "hidden";
+				document.getElementById("newgroupname").style.visibility = "hidden";
+			} 
+									
 			if(document.getElementById("groups").selectedIndex==-1){
 				document.getElementById("groupremove").disabled=true;
 				document.getElementById("nonmembersadd").disabled=true;
 				document.getElementById("membersremove").disabled=true;
 			}else{
-				if ( <c:out value="${mayDelete}"/> ) {
+				if ( mayDelete ) {
 					document.getElementById("groupremove").disabled=false;
 				}
 				if(document.getElementById("nonmembers[]").selectedIndex==-1){
@@ -65,7 +86,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				}else{
 					document.getElementById("nonmembersadd").disabled=false;
 				}
-				if(document.getElementById("members[]").selectedIndex==-1 || ! <c:out value="${mayDelete}"/> ){
+				if(document.getElementById("members[]").selectedIndex==-1 || ! mayDelete ){
 					document.getElementById("membersremove").disabled=true;
 				}else{
 					document.getElementById("membersremove").disabled=false;
@@ -82,7 +103,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		function getGroups(){
 			displayLoadingMessage();
-			url="<lams:WebAppURL/>/grouping.do?method=getGroups&activityID=<c:out value="${activityID}"/>";
+			url="<lams:LAMSURL/>monitoring/grouping.do?method=getGroups&activityID=<c:out value="${activityID}"/>";
 			if (window.XMLHttpRequest) { // Non-IE browsers
 				groupRequest = new XMLHttpRequest();
 				groupRequest.onreadystatechange = updateGroups;
@@ -126,7 +147,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		function getNonmembers(){
 			displayLoadingMessage();
-			url="<lams:WebAppURL/>/grouping.do?method=getClassMembersNotGrouped&lessonID=<c:out value="${lessonID}"/>&activityID=<c:out value="${activityID}"/>";
+			url="<lams:LAMSURL/>monitoring/grouping.do?method=getClassMembersNotGrouped&lessonID=<c:out value="${lessonID}"/>&activityID=<c:out value="${activityID}"/>";
 			if (window.XMLHttpRequest) { // Non-IE browsers
 				nonmembersRequest = new XMLHttpRequest();
 				nonmembersRequest.onreadystatechange = updateNonmembers;
@@ -170,7 +191,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		function getMembers(group){
 			displayLoadingMessage();
-			url="<lams:WebAppURL/>/grouping.do?method=getGroupMembers&activityID=<c:out value="${activityID}"/>&groupID="+group.value;
+			url="<lams:LAMSURL/>monitoring/grouping.do?method=getGroupMembers&activityID=<c:out value="${activityID}"/>&groupID="+group.value;
 			if (window.XMLHttpRequest) { // Non-IE browsers
 				memberRequest = new XMLHttpRequest();
 				memberRequest.onreadystatechange = updateMembers;
@@ -219,7 +240,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				document.getElementById("newgroupname").focus();
 			}else{
 				
-				url="<lams:WebAppURL/>/grouping.do";
+				url="<lams:LAMSURL/>monitoring/grouping.do";
 				var params = "method=addGroup&activityID=<c:out value="${activityID}"/>&name="+document.getElementById("newgroupname").value;
 				
 				if (window.XMLHttpRequest) { // Non-IE browsers
@@ -265,7 +286,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			if(document.getElementById("groups").selectedIndex == -1){
 				alert("<fmt:message key="${error.grouping.remove.group}"/>");
 			}else{
-				url="<lams:WebAppURL/>/grouping.do?method=removeGroup&activityID=<c:out value="${activityID}"/>&groupID="+document.getElementById("groups").value;
+				url="<lams:LAMSURL/>monitoring/grouping.do?method=removeGroup&activityID=<c:out value="${activityID}"/>&groupID="+document.getElementById("groups").value;
 				if (window.XMLHttpRequest) { // Non-IE browsers
 						rmgrpRequest = new XMLHttpRequest();
 						rmgrpRequest.onreadystatechange = grpRemoved;
@@ -312,7 +333,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					members = members + "," + nonmembersSelectObj.options[i].value;
 				}	
 			}
-			url="<lams:WebAppURL/>/grouping.do?method=addMembers&activityID=<c:out value="${activityID}"/>&groupID="+document.getElementById("groups").value+"&members="+members.substr(1);
+			url="<lams:LAMSURL/>monitoring/grouping.do?method=addMembers&activityID=<c:out value="${activityID}"/>&groupID="+document.getElementById("groups").value+"&members="+members.substr(1);
 			if (window.XMLHttpRequest) { // Non-IE browsers
 					addmbrsRequest = new XMLHttpRequest();
 					addmbrsRequest.onreadystatechange = membersAdded;
@@ -363,7 +384,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					nonmembers = nonmembers + "," + membersSelectObj.options[i].value;
 				}	
 			}
-			url="<lams:WebAppURL/>/grouping.do?method=removeMembers&activityID=<c:out value="${activityID}"/>&groupID="+document.getElementById("groups").value+"&members="+nonmembers.substr(1);
+			url="<lams:LAMSURL/>monitoring/grouping.do?method=removeMembers&activityID=<c:out value="${activityID}"/>&groupID="+document.getElementById("groups").value+"&members="+nonmembers.substr(1);
 			if (window.XMLHttpRequest) { // Non-IE browsers
 					rmmbrsRequest = new XMLHttpRequest();
 					rmmbrsRequest.onreadystatechange = membersRemoved;
@@ -433,12 +454,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<p><c:out value="${description}"/></p>
 	</c:if>
 	
-	<p><STRONG><fmt:message key="label.grouping.max.num.in.group.heading"/></STRONG> <c:out value="${maxNumberOfGroups}"/> 
-	<span id="message" align="right"></span></p>
+	<p>&nbsp;
+		<c:if test="${not usedForBranching and maxNumberOfGroups > 0}">
+			<STRONG><fmt:message key="label.grouping.max.num.in.group.heading"/></STRONG> <c:out value="${maxNumberOfGroups}"/> 
+		</c:if>
+		<span id="message" align="right"></span></p>
 
 	<P><STRONG><fmt:message key="label.grouping.general.instructions.heading"/></STRONG> <fmt:message key="label.grouping.general.instructions.line1"/></P>
 
 	<p><fmt:message key="label.grouping.general.instructions.line2"/></p>
+
+	<c:if test="${usedForBranching}">
+	<p><fmt:message key="label.grouping.general.instructions.branching"/></p>
+	</c:if>
 
 	<table class="chosengrouping">
 		<tr>
