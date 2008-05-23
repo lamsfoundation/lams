@@ -53,6 +53,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
+import org.lamsfoundation.lams.tool.rsrc.util.ResourceWebUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -64,8 +65,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class ViewItemAction extends Action {
 	
 	private static final Logger log = Logger.getLogger(ViewItemAction.class);
-	private static final String DEFUALT_PROTOCOL_REFIX = "http://";
-	private static final String ALLOW_PROTOCOL_REFIX = new String("[http://|https://|ftp://|nntp://]");
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -245,13 +244,13 @@ public class ViewItemAction extends Action {
 			
 			if(item.isOpenUrlNewWindow() || wikipediaInURL) {
 				try {
-					url = "/openUrlPopup.do?popupUrl=" + URLEncoder.encode(protocol(item.getUrl()), "UTF8") + "&title="
+					url = "/openUrlPopup.do?popupUrl=" + URLEncoder.encode(ResourceWebUtils.protocol(item.getUrl()), "UTF8") + "&title="
 							+ URLEncoder.encode(item.getTitle(), "UTF8");
 				} catch (UnsupportedEncodingException e) {
 					log.error(e);
 				}
 			}else
-				url = protocol(item.getUrl());
+				url = ResourceWebUtils.protocol(item.getUrl());
 			break;
 		case ResourceConstants.RESOURCE_TYPE_FILE:
 			url = "/download/?uuid="+item.getFileUuid()+"&preferDownload=false";
@@ -263,22 +262,6 @@ public class ViewItemAction extends Action {
 			url = "/pages/learningobj/mainframe.jsp?sessionMapID="+sessionMapID;
 			break;
 		}
-		return url;
-	}
-	/**
-	 * If there is not url prefix, such as http://, https:// or ftp:// etc, this 
-	 * method will add default url protocol.
-	 * 
-	 * @param url
-	 * @return
-	 */
-	private String protocol(String url) {
-		if(url == null)
-			return "";
-		
-		if(!url.matches("^" + ALLOW_PROTOCOL_REFIX + ".*"))
-			url = DEFUALT_PROTOCOL_REFIX + url;
-		
 		return url;
 	}
 

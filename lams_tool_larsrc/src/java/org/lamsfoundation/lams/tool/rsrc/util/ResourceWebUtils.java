@@ -21,21 +21,34 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.util;
 
-import org.lamsfoundation.lams.tool.rsrc.model.Resource;
-import org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction;
-
-
+import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 
 /**
  * Contains helper methods used by the Action Servlets
  * 
  * @author Anthony Sukkar
- *
+ * 
  */
 public class ResourceWebUtils {
 
-// We leave this blank for future use
+	/**
+	 * If there is not url prefix, such as http://, https:// or ftp:// etc, this
+	 * method will add default url protocol.
+	 * 
+	 * @param url
+	 * @return
+	 */
+	public static String protocol(String url) {
+		if (url == null)
+			return "";
+
+		if (!url.matches("^" + ResourceConstants.ALLOW_PROTOCOL_REFIX + ".*"))
+			url = ResourceConstants.DEFUALT_PROTOCOL_REFIX + url;
+
+		return url;
+	}
+
 }

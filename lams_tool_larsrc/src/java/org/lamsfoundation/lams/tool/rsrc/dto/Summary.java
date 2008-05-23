@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.rsrc.dto;
 
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
+import org.lamsfoundation.lams.tool.rsrc.util.ResourceWebUtils;
 
 /**
  * List contains following element: <br>
@@ -83,7 +84,7 @@ public class Summary {
 			this.itemHide = item.isHide();
 			this.itemTitle = item.getTitle();
 			this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
-			this.url = item.getUrl();
+			this.url = ResourceWebUtils.protocol(item.getUrl());
 			this.fileName = item.getFileName();
 			this.fileUuid = item.getFileUuid();
 			this.fileVersionId = item.getFileVersionId();
@@ -108,7 +109,7 @@ public class Summary {
 			this.itemHide = item.isHide();
 			this.itemTitle = item.getTitle();
 			this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
-			this.url = item.getUrl();
+			this.url = ResourceWebUtils.protocol(item.getUrl());
 			this.fileName = item.getFileName();
 			this.fileUuid = item.getFileUuid();
 			this.fileVersionId = item.getFileVersionId();

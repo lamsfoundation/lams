@@ -98,4 +98,6 @@ public class ResourceConstants {
 	public static final String ATTR_REFLECT_LIST = "reflectList";
 	public static final String ATTR_USER_UID = "userUid";
 
+	public static final String DEFUALT_PROTOCOL_REFIX = "http://";
+	public static final String ALLOW_PROTOCOL_REFIX = new String("[http://|https://|ftp://|nntp://]");
 }
