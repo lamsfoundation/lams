@@ -1937,8 +1937,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         * @return Sorted set of Users, sorted by surname
         */
        public SortedSet<User> getClassMembersNotGrouped(Long lessonID, Long activityID, boolean useCreateGrouping) {
-
-    	    Grouping grouping = getGroupingForActivity(activityID, useCreateGrouping,"getClassMembersNotGrouped");
+      	    Activity activity = getActivityById(activityID);
+    	    Grouping grouping = getGroupingForActivity(activity, useCreateGrouping,"getClassMembersNotGrouped");
     	    
 			// get all the learners in the class, irrespective of whether they have joined the lesson or not.
 			// then go through each group and remove the grouped users from the activeLearners set.
@@ -1981,8 +1981,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
  	 * If it is a teacher chosen branching activity and the grouping doesn't exist, it creates
  	 * one.
      */ 
-	private Grouping getGroupingForActivity(Long activityID, boolean useCreateGrouping, String methodName) {
-   	    Activity activity = getActivityById(activityID);
+	private Grouping getGroupingForActivity(Activity activity, boolean useCreateGrouping, String methodName) {
 		if ( useCreateGrouping && (activity == null || !activity.isGroupingActivity()) ) {
 			String error = methodName+": Trying to use the create grouping option but the activity isn't a grouping activity. Activity was "+activity; 
 			log.error(error);
@@ -2016,10 +2015,25 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
  	 * one.
 	 * 	@param activityID id of the grouping activity
 	 * @param name group name
-	 * @throws LessonServiceException 
+	 * @throws LessonServiceException, MonitoringServiceException 
 	 */
-	public void addGroup(Long activityID, String name) throws LessonServiceException {
-        Grouping grouping = getGroupingForActivity(activityID, true,"addGroup");
+	public void addGroup(Long activityID, String name, boolean overrideMaxNumberOfGroups) throws LessonServiceException, MonitoringServiceException {
+   	    Activity activity = getActivityById(activityID);
+        Grouping grouping = getGroupingForActivity(activity, true,"addGroup");
+		if ( overrideMaxNumberOfGroups ) {
+			// Is this grouping used for branching. If it is, must honour the groups
+			// set in authoring or some groups won't have a branch.
+			if ( grouping.getMaxNumberOfGroups() != null && grouping.getMaxNumberOfGroups() > 0 && grouping.getGroups() != null && grouping.getGroups().size() >= grouping.getMaxNumberOfGroups() ) {
+				boolean usedForBranching = grouping.isUsedForBranching();
+				if ( ! usedForBranching ) {
+					log.info("Setting max number of groups to null for grouping "+grouping+" we have been asked to add a group in excess of the max number of groups (probably via the Chosen Grouping screen).");
+					grouping.setMaxNumberOfGroups(null); // must be null and not 0 or the groups will be lost via Live Edit.
+				} else {
+					log.error("Request made to add a group which would be more than the max number of groups for the grouping "+grouping+". This grouping is used for branching so we can't increase the max group number.");
+					throw new MonitoringServiceException("Cannot increase the number of groups for the grouping "+grouping+" as this grouping is used for a branching activity.");
+				}
+			}
+		}
 		lessonService.createGroup(grouping, name);
 	}
 		
@@ -2037,14 +2051,15 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 * @throws LessonServiceException 
 	 **/
 	public void removeGroup(Long activityID, Long groupId) throws LessonServiceException {
-   	    Grouping grouping = getGroupingForActivity(activityID, true,"removeGroup");
+   	    Activity activity = getActivityById(activityID);
+   	    Grouping grouping = getGroupingForActivity(activity, true,"removeGroup");
 		lessonService.removeGroup(grouping, groupId);
 	}
 
 	/** Add learners to a group. Doesn't necessarily check if the user is already in another group. */
 	public void addUsersToGroup(Long activityID, Long groupId, String learnerIDs[])  throws LessonServiceException {
-
-   	    Grouping grouping = getGroupingForActivity(activityID, true, "addUsersToGroup");
+   	    Activity activity = getActivityById(activityID);
+   	    Grouping grouping = getGroupingForActivity(activity, true, "addUsersToGroup");
 		ArrayList<User> learners = createUserList(activityID, learnerIDs,"add");
 		lessonService.performGrouping(grouping, groupId, learners);
 	} 
@@ -2123,8 +2138,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 		/** Remove a user to a group. If the user is not in the group, then nothing is changed. 
 		 * @throws LessonServiceException */
 		public void removeUsersFromGroup(Long activityID, Long groupId, String learnerIDs[]) throws LessonServiceException {
-
-	   	    Grouping grouping = getGroupingForActivity(activityID, true,"removeUsersFromGroup");
+	   	    Activity activity = getActivityById(activityID);
+	   	    Grouping grouping = getGroupingForActivity(activity, true,"removeUsersFromGroup");
 			ArrayList<User> learners = createUserList(activityID, learnerIDs,"remove");
 			lessonService.removeLearnersFromGroup(grouping, groupId, learners);
 		}

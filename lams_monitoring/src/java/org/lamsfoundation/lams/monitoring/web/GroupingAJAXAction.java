@@ -90,6 +90,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	public static final String PARAM_GROUPS = "groups";
 	public static final String PARAM_MEMBERS = "members";
 	public static final String PARAM_MAY_DELETE = "mayDelete";
+	public static final String PARAM_USED_FOR_BRANCHING = "usedForBranching";
 	
 	private Integer getUserId(HttpServletRequest request) {
 		HttpSession ss = SessionManager.getSession();
@@ -134,7 +135,6 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 		request.setAttribute(PARAM_ACTIVITY_DESCRIPTION, activity.getDescription());
 		
 		if ( grouping.isChosenGrouping() ) {
-			request.setAttribute(PARAM_MAX_NUM_GROUPS, grouping.getMaxNumberOfGroups());
 			// can I remove groups/users - can't if tool sessions have been created
 			Set groups = grouping.getGroups();
 			Iterator iter = groups.iterator();
@@ -143,7 +143,17 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 				Group group = (Group) iter.next();
 				mayDelete = group.mayBeDeleted();
 			}
+
+			// is this grouping used for branching. If it is, must honour the groups
+			// set in authoring or some groups won't have a branch. mayDelete can still
+			// be true or false as you can remove users from groups, you just can't remove
+			// groups due to the branching relationship.
+			boolean usedForBranching = grouping.isUsedForBranching();
+			
 			request.setAttribute(PARAM_MAY_DELETE, mayDelete);
+			request.setAttribute(PARAM_USED_FOR_BRANCHING, usedForBranching);
+			request.setAttribute(PARAM_MAX_NUM_GROUPS, grouping.getMaxNumberOfGroups());
+
 			return mapping.findForward(CHOSEN_GROUPING_SCREEN);
 			
 		} else {
@@ -281,7 +291,9 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	
 	/** 
 	 * Add a new group. Designed to respond to an AJAX call.
-     *
+     * If the teacher wants to add more groups than the number of groups set in authoring, and this grouping
+     * isn't used for branching then reset the max number of groups to avoid that validation.
+     * 
 	 * Input parameters: activityID, name (group name)
 	 * 
 	 * Output format: no data returned - just the header 
@@ -293,7 +305,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
     	String name = WebUtil.readStrParam(request, PARAM_NAME);
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-		monitoringService.addGroup(activityID, name);
+		monitoringService.addGroup(activityID, name, true);
 		writeAJAXResponse(response,"");
 		return null;
 	}

@@ -541,7 +541,7 @@ public interface IMonitoringService
 	 * @param name group name
 	 * @throws LessonServiceException 
 	 */
-	public abstract void addGroup(Long activityID, String name) throws LessonServiceException;
+	public abstract void addGroup(Long activityID, String name, boolean overrideMaxNumberOfGroups) throws LessonServiceException, MonitoringServiceException;
 	
 	/** Remove a group to from a grouping activity. If the group does not exists then nothing happens.
 	 * If the group is already used (e.g. a tool session exists) then it throws a LessonServiceException.
