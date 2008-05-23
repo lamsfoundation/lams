@@ -49,7 +49,7 @@ public class ExportPortfolioDTO implements Comparable
     protected List listUserEntries;
     protected List listMonitoredAnswersContainerDto;
     
-
+    protected boolean allowText;
     
     public int compareTo(Object o)
     {
@@ -175,5 +175,13 @@ public class ExportPortfolioDTO implements Comparable
 
 	public void setShowResults(String showResults) {
 		this.showResults = showResults;
+	}
+
+	public boolean isAllowText() {
+		return allowText;
+	}
+
+	public void setAllowText(boolean allowText) {
+		this.allowText = allowText;
 	}
 }

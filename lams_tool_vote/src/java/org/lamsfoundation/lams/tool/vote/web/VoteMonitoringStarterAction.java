@@ -54,6 +54,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
@@ -107,6 +108,8 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 
 		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 		logger.debug("voteService: " + voteService);
+		
+		MessageService messageService = VoteServiceProxy.getMessageService(getServlet().getServletContext());
 		
 		VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
 		logger.debug("voteMonitoringForm: " + voteMonitoringForm);
@@ -205,7 +208,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		//voteMonitoringAction.prepareReflectionData(request, voteContent, voteService, null, false);
 		
 		logger.debug("calling submitSession with selectedToolSessionId" + voteMonitoringForm.getSelectedToolSessionId());
-		return voteMonitoringAction.submitSession(mapping, voteMonitoringForm,  request, response, voteService, voteGeneralMonitoringDTO);
+		return voteMonitoringAction.submitSession(mapping, voteMonitoringForm,  request, response, voteService, messageService, voteGeneralMonitoringDTO);
 	}
 
 	

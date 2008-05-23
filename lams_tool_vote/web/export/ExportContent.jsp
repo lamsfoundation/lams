@@ -66,36 +66,39 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												</td>								
 											</tr>	
 										</c:forEach>	
-
 										
-										<tr>
-									 		<td NOWRAP colspan=2>
-								 			<table class="align-left">
-														<tr>
-													 		<th NOWRAP colspan=2>  <fmt:message key="label.openVotes"/>  </th>
-														</tr>
-			
-														<tr> 
-															 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.vote"/>  </b> </td>  														 
-									  						 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.attemptTime"/> </b></td>
-											  			</tr>				 
-													
-													<c:forEach var="currentDto" items="${exportPortfolioDto.listUserEntries}">
-								  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
-													  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
-																<tr> 
-																		<td NOWRAP valign=top class="align-left"> 
-																				<c:out value="${currentDto.question}" escapeXml="false"/> 
-																		</td>
-																		 <td NOWRAP valign=top class="align-left">   
-																			<lams:Date value="${userData.attemptTime}"/> 
-																		 </td>
-																</tr>		
-															</c:forEach>		  	
-													</c:forEach>		
-											</table> 
-											</td>
-										</tr>
+										<c:if test="${exportPortfolioDto.allowText}">
+																				
+											<tr>
+										 		<td NOWRAP colspan=2>
+									 			<table class="align-left">
+															<tr>
+														 		<th NOWRAP colspan=2>  <fmt:message key="label.openVotes"/>  </th>
+															</tr>
+				
+															<tr> 
+																 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.vote"/>  </b> </td>  														 
+										  						 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.attemptTime"/> </b></td>
+												  			</tr>				 
+														
+														<c:forEach var="currentDto" items="${exportPortfolioDto.listUserEntries}">
+									  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
+														  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
+																	<tr> 
+																			<td NOWRAP valign=top class="align-left"> 
+																					<c:out value="${currentDto.question}" escapeXml="false"/> 
+																			</td>
+																			 <td NOWRAP valign=top class="align-left">   
+																				<lams:Date value="${userData.attemptTime}"/> 
+																			 </td>
+																	</tr>		
+																</c:forEach>		  	
+														</c:forEach>		
+												</table> 
+												</td>
+											</tr>
+										
+										</c:if>
 										
 									</c:if>											
 
@@ -135,42 +138,43 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											</tr>	
 										</c:forEach>	
 										
-										
-								<tr>
-							 		<td NOWRAP colspan=2>
-						 			<table class="align-left">
-												<tr>
-											 		<th NOWRAP colspan=3>  <fmt:message key="label.openVotes"/>  </th>
-												</tr>
-	
-												<tr> 
-													 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.vote"/>  </b> </td>  														 
-													 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.user"/>  </b> </td>  
-							  						 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.attemptTime"/> </b></td>
-									  			</tr>				 
-											
-						 			
-											<c:forEach var="currentDto" items="${exportPortfolioDto.listUserEntries}">
-						  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
-											  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
-		  	 									  	 		<c:set var="currentUid" scope="request" value="${userData.uid}"/>
-														<tr> 
-																<td NOWRAP valign=top class="align-left"> 
-																	<c:out value="${currentDto.question}" escapeXml="false"/> 
-																	<c:if test="${userData.visible != 'true' }"> 			
-												                                 <i><fmt:message key="label.hidden"/> </i> 
-																	</c:if> 								
-																</td>
-																 
-																 <td NOWRAP valign=top class="align-left">    <c:out value="${userData.userName}"/>   </td>  
-																 <td NOWRAP valign=top class="align-left">    <lams:Date value="${userData.attemptTime}"/>  </td>																 
-																 
-														</tr>		
-													</c:forEach>		  	
-											</c:forEach>		
-									</table> 
-									</td>
-								</tr>
+										<c:if test="${exportPortfolioDto.allowText}">
+											<tr>
+										 		<td NOWRAP colspan=2>
+									 			<table class="align-left">
+															<tr>
+														 		<th NOWRAP colspan=3>  <fmt:message key="label.openVotes"/>  </th>
+															</tr>
+				
+															<tr> 
+																 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.vote"/>  </b> </td>  														 
+																 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.user"/>  </b> </td>  
+										  						 <td NOWRAP valign=top class="align-left"> <b>   <fmt:message key="label.attemptTime"/> </b></td>
+												  			</tr>				 
+														
+									 			
+														<c:forEach var="currentDto" items="${exportPortfolioDto.listUserEntries}">
+									  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
+														  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
+					  	 									  	 		<c:set var="currentUid" scope="request" value="${userData.uid}"/>
+																	<tr> 
+																			<td NOWRAP valign=top class="align-left"> 
+																				<c:out value="${currentDto.question}" escapeXml="false"/> 
+																				<c:if test="${userData.visible != 'true' }"> 			
+															                                 <i><fmt:message key="label.hidden"/> </i> 
+																				</c:if> 								
+																			</td>
+																			 
+																			 <td NOWRAP valign=top class="align-left">    <c:out value="${userData.userName}"/>   </td>  
+																			 <td NOWRAP valign=top class="align-left">    <lams:Date value="${userData.attemptTime}"/>  </td>																 
+																			 
+																	</tr>		
+																</c:forEach>		  	
+														</c:forEach>		
+												</table> 
+												</td>
+											</tr>
+										</c:if>
 
 										
 									</c:if>											

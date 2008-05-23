@@ -198,18 +198,19 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
             HttpServletRequest request,
             HttpServletResponse response,
             IVoteService voteService,
+            MessageService messageService,
             VoteGeneralMonitoringDTO voteGeneralMonitoringDTO
             ) throws IOException,
                                          ServletException
 	{
         logger.debug("calling submitSession...voteGeneralMonitoringDTO:" + voteGeneralMonitoringDTO);
-        commonSubmitSessionCode(form, request, voteService,voteGeneralMonitoringDTO);
+        commonSubmitSessionCode(form, request, voteService, messageService, voteGeneralMonitoringDTO);
         logger.debug("post commonSubmitSessionCode: " +voteGeneralMonitoringDTO);
     	return (mapping.findForward(LOAD_MONITORING));
 	}
     
 
-    protected void commonSubmitSessionCode(ActionForm form, HttpServletRequest request,IVoteService voteService,
+    protected void commonSubmitSessionCode(ActionForm form, HttpServletRequest request,IVoteService voteService, MessageService messageService,
             VoteGeneralMonitoringDTO voteGeneralMonitoringDTO) throws IOException, ServletException
     {
     	logger.debug("starting  commonSubmitSessionCode...voteGeneralMonitoringDTO:" + voteGeneralMonitoringDTO);
@@ -228,15 +229,15 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    
 	    VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
 		logger.debug("existing voteContent:" + voteContent);
-
-
+		
+		
 		if (currentMonitoredToolSession.equals("All"))
 	    {
 		    voteGeneralMonitoringDTO.setSelectionCase(new Long(2));
 		    request.setAttribute(SELECTION_CASE, new Long(2));
 		    
 		    logger.debug("generate DTO for All sessions: ");
-		    List listVoteAllSessionsDTO=MonitoringUtil.prepareChartDTO(request, voteService, voteMonitoringForm, voteContent.getVoteContentId());
+		    List listVoteAllSessionsDTO=MonitoringUtil.prepareChartDTO(request, voteService, voteMonitoringForm, voteContent.getVoteContentId(), messageService);
 		    logger.debug("listVoteAllSessionsDTO: " + listVoteAllSessionsDTO);
 		    voteGeneralMonitoringDTO.setListVoteAllSessionsDTO(listVoteAllSessionsDTO);
 	    }
@@ -405,7 +406,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     public ActionForward submitSession(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
-            HttpServletResponse response) 
+            HttpServletResponse response,
+            MessageService messageService) 
     		throws IOException,ServletException
 	{
         logger.debug("dispathcing submitSession..");
@@ -414,7 +416,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
         
         VoteGeneralMonitoringDTO voteGeneralMonitoringDTO= new VoteGeneralMonitoringDTO();
         
-        commonSubmitSessionCode(form, request, voteService,voteGeneralMonitoringDTO);
+        commonSubmitSessionCode(form, request, voteService, messageService, voteGeneralMonitoringDTO);
         logger.debug("post commonSubmitSessionCode: " +voteGeneralMonitoringDTO);
         
 
@@ -1469,7 +1471,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 		
 	    logger.debug("submitting session to refresh the data from the database: ");
-    	return submitSession(mapping, form,  request, response, voteService, voteGeneralMonitoringDTO);
+    	return submitSession(mapping, form,  request, response, voteService, getMessageService(), voteGeneralMonitoringDTO);
      }
 
     
@@ -1613,7 +1615,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		MonitoringUtil.buildVoteStatsDTO(request,voteService, voteContent);
 		
 	    logger.debug("submitting session to refresh the data from the database: ");
-	    return submitSession(mapping, form,  request, response, voteService, voteGeneralMonitoringDTO);
+	    return submitSession(mapping, form,  request, response, voteService, getMessageService(), voteGeneralMonitoringDTO);
     }
 
 
@@ -3835,7 +3837,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	 * Return ResourceService bean.
 	 */
 	private MessageService getMessageService() {
-	     return (MessageService) VoteServiceProxy.getMessageService(getServlet().getServletContext());
+	     return VoteServiceProxy.getMessageService(getServlet().getServletContext());
 	}
 }
     

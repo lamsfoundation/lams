@@ -53,6 +53,8 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
+import org.lamsfoundation.lams.tool.vote.service.VoteServicePOJO;
+import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -678,7 +680,7 @@ public class MonitoringUtil implements VoteAppConstants{
 	 * @return 
 	 */
 	public static List prepareChartDTO(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, 
-	        Long toolContentID)
+	        Long toolContentID, MessageService messageService)
 	{
 	    logger.debug("start preparing ChartDTO with voteMonitoringForm: " + voteMonitoringForm);
 	    logger.debug("start preparing ChartDTO with toolContentID: " + toolContentID);
@@ -838,8 +840,10 @@ public class MonitoringUtil implements VoteAppConstants{
 			}
 			logger.debug("final share: " + share);
 	        
-		    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
-		    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), "Open Vote");
+			if (voteContent.isAllowText()) {
+			    mapStandardNominationsContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
+			    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
+			}
 		    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
 		    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
 		    /**following  are needed just for proper iteration in the summary jsp*/
@@ -1241,9 +1245,11 @@ public class MonitoringUtil implements VoteAppConstants{
 		}
 		logger.debug("final share: " + share);
 
-        
-	    mapStandardNominationsContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
-	    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
+
+		if(voteContent.isAllowText()) {
+		    mapStandardNominationsContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
+		    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
+		}
 	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
 	    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
 	    

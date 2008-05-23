@@ -137,7 +137,9 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 	            logger.error(error);
 	            throw new VoteApplicationException(error);
 	        }
-	
+	        
+	        exportPortfolioDTO.setAllowText(content.isAllowText());
+	        
 	        VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
 	        
 	    	VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
@@ -193,6 +195,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
             throw new VoteApplicationException(error);
         }
 		
+        exportPortfolioDTO.setAllowText(content.isAllowText());
+        
         VoteGeneralMonitoringDTO voteGeneralMonitoringDTO=new VoteGeneralMonitoringDTO();
         VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
         
