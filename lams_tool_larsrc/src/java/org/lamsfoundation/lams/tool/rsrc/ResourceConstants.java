@@ -78,6 +78,7 @@ public class ResourceConstants {
 	public static final String ATTR_ADD_RESOURCE_TYPE = "addType";
 	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 	public static final String ATTR_TITLE = "title";
+	public static final String ATTR_INSTRUCTIONS = "instructions";
 	public static final String ATTR_USER_FINISHED = "userFinished";
 	
 	//error message keys

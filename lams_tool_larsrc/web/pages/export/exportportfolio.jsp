@@ -6,6 +6,7 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}" />
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="title" value="${sessionMap.title}" />
+<c:set var="instructions" value="${sessionMap.instructions}" />
 
 <lams:html>
 <lams:head>
@@ -40,6 +41,10 @@
 		<h1>
 			${title}
 		</h1>
+		
+		<div>
+			${instructions}
+		</div>
 
 		<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
 			<!-- 'group' always contains at least one Summary element  -->

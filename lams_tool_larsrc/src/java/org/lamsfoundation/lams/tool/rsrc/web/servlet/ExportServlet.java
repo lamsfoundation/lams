@@ -184,6 +184,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 		
 		sessionMap.put(ResourceConstants.ATTR_TITLE, content.getTitle());
+		sessionMap.put(ResourceConstants.ATTR_INSTRUCTIONS, content.getInstructions());
 		sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
@@ -223,6 +224,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		
 		// put it into HTTPSession
 		sessionMap.put(ResourceConstants.ATTR_TITLE, content.getTitle());
+		sessionMap.put(ResourceConstants.ATTR_INSTRUCTIONS, content.getInstructions());
 		sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
