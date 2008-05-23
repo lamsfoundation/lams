@@ -103,17 +103,8 @@
 			<c:forEach var="item" items="${sessionMap.resourceList}">
 				<tr>
 					<td>
-
-						<c:choose>
-							<c:when test="${not finishedLock}">
-								<a href="javascript:;" onclick="viewItem(${item.uid})">
-									${item.title} </a>
-							</c:when>
-
-							<c:otherwise>
-								${item.title}
-							</c:otherwise>
-						</c:choose>
+						<a href="javascript:;" onclick="viewItem(${item.uid})">
+							${item.title} </a>
 
 						<c:if test="${!item.createByAuthor && item.createBy != null}">
 								[${item.createBy.loginName}]
