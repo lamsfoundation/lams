@@ -303,17 +303,16 @@ class LearnerActivity extends MovieClip {
 		hideToolTip();
 	}
 	
-	private function onPress():Void{
+	public function onPress():Void{
+			var c = (_controller instanceof LessonController) ? LessonController(_controller) : MonitorController(_controller);
 			
 			// check double-click
 			var now:Number = new Date().getTime();
 			
 			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
-				//if (app.controlKeyPressed != "transition"){
 					_doubleClicking = true;
-					controller.activityDoubleClick(this);
+					c.activityDoubleClick(this);
 					Debugger.log('DoubleClicking:+'+this,Debugger.GEN,'onPress','LearnerActivity');
-				//}
 			}else{
 				Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','LearnerActivity');
 				_doubleClicking = false;
@@ -326,7 +325,9 @@ class LearnerActivity extends MovieClip {
 	}
 	
 	
-	private function onRelease():Void{
+	public function onRelease():Void{
+		var c = (_controller instanceof LessonController) ? LessonController(_controller) : MonitorController(_controller);
+			
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','LearnerActivity');
 			Debugger.log('Is sequence:'+this.activity.isSequenceActivity(),Debugger.GEN,'onRelease','LearnerActivity');
@@ -366,12 +367,12 @@ class LearnerActivity extends MovieClip {
 					}
 				}
 				
-				controller.activityRelease(this);
+				c.activityRelease(this);
 		}
 		
 	}
 	
-	private function onReleaseOutside():Void{
+	public function onReleaseOutside():Void{
 		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','LearnerActivity');
 		
 		controller.activityReleaseOutside(this);
@@ -381,12 +382,8 @@ class LearnerActivity extends MovieClip {
 		learner = a;
 	}
 	
-	public function get controller(){
-		if(app.module == 'learner'){
-			return LessonController(_controller);
-		} else {
-			return MonitorController(_controller);
-		}
+	public function set controller(a:AbstractController){
+		_controller = a;
 	}
 	
 	public function get model(){

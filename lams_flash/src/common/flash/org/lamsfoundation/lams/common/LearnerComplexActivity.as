@@ -643,8 +643,12 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		return a;
 	}
 	
+	public function set controller(a:AbstractController){
+		_controller = a;
+	}
+	
 	public function get controller(){
-		if(isLearnerModule()){
+		if(_controller instanceof LessonController){
 			return LessonController(_controller);
 		} else {
 			return MonitorController(_controller);

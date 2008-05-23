@@ -21,14 +21,16 @@
  * ************************************************************************
  */
 
-import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.LearnerComplexActivity;
 import org.lamsfoundation.lams.common.ApplicationParent;
-import org.lamsfoundation.lams.common.mvc.*
-import org.lamsfoundation.lams.common.util.*
-import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.comms.Communication;
-import org.lamsfoundation.lams.learner.*
+import org.lamsfoundation.lams.common.mvc.*;
+import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.dict.*;
+
+import org.lamsfoundation.lams.learner.*;
+import org.lamsfoundation.lams.learner.ls.*;
+
 import org.lamsfoundation.lams.authoring.Activity;
 
 import mx.managers.*;
