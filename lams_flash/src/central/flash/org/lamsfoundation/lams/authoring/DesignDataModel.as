@@ -1050,11 +1050,15 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function getComplexActivityChildren(activityUIID):Array{
 		Debugger.log('Looking for chiildren of UIID:'+activityUIID,Debugger.GEN,'getComplexActivityChildren','DesignDataModel');
 		_global.breakpoint();
-		var k:Array = _activities.keys();
+		
+		var k:Array = _activities.values();
+		k.sortOn("orderID", Array.NUMERIC);
+		
 		var children:Array = new Array();
 		var count = 0;
+		
 		for(var i=0;i<k.length;i++){
-			var a = _activities.get(k[i]);
+			var a = k[i];
 			if(a.parentUIID == activityUIID){
 				Debugger.log('Found a child! UIID:'+a.activityUIID,Debugger.GEN,'getComplexActivityChildren','DesignDataModel');
 				count++;
@@ -1062,6 +1066,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				children.push(a);
 			}
 		}
+		
 		return children;
 		
 		
