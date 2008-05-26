@@ -91,6 +91,7 @@ public class TaskList implements Cloneable{
 
 	private List<TaskListAttachment> onlineFileList;
 	private List<TaskListAttachment> offlineFileList;
+	private int numberTasksToComplete; 
 	
 	/**
 	 * Default contructor. 
@@ -272,7 +273,6 @@ public class TaskList implements Cloneable{
 	public Date getCreated() {
       return created;
 	}
-
 	/**
 	 * Sets the object's creation date
 	 *
@@ -291,7 +291,6 @@ public class TaskList implements Cloneable{
 	public Date getUpdated() {
         return updated;
 	}
-
 	/**
 	 * Sets the object's date of last update
 	 *
@@ -314,7 +313,6 @@ public class TaskList implements Cloneable{
     public TaskListUser getCreatedBy() {
         return createdBy;
     }
-
     /**
      * Sets id of a user created the taskList.
      * 
@@ -334,7 +332,6 @@ public class TaskList implements Cloneable{
 	public Long getUid() {
 		return uid;
 	}
-
 	/**
 	 * Sets <code>TaskList</code> id.
 	 * 
@@ -356,7 +353,6 @@ public class TaskList implements Cloneable{
 	public String getTitle() {
 		return title;
 	}
-
 	/**
 	 * Sets the tasklist title
 	 * 
@@ -377,7 +373,6 @@ public class TaskList implements Cloneable{
 	public boolean getRunOffline() {
 		return runOffline;
 	}
-    
 	/**
 	 * Sets if the tasklist should run offline.
 	 * 
@@ -399,7 +394,6 @@ public class TaskList implements Cloneable{
     public String getInstructions() {
         return instructions;
     }
-
     /**
      * Sets tasklist instructions. Usually done by teacher.
      * 
@@ -421,7 +415,6 @@ public class TaskList implements Cloneable{
     public String getOnlineInstructions() {
         return onlineInstructions;
     }
-
     /**
      * Sets tasklist instructions. Usually done by teacher.
      * 
@@ -443,7 +436,6 @@ public class TaskList implements Cloneable{
     public String getOfflineInstructions() {
         return offlineInstructions;
     }
-
     /**
      * Sets tasklist offlineInstructions. Usually done by teacher.
      * 
@@ -469,7 +461,6 @@ public class TaskList implements Cloneable{
 	public Set getAttachments() {
 		return attachments;
 	}
-
     /**
      * Sets a set of Attachments belong to this tasklist
      * 
@@ -494,7 +485,6 @@ public class TaskList implements Cloneable{
 	public Set getConditions() {
 		return conditions;
 	}
-
     /**
      * Sets a set of Conditions belong to this tasklist
      * 
@@ -519,7 +509,6 @@ public class TaskList implements Cloneable{
 	public Set getTaskListItems() {
 		return taskListItems;
 	}
-	
 	/**
 	 * Sets set of TaskListItems.
 	 * 
@@ -539,7 +528,6 @@ public class TaskList implements Cloneable{
 	public boolean isContentInUse() {
 		return contentInUse;
 	}
-
 	/**
 	 * Sets whether this tasklist in use or not.
 	 * 
@@ -559,7 +547,6 @@ public class TaskList implements Cloneable{
 	public boolean isDefineLater() {
 		return defineLater;
 	}
-
 	/**
 	 * Sets whether this tasklist should be defined later or not.
 	 * 
@@ -579,7 +566,6 @@ public class TaskList implements Cloneable{
 	public Long getContentId() {
 		return contentId;
 	}
-
 	/**
 	 * Sets ContentId.
 	 * 
@@ -600,7 +586,6 @@ public class TaskList implements Cloneable{
     public boolean getLockWhenFinished() {
         return lockWhenFinished;
     }
-    
     /**
      * Set if the tasklist should be locked after being finished or not.
      * 
@@ -620,7 +605,6 @@ public class TaskList implements Cloneable{
 	public boolean isAllowContributeTasks() {
 		return allowContributeTasks;
 	}
-	
 	/**
 	 * Sets whether learners are allowed to contribute tasks.
 	 * 
@@ -640,7 +624,6 @@ public class TaskList implements Cloneable{
 	public boolean isMonitorVerificationRequired() {
 		return monitorVerificationRequired;
 	}
-	
 	/**
 	 * Sets whether the learners should be verified by monitor before they can finish tasklist.
 	 * 
@@ -660,7 +643,6 @@ public class TaskList implements Cloneable{
 	public boolean isSequentialOrder() {
 		return sequentialOrder;
 	}
-	
 	/**
 	 * Sets if the tasks should be done in a sequential order.
 	 * 
@@ -669,7 +651,6 @@ public class TaskList implements Cloneable{
 	public void setSequentialOrder(boolean sequentialOrder) {
 		this.sequentialOrder = sequentialOrder;
 	}
-	
 	
 	/**
 	 * Returns the minimum number of tasks needed to be completed to finish this activity.
@@ -681,14 +662,35 @@ public class TaskList implements Cloneable{
 	public int getMinimumNumberTasksComplete() {
 		return minimumNumberTasksComplete;
 	}
-	
 	/**
 	 * Sets the minimum number of tasks needed to be completed to finish this activity.
 	 * 
-	 * @param sequentialOrder the minimum number of tasks needed to be completed to finish this activity
+	 * @param numberTasksToComplete the minimum number of tasks needed to be completed to finish this activity
 	 */
 	public void setMinimumNumberTasksComplete(int minimumNumberTasksComplete) {
 		this.minimumNumberTasksComplete = minimumNumberTasksComplete;
+	}
+	
+	/**
+	 * @hibernate.property column="reflect_instructions"
+	 * @return
+	 */	
+	public String getReflectInstructions() {
+		return reflectInstructions;
+	}
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
+	}
+	
+	/**
+	 * @hibernate.property column="reflect_on_activity"
+	 * @return
+	 */		
+	public boolean isReflectOnActivity() {
+		return reflectOnActivity;
+	}
+	public void setReflectOnActivity(boolean reflectOnActivity) {
+		this.reflectOnActivity = reflectOnActivity;
 	}
 	
 	/**
@@ -701,34 +703,34 @@ public class TaskList implements Cloneable{
 	public void setOfflineFileList(List<TaskListAttachment> offlineFileList) {
 		this.offlineFileList = offlineFileList;
 	}
+	
 	public List<TaskListAttachment> getOnlineFileList() {
 		return onlineFileList;
 	}
 	public void setOnlineFileList(List<TaskListAttachment> onlineFileList) {
 		this.onlineFileList = onlineFileList;
 	}
+	
 	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
 		this.toolContentHandler = toolContentHandler;
 	}
+	
+	/**
+	 * Returns the number of tasks needed to be completed to finish this activity.
+	 * 
+	 * @return the number of tasks needed to be completed to finish this activity
+	 * 
+	 */
+	public int getNumberTasksToComplete() {
+		return numberTasksToComplete;
+	}
+	/**
+	 * Sets the number of tasks needed to be completed to finish this activity.
+	 * 
+	 * @param numberTasksToComplete the number of tasks needed to be completed to finish this activity
+	 */
+	public void setNumberTasksToComplete(int numberTasksToComplete) {
+		this.numberTasksToComplete = numberTasksToComplete;
+	}
 
-	/**
-	 * @hibernate.property column="reflect_instructions"
-	 * @return
-	 */	
-	public String getReflectInstructions() {
-		return reflectInstructions;
-	}
-	public void setReflectInstructions(String reflectInstructions) {
-		this.reflectInstructions = reflectInstructions;
-	}
-	/**
-	 * @hibernate.property column="reflect_on_activity"
-	 * @return
-	 */		
-	public boolean isReflectOnActivity() {
-		return reflectOnActivity;
-	}
-	public void setReflectOnActivity(boolean reflectOnActivity) {
-		this.reflectOnActivity = reflectOnActivity;
-	}
 }

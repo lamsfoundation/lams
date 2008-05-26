@@ -239,6 +239,10 @@ public class LearningAction extends Action {
 			
 			itemDTOs.add(itemDTO);
 		}
+
+		//construct taskList dto field
+		int numberTasksToComplete = service.checkMinimumNumberTasksComplete(sessionId, taskListUser.getUserId());
+		taskList.setNumberTasksToComplete(numberTasksToComplete);
 		
 		//add define later support
 		if(taskList.isDefineLater()){

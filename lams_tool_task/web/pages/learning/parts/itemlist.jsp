@@ -142,11 +142,11 @@
 		
 	</c:forEach>
 	
-	<c:if test="${taskList.minimumNumberTasksComplete > 0}">
+	<c:if test="${taskList.numberTasksToComplete > 0}">
 		<tr>
 			<td colspan="3" align="left">
 				<fmt:message key="label.learning.notification.you.must.complete.tasks.1" /> 
-				<b>${taskList.minimumNumberTasksComplete}</b>
+				<b>${taskList.numberTasksToComplete}</b>
 				<fmt:message key="label.learning.notification.you.must.complete.tasks.2" />
 			</td>
 		</tr>
