@@ -1251,6 +1251,10 @@ class PropertyInspectorControls extends MovieClip {
 		var grouping:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.groupingUIID);
 		_group_match_btn.visible = ((grouping.numberOfGroups > 0 || grouping.maxNumberOfGroups > 0) && !_define_monitor_cb.selected) ? true : false;
 		
+		if(_define_monitor_cb.selected) {
+			_canvasModel.getCanvas().ddm.clearBranchMappingsByGroupingUIID(grouping.groupingUIID);
+		}
+		
 		setModified();
 	}
     
