@@ -39,8 +39,3 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</c:if>
 	</p>
 </c:if>
-
-
-<c:if test="${not GateForm.map.readOnly}"> 
-	<%@ include file="../template/finishbutton.jsp" %>
-</c:if>
