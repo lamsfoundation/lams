@@ -65,7 +65,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		function getBranches(){
 			displayLoadingMessage();
-			url="<lams:WebAppURL/>/groupedBranching.do?method=getBranches&activityID=<c:out value="${activityID}"/>";
+			url="<lams:LAMSURL/>monitoring/groupedBranching.do?method=getBranches&activityID=<c:out value="${activityID}"/>";
 			if (window.XMLHttpRequest) { // Non-IE browsers
 				branchRequest = new XMLHttpRequest();
 				branchRequest.onreadystatechange = updateBranches;
@@ -108,7 +108,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		function getNonmembers(){
 			displayLoadingMessage();
-			url="<lams:WebAppURL/>/groupedBranching.do?method=getGroupsNotAssignedToBranch&activityID=<c:out value="${activityID}"/>";
+			url="<lams:LAMSURL/>monitoring/groupedBranching.do?method=getGroupsNotAssignedToBranch&activityID=<c:out value="${activityID}"/>";
 			if (window.XMLHttpRequest) { // Non-IE browsers
 				nonmembersRequest = new XMLHttpRequest();
 				nonmembersRequest.onreadystatechange = updateNonmembers;
@@ -151,7 +151,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		function getMembers(branch){
 			displayLoadingMessage();
-			url="<lams:WebAppURL/>/groupedBranching.do?method=getBranchGroups&branchID="+branch.value;
+			url="<lams:LAMSURL/>monitoring/groupedBranching.do?method=getBranchGroups&branchID="+branch.value;
 			if (window.XMLHttpRequest) { // Non-IE browsers
 				memberRequest = new XMLHttpRequest();
 				memberRequest.onreadystatechange = updateMembers;
@@ -204,7 +204,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					members = members + "," + nonmembersSelectObj.options[i].value;
 				}	
 			}
-			url="<lams:WebAppURL/>/groupedBranching.do?method=addGroups&branchID="+document.getElementById("branches").value+"&groups="+members.substr(1);
+			url="<lams:LAMSURL/>monitoring/groupedBranching.do?method=addGroups&branchID="+document.getElementById("branches").value+"&groups="+members.substr(1);
 			if (window.XMLHttpRequest) { // Non-IE browsers
 					addmbrsRequest = new XMLHttpRequest();
 					addmbrsRequest.onreadystatechange = membersAdded;
@@ -254,7 +254,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					nonmembers = nonmembers + "," + membersSelectObj.options[i].value;
 				}	
 			}
-			url="<lams:WebAppURL/>/groupedBranching.do?method=removeGroups&branchID="+document.getElementById("branches").value+"&groups="+nonmembers.substr(1);
+			url="<lams:LAMSURL/>monitoring/groupedBranching.do?method=removeGroups&branchID="+document.getElementById("branches").value+"&groups="+nonmembers.substr(1);
 			if (window.XMLHttpRequest) { // Non-IE browsers
 					rmmbrsRequest = new XMLHttpRequest();
 					rmmbrsRequest.onreadystatechange = membersRemoved;
