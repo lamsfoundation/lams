@@ -374,18 +374,12 @@ public class Group implements Serializable,Nullable,Comparable {
 		return entry;
     }
     
-    /** Remove the branch with which this group is associated.
+    /** 
+     * Remove the branch with which this group is associated.
+     * Actually calls the SequenceActivity to do the removal as it is the SequenceActivity that has the hibernate cascade.
+     * So its the activity that must be saved, not the group. Method left here to make it easier to find.
      */
     public void removeGroupFromBranch(SequenceActivity branch) {
-    	if ( getBranchActivities() != null ) {
-    		Iterator iter = getBranchActivities().iterator();
-    		while (iter.hasNext()) {
-				BranchActivityEntry object = (BranchActivityEntry) iter.next();
-				if ( object.getBranchSequenceActivity().equals(branch) ) {
-					iter.remove();
-				}
-			}
-    	}
-    	// branch.getGroupsForBranch().remove(this);
+    	branch.removeGroupFromBranch(this);
     }
 }

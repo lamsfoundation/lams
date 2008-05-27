@@ -260,5 +260,21 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
     	return listOfValidationErrors;
     }
     
+    /** 
+     * Remove the entry mapping the given group to this branch.
+     * Need to remove it from the branch end, as it is the branch end that 
+     * has the all-delete-orphan cascade (LDEV-1766)
+     */
+    public void removeGroupFromBranch(Group group) {
+    	if ( getBranchEntries() != null ) {
+    		Iterator iter = getBranchEntries().iterator();
+    		while (iter.hasNext()) {
+				BranchActivityEntry object = (BranchActivityEntry) iter.next();
+				if ( object.getGroup().equals(group) ) {
+					iter.remove();
+				}
+			}
+    	}
+    }
 
 }
