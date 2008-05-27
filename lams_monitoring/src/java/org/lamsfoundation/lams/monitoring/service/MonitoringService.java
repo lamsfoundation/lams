@@ -2268,8 +2268,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 				if ( isActivityAttempted(branch) )  {
 					log.warn("removeGroupFromBranch: A group member has already started the branch. Unable to remove the group from the branch. Group ID was "+groupIDString);
 				} else {
-					group.removeGroupFromBranch(branch);
-					groupingDAO.update(group);
+					branch.removeGroupFromBranch(group);
+					activityDAO.update(branch);
 				}
 			}
 			
