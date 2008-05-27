@@ -62,21 +62,24 @@
 
 			<table cellspacing="0" width="98%" class="alternative-color">
 				<tr>
-					<th width="50">
+					<th>
 						<fmt:message key="monitoring.label.type" />
 					</th>
-					<th width="300">
+					<th width="20%">
 						<fmt:message key="monitoring.label.title" />
 					</th>
-					<th width="150">
+					<th width="45%">
+						<fmt:message key="monitoring.label.instructions" />
+					</th>
+					<th>
 						<fmt:message key="monitoring.label.suggest" />
 					</th>
-					<th width="300" align="center">
+					<th align="center">
 						<fmt:message key="export.label.resource" />
 					</th>
 
 					<c:if test="${mode == 'teacher'}">
-						<th width="50" align="center">
+						<th align="center">
 							<!-- hide/show -->
 						</th>
 					</c:if>
@@ -96,7 +99,7 @@
 
 					<c:if test="${item.itemUid == -1}">
 						<tr>
-							<td colspan="4">
+							<td colspan="5">
 								<div align="left">
 									<fmt:message
 										key="message.monitoring.summary.no.resource.for.group" />
@@ -127,6 +130,23 @@
 
 							<td>
 								${item.itemTitle}
+							</td>
+							
+							<td>
+								<c:choose>
+									<c:when test="${not empty item.itemInstructions}">
+										<ol>
+											<c:forEach var="itemInstruction" items="${item.itemInstructions}">
+												<li>
+													${itemInstruction}
+												</li>
+											</c:forEach>
+										</ol>
+									</c:when>									
+									<c:otherwise>
+										&nbsp;
+									</c:otherwise>								
+								</c:choose>								
 							</td>
 
 							<td>

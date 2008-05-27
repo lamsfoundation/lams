@@ -24,7 +24,12 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.rsrc.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceWebUtils;
 
 /**
@@ -52,6 +57,7 @@ public class Summary {
 	private boolean itemCreateByAuthor;
 	private boolean itemHide;
 	private String itemTitle;
+	private List<String> itemInstructions = new ArrayList<String>();
 	private String username;
 	private int viewNumber;
 	
@@ -113,6 +119,10 @@ public class Summary {
 			this.fileName = item.getFileName();
 			this.fileUuid = item.getFileUuid();
 			this.fileVersionId = item.getFileVersionId();
+
+			for (ResourceItemInstruction instruction : (Set<ResourceItemInstruction>)item.getItemInstructions()) {
+				itemInstructions.add(instruction.getDescription());
+			}
 		}else
 			this.itemUid = new Long(-1);
 		this.isInitGroup = isInitGroup;
@@ -208,6 +218,12 @@ public class Summary {
 	}
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+	public List<String> getItemInstructions() {
+		return itemInstructions;
+	}
+	public void setItemInstructions(List<String> itemInstructions) {
+		this.itemInstructions = itemInstructions;
 	}
 	
 }
