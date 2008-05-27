@@ -99,9 +99,8 @@ public class LAMSUploadServlet extends HttpServlet {
 		if(baseDir==null)
 			baseDir="secure";
 		
-		realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + baseDir;
-		lamsContextPath = "/" + Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH) +"/";
-
+		getConfigKeyValues();
+		
 		File baseFile=new File(realBaseDir);
 		if(!baseFile.exists()){
 			baseFile.mkdir();
@@ -137,6 +136,9 @@ public class LAMSUploadServlet extends HttpServlet {
 
 		if (debug) System.out.println("--- BEGIN DOPOST ---");
 
+		// get realBaseDir and lamsContextPath at request time from config values in memory
+		getConfigKeyValues();
+		
 		response.setContentType("text/html; charset=UTF-8");
 		response.setHeader("Cache-Control","no-cache");
 		PrintWriter out = response.getWriter();
@@ -317,5 +319,9 @@ public class LAMSUploadServlet extends HttpServlet {
 			 return true;
 	 }
 
+	 private void getConfigKeyValues() {
+	 	realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + baseDir;
+		lamsContextPath = "/" + Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH) +"/";
+	 }
 }
 
