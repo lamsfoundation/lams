@@ -45,6 +45,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	private var app:Application;
 	private var _isBusy:Boolean;
 	private var _tempSelectedItem:Object;
+	private var _binCheckIntervalID:Number;
+	private var _binBlock:Boolean;
+	
+	private static var BIN_CHECK_INTERVAL:Number = 100;
 	
 	/**
 	* Constructor
@@ -65,7 +69,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
    
     public function activityClick(ca:Object):Void{
-	
+		
 		_tempSelectedItem = _canvasModel.selectedItem;
 		_canvasModel.selectedItem = null;
 		
@@ -103,6 +107,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					ca.depthHistory = ca.getDepth();
 					ca.swapDepths(DepthManager.kTopmost);
 				}
+				
+				_binBlock = _canvasModel.getCanvas().bin.initBlocked(ca);
+				_binCheckIntervalID = setInterval(Proxy.create(_canvasModel.getCanvas().bin, _canvasModel.getCanvas().bin.isActivityOverBin, ca, false), BIN_CHECK_INTERVAL);
+				
 				ca.startDrag(false);
 				_canvasModel.isDragging = true;
 			}
@@ -169,6 +177,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 	    if(_canvasModel.isDragging) {
 			ca.stopDrag();
+			
 			if (ca.activity.isOptionalActivity() || ca.activity.isOptionsWithSequencesActivity()) {
 				ca.swapDepths(ca.depthHistory);
 				ca.depthHistory = null;
@@ -322,6 +331,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			// if we are on the bin - trash it
 			isActivityOnBin(ca);
+			clearInterval(_binCheckIntervalID);
+			
 			
 			//get a view if ther is not one
 			if(!_canvasView)
@@ -619,7 +630,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		var r:Object = null;
 		var parentUIID:Number = ca.activity.parentUIID;
 		
-		if(ca.hitTest(_canvasModel.getCanvas().bin)) {
+		if(ca.hitTest(_canvasModel.getCanvas().bin) && !_canvasModel.getCanvas().bin.blocked) {
 			if(_canvasModel.activeView instanceof CanvasComplexView) {
 				var seqActivity:Activity = Activity(_canvasModel.ddm.getActivityByUIID(parentUIID));
 				if(seqActivity.isOptionalSequenceActivity(_canvasModel.ddm.getActivityByUIID(seqActivity.parentUIID)))
@@ -667,6 +678,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					activitySnapBack(ca);
 				}
 			}
+			
+			_canvasModel.getCanvas().bin.setOff();
 		}
 	}
    

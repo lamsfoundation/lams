@@ -44,6 +44,8 @@ class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{
 	private var up_mc:MovieClip;
 	private var over_mc:MovieClip;
 	
+	private var _blocked:Boolean;
+	
 	//Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -67,6 +69,8 @@ class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{
 	private function draw(){
 		over_mc._visible = false;
 		up_mc._visible = true;
+		
+		setStyles();
 	}
 	
 	private function onRelease():Void{
@@ -86,5 +90,41 @@ class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{
 	
 	private function onRollOut():Void{
 		_tip.CloseToolTip();
+	}
+	
+	private function setStyles():Void {
+		//var styleObj = _tm.getStyleObject("bin");
+		over_mc._alpha = 40;
+	}
+	
+	private function setOn(a:Boolean):Void {
+		over_mc._visible = a;
+		up_mc._visible = !a;
+	}
+	
+	public function setOff():Void {
+		setOn(false);
+	}
+	
+	public function isActivityOverBin(ca:MovieClip, isInit:Boolean):Void {
+		var hit = ca.hitTest(this);
+		_blocked = (isInit || (!hit && _blocked)) ? hit : _blocked;
+		
+		if(!isInit && !_blocked)
+			setOn(hit);
+	}
+	
+	public function initBlocked(ca:MovieClip):Boolean {
+		isActivityOverBin(ca, true);
+		
+		return _blocked;
+	}
+	
+	public function set blocked(a:Boolean):Void {
+		_blocked = blocked;
+	}
+	
+	public function get blocked():Boolean {
+		return _blocked;
 	}
 }
