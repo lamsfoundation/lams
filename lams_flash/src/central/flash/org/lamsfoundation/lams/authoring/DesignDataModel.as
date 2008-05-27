@@ -1124,7 +1124,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			
 			if(target != null && hub != null){
 					break;
-			}else{
+			} else {
 				if(br[i].targetUIID == UIID){
 					target = br[i];
 				}
