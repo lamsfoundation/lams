@@ -108,9 +108,15 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 
 	/** Prepares to process children */
 	public boolean startComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
-		// Create a new current activity list, putting the old current one on the stack. 
-		activityListStack.push(currentPortfolioList);
-		currentPortfolioList = new ArrayList<ActivityPortfolio>();
+		// Create a new current activity list, putting the old current one on the stack.
+		// An exception to this is when we reach a branching activity in learner mode. The children are added to the current list.
+		boolean flattenLearnerBranching = (activity.isBranchingActivity() || (activity.isSequenceActivity() 
+				&& activity.getParentActivity().isBranchingActivity())) && accessMode == ToolAccessMode.LEARNER;
+
+		if (!flattenLearnerBranching) {
+			activityListStack.push(currentPortfolioList);
+			currentPortfolioList = new ArrayList<ActivityPortfolio>();
+		}
 		return true;
 	}
 
@@ -119,11 +125,14 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 		
 		ActivityPortfolio complexPortfolio = null;
 		
+		boolean flattenLearnerBranching = (activity.isBranchingActivity() || (activity.isSequenceActivity() 
+				&& activity.getParentActivity().isBranchingActivity())) && accessMode == ToolAccessMode.LEARNER;
+		
 		if ( currentPortfolioList.size()>0 || accessMode == ToolAccessMode.TEACHER) {
 			complexPortfolio = createActivityPortfolio(activity);
 
 			if ( currentPortfolioList.size()>0 ) {
-			complexPortfolio.setChildPortfolios(currentPortfolioList);
+				complexPortfolio.setChildPortfolios(currentPortfolioList);
 			}
 		
 			if ( activity.isSystemToolActivity() ) {
@@ -138,8 +147,11 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 			}
 		}
 
-		currentPortfolioList = (ArrayList<ActivityPortfolio>) activityListStack.pop();
-		if ( complexPortfolio != null )
+		if (!flattenLearnerBranching) {
+			currentPortfolioList = (ArrayList<ActivityPortfolio>) activityListStack.pop();
+		}
+
+		if ( complexPortfolio != null && !flattenLearnerBranching)
 			currentPortfolioList.add(complexPortfolio);
 	}
 
