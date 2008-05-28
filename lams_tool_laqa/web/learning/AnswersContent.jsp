@@ -38,16 +38,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><fmt:message key="activity.title" /></title>
 	
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-latest.pack.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
-		function submitLearningMethod(actionMethod) 
-		{
-			document.QaLearningForm.method.value=actionMethod; 
-			document.QaLearningForm.submit();
+		function submitMethod(actionMethod) {
+			var submit = true;
+			if (actionMethod != 'getPreviousQuestion') {
+				jQuery(".text-area").each(function() {
+					if (jQuery.trim($(this).val()) == "") {
+						if (confirm('<fmt:message key="warning.empty.answers" />')) {
+							doSubmit(actionMethod);
+							return false;
+						} else {
+							this.focus();
+							return submit = false;
+						}
+					}
+				});
+			}
+			if (submit) {
+				doSubmit(actionMethod);
+			}
 		}
 		
-		function submitMethod(actionMethod) 
-		{
-			submitLearningMethod(actionMethod);
+		function doSubmit(actionMethod) {
+			document.QaLearningForm.method.value=actionMethod; 
+			document.QaLearningForm.submit();
 		}
 		
 	</script>
