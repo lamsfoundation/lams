@@ -2118,6 +2118,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 				LearningDesign design = branchingActivity.getLearningDesign();
 
 				group = lessonService.createGroup(grouping, branch.getTitle());
+				groupingDAO.insert(group);
 				Integer nextUIID = new Integer(design.getMaxID().intValue()+1);
 				group.setGroupUIID(nextUIID);
 				nextUIID = new Integer(nextUIID.intValue()+1);
