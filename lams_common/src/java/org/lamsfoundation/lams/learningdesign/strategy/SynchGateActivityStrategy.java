@@ -39,6 +39,8 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
  */
 public class SynchGateActivityStrategy extends GateActivityStrategy
 {
+	private static final int MINIMUM_NUMBER_OF_LEARNERS = 2;
+	
 	public SynchGateActivityStrategy(GateActivity gateActivity) {
 		super(gateActivity);
 	}
@@ -49,7 +51,9 @@ public class SynchGateActivityStrategy extends GateActivityStrategy
     /**
      * <p>Check up the waiting learners list and lesson learner list. If all 
      * lesson learner appears in the waiting list, we assume the open condition
-     * for the sync gate is met. </p>
+     * for the sync gate is met. A minimum no. of learners must also be waiting at
+     * the gate to prevent one from racing through it before others have even started
+     * (LDEV-1773).</p>
      *
      * <p>Given that the list of lessonLearners is everyone who has started
      * the lesson, we can assume that # waiting is less than or equal to # in lesson.
@@ -61,14 +65,14 @@ public class SynchGateActivityStrategy extends GateActivityStrategy
      */
     protected boolean isOpenConditionMet(List lessonLearners)
     {
+    	int numWaiting = gateActivity.getWaitingLearners().size();
     	if ( gateActivity != null ) {
-    		int numWaiting = gateActivity.getWaitingLearners().size();
     		int numLesson = lessonLearners!=null?lessonLearners.size():0;
     		if ( numWaiting < numLesson ) {
     			return false;
     		}
     	}
-        return true;
+    	return (numWaiting >= MINIMUM_NUMBER_OF_LEARNERS ? true : false);
     }
     
     /**
