@@ -61,6 +61,7 @@
 			<table class="alternative-color" cellspacing="0">
 				<c:forEach items="${optionsActivityForm.activityURLs}"
 					var="activityURL" varStatus="loop">
+					<c:set var="numActivities" value="${loop.count}" />
 					<tr>
 						<td width="2%">
 							<c:if test="${not activityURL.complete}">
@@ -95,7 +96,16 @@
 	</div>
 
 	<p class="info">
-		<fmt:message key="message.activity.options.note" />
+		<c:choose>
+			<c:when test="${optionsActivityForm.maximum gt 0 and optionsActivityForm.maximum lt numActivities}">
+				<fmt:message key="message.activity.options.note.maximum">
+					<fmt:param value="${optionsActivityForm.maximum}" />
+				</fmt:message>
+			</c:when>
+			<c:otherwise>
+				<fmt:message key="message.activity.options.note" />
+			</c:otherwise>
+		</c:choose>
 	</p>
 
 	<c:if test="${optionsActivityForm.finished}">
