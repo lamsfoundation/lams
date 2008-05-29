@@ -648,9 +648,16 @@ class PropertyInspector extends PropertyInspectorControls {
 		//loop through combo to find SI of our gate activity type
 		for (var i=0; i<gateType_cmb.dataProvider.length;i++){
 			if(_canvasModel.selectedItem.activity.activityTypeID == gateType_cmb.dataProvider[i].data){
-				
 				gateType_cmb.selectedIndex=i;
 			}
+		}
+		
+		if(_canvasModel.selectedItem.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE) {
+			var offset:Number = GateActivity(_canvasModel.selectedItem.activity).gateStartTimeOffset;
+			
+			days_stp.value = (offset/60/24);
+			hours_stp.value = (offset%(days_stp.value*60*24))/60;
+			mins_stp.value = (offset%((days_stp.value*60*24) + (hours_stp.value*60)));
 		}
 		
 		//TODO: set the stepper values too!

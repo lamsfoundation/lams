@@ -361,18 +361,20 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	private function showGateControls(v:Boolean, e:Boolean){
-		
-		days_lbl.visible = v;
-		hours_lbl.visible = v;
-		mins_lbl.visible = v;
+		 		
+		var steppers_visible:Boolean = (_canvasModel.selectedItem.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE);
+
+		days_lbl.visible = (steppers_visible && v);
+		hours_lbl.visible = (steppers_visible && v);
+		mins_lbl.visible = (steppers_visible && v);
 		hoursEnd_lbl.visible = v;
 		minsEnd_lbl.visible = v;
-		days_stp.visible = v;
-		hours_stp.visible = v;
-		mins_stp.visible = v;
+		days_stp.visible = (steppers_visible && v);
+		hours_stp.visible = (steppers_visible && v);
+		mins_stp.visible = (steppers_visible && v);
 		gateType_lbl.visible = v;
 		gateType_cmb.visible = v;
-		startOffset_lbl.visible = v;
+		startOffset_lbl.visible = (steppers_visible && v);
 		
 		if(e != null) {
 			days_lbl.enabled = e;
@@ -575,12 +577,6 @@ class PropertyInspectorControls extends MovieClip {
 				endMins_stp.enabled = true;
 			}
 					
-		} else {
-			days_stp.enabled = false;
-			hours_stp.enabled = false;
-			mins_stp.enabled = false;
-			endHours_stp.enabled = false;
-			endMins_stp.enabled = false;
 		}
 		
 		//this is a crazy hack to stop the steppter dissapearing after its .enabled property is set.
