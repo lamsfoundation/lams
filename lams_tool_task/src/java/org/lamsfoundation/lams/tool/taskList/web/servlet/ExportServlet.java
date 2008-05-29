@@ -42,6 +42,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
+import org.lamsfoundation.lams.tool.taskList.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
@@ -164,12 +165,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new TaskListException(error);
 		}
 		
-		List<ItemSummary> taskSummaries = service.exportForLearner(toolSessionID, learner);
+		List<List<GroupSummary>> itemSummaries = service.exportForLearner(toolSessionID, learner);
 		
-		saveFileToLocal(taskSummaries, directoryName);
+		saveFileToLocal(itemSummaries, directoryName);
 		
 		sessionMap.put(TaskListConstants.ATTR_TITLE, content.getTitle());
-//		sessionMap.put(TaskListConstants.ATTR_TASK_SUMMARY_LIST, taskSummaries);
+		sessionMap.put(TaskListConstants.ATTR_ITEM_SUMMARY_LIST, itemSummaries);
 	}
 
 	/**
@@ -201,13 +202,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new TaskListException(error);
 		}
 		
-		List<ItemSummary> taskSummaries = service.exportForTeacher(toolContentID);
+		List<List<GroupSummary>> itemSummaries = service.exportForTeacher(toolContentID);
 		
-		saveFileToLocal(taskSummaries, directoryName);
+		saveFileToLocal(itemSummaries, directoryName);
 		
 		// put it into HTTPSession
 		sessionMap.put(TaskListConstants.ATTR_TITLE, content.getTitle());
-//		sessionMap.put(TaskListConstants.ATTR_TASK_SUMMARY_LIST, taskSummaries);
+		sessionMap.put(TaskListConstants.ATTR_ITEM_SUMMARY_LIST, itemSummaries);
 	}
 
     /**
@@ -217,33 +218,37 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
      * @param directoryName
      * @throws IOException 
      */
-    private void saveFileToLocal(List<ItemSummary> taskSummaries, String directoryName) {
+    private void saveFileToLocal(List<List<GroupSummary>> eachItemOverallSummaries, String directoryName) {
     	handler = getToolContentHandler();
     	
     	//save all the attachments
-		for (ItemSummary taskSummary : taskSummaries) {
-//			for (ItemSummary taskSummaryItem : taskSummary.getTaskSummaryItems()) {
-//				for (TaskListItemAttachment attachment : taskSummaryItem.getAttachments()) {
-//					try{
-//						int idx= 1;
-//						String userName = attachment.getCreateBy().getLoginName();
-//						String localDir;
-//						while(true){
-//							localDir = FileUtil.getFullPath(directoryName,userName + "/" + idx);
-//							File local = new File(localDir);
-//							if(!local.exists()){
-//								local.mkdirs();
-//								break;
-//							}
-//							idx++;
-//						}
-//						attachment.setAttachmentLocalUrl(userName + "/" + idx + "/" + attachment.getFileUuid() + '.' + FileUtil.getFileExtension(attachment.getFileName()));
-//						handler.saveFile(attachment.getFileUuid(), FileUtil.getFullPath(directoryName, attachment.getAttachmentLocalUrl()));
-//					} catch (Exception e) {
-//						logger.error("Export forum topic attachment failed: " + e.toString());
-//					}
-//				}
-//			}
+		for (List<GroupSummary> itemOverallSummary : eachItemOverallSummaries) {
+			for (GroupSummary groupSummary : itemOverallSummary) {
+				for (ItemSummary itemSummary : groupSummary.getItemSummaries()) {
+					
+					for (TaskListItemAttachment attachment : itemSummary.getAttachments()) {
+						try{
+							int idx= 1;
+							String userName = attachment.getCreateBy().getLoginName();
+							String localDir;
+							while(true){
+								localDir = FileUtil.getFullPath(directoryName,userName + "/" + idx);
+								File local = new File(localDir);
+								if(!local.exists()){
+									local.mkdirs();
+									break;
+								}
+								idx++;
+							}
+							attachment.setAttachmentLocalUrl(userName + "/" + idx + "/" + attachment.getFileUuid() + '.' + FileUtil.getFileExtension(attachment.getFileName()));
+							handler.saveFile(attachment.getFileUuid(), FileUtil.getFullPath(directoryName, attachment.getAttachmentLocalUrl()));
+						} catch (Exception e) {
+							logger.error("Export forum topic attachment failed: " + e.toString());
+						}
+					}
+					
+				}
+			}
 		}
 	}
     

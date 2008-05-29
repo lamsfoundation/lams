@@ -82,6 +82,7 @@ import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemVisitDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListSessionDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListUserDAO;
+import org.lamsfoundation.lams.tool.taskList.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
@@ -422,7 +423,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	/** 
 	 * {@inheritDoc}
 	 */
-	public List<Summary> getTaskListSummary(Long contentId) {
+	public List<Summary> getSummary(Long contentId) {
 		
 		List<Summary> summaryList = new ArrayList<Summary>();
 		
@@ -468,7 +469,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 				}
 			}
 			
-			Summary summary = new Summary(session.getSessionId(), session.getSessionName(), itemList, userList, complete, visitNumbers, taskList.isMonitorVerificationRequired());
+			Summary summary = new Summary(session.getSessionName(), itemList, userList, complete, visitNumbers, taskList.isMonitorVerificationRequired());
 			summaryList.add(summary);
 		}
 
@@ -524,24 +525,25 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	/** 
 	 * {@inheritDoc}
 	 */
-	public List<List<ItemSummary>> getTaskListItemSummary(Long contentId, Long taskListItemUid) {
+	public List<GroupSummary> getItemSummary(Long contentId, Long taskListItemUid) {
 		
 		TaskListItem taskListItem = taskListItemDao.getByUid(taskListItemUid);
 		
-		List<List<ItemSummary>> resultSummaryList = new ArrayList<List<ItemSummary>>();
+		List<GroupSummary> groupSummaries = new ArrayList<GroupSummary>();
 		
 		//create the user list of all whom were started this task
 		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
 		for(TaskListSession session:sessionList) {
-			List<ItemSummary> groupSummary = new ArrayList<ItemSummary>();
 			
-			List<TaskListUser> grouppedUsers = taskListUserDao.getBySessionID(session.getSessionId());
-			for(TaskListUser user : grouppedUsers) {
+			GroupSummary groupSummary = new GroupSummary();
+			groupSummary.setSessionName(session.getSessionName());
+			groupSummary.setTaskListItem(taskListItem);
+			
+			List<TaskListUser> usersBelongToGroup = taskListUserDao.getBySessionID(session.getSessionId());
+			for(TaskListUser user : usersBelongToGroup) {
 				
 				ItemSummary userItemSummary = new ItemSummary();
 				userItemSummary.setUser(user);
-				userItemSummary.setSessionId(session.getSessionId());
-				userItemSummary.setSessionName(session.getSessionName());
 				
 				TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(taskListItem.getUid(), user.getUserId());
 				//If TaskListItemVisitLog exists then fill up taskSummaryItem otherwise put false in a completed field
@@ -559,101 +561,91 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 					for(TaskListItemAttachment attachment : itemAttachments) {
 						if (user.getUserId().equals(attachment.getCreateBy().getUserId())) userItemSummary.getAttachments().add(attachment);
 					}
-
 				} else {
 					userItemSummary.setCompleted(false);
 				}
-				groupSummary.add(userItemSummary);
+				
+				groupSummary.getItemSummaries().add(userItemSummary);
 			}
-			resultSummaryList.add(groupSummary);
+			groupSummaries.add(groupSummary);
 		}
 		
 		
-		return resultSummaryList;
+		return groupSummaries;
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ItemSummary> exportForTeacher(Long contentId) {
-//		TaskList taskList = taskListDao.getByContentId(contentId);
-//		ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
-//		itemList.addAll(taskList.getTaskListItems());
-//		
-//		//retrieve all the sessions associated with this taskList
-//		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
-//		//create the list containing all taskListItems  
-//		for(TaskListSession session:sessionList) {
-//			Set<TaskListItem> newItems = session.getTaskListItems();
-//			for(TaskListItem item : newItems) {
-//				if (!itemList.contains(item)) itemList.add(item);
-//			}
-//		}
-//		
-//		List<TaskSummary> taskSummaries = new ArrayList<TaskSummary>();
-//		for(TaskListItem item:itemList) {
-//			taskSummaries.add(getTaskSummary(contentId, item.getUid()));
-//		}
-//		
-//		return taskSummaries;
-		return null;
+	public List<List<GroupSummary>> exportForTeacher(Long contentId) {
+		TaskList taskList = taskListDao.getByContentId(contentId);
+		ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
+		itemList.addAll(taskList.getTaskListItems());
+		
+		//retrieve all the sessions associated with this taskList
+		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
+		//create the list containing all taskListItems  
+		for(TaskListSession session:sessionList) {
+			Set<TaskListItem> newItems = session.getTaskListItems();
+			for(TaskListItem item : newItems) {
+				if (!itemList.contains(item)) itemList.add(item);
+			}
+		}
+		
+		List<List<GroupSummary>> taskSummaries = new ArrayList<List<GroupSummary>>();
+		for(TaskListItem item:itemList) {
+			taskSummaries.add(getItemSummary(contentId, item.getUid()));
+		}
+		
+		return taskSummaries;
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ItemSummary> exportForLearner(Long sessionId, TaskListUser learner) {
-//		Long contentId = getTaskListBySessionId(sessionId).getContentId();
-//		
-//		TaskList taskList = taskListDao.getByContentId(contentId);
-//		ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
-//		itemList.addAll(taskList.getTaskListItems());
-//		
-//		//retrieve all the sessions associated with this taskList
-//		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
-//		//create the list containing all taskListItems  
-//		for(TaskListSession session:sessionList) {
-//			Set<TaskListItem> newItems = session.getTaskListItems();
-//			for(TaskListItem item : newItems) {
-//				if (!itemList.contains(item)) itemList.add(item);
-//			}
-//		}
-//		
-//		List<TaskSummary> taskSummaries = new ArrayList<TaskSummary>();
-//		for(TaskListItem item:itemList) {
-//			taskSummaries.add(getTaskSummary(contentId, item.getUid()));
-//		}
-//		
-//		//get rid of information that is not allowed to be shown to the current user
-//		for(TaskSummary taskSummary:taskSummaries) {
-//			
-//			//get rid of taskSummaryItems belong to another users
-//			List<TaskListItemSummary> newTaskSummaryItems = new  ArrayList<TaskListItemSummary>();
-//			for(TaskListItemSummary taskSummaryItem:taskSummary.getTaskSummaryItems()) {
-//				if (learner.equals(taskSummaryItem.getUser())) newTaskSummaryItems.add(taskSummaryItem);
-//			}
-//			taskSummary.setTaskSummaryItems(newTaskSummaryItems);
-//
-//			//get rid of TaskListItemComments and TaskListItemAttachments belong to another users
-//			if (taskSummary.getTaskListItem().isCommentsFilesAllowed() && !taskSummary.getTaskListItem().getShowCommentsToAll()) {
-//				TaskListItemSummary taskSummaryItem = taskSummary.getTaskSummaryItems().get(0);
-//				
-//				List<TaskListItemComment> newComments = new  ArrayList<TaskListItemComment>();
-//				for(TaskListItemComment comment:taskSummaryItem.getComments()) {
-//					if (learner.equals(comment.getCreateBy())) newComments.add(comment);
-//				}
-//				taskSummaryItem.setComments(newComments);
-//
-//				List<TaskListItemAttachment> newAttachments = new  ArrayList<TaskListItemAttachment>();
-//				for(TaskListItemAttachment attachment:taskSummaryItem.getAttachments()) {
-//					if (learner.equals(attachment.getCreateBy())) newAttachments.add(attachment);
-//				}
-//				taskSummaryItem.setAttachments(newAttachments);
-//			}
-//		}
-//		
-//		return taskSummaries;
-		return null;
+	public List<List<GroupSummary>> exportForLearner(Long sessionId, TaskListUser learner) {
+		Long contentId = getTaskListBySessionId(sessionId).getContentId();
+		
+		TaskList taskList = taskListDao.getByContentId(contentId);
+		ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
+		itemList.addAll(taskList.getTaskListItems());
+		
+		//retrieve all the sessions associated with this taskList
+		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
+		//create the list containing all taskListItems  
+		for(TaskListSession session:sessionList) {
+			Set<TaskListItem> newItems = session.getTaskListItems();
+			for(TaskListItem item : newItems) {
+				if (!itemList.contains(item)) itemList.add(item);
+			}
+		}
+		
+		List<List<GroupSummary>> eachItemOverallSummaries = new ArrayList<List<GroupSummary>>();
+		for(TaskListItem item:itemList) {
+			eachItemOverallSummaries.add(getItemSummary(contentId, item.getUid()));
+		}
+		
+		//get rid of information that doesn't belong to the current user
+		for(List<GroupSummary> itemOverallSummary:eachItemOverallSummaries) {
+			
+			//get rid of groups that user doesn't belong to	
+			GroupSummary newGroupSummary = new GroupSummary();
+			for(GroupSummary groupSummary:itemOverallSummary) {
+			
+				for(ItemSummary itemSummary:groupSummary.getItemSummaries()) {
+					if (learner.equals(itemSummary.getUser()))  {
+						newGroupSummary.setSessionName(groupSummary.getSessionName());
+						newGroupSummary.setTaskListItem(groupSummary.getTaskListItem());
+						newGroupSummary.getItemSummaries().add(itemSummary);
+					}
+				}
+			}
+			itemOverallSummary.clear();
+			itemOverallSummary.add(newGroupSummary);
+			
+		}
+		
+		return eachItemOverallSummaries;
 	}
 
 	/** 

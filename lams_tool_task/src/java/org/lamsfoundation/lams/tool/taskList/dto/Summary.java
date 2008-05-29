@@ -43,7 +43,6 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
  */
 public class Summary {
 
-	private Long sessionId; 
 	private String sessionName;
 	
 	private boolean isMonitorVerificationRequired;
@@ -59,24 +58,15 @@ public class Summary {
 	/**
 	 * Contruction method for monitoring summary function. 
 	 */
-	public Summary(Long sessionId, String sessionName,
-			List<TaskListItem> taskListItems, List<TaskListUser> userNames,
-			boolean[][] completeMap, int[] visitNumbers,
-			boolean isMonitorVerificationRequired) {
-		this.sessionId = sessionId;
+	public Summary(String sessionName, List<TaskListItem> taskListItems,
+			List<TaskListUser> userNames, boolean[][] completeMap,
+			int[] visitNumbers, boolean isMonitorVerificationRequired) {
 		this.sessionName = sessionName;
 		this.userNames = userNames;
 		this.taskListItems = taskListItems;
 		this.completeMap = completeMap;
 		this.visitNumbers = visitNumbers;
 		this.isMonitorVerificationRequired = isMonitorVerificationRequired;
-	}
-	
-	public Long getSessionId() {
-		return sessionId;
-	}
-	public void setSessionId(Long sessionId) {
-		this.sessionId = sessionId;
 	}
 	
 	public String getSessionName() {

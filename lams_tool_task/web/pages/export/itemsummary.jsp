@@ -1,29 +1,13 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+			<c:set var="item" value="${itemSummary[0].taskListItem}"/>
 
-<%@ include file="/common/taglibs.jsp"%>
-<lams:html>
-	<lams:head>
-		<title><fmt:message key="label.learning.title" />
-		</title>
-		<%@ include file="/common/header.jsp"%>
-		<c:set var="item" value="${taskListItem}" />
-	</lams:head>
-	
-	<body class="stripes">
-	
-		<div id="content">
-
-			<h2>
-				<fmt:message key="label.monitoring.tasksummary.task.summary" />
-			</h2>
-				
 			<div>
-				<c:out value="${item.title}"></c:out>
-				
+				<h2>
+					<c:out value="${item.title}"></c:out>
+				</h2>
+									
 				<c:if test="${item.required}">
-						(<fmt:message key="label.monitoring.tasksummary.task.required.to.finish" />)
-				</c:if>				
+					(<fmt:message key="label.monitoring.tasksummary.task.required.to.finish" />)
+				</c:if>
 			</div>
 			<br/>
 				
@@ -71,14 +55,13 @@
 				</ul>
 			</c:if>
 			<br>
-			<br>
+			<br>			
 			
-			
-			<c:forEach var="groupSummary" items="${groupSummaryList}">
+			<c:forEach var="groupSummary" items="${itemSummary}">
 				<h1><fmt:message key="monitoring.label.group" /> ${groupSummary.sessionName}	</h1>
-				
+	
 				<table cellpadding="0" class="alternative-color" >
-			
+				
 					<tr>
 						<th width="20%">
 							<fmt:message key="label.monitoring.tasksummary.user" />
@@ -108,11 +91,11 @@
 							<td align="center">
 								<c:choose>
 									<c:when test="${itemSummary.completed}">
-										<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">
+										<img src="../images/tick.gif"	border="0">
 									</c:when>
 										
 									<c:otherwise>
-										<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">
+										<img src="../images/cross.gif" border="0">
 									</c:otherwise>
 								</c:choose>
 							</td>
@@ -127,7 +110,7 @@
 									<ul>
 										<c:forEach var="comment" items="${itemSummary.comments}">
 											<li>
-												<c:out value="${comment.comment}"></c:out>
+												<c:out value="${comment.comment}" escapeXml="false"></c:out>
 											</li>
 										</c:forEach>
 										
@@ -135,33 +118,26 @@
 											<li>
 												<c:out value="${attachment.fileName}" />
 	
-												<c:set var="downloadURL">
-													<html:rewrite page="/download/?uuid=${attachment.fileUuid}&versionID=${attachment.fileVersionId}&preferDownload=true" />
-												</c:set>
-												<html:link href="${downloadURL}">
+												<html:link href="${attachment.attachmentLocalUrl}">
 													<fmt:message key="label.download" />
 												</html:link>
 	
 											</li>
 										</c:forEach>
+										
 									</ul>
+								
+								
+								
+								
 								</td>
 							</c:if>
 								
 						</tr>
+						
+							
 					</c:forEach>
 				</table>
-			
-			
-			</c:forEach>
-	
-	
-		</div>
-		<!--closes content-->
-	
-		<div id="footer">
-		</div>
-		<!--closes footer-->
-	
-	</body>
-</lams:html>
+			<br/><br/>
+		</c:forEach>
+

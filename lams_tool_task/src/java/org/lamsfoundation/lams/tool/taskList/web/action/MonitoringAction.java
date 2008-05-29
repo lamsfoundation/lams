@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
+import org.lamsfoundation.lams.tool.taskList.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
@@ -96,7 +97,7 @@ public class MonitoringAction extends Action {
 		TaskList taskList = service.getTaskListByContentId(contentId);
 		taskList.toDTO();
 		
-		List<Summary> summaryList = service.getTaskListSummary(contentId);
+		List<Summary> summaryList = service.getSummary(contentId);
 		
 		//cache into sessionMap
 		sessionMap.put(TaskListConstants.ATTR_SUMMARY_LIST, summaryList);
@@ -114,8 +115,8 @@ public class MonitoringAction extends Action {
 		Long taskListItemId = WebUtil.readLongParam(request, TaskListConstants.ATTR_TASK_LIST_ITEM_UID);
 		request.setAttribute(TaskListConstants.ATTR_TASK_LIST_ITEM, service.getTaskListItemByUid(taskListItemId));
 		
-		List<List<ItemSummary>> itemSummaryList = service.getTaskListItemSummary(contentId, taskListItemId);
-		request.setAttribute(TaskListConstants.ATTR_ITEM_SUMMARY_LIST_LIST, itemSummaryList);
+		List<GroupSummary> groupSummaryList = service.getItemSummary(contentId, taskListItemId);
+		request.setAttribute(TaskListConstants.ATTR_GROUP_SUMMARY_LIST, groupSummaryList);
 						
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}

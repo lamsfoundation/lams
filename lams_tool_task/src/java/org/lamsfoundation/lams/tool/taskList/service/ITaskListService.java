@@ -34,6 +34,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.taskList.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
@@ -324,7 +325,7 @@ public interface ITaskListService {
 	 *
 	 * @return
 	 */
-	List<ItemSummary> exportForLearner(Long contentUid, TaskListUser learner);
+	List<List<GroupSummary>> exportForLearner(Long contentUid, TaskListUser learner);
 	
 	/**
 	 * Make an export for the whole TaskList.
@@ -332,7 +333,7 @@ public interface ITaskListService {
 	 * @param contentUid
 	 * @return
 	 */
-	List<ItemSummary> exportForTeacher(Long contentUid);
+	List<List<GroupSummary>> exportForTeacher(Long contentUid);
 	
 	/**
 	 * Return summary list for the specified TaskList. Used in monitoring.
@@ -340,7 +341,7 @@ public interface ITaskListService {
 	 * @param contentId specified TaskList uid
 	 * @return
 	 */
-	List<Summary> getTaskListSummary(Long contentId);
+	List<Summary> getSummary(Long contentId);
 	
 	/**
 	 * Return task summary for the specified TaskListItem. Used in monitoring.
@@ -349,7 +350,7 @@ public interface ITaskListService {
 	 * @param taskListItemUid specified TaskListItem uid
 	 * @return
 	 */
-	List<List<ItemSummary>> getTaskListItemSummary(Long contentId, Long taskListItemUid);
+	List<GroupSummary> getItemSummary(Long contentId, Long taskListItemUid);
 	
 }
 
