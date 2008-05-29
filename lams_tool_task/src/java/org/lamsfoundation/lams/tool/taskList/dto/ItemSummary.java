@@ -38,7 +38,11 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
  * 
  * @author Andrey Balan
  */
-public class TaskSummaryItem {
+public class ItemSummary {
+	
+	//Group information.
+	private Long sessionId; 
+	private String sessionName;
 	
 	private TaskListUser user;
 	private boolean completed;
@@ -47,7 +51,7 @@ public class TaskSummaryItem {
 	private List<TaskListItemComment> comments;
 	private List<TaskListItemAttachment> attachments;
 	
-	public TaskSummaryItem() {
+	public ItemSummary() {
 		comments = new ArrayList<TaskListItemComment>();
 		attachments = new ArrayList<TaskListItemAttachment>();
 	}
@@ -55,6 +59,20 @@ public class TaskSummaryItem {
 	//  **********************************************************
   	//		Get/Set methods
 	//  **********************************************************
+	
+	public Long getSessionId() {
+		return sessionId;
+	}
+	public void setSessionId(Long sessionId) {
+		this.sessionId = sessionId;
+	}
+	
+	public String getSessionName() {
+		return sessionName;
+	}
+	public void setSessionName(String sessionName) {
+		this.sessionName = sessionName;
+	}
 	
 	/**
 	 * Returns user whom created this TaskListItem.

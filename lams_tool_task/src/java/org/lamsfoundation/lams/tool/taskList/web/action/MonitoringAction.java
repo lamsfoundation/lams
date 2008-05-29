@@ -41,8 +41,8 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
+import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
-import org.lamsfoundation.lams.tool.taskList.dto.TaskSummary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
@@ -62,8 +62,8 @@ public class MonitoringAction extends Action {
 		if (param.equals("summary")) {
 			return summary(mapping, form, request, response);
 		}
-		if (param.equals("summaryTask")) {
-			return summaryTask(mapping, form, request, response);
+		if (param.equals("itemSummary")) {
+			return itemSummary(mapping, form, request, response);
 		}
 		if(param.equals("setVerifiedByMonitor")){
 			return setVerifiedByMonitor(mapping, form, request, response);
@@ -96,10 +96,10 @@ public class MonitoringAction extends Action {
 		TaskList taskList = service.getTaskListByContentId(contentId);
 		taskList.toDTO();
 		
-		List<Summary> summaryList = service.getSummary(contentId);
+		List<Summary> summaryList = service.getTaskListSummary(contentId);
 		
 		//cache into sessionMap
-		sessionMap.put(TaskListConstants.ATTR_TASK_SUMMARY_LIST, summaryList);
+		sessionMap.put(TaskListConstants.ATTR_SUMMARY_LIST, summaryList);
 		sessionMap.put(TaskListConstants.PAGE_EDITABLE, taskList.isContentInUse());
 		sessionMap.put(TaskListConstants.ATTR_RESOURCE, taskList);
 		sessionMap.put(TaskListConstants.ATTR_TOOL_CONTENT_ID, contentId);
@@ -107,16 +107,15 @@ public class MonitoringAction extends Action {
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}
 	
-	private ActionForward summaryTask(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+	private ActionForward itemSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		ITaskListService service = getTaskListService();
 		
 		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 		Long taskListItemId = WebUtil.readLongParam(request, TaskListConstants.ATTR_TASK_LIST_ITEM_UID);
-//		request.setAttribute(TaskListConstants.ATTR_TASK_LIST_ITEM_UID, contentId);
+		request.setAttribute(TaskListConstants.ATTR_TASK_LIST_ITEM, service.getTaskListItemByUid(taskListItemId));
 		
-		TaskSummary taskSummary = service.getTaskSummary(contentId, taskListItemId);
-		request.setAttribute(TaskListConstants.ATTR_TASK_SUMMARY, taskSummary);
-		request.setAttribute("taskSummary", taskSummary);
+		List<List<ItemSummary>> itemSummaryList = service.getTaskListItemSummary(contentId, taskListItemId);
+		request.setAttribute(TaskListConstants.ATTR_ITEM_SUMMARY_LIST_LIST, itemSummaryList);
 						
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}

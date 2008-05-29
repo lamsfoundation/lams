@@ -251,10 +251,10 @@
 			parameter="summary" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
-		<action path="/monitoring/summaryTask"
+		<action path="/monitoring/itemSummary"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
-			parameter="summaryTask" >
-			<forward name="success" path="/pages/monitoring/summaryTask.jsp" />
+			parameter="itemSummary" >
+			<forward name="success" path="/pages/monitoring/itemsummary.jsp" />
 		</action>
 		<action path="/monitoring/setVerifiedByMonitor"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"

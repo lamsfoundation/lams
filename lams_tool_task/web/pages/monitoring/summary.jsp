@@ -1,10 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
-<c:set var="summaryList" value="${sessionMap.taskSummaryList}"/>
+<c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <script type="text/javascript">
 
 	function summaryTask(taskUid){
-		var myUrl = "<c:url value="/monitoring/summaryTask.do"/>?toolContentID=${toolContentID}&taskListItemUid=" + taskUid;
+		var myUrl = "<c:url value="/monitoring/itemSummary.do"/>?toolContentID=${toolContentID}&taskListItemUid=" + taskUid;
 		launchPopup(myUrl,"LearnerView");
 	}
 	
@@ -16,7 +16,6 @@
 </script>
 
 
-
 <c:if test="${empty summaryList}">
 	<div align="center">
 		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
@@ -24,10 +23,8 @@
 </c:if>
 
 
-
 <c:forEach var="summary" items="${summaryList}">
 <h1><fmt:message key="monitoring.label.group" /> ${summary.sessionName}	</h1>
-<br>
 
 	<h2 style="color:black; margin-left: 20px;"><fmt:message key="label.monitoring.summary.overall.summary" />	</h2>
 	<table cellpadding="0" class="alternative-color" >

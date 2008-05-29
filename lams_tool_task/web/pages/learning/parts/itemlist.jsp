@@ -91,7 +91,7 @@
 						<div class="info space-bottom">
 							<c:choose>
 								<c:when test="${!itemDTO.commentRequirementsMet && !itemDTO.attachmentRequirementsMet}">
-									<fmt:message key="label.learning.info.comment.and.attachmnet.required" />		
+									<fmt:message key="label.learning.info.comment.and.attachment.required" />		
 								</c:when>
 								<c:when test="${!itemDTO.commentRequirementsMet}">
 									<fmt:message key="label.learning.info.post.comment.required" />		

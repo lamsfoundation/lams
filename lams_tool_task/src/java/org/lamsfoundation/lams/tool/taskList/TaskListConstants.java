@@ -64,9 +64,8 @@ public class TaskListConstants {
 	public static final String ATTR_RUN_AUTO = "runAuto";
 	public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
 	public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
-	public static final String ATTR_SUMMARY = "summary";
-	public static final String ATTR_TASK_SUMMARY = "taskSummary";
-	public static final String ATTR_TASK_SUMMARY_LIST = "taskSummaryList";
+	public static final String ATTR_SUMMARY_LIST = "summaryList";
+	public static final String ATTR_ITEM_SUMMARY_LIST_LIST = "itemSummaryListList";
 	public static final String ATTR_USER_LIST = "userList";
 	public static final String ATTR_FINISH_LOCK = "finishedLock";
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
