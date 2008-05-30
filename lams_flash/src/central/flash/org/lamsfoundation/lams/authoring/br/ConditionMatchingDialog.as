@@ -49,6 +49,8 @@ class ConditionMatchingDialog extends BranchMappingDialog {
     //References to components + clips 
     private var _branchingActivity:BranchingActivity;
 
+	private var message_txt:TextField;
+
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -89,7 +91,10 @@ class ConditionMatchingDialog extends BranchMappingDialog {
         _container.addEventListener('click',this);
         _container.addEventListener('size',this);
        
-        //fire event to say we have loaded
+	    message_txt.setStyle(ThemeManager.getInstance().getStyleObject('label'));
+	    message_txt.htmlText = Dictionary.getValue("condmatch_dlg_message_lbl");
+        
+		//fire event to say we have loaded
 		_container.contentLoaded();
 	}
 	
