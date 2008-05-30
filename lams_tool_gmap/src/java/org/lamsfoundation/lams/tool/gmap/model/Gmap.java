@@ -42,7 +42,7 @@ public class Gmap implements java.io.Serializable, Cloneable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 579733009969321015L;
+	private static final long serialVersionUID = 938457189932877382L;
 
 	static Logger log = Logger.getLogger(GmapService.class.getName());
 
@@ -386,6 +386,8 @@ public class Gmap implements java.io.Serializable, Cloneable {
 		toContent = (Gmap) fromContent.clone();
 		toContent.setToolContentId(toContentId);
 		toContent.setCreateDate(new Date());
+		Set<GmapMarker> set = new HashSet<GmapMarker>();
+		toContent.setGmapMarkers(set);
 		return toContent;
 	}
 
@@ -402,9 +404,20 @@ public class Gmap implements java.io.Serializable, Cloneable {
 				Set<GmapAttachment> set = new HashSet<GmapAttachment>();
 				while (iter.hasNext()) {
 					GmapAttachment originalFile = (GmapAttachment) iter.next();
-					GmapAttachment newFile = (GmapAttachment) originalFile
-							.clone();
+					GmapAttachment newFile = (GmapAttachment) originalFile.clone();
 					set.add(newFile);
+				}
+				gmap.gmapAttachments = set;
+			}
+			
+			if (gmapMarkers != null) {
+				// create a copy of the attachments
+				Iterator iter = gmapMarkers.iterator();
+				Set<GmapMarker> set = new HashSet<GmapMarker>();
+				while (iter.hasNext()) {
+					GmapMarker originalMarker = (GmapMarker) iter.next();
+					GmapMarker newMarker = (GmapMarker) originalMarker.clone();
+					set.add(newMarker);
 				}
 				gmap.gmapAttachments = set;
 			}
@@ -426,10 +439,12 @@ public class Gmap implements java.io.Serializable, Cloneable {
 	}
 
 	/**
-	 * @hibernate.set lazy="true" inverse="true" cascade="none"
+	 * @hibernate.set lazy="false"
+	 *                cascade="all-delete-orphan"
 	 * @hibernate.collection-key column="gmap_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.gmap.model.GmapMarker"
 	 * 
+	 * @return
 	 */
 	public Set<GmapMarker> getGmapMarkers() {
 		return gmapMarkers;
@@ -438,6 +453,45 @@ public class Gmap implements java.io.Serializable, Cloneable {
 	public void setGmapMarkers(Set<GmapMarker> gmapMarkers) {
 		this.gmapMarkers = gmapMarkers;
 	}
+	
+	public void addMarker(GmapMarker marker)
+	{
+		gmapMarkers.add(marker);
+	}
+	
+	public GmapMarker getMarkerByUid(Long uid)
+	{
+		Iterator it = gmapMarkers.iterator();
+		GmapMarker ret = null;
+		while (it.hasNext())
+		{
+			GmapMarker marker = (GmapMarker)it.next();
+			if (marker.getUid().equals(uid))
+			{
+				ret =  marker;
+				break;
+			}
+		}
+		return ret;
+	}
+	
+	public void removeMarker(Long uid)
+	{
+		Iterator it = gmapMarkers.iterator();
+		GmapMarker ret = null;
+		while (it.hasNext())
+		{
+			GmapMarker marker = (GmapMarker)it.next();
+			if (marker.getUid().equals(uid))
+			{
+				gmapMarkers.remove(marker);
+				break;
+			}
+		}
+	}
+	
+	
+	
 
 
 }

@@ -18,7 +18,8 @@
 				<value>org/lamsfoundation/lams/tool/gmap/model/Gmap.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/gmap/model/GmapSession.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/gmap/model/GmapUser.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/gmap/model/GmapAttachment.hbm.xml</value> 
+				<value>org/lamsfoundation/lams/tool/gmap/model/GmapAttachment.hbm.xml</value> 		
+				<value>org/lamsfoundation/lams/tool/gmap/model/GmapMarker.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
@@ -33,6 +34,7 @@
 				<property name="gmapSessionDAO"><ref bean="gmapSessionDAO"/></property>
 				<property name="gmapUserDAO"><ref bean="gmapUserDAO"/></property>
 				<property name="gmapDAO"><ref bean="gmapDAO"/></property>
+				<property name="gmapMarkerDAO"><ref bean="gmapMarkerDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property>	
 				<property name="auditService"><ref bean="auditService"/></property>		
@@ -66,6 +68,10 @@
 	
 	<!--  DAO classes -->
 	<bean id="gmapDAO" class="org.lamsfoundation.lams.tool.gmap.dao.hibernate.GmapDAO">
+		<property name="sessionFactory"><ref local="gmapSessionFactory"/></property>
+	</bean>  
+	
+	<bean id="gmapMarkerDAO" class="org.lamsfoundation.lams.tool.gmap.dao.hibernate.GmapMarkerDAO">
 		<property name="sessionFactory"><ref local="gmapSessionFactory"/></property>
 	</bean>  
 

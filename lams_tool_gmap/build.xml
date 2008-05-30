@@ -470,7 +470,7 @@ Ant build file.
 		</delete>
 	</target>
 
-	<target name="explode-tool" depends="" description="explode tool jar and war package to a war folder">
+	<target name="explode-tool" depends="delete-exploded-tool-folder, deploy-tool" description="explode tool jar and war package to a war folder">
 		<!-- rename war file to avoid name conflict -->
 		<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war" />
 		<!-- explode the ear -->

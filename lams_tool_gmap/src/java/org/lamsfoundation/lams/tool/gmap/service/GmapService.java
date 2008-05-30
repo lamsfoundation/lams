@@ -67,10 +67,12 @@ import org.lamsfoundation.lams.tool.gmap.dao.IGmapAttachmentDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapSessionDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapUserDAO;
+import org.lamsfoundation.lams.tool.gmap.dao.IGmapMarkerDAO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
+import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.util.GmapConstants;
 import org.lamsfoundation.lams.tool.gmap.util.GmapException;
 import org.lamsfoundation.lams.tool.gmap.util.GmapToolContentHandler;
@@ -92,6 +94,8 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 	static Logger logger = Logger.getLogger(GmapService.class.getName());
 
 	private IGmapDAO gmapDAO = null;
+	
+	private IGmapMarkerDAO gmapMarkerDAO = null;
 
 	private IGmapSessionDAO gmapSessionDAO = null;
 
@@ -444,7 +448,11 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 	public void saveOrUpdateGmap(Gmap gmap) {
 		gmapDAO.saveOrUpdate(gmap);
 	}
-
+	
+	public void saveOrUpdateGmapMarker(GmapMarker gmapMarker) {
+		gmapMarkerDAO.saveOrUpdate(gmapMarker);
+	}
+	
 	public void saveOrUpdateGmapSession(GmapSession gmapSession) {
 		gmapSessionDAO.saveOrUpdate(gmapSession);
 	}
@@ -648,5 +656,13 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 
 	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 		this.coreNotebookService = coreNotebookService;
+	}
+
+	public IGmapMarkerDAO getGmapMarkerDAO() {
+		return gmapMarkerDAO;
+	}
+
+	public void setGmapMarkerDAO(IGmapMarkerDAO gmapMarkerDAO) {
+		this.gmapMarkerDAO = gmapMarkerDAO;
 	}
 }

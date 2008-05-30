@@ -180,9 +180,8 @@
 
         <set
             name="gmapMarkers"
-            lazy="true"
-            inverse="true"
-            cascade="none"
+            lazy="false"
+            cascade="all-delete-orphan"
             sort="unsorted"
         >
 

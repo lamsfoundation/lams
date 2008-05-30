@@ -34,6 +34,8 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.lamsfoundation.lams.tool.gmap.model.Gmap;
+
 
 /**
  * @struts.form name="authoringForm"
@@ -69,6 +71,26 @@ public class AuthoringForm extends ActionForm {
 	Long deleteFileUuid;
 
 	SessionMap sessionMap;
+	
+	Gmap gmap;
+	
+	String markersXML;
+
+	public String getMarkersXML() {
+		return markersXML;
+	}
+
+	public void setMarkersXML(String markersXML) {
+		this.markersXML = markersXML;
+	}
+
+	public Gmap getGmap() {
+		return gmap;
+	}
+
+	public void setGmap(Gmap gmap) {
+		this.gmap = gmap;
+	}
 
 	@Override
 	public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {

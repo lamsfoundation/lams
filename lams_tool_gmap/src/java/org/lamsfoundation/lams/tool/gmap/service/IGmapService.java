@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
+import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.util.GmapException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
@@ -93,7 +94,13 @@ public interface IGmapService {
 	 * @param gmap
 	 */
 	public void saveOrUpdateGmap(Gmap gmap);
-
+	
+	
+	/**
+	 * @param gmapMarker
+	 */
+	public void saveOrUpdateGmapMarker(GmapMarker gmapMarker);
+	
 	/**
 	 * @param toolSessionId
 	 * @return

@@ -68,6 +68,7 @@
        	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&contentFolderID=${contentFolderID}'/>";
 	}
     function doSubmit_Form_Only() {
+    	serialiseMarkers();
     	document.getElementById("${formID}").submit();
     }
     function doCancel() {

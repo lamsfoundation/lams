@@ -30,9 +30,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
+import java.io.PrintWriter;
+import java.io.StringReader;
+import org.xml.sax.InputSource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -46,6 +51,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
+import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
 import org.lamsfoundation.lams.tool.gmap.service.GmapServiceProxy;
 import org.lamsfoundation.lams.tool.gmap.util.GmapConstants;
@@ -55,6 +61,10 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.NamedNodeMap;
 
 /**
  * @author
@@ -140,7 +150,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		SessionMap<String, Object> map = createSessionMap(gmap,
 				getAccessMode(request), contentFolderID, toolContentID);
 		authForm.setSessionMapID(map.getSessionID());
-
+		authForm.setGmap(gmap);
+		
 		// add the sessionMap to HTTPSession.
 		request.getSession().setAttribute(map.getSessionID(), map);
 		request.setAttribute(GmapConstants.ATTR_SESSION_MAP, map);
@@ -155,10 +166,11 @@ public class AuthoringAction extends LamsDispatchAction {
 		// get authForm and session map.
 		AuthoringForm authForm = (AuthoringForm) form;
 		SessionMap<String, Object> map = getSessionMap(request, authForm);
-
+		Long toolContentID = (Long) map.get(KEY_TOOL_CONTENT_ID);
+		
+		
 		// get gmap content.
-		Gmap gmap = gmapService.getGmapByContentId((Long) map
-				.get(KEY_TOOL_CONTENT_ID));
+		Gmap gmap = gmapService.getGmapByContentId(toolContentID);
 
 		// update gmap content using form inputs.
 		ToolAccessMode mode = (ToolAccessMode) map.get(KEY_MODE);
@@ -168,6 +180,12 @@ public class AuthoringAction extends LamsDispatchAction {
 		Set<GmapAttachment> attachments = gmap.getGmapAttachments();
 		if (attachments == null) {
 			attachments = new HashSet<GmapAttachment>();
+		}
+		
+		// do the same for the gmap markers
+		Set<GmapMarker> markers = gmap.getGmapMarkers();
+		if (markers == null) {
+			markers = new HashSet<GmapMarker>();
 		}
 
 		for (GmapAttachment att : getAttList(KEY_DELETED_FILES, map)) {
@@ -360,6 +378,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		return mapping.findForward("success");
 	}
 
+
 	/**
 	 * Updates Gmap content using AuthoringForm inputs.
 	 * 
@@ -367,15 +386,81 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param mode
 	 * @return
 	 */
-	private void updateGmap(Gmap gmap, AuthoringForm authForm,
-			ToolAccessMode mode) {
+	private void updateGmap(Gmap gmap, AuthoringForm authForm, ToolAccessMode mode)
+	{
 		gmap.setTitle(authForm.getTitle());
 		gmap.setInstructions(authForm.getInstructions());
+		
+		updateMarkerListFromXML(authForm.getMarkersXML(), gmap);
+		
 		if (mode.isAuthor()) { // Teacher cannot modify following
 			gmap.setOfflineInstructions(authForm.getOnlineInstruction());
 			gmap.setOnlineInstructions(authForm.getOfflineInstruction());
 			gmap.setLockOnFinished(authForm.isLockOnFinished());
 			gmap.setAllowRichEditor(authForm.isAllowRichEditor());
+		}
+	}
+	
+	private void updateMarkerListFromXML(String markerXML, Gmap gmap)
+	{
+		//Set<GmapMarker> newMarkers = new HashSet<GmapMarker>();
+		Set<GmapMarker> existingMarkers = gmap.getGmapMarkers();
+		try 
+		{
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document document = db.parse(new InputSource(new StringReader(markerXML)));
+			NodeList list = document.getElementsByTagName("marker");
+			
+			for (int i =0; i<list.getLength(); i++)
+			{
+				NamedNodeMap markerNode = ((Node)list.item(i)).getAttributes();
+				
+				Long uid  = Long.parseLong(markerNode.getNamedItem("markerUID").getNodeValue());
+				String infoMessage = markerNode.getNamedItem("infoMessage").getNodeValue();
+				Double latitude = Double.parseDouble(markerNode.getNamedItem("latitude").getNodeValue());
+				Double longitude = Double.parseDouble(markerNode.getNamedItem("longitude").getNodeValue());
+
+				String markerState = markerNode.getNamedItem("state").getNodeValue();
+				if (markerState.equals("save"))
+				{
+					GmapMarker marker = new GmapMarker();
+					marker.setInfoWindowMessage(infoMessage);
+					marker.setLatitude(latitude);
+					marker.setLongitude(longitude);
+					marker.setGmap(gmap);
+					marker.setCreated(new Date());
+					marker.setUpdated(new Date());
+					marker.setAuthored(true);
+					//gmap.addMarker(marker);
+					gmapService.saveOrUpdateGmapMarker(marker);
+					
+				}
+				else if (markerState.equals("update"))
+				{
+					
+					GmapMarker marker = gmap.getMarkerByUid(uid);
+					marker.setInfoWindowMessage(infoMessage);
+					marker.setLatitude(latitude);
+					marker.setLongitude(longitude);
+					marker.setGmap(gmap);
+					marker.setUpdated(new Date());
+					marker.setAuthored(true);
+					gmapService.saveOrUpdateGmapMarker(marker);
+					//gmap.updateMarker(marker, uid);
+				}
+				else if (markerState.equals("remove"))
+				{
+					gmap.removeMarker(uid);
+					//GmapMarker marker = gmap.getMarkerByUid(uid);
+					//gmapService.deleteGmapMarker(marker);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			// TODO: improve error handling
+			log.error("Could not get marker xml object to update", e);
 		}
 	}
 
@@ -464,7 +549,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 
 	/**
-	 * Retrieve the SessionMap from the HttpSession.
+	 * Retrieve the SessionMap from the HttpSession using the author form.
 	 * 
 	 * @param request
 	 * @param authForm
@@ -472,7 +557,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	 */
 	private SessionMap<String, Object> getSessionMap(
 			HttpServletRequest request, AuthoringForm authForm) {
-		return (SessionMap<String, Object>) request.getSession().getAttribute(
-				authForm.getSessionMapID());
+		return (SessionMap<String, Object>) request.getSession().getAttribute(authForm.getSessionMapID());
 	}
+	
 }
