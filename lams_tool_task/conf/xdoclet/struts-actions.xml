@@ -215,6 +215,7 @@
 			scope="request" 
 			validate="false">
 			<forward name="success" path="/learning/start.do" />
+			<forward name="refresh" path="/pages/learning/learning.jsp" />
 		</action>
 		<action path="/learning/uploadFile"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.LearningAction"
@@ -223,6 +224,7 @@
 			validate="false"
 			parameter="uploadFile">
 			<forward name="success" path="/learning/start.do" />
+			<forward name="refresh" path="/pages/learning/learning.jsp" />
 		</action>
 		
 		<action path="/learning/newReflection"

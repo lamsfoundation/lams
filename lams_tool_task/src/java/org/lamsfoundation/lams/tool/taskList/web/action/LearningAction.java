@@ -434,7 +434,7 @@ public class LearningAction extends Action {
 
 		String commentMessage = taskListItemForm.getComment();
 		if(commentMessage == null || StringUtils.isBlank(commentMessage))
-			return mapping.findForward(TaskListConstants.SUCCESS);
+			return mapping.findForward("refresh");
 		
 		TaskListItemComment comment = new TaskListItemComment();
 		comment.setComment(commentMessage);
@@ -482,14 +482,14 @@ public class LearningAction extends Action {
 		FormFile file = (FormFile) taskListItemForm.getUploadedFile();
 		
 		if(file == null || StringUtils.isBlank(file.getFileName()))
-			return mapping.findForward(TaskListConstants.SUCCESS);
+			return mapping.findForward("refresh");
 		
 		//validate file size
 		ActionMessages errors = new ActionMessages();
 		FileValidatorUtil.validateFileSize(file, true, errors );
 		if(!errors.isEmpty()){
 			this.saveErrors(request, errors);
-			return mapping.findForward(TaskListConstants.SUCCESS);
+			return mapping.findForward("refresh");
 		}
 		
 		//upload to repository

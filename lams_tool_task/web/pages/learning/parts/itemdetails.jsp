@@ -16,9 +16,9 @@
 				</div>
 				
 				<div >
-					<lams:STRUTS-textarea property="comment" rows="2" style="width: 65%;"/>
+					<html:textarea property="comment" rows="2" style="width: 65%;"/>
 	
-					<html:button property="newcomment" onclick="javascript:addNewComment(this.form, ${item.uid});" styleClass="button" style="position:relative; left:40px; top:-35px;">
+					<html:button property="commentButton" onclick="javascript:addNewComment(this.form, ${item.uid});" styleClass="button" style="position:relative; left:40px; top:-35px;">
 						<fmt:message key="label.preview.post" />
 					</html:button>
 				</div>
@@ -38,7 +38,7 @@
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
 									 
-				<html:button property="newcomment" onclick="javascript:doUpload(this.form, ${item.uid});" styleClass="button">
+				<html:button property="uploadedFileButton" onclick="javascript:doUpload(this.form, ${item.uid});" styleClass="button">
 					<fmt:message key="label.preview.upload.button" /> 
 				</html:button>
 									
