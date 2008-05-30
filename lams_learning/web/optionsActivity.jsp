@@ -8,6 +8,12 @@
 		progress="${optionsActivityForm.progressSummary}" />
 </c:if>
 
+<%
+	if (request.getAttribute("activity") instanceof org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity) {
+		request.setAttribute("isOptionsWithSequencesActivity", "true");
+	}
+%>
+
 <script language="JavaScript" type="text/JavaScript"><!--
 	function validate() {
 		var validated = false;
@@ -47,10 +53,20 @@
 	<div class="group-box">
 
 		<p>
-			<fmt:message key="message.activity.options.activityCount">
-				<fmt:param value="${optionsActivityForm.minimum}" />
-				<fmt:param value="${optionsActivityForm.maximum}" />
-			</fmt:message>
+			<c:choose>
+				<c:when test="${isOptionsWithSequencesActivity}">
+					<fmt:message key="message.activity.set.options.activityCount">
+						<fmt:param value="${optionsActivityForm.minimum}" />
+						<fmt:param value="${optionsActivityForm.maximum}" />
+					</fmt:message>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="message.activity.options.activityCount">
+						<fmt:param value="${optionsActivityForm.minimum}" />
+						<fmt:param value="${optionsActivityForm.maximum}" />
+					</fmt:message>
+				</c:otherwise>
+			</c:choose>
 		</p>
 
 		<html:form action="/ChooseActivity" method="post"
@@ -98,12 +114,28 @@
 	<p class="info">
 		<c:choose>
 			<c:when test="${optionsActivityForm.maximum gt 0 and optionsActivityForm.maximum lt numActivities}">
-				<fmt:message key="message.activity.options.note.maximum">
-					<fmt:param value="${optionsActivityForm.maximum}" />
-				</fmt:message>
+				<c:choose>
+					<c:when test="${isOptionsWithSequencesActivity}">
+						<fmt:message key="message.activity.set.options.note.maximum">
+							<fmt:param value="${optionsActivityForm.maximum}" />
+						</fmt:message>
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="message.activity.options.note.maximum">
+							<fmt:param value="${optionsActivityForm.maximum}" />
+						</fmt:message>
+					</c:otherwise>
+				</c:choose>
 			</c:when>
 			<c:otherwise>
-				<fmt:message key="message.activity.options.note" />
+				<c:choose>
+					<c:when test="${isOptionsWithSequencesActivity}">
+						<fmt:message key="message.activity.set.options.note" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="message.activity.options.note" />
+					</c:otherwise>
+				</c:choose>
 			</c:otherwise>
 		</c:choose>
 	</p>
