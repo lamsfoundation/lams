@@ -300,9 +300,14 @@ public class LearnerService implements ICoreLearnerService
     }
     
     /**
-     * This method navigate through all the tool activities for the given
-     * activity. For each tool activity, we look up the database
-     * to check up the existance of correspondent tool session. If the tool 
+     * This method creates the tool session (if needed) for a tool activity.
+     * It won't try it for the child activities, as any Sequence activities inside this 
+     * activity may have a grouping WITHIN the sequence, and then the grouped activities
+     * get the won't be grouped properly (See LDEV-1774). We could get the child tool activities
+     * for a parallel activity but that could create a bug in the future - if we ever put 
+     * sequences inside parallel activities then we are stuck again!
+     * 
+     * We look up the database to check up the existence of correspondent tool session. If the tool 
      * session doesn't exist, we create a new tool session instance.
      * 
      * @param learnerProgress the learner progress we are processing.
@@ -310,26 +315,21 @@ public class LearnerService implements ICoreLearnerService
      */
     public void createToolSessionsIfNecessary(Activity activity, LearnerProgress learnerProgress) 
     {
-        if(activity!=null) {
-        
-	        try
-	        {
-	            for(Iterator i = activity.getAllToolActivities().iterator();i.hasNext();)
-	            {
-	            	ToolActivity toolActivity =  (ToolActivity)i.next();
-	           		createToolSessionFor(toolActivity, learnerProgress.getUser(),learnerProgress.getLesson());
-	            }
+    	try {
+	        if(activity!=null && activity.isToolActivity() ) {
+	           	ToolActivity toolActivity =  (ToolActivity)activity;
+	           	createToolSessionFor(toolActivity, learnerProgress.getUser(),learnerProgress.getLesson());
 	        }
-	        catch (LamsToolServiceException e)
-	        {
-	            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
-	    		throw new LearnerServiceException(e.getMessage());
-	        }
-	        catch (ToolException e)
-	        {
-	            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
-	    		throw new LearnerServiceException(e.getMessage());
-	        }
+    	}
+        catch (LamsToolServiceException e)
+        {
+            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
+    		throw new LearnerServiceException(e.getMessage());
+        }
+        catch (ToolException e)
+        {
+            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
+    		throw new LearnerServiceException(e.getMessage());
         }
     }
     
