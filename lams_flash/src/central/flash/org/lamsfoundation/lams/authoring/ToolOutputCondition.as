@@ -46,6 +46,8 @@ class ToolOutputCondition   {
 	private var _branchingActivity:BranchingActivity;
 	private var _toolActivity:ToolActivity;
 	
+	private var _isDefault:Boolean;
+	
 	function ToolOutputCondition(conditionID:Number, conditionUIID:Number, name:String, type:String, startValue:Object, endValue:Object, exactMatchValue:Object, displayName:String){
 		_conditionID = conditionID;
 		_conditionUIID = conditionUIID;
@@ -57,6 +59,8 @@ class ToolOutputCondition   {
 		_exactMatchValue = exactMatchValue;
 		
 		_display_name = displayName;
+		
+		_isDefault = false;
 	}
 	
 	public static function createBoolCondition(UIID:Number, definition:ToolOutputDefinition, toolActivity:ToolActivity, branchingActivity:BranchingActivity, value:Boolean):ToolOutputCondition {
@@ -221,5 +225,12 @@ class ToolOutputCondition   {
 		return _branchingActivity;
 	}
 
+	public function set isDefault(a:Boolean) {
+		_isDefault = a;
+	}
+	
+	public function get isDefault():Boolean {
+		return _isDefault;
+	}
 
 }

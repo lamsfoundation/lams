@@ -273,7 +273,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 		var column_name:DataGridColumn = new DataGridColumn("conditionName");
 		column_name.headerText = Dictionary.getValue("to_conditions_dlg_condition_items_name_col_lbl");
-		column_name.editable = true;
+		column_name.editable = !(_selectedDefinition.defaultConditions.length > 0);
 		
 		column_name.width = (hideValueColumn) ?  _condition_item_dgd.width : _condition_item_dgd.width*0.4;
 		
@@ -590,6 +590,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				
 					showSteppers(false, false);
 					addDefaultConditions(_selectedDefinition.defaultConditions);
+					
 				} else {
 					add_btn.visible = true;
 					remove_item_btn.visible = true;
@@ -664,7 +665,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				condition.conditionUIID = ddm.newUIID();
 				condition.toolActivity = _toolActivity;
 				condition.branchingActivity = _branchingActivity;
-						
+				condition.isDefault = true;
+				
 				addCondition(condition);
 			}
 					
