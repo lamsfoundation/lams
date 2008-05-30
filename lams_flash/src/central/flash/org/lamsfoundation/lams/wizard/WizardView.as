@@ -385,7 +385,8 @@ class WizardView extends AbstractView {
 		next_btn._x = panel._width - next_btn._width - X_BUTTON_OFFSET;
 		start_btn._x = panel._width - start_btn._width - X_BUTTON_OFFSET;
 		close_btn._x = panel._width - close_btn._width - X_BUTTON_OFFSET;
-		finish_btn._x = panel._width - finish_btn._width - X_BUTTON_OFFSET;
+		
+		finish_btn._x = 10; // panel._width - finish_btn._width - X_BUTTON_OFFSET;
 		
 		Debugger.log("visible: "+ _wizardLessonView.getScheduleBtn().visible, Debugger.CRITICAL, "positionButtons", "WizardView");
 		if(_wizardLessonView.getScheduleBtn().visible) {
@@ -673,10 +674,11 @@ class WizardView extends AbstractView {
 		// move buttons
         next_btn.move(panel._width-xNextOffset,panel._height-yNextOffset);
 		prev_btn.move(panel._width-xPrevOffset,panel._height-yPrevOffset);
-		finish_btn.move(panel._width-xNextOffset,panel._height-yNextOffset);
 		close_btn.move(panel._width-xCancelOffset,panel._height-yCancelOffset);
         cancel_btn.move(panel._width-xCancelOffset,panel._height-yCancelOffset);
 				
+		finish_btn.move(10, panel._height-yNextOffset);
+		
 		// move logo
 		logo._x = header_pnl._width-xLogoOffset;
 		

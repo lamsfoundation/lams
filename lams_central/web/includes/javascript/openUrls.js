@@ -134,11 +134,11 @@
 			{
 				if(belowMinRes)
 				{
-					addLessonWin = window.open('home.do?method=addLesson&courseID='+courseID+'&classID='+classID,'alWindow','width=623,height=450,scrollbars');
+					addLessonWin = window.open('home.do?method=addLesson&courseID='+courseID+'&classID='+classID,'alWindow','width=623,height=480,scrollbars');
 				}
 				else
 				{
-					addLessonWin = window.open('home.do?method=addLesson&courseID='+courseID+'&classID='+classID,'alWindow','width=610,height=450,scrollbars');
+					addLessonWin = window.open('home.do?method=addLesson&courseID='+courseID+'&classID='+classID,'alWindow','width=610,height=480,scrollbars');
 				}
 			}
 			else
@@ -150,7 +150,7 @@
 				}
 				else
 				{
-					addLessonWin = window.open('home.do?method=addLesson&courseID='+courseID+'&classID='+classID,'alWindow','width=610,height=450,scrollbars');
+					addLessonWin = window.open('home.do?method=addLesson&courseID='+courseID+'&classID='+classID,'alWindow','width=610,height=480,scrollbars');
 				}
 			}
 		}
