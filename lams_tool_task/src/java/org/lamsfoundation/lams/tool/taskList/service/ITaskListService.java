@@ -156,6 +156,14 @@ public interface ITaskListService {
 	 * @return
 	 */
 	List<TaskListUser> getUserListBySessionItem(Long sessionId, Long itemUid);
+	
+	/**
+	 * Get user list by sessionId. (thus users belonging to one group)
+	 * 
+	 * @param sessionId
+	 * @return
+	 */
+	List<TaskListUser> getUserListBySessionId(Long sessionId);
 
 	/**
 	 * Get user by UID

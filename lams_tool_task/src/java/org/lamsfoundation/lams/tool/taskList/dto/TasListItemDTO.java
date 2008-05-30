@@ -25,7 +25,9 @@ package org.lamsfoundation.lams.tool.taskList.dto;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
@@ -48,8 +50,15 @@ public class TasListItemDTO {
 	//shows if this TaskListItem shoud be displayed open or close
 	private boolean isDisplayedOpen;
 	
+	//Set of comments posted by the members of the group to which user belong to
+	private Set comments;
+	//Set of files uploaded by the members of the group to which user belong to
+	private Set attachments;
+	
 	public TasListItemDTO(TaskListItem taskListItem) {
 		this.taskListItem = taskListItem;
+		comments = new HashSet<TaskListItemComment>();
+		attachments = new HashSet<TaskListItemAttachment>();
 	}
 	
 	//  **********************************************************
@@ -156,6 +165,40 @@ public class TasListItemDTO {
 	 */
 	public void setDisplayedOpen(boolean isDisplayedOpen) {
 		this.isDisplayedOpen = isDisplayedOpen;
+	}
+	
+	/**
+	 * Returns set of comments posted by the members of the group to which user belong to.
+	 * 
+	 * @return set of comments posted by the members of the group to which user belong to
+	 */
+	public Set getComments() {
+		return comments;
+	}
+	/**
+	 * Sets set of comments posted by the members of the group to which user belong to.
+	 * 
+	 * @param comments set of comments posted by the members of the group to which user belong to
+	 */
+	public void setComments(Set comments) {
+		this.comments = comments;
+	}
+	
+	/**
+	 * Returns set of files uploaded by the members of the group to which user belong to.
+	 * 
+	 * @return  set of files uploaded by the members of the group to which user belong to
+	 */
+	public Set getAttachments() {
+		return attachments;
+	}
+	/**
+	 * Sets set of files uploaded by the members of the group to which user belong to.
+	 * 
+	 * @param attachments set of files uploaded by the members of the group to which user belong to
+	 */
+	public void setAttachments(Set attachments) {
+		this.attachments = attachments;
 	}
 
 }

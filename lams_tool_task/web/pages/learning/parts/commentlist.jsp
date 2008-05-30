@@ -1,4 +1,4 @@
-<c:set var="commentList" value="${item.comments}" />
+<c:set var="commentList" value="${itemDTO.comments}" />
 <c:if test="${not empty commentList}">
 	<div class="field-name">
 		<fmt:message key="label.preview.comments" />

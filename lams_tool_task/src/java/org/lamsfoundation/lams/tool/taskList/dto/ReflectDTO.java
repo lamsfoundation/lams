@@ -55,7 +55,7 @@ public class ReflectDTO {
 	public String getReflectInstrctions() {
 		return reflectInstrctions;
 	}
-	public void setReflectInstrctions(String reflectInstrctions) {
+	public void setReflectInstructions(String reflectInstrctions) {
 		this.reflectInstrctions = reflectInstrctions;
 	}
 	public Long getUserUid() {

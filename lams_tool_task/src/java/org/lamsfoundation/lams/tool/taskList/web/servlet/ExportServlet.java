@@ -40,9 +40,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.dto.GroupSummary;
+import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
@@ -54,6 +60,7 @@ import org.lamsfoundation.lams.tool.taskList.service.TaskListException;
 import org.lamsfoundation.lams.tool.taskList.service.TaskListServiceProxy;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListToolContentHandler;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -204,6 +211,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		
 		List<List<GroupSummary>> itemSummaries = service.exportForTeacher(toolContentID);
 		
+
+		
 		saveFileToLocal(itemSummaries, directoryName);
 		
 		// put it into HTTPSession
@@ -261,5 +270,32 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     	      handler = (TaskListToolContentHandler) wac.getBean(TaskListConstants.TOOL_CONTENT_HANDLER_NAME);
     	    }
     	    return handler;
+	}
+	
+	private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+		Long uid = WebUtil.readLongParam(request, TaskListConstants.ATTR_USER_UID); 
+		
+		ITaskListService service = TaskListServiceProxy.getTaskListService(getServletContext());
+		TaskListUser user = service.getUser(uid);
+		Long sessionID = user.getSession().getSessionId();
+		NotebookEntry notebookEntry = service.getEntry(sessionID, 
+				CoreNotebookConstants.NOTEBOOK_TOOL, 
+				TaskListConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+		
+		TaskListSession session = service.getTaskListSessionBySessionId(sessionID);
+		
+		ReflectDTO refDTO = new ReflectDTO(user);
+		if(notebookEntry == null){
+			refDTO.setFinishReflection(false);
+			refDTO.setReflect(null);
+		}else{
+			refDTO.setFinishReflection(true);
+			refDTO.setReflect(notebookEntry.getEntry());
+		}
+		refDTO.setReflectInstructions(session.getTaskList().getReflectInstructions());
+		
+		request.setAttribute("userDTO", refDTO);
+		return mapping.findForward("success");
 	}
 }

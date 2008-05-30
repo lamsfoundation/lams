@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -358,32 +359,6 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		return nextUrl;
 	}
 	
-	public int checkMinimumNumberTasksComplete(Long toolSessionId, Long userUid) {
-		int completedItems = taskListItemVisitDao.getTasksCompletedCountByUser(toolSessionId, userUid);
-		TaskListSession session = taskListSessionDao.getSessionBySessionId(toolSessionId);
-		if(session == null){
-			log.error("Failed get session by ID [" + toolSessionId + "]");
-			return 0;
-		}
-		int minimumNumberTasksComplete = session.getTaskList().getMinimumNumberTasksComplete();
-		
-		return (minimumNumberTasksComplete - completedItems);
-	}
-
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void retrieveComplete(Set<TaskListItem> taskListItemList, TaskListUser user) {
-		for(TaskListItem item:taskListItemList){
-			TaskListItemVisitLog log = taskListItemVisitDao.getTaskListItemLog(item.getUid(),user.getUserId());
-			if(log == null)
-				item.setComplete(false);
-			else
-				item.setComplete(log.isComplete());
-		}
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -419,7 +394,36 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 			taskListItemVisitDao.saveObject(log);
 		}
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public int checkMinimumNumberTasksComplete(Long toolSessionId, Long userUid) {
+		int completedItems = taskListItemVisitDao.getTasksCompletedCountByUser(toolSessionId, userUid);
+		TaskListSession session = taskListSessionDao.getSessionBySessionId(toolSessionId);
+		if(session == null){
+			log.error("Failed get session by ID [" + toolSessionId + "]");
+			return 0;
+		}
+		int minimumNumberTasksComplete = session.getTaskList().getMinimumNumberTasksComplete();
+		
+		return (minimumNumberTasksComplete - completedItems);
+	}
 
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void retrieveComplete(Set<TaskListItem> taskListItemList, TaskListUser user) {
+		for(TaskListItem item:taskListItemList){
+			TaskListItemVisitLog log = taskListItemVisitDao.getTaskListItemLog(item.getUid(),user.getUserId());
+			if(log == null)
+				item.setComplete(false);
+			else
+				item.setComplete(log.isComplete());
+		}
+	}
+	
 	/** 
 	 * {@inheritDoc}
 	 */
@@ -474,52 +478,6 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		}
 
 		return summaryList;
-	}
-	
-	/** 
-	 * {@inheritDoc}
-	 */
-	public int getNumTasksCompletedByUser(Long toolSessionId, Long userUid) {
-		return getTaskListItemVisitDao().getTasksCompletedCountByUser(toolSessionId, userUid);
-	}
-	
-	/** 
-	 * {@inheritDoc}
-	 */
-	public boolean checkCondition(String conditionName, Long toolSessionId, Long userUid) {
-		TaskListUser user = taskListUserDao.getUserByUserIDAndSessionID(userUid, toolSessionId);
-		TaskList taskList = taskListSessionDao.getSessionBySessionId(toolSessionId).getTaskList();
-		Set<TaskListCondition> conditions = taskList.getConditions();
-		TaskListCondition condition = null;
-		for (TaskListCondition cond:conditions) {
-			if (cond.getName().equals(conditionName)) {
-				condition = cond;
-				break;
-			}
-		}
-
-		boolean result = true;
-		if (condition != null) {
-			Iterator it = condition.getTaskListItems().iterator();
-			while(it.hasNext()) {
-				TaskListItem item = (TaskListItem) it.next();
-				
-				TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(), userUid);
-				if (visitLog != null) {
-					//result is being calculated depending on visitLog value
-					result &= visitLog.isComplete();
-				} else {
-					//user hadn't complete this task. So this means the condition isn't met.
-					result = false;
-					break;
-				}
-			}
-		} else {
-			//there is no such a condition
-			result = false;
-		}
-		
-		return result;
 	}
 	
 	/** 
@@ -647,6 +605,52 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		
 		return eachItemOverallSummaries;
 	}
+	
+	/** 
+	 * {@inheritDoc}
+	 */
+	public int getNumTasksCompletedByUser(Long toolSessionId, Long userUid) {
+		return getTaskListItemVisitDao().getTasksCompletedCountByUser(toolSessionId, userUid);
+	}
+	
+	/** 
+	 * {@inheritDoc}
+	 */
+	public boolean checkCondition(String conditionName, Long toolSessionId, Long userUid) {
+		TaskListUser user = taskListUserDao.getUserByUserIDAndSessionID(userUid, toolSessionId);
+		TaskList taskList = taskListSessionDao.getSessionBySessionId(toolSessionId).getTaskList();
+		Set<TaskListCondition> conditions = taskList.getConditions();
+		TaskListCondition condition = null;
+		for (TaskListCondition cond:conditions) {
+			if (cond.getName().equals(conditionName)) {
+				condition = cond;
+				break;
+			}
+		}
+
+		boolean result = true;
+		if (condition != null) {
+			Iterator it = condition.getTaskListItems().iterator();
+			while(it.hasNext()) {
+				TaskListItem item = (TaskListItem) it.next();
+				
+				TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(), userUid);
+				if (visitLog != null) {
+					//result is being calculated depending on visitLog value
+					result &= visitLog.isComplete();
+				} else {
+					//user hadn't complete this task. So this means the condition isn't met.
+					result = false;
+					break;
+				}
+			}
+		} else {
+			//there is no such a condition
+			result = false;
+		}
+		
+		return result;
+	}
 
 	/** 
 	 * {@inheritDoc}
@@ -660,6 +664,13 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 			userList.add(user);
 		}
 		return userList;
+	}
+	
+	/** 
+	 * {@inheritDoc}
+	 */
+	public List<TaskListUser> getUserListBySessionId(Long sessionId) {
+		return taskListUserDao.getBySessionID(sessionId);
 	}
 
 	/** 

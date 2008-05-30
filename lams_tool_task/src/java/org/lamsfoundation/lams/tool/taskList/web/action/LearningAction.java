@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -57,6 +59,7 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
@@ -158,9 +161,25 @@ public class LearningAction extends Action {
 		}
 
 		TaskList taskList = service.getTaskListBySessionId(sessionId);
+
+		//Create set of TaskListItems besides this filtering out items added by users from other groups
 		TreeSet<TaskListItem> items = new TreeSet<TaskListItem> (new TaskListItemComparator());
-		items.addAll(taskList.getTaskListItems());
-		
+		if (mode.isLearner()) {
+			
+			List<TaskListUser> grouppedUsers = service.getUserListBySessionId(sessionId);
+			Set<TaskListItem> allTaskListItems = taskList.getTaskListItems();
+
+			for(TaskListItem item:allTaskListItems) {
+				for(TaskListUser grouppedUser:grouppedUsers) {
+					if (item.isCreateByAuthor() || grouppedUser.getUserId().equals(item.getCreateBy().getUserId())) items.add(item);
+				}
+			}
+			
+		} else {
+			items.addAll(taskList.getTaskListItems());
+		}
+
+
 		//check whehter finish lock is on/off
 		boolean lock = taskList.getLockWhenFinished() && taskListUser !=null && taskListUser.isSessionFinished();
 		
@@ -236,6 +255,33 @@ public class LearningAction extends Action {
 			// sets whether the previous TaskListItem was completed
 			itemDTO.setPreviousTaskCompleted(isPreviousTaskCompleted);
 			isPreviousTaskCompleted = item.isComplete();
+			
+			//filter out comments and attachments which belong to another group
+			Set filteredComments = new HashSet<TaskListItemComment>();
+			Set filteredAttachments = new HashSet<TaskListItemAttachment>();
+			if (mode.isLearner()) {
+				
+				List<TaskListUser> grouppedUsers = service.getUserListBySessionId(sessionId);
+				Set<TaskListItemComment> comments = item.getComments();
+				Set<TaskListItemAttachment> attachments = item.getAttachments();
+
+				for(TaskListItemComment comment:comments) {
+					for(TaskListUser grouppedUser:grouppedUsers) {
+						if (grouppedUser.getUserId().equals(comment.getCreateBy().getUserId())) filteredComments.add(comment);
+					}
+				}
+				
+				for(TaskListItemAttachment attachment:attachments) {
+					for(TaskListUser grouppedUser:grouppedUsers) {
+						if (grouppedUser.getUserId().equals(attachment.getCreateBy().getUserId())) filteredAttachments.add(attachment);
+					}
+				}
+			} else {
+				filteredComments = item.getComments();
+				filteredAttachments = item.getAttachments();
+			}
+			itemDTO.setComments(filteredComments);
+			itemDTO.setAttachments(filteredAttachments);
 			
 			itemDTOs.add(itemDTO);
 		}

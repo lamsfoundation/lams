@@ -1,5 +1,5 @@
 <div>
-	<c:set var="fileList" value="${item.attachments}" />
+	<c:set var="fileList" value="${itemDTO.attachments}" />
 	
 	<c:if test="${not empty fileList}">
 		<div class="field-name">
