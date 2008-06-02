@@ -967,6 +967,15 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     	}
    		newLearningDesign.getActivities().addAll(activities);
    		
+   		// On very rare occasions, we've had Hibernate try to save the branching entries before saving the branching activity
+   		// which throws an exception as the branch_activity_id is null. So force any branching activities to save first.
+   		// And yes, this IS a hack. (See LDEV-1786)	
+    	for ( Activity activity : activities) {
+    		if ( activity.isBranchingActivity() ) {
+    			activityDAO.insert(activity);
+    		}
+    	}
+    	
    		return newActivities;
    		
     }
