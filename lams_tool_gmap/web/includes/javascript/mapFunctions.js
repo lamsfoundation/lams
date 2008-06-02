@@ -1,6 +1,6 @@
 
 // add a marker at the given point
-function addMarker(point, infoMessage, uid, isSaved)
+function addMarker(point, infoMessage, title, uid, isSaved)
 {
 	map.closeInfoWindow();
 	var marker = new GMarker(point, {draggable: true})
@@ -24,6 +24,26 @@ function addMarker(point, infoMessage, uid, isSaved)
     	updateMarkerInfoWindowHtml(marker);
     });
     
+    GEvent.addListener(marker,'mouseover',function(){
+		//marker[i].setImage(markerImage[3]);
+		//alert("hello");
+		//document.getElementById("sidebar").getElementsByTagName("span")[markers.length].style.background ="blue";
+	});
+	
+	GEvent.addListener(marker,'mouseout',function()
+	{
+		//document.getElementById("sidebar").getElementsByTagName("span")[markers.length].style.background ="blue";
+		
+		/*if(marker[i].visited){
+			marker[i].setImage(markerImage[4]);
+			document.getElementById("sidebar").getElementsByTagName("span")[i].style.color ="gray";
+		
+		}else{
+		marker[i].setImage(markerImage[0]);
+		document.getElementById("sidebar").getElementsByTagName("span")[i].style.color ="black";
+		*/
+	});
+    
     if (infoMessage!=null)
     {
     	marker.infoMessage = unescape(infoMessage);
@@ -33,24 +53,27 @@ function addMarker(point, infoMessage, uid, isSaved)
     	marker.infoMessage = "";
     }
     
+    //marker.title = "Marker #" + markers.length;
+    marker.title = title;
+    
+    //sideBar(marker.infoMessage, markers.length);
+    
+    
     // set the state of the marker
     marker.editingOn = !isSaved;
     marker.uid = uid;
     if (isSaved){marker.state = "unchanged";}
-    else {marker.state="save";}
+    else {marker.state="unsaved";}
     
-
+	marker.sideBarLinkPrefix = "<span class='sidebar'><a href='javascript:GEvent.trigger(markers["+markers.length+"],\"click\")'>";
+    //marker.sideBarLinkSuffix = marker.title+"</a></span><br />"
     marker.removeLink = "<a href='javascript:removeMarker(" + markers.length + ")'>Remove</a>" ;
-    //marker.editLink = "<a href='pages/authoring/map.jsp' class='thickbox'>Edit</a>";
    	marker.editLink = "<a href='javascript:editMarker(" + markers.length + ")'>Edit</a>";
-   	
    	marker.saveLink = "<a href='javascript:saveMarkerInfo(" + markers.length + "); openInfoWindow("+ markers.length +");'>Save</a>";
    	marker.cancelLink = "<a href='javascript:cancelEditMarkerInfo(" + markers.length + ")'>Cancel</a>";
-   	
-   	//markerManager.addMarkers(marker,  5);
-   	
     updateMarkerInfoWindowHtml(marker);
     markers[markers.length] = marker;
+    
 }
 
 // Add a new marker to the center of the map
@@ -58,8 +81,23 @@ function addMarkerToCenter()
 {
 	var bounds = map.getBounds();
 	var point = bounds.getCenter();
-	addMarker(point, "", -1, false)
+	addMarker(point, "", "", -1, false);
 }
+
+function refreshSideBar()
+{
+	var sideBarText = "";
+	var i=0;
+	for (;i<markers.length; i++)
+	{
+		if (markers[i].state != "remove")
+		{
+			sideBarText += markers[i].sideBarLinkPrefix + markers[i].title+"</a></span><br />";
+		}
+	}
+	document.getElementById("sidebar").innerHTML = sideBarText;
+}
+
 
 function test()
 {
@@ -75,6 +113,7 @@ function removeMarker(x)
 		try{map.removeOverlay(markers[x]);}
 		catch (e){}
 		markers[x].state = "remove";
+		refreshSideBar();
 		//serialiseMarkers();
 	}
 }
@@ -88,9 +127,16 @@ function editMarker(x)
 
 function cancelEditMarkerInfo(x)
 {
-	markers[x].editingOn = false;
-	updateMarkerInfoWindowHtml(markers[x]);
-	openInfoWindow(x);
+	if (markers[x].state == "unsaved")
+	{
+		removeMarker(x);
+	}
+	else
+	{
+		markers[x].editingOn = false;
+		updateMarkerInfoWindowHtml(markers[x]);
+		openInfoWindow(x);
+	}
 }
 
 function updateMarkerInfoWindowHtml(markerIn)
@@ -105,11 +151,11 @@ function updateMarkerInfoWindowHtml(markerIn)
 	{
 		markerIn.setImage(webAppUrl + "/images/blue_Marker.png");
 	}
-	else if (markerIn.state == "update")
+	else if (markerIn.state == "update" || markerIn.state == "save")
 	{
 		markerIn.setImage(webAppUrl + "/images/paleblue_Marker.png");
 	}
-	else
+	else if (markerIn.state == "unsaved")
 	{
 		markerIn.setImage(webAppUrl + "/images/red_Marker.png");
 	}
@@ -124,8 +170,11 @@ function updateMarkerInfoWindowHtml(markerIn)
 		//markerIn.inputForm += "contentFolderID='${sessionMap.contentFolderID}'>";
 		//markerIn.inputForm += "</lams:FCKEditor>";
 		
-		markerIn.infoWindowTextarea = "<textarea id='infoWindow' name='infoWindow' rows='5' cols='50'>" + markerIn.infoMessage + "</textarea>";
-		markerIn.inputForm = "New Info Window Text: <br>" + markerIn.infoWindowTextarea;
+		//markerIn.titleInput = "Title:<br><textarea id='markerTitle' name='markerTitle' value='" + markerIn.title +"' /><br>";
+		//markerIn.infoWindowTextarea = "New Info Window Text:<br><textarea id='infoWindow' name='infoWindow' rows='5' cols='50'>" + markerIn.infoMessage + "</textarea>";
+		markerIn.inputForm = "Title:<br><input tupe='text' id='markerTitle' name='markerTitle' value='" + markerIn.title +"' /><br>";
+		markerIn.inputForm += "New Info Window Text:<br><textarea id='infoWindow' name='infoWindow' rows='5' cols='50'>" + markerIn.infoMessage + "</textarea>";
+		//markerIn.inputForm = "" + markerIn.infoWindowTextarea;
 		markerIn.infoWindowHtml += markerIn.inputForm + markerIn.linksBar;
 	}
 	else
@@ -176,21 +225,54 @@ function fitMapMarkers()
    map.setCenter(bounds.getCenter());
 }
 
+/*
+function saveClick(x)
+{
+	var title=document.getElementById("markerTitle");
+	if (title==null || trim(title) == "")
+	{
+		alert("Title is required.");
+		return false;
+	}
+	else
+	{
+		saveMarkerInfo(x);
+	}
+}
+*/
+
 function saveMarkerInfo(x)
 {
 	if (markers[x] != null)
 	{
-		var info=document.getElementById("infoWindow");
-		markers[x].infoMessage = info.value;
-		markers[x].editingOn = false;
-		
-		// change the state to update if it is a pre-existing marker
-		if (markers[x].state == "unchanged") {markers[x].state = "update";}
-		
-		//markers[x].isSaved = persistMarker(markers[x], "createMarker");
-		updateMarkerInfoWindowHtml(markers[x]);
-
+		var title= trim(document.getElementById("markerTitle").value);
+		if (title==null || title == "")
+		{
+			alert("Title is required.");
+			return false;
+		}
+		else
+		{		
+			
+			var info=document.getElementById("infoWindow").value;
+			markers[x].title = title;
+			markers[x].infoMessage = info;
+			markers[x].editingOn = false;
+			
+			// change the state to update if it is a pre-existing marker
+			if (markers[x].state == "unchanged") {markers[x].state = "update";}
+			else (markers[x].state ="save");
+			
+			//markers[x].isSaved = persistMarker(markers[x], "createMarker");
+			updateMarkerInfoWindowHtml(markers[x]);
+			refreshSideBar();
+		}
 	}
+}
+
+function trim(x)
+{
+	return x.replace(/^\s+|\s+$/g, '')
 }
 
 /*
@@ -255,13 +337,14 @@ function serialiseMarkers()
 	
 	for (;i<markers.length;i++)
 	{
-		if (markers[i].state != "unchanged")
+		if (markers[i].state != "unchanged" && markers[i].state !="unsaved")
 		{
 			var markerString = '<marker'+
 			' latitude="'+ markers[i].getPoint().lat()+ '"'+
 			' longitude="'+ markers[i].getPoint().lng()+ '"'+
 			' infoMessage="'+ escape(markers[i].infoMessage)+ '"' +
 			' markerUID="'+ markers[i].uid + '"' +
+			' title="'+ markers[i].title + '"' +
 			' state="'+ markers[i].state + '"' +
 			' />';
 			xmlString += markerString;

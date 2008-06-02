@@ -6,7 +6,7 @@
 <c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 
 <!-- ========== Basic Tab ========== -->
-<table cellpadding="0">
+<table cellpadding="0" border='0'>
 	<tr>
 		<td>
 			<div class="field-name">
@@ -30,12 +30,20 @@
 			<div class="field-name">
 				Map:
 			</div>
-			<div id="map_canvas" style="width: 500px; height: 300px"></div>
+			<!--  
+			<div id="map_canvas" style="width: 500px; height: 300px"></div> 
+			-->
+			<table cellpadding='0' cellspacing='0' border='1'>
+			<tr><td><div id="map_canvas" style="width: 400px; height: 300px;" ></div></td>
+			<td><div id="sidebar" style="width:100px; 
+									overflow:auto;
+									height:320px; 
+									background:WhiteSmoke; "></div></td></tr>
+			</table>
 			
 			<input type="button" onclick="addMarkerToCenter()"  value="Add Marker" />
 			<input type="button" onclick="fitMapMarkers()" value="Fit Markers" />
 			<input type="button" onclick="test()"  value="Test" />
-			<a href='map.jsp' class='thickbox'>Edit</a>
 		</td>
 	</tr>
 	
@@ -58,13 +66,21 @@
 	        	<script type="text/javascript">
 				<!--
 					var savedPoint = new GLatLng('${marker.latitude}', '${marker.longitude}' );
-					addMarker(savedPoint, '${marker.infoWindowMessage}', '${marker.uid}', true);
+					addMarker(savedPoint, '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true);
 				//-->
 				</script>
       		</c:forEach>
       		<script type="text/javascript">
 			<!--
-	       		fitMapMarkers();
+	       		if (markers.length == 1)
+	       		{
+	       			map.setCenter(markers[0].getPoint());
+	       		}
+	       		else if (markers.length >= 2)
+	       		{
+	       			fitMapMarkers();
+	       		}
+	       		refreshSideBar();
        		//-->
 			</script>
 

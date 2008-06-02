@@ -62,6 +62,11 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	// Info windo message that appears when you click the marker (in HTML)
 	private String infoWindowMessage;
 	
+	
+	// The marker title
+	private String title;
+	
+	
 	// Text that appears when the user mouseovers the marker
 	//private String mouseoverText;
 	
@@ -230,6 +235,20 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 
 	public void setGmap(Gmap gmap) {
 		this.gmap = gmap;
+	}
+
+	/**
+	 * 
+	 * @return
+	 * @hibernate.property column="title"
+	 */
+	public String getTitle() {
+		return title;
+	}
+
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 

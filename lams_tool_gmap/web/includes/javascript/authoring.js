@@ -19,7 +19,8 @@ function initGmap()
 {
 	if (GBrowserIsCompatible()) 
 	{
-		map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(640,320) } );
+		//map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(640,320) } );
+		map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(500,320) } );
 		map.setCenter(new GLatLng(-33.774322, 151.111988), 13);
     	map.addControl(new GLargeMapControl());
     	map.addControl(new GMapTypeControl());

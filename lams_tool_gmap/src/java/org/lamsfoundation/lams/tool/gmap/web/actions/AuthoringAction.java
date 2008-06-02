@@ -417,6 +417,7 @@ public class AuthoringAction extends LamsDispatchAction {
 				NamedNodeMap markerNode = ((Node)list.item(i)).getAttributes();
 				
 				Long uid  = Long.parseLong(markerNode.getNamedItem("markerUID").getNodeValue());
+				String markerTitle = markerNode.getNamedItem("title").getNodeValue();
 				String infoMessage = markerNode.getNamedItem("infoMessage").getNodeValue();
 				Double latitude = Double.parseDouble(markerNode.getNamedItem("latitude").getNodeValue());
 				Double longitude = Double.parseDouble(markerNode.getNamedItem("longitude").getNodeValue());
@@ -425,6 +426,7 @@ public class AuthoringAction extends LamsDispatchAction {
 				if (markerState.equals("save"))
 				{
 					GmapMarker marker = new GmapMarker();
+					marker.setTitle(markerTitle);
 					marker.setInfoWindowMessage(infoMessage);
 					marker.setLatitude(latitude);
 					marker.setLongitude(longitude);
@@ -440,6 +442,7 @@ public class AuthoringAction extends LamsDispatchAction {
 				{
 					
 					GmapMarker marker = gmap.getMarkerByUid(uid);
+					marker.setTitle(markerTitle);
 					marker.setInfoWindowMessage(infoMessage);
 					marker.setLatitude(latitude);
 					marker.setLongitude(longitude);
