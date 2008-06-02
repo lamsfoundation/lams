@@ -48,13 +48,13 @@
 						<c:when test="${fileTypeFlag==CONS_OFFLINE}">
 							<html:link href="#"
 								onclick="deleteOfflineFile(${file.fileUuid},${file.fileVersionId})">
-								<fmt:message key="label.authoring.offline.delete" />
+								<fmt:message key="label.authoring.instructions.delete.button" />
 							</html:link>
 						</c:when>
 						<c:otherwise>
 							<html:link href="#"
 								onclick="deleteOnlineFile(${file.fileUuid},${file.fileVersionId})">
-								<fmt:message key="label.authoring.online.delete" />
+								<fmt:message key="label.authoring.instructions.delete.button" />
 							</html:link>
 						</c:otherwise>
 					</c:choose>
