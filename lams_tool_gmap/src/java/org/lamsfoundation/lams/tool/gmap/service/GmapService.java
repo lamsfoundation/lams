@@ -559,7 +559,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
     	gmap.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
     	gmap.setToolContentId(toolContentId);
     	gmap.setUpdateDate(now);
-    	gmap.setAllowRichEditor(Boolean.FALSE);
+    	//gmap.setAllowRichEditor(Boolean.FALSE);
     	// leave as empty, no need to set them to anything.
     	//setGmapAttachments(Set gmapAttachments);
     	//setGmapSessions(Set gmapSessions);

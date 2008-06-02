@@ -87,15 +87,6 @@
         />
 
         <property
-            name="allowRichEditor"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="allow_rich_editor"
-            length="1"
-        />
-
-        <property
             name="onlineInstructions"
             type="java.lang.String"
             update="true"
@@ -195,6 +186,110 @@
             />
 
         </set>
+
+        <property
+            name="allowEditMarkers"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_edit_markers"
+            length="1"
+        />
+
+        <property
+            name="allowShowAllMarkers"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="show_all_markers"
+            length="1"
+        />
+
+        <property
+            name="limitMarkers"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="limit_markers"
+            length="1"
+        />
+
+        <property
+            name="maxMarkers"
+            type="int"
+            update="true"
+            insert="true"
+            column="max_markers"
+        />
+
+        <property
+            name="allowZoom"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_zoom"
+            length="1"
+        />
+
+        <property
+            name="allowTerrain"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_terrain"
+            length="1"
+        />
+
+        <property
+            name="allowSatellite"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_satellite"
+            length="1"
+        />
+
+        <property
+            name="allowHybrid"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_hybrid"
+            length="1"
+        />
+
+        <property
+            name="mapCenterLatitude"
+            type="java.lang.Double"
+            update="true"
+            insert="true"
+            column="map_center_latitude"
+        />
+
+        <property
+            name="mapCenterLongitude"
+            type="java.lang.Double"
+            update="true"
+            insert="true"
+            column="map_center_longitude"
+        />
+
+        <property
+            name="mapZoom"
+            type="int"
+            update="true"
+            insert="true"
+            column="map_zoom"
+        />
+
+        <property
+            name="mapType"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="map_type"
+            length="20"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

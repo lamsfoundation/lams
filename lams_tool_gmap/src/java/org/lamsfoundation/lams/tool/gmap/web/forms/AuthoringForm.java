@@ -56,7 +56,29 @@ public class AuthoringForm extends ActionForm {
 
 	boolean lockOnFinished;
 	
-	boolean allowRichEditor;
+	private boolean allowEditMarkers;
+	
+	private boolean allowShowAllMarkers;
+	
+	private boolean limitMarkers;
+	
+	private int maxMarkers;
+	
+	private boolean allowZoom;
+	
+	private boolean allowTerrain;
+	
+	private boolean allowSatellite;
+	
+	private boolean allowHybrid;
+	
+	private Double mapCenterLatitude;
+	
+	private Double mapCenterLongitude;
+	
+	private int mapZoom;
+	
+	private String mapType;
 	
 	FormFile onlineFile; 
 
@@ -196,11 +218,99 @@ public class AuthoringForm extends ActionForm {
 		this.deleteFileUuid = deleteFile;
 	}
 
-	public boolean isAllowRichEditor() {
-		return allowRichEditor;
+	public boolean isAllowEditMarkers() {
+		return allowEditMarkers;
 	}
 
-	public void setAllowRichEditor(boolean allowRichEditor) {
-		this.allowRichEditor = allowRichEditor;
+	public void setAllowEditMarkers(boolean allowEditMarkers) {
+		this.allowEditMarkers = allowEditMarkers;
+	}
+
+	public boolean isAllowShowAllMarkers() {
+		return allowShowAllMarkers;
+	}
+
+	public void setAllowShowAllMarkers(boolean allowShowAllMarkers) {
+		this.allowShowAllMarkers = allowShowAllMarkers;
+	}
+
+	public boolean isLimitMarkers() {
+		return limitMarkers;
+	}
+
+	public void setLimitMarkers(boolean limitMarkers) {
+		this.limitMarkers = limitMarkers;
+	}
+
+	public int getMaxMarkers() {
+		return maxMarkers;
+	}
+
+	public void setMaxMarkers(int maxMarkers) {
+		this.maxMarkers = maxMarkers;
+	}
+
+	public boolean isAllowZoom() {
+		return allowZoom;
+	}
+
+	public void setAllowZoom(boolean allowZoom) {
+		this.allowZoom = allowZoom;
+	}
+
+	public boolean isAllowTerrain() {
+		return allowTerrain;
+	}
+
+	public void setAllowTerrain(boolean allowTerrain) {
+		this.allowTerrain = allowTerrain;
+	}
+
+	public boolean isAllowSatellite() {
+		return allowSatellite;
+	}
+
+	public void setAllowSatellite(boolean allowSatellite) {
+		this.allowSatellite = allowSatellite;
+	}
+
+	public boolean isAllowHybrid() {
+		return allowHybrid;
+	}
+
+	public void setAllowHybrid(boolean allowHybrid) {
+		this.allowHybrid = allowHybrid;
+	}
+
+	public Double getMapCenterLatitude() {
+		return mapCenterLatitude;
+	}
+
+	public void setMapCenterLatitude(Double mapCenterLatitude) {
+		this.mapCenterLatitude = mapCenterLatitude;
+	}
+
+	public Double getMapCenterLongitude() {
+		return mapCenterLongitude;
+	}
+
+	public void setMapCenterLongitude(Double mapCenterLongitude) {
+		this.mapCenterLongitude = mapCenterLongitude;
+	}
+
+	public int getMapZoom() {
+		return mapZoom;
+	}
+
+	public void setMapZoom(int mapZoom) {
+		this.mapZoom = mapZoom;
+	}
+
+	public String getMapType() {
+		return mapType;
+	}
+
+	public void setMapType(String mapType) {
+		this.mapType = mapType;
 	}
 }

@@ -28,7 +28,7 @@
 	<tr>
 		<td>
 			<div class="field-name">
-				Map:
+				<fmt:message key="label.authoring.basic.map"></fmt:message>
 			</div>
 			<!--  
 			<div id="map_canvas" style="width: 500px; height: 300px"></div> 
@@ -41,8 +41,13 @@
 									background:WhiteSmoke; "></div></td></tr>
 			</table>
 			
+			<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
+			<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
+			
+			<!-- 
 			<input type="button" onclick="addMarkerToCenter()"  value="Add Marker" />
 			<input type="button" onclick="fitMapMarkers()" value="Fit Markers" />
+			-->
 			<input type="button" onclick="test()"  value="Test" />
 		</td>
 	</tr>
@@ -50,11 +55,13 @@
 	<tr>
 		<td>
 			<div class="field-name">
-				Center map on address:
+				<fmt:message key="label.authoring.basic.centerMap"></fmt:message>
 			</div>
-			<input type="text" size="60" name="address" id="address" value="Macquarie University, Sydney NSW" />
+			<input type="text" size="60" name="address" id="address" value="<fmt:message key="label.authoring.basic.sampleAddress"></fmt:message>" />
+       		<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
+       		<!--  
        		<input type="button" onclick="showAddress()" value="Go!" />
-       		
+       		-->
        		
        		
        		<script type="text/javascript">
@@ -72,14 +79,10 @@
       		</c:forEach>
       		<script type="text/javascript">
 			<!--
-	       		if (markers.length == 1)
-	       		{
-	       			map.setCenter(markers[0].getPoint());
-	       		}
-	       		else if (markers.length >= 2)
-	       		{
-	       			fitMapMarkers();
-	       		}
+	       		map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
+	       		map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
+	       		map.setZoom(${formBean.gmap.mapZoom});
+	       		map.setMapType(${formBean.gmap.mapType});
 	       		refreshSideBar();
        		//-->
 			</script>

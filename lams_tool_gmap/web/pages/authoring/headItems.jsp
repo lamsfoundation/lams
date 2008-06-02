@@ -15,5 +15,8 @@
 <script type="text/javascript">
 <!--
 	var webAppUrl = "${tool}";
+	var errorMissingTitle = '<fmt:message key="error.missingMarkerTitle"/>';
+	var errorCantFindLocation = '<fmt:message key="error.cantFindAddress"/>'
+	var confirmDelete = '<fmt:message key="label.authoring.basic.confirmDelete"/>'
 //-->
 </script>

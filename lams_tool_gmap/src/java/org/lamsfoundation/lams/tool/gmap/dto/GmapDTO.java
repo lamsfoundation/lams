@@ -53,7 +53,7 @@ public class GmapDTO {
 	
 	public boolean contentInUse;
 	
-	public boolean allowRichEditor;
+	//public boolean allowRichEditor;
 	
 	public Set<GmapAttachmentDTO> onlineInstructionsFiles;
 
@@ -71,7 +71,7 @@ public class GmapDTO {
 		onlineInstructions = gmap.getOnlineInstructions();
 		offlineInstructions = gmap.getOfflineInstructions();
 		contentInUse = gmap.isContentInUse();
-		allowRichEditor = gmap.isAllowRichEditor();
+		//allowRichEditor = gmap.isAllowRichEditor();
 
 		onlineInstructionsFiles = new TreeSet<GmapAttachmentDTO>();
 		offlineInstructionsFiles = new TreeSet<GmapAttachmentDTO>();
@@ -175,11 +175,11 @@ public class GmapDTO {
 		this.contentInUse = contentInUse;
 	}
 
-	public boolean isAllowRichEditor() {
-		return allowRichEditor;
-	}
+	//public boolean isAllowRichEditor() {
+	//	return allowRichEditor;
+	//}
 
-	public void setAllowRichEditor(boolean allowRichEditor) {
-		this.allowRichEditor = allowRichEditor;
-	}
+	//public void setAllowRichEditor(boolean allowRichEditor) {
+	//	this.allowRichEditor = allowRichEditor;
+	//}
 }

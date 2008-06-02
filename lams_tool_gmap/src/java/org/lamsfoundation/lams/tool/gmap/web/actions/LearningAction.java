@@ -115,7 +115,7 @@ public class LearningAction extends LamsDispatchAction {
 		GmapDTO gmapDTO = new GmapDTO();
 		gmapDTO.title = gmap.getTitle();
 		gmapDTO.instructions = gmap.getInstructions();
-		gmapDTO.allowRichEditor = gmap.isAllowRichEditor();
+		//gmapDTO.allowRichEditor = gmap.isAllowRichEditor();
 		
 		request.setAttribute("gmapDTO", gmapDTO);
 

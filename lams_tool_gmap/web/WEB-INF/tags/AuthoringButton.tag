@@ -69,6 +69,7 @@
 	}
     function doSubmit_Form_Only() {
     	serialiseMarkers();
+    	saveMapState();
     	document.getElementById("${formID}").submit();
     }
     function doCancel() {

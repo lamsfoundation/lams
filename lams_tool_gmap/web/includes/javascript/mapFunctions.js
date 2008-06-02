@@ -24,26 +24,6 @@ function addMarker(point, infoMessage, title, uid, isSaved)
     	updateMarkerInfoWindowHtml(marker);
     });
     
-    GEvent.addListener(marker,'mouseover',function(){
-		//marker[i].setImage(markerImage[3]);
-		//alert("hello");
-		//document.getElementById("sidebar").getElementsByTagName("span")[markers.length].style.background ="blue";
-	});
-	
-	GEvent.addListener(marker,'mouseout',function()
-	{
-		//document.getElementById("sidebar").getElementsByTagName("span")[markers.length].style.background ="blue";
-		
-		/*if(marker[i].visited){
-			marker[i].setImage(markerImage[4]);
-			document.getElementById("sidebar").getElementsByTagName("span")[i].style.color ="gray";
-		
-		}else{
-		marker[i].setImage(markerImage[0]);
-		document.getElementById("sidebar").getElementsByTagName("span")[i].style.color ="black";
-		*/
-	});
-    
     if (infoMessage!=null)
     {
     	marker.infoMessage = unescape(infoMessage);
@@ -66,7 +46,6 @@ function addMarker(point, infoMessage, title, uid, isSaved)
     else {marker.state="unsaved";}
     
 	marker.sideBarLinkPrefix = "<span class='sidebar'><a href='javascript:GEvent.trigger(markers["+markers.length+"],\"click\")'>";
-    //marker.sideBarLinkSuffix = marker.title+"</a></span><br />"
     marker.removeLink = "<a href='javascript:removeMarker(" + markers.length + ")'>Remove</a>" ;
    	marker.editLink = "<a href='javascript:editMarker(" + markers.length + ")'>Edit</a>";
    	marker.saveLink = "<a href='javascript:saveMarkerInfo(" + markers.length + "); openInfoWindow("+ markers.length +");'>Save</a>";
@@ -107,7 +86,7 @@ function test()
 
 function removeMarker(x)
 {
-	var ans = confirm("Are you sure you want to remove this marker?");
+	var ans = confirm(confirmDelete);
 	if (ans)
 	{
 		try{map.removeOverlay(markers[x]);}
@@ -201,7 +180,7 @@ function showAddress()
 			{
 				if (!point) 
 				{
-					alert(address + " not found");
+					alert(errorCantFindLocation + " " + address );
 				} 
 				else 
 				{
@@ -222,7 +201,9 @@ function fitMapMarkers()
       bounds.extend(markers[i].getPoint());
    }
    map.setZoom(map.getBoundsZoomLevel(bounds));
-   map.setCenter(bounds.getCenter());
+   //map.setCenter(bounds.getCenter());
+   map.panTo(bounds.getCenter());
+   
 }
 
 /*
@@ -248,7 +229,7 @@ function saveMarkerInfo(x)
 		var title= trim(document.getElementById("markerTitle").value);
 		if (title==null || title == "")
 		{
-			alert("Title is required.");
+			alert(errorMissingTitle);
 			return false;
 		}
 		else
@@ -353,6 +334,33 @@ function serialiseMarkers()
 	xmlString += "</markers>"
 	document.authoringForm.markersXML.value=xmlString;
 }
+
+// TODO: This method should only be included for the authoring pages, put them in another file
+function saveMapState()
+{
+	document.authoringForm.mapZoom.value=map.getZoom();
+	document.authoringForm.mapCenterLatitude.value=map.getCenter().lat();
+	document.authoringForm.mapCenterLongitude.value=map.getCenter().lng();
+	
+	var mapTypeName = map.getCurrentMapType().getName();
+	
+	alert("TYPE: " +mapTypeName);
+	
+	var mapType = "";	
+	if 		(mapTypeName == "Satellite") { mapType = "G_SATELLITE_MAP"; }
+	else if (mapTypeName == "Hybrid") { mapType = "G_HYBRID_MAP"; }
+	else if (mapTypeName == "Terrain") { mapType = "G_PHYSICAL_MAP"; }
+	else { mapType = "G_NORMAL_MAP"; }
+	
+	document.authoringForm.mapType.value=mapType;
+	
+	alert(document.authoringForm.mapZoom.value);
+	alert(document.authoringForm.mapCenterLatitude.value);
+	alert(document.authoringForm.mapCenterLongitude.value);
+	alert(document.authoringForm.mapType.value);
+}
+
+
 
 
 

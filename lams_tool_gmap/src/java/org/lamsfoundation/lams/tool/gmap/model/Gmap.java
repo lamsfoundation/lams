@@ -66,7 +66,29 @@ public class Gmap implements java.io.Serializable, Cloneable {
 
 	private boolean lockOnFinished;
 	
-	private boolean allowRichEditor;
+	private boolean allowEditMarkers;
+	
+	private boolean allowShowAllMarkers;
+	
+	private boolean limitMarkers;
+	
+	private int maxMarkers;
+	
+	private boolean allowZoom;
+	
+	private boolean allowTerrain;
+	
+	private boolean allowSatellite;
+	
+	private boolean allowHybrid;
+	
+	private Double mapCenterLatitude;
+	
+	private Double mapCenterLongitude;
+	
+	private int mapZoom;
+	
+	private String mapType;
 
 	private String onlineInstructions;
 
@@ -229,18 +251,6 @@ public class Gmap implements java.io.Serializable, Cloneable {
 
 	public void setLockOnFinished(boolean lockOnFinished) {
 		this.lockOnFinished = lockOnFinished;
-	}
-	
-	/**
-	 * @hibernate.property column="allow_rich_editor" length="1"
-	 * @return
-	 */
-	public boolean isAllowRichEditor() {
-		return allowRichEditor;
-	}
-
-	public void setAllowRichEditor(boolean allowRichEditor) {
-		this.allowRichEditor = allowRichEditor;
 	}
 
 	/**
@@ -489,9 +499,161 @@ public class Gmap implements java.io.Serializable, Cloneable {
 			}
 		}
 	}
-	
-	
-	
 
+	
+	/**
+	 * @hibernate.property column="allow_edit_markers" length="1"
+	 * 
+	 */
+	
+	public boolean isAllowEditMarkers() {
+		return allowEditMarkers;
+	}
+
+	public void setAllowEditMarkers(boolean allowEditMarkers) {
+		this.allowEditMarkers = allowEditMarkers;
+	}
+
+	/**
+	 * @hibernate.property column="show_all_markers" length="1"
+	 * 
+	 */
+	
+	public boolean isAllowShowAllMarkers() {
+		return allowShowAllMarkers;
+	}
+
+	public void setAllowShowAllMarkers(boolean allowShowAllMarkers) {
+		this.allowShowAllMarkers = allowShowAllMarkers;
+	}
+
+	/**
+	 * @hibernate.property column="limit_markers" length="1"
+	 * 
+	 */
+	
+	public boolean isLimitMarkers() {
+		return limitMarkers;
+	}
+
+	public void setLimitMarkers(boolean limitMarkers) {
+		this.limitMarkers = limitMarkers;
+	}
+
+	/**
+	 * @hibernate.property column="max_markers"
+	 * 
+	 */
+	
+	public int getMaxMarkers() {
+		return maxMarkers;
+	}
+
+	public void setMaxMarkers(int maxMarkers) {
+		this.maxMarkers = maxMarkers;
+	}
+
+	/**
+	 * @hibernate.property column="allow_zoom" length="1"
+	 * 
+	 */
+	
+	public boolean isAllowZoom() {
+		return allowZoom;
+	}
+
+	public void setAllowZoom(boolean allowZoom) {
+		this.allowZoom = allowZoom;
+	}
+
+	/**
+	 * @hibernate.property column="allow_terrain" length="1"
+	 * 
+	 */
+	
+	public boolean isAllowTerrain() {
+		return allowTerrain;
+	}
+
+	public void setAllowTerrain(boolean allowTerrain) {
+		this.allowTerrain = allowTerrain;
+	}
+
+	/**
+	 * @hibernate.property column="allow_satellite" length="1"
+	 * 
+	 */
+	
+	public boolean isAllowSatellite() {
+		return allowSatellite;
+	}
+
+	public void setAllowSatellite(boolean allowSatellite) {
+		this.allowSatellite = allowSatellite;
+	}
+
+	/**
+	 * @hibernate.property column="allow_hybrid" length="1"
+	 * 
+	 */
+	
+	public boolean isAllowHybrid() {
+		return allowHybrid;
+	}
+
+	public void setAllowHybrid(boolean allowHybrid) {
+		this.allowHybrid = allowHybrid;
+	}
+
+	/**
+	 * 
+	 * @hibernate.property column="map_center_latitude"
+	 */
+	
+	public Double getMapCenterLatitude() {
+		return mapCenterLatitude;
+	}
+
+	public void setMapCenterLatitude(Double mapCenterLatitude) {
+		this.mapCenterLatitude = mapCenterLatitude;
+	}
+
+	/**
+	 * 
+	 * @hibernate.property column="map_center_longitude"
+	 */
+	
+	public Double getMapCenterLongitude() {
+		return mapCenterLongitude;
+	}
+
+	public void setMapCenterLongitude(Double mapCenterLongitude) {
+		this.mapCenterLongitude = mapCenterLongitude;
+	}
+
+	/**
+	 * 
+	 * @hibernate.property column="map_zoom"
+	 */
+	
+	public int getMapZoom() {
+		return mapZoom;
+	}
+
+	public void setMapZoom(int mapZoom) {
+		this.mapZoom = mapZoom;
+	}
+
+	/**
+	 * 
+	 * @hibernate.property column="map_type" length ="20"
+	 */
+	public String getMapType() {
+		return mapType;
+	}
+
+	public void setMapType(String mapType) {
+		this.mapType = mapType;
+	}
 
 }

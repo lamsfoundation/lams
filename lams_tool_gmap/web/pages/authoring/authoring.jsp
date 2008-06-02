@@ -1,7 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<%@ page
-	import="org.lamsfoundation.lams.tool.gmap.util.GmapConstants"%>
+<%@ page import="org.lamsfoundation.lams.tool.gmap.util.GmapConstants"%>
 
 
 <html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data">
@@ -38,6 +37,10 @@
 		<html:hidden property="dispatch" value="updateContent" />
 		<html:hidden property="sessionMapID" />
 		<html:hidden property="markersXML" value=""/>
+		<html:hidden property="mapZoom" value=""/>
+		<html:hidden property="mapCenterLatitude" value=""/>
+		<html:hidden property="mapCenterLongitude" value=""/>
+		<html:hidden property="mapType" value=""/>
 
 
 		<div id="message" style="text-align: center;">

@@ -397,7 +397,18 @@ public class AuthoringAction extends LamsDispatchAction {
 			gmap.setOfflineInstructions(authForm.getOnlineInstruction());
 			gmap.setOnlineInstructions(authForm.getOfflineInstruction());
 			gmap.setLockOnFinished(authForm.isLockOnFinished());
-			gmap.setAllowRichEditor(authForm.isAllowRichEditor());
+			gmap.setAllowEditMarkers(authForm.isAllowEditMarkers());
+			gmap.setAllowShowAllMarkers(authForm.isAllowShowAllMarkers());
+			gmap.setMaxMarkers(authForm.getMaxMarkers());
+			gmap.setLimitMarkers(authForm.isLimitMarkers());
+			gmap.setAllowZoom(authForm.isAllowZoom());
+			gmap.setAllowTerrain(authForm.isAllowTerrain());
+			gmap.setAllowSatellite(authForm.isAllowSatellite());
+			gmap.setAllowHybrid(authForm.isAllowHybrid());
+			gmap.setMapType(authForm.getMapType());
+			gmap.setMapZoom(authForm.getMapZoom());
+			gmap.setMapCenterLatitude(authForm.getMapCenterLatitude());
+			gmap.setMapCenterLongitude(authForm.getMapCenterLongitude());
 		}
 	}
 	
@@ -480,7 +491,19 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.setOnlineInstruction(gmap.getOnlineInstructions());
 		authForm.setOfflineInstruction(gmap.getOfflineInstructions());
 		authForm.setLockOnFinished(gmap.isLockOnFinished());
-		authForm.setAllowRichEditor(gmap.isAllowRichEditor());
+		//authForm.setAllowRichEditor(gmap.isAllowRichEditor());
+		authForm.setAllowEditMarkers(gmap.isAllowEditMarkers());
+		authForm.setAllowShowAllMarkers(gmap.isAllowShowAllMarkers());
+		authForm.setMaxMarkers(gmap.getMaxMarkers());
+		authForm.setLimitMarkers(gmap.isLimitMarkers());
+		authForm.setAllowZoom(gmap.isAllowZoom());
+		authForm.setAllowTerrain(gmap.isAllowTerrain());
+		authForm.setAllowSatellite(gmap.isAllowSatellite());
+		authForm.setAllowHybrid(gmap.isAllowHybrid());
+		authForm.setMapType(gmap.getMapType());
+		authForm.setMapZoom(gmap.getMapZoom());
+		authForm.setMapCenterLatitude(gmap.getMapCenterLatitude());
+		authForm.setMapCenterLongitude(gmap.getMapCenterLongitude());
 	}
 
 	/**
