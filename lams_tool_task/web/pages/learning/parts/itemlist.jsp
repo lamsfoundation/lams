@@ -132,8 +132,8 @@
 						</c:when>
 								
 						<c:otherwise>
-							<%--<fmt:message key="label.completed" /> --%>
-							<img src="<html:rewrite page='/includes/images/cross.gif'/>" border="0"> 
+							<%--<img src="<html:rewrite page='/includes/images/cross.gif'/>" border="0"> --%>
+							<img src="<html:rewrite page='/includes/images/dash.jpeg'/>" border="0">
 						</c:otherwise>
 					</c:choose>
 				</td>
