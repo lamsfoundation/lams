@@ -127,7 +127,7 @@
 						<c:when	test="${(mode != 'teacher') && (not finishedLock) && (not taskList.sequentialOrder || itemDTO.previousTaskCompleted) 
 									&& itemDTO.commentRequirementsMet && itemDTO.attachmentRequirementsMet}">
 							<a href="javascript:;" onclick="return completeItem(${item.uid})">
-								<fmt:message key="label.completed" /> 
+								<img src="<html:rewrite page='/includes/images/empty_checkbox.jpeg'/>" title="<fmt:message key='label.completed' />" border="0" > 
 							</a>
 						</c:when>
 								
