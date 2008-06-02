@@ -18,19 +18,19 @@ create table tl_latask10_attachment (
    create_date datetime,
    taskList_uid bigint,
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_latask10_condition (
    condition_uid bigint not null auto_increment,
    sequence_id integer,
    taskList_uid bigint,
    name varchar(255),
    primary key (condition_uid)
-);
+)TYPE=InnoDB;
 create table tl_latask10_condition_tl_item (
    uid bigint not null,
    condition_uid bigint not null,
    primary key (uid, condition_uid)
-);
+)TYPE=InnoDB;
 create table tl_latask10_taskList (
    uid bigint not null auto_increment,
    create_date datetime,
@@ -52,7 +52,7 @@ create table tl_latask10_taskList (
    reflect_instructions varchar(255), 
    reflect_on_activity smallint, 
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_latask10_taskList_item (
    uid bigint not null auto_increment,
    sequence_id integer,
@@ -75,7 +75,7 @@ create table tl_latask10_taskList_item (
    taskList_uid bigint,
    session_uid bigint,
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_latask10_item_log (
    uid bigint not null auto_increment,
    access_date datetime,
@@ -84,7 +84,7 @@ create table tl_latask10_item_log (
    complete tinyint,
    session_id bigint,
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_latask10_item_attachment (
    uid bigint not null auto_increment,
    file_version_id bigint,
@@ -95,7 +95,7 @@ create table tl_latask10_item_attachment (
    taskList_item_uid bigint,
    create_by bigint,
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_latask10_item_comment (
    uid bigint not null auto_increment,
    comment text,
@@ -103,7 +103,7 @@ create table tl_latask10_item_comment (
    create_by bigint,
    create_date datetime,
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_latask10_session (
    uid bigint not null auto_increment,
    session_end_date datetime,
@@ -113,7 +113,7 @@ create table tl_latask10_session (
    session_id bigint,
    session_name varchar(250),
    primary key (uid)
-);
+)TYPE=InnoDB;
 create table tl_latask10_user (
    uid bigint not null auto_increment,
    user_id bigint,
@@ -125,7 +125,7 @@ create table tl_latask10_user (
    taskList_uid bigint,
    is_verified_by_monitor tinyint,
    primary key (uid)
-);
+)TYPE=InnoDB;
 alter table tl_latask10_attachment add index FK_NEW_174079138_1E7009430E79035 (taskList_uid), add constraint FK_NEW_174079138_1E7009430E79035 foreign key (taskList_uid) references tl_latask10_taskList (uid);
 alter table tl_latask10_condition add index FK_tl_latask10_condition_1 (taskList_uid), add constraint FK_tl_latask10_condition_1 foreign key (taskList_uid) references tl_latask10_taskList (uid);
 alter table tl_latask10_condition_tl_item add index FK_tl_latask10_taskList_item_condition_1 (condition_uid), add constraint FK_tl_latask10_taskList_item_condition_1 foreign key (condition_uid) references tl_latask10_condition (condition_uid);
