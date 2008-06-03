@@ -9,7 +9,7 @@
 	</lams:head>
 	<body>
 
-		<table class="wiki" cellspacing="0">
+		<table class="forum" cellspacing="0">
 			<!-- Basic Info Form-->
 			<tr>
 				<th>

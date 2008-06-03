@@ -40,7 +40,7 @@
 	</label>
 </p>
 
-<p>
+<!--  <p>
 	<html:checkbox property="wiki.allowRevertPage" styleClass="noBorder"
 		styleId="allowRevertPage">
 	</html:checkbox>
@@ -48,15 +48,7 @@
 		<fmt:message key="label.authoring.advance.allow.revert.page" />
 	</label>
 </p>
-
-<p>
-	<html:checkbox property="wiki.allowUpload" styleClass="noBorder"
-		styleId="allowUpload">
-	</html:checkbox>
-	<label for="allowUpload">
-		<fmt:message key="label.authoring.advance.allow.upload" />
-	</label>
-</p>
+-->
 
 <p>
 	<html:checkbox property="wiki.reflectOnActivity" styleClass="noBorder"	styleId="reflectOn">

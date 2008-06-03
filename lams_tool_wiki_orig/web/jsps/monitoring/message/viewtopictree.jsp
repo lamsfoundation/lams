@@ -4,7 +4,7 @@
 <c:forEach var="msgDto" items="${topicThread}">
 	<c:set var="indentSize" value="${msgDto.level*3}" />
 	<div style="margin-left:<c:out value="${indentSize}"/>em;">
-		<table cellspacing="0" class="wiki">
+		<table cellspacing="0" class="forum">
 			<tr>
 				<th class="first">
 					<b> <c:out value="${msgDto.message.subject}" /> </b>

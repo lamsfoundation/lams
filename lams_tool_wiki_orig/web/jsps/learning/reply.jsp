@@ -20,7 +20,7 @@
 	<p><!--  Begins Original Message  -->
 	
 	<div>
-	<table cellspacing="0" class="wiki">
+	<table cellspacing="0" class="forum">
 		<tr>
 			<th><c:out value='${originalMessage.message.subject}'
 				escapeXml='false' /></th>

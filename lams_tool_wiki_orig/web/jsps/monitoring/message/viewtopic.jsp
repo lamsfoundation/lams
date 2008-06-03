@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<table class="wiki" cellspacing="0">
+<table class="forum" cellspacing="0">
 	<tbody>
 		<tr>
 			<th class="first" scope="col">
