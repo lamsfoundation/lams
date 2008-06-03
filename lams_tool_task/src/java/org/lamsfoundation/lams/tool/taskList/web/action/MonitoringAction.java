@@ -80,20 +80,17 @@ public class MonitoringAction extends Action {
 	}
 
 	private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		ITaskListService service = getTaskListService();
-		
-		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
 		
 		//initial Session Map 
 		SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+		
 		request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-		//save contentFolderID into session
-		sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID));
-
 		request.setAttribute("initialTabId",WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
+		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
 
+		ITaskListService service = getTaskListService();
 		TaskList taskList = service.getTaskListByContentId(contentId);
 		taskList.toDTO();
 		
@@ -104,6 +101,7 @@ public class MonitoringAction extends Action {
 		sessionMap.put(TaskListConstants.PAGE_EDITABLE, taskList.isContentInUse());
 		sessionMap.put(TaskListConstants.ATTR_RESOURCE, taskList);
 		sessionMap.put(TaskListConstants.ATTR_TOOL_CONTENT_ID, contentId);
+		sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID));
 		
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}
@@ -115,7 +113,7 @@ public class MonitoringAction extends Action {
 		Long taskListItemId = WebUtil.readLongParam(request, TaskListConstants.ATTR_TASK_LIST_ITEM_UID);
 		request.setAttribute(TaskListConstants.ATTR_TASK_LIST_ITEM, service.getTaskListItemByUid(taskListItemId));
 		
-		List<GroupSummary> groupSummaryList = service.getItemSummary(contentId, taskListItemId);
+		List<GroupSummary> groupSummaryList = service.getItemSummary(contentId, taskListItemId, false);
 		request.setAttribute(TaskListConstants.ATTR_GROUP_SUMMARY_LIST, groupSummaryList);
 						
 		return mapping.findForward(TaskListConstants.SUCCESS);

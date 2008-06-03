@@ -62,6 +62,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -467,7 +468,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	/** 
 	 * {@inheritDoc}
 	 */
-	public List<GroupSummary> getItemSummary(Long contentId, Long taskListItemUid) {
+	public List<GroupSummary> getItemSummary(Long contentId, Long taskListItemUid, boolean isExportProcessing) {
 		
 		TaskListItem taskListItem = taskListItemDao.getByUid(taskListItemUid);
 		
@@ -507,6 +508,25 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 					userItemSummary.setCompleted(false);
 				}
 				
+				//if we're doing export then fill up all the itemSummaries with reflection information
+				if (isExportProcessing) {
+
+					NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, 
+							TaskListConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+					
+					ReflectDTO reflectDTO = new ReflectDTO(user);
+					if(notebookEntry == null){
+						reflectDTO.setFinishReflection(false);
+						reflectDTO.setReflect(null);
+					}else{
+						reflectDTO.setFinishReflection(true);
+						reflectDTO.setReflect(notebookEntry.getEntry());
+					}
+					reflectDTO.setReflectInstructions(session.getTaskList().getReflectInstructions());
+					
+					userItemSummary.setReflectDTO(reflectDTO);
+				}
+				
 				groupSummary.getItemSummaries().add(userItemSummary);
 			}
 			groupSummaries.add(groupSummary);
@@ -536,7 +556,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		
 		List<List<GroupSummary>> taskSummaries = new ArrayList<List<GroupSummary>>();
 		for(TaskListItem item:itemList) {
-			taskSummaries.add(getItemSummary(contentId, item.getUid()));
+			taskSummaries.add(getItemSummary(contentId, item.getUid(), true));
 		}
 		
 		return taskSummaries;
@@ -564,7 +584,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		
 		List<List<GroupSummary>> eachItemOverallSummaries = new ArrayList<List<GroupSummary>>();
 		for(TaskListItem item:itemList) {
-			eachItemOverallSummaries.add(getItemSummary(contentId, item.getUid()));
+			eachItemOverallSummaries.add(getItemSummary(contentId, item.getUid(), true));
 		}
 		
 		//get rid of information that doesn't belong to the current user

@@ -178,6 +178,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		
 		sessionMap.put(TaskListConstants.ATTR_TITLE, content.getTitle());
 		sessionMap.put(TaskListConstants.ATTR_ITEM_SUMMARY_LIST, itemSummaries);
+		sessionMap.put(TaskListConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
 	}
 
 	/**
@@ -218,6 +219,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		// put it into HTTPSession
 		sessionMap.put(TaskListConstants.ATTR_TITLE, content.getTitle());
 		sessionMap.put(TaskListConstants.ATTR_ITEM_SUMMARY_LIST, itemSummaries);
+		sessionMap.put(TaskListConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
 	}
 
     /**
@@ -271,31 +273,5 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     	    }
     	    return handler;
 	}
-	
-	private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		
-		Long uid = WebUtil.readLongParam(request, TaskListConstants.ATTR_USER_UID); 
-		
-		ITaskListService service = TaskListServiceProxy.getTaskListService(getServletContext());
-		TaskListUser user = service.getUser(uid);
-		Long sessionID = user.getSession().getSessionId();
-		NotebookEntry notebookEntry = service.getEntry(sessionID, 
-				CoreNotebookConstants.NOTEBOOK_TOOL, 
-				TaskListConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		
-		TaskListSession session = service.getTaskListSessionBySessionId(sessionID);
-		
-		ReflectDTO refDTO = new ReflectDTO(user);
-		if(notebookEntry == null){
-			refDTO.setFinishReflection(false);
-			refDTO.setReflect(null);
-		}else{
-			refDTO.setFinishReflection(true);
-			refDTO.setReflect(notebookEntry.getEntry());
-		}
-		refDTO.setReflectInstructions(session.getTaskList().getReflectInstructions());
-		
-		request.setAttribute("userDTO", refDTO);
-		return mapping.findForward("success");
-	}
+
 }

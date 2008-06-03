@@ -355,9 +355,10 @@ public interface ITaskListService {
 	 * 
 	 * @param contentId toolContenId
 	 * @param taskListItemUid specified TaskListItem uid
+	 * @param isExportProcessing true if this method called for export, false otherwise
 	 * @return
 	 */
-	List<GroupSummary> getItemSummary(Long contentId, Long taskListItemUid);
+	List<GroupSummary> getItemSummary(Long contentId, Long taskListItemUid, boolean isExportProcessing);
 	
 }
 

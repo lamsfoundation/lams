@@ -47,6 +47,9 @@ public class ItemSummary {
 	private List<TaskListItemComment> comments;
 	private List<TaskListItemAttachment> attachments;
 	
+	//using only during export
+	private ReflectDTO reflectDTO;
+	
 	public ItemSummary() {
 		comments = new ArrayList<TaskListItemComment>();
 		attachments = new ArrayList<TaskListItemAttachment>();
@@ -139,6 +142,23 @@ public class ItemSummary {
 	 */
 	public void setAttachments(List<TaskListItemAttachment> attachments) {
 		this.attachments = attachments;
+	}
+	
+	/**
+	 * Returns ReflectDTO.
+	 * 
+	 * @return ReflectDTO
+	 */
+	public ReflectDTO getReflectDTO() {
+		return reflectDTO;
+	}
+	/**
+	 * Sets ReflectDTO.
+	 * 
+	 * @param reflectDTO ReflectDTO
+	 */
+	public void setReflectDTO(ReflectDTO reflectDTO) {
+		this.reflectDTO = reflectDTO;
 	}
 	
 }
