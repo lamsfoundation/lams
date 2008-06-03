@@ -160,7 +160,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 	        	exportPortfolioDTO.setShowResults(Boolean.FALSE.toString());
 	    	}
 	    	
-	    	//	voteMonitoringAction.prepareReflectionData(request, content, voteService, userID.toString(),true);
+	    	voteMonitoringAction.prepareReflectionData(request, content, voteService, userID.toString(), true, "");
 	     } else {
 	    	 // thise field is needed for the jsp.
 	    	 exportPortfolioDTO.setUserExceptionNoToolSessions("false");
