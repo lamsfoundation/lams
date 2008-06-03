@@ -653,6 +653,7 @@ public class LearningAction extends Action {
 		messagePO.setSubject(message.getSubject());
 		messagePO.setBody(message.getBody());
 		messagePO.setUpdated(new Date());
+		messagePO.setReplyNumber(messagePO.getReplyNumber() + 1);
 		messagePO.setModifiedBy(getCurrentUser(request,(Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID)));
 		setAttachment(messageForm, messagePO);
 
