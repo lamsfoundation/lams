@@ -84,27 +84,31 @@
 			${taskList.title}
 		</h1>
 		
-		<c:if test="${mode == 'author' || mode == 'learner'}">
-			<c:if test="${taskList.lockWhenFinished}">
-		    	<div class="info space-bottom">
-			   		<c:choose>
-				    	<c:when test = "${finishedLock}">
-							<fmt:message key="label.learning.responses.locked.reminder" />								
-					    </c:when>
-					    <c:otherwise>
-							<fmt:message key="label.learning.responses.locked" />								
-					    </c:otherwise>
-				   </c:choose>
-				</div>
-			</c:if>
+		<c:if test="${(mode != 'teacher') && taskList.lockWhenFinished}">
+	    	<div class="info space-bottom">
+		   		<c:choose>
+			    	<c:when test = "${finishedLock}">
+						<fmt:message key="label.learning.responses.locked.reminder" />								
+				    </c:when>
+				    <c:otherwise>
+						<fmt:message key="label.learning.responses.locked" />								
+				    </c:otherwise>
+			   </c:choose>
+			</div>
 	   </c:if>
+	   
+	   	<c:if test="${(mode != 'teacher') && taskList.sequentialOrder}">
+	    	<div class="info space-bottom">
+				<fmt:message key="label.learning.info.sequential.order" />								
+			</div>
+	   </c:if>
+	   
+	   	<%@ include file="/common/messages.jsp"%>
 
 		<p>
 			${taskList.instructions}
 		</p>
 		
-		<%@ include file="/common/messages.jsp"%>
-
 		<!--TaskListItems table-->
 		
 		<%@ include file="/pages/learning/parts/itemlist.jsp"%>
