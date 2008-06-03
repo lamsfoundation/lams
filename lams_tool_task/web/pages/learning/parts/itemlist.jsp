@@ -87,22 +87,6 @@
 						</c:if>
 					</a>
 					
-					<c:if test="${mode != 'teacher' && (!itemDTO.commentRequirementsMet || !itemDTO.attachmentRequirementsMet)}">
-						<div class="info space-bottom">
-							<c:choose>
-								<c:when test="${!itemDTO.commentRequirementsMet && !itemDTO.attachmentRequirementsMet}">
-									<fmt:message key="label.learning.info.comment.and.attachment.required" />		
-								</c:when>
-								<c:when test="${!itemDTO.commentRequirementsMet}">
-									<fmt:message key="label.learning.info.add.comment.required" />		
-								</c:when>							
-								<c:when test="${!itemDTO.attachmentRequirementsMet}">
-									<fmt:message key="label.learning.info.upload.file.required" />	
-								</c:when>							
-							</c:choose>
-						</div>
-					</c:if>
-					
 					<c:choose>
 						<c:when test="${itemDTO.displayedOpen}">
 							<c:set var="displayStyle" value="block" />

@@ -1,16 +1,42 @@
 <html:form action="learning/addNewComment" method="post" enctype="multipart/form-data">
 
 	<p>${item.description}</p>
-
+<!-- 	
+					<c:if test="${mode != 'teacher' && (!itemDTO.commentRequirementsMet || !itemDTO.attachmentRequirementsMet)}">
+						<div class="info space-bottom">
+							<c:choose>
+								<c:when test="${!itemDTO.commentRequirementsMet && !itemDTO.attachmentRequirementsMet}">
+									<fmt:message key="label.learning.info.comment.and.attachment.required" />		
+								</c:when>
+								<c:when test="${!itemDTO.commentRequirementsMet}">
+									<fmt:message key="label.learning.info.add.comment.required" />		
+								</c:when>							
+								<c:when test="${!itemDTO.attachmentRequirementsMet}">
+									<fmt:message key="label.learning.info.upload.file.required" />	
+								</c:when>							
+							</c:choose>
+						</div>
+					</c:if>
+ -->
 	<c:if test="${item.commentsFilesAllowed}">
 				
 		<!-- Comments Part -->
 		<c:if test="${item.commentsAllowed}">
-		
-			<br/><br/>
+
+			<c:choose>
+				<c:when test="${(mode != 'teacher') && !itemDTO.commentRequirementsMet}">
+					<div class="info space-bottom">
+						<fmt:message key="label.learning.info.add.comment.required" />
+					</div>
+				</c:when>
+				<c:otherwise>
+					<br/>
+				</c:otherwise>
+			</c:choose>
+					
 			<%@ include file="commentlist.jsp"%>
 				
-			<c:if test="${sessionMap.mode != 'teacher'}">
+			<c:if test="${mode != 'teacher'}">
 				<div class="field-name">
 					<fmt:message key="label.preview.add.comment" />
 				</div>
@@ -28,6 +54,18 @@
 						
 		<!-- Uploaded Attachments -->	
 		<c:if test="${item.filesAllowed}">
+		
+			<c:choose>
+				<c:when test="${(mode != 'teacher') && !itemDTO.attachmentRequirementsMet}">
+					<div class="info space-bottom">
+						<fmt:message key="label.learning.info.upload.file.required" />
+					</div>
+				</c:when>
+				<c:otherwise>
+					<br/>
+				</c:otherwise>
+			</c:choose>
+		
 			<%@ include file="filelist.jsp"%>
 						
 			<c:if test="${sessionMap.mode != 'teacher'}">

@@ -84,6 +84,12 @@
 			${taskList.title}
 		</h1>
 		
+ 	   	<%@ include file="/common/messages.jsp"%>
+
+		<p>
+			${taskList.instructions}
+		</p>
+		
 		<c:if test="${(mode != 'teacher') && taskList.lockWhenFinished}">
 	    	<div class="info space-bottom">
 		   		<c:choose>
@@ -102,12 +108,6 @@
 				<fmt:message key="label.learning.info.sequential.order" />								
 			</div>
 	   </c:if>
-	   
-	   	<%@ include file="/common/messages.jsp"%>
-
-		<p>
-			${taskList.instructions}
-		</p>
 		
 		<!--TaskListItems table-->
 		
