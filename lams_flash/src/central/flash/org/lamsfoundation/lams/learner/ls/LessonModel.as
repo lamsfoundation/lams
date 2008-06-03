@@ -370,9 +370,9 @@ class LessonModel extends Observable {
 				if(children[i].stopAfterActivity && !backtrack) return false;
 				
 			} else {
-				
+				/**
 				Debugger.log("progress: " + _progressStr + " for id: " + firstActivitySeq.activityID, Debugger.CRITICAL, "orderDesign", "LessonModel");
-			
+
 				if(_progressStr == "current_mc") {
 					for(var j=i; j>0; j--) {
 						if(!orderDesignChildren(children, j-1, order, true)) return false;
@@ -387,7 +387,7 @@ class LessonModel extends Observable {
 					if(!orderDesign(firstActivitySeq, order, backtrack)) return false;
 					if(children[i].stopAfterActivity && !backtrack) return false;
 				}
-				
+				*/
 			}
 			
 		}

@@ -39,11 +39,13 @@ import org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView;
 import org.lamsfoundation.lams.common.style. *;
 
 import mx.controls. *;
-import mx.managers. *
+import mx.managers. *;
+
 /**
 * CanvasOptionalActivity
 * This is the UI / view representation of a complex (Optional) activity
 */
+
 class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 {
 	private var CHILD_OFFSET_X : Number = 8;
@@ -52,8 +54,6 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	private var LABEL_W:Number = 130;
 	private var LABEL_H:Number = 22;
-	
-	//private var count:Number;
 	
 	//this is set by the init object
 	private var _controller:AbstractController;
@@ -68,6 +68,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private var container_pnl:MovieClip;
 	private var title_lbl:MovieClip;
 	private var labelHolder_mc:MovieClip;
+	
 	//locals
 	private var actStatus:String;
 	private var childActivities_mc : MovieClip;
@@ -99,6 +100,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	private var _nested:Boolean;
 	private var _level:Number;
+	private var _complexLevel:Number;
 	
 	private var activeSequence:SequenceActivity;
 	private var activeComplex:ComplexActivity;
@@ -108,6 +110,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	function LearnerComplexActivity () {
 		complexActivity_mc = this;
+		
 		activeSequence = null;
 		activeComplex = null;
 		
@@ -125,6 +128,8 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		if(!_nested)
 			_level = 0;
+			
+		_complexLevel = 0;
 		
 		init();
 	}
@@ -169,8 +174,6 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private function clearDelegates():Void {
 		
 		// run delegates
-		Debugger.log("del length: " + delegates.length, Debugger.CRITICAL, "init", "LearnerComplexActivity");
-		
 		if(delegates.length > 0) {
 			MovieClipUtils.doLater(Function(delegates.shift()));
 		} else {
@@ -193,7 +196,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private function drawChildren(_children:Array, index:Number):Number {
 		var childCoordY:Number = 0;
 		
-		Debugger.log("draw children: " + _children.length + " :: index: " + index, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
+		Debugger.log("draw children: " + _children.length + " :: index: " + index + " :: level: " + _level, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
 		
 		var _idx=0;
 		if(index != null) _idx = index; 
@@ -204,16 +207,15 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			var progStatus:String = Progress.compareProgressData(learner, _children[i].activityID);
 			var parentAct:Activity = (model instanceof LessonModel) ? model.learningDesignModel.getActivityByUIID(Activity(_children[i]).parentUIID) : model.ddm.getActivityByUIID(Activity(_children[i]).parentUIID);
 			
-			Debugger.log("children_mc length: " + children_mc.length, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
-			
 			if(children_mc.length > 0)
 				childCoordY = (children_mc[children_mc.length-1] instanceof LearnerComplexActivity) ? children_mc[children_mc.length-1]._y + children_mc[children_mc.length-1].getChildrenHeight() : children_mc[children_mc.length-1]._y + 21; // (count*21);
 				
 			Debugger.log("progStatus: " + progStatus, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
-			Debugger.log("childCoordY: " + childCoordY, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
 			
-			var _newLevel:Number = (parentAct.isOptionalSequenceActivity(activity)) ? _level + 1 : _level;
+			var _newLevel:Number = (parentAct.isOptionalSequenceActivity(activity) || parentAct.isSequenceActivity()) ? 1 : 0;
 			learnerAct = LearnerActivity(childHolder_mc.createChildAtDepth("LearnerActivity_forComplex", childHolder_mc.getNextHighestDepth(), {_activity:_children[i], _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _complex:true, _level: _newLevel, xPos:this._x, yPos:childCoordY}));
+			
+			Debugger.log('newLevel:' + _newLevel,Debugger.CRITICAL,'drawChildren','LearnerComplexActivity');
 			
 			Debugger.log('attaching child movieL ' + learnerAct,Debugger.CRITICAL,'drawChildren','LearnerComplexActivity');
 			
@@ -225,38 +227,39 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			
 			learnerAct._visible = true;
 			
-			Debugger.log('x: ' + learnerAct._x + ' y: ' +  learnerAct._y, Debugger.CRITICAL, 'drawChildren', 'LearnerComplexActivity');
-        
 			if((activity.isBranchingActivity() && parentAct.isSequenceActivity()) || (activity.isOptionsWithSequencesActivity() && parentAct.isSequenceActivity())) {
-				/** TODO: Use for Sequence in Optional */
 				learnerAct.lineTopVisible = (i != 0) ? false : true;
 				learnerAct.lineBottomVisible = (i == _children.length-1) ? true : false;
 			}
 			
 			children_mc.push(learnerAct);
 			
-			if(learnerAct.activity == activeSequence) {
-				if(activeSequence.firstActivityUIID != null) {
-					var actOrder:Array = model.getDesignOrder(activeSequence.firstActivityUIID, true);
-					createChildren(actOrder, null);
+			if(learnerAct.activity == activeSequence && activeSequence.firstActivityUIID != null) {
+				
+				var actOrder:Array = model.getDesignOrder(activeSequence.firstActivityUIID, true);
+				createChildren(actOrder, null);
 					
-					return i+1;
-				}
-			} else if(learnerAct.activity.isBranchingActivity()) {
+				return i+1;
+				
+			/*} 
+			else if(learnerAct.activity.isBranchingActivity()) {
 				Debugger.log('test: ' + (learnerAct.isAttempted || learnerAct.isCompleted), Debugger.CRITICAL, 'drawChildren', 'LearnerComplexActivity');
+				Debugger.log('mode: ' + _root.mode, Debugger.CRITICAL, 'drawChildren', 'LearnerComplexActivity');
         
-				if(learnerAct.isAttempted || learnerAct.isCompleted) {
-					if(!isLearnerModule()) {
-						drawActiveBranch(learnerAct);
-					}
-					
-					return i+1;
+				if(!isLearnerModule() || _root.mode == 'preview') {
+					var _cChildren:Array = (model instanceof LessonModel) ? model.learningDesignModel.getComplexActivityChildren(learnerAct.activity.activityUIID) : model.ddm.getComplexActivityChildren(learnerAct.activity.activityUIID);
+		
+					learnerAct = LearnerComplexActivity(childHolder_mc.createChildAtDepth("LearnerComplexActivity_Nested", DepthManager.kTop, {_activity:_children[i], _children:_cChildren, _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _nested:true, _level: _level+1, _x:0, _y:childCoordY+21}));
+					children_mc.push(learnerAct);
+				
 				}
+					
+				return i+1;
+				*/
 			} else if(learnerAct.activity == activeComplex) {
 				var _cChildren:Array = (model instanceof LessonModel) ? model.learningDesignModel.getComplexActivityChildren(activeComplex.activityUIID) : model.ddm.getComplexActivityChildren(activeComplex.activityUIID);
-				Debugger.log("children length: " + _cChildren.length, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
-
-				learnerAct = LearnerComplexActivity(childHolder_mc.createChildAtDepth("LearnerComplexActivity_Nested", DepthManager.kTop, {_activity:_children[i], _children:_cChildren, _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _nested:true, _level: _level+1, _x:0, _y:childCoordY+21}));
+				
+				learnerAct = LearnerComplexActivity(childHolder_mc.createChildAtDepth("LearnerComplexActivity_Nested", DepthManager.kTop, {_activity:_children[i], _children:_cChildren, _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _nested:true, _level: _level+_complexLevel+1, _x:0, _y:childCoordY+21}));
 				children_mc.push(learnerAct);
 						
 				return i+1;
@@ -264,12 +267,13 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			
 		}
 		
-		Debugger.log("children_mc length: " + children_mc.length, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
-		
 		return null;
 		
 	}
 	
+	/**
+	 * @deprecated
+	 */
 	private function drawActiveBranch(learnerAct:LearnerActivity):Void {
 		var _cChildren:Array = model.ddm.getComplexActivityChildren(learnerAct.activity.activityUIID);
 		
@@ -441,9 +445,12 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		updateComplex();
 	}
 	
-	public function removeAllChildrenAndInputComplex(activity:ComplexActivity):Void {
+	public function removeAllChildrenAndInputComplex(activity:ComplexActivity, complexLevel:Number):Void {
 		activeComplex = activity;
+		_complexLevel = complexLevel;
+		
 		manualSelect = true;
+		
 		updateComplex();
 	}
 	

@@ -120,10 +120,8 @@ class LearnerActivity extends MovieClip {
 			_visibleWidth = LearnerActivity.TOOL_ACTIVITY_WIDTH;
 		}
 		
-		//_base_mc = this;
 		//call init if we have passed in the _activity as an initObj in the attach movie,
 		//otherwise wait as the class outside will call it
-
 		if(_activity != undefined){
 			init();
 		}
@@ -139,7 +137,6 @@ class LearnerActivity extends MovieClip {
 				_controller = initObj._controller;
 				_activity = initObj._activity;
 				learner = initObj.learner;
-				//actStatus = initObj.actStatus;
 		}
 		
 		if(_complex){
@@ -160,10 +157,6 @@ class LearnerActivity extends MovieClip {
 		title_lbl = this.attachMovie("Label", "Label"+_activity.activityID, this.getNextHighestDepth(), {_x:LABEL_X , _y:LABEL_Y, _width:LABEL_W, _height:LABEL_H, autoSize:_autosize, styleName:styleObj});
 		
 		showAssets(false);
-		
-		if(!_activity.isGateActivity() && !_activity.isGroupActivity()){
-			//loadIcon();
-		}
 		
 		MovieClipUtils.doLater(Proxy.create(this, draw));
 
@@ -234,6 +227,8 @@ class LearnerActivity extends MovieClip {
 		}else {
 			toolTitle = actLabel;
 		}
+		
+		Debugger.log("parent level: " + _parent._parent.level, Debugger.CRITICAL, "draw", "LearnerActivity");
 		
 		if(_parent._parent.level > 0) {
 			for(var i=0; i<_parent._parent.level; i++)
@@ -353,16 +348,15 @@ class LearnerActivity extends MovieClip {
 						}
 						
 					}
-				} else if(this.activity.isOptionsWithSequencesActivity() || this.activity.isOptionalActivity() || this.activity.isParallelActivity()) {
+				} else if(this.activity.isOptionsWithSequencesActivity() || this.activity.isOptionalActivity() || this.activity.isParallelActivity() || this.activity.isBranchingActivity()) {
 					Debugger.log('activeComplex:'+activeComplex, Debugger.CRITICAL,'onRelease','LearnerActivity');
 					if(model.findParent(this.activity, LearnerComplexActivity(this._parent._parent).activity) || (activeSequence.activityUIID == this.activity.parentUIID)) {
-					//if(LearnerComplexActivity(this._parent._parent).activity.activityUIID == this.activity.parentUIID || activeSequence.activityUIID == this.activity.parentUIID) {
 						if(activeComplex == this.activity) {
 							// close current active complex
 							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(null);
 						} else {
 							// open complex
-							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(this.activity);
+							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(this.activity, this.level);
 						}
 					}
 				}
