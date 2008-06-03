@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.learning.progress;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.commons.collections.ArrayStack;
 import org.apache.log4j.Logger;
@@ -109,18 +110,33 @@ public class ProgressBuilder extends LearningDesignProcessor {
 	/** Creates an ActivityURL and sets up the list of its children. */
 	public void endComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
 		
-		ActivityURL complexActivityURL = createActivityURL(activity);
 
-		// don't want to show a branch if it isn't being done
-		if ( complexActivityURL.getStatus()!=LearnerProgress.ACTIVITY_NOT_ATTEMPTED || ! (activity.isSequenceActivity() 
-				&& activity.getParentActivity() != null && activity.getParentActivity().isBranchingActivity()) ) {
+		// only want to show the overall heading level for branching if none of the child activities have been started
+		// have to check the children as the branching activity is attempted but no child is attempted if a user
+		// is sitting on the waiting screen.
+		// if a branch has been attempted, then we only want to show its children.
+		if ( activity.isBranchingActivity() ) {
+			boolean branchStarted = false;
+			Iterator iter = currentActivityList.iterator();
+			while (!branchStarted && iter.hasNext()) {
+				ActivityURL sequenceURL = (ActivityURL) iter.next();
+				if ( sequenceURL.getStatus() != LearnerProgress.ACTIVITY_NOT_ATTEMPTED ) {
+					branchStarted = true;
+					currentActivityList = (ArrayList<ActivityURL>) activityListStack.pop();
+					currentActivityList.addAll(sequenceURL.getChildActivities());
+				}
+			}
+			if ( !branchStarted) {
+				currentActivityList = (ArrayList<ActivityURL>) activityListStack.pop();
+				currentActivityList.add(createActivityURL(activity));
+			}
+			
+		} else {
+			ActivityURL complexActivityURL = createActivityURL(activity);
 			complexActivityURL.setChildActivities(currentActivityList);
 			currentActivityList = (ArrayList<ActivityURL>) activityListStack.pop();
 			currentActivityList.add(complexActivityURL);
-		} else {
-			currentActivityList = (ArrayList<ActivityURL>) activityListStack.pop();
 		}
-
 	}
 
 	public void startSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
