@@ -396,8 +396,6 @@ public class Gmap implements java.io.Serializable, Cloneable {
 		toContent = (Gmap) fromContent.clone();
 		toContent.setToolContentId(toContentId);
 		toContent.setCreateDate(new Date());
-		Set<GmapMarker> set = new HashSet<GmapMarker>();
-		toContent.setGmapMarkers(set);
 		return toContent;
 	}
 
@@ -408,32 +406,36 @@ public class Gmap implements java.io.Serializable, Cloneable {
 			gmap = (Gmap) super.clone();
 			gmap.setUid(null);
 
+			Set<GmapAttachment> attachmentSet = new HashSet<GmapAttachment>();
+			Set<GmapMarker> markerSet = new HashSet<GmapMarker>();
+			
+			
 			if (gmapAttachments != null) {
 				// create a copy of the attachments
 				Iterator iter = gmapAttachments.iterator();
-				Set<GmapAttachment> set = new HashSet<GmapAttachment>();
 				while (iter.hasNext()) {
 					GmapAttachment originalFile = (GmapAttachment) iter.next();
 					GmapAttachment newFile = (GmapAttachment) originalFile.clone();
-					set.add(newFile);
+					attachmentSet.add(newFile);
 				}
-				gmap.gmapAttachments = set;
 			}
+			gmap.gmapAttachments = attachmentSet;
 			
 			if (gmapMarkers != null) {
 				// create a copy of the attachments
 				Iterator iter = gmapMarkers.iterator();
-				Set<GmapMarker> set = new HashSet<GmapMarker>();
 				while (iter.hasNext()) {
 					GmapMarker originalMarker = (GmapMarker) iter.next();
 					GmapMarker newMarker = (GmapMarker) originalMarker.clone();
-					set.add(newMarker);
+					markerSet.add(newMarker);
 				}
-				gmap.gmapAttachments = set;
+				
 			}
+			gmap.gmapMarkers = markerSet;
+				
 			// create an empty set for the gmapSession
-			gmap.gmapSessions = new HashSet();
-
+			gmap.gmapSessions = new HashSet<GmapSession>();
+			
 		} catch (CloneNotSupportedException cnse) {
 			log.error("Error cloning " + Gmap.class);
 		}

@@ -32,6 +32,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
+import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 
@@ -55,6 +56,33 @@ public class GmapDTO {
 	
 	//public boolean allowRichEditor;
 	
+	
+	public boolean allowEditMarkers;
+	
+	public boolean allowShowAllMarkers;
+	
+	public boolean limitMarkers;
+	
+	public int maxMarkers;
+	
+	public boolean allowZoom;
+	
+	public boolean allowTerrain;
+	
+	public boolean allowSatellite;
+	
+	public boolean allowHybrid;
+	
+	public Double mapCenterLatitude;
+	
+	public Double mapCenterLongitude;
+	
+	public int mapZoom;
+	
+	public String mapType;
+	
+	public Set<GmapMarker> gmapMarkers;
+	
 	public Set<GmapAttachmentDTO> onlineInstructionsFiles;
 
 	public Set<GmapAttachmentDTO> offlineInstructionsFiles;
@@ -71,7 +99,20 @@ public class GmapDTO {
 		onlineInstructions = gmap.getOnlineInstructions();
 		offlineInstructions = gmap.getOfflineInstructions();
 		contentInUse = gmap.isContentInUse();
-		//allowRichEditor = gmap.isAllowRichEditor();
+		//allowRichEditor = gmap.isAllowRichEditor();		
+		allowEditMarkers = gmap.isAllowEditMarkers();		
+		allowShowAllMarkers = gmap.isAllowShowAllMarkers();		
+		limitMarkers = gmap.isLimitMarkers();		
+		maxMarkers = gmap.getMaxMarkers();
+		allowZoom = gmap.isAllowZoom();		
+		allowTerrain = gmap.isAllowTerrain();		
+		allowSatellite = gmap.isAllowSatellite();		
+		allowHybrid = gmap.isAllowHybrid();		
+		mapCenterLatitude = gmap.getMapCenterLatitude();		
+		mapCenterLongitude = gmap.getMapCenterLongitude();		
+		mapZoom = gmap.getMapZoom();
+		mapType = gmap.getMapType();
+		gmapMarkers = gmap.getGmapMarkers();
 
 		onlineInstructionsFiles = new TreeSet<GmapAttachmentDTO>();
 		offlineInstructionsFiles = new TreeSet<GmapAttachmentDTO>();
@@ -175,6 +216,110 @@ public class GmapDTO {
 		this.contentInUse = contentInUse;
 	}
 
+	public boolean isAllowEditMarkers() {
+		return allowEditMarkers;
+	}
+
+	public void setAllowEditMarkers(boolean allowEditMarkers) {
+		this.allowEditMarkers = allowEditMarkers;
+	}
+
+	public boolean isAllowShowAllMarkers() {
+		return allowShowAllMarkers;
+	}
+
+	public void setAllowShowAllMarkers(boolean allowShowAllMarkers) {
+		this.allowShowAllMarkers = allowShowAllMarkers;
+	}
+
+	public boolean isLimitMarkers() {
+		return limitMarkers;
+	}
+
+	public void setLimitMarkers(boolean limitMarkers) {
+		this.limitMarkers = limitMarkers;
+	}
+
+	public int getMaxMarkers() {
+		return maxMarkers;
+	}
+
+	public void setMaxMarkers(int maxMarkers) {
+		this.maxMarkers = maxMarkers;
+	}
+
+	public boolean isAllowZoom() {
+		return allowZoom;
+	}
+
+	public void setAllowZoom(boolean allowZoom) {
+		this.allowZoom = allowZoom;
+	}
+
+	public boolean isAllowTerrain() {
+		return allowTerrain;
+	}
+
+	public void setAllowTerrain(boolean allowTerrain) {
+		this.allowTerrain = allowTerrain;
+	}
+
+	public boolean isAllowSatellite() {
+		return allowSatellite;
+	}
+
+	public void setAllowSatellite(boolean allowSatellite) {
+		this.allowSatellite = allowSatellite;
+	}
+
+	public boolean isAllowHybrid() {
+		return allowHybrid;
+	}
+
+	public void setAllowHybrid(boolean allowHybrid) {
+		this.allowHybrid = allowHybrid;
+	}
+
+	public Double getMapCenterLatitude() {
+		return mapCenterLatitude;
+	}
+
+	public void setMapCenterLatitude(Double mapCenterLatitude) {
+		this.mapCenterLatitude = mapCenterLatitude;
+	}
+
+	public Double getMapCenterLongitude() {
+		return mapCenterLongitude;
+	}
+
+	public void setMapCenterLongitude(Double mapCenterLongitude) {
+		this.mapCenterLongitude = mapCenterLongitude;
+	}
+
+	public int getMapZoom() {
+		return mapZoom;
+	}
+
+	public void setMapZoom(int mapZoom) {
+		this.mapZoom = mapZoom;
+	}
+
+	public String getMapType() {
+		return mapType;
+	}
+
+	public void setMapType(String mapType) {
+		this.mapType = mapType;
+	}
+
+	public Set<GmapMarker> getGmapMarkers() {
+		return gmapMarkers;
+	}
+
+	public void setGmapMarkers(Set<GmapMarker> gmapMarkers) {
+		this.gmapMarkers = gmapMarkers;
+	}
+
 	//public boolean isAllowRichEditor() {
 	//	return allowRichEditor;
 	//}
@@ -182,4 +327,6 @@ public class GmapDTO {
 	//public void setAllowRichEditor(boolean allowRichEditor) {
 	//	this.allowRichEditor = allowRichEditor;
 	//}
+	
+	
 }

@@ -2,6 +2,7 @@
 
 <!-- ========== Advanced Tab ========== -->
 
+
 <h2><fmt:message key="advanced.editingOptions" /></h2>
 
 <p class="small-space-top">
@@ -59,6 +60,16 @@
 		<fmt:message key="advanced.markerLimitsMessage" />
 	</label>
 </p>
+
+<script type="text/javascript">
+<!--
+	toggleMaxMarkerMenu();
+	function toggleMaxMarkerMenu()
+	{
+		document.getElementById("maxMarkers").disabled = !document.getElementById("limitMarkers").checked
+	}
+//-->
+</script>
 
 <h2><fmt:message key="advanced.mapOptions" /></h2>
 

@@ -206,6 +206,25 @@ Ant build file.
 	   </target>
 
 	<!-- =================================================================== -->
+	<!-- Deploy the gmap jar                          -->
+	<!-- =================================================================== -->
+	<target name="deploy-jar" depends="build-jar" description="Deploy the tool jar file">
+		<delete quiet="true">
+			<fileset dir="${jboss.deploy}/tmp" />
+			<fileset dir="${jboss.deploy}/work" />
+		</delete>
+		<copy file="${build.lib}/${product}.jar" todir="${jboss.deploy}" />
+		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/tool/gmap">
+		   <fileset dir="${conf.language.dir}">
+		    <include name="**/*.properties"/>
+		    <include name="**/*.txt"/>
+		   </fileset>
+		</copy>
+	</target>
+	
+	
+	
+	<!-- =================================================================== -->
 	<!-- Deploy the gmap struts jar and war                               -->
 	<!-- =================================================================== -->
 	<target name="deploy-war" depends="build-war" description="Deploy the tool war file and jar file">

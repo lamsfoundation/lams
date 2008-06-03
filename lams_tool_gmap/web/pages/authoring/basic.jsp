@@ -43,15 +43,9 @@
 			
 			<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
 			<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-			
-			<!-- 
-			<input type="button" onclick="addMarkerToCenter()"  value="Add Marker" />
-			<input type="button" onclick="fitMapMarkers()" value="Fit Markers" />
-			-->
 			<input type="button" onclick="test()"  value="Test" />
 		</td>
 	</tr>
-	
 	<tr>
 		<td>
 			<div class="field-name">
@@ -59,35 +53,32 @@
 			</div>
 			<input type="text" size="60" name="address" id="address" value="<fmt:message key="label.authoring.basic.sampleAddress"></fmt:message>" />
        		<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
-       		<!--  
-       		<input type="button" onclick="showAddress()" value="Go!" />
-       		-->
-       		
-       		
-       		<script type="text/javascript">
-			<!--
-	       		initGmap();
-       		//-->
-			</script>
-       		<c:forEach var="marker" items="${formBean.gmap.gmapMarkers}">
-	        	<script type="text/javascript">
-				<!--
-					var savedPoint = new GLatLng('${marker.latitude}', '${marker.longitude}' );
-					addMarker(savedPoint, '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true);
-				//-->
-				</script>
-      		</c:forEach>
-      		<script type="text/javascript">
-			<!--
-	       		map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
-	       		map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
-	       		map.setZoom(${formBean.gmap.mapZoom});
-	       		map.setMapType(${formBean.gmap.mapType});
-	       		refreshSideBar();
-       		//-->
-			</script>
-
 		</td>
 	</tr>
 </table>
+
+<script type="text/javascript">
+<!--
+	initGmap();
+	map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
+	map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
+	map.setZoom(${formBean.gmap.mapZoom});
+	map.setMapType(${formBean.gmap.mapType});
+//-->
+</script>
+
+<c:forEach var="marker" items="${formBean.gmap.gmapMarkers}">
+	<script type="text/javascript">
+	<!--
+		var savedPoint = new GLatLng('${marker.latitude}', '${marker.longitude}' );
+		addMarker(savedPoint, '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true);
+	//-->
+	</script>
+</c:forEach>
+   		
+<script type="text/javascript">
+<!--
+	refreshSideBar();
+//-->
+</script>
 

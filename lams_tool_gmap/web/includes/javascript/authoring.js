@@ -3,7 +3,6 @@
 var map;
 var markers;
 var geocoder = null;
-var markerManager = null;
 function init() {
 	// open the current tab    
 	var tag = document.getElementById("currentTab");
@@ -33,8 +32,6 @@ function initGmap()
     	*/
     	markers = new Array();
     	geocoder = new GClientGeocoder();
-    	var mgrOptions = { trackMarkers: true };
-    	//markerManager = new GMarkerManager(map, mgrOptions);
     }
 }
 

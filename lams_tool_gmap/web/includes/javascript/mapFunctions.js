@@ -206,22 +206,6 @@ function fitMapMarkers()
    
 }
 
-/*
-function saveClick(x)
-{
-	var title=document.getElementById("markerTitle");
-	if (title==null || trim(title) == "")
-	{
-		alert("Title is required.");
-		return false;
-	}
-	else
-	{
-		saveMarkerInfo(x);
-	}
-}
-*/
-
 function saveMarkerInfo(x)
 {
 	if (markers[x] != null)
@@ -332,32 +316,23 @@ function serialiseMarkers()
 		}	
 	}
 	xmlString += "</markers>"
-	document.authoringForm.markersXML.value=xmlString;
+	//document.authoringForm.markersXML.value=xmlString;
+	document.getElementById("markersXML").value=xmlString;
 }
 
 // TODO: This method should only be included for the authoring pages, put them in another file
 function saveMapState()
 {
-	document.authoringForm.mapZoom.value=map.getZoom();
-	document.authoringForm.mapCenterLatitude.value=map.getCenter().lat();
-	document.authoringForm.mapCenterLongitude.value=map.getCenter().lng();
-	
+	document.getElementById("mapZoom").value=map.getZoom();
+	document.getElementById("mapCenterLatitude").value=map.getCenter().lat();
+	document.getElementById("mapCenterLongitude").value=map.getCenter().lng();
 	var mapTypeName = map.getCurrentMapType().getName();
-	
-	alert("TYPE: " +mapTypeName);
-	
 	var mapType = "";	
-	if 		(mapTypeName == "Satellite") { mapType = "G_SATELLITE_MAP"; }
-	else if (mapTypeName == "Hybrid") { mapType = "G_HYBRID_MAP"; }
-	else if (mapTypeName == "Terrain") { mapType = "G_PHYSICAL_MAP"; }
-	else { mapType = "G_NORMAL_MAP"; }
-	
-	document.authoringForm.mapType.value=mapType;
-	
-	alert(document.authoringForm.mapZoom.value);
-	alert(document.authoringForm.mapCenterLatitude.value);
-	alert(document.authoringForm.mapCenterLongitude.value);
-	alert(document.authoringForm.mapType.value);
+	if 		(mapTypeName == "Satellite"){ mapType = "G_SATELLITE_MAP"; }
+	else if (mapTypeName == "Hybrid")	{ mapType = "G_HYBRID_MAP"; }
+	else if (mapTypeName == "Terrain") 	{ mapType = "G_PHYSICAL_MAP"; }
+	else 								{ mapType = "G_NORMAL_MAP"; }
+	document.getElementById("mapType").value=mapType;
 }
 
 

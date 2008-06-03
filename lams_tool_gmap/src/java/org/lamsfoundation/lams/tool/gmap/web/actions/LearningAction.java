@@ -112,10 +112,12 @@ public class LearningAction extends LamsDispatchAction {
 		request.setAttribute("mode", mode.toString());
 		learningForm.setToolSessionID(toolSessionID);
 
-		GmapDTO gmapDTO = new GmapDTO();
-		gmapDTO.title = gmap.getTitle();
-		gmapDTO.instructions = gmap.getInstructions();
+		//GmapDTO gmapDTO = new GmapDTO();
+		//gmapDTO.title = gmap.getTitle();
+		//gmapDTO.instructions = gmap.getInstructions();
 		//gmapDTO.allowRichEditor = gmap.isAllowRichEditor();
+		GmapDTO gmapDTO = new GmapDTO(gmap);
+		
 		
 		request.setAttribute("gmapDTO", gmapDTO);
 

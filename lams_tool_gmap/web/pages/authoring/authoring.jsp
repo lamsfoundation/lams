@@ -36,11 +36,11 @@
 		<html:hidden property="currentTab" styleId="currentTab" />
 		<html:hidden property="dispatch" value="updateContent" />
 		<html:hidden property="sessionMapID" />
-		<html:hidden property="markersXML" value=""/>
-		<html:hidden property="mapZoom" value=""/>
-		<html:hidden property="mapCenterLatitude" value=""/>
-		<html:hidden property="mapCenterLongitude" value=""/>
-		<html:hidden property="mapType" value=""/>
+		<html:hidden property="markersXML" value="" styleId="markersXML" />
+		<html:hidden property="mapZoom" value="" styleId="mapZoom" />
+		<html:hidden property="mapCenterLatitude" value="" styleId="mapCenterLatitude" />
+		<html:hidden property="mapCenterLongitude" value="" styleId="mapCenterLongitude" />
+		<html:hidden property="mapType" value="" styleId="mapType" />
 
 
 		<div id="message" style="text-align: center;">

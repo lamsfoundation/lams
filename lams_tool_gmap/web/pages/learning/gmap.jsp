@@ -53,24 +53,27 @@
 			${gmapDTO.instructions}
 		</p>
 
-		<c:set var="lrnForm"
-			value="<%=request
-									.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 		<c:choose>
 			<c:when test="${contentEditable}">
-				<c:choose>
-					<c:when test="${gmapDTO.allowRichEditor}">
-						<lams:FCKEditor id="entryText" value="${lrnForm.entryText}"
-							toolbarSet="Default-Learner">
-						</lams:FCKEditor>
-					</c:when>
-
-					<c:otherwise>
-						<html:textarea cols="60" rows="8" property="entryText"
-							styleClass="text-area"></html:textarea>
-					</c:otherwise>
-				</c:choose>
+				<table cellpadding='0' cellspacing='0' border='1'>
+				<tr><td><div id="map_canvas" style="width: 400px; height: 300px;" ></div></td>
+				<td><div id="sidebar" style="width:100px; 
+										overflow:auto;
+										height:320px; 
+										background:WhiteSmoke; "></div></td></tr>
+				</table>
+				
+				<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
+				<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
+				<input type="button" onclick="test()"  value="Test" />
+				
+				<br><br>
+				
+				<input type="text" size="60" name="address" id="address" value="<fmt:message key="label.authoring.basic.sampleAddress"></fmt:message>" />
+       			<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
+				
 
 				<div class="space-bottom-top align-right">
 					<html:submit styleClass="button" styleId="finishButton">
@@ -84,6 +87,20 @@
 					<lams:out value="${lrnForm.entryText}" />
 				</c:otherwise>
 		</c:choose>
+		
+		<script type="text/javascript">
+		<!--
+			initLearnerGmap();
+		//-->
+		</script>
+		
+		
+		   		
+		<script type="text/javascript">
+		<!--
+			refreshSideBar();
+		//-->
+		</script>
 
 	</html:form>
 </div>

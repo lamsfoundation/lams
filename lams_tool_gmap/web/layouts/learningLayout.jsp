@@ -5,7 +5,7 @@
 
 <lams:html>
 	<tiles:insert attribute="header" />
-	<body class="stripes">
+	<body class="stripes" onunload="GUnload()">
 		<tiles:insert attribute="body" />
 		<div class="footer">
 		</div>					
