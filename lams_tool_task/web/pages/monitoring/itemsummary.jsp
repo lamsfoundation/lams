@@ -112,7 +112,7 @@
 									</c:when>
 										
 									<c:otherwise>
-										<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">
+										<img src="<html:rewrite page='/includes/images/dash.gif'/>" border="0">
 									</c:otherwise>
 								</c:choose>
 							</td>

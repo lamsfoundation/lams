@@ -209,11 +209,11 @@
         />
 
         <property
-            name="minimumNumberTasksComplete"
+            name="minimumNumberTasks"
             type="int"
             update="true"
             insert="true"
-            column="minimum_number_tasks_complete"
+            column="minimum_number_tasks"
         />
 
         <property

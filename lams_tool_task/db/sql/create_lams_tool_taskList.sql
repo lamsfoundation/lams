@@ -46,7 +46,7 @@ create table tl_latask10_taskList (
    content_id bigint unique,
    lock_when_finished tinyint,
    is_sequential_order tinyint,
-   minimum_number_tasks_complete integer,
+   minimum_number_tasks integer,
    allow_contribute_tasks tinyint,
    is_monitor_verification_required tinyint,
    reflect_instructions varchar(255), 
@@ -148,7 +148,7 @@ alter table tl_latask10_user add index FK_NEW_174079138_30113BFC309ED320 (taskLi
 
 INSERT INTO `tl_latask10_taskList` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `instructions`,
 	`online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `lock_when_finished`, 
-	`minimum_number_tasks_complete`, `is_sequential_order`, `allow_contribute_tasks`, `is_monitor_verification_required`, 
+	`minimum_number_tasks`, `is_sequential_order`, `allow_contribute_tasks`, `is_monitor_verification_required`, 
 	`reflect_on_activity`) VALUES
   (1,NULL,NULL,NULL,'Task List','0','Instructions ',null,null,0,0,${default_content_id},0,0,0,0,0,0);
   

@@ -429,8 +429,8 @@ public class AuthoringAction extends Action {
     	}
 		
 		//if MinimumNumberTasksComplete is bigger than available items, then set it topics size
-		if(taskListPO.getMinimumNumberTasksComplete() > items.size())
-			taskListPO.setMinimumNumberTasksComplete(items.size());
+		if(taskListPO.getMinimumNumberTasks() > items.size())
+			taskListPO.setMinimumNumberTasks(items.size());
 		
 		//**********************************************
 		//finally persist taskListPO again

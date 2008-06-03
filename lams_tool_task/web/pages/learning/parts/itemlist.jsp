@@ -94,10 +94,10 @@
 									<fmt:message key="label.learning.info.comment.and.attachment.required" />		
 								</c:when>
 								<c:when test="${!itemDTO.commentRequirementsMet}">
-									<fmt:message key="label.learning.info.post.comment.required" />		
+									<fmt:message key="label.learning.info.add.comment.required" />		
 								</c:when>							
 								<c:when test="${!itemDTO.attachmentRequirementsMet}">
-									<fmt:message key="label.learning.info.upload.attachment.required" />	
+									<fmt:message key="label.learning.info.upload.file.required" />	
 								</c:when>							
 							</c:choose>
 						</div>
@@ -133,7 +133,7 @@
 								
 						<c:otherwise>
 							<%--<img src="<html:rewrite page='/includes/images/cross.gif'/>" border="0"> --%>
-							<img src="<html:rewrite page='/includes/images/dash.jpeg'/>" border="0">
+							<img src="<html:rewrite page='/includes/images/dash.gif'/>" border="0">
 						</c:otherwise>
 					</c:choose>
 				</td>
@@ -142,12 +142,10 @@
 		
 	</c:forEach>
 	
-	<c:if test="${taskList.numberTasksToComplete > 0}">
+	<c:if test="${fn:length(taskList.minimumNumberTasksErrorStr) > 0}">
 		<tr>
 			<td colspan="3" align="left">
-				<fmt:message key="label.learning.notification.you.must.complete.tasks.1" /> 
-				<b>${taskList.numberTasksToComplete}</b>
-				<fmt:message key="label.learning.notification.you.must.complete.tasks.2" />
+				<b>${taskList.minimumNumberTasksErrorStr}</b>
 			</td>
 		</tr>
 	</c:if>

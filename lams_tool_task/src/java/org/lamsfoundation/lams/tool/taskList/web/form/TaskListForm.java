@@ -73,7 +73,7 @@ public class TaskListForm extends ActionForm  {
     	if(!StringUtils.equals(param,"start") && !StringUtils.equals(param,"initPage")){
 	    	taskList.setLockWhenFinished(false);
 	    	taskList.setSequentialOrder(false);
-	    	taskList.setMinimumNumberTasksComplete(0);
+	    	taskList.setMinimumNumberTasks(0);
 	    	taskList.setAllowContributeTasks(false);
 	    	taskList.setMonitorVerificationRequired(false);
 	    	taskList.setDefineLater(false);

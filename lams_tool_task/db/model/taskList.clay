@@ -557,7 +557,7 @@
 <variant type-name-pattern="BIT"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="minimum_number_tasks_complete" remarks="" uid="a85b18:11a137921e5:-7f87">
+<column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="minimum_number_tasks" remarks="" uid="a85b18:11a137921e5:-7f87">
 <column-description/>
 <data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
 <variant type-name-pattern="INT"/>

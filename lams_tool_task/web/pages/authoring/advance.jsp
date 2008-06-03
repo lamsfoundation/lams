@@ -21,10 +21,10 @@
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-	<html:select property="taskList.minimumNumberTasksComplete"	styleId="minimumNumberTasksComplete" style="width:50px">
+	<html:select property="taskList.minimumNumberTasks"	styleId="minimumNumberTasks" style="width:50px">
 <!-- 		<c:forEach begin="1" end="${fn:length(sessionMap.taskListList)}" varStatus="status">
 			<c:choose>
-				<c:when	test="${formBean.taskList.minimumNumberTasksComplete == status.index}">
+				<c:when	test="${formBean.taskList.minimumNumberTasks == status.index}">
 					<option value="${status.index}" selected="true">
 						${status.index}
 					</option>
@@ -39,7 +39,7 @@
  -->		
 	</html:select>
 
-	<label for="minimumNumberTasksComplete">
+	<label for="minimumNumberTasks">
 		<fmt:message key="label.authoring.advance.minimum.number.tasks" />
 	</label>
 </p>

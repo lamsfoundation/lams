@@ -35,7 +35,7 @@
 	    	
 	    	//for advanceTab
 	    	if(tabId == 2)
-	    		changeMinTasksComplete(-1);
+	    		changeMinTasks(-1);
         } 
 
         function doUploadOnline() {
@@ -50,10 +50,10 @@
         	myForm.submit();
         }
         
-        function changeMinTasksComplete(initVal){
+        function changeMinTasks(initVal){
 			var tb = document.getElementById("itemTable");
 			var num = tb.getElementsByTagName("tr");
-			var sel = document.getElementById("minimumNumberTasksComplete");
+			var sel = document.getElementById("minimumNumberTasks");
 			var newField = sel.options;
 			var len = sel.length;
 			
@@ -149,7 +149,7 @@
 </div>
 
 <script type="text/javascript">
-	changeMinTasksComplete(${formBean.taskList.minimumNumberTasksComplete});
+	changeMinTasks(${formBean.taskList.minimumNumberTasks});
 </script>
 
 

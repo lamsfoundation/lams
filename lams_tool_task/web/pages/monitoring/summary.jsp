@@ -43,7 +43,7 @@
 			
 			<c:if test="${summary.monitorVerificationRequired}">
 				<th width="60px" align="center">
-					<fmt:message key="label.monitoring.summary.complete.activity" />
+					<fmt:message key="label.monitoring.summary.confirm.completion" />
 				</th>
 			</c:if>			
 		</tr>
@@ -64,7 +64,7 @@
 							</c:when>
 							
 							<c:otherwise>
-								<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">
+								<img src="<html:rewrite page='/includes/images/dash.gif'/>" border="0">
 							</c:otherwise>
 						</c:choose>
 					</td>

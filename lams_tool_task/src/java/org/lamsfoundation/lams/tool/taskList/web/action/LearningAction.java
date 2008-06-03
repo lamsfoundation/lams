@@ -287,8 +287,13 @@ public class LearningAction extends Action {
 		}
 
 		//construct taskList dto field
-		int numberTasksToComplete = service.checkMinimumNumberTasksComplete(sessionId, taskListUser.getUserId());
-		taskList.setNumberTasksToComplete(numberTasksToComplete);
+		
+		Integer numberCompletedTasks = service.getNumTasksCompletedByUser(sessionId, taskListUser.getUserId());
+		Integer minimumNumberTasks = taskList.getMinimumNumberTasks();
+		if ((minimumNumberTasks - numberCompletedTasks) > 0) {
+			String MinimumNumberTasksStr = service.getMessageService().getMessage("lable.learning.minimum.view.number",new Object[]{minimumNumberTasks, numberCompletedTasks});
+			taskList.setMinimumNumberTasksErrorStr(MinimumNumberTasksStr);
+		}
 		
 		//add define later support
 		if(taskList.isDefineLater()){
@@ -691,13 +696,15 @@ public class LearningAction extends Action {
 		Long userID = new Long(user.getUserID().longValue());
 		
 		ITaskListService service = getTaskListService();
-		int miniViewFlag = service.checkMinimumNumberTasksComplete(sessionId, userID);
+		
+		int numberCompletedTasks = service.getNumTasksCompletedByUser(sessionId, userID);
+		int minimumNumberTasks = service.getTaskListBySessionId(sessionId).getMinimumNumberTasks();
 		//if current user view less than reqired view count number, then just return error message.
 		//if it is runOffline content, then need not check minimum view count
 		Boolean runOffline = (Boolean) sessionMap.get(TaskListConstants.PARAM_RUN_OFFLINE);
-		if(miniViewFlag > 0 && !runOffline){
+		if((minimumNumberTasks - numberCompletedTasks) > 0 && !runOffline){
 			ActionErrors errors = new ActionErrors();
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("lable.learning.minimum.view.number.less",miniViewFlag));
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("lable.learning.minimum.view.number",minimumNumberTasks, numberCompletedTasks));
 			this.addErrors(request,errors);
 			return false;
 		}

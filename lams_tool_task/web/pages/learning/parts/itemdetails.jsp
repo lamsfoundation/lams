@@ -12,7 +12,7 @@
 				
 			<c:if test="${sessionMap.mode != 'teacher'}">
 				<div class="field-name">
-					<fmt:message key="label.preview.leave.your.comment" />
+					<fmt:message key="label.preview.add.comment" />
 				</div>
 				
 				<div >

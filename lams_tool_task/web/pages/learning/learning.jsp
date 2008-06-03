@@ -4,7 +4,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.learning.title" />
+	<title>
+		<fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
 

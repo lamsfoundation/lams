@@ -311,8 +311,8 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		TaskListSession session = taskListSessionDao.getSessionBySessionId(sessionId);
 		//to skip CGLib problem
 		Long contentId = session.getTaskList().getContentId();
-		TaskList res = taskListDao.getByContentId(contentId);
-		return res;
+		TaskList taskList = taskListDao.getByContentId(contentId);
+		return taskList;
 	}
 	
 	/**
@@ -394,22 +394,6 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 			taskListItemVisitDao.saveObject(log);
 		}
 	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public int checkMinimumNumberTasksComplete(Long toolSessionId, Long userUid) {
-		int completedItems = taskListItemVisitDao.getTasksCompletedCountByUser(toolSessionId, userUid);
-		TaskListSession session = taskListSessionDao.getSessionBySessionId(toolSessionId);
-		if(session == null){
-			log.error("Failed get session by ID [" + toolSessionId + "]");
-			return 0;
-		}
-		int minimumNumberTasksComplete = session.getTaskList().getMinimumNumberTasksComplete();
-		
-		return (minimumNumberTasksComplete - completedItems);
-	}
-
 
 	/**
 	 * {@inheritDoc}
@@ -777,6 +761,10 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 
 	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 		this.coreNotebookService = coreNotebookService;
+	}
+	
+	public MessageService getMessageService() {
+		return messageService;
 	}
 
 	//*******************************************************************************

@@ -61,7 +61,7 @@ public class TaskList implements Cloneable{
 	//advance
 	private boolean lockWhenFinished;
 	private boolean sequentialOrder;
-	private int minimumNumberTasksComplete; 
+	private int minimumNumberTasks; 
 	private boolean allowContributeTasks;
 	private boolean monitorVerificationRequired;
 
@@ -91,7 +91,7 @@ public class TaskList implements Cloneable{
 
 	private List<TaskListAttachment> onlineFileList;
 	private List<TaskListAttachment> offlineFileList;
-	private int numberTasksToComplete; 
+	private String minimumNumberTasksErrorStr; 
 	
 	/**
 	 * Default contructor. 
@@ -657,18 +657,18 @@ public class TaskList implements Cloneable{
 	 * 
 	 * @return the minimum number of tasks needed to be completed to finish this activity
 	 * 
-	 * @hibernate.property column="minimum_number_tasks_complete"
+	 * @hibernate.property column="minimum_number_tasks"
 	 */
-	public int getMinimumNumberTasksComplete() {
-		return minimumNumberTasksComplete;
+	public int getMinimumNumberTasks() {
+		return minimumNumberTasks;
 	}
 	/**
 	 * Sets the minimum number of tasks needed to be completed to finish this activity.
 	 * 
 	 * @param numberTasksToComplete the minimum number of tasks needed to be completed to finish this activity
 	 */
-	public void setMinimumNumberTasksComplete(int minimumNumberTasksComplete) {
-		this.minimumNumberTasksComplete = minimumNumberTasksComplete;
+	public void setMinimumNumberTasks(int minimumNumberTasks) {
+		this.minimumNumberTasks = minimumNumberTasks;
 	}
 	
 	/**
@@ -721,16 +721,16 @@ public class TaskList implements Cloneable{
 	 * @return the number of tasks needed to be completed to finish this activity
 	 * 
 	 */
-	public int getNumberTasksToComplete() {
-		return numberTasksToComplete;
+	public String getMinimumNumberTasksErrorStr() {
+		return minimumNumberTasksErrorStr;
 	}
 	/**
 	 * Sets the number of tasks needed to be completed to finish this activity.
 	 * 
 	 * @param numberTasksToComplete the number of tasks needed to be completed to finish this activity
 	 */
-	public void setNumberTasksToComplete(int numberTasksToComplete) {
-		this.numberTasksToComplete = numberTasksToComplete;
+	public void setMinimumNumberTasksErrorStr(String minimumNumberTasksErrorStr) {
+		this.minimumNumberTasksErrorStr = minimumNumberTasksErrorStr;
 	}
 
 }

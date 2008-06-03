@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * Interface that defines the contract that all TaskLisk service providers must follow.
@@ -124,6 +125,13 @@ public interface ITaskListService {
 	 * @throws UploadTaskListFileException
 	 */
 	TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, String fileType, TaskListUser user) throws UploadTaskListFileException; 
+	
+	/**
+	 * Returns Message service. It makes available to have access to message resources files. 
+	 * 
+	 * @return MessageService
+	 */
+	MessageService getMessageService();
 	
 	//********** for user methods *************
 	/**
@@ -287,15 +295,6 @@ public interface ITaskListService {
 	 */
 	String finishToolSession(Long toolSessionId, Long userId)  throws TaskListException;
 	
-	/**
-	 * Checks how many tasks more user should complete to be able to finish this activity.
-	 * 
-	 * @param toolSessionId
-	 * @param userUid
-	 * @return
-	 */
-	int checkMinimumNumberTasksComplete(Long toolSessionId, Long userUid);
-
 	/**
 	 * Create refection entry into notebook tool.
 	 * 
