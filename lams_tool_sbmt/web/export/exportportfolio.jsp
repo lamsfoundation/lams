@@ -6,6 +6,7 @@
 <c:set var="sessionMapID" value="${param.sessionMapID}"/>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="report" value="${sessionMap.report}"/>
+<c:set var="reflectOn" value="${sessionMap.reflectOn}"/>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
 	"http://www.w3.org/TR/html4/loose.dtd">
@@ -54,18 +55,6 @@
 									<fmt:message key="label.submit.file.suffix"/>:
 								</td>
 							</tr>
-							
-							<c:if test="${reflectOn}" >
-								<tr>
-									<td>
-										<fmt:message key="title.reflection" />
-										:
-									</td>
-									<td>
-										<lams:out value="${user.reflect}" escapeHtml="true" />
-									</td>
-								</tr>
-							</c:if>
 							
 							<c:choose>
 							<c:when test="${empty submissionList}">
@@ -140,6 +129,19 @@
 								</c:forEach>
 							</c:otherwise>
 							</c:choose>
+							
+							<c:if test="${reflectOn}">
+								<tr>
+									<td>
+										<fmt:message key="title.reflection" />
+										:
+									</td>
+									<td>
+										<lams:out value="${user.reflect}" escapeHtml="true" />
+									</td>
+								</tr>
+							</c:if>
+							
 							<tr>
 								<td>
 									&nbsp;
