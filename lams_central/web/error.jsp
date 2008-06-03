@@ -12,6 +12,8 @@
 </c:set>
 
 <%-- Catch JSP Servlet Exception --%>
+<%-- The javascript method checkForErrorScreen in error.js is coded to match this page exactly.
+---- If you change this page, please change the javascript. --%>
 <%
 if (exception != null) {
 %>

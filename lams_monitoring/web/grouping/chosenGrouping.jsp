@@ -33,6 +33,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	   <lams:css/>
       <title><c:out value="${title}"/></title>
 
+	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/error.js"></script>
+
 	<script type="text/javascript">
 	<!-- 
 		<c:choose>
@@ -128,6 +130,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			if (groupRequest.readyState == 4) { // Complete
 				clearMessage();
 				if (groupRequest.status == 200) { // OK response
+					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", groupRequest.responseText);
 					var grpSelectObj = document.getElementById("groups");
 					grpSelectObj.options.length = 0;
 					var res = groupRequest.responseText.replace(/^\s*|\s*$/g,"");
@@ -172,6 +175,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			if (nonmembersRequest.readyState == 4) { // Complete
 				clearMessage();
 				if (nonmembersRequest.status == 200) { // OK response
+					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", nonmembersRequest.responseText);
 					var nonmembersSelectObj = document.getElementById("nonmembers[]");
 					nonmembersSelectObj.options.length = 0;
 					var res = nonmembersRequest.responseText.replace(/^\s*|\s*$/g,"");
@@ -183,7 +187,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						}
 					}
 				}else{
-					alert("<fmt:message key="error.grouping.data"/>"+" "+groupRequest.status+".");
+					alert("<fmt:message key="error.grouping.data"/>"+" "+nonmembersRequest.status+".");
 				}
 				ajustButtonStatus();
 			}
@@ -216,6 +220,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			if (memberRequest.readyState == 4) { // Complete
 				clearMessage();
 				if (memberRequest.status == 200) { // OK response
+					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", memberRequest.responseText);
 					var membersSelectObj = document.getElementById("members[]");
 					membersSelectObj.options.length = 0;
 					var res = memberRequest.responseText.replace(/^\s*|\s*$/g,"");
@@ -272,6 +277,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		function grpAdded(){
 			if (addgrpRequest.readyState == 4) { // Complete
 				if (addgrpRequest.status == 200) { // OK response
+					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", addgrpRequest.responseText);
 					getGroups();
 					document.getElementById("newgroupname").value = "";
 					document.getElementById("members[]").options.length=0;
@@ -311,6 +317,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		function grpRemoved(){
 			if (rmgrpRequest.readyState == 4) { // Complete
 				if (rmgrpRequest.status == 200) { // OK response
+					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", rmgrpRequest.responseText);
 					var grpSelectObj = document.getElementById("groups");
 					grpSelectObj.remove(grpSelectObj.selectedIndex);
 					document.getElementById("members[]").options.length = 0;
@@ -357,6 +364,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		function membersAdded(){
 				if (addmbrsRequest.readyState == 4) { // Complete
 						if (addmbrsRequest.status == 200) { // OK response
+							checkForErrorScreen("<fmt:message key="error.grouping.data"/>", addmbrsRequest.responseText);
 							getNonmembers(document.getElementById("groupings"));
 							getMembers(document.getElementById("groups"));
 							var groupSelectObj = document.getElementById("groups");
@@ -408,6 +416,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		function membersRemoved(){
 			if (rmmbrsRequest.readyState == 4) { // Complete
 					if (rmmbrsRequest.status == 200) { // OK response
+						checkForErrorScreen("<fmt:message key="error.grouping.data"/>", rmmbrsRequest.responseText);
 						getMembers(document.getElementById("groups"));
 						getNonmembers(document.getElementById("groupings"));
 						var groupSelectObj = document.getElementById("groups");

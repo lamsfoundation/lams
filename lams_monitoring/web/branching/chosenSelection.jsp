@@ -33,6 +33,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	   <lams:css/>
       <title><c:out value="${title}"/></title>
 
+	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/error.js"></script>
+
 	<script type="text/javascript">
 	<!-- 
 		function init(){
@@ -90,6 +92,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			if (branchRequest.readyState == 4) { // Complete
 				clearMessage();
 				if (branchRequest.status == 200) { // OK response
+					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", branchRequest.responseText);
 					var branchSelectObj = document.getElementById("branches");
 					branchSelectObj.options.length = 0;
 					var res = branchRequest.responseText.replace(/^\s*|\s*$/g,"");
@@ -133,6 +136,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			if (nonmembersRequest.readyState == 4) { // Complete
 				clearMessage();
 				if (nonmembersRequest.status == 200) { // OK response
+					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", nonmembersRequest.responseText);
 					var nonmembersSelectObj = document.getElementById("nonmembers[]");
 					nonmembersSelectObj.options.length = 0;
 					var res = nonmembersRequest.responseText.replace(/^\s*|\s*$/g,"");
@@ -176,6 +180,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			if (memberRequest.readyState == 4) { // Complete
 				clearMessage();
 				if (memberRequest.status == 200) { // OK response
+					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", memberRequest.responseText);
 					var membersSelectObj = document.getElementById("members[]");
 					membersSelectObj.options.length = 0;
 					var res = memberRequest.responseText.replace(/^\s*|\s*$/g,"");
@@ -228,6 +233,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		function membersAdded(){
 				if (addmbrsRequest.readyState == 4) { // Complete
 						if (addmbrsRequest.status == 200) { // OK response
+							checkForErrorScreen("<fmt:message key="error.grouping.data"/>", addmbrsRequest.responseText);
 							getNonmembers(document.getElementById("branches"));
 							getMembers(document.getElementById("branches"));
 							var branchSelectObj = document.getElementById("branches");
@@ -278,6 +284,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		function membersRemoved(){
 			if (rmmbrsRequest.readyState == 4) { // Complete
 					if (rmmbrsRequest.status == 200) { // OK response
+						checkForErrorScreen("<fmt:message key="error.grouping.data"/>", rmmbrsRequest.responseText);
 						getMembers(document.getElementById("branches"));
 						getNonmembers(document.getElementById("branches"));
 						var branchSelectObj = document.getElementById("branches");
