@@ -214,7 +214,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		setStyles();
 		
-		MovieClipUtils.doLater(Proxy.create(this,draw));
+		MovieClipUtils.doLater(Proxy.create(this, draw));
 	}
 	
 	private function showAssets(isVisible:Boolean){

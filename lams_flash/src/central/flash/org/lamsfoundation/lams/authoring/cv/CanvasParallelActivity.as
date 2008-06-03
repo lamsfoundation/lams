@@ -105,7 +105,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
 		
-		MovieClipUtils.doLater(Proxy.create(this,init));
+		MovieClipUtils.doLater(Proxy.create(this, init));
 	}
 	
 	public function init():Void{
@@ -140,42 +140,48 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		//so now it is placed on in the IDE and we just call init
 		Debugger.log("fromModuleTab: " + fromModuleTab, Debugger.CRITICAL, "init", "CanvasParallelActivity");
 		
+		MovieClipUtils.doLater(Proxy.create(this, initChildren, child1, child2));
+		
+		//let it wait one frame to set up the components.
+		MovieClipUtils.doLater(Proxy.create(this, draw));
+		
+	}
+	
+	private function initChildren(child1:Activity, child2:Activity):Void {
 		if(fromModuleTab == "monitorMonitorTab"){
 			Debugger.log("initialising for monitor: " + child1.activityUIID + " " + child2.activityUIID, Debugger.CRITICAL, "init", "CanvasParallelActivity");
 			Debugger.log("controller for monitor: " + _monitorController, Debugger.CRITICAL, "init", "CanvasParallelActivity");
 			
 			//child1_mc = childActivities_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:child1 ,_monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
 			//child2_mc = childActivities_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:child2 ,_monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+			
 			if(_canvasBranchView != null) {
-				child1_mc.init({activity:child1, _monitorController:_monitorController, _monitorView:_canvasBranchView, _module:"monitoring", learnerContainer:learnerContainer});
-				child2_mc.init({activity:child2, _monitorController:_monitorController, _monitorView:_canvasBranchView, _module:"monitoring", learnerContainer:learnerContainer});
+				CanvasActivity(child1_mc).init({activity:child1, _monitorController:_monitorController, _monitorView:_canvasBranchView, _module:"monitoring", learnerContainer:learnerContainer});
+				CanvasActivity(child2_mc).init({activity:child2, _monitorController:_monitorController, _monitorView:_canvasBranchView, _module:"monitoring", learnerContainer:learnerContainer});
 			} else if(_canvasComplexView != null) {
-				child1_mc.init({activity:child1, _monitorController:_monitorController, _monitorView:_canvasComplexView, _module:"monitoring", learnerContainer:learnerContainer});
-				child2_mc.init({activity:child2, _monitorController:_monitorController, _monitorView:_canvasComplexView, _module:"monitoring", learnerContainer:learnerContainer});
+				CanvasActivity(child1_mc).init({activity:child1, _monitorController:_monitorController, _monitorView:_canvasComplexView, _module:"monitoring", learnerContainer:learnerContainer});
+				CanvasActivity(child2_mc).init({activity:child2, _monitorController:_monitorController, _monitorView:_canvasComplexView, _module:"monitoring", learnerContainer:learnerContainer});
 			} else {
-				child1_mc.init({activity:child1, _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
-				child2_mc.init({activity:child2, _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+				CanvasActivity(child1_mc).init({activity:child1, _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
+				CanvasActivity(child2_mc).init({activity:child2, _monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
 			}
 			
 			Debugger.log("child_mc(s) " + child1_mc + " " + child2_mc, Debugger.CRITICAL, "init", "CanvasParallelActivity");
 			
-		}else {
+		} else {
+			
 			if(_canvasBranchView != null) {
-				child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasBranchView:_canvasBranchView});
-				child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasBranchView:_canvasBranchView});
+				CanvasActivity(child1_mc).init({activity:child1,_canvasController:_canvasController,_canvasBranchView:_canvasBranchView});
+				CanvasActivity(child2_mc).init({activity:child2,_canvasController:_canvasController,_canvasBranchView:_canvasBranchView});
 			} else if(_canvasComplexView != null) {
-				child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasComplexView:_canvasComplexView});
-				child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasComplexView:_canvasComplexView});
+				CanvasActivity(child1_mc).init({activity:child1,_canvasController:_canvasController,_canvasComplexView:_canvasComplexView});
+				CanvasActivity(child2_mc).init({activity:child2,_canvasController:_canvasController,_canvasComplexView:_canvasComplexView});
 			} else {
-				child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
-				child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
+				CanvasActivity(child1_mc).init({activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
+				CanvasActivity(child2_mc).init({activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
 			}
 			
 		}
-		
-		//let it wait one frame to set up the components.
-		MovieClipUtils.doLater(Proxy.create(this,draw));
-		
 	}
 	
 	public function refreshChildren():Void {
