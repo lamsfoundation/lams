@@ -778,7 +778,7 @@ Login page styles
 
 
 #login-page { /*whole layout of login page*/
-margin:0px auto; 
+margin:-35px auto; 
 width:707px;
 }
 
@@ -800,10 +800,10 @@ line-height:18px;
 }
 
 #login-left-col {
-width:330px; 
+width:370px; 
 float:left; 
-padding-left:40px;
-margin-top:15px;
+padding-left:25px;
+margin-top:5px;
 }
 
 
@@ -813,7 +813,7 @@ padding:0px;
 }
 
 #login-left-col h2 {
-margin:30px 0px 0px 3px; 
+margin:10px 0px 0px 3px; 
 padding:0px;
 font-weight:100;
 font-size:1.5em;
@@ -822,7 +822,8 @@ font-size:1.5em;
 #login-left-col h3 {
 color:#239CF7; 
 font-size:11px; 
-margin:0px;
+margin:8px 0px 0px 3px; 
+
 }
 
 #login-left-col ul {
@@ -840,7 +841,7 @@ list-style-type:none;
 #login-right-col {
 width:285px; 
 float:left; 
-margin-left:47px; 
+margin-left:17px; 
 background: url('../images/css/lams_login_bar.jpg') no-repeat 0 0; 
 margin-top:5px;
 height:450px;
