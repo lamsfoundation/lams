@@ -692,8 +692,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	}
 	
 	private function showSteppers(a:Boolean, b:Boolean):Void {
-		repositionSteppers(a,b);
-		
 		_start_value_stp.value = _start_value_stp.minimum;
 		_end_value_stp.value = _end_value_stp.minimum;
 		
@@ -701,6 +699,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		_condition_from_lbl.visible = a;
 		_end_value_stp.visible = b;
 		_condition_to_lbl.visible = b;
+		
+		repositionSteppers(a,b);
 		
 	}
 	
@@ -711,11 +711,11 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 			_condition_to_lbl._x = _start_value_stp._x + _start_value_stp._width + 20;
 			_end_value_stp._x = _condition_to_lbl._x + _condition_to_lbl._width + 5;
 		} else if(a&&!b) {
-			_condition_from_lbl._x = 14;
-			_start_value_stp._x = _condition_from_lbl._x + _condition_from_lbl._width + 5;
+			_condition_from_lbl._visible = false;
+			_start_value_stp._x = 14;
 		} else if(!a&&b) {
-			_condition_to_lbl._x = 14;
-			_end_value_stp._x = _condition_to_lbl._x + _condition_to_lbl._width + 5;
+			_condition_to_lbl._visible = false;
+			_end_value_stp._x = 14;
 		}
 	}
 
