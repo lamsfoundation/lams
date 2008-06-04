@@ -4829,12 +4829,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		byte[] data = bos.toByteArray();
     	
 		return data;
-		/*
-		if(out != null) {
-			out.write(data, 0, data.length);
-			out.flush();
-		}
-		*/
 	}
 
     /**
