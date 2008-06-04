@@ -60,6 +60,7 @@
 <script type="text/javascript">
 <!--
 	initGmap();
+	currUser = '${gmapUser.firstName} ${gmapUser.lastName}';
 	map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
 	map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
 	map.setZoom(${formBean.gmap.mapZoom});
@@ -71,7 +72,7 @@
 	<script type="text/javascript">
 	<!--
 		var savedPoint = new GLatLng('${marker.latitude}', '${marker.longitude}' );
-		addMarker(savedPoint, '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true);
+		addMarker(savedPoint, '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, true, "${marker.createdBy.firstName} ${marker.createdBy.lastName}");
 	//-->
 	</script>
 </c:forEach>

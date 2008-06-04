@@ -21,6 +21,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
 	
 	<script type="text/javascript" src="${tool}includes/javascript/mapFunctions.js"></script>
+	<script type="text/javascript" src="${tool}includes/javascript/mapFunctionsLearning.js"></script>
 
 	<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAvPAE96y1iioFQOnrP1RCBxS3S_A0Q4kgEfsHF6TMv6-oezFszBTPVN72_75MGlxr3nP_6ixxWd30jw" type="text/javascript"></script>
 	<script type="text/javascript">
@@ -32,6 +33,11 @@
 		var map;
 		var markers;
 		var geocoder = null;
+		var currUser;
+		var userMarkerCount =0;
+		var limitMarkers = ${gmapDTO.limitMarkers};
+		var markerLimit = 0;
+		var markerLimit = ${gmapDTO.maxMarkers};
 		function initLearnerGmap()
 		{
 			if (GBrowserIsCompatible()) 
@@ -45,6 +51,8 @@
 				map.setCenter(new GLatLng('${gmapDTO.mapCenterLatitude}', '${gmapDTO.mapCenterLongitude}' ));
 				map.setZoom(${gmapDTO.mapZoom});
 
+				currUser = '${gmapUserDTO.firstName} ${gmapUserDTO.lastName}';
+
 				if (${gmapDTO.allowEditMarkers})
 				{
 				
@@ -54,22 +62,26 @@
 				map.addControl(new GMapTypeControl());
 				if (${gmapDTO.allowZoom}) {map.addControl(new GLargeMapControl());}
 				if (${gmapDTO.allowTerrain}) {map.addMapType(G_PHYSICAL_MAP);}
-				if (${gmapDTO.allowSatellite}) {map.removeMapType(G_SATELLITE_MAP);}
-				if (${gmapDTO.allowHybrid}) {map.removeMapType(G_HYBRID_MAP);}
+				if (!${gmapDTO.allowSatellite}) {map.removeMapType(G_SATELLITE_MAP);}
+				if (!${gmapDTO.allowHybrid}) {map.removeMapType(G_HYBRID_MAP);}
 				map.setMapType(${gmapDTO.mapType});
 		    	
 		    	<c:forEach var="marker" items="${gmapDTO.gmapMarkers}">
-					
-					addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true);
-					
-					if (${gmapDTO.allowEditMarkers}){}
-					
-					if (${gmapDTO.allowShowAllMarkers}){}
+					if (${marker.isAuthored})
+					{
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}' );
+					}
+					else if ("${marker.createdBy.loginName}" == "${gmapUserDTO.loginName}" && !${marker.isAuthored})
+					{
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, ${gmapDTO.allowEditMarkers}, '${marker.createdBy.firstName} ${marker.createdBy.lastName}' );
+						userMarkerCount ++;
+					}
+					else if (${gmapDTO.allowShowAllMarkers})
+					{
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}' );
+					}
 				</c:forEach>
-				
-				
-				var limitMarkers = ${gmapDTO.limitMarkers};
-				var markerLimit = markers.length + ${gmapDTO.maxMarkers};
+
 		    }
 		}
 	//-->

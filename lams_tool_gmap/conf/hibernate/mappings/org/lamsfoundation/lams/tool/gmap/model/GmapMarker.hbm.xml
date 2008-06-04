@@ -47,6 +47,7 @@
             update="true"
             insert="true"
             column="info_window_message"
+            length="65535"
         />
 
         <property
@@ -92,6 +93,27 @@
             update="true"
             insert="true"
             column="title"
+            length="55"
+        />
+
+        <many-to-one
+            name="createdBy"
+            class="org.lamsfoundation.lams.tool.gmap.model.GmapUser"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="created_by"
+        />
+
+        <many-to-one
+            name="updatedBy"
+            class="org.lamsfoundation.lams.tool.gmap.model.GmapUser"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="updated_by"
         />
 
         <!--

@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapDTO;
+import org.lamsfoundation.lams.tool.gmap.dto.GmapUserDTO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
@@ -80,29 +81,26 @@ public class LearningAction extends LamsDispatchAction {
 
 		// 'toolSessionID' and 'mode' paramters are expected to be present.
 		// TODO need to catch exceptions and handle errors.
-		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,
-				AttributeNames.PARAM_MODE, MODE_OPTIONAL);
+		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, MODE_OPTIONAL);
 
-		Long toolSessionID = WebUtil.readLongParam(request,
-				AttributeNames.PARAM_TOOL_SESSION_ID);
+		Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 		// set up gmapService
 		if (gmapService == null) {
-			gmapService = GmapServiceProxy.getGmapService(this
-					.getServlet().getServletContext());
+			gmapService = GmapServiceProxy.getGmapService(this.getServlet().getServletContext());
 		}
 
 		// Retrieve the session and content.
-		GmapSession gmapSession = gmapService
-				.getSessionBySessionId(toolSessionID);
+		GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
 		if (gmapSession == null) {
-			throw new GmapException(
-					"Cannot retreive session with toolSessionID"
-							+ toolSessionID);
+			throw new GmapException("Cannot retreive session with toolSessionID"+ toolSessionID);
 		}
 
 		Gmap gmap = gmapSession.getGmap();
-
+		if (gmap.getTitle() == null) {
+			throw new GmapException("Cannot retreive gmap with toolSessionID"+ toolSessionID);
+		}
+		
 		// check defineLater
 		if (gmap.isDefineLater()) {
 			return mapping.findForward("defineLater");
@@ -117,8 +115,6 @@ public class LearningAction extends LamsDispatchAction {
 		//gmapDTO.instructions = gmap.getInstructions();
 		//gmapDTO.allowRichEditor = gmap.isAllowRichEditor();
 		GmapDTO gmapDTO = new GmapDTO(gmap);
-		
-		
 		request.setAttribute("gmapDTO", gmapDTO);
 
 		// Set the content in use flag.
@@ -139,8 +135,10 @@ public class LearningAction extends LamsDispatchAction {
 		} else {
 			gmapUser = getCurrentUser(toolSessionID);
 		}
+		GmapUserDTO gmapUserDTO = new GmapUserDTO(gmapUser);
+		request.setAttribute(GmapConstants.ATTR_USER_DTO, gmapUserDTO);
 		
-		// get any existing gmap entry
+		// get any existing Notebook entry
 		NotebookEntry nbEntry = null;
 		if ( gmapUser != null ) {
 			nbEntry = gmapService.getEntry(gmapUser.getEntryUID());

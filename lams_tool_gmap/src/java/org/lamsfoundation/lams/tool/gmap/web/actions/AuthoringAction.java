@@ -35,6 +35,7 @@ import java.io.StringReader;
 import org.xml.sax.InputSource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -50,6 +51,7 @@ import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
+import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
 import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
@@ -61,6 +63,8 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -125,8 +129,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 
 		// retrieving Gmap with given toolContentID
-		Gmap gmap = gmapService
-				.getGmapByContentId(toolContentID);
+		Gmap gmap = gmapService.getGmapByContentId(toolContentID);
 		if (gmap == null) {
 			gmap = gmapService.copyDefaultContent(toolContentID);
 			gmap.setCreateDate(new Date());
@@ -142,6 +145,19 @@ public class AuthoringAction extends LamsDispatchAction {
 			gmapService.saveOrUpdateGmap(gmap);
 		}
 
+		GmapUser gmapUser = null;
+		HttpSession ss = SessionManager.getSession();
+		//get back login user DTO
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		gmapUser = gmapService.getUserByUID(new Long(user.getUserID().intValue()));
+		if(gmapUser == null){
+			gmapUser = new GmapUser(user,null);
+			gmapService.saveOrUpdateGmapUser(gmapUser);
+		}
+		request.setAttribute(GmapConstants.ATTR_USER, gmapUser);
+		
+
+		
 		// Set up the authForm.
 		AuthoringForm authForm = (AuthoringForm) form;
 		updateAuthForm(authForm, gmap);
@@ -174,7 +190,23 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		// update gmap content using form inputs.
 		ToolAccessMode mode = (ToolAccessMode) map.get(KEY_MODE);
-		updateGmap(gmap, authForm, mode);
+		
+		String contentFolderID = (String) map.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		GmapUser gmapUser = null;
+		//check whether it is sysadmin:LDEV-906 
+		if(!StringUtils.equals(contentFolderID,"-1" )){
+			//try to get form system session
+			HttpSession ss = SessionManager.getSession();
+			//get back login user DTO
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			gmapUser = gmapService.getUserByUID(new Long(user.getUserID().intValue()));
+			if(gmapUser == null){
+				gmapUser = new GmapUser(user,null);
+				gmapService.saveOrUpdateGmapUser(gmapUser);
+			}
+		}	
+		
+		updateGmap(gmap, authForm, mode, gmapUser);
 
 		// remove attachments marked for deletion.
 		Set<GmapAttachment> attachments = gmap.getGmapAttachments();
@@ -386,12 +418,12 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param mode
 	 * @return
 	 */
-	private void updateGmap(Gmap gmap, AuthoringForm authForm, ToolAccessMode mode)
+	private void updateGmap(Gmap gmap, AuthoringForm authForm, ToolAccessMode mode, GmapUser guser)
 	{
 		gmap.setTitle(authForm.getTitle());
 		gmap.setInstructions(authForm.getInstructions());
 		
-		updateMarkerListFromXML(authForm.getMarkersXML(), gmap);
+		updateMarkerListFromXML(authForm.getMarkersXML(), gmap, guser);
 		
 		if (mode.isAuthor()) { // Teacher cannot modify following
 			gmap.setOfflineInstructions(authForm.getOnlineInstruction());
@@ -412,7 +444,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 	}
 	
-	private void updateMarkerListFromXML(String markerXML, Gmap gmap)
+	private void updateMarkerListFromXML(String markerXML, Gmap gmap, GmapUser guser)
 	{
 		//Set<GmapMarker> newMarkers = new HashSet<GmapMarker>();
 		Set<GmapMarker> existingMarkers = gmap.getGmapMarkers();
@@ -445,7 +477,8 @@ public class AuthoringAction extends LamsDispatchAction {
 					marker.setCreated(new Date());
 					marker.setUpdated(new Date());
 					marker.setAuthored(true);
-					//gmap.addMarker(marker);
+					marker.setCreatedBy(guser);
+					marker.setUpdatedBy(guser);
 					gmapService.saveOrUpdateGmapMarker(marker);
 					
 				}
@@ -459,15 +492,13 @@ public class AuthoringAction extends LamsDispatchAction {
 					marker.setLongitude(longitude);
 					marker.setGmap(gmap);
 					marker.setUpdated(new Date());
+					marker.setUpdatedBy(guser);
 					marker.setAuthored(true);
 					gmapService.saveOrUpdateGmapMarker(marker);
-					//gmap.updateMarker(marker, uid);
 				}
 				else if (markerState.equals("remove"))
 				{
 					gmap.removeMarker(uid);
-					//GmapMarker marker = gmap.getMarkerByUid(uid);
-					//gmapService.deleteGmapMarker(marker);
 				}
 			}
 		}
@@ -485,7 +516,10 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param authForm
 	 * @return
 	 */
-	private void updateAuthForm(AuthoringForm authForm, Gmap gmap) {
+	private void updateAuthForm(AuthoringForm authForm, Gmap gmap) 
+	{
+		// #################################### TODO: Fix this by setting a gmap in the authform
+		
 		authForm.setTitle(gmap.getTitle());
 		authForm.setInstructions(gmap.getInstructions());
 		authForm.setOnlineInstruction(gmap.getOnlineInstructions());
@@ -523,9 +557,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		map.put(KEY_ONLINE_FILES, new LinkedList<GmapAttachment>());
 		map.put(KEY_OFFLINE_FILES, new LinkedList<GmapAttachment>());
 		map.put(KEY_UNSAVED_ONLINE_FILES, new LinkedList<GmapAttachment>());
-		map
-				.put(KEY_UNSAVED_OFFLINE_FILES,
-						new LinkedList<GmapAttachment>());
+		map.put(KEY_UNSAVED_OFFLINE_FILES,new LinkedList<GmapAttachment>());
 		map.put(KEY_DELETED_FILES, new LinkedList<GmapAttachment>());
 
 		Iterator iter = gmap.getGmapAttachments().iterator();

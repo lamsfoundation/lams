@@ -1,9 +1,15 @@
-
 // add a marker at the given point
-function addMarker(point, infoMessage, title, uid, isSaved)
+function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy)
 {
 	map.closeInfoWindow();
-	var marker = new GMarker(point, {draggable: true})
+	var marker;
+	
+	if(editAble) 	{marker = new GMarker(point, {draggable: true});}
+	else 			{marker = new GMarker(point, {draggable: false})};
+	
+	marker.editAble = editAble;
+	marker.createdBy = createdBy;
+	
     map.addOverlay(marker);
     
     GEvent.addListener(marker, "dragstart", function() {
@@ -12,7 +18,6 @@ function addMarker(point, infoMessage, title, uid, isSaved)
 
     GEvent.addListener(marker, "dragend", function() {
 		if (marker.state == "unchanged") {marker.state = "update";}
-		//serialiseMarkers();
 		updateMarkerInfoWindowHtml(marker);	
     });
     
@@ -32,12 +37,8 @@ function addMarker(point, infoMessage, title, uid, isSaved)
     {
     	marker.infoMessage = "";
     }
-    
-    //marker.title = "Marker #" + markers.length;
     marker.title = title;
-    
-    //sideBar(marker.infoMessage, markers.length);
-    
+
     
     // set the state of the marker
     marker.editingOn = !isSaved;
@@ -45,23 +46,17 @@ function addMarker(point, infoMessage, title, uid, isSaved)
     if (isSaved){marker.state = "unchanged";}
     else {marker.state="unsaved";}
     
-	marker.sideBarLinkPrefix = "<span class='sidebar'><a href='javascript:GEvent.trigger(markers["+markers.length+"],\"click\")'>";
+	marker.sideBarLinkPrefix = "<span class='sidebar'><a href='javascript:GEvent.trigger(markers["+markers.length+"],\"click\")'";
     marker.removeLink = "<a href='javascript:removeMarker(" + markers.length + ")'>Remove</a>" ;
    	marker.editLink = "<a href='javascript:editMarker(" + markers.length + ")'>Edit</a>";
-   	marker.saveLink = "<a href='javascript:saveMarkerInfo(" + markers.length + "); openInfoWindow("+ markers.length +");'>Save</a>";
+   	marker.saveLink = "<a href='javascript:saveMarkerInfo(" + markers.length + ");'>Save</a>";
    	marker.cancelLink = "<a href='javascript:cancelEditMarkerInfo(" + markers.length + ")'>Cancel</a>";
     updateMarkerInfoWindowHtml(marker);
     markers[markers.length] = marker;
     
 }
 
-// Add a new marker to the center of the map
-function addMarkerToCenter()
-{
-	var bounds = map.getBounds();
-	var point = bounds.getCenter();
-	addMarker(point, "", "", -1, false);
-}
+
 
 function refreshSideBar()
 {
@@ -71,38 +66,11 @@ function refreshSideBar()
 	{
 		if (markers[i].state != "remove")
 		{
-			sideBarText += markers[i].sideBarLinkPrefix + markers[i].title+"</a></span><br />";
+			sideBarText += markers[i].sideBarLinkPrefix + " title='" + markers[i].createdBy + "' >" + markers[i].title+"</a></span><br />";
 		}
 	}
 	document.getElementById("sidebar").innerHTML = sideBarText;
 }
-
-
-function test()
-{
-	serialiseMarkers();
-	alert(document.authoringForm.markersXML.value);
-}
-
-function removeMarker(x)
-{
-	var ans = confirm(confirmDelete);
-	if (ans)
-	{
-		try{map.removeOverlay(markers[x]);}
-		catch (e){}
-		markers[x].state = "remove";
-		refreshSideBar();
-		//serialiseMarkers();
-	}
-}
-
-function editMarker(x)
-{
-	markers[x].editingOn = true;
-	updateMarkerInfoWindowHtml(markers[x]);
-	openInfoWindow(x);
-}	
 
 function cancelEditMarkerInfo(x)
 {
@@ -116,52 +84,6 @@ function cancelEditMarkerInfo(x)
 		updateMarkerInfoWindowHtml(markers[x]);
 		openInfoWindow(x);
 	}
-}
-
-function updateMarkerInfoWindowHtml(markerIn)
-{
-	markerIn.locationMessage = "<font size='small'><i>";
-	markerIn.locationMessage += "Latitude: " + markerIn.getPoint().lat() + "<br />";
-	markerIn.locationMessage += "Longitude: " + markerIn.getPoint().lng() + "<br /><br />";
-	markerIn.locationMessage += "</i></font>";
-	markerIn.infoWindowHtml = markerIn.locationMessage;
-	
-	if (markerIn.state == "unchanged")
-	{
-		markerIn.setImage(webAppUrl + "/images/blue_Marker.png");
-	}
-	else if (markerIn.state == "update" || markerIn.state == "save")
-	{
-		markerIn.setImage(webAppUrl + "/images/paleblue_Marker.png");
-	}
-	else if (markerIn.state == "unsaved")
-	{
-		markerIn.setImage(webAppUrl + "/images/red_Marker.png");
-	}
-	
-	if (markerIn.editingOn)
-	{
-		markerIn.linksBar = "<br/ >" + markerIn.saveLink + "&nbsp;" + markerIn.cancelLink;
-		
-		//markerIn.inputForm = "New Info Window Text: <br>";
-		//markerIn.inputForm += "<lams:FCKEditor id='infoWindow'";
-		//markerIn.inputForm += "value='"+markerIn.infoMessage+"'";
-		//markerIn.inputForm += "contentFolderID='${sessionMap.contentFolderID}'>";
-		//markerIn.inputForm += "</lams:FCKEditor>";
-		
-		//markerIn.titleInput = "Title:<br><textarea id='markerTitle' name='markerTitle' value='" + markerIn.title +"' /><br>";
-		//markerIn.infoWindowTextarea = "New Info Window Text:<br><textarea id='infoWindow' name='infoWindow' rows='5' cols='50'>" + markerIn.infoMessage + "</textarea>";
-		markerIn.inputForm = "Title:<br><input tupe='text' id='markerTitle' name='markerTitle' value='" + markerIn.title +"' /><br>";
-		markerIn.inputForm += "New Info Window Text:<br><textarea id='infoWindow' name='infoWindow' rows='5' cols='50'>" + markerIn.infoMessage + "</textarea>";
-		//markerIn.inputForm = "" + markerIn.infoWindowTextarea;
-		markerIn.infoWindowHtml += markerIn.inputForm + markerIn.linksBar;
-	}
-	else
-	{
-		markerIn.linksBar = "<br/ >" + markerIn.removeLink + "&nbsp;" + markerIn.editLink;
-		markerIn.inputForm = "";
-		markerIn.infoWindowHtml += markerIn.infoMessage + "<br />" + markerIn.inputForm + markerIn.linksBar;
-	}	
 }
 
 function openInfoWindow(x)
@@ -196,43 +118,19 @@ function showAddress()
 
 function fitMapMarkers() 
 {
-   var bounds = new GLatLngBounds();
-   for (var i=0; i< markers.length; i++) {
-      bounds.extend(markers[i].getPoint());
-   }
-   map.setZoom(map.getBoundsZoomLevel(bounds));
-   //map.setCenter(bounds.getCenter());
-   map.panTo(bounds.getCenter());
-   
-}
-
-function saveMarkerInfo(x)
-{
-	if (markers[x] != null)
+   	var bounds = new GLatLngBounds();
+	for (var i=0; i< markers.length; i++) 
 	{
-		var title= trim(document.getElementById("markerTitle").value);
-		if (title==null || title == "")
+		if (markers[i].state != "remove")
 		{
-			alert(errorMissingTitle);
-			return false;
-		}
-		else
-		{		
-			
-			var info=document.getElementById("infoWindow").value;
-			markers[x].title = title;
-			markers[x].infoMessage = info;
-			markers[x].editingOn = false;
-			
-			// change the state to update if it is a pre-existing marker
-			if (markers[x].state == "unchanged") {markers[x].state = "update";}
-			else (markers[x].state ="save");
-			
-			//markers[x].isSaved = persistMarker(markers[x], "createMarker");
-			updateMarkerInfoWindowHtml(markers[x]);
-			refreshSideBar();
+			bounds.extend(markers[i].getPoint());	
 		}
 	}
+   	var zoom = map.getBoundsZoomLevel(bounds) - 1;
+   	if (zoom > 15) {zoom = 15;}
+   	map.setZoom(zoom);
+   	map.panTo(bounds.getCenter());
+   
 }
 
 function trim(x)
@@ -240,99 +138,44 @@ function trim(x)
 	return x.replace(/^\s+|\s+$/g, '')
 }
 
-/*
-function getAjaxObject()
+function updateMarkerInfoWindowHtml(markerIn)
 {
-	var req=null;
-	if ( window.XMLHttpRequest ) {req = new XMLHttpRequest();} 
-	else {req = new ActiveXObject("MSXML2.XMLHTTP");} 
-	return req;	
-}
-*/
-
-/*
-function persistMarker(marker, method)
-{
-	var ajax = getAjaxObject();
-	var result = null;
-	ajax.onreadystatechange = function() 
-	{ 
-	    if(ajax.readyState == 4) 
-	    {
-	    	result = ajax.responseText;
-	    }
-	}
-	
- 	var url = webAppUrl + "/marker.do?" +
- 		"&method="  + method +
- 		"&toolContentID=" + toolContentID + 
- 		"&latitude=" + marker.getPoint().lat() +
- 		"&longitude=" + marker.getPoint().lng() +
- 		"&infoMessage=" + marker.infoMessage;
- 		
- 	try
- 	{
-		ajax.open("GET",url,false);
-		ajax.send(null);
-	
-		if (result=="success")
-		{
-			alert("yay!");
-			return true;
-		}
-		else
-		{
-			//TODO: handle marker save failure
-			alert("boo!");
-			return false;
-		}
-	}
-	catch(e)
+	if (markerIn.state == "unchanged")
 	{
-		return e;
-		//alert("An error occurred: " + e);
+		markerIn.setImage(webAppUrl + "/images/blue_Marker.png");
 	}
-}*/	
-
-
-function serialiseMarkers()
-{
-	var xmlString = '<?xml version="1.0"?><markers>';
-	var i =0;
-	
-	for (;i<markers.length;i++)
+	else if (markerIn.state == "update" || markerIn.state == "save")
 	{
-		if (markers[i].state != "unchanged" && markers[i].state !="unsaved")
-		{
-			var markerString = '<marker'+
-			' latitude="'+ markers[i].getPoint().lat()+ '"'+
-			' longitude="'+ markers[i].getPoint().lng()+ '"'+
-			' infoMessage="'+ escape(markers[i].infoMessage)+ '"' +
-			' markerUID="'+ markers[i].uid + '"' +
-			' title="'+ markers[i].title + '"' +
-			' state="'+ markers[i].state + '"' +
-			' />';
-			xmlString += markerString;
-		}	
+		markerIn.setImage(webAppUrl + "/images/paleblue_Marker.png");
 	}
-	xmlString += "</markers>"
-	//document.authoringForm.markersXML.value=xmlString;
-	document.getElementById("markersXML").value=xmlString;
-}
-
-// TODO: This method should only be included for the authoring pages, put them in another file
-function saveMapState()
-{
-	document.getElementById("mapZoom").value=map.getZoom();
-	document.getElementById("mapCenterLatitude").value=map.getCenter().lat();
-	document.getElementById("mapCenterLongitude").value=map.getCenter().lng();
-	var mapTypeName = map.getCurrentMapType().getName();
-	var mapType = "";	
-	if 		(mapTypeName == "Satellite"){ mapType = "G_SATELLITE_MAP"; }
-	else if (mapTypeName == "Hybrid")	{ mapType = "G_HYBRID_MAP"; }
-	else if (mapTypeName == "Terrain") 	{ mapType = "G_PHYSICAL_MAP"; }
-	else 								{ mapType = "G_NORMAL_MAP"; }
-	document.getElementById("mapType").value=mapType;
+	else if (markerIn.state == "unsaved")
+	{
+		markerIn.setImage(webAppUrl + "/images/red_Marker.png");
+	}
+	
+	if (markerIn.editingOn)
+	{
+		markerIn.linksBar = "<br/ >" + markerIn.saveLink + "&nbsp;" + markerIn.cancelLink;
+		markerIn.inputForm = "Title:<br><input tupe='text' maxlength='50' size='50' id='markerTitle' name='markerTitle' value='" + markerIn.title +"' /><br>";
+		markerIn.inputForm += "New Info Window Text:<br><textarea wrap='hard' id='infoWindow' name='infoWindow' rows='5' cols='50'>" + markerIn.infoMessage + "</textarea>";
+		markerIn.markerMetaData = "<font size='tiny' color='grey'>";
+		markerIn.markerMetaData += "<nobr>Latitude-Longitude: (" + markerIn.getPoint().lat() + "-" + markerIn.getPoint().lng() +")</nobr>";
+		markerIn.markerMetaData += "</font>";
+		markerIn.infoWindowHtml =  markerIn.inputForm + "<br />" +markerIn.markerMetaData + markerIn.linksBar;
+	}
+	else
+	{
+		markerIn.linksBar = ""
+		if (markerIn.editAble)
+		{
+			markerIn.linksBar = "<br/ >" + markerIn.removeLink + "&nbsp;" + markerIn.editLink;
+		}
+		markerIn.markerMetaData = "<font size='tiny' color='grey'>";
+		markerIn.markerMetaData += "Created By: " + markerIn.createdBy + "<br />";
+		markerIn.markerMetaData += "<nobr>Latitude-Longitude: (" + markerIn.getPoint().lat() + "-" + markerIn.getPoint().lng() +")</nobr>";
+		markerIn.markerMetaData += "</font>";
+		markerIn.infoWindowHtml = "" + "<h4>" + markerIn.title + "</h4><div style='overflow:auto;width:400px;height:80px'>" +  markerIn.infoMessage.replace(/\n/g, "<br />") + "</div>"+ markerIn.markerMetaData  + markerIn.linksBar;
+	}	
 }
 
 

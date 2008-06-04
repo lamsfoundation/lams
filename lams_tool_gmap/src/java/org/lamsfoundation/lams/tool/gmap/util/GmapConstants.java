@@ -43,6 +43,8 @@ public interface GmapConstants {
 	// Attribute names
 	public static final String ATTR_MESSAGE = "message";
 	public static final String ATTR_SESSION_MAP = "sessionMap";
+	public static final String ATTR_USER_DTO = "gmapUserDTO";
+	public static final String ATTR_USER = "gmapUser";
 	
 	// Parameter names
 	public static final String PARAM_PARENT_PAGE = "parentPage";

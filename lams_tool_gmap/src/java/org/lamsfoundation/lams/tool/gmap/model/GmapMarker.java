@@ -40,78 +40,42 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	private static final long serialVersionUID = 54263746982364732L;
 	
 	private static final Logger log = Logger.getLogger(GmapMarker.class);
-	
-	// Unique identifier
-	private Long uid;		
-	
-	// Longitude of marker position
-	private Double longitude;
-	
-	// Latitude of marker position
-	private Double latitude;
-	
-	// String address of marker if given
-	//private String address;
-	
-	// Marker colour, can be: ORANGE, PURPLE, YELLOW, GREEN, BLUE, RED, AQUA, WHITE, or GRAY
-	//private String colour;
-	
-	// A character that will display on the marker
-	//private char markerDisplayCharacter;
-	
-	// Info windo message that appears when you click the marker (in HTML)
-	private String infoWindowMessage;
-	
-	
-	// The marker title
-	private String title;
-	
-	
-	// Text that appears when the user mouseovers the marker
-	//private String mouseoverText;
-	
-	// The date the marker was created
-	private Date created;
-	
-	// The date the marker was updated
-	private Date updated;
-	
-	// True if it is an authored marker, false if it is a learner marker
-	private boolean isAuthored;
-	
-	// The gmap tool session if in learner, null if in author 
-	//private GmapSession toolSession;
-	
-	// The gmap instance that this marker is part of
-	private Gmap gmap;
-	//private Long gmapID;
-	
-	// The user who created the marker
-	//private GmapUser createBy;
-	
-	// The last user to modify the marker
-	//private GmapUser modifiedBy;
 
+	private Long uid;		
+	private Double longitude;
+	private Double latitude;
+	private String infoWindowMessage;
+	private String title;
+	private Date created;
+	private Date updated;
+	private boolean isAuthored;
+	private Gmap gmap;
+	private GmapUser createdBy;
+	private GmapUser updatedBy;
 
 	/**
 	 * Generic POJO constructor
 	 */
 	public GmapMarker() {}
 
-
 	public GmapMarker(Long uid, Double longitude, Double latitude,
-			String infoWindowMessage, Date created, Date updated,
-			boolean isAuthored) {
+			String infoWindowMessage, String title, Date created, Date updated,
+			boolean isAuthored, Gmap gmap, GmapUser createdBy,
+			GmapUser updatedBy) {
 		super();
 		this.uid = uid;
 		this.longitude = longitude;
 		this.latitude = latitude;
 		this.infoWindowMessage = infoWindowMessage;
+		this.title = title;
 		this.created = created;
 		this.updated = updated;
 		this.isAuthored = isAuthored;
+		this.gmap = gmap;
+		this.createdBy = createdBy;
+		this.updatedBy = updatedBy;
 	}
-	
+
 	public Object clone() {
 		Object obj = null;
 		try {
@@ -123,11 +87,6 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 
 		return obj;
 	}
-
-
-
-
-
 
 	/**
 	 * 
@@ -171,7 +130,7 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	/**
 	 * 
 	 * @return
-	 * @hibernate.property column="info_window_message"
+	 * @hibernate.property column="info_window_message" length="65535"
 	 */
 	public String getInfoWindowMessage() {
 		return infoWindowMessage;
@@ -240,7 +199,7 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	/**
 	 * 
 	 * @return
-	 * @hibernate.property column="title"
+	 * @hibernate.property column="title" length="55"
 	 */
 	public String getTitle() {
 		return title;
@@ -250,6 +209,39 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	
+	/**
+     * @return Returns the userid of the user who created the Forum.
+     *
+     * @hibernate.many-to-one
+     * 		column="created_by"
+     *  	cascade="none"
+     *
+     */
+	public GmapUser getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(GmapUser createdBy) {
+		this.createdBy = createdBy;
+	}
+	
+	/**
+     * @return Returns the userid of the user who created the Forum.
+     *
+     * @hibernate.many-to-one
+     * 		column="updated_by"
+     *  	cascade="none"
+     *
+     */
+	public GmapUser getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(GmapUser updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
 
 
 }

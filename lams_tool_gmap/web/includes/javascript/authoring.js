@@ -3,6 +3,7 @@
 var map;
 var markers;
 var geocoder = null;
+var currUser;
 function init() {
 	// open the current tab    
 	var tag = document.getElementById("currentTab");

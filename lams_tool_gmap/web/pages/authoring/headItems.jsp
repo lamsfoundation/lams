@@ -6,6 +6,7 @@
 
 <script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
 <script type="text/javascript" src="${tool}includes/javascript/mapFunctions.js"></script>
+<script type="text/javascript" src="${tool}includes/javascript/mapFunctionsAuthoring.js"></script>
 
 <!--  
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>

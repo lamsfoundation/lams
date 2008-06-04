@@ -81,7 +81,7 @@ public class GmapDTO {
 	
 	public String mapType;
 	
-	public Set<GmapMarker> gmapMarkers;
+	public Set<GmapMarkerDTO> gmapMarkers = new TreeSet<GmapMarkerDTO>();
 	
 	public Set<GmapAttachmentDTO> onlineInstructionsFiles;
 
@@ -112,7 +112,6 @@ public class GmapDTO {
 		mapCenterLongitude = gmap.getMapCenterLongitude();		
 		mapZoom = gmap.getMapZoom();
 		mapType = gmap.getMapType();
-		gmapMarkers = gmap.getGmapMarkers();
 
 		onlineInstructionsFiles = new TreeSet<GmapAttachmentDTO>();
 		offlineInstructionsFiles = new TreeSet<GmapAttachmentDTO>();
@@ -135,9 +134,14 @@ public class GmapDTO {
 		
 		for (Iterator iter = gmap.getGmapSessions().iterator(); iter.hasNext();) {
 			GmapSession session = (GmapSession) iter.next();
-			GmapSessionDTO sessionDTO = new GmapSessionDTO(session);
-			
+			GmapSessionDTO sessionDTO = new GmapSessionDTO(session);			
 			sessionDTOs.add(sessionDTO);
+		}
+		
+		for (Iterator<GmapMarker> i = gmap.getGmapMarkers().iterator(); i.hasNext();) {
+			GmapMarker marker = (GmapMarker) i.next();
+			GmapMarkerDTO markerDTO = new GmapMarkerDTO(marker);
+			gmapMarkers.add(markerDTO);
 		}
 	}
 
@@ -312,11 +316,11 @@ public class GmapDTO {
 		this.mapType = mapType;
 	}
 
-	public Set<GmapMarker> getGmapMarkers() {
+	public Set<GmapMarkerDTO> getGmapMarkers() {
 		return gmapMarkers;
 	}
 
-	public void setGmapMarkers(Set<GmapMarker> gmapMarkers) {
+	public void setGmapMarkers(Set<GmapMarkerDTO> gmapMarkers) {
 		this.gmapMarkers = gmapMarkers;
 	}
 
