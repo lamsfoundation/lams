@@ -414,26 +414,15 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 	 */
 	public List<Summary> getSummary(Long contentId) {
 		
-		List<Summary> summaryList = new ArrayList<Summary>();
-		
-		//retrieve all the sessions associated with this taskList
-		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
-		
 		TaskList taskList = taskListDao.getByContentId(contentId);
-		ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
-		itemList.addAll(taskList.getTaskListItems());
-		//create the list containing all taskListItems  
-		for(TaskListSession session:sessionList) {
+		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
 
-			Set<TaskListItem> newItems = session.getTaskListItems();
-			for(TaskListItem item : newItems) {
-				if (!itemList.contains(item)) itemList.add(item);
-			}
-		}
-		
+		List<Summary> summaryList = new ArrayList<Summary>();
 		
 		//create the user list of all whom were started this task
 		for(TaskListSession session:sessionList) {
+			
+			List<TaskListItem> itemList = getItemListForGroup(contentId, session.getSessionId());
 			
 			List<TaskListUser> userList = taskListUserDao.getBySessionID(session.getSessionId());
 			
@@ -465,6 +454,46 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		return summaryList;
 	}
 	
+	/**
+	 * @param contentId
+	 * @param sessionId sessionId which defines Group 
+	 * @return
+	 */
+	public List<TaskListItem> getItemListForGroup(Long contentId, Long sessionId) {
+		
+		//create the list containing all taskListItems
+		TaskList taskList = taskListDao.getByContentId(contentId);
+		ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
+		itemList.addAll(taskList.getTaskListItems());
+		
+		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);  
+		for(TaskListSession session:sessionList) {
+			Set<TaskListItem> newItems = session.getTaskListItems();
+			for(TaskListItem item : newItems) {
+				if (!itemList.contains(item)) itemList.add(item);
+			}
+		}
+		
+		List<TaskListUser> userList = taskListUserDao.getBySessionID(sessionId);
+		
+		ArrayList<TaskListItem> groupItemList = new ArrayList<TaskListItem>();
+		for (TaskListItem item:itemList) {
+			
+			if (item.isCreateByAuthor()) {
+				groupItemList.add(item);
+			} else {
+				for (TaskListUser user:userList) {
+					if (user.getUserId().equals(item.getCreateBy().getUserId())) {
+						groupItemList.add(item);
+						break;
+					}
+				}
+			}
+		}
+		
+		return groupItemList;
+	}
+	
 	/** 
 	 * {@inheritDoc}
 	 */
@@ -474,8 +503,16 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		
 		List<GroupSummary> groupSummaries = new ArrayList<GroupSummary>();
 		
+		//create sessionList depending on if taskListItem created be author or created during learning
+		List<TaskListSession> sessionList = new ArrayList<TaskListSession>();
+		if (taskListItem.isCreateByAuthor()) {
+			sessionList = taskListSessionDao.getByContentId(contentId);	
+		} else {
+			TaskListSession userSession = taskListItem.getCreateBy().getSession();
+			sessionList.add(userSession);	
+		}
+		
 		//create the user list of all whom were started this task
-		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
 		for(TaskListSession session:sessionList) {
 			
 			GroupSummary groupSummary = new GroupSummary();
@@ -508,7 +545,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 					userItemSummary.setCompleted(false);
 				}
 				
-				//if we're doing export then fill up all the itemSummaries with reflection information
+				//if we're doing export then fill up all itemSummaries with reflection information
 				if (isExportProcessing) {
 
 					NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, 
