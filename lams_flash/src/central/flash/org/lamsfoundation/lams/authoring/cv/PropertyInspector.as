@@ -92,7 +92,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		numGroups_rdo.addEventListener("click", Delegate.create(this, onGroupingMethodChange));
 		numLearners_rdo.addEventListener("click", Delegate.create(this, onGroupingMethodChange));
 		groupType_cmb.addEventListener("change", Delegate.create(this, onGroupTypeChange));
-		gateType_cmb.addEventListener("change", Delegate.create(this, onGateTypeChange));
+		gateType_cmb.addEventListener("change", Delegate.create(this, gateTypeChange));
 		branchType_cmb.addEventListener("change", Delegate.create(this, onBranchTypeChange));
 		
 		toolActs_cmb.addEventListener("change", Delegate.create(this, onBranchToolInputChange));
@@ -108,13 +108,16 @@ class PropertyInspector extends PropertyInspectorControls {
 		days_stp.addEventListener("change", Delegate.create(this, onScheduleOffsetChange));
 		hours_stp.addEventListener("change", Delegate.create(this, onScheduleOffsetChange));
 		mins_stp.addEventListener("change", Delegate.create(this, onScheduleOffsetChange));
+		
 		days_stp.addEventListener("focusOut", Delegate.create(this, onScheduleOffsetChange));
 		hours_stp.addEventListener("focusOut", Delegate.create(this, onScheduleOffsetChange));
 		mins_stp.addEventListener("focusOut", Delegate.create(this, onScheduleOffsetChange));
+		
 		endHours_stp.addEventListener("change", Delegate.create(this, onScheduleOffsetChange));
 		endMins_stp.addEventListener("change", Delegate.create(this,onScheduleOffsetChange));
 		endHours_stp.addEventListener("focusOut", Delegate.create(this,onScheduleOffsetChange));
 		endMins_stp.addEventListener("focusOut", Delegate.create(this, onScheduleOffsetChange));
+		
 		numGroups_stp.addEventListener("change", Delegate.create(this, updateGroupingMethodData));
 		numLearners_stp.addEventListener("change", Delegate.create(this, updateGroupingMethodData));
 		numLearners_stp.addEventListener("focusOut", Delegate.create(this, updateGroupingMethodData));
@@ -138,6 +141,11 @@ class PropertyInspector extends PropertyInspectorControls {
 		setTabIndex();
 		hideAllSteppers(false);
 		
+	}
+	
+	private function gateTypeChange(evt:Object):Void {
+		onGateTypeChange(evt);
+		showGateActivityProperties(GateActivity(_canvasModel.selectedItem.activity));
 	}
 	
 	public function setupLabels(){
@@ -655,9 +663,22 @@ class PropertyInspector extends PropertyInspectorControls {
 		if(_canvasModel.selectedItem.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE) {
 			var offset:Number = GateActivity(_canvasModel.selectedItem.activity).gateStartTimeOffset;
 			
-			days_stp.value = (offset/60/24);
-			hours_stp.value = (offset%(days_stp.value*60*24))/60;
-			mins_stp.value = (offset%((days_stp.value*60*24) + (hours_stp.value*60)));
+			Debugger.log("offset: " + offset, Debugger.CRITICAL, "showGateActivityProperties", "PropertyInspector");
+			
+			if(offset > 0) {
+				var rem_days = offset%1440;
+				var rem_hours = rem_days%60;
+				var rem_mins = rem_hours
+				
+				days_stp.value = Math.floor((offset-rem_days)/1440); 
+				hours_stp.value = Math.floor((rem_days-rem_hours)/60); 
+				mins_stp.value = rem_mins; 
+				
+			} else {
+				days_stp.value = 0;
+				hours_stp.value = 0;
+				mins_stp.value = 0;
+			}
 		}
 		
 		//TODO: set the stepper values too!

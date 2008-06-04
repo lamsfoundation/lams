@@ -576,7 +576,6 @@ class PropertyInspectorControls extends MovieClip {
 				endHours_stp.enabled = true;
 				endMins_stp.enabled = true;
 			}
-					
 		}
 		
 		//this is a crazy hack to stop the steppter dissapearing after its .enabled property is set.
@@ -1104,13 +1103,13 @@ class PropertyInspectorControls extends MovieClip {
 	private function onScheduleOffsetChange(evt:Object){
 		
 		var startOffsetMins:Number = (days_stp.value * 60 * 24) + (hours_stp.value * 60) + mins_stp.value;
-		_canvasModel.selectedItem.activity.gateStartTimeOffset = startOffsetMins;
+		GateActivity(_canvasModel.selectedItem.activity).gateStartTimeOffset = startOffsetMins;
 		
 		var endOffsetMins:Number = (endHours_stp.value * 60) + endMins_stp.value;
-		_canvasModel.selectedItem.activity.gateEndTimeOffset = endOffsetMins;
+		GateActivity(_canvasModel.selectedItem.activity).gateEndTimeOffset = endOffsetMins;
 		
-		Debugger.log('activity.gateStartTimeOffset :'+_canvasModel.selectedItem.activity.gateStartTimeOffset ,Debugger.GEN,'onScheduleOffsetChange','PropertyInspector');
-		Debugger.log('activity.gateEndTimeOffset :'+_canvasModel.selectedItem.activity.gateEndTimeOffset,Debugger.GEN,'onScheduleOffsetChange','PropertyInspector');
+		Debugger.log('activity.gateStartTimeOffset :'+GateActivity(_canvasModel.selectedItem.activity).gateStartTimeOffset ,Debugger.GEN,'onScheduleOffsetChange','PropertyInspector');
+		Debugger.log('activity.gateEndTimeOffset :'+GateActivity(_canvasModel.selectedItem.activity).gateEndTimeOffset,Debugger.GEN,'onScheduleOffsetChange','PropertyInspector');
 		
 		setModified();
 		
