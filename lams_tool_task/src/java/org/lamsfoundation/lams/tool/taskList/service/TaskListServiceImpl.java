@@ -606,18 +606,7 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		Long contentId = getTaskListBySessionId(sessionId).getContentId();
 		
 		TaskList taskList = taskListDao.getByContentId(contentId);
-		ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
-		itemList.addAll(taskList.getTaskListItems());
-		
-		//retrieve all the sessions associated with this taskList
-		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
-		//create the list containing all taskListItems  
-		for(TaskListSession session:sessionList) {
-			Set<TaskListItem> newItems = session.getTaskListItems();
-			for(TaskListItem item : newItems) {
-				if (!itemList.contains(item)) itemList.add(item);
-			}
-		}
+		List<TaskListItem> itemList = getItemListForGroup(contentId, sessionId);
 		
 		List<List<GroupSummary>> eachItemOverallSummaries = new ArrayList<List<GroupSummary>>();
 		for(TaskListItem item:itemList) {
