@@ -17,6 +17,10 @@
 
 		<c:forEach var="condition" items="${sessionMap.conditionList}" varStatus="status">
 			<tr>
+                <td width="2%">
+					${status.index + 1}
+				</td>
+			
                 <td>
 					${condition.name}
 				</td>
