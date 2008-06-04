@@ -23,9 +23,8 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -52,7 +51,6 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.EditActivityDTO;
-import org.lamsfoundation.lams.tool.mc.ExportPortfolioDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
@@ -142,13 +140,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 			path="/monitoring/editQuestionBox.jsp"
 			redirect="false"
 	    />
-
-
-	  	<forward
-		    name="errorList"
-	        path="/McErrorBox.jsp"
-		    redirect="false"
-	  	/>
 	</action>  
   
  * 
@@ -4678,6 +4669,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		McContent mcContent = mcService.retrieveMc(new Long(toolContentID));
 		
 		String errors = null; 
+		OutputStream out = response.getOutputStream();
 		
 		try {
 			//construct download file response header
@@ -4687,17 +4679,16 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 			response.setContentType(mineType);
 			response.setHeader("Content-Disposition",header);
 
-			prepareSessionDataSpreadsheet(request, response, mcContent, mcService, messageService, currentMonitoredToolSession, response.getOutputStream());
+			prepareSessionDataSpreadsheet(request, response, mcContent, mcService, messageService, currentMonitoredToolSession, out);
 			
 		} catch (Exception e) {
 			log.error(e);
-			errors = new ActionMessage("monitoring.download.error", e.toString()).toString();
+			errors = getMessageService().getMessage("error.monitoring.spreadsheet.download") + " " + e;
 		}
 	
 		if(errors != null){
 			try {
-				PrintWriter out = response.getWriter();
-				out.write(errors);
+				out.write(errors.getBytes());
 				out.flush();
 			} catch (IOException e) {
 			}

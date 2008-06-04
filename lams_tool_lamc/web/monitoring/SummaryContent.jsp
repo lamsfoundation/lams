@@ -56,7 +56,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">
 				
-					<c:if test="${fn:length(mcGeneralMonitoringDTO.summaryToolSessions) > 2 }">
+					<c:choose>
+					<c:when test="${fn:length(mcGeneralMonitoringDTO.summaryToolSessions) > 2 }">
 						<%-- When grouping is not enabled, we have only 2 items in summaryToolSessions.  The main toolSession and 'All' --%>
 								
 						<tr> 
@@ -80,7 +81,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</select>									
 							</td> 
 						</tr>
-					</c:if>					
+					</c:when>
+					<c:otherwise>
+						<tr><td><input type="hidden" name="monitoredToolSessionId" value="All" /></td></tr>
+					</c:otherwise>
+					</c:choose>
 					
 		  	 		<c:set var="queIndex" scope="request" value="0"/>
 					<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
