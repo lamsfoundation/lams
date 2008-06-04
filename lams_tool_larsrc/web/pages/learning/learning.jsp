@@ -117,8 +117,7 @@
 									border="0">
 							</c:when>
 							<c:otherwise>
-								<img src="<html:rewrite page='/includes/images/cross.gif'/>"
-									border="0">
+								-
 							</c:otherwise>
 						</c:choose>
 					</td>
