@@ -128,8 +128,9 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		if(!_nested)
 			_level = 0;
-			
-		_complexLevel = 0;
+		
+		if(_complexLevel == null)
+			_complexLevel = 0;
 		
 		init();
 	}
@@ -258,8 +259,11 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 				*/
 			} else if(learnerAct.activity == activeComplex) {
 				var _cChildren:Array = (model instanceof LessonModel) ? model.learningDesignModel.getComplexActivityChildren(activeComplex.activityUIID) : model.ddm.getComplexActivityChildren(activeComplex.activityUIID);
+				Debugger.log("learner level: " + _level, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
+				Debugger.log("learner complex level: " + _complexLevel, Debugger.CRITICAL, "drawChildren", "LearnerComplexActivity");
+		
 				
-				learnerAct = LearnerComplexActivity(childHolder_mc.createChildAtDepth("LearnerComplexActivity_Nested", DepthManager.kTop, {_activity:_children[i], _children:_cChildren, _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _nested:true, _level: _level+_complexLevel+1, _x:0, _y:childCoordY+21}));
+				learnerAct = LearnerComplexActivity(childHolder_mc.createChildAtDepth("LearnerComplexActivity_Nested", DepthManager.kTop, {_activity:_children[i], _children:_cChildren, _controller:_controller, _view:_view, learner:learner, actStatus:progStatus, _nested:true, _level: _level+1, _complexLevel:_complexLevel, _x:0, _y:childCoordY+21}));
 				children_mc.push(learnerAct);
 						
 				return i+1;
@@ -368,8 +372,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 				if(children_mc[i].activity != activeSequence)
 					activeSequence = children_mc[i].activity;
 			} else if(isChildCurrent && (children_mc[i].activity.isOptionsWithSequencesActivity() || children_mc[i].activity.isOptionalActivity() || children_mc[i].activity.isParallelActivity())) {
-				if(children_mc[i].activity != activeComplex)
+				if(children_mc[i].activity != activeComplex) {
 					activeComplex = children_mc[i].activity;
+					_complexLevel = children_mc[i].level;
+				}
 			}
 			
 			if(isChildAttempted && children_mc[i].activity.isSequenceActivity()) {
@@ -377,8 +383,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 				if(model.checkComplexHasCurrentActivity(children_mc[i].activity, learner) && (children_mc[i].activity != activeSequence))
 					activeSequence = children_mc[i].activity;
 			} else if(isChildAttempted && (children_mc[i].activity.isOptionsWithSequencesActivity() || children_mc[i].activity.isOptionalActivity() || children_mc[i].activity.isParallelActivity())) {
-				if(model.checkComplexHasCurrentActivity(children_mc[i].activity, learner) && (children_mc[i].activity != activeComplex))
+				if(model.checkComplexHasCurrentActivity(children_mc[i].activity, learner) && (children_mc[i].activity != activeComplex)) {
 					activeComplex = children_mc[i].activity;
+					_complexLevel = children_mc[i].level;
+				}
 			}
 			
 			if(children_mc[i].activityStatus == "completed_mc") {
@@ -445,9 +453,11 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		updateComplex();
 	}
 	
-	public function removeAllChildrenAndInputComplex(activity:ComplexActivity, complexLevel:Number):Void {
+	public function removeAllChildrenAndInputComplex(activity:ComplexActivity, tempComplexLevel:Number):Void {
+		Debugger.log("activecomplex: " + tempComplexLevel, Debugger.CRITICAL, "removeAllChildrenAndInputComplex", "LearnerComplexActivity");
+		
 		activeComplex = activity;
-		_complexLevel = complexLevel;
+		_complexLevel = tempComplexLevel;
 		
 		manualSelect = true;
 		
@@ -522,6 +532,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		var border_color = new Color(this.container_pnl.bg);
 		
 		var styleObject = _tm.getStyleObject("progressBar");
+		
+		Debugger.log("style level: " + _level, Debugger.CRITICAL, "draw", "LearnerComplexActivity");
+		
+		Debugger.log("style mod: " + (_level%styleObject.colors.length), Debugger.CRITICAL, "draw", "LearnerComplexActivity");
 		
 		bgcolor.setRGB(styleObject.colors[_level%styleObject.colors.length].backgroundColor);
 		border_color.setRGB(styleObject.colors[_level%styleObject.colors.length].borderColor);
@@ -752,6 +766,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	public function get level():Number {
 		return _level;
+	}
+	
+	public function get complexLevel():Number {
+		return _complexLevel;
 	}
 	
 	public function destroy():Void {

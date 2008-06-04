@@ -229,9 +229,8 @@ class LearnerActivity extends MovieClip {
 		}
 		
 		Debugger.log("parent level: " + _parent._parent.level, Debugger.CRITICAL, "draw", "LearnerActivity");
-		
 		if(_parent._parent.level > 0) {
-			for(var i=0; i<_parent._parent.level; i++)
+			for(var i=0; i<(_parent._parent.level + _parent._parent.complexLevel); i++)
 				toolTitle = "-" + toolTitle;
 		}
 		
