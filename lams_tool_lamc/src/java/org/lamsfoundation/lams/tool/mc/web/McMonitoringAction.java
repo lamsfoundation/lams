@@ -4668,30 +4668,33 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		McContent mcContent = mcService.retrieveMc(new Long(toolContentID));
 		
-		String errors = null; 
-		OutputStream out = response.getOutputStream();
+		byte[] spreadsheet = null;
 		
 		try {
-			//construct download file response header
-			String fileName = "lams_mcq_" + currentMonitoredToolSession+".xls";
-			String mineType = "application/vnd.ms-excel";
-			String header = "attachment; filename=\"" + fileName + "\";";
-			response.setContentType(mineType);
-			response.setHeader("Content-Disposition",header);
-
-			prepareSessionDataSpreadsheet(request, response, mcContent, mcService, messageService, currentMonitoredToolSession, out);
-			
+			spreadsheet = prepareSessionDataSpreadsheet(request, response, mcContent, mcService, messageService, currentMonitoredToolSession);
 		} catch (Exception e) {
-			log.error(e);
-			errors = getMessageService().getMessage("error.monitoring.spreadsheet.download") + " " + e;
+			log.error("Error preparing spreadsheet: ", e);
+			request.setAttribute("errorName", messageService.getMessage("error.monitoring.spreadsheet.download"));
+			request.setAttribute("errorMessage", e);
+			return mapping.findForward("error");
 		}
-	
-		if(errors != null){
+		
+		//	construct download file response header
+		OutputStream out = response.getOutputStream();
+		String fileName = "lams_mcq_" + currentMonitoredToolSession+".xls";
+		String mineType = "application/vnd.ms-excel";
+		String header = "attachment; filename=\"" + fileName + "\";";
+		response.setContentType(mineType);
+		response.setHeader("Content-Disposition",header);
+		
+		// write response
+		try {
+			out.write(spreadsheet);
+			out.flush();
+		} finally {
 			try {
-				out.write(errors.getBytes());
-				out.flush();
-			} catch (IOException e) {
-			}
+        		if (out != null) out.close();
+        	} catch (IOException e) {}
 		}
 		
 		return null;
@@ -4699,7 +4702,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	
 	/**
 	 * prepareSessionDataSpreadsheet(HttpServletRequest request, HttpServletResponse response McContent mcContent, 
-	        IMcService mcService, MessageService messageService, String currentMonitoredToolSession, OutputStream out)
+	        IMcService mcService, MessageService messageService, String currentMonitoredToolSession)
 	 * 
 	 * 
 	 * prepareSessionDataSpreadsheet
@@ -4709,12 +4712,11 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	 * @param mcContent
 	 * @param mcService
 	 * @param currentMonitoredToolSession
-	 * @param errors
 	 * 
 	 * @return data to write out
 	 */
-    public void prepareSessionDataSpreadsheet(HttpServletRequest request, HttpServletResponse response, McContent mcContent, 
-	        IMcService mcService, MessageService messageService, String currentMonitoredToolSession, OutputStream out) 
+    public byte[] prepareSessionDataSpreadsheet(HttpServletRequest request, HttpServletResponse response, McContent mcContent, 
+	        IMcService mcService, MessageService messageService, String currentMonitoredToolSession) 
     		throws IOException, ServletException
 	{
     	//create an empty excel file
@@ -4826,10 +4828,13 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 			
 		byte[] data = bos.toByteArray();
     	
+		return data;
+		/*
 		if(out != null) {
 			out.write(data, 0, data.length);
 			out.flush();
 		}
+		*/
 	}
 
     /**

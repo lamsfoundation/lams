@@ -24,16 +24,12 @@
 
 package org.lamsfoundation.lams.tool.mc.web;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import java.io.File;
-import java.io.OutputStream;
-import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -41,18 +37,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
-import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 /**
  * <p> Enables exporting portfolio for teacher and learner modes. </p> 
@@ -231,15 +224,14 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
         String fileName="lams_mcq_All_" + toolContentID + ".xls";
         MessageService messageService = McServiceProxy.getMessageService(getServletContext());
         
+        OutputStream out = null;
         try{
-            OutputStream out = new FileOutputStream(directoryName +  File.separator + fileName);
-            
-            String errors = null;
+            out = new FileOutputStream(directoryName +  File.separator + fileName);
             
             McMonitoringAction mcMonitoringAction= new McMonitoringAction();
-            mcMonitoringAction.prepareSessionDataSpreadsheet(request, response, mcContent, mcService, messageService, "All", out);
-        
-            out.close();
+            byte[] spreadsheet = mcMonitoringAction.prepareSessionDataSpreadsheet(request, response, mcContent, mcService, messageService, "All");
+
+            out.write(spreadsheet);
             
             request.getSession().setAttribute(PORTFOLIO_EXPORT_DATA_FILENAME, fileName);
         }
@@ -254,6 +246,12 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
         catch(Exception e)
         {
         	logger.error("exception creating spreadsheet: ",e) ;
+        } 
+        finally
+        {
+        	try {
+        		if (out != null) out.close();
+        	} catch (IOException e) {}
         }
         
     }

@@ -21,7 +21,8 @@
 
  	<!-- ========== Global Forward Definitions =================================== -->
    	<global-forwards>
-		<forward name="starter" path="/authoringStarter"/>   
+		<forward name="starter" path="/authoringStarter"/>
+		<forward name="error" path="/error.jsp"/>   
 	</global-forwards>
 	
   <!-- ========== Action Mapping Definitions =================================== -->
