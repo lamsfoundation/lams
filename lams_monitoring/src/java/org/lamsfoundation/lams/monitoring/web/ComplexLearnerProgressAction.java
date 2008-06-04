@@ -126,8 +126,9 @@ public class ComplexLearnerProgressAction extends Action {
 					ContributeActivityDTO dto = new ContributeActivityDTO(a);
 					subActivities.add(dto);
 
-					statusMap.put(a.getActivityId(), learnerProgress.getProgressState(a));
-
+					Byte status = learnerProgress.getProgressState(a);
+					statusMap.put(a.getActivityId(), status);
+					
 					if (a.isSequenceActivity()) {
 						request.setAttribute("hasSequenceActivity", true);
 						// map learner progress urls of each activity in the sequence
@@ -136,6 +137,10 @@ public class ComplexLearnerProgressAction extends Action {
 						processSequenceChildren(lessonID, userID,
 								monitoringService, user, statusMap, urlMap,
 								learnerProgress, sequenceActivity, dto, null);
+					} else {
+						if (status.equals(LearnerProgress.ACTIVITY_ATTEMPTED) || status.equals(LearnerProgress.ACTIVITY_COMPLETED)) {
+							urlMap.put(a.getActivityId(), monitoringService.getLearnerActivityURL(lessonID, a.getActivityId(), userID, user.getUserID()));
+						}
 					}
 				}
 				
