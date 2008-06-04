@@ -189,7 +189,7 @@
 			<div class="space-bottom-top align-right">
 
 				<c:choose>
-					<c:when	test="${taskList.monitorVerificationRequired && !sessionMap.userVerifiedByMonitor}">
+					<c:when	test="${taskList.monitorVerificationRequired && !sessionMap.userVerifiedByMonitor && (mode != 'author')}">
 						<fmt:message key="label.learning.wait.for.monitor.verification" />
 					</c:when>
 				

@@ -454,46 +454,6 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
 		return summaryList;
 	}
 	
-	/**
-	 * @param contentId
-	 * @param sessionId sessionId which defines Group 
-	 * @return
-	 */
-	public List<TaskListItem> getItemListForGroup(Long contentId, Long sessionId) {
-		
-		//create the list containing all taskListItems
-		TaskList taskList = taskListDao.getByContentId(contentId);
-		ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
-		itemList.addAll(taskList.getTaskListItems());
-		
-		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);  
-		for(TaskListSession session:sessionList) {
-			Set<TaskListItem> newItems = session.getTaskListItems();
-			for(TaskListItem item : newItems) {
-				if (!itemList.contains(item)) itemList.add(item);
-			}
-		}
-		
-		List<TaskListUser> userList = taskListUserDao.getBySessionID(sessionId);
-		
-		ArrayList<TaskListItem> groupItemList = new ArrayList<TaskListItem>();
-		for (TaskListItem item:itemList) {
-			
-			if (item.isCreateByAuthor()) {
-				groupItemList.add(item);
-			} else {
-				for (TaskListUser user:userList) {
-					if (user.getUserId().equals(item.getCreateBy().getUserId())) {
-						groupItemList.add(item);
-						break;
-					}
-				}
-			}
-		}
-		
-		return groupItemList;
-	}
-	
 	/** 
 	 * {@inheritDoc}
 	 */
@@ -1103,6 +1063,48 @@ public class TaskListServiceImpl implements ITaskListService,ToolContentManager,
     	}
 	    return contentId;
     }
+    
+	/**
+	 * Returns list of tasks from authoring + the tasks added by members of that group. 
+	 * 
+	 * @param contentId
+	 * @param sessionId sessionId which defines Group 
+	 * @return
+	 */
+	private List<TaskListItem> getItemListForGroup(Long contentId, Long sessionId) {
+		
+		//create the list containing all taskListItems
+		TaskList taskList = taskListDao.getByContentId(contentId);
+		ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
+		itemList.addAll(taskList.getTaskListItems());
+		
+		List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);  
+		for(TaskListSession session:sessionList) {
+			Set<TaskListItem> newItems = session.getTaskListItems();
+			for(TaskListItem item : newItems) {
+				if (!itemList.contains(item)) itemList.add(item);
+			}
+		}
+		
+		List<TaskListUser> userList = taskListUserDao.getBySessionID(sessionId);
+		
+		ArrayList<TaskListItem> groupItemList = new ArrayList<TaskListItem>();
+		for (TaskListItem item:itemList) {
+			
+			if (item.isCreateByAuthor()) {
+				groupItemList.add(item);
+			} else {
+				for (TaskListUser user:userList) {
+					if (user.getUserId().equals(item.getCreateBy().getUserId())) {
+						groupItemList.add(item);
+						break;
+					}
+				}
+			}
+		}
+		
+		return groupItemList;
+	}
     
     /**
      * Process an uploaded file.

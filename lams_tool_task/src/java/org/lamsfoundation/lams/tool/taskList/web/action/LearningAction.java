@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.taskList.web.action;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
@@ -65,6 +66,8 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
 import org.lamsfoundation.lams.tool.taskList.service.TaskListException;
 import org.lamsfoundation.lams.tool.taskList.service.UploadTaskListFileException;
+import org.lamsfoundation.lams.tool.taskList.util.TaskListItemAttachmentComparator;
+import org.lamsfoundation.lams.tool.taskList.util.TaskListItemCommentComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
@@ -257,8 +260,8 @@ public class LearningAction extends Action {
 			isPreviousTaskCompleted = item.isComplete();
 			
 			//filter out comments and attachments which belong to another group
-			Set filteredComments = new HashSet<TaskListItemComment>();
-			Set filteredAttachments = new HashSet<TaskListItemAttachment>();
+			Set filteredComments = new TreeSet<TaskListItemComment>(new TaskListItemCommentComparator());
+			Set filteredAttachments = new TreeSet<TaskListItemAttachment>(new TaskListItemAttachmentComparator());
 			if (mode.isLearner()) {
 				
 				List<TaskListUser> grouppedUsers = service.getUserListBySessionId(sessionId);
