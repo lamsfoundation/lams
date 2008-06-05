@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}"
-	scope="request" />
+<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <c:set var="tool">
 	<lams:WebAppURL />
@@ -13,11 +13,26 @@
 	</h2>
 	
 	<table class="alternative-color" id="conditionTable" cellspacing="0">
-		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+		<tr>
+			<th width="8%">
+				<fmt:message key="label.authoring.conditions.order" />
+			</th>
+			<th align="left" colspan="4">
+				<fmt:message key="label.authoring.conditions.condition.name" />
+			</th>
+		</tr>
+
+		<c:if test="${empty sessionMap.conditionList}">
+			<tr>
+                <td colspan="5">
+					<fmt:message key="label.authoring.conditions.empty.condition.list" />
+				</td>
+			</tr>
+		</c:if>
 
 		<c:forEach var="condition" items="${sessionMap.conditionList}" varStatus="status">
 			<tr>
-                <td width="2%">
+                <td>
 					${status.index + 1}
 				</td>
 			
