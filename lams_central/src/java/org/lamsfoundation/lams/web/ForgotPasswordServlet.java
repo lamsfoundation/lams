@@ -56,6 +56,7 @@ public class ForgotPasswordServlet extends HttpServlet
 	public static String EMAIL_NOT_FOUND			= "error.email.not.found";
 	public static String MULTIPLE_EMAILS			= "error.multiple.emails";
 	public static String EMAIL_FAILED				= "error.email.not.sent";
+	public static String REQUEST_KEY_NOT_FOUND		= "error.forgot.password.incorrect.key";
 	
 	private static int MILLISECONDS_IN_A_DAY 	= 86400000;
 	
@@ -269,6 +270,18 @@ public class ForgotPasswordServlet extends HttpServlet
 		IUserManagementService userService = (IUserManagementService) ctx.getBean("userManagementService");
 		
 		ForgotPasswordRequest fp = userService.getForgotPasswordRequest(key);
+		
+		if (fp == null)
+		{
+			response.sendRedirect(Configuration.get("ServerURL") + "forgotPasswordProc.jsp?" + 
+					STATE + 
+					0 + 
+					LANGUAGE_KEY + 
+					REQUEST_KEY_NOT_FOUND
+					);
+			return;
+		}
+		
 		long cutoffTime = fp.getRequestDate().getTime() + MILLISECONDS_IN_A_DAY;
 		Date now = new Date();
 	    long nowLong = now.getTime();
@@ -286,6 +299,8 @@ public class ForgotPasswordServlet extends HttpServlet
 			// validate password request expired
 			languageKey = this.PASSWORD_REQUEST_EXPIRED;
 		}
+		
+		userService.delete(fp);
 		
 		response.sendRedirect(Configuration.get("ServerURL") + "forgotPasswordProc.jsp?" + 
 				STATE + 
