@@ -16,11 +16,11 @@
 			<html:hidden property="sessionMapID" />
 			<html:hidden property="sequenceId" />
 			<h2 class="no-space-left">
-				<fmt:message key="label.authoring.basic.add.task" />
+				<fmt:message key="label.authoring.conditions.add.condition" />
 			</h2>
 
 			<div class="field-name">
-            	<fmt:message key="label.authoring.basic.resource.title.input" />
+            	<fmt:message key="label.authoring.conditions.condition.name" />
 			</div>
 
 			<div class="small-space-bottom">
