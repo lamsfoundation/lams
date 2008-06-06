@@ -696,7 +696,7 @@ class PropertyInspector extends PropertyInspectorControls {
 			}
 		}
 		
-		if(_canvasModel.getCanvas().ddm.editOverrideLock) {
+		if(_canvasModel.getCanvas().ddm.editOverrideLock && _canvasModel.selectedItem.activity.activityID != null) {
 			branchType_cmb.enabled = false;
 		}
 		
