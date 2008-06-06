@@ -1,8 +1,7 @@
 -- Update the Notebook tables to 20080220
 -- This is for the LAMS 2.1 release.
 
-ALTER TABLE tl_lafrum11_message
-ADD COLUMN authored_parent_uid bigint;
+ALTER TABLE tl_lafrum11_message ADD COLUMN authored_parent_uid bigint;
 
 alter table tl_lafrum11_message add index IX_msg_auth_parent (authored_parent_uid);
 
