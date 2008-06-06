@@ -243,7 +243,7 @@ public class BranchCondition implements Comparable {
 		if ( output != null ) {
 			if ( exactMatchValue != null ) {
 				return exactMatchMet(output.getValue());
-			} else if ( startValue != null ) {
+			} else if ( startValue != null || endValue != null) {
 				return inRange(output.getValue());
 			}
 		}
