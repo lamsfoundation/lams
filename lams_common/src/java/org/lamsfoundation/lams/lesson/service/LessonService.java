@@ -237,7 +237,9 @@ public class LessonService implements ILessonService
      */
   	public void performGrouping(Grouping grouping, String groupName, List learners) throws LessonServiceException {
   		
-		if ( grouping != null && grouping.isChosenGrouping() ) {
+		if ( grouping != null ) {
+			// Ensure we have a real grouping object, not just a CGLIB version (LDEV-1817)
+			grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
         	Grouper grouper = grouping.getGrouper();
         	if ( grouper != null ) {
         		grouper.setCommonMessageService(messageService);
@@ -248,10 +250,6 @@ public class LessonService implements ILessonService
         		}
         		groupingDAO.update(grouping);
         	}
-		} else {
-			String error = "The method performChosenGrouping supports only grouping methods where the supplied list should be used as a single group (currently only ChosenGrouping). Called with wrong grouper "+grouping;
-			log.error(error);
-			throw new LessonServiceException(error);
 		}
   	}
     

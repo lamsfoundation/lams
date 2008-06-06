@@ -59,6 +59,7 @@ public class LoadToolActivityAction extends ActivityAction {
 
 	public static final String DEFINE_LATER = "previewDefineLater";
 	public static final String PARAM_ACTIVITY_URL = "activityURL";
+	public static final String PARAM_IS_BRANCHING = "isBranching";
 
 	/**
 	 * Gets an activity from the request (attribute) and forwards onto a
@@ -88,6 +89,7 @@ public class LoadToolActivityAction extends ActivityAction {
 				// preview define later
 				request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
 				request.setAttribute(PARAM_ACTIVITY_URL, url);
+				request.setAttribute(PARAM_IS_BRANCHING, activity.isBranchingActivity());
 				return mapping.findForward("previewDefineLater");
 			} else {
 				// normal case

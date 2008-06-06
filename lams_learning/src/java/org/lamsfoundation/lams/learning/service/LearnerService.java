@@ -49,7 +49,6 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
-import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
@@ -612,10 +611,24 @@ public class LearnerService implements ICoreLearnerService
 		if ( lesson.isPreviewLesson() ) {
 			ArrayList<User> learnerList = new ArrayList<User>();
 			learnerList.add(learner);
-			if ( group != null && group.getGroupId() != null )
-				lessonService.performGrouping(grouping, group!=null?group.getGroupId():null, learnerList);
-			else 
-				lessonService.performGrouping(grouping, group.getGroupName(), learnerList);
+			if ( group != null ) {
+				if ( group.getGroupId() != null )
+					lessonService.performGrouping(grouping, group.getGroupId(), learnerList);
+				else 
+					lessonService.performGrouping(grouping, group.getGroupName(), learnerList);
+			} else {
+				if ( grouping.getGroups().size() > 0 ) {
+					// if any group exists, put them in there.
+					Group aGroup = (Group)grouping.getGroups().iterator().next();
+					if ( aGroup.getGroupId() != null )
+						lessonService.performGrouping(grouping, aGroup.getGroupId(), learnerList);
+					else 
+						lessonService.performGrouping(grouping, aGroup.getGroupName(), learnerList);
+				} else {
+					// just create a group and stick the user in there!
+					lessonService.performGrouping(grouping, (String)null, learnerList);
+				}
+			}
 			groupingDone = true;
 		}
 		return groupingDone;
@@ -993,8 +1006,14 @@ public class LearnerService implements ICoreLearnerService
 					}
 				}
 				
-			// if no groups exist, then create one and assign it to the branch.
-    		} else {
+			// if no matching groups exist (just to Define in Monitor), then create one and assign it to the branch. 
+			// if it is a chosen grouping, make sure we allow it to go over the normal number of groups (the real groups will exist
+			// but it too hard to reuse them.)
+			} else {
+    			if ( grouping.isChosenGrouping() && grouping.getMaxNumberOfGroups() != null ) {
+   					grouping.setMaxNumberOfGroups(null); 
+    			}
+
 				Group group = lessonService.createGroup(grouping, selectedBranch.getTitle());
 				group.allocateBranchToGroup(null, selectedBranch, branchingActivity);
 				if ( ! forceGrouping(lesson, grouping, group, learner) ) {
