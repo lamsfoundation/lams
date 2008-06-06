@@ -30,6 +30,8 @@ import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
 import org.lamsfoundation.lams.authoring.Activity;
+import org.lamsfoundation.lams.authoring.SequenceActivity;
+import org.lamsfoundation.lams.authoring.ComplexActivity;
 import org.lamsfoundation.lams.common.style.*;
 
 import com.polymercode.Draw;
@@ -325,8 +327,17 @@ class LearnerActivity extends MovieClip {
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','LearnerActivity');
 			Debugger.log('Is sequence:'+this.activity.isSequenceActivity(),Debugger.GEN,'onRelease','LearnerActivity');
-				var activeComplex = LearnerComplexActivity(this._parent._parent).getActiveComplex();
-				var activeSequence = LearnerComplexActivity(this._parent._parent).getActiveSequence();
+			
+			Debugger.log('cmap:'+LearnerComplexActivity(_parent._parent).sequenceMap,Debugger.CRITICAL,'onRelease','LearnerActivity');
+			Debugger.log('cmap length:'+LearnerComplexActivity(_parent._parent).sequenceMap.values().length,Debugger.CRITICAL,'onRelease','LearnerActivity');
+			
+			Debugger.log('activity uiid:'+this.activity.activityUIID,Debugger.CRITICAL,'onRelease','LearnerActivity');
+			Debugger.log('c value :'+ LearnerComplexActivity(_parent._parent).sequenceMap.containsValue(SequenceActivity(this.activity)),Debugger.CRITICAL,'onRelease','LearnerActivity');
+			Debugger.log('c title :'+ LearnerComplexActivity(_parent._parent).sequenceMap.values()[0].title,Debugger.CRITICAL,'onRelease','LearnerActivity');
+			
+			
+			var activeComplex = LearnerComplexActivity(_parent._parent).complexMap.get(this.activity.activityUIID);
+			var activeSequence = LearnerComplexActivity(_parent._parent).sequenceMap.get(this.activity.activityUIID);
 					
 				if(this.activity.isSequenceActivity()) {
 					// insert sequence design into learner complex activity
@@ -336,26 +347,26 @@ class LearnerActivity extends MovieClip {
 					
 					if(LearnerComplexActivity(this._parent._parent).activity.activityUIID == this.activity.parentUIID) {
 						
-						LearnerComplexActivity(this._parent._parent).setActiveComplex(null);
+						LearnerComplexActivity(this._parent._parent).setActiveComplex(null); //****
 						
-						if(activeSequence == this.activity) {
+						if(activeSequence) {
 							// close current active sequence
-							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(null);
+							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(null, true);
 						} else {
 							// open sequence
-							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(this.activity);
+							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(this.activity, true);
 						}
 						
 					}
 				} else if(this.activity.isOptionsWithSequencesActivity() || this.activity.isOptionalActivity() || this.activity.isParallelActivity() || this.activity.isBranchingActivity()) {
 					Debugger.log('activeComplex:'+activeComplex, Debugger.CRITICAL,'onRelease','LearnerActivity');
 					if(model.findParent(this.activity, LearnerComplexActivity(this._parent._parent).activity) || (activeSequence.activityUIID == this.activity.parentUIID)) {
-						if(activeComplex == this.activity) {
+						if(activeComplex != null) {
 							// close current active complex
-							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(null);
+							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(null, null, true);
 						} else {
 							// open complex
-							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(this.activity, this.level);
+							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(this.activity, this.level, true);
 						}
 					}
 				}
