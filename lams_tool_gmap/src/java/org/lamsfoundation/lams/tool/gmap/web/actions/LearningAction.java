@@ -1,5 +1,5 @@
 /****************************************************************
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * Copyright (C) 2008 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
@@ -25,9 +25,14 @@
 package org.lamsfoundation.lams.tool.gmap.web.actions;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.Date;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -42,6 +47,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapUserDTO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
+import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
@@ -54,6 +60,11 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
  * @author
@@ -202,19 +213,29 @@ public class LearningAction extends LamsDispatchAction {
 
 			gmapUser.setFinishedActivity(true);
 			gmapService.saveOrUpdateGmapUser(gmapUser);
+			
+			
+			// Retrieve the session and content.
+			GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
+			if (gmapSession == null) {
+				throw new GmapException("Cannot retreive session with toolSessionID"+ toolSessionID);
+			}
+			
+			// update the marker list
+			Gmap gmap = gmapSession.getGmap();
+			updateMarkerListFromXML(learningForm.getMarkersXML(), gmap, gmapUser);
+
 		} else {
 			log.error("finishActivity(): couldn't find GmapUser with id: "
 					+ gmapUser.getUserId() + "and toolSessionID: "
 					+ toolSessionID);
 		}
 
-		ToolSessionManager sessionMgrService = GmapServiceProxy
-				.getGmapSessionManager(getServlet().getServletContext());
 
+		ToolSessionManager sessionMgrService = GmapServiceProxy.getGmapSessionManager(getServlet().getServletContext());
 		String nextActivityUrl;
 		try {
-			nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID,
-					gmapUser.getUserId());
+			nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID,gmapUser.getUserId());
 			response.sendRedirect(nextActivityUrl);
 		} catch (DataMissingException e) {
 			throw new GmapException(e);
@@ -226,4 +247,69 @@ public class LearningAction extends LamsDispatchAction {
 
 		return null; // TODO need to return proper page.
 	}
+
+	private void updateMarkerListFromXML(String markerXML, Gmap gmap, GmapUser guser)
+	{
+		//Set<GmapMarker> newMarkers = new HashSet<GmapMarker>();
+		Set<GmapMarker> existingMarkers = gmap.getGmapMarkers();
+		try 
+		{
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document document = db.parse(new InputSource(new StringReader(markerXML)));
+			NodeList list = document.getElementsByTagName("marker");
+			
+			for (int i =0; i<list.getLength(); i++)
+			{
+				NamedNodeMap markerNode = ((Node)list.item(i)).getAttributes();
+				
+				Long uid  = Long.parseLong(markerNode.getNamedItem("markerUID").getNodeValue());
+				String markerTitle = markerNode.getNamedItem("title").getNodeValue();
+				String infoMessage = markerNode.getNamedItem("infoMessage").getNodeValue();
+				Double latitude = Double.parseDouble(markerNode.getNamedItem("latitude").getNodeValue());
+				Double longitude = Double.parseDouble(markerNode.getNamedItem("longitude").getNodeValue());
+
+				String markerState = markerNode.getNamedItem("state").getNodeValue();
+				
+				if (markerState.equals("remove"))
+				{
+					gmap.removeMarker(uid);
+					return;
+				}
+
+				GmapMarker marker = null;
+				if (markerState.equals("save"))
+				{
+					marker = new GmapMarker();
+					marker.setCreatedBy(guser);
+					marker.setCreated(new Date());
+				}
+				else if (markerState.equals("update"))
+				{
+					marker = gmap.getMarkerByUid(uid);
+				}
+				
+				marker.setTitle(markerTitle);
+				marker.setInfoWindowMessage(infoMessage);
+				marker.setLatitude(latitude);
+				marker.setLongitude(longitude);
+				marker.setGmap(gmap);
+				marker.setUpdated(new Date());
+				marker.setUpdatedBy(guser);
+				marker.setAuthored(false);
+				gmapService.saveOrUpdateGmapMarker(marker);
+					
+				
+			}
+		}
+		catch (Exception e)
+		{
+			// TODO: improve error handling
+			log.error("Could not get marker xml object to update", e);
+		}
+	}
+	
+	
+	
+	
 }

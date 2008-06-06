@@ -1,5 +1,5 @@
 /****************************************************************
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * Copyright (C) 2008 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
@@ -29,7 +29,7 @@ import org.apache.struts.action.ActionForm;
 
 /**
  * 
- * @author Anthony Sukkar
+ * @author lfoxton
  * 
  * @struts.form name="learningForm"
  */
@@ -45,6 +45,16 @@ public class LearningForm extends ActionForm {
 	String mode;
 	
 	String entryText;
+	
+	String markersXML;
+
+	public String getMarkersXML() {
+		return markersXML;
+	}
+
+	public void setMarkersXML(String markersXML) {
+		this.markersXML = markersXML;
+	}
 
 	public String getMode() {
 		return mode;

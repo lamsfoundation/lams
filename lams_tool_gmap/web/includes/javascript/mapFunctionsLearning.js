@@ -66,27 +66,3 @@ function saveMarkerInfo(x)
 }
 
 
-function serialiseMarkers()
-{
-	var xmlString = '<?xml version="1.0"?><markers>';
-	var i =0;
-	
-	for (;i<markers.length;i++)
-	{
-		if (markers[i].state != "unchanged" && markers[i].state !="unsaved")
-		{
-			var markerString = '<marker'+
-			' latitude="'+ markers[i].getPoint().lat()+ '"'+
-			' longitude="'+ markers[i].getPoint().lng()+ '"'+
-			' infoMessage="'+ escape(markers[i].infoMessage)+ '"' +
-			' markerUID="'+ markers[i].uid + '"' +
-			' title="'+ markers[i].title + '"' +
-			' state="'+ markers[i].state + '"' +
-			' />';
-			xmlString += markerString;
-		}	
-	}
-	xmlString += "</markers>"
-	document.getElementById("markersXML").value=xmlString;
-}
-

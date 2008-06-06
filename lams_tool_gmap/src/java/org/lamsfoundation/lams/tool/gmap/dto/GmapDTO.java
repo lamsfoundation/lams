@@ -1,5 +1,5 @@
 /****************************************************************
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * Copyright (C) 2008 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.tool.gmap.dto;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -81,7 +82,7 @@ public class GmapDTO {
 	
 	public String mapType;
 	
-	public Set<GmapMarkerDTO> gmapMarkers = new TreeSet<GmapMarkerDTO>();
+	public Set<GmapMarkerDTO> gmapMarkers = new HashSet<GmapMarkerDTO>();
 	
 	public Set<GmapAttachmentDTO> onlineInstructionsFiles;
 

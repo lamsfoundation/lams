@@ -1,5 +1,5 @@
 /****************************************************************
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * Copyright (C) 2008 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
@@ -466,40 +466,34 @@ public class AuthoringAction extends LamsDispatchAction {
 				Double longitude = Double.parseDouble(markerNode.getNamedItem("longitude").getNodeValue());
 
 				String markerState = markerNode.getNamedItem("state").getNodeValue();
+				
+				if (markerState.equals("remove"))
+				{
+					gmap.removeMarker(uid);
+					return;
+				}
+
+				GmapMarker marker = null;
 				if (markerState.equals("save"))
 				{
-					GmapMarker marker = new GmapMarker();
-					marker.setTitle(markerTitle);
-					marker.setInfoWindowMessage(infoMessage);
-					marker.setLatitude(latitude);
-					marker.setLongitude(longitude);
-					marker.setGmap(gmap);
-					marker.setCreated(new Date());
-					marker.setUpdated(new Date());
-					marker.setAuthored(true);
+					marker = new GmapMarker();
 					marker.setCreatedBy(guser);
-					marker.setUpdatedBy(guser);
-					gmapService.saveOrUpdateGmapMarker(marker);
-					
+					marker.setCreated(new Date());
 				}
 				else if (markerState.equals("update"))
 				{
-					
-					GmapMarker marker = gmap.getMarkerByUid(uid);
-					marker.setTitle(markerTitle);
-					marker.setInfoWindowMessage(infoMessage);
-					marker.setLatitude(latitude);
-					marker.setLongitude(longitude);
-					marker.setGmap(gmap);
-					marker.setUpdated(new Date());
-					marker.setUpdatedBy(guser);
-					marker.setAuthored(true);
-					gmapService.saveOrUpdateGmapMarker(marker);
+					marker = gmap.getMarkerByUid(uid);
 				}
-				else if (markerState.equals("remove"))
-				{
-					gmap.removeMarker(uid);
-				}
+				
+				marker.setTitle(markerTitle);
+				marker.setInfoWindowMessage(infoMessage);
+				marker.setLatitude(latitude);
+				marker.setLongitude(longitude);
+				marker.setGmap(gmap);
+				marker.setUpdated(new Date());
+				marker.setUpdatedBy(guser);
+				marker.setAuthored(true);
+				gmapService.saveOrUpdateGmapMarker(marker);
 			}
 		}
 		catch (Exception e)

@@ -62,42 +62,6 @@ function saveMarkerInfo(x)
 }
 
 
-
-
-function serialiseMarkers()
-{
-	var xmlString = '<?xml version="1.0"?><markers>';
-	var i =0;
-	
-	for (;i<markers.length;i++)
-	{
-		if (markers[i].state == "unchanged")
-		{
-			var ans = confirm("You have unsaved markers, do you wish to continue?");
-			if (!ans)
-			{
-				return false;
-			}
-		}
-		if (markers[i].state != "unchanged" && markers[i].state !="unsaved")
-		{
-			var markerString = '<marker'+
-			' latitude="'+ markers[i].getPoint().lat()+ '"'+
-			' longitude="'+ markers[i].getPoint().lng()+ '"'+
-			' infoMessage="'+ escape(markers[i].infoMessage)+ '"' +
-			' markerUID="'+ markers[i].uid + '"' +
-			' title="'+ markers[i].title + '"' +
-			' state="'+ markers[i].state + '"' +
-			' />';
-			xmlString += markerString;
-		}	
-	}
-	xmlString += "</markers>"
-	//document.authoringForm.markersXML.value=xmlString;
-	document.getElementById("markersXML").value=xmlString;
-	return true;
-}
-
 // TODO: This method should only be included for the authoring pages, put them in another file
 function saveMapState()
 {

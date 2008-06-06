@@ -1,10 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
-
-<c:set var="formBean"
-	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<c:set var="formBean"value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
 <c:set var="sessionMapID" value="${formBean.sessionMapID}" />
-
 <!-- ========== Basic Tab ========== -->
 <table cellpadding="0" border='0'>
 	<tr>
@@ -33,17 +30,14 @@
 			<!--  
 			<div id="map_canvas" style="width: 500px; height: 300px"></div> 
 			-->
-			<table cellpadding='0' cellspacing='0' border='1'>
+			<table cellpadding='0' cellspacing='0' border='0'>
 			<tr><td><div id="map_canvas" style="width: 400px; height: 300px;" ></div></td>
-			<td><div id="sidebar" style="width:100px; 
-									overflow:auto;
-									height:320px; 
-									background:WhiteSmoke; "></div></td></tr>
-			</table>
-			
+			<td><div id="sidebar" style="width:100px; overflow:auto;height:320px; background:WhiteSmoke; "></div></td></tr>
+			<tr><td>
 			<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
 			<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-			<input type="button" onclick="test()"  value="Test" />
+			</td></tr>
+			</table>
 		</td>
 	</tr>
 	<tr>
@@ -56,30 +50,36 @@
 		</td>
 	</tr>
 </table>
-
+ 		
 <script type="text/javascript">
 <!--
-	initGmap();
-	currUser = '${gmapUser.firstName} ${gmapUser.lastName}';
-	map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
-	map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
-	map.setZoom(${formBean.gmap.mapZoom});
-	map.setMapType(${formBean.gmap.mapType});
-//-->
-</script>
-
-<c:forEach var="marker" items="${formBean.gmap.gmapMarkers}">
-	<script type="text/javascript">
-	<!--
-		var savedPoint = new GLatLng('${marker.latitude}', '${marker.longitude}' );
-		addMarker(savedPoint, '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, true, "${marker.createdBy.firstName} ${marker.createdBy.lastName}");
-	//-->
-	</script>
-</c:forEach>
-   		
-<script type="text/javascript">
-<!--
-	refreshSideBar();
+	function initGmap()
+	{
+		if (GBrowserIsCompatible()) 
+		{
+			//map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(640,320) } );
+			map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(500,320) } );
+			//map.setCenter(new GLatLng(-33.774322, 151.111988), 13);
+	    	map.addControl(new GLargeMapControl());
+	    	map.addControl(new GMapTypeControl());
+	    	map.addMapType(G_PHYSICAL_MAP); 
+	
+	    	markers = new Array();
+	    	geocoder = new GClientGeocoder();
+	    	
+	    	currUser = '${gmapUser.firstName} ${gmapUser.lastName}';
+			map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
+			map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
+			map.setZoom(${formBean.gmap.mapZoom});
+			map.setMapType(${formBean.gmap.mapType});
+			
+			<c:forEach var="marker" items="${formBean.gmap.gmapMarkers}">
+			addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, true, "${marker.createdBy.firstName} ${marker.createdBy.lastName}");
+			</c:forEach>
+			
+			refreshSideBar();
+	    }
+	}
 //-->
 </script>
 

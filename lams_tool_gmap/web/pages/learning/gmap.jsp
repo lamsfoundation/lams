@@ -48,7 +48,7 @@
 	<html:form action="/learning" method="post" onsubmit="return validateForm();">
 		<html:hidden property="dispatch" value="finishActivity" />
 		<html:hidden property="toolSessionID" />
-
+		<html:hidden property="markersXML" value="" styleId="markersXML" />
 		<p>
 			${gmapDTO.instructions}
 		</p>
@@ -76,7 +76,7 @@
 				
 
 				<div class="space-bottom-top align-right">
-					<html:submit styleClass="button" styleId="finishButton">
+					<html:submit styleClass="button" styleId="finishButton" onclick="javascript:serialiseMarkers();">
 						<fmt:message>button.finish</fmt:message>
 					</html:submit>
 				</div>
@@ -91,14 +91,6 @@
 		<script type="text/javascript">
 		<!--
 			initLearnerGmap();
-		//-->
-		</script>
-		
-		
-		   		
-		<script type="text/javascript">
-		<!--
-			refreshSideBar();
 		//-->
 		</script>
 

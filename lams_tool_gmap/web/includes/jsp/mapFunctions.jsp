@@ -1,3 +1,11 @@
+<%@ include file="/common/taglibs.jsp"%>
+
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
+
+<script type="text/javascript">
+<!--
 // add a marker at the given point
 function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy)
 {
@@ -47,10 +55,10 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy)
     else {marker.state="unsaved";}
     
 	marker.sideBarLinkPrefix = "<span class='sidebar'><a href='javascript:GEvent.trigger(markers["+markers.length+"],\"click\")'";
-    marker.removeLink = "<a href='javascript:removeMarker(" + markers.length + ")'>Remove</a>" ;
-   	marker.editLink = "<a href='javascript:editMarker(" + markers.length + ")'>Edit</a>";
-   	marker.saveLink = "<a href='javascript:saveMarkerInfo(" + markers.length + ");'>Save</a>";
-   	marker.cancelLink = "<a href='javascript:cancelEditMarkerInfo(" + markers.length + ")'>Cancel</a>";
+    marker.removeLink = "<a href='javascript:removeMarker(" + markers.length + ")'><fmt:message key='button.remove'/></a>" ;
+   	marker.editLink = "<a href='javascript:editMarker(" + markers.length + ")'><fmt:message key='button.edit'/></a>";
+   	marker.saveLink = "<a href='javascript:saveMarkerInfo(" + markers.length + ");'><fmt:message key='button.save'/></a>";
+   	marker.cancelLink = "<a href='javascript:cancelEditMarkerInfo(" + markers.length + ")'><fmt:message key='button.cancel'/></a>";
     updateMarkerInfoWindowHtml(marker);
     markers[markers.length] = marker;
     
@@ -102,14 +110,11 @@ function showAddress()
 			{
 				if (!point) 
 				{
-					alert(errorCantFindLocation + " " + address );
+					alert('<fmt:message key="error.cantFindAddress"/> ' + address );
 				} 
 				else 
 				{
 					map.setCenter(point, 13);
-					//var marker = new GMarker(point);
-					//map.addOverlay(marker);
-					//marker.openInfoWindowHtml(address);
 				}
 			}
 		);
@@ -142,24 +147,24 @@ function updateMarkerInfoWindowHtml(markerIn)
 {
 	if (markerIn.state == "unchanged")
 	{
-		markerIn.setImage(webAppUrl + "/images/blue_Marker.png");
+		markerIn.setImage("${tool}/images/blue_Marker.png");
 	}
 	else if (markerIn.state == "update" || markerIn.state == "save")
 	{
-		markerIn.setImage(webAppUrl + "/images/paleblue_Marker.png");
+		markerIn.setImage("${tool}/images/paleblue_Marker.png");
 	}
 	else if (markerIn.state == "unsaved")
 	{
-		markerIn.setImage(webAppUrl + "/images/red_Marker.png");
+		markerIn.setImage("${tool}/images/red_Marker.png");
 	}
 	
 	if (markerIn.editingOn)
 	{
 		markerIn.linksBar = "<br/ >" + markerIn.saveLink + "&nbsp;" + markerIn.cancelLink;
-		markerIn.inputForm =titleMsg + <br><input tupe='text' maxlength='50' size='50' id='markerTitle' name='markerTitle' value='" + markerIn.title +"' /><br>";
-		markerIn.inputForm += newInfoWindowTextMsg + "<br><textarea wrap='hard' id='infoWindow' name='infoWindow' rows='5' cols='50'>" + markerIn.infoMessage + "</textarea>";
+		markerIn.inputForm ="<fmt:message key='label.authoring.basic.title'/><br><input type='text' maxlength='50' size='50' id='markerTitle' name='markerTitle' value='" + markerIn.title +"' /><br>";
+		markerIn.inputForm += "<fmt:message key='label.newInfoWindowText'/><br><textarea id='infoWindow' name='infoWindow' rows='5' cols='50'>" + markerIn.infoMessage + "</textarea>";
 		markerIn.markerMetaData = "<font size='tiny' color='grey'>";
-		markerIn.markerMetaData += "<nobr>" + latitudeLongitudeMsg + " (" + markerIn.getPoint().lat() + "-" + markerIn.getPoint().lng() +")</nobr>";
+		markerIn.markerMetaData += '<nobr><fmt:message key="label.latitudeLongitude"/> (' + markerIn.getPoint().lat() + "-" + markerIn.getPoint().lng() +")</nobr>";
 		markerIn.markerMetaData += "</font>";
 		markerIn.infoWindowHtml =  markerIn.inputForm + "<br />" +markerIn.markerMetaData + markerIn.linksBar;
 	}
@@ -171,8 +176,8 @@ function updateMarkerInfoWindowHtml(markerIn)
 			markerIn.linksBar = "<br/ >" + markerIn.removeLink + "&nbsp;" + markerIn.editLink;
 		}
 		markerIn.markerMetaData = "<font size='tiny' color='grey'>";
-		markerIn.markerMetaData += createdByMsg + " " + markerIn.createdBy + "<br />";
-		markerIn.markerMetaData += "<nobr>" + latitudeLongitudeMsg + " (" + markerIn.getPoint().lat() + "-" + markerIn.getPoint().lng() +")</nobr>";
+		markerIn.markerMetaData += '<fmt:message key="label.createdBy"/> ' + markerIn.createdBy + "<br />";
+		markerIn.markerMetaData += '<nobr><fmt:message key="label.latitudeLongitude"/> (' + markerIn.getPoint().lat() + "-" + markerIn.getPoint().lng() +")</nobr>";
 		markerIn.markerMetaData += "</font>";
 		markerIn.infoWindowHtml = "" + "<h4>" + markerIn.title + "</h4><div style='overflow:auto;width:400px;height:80px'>" +  markerIn.infoMessage.replace(/\n/g, "<br />") + "</div>"+ markerIn.markerMetaData  + markerIn.linksBar;
 	}	
@@ -184,7 +189,7 @@ function serialiseMarkers()
 	var i =0;
 	for (;i<markers.length;i++)
 	{
-		if (markers[i].state == "unchanged")
+		if (markers[i].state == "unsaved")
 		{
 			var ans = confirm("You have unsaved markers, do you wish to continue?");
 			if (!ans)
@@ -209,7 +214,8 @@ function serialiseMarkers()
 	document.getElementById("markersXML").value=xmlString;
 	return true;
 }
-
+//-->
+</script>
 
 
 
