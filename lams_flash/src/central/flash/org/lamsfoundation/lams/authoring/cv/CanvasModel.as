@@ -771,8 +771,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			//b.setDefaultSequenceName();
 			
 			sequences.sortOn("orderID", Array.NUMERIC);
-			var orderID:Number = (sequences.length > 0) ? sequences[sequences.length-1].orderID : 0;
 			
+			var orderID:Number = (sequences.length > 0) ? getHighestBranchNumber(b.sequenceActivity.parentUIID) : 0;
 			Debugger.log("sequences length (order id): " + orderID, Debugger.CRITICAL, "createBranchStartConnector", "CanvasModel");
 			
 			createNewSequenceActivity(activeView.activity, orderID+1, null, true);
@@ -780,6 +780,36 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			return b;
 		}
 	}
+	
+	/**
+	 * @usage gets the highest branch number for the current branching activities
+	 * @param   
+	 * @return  
+	 */
+	public function getHighestBranchNumber(branchParentUIID:Number):Number {
+		
+		var sequences:Array = _cv.ddm.getComplexActivityChildren(branchParentUIID);
+		var highestNum:Number = 0;
+		
+		for (var i=0; i<sequences.length; ++i) {
+
+			var title:String = sequences[i].title;
+			
+			var branchNum = 0;
+			if (title.substring(0,Dictionary.getValue('branch_mapping_dlg_branch_col_lbl').length) == Dictionary.getValue('branch_mapping_dlg_branch_col_lbl')) {
+				branchNum = Number(title.substr(Dictionary.getValue('branch_mapping_dlg_branch_col_lbl').length + 1));
+			}
+			
+			if (isNaN(Number(branchNum))) branchNum = 0;
+			
+			if (branchNum > highestNum) {	
+				highestNum = branchNum;
+			}
+		}
+
+		return highestNum;
+	}
+
 
 	/**
 	 * @usage   
@@ -824,7 +854,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		//b.setDefaultSequenceName();
 			
 		sequences.sortOn("orderID", Array.NUMERIC);
-		var orderID:Number = (sequences.length > 0) ? sequences[sequences.length-1].orderID : 0;
+		var orderID:Number = (sequences.length > 0) ? getHighestBranchNumber(b.sequenceActivity.parentUIID) : 0;
 		
 		Debugger.log("orderID: " + orderID, Debugger.CRITICAL, "createActivitylessBranch", "CanvasModel");
 			

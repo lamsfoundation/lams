@@ -378,8 +378,10 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		}
 		
 		
-		if(defaultSequenceActivity == null)
-			createInitialSequenceActivity(sequenceActs.length+1);
+		if(defaultSequenceActivity == null) {
+			var orderID:Number = model.getHighestBranchNumber(activity.activityUIID);
+			createInitialSequenceActivity(orderID+1);
+		}
 		
 		model.haltRefresh(false);
 
