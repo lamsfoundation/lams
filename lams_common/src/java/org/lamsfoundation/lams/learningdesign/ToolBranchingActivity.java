@@ -171,6 +171,7 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
     	if ( getActivities() == null || getActivities().size() == 0 ) {
 			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH), this.getActivityUIID()));
     	} else {
+    		boolean conditionsExist = false;
 	    	Iterator actIterator = getActivities().iterator();
 	   		while (actIterator.hasNext()) {
 				SequenceActivity branch = (SequenceActivity) actIterator.next();
@@ -179,14 +180,25 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
 					while (condIterator.hasNext()) {
 						BranchActivityEntry entry = (BranchActivityEntry) condIterator.next();
 						BranchCondition condition = entry.getCondition();
-						if ( condition == null || ! condition.isValid() ) {
+						if ( condition == null ) {
 							listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCH_CONDITION_INVALID_ERROR_CODE, 
 									messageService.getMessage(ValidationErrorDTO.BRANCH_CONDITION_INVALID), this.getActivityUIID()));
+						} else {
+							conditionsExist = true;
+							if (! condition.isValid() ) {
+								listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCH_CONDITION_INVALID_ERROR_CODE, 
+										messageService.getMessage(ValidationErrorDTO.BRANCH_CONDITION_INVALID), this.getActivityUIID()));
+							}
 						}
 					}
 				}
 			}
+	   		if ( ! conditionsExist ) {
+				listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTVITY_TOOLCONDITION_ERROR_CODE, 
+						messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_TOOLCONDITION), this.getActivityUIID()));
+	   		}
     	}
+    	
     	return listOfValidationErrors;
     }
 

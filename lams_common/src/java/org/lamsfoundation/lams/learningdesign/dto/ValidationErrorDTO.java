@@ -54,6 +54,7 @@ public class ValidationErrorDTO {
 	public static final String BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED = "validation.error.groupedBranchingMustHaveBranchForGroup"; //BGM
 	public static final String BRANCH_CONDITION_INVALID = "validation.error.toolBranchingConditionInvalid"; 				// BCOND
 	public static final String BRANCHING_ACTVITY_TOOLINPUT = "validation.error.toolBranchingMustHaveAnInputToolActivity"; 	// BTI
+	public static final String BRANCHING_ACTVITY_TOOLCONDITION = "validation.error.toolBranchingMustHaveACondition"; 		// BTC
 	
 	public static final String OTHER_ERROR_CODE = "O";
 	public static final String TRANSITION_ERROR_CODE = "T";
@@ -75,6 +76,7 @@ public class ValidationErrorDTO {
 	public static final String BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED_ERROR_CODE = "BGM";
 	public static final String BRANCH_CONDITION_INVALID_ERROR_CODE = "BCOND";
 	public static final String BRANCHING_ACTVITY_TOOLINPUT_ERROR_CODE = "BTI";
+	public static final String BRANCHING_ACTVITY_TOOLCONDITION_ERROR_CODE = "BTC";
 	
 	
 	private static MessageResources resources = MessageResources.getMessageResources(CONFIG_PARAM);
