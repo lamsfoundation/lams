@@ -32,10 +32,20 @@
 
 		<h1><fmt:message key="label.preview.definelater.title"/></h1>
 
+		<c:choose>
+		<c:when test="${isBranching}">
+			<p><fmt:message key="label.preview.definelater.branching.message">
+					<fmt:param><c:out value="${requestScope.title}"/></fmt:param>
+				</fmt:message>
+			</p>
+		</c:when>
+		<c:otherwise>
 		<p><fmt:message key="label.preview.definelater.message">
 				<fmt:param><c:out value="${requestScope.title}"/></fmt:param>
 			</fmt:message>
 		</p>
+		</c:otherwise>
+		</c:choose>
 
 		<div class="right-buttons"><a href="<lams:LAMSURL/>${requestScope.activityURL}" class="button"><fmt:message key="label.next.button"/></a></div>
 
