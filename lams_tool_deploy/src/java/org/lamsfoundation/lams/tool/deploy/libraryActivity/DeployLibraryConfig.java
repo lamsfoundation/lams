@@ -54,8 +54,9 @@ public class DeployLibraryConfig extends DeployConfig {
     private ArrayList learningLibraryList; 
     
     
-    public DeployLibraryConfig()
+    public DeployLibraryConfig(String outputPath)
     {       
+    	super(outputPath);
         xstream.alias(ROOT_ELEMENT, DeployLibraryConfig.class);
         xstream.alias(LEARNING_LIBRARY, LearningLibrary.class);
         xstream.alias(TOOL_ACTIVITY, ToolActivity.class);
@@ -65,8 +66,10 @@ public class DeployLibraryConfig extends DeployConfig {
             					String dbPassword,
             					String dbDriverClass,
             					String dbDriverUrl,
-            					ArrayList learningLibraries)
+            					ArrayList learningLibraries,
+            					String outputPath)
     {
+    	super(outputPath);
         setDbUsername(dbUsername);
         setDbPassword(dbPassword);
         setDbDriverClass(dbDriverClass);
@@ -78,9 +81,9 @@ public class DeployLibraryConfig extends DeployConfig {
         xstream.alias(TOOL_ACTIVITY, ToolActivity.class);
     }
     
-    public DeployLibraryConfig(String configurationFilePath) throws ParserConfigurationException, IOException, SAXException
+    public DeployLibraryConfig(String configurationFilePath, String outputPath) throws ParserConfigurationException, IOException, SAXException
     {
-        super();
+        super(outputPath);
         xstream.alias(ROOT_ELEMENT, DeployLibraryConfig.class);
         xstream.alias(LEARNING_LIBRARY, LearningLibrary.class);
         xstream.alias(TOOL_ACTIVITY, ToolActivity.class);
@@ -223,4 +226,8 @@ public class DeployLibraryConfig extends DeployConfig {
     public void setLearningLibraryList(ArrayList learningLibraryList) {
         this.learningLibraryList = learningLibraryList;
     }
+
+	public void convertForInstallers() {
+		// No conversion being done at this stage as the updater doesn't use them.
+	}
 }

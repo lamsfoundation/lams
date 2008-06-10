@@ -456,6 +456,7 @@ Ant build file.
 				<generateDeployProperties depends="compile" 
 					mode="development" 
 					outputPath="${build.deploy}"
+					generateForInstallers="${generate.for.installers}"
 					dbPassword="${db.password}"
 					dbUsername="${db.username}"
 					dbDriverUrl="${db.url}"

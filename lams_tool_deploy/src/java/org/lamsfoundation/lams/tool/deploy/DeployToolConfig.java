@@ -58,6 +58,7 @@ public class DeployToolConfig extends DeployConfig {
     private static final String TOOL_JAR_FILE_NAME = "toolJarFileName";
     private static final String DEPLOY_FILES= "deployFiles";
     private static final String MIN_SERVER_VERSION_NUMBER= "minServerVersionNumber";
+    private static final String GENERATE_XML_FOR_INSTALLERS = "generateForInstallers";
     protected static final String LANGUAGE_FILES= "languageFiles";
     
    
@@ -142,27 +143,26 @@ public class DeployToolConfig extends DeployConfig {
      */
     private ArrayList<String> languageFiles;
 
-
-    /**
+   /**
      * Creates an instance of DeployToolConfig object.
      */
-    public DeployToolConfig()
+    public DeployToolConfig(String outputPath)
     {
-        super();
+        super(outputPath);
         xstream.alias(ROOT_ELEMENT, DeployToolConfig.class);
     }
     
     /**
      * Creates an instance of DeployToolConfig object, with the values
      * of its properties, set to that specified by the Xml configuration file
-     * @param configurationFilePath
+     * @param configurationFilePath - only needed when generating the initial deploy.xml
      * @throws ParserConfigurationException
      * @throws IOException
      * @throws SAXException
      */
-    public DeployToolConfig(String configurationFilePath) throws ParserConfigurationException, IOException, SAXException
+    public DeployToolConfig(String outputPath, String configurationFilePath) throws ParserConfigurationException, IOException, SAXException
     {
-        super();
+        super(outputPath);
         xstream.alias(ROOT_ELEMENT, DeployToolConfig.class);
         updateConfigurationProperties(configurationFilePath);
     }
@@ -173,7 +173,7 @@ public class DeployToolConfig extends DeployConfig {
         String xml = readFile(configFilePath);
         DeployToolConfig config = (DeployToolConfig)deserialiseXML(xml);
         copyProperties(config);
-        //printObjectProperties(); //for testing purposes
+        printObjectProperties(); //for testing purposes
     }
     
     
@@ -190,6 +190,11 @@ public class DeployToolConfig extends DeployConfig {
        super.setProperty(key, value);
        //System.out.println("ToolConfig " + key + " is: " + value);
      
+       if ( key.equalsIgnoreCase(GENERATE_XML_FOR_INSTALLERS) ) {
+    	   generateForInstallers = java.lang.Boolean.parseBoolean(value);
+    	   System.out.print("generateForInstallers"+generateForInstallers);
+       }
+       
        if ( key.equalsIgnoreCase(TOOL_SIGNATURE) ) {
           
            toolSignature = value;
@@ -576,5 +581,43 @@ public class DeployToolConfig extends DeployConfig {
 		this.toolJarFileName = toolJarFileName;
 	}
 
- 
+	public void convertForInstallers() {
+	    if ( isGenerateForInstallers() ) {
+	    	System.out.println("Stripping paths output path "+outputPath);
+	    	int lengthOfPath = outputPath.length();
+	    	toolUpdateScriptPath = stripPath(toolUpdateScriptPath, outputPath, lengthOfPath);
+	    	toolInsertScriptPath = stripPath(toolInsertScriptPath, outputPath, lengthOfPath);
+	    	toolLibraryInsertScriptPath = stripPath(toolLibraryInsertScriptPath, outputPath, lengthOfPath);
+	    	toolActivityInsertScriptPath = stripPath(toolActivityInsertScriptPath, outputPath, lengthOfPath);
+	    	toolTablesScriptPath = stripPath(toolTablesScriptPath, outputPath, lengthOfPath);
+	    	toolTablesDeleteScriptPath = stripPath(toolTablesDeleteScriptPath, outputPath, lengthOfPath);
+	    	
+	    	ArrayList<String> newLanguageFiles = new ArrayList<String>(languageFiles.size());
+	    	for ( String file : languageFiles ) {
+	    		newLanguageFiles.add(stripPath(file, outputPath, lengthOfPath));
+	    	}
+	    	languageFiles = newLanguageFiles;
+	    	
+	    	ArrayList<String> newDeployFiles = new ArrayList<String>(deployFiles.size());
+	    	for ( String file : deployFiles ) {
+	    		newDeployFiles.add(stripPath(file, outputPath, lengthOfPath));
+	    	}
+	    	deployFiles = newDeployFiles;;
+
+	    	setDbDriverClass("@dbDriverClass@");
+	    	setDbDriverUrl("@dbDriverUrl@");
+	    	setDbUsername("@dbUsername@");
+	    	setDbPassword("@dbPassword@");
+	    	setLamsEarPath("@lamsear@");
+	    }
+	}
+	
+	private String stripPath(String path, String outputPath, int lengthOfPath) {
+		System.out.println("script path "+path+" index of "+path.indexOf(outputPath) );
+		if ( path.indexOf(outputPath) == 0 ) {
+		   return "@toolDeployPackageDir@"+path.substring(lengthOfPath);
+		} else {
+			return path;
+		}
+	}
 }

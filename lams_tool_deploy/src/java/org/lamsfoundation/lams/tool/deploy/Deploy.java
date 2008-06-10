@@ -73,8 +73,8 @@ public class Deploy
         System.out.println("Starting Tool Deploy");
         try
         {
-            System.out.println("Reading Configuration File"+args[0]);
-            DeployToolConfig config =  new DeployToolConfig(args[0]);
+            System.out.println("Reading Configuration File "+args[0]);
+            DeployToolConfig config =  new DeployToolConfig(null, args[0]);
             
             String toolSignature = config.getToolSignature();
             String toolVersionStr = config.getToolVersion();

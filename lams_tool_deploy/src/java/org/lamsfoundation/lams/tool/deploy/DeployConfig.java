@@ -75,6 +75,10 @@ public abstract class DeployConfig {
     protected transient String validationError = "";
     protected transient XStream xstream;
     
+    protected transient boolean generateForInstallers = false;
+    protected transient  String outputPath = null;
+    
+ 
     /**
      * Holds value of property toolVersion.
      */
@@ -112,10 +116,12 @@ public abstract class DeployConfig {
      */
     private String languageFilesPackage;
     
-    public DeployConfig()
+    public DeployConfig(String outputPath)
     {
         this.validationError = "";
         xstream = new XStream(new DomDriver());    
+
+        this.outputPath = outputPath != null ? outputPath : "";
     }
     
     /**
@@ -383,6 +389,23 @@ public abstract class DeployConfig {
            this.setLamsEarPath(config.getLamsEarPath());
    }
    
+	public boolean isGenerateForInstallers() {
+		return generateForInstallers;
+	}
+
+	public void setGenerateForInstallers(boolean generateForInstallers) {
+		this.generateForInstallers = generateForInstallers;
+	}
+
+	public String getOutputPath() {
+		return outputPath;
+	}
+
+	public void setOutputPath(String outputPath) {
+		this.outputPath = outputPath;
+	}
+
+	public abstract void convertForInstallers();
 
 }
 

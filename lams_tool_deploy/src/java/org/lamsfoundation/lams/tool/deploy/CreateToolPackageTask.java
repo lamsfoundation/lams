@@ -75,6 +75,8 @@ import org.xml.sax.SAXException;
  * containing any tool language files. On deployment, files will
  * be copied to the lams-dictionary jar directory. 
  * Generates the languageFiles entries.</LI>
+ * <LI>(Optional) generateForInstallers: if true then the paths are prepended with @tool_build_dir@
+ * rather than a full path.</LI>
  * <LI>(Optional) all other parameters go into the deploy.properties file.</LI> 
  * </UL>
  *
@@ -88,7 +90,7 @@ public class CreateToolPackageTask extends CreatePackageTask {
         
         // create the new configuration file, using the template
         //deployConfig = new DeployToolConfig(getTemplateDeployName());
-        deployConfig = new DeployToolConfig();
+        deployConfig = new DeployToolConfig(outputPath.toString());
         // override with values from an optional config file
         if ( configFile != null && configFile.length() > 0 ) {
             log("Applying configuration file "+configFile.getAbsolutePath());
@@ -115,6 +117,7 @@ public class CreateToolPackageTask extends CreatePackageTask {
         applyParameters();
         applyFilesets(DeployToolConfig.LANGUAGE_FILES, filesets);
         deployConfig.validateProperties();
+        deployConfig.convertForInstallers();
         try
         {
             writeConfigFile();  

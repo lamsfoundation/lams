@@ -75,7 +75,7 @@ public class CreateLibraryPackageTask extends CreatePackageTask {
         
         // create the new configuration file, using the template
         //deployConfig = new DeployToolConfig(getTemplateDeployName());
-        deployConfig = new DeployLibraryConfig();
+        deployConfig = new DeployLibraryConfig(outputPath.toString());
         // override with values from an optional config file
         if ( configFile != null && configFile.length() > 0 ) {
             log("Applying configuration file "+configFile.getAbsolutePath());
