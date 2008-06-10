@@ -73,9 +73,9 @@ public class DeployLibraryConfigTest extends TestCase {
     
     protected void setUp() throws ParserConfigurationException, IOException, SAXException
     {
-        config = new DeployLibraryConfig("test/file/library_deploy/deployLibraryTest.xml");
+        config = new DeployLibraryConfig("test/file/library_deploy/deployLibraryTest.xml",null);
        // testConfigObject = createTestObject();
-        config2 = new DeployLibraryConfig("test/file/library_deploy/deployLibraryTest.xml");
+        config2 = new DeployLibraryConfig("test/file/library_deploy/deployLibraryTest.xml",null);
         config2.updateConfigurationProperties("test/file/library_deploy/deployLibraryTest2.xml");
     }
     

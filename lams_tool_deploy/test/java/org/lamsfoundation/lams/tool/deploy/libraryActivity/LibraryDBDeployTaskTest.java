@@ -43,7 +43,7 @@ public class LibraryDBDeployTaskTest extends ToolDBTest {
     {
         super.setUp();
         insertTestRecordsForLibraryDeploy("test/file/test.properties");
-        config = new DeployLibraryConfig("test/file/library_deploy/deployLibraryTest.xml");
+        config = new DeployLibraryConfig("test/file/library_deploy/deployLibraryTest.xml",null);
     }
     
     protected void tearDown() throws java.lang.Exception

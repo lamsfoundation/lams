@@ -47,9 +47,9 @@ public class DeployToolConfigTest extends TestCase
     
     protected void setUp() throws java.lang.Exception
     {
-        config = new DeployToolConfig("test/file/tool_deploy/deploy.xml");
+        config = new DeployToolConfig(null,"test/file/tool_deploy/deploy.xml");
 
-        config2 = new DeployToolConfig("test/file/tool_deploy/deploy.xml");
+        config2 = new DeployToolConfig(null, "test/file/tool_deploy/deploy.xml");
         config2.updateConfigurationProperties("test/file/tool_deploy/deploy2.xml");
     }
     
