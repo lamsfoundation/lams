@@ -617,6 +617,10 @@ public class DeployToolConfig extends DeployConfig {
 		if ( path.indexOf(outputPath) == 0 ) {
 		   return "@toolDeployPackageDir@"+path.substring(lengthOfPath);
 		} else {
+			String convertedPath = path.replace('/', '\\');
+			if ( convertedPath.indexOf(outputPath) == 0 ) {
+			   return "@toolDeployPackageDir@"+convertedPath.substring(lengthOfPath);
+			}
 			return path;
 		}
 	}
