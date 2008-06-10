@@ -59,7 +59,7 @@ public class DeployLibrary {
         
        try
        {
-            DeployLibraryConfig config= new DeployLibraryConfig(args[0]);
+            DeployLibraryConfig config= new DeployLibraryConfig(args[0],null);
             LibraryDBDeployTask dbDeployTask = new LibraryDBDeployTask(config);
             dbDeployTask.execute();
             System.out.println("Inserted activities into database");
