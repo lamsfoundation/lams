@@ -718,31 +718,14 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId()); 
 				initToolSessionIfSuitable(toolActivity, requestedLesson);
             }
-            //if it is schedule gate, we need to initialize the sheduler for it.
-            if(activity.getActivityTypeId().intValue() == Activity.SCHEDULE_GATE_ACTIVITY_TYPE) {
-            	ScheduleGateActivity gateActivity = (ScheduleGateActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
-                activity = runGateScheduler(gateActivity,lessonStartTime,requestedLesson.getLessonName()); 
-            }
-			if ( activity.isBranchingActivity() && activity.getGrouping() == null) {
-				Integer currentMaxId = design.getMaxID();
-				// all branching activities must have a grouping, as the learner will be allocated to a group linked to a sequence (branch)
-				Grouping grouping = new ChosenGrouping(null, null, null);
-				grouping.setGroupingUIID(currentMaxId);
-				grouping.getActivities().add(activity);
-				activity.setGrouping(grouping);
-				activity.setGroupingUIID(currentMaxId);
-				activity.setApplyGrouping(Boolean.TRUE);
-				groupingDAO.insert(grouping);
 
-				activity.setGrouping(grouping);
-				if ( log.isDebugEnabled() ) {
-					log.debug( "startLesson: Created chosen grouping "+grouping+" for branching activity "+activity);
-				}
-				design.setMaxID(new Integer(currentMaxId.intValue()+1));
+            Integer newMaxId = startSystemActivity(activity, design.getMaxID(), lessonStartTime, requestedLesson.getLessonName());
+            if ( newMaxId != null ) {
+				design.setMaxID(newMaxId);
 				designModified = true;
-			}
-
-            activity.setInitialised(Boolean.TRUE);
+            }
+            
+			activity.setInitialised(Boolean.TRUE);
             activityDAO.update(activity);
             
         }
@@ -759,7 +742,36 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             log.debug("=============Lesson "+lessonId+" started===============");
     }
     
-    
+    /** Do any normal initialisation needed for gates and branching. Done both when a lesson is started, or for new activities
+     * added during a Live Edit. Returns a new MaxID for the design if needed. If MaxID is returned, update the design with this
+     * new value and save the whole design (as initialiseSystemActivities has changed the design).
+     */
+    public Integer startSystemActivity( Activity activity, Integer currentMaxId, Date lessonStartTime, String lessonName ) {
+    	Integer newMaxId = null;
+    	
+    	//if it is schedule gate, we need to initialize the sheduler for it.
+	    if(activity.getActivityTypeId().intValue() == Activity.SCHEDULE_GATE_ACTIVITY_TYPE) {
+	    	ScheduleGateActivity gateActivity = (ScheduleGateActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
+	        activity = runGateScheduler(gateActivity,lessonStartTime,lessonName); 
+	    }
+		if ( activity.isBranchingActivity() && activity.getGrouping() == null) {
+			// all branching activities must have a grouping, as the learner will be allocated to a group linked to a sequence (branch)
+			Grouping grouping = new ChosenGrouping(null, null, null);
+			grouping.setGroupingUIID(currentMaxId);
+			grouping.getActivities().add(activity);
+			activity.setGrouping(grouping);
+			activity.setGroupingUIID(currentMaxId);
+			activity.setApplyGrouping(Boolean.TRUE);
+			groupingDAO.insert(grouping);
+	
+			activity.setGrouping(grouping);
+			if ( log.isDebugEnabled() ) {
+				log.debug( "startLesson: Created chosen grouping "+grouping+" for branching activity "+activity);
+			}
+			newMaxId = new Integer(currentMaxId.intValue()+1);
+		}
+		return newMaxId;
+    }
     
     /**
      * <p>Runs the system scheduler to start the scheduling for opening gate and

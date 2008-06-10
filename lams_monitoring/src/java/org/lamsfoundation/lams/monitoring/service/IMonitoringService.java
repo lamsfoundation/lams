@@ -136,6 +136,14 @@ public interface IMonitoringService
      */
     public void startLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
     
+    
+    /** Do any normal initialisation needed for gates and branching. Done both when a lesson is started, or for new activities
+     * added during a Live Edit. Returns a new MaxID for the design if needed. If MaxID is returned, update the design with this
+     * new value and save the whole design (as initialiseSystemActivities has changed the design).
+     */
+    public Integer startSystemActivity( Activity activity, Integer currentMaxId, Date lessonStartTime, String lessonName );
+    
+    
     /**
      * <p>Runs the system scheduler to start the scheduling for opening gate and
      * closing gate. It invlovs a couple of steps to start the scheduler:</p>

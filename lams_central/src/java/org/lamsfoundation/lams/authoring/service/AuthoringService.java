@@ -708,10 +708,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	            	Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, true);
                     toolActivity.setToolContentId(newContentId);
  
-            	} else if ( activity.isScheduleGate() ) {
-		            //if it is schedule gate, we need to initialize the sheduler for it.
-	            	ScheduleGateActivity gateActivity = (ScheduleGateActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
-	            	monitoringService.runGateScheduler(gateActivity,now,lesson.getLessonName()); 
+            	} else {
+                    Integer newMaxId = monitoringService.startSystemActivity(activity, design.getMaxID(), now, lesson.getLessonName());
+                    if ( newMaxId != null ) {
+        				design.setMaxID(newMaxId);
+                    }
 	            }
 	            activity.setInitialised(Boolean.TRUE);
 	            activityDAO.update(activity);
