@@ -1025,13 +1025,13 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		for(var i=0; i<bMappings.length; i++)
 			if(bMappings[i].branchingActivity.activityUIID == activityUIID || bMappings[i].sequenceActivity.activityUIID == activityUIID) {
-				if(bMappings[i] instanceof GroupBranchActivityEntry &&  bMappings[i].branchingActivity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE)	
+				if(bMappings[i] instanceof GroupBranchActivityEntry && bMappings[i].isGroupType)
 					myMappings.groupBased.push(bMappings[i]);
-				else if(bMappings[i] instanceof GroupBranchActivityEntry &&  bMappings[i].branchingActivity.activityTypeID == Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE)
+				else if(bMappings[i] instanceof GroupBranchActivityEntry && !bMappings[i].isGroupType)
 					myMappings.choosenBased.push(bMappings[i]);
 				else if(bMappings[i] instanceof ToolOutputBranchActivityEntry)
 					myMappings.toolBased.push(bMappings[i]);
-				else 
+				else
 					myMappings.uncategorised.push(bMappings[i]);
 				
 				myMappings.all.push(bMappings[i]);

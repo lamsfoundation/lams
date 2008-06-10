@@ -31,13 +31,14 @@ import org.lamsfoundation.lams.authoring.*;
 class GroupBranchActivityEntry extends BranchActivityEntry {
 	
 	private var _group:Group;
+	private var _isGroupType:Boolean;
 	
 	function GroupBranchActivityEntry(entryID:Number, entryUIID:Number, group:Group, sequenceActivity:SequenceActivity, branchingActivity:BranchingActivity){
 		this.entryID = entryID;
 		this.entryUIID = entryUIID;
 		this.sequenceActivity = sequenceActivity;
 		this.branchingActivity = branchingActivity;
-		
+		this.isGroupType = (branchingActivity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE);
 		this.group = group;
 	}
 	
@@ -64,6 +65,14 @@ class GroupBranchActivityEntry extends BranchActivityEntry {
 	
 	public function get groupName():String {
 		return _group.groupName;
+	}
+	
+	public function set isGroupType(a:Boolean) {
+		_isGroupType = a;
+	}
+	
+	public function get isGroupType():Boolean {
+		return _isGroupType;
 	}
 
 }
