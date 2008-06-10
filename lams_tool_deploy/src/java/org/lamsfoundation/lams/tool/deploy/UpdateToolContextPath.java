@@ -49,7 +49,7 @@ public class UpdateToolContextPath {
 		
 		try
 		{
-			DeployToolConfig config =  new DeployToolConfig(args[0]);
+			DeployToolConfig config =  new DeployToolConfig(null, args[0]);
 			
 			// the tool signature of this tool
 			String toolSig = config.getToolSignature();
@@ -99,6 +99,7 @@ public class UpdateToolContextPath {
 		catch (Exception e)
 		{
 			System.out.println("Unable to read deploy.xml: " + e.getMessage()); 
+			e.printStackTrace();
 		}
 		
 	}
