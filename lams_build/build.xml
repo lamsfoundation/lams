@@ -316,6 +316,10 @@
 		<ant target="deploy-learning-libraries"/>
 	</target>
 
+	<!-- use this target only if you are building the special deploy packages needed for the tool upgrader -->
+	<target name="deploy-tools-for-upgrader" depends="deploy-lams-tools,deploy-rams-tools" 
+		description="Deploys the desired tools, working out automatically whether they should be the LAMS or RAMS set of tools. Doesn't include parallel activities">
+	</target>
 
 	<!-- ============================================================================== -->
 	<!--  Rebuild the LAMS Database														-->						
