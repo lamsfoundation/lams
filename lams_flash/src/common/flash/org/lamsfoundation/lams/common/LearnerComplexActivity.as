@@ -400,7 +400,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 					removeAllChildrenAndInputComplex(children_mc[i].activity, children_mc[i].level, false);
 			}
 			
-			if(children_mc[i].activityStatus == "completed_mc") {
+			if(children_mc[i].activityStatus == "completed_mc" && isLearnerModule()) {
 				if(children_mc[i].activity == activeSequence) 
 					removeAllChildrenAndInputSequence(activeSequence, false);
 				else if(children_mc[i].activity == activeComplex)  
@@ -426,7 +426,9 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			}
 		}
 		
-		if(closeBox && locked) {
+		if(closeBox && locked && isLearnerModule()) {
+			Debugger.log("closing: " + isLearnerModule(), Debugger.CRITICAL, "checkIfSequenceActive", "LearnerComplexActivity");
+			
 			collapse();
 			controller.complexActivityRelease(this, false);
 		}
@@ -445,19 +447,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		children_mc = new Array();
 		delegates = new Array();
 	}
-	
-	/** TODO: Use for Sequence in Optional */
-	/**private function removeAllChildrenAndLoadSequences(activity:Activity):Void {
-		activeSequence = null;
-		removeAllChildren();
-		
-		children_mc = new Array();
-		
-		createChildren(_children);
-		clearDelegates();
-	}*/
-	
-	/** TODO: Use for Sequence in Optional */
+
 	public function removeAllChildrenAndInputSequence(activity:SequenceActivity, manualSelect:Boolean):Void {
 		Debugger.log("activity: " + activity.activityUIID, Debugger.CRITICAL, "removeAllChildrenAndInputSequence", "LearnerComplexActivity");
 		Debugger.log("manual select: " + manualSelect, Debugger.CRITICAL, "removeAllChildrenAndInputSequence", "LearnerComplexActivity");
