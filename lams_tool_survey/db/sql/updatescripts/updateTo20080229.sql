@@ -1,20 +1,2 @@
--- LDEV1511 make tables InnoDB
-ALTER TABLE tl_lasurv11_answer ENGINE=InnoDB;
-ALTER TABLE tl_lasurv11_attachment ENGINE=InnoDB;
-ALTER TABLE tl_lasurv11_option ENGINE=InnoDB;
-ALTER TABLE tl_lasurv11_question ENGINE=InnoDB;
-ALTER TABLE tl_lasurv11_session ENGINE=InnoDB;
-ALTER TABLE tl_lasurv11_survey ENGINE=InnoDB;
-ALTER TABLE tl_lasurv11_user ENGINE=InnoDB;
-alter table tl_lasurv11_answer add constraint FK6DAAFE3BB1423DC1 foreign key (user_uid) references tl_lasurv11_user (uid);
-alter table tl_lasurv11_answer add constraint FK6DAAFE3B25F3BB77 foreign key (question_uid) references tl_lasurv11_question (uid);
-alter table tl_lasurv11_attachment add constraint FKD92A9120D14146E5 foreign key (survey_uid) references tl_lasurv11_survey (uid);
-alter table tl_lasurv11_option add constraint FK85AB46F26966134F foreign key (question_uid) references tl_lasurv11_question (uid);
-alter table tl_lasurv11_question add constraint FK872D4F23D14146E5 foreign key (survey_uid) references tl_lasurv11_survey (uid);
-alter table tl_lasurv11_question add constraint FK872D4F23E4C99A5F foreign key (create_by) references tl_lasurv11_user (uid);
-alter table tl_lasurv11_session add constraint FKF08793B9D14146E5 foreign key (survey_uid) references tl_lasurv11_survey (uid);
-alter table tl_lasurv11_survey add constraint FK8CC465D7E4C99A5F foreign key (create_by) references tl_lasurv11_user (uid);
-alter table tl_lasurv11_user add constraint FK633F25884F803F63 foreign key (session_uid) references tl_lasurv11_session (uid);
-alter table tl_lasurv11_user add constraint FK633F2588D14146E5 foreign key (survey_uid) references tl_lasurv11_survey (uid);
 UPDATE lams_tool SET modified_date_time = NOW() WHERE tool_signature = "lasurv11";
 UPDATE lams_tool SET tool_version = "20080229" WHERE tool_signature = "lasurv11";
