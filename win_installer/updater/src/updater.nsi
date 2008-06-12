@@ -50,15 +50,17 @@
 # constants
 !define VERSION "2.1"
 !define PREVIOUS_VERSION "2.0.4"
-!define LANGUAGE_PACK_VERSION "2008-04-14"
-!define LANGUAGE_PACK_VERSION_INT "20080414"
-!define DATE_TIME_STAMP "200804141000"
-!define SERVER_VERSION_NUMBER "${VERSION}.${DATE_TIME_STAMP}"
+!define LANGUAGE_PACK_VERSION "2008-06-11"
+!define LANGUAGE_PACK_VERSION_INT "20080611"
+!define DATE_TIME_STAMP "200806111000"
+######################## Added in the extra .0 for 2.1 for constitency 
+!define SERVER_VERSION_NUMBER "${VERSION}.0.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
 !define SOURCE_LAMS_EAR "${SOURCE_JBOSS_HOME}\server\default\deploy\lams.ear\"
 !define SOURCE_JBOSS_LIB "${SOURCE_JBOSS_HOME}\server\default\lib"
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
+!define BUILD_REPOSITORY "D:\repository"
 
 # project directories
 !define BASE_DIR "..\..\"
@@ -277,6 +279,7 @@ SectionGroup "LAMS ${VERSION} Full Install" fullInstall
             DetailPrint "Setting up JBoss 4.0.2"
             SetOutPath $INSTDIR
             File /a /r /x all /x minimal /x robyn /x log /x tmp /x work /x jsMath.war /x *.bak ${SOURCE_JBOSS_HOME}
+                       
             ; Configuring jboss.jar
             ; Copy jboss-cache.jar, jgroups.jar from server/all/lib to server/default/lib
             copyfiles "$INSTDIR\jboss-4.0.2\server\all\lib\jboss-cache.jar" "$INSTDIR\jboss-4.0.2\server\default\lib"
@@ -302,6 +305,10 @@ SectionGroup "LAMS ${VERSION} Full Install" fullInstall
             CreateDirectory "$INSTDIR\temp"
             CreateDirectory "$INSTDIR\dump"
             CreateDirectory "$LAMS_REPOSITORY"
+            
+            # Copy repository for sample lessons
+            SetOutPath $LAMS_REPOSITORY
+            File /a /r ${BUILD_REPOSITORY}\*
             
             # Log mode is set to INFO in this log4j.xml
             SetOutPath "$INSTDIR\jboss-4.0.2\server\default\conf"
@@ -517,9 +524,18 @@ FunctionEnd
 Function CheckMySQL  
         # check mysql version is 5.0.x
         Setoutpath "$TEMP\lams\"
+        
+        #StrLen $9 $MYSQL_ROOT_PASS
+        
+        ${if} $IS_UPDATE == "0"
+            Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/?characterEncoding=utf8" "root" "$MYSQL_ROOT_PASS"'
+        ${else}
+            Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/?characterEncoding=utf8" "$DB_USER" "$DB_PASS"'
+        ${endif}
+        
         File "${BUILD_DIR}\checkmysqlversion.class"
         File "${LIB}\mysql-connector-java-3.1.12-bin.jar"
-        nsExec::ExecToStack '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/?characterEncoding=utf8" $DB_USER $DB_PASS'
+        nsExec::ExecToStack $0
         Pop $0
         Pop $1
         ${If} $0 != 0
@@ -627,7 +643,7 @@ FunctionEnd
 Function PostMySQLConfig
     ${if} $IS_UPDATE == "0"
         !insertmacro MUI_INSTALLOPTIONS_READ $MYSQL_DIR "mysql.ini" "Field 3" "State"
-        !insertmacro MUI_INSTALLOPTIONS_READ $MYSQL_ROOT_PASS "ysql.ini" "Field 5" "State"
+        !insertmacro MUI_INSTALLOPTIONS_READ $MYSQL_ROOT_PASS "mysql.ini" "Field 5" "State"
         !insertmacro MUI_INSTALLOPTIONS_READ $DB_NAME "mysql.ini" "Field 7" "State"
         !insertmacro MUI_INSTALLOPTIONS_READ $DB_USER "mysql.ini" "Field 9" "State"
         !insertmacro MUI_INSTALLOPTIONS_READ $DB_PASS "mysql.ini" "Field 10" "State"
@@ -1124,6 +1140,8 @@ Function updateLamswww
     File "${DOCUMENTS}\news-${PREVIOUS_VERSION}.html"
     ;if news and news-${PREVIOUS_VERSION} are the same
 
+    # Commented out below, see LI-157
+    /*
     nsExec::ExecToStack 'fc $INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\news.html $INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\news-${PREVIOUS_VERSION}.html'
     pop $0
     pop $1
@@ -1132,6 +1150,7 @@ Function updateLamswww
     ${if} "$3" != ""
         File "${BASE_PROJECT_DIR}\lams_www\conf\lams\news.html"
     ${endif}
+    */
 FunctionEnd
 
 
@@ -1193,7 +1212,8 @@ Function updateCoreDatabase
     ;file "${BASE_PROJECT_DIR}\lams_common\db\sql\updatescripts\alter_${VERSION}*.sql" 
     ;file "${BASE_PROJECT_DIR}\lams_common\db\sql\updatescripts\alter_203*.sql" 
     file "${BASE_PROJECT_DIR}\lams_common\db\sql\updatescripts\alter_21*.sql" 
-    
+    file "${SQL}\updateLocales.sql" 
+     
     setoutpath "$TEMP\lams\"
     file "${ANT}\update-core-database.xml"
     
@@ -1404,6 +1424,11 @@ Function createAndDeployTools
     call deployTool
     call runUpdateToolContext
     
+    strcpy $TOOL_SIG "latask10"
+    call runCreateDeployPackage
+    call deployTool
+    call runUpdateToolContext
+    
     strcpy $TOOL_SIG "lavote11"
     call runCreateDeployPackage
     call deployTool
@@ -1540,7 +1565,7 @@ Function generateToolProperties
     FileOpen $0 $TEMP\lams\tools.properties w
     IfErrors 0 +2
         goto error
-    
+        
     # convert '\' to '/' for Ant's benefit
     Push $TEMP
     Push "\"
@@ -1556,14 +1581,16 @@ Function generateToolProperties
     FileWrite $0 "instdir=$2/$\r$\n"
     FileWrite $0 "basetooldir=$${temp}/lams/$${signature}$\r$\n"
     FileWrite $0 "build=$${basetooldir}/build/$\r$\n"
-    FileWrite $0 "build.deploy=$${build}/deploy/$\r$\n"
+    FileWrite $0 "build.deploy=$${build}/deploy$\r$\n"
     FileWrite $0 "build.lib=$${build}/deploy/lib/$\r$\n"
     FileWrite $0 "db.scripts=$${build.deploy}/sql/$\r$\n"
     FileWrite $0 "db.name=$DB_NAME$\r$\n"
     FileWrite $0 "db.username=$DB_USER$\r$\n"
     FileWrite $0 "db.password=$DB_PASS$\r$\n"
     FileWrite $0 "db.Driver=com.mysql.jdbc.Driver$\r$\n"
+    FileWrite $0 "db.urlDeployXML=jdbc:mysql://$MYSQL_HOST/$${db.name}?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;autoReconnect=true&amp;useUnicode=true$\r$\n"
     FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
+    ;FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST/$${db.name}?characterEncoding=utf8$\r$\n"
     FileWrite $0 "conf.language.dir=$${build.deploy}/language/$\r$\n"
     FileWrite $0 "jboss.deploy=$${instdir}/jboss-4.0.2/server/default/deploy/lams.ear/$\r$\n"
     FileWrite $0 "deploy.tool.dir=$${temp}/lams/$\r$\n"
@@ -1612,6 +1639,9 @@ Function copyToolBuildProperties
     SetoutPath "$TEMP\lams\lasurv11"
     File "${BASE_PROJECT_DIR}\lams_tool_survey\build.properties"
     
+    SetoutPath "$TEMP\lams\latask10"
+    File "${BASE_PROJECT_DIR}\lams_tool_task\build.properties"
+    
     SetoutPath "$TEMP\lams\lavote11"
     File "${BASE_PROJECT_DIR}\lams_tool_vote\build.properties"
 
@@ -1623,6 +1653,7 @@ Function extractToolJars
     SetoutPath "$TEMP\lams\lachat11\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_chat\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_chat\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_chat\build\deploy\deploy.xml"
     SetoutPath "$TEMP\lams\lachat11\build\deploy\sql"
     File /r "${BASE_PROJECT_DIR}\lams_tool_chat\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lachat11\build\deploy\language"
@@ -1631,6 +1662,7 @@ Function extractToolJars
     SetoutPath "$TEMP\lams\lafrum11\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_forum\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_forum\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_forum\build\deploy\deploy.xml"
     SetoutPath "$TEMP\lams\lafrum11\build\deploy\sql"
     File /r "${BASE_PROJECT_DIR}\lams_tool_forum\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lafrum11\build\deploy\language"
@@ -1639,6 +1671,7 @@ Function extractToolJars
     SetoutPath "$TEMP\lams\lamc11\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_lamc\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_lamc\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_lamc\build\deploy\deploy.xml"
     SetoutPath "$TEMP\lams\lamc11\build\deploy\sql"
     File /r  "${BASE_PROJECT_DIR}\lams_tool_lamc\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lamc11\build\deploy\language"
@@ -1647,6 +1680,7 @@ Function extractToolJars
     SetoutPath "$TEMP\lams\laqa11\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_laqa\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_laqa\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_laqa\build\deploy\deploy.xml"
     SetoutPath "$TEMP\lams\laqa11\build\deploy\sql"
     File /r  "${BASE_PROJECT_DIR}\lams_tool_laqa\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\laqa11\build\deploy\language"
@@ -1655,6 +1689,7 @@ Function extractToolJars
     SetoutPath "$TEMP\lams\larsrc11\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_larsrc\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_larsrc\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_larsrc\build\deploy\deploy.xml"
     SetoutPath "$TEMP\lams\larsrc11\build\deploy\sql"
     File /r  "${BASE_PROJECT_DIR}\lams_tool_larsrc\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\larsrc11\build\deploy\language"
@@ -1663,6 +1698,7 @@ Function extractToolJars
     SetoutPath "$TEMP\lams\lanb11\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_nb\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_nb\build\lib\*.war" 
+    File "${BASE_PROJECT_DIR}\lams_tool_nb\build\deploy\deploy.xml"
     SetoutPath "$TEMP\lams\lanb11\build\deploy\sql"
     File /r  "${BASE_PROJECT_DIR}\lams_tool_nb\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lanb11\build\deploy\language"
@@ -1671,6 +1707,7 @@ Function extractToolJars
     SetoutPath "$TEMP\lams\lantbk11\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_notebook\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_notebook\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_notebook\build\deploy\deploy.xml"
     SetoutPath "$TEMP\lams\lantbk11\build\deploy\sql"
     File /r  "${BASE_PROJECT_DIR}\lams_tool_notebook\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lantbk11\build\deploy\language"
@@ -1679,6 +1716,7 @@ Function extractToolJars
     SetoutPath "$TEMP\lams\lasbmt11\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_sbmt\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_sbmt\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_sbmt\build\deploy\deploy.xml"
     SetoutPath "$TEMP\lams\lasbmt11\build\deploy\sql"
     File /r "${BASE_PROJECT_DIR}\lams_tool_sbmt\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lasbmt11\build\deploy\language"
@@ -1687,6 +1725,7 @@ Function extractToolJars
     SetoutPath "$TEMP\lams\lascrb11\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_scribe\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_scribe\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_scribe\build\deploy\deploy.xml"
     SetoutPath "$TEMP\lams\lascrb11\build\deploy\sql"
     File /r "${BASE_PROJECT_DIR}\lams_tool_scribe\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lascrb11\build\deploy\language"
@@ -1695,14 +1734,25 @@ Function extractToolJars
     SetoutPath "$TEMP\lams\lasurv11\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_survey\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_survey\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_survey\build\deploy\deploy.xml"
     SetoutPath "$TEMP\lams\lasurv11\build\deploy\sql"
     File /r "${BASE_PROJECT_DIR}\lams_tool_survey\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lasurv11\build\deploy\language"
     File "${BASE_PROJECT_DIR}\lams_tool_survey\build\deploy\language\*.properties"
     
+    SetoutPath "$TEMP\lams\latask10\build\deploy\"
+    File "${BASE_PROJECT_DIR}\lams_tool_task\build\lib\*.jar"
+    File "${BASE_PROJECT_DIR}\lams_tool_task\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_task\build\deploy\deploy.xml"
+    SetoutPath "$TEMP\lams\latask10\build\deploy\sql"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_task\build\deploy\sql\*"
+    SetoutPath "$TEMP\lams\latask10\build\deploy\language"
+    File "${BASE_PROJECT_DIR}\lams_tool_task\build\deploy\language\*.properties"
+    
     SetoutPath "$TEMP\lams\lavote11\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_vote\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_vote\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_vote\build\deploy\deploy.xml"
     SetoutPath "$TEMP\lams\lavote11\build\deploy\sql"
     File /r "${BASE_PROJECT_DIR}\lams_tool_vote\build\deploy\sql\*"
     SetoutPath "$TEMP\lams\lavote11\build\deploy\language"
@@ -1938,7 +1988,7 @@ Function readRegistry
     
     ; TODO Change for 2.2, get the port from the registry instead or hard coding it
     ;ReadRegStr $MYSQL_PORT HKLM "${REG_HEAD}" "mysql_port"
-    strcpy $MYSQL_PORT 3360
+    strcpy $MYSQL_PORT 3306
     
 FunctionEnd
 
@@ -1958,6 +2008,7 @@ Function ImportDatabase
         ${If} $9 != 0
             StrCpy $0 '$MYSQL_DIR\bin\mysql -e "CREATE DATABASE $DB_NAME DEFAULT CHARACTER SET utf8" -u root -p$MYSQL_ROOT_PASS' 
         ${EndIf}
+        
         nsExec::ExecToStack $0
         Pop $0
         Pop $1
@@ -2334,7 +2385,7 @@ Function un.PostUninstall
     !insertmacro MUI_INSTALLOPTIONS_READ $UNINSTALL_RETAIN "uninstall.ini" "Field 1" "State"
     ReadRegStr $MYSQL_HOST HKLM "${REG_HEAD}" "mysql_host"
     ${if} $UNINSTALL_RETAIN == 1
-        ${if} MYSQL_HOST != 'localhost'
+        ${if} $MYSQL_HOST != 'localhost'
             MessageBox MB_YESNO|MB_ICONQUESTION "Unable to backup LAMS. MYSQL_HOST is not set to localhost. Manual backup required. $\r$\n$\r$\nWould you like to quit the uninstaller and backup LAMS manually? If you choose 'No', the unistallation will proceed and lams will not be backed up." IDYES quit IDNO continue
                 quit:
                     Quit
