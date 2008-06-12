@@ -8,10 +8,6 @@ update lams_learning_activity set system_tool_id = 1 where learning_activity_typ
 alter table lams_supported_locale
 ADD COLUMN fckeditor_code VARCHAR(10);
 
--- Fixing Japanese language string. See LDEV-1702
-UPDATE lams_supported_locale SET description='日本語' WHERE language_iso_code='ja' AND country_iso_code='JP';
-
-
 UPDATE lams_supported_locale SET fckeditor_code='en-au' WHERE language_iso_code='en' AND country_iso_code='AU';
 UPDATE lams_supported_locale SET fckeditor_code='es' WHERE language_iso_code='es' AND country_iso_code='ES';
 UPDATE lams_supported_locale SET fckeditor_code='en-au' WHERE language_iso_code='mi' AND country_iso_code='NZ';
