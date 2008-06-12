@@ -12,11 +12,24 @@
 			userid="${db.username}" 
 			password="${db.password}"
 			encoding="utf8"
-			onerror="continue">
+			onerror="abort">
 			<transaction src="${temp}/lams/sql/updateConfiguration.sql" />
 			<transaction src="${temp}/lams/sql/alter_21_branching.sql" />
-			<transaction src="${temp}/lams/sql/alter_21_engine.sql" />
 			<transaction src="${temp}/lams/sql/alter_21_groupings_fckeditor.sql" />
+			<transaction src="${temp}/lams/sql/updateLocales.sql" />
 		</sql>
+		
+		<!-- REMOVE BELOW FOR 2.2 -->
+		<echo></echo>
+		<echo>The below script will fail if the database tables are already INNODB, this will not affect the update.</echo>
+		<sql driver="com.mysql.jdbc.Driver" 
+            classpath="${jboss.deploy}/mysql-connector-java-3.1.12-bin.jar" 
+            url="${db.url}" 
+            userid="${db.username}" 
+            password="${db.password}"
+            encoding="utf8"
+            onerror="continue">
+            <transaction src="${temp}/lams/sql/alter_21_engine.sql" />
+        </sql>
 	</target>
 </project>
