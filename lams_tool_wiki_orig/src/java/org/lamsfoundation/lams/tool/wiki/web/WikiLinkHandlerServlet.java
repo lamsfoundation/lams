@@ -82,10 +82,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class WikiLinkHandlerServlet extends HttpServlet {
 
 	private static Logger log = Logger.getLogger(WikiLinkHandlerServlet.class);
-
-	private static final String JNDI_DATASOURCE = "java:/jdbc/lams-ds";
-
-	private static final String PASSWORD_QUERY = "select password from lams_user where login=?";
 	
 	private static IWikiService wikiService = null;
 	

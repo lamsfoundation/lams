@@ -227,6 +227,7 @@ public class LearningAction extends Action {
 		sessionMap.put(WikiConstants.ATTR_ALLOW_ATTACH_IMAGES,wiki.isAllowAttachImage());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_INSERT_LINKS,wiki.isAllowInsertLink());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_REVERT_PAGES,wiki.isAllowRevertPage());
+		sessionMap.put(WikiConstants.ATTR_MAXIMUM_REPLIES,wiki.getMaximumReply());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_RICH_EDITOR,allowRichEditor);
 		sessionMap.put(WikiConstants.ATTR_REFLECTION_ON,wiki.isReflectOnActivity());
 		sessionMap.put(WikiConstants.ATTR_REFLECTION_INSTRUCTION,wiki.getReflectInstructions());
