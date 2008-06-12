@@ -6,13 +6,43 @@
 	<property file="${prop.path}/build.properties" />
 	<property file="tools.properties"/>
 
+	
+	<target name="create-deploy-package" description="Generate the deployment package.">
+        <echo>+------------------------------------------+</echo>
+        <echo>| Generate the deployment package.         |</echo>
+        <echo>+------------------------------------------+</echo>
+        <echo>Copying deploy.xml for ${signature}</echo>
+	    
+		<mkdir dir="${build.deploy}/filtered"/>
+		<copy overwrite="yes" todir="${build.deploy}/filtered"> 
+			<fileset dir="${build.deploy}">
+                <include name="deploy.xml" />
+            </fileset>
+			<filterset>  
+				<filter token="dbUsername" value="${db.username}" />
+				<filter token="dbPassword" value="${db.password}" />
+				<filter token="dbDriverUrl" value="${db.urlDeployXML}" />
+				<filter token="dbDriverClass" value="${db.Driver}" />
+				<filter token="lamsear" value="${jboss.deploy}" />
+				<filter token="toolDeployPackageDir" value="${build.deploy}" />
+			</filterset>
+		</copy>
+		
+		<move file="${build.deploy}/filtered/deploy.xml" tofile="${build.deploy}/deploy.xml"/>
+		
+	    <echo>Deploy packaqe for ${signature} created.</echo>
+	              
+	    </target>
+	
+	
+	
+	
+	
 	<!-- =================================================================== -->
 	<!-- Generate the deploy package                                         -->
 	<!-- =================================================================== -->
+	<!--
 	<target name="create-deploy-package" description="Generate the deployment package.">
-		<echo>+------------------------------------------+</echo>
-		<echo>| Generate the deployment package.         |</echo>
-		<echo>+------------------------------------------+</echo>
 		<echo>Generating deploy.xml for ${signature}</echo>
 	
 		<path id="deploy.lib.classpath">
@@ -51,7 +81,6 @@
 			toolWebUri="${product}.war"
 			languageFilesPackage="${language.files.package}">
 
-			<!-- language files go as a fileset. Not nice but can't work out how to embed them in a tag. -->
 			<fileset dir="${build.deploy}/language">
 				<include name="**/*.properties"/>
 				<include name="**/*.txt"/>
@@ -64,6 +93,7 @@
 		
 		
 	</target>
+	-->
 	
 	<target name="update-custom-tool-contexts" description="Updates the web.xmls for the non-custom tools">
         <echo>Updating web.xml and MANIFEST.MF for lams-central.war, lams-monitor.war and lams-learning.war. using for custom tools</echo>
@@ -150,6 +180,7 @@
 				<include name="*"/>
 				<include name="css/*"/>
 				<include name="branching/*"/>
+				<include name="common/*"/>
 				<include name="exportPortfolio/*"/>
 				<include name="notebook/*"/>
 				<include name="gate/*"/>
