@@ -47,7 +47,9 @@ public class checkmysql
 	        this.dbDriverClass = "com.mysql.jdbc.Driver";
         	this.dbDriverUrl = url;
         	this.dbUsername = user;
-        	this.dbPassword = pass;
+        	
+        	if (pass != null) 	{this.dbPassword = pass;}
+        	else 				{this.dbPassword = "";}
 	
 			Class.forName(dbDriverClass);
        		Connection conn = DriverManager.getConnection(dbDriverUrl, dbUsername, dbPassword);

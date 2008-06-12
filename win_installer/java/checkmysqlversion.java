@@ -49,9 +49,13 @@ public class checkmysqlversion
 	        this.dbDriverClass = "com.mysql.jdbc.Driver";
         	this.dbDriverUrl = url;
         	this.dbUsername = user;
-        	this.dbPassword = pass;
+        	//this.dbPassword = pass;
 			this.minMysqlVersion = 5.0;
 	
+			if (pass != null) 	{this.dbPassword = pass;}
+        	else 				{this.dbPassword = "";}
+			
+			
 			Class.forName(dbDriverClass);
        		Connection conn = DriverManager.getConnection(dbDriverUrl, dbUsername, dbPassword);
        		conn.setAutoCommit(false);
