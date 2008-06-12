@@ -77,6 +77,8 @@ Section Revert
     ; getting the required settings to revert from the register
     call readRegister
     
+    call setUpAnt
+    
     call revertFiles
     
     detailprint "Restoring back to old database"
@@ -191,18 +193,115 @@ Function readRegister
     ReadRegStr $REPOSITORY_DIR HKLM "${REG_HEAD}" "dir_repository"
 FunctionEnd
 
+Function setUpAnt
+    # extract ant
+    SetOutPath $TEMP
+    File /r "..\..\apache-ant-1.6.5"
+    File "ant\revert.xml"
+
+    # create installer.properties
+    ClearErrors
+    FileOpen $0 "$TEMP\revert.properties" w
+    IfErrors error +1
+   
+    # convert '\' to '/' for Ant's benefit
+    Push "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\"
+    Push "\"
+    Call StrSlash
+    Pop $2
+    
+    Push "$BACKUP_DIR"
+    Push "\"
+    Call StrSlash
+    Pop $3
+    
+    Push "$INSTDIR"
+    Push "\"
+    Call StrSlash
+    Pop $4
+    
+    filewrite $0 "EARDIR=$2$\r$\n"
+    IfErrors error +1
+    
+    filewrite $0 "BACKUP_DIR=$3$\r$\n"
+    IfErrors error +1
+    
+    filewrite $0 "INSTDIR=$4$\r$\n"
+    IfErrors error +1
+    
+    filewrite $0 "DB_NAME=$DB_NAME$\r$\n"
+    IfErrors error +1
+    
+    filewrite $0 "DB_USER=$DB_USER$\r$\n"
+    IfErrors error +1
+    
+    filewrite $0 "DB_PASS=$DB_PASS$\r$\n"
+    IfErrors error +1
+    
+    FileClose $0
+    IfErrors error +1
+    
+    goto done
+    error:
+        MessageBox MB_OK|MB_ICONSTOP "Ant setup failed, cannot continue with revert"
+        rmdir "$TEMP\apache-ant-1.6.5"
+        delete "$TEMP\revert.xml"
+        delete "$TEMP\revert.properties"
+        Abort "Ant setup failed."
+    done:
+FunctionEnd
+
+
+
 Function revertfiles
     rmdir /r "$INSTDIR\jboss-4.0.2"
     rmdir /r "$REPOSITORY_DIR"
     rmdir /r "$INSTDIR\dump"
     detailprint "Copying files back to $INSTDIR"
+    
+    createdirectory $INSTDIR
     createdirectory $REPOSITORY_DIR
     
     DetailPrint "Restoring LAMS files. This may take a few minutes"
     SetDetailsPrint listonly
-    copyfiles /SILENT "$BACKUP_DIR\repository\*" $REPOSITORY_DIR
-    copyfiles /SILENT "$BACKUP_DIR\*" "$INSTDIR"
+    strcpy $5 "$TEMP\apache-ant-1.6.5\bin\ant.bat -buildfile $TEMP\revert.xml -logfile $INSTDIR\restore-copyfiles.log copy-files"
+    detailprint $5
+    nsExec::ExecToStack $5
+    Pop $3
+    Pop $4
+    ${If} $3 != 0
+        detailprint "Problem copying files"
+        goto error
+    ${EndIf}
+    SetDetailsPrint both
+    
+    goto done
+    error:
+        MessageBox MB_OK|MB_ICONSTOP "LAMS restore failed.  Could not copy from backup directory.$\r$\nError:$\r$\n$\r$\n$4"
+        rmdir "$TEMP\apache-ant-1.6.5"
+        delete "$TEMP\revert.xml"
+        delete "$TEMP\revert.properties"
+        Abort "File restore failed."
+    done:
+
+    
+    /*
+    clearerrors
+    DetailPrint "Restoring LAMS files. This may take a few minutes"
     SetDetailsPrint listonly
+    #copyfiles /SILENT "$BACKUP_DIR\repository\*" $REPOSITORY_DIR
+    copyfiles "$BACKUP_DIR\*" "$INSTDIR"
+    SetDetailsPrint listonly
+    IfErrors fail continue
+    
+    goto continue
+    
+    fail:
+    DetailPrint "File copy failed."
+    MessageBox MB_OK|MB_ICONSTOP "LAMS restore failed.  Could not copy from backup directory: $\r$\n$BACKUP_DIR"
+    Abort "LAMS configuration failed."
+    continue:
+    */
 Functionend
 
 Function revertDatabase
@@ -250,49 +349,6 @@ Function revertDatabase
         goto error
     ${EndIf}
     
-    
-    # extract ant
-    SetOutPath $TEMP
-    File /r "..\..\apache-ant-1.6.5"
-    File "ant\revert.xml"
-
-    # create installer.properties
-    ClearErrors
-    FileOpen $0 "$TEMP\revert.properties" w
-    IfErrors error +1
-   
-        
-    # convert '\' to '/' for Ant's benefit
-    Push "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\"
-    Push "\"
-    Call StrSlash
-    Pop $2
-    
-    Push "$BACKUP_DIR"
-    Push "\"
-    Call StrSlash
-    Pop $3
-    
-    filewrite $0 "EARDIR=$2$\r$\n"
-    IfErrors error +1
-    
-    filewrite $0 "BACKUP_DIR=$3$\r$\n"
-    IfErrors error +1
-    
-    filewrite $0 "DB_NAME=$DB_NAME$\r$\n"
-    IfErrors error +1
-    
-    filewrite $0 "DB_USER=$DB_USER$\r$\n"
-    IfErrors error +1
-    
-    filewrite $0 "DB_PASS=$DB_PASS$\r$\n"
-    IfErrors error +1
-    
-    FileClose $0
-    IfErrors error +1
-
-    
-
     strcpy $5 "$TEMP\apache-ant-1.6.5\bin\ant.bat -buildfile $TEMP\revert.xml -logfile $INSTDIR\restore.log revert-db"
     detailprint $5
     nsExec::ExecToStack $5

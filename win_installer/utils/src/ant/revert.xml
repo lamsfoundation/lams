@@ -14,4 +14,19 @@
 		</sql>
 	</target>
 	
+	<target name="copy-files" >
+		<!--
+        <copy todir="${INSTDIR}"  overwrite="true">
+            <fileset dir="${BACKUP_DIR}">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        
+        -->
+		
+        <copy todir="${INSTDIR}" overwrite="true" verbose="true">
+            <fileset dir="${BACKUP_DIR}" excludes="lams-restore.exe"/>
+        </copy>
+    </target>
+	
 </project>
