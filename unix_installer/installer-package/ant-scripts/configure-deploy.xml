@@ -40,6 +40,7 @@
 				<filter token="DB_USER" value="${DB_USER}" />
 				<filter token="DB_PASS" value="${DB_PASS}" />
 				<filter token="MYSQL_HOST" value="${SQL_HOST}" />
+				<filter token="MYSQL_PORT" value="${SQL_PORT}" />
 			</filterset>
 		</copy>
 		<copy overwrite="true" todir="${DEPLOY_DIR}" failonerror="true">
