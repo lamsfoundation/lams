@@ -14,7 +14,7 @@
 	
 	<target name="dump-db" description="Dump full LAMS database contents.">
 		<exec executable="mysqldump" 
-		     output="${basedir}/database/lams.dump" failonerror="true">
+		     output="${basedir}/database/dump.sql" failonerror="true">
 		      <arg line="-u${db.username}" />
 		      <arg line="--password=${db.password}" />
 		      <arg line="${db.name}" />
@@ -57,7 +57,6 @@
 			<arg value="-c" />
 			<arg value="./createPackage.sh" />
 		</exec>
-		
 	</target>
 	
 	<!-- clean the installation, the .bak file will remain in the build dir -->

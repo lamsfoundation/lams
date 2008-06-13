@@ -288,14 +288,15 @@ configureWrapper()
         		installfailed
 		fi
 
-
-		if [ -f "$JBOSS_DIR/logs/" ]
-		then
-			printf " "
-		else
-			mkdir "$JBOSS_DIR/logs/"
-		fi
-		cp wrapper/run.sh "$JBOSS_DIR/bin"
+		mkdir -p $JBOSS_DIR/logs/
+		cp wrapper/run.sh $JBOSS_DIR/bin
+		#if [ -f "$JBOSS_DIR/logs/" ]
+		#then
+		#	printf " "
+		#else
+		#	mkdir "$JBOSS_DIR/logs/"
+		#fi
+		#cp wrapper/run.sh "$JBOSS_DIR/bin"
 		
 		if [ -f /etc/init.d/lams2 ]
 		then
@@ -386,10 +387,6 @@ if [  "$?" -ne  "0" ]
        	installfailed
 fi
 
-# UNCOMMENT FOR (2.1) Create news-unmodified.html and place it with news.html such that the upgrader can do a 
-# diff between the two files to determine whether it should update news.html or not.
-cp assembly/lams.ear/lams-www.war/news.html ${DEFAULT_DIR}/deploy/lams.ear/lams-www.war/news-unmodified.html
-
 # Configuring jboss with settings from lams.properties
 printf "Configuring JBoss with your settings.\n"
 ant/bin/ant -buildfile ant-scripts/configure-deploy.xml -logfile log/copy-conf.log copy-conf
@@ -407,6 +404,7 @@ if [ -f $JBOSS_DIR/bin/wrapper ]
 fi
 
 # Add the sample lessons to the repository as of 2.1
+mkdir -p $REPOSITORY_DIR
 cp -r repository/* $REPOSITORY_DIR
 
 # configure the wrapper
@@ -414,12 +412,13 @@ printf "\nConfiguring the java Wrapper\n"
 configureWrapper
 
 # configure jboss
-if [ -d ${DEFAULT_DIR}/lib ]
-	then
-	printf "\n${DEFAULT_DIR}/lib exists.\n\n"
-else
-	mkdir ${DEFAULT_DIR}/lib
-fi
+mkdir -p ${DEFAULT_DIR}/lib
+#if [ -d ${DEFAULT_DIR}/lib ]
+#	then
+#	printf "\n${DEFAULT_DIR}/lib exists.\n\n"
+#else
+#	mkdir ${DEFAULT_DIR}/lib
+#fi
 
 
 cp $JBOSS_DIR/server/all/lib/jgroups.jar $JBOSS_DIR/server/all/lib/jboss-cache.jar ${DEFAULT_DIR}/lib
@@ -432,13 +431,15 @@ fi
 
 
 printf "Copying lams.properties to /etc.\n"	
-if [ -d /etc/lams2 ]
-	then
-	printf "\n/etc/lams2 exists.\n"
-else
-	mkdir -p  /etc/lams2
-fi
+mkdir -p /etc/lams2
 cp lams.properties /etc/lams2/
+#if [ -d /etc/lams2 ]
+#	then
+#	printf "\n/etc/lams2 exists.\n"
+#else
+#	mkdir -p  /etc/lams2
+#fi
+#cp lams.properties /etc/lams2/
 
 # changing JAVA_HOME back 
 export JAVA_HOME=$ORIG_JAVA_HOME
