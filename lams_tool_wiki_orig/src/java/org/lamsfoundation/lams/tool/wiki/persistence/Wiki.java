@@ -64,7 +64,6 @@ public class Wiki implements Cloneable{
 	private int maximumReply;
 	private int minimumReply;
 	
-	private boolean allowRichEditor;
 	private String instructions;
 	private String onlineInstructions;
 	private String offlineInstructions;

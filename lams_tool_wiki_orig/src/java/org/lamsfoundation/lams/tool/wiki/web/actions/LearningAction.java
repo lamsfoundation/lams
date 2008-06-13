@@ -207,7 +207,6 @@ public class LearningAction extends Action {
 		}
 		
 		Long wikiId = wiki.getUid();
-		Boolean allowRichEditor = new Boolean(true);
 		
 		// get notebook entry
 		String entryText = new String();
@@ -228,7 +227,6 @@ public class LearningAction extends Action {
 		sessionMap.put(WikiConstants.ATTR_ALLOW_INSERT_EXTERNAL_LINKS,wiki.isAllowInsertExternalLink());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_REVERT_PAGES,wiki.isAllowRevertPage());
 		sessionMap.put(WikiConstants.ATTR_MAXIMUM_REPLIES,wiki.getMaximumReply());
-		sessionMap.put(WikiConstants.ATTR_ALLOW_RICH_EDITOR,allowRichEditor);
 		sessionMap.put(WikiConstants.ATTR_REFLECTION_ON,wiki.isReflectOnActivity());
 		sessionMap.put(WikiConstants.ATTR_REFLECTION_INSTRUCTION,wiki.getReflectInstructions());
 		sessionMap.put(WikiConstants.ATTR_REFLECTION_ENTRY, entryText);

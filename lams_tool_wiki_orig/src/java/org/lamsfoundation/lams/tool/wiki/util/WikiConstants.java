@@ -65,7 +65,6 @@ public interface WikiConstants {
 	public static final String ATTR_ALLOW_INSERT_EXTERNAL_LINKS = "allowInsertExternalLinks";
 	public static final String ATTR_ALLOW_REVERT_PAGES = "allowRevertPages";
 	public static final String ATTR_MAXIMUM_REPLIES = "maximumReplies";
-	public static final String ATTR_ALLOW_RICH_EDITOR = "allowRichEditor";
 
 	public static final String ONLINE_ATTACHMENT = "online_att";
 	public static final String OFFLINE_ATTACHMENT = "offline_att";
