@@ -196,7 +196,7 @@ public class backup
 		{
 
 			FileWriter outfile = new FileWriter("bin/lamsdump.sql");
-			outfile.write(mysqldir+ "/mysqldump -u" +dbuser+ " -p" +dbpass+ " " +dbname+ " > " +backupdir+ "/lams.dump");
+			outfile.write(mysqldir+ "/mysqldump -u" +dbuser+ " -p" +dbpass+ " " +dbname+ " > " +backupdir+ "/dump.sql");
 			outfile.close();
 		}
 		catch (Exception e)

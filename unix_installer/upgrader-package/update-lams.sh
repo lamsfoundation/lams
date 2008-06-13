@@ -25,8 +25,8 @@
 	
 # The version of this LAMS updater
 LAMS_VERSION=2.1
-LAMS_SERVER_VERSION=2.1.200804291000
-LAMS_LANGUAGE_VERSION=2008-04-29
+LAMS_SERVER_VERSION=2.1.0.200806131057
+LAMS_LANGUAGE_VERSION=2008-06-13
 REQ_LAMS_VERSION=2.0.4
 
 JAVA_REQ_VERSION=1.5
@@ -40,11 +40,11 @@ cp lams.properties docs/lams.properties.backup.orig
 # Invoked when the install is failed
 installfailed()
 {
-        echo ""
+    echo ""
     cp lams.properties docs/lams.properties.backup.exec
     cp docs/lams.properties.backup.orig lams.properties
     export JAVA_HOME=$ORIG_JAVA_HOME
-        exit 1
+    exit 1
 }
 
 # Invoked when the install is exited
@@ -78,6 +78,7 @@ then
 		echo "LAMS_VERSION=2.1" >> lams.properties
 		echo "LAMS_SERVER_VERSION=2.1.200804291000" >> lams.properties
 		echo "LAMS_LANGUAGE_VERSION=2008-04-29" >> lams.properties
+		echo "SQL_PORT=3306" >> lams.properties
 		echo "" >> lams.properties
 		############## End 2.1 Specific Code ##################
         
@@ -189,9 +190,9 @@ checkMysql()
         $JAVA_HOME/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$SQL_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION"
 
     if [  "$?" -ne  "0" ]
-        then
-        installfailed
-        fi
+    then
+    	installfailed
+    fi
 }
 
 getMysqlHost()
@@ -300,7 +301,7 @@ backup()
         printf "2) Backup $LAMS_DIR\n"
         printf "3) Backup /etc/lams2\n"
         printf "4) Dump the database by executing the following command. Fill in your own backup \ndirectory.\n"
-        printf "> $sqldir/mysqldump -u$dbuser -p$dbpass $dbname > (backup dir)/lams.dump\n"
+        printf "> $sqldir/mysqldump -u$dbuser -p$dbpass $dbname > (backup dir)/dump.sql\n"
         installexit 
         ;;
     y)
@@ -309,7 +310,7 @@ backup()
         $JDK_DIR/bin/java -cp bin backup
         if [  "$?" -ne  "0" ]
                 then
-                        echo "Update failed, please check that LAMS 2.0 is installed and your lams.properties file is correct."
+                        echo "Update failed, please check that LAMS $REQ_LAMS_VERSION is installed and your lams.properties file is correct."
                         installfailed
                 fi
 
@@ -317,7 +318,7 @@ backup()
         bin/lamsdump.sql
         if [  "$?" -ne  "0" ]
                 then
-                        echo "Update failed, please check that LAMS 2.0 is installed and your lams.properties file is correct."
+                        echo "Update failed, please check that LAMS $REQ_LAMS_VERSION is installed and your lams.properties file is correct."
                         installfailed
                 fi
 
@@ -350,7 +351,7 @@ printf "\n1) Backup $JBOSS_DIR\n"
 printf "2) Backup $LAMS_DIR\n"
 printf "3) Backup /etc/lams2\n"
 printf "4) Dump the database by executing the following command. Fill in your own backup \ndirectory.\n"
-printf "> $sqldir/mysqldump -u$dbuser -p$dbpass $dbname > (backup dir)/lams.dump\n"
+printf "> $sqldir/mysqldump -u$dbuser -p$dbpass $dbname > (backup dir)/dump.sql\n"
 printf "\n--------------------------------------------------------------------------------\n\n"
 
 getMysqlHost

@@ -27,12 +27,15 @@
     <property file="../lams.properties" />
     <property file="lang.properties"/>
 
-    <condition property="files.match">
+	<!-- LI-157 Do not overwrite news.html - commented out -->
+    <!--
+	<condition property="files.match">
         <filesmatch file1="${DEPLOY_DIR}/lams.ear/lams-www.war/news.html" file2="../assembly/lams.ear/lams-www.war/news-2.0.2.html" />
-        <!-- Uncomment the line below for 2.1.x upgrader and delete the line above (2.1 installer will create news-unmodified in the deploy dir)
-         <filesmatch file1="${DEPLOY_DIR}/lams.ear/lams-www.war/news.html" file2="${DEPLOY_DIR}/lams.ear/lams-www.war/news-unmodified.html" /> -->
+        
+         <filesmatch file1="${DEPLOY_DIR}/lams.ear/lams-www.war/news.html" file2="${DEPLOY_DIR}/lams.ear/lams-www.war/news-unmodified.html" /> 
     </condition>
-
+	-->
+	
     <!-- Main Task, calls all the other tasks -->
     <target name="update-lams" description="Runs the entire update process">
         <!-- antcall target="check-software" / -->
@@ -150,7 +153,8 @@
                 <include name="mysql-ds.xml"/>
             </fileset>
             <filterset>
-                <filter token="SQL_HOST" value="${SQL_HOST}"/>
+                <filter token="MYSQL_HOST" value="${SQL_HOST}"/>
+                <filter token="MYSQL_PORT" value="${SQL_HOST}"/>
                 <filter token="DB_NAME" value="${DB_NAME}"/>
                 <filter token="DB_USER" value="${DB_USER}"/>
                 <filter token="DB_PASS" value="${DB_PASS}"/>
@@ -212,6 +216,10 @@
             <property name="prop.path" value="lasurv11"/>
         </ant>
 
+    	<ant antfile="update-deploy-tools.xml" output="../log/create-latask10-deploy.log" target="create-deploy-package">
+            <property name="prop.path" value="latask10"/>
+        </ant>
+    	
         <ant antfile="update-deploy-tools.xml" output="../log/create-lavote11-deploy.log" target="create-deploy-package">
             <property name="prop.path" value="lavote11"/>
         </ant>
@@ -256,6 +264,10 @@
         <ant antfile="update-deploy-tools.xml" output="../log/deploy-lasurv11.log" target="deploy-tool">
             <property name="prop.path" value="lasurv11"/>
         </ant>
+    	
+    	<ant antfile="update-deploy-tools.xml" output="../log/deploy-latask10.log" target="deploy-tool">
+	        <property name="prop.path" value="latask10"/>
+	    </ant>
 
         <ant antfile="update-deploy-tools.xml" output="../log/deploy-lavote11.log" target="deploy-tool">
             <property name="prop.path" value="lavote11"/>
@@ -302,6 +314,10 @@
             <property name="prop.path" value="lasurv11"/>
         </ant>
 
+    	<ant antfile="update-deploy-tools.xml" output="../log/update-tool-context-latask10.log" target="update-tool-context">
+            <property name="prop.path" value="latask10"/>
+        </ant>
+    	
         <ant antfile="update-deploy-tools.xml" output="../log/update-tool-context-lavote11.log" target="update-tool-context">
             <property name="prop.path" value="lavote11"/>
         </ant>
@@ -318,6 +334,20 @@
 		<ant antfile="update-deploy-tools.xml" output="../log/update-application-xml.log" target="update-application-xml">
             <property name="prop.path" value="lavote11"/>
         </ant>
+		
+		<!-- LI-159 Update mysql-ds for 2.1 --> 
+		<copy todir="${DEPLOY_DIR}" overwrite="true">
+            <fileset dir="../conf">
+                <include name="mysql-ds.xml"/>
+            </fileset>
+            <filterset>
+                <filter token="MYSQL_HOST" value="${SQL_HOST}"/>
+                <filter token="MYSQL_PORT" value="${SQL_PORT}"/>
+                <filter token="DB_NAME" value="${DB_NAME}"/>
+                <filter token="DB_USER" value="${DB_USER}"/>
+                <filter token="DB_PASS" value="${DB_PASS}"/>
+            </filterset>
+        </copy>
 	</target>
 	
 	

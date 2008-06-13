@@ -16,7 +16,7 @@
 	
 	<target name="dump-db" description="Dump full LAMS database contents.">
 		<exec executable="mysqldump" 
-		     output="${basedir}/database/lams.dump" failonerror="true">
+		     output="${basedir}/database/dump.sql" failonerror="true">
 		      <arg line="-u${db.username}" />
 		      <arg line="--password=${db.password}" />
 		      <arg line="${db.name}" />
@@ -111,6 +111,17 @@
         <antcall target="copy-tool-deploy-package"> 
             <param name="tool.dir" value="lams_tool_scribe" /> 
             <param name="tool.sig" value="lascrb11" /> 
+        </antcall>
+		
+		<antcall target="copy-tool-deploy-package"> 
+            <param name="tool.dir" value="lams_tool_survey" /> 
+            <param name="tool.sig" value="lasurv11" /> 
+        </antcall>
+
+		
+		<antcall target="copy-tool-deploy-package"> 
+            <param name="tool.dir" value="lams_tool_task" /> 
+            <param name="tool.sig" value="latask10" /> 
         </antcall>
 		
         <antcall target="copy-tool-deploy-package"> 

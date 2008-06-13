@@ -14,12 +14,33 @@
 	<!-- Generate the deploy package                                         -->
 	<!-- =================================================================== -->
 	<target name="create-deploy-package" description="Generate the deployment package.">
-		<echo>+------------------------------------------+</echo>
-		<echo>| Generate the deployment package.         |</echo>
-		<echo>+------------------------------------------+</echo>
-		<echo>Generating deploy.xml for ${signature}</echo>
-		<echo>../tools/${prop.path}/build.properties</echo>
 		
+		<echo>+------------------------------------------+</echo>
+	        <echo>| Generate the deployment package.         |</echo>
+	        <echo>+------------------------------------------+</echo>
+	        <echo>Copying deploy.xml for ${signature}</echo>
+		    
+			<mkdir dir="${build.deploy}/filtered"/>
+			<copy overwrite="yes" todir="${build.deploy}/filtered"> 
+				<fileset dir="${build.deploy}">
+	                <include name="deploy.xml" />
+	            </fileset>
+				<filterset>  
+					<filter token="dbUsername" value="${db.username}" />
+					<filter token="dbPassword" value="${db.password}" />
+					<filter token="dbDriverUrl" value="${db.url}" />
+					<filter token="dbDriverClass" value="${db.Driver}" />
+					<filter token="lamsear" value="${jboss.deploy}" />
+					<filter token="toolDeployPackageDir" value="${build.deploy}" />
+				</filterset>
+			</copy>
+			
+			<move file="${build.deploy}/filtered/deploy.xml" tofile="${build.deploy}/deploy.xml"/>
+			<delete dir="${build.deploy}/filtered"/>
+		    
+			<echo>Deploy packaqe for ${signature} created.</echo>
+		
+		<!--
 		<path id="deploy.lib.classpath">
 			<fileset dir="${deploy.tool.dir}">
 				<include name="lib/*.jar"/>
@@ -56,7 +77,7 @@
 			toolWebUri="${product}.war"
 			languageFilesPackage="${language.files.package}">
 
-			<!-- language files go as a fileset. Not nice but can't work out how to embed them in a tag. -->
+			
 			<fileset dir="${build.deploy}/language">
 				<include name="**/*.properties"/>
 				<include name="**/*.txt"/>
@@ -65,7 +86,7 @@
 		</generateDeployProperties>
 		
 		<echo>Deploy packaqe for ${signature} created.</echo>
-			
+		-->	
 		
 		
 	</target>

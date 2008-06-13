@@ -10,4 +10,4 @@ find . -name *.bak | xargs rm -rf
 tar -czf lams-unix-updater-$LAMS_VERSION.tar.gz lams-unix-updater-$LAMS_VERSION
 
 #Copying to test dir
-cp -r lams-unix-updater-$LAMS_VERSION /home/lfoxton/workspace/test_installers/updater
+#cp -r lams-unix-updater-$LAMS_VERSION /home/lfoxton/workspace/test_installers/updater
