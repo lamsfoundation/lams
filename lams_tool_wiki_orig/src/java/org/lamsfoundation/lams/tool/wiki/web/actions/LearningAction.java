@@ -218,7 +218,7 @@ public class LearningAction extends Action {
 			entryText = notebookEntry.getEntry();
 		}
 		
-		sessionMap.put(WikiConstants.FORUM_ID, wikiId);
+		sessionMap.put(WikiConstants.WIKI_ID, wikiId);
 		sessionMap.put(AttributeNames.ATTR_MODE, mode);
 		sessionMap.put(WikiConstants.ATTR_FINISHED_LOCK, new Boolean(lock));
 		sessionMap.put(WikiConstants.ATTR_USER_FINISHED, wikiUser.isSessionFinished());
@@ -234,8 +234,8 @@ public class LearningAction extends Action {
 		sessionMap.put(WikiConstants.ATTR_REFLECTION_INSTRUCTION,wiki.getReflectInstructions());
 		sessionMap.put(WikiConstants.ATTR_REFLECTION_ENTRY, entryText);
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
-		sessionMap.put(WikiConstants.ATTR_FORUM_TITLE,wiki.getTitle());
-		sessionMap.put(WikiConstants.ATTR_FORUM_INSTRCUTION,wiki.getInstructions());
+		sessionMap.put(WikiConstants.ATTR_WIKI_TITLE,wiki.getTitle());
+		sessionMap.put(WikiConstants.ATTR_WIKI_INSTRCUTION,wiki.getInstructions());
 		
 		// get all root topic to display on init page
 		List rootTopics = wikiService.getRootTopics(sessionId);
@@ -445,7 +445,7 @@ public class LearningAction extends Action {
 
 		MessageForm messageForm = (MessageForm) form;
 		SessionMap sessionMap = getSessionMap(request, messageForm);
-		Long wikiId = (Long) sessionMap.get(WikiConstants.FORUM_ID);
+		Long wikiId = (Long) sessionMap.get(WikiConstants.WIKI_ID);
 		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 		Message message = messageForm.getMessage();
@@ -841,7 +841,7 @@ public class LearningAction extends Action {
 					.getRequiredWebApplicationContext(getServlet()
 							.getServletContext());
 			wikiService = (IWikiService) wac
-					.getBean(WikiConstants.FORUM_SERVICE);
+					.getBean(WikiConstants.WIKI_SERVICE);
 		}
 		return wikiService;
 	}

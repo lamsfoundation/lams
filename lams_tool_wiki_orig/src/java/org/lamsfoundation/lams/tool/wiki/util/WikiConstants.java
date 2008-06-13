@@ -38,13 +38,13 @@ public interface WikiConstants {
 	// For old style (Fiona's description): The oldest topic is at the top, does not depends the reply date etc.
 	// For new style (Ernie's early desc): Most current popular wiki used style: latest topics 
 	// should be at the top, reply date will descide the order etc.
-	public static final boolean OLD_FORUM_STYLE  = true;
+	public static final boolean OLD_WIKI_STYLE  = true;
 	
 	public static final int STATUS_CONTENT_COPYED = 1;
 	public static final int SESSION_STATUS_FINISHED = 1;
 	
     public final static int MAX_FILE_SIZE = 250 * 1000;
-    public final static String FORUM_SERVICE = "wikiService";
+    public final static String WIKI_SERVICE = "wikiService";
     
     public final static String CONTENT_HANDLER = "toolContentHandler";
 
@@ -57,7 +57,7 @@ public interface WikiConstants {
 	public static final String DEFAULT_TITLE = "Wiki";
 	//TODO:hard code!!! need to read from config
 	public static final String TOOL_URL_BASE = "/lams/tool/lawiki10/";
-	public static final String FORUM_ID = "wiki_id";
+	public static final String WIKI_ID = "wiki_id";
 
 	public static final String ATTR_ALLOW_UPLOAD = "allowUpload";
 	public static final String ATTR_ALLOW_NEW_WIKI_PAGES = "allowNewWikiPages";
@@ -91,8 +91,8 @@ public interface WikiConstants {
 
 	public static final String ATTR_ROOT_TOPIC_UID = "rootUid";
 
-	public static final String ATTR_FORUM_TITLE = "title";
-	public static final String ATTR_FORUM_INSTRCUTION = "instruction";
+	public static final String ATTR_WIKI_TITLE = "title";
+	public static final String ATTR_WIKI_INSTRCUTION = "instruction";
 
 	public static final String ATTR_TOOL_CONTENT_TOPICS = "ToolContentTopicList";
 	public static final String ATTR_TOPIC = "topic";
@@ -120,7 +120,7 @@ public interface WikiConstants {
 	
 	public static final String MARK_UPDATE_FROM_SESSION = "listAllMarks";
 	public static final String MARK_UPDATE_FROM_USER = "listMarks";
-	public static final String MARK_UPDATE_FROM_FORUM = "viewWiki";
+	public static final String MARK_UPDATE_FROM_WIKI = "viewWiki";
 
 
 

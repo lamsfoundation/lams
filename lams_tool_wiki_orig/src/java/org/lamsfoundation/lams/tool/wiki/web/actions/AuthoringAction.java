@@ -25,7 +25,7 @@
 
 package org.lamsfoundation.lams.tool.wiki.web.actions;
 
-import static org.lamsfoundation.lams.tool.wiki.util.WikiConstants.OLD_FORUM_STYLE;
+import static org.lamsfoundation.lams.tool.wiki.util.WikiConstants.OLD_WIKI_STYLE;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -621,7 +621,7 @@ public class AuthoringAction extends Action {
 		message.setAttachments(attSet);
 		
 		//save the new message into HttpSession
-		if(OLD_FORUM_STYLE)
+		if(OLD_WIKI_STYLE)
 			topics.add(MessageDTO.getMessageDTO(message));
 		else
 			topics.add(0,MessageDTO.getMessageDTO(message));
@@ -822,7 +822,7 @@ public class AuthoringAction extends Action {
   	private IWikiService getWikiManager() {
   	    if ( wikiService == null ) {
   	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-  	      wikiService = (IWikiService) wac.getBean(WikiConstants.FORUM_SERVICE);
+  	      wikiService = (IWikiService) wac.getBean(WikiConstants.WIKI_SERVICE);
   	    }
   	    return wikiService;
   	}

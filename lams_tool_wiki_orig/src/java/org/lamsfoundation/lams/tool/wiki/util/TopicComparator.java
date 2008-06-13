@@ -30,7 +30,7 @@ import java.util.Comparator;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.wiki.persistence.Message;
 import org.lamsfoundation.lams.tool.wiki.persistence.MessageSeq;
-import static org.lamsfoundation.lams.tool.wiki.util.WikiConstants.OLD_FORUM_STYLE; 
+import static org.lamsfoundation.lams.tool.wiki.util.WikiConstants.OLD_WIKI_STYLE; 
 
 /**
  * This class implementaion <code>java.util.Comparator</code> interface. It can sort meesage according to
@@ -79,7 +79,7 @@ public class TopicComparator implements Comparator<MessageSeq> {
 			//this comparation will handle different branch node
 			if(parent1 != parent2){
 				//compare last modified date, the latest is at beginning
-				if(OLD_FORUM_STYLE)
+				if(OLD_WIKI_STYLE)
 					return  parent1.getUpdated().before(parent2.getUpdated())?-1:1;
 				else
 					return  parent1.getUpdated().before(parent2.getUpdated())?1:-1;
@@ -90,7 +90,7 @@ public class TopicComparator implements Comparator<MessageSeq> {
 				if(msgSeq1.getMessageLevel() != msgSeq2.getMessageLevel())
 					return msgSeq1.getMessageLevel() -msgSeq2.getMessageLevel();
 				else{
-					if(OLD_FORUM_STYLE)
+					if(OLD_WIKI_STYLE)
 						return msg1.getUpdated().before(msg2.getUpdated())?-1:1;
 					else
 						return msg1.getUpdated().before(msg2.getUpdated())?1:-1;
@@ -98,7 +98,7 @@ public class TopicComparator implements Comparator<MessageSeq> {
 			}
 			
 		}
-		if(OLD_FORUM_STYLE)
+		if(OLD_WIKI_STYLE)
 			return msg1.getUpdated().before(msg2.getUpdated())?-1:1;
 		else
 			return msg1.getUpdated().before(msg2.getUpdated())?1:-1;

@@ -24,7 +24,7 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.tool.wiki.service;
 
-import static org.lamsfoundation.lams.tool.wiki.util.WikiConstants.OLD_FORUM_STYLE;
+import static org.lamsfoundation.lams.tool.wiki.util.WikiConstants.OLD_WIKI_STYLE;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -387,7 +387,7 @@ public class WikiService implements IWikiService,ToolContentManager,ToolSessionM
 		Iterator iter = topicsBySession.iterator();
 		while(iter.hasNext()){
 			msg = (Message) iter.next();
-			if(OLD_FORUM_STYLE)
+			if(OLD_WIKI_STYLE)
 				map.put(msg.getCreated(),msg);
 			else
 				map.put(msg.getLastReplyDate(),msg);

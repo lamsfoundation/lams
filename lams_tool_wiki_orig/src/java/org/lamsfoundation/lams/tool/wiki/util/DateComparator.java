@@ -27,11 +27,11 @@ package org.lamsfoundation.lams.tool.wiki.util;
 
 import java.util.Comparator;
 import java.util.Date;
-import static org.lamsfoundation.lams.tool.wiki.util.WikiConstants.OLD_FORUM_STYLE; 
+import static org.lamsfoundation.lams.tool.wiki.util.WikiConstants.OLD_WIKI_STYLE; 
 public class DateComparator implements Comparator<Date> {
 
 	public int compare(Date arg0, Date arg1) {
-		if(OLD_FORUM_STYLE)
+		if(OLD_WIKI_STYLE)
 			return (arg0.getTime() - arg1.getTime()) > 0 ?1:-1;
 		else
 			return (arg0.getTime() - arg1.getTime()) > 0 ?-1:1;

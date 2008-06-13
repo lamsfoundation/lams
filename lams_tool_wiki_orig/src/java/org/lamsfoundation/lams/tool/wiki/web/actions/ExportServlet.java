@@ -155,7 +155,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 		sessionMap.put(WikiConstants.ATTR_TOOL_CONTENT_TOPICS, sessionTopicMap);
 		
 		//set wiki title 
-		sessionMap.put(WikiConstants.ATTR_FORUM_TITLE, session.getWiki().getTitle());
+		sessionMap.put(WikiConstants.ATTR_WIKI_TITLE, session.getWiki().getTitle());
 		
     }
 
@@ -193,7 +193,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
         sessionMap.put(WikiConstants.ATTR_TOOL_CONTENT_TOPICS,topicsByUser);
         
 //      set wiki title 
-		sessionMap.put(WikiConstants.ATTR_FORUM_TITLE, content.getTitle());
+		sessionMap.put(WikiConstants.ATTR_WIKI_TITLE, content.getTitle());
     }
 
 	/**

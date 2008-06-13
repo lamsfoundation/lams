@@ -35,7 +35,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  *
  */
 public class WikiDao extends HibernateDaoSupport {
-	private static final String FIND_FORUM_BY_CONTENTID = "from Wiki wiki where wiki.contentId=?";
+	private static final String FIND_WIKI_BY_CONTENTID = "from Wiki wiki where wiki.contentId=?";
 	
 	public void saveOrUpdate(Wiki wiki) {
 		wiki.updateModificationData();
@@ -58,7 +58,7 @@ public class WikiDao extends HibernateDaoSupport {
 	}
 
 	public Wiki getByContentId(Long contentID) {
-		List list = getHibernateTemplate().find(FIND_FORUM_BY_CONTENTID,contentID);
+		List list = getHibernateTemplate().find(FIND_WIKI_BY_CONTENTID,contentID);
 		if(list != null && list.size() > 0)
 			return (Wiki) list.get(0);
 		else

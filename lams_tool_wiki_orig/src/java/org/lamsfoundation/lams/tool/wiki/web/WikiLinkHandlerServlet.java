@@ -20,7 +20,7 @@
  */
 package org.lamsfoundation.lams.tool.wiki.web;
 
-import static org.lamsfoundation.lams.tool.wiki.util.WikiConstants.OLD_FORUM_STYLE;
+import static org.lamsfoundation.lams.tool.wiki.util.WikiConstants.OLD_WIKI_STYLE;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -91,7 +91,7 @@ public class WikiLinkHandlerServlet extends HttpServlet {
 	// For old style (Fiona's description): The oldest topic is at the top, does not depends the reply date etc.
 	// For new style (Ernie's early desc): Most current popular wiki used style: latest topics 
 	// should be at the top, reply date will descide the order etc.
-	public static final boolean OLD_FORUM_STYLE  = true;
+	public static final boolean OLD_WIKI_STYLE  = true;
 	
 
 	/**

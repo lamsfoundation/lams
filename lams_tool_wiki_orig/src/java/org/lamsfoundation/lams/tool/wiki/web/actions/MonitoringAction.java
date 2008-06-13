@@ -677,7 +677,7 @@ public class MonitoringAction extends Action {
 		String updateMode = (String) sessionMap.get(WikiConstants.PARAM_UPDATE_MODE);
 		//view wiki mode
 		if(StringUtils.isBlank(updateMode)){
-			sessionMap.put(WikiConstants.PARAM_UPDATE_MODE, WikiConstants.MARK_UPDATE_FROM_FORUM);
+			sessionMap.put(WikiConstants.PARAM_UPDATE_MODE, WikiConstants.MARK_UPDATE_FROM_WIKI);
 			sessionMap.put(WikiConstants.ATTR_ROOT_TOPIC_UID,markForm.getTopicID());
 		}
 		
@@ -803,7 +803,7 @@ public class MonitoringAction extends Action {
 					.getRequiredWebApplicationContext(getServlet()
 							.getServletContext());
 			wikiService = (IWikiService) wac
-					.getBean(WikiConstants.FORUM_SERVICE);
+					.getBean(WikiConstants.WIKI_SERVICE);
 		}
 		return wikiService;
 	}
