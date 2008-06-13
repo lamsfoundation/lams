@@ -58,7 +58,8 @@ public class Wiki implements Cloneable{
 	private boolean allowAnonym;
 	private boolean allowNewWikiPage;
 	private boolean allowAttachImage;
-	private boolean allowInsertLink;
+	private boolean allowInsertWikiLink;
+	private boolean allowInsertExternalLink;
 	private boolean allowRevertPage;
 	private boolean allowUpload;
 	private int maximumReply;
@@ -470,14 +471,24 @@ public class Wiki implements Cloneable{
 		this.allowAttachImage = allowAttachImage;
 	}
 	/**
-	 * @hibernate.property column="allow_insert_link"
+	 * @hibernate.property column="allow_insert_wiki_link"
 	 * @return
 	 */	
-	public boolean isAllowInsertLink() {
-		return allowInsertLink;
+	public boolean isAllowInsertWikiLink() {
+		return allowInsertWikiLink;
 	}
-	public void setAllowInsertLink(boolean allowInsertLink) {
-		this.allowInsertLink = allowInsertLink;
+	public void setAllowInsertWikiLink(boolean allowInsertWikiLink) {
+		this.allowInsertWikiLink = allowInsertWikiLink;
+	}	
+	/**
+	 * @hibernate.property column="allow_insert_external_link"
+	 * @return
+	 */	
+	public boolean isAllowInsertExternalLink() {
+		return allowInsertExternalLink;
+	}
+	public void setAllowInsertExternalLink(boolean allowInsertExternalLink) {
+		this.allowInsertExternalLink = allowInsertExternalLink;
 	}
 	/**
 	 * @hibernate.property column="allow_revert_page"

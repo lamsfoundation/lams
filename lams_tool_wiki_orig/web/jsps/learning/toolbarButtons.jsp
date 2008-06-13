@@ -11,7 +11,10 @@
 		if (!${sessionMap.allowAttachImages}) {	
 			hideToolbarItem(editorInstance, 'Image');
 		}
-		if (!${sessionMap.allowInsertLinks}) {	
+		if (!${sessionMap.allowInsertWikiLinks}) {	
+			hideToolbarItem(editorInstance, 'WikiLink');
+		}
+		if (!${sessionMap.allowInsertExternalLinks}) {	
 			hideToolbarItem(editorInstance, 'Link');
 		}
 		document.getElementById("fckbox").style.visibility = 'visible';

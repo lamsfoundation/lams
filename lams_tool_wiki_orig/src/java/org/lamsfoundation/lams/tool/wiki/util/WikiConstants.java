@@ -62,7 +62,8 @@ public interface WikiConstants {
 	public static final String ATTR_ALLOW_UPLOAD = "allowUpload";
 	public static final String ATTR_ALLOW_NEW_WIKI_PAGES = "allowNewWikiPages";
 	public static final String ATTR_ALLOW_ATTACH_IMAGES = "allowAttachImages";
-	public static final String ATTR_ALLOW_INSERT_LINKS = "allowInsertLinks";
+	public static final String ATTR_ALLOW_INSERT_WIKI_LINKS = "allowInsertWikiLinks";
+	public static final String ATTR_ALLOW_INSERT_EXTERNAL_LINKS = "allowInsertExternalLinks";
 	public static final String ATTR_ALLOW_REVERT_PAGES = "allowRevertPages";
 	public static final String ATTR_MAXIMUM_REPLIES = "maximumReplies";
 	public static final String ATTR_ALLOW_RICH_EDITOR = "allowRichEditor";

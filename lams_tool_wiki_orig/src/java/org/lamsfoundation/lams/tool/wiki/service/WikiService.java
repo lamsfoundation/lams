@@ -912,7 +912,8 @@ public class WikiService implements IWikiService,ToolContentManager,ToolSessionM
 	    	toolContentObj.setAllowAnonym(Boolean.FALSE);
 	    	toolContentObj.setAllowNewWikiPage(Boolean.FALSE); // this is the default value
 	    	toolContentObj.setAllowAttachImage(Boolean.TRUE); // this is the default value
-	    	toolContentObj.setAllowInsertLink(Boolean.FALSE); // this is the default value
+	    	toolContentObj.setAllowInsertWikiLink(Boolean.FALSE); // this is the default value
+	    	toolContentObj.setAllowInsertExternalLink(Boolean.FALSE); // this is the default value
 	    	toolContentObj.setAllowRevertPage(Boolean.FALSE); // this is the default value
 	    	//toolContentObj.setAllowRichEditor(Boolean.FALSE);
 	    	toolContentObj.setAllowUpload(Boolean.TRUE); // this is the default value

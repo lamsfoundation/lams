@@ -32,15 +32,24 @@
 </p>
 
 <p>
-	<html:checkbox property="wiki.allowInsertLink" styleClass="noBorder"
-		styleId="allowInsertLink">
+	<html:checkbox property="wiki.allowInsertWikiLink" styleClass="noBorder"
+		styleId="allowInsertWikiLink">
 	</html:checkbox>
-	<label for="allowInsertLink">
-		<fmt:message key="label.authoring.advance.allow.insert.link" />
+	<label for="allowInsertWikiLink">
+		<fmt:message key="label.authoring.advance.allow.insert.wiki.link" />
 	</label>
 </p>
 
-<!--  <p>
+<p>
+	<html:checkbox property="wiki.allowInsertExternalLink" styleClass="noBorder"
+		styleId="allowInsertExternalLink">
+	</html:checkbox>
+	<label for="allowInsertExternalLink">
+		<fmt:message key="label.authoring.advance.allow.insert.external.link" />
+	</label>
+</p>
+
+<p>
 	<html:checkbox property="wiki.allowRevertPage" styleClass="noBorder"
 		styleId="allowRevertPage">
 	</html:checkbox>
@@ -48,7 +57,6 @@
 		<fmt:message key="label.authoring.advance.allow.revert.page" />
 	</label>
 </p>
--->
 
 <p>
 	<html:checkbox property="wiki.reflectOnActivity" styleClass="noBorder"	styleId="reflectOn">

@@ -134,11 +134,11 @@
 								</c:otherwise>
 							</c:choose>
 						</c:if>
-
 						<!--  Edit Button -->
 						<c:if test="${not hidden}">
 							<c:if
-								test='${ (sessionMap.mode == "teacher") || (not sessionMap.finishedLock && (empty msgDto.mark) && (msgDto.message.replyNumber < sessionMap.maximumReplies)) }'>
+								test='${ (sessionMap.mode == "teacher") 
+								|| (not sessionMap.finishedLock && (empty msgDto.mark) && ((msgDto.message.replyNumber < sessionMap.maximumReplies) || sessionMap.maximumReplies == 0)) }'>
 								<c:set var="edittopic">
 									<html:rewrite
 										page="/learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}" />
