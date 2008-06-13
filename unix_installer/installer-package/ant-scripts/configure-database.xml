@@ -38,7 +38,7 @@
                         password="${DB_PASS}"
                         encoding="utf8"
                         onerror="continue">
-                        <transaction src="../database/lams.dump" />
+                        <transaction src="../database/dump.sql" />
                         <transaction src="../sql-scripts/setLamsConfiguration.sql"/>
                 </sql>
 	</target>
