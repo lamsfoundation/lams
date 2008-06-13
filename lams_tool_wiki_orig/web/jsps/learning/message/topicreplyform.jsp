@@ -15,15 +15,6 @@
 		</div>
 		<%@include file="bodyarea.jsp"%>
 		
-		<c:if test="${sessionMap.allowUpload}">
-		
-			<div class="field-name title-space-top">
-				<fmt:message key="message.label.attachment" />
-			</div>
-			<html:file tabindex="3" property="attachmentFile" />
-			<html:errors property="message.attachment" />
-		
-		</c:if>
 		<div class="space-bottom-top">
 		<div class="right-buttons">
 			<html:submit styleClass="button">

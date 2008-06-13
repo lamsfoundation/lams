@@ -15,15 +15,6 @@
 			<%@include file="bodyarea.jsp"%>
 		</td>
 	</tr>
-	<c:if test="${sessionMap.allowUpload}">
-		<tr>
-			<td>
-				<span class="field-name"><fmt:message key="message.label.attachment" /></span>
-				<html:file tabindex="3" property="attachmentFile" /><BR>
-				<html:errors property="message.attachment" />
-			</td>
-		</tr>
-	</c:if>
 
 	<div class="right-buttons">
 	<tr>

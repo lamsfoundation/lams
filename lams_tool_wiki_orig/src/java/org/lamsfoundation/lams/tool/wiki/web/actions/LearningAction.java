@@ -222,7 +222,6 @@ public class LearningAction extends Action {
 		sessionMap.put(AttributeNames.ATTR_MODE, mode);
 		sessionMap.put(WikiConstants.ATTR_FINISHED_LOCK, new Boolean(lock));
 		sessionMap.put(WikiConstants.ATTR_USER_FINISHED, wikiUser.isSessionFinished());
-		sessionMap.put(WikiConstants.ATTR_ALLOW_UPLOAD,wiki.isAllowUpload());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_NEW_WIKI_PAGES,wiki.isAllowNewWikiPage());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_ATTACH_IMAGES,wiki.isAllowAttachImage());
 		sessionMap.put(WikiConstants.ATTR_ALLOW_INSERT_WIKI_LINKS,wiki.isAllowInsertWikiLink());
@@ -618,7 +617,6 @@ public class LearningAction extends Action {
 		dto.setHasAttachment(false);
 		request.setAttribute(WikiConstants.AUTHORING_TOPIC, dto);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(WebUtil.readStrParam(request, WikiConstants.ATTR_SESSION_MAP_ID));
-		request.setAttribute(WikiConstants.ATTR_ALLOW_UPLOAD, sessionMap.get(WikiConstants.ATTR_ALLOW_UPLOAD));
 		
     	return mapping.findForward("success");
 	}

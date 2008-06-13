@@ -59,7 +59,6 @@ public interface WikiConstants {
 	public static final String TOOL_URL_BASE = "/lams/tool/lawiki10/";
 	public static final String WIKI_ID = "wiki_id";
 
-	public static final String ATTR_ALLOW_UPLOAD = "allowUpload";
 	public static final String ATTR_ALLOW_NEW_WIKI_PAGES = "allowNewWikiPages";
 	public static final String ATTR_ALLOW_ATTACH_IMAGES = "allowAttachImages";
 	public static final String ATTR_ALLOW_INSERT_WIKI_LINKS = "allowInsertWikiLinks";

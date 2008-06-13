@@ -16,19 +16,6 @@
 			
 			<%@include file="bodyarea.jsp"%>
 		
-			<c:if test="${topic.hasAttachment || sessionMap.allowUpload}">
-		
-				<div class="field-name title-space-top">
-					<fmt:message key="message.label.attachment" />
-				</div>
-				
-				<c:set var="allowUpload" value="${sessionMap.allowUpload}" />
-				
-				<div id="itemAttachmentArea">
-					<%@ include file="/jsps/learning/message/msgattachment.jsp"%>
-				</div>		
-			
-	</c:if>
 		<div class="space-bottom-top">
 <div class="right-buttons">
 			<html:submit styleClass="button">

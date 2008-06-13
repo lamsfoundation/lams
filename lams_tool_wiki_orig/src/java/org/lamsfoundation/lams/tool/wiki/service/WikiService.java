@@ -916,7 +916,6 @@ public class WikiService implements IWikiService,ToolContentManager,ToolSessionM
 	    	toolContentObj.setAllowInsertExternalLink(Boolean.FALSE); // this is the default value
 	    	toolContentObj.setAllowRevertPage(Boolean.FALSE); // this is the default value
 	    	//toolContentObj.setAllowRichEditor(Boolean.FALSE);
-	    	toolContentObj.setAllowUpload(Boolean.TRUE); // this is the default value
 	    	toolContentObj.setContentId(toolContentId);
 	    	toolContentObj.setContentInUse(Boolean.FALSE);
 	    	toolContentObj.setCreated(now);
