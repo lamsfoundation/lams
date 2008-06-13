@@ -507,7 +507,7 @@ class Canvas extends CanvasHelper {
 	public function openDesignBySelection(mode:String, confirm:Boolean){
         //Work space opens dialog and user will select view
 		if(mode == Workspace.MODE_INSERT && !confirm) {
-			LFMessage.showMessageConfirm(Dictionary.getValue("cv_design_insert_warning"), Proxy.create(this, openDesignBySelection, mode, true), null)
+			LFMessage.showMessageConfirm(Dictionary.getValue("cv_design_insert_warning"), Proxy.create(this, openDesignBySelection, mode, true), null, null, null, Dictionary.getValue('cv_autosave_rec_title'));
 			return;
 		}
 		
