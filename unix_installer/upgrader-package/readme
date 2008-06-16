@@ -95,7 +95,7 @@ your lams.properties file (under Installation Options):
 LOCALE - (locale)
 LOCALE_DIRECTION - (locale direction)
 
-Language		Locale	Locale-Direction
+Language		Locale	Locale Direction
 ------------------------------------------------
 English	(Australia)		en_AU	LTR
 Español	(Spanish)		es_ES	LTR
@@ -112,7 +112,7 @@ Tiếng Việt (Vietnamese)		vi_VN	LTR
 Chinese (Taiwan)		zh_TW	LTR
 Arabic (عربي) (Jordan)		ar_JO	RTL
 Ελληνικά (Greek)		el_GR	LTR
-日本語 (Japanese)			ja_JP	LTR
+日本語 (Japanese)		ja_JP	LTR
 Malay (Malaysian)		ms_MY	LTR
 Русский (Russian)		ru_RU	LTR
 
