@@ -6,6 +6,12 @@ document carefully before upgrading and make sure that you have a valid
 installation of LAMS 2.0.4 on your machine. Please also ensure that you have 
 read and understood the terms of the license agreement.
 
+NOTE TO SYSADMINS: If you are doing an upgrade and your users report problems in 
+authoring, they may need to clear their browser cache. If you have a user see 
+the message "Unknown toolbar item "UniversalKey" or if the user is sees the 
+message "Congratulations, your content saved successfully!" but the close button
+doesn't work, then please tell them to clear their cache.
+
 CONTENTS
 ========
 
@@ -106,6 +112,9 @@ Tiếng Việt (Vietnamese)		vi_VN	LTR
 Chinese (Taiwan)		zh_TW	LTR
 Arabic (عربي) (Jordan)		ar_JO	RTL
 Ελληνικά (Greek)		el_GR	LTR
+日本語 (Japanese)			ja_JP	LTR
+Malay (Malaysian)		ms_MY	LTR
+Русский (Russian)		ru_RU	LTR
 
 
 4. Production Server Configuration
@@ -184,6 +193,10 @@ backup directory
 Unix Installer help wiki
 
 	http://wiki.lamsfoundation.org/display/lamsdocs/Unix+Installer+Help
+	
+Backing up LAMS and reverting LAMS
+
+    http://wiki.lamsfoundation.org/display/lamsdocs/Revert+To+Other+Backup
 	
 LAMS 2.1 developer-oriented information
 

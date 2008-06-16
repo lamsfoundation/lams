@@ -8,6 +8,8 @@ For the source code, please see the 'Building LAMS' wiki at
 
 for more information.
 
+For release notes goto: http://wiki.lamsfoundation.org/display/lams/2.1
+
 NOTE TO SYSADMINS: If you are doing an upgrade and your users report problems in 
 authoring, they may need to clear their browser cache. If you have a user see 
 the message "Unknown toolbar item "UniversalKey" or if the user is sees the 

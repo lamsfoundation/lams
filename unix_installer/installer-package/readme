@@ -85,12 +85,12 @@ jboss-4.0.2/server/default/jmx-console.war diectory.
 3. Languages and Locales
 ========================
 
-In LAMS 2.0 you can set the default language of your server to be one of many
+In LAMS 2.1 you can set the default language of your server to be one of many
 languages, and more to come, see http://lamscommunity.org
 
 Look out for UNIX language packs to add to your list of language locales
 
-The locale options for LAMS-2.0 available are listed below, simply put in
+The locale options for LAMS-2.1 available are listed below, simply put in
 your lams.properties file (under Installation Options):
 
 LOCALE - (locale)
@@ -113,6 +113,9 @@ Tieng Viet (Vietnamese)		vi_VN	LTR
 Chinese (Taiwan)                zh_TW   LTR
 Arabic (Jordan)			ar_JO	RTL
 Greek				el_GR	LTR
+日本語 (Japanese)			ja_JP	LTR
+Malay (Malaysian)		ms_MY	LTR
+Русский (Russian)		ru_RU	LTR
 
 
 4. Setting up MySql on a Different Server
@@ -168,17 +171,17 @@ http://wiki.lamsfoundation.org/display/lamsdocs/Production+Server+Settings
 6. Startup and Shutdown
 =======================
 
-To start LAMS 2.0 go to (jboss directory)/bin and type:
+To start LAMS 2.1 go to (jboss directory)/bin and type:
 >sudo ./run-lams.sh 
 
-After a couple of minutes LAMS 2.0 will have started. In your browser type the 
+After a couple of minutes LAMS 2.1 will have started. In your browser type the 
 server URL that you specified in the lams.configuration file, and you should be 
 at the lams homepage.
 
-To shutdown LAMS 2.0 go to (jboss directory)/bin and type;
+To shutdown LAMS 2.1 go to (jboss directory)/bin and type;
 > sudo ./shutdown.sh -S
 
-LAMS 2.0 will take a few moments to shut down. To check if LAMS 2.0 has shut 
+LAMS 2.1 will take a few moments to shut down. To check if LAMS 2.1 has shut 
 down correctly, type the following on Linux:
 > ps -ef | grep java
 
@@ -188,9 +191,9 @@ Or type the following on Macintosh
 If you aren't sure which version of 'ps' to use, try the '-ef' version and if
 that gives and error 'ps: illegal option --f" then try the -A version.
 
-If you can see the LAMS 2.0 process still running, type:
+If you can see the LAMS 2.1 process still running, type:
 > sudo kill (pid) 
-Where pid is the process id listed next to the LAMS 2.0 process
+Where pid is the process id listed next to the LAMS 2.1 process
 
 Be careful to type the correct (pid). If you type the wrong number, you will 
 stop another process on your server, and as you are using sudo you could stop 
@@ -243,11 +246,15 @@ Unix Installer help wiki
 
 	http://wiki.lamsfoundation.org/display/lamsdocs/Unix+Installer+Help
 	
-LAMS 2.0 developer-oriented information
+Backing up LAMS and reverting LAMS
+
+    http://wiki.lamsfoundation.org/display/lamsdocs/Revert+To+Other+Backup
+	
+LAMS 2.1 developer-oriented information
 
 	http://wiki.lamsfoundation.org/display/lams
 
-LAMS 2.0 help documents
+LAMS 2.1 help documents
 
 	http://wiki.lamsfoundation.org/display/lamsdocs
 
@@ -255,7 +262,7 @@ Educational and technical forums for help and discussion
 				
 	http://www.lamscommunity.org
 
-LAMS 2.0 bug tracker			
+LAMS 2.1 bug tracker			
 
 	http://bugs.lamsfoundation.org
 
