@@ -136,6 +136,14 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
     	ChosenBranchingActivity newBranchingActivity = new ChosenBranchingActivity();
     	copyBranchingFields(newBranchingActivity);
     	copyToNewComplexActivity(newBranchingActivity, uiidOffset);
+
+    	// Any grouping attached to a teacher chosen branching was either a runtime grouping
+    	// because we are running a runtime copy of a design, or some rubbish left from a bug in authoring.
+    	// We won't actually want this group, so remove references to it and they will be set up 
+    	// again when a lesson is started. 
+    	newBranchingActivity.setGrouping(null);
+    	newBranchingActivity.setGroupingUIID(null);
+    	newBranchingActivity.setApplyGrouping(false);
     	
     	return newBranchingActivity;
     }

@@ -930,19 +930,33 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     			SequenceActivity newSequenceActivity = (SequenceActivity) activity;
             	// Need to check if the sets are not null as these are new objects and Hibernate may not have backed them with collections yet.
 	    		if ( newSequenceActivity.getBranchEntries() != null && newSequenceActivity.getBranchEntries().size() > 0 ) {
-	    			Iterator beIter = newSequenceActivity.getBranchEntries().iterator();
-	    			while ( beIter.hasNext() ) {
-	    				// sequence activity will be correct but the branching activity and the grouping will be wrong
-	    				// the condition was copied by the sequence activity copy
-	    				BranchActivityEntry entry = (BranchActivityEntry) beIter.next();
-	    				BranchingActivity oldBranchingActivity = entry.getBranchingActivity();
-	    				entry.setBranchingActivity((BranchingActivity) newActivities.get(LearningDesign.addOffset(oldBranchingActivity.getActivityUIID(), uiidOffset)));
-	    				Group oldGroup = entry.getGroup();
-	    				if ( oldGroup != null ) {
-	    					Grouping oldGrouping = oldGroup.getGrouping();
-	    					Grouping newGroouping = newGroupings.get(LearningDesign.addOffset(oldGrouping.getGroupingUIID(), uiidOffset));
-	    					entry.setGroup(newGroouping.getGroup(LearningDesign.addOffset(oldGroup.getGroupUIID(), uiidOffset)));
-	    				}
+	    			
+	    			Activity parentActivity = newSequenceActivity.getParentActivity();
+	    			if ( parentActivity.isChosenBranchingActivity() || 
+	    					( parentActivity.isGroupBranchingActivity() && parentActivity.getDefineLater()!=null &&
+	    					  parentActivity.getDefineLater().booleanValue())) {
+	    				// Don't have any preset up entries for a teacher chosen or a define later group based branching.
+	    				// Must be copying a design that was run previously.
+	    				newSequenceActivity.getBranchEntries().clear();
+
+	    			} else {
+		    			Iterator beIter = newSequenceActivity.getBranchEntries().iterator();
+		    			while ( beIter.hasNext() ) {
+		    				// sequence activity will be correct but the branching activity and the grouping will be wrong
+		    				// the condition was copied by the sequence activity copy
+		    				BranchActivityEntry entry = (BranchActivityEntry) beIter.next();
+		    				BranchingActivity oldBranchingActivity = entry.getBranchingActivity();
+		    				entry.setBranchingActivity((BranchingActivity) newActivities.get(LearningDesign.addOffset(oldBranchingActivity.getActivityUIID(), uiidOffset)));
+		    				Group oldGroup = entry.getGroup();
+		    				if ( oldGroup != null ) {
+		    					Grouping oldGrouping = oldGroup.getGrouping();
+		    					Grouping newGrouping = newGroupings.get(LearningDesign.addOffset(oldGrouping.getGroupingUIID(), uiidOffset));
+		    					if ( newGrouping != null ) {
+		    						entry.setGroup(newGrouping.getGroup(LearningDesign.addOffset(oldGroup.getGroupUIID(), uiidOffset)));
+		    					}
+		    				}
+		    			}
+	    				
 	    			}
 	    		}
     		}

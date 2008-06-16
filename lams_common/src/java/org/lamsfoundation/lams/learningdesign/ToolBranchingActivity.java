@@ -133,7 +133,7 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
     }
 
     /**
-     * Makes a copy of the BranchingActivity for authoring, preview and monitoring enviornment 
+     * Makes a copy of the BranchingActivity for authoring, preview and monitoring environment 
      * @return BranchingActivity Returns a deep-copy of the originalActivity
      */
     public Activity createCopy(int uiidOffset){
@@ -141,6 +141,15 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
     	ToolBranchingActivity newBranchingActivity = new ToolBranchingActivity();
     	copyBranchingFields(newBranchingActivity);
     	copyToNewComplexActivity(newBranchingActivity, uiidOffset);
+    	
+    	// Any grouping attached to a teacher chosen branching was either a runtime grouping
+    	// because we are running a runtime copy of a design, or some rubbish left from a bug in authoring.
+    	// We won't actually want this group, so remove references to it and they will be set up 
+    	// again when a lesson is started. 
+    	newBranchingActivity.setGrouping(null);
+    	newBranchingActivity.setGroupingUIID(null);
+    	newBranchingActivity.setApplyGrouping(false);
+ 
     	return newBranchingActivity;
     }
 
