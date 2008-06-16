@@ -263,10 +263,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 									activitySnapBack(ca);
 									var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity', [ca.activity.title]);
 									LFMessage.showMessageAlert(msg);
-								//} else if(_canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID).hasBranches) {
-								//	activitySnapBack(ca);
-								//	var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity_no_branches', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity_no_branches', [ca.activity.title]);
-								//	LFMessage.showMessageAlert(msg);
+								} else if(_canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID).hasBranches) {
+									activitySnapBack(ca);
+									var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity_no_branches', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity_no_branches', [ca.activity.title]);
+									LFMessage.showMessageAlert(msg);
 								} else if(optionalOnCanvas[i].activity.isOptionsWithSequencesActivity() && optionalOnCanvas[i].activity.noSequences <= 0) {
 									activitySnapBack(ca);
 									var msg:String = Dictionary.getValue('ta_iconDrop_optseq_error_msg');
