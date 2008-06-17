@@ -20,7 +20,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('SMTPServer','', 'config.smtp.server', 'config.header.email', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('LamsSupportEmail','lams_support@melcoe.mq.edu.au', 'config.lams.support.email', 'config.header.email', 'STRING', 0);
+values ('LamsSupportEmail','', 'config.lams.support.email', 'config.header.email', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('ContentRepositoryPath','/var/opt/lams/repository', 'config.content.repository.path', 'config.header.uploads', 'STRING', 1);
