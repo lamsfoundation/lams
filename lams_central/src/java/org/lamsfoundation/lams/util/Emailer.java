@@ -54,7 +54,7 @@ public class Emailer {
 	public static void send(String subject, String to, String from, String body, Properties mailServerConfig) 
 							throws AddressException, MessagingException
 	{
-		Session session = Session.getDefaultInstance(mailServerConfig, null);
+		Session session = Session.getInstance(mailServerConfig);
 		MimeMessage message = new MimeMessage(session);
 		message.setFrom(new InternetAddress(from));
 		message.addRecipient(RecipientType.TO, new InternetAddress(to));
