@@ -73,6 +73,7 @@
 !define LIB "..\lib"
 !define ANT "ant"
 !define SQL "sql"
+!define DATABASE "..\..\database\"
 
 
 # installer settings
@@ -1995,7 +1996,7 @@ FunctionEnd
 
 Function ImportDatabase
     SetOutPath $TEMP
-    File "${BUILD_DIR}\dump.sql"
+    File "${DATABASE}\dump.sql"
     
     # Only do this if mysql is set up on local host 
     #######################################################

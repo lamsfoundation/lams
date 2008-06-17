@@ -44,6 +44,7 @@
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 !define BASE_DEV_DIR "..\..\"
 !define BUILD "..\..\build\"
+!define DATABASE "..\..\database\"
 
 # installer settings
 !define MUI_ICON "..\graphics\lams2.ico"
@@ -727,7 +728,7 @@ FunctionEnd
 
 Function ImportDatabase
     SetOutPath $TEMP
-    File "${BUILD}\dump.sql"
+    File "${DATABASE}\dump.sql"
     
     FileOpen $R0 "$INSTDIR\install_logs\installer_db.log" w
             IfErrors 0 +2
