@@ -190,7 +190,7 @@
   </appender>
   
   <category name="org.lamsfoundation.lams" additivity="false">
-    <priority value="DEBUG"/>
+    <priority value="INFO"/>
     <appender-ref ref="LAMSFILE"/>
     <appender-ref ref="LAMSCONSOLE"/>
   </category>

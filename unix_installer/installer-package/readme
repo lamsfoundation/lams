@@ -77,10 +77,10 @@ wrapper-linux-ppc-64-3.2.3	Linux	PPC
 wrapper-linux-x86-32-3.2.3	Linux	i386 	
 wrapper-linux-x86-64-3.2.3	Linux	IA64 	
 
-NOTE: If you are installing an production server, It is strongly recommended that
-you remove the jmx-console web applications as they can be a security risk. To do 
-so, remove the jboss-4.0.2/server/default/management directory and the 
-jboss-4.0.2/server/default/jmx-console.war diectory.
+NOTE: If you are installing a production server, It is strongly recommended 
+that you remove the jmx-console web applications as they can be a security risk.
+To do so, remove the jboss-4.0.2/server/default/management directory and the 
+jboss-4.0.2/server/default/jmx-console.war directory.
 
 3. Languages and Locales
 ========================
