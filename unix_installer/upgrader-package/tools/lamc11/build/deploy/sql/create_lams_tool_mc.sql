@@ -19,6 +19,7 @@ CREATE TABLE tl_lamc11_content (
      , reflectionSubject TEXT
      , showMarks TINYINT(1) NOT NULL DEFAULT 0
      , randomize TINYINT(1) NOT NULL DEFAULT 0
+     , displayAnswers TINYINT(1) NOT NULL DEFAULT 1
      , UNIQUE UQ_tl_lamc11_content_1 (content_id)
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
@@ -71,6 +72,8 @@ CREATE TABLE tl_lamc11_que_usr (
      , fullname VARCHAR(255)
      , responseFinalised TINYINT(1) NOT NULL DEFAULT 0
      , viewSummaryRequested TINYINT(1) NOT NULL DEFAULT 0
+     , last_attempt_order INTEGER
+     , last_attempt_total_mark INTEGER
      , PRIMARY KEY (uid)
      , INDEX (mc_session_id)
      , CONSTRAINT FK_tl_lamc11_que_usr_1 FOREIGN KEY (mc_session_id)
@@ -117,7 +120,7 @@ INSERT INTO tl_lamc11_content(uid, content_id , title, instructions, creation_da
 
 INSERT INTO tl_lamc11_que_content  (uid,question, mark, display_order,  mc_content_id) VALUES (1, 'A Sample question?', 1,1,1);
 	
-INSERT INTO tl_lamc11_options_content (uid,  correct_option,  displayOrder, mc_que_content_id,  mc_que_option_text) VALUES (1, 0, 1, 1,'Candidate Answer 1');
-INSERT INTO tl_lamc11_options_content (uid,  correct_option,  displayOrder, mc_que_content_id,  mc_que_option_text) VALUES (2, 1, 2, 1,'Candidate Answer 2');
+INSERT INTO tl_lamc11_options_content (uid,  correct_option,  displayOrder, mc_que_content_id,  mc_que_option_text) VALUES (1, 0, 1, 1,'Answer 1');
+INSERT INTO tl_lamc11_options_content (uid,  correct_option,  displayOrder, mc_que_content_id,  mc_que_option_text) VALUES (2, 1, 2, 1,'Answer 2');
 
 

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="language-pack" basedir="." >
     <property file="../lams.properties"/>
-    <property file="lang.properties"/>
-
+	
     <target name="update-languages" description="Runs the entire language pack process">
         <antcall target="copy-llid"/>
-        <echo>LAMS language-pack ${version} updated</echo>
+        <echo>LAMS language-pack ${LAMS_LANGUAGE_VERSION} updated</echo>
     </target>
     
     <target name="copy-llid" description="Copies the language files for combined tasks based on the llid values found in the database table lams-learning-library">
@@ -18,7 +17,6 @@
         	<classpath>
                 <pathelement path="../bin:../tools/lib/mysql-connector-java-3.1.12-bin.jar"/>
             </classpath>
-        	
         </java>
     	
     </target>

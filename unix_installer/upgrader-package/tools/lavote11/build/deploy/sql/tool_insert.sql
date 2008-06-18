@@ -49,7 +49,8 @@ language_file,
 classpath_addition,
 context_file,
 create_date_time,
-modified_date_time
+modified_date_time,
+supports_outputs
 )
 VALUES
 (
@@ -58,7 +59,7 @@ VALUES
 'Voting',
 'Voting',
 'vote',
-'20070214',
+'20080326',
 NULL,
 NULL,
 0,
@@ -79,6 +80,7 @@ NULL,
 'lams-tool-lavote11.jar',
 '/org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml',
 NOW(),
-NOW()
+NOW(),
+1
 )
 

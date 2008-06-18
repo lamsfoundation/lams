@@ -25,8 +25,8 @@
 	
 # The version of this LAMS updater
 LAMS_VERSION=2.1
-LAMS_SERVER_VERSION=2.1.0.200806131057
-LAMS_LANGUAGE_VERSION=2008-06-13
+LAMS_SERVER_VERSION=2.1.0.200806190000 
+LAMS_LANGUAGE_VERSION=2008-06-19
 REQ_LAMS_VERSION=2.0.4
 
 JAVA_REQ_VERSION=1.5
@@ -75,9 +75,9 @@ then
 		
 		############## 2.1 Specific Code ##################
 		echo "# The version numbers for this LAMS updater" >> lams.properties
-		echo "LAMS_VERSION=2.1" >> lams.properties
-		echo "LAMS_SERVER_VERSION=2.1.200804291000" >> lams.properties
-		echo "LAMS_LANGUAGE_VERSION=2008-04-29" >> lams.properties
+		echo "LAMS_VERSION=$LAMS_VERSION" >> lams.properties
+		echo "LAMS_SERVER_VERSION=$LAMS_SERVER_VERSION" >> lams.properties
+		echo "LAMS_LANGUAGE_VERSION=$LAMS_LANGUAGE_VERSION" >> lams.properties
 		echo "SQL_PORT=3306" >> lams.properties
 		echo "" >> lams.properties
 		############## End 2.1 Specific Code ##################
@@ -351,7 +351,7 @@ printf "\n1) Backup $JBOSS_DIR\n"
 printf "2) Backup $LAMS_DIR\n"
 printf "3) Backup /etc/lams2\n"
 printf "4) Dump the database by executing the following command. Fill in your own backup \ndirectory.\n"
-printf "> $sqldir/mysqldump -u$dbuser -p$dbpass $dbname > (backup dir)/dump.sql\n"
+printf "> $sqldir/mysqldump -u$DB_USER -p$DB_PASS $DB_NAME > (backup dir)/dump.sql\n"
 printf "\n--------------------------------------------------------------------------------\n\n"
 
 getMysqlHost
@@ -414,7 +414,7 @@ cp lams.properties /etc/lams2/lams.properties
 # changing JAVA_HOME back
 export JAVA_HOME=$ORIG_JAVA_HOME
 
-printf "\nLAMS $LAMS_VERSION Configuration completed!\n"
+printf "\n\nLAMS $LAMS_VERSION Configuration completed!\n"
 printf "Please view the README for instructions on how to run LAMS\n\n"
 
 

@@ -1,0 +1,33 @@
+<Deploy>
+  <toolSignature>latask10</toolSignature>
+  <toolWebUri>lams-tool-latask10.war</toolWebUri>
+  <toolContext>/lams/tool/latask10</toolContext>
+  <toolUpdateScriptPath>@toolDeployPackageDir@/sql/updatescripts/updateTo20080211.sql</toolUpdateScriptPath>
+  <toolInsertScriptPath>@toolDeployPackageDir@/sql/tool_insert.sql</toolInsertScriptPath>
+  <toolLibraryInsertScriptPath>@toolDeployPackageDir@/sql/library_insert.sql</toolLibraryInsertScriptPath>
+  <hideTool>false</hideTool>
+  <toolActivityInsertScriptPath>@toolDeployPackageDir@/sql/activity_insert.sql</toolActivityInsertScriptPath>
+  <toolTablesScriptPath>@toolDeployPackageDir@/sql/create_lams_tool_taskList.sql</toolTablesScriptPath>
+  <toolTablesDeleteScriptPath>@toolDeployPackageDir@/sql/drop_lams_tool_taskList.sql</toolTablesDeleteScriptPath>
+  <toolApplicationContextPath>/org/lamsfoundation/lams/tool/taskList/taskListApplicationContext.xml</toolApplicationContextPath>
+  <toolJarFileName>lams-tool-latask10.jar</toolJarFileName>
+  <minServerVersionNumber>2.0</minServerVersionNumber>
+  <deployFiles>
+    <string>@toolDeployPackageDir@/lams-tool-latask10.war</string>
+    <string>@toolDeployPackageDir@/lams-tool-latask10.jar</string>
+  </deployFiles>
+  <languageFiles>
+    <string>@toolDeployPackageDir@/language/ApplicationResources.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_en_AU.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_es_ES.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_fr_FR.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_no_NO.properties</string>
+  </languageFiles>
+  <toolVersion>20080211</toolVersion>
+  <dbDriverClass>@dbDriverClass@</dbDriverClass>
+  <dbDriverUrl>@dbDriverUrl@</dbDriverUrl>
+  <dbUsername>@dbUsername@</dbUsername>
+  <dbPassword>@dbPassword@</dbPassword>
+  <lamsEarPath>@lamsear@</lamsEarPath>
+  <languageFilesPackage>org.lamsfoundation.lams.tool.taskList</languageFilesPackage>
+</Deploy>

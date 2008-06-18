@@ -37,7 +37,7 @@ VALUES
 'NoticeboardX',
 'Displays a NoticeboardX',
 'nb',
-'20070315',
+'20080601',
 NULL,
 NULL,
 0,

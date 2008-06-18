@@ -43,22 +43,24 @@ ANT - Included in this package
 
 There are a few steps to updating LAMS on your computer.
 
-Firstly you must edit the lams.properties file (located in the root directory of
-the package) to comply with the settings you want for your computer. If you
-have retained the lams.properties file from a previous install, you can just 
-replace the given lams.property with your  previously edited one. Open the 
-lams.properties file in a text editor and follow the instructions to alter the 
-settings. The default settings are in the lams.properties file already so you 
-need not change a lot. Pay particular attention to the Installation Options 
+Firstly you must set up a lams.properties file. If you previously installed 
+lams using the unix installer, it will have backed up your lams.properties in 
+the /etc/lams2/ directory. If your settings are unchanged, then simply run the 
+updater and select yes when it asks you whether you want to use the 
+lams.properties stored in /etc/lams2. Otherwise, you will need to edit the 
+lams.properties in the root directory of the update package yourself. Open 
+the lams.properties file in a text editor and follow the instructions to alter 
+the settings. The default settings are in the lams.properties file already so 
+you need not change a lot. Pay particular attention to the Installation Options 
 section and the Essential settings section.
 
-Take note that the majority of the projects in lams.ear for instance 
+Take note that the majority of the projects are in lams.ear for instance 
 lams-central.war and lams-common.jar, if you have made changes to any projects,
 ensure that you back them up so you can re-apply them after the update.
 
 Before you run the script, you need to ensure that your $JAVA_HOME is set to 
 your java 1.5 or higher directory, also you will need to set the $PATH variable 
-to include the path to the java binaries. The steps to do this are listed below.
+to include the pasudoth to the java binaries. The steps to do this are listed below.
 > JAVA_HOME="(path to java installation directory)"
 > export JAVA_HOME
 > PATH="(path to java bin directory):$PATH"
@@ -75,10 +77,10 @@ LAMS, otherwise the upgrade will not run correctly. Also it is recommended that
 you backup LAMS before the upgrade, the upgrade script gives you this option, or
 you are also free to do so yourself.
 
-NOTE: If you are installing an production server, It is strongly recommended that
-you remove the jmx-console web applications as they can be a security risk. To do 
-so, remove the jboss-4.0.2/server/default/management directory and the 
-jboss-4.0.2/server/default/jmx-console.war diectory.
+NOTE: If you are installing a production server, It is strongly recommended 
+that you remove the jmx-console web applications as they can be a security risk.
+To do so, remove the jboss-4.0.2/server/default/management directory and the 
+jboss-4.0.2/server/default/jmx-console.war directory.
 
 
 3. Languages and Locales

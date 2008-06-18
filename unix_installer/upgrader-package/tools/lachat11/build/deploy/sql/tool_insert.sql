@@ -37,7 +37,7 @@ VALUES
 'Chat',
 'Chat',
 'chat',
-'20070315',
+'20080229',
 NULL,
 NULL,
 0,

@@ -121,13 +121,7 @@
 			<arg value="commons-io-1.4.jar" />
 		</java>
 		<!-- END 2.1 SPECIFIC UPDATE!!!!!!!!!!!! -->
-		
-		<!-- 2.0.4 SPECIFIC UPDATE!!!!!!!!!!!! 
-		<java classname="org.lamsfoundation.lams.tool.deploy.RemoveModuleFromApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
-			<arg value="${jboss.deploy}" />
-		</java>
-		END 2.0.4 SPECIFIC UPDATE!!!!!!!!!!!! -->
-		
+
 	</target>
 	
 	
@@ -183,6 +177,7 @@
 				<include name="*"/>
 				<include name="css/*"/>
 				<include name="branching/*"/>
+				<include name="common/*" />
 				<include name="exportPortfolio/*"/>
 				<include name="notebook/*"/>
 				<include name="gate/*"/>

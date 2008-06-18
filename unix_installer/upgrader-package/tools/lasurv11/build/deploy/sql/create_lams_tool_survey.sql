@@ -26,7 +26,7 @@ create_date datetime,
 update_date datetime, 
 create_by bigint, 
 primary key (uid)
-);
+)type=innodb;
 
 
 create table tl_lasurv11_answer (
@@ -37,7 +37,7 @@ answer_choices varchar(255),
 udpate_date datetime, 
 answer_text text, 
 primary key (uid)
-);
+)type=innodb;
 
 create table tl_lasurv11_attachment (
 uid bigint not null auto_increment, 
@@ -48,7 +48,7 @@ file_uuid bigint,
 create_date datetime, 
 survey_uid bigint, 
 primary key (uid)
-);
+)type=innodb;
 
 create table tl_lasurv11_option (
 uid bigint not null auto_increment, 
@@ -56,7 +56,7 @@ description text,
 sequence_id integer, 
 question_uid bigint, 
 primary key (uid)
-);
+)type=innodb;
 
 create table tl_lasurv11_question (
 uid bigint not null auto_increment, 
@@ -70,7 +70,7 @@ optional smallint,
 allow_multiple_answer smallint,
 survey_uid bigint, 
 primary key (uid)
-);
+)type=innodb;
 
 create table tl_lasurv11_session (
 uid bigint not null auto_increment, 
@@ -80,7 +80,7 @@ survey_uid bigint,
 session_id bigint, 
 session_name varchar(250), 
 primary key (uid)
-);
+)type=innodb;
 
 create table tl_lasurv11_user (
 uid bigint not null auto_increment, 
@@ -92,7 +92,7 @@ session_uid bigint,
 survey_uid bigint, 
 session_finished smallint, 
 primary key (uid)
-);
+)type=innodb;
 
 alter table tl_lasurv11_answer add index FK6DAAFE3BB1423DC1 (user_uid), add constraint FK6DAAFE3BB1423DC1 foreign key (user_uid) references tl_lasurv11_user (uid);
 alter table tl_lasurv11_answer add index FK6DAAFE3B25F3BB77 (question_uid), add constraint FK6DAAFE3B25F3BB77 foreign key (question_uid) references tl_lasurv11_question (uid);

@@ -38,6 +38,7 @@
 		    <arg line="ant-scripts" />
 		    <arg line="assembly" />
 			<arg line="conf" />
+			<arg line="language-pack" />
 			<arg line="sql-scripts" />
 			<arg line="tools" />
 			<arg line="license" />
