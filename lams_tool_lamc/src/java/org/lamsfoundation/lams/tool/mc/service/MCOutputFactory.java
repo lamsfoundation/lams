@@ -72,28 +72,39 @@ public class MCOutputFactory extends OutputFactory {
 
 	public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IMcService mcService, Long toolSessionId, Long learnerId) {
 		
-		McSession session = mcService.findMcSessionById(toolSessionId);
-		McQueUsr queUser = mcService.getMcUserBySession(learnerId, session.getUid());
-
 		TreeMap<String,ToolOutput> output = new TreeMap<String, ToolOutput>();
-		if ( names == null || names.contains(OUTPUT_NAME_LEARNER_MARK) ) {
-			output.put(OUTPUT_NAME_LEARNER_MARK, getLearnerMark(queUser) );
+
+		McSession session = mcService.findMcSessionById(toolSessionId);
+		if ( session != null ) {
+
+			McQueUsr queUser = mcService.getMcUserBySession(learnerId, session.getUid());
+			if ( queUser != null ) {
+				
+				if ( names == null || names.contains(OUTPUT_NAME_LEARNER_MARK) ) {
+					output.put(OUTPUT_NAME_LEARNER_MARK, getLearnerMark(queUser) );
+				}
+				if ( names == null || names.contains(OUTPUT_NAME_LEARNER_ALL_CORRECT) ) {
+					output.put(OUTPUT_NAME_LEARNER_ALL_CORRECT, getLearnerAllCorrect(mcService, queUser) );
+				}
+			}
 		}
-		if ( names == null || names.contains(OUTPUT_NAME_LEARNER_ALL_CORRECT) ) {
-			output.put(OUTPUT_NAME_LEARNER_ALL_CORRECT, getLearnerAllCorrect(mcService, queUser) );
-		}
+		
 		return output;
 	}
 
 	public ToolOutput getToolOutput(String name, IMcService mcService, Long toolSessionId, Long learnerId) {
 		if ( name != null ) {
 			McSession session = mcService.findMcSessionById(toolSessionId);
-			McQueUsr queUser = mcService.getMcUserBySession(learnerId, session.getUid());
-
-			if ( name.equals(OUTPUT_NAME_LEARNER_MARK) ) {
-				return getLearnerMark(queUser);
-			} else if ( name.equals(OUTPUT_NAME_LEARNER_ALL_CORRECT) ){
-				return getLearnerAllCorrect(mcService, queUser);
+			if ( session != null ) {
+				McQueUsr queUser = mcService.getMcUserBySession(learnerId, session.getUid());
+	
+				if ( queUser != null ) {
+					if ( name.equals(OUTPUT_NAME_LEARNER_MARK) ) {
+						return getLearnerMark(queUser);
+					} else if ( name.equals(OUTPUT_NAME_LEARNER_ALL_CORRECT) ){
+						return getLearnerAllCorrect(mcService, queUser);
+					}
+				}
 			}
 		}
 		return null;
