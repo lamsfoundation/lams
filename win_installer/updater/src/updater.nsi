@@ -50,9 +50,9 @@
 # constants
 !define VERSION "2.1"
 !define PREVIOUS_VERSION "2.0.4"
-!define LANGUAGE_PACK_VERSION "2008-06-11"
-!define LANGUAGE_PACK_VERSION_INT "20080611"
-!define DATE_TIME_STAMP "200806111000"
+!define LANGUAGE_PACK_VERSION "2008-06-19"
+!define LANGUAGE_PACK_VERSION_INT "20080619"
+!define DATE_TIME_STAMP "200806190000"
 ######################## Added in the extra .0 for 2.1 for constitency 
 !define SERVER_VERSION_NUMBER "${VERSION}.0.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
@@ -528,10 +528,12 @@ Function CheckMySQL
         
         #StrLen $9 $MYSQL_ROOT_PASS
         
-        ${if} $IS_UPDATE == "0"
-            Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/?characterEncoding=utf8" "root" "$MYSQL_ROOT_PASS"'
+        ${if} $IS_UPDATE == "1" 
+           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8" "$DB_USER" "$DB_PASS"'
+        ${elseif} $MYSQL_HOST != "localhost"
+           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8" "$DB_USER" "$DB_PASS"' 
         ${else}
-            Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/?characterEncoding=utf8" "$DB_USER" "$DB_PASS"'
+           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/?characterEncoding=utf8" "root" "$MYSQL_ROOT_PASS"'
         ${endif}
         
         File "${BUILD_DIR}\checkmysqlversion.class"
@@ -752,6 +754,7 @@ Function PostLAMSConfig
         Pop $1
         ${If} $0 != 0
             ${StrStr} $3 $1 "UnknownHostException"
+            
             ${if} $3 == "" 
                 MessageBox MB_OK|MB_ICONEXCLAMATION "An error occurred whilst checking your mysql configuration $\r$\n$\r$\nError: $1"
             ${else}
@@ -944,6 +947,7 @@ Function update21Specific
     setoutpath "$TEMP\lams\"
     File "${ANT}\update-mysql-ds-xml-2.1.xml"
     File /a "${TEMPLATES}\mysql-ds.xml"
+    File /a "${BUILD_DIR}\lams-start.exe"
     
     FileOpen $0 "$TEMP\lams\update-mysql-ds.properties" w
     IfErrors 0 +3
