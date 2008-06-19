@@ -43,27 +43,31 @@ Section
     ReadRegStr $8 HKLM "${REG_HEAD}" "db_pass"
     ReadRegStr $7 HKLM "${REG_HEAD}" "dir_inst"
     ReadRegStr $6 HKLM "${REG_HEAD}" "dir_mysql"
+    ReadRegStr $5 HKLM "${REG_HEAD}" "mysql_host"
 
+
+    ${if} $5 == "localhost"
     # check mysql password, mysql server status
-    StrLen $0 $8
-    ${If} $0 == 0
-        nsExec::ExecToStack '$6\bin\mysqladmin ping -u $9'
-    ${Else}
-        nsExec::ExecToStack '$6\bin\mysqladmin ping -u $9 -p$8'
-    ${EndIf}
-    Pop $0
-    Pop $1
-    # check mysql password is correct
-    ${StrStr} $2 $1 "Access denied"
-    ${If} $2 != ""
-        ; mysql password somehow changed - prompt user to update registry entry
-    ${EndIf}
-    # check mysql is running
-    ${StrStr} $2 $1 "mysqld is alive"
-    ${If} $2 == ""
-        MessageBox MB_OK|MB_ICONEXCLAMATION "MySQL does not appear to be running - please make sure it is running before starting LAMS."
-        Abort
-    ${EndIf}
+        StrLen $0 $8
+        ${If} $0 == 0
+            nsExec::ExecToStack '$6\bin\mysqladmin ping -u $9'
+        ${Else}
+            nsExec::ExecToStack '$6\bin\mysqladmin ping -u $9 -p$8'
+        ${EndIf}
+        Pop $0
+        Pop $1
+        # check mysql password is correct
+        ${StrStr} $2 $1 "Access denied"
+        ${If} $2 != ""
+            ; mysql password somehow changed - prompt user to update registry entry
+        ${EndIf}
+        # check mysql is running
+        ${StrStr} $2 $1 "mysqld is alive"
+        ${If} $2 == ""
+            MessageBox MB_OK|MB_ICONEXCLAMATION "MySQL does not appear to be running - please make sure it is running before starting LAMS."
+            Abort
+        ${EndIf}
+    ${endif}
 
     nsExec::ExecToStack 'sc start LAMSv2'
     Pop $0
