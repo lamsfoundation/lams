@@ -929,6 +929,7 @@ Function update21Specific
     
     Setoutpath "$TEMP\lams\"
     file "${BUILD_DIR}\Alter21Integration.class"
+    file "${BUILD_DIR}\Alter21Integration$OrgDTO.class"
     
     strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
     ReadRegStr $2 HKLM "${REG_HEAD}" "dir_repository"
@@ -939,7 +940,7 @@ Function update21Specific
     pop $0
     pop $1
     ${if} $0 != '0'
-        Messagebox MB_OK|MB_ICONSTOP "Error while updating Chat tool $\r$\nError: $1"
+        Messagebox MB_OK|MB_ICONSTOP "Error while updating integration classes.$\r$\nError: $1"
         Abort
     ${endif}
     
