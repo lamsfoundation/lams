@@ -23,7 +23,7 @@
 		</exec>
 	</target>
 	
-	<target name="build" depends="clean" description="Build all sources.">
+	<target name="build" depends="clean, compile-java" description="Build all sources.">
 
 		<!-- create the necessary directories -->
 		<mkdir dir="${PACKAGE-ROOT}" /> 
@@ -64,6 +64,17 @@
 	
 	<target name="copy-tools" description="Copies all the tool deploy files to the tools directory">
 
+		<echo>Copying tool libraries</echo>
+		<delete dir="${TOOLS}/lib" failonerror="false"/>
+		<mkdir dir="${TOOLS}/lib" /> 
+		
+		<copy todir="${TOOLS}/lib">
+            <fileset dir="${LAMS_PROJECT_ROOT}/lams_build/deploy-tool/lib">
+            	<include name="*.jar" />
+            </fileset>
+        </copy>
+		
+		
 		<antcall target="copy-tool-deploy-package"> 
 			<param name="tool.dir" value="lams_tool_chat" /> 
 			<param name="tool.sig" value="lachat11" /> 
