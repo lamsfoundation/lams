@@ -42,8 +42,8 @@ import mx.managers.*;
 class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieClip implements ICanvasActivity{  
 	
 	private var CHILD_OFFSET_X:Number = 8;
-	private var CHILD1_OFFSET_Y:Number = 45 //67.5;
-	private var CHILD2_OFFSET_Y:Number = 108 //130.5;
+	private var CHILD1_OFFSET_Y:Number = 45;
+	private var CHILD2_OFFSET_Y:Number = 108;
 	
 	private var newContainerXCoord:Number; 
 	private var newContainerYCoord:Number;
@@ -132,10 +132,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		newContainerXCoord = container_pnl._width/2;
 		newContainerYCoord = container_pnl._height/2;
 			
-		child1.xCoord = CHILD_OFFSET_X //+ (newContainerXCoord-CHILD_OFFSET_X);
+		child1.xCoord = CHILD_OFFSET_X;
 		child1.yCoord = CHILD1_OFFSET_Y;
-		child2.xCoord = CHILD_OFFSET_X //+ (newContainerXCoord-CHILD_OFFSET_X);
-		child2.yCoord = CHILD2_OFFSET_Y //+ newContainerYCoord;
+		child2.xCoord = CHILD_OFFSET_X;
+		child2.yCoord = CHILD2_OFFSET_Y;
 		
 		//so now it is placed on in the IDE and we just call init
 		Debugger.log("fromModuleTab: " + fromModuleTab, Debugger.CRITICAL, "init", "CanvasParallelActivity");
@@ -151,9 +151,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		if(fromModuleTab == "monitorMonitorTab"){
 			Debugger.log("initialising for monitor: " + child1.activityUIID + " " + child2.activityUIID, Debugger.CRITICAL, "init", "CanvasParallelActivity");
 			Debugger.log("controller for monitor: " + _monitorController, Debugger.CRITICAL, "init", "CanvasParallelActivity");
-			
-			//child1_mc = childActivities_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:child1 ,_monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
-			//child2_mc = childActivities_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:child2 ,_monitorController:_monitorController, _monitorView:_monitorTabView, _module:"monitoring", learnerContainer:learnerContainer});
 			
 			if(_canvasBranchView != null) {
 				CanvasActivity(child1_mc).init({activity:child1, _monitorController:_monitorController, _monitorView:_canvasBranchView, _module:"monitoring", learnerContainer:learnerContainer});
@@ -305,7 +302,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		container_pnl.setStyle('styleName',styleObj);
 		styleObj = _tm.getStyleObject ('parallelHeadPanel');
 		header_pnl.setStyle('styleName',styleObj);
-		//container_pnl.setStyle("backgroundColor",0x4289FF);
 	}
 	
 	private function setLocking():Void{

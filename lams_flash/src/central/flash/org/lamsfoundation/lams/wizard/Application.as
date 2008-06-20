@@ -52,10 +52,10 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
     private static var WIZARD_H:Number = 550;
     
 	private static var LOADING_ROOT_DEPTH:Number = 100;	//depth of the loading movie
-    private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
-    private static var DIALOGUE_DEPTH:Number = 20;	//depth of the cursors
-    private static var TOOLTIP_DEPTH:Number = 30;	//depth of the cursors
-    private static var CURSOR_DEPTH:Number = 40;   //depth of the cursors
+    private static var APP_ROOT_DEPTH:Number = 10; 		//depth of the application root
+    private static var DIALOGUE_DEPTH:Number = 20;			//depth of the dialog
+    private static var TOOLTIP_DEPTH:Number = 30;			//depth of the tooltips
+    private static var CURSOR_DEPTH:Number = 40;   		//depth of the cursors
     private static var CCURSOR_DEPTH:Number = 101;
 	 
     private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
@@ -111,7 +111,6 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
     private function Application(){
 		super(this);
 		_module = Application.MODULE;
-		// loaded flag
     }
     
     /**
@@ -162,7 +161,6 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 		_root.preloader.complete();
 		setupData();
 		checkDataLoaded();
-		
     }
     
     /**
@@ -222,14 +220,11 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 			_uiLoadCheckCount++;
             //If all events dispatched clear interval and call start()
             if(_dictionaryEventDispatched && _themeEventDispatched){
-				//Debugger.log('Clearing Interval and calling start :',Debugger.CRITICAL,'checkUILoaded','Application');	
-                clearInterval(_UILoadCheckIntervalID);
+				clearInterval(_UILoadCheckIntervalID);
 				start();
             }else {
                 //If UI loaded check which events can be broadcast
                 if(_UILoaded){
-					//Debugger.log('ALL UI LOADED, waiting for all true to dispatch init events: _dictionaryLoaded:'+_dictionaryLoaded+'_themeLoaded:'+_themeLoaded ,Debugger.GEN,'checkUILoaded','Application');
-
                     //If dictionary is loaded and event hasn't been dispatched - dispatch it
                     if(_dictionaryLoaded && !_dictionaryEventDispatched){
 						_dictionaryEventDispatched = true;
@@ -254,7 +249,8 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 						msg+=Dictionary.getValue("app_fail_continue");
 						var e:LFError = new LFError(msg,"Canvas.setDroppedTemplateActivity",this,'_themeEventDispatched:'+_themeEventDispatched+' _dictionaryEventDispatched:'+_dictionaryEventDispatched);
 						e.showErrorAlert();
-						//todo:  give the user a message
+						
+						//TODO:  give the user a message
 						clearInterval(_UILoadCheckIntervalID);
 					}
                 }
@@ -271,7 +267,6 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
     */
     public function UIElementLoaded(evt:Object) {
        if(evt.type=='load'){
-            //Which item has loaded
             switch (evt.target.className) {
 				case 'Wizard' :
                     _wizardLoaded = true;
@@ -295,7 +290,8 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
     private function setupUI(){
 		//Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
-        //Create screen elements
+        
+		//Create screen elements
         dialogueContainer = _container_mc.createEmptyMovieClip('_dialogueContainer_mc',DIALOGUE_DEPTH);
         _tooltipContainer_mc = _container_mc.createEmptyMovieClip('_tooltipContainer_mc',TOOLTIP_DEPTH);
         _cursorContainer_mc = _container_mc.createEmptyMovieClip('_cursorContainer_mc',CURSOR_DEPTH);
@@ -305,7 +301,8 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 		// WIZARD 
 		_wizard = new Wizard(_appRoot_mc,WIZARD_X, WIZARD_Y, WIZARD_W, WIZARD_H);
         _wizard.addEventListener('load',Proxy.create(this,UIElementLoaded));
-        //WORKSPACE
+        
+		//WORKSPACE
         _workspace = new Workspace();
 		
     }
@@ -347,16 +344,6 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
     * Receives events from the Stage resizing
     */
     public function onResize(){
-        //Debugger.log('onResize',Debugger.GEN,'main','org.lamsfoundation.lams.Application');
-
-        //Get the stage width and height and call onResize for stage based objects
-       // var w:Number = Stage.width;
-       // var h:Number = Stage.height;
-		//var someListener:Object = new Object();
-		//someListener.onMouseUp = function () {
-		//	_wizard.setSize(w,h);
-		//}
-		//_wizard.setSize(w,h);
     }
 	
 	/**
@@ -383,7 +370,6 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 	 */
 	public function setClipboardData(obj:Object):Void{
 		_clipboardData = obj;
-		trace("clipBoard data id"+_clipboardData);
 	}
 	
 	/**
@@ -396,19 +382,13 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 		return _clipboardData;
 	}
 	
-	
 	public function cut():Void{
-		 //setClipboardData(_canvas.model.selectedItem);
 	}
 	
 	public function copy():Void{
-		trace("testing copy");
-		 //setClipboardData(_canvas.model.selectedItem);
 	}
 	
 	public function paste():Void{
-		trace("testing paste");
-		//_canvas.setPastedItem(getClipboardData());
 	}
 	
 	public function get controlKeyPressed():String{
@@ -472,10 +452,6 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
     * Handles KEY presses for Application
     */
     private function onKeyDown(){
-		
-		//var mouseListener:Object = new Object();
-        //Debugger.log('Key.isDown(Key.CONTROL): ' + Key.isDown(Key.CONTROL),Debugger.GEN,'onKeyDown','Application');
-        //Debugger.log('Key: ' + Key.getCode(),Debugger.GEN,'onKeyDown','Application');
 		//the debug window:
         if (Key.isDown(Key.CONTROL) && Key.isDown(Key.ALT) && Key.isDown(QUESTION_MARK_KEY)) {
             if (!_debugDialog.content){

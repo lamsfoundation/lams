@@ -272,10 +272,6 @@ class Sequence {
 		
 	}
 	
-	//public function getLearningDesignID():Number{
-	//	return _learningDesignID;
-	//}
-	
 	public function get learningDesignID():Number{
 		return _learningDesignID;
 	}
@@ -394,15 +390,6 @@ class Sequence {
 		return true;
 	}
 	
-	/**public function setFinishDateTime(seqFinishDate:Date){
-		_seqFinishDate = seqFinishDate;
-	}
-	
-	public function getFinishDateTime():String{
-		var finishDate:String = (_seqFinishDate.getDate()+" "+(StringUtils.getMonthAsString(_seqFinishDate.getMonth()+1))+" "+_seqFinishDate.getFullYear());;
-		return finishDate;
-	}
-	*/
 	public function setActive() {
 		_active = true;
 		trace('setting seq active...');
@@ -498,8 +485,5 @@ class Sequence {
 	function get className():String{
         return 'Sequence';
     }
-	
-	
-	
 
 }

@@ -101,7 +101,6 @@ class Header extends MovieClip {
 		setLabels();
 		resize(Stage.width);
 		
-		
 		//Add event listeners for resume and exit buttons
 		
 		resume_btn.onRelease = function(){

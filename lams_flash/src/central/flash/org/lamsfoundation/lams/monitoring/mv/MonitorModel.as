@@ -114,12 +114,11 @@ class MonitorModel extends Observable{
 	private var ddmTransition_keys:Array;
 	private var _orgs:Array;
 	private var _resultDTO:Object;
-	//private var _selectedTreeNode:XMLNode;
 	
 	private static var USER_LOAD_CHECK_INTERVAL:Number = 50;
 	private static var USER_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
-	private var _UserLoadCheckIntervalID:Number;         //Interval ID for periodic check on User Load status
-	private var _userLoadCheckCount = 0;				// instance counter for number of times we have checked to see if users are loaded	
+	private var _UserLoadCheckIntervalID:Number;         	//Interval ID for periodic check on User Load status
+	private var _userLoadCheckCount = 0;					// instance counter for number of times we have checked to see if users are loaded	
 	
 	private var _currentLearnerIndex:Number;
 	private var _oldIndex:Number;
@@ -145,8 +144,6 @@ class MonitorModel extends Observable{
 	private var dispatchEvent:Function;       
     public var addEventListener:Function;  
     public var removeEventListener:Function;
-	
-	//private var _config:Config;
 	
 	/**
 	* Constructor.
@@ -971,7 +968,6 @@ class MonitorModel extends Observable{
 			if(_staffLoaded && _learnersLoaded) {
 				clearInterval(_UserLoadCheckIntervalID);
 				
-				trace('ALL USERS LOADED -CONTINUE');
 				// populate learner/staff scrollpanes
 				broadcastViewUpdate("USERS_LOADED", null, null);
 				

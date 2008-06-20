@@ -32,14 +32,12 @@ import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.ui.*
 import it.sephiroth.TreeDnd;
+
 /**
 * @author      DI & DC
 */
 class CreateLessonDialog extends MovieClip{
  
-    //private static var OK_OFFSET:Number = 50;
-    //private static var CANCEL_OFFSET:Number = 50;
-
     //References to components + clips 
     private var _container:MovieClip;       //The container window that holds the dialog
     private var ok_btn:Button;              //OK+Cancel buttons
@@ -61,8 +59,8 @@ class CreateLessonDialog extends MovieClip{
 	
     private var resourceDesc_txa:TextArea;
     
-    private var fm:FocusManager;            //Reference to focus manager
-    private var themeManager:ThemeManager;  //Theme manager
+    private var fm:FocusManager;            	//Reference to focus manager
+    private var themeManager:ThemeManager;  	//Theme manager
 	
 	private var _workspaceView:WorkspaceView;
 	private var _workspaceModel:WorkspaceModel;
@@ -90,7 +88,6 @@ class CreateLessonDialog extends MovieClip{
     * constructor
     */
     function CreateLessonDialog(){
-        //trace('WorkSpaceDialog.constructor');
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
         _resultDTO = new Object();
@@ -113,7 +110,7 @@ class CreateLessonDialog extends MovieClip{
         //Set the container reference
         Debugger.log('container=' + _container,Debugger.GEN,'init','org.lamsfoundation.lams.WorkspaceDialog');
 
-	//Set the text on the labels
+		//Set the text on the labels
         
         //Set the text for buttons
 		currentPath_lbl.text = "<b>"+Dictionary.getValue('ws_dlg_location_button')+"</b>:"
@@ -129,21 +126,17 @@ class CreateLessonDialog extends MovieClip{
         fm = _container.getFocusManager();
         fm.enabled = true;
         ok_btn.setFocus();
-        //fm.defaultPushButton = ok_btn;
         
         Debugger.log('ok_btn.tabIndex: '+ok_btn.tabIndex,Debugger.GEN,'init','org.lamsfoundation.lams.WorkspaceDialog');
         
        
         //Tie parent click event (generated on clicking close button) to this instance
         _container.addEventListener('click',this);
-        //Register for LFWindow size events
+        
+		//Register for LFWindow size events
         _container.addEventListener('size',this);
 		
-		//panel.setStyle('backgroundColor',0xFFFFFF);
-        
-        //Debugger.log('setting offsets',Debugger.GEN,'init','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-
-        //work out offsets from bottom RHS of panel
+		//work out offsets from bottom RHS of panel
         xOkOffset = panel._width - ok_btn._x;
         yOkOffset = panel._height - ok_btn._y;
         xCancelOffset = panel._width - cancel_btn._x;
@@ -153,8 +146,8 @@ class CreateLessonDialog extends MovieClip{
         themeManager.addEventListener('themeChanged',this);
 		location_dnd.dragRules = TreeDnd.DENYALL;
         treeview = location_dnd.getTree();
+		
 		//Fire contentLoaded event, this is required by all dialogs so that creator of LFWindow can know content loaded
-        
 		_container.contentLoaded();
     }
 	
@@ -171,13 +164,13 @@ class CreateLessonDialog extends MovieClip{
 		Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpContent','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		//get a ref to the controller and kkep it here to listen for events:
 		_workspaceController = _workspaceView.getController();
-		Debugger.log('_workspaceController:'+_workspaceController,Debugger.GEN,'setUpContent','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		
+		Debugger.log('_workspaceController:'+_workspaceController,Debugger.GEN,'setUpContent','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		
 		 //Add event listeners for ok, cancel and close buttons
         ok_btn.addEventListener('click',Delegate.create(this, ok));
         cancel_btn.addEventListener('click',Delegate.create(this, cancel));
-		//think this is failing....
+		
 		//Set up the treeview
         setUpTreeview();
 		
@@ -191,15 +184,17 @@ class CreateLessonDialog extends MovieClip{
 	 */
 	public function viewUpdate(event:Object):Void{
 		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','org.lamsfoundation.lams.ws.WorkspaceDialog');
-		 //Update view from info object
+		
+		//Update view from info object
         //Debugger.log('Recived an UPDATE!, updateType:'+infoObj.updateType,4,'update','CanvasView');
-       var wm:WorkspaceModel = event.target;
+		var wm:WorkspaceModel = event.target;
+	   
 	   //set a permenent ref to the model for ease (sorry mvc guru)
 	   _workspaceModel = wm;
 	  
-	   switch (event.updateType){
+	    switch (event.updateType){
 			case 'POPULATE_LICENSE_DETAILS' :
-				//populateAvailableLicenses(event.data, wm);
+				break;
 			case 'REFRESH_TREE' :
                 refreshTree(wm);
                 break;
@@ -241,11 +236,12 @@ class CreateLessonDialog extends MovieClip{
 	 * @return  
 	 */
 	private function updateChildFolderBranches(changedNode:XMLNode,wm:WorkspaceModel){
-		 Debugger.log('updateChildFolder....:' ,Debugger.GEN,'updateChildFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
-		 //we have to set the new nodes to be branches, if they are branches
+		Debugger.log('updateChildFolder....:' ,Debugger.GEN,'updateChildFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		
+		//we have to set the new nodes to be branches, if they are branches
 		if(changedNode.attributes.isBranch){
 			treeview.setIsBranch(changedNode,true);
-			//do its kids
+			
 			for(var i=0; i<changedNode.childNodes.length; i++){
 				var cNode:XMLNode = changedNode.getTreeNodeAt(i);
 				if(cNode.attributes.isBranch){
@@ -259,17 +255,7 @@ class CreateLessonDialog extends MovieClip{
 	
 	private function refreshTree(){
 		 Debugger.log('Refreshing tree....:' ,Debugger.GEN,'refreshTree','org.lamsfoundation.lams.ws.WorkspaceDialog');
-		
-		
-		 treeview.refresh();// this is USELESS
-
-		//var oBackupDP = treeview.dataProvider;
-		//treeview.dataProvider = null; // clear
-		//treeview.dataProvider = oBackupDP;
-		
-		//treeview.setIsOpen(treeview.getNodeDisplayedAt(0),false);
-		//treeview.setIsOpen(treeview.getNodeDisplayedAt(0),true);
-
+		 treeview.refresh();
 	}
 	
 	/**
@@ -284,7 +270,6 @@ class CreateLessonDialog extends MovieClip{
 		//open the node
 		treeview.setIsOpen(nodeToOpen,true);
 		refreshTree();
-	
 	}
 	
 	/**
@@ -315,8 +300,10 @@ class CreateLessonDialog extends MovieClip{
 	 */
 	private function refreshFolder(nodeToOpen:XMLNode, wm:WorkspaceModel){
 		Debugger.log('refreshFolder:'+nodeToOpen ,Debugger.GEN,'refreshFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		
 		//close the node
 		treeview.setIsOpen(nodeToOpen,false);		
+		
 		//we are gonna need to fire the event manually for some stupid reason the tree is not firing it.
 		//dispatchEvent({type:'nodeOpen',target:treeview,node:nodeToOpen});
 		_workspaceController = _workspaceView.getController();
@@ -326,8 +313,7 @@ class CreateLessonDialog extends MovieClip{
 	
 	private function itemSelected(newSelectedNode:XMLNode,wm:WorkspaceModel){
 		//update the UI with the new info:
-		//_global.breakpoint();
-		//Only update the details if the node if its a resource:a
+		//Only update the details if the node if its a resource:
 		var nodeData = newSelectedNode.attributes.data;
 		if(nodeData.resourceType == _workspaceModel.RT_FOLDER){
 			resourceTitle_txi.text = "";
@@ -336,14 +322,8 @@ class CreateLessonDialog extends MovieClip{
 		}else{
 			resourceTitle_txi.text = nodeData.name;
 			resourceDesc_txa.text = nodeData.description;
-			Debugger.log('nodeData.licenseID:'+nodeData.licenseID,Debugger.GEN,'itemSelected','org.lamsfoundation.lams.ws.WorkspaceDialog');
-					
-			//TODO These Items must also be in the FolderContentsDTO
-			/*
-			license_txa.text = ;
-			licenseID_cmb.value = ;
-			*/
-		
+			
+			Debugger.log('nodeData.licenseID:'+nodeData.licenseID,Debugger.GEN,'itemSelected','org.lamsfoundation.lams.ws.WorkspaceDialog');		
 		}
 		
 	}
@@ -367,22 +347,19 @@ class CreateLessonDialog extends MovieClip{
 	 * @return  
 	 */
 	private function showData(wm:WorkspaceModel){
-		//Debugger.log('tabToSelect:'+tabToSelect,Debugger.GEN,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
-		//if(tabToSelect == "LOCATION"){
-			setLocationContentVisible(true);
+		setLocationContentVisible(true);
 			
-		//set the right label on the 'doit' button
+		// set the right label on the 'doit' button
 			if(wm.currentMode=="OPEN"){
 				ok_btn.label = Dictionary.getValue('ws_dlg_open_btn');
 			}else if(wm.currentMode=="SAVE" || wm.currentMode=="SAVEAS"){
 				ok_btn.label = Dictionary.getValue('ws_dlg_save_btn');
 			}else if(wm.currentMode=="READONLY"){
-				ok_btn.label = "Create"		//Dictionary.getValue('ws_dlg_create_btn');
+				ok_btn.label = "Create"		//TODO: Dictionary.getValue('ws_dlg_create_btn');
 			}else{
 				Debugger.log('Dont know what mode the Workspace is in!',Debugger.CRITICAL,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
 				ok_btn.label = Dictionary.getValue('ws_dlg_ok_btn');
 			}
-		//}
 	}
 	
 	
@@ -404,43 +381,15 @@ class CreateLessonDialog extends MovieClip{
     * Called on initialisation and themeChanged event handler
     */
     private function setStyles(){
-        //LFWindow, goes first to prevent being overwritten with inherited styles.
-        //var styleObj = themeManager.getStyleObject('LFWindow');
-        //_container.setStyle('styleName',styleObj);
-
-        //Get the button style from the style manager
-       // styleObj = themeManager.getStyleObject('button');
-        
-        //apply to both buttons
-       // Debugger.log('styleObject : ' + styleObj,Debugger.GEN,'setStyles','org.lamsfoundation.lams.WorkspaceDialog');
-       // ok_btn.setStyle('styleName',styleObj);
-        //cancel_btn.setStyle('styleName',styleObj);
-        
         //Get label style and apply to label
-       var styleObj = themeManager.getStyleObject('label');
+        var styleObj = themeManager.getStyleObject('label');
         name_lbl.setStyle('styleName',styleObj);
-
-        //Apply treeview style 
-       // styleObj = themeManager.getStyleObject('treeview');
-        //treeview.setStyle('styleName',styleObj);
-
-        //Apply datagrid style 
-      //  styleObj = themeManager.getStyleObject('datagrid');
-        //datagrid.setStyle('styleName',styleObj);
-
-/*
-        //Apply combo style 
-        styleObj = themeManager.getStyleObject('combo');
-        combo.setStyle('styleName',styleObj);
-  */
   }
 
     /**
     * Called by the cancel button 
     */
     private function cancel(){
-        trace('Cancel');
-        //close parent window
         _container.deletePopUp();
     }
     
@@ -456,8 +405,7 @@ class CreateLessonDialog extends MovieClip{
     *</code>
 	*/
     private function ok(){
-        trace('OK');
-		_global.breakpoint();
+        _global.breakpoint();
 		
 		//TODO: Rmeove this code as its been here only for deflopment
 		//set the selectedDesignId
@@ -468,6 +416,7 @@ class CreateLessonDialog extends MovieClip{
 			input_txt.text = snode.attributes.data.resourceID;
 			
 		}
+		
 		_selectedDesignId = Number(input_txt.text);
 		
 		
@@ -524,10 +473,7 @@ class CreateLessonDialog extends MovieClip{
 		
 		_resultDTO.resourceName = resourceTitle_txi.text;
 		_resultDTO.resourceDescription = resourceDesc_txa.text;
-		//_resultDTO.resourceLicenseText = license_txa.text;
-		//_resultDTO.resourceLicenseID = licenseID_cmb.value.licenseID;
 		
-
         dispatchEvent({type:'okClicked',target:this});
 	   
         closeThisDialogue();
@@ -543,7 +489,6 @@ class CreateLessonDialog extends MovieClip{
     * Event dispatched by parent container when close button clicked
     */
     private function click(e:Object){
-        trace('WorkspaceDialog.click');
         e.target.deletePopUp();
     }
 	
@@ -561,13 +506,6 @@ class CreateLessonDialog extends MovieClip{
 			for (var i = 0; i<node.childNodes.length; i++) {
 				var cNode = node.getTreeNodeAt(i);
 				setBranches(cNode);
-				/*
-				if(cNode.hasChildNodes()){
-					treeview.setIsBranch(cNode, true);
-					setBranches(cNode);
-				}
-				*/
-				
 			}
 		}
 	}
@@ -580,6 +518,7 @@ class CreateLessonDialog extends MovieClip{
 	 */
 	private function setUpBranchesInit(){
 		Debugger.log('Running...',Debugger.GEN,'setUpBranchesInit','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		
 		//get the 1st child
 		treeview.dataProvider = WorkspaceModel(_workspaceView.getModel()).treeDP;
 		var fNode = treeview.dataProvider.firstChild;
@@ -595,50 +534,20 @@ class CreateLessonDialog extends MovieClip{
 	 * @return  
 	 */
 	private function setUpTreeview(){
-			
-		//Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-		
 		setUpBranchesInit();
 		Debugger.log('WorkspaceModel(_workspaceView.getModel()).treeDP:'+WorkspaceModel(_workspaceView.getModel()).treeDP.toString(),Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-		
-		//Debugger.log('_workspaceController.onTreeNodeOpen:'+_workspaceController.onTreeNodeOpen,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-		
-		
 		
 		treeview.addEventListener("nodeOpen", Delegate.create(_workspaceController, _workspaceController.onTreeNodeOpen));
 		treeview.addEventListener("nodeClose", Delegate.create(_workspaceController, _workspaceController.onTreeNodeClose));
 		treeview.addEventListener("change", Delegate.create(_workspaceController, _workspaceController.onTreeNodeChange));
-
-		//location_dnd.addEventListener('double_click', dndList);
-		//location_dnd.addEventListener('drag_start', dndList);
-		//location_dnd.addEventListener('drag_fail', dndList);
-		
-		//location_dnd.addEventListener('drag_target', dndList);
 		location_dnd.addEventListener("drag_complete", Delegate.create(_workspaceController, _workspaceController.onDragComplete));
-		//location_dnd.addEventListener('drag_complete', dndList);
-		//use the above event, on comlete the drop, send the request to do the move to the server (evt.targetNode);
-		//then immediatly invlaidate the cache.  then server may return error if therrte is a problem, else new details willbe shown
-		
-		
-		
-		
     }
     
     /**
     * XML onLoad handler for treeview data
- */
+	*/
     private function tvXMLLoaded (ok:Boolean,rootXML:XML){
         if(ok){
-            /*
-			//Set the XML as the data provider for the tree
-            treeview.dataProvider = rootXML.firstChild;
-            treeview.addEventListener("change", Delegate.create(this, onTvChange));
-            
-            //Add this function to prevent displaying [type function],[type function] when label attribute missing from XML
-            treeview.labelFunction = function(node) {
-                    return node.nodeType == 1 ? node.nodeName : node.nodeValue;
-            };
-            */
         }
     }
     
@@ -647,7 +556,6 @@ class CreateLessonDialog extends MovieClip{
     * Main resize method, called by scrollpane container/parent
     */
     public function setSize(w:Number,h:Number){
-        //Debugger.log('setSize',Debugger.GEN,'setSize','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
         //Size the panel
         panel.setSize(w,h);
 
@@ -682,12 +590,10 @@ class CreateLessonDialog extends MovieClip{
 	public function get workspaceView ():WorkspaceView {
 		return _workspaceView;
 	}
-	
     
     function get selectedDesignId():Number { 
         return _selectedDesignId;
     }
-	
 	
 	/**
 	 * 

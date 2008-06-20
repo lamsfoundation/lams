@@ -439,6 +439,7 @@ class MonitorController extends AbstractController {
 					if(ca.activity.parentUIID != null &&  (ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || 
 						ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE ||
 						ca.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE)) {
+						
 						// open complex inside complex view
 						Debugger.log("open complex viewer: " + ca.activity.activityUIID, Debugger.CRITICAL, "activityDoubleClick", "MonitorController")
 						_monitorModel.getMonitor().openComplexView(ca);
@@ -539,7 +540,7 @@ class MonitorController extends AbstractController {
 			LessonTabView(getView()).dialog = evt.target.scrollContent;
 			
 			//set up UI
-			//note this function registeres the dialog to recieve view updates
+			//note this function registeres the dialog to receive view updates
 			evt.target.scrollContent.setUpContent();		
 			
         } else {
@@ -555,7 +556,6 @@ class MonitorController extends AbstractController {
         Debugger.log('!okClicked:'+evt.type+', now follows the resultDTO:',Debugger.GEN,'okClicked','org.lamsfoundation.lams.MonitorController');
         //Check type is correct
 		if(evt.type == 'okClicked'){
-			
             //Call the callback, passing in the design selected designId
 
 			//invalidate the cache of folders
@@ -574,11 +574,9 @@ class MonitorController extends AbstractController {
     public function onTreeNodeOpen (evt:Object){
 		var treeview = evt.target;
 		var nodeToOpen:XMLNode = evt.node;
+		
 		Debugger.log('nodeToOpen organisationID:'+nodeToOpen.attributes.data.organisationID,Debugger.GEN,'onTreeNodeOpen','org.lamsfoundation.lams.MonitorController');
 		Debugger.log('nodeToOpen org name:'+nodeToOpen.attributes.data.name,Debugger.GEN,'onTreeNodeOpen','org.lamsfoundation.lams.MonitorController');
-		//if this ndoe has children then the 
-		//data has already been got, nothing to do
-		
     }
 	
 	/**
@@ -595,10 +593,8 @@ class MonitorController extends AbstractController {
 	 * @param   lessonID 
 	 * @return  
 	 */
-	
 	public function editLessonClass(resultDTO:Object){
 		_monitorModel.resultDTO = resultDTO;
-		trace('editing lesson class');
 		_monitorModel.getMonitor().createLessonClass();
 	}
 
@@ -624,7 +620,7 @@ class MonitorController extends AbstractController {
 					
 					break;
 				case LessonTabView.NULL_CBI :
-					// error msg
+					// TODO: error msg
 					break;
 				case LessonTabView.ACTIVE_CBI :
 					_monitorModel.activateSequence();

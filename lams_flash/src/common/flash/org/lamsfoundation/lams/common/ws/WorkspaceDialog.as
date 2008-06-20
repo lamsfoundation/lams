@@ -385,8 +385,10 @@ class WorkspaceDialog extends MovieClip{
 	 * @return  
 	 */
 	private function refreshFolder(nodeToOpen:XMLNode, wm:WorkspaceModel){		Debugger.log('refreshFolder:'+nodeToOpen ,Debugger.GEN,'refreshFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		
 		//close the node
 		treeview.setIsOpen(nodeToOpen,false);		
+		
 		//we are gonna need to fire the event manually for some stupid reason the tree is not firing it.
 		//dispatchEvent({type:'nodeOpen',target:treeview,node:nodeToOpen});
 		_workspaceController = _workspaceView.getController();
@@ -396,29 +398,23 @@ class WorkspaceDialog extends MovieClip{
 	private function removeProps(wm:WorkspaceModel):Void{
 		if (wm.currentMode == Workspace.MODE_OPEN || wm.currentMode == Workspace.MODE_INSERT){
 				switchView_tab.removeItemAt(1)
-		}	
-		
+		}
 	}
 	
 	private function restoreProps(wm:WorkspaceModel):Void{
 		if(wm.currentMode == Workspace.MODE_OPEN){	
-				if (typeof(switchView_tab.getItemAt(1)) != "object"){
-					switchView_tab.addItem({label:Dictionary.getValue('ws_dlg_properties_button'), data:'PROPERTIES'});
-				}
-			}	
-		
+			if (typeof(switchView_tab.getItemAt(1)) != "object"){
+				switchView_tab.addItem({label:Dictionary.getValue('ws_dlg_properties_button'), data:'PROPERTIES'});
+			}
+		}
 	}
 	
 	private function itemSelected(newSelectedNode:XMLNode,wm:WorkspaceModel){
 		//update the UI with the new info:
-		//_global.breakpoint();
-
 		//Only update the details if the node if its a resource:a
 		var nodeData = newSelectedNode.attributes.data;
 		removeProps(wm);
 		if(nodeData.resourceType == _workspaceModel.RT_FOLDER){
-			
-			
 			resourceTitle_txi.text = "";
 			
 			if(wm.currentMode != Workspace.MODE_SAVEAS || wm.currentMode != Workspace.MODE_SAVE){	
@@ -450,8 +446,8 @@ class WorkspaceDialog extends MovieClip{
 					}
 				}
 				if(wm.currentMode == Workspace.MODE_OPEN){
-					//licenseID_cmb.enabled = false;
 				}
+				
 				onLicenseComboSelect();
 				
 				
@@ -526,8 +522,6 @@ class WorkspaceDialog extends MovieClip{
 		licenseImg_pnl.createEmptyMovieClip("image_mc", this.getNextHighestDepth());
 		licenseImg_pnl.image_mc.loadMovie(licenseID_cmb.value.pictureURL);
 
-		//license_txa.text = StringUtils.cleanNull(evt.target.data.
-		
 		if(licenseID_cmb.value.url == undefined){
 			viewLicense_btn.enabled = false;
 		}else{
@@ -561,7 +555,6 @@ class WorkspaceDialog extends MovieClip{
 		name_lbl.visible = v;
 		resourceTitle_txi.visible = v;
 		new_btn.visible = v;
-		//cut_btn.visible = v;
 		copy_btn.visible = v;
 		paste_btn.visible = v;
 		delete_btn.visible = v;
@@ -585,8 +578,6 @@ class WorkspaceDialog extends MovieClip{
 			license_comment_lbl.visible = false;
 			license_txa.visible = false;
 		}
-		
-		
 
 	}
 	
@@ -603,13 +594,12 @@ class WorkspaceDialog extends MovieClip{
 		if(tabToSelect == "LOCATION"){
 			setLocationContentVisible(true);
 			setPropertiesContentVisible(false);
-			//setTabIndex("LOCATION");
+			
 			if(wm.currentMode==Workspace.MODE_OPEN){
 				licenseID_cmb.enabled = true;
 			}
 			_currentTab = LOCATION_TAB;
 			
-			//removeProps(wm);
 						
 		}else if(tabToSelect == "PROPERTIES"){
 			setLocationContentVisible(false);
@@ -617,14 +607,13 @@ class WorkspaceDialog extends MovieClip{
 			if(wm.currentMode==Workspace.MODE_OPEN){
 				licenseID_cmb.enabled = false;
 			}
-			//setTabIndex("PROPERTIES");
+			
 			_currentTab = PROP_TAB;
 		}
 		
 		//set the right label on the 'doit' button
 		if(wm.currentMode==Workspace.MODE_OPEN){
 			ok_btn.label = Dictionary.getValue('ws_dlg_open_btn');
-			//licenseID_cmb.enabled = false;
 		}else if(wm.currentMode == Workspace.MODE_INSERT){
 			ok_btn.label = Dictionary.getValue("ws_dlg_insert_btn");
 		}else if(wm.currentMode==Workspace.MODE_SAVE || wm.currentMode==Workspace.MODE_SAVEAS){
@@ -639,26 +628,19 @@ class WorkspaceDialog extends MovieClip{
 	}
 	
 	private function setTabIndex(selectedTab:String){
-		
 		ok_btn.tabIndex = 25
         cancel_btn.tabIndex = 26
 		switchView_tab.tabIndex = 1
-		//think this is failing....
-		//if(tabToSelect == "LOCATION"){
-			new_btn.tabIndex = 2
-			//cut_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
-			copy_btn.tabIndex = 3
-			paste_btn.tabIndex = 4
-			delete_btn.tabIndex = 5
-			rename_btn.tabIndex = 6
-			location_dnd.tabIndex = 7
-			treeview.tabIndex = 7
-		//}else {
-			resourceDesc_txa.tabIndex = 8
-			licenseID_cmb.tabIndex = 9
-			viewLicense_btn.tabIndex = 10
-		//}
-		
+		new_btn.tabIndex = 2
+		copy_btn.tabIndex = 3
+		paste_btn.tabIndex = 4
+		delete_btn.tabIndex = 5
+		rename_btn.tabIndex = 6
+		location_dnd.tabIndex = 7
+		treeview.tabIndex = 7
+		resourceDesc_txa.tabIndex = 8
+		licenseID_cmb.tabIndex = 9
+		viewLicense_btn.tabIndex = 10
 	}
     
     /**
@@ -678,36 +660,10 @@ class WorkspaceDialog extends MovieClip{
     * Called on initialisation and themeChanged event handler
     */
     private function setStyles(){
-        //LFWindow, goes first to prevent being overwritten with inherited styles.
-        //var styleObj = themeManager.getStyleObject('LFWindow');
-        //_container.setStyle('styleName',styleObj);
-
-        //Get the button style from the style manager
-       // styleObj = themeManager.getStyleObject('button');
-        
-        //apply to both buttons
-       // Debugger.log('styleObject : ' + styleObj,Debugger.GEN,'setStyles','org.lamsfoundation.lams.WorkspaceDialog');
-       // ok_btn.setStyle('styleName',styleObj);
-        //cancel_btn.setStyle('styleName',styleObj);
-        
         //Get label style and apply to label
 		var styleObj = themeManager.getStyleObject('label');
         name_lbl.setStyle('styleName',styleObj);
-
-        //Apply treeview style 
-       // styleObj = themeManager.getStyleObject('treeview');
-        //treeview.setStyle('styleName',styleObj);
-
-        //Apply datagrid style 
-      //  styleObj = themeManager.getStyleObject('datagrid');
-        //datagrid.setStyle('styleName',styleObj);
-
-/*
-        //Apply combo style 
-        styleObj = themeManager.getStyleObject('combo');
-        combo.setStyle('styleName',styleObj);
-  */
-  }
+	}
 
     /**
     * Called by the cancel button 
@@ -731,7 +687,6 @@ class WorkspaceDialog extends MovieClip{
 		licenseID_cmb.enabled = v;
 		viewLicense_btn.enabled = v;
 	}
-	
 	 
    /**
     * Called by the OK button
@@ -745,17 +700,16 @@ class WorkspaceDialog extends MovieClip{
     *</code>
 	*/
     private function ok(){
-		
-        trace('OK');
-		_global.breakpoint();
+        _global.breakpoint();
 		_workspaceController = _workspaceView.getController();
 		_workspaceController.setBusy()
+		
 		//TODO: Validate you are allowed to use the name etc... Are you overwriting - NOTE Same names are nto allowed in this version
 		
 		var snode = treeview.selectedNode;
 		
 		if(isVirtualFolder(snode)){
-			_workspaceController.clearBusy();			//LFMessage.showMessageAlert(Dictionary.getValue('ws_click_virtual_folder'),null);
+			_workspaceController.clearBusy();
 			return;
 		}
 		
@@ -790,11 +744,9 @@ class WorkspaceDialog extends MovieClip{
 		
 		if (snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
 			if(resourceTitle_txi.text == null){
-				//LFMessage.showMessageAlert(Dictionary.getValue('ws_click_file_open'),null);
 			} else {
 				if(!searchForFile(snode, resourceTitle_txi.text)){
-					//LFMessage.showMessageAlert(Dictionary.getValue('ws_no_file_open'),null);
-				_workspaceController.clearBusy()	
+					_workspaceController.clearBusy()	
 				}
 			}
 		} else {
@@ -807,7 +759,6 @@ class WorkspaceDialog extends MovieClip{
 	 *   
 	 * @param   snode folder to save to
 	 */
-	
 	private function saveFile(snode:XMLNode):Void{
 		Debugger.log('Saving a file.',Debugger.GEN,'saveFile','org.lamsfoundation.lams.WorkspaceDialog');
 		_workspaceController = _workspaceView.getController();
@@ -915,7 +866,6 @@ class WorkspaceDialog extends MovieClip{
 				}
 			} else {
 				if(!searchForFile(_workspaceModel.getWorkspaceResource('Folder_'+dto.workspaceFolderID), _resultDTO.resourceName)){
-					//LFMessage.showMessageAlert(Dictionary.getValue('ws_no_file_open'),null);
 					_workspaceController.clearBusy()
 				}
 			}
@@ -930,7 +880,6 @@ class WorkspaceDialog extends MovieClip{
 	 * @param   resourceID  
 	 * @return  
 	 */
-	
 	private function isVirtualFolder(folder:XMLNode){
 		return folder.attributes.data.resourceID < 0;
 	}
@@ -979,14 +928,11 @@ class WorkspaceDialog extends MovieClip{
 
         dispatchEvent({type:'okClicked',target:this});
 		_workspaceController.clearBusy();
-        //closeThisDialogue();
-		
 	}
 	
 	public function closeThisDialogue(){
 		 close();
 	}
-
 	
 	/**
 	 * Called when the tabs are clicked
@@ -1007,9 +953,7 @@ class WorkspaceDialog extends MovieClip{
     * Event dispatched by parent container when close button clicked
     */
     private function click(e:Object){
-        trace('WorkspaceDialog.click');
-		close(e.target);
-        // e.target.deletePopUp();
+        close(e.target);
     }
 	
 	private function close(container:Object){
@@ -1070,39 +1014,28 @@ class WorkspaceDialog extends MovieClip{
 	 */
 	private function setUpTreeview(){
 			
-		//Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-		
 		setUpBranchesInit();
 		Debugger.log('WorkspaceModel(_workspaceView.getModel()).treeDP:'+WorkspaceModel(_workspaceView.getModel()).treeDP.toString(),Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-		
-		//Debugger.log('_workspaceController.onTreeNodeOpen:'+_workspaceController.onTreeNodeOpen,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-		
-		
 		
 		treeview.addEventListener("nodeOpen", Delegate.create(_workspaceController, _workspaceController.onTreeNodeOpen));
 		treeview.addEventListener("nodeClose", Delegate.create(_workspaceController, _workspaceController.onTreeNodeClose));
 		treeview.addEventListener("change", Delegate.create(_workspaceController, _workspaceController.onTreeNodeChange));
 		
-		//location_dnd.addEventListener('double_click', dndList);
-		//location_dnd.addEventListener('drag_start', dndList);
-		//location_dnd.addEventListener('drag_fail', dndList);
-		
-		//location_dnd.addEventListener('drag_target', dndList);
 		location_dnd.addEventListener("drag_complete", Delegate.create(_workspaceController, _workspaceController.onDragComplete));
-		//location_dnd.addEventListener('drag_complete', dndList);
+		
 		//use the above event, on comlete the drop, send the request to do the move to the server (evt.targetNode);
 		//then immediatly invlaidate the cache.  then server may return error if therrte is a problem, else new details willbe shown
 		
 		// open My Workspace virtual folder
 		var wsNode:XMLNode = treeview.firstVisibleNode;
-		//treeview.setIsOpen(wsNode, true);
+		
 		_workspaceController.forceNodeOpen(wsNode);
 		
     }
     
     /**
     * XML onLoad handler for treeview data
- */
+	*/
     private function tvXMLLoaded (ok:Boolean,rootXML:XML){
         if(ok){
             /*
@@ -1159,11 +1092,9 @@ class WorkspaceDialog extends MovieClip{
 		return _workspaceView;
 	}
 	
-    
     function get selectedDesignId():Number { 
         return _selectedDesignId;
     }
-	
 	
 	/**
 	 * 

@@ -170,14 +170,15 @@ class Organisation {
 	private function getUsersByRole(roleName:String):Array{
 		var usrs:Array = new Array();
 		var keys:Array = _users.keys();
+		
 		Debugger.log("Getting users by role...", Debugger.GEN, "getUsersByRole", "Organisation");
 		for(var i=0; i<keys.length;i++){
 			var user:User = User(_users.get(keys[i]));
-			//var u:User = user.classInstanceRefs;
 			if(user.hasRole(roleName)){
 				usrs.push(user);
 			}
 		}
+		
 		usrs.sortOn(["_firstName", "_lastName"], Array.CASEINSENSITIVE);
 		return usrs;
 	}

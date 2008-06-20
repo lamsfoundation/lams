@@ -23,10 +23,10 @@
 
 import org.lamsfoundation.lams.monitoring.Application;
 import org.lamsfoundation.lams.monitoring.ls.*;
-//import org.lamsfoundation.lams.monitoring.ls.Lesson;
 import org.lamsfoundation.lams.common.util.*; 
 import org.lamsfoundation.lams.common.Sequence;
 import mx.managers.*;
+
 /**
 * Monitoring - LAMS Application
 * @author   Pradeep Sharma
@@ -35,6 +35,7 @@ class org.lamsfoundation.lams.monitoring.ls.Lesson {
 	
 	// Model
 	private var lessonModel:LessonModel;
+	
 	// View
 	private var lessonView:LessonView;
 	private var lessonView_mc:MovieClip;
@@ -115,13 +116,9 @@ class org.lamsfoundation.lams.monitoring.ls.Lesson {
 		// go through list of DTO's and make Lesson objects to add to hash map
 		for(var i=0; i< lessons.length; i++){
 			var ln:Object = lessons[i];
-			
-			
-			//var lesson:Lesson = new Lesson(sp_mc.content, LESSON_X, LESSON_Y+(LESSON_H*i), libraryView);
 			var seq:Sequence = new Sequence();
 			seq.populateFromDTO(ln);
 			
-			//trace('pushing lesson with id: ' + lessonModel.getLessonID());
 			lns.push(seq);
 		}
 			
@@ -138,10 +135,6 @@ class org.lamsfoundation.lams.monitoring.ls.Lesson {
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonData&lessonID=' + String(lessonID), callback);
 	
 	}
-	
-	//public function populateFromDTO(dto:Object){
-	//	lessonModel.populateFromDTO(dto);
-	//}
 	
 	/**
 	* Used by application to set the size

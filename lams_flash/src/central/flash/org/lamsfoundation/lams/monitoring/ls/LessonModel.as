@@ -77,10 +77,7 @@ class org.lamsfoundation.lams.monitoring.ls.LessonModel extends Observable {
 		//clear the old lot
 		_lessonSequences.clear();
 		
-		trace('adding learning seq for length' + lsc.length);
 		for(var i=0; i<lsc.length;i++){
-			trace('adding learning seq with ID: ' + lsc[i].getSequenceID());
-			
 			_lessonSequences.put(lsc[i].getSequenceID(),lsc[i]);
 		}
 		
@@ -146,86 +143,6 @@ class org.lamsfoundation.lams.monitoring.ls.LessonModel extends Observable {
 		return _currentlySelectedSequence;
 	}
 	
-	
-	/**
-	public function getNewSequences():Array{
-		if(_learningSequences==null){
-			return null;
-		}
-		
-		return getSequencesByState(NEW_STATE_ID);
-	}
-	
-	public function getStartedSequences():Array{
-		if(_learningSequences==null){
-			return null;
-		}
-		
-		return getSequencesByState(STARTED_STATE_ID);
-	}
-	
-	public function getFinishedSequences():Array{
-		if(_learningSequences==null){
-			return null;
-		}
-		
-		return getSequencesByState(FINISHED_STATE_ID);
-	}
-	*/
-	/**
-	 * Retrieve the Learning Sequences for a specific state
-	 * 
-	 * @param   stateID The state of the sequences to return
-	 * @return  sequences
-	 
-	
-	private function getSequencesByState(stateID:Number):Array{
-		var seqs:Array = new Array();
-		var keys:Array = _learningSequences.keys();
-		
-		for(var i=0; i<keys.length;i++){
-			var seq:Object = _learningSequences.get(keys[i]);
-			var l:Lesson = seq.classInstanceRefs;
-			if(l.checkState(stateID)){
-				seqs.push(l);
-			}
-		}
-		
-		return seqs;
-	}
-	*/
-	/**
-	* Gets last selected Lesson
-	
-	public function getLastSelectedLesson():Lesson{
-		return _lastSelectedLesson;
-	}
-	
-	
-	public function addLessonToLibrary(LessonDTO:Object):Boolean {
-		
-		return true;
-	}
-	
-	private function createLessonFromDTO(LessonDTO:Object):Lesson {
-		// convert to DTO to Lesson object
-		return null;
-	}
-	
-	public function addLesson(lesson:Lesson):Boolean {
-		_learningSequences.put(lesson.getLessonID(), lesson);
-		return true;
-	}
-	
-	public function removeLesson(lesson:Lesson):Boolean {
-		_learningSequences.remove(lesson);
-		return true;
-	}
-	
-	public function getLesson(lessonID:Number):Lesson {
-		return Lesson(_learningSequences.get(lessonID));
-	}
-	*/
 	/**
     * set the size on the model, this in turn will set a changed flag and notify observers (views)
     * @param width - Tookit width

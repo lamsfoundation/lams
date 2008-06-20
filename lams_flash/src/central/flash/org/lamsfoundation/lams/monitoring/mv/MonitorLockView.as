@@ -102,12 +102,9 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLockView extends AbstractView
 	/**
 	* Called to initialise Canvas  . CAlled by the Canvas container
 	*/
-	public function init(m:Observable,c:Controller,x:Number,y:Number,w:Number,h:Number, enabled:Boolean){
-
+	public function init(m:Observable,c:Controller,x:Number,y:Number,w:Number,h:Number, enabled:Boolean) {
 		super (m, c);
-		
-		MovieClipUtils.doLater(Proxy.create(this,draw,enabled)); 
-		
+		MovieClipUtils.doLater(Proxy.create(this,draw,enabled));
     }    
 	
 	/**
@@ -149,9 +146,6 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLockView extends AbstractView
 		
 		_enabled = enabled;
 		action_btn.addEventListener("click",mcontroller);
-		
-		// display continue button?
-		//action_btn._visible = (enabled) ? true : false;
 		
 		setLabels(enabled);
 		setStyles();
@@ -234,6 +228,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLockView extends AbstractView
 		var obj:Object = app.layout.manager.checkAvailability(mm.getSequence());
 		
 		Debugger.log("isLocked: " + obj.locked + " isEditingUser: " + obj.isEditingUser, Debugger.CRITICAL, "checkAvailability", "MonitorLockView");
+		
 		if(!obj.locked) {
 			// reload monitor
 			Debugger.log("Now unlocked, Reloading UI" + obj.isEditingUser, Debugger.CRITICAL, "checkAvailability", "MonitorLockView");

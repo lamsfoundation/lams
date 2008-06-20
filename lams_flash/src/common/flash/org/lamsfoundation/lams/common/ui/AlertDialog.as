@@ -47,11 +47,11 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 	private var _bgpanel:MovieClip;
 	private var _bgcolor:Color;
 
-    private var ok_btn:Button;         //OK+Cancel buttons
+    private var ok_btn:Button;         		//OK+Cancel buttons
     private var cancel_btn:Button;
 	
 	private var _title:TextArea;
-    private var _message:TextArea;	// Alert message text
+    private var _message:TextArea;				// Alert message text
 	
 	private var _okHandler:Function;
 	private var _cancelHandler:Function;
@@ -60,8 +60,8 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 	private var _isDragging:Boolean;
     
 	private var app:Object;
-    private var fm:FocusManager;            //Reference to focus manager
-    private var themeManager:ThemeManager;  //Theme manager
+    private var fm:FocusManager;            	//Reference to focus manager
+    private var themeManager:ThemeManager;  	//Theme manager
     
 	private var transparentCover:MovieClip;
 	private var clickTarget:MovieClip;
@@ -104,11 +104,8 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 		_isDragging = false;
 		
 		clickTarget.enabled = true;	
-		
-		//clickTarget.onPress = Proxy.create(this, onDrag);
 		clickTarget.onPress = Proxy.create(this, onDrag);
 		clickTarget.onRelease = Proxy.create(this, onDrag);
-		
 		clickTarget.onReleaseOutside = Proxy.create(this, onDrag);
 
 		ok_btn.addEventListener('click', Delegate.create(this, onOkPress));
@@ -154,13 +151,10 @@ class org.lamsfoundation.lams.common.ui.AlertDialog extends MovieClip {
 		
 		transparentCover = target.createClassObject(Panel, "transparentCover", DepthManager.kTop, {_visible: true, enabled: false, _alpha: 0, _width: Stage.width, _height: Stage.height, styleName: styleObj});
 		transparentCover.onPress = null;
-		
-		///org.lamsfoundation.lams.authoring.Application.getInstance().getToolbar().disableAll();
 	}
 	
 	private function removeTransparentLayer() {
 		transparentCover.removeMovieClip();
-		//org.lamsfoundation.lams.authoring.Application.getInstance().getToolbar().enableAll();
 	}
 	
 	public function setOKButton(lbl:String,fn:Function){

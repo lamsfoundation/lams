@@ -310,10 +310,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 
 	public function setSize(dHeight:Number) {
 		org_treeview.setSize(org_treeview.width, Number(org_treeview.height + dHeight));
-		
-		//staff_scp.setSize(staff_scp._width, staff_scp._height + dHeight);
 		learner_scp.setSize(learner_scp._width, learner_scp._height + dHeight);
-		
 	}
 	
 	private function toogleStaffSelection(evt:Object) {

@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.Config;
 import org.lamsfoundation.lams.common.util.Debugger;
 import org.lamsfoundation.lams.common.util.StringUtils;
+
 /*
 * This class represents all the complex activity types.  they are not much different, so we can handle them in one class.
 * For reference these are the activity types
@@ -37,7 +38,7 @@ import org.lamsfoundation.lams.common.util.StringUtils;
 * @version     0.1
 * @see		   Activity
 */
-class ComplexActivity extends Activity{
+class ComplexActivity extends Activity {
 	
 	private var _maxOptions:Number;
 	private var _minOptions:Number;

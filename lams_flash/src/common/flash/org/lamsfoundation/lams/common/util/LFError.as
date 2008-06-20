@@ -24,8 +24,8 @@
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
-import mx.controls.Alert;
 
+import mx.controls.Alert;
 
 /**  
 * LFError  
@@ -40,77 +40,40 @@ class LFError extends Error{
 	 private var title:String;
 	 	 
      //Constructor  
-  function LFError(msg:String,fn:String,ref:Object,debugInfo:String) {
+	function LFError(msg:String,fn:String,ref:Object,debugInfo:String) {
 	 super(msg);
 	 _fn = fn;
 	 _ref = ref;
+	 
 	 Debugger.log('Creating LFError instance:'+msg,Debugger.CRITICAL,'LFError','LFError');
 	 Debugger.log('Function:'+fn,Debugger.CRITICAL,'LFError','LFError');
 	 Debugger.log('Ref:'+ref,Debugger.CRITICAL,'LFError','LFError');
 	 Debugger.log('debugInfo:'+debugInfo,Debugger.CRITICAL,'LFError','LFError');
-	
-	 //title = Dictionary.getValue('al_alert')
-	 
-  }
-  
-  public function showErrorAlert(okHandler){
-	/**title = Dictionary.getValue('al_alert')
-	var a:Alert;
-	
-	Alert.okLabel = Dictionary.getValue('al_ok');
-	
-	if(okHandler != undefined){
-		
-		//TODO: Fix the problem of size calculation with icons
-	   a = Alert.show(message,title,Alert.OK,null,okHandler,null,Alert.OK);
-	}else{
-	   a = Alert.show(message,title,Alert.OK,null,null,null,Alert.OK);
 	}
-	*/
-	
-	LFMessage.showMessageAlert(message, okHandler);
-  }
-  /**
- * Shows an alert confirm dialogue.  It is centred in the root time line and diplays the standard LAMS alert icon
- * @usage   
- * @param   msg     	The message to display
- * @param   handler		A handler for the click events broadcast when the buttons are clicked. In addition to the standard click event object properties, there is an additional detail property, which contains the flag value of the button that was clicked (Alert.OK, Alert.CANCEL, Alert.YES, Alert.NO). This handler can be a function or an object
- * @return  
- */
-  public static function showSendErrorRequest(msg:String, msgTitle:String, okHandler:Function, cancelHandler:Function){
+  
+	public function showErrorAlert(okHandler){
+		LFMessage.showMessageAlert(message, okHandler);
+	}
+	  
 	/**
-	var alt:Alert;
-	var customTitle = Dictionary.getValue(msgTitle)
-	var handlerObj = new Object();
-	
-	Alert.okLabel = Dictionary.getValue('al_send');
-	Alert.cancelLabel = Dictionary.getValue('al_cancel');
-	
-	handlerObj.click = function(e){
-		if(e.detail == Alert.OK){
-			okHandler();
-		}else if(e.detail == Alert.CANCEL){
-			cancelHandler();
-		}else{
-			Debugger.log('Unknown event detail form confirm:'+e.detail,Debugger.CRITICAL,"showMessageConfirm",'LFMessage');		
-		}
-	}
-	
-	alt = Alert.show(msg, customTitle ,Alert.OK | Alert.CANCEL, null, handlerObj, null, Alert.OK);
+	* Shows an alert confirm dialogue.  It is centred in the root time line and diplays the standard LAMS alert icon
+	* @usage   
+	* @param   msg     	The message to display
+	* @param   handler		A handler for the click events broadcast when the buttons are clicked. In addition to the standard click event object properties, there is an additional detail property, which contains the flag value of the button that was clicked (Alert.OK, Alert.CANCEL, Alert.YES, Alert.NO). This handler can be a function or an object
+	* @return  
 	*/
-	
-	var customTitle = Dictionary.getValue(msgTitle);
-	LFMessage.showMessageConfirm(msg, okHandler, cancelHandler, Dictionary.getValue('al_send'), Dictionary.getValue('al_cancel'), customTitle);
-  
-  }
-  
-  public function get reference():Object{
-   return _ref;
-  }
-	
-  public function get fname():String{
-	return _fn;
-  }
-
+	public static function showSendErrorRequest(msg:String, msgTitle:String, okHandler:Function, cancelHandler:Function){
+		var customTitle = Dictionary.getValue(msgTitle);
+		LFMessage.showMessageConfirm(msg, okHandler, cancelHandler, Dictionary.getValue('al_send'), Dictionary.getValue('al_cancel'), customTitle);
+	  
+	}
+	  
+	public function get reference():Object{
+	   return _ref;
+	}
+		
+	public function get fname():String{
+		return _fn;
+	}
 	 
 }

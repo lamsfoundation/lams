@@ -36,7 +36,7 @@ import mx.events.*
 import mx.utils.*
 
 /**  
-* CanvasActivity - 
+* LearnerIcon
 */  
 class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
   
@@ -74,7 +74,6 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	
 	
 	function LearnerIcon(){
-		//Debugger.log("_activity:"+_activity.title,4,'Constructor','CanvasActivity');
 		_tm = ThemeManager.getInstance();
 		toolTip = new ToolTip();
 		
@@ -88,8 +87,6 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 		if(_activity != undefined){
 			init();
 		}
-		
-		
 	}
 	
 	public function init(initObj):Void{
@@ -142,7 +139,6 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	}
 	
 	private function showAssets(isVisible:Boolean){
-		//toolTip._visible = isVisible;
 		if(isVisible) showToolTip();
 		else hideToolTip();
 	}
@@ -154,13 +150,9 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	 * @return  
 	 */
 	private function draw(){
-		
-		//Code for Drawing learner on the activty. 
-				
 		Debugger.log('Learner is in Activity: '+_activity.title,4,'draw','LearnerIcon');
 		setStyles();
-		//toolTip.text = learner.getFullName();
-
+		
 		Debugger.log('hasPlus: '+ _hasPlus,Debugger.CRITICAL,'draw','CanvasActivity');
 		smallCross._visible = _hasPlus;
 		
@@ -198,12 +190,10 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	}
 	
 	private function localOnRollOver():Void{
-		//toolTip._visible = true;
 		showAssets(true);
 	}
 	
 	private function localOnRollOut():Void{
-		//toolTip._visible = false;
 		showAssets(false);
 	}
 	
@@ -218,7 +208,6 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	
 	private function localOnReleaseOutside():Void{
 		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
-		//toolTip._visible = false;
 		showAssets(false);
 		_monitorController.activityRelease(_clone_mc, "LearnerIcon");
 		_clone_mc.removeMovieClip();

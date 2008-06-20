@@ -24,7 +24,6 @@
 import org.lamsfoundation.lams.authoring.tb.*;
 import org.lamsfoundation.lams.common.util.*;
 
-
 /*
 * Model for the Toolbar
 */
@@ -57,6 +56,7 @@ class ToolbarModel extends Observable {
 		__width = width;
 		__height = height;
 		setChanged();
+		
 		//send an update
 		infoObj = {};
 		infoObj.updateType = "SIZE";
@@ -109,10 +109,10 @@ class ToolbarModel extends Observable {
 		notifyObservers(infoObj);
 		
 	}
+	
 	/**
 	* set the button state to enabled/disabled and set a changed flag and notify view and controller.
     */
-	
 	public function setDefaultState(){
 		Debugger.log('setDefaultState is called: ',Debugger.GEN,'setDefaultState','Toolbar');
 		setButtonState("preview_btn", false);
@@ -154,7 +154,6 @@ class ToolbarModel extends Observable {
 	* Used by View to get the button state enabled/disabled
 	* @returns Object containing true or false .  obj.newbtnstate
 	*/
-	
 	public function getState():Object{
 		var s:Object = {};
 		s.newbtnstate = _btnState;

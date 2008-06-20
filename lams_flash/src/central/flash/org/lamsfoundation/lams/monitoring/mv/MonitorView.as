@@ -41,10 +41,9 @@ import mx.controls.*
 
 
 /**
-*Monitoring view for the Monitor
+* Monitoring view for the Monitor
 * Relects changes in the MonitorModel
 */
-
 class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	
 	private var _className = "MonitorView";
@@ -94,18 +93,23 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	//LessonTabView
 	private var lessonTabView:LessonTabView;
 	private var lessonTabView_mc:MovieClip;
+	
 	//MonitorTabView
 	private var monitorTabView:MonitorTabView;
 	private var monitorTabView_mc:MovieClip;
+	
 	//MonitorGateView
 	private var monitorGateView:MonitorGateView;
 	private var monitorGateView_mc:MovieClip;
+	
 	//TodoTabView
 	private var todoTabView:TodoTabView;
 	private var todoTabView_mc:MovieClip;
+	
 	//LearnerTabView
 	private var learnerTabView:LearnerTabView;
 	private var learnerTabView_mc:MovieClip;
+	
 	//LearnerIndexView
 	private var learnerIndexView:LearnerIndexView;
 	private var learnerIndexView_mc:MovieClip;
@@ -122,7 +126,6 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
     public var removeEventListener:Function;
-	
 	
 	/**
 	* Constructor
@@ -146,12 +149,12 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	* Called to initialise Canvas  . Called by the Canvas container
 	*/
 	public function init(m:Observable,c:Controller,x:Number,y:Number,w:Number,h:Number){
-
 		super (m, c);
+		
         //Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
-		//_monitorModel = getModel();
+		
 		bkg_pnl._visible = false;
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
@@ -283,8 +286,8 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		setLabels();
 		setStyles();
 		setupTabInit();
-	    dispatchEvent({type:'load',target:this});
 		
+	    dispatchEvent({type:'load',target:this});
 	}
 	
 	private function setupTabInit(){
@@ -333,16 +336,6 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	public function showToolTip(btnObj, btnTT:String):Void{
 		var btnLabel = btnObj.label;
 		var xpos:Number = btnObj._x;
-		
-		/**
-		if (btnLabel == "Help"){
-			xpos = bkgHeader_pnl.width - 165 //btnObj._x - 105
-		}else if (btnLabel == "Refresh"){
-			xpos = bkgHeader_pnl.width - 165 //btnObj._x - 40
-		}else{
-			xpos = btnObj._x
-		}
-		*/
 		
 		var Xpos = Application.MONITOR_X + xpos;
 		var Ypos = (Application.MONITOR_Y + btnObj._y + btnObj.height) + 5;
@@ -398,11 +391,12 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		
 		bkgHeader_pnl.setSize(s.w, bkgHeader_pnl._height);
 
-		//monitorLesson_scp.setSize(s.w-monitorLesson_scp._x, s.h-monitorLesson_scp._y);
 		monitorLesson_scp.setSize(s.w-monitorLesson_scp._x, s.h);
-		monitorSequence_scp.setSize(s.w-monitorSequence_scp._x, s.h-40.7); // endGate height = 40.7
+		monitorSequence_scp.setSize(s.w-monitorSequence_scp._x, s.h-40.7); 				// endGate height = 40.7
 		monitorGateView.setSize(mm);
+		
 		Debugger.log("MonitorViews.w: "+s.w, Debugger.CRITICAL, "setSize", "MonitorView");
+		
 		learnerIndexView.setSize(mm);
 		(mm.numIndexButtons > 1 || mm.inSearchView) ? monitorLearner_scp.setSize(s.w-monitorLearner_scp._x, s.h-20) : monitorLearner_scp.setSize(s.w-monitorLearner_scp._x, s.h);
 				

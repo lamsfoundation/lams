@@ -199,7 +199,6 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 		
 		var valid:Boolean = true;
 		if(resourceTitle_txi.text == ""){
-			trace('title is empty must contain value');
 			valid = false;
 		} 
 		

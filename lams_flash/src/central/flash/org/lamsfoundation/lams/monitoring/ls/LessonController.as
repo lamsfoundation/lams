@@ -44,43 +44,16 @@ class org.lamsfoundation.lams.monitoring.ls.LessonController extends AbstractCon
 		_lessonModel = LessonModel(model);
 	}
 	
-	// control methods
-	
 	/**
 	 * Recieves the click events from the Lesson buttons.  Based on the label
 	 * the relevent method is called to action the user request
 	 * @param   evt 
 	 */
 	public function cellPress(evt):Void{
-		trace(String(evt.target));
-		trace("Item index: " + evt.target.getItemAt(evt.itemIndex).data);
-		trace('onClick event: joining lesson...');
 		var seqID:Number = evt.target.getItemAt(evt.itemIndex).data;
-		trace("Lesson Name: "+seqID);	
+		
 		var seq:Sequence = Sequence(_lessonModel.getLessonSequence(seqID));
 		Application.getInstance().getMonitor().getMM().setSequence(seq);
-		
-		//_lessonModel.getLesson().joinLesson();
-		
-		/*
-		Debugger.log('click evt.target.label:'+evt.target.label,Debugger.GEN,'click','LessonController');
-		var tgt:String = new String(evt.target);
-		if(tgt.indexOf("join") != -1){
-			_lessonModel.getLesson().joinLesson();
-		}*/
+
 	}
-	/**
-	*Called by Lesson when one in clicked
-	* @param lesson - the lesson that was clicked
-	
-	public function selectLesson(lesson:Lesson):Void{
-		_lessonModel = LessonModel(model);
-		//_lessonModel.setSelectedLesson(lesson);
-	}
-	
-	public function getAllLessons():Void {
-		_lessonModel = LessonModel(model);
-		//_lessonModel.getLessons().getAllLessons();
-	}
-	*/
 }

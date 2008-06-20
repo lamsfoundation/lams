@@ -40,7 +40,7 @@ import mx.managers.*;
 import mx.utils.*;
 
 /**
-*Authoring view for the canvas
+* Authoring view for the canvas
 * Relects changes in the CanvasModel
 */
 
@@ -60,8 +60,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 	private var _parentActivity:Object;
 	private var _prevActiveView;
 	
-	//private var canvas_scp:ScrollPane;
-	
 	private var lastScreenWidth:Number = 500;
 	private var lastScreenHeight:Number = 300;
 	
@@ -75,7 +73,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 		_canvasComplexView = this;
 		_tm = ThemeManager.getInstance();
 		_branchingToClear = new Array();
-		//activitiesDisplayed = new Hashtable("activitiesDisplayed");
 		
         //Init for event delegation
         mx.events.EventDispatcher.initialize(this);
@@ -246,7 +243,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
-			//get the children
 			var children:Array = ddm.getComplexActivityChildren(a.activityUIID);
 			
 			var newActivity_mc =  (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_x: 0, _y: 0, _activity:a,_children:children,_canvasController:cvc,_canvasComplexView:ccv, _locked:a.isReadOnly()}) 

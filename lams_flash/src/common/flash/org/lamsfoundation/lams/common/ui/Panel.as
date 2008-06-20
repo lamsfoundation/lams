@@ -24,6 +24,7 @@
 //import org.lamsfoundation.lams.common.util.Debugger
 import mx.core.UIComponent
 import mx.styles.StyleManager
+
 /**
 * Panel is a base UI building block used in LAMS.  
 * It is often a holder or background for other UI components
@@ -72,6 +73,7 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 		//some default values;
 		_borderType  = "inset";
 		_backgroundColour = 0xCCCCCC;
+		
 		//hide the bounding box place holder
 		boundingBox_mc._visible = false;
 		boundingBox_mc._width = 0;
@@ -92,10 +94,10 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 	
 	public function draw () : Void 
 	{
-		//trace ('panel.draw()');
 		super.draw ();
 		layoutChildren ();
 	}
+	
 	/**
 	* Overrides the function in UIObject.
 	* Calls invalidate, which will call draw() one frame 
@@ -104,7 +106,6 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 	*/
 	public function size (Void) : Void
 	{
-		//trace ('Panel.size()');
 		invalidate ();
 	}
 	
@@ -117,8 +118,7 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 	* 
 	*/
 	[Inspectable(enumeration="inset,outset,solid,default,dropDown,none"defaultValue="inset")]
-	function set borderType (bStyle:String):Void{		//trace('set bStyle:'+bStyle);
-		_borderType = bStyle;		invalidate();
+	function set borderType (bStyle:String):Void{		_borderType = bStyle;		invalidate();
 	}
 	
 	function get borderType():String{
@@ -134,8 +134,7 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 	* @param styleProp The property to affect
 	* @param newValue the value to assign to that styleProp. Colours in hex format, borders as in set borderType
 	* 
-	*/	public function setStyle(styleProp:String, newValue):Void{		//trace('[Panel setStyle]styleProp:'+styleProp+' newValue:'+newValue);
-		//only process if we want to set the bkg
+	*/	public function setStyle(styleProp:String, newValue):Void{		//only process if we want to set the bkg
 		if(styleProp == "backgroundColor"){
 			_backgroundColour = newValue;
 		}else if(styleProp == "borderStyle"){
@@ -148,11 +147,9 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 			_backgroundColour = newValue.getStyle('backgroundColor');
 			_borderType = newValue.getStyle('borderStyle');
 			_borderColor = newValue.getStyle('borderColor');
-			//trace('[Panel setStyle]styleName: _backgroundColour:'+_backgroundColour);
-			//trace('[Panel setStyle]styleName: borderStyle:'+_borderType);
 		}else{
-			trace('Panel got an unsupported set style type.... can only be backgroundColor or borderStyle or styleName');
 		}
+		
 		invalidate();
 	}
 	
@@ -165,9 +162,8 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 	*/
 	private function createChildren() : Void
 	{
-		//trace('create children in panel, panel:'+panel);
 		panel = this.createObject ("PanelAssets", "panel", getNextHighestDepth());
-		//trace('panel:'+panel);		background_ct = new Color(panel.background_mc);		//the border is a MM rect border
+		background_ct = new Color(panel.background_mc);		//the border is a MM rect border
 		border_mc = createClassObject(mx.skins.RectBorder,"border_mc", getNextHighestDepth()); //make sure this is the last
 		layoutChildren();
 	}
@@ -199,7 +195,7 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 			border_mc.setStyle('borderColor',_borderColor);
 		}
 
-	}	
+	}
 	
 	/*
 	* These are not used, but I have left them her so we know how 

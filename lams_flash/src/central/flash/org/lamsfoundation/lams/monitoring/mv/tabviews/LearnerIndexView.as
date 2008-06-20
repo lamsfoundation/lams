@@ -43,6 +43,10 @@ import mx.events.*;
 import mx.utils.*;
 import mx.controls.*;
 
+/**
+ * Page index panel when LearnerTabView is active
+ * @author Daniel Carlier
+ */
 class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends AbstractView {
 	
 	public static var _tabID:Number = 2;

@@ -93,7 +93,6 @@ class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{
 	}
 	
 	private function setStyles():Void {
-		//var styleObj = _tm.getStyleObject("bin");
 		over_mc._alpha = 40;
 	}
 	

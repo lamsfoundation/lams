@@ -34,7 +34,6 @@ interface org.lamsfoundation.lams.common.layout.ILayoutManager {
 	* 
 	*
 	*/
-  
 	public function setup(target:ApplicationParent):Void;
   
 	public function getLayoutName():String;

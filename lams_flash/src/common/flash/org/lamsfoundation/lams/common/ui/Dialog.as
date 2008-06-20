@@ -31,10 +31,10 @@ import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
+
 import mx.containers.*
 import mx.managers.*
 import mx.events.*
-//import org.lamsfoundation.lams.authoring.*
 
 
 class org.lamsfoundation.lams.common.ui.Dialog {

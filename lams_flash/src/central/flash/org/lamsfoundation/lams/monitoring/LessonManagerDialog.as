@@ -276,7 +276,6 @@ class LessonManagerDialog extends MovieClip implements Dialog{
     * If an alert was spawned by this dialog this method is called when it's closed
     */
     private function alertClosed(evt:Object){
-        //_container.deletePopUp();
     }
     
 	/**
@@ -386,7 +385,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
             }else {
 				if(_usersLoadCheckCount >= USERS_LOAD_CHECK_TIMEOUT_COUNT){
 					//if we havent loaded the dict or theme by the timeout count then give up
-					Debugger.log('raeached time out waiting to load dict and themes, giving up.',Debugger.CRITICAL,'checkUILoaded','Application');
+					Debugger.log('reached time out waiting to load dict and themes, giving up.',Debugger.CRITICAL,'checkUILoaded','Application');
 					clearInterval(_UsersLoadCheckIntervalID);
 				}
             }

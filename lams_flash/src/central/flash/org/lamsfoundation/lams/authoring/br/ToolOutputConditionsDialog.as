@@ -58,7 +58,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private static var DEFINITION_DELIMITER:String = "#";
 	
 	//References to components + clips 
-    private var _container:MovieClip;  //The container window that holds the dialog
+    private var _container:MovieClip;  					//The container window that holds the dialog
     
 	private var _definitions:Array;
 	private var _conditions:Array;
@@ -90,11 +90,11 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private var _condition_from_lbl:Label;
 	private var _condition_to_lbl:Label;
 	
-	private var _bgpanel:MovieClip;       //The underlaying panel base
+	private var _bgpanel:MovieClip;       					//The underlaying panel base
     
     private var app:Application;
-	private var fm:FocusManager;            //Reference to focus manager
-    private var themeManager:ThemeManager;  //Theme manager
+	private var fm:FocusManager;           				//Reference to focus manager
+    private var themeManager:ThemeManager;  				//Theme manager
 	
     //Dimensions for resizing
     private var xOkOffset:Number;
@@ -394,7 +394,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	 * @usage   
 	 * @return  
 	 */
-	
 	private function addCondition(condition:ToolOutputCondition):Void {
 		
 		switch(condition.type) {
@@ -762,7 +761,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     * Main resize method, called by scrollpane container/parent
     */
     public function setSize(w:Number,h:Number):Void{
-		//Size the panel
+		// Size the panel
         _bgpanel.setSize(w,h);
 
 		_condition_item_dgd.setSize(w - 2*_condition_item_dgd._x, h*0.45);
@@ -777,7 +776,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		_toolOutputDefin_cmb.setSize(w - 2*_toolOutputDefin_cmb._x - help_btn.width - 5, 22);
 		_toolOutputLongOptions_cmb.setSize(_toolOutputDefin_cmb._width, 22);
 		
-		//Buttons
+		// Buttons
 		add_btn._x = _toolOutputLongOptions_cmb._x + _toolOutputLongOptions_cmb._width - add_btn.width;
 		remove_item_btn.move(_condition_item_dgd._x + _condition_item_dgd._width - remove_item_btn.width, _condition_item_dgd._y + _condition_item_dgd._height + 5);
 		clear_all_btn.move(remove_item_btn._x - clear_all_btn.width - 5, remove_item_btn._y);
@@ -789,8 +788,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		cancel_btn.move(close_btn._x - cancel_btn.width - 5, h-yOkOffset);
 		
     }
-    
-    //Gets+Sets
     
 	public function set definitions(a:Array):Void {
 		_definitions = new Array();

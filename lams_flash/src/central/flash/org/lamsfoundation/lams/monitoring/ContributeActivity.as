@@ -70,7 +70,6 @@ class ContributeActivity extends Activity {
 	
 	
 	public function populateFromDTO(dto:Object, id:String){
-		trace('populating from dto...');
 		_activityID = dto.activityID;
 		_parentActivityID = dto.parentActivityID;
 		_activityTypeID = dto.activityTypeID;
@@ -92,6 +91,7 @@ class ContributeActivity extends Activity {
 				_contributeEntries.push(ca);
 			}
 		}
+		
 		_title = dto.title;
 		_description = dto.description;
 		_taskURL = dto.URL + '&contentFolderID=' + id;

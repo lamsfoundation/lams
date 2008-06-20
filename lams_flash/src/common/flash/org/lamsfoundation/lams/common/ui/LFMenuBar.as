@@ -23,10 +23,10 @@
 import org.lamsfoundation.lams.common.ApplicationParent;
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*
-//import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.ws.Workspace
+
 import mx.controls.*
 import mx.utils.*
 
@@ -96,7 +96,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         
         //Register for theme changed events and set Initial style
         tm.addEventListener('themeChanged',this);
-        //setStyles();
+		
         //Broadcast event
         dispatchEvent({type:'load',target:this});
 		this.tabChildren = true;
@@ -120,7 +120,6 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 		
 		setVisible(!isLocked);
 		
-		//trace("Called From: "+env)
 		if (env != "Monitoring"){
 			
 		/*=================
@@ -128,9 +127,6 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         =================*/
         file_menu = _mb.addMenu(Dictionary.getValue('mnu_file'));
         
-        // "new" is the linkage id of the movie clip to be used as the icon for the "New" menu item.
-        //file_menu.addMenuItem({label:"New", instanceName:"newInstance", icon:"new"});
-        //_global.breakpoint();
         if(layout != ApplicationParent.EDIT_MODE) {
 			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_new'), instanceName:"newItem"});
 			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_open'), instanceName:"openItem"});
@@ -164,9 +160,6 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         =================*/
         edit_menu = _mb.addMenu(Dictionary.getValue("mnu_edit"));
         
-        // "new" is the linkage id of the movie clip to be used as the icon for the "New" menu item.
-        //file_menu.addMenuItem({label:"New", instanceName:"newInstance", icon:"new"});
-        //_global.breakpoint();
         edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_undo'), instanceName:"undoItem"});
         edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_redo'), instanceName:"redoItem"});
         edit_menu.addMenuItem({type:"separator"});
@@ -465,7 +458,6 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 	}
 	
 	public function setDefaults():Void{
-		//file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(0), true);
 		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(1), false);
 		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(2), false);
 		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(3), false);

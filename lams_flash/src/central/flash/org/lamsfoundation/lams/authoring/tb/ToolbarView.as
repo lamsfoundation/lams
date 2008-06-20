@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.dict.*
 import mx.managers.*
 import mx.controls.*
+
 /*
 * Authoring view for the toolbar
 */
@@ -118,8 +119,6 @@ class ToolbarView extends AbstractView {
 	}
 	
 	public function showHideFlowAssets(v:Boolean){
-		//showHideOptAssets(false);
-		
 		gate_btn.visible = v;
 		branch_btn.visible = v;
 		flow_bkg_pnl.visible = v;
@@ -129,8 +128,6 @@ class ToolbarView extends AbstractView {
 	}
 	
 	public function showHideOptAssets(v:Boolean){
-		//showHideFlowAssets(false);
-		
 		optional_act_btn.visible = v;
 		optional_seq_btn.visible = v;
 		optional_bkg_pnl.visible = v;

@@ -21,11 +21,10 @@
  * ************************************************************************
  */
 
-import org.lamsfoundation.lams.common.*;
-import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.ls.*;
-//import org.lamsfoundation.lams.learner.ls.*;
+
+import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*;
@@ -52,6 +51,7 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 	private var lsns_Archive:MovieClip;
 	private var lsns_Disabled:MovieClip;
 	private var lsViewExist:Boolean 
+	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -73,7 +73,6 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 		//Invoke superconstructor, which sets up MVC relationships.
 		super (m, c);
 		lsViewExist = false;
-		trace('Initiating lesson view...');
 		this.onEnterFrame = createLessons;
 	}
 	
@@ -152,17 +151,17 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 			lsns_Active.addEventListener("cellPress",lvc);
 			lsViewExist = true;
 		}
+		
 		lsns_Active.removeAll(); 
 		lsns_Archive.removeAll();
 		lsns_Disabled.removeAll();
+		
 		//loop through the sequences
 		var keys:Array = mySeqs.keys();
-		trace("Length of Keys: "+keys.length)
+		
 		for(var i=0; i<keys.length; i++){
 			
-			//trace('attaching lesson movie for id: ' + keys[i]);
 			var learningSeq:Object = mySeqs.get(keys[i]);
-			
 			var anObject= {Lesson:learningSeq.getSequenceName(), Started:learningSeq.getStartDateTime(), data:learningSeq.getSequenceID()};
 			
 			// Organize Sequences based on their StateID "7" for DISABLED, "6" for ARCHIVED and all the rest of them for ACTIVE.
@@ -179,14 +178,7 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
             }
 			
 		}
-		
-		
-		//lsns_Active.onRelease = Proxy.create(this,this['select']);
-		 //Now that view is setup dispatch loaded event
-       //dispatchEvent({type:'load',target:this});
-		
 	}
-	
 	
 	/**
 	*The currently selected Lesson
@@ -194,31 +186,19 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 	* @param   o   		The model object that is broadcasting an update.
 	*/
 	private function updateSelectedLesson(o:Observable):Void{
-
 		//get the model
 		var lm = LessonModel(o);
-		
-		//set the states of Lessons
-		//var l = lm.getLastSelectedLesson();
-		//l.setInactive();
-		//var c = lm.getSelectedLesson();
-		//c.setActive();
-		
-		
 	}
 	
-	 /**
+	/**
     * Sets the size of the Toolbar on stage, called from update
     */
 	private function setSize(lm:LessonModel):Void{
 		
         var s:Object = lm.getSize();
 		var p:Object = lm.getPosition();
-		//Size panel
-		trace('lesson view  setting width to '+s.w);
-		//bkg_pnl.setSize(s.w,bkg_pnl._width);
 		
-		       //Panel
+		//Panel
         bkg_pnl.setSize(bkg_pnl._width,s.h);
         
         //Calculate Accordion size
@@ -255,6 +235,7 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 		var l:Controller = super.getController();
 		return LessonController(l);
 	}
+	
     /**
     * Returns the default controller for this view (LessonController).
 	* Overrides AbstractView.defaultController()

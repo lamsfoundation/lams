@@ -69,9 +69,6 @@ class MovieLoader {
 		  MovieLoader.movieCache[_mcUrl] = loaded_mc;
 		  var myFn = Proxy.create(_scope,_fn,loaded_mc);
 		  myFn.call();
-		  //_fn.apply(_scope,[loaded_mc]);
-		  
-		  
 	  }
 	  
 	 public function onLoadError(loaded_mc:MovieClip,errorCode:String):Void{
@@ -92,7 +89,7 @@ class MovieLoader {
 	
 		
 	
-		//TODO: Add all the other handlers and methods to set n get them
+	//TODO: Add all the other handlers and methods to set n get them
 	
 
 

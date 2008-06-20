@@ -148,6 +148,7 @@ class ThemeManager {
     
     
     /**
+	* @deprecated
     * TODO: THIS IS ONLY USED FOR TESTING WHILST SERVER DOES NOT SUPPORT STRUCTURE
     * REMOVE WHEN NO LONGER REQUIRED
 	* //BASE STYLE OBJ not being used - see the node on getStyleObject
@@ -440,7 +441,6 @@ class ThemeManager {
     */
     public function broadcastThemeChanged(){
         dispatchEvent({type:'themeChanged',target:_instance});
-        trace('broadcast');
     }
     
     
@@ -457,8 +457,6 @@ class ThemeManager {
         //Get base style object theme + overwrite properties with ones in visual element for selected theme if found 
         var baseSO = _theme.baseStyleObject;
 		
-		
-
         //Get the correct visual element
         var visualElement:VisualElement = _theme.getVisualElement(visualElementId);
 		if(visualElement){
@@ -596,18 +594,11 @@ class ThemeManager {
 		}
 		
 		res += hex[I];
-		/* WARNING SECTION - Can be removed */
-		//warns if given dec was not integer
-		//dec was converted to integer
-		//if(this != Math.floor(this)){
-		//trace("Warning: Given number "+this+" was not integer.");
-		//trace(" Integer "+Math.floor(this)+" was used instead.");
-		//}
-		/* ENDS WARNING SECTION */
 		
 		return res;
-		}
-    /**
+	}
+    
+	/**
      * Converts style object to a data format that can be serialized
      * @param   so - an MX style object
      * @return  Object

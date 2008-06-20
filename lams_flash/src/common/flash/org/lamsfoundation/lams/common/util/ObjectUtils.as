@@ -31,9 +31,7 @@ import org.lamsfoundation.lams.common.comms.*
 * 
 */  
 class org.lamsfoundation.lams.common.util.ObjectUtils{
-	
 
-	
 	/**
 	* Recursively goes through and object and prints out property values
 	* @usage   printObject(_global);
@@ -43,9 +41,6 @@ class org.lamsfoundation.lams.common.util.ObjectUtils{
 	public static function printObject(target):String{  
 		var str:String = "";
 		for(var o in target){  
-			//trace('object:' + o  + ' value:' + target[o]);  
-			
-			
 			Debugger.log(o  + ':' + target[o],Debugger.GEN,'printObject','org.lamsfoundation.lams.common.util.ObjectUtils');
 			str += o  + ':' + target[o];
 			printObject(target[o]);  
@@ -63,10 +58,6 @@ class org.lamsfoundation.lams.common.util.ObjectUtils{
 	public static function toString(target):String{ 
 		var str:String = "";
 		for(var o in target){  
-			//trace('object:' + o  + ' value:' + target[o]);  
-			
-			
-			//Debugger.log(o  + ':' + target[o],Debugger.GEN,'printObject','org.lamsfoundation.lams.common.util.ObjectUtils');
 			str += '\n'+ o  + ':' + target[o];
 			toString(target[o]);  
 		}  
@@ -75,7 +66,7 @@ class org.lamsfoundation.lams.common.util.ObjectUtils{
 	
 	public static function deNull(obj:Object):Object{
 		Debugger.log('FOR:'+printObject(obj),Debugger.GEN,'deNull','org.lamsfoundation.lams.common.util.ObjectUtils');
-			//Removes null values in objects suitable for sending XML to the Java WDDX deserialiser
+		//Removes null values in objects suitable for sending XML to the Java WDDX deserialiser
 		
 		if (obj instanceof Array) {
 			for (var i = 0; i<obj.length; i++) {
@@ -100,8 +91,6 @@ class org.lamsfoundation.lams.common.util.ObjectUtils{
 	}
 	
 	private static function replaceNullValues(val){
-		//Debugger.log('Communication.STRING_NULL_VALUE:'+Communication.STRING_NULL_VALUE,Debugger.GEN,'deNull','org.lamsfoundation.lams.common.util.ObjectUtils');
-
 		switch(typeof(val)){
 			
 			case "string":
@@ -131,12 +120,7 @@ class org.lamsfoundation.lams.common.util.ObjectUtils{
 			default:
 				val = Config.STRING_NULL_VALUE;
 				return val;
-			
-						
-		
 		}
-		
 	}
-	
 	
 }

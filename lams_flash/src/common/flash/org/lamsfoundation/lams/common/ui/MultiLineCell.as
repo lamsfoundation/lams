@@ -31,8 +31,8 @@ import mx.controls.Label;
 class org.lamsfoundation.lams.common.ui.MultiLineCell extends mx.core.UIComponent
 {
 	var multiLineLabel; 
-	var owner; // row that contains the cell
-	var listOwner; // List that contains the cell
+	var owner; 		// row that contains the cell
+	var listOwner; 	// List that contains the cell
 
 	function MultiLineCell() {
 	}

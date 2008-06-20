@@ -37,13 +37,14 @@ import mx.events.*;
 import mx.utils.*;
 
 /**
-*Monitoring view for the Monitor
+* Monitoring ToDo tab view for the Monitor
 * Relects changes in the MonitorModel
 */
 
 class org.lamsfoundation.lams.monitoring.mv.tabviews.TodoTabView extends AbstractView{
 	public static var _tabID:Number = 3;
 	private var _className = "TodoTabView";
+	
 	//constants:
 	private var _tm:ThemeManager;
 	private var mm:MonitorModel;
@@ -56,7 +57,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.TodoTabView extends Abstrac
 	private var _monitorTodoTask_mc:MovieClip;
 	private var goContribute:Button;	
 	private var btnLabel:String;
-	// Background
+	
 	private var bkg_pnl:MovieClip;
 		
 	//Text Items
@@ -69,8 +70,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.TodoTabView extends Abstrac
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
     public var removeEventListener:Function;
-	//public var menu:ContextMenu;
-
 	
 	/**
 	* Constructor
@@ -78,9 +77,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.TodoTabView extends Abstrac
 	function TodoTabView(){
 		_todoTabView = this;
 		_monitorTodoTask_mc = this;
+		
 		this._visible = false;
+		
 		_tm = ThemeManager.getInstance();
-        //Init for event delegation
+        
+		//Init for event delegation
 		_dictionary = Dictionary.getInstance();
         mx.events.EventDispatcher.initialize(this);
 	}
@@ -94,11 +96,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.TodoTabView extends Abstrac
 	}    
 	
 	/**
- * Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
- * @usage   
- * @param   event
- */
-public function update (o:Observable,infoObj:Object):Void{
+	* Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
+	* @usage   
+	* @param   event
+	*/
+	public function update (o:Observable,infoObj:Object):Void{
 		
        mm = MonitorModel(o);
 	   
@@ -132,7 +134,6 @@ public function update (o:Observable,infoObj:Object):Void{
 	}
 	
 	private function hideMainExp(mm:MonitorModel):Void{
-		//var mcontroller = getController();
 		mm.broadcastViewUpdate("EXPORTSHOWHIDE", false)
 	}
 	
@@ -141,16 +142,10 @@ public function update (o:Observable,infoObj:Object):Void{
     */
 	private function draw(){
 		listCount = 0; 
-		//this.onEnterFrame = setupLabels;
-		//get the content path for the sp
-		//_monitorTodoTask_mc = reqTasks_scp.content;
 		_monitorController = getController();
-		//Debugger.log('_canvas_mc'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
-		trace("Loaded TodoTabView Data"+ this)
+		
 		populateLessonDetails();
 		
-		trace('seq id: ' + mm.getSequence().getSequenceID());
-		trace('last seq id: ' + mm.getLastSelectedSequence().getSequenceID());
 		if (mm.getSequence().getSequenceID() == mm.getLastSelectedSequence().getSequenceID()){
 			if(mm.getToDos() == null){
 				mm.getMonitor().getContributeActivities(mm.getSequence().getSequenceID());
@@ -168,14 +163,11 @@ public function update (o:Observable,infoObj:Object):Void{
 	
 	/**
 	 * Populate the lesson details from HashTable Sequence in MOnitorModel
-	*/
+	 */
 	private function populateLessonDetails():Void{
-		
 		var s:Object = mm.getSequence();
 		var desc:String = "<b>" + Dictionary.getValue('td_desc_heading') + "</b>" + Dictionary.getValue('td_desc_text');
-		genralInfo_txt.htmlText = desc;
-		
-		  
+		genralInfo_txt.htmlText = desc; 
 	}
 
 	private function populateContributeActivities():Void{
@@ -197,11 +189,10 @@ public function update (o:Observable,infoObj:Object):Void{
 	 * @param   ca ContributeActivity
 	 * @return  Array of isRequired entries
 	 */
-	
 	private function getEntries(ca:Object):Array{
 		var array:Array = new Array();
+		
 		for (var i=0; i<ca.childActivities.length; i++){
-			trace(ca.title+"'s Child Activity "+i+" is: "+ca.childActivities[i].title)
 			var tmp:Array = getEntries(ca.childActivities[i]);
 			if(tmp.length > 0){
 				var obj:Object = {}
@@ -209,18 +200,12 @@ public function update (o:Observable,infoObj:Object):Void{
 				obj.child= ca.childActivities[i];
 				array.push(obj);
 			}
-			
-			//var tmp:Array = getEntries(ca.childActivities[i]);
-			//drawIsRequiredChildTasks(ca, ca.childActivities[i], tmp);
-			//return null;
 		}
-		for (var j=0; j<ca.contributeEntries.length; j++){ 
-			trace("Contribute Entry for "+ca.title+" is: "+ca.contributeEntries[j].contributionType)
-			//if(ca.contributeEntries[j].isRequired){
-				// show isRequired entry
-				array.push(ca.contributeEntries[j]);
-			//}
+		
+		for (var j=0; j<ca.contributeEntries.length; j++){
+			array.push(ca.contributeEntries[j]);
 		}
+		
 		return array;
 	}
 	
@@ -233,8 +218,6 @@ public function update (o:Observable,infoObj:Object):Void{
 	 */
 	
 	private function drawTodoTasks(ca:Object, array:Array, x:Number):Void{
-		//var o:Object;
-		
 		if(array.length > 0){
 			// write ca title / details to screen with x position
 			todoTaskList[listCount] = _monitorTodoTask_mc.attachMovie("contributeActivityRow", "contributeActivityRow"+listCount, _monitorTodoTask_mc.getNextHighestDepth(), {_x:x, _y:YPOS+(19*listCount)})
@@ -257,24 +240,19 @@ public function update (o:Observable,infoObj:Object):Void{
 			
 			if(o instanceof ContributeActivity){
 				// normal CA entries
-				trace('write out entry with GO link'+o.taskURL);
-				trace('button label is: '+btnLabel);
 				todoTaskList[listCount] =_monitorTodoTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow"+listCount, this._monitorTodoTask_mc.getNextHighestDepth(), {_x:x, _y:YPOS+(19*listCount), buttonLabel:btnLabel})
 				todoTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
 				todoTaskList[listCount].goContribute._x = this._width-50;
-				//todoTaskList[listCount].goContribute.label = 
+				
 				todoTaskList[listCount].goContribute.onRelease = function (){
-					trace("Contrybute Type is: "+o.taskURL);
 					JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 398, 570, true, true, false, false, false);
-					//getURL(String(o.taskURL), "_blank");
 				}
+				
 				todoTaskList[listCount].goContribute.setStyle("fontSize", "9"); 
 				listCount++
 			}else{
 				// child CA
-				trace('child entries length:' + o.entries.length)
 				if(o.entries.length > 0){
-					trace('now drawing child');
 					// write child ca title (indented - x + 10 position)
 					drawTodoTasks(o.child, o.entries, x);
 				}
@@ -310,7 +288,6 @@ public function update (o:Observable,infoObj:Object):Void{
     */
 	private function setPosition(mm:MonitorModel):Void{
         var p:Object = mm.getPosition();
-		trace("X pos set in Model is: "+p.x+" and Y pos set in Model is "+p.y)
 		for (var i=0; i<todoTaskList.length; i++){
 			todoTaskList[i].goContribute._x = _monitorTodoTask_mc._width-50;
 		}	}
@@ -325,7 +302,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		return MonitorController(c);
 	}
 	
-	 /*
+	/**
     * Returns the default controller for this view.
     */
     public function defaultController (model:Observable):Controller {

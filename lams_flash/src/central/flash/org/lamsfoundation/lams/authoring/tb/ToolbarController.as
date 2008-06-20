@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.authoring.*
 * Makes changes to the Canvas Authoring model's data based on user input.
 */
 class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractController {
+	
 	/**
 	* Constructor
 	*

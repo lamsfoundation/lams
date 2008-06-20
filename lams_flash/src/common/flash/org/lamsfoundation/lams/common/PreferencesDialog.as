@@ -40,25 +40,25 @@ import org.lamsfoundation.lams.authoring.*
 class PreferencesDialog extends MovieClip implements Dialog{
 
     //References to components + clips 
-    private var _container:MovieClip;  //The container window that holds the dialog
-    private var cfg:Config;            //local config reference
+    private var _container:MovieClip;  		//The container window that holds the dialog
+    private var cfg:Config;            			//local config reference
     
-    private var ok_btn:Button;         //OK+Cancel buttons
+    private var ok_btn:Button;         		//OK+Cancel buttons
     private var cancel_btn:Button;
     
-    private var panel:MovieClip;       //The underlaying panel base
+    private var panel:MovieClip;       		//The underlaying panel base
     
-    private var lang_cb:ComboBox;    //Theme + language labels
+    private var lang_cb:ComboBox;    			//Theme + language labels
     private var theme_cb:ComboBox;    
     
-    private var lang_lbl:Label;        //Theme + language labels
+    private var lang_lbl:Label;        		//Theme + language labels
     private var theme_lbl:Label;
     
     
-    private var fm:FocusManager;            //Reference to focus manager
-    private var themeManager:ThemeManager;  //Theme manager
+    private var fm:FocusManager;            	//Reference to focus manager
+    private var themeManager:ThemeManager;  	//Theme manager
     
-    private var currentLanguage:String;     //Language and theme settings for current and new 
+    private var currentLanguage:String;     	//Language and theme settings for current and new 
     private var newLanguage:String;
 
     private var currentTheme:String;
@@ -83,7 +83,7 @@ class PreferencesDialog extends MovieClip implements Dialog{
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
 
-        //set up local confi reference
+        //set up local config reference
         cfg = Config.getInstance();
         
         //Create a clip that will wait a frame before dispatching init to give components time to setup
@@ -120,7 +120,8 @@ class PreferencesDialog extends MovieClip implements Dialog{
         //Add event listeners for ok, cancel and close buttons
         ok_btn.addEventListener('click',Delegate.create(this, ok));
         cancel_btn.addEventListener('click',Delegate.create(this, cancel));
-        //Assign Click (close button) and resize handlers
+        
+		//Assign Click (close button) and resize handlers
         _container.addEventListener('click',this);
         _container.addEventListener('size',this);
         
@@ -138,34 +139,39 @@ class PreferencesDialog extends MovieClip implements Dialog{
         //Languages is an array containing objects with label and data properties
         var languages = cfg.getItem('languages');
         lang_cb.dataProvider = languages;
-        //Select current language
+        
+		//Select current language
         var language = cfg.getItem('language');
-        //Go through all options to find current language index and select it in combo
+        
+		//Go through all options to find current language index and select it in combo
         for(var i=0;i<lang_cb.length;i++){
             if(lang_cb.getItemAt(i).data == language){
                 lang_cb.selectedIndex = i;
                 break;
             }
         }
-        //Set up event handler
+        
+		//Set up event handler
         lang_cb.addEventListener('change',Delegate.create(this,languageSelectionChanged));
         
         //THEMES
         var themes = cfg.getItem('themes');
         theme_cb.dataProvider = themes;
-        //Select current theme
+        
+		//Select current theme
         var theme = cfg.getItem('theme');
-        //Go through all options to find current language index and select it in combo
+        
+		//Go through all options to find current language index and select it in combo
         for(var i=0;i<theme_cb.length;i++){
             if(theme_cb.getItemAt(i).data == theme){
                 theme_cb.selectedIndex = i;
                 break;
             }
         }
-        //Set up event handler
+        
+		//Set up event handler
         theme_cb.addEventListener('change',Delegate.create(this,themeSelectionChanged));
     }
-    
     
     /**
     * Event fired when theme combo box has been used to change the theme selection
@@ -174,7 +180,6 @@ class PreferencesDialog extends MovieClip implements Dialog{
     private function themeSelectionChanged(evt:Object) {
         //Verify event type
         if(evt.type == 'change'){
-            trace("Value changed to " + evt.target.value);
             //Store selected language
             newTheme = evt.target.value;
         } else {
@@ -190,7 +195,6 @@ class PreferencesDialog extends MovieClip implements Dialog{
     private function languageSelectionChanged(evt:Object) {
         //Verify event type
         if(evt.type == 'change'){
-            trace("Value changed to " + evt.target.value);
             //Store selected language
             newLanguage = evt.target.value;
         } else {
@@ -239,7 +243,6 @@ class PreferencesDialog extends MovieClip implements Dialog{
     * Called by the cancel button 
     */
     private function cancel(){
-        trace('Cancel');
         //close parent window
         _container.deletePopUp();
     }
@@ -265,7 +268,8 @@ class PreferencesDialog extends MovieClip implements Dialog{
             //Save the change to the config class
             validateOk = cfg.setItem('theme',newTheme);
             validateOk = cfg.saveItem('theme');
-            //Load the new theme and then broadcast change
+            
+			//Load the new theme and then broadcast change
             themeManager.loadTheme(newTheme);
             themeManager.broadcastThemeChanged();
         }

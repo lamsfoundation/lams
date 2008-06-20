@@ -680,8 +680,6 @@ class PropertyInspector extends PropertyInspectorControls {
 				mins_stp.value = 0;
 			}
 		}
-		
-		//TODO: set the stepper values too!
 	
 	}
 	
@@ -691,7 +689,6 @@ class PropertyInspector extends PropertyInspectorControls {
 		//loop through combo to find SI of our branching activity type
 		for (var i=0; i<branchType_cmb.dataProvider.length;i++){
 			if(_canvasModel.selectedItem.activity.activityTypeID == branchType_cmb.dataProvider[i].data){
-				
 				branchType_cmb.selectedIndex=i;
 			}
 		}
@@ -703,9 +700,6 @@ class PropertyInspector extends PropertyInspectorControls {
 		if(_canvasModel.selectedItem.activity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE) {
 			showAppliedGroupingControls(true, !ba.readOnly);
 			showGroupBasedBranchingControls(true, !ba.readOnly);
-			
-			Debugger.log("defineLater: " + ba.defineLater, Debugger.CRITICAL, "showBranchingActivityProperties", "PropertyInspector");
-			//_define_monitor_cb.selected = (ba.defineLater != null) ? ba.defineLater : false;
 		} else if(_canvasModel.selectedItem.activity.activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) {
 			if(toolActs_cmb.selectedIndex == 0) {
 				_canvasModel.selectedItem.activity.toolActivityUIID = null;
@@ -715,10 +709,7 @@ class PropertyInspector extends PropertyInspectorControls {
 	
 	}
 	
-	private function showTransitionProperties(t:Transition){
-		//TODO: show from act and to act
-		
-	}
+	private function showTransitionProperties(t:Transition){}
 	
 	private function showBranchControls(v:Boolean):Void {
 		_pi_defaultBranch_cb.visible = v;
@@ -744,6 +735,7 @@ class PropertyInspector extends PropertyInspectorControls {
 	 * if you click the edit button, the the activity is selected, 
 	 * and therefore the Grouping obeject properties 
 	 * are shown in the PropertyInspector.
+	 * 
 	 * @usage   
 	 * @param   a The selected Activity
 	 * @return  
@@ -759,6 +751,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		var dp = appliedGroupingActivity_cmb.dataProvider;
 		Debugger.log('dp:'+dp.toString(),Debugger.GEN,'showAppliedGroupingProperties','PropertyInspector');
 		appliedGroupingActivity_cmb.selectedIndex = 0;
+		
 		for(var i=0; i<dp.length;i++){
 			
 			Debugger.log('dp[i].data.createGroupingID:'+dp[i].data.createGroupingID,Debugger.GEN,'showAppliedGroupingProperties','PropertyInspector');

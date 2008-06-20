@@ -21,20 +21,20 @@
  * ************************************************************************
  */
 
-//import org.lamsfoundation.lams.monitoring.*
-import org.lamsfoundation.lams.monitoring.ls.*      //Lessons
-import org.lamsfoundation.lams.authoring.cv.CanvasActivity    //Canvas Activity Used in Monitor Tab View 
+import org.lamsfoundation.lams.monitoring.ls.*      						//Lessons
+import org.lamsfoundation.lams.authoring.cv.CanvasActivity    				//Canvas Activity Used in Monitor Tab View 
 import org.lamsfoundation.lams.authoring.DesignDataModel
-import org.lamsfoundation.lams.monitoring.mv.* 	 //Monitor 
-import org.lamsfoundation.lams.monitoring.layout.DefaultLayoutManager 	 //Monitor Layouts
-import org.lamsfoundation.lams.common.ws.*          //Workspace
-import org.lamsfoundation.lams.common.comms.*       //communications
-import org.lamsfoundation.lams.common.util.*        //Utils
-import org.lamsfoundation.lams.common.dict.*        //Dictionary
-import org.lamsfoundation.lams.common.ui.*          //User interface
-import org.lamsfoundation.lams.common.style.*       //Themes/Styles
-import org.lamsfoundation.lams.common.layout.*		// Layouts
-import org.lamsfoundation.lams.common.*             
+import org.lamsfoundation.lams.monitoring.mv.* 	 							//Monitor 
+import org.lamsfoundation.lams.monitoring.layout.DefaultLayoutManager 	 	//Monitor Layouts
+import org.lamsfoundation.lams.common.ws.*          						//Workspace
+import org.lamsfoundation.lams.common.comms.*       						//Communications
+import org.lamsfoundation.lams.common.util.*        						//Utils
+import org.lamsfoundation.lams.common.dict.*        						//Dictionary
+import org.lamsfoundation.lams.common.ui.*          						//User interface
+import org.lamsfoundation.lams.common.style.*       						//Themes/Styles
+import org.lamsfoundation.lams.common.layout.*								// Layouts
+import org.lamsfoundation.lams.common.* 
+
 import mx.managers.*
 import mx.utils.*
 
@@ -43,7 +43,6 @@ import mx.utils.*
 * @author   DI
 */
 class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
-	
 		
 	private static var SHOW_DEBUGGER:Boolean = false;
 	private static var MODULE:String = "monitoring";
@@ -61,11 +60,11 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     public static var WORKSPACE_W:Number = 300;
     public static var WORKSPACE_H:Number = 200;
     
-    public static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
+    public static var APP_ROOT_DEPTH:Number = 10; 	//depth of the application root
     public static var DIALOGUE_DEPTH:Number = 55;	//depth of the cursors
     public static var TOOLTIP_DEPTH:Number = 60;	//depth of the cursors
-    public static var CURSOR_DEPTH:Number = 40;   //depth of the cursors
-    public static var MENU_DEPTH:Number = 25;   //depth of the menu
+    public static var CURSOR_DEPTH:Number = 40;   	//depth of the cursors
+    public static var MENU_DEPTH:Number = 25;   	//depth of the menu
     public static var CCURSOR_DEPTH:Number = 101;
 
     public static var UI_LOAD_CHECK_INTERVAL:Number = 50;
@@ -111,7 +110,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	private var _DataLoadCheckIntervalID:Number;
 	
     // Data Elements
-    private var _sequenceLoaded:Boolean;             //Sequence(+Design) loaded flag
+    private var _sequenceLoaded:Boolean;             	//Sequence(+Design) loaded flag
 	
     //UI Elements
     private var _monitorLoaded:Boolean;
@@ -198,7 +197,6 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         _root.preloader.complete();
 		setupData();
 		checkDataLoaded();
-		
     }
     
     /**
@@ -211,8 +209,6 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         _dictionary = Dictionary.getInstance();
         _dictionary.addEventListener('load',Delegate.create(this,onDictionaryLoad));
 		_dictionary.load(language);
-        
-		
 		
         //Set reference to StyleManager and load Themes and setup load handler.
         var theme:String = String(_config.getItem('theme'));
@@ -323,15 +319,12 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 			_uiLoadCheckCount++;
             //If all events dispatched clear interval and call start()
             if(_UILoaded && _dictionaryEventDispatched && _themeEventDispatched){
-				//Debugger.log('Clearing Interval and calling start :',Debugger.CRITICAL,'checkUILoaded','Application');	
-                clearInterval(_UILoadCheckIntervalID);
+				clearInterval(_UILoadCheckIntervalID);
 				start();
             }else {
                 //If UI loaded check which events can be broadcast
                 if(_UILoaded){
-					//Debugger.log('ALL UI LOADED, waiting for all true to dispatch init events: _dictionaryLoaded:'+_dictionaryLoaded+'_themeLoaded:'+_themeLoaded ,Debugger.GEN,'checkUILoaded','Application');
-
-                    //If dictionary is loaded and event hasn't been dispatched - dispatch it
+					//If dictionary is loaded and event hasn't been dispatched - dispatch it
                     if(_dictionaryLoaded && !_dictionaryEventDispatched){
 						_dictionaryEventDispatched = true;
                         _dictionary.broadcastInit();
@@ -371,11 +364,9 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     * @param UIElementID:String - Identifier for the Element that was loaded
     */
     public function UIElementLoaded(evt:Object) {
-        //Debugger.log('UIElementLoaded: ' + evt.target.className,Debugger.GEN,'UIElementLoaded','Application');
         if(evt.type=='load'){
 
 			_layout.manager.addLayoutItem(new LFLayoutItem(evt.target.className, evt.target));
-			
 			_root.preloader.complete();
             
             //If all of them are loaded set UILoad accordingly
@@ -452,8 +443,6 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     * Receives events from the Stage resizing
     */
     public function onResize(){
-        //Debugger.log('onResize',Debugger.GEN,'main','org.lamsfoundation.lams.Application');
-
         //Get the stage width and height and call onResize for stage based objects
         var w:Number = Stage.width;
         var h:Number = Stage.height;
@@ -507,15 +496,12 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	
 	
 	public function cut():Void{
-		 //setClipboardData(_canvas.model.selectedItem);
 	}
 	
 	public function copy():Void{
-		 //setClipboardData(_canvas.model.selectedItem);
 	}
 	
 	public function paste():Void{
-		//_canvas.setPastedItem(getClipboardData());
 	}
 
     /**

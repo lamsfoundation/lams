@@ -33,9 +33,7 @@ import org.lamsfoundation.lams.common.util.*
  * @since   
  */
 class org.lamsfoundation.lams.common.util.Proxy {
-	
-	
-	
+
 	/**
 	 * Creates a function that executes in the scope passed in as target, 
 	 * not the scope it is actually executed in.  

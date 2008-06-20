@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.common.*;
+
 /*
 * User - singleton class representing a user (teacher, staff, learner)
 */
@@ -65,7 +66,6 @@ class User {
 		_firstName = userDTO.firstName;
 		_lastName = userDTO.lastName;
 		_userName = userDTO.login;
-		//setRoles(userDTO.roles);
 	}
 	
 	public function getDTO():Object{

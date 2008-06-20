@@ -243,26 +243,20 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 	private function setStyles():Void{
 		Debugger.log('Running....',Debugger.GEN,'setStyles','TemplateActivity');
 		var styleObj;
-		_taPanelStyle = _tm.getStyleObject('TAPanel');  //getAssociatedStyle()
+		_taPanelStyle = _tm.getStyleObject('TAPanel'); 
 		bkg_pnl.setStyle('styleName',_taPanelStyle);
 		styleObj = _tm.getStyleObject('label');
 		title_lbl.setStyle('styleName',styleObj);
-		
 	}
 	
-	/**  
+	/** 
+	* @depricated 
+	* 
 	* Gets this TemplateActivity's data
 	*/
 	public function get toolActivity():Object{
-		/*
-		//if we only have one element then return that cos it must be a single toolActiivity
-		if(_activities.length ==1){
-			return _mainActivity;
-		}else{
-			return new LFError("There is more than one item in the activities array, may be a complex activity - cant return a ToolActitiy","get toolActivity",this);
-		}
-		*/
 		Debugger.log('This function is deprecated, use mainActivity instead',Debugger.MED,'getToolActivity','TemplateActivity');
+		
 		return _mainActivity;
 		
 	}

@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.learner.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import mx.managers.*
 import mx.utils.*
+
 /**
 * Application - LAMS Learner Application
 * @author   Mitchell Seaton
@@ -38,7 +39,6 @@ import mx.utils.*
 class Application extends ApplicationParent {
 	
 	// private constants
-	//private var _comms:Communication;
 	private var _lesson:Lesson;
 	private var _header_mc:MovieClip;
 	private var _scratchpad_mc:MovieClip;
@@ -149,7 +149,6 @@ class Application extends ApplicationParent {
         
 		setupData();
 		checkDataLoaded();
-		
 	}
 	
 	/**
@@ -174,7 +173,7 @@ class Application extends ApplicationParent {
 		
     }
 	
-		/**
+	/**
 	* Periodically checks if data has been loaded
 	*/
 	private function checkDataLoaded() {

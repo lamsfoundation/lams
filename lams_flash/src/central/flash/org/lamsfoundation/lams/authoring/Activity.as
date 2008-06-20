@@ -31,17 +31,28 @@ import org.lamsfoundation.lams.common.util.*
 *Activity Data storage class. USed as a base class for extending to be Tool, Gate and Complex
 * <pre><code>
 * 
-* * static final variables indicating the type of activities
-* 	/******************************************************************
+/**
+	 * static final variables indicating the type of activities
+	 * available for a LearningDesign 
+	******************************************************************
 	public static var TOOL_ACTIVITY_TYPE:Number = 1;
 	public static var GROUPING_ACTIVITY_TYPE:Number = 2;
+	public static var NO_GATE_ACTIVITY_TYPE:Number = 30
 	public static var SYNCH_GATE_ACTIVITY_TYPE:Number = 3;
 	public static var SCHEDULE_GATE_ACTIVITY_TYPE:Number = 4;
 	public static var PERMISSION_GATE_ACTIVITY_TYPE:Number = 5;
 	public static var PARALLEL_ACTIVITY_TYPE:Number = 6;
 	public static var OPTIONAL_ACTIVITY_TYPE:Number = 7;
 	public static var SEQUENCE_ACTIVITY_TYPE:Number = 8;
-
+	public static var SYSTEM_GATE_ACTIVITY_TYPE:Number = 9;
+	public static var CHOSEN_BRANCHING_ACTIVITY_TYPE:Number = 10;
+	public static var GROUP_BRANCHING_ACTIVITY_TYPE:Number = 11;
+	public static var TOOL_BRANCHING_ACTIVITY_TYPE:Number = 12;
+	public static var OPTIONS_WITH_SEQUENCES_TYPE:Number = 13; 
+	
+	/******************************************************************
+	
+	/**
 	* static final variables indicating the the category of activities
     *******************************************************************
 	public static var CATEGORY_SYSTEM:Number = 1;
@@ -61,13 +72,12 @@ import org.lamsfoundation.lams.common.util.*
 	/******************************************************************
 
 * </code></pre>
+* 
 * @author      DC
-* @version     0.1  
+* @version     2.1
 */
 class org.lamsfoundation.lams.authoring.Activity {
-	
-	
-	
+		
 	/*
 	//---------------------------------------------------------------------
     // Class Level Constants
@@ -128,7 +138,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	private var _activityUIID:Number;			//*
 
 	private var _learningLibraryID:Number;		//*
-	//TODO: This will be removed by mai this week.
+	
 	private var _learningDesignID:Number;			
 	private var _libraryActivityID:Number;		
 
@@ -153,11 +163,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 	private var _activityToolContentID:Number;
 
 	private var _runOffline:Boolean;
-	/*
-	* these have now been removed, set in the tool content instead
-	private var _offlineInstructions:String;
-	private var _onlineInstructions:String;
-	*/
 	private var _defineLater:Boolean;
 	private var _createDateTime:Date;
 
@@ -170,16 +175,12 @@ class org.lamsfoundation.lams.authoring.Activity {
 
 	private var _branchView:CanvasBranchView;
      
-    //Constructor
-	 /**
+	/**
+	 * Constructor
+	 * 
 	 * Creates an activity with the minimum of fields. 
 	 * 
-	 * @param   learningActivityTypeId 
-	 * @param   learningLibraryId      
-	 * @param   toolId                 
-	 * @param   toolContentId          
-	 * @param   helpText               
-	 * @param   libraryActivityUIImage  
+	 * @param   activityUIID
 	 */
     function Activity(activityUIID:Number){
         Debugger.log('activityUIID:'+activityUIID,Debugger.GEN,'constructor','Activity');
@@ -198,6 +199,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	}
 	
 	//static class level methods
+	
 	/**
 	 * Created an array of activity types to be can be used as a dataprovider
 	 * @usage   
@@ -226,7 +228,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 	
 	
 	//helper methods
-	
 	
 	public function isGateActivity():Boolean{
 		if (_activityTypeID == SYNCH_GATE_ACTIVITY_TYPE){
@@ -305,7 +306,9 @@ class org.lamsfoundation.lams.authoring.Activity {
 			_defineLater = dto.defineLater;
 			_createDateTime = dto.createDateTime;
 			_groupingSupportType = dto.groupingSupportType;
-</pre></code>
+			_readOnly = dto.readOnly;
+			_stopAfterActivity = dto.stopAfterActivity;
+		</pre></code>
 	 * 
 	 * 
 	 * @usage   
@@ -350,8 +353,8 @@ class org.lamsfoundation.lams.authoring.Activity {
 	
 	public function toData(){
 		var dto:Object = new Object();
-		//DC - Changed mode of toData to be ommiting fields with undefined values
 		
+		//DC - Changed mode of toData to be omiting fields with undefined values
 		if(_activityTypeID){		dto.activityTypeID 		= _activityTypeID;			}
 		if(_activityID){			dto.activityID			= _activityID;				}
 		if(_activityCategoryID){	dto.activityCategoryID	= _activityCategoryID;		}
@@ -372,7 +375,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 		dto.parentUIID = (_parentUIID==null) ? Config.NUMERIC_NULL_VALUE : _parentUIID;
 		dto.parentActivityID = (_parentActivityID==null) ? Config.NUMERIC_NULL_VALUE : _parentActivityID;
 		
-		//bnools need to be included - so do as follows:
+		//bools need to be included - so do as follows:
 		dto.applyGrouping = (_applyGrouping==null) ? false : _applyGrouping;
 		dto.runOffline = (_runOffline==null) ? false : _runOffline;
 		
@@ -383,7 +386,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 				dto.defineLater = false;
 		else
 			dto.defineLater = (_defineLater==null) ? false : _defineLater;
-		
 		
 		if(_createDateTime){		dto.createDateTime		= _createDateTime;			}
 		if(_groupingSupportType){	dto.groupingSupportType = _groupingSupportType;		}
@@ -402,7 +404,8 @@ class org.lamsfoundation.lams.authoring.Activity {
 		return n;
 	}
 	
-	//getters and setters:
+	//getters and setters
+	
 	public function set objectType(a:String):Void{
 		_objectType = a;
 	}

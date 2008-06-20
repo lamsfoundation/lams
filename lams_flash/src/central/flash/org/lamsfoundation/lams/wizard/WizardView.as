@@ -386,9 +386,10 @@ class WizardView extends AbstractView {
 		start_btn._x = panel._width - start_btn._width - X_BUTTON_OFFSET;
 		close_btn._x = panel._width - close_btn._width - X_BUTTON_OFFSET;
 		
-		finish_btn._x = 10; // panel._width - finish_btn._width - X_BUTTON_OFFSET;
+		finish_btn._x = 10;
 		
 		Debugger.log("visible: "+ _wizardLessonView.getScheduleBtn().visible, Debugger.CRITICAL, "positionButtons", "WizardView");
+		
 		if(_wizardLessonView.getScheduleBtn().visible) {
 			button = _wizardLessonView.getScheduleBtn();
 			RET_OFFSET = _wizardLessonView._x;

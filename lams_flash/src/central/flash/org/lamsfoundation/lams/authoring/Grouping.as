@@ -52,7 +52,9 @@ class org.lamsfoundation.lams.authoring.Grouping {
 		
 		Debugger.log('Created a new Grouping:'+_groupingUIID,Debugger.GEN,'Constructor','Grouping');
 	}
+	
 	//static class level methods
+	
 	/**
 	 * Created an array of grouping types to be can be used as a dataprovider
 	 * @usage   

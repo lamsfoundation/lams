@@ -78,7 +78,7 @@ class CanvasHelper {
 	private static var AUTOSAVE_CONFIG:String = "autosave";
 	private static var AUTOSAVE_TAG:String = "cv.ddm.autosave.user.";
    
-   private var _bin:MovieClip;	//bin
+   private var _bin:MovieClip;
 	
 	private var _target_mc:MovieClip;
 	

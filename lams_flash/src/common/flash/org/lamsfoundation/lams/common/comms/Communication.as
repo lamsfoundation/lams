@@ -49,30 +49,19 @@ class org.lamsfoundation.lams.common.comms.Communication {
     
     private var queue:Array;
     private var queueID:Number;
-	
-	//so compiler can see application when not in LAMS - but this overwrites the actual ref... need to think about this one
-	//TODO: Fix the above
-	//private var _app:Application;
-	//private var Application;
-    
-   
+
     /**
     * Comms constructor
     */
     function Communication(aServerURL:String){
-        trace('Communication.constructor');
-
-		//_app = Application.getInstance();
-
         //Set up queue
         queue=[];
         queueID=0;
         
         
         ignoreWhite = true;
-		//_global.breakpoint();
+		
 		if(_serverURL == null){
-			//_serverURL = Config.getInstance().serverUrl;
 			if(_root.serverURL!=null){
 				_serverURL = _root.serverURL;
 			}else if(aServerURL != null){
@@ -82,14 +71,9 @@ class org.lamsfoundation.lams.common.comms.Communication {
 			}
 			
 		}
-        
-        		//Debugger.log('_serverURL:'+_serverURL,4,'Consturcutor','Communication');
-        wddx = new Wddx();
+       
+	    wddx = new Wddx();
     }
-	
-	
-	
-	
     
     /**
     * Make a request to the server.  Each request handlers is added to a queue whilst waiting for the (asynchronous) response 
@@ -129,9 +113,6 @@ class org.lamsfoundation.lams.common.comms.Communication {
 			responseXML.load(_serverURL+requestURL);
 		}
     }
-    
-    
-    
   
     /**
 	* Sends a data object to the server and directs response to handler function.
@@ -145,26 +126,21 @@ class org.lamsfoundation.lams.common.comms.Communication {
 	* 
     */
     public function sendAndReceive(rawDto:Object, requestURL:String,handler:Function,isFullURL){
-        //denull the object first, stops the wddx processor on java side form barfing
-		
-		
-		//var dto:Object = ObjectUtils.deNull(rawDto);
-		
-		//Serialise the Data Transfer Object
+        //Serialise the Data Transfer Object
         var xmlToSend:XML = serializeObj(rawDto);
 		xmlToSend.ignoreWhite = ignoreWhite;
-		//xmlToSend.contentType="dave";
-        
+		
 		//Create XML response object 
         var responseXML = new XML();
 		 //Assign onLoad handler
         responseXML.onLoad = Proxy.create(this,onServerResponse,queueID);
 
         //Assign onLoad handler
-       // responseXML.onLoad = Proxy.create(this,onSendACK,queueID);
+        //responseXML.onLoad = Proxy.create(this,onSendACK,queueID);
         //Add handler to queue
         addToQueue(handler);        
-        //Assign onData function        
+        
+		//Assign onData function        
         setOnData(responseXML);
         
         //TODO DI 11/04/05 Stub here for now until we have server implmenting new WDDX structure
@@ -186,8 +162,8 @@ class org.lamsfoundation.lams.common.comms.Communication {
     * @param queueID:Number     ID of request handler on queue 
     */
     private function onServerResponse(success:Boolean,wrappedPacketXML:XML,queueID:Number){
-        //trace('XML loaded success:'+ success);
-		Debugger.log('xml recieved is:'+wrappedPacketXML.toString(),Debugger.VERBOSE,'onServerResponse','Communication');
+        Debugger.log('xml recieved is:'+wrappedPacketXML.toString(),Debugger.VERBOSE,'onServerResponse','Communication');
+		
 		//Load ok?
         if(success){
 		   var responseObj:Object = wddx.deserialize(wrappedPacketXML);
@@ -225,7 +201,6 @@ class org.lamsfoundation.lams.common.comms.Communication {
             Debugger.log("XML Load failed",Debugger.CRITICAL,'onServerResponse','Communication');
 			var e = new LFError("Communication with the server has failed. \nPlease check you are connected to the internet and/or LAMS server","onServerResponse",this,'Server URL:'+_serverURL);
 			e.showMessageConfirm();
-		
 		}
     }
     
@@ -249,11 +224,14 @@ class org.lamsfoundation.lams.common.comms.Communication {
     public function loadXML(requestURL:String,handler:Function,isFullURL:Boolean,deserialize:Boolean):Void{
         //Create XML response object 
         var responseXML = new XML();
-        //Assign onLoad handler
+        
+		//Assign onLoad handler
         responseXML.onLoad = Proxy.create(this,onXMLLoad,queueID,deserialize);
-        //Add handler to queue
+        
+		//Add handler to queue
         addToQueue(handler);        
-        //Assign onData function        
+        
+		//Assign onData function        
         setOnData(responseXML);
         
         //TODO DI 11/04/05 Stub here for now until we have server implmenting new WDDX structure
@@ -294,10 +272,8 @@ class org.lamsfoundation.lams.common.comms.Communication {
     private function setOnData(xmlObject:XML){
         //Set ondata handler to validate data returned in XML object
         xmlObject.onData = function(src){
-			//Debugger.log('src:'+src,Debugger.GEN,' xmlObject.onData ','Communication');		
-			//if(Application != null){
-				Cursor.showCursor(ApplicationParent.C_DEFAULT);
-           // }
+			Cursor.showCursor(ApplicationParent.C_DEFAULT);
+           
 			if (src != undefined) {
                 //Check for login page
                 if(src.indexOf("j_security_login_page") != -1){

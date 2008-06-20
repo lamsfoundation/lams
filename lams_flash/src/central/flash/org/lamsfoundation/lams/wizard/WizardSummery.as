@@ -36,8 +36,7 @@ import mx.controls.*
 /**  
 *  
 */  
-class WizardSummery extends MovieClip {  
-//class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip{  
+class WizardSummery extends MovieClip {
 	
 	//this is set by the init object
 	private var _wizardController:WizardController;
@@ -83,7 +82,6 @@ class WizardSummery extends MovieClip {
 		MovieClipUtils.doLater(Proxy.create(this,draw));
 
 	}
-	
 
 	/**
 	 * Does the work of laying out the screen assets.
@@ -97,7 +95,6 @@ class WizardSummery extends MovieClip {
 		setupStyles();
 		_visible = true;
 	}
-	
 	
 	/**
 	 * Get the CSSStyleDeclaration objects for each component and applies them
@@ -125,6 +122,5 @@ class WizardSummery extends MovieClip {
 		staff_lbl.text = Dictionary.getValue('summery_staff_lbl');
 		learners_lbl.text = Dictionary.getValue('summery_learners_lbl');
 	}
-    
 
 }

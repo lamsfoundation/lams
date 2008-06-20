@@ -83,11 +83,7 @@ class org.lamsfoundation.lams.common.ui.InputDialog extends MovieClip implements
         fm.enabled = true;
         input_txi.setFocus();
 		
-        // Set the text for buttons
-		// ok_btn.label = Dictionary.getValue('input_dlg_ok');
-		// cancel_btn.label = Dictionary.getValue('input_dlg_cancel');
 		// Fire contentLoaded event, this is required by all dialogs so that creator of LFWindow can know content loaded
-        
 		_container.contentLoaded();
         
 	}
@@ -188,12 +184,9 @@ class org.lamsfoundation.lams.common.ui.InputDialog extends MovieClip implements
     */
     public function setSize(w:Number,h:Number):Void{
         //Debugger.log('setSize',Debugger.GEN,'setSize','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-        //Size the panel
+        
+		//Size the panel
         panel.setSize(w,h);
-
-        //Buttons
-        //ok_btn.move(w-xOkOffset,h-yOkOffset);
-        //cancel_btn.move(w-xCancelOffset,h-yCancelOffset);
     }
     
     //Gets+Sets

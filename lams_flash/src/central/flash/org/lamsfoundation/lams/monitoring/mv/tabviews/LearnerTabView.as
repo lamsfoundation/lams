@@ -44,10 +44,9 @@ import mx.controls.*;
 
 
 /**
-*Monitoring Tab view for the Monitor
-* Reflects changes in the MonitorModel
+* Learner Tab View for the Monitor
+* Reflects progress data of the learner class.
 */
-
 class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends AbstractView {
 	
 	public static var _tabID:Number = 2;
@@ -250,9 +249,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			update(mm, evtArr[drawCount])
 			setSize(mm);
 		} else {
-			//setSize(mm);
 			activitiesDrawn = 0;
 			drawNextLearner();
+			
 			return;
 		}
 		
@@ -264,7 +263,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     */
 	private function draw(){
 		//set up the Movie Clips to load relevant  
-		
 		this._nameLayer_mc = this.createEmptyMovieClip("_nameLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 		this._activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 		
@@ -331,7 +329,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		if (mm.numIndexButtons > 1 && !panelLowered) {
 			if (hAdjustment) {
 				_scroll.setSize(s.w-_scroll._x, s.h - 20);
-				//_scroll.setSize(s.w-_scroll._x, s.h);
 				hAdjustment = false;
 			}
 			
@@ -525,7 +522,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
 			
 		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONS_WITH_SEQUENCES_TYPE || a.isBranchingActivity()){
-			//get the children
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerComplexActivity", _activityLayer_mc.getNextHighestDepth(),{_activity:a,_children:children,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
 			
@@ -611,8 +607,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     * Sets the size of the canvas on stage, called from update
     */
 	private function setSize(mm:MonitorModel):Void{
-		//var s:Object = mm.getSize(); // when taken from monitor model wasn't setting size properly with 1 learner
-		
 		if (mostRowActivities < activitiesDrawn)
 			mostRowActivities = activitiesDrawn;
 			
@@ -625,7 +619,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		}
 
 		bkg_pnl._visible = false;
-		bkg_pnl.setSize(_activityLayer_mc._width + 6, 0); // fixes scroll display issue though 0 height is questionable
+		bkg_pnl.setSize(_activityLayer_mc._width + 6, 0); 		// fixes scroll display issue though 0 height is questionable
 		
 		mm.getMonitor().getMV().getMonitorLearnerScp().redraw(true);
 }

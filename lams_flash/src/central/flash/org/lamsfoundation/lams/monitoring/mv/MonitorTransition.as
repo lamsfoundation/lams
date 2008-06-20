@@ -34,10 +34,7 @@ import org.lamsfoundation.lams.authoring.cv.*;
 /**  
 * -+ - 
 */  
-class org.lamsfoundation.lams.monitoring.mv.MonitorTransition extends MovieClip{  
-	//set by passing initObj to mc.createClass()
-	//private var _MonitorController:CanvasController;
-	//private var _monitorTabView:MonitorTabView;
+class org.lamsfoundation.lams.monitoring.mv.MonitorTransition extends MovieClip {
 	
 	private var _transition:Transition;
 	
@@ -47,17 +44,12 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorTransition extends MovieClip{
 	private var stopArrow_mc:MovieClip;
 	private var stopSign_mc:MovieClip;
 	
-	
 	private var _startPoint:Point;
 	private var _midPoint:Point;
 	private var _endPoint:Point;
 	
-	
-	
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
-	
-	
 	
 	function MonitorTransition(){
 		
@@ -86,8 +78,6 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorTransition extends MovieClip{
 	public function get midPoint():Point{
 		return _midPoint;
 	}
-	
-	
 	
 	/**
 	 * Renders the transition to stage
@@ -118,7 +108,6 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorTransition extends MovieClip{
 		this.lineStyle(2, _drawnLineStyle);
 		this.moveTo(_startPoint.x, _startPoint.y);
 		
-		//this.dashTo(startX, startY, endX, endY, 8, 4);
 		this.lineTo(_endPoint.x, _endPoint.y);
 		
 		// calculate the position and angle for the arrow_mc
@@ -131,9 +120,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorTransition extends MovieClip{
 		var angle:Number = Math.atan2((_endPoint.y- _startPoint.y),(_endPoint.x- _startPoint.x));
 		var degs:Number = Math.round(angle*180/Math.PI);
 		arrow_mc._rotation = degs;
-		arrow_mc._visible = true;
-		
+		arrow_mc._visible = true;		
 	}
-	
 
 }

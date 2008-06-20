@@ -46,6 +46,7 @@ class Wizard {
 	
 	// Model
 	private var wizardModel:WizardModel;
+	
 	// View
 	private var wizardView:WizardView;
 	private var wizardView_mc:MovieClip;
@@ -58,8 +59,6 @@ class Wizard {
     public var removeEventListener:Function;
 	
 	private var _onOKCallBack:Function;
-	
-	
 	
 	/**
 	 * Wizard Constructor Function
@@ -79,8 +78,6 @@ class Wizard {
 
 		//Create the view
 		wizardView_mc = target_mc.createChildAtDepth("wizardView",DepthManager.kTop);	
-		
-		trace(wizardView_mc);
 		
 		wizardView = WizardView(wizardView_mc);
 		wizardView.init(wizardModel,undefined);
@@ -104,7 +101,6 @@ class Wizard {
 	public function broadcastInit(){
 		dispatchEvent({type:'init',target:this});		
 	}
- 
 	
 	private function viewLoaded(evt:Object){
         Debugger.log('viewLoaded called',Debugger.GEN,'viewLoaded','Wizard');
@@ -145,7 +141,6 @@ class Wizard {
 		if(classID != undefined && courseID != undefined){
 			Application.getInstance().getComms().getRequest('workspace.do?method=getOrganisationsByUserRole&userID='+_root.userID+'&courseID='+courseID+'&classID='+classID+'&roles=MONITOR,COURSE MANAGER',callback, false);
 		}else if(courseID != undefined){
-			trace('course defined: doing request');
 			Application.getInstance().getComms().getRequest('workspace.do?method=getOrganisationsByUserRole&userID='+_root.userID+'&courseID='+courseID+'&roles=MONITOR,COURSE MANAGER',callback, false);
 		}else{
 			// TODO no course or class defined
@@ -153,20 +148,17 @@ class Wizard {
 	}
 	
 	private function showOrgTree(dto:Object):Void{
-		trace('organisations tree returned...');
-		trace('creating root node...');
 		// create root (dummy) node
-		
 		var odto = getDataObject(dto);
 		
 		wizardModel.initOrganisationTree();
 		var rootNode:XMLNode = wizardModel.treeDP.addTreeNode(odto.name, odto);
-		//rootNode.attributes.isBranch = true;
+		
 		wizardModel.setOrganisationResource(RT_ORG+'_'+odto.organisationID,rootNode);
+		
 		if(_root.classID != undefined){
 			// create tree xml branches
 			createXMLNodes(rootNode, dto.nodes);
-			
 			
 			wizardView.setUpOrgTree(true);
 		}else{
@@ -181,12 +173,8 @@ class Wizard {
 	
 	private function createXMLNodes(root:XMLNode, nodes:Array) {
 		for(var i=0; i<nodes.length; i++){
-			trace('creating child node...');
-			
 			var odto = getDataObject(nodes[i]);
 			var childNode:XMLNode = root.addTreeNode(odto.name, odto);
-			
-			trace('adding node with org ID: ' + odto.organisationID);
 			
 			if(nodes[i].nodes.length>0){
 				childNode.attributes.isBranch = true;
@@ -231,7 +219,6 @@ class Wizard {
 	 * @return  
 	 */
     private function openDesignById(workspaceResultDTO:Object){
-		trace('step 1 completed');
 		ObjectUtils.toString(workspaceResultDTO);
 		wizardModel.workspaceResultDTO = workspaceResultDTO;
 		//var designId:Number = workspaceResultDTO.selectedResourceID;
@@ -246,7 +233,6 @@ class Wizard {
 	
 	public function requestUsers(role:String, orgID:Number, callback:Function){
 		Application.getInstance().getComms().getRequest('workspace.do?method=getUsersFromOrganisationByRole&organisationID='+orgID+'&role='+role,callback, false);
-	
 	}
 	
 	/**
@@ -258,7 +244,6 @@ class Wizard {
 	 */
 	
 	public function initializeLesson(resultDTO:Object, callback:Function){
-		
 		var designId:Number = resultDTO.selectedResourceID;
 		var lessonName:String = resultDTO.resourceTitle;
 		var lessonDesc:String = resultDTO.resourceDescription;
@@ -274,7 +259,6 @@ class Wizard {
 	}
 	
 	public function startLesson(isScheduled:Boolean, lessonID:Number, datetime:String){
-		trace('starting lesson...');
 		var callback:Function = Proxy.create(this, onStartLesson);
 		
 		if(isScheduled){
@@ -285,13 +269,10 @@ class Wizard {
 	}
 	
 	private function onStartLesson(b:Boolean){
-		trace('receive back after lesson started..');
 		if(b){
-			trace('lesson started');
 			wizardModel.broadcastViewUpdate("LESSON_STARTED", WizardView.FINISH_MODE);
 		} else {
 			// error occured
-			trace('error occurred starting lesson');
 		}
 	}
 	
@@ -301,7 +282,6 @@ class Wizard {
 	 */
 	
 	public function createLessonClass():Void{
-		trace('creating lesson class...');
 		var dto:Object = wizardModel.getLessonClassData();
 		var callback:Function = Proxy.create(this,onCreateLessonClass);
 		
@@ -314,12 +294,9 @@ class Wizard {
 			r.showErrorAlert();
 		} else if(r) {
 			// lesson class created
-			trace('lesson class created');
-			trace('mode: ' + wizardModel.resultDTO.mode);
 			wizardModel.broadcastViewUpdate("SAVED_LC", wizardModel.resultDTO.mode);
 		} else {
 			// failed creating lesson class
-			trace('failed creating lesson class');
 		}
 	}
 
@@ -376,9 +353,11 @@ class Wizard {
     function get className():String { 
         return _className;
     }
+	
 	public function getWM():WizardModel{
 		return wizardModel;
 	}
+	
 	public function getWV():WizardView{
 		return wizardView;
 	}

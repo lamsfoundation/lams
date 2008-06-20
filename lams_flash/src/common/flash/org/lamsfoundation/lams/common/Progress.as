@@ -79,9 +79,6 @@ class Progress {
 	}
 	
 	public static function compareProgressData(learner:Progress, activityID:Number):String{
-		trace ("activity ID passed is: "+activityID)
-		trace("Number of Activities completed in the lesson are: "+learner.getCompletedActivities().length)
-		
 		var arrLearnerProgComp = learner.getCompletedActivities()
 		for (var i=0; i<arrLearnerProgComp.length; i++){
 			if (activityID == arrLearnerProgComp[i]){
@@ -92,9 +89,7 @@ class Progress {
 		}
 		
 		var arrLearnerProgAttempt = learner.getAttemptedActivities()
-		trace("Attempted activities are: "+arrLearnerProgAttempt.length)
 		for (var j=0; j<arrLearnerProgAttempt.length; j++){
-			trace("Activity Id Passed is "+activityID+" and attempted ID is "+arrLearnerProgAttempt[j])
 			if (activityID == arrLearnerProgAttempt[j]){
 				if (activityID == learner.getCurrentActivityId()){
 					var clipName:String = "current_mc";
@@ -106,7 +101,7 @@ class Progress {
 			}
 			
 		}
-		//arrLearnerProg = learner.getCurrentActivityId()
+		
 		if (activityID == learner.getCurrentActivityId()){
 			var clipName:String = "current_mc";
 			return clipName;

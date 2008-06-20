@@ -22,6 +22,7 @@
  */
 
 import org.lamsfoundation.lams.authoring.*;
+
 /*
 *
 * @author      DC
@@ -34,7 +35,6 @@ class GroupingActivity extends Activity{
 	private var _createGroupingID:Number;
 	private var _createGroupingUIID:Number;
 
-	
 	function GroupingActivity(activityUIID:Number){
 		super(activityUIID);
 		_activityTypeID = GROUPING_ACTIVITY_TYPE;
@@ -43,9 +43,8 @@ class GroupingActivity extends Activity{
 	}
 	
 	
-	
 	/**
-	 * Creates from a dto... which is nice
+	 * Creates from a dto
 	 * @usage   
 	 * @param   dto 
 	 * @return  
@@ -76,7 +75,6 @@ class GroupingActivity extends Activity{
 	 * @return  the copy
 	 */
 	public function clone():GroupingActivity{
-		// TODO: new grouping object
 		var dto:Object = toData();
 		var ga = new GroupingActivity();
 		ga.populateFromDTO(dto);
@@ -85,7 +83,6 @@ class GroupingActivity extends Activity{
 
 	
 	//get and sets
-	
 	
 	/**
 	 * 
@@ -96,6 +93,7 @@ class GroupingActivity extends Activity{
 	public function set createGroupingID (newcreateGroupingID:Number):Void {
 		_createGroupingID = newcreateGroupingID;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -104,7 +102,6 @@ class GroupingActivity extends Activity{
 	public function get createGroupingID ():Number {
 		return _createGroupingID;
 	}
-
 	
 	/**
 	 * 
@@ -123,10 +120,6 @@ class GroupingActivity extends Activity{
 	public function get createGroupingUIID ():Number {
 		return _createGroupingUIID;
 	}
-
-	
-	
-
 	
 }
 

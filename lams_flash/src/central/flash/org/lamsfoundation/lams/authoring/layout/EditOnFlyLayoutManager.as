@@ -117,14 +117,17 @@ class EditOnFlyLayoutManager extends LFLayoutManager {
 		//Canvas
         app.toolkit.setSize(app.toolkit.width, h-Application.TOOLKIT_Y);
 		app.canvas.setSize(w-app.toolkit.width, h-(Application.CANVAS_Y + app.canvas.model.getPIHeight()));
-       //Toolbar
+        
+		//Toolbar
         app.toolbar.setSize(w, Application.TOOLBAR_HEIGHT);
+		
 		//Property Inspector
 		app.pi.setSize(w-app.toolkit.width, app.pi._height)
 		app.pi._y = h - app.canvas.model.getPIHeight();
 		
 		var piHeight:Number = app.canvas.model.getPIHeight();
 		app.pi.showExpand(false)
+		
 		if (piHeight != app.pi.piFullHeight()){
 			app.pi.showExpand(true);
 		}

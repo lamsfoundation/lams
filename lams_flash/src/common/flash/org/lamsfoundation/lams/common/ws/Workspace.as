@@ -45,9 +45,9 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	
 	//Model
 	private var workspaceModel:WorkspaceModel;
+	
 	//View
 	private var workspaceView:WorkspaceView;
-
 	private var _onOKCallBack:Function;
 	
 
@@ -71,7 +71,6 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		//requestUserWorkspace();
 		workspaceModel.initWorkspaceTree();
 		requestAvailableLicenses();
-			
 	}
 	
 	/**
@@ -94,7 +93,6 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		Debugger.log('workspaceID:'+dto.workspaceID+',rootFolderID:'+dto.rootFolderID,Debugger.GEN,'recievedUserWorkspace','Workspace');			
 		workspaceModel.rootFolderID = dto.rootFolderID;
 		workspaceModel.workspaceID = dto.workspaceID;
-
 	}
 	
 	/**
@@ -110,8 +108,6 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		if(funcToCall != undefined || funcToCall != null){ callback = funcToCall; }
         var uid:Number = Config.getInstance().userID;
 		ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=getFolderContents&folderID='+folderID+'&mode='+Config.getInstance().mode+'&userID='+uid,callback, false);
-		//ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=getFolderContentsExcludeHome&folderID='+folderID+'&mode='+Config.getInstance().mode+'&userID='+uid,callback, false);
-		
 	}
 	
 	/**
@@ -193,7 +189,6 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		var fn:Function = Proxy.create(ref,requestDeleteResource,resourceID,resourceType,true);
 		fn.apply();
 	}
-	
 
 	public function requestNewFolder(parentFolderID:Number,folderName:String){
 		Debugger.log('parentFolderID:'+parentFolderID+', folderName'+folderName,Debugger.GEN,'requestNewFolder','Workspace');			
@@ -224,7 +219,6 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		
 		workspaceModel.clearWorkspaceCacheMultiple();
 
-		
 	}
 	
 	/**
@@ -250,6 +244,7 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 
 	}
 	 */
+	 
 	/**
 	 * Gets a list of available licenses to apply to the designs.  Mostly they are creative commons licenses
 	 * @usage   
@@ -271,8 +266,6 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		workspaceModel.setAvailableLicenses(dto);
 	}
 	
-	
-	
 	/**
 	 * Shows the workspace browsing dialoge to open a design
 	 * Usually used by the canvas.
@@ -280,7 +273,6 @@ class org.lamsfoundation.lams.common.ws.Workspace {
     */
     public function userSelectItem(callback, mode){
 		_onOKCallBack = callback;
-		//var fn:Function = Delegate.create(this,itemSelected);
 		workspaceModel.currentMode = (mode != null) ? mode : "OPEN";
 		workspaceModel.openDesignBySelection();
     }
@@ -362,7 +354,5 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	public function getWV():WorkspaceView{
 		return workspaceView;
 	}
-	
-	
 	
 }

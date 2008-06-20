@@ -30,8 +30,10 @@ import mx.managers.*;
 * The canvas is the main screen area of the LAMS application where activies are added and sequenced
 */
 class Toolbar {
+	
 	// Model
 	private var toolbarModel:ToolbarModel;
+	
 	// View
 	private var toolbarView:ToolbarView;
 	private var toolbarView_mc:MovieClip;
@@ -73,13 +75,11 @@ class Toolbar {
 		
 	}
     
-    
 	/**
 	* Used by application to set the size
 	* @param width The desired width
 	* @param height the desired height
 	*/
-	
 	public function setSize(width:Number, height:Number):Void{
 		toolbarModel.setSize(width, height);
 	}

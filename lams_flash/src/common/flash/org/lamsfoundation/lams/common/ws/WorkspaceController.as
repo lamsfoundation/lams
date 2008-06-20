@@ -48,9 +48,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		_workspaceModel = WorkspaceModel(wm);
 		_isBusy = false;
 	}
-   
-   
-   
 
 	/**
 	 * called when the dialog is loaded, calles methods to set up content in dialogue
@@ -241,50 +238,36 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			_workspaceModel.folderIDPendingRefresh = null;
 			_workspaceModel.folderIDPendingRefreshList = new Array(targetFolderID,sourceFolderID);
 			
-			//Debugger.log('SourceNode:\n'+ObjectUtils.toString(sourceNodeData),Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
-			//Debugger.log('TargetNode:\n'+ObjectUtils.toString(targetNodeData),Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
-			
 			//ok we are going to do a move:
 			if(isWritable){
 				_workspaceModel.getWorkspace().requestMoveResource(sourceNodeData.resourceID, targetFolderID, sourceNodeData.resourceType);
 			}else{
-				//show an alert();
 				LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);
+				
 				//we still have to refresh the folders as the DnD tree will be showing wrong info
 				_workspaceModel.clearWorkspaceCacheMultiple();
 			}
 		
 		}
 		
-		
-		
 	}
 	
-	
-	
-		/**
+	/**
 	 * Handles the events from the cut, copy, paste n delete buttons
 	 * @usage   
 	 * @param   e 
 	 * @return  
 	 */
 	public function fileOperationRequest(e:Object){
-		setBusy()
+		setBusy();
 		var tgt:String = new String(e.target);
 		var workspaceDialogue = getView().workspaceDialogue;
+		
 		Debugger.log('type:'+e.type+',target:'+tgt,Debugger.GEN,'fileOperationRequest','org.lamsfoundation.lams.WorkspaceController');
+		
 		//get the selected node:
 		var snode = workspaceDialogue.treeview.selectedNode;
 		
-		//Number(snode.attributes.data.resourceID);
-		//check target for button name
-		/* TODO: Add cut implementation, for now just scrap it :-)
-		if(tgt.indexOf("cut_btn") != -1){
-			_workspaceModel.setClipboardItem(snode,"CUT");
-			//TODO: Be nice to dim the branch in the tree
-			
-		}else 
-		*/
 		_global.breakpoint();
 		if(tgt.indexOf("copy_btn") != -1){
 			_workspaceModel.setClipboardItem(snode.attributes.data);
@@ -344,8 +327,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
 			
 			if(snodeData != null){
-				
-				
 				//check if we can write to this folder
 				if(_workspaceModel.isWritableResource(snodeData.resourceType,snodeData.resourceID)){
 					Dialog.createInputDialog(Dictionary.getValue('ws_newfolder_ins'), Dictionary.getValue('ws_newfolder_ok'), Dictionary.getValue('ws_newfolder_cancel'), Delegate.create(_workspaceController ,setNewFolderName),null);
@@ -361,9 +342,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			
 		}else if(tgt.indexOf("rename_btn") != -1){
 			//check we can rename a folder here
-			
 			if(isUserPrivateFolder(snode)) { LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);  clearBusy(); return; }
-			
 			
 			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
 			if(snodeData != null){
@@ -378,10 +357,8 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 				//nothing to rename
 			}
 			
-			//_workspaceModel.getWorkspace().requestCreateFolder();
-			
 		}
-		clearBusy()
+		clearBusy();
 		
 		//TODO: integrate with key listener for canvas!! CTRL-C is handels by the canvas at the mo... need to set somethign in application.#
 		
@@ -412,13 +389,16 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		var workspaceDialogue = getView().workspaceDialogue;
 		var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
 		var selectedFolderID:Number;
+		
 		//if its a folder then the resourceID is the selected folder ID, otherwise its the parent
 		if(snodeData.resourceType == _workspaceModel.RT_FOLDER){
 			selectedFolderID = snodeData.resourceID;
 		}else{
 			selectedFolderID = snodeData.workspaceFolderID;
 		}
+		
 		_workspaceModel.folderIDPendingRefresh = selectedFolderID;
+		
 		//TODO: Validate is allowed name
 		_workspaceModel.getWorkspace().requestNewFolder(selectedFolderID,newName);
 	}
@@ -429,7 +409,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 	 * @param   snode Node to check
 	 * @return  
 	 */
-	
 	private function isUserPrivateFolder(snode:XMLNode) {
 		if(_workspaceModel.getWorkspaceResource(_workspaceModel.RT_FOLDER + "_" + WorkspaceModel.ROOT_VFOLDER).firstChild == snode) {
 			return true;

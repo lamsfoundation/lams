@@ -20,6 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
+ 
 import org.lamsfoundation.lams.monitoring.Application;
 import org.lamsfoundation.lams.monitoring.Organisation;
 import org.lamsfoundation.lams.monitoring.User;
@@ -286,14 +287,10 @@ class Monitor {
 	}
 	
 	private function onStartLesson(b:Boolean){
-		trace('receive back after lesson started..');
 		if(b){
-			trace('lesson started');
 			loadLessonToMonitor(_root.lessonID);
-			
 		} else {
 			// error occured
-			trace('error occurred starting lesson');
 		}
 	}
 	
@@ -301,7 +298,6 @@ class Monitor {
 	 * Create LessonClass using wizard data and CreateLessonClass servlet
 	 * 
 	 */
-	
 	public function createLessonClass():Void{
 		var dto:Object = monitorModel.getLessonClassData();
 		var callback:Function = Proxy.create(this,onCreateLessonClass);
@@ -336,7 +332,6 @@ class Monitor {
 
 	public function requestUsers(role:String, orgID:Number, callback:Function){
 		Application.getInstance().getComms().getRequest('workspace.do?method=getUsersFromOrganisationByRole&organisationID='+orgID+'&role='+role,callback, false);
-	
 	}
 
 	/**
@@ -347,7 +342,6 @@ class Monitor {
 	 * @return  		Void
 	 */
 	public function openLearningDesign(seq:Sequence){
-		trace('opening learning design...'+ seq.learningDesignID);
 		var designID:Number  = seq.learningDesignID;
         var callback:Function = Proxy.create(this,saveDataDesignModel);
            
@@ -356,8 +350,6 @@ class Monitor {
 	}
 	
 	private function saveDataDesignModel(learningDesignDTO:Object){
-		trace('returning learning design...');
-		trace('saving model data...');
 		var seq:Sequence = Sequence(monitorModel.getSequence());
 		_ddm = new DesignDataModel();
 		
@@ -374,8 +366,7 @@ class Monitor {
 	}
 
 	public function getContributeActivities(seqID:Number):Void{
-		trace('getting all contribute activities for sequence: ' + seqID);
-        var callback:Function = Proxy.create(monitorModel,monitorModel.setToDos);
+		var callback:Function = Proxy.create(monitorModel,monitorModel.setToDos);
            
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAllContributeActivities&lessonID='+seqID,callback, false);
 		
@@ -388,18 +379,25 @@ class Monitor {
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAllLearnersProgress&lessonID=' + seqId, callback, false);
 	}
 	
-	public function getInitialLearnersProgress(seq:Object) { // Not used atm but leaving here in case we ever want to implement batch loading
+	/**
+	 * @deprecated
+	 * Not used atm but leaving here in case we ever want to implement batch loading
+	 */
+	public function getInitialLearnersProgress(seq:Object) {
 		var seqId:Number = seq.getSequenceID();
 		Debugger.log('getting initial progress data for Sequence: '+seqId, Debugger.CRITICAL, "getInitialLearnersProgress", "Monitor");
 		var callback:Function = Proxy.create(this, saveProgressData);	
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getInitialLearnersProgress&lessonID=' + seqId,callback, false);
 	}
 	
-	public function getAdditionalLearnersProgress(seq:Object) { // Not used atm but leaving here in case we ever want to implement batch loading
+	/**
+	 * @deprecated
+	 * Not used atm but leaving here in case we ever want to implement batch loading
+	 */
+	public function getAdditionalLearnersProgress(seq:Object) { 
 		var seqId:Number = seq.getSequenceID();
 		Debugger.log('getting additional progress data for Sequence: '+seqId, Debugger.CRITICAL, "getInitialLearnersProgress", "Monitor");
 		var callback:Function = Proxy.create(this, saveProgressData);
-		//Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAdditionalLearnersProgress&lessonID='+seqId+'&lastUserID='+learnerProgressList[learnersProgressList.length-1].userName,callback,false);
 	}
 	
 	private function saveProgressData(progressDTO:Object){
@@ -427,34 +425,34 @@ class Monitor {
 		
 		switch(String(taskType)){
 			case '1' :
-				seqStat = Dictionary.getValue("ls_seq_status_moderation"); // "Moderation"
+				seqStat = Dictionary.getValue("ls_seq_status_moderation"); 			// "Moderation"
 				break;
 			case '2' :
-				seqStat = Dictionary.getValue("ls_seq_status_define_later"); // "Define Later"
+				seqStat = Dictionary.getValue("ls_seq_status_define_later"); 		// "Define Later"
 				break;
 			case '3' :
-				seqStat = Dictionary.getValue("ls_seq_status_perm_gate"); // "Permission Gate"
+				seqStat = Dictionary.getValue("ls_seq_status_perm_gate"); 			// "Permission Gate"
 				break;
 			case '4' :
-				seqStat = Dictionary.getValue("ls_seq_status_synch_gate"); // "Syncronise Gate"
+				seqStat = Dictionary.getValue("ls_seq_status_synch_gate"); 			// "Syncronise Gate"
 				break;
 			case '5' :
-				seqStat = Dictionary.getValue("ls_seq_status_sched_gate"); // "Schedule Gate"
+				seqStat = Dictionary.getValue("ls_seq_status_sched_gate"); 			// "Schedule Gate"
 				break;
 			case '6' :
-				seqStat = Dictionary.getValue("ls_seq_status_choose_grouping"); // "Choose Grouping"
+				seqStat = Dictionary.getValue("ls_seq_status_choose_grouping"); 	// "Choose Grouping"
 				break;
 			case '7' :
-				seqStat = Dictionary.getValue("ls_seq_status_contribution"); // "Contribution"
+				seqStat = Dictionary.getValue("ls_seq_status_contribution"); 		// "Contribution"
 				break;
 			case '8' :
-				seqStat = Dictionary.getValue("ls_seq_status_system_gate"); // "System Gate"
+				seqStat = Dictionary.getValue("ls_seq_status_system_gate"); 		// "System Gate"
 				break;
 			case '9' :
-				seqStat = Dictionary.getValue("ls_seq_status_teacher_branching"); // "Teacher Chosen Branching"
+				seqStat = Dictionary.getValue("ls_seq_status_teacher_branching"); 	// "Teacher Chosen Branching"
 				break;
 			default:
-				seqStat = Dictionary.getValue("ls_seq_status_not_set"); // "Not yet set"
+				seqStat = Dictionary.getValue("ls_seq_status_not_set"); 			// "Not yet set"
 		}
 		
 		return seqStat;
@@ -469,20 +467,18 @@ class Monitor {
 	public function clearCanvas(noWarn:Boolean):Boolean{
 		var s = false;
 		var ref = this;
+		
 		Debugger.log('noWarn:'+noWarn,4,'clearCanvas','Monitor');
+		
 		if(noWarn){
 			
 			_ddm = new DesignDataModel();
-			//as its a new instance of the ddm,need to add the listener again
-			//_ddm.addEventListener('ddmUpdate',Proxy.create(this,onDDMUpdated));
 			
 			Debugger.log('noWarn2:'+noWarn,4,'clearCanvas','Monitor');//_ddm.addEventListener('ddmBeforeUpdate',Proxy.create(this,onDDMBeforeUpdate));
 			
 			monitorModel.setDirty();
 			return true;
 		}else{
-			//var fn:Function = Proxy.create(ref,confirmedClearDesign, ref);
-			//LFMessage.showMessageConfirm(Dictionary.getValue('new_confirm_msg'), fn,null);
 			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
 		}
 	}
@@ -641,11 +637,6 @@ class Monitor {
 		}
 		
 		Debugger.log("Check OK. Proceed with opening design.",Debugger.GEN,'setupEditOnFly','Monitor');
-		
-		//var loader_url = Config.getInstance().serverUrl + "lams_preloader.swf?loadFile=lams_authoring.swf&loadLibrary=lams_authoring_library.swf&serverURL=" + Config.getInstance().serverUrl + "&userID=" + _root.userID  + "&build=" + _root.build + "&lang=" + _root.lang + "&country=" + _root.country + "&langDate=" + _root.langDate + "&theme=" + _root.theme + "&uniqueID=undefined" + "&layout=" + ApplicationParent.EDIT_MODE + "&learningDesignID=" + monitorModel.getSequence().learningDesignID;
-		//Debugger.log("url: " + loader_url, Debugger.CRITICAL, 'openEditOnFly', 'MonitorView');
-		
-		//JsPopup.getInstance().launchPopupWindow(loader_url , 'AuthoringWindow', 570, 796, true, true, false, false, false);
 		
 		var designID:Number = monitorModel.getSequence().learningDesignID;
 		if(designID != null)

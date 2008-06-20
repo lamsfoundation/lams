@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.common.ui.Cursor;
 import org.lamsfoundation.lams.authoring.br.BranchConnector;
 import org.lamsfoundation.lams.common.*;
 import mx.events.*
+
 /*
 *
 * DesignDataModel stores all the data relating to the design
@@ -146,14 +147,17 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	*/
 	public function addActivity(activity:Activity):Object{
 		var success = false;
+		
 		//create an Activity from the template actvity.
 		Debugger.log('activity:'+activity.title+', UIID:'+activity.activityUIID,4,'addActivity','DesignDataModel');
 		
 		//validate the activity ?		
 		//validate if we can do it?
+		
 		//dispatch an event before the design has changed
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 		_activities.put(activity.activityUIID, activity);
+		
 		//pull it out to check it
 		var tmp:Activity = _activities.get(activity.activityUIID)
 		
@@ -162,6 +166,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		}else{
 			return new LFError("Adding activity failed","addActivity",this,'activityUIID:'+activity.activityUIID);
 		}
+		
 		//dispatch an event now the design has changed
 		dispatchEvent({type:'ddmUpdate',target:this});
 		
@@ -178,7 +183,6 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function removeActivity(activityUIID:Number):Object{
 		//dispatch an event to show the design has changed
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
-	
 		
 		var r:Object = _activities.remove(activityUIID);
 		if(r==null){
@@ -240,6 +244,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		dispatchEvent({type:'ddmUpdate',target:this});
 		
 		//TODO some validation would be nice
+		
 		return true;
 	}
 	
@@ -346,13 +351,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 		Debugger.log('groupingUIID:'+grp.groupingUIID,Debugger.GEN,'addGrouping','DesignDataModel');
 		var r = _groupings.put(grp.groupingUIID,grp);
-		/*
-		if(r){
-			return r;
-		}else{
-			return new LFError("Adding grouping to hashtable failed","addGrouping",this,'groupingUIID:'+grp.groupingUIID);
-		}
-		*/
+
 		dispatchEvent({type:'ddmUpdate',target:this});
 		
 		return true;
@@ -443,6 +442,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function setDesign(design:Object):Boolean{
 		//note the design must be empty to call this
 		//note: Dont fire the update event as we dont want to store this change in an undo!
+		
 		//TODO: Validate that the design is clear
 		var success:Boolean = false;
 		
@@ -505,7 +505,6 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			
 			} else if(dto.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || dto.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || dto.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE){
 				
-				//TODO: Test this!
 				var cAct:ComplexActivity= new ComplexActivity(dto.activityUIID);
 				cAct.populateFromDTO(dto);				
 				
@@ -513,7 +512,6 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 					
 			} else if(dto.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
 				
-				//TODO: Test this code when we are able to save and then open a design with grouping
 				var newGroupActivity:GroupingActivity = new GroupingActivity(dto.activityUIID);
 				newGroupActivity.populateFromDTO(dto);
 				
@@ -552,10 +550,11 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		//set the groupings in the hashtable
 		for(var i=0; i<design.groupings.length;i++){
-			//TODO: Test this when the server can save and open a design with groupings.
 			Debugger.log('Adding grouping UIID:'+design.groupings[i].groupingUIID,Debugger.GEN,'setDesign','DesignDataModel');
+			
 			var gdto = design.groupings[i];
 			var newGrouping:Grouping = new Grouping(gdto.groupingUIID);
+			
 			newGrouping.populateFromDTO(gdto);
 			_groupings.put(newGrouping.groupingUIID,newGrouping);
 		
@@ -705,40 +704,12 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 */
 	public function toData():Object{
 		var design:Object = new Object();
-		//if null, use default
 		
-		//TODO: get this sorted - query string
 		Debugger.log('1 UserID:'+_userID,Debugger.GEN,'toData','DesignDataModel');
-		
 		
 		if(_copyTypeID == undefined){
 			_copyTypeID = COPY_TYPE_ID_AUTHORING;
 		}
-		
-		/*
-		* //09-11-05: converted to not including nulls in the packet
-		design.objectType = (_objectType) ? _objectType : Config.STRING_NULL_VALUE;
-		design.copyTypeID = (_copyTypeID) ? _copyTypeID : Config.NUMERIC_NULL_VALUE;
-		design.learningDesignID = (_learningDesignID) ? _learningDesignID : Config.NUMERIC_NULL_VALUE;
-		design.title = _title ? _title : Config.STRING_NULL_VALUE;
-		design.description = (_description) ? _description : Config.STRING_NULL_VALUE;
-		design.helpText = (_helpText) ? _helpText : Config.STRING_NULL_VALUE;
-		design.version = (_version) ? _version : Config.STRING_NULL_VALUE;
-		design.userID = (_userID) ? _userID : Config.NUMERIC_NULL_VALUE;
-		design.duration = (_duration) ? _duration: Config.NUMERIC_NULL_VALUE;
-		design.readOnly = (_readOnly!=null) ? _readOnly : Config.BOOLEAN_NULL_VALUE;
-		design.validDesign = (_validDesign!=null) ? _validDesign : Config.BOOLEAN_NULL_VALUE;
-		design.maxID = (_maxID) ? _maxID : Config.NUMERIC_NULL_VALUE;
-		design.firstActivityID = (_firstActivityID) ? _firstActivityID : Config.NUMERIC_NULL_VALUE;
-		design.firstActivityUIID = (_firstActivityUIID) ? _firstActivityUIID : Config.NUMERIC_NULL_VALUE;
-		design.parentLearningDesignID= (_parentLearningDesignID) ? _parentLearningDesignID: Config.NUMERIC_NULL_VALUE;
-		design.licenseID= (_licenseID) ? _licenseID: Config.NUMERIC_NULL_VALUE;
-		design.licenseText= (_licenseText) ? _licenseText: Config.STRING_NULL_VALUE;
-		design.workspaceFolderID = (_workspaceFolderID) ? _workspaceFolderID : Config.NUMERIC_NULL_VALUE;
-		design.createDateTime = (_createDateTime) ? _createDateTime : Config.DATE_NULL_VALUE;
-		design.lastModifiedDateTime= (_lastModifiedDateTime) ? _lastModifiedDateTime: Config.DATE_NULL_VALUE;
-		design.dateReadOnly = (_dateReadOnly) ? _dateReadOnly: Config.DATE_NULL_VALUE;
-		*/
 		
 		//if the value is null, it is not included in the DTO
 		if(_copyTypeID == COPY_TYPE_ID_RUN && !_editOverrideLock){
@@ -754,8 +725,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		if(_userID){			design.userID			= _userID;				}
 		if(_editOverrideUserID){	design.editOverrideUserID = _editOverrideUserID;	}
 		if(_duration){			design.duration			= _duration;			}
-		//readOnly must be in the DTO, so if its null, then give a false
 		
+		//readOnly must be in the DTO, so if its null, then give a false
 		if(_copyTypeID == COPY_TYPE_ID_RUN && !_editOverrideLock){
 			design.readOnly = false;
 		} else {
@@ -771,7 +742,6 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		design.validDesign = (_validDesign==null) ? false : _validDesign;
 		
 		design.saveMode =  (_saveMode!=null) ? _saveMode : Config.NUMERIC_NULL_VALUE;
-		
 		
 		if(_maxID){				design.maxID			= _maxID;				}
 		if(_firstActivityID){	design.firstActivityID	= _firstActivityID;		}

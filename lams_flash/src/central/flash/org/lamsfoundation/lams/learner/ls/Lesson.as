@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.common.dict.Dictionary;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 
 import mx.managers.*;
+
 /**
 * Lesson - LAMS Application
 * @author   Mitchell Seaton
@@ -286,11 +287,6 @@ class Lesson {
 	}
 	
 	private function closeLesson(pkt:Object){
-		// set lesson as inactive
-		//lessonModel.setInactive();
-		
-		// deactivate Progress movie
-		
 		// load exit jsp
 		getURL(_root.serverURL + 'learning'+String(pkt), 'contentFrame');
 	}
@@ -373,6 +369,7 @@ class Lesson {
 	public function get view():LessonView{
 		return lessonView;
 	}
+	
 	/**
 	* Used by application to set the size
 	* @param width The desired width

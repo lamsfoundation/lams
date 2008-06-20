@@ -39,7 +39,7 @@ import mx.events.*;
 import mx.utils.*;
 
 /**  
-* CanvasActivity - 
+* CanvasSequenceActivity
 */  
 class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieClip implements ICanvasActivity{
   
@@ -292,17 +292,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSequenceActivity extends MovieC
 		icon_mc._x = (_visibleWidth / 2) - (icon_mc._width / 2);
 		icon_mc._y = (_visibleHeight / 2) - (icon_mc._height / 2);
 	}
-	
-	/**
-	 * Add + icon to indicate that more users are currently at the Activity. 
-	 * We are unable to display all the users across the Activity's panel.
-	 * 
-	 * @usage   
-	 * @param   target  The target reference, this class OR a parent
-	 * @param   x_pos  	The X position of the icon
-	 * @return  
-	 */
-
 	
 	/**
 	 * Does the work of laying out the screen assets.

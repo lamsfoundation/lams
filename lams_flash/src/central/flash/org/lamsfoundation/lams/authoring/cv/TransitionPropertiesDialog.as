@@ -46,8 +46,6 @@ class TransitionPropertiesDialog extends MovieClip{
 	private var gateType_lbl:Label;
 	private var section_lbl:Label;
 	
-	
-        
     private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
     
@@ -69,7 +67,6 @@ class TransitionPropertiesDialog extends MovieClip{
     * constructor
     */
     function TransitionPropertiesDialog(){
-        //trace('WorkSpaceDialog.constructor');
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
         
@@ -95,21 +92,16 @@ class TransitionPropertiesDialog extends MovieClip{
 		//populate the synch type combo:
 		gateType_cmb.dataProvider = Activity.getGateActivityTypes();
 		
-        /*
-		//get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
-        fm = _container.getFocusManager();
-        fm.enabled = true;
-        ok_btn.setFocus();
-        */
-        
         Debugger.log('ok_btn.tabIndex: '+ok_btn.tabIndex,Debugger.GEN,'init','org.lamsfoundation.lams.WorkspaceDialog');
         
         //Add event listeners for ok, cancel and close buttons
         ok_btn.addEventListener('click',Delegate.create(this, ok));
         cancel_btn.addEventListener('click',Delegate.create(this, cancel));
-        //Tie parent click event (generated on clicking close button) to this instance
+        
+		//Tie parent click event (generated on clicking close button) to this instance
         _container.addEventListener('click',this);
-        //Register for LFWindow size events
+        
+		//Register for LFWindow size events
         _container.addEventListener('size',this);
         
         Debugger.log('setting offsets',Debugger.GEN,'init','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
@@ -152,16 +144,12 @@ class TransitionPropertiesDialog extends MovieClip{
         //LFWindow, goes first to prevent being overwritten with inherited styles.
         var styleObj = themeManager.getStyleObject('LFWindow');
         _container.setStyle('styleName',styleObj);
-
-     
     }
 
     /**
     * Called by the cancel button 
     */
     private function cancel(){
-        trace('Cancel');
-        //close parent window
         _container.deletePopUp();
     }
     
@@ -169,7 +157,6 @@ class TransitionPropertiesDialog extends MovieClip{
     * Called by the OK button 
     */
     private function ok(){
-        trace('OK');
        //If validation successful commit + close parent window
 	   if (getSelectedGateType() == Activity.NO_GATE_ACTIVITY_TYPE){
 		   cancel()
@@ -177,13 +164,11 @@ class TransitionPropertiesDialog extends MovieClip{
 	   }else {
 		   //Fire callback with selectedId
 		   dispatchEvent({type:'okClicked',target:this,gate:getSelectedGateType()});
-       _container.deletePopUp();
+		   _container.deletePopUp();
 	   }
        
        
     }
-	
-	
     
     /**
     * Event dispatched by parent container when close button clicked
@@ -192,13 +177,10 @@ class TransitionPropertiesDialog extends MovieClip{
         e.target.deletePopUp();
     }
     
-   
-    
     /**
     * Main resize method, called by scrollpane container/parent
     */
     public function setSize(w:Number,h:Number){
-        //Debugger.log('setSize',Debugger.GEN,'setSize','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
         //Size the bkg_pnl
         bkg_pnl.setSize(w,h);
 

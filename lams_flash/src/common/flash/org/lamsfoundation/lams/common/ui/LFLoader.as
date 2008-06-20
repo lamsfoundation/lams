@@ -37,7 +37,6 @@ import mx.events.*
 class LFLoader extends MovieClip {
 	
 	// components
-	//private var panel:MovieClip;
 	private var lams_logo:MovieClip;
 	private var pBar:MovieClip;
 	private var pBar_lbl:Label;
@@ -109,8 +108,6 @@ class LFLoader extends MovieClip {
 	 */
 	
 	private function resize(){
-		//panel._width = Stage.width;
-		//panel._height = Stage.height;
 		pBar._x = (Stage.width - pBar._width)/2;
 		pBar._y = (Stage.height - pBar._height)/2;
 		pBar_lbl._x = pBar._x + LABEL_X_OFFSET;
@@ -140,17 +137,6 @@ class LFLoader extends MovieClip {
 		destroy();
 	}
 
-	/**
-    * Called on initialisation and themeChanged event handler
-    /
-    private function setStyles(){
-		panel.setStyle('backgroundColor', 0xDBE6FD);
-		pBar.setStyle('themeColor', 'haloBlue');
-		pBar_lbl.setStyle('color', 0x0B333C);
-		pBar_lbl.setStyle('fontFamily', 'Tahoma');
-		pBar_lbl.setStyle('fontSize', 9);
-	}
-	*/
 	public function setProgress(completed:Number, total:Number){
 		if(completed != undefined && total != undefined){
 			pBar.setProgress(completed, total);
@@ -164,7 +150,6 @@ class LFLoader extends MovieClip {
 	 * Update the progress bar after a component has been completed
 	 *  
 	 */
-	
 	public function complete(){
 		_noCompleted++;
 		if(_noCompleted <= _noComponents){
@@ -179,7 +164,6 @@ class LFLoader extends MovieClip {
 	/**
 	* Set the number of application components to load
 	*/
-	
 	public function set noComponents(a:Number){
 		_noComponents = a;
 	}
@@ -188,13 +172,10 @@ class LFLoader extends MovieClip {
 	 * Remove the MovieClip
 	 *  
 	 */
-	
 	private function destroy(){
 		if(!LOADER_INT){
-			trace('setting loader interval');
 			LOADER_INT = setInterval(Proxy.create(this, remove), LOADER_DELAY);
 		} else {
-			trace('already interval');
 		}
 	}
 	

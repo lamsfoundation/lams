@@ -36,6 +36,10 @@ import mx.events.*;
 import mx.utils.*;
 import mx.controls.*;
 
+/**
+ * 	IndexButton
+ *  @author Daniel Carlier
+ */
 class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 	
 	public static var _tabID:Number = 2;
@@ -80,6 +84,7 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 	public function indexClicked(): Void {
 		Selection.setFocus(mm.getMonitor().getMV().getMonitorLearnerScp()); // take focus off idx textfield as it interferes << and >> button clicks
 		var buttonText:String = String(label.text)
+		
 		if (buttonText == "<<") {
 			Debugger.log("<< clicked", Debugger.GEN, "indexClicked", "IndexButton");
 			mm.drawIndexButtons = false;
@@ -90,6 +95,7 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 			mm.updateIndexButtons(">>");
 		} else if (_btnType == "Go") { // 'Go' button
 			mm.learnerIndexView.textFieldContents = String(mm.learnerIndexView.getIdxTextField().text); // backup the string incase need to remove textfield
+			
 			if(!isNaN(mm.learnerIndexView.getIdxTextField().text)) { // if the text field contains a number
 				var idx:Number = Number(mm.learnerIndexView.getIdxTextField().text);
 				if (idx >= 1 && idx <= mm.numIndexButtons) { // if the selected index exists

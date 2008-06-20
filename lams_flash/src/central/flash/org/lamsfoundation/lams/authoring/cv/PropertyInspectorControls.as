@@ -145,11 +145,9 @@ class PropertyInspectorControls extends MovieClip {
     public var addEventListener:Function;
     public var removeEventListener:Function;
 	
-	
 	/**
 	 * Constructor
 	 */
- 
 	public function PropertyInspectorControls(){
 		//register to recive updates form the model
 		Debugger.log('Constructor',Debugger.GEN,'PropertyInspector','PropertyInspector');
@@ -517,7 +515,7 @@ class PropertyInspectorControls extends MovieClip {
 			numLearners_rdo.visible = false;
 			numGroups_rdo.visible = false;
 			
-			_group_naming_btn.visible = true; //(numGroups_stp.value > 0) ? true : false;
+			_group_naming_btn.visible = true;
 			
 			if(e != null) {
 				numGroups_lbl.enabled = e;
@@ -615,7 +613,7 @@ class PropertyInspectorControls extends MovieClip {
 			numLearners_stp.enabled = false;
 			
 			_group_naming_btn.enabled = (e != null) ? e : true;
-			_group_naming_btn.visible = true; // (numRandomGroups_stp.value > 0) ? true : false;
+			_group_naming_btn.visible = true;
 		
 		}
 		
@@ -678,12 +676,7 @@ class PropertyInspectorControls extends MovieClip {
 		if(!_canvasController.isBusy() && evt.type == 'focusOut') {
 			var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
 		
-			//if(_canvasModel.getCanvas().ddm.hasBranchMappingsForGroupingUIID(g.groupingUIID)) {
-			//	_canvasController.setBusy();
-			//	LFMessage.showMessageConfirm("Warning: Existing Group-to-Branch mappings may be effected by your change. Do you wish to continue?", Proxy.create(this, doUpdateGroupingMethodData, g), Proxy.create(this, retainOldGroupingMethodData), "Yes", "No",  "Warning");
-			//} else {
-				doUpdateGroupingMethodData(g);
-			//}
+			doUpdateGroupingMethodData(g);
 		}
 	}
 	
@@ -1058,12 +1051,7 @@ class PropertyInspectorControls extends MovieClip {
 			return; 
 		}		
 		
-		//if(_canvasModel.selectedItem.activity.defineLater != null)
-		//	_define_monitor_cb.selected = _canvasModel.selectedItem.activity.defineLater;
-
 		var ca = _canvasModel.selectedItem;
-		
-		//var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
 		var sequences:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(ca.activity.activityUIID);
 		
 		if(hasConnectedSequences(sequences) && ca.activity.groupingUIID != null) {
@@ -1183,6 +1171,12 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	/**
+	 * @depricated
+	 * 
+	 * @usage   
+	 * @param   branches 
+	 * @return  
+	 *
 	private function getValidBranches(branches:Array):Array {
 		Debugger.log("validating br len: " + branches.length, Debugger.CRITICAL, "getvalidbranches", "PIC*");
 		
@@ -1201,12 +1195,9 @@ class PropertyInspectorControls extends MovieClip {
 	*/
 	
 	private function getValidSequences(seqs:Array):Array {
-		Debugger.log("validating seqs len: " + seqs.length, Debugger.CRITICAL, "getvalidsequences", "PIC*");
-		
 		for(var i=0; i < seqs.length; i++) {
 			var sequence:SequenceActivity = SequenceActivity(seqs[i]);
-			Debugger.log("validating seq: " +sequence.title, Debugger.CRITICAL, "getvalidsequences", "PIC*");
-			Debugger.log("validating seq default + empty: " + (sequence.isDefault && sequence.empty), Debugger.CRITICAL, "getvalidsequences", "PIC*");
+			
 			if(sequence.isDefault && sequence.empty) {
 				seqs.splice(i, 1);
 				i=i-1;
@@ -1274,7 +1265,7 @@ class PropertyInspectorControls extends MovieClip {
 	public function focusOut(e):Void{
 		var tgt:String = new String(e.target);
 		if(tgt.indexOf("title_txt") != -1){
-			//todo check if this is the right place to set edited content, should it be ddm?
+			//TODO: check if this is the right place to set edited content, should it be ddm?
 			_canvasModel.selectedItem.activity.title = title_txt.text;
 		} else if(tgt.indexOf("desc_txt") != -1){
 			_canvasModel.selectedItem.activity.description = desc_txt.text;

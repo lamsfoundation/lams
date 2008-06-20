@@ -64,7 +64,6 @@ class org.lamsfoundation.lams.authoring.cv.ValidationIssuesDialog extends MovieC
     public var addEventListener:Function;
     public var removeEventListener:Function;
 	
-	
 	/**
 	 * Constructor
 	 */
@@ -142,7 +141,7 @@ class org.lamsfoundation.lams.authoring.cv.ValidationIssuesDialog extends MovieC
 		_container.contentLoaded();
 					
 		this.onEnterFrame = initSetup;
-		//validationIssues_dgd.setSize(validationIssues_dgd.)
+		
 		setSize(_width, _height);
 	}
 	

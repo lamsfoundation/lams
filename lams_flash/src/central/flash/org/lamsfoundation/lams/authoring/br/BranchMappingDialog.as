@@ -44,31 +44,31 @@ import mx.events.*
 class BranchMappingDialog extends MovieClip implements Dialog {
 
     //References to components + clips 
-    private var _container:MovieClip;  //The container window that holds the dialog
+    private var _container:MovieClip;  		//The container window that holds the dialog
     
 	private var _primary:Array;
 	private var _secondary:Array;
 	
-    private var close_btn:Button;         // Close button
+    private var close_btn:Button;         		// Close button
 	
 	private var add_match_btn:Button;
 	private var remove_match_btn:Button;
     
-    private var panel:MovieClip;       //The underlaying panel base
+    private var panel:MovieClip;       		//The underlaying panel base
     
     private var primary_lst:List;  
     private var secondary_lst:List;    
     
-    private var primary_lst_lbl:Label;        // Group and Branches list labels
+    private var primary_lst_lbl:Label;        	// Group and Branches list labels
     private var secondary_lst_lbl:Label;
 	private var match_dgd_lbl:Label;
 	
-	private var match_dgd:DataGrid;		// Group-Branch Matching listbox
+	private var match_dgd:DataGrid;			// Group-Branch Matching listbox
     
 	private var branches_loaded:Boolean;
 	
-    private var fm:FocusManager;            //Reference to focus manager
-    private var themeManager:ThemeManager;  //Theme manager
+    private var fm:FocusManager;            	//Reference to focus manager
+    private var themeManager:ThemeManager;  	//Theme manager
 	public var app:Application;
 	
     //Dimensions for resizing

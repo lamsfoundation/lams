@@ -41,7 +41,6 @@ import org.lamsfoundation.lams.monitoring.mv.tabviews.*
 */
 class LearnersDialog extends MovieClip implements Dialog{
 	
-	
 	public var RT_ORG:String = "Organisation";
 	public static var USERS_X:Number = -5;
 	public static var USER_OFFSET:Number = 20;
@@ -79,8 +78,7 @@ class LearnersDialog extends MovieClip implements Dialog{
     * constructor
     */
     function LearnersDialog(){
-		trace('initialising Lesson Manager Dialog');
-        //Set up this class to use the Flash event delegation model
+		//Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
         
         //Create a clip that will wait a frame before dispatching init to give components time to setup
@@ -91,8 +89,6 @@ class LearnersDialog extends MovieClip implements Dialog{
     * Called a frame after movie attached to allow components to initialise
     */
     private function init():Void{
-        
-        trace('now initialising ...');
         //set the reference to the StyleManager
         themeManager = ThemeManager.getInstance();
         
@@ -107,7 +103,8 @@ class LearnersDialog extends MovieClip implements Dialog{
         //EVENTS
         //Add event listeners for ok, cancel and close buttons
         close_btn.addEventListener('click',Delegate.create(this, close));
-        //Assign Click (close button) and resize handlers
+        
+		//Assign Click (close button) and resize handlers
         _container.addEventListener('click',this);
         _container.addEventListener('size',this);
         
@@ -119,16 +116,12 @@ class LearnersDialog extends MovieClip implements Dialog{
 		_container.contentLoaded();
     }
 	
-		/**
+	/**
 	 * Called by the worspaceView after the content has loaded
 	 * @usage   
 	 * @return  
 	 */
 	public function setUpContent():Void{
-		
-		//register to recive updates form the model
-		//MonitorModel(_monitorView.getModel()).addEventListener('viewUpdate',this);
-		
 		Debugger.log('_monitorView:'+_monitorView,Debugger.GEN,'setUpContent','org.lamsfoundation.lams.LearnersDialog');
 		
 		//get a ref to the controller and kkep it here to listen for events:
@@ -142,7 +135,6 @@ class LearnersDialog extends MovieClip implements Dialog{
 		
 		var callback:Function = Proxy.create(this,loadLearners);
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonLearners&lessonID='+_root.lessonID,callback, false);
-		
 	}
 	
     /**
@@ -188,9 +180,7 @@ class LearnersDialog extends MovieClip implements Dialog{
     * Called by the close button 
     */
     private function close(){
-        trace('Close');
-        //close parent window
-        _container.deletePopUp();
+		_container.deletePopUp();
     }
 	
     /**
@@ -225,7 +215,6 @@ class LearnersDialog extends MovieClip implements Dialog{
     * Event dispatched by parent container when close button clicked
     */
     public function click(e:Object):Void{
-        trace('LessonManagerDialog.click');
         e.target.deletePopUp();
     }
 
@@ -260,6 +249,7 @@ class LearnersDialog extends MovieClip implements Dialog{
 			var user:User = new User(users[i]);
 			usersArr.push(user);
 		}
+		
 		usersArr.sortOn(["_firstName", "_lastName"], Array.CASEINSENSITIVE);
 		
 		for(var i=0; i<usersArr.length; i++){
@@ -276,7 +266,6 @@ class LearnersDialog extends MovieClip implements Dialog{
     * Main resize method, called by scrollpane container/parent
     */
     public function setSize(w:Number,h:Number):Void{
-        //Debugger.log('setSize',Debugger.GEN,'setSize','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
         //Size the panel
         panel.setSize(w,h);
 

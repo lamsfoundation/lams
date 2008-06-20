@@ -75,7 +75,6 @@ class Scratchpad extends MovieClip {
     public var addEventListener:Function;
     public var removeEventListener:Function;
    
-	
 	/** 
 	* constructor
 	*/
@@ -97,8 +96,6 @@ class Scratchpad extends MovieClip {
     * Called a frame after movie attached to allow components to initialise
     */
     public function init(){
-		trace('initialing header..');
-		
         //Delete the enterframe dispatcher
         delete this.onEnterFrame;
 		_lessonModel = _lessonModel;
@@ -115,13 +112,10 @@ class Scratchpad extends MovieClip {
 		//Add event listeners for resume and exit buttons
 		
 		view_btn.onRelease = function(){
-			trace('on releasing view all button..');
 			Application.getInstance().getScratchpad().viewNotebookEntries();
 		}
 		
 		save_btn.onRelease = function(){
-			trace('on releasing save button..');
-			
 			Application.getInstance().getScratchpad().saveEntry();
 		}
 		
@@ -130,8 +124,10 @@ class Scratchpad extends MovieClip {
 		
 		save_btn.onRollOver = Proxy.create(this,this['showToolTip'], save_btn, "sp_save_tooltip");
 		save_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
 		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
+		
 		this.onEnterFrame = setLabels;
 		
 	}
@@ -139,14 +135,12 @@ class Scratchpad extends MovieClip {
 	public function localOnRelease():Void{
 		
 		if (_spadIsExpended){
-			trace("P Pressed in 'localOnRelease' and _spadIsExpended is: "+_spadIsExpended)
 			_spadIsExpended = false
 			minIcon._visible = true;
 			maxIcon._visible = false;
 			_lessonModel.setSpadHeight(spadHeightHide);
 			
 		}else {
-			trace("P Pressed in 'localOnRelease' and _spadIsExpended is: "+_spadIsExpended)
 			_spadIsExpended = true
 			minIcon._visible = false;
 			maxIcon._visible = true;
@@ -166,17 +160,15 @@ class Scratchpad extends MovieClip {
 	
 	public function localOnReleaseOutside():Void{
 		Debugger.log('Release outside so no event has been fired, current state is: ' + _spadIsExpended,Debugger.GEN,'localOnReleaseOutside','Scratch Pad');
-		
 	}
+	
 	public function showToolTip(btnObj, btnTT:String):Void{
-		
 		var Xpos = Application.HEADER_X+ 5;
 		var Ypos = Application.HEADER_Y+( btnObj._y+btnObj._height)+2;
 		var ttHolder = ApplicationParent.tooltip;
 		var ttMessage = Dictionary.getValue(btnTT);
 		var ttWidth = 150
 		_tip.DisplayToolTip(ttHolder, ttMessage, Xpos, Ypos, undefined, ttWidth);
-		
 	}
 	
 	public function hideToolTip():Void{
@@ -217,13 +209,11 @@ class Scratchpad extends MovieClip {
 	
 	public function saveEntry(){
 		// TODO: validate entry fields
-		
 		var dto:Object = getDataForSaving();
 		
 		var callback:Function = Proxy.create(this,onStoreEntryResponse);
 		
 		Application.getInstance().getComms().sendAndReceive(dto,"servlet/notebook/storeNotebookEntry",callback,false);
-		
 	}
 	
 	public function getDataForSaving():Object {
@@ -250,11 +240,9 @@ class Scratchpad extends MovieClip {
 	
 	public function viewNotebookEntries(){
 		// TODO: Pop-up for Notebook Entries
-		
 		var notebook_url:String = _root.serverURL + 'learning/notebook.do?method=viewAll&lessonID=' + _root.lessonID;
 		
 		JsPopup.getInstance().launchPopupWindow(notebook_url, 'Notebook', 570, 796, true, true, false, false, false);
-	
 	}
 	
 	public function resize(width:Number){

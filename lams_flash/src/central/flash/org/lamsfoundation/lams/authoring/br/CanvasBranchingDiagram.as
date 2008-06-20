@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.common.style.*;
  **/
 class CanvasBranchingDiagram extends MovieClip  {
 	
-	//private static var CIRCLE_SIZE:Number = 3;
 	private static var ACT_SIZE:Number = 4;
 	private static var BRANCH_LIMIT:Number = 5;
 	
@@ -221,35 +220,6 @@ class CanvasBranchingDiagram extends MovieClip  {
 		drawActivity(container, startPoint.x, startPoint.y, ACT_SIZE);
 		drawActivity(container, endPoint.x, endPoint.y, ACT_SIZE);
 	}
-	
-	/**
-	private function drawCircle(mc:MovieClip, x:Number, y:Number, r:Number, indicateMore:Boolean, indicateStops:Boolean):Void {
-		  
-		  
-		  if(indicateStops) mc.lineStyle(0, stopColor);
-		  else mc.lineStyle(0, lineColor);
-		  
-		  if(indicateStops) mc.beginFill(stopColor);
-		  else mc.beginFill(fillColor);
-		  
-		  mc.moveTo(x+r, y);
-		  mc.curveTo(r+x, Math.tan(Math.PI/8)*r+y, Math.sin(Math.PI/4)*r+x, Math.sin(Math.PI/4)*r+y);
-		  mc.curveTo(Math.tan(Math.PI/8)*r+x, r+y, x, r+y);
-		  mc.curveTo(-Math.tan(Math.PI/8)*r+x, r+y, -Math.sin(Math.PI/4)*r+x, Math.sin(Math.PI/4)*r+y);
-		  mc.curveTo(-r+x, Math.tan(Math.PI/8)*r+y, -r+x, y);
-		  mc.curveTo(-r+x, -Math.tan(Math.PI/8)*r+y, -Math.sin(Math.PI/4)*r+x, -Math.sin(Math.PI/4)*r+y);
-		  mc.curveTo(-Math.tan(Math.PI/8)*r+x, -r+y, x, -r+y);
-		  mc.curveTo(Math.tan(Math.PI/8)*r+x, -r+y, Math.sin(Math.PI/4)*r+x, -Math.sin(Math.PI/4)*r+y);
-		  mc.curveTo(r+x, -Math.tan(Math.PI/8)*r+y, r+x, y);
-		  mc.endFill();
-		 
-		 if(indicateMore) {
-			 drawCircle(mc, x+(CIRCLE_SIZE*2)+1, y, CIRCLE_SIZE-1);
-			 drawCircle(mc, x+(CIRCLE_SIZE*4)+1, y, CIRCLE_SIZE-2);
-		 }
-		  
-	}
-	*/
 	
 	private function drawActivity(mc:MovieClip, x:Number, y:Number, r:Number, indicateMore:Boolean, indicateStops:Boolean, useAssocColor:Object):Void {
 		  if(indicateStops) mc.lineStyle(0.5, stopColor);

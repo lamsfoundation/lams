@@ -99,14 +99,14 @@ class StringUtils {
 	 * @return  		The result
 	 */
 	public static function replace (s:String,p_str:String,p_repl:String) {
-		//var s:String = this.toString();
-		//var s:String = new String(;
 		var position:Number;
+		
 		while((position = s.indexOf(p_str)) != -1) {
 			position= s.indexOf(p_str);
 			s = s.substring(0,position)+p_repl+s.substring(position+p_str.length,s.length)
 		}
-		return s
+		
+		return s;
 	}
 	
 
@@ -175,18 +175,22 @@ class StringUtils {
     public static function getUID():String {
         //Return object
         var uid:String;
-        //Get the time now in ms and concatenate with random number between 1-10
+        
+		//Get the time now in ms and concatenate with random number between 1-10
         var date:Date = new Date();
         
         //YEAR
         var year_str:String = String(date.getFullYear());
-        //MONTH
+        
+		//MONTH
         var month_str:String = String(date.getMonth()+1);
         month_str = StringUtils.pad(month_str,2);
-        //DAY
+        
+		//DAY
         var day_str:String = String(date.getDate());
         day_str = StringUtils.pad(day_str,2);
-        //HOUR
+        
+		//HOUR
         var hour_str:String = String(date.getHours());
         hour_str = StringUtils.pad(hour_str,2);
 
@@ -202,9 +206,6 @@ class StringUtils {
         var milliSecond_str:String = String(date.getMilliseconds());
         milliSecond_str = StringUtils.pad(milliSecond_str,3);
 
-        //var rand_str:String = String(NumberUtils.randomBetween(0,999));
-        //rand_str = StringUtils.pad(rand_str,3);
-        
         var id:String = String(_nextID++);
         id = StringUtils.pad(id,3);
         
@@ -214,7 +215,6 @@ class StringUtils {
         }
         
         //Convert back to a number for return
-        //uid = year_str + month_str + day_str + hour_str + minute_str + second_str + milliSecond_str + '-'+ rand_str;
         uid = year_str + month_str + day_str + hour_str + minute_str + second_str + milliSecond_str + '-'+ id;
        
         return uid;

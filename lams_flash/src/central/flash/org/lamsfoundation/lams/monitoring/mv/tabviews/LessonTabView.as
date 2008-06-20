@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.ToolTip;
+
 import mx.controls.*;
 import mx.managers.*;
 import mx.containers.*;
@@ -41,10 +42,8 @@ import mx.events.*;
 import mx.utils.*;
 
 /**
-*Monitoring view for the Monitor
-* Relects changes in the MonitorModel
+* Lesson view for the Monitor
 */
-
 class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends AbstractView{
 	public static var _tabID:Number = 0;
 	
@@ -139,7 +138,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
     public var addEventListener:Function;
     public var removeEventListener:Function;
 
-	
 	/**
 	* Constructor
 	*/
@@ -152,7 +150,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		
 		//Init for event delegation
         mx.events.EventDispatcher.initialize(this);
-		
 	}
 	
 	/**
@@ -168,11 +165,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	}    
 	
 	/**
- * Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
- * @usage   
- * @param   event
- */
-public function update (o:Observable,infoObj:Object):Void{
+	* Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
+	* @usage   
+	* @param   event
+	*/
+	public function update (o:Observable,infoObj:Object):Void{
 		
        mm = MonitorModel(o);
 	   
@@ -194,7 +191,6 @@ public function update (o:Observable,infoObj:Object):Void{
 					mm.broadcastViewUpdate("JOURNALSSHOWHIDE", false);
 					
 					if(mm.getIsProgressChangedLesson()){
-						trace("I am calling reloadProgress now")
 						reloadProgress(false);
 					}
 					
@@ -218,7 +214,6 @@ public function update (o:Observable,infoObj:Object):Void{
 				break;
 			case 'RELOADPROGRESS' :	
 					if (infoObj.tabID == _tabID && !mm.locked){
-						trace("called Reload progress")
 						reloadProgress(true);
 					}
 					break;
@@ -305,14 +300,15 @@ public function update (o:Observable,infoObj:Object):Void{
 	 */
 	private function reloadProgress(isChanged:Boolean){
 		
-			if (isChanged == false){
-				mm.setIsProgressChangedLesson(false);
-				
-			}else {
-				mm.setIsProgressChangedLearner(true);
-				mm.setIsProgressChangedSequence(true)
-			}
-			mm.getMonitor().reloadLessonToMonitor();
+		if (isChanged == false){
+			mm.setIsProgressChangedLesson(false);
+			
+		}else {
+			mm.setIsProgressChangedLearner(true);
+			mm.setIsProgressChangedSequence(true)
+		}
+		
+		mm.getMonitor().reloadLessonToMonitor();
 	}
 	
 	/**
@@ -321,6 +317,7 @@ public function update (o:Observable,infoObj:Object):Void{
 	private function draw(){
 		Debugger.log('Lesson Launch set in sysadmin :'+_root.lessonLaunch, Debugger.CRITICAL,'Draw','org.lamsfoundation.lams.LessonTabView');
 		listCount = 0; 
+		
 		this.onEnterFrame = setupLabels;
 		
 		_monitorReqTask_mc = reqTasks_scp.content;
@@ -390,12 +387,11 @@ public function update (o:Observable,infoObj:Object):Void{
 		reqTasks_scp._y = reqTasks_scp._y - 30
 		learner_expp_cb._y = learner_expp_cb._y - 30
 		learner_expp_cb_lbl._y = learner_expp_cb_lbl._y - 30
-		
-		
 	}
+	
 	/**
 	 * Populate the lesson details from HashTable Sequence in MOnitorModel
-	*/
+	 */
 	private function populateLessonDetails():Void{
 		
 		var s:Object = mm.getSequence();

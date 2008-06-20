@@ -156,8 +156,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 					}
 					else {
 						mm.getMonitor().getMV().getMonitorSequenceScp()._visible = false;
-						//this._visible = false;
 					}
+					
 					break;
 				case 'PROGRESS' :
 					if (infoObj.tabID == _tabID){
@@ -216,6 +216,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 						
 						mm.drawDesign(infoObj.tabID);
 					}
+					
 					break;
 				case 'DRAW_ALL' :
 					if (infoObj.tabID == _tabID && !mm.locked){
@@ -238,12 +239,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		content = this;
 		
 		bkg_pnl = this.attachMovie("Panel", "bkg_pnl", this.getNextHighestDepth());
-
 		gridLayer = this.createEmptyMovieClip("_gridLayer_mc", this.getNextHighestDepth());
-		
 		transitionLayer = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
-		//branchLayer = this.createEmptyMovieClip("_branchLayer_mc", this.getNextHighestDepth());
-		
 		activityLayer = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 		
 		// creates learner icon on initial draw
@@ -275,11 +272,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		
 		showAssets(true);
 		
-		//mm.openBranchingActivity = mm.currentBranchingActivity.activity.activityUIID;
 		mm.activeView = this;
 		mm.currentBranchingActivity = null;
-		//Remove all the movies drawn on the transition and activity movieclip holder
 		
+		//Remove all the movies drawn on the transition and activity movieclip holder
 		this._learnerContainer_mc.removeMovieClip();
 		this.transitionLayer.removeMovieClip();
 		this.activityLayer.removeMovieClip();
@@ -290,9 +286,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	
 		//Recreate both Transition holder and Activity holder Movieclips
 		transitionLayer = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
-		
 		activityLayer = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
-		
 		_learnerContainer_mc = this.createEmptyMovieClip("_learnerContainer_mc", this.getNextHighestDepth());
 		
 		transparentCover = this.attachMovie("Panel", "_transparentCover_mc", this.getNextHighestDepth(), {_visible: false, enabled: true, _alpha: 50});
@@ -565,10 +559,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
     */
 	private function setPosition(mm:MonitorModel):Void{
         var p:Object = mm.getPosition();
-		trace("X pos set in Model is: "+p.x+" and Y pos set in Model is "+p.y)
         this._x = p.x;
         this._y = p.y;
-		
 	}
 	
 	public function getLearnerIcon():MovieClip {
@@ -578,12 +570,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	public function get ddm():DesignDataModel {
 		return mm.getMonitor().ddm;
 	}
-	
-	/**
-	public function get model():MonitorModel {
-		return mm;
-	}
-	*/
 	
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned

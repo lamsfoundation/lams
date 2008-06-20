@@ -63,11 +63,9 @@ class ToolActivity extends Activity{
 		_activityTypeID = TOOL_ACTIVITY_TYPE;
 		_toolOutputDefinitions = new Hashtable("_toolOutputDefinitions");
 		
-		//assign default values:
-		
 	}
 	
-	//todo ADD A VALIDATE() FUNCTION
+	//TODO: ADD A VALIDATE() FUNCTION
 	
 	/**
 	 * Pass an object with all the fields of a ToolActivity into this function to populate:
@@ -114,37 +112,11 @@ class ToolActivity extends Activity{
 	 * @return  Noting
 	 */
 	public function populateFromDTO(dto:Object):Void{
-			/*
-			//activity properties:
-			_activityTypeID = dto.activityTypeID;
-			_activityID = dto.activityID;
-			_activityCategoryID = dto.activityCategoryID;
-			_activityUIID = dto.activityUIID;
-			_learningLibraryID = dto.learningLibraryID;
-			_learningDesignID = dto.learningDesignID;
-			_libraryActivityID = dto.libraryActivityID;
-			_parentActivityID = dto.parentActivityID;
-			_parentUIID = dto.parentUIID
-			_orderID = dto.orderID
-			_groupingID = dto.groupingID;
-			_groupingUIID = dto.groupingUIID
-			_title = dto.title;
-			_description = dto.description;
-			_helpText =  dto.helpText;
-			_yCoord = dto.yCoord;
-			_xCoord = dto.xCoord;
-			_libraryActivityUIImage = dto.libraryActivityUIImage;
-			_applyGrouping = dto.applyGrouping;
-			_runOffline = dto.runOffline;
-			_defineLater = dto.defineLater;
-			_createDateTime = dto.createDateTime;
-			_groupingSupportType = dto.groupingSupportType;
-			*/
-			
 			
 			//first do the super method for activity props
 			super.populateFromDTO(dto);
-			//Toolactivity class props
+			
+			//Tool Activity class props
 			if(StringUtils.isWDDXNull(dto.authoringURL)) { _authoringURL = null }
 			else { _authoringURL = dto.authoringURL; }
 			
@@ -169,24 +141,20 @@ class ToolActivity extends Activity{
 			_supportsOutputs = dto.supportsOutputs;
 			
 			activityToolContentID = _toolContentID;
-			
-			//maybe return isValid();
 	}
 	
 	//to data for serialising:
 	
 	public function toData():Object{
 		var dto = super.toData();
+		
 		dto.authoringURL = (_authoringURL) ?  _authoringURL : Config.STRING_NULL_VALUE;	
 		dto.helpURL = (_helpURL) ? _helpURL : Config.STRING_NULL_VALUE;
 		dto.toolDisplayName = (_toolDisplayName) ?  _toolDisplayName: Config.STRING_NULL_VALUE;	
 		dto.toolSignature = (_toolSignature) ? _toolSignature: Config.STRING_NULL_VALUE;
-		//if(isCopy) { Application.getInstance().getCanvas().getCanvasModel().setDefaultToolContentID(this); }
 		
 		dto.toolContentID = (_toolContentID) ?  _toolContentID: Config.NUMERIC_NULL_VALUE;	
-		
 		dto.toolID = (_toolID) ?  _toolID: Config.NUMERIC_NULL_VALUE;	
-		
 		
 		/* THESE are internal flags, not part of the design
 		dto.supportsContribute = (_supportsContribute!=null) ?  _supportsContribute: Config.BOOLEAN_NULL_VALUE;	

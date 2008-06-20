@@ -26,9 +26,9 @@ import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.ui.Cursor;
 import org.lamsfoundation.lams.common.ApplicationParent;
 
-//import mx.utils.ObjectCopy;
 import mx.events.*
 import mx.utils.*
+
 /*
 * Model for the Canvas
 */
@@ -46,39 +46,31 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	public var MEMBERSHIP_ACCESS:Number = 2;
 	public var OWNER_ACCESS:Number = 3;
 	public var NO_ACCESS:Number = 4;
-	
-	
 
 	//ref to the wsp containter
 	private var _workspace:Workspace;
 	
 	private var _availableLicenses:Array;
 	
-
-	
-	//private data
+	// private data
 	private var _workspaceID:Number;
 	private var _rootFolderID:Number;
-	//this is hte inital data
-	//private var _workspaceData:Object;
 	
-	
-	//private var _workspaceResources:Hashtable;				//this contains refs to the tree nodes stored by resourceID
-	private var _workspaceResources:Array;				//this contains refs to the tree nodes stored by resourceType_resourceID
+	private var _workspaceResources:Array;					//this contains refs to the tree nodes stored by resourceType_resourceID
 	private var _accessibleWorkspaceFoldersDTOCopy:Object; // this is used so we can start again after we kill the cache
 	
-	//this is the dartaprovider for the tree
+	//this is the data provider for the tree
 	private var _treeDP:XML;
 
 	private var _selectedTreeNode:XMLNode;
-	private var _currentOpenNode:Object;	// node of the current file which is open on the canvas
+	private var _currentOpenNode:Object;			// node of the current file which is open on the canvas
 	
-	private var _currentTab:String; //tells us which tab should be displayed - LOCATION or PROPERTIES
+	private var _currentTab:String; 				// tells us which tab should be displayed - LOCATION or PROPERTIES
 	private var _defaultTab:String;
-	private var _currentMode:String; //Tells us which mode the dialogue should be in - SAVE, SAVEAS, OPEN...
+	private var _currentMode:String; 				// Tells us which mode the dialogue should be in - SAVE, SAVEAS, OPEN...
 	private var _clipboard:Object;
-	private var _clipboardMode:String; // tells us if its a cut or copy 
-	private var _folderIDPendingRefresh:Number; // The ID of the folder an operation has just been done on, will be refreshed...
+	private var _clipboardMode:String; 			// tells us if its a cut or copy 
+	private var _folderIDPendingRefresh:Number; 	// The ID of the folder an operation has just been done on, will be refreshed...
 	private var _folderIDPendingRefreshList:Array; // The List of ID of the folder an operation has just been done on, will be refreshed...
 
 	// if true folder is being forced to open
@@ -99,7 +91,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		_workspaceResources = new Array();
 		_availableLicenses = new Array();
 		_defaultTab = "LOCATION";
-		
 	}	
 	
 	
@@ -110,14 +101,10 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 * @return  
 	 */
 	public function openDesignBySelection(){
-		
-        //workspaceView.createWorkspaceDialogOpen('centre',Delegate.create(this,itemSelected));
-		
-		var dto:Object = {};
+        var dto:Object = {};
 		dto.pos='centre';
 		Debugger.log('_workspace.itemSelected:'+_workspace.itemSelected,Debugger.GEN,'openDesignBySelection','WorkspaceModel');
 		broadcastViewUpdate('CREATE_DIALOG',dto);
-		
 	}
 	
 	/**
@@ -143,8 +130,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		var dto:Object = {};
 		dto.pos='centre';
 		broadcastViewUpdate('CREATE_DIALOG',dto);
-		
-		
 	}
 	
 	/**
@@ -157,8 +142,8 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		if(tabToSelect == undefined){
 			tabToSelect = _defaultTab;
 		}
-		broadcastViewUpdate('SHOW_TAB',tabToSelect);
 		
+		broadcastViewUpdate('SHOW_TAB',tabToSelect);
 	}
 	
 	/**
@@ -186,8 +171,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
         dispatchEvent({type:'viewUpdate',target:this,updateType:_updateType,data:_data});
     }
 	
-	
-	
 	/**
 	 * Sets up the tree for the 1st time
 	 * Creates the dummy root folder with ID -1
@@ -198,16 +181,17 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		Debugger.log('Running',Debugger.GEN,'initWorkspaceTree','org.lamsfoundation.lams.WorkspaceModel');
 		_treeDP = new XML();
 		_workspaceResources = new Array();
+		
 		//add top level
 		//create the data obj:
 		var mdto= {};
 		mdto.creationDateTime = new Date(null);
 		mdto.description = "";
 		mdto.lastModifiedDateTime = new Date(null);
-		//why is this returning undefines
+		
 		mdto.name = Dictionary.getValue('ws_tree_mywsp');
-		trace(Dictionary.getValue('ws_dlg_location_button'));
 		mdto.parentWorkspaceFolderID = null;
+		
 		//read only
 		mdto.permissionCode = 1;
 		mdto.resourceID = "-1";
@@ -218,7 +202,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		var rootNode = _treeDP.addTreeNode(mdto.name,mdto);
 		rootNode.attributes.isBranch = true;
 		setWorkspaceResource(RT_FOLDER+'_'+mdto.resourceID,rootNode);
-		//ObjectUtils.printObject(getWorkspaceResource(RT_FOLDER+'_'+mdto.resourceID));
+	
 	}
 	
 	/**
@@ -232,20 +216,11 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		Cursor.showCursor(ApplicationParent.C_HOURGLASS, _workspace.getWV().workspaceCursor);
 		
 		Debugger.log('resourceToOpen :'+resourceToOpen ,Debugger.GEN,'openFolderInTree','org.lamsfoundation.lams.WorkspaceModel');
-		//lets see if its in the hash table already (prob not)
-		//if(_workspaceResources.get(resourceToOpen).attributes.data.contents == undefined){
-			Debugger.log('Requesting...',Debugger.GEN,'openFolderInTree','org.lamsfoundation.lams.WorkspaceModel');
-			//get that resource
-			_forced = forced;
-			_workspace.requestFolderContents(resourceToOpen);
-			
-	
-		//}else{
-		//	Debugger.log('Already in hashtable',Debugger.GEN,'openResourceInTree','org.lamsfoundation.lams.WorkspaceModel');
-			//just update the tree, nothing to do...
-			
-			
-		//}
+		Debugger.log('Requesting...',Debugger.GEN,'openFolderInTree','org.lamsfoundation.lams.WorkspaceModel');
+		
+		_forced = forced;
+		_workspace.requestFolderContents(resourceToOpen);
+
 		
 	}
 	
@@ -283,7 +258,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		Debugger.log('looking for:Folder_'+dto.workspaceFolderID+', parentWorkspaceFolderID:'+dto.parentWorkspaceFolderID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 		_global.breakpoint();
 		
-		//if(_workspaceResources.containsKey(dto.workspaceFolderID)){
 		if(getWorkspaceResource('Folder_'+dto.workspaceFolderID)!=null){
 			nodeToUpdate = getWorkspaceResource('Folder_'+dto.workspaceFolderID);
 			Debugger.log('nodeToUpdate.attributes.data.resourceID:'+nodeToUpdate.attributes.data.resourceID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
@@ -294,10 +268,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		
 		// do not populate folder if already contains contents
 		if(nodeToUpdate.hasChildNodes()) { 
-			
-			//return; 
-			broadcastViewUpdate('UPDATE_CHILD_FOLDER_NOOPEN',nodeToUpdate);
-			
+			broadcastViewUpdate('UPDATE_CHILD_FOLDER_NOOPEN',nodeToUpdate);	
 		}
 		
 		// sort contents for content folders
@@ -326,13 +297,13 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			if(dto.contents[i].resourceType==RT_FOLDER){
 				cNode.attributes.isBranch=true;	
 				
-				// no longer force open Organisation virtual folder
+				// **no longer force open Organisation virtual folder
 				// force open the Organisation virtual folder when opening My Workspace (root) virtual folder
-				//if(cNode.attributes.data.resourceID == ORG_VFOLDER && !cNode.hasChildNodes()){ openFolderInTree(cNode.attributes.data.resourceID, forced); }
+				// if(cNode.attributes.data.resourceID == ORG_VFOLDER && !cNode.hasChildNodes()){ openFolderInTree(cNode.attributes.data.resourceID, forced); }
 			
 			}else{
-				
 			}
+			
 			Debugger.log('Adding new node to _workspaceResources ID :'+key,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 			setWorkspaceResource(key,cNode);
 		}
@@ -342,7 +313,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		else { broadcastViewUpdate('UPDATE_CHILD_FOLDER_NOOPEN',nodeToUpdate);  }
 		
 		Cursor.showCursor(ApplicationParent.C_DEFAULT);
-		
 		
 	}
 	
@@ -364,8 +334,8 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		
 				if (wspResource.hasChildNodes()) {
 				   var deleteQue:Array = new Array();
-				  //mental. but true - you have to add them to an array and then delete them from the array, 
-				  //as deleting in the loop them will remove the reference from nextSibling
+				  // mental. but true - you have to add them to an array and then delete them from the array, 
+				  // as deleting in the loop them will remove the reference from nextSibling
 				  // also childNodes:Array not seem to work properly.
 				  // use firstChild to iterate through the child nodes of wspResource
 				  for (var aNode:XMLNode = wspResource.firstChild; aNode != null; aNode=aNode.nextSibling) {
@@ -374,7 +344,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 				  
 				  for(var i=0; i<deleteQue.length;i++){
 					  var deletedNode:XMLNode = deleteQue[i].removeTreeNode();
-					  //Debugger.log('Removed node:'+deletedNode,Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
 				  }
 				  
 
@@ -383,14 +352,8 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 					nodeToUpdate.attributes.isEmpty = null;
 					Debugger.log('No Child nodes to delete',Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
 				}
+				
 				_folderIDPendingRefresh = null;
-	/*			//this only deletes some children, dont know why, see solution above
-				for(var i=0; i<wspResource.childNodes.length;i++){
-					var deletedNode:XMLNode = wspResource.childNodes[i].removeTreeNode();
-					Debugger.log('Removed node:'+deletedNode,Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
-					
-				}
-		*/		
 		}else{
 			//think this wont ever happen as must have been listed by prevous node
 			Debugger.log('Failing! - Did not find folderIDPendingRefresh:'+folderIDPendingRefresh+' Cant do anything',Debugger.CRITICAL,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
@@ -447,8 +410,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		var nodeToOpen:XMLNode = getWorkspaceResource('Folder_'+folderID);
 		Debugger.log('Basic open folder call:'+nodeToOpen,Debugger.GEN,'setFolderOpen','org.lamsfoundation.lams.WorkspaceModel');
 		broadcastViewUpdate('OPEN_FOLDER',nodeToOpen);
-		
-		
 	}
 	
 	/**
@@ -472,7 +433,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		//mode not used :-) no cut, only copy functionality this time.
 		_clipboardMode = mode;
 		_clipboard = item;
-		
 	}
 	
 	/**
@@ -500,6 +460,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		if(rData.permissionCode == READ_ACCESS){
 			return false;
 		}
+		
 		if(rData.permissionCode == MEMBERSHIP_ACCESS){
 			if(!rData.readOnly) { //if the file folder is writable
 				if (resourceType == "Folder")
@@ -507,22 +468,23 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			}
 			return false;
 		}
+		
 		if(rData.permissionCode == OWNER_ACCESS){
 			if(!rData.readOnly)
 				return true;
 			else
 				return false;
 		}
+		
 		if(rData.permissionCode == NO_ACCESS){
 			return false;
 		}
+		
 		if(rData.permissionCode == undefined || rData.permissionCode == null){
 			return false;
 		}
 	
 	}
-	
-	
 	
 	//getts n setters
 	/**
@@ -535,6 +497,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		Debugger.log(key+'='+newworkspaceResources,Debugger.GEN,'setWorkspaceResource','org.lamsfoundation.lams.WorkspaceModel');
 		_workspaceResources[key] = newworkspaceResources;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -545,13 +508,10 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		return _workspaceResources[key];
 		
 	}
-
 	
 	public function get treeDP():XML{
 		return _treeDP;
 	}
-
-	
 	
 	/**
 	 * 
@@ -611,6 +571,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		//dispatch an update to the view
 		broadcastViewUpdate('ITEM_SELECTED',_selectedTreeNode);
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -664,6 +625,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	public function set currentMode (newcurrentMode:String):Void {
 		_currentMode = newcurrentMode;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -682,6 +644,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	public function set folderIDPendingRefresh (newfolderIDPendingRefresh:Number):Void {
 		_folderIDPendingRefresh = newfolderIDPendingRefresh;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -690,7 +653,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	public function get folderIDPendingRefresh ():Number {
 		return _folderIDPendingRefresh;
 	}
-
 
 	/**
 	 * 
@@ -731,6 +693,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		newavailableLicenses.sortOn('name');
 		_availableLicenses = newavailableLicenses;
 	}
+	
 	/**
 	 * 
 	 * @usage   

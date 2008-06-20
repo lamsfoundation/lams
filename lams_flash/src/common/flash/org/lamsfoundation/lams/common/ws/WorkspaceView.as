@@ -126,7 +126,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 		wizard.initWorkspace();
 	}
 	
-	
 	/**
 	 * 
 	 * @usage   
@@ -136,6 +135,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 	public function set workspaceDialog (newworkspaceDialog:MovieClip):Void {
 		dialog = newworkspaceDialog;
 	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -161,6 +161,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 		dialog.deletePopUp();
 		isOpen = false;
 	}
+	
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned
 	 * @usage   
@@ -180,9 +181,5 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
         trace('default controller in wsv');
 		return new WorkspaceController(model);
     }
-	
-	
-
-    
     
 }

@@ -73,8 +73,6 @@ class org.lamsfoundation.lams.common.util.Debugger {
         EventDispatcher.initialize(this);
         _msgLog = [];
 		_crashDumpMsgLog = [];
-		
-		
 	}  
     
     /**
@@ -118,8 +116,7 @@ class org.lamsfoundation.lams.common.util.Debugger {
 	* Method to get the Design Data from canvas & debugger log and store it in an object to send it to the server. 
 	*/
 	public static function crashDataDump():Void{
-        //getInstance();
-		var dto:Object = new Object()
+        var dto:Object = new Object()
 		var _instance = getInstance()
 		
 		
@@ -134,10 +131,7 @@ class org.lamsfoundation.lams.common.util.Debugger {
 			}
         }
 		
-		//trace("Length of _crashDumpMsgLog:- "+_crashDumpMsgLog.length)	
 		var sendDumpMsgLog = _crashDumpMsgLog;
-		//_global.breakpoint();
-		//Debugger.log('HI there: '+mytest,Debugger.CRITICAL,'crashDataDump','Debugger');
 		
 		// save model data depending on which application is running
 		switch(ApplicationParent.getInstance().module){
@@ -205,16 +199,11 @@ class org.lamsfoundation.lams.common.util.Debugger {
 				
 				//Write to trace(NOT USED??)
                 msg = "["+fname+"]"+msg
-				
-				//chuck it to the trace window
-				trace(msg);
-				
-                
+				 
                 //Write to log
                 _msgLog.push(obj);
 					
-				//trace("Length of _msgLog:- "+_msgLog.length)
-                //Dispatch update event
+				//Dispatch update event
                 _instance.dispatchEvent({type:'update',target:_instance});
 			}
 		}
@@ -223,9 +212,7 @@ class org.lamsfoundation.lams.common.util.Debugger {
 	public static function error(e:Object):Void{
 		if(e instanceof LFError){
 			var lfe = LFError(e);
-			trace("/////////////////////// ERROR ///////////////////");
 			log(lfe.message,Debugger.CRITICAL,lfe.fname,"LFError");
-			trace("/////////////////////////////////////////////////");
 		}else{
 			log("Recieved unsupported error type",Debugger.CRITICAL,"error","Debugger");
 		}
@@ -256,15 +243,11 @@ class org.lamsfoundation.lams.common.util.Debugger {
             format = {};
             format.date = false;
         }
-        //Loop through messages and build return string
-        //for(var i=0;i<_msgLog.length;i++) {
-        //    ret += buildMessage(format,_msgLog[i]);
-        //}
-		//Loop through messages and build return string
 		
         for(var i=0;i<_msgLog.length;i++) {
             ret += buildMessage(format,_msgLog[i]);
         }
+		
         return ret;
     }
 	

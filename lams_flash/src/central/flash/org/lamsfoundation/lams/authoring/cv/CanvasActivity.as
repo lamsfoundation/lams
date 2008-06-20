@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.authoring.br.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
 import org.lamsfoundation.lams.common.style.*
+
 import mx.controls.*
 import com.polymercode.Draw;
 import mx.managers.*
@@ -405,18 +406,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			}
 		}
 	}
-	
-	
-	/**
-	 * Add + icon to indicate that more users are currently at the Activity. 
-	 * We are unable to display all the users across the Activity's panel.
-	 * 
-	 * @usage   
-	 * @param   target  The target reference, this class OR a parent
-	 * @param   x_pos  	The X position of the icon
-	 * @return  
-	 */
-
 	
 	/**
 	 * Does the work of laying out the screen assets.

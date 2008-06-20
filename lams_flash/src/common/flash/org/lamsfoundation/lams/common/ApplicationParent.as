@@ -56,7 +56,7 @@ class ApplicationParent {
 	public static var NORMAL_MODE:String = "author";		// Normal Operation Mode
 	public static var EDIT_MODE:String = "editonfly";		// Edit-On-The-Fly Mode
 
-	public static var DIALOGUE_DEPTH:Number = 55;	//depth of the cursors
+	public static var DIALOGUE_DEPTH:Number = 55;			//depth of the cursors
     
     private var _comms:Communication;
     private var _themeManager:ThemeManager;
@@ -65,7 +65,7 @@ class ApplicationParent {
     private var _workspace:Workspace;
 	
 	private var _currentDialog:MovieClip;
-	private var _customCursor_mc:MovieClip;         //Cursor container
+	private var _customCursor_mc:MovieClip;         		//Cursor container
 	
 	private static var _controlKeyPressed:String;
 	

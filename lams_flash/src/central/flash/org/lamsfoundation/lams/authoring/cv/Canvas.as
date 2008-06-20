@@ -193,12 +193,12 @@ class Canvas extends CanvasHelper {
 			return;
 		}
 		
-		//TODO: Set the results from wsp into design.
 		if(workspaceResultDTO != null){
 			if(workspaceResultDTO.selectedResourceID != null){
 				//must be overwriting an existing design as we have a new resourceID
 				_ddm.learningDesignID = workspaceResultDTO.selectedResourceID;
 			}
+			
 			_ddm.workspaceFolderID = workspaceResultDTO.targetWorkspaceFolderID;
 			_ddm.title = workspaceResultDTO.resourceName;
 			_ddm.description = workspaceResultDTO.resourceDescription;
@@ -356,23 +356,19 @@ class Canvas extends CanvasHelper {
 			case(Activity.TOOL_ACTIVITY_TYPE):
 				actType = "Tool"
 				 actToAdd = ToolActivity(actToCopy.clone());
-				//give it a new UIID:
 				actToAdd.activityUIID = _ddm.newUIID();
 			break;
 			case(Activity.OPTIONAL_ACTIVITY_TYPE):
 				actToAdd = Activity(actToCopy.clone());
-				//give it a new UIID:
 				actToAdd.activityUIID = _ddm.newUIID();
 			
 			case(Activity.PARALLEL_ACTIVITY_TYPE):
 				actType = "Parallel"
 				actToAdd = Activity(actToCopy.clone());
-				
-				//give it a new UIID:
 				actToAdd.activityUIID = _ddm.newUIID();
 				
-				
 			Debugger.log('parallel activity given new UIID of:'+actToAdd.activityUIID ,Debugger.GEN,'setDroppedTemplateActivity','Canvas');			
+			
 			//now get this acts children and add them to the design (WHINEY VOICE:"will somebody pleeeease think of the children.....")
 			for(var i=0;i<ta.childActivities.length;i++){
 					
@@ -381,15 +377,19 @@ class Canvas extends CanvasHelper {
 					
 					var child:Activity = ToolActivity(ta.childActivities[i].clone());
 					child.activityUIID = _ddm.newUIID();
+					
 					//tell it who's the daddy (set its parent UIID)
 					child.parentUIID = actToAdd.activityUIID;
 					Debugger.log('child.parentUIID:'+child.parentUIID,Debugger.GEN,'setDroppedTemplateActivity','Canvas');			
 					child.learningDesignID = _ddm.learningDesignID;
+					
 					//does not need mouse co-ords as in in container act.
 					
 					_ddm.addActivity(child);
+					
 					var callback:Function = Proxy.create(this,setNewChildContentID, child);
 					var passChildToolID = ta.childActivities[i].toolID;
+					
 					Application.getInstance().getComms().getRequest('authoring/author.do?method=getToolContentID&toolID='+passChildToolID,callback, false);
 			}				 
 			break;
@@ -401,7 +401,6 @@ class Canvas extends CanvasHelper {
 		}
 		
 		//Set up the main activity for the canvas:
-		
 		
 		//assign it the LearningDesignID
 		actToAdd.learningDesignID = _ddm.learningDesignID;

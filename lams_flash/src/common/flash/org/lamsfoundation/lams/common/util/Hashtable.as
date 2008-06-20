@@ -118,12 +118,13 @@ class org.lamsfoundation.lams.common.util.Hashtable {
     public function remove(o) {
 		setBusy();
 
-        trace("removing " + o);
         var i = this._getIndex(o);
+		
 		//we gotta clear the busy flag as keys needs to be called
 		clearBusy();
         var l = this.keys().length;
-        setBusy();
+		setBusy();
+		
 		if(i < l){
             // o found
             var r = this.elements[i].val;
@@ -133,8 +134,8 @@ class org.lamsfoundation.lams.common.util.Hashtable {
             }
             
             this.elements.splice(i, 1);
-            trace("length after removal: "+ this.elements.length);
 			clearBusy();
+			
             return r;
         }else{
 			clearBusy();
@@ -180,15 +181,6 @@ class org.lamsfoundation.lams.common.util.Hashtable {
     public function isEmpty() {
         return this.elements.length == 0;
     }
-    /*
-    public function toString = function() {
-        var r = "";
-        for (var i = 0; i < this.elements.length; i++) {
-            r += ", " + this.elements[i];
-        }
-        return r.substring(2 * (r.length > 0));
-    } 
-	*/
     
     public function startWatch(newWatchFunction,loc) {
         this._watch = true;
@@ -210,7 +202,6 @@ class org.lamsfoundation.lams.common.util.Hashtable {
     * o = search term, f is name of field, can be 'val' or blank is key
     */
     private function _getIndex (o, f) {
-        //trace('Hashtable.prototype._getIndex');
         var r;
         f = f == undefined ? "key" : f;
         for (r = 0; r < this.elements.length && this.elements[r][f] != o; r++);
@@ -228,7 +219,4 @@ class org.lamsfoundation.lams.common.util.Hashtable {
 		_isBusy=false;
 	}
 	
-	
-	
-
 }

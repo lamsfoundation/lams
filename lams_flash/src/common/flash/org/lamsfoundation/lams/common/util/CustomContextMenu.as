@@ -25,8 +25,9 @@ import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.common.ApplicationParent;
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
+
 /**
-* DTO  Generic data transfer obj
+* CustomContextMenu
 */
 class CustomContextMenu {
 	//Declarations
@@ -47,8 +48,6 @@ class CustomContextMenu {
 	
 	//Constructor
 	private function CustomContextMenu() {
-		
-		
 		//To hide builtin menu for root
 		rootMenu = new ContextMenu();
 		rootMenu.hideBuiltInItems();
@@ -59,8 +58,6 @@ class CustomContextMenu {
 		
 		authorMenu = new ContextMenu();
 		authorMenu.hideBuiltInItems();
-		//To show hide menu for activities
-		
 		
 		mx.events.EventDispatcher.initialize(this);
 	}

@@ -40,6 +40,7 @@ class Config {
 	//MS of delay between clicks to make a double click
 	//TODO - set this to 500 ms when not in IDE
 	public static var DOUBLE_CLICK_DELAY:Number = 500;
+	
 	//message type codes
 	public static var MESSAGE_TYPE_ERROR:Number = 1;
 	public static var MESSAGE_TYPE_CRITICAL:Number = 2;
@@ -124,7 +125,6 @@ class Config {
         var callBack = Proxy.create(this,serverDefaultsLoaded);
 
         _comms.getRequest('flashxml/configData.xml',callBack)
-        //_comms.loadXML('lams_authoring/configData.xml',callBack,true,true);
     }
         
     /**
@@ -233,10 +233,8 @@ class Config {
     * gets the language from the root that was passed in by the JSP page containing the SWF
     */
     private function getLanguage():String{
-        //TODO: make this a real call to get browser lcoale!
-		//return 'en';
-        //return 'en';
-        var lang:String;
+        //TODO: make this a real call to get browser locale
+		var lang:String;
 		
         if(_root.lang){
 			lang = _root.lang;

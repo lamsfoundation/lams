@@ -59,8 +59,7 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 	}
 	
 	public function init():Void{
-		_drawnLineStyle = 0xAFCE63; //0xEA00FF;
-		//arrow_mc.setStyle("backgroundColor", "0xEA00FF");
+		_drawnLineStyle = 0xAFCE63;
 		arrow_mc.setStyle("backgroundColor", "0xAFCE63");
 		
 		if(branch.direction == DIR_SINGLE)
@@ -69,6 +68,7 @@ class org.lamsfoundation.lams.authoring.br.BranchConnector extends CanvasConnect
 			draw();
 		
 		Debugger.log("is open: " + model.activeView.isOpen, Debugger.CRITICAL, "init", "BranchConnector");
+		
 		if(branch.direction != DIR_TO_END && model.activeView.isOpen)
 			createBranchLabel();
 	}

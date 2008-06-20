@@ -40,6 +40,7 @@ class WizardController extends AbstractController {
 	private var _wizardView:WizardView;
 	private var _resultDTO:Object;
 	private var _isBusy:Boolean;
+	
 	/**
 	* Constructor
 	*
@@ -92,7 +93,7 @@ class WizardController extends AbstractController {
 	}
 	
 	private function gonext(evt:Object){
-       Debugger.log('I am in goNext:',Debugger.CRITICAL,'click','gonext');
+        Debugger.log('I am in goNext:',Debugger.CRITICAL,'click','gonext');
 		_global.breakpoint();
 		var wizView:WizardView = getView();
 		if(wizView.validateStep(_wizardModel)){
@@ -101,26 +102,18 @@ class WizardController extends AbstractController {
     }
 	
 	private function gocancel(evt:Object){
-		// close window
-		//getURL('javascript:window.close()');
 		ApplicationParent.extCall("closeWindow", null);
 	}
 	
 	private function goclose(evt:Object){
-		//getURL('javascript:closeWizard()');
 		ApplicationParent.extCall("closeWizard", null);
 	}
 	
 	private function goprev(evt:Object){
-		trace('PREV CLICKED');
-		//var wm:WizardModel = WizardModel(getModel());
 		_wizardModel.stepID--;
-		trace('new step ID: ' +_wizardModel.stepID);
 	}
 	
 	private function gofinish(evt:Object){
-		trace('FINISH CLICKED');
-		//var wm:WizardModel = WizardModel(getModel());
 		var wizView:WizardView = getView();
 		if(wizView.validateStep(_wizardModel)){
 			wizView.resultDTO.mode = WizardView.FINISH_MODE;
@@ -130,8 +123,6 @@ class WizardController extends AbstractController {
 	}
 	
 	private function gostart(evt:Object){
-		trace('START CLICKED');
-		//var wm:WizardModel = WizardModel(getModel());
 		var wizView:WizardView = getView();
 		if(wizView.validateStep(_wizardModel)){
 			wizView.resultDTO.mode = WizardView.START_MODE;
@@ -144,14 +135,12 @@ class WizardController extends AbstractController {
     * Workspace dialog OK button clicked handler
     */
     private function okClicked(evt:Object) {
-		
 		if(evt.type == 'okClicked'){
 			//invalidate the cache of folders
 			//getView().workspaceView.getModel().clearWorkspaceCache(evt.target.resultDTO.targetWorkspaceFolderID);
 			
 			//pass the resultant DTO back to the class that called us.
             Application.getInstance().getWorkspace().onOKCallback(evt.target.resultDTO);
-			
 		}
 	}
 	

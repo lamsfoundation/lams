@@ -122,10 +122,12 @@ class DebugDialog extends MovieClip implements Dialog{
         //Add event listeners for ok, cancel and close buttons
         ok_btn.addEventListener('click',Delegate.create(this, ok));
         cancel_btn.addEventListener('click',Delegate.create(this, cancel));
-        //Assign Click (close button) and resize handlers
+        
+		//Assign Click (close button) and resize handlers
         _container.addEventListener('click',this);
         _container.addEventListener('size',this);
-        //Register as listener with StyleManager and set Styles
+        
+		//Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
         
         //Register with the Debugger class to pick up log messages
@@ -200,20 +202,11 @@ class DebugDialog extends MovieClip implements Dialog{
             var beginPos:Number = 0;
             var endPos:Number = text_str.indexOf('=');
             var obj_str:String = text_str.substr(0,endPos);
-            //var obj = eval(obj_str);
-            //get the property which is after the = sign
             var prop = text_str.substr(endPos+1,text_str.length-endPos);
-            //trace('obj_str :' + obj_str);
-            //trace('prop :' + prop);
-           
-            //Make the assignment
-            //obj = prop;
             var o:String = '_root'
             var p:String = '_root._x';
             var val:String = '500'
-            //setProperty(o,p,val);
-            //setProperty(obj,prop,
-        } else {
+		} else {
             traceMsg('Missing = sign or invalid string');
         }
     }
@@ -237,11 +230,13 @@ class DebugDialog extends MovieClip implements Dialog{
                 //Get comms and serialize object
                 var comms = ApplicationParent.getInstance().getComms();
                 var sx:String = comms.serializeObj(data);
-                //Write out the serialized object
+                
+				//Write out the serialized object
                 messages_ta.html=false;
                 traceMsg('serializing \n' + input_ti.text +'\n \n' + sx);
                 messages_ta.html=true;
-                //Copy to clipboard
+                
+				//Copy to clipboard
                 System.setClipboard(sx);
             }else {
                 traceMsg("no 'toData' or 'itemToData' method or found for :" + text_str);
@@ -314,7 +309,6 @@ class DebugDialog extends MovieClip implements Dialog{
 		var url_str:String = input_ti.text;
 		var comms = ApplicationParent.getInstance().getComms();
 		comms.getRequest(url_str,testLoadXMLLoaded,true);
-		
 	}
 
 	/**
@@ -324,7 +318,6 @@ class DebugDialog extends MovieClip implements Dialog{
         _global.breakpoint();
 		var test=dto;
 		ObjectUtils.printObject(dto);
-		
     }
 
     /**
@@ -340,10 +333,8 @@ class DebugDialog extends MovieClip implements Dialog{
     * Event dispatched by parent container when close button clicked
     */
     public function click(e:Object):Void{
-        trace('PreferencesDialog.click');
-        e.target.deletePopUp();
+       e.target.deletePopUp();
     }
-    
     
     /**
     * Main resize method, called by scrollpane container/parent
@@ -353,7 +344,8 @@ class DebugDialog extends MovieClip implements Dialog{
         if(w>400 && h>260){
             //Size the panel
             panel.setSize(w,h);
-            //Buttons
+            
+			//Buttons
             ok_btn.move(w-xOkOffset-20,h-yOkOffset-20);
             cancel_btn.move(w-xCancelOffset-20,h-yCancelOffset-20);
         

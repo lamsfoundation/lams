@@ -255,8 +255,10 @@ class org.lamsfoundation.lams.wizard.steps.WizardSequenceView extends AbstractVi
 	 */
 	public function refreshFolder(nodeToOpen:XMLNode, wm:WorkspaceModel){
 		Debugger.log('refreshFolder:'+nodeToOpen ,Debugger.GEN,'refreshFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		
 		//close the node
 		location_treeview.setIsOpen(nodeToOpen,false);		
+		
 		//we are gonna need to fire the event manually for some stupid reason the tree is not firing it.
 		//dispatchEvent({type:'nodeOpen',target:treeview,node:nodeToOpen});
 		_workspaceController = _workspaceView.getController();

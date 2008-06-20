@@ -86,7 +86,8 @@ dynamic class Dictionary {
 		
 		var _oldDate:Object = null;
 		var _removeCache:Boolean = Config.getInstance().removeCache;
-        // Cookie or server?
+        
+		// Cookie or server?
 		Debugger.log('Config.DOUBLE_CLICK_DELAY:'+Config.DOUBLE_CLICK_DELAY,Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
 		Debugger.log('Config.USE_CACHE:'+Config.USE_CACHE,Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
         if(CookieMonster.cookieExists(DICT_DATE)){
@@ -147,14 +148,10 @@ dynamic class Dictionary {
         var v:String = _instance.items.get(key).value;
 		if(v!=null){
 			if(param!=null){
-				trace('using params..');
 				for(var i=0; i<param.length; i++){
-					trace('param values: ' + param[0]);
 					// replace param {i} with value in array
 					var str_toReplace =  String.fromCharCode(123) + String(i) + String.fromCharCode(125);
-					trace(str_toReplace);
 					var newStr:String = StringUtils.replace(v, str_toReplace, String(param[i]));
-					trace(String(newStr));
 					v = newStr;
 				}
 			}
@@ -314,11 +311,12 @@ dynamic class Dictionary {
 		this._module = app.module;
 		Debugger.log('URL : '+ 'flashxml/' + _module  + '/' + _currentLanguage + '_dictionary.xml',Debugger.CRITICAL,'openFromServer','Dictionary');
 		var callBack = Proxy.create(this,onDictionaryLoadedFromServer);
-        //comms.loadXML('http://dolly.uklams.net/lams/lams_authoring/' + _currentLanguage + '_dictionary.xml',callBack,true,true);
         comms.getRequest('flashxml/' + _module + '/' + _currentLanguage + '_dictionary.xml' + "?v=" + _root.build,callBack,false);
     }
     
     /**
+	* @deprecated
+	* 
     * TODO: THIS IS ONLY USED FOR TESTING WHILST SERVER DOES NOT SUPPORT STRUCTURE
     * REMOVE WHEN NO LONGER REQUIRED
     */

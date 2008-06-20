@@ -21,19 +21,19 @@
  * ************************************************************************
  */
 
-import org.lamsfoundation.lams.authoring.*       	//Design Data model n stuffimport org.lamsfoundation.lams.authoring.*       	//Design Data model n stuff
+import org.lamsfoundation.lams.authoring.*       				//Design Data model n stuff
 import org.lamsfoundation.lams.authoring.br.CanvasBranchView 
-import org.lamsfoundation.lams.authoring.tk.*       //Toolkit
-import org.lamsfoundation.lams.authoring.tb.*       //Toolbar
-import org.lamsfoundation.lams.authoring.cv.*       //Canvas
-import org.lamsfoundation.lams.authoring.layout.*       //Authoring Layout Managers
-import org.lamsfoundation.lams.common.ws.*          //Workspace
-import org.lamsfoundation.lams.common.comms.*       //communications
-import org.lamsfoundation.lams.common.util.*        //Utils
-import org.lamsfoundation.lams.common.dict.*        //Dictionary
-import org.lamsfoundation.lams.common.ui.*          //User interface
-import org.lamsfoundation.lams.common.style.*       //Themes/Styles
-import org.lamsfoundation.lams.common.layout.*		// Layouts
+import org.lamsfoundation.lams.authoring.tk.*       			//Toolkit
+import org.lamsfoundation.lams.authoring.tb.*       			//Toolbar
+import org.lamsfoundation.lams.authoring.cv.*       			//Canvas
+import org.lamsfoundation.lams.authoring.layout.*       		//Authoring Layout Managers
+import org.lamsfoundation.lams.common.ws.*          			//Workspace
+import org.lamsfoundation.lams.common.comms.*       			//Communications
+import org.lamsfoundation.lams.common.util.*        			//Utils
+import org.lamsfoundation.lams.common.dict.*        			//Dictionary
+import org.lamsfoundation.lams.common.ui.*          			//User interface
+import org.lamsfoundation.lams.common.style.*       			//Themes/Styles
+import org.lamsfoundation.lams.common.layout.*					// Layouts
 import org.lamsfoundation.lams.common.*             
 import mx.managers.*
 import mx.utils.*
@@ -69,15 +69,15 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     public static var WORKSPACE_W:Number = 300;
     public static var WORKSPACE_H:Number = 200;
     
-	private static var LOADING_ROOT_DEPTH:Number = 100;	//depth of the loading movie
-    private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
-    private static var DIALOGUE_DEPTH:Number = 55;	//depth of the dialogue box
-    private static var TOOLTIP_DEPTH:Number = 60;	//depth of the tooltip
-    private static var CURSOR_DEPTH:Number = 70;   //depth of the cursors
+	private static var LOADING_ROOT_DEPTH:Number = 100;		//depth of the loading movie
+    private static var APP_ROOT_DEPTH:Number = 10; 			//depth of the application root
+    private static var DIALOGUE_DEPTH:Number = 55;				//depth of the dialogue box
+    private static var TOOLTIP_DEPTH:Number = 60;				//depth of the tooltip
+    private static var CURSOR_DEPTH:Number = 70;   			//depth of the cursors
 	private static var CCURSOR_DEPTH:Number = 101;
-    public static var MENU_DEPTH:Number = 25;   //depth of the menu
-	public static var PI_DEPTH:Number = 35;   //depth of the menu
-    public static var TOOLBAR_DEPTH:Number = 50;   //depth of the menu
+    public static var MENU_DEPTH:Number = 25;   				//depth of the menu
+	public static var PI_DEPTH:Number = 35;
+    public static var TOOLBAR_DEPTH:Number = 50;   			
     private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
 	private static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
 	private static var DATA_LOAD_CHECK_INTERVAL:Number = 50;
@@ -97,7 +97,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	
 	private static var COMMON_COMPONENT_NO = 4;
 
-	private var _uiLoadCheckCount = 0;				// instance counter for number of times we have checked to see if theme and dict are loaded
+	private var _uiLoadCheckCount = 0;					// instance counter for number of times we have checked to see if theme and dict are loaded
 	private var _dataLoadCheckCount = 0;			
 	
 	private var _ddm:DesignDataModel;
@@ -112,7 +112,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     
     private var _cursorContainer_mc:MovieClip;         //Cursor container
     private var _menu_mc:MovieClip;                    //Menu bar clip
-    private var _container_mc:MovieClip;              //Main container
+    private var _container_mc:MovieClip;              	//Main container
 	private var _pi_mc:MovieClip;
     private var _toolbarContainer_mc:MovieClip;		//Container for Toolbar
     private var _UILoadCheckIntervalID:Number;         //Interval ID for periodic check on UILoad status
@@ -131,9 +131,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	//clipboard
 	private var _clipboardData:Object;
 	private var _clipboardPasteCount:Number;
-	
-	// set up Key Listener
-	//private var keyListener:Object;
     
 	// operation modes
 	private var _isEditMode:Boolean;
@@ -217,6 +214,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         //Now that the config class is ready setup the UI and data, call to setupData() first in 
 		//case UI element constructors use objects instantiated with setupData()
         _root.preloader.complete();
+		
 		setupData();
 		checkDataLoaded();
     }
@@ -308,7 +306,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 						var e:LFError = new LFError(msg,"Canvas.setDroppedTemplateActivity",this,'_themeEventDispatched:'+_themeEventDispatched+' _dictionaryEventDispatched:'+_dictionaryEventDispatched);
 						e.showErrorAlert();
 						
-						//todo:  give the user a message
+						//TODO:  give the user a message
 						clearInterval(_UILoadCheckIntervalID);
 					}
                 }
@@ -397,7 +395,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		//All Buttons Tab Index
 		_menu_mc.tabIndex = 100;
 		_toolbarContainer_mc.tabIndex = 200;
-		//_toolkit.tabIndex = 3;
 		_pi_mc.tabIndex = 400;
 	}
 	
@@ -488,9 +485,6 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     */
     private function onKeyDown(){
 		
-		//var mouseListener:Object = new Object();
-        //Debugger.log('Key.isDown(Key.CONTROL): ' + Key.isDown(Key.CONTROL),Debugger.GEN,'onKeyDown','Application');
-        //Debugger.log('Key: ' + Key.getCode(),Debugger.GEN,'onKeyDown','Application');
 		//the debug window:
         if (Key.isDown(Key.CONTROL) && Key.isDown(Key.ALT) && Key.isDown(QUESTION_MARK_KEY)) {
             if (!_debugDialog.content){

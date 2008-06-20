@@ -28,6 +28,7 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 	// The button to display the ToolTip on
 	var btn:Button;
 	var ttHolder:MovieClip;
+	
 	// The movieclips & textfield which form the tooltip
 	var ToolTipHolder:MovieClip;
 	var ToolTipBackground:MovieClip;
@@ -96,6 +97,7 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 		
 		var bgwidth = ttHolder.ToolTipHolder.ToolTipText.textWidth + 8;
 		var bgheight = ttHolder.ToolTipHolder.ToolTipText.textHeight + 4;
+		
 		// Create the background on the tool tip
 		ttHolder.ToolTipHolder.createEmptyMovieClip("ToolTipBackground", 2);
 		with (ttHolder.ToolTipHolder.ToolTipBackground){
@@ -215,9 +217,6 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 		ttHolder.ToolTipHolder._visible = true;
 		ttHolder.ToolTipHolder._alpha = 0;
 		
-		//ttHolder.ToolTipHolder._x = _root._xmouse + xoffset
-		//ttHolder.ToolTipHolder._y = _root._ymouse + yoffset
-		
 		var delayed = 0;
 		var delayfor = this.delay * 10;
 		
@@ -238,7 +237,6 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 	
 	public function CloseToolTip(){
 		delete ttHolder.ToolTipHolder.onEnterFrame;
-		//ttHolder.ToolTipHolder._visible = false;	
 		ttHolder.ToolTipHolder.removeMovieClip();
 	}
 }

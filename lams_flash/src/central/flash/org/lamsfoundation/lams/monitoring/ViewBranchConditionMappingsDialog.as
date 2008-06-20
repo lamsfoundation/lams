@@ -21,7 +21,6 @@
  * ************************************************************************
  */
 
-
 import org.lamsfoundation.lams.common.*
 import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.ui.*
@@ -159,7 +158,6 @@ class org.lamsfoundation.lams.monitoring.ViewBranchConditionMappingsDialog exten
     * Called by the OK button 
     */
     private function close(){
-		//close popup
 		_container.deletePopUp();
     }
 	

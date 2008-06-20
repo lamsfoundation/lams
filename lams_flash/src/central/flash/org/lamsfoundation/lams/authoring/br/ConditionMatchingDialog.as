@@ -166,7 +166,6 @@ class ConditionMatchingDialog extends BranchMappingDialog {
     */
     public function themeChanged(event:Object):Void{
         if(event.type=='themeChanged') {
-            //Theme has changed so update objects to reflect new styles
             setStyles();
         }else {
             Debugger.log('themeChanged event broadcast with an object.type not equal to "themeChanged"',Debugger.CRITICAL,'themeChanged','ConditionMatchingDialog');
@@ -183,7 +182,6 @@ class ConditionMatchingDialog extends BranchMappingDialog {
 		if(conditions_lst.length > 0) {
 			LFMessage.showMessageAlert(Dictionary.getValue("branch_mapping_auto_condition_msg"), Proxy.create(this, cleanupUnmappedConditions));
 		} else {
-			//close popup
 			_container.deletePopUp();
 		}
 		

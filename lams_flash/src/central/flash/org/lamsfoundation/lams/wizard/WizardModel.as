@@ -87,7 +87,7 @@ class WizardModel extends Observable{
     public var removeEventListener:Function;
 	
 	/**
-	* Constructor.
+	* Constructor
 	*/
 	public function WizardModel (wizard:Wizard){
 		_wizard = wizard;
@@ -140,7 +140,6 @@ class WizardModel extends Observable{
 		
 	}
 	
-	
 	/**
 	* Periodically checks if users have been loaded
 	*/
@@ -154,10 +153,8 @@ class WizardModel extends Observable{
 			if(_staffLoaded && _learnersLoaded) {
 				clearInterval(_UserLoadCheckIntervalID);
 				
-				trace('ALL USERS LOADED -CONTINUE');
 				// populate learner/staff scrollpanes
 				broadcastViewUpdate("USERS_LOADED", null, null);
-				
 				
 			} else if(_userLoadCheckCount >= USER_LOAD_CHECK_TIMEOUT_COUNT) {
 				Debugger.log('reached timeout waiting for data to load.',Debugger.CRITICAL,'checkUsersLoaded','MonitorModel');
@@ -174,39 +171,30 @@ class WizardModel extends Observable{
 	}
 	
 	private function requestLearners(data:Object){
-		
-		trace('requesting learners...');
 		var callback:Function = Proxy.create(this,saveLearners);
 		_wizard.requestUsers(LEARNER_ROLE, data.organisationID, callback);
 	}
 
 	
 	private function requestStaff(data:Object){
-		
-		trace('requesting staff members...');
 		var callback:Function = Proxy.create(this,saveStaff);
 		
 		_wizard.requestUsers(MONITOR_ROLE, data.organisationID, callback);
 	}
 	
 	public function saveLearners(users:Array){
-		trace('retrieving back users for org by role: ' + LEARNER_ROLE);
-		
 		saveUsers(users, LEARNER_ROLE);
 		
 		dispatchEvent({type:'learnersLoad',target:this});
 	}
 	
 	public function saveStaff(users:Array){
-		trace('retrieving back users for org by role: ' + MONITOR_ROLE);
-		
 		saveUsers(users, MONITOR_ROLE);
 		
 		dispatchEvent({type:'staffLoad',target:this});
 	}
 
 	private function saveUsers(users:Array, role:String):Void{
-		
 		for(var i=0; i< users.length; i++){
 			var u:Object = users[i];
 			
@@ -257,7 +245,8 @@ class WizardModel extends Observable{
         //Set state variables
 		__x = x;
 		__y = y;
-        //Set flag for notify observers
+        
+		//Set flag for notify observers
 		setChanged();
         
 		//build and send update object

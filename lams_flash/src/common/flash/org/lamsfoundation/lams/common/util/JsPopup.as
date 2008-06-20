@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.* 
 import mx.managers.*
 import mx.utils.*
+
 /**
  * Popup method for opening browser popup window using javascript in author.js file.
  * @author  Pradeep Sharma
@@ -39,8 +40,6 @@ import mx.utils.*
 class JsPopup{
 	
 	private static var _instance:JsPopup = null;
-	
-
 
 	/**
 	 * Constructor Function

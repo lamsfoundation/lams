@@ -61,10 +61,8 @@ class org.lamsfoundation.lams.authoring.cv.SaveConfirmDialog extends MovieClip {
 	
 	private var msgBox:TextArea;
 	
-	
     private var fm:FocusManager;
     private var _tm:ThemeManager;
-
    
 	//Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -110,9 +108,9 @@ class org.lamsfoundation.lams.authoring.cv.SaveConfirmDialog extends MovieClip {
 		stpButtons();
 		okBtn.setFocus();
 		
-		//_container._parent.setSize(150, 120);
 		_container._parent.hScrollPolicy = "no";
 		_container.resize = false;
+		
 		setSize(this._width, this._height);
 
 		//fire event to say we have loaded
@@ -155,9 +153,6 @@ class org.lamsfoundation.lams.authoring.cv.SaveConfirmDialog extends MovieClip {
 	  okBtn._y =  h - okBtn._height - MARGIN;
 	  retBtn._x = (w/2) - (wid/2) + okBtn._width + (2*MARGIN);
 	  retBtn._y =  h - retBtn._height - MARGIN;
-	  
-	  
-	  
     }
 	
 	/**
@@ -172,7 +167,6 @@ class org.lamsfoundation.lams.authoring.cv.SaveConfirmDialog extends MovieClip {
 		okBtn.setStyle('styleName',styleObj);
 		retBtn.setStyle('styleName',styleObj);
 		msgBox.setStyle('borderStyle', 'none');
-		
     }
     
     /**
