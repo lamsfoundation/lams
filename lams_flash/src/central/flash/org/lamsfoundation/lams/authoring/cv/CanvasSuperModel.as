@@ -166,7 +166,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		var tActivities:Array = new Array();
 		
 		if(isBranching)
-			tActivities.addItem({label: "--Selection--", data: 0});	 // TODO: Label required
+			tActivities.addItem({label: Dictionary.getValue("pi_branch_tool_acts_default"), data: 0});
 		
 		while(_activityUIID != null) {
 			

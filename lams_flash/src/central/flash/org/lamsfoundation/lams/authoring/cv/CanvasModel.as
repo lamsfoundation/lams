@@ -36,7 +36,7 @@ import mx.events.*;
 */
 class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundation.lams.authoring.cv.CanvasSuperModel {
 
-	public static var TRANSITION_TOOL:String = "TRANSITION";  //activie tool ID strings definition
+	public static var TRANSITION_TOOL:String = "TRANSITION";
 	public static var OPTIONAL_TOOL:String = "OPTIONAL";
 	public static var OPTIONAL_SEQ_TOOL:String = "OPTIONAL_SEQ";
 	public static var GATE_TOOL:String = "GATE";
@@ -45,7 +45,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	
 	public static var OPEN_FROM_FILE:Number = 0;
 	public static var ADD_FROM_TEMPLATE:Number = 1;
-	
 
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -125,24 +124,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	 * @param   toActivity 
 	 * @return  
 	 */
-	
 	public function createSequenceTransition(fromActivity:Activity, toActivity:Activity):Void {
-	/**	var fromActivity:Activity;
-		var _children:Array = _cv.ddm.getComplexActivityChildren(sequence.activityUIID);
-		_children.sortOn('orderID', Array.NUMERIC);
+		addActivityToTransition(fromActivity);
+		addActivityToTransition(toActivity);
+		resetTransitionTool();
 		
-		Debugger.log("toActivity orderID " + toActivity.orderID, Debugger.CRITICAL, "createSequenceTransition", "CanvasModel");
-		var _index:Number = toActivity.orderID - 2;
-		if(_index >= 0) {
-			fromActivity = _children[_index];
-			Debugger.log("fromActivity " + fromActivity.activityUIID, Debugger.CRITICAL, "createSequenceTransition", "CanvasModel");
-		*/
-			addActivityToTransition(fromActivity);
-			addActivityToTransition(toActivity);
-			resetTransitionTool();
-		//}
-		
-		 setDirty();
+		setDirty();
 	 }
 	
 	/**
@@ -265,6 +252,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		
 		//tell the canvas to go refresh
 		setDirty();
+		
 		//select the new thing
 		setSelectedItem(_activitiesDisplayed.get(groupingActivity.activityUIID));
 	}
@@ -378,7 +366,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 				Debugger.log("selectedIndex order: " + Activity(oChildren[selectedIndex]).orderID, Debugger.CRITICAL, "moveOptionalSequenceCA", "CanvasModel");
 				Debugger.log("ca order: " + ca.activity.orderID, Debugger.CRITICAL, "moveOptionalSequenceCA", "CanvasModel");
 			
-				//var _dir:Number = (Activity(oChildren[selectedIndex]).orderID < ca.activity.orderID) ? 0 : 1;
 				var _dir:Number = (ca.activity.xCoord > ca._x) ? 0 : 1;
 				
 				unhookOptionalSequenceCA(ca);
@@ -417,8 +404,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		Debugger.log("target UIID: " +targetActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
 		Debugger.log("nextOrPrevActivity: " + nextOrPrevActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
 		Debugger.log("direction: " + _dir, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
-		
-		//_cv.ddm.removeTransitionByConnection(ca.activity.activityUIID);
 		
 		if(targetActivity != null) {
 			var fromActivity:Activity = (_dir == 0) ? targetActivity : nextOrPrevActivity;
@@ -602,6 +587,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 				return new LFError(Dictionary.getValue('cv_trans_target_act_missing'),"addActivityToBranch",this);
 			}
 			
+			//check there is not already a branch to or from this activity:
+			var branchesArray:Array = _cv.ddm.branches.values();
+			
+			for(var i=0;i<branchesArray.length;i++){
+				if(branchesArray[i].targetUIID == toAct && !branchesArray[i].isActivityless){
+					return new LFError(Dictionary.getValue("cv_invalid_branch_target_to_activity", [_connectionActivities[1].title]));
+				}
+				
+				if(branchesArray[i].targetUIID == fromAct && !branchesArray[i].isActivityless) {
+					if(!SequenceActivity(branchesArray[i].sequenceActivity).stopAfterActivity && (fromAct != activeView.startHub))
+						return new LFError(Dictionary.getValue("cv_invalid_branch_target_from_activity", [_connectionActivities[0].title]));
+				}
+			}
+			
 			//lets make the connection
 			var b:Object = (activeView.fingerprint == activeView.endHub) ? createBranchEndConnector(_connectionActivities) : createBranchStartConnector(_connectionActivities);
 
@@ -634,11 +633,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	private function addActivityToTransition(activity:Activity):Object{
 		
 		if(_connectionActivities.length >= 2){
-			//TODO: show an error
-			return new LFError("Too many activities in the Transition","addActivityToTransition",this);
+			/* unlikely to be reached */
+			return new LFError("Too many activities in the Transition", "addActivityToTransition",this);
 		}
 		
 		Debugger.log('Adding Activity.UIID:'+activity.activityUIID,Debugger.GEN,'addActivityToTransition','CanvasModel');
+		
 		_connectionActivities.push(activity);
 		
 		var fromAct = _connectionActivities[0].activityUIID
@@ -654,11 +654,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 				
 			//check we have 2 valid acts to create the transition.
 			if(fromAct == toAct){
+				/* unlikely to be reached in most use cases */
 				return new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
 			}
 				
 			if(!_cv.ddm.activities.containsKey(fromAct)){
-				return new LFError("First activity of the Transition is missing, UIID:"+_connectionActivities[0].activityUIID,"addActivityToTransition",this);
+				/* unlikely to be reached in most use cases */
+				return new LFError("First activity of the Transition is missing, UIID:" + _connectionActivities[0].activityUIID,"addActivityToTransition",this);
 			}
 			
 			if(!_cv.ddm.activities.containsKey(toAct)){
@@ -668,15 +670,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			//check there is not already a transition to or from this activity:
 			var transitionsArray:Array = _cv.ddm.transitions.values();
 				
-			/**/
 			for(var i=0;i<transitionsArray.length;i++){
 					
 				if(transitionsArray[i].toUIID == toAct){
-					return new LFError(Dictionary.getValue('cv_invalid_trans_target_to_activity',[_connectionActivities[1].title]));
+					return new LFError(Dictionary.getValue('cv_invalid_trans_target_to_activity', [_connectionActivities[1].title]));
 				}
 				
 				if(transitionsArray[i].fromUIID == fromAct){
-					return new LFError(Dictionary.getValue('cv_invalid_trans_target_from_activity',[_connectionActivities[0].title]));
+					return new LFError(Dictionary.getValue('cv_invalid_trans_target_from_activity', [_connectionActivities[0].title]));
 				}
 					
 				if ((transitionsArray[i].toUIID == toAct && transitionsArray[i].fromUIID == fromAct) || (transitionsArray[i].toUIID == fromAct && transitionsArray[i].fromUIID == toAct)){
@@ -687,19 +688,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			
 			var branch = _cv.ddm.getBranchesForActivityUIID(toAct);
 			if(branch.target != null && branch.target.direction == BranchConnector.DIR_FROM_START) {
-				
-				return new LFError("Can't create transition between activities in different branches", "addActivityToTransition", this);
+				return new LFError(Dictionary.getValue("cv_invalid_trans_diff_branches"), "addActivityToTransition", this);
 			}
 			
 			var branchesArray:Array = _cv.ddm.branches.values();
 			for(var i=0; i<branchesArray.length; i++) {
 				if(branchesArray[i].targetUIID == toAct && branchesArray[i].direction == BranchConnector.DIR_TO_END) {
+					/* unlikely to be reached in most use cases */
 					//return new LFError("Cannot connect a new transition a closed sequence");
-					
 				}
 				
 				if(branchesArray[i].targetUIID == fromAct && branchesArray[i].direction == BranchConnector.DIR_TO_END ) {
-					return new LFError("Cannot connect a new transition a closed sequence");
+					return new LFError(Dictionary.getValue("cv_invalid_trans_closed_sequence"));
 				}
 			}
 				
@@ -767,9 +767,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			b.sequenceActivity.isDefault = false;
 			
 			var sequences:Array = _cv.ddm.getComplexActivityChildren(sequence.parentUIID);
-			//b.sequenceActivity.orderID = sequences.length;
-			//b.setDefaultSequenceName();
-			
 			sequences.sortOn("orderID", Array.NUMERIC);
 			
 			var orderID:Number = (sequences.length > 0) ? getHighestBranchNumber(b.sequenceActivity.parentUIID) : 0;
@@ -850,8 +847,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		var sequences:Array = _cv.ddm.getComplexActivityChildren(b.sequenceActivity.parentUIID);
 		
 		SequenceActivity(b.sequenceActivity).isDefault = false;
-		//b.sequenceActivity.orderID = sequences.length;
-		//b.setDefaultSequenceName();
 			
 		sequences.sortOn("orderID", Array.NUMERIC);
 		var orderID:Number = (sequences.length > 0) ? getHighestBranchNumber(b.sequenceActivity.parentUIID) : 0;
