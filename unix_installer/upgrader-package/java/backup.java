@@ -7,7 +7,7 @@ public class backup
 	
 	private BufferedReader in;
 	
-	private String backupdir, jbossdir;
+	private String backupdir, jbossdir, repositoryDir, etcdir;
 
 	public String mysqldir, dbuser, dbname, dbpass, dburl;
 
@@ -30,6 +30,8 @@ public class backup
 		{
 			System.out.println("Copying files from " + jbossdir + "/ to " + backupdir + "/jboss-4.0.2/ ...");
 			copyFiles(jbossdir + "/", backupdir+"/jboss-4.0.2/");
+			copyFiles(etcdir + "/", backupdir+"/ectlams2/");
+			copyFiles(repositoryDir + "/", backupdir+"/repository/");
 			System.out.println("Done.\n");
 		}
 		catch (IOException e)
@@ -52,6 +54,8 @@ public class backup
 			Properties lamsProperties = new Properties();
 			lamsProperties.load(new FileInputStream("lams.properties"));		
 			jbossdir = lamsProperties.getProperty("JBOSS_DIR");
+			repositoryDir = lamsProperties.getProperty("LAMS_DIR") + "/repository";
+			etcdir = "/etc/lams2";
 			mysqldir = lamsProperties.getProperty("SQL_DIR");
 			dbname = lamsProperties.getProperty("DB_NAME");
 			dbuser = lamsProperties.getProperty("DB_USER");
@@ -154,29 +158,28 @@ public class backup
 	// The method copyFiles being defined
 	public void copyFiles(String strPath, String dstPath) throws IOException
 	{
-		
-  
 		File src = new File(strPath);
 		File dest = new File(dstPath);
 	
-		if (src.isDirectory())
+		if (src.exists())
 		{
-			System.out.println("Copying: " + src.getAbsolutePath());
-			dest.mkdirs();
-			String list[] = src.list();
-		
-		
-		
-			for (int i = 0; i < list.length; i++)
+			if (src.isDirectory())
 			{
-				String dest1 = dest.getAbsolutePath() + "/" + list[i];
-				String src1 = src.getAbsolutePath() + "/" + list[i];
-				copyFiles(src1 , dest1);
+				System.out.println("Copying: " + src.getAbsolutePath());
+				dest.mkdirs();
+				String list[] = src.list();
+			
+				for (int i = 0; i < list.length; i++)
+				{
+					String dest1 = dest.getAbsolutePath() + "/" + list[i];
+					String src1 = src.getAbsolutePath() + "/" + list[i];
+					copyFiles(src1 , dest1);
+				}
 			}
-		}
-		else
-		{
- 			copy(src, dest);
+			else
+			{
+	 			copy(src, dest);
+			}
 		}
 	}
 

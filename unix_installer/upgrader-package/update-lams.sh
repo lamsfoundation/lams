@@ -285,7 +285,8 @@ checklams()
 backup()
 {
     printf "\nDo you wish to automatically backup lams before updating? (Recommended. NOTE: Requires MySql to be installed at localhost)\n"
-    printf "The space required to backup your LAMS installation: \n"
+    printf "Please check the below directories are correct before running this backup. If they are not, quit the installer and backup LAMS manually.\n"
+    printf "The space required to backup your LAMS installation:\n"
     du -chs $LAMS_DIR $JBOSS_DIR
     printf "(y)es I wish to backup LAMS.\n"
     printf "(n)o I have already backed up LAMS, I am ready to update.\n"
@@ -309,18 +310,18 @@ backup()
         
         $JDK_DIR/bin/java -cp bin backup
         if [  "$?" -ne  "0" ]
-                then
-                        echo "Update failed, please check that LAMS $REQ_LAMS_VERSION is installed and your lams.properties file is correct."
-                        installfailed
-                fi
+        then
+                echo "Update failed, Failed to backup LAMS."
+                installfailed
+        fi
 
         chmod 755 bin/lamsdump.sql
         bin/lamsdump.sql
         if [  "$?" -ne  "0" ]
-                then
-                        echo "Update failed, please check that LAMS $REQ_LAMS_VERSION is installed and your lams.properties file is correct."
-                        installfailed
-                fi
+        then
+                echo "Update failed, problem dumping database for backup."
+                installfailed
+        fi
 
         ;;
     n) 
