@@ -438,11 +438,12 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	}
 	
 	private function close():Void {
-		if(model instanceof CanvasModel) model.getCanvas().hideBin(); //typo
+		if(model instanceof CanvasModel) model.getCanvas().hideBin();
 		this.activity.clear = false;
 		
 		Debugger.log("this._canvasBranchingActivity: "+ this._canvasBranchingActivity, Debugger.CRITICAL, "close", "CanvasBranchView");
 		
+		this._canvasBranchingActivity.isSetSelected = false;
 		this._canvasBranchingActivity.refresh();
 		
 		model.selectedItem = null;
