@@ -127,8 +127,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		
 		if(createGroupingUIID != null) {
 		
-			var keyArray:Array = _activitiesDisplayed.keys();
+			var valuesArray:Array = _activitiesDisplayed.values();
+			clearGrouping(valuesArray, createGroupingUIID);
 			
+			/*
 			for(var i=0; i<keyArray.length; i++){
 				var a = _activitiesDisplayed.get(keyArray[i]);
 				var currentGroupingUIID:Number = a.activity.groupingUIID;
@@ -147,17 +149,54 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 						}
 						
 						a.init();
-					}
+					} 
 			
 					Debugger.log('Set grouping UIID to null: '+a.activity.groupingUIID ,Debugger.GEN,'clearGroupedActivities','CanvasSuperModel');
 					
 					a.isSetSelected = false;
 					a.refresh()
+				} else if(a instanceof CanvasOptionalActivity) {
+					clearComplexGrouping(a.children, createGroupingUIID);
 				}
-			}
+			}*/
+			
 		}
 		
 		selectedItem = null;
+	}
+	
+	/**
+	 * Recursive method to clear the grouping reference of any activities that are grouped by the removed grouping.
+	 *   
+	 * @param   children           
+	 * @param   createGroupingUIID
+	 */
+	
+	public function clearGrouping(children:Array, createGroupingUIID:Number):Void {
+		for (var i=0; i<children.length; i++){
+			var currentGroupingUIID:Number = children[i].activity.groupingUIID;
+			Debugger.log('currentGroupingUIID:'+currentGroupingUIID, Debugger.CRITICAL,'clearGrouping','CanvasSuperModel');
+					
+			if(currentGroupingUIID == createGroupingUIID) {
+				children[i].activity.groupingUIID = null;
+					
+				if (children[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+					for (var k=0; k<children[i].actChildren.length; k++){
+						children[i].actChildren[k].groupingUIID = null;
+					}
+						
+					children[i].init();
+				}
+				
+				Debugger.log('Set grouping UIID to null: '+children[i].activity.groupingUIID ,Debugger.GEN,'clearGrouping','CanvasSuperModel');
+					
+				children[i].isSetSelected = false;
+				children[i].refresh()
+				
+			} else if(children[i] instanceof CanvasOptionalActivity || children[i] instanceof CanvasSequenceActivity) {
+				clearGrouping(children[i].children, createGroupingUIID);
+			}
+		}			
 	}
 	
 	public function getDownstreamActivities(_class, isBranching:Boolean):Array {
