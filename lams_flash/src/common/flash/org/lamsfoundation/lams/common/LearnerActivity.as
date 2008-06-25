@@ -135,10 +135,10 @@ class LearnerActivity extends MovieClip {
 		var _autosize:String;
 		
 		if(initObj){
-				_view = initObj._view;
-				_controller = initObj._controller;
-				_activity = initObj._activity;
-				learner = initObj.learner;
+			_view = initObj._view;
+			_controller = initObj._controller;
+			_activity = initObj._activity;
+			learner = initObj.learner;
 		}
 		
 		if(_complex){
@@ -384,6 +384,14 @@ class LearnerActivity extends MovieClip {
 	
 	public function set progressData(a:Progress){
 		learner = a;
+	}
+	
+	public function get controller(){
+		if(_controller instanceof LessonController){
+			return LessonController(_controller);
+		} else {
+			return MonitorController(_controller);
+		}
 	}
 	
 	public function set controller(a:AbstractController){
