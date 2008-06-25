@@ -309,6 +309,8 @@ public class LearnerAction extends DispatchAction {
 		if(StringUtils.isBlank(learnerForm.getDescription())){
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.required",
 					this.getResources(request).getMessage(preferredLocale,"label.learner.fileDescription")));
+		} else if ( learnerForm.getDescription().length() > LearnerForm.DESCRIPTION_LENGTH ) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.maxdescsize", LearnerForm.DESCRIPTION_LENGTH));
 		}
 		
 		FileValidatorUtil.validateFileSize(learnerForm.getFile(),false,errors);
