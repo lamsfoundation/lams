@@ -27,6 +27,12 @@
 	<%@ taglib uri="tags-lams" prefix="lams" %>
 
 
+<c:set var="enableFlash"><lams:LearnerFlashEnabled/></c:set>
+
+<c:if test="${enableFlash}">
+	<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}" version="${activityForm.version}" redirect="false"/>
+</c:if>
+
 
 	<div id="content">
 

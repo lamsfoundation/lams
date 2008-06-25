@@ -81,6 +81,7 @@ public class LoadToolActivityAction extends ActivityAction {
 				
 		form.setActivityID(activity.getActivityId());
 		
+		String mappingName = "displayTool";
 		if (activity.isToolActivity() || activity.isSystemToolActivity() ) {
 
 			String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(),activity, learnerProgress.getUser());
@@ -90,7 +91,7 @@ public class LoadToolActivityAction extends ActivityAction {
 				request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
 				request.setAttribute(PARAM_ACTIVITY_URL, url);
 				request.setAttribute(PARAM_IS_BRANCHING, activity.isBranchingActivity());
-				return mapping.findForward("previewDefineLater");
+				mappingName = "previewDefineLater";
 			} else {
 				// normal case
 				form.addActivityURL(new ActivityURL(activity.getActivityId(),url));
@@ -102,7 +103,7 @@ public class LoadToolActivityAction extends ActivityAction {
 		}
 		
 		LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
-		return mapping.findForward("displayTool");
+		return mapping.findForward(mappingName);
 	}
 
 
