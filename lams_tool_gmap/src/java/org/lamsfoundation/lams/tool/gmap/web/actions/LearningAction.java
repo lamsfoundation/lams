@@ -274,7 +274,7 @@ public class LearningAction extends LamsDispatchAction {
 				if (markerState.equals("remove"))
 				{
 					gmap.removeMarker(uid);
-					return;
+					continue;
 				}
 
 				GmapMarker marker = null;
