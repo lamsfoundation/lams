@@ -122,7 +122,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
         mx.events.EventDispatcher.initialize(this);
 		
 		this._visible = false;
-		
 	}
     
 	/**
@@ -308,7 +307,6 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		complexViewer = content.createEmptyMovieClip("_complex_viewer_mc", DepthManager.kTop);
 		branchContent = content.createEmptyMovieClip("_branch_content_mc", DepthManager.kTopmost);
 		
-		
 		setupConnectorHubs();
 		loadSequenceActivities();
 		
@@ -341,13 +339,19 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var hubStartDir_x = (ApplicationParent.isRTL()) ? _endx : _startx;
 		var hubEndDir_x = (ApplicationParent.isRTL()) ?  _startx : _endx;
 		
+		var startX:Number = (this.activity.startXCoord != null) ? this.activity.startXCoord  : hubStartDir_x;
+		var startY:Number =  (this.activity.startYCoord != null) ? this.activity.startYCoord : _starty;
+		
+		var endX:Number = (this.activity.endXCoord != null) ? this.activity.endXCoord : hubEndDir_x;
+		var endY:Number = (this.activity.endYCoord != null) ? this.activity.endYCoord : _endy;
+		
 		// start-point connector hub
-		cHubStart_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _canvasController:getController(), _canvasBranchView:_canvasBranchView, _x: hubStartDir_x , _y: _starty, branchConnector:true})
+		cHubStart_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _canvasController:getController(), _canvasBranchView:_canvasBranchView, _x: startX , _y: startY, branchConnector:true})
 												  : activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _monitorController:getController(), _canvasBranchView:_canvasBranchView, _x: activity.startXCoord , _y: activity.startYCoord, branchConnector:true});
 		// end-point connector hub
-		cHubEnd_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _canvasController:CanvasController(getController()), _canvasBranchView:_canvasBranchView, _x: hubEndDir_x , _y: _endy, branchConnector:true})
+		cHubEnd_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _canvasController:CanvasController(getController()), _canvasBranchView:_canvasBranchView, _x: endX , _y: endY, branchConnector:true})
 												: activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _monitorController:MonitorController(getController()), _canvasBranchView:_canvasBranchView, _x: activity.endXCoord , _y: activity.endYCoord, branchConnector:true});
-	
+												
 		this.onEnterFrame = hitConnectorHubs;
 		
 	}
@@ -357,6 +361,9 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		
 		startHub.hit();
 		endHub.hit();
+		
+		Debugger.log('start x:' + this.activity.startXCoord, Debugger.CRITICAL,' hitConnectorHubs','CanvasBranchView');
+		
 	}
 	
 	private function loadSequenceActivities() {

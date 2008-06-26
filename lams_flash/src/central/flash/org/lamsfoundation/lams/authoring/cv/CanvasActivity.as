@@ -576,11 +576,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				_canvasSize = _canvasModel.getSize();
 			
 			if(_canvasBranchView.isStart(this)) {
-				Debugger.log('start branch:' + _canvasBranchView.activity.startXCoord + ":" + _canvasBranchView.activity.startYCoord, Debugger.CRITICAL,'draw','CanvasActivity');
 				_x = (_canvasBranchView.activity.startXCoord != null) ? _canvasBranchView.activity.startXCoord : _x;
 				_y = (_canvasBranchView.activity.startYCoord != null) ? _canvasBranchView.activity.startYCoord : _y;
 			} else if(_canvasBranchView.isEnd(this)) {
-				Debugger.log('end branch:' + _canvasBranchView.activity.endXCoord + ":" + _canvasBranchView.activity.endYCoord,Debugger.CRITICAL,'draw','CanvasActivity');
 				_x = (_canvasBranchView.activity.endXCoord != null) ? _canvasBranchView.activity.endXCoord : _x;
 				_y = (_canvasBranchView.activity.endYCoord != null) ? _canvasBranchView.activity.endYCoord : _y;
 			}
@@ -712,7 +710,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 		
 	}
-
 	
 	public function set isSetSelected(v:Boolean):Void{
 		_isSelected = v;

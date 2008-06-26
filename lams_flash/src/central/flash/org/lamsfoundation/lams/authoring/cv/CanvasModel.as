@@ -381,15 +381,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	private function addOptionalSequenceCA(ca:Object, nextOrPrevActivity:Activity, _dir:Number):Void {
 		haltRefresh(true);
 		
-		Debugger.log("ca: " + ca.activity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
-		
 		var sequence:Activity = _cv.ddm.getActivityByUIID(nextOrPrevActivity.parentUIID);
 		var transitionObj:Object = _cv.ddm.getTransitionsForActivityUIID(nextOrPrevActivity.activityUIID);
 		
 		var targetActivity:Activity = null;
 		
 		var transition:Transition = (_dir == 0) ? transitionObj.into : transitionObj.out;
-		Debugger.log("transition length: " + transitionObj.myTransitions.length, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
 		
 		if(transition != null) {
 			targetActivity = (_dir == 0) ? _cv.ddm.getActivityByUIID(transition.fromUIID) :  _cv.ddm.getActivityByUIID(transition.toUIID);
@@ -397,20 +394,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			if(_dir == 0) ComplexActivity(sequence).firstActivityUIID = ca.activity.activityUIID;
 		}
 		
-		Debugger.log("targetActivity order: " + targetActivity.orderID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
-		Debugger.log("transition toUIID: " + transition.toUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
-		Debugger.log("transition fromUIID: " + transition.fromUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
-		
-		Debugger.log("target UIID: " +targetActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
-		Debugger.log("nextOrPrevActivity: " + nextOrPrevActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
-		Debugger.log("direction: " + _dir, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
-		
 		if(targetActivity != null) {
 			var fromActivity:Activity = (_dir == 0) ? targetActivity : nextOrPrevActivity;
 			var toActivity:Activity = (_dir == 0) ? nextOrPrevActivity : targetActivity;
-			
-			Debugger.log("fromActivity: " + fromActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
-			Debugger.log("toActivity: " + toActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
 			
 			_cv.ddm.removeTransition(transition.transitionUIID);
 			
@@ -420,9 +406,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		} else {
 			var fromActivity:Activity = (_dir == 0) ? ca.activity : nextOrPrevActivity;
 			var toActivity:Activity = (_dir == 0) ? nextOrPrevActivity : ca.activity;
-			
-			Debugger.log("fromActivity: " + fromActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
-			Debugger.log("toActivity: " + toActivity.activityUIID, Debugger.CRITICAL, "addOptionalSequenceCA", "CanvasModel");
 		
 			createSequenceTransition(fromActivity, toActivity);
 		}
@@ -581,8 +564,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			/*********************************************
 			* TODO: REQUIRE NORMAL BRANCH CLIENT_SIDE VALIDATION
 			*********************************************/
-			Debugger.log('fromAct: ' + fromAct + " toAct:" + toAct, Debugger.GEN,'addActivityToBranch','CanvasModel');
-			
 			if(!_cv.ddm.activities.containsKey(toAct)){
 				return new LFError(Dictionary.getValue('cv_trans_target_act_missing'),"addActivityToBranch",this);
 			}
@@ -707,8 +688,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 				return new LFError(Dictionary.getValue('cv_invalid_trans_circular_sequence'),"addActivityToTransition",this);
 			}
 				
-			Debugger.log('No validation errors, creating transition.......',Debugger.GEN,'addActivityToTransition','CanvasModel');
-			
 			//lets make the transition
 			t = createTransition(_connectionActivities);
 				
@@ -770,8 +749,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			sequences.sortOn("orderID", Array.NUMERIC);
 			
 			var orderID:Number = (sequences.length > 0) ? getHighestBranchNumber(b.sequenceActivity.parentUIID) : 0;
-			Debugger.log("sequences length (order id): " + orderID, Debugger.CRITICAL, "createBranchStartConnector", "CanvasModel");
-			
 			createNewSequenceActivity(activeView.activity, orderID+1, null, true);
 			
 			return b;
@@ -827,10 +804,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		} else if(_cv.ddm.getBranchesForActivityUIID(sequence.activityUIID).myBranches.length <= 0) {
 			return new LFError("Cannot create end-branch connection to an unconnected Sequence.", "createBranchStartConnector", this);
 		} else {
-			Debugger.log("looping: " + isLoopingLD(fromAct, _cv.ddm.getActivityByUIID(sequence.firstActivityUIID)), Debugger.CRITICAL, "createBranchStartConnector", "CanvasModel");
-			
 			var condition:Boolean = (sequence.firstActivityUIID != null && isLoopingLD(fromAct.activityUIID, sequence.firstActivityUIID));
-			Debugger.log("condition: " + condition, Debugger.CRITICAL, "createBranchStartConnector", "CanvasModel");
 			
 			if(condition || sequence.firstActivityUIID == fromAct.activityUIID)
 				return new Branch(_cv.ddm.newUIID(), BranchConnector.DIR_TO_END, fromAct.activityUIID, activeView.endHub.activity.activityUIID, sequence, _cv.ddm.learningDesignID);
@@ -851,8 +825,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		sequences.sortOn("orderID", Array.NUMERIC);
 		var orderID:Number = (sequences.length > 0) ? getHighestBranchNumber(b.sequenceActivity.parentUIID) : 0;
 		
-		Debugger.log("orderID: " + orderID, Debugger.CRITICAL, "createActivitylessBranch", "CanvasModel");
-			
 		createNewSequenceActivity(activeView.activity, orderID+1, null, true);
 			
 		return b;
@@ -872,9 +844,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		// move first activity
 		var ca = _activitiesDisplayed.get(activityUIID);
 		
-		Debugger.log("sequence uiid: " + sequence.activityUIID, Debugger.CRITICAL, "moveActivitiesToBranchSequence", "CanvasModel");
-		Debugger.log("ca.activity.parentUIID: " + ca.activity.parentUIID, Debugger.CRITICAL, "moveActivitiesToBranchSequence", "CanvasModel");
-		
 		if(sequence.activityUIID != ca.activity.parentUIID) {
 			addParentToActivity(sequence.activityUIID, ca, false);
 		} else {
@@ -888,15 +857,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		if(transObj.out == null && branches.target != null) {
 			if(branches.target.sequenceActivity.activityUIID != sequence.activityUIID && branches.target.direction == BranchConnector.DIR_TO_END) {
 				
-				Debugger.log("end branch found: " + branches.target.branchUIID, Debugger.CRITICAL, "moveActivitiesToBranchSequence", "CanvasModel");
-				Debugger.log("tar seq: " + branches.target.sequenceActivity.activityUIID + " = " + sequence.activityUIID, Debugger.CRITICAL, "moveActivitiesToBranchSequence", "CanvasModel");
-				
 				if(!branches.target.sequenceActivity.stopAfterActivity) {
 					
 					_cv.removeBranch(branches.target.branchUIID);
 					MovieClipUtils.doLater(Proxy.create(this, moveBranchToSequence, activityUIID, sequence));
-					
-					Debugger.log("stopAfterActivity: " + sequence.stopAfterActivity, Debugger.CRITICAL, "moveActivitiesToBranchSequence", "CanvasModel");
 				}
 				
 			}
@@ -1060,11 +1024,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	 * @return  
 	 */
 	public function openToolActivityContent(ta:ToolActivity):Void{
-		Debugger.log('ta:'+ta.title+'toolContentID:'+ta.toolContentID+" and learningLibraryID: "+ta.learningLibraryID,Debugger.GEN,'openToolActivityContent','CanvasModel');
 		//check if we have a toolContentID
-		
 		var defaultContentID:Number = Application.getInstance().getToolkit().getDefaultContentID(ta.learningLibraryID, ta.toolID);
-		Debugger.log('ta:'+ta.title+'toolContentID:'+ta.toolContentID+', default content ID:'+defaultContentID,Debugger.GEN,'openToolActivityContent','CanvasModel');
+		
 		if(ta.toolContentID == defaultContentID){
 			getNewToolContentID(ta);
 		}else{
@@ -1080,8 +1042,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 					url = cfg.serverUrl+ta.authoringURL + '?toolContentID='+ta.toolContentID+'&contentFolderID='+ddm.contentFolderID;
 				}
 			
-				Debugger.log('Opening url:'+url,Debugger.GEN,'openToolActivityContent','CanvasModel');
-				
 				// TODO: Maybe add learningDesignID and serverURL to window title to handle multiple LAMS(s) running in same browser session.
 				JsPopup.getInstance().launchPopupWindow(url, 'ToolActivityContent_' + ta.toolContentID, 600, 800, true, true, false, false, false);
 			
@@ -1096,7 +1056,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	}
 	
 	public function getNewToolContentID(ta:ToolActivity):Void{
-		Debugger.log('ta:'+ta.title+', activityUIID:'+ta.activityUIID,Debugger.GEN,'getNewToolContentID','CanvasModel');
 		var callback:Function = Proxy.create(this,setNewToolContentID,ta);
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getToolContentID&toolID='+ta.toolID,callback, false);
 	}
@@ -1104,23 +1063,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	public function setNewToolContentID(toolContentID:Number,ta:ToolActivity):Void{
 		Debugger.log('new content ID from server:'+toolContentID,Debugger.GEN,'setNewToolContentID','CanvasModel');
 		ta.toolContentID = toolContentID;
-		Debugger.log('ta:'+ta.title+',toolContentID:'+ta.toolContentID+', activityUIID:'+ta.activityUIID,Debugger.GEN,'setNewToolContentID','CanvasModel');
+		
 		openToolActivityContent(ta);
 	}
 	
 	public function setDefaultToolContentID(ta:ToolActivity):Void{
 		ta.toolContentID = Application.getInstance().getToolkit().getDefaultContentID(ta.toolContentID,ta.toolID);
-		Debugger.log('ta:'+ta.title+',toolContentID:'+ta.toolContentID+', activityUIID:'+ta.activityUIID,Debugger.GEN,'setDefaultToolContentID','CanvasModel');
 	}
 	
 	public function openBranchActivityContent(ba, visible:Boolean):Void {
 		currentBranchingActivity = ba;
 		
 		if(visible == null) visible = true;
-		
-		Debugger.log("visible: " + visible, Debugger.CRITICAL, "openBranchActivityContent", "CanvasModel");
-		Debugger.log("currentBranchingActivity UIID: " + currentBranchingActivity.activity.activityUIID, Debugger.CRITICAL, "openBranchActivityContent", "CanvasModel");
-		Debugger.log("branchView: " + ba.activity.branchView, Debugger.CRITICAL, "openBranchActivityContent", "CanvasModel");
 		
 		if(BranchingActivity(ba.activity).clear)
 			clearBranchingActivity(ba);

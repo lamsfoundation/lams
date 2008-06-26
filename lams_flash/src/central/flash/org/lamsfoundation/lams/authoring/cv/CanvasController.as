@@ -358,11 +358,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					
 				} else {
 					if(_canvasModel.activeView.isStart(ca)) {
-						ca.activity.startXCoord = ca._x;
-						ca.activity.startYCoord = ca._y;
+						BranchingActivity(ca.activity).startXCoord = ca._x;
+						BranchingActivity(ca.activity).startYCoord = ca._y;
 					} else if(_canvasModel.activeView.isEnd(ca)) {
-						ca.activity.endXCoord = ca._x;
-						ca.activity.endYCoord = ca._y;
+						BranchingActivity(ca.activity).endXCoord = ca._x;
+						BranchingActivity(ca.activity).endYCoord = ca._y;
 					}
 				}
 			} else {
