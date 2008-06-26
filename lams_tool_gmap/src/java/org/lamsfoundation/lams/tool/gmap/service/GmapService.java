@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.gmap.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
@@ -263,10 +264,28 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 				null);
 		gmap.setToolContentHandler(null);
 		gmap.setGmapSessions(null);
+		gmap.setCreateBy(null);
+		
 		Set<GmapAttachment> atts = gmap.getGmapAttachments();
 		for (GmapAttachment att : atts) {
 			att.setGmap(null);
 		}
+		
+		Set<GmapMarker> markers = gmap.getGmapMarkers();
+		Set<GmapMarker> authorItems = new HashSet<GmapMarker>();
+		
+		for (GmapMarker gmapMarker:markers)
+		{
+			if (gmapMarker.isAuthored())
+			{
+				gmapMarker.setCreatedBy(null);
+				gmapMarker.setGmap(null);
+				gmapMarker.setUpdatedBy(null);
+				authorItems.add(gmapMarker);
+			}
+		}
+		gmap.setGmapMarkers(authorItems);
+
 		try {
 			exportContentService.registerFileClassForExport(
 					GmapAttachment.class.getName(), "fileUuid",
