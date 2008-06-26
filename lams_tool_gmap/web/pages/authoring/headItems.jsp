@@ -33,6 +33,7 @@
 	var markers;
 	var geocoder = null;
 	var currUser;
+	var currUserId;
 //-->
 </script>
 

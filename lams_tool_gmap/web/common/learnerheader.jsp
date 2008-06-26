@@ -19,9 +19,6 @@
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
-	<!--  
-	<script type="text/javascript" src="${tool}includes/javascript/mapFunctions.js"></script>
-	-->
 	<script type="text/javascript" src="${tool}includes/javascript/mapFunctionsLearning.js"></script>
 
 	<%@ include file="/includes/jsp/mapFunctions.jsp"%>
@@ -46,6 +43,7 @@
 		var markers;
 		var geocoder = null;
 		var currUser;
+		var currUserId;
 		var userMarkerCount =0;
 		var limitMarkers = ${gmapDTO.limitMarkers};
 		var markerLimit = 0;
@@ -60,10 +58,10 @@
 		    	geocoder = new GClientGeocoder();
 
 				map.setCenter(new GLatLng('${gmapDTO.mapCenterLatitude}', '${gmapDTO.mapCenterLongitude}' ));
-				map.setCenter(new GLatLng('${gmapDTO.mapCenterLatitude}', '${gmapDTO.mapCenterLongitude}' ));
 				map.setZoom(${gmapDTO.mapZoom});
 
 				currUser = '${gmapUserDTO.firstName} ${gmapUserDTO.lastName}';
+				currUserId = '${gmapUserDTO.uid}'
 				
 				// Set up map controls
 				map.addControl(new GMapTypeControl());
@@ -81,27 +79,27 @@
 				</c:if>
 				
 				<c:if test="${gmapDTO.allowHybrid == false}">
-				   map.removeMapType(G_HYBRID_MAP);
+				map.removeMapType(G_HYBRID_MAP);
 				</c:if>
 				
-				/*
-				if (${gmapDTO.allowZoom}) {map.addControl(new GLargeMapControl());}
-				if (${gmapDTO.allowTerrain}) {map.addMapType(G_PHYSICAL_MAP);}
-				if (!${gmapDTO.allowSatellite}) {map.removeMapType(G_SATELLITE_MAP);}
-				if (!${gmapDTO.allowHybrid}) {map.removeMapType(G_HYBRID_MAP);}
-				*/
 				map.setMapType(${gmapDTO.mapType});
 		    	
 		    	<c:forEach var="marker" items="${gmapDTO.gmapMarkers}">
 					<c:choose>
 						<c:when test="${marker.createdBy.loginName == gmapUserDTO.loginName && marker.isAuthored == false}">
-						    addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, ${gmapDTO.allowEditMarkers}, '${marker.createdBy.firstName} ${marker.createdBy.lastName}' );
+						    addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ),'${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, ${gmapDTO.allowEditMarkers}, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');	
 							userMarkerCount ++;
 						</c:when>
+						
 						<c:otherwise>
-							<c:if  test="${marker.isAuthored || gmapDTO.allowShowAllMarkers}">
-							    addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}' );
-							</c:if>
+							<c:choose>
+								<c:when  test="${marker.isAuthored}">
+								    addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '<fmt:message key="label.authoring.basic.authored"></fmt:message>', '0' );
+								</c:when>
+								<c:when  test="${gmapDTO.allowShowAllMarkers}">
+								    addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}' );
+								</c:when>
+							</c:choose>
 						</c:otherwise>
 					</c:choose>
 				</c:forEach>

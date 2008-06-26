@@ -1,5 +1,5 @@
 // add a marker at the given point
-function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy)
+function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy, createdById)
 {
 	map.closeInfoWindow();
 	var marker;
@@ -9,6 +9,7 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy)
 	
 	marker.editAble = editAble;
 	marker.createdBy = createdBy;
+	marker.createdById = createdById
 	
     map.addOverlay(marker);
     

@@ -65,15 +65,12 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		setupService();
 
-		Long toolContentID = new Long(WebUtil.readLongParam(request,
-				AttributeNames.PARAM_TOOL_CONTENT_ID));
+		Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 		
-		String contentFolderID = WebUtil.readStrParam(request,
-				AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 				
-		Gmap gmap = gmapService
-				.getGmapByContentId(toolContentID);
-
+		Gmap gmap = gmapService.getGmapByContentId(toolContentID);
+		
 		if (gmap == null) {
 			// TODO error page.
 		}

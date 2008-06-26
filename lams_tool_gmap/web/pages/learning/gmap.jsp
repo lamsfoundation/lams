@@ -57,17 +57,24 @@
 
 		<c:choose>
 			<c:when test="${contentEditable}">
-				<table cellpadding='0' cellspacing='0' border='1'>
-				<tr><td><div id="map_canvas" style="width: 400px; height: 300px;" ></div></td>
-				<td><div id="sidebar" style="width:100px; 
-										overflow:auto;
-										height:320px; 
-										background:WhiteSmoke; "></div></td></tr>
+			
+				<table style="cellpadding:0; cellspacing:0; border:0; width:500px;">
+					<tr>
+						<td width="80%">
+						<div id="map_canvas" style="width:400px;height:300px;" ></div></td>
+						<td width="10%">
+						<div id="sidebar" style="width:100px; overflow:auto;height:320px; background:WhiteSmoke; "></div>
+						</td>
+					</tr>
+					<tr>
+						<td>
+						<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
+						<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
+						</td>
+					</tr>
 				</table>
+
 				
-				<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
-				<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-				<input type="button" onclick="test()"  value="Test" />
 				
 				<br><br>
 				
@@ -85,7 +92,7 @@
 
 			<c:otherwise>
 					<lams:out value="${lrnForm.entryText}" />
-				</c:otherwise>
+			</c:otherwise>
 		</c:choose>
 		
 		<script type="text/javascript">

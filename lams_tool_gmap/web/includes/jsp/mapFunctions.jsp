@@ -7,7 +7,7 @@
 <script type="text/javascript">
 <!--
 // add a marker at the given point
-function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy)
+function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy, createdById)
 {
 	map.closeInfoWindow();
 	var marker;
@@ -17,6 +17,7 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy)
 	
 	marker.editAble = editAble;
 	marker.createdBy = createdBy;
+	marker.createdById = createdById;
 	
     map.addOverlay(marker);
     
@@ -54,7 +55,8 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy)
     if (isSaved){marker.state = "unchanged";}
     else {marker.state="unsaved";}
     
-	marker.sideBarLinkPrefix = "<span class='sidebar'><a href='javascript:GEvent.trigger(markers["+markers.length+"],\"click\")'";
+	//marker.sideBarLinkPrefix = "<span class='sidebar'><a href='javascript:GEvent.trigger(markers["+markers.length+"],\"click\")'";
+	marker.sideBarIndex = markers.length;
     marker.removeLink = "<a href='javascript:removeMarker(" + markers.length + ")'><fmt:message key='button.remove'/></a>" ;
    	marker.editLink = "<a href='javascript:editMarker(" + markers.length + ")'><fmt:message key='button.edit'/></a>";
    	marker.saveLink = "<a href='javascript:saveMarkerInfo(" + markers.length + ");'><fmt:message key='button.save'/></a>";
@@ -68,13 +70,18 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy)
 
 function refreshSideBar()
 {
+	//marker.sideBarLinkPrefix = "<span class='sidebar'><a href='javascript:GEvent.trigger(markers["+markers.length+"],\"click\")'";
 	var sideBarText = "";
 	var i=0;
 	for (;i<markers.length; i++)
 	{
 		if (markers[i].state != "remove" && markers[i].state != "unsaved")
 		{
-			sideBarText += markers[i].sideBarLinkPrefix + " title='" + markers[i].createdBy + "' >" + markers[i].title+"</a></span><br />";
+			sideBarText += "<span class='sidebar'>";
+			sideBarText += "<a href='javascript:GEvent.trigger(markers[" + markers[i].sideBarIndex + "],\"click\")' ";
+			sideBarText += "title='" + markers[i].createdBy + "' >" + markers[i].title + "</a>"
+			sideBarText += "</span><br />";
+			//sideBarText += markers[i].sideBarLinkPrefix + " title='" + markers[i].createdBy + "' >" + markers[i].title+"</a></span><br />";
 		}
 	}
 	document.getElementById("sidebar").innerHTML = sideBarText;
@@ -213,6 +220,13 @@ function serialiseMarkers()
 	xmlString += "</markers>"
 	document.getElementById("markersXML").value=xmlString;
 	return true;
+}
+
+
+function test()
+{
+	serialiseMarkers();
+	alert(document.getElementById("markersXML").value);
 }
 //-->
 </script>

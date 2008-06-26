@@ -36,6 +36,7 @@
 			<tr><td>
 			<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
 			<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
+			<a href="javascript:test()" class="button"/>Test</a>
 			</td></tr>
 			</table>
 		</td>
@@ -67,14 +68,17 @@
 	    	markers = new Array();
 	    	geocoder = new GClientGeocoder();
 	    	
-	    	currUser = '${gmapUser.firstName} ${gmapUser.lastName}';
+	    	//currUser = '${gmapUser.firstName} ${gmapUser.lastName}';
+	    	//currUserId = '${gmapUser.uid}';
+	    	currUser = '<fmt:message key="label.authoring.basic.authored"></fmt:message>';
+	    	currUserId = '0';
 			map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
 			map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
 			map.setZoom(${formBean.gmap.mapZoom});
 			map.setMapType(${formBean.gmap.mapType});
 			
 			<c:forEach var="marker" items="${formBean.gmap.gmapMarkers}">
-			addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, true, "${marker.createdBy.firstName} ${marker.createdBy.lastName}");
+			addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, true, currUser, currUserId);
 			</c:forEach>
 			
 			refreshSideBar();

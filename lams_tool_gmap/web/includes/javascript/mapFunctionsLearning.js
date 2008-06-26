@@ -11,7 +11,7 @@ function addMarkerToCenter()
 	}
 	var bounds = map.getBounds();
 	var point = bounds.getCenter();
-	addMarker(point, "", "", -1, false, true, currUser);
+	addMarker(point, "", "", -1, false, true, currUser, currUserId);
 	userMarkerCount ++;
 }
 
