@@ -680,7 +680,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 				}
 				
 				if(branchesArray[i].targetUIID == fromAct && branchesArray[i].direction == BranchConnector.DIR_TO_END ) {
-					return new LFError(Dictionary.getValue("cv_invalid_trans_closed_sequence"));
+					return new LFError(Dictionary.getValue('cv_invalid_trans_target_from_activity', [_connectionActivities[0].title]));
+					//return new LFError(Dictionary.getValue("cv_invalid_trans_closed_sequence"));
 				}
 			}
 				
