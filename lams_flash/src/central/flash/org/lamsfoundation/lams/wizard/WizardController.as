@@ -88,6 +88,8 @@ class WizardController extends AbstractController {
 			goclose();
 		}else if(tgt.indexOf("cancel_btn") != -1){
 			gocancel();
+		}else if(tgt.indexOf("addmore_btn") != -1){
+			goaddmore();
 		}
 		
 	}
@@ -129,6 +131,11 @@ class WizardController extends AbstractController {
 			wizView.disableButtons();
 			initializeLesson(wizView.resultDTO);
 		}
+	}
+	
+	private function goaddmore(evt:Object){
+		// go back to step 1
+		_wizardModel.stepID = 1;
 	}
 	
 	/**

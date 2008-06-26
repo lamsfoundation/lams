@@ -110,6 +110,7 @@ class WizardView extends AbstractView {
 	private var prev_btn:Button;
 	private var close_btn:Button;
 	private var start_btn:Button;
+	private var addmore_btn:Button;
 	
 	private var desc_txa:TextArea;
 	private var desc_scr:MovieClip;
@@ -271,6 +272,7 @@ class WizardView extends AbstractView {
 		cancel_btn.addEventListener("click",controller);
 		close_btn.addEventListener("click",controller);
 		start_btn.addEventListener("click",controller);
+		addmore_btn.addEventListener("click",controller);
 		
 		_wizardOrgView.setupContent();
 		_wizardLessonView.setupContent();
@@ -292,6 +294,7 @@ class WizardView extends AbstractView {
 		finish_btn.label = Dictionary.getValue('finish_btn');
 		close_btn.label = Dictionary.getValue('close_btn');
 		start_btn.label = Dictionary.getValue('start_btn');
+		addmore_btn.label = Dictionary.getValue('addmore_btn');
 		
 		//labels
 		setTitle(Dictionary.getValue('wizardTitle_1_lbl'));
@@ -300,7 +303,7 @@ class WizardView extends AbstractView {
 		_wizardLessonView.setupLabels();
 		_wizardOrgView.setupLabels();
 		
-		resizeButtons([cancel_btn, prev_btn, next_btn, close_btn, finish_btn, start_btn, _wizardLessonView.getScheduleBtn()]);
+		resizeButtons([cancel_btn, prev_btn, next_btn, close_btn, finish_btn, start_btn, _wizardLessonView.getScheduleBtn(), addmore_btn]);
 		positionButtons();
 	}
 	
@@ -385,6 +388,7 @@ class WizardView extends AbstractView {
 		next_btn._x = panel._width - next_btn._width - X_BUTTON_OFFSET;
 		start_btn._x = panel._width - start_btn._width - X_BUTTON_OFFSET;
 		close_btn._x = panel._width - close_btn._width - X_BUTTON_OFFSET;
+		addmore_btn._x = close_btn._x - addmore_btn._width - X_BUTTON_OFFSET;
 		
 		finish_btn._x = 10;
 		
@@ -417,6 +421,7 @@ class WizardView extends AbstractView {
 		cancel_btn.setStyle('styleName',styleObj);
 		close_btn.setStyle('styleName',styleObj);
 		start_btn.setStyle('styleName',styleObj);
+		addmore_btn.setStyle('styleName',styleObj);
 		
 		styleObj = _tm.getStyleObject('BGPanel');
 		header_pnl.setStyle('styleName',styleObj);
@@ -601,7 +606,7 @@ class WizardView extends AbstractView {
 		setDescription("");
 		
 		_wizardSummaryView.showConfirmMessage(resultDTO.mode);
-		showButtons([false, false, false, false, false, true]);
+		showButtons([false, false, false, false, false, true, true]);
 	}
 	
 	private function conclusionStep(mode:Number, wm:WizardModel):Void{
@@ -646,6 +651,7 @@ class WizardView extends AbstractView {
 		finish_btn.visible = (v[3] != null) ? v[3] : false;
 		start_btn.visible = (v[4] != null) ? v[4] : false;
 		close_btn.visible = (v[5] != null) ? v[5] : false;
+		addmore_btn.visible = (v[6] != null) ? v[6] : false;
 	}
 	
 	/*

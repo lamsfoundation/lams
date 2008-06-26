@@ -63,7 +63,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardSummaryView  extends AbstractVi
 	}
 	
 	public function show(v:Boolean):Void {
-		confirmMsg_txt.visible = v;
+		confirmMsg_txt._visible = v;
 	}
 	
 	public function showConfirmMessage(mode:Number){
@@ -90,7 +90,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardSummaryView  extends AbstractVi
 		confirmMsg_txt._x = _parent.panel._x + (_parent.panel._width/2) - (confirmMsg_txt._width/2);
 		confirmMsg_txt._y = _parent.panel._y + (_parent.panel._height/4);
 		
-		confirmMsg_txt.visible = true;
+		confirmMsg_txt._visible = true;
 		
 	}
 
