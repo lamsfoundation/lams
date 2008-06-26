@@ -145,18 +145,18 @@ public class AuthoringAction extends LamsDispatchAction {
 			gmapService.saveOrUpdateGmap(gmap);
 		}
 
-		GmapUser gmapUser = null;
-		HttpSession ss = SessionManager.getSession();
+		//GmapUser gmapUser = null;
+		//HttpSession ss = SessionManager.getSession();
 		//get back login user DTO
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		//UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		/*
 		gmapUser = gmapService.getUserByUID(new Long(user.getUserID().intValue()));
 		if(gmapUser == null){
 			gmapUser = new GmapUser(user,null);
 			gmapService.saveOrUpdateGmapUser(gmapUser);
 		}
-		request.setAttribute(GmapConstants.ATTR_USER, gmapUser);
-		
-
+		*/
+		//request.setAttribute(GmapConstants.ATTR_USER, user);
 		
 		// Set up the authForm.
 		AuthoringForm authForm = (AuthoringForm) form;
@@ -191,20 +191,29 @@ public class AuthoringAction extends LamsDispatchAction {
 		// update gmap content using form inputs.
 		ToolAccessMode mode = (ToolAccessMode) map.get(KEY_MODE);
 		
+		
 		String contentFolderID = (String) map.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 		GmapUser gmapUser = null;
 		//check whether it is sysadmin:LDEV-906 
 		if(!StringUtils.equals(contentFolderID,"-1" )){
 			//try to get form system session
-			HttpSession ss = SessionManager.getSession();
+			//HttpSession ss = SessionManager.getSession();
 			//get back login user DTO
-			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			gmapUser = gmapService.getUserByUID(new Long(user.getUserID().intValue()));
-			if(gmapUser == null){
+			//UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			//gmapUser = gmapService.getUserByUID(new Long(user.getUserID().intValue()));
+			
+			if (gmap.getCreateBy() == null)
+			{
+				HttpSession ss = SessionManager.getSession();
+				UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 				gmapUser = new GmapUser(user,null);
 				gmapService.saveOrUpdateGmapUser(gmapUser);
 			}
-		}	
+			else
+			{
+				gmapUser = gmapService.getUserByUID(gmap.getCreateBy());
+			}
+		}
 		
 		updateGmap(gmap, authForm, mode, gmapUser);
 
@@ -426,6 +435,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		updateMarkerListFromXML(authForm.getMarkersXML(), gmap, guser);
 		
 		if (mode.isAuthor()) { // Teacher cannot modify following
+			gmap.setCreateBy(guser.getUid());
 			gmap.setOfflineInstructions(authForm.getOnlineInstruction());
 			gmap.setOnlineInstructions(authForm.getOfflineInstruction());
 			gmap.setLockOnFinished(authForm.isLockOnFinished());
@@ -470,7 +480,7 @@ public class AuthoringAction extends LamsDispatchAction {
 				if (markerState.equals("remove"))
 				{
 					gmap.removeMarker(uid);
-					return;
+					continue;
 				}
 
 				GmapMarker marker = null;
