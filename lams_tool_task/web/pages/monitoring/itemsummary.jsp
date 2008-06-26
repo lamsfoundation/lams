@@ -7,7 +7,7 @@
 		<title><fmt:message key="label.learning.title" />
 		</title>
 		<%@ include file="/common/header.jsp"%>
-		<c:set var="item" value="${taskListItem}" />
+		<c:set var="item" value="${itemSummary.taskListItem}" />
 	</lams:head>
 	
 	<body class="stripes">
@@ -74,7 +74,7 @@
 			<br>
 			
 			
-			<c:forEach var="groupSummary" items="${groupSummaryList}">
+			<c:forEach var="groupSummary" items="${itemSummary.groupSummaries}">
 				<h1><fmt:message key="monitoring.label.group" /> ${groupSummary.sessionName}	</h1>
 				
 				<table cellpadding="0" class="alternative-color" >
@@ -98,16 +98,16 @@
 					</tr>
 				
 				
-					<c:forEach var="itemSummary" items="${groupSummary.itemSummaries}">
+					<c:forEach var="visitLogSummary" items="${groupSummary.taskListItemVisitLogSummaries}">
 					
 						<tr>
 							<td>
-								${itemSummary.user.loginName}
+								${visitLogSummary.user.loginName}
 							</td>
 							
 							<td align="center">
 								<c:choose>
-									<c:when test="${itemSummary.completed}">
+									<c:when test="${visitLogSummary.completed}">
 										<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">
 									</c:when>
 										
@@ -118,20 +118,20 @@
 							</td>
 							
 							<td>
-								<lams:Date value="${itemSummary.date}" />
+								<lams:Date value="${visitLogSummary.date}" />
 							</td>
 										
 							<c:if test="${item.commentsAllowed  || item.filesAllowed}">
 								<td>
 								
 									<ul>
-										<c:forEach var="comment" items="${itemSummary.comments}">
+										<c:forEach var="comment" items="${visitLogSummary.comments}">
 											<li>
 												<c:out value="${comment.comment}"></c:out>
 											</li>
 										</c:forEach>
 										
-										<c:forEach var="attachment" items="${itemSummary.attachments}">
+										<c:forEach var="attachment" items="${visitLogSummary.attachments}">
 											<li>
 												<c:out value="${attachment.fileName}" />
 	

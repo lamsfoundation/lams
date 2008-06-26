@@ -35,8 +35,9 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.taskList.dto.GroupSummary;
-import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
+import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
+import org.lamsfoundation.lams.tool.taskList.dto.TaskListItemVisitLogSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment;
@@ -332,7 +333,7 @@ public interface ITaskListService {
 	 *
 	 * @return
 	 */
-	List<List<GroupSummary>> exportForLearner(Long contentUid, TaskListUser learner);
+	List<ItemSummary> exportForLearner(Long contentUid, TaskListUser learner);
 	
 	/**
 	 * Make an export for the whole TaskList.
@@ -340,7 +341,7 @@ public interface ITaskListService {
 	 * @param contentUid
 	 * @return
 	 */
-	List<List<GroupSummary>> exportForTeacher(Long contentUid);
+	List<ItemSummary> exportForTeacher(Long contentUid);
 	
 	/**
 	 * Return summary list for the specified TaskList. Used in monitoring.
@@ -358,7 +359,7 @@ public interface ITaskListService {
 	 * @param isExportProcessing true if this method called for export, false otherwise
 	 * @return
 	 */
-	List<GroupSummary> getItemSummary(Long contentId, Long taskListItemUid, boolean isExportProcessing);
+	ItemSummary getItemSummary(Long contentId, Long taskListItemUid, boolean isExportProcessing);
 	
 }
 

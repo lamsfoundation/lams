@@ -1,6 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
+<c:set var="taskList" value="${sessionMap.taskList}"/>
 <script type="text/javascript">
 
 	function summaryTask(taskUid){
@@ -15,6 +16,77 @@
 	
 </script>
 
+<%-- Overall TaskList information  --%>
+
+<div class="info space-bottom" align="right" style="position:relative; right:40px; top:15px;">
+	<fmt:message key="label.monitoring.summary.lock.when.finished" />
+	<c:choose>
+		<c:when test="${taskList.lockWhenFinished}">
+			On
+		</c:when>
+		<c:otherwise>
+			Off
+		</c:otherwise>
+	</c:choose>	
+	<br>
+	 						
+	<fmt:message key="label.monitoring.summary.sequential.order" />
+	<c:choose>
+		<c:when test="${taskList.sequentialOrder}">
+			On
+		</c:when>
+		<c:otherwise>
+			Off
+		</c:otherwise>
+	</c:choose>	
+	<br>	
+						
+	<fmt:message key="label.monitoring.summary.min.number.tasks" />
+	<c:choose>
+		<c:when test="${taskList.minimumNumberTasks > 0}">
+			${taskList.minimumNumberTasks}
+		</c:when>
+		<c:otherwise>
+			Off
+		</c:otherwise>
+	</c:choose>	
+	<br>	
+						
+	<fmt:message key="label.monitoring.summary.allowed.contribute.tasks" />
+	<c:choose>
+		<c:when test="${taskList.allowContributeTasks}">
+			On
+		</c:when>
+		<c:otherwise>
+			Off
+		</c:otherwise>
+	</c:choose>	
+	<br>					
+	
+	<fmt:message key="label.monitoring.summary.monitor.verification" />
+	<c:choose>
+		<c:when test="${taskList.monitorVerificationRequired}">
+			On
+		</c:when>
+		<c:otherwise>
+			Off
+		</c:otherwise>
+	</c:choose>	
+	<br>					
+	
+	<fmt:message key="label.monitoring.summary.notebook.reflection" />
+	<c:choose>
+		<c:when test="${taskList.reflectOnActivity}">
+			On
+		</c:when>
+		<c:otherwise>
+			Off
+		</c:otherwise>
+	</c:choose>	
+	<br>
+</div>
+
+<%-- Summary list  --%>
 
 <c:if test="${empty summaryList}">
 	<div align="center">
@@ -22,10 +94,9 @@
 	</div>
 </c:if>
 
-
 <c:forEach var="summary" items="${summaryList}">
-<h1><fmt:message key="monitoring.label.group" /> ${summary.sessionName}	</h1>
 
+	<h1><fmt:message key="monitoring.label.group" /> ${summary.sessionName}	</h1>
 	<h2 style="color:black; margin-left: 20px;"><fmt:message key="label.monitoring.summary.overall.summary" />	</h2>
 	<table cellpadding="0" class="alternative-color" >
 		
@@ -128,8 +199,5 @@
 	</c:if>
 	<br>
 	
-</c:forEach>
-
-
-				
+</c:forEach>				
 				

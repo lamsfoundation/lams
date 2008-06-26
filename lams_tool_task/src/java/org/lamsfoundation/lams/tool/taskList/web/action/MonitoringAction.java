@@ -41,8 +41,9 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.dto.GroupSummary;
-import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
+import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
+import org.lamsfoundation.lams.tool.taskList.dto.TaskListItemVisitLogSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
@@ -111,11 +112,9 @@ public class MonitoringAction extends Action {
 		
 		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 		Long taskListItemId = WebUtil.readLongParam(request, TaskListConstants.ATTR_TASK_LIST_ITEM_UID);
-		request.setAttribute(TaskListConstants.ATTR_TASK_LIST_ITEM, service.getTaskListItemByUid(taskListItemId));
+		ItemSummary ItemSummary = service.getItemSummary(contentId, taskListItemId, false);
 		
-		List<GroupSummary> groupSummaryList = service.getItemSummary(contentId, taskListItemId, false);
-		request.setAttribute(TaskListConstants.ATTR_GROUP_SUMMARY_LIST, groupSummaryList);
-						
+		request.setAttribute(TaskListConstants.ATTR_ITEM_SUMMARY, ItemSummary);
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}
 	

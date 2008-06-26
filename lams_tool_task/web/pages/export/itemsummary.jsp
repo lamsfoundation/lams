@@ -1,4 +1,4 @@
-<c:set var="item" value="${itemSummary[0].taskListItem}"/>
+<c:set var="item" value="${itemSummary.taskListItem}"/>
 
 <div>
 	<h2>
@@ -57,7 +57,7 @@
 <br>
 <br>			
 			
-<c:forEach var="groupSummary" items="${itemSummary}">
+<c:forEach var="groupSummary" items="${itemSummary.groupSummaries}">
 	<h1><fmt:message key="monitoring.label.group" /> ${groupSummary.sessionName}	</h1>
 	
 	<table cellpadding="0" class="alternative-color" >
@@ -79,16 +79,16 @@
 			</c:if>			
 		</tr>
 				
-		<c:forEach var="itemSummary" items="${groupSummary.itemSummaries}">
+		<c:forEach var="visitLogSummary" items="${groupSummary.taskListItemVisitLogSummaries}">
 					
 			<tr>
 				<td>
-					${itemSummary.user.loginName}
+					${visitLogSummary.user.loginName}
 				</td>
 							
 				<td align="center">
 					<c:choose>
-						<c:when test="${itemSummary.completed}">
+						<c:when test="${visitLogSummary.completed}">
 							<img src="../images/tick.gif"	border="0">
 						</c:when>
 										
@@ -99,19 +99,19 @@
 				</td>
 							
 				<td>
-					<lams:Date value="${itemSummary.date}" />
+					<lams:Date value="${visitLogSummary.date}" />
 				</td>
 										
 				<c:if test="${item.commentsAllowed  || item.filesAllowed}">
 					<td>
 						<ul>
-							<c:forEach var="comment" items="${itemSummary.comments}">
+							<c:forEach var="comment" items="${visitLogSummary.comments}">
 								<li>
 									<c:out value="${comment.comment}" escapeXml="false"></c:out>
 								</li>
 							</c:forEach>
 										
-							<c:forEach var="attachment" items="${itemSummary.attachments}">
+							<c:forEach var="attachment" items="${visitLogSummary.attachments}">
 								<li>
 									<c:out value="${attachment.fileName}" />
 									<html:link href="${attachment.attachmentLocalUrl}">
@@ -134,8 +134,8 @@
 			<fmt:message key="label.export.reflection" />
 		</h3>
 		
-		<c:forEach var="itemSummary" items="${groupSummary.itemSummaries}">
-			<c:set var="reflectDTO" value="${itemSummary.reflectDTO}" />
+		<c:forEach var="visitLogSummary" items="${groupSummary.taskListItemVisitLogSummaries}">
+			<c:set var="reflectDTO" value="${visitLogSummary.reflectDTO}" />
 			<h4>
 				${reflectDTO.fullName}
 			</h4>

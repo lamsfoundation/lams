@@ -48,9 +48,10 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.dto.GroupSummary;
+import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
-import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
+import org.lamsfoundation.lams.tool.taskList.dto.TaskListItemVisitLogSummary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
@@ -172,7 +173,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new TaskListException(error);
 		}
 		
-		List<List<GroupSummary>> itemSummaries = service.exportForLearner(toolSessionID, learner);
+		List<ItemSummary> itemSummaries = service.exportForLearner(toolSessionID, learner);
 		
 		saveFileToLocal(itemSummaries, directoryName);
 		
@@ -210,7 +211,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new TaskListException(error);
 		}
 		
-		List<List<GroupSummary>> itemSummaries = service.exportForTeacher(toolContentID);
+		List<ItemSummary> itemSummaries = service.exportForTeacher(toolContentID);
 		
 
 		
@@ -229,15 +230,15 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
      * @param directoryName
      * @throws IOException 
      */
-    private void saveFileToLocal(List<List<GroupSummary>> eachItemOverallSummaries, String directoryName) {
+    private void saveFileToLocal(List<ItemSummary> itemSummaries, String directoryName) {
     	handler = getToolContentHandler();
     	
     	//save all the attachments
-		for (List<GroupSummary> itemOverallSummary : eachItemOverallSummaries) {
-			for (GroupSummary groupSummary : itemOverallSummary) {
-				for (ItemSummary itemSummary : groupSummary.getItemSummaries()) {
+		for (ItemSummary itemSummary : itemSummaries) {
+			for (GroupSummary groupSummary : itemSummary.getGroupSummaries()) {
+				for (TaskListItemVisitLogSummary taskListItemVisitLogSummary : groupSummary.getTaskListItemVisitLogSummaries()) {
 					
-					for (TaskListItemAttachment attachment : itemSummary.getAttachments()) {
+					for (TaskListItemAttachment attachment : taskListItemVisitLogSummary.getAttachments()) {
 						try{
 							int idx= 1;
 							String userName = attachment.getCreateBy().getLoginName();

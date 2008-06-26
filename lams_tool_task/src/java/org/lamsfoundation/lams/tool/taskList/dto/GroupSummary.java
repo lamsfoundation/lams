@@ -29,7 +29,7 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 
 /**
- * DTO object which is used in a monitoring. Contains information describing current group.
+ * DTO object used in a monitoring. Contains information for group.
  * 
  * @author Andrey Balan
  */
@@ -38,13 +38,10 @@ public class GroupSummary {
 	//Group information.
 	private String sessionName;
 	
-	private List<ItemSummary> itemSummaries;
-	
-	//only for export
-	private TaskListItem taskListItem;
+	private List<TaskListItemVisitLogSummary> taskListItemVisitLogSummaries;
 	
 	public GroupSummary() {
-		itemSummaries = new ArrayList<ItemSummary>();
+		taskListItemVisitLogSummaries = new ArrayList<TaskListItemVisitLogSummary>();
 	}
 	
 	public String getSessionName() {
@@ -54,19 +51,12 @@ public class GroupSummary {
 		this.sessionName = sessionName;
 	}
 	
-	public List<ItemSummary> getItemSummaries() {
-		return itemSummaries;
+	public List<TaskListItemVisitLogSummary> getTaskListItemVisitLogSummaries() {
+		return taskListItemVisitLogSummaries;
 	}
-	public void setItemSummaries(List<ItemSummary> itemSummaries) {
-		this.itemSummaries = itemSummaries;
+	public void setTaskListItemVisitLogSummaries(List<TaskListItemVisitLogSummary> taskListItemVisitLogSummaries) {
+		this.taskListItemVisitLogSummaries = taskListItemVisitLogSummaries;
 	}
 	
-	public TaskListItem getTaskListItem() {
-		return taskListItem;
-	}
-	public void setTaskListItem(TaskListItem taskListItem) {
-		this.taskListItem = taskListItem;
-	}
-
 }
  
