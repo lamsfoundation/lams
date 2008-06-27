@@ -669,6 +669,11 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	 * @return  
 	 */
 	private function drawTransition(t:Transition, cm):Boolean{
+		Debugger.log('drawn a transition to:'+t.toUIID+', from:' + t.fromUIID, Debugger.CRITICAL, 'drawTransition', 'CanvasBranchView');
+		
+		Debugger.log('test 1: '+ !isActivityOnLayer(cm.activitiesDisplayed.get(t.fromUIID), this.activityLayers), Debugger.CRITICAL, 'drawTransition', 'CanvasBranchView');
+		Debugger.log('test 2: '+ !isActivityOnLayer(cm.activitiesDisplayed.get(t.toUIID), this.activityLayers), Debugger.CRITICAL, 'drawTransition', 'CanvasBranchView');
+		
 		if(!isActivityOnLayer(cm.activitiesDisplayed.get(t.fromUIID), this.activityLayers) && !isActivityOnLayer(cm.activitiesDisplayed.get(t.toUIID), this.activityLayers)) 
 			return false;
 		

@@ -298,9 +298,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 											ca.activity.orderID = _canvasModel.getCanvas().ddm.getNextSequenceOrderID(selectedSequence.activity.activityUIID);
 											
 											Debugger.log("ca orderID: " + ca.activity.orderID, Debugger.CRITICAL, "activityRelease", "CanvasController");
+											_canvasModel.haltRefresh(true);
 											
 											if(ca.activity.orderID > 1) _canvasModel.createSequenceTransition(CanvasSequenceActivity(selectedSequence).lastActivity, ca.activity);
 											else ComplexActivity(selectedSequence.activity).firstActivityUIID = ca.activity.activityUIID;							
+											
+											_canvasModel.haltRefresh(false);
 											
 											_canvasModel.addParentToActivity(selectedSequence.activity.activityUIID, ca, false);
 											
