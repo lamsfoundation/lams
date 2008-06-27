@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
 import org.lamsfoundation.lams.authoring.Activity;
+import org.lamsfoundation.lams.authoring.GateActivity;
 import org.lamsfoundation.lams.authoring.SequenceActivity;
 import org.lamsfoundation.lams.authoring.ComplexActivity;
 import org.lamsfoundation.lams.common.style.*;
@@ -251,7 +252,8 @@ class LearnerActivity extends MovieClip {
 		
 	}
 	
-	public function showToolTip(btnObj, btnTT:String):Void{
+	public function showToolTip(btnObj, ttMessage:String):Void{
+		Debugger.log("showToolTip invoked", Debugger.CRITICAL, "showToolTip", "LearnerActivity");
 		var appData = getAppData();
 		if(_complex){
 			var ttXpos = appData.compX + xPos;
@@ -262,16 +264,19 @@ class LearnerActivity extends MovieClip {
 			}else {
 				var ttXpos = appData.compX + this._x;
 			}
-			var ttYpos = appData.compY + this._y+btnObj._height;
+			var targetHeightOffset:Number = (btnObj._height == undefined) ? 15 : btnObj._height;
+			var ttYpos = appData.compY + this._y+targetHeightOffset;
 		}
 		
 		var ttHolder = appData.ttHolder;
-		trace("x pos: "+ttXpos+" and y pos: "+ttYpos+" and tt holder is: "+ttHolder)
-		if (btnTT == undefined || btnTT == null || btnTT == "" || btnTT == "undefined"){
-			var ttMessage = "<b>"+ _activity.title+"</b>"
-		}else {
-			var ttMessage = "<b>"+ _activity.title +"</b> \n"+Dictionary.getValue(btnTT);
+		Debugger.log("ttHolder: "+ttHolder, Debugger.CRITICAL, "showToolTip", "LearnerActivity");
+		
+		if (ttMessage == undefined || ttMessage == null || ttMessage == "" || ttMessage == "undefined"){
+			ttMessage = "<b>"+ _activity.title+"</b>";
+		} else {
+			ttMessage = "<b>"+ _activity.title+"</b>\n" + ttMessage;
 		}
+		
 		var ttWidth = 140;
 		_tip.DisplayToolTip(ttHolder, ttMessage, ttXpos, ttYpos, undefined, ttWidth);
 		
@@ -283,15 +288,39 @@ class LearnerActivity extends MovieClip {
 	
 	private function onRollOver(){
 		if (actStatus == "completed_mc"){
-			showToolTip(this.clickTarget_mc, "completed_act_tooltip");
+			showToolTip(this.clickTarget_mc, Dictionary.getValue("completed_act_tooltip"));
+			
 		}else if (actStatus == "current_mc"){
-			showToolTip(this.clickTarget_mc, "current_act_tooltip");
-		}else {
-			if (String(_activity.title).length > 19){
-				showToolTip(this.clickTarget_mc, "undefined");
+			showToolTip(this.clickTarget_mc, Dictionary.getValue("current_act_tooltip"));
+			
+		}else { // Handle tooltips for not yet attempted activities
+			var attemptedActs:Array = learner.getAttemptedActivities();
+			var attempted:Boolean = false;
+			for (var i=0; i<attemptedActs.length; ++i) {
+				if (attemptedActs[i] == _activity.activityID) {
+					attempted = true;
+				}
+			}
+			if (!attempted) { // Check if it's a gate activity
+				if(app.module == 'learner') {
+					if (_activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE) {
+						showToolTip(this.clickTarget_mc, Dictionary.getValue("synchronise_gate_tooltip"));
+					
+					} else if (_activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE) {
+						
+						var gateReleaseDate:Date = new Date(_activity.createDateTime); // copy Date instance
+						gateReleaseDate.setMinutes(gateReleaseDate.getMinutes() + GateActivity(_activity).gateStartTimeOffset);
+						showToolTip(this.clickTarget_mc, Dictionary.getValue("schedule_gate_tooltip", [gateReleaseDate.toString()]));
+						
+					} else if (_activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE) {
+						showToolTip(this.clickTarget_mc, Dictionary.getValue("permission_gate_tooltip"));
+					
+					} else { // Otherwise show the default message for non attempted activities
+						showToolTip(this.clickTarget_mc, Dictionary.getValue("not_attempted_act_tooltip"));
+					}
+				}
 			}
 		}
-		
 	}
 	
 	private function onRollOut(){
