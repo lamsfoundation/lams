@@ -1,7 +1,4 @@
 
-function init() {
-	selectTab(1);
-}
 function doSelectTab(tabId) {
 	selectTab(tabId);
 }

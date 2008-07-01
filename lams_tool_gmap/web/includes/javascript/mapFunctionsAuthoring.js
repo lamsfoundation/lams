@@ -61,8 +61,6 @@ function saveMarkerInfo(x)
 	}
 }
 
-
-// TODO: This method should only be included for the authoring pages, put them in another file
 function saveMapState()
 {
 	document.getElementById("mapZoom").value=map.getZoom();

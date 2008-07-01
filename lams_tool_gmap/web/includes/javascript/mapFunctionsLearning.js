@@ -5,7 +5,7 @@ function addMarkerToCenter()
 	{
 		if (userMarkerCount == markerLimit)
 		{
-			alert("You have reached the marker limit, you cannot add any more");
+			alert(markerLimitMsg);
 			return;
 		}
 	}
