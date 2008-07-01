@@ -125,36 +125,34 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new GmapException(error);
 		}
 
-		GmapSession gmapSession = gmapService
-				.getSessionBySessionId(toolSessionID);
+		GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
 
 		Gmap gmap = gmapSession.getGmap();
 
-		UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession()
-				.getAttribute(AttributeNames.USER);
+		UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
-		GmapUser gmapUser = gmapService
-				.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()),
-						toolSessionID);
+		GmapUser gmapUser = gmapService.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()),toolSessionID);
 
-		NotebookEntry gmapEntry = gmapService.getEntry(gmapUser
-				.getEntryUID());
+		//NotebookEntry gmapEntry = gmapService.getEntry(gmapUser.getEntryUID());
 
 		// construct dto's
-		GmapDTO gmapDTO = new GmapDTO();
-		gmapDTO.setTitle(gmap.getTitle());
-		gmapDTO.setInstructions(gmap.getInstructions());
+		GmapDTO gmapDTO = new GmapDTO(gmap);
+		//GmapDTO gmapDTO = new GmapDTO();
+		//gmapDTO.setTitle(gmap.getTitle());
+		//gmapDTO.setInstructions(gmap.getInstructions());
 
 		GmapSessionDTO sessionDTO = new GmapSessionDTO();
 		sessionDTO.setSessionName(gmapSession.getSessionName());
 		sessionDTO.setSessionID(gmapSession.getSessionId());
+		sessionDTO.setUserDTOs(gmapSession.getGmapUsers());
 
 		// If the user hasn't put in their entry yet, gmapEntry will be null;
-		GmapUserDTO userDTO = gmapEntry != null 
-			? new GmapUserDTO(gmapUser,gmapEntry) 
-			: new GmapUserDTO(gmapUser);
+		//GmapUserDTO userDTO = gmapEntry != null ? new GmapUserDTO(gmapUser,gmapEntry) : new GmapUserDTO(gmapUser);
 
-		sessionDTO.getUserDTOs().add(userDTO);
+		//GmapUserDTO userDTO = new GmapUserDTO(gmapUser);
+		
+		
+		//sessionDTO.getUserDTOs().add(userDTO);
 		gmapDTO.getSessionDTOs().add(sessionDTO);
 
 		request.getSession().setAttribute("gmapDTO", gmapDTO);
