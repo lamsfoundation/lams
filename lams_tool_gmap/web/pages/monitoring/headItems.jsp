@@ -5,26 +5,13 @@
 </c:set>
 
 <script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
-
 <script type="text/javascript" src="${tool}includes/javascript/mapFunctionsMonitoring.js"></script>
 <%@ include file="/includes/jsp/mapFunctions.jsp"%>
 
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAvPAE96y1iioFQOnrP1RCBxS3S_A0Q4kgEfsHF6TMv6-oezFszBTPVN72_75MGlxr3nP_6ixxWd30jw" type="text/javascript"></script>	
 <script type="text/javascript">
 <!--
-
 var webAppUrl = "${tool}";
-var errorMissingTitle = '<fmt:message key="error.missingMarkerTitle"/>';
-var errorCantFindLocation = '<fmt:message key="error.cantFindAddress"/>';
-var confirmDelete = '<fmt:message key="label.authoring.basic.confirmDelete"/>';
-var createdByMsg = '<fmt:message key="label.createdBy"/>';
-var latitudeLongitudeMsg = '<fmt:message key="label.latitudelongitude"/>';
-var titleMsg = '<fmt:message key="label.authoring.basic.title"/>';
-var newInfoWindowTextMsg = '<fmt:message key="label.newInfoWindowText"/>';
-var editMsg = '<fmt:message key="button.Edit"/>';
-var saveMsg = '<fmt:message key="button.Save"/>';
-var removeMsg = '<fmt:message key="button.Remove"/>';
-var cancelMsg = '<fmt:message key="button.Cancel"/>';
 var map;
 var markers;
 var users;
@@ -32,7 +19,6 @@ var geocoder = null;
 var currUser;
 var userMarkerCount =0;
 var limitMarkers = ${gmapDTO.limitMarkers};
-var markerLimit = 0;
 var markerLimit = ${gmapDTO.maxMarkers};
 
 function initMonotorGmap()
@@ -60,7 +46,7 @@ function initMonotorGmap()
     	<c:forEach var="marker" items="${gmapDTO.gmapMarkers}">
     		<c:choose>
 				<c:when test="${marker.isAuthored == true}">
-					addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '<fmt:message key="label.authoring.basic.authored"></fmt:message>', '0');
+					addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
 				</c:when>
 				<c:otherwise>
 					addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
@@ -91,7 +77,8 @@ function refreshSideBarMonitor()
 	//sideBarText += "<a href='javascript:refreshSideBar()'>View All</a><br>";
 	for (;j<users.length; j++)
 	{
-		sideBarText += "<nobr><a href='javascript:makeUsersSideBarVisible(" + users[j].id + ");'>" + users[j].name + "</a></nobr><br>";
+		sideBarText += "<nobr><img src='" + webAppUrl + "/images/tree_closed.gif' id='userTreeIcon" + users[j].id + "' onclick='javascript:makeUsersSideBarVisible(" + users[j].id + ");' />";
+		sideBarText += "<a href='javascript:makeUsersSideBarVisible(" + users[j].id + ");'> " + users[j].name + "</a></nobr><br>";
 		sideBarText += "<div style='display:none;' id='userdiv" + users[j].id + "'>";
 		for (i=0;i<markers.length; i++)
 		{
@@ -119,12 +106,13 @@ function makeUsersSideBarVisible(id)
 	if (div.style.display == "block")
 	{
 		document.getElementById("userdiv" + id).style.display = "none";
+		document.getElementById("userTreeIcon" + id).src = webAppUrl + "/images/tree_closed.gif";
 	}
 	else if (div.style.display == "none")
 	{
 		document.getElementById("userdiv" + id).style.display = "block";
+		document.getElementById("userTreeIcon" + id).src = webAppUrl + "/images/tree_open.gif";
 	}
-	
 }
 
 /*
@@ -151,6 +139,12 @@ function makeUsersSideBarVisible(id)
 	document.getElementById("sidebar").innerHTML = sideBarText;
 }
 */
+
+function init()
+{
+	selectTab(1);
+	initMonotorGmap();
+}
 
 
 //-->

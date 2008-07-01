@@ -46,61 +46,15 @@
  		<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
 	</td></tr>
 	</table>
-	<!--  
-	<table cellpadding="0">
-
-		<tr>
-			<th>
-				<fmt:message key="heading.learner" />
-			</th>
-			<th>
-				<fmt:message key="heading.notebookEntry" />
-			</th>
-		</tr>
-
-		
-		
-		
-		
-		
+	
+	<script type="text/javascript">
+	<!--
+		users = new Array();
+		addUserToList('0','<fmt:message key="label.authoring.basic.authored"></fmt:message>' );
 		<c:forEach var="user" items="${session.userDTOs}">
-			<tr>
-				<td width="30%">
-					${user.firstName} ${user.lastName}
-				</td>
-				<td width="70%">
-					<c:choose>
-						<c:when test="${user.entryUID == null}">
-							<fmt:message key="label.notAvailable" />
-						</c:when>
-
-						<c:otherwise>
-							<a
-								href="./monitoring.do?dispatch=showGmap&amp;userUID=${user.uid}">
-								<fmt:message key="label.view" /> </a>
-						</c:otherwise>
-					</c:choose>
-
-				</td>
-			</tr>
+			addUserToList('${user.uid}','${user.firstName} ${user.lastName}' );
 		</c:forEach>
-	</table>
-	-->
-	
-	<script type="text/javascript">
-	<!--
-	users = new Array();
-	addUserToList('0','<fmt:message key="label.authoring.basic.authored"></fmt:message>' );
-	<c:forEach var="user" items="${session.userDTOs}">
-	addUserToList('${user.uid}','${user.firstName} ${user.lastName}' );
-	</c:forEach>
 	//-->
 	</script>
 	
-	
-	<script type="text/javascript">
-	<!--
-		initMonotorGmap();
-	//-->
-	</script>
 </c:forEach>

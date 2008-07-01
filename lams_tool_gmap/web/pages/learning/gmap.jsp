@@ -95,11 +95,7 @@
 			</c:otherwise>
 		</c:choose>
 		
-		<script type="text/javascript">
-		<!--
-			initLearnerGmap();
-		//-->
-		</script>
+		
 
 	</html:form>
 </div>
