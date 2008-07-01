@@ -242,12 +242,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 				drawAll(event.data, _model);
 				break;
 			case 'SET_ACTIVE':
-				Debugger.log('setting activie :' + event.updateType + " event.data: " + event.data.activity.activityUIID + " condition: " + (event.data.activity.activityUIID == this.activity.activityUIID),Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasBranchView');
-				Debugger.log('this object :' + this.activity.activityUIID,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasBranchView');
-				
 				transparentCover._visible = (event.data == this) ? false : true;
-				
-				Debugger.log("is open: " + _isOpen, Debugger.CRITICAL, "viewUpdate", "CanvasBranchView");
 				
 				if(event.data.activity.activityUIID == this.activity.activityUIID) {
 					_eventsEnabled = true;
@@ -358,23 +353,15 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 	
 	private function hitConnectorHubs() {
 		delete this.onEnterFrame;
-		
 		startHub.hit();
 		endHub.hit();
-		
-		Debugger.log('start x:' + this.activity.startXCoord, Debugger.CRITICAL,' hitConnectorHubs','CanvasBranchView');
-		
 	}
 	
 	private function loadSequenceActivities() {
 		var sequenceActs:Array = (model instanceof CanvasModel) ? _cm.getCanvas().ddm.getComplexActivityChildren(activity.activityUIID) : _mm.getMonitor().ddm.getComplexActivityChildren(activity.activityUIID);
-		Debugger.log("Sequence Activities length: " + sequenceActs.length, Debugger.CRITICAL, "loadSequenceActivities", "CanvasBranchView");
-		
 		model.haltRefresh(true);
 		
 		for(var i=0; i<sequenceActs.length;  i++) {
-			Debugger.log('firstActivityUIID:' + activity.firstActivityUIID, Debugger.CRITICAL, "loadSequenceActivities", "CanvasBranchView");
-			
 			if(SequenceActivity(sequenceActs[i]).activityUIID == activity.firstActivityUIID) {
 				// (monitoring) entering this if statement
 				model.addNewBranch(SequenceActivity(sequenceActs[i]), activity, true);
@@ -881,22 +868,13 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
     * @param cm Canvas model object 
     */
 	private function setPosition(model, cx, cy){
-		Debugger.log("model: " + model.activitiesDisplayed, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
-		Debugger.log("act UIID: " + activity.activityUIID, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
-		
 		if(cx != null && cy != null) {
 			_x = cx;
 			_y = cy;
 			
-			if(_isBranchChild) 
-				Debugger.log("bc cx: " + cx + " // bc cy: " + cy, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
-			
 			var hPosition:Number = (model instanceof CanvasModel) ? model.getCanvas().view.getScrollPaneHPosition() : model.getMonitor().getMV().getMonitorSequenceScp().hPosition;
 			var vPosition:Number = (model instanceof CanvasModel) ? model.getCanvas().view.getScrollPaneVPosition() : model.getMonitor().getMV().getMonitorSequenceScp().vPosition;
 			
-			Debugger.log(" hPosition: " +  hPosition, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
-			Debugger.log(" vPosition: " +  vPosition, Debugger.CRITICAL, "setPosition", "CanvasBranchView");
-		
 			canvas_scp._x = (_isBranchChild) ? -cx : -cx + hSpace + hPosition;
 			canvas_scp._y = (_isBranchChild) ? -cy : -cy + vSpace + vPosition;
 			
@@ -999,10 +977,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var c:Controller = super.getController();
 		
 		if(model instanceof CanvasModel) {
-			Debugger.log("canvas controller: " + c, Debugger.CRITICAL,'getController','CanvasBranchView');
 			return CanvasController(c);
 		} else {
-			Debugger.log("monitor controller: " + c, Debugger.CRITICAL,'getController','CanvasBranchView');
 			return MonitorController(c);
 		}
 	}

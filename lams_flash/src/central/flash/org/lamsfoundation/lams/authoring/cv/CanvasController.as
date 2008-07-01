@@ -353,7 +353,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				
 			//give it the new co-ords and 'drop' it
 			
-				if(!ca.branchConnector) {
+				if(!ca.branchConnector || ca.branchConnector == undefined) {
 					ca.activity.xCoord = ca._x;
 					ca.activity.yCoord = ca._y;
 					
