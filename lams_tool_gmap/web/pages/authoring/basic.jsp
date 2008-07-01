@@ -51,39 +51,46 @@
 		</td>
 	</tr>
 </table>
- 		
+
 <script type="text/javascript">
 <!--
-	function initGmap()
+
+function initGmap()
+{
+	if (GBrowserIsCompatible()) 
 	{
-		if (GBrowserIsCompatible()) 
-		{
-			//map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(640,320) } );
-			map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(500,320) } );
-			//map.setCenter(new GLatLng(-33.774322, 151.111988), 13);
-	    	map.addControl(new GLargeMapControl());
-	    	map.addControl(new GMapTypeControl());
-	    	map.addMapType(G_PHYSICAL_MAP); 
-	
-	    	markers = new Array();
-	    	geocoder = new GClientGeocoder();
-	    	
-	    	//currUser = '${gmapUser.firstName} ${gmapUser.lastName}';
-	    	//currUserId = '${gmapUser.uid}';
-	    	currUser = '<fmt:message key="label.authoring.basic.authored"></fmt:message>';
-	    	currUserId = '0';
-			map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
-			map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
-			map.setZoom(${formBean.gmap.mapZoom});
-			map.setMapType(${formBean.gmap.mapType});
-			
-			<c:forEach var="marker" items="${formBean.gmap.gmapMarkers}">
-			addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, true, currUser, currUserId);
-			</c:forEach>
-			
-			refreshSideBar();
-	    }
-	}
-//-->
+		//map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(640,320) } );
+		map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(500,320) } );
+    	map.addControl(new GLargeMapControl());
+    	map.addControl(new GMapTypeControl());
+    	map.addMapType(G_PHYSICAL_MAP); 
+
+    	markers = new Array();
+    	geocoder = new GClientGeocoder();
+    	
+    	//currUser = '${gmapUser.firstName} ${gmapUser.lastName}';
+    	//currUserId = '${gmapUser.uid}';
+    	currUser = '<fmt:message key="label.authoring.basic.authored"></fmt:message>';
+    	currUserId = '0';
+		map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
+		map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
+		map.setZoom(${formBean.gmap.mapZoom});
+		map.setMapType(${formBean.gmap.mapType});
+		
+		addAuthorMarkers();	
+		refreshSideBar();
+		
+    }
+}
+
+function addAuthorMarkers()
+{
+	<c:forEach var="marker" items="${formBean.gmap.gmapMarkers}">
+	addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, true, currUser, currUserId);
+	</c:forEach>		
+}
+
+-->
 </script>
+ 		
 

@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
@@ -17,18 +16,8 @@
 
 <script type="text/javascript">
 <!--
-	//var webAppUrl = "${tool}";
 	var errorMissingTitle = '<fmt:message key="error.missingMarkerTitle"/>';
 	var confirmDelete = '<fmt:message key="label.authoring.basic.confirmDelete"/>';
-	//var errorCantFindLocation = '<fmt:message key="error.cantFindAddress"/>';
-	//var createdByMsg = '<fmt:message key="label.createdBy"/>';
-	//var latitudeLongitudeMsg = '<fmt:message key="label.latitudeLongitude"/>';
-	//var titleMsg = '<fmt:message key="label.authoring.basic.title"/>';
-	//var newInfoWindowTextMsg = '<fmt:message key="label.newInfoWindowText"/>';
-	//var editMsg = '<fmt:message key="button.edit"/>';
-	//var saveMsg = '<fmt:message key="button.save"/>';
-	//var removeMsg = '<fmt:message key="button.remove"/>';
-	// var cancelMsg = '<fmt:message key="button.cancel"/>';
 	var map;
 	var markers;
 	var geocoder = null;
