@@ -50,6 +50,7 @@ class GroupNamingDialog extends MovieClip implements Dialog {
 	private var _groups:Array;
 	private var _grouping:Grouping;
 	private var _changedGroups:Hashtable;
+	private var selectedGroup:Group;
 	
     private var close_btn:Button;         // Close button
     
@@ -151,14 +152,57 @@ class GroupNamingDialog extends MovieClip implements Dialog {
 	public function itemEdited(evt:Object):Void {
 		var group = _group_naming_dgd.getItemAt(evt.itemIndex);
 		
-		_changedGroups.put(group.groupUIID, group);
+		var nameIsValid:Boolean = false;
 		
-		Debugger.log("item changed: " + group.groupUIID, Debugger.CRITICAL, "itemChanged", "GroupNamingDialog");
+		if (group.groupName != selectedGroup.groupName) {
+			nameIsValid = areGroupNamesValid(true);
+		}
+		
+		if (nameIsValid) {
+			_changedGroups.put(group.groupUIID, group);
+		} else {
+			_group_naming_dgd.replaceItemAt(evt.itemIndex, selectedGroup);
+			_changedGroups.put(selectedGroup.groupUIID, selectedGroup); //restore value
+		}
+	}
+	
+	public function areGroupNamesValid(showMessages:Boolean):Boolean {
+
+		for (var i=0; i<_group_naming_dgd.length; i++) {
+			var numGroupsWithThatName:Number = 0;
+			
+			// remove spaces from groupName and return it as a new String leaving groupName unchanged
+			var tmpString:String = StringUtils.replace(_group_naming_dgd.getItemAt(i).groupName, " ", ""); 
+			
+			if (tmpString == "" || tmpString == null || tmpString == undefined) {
+				if (showMessages) { 
+					LFMessage.showMessageAlert(Dictionary.getValue("al_group_name_invalid_blank"), null);
+				}
+				return false;
+			}
+
+			for (var j=0; j<_group_naming_dgd.length; j++) {
+				
+				if (_group_naming_dgd.getItemAt(j).groupName == _group_naming_dgd.getItemAt(i).groupName) {
+
+					numGroupsWithThatName++;
+					if (numGroupsWithThatName > 1) {
+						if (showMessages) { 
+							LFMessage.showMessageAlert(Dictionary.getValue("al_group_name_invalid_existing"), null);
+						}
+						return false;
+					}
+				} 
+			}
+		}
+		
+		return true;
 	}
 	
 	public function itemSelected(evt:Object):Void {
 		// TODO: Highlight the text to be changed
 		var item = _group_naming_dgd.getItemAt(evt.itemIndex);
+		selectedGroup = new Group(item.parentID, item.groupID, item.groupUIID, item.groupName, item.orderID); // backup selected grouping object
 		Debugger.log("current selection: " + Selection.getFocus(), Debugger.CRITICAL, "itemSelected", "GroupNamingDialog");
 	}
 	
@@ -199,14 +243,18 @@ class GroupNamingDialog extends MovieClip implements Dialog {
     * Called by the OK button 
     */
     private function close(){
-		_grouping.updateGroups(_changedGroups.values());
-        _container.deletePopUp();
+		
+		if (areGroupNamesValid(false)) {
+			_grouping.updateGroups(_changedGroups.values());
+			_container.deletePopUp();
+		}
     }
 	
     /**
     * Event dispatched by parent container when close button clicked
     */
     public function click(e:Object):Void{
+		_grouping.updateGroups(_changedGroups.values());
         e.target.deletePopUp();
     }
     
