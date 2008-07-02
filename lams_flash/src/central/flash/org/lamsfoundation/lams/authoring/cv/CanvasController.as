@@ -233,8 +233,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 								
 								_canvasModel.removeOptionalSequenceCA(ca, optionalOnCanvas[i].activity.activityUIID);
 							} else {
-								if(!_canvasModel.moveOptionalSequenceCA(ca, sequenceActivity))
+								if(!_canvasModel.moveOptionalSequenceCA(ca, sequenceActivity)) {
+									for (var j=0; j<optionalOnCanvas[i].children.length; j++) {
+										// The following condition checks to see if the released child activity landed on a different sequence to which it was originally on (within the same optionsWithSequences activity)
+										if (optionalOnCanvas[i].children[j].hitTest(ca) && _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID) != optionalOnCanvas[i].children[j].activity)
+											LFMessage.showMessageAlert(Dictionary.getValue('al_cannot_move_to_diff_opt_seq'));
+									}
 									activitySnapBack(ca);
+								}
 							}
 						
 						}
