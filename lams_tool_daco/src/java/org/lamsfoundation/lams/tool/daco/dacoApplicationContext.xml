@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<bean id="messageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.daco.ApplicationResources</value></property>
+			</bean>
+		</property>										
+	</bean>
+    <!-- Hibernate SessionFactory -->
+    <bean id="dacoSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource"><ref bean="toolDataSource"/></property>
+		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
+
+        <!-- Must references all OR mapping files. -->
+        <property name="mappingResources">
+            <list>
+               <value>org/lamsfoundation/lams/tool/daco/model/DacoUser.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/daco/model/Daco.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/daco/model/DacoQuestion.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/daco/model/DacoQuestionVisitLog.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/daco/model/DacoAttachment.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/daco/model/DacoSession.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/daco/model/DacoAnswer.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/daco/model/DacoAnswerOption.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- core beans -->
+    <bean id="dacoDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="dacoSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="dacoQuestionDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoQuestionDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="dacoSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="dacoQuestionVisitDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoQuestionVisitDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="dacoSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="dacoAttachmentDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoAttachmentDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="dacoSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="dacoUserDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="dacoSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="dacoSessionDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoSessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="dacoSessionFactory"/>
+        </property>
+    </bean>
+   <bean id="dacoAnswerDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoAnswerDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="dacoSessionFactory"/>
+        </property>
+    </bean>
+       <bean id="dacoAnswerOptionDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoAnswerOptionDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="dacoSessionFactory"/>
+        </property>
+    </bean>
+
+    <!-- Managers -->
+	<bean id="dacoToolContentHandler" class="org.lamsfoundation.lams.tool.daco.util.DacoToolContentHandler">
+	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+	
+    <bean id="dacoManagerTarget" class="org.lamsfoundation.lams.tool.daco.service.DacoServiceImpl">
+        <property name="dacoDao">
+            <ref local="dacoDao"/>
+        </property>
+        <property name="dacoQuestionDao">
+            <ref local="dacoQuestionDao"/>
+        </property>
+        <property name="dacoAnswerOptionDao">
+            <ref local="dacoAnswerOptionDao"/>
+        </property>
+        <property name="dacoAnswerDao">
+            <ref local="dacoAnswerDao"/>
+        </property>
+        <property name="dacoQuestionVisitDao">
+            <ref local="dacoQuestionVisitDao"/>
+        </property>
+        <property name="dacoAttachmentDao">
+            <ref local="dacoAttachmentDao"/>
+        </property>
+        <property name="dacoUserDao">
+            <ref local="dacoUserDao"/>
+        </property>
+        <property name="dacoSessionDao">
+            <ref local="dacoSessionDao"/>
+        </property>
+        <property name="dacoToolContentHandler">
+            <ref local="dacoToolContentHandler"/>
+        </property>
+        <property name="repositoryService">
+            <ref bean="repositoryService"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
+   		<property name="auditService">
+   			<ref bean="auditService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService"><ref bean="messageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   		
+    </bean>
+
+    <bean id="dacoService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref local="dacoManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setQuestionComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setQuestionVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setQuestionAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+			    <prop key="importToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                
+                <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
+				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
+

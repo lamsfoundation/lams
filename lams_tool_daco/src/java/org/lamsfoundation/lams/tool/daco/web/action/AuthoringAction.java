@@ -1,0 +1,1242 @@
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+/* $$Id$$ */
+package org.lamsfoundation.lams.tool.daco.web.action;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.log4j.Logger;
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
+import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.daco.DacoConstants;
+import org.lamsfoundation.lams.tool.daco.model.Daco;
+import org.lamsfoundation.lams.tool.daco.model.DacoAnswerOption;
+import org.lamsfoundation.lams.tool.daco.model.DacoAttachment;
+import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
+import org.lamsfoundation.lams.tool.daco.model.DacoUser;
+import org.lamsfoundation.lams.tool.daco.service.DacoApplicationException;
+import org.lamsfoundation.lams.tool.daco.service.IDacoService;
+import org.lamsfoundation.lams.tool.daco.service.UploadDacoFileException;
+import org.lamsfoundation.lams.tool.daco.util.DacoQuestionComparator;
+import org.lamsfoundation.lams.tool.daco.web.form.DacoForm;
+import org.lamsfoundation.lams.tool.daco.web.form.DacoQuestionForm;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+/**
+ * @author Steve.Ni
+ * @version $Revision$
+ */
+public class AuthoringAction extends Action {
+
+	private static Logger log = Logger.getLogger(AuthoringAction.class);
+
+	/**
+	 * Delete offline instruction file from current Daco authoring page.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	protected ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_OFFLINE);
+	}
+
+	/**
+	 * Delete online instruction file from current Daco authoring page.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	protected ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_ONLINE);
+	}
+
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+
+		String param = mapping.getParameter();
+		// -----------------------Daco Author function
+		// ---------------------------
+		if (param.equals("start")) {
+			ToolAccessMode mode = getAccessMode(request);
+			// teacher mode "check for new" button enter.
+			if (mode != null) {
+				request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+			}
+			else {
+				request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.AUTHOR.toString());
+			}
+			return start(mapping, form, request);
+		}
+		if (param.equals("definelater")) {
+			// update define later flag to true
+			Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+			IDacoService service = getDacoService();
+			Daco daco = service.getDacoByContentId(contentId);
+
+			daco.setDefineLater(true);
+			service.saveOrUpdateDaco(daco);
+
+			request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+			return start(mapping, form, request);
+		}
+		if (param.equals("initPage")) {
+			return initPage(mapping, form, request, response);
+		}
+		if (param.equals("updateContent")) {
+			return updateContent(mapping, form, request, response);
+		}
+		if (param.equals("uploadOnlineFile")) {
+			return uploadOnline(mapping, form, request, response);
+		}
+		if (param.equals("uploadOfflineFile")) {
+			return uploadOffline(mapping, form, request, response);
+		}
+		if (param.equals("deleteOnlineFile")) {
+			return deleteOnlineFile(mapping, form, request, response);
+		}
+		if (param.equals("deleteOfflineFile")) {
+			return deleteOfflineFile(mapping, form, request, response);
+		}
+		// ----------------------- Add daco question function
+		// ---------------------------
+		if (param.equals("newQuestionInit")) {
+			return newQuestionlInit(mapping, form, request);
+		}
+		if (param.equals("editQuestionInit")) {
+			return editQuestionInit(mapping, form, request);
+		}
+		if (param.equals("saveOrUpdateQuestion")) {
+			return saveOrUpdateQuestion(mapping, form, request);
+		}
+		if (param.equals("removeQuestion")) {
+			return removeQuestion(mapping, form, request);
+		}
+		if (param.equals("newAnswerOption")) {
+			return newAnswerOption(mapping, form, request);
+		}
+		if (param.equals("removeAnswerOption")) {
+			return removeAnswerOption(mapping, form, request);
+		}
+
+		if (param.equals("removeQuestionAttachment")) {
+			return removeQuestionAttachment(mapping, form, request, response);
+		}
+
+		return mapping.findForward(DacoConstants.ERROR);
+	}
+
+	/**
+	 * Handle upload offline instruction files request.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws UploadDacoFileException
+	 */
+	public ActionForward uploadOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws UploadDacoFileException {
+		return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE, request);
+	}
+
+	/**
+	 * Handle upload online instruction files request.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws UploadDacoFileException
+	 */
+	public ActionForward uploadOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws UploadDacoFileException {
+		return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE, request);
+	}
+
+	/**
+	 * General method to delete file (online or offline)
+	 * 
+	 * @param mapping
+	 * @param request
+	 * @param response
+	 * @param form
+	 * @param type
+	 * @return
+	 */
+	protected ActionForward deleteFile(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
+			ActionForm form, String type) {
+		Long versionID = new Long(WebUtil.readLongParam(request, DacoConstants.PARAM_FILE_VERSION_ID));
+		Long uuID = new Long(WebUtil.readLongParam(request, DacoConstants.PARAM_FILE_UUID));
+
+		// get back sessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+
+		// handle session value
+		List attachmentList = getAttachmentList(sessionMap);
+		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
+		// first check exist attachment and delete old one (if exist) to
+		// deletedAttachmentList
+		Iterator iter = attachmentList.iterator();
+		DacoAttachment existAtt;
+		while (iter.hasNext()) {
+			existAtt = (DacoAttachment) iter.next();
+			if (existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)) {
+				// if there is same name attachment, delete old one
+				deleteAttachmentList.add(existAtt);
+				iter.remove();
+			}
+		}
+
+		request.setAttribute(DacoConstants.ATTR_FILE_TYPE_FLAG, type);
+		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+		return mapping.findForward(DacoConstants.SUCCESS);
+
+	}
+
+	/**
+	 * Display edit page for existed daco question.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	protected ActionForward editQuestionInit(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
+
+		// get back sessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		int questionIndex = NumberUtils.stringToInt(request.getParameter(DacoConstants.PARAM_QUESTION_INDEX), -1);
+		DacoQuestion question = null;
+		DacoQuestionForm questionForm = (DacoQuestionForm) form;
+		if (questionIndex != -1) {
+			SortedSet<DacoQuestion> questionSet = getQuestionList(sessionMap);
+			List<DacoQuestion> questionList = new ArrayList<DacoQuestion>(questionSet);
+			question = questionList.get(questionIndex);
+			if (question != null) {
+				populateQuestionToForm(questionIndex, question, questionForm, request);
+			}
+		}
+		return findForward(question == null ? -1 : question.getType(), mapping);
+	}
+
+	/**
+	 * Extract web from content to daco question.
+	 * 
+	 * @param request
+	 * @param questionForm
+	 * @param answerOptionList
+	 * @throws DacoApplicationException
+	 */
+	protected void extractFormToDacoQuestion(HttpServletRequest request, List<String> answerOptionList,
+			DacoQuestionForm questionForm) throws Exception {
+		/*
+		 * BE CAREFUL: This method will copy nessary info from request form to a old or new DacoQuestion instance. It gets all
+		 * info EXCEPT DacoQuestion.createDate and DacoQuestion.createBy, which need be set when persisting this daco question.
+		 */
+
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(questionForm.getSessionMapID());
+		// check whether it is "edit(old question)" or "add(new question)"
+		SortedSet<DacoQuestion> questionSet = getQuestionList(sessionMap);
+		int questionIndex = NumberUtils.stringToInt(questionForm.getQuestionIndex(), -1);
+		DacoQuestion question = null;
+
+		if (questionIndex == -1) { // add
+			question = new DacoQuestion();
+			question.setCreateDate(new Timestamp(new Date().getTime()));
+			questionSet.add(question);
+		}
+		else { // edit
+			List<DacoQuestion> questionList = new ArrayList<DacoQuestion>(questionSet);
+			question = questionList.get(questionIndex);
+		}
+
+		question.setType(questionForm.getQuestionType());
+
+		String constraint = questionForm.getMax();
+		if (!StringUtils.isBlank(constraint)) {
+			question.setMax(Float.parseFloat(constraint));
+		}
+		constraint = questionForm.getMin();
+		if (!StringUtils.isBlank(constraint)) {
+			question.setMin(Float.parseFloat(constraint));
+		}
+		question.setCreateByAuthor(true);
+		question.setHide(false);
+
+		Set answerOptions = new LinkedHashSet();
+		if (answerOptionList != null) {
+			int index = 1;
+			for (String ins : answerOptionList) {
+				DacoAnswerOption answerOption = new DacoAnswerOption();
+				answerOption.setAnswerOption(ins.trim());
+				answerOption.setSequenceNumber(index++);
+				answerOptions.add(answerOption);
+			}
+		}
+		question.setRequired(questionForm.isQuestionRequired());
+		question.setAnswerOptions(answerOptions);
+		question.setSummary(questionForm.getSummary());
+
+		question.setDescription(StringUtils.isBlank(questionForm.getDescription()) ? null : questionForm.getDescription().trim());
+
+		question.setDigitsDecimal(questionForm.getDigitsDecimal());
+	}
+
+	/**
+	 * Get back relative <code>ActionForward</code> from request.
+	 * 
+	 * @param type
+	 * @param mapping
+	 * @return
+	 */
+	protected ActionForward findForward(short type, ActionMapping mapping) {
+		ActionForward forward;
+		switch (type) {
+			case DacoConstants.QUESTION_TYPE_TEXTFIELD:
+				forward = mapping.findForward("textfield");
+				break;
+			case DacoConstants.QUESTION_TYPE_TEXTAREA:
+				forward = mapping.findForward("textarea");
+				break;
+			case DacoConstants.QUESTION_TYPE_NUMBER:
+				forward = mapping.findForward("number");
+				break;
+			case DacoConstants.QUESTION_TYPE_DATE:
+				forward = mapping.findForward("date");
+				break;
+			case DacoConstants.QUESTION_TYPE_FILE:
+				forward = mapping.findForward("file");
+				break;
+			case DacoConstants.QUESTION_TYPE_IMAGE:
+				forward = mapping.findForward("image");
+				break;
+			case DacoConstants.QUESTION_TYPE_RADIO:
+				forward = mapping.findForward("radio");
+				break;
+			case DacoConstants.QUESTION_TYPE_DROPDOWN:
+				forward = mapping.findForward("dropdown");
+				break;
+			case DacoConstants.QUESTION_TYPE_CHECKBOX:
+				forward = mapping.findForward("checkbox");
+				break;
+			case DacoConstants.QUESTION_TYPE_LONGLAT:
+				forward = mapping.findForward("longlat");
+				break;
+			default:
+				forward = null;
+				break;
+		}
+		return forward;
+	}
+
+	/**
+	 * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	protected ToolAccessMode getAccessMode(HttpServletRequest request) {
+		ToolAccessMode mode;
+		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
+		if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
+			mode = ToolAccessMode.TEACHER;
+		}
+		else {
+			mode = ToolAccessMode.AUTHOR;
+		}
+		return mode;
+	}
+
+	/**
+	 * Get answer options from <code>HttpRequest</code>
+	 * 
+	 * @param request
+	 */
+	protected List<String> getAnswerOptionsFromRequest(HttpServletRequest request) {
+		String list = request.getParameter(DacoConstants.ATTR_ANSWER_OPTION_LIST);
+		if (list == null) {
+			return null;
+		}
+		String[] params = list.split("&");
+		Map<String, String> paramMap = new HashMap<String, String>();
+		String[] pair;
+		for (String item : params) {
+			pair = item.split("=");
+			if (pair == null || pair.length != 2) {
+				continue;
+			}
+			try {
+				paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
+			}
+			catch (UnsupportedEncodingException e) {
+				AuthoringAction.log.error("Error occurs when decode answer options string:" + e.toString());
+			}
+		}
+
+		int count = NumberUtils.stringToInt(paramMap.get(DacoConstants.ANSWER_OPTION_COUNT));
+		List<String> answerOptionList = new ArrayList<String>();
+		for (int index = 1; index <= count; index++) {
+			String item = paramMap.get(DacoConstants.ANSWER_OPTION_DESC_PREFIX + index);
+			if (item != null) {
+				answerOptionList.add(item);
+			}
+		}
+		return answerOptionList;
+	}
+
+	/**
+	 * @param request
+	 * @return
+	 */
+	protected List getAttachmentList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap, DacoConstants.ATT_ATTACHMENT_LIST);
+	}
+
+	// *************************************************************************************
+	// Private method
+	// *************************************************************************************
+	/**
+	 * Return DacoService bean.
+	 */
+	protected IDacoService getDacoService() {
+		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+		return (IDacoService) wac.getBean(DacoConstants.DACO_SERVICE);
+	}
+
+	/**
+	 * @param request
+	 * @return
+	 */
+	protected List getDeletedAttachmentList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap, DacoConstants.ATTR_DELETED_ATTACHMENT_LIST);
+	}
+
+	/**
+	 * List save deleted daco questions, which could be persisted or non-persisted questions.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	protected List getDeletedDacoQuestionList(SessionMap sessionMap) {
+		return getListFromSession(sessionMap, DacoConstants.ATTR_DELETED_QUESTION_LIST);
+	}
+
+	/**
+	 * Get <code>java.util.List</code> from HttpSession by given name.
+	 * 
+	 * @param request
+	 * @param name
+	 * @return
+	 */
+	protected List getListFromSession(SessionMap sessionMap, String name) {
+		List list = (List) sessionMap.get(name);
+		if (list == null) {
+			list = new ArrayList();
+			sessionMap.put(name, list);
+		}
+		return list;
+	}
+
+	/**
+	 * Get longitude/latitude maps from <code>HttpRequest</code>
+	 * 
+	 * @param request
+	 */
+	protected List<String> geSelectedMapsFromRequest(HttpServletRequest request) {
+		String list = request.getParameter(DacoConstants.PARAM_LONGLAT_MAPS_SELECTED);
+		if (list == null) {
+			return null;
+		}
+		String[] params = list.split("&");
+		List<String> longlatMaps = new ArrayList<String>();
+		for (String item : params) {
+			longlatMaps.add(item);
+		}
+		return longlatMaps;
+	}
+
+	/**
+	 * List save current daco questions.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	protected SortedSet<DacoQuestion> getQuestionList(SessionMap sessionMap) {
+
+		SortedSet<DacoQuestion> list = (SortedSet<DacoQuestion>) sessionMap.get(DacoConstants.ATTR_QUESTION_LIST);
+		if (list == null) {
+			list = new TreeSet<DacoQuestion>(new DacoQuestionComparator());
+			sessionMap.put(DacoConstants.ATTR_QUESTION_LIST, list);
+		}
+		return list;
+	}
+
+	/**
+	 * Display same entire authoring page content from HttpSession variable.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 */
+	protected ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws ServletException {
+		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		DacoForm existForm = (DacoForm) sessionMap.get(DacoConstants.ATTR_DACO_FORM);
+
+		DacoForm dacoForm = (DacoForm) form;
+		try {
+			PropertyUtils.copyProperties(dacoForm, existForm);
+		}
+		catch (Exception e) {
+			throw new ServletException(e);
+		}
+
+		ToolAccessMode mode = getAccessMode(request);
+		if (mode.isAuthor()) {
+			return mapping.findForward(DacoConstants.SUCCESS);
+		}
+		else {
+			return mapping.findForward(DacoConstants.DEFINE_LATER);
+		}
+	}
+
+	/**
+	 * Ajax call, will add one more input line for new answer option.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	protected ActionForward newAnswerOption(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
+		int count = NumberUtils.stringToInt(request.getParameter(DacoConstants.ANSWER_OPTION_COUNT), 0);
+
+		List answerOptionList = new ArrayList(++count);
+		for (int index = 1; index <= count; index++) {
+			String answerOption = request.getParameter(DacoConstants.ANSWER_OPTION_DESC_PREFIX + index);
+			answerOptionList.add(answerOption == null ? "" : answerOption);
+		}
+		request.setAttribute(DacoConstants.ATTR_ANSWER_OPTION_LIST, answerOptionList);
+		return mapping.findForward(DacoConstants.SUCCESS);
+	}
+
+	/**
+	 * Display empty page for new daco question.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	protected ActionForward newQuestionlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
+		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
+		DacoQuestionForm questionForm = (DacoQuestionForm) form;
+		questionForm.setSessionMapID(sessionMapID);
+
+		short type = (short) NumberUtils.stringToInt(request.getParameter(DacoConstants.QUESTION_TYPE));
+		if (type == DacoConstants.QUESTION_TYPE_RADIO || type == DacoConstants.QUESTION_TYPE_DROPDOWN
+				|| type == DacoConstants.QUESTION_TYPE_CHECKBOX) {
+			List answerOptionList = new ArrayList(DacoConstants.INIT_ANSWER_OPTION_COUNT);
+			for (int index = 0; index < DacoConstants.INIT_ANSWER_OPTION_COUNT; index++) {
+				answerOptionList.add("");
+			}
+			request.setAttribute(DacoConstants.ATTR_ANSWER_OPTION_LIST, answerOptionList);
+		}
+		return findForward(type, mapping);
+	}
+
+	/**
+	 * This method will populate daco question information to its form for edit use.
+	 * 
+	 * @param questionIndex
+	 * @param question
+	 * @param form
+	 * @param request
+	 */
+	protected void populateQuestionToForm(int questionIndex, DacoQuestion question, DacoQuestionForm form,
+			HttpServletRequest request) {
+		form.setDescription(question.getDescription());
+		form.setQuestionRequired(question.isRequired());
+		form.setSummary(question.getSummary());
+		form.setDigitsDecimal(question.getDigitsDecimal());
+		if (questionIndex >= 0) {
+			form.setQuestionIndex(new Integer(questionIndex).toString());
+		}
+
+		Float min = question.getMin();
+		Float max = question.getMax();
+		short questionType = question.getType();
+
+		if (questionType == DacoConstants.QUESTION_TYPE_NUMBER) {
+			Short digitsDecimal = question.getDigitsDecimal();
+			if (digitsDecimal != null) {
+				if (digitsDecimal == 0) {
+					form.setMin(min == null ? null : String.valueOf(Math.round(min)));
+					form.setMax(max == null ? null : String.valueOf(Math.round(max)));
+				}
+				else {
+					form.setMin(min == null ? null : String.valueOf(round(min, digitsDecimal)));
+					form.setMax(max == null ? null : String.valueOf(round(max, digitsDecimal)));
+				}
+			}
+		}
+		else {
+			form.setMin(min == null ? null : min.toString());
+			if (max != null) {
+				form.setMax(String.valueOf((int) max.floatValue()));
+			}
+		}
+
+		if (questionType == DacoConstants.QUESTION_TYPE_RADIO || questionType == DacoConstants.QUESTION_TYPE_DROPDOWN
+				|| questionType == DacoConstants.QUESTION_TYPE_CHECKBOX) {
+			Set<DacoAnswerOption> answerOptionList = question.getAnswerOptions();
+			List answerOptions = new ArrayList();
+			for (DacoAnswerOption in : answerOptionList) {
+				answerOptions.add(in.getAnswerOption());
+			}
+			request.setAttribute(DacoConstants.ATTR_ANSWER_OPTION_LIST, answerOptions);
+		}
+		else if (questionType == DacoConstants.QUESTION_TYPE_LONGLAT) {
+
+			Set<DacoAnswerOption> answerOptionList = question.getAnswerOptions();
+			List selectedMaps = new ArrayList();
+			for (DacoAnswerOption in : answerOptionList) {
+				selectedMaps.add(in.getAnswerOption());
+			}
+			request.setAttribute(DacoConstants.PARAM_LONGLAT_MAPS_SELECTED, selectedMaps);
+		}
+	}
+
+	/**
+	 * Ajax call, remove the given line of instruction of resource item.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	protected ActionForward removeAnswerOption(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
+		int count = NumberUtils.stringToInt(request.getParameter(DacoConstants.ANSWER_OPTION_COUNT), 0);
+		int removeIndex = NumberUtils.stringToInt(request.getParameter(DacoConstants.PARAM_REMOVE_INDEX), -1);
+		List answerOptionList = new ArrayList(count - 1);
+		for (int index = 1; index <= count; index++) {
+			if (index != removeIndex) {
+				String answerOption = request.getParameter(DacoConstants.ANSWER_OPTION_DESC_PREFIX + index);
+				answerOptionList.add(answerOption == null ? "" : answerOption);
+			}
+		}
+		request.setAttribute(DacoConstants.ATTR_ANSWER_OPTION_LIST, answerOptionList);
+		return mapping.findForward(DacoConstants.SUCCESS);
+	}
+
+	/**
+	 * Remove daco question from HttpSession list and update page display. As authoring rule, all persist only happen when user
+	 * submit whole page. So this remove is just impact HttpSession values.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	protected ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
+
+		// get back sessionMAP
+		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+
+		int questionIndex = NumberUtils.stringToInt(request.getParameter(DacoConstants.PARAM_QUESTION_INDEX), -1);
+		if (questionIndex != -1) {
+			SortedSet<DacoQuestion> questionSet = getQuestionList(sessionMap);
+			List<DacoQuestion> questionList = new ArrayList<DacoQuestion>(questionSet);
+			DacoQuestion question = questionList.remove(questionIndex);
+			questionSet.clear();
+			questionSet.addAll(questionList);
+			// add to delList
+			List deletedList = getDeletedDacoQuestionList(sessionMap);
+			deletedList.add(question);
+		}
+
+		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+		return mapping.findForward(DacoConstants.SUCCESS);
+	}
+
+	/**
+	 * Remove daco question attachment, such as single file, learning object ect. It is a ajax call and just temporarily remove
+	 * from page, all permenant change will happen only when user sumbit this daco question again.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	protected ActionForward removeQuestionAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		request.setAttribute("questionAttachment", null);
+		return mapping.findForward(DacoConstants.SUCCESS);
+	}
+
+	/**
+	 * This method will get necessary information from daco question form and save or update into <code>HttpSession</code>
+	 * DacoQuestionList. Notice, this save is not persist them into database, just save <code>HttpSession</code> temporarily.
+	 * Only they will be persist when the entire authoring page is being persisted.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 */
+	protected ActionForward saveOrUpdateQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
+		List<String> answerOptionList = getAnswerOptionsFromRequest(request);
+		List<String> longlatMaps = geSelectedMapsFromRequest(request);
+		DacoQuestionForm questionForm = (DacoQuestionForm) form;
+		ActionErrors errors = validateDacoQuestionForm(questionForm, answerOptionList);
+
+		if (!errors.isEmpty()) {
+			this.addErrors(request, errors);
+			ensureMinimumAnswerOptions(answerOptionList);
+			request.setAttribute(DacoConstants.ATTR_ANSWER_OPTION_LIST, answerOptionList);
+			request.setAttribute(DacoConstants.PARAM_LONGLAT_MAPS_SELECTED, longlatMaps);
+			return findForward(questionForm.getQuestionType(), mapping);
+		}
+
+		try {
+			List<String> listToSave = answerOptionList == null ? longlatMaps : answerOptionList;
+			extractFormToDacoQuestion(request, listToSave, questionForm);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			// any upload exception will display as normal error message rather
+			// then throw exception directly
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
+			if (!errors.isEmpty()) {
+				this.addErrors(request, errors);
+				request.setAttribute(DacoConstants.ATTR_ANSWER_OPTION_LIST, answerOptionList);
+				request.setAttribute(DacoConstants.PARAM_LONGLAT_MAPS_SELECTED, longlatMaps);
+				return findForward(questionForm.getQuestionType(), mapping);
+			}
+		}
+		// set session map ID so that questionlist.jsp can get sessionMAP
+		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, questionForm.getSessionMapID());
+		// return null to close this window
+		return mapping.findForward(DacoConstants.SUCCESS);
+	}
+
+	/**
+	 * Read daco data from database and put them into HttpSession. It will redirect to init.do directly after this method run
+	 * successfully.
+	 * 
+	 * This method will avoid read database again and lost un-saved resouce question lost when user "refresh page",
+	 * 
+	 * @throws ServletException
+	 * 
+	 */
+	protected ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request) throws ServletException {
+
+		// save toolContentID into HTTPSession
+		Long contentId = new Long(WebUtil.readLongParam(request, DacoConstants.PARAM_TOOL_CONTENT_ID));
+
+		// get back the daco and question list and display them on page
+		IDacoService service = getDacoService();
+
+		List<DacoQuestion> questions = null;
+		Daco daco = null;
+		DacoForm dacoForm = (DacoForm) form;
+
+		// initial Session Map
+		SessionMap sessionMap = new SessionMap();
+		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+		dacoForm.setSessionMapID(sessionMap.getSessionID());
+
+		// Get contentFolderID and save to form.
+		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+		dacoForm.setContentFolderID(contentFolderID);
+		sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+
+		try {
+			daco = service.getDacoByContentId(contentId);
+			// if daco does not exist, try to use default content instead.
+			if (daco == null) {
+				daco = service.getDefaultContent(contentId);
+				if (daco.getDacoQuestions() != null) {
+					questions = new ArrayList<DacoQuestion>(daco.getDacoQuestions());
+				}
+				else {
+					questions = null;
+				}
+			}
+			else {
+				questions = service.getAuthoredQuestions(daco.getUid());
+			}
+
+			dacoForm.setDaco(daco);
+
+			// initialize instruction attachment list
+			List attachmentList = getAttachmentList(sessionMap);
+			attachmentList.clear();
+			attachmentList.addAll(daco.getAttachments());
+		}
+		catch (Exception e) {
+			AuthoringAction.log.error(e);
+			throw new ServletException(e);
+		}
+
+		// init it to avoid null exception in following handling
+		if (questions == null) {
+			questions = new ArrayList<DacoQuestion>();
+		}
+		else {
+			DacoUser dacoUser = null;
+			// handle system default question: createBy is null, now set it to
+			// current user
+			for (DacoQuestion question : questions) {
+				if (question.getCreateBy() == null) {
+					if (dacoUser == null) {
+						// get back login user DTO
+						HttpSession ss = SessionManager.getSession();
+						UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+						dacoUser = new DacoUser(user, daco);
+					}
+					question.setCreateBy(dacoUser);
+				}
+			}
+		}
+		// init daco question list
+		SortedSet<DacoQuestion> dacoQuestionList = getQuestionList(sessionMap);
+		dacoQuestionList.clear();
+		dacoQuestionList.addAll(questions);
+
+		sessionMap.put(DacoConstants.ATTR_DACO_FORM, dacoForm);
+		return mapping.findForward(DacoConstants.SUCCESS);
+	}
+
+	/**
+	 * This method will persist all inforamtion in this authoring page, include all daco question, information etc.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 */
+	protected ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		DacoForm dacoForm = (DacoForm) form;
+
+		// get back sessionMAP
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(dacoForm.getSessionMapID());
+
+		ToolAccessMode mode = getAccessMode(request);
+
+		ActionMessages errors = validateDacoForm(dacoForm, mapping, request);
+		if (!errors.isEmpty()) {
+			saveErrors(request, errors);
+			if (mode.isAuthor()) {
+				return mapping.findForward("author");
+			}
+			else {
+				return mapping.findForward("monitor");
+			}
+		}
+
+		Daco daco = dacoForm.getDaco();
+		IDacoService service = getDacoService();
+
+		// **********************************Get Daco PO*********************
+		Daco dacoPO = service.getDacoByContentId(dacoForm.getDaco().getContentId());
+		if (dacoPO == null) {
+			// new Daco, create it.
+			dacoPO = daco;
+			dacoPO.setCreated(new Timestamp(new Date().getTime()));
+			dacoPO.setUpdated(new Timestamp(new Date().getTime()));
+		}
+		else {
+			if (mode.isAuthor()) {
+				Long uid = dacoPO.getUid();
+				PropertyUtils.copyProperties(dacoPO, daco);
+				// get back UID
+				dacoPO.setUid(uid);
+			}
+			else { // if it is Teacher, then just update basic tab content
+				// (definelater)
+				dacoPO.setInstructions(daco.getInstructions());
+				dacoPO.setTitle(daco.getTitle());
+				// change define later status
+				dacoPO.setDefineLater(false);
+			}
+			dacoPO.setUpdated(new Timestamp(new Date().getTime()));
+		}
+
+		// *******************************Handle user*******************
+		// try to get form system session
+		HttpSession ss = SessionManager.getSession();
+		// get back login user DTO
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		DacoUser dacoUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()), dacoForm.getDaco()
+				.getContentId());
+		if (dacoUser == null) {
+			dacoUser = new DacoUser(user, dacoPO);
+		}
+
+		dacoPO.setCreatedBy(dacoUser);
+
+		// **********************************Handle Authoring Instruction
+		// Attachement *********************
+		// merge attachment info
+		// so far, attPOSet will be empty if content is existed. because
+		// PropertyUtils.copyProperties() is executed
+		Set attPOSet = dacoPO.getAttachments();
+		if (attPOSet == null) {
+			attPOSet = new HashSet();
+		}
+		List attachmentList = getAttachmentList(sessionMap);
+		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
+
+		// current attachemnt in authoring instruction tab.
+		Iterator iter = attachmentList.iterator();
+		while (iter.hasNext()) {
+			DacoAttachment newAtt = (DacoAttachment) iter.next();
+			attPOSet.add(newAtt);
+		}
+		attachmentList.clear();
+
+		// deleted attachment. 2 possible types: one is persist another is
+		// non-persist before.
+		iter = deleteAttachmentList.iterator();
+		while (iter.hasNext()) {
+			DacoAttachment delAtt = (DacoAttachment) iter.next();
+			iter.remove();
+			// it is an existed att, then delete it from current attachmentPO
+			if (delAtt.getUid() != null) {
+				Iterator attIter = attPOSet.iterator();
+				while (attIter.hasNext()) {
+					DacoAttachment att = (DacoAttachment) attIter.next();
+					if (delAtt.getUid().equals(att.getUid())) {
+						attIter.remove();
+						break;
+					}
+				}
+				service.deleteDacoAttachment(delAtt.getUid());
+			}// end remove from persist value
+		}
+
+		// copy back
+		dacoPO.setAttachments(attPOSet);
+		// ************************* Handle daco questions *******************
+		// Handle daco questions
+		Set questionList = new LinkedHashSet();
+		SortedSet topics = getQuestionList(sessionMap);
+		iter = topics.iterator();
+		while (iter.hasNext()) {
+			DacoQuestion question = (DacoQuestion) iter.next();
+			if (question != null) {
+				// This flushs user UID info to message if this user is a new
+				// user.
+				question.setCreateBy(dacoUser);
+				questionList.add(question);
+			}
+		}
+		dacoPO.setDacoQuestions(questionList);
+		// delete instructino file from database.
+		List delDacoQuestionList = getDeletedDacoQuestionList(sessionMap);
+		iter = delDacoQuestionList.iterator();
+		while (iter.hasNext()) {
+			DacoQuestion question = (DacoQuestion) iter.next();
+			iter.remove();
+			if (question.getUid() != null) {
+				service.deleteDacoQuestion(question.getUid());
+			}
+		}
+
+		service.saveOrUpdateDaco(dacoPO);
+
+		// initialize attachmentList again
+		attachmentList = getAttachmentList(sessionMap);
+		attachmentList.addAll(daco.getAttachments());
+		dacoForm.setDaco(dacoPO);
+
+		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+		if (mode.isAuthor()) {
+			return mapping.findForward("author");
+		}
+		else {
+			return mapping.findForward("monitor");
+		}
+	}
+
+	/**
+	 * Common method to upload online or offline instruction files request.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param type
+	 * @param request
+	 * @return
+	 * @throws UploadDacoFileException
+	 */
+	protected ActionForward uploadFile(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request)
+			throws UploadDacoFileException {
+
+		DacoForm dacoForm = (DacoForm) form;
+		// get back sessionMAP
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(dacoForm.getSessionMapID());
+
+		FormFile file;
+		if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
+			file = dacoForm.getOfflineFile();
+		}
+		else {
+			file = dacoForm.getOnlineFile();
+		}
+
+		if (file == null || StringUtils.isBlank(file.getFileName())) {
+			return mapping.findForward(DacoConstants.SUCCESS);
+		}
+
+		// validate file size
+		ActionMessages errors = new ActionMessages();
+		FileValidatorUtil.validateFileSize(file, true, errors);
+		if (!errors.isEmpty()) {
+			this.saveErrors(request, errors);
+			return mapping.findForward(DacoConstants.SUCCESS);
+		}
+
+		IDacoService service = getDacoService();
+		// upload to repository
+		DacoAttachment att = service.uploadInstructionFile(file, type);
+		// handle session value
+		List attachmentList = getAttachmentList(sessionMap);
+		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
+		// first check exist attachment and delete old one (if exist) to
+		// deletedAttachmentList
+		Iterator iter = attachmentList.iterator();
+		DacoAttachment existAtt;
+		while (iter.hasNext()) {
+			existAtt = (DacoAttachment) iter.next();
+			if (StringUtils.equals(existAtt.getFileName(), att.getFileName())
+					&& StringUtils.equals(existAtt.getFileType(), att.getFileType())) {
+				// if there is same name attachment, delete old one
+				deleteAttachmentList.add(existAtt);
+				iter.remove();
+				break;
+			}
+		}
+		// add to attachmentList
+		attachmentList.add(att);
+
+		return mapping.findForward(DacoConstants.SUCCESS);
+
+	}
+
+	protected ActionMessages validateDacoForm(DacoForm dacoForm, ActionMapping mapping, HttpServletRequest request) {
+		ActionMessages errors = new ActionMessages();
+		if (dacoForm.getDaco().getMinRecords() > 0 && dacoForm.getDaco().getMaxRecords() > 0
+				&& dacoForm.getDaco().getMinRecords() > dacoForm.getDaco().getMaxRecords()) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_RECORDLIMIT_MIN_TOOHIGH_MAX));
+		}
+
+		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
+		if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
+			return errors;
+		}
+
+		// Some other validation outside basic Tab.
+
+		return errors;
+	}
+
+	/**
+	 * Vaidate daco question regards to their type (textfield/textarea/number/date/file/image/radio/dropdown/checkbox/longlat)
+	 * 
+	 * @param questionForm
+	 * @return
+	 */
+	protected ActionErrors validateDacoQuestionForm(DacoQuestionForm questionForm, List<String> answerOptionList) {
+		ActionErrors errors = new ActionErrors();
+		if (StringUtils.isBlank(questionForm.getDescription())) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_DESC_BLANK));
+		}
+
+		String constraint = questionForm.getMax();
+		Float max = null;
+		if (!StringUtils.isBlank(constraint)) {
+			if (questionForm.getQuestionType() == DacoConstants.QUESTION_TYPE_TEXTFIELD
+					|| questionForm.getQuestionType() == DacoConstants.QUESTION_TYPE_TEXTAREA
+					|| questionForm.getQuestionType() == DacoConstants.QUESTION_TYPE_CHECKBOX) {
+				try {
+					max = (float) Integer.parseInt(constraint);
+					if (max < 0) {
+						errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_MAX_NEGATIVE));
+					}
+					else if (questionForm.getQuestionType() == DacoConstants.QUESTION_TYPE_CHECKBOX
+							&& max > answerOptionList.size()) {
+						errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+								DacoConstants.ERROR_MSG_MAX_TOOHIGH_ANSWEROPTION));
+					}
+				}
+				catch (NumberFormatException e) {
+					errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_MAX_NUMBER_INT));
+				}
+			}
+			else if (questionForm.getQuestionType() == DacoConstants.QUESTION_TYPE_NUMBER) {
+				try {
+					max = Float.parseFloat(constraint);
+
+				}
+				catch (NumberFormatException e) {
+					errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_MAX_NUMBER_FLOAT));
+				}
+			}
+		}
+
+		constraint = questionForm.getMin();
+		if (!StringUtils.isBlank(constraint)) {
+			Float min = null;
+			if (questionForm.getQuestionType() == DacoConstants.QUESTION_TYPE_TEXTFIELD
+					|| questionForm.getQuestionType() == DacoConstants.QUESTION_TYPE_TEXTAREA
+					|| questionForm.getQuestionType() == DacoConstants.QUESTION_TYPE_CHECKBOX) {
+				try {
+					min = (float) Integer.parseInt(constraint);
+					if (min < 0) {
+						errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_MIN_NEGATIVE));
+					}
+					else if (questionForm.getQuestionType() == DacoConstants.QUESTION_TYPE_CHECKBOX
+							&& min > answerOptionList.size()) {
+						errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+								DacoConstants.ERROR_MSG_MIN_TOOHIGH_ANSWEROPTION));
+					}
+				}
+				catch (NumberFormatException e) {
+					errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_MIN_NUMBER_INT));
+				}
+			}
+			if (questionForm.getQuestionType() == DacoConstants.QUESTION_TYPE_NUMBER) {
+				try {
+					min = Float.parseFloat(constraint);
+
+				}
+				catch (NumberFormatException e) {
+					errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_MIN_NUMBER_FLOAT));
+				}
+			}
+			if (min != null && max != null && min > max) {
+				errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_MIN_TOOHIGH_MAX));
+			}
+		}
+
+		if (answerOptionList != null) {
+			if (answerOptionList.size() < DacoConstants.ANSWER_OPTION_MINIMUM_COUNT) {
+				errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_ANSWEROPTION_NOTENOUGH,
+						DacoConstants.ANSWER_OPTION_MINIMUM_COUNT));
+			}
+			for (int firstOptionNumber = 0; firstOptionNumber < answerOptionList.size(); firstOptionNumber++) {
+				String firstOption = answerOptionList.get(firstOptionNumber);
+				for (int secondOptionNumber = firstOptionNumber + 1; secondOptionNumber < answerOptionList.size(); secondOptionNumber++) {
+					String secondOption = answerOptionList.get(secondOptionNumber);
+					if (firstOption.trim().equals(secondOption.trim())) {
+						errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_ANSWEROPTION_REPEAT,
+								firstOptionNumber + 1, secondOptionNumber + 1));
+					}
+				}
+			}
+		}
+
+		return errors;
+	}
+
+	protected void ensureMinimumAnswerOptions(List<String> answerOptionList) {
+		if (answerOptionList != null) {
+			while (answerOptionList.size() < DacoConstants.ANSWER_OPTION_MINIMUM_COUNT) {
+				answerOptionList.add("");
+			}
+		}
+	}
+
+	public final double round(double number, int positions) {
+		double shift = Math.pow(10, positions);
+		shift = Math.round(number * shift) / shift;
+		return shift;
+	}
+}

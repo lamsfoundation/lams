@@ -1,0 +1,45 @@
+<%@ include file="/common/taglibs.jsp"%>
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+
+<!-- Javascript functions -->
+
+<script type="text/javascript">
+	function turnOnReflect(){
+			document.getElementById("reflectOn").checked = !isEmpty(document.getElementById("reflectInstructions").value);
+	}
+</script>
+
+<!-- Advance Tab Content -->
+
+<p class="small-space-top"><fmt:message key="label.authoring.advanced.record" /></p>
+<p>
+<label for="minRecords">
+<fmt:message key="label.authoring.advanced.record.min" /></label> <html:select property="daco.minRecords"
+	styleClass="noBorder">
+	<html:option value="0">
+		<fmt:message key="label.authoring.advanced.record.nolimit" />
+	</html:option>
+	<c:forEach begin="1" end="50" var="index">
+		<html:option value="${index}">${index}</html:option>
+	</c:forEach>
+</html:select> <label for="maxRecords" style="space-left"> <fmt:message key="label.authoring.advanced.record.max" /> </label> <html:select
+	property="daco.maxRecords" styleClass="noBorder">
+	<html:option value="0">
+		<fmt:message key="label.authoring.advanced.record.nolimit" />
+	</html:option>
+	<c:forEach begin="1" end="50" var="index">
+		<html:option value="${index}">${index}</html:option>
+	</c:forEach>
+</html:select>
+
+</p>
+
+<p class="small-space-top"><html:checkbox property="daco.lockWhenFinished" styleClass="noBorder"
+	styleId="lockWhenFinished">
+</html:checkbox> <label for="lockWhenFinished"> <fmt:message key="label.authoring.advanced.lock.on.finished" /> </label></p>
+
+<p><html:checkbox property="daco.reflectOnActivity" styleClass="noBorder" styleId="reflectOn">
+</html:checkbox> <label for="reflectOn"> <fmt:message key="label.authoring.advanced.reflectOnActivity" /> </label></p>
+
+<p><html:textarea property="daco.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3"
+	onkeyup="javascript:turnOnReflect()" /></p>

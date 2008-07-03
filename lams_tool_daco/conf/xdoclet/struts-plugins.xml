@@ -1,0 +1,5 @@
+<!-- Put custom struts plugin here -->
+
+<plug-in className="org.apache.struts.tiles.TilesPlugin">
+	<set-property property="definitions-config" value="/WEB-INF/tiles-defs.xml"/>
+</plug-in>

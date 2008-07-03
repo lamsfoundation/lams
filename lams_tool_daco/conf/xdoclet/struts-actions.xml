@@ -1,0 +1,177 @@
+<!-- ========== Action Mapping Definitions ============================== -->
+<!-- ========== BEGIN: Authroing Definitions ============================== -->
+<action path="/authoring/start" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm"
+	scope="request" parameter="start" validate="false">
+	<forward name="success" path="/pages/authoring/start.jsp" />
+</action>
+<action path="/definelater" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm" scope="request"
+	parameter="definelater" validate="false">
+	<forward name="forbidden" path="/pages/authoring/definelaterforbid.jsp" />
+	<forward name="success" path="/pages/authoring/start.jsp" />
+</action>
+<action path="/authoring/init" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm" scope="request"
+	parameter="initPage" validate="false">
+	<forward name="success" path="/pages/authoring/authoring.jsp" />
+	<forward name="definelater" path="/pages/authoring/definelater.jsp" />
+</action>
+
+<action path="/authoring/update" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm"
+	scope="request" parameter="updateContent" validate="false">
+	<forward name="author" path="/pages/authoring/authoring.jsp" />
+	<forward name="monitor" path="/pages/authoring/definelater.jsp" />
+</action>
+<!-- ==========  Instrcutions File: online/offline ========== -->
+<action path="/authoring/uploadOnlineFile" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm"
+	scope="request" validate="false" parameter="uploadOnlineFile">
+	<forward name="success" path="/pages/authoring/authoring.jsp" />
+</action>
+<action path="/authoring/uploadOfflineFile" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm"
+	scope="request" validate="false" parameter="uploadOfflineFile">
+	<forward name="success" path="/pages/authoring/authoring.jsp" />
+</action>
+<action path="/authoring/deleteOnlineFile" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm"
+	scope="request" validate="false" parameter="deleteOnlineFile">
+	<forward name="success" path="/pages/authoring/parts/instructionfilelist.jsp" />
+</action>
+<action path="/authoring/deleteOfflineFile" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm"
+	scope="request" validate="false" parameter="deleteOfflineFile">
+	<forward name="success" path="/pages/authoring/parts/instructionfilelist.jsp" />
+</action>
+<!-- ==========  Daco Question  ========== -->
+<action path="/authoring/newQuestionInit" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
+	name="dacoQuestionForm" scope="request" validate="false" parameter="newQuestionInit">
+	<forward name="textfield" path="/pages/authoring/parts/addtextfield.jsp" />
+	<forward name="textarea" path="/pages/authoring/parts/addtextarea.jsp" />
+	<forward name="number" path="/pages/authoring/parts/addnumber.jsp" />
+	<forward name="date" path="/pages/authoring/parts/adddate.jsp" />
+	<forward name="file" path="/pages/authoring/parts/addfile.jsp" />
+	<forward name="image" path="/pages/authoring/parts/addimage.jsp" />
+	<forward name="radio" path="/pages/authoring/parts/addradio.jsp" />
+	<forward name="dropdown" path="/pages/authoring/parts/adddropdown.jsp" />
+	<forward name="checkbox" path="/pages/authoring/parts/addcheckbox.jsp" />
+	<forward name="longlat" path="/pages/authoring/parts/addlonglat.jsp" />
+</action>
+
+<action path="/authoring/editQuestionInit" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
+	name="dacoQuestionForm" scope="request" parameter="editQuestionInit" validate="false">
+	<forward name="textfield" path="/pages/authoring/parts/addtextfield.jsp" />
+	<forward name="textarea" path="/pages/authoring/parts/addtextarea.jsp" />
+	<forward name="number" path="/pages/authoring/parts/addnumber.jsp" />
+	<forward name="date" path="/pages/authoring/parts/adddate.jsp" />
+	<forward name="file" path="/pages/authoring/parts/addfile.jsp" />
+	<forward name="image" path="/pages/authoring/parts/addimage.jsp" />
+	<forward name="radio" path="/pages/authoring/parts/addradio.jsp" />
+	<forward name="dropdown" path="/pages/authoring/parts/adddropdown.jsp" />
+	<forward name="checkbox" path="/pages/authoring/parts/addcheckbox.jsp" />
+	<forward name="longlat" path="/pages/authoring/parts/addlonglat.jsp" />
+</action>
+
+<action path="/authoring/saveOrUpdateQuestion" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
+	parameter="saveOrUpdateQuestion" name="dacoQuestionForm" scope="request" validate="false">
+	<forward name="textfield" path="/pages/authoring/parts/addtextfield.jsp" />
+	<forward name="textarea" path="/pages/authoring/parts/addtextarea.jsp" />
+	<forward name="number" path="/pages/authoring/parts/addnumber.jsp" />
+	<forward name="date" path="/pages/authoring/parts/adddate.jsp" />
+	<forward name="file" path="/pages/authoring/parts/addfile.jsp" />
+	<forward name="image" path="/pages/authoring/parts/addimage.jsp" />
+	<forward name="radio" path="/pages/authoring/parts/addradio.jsp" />
+	<forward name="dropdown" path="/pages/authoring/parts/adddropdown.jsp" />
+	<forward name="checkbox" path="/pages/authoring/parts/addcheckbox.jsp" />
+	<forward name="longlat" path="/pages/authoring/parts/addlonglat.jsp" />
+	<forward name="success" path="/pages/authoring/parts/questionlist.jsp" />
+</action>
+<action path="/authoring/removeQuestion" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
+	parameter="removeQuestion">
+	<forward name="success" path="/pages/authoring/parts/questionlist.jsp" />
+</action>
+
+<!-- ==========  Answer options  ========== -->
+<action path="/authoring/newAnswerOption" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
+	parameter="newAnswerOption">
+	<forward name="success" path="/pages/authoring/parts/answeroptions.jsp" />
+</action>
+<action path="/authoring/removeAnswerOption" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
+	parameter="removeAnswerOption">
+	<forward name="success" path="/pages/authoring/parts/answeroptions.jsp" />
+</action>
+<action path="/authoring/removeQuestionAttachment" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
+	parameter="removeQuestionAttachment">
+	<forward name="success" path="/pages/authoring/parts/questionattachment.jsp" />
+</action>
+
+<!-- ==========  Display Question  ========== -->
+<action path="/reviewQuestion" type="org.lamsfoundation.lams.tool.daco.web.action.ViewQuestionAction"
+	parameter="reviewQuestion">
+	<forward name="success" path="/pages/questionreview/mainframe.jsp" />
+</action>
+<action path="/nextInstruction" type="org.lamsfoundation.lams.tool.daco.web.action.ViewQuestionAction"
+	parameter="nextInstruction">
+	<forward name="success" path="/pages/questionreview/instructionsnav.jsp" />
+</action>
+
+<!-- ========== BEGIN: Learning Definitions ============================== -->
+<action path="/learning/start" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" parameter="start"
+	name="recordForm" scope="request" validate="false">
+	<forward name="success" path="/pages/learning/start.jsp" />
+	<forward name="defineLater" path="/pages/learning/definelater.jsp" />
+	<forward name="runOffline" path="/pages/learning/runoffline.jsp" />
+</action>
+<action path="/learning/finish" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction"
+	input="/pages/learning/learning.jsp" parameter="finish">
+	<forward name="success" path="/pages/learning/finish.jsp" />
+</action>
+<action path="/learning/saveOrUpdateRecord" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction"
+	parameter="saveOrUpdateRecord" input="/pages/learning/addRecord.jsp" name="recordForm" scope="request" validate="false">
+	<forward name="success" path="/pages/learning/learning.jsp" />
+</action>
+
+<action path="/learning/editRecord" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" parameter="editRecord"
+	name="recordForm" scope="request" validate="false">
+	<forward name="success" path="/pages/learning/addRecord.jsp" />
+</action>
+
+<action path="/learning/diplayHorizontalRecordList" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" parameter="diplayHorizontalRecordList">
+	<forward name="success" path="/pages/learning/listRecordsHorizontalPart.jsp" />
+</action>
+
+<action path="/learning/removeRecord" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" parameter="removeRecord">
+	<forward name="success" path="/pages/learning/listRecords.jsp" />
+</action>
+
+<action path="/learning/changeView" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" parameter="changeView">
+	<forward name="success" path="/pages/learning/learning.jsp" />
+</action>
+
+<!--  ========= Reflection =============== -->
+<action path="/learning/newReflection" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" name="reflectionForm"
+	validate="false" parameter="newReflection" input="/pages/learning/learning.jsp" scope="request">
+	<forward name="success" path="/pages/learning/notebook.jsp" />
+</action>
+
+<action path="/learning/submitReflection" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" name="reflectionForm"
+	validate="false" input="/pages/learning/notebook.jsp" parameter="submitReflection" scope="request">
+	<forward name="success" path="/pages/learning/finish.jsp" />
+
+</action>
+<!-- ========== BEGIN: Monitoring Definitions ============================== -->
+<action path="/monitoring/summary" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction" parameter="summary">
+	<forward name="success" path="/pages/monitoring/monitoring.jsp" />
+</action>
+<action path="/monitoring/listuser" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction" parameter="listuser">
+	<forward name="success" path="/pages/monitoring/userlist.jsp" />
+</action>
+<action path="/monitoring/hidequestion" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction"
+	parameter="hidequestion">
+	<forward name="success" path="/pages/monitoring/monitoring.jsp" />
+</action>
+<action path="/monitoring/showquestion" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction"
+	parameter="showquestion">
+	<forward name="success" path="/pages/monitoring/monitoring.jsp" />
+</action>
+
+<action path="/monitoring/viewReflection" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction"
+	parameter="viewReflection">
+	<forward name="success" path="/pages/monitoring/notebook.jsp" />
+</action>
+<!-- ========== BEGIN: Common ============================== -->
+<action path="/clearsession" type="org.lamsfoundation.lams.tool.daco.web.action.ClearSessionAction"></action>
