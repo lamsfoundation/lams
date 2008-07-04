@@ -126,11 +126,6 @@ public class LearningAction extends LamsDispatchAction {
 		// Putting in the GmapDTO for the request
 		GmapDTO gmapDTO = new GmapDTO(gmap);
 		request.setAttribute("gmapDTO", gmapDTO);
-		
-		// Putting in a gmap session attribute, along with markers for this session
-		GmapSessionDTO gmapSessionDTO= new GmapSessionDTO(gmapSession);
-		gmapSessionDTO.setMarkerDTOs(gmapService.getGmapMarkersBySessionId(toolSessionID));
-		request.setAttribute("gmapSessionDTO", gmapSessionDTO);
 
 		// Set the content in use flag.
 		if (!gmap.isContentInUse()) {
@@ -152,6 +147,16 @@ public class LearningAction extends LamsDispatchAction {
 		}
 		GmapUserDTO gmapUserDTO = new GmapUserDTO(gmapUser);
 		request.setAttribute(GmapConstants.ATTR_USER_DTO, gmapUserDTO);
+		
+		
+		// Putting in a gmap session attribute, along with markers for this session
+		GmapSessionDTO gmapSessionDTO= new GmapSessionDTO(gmapSession);
+		gmapSessionDTO.setMarkerDTOs(gmapService.getGmapMarkersBySessionId(toolSessionID));
+		if (!gmapSessionDTO.getUserDTOs().contains(gmapUserDTO))
+		{
+			gmapSessionDTO.getUserDTOs().add(gmapUserDTO);
+		}
+		request.setAttribute("gmapSessionDTO", gmapSessionDTO);
 		
 		
 		// set readOnly flag.
