@@ -225,4 +225,6 @@ public class ConfigurationKeys {
 	public static String LEARNER_SCREEN_SIZE = "LearnerScreenSize";
 	public static String ADMIN_SCREEN_SIZE = "AdminScreenSize";
 	
+	public static String GMAP_KEY = "GmapKey";
+	
 }

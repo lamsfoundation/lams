@@ -1,5 +1,5 @@
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('ServerURL','http://shaun.melcoe.mq.edu.au/lams/', 'config.server.url', 'config.header.system', 'STRING', 1);
+values ('ServerURL','http://192.168.111.40:8080/lams/', 'config.server.url', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('ServerURLContextPath','lams/', 'config.server.url.context.path', 'config.header.system', 'STRING', 1);
@@ -234,3 +234,6 @@ values ('LearnerScreenSize','800x600', 'config.learner.screen.size', 'config.hea
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('AdminScreenSize','800x600', 'config.admin.screen.size', 'config.header.look.feel', 'STRING', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('GmapKey','', 'config.gmap.gmapkey', 'config.gmap.section.title', 'STRING', 0);

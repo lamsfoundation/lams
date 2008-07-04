@@ -234,3 +234,6 @@ values ('LearnerScreenSize','800x600', 'config.learner.screen.size', 'config.hea
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('AdminScreenSize','800x600', 'config.admin.screen.size', 'config.header.look.feel', 'STRING', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('GmapKey','', 'config.gmap.gmapkey', 'config.gmap.section.title', 'STRING', 0);
