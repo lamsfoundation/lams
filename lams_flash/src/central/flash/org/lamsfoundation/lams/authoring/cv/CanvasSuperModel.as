@@ -1054,7 +1054,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		}
 	}
 	
-	public function clearBranchingActivity(ca:Object):Void {
+	public function clearBranchingActivity(ca:Object, doSaveMappings:Boolean):Void {
 		
 			haltRefresh(true);
 			
@@ -1070,7 +1070,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 				else
 					removeActivity(c[i].activityUIID);
 					
-				clearBranches(c[i].activityUIID);
+				clearBranches(c[i].activityUIID, doSaveMappings);
 			}
 			
 			CanvasBranchView(ca.activity.branchView).removeMovieClip();
@@ -1081,7 +1081,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 				
 	}
 	
-	public function clearBranches(seqUIID:Number):Void {
+	public function clearBranches(seqUIID:Number, doSaveMappings:Boolean):Void {
 		var b:Object = _cv.ddm.getBranchesForActivityUIID(seqUIID);
 		for(var j=0; j<b.myBranches.length; j++) {
 			Debugger.log("br: " + b.myBranches[j].branchUIID, Debugger.CRITICAL, "clearBranches", "CanvasSuperModel");
@@ -1089,7 +1089,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			var r = branchesDisplayed.remove(b.myBranches[j].branchUIID);
 			r.removeMovieClip();
 				
-			_cv.ddm.removeBranch(b.myBranches[j].branchUIID);
+			_cv.ddm.removeBranch(b.myBranches[j].branchUIID, doSaveMappings);
 				
 		}
 	}

@@ -373,7 +373,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @param   branchUIID 
 	 * @return  
 	 */
-	public function removeBranch(branchUIID):Object{
+	public function removeBranch(branchUIID, doSaveMappings:Boolean):Object{
 		//dispatch an event to show the design has changed
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 		
@@ -386,7 +386,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				var mappings:Object = getBranchMappingsByActivityUIIDAndType(r.sequenceActivity.activityUIID)
 				Debugger.log("removing " + mappings.length + " entries", Debugger.GEN, "removeBranch", "DesignDataModel");
 				
-				removeEntries(mappings.all);
+				if(!doSaveMappings)
+					removeEntries(mappings.all);
 			}
 			
 			Debugger.log('Removed:'+r.branchUIID,Debugger.GEN,'removeBranch','DesignDataModel');

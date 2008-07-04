@@ -206,7 +206,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasComplexView extends CommonCanva
 		for(var i=0; i<branchingToClear.length; i++) {
 			// clearing opened branching views
 			Debugger.log("clearing branching view: " + branchingToClear[i].activity.activityUIID, Debugger.CRITICAL, "close", "CanvasComplexView");
-			model.clearBranchingActivity(branchingToClear[i]);
+			model.clearBranchingActivity(branchingToClear[i], true);
 		}
 		
 		if(_tempActivity instanceof CanvasOptionalActivity)
