@@ -24,8 +24,8 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
 	map.closeInfoWindow();
 	var marker;
 	
-	if(editAble) 	{marker = new GMarker(point, {draggable: true});}
-	else 			{marker = new GMarker(point, {draggable: false})};
+	if(editAble) 	{marker = new GMarker(point, {draggable: true, zIndex:1});}
+	else 			{marker = new GMarker(point, {draggable: false, zIndex:0})};
 	
 	marker.editAble = editAble;
 	marker.createdBy = createdBy;
@@ -192,7 +192,7 @@ function refreshSideBar(groupName)
 		sideBarText += "<div style='display:none;' id='userdiv" + users[j].id + "'>";
 		for (i=0;i<markers.length; i++)
 		{
-			if (markers[i].createdById == users[j].id)
+			if (markers[i].createdById == users[j].id && markers[i].state != "remove")
 			{
 				sideBarText += "&nbsp;&nbsp;&nbsp;&nbsp;<span id='markerSpan" + markers[i].sideBarIndex + "'><nobr>";
 				sideBarText += "<a href='javascript:GEvent.trigger(markers[" + markers[i].sideBarIndex + "],\"click\");' ";
