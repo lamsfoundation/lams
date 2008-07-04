@@ -1,0 +1,32 @@
+#!/bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+db_input critical lams2/db_root_pass || true
+#db_input critical lams2/db_name || true
+#db_input critical lams2/db_user || true
+#db_input critical lams2/db_pass || true
+db_beginblock
+db_input critical lams2/server_host || true
+db_input critical lams2/server_port || true
+db_endblock
+db_input critical lams2/sysadmin_user || true
+
+db_go
+
+db_input critical lams2/sysadmin_pass || true
+db_input critical lams2/sysadmin_pass_confirm || true
+db_go
+db_get lams2/sysadmin_pass || true
+sysadmin_pass="$RET"
+db_get lams2/sysadmin_pass_confirm || true
+sysadmin_pass_confirm="$RET"
+while [ "$sysadmin_pass" != "$sysadmin_pass_confirm" ]; do
+    db_input critical lams2/sysadmin_pass_again || true
+    db_input critical lams2/sysadmin_pass_confirm || true
+    db_go
+    db_get lams2/sysadmin_pass_again || true
+    sysadmin_pass="$RET"
+    db_get lams2/sysadmin_pass_confirm || true
+    sysadmin_pass_confirm="$RET"
+done

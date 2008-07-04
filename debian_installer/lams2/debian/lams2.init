@@ -18,16 +18,17 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin:${JAVA_HOME}/bin
 JAVA=${JAVA_HOME}/bin/java
 JBOSS_HOME=/usr/share/jboss-4.0.2
 NAME=lams2
-DESC="LAMS 2 Server"
+LONGNAME="LAMS 2 Server"
+PIDFILE="/var/run/$NAME.pid"
+USER=lams
+GROUP=lams
+JBOSS_OPTS=
 
 test -x $JAVA || exit 0
 
 # Read an optional running configuration file
-if [ "x$RUN_CONF" = "x" ]; then
-    RUN_CONF="${JBOSS_HOME}/bin/run.conf"
-fi
-if [ -r "$RUN_CONF" ]; then
-    . "$RUN_CONF"
+if [ -r "$JBOSS_HOME/bin/run.conf" ]; then
+    . "$JBOSS_HOME/bin/run.conf"
 fi
 
 JAVA_OPTS="$JAVA_OPTS -Dprogram.name=$PROGNAME"
@@ -58,46 +59,55 @@ fi
 DAEMON_OPTS="$JAVA_OPTS \
       -Djava.endorsed.dirs=$JBOSS_ENDORSED_DIRS \
       -classpath $JBOSS_CLASSPATH \
-      org.jboss.Main"
+      org.jboss.Main $JBOSS_OPTS"
 
 
 #set -e
 start() {
         start-stop-daemon --start --quiet --background --make-pidfile \
-                --pidfile /var/run/$NAME.pid --chuid lams:lams \
+                --pidfile $PIDFILE --chuid $USER:$GROUP \
                 --exec $JAVA -- $DAEMON_OPTS
-
 }
 
 stop() {
-        start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid
+        start-stop-daemon --stop --quiet --pidfile $PIDFILE
 }
 
 case "$1" in
   start)
-	echo "$DESC is starting up."
+	echo "$LONGNAME is starting up."
 	start
 	;;
   stop)
-	echo -n "Stopping $DESC... "
+	echo -n "Stopping $LONGNAME... "
 	stop
-	rm -f /var/run/$NAME.pid
+	rm -f "$PIDFILE"
 	echo "stopped."
 	;;
   status)
-        if [ -e /var/run/$NAME.pid ]; then
-            if [ -r /var/run/$NAME.pid ]; then
-                pid=`cat /var/run/"$NAME".pid`
+        if [ -e $PIDFILE ]; then
+            if [ -r $PIDFILE ]; then
+                pid=`cat "$PIDFILE"`
+                pidtest=`ps -p $pid -o args | grep "$JBOSS_BOOT_CLASSPATH" | tail -1`
+                if [ "X$pidtest" = "X" ]
+                then
+                    rm -f "$PIDFILE"
+                    echo "Removed stale pid file: $PIDFILE"
+                    pid=""
+                fi
                 if [ "X$pid" = "X" ]; then
-                    echo "$DESC is not running."
+                    echo "$LONGNAME is not running."
                     exit 1
                 else
-                    echo "$DESC is running ($pid)."
+                    echo "$LONGNAME is running ($pid)."
                     exit 0
                 fi
+            else
+                echo "Cannot read $PIDFILE."
+                exit 1
             fi
         fi
-	echo "$DESC is not running."
+	echo "$LONGNAME is not running."
         ;;
   restart|force-reload)
 	#
@@ -105,7 +115,7 @@ case "$1" in
 	#	option to the "reload" entry above. If not, "force-reload" is
 	#	just the same as "restart".
 	#
-	echo -n "Restarting $DESC: "
+	echo -n "Restarting $LONGNAME: "
 	#set +e
 	stop
 	#set -e
@@ -113,8 +123,8 @@ case "$1" in
 	start	
 	;;
   *)
-	N=/etc/init.d/$NAME
-	echo "Usage: $N {start|stop|restart|force-reload|status}" >&2
+	SELF=`dirname $0`/`basename $0`
+	echo "Usage: $SELF {start|stop|restart|force-reload|status}" >&2
 	exit 1
 	;;
 esac

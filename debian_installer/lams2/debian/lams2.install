@@ -10,6 +10,8 @@ jboss/tomcat/web.xml	/usr/share/jboss-4.0.2/server/default/deploy/jbossweb-tomca
 lams.ear	/usr/share/jboss-4.0.2/server/default/deploy/
 lams.ear/lams-session.jar	/usr/share/jboss-4.0.2/server/default/lib/
 lams.ear/lams-valve.jar	/usr/share/jboss-4.0.2/server/default/lib/
-lams.sql	/usr/share/jboss-4.0.2/server/default/
+lams.sql	/usr/share/lams2/
 lams2.cnf	/etc/mysql/conf.d/
 index.html	/usr/share/jboss-4.0.2/server/default/deploy/jbossweb-tomcat55.sar/ROOT.war/
+2.1rc1to2.1.sql	/usr/share/lams2/
+lams_tool_task	/usr/share/lams2/

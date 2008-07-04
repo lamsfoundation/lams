@@ -1,0 +1,245 @@
+#!/bin/sh
+# postinst script for lams2
+#
+# see: dh_installdeb(1)
+
+set -e
+
+# summary of how this script can be called:
+#        * <postinst> `configure' <most-recently-configured-version>
+#        * <old-postinst> `abort-upgrade' <new version>
+#        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
+#          <new-version>
+#        * <postinst> `abort-remove'
+#        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'
+#          <failed-install-package> <version> `removing'
+#          <conflicting-package> <version>
+# for details, see http://www.debian.org/doc/debian-policy/ or
+# the debian-policy package
+
+
+case "$1" in
+    configure)
+        . /usr/share/debconf/confmodule
+
+        db_get lams2/db_root_pass || true
+        db_root_pass="$RET"
+
+        #db_get lams2/db_name || true
+        #db_name="$RET"
+        db_name="lams"
+
+        #db_get lams2/db_user || true
+        #db_user="$RET"
+        db_user="lams"
+
+        #db_get lams2/db_pass || true
+        #db_pass="$RET"
+        db_pass="lamsdbpasswd"
+
+        db_get lams2/server_host || true
+        server_host="$RET"
+
+        db_get lams2/server_port || true
+        server_port="$RET"
+
+        db_get lams2/sysadmin_user || true
+        sysadmin_user="$RET"
+
+        db_get lams2/sysadmin_pass_confirm || true
+        sysadmin_pass="$RET"
+
+        db_stop || true
+
+        # Customise log4j.xml for lams
+        cd /usr/share/jboss-4.0.2/server/default/conf/
+        sed -i -e "s/@application@/lams/" log4j.xml
+
+        # Configure database access in mysql-ds.xml
+        cd /usr/share/jboss-4.0.2/server/default/deploy/
+        sed -i -e "s/\(<connection-url>\).*\(<\/connection-url>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2/" mysql-ds.xml
+        sed -i -e "s/\(<user-name>\).*\(<\/user-name>\)/\1$db_user\2/" mysql-ds.xml
+        sed -i -e "s/\(<password>\).*\(<\/password>\)/\1$db_pass\2/" mysql-ds.xml
+
+        # Configure port in server.xml
+        cd /usr/share/jboss-4.0.2/server/default/deploy/jbossweb-tomcat55.sar/
+        sed -i -e "s/port=\"8080\"/port=\"$server_port\"/" server.xml
+
+        case "$2" in
+            2.1rc1*)
+                # Update 2.1rc1 database to 2.1
+                if [ "$db_root_pass" != "" ] ; then 
+                    mysql $db_name < /usr/share/lams2/2.1rc1to2.1.sql -u root -p$db_root_pass || true
+                else
+                    mysql $db_name < /usr/share/lams2/2.1rc1to2.1.sql -u root || true
+                fi
+
+                # Add Tasklist tool, new in 2.1
+                cd /usr/share/lams2/lams_tool_task/
+                sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2/" deploy.xml
+                sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
+                sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
+                ./deploy.sh > /dev/null || true
+            ;;
+
+            *)
+                # Assemble a ServerURL
+                server_url="http://$server_host:$server_port/lams/"
+
+                if [ "$db_root_pass" != "" ] ; then
+                    # Check if db exists
+                    if [ ! -d /var/lib/mysql/lams/ ] ; then
+                        mysql -e "create database $db_name default charset utf8;" \
+                            -u root -p$db_root_pass || true
+                    fi
+                    mysql -e "grant all privileges on $db_name.* to $db_user@localhost identified by '$db_pass';" \
+                        -u root -p$db_root_pass || true
+                    mysql -e "revoke process,super on *.* from $db_user@localhost;" -u root -p$db_root_pass || true
+                    mysql $db_name < /usr/share/lams2/lams.sql -u root -p$db_root_pass || true
+                    # Configure ServerURL and admin username/password
+                    mysql $db_name -e "update lams_configuration \
+                        set config_value='$server_url' where config_key='ServerURL'" \
+                        -u root -p$db_root_pass || true
+                    mysql $db_name -e "update lams_configuration \
+                        set config_value='/usr/share/jboss-4.0.2/server/default/deploy/lams.ear/' \
+                        where config_key='EARDir'" \
+                        -u root -p$db_root_pass || true
+                    mysql $db_name -e "update lams_user \
+                        set login='$sysadmin_user' \
+                        where user_id=1" \
+                        -u root -p$db_root_pass || true
+                    mysql $db_name -e "update lams_user \
+                        set password=sha1('$sysadmin_pass') \
+                        where user_id=1" \
+                        -u root -p$db_root_pass || true
+                    mysql $db_name -e "update lams_configuration \
+                        set config_value='/var/lib/lams/repository' \
+                        where config_key='ContentRepositoryPath'" \
+                        -u root -p$db_root_pass || true
+                    mysql $db_name -e "update lams_configuration \
+                        set config_value='/var/lib/lams/dump' \
+                        where config_key='DumpDir'" \
+                        -u root -p$db_root_pass || true
+                    mysql $db_name -e "update lams_configuration \
+                        set config_value='/var/lib/lams/temp' \
+                        where config_key='TempDir'" \
+                        -u root -p$db_root_pass || true
+                else
+                    if [ ! -d /var/lib/mysql/lams/ ] ; then
+                        mysql -e "create database $db_name default charset utf8;" -u root || true
+                    fi
+                    mysql -e "grant all privileges on $db_name.* to $db_user@localhost identified by '$db_pass';" \
+                        -u root || true
+                    mysql -e "revoke process,super on *.* from $db_user@localhost;" -u root || true
+                    mysql $db_name < /usr/share/lams2/lams.sql -u root || true 
+                    # Configure ServerURL and admin username/password
+                    mysql $db_name -e "update lams_configuration \
+                        set config_value='$server_url' \
+                        where config_key='ServerURL'" \
+                        -u root || true
+                    mysql $db_name -e "update lams_configuration \
+                        set config_value='/usr/share/jboss-4.0.2/server/default/deploy/lams.ear/' \
+                        where config_key='EARDir'" \
+                        -u root || true
+                    mysql $db_name -e "update lams_user \
+                        set login='$sysadmin_user' \
+                        where user_id=1" \
+                        -u root || true
+                    mysql $db_name -e "update lams_user \
+                        set password=sha1('$sysadmin_pass') \
+                        where user_id=1" \
+                        -u root || true
+                    mysql $db_name -e "update lams_configuration \
+                        set config_value='/var/lib/lams/repository' \
+                        where config_key='ContentRepositoryPath'" \
+                        -u root || true
+                    mysql $db_name -e "update lams_configuration \
+                        set config_value='/var/lib/lams/dump' \
+                        where config_key='DumpDir'" \
+                        -u root || true
+                    mysql $db_name -e "update lams_configuration \
+                        set config_value='/var/lib/lams/temp' \
+                        where config_key='TempDir'" \
+                        -u root || true
+                fi
+
+                # Copy caching jars
+                cd /usr/share/jboss-4.0.2/server/
+                cp all/lib/jgroups.jar default/lib/
+                cp all/lib/jboss-cache.jar default/lib/
+
+                # Place lams-www.war (uploaded data) in /var/lib
+                cd /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/
+                if [ ! -d /var/lib/lams/ ] ; then
+                    mkdir -p /var/lib/lams/
+                fi
+                if [ ! -d /var/lib/lams/lams-www.war ]; then
+                    mv lams-www.war /var/lib/lams/
+                fi
+                # If lams-www.war already exists, copy to /var and remove it before linking it
+                if [ -d /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/lams-www.war ] ; then
+                    cp -pr lams-www.war /var/lib/lams/
+                    rm -rf lams-www.war
+                fi
+                ln -s /var/lib/lams/lams-www.war 2>/dev/null || true
+
+                # Add user and group
+                adduser --system --group --no-create-home lams 2> /dev/null
+                chown -L -R lams:lams /usr/share/jboss-4.0.2/
+                chown -R lams:lams /var/lib/lams/
+
+                # Restart MySQL so tx-isolation=READ-COMMITTED takes effect
+                if [ -x "/etc/init.d/mysql" ]; then
+                    if [ -x "`which invoke-rc.d 2>/dev/null`" ]; then
+                        invoke-rc.d mysql restart || exit $?
+                    else
+                        /etc/init.d/mysql restart || exit $?
+                    fi
+                fi
+            ;;
+        esac
+
+        # Set learning library dictionary folder names right
+        if [ "$db_root_pass" != "" ] ; then
+            forum_scribe_id=`mysql $db_name -e'select learning_library_id from lams_learning_library where title="Forum and Scribe"' \
+                -u root -p$db_root_pass | tail -1`
+            chat_scribe_id=`mysql $db_name -e'select learning_library_id from lams_learning_library where title="Chat and Scribe"' \
+                -u root -p$db_root_pass | tail -1`
+            resources_forum_id=`mysql $db_name -e'select learning_library_id from lams_learning_library where title="Resources and Forum"' \
+                -u root -p$db_root_pass | tail -1`
+        else
+            forum_scribe_id=`mysql $db_name -e'select learning_library_id from lams_learning_library where title="Forum and Scribe"' \
+                -u root | tail -1`
+            chat_scribe_id=`mysql $db_name -e'select learning_library_id from lams_learning_library where title="Chat and Scribe"' \
+                -u root | tail -1`
+            resources_forum_id=`mysql $db_name -e'select learning_library_id from lams_learning_library where title="Resources and Forum"' \
+                -u root | tail -1`
+        fi
+        cd /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/
+        mv forumscribe llid$forum_scribe_id;
+        mv chatscribe llid$chat_scribe_id;
+        mv resourcesforum llid$resources_forum_id;
+
+        # Remove temp files
+        rm -f /usr/share/lams2/2.1rc1to2.1.sql
+        rm -f /usr/share/lams2/lams.sql
+        rm -rf /usr/share/lams2/lams_tool_task_list
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+# dh_installdeb will replace this with shell code automatically
+# generated by other debhelper scripts.
+
+#DEBHELPER#
+
+exit 0
+
+

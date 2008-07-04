@@ -18,7 +18,14 @@ case "$1" in
     install)
     ;;
 
-    upgrade|abort-upgrade)
+    upgrade)
+        # Backup selected files
+        #cd /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/lams-www.war/
+        #cp -p news.html news.html.bak
+        #cd /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/META-INF/
+        #cp -p application.xml application.xml.bak
+    ;;
+    abort-upgrade)
     ;;
 
     *)

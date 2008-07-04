@@ -19,7 +19,7 @@ set -e
 # the debian-policy package
 
 . /usr/share/debconf/confmodule
-db_get lams2/db_root_pass
+db_get lams2/db_root_pass || true
 db_root_pass="$RET"
 
 case "$1" in
