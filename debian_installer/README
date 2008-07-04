@@ -47,13 +47,14 @@ Instructions - lams2
 7.	cd lams2-2.1rc1
 8.	cp -pr /path/to/jboss-4.0.2/server/default/deploy/lams.ear/ .
 9.	cp -pr /path/to/lams_build/conf/unix/jboss/ .
-10.	copy index.html and lams2.cnf from this cvs project into the current directory
-11.	dh_make --createorig
-12.	rm -rf debian
-13.	copy the debian folder from this cvs project into the current directory
-14.	sudo dpkg-buildpackage -S -sa (add '-kxxxxxxxx' if you have a gpg key to sign
+10. mysqldump lams > lams.sql -u root -p
+11.	copy index.html and lams2.cnf from this cvs project into the current directory
+12.	dh_make --createorig
+13.	rm -rf debian
+14.	copy the debian folder from this cvs project into the current directory
+15.	sudo dpkg-buildpackage -S -sa (add '-kxxxxxxxx' if you have a gpg key to sign
 	it) - this will create a source package in the parent folder
-15.	sudo dpkg-buildpackage -b (add '-kxxxxxxxx' if you want to sign it) - this
+16.	sudo dpkg-buildpackage -b (add '-kxxxxxxxx' if you want to sign it) - this
 	will create the binary .deb in the parent folder
 	
 
