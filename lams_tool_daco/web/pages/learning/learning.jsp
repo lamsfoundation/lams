@@ -33,6 +33,8 @@
 	<script type="text/javascript">
 	 	var currentTab = ${learningCurrentTab};
 	 	var changeViewUrl = "<html:rewrite page='/learning/changeView.do' />";
+	 	var finishUrl = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
+	 	var continueReflectUrl = '<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 	 	var questionListLength	=  ${fn:length(daco.dacoQuestions)};
     </script>
     <script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoLearning.js'/>"></script>

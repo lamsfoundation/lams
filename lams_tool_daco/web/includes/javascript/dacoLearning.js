@@ -10,12 +10,12 @@
         
 	function finishSession(){
 		document.getElementById("finishButton").disabled = true;
-		document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
+		document.location.href = finishUrl;
 		return false;
 	}
 		
 	function continueReflect(){
-		document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
+		document.location.href=continueReflectUrl;
 	}
 	
 	function saveOrUpdateRecord()	{

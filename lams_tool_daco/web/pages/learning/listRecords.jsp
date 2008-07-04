@@ -44,7 +44,7 @@
 					<tr>
 					<td class="fixedCellHeight">Record number</td>
 					<td rowspan="${fn:length(daco.dacoQuestions) + 2}" style="padding: 0px; height: 100%;">
-						<iframe id="horizontalRecordListFrame" onLoad="javascript:resizeHorizontalRecordListFrame();" style="width: 100%;"
+						<iframe id="horizontalRecordListFrame" onLoad="javascript:resizeHorizontalRecordListFrame();" style="width: 100%; "
 						frameborder="0" scrolling="auto" 
 						src="<html:rewrite page='/learning/diplayHorizontalRecordList.do?sessionMapID=${sessionMapID}' />"></iframe>
 					</td>
@@ -52,7 +52,7 @@
 					</tr>
 						<c:forEach var="question" items="${daco.dacoQuestions}" varStatus="questionStatus">
 							<tr>
-								<td class="fixedCellHeight">
+								<td class="fixedCellHeight" style="width: 160px">
 									<div class="bigNumber">${questionStatus.index+1}</div>
 									${question.description}
 								</td>	

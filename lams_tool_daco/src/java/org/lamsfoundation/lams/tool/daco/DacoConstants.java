@@ -164,6 +164,7 @@ public class DacoConstants {
 	public static final String ERROR_MSG_RECORD_LATITUDE_BLANK = "error.record.longlat.latitude.blank";
 	public static final String ERROR_MSG_RECORD_LATITUDE_FLOAT = "error.record.longlat.latitude.float";
 	public static final String ERROR_MSG_RECORD_NOTENOUGH = "error.record.notenough";
+	public static final String ERROR_MSG_RECORD_TOOMUCH = "error.record.toomuch";
 
 	public static final String PAGE_EDITABLE = "isPageEditable";
 	public static final String MODE_AUTHOR_SESSION = "author_session";

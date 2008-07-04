@@ -245,7 +245,9 @@ public class LearningAction extends Action {
 		ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-		if (!validateBeforeFinish(request, sessionMapID)) {
+		ActionErrors errors = validateBeforeFinish(request, sessionMapID);
+		if (!errors.isEmpty()) {
+			this.addErrors(request, errors);
 			return mapping.getInputForward();
 		}
 
@@ -261,6 +263,7 @@ public class LearningAction extends Action {
 			request.setAttribute(DacoConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
 		}
 		catch (DacoApplicationException e) {
+
 			LearningAction.log.error("Failed get next activity url:" + e.getMessage());
 		}
 
@@ -299,8 +302,6 @@ public class LearningAction extends Action {
 
 		List<List<DacoAnswer>> records = (List<List<DacoAnswer>>) sessionMap.get(DacoConstants.ATTR_RECORD_LIST);
 		int displayedRecordNumber = recordForm.getDisplayedRecordNumber();
-		System.out.print(displayedRecordNumber);
-		System.out.print(records.size());
 		boolean isEdit = false;
 		if (displayedRecordNumber <= records.size()) {
 			record = records.get(displayedRecordNumber - 1);
@@ -375,7 +376,6 @@ public class LearningAction extends Action {
 					}
 					else {
 						for (int checkboxNumber = 0; checkboxNumber < checkboxes.length; checkboxNumber++) {
-							System.out.println("CHECKBOX " + checkboxNumber + ": " + checkboxes[checkboxNumber]);
 							answer.setAnswer(checkboxes[checkboxNumber]);
 							if (checkboxNumber < checkboxes.length - 1) {
 								service.saveOrUpdateAnswer(answer);
@@ -466,7 +466,9 @@ public class LearningAction extends Action {
 
 		// get session value
 		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
-		if (!validateBeforeFinish(request, sessionMapID)) {
+		ActionErrors errors = validateBeforeFinish(request, sessionMapID);
+		if (!errors.isEmpty()) {
+			this.addErrors(request, errors);
 			return mapping.getInputForward();
 		}
 
@@ -534,8 +536,20 @@ public class LearningAction extends Action {
 	// *************************************************************************************
 	// Private method
 	// *************************************************************************************
-	protected boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
-		return true;
+	protected ActionErrors validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
+		ActionErrors errors = new ActionErrors();
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		int recordCount = ((List) sessionMap.get(DacoConstants.ATTR_RECORD_LIST)).size();
+		Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
+		if (daco.getMinRecords() != null && recordCount < daco.getMinRecords()) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_RECORD_NOTENOUGH, daco
+					.getMinRecords()));
+		}
+		else if (daco.getMaxRecords() != null && recordCount > daco.getMaxRecords()) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_RECORD_TOOMUCH, daco
+					.getMaxRecords()));
+		}
+		return errors;
 	}
 
 	protected IDacoService getDacoService() {
