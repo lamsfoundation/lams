@@ -25,10 +25,12 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
 	map.closeInfoWindow();
 	var marker;
 	
+
 	if(editAble) 	
 	{
 		marker = new GMarker(point, {draggable: true, zIndexProcess:importanceOrder});
-		marker.importance = 1;
+		if (isSaved) 	{marker.importance = 1;}
+		else 			{marker.importance = 2;}
 	}
 	else 			
 	{
@@ -56,7 +58,7 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     	marker.openInfoWindowHtml(marker.infoWindowHtml);
     	showSelectedMarkerSideBar(marker.sideBarIndex);
     	currentOpenMarkerImportance = marker.importance;
-    	marker.importance = 2;
+    	marker.importance = 3;
     });
     
     GEvent.addListener(marker, "infowindowclose", function() {
@@ -208,7 +210,7 @@ function refreshSideBar(groupName)
 		sideBarText += "<div style='display:none;' id='userdiv" + users[j].id + "'>";
 		for (i=0;i<markers.length; i++)
 		{
-			if (markers[i].createdById == users[j].id && markers[i].state != "remove")
+			if (markers[i].createdById == users[j].id && markers[i].state != "remove" && markers[i].state != "unsaved")
 			{
 				sideBarText += "&nbsp;&nbsp;&nbsp;&nbsp;<span id='markerSpan" + markers[i].sideBarIndex + "'><nobr>";
 				sideBarText += "<a href='javascript:GEvent.trigger(markers[" + markers[i].sideBarIndex + "],\"click\");' ";
@@ -266,13 +268,16 @@ function showAddress()
 function fitMapMarkers() 
 {
    	var bounds = new GLatLngBounds();
+	
 	for (var i=0; i< markers.length; i++) 
 	{
-		if (markers[i].state != "remove")
+		if (markers[i] && markers[i].getPoint() && markers[i].state != "remove")
 		{
+			
 			bounds.extend(markers[i].getPoint());	
 		}
 	}
+	
    	var zoom = map.getBoundsZoomLevel(bounds) - 1;
    	if (zoom > 15) {zoom = 15;}
    	map.setZoom(zoom);
