@@ -1,0 +1,32 @@
+<!--
+// GPL
+-->
+<html>
+<head>
+<style>
+body,html,textarea {
+  border:0px;
+  margin:0px;
+  padding:0px;
+}
+body {
+  background-color:#FFFFFF;
+  border:1px solid #999999;
+}
+</style>
+</head>
+<body>
+<textarea onkeyup='refresh(this.value);' id='multiline' style='width:100%; height:90%;'></textarea>
+<center><a href="tinymce/index.html">HTML</a></center>
+<script>
+function refresh(value) {
+  parent.previewMultiline(value);
+}
+function update() {
+  document.getElementById("multiline").value = parent.getObj("value").value.replace(/\\n/g,"\n");
+}
+update();
+// document.getElementById("multiline").focus();
+</script>
+</body>
+</html>

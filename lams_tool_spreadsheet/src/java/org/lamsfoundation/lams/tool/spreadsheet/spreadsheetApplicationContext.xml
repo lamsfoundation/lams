@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<bean id="messageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.spreadsheet.ApplicationResources</value></property>
+			</bean>
+		</property>										
+	</bean>
+    <!-- Hibernate SessionFactory -->
+    <bean id="spreadsheetSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource"><ref bean="toolDataSource"/></property>
+		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
+
+        <!-- Must references all OR mapping files. -->
+        <property name="mappingResources">
+            <list>
+               <value>org/lamsfoundation/lams/tool/spreadsheet/model/SpreadsheetUser.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/spreadsheet/model/Spreadsheet.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/spreadsheet/model/UserEditedSpreadsheet.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/spreadsheet/model/SpreadsheetAttachment.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/spreadsheet/model/SpreadsheetSession.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- core beans -->
+    <bean id="spreadsheetDao" class="org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate.SpreadsheetDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="spreadsheetSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="userEditedSpreadsheetDao" class="org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate.UserEditedSpreadsheetDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="spreadsheetSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="spreadsheetAttachmentDao" class="org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate.SpreadsheetAttachmentDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="spreadsheetSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="spreadsheetUserDao" class="org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate.SpreadsheetUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="spreadsheetSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="spreadsheetSessionDao" class="org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate.SpreadsheetSessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="spreadsheetSessionFactory"/>
+        </property>
+    </bean>
+
+
+    <!-- Managers -->
+	<bean id="spreadsheetToolContentHandler" class="org.lamsfoundation.lams.tool.spreadsheet.util.SpreadsheetToolContentHandler">
+	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+	
+    <bean id="spreadsheetManagerTarget" class="org.lamsfoundation.lams.tool.spreadsheet.service.SpreadsheetServiceImpl">
+        <property name="spreadsheetDao">
+            <ref local="spreadsheetDao"/>
+        </property>
+        <property name="userEditedSpreadsheetDao">
+            <ref local="userEditedSpreadsheetDao"/>
+        </property>
+        <property name="spreadsheetAttachmentDao">
+            <ref local="spreadsheetAttachmentDao"/>
+        </property>
+        <property name="spreadsheetUserDao">
+            <ref local="spreadsheetUserDao"/>
+        </property>
+        <property name="spreadsheetSessionDao">
+            <ref local="spreadsheetSessionDao"/>
+        </property>
+        <property name="spreadsheetToolContentHandler">
+            <ref local="spreadsheetToolContentHandler"/>
+        </property>
+        <property name="repositoryService">
+            <ref bean="repositoryService"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
+   		<property name="auditService">
+   			<ref bean="auditService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService"><ref bean="messageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   		
+    </bean>
+
+    <bean id="spreadsheetService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref local="spreadsheetManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="get*">PROPAGATION_REQUIRED, -java.lang.Exception</prop>                    
+                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+			    <prop key="importToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                
+                <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
+				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
+

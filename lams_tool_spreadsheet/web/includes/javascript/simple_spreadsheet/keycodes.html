@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Key Events</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<style type="text/css">
+td,th{border:2px solid #aaa;}
+</style>
+<script type="text/javascript">
+var t_cel,tc_ln;
+
+if(document.addEventListener){ //code for Moz
+document.addEventListener("keydown",keyCapt,false);
+document.addEventListener("keyup",keyCapt,false);
+document.addEventListener("keypress",keyCapt,false);
+}else{
+document.attachEvent("onkeydown",keyCapt); //code for IE
+document.attachEvent("onkeyup",keyCapt);
+document.attachEvent("onkeypress",keyCapt);
+}
+function keyCapt(e){
+
+if(typeof window.event!="undefined"){
+e=window.event;//code for IE
+}
+var shift = e.shiftKey;
+var alt = e.altKey;
+var ctrl = e.ctrlKey;
+
+// e.cancelBubble=true;
+
+// if (e.preventDefault) e.preventDefault(); // Firefox, Opera
+
+// if (e.stopPropagation) e.stopPropagation(); // Firefox
+
+if(e.type=="keydown"){
+t_cel[0].innerHTML=e.keyCode+" Shift: "+shift+ " Alt: "+alt+" Ctrl: "+ctrl;
+t_cel[3].innerHTML=e.charCode;
+t_cel[6].innerHTML=e.which;
+}else if(e.type=="keyup"){
+t_cel[1].innerHTML=e.keyCode;
+t_cel[4].innerHTML=e.charCode;
+t_cel[7].innerHTML=e.which;
+}else if(e.type=="keypress"){
+t_cel[2].innerHTML=e.keyCode;
+t_cel[5].innerHTML=e.charCode;
+t_cel[8].innerHTML=e.which;
+}
+if (e.keyCode==69 && alt) {
+//  alert("hallo alt+e");
+//  document.location.reload();
+}
+}
+window.onload=function(){
+t_cel=document.getElementById("tblOne").getElementsByTagName("td");
+tc_ln=t_cel.length;
+}
+</script>
+</head>
+<body>
+<table id="tblOne">
+<tr>
+<th style="border:none;"></th><th>onkeydown</th><th>onkeyup</th><th>onkeypress</th>
+</tr>
+<tr>
+<th>keycode</th><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+</tr>
+<tr>
+<th>charCode</th><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+</tr>
+<tr>
+<th>which</th><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+</tr>
+</table>
+<script>
+function clear() {
+  for (i=0;i<tc_ln;i++) {
+  	t_cel[i].innerHTML='&nbsp;';
+  }
+}
+</script>
+<input type="button" onclick="clear();" value="CLEAR" />
+</body>
+</html>

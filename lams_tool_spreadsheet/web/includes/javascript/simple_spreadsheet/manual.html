@@ -1,0 +1,315 @@
+<!--
+// GPL
+-->
+<html>
+<head><title>Simple Spreadsheet Function Reference</title>
+<!-- 
+	This website is brought to you by Simple Groupware
+	Simple Groupware is an open source Groupware and Web Application Framework created by Thomas Bley and licensed under GNU GPL v2.
+	Simple Groupware is copyright 2002-2008 by Thomas Bley.	Extensions and translations are copyright of their respective owners.
+	More information and documentation at http://www.simple-groupware.de/
+--></head>
+<body>
+<h2>Simple Spreadsheet Function Reference</h2>
+<pre>
+
+<a target="_blank" href="http://www.simple-groupware.de/cms/index.php?n=Spreadsheet.Manual">Simple Spreadsheet Online Manual</a>
+
+<!-- TODO2 move view modes to online manual -->
+<b>View modes</b>
+
+Values: shows all calculated values on the screen (default)
+  Auto-Calculate: All values are automatically calculated
+  Manual: Disables automatic recalculation (gives better performance)
+  Refresh: Recalculates all values if Auto-Refresh is disabled
+
+Formulas: shows all formulas on the screen
+Styles: shows all styles on the screen
+
+<b>Cell References</b>
+
+= A1      // gives A1
+= A2:A4   // gives array of A2,A3,A4
+= [A2,A4] // gives array of A2,A4
+= a1      // does not give A1
+
+<b>Aggregate Functions</b>
+
+= sum(A2:A4) // gives A2+A3+A4
+= sum(A2:B3) // gives A2+A3+B2+B3
+= avg(2,3,4) // gives (2+3+4)/3 = 3
+= min(2,3,4) // gives 2
+= max(2,3,4) // gives 4
+= count(A2:A4) // gives 3
+
+<b>Math Functions</b>
+
+Math.abs(a)     // the absolute value of a
+Math.acos(a)    // arc cosine of a
+Math.asin(a)    // arc sine of a
+Math.atan(a)    // arc tangent of a
+Math.atan2(a,b) // arc tangent of a/b
+Math.ceil(a)    // integer closest to a and not less than a
+Math.cos(a)     // cosine of a
+Math.exp(a)     // exponent of a
+Math.floor(a)   // integer closest to and not greater than a
+Math.log(a)     // log of a base e
+Math.max(a,b)   // the maximum of a and b
+Math.min(a,b)   // the minimum of a and b
+Math.pow(a,b)   // a to the power b
+Math.random()   // pseudorandom number in the range 0 to 1
+Math.round(a)   // integer closest to a 
+Math.sin(a)     // sine of a
+Math.sqrt(a)    // square root of a
+Math.tan(a)     // tangent of a
+
+<b>Numbers</b>
+
+conventional decimal numbers:        5, 137, 1.3
+decimal numbers in exponential form: 6.67e-11, -1.127e20
+
+octal numbers, for example:          01234, -077, 0312
+(Positive octal numbers must begin with 0 (zero) and negative octal numbers must begin with -0.)
+
+hexadecimal numbers, for example:    0xFF -0xCCFF 0xabcdef
+(Positive hexadecimals must begin with 0x and negative hexadecimals must begin with -0x.)
+	  
+
+<b>Constants</b>
+
+Math.PI      // pi = 3.14159265...
+Math.E       // e = 2.71828182...
+Math.LOG2E   // log of e base 2
+Math.LOG10E  // log of e base 10
+Math.LN2     // log of 2 base e
+Math.LN10    // log of 10 base e
+Math.SQRT2   // square root of 2
+Math.SQRT1_2 // square root of 1/2
+
+<b>Base conversion</b>
+
+= (32767).toString(16)  // this gives "7fff"
+= (255).toString(8)     // this gives "377"
+= (1295).toString(36)   // this gives "zz"
+= (127).toString(2)     // this gives "1111111"
+
+<b>Arithmetic operations</b>
+
+Unary operations have one argument (in the following examples, the argument is a):
+
+-a   // change the sign of a
+~a   // bitwise NOT a
+++a  // add 1 to a (before using a)
+a++  // add 1 to a (after using a)
+--a  // subtract 1 from a (before using a)
+a--  // subtract 1 from a (after using a)
+
+Binary operations operations have two arguments (in the following examples, the arguments are a and b):
+
+a * b    // multiply a by b
+a / b    // divide a by b
+a % b    // find the remainder of division of a by b
+a + b    // add a and b
+a - b    // subtract b from a
+a &amp; b    // bitwise a AND b
+a | b    // bitwise a OR b
+a ^ b    // bitwise a XOR b
+
+Shifts are the following operations:
+
+a &lt;&lt; b   // shift a by b bits to the left
+         // (padding with zeros)
+a &gt;&gt; b   // shift a by b bits to the right
+         // (copying the sign bit)
+a &gt;&gt;&gt; b  // shift a by b bits to the right 
+         // (padding with zeros)
+
+		 
+<b>Random Numbers</b>
+
+= Math.random()  // gives random, 0 to 1 
+
+If you need random floating-point numbers in the range from A to B, use this code:
+
+= A + (B-A)*Math.random()  // gives random, from A to B 
+
+<b>Rounding</b>
+
+Math.round(10*X)/10;     // round to tenths
+Math.round(100*X)/100;   // round to hundredths
+Math.round(1000*X)/1000; // round to thousandths
+
+<b>Substrings</b>
+
+string.substring(start,end)
+
+Here
+string 	is the string from which you want to extract a substring.
+start 	is the number specifying the position of the character at which the substring begins. (The character at start itself will be included in the substring.)
+end 	is the number specifying the position of the character at which the substring ends. (The character at end will not be included in the substring.)
+
+Note that the first character in the string corresponds to position 0, and the last character to position string.length-1.
+
+Examples:
+
+'Hello'.substring(0,2)  // 'He'
+'Hello'.substring(0,4)  // 'Hell'
+
+<b>String operations</b>
+
+string.toUpperCase();          // Converts the string to upper case.
+string.toLowerCase();          // Converts the string to lower case.
+string.indexOf("B");           // Returns the index of the given character in a string.
+string.lastIndexOf("B");       // Returns the last index of a given character in a string.
+string.split(",");             // Splits a string into an array of substrings.
+string.charAt(1);              // Returns the character at a given index.
+string.charCodeAt(1);          // Converts the char at the given index to an ASCII value.
+String.fromCharCode(65,66,67); // Return a string from a number of Unicode character values.
+
+string.replace(new RegExp("A","gi"),"B");
+// Can be used to replace a string given as a regular expression with another string.
+
+string.match("A");
+// Can be used to match a regular expression against a string. It returns an array of the matches.
+
+string.search(/^[a-z]*@[a-z]*$/i);
+// Can be used to with a regular expression to search for a special format.
+
+<b>String Quoting</b>
+
+= 'I\'m not a JavaScript hacker.'
+
+<b>Conditions</b>
+
+= D2==10?"yes it is 10!":"other case"
+		 
+
+<b>Graph functions</b>
+
+=graph(<i>graph type</i>,<i>graph title</i>,<i>values y-axis</i>,<i>labels x-axis</i>,<i>caption x-axis</i>,<i>caption y-axis</i>,<i>width</i>,<i>height</i>)
+
+The <i>graph</i> function creates an image with one graph inside.
+
+Graph types: bar, pie, line, linesteps, scatter
+Optional: caption x-axis, caption y-axis, width, height
+
+Example: =graph('bar',E11,F12:F15,E12:E15,'quarter','value')
+  
+  
+=graph2(<i>graph type</i>,<i>graph title</i>,<i>values y-axis graph 1</i>,<i>values y-axis graph 2</i>,<i>labels x-axis</i>,<i>caption x-axis</i>,<i>caption y-axis</i>,<i>width</i>,<i>height</i>)
+
+The <i>graph2</i> function creates an image with two graphs inside.
+
+Graph2 types: bar, baraccumulate, line, linesteps
+Optional: caption x-axis, caption y-axis, width, height
+
+Example: =graph2('bar','Bar graph (2 bars)',F12:F15,G12:G15,E12:E15)
+
+<b>Multiline editing</b>
+
+Use "\n" in the formula to force a line-break and open the multiline editor
+
+<b>HTML editing</b>
+
+Use "html:" at the beginning of the formula to force the interpretation as HTML code.
+Using "html:" as prefix automatically opens the HTML editor.
+
+<b>Styles: Font decoration / font effects</b>  (use the style field next to the formula)
+
+<b>bold</b>:          font-weight:bold;
+<i>italic</i>:        font-style:italic;
+<u>underlined</u>:    text-decoration:underline;
+<strike>strikethrough</strike>: text-decoration:line-through;
+<b><i>bold italic</i></b>:   font-weight:bold;
+
+<font style="font-size:120%;">font-size "120%"</font>:   font-size:120%;
+<font style="font-size:18px;">font-size "18px"</font>: font-size:18px;
+
+<font style="font-family:Helvetica;">font-family "Helvetica"</font>:      font-family:Helvetica;
+<font style="font-family:Verdana;">font-family "Verdana"</font>:    font-family:Verdana;
+<font style="font-family:sans-serif;">font-family "sans-serif"</font>:  font-family:sans-serif;
+<font style="font-family:Courier;">font-family "Courier"</font>: font-family:Courier;
+
+<font style="color:red;">font color red</font>:   color:red;
+<font style="color:blue;">font color blue</font>:  color:blue;
+<font style="color:green;">font color green</font>: color:green;
+
+<font style="background-color:yellow;">background color yellow</font>:      background-color:yellow;
+<font style="background-color:red;">background color red</font>:         background-color:red;
+<font style="background-color:lightgreen;">background color light-green;</font> background-color:lightgreen;
+
+<b>Styles: Text alignment</b>
+
+Text align left:  text-align:left;
+Text centered:    text-align:center;
+Text align right: text-align:right;
+Text justified:   text-align:justify;
+
+Override automatic line-break: white-space:nowrap;
+
+Cell width "250px": width:250px;
+Cell height "100px": height:250px;
+
+<b>Styles: Data formats</b>
+
+Currency Euro   (10 =&gt; 10 €): format:euro;
+Currency Dollar (10 =&gt; $10):  format:dollar;
+Percent value   (10 =&gt; 10%):  format:percent;
+
+Time format (14:11:12 =&gt; 2:11:12 pm): format:time;
+Date format (1.2.2004 =&gt; 2/1/2004): format:date;
+
+Full date format (02/26/2006 =&gt; Sunday, February 26 2006): format:datefull;
+Datetime format (03/27/2007 9:11:12 =&gt; 3/27/2007 9:11:12 am): format:datetime;
+Full datetime format (03/27/2007 9:11:12 =&gt; Tuesday, March 27 2007, 9:11:12 am): format:datefulltime;
+
+<b>Styles: Cell protection</b>
+
+Lock the value of a cell: readonly:true;
+
+<b>Keyboard access keys [Alt+x or Alt+Shift+x]</b>
+
+* g = switch to goto field
+* x = cut cell
+* c = copy cell
+* v = paste cell
+* e = empty cell
+* p = print
+
+* n = create a new spreadsheet
+* l = load a spreadsheet
+* s = save spreadsheet (if run inside Simple Groupware)
+* q = close Simple Spreadsheet (if run inside Simple Groupware)
+* m = change auto-refresh
+* r = refresh (if auto-refresh is off)
+* h = function reference
+
+* 1 = values view
+* 2 = formulas view
+* 3 = styles view
+
+<b>Keyboard shortcuts</b>
+
+* enter / start typing = edit cell
+* ctrl+x or shift+del = cut cell
+* ctrl+c or ctrl+ins = copy cell
+* ctrl+v or shift+ins = paste cell
+* del = empty cell
+* cursor up = go up
+* cursor down = go down
+* cursor left = go left
+* cursor right = go right
+* home = go to first cell in row or page left/up if already in first cell
+* end = go to last cell in row or page right if already in last cell
+* page up = go 10 rows down
+* page down = go 10 rows up
+
+// TODO2 dates / date functions
+// http://www.merlyn.demon.co.uk/js-dates.htm
+// http://www.tizag.com/javascriptT/javascriptdate.php
+
+Sources:
+- JavaScripter.net. Copyright © 1999-2000, Alexei Kourbatov
+</pre>
+</body>
+</html>

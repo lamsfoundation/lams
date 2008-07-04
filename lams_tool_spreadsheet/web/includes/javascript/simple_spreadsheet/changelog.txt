@@ -1,0 +1,137 @@
+Version 0.9 (July 2, 2007) (tb)
+------------------------------------------
+
+	* changed the chart library to Artichow
+
+	* fixed problems with Safari 3.0
+	
+
+Version 0.8 (June 7, 2007) (tb)
+------------------------------------------
+
+	* added French translation from Ben
+	
+	* added the option to load a different stylesheet
+	
+	* added width and height parameters to graph functions
+	
+	* added copying a cell into several cells
+	
+	* changed save() function to split format conversion and layout
+	
+	* fixed setting dimensions in the GUI
+	
+	* fixed exporting empty rows to CSV
+	
+
+Version 0.7 (March 17, 2007) (tb)
+------------------------------------------
+
+	* added the option to disable automatic recalculation (better performance)
+	
+	* added the option to jump to another page with the gotoCell function
+
+	* added paging for cursor keys, page up, page down, home, end keys
+
+	* changed "readonly" to affect only the value
+	
+	* fixed calculations after column AA
+	
+
+Version 0.6 (January 29, 2007) (tb)
+------------------------------------------
+
+	* added load button to the top menu
+	
+	* added documentation for string functions
+	
+	* fixed loading CSV data in IE
+
+	* fixed a problem with missing quotes in CSV data
+	
+	* fixed a problem with copy/pasting cells into each other
+
+
+Version 0.5 (December 9, 2006) (tb)
+------------------------------------------
+
+	* added Italian translation from Nicola Canepa
+	
+	* added Spanish translation from Cesar Reyes
+	
+	* added import for tab separated values (= copy/paste from Excel)
+	
+	* added styles to the manual
+	
+	* added accesskeys for new / save / close
+	
+	* added option to use HTML in a cell
+	
+	* added loading sheets from an URL
+	
+	* added multiline editor
+	
+	* added TinyMCE html editor
+	
+	* fixed a problem with displaying data formats
+	
+	* fixed layout problems on the start page with IE
+	
+	* add type-to-edit cell from Cesar Reyes for Firefox
+
+
+Version 0.4 (November 30, 2006) (tb)
+------------------------------------------
+
+	* added new start page for language selection
+
+	* added index_offline.html for offline usage
+
+	* fixed problem with saving the data in IE
+
+	* fixed csv import
+	
+
+Version 0.4 (sl)
+------------------------------------------
+
+  * added English / German translations
+
+    
+Version 0.3 (June 22, 2006) (tb)
+------------------------------------------
+
+	* added sorting
+	
+	* added CSV import, export
+	
+	* added export to Simple Groupware
+	
+
+Version 0.2 (June 11, 2006) (tb)
+------------------------------------------
+
+	* added date and currency formats
+	
+	* added column/row merging
+	
+	* added group bar graph, scatter graph,
+	  accumulated bar graph and line graph
+	  
+	* added live preview when typing
+	
+	* added selecting ranges
+	
+	* added cut/copy/paste with ranges
+
+	* some fixes for saving data
+	
+
+Version 0.1 (June 7, 2006) (tb)
+------------------------------------------
+
+	* first release
+	
+
+tb = Thomas Bley
+sl = Sophie Lee
