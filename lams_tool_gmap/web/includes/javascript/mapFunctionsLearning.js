@@ -61,8 +61,6 @@ function saveMarkerInfo(x)
 			
 			
 			refreshSideBar(sessionName);
-			alert(selectedUser);
-			//showSelectedUser(selectedUser);
 			updateMarkerInfoWindowHtml(markers[x]);
 			openInfoWindow(x);
 		}

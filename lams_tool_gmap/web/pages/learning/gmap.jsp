@@ -33,7 +33,7 @@
 				<table style="cellpadding:0; cellspacing:0; border:0; width:500px;">
 					<tr>
 						<td width="80%">
-						<div id="map_canvas" style="width:400px;height:300px;" ></div><fmt:message key="error.cantLoadMap"></fmt:message></td>
+						<div id="map_canvas" style="width:400px;height:300px;" ><fmt:message key="error.cantLoadMap"></fmt:message></div></td>
 						<td width="10%">
 						<div id="usersidebar" style="width:100px; overflow:auto;height:320px; background:WhiteSmoke; "></div>
 						</td>
