@@ -184,7 +184,7 @@ function refreshSideBar(groupName)
 	var i;
 	
 	//sideBarText += "<a href='javascript:refreshSideBar()'>View All</a><br>";
-	sideBarText += "<h2>" + groupName + "</h2>";
+	sideBarText += "<nobr><h2>" + groupName + "</h2></nobr>";
 	for (j=0;j<users.length; j++)
 	{
 		sideBarText += "<nobr><img src='" +TREE_CLOSED_ICON+ "' id='userTreeIcon" + users[j].id + "' onclick='javascript:makeUsersSideBarVisible(" + users[j].id + ");' />";
