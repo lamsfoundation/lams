@@ -16,6 +16,7 @@
 
 var selectedUser = -1;
 var selectedMarker = -1;
+var currentOpenMarkerImportance= 0;
 
 
 // add a marker at the given point
@@ -24,8 +25,16 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
 	map.closeInfoWindow();
 	var marker;
 	
-	if(editAble) 	{marker = new GMarker(point, {draggable: true, zIndex:1});}
-	else 			{marker = new GMarker(point, {draggable: false, zIndex:0})};
+	if(editAble) 	
+	{
+		marker = new GMarker(point, {draggable: true, zIndexProcess:importanceOrder});
+		marker.importance = 1;
+	}
+	else 			
+	{
+		marker = new GMarker(point, {draggable: false, zIndexProcess:importanceOrder})
+		marker.importance = 0;
+	};
 	
 	marker.editAble = editAble;
 	marker.createdBy = createdBy;
@@ -46,11 +55,14 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     GEvent.addListener(marker, "click", function() {
     	marker.openInfoWindowHtml(marker.infoWindowHtml);
     	showSelectedMarkerSideBar(marker.sideBarIndex);
+    	currentOpenMarkerImportance = marker.importance;
+    	marker.importance = 2;
     });
     
     GEvent.addListener(marker, "infowindowclose", function() {
     	updateMarkerInfoWindowHtml(marker);
     	showSelectedMarkerSideBar(marker.sideBarIndex);
+    	marker.importance = currentOpenMarkerImportance
     });
     
     if (infoMessage!=null)
@@ -88,6 +100,10 @@ function addUserToList(id, name)
 	users[users.length] = user;
 }
 
+function importanceOrder (marker,b) 
+{
+	return GOverlay.getZIndex(marker.getPoint().lat()) + marker.importance*1000000;
+}
 
 function makeUsersSideBarVisible(id)
 {
