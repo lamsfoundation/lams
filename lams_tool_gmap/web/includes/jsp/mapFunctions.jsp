@@ -188,7 +188,7 @@ function refreshSideBar(groupName)
 	for (j=0;j<users.length; j++)
 	{
 		sideBarText += "<nobr><img src='" +TREE_CLOSED_ICON+ "' id='userTreeIcon" + users[j].id + "' onclick='javascript:makeUsersSideBarVisible(" + users[j].id + ");' />";
-		sideBarText += " <a href='javascript:showSelectedUser(" + users[j].id + ");'><span id='userSpan" + users[j].id +"'>" + users[j].name + "</span></a></nobr><br>";
+		sideBarText += " <a href='javascript:showSelectedUser(" + users[j].id + ");' title='" +users[j].name+ "'><span id='userSpan" + users[j].id +"'>" + users[j].name + "</span></a></nobr><br>";
 		sideBarText += "<div style='display:none;' id='userdiv" + users[j].id + "'>";
 		for (i=0;i<markers.length; i++)
 		{
@@ -196,7 +196,7 @@ function refreshSideBar(groupName)
 			{
 				sideBarText += "&nbsp;&nbsp;&nbsp;&nbsp;<span id='markerSpan" + markers[i].sideBarIndex + "'><nobr>";
 				sideBarText += "<a href='javascript:GEvent.trigger(markers[" + markers[i].sideBarIndex + "],\"click\");' ";
-				sideBarText += "title='" + markers[i].createdBy + "' >" + markers[i].title + "</a>"
+				sideBarText += "title='" + markers[i].title + "' >" + markers[i].title + "</a>"
 				sideBarText += "</span></nobr><br />";
 			}
 		}

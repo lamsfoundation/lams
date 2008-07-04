@@ -35,6 +35,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
@@ -82,6 +84,8 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * An implementation of the IGmapService interface.
@@ -298,6 +302,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 		gmap.setToolContentHandler(null);
 		gmap.setGmapSessions(null);
 		gmap.setCreateBy(null);
+		gmap.setToolContentHandler(null);
 		
 		Set<GmapAttachment> atts = gmap.getGmapAttachments();
 		for (GmapAttachment att : atts) {
@@ -354,7 +359,15 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 
 			// reset it to new toolContentId
 			gmap.setToolContentId(toolContentId);
-			gmap.setCreateBy(new Long(newUserUid.longValue()));
+			
+			// Create a user for gmap to be created by:
+			HttpSession ss = SessionManager.getSession();
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			GmapUser gmapUser = new GmapUser(user,null);
+			gmapUserDAO.saveOrUpdate(gmapUser);
+			
+			gmap.setCreateBy(gmapUser.getUid());
+			//gmap.setCreateBy(new Long(newUserUid.longValue()));
 
 			gmapDAO.saveOrUpdate(gmap);
 		} catch (ImportToolContentException e) {

@@ -86,7 +86,7 @@ function refreshSideBarAuthoring()
 		{
 			sideBarText += "<span id='markerSpan" +markers[i].sideBarIndex+ "'>";
 			sideBarText += "<a href='javascript:GEvent.trigger(markers[" + markers[i].sideBarIndex + "],\"click\")' ";
-			sideBarText += "title='" + markers[i].createdBy + "' >" + markers[i].title + "</a>"
+			sideBarText += "title='" + markers[i].title + "' >" + markers[i].title + "</a>"
 			sideBarText += "</span><br />";
 			//sideBarText += markers[i].sideBarLinkPrefix + " title='" + markers[i].createdBy + "' >" + markers[i].title+"</a></span><br />";
 		}
