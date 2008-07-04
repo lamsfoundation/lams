@@ -36,7 +36,6 @@
 			<tr><td>
 			<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
 			<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-			<a href="javascript:test()" class="button"/>Test</a>
 			</td></tr>
 			</table>
 		</td>
