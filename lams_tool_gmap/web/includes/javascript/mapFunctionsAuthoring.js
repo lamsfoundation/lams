@@ -21,8 +21,8 @@ function removeMarker(x)
 		try{map.removeOverlay(markers[x]);}
 		catch (e){}
 		markers[x].state = "remove";
-		refreshSideBar();
-		//serialiseMarkers();
+		refreshSideBarAuthoring();
+		selectedMarker = -1;
 	}
 }
 
@@ -55,7 +55,7 @@ function saveMarkerInfo(x)
 			else (markers[x].state ="save");
 			
 			updateMarkerInfoWindowHtml(markers[x]);
-			refreshSideBar();
+			refreshSideBarAuthoring();
 			openInfoWindow(x);
 		}
 	}
@@ -73,4 +73,23 @@ function saveMapState()
 	else if (mapTypeName == "Terrain") 	{ mapType = "G_PHYSICAL_MAP"; }
 	else 								{ mapType = "G_NORMAL_MAP"; }
 	document.getElementById("mapType").value=mapType;
+}
+
+function refreshSideBarAuthoring()
+{
+	//marker.sideBarLinkPrefix = "<span class='sidebar'><a href='javascript:GEvent.trigger(markers["+markers.length+"],\"click\")'";
+	var sideBarText = "";
+	var i=0;
+	for (;i<markers.length; i++)
+	{
+		if (markers[i].state != "remove" && markers[i].state != "unsaved")
+		{
+			sideBarText += "<span id='markerSpan" +markers[i].sideBarIndex+ "'>";
+			sideBarText += "<a href='javascript:GEvent.trigger(markers[" + markers[i].sideBarIndex + "],\"click\")' ";
+			sideBarText += "title='" + markers[i].createdBy + "' >" + markers[i].title + "</a>"
+			sideBarText += "</span><br />";
+			//sideBarText += markers[i].sideBarLinkPrefix + " title='" + markers[i].createdBy + "' >" + markers[i].title+"</a></span><br />";
+		}
+	}
+	document.getElementById("sidebar").innerHTML = sideBarText;
 }

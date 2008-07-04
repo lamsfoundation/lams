@@ -1,11 +1,23 @@
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
 
+
+
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=<%= Configuration.get(ConfigurationKeys.GMAP_KEY) %>" type="text/javascript"></script>
+
+
 <script type="text/javascript">
 <!--
+
+var selectedUser = -1;
+var selectedMarker = -1;
+
+
 // add a marker at the given point
 function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy, createdById)
 {
@@ -18,6 +30,7 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
 	marker.editAble = editAble;
 	marker.createdBy = createdBy;
 	marker.createdById = createdById;
+	marker.sideBarIndex = markers.length;
 	
     map.addOverlay(marker);
     
@@ -32,10 +45,12 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     
     GEvent.addListener(marker, "click", function() {
     	marker.openInfoWindowHtml(marker.infoWindowHtml);
+    	showSelectedMarkerSideBar(marker.sideBarIndex);
     });
     
     GEvent.addListener(marker, "infowindowclose", function() {
     	updateMarkerInfoWindowHtml(marker);
+    	showSelectedMarkerSideBar(marker.sideBarIndex);
     });
     
     if (infoMessage!=null)
@@ -47,7 +62,6 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     	marker.infoMessage = "";
     }
     marker.title = title;
-
     
     // set the state of the marker
     marker.editingOn = !isSaved;
@@ -56,7 +70,7 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     else {marker.state="unsaved";}
     
 	//marker.sideBarLinkPrefix = "<span class='sidebar'><a href='javascript:GEvent.trigger(markers["+markers.length+"],\"click\")'";
-	marker.sideBarIndex = markers.length;
+    marker.highlight = false;
     marker.removeLink = "<a href='javascript:removeMarker(" + markers.length + ")'><fmt:message key='button.remove'/></a>" ;
    	marker.editLink = "<a href='javascript:editMarker(" + markers.length + ")'><fmt:message key='button.edit'/></a>";
    	marker.saveLink = "<a href='javascript:saveMarkerInfo(" + markers.length + ");'><fmt:message key='button.save'/></a>";
@@ -66,26 +80,131 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     
 }
 
-
-
-function refreshSideBar()
+function addUserToList(id, name)
 {
-	//marker.sideBarLinkPrefix = "<span class='sidebar'><a href='javascript:GEvent.trigger(markers["+markers.length+"],\"click\")'";
-	var sideBarText = "";
-	var i=0;
-	for (;i<markers.length; i++)
-	{
-		if (markers[i].state != "remove" && markers[i].state != "unsaved")
-		{
-			sideBarText += "<span class='sidebar'>";
-			sideBarText += "<a href='javascript:GEvent.trigger(markers[" + markers[i].sideBarIndex + "],\"click\")' ";
-			sideBarText += "title='" + markers[i].createdBy + "' >" + markers[i].title + "</a>"
-			sideBarText += "</span><br />";
-			//sideBarText += markers[i].sideBarLinkPrefix + " title='" + markers[i].createdBy + "' >" + markers[i].title+"</a></span><br />";
-		}
-	}
-	document.getElementById("sidebar").innerHTML = sideBarText;
+	var user = new Object();
+	user.name = name;
+	user.id = id;
+	users[users.length] = user;
 }
+
+
+function makeUsersSideBarVisible(id)
+{
+	var div = document.getElementById("userdiv" + id);
+	
+	if (div.style.display == "block")
+	{
+		document.getElementById("userdiv" + id).style.display = "none";
+		document.getElementById("userTreeIcon" + id).src = TREE_CLOSED_ICON;
+	}
+	else if (div.style.display == "none")
+	{
+		document.getElementById("userdiv" + id).style.display = "block";
+		document.getElementById("userTreeIcon" + id).src = TREE_OPEN_ICON;
+		
+	}
+}
+
+function showSelectedUser(id)
+{
+	map.closeInfoWindow();
+	
+	var div = document.getElementById("userdiv" + id);
+	var i;
+	
+	if (selectedUser == -1)
+	{
+		fitMapMarkers();
+		document.getElementById("userSpan" + id).style.backgroundColor = "yellow";
+		selectedUser = id;
+	}
+	else if (selectedUser == id)
+	{
+		document.getElementById("userSpan" + selectedUser).style.backgroundColor = "";
+		selectedUser = -1;
+	}
+	else
+	{
+		fitMapMarkers();
+		document.getElementById("userSpan" + selectedUser).style.backgroundColor = "";
+		document.getElementById("userSpan" + id).style.backgroundColor = "yellow";
+		selectedUser = id;
+	}
+
+	
+	for (i=0;i<markers.length; i++)
+	{
+		if (markers[i].createdById == selectedUser)
+		{
+			//markers[i].setImage(YELLOW_MARKER_ICON);
+			markers[i].highlight=true;
+		}
+		else
+		{
+			//markers[i].setImage(BLUE_MARKER_ICON);
+			markers[i].highlight=false;
+		}
+		updateMarkerInfoWindowHtml(markers[i]);
+	}
+	
+}
+
+function showSelectedMarkerSideBar(id)
+{
+	
+	//alert ("Marker to select: " +id+ "\nSelected marker: " + selectedMarker);
+	
+	var selectedMarkerSpan = document.getElementById("markerSpan" + selectedMarker);
+	var markerSpanToSelect = document.getElementById("markerSpan" + id);
+	
+	if (selectedMarker == -1 && markerSpanToSelect != null)
+	{
+		document.getElementById("markerSpan" + id).style.backgroundColor = "yellow";
+		selectedMarker = id;
+	}
+	else if (selectedMarker == id && selectedMarkerSpan!= null)
+	{
+		document.getElementById("markerSpan" + selectedMarker).style.backgroundColor = "";
+		selectedMarker = -1;
+	}
+	else if (selectedMarkerSpan != null && markerSpanToSelect!= null)
+	{
+		document.getElementById("markerSpan" + selectedMarker).style.backgroundColor = "";
+		document.getElementById("markerSpan" + id).style.backgroundColor = "yellow";
+		selectedMarker = id;
+	}
+}
+
+function refreshSideBar(groupName)
+{
+	var sideBarText = "";
+	
+	var j;
+	var i;
+	
+	//sideBarText += "<a href='javascript:refreshSideBar()'>View All</a><br>";
+	sideBarText += "<h2>" + groupName + "</h2>";
+	for (j=0;j<users.length; j++)
+	{
+		sideBarText += "<nobr><img src='" +TREE_CLOSED_ICON+ "' id='userTreeIcon" + users[j].id + "' onclick='javascript:makeUsersSideBarVisible(" + users[j].id + ");' />";
+		sideBarText += " <a href='javascript:showSelectedUser(" + users[j].id + ");'><span id='userSpan" + users[j].id +"'>" + users[j].name + "</span></a></nobr><br>";
+		sideBarText += "<div style='display:none;' id='userdiv" + users[j].id + "'>";
+		for (i=0;i<markers.length; i++)
+		{
+			if (markers[i].createdById == users[j].id)
+			{
+				sideBarText += "&nbsp;&nbsp;&nbsp;&nbsp;<span id='markerSpan" + markers[i].sideBarIndex + "'><nobr>";
+				sideBarText += "<a href='javascript:GEvent.trigger(markers[" + markers[i].sideBarIndex + "],\"click\");' ";
+				sideBarText += "title='" + markers[i].createdBy + "' >" + markers[i].title + "</a>"
+				sideBarText += "</span></nobr><br />";
+			}
+		}
+		sideBarText += "</div>";
+	}
+	document.getElementById("usersidebar").innerHTML = sideBarText;
+}
+
 
 function cancelEditMarkerInfo(x)
 {
@@ -154,15 +273,20 @@ function updateMarkerInfoWindowHtml(markerIn)
 {
 	if (markerIn.state == "unchanged")
 	{
-		markerIn.setImage("${tool}/images/blue_Marker.png");
+		markerIn.setImage(BLUE_MARKER_ICON);
 	}
 	else if (markerIn.state == "update" || markerIn.state == "save")
 	{
-		markerIn.setImage("${tool}/images/paleblue_Marker.png");
+		markerIn.setImage(LIGHTBLUE_MARKER_ICON);
 	}
 	else if (markerIn.state == "unsaved")
 	{
-		markerIn.setImage("${tool}/images/red_Marker.png");
+		markerIn.setImage(RED_MARKER_ICON);
+	}
+	
+	if (markerIn.highlight)
+	{
+		markerIn.setImage(YELLOW_MARKER_ICON);
 	}
 	
 	if (markerIn.editingOn)
@@ -221,6 +345,9 @@ function serialiseMarkers()
 	document.getElementById("markersXML").value=xmlString;
 	return true;
 }
+
+
+
 
 
 function test()

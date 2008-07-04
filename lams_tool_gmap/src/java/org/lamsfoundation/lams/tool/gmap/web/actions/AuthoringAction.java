@@ -163,8 +163,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		updateAuthForm(authForm, gmap);
 
 		// Set up sessionMap
-		SessionMap<String, Object> map = createSessionMap(gmap,
-				getAccessMode(request), contentFolderID, toolContentID);
+		SessionMap<String, Object> map = createSessionMap(gmap, getAccessMode(request), contentFolderID, toolContentID);
 		authForm.setSessionMapID(map.getSessionID());
 		authForm.setGmap(gmap);
 		
@@ -195,12 +194,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		String contentFolderID = (String) map.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 		GmapUser gmapUser = null;
 		//check whether it is sysadmin:LDEV-906 
-		if(!StringUtils.equals(contentFolderID,"-1" )){
-			//try to get form system session
-			//HttpSession ss = SessionManager.getSession();
-			//get back login user DTO
-			//UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			//gmapUser = gmapService.getUserByUID(new Long(user.getUserID().intValue()));
+		//if(!StringUtils.equals(contentFolderID,"-1" )){
+
 			
 			if (gmap.getCreateBy() == null)
 			{
@@ -213,7 +208,8 @@ public class AuthoringAction extends LamsDispatchAction {
 			{
 				gmapUser = gmapService.getUserByUID(gmap.getCreateBy());
 			}
-		}
+		//}
+		
 		
 		updateGmap(gmap, authForm, mode, gmapUser);
 

@@ -27,8 +27,11 @@ package org.lamsfoundation.lams.tool.gmap.dto;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
 import java.util.TreeSet;
 
+import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 
@@ -42,7 +45,9 @@ public class GmapSessionDTO implements Comparable {
 	
 	int numberOfLearners;
 	
-	int numberOfFinishedLearners;;
+	int numberOfFinishedLearners;
+	
+	Set<GmapMarkerDTO> markerDTOs = new HashSet<GmapMarkerDTO>();
 	
 	public GmapSessionDTO(GmapSession session) {
 		this.sessionID = session.getSessionId();
@@ -113,4 +118,22 @@ public class GmapSessionDTO implements Comparable {
 	public void setNumberOfFinishedLearners(int numberOfFinishedLearners) {
 		this.numberOfFinishedLearners = numberOfFinishedLearners;
 	}
+
+	public Set<GmapMarkerDTO> getMarkerDTOs() {
+		return markerDTOs;
+	}
+
+	public void setMarkerDTOs(Set<GmapMarkerDTO> markerDTOs) {
+		this.markerDTOs = markerDTOs;
+	}
+	
+	public void setMarkerDTOs(List<GmapMarker> markers)
+	{
+		for (GmapMarker marker : markers) {
+			GmapMarkerDTO markerDTO = new GmapMarkerDTO(marker);
+			markerDTOs.add(markerDTO);
+		}
+	}
+	
+	
 }

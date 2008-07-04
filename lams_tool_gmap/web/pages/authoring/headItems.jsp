@@ -4,15 +4,8 @@
 </c:set>
 
 <script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
-
-<!--  
-<script type="text/javascript" src="${tool}includes/javascript/mapFunctions.js"></script>
--->
-
-<%@ include file="/includes/jsp/mapFunctions.jsp"%>
-
 <script type="text/javascript" src="${tool}includes/javascript/mapFunctionsAuthoring.js"></script>
-<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAvPAE96y1iioFQOnrP1RCBxS3S_A0Q4kgEfsHF6TMv6-oezFszBTPVN72_75MGlxr3nP_6ixxWd30jw" type="text/javascript"></script>
+<%@ include file="/includes/jsp/mapFunctions.jsp"%>
 
 <script type="text/javascript">
 <!--
@@ -23,6 +16,12 @@
 	var geocoder = null;
 	var currUser;
 	var currUserId;
+	var YELLOW_MARKER_ICON = "${tool}/images/yellow_Marker.png";
+	var BLUE_MARKER_ICON = "${tool}/images/blue_Marker.png";
+	var LIGHTBLUE_MARKER_ICON = "${tool}/images/paleblue_Marker.png";
+	var RED_MARKER_ICON = "${tool}/images/red_Marker.png";
+	var TREE_CLOSED_ICON = "${tool}/images/tree_closed.gif";
+	var TREE_OPEN_ICON = "${tool}/images/tree_open.gif";
 //-->
 </script>
 

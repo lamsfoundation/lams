@@ -31,7 +31,7 @@
 			<div id="map_canvas" style="width: 500px; height: 300px"></div> 
 			-->
 			<table cellpadding='0' cellspacing='0' border='0'>
-			<tr><td><div id="map_canvas" style="width: 400px; height: 300px;" ></div></td>
+			<tr><td><div id="map_canvas" style="width: 400px; height: 300px;" ><fmt:message key="error.cantLoadMap"></fmt:message></div></td>
 			<td><div id="sidebar" style="width:100px; overflow:auto;height:320px; background:WhiteSmoke; "></div></td></tr>
 			<tr><td>
 			<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
@@ -78,7 +78,7 @@ function initGmap()
 		map.setMapType(${formBean.gmap.mapType});
 		
 		addAuthorMarkers();	
-		refreshSideBar();
+		refreshSideBarAuthoring();
 		
     }
 }

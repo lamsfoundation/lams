@@ -51,6 +51,8 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	private Gmap gmap;
 	private GmapUser createdBy;
 	private GmapUser updatedBy;
+	private GmapSession gmapSession;
+	
 
 	/**
 	 * Generic POJO constructor
@@ -60,7 +62,7 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	public GmapMarker(Long uid, Double longitude, Double latitude,
 			String infoWindowMessage, String title, Date created, Date updated,
 			boolean isAuthored, Gmap gmap, GmapUser createdBy,
-			GmapUser updatedBy) {
+			GmapUser updatedBy, GmapSession gmapSession) {
 		super();
 		this.uid = uid;
 		this.longitude = longitude;
@@ -73,6 +75,7 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 		this.gmap = gmap;
 		this.createdBy = createdBy;
 		this.updatedBy = updatedBy;
+		this.gmapSession = gmapSession;
 	}
 
 	public Object clone() {
@@ -241,6 +244,23 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 		this.updatedBy = updatedBy;
 	}
 
+	/**
+     * Gets the toolSession
+     *
+     * @hibernate.many-to-one cascade="none"
+     *	class="org.lamsfoundation.lams.tool.gmap.model.GmapSession"
+     *	              column="gmap_session_uid"
+     *
+     */
+	public GmapSession getGmapSession() {
+		return gmapSession;
+	}
+
+	public void setGmapSession(GmapSession gmapSession) {
+		this.gmapSession = gmapSession;
+	}
+
+	
 
 
 }

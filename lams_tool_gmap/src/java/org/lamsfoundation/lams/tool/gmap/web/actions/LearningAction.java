@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapUserDTO;
+import org.lamsfoundation.lams.tool.gmap.dto.GmapSessionDTO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
@@ -112,6 +113,7 @@ public class LearningAction extends LamsDispatchAction {
 			throw new GmapException("Cannot retreive gmap with toolSessionID"+ toolSessionID);
 		}
 		
+		
 		// check defineLater
 		if (gmap.isDefineLater()) {
 			return mapping.findForward("defineLater");
@@ -121,12 +123,14 @@ public class LearningAction extends LamsDispatchAction {
 		request.setAttribute("mode", mode.toString());
 		learningForm.setToolSessionID(toolSessionID);
 
-		//GmapDTO gmapDTO = new GmapDTO();
-		//gmapDTO.title = gmap.getTitle();
-		//gmapDTO.instructions = gmap.getInstructions();
-		//gmapDTO.allowRichEditor = gmap.isAllowRichEditor();
+		// Putting in the GmapDTO for the request
 		GmapDTO gmapDTO = new GmapDTO(gmap);
 		request.setAttribute("gmapDTO", gmapDTO);
+		
+		// Putting in a gmap session attribute, along with markers for this session
+		GmapSessionDTO gmapSessionDTO= new GmapSessionDTO(gmapSession);
+		gmapSessionDTO.setMarkerDTOs(gmapService.getGmapMarkersBySessionId(toolSessionID));
+		request.setAttribute("gmapSessionDTO", gmapSessionDTO);
 
 		// Set the content in use flag.
 		if (!gmap.isContentInUse()) {
@@ -149,14 +153,6 @@ public class LearningAction extends LamsDispatchAction {
 		GmapUserDTO gmapUserDTO = new GmapUserDTO(gmapUser);
 		request.setAttribute(GmapConstants.ATTR_USER_DTO, gmapUserDTO);
 		
-		// get any existing Notebook entry
-		NotebookEntry nbEntry = null;
-		if ( gmapUser != null ) {
-			nbEntry = gmapService.getEntry(gmapUser.getEntryUID());
-		}
-		if (nbEntry != null) {
-			learningForm.setEntryText(nbEntry.getEntry());
-		}
 		
 		// set readOnly flag.
 		if (mode.equals(ToolAccessMode.TEACHER) || (gmap.isLockOnFinished() && gmapUser.isFinishedActivity())) {
@@ -199,7 +195,8 @@ public class LearningAction extends LamsDispatchAction {
 			LearningForm learningForm = (LearningForm) form;
 
 			// TODO fix idType to use real value not 999
-
+			
+			/*
 			if (gmapUser.getEntryUID() == null) {
 				gmapUser.setEntryUID(gmapService.createNotebookEntry(
 						toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, GmapConstants.TOOL_SIGNATURE,
@@ -210,9 +207,10 @@ public class LearningAction extends LamsDispatchAction {
 				gmapService.updateEntry(gmapUser.getEntryUID(),
 						learningForm.getEntryText());
 			}
-
+			
 			gmapUser.setFinishedActivity(true);
 			gmapService.saveOrUpdateGmapUser(gmapUser);
+			*/
 			
 			
 			// Retrieve the session and content.
@@ -223,7 +221,7 @@ public class LearningAction extends LamsDispatchAction {
 			
 			// update the marker list
 			Gmap gmap = gmapSession.getGmap();
-			updateMarkerListFromXML(learningForm.getMarkersXML(), gmap, gmapUser);
+			updateMarkerListFromXML(learningForm.getMarkersXML(), gmap, gmapUser, gmapSession);
 
 		} else {
 			log.error("finishActivity(): couldn't find GmapUser with id: "
@@ -248,7 +246,8 @@ public class LearningAction extends LamsDispatchAction {
 		return null; // TODO need to return proper page.
 	}
 
-	private void updateMarkerListFromXML(String markerXML, Gmap gmap, GmapUser guser)
+	
+	private void updateMarkerListFromXML(String markerXML, Gmap gmap, GmapUser guser, GmapSession session)
 	{
 		//Set<GmapMarker> newMarkers = new HashSet<GmapMarker>();
 		Set<GmapMarker> existingMarkers = gmap.getGmapMarkers();
@@ -289,6 +288,7 @@ public class LearningAction extends LamsDispatchAction {
 					marker = gmap.getMarkerByUid(uid);
 				}
 				
+				marker.setGmapSession(session);
 				marker.setTitle(markerTitle);
 				marker.setInfoWindowMessage(infoMessage);
 				marker.setLatitude(latitude);
@@ -298,8 +298,7 @@ public class LearningAction extends LamsDispatchAction {
 				marker.setUpdatedBy(guser);
 				marker.setAuthored(false);
 				gmapService.saveOrUpdateGmapMarker(marker);
-					
-				
+
 			}
 		}
 		catch (Exception e)

@@ -24,6 +24,8 @@
 
 package org.lamsfoundation.lams.tool.gmap.service;
 
+import java.util.List;
+
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
@@ -100,6 +102,14 @@ public interface IGmapService {
 	 * @param gmapMarker
 	 */
 	public void saveOrUpdateGmapMarker(GmapMarker gmapMarker);
+	
+	/**
+	 * 
+	 * @param sessionId
+	 * @return
+	 */
+	public List<GmapMarker> getGmapMarkersBySessionId(Long sessionId);
+	
 	
 	/**
 	 * @param toolSessionId

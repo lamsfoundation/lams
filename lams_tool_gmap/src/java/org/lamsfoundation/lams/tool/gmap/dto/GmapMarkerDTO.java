@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.gmap.dto;
 
 import java.util.Date;
 import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
-import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 
 /**
  * 
@@ -45,6 +44,8 @@ public class GmapMarkerDTO
 	public boolean isAuthored;
 	public GmapUserDTO createdBy;
 	public GmapUserDTO updatedBy;
+	public GmapSessionDTO gmapSession;
+	
 	
 	
 	public GmapUserDTO getCreatedBy() {
@@ -75,8 +76,9 @@ public class GmapMarkerDTO
 		this.created = marker.getCreated();
 		this.updated = marker.getUpdated();
 		this.isAuthored = marker.isAuthored();
-		this.createdBy = new GmapUserDTO(marker.getCreatedBy());
-		this.updatedBy = new GmapUserDTO(marker.getCreatedBy());
+		this.createdBy = marker.getCreatedBy() == null ? null : new GmapUserDTO(marker.getCreatedBy());
+		this.updatedBy = marker.getUpdatedBy() == null ? null : new GmapUserDTO(marker.getCreatedBy());
+		this.gmapSession = new GmapSessionDTO(marker.getGmapSession());
 	}
 
 	public Long getUid() {
@@ -130,5 +132,11 @@ public class GmapMarkerDTO
 	public boolean getIsAuthored() {
 		return isAuthored;
 	}
+	public GmapSessionDTO getGmapSession() {
+		return gmapSession;
+	}
 
+	public void setGmapSession(GmapSessionDTO gmapSession) {
+		this.gmapSession = gmapSession;
+	}
 }

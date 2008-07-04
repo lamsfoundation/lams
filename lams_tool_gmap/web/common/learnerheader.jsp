@@ -6,6 +6,7 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
+<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <lams:head>  
 	<title>
@@ -22,14 +23,24 @@
 
 	<%@ include file="/includes/jsp/mapFunctions.jsp"%>
 
-	<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAvPAE96y1iioFQOnrP1RCBxS3S_A0Q4kgEfsHF6TMv6-oezFszBTPVN72_75MGlxr3nP_6ixxWd30jw" type="text/javascript"></script>
 	<script type="text/javascript">
 	<!--
-		var webAppUrl = "${tool}";
+		var YELLOW_MARKER_ICON = "${tool}/images/yellow_Marker.png";
+		var BLUE_MARKER_ICON = "${tool}/images/blue_Marker.png";
+		var LIGHTBLUE_MARKER_ICON = "${tool}/images/paleblue_Marker.png";
+		var RED_MARKER_ICON = "${tool}/images/red_Marker.png";
+		var TREE_CLOSED_ICON = "${tool}/images/tree_closed.gif";
+		var TREE_OPEN_ICON = "${tool}/images/tree_open.gif";
+		
 		var errorMissingTitle = '<fmt:message key="error.missingMarkerTitle"/>';
 		var makerLimitMsg = '<fmt:message key="label.learner.markerLimitReached"/>'
+		var confirmDelete = '<fmt:message key="label.authoring.basic.confirmDelete"/>';
+		
+		var sessionName = '${gmapSessionDTO.sessionName}';
+		
 		var map;
 		var markers;
+		var users;
 		var geocoder = null;
 		var currUser;
 		var currUserId;
@@ -44,6 +55,7 @@
 				//map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(640,320) } );
 				map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(500,320) } );
 				markers = new Array();
+		    	users = new Array();
 		    	geocoder = new GClientGeocoder();
 
 				map.setCenter(new GLatLng('${gmapDTO.mapCenterLatitude}', '${gmapDTO.mapCenterLongitude}' ));
@@ -60,26 +72,33 @@
 				<c:if test="${gmapDTO.allowHybrid == false}">map.removeMapType(G_HYBRID_MAP);</c:if>
 				map.setMapType(${gmapDTO.mapType});
 		    	
-		    	<c:forEach var="marker" items="${gmapDTO.gmapMarkers}">
-				<c:choose>
-				<c:when test="${marker.createdBy.loginName == gmapUserDTO.loginName && marker.isAuthored == false}">
-				    addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ),'${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, ${gmapDTO.allowEditMarkers}, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');	
-					userMarkerCount ++;
-				</c:when>
-				<c:otherwise>
+		    	
+		    	
+		    	addUserToList('0','<fmt:message key="label.authoring.basic.authored"></fmt:message>' );
+		    	<c:forEach var="user" items="${gmapSessionDTO.userDTOs}">
+		    		addUserToList('${user.uid}','${user.firstName} ${user.lastName}');
+		    	</c:forEach>
+		    	
+		    	<c:forEach var="marker" items="${gmapSessionDTO.markerDTOs}">
 					<c:choose>
-					<c:when  test="${marker.isAuthored}">
-					addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '<fmt:message key="label.authoring.basic.authored"></fmt:message>', '0' );
+					<c:when test="${marker.createdBy.loginName == gmapUserDTO.loginName && marker.isAuthored == false}">
+					    addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ),'${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, ${gmapDTO.allowEditMarkers}, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');	
+						userMarkerCount ++;
 					</c:when>
-					<c:when  test="${gmapDTO.allowShowAllMarkers}">
-					addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}' );
-					</c:when>
+					<c:otherwise>
+						<c:choose>
+						<c:when  test="${marker.isAuthored}">
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '<fmt:message key="label.authoring.basic.authored"></fmt:message>', '0' );
+						</c:when>
+						<c:when  test="${gmapDTO.allowShowAllMarkers}">
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}' );
+						</c:when>
+						</c:choose>
+					</c:otherwise>
 					</c:choose>
-				</c:otherwise>
-				</c:choose>
 				</c:forEach>
 
-		    	refreshSideBar();
+		    	refreshSideBar(sessionName);
 		    }
 		}
 	//-->

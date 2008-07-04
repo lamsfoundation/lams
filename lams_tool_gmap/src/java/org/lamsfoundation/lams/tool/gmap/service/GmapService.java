@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
@@ -141,6 +142,17 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 		Gmap gmap = gmapDAO.getByContentId(toolContentId);
 		session.setGmap(gmap);
 		gmapSessionDAO.saveOrUpdate(session);
+		
+		Set<GmapMarker> markers = gmap.getGmapMarkers();
+		if(markers != null && markers.size() > 0){
+			for(GmapMarker marker : markers){
+				if(marker.isAuthored() && marker.getGmapSession() == null){
+					GmapMarker newMarker = (GmapMarker)marker.clone();
+					newMarker.setGmapSession(session);
+					saveOrUpdateGmapMarker(newMarker);
+				}
+			}
+		}
 	}
 
 	public String leaveToolSession(Long toolSessionId, Long learnerId)
@@ -210,6 +222,27 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 		Gmap toContent = Gmap.newInstance(fromContent, toContentId,
 				gmapToolContentHandler);
 		gmapDAO.saveOrUpdate(toContent);
+		
+		
+		//save markers in this gmap, only save the author created markers
+		// ###### Commenting this out, it is unneccessary unless teacher editing of authored markers is
+		// allowed at lesson runtime
+		/*
+		Set<GmapMarker> markers = toContent.getGmapMarkers();
+		if(markers != null){
+			Iterator iter = markers.iterator();
+			while(iter.hasNext()){
+				GmapMarker marker = (GmapMarker) iter.next();
+				//set this message forum Uid as toContent
+				if(!marker.isAuthored())
+					continue;
+				
+				marker.setUpdated(new Date());
+				marker.setGmap(toContent);
+				saveOrUpdateGmapMarker(marker);
+			}
+		}
+		*/
 	}
 
 	public void setAsDefineLater(Long toolContentId, boolean value)
@@ -470,6 +503,10 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 	
 	public void saveOrUpdateGmapMarker(GmapMarker gmapMarker) {
 		gmapMarkerDAO.saveOrUpdate(gmapMarker);
+	}
+	
+	public List<GmapMarker> getGmapMarkersBySessionId(Long sessionId) {
+		return gmapMarkerDAO.getByToolSessionId(sessionId);
 	}
 	
 	public void saveOrUpdateGmapSession(GmapSession gmapSession) {

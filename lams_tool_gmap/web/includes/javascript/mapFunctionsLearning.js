@@ -23,9 +23,9 @@ function removeMarker(x)
 		try{map.removeOverlay(markers[x]);}
 		catch (e){}
 		markers[x].state = "remove";
-		refreshSideBar();
+		refreshSideBar(sessionName);
 		userMarkerCount --;
-		//serialiseMarkers();
+		selectedMarker = -1;
 	}
 }
 
@@ -53,13 +53,17 @@ function saveMarkerInfo(x)
 			markers[x].title = title;
 			markers[x].infoMessage = info;
 			markers[x].editingOn = false;
+			markers[x].highlight = selectedUser == markers[x].createdById;
 			
 			// change the state to update if it is a pre-existing marker
 			if (markers[x].state == "unchanged") {markers[x].state = "update";}
 			else (markers[x].state ="save");
 			
+			
+			refreshSideBar(sessionName);
+			alert(selectedUser);
+			//showSelectedUser(selectedUser);
 			updateMarkerInfoWindowHtml(markers[x]);
-			refreshSideBar();
 			openInfoWindow(x);
 		}
 	}

@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.gmap.util;
 
 /**
  * 
- * @author Anthony Sukkar
+ * @author Luke Foxton
  *
  */
 public class GmapException extends RuntimeException {

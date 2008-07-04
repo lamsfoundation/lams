@@ -12,15 +12,20 @@
 		</title>
 		<lams:css localLinkPath="../" />
 		
-		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAvPAE96y1iioFQOnrP1RCBxS3S_A0Q4kgEfsHF6TMv6-oezFszBTPVN72_75MGlxr3nP_6ixxWd30jw" type="text/javascript"></script>	
-
 		<script type="text/javascript">
 		<!--
-		var webAppUrl = "${tool}";
+		var YELLOW_MARKER_ICON = "/images/yellow_Marker.png";
+		var BLUE_MARKER_ICON = "/images/blue_Marker.png";
+		var LIGHTBLUE_MARKER_ICON = "/images/paleblue_Marker.png";
+		var RED_MARKER_ICON = "/images/red_Marker.png";
+		var TREE_CLOSED_ICON = "/images/tree_closed.gif";
+		var TREE_OPEN_ICON = "/images/tree_open.gif";
+		
 		var map;
 		var markers;
 		var users = new Array();
 		var geocoder = null;
+	
 		
 		function initExportGmap()
 		{
@@ -51,7 +56,7 @@
 				</c:forEach>
 		    	
 				
-		    	refreshSideBarMonitor();
+		    	refreshSideBar();
 		    	//fitMapMarkers();
 		    }
 		}
@@ -64,7 +69,7 @@
 			users[users.length] = user;
 		}
 		
-		function refreshSideBarMonitor()
+		function refreshSideBar()
 		{
 			var sideBarText = "";
 			
@@ -149,7 +154,7 @@
 						<table style="cellpadding:0; cellspacing:0; border:0; width:500px;">
 							<tr>
 								<td width="80%">
-								<div id="map_canvas" style="width:400px;height:300px;" ></div></td>
+								<div id="map_canvas" style="width:400px;height:300px;" ><fmt:message key="error.cantLoadMap"></fmt:message></div></td>
 								<td width="20%">
 								<div id="usersidebar" style="width:100px; overflow:auto;height:320px; background:WhiteSmoke; "></div>
 								</td>

@@ -13,5 +13,8 @@
 	<classpathentry kind="lib" path="/lams_build/lib/log4j/log4j-1.2.13.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/axis/axis.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="/lams_bb_integration/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="/lams_common/src/java/org/lamsfoundation/lams/dao/hibernate"/>
+	<classpathentry kind="lib" path="/lams_common/build/lib/lams.jar"/>
 	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>

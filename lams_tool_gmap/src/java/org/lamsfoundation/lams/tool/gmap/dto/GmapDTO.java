@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.gmap.dto;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.List;
 import java.util.TreeSet;
 import java.util.HashSet;
 
@@ -139,11 +140,12 @@ public class GmapDTO {
 			sessionDTOs.add(sessionDTO);
 		}
 		
+		/*
 		for (Iterator<GmapMarker> i = gmap.getGmapMarkers().iterator(); i.hasNext();) {
 			GmapMarker marker = (GmapMarker) i.next();
 			GmapMarkerDTO markerDTO = new GmapMarkerDTO(marker);
 			gmapMarkers.add(markerDTO);
-		}
+		}*/
 	}
 
 	/* Getters / Setters */
@@ -321,17 +323,12 @@ public class GmapDTO {
 		return gmapMarkers;
 	}
 
-	public void setGmapMarkers(Set<GmapMarkerDTO> gmapMarkers) {
-		this.gmapMarkers = gmapMarkers;
+	public void setGmapMarkers(List<GmapMarker> gmapMarkers) {
+		
+		for (Iterator<GmapMarker> i = gmapMarkers.iterator(); i.hasNext();) {
+			GmapMarker marker = (GmapMarker) i.next();
+			GmapMarkerDTO markerDTO = new GmapMarkerDTO(marker);
+			this.gmapMarkers.add(markerDTO);
+		}
 	}
-
-	//public boolean isAllowRichEditor() {
-	//	return allowRichEditor;
-	//}
-
-	//public void setAllowRichEditor(boolean allowRichEditor) {
-	//	this.allowRichEditor = allowRichEditor;
-	//}
-	
-	
 }

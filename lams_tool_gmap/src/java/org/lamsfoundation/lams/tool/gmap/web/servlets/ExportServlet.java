@@ -62,27 +62,29 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			HttpServletResponse response, String directoryName, Cookie[] cookies) {
 
 		if (gmapService == null) {
-			gmapService = GmapServiceProxy
-					.getGmapService(getServletContext());
+			gmapService = GmapServiceProxy.getGmapService(getServletContext());
 		}
 
-		try {
-			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
-				request.getSession().setAttribute(AttributeNames.ATTR_MODE,
-						ToolAccessMode.LEARNER);
-				doLearnerExport(request, response, directoryName, cookies);
-			} else if (StringUtils.equals(mode, ToolAccessMode.TEACHER
-					.toString())) {
-				request.getSession().setAttribute(AttributeNames.ATTR_MODE,
-						ToolAccessMode.TEACHER);
+		try 
+		{
+			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString()))
+			{
+				request.getSession().setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.LEARNER);
+				doLearnerExport(request, response, directoryName, cookies);	
+			} 
+			else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) 
+			{
+				request.getSession().setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
 				doTeacherExport(request, response, directoryName, cookies);
 			}
-		} catch (GmapException e) {
+		} 
+		catch (GmapException e) 
+		{
 			logger.error("Cannot perform export for gmap tool.");
 		}
 
 		String basePath = request.getScheme() + "://" + request.getServerName()
-				+ ":" + request.getServerPort() + request.getContextPath();
+			+ ":" + request.getServerPort() + request.getContextPath();
 		writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp",
 				directoryName, FILENAME, cookies);
 
@@ -160,24 +162,25 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	private void doTeacherExport(HttpServletRequest request,
 			HttpServletResponse response, String directoryName, Cookie[] cookies)
-			throws GmapException {
+			throws GmapException 
+	{
 
 		logger.debug("doExportTeacher: toolContentID:" + toolContentID);
 
 		// check if toolContentID available
-		if (toolContentID == null) {
+		if (toolContentID == null) 
+		{
 			String error = "Tool Content ID is missing. Unable to continue";
 			logger.error(error);
 			throw new GmapException(error);
 		}
 
-		Gmap gmap = gmapService
-				.getGmapByContentId(toolContentID);
+		Gmap gmap = gmapService.getGmapByContentId(toolContentID);
 
 		GmapDTO gmapDTO = new GmapDTO(gmap);
 		
 		// add the gmapEntry for each user in each session
-		
+		/*
 		for (GmapSessionDTO session : gmapDTO.getSessionDTOs()) {
 			for (GmapUserDTO user : session.getUserDTOs()) {
 				NotebookEntry entry = gmapService.getEntry(user.getEntryUID());
@@ -186,7 +189,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 					user.setEntryDTO(entryDTO);
 				}
 			}
-		}
+		}*/
 		
 		request.getSession().setAttribute("gmapDTO", gmapDTO);
 	}

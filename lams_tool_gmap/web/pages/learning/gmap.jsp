@@ -3,34 +3,6 @@
 <script type="text/javascript">
 <!--	
 	function validateForm() {
-	
-		// Validates that there's input from the user. 
-		
-		// disables the Finish button to avoid double submittion 
-		disableFinishButton();
-
- 	<c:if test='${mode == "learner"}'>
-		// if this is learner mode, then we add this validation see (LDEV-1319)
-		
-		if (document.learningForm.entryText.value == "") {
-			
-			// if the input is blank, then we further inquire to make sure it is correct
-			if (confirm("\n<fmt:message>message.learner.blank.input</fmt:message>"))  {
-				// if correct, submit form
-				return true;
-			} else {
-				// otherwise, focus on the text area
-				document.learningForm.entryText.focus();
-				document.getElementById("finishButton").disabled = false;
-				return false;      
-			}
-		} else {
-			// there was something on the form, so submit the form
-			return true;
-		}
-		
-	</c:if>
-	
 	}
 
 	function disableFinishButton() {
@@ -47,7 +19,7 @@
 	
 	<html:form action="/learning" method="post" onsubmit="return validateForm();">
 		<html:hidden property="dispatch" value="finishActivity" />
-		<html:hidden property="toolSessionID" />
+		<html:hidden property="toolSessionID" styleId="toolSessionID"/>
 		<html:hidden property="markersXML" value="" styleId="markersXML" />
 		<p>
 			${gmapDTO.instructions}
@@ -61,9 +33,9 @@
 				<table style="cellpadding:0; cellspacing:0; border:0; width:500px;">
 					<tr>
 						<td width="80%">
-						<div id="map_canvas" style="width:400px;height:300px;" ></div></td>
+						<div id="map_canvas" style="width:400px;height:300px;" ></div><fmt:message key="error.cantLoadMap"></fmt:message></td>
 						<td width="10%">
-						<div id="sidebar" style="width:100px; overflow:auto;height:320px; background:WhiteSmoke; "></div>
+						<div id="usersidebar" style="width:100px; overflow:auto;height:320px; background:WhiteSmoke; "></div>
 						</td>
 					</tr>
 					<tr>
