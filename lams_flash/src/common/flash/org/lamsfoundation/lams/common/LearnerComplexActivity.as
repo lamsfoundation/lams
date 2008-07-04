@@ -236,7 +236,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	}
 	
 	/**
-	 * Main function for drawing the MovieClip to represent the chldren activity. Complex type children will create a nested LCA.
+	 * Main function for drawing the MovieClip to represent the children activities. Complex type children will create a nested LCA.
 	 * Identifies when a active/open sequence (of Optional Sequence for example) is reached and halts for later processing, to control
 	 * drawing order and timing. 
 	 *   
@@ -415,7 +415,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	}
 	
 	/**
-	* Checking if the Learner is currently current at, attempting or completed a Sequence or Complex activity and redrawing the component
+	* Checking if the Learner is currently at, attempting or completed a Sequence or Complex activity and redrawing the component
 	* appropriatly for the progress status. This function updates and redraws the component due to the progress status of the children activities.
 	* 
 	*/
