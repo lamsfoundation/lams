@@ -21,55 +21,68 @@
 * ************************************************************************
 */
 import org.lamsfoundation.lams.common.*;
-import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.dict.*;
-import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.mvc.*;
+import org.lamsfoundation.lams.common.style.*;
+import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.ui.*;
+
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.ComplexActivity;
-import org.lamsfoundation.lams.authoring.SequenceActivity;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
+import org.lamsfoundation.lams.authoring.SequenceActivity;
 import org.lamsfoundation.lams.authoring.cv.ICanvasActivity;
-import org.lamsfoundation.lams.learner.ls.*;
+
 import org.lamsfoundation.lams.learner.Application;
-import org.lamsfoundation.lams.monitoring.mv.MonitorModel;
+import org.lamsfoundation.lams.learner.ls.*;
+
 import org.lamsfoundation.lams.monitoring.mv.MonitorController;
+import org.lamsfoundation.lams.monitoring.mv.MonitorModel;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView;
-import org.lamsfoundation.lams.common.style. *;
 
 import mx.controls. *;
 import mx.managers. *;
 
 /**
-* CanvasOptionalActivity
-* This is the UI / view representation of a complex (Optional) activity
+* LearnerComplexActivity
+* 
+* This class represents and controls the complex activity presentation in the Learner Progress Bar. 
+* The Progress Bar is displayed in the Learner application and in the Monitor application (Learner tab). 
+* 
+* A complex activity can have multiple children, this class displays the children of the complex activity (_activity) in a linear/vertical 
+* way with only the single level shown in the progress component. However, for any children of a complex type another instance of this class is 
+* nested to represent and control this child activity. 
+* 
+* This class is designed to handle multiple complex children and uses two local variables to identify the active ones for a Sequence Activity 
+* (_activeSequence) and Complex Activity (_activeComplex).
+* 
+* 
 */
 
 class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 {
-	private var CHILD_OFFSET_X : Number = 8;
-	private var CHILD_OFFSET_Y : Number = 57;
-	private var CHILD_INCRE : Number = 60;
+	private var CHILD_OFFSET_X:Number = 8;
+	private var CHILD_OFFSET_Y:Number = 57;
+	private var CHILD_INCRE:Number = 60;
 	
 	private var LABEL_W:Number = 130;
 	private var LABEL_H:Number = 22;
 	
-	//this is set by the init object
+	// Set by the init obj
 	private var _controller:AbstractController;
 	private var _view:AbstractView;
 	private var _tip:ToolTip;
 	
-	//Set by the init obj
-	private var _activity : Activity;
-	private var _children : Array;
+	// Set by the init obj - the complex/sequence activity and children array
+	private var _activity:Activity;
+	private var _children:Array;
 	
 	//refs to screen items:
 	private var container_pnl:MovieClip;
 	private var title_lbl:MovieClip;
 	private var labelHolder_mc:MovieClip;
 	
-	//locals
 	private var actStatus:String;
 	private var childActivities_mc : MovieClip;
 	private var complexActivity_mc : MovieClip;
@@ -98,19 +111,23 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private var _ddm:DesignDataModel;
 	private var app:ApplicationParent;
 	
+	// Identify if activity is nested inside another active LCA and at the depth level 
 	private var _nested:Boolean;
 	private var _level:Number;
 	private var _complexLevel:Number;
 	
+	// Current active sequence/complex activities
 	private var _activeSequence:SequenceActivity;
 	private var _activeComplex:ComplexActivity;
 	
+	// Map tracking of open, nested sequence/complex activities.
 	private var activeSequenceMap:Hashtable;
 	private var activeComplexMap:Hashtable;
 	
 	private var delegates:Array;
 	private var _manualSelect:Boolean;	private var lockedRefresh:Boolean;
 	
+	/* Constructor */
 	function LearnerComplexActivity () {
 		complexActivity_mc = this;
 		
@@ -141,6 +158,11 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		init();
 	}
 	
+	/**
+	 * Setup the components labels and events and start processing the children.
+	 *  
+	 */
+	
 	public function init():Void {
 		var styleObj = _tm.getStyleObject('smallLabel');
 		title_lbl = labelHolder_mc.attachMovie("Label", "actTitle", this.getNextHighestDepth(), {_width:LABEL_W, _height:LABEL_H, autoSize:"center", styleName:styleObj});
@@ -156,6 +178,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		showStatus(false);
 		
+		// click target events
 		clickTarget_mc.onRollOver = Proxy.create(this, localOnRollOver);
 		clickTarget_mc.onRollOut = Proxy.create(this, localOnRollOut);
 		clickTarget_mc.onPress = Proxy.create(this, localOnPress);
@@ -172,15 +195,19 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			childrenArray = _children;
 		}
 		
+		// draw the children and any nested LCA's
 		createChildren(childrenArray);
 		clearDelegates();
 		
 		childHolder_mc._visible = (!_nested) ? false : true;
 	}
 	
+	/**
+	 * Run through and call all the functions pushed to the delegates array for processing.
+	 * Used to control the order of drawing the children when nested LCA's are open/active.
+	 */
+	 
 	private function clearDelegates():Void {
-		
-		// run delegates
 		if(delegates.length > 0) {
 			MovieClipUtils.doLater(Function(delegates.shift()));
 		} else {
@@ -191,14 +218,34 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		MovieClipUtils.doLater(Proxy.create(this, clearDelegates));
 	}
 
+	/**
+	 * Drawing the children activites in this complex object. 
+	 *   
+	 * @param   _children 	Array of children activities
+	 * @param   index   	Index position to start iteration
+	 */
+	
 	private function createChildren(_children:Array, index:Number):Void {
 		
 		var rIndex:Number = drawChildren(_children, index);
 		
+		// rIndex returns not null the function needs to be set for later processing at the array position it had to halt.
 		if(rIndex != null) delegates.push(Proxy.create(this, createChildren, _children, rIndex));
 		
 		return;
 	}
+	
+	/**
+	 * Main function for drawing the MovieClip to represent the chldren activity. Complex type children will create a nested LCA.
+	 * Identifies when a active/open sequence (of Optional Sequence for example) is reached and halts for later processing, to control
+	 * drawing order and timing. 
+	 *   
+	 * @param   _children 	Array of children activities
+	 * @param   index   	Index position to start iteration	
+	 * 
+	 * @return  The index location where the function had to halt due to inserting of a sequence or LCA (complex activity).
+	 * 
+	 */
 	
 	private function drawChildren(_children:Array, index:Number):Number {
 		var childCoordY:Number = 0;
@@ -287,8 +334,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	}
 	
 	/**
-	 * @deprecated
-	 */
+	* Not currently in use due to a nested LCA being used to display the active Branch sequence.
+	* 
+	* @deprecated
+	*/
 	private function drawActiveBranch(learnerAct:LearnerActivity):Void {
 		var _cChildren:Array = model.ddm.getComplexActivityChildren(learnerAct.activity.activityUIID);
 		
@@ -306,28 +355,26 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		}
 	}
 	
+	/**
+	 * Progress status of the complex activity.
+	 * 
+	 * @usage   
+	 * @param   isVisible 
+	 * @return  
+	 */
+	
 	private function showStatus(isVisible:Boolean) {
 		completed_mc._visible = isVisible;
 		current_mc._visible = isVisible;
 		attempted_mc._visible = isVisible;
 		todo_mc._visible = isVisible;
 	}
-	
-	public function get activity():Activity {
-		return getActivity();
-	}
-	
-	public function set activity(a:Activity) {
-		setActivity(a);
-	}
-	
-	public function getActivity():Activity {
-		return _activity;
-	}
-	
-	public function setActivity(a:Activity) {
-		_activity = a;
-	}
+
+	/**
+	 * Refresh and redraw the complex component.
+	 * 
+	 * @param   _clear	Set no active sequence/complex activities
+	 */
 	
 	public function refresh(_clear:Boolean) {
 		if(lockedRefresh) return;
@@ -344,6 +391,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		delegates = new Array();
 		
+		// Not setting an activity active manually (mouse click) then check progress information for further branching or sequence activity updates.
 		if(!_manualSelect) {
 			checkIfBranchActive();
 			checkIfSequenceActive();
@@ -353,13 +401,24 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 	}
 	
+	/**
+	 * Checking if the Learner is currently attempting or completed a Branch.
+	 *  
+	 */
+	
 	private function checkIfBranchActive():Void {
 		for(var i=0; i<children_mc.length; i++) {
 			var learnerAct = children_mc[i];
 			if((learnerAct.isAttempted || learnerAct.isCompleted) && children_mc[i].activity.isBranchingActivity())
-				activeSequence = null;			// ?
+				activeSequence = null;			// Possibly closing any other open sequence if a branching activity is active. TODO: review.
 		}
 	}
+	
+	/**
+	* Checking if the Learner is currently current at, attempting or completed a Sequence or Complex activity and redrawing the component
+	* appropriatly for the progress status. This function updates and redraws the component due to the progress status of the children activities.
+	* 
+	*/
 	
 	/** TODO: Use for Sequence in Optional */
 	private function checkIfSequenceActive():Void {
@@ -435,6 +494,12 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 	}
 	
+	/**
+	 * Clear all children movieclips from the component. Used prior to redrawing. 
+	 * Note: Also resets children and delegates (fn) arrays
+	 *  
+	 */
+	
 	private function removeAllChildren():Void {
 		
 		Debugger.log("removing children len: " + children_mc.length, Debugger.CRITICAL, "removeAllChildren", "LearnerComplexActivity");
@@ -448,6 +513,15 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		delegates = new Array();
 	}
 
+
+	/**
+	 * Setting a sequence activity as active.
+	 * Update/redraw the component if occured by user action.
+	 * 
+	 * @param   activity    	Sequence activity to set active. 
+	 * @param   manualSelect 	Was mouse event (user action) used to trigger this action.
+	 */
+	
 	public function removeAllChildrenAndInputSequence(activity:SequenceActivity, manualSelect:Boolean):Void {
 		Debugger.log("activity: " + activity.activityUIID, Debugger.CRITICAL, "removeAllChildrenAndInputSequence", "LearnerComplexActivity");
 		Debugger.log("manual select: " + manualSelect, Debugger.CRITICAL, "removeAllChildrenAndInputSequence", "LearnerComplexActivity");
@@ -458,6 +532,16 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		if(_manualSelect)
 			updateComplex();
 	}
+	
+	/**
+	 * Setting a complex activity as active.
+	 * Update/redraw the component if occured by user action.
+	 * 
+	 * @usage   
+	 * @param   activity   	  		Complex activity to set active.    
+	 * @param   tempComplexLevel 	Level value for the nested LCA.	
+	 * @param   manualSelect  		Was mouse event (user action) used to trigger this action.
+	 */
 	
 	public function removeAllChildrenAndInputComplex(activity:ComplexActivity, tempComplexLevel:Number, manualSelect:Boolean):Void {
 		Debugger.log("activecomplex level: " + tempComplexLevel, Debugger.CRITICAL, "removeAllChildrenAndInputComplex", "LearnerComplexActivity");
@@ -472,12 +556,20 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			updateComplex();
 	}
 	
+	/**
+	 * Update/redraw the component.
+	 * If the LCA component is nested, call the parent to update.
+	 * 
+	 *  
+	 */
+	
 	public function updateComplex():Void {
 		if(_parent._parent instanceof LearnerComplexActivity) {
 			LearnerComplexActivity(_parent._parent).updateComplex();
 		} else {
 			redrawComplex(true);
 		
+			// Open component if closed in Learner's progress bar.
 			if(!locked && isLearnerModule()) { 
 				localOnPress(true);
 				expand();
@@ -487,6 +579,12 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		}
 	}
 	
+	/**
+	 * Redraw component after status/progress changes.
+	 * 
+	 * @param   clear	Clear delegates (fn) array
+	 */
+	
 	private function redrawComplex(clear:Boolean):Void {
 		removeAllChildren();
 		
@@ -494,6 +592,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		if(clear) clearDelegates();
 		
 	}
+	
+	/**
+	 * @return  true if one of the children activities is the current activity.
+	 */
 	
 	private function hasCurrentChild(){
 		for(var i=0; i<children_mc.length;i++){
@@ -504,6 +606,12 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		return false;
 	}
+	
+	/**
+	 * Draws the complex component and sets the progress icon, title label and panel's style colours. 
+	 * 
+	 * @param   _callback 	Function to call at the end.
+	 */
 	
 	private function draw(_callback:Function) {
 
@@ -556,10 +664,15 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		if(_callback != null)
 			_callback();
 		
+		// If this component is not nested, draw the nested activity in the design.
 		if(_view instanceof LearnerTabView && !nested)
 			LearnerTabView(_view).drawNext();
 			
 	}
+	
+	/**
+	 * Display the tooltip.
+	 */
 	
 	public function showToolTip(btnObj, btnTT:String):Void{
 		var appData = getAppData();
@@ -578,6 +691,9 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 	}
 	
+	/**
+	 * Hide the tooltip.
+	 */
 	public function hideToolTip():Void{
 		_tip.CloseToolTip();
 	}
@@ -601,12 +717,19 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		hideToolTip();
 	}
 
+	/**
+	 * Handles double clicking event.
+	 * 
+	 * @usage   
+	 * @param   noDoubleClick 
+	 * @return  
+	 */
+	
 	private function localOnPress(noDoubleClick:Boolean):Void{
 		hideToolTip();
 		
 		this.swapDepths(this._parent.getNextHighestDepth());
 		// check double-click
-		
 		var now:Number = new Date().getTime();
 		if ((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY)	{
 			Debugger.log ('DoubleClicking:' + this, Debugger.GEN, 'localOnPress', 'LearnerOptionalActivity');
@@ -624,6 +747,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		_dcStartTime = now;
 	}
 	
+	/**
+	 * Local mouse release event which opens/closes the component.
+	 * 
+	 */
 	
 	private function localOnRelease():Void{
 		Debugger.log ('_doubleClicking:' + _doubleClicking + ', localOnRelease:' + this, Debugger.GEN, 'localOnRelease', 'LearnerOptionalActivity');
@@ -641,12 +768,24 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		Debugger.log ('localOnReleaseOutside:' + this, Debugger.GEN, 'localOnReleaseOutside', 'LearnerOptionalActivity');
 	}
 	
+	/**
+	 * Closes the component to hide the children.
+	 * 
+	 */
+	
 	public function collapse():Void{
 		_locked = false;
 		gotoAndStop('collapse');
 		childHolder_mc._visible = false;
 		draw();
 	}
+	
+	/**
+	 * Opens the component to display the children.
+	 * 
+	 * @usage   
+	 * @return  
+	 */
 	
 	public function expand():Void{
 		_locked = true;
@@ -656,7 +795,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	}
 	
 	/**
-	 * return new children array
+	 * Changes order of children.
 	 * 
 	 * @usage   
 	 * @param   child1 First child
@@ -670,6 +809,22 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		a.push(child2);
 		
 		return a;
+	}
+	
+	public function get activity():Activity {
+		return getActivity();
+	}
+	
+	public function set activity(a:Activity) {
+		setActivity(a);
+	}
+	
+	public function getActivity():Activity {
+		return _activity;
+	}
+	
+	public function setActivity(a:Activity) {
+		_activity = a;
 	}
 	
 	public function set controller(a:AbstractController){
@@ -785,6 +940,12 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		this.removeMovieClip();
 	}
 
+	/**
+	 * Returns height value of the children. Useful for finding the y-position after drawing a nested LCA.
+	 *  
+	 * @return  	height 
+	 */
+	
 	public function getChildrenHeight():Number {
 		if(children_mc.length <= 0) return 0;
 		
@@ -793,6 +954,12 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		return cHeight;
 	}
+	
+	/**
+	 * Sets the active Sequence activity and adds to tracking map.
+	 *   
+	 * @param   a 	activity
+	 */
 	
 	public function set activeSequence(a:SequenceActivity):Void {
 		Debugger.log("adding sequence: " + a.activityUIID, Debugger.CRITICAL, "activeSequence", "LearnerComplexActivity");
@@ -804,6 +971,12 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		_activeSequence = a;
 	}
 	
+	/**
+	 * Sets the active Complex activity and adds to tracking map.
+	 *   
+	 * @param   a 	activity
+	 */
+	 
 	public function set activeComplex(a:ComplexActivity):Void {
 		Debugger.log("adding complex: " + a.activityUIID, Debugger.CRITICAL, "activeComplex", "LearnerComplexActivity");
 		
@@ -811,7 +984,6 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		if(_activeComplex != null) complexMap.remove(ComplexActivity(activeComplex).activityUIID);
 		
 		Debugger.log("complex map length: " + complexMap.size(), Debugger.CRITICAL, "activeComplex", "LearnerComplexActivity");
-		
 		
 		_activeComplex = a;
 	}

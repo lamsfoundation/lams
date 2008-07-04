@@ -22,20 +22,24 @@
  */
 
 import org.lamsfoundation.lams.common.*;
-import org.lamsfoundation.lams.common.util.*;
-import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.mvc.*;
+import org.lamsfoundation.lams.common.style.*;
+import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.ui.*;
+
 import org.lamsfoundation.lams.learner.ls.*;
+
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
+
 import org.lamsfoundation.lams.authoring.Activity;
+import org.lamsfoundation.lams.authoring.ComplexActivity;
 import org.lamsfoundation.lams.authoring.GateActivity;
 import org.lamsfoundation.lams.authoring.SequenceActivity;
-import org.lamsfoundation.lams.authoring.ComplexActivity;
-import org.lamsfoundation.lams.common.style.*;
 
 import com.polymercode.Draw;
+
 import mx.managers.*
 import mx.containers.*;
 import mx.events.*
@@ -43,7 +47,14 @@ import mx.utils.*
 import mx.controls.*
 
 /**  
-* LearnerActivity - 
+* LearnerActivity
+* 
+* This class represets and controls the display of a simple tool or system activity in the Learner's progress bar. 
+* The Progress Bar is displayed in the Learner application and in the Monitor application (Learner tab). 
+* 
+* A simple movieclip is displayed in the progess bar using an icon to identify the status of the activity in the progress bar.
+* This class can also be nested within a LCA (Learner Complex Activity) at multiple levels.
+* 
 */  
 class LearnerActivity extends MovieClip { 
 	
@@ -63,12 +74,12 @@ class LearnerActivity extends MovieClip {
 	//this is set by the init object
 	private var _controller:AbstractController;
 	private var _view:AbstractView;
-	private var _tm:ThemeManager;
 	
-	//TODO:This should be ToolActivity
-	private var _activity:Activity;
+	private var _activity:Activity;				//TODO:This should be ToolActivity
 	private var _isSelected:Boolean;
+	
 	private var app:ApplicationParent;
+	private var _tm:ThemeManager;
 	private var _tip:ToolTip;
 	
 	//locals
@@ -97,9 +108,11 @@ class LearnerActivity extends MovieClip {
 	private var _line_bottom:MovieClip;
 	private var _line_top:MovieClip;
 	
+	// Identifies if the activity is a child of a complex activity and therefore nested inside a LCA and the level it is nested at.
 	private var _complex:Boolean;
 	private var _level:Number;
 	
+	/* Constructor */
 	function LearnerActivity(){
 		Debugger.log("_activity:"+_activity.title,4,'Constructor','LearnerActivity');
 		Debugger.log("actStatus:"+ actStatus,4,'Constructor','LearnerActivity');
@@ -131,6 +144,10 @@ class LearnerActivity extends MovieClip {
 		
 	}
 	
+	/** 
+	* Setup and draw the component. 
+	* 
+	*/
 	public function init(initObj):Void{
 		var styleObj = _tm.getStyleObject('smallLabel');
 		var _autosize:String;
@@ -187,6 +204,11 @@ class LearnerActivity extends MovieClip {
 		draw();
 	}
 	
+	/**
+	 * Clear this component.
+	 * 
+	 */
+	
 	public function destroy():Void {
 		title_lbl.removeMovieClip();
 		this._visible = false;
@@ -194,10 +216,8 @@ class LearnerActivity extends MovieClip {
 	}
 	
 	/**
-	 * Does the work of laying out the screen assets.
-	 * Depending on type of Activity different bits will be shown
-	 * @usage   
-	 * @return  
+	 * Does the work of laying out the screen assets, displaying the title label and setting the progress icon.
+	 * 
 	 */
 	private function draw(){
 		
@@ -232,6 +252,9 @@ class LearnerActivity extends MovieClip {
 		}
 		
 		Debugger.log("parent level: " + _parent._parent.level, Debugger.CRITICAL, "draw", "LearnerActivity");
+		
+		// Using a dash to indicate level depth when nested inside a LCA
+		
 		if(_parent._parent.level > 0) {
 			for(var i=0; i<(_parent._parent.level + _parent._parent.complexLevel); i++)
 				toolTitle = "-" + toolTitle;
@@ -240,17 +263,24 @@ class LearnerActivity extends MovieClip {
 		if(level > 0)
 			for(var i=0; i<level; i++)
 				toolTitle = "-" + toolTitle;
-				
+		
+		// Cut the title if too long
 		if (toolTitle.length > 18){
 				toolTitle = toolTitle.substr(0, 16)+"...";
 		}
 		
 		title_lbl.text = toolTitle;
 		
+		// Continue drawing the next activity in the design if on top level.
 		if(_view instanceof LearnerTabView && !_complex)
 			LearnerTabView(_view).drawNext();
 		
 	}
+	
+	/**
+	 * Display the tooltip.
+	 *  
+	 */
 	
 	public function showToolTip(btnObj, ttMessage:String):Void{
 		Debugger.log("showToolTip invoked", Debugger.CRITICAL, "showToolTip", "LearnerActivity");
@@ -282,9 +312,19 @@ class LearnerActivity extends MovieClip {
 		
 	}
 	
+	/**
+	 * Hide the tooltip.
+	 *
+	 */
+	
 	public function hideToolTip():Void{
 		_tip.CloseToolTip();
 	}
+	
+	/**
+	 * Handles the rollOver event and displays a tooltip for the activity.
+	 *  
+	 */
 	
 	private function onRollOver(){
 		if (actStatus == "completed_mc"){
@@ -323,10 +363,20 @@ class LearnerActivity extends MovieClip {
 		}
 	}
 	
+	/**
+	 * Handles the rollOut event and removes the tooltip.
+	 * 
+	 */
+	
 	private function onRollOut(){
 		
 		hideToolTip();
 	}
+	
+	/**
+	 * Handles the onPress (doubleClick) event.
+	 * DoubleClick will open the activity's learner/monitor page.
+	 */
 	
 	public function onPress():Void{
 			var c = (_controller instanceof LessonController) ? LessonController(_controller) : MonitorController(_controller);
@@ -349,6 +399,11 @@ class LearnerActivity extends MovieClip {
 	
 	}
 	
+	/**
+	 * Handles the onRelease event.
+	 * Assists with setting active sequence/complex activities of a LCA when the component is manually selected to be opened/closed.
+	 * 
+	 */
 	
 	public function onRelease():Void{
 		var c = (_controller instanceof LessonController) ? LessonController(_controller) : MonitorController(_controller);
@@ -368,39 +423,39 @@ class LearnerActivity extends MovieClip {
 			var activeComplex = LearnerComplexActivity(_parent._parent).complexMap.get(this.activity.activityUIID);
 			var activeSequence = LearnerComplexActivity(_parent._parent).sequenceMap.get(this.activity.activityUIID);
 					
-				if(this.activity.isSequenceActivity()) {
-					// insert sequence design into learner complex activity
-					Debugger.log('parent :'+this._parent._parent, Debugger.CRITICAL,'onRelease','LearnerActivity');
-					
-					Debugger.log('activeSequence:'+activeSequence, Debugger.CRITICAL,'onRelease','LearnerActivity');
-					
-					if(LearnerComplexActivity(this._parent._parent).activity.activityUIID == this.activity.parentUIID) {
+			if(this.activity.isSequenceActivity()) {
+				Debugger.log('parent :'+this._parent._parent, Debugger.CRITICAL,'onRelease','LearnerActivity');
+				Debugger.log('activeSequence:'+activeSequence, Debugger.CRITICAL,'onRelease','LearnerActivity');
+				
+				if(LearnerComplexActivity(this._parent._parent).activity.activityUIID == this.activity.parentUIID) {
+				
+					LearnerComplexActivity(this._parent._parent).setActiveComplex(null); //****
 						
-						LearnerComplexActivity(this._parent._parent).setActiveComplex(null); //****
-						
-						if(activeSequence) {
-							// close current active sequence
-							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(null, true);
-						} else {
-							// open sequence
-							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(this.activity, true);
-						}
-						
+					if(activeSequence) {
+						// close current active sequence
+						LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(null, true);
+					} else {
+						// open sequence
+						LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(this.activity, true);
 					}
-				} else if(this.activity.isOptionsWithSequencesActivity() || this.activity.isOptionalActivity() || this.activity.isParallelActivity() || this.activity.isBranchingActivity()) {
-					Debugger.log('activeComplex:'+activeComplex, Debugger.CRITICAL,'onRelease','LearnerActivity');
-					if(model.findParent(this.activity, LearnerComplexActivity(this._parent._parent).activity) || (activeSequence.activityUIID == this.activity.parentUIID)) {
-						if(activeComplex != null) {
-							// close current active complex
-							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(null, null, true);
-						} else {
-							// open complex
-							LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(this.activity, this.level, true);
-						}
+						
+				}
+			} else if(this.activity.isOptionsWithSequencesActivity() || this.activity.isOptionalActivity() || this.activity.isParallelActivity() || this.activity.isBranchingActivity()) {
+				Debugger.log('activeComplex:'+activeComplex, Debugger.CRITICAL,'onRelease','LearnerActivity');
+					
+				if(model.findParent(this.activity, LearnerComplexActivity(this._parent._parent).activity) || (activeSequence.activityUIID == this.activity.parentUIID)) {
+					if(activeComplex != null) {
+						// close current active complex
+						LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(null, null, true);
+					} else {
+						// open complex
+						LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputComplex(this.activity, this.level, true);
 					}
 				}
+			}
 				
-				c.activityRelease(this);
+			c.activityRelease(this);
+			
 		}
 		
 	}
@@ -447,7 +502,6 @@ class LearnerActivity extends MovieClip {
 		return _visibleWidth;
 	}
 
-	
 	/**
 	 * 
 	 * @usage   
