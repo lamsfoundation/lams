@@ -58,8 +58,9 @@ public class DacoConstants {
 	public static final String[] IMAGE_EXTENSIONS = new String[] { "GIF", "JPG", "PNG" };
 
 	// format for the date question
-	public static final String DATE_FORMAT = "dd-MM-yyyy";
-
+	public static final String DATE_PART_DELIMETER = "-";
+	public static final String DATE_FORMAT = "dd" + DacoConstants.DATE_PART_DELIMETER + "MM" + DacoConstants.DATE_PART_DELIMETER
+			+ "yyyy";
 	// for action forward name
 	public static final String SUCCESS = "success";
 	public static final String ERROR = "error";

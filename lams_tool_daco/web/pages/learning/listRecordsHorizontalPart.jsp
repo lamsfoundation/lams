@@ -64,14 +64,14 @@
 						<c:otherwise>
 							<c:set var="generated" value="true" />
 									<td class="fixedCellHeight" 
-										<c:if test="${questionStatus.index==fn:length(daco.dacoQuestions)-1}">
+										<c:if test="${questionStatus.index==fn:length(daco.dacoQuestions)-1 && fn:length(recordList)>1}">
 											id="lastHorizontalQuestion"
 										</c:if>
 									 >
 									
 									<c:choose>
 										<c:when test="${question.type==1 || question.type==4}">
-											<input type="text" size="72" readonly="readonly" value="${answer.answer}"/>
+											<input type="text" size="65" readonly="readonly" value="${answer.answer}"/>
 										</c:when>
 										<c:when test="${question.type==2}">
 											<textarea  cols="55" rows="3" readonly="readonly">${answer.answer}</textarea>
@@ -90,14 +90,24 @@
 											</c:choose>
 										</c:when>
 										<c:when test="${question.type==7}">
-											<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-												<input type="radio" readonly="readonly" 
-												<c:if test="${answer.answer==status.index+1}">
-												checked="checked"
-												</c:if>
-												>
-												${answerOption.answerOption}</input><br />
-											</c:forEach>
+											<table class="alternative-color-inner-table">
+												<tr>
+													<td>
+														<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
+															<c:if test="${status.index>0 && (status.index%3==0)}">
+																</td>
+																<td>
+															</c:if>
+															<input type="radio" readonly="readonly" 
+															<c:if test="${answer.answer==status.index+1}">
+															checked="checked"
+															</c:if>
+															>
+															${answerOption.answerOption}</input><br />
+														</c:forEach>
+													</td>
+												</tr>
+											</table>
 										</c:when>
 										<c:when test="${question.type==8}">
 											<c:choose>
@@ -105,7 +115,11 @@
 													<fmt:message key="label.learning.dropdown.noneselected" />
 												</c:when>
 												<c:otherwise>
-													<fmt:message key="label.learning.dropdown.selected" /> ${answer.answer}
+													<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
+														<c:if test="${status.index+1==answer.answer}">
+															<fmt:message key="label.learning.dropdown.selected" /> ${answerOption.answerOption}
+														</c:if>
+													</c:forEach>
 												</c:otherwise>
 											</c:choose>
 										</c:when>

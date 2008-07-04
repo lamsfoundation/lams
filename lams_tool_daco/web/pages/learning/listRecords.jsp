@@ -134,7 +134,11 @@
 															<fmt:message key="label.learning.dropdown.noneselected" />
 														</c:when>
 														<c:otherwise>
-															<fmt:message key="label.learning.dropdown.selected" /> ${answer.answer}
+															<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
+																<c:if test="${status.index+1==answer.answer}">
+																	<fmt:message key="label.learning.dropdown.selected" /> ${answerOption.answerOption}
+																</c:if>
+															</c:forEach>
 														</c:otherwise>
 													</c:choose>
 												</c:when>

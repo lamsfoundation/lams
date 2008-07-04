@@ -122,6 +122,6 @@ INSERT INTO `tl_ladaco10_contents` (`uid`, `create_date`, `update_date`, `create
   (1,NULL,NULL,NULL,'Daco','0','0',0,0,'Instructions ',null,null,0,0,${default_content_id},0);
   
 INSERT INTO `tl_ladaco10_questions` (`uid`, `description`, `organization_xml`, `create_by`, `create_date`, `create_by_author`, `is_hide`, `is_required`, `question_type`, `min_constraint`, `max_constraint`,`digits_decimal`,`summary`, `content_uid`, `session_uid`) VALUES 
-  (1,'<div>Web Search</div>',NULL,null,NOW(),1,0,1,1,NULL,NULL,NULL,NULL,1,NULL);
+  (1,'<div>What is your favourite colour?</div>',NULL,null,NOW(),1,0,0,1,NULL,NULL,NULL,NULL,1,NULL);
     
 SET FOREIGN_KEY_CHECKS=1;

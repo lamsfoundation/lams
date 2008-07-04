@@ -299,6 +299,8 @@ public class LearningAction extends Action {
 
 		List<List<DacoAnswer>> records = (List<List<DacoAnswer>>) sessionMap.get(DacoConstants.ATTR_RECORD_LIST);
 		int displayedRecordNumber = recordForm.getDisplayedRecordNumber();
+		System.out.print(displayedRecordNumber);
+		System.out.print(records.size());
 		boolean isEdit = false;
 		if (displayedRecordNumber <= records.size()) {
 			record = records.get(displayedRecordNumber - 1);
@@ -329,13 +331,20 @@ public class LearningAction extends Action {
 
 			switch (question.getType()) {
 				case DacoConstants.QUESTION_TYPE_DATE: {
-					int day = Integer.parseInt(recordForm.getAnswer(formAnswerNumber++));
-					int month = Integer.parseInt(recordForm.getAnswer(formAnswerNumber++));
-					int year = Integer.parseInt(recordForm.getAnswer(formAnswerNumber));
-					DateFormat dateFormat = new SimpleDateFormat(DacoConstants.DATE_FORMAT);
-					Calendar calendar = Calendar.getInstance();
-					calendar.set(year, month, day);
-					answer.setAnswer(dateFormat.format(calendar.getTime()));
+					String[] dateParts = new String[] { recordForm.getAnswer(formAnswerNumber++),
+							recordForm.getAnswer(formAnswerNumber++), recordForm.getAnswer(formAnswerNumber) };
+					if (!(StringUtils.isBlank(dateParts[0]) || StringUtils.isBlank(dateParts[1]) || StringUtils
+							.isBlank(dateParts[2]))) {
+						DateFormat dateFormat = new SimpleDateFormat(DacoConstants.DATE_FORMAT);
+						Calendar calendar = Calendar.getInstance();
+						calendar.set(Integer.parseInt(dateParts[2]), Integer.parseInt(dateParts[1]), Integer
+								.parseInt(dateParts[0]));
+						answer.setAnswer(dateFormat.format(calendar.getTime()));
+					}
+					else {
+						answer.setAnswer(null);
+
+					}
 				}
 					formAnswerNumber++;
 					break;
@@ -366,8 +375,9 @@ public class LearningAction extends Action {
 					}
 					else {
 						for (int checkboxNumber = 0; checkboxNumber < checkboxes.length; checkboxNumber++) {
+							System.out.println("CHECKBOX " + checkboxNumber + ": " + checkboxes[checkboxNumber]);
 							answer.setAnswer(checkboxes[checkboxNumber]);
-							if (checkboxNumber < checkboxes.length) {
+							if (checkboxNumber < checkboxes.length - 1) {
 								service.saveOrUpdateAnswer(answer);
 								record.add(answer);
 								answer = (DacoAnswer) answer.clone();
@@ -383,8 +393,13 @@ public class LearningAction extends Action {
 				case DacoConstants.QUESTION_TYPE_LONGLAT: {
 					answer.setAnswer(recordForm.getAnswer(formAnswerNumber++));
 					service.saveOrUpdateAnswer(answer);
-					record.add(answer);
-					answer = (DacoAnswer) answer.clone();
+					if (isEdit) {
+						answer = record.get(answerNumber++);
+					}
+					else {
+						record.add(answer);
+						answer = (DacoAnswer) answer.clone();
+					}
 					answer.setAnswer(recordForm.getAnswer(formAnswerNumber));
 				}
 					formAnswerNumber++;
@@ -890,12 +905,14 @@ public class LearningAction extends Action {
 			recordForm.setSessionMapID(sessionMapID);
 			StringBuilder checkboxes = null;
 			int checkboxQuestionNumber = 0;
+			int formAnswerNumber = 0;
 			for (int answerNumber = 0; answerNumber < record.size(); answerNumber++) {
 				DacoAnswer answer = record.get(answerNumber);
-				if (answer.getQuestion().getType() == DacoConstants.QUESTION_TYPE_CHECKBOX) {
+				short questionType = answer.getQuestion().getType();
+				if (questionType == DacoConstants.QUESTION_TYPE_CHECKBOX) {
 					if (checkboxes == null) {
 						checkboxes = new StringBuilder(record.size() * 3);
-						checkboxQuestionNumber = answerNumber;
+						checkboxQuestionNumber = formAnswerNumber;
 					}
 					checkboxes.append(answer.getAnswer()).append('&');
 				}
@@ -904,7 +921,21 @@ public class LearningAction extends Action {
 						recordForm.setAnswer(checkboxQuestionNumber, checkboxes.toString());
 						checkboxes = null;
 					}
-					recordForm.setAnswer(answerNumber, answer.getAnswer());
+					if (questionType == DacoConstants.QUESTION_TYPE_DATE) {
+						String[] dateParts = null;
+						if (answer.getAnswer() != null) {
+							dateParts = answer.getAnswer().split(DacoConstants.DATE_PART_DELIMETER);
+						}
+						else {
+							dateParts = new String[] { null, null, null };
+						}
+						recordForm.setAnswer(formAnswerNumber++, dateParts[0]);
+						recordForm.setAnswer(formAnswerNumber++, dateParts[1]);
+						recordForm.setAnswer(formAnswerNumber++, dateParts[2]);
+					}
+					else if (!(questionType == DacoConstants.QUESTION_TYPE_FILE || questionType == DacoConstants.QUESTION_TYPE_IMAGE)) {
+						recordForm.setAnswer(formAnswerNumber++, answer.getAnswer());
+					}
 				}
 			}
 			if (checkboxes != null) {
