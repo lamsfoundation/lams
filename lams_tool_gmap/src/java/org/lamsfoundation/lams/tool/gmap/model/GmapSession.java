@@ -60,7 +60,7 @@ public class GmapSession implements java.io.Serializable {
 
 	private Gmap gmap;
 
-	private Set gmapUsers;
+	private Set<GmapUser> gmapUsers;
 
 	// Constructors
 
@@ -181,7 +181,7 @@ public class GmapSession implements java.io.Serializable {
 	 * 
 	 */
 
-	public Set getGmapUsers() {
+	public Set<GmapUser> getGmapUsers() {
 		return this.gmapUsers;
 	}
 

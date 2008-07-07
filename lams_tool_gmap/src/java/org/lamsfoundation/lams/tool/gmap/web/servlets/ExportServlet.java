@@ -134,27 +134,18 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 		GmapUser gmapUser = gmapService.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()),toolSessionID);
-
-		//NotebookEntry gmapEntry = gmapService.getEntry(gmapUser.getEntryUID());
+		GmapUserDTO gmapUserDTO = new GmapUserDTO(gmapUser);
+		request.getSession().setAttribute("userDTO", gmapUserDTO);
+		
 
 		// construct dto's
 		GmapDTO gmapDTO = new GmapDTO(gmap);
-		//GmapDTO gmapDTO = new GmapDTO();
-		//gmapDTO.setTitle(gmap.getTitle());
-		//gmapDTO.setInstructions(gmap.getInstructions());
-
-		GmapSessionDTO sessionDTO = new GmapSessionDTO();
-		sessionDTO.setSessionName(gmapSession.getSessionName());
-		sessionDTO.setSessionID(gmapSession.getSessionId());
-		sessionDTO.setUserDTOs(gmapSession.getGmapUsers());
-
-		// If the user hasn't put in their entry yet, gmapEntry will be null;
-		//GmapUserDTO userDTO = gmapEntry != null ? new GmapUserDTO(gmapUser,gmapEntry) : new GmapUserDTO(gmapUser);
-
-		//GmapUserDTO userDTO = new GmapUserDTO(gmapUser);
+		gmapDTO.setGmapMarkers(gmapService.getGmapMarkersBySessionId(toolSessionID));
 		
+
+		GmapSessionDTO sessionDTO = new GmapSessionDTO(gmapSession);
+		request.getSession().setAttribute("sessionDTO", sessionDTO);
 		
-		//sessionDTO.getUserDTOs().add(userDTO);
 		gmapDTO.getSessionDTOs().add(sessionDTO);
 
 		request.getSession().setAttribute("gmapDTO", gmapDTO);
@@ -179,17 +170,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		GmapDTO gmapDTO = new GmapDTO(gmap);
 		
-		// add the gmapEntry for each user in each session
-		/*
-		for (GmapSessionDTO session : gmapDTO.getSessionDTOs()) {
-			for (GmapUserDTO user : session.getUserDTOs()) {
-				NotebookEntry entry = gmapService.getEntry(user.getEntryUID());
-				if (entry != null) { 
-					NotebookEntryDTO entryDTO = new NotebookEntryDTO(entry);
-					user.setEntryDTO(entryDTO);
-				}
-			}
-		}*/
+		for (GmapSessionDTO gmapSessionDTO : gmapDTO.getSessionDTOs() )
+		{
+			gmapSessionDTO.setMarkerDTOs(gmapService.getGmapMarkersBySessionId(gmapSessionDTO.getSessionID()));
+		}
 		
 		request.getSession().setAttribute("gmapDTO", gmapDTO);
 	}
