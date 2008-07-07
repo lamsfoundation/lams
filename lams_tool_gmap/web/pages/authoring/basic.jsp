@@ -31,8 +31,8 @@
 			<div id="map_canvas" style="width: 500px; height: 300px"></div> 
 			-->
 			<table cellpadding='0' cellspacing='0' border='0'>
-			<tr><td><div id="map_canvas" style="width: 400px; height: 300px;" ><fmt:message key="error.cantLoadMap"></fmt:message></div></td>
-			<td><div id="sidebar" style="width:100px; overflow:auto; height:320px; background:WhiteSmoke; "></div></td></tr>
+			<tr><td><div id="map_canvas" style="width: 400px; height: 400px;" ><fmt:message key="error.cantLoadMap"></fmt:message></div></td>
+			<td><div id="sidebar" style="width:100px; overflow:auto; height:400px; background:WhiteSmoke; "></div></td></tr>
 			<tr><td>
 			<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
 			<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
@@ -45,7 +45,7 @@
 			<div class="field-name">
 				<fmt:message key="label.authoring.basic.centerMap"></fmt:message>
 			</div>
-			<input type="text" size="60" name="address" id="address" value="<fmt:message key="label.authoring.basic.sampleAddress"></fmt:message>" />
+			<input type="text" size="60" onkeypress="javascript:if (event.keyCode==13){showAddress(); return false;}" name="address" id="address" value="<fmt:message key="label.authoring.basic.sampleAddress"></fmt:message>" />
        		<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
 		</td>
 	</tr>
@@ -59,7 +59,7 @@ function initGmap()
 	if (GBrowserIsCompatible()) 
 	{
 		//map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(640,320) } );
-		map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(500,320) } );
+		map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(500,400) } );
     	map.addControl(new GLargeMapControl());
     	map.addControl(new GMapTypeControl());
     	map.addMapType(G_PHYSICAL_MAP); 

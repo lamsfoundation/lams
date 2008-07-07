@@ -87,11 +87,13 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     marker.highlight = false;
     marker.removeLink = "<a href='javascript:removeMarker(" + markers.length + ")'><fmt:message key='button.remove'/></a>" ;
    	marker.editLink = "<a href='javascript:editMarker(" + markers.length + ")'><fmt:message key='button.edit'/></a>";
-   	marker.saveLink = "<a href='javascript:saveMarkerInfo(" + markers.length + ");'><fmt:message key='button.save'/></a>";
+   	marker.saveFuncStr = "saveMarkerInfo(" + markers.length + ");";
+   	marker.saveLink = "<a href='javascript:" +marker.saveFuncStr+ "'><fmt:message key='button.save'/></a>";
    	marker.cancelLink = "<a href='javascript:cancelEditMarkerInfo(" + markers.length + ")'><fmt:message key='button.cancel'/></a>";
     updateMarkerInfoWindowHtml(marker);
     markers[markers.length] = marker;
     
+    if (!isSaved) {openInfoWindow(markers.length - 1);}
 }
 
 function addUserToList(id, name)
@@ -313,7 +315,8 @@ function updateMarkerInfoWindowHtml(markerIn)
 	if (markerIn.editingOn)
 	{
 		markerIn.linksBar = "<br/ >" + markerIn.saveLink + "&nbsp;" + markerIn.cancelLink;
-		markerIn.inputForm ="<fmt:message key='label.authoring.basic.title'/><br><input type='text' maxlength='50' size='50' id='markerTitle' name='markerTitle' value='" + markerIn.title +"' /><br>";
+		markerIn.inputForm ="<fmt:message key='label.authoring.basic.title'/>"
+		markerIn.inputForm += "<br><input type='text' onkeypress='javascript:if (event.keyCode==13){" +markerIn.saveFuncStr+ "}' maxlength='50' size='50' id='markerTitle' name='markerTitle' value='" + markerIn.title +"' /><br>";
 		markerIn.inputForm += "<fmt:message key='label.newInfoWindowText'/><br><textarea id='infoWindow' name='infoWindow' rows='5' cols='50'>" + markerIn.infoMessage + "</textarea>";
 		markerIn.markerMetaData = "<font size='tiny' color='grey'>";
 		markerIn.markerMetaData += '<nobr><fmt:message key="label.latitudeLongitude"/> (' + markerIn.getPoint().lat() + "-" + markerIn.getPoint().lng() +")</nobr>";
