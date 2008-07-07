@@ -1,5 +1,5 @@
 // Register the related command.
-FCKCommands.RegisterCommand( 'WikiLink', new FCKDialogCommand( 'WikiLink', FCKLang.WikiLinkDlgTitle, FCKPlugins.Items['wikilink'].Path + 'fck_wikilink.jsp', 280, 260 ) ) ;
+FCKCommands.RegisterCommand( 'WikiLink', new FCKDialogCommand( 'WikiLink', FCKLang.WikiLinkDlgTitle, FCKPlugins.Items['wikilink'].Path + 'fck_wikilink.jsp', 280, 230 ) ) ;
 
 // Create the "WikiLink" toolbar button.
 var oWikiLinkItem = new FCKToolbarButton( 'WikiLink', FCKLang.WikiLinkBtn ) ;
@@ -10,9 +10,9 @@ FCKToolbarItems.RegisterItem( 'WikiLink', oWikiLinkItem ) ;
 // The object used for all WikiLink operations.
 var FCKWikiLinks = new Object() ;
 
-FCKWikiLinks.InsertWikiLink = function ( linkName, wikiName )
+FCKWikiLinks.InsertWikiLink = function ( linkAlias, wikiName )
 {
-	FCK.InsertHtml( '<a href="' + wikiName + '">' + linkName + '</a>' );
+	FCK.InsertHtml( '<a href="' + wikiName + '">' + linkAlias + '</a>' );
 }
 
 
