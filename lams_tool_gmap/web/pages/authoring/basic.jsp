@@ -27,17 +27,16 @@
 			<div class="field-name">
 				<fmt:message key="label.authoring.basic.map"></fmt:message>
 			</div>
-			<!--  
-			<div id="map_canvas" style="width: 500px; height: 300px"></div> 
-			-->
-			<table cellpadding='0' cellspacing='0' border='0'>
-			<tr><td><div id="map_canvas" style="width: 400px; height: 400px;" ><fmt:message key="error.cantLoadMap"></fmt:message></div></td>
-			<td><div id="sidebar" style="width:100px; overflow:auto; height:400px; background:WhiteSmoke; "></div></td></tr>
-			<tr><td>
+			<br>
+			<div id="map_canvas" style="float: left; width:80%; height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
+			<div id="sidebar" style="float: right; width:20%; overflow:auto; height:400px; background:WhiteSmoke; "></div>		
+
+		</td>
+	</tr>
+	<tr>
+		<td>
 			<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
 			<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-			</td></tr>
-			</table>
 		</td>
 	</tr>
 	<tr>
