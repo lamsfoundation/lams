@@ -29,45 +29,29 @@
 
 		<c:choose>
 			<c:when test="${contentEditable}">
-			
-				<table style="cellpadding:0; cellspacing:0; border:0; width:500px;">
-					<tr>
-						<td width="80%">
-						<div id="map_canvas" style="width:400px;height:300px;" ><fmt:message key="error.cantLoadMap"></fmt:message></div></td>
-						<td width="10%">
-						<div id="usersidebar" style="width:100px; overflow:auto;height:320px; background:WhiteSmoke; "></div>
-						</td>
-					</tr>
-					<tr>
-						<td>
-						<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
-						<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-						</td>
-					</tr>
-				</table>
-
+				<br />
+				<div id="map_canvas" style="float: left; width:80%; height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div></td>
+				<div id="usersidebar" style="float: right; width:20%; overflow:auto; height:400px; background:WhiteSmoke; "></div>		
+				<p />
+				<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
+				<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
 				
+				<p />
 				
-				<br><br>
-				
-				<input type="text" size="60" name="address" id="address" value="<fmt:message key="label.authoring.basic.sampleAddress"></fmt:message>" />
+				<input type="text" onkeypress="javascript:if (event.keyCode==13){showAddress();return false;}" size="60" name="address" id="address" value="<fmt:message key="label.authoring.basic.sampleAddress"></fmt:message>" />
        			<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
 				
-
 				<div class="space-bottom-top align-right">
 					<html:submit styleClass="button" styleId="finishButton" onclick="javascript:serialiseMarkers();">
 						<fmt:message>button.finish</fmt:message>
 					</html:submit>
 				</div>
-
 			</c:when>
-
 			<c:otherwise>
 					<lams:out value="${lrnForm.entryText}" />
 			</c:otherwise>
 		</c:choose>
-		
-		
-
 	</html:form>
 </div>
+
+
