@@ -281,7 +281,7 @@ function fitMapMarkers()
 	}
 	
    	var zoom = map.getBoundsZoomLevel(bounds) - 1;
-   	if (zoom > 15) {zoom = 15;}
+   	if (zoom > 16) {zoom = 16;}
    	map.setZoom(zoom);
    	map.panTo(bounds.getCenter());
    
