@@ -27,13 +27,15 @@
 </c:forEach>
 </table>	
 	
-<table style="cellpadding:0; cellspacing:0; border:0; width:500px;">
+	
+
+
+<table>
 	<tr>
-		<td width="80%">
-		<div id="map_canvas" style="width:400px;height:300px;" ><fmt:message key="error.cantLoadMap"></fmt:message></div></td>
-		<td width="20%">
-		<div id="usersidebar" style="width:100px; overflow:auto;height:320px; background:WhiteSmoke; "></div>
-		</td>
+		 <td>
+		 	<div id="map_canvas" style="float: left; width:80%; height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
+			<div id="usersidebar" style="float: right; width:20%; overflow:auto; height:400px; background:WhiteSmoke; "></div>			 	
+		 </td> 			
 	</tr>
 	<tr>
 		<td>
@@ -41,6 +43,7 @@
 		</td>
 	</tr>
 </table>
+
 
 <table>
 <tr><td>

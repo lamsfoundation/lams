@@ -31,7 +31,8 @@ function initMonotorGmap()
 	if (GBrowserIsCompatible()) 
 	{
 		//map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(640,320) } );
-		map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(500,320) } );
+		map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(500,400) } );
+		//map = new GMap2(document.getElementById("map_canvas"));
 		markers = new Array();
     	geocoder = new GClientGeocoder();
     	
