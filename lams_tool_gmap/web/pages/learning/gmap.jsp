@@ -30,12 +30,21 @@
 		<c:choose>
 			<c:when test="${contentEditable}">
 				<br />
-				<div id="map_canvas" style="float: left; width:80%; height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div></td>
-				<div id="usersidebar" style="float: right; width:20%; overflow:auto; height:400px; background:WhiteSmoke; "></div>		
-				<p />
-				<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
-				<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
 				
+				<table>
+					<tr>
+						<td>
+							<div id="map_canvas" style="float: left; width:80%; height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
+							<div id="usersidebar" style="float: right; width:20%; overflow:auto; height:400px; background:WhiteSmoke; "></div>		
+						</td>
+					</tr>
+					<tr>
+						<td>	
+							<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
+							<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
+						</td>
+					</tr>
+				</table>
 				<p />
 				
 				<input type="text" onkeypress="javascript:if (event.keyCode==13){showAddress();return false;}" size="60" name="address" id="address" value="<fmt:message key="label.authoring.basic.sampleAddress"></fmt:message>" />

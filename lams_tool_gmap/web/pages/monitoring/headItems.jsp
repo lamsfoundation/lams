@@ -64,10 +64,7 @@ function clearMap()
 	markers = new Array();
 	selectedUser = -1;
 	selectedMarker = -1;
-	
-	
 	refreshSideBar("");
-	
 	map.setCenter(new GLatLng('${gmapDTO.mapCenterLatitude}', '${gmapDTO.mapCenterLongitude}' ));
 	map.setZoom(${gmapDTO.mapZoom});
 	map.setMapType(${gmapDTO.mapType});
