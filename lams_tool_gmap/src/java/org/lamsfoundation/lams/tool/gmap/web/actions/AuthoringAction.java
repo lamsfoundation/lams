@@ -444,14 +444,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	 */
 	private void updateAuthForm(AuthoringForm authForm, Gmap gmap) 
 	{
-		// #################################### TODO: Fix this by setting a gmap in the authform
-		
 		authForm.setTitle(gmap.getTitle());
 		authForm.setInstructions(gmap.getInstructions());
 		authForm.setOnlineInstruction(gmap.getOnlineInstructions());
 		authForm.setOfflineInstruction(gmap.getOfflineInstructions());
 		authForm.setLockOnFinished(gmap.isLockOnFinished());
-		//authForm.setAllowRichEditor(gmap.isAllowRichEditor());
 		authForm.setAllowEditMarkers(gmap.isAllowEditMarkers());
 		authForm.setAllowShowAllMarkers(gmap.isAllowShowAllMarkers());
 		authForm.setMaxMarkers(gmap.getMaxMarkers());
