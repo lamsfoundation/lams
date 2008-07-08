@@ -197,26 +197,7 @@ public class LearningAction extends LamsDispatchAction {
 
 		if (gmapUser != null) {
 
-			LearningForm learningForm = (LearningForm) form;
-
-			// TODO fix idType to use real value not 999
-			
-			/*
-			if (gmapUser.getEntryUID() == null) {
-				gmapUser.setEntryUID(gmapService.createNotebookEntry(
-						toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, GmapConstants.TOOL_SIGNATURE,
-						gmapUser.getUserId().intValue(), learningForm
-								.getEntryText()));
-			} else {
-				// update existing entry.
-				gmapService.updateEntry(gmapUser.getEntryUID(),
-						learningForm.getEntryText());
-			}
-			
-			gmapUser.setFinishedActivity(true);
-			gmapService.saveOrUpdateGmapUser(gmapUser);
-			*/
-			
+			LearningForm learningForm = (LearningForm) form;	
 			
 			// Retrieve the session and content.
 			GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
@@ -249,6 +230,39 @@ public class LearningAction extends LamsDispatchAction {
 		}
 
 		return null; // TODO need to return proper page.
+	}
+	
+	
+	public ActionForward saveMarkers(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
+
+		Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
+
+		GmapUser gmapUser = getCurrentUser(toolSessionID);
+
+		if (gmapUser != null) {
+
+			LearningForm learningForm = (LearningForm) form;	
+			
+			// Retrieve the session and content.
+			GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
+			if (gmapSession == null) {
+				throw new GmapException("Cannot retreive session with toolSessionID"+ toolSessionID);
+			}
+			
+			// update the marker list
+			Gmap gmap = gmapSession.getGmap();
+			updateMarkerListFromXML(learningForm.getMarkersXML(), gmap, gmapUser, gmapSession);
+
+		} else {
+			log.error("saveMarkers(): couldn't find GmapUser with id: "
+					+ gmapUser.getUserId() + "and toolSessionID: "
+					+ toolSessionID);
+		}
+
+		//return mapping.findForward("gmap");
+		return unspecified(mapping, form, request, response);
 	}
 
 	

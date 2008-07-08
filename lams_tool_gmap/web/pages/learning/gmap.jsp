@@ -16,11 +16,11 @@
 		${gmapDTO.title}
 	</h1>
 
-	
 	<html:form action="/learning" method="post" onsubmit="return validateForm();">
-		<html:hidden property="dispatch" value="finishActivity" />
+		<html:hidden property="dispatch" styleId = "dispatch" value="finishActivity" />
 		<html:hidden property="toolSessionID" styleId="toolSessionID"/>
 		<html:hidden property="markersXML" value="" styleId="markersXML" />
+		<html:hidden property="mode" value="${mode}" />
 		<p>
 			${gmapDTO.instructions}
 		</p>
@@ -51,7 +51,11 @@
        			<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
 				
 				<div class="space-bottom-top align-right">
-					<html:submit styleClass="button" styleId="finishButton" onclick="javascript:serialiseMarkers();">
+					<html:submit styleClass="button" styleId="finishButton" onclick="javascript:serialiseMarkers();document.getElementById('dispatch').value = 'saveMarkers';">
+						<fmt:message>button.save</fmt:message>
+					</html:submit>
+					
+					<html:submit styleClass="button" styleId="finishButton" onclick="javascript:serialiseMarkers();document.getElementById('dispatch').value = 'finishActivity';">
 						<fmt:message>button.finish</fmt:message>
 					</html:submit>
 				</div>
