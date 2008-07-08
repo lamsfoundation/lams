@@ -54,17 +54,13 @@ public class GmapSessionDTO implements Comparable {
 		this.sessionName = session.getSessionName();
 		
 		numberOfFinishedLearners = 0;
-		for (Iterator iterator = session.getGmapUsers().iterator(); iterator.hasNext();) {
+		for (Iterator<GmapUser> iterator = session.getGmapUsers().iterator(); iterator.hasNext();) {
 			GmapUser user = (GmapUser) iterator.next();
 			GmapUserDTO userDTO = new GmapUserDTO(user);
-			if (userDTO.getEntryUID() != null) {
-				numberOfFinishedLearners++;
-			}
 			userDTOs.add(userDTO);
-		}
-		
+			if (user.isFinishedActivity()) {numberOfFinishedLearners++;}
+		}	
 		numberOfLearners = userDTOs.size();
-		
 	}
 	
 	public GmapSessionDTO() {}

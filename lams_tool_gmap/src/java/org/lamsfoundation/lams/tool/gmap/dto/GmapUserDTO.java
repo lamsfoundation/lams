@@ -25,7 +25,6 @@
 
 package org.lamsfoundation.lams.tool.gmap.dto;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 
 public class GmapUserDTO implements Comparable{
@@ -38,25 +37,11 @@ public class GmapUserDTO implements Comparable{
 	
 	public String lastName;
 	
-	public NotebookEntryDTO entryDTO;
-
-	public Long entryUID;
-	
-	public GmapUserDTO(GmapUser user, NotebookEntry entry) {
-		this.uid = user.getUid();
-		this.loginName = user.getLoginName();
-		this.firstName = user.getFirstName();
-		this.lastName = user.getLastName();
-		this.entryUID = user.getEntryUID();
-		this.entryDTO = new NotebookEntryDTO(entry);
-	}
-	
 	public GmapUserDTO(GmapUser user) {
 		this.uid = user.getUid();
 		this.loginName = user.getLoginName();
 		this.firstName = user.getFirstName();
 		this.lastName = user.getLastName();
-		this.entryUID = user.getEntryUID();		
 	}
 
 	public int compareTo(Object o) {
@@ -99,21 +84,5 @@ public class GmapUserDTO implements Comparable{
 
 	public void setUid(Long uid) {
 		this.uid = uid;
-	}
-
-	public NotebookEntryDTO getEntryDTO() {
-		return entryDTO;
-	}
-
-	public void setEntryDTO(NotebookEntryDTO entryDTO) {
-		this.entryDTO = entryDTO;
-	}
-
-	public Long getEntryUID() {
-		return entryUID;
-	}
-
-	public void setEntryUID(Long entryUID) {
-		this.entryUID = entryUID;
 	}
 }

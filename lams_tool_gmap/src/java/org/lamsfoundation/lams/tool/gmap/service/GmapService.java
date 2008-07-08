@@ -59,7 +59,6 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -234,27 +233,6 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 		Gmap toContent = Gmap.newInstance(fromContent, toContentId,
 				gmapToolContentHandler);
 		gmapDAO.saveOrUpdate(toContent);
-		
-		
-		//save markers in this gmap, only save the author created markers
-		// ###### Commenting this out, it is unneccessary unless teacher editing of authored markers is
-		// allowed at lesson runtime
-		/*
-		Set<GmapMarker> markers = toContent.getGmapMarkers();
-		if(markers != null){
-			Iterator iter = markers.iterator();
-			while(iter.hasNext()){
-				GmapMarker marker = (GmapMarker) iter.next();
-				//set this message forum Uid as toContent
-				if(!marker.isAuthored())
-					continue;
-				
-				marker.setUpdated(new Date());
-				marker.setGmap(toContent);
-				saveOrUpdateGmapMarker(marker);
-			}
-		}
-		*/
 	}
 
 	public void setAsDefineLater(Long toolContentId, boolean value)
@@ -394,18 +372,6 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 
 	/* ********** IGmapService Methods ********************************* */
 
-	public Long createNotebookEntry(Long id, Integer idType, String signature,
-			Integer userID, String entry) {
-		return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-	}
-
-	public NotebookEntry getEntry(Long uid) {
-		return coreNotebookService.getEntry(uid);
-	}
-
-	public void updateEntry(Long uid, String entry) {
-		coreNotebookService.updateEntry(uid, "", entry);
-	}
 	
 	public Long getDefaultContentIdBySignature(String toolSignature) {
 		Long toolContentId = null;

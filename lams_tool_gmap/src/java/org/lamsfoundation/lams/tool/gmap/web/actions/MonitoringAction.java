@@ -27,25 +27,13 @@ package org.lamsfoundation.lams.tool.gmap.web.actions;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.List;
-import java.util.HashSet;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapDTO;
-import org.lamsfoundation.lams.tool.gmap.dto.GmapUserDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapSessionDTO;
-import org.lamsfoundation.lams.tool.gmap.dto.GmapMarkerDTO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
-import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
-import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
 import org.lamsfoundation.lams.tool.gmap.service.GmapServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -92,39 +80,12 @@ public class MonitoringAction extends LamsDispatchAction {
 		for (GmapSessionDTO sessionDTO : gmapDT0.getSessionDTOs())
 		{
 			Long toolSessionID = sessionDTO.getSessionID();
-			List<GmapMarker> markers = gmapService.getGmapMarkersBySessionId(toolSessionID);
-			sessionDTO.setMarkerDTOs(markers);
-			/*
-			Set<GmapMarkerDTO> markerDTOs = new HashSet<GmapMarkerDTO>();
-			for (GmapMarker marker : markers) {
-				GmapMarkerDTO markerDTO = new GmapMarkerDTO(marker);
-				markerDTOs.add(markerDTO);
-			}
-			*/
-			//sessionMarkersMap.put(toolSessionID, markerDTOs);
+			sessionDTO.setMarkerDTOs(gmapService.getGmapMarkersBySessionId(toolSessionID));
 		}
-		//request.setAttribute("sessionMarkers", sessionMarkersMap);
 		
 		request.setAttribute("gmapDTO", gmapDT0);
 		request.setAttribute("contentFolderID", contentFolderID);
 		return mapping.findForward("success");
-	}
-
-	public ActionForward showGmap(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		
-		setupService();
-		
-		Long uid = new Long(WebUtil.readLongParam(request, "userUID"));
-
-		GmapUser user = gmapService.getUserByUID(uid);
-		NotebookEntry entry = gmapService.getEntry(user.getEntryUID());
-
-		GmapUserDTO userDTO = new GmapUserDTO(user, entry);
-
-		request.setAttribute("userDTO", userDTO);
-
-		return mapping.findForward("gmap_display");
 	}
 	
 	/**

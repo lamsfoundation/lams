@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -207,14 +206,18 @@ public class LearningAction extends LamsDispatchAction {
 			
 			// update the marker list
 			Gmap gmap = gmapSession.getGmap();
-			updateMarkerListFromXML(learningForm.getMarkersXML(), gmap, gmapUser, gmapSession);
+			gmapService.updateMarkerListFromXML(learningForm.getMarkersXML(), gmap, gmapUser, true, gmapSession);
+			
+			// Set the user finished flag
+			gmapUser.setFinishedActivity(true);
+			gmapService.saveOrUpdateGmapUser(gmapUser);
+			
 
 		} else {
 			log.error("finishActivity(): couldn't find GmapUser with id: "
 					+ gmapUser.getUserId() + "and toolSessionID: "
 					+ toolSessionID);
 		}
-
 
 		ToolSessionManager sessionMgrService = GmapServiceProxy.getGmapSessionManager(getServlet().getServletContext());
 		String nextActivityUrl;

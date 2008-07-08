@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.tool.gmap.service;
 import java.util.List;
 
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
@@ -153,33 +152,6 @@ public interface IGmapService {
 	public GmapUser createGmapUser(UserDTO user,
 			GmapSession gmapSession);
 	
-	/**
-	 * 
-	 * @param id
-	 * @param idType
-	 * @param signature
-	 * @param userID
-	 * @param title
-	 * @param entry
-	 * @return
-	 */
-	Long createNotebookEntry(Long id, Integer idType, String signature,
-			Integer userID, String entry);
-	
-	/**
-	 * 
-	 * @param uid
-	 * @return
-	 */
-	NotebookEntry getEntry(Long uid);
-	
-	/**
-	 * 
-	 * @param uid
-	 * @param title
-	 * @param entry
-	 */
-	void updateEntry(Long uid, String entry);
 	
 	/**
 	 * Updates the marker list for the gmap based upon a serialised xml version of the marker array

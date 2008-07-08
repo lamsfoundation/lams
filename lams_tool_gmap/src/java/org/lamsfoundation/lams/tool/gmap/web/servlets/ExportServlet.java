@@ -31,10 +31,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapDTO;
-import org.lamsfoundation.lams.tool.gmap.dto.NotebookEntryDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapSessionDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapUserDTO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;

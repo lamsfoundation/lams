@@ -57,7 +57,6 @@ public class GmapUser implements java.io.Serializable {
 	
 	private boolean finishedActivity;
 	
-	private Long entryUID;
 
 	// Constructors
 
@@ -164,17 +163,6 @@ public class GmapUser implements java.io.Serializable {
 
 	public void setGmapSession(GmapSession gmapSession) {
 		this.gmapSession = gmapSession;
-	}
-
-	/**
-	 * @hibernate.property column="entry_uid"
-	 */
-	public Long getEntryUID() {
-		return entryUID;
-	}
-
-	public void setEntryUID(Long entryUID) {
-		this.entryUID = entryUID;
 	}
 	
 	/**
