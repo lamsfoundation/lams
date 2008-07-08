@@ -21,15 +21,17 @@
  * ************************************************************************
  */
 
-import org.lamsfoundation.lams.common.*  
-import org.lamsfoundation.lams.common.util.*        //Utils
-import org.lamsfoundation.lams.common.dict.*        //Dictionary
-import org.lamsfoundation.lams.common.ui.*          //User interface
-import org.lamsfoundation.lams.common.style.*       //Themes/Styles
-import org.lamsfoundation.lams.common.comms.*       //communications
-import org.lamsfoundation.lams.authoring.*
-import org.lamsfoundation.lams.authoring.cv.Canvas;
+import org.lamsfoundation.lams.common.*;
+import org.lamsfoundation.lams.common.comms.*;       //communications
+import org.lamsfoundation.lams.common.dict.*;        //Dictionary
+import org.lamsfoundation.lams.common.style.*;       //Themes/Styles
+import org.lamsfoundation.lams.common.util.Debugger;
+import org.lamsfoundation.lams.common.util.Proxy;
 import org.lamsfoundation.lams.common.ws.*;
+
+import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.authoring.cv.Canvas;
+
 import org.lamsfoundation.lams.learner.*
 
 class ApplicationParent {
