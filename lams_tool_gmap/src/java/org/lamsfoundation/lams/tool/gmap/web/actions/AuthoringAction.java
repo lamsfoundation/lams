@@ -428,7 +428,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		gmap.setTitle(authForm.getTitle());
 		gmap.setInstructions(authForm.getInstructions());
 		
-		updateMarkerListFromXML(authForm.getMarkersXML(), gmap, guser);
+		//updateMarkerListFromXML(authForm.getMarkersXML(), gmap, guser);
+		gmapService.updateMarkerListFromXML(authForm.getMarkersXML(), gmap, guser, true, null);
 		
 		if (mode.isAuthor()) { // Teacher cannot modify following
 			gmap.setCreateBy(guser.getUid());
@@ -447,65 +448,6 @@ public class AuthoringAction extends LamsDispatchAction {
 			gmap.setMapZoom(authForm.getMapZoom());
 			gmap.setMapCenterLatitude(authForm.getMapCenterLatitude());
 			gmap.setMapCenterLongitude(authForm.getMapCenterLongitude());
-		}
-	}
-	
-	private void updateMarkerListFromXML(String markerXML, Gmap gmap, GmapUser guser)
-	{
-		//Set<GmapMarker> newMarkers = new HashSet<GmapMarker>();
-		Set<GmapMarker> existingMarkers = gmap.getGmapMarkers();
-		try 
-		{
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document document = db.parse(new InputSource(new StringReader(markerXML)));
-			NodeList list = document.getElementsByTagName("marker");
-			
-			for (int i =0; i<list.getLength(); i++)
-			{
-				NamedNodeMap markerNode = ((Node)list.item(i)).getAttributes();
-				
-				Long uid  = Long.parseLong(markerNode.getNamedItem("markerUID").getNodeValue());
-				String markerTitle = markerNode.getNamedItem("title").getNodeValue();
-				String infoMessage = markerNode.getNamedItem("infoMessage").getNodeValue();
-				Double latitude = Double.parseDouble(markerNode.getNamedItem("latitude").getNodeValue());
-				Double longitude = Double.parseDouble(markerNode.getNamedItem("longitude").getNodeValue());
-
-				String markerState = markerNode.getNamedItem("state").getNodeValue();
-				
-				if (markerState.equals("remove"))
-				{
-					gmap.removeMarker(uid);
-					continue;
-				}
-
-				GmapMarker marker = null;
-				if (markerState.equals("save"))
-				{
-					marker = new GmapMarker();
-					marker.setCreatedBy(guser);
-					marker.setCreated(new Date());
-				}
-				else if (markerState.equals("update"))
-				{
-					marker = gmap.getMarkerByUid(uid);
-				}
-				
-				marker.setTitle(markerTitle);
-				marker.setInfoWindowMessage(infoMessage);
-				marker.setLatitude(latitude);
-				marker.setLongitude(longitude);
-				marker.setGmap(gmap);
-				marker.setUpdated(new Date());
-				marker.setUpdatedBy(guser);
-				marker.setAuthored(true);
-				gmapService.saveOrUpdateGmapMarker(marker);
-			}
-		}
-		catch (Exception e)
-		{
-			// TODO: improve error handling
-			log.error("Could not get marker xml object to update", e);
 		}
 	}
 

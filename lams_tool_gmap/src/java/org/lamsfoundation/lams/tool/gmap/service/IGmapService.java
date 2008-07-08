@@ -180,4 +180,14 @@ public interface IGmapService {
 	 * @param entry
 	 */
 	void updateEntry(Long uid, String entry);
+	
+	/**
+	 * Updates the marker list for the gmap based upon a serialised xml version of the marker array
+	 * 
+	 * @param markerXML
+	 * @param gmap
+	 * @param guser
+	 * @param session
+	 */
+	void updateMarkerListFromXML(String markerXML, Gmap gmap, GmapUser guser, boolean isAuthored, GmapSession session);
 }

@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.gmap.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -36,6 +37,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpSession;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -86,6 +89,11 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
  * An implementation of the IGmapService interface.
@@ -614,7 +622,6 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
     {
     	Date now = new Date();
-    	
     	Gmap gmap = new Gmap();
     	gmap.setContentInUse(Boolean.FALSE);
     	gmap.setCreateBy(new Long(user.getUserID().longValue()));
@@ -628,10 +635,6 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
     	gmap.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
     	gmap.setToolContentId(toolContentId);
     	gmap.setUpdateDate(now);
-    	//gmap.setAllowRichEditor(Boolean.FALSE);
-    	// leave as empty, no need to set them to anything.
-    	//setGmapAttachments(Set gmapAttachments);
-    	//setGmapSessions(Set gmapSessions);
     	gmapDAO.saveOrUpdate(gmap);
     }
 
@@ -733,5 +736,65 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 
 	public void setGmapMarkerDAO(IGmapMarkerDAO gmapMarkerDAO) {
 		this.gmapMarkerDAO = gmapMarkerDAO;
+	}
+	
+	public void updateMarkerListFromXML(String markerXML, Gmap gmap, GmapUser guser, boolean isAuthored, GmapSession session)
+	{
+		try 
+		{
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document document = db.parse(new InputSource(new StringReader(markerXML)));
+			NodeList list = document.getElementsByTagName("marker");
+			
+			for (int i =0; i<list.getLength(); i++)
+			{
+				NamedNodeMap markerNode = ((Node)list.item(i)).getAttributes();
+				
+				Long uid  = Long.parseLong(markerNode.getNamedItem("markerUID").getNodeValue());
+				String markerTitle = markerNode.getNamedItem("title").getNodeValue();
+				String infoMessage = markerNode.getNamedItem("infoMessage").getNodeValue();
+				Double latitude = Double.parseDouble(markerNode.getNamedItem("latitude").getNodeValue());
+				Double longitude = Double.parseDouble(markerNode.getNamedItem("longitude").getNodeValue());
+
+				String markerState = markerNode.getNamedItem("state").getNodeValue();
+				
+				if (markerState.equals("remove"))
+				{
+					gmap.removeMarker(uid);
+					continue;
+				}
+
+				GmapMarker marker = null;
+				if (markerState.equals("save"))
+				{
+					marker = new GmapMarker();
+					marker.setCreatedBy(guser);
+					marker.setCreated(new Date());
+				}
+				else if (markerState.equals("update"))
+				{
+					marker = gmap.getMarkerByUid(uid);
+				}
+				
+				marker.setGmapSession(session);
+				marker.setTitle(markerTitle);
+				marker.setInfoWindowMessage(infoMessage);
+				marker.setLatitude(latitude);
+				marker.setLongitude(longitude);
+				marker.setGmap(gmap);
+				marker.setUpdated(new Date());
+				marker.setUpdatedBy(guser);
+				marker.setAuthored(isAuthored);
+				saveOrUpdateGmapMarker(marker);
+
+			}
+		}
+		catch (Exception e)
+		{
+			// TODO: improve error handling
+			logger.error("Could not get marker xml object to update", e);
+			throw new GmapException("Could not get marker xml object to update", e);
+		}
 	}
 }
