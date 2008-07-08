@@ -51,10 +51,21 @@
 				map.setCenter(new GLatLng('${gmapDTO.mapCenterLatitude}', '${gmapDTO.mapCenterLongitude}' ));
 				map.setZoom(${gmapDTO.mapZoom});
 				
+								
 				// Set up map controls
 				map.addControl(new GMapTypeControl());
-				map.addControl(new GLargeMapControl());
-				map.addMapType(G_PHYSICAL_MAP);
+				if (${mode == "teacher"}) 
+				{
+					map.addControl(new GLargeMapControl());
+					map.addMapType(G_PHYSICAL_MAP);
+				}
+				else
+				{
+					<c:if test="${gmapDTO.allowZoom == true}">map.addControl(new GLargeMapControl());</c:if>
+					<c:if test="${gmapDTO.allowTerrain == true}">map.addMapType(G_PHYSICAL_MAP);</c:if>
+					<c:if test="${gmapDTO.allowSatellite == false}">map.removeMapType(G_SATELLITE_MAP);</c:if>
+					<c:if test="${gmapDTO.allowHybrid == false}">map.removeMapType(G_HYBRID_MAP);</c:if>
+				}
 				
 				// Set map type
 				map.setMapType(${gmapDTO.mapType});
@@ -123,7 +134,8 @@
 				</div>
 			</c:when>
 			<c:otherwise>
-			
+				<br>
+				<h2>${sessionDTO.sessionName}</h2>
 			</c:otherwise>
 			</c:choose>
 			
@@ -205,14 +217,14 @@
 				addUserToList('${user.uid}','${user.firstName} ${user.lastName}' );
 			</c:forEach>
 			
-			<c:forEach var="marker" items="${gmapDTO.gmapMarkers}">			
+			<c:forEach var="marker" items="${gmapDTO.gmapMarkers}">							
 				<c:choose>
 					<c:when test="${marker.isAuthored == true}">
 						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
 					</c:when>
 					<c:otherwise>
 						<c:choose>
-							<c:when test="${gmapDTO.allowShowAllMarkers != true || marker.createdBy.loginName == gmapUserDTO.loginName}">
+							<c:when test="${gmapDTO.allowShowAllMarkers == true || marker.createdBy.loginName == gmapUserDTO.loginName}">
 								addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
 							</c:when>
 						</c:choose>

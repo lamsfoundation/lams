@@ -135,7 +135,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		GmapUser gmapUser = gmapService.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()),toolSessionID);
 		GmapUserDTO gmapUserDTO = new GmapUserDTO(gmapUser);
-		request.getSession().setAttribute("userDTO", gmapUserDTO);
+		request.getSession().setAttribute("gmapUserDTO", gmapUserDTO);
 		
 
 		// construct dto's
