@@ -44,18 +44,15 @@ Description: Enter the username for your admin user:
 
 Template: lams2/sysadmin_pass
 Type: password
-Default: sysadmin
 Description: Enter the password for your admin user:
- The password for your admin user.  Must not be blank.
+ The password for your admin user.
 
 Template: lams2/sysadmin_pass_confirm
 Type: password
-Default: sysadmin
 Description: Confirm the password for your admin user:
- The password for your admin user.  Must not be blank.
+ The password for your admin user.
 
 Template: lams2/sysadmin_pass_again
 Type: password
-Default: sysadmin
 Description: Re-enter the password for your admin user:
  The passwords don't match.

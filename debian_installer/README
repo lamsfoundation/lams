@@ -48,7 +48,7 @@ Instructions - lams2
 8.	cp -pr /path/to/jboss-4.0.2/server/default/deploy/lams.ear/ .
 9.	cp -pr /path/to/lams_build/conf/unix/jboss/ .
 10. mysqldump lams > lams.sql -u root -p
-11.	copy index.html and lams2.cnf from this cvs project into the current directory
+11.	copy index.jsp and lams2.cnf from this cvs project into the current directory
 12.	dh_make --createorig
 13.	rm -rf debian
 14.	copy the debian folder from this cvs project into the current directory

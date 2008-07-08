@@ -76,7 +76,7 @@ case "$1" in
 
                 # Add Tasklist tool, new in 2.1
                 cd /usr/share/lams2/lams_tool_task/
-                sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2/" deploy.xml
+                sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
                 sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
                 sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
                 ./deploy.sh > /dev/null || true
@@ -177,9 +177,11 @@ case "$1" in
                     mv lams-www.war /var/lib/lams/
                 fi
                 # If lams-www.war already exists, copy to /var and remove it before linking it
-                if [ -d /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/lams-www.war ] ; then
-                    cp -pr lams-www.war /var/lib/lams/
-                    rm -rf lams-www.war
+                if [ ! -L /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/lams-www.war ] ; then
+                    if [ -d /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/lams-www.war ] ; then
+                        cp -pr lams-www.war /var/lib/lams/
+                        rm -rf lams-www.war
+                    fi
                 fi
                 ln -s /var/lib/lams/lams-www.war 2>/dev/null || true
 
@@ -215,15 +217,36 @@ case "$1" in
             resources_forum_id=`mysql $db_name -e'select learning_library_id from lams_learning_library where title="Resources and Forum"' \
                 -u root | tail -1`
         fi
+
         cd /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/
-        mv forumscribe llid$forum_scribe_id;
-        mv chatscribe llid$chat_scribe_id;
-        mv resourcesforum llid$resources_forum_id;
+        set +e  # don't want to fail if grep finds nothing 
+        for dir in `ls` 
+        do
+            grep resources_and_forum $dir/ApplicationResources.properties > /dev/null 2>&1
+            if [ $? = 0 ] ; then
+                if [ $dir != "llid$resources_forum_id" ]; then mv $dir llid$resources_forum_id; fi
+                continue
+            fi
+            grep chatscribe $dir/ApplicationResources.properties > /dev/null 2>&1
+            if [ $? = 0 ] ; then
+                if [ $dir != "llid$chat_scribe_id" ]; then mv $dir llid$chat_scribe_id; fi
+                continue
+            fi
+            grep forumscribe $dir/ApplicationResources.properties > /dev/null 2>&1
+            if [ $? = 0 ] ; then
+                if [ $dir != "llid$forum_scribe_id" ]; then mv $dir llid$forum_scribe_id; fi
+                continue
+            fi
+        done
+        set -e
 
         # Remove temp files
         rm -f /usr/share/lams2/2.1rc1to2.1.sql
         rm -f /usr/share/lams2/lams.sql
         rm -rf /usr/share/lams2/lams_tool_task_list
+
+        # Delete default ROOT.war/index.html (replaced with redirecting index.jsp)
+        rm -f /usr/share/jboss-4.0.2/server/default/deploy/jbossweb-tomcat55.sar/ROOT.war/index.html
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
