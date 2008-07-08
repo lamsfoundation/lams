@@ -261,6 +261,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 								var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('act_lock_chk') : Dictionary.getValue('act_seq_lock_chk');
 								LFMessage.showMessageAlert(msg);
 							} else {
+								var branches:Object = _canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID);
+								
 								if(ca.activity.isGateActivity() && !optionalOnCanvas[i].activity.isSequenceBased){
 									activitySnapBack(ca);
 									var msg:String = Dictionary.getValue('cv_gateoptional_hit_chk');
@@ -269,7 +271,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 									activitySnapBack(ca);
 									var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity', [ca.activity.title]);
 									LFMessage.showMessageAlert(msg);
-								} else if(_canvasModel.getCanvas().ddm.getBranchesForActivityUIID(ca.activity.activityUIID).hasBranches) {
+								} else if(branches.hasBranches && branches.target != null) {
 									activitySnapBack(ca);
 									var msg:String = (!optionalOnCanvas[i].activity.isSequenceBased) ? Dictionary.getValue('cv_invalid_optional_activity_no_branches', [ca.activity.title]) : Dictionary.getValue('cv_invalid_optional_seq_activity_no_branches', [ca.activity.title]);
 									LFMessage.showMessageAlert(msg);
