@@ -71,7 +71,7 @@ public class GmapSession implements java.io.Serializable {
 	/** full constructor */
 	public GmapSession(Date sessionEndDate, Date sessionStartDate,
 			Integer status, Long sessionId, String sessionName, Gmap gmap,
-			Set gmapUsers) {
+			Set<GmapUser> gmapUsers) {
 		this.sessionEndDate = sessionEndDate;
 		this.sessionStartDate = sessionStartDate;
 		this.status = status;
@@ -185,7 +185,7 @@ public class GmapSession implements java.io.Serializable {
 		return this.gmapUsers;
 	}
 
-	public void setGmapUsers(Set gmapUsers) {
+	public void setGmapUsers(Set<GmapUser> gmapUsers) {
 		this.gmapUsers = gmapUsers;
 	}
 
@@ -239,7 +239,7 @@ public class GmapSession implements java.io.Serializable {
   		GmapSession session = null;
   		try{
   			session = (GmapSession) super.clone();
-  			session.gmapUsers = new HashSet();
+  			session.gmapUsers = new HashSet<GmapUser>();
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + GmapSession.class + " failed");
 		}

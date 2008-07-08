@@ -39,7 +39,6 @@ import javax.servlet.http.HttpSession;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -144,19 +143,6 @@ public class AuthoringAction extends LamsDispatchAction {
 			gmap.setDefineLater(true);
 			gmapService.saveOrUpdateGmap(gmap);
 		}
-
-		//GmapUser gmapUser = null;
-		//HttpSession ss = SessionManager.getSession();
-		//get back login user DTO
-		//UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		/*
-		gmapUser = gmapService.getUserByUID(new Long(user.getUserID().intValue()));
-		if(gmapUser == null){
-			gmapUser = new GmapUser(user,null);
-			gmapService.saveOrUpdateGmapUser(gmapUser);
-		}
-		*/
-		//request.setAttribute(GmapConstants.ATTR_USER, user);
 		
 		// Set up the authForm.
 		AuthoringForm authForm = (AuthoringForm) form;
@@ -195,8 +181,6 @@ public class AuthoringAction extends LamsDispatchAction {
 		GmapUser gmapUser = null;
 		//check whether it is sysadmin:LDEV-906 
 		//if(!StringUtils.equals(contentFolderID,"-1" )){
-
-			
 			if (gmap.getCreateBy() == null)
 			{
 				HttpSession ss = SessionManager.getSession();
@@ -502,7 +486,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		map.put(KEY_UNSAVED_OFFLINE_FILES,new LinkedList<GmapAttachment>());
 		map.put(KEY_DELETED_FILES, new LinkedList<GmapAttachment>());
 
-		Iterator iter = gmap.getGmapAttachments().iterator();
+		Iterator<GmapAttachment> iter = gmap.getGmapAttachments().iterator();
 		while (iter.hasNext()) {
 			GmapAttachment attachment = (GmapAttachment) iter.next();
 			String type = attachment.getFileType();

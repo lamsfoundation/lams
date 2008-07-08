@@ -40,18 +40,18 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	
 	private static final Logger log = Logger.getLogger(GmapMarker.class);
 
-	private Long uid;		
-	private Double longitude;
-	private Double latitude;
-	private String infoWindowMessage;
-	private String title;
-	private Date created;
-	private Date updated;
-	private boolean isAuthored;
-	private Gmap gmap;
-	private GmapUser createdBy;
-	private GmapUser updatedBy;
-	private GmapSession gmapSession;
+	private Long uid;					// id	
+	private Double longitude;			// longitude of marker
+	private Double latitude;			// latitude of marker
+	private String infoWindowMessage;	// message box that appears when you click the marker
+	private String title;				// marker title
+	private Date created;				// date of creation
+	private Date updated;				// date of last update
+	private boolean isAuthored;			// flag for whether maker was made in author/learner
+	private Gmap gmap;					// gmap to which marker belongs
+	private GmapUser createdBy;			// user who created the marker
+	private GmapUser updatedBy;			// last user to update the marker
+	private GmapSession gmapSession;	// tool session to which marker belongs, null if there is in author
 	
 
 	/**
@@ -259,8 +259,4 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	public void setGmapSession(GmapSession gmapSession) {
 		this.gmapSession = gmapSession;
 	}
-
-	
-
-
 }

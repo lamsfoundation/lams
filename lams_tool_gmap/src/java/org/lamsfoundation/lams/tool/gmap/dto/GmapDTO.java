@@ -38,6 +38,11 @@ import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 
+/**
+ * DTO for gmap, contains all the same variables as gmap persistance object + session
+ * @author lfoxton
+ *
+ */
 public class GmapDTO {
 
 	private static Logger logger = Logger.getLogger(GmapDTO.class);

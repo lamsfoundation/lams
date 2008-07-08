@@ -25,20 +25,14 @@
 package org.lamsfoundation.lams.tool.gmap.web.actions;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.util.Date;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -47,7 +41,6 @@ import org.lamsfoundation.lams.tool.gmap.dto.GmapDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapUserDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapSessionDTO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
-import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
@@ -60,11 +53,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 /**
  * @author

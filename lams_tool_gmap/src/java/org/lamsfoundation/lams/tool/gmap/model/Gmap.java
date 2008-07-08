@@ -39,71 +39,92 @@ import org.lamsfoundation.lams.tool.gmap.service.GmapService;
 
 public class Gmap implements java.io.Serializable, Cloneable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 938457189932877382L;
 
 	static Logger log = Logger.getLogger(GmapService.class.getName());
 
-	// Fields
-	/**
-	 * 
-	 */
+	// id
 	private Long uid;
 
+	// create date
 	private Date createDate;
 
+	// update date
 	private Date updateDate;
 
+	// user who created gmap
 	private Long createBy;
 
+	// gmap title
 	private String title;
 
+	// activity instructions
 	private String instructions;
 
+	// run offline flag
 	private boolean runOffline;
 
+	// lock when user finishes activity
 	private boolean lockOnFinished;
 	
+	// allow users to edit markersr after saving
 	private boolean allowEditMarkers;
 	
+	// show other user's makres
 	private boolean allowShowAllMarkers;
 	
+	// limit the ammount of markers
 	private boolean limitMarkers;
 	
+	// the maximum number or markers
 	private int maxMarkers;
 	
+	// allow zooming option
 	private boolean allowZoom;
 	
+	// allow terrain map type
 	private boolean allowTerrain;
 	
+	// allow satellite map type
 	private boolean allowSatellite;
 	
+	// allow hybrid satellite/normal map type
 	private boolean allowHybrid;
 	
+	// latitude of centre of map
 	private Double mapCenterLatitude;
 	
+	// longitude of centre of map
 	private Double mapCenterLongitude;
 	
+	// zoom level of the map
 	private int mapZoom;
 	
+	// map type 
 	private String mapType;
 
+	// online instructions
 	private String onlineInstructions;
 
+	// offline instructions 
 	private String offlineInstructions;
 
+	// flag for content in use
 	private boolean contentInUse;
 
+	// flag for define later
 	private boolean defineLater;
 
+	// tool content id
 	private Long toolContentId;
 
-	private Set gmapAttachments;
+	// list of attached files for the gmap
+	private Set<GmapAttachment> gmapAttachments;
 
-	private Set gmapSessions;
+	// list of sessions for this gmap
+	private Set<GmapSession> gmapSessions;
 	
+	// list of markers for this gmap
 	private Set<GmapMarker> gmapMarkers;
 
 	//*********** NON Persist fields
@@ -123,7 +144,7 @@ public class Gmap implements java.io.Serializable, Cloneable {
 			boolean filteringEnabled, String filterKeywords,
 			String onlineInstructions, String offlineInstructions,
 			boolean contentInUse, boolean defineLater, Long toolContentId,
-			Set gmapAttachments, Set gmapSessions, Set<GmapMarker> markers) {
+			Set<GmapAttachment> gmapAttachments, Set<GmapSession> gmapSessions, Set<GmapMarker> markers) {
 		this.createDate = createDate;
 		this.updateDate = updateDate;
 		this.createBy = createBy;
@@ -325,11 +346,11 @@ public class Gmap implements java.io.Serializable, Cloneable {
 	 * 
 	 */
 
-	public Set getGmapAttachments() {
+	public Set<GmapAttachment> getGmapAttachments() {
 		return this.gmapAttachments;
 	}
 
-	public void setGmapAttachments(Set gmapAttachments) {
+	public void setGmapAttachments(Set<GmapAttachment> gmapAttachments) {
 		this.gmapAttachments = gmapAttachments;
 	}
 
@@ -340,11 +361,11 @@ public class Gmap implements java.io.Serializable, Cloneable {
 	 * 
 	 */
 
-	public Set getGmapSessions() {
+	public Set<GmapSession> getGmapSessions() {
 		return this.gmapSessions;
 	}
 
-	public void setGmapSessions(Set gmapSessions) {
+	public void setGmapSessions(Set<GmapSession> gmapSessions) {
 		this.gmapSessions = gmapSessions;
 	}
 
@@ -412,7 +433,7 @@ public class Gmap implements java.io.Serializable, Cloneable {
 			
 			if (gmapAttachments != null) {
 				// create a copy of the attachments
-				Iterator iter = gmapAttachments.iterator();
+				Iterator<GmapAttachment> iter = gmapAttachments.iterator();
 				while (iter.hasNext()) {
 					GmapAttachment originalFile = (GmapAttachment) iter.next();
 					GmapAttachment newFile = (GmapAttachment) originalFile.clone();
@@ -423,7 +444,7 @@ public class Gmap implements java.io.Serializable, Cloneable {
 			
 			if (gmapMarkers != null) {
 				// create a copy of the attachments
-				Iterator iter = gmapMarkers.iterator();
+				Iterator<GmapMarker> iter = gmapMarkers.iterator();
 				while (iter.hasNext()) {
 					GmapMarker originalMarker = (GmapMarker) iter.next();
 					GmapMarker newMarker = (GmapMarker) originalMarker.clone();
@@ -473,7 +494,7 @@ public class Gmap implements java.io.Serializable, Cloneable {
 	
 	public GmapMarker getMarkerByUid(Long uid)
 	{
-		Iterator it = gmapMarkers.iterator();
+		Iterator<GmapMarker> it = gmapMarkers.iterator();
 		GmapMarker ret = null;
 		while (it.hasNext())
 		{
@@ -489,8 +510,7 @@ public class Gmap implements java.io.Serializable, Cloneable {
 	
 	public void removeMarker(Long uid)
 	{
-		Iterator it = gmapMarkers.iterator();
-		GmapMarker ret = null;
+		Iterator<GmapMarker> it = gmapMarkers.iterator();
 		while (it.hasNext())
 		{
 			GmapMarker marker = (GmapMarker)it.next();

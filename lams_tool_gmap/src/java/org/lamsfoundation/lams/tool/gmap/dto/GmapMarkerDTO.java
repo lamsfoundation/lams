@@ -28,7 +28,8 @@ import java.util.Date;
 import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 
 /**
- * 
+ * DTO for GmapMarker containts all the same variables as GMapMarker 
+ * but with session added
  * @author lfoxton
  *
  */

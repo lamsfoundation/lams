@@ -40,18 +40,10 @@ import org.apache.log4j.Logger;
 
 public class GmapAttachment implements java.io.Serializable, Cloneable {
 
-
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 47452859888067500L;
 	
 	private static final Logger log = Logger.getLogger(GmapAttachment.class);
 
-	/**
-	 * 
-	 */
 	private Long uid;
 
 	private Long fileVersionId;

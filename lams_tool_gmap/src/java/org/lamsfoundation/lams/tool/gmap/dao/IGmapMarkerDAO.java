@@ -29,9 +29,20 @@ import java.util.List;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 
+/**
+ * DAO for accessing markers
+ * 
+ * @author lfoxton
+ *
+ */
 public interface IGmapMarkerDAO extends IBaseDAO
 {
 	void saveOrUpdate(GmapMarker toContent);
 	
+	/**
+	 * Gets the markers based on the session they belong to
+	 * @param toolSessionId
+	 * @return
+	 */
 	List<GmapMarker> getByToolSessionId(Long toolSessionId);
 }

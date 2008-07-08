@@ -47,6 +47,11 @@ public class GmapSessionDTO implements Comparable {
 	
 	int numberOfFinishedLearners;
 	
+	/**
+	 * This set has been added here to simplify the ambiguity with gmap to marker set mappings
+	 * There is one set of markers for each gmap session, whereas there are several for each gmap
+	 * So much simpler to make the set a property of the gmap session object rather than the gmap object
+	 */
 	Set<GmapMarkerDTO> markerDTOs = new HashSet<GmapMarkerDTO>();
 	
 	public GmapSessionDTO(GmapSession session) {
