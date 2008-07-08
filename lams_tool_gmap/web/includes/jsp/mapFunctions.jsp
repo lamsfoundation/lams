@@ -6,10 +6,22 @@
 	<lams:WebAppURL />
 </c:set>
 
+<c:set var="gmapKey">
+	<%= Configuration.get(ConfigurationKeys.GMAP_KEY) %>
+</c:set>
 
-
-<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=<%= Configuration.get(ConfigurationKeys.GMAP_KEY) %>" type="text/javascript"></script>
-
+<c:choose>
+	<c:when test="${gmapKey != ''}">
+		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=<%= Configuration.get(ConfigurationKeys.GMAP_KEY) %>" type="text/javascript"></script>
+	</c:when>
+	<c:otherwise>
+		<script type="text/javascript">	
+		<!--
+			alert("<fmt:message key='error.gmapKeyMissing'/>");
+		-->
+		</script>
+	</c:otherwise>
+</c:choose>
 
 <script type="text/javascript">
 <!--
@@ -17,7 +29,6 @@
 var selectedUser = -1;
 var selectedMarker = -1;
 var currentOpenMarkerImportance= 0;
-
 
 // add a marker at the given point
 function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy, createdById)
@@ -370,14 +381,5 @@ function serialiseMarkers()
 	return true;
 }
 
-
-
-
-
-function test()
-{
-	serialiseMarkers();
-	alert(document.getElementById("markersXML").value);
-}
 //-->
 </script>
