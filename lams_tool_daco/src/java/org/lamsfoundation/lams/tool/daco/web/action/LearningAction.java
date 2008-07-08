@@ -25,14 +25,13 @@
 package org.lamsfoundation.lams.tool.daco.web.action;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -70,6 +69,7 @@ import org.lamsfoundation.lams.tool.daco.web.form.RecordForm;
 import org.lamsfoundation.lams.tool.daco.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -331,20 +331,29 @@ public class LearningAction extends Action {
 			}
 
 			switch (question.getType()) {
+				case DacoConstants.QUESTION_TYPE_NUMBER: {
+					String formAnswer = recordForm.getAnswer(formAnswerNumber);
+					if (!StringUtils.isBlank(formAnswer) && question.getDigitsDecimal() != null) {
+						formAnswer = NumberUtil.formatLocalisedNumber(Double.parseDouble(formAnswer), (Locale) null, question
+								.getDigitsDecimal());
+					}
+					answer.setAnswer(formAnswer);
+					formAnswerNumber++;
+				}
+					break;
 				case DacoConstants.QUESTION_TYPE_DATE: {
 					String[] dateParts = new String[] { recordForm.getAnswer(formAnswerNumber++),
 							recordForm.getAnswer(formAnswerNumber++), recordForm.getAnswer(formAnswerNumber) };
 					if (!(StringUtils.isBlank(dateParts[0]) || StringUtils.isBlank(dateParts[1]) || StringUtils
 							.isBlank(dateParts[2]))) {
-						DateFormat dateFormat = new SimpleDateFormat(DacoConstants.DATE_FORMAT);
 						Calendar calendar = Calendar.getInstance();
-						calendar.set(Integer.parseInt(dateParts[2]), Integer.parseInt(dateParts[1]), Integer
+						calendar.clear();
+						calendar.set(Integer.parseInt(dateParts[2]), Integer.parseInt(dateParts[1]) - 1, Integer
 								.parseInt(dateParts[0]));
-						answer.setAnswer(dateFormat.format(calendar.getTime()));
+						answer.setAnswer(calendar.getTime().toString());
 					}
 					else {
 						answer.setAnswer(null);
-
 					}
 				}
 					formAnswerNumber++;

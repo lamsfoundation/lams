@@ -63,6 +63,5 @@
 		key="label.authoring.basic.checkbox.add" /> </a>
 	<a href="#" onclick="javascript:cancelDacoQuestion()" class="button space-left"><fmt:message key="label.cancel" /> </a>
 </lams:ImgButtonWrapper>
-
 </body>
 </lams:html>

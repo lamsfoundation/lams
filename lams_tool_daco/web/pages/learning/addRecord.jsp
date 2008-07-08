@@ -76,7 +76,14 @@
 						<c:set var="answerIndex" value="${answerIndex+1}" />
 					</c:when>
 					<c:when test="${question.type==3}">
-						<div class="hint"><fmt:message key="label.learning.number.hint" /></div>
+						<div class="hint"><fmt:message key="label.learning.number.hint" />
+						<c:if test="${not empty question.digitsDecimal}">
+							<br />
+							<fmt:message key="label.learning.number.decimal">
+								<fmt:param value="${question.digitsDecimal}" />
+							</fmt:message>
+						</c:if>
+						</div>
 						<c:if test="${horizontal}">
 							</td><td style="vertical-align: middle;">
 						</c:if>
@@ -106,7 +113,8 @@
 						<c:if test="${horizontal}">
 							</td><td style="vertical-align: middle;">
 						</c:if>
-						<html:file property="file[${fileNumber}]" size="58" />
+						<html:hidden styleId="filePath-${fileNumber+1}" property="filePath[${fileNumber}]" />
+						<html:file styleId="file-${fileNumber+1}" property="file[${fileNumber}]" size="58" />
 						<c:set var="fileNumber" value="${fileNumber+1}" />
 					</c:when>
 					<c:when test="${question.type==6}">
@@ -114,7 +122,8 @@
 						<c:if test="${horizontal}">
 							</td><td style="vertical-align: middle;">
 						</c:if>
-						<html:file property="file[${fileNumber}]" size="58" />
+						<html:hidden styleId="filePath-${fileNumber+1}" property="filePath[${fileNumber}]" />
+						<html:file styleId="file-${fileNumber+1}" property="file[${fileNumber}]" size="58" />
 						<c:set var="fileNumber" value="${fileNumber+1}" />
 					</c:when>
 					<c:when test="${question.type==7}">

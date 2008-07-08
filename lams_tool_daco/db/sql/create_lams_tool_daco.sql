@@ -48,7 +48,7 @@ create table tl_ladaco10_questions (
    question_type smallint,
    min_constraint float,
 	max_constraint float,
-	digits_decimal smallint default 0,
+	digits_decimal smallint,
 	summary smallint,
    content_uid bigint,
    session_uid bigint,

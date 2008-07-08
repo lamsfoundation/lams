@@ -59,8 +59,6 @@ public class DacoConstants {
 
 	// format for the date question
 	public static final String DATE_PART_DELIMETER = "-";
-	public static final String DATE_FORMAT = "dd" + DacoConstants.DATE_PART_DELIMETER + "MM" + DacoConstants.DATE_PART_DELIMETER
-			+ "yyyy";
 	// for action forward name
 	public static final String SUCCESS = "success";
 	public static final String ERROR = "error";
@@ -141,6 +139,8 @@ public class DacoConstants {
 	public static final String ERROR_MSG_MIN_TOOHIGH_MAX = "error.question.min.toohigh.max";
 	public static final String ERROR_MSG_ANSWEROPTION_REPEAT = "error.question.answeroption.repeat";
 	public static final String ERROR_MSG_ANSWEROPTION_NOTENOUGH = "error.question.answeroption.notenough";
+	public static final String ERROR_MSG_DIGITSDECIMAL_INT = "error.question.digitsdecimal.int";
+	public static final String ERROR_MSG_DIGITSDECIMAL_NONNEGATIVE = "error.question.digitsdecimal.nonnegative";
 	public static final String ERROR_MSG_RECORDLIMIT_MIN_TOOHIGH_MAX = "error.recordlimit.min.toohigh.max";
 
 	public static final String ERROR_MSG_RECORD_BLANK = "error.record.blank";

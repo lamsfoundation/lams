@@ -93,3 +93,6 @@ form#recordForm table.alternative-color-inner-table td, table.recordList table.a
 	background: transparent;
 	vertical-align: middle;
 }
+table#recordListTable td.fixedCellWidth{
+	width: 160px;
+}

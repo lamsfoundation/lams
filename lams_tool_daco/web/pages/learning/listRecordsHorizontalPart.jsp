@@ -14,6 +14,8 @@
 	<c:set var="tool">
 		<lams:WebAppURL />
 	</c:set>
+	<c:set var="isIE" value="${param.isIE}" />
+	
 	<lams:css style="tabbed" />
 	<style type="text/css">
 		html,body {
@@ -63,21 +65,42 @@
 						</c:when>
 						<c:otherwise>
 							<c:set var="generated" value="true" />
-									<td class="fixedCellHeight" 
-										<c:if test="${questionStatus.index==fn:length(daco.dacoQuestions)-1 && fn:length(recordList)>1}">
-											id="lastHorizontalQuestion"
-										</c:if>
+									<td class="fixedCellHeight"
+											<c:choose>
+												<c:when test="${isIE}">
+													<c:if test="${questionStatus.index==fn:length(daco.dacoQuestions)-1 && fn:length(recordList)>1}">
+															id="lastHorizontalQuestion"
+													</c:if>
+												</c:when>
+												<c:otherwise>
+													<c:if test="${questionStatus.index==fn:length(daco.dacoQuestions)-1}">
+															<c:choose>
+																<c:when test="${fn:length(recordList)>1}">
+																	style="height: 69px"
+																</c:when>
+																<c:otherwise>
+																	style="height: 85px"
+																</c:otherwise>
+															</c:choose>
+														</c:if>
+												</c:otherwise>
+											</c:choose>
 									 >
-									
 									<c:choose>
-										<c:when test="${question.type==1 || question.type==4}">
+										<c:when test="${question.type==1}">
 											<input type="text" size="65" readonly="readonly" value="${answer.answer}"/>
 										</c:when>
 										<c:when test="${question.type==2}">
-											<textarea  cols="55" rows="3" readonly="readonly">${answer.answer}</textarea>
+											<textarea  cols="53" rows="3" readonly="readonly">${answer.answer}</textarea>
 										</c:when>
 										<c:when test="${question.type==3}">
 											<input type="text" size="10" readonly="readonly" value="${answer.answer}"/>
+										</c:when>
+										<c:when test="${question.type==4}">
+											<c:set var="date">
+												<lams:Date value="${fn:trim(answer.answer)}" type="date" style="medium"/>
+											</c:set>
+											<input type="text" size="20" readonly="readonly" value="${date}" />
 										</c:when>
 										<c:when test="${question.type==5 || question.type==6}">
 											<c:choose>
@@ -176,7 +199,5 @@
 			</tr>
 		</c:forEach>
 	</table>
-	<script type="text/javascript">
-	</script>
 </body>
 </lams:html>

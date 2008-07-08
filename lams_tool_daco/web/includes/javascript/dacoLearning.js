@@ -1,6 +1,6 @@
 	function init(){
 	 doSelectTab(currentTab);
-	 readCheckboxQuestionsValues();
+	 readHiddenFormValues();
     }
         
     function doSelectTab(tabId) {
@@ -19,38 +19,44 @@
 	}
 	
 	function saveOrUpdateRecord()	{
-		setCheckboxQuestionsValues();
+		setHiddenFormValues();
 		document.getElementById("recordForm").submit();
 	}
 	
-	function setCheckboxQuestionsValues(){
+	function setHiddenFormValues(){
 		var elementCount = document.getElementById("recordForm").elements.length;
-		for (var checkboxQuestionNumber=1;checkboxQuestionNumber<=elementCount;checkboxQuestionNumber++){
-			var checkboxQuestion=document.getElementById("checkbox-"+checkboxQuestionNumber);
+		for (var questionNumber=1;questionNumber<=elementCount;questionNumber++){
+			var checkboxQuestion=document.getElementById("checkbox-"+questionNumber);
+			var fileQuestion = document.getElementById("file-"+questionNumber);
 			if (checkboxQuestion!=null){
 				var checkboxQuestionValue = "";
 				var checkboxNumber = 1;
-				var checkbox = document.getElementById("checkbox-"+checkboxQuestionNumber+"-"+checkboxNumber);
+				var checkbox = document.getElementById("checkbox-"+questionNumber+"-"+checkboxNumber);
 				while (checkbox!=null){
 					if (checkbox.checked){
 						checkboxQuestionValue += checkboxNumber + "&";
 					}
 				checkboxNumber++;
-				checkbox = document.getElementById("checkbox-"+checkboxQuestionNumber+"-"+checkboxNumber);
+				checkbox = document.getElementById("checkbox-"+questionNumber+"-"+checkboxNumber);
 				}
 				checkboxQuestion.value=checkboxQuestionValue;
+			}
+			
+			if (fileQuestion!=null){
+				document.getElementById("filePath-"+questionNumber).value=document.getElementById("file-"+questionNumber).value;
 			}
 		}
 	}
 	
-	function readCheckboxQuestionsValues(){
+	function readHiddenFormValues(){
 		var elementCount = document.getElementById("recordForm").elements.length;
-		for (var checkboxQuestionNumber=1;checkboxQuestionNumber<=elementCount;checkboxQuestionNumber++){
-			var checkboxQuestion=document.getElementById("checkbox-"+checkboxQuestionNumber);
+		for (var questionNumber=1;questionNumber<=elementCount;questionNumber++){
+			var checkboxQuestion=document.getElementById("checkbox-"+questionNumber);
+			var fileQuestion = document.getElementById("file-"+questionNumber);
 			if (checkboxQuestion!=null){
 				var checkboxValues = checkboxQuestion.value.split("&");
 				var checkboxNumber = 1;
-				var checkbox = document.getElementById("checkbox-"+checkboxQuestionNumber+"-"+checkboxNumber);
+				var checkbox = document.getElementById("checkbox-"+questionNumber+"-"+checkboxNumber);
 				while (checkbox!=null){
 					for (var index = 0; index<checkboxValues.length; index++){
 						if (checkboxNumber==checkboxValues[index]){
@@ -58,8 +64,11 @@
 						}
 					}
 				checkboxNumber++;
-				checkbox = document.getElementById("checkbox-"+checkboxQuestionNumber+"-"+checkboxNumber);
+				checkbox = document.getElementById("checkbox-"+questionNumber+"-"+checkboxNumber);
 				}
+			}
+			if (fileQuestion!=null){
+				document.getElementById("file-"+questionNumber).value=document.getElementById("filePath-"+questionNumber).value;
 			}
 		}
 	}
@@ -73,7 +82,7 @@
 		    		method:'post',
 		    		parameters:param,
 		    		onComplete: function(){
-		    			readCheckboxQuestionsValues();
+		    			readHiddenFormValues();
 		    			doSelectTab(1);
 		    		},
 		    		evalScripts:true
@@ -159,6 +168,6 @@
 	function resizeHorizontalRecordListFrame(){
 		var horizontalRecordListFrame = document.getElementById('horizontalRecordListFrame');
 		if (horizontalRecordListFrame!=null){
-			horizontalRecordListFrame.style.height=((questionListLength+1)*111)+'px';		
+			horizontalRecordListFrame.style.height=((questionListLength+1)*111)+'px';
 		}
 	}

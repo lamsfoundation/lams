@@ -40,7 +40,7 @@ public class DacoQuestionForm extends ActionForm {
 	private short questionType;
 	private String min;
 	private String max;
-	private Short digitsDecimal;
+	private String digitsDecimal;
 	private Short summary;
 	private String description;
 
@@ -110,11 +110,11 @@ public class DacoQuestionForm extends ActionForm {
 		this.summary = summary;
 	}
 
-	public Short getDigitsDecimal() {
+	public String getDigitsDecimal() {
 		return digitsDecimal;
 	}
 
-	public void setDigitsDecimal(Short digitsDecimal) {
+	public void setDigitsDecimal(String digitsDecimal) {
 		this.digitsDecimal = digitsDecimal;
 	}
 }

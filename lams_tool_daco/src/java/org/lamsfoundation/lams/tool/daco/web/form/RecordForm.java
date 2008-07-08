@@ -47,6 +47,7 @@ public class RecordForm extends ActionForm {
 
 	private List<String> answer;
 	private List<FormFile> file;
+	private List<String> filePath;
 	private int displayedRecordNumber = 1;
 
 	public void setAnswer(int number, String answer) {
@@ -64,6 +65,23 @@ public class RecordForm extends ActionForm {
 			return null;
 		}
 		return answer.get(number);
+	}
+
+	public void setFilePath(int number, String filePath) {
+		if (this.filePath == null) {
+			this.filePath = new ArrayList<String>();
+		}
+		while (number >= this.filePath.size()) {
+			this.filePath.add(null);
+		}
+		this.filePath.set(number, filePath);
+	}
+
+	public String getFilePath(int number) {
+		if (filePath == null || number >= filePath.size()) {
+			return null;
+		}
+		return filePath.get(number);
 	}
 
 	public void setFile(int number, FormFile file) {
@@ -106,5 +124,9 @@ public class RecordForm extends ActionForm {
 
 	public void setDisplayedRecordNumber(int displayedRecordNumber) {
 		this.displayedRecordNumber = displayedRecordNumber;
+	}
+
+	public int getFileCount() {
+		return file.size();
 	}
 }

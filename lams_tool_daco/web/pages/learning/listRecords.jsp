@@ -11,7 +11,8 @@
 	<lams:WebAppURL />
 </c:set>
 <c:set var="horizontal" value="${sessionMap.learningView=='horizontal'}" />
-
+<c:set var="userAgent" value='<%=request.getHeader("User-Agent") %>' />
+<c:set var="isIE" value='${(not empty userAgent) && fn:indexOf(userAgent,"MSIE") != -1}' />
 <script type="text/javascript">
 	var editRecordUrl = "<html:rewrite page='/learning/editRecord.do' />";
 	var removeRecordUrl = "<html:rewrite page='/learning/removeRecord.do' />";
@@ -42,11 +43,11 @@
 						<th>Records</th>
 					</tr>
 					<tr>
-					<td class="fixedCellHeight">Record number</td>
+					<td class="fixedCellHeight" style="width: 160px">Record number</td>
 					<td rowspan="${fn:length(daco.dacoQuestions) + 2}" style="padding: 0px; height: 100%;">
-						<iframe id="horizontalRecordListFrame" onLoad="javascript:resizeHorizontalRecordListFrame();" style="width: 100%; "
-						frameborder="0" scrolling="auto" 
-						src="<html:rewrite page='/learning/diplayHorizontalRecordList.do?sessionMapID=${sessionMapID}' />"></iframe>
+						<iframe id="horizontalRecordListFrame" onLoad="javascript:resizeHorizontalRecordListFrame();" style="width: 100%;"
+						frameborder="0" scrolling="auto"
+						src="<html:rewrite page='/learning/diplayHorizontalRecordList.do?sessionMapID=${sessionMapID}&isIE=${isIE}' />"></iframe>
 					</td>
 					
 					</tr>
@@ -99,7 +100,7 @@
 											<div class="bigNumber">${questionStatus.index+1}</div>
 											${question.description}
 											<c:choose>
-												<c:when test="${question.type==1 || question.type==4}">
+												<c:when test="${question.type==1}">
 													<input type="text" size="72" readonly="readonly" value="${answer.answer}"/>
 												</c:when>
 												<c:when test="${question.type==2}">
@@ -108,13 +109,20 @@
 												<c:when test="${question.type==3}">
 													<input type="text" size="10" readonly="readonly" value="${answer.answer}"/>
 												</c:when>
+												<c:when test="${question.type==4}">
+													<c:set var="date">
+														<lams:Date value="${fn:trim(answer.answer)}" type="date" style="medium"/>
+													</c:set>
+													<input type="text" size="20" readonly="readonly" value="${date}" />
+												</c:when>
 												<c:when test="${question.type==5 || question.type==6}">
 													<c:choose>
 														<c:when test="${empty answer.fileName}">
 															<fmt:message key="label.learning.file.notuploaded" />
 														</c:when>
 														<c:otherwise>
-															<fmt:message key="label.learning.file.uploaded" /> ${answer.fileName}
+															<fmt:message key="label.learning.file.uploaded" /> 
+															<a href="<c:url value='/download/?uuid=${answer.fileUuid}&preferDownload=true'/>">${answer.fileName}</a>
 														</c:otherwise>
 													</c:choose>
 												</c:when>

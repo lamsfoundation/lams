@@ -331,6 +331,10 @@ public class AuthoringAction extends Action {
 		if (!StringUtils.isBlank(constraint)) {
 			question.setMin(Float.parseFloat(constraint));
 		}
+		constraint = questionForm.getDigitsDecimal();
+		if (!StringUtils.isBlank(constraint)) {
+			question.setDigitsDecimal(Short.parseShort(constraint));
+		}
 		question.setCreateByAuthor(true);
 		question.setHide(false);
 
@@ -350,7 +354,6 @@ public class AuthoringAction extends Action {
 
 		question.setDescription(StringUtils.isBlank(questionForm.getDescription()) ? null : questionForm.getDescription().trim());
 
-		question.setDigitsDecimal(questionForm.getDigitsDecimal());
 	}
 
 	/**
@@ -635,7 +638,6 @@ public class AuthoringAction extends Action {
 		form.setDescription(question.getDescription());
 		form.setQuestionRequired(question.isRequired());
 		form.setSummary(question.getSummary());
-		form.setDigitsDecimal(question.getDigitsDecimal());
 		if (questionIndex >= 0) {
 			form.setQuestionIndex(new Integer(questionIndex).toString());
 		}
@@ -647,6 +649,7 @@ public class AuthoringAction extends Action {
 		if (questionType == DacoConstants.QUESTION_TYPE_NUMBER) {
 			Short digitsDecimal = question.getDigitsDecimal();
 			if (digitsDecimal != null) {
+				form.setDigitsDecimal(digitsDecimal.toString());
 				if (digitsDecimal == 0) {
 					form.setMin(min == null ? null : String.valueOf(Math.round(min)));
 					form.setMax(max == null ? null : String.valueOf(Math.round(max)));
@@ -655,6 +658,9 @@ public class AuthoringAction extends Action {
 					form.setMin(min == null ? null : String.valueOf(round(min, digitsDecimal)));
 					form.setMax(max == null ? null : String.valueOf(round(max, digitsDecimal)));
 				}
+			}
+			else {
+				form.setDigitsDecimal(null);
 			}
 		}
 		else {
@@ -1206,18 +1212,33 @@ public class AuthoringAction extends Action {
 			}
 		}
 
+		constraint = questionForm.getDigitsDecimal();
+		if (!StringUtils.isBlank(constraint)) {
+			try {
+				Short digitsDecimal = Short.parseShort(constraint);
+				if (digitsDecimal < 0) {
+					errors.add(ActionMessages.GLOBAL_MESSAGE,
+							new ActionMessage(DacoConstants.ERROR_MSG_DIGITSDECIMAL_NONNEGATIVE));
+				}
+			}
+			catch (NumberFormatException e) {
+				errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_DIGITSDECIMAL_INT));
+			}
+		}
+
 		if (answerOptionList != null) {
 			if (answerOptionList.size() < DacoConstants.ANSWER_OPTION_MINIMUM_COUNT) {
 				errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_ANSWEROPTION_NOTENOUGH,
 						DacoConstants.ANSWER_OPTION_MINIMUM_COUNT));
 			}
+			String ordinal = getDacoService().getLocalisedMessage("label.authoring.basic.answeroption.ordinal", null);
 			for (int firstOptionNumber = 0; firstOptionNumber < answerOptionList.size(); firstOptionNumber++) {
 				String firstOption = answerOptionList.get(firstOptionNumber);
 				for (int secondOptionNumber = firstOptionNumber + 1; secondOptionNumber < answerOptionList.size(); secondOptionNumber++) {
 					String secondOption = answerOptionList.get(secondOptionNumber);
 					if (firstOption.trim().equals(secondOption.trim())) {
 						errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_ANSWEROPTION_REPEAT,
-								firstOptionNumber + 1, secondOptionNumber + 1));
+								ordinal.charAt(firstOptionNumber) + ")", ordinal.charAt(secondOptionNumber) + ")"));
 					}
 				}
 			}

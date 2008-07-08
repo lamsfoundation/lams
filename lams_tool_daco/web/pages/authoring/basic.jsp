@@ -113,5 +113,5 @@
 </select><html:link href="#" styleClass="button space-left" onclick="javascript:showQuestionInputAreaByType('${showMessageURL }')">
 	<fmt:message key="label.authoring.basic.question.add" />
 </html:link></p>
-<p><iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'" id="questionInputArea"
+<p><iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+10+'px'" id="questionInputArea"
 	name="questionInputArea" style="width: 0px; height: 0px; border: 0px; display: none" frameborder="no" scrolling="no"> </iframe></p>

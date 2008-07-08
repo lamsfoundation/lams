@@ -282,4 +282,6 @@ public interface IDacoService {
 	 * @return
 	 */
 	DacoUser getUser(Long uid);
+
+	public String getLocalisedMessage(String key, Object[] args);
 }

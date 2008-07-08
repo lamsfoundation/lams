@@ -16,7 +16,7 @@
 	//Resizes the question input area so it is visible on the screen.
 	function resizeQuestionInputArea (){
 		var questionInputArea = window.top.document.getElementById('questionInputArea');
-		questionInputArea.style.height=questionInputArea.contentWindow.document.body.scrollHeight+'px';
+		questionInputArea.style.height=questionInputArea.contentWindow.document.body.scrollHeight+10+'px';
 	}
 	
 	//Checks if the additional options area has all the default values, so it may stay hidden
@@ -24,7 +24,7 @@
     if (checkNonDefaultValue("max") 
     	|| checkNonDefaultValue("min")
     	|| checkNonDefaultValue("digitsDecimal")
-    	|| $('#questionRequired').attr('checked')){ 
+    	|| $('#questionRequired').attr('checked')){
    		toggleAdditionalOptionsArea();
    }
   }
@@ -66,7 +66,7 @@
 	}
 	
 	//Moves the chosen answer option one place up
-	function upItem(itemIndex){digitsDecimal
+	function upItem(itemIndex){
 		if(itemIndex == 0)
 			return;
 		var currId = "#answerOptionItemDesc" + itemIndex;

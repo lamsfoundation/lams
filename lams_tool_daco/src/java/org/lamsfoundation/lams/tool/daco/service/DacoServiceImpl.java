@@ -613,8 +613,6 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 			throw new DacoApplicationException(error);
 		}
 
-		defaultDaco.setLockWhenFinished(true);
-
 		return defaultDaco;
 	}
 
@@ -1024,5 +1022,9 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
 	public void saveOrUpdateAnswer(DacoAnswer answer) {
 		dacoAnswerDao.saveObject(answer);
+	}
+
+	public String getLocalisedMessage(String key, Object[] args) {
+		return messageService.getMessage(key, args);
 	}
 }
