@@ -102,8 +102,9 @@ class LessonController extends AbstractController {
 					_lessonModel.getLesson().getActivityURL(URLToSend, false);
 				}
 			} else if(_app.module == 'learner' && // sequence activities of optional sequences
-				ca.activity.isOptionalSequenceActivity(_lessonModel.learningDesignModel.getActivityByUIID(ca.activity.parentUIID))) { 
-									
+				ca.activity.isOptionalSequenceActivity(_lessonModel.learningDesignModel.getActivityByUIID(ca.activity.parentUIID)) &&
+				(ca._parent._parent.activityStatus == "current_mc" || ca._parent._parent.activityStatus == "attempted_mc")) { 
+				
 				_lessonModel.getLesson().moveToActivity(_lessonModel.progressData.getCurrentActivityId(), ca.activity.parentActivityID);
 				
 			} else if(_root.mode == 'preview') {
