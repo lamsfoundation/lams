@@ -99,7 +99,7 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" uid="1556f4c:11b05e34f9e:-7f88" unique="true">
+<index alias="" name="PRIMARY1" remarks="" uid="1556f4c:11b05e34f9e:-7f88" unique="true">
 <index-description/>
 <index-column name="uid" sort="ASC"/>
 </index>
@@ -337,7 +337,7 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" uid="1556f4c:11b05e34f9e:-7f6e" unique="true">
+<index alias="" name="PRIMARY2" remarks="" uid="1556f4c:11b05e34f9e:-7f6e" unique="true">
 <index-description/>
 <index-column name="uid" sort="ASC"/>
 </index>
@@ -434,7 +434,7 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" uid="1556f4c:11b05e34f9e:-7e20" unique="true">
+<index alias="" name="PRIMARY3" remarks="" uid="1556f4c:11b05e34f9e:-7e20" unique="true">
 <index-description/>
 <index-column name="uid" sort="ASC"/>
 </index>
