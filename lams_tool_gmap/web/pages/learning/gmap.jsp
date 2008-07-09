@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-
+<c:set var="tool"><lams:WebAppURL /></c:set>
 <script type="text/javascript">
 <!--	
 	function validateForm() {
@@ -32,6 +32,7 @@
 		<table>
 			<tr>
 				<td>
+					<iframe marginwidth="0" align="left" height="60px" width="100%" frameborder="0" src="${tool}/common/mapLegend.jsp"></iframe>
 					<div id="map_canvas" style="float: left; width:80%; height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
 					<div id="usersidebar" style="float: right; width:20%; overflow:auto; height:400px; background:WhiteSmoke; "></div>		
 				</td>

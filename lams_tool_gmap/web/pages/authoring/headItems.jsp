@@ -9,8 +9,9 @@
 
 <script type="text/javascript">
 <!--
-	var errorMissingTitle = '<fmt:message key="error.missingMarkerTitle"/>';
-	var confirmDelete = '<fmt:message key="label.authoring.basic.confirmDelete"/>';
+	var errorMissingTitle = "<fmt:message key='error.missingMarkerTitle'/>";
+	var confirmDelete = "<fmt:message key='label.authoring.basic.confirmDelete'/>";
+	var authoredMarkerMsg = "<fmt:message key='label.authoring.authoredMarkers' />";
 	var map;
 	var markers;
 	var geocoder = null;

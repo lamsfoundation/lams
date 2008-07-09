@@ -78,10 +78,11 @@ function saveMapState()
 function refreshSideBarAuthoring()
 {
 	//marker.sideBarLinkPrefix = "<span class='sidebar'><a href='javascript:GEvent.trigger(markers["+markers.length+"],\"click\")'";
-	var sideBarText = "";
+	var sideBarText = "<div class='field-name'>" + authoredMarkerMsg + "</div>";
 	var i=0;
 	for (;i<markers.length; i++)
 	{
+		
 		if (markers[i].state != "remove" && markers[i].state != "unsaved")
 		{
 			sideBarText += "<span id='markerSpan" +markers[i].sideBarIndex+ "'>";

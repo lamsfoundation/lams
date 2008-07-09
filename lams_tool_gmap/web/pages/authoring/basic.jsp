@@ -2,6 +2,7 @@
 <c:set var="formBean"value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
 <c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+<c:set var="tool"><lams:WebAppURL /></c:set>
 <!-- ========== Basic Tab ========== -->
 <table cellpadding="0" border='0'>
 	<tr>
@@ -27,7 +28,8 @@
 			<div class="field-name">
 				<fmt:message key="label.authoring.basic.map"></fmt:message>
 			</div>
-			<br>
+			
+			<iframe marginwidth="0" align="left" height="60px" width="100%" frameborder="0" src="${tool}/common/mapLegend.jsp"></iframe>
 			<div id="map_canvas" style="float: left; width:80%; height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
 			<div id="sidebar" style="float: right; width:20%; overflow:auto; height:400px; background:WhiteSmoke; "></div>		
 
@@ -65,9 +67,7 @@ function initGmap()
 
     	markers = new Array();
     	geocoder = new GClientGeocoder();
-    	
-    	//currUser = '${gmapUser.firstName} ${gmapUser.lastName}';
-    	//currUserId = '${gmapUser.uid}';
+
     	currUser = '<fmt:message key="label.authoring.basic.authored"></fmt:message>';
     	currUserId = '0';
 		map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
