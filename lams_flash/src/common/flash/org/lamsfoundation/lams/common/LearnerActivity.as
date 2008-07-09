@@ -99,6 +99,7 @@ class LearnerActivity extends MovieClip {
 	private var sentFrom:String;
 	private var canvasActivityGrouped_mc:MovieClip;
 	private var _dcStartTime:Number = 0;
+	private var _doubleClickInterval:Number;
 	private var _doubleClicking:Boolean;
 	private var _visibleWidth:Number;
 	private var _visibleHeight:Number;
@@ -121,7 +122,7 @@ class LearnerActivity extends MovieClip {
 		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
 		
-		_dcStartTime = (_parent._parent.getActiveComplex() == this.activity || _parent._parent.getActiveSequence() == this.activity) ? new Date().getTime() : 0;
+		_dcStartTime = new Date().getTime();
 		 
 		//Get reference to application and design data model
 		app = ApplicationParent.getInstance();
@@ -383,9 +384,14 @@ class LearnerActivity extends MovieClip {
 			
 			// check double-click
 			var now:Number = new Date().getTime();
+			Debugger.log("LearnerActivity->onPress: (now - _dcStartTime)"+(now - _dcStartTime), Debugger.GEN, "onPress", "LearnerActivity");
 			
 			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
 					_doubleClicking = true;
+					if (_doubleClickInterval != null && _doubleClickInterval != undefined) {
+						clearInterval(_doubleClickInterval);
+						Cursor.showCursor(ApplicationParent.C_DEFAULT);
+					}
 					c.activityDoubleClick(this);
 					Debugger.log('DoubleClicking:+'+this,Debugger.GEN,'onPress','LearnerActivity');
 			}else{
@@ -429,16 +435,8 @@ class LearnerActivity extends MovieClip {
 				
 				if(LearnerComplexActivity(this._parent._parent).activity.activityUIID == this.activity.parentUIID) {
 				
-					LearnerComplexActivity(this._parent._parent).setActiveComplex(null); //****
-						
-					if(activeSequence) {
-						// close current active sequence
-						LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(null, true);
-					} else {
-						// open sequence
-						LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(this.activity, true);
-					}
-						
+					_doubleClickInterval = setInterval(Proxy.create(this, selectActiveSequence, activeSequence), (Config.DOUBLE_CLICK_DELAY - 100));
+					Cursor.showCursor(ApplicationParent.C_HOURGLASS); 
 				}
 			} else if(this.activity.isOptionsWithSequencesActivity() || this.activity.isOptionalActivity() || this.activity.isParallelActivity() || this.activity.isBranchingActivity()) {
 				Debugger.log('activeComplex:'+activeComplex, Debugger.CRITICAL,'onRelease','LearnerActivity');
@@ -458,6 +456,24 @@ class LearnerActivity extends MovieClip {
 			
 		}
 		
+	}
+	
+	private function selectActiveSequence(activeSequence):Void {
+		
+		if (_doubleClickInterval != null && _doubleClickInterval != undefined) {
+			clearInterval(_doubleClickInterval);
+			Cursor.showCursor(ApplicationParent.C_DEFAULT);
+		}
+		
+		LearnerComplexActivity(this._parent._parent).setActiveComplex(null); //****
+		
+		if(activeSequence) {
+			// close current active sequence
+			LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(null, true);
+		} else {
+			// open sequence
+			LearnerComplexActivity(this._parent._parent).removeAllChildrenAndInputSequence(this.activity, true);
+		}
 	}
 	
 	public function onReleaseOutside():Void{

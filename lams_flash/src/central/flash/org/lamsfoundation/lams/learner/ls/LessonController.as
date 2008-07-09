@@ -21,6 +21,7 @@
  * ************************************************************************
  */
 
+import org.lamsfoundation.lams.common.LearnerActivity;
 import org.lamsfoundation.lams.common.LearnerComplexActivity;
 import org.lamsfoundation.lams.common.ApplicationParent;
 import org.lamsfoundation.lams.common.comms.Communication;
@@ -100,8 +101,13 @@ class LessonController extends AbstractController {
 				} else {
 					_lessonModel.getLesson().getActivityURL(URLToSend, false);
 				}
+			} else if(_app.module == 'learner' && // sequence activities of optional sequences
+				ca.activity.isOptionalSequenceActivity(_lessonModel.learningDesignModel.getActivityByUIID(ca.activity.parentUIID))) { 
+									
+				_lessonModel.getLesson().moveToActivity(_lessonModel.progressData.getCurrentActivityId(), ca.activity.parentActivityID);
+				
 			} else if(_root.mode == 'preview') {
-				/* if child Activity is double-clicked then load the parent Activity */
+				// if child Activity is double-clicked then load the parent Activity
 				if(ca.activity.parentActivityID != null || ca.activity.parentActivityID != undefined){
 					_lessonModel.getLesson().moveToActivity(_lessonModel.progressData.getCurrentActivityId(), ca.activity.parentActivityID);
 				} else {
