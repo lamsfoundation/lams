@@ -130,36 +130,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			var valuesArray:Array = _activitiesDisplayed.values();
 			clearGrouping(valuesArray, createGroupingUIID);
 			
-			/*
-			for(var i=0; i<keyArray.length; i++){
-				var a = _activitiesDisplayed.get(keyArray[i]);
-				var currentGroupingUIID:Number = a.activity.groupingUIID;
-				
-				Debugger.log('currentGroupingUIID:'+currentGroupingUIID, Debugger.CRITICAL,'clearGroupedActivities','CanvasSuperModel');
-				
-				if(currentGroupingUIID == createGroupingUIID) {
-					
-					Debugger.log('Found grouping match:'+ a.activity.groupingUIID, Debugger.CRITICAL,'clearGroupedActivities','CanvasSuperModel');
-					
-					a.activity.groupingUIID = null;
-					
-					if (a.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
-						for (var k=0; k<a.actChildren.length; k++){
-							a.actChildren[k].groupingUIID = null;
-						}
-						
-						a.init();
-					} 
-			
-					Debugger.log('Set grouping UIID to null: '+a.activity.groupingUIID ,Debugger.GEN,'clearGroupedActivities','CanvasSuperModel');
-					
-					a.isSetSelected = false;
-					a.refresh()
-				} else if(a instanceof CanvasOptionalActivity) {
-					clearComplexGrouping(a.children, createGroupingUIID);
-				}
-			}*/
-			
 		}
 		
 		selectedItem = null;
