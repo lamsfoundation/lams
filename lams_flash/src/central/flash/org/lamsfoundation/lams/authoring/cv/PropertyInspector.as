@@ -359,11 +359,13 @@ class PropertyInspector extends PropertyInspectorControls {
 				showGeneralInfo(false);
 				showAppliedGroupingControls(false);
 				checkEnableOptionalControls(!a.readOnly);
-				populateGroupingProperties(GroupingActivity(caco));
+				//populateGroupingProperties(GroupingActivity(caco));
 				showAppliedGroupingProperties(caco);
 				showOptionalActivityProperties(caco);
 				
 			} else if(a.isParallelActivity()) {
+				var co = (cm.selectedItem instanceof CanvasParallelActivity) ? CanvasParallelActivity(cm.selectedItem) : CanvasActivity(cm.selectedItem);
+				var cca:ComplexActivity = ComplexActivity(co.activity);
 				
 				showOptionalControls(false);
 				showGeneralControls(true, !a.readOnly);
@@ -373,9 +375,9 @@ class PropertyInspector extends PropertyInspectorControls {
 				showToolActivityControls(false);
 				showGateControls(false);
 				showAppliedGroupingControls(true, !a.readOnly);
-				populateGroupingProperties(GroupingActivity(cacp));
-				showAppliedGroupingProperties(cacp);
-				showParallelActivityProperties(cacp);
+				//populateGroupingProperties(GroupingActivity(cacp));
+				showAppliedGroupingProperties(cca);
+				showParallelActivityProperties(cca);
 				
 			} else {
 				showOptionalControls(false);
