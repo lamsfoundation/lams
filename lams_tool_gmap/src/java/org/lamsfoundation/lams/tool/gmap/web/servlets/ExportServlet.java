@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
 import org.lamsfoundation.lams.tool.gmap.service.GmapServiceProxy;
 import org.lamsfoundation.lams.tool.gmap.util.GmapException;
+import org.lamsfoundation.lams.tool.gmap.util.GmapImageBundler;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -81,8 +82,15 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error("Cannot perform export for gmap tool.");
 		}
 
+		
+		
+		
 		String basePath = request.getScheme() + "://" + request.getServerName()
 			+ ":" + request.getServerPort() + request.getContextPath();
+		
+		GmapImageBundler imageBundler = new GmapImageBundler();
+		imageBundler.bundle(request, cookies, directoryName);
+		
 		writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp",
 				directoryName, FILENAME, cookies);
 

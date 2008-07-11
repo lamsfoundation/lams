@@ -15,21 +15,13 @@
 		
 		<script type="text/javascript">
 		<!--
-		/*
-		var YELLOW_MARKER_ICON = "/images/yellow_Marker.png";
-		var BLUE_MARKER_ICON = "/images/blue_Marker.png";
-		var LIGHTBLUE_MARKER_ICON = "/images/paleblue_Marker.png";
-		var RED_MARKER_ICON = "/images/red_Marker.png";
-		var TREE_CLOSED_ICON = "/images/tree_closed.gif";
-		var TREE_OPEN_ICON = "/images/tree_open.gif";
-		*/
 		
-		var YELLOW_MARKER_ICON = "${tool}/images/yellow_Marker.png";
-		var BLUE_MARKER_ICON = "${tool}/images/blue_Marker.png";
-		var LIGHTBLUE_MARKER_ICON = "${tool}/images/paleblue_Marker.png";
-		var RED_MARKER_ICON = "${tool}/images/red_Marker.png";
-		var TREE_CLOSED_ICON = "${tool}/images/tree_closed.gif";
-		var TREE_OPEN_ICON = "${tool}/images/tree_open.gif";
+		var YELLOW_MARKER_ICON = "gmap_images/yellow_Marker.png";
+		var BLUE_MARKER_ICON = "gmap_images/blue_Marker.png";
+		var LIGHTBLUE_MARKER_ICON = "gmap_images/paleblue_Marker.png";
+		var RED_MARKER_ICON = "gmap_images/red_Marker.png";
+		var TREE_CLOSED_ICON = "gmap_images/tree_closed.gif";
+		var TREE_OPEN_ICON = "gmap_images/tree_open.gif";
 		
 		var map;
 		var markers;
