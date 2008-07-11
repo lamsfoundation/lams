@@ -29,13 +29,13 @@ import java.util.Date;
  * Spreadsheet
  * @author Andrey Balan
  *
- * @hibernate.class  table="tl_lasprd10_user_edited_spreadsheet"
+ * @hibernate.class  table="tl_lasprd10_user_modified_spreadsheet"
  *
  */
-public class UserEditedSpreadsheet {
+public class UserModifiedSpreadsheet {
 
 	private Long uid;
-	private String userEditedSpreadsheet;
+	private String userModifiedSpreadsheet;
 	private SpreadsheetMark mark;
 	
 	
@@ -50,20 +50,20 @@ public class UserEditedSpreadsheet {
 	}
 	
 	/**
-	 * @hibernate.property column="user_edited_spreadsheet" type="text"
-	 * 
+	 * @hibernate.property column="user_modified_spreadsheet" type="text"
 	 * 
 	 * @return
 	 */
-	public String getUserEditedSpreadsheet() {
-		return userEditedSpreadsheet;
+	public String getUserModifiedSpreadsheet() {
+		return userModifiedSpreadsheet;
 	}
-	public void setUserEditedSpreadsheet(String userEditedSpreadsheet) {
-		this.userEditedSpreadsheet = userEditedSpreadsheet;
+	public void setUserModifiedSpreadsheet(String userModifiedSpreadsheet) {
+		this.userModifiedSpreadsheet = userModifiedSpreadsheet;
 	}
 	
-    /**
-     * @hibernate.id column="mark_id"
+	/**
+	 * @hibernate.many-to-one column="mark_id" 
+	 * 			cascade="all"	
      */
 	public SpreadsheetMark getMark() {
 		return mark;

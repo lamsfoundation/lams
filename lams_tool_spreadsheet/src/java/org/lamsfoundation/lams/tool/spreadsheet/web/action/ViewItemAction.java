@@ -130,17 +130,13 @@ public class ViewItemAction extends Action {
 	 * @return
 	 */
 	private ActionForward reviewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-//		String mode = request.getParameter(AttributeNames.ATTR_MODE);
-//		
-//		String sessionMapID = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_SESSION_MAP_ID);
-//		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
 		
 		Long userId = WebUtil.readLongParam(request, SpreadsheetConstants.ATTR_USER_UID);
 		SpreadsheetUser user = getSpreadsheetService().getUser(userId);
 		request.setAttribute(SpreadsheetConstants.ATTR_USER_NAME, user.getLoginName());
 		String code = null;
-		if (user.getUserEditedSpreadsheet() != null) {
-			code = user.getUserEditedSpreadsheet().getUserEditedSpreadsheet();
+		if (user.getUserModifiedSpreadsheet() != null) {
+			code = user.getUserModifiedSpreadsheet().getUserModifiedSpreadsheet();
 		}
 		request.setAttribute(SpreadsheetConstants.ATTR_CODE, code);
 		

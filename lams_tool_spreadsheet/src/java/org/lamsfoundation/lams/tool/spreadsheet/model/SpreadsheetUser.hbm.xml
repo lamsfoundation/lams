@@ -81,13 +81,13 @@
         />
 
         <many-to-one
-            name="userEditedSpreadsheet"
-            class="org.lamsfoundation.lams.tool.spreadsheet.model.UserEditedSpreadsheet"
+            name="userModifiedSpreadsheet"
+            class="org.lamsfoundation.lams.tool.spreadsheet.model.UserModifiedSpreadsheet"
             cascade="all"
             outer-join="auto"
             update="true"
             insert="true"
-            column="user_edited_spreadsheet_uid"
+            column="user_modified_spreadsheet_uid"
         />
 
         <property

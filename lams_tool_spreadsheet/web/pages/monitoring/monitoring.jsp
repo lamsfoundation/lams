@@ -23,7 +23,7 @@
 		   		selectTab(tabId);
 
 	    		//for statistic page change:
-	    		if(tabId == 4) doStatistic();	  
+	    		if(tabId == 4) doStatistic();
 	       	} 
 	        
 		    function viewItem(itemUid,sessionMapID){
@@ -33,9 +33,9 @@
 			
 			var statisticTargetDiv = "statisticArea";
 			function doStatistic(){
-				var url = "<c:url value="/monitoring.do"/>";
+				var url = "<c:url value="/monitoring/doStatistic.do"/>";
 			    var reqIDVar = new Date();
-				var param = "method=doStatistic&toolContentID=" + ${param.toolContentID};
+				var param = "toolContentID=" + ${param.toolContentID};
 				messageLoading();
 			    var myAjax = new Ajax.Updater(
 				    	statisticTargetDiv,
@@ -74,7 +74,7 @@
 			<fmt:message key="label.authoring.heading" />
 		</h1>
 	<div id="header">
-		<lams:Tabs>
+		<lams:Tabs useKey="true" control="true">
 			<lams:Tab id="1" key="monitoring.tab.summary" />
 			<lams:Tab id="2" key="monitoring.tab.instructions" />
 			<lams:Tab id="3" key="monitoring.tab.edit.activity" />			

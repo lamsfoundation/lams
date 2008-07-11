@@ -28,6 +28,6 @@ import java.util.Map;
 
 import org.lamsfoundation.lams.tool.spreadsheet.dto.Summary;
 
-public interface UserEditedSpreadsheetDAO extends DAO {
+public interface UserModifiedSpreadsheetDAO extends DAO {
 
 }

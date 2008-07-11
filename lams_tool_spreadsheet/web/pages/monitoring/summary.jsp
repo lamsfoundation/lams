@@ -2,10 +2,13 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="spreadsheet" value="${sessionMap.spreadsheet}"/>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
 
 <script lang="javascript">
 	function showMessage(url) {
-		var area=document.getElementById("resourceInputArea");
+		var area=document.getElementById("marksInputArea");
 		if(area != null){
 			area.style.width="650px";
 			area.style.height="100%";
@@ -16,10 +19,10 @@
 		if (elem != null) {
 			elem.style.display="none";
 		}
-		location.hash = "resourceInputArea";
+		location.hash = "marksInputArea";
 	}
 	function hideMessage(){
-		var area=document.getElementById("resourceInputArea");
+		var area=document.getElementById("marksInputArea");
 		if(area != null){
 			area.style.width="0px";
 			area.style.height="0px";
@@ -31,11 +34,56 @@
 		}
 	}
 	
-	function editItem(idx, sessionMapID){
-		var reqIDVar = new Date();
-		var url = "<c:url value="/authoring/editItemInit.do?itemIndex="/>" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+	function editMark(userUid){
+		var url = "<c:url value="/monitoring/editMark.do?userUid="/>" + userUid +"&toolContentID=" + ${param.toolContentID} + "&sessionMapID=" + "${sessionMapID}";
 		showMessage(url);
 	}
+	
+	function downloadMarks(sessionId){
+		var url = "<c:url value="/monitoring/downloadMarks.do"/>";
+	    var reqIDVar = new Date();
+		var param = "?toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
+		url = url + param;
+		location.href = url;
+	}	
+	
+	function viewAllMarks(sessionId){
+		var wd = null;
+		if(wd && wd.open && !wd.closed){
+			wd.close();
+		}
+		wd = window.open("<c:url value='/monitoring/viewAllMarks.do?toolSessionID='/>" + sessionId, "mark", 'resizable, width=796, height=570, scrollbars');
+		wd.window.focus();
+	}
+	
+	var messageTargetDiv = "messageArea";
+	function releaseMarks(sessionId){
+		var url = "<c:url value="/monitoring/releaseMarks.do"/>";
+	    var reqIDVar = new Date();
+		var param = "toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
+		messageLoading();
+	    var myAjax = new Ajax.Updater(
+		    	messageTargetDiv,
+		    	url,
+		    	{
+		    		method:'get',
+		    		parameters:param,
+		    		onComplete:messageComplete,
+		    		evalScripts:true
+		    	}
+	    );
+		
+	}	
+	function messageLoading(){
+		if($(messageTargetDiv+"_Busy") != null){
+			Element.show(messageTargetDiv+"_Busy");
+		}		
+	}
+	function messageComplete(){
+		if($(messageTargetDiv+"_Busy") != null){
+			Element.hide(messageTargetDiv+"_Busy");
+		}
+	}	
 </script>
 
 
@@ -89,134 +137,16 @@
 
 <%-- Summary list  --%>
 
-<c:if test="${empty summaryList}">
-	<div align="center">
-		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
-	</div>
-</c:if>
+<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
+<span id="messageArea"></span>
 
-<c:forEach var="summary" items="${summaryList}" varStatus="firstGroup">
-	<h1><fmt:message key="monitoring.label.group" /> ${summary.sessionName}	</h1>
-	<h2 style="color:black; margin-left: 20px;"><fmt:message key="label.monitoring.summary.overall.summary" />	</h2>
-	<table cellpadding="0" class="alternative-color" >
+<%@ include file="/common/messages.jsp"%>
 
-		<tr>
-			<th width="60%" align="left">
-				<fmt:message key="label.monitoring.summary.learner" />
-			</th>
-			<c:if test="${spreadsheet.markingEnabled}">			
-				<th width="40px" align="center">
-					<fmt:message key="label.monitoring.summary.marked" />
-				</th>
-				<th width="20px" align="left">
-				</th>
-			</c:if>
-		</tr>
-
-		<c:forEach var="user" items="${summary.users}" varStatus="userStatus">
-			<tr>
-				<td>
-					<c:choose>
-						<c:when test="${spreadsheet.learnerAllowedToSave}">
-							<c:set var="reviewItem">
-								<c:url value="/reviewItem.do?userUid=${user.uid}"/>
-							</c:set>
-							<html:link href="javascript:launchPopup('${reviewItem}')">
-								${user.loginName}
-							</html:link>
-						</c:when>
-						<c:otherwise>
-							${user.loginName}
-						</c:otherwise>
-					</c:choose>					
-				</td>
-				
-				<c:if test="${spreadsheet.markingEnabled}">					
-					<td align="center">
-						<c:choose>
-							<c:when test="${(user.userEditedSpreadsheet != null) && (user.userEditedSpreadsheet.mark != null)}">
-								<img src="<lams:LAMSURL/>/images/tick.gif" alt="tick" border="0"/>
-							</c:when>
-								
-							<c:otherwise>
-								<img src="<lams:LAMSURL/>/images/cross.gif" alt="cross" border="0"/>
-							</c:otherwise>
-						</c:choose>
-					</td>
-					
-					<td align="left">
-						<c:set var="url2" value="<html:rewrite page='/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}'/>" />
-						<html:link
-							href="javascript:showMessage(url2);"
-							property="Mark" styleClass="button">
-							<fmt:message key="label.monitoring.summary.mark.button" />
-						</html:link>
-					</td>
-				</c:if>				
-			</tr>
-		</c:forEach>
-		
-	</table>
-	<c:if test="${spreadsheet.markingEnabled}">	
-		<div style="position:relative; left:30px; ">
-			<html:link href="javascript:viewAllMarks(${sessionDto.sessionID});"
-				property="viewAllMarks" styleClass="button">
-				<fmt:message key="label.monitoring.summary.viewAllMarks.button" />
-			</html:link>
-			<html:link href="javascript:releaseMarks(${sessionDto.sessionID});"
-				property="releaseMarks" styleClass="button">
-				<fmt:message key="label.monitoring.summary.releaseMarks.button" />
-			</html:link>
-			<html:link href="javascript:downloadMarks(${sessionDto.sessionID});"
-				property="downloadMarks" styleClass="button">
-				<fmt:message key="label.monitoring.summary.downloadMarks.button" />
-			</html:link>
-		</div>
-	</c:if>
-	
-	<%-- Reflection list  --%>
-	
-	<c:if test="${sessionMap.spreadsheet.reflectOnActivity}">
-	
-		<h2 style="color:black; margin-left: 20px; " ><fmt:message key="label.monitoring.summary.title.reflection"/>	</h2>
-		<table cellpadding="0"  class="alternative-color"  >
-
-			<tr>
-				<th>
-					<fmt:message key="label.monitoring.summary.user"/>
-				</th>
-				<th>
-					<fmt:message key="label.monitoring.summary.reflection"/>
-				</th>
-			</tr>				
-						
-			<c:forEach var="user" items="${summary.users}">
-				<tr>
-					<td>
-						${user.loginName}
-					</td>
-					<td >
-						<c:set var="viewReflection">
-							<c:url value="/monitoring/viewReflection.do?userUid=${user.uid}"/>
-						</c:set>
-						<html:link href="javascript:launchPopup('${viewReflection}')">
-							<fmt:message key="label.view" />
-						</html:link>
-					</td>
-				</tr>
-			</c:forEach>
-						
-		</table>
-	</c:if>
-	<br>
-	
-	
-</c:forEach>
-
+<div id="summariesArea">
+	<%@ include file="/pages/monitoring/summarylist.jsp"%>
+</div>
 
 <c:if test="${spreadsheet.markingEnabled}">	
-
-	
 	<p>
 		<iframe
 			onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"

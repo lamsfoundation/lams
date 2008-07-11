@@ -36,7 +36,7 @@ public class StatisticDTO {
 	public StatisticDTO() {
 	}
 	
-	public StatisticDTO(String sessionName, int notMarkedCounter, int markedCounter, int totalSpreadsheetsSentByLearners) {
+	public StatisticDTO(String sessionName, int markedCounter, int notMarkedCounter, int totalSpreadsheetsSentByLearners) {
 		this.sessionName = sessionName;
 		this.notMarkedCounter = notMarkedCounter;
 		this.markedCounter = markedCounter;

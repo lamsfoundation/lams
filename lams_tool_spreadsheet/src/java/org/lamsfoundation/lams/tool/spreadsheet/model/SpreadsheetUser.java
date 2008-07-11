@@ -50,7 +50,7 @@ public class SpreadsheetUser implements Cloneable, Serializable{
 	
 	private SpreadsheetSession session;
 	private Spreadsheet spreadsheet;
-	private UserEditedSpreadsheet userEditedSpreadsheet;
+	private UserModifiedSpreadsheet userModifiedSpreadsheet;
 	
 	//=============== NON Persisit value: for display use ===========
 	//the user access some reousrce item date time. Use in monitoring summary page
@@ -182,16 +182,16 @@ public class SpreadsheetUser implements Cloneable, Serializable{
 		this.spreadsheet = spreadsheet;
 	}
 	/**
-	 * @hibernate.many-to-one column="user_edited_spreadsheet_uid" 
+	 * @hibernate.many-to-one column="user_modified_spreadsheet_uid" 
 	 * 			cascade="all"
 	 *  
 	 * @return
 	 */
-	public UserEditedSpreadsheet getUserEditedSpreadsheet() {
-		return userEditedSpreadsheet;
+	public UserModifiedSpreadsheet getUserModifiedSpreadsheet() {
+		return userModifiedSpreadsheet;
 	}
-	public void setUserEditedSpreadsheet(UserEditedSpreadsheet userEditedSpreadsheet) {
-		this.userEditedSpreadsheet = userEditedSpreadsheet;
+	public void setUserModifiedSpreadsheet(UserModifiedSpreadsheet userModifiedSpreadsheet) {
+		this.userModifiedSpreadsheet = userModifiedSpreadsheet;
 	}
 	/**
 	 * @hibernate.property column="session_finished"

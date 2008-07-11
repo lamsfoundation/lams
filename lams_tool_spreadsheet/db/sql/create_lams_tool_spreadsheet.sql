@@ -1,7 +1,7 @@
 SET FOREIGN_KEY_CHECKS=0;
 drop table if exists tl_lasprd10_attachment;
 drop table if exists tl_lasprd10_spreadsheet;
-drop table if exists tl_lasprd10_user_edited_spreadsheet;
+drop table if exists tl_lasprd10_user_modified_spreadsheet;
 drop table if exists tl_lasprd10_session;
 drop table if exists tl_lasprd10_user;
 create table tl_lasprd10_attachment (
@@ -35,9 +35,9 @@ create table tl_lasprd10_spreadsheet (
    reflect_on_activity smallint, 
    primary key (uid)
 )type=innodb;
-create table tl_lasprd10_user_edited_spreadsheet (
+create table tl_lasprd10_user_modified_spreadsheet (
    uid bigint not null auto_increment,
-   user_edited_spreadsheet text,
+   user_modified_spreadsheet text,
    mark_id bigint,
    primary key (uid)
 )type=innodb;
@@ -67,7 +67,7 @@ create table tl_lasprd10_user (
    session_finished smallint,
    session_uid bigint,
    spreadsheet_uid bigint,
-   user_edited_spreadsheet_uid bigint,
+   user_modified_spreadsheet_uid bigint,
    primary key (uid)
 )type=innodb;
 alter table tl_lasprd10_attachment add index FK_NEW_2065267438_1E7009430E79035 (spreadsheet_uid), add constraint FK_NEW_2065267438_1E7009430E79035 foreign key (spreadsheet_uid) references tl_lasprd10_spreadsheet (uid);
@@ -75,8 +75,8 @@ alter table tl_lasprd10_spreadsheet add index FK_NEW_2065267438_89093BF758092FB 
 alter table tl_lasprd10_session add index FK_NEW_2065267438_24AA78C530E79035 (spreadsheet_uid), add constraint FK_NEW_2065267438_24AA78C530E79035 foreign key (spreadsheet_uid) references tl_lasprd10_spreadsheet (uid);
 alter table tl_lasprd10_user add index FK_NEW_2065267438_30113BFCEC0D3147 (session_uid), add constraint FK_NEW_2065267438_30113BFCEC0D3147 foreign key (session_uid) references tl_lasprd10_session (uid);
 alter table tl_lasprd10_user add index FK_NEW_2065267438_30113BFC309ED320 (spreadsheet_uid), add constraint FK_NEW_2065267438_30113BFC309ED320 foreign key (spreadsheet_uid) references tl_lasprd10_spreadsheet (uid);
-alter table tl_lasprd10_user add index FK_NEW_2065267438_693580A441F9365D (user_edited_spreadsheet_uid), add constraint FK_NEW_2065267438_693580A441F9365D foreign key (user_edited_spreadsheet_uid) references tl_lasprd10_user_edited_spreadsheet (uid);
-alter table tl_lasprd10_user_edited_spreadsheet add index FK_tl_lasprd10_user_edited_spreadsheet_1 (mark_id), add constraint FK_tl_lasprd10_user_edited_spreadsheet_1 foreign key (mark_id) references tl_lasprd10_spreadsheet_mark (uid);
+alter table tl_lasprd10_user add index FK_NEW_2065267438_693580A441F9365D (user_modified_spreadsheet_uid), add constraint FK_NEW_2065267438_693580A441F9365D foreign key (user_modified_spreadsheet_uid) references tl_lasprd10_user_modified_spreadsheet (uid);
+alter table tl_lasprd10_user_modified_spreadsheet add index FK_tl_lasprd10_user_modified_spreadsheet_1 (mark_id), add constraint FK_tl_lasprd10_user_modified_spreadsheet_1 foreign key (mark_id) references tl_lasprd10_spreadsheet_mark (uid);
 
 
 

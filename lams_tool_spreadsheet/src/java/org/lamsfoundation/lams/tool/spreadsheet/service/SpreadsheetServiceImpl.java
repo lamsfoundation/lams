@@ -77,7 +77,8 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetAttachmentDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetDAO;
-import org.lamsfoundation.lams.tool.spreadsheet.dao.UserEditedSpreadsheetDAO;
+import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetMarkDAO;
+import org.lamsfoundation.lams.tool.spreadsheet.dao.UserModifiedSpreadsheetDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetSessionDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetUserDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.ReflectDTO;
@@ -85,7 +86,8 @@ import org.lamsfoundation.lams.tool.spreadsheet.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.Summary;
 import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetAttachment;
-import org.lamsfoundation.lams.tool.spreadsheet.model.UserEditedSpreadsheet;
+import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetMark;
+import org.lamsfoundation.lams.tool.spreadsheet.model.UserModifiedSpreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
 import org.lamsfoundation.lams.tool.spreadsheet.util.ReflectDTOComparator;
@@ -113,7 +115,8 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService,ToolContentMa
 	private SpreadsheetAttachmentDAO spreadsheetAttachmentDao;
 	private SpreadsheetUserDAO spreadsheetUserDao;
 	private SpreadsheetSessionDAO spreadsheetSessionDao;
-	private UserEditedSpreadsheetDAO userEditedSpreadsheetDao;
+	private UserModifiedSpreadsheetDAO userModifiedSpreadsheetDao;
+	private SpreadsheetMarkDAO spreadsheetMarkDao;
 	//tool service
 	private SpreadsheetToolContentHandler spreadsheetToolContentHandler;
 	private MessageService messageService;
@@ -245,6 +248,10 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService,ToolContentMa
 		spreadsheetUserDao.saveObject(spreadsheetUser);
 	}
 	
+	public void saveOrUpdateUserModifiedSpreadsheet(UserModifiedSpreadsheet userModifiedSpreadsheet) {
+		userModifiedSpreadsheetDao.saveObject(userModifiedSpreadsheet);
+	}
+	
 	public SpreadsheetUser getUserByIDAndContent(Long userId, Long contentId) {
 		return (SpreadsheetUser) spreadsheetUserDao.getUserByUserIDAndContentID(userId,contentId);
 	}
@@ -253,17 +260,11 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService,ToolContentMa
 		return (SpreadsheetUser) spreadsheetUserDao.getUserByUserIDAndSessionID(userId,sessionId);
 	}
 	
-//	public List<SpreadsheetUser> getUserListBySessionItem(Long sessionId, Long itemUid) {
-//		List<TaskListItemVisitLog> logList = taskListItemVisitDao.getTaskListItemLogBySession(sessionId,itemUid);
-//		List<SpreadsheetUser> userList = new ArrayList(logList.size());
-//		for(TaskListItemVisitLog visit : logList){
-//			SpreadsheetUser user = visit.getUser();
-//			user.setAccessDate(visit.getAccessDate());
-//			userList.add(user);
-//		}
-//		return userList;		
-//	}
-
+	public List<SpreadsheetUser> getUserListBySessionId(Long sessionId) {
+		List<SpreadsheetUser> userList = spreadsheetUserDao.getBySessionID(sessionId);
+		return userList;
+	}
+	
 	public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws SpreadsheetApplicationException {
 		ITicket ticket = getRepositoryLoginTicket();
 		try {
@@ -362,7 +363,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService,ToolContentMa
 		Spreadsheet res = spreadsheetDao.getByContentId(contentId);
 		return res;
 	}
-	public SpreadsheetSession getSpreadsheetSessionBySessionId(Long sessionId) {
+	public SpreadsheetSession getSessionBySessionId(Long sessionId) {
 		return spreadsheetSessionDao.getSessionBySessionId(sessionId);
 	}
 
@@ -401,7 +402,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService,ToolContentMa
 		for(SpreadsheetSession session:sessionList) {
 			List<SpreadsheetUser> userList = spreadsheetUserDao.getBySessionID(session.getSessionId());
 			
-			Summary summary = new Summary(session.getSessionName(), spreadsheet, userList);
+			Summary summary = new Summary(session, spreadsheet, userList);
 			summaryList.add(summary);
 		}
 
@@ -418,9 +419,9 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService,ToolContentMa
 			int totalUserModifiedSpreadsheets = 0;
 			int totalMarkedSpreadsheets = 0;
 			for (SpreadsheetUser user:userList) {
-				if (user.getUserEditedSpreadsheet() != null) {
+				if (user.getUserModifiedSpreadsheet() != null) {
 					totalUserModifiedSpreadsheets++;
-					if (user.getUserEditedSpreadsheet().getMark() != null)
+					if (user.getUserModifiedSpreadsheet().getMark() != null)
 						totalMarkedSpreadsheets++;
 				}
 			}
@@ -484,6 +485,18 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService,ToolContentMa
 	public SpreadsheetUser getUser(Long uid){
 		return (SpreadsheetUser) spreadsheetUserDao.getObject(SpreadsheetUser.class, uid);
 	}
+	
+	public void releaseMarksForSession(Long sessionId){
+		List<SpreadsheetUser> users = spreadsheetUserDao.getBySessionID(sessionId);
+		for (SpreadsheetUser user: users) {
+			if ((user.getUserModifiedSpreadsheet() != null) && (user.getUserModifiedSpreadsheet().getMark() != null)) {
+				SpreadsheetMark mark = user.getUserModifiedSpreadsheet().getMark();
+				mark.setDateMarksReleased(new Date());
+				spreadsheetMarkDao.saveObject(mark);
+			}
+		}
+	}
+	
 	//*****************************************************************************
 	// private methods
 	//*****************************************************************************
@@ -593,6 +606,9 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService,ToolContentMa
 	public void setMessageService(MessageService messageService) {
 		this.messageService = messageService;
 	}
+	public MessageService getMessageService() {
+		return messageService;
+	}	
 	public void setRepositoryService(IRepositoryService repositoryService) {
 		this.repositoryService = repositoryService;
 	}
@@ -614,9 +630,12 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService,ToolContentMa
 	public void setToolService(ILamsToolService toolService) {
 		this.toolService = toolService;
 	}
-	public void setUserEditedSpreadsheetDao(UserEditedSpreadsheetDAO userEditedSpreadsheetDao) {
-		this.userEditedSpreadsheetDao = userEditedSpreadsheetDao;
+	public void setUserModifiedSpreadsheetDao(UserModifiedSpreadsheetDAO userModifiedSpreadsheetDao) {
+		this.userModifiedSpreadsheetDao = userModifiedSpreadsheetDao;
 	}
+	public void setSpreadsheetMarkDao(SpreadsheetMarkDAO spreadsheetMarkDao) {
+		this.spreadsheetMarkDao = spreadsheetMarkDao;
+	}	
 
 	//*******************************************************************************
 	//ToolContentManager, ToolSessionManager methods

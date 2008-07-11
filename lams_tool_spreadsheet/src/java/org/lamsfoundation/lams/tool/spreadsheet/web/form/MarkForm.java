@@ -27,9 +27,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
 import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
  
@@ -44,23 +48,23 @@ public class MarkForm extends ActionForm  {
 	private static final long serialVersionUID = -6028705988278223361L;
 	
 	//Forum fields
-	private String sessionMapId;
-	private SpreadsheetUser user;
+	private String sessionMapID;
+	private Long userUid;
 	private String marks;
 	private String comments;
 
-	public String getSessionMapId() {
-		return sessionMapId;
+	public String getSessionMapID() {
+		return sessionMapID;
 	}
-	public void setSessionMapId(String sessionMapId) {
-		this.sessionMapId = sessionMapId;
+	public void setSessionMapID(String sessionMapID) {
+		this.sessionMapID = sessionMapID;
 	}
 	
-	public SpreadsheetUser getUser() {
-		return user;
+	public Long getUserUid() {
+		return userUid;
 	}
-	public void setUser(SpreadsheetUser user) {
-		this.user = user;
+	public void setUserUid(Long userUid) {
+		this.userUid = userUid;
 	}
 
 	public String getMarks() {
@@ -76,6 +80,7 @@ public class MarkForm extends ActionForm  {
 	public void setComments(String comments) {
 		this.comments = comments;
 	}
+
 }
 
  

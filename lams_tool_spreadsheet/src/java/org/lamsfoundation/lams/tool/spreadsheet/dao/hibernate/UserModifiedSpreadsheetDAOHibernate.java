@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.lamsfoundation.lams.tool.spreadsheet.dao.UserEditedSpreadsheetDAO;
+import org.lamsfoundation.lams.tool.spreadsheet.dao.UserModifiedSpreadsheetDAO;
 		
-public class UserEditedSpreadsheetDAOHibernate extends BaseDAOHibernate implements UserEditedSpreadsheetDAO{
+public class UserModifiedSpreadsheetDAOHibernate extends BaseDAOHibernate implements UserModifiedSpreadsheetDAO{
 	
 }

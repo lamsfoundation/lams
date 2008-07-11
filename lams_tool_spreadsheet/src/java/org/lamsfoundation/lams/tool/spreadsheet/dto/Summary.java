@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
+import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
 import org.lamsfoundation.lams.tool.spreadsheet.util.SpreadsheetWebUtils;
 
@@ -63,8 +64,9 @@ public class Summary {
 	 * @param item
 	 * @param isInitGroup
 	 */
-	public Summary(String sessionName, Spreadsheet spreadsheet, List<SpreadsheetUser> users){
-		this.sessionName = sessionName;
+	public Summary(SpreadsheetSession session, Spreadsheet spreadsheet, List<SpreadsheetUser> users){
+		this.sessionId = session.getSessionId();
+		this.sessionName = session.getSessionName();
 		this.spreadsheet = spreadsheet;
 		if (users != null) {
 			this.users = users;

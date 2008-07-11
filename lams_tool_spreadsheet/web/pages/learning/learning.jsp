@@ -19,28 +19,29 @@
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="spreadsheet" value="${sessionMap.spreadsheet}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+	<c:set var="user" value="${sessionMap.user}" />
 
 	<script type="text/javascript">
 	<!--
 		function finishSession(){
 			document.getElementById("finishButton").disabled = true;
         	//var url = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&toolSessionID=${toolSessionID}"/>';
-        	saveUserSpreadsheet(true);
+        	saveUserSpreadsheet("finishSession");
 			return false;
 		}
 		
 		function continueReflect(){
 			//var url = '<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-			saveUserSpreadsheet(false);
+			saveUserSpreadsheet("continueReflect");
 		}
 		
 		//save changes made in spreadsheet
-		function saveUserSpreadsheet(finishSession){
+		function saveUserSpreadsheet(typeOfAction){
 			var code = window.frames["externalSpreadsheet"].cellsToJS();
 			document.getElementById("spreadsheet.code").value = code;
 		
 		    var learningForm = $("learningForm");
-        	learningForm.action = "<c:url value='/learning/saveUserSpreadsheet.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&finishSession='/>" + finishSession;
+        	learningForm.action = "<c:url value='/learning/saveUserSpreadsheet.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&typeOfAction='/>" + typeOfAction;
         	learningForm.submit();
 		}
 		
@@ -76,13 +77,63 @@
 		<html:form action="learning/saveUserSpreadsheet" method="post" styleId="learningForm" enctype="multipart/form-data">
 			<html:hidden property="spreadsheet.code" styleId="spreadsheet.code"/>	
 		</html:form>
+		<br>
 		
-		<br><br>
+		<c:if test="${spreadsheet.markingEnabled}">
+ 			<div class="shading-bg">		
+				<table width="30%">
+					<tr>
+						<!--First row displaying the comments -->
+						<td class="field-name">
+							<fmt:message key="label.learning.comments" />
+						</td>
+						<td>
+							<c:choose>
+								<c:when test="${mark == null}">
+									<fmt:message key="label.learning.not.available" />
+								</c:when>
+								<c:otherwise>
+									<c:out value="${mark.comments}" escapeXml="false" />
+								</c:otherwise>
+							</c:choose>
+						</td>
+					</tr>
+		
+					<tr>
+						<!--Second row displaying the marks-->
+						<td class="field-name">
+							<fmt:message key="label.learning.marks" />
+						</td>
+						<td>
+							<c:choose>
+								<c:when test="${mark == null}">
+									<fmt:message key="label.learning.not.available" />
+								</c:when>
+								<c:otherwise>
+									<c:out value="${mark.marks}" escapeXml="false" />
+								</c:otherwise>
+							</c:choose>
+						</td>
+					</tr>
+				</table>		
+			</div>
+			<div class="last-item"></div>
+			<br>
+		</c:if>		
+		
 		<iframe
 			id="externalSpreadsheet" name="externalSpreadsheet" src="<html:rewrite page='/includes/javascript/simple_spreadsheet/spreadsheet_offline.html'/>?lang=<%=request.getLocale().getLanguage()%>"
 			style="width:99%;" frameborder="no" height="385px"
 			scrolling="no">
 		</iframe>
+		
+		<c:if test="${(mode != 'teacher') && (spreadsheet.learnerAllowedToSave)}">
+			<div class="space-bottom-top align-right">
+				<html:button property="SaveButton" onclick="return saveUserSpreadsheet('saveUserSpreadsheet')" styleClass="button">
+					<fmt:message key="label.save" />
+				</html:button>
+			</div>
+		</c:if>		
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">

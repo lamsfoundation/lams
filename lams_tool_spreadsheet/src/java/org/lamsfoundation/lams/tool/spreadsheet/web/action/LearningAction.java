@@ -60,7 +60,7 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetAttachment;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
-import org.lamsfoundation.lams.tool.spreadsheet.model.UserEditedSpreadsheet;
+import org.lamsfoundation.lams.tool.spreadsheet.model.UserModifiedSpreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.service.ISpreadsheetService;
 import org.lamsfoundation.lams.tool.spreadsheet.service.SpreadsheetApplicationException;
 import org.lamsfoundation.lams.tool.spreadsheet.service.UploadSpreadsheetFileException;
@@ -151,16 +151,6 @@ public class LearningAction extends Action {
 		Spreadsheet spreadsheet;
 		spreadsheet = service.getSpreadsheetBySessionId(sessionId);
 		
-		
-		
-//		SpreadsheetForm spreadsheetForm = (SpreadsheetForm)form;
-//		spreadsheetForm.setSessionMapID(sessionMap.getSessionID());
-//		spreadsheetForm.setSpreadsheet(spreadsheet);
-//		sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE_FORM, spreadsheetForm);
-//		request.setAttribute("spreadsheet.code", spreadsheet.getCode());
-		
-		
-
 		//check whehter finish lock is on/off
 		boolean lock = spreadsheet.getLockWhenFinished() && spreadsheetUser !=null && spreadsheetUser.isSessionFinished();
 		
@@ -230,31 +220,19 @@ public class LearningAction extends Action {
 		//load up learner changes in spreadsheet if such option is activated in spreadsheet
 		ISpreadsheetService service = getSpreadsheetService();
 		Spreadsheet spreadsheet = (Spreadsheet) sessionMap.get(SpreadsheetConstants.ATTR_RESOURCE);
+		SpreadsheetUser spreadsheetUser = getCurrentUser(service, sessionId);		
 		if(spreadsheet.isLearnerAllowedToSave() && !mode.isTeacher()){
-			SpreadsheetUser spreadsheetUser = getCurrentUser(service, sessionId);
-			if (spreadsheetUser.getUserEditedSpreadsheet() != null) {
-				spreadsheet.setCode(spreadsheetUser.getUserEditedSpreadsheet().getUserEditedSpreadsheet());
+			if (spreadsheetUser.getUserModifiedSpreadsheet() != null) {
+				spreadsheet.setCode(spreadsheetUser.getUserModifiedSpreadsheet().getUserModifiedSpreadsheet());
 			}
 		}
-		
-		
-		
-//		request.setAttribute(SpreadsheetConstants.ATTR_CODE, spreadsheet.getCode());
-//		SpreadsheetForm spreadsheetForm = (SpreadsheetForm )form;
-//		try {
-//			PropertyUtils.copyProperties(spreadsheetForm, existForm);
-//		} catch (Exception e) {
-//			throw new ServletException(e);
-//		}
-//		
+
 		SpreadsheetForm spreadsheetForm = (SpreadsheetForm)form;
-//		spreadsheetForm.setSessionMapID(sessionMap.getSessionID());
 		spreadsheetForm.setSpreadsheet(spreadsheet);
-//		sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE_FORM, spreadsheetForm);
-//		request.setAttribute("spreadsheet.code", spreadsheet.getCode());
 		
-		
-		
+		if ((spreadsheetUser != null) && (spreadsheetUser.getUserModifiedSpreadsheet() != null) && (spreadsheetUser.getUserModifiedSpreadsheet().getMark() != null) && (spreadsheetUser.getUserModifiedSpreadsheet().getMark().getDateMarksReleased() != null)) {
+			request.setAttribute(SpreadsheetConstants.ATTR_USER_MARK, spreadsheetUser.getUserModifiedSpreadsheet().getMark());
+		}
 		
 		if(mode.isAuthor()) {
 			return mapping.findForward(SpreadsheetConstants.SUCCESS);
@@ -288,15 +266,22 @@ public class LearningAction extends Action {
 		if(spreadsheetPO.isLearnerAllowedToSave() && !mode.isTeacher()){
 				
 			SpreadsheetUser spreadsheetUser = getCurrentUser(service,sessionId);
-			UserEditedSpreadsheet userEditedSpreadsheet = new UserEditedSpreadsheet();
+			UserModifiedSpreadsheet userModifiedSpreadsheet = new UserModifiedSpreadsheet();
 			String code = ((SpreadsheetForm)form).getSpreadsheet().getCode();
-			userEditedSpreadsheet.setUserEditedSpreadsheet(code);
-			spreadsheetUser.setUserEditedSpreadsheet(userEditedSpreadsheet);
+			userModifiedSpreadsheet.setUserModifiedSpreadsheet(code);
+			spreadsheetUser.setUserModifiedSpreadsheet(userModifiedSpreadsheet);
 			service.saveOrUpdateUser(spreadsheetUser);
 		}
 		
-		boolean finishSession = WebUtil.readBooleanParam(request, "finishSession"); 
-		ForwardConfig conf = finishSession ? mapping.findForwardConfig("finishSession") : mapping.findForwardConfig("continueReflect");
+		String typeOfAction = WebUtil.readStrParam(request, "typeOfAction");
+		ForwardConfig conf;
+		if ("finishSession".equals(typeOfAction)) {
+			conf = mapping.findForwardConfig("finishSession");
+		} else if ("continueReflect".equals(typeOfAction)) {
+			conf = mapping.findForwardConfig("continueReflect");
+		} else {
+			conf = mapping.findForwardConfig("saveUserSpreadsheet");
+		}
 		ActionRedirect redirect = new ActionRedirect(conf);
 		redirect.addParameter(SpreadsheetConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
@@ -421,7 +406,7 @@ public class LearningAction extends Action {
 		SpreadsheetUser spreadsheetUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
 		
 		if(spreadsheetUser == null){
-			SpreadsheetSession session = service.getSpreadsheetSessionBySessionId(sessionId);
+			SpreadsheetSession session = service.getSessionBySessionId(sessionId);
 			spreadsheetUser = new SpreadsheetUser(user,session);
 			service.saveOrUpdateUser(spreadsheetUser);
 		}

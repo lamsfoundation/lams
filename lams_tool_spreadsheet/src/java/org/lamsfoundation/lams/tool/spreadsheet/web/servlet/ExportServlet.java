@@ -121,7 +121,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
             if ( toolContentID != null ) {
             	content = service.getSpreadsheetByContentId(toolContentID);
             } else {
-            	SpreadsheetSession session=service.getSpreadsheetSessionBySessionId(toolSessionID);
+            	SpreadsheetSession session=service.getSessionBySessionId(toolSessionID);
             	if ( session != null )
             		content = session.getSpreadsheet();
             }

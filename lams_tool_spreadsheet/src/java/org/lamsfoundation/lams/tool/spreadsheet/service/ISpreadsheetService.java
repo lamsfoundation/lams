@@ -38,6 +38,8 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetAttachment;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
+import org.lamsfoundation.lams.tool.spreadsheet.model.UserModifiedSpreadsheet;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * @author Andrey Balan
@@ -72,11 +74,18 @@ public interface ISpreadsheetService{
 	
 	//********** user methods *************
 	/**
-	 * Save or update SpreadsheetUser in database, mostly for saving userEditedSpreadsheet.
+	 * Save or update SpreadsheetUser in database, mostly for saving userModifiedSpreadsheet.
 	 * 
 	 * @param user user which did modifications to spreadsheet
 	 */
 	void saveOrUpdateUser(SpreadsheetUser spreadsheetUser);
+	
+	/**
+	 * Save or update UserModifiedSpreadsheet in database.
+	 * 
+	 * @param userModifiedSpreadsheet
+	 */
+	void saveOrUpdateUserModifiedSpreadsheet(UserModifiedSpreadsheet userModifiedSpreadsheet);
 	
 	/**
 	 * Get user by given userID and toolContentID.
@@ -93,15 +102,21 @@ public interface ISpreadsheetService{
 	 */
 	SpreadsheetUser getUserByIDAndSession(Long long1, Long sessionId); 
 	
-//	/**
-//	 * Get user list by sessionId and itemUid
-//	 * 
-//	 * @param sessionId
-//	 * @param uid
-//	 * @return
-//	 */
-//	List<SpreadsheetUser> getUserListBySessionItem(Long sessionId, Long itemUid);
-
+	/**
+	 * Get user list by sessionId
+	 * 
+	 * @param sessionId
+	 * @return
+	 */
+	List<SpreadsheetUser> getUserListBySessionId(Long sessionId);
+	
+	/**
+	 * Get user by UID
+	 * @param uid
+	 * @return
+	 */
+	SpreadsheetUser getUser(Long uid);
+	
 	//********** Repository methods ***********************
 	/**
 	 * Delete file from repository.
@@ -132,7 +147,7 @@ public interface ISpreadsheetService{
 	 * @param sessionId
 	 * @return
 	 */
-	SpreadsheetSession getSpreadsheetSessionBySessionId(Long sessionId);
+	SpreadsheetSession getSessionBySessionId(Long sessionId);
 
 	/**
 	 * Save or update spreadsheet session.
@@ -205,10 +220,17 @@ public interface ISpreadsheetService{
 	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
 
 	/**
-	 * Get user by UID
-	 * @param uid
+	 * Returns messageService
+	 * 
 	 * @return
 	 */
-	SpreadsheetUser getUser(Long uid);
+	public MessageService getMessageService();	
+	
+	/**
+	 * Release marks
+	 * 
+	 * @param sessionId
+	 */
+	public void releaseMarksForSession(Long sessionId);
 }
 

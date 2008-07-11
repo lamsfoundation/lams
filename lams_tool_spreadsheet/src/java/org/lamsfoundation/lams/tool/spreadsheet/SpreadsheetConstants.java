@@ -72,10 +72,8 @@ public class SpreadsheetConstants {
 	public static final String ATTR_USER_FINISHED = "userFinished";
 	
 	//error message keys
-	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
-	public static final String ERROR_MSG_URL_BLANK = "error.resource.item.url.blank";
-	public static final String ERROR_MSG_DESC_BLANK = "error.resource.item.desc.blank";
-	public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
+	public static final String ERROR_MSG_MARKS_BLANK = "error.summary.marks.blank";
+	public static final String ERROR_MSG_COMMENTS_BLANK = "error.summary.comments.blank";
 	public static final String ERROR_MSG_INVALID_URL = "error.resource.item.invalid.url";
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
 	
@@ -89,6 +87,7 @@ public class SpreadsheetConstants {
 	public static final String ATTR_REFLECT_LIST = "reflectList";
 	public static final String ATTR_USER_UID = "userUid";
 	public static final String ATTR_USER_NAME = "userName";
+	public static final String ATTR_USER_MARK = "mark";
 	public static final String ATTR_CODE = "code";
 
 	public static final String DEFUALT_PROTOCOL_REFIX = "http://";

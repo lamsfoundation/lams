@@ -21,7 +21,8 @@
             <list>
                <value>org/lamsfoundation/lams/tool/spreadsheet/model/SpreadsheetUser.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/spreadsheet/model/Spreadsheet.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/spreadsheet/model/UserEditedSpreadsheet.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/spreadsheet/model/UserModifiedSpreadsheet.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/spreadsheet/model/SpreadsheetMark.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/spreadsheet/model/SpreadsheetAttachment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/spreadsheet/model/SpreadsheetSession.hbm.xml</value>
             </list>
@@ -34,7 +35,14 @@
             <ref local="spreadsheetSessionFactory"/>
         </property>
     </bean>
-    <bean id="userEditedSpreadsheetDao" class="org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate.UserEditedSpreadsheetDAOHibernate">
+    
+    <bean id="userModifiedSpreadsheetDao" class="org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate.UserModifiedSpreadsheetDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="spreadsheetSessionFactory"/>
+        </property>
+    </bean>
+    
+    <bean id="spreadsheetMarkDao" class="org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate.SpreadsheetMarkDAOHibernate">
         <property name="sessionFactory">
             <ref local="spreadsheetSessionFactory"/>
         </property>
@@ -68,8 +76,11 @@
         <property name="spreadsheetDao">
             <ref local="spreadsheetDao"/>
         </property>
-        <property name="userEditedSpreadsheetDao">
-            <ref local="userEditedSpreadsheetDao"/>
+        <property name="userModifiedSpreadsheetDao">
+            <ref local="userModifiedSpreadsheetDao"/>
+        </property>
+        <property name="spreadsheetMarkDao">
+            <ref local="spreadsheetMarkDao"/>
         </property>
         <property name="spreadsheetAttachmentDao">
             <ref local="spreadsheetAttachmentDao"/>
@@ -119,6 +130,7 @@
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="release*">PROPAGATION_REQUIRED</prop>                
 				<prop key="get*">PROPAGATION_REQUIRED, -java.lang.Exception</prop>                    
                 <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

@@ -27,7 +27,7 @@
 
         <property
             name="marks"
-            type="java.lang.Long"
+            type="java.lang.String"
             update="true"
             insert="true"
             column="marks"

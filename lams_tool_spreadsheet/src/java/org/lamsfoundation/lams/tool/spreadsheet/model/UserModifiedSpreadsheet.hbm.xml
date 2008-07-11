@@ -7,8 +7,8 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.spreadsheet.model.UserEditedSpreadsheet"
-        table="tl_lasprd10_user_edited_spreadsheet"
+        name="org.lamsfoundation.lams.tool.spreadsheet.model.UserModifiedSpreadsheet"
+        table="tl_lasprd10_user_modified_spreadsheet"
     >
 
         <id
@@ -19,23 +19,33 @@
             <generator class="native">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-UserEditedSpreadsheet.xml 
+                  hibernate-generator-params-UserModifiedSpreadsheet.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
         </id>
 
         <property
-            name="userEditedSpreadsheet"
+            name="userModifiedSpreadsheet"
             type="text"
             update="true"
             insert="true"
-            column="user_edited_spreadsheet"
+            column="user_modified_spreadsheet"
+        />
+
+        <many-to-one
+            name="mark"
+            class="org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetMark"
+            cascade="all"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="mark_id"
         />
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-UserEditedSpreadsheet.xml
+                hibernate-properties-UserModifiedSpreadsheet.xml
             containing the additional properties and place it in your merge dir.
         -->
 
