@@ -347,6 +347,7 @@ function display() {
 	  }
 	}
   }
+
   out += "</tr>";
   out += "<tr><th id='-1_-1' ondblclick='editCell(-1,-1,0);' onclick='mouseoverCell(-1,-1);'>"+htmlEscape(showCell(-1,-1,0),true)+"</th>";
   for (var i=col0; i<cols+col0; i++) {
@@ -389,6 +390,7 @@ function display() {
     }
     out += "</tr>";
   }
+
   out += "<tr id='spacer'><th class='empty'></th>";
   for (var i=col0; i<cols+col0; i++) out += "<th class='empty'><img src='' style='width:"+col_min_width+"; height:0px;'></th>";
   out += "</tr>";
@@ -415,7 +417,6 @@ function display() {
   getObj("data").innerHTML = out;
   getObj("content").scrollLeft = scrollX;
   getObj("content").scrollTop = scrollY;
-
   mouseoverCell(currRow,currCol);
   if (clipboard_mode!="") {
     var color = "#DDDDFF"
@@ -535,12 +536,45 @@ function setCellsR(row,col,item,value) {
   return setCells(arr[0],arr[1],item,value);
 }
 
-function loadScriptFile(location){
+function loadScriptFileAndCode(location, spreadsheetCode){
   var script = document.createElement("script");
   script.type = "text/javascript";
+  var code = spreadsheetCode.value;
+  
+  if (window.addEventListener) {
+    window.addEventListener("load",function() { load(code); },false);
+  } else {
+	  script.onreadystatechange = function() {
+		  if ((this.readyState == 'loaded') || (this.readyState == 'complete'))  {
+				    load(code); 
+			    }
+	  	   }
+	}
+  
   script.src = location;
   document.getElementsByTagName("head").item(0).appendChild(script);
 }
+
+function loadLamsCode(code) {
+  var script = document.createElement("script");
+  script.type = "text/javascript";
+
+    if (window.addEventListener) {
+    window.addEventListener("load",function() { load(code); },false);
+  } else {
+	  script.onreadystatechange = function() {
+//		  alert("onreadystatechange "+ this.readyState + "!");
+		  if ((this.readyState == 'loaded') || (this.readyState == 'complete'))  {
+				    load(code); 
+			    }
+	  	   }
+	}
+
+  document.getElementsByTagName("head").item(0).appendChild(script);
+}
+
+
+
 function loadStyleFile(location){
   var script = document.createElement("link");
   script.type = "text/css";
@@ -587,6 +621,7 @@ function load(code) {
 	  return;
     }
   }
+  
   if (typeof cells[-2] != "undefined") showColumnGroups = true; else showColumnGroups = false;
   active = "content";
   getObj("source").style.display = "none";
@@ -767,21 +802,14 @@ function saveSGS() {
 function loadSheetFromUrl(location) {
   var script = document.createElement("script");
   script.type = "text/javascript";
-//  if (window.addEventListener) {
-//    window.addEventListener("load",function() { load("// dbCells"); },false);
-//  } else {
-//    script.onreadystatechange = function() { if (this.readyState == 'loaded') load("// dbCells"); }
-//  }
-  window.addEventListener("load",function() { load("// dbCells"); },false);
+  if (window.addEventListener) {
+    window.addEventListener("load",function() { load("// dbCells"); },false);
+  } else {
+    script.onreadystatechange = function() { if (this.readyState == 'loaded') load("// dbCells"); }
+  }
   script.src = location;
   document.getElementsByTagName("head").item(0).appendChild(script);
-}
 
-function loadLamsCode(code) {
-  var script = document.createElement("script");
-  script.type = "text/javascript";
-  window.addEventListener("load",function() { load(code); },false);
-  document.getElementsByTagName("head").item(0).appendChild(script);
 }
 
 function loadCode() {

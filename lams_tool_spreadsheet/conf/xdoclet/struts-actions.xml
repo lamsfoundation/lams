@@ -101,7 +101,7 @@
 			validate="false" 
 			input="/pages/learning/learning.jsp" 
 			scope="request">
-			<forward name="saveUserSpreadsheet" redirect="true" path="/pages/learning/learning.jsp" />
+			<forward name="initPage" redirect="true" path="/learning/init.do" />
 			<forward name="continueReflect" redirect="true" path="/learning/newReflection.do" />			
 			<forward name="finishSession" redirect="true" path="/learning/finish.do" />
 		</action>
@@ -139,12 +139,12 @@
 		<action path="/monitoring/doStatistic"
 			type="org.lamsfoundation.lams.tool.spreadsheet.web.action.MonitoringAction"
 			parameter="doStatistic" >
-			<forward name="success" path="/pages/monitoring/statisticspart.jsp" />
+			<forward name="success" path="/pages/monitoring/parts/statisticspart.jsp" />
 		</action>
 		<action path="/monitoring/viewAllMarks"
 			type="org.lamsfoundation.lams.tool.spreadsheet.web.action.MonitoringAction"
 			parameter="viewAllMarks" >
-			<forward name="viewAllMarks" path="/pages/monitoring/viewallmarks.jsp" />
+			<forward name="viewAllMarks" path="/pages/monitoring/parts/viewallmarks.jsp" />
 		</action>
 		<action path="/monitoring/releaseMarks"
 			type="org.lamsfoundation.lams.tool.spreadsheet.web.action.MonitoringAction"
@@ -160,7 +160,7 @@
 			name="markForm" 
 			validate="false" 
 			scope="request">
-			<forward name="success" path="/pages/monitoring/editmark.jsp" />
+			<forward name="success" path="/pages/monitoring/parts/editmark.jsp" />
 		</action>
 		<action path="/monitoring/saveMark"
 			type="org.lamsfoundation.lams.tool.spreadsheet.web.action.MonitoringAction"
@@ -168,13 +168,13 @@
 			name="markForm" 
 			validate="false" 
 			scope="request">
-            <forward name="editMark" path="/pages/monitoring/editmark.jsp" />
-			<forward name="success" path="/pages/monitoring/summarylist.jsp" />            			
+            <forward name="editMark" path="/pages/monitoring/parts/editmark.jsp" />
+			<forward name="success" path="/pages/monitoring/parts/summarylist.jsp" />            			
 		</action>		
 		<action path="/monitoring/viewReflection"
 			type="org.lamsfoundation.lams.tool.spreadsheet.web.action.MonitoringAction"
 			parameter="viewReflection">
-			<forward name="success" path="/pages/monitoring/notebook.jsp" />
+			<forward name="success" path="/pages/monitoring/parts/notebook.jsp" />
 		</action>
 		
 		<!-- ========== BEGIN: Common ============================== -->

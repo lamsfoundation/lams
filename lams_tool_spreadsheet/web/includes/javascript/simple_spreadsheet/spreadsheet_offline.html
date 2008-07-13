@@ -32,17 +32,7 @@
   <link media="all" href="styles.css" rel="stylesheet" type="text/css" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <script src="spreadsheet.js" type="text/javascript"></script>
-  <script>
-	var lang = "en";
-	if (m = /lang=([^&]*)/.exec(document.location.href)) {
-	  if (m[1]) lang = m[1];
-	}
-	loadScriptFile("translations/"+lang+".js");
-	
-	var spreadsheetCode = parent.document.getElementById("spreadsheet.code").value;
-	loadLamsCode(spreadsheetCode);
 
-  </script>
   
 </head>
 <body>
@@ -56,6 +46,27 @@
 <div class="data" id="data"></div>
 <div id="source" align="center">
 
+  <script>
+	var lang = "en";
+	if (m = /lang=([^&]*)/.exec(document.location.href)) {
+	  if (m[1]) lang = m[1];
+	}
+	
+	var spreadsheetCode = parent.document.getElementById("spreadsheet.code");
+	loadScriptFileAndCode("translations/"+lang+".js", spreadsheetCode);
+	
+  </script>
+
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+

@@ -143,7 +143,7 @@
 <%@ include file="/common/messages.jsp"%>
 
 <div id="summariesArea">
-	<%@ include file="/pages/monitoring/summarylist.jsp"%>
+	<%@ include file="/pages/monitoring/parts/summarylist.jsp"%>
 </div>
 
 <c:if test="${spreadsheet.markingEnabled}">	

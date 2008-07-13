@@ -221,10 +221,8 @@ public class LearningAction extends Action {
 		ISpreadsheetService service = getSpreadsheetService();
 		Spreadsheet spreadsheet = (Spreadsheet) sessionMap.get(SpreadsheetConstants.ATTR_RESOURCE);
 		SpreadsheetUser spreadsheetUser = getCurrentUser(service, sessionId);		
-		if(spreadsheet.isLearnerAllowedToSave() && !mode.isTeacher()){
-			if (spreadsheetUser.getUserModifiedSpreadsheet() != null) {
-				spreadsheet.setCode(spreadsheetUser.getUserModifiedSpreadsheet().getUserModifiedSpreadsheet());
-			}
+		if(spreadsheet.isLearnerAllowedToSave() && !mode.isTeacher() && (spreadsheetUser.getUserModifiedSpreadsheet() != null)){
+			spreadsheet.setCode(spreadsheetUser.getUserModifiedSpreadsheet().getUserModifiedSpreadsheet());
 		}
 
 		SpreadsheetForm spreadsheetForm = (SpreadsheetForm)form;
@@ -280,11 +278,12 @@ public class LearningAction extends Action {
 		} else if ("continueReflect".equals(typeOfAction)) {
 			conf = mapping.findForwardConfig("continueReflect");
 		} else {
-			conf = mapping.findForwardConfig("saveUserSpreadsheet");
+			conf = mapping.findForwardConfig("initPage");
 		}
 		ActionRedirect redirect = new ActionRedirect(conf);
 		redirect.addParameter(SpreadsheetConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+		redirect.addParameter(AttributeNames.ATTR_MODE, mode);
 		return  redirect;
 	}
 	

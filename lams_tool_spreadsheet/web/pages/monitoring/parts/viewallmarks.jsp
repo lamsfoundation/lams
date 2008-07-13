@@ -21,7 +21,7 @@
 
 		<div id="content">
 		<h1>
-			<fmt:message key="label.monitoring.heading.marking"/>
+			<fmt:message key="label.monitoring.vieawallmarks.heading.marking"/>
 		</h1>
 
 			<table cellpadding="0">
@@ -60,7 +60,7 @@
 						<td>
 							<c:choose>
 								<c:when test="${(user.userModifiedSpreadsheet != null) && (user.userModifiedSpreadsheet.mark != null)}">
-									<c:out value="$user.userModifiedSpreadsheet.mark.marks}" escapeXml="false" />
+									<c:out value="${user.userModifiedSpreadsheet.mark.marks}" escapeXml="false" />
 								</c:when>
 								<c:otherwise>
 									<fmt:message key="label.learning.not.available" />
@@ -70,11 +70,11 @@
 								<c:when test="${user.userModifiedSpreadsheet != null}">
 									<html:link href="javascript:updateMark(${user.uid});" 
 										property="submit" styleClass="button">
-										<fmt:message key="label.monitoring.updateMarks.button" />
+										<fmt:message key="label.monitoring.vieawallmarks.update.marks" />
 									</html:link>
 								</c:when>
 								<c:otherwise>
-										<fmt:message key="label.monitoring.updateMarks.button" />
+										<fmt:message key="label.monitoring.vieawallmarks.update.marks" />
 								</c:otherwise>
 							</c:choose>							
 
