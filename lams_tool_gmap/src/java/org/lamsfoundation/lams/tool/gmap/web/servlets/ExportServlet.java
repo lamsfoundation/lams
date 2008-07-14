@@ -41,7 +41,6 @@ import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
 import org.lamsfoundation.lams.tool.gmap.service.GmapServiceProxy;
 import org.lamsfoundation.lams.tool.gmap.util.GmapException;
-import org.lamsfoundation.lams.tool.gmap.util.GmapImageBundler;
 import org.lamsfoundation.lams.tool.gmap.util.GmapConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
