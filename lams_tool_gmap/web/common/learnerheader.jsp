@@ -33,7 +33,7 @@
 		var TREE_OPEN_ICON = "${tool}/images/tree_open.gif";
 		
 		var errorMissingTitle = '<fmt:message key="error.missingMarkerTitle"/>';
-		var makerLimitMsg = '<fmt:message key="label.learner.markerLimitReached"/>'
+		var markerLimitMsg = '<fmt:message key="label.learner.markerLimitReached"/>'
 		var confirmDelete = '<fmt:message key="label.authoring.basic.confirmDelete"/>';
 		
 		var sessionName = '${gmapSessionDTO.sessionName}';

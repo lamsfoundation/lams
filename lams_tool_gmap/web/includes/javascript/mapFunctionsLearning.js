@@ -44,11 +44,9 @@ function saveMarkerInfo(x)
 		if (title==null || title == "")
 		{
 			alert(errorMissingTitle);
-			return false;
 		}
 		else
 		{		
-			
 			var info=document.getElementById("infoWindow").value;
 			markers[x].title = title;
 			markers[x].infoMessage = info;
