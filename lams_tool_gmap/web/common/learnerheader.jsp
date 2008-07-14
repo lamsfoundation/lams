@@ -52,12 +52,8 @@
 		
 		function initLearnerGmap()
 		{
-			//window.onresize=resizeMap;
-			//resizeMap();
 			if (GBrowserIsCompatible()) 
 			{
-				//map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(640,320) } );
-				//map = new GMap2(document.getElementById("map_canvas"), { size: new GSize(400,400) } );
 				map = new GMap2(document.getElementById("map_canvas"));
 				markers = new Array();
 		    	users = new Array();
@@ -106,47 +102,7 @@
 		    	refreshSideBar(sessionName);
 		    }
 		}
-		
-		function resizeMap()
-		{
-			var contentDiv = document.getElementById("content");
-			var mapDiv = document.getElementById("map_canvas");
-			var sideBarDiv = document.getElementById("usersidebar");
-			
-			var windowSize = getWindowSize();
 
-			
-			var contentDivWidth = Math.round(windowSize[0] * 0.85) - 20;
-			//var contentDivHeight = Math.round(windowSize[0] * 0.85);
-
-			mapDiv.style.width = Math.round(contentDivWidth * 0.8) + "px";
-			sideBarDiv.style.width = Math.round(contentDivWidth * 0.2) + "px";
-			//sideBarDiv.style.height = mapDiv.style.height;
-		}
-		
-		
-		function getWindowSize() 
-		{
-			var myWidth = 0, myHeight = 0;
-			if( typeof( window.innerWidth ) == 'number' ) 
-			{
-				//Non-IE
-				myWidth = window.innerWidth;
-				myHeight = window.innerHeight;
-			} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
-				//IE 6+ in 'standards compliant mode'
-				myWidth = document.documentElement.clientWidth;
-				myHeight = document.documentElement.clientHeight;
-			} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
-				//IE 4 compatible
-				myWidth = document.body.clientWidth;
-				myHeight = document.body.clientHeight;
-			}
-			var size = new Array();
-			size[0] = myWidth;
-			size[1] = myHeight;
-			return size;
-		}
 	//-->
 	
 	
