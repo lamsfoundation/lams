@@ -86,53 +86,57 @@
 	}	
 </script>
 
+<h1><fmt:message key="label.authoring.heading.advance"/></h1>
 
 <%-- Overall TaskList information  --%>
+<div class="monitoring-advanced">
 
-<div class="info space-bottom" align="right" style="position:relative; right:40px; top:15px;">
-	<fmt:message key="label.monitoring.summary.lock.when.finished" />
+	<fmt:message key="label.monitoring.summary.lock.when.finished"><fmt:param>
 	<c:choose>
 		<c:when test="${spreadsheet.lockWhenFinished}">
-			On
+			<fmt:message key="label.on" />
 		</c:when>
 		<c:otherwise>
-			Off
+			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
-	<br>
-	 						
-	<fmt:message key="label.monitoring.summary.individual.spreadsheets" /> 
+	</fmt:param></fmt:message>
+	<br/>
+
+	<fmt:message key="label.monitoring.summary.individual.spreadsheets"><fmt:param>
 	<c:choose>
 		<c:when test="${spreadsheet.learnerAllowedToSave}">
-			On
+			<fmt:message key="label.on" />
 		</c:when>
 		<c:otherwise>
-			Off
+			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
-	<br>	
-						
-	<fmt:message key="label.monitoring.summary.marking.enabled" />
+	</fmt:param></fmt:message>
+	<br/>
+	
+	<fmt:message key="label.monitoring.summary.marking.enabled"><fmt:param>
 	<c:choose>
-		<c:when test="${spreadsheet.markingEnabled}"> 
-			On
+		<c:when test="${spreadsheet.markingEnabled}">
+			<fmt:message key="label.on" />
 		</c:when>
 		<c:otherwise>
-			Off
+			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
-	<br>	
-						
-	<fmt:message key="label.monitoring.summary.notebook.reflection" />
+	</fmt:param></fmt:message>
+	<br/>
+	
+	<fmt:message key="label.monitoring.summary.notebook.reflection"><fmt:param>
 	<c:choose>
 		<c:when test="${spreadsheet.reflectOnActivity}">
-			On
+			<fmt:message key="label.on" />
 		</c:when>
 		<c:otherwise>
-			Off
+			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
-	<br>
+	</fmt:param></fmt:message>
 </div>
 
 <%-- Summary list  --%>
