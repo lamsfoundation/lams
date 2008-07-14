@@ -21,7 +21,8 @@
 <h1><fmt:message key="label.authoring.heading.advance"/></h1>
 
 <div class="monitoring-advanced">
-	<fmt:message key="label.monitoring.summary.lock.when.finished" />
+
+	<fmt:message key="label.monitoring.summary.lock.when.finished"><fmt:param>
 	<c:choose>
 		<c:when test="${taskList.lockWhenFinished}">
 			<fmt:message key="label.on" />
@@ -30,9 +31,10 @@
 			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
-	<br>
+	</fmt:param></fmt:message>
+	<br/>
 	 						
-	<fmt:message key="label.monitoring.summary.sequential.order" />
+	<fmt:message key="label.monitoring.summary.sequential.order"><fmt:param>
 	<c:choose>
 		<c:when test="${taskList.sequentialOrder}">
 			<fmt:message key="label.on" />
@@ -41,9 +43,10 @@
 			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
+	</fmt:param></fmt:message>
 	<br>	
 						
-	<fmt:message key="label.monitoring.summary.min.number.tasks" />
+	<fmt:message key="label.monitoring.summary.min.number.tasks"><fmt:param>
 	<c:choose>
 		<c:when test="${taskList.minimumNumberTasks > 0}">
 			${taskList.minimumNumberTasks}
@@ -52,9 +55,10 @@
 			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
+	</fmt:param></fmt:message>
 	<br>	
 						
-	<fmt:message key="label.monitoring.summary.allowed.contribute.tasks" />
+	<fmt:message key="label.monitoring.summary.allowed.contribute.tasks"><fmt:param>
 	<c:choose>
 		<c:when test="${taskList.allowContributeTasks}">
 			<fmt:message key="label.on" />
@@ -63,9 +67,10 @@
 			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
+	</fmt:param></fmt:message>
 	<br>					
 	
-	<fmt:message key="label.monitoring.summary.monitor.verification" />
+	<fmt:message key="label.monitoring.summary.monitor.verification"><fmt:param>
 	<c:choose>
 		<c:when test="${taskList.monitorVerificationRequired}">
 			<fmt:message key="label.on" />
@@ -74,9 +79,10 @@
 			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
+	</fmt:param></fmt:message>
 	<br>					
 	
-	<fmt:message key="label.monitoring.summary.notebook.reflection" />
+	<fmt:message key="label.monitoring.summary.notebook.reflection"><fmt:param>
 	<c:choose>
 		<c:when test="${taskList.reflectOnActivity}">
 			<fmt:message key="label.on" />
@@ -85,7 +91,7 @@
 			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
-	<br>
+	</fmt:param></fmt:message>
 </div>
 
 <%-- Summary list  --%>
