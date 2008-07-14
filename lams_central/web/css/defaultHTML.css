@@ -769,6 +769,18 @@ hr {border:0px;
 
 b.error {color:#cc0000;} 
 
+/* ***********************************************
+    Monitoring page styles
+************************************************ */
+
+/* Display the adavanced options in the summary tab */
+div.monitoring-advanced {
+	margin-left: 25px;
+	margin-right: 30px;
+	margin-bottom: 20px;
+}
+
+
 /*
 *************************************************
 
