@@ -42,23 +42,32 @@ import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
 import org.lamsfoundation.lams.tool.gmap.service.GmapServiceProxy;
 import org.lamsfoundation.lams.tool.gmap.util.GmapException;
 import org.lamsfoundation.lams.tool.gmap.util.GmapImageBundler;
+import org.lamsfoundation.lams.tool.gmap.util.GmapConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.learning.export.web.action.CustomToolImageBundler;
 
 public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	private static final long serialVersionUID = -2829707715037631881L;
 
 	private static Logger logger = Logger.getLogger(ExportServlet.class);
+	
+	// list of images that need to be copied for export
+	static String[] GMAP_IMAGES = {"blue_Marker.png", "paleblue_Marker.png", 
+		"red_Marker.png", "yellow_Marker.png", "tree_closed.gif", "tree_open.gif"};
 
 	private final String FILENAME = "gmap_main.html";
 
 	private IGmapService gmapService;
 
 	protected String doExport(HttpServletRequest request,
-			HttpServletResponse response, String directoryName, Cookie[] cookies) {
+			HttpServletResponse response, String directoryName, Cookie[] cookies) 
+	{
 
 		if (gmapService == null) {
 			gmapService = GmapServiceProxy.getGmapService(getServletContext());
@@ -81,15 +90,21 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		{
 			logger.error("Cannot perform export for gmap tool.");
 		}
-
-		
-		
 		
 		String basePath = request.getScheme() + "://" + request.getServerName()
 			+ ":" + request.getServerPort() + request.getContextPath();
 		
-		GmapImageBundler imageBundler = new GmapImageBundler();
-		imageBundler.bundle(request, cookies, directoryName);
+		// Attempting to export required images
+		try
+		{
+			CustomToolImageBundler imageBundler = new CustomToolImageBundler();
+			imageBundler.bundle(request, cookies, directoryName, getImagesUrlDir(), GMAP_IMAGES);
+		}
+		catch (Exception e)
+		{
+			logger.error("Could not export gmap images, some images may be missing in export portfolio", e);
+		}
+		
 		
 		writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp",
 				directoryName, FILENAME, cookies);
@@ -182,6 +197,19 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 		
 		request.getSession().setAttribute("gmapDTO", gmapDTO);
+	}
+	
+	private String getImagesUrlDir() 
+	{
+		String gmapUrlPath = Configuration.get(ConfigurationKeys.SERVER_URL);
+		if ( gmapUrlPath == null )  
+		{
+			logger.error("Unable to get path to the LAMS Gmap URL from the configuration table. Gmap images export failed");
+			return "";
+		} else {
+			gmapUrlPath = gmapUrlPath + "/tool/" + GmapConstants.TOOL_SIGNATURE + "/images/";
+			return gmapUrlPath;
+		}
 	}
 
 }
