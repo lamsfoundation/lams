@@ -329,9 +329,9 @@ function updateMarkerInfoWindowHtml(markerIn)
 		markerIn.inputForm ="<fmt:message key='label.authoring.basic.title'/>"
 		markerIn.inputForm += "<br><input type='text' onkeypress='javascript:if (event.keyCode==13){" +markerIn.saveFuncStr+ "}' maxlength='50' size='50' id='markerTitle' name='markerTitle' value='" + markerIn.title +"' /><br>";
 		markerIn.inputForm += "<fmt:message key='label.newInfoWindowText'/><br><textarea id='infoWindow' name='infoWindow' rows='5' cols='50'>" + markerIn.infoMessage + "</textarea>";
-		markerIn.markerMetaData = "<font size='tiny' color='grey'>";
+		markerIn.markerMetaData = "<span style='font-size:90%; color:#999999;'>";
 		markerIn.markerMetaData += '<nobr><fmt:message key="label.latitudeLongitude"/> (' + markerIn.getPoint().lat() + "-" + markerIn.getPoint().lng() +")</nobr>";
-		markerIn.markerMetaData += "</font>";
+		markerIn.markerMetaData += "</span>";
 		markerIn.infoWindowHtml =  markerIn.inputForm + "<br />" +markerIn.markerMetaData + markerIn.linksBar;
 	}
 	else
@@ -341,10 +341,10 @@ function updateMarkerInfoWindowHtml(markerIn)
 		{
 			markerIn.linksBar = "<br/ >" + markerIn.removeLink + "&nbsp;" + markerIn.editLink;
 		}
-		markerIn.markerMetaData = "<font size='tiny' color='grey'>";
+		markerIn.markerMetaData = "<span style='font-size:90%; color:#999999;'>";
 		markerIn.markerMetaData += '<fmt:message key="label.createdBy"/> ' + markerIn.createdBy + "<br />";
 		markerIn.markerMetaData += '<nobr><fmt:message key="label.latitudeLongitude"/> (' + markerIn.getPoint().lat() + "-" + markerIn.getPoint().lng() +")</nobr>";
-		markerIn.markerMetaData += "</font>";
+		markerIn.markerMetaData += "</span>";
 		markerIn.infoWindowHtml = "" + "<h4>" + markerIn.title + "</h4><div style='overflow:auto;width:400px;height:80px'>" +  markerIn.infoMessage.replace(/\n/g, "<br />") + "</div>"+ markerIn.markerMetaData  + markerIn.linksBar;
 	}	
 }
