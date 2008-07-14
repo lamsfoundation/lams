@@ -18,14 +18,16 @@
 
 <%-- Overall TaskList information  --%>
 
-<div class="info space-bottom" align="right" style="position:relative; right:40px; top:15px;">
+<h1><fmt:message key="label.authoring.heading.advance"/></h1>
+
+<div class="monitoring-advanced">
 	<fmt:message key="label.monitoring.summary.lock.when.finished" />
 	<c:choose>
 		<c:when test="${taskList.lockWhenFinished}">
-			On
+			<fmt:message key="label.on" />
 		</c:when>
 		<c:otherwise>
-			Off
+			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
 	<br>
@@ -33,10 +35,10 @@
 	<fmt:message key="label.monitoring.summary.sequential.order" />
 	<c:choose>
 		<c:when test="${taskList.sequentialOrder}">
-			On
+			<fmt:message key="label.on" />
 		</c:when>
 		<c:otherwise>
-			Off
+			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
 	<br>	
@@ -47,7 +49,7 @@
 			${taskList.minimumNumberTasks}
 		</c:when>
 		<c:otherwise>
-			Off
+			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
 	<br>	
@@ -55,10 +57,10 @@
 	<fmt:message key="label.monitoring.summary.allowed.contribute.tasks" />
 	<c:choose>
 		<c:when test="${taskList.allowContributeTasks}">
-			On
+			<fmt:message key="label.on" />
 		</c:when>
 		<c:otherwise>
-			Off
+			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
 	<br>					
@@ -66,10 +68,10 @@
 	<fmt:message key="label.monitoring.summary.monitor.verification" />
 	<c:choose>
 		<c:when test="${taskList.monitorVerificationRequired}">
-			On
+			<fmt:message key="label.on" />
 		</c:when>
 		<c:otherwise>
-			Off
+			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
 	<br>					
@@ -77,10 +79,10 @@
 	<fmt:message key="label.monitoring.summary.notebook.reflection" />
 	<c:choose>
 		<c:when test="${taskList.reflectOnActivity}">
-			On
+			<fmt:message key="label.on" />
 		</c:when>
 		<c:otherwise>
-			Off
+			<fmt:message key="label.off" />
 		</c:otherwise>
 	</c:choose>	
 	<br>
