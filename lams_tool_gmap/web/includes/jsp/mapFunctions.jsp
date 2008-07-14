@@ -345,7 +345,7 @@ function updateMarkerInfoWindowHtml(markerIn)
 		markerIn.markerMetaData += '<fmt:message key="label.createdBy"/> ' + markerIn.createdBy + "<br />";
 		markerIn.markerMetaData += '<nobr><fmt:message key="label.latitudeLongitude"/> (' + markerIn.getPoint().lat() + "-" + markerIn.getPoint().lng() +")</nobr>";
 		markerIn.markerMetaData += "</span>";
-		markerIn.infoWindowHtml = "" + "<h4>" + markerIn.title + "</h4><div style='overflow:auto;width:400px;height:80px'>" +  markerIn.infoMessage.replace(/\n/g, "<br />") + "</div>"+ markerIn.markerMetaData  + markerIn.linksBar;
+		markerIn.infoWindowHtml = "<h4>" + markerIn.title + "</h4><div style='overflow:auto; width:350px; height:80px'>" +  markerIn.infoMessage.replace(/\n/g, "<br />") + "</div>"+ markerIn.markerMetaData  + markerIn.linksBar;
 	}	
 }
 
