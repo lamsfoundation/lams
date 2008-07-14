@@ -285,14 +285,51 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService,ToolContentMa
 		
 	}
 
-	public List<Summary> exportBySessionId(Long sessionId, boolean skipHide) {
+	public List<Summary> exportForLearner(Long sessionId, SpreadsheetUser learner) {
 		SpreadsheetSession session = spreadsheetSessionDao.getSessionBySessionId(sessionId);
 		if(session == null){
 			log.error("Failed get SpreadsheetSession by ID [" +sessionId + "]");
 			return null;
 		}
+		
+		Spreadsheet spreadsheet = session.getSpreadsheet();
+		List<Summary> summaryList = new ArrayList<Summary>();
+		
+		List<SpreadsheetUser> userList = new ArrayList<SpreadsheetUser>();
+		userList.add(learner);
+		Summary summary = new Summary(session, spreadsheet, userList);
+			
+		//Fill up reflect dto
+		NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, 
+				SpreadsheetConstants.TOOL_SIGNATURE, learner.getUserId().intValue());
+		ReflectDTO reflectDTO = new ReflectDTO(learner);
+		if(notebookEntry == null){
+			reflectDTO.setFinishReflection(false);
+			reflectDTO.setReflect(null);
+		}else{
+			reflectDTO.setFinishReflection(true);
+			reflectDTO.setReflect(notebookEntry.getEntry());
+		}
+		reflectDTO.setReflectInstructions(session.getSpreadsheet().getReflectInstructions());
+		summary.getReflectDTOList().add(reflectDTO);
+		summaryList.add(summary);
+		
+		return summaryList;
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		//initial spreadsheet items list
-		List<Summary> itemList = new ArrayList();
+//		List<Summary> itemList = new ArrayList();
 //		Set<SpreadsheetItem> resList = session.getSpreadsheet().getSpreadsheetItems();
 //		for(SpreadsheetItem item:resList){
 //			if(skipHide && item.isHide())
@@ -317,45 +354,42 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService,ToolContentMa
 //			}
 //		}
 		
-		return itemList;
+//		return itemList;
 	}
 	
-	public List<List<Summary>> exportByContentId(Long contentId) {
+	public List<Summary> exportForTeacher(Long contentId) {
 		Spreadsheet spreadsheet = spreadsheetDao.getByContentId(contentId);
-		List<List<Summary>> groupList = new ArrayList();
+		List<Summary> summaryList = new ArrayList<Summary>();
 		
-//		//create init spreadsheet items list
-//		List<Summary> initList = new ArrayList();
-//		groupList.add(initList);
-//		Set<SpreadsheetItem> resList = spreadsheet.getSpreadsheetItems();
-//		for(SpreadsheetItem item:resList){
-//			if(item.isCreateByAuthor()){
-//				Summary sum = new Summary(null, null,item,true);
-//				initList.add(sum);
-//			}
-//		}
-//		
-//		//session by session
-//		List<SpreadsheetSession> sessionList = spreadsheetSessionDao.getByContentId(contentId);
-//		for(SpreadsheetSession session:sessionList){
-//			List<Summary> group = new ArrayList<Summary>();
-//			//get this session's all spreadsheet items
-//			Set<SpreadsheetItem> sessList =session.getSpreadsheetItems();
-//			for(SpreadsheetItem item:sessList){
-//				//to skip all item create by author
-//				if(!item.isCreateByAuthor()){
-//					Summary sum = new Summary(session.getSessionId(), session.getSessionName(),item,false);
-//					group.add(sum);
-//				}
-//			}
-//			if(group.size() == 0){
-//				group.add(new Summary(session.getSessionId(), session.getSessionName(),null,false));
-//			}
-//			groupList.add(group);
-//		}
+		List<SpreadsheetSession> sessionList = spreadsheetSessionDao.getByContentId(contentId);		
+		//create the user list of all whom were started this task
+		for(SpreadsheetSession session:sessionList) {
+			List<SpreadsheetUser> userList = spreadsheetUserDao.getBySessionID(session.getSessionId());
+			Summary summary = new Summary(session, spreadsheet, userList);
+			
+			//Fill up reflect dto
+			for(SpreadsheetUser user : userList) {
+				NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, 
+						SpreadsheetConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+				
+				ReflectDTO reflectDTO = new ReflectDTO(user);
+				if(notebookEntry == null){
+					reflectDTO.setFinishReflection(false);
+					reflectDTO.setReflect(null);
+				}else{
+					reflectDTO.setFinishReflection(true);
+					reflectDTO.setReflect(notebookEntry.getEntry());
+				}
+				reflectDTO.setReflectInstructions(session.getSpreadsheet().getReflectInstructions());
+				
+				summary.getReflectDTOList().add(reflectDTO);
+			}
+			summaryList.add(summary);
+		}
 		
-		return groupList;
+		return summaryList;
 	}
+	
 	public Spreadsheet getSpreadsheetBySessionId(Long sessionId){
 		SpreadsheetSession session = spreadsheetSessionDao.getSessionBySessionId(sessionId);
 		//to skip CGLib problem

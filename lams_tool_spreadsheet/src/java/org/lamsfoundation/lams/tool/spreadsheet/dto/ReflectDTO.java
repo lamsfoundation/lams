@@ -12,7 +12,7 @@ public class ReflectDTO {
 	private String fullName;
 	private String loginName;
 	private boolean hasRefection;
-	private String reflectInstrctions;
+	private String reflectInstructions;
 	private boolean finishReflection;
 	private String reflect;
 	
@@ -52,11 +52,11 @@ public class ReflectDTO {
 	public void setReflect(String reflect) {
 		this.reflect = reflect;
 	}
-	public String getReflectInstrctions() {
-		return reflectInstrctions;
+	public String getReflectInstructions() {
+		return reflectInstructions;
 	}
-	public void setReflectInstrctions(String reflectInstrctions) {
-		this.reflectInstrctions = reflectInstrctions;
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
 	}
 	public Long getUserUid() {
 		return userUid;

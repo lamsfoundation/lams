@@ -54,8 +54,13 @@ public class Summary {
 	private String sessionName;
 	private Spreadsheet spreadsheet;
     private List<SpreadsheetUser> users; 	
+    
+	//used for export purposes
+	private List<ReflectDTO> reflectDTOList;
 	
-	public Summary(){}
+	public Summary(){
+		this.reflectDTOList = new ArrayList<ReflectDTO>();
+	}
 	/**
 	 * Contruction method for monitoring summary function. 
 	 * 
@@ -73,37 +78,9 @@ public class Summary {
 		} else {
 			this.users = new ArrayList<SpreadsheetUser>();
 		}
+		
+		this.reflectDTOList = new ArrayList<ReflectDTO>();
 	}
-//	/**
-//	 * Contruction method for export profolio function. 
-//	 * 
-//	 * <B>Don't not set sessionId and viewNumber fields</B>
-//	 * @param sessionName
-//	 * @param item
-//	 * @param isInitGroup
-//	 */
-//	public Summary(Long sessionId, String sessionName, SpreadsheetItem item,boolean isInitGroup){
-//		this.sessionId = sessionId;
-//		this.sessionName = sessionName;
-//		if(item != null){
-//			this.itemUid = item.getUid();
-//			this.itemType = item.getType();
-//			this.itemCreateByAuthor = item.isCreateByAuthor();
-//			this.itemHide = item.isHide();
-//			this.itemTitle = item.getTitle();
-//			this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
-//			this.url = SpreadsheetWebUtils.protocol(item.getUrl());
-//			this.fileName = item.getFileName();
-//			this.fileUuid = item.getFileUuid();
-//			this.fileVersionId = item.getFileVersionId();
-//
-//			for (SpreadsheetItemInstruction instruction : (Set<SpreadsheetItemInstruction>)item.getItemInstructions()) {
-//				itemInstructions.add(instruction.getDescription());
-//			}
-//		}else
-//			this.itemUid = new Long(-1);
-//		this.isInitGroup = isInitGroup;
-//	}
 
 	public Long getSessionId() {
 		return sessionId;
@@ -128,5 +105,22 @@ public class Summary {
 	}
 	public void setUsers(List<SpreadsheetUser> users) {
 		this.users = users;
+	}
+	
+	/**
+	 * Returns ReflectDTO.
+	 * 
+	 * @return ReflectDTO
+	 */
+	public List<ReflectDTO> getReflectDTOList() {
+		return reflectDTOList;
+	}
+	/**
+	 * Sets ReflectDTO.
+	 * 
+	 * @param reflectDTO ReflectDTO
+	 */
+	public void setReflectDTOList(List<ReflectDTO> reflectDTOList) {
+		this.reflectDTOList = reflectDTOList;
 	}
 }

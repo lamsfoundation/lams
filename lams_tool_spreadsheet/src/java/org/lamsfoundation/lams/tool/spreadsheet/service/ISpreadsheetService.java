@@ -185,8 +185,8 @@ public interface ISpreadsheetService{
 	 * 				  Otherwise, get all spreadsheet item  
 	 * @return
 	 */
-	public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
-	public List<List<Summary>> exportByContentId(Long contentId);
+	public List<Summary> exportForLearner(Long sessionId, SpreadsheetUser learner);
+	public List<Summary> exportForTeacher(Long contentId);
 
 	/**
 	 * Create refection entry into notebook tool.

@@ -418,7 +418,7 @@ public class MonitoringAction extends Action {
 			refDTO.setFinishReflection(true);
 			refDTO.setReflect(notebookEntry.getEntry());
 		}
-		refDTO.setReflectInstrctions(session.getSpreadsheet().getReflectInstructions());
+		refDTO.setReflectInstructions(session.getSpreadsheet().getReflectInstructions());
 		
 		request.setAttribute("userDTO", refDTO);
 		return mapping.findForward("success");

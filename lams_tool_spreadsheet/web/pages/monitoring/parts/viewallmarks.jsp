@@ -25,7 +25,7 @@
 		</h1>
 
 			<table cellpadding="0">
-				<c:forEach var="user" items="${userList}" varStatus="status">
+				<c:forEach var="user" items="${userList}">
 						
 						
 					<tr>

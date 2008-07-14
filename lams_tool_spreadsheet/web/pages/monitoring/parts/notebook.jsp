@@ -17,7 +17,7 @@
 				<table class="alternative-color" cellspacing="0">
 					<tr>
 						<th class="first">
-							<lams:out value="${userDTO.reflectInstrctions}"/>
+							<lams:out value="${userDTO.reflectInstructions}"/>
 						</th>
 					</tr>
 					<tr>

@@ -62,19 +62,17 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * Export portfolio servlet to export all shared spreadsheet into offline HTML
+ * Export portfolio servlet to export all spreadsheets into offline HTML
  * package.
  * 
- * @author Steve.Ni
- * 
- * @version $Revision$
+ * @author Andrey Balan
  */
 public class ExportServlet extends AbstractExportPortfolioServlet {
 	private static final long serialVersionUID = -4529093489007108143L;
 
 	private static Logger logger = Logger.getLogger(ExportServlet.class);
 
-	private final String FILENAME = "shared_spreadsheet_main.html";
+	private final String FILENAME = "spreadsheet_main.html";
 
 	private SpreadsheetToolContentHandler handler;
 	
@@ -88,26 +86,24 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
 
-//		initial sessionMap
+		//initial sessionMap
 		SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		
 		try {
 			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
-				sessionMap.put(AttributeNames.ATTR_MODE,ToolAccessMode.LEARNER);
-				learner(request, response, directoryName, cookies,sessionMap);
+				sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.LEARNER);
+				learner(request, response, directoryName, cookies, sessionMap);
 			} else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
-				sessionMap.put(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
-				teacher(request, response, directoryName, cookies,sessionMap);
+				sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
+				teacher(request, response, directoryName, cookies, sessionMap);
 			}
 		} catch (SpreadsheetApplicationException e) {
 			logger.error("Cannot perform export for spreadsheet tool.");
 		}
 
-		String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-				+ request.getContextPath();
-		writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID="+sessionMap.getSessionID()
-				, directoryName, FILENAME, cookies);
+		String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()	+ request.getContextPath();
+		writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID=" + sessionMap.getSessionID(), directoryName, FILENAME, cookies);
 
 		return FILENAME;
 	}
@@ -132,10 +128,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
         return super.doOfflineExport(request, response, directoryName, cookies);
 	}
 
-
-
-	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
-			throws SpreadsheetApplicationException {
+	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap) throws SpreadsheetApplicationException {
 
 		if (userID == null || toolSessionID == null) {
 			String error = "Tool session Id or user Id is null. Unable to continue";
@@ -159,37 +152,33 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new SpreadsheetApplicationException(error);
 		}
 		
-		
-		List<Summary> group = service.exportBySessionId(toolSessionID,true);
-		saveFileToLocal(group, directoryName);
-		
-		List<List> groupList = new ArrayList<List>();
-		if(group.size() > 0)
-			groupList.add(group);
+		List<Summary> summaryList = service.exportForLearner(toolSessionID, learner);
+//		saveFileToLocal(summaryList, directoryName);
 		
 		// Add flag to indicate whether to render user notebook entries
 		sessionMap.put(SpreadsheetConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
 		
-		// Create reflectList if reflection is enabled.
-		if (content.isReflectOnActivity()) {
-			// Create reflectList, need to follow same structure used in teacher
-			// see service.getReflectList();
-			Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();  
-			Set<ReflectDTO> reflectDTOSet = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
-			reflectDTOSet.add(getReflectionEntry(learner));
-			map.put(toolSessionID, reflectDTOSet);
-			
-			// Add reflectList to sessionMap
-			sessionMap.put(SpreadsheetConstants.ATTR_REFLECT_LIST, map);
-		}
+//		// Create reflectList if reflection is enabled.
+//		if (content.isReflectOnActivity()) {
+//			// Create reflectList, need to follow same structure used in teacher
+//			// see service.getReflectList();
+//			Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();  
+//			Set<ReflectDTO> reflectDTOSet = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
+//			reflectDTOSet.add(getReflectionEntry(learner));
+//			map.put(toolSessionID, reflectDTOSet);
+//			
+//			// Add reflectList to sessionMap
+//			sessionMap.put(SpreadsheetConstants.ATTR_REFLECT_LIST, map);
+//		}
 		
+		
+		sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE, content);
 		sessionMap.put(SpreadsheetConstants.ATTR_TITLE, content.getTitle());
 		sessionMap.put(SpreadsheetConstants.ATTR_INSTRUCTIONS, content.getInstructions());
-		sessionMap.put(SpreadsheetConstants.ATTR_SUMMARY_LIST, groupList);
+		sessionMap.put(SpreadsheetConstants.ATTR_SUMMARY_LIST, summaryList);
 	}
 
-	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
-			throws SpreadsheetApplicationException {
+	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap) throws SpreadsheetApplicationException {
 
 		// check if toolContentId exists in db or not
 		if (toolContentID == null) {
@@ -205,27 +194,28 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new SpreadsheetApplicationException(error);
 		}
-		List<List<Summary>> groupList = service.exportByContentId(toolContentID);
-		if(groupList != null) {
-			for (List<Summary> list : groupList) {
-				saveFileToLocal(list, directoryName);
-			}
-		}
+		List<Summary> summaryList = service.exportForTeacher(toolContentID);
+//		if(summaryList != null) {
+//			for (List<Summary> list : summaryList) {
+//				saveFileToLocal(list, directoryName);
+//			}
+//		}
 		
 		// Add flag to indicate whether to render user notebook entries
 		sessionMap.put(SpreadsheetConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
 		
-		// Create reflectList if reflection is enabled.
-		if (content.isReflectOnActivity()) {
-			Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(content.getContentId(), true);
-			// Add reflectList to sessionMap
-			sessionMap.put(SpreadsheetConstants.ATTR_REFLECT_LIST, reflectList);
-		}
+//		// Create reflectList if reflection is enabled.
+//		if (content.isReflectOnActivity()) {
+//			Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(content.getContentId(), true);
+//			// Add reflectList to sessionMap
+//			sessionMap.put(SpreadsheetConstants.ATTR_REFLECT_LIST, reflectList);
+//		}
 		
 		// put it into HTTPSession
+		sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE, content);
 		sessionMap.put(SpreadsheetConstants.ATTR_TITLE, content.getTitle());
 		sessionMap.put(SpreadsheetConstants.ATTR_INSTRUCTIONS, content.getInstructions());
-		sessionMap.put(SpreadsheetConstants.ATTR_SUMMARY_LIST, groupList);
+		sessionMap.put(SpreadsheetConstants.ATTR_SUMMARY_LIST, summaryList);
 	}
 
     private void saveFileToLocal(List<Summary> list, String directoryName) {
