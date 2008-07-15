@@ -92,13 +92,13 @@
 			classpathref="all-libs"/>
 
 		<echo>Building hbm.xml files using XDoclet to ${conf.hibernate.mapping.dir} from ${src.java.dir}</echo>
-
 		<hibernatedoclet
 			destdir="${conf.hibernate.mapping.dir}"
 			excludedtags="@version,@author,@todo"
 			force="true">
 				<fileset dir="${src.java.dir}">
 					<include name="**/*.java"/>
+					<exclude name="**/DacoAnswer.java"/>
 				</fileset>
 			<hibernate version="3.0"/>
 		</hibernatedoclet>

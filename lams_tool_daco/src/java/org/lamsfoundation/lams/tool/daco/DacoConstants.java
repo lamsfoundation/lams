@@ -69,6 +69,20 @@ public class DacoConstants {
 	public static final String RECORD_OPERATION_ADD = "add";
 	public static final String RECORD_OPERATION_EDIT = "edit";
 
+	// question summary columns
+	public static final short QUESTION_SUMMARY_COLUMN_COUNT = 4;
+	public static final short QUESTION_SUMMARY_ANSWER = 0;
+	public static final short QUESTION_SUMMARY_SUM = 1;
+	public static final short QUESTION_SUMMARY_AVERAGE = 2;
+	public static final short QUESTION_SUMMARY_COUNT = 3;
+
+	public static final short QUESTION_DB_SUMMARY_QUESTION_UID = 0;
+	public static final short QUESTION_DB_SUMMARY_ANSWER = 1;
+	public static final short QUESTION_DB_SUMMARY_QUESTION_TYPE = 2;
+	public static final short QUESTION_DB_SUMMARY_SUM = 3;
+	public static final short QUESTION_DB_SUMMARY_AVERAGE = 4;
+	public static final short QUESTION_DB_SUMMARY_COUNT = 5;
+
 	// learning views
 	public static final String LEARNING_VIEW_HORIZONTAL = "horizontal";
 	public static final String LEARNING_VIEW_VERTICAL = "vertical";
@@ -117,6 +131,7 @@ public class DacoConstants {
 	public static final String ATTR_RECORD_OPERATION_SUCCESS = "recordOperationSuccess";
 	public static final String ATTR_DISPLAYED_RECORD_NUMBER = "displayedRecordNumber";
 	public static final String ATTR_LEARNING_VIEW = "learningView";
+	public static final String ATTR_QUESTION_SUMMARIES = "questionSummaries";
 
 	// error message keys
 	public static final String ERROR_MSG_DESC_BLANK = "error.question.desc.blank";

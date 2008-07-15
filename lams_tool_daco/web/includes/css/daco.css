@@ -86,13 +86,20 @@ table#horizontalListTable td#lastHorizontalQuestion{
 	vertical-align: middle;
 }
 
-form#recordForm table.alternative-color-inner-table td, table.recordList table.alternative-color-inner-table td, table#horizontalListTable table.alternative-color-inner-table td {
+form#recordForm table.alternative-color-inner-table td, table.recordList table.alternative-color-inner-table td,
+table#horizontalListTable table.alternative-color-inner-table td,  table#summaryTable table.alternative-color-inner-table td{
 	margin: 0px;
 	padding: 0px;
 	border: none;
 	background: transparent;
 	vertical-align: middle;
 }
+
+table#summaryTable td.singleSummaryCell {
+	vertical-align: middle;
+	text-align: center;
+}
+
 table#recordListTable td.fixedCellWidth{
 	width: 160px;
 }

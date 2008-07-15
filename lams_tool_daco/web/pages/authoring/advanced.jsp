@@ -22,7 +22,8 @@
 	<c:forEach begin="1" end="50" var="index">
 		<html:option value="${index}">${index}</html:option>
 	</c:forEach>
-</html:select> <label for="maxRecords" style="space-left"> <fmt:message key="label.authoring.advanced.record.max" /> </label> <html:select
+</html:select> <label for="maxRecords" style="space-left"> <fmt:message key="label.authoring.advanced.record.max" /> </label> 
+<html:select
 	property="daco.maxRecords" styleClass="noBorder">
 	<html:option value="0">
 		<fmt:message key="label.authoring.advanced.record.nolimit" />

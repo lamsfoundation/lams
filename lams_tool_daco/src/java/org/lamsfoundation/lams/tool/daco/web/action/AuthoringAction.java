@@ -327,9 +327,15 @@ public class AuthoringAction extends Action {
 		if (!StringUtils.isBlank(constraint)) {
 			question.setMax(Float.parseFloat(constraint));
 		}
+		else {
+			question.setMax(null);
+		}
 		constraint = questionForm.getMin();
 		if (!StringUtils.isBlank(constraint)) {
 			question.setMin(Float.parseFloat(constraint));
+		}
+		else {
+			question.setMin(null);
 		}
 		constraint = questionForm.getDigitsDecimal();
 		if (!StringUtils.isBlank(constraint)) {
@@ -350,7 +356,13 @@ public class AuthoringAction extends Action {
 		}
 		question.setRequired(questionForm.isQuestionRequired());
 		question.setAnswerOptions(answerOptions);
-		question.setSummary(questionForm.getSummary());
+		Short summary = questionForm.getSummary();
+		if (summary != null && summary > 0) {
+			question.setSummary(questionForm.getSummary());
+		}
+		else {
+			question.setSummary(null);
+		}
 
 		question.setDescription(StringUtils.isBlank(questionForm.getDescription()) ? null : questionForm.getDescription().trim());
 
@@ -660,14 +672,14 @@ public class AuthoringAction extends Action {
 				}
 			}
 			else {
+				form.setMin(min == null ? null : String.valueOf(min));
+				form.setMax(max == null ? null : String.valueOf(max));
 				form.setDigitsDecimal(null);
 			}
 		}
 		else {
-			form.setMin(min == null ? null : min.toString());
-			if (max != null) {
-				form.setMax(String.valueOf((int) max.floatValue()));
-			}
+			form.setMin(min == null ? null : String.valueOf(min.intValue()));
+			form.setMax(max == null ? null : String.valueOf(max.intValue()));
 		}
 
 		if (questionType == DacoConstants.QUESTION_TYPE_RADIO || questionType == DacoConstants.QUESTION_TYPE_DROPDOWN

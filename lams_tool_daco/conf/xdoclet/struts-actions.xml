@@ -142,6 +142,10 @@
 	<forward name="success" path="/pages/learning/learning.jsp" />
 </action>
 
+<action path="/learning/refreshQuestionSummaries" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" parameter="refreshQuestionSummaries">
+	<forward name="success" path="/pages/learning/questionSummaries.jsp" />
+</action>
+
 <!--  ========= Reflection =============== -->
 <action path="/learning/newReflection" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" name="reflectionForm"
 	validate="false" parameter="newReflection" input="/pages/learning/learning.jsp" scope="request">

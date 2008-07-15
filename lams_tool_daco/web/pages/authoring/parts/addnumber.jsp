@@ -44,11 +44,12 @@
 	<div class="space-top"><html:checkbox property="questionRequired" styleId="questionRequired" styleClass="noBorder">
 		<fmt:message key="label.authoring.basic.required" />
 	</html:checkbox></div>
-	<div class="field-name space-top"><fmt:message key="label.authoring.basic.summary" /></div>
+	<div class="field-name space-top"><fmt:message key="label.common.summary" /></div>
 	<html:select property="summary" styleClass="noBorder">
-		<option value="1"><fmt:message key="label.authoring.basic.summary.sum" /></option>
-		<option value="2"><fmt:message key="label.authoring.basic.summary.average" /></option>
-		<option value="3"><fmt:message key="label.authoring.basic.summary.count" /></option>
+	<html:option value="0" styleId="noSummaryOption"><fmt:message key="label.common.summary.none" /></html:option>
+		<html:option value="1"><fmt:message key="label.common.summary.sum" /></html:option>
+		<html:option value="2"><fmt:message key="label.common.summary.average" /></html:option>
+		<html:option value="3"><fmt:message key="label.common.summary.count" /></html:option>
 	</html:select></div>
 </html:form>
 <lams:ImgButtonWrapper>

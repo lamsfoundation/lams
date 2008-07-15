@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.daco.model.DacoAttachment;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
+import org.lamsfoundation.lams.tool.daco.util.QuestionSummary;
 
 /**
  * @author Dapeng.Ni
@@ -155,6 +156,8 @@ public interface IDacoService {
 	void deleteDacoQuestion(Long uid);
 
 	void deleteDacoAnswer(Long uid);
+
+	void deleteDacoRecord(List<DacoAnswer> record);
 
 	/**
 	 * Return all reource questions within the given toolSessionID.
@@ -284,4 +287,6 @@ public interface IDacoService {
 	DacoUser getUser(Long uid);
 
 	public String getLocalisedMessage(String key, Object[] args);
+
+	public List<QuestionSummary> getQuestionSummaries(Long contentUid, Long userUid);
 }

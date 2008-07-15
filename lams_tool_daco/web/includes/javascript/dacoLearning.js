@@ -27,7 +27,6 @@
 		var elementCount = document.getElementById("recordForm").elements.length;
 		for (var questionNumber=1;questionNumber<=elementCount;questionNumber++){
 			var checkboxQuestion=document.getElementById("checkbox-"+questionNumber);
-			var fileQuestion = document.getElementById("file-"+questionNumber);
 			if (checkboxQuestion!=null){
 				var checkboxQuestionValue = "";
 				var checkboxNumber = 1;
@@ -41,10 +40,6 @@
 				}
 				checkboxQuestion.value=checkboxQuestionValue;
 			}
-			
-			if (fileQuestion!=null){
-				document.getElementById("filePath-"+questionNumber).value=document.getElementById("file-"+questionNumber).value;
-			}
 		}
 	}
 	
@@ -52,7 +47,6 @@
 		var elementCount = document.getElementById("recordForm").elements.length;
 		for (var questionNumber=1;questionNumber<=elementCount;questionNumber++){
 			var checkboxQuestion=document.getElementById("checkbox-"+questionNumber);
-			var fileQuestion = document.getElementById("file-"+questionNumber);
 			if (checkboxQuestion!=null){
 				var checkboxValues = checkboxQuestion.value.split("&");
 				var checkboxNumber = 1;
@@ -67,16 +61,13 @@
 				checkbox = document.getElementById("checkbox-"+questionNumber+"-"+checkboxNumber);
 				}
 			}
-			if (fileQuestion!=null){
-				document.getElementById("file-"+questionNumber).value=document.getElementById("filePath-"+questionNumber).value;
-			}
 		}
 	}
 	
 	function editRecord (sessionMapID, recordIndex){
 		var param = "sessionMapID="+sessionMapID+"&recordIndex="+recordIndex+"&reqID="+((new Date()).getTime());
 	    new Ajax.Updater(
-		    	document.getElementById("addRecordDiv"),
+		    	"addRecordDiv",
 		    	editRecordUrl,
 		    	{
 		    		method:'post',
@@ -121,7 +112,7 @@
  		var displayedRecordNumber = document.getElementById("displayedRecordNumber").value;
 	   	var param = "sessionMapID="+sessionMapID+"&recordIndex="+recordIndex+"&displayedRecordNumber="+displayedRecordNumber+"&reqID="+((new Date()).getTime());    
 	    new Ajax.Updater(
-		    	document.getElementById("recordListDiv"),
+		    	"recordListDiv",
 		    	removeRecordUrl,
 		    	{
 		    		method:'post',
@@ -137,6 +128,7 @@
 	    				}
 						document.getElementById("displayedRecordNumber").value=displayedRecordNumber;
 	    				document.getElementById("displayedRecordNumberSpan").innerHTML=displayedRecordNumber;
+	    				refreshQuestionSummaries(sessionMapID);
 		    		},
 		    		evalScripts:true
 		    	}
@@ -170,4 +162,17 @@
 		if (horizontalRecordListFrame!=null){
 			horizontalRecordListFrame.style.height=((questionListLength+1)*111)+'px';
 		}
+	}
+	
+	function refreshQuestionSummaries(sessionMapID){
+		var param = "sessionMapID="+sessionMapID+"&reqID="+((new Date()).getTime());
+	    new Ajax.Updater(
+		    	"questionSummariesDiv",
+		    	refreshQuestionSummariesUrl,
+		    	{
+		    		method:'post',
+		    		parameters:param,
+		    		evalScripts:true
+		    	}
+	    );
 	}

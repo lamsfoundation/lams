@@ -28,17 +28,16 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.daco.dao.DacoQuestionDAO;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 
-public class DacoQuestionDAOHibernate extends BaseDAOHibernate implements DacoQuestionDAO{
-	
-	private static final String FIND_AUTHORING_QUESTIONS = "from " + DacoQuestion.class.getName() + " where content_uid = ? order by create_date asc";
-	
-	public List getAuthoringQuestions(Long dacoUid) {
-		
-		return this.getHibernateTemplate().find(FIND_AUTHORING_QUESTIONS,dacoUid); 
+public class DacoQuestionDAOHibernate extends BaseDAOHibernate implements DacoQuestionDAO {
+
+	private static final String FIND_BY_CONTENT_UID = "from " + DacoQuestion.class.getName()
+			+ " where content_uid = ? order by create_date asc";
+
+	public List getByContentUid(Long dacoUid) {
+		return this.getHibernateTemplate().find(DacoQuestionDAOHibernate.FIND_BY_CONTENT_UID, dacoUid);
 	}
 
 	public DacoQuestion getByUid(Long dacoQuestionUid) {
-		return (DacoQuestion) this.getObject(DacoQuestion.class,dacoQuestionUid);
+		return (DacoQuestion) this.getObject(DacoQuestion.class, dacoQuestionUid);
 	}
-
 }

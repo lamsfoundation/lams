@@ -84,6 +84,7 @@ import org.lamsfoundation.lams.tool.daco.model.DacoQuestionVisitLog;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
 import org.lamsfoundation.lams.tool.daco.util.DacoToolContentHandler;
+import org.lamsfoundation.lams.tool.daco.util.QuestionSummary;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -240,7 +241,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	}
 
 	public List getAuthoredQuestions(Long dacoUid) {
-		return dacoQuestionDao.getAuthoringQuestions(dacoUid);
+		return dacoQuestionDao.getByContentUid(dacoUid);
 	}
 
 	public DacoAttachment uploadInstructionFile(FormFile uploadFile, String fileType) throws UploadDacoFileException {
@@ -1026,5 +1027,50 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
 	public String getLocalisedMessage(String key, Object[] args) {
 		return messageService.getMessage(key, args);
+	}
+
+	public List<QuestionSummary> getQuestionSummaries(Long contentUid, Long userUid) {
+		List<QuestionSummary> result = new ArrayList<QuestionSummary>();
+		List<DacoQuestion> questions = dacoQuestionDao.getByContentUid(contentUid);
+		if (questions.size() > 0) {
+			for (DacoQuestion question : questions) {
+				switch (question.getType()) {
+					case DacoConstants.QUESTION_TYPE_NUMBER: {
+						QuestionSummary summary = new QuestionSummary();
+						summary.addUserSummaryRow(0, new String[DacoConstants.QUESTION_SUMMARY_COLUMN_COUNT]);
+						summary.addAllSummaryRow(0, new String[DacoConstants.QUESTION_SUMMARY_COLUMN_COUNT]);
+						summary.setQuestionUid(question.getUid());
+						result.add(summary);
+					}
+						break;
+					case DacoConstants.QUESTION_TYPE_RADIO:
+					case DacoConstants.QUESTION_TYPE_DROPDOWN:
+					case DacoConstants.QUESTION_TYPE_CHECKBOX: {
+						int answerOptionCount = question.getAnswerOptions().size();
+						QuestionSummary summary = new QuestionSummary();
+						summary.setQuestionUid(question.getUid());
+						for (int answerOption = 0; answerOption < answerOptionCount; answerOption++) {
+							String[] columns = new String[] { String.valueOf(answerOption + 1), null, "0%", "0" };
+							summary.addUserSummaryRow(answerOption, columns);
+							columns = new String[] { String.valueOf(answerOption + 1), null, "0%", "0" };
+							summary.addAllSummaryRow(answerOption, columns);
+						}
+						result.add(summary);
+					}
+						break;
+					default:
+						result.add(null);
+						break;
+				}
+			}
+			result = dacoAnswerDao.getSummaries(contentUid, userUid, result);
+		}
+		return result;
+	}
+
+	public void deleteDacoRecord(List<DacoAnswer> record) {
+		for (DacoAnswer answer : record) {
+			deleteDacoAnswer(answer.getUid());
+		}
 	}
 }

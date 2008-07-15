@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
  * @author Marcin Cieslak
  * 
  * @hibernate.class table="tl_ladaco10_answers"
- * 
  */
 public class DacoAnswer implements Cloneable {
 	private static final Logger log = Logger.getLogger(DacoQuestion.class);

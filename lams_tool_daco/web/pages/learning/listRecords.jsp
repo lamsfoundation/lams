@@ -39,11 +39,11 @@
 			<c:when test="${horizontal}">
 				<table cellspacing="0" class="alternative-color" id="recordListTable">
 					<tr>
-						<th>Questions</th>
-						<th>Records</th>
+						<th><fmt:message key="label.learning.tableheader.questions" /></th>
+						<th><fmt:message key="label.learning.tableheader.records" /></th>
 					</tr>
 					<tr>
-					<td class="fixedCellHeight" style="width: 160px">Record number</td>
+					<td class="fixedCellHeight" style="width: 160px"><fmt:message key="label.learning.tableheader.recordnumber" /></td>
 					<td rowspan="${fn:length(daco.dacoQuestions) + 2}" style="padding: 0px; height: 100%;">
 						<iframe id="horizontalRecordListFrame" onLoad="javascript:resizeHorizontalRecordListFrame();" style="width: 100%;"
 						frameborder="0" scrolling="auto"

@@ -65,6 +65,7 @@ import org.lamsfoundation.lams.tool.daco.service.DacoApplicationException;
 import org.lamsfoundation.lams.tool.daco.service.IDacoService;
 import org.lamsfoundation.lams.tool.daco.service.UploadDacoFileException;
 import org.lamsfoundation.lams.tool.daco.util.DacoQuestionComparator;
+import org.lamsfoundation.lams.tool.daco.util.QuestionSummary;
 import org.lamsfoundation.lams.tool.daco.web.form.RecordForm;
 import org.lamsfoundation.lams.tool.daco.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -119,6 +120,10 @@ public class LearningAction extends Action {
 
 		if (param.equals("changeView")) {
 			return changeView(mapping, request);
+		}
+
+		if (param.equals("refreshQuestionSummaries")) {
+			return refreshQuestionSummaries(mapping, request);
 		}
 
 		// ================ Reflection =======================
@@ -202,6 +207,9 @@ public class LearningAction extends Action {
 		List<List<DacoAnswer>> records = service.getDacoAnswersByUserAndDaco(dacoUser.getUid(), daco);
 		sessionMap.put(DacoConstants.ATTR_RECORD_LIST, records);
 
+		List<QuestionSummary> summaries = service.getQuestionSummaries(daco.getUid(), dacoUser.getUid());
+		sessionMap.put(DacoConstants.ATTR_QUESTION_SUMMARIES, summaries);
+
 		// add define later support
 		if (daco.isDefineLater()) {
 			return mapping.findForward(DacoConstants.DEFINE_LATER);
@@ -284,19 +292,21 @@ public class LearningAction extends Action {
 		RecordForm recordForm = (RecordForm) form;
 		String sessionMapID = request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		Set<DacoQuestion> questionList = ((Daco) sessionMap.get(DacoConstants.ATTR_DACO)).getDacoQuestions();
+		Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
+		Set<DacoQuestion> questionList = daco.getDacoQuestions();
+		Long sessionId = (Long) sessionMap.get(DacoConstants.ATTR_TOOL_SESSION_ID);
+		IDacoService service = getDacoService();
+		DacoUser user = getCurrentUser(service, sessionId);
+
 		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		sessionMap.put(DacoConstants.ATTR_LEARNING_CURRENT_TAB, 1);
 
 		ActionErrors errors = validateRecordForm(recordForm, questionList);
 		if (!errors.isEmpty()) {
 			this.addErrors(request, errors);
+			refreshQuestionSummaries(mapping, request);
 			return mapping.findForward(DacoConstants.SUCCESS);
 		}
-
-		Long sessionId = (Long) sessionMap.get(DacoConstants.ATTR_TOOL_SESSION_ID);
-		IDacoService service = getDacoService();
-		DacoUser user = getCurrentUser(service, sessionId);
 
 		List<DacoAnswer> record = null;
 
@@ -333,11 +343,16 @@ public class LearningAction extends Action {
 			switch (question.getType()) {
 				case DacoConstants.QUESTION_TYPE_NUMBER: {
 					String formAnswer = recordForm.getAnswer(formAnswerNumber);
-					if (!StringUtils.isBlank(formAnswer) && question.getDigitsDecimal() != null) {
-						formAnswer = NumberUtil.formatLocalisedNumber(Double.parseDouble(formAnswer), (Locale) null, question
-								.getDigitsDecimal());
+					if (StringUtils.isBlank(formAnswer)) {
+						answer.setAnswer(null);
 					}
-					answer.setAnswer(formAnswer);
+					else {
+						if (question.getDigitsDecimal() != null) {
+							formAnswer = NumberUtil.formatLocalisedNumber(Double.parseDouble(formAnswer), (Locale) null, question
+									.getDigitsDecimal());
+						}
+						answer.setAnswer(formAnswer);
+					}
 					formAnswerNumber++;
 				}
 					break;
@@ -363,11 +378,12 @@ public class LearningAction extends Action {
 					String[] checkboxes = formAnswer.split("&");
 					if (isEdit) {
 						DacoAnswer localAnswer = answer;
+						answerNumber--;
 						do {
 							service.deleteDacoAnswer(localAnswer.getUid());
-							record.remove(answerNumber - 1);
+							record.remove(answerNumber);
 							if (answerNumber <= record.size()) {
-								localAnswer = record.get(answerNumber - 1);
+								localAnswer = record.get(answerNumber);
 								if (localAnswer.getQuestion().getType() != DacoConstants.QUESTION_TYPE_CHECKBOX) {
 									localAnswer = null;
 								}
@@ -388,13 +404,19 @@ public class LearningAction extends Action {
 							answer.setAnswer(checkboxes[checkboxNumber]);
 							if (checkboxNumber < checkboxes.length - 1) {
 								service.saveOrUpdateAnswer(answer);
-								record.add(answer);
+								if (isEdit) {
+									record.add(answerNumber++, answer);
+								}
+								else {
+									record.add(answer);
+								}
+
 								answer = (DacoAnswer) answer.clone();
 							}
 						}
 					}
 					if (isEdit) {
-						record.add(answer);
+						record.add(answerNumber++, answer);
 					}
 				}
 					formAnswerNumber++;
@@ -457,6 +479,7 @@ public class LearningAction extends Action {
 		}
 		sessionMap.put(DacoConstants.ATTR_RECORD_LIST, records);
 		request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, records.size() + 1);
+		refreshQuestionSummaries(mapping, request);
 
 		return mapping.findForward(DacoConstants.SUCCESS);
 	}
@@ -550,11 +573,13 @@ public class LearningAction extends Action {
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		int recordCount = ((List) sessionMap.get(DacoConstants.ATTR_RECORD_LIST)).size();
 		Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
-		if (daco.getMinRecords() != null && recordCount < daco.getMinRecords()) {
+		Short min = daco.getMinRecords();
+		Short max = daco.getMaxRecords();
+		if (min != null && min > 0 && recordCount < min) {
 			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_RECORD_NOTENOUGH, daco
 					.getMinRecords()));
 		}
-		else if (daco.getMaxRecords() != null && recordCount > daco.getMaxRecords()) {
+		else if (max != null && max > 0 && recordCount > max) {
 			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_RECORD_TOOMUCH, daco
 					.getMaxRecords()));
 		}
@@ -932,10 +957,11 @@ public class LearningAction extends Action {
 			for (int answerNumber = 0; answerNumber < record.size(); answerNumber++) {
 				DacoAnswer answer = record.get(answerNumber);
 				short questionType = answer.getQuestion().getType();
+
 				if (questionType == DacoConstants.QUESTION_TYPE_CHECKBOX) {
 					if (checkboxes == null) {
 						checkboxes = new StringBuilder(record.size() * 3);
-						checkboxQuestionNumber = formAnswerNumber;
+						checkboxQuestionNumber = formAnswerNumber++;
 					}
 					checkboxes.append(answer.getAnswer()).append('&');
 				}
@@ -964,6 +990,7 @@ public class LearningAction extends Action {
 			if (checkboxes != null) {
 				recordForm.setAnswer(checkboxQuestionNumber, checkboxes.toString());
 			}
+
 			request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 			sessionMap.put(DacoConstants.ATTR_LEARNING_CURRENT_TAB, 1);
 			request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, recordIndex);
@@ -979,8 +1006,11 @@ public class LearningAction extends Action {
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		int recordIndex = NumberUtils.stringToInt(request.getParameter(DacoConstants.PARAM_RECORD_INDEX), -1);
 		List<List<DacoAnswer>> records = (List<List<DacoAnswer>>) sessionMap.get(DacoConstants.ATTR_RECORD_LIST);
+		IDacoService service = getDacoService();
 		if (recordIndex != -1 && records != null && records.size() >= recordIndex) {
-			records.remove(recordIndex - 1);
+			List<DacoAnswer> record = records.get(recordIndex - 1);
+			service.deleteDacoRecord(record);
+			records.remove(record);
 			sessionMap.put(DacoConstants.ATTR_RECORD_LIST, records);
 			request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 			return mapping.findForward(DacoConstants.SUCCESS);
@@ -996,6 +1026,7 @@ public class LearningAction extends Action {
 		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, WebUtil.readIntParam(request,
 				DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
+
 		String currentView = (String) sessionMap.get(DacoConstants.ATTR_LEARNING_VIEW);
 		if (DacoConstants.LEARNING_VIEW_HORIZONTAL.equals(currentView)) {
 			sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW, DacoConstants.LEARNING_VIEW_VERTICAL);
@@ -1005,4 +1036,20 @@ public class LearningAction extends Action {
 		}
 		return mapping.findForward(DacoConstants.SUCCESS);
 	}
+
+	protected ActionForward refreshQuestionSummaries(ActionMapping mapping, HttpServletRequest request) {
+		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
+		Long sessionId = (Long) sessionMap.get(DacoConstants.ATTR_TOOL_SESSION_ID);
+		IDacoService service = getDacoService();
+		DacoUser user = getCurrentUser(service, sessionId);
+
+		List<QuestionSummary> summaries = service.getQuestionSummaries(daco.getUid(), user.getUid());
+		sessionMap.put(DacoConstants.ATTR_QUESTION_SUMMARIES, summaries);
+		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+
+		return mapping.findForward(DacoConstants.SUCCESS);
+	}
+
 }

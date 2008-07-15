@@ -35,6 +35,7 @@
 	 	var changeViewUrl = "<html:rewrite page='/learning/changeView.do' />";
 	 	var finishUrl = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
 	 	var continueReflectUrl = '<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
+	 	var refreshQuestionSummariesUrl = '<c:url value="/learning/refreshQuestionSummaries.do"/>';
 	 	var questionListLength	=  ${fn:length(daco.dacoQuestions)};
     </script>
     <script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoLearning.js'/>"></script>
@@ -48,6 +49,7 @@
 <lams:Tabs useKey="true" control="true">
 	<lams:Tab id="1" key="label.learning.heading.add" />
 	<lams:Tab id="2" key="label.learning.heading.list" />
+	<lams:Tab id="3" key="label.learning.heading.summary" />
 </lams:Tabs></div>
 
 <div id="content">
@@ -72,7 +74,7 @@
 
 <lams:TabBody id="1" titleKey="label.learning.heading.add" page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}" />
 <lams:TabBody id="2" titleKey="label.learning.heading.list" page="listRecords.jsp" />
-
+<lams:TabBody id="3" titleKey="label.learning.heading.summary" page="questionSummaries.jsp" />
 		
 <c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 	<div class="small-space-top">

@@ -113,7 +113,6 @@
 						<c:if test="${horizontal}">
 							</td><td style="vertical-align: middle;">
 						</c:if>
-						<html:hidden styleId="filePath-${fileNumber+1}" property="filePath[${fileNumber}]" />
 						<html:file styleId="file-${fileNumber+1}" property="file[${fileNumber}]" size="58" />
 						<c:set var="fileNumber" value="${fileNumber+1}" />
 					</c:when>
@@ -122,7 +121,6 @@
 						<c:if test="${horizontal}">
 							</td><td style="vertical-align: middle;">
 						</c:if>
-						<html:hidden styleId="filePath-${fileNumber+1}" property="filePath[${fileNumber}]" />
 						<html:file styleId="file-${fileNumber+1}" property="file[${fileNumber}]" size="58" />
 						<c:set var="fileNumber" value="${fileNumber+1}" />
 					</c:when>

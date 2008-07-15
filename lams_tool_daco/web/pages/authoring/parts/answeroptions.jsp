@@ -4,8 +4,6 @@
 <c:set var="listSize" value="${fn:length(answerOptionList)}" />
 <c:set var="ordinal"><fmt:message key="label.authoring.basic.answeroption.ordinal"/></c:set>
 
-<script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoQuestion.js'/>"></script>
-
 <div id="answerOptionsArea" class="space-bottom-top">
 <form id="answerOptionsForm"><input type="hidden" id="answerOptionCount" name="answerOptionCount" value="${listSize}"/>
 <div class="field-name"><fmt:message key="label.authoring.basic.answeroption" /></div>
