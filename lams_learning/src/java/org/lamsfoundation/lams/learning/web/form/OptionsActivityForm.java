@@ -38,6 +38,7 @@ public class OptionsActivityForm extends ActivityForm {
 	private int maximum;
 	private boolean finished;
 	private Long progressID;
+	private boolean maxActivitiesReached;
 	
 	public String getTitle() {
 		return title;
@@ -74,5 +75,11 @@ public class OptionsActivityForm extends ActivityForm {
 	}
 	public void setProgressID(Long progressID) {
 		this.progressID = progressID;
+	}
+	public boolean isMaxActivitiesReached() {
+		return maxActivitiesReached;
+	}
+	public void setMaxActivitiesReached(boolean maxActivitiesReached) {
+		this.maxActivitiesReached = maxActivitiesReached;
 	}
 }

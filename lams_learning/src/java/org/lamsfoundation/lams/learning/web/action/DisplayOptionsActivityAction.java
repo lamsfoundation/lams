@@ -101,6 +101,12 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		if ( optionsActivity.getMinNumberOfOptionsNotNull().intValue() <= completedCount ) {
 			form.setFinished(true);
 		}
+		
+		if (completedCount >= optionsActivity.getMaxNumberOfOptionsNotNull().intValue()  )
+		{
+			form.setMaxActivitiesReached(true);
+		}
+			
 		form.setMinimum(optionsActivity.getMinNumberOfOptionsNotNull().intValue());
 		form.setMaximum(optionsActivity.getMaxNumberOfOptionsNotNull().intValue());
 		form.setDescription(optionsActivity.getDescription());

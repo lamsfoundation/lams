@@ -80,11 +80,18 @@
 					<c:set var="numActivities" value="${loop.count}" />
 					<tr>
 						<td width="2%">
-							<c:if test="${not activityURL.complete}">
-								<input type="radio" name="activityID" class="noBorder"
-									id="activityID-${activityURL.activityId}"
-									value="${activityURL.activityId}">
-							</c:if>
+							<c:choose>
+								<c:when test="${not activityURL.complete and not optionsActivityForm.maxActivitiesReached}">
+									<input type="radio" name="activityID" class="noBorder"
+										id="activityID-${activityURL.activityId}"
+										value="${activityURL.activityId}">
+								
+								
+								</c:when>
+								<c:when test="${activityURL.complete}">
+									<img src="<lams:LAMSURL/>/images/tick.gif" />
+								</c:when>
+							</c:choose>
 						</td>
 						<td>
 							<c:choose>
@@ -103,9 +110,19 @@
 			</table>
 
 			<div align="center" class="small-space-bottom">
-				<html:submit styleClass="button">
-					<fmt:message key="label.activity.options.choose" />
-				</html:submit>
+				
+				<c:choose>
+					<c:when test="${optionsActivityForm.maxActivitiesReached}">
+						<p class="warning">
+							<fmt:message key="label.optional.maxReached" /> 
+						</p>
+					</c:when>
+					<c:otherwise>
+						<html:submit styleClass="button">
+							<fmt:message key="label.activity.options.choose" />
+						</html:submit>
+					</c:otherwise>
+				</c:choose>
 			</div>
 
 		</html:form>
