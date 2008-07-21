@@ -94,7 +94,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		Chat chat = chatService.getChatByContentId(toolContentID);
 		ChatDTO chatDTO = new ChatDTO(chat);
 
-		Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true);
+ 		Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true);
 		chatDTO.setCurrentTab(currentTab);
 		
 		Map<Long, Integer> sessCountMap = chatService

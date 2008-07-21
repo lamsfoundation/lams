@@ -56,6 +56,10 @@ public class ChatDTO {
 	
 	public boolean lockOnFinish;
 	
+	public boolean filteringEnabled;
+	
+	public String filteredKeyWords;
+	
 	public String reflectInstructions;
 	
 	public Set<ChatAttachmentDTO> onlineInstructionsFiles = new TreeSet<ChatAttachmentDTO>();
@@ -76,7 +80,9 @@ public class ChatDTO {
 		reflectInstructions = chat.getReflectInstructions();
 		reflectOnActivity = chat.isReflectOnActivity();
 		lockOnFinish = chat.isLockOnFinished();
-
+		filteringEnabled = chat.isFilteringEnabled();
+		filteredKeyWords = chat.getFilterKeywords();
+		
 		for (Iterator i = chat.getChatAttachments().iterator(); i.hasNext();) {
 			ChatAttachment att = (ChatAttachment) i.next();
 			if (att.getFileType().equals(IToolContentHandler.TYPE_OFFLINE)) {
@@ -206,5 +212,21 @@ public class ChatDTO {
 
 	public void setCurrentTab(Long currentTab) {
 		this.currentTab = currentTab;
+	}
+
+	public boolean isFilteringEnabled() {
+		return filteringEnabled;
+	}
+
+	public void setFilteringEnabled(boolean filteringEnabled) {
+		this.filteringEnabled = filteringEnabled;
+	}
+
+	public String getFilteredKeyWords() {
+		return filteredKeyWords;
+	}
+
+	public void setFilteredKeyWords(String filteredKeyWords) {
+		this.filteredKeyWords = filteredKeyWords;
 	}
 }
