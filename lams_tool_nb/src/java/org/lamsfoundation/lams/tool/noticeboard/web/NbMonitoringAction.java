@@ -151,6 +151,7 @@ public class NbMonitoringAction extends LamsDispatchAction {
         
         // Set reflection statistics, if reflection is set
         request.setAttribute("reflectOnActivity", content.getReflectOnActivity());
+        request.setAttribute("reflectInstructions", content.getReflectInstructions());
         request.setAttribute("reflections", reflections);
         
         String currentTab = WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB,true);
