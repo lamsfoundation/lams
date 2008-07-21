@@ -2,13 +2,163 @@
 <c:set var="tool"><lams:WebAppURL /></c:set>
 <c:set var="dto" value="${gmapDTO}" />
 
-<table>
+<h1>
+	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
+
+	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
+		<fmt:message key="monitor.summary.th.advancedSettings" />
+	</a>
+</h1>
+<br />
+
+<div class="monitoring-advanced" id="advancedDiv" style="display:none">
+<table class="alternative-color">
+
+	<tr>
+		<td>
+			<fmt:message key="advanced.lockOnFinished" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${dto.lockOnFinish == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="advanced.allowEditMarkers" />
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${dto.allowEditMarkers == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<fmt:message key="advanced.allowShowAllMarkers" />
+		</td>
+		<td>	
+			<c:choose>
+				<c:when test="${dto.allowShowAllMarkers == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	
+	<tr>
+		<td>
+			<fmt:message key="advanced.markerLimitsMessage" />
+		</td>	
+		<td>
+			<c:choose>
+				<c:when test="${dto.limitMarkers == true}">
+					<fmt:message key="label.on" />, ${dto.maxMarkers}
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	 		
+	<tr>
+	 	<td>
+			<fmt:message key="advanced.allowZoom" />
+		</td>
+		<td>	
+			<c:choose>
+				<c:when test="${dto.allowZoom == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<fmt:message key="advanced.allowTerrain" />
+		</td>
+		<td>	
+			<c:choose>
+				<c:when test="${dto.allowTerrain == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<fmt:message key="advanced.allowSatellite" />
+		</td>
+		<td>	
+			<c:choose>
+				<c:when test="${dto.allowSatellite == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="advanced.allowHybrid" />
+		</td>
+		<td>	
+			<c:choose>	
+				<c:when test="${dto.allowHybrid == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+</table>
+</div>
+
+
+<div id="groupsTable">
+<h1><fmt:message key="monitor.summary.title.groups"/></h1>
+
+<br />
+
+<table class="alternative-color">
 <tr>
 	<th>
-		<h1>Group:</h1>
+		<fmt:message key="heading.table.group" />
 	</th>
 	<th>
-		<h1><fmt:message key="heading.totalLearners" /></h1>
+		<fmt:message key="heading.totalLearners" />
 	</th>
 </tr>
 
@@ -26,10 +176,13 @@
 		</tr>
 </c:forEach>
 </table>	
-	
-	
+</div>
 
 
+<div id="gmapDiv">	
+<h1><fmt:message key="monitor.summary.title.map"/></h1>
+
+<br />
 <table>
 	<tr>
 		 <td>
@@ -54,9 +207,9 @@
 		<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
 </td></tr>
 </table>
-	
-	
-	
+
+</div>
+		
 <script type="text/javascript">
 <!--
 	initMonotorGmap();
@@ -97,5 +250,6 @@
 	
 //-->
 </script>
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/monitorToolSummaryAdvanced.js" />
 	
 

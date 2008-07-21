@@ -63,6 +63,7 @@ public class GmapDTO {
 	
 	//public boolean allowRichEditor;
 	
+	public boolean lockOnFinish;
 	
 	public boolean allowEditMarkers;
 	
@@ -106,7 +107,8 @@ public class GmapDTO {
 		onlineInstructions = gmap.getOnlineInstructions();
 		offlineInstructions = gmap.getOfflineInstructions();
 		contentInUse = gmap.isContentInUse();
-		//allowRichEditor = gmap.isAllowRichEditor();		
+		//allowRichEditor = gmap.isAllowRichEditor();	
+		lockOnFinish = gmap.isLockOnFinished();
 		allowEditMarkers = gmap.isAllowEditMarkers();		
 		allowShowAllMarkers = gmap.isAllowShowAllMarkers();		
 		limitMarkers = gmap.isLimitMarkers();		
@@ -139,18 +141,11 @@ public class GmapDTO {
 			}
 		}
 		
-		for (Iterator iter = gmap.getGmapSessions().iterator(); iter.hasNext();) {
+		for (Iterator<GmapSession> iter = gmap.getGmapSessions().iterator(); iter.hasNext();) {
 			GmapSession session = (GmapSession) iter.next();
 			GmapSessionDTO sessionDTO = new GmapSessionDTO(session);			
 			sessionDTOs.add(sessionDTO);
 		}
-		
-		/*
-		for (Iterator<GmapMarker> i = gmap.getGmapMarkers().iterator(); i.hasNext();) {
-			GmapMarker marker = (GmapMarker) i.next();
-			GmapMarkerDTO markerDTO = new GmapMarkerDTO(marker);
-			gmapMarkers.add(markerDTO);
-		}*/
 	}
 
 	/* Getters / Setters */
@@ -335,5 +330,29 @@ public class GmapDTO {
 			GmapMarkerDTO markerDTO = new GmapMarkerDTO(marker);
 			this.gmapMarkers.add(markerDTO);
 		}
+	}
+
+	public boolean isDefineLater() {
+		return defineLater;
+	}
+
+	public void setDefineLater(boolean defineLater) {
+		this.defineLater = defineLater;
+	}
+
+	public boolean isLockOnFinish() {
+		return lockOnFinish;
+	}
+
+	public void setLockOnFinish(boolean lockOnFinish) {
+		this.lockOnFinish = lockOnFinish;
+	}
+
+	public void setContentInUse(boolean contentInUse) {
+		this.contentInUse = contentInUse;
+	}
+
+	public void setGmapMarkers(Set<GmapMarkerDTO> gmapMarkers) {
+		this.gmapMarkers = gmapMarkers;
 	}
 }
