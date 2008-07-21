@@ -612,14 +612,14 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    QaContent qaContent=qaService.loadQa(new Long(strToolContentID).longValue());
 		logger.debug("existing qaContent:" + qaContent);
 		
-    	/* this section is related to summary tab. Starts here. */
+    	
+		/* this section is related to summary tab. Starts here. */
 		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, qaContent, qaService);
 		logger.debug("summaryToolSessions: " + summaryToolSessions);
 
 		request.setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
 		logger.debug("SUMMARY_TOOL_SESSIONS: " + request.getAttribute(SUMMARY_TOOL_SESSIONS));
-	    /* ends here. */
-		
+	    
 	    Map summaryToolSessionsId=MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
 		request.setAttribute(SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
@@ -677,7 +677,14 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
         generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
         /* ...till here */
 
-		
+        // setting up the advanced summary for LDEV-1662
+        request.setAttribute("showOtherAnswers", qaContent.isShowOtherAnswers());
+        request.setAttribute("usernameVisible", qaContent.isUsernameVisible());
+        request.setAttribute("questionsSequenced",	qaContent.isQuestionsSequenced());
+        request.setAttribute("lockWhenFinished", qaContent.isLockWhenFinished());
+        request.setAttribute("reflect", qaContent.isReflect());
+        request.setAttribute("reflectionSubject", qaContent.getReflectionSubject());
+        
     	logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO );
 		request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
