@@ -385,8 +385,14 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
         voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
         /** ...till here **/
 
-		
-		
+        // setting up the advanced summary for LDEV-1662
+	    request.setAttribute("lockOnFinish", voteContent.isLockOnFinish());
+	    request.setAttribute("allowText", voteContent.isAllowText());
+	    request.setAttribute("maxNominationCount", voteContent.getMaxNominationCount());
+	    request.setAttribute("showResults", voteContent.isShowResults());
+	    request.setAttribute("reflect", voteContent.isReflect());
+	    request.setAttribute("reflectionSubject", voteContent.getReflectionSubject());
+
 		MonitoringUtil.buildVoteStatsDTO(request,voteService, voteContent);
 
 		return true;

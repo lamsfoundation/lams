@@ -24,7 +24,107 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/monitorToolSummaryAdvanced.js" />
 
+<h1>
+	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
+
+	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
+		<fmt:message key="monitor.summary.th.advancedSettings" />
+	</a>
+</h1>
+<br />
+
+<div class="monitoring-advanced" id="advancedDiv" style="display:none">
+<table class="alternative-color">
+	<tr>
+		<td>
+			<fmt:message key="label.vote.lockedOnFinish" />
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${lockOnFinish}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.allowText" />
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${allowText}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<fmt:message key="label.maxNomCount" />
+		</td>
+		<td>	
+			${maxNominationCount}
+		</td>
+	</tr>
+	
+	
+	<tr>
+		<td>
+			<fmt:message key="label.show.results" />
+		</td>	
+		<td>
+			<c:choose>
+				<c:when test="${showResults}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<fmt:message key="monitor.summary.td.addNotebook" />
+		</td>
+		<td>	
+			<c:choose>
+				<c:when test="${reflect}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<c:choose>
+		<c:when test="${reflect}">
+			<tr>
+				<td>
+					<fmt:message key="monitor.summary.td.notebookInstructions" />
+				</td>
+				<td>	
+					${reflectionSubject}
+				</td>
+			</tr>
+		</c:when>
+	</c:choose>
+</table>
+</div>
 		<c:if test="${(voteGeneralMonitoringDTO.userExceptionNoToolSessions == 'true')}"> 	
 			<c:if test="${notebookEntriesExist != 'true' }"> 			
 				<table align="center">
