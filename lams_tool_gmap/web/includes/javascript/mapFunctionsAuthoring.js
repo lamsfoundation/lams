@@ -52,7 +52,7 @@ function saveMarkerInfo(x)
 			
 			// change the state to update if it is a pre-existing marker
 			if (markers[x].state == "unchanged") {markers[x].state = "update";}
-			else (markers[x].state ="save");
+			else if (markers[x].state != "update") 		{markers[x].state ="save"};
 			
 			updateMarkerInfoWindowHtml(markers[x]);
 			refreshSideBarAuthoring();

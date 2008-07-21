@@ -54,8 +54,8 @@ function saveMarkerInfo(x)
 			markers[x].highlight = selectedUser == markers[x].createdById;
 			
 			// change the state to update if it is a pre-existing marker
-			if (markers[x].state == "unchanged") {markers[x].state = "update";}
-			else (markers[x].state ="save");
+			if (markers[x].state == "unchanged") 	{markers[x].state = "update";}
+			else if (markers[x].state != "update") 		{markers[x].state ="save"};
 			
 			
 			refreshSideBar(sessionName);
