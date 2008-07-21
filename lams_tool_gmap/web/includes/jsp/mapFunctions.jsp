@@ -94,7 +94,6 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     if (isSaved){marker.state = "unchanged";}
     else {marker.state="unsaved";}
     
-	//marker.sideBarLinkPrefix = "<span class='sidebar'><a href='javascript:GEvent.trigger(markers["+markers.length+"],\"click\")'";
     marker.highlight = false;
     marker.removeLink = "<a href='javascript:removeMarker(" + markers.length + ")'><fmt:message key='button.remove'/></a>" ;
    	marker.editLink = "<a href='javascript:editMarker(" + markers.length + ")'><fmt:message key='button.edit'/></a>";
@@ -168,12 +167,10 @@ function showSelectedUser(id)
 	{
 		if (markers[i].createdById == selectedUser)
 		{
-			//markers[i].setImage(YELLOW_MARKER_ICON);
 			markers[i].highlight=true;
 		}
 		else
 		{
-			//markers[i].setImage(BLUE_MARKER_ICON);
 			markers[i].highlight=false;
 		}
 		updateMarkerInfoWindowHtml(markers[i]);
@@ -183,9 +180,6 @@ function showSelectedUser(id)
 
 function showSelectedMarkerSideBar(id)
 {
-	
-	//alert ("Marker to select: " +id+ "\nSelected marker: " + selectedMarker);
-	
 	var selectedMarkerSpan = document.getElementById("markerSpan" + selectedMarker);
 	var markerSpanToSelect = document.getElementById("markerSpan" + id);
 	
@@ -210,11 +204,9 @@ function showSelectedMarkerSideBar(id)
 function refreshSideBar(groupName)
 {
 	var sideBarText = "";
-	
 	var j;
 	var i;
-	
-	//sideBarText += "<a href='javascript:refreshSideBar()'>View All</a><br>";
+
 	sideBarText += "<nobr><h2>" + groupName + "</h2></nobr>";
 	for (j=0;j<users.length; j++)
 	{

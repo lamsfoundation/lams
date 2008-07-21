@@ -99,13 +99,13 @@
 			<c:choose>
 			<c:when test='${mode == "teacher"}'>
 				<div id="sessionContents">
-					<table width="300px">
+					<table width="300px" class="alternative-color">
 					<tr>
 						<th>
-							<h1>Group:</h1>
+							<fmt:message key="heading.table.group" />
 						</th>
 						<th>
-							<h1><fmt:message key="heading.totalLearners" /></h1>
+							<fmt:message key="heading.totalLearners" />
 						</th>
 					</tr>
 					
