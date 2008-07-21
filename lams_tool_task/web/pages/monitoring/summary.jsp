@@ -2,6 +2,7 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="taskList" value="${sessionMap.taskList}"/>
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" />
 <script type="text/javascript">
 
 	function summaryTask(taskUid){
@@ -17,81 +18,114 @@
 </script>
 
 <%-- Overall TaskList information  --%>
+<h1>
+	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
 
-<h1><fmt:message key="label.authoring.heading.advance"/></h1>
+	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
+		<fmt:message key="monitor.summary.th.advancedSettings" />
+	</a>
+</h1>
+<br />
 
-<div class="monitoring-advanced">
+<div class="monitoring-advanced" id="advancedDiv" style="display:none">
+<table class="alternative-color">
 
-	<fmt:message key="label.monitoring.summary.lock.when.finished"><fmt:param>
-	<c:choose>
-		<c:when test="${taskList.lockWhenFinished}">
-			<fmt:message key="label.on" />
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.off" />
-		</c:otherwise>
-	</c:choose>	
-	</fmt:param></fmt:message>
-	<br/>
-	 						
-	<fmt:message key="label.monitoring.summary.sequential.order"><fmt:param>
-	<c:choose>
-		<c:when test="${taskList.sequentialOrder}">
-			<fmt:message key="label.on" />
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.off" />
-		</c:otherwise>
-	</c:choose>	
-	</fmt:param></fmt:message>
-	<br>	
-						
-	<fmt:message key="label.monitoring.summary.min.number.tasks"><fmt:param>
-	<c:choose>
-		<c:when test="${taskList.minimumNumberTasks > 0}">
-			${taskList.minimumNumberTasks}
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.off" />
-		</c:otherwise>
-	</c:choose>	
-	</fmt:param></fmt:message>
-	<br>	
-						
-	<fmt:message key="label.monitoring.summary.allowed.contribute.tasks"><fmt:param>
-	<c:choose>
-		<c:when test="${taskList.allowContributeTasks}">
-			<fmt:message key="label.on" />
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.off" />
-		</c:otherwise>
-	</c:choose>	
-	</fmt:param></fmt:message>
-	<br>					
+	<tr>
+		<td>
+			<fmt:message key="label.monitoring.summary.lock.when.finished" ><fmt:param> </fmt:param></fmt:message>
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${taskList.lockWhenFinished}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
 	
-	<fmt:message key="label.monitoring.summary.monitor.verification"><fmt:param>
-	<c:choose>
-		<c:when test="${taskList.monitorVerificationRequired}">
-			<fmt:message key="label.on" />
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.off" />
-		</c:otherwise>
-	</c:choose>	
-	</fmt:param></fmt:message>
-	<br>					
+	<tr>
+		<td>
+			<fmt:message key="label.monitoring.summary.sequential.order" ><fmt:param> </fmt:param></fmt:message>
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${taskList.sequentialOrder}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
 	
-	<fmt:message key="label.monitoring.summary.notebook.reflection"><fmt:param>
-	<c:choose>
-		<c:when test="${taskList.reflectOnActivity}">
-			<fmt:message key="label.on" />
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.off" />
-		</c:otherwise>
-	</c:choose>	
-	</fmt:param></fmt:message>
+	<tr>
+		<td>
+			<fmt:message key="label.monitoring.summary.min.number.tasks" ><fmt:param> </fmt:param></fmt:message>
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${taskList.minimumNumberTasks > 0}">
+					${taskList.minimumNumberTasks}
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.monitoring.summary.allowed.contribute.tasks" ><fmt:param> </fmt:param></fmt:message>
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${taskList.allowContributeTasks}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.monitoring.summary.monitor.verification" ><fmt:param> </fmt:param></fmt:message>
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${taskList.monitorVerificationRequired}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.monitoring.summary.notebook.reflection" ><fmt:param> </fmt:param></fmt:message>
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${taskList.reflectOnActivity}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+</table>
 </div>
 
 <%-- Summary list  --%>
