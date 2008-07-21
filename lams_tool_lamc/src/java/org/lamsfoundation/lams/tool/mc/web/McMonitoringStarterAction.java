@@ -249,6 +249,16 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    mcGeneralMonitoringDTO.setListMonitoredAnswersContainerDto(new LinkedList());
 	    mcGeneralMonitoringDTO.setExistsOpenMcs(new Boolean(false).toString());
 	    
+	    // setting up the advanced summary for LDEV-1662
+	    request.setAttribute("questionsSequenced",	mcContent.isQuestionsSequenced());
+	    request.setAttribute("showMarks", mcContent.isShowMarks());
+	    request.setAttribute("randomize", mcContent.isRandomize());
+	    request.setAttribute("displayAnswers", mcContent.isDisplayAnswers());
+	    request.setAttribute("retries", mcContent.isRetries());
+	    request.setAttribute("reflect", mcContent.isReflect());
+	    request.setAttribute("reflectionSubject", mcContent.getReflectionSubject());
+	    request.setAttribute("passMark", mcContent.getPassMark());
+
 	    // The edit activity code needs a session map
 	    SessionMap sessionMap = new SessionMap();
 	    mcMonitoringForm.setHttpSessionID(sessionMap.getSessionID());

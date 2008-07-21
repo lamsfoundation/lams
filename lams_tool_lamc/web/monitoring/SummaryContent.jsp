@@ -19,7 +19,141 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 <%@ include file="/common/taglibs.jsp"%>
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/monitorToolSummaryAdvanced.js" />
 
+<h1>
+	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
+
+	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
+		<fmt:message key="monitor.summary.th.advancedSettings" />
+	</a>
+</h1>
+<br />
+
+<div class="monitoring-advanced" id="advancedDiv" style="display:none">
+<table class="alternative-color">
+
+	<tr>
+		<td>
+			<fmt:message key="radiobox.onepq" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${questionsSequenced}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.showMarks" />
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${showMarks}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<fmt:message key="label.randomize" />
+		</td>
+		<td>	
+			<c:choose>
+				<c:when test="${randomize}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	
+	<tr>
+		<td>
+			<fmt:message key="label.displayAnswers" />
+		</td>	
+		<td>
+			<c:choose>
+				<c:when test="${displayAnswers}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	 		
+	<tr>
+	 	<td>
+			<fmt:message key="radiobox.retries" />
+		</td>
+		<td>	
+			<c:choose>
+				<c:when test="${retries}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<fmt:message key="radiobox.passmark" />
+		</td>
+		<td>	
+			${passMark}
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<fmt:message key="monitor.summary.td.addNotebook" />
+		</td>
+		<td>	
+			<c:choose>
+				<c:when test="${reflect}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<c:choose>
+		<c:when test="${reflect}">
+			<tr>
+				<td>
+					<fmt:message key="monitor.summary.td.notebookInstructions" />
+				</td>
+				<td>	
+					${reflectionSubject}
+				</td>
+			</tr>
+		</c:when>
+	</c:choose>
+</table>
+</div>
 
 		<c:if test="${(mcGeneralMonitoringDTO.userExceptionNoToolSessions == 'true')}"> 	
 			<c:if test="${notebookEntriesExist != 'true' }"> 			
