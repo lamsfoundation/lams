@@ -113,9 +113,19 @@
 				
 				<c:choose>
 					<c:when test="${optionsActivityForm.maxActivitiesReached}">
-						<p class="warning">
-							<fmt:message key="label.optional.maxReached" /> 
-						</p>
+						<c:choose>
+							<c:when test="${isOptionsWithSequencesActivity}">
+								<p class="warning">
+									<fmt:message key="label.optional.maxSequencesReached" /> 
+								</p>
+							</c:when>
+							<c:otherwise>
+								<p class="warning">
+									<fmt:message key="label.optional.maxActivitiesReached" /> 
+								</p>
+							</c:otherwise>
+						</c:choose>
+						
 					</c:when>
 					<c:otherwise>
 						<html:submit styleClass="button">
