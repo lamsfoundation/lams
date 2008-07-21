@@ -6,6 +6,8 @@
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
+
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" />
 <script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 <script type="text/javascript">
 	function launchPopup(url,title) {
@@ -69,10 +71,90 @@
 	function messageComplete(){
 		hideBusy(messageTargetDiv);
 	}
-	
-	
-	
 </script>
+
+
+<h1>
+	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
+
+	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
+		<fmt:message key="monitor.summary.th.advancedSettings" />
+	</a>
+</h1>
+<br />
+
+<div class="monitoring-advanced" id="advancedDiv" style="display:none">
+<table class="alternative-color">
+
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advance.lock.on.finished" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${authoring.lockOnFinished}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.limit.number.upload" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${authoring.limitUpload}">
+					<fmt:message key="label.on" />, ${authoring.limitUploadNumber}
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="monitor.summary.td.addNotebook" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${authoring.reflectOnActivity}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<c:choose>
+		<c:when test="${authoring.reflectOnActivity}">
+			<tr>
+				<td>
+					<fmt:message key="monitor.summary.td.notebookInstructions" />
+				</td>
+				<td>
+					${authoring.reflectInstructions}	
+				</td>
+			</tr>
+		</c:when>
+	</c:choose>
+</table>
+</div>
+
+
+
+
 <table cellpadding="0">
 <tr><td>
 	<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />

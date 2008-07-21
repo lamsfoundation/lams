@@ -56,6 +56,10 @@ public class AuthoringDTO implements Serializable {
 	private List offlineFiles;
 	//advance
 	private boolean lockOnFinished;
+	private boolean limitUpload;
+	private int limitUploadNumber;
+	private boolean reflectOnActivity;
+	private String reflectInstructions;
 	
 	public AuthoringDTO(){
 	}
@@ -183,5 +187,34 @@ public class AuthoringDTO implements Serializable {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	public boolean isLimitUpload() {
+		return limitUpload;
+	}
+	public void setLimitUpload(boolean limitUpload) {
+		this.limitUpload = limitUpload;
+	}
 	
+	public int getLimitUploadNumber() {
+		return limitUploadNumber;
+	}
+	
+	public void setLimitUploadNumber(int limitUploadNumber) {
+		this.limitUploadNumber = limitUploadNumber;
+	}
+	
+	public boolean isReflectOnActivity() {
+		return reflectOnActivity;
+	}
+	
+	public void setReflectOnActivity(boolean reflectOnActivity) {
+		this.reflectOnActivity = reflectOnActivity;
+	}
+	
+	public String getReflectInstructions() {
+		return reflectInstructions;
+	}
+	
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
+	}
 }
