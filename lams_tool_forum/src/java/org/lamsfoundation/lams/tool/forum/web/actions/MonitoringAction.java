@@ -218,6 +218,9 @@ public class MonitoringAction extends Action {
 		forumService = getForumService();
 		List sessionsList = forumService.getSessionsByContentId(toolContentID);
 
+		// A forum clone required for listing the advanced options LDEV-1662
+		Forum forumClone = null;
+
 		Map sessionUsersMap = new TreeMap(this.new SessionDTOComparator());
 		// build a map with all users in the submitFilesSessionList
 		Iterator it = sessionsList.iterator();
@@ -225,6 +228,12 @@ public class MonitoringAction extends Action {
 			SessionDTO sessionDto = new SessionDTO();
 			ForumToolSession fts = (ForumToolSession) it.next();
 			boolean hasReflection = fts.getForum().isReflectOnActivity();
+			
+			if (forumClone == null)
+			{
+				forumClone = (Forum)fts.getForum().clone();
+				request.setAttribute("forum", forumClone);
+			}
 			
 			sessionDto.setSessionID(fts.getSessionId());
 			sessionDto.setSessionName(fts.getSessionName());

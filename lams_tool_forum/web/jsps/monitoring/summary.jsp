@@ -2,6 +2,8 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
+
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" />
 <script type="text/javascript">
 <!--
 
@@ -21,7 +23,6 @@
 		    		evalScripts:true
 		    	}
 	    );
-		
 	}
 	
 	function showBusy(targetDiv){
@@ -44,6 +45,185 @@
 	
 //-->
 </script>
+
+
+<h1>
+	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
+
+	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
+		<fmt:message key="monitor.summary.th.advancedSettings" />
+	</a>
+</h1>
+<br />
+
+<div class="monitoring-advanced" id="advancedDiv" style="display:none">
+
+<table class="alternative-color">	
+
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advance.lock.on.finished" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${forum.lockWhenFinished == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advance.allow.edit" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${forum.allowEdit == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advance.allow.upload" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${forum.allowUpload == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advance.use.richeditor" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${forum.allowRichEditor == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advance.limited.input" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${forum.limitedInput == true}">
+					<fmt:message key="label.on" />, ${forum.limitedChar}
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advance.allow.new.topics" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${forum.allowNewTopic == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advance.number.reply" />
+		</td>
+		
+		<td>
+			<fmt:message key="label.authoring.advance.minimum.reply" />
+			<c:choose>
+				<c:when test="${forum.minimumReply != 0}">
+					${forum.minimumReply}
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.authoring.advance.no.minimum" />
+				</c:otherwise>
+			</c:choose>
+			<br />
+			
+			<fmt:message key="label.authoring.advance.maximum.reply" />
+			<c:choose>
+				<c:when test="${forum.maximumReply != 0}">
+					${forum.maximumReply}
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.authoring.advance.no.maximum" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="monitor.summary.td.addNotebook" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${forum.reflectOnActivity == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<c:choose>
+		<c:when test="${forum.reflectOnActivity == true}">
+			<tr>
+				<td>
+					<fmt:message key="monitor.summary.td.notebookInstructions" />
+				</td>
+				<td>
+					${forum.reflectInstructions}	
+				</td>
+			</tr>
+		</c:when>
+	</c:choose>
+	
+</table>
+</div>
 
 <c:forEach var="element" items="${sessionUserMap}">
 	<c:set var="toolSessionDto" value="${element.key}" />
