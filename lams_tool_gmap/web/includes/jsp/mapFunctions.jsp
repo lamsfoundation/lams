@@ -1,3 +1,11 @@
+<%-- 
+This is the google map library for that handles most of the google map functionality in LAMS
+The functions are in javascript, but it was made as a jsp page so the custom language and other
+tags could be used
+
+Author: lfoxton
+--%>	
+
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
@@ -33,10 +41,11 @@ var currentOpenMarkerImportance= 0;
 // add a marker at the given point
 function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy, createdById)
 {
-	map.closeInfoWindow();
-	var marker;
 	
-
+	map.closeInfoWindow();
+	
+	// Create the marker and set whether is is editable, and some other properties
+	var marker;
 	if(editAble) 	
 	{
 		marker = new GMarker(point, {draggable: true, zIndexProcess:importanceOrder});
@@ -48,14 +57,15 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
 		marker = new GMarker(point, {draggable: false, zIndexProcess:importanceOrder})
 		marker.importance = 0;
 	};
-	
 	marker.editAble = editAble;
 	marker.createdBy = createdBy;
 	marker.createdById = createdById;
 	marker.sideBarIndex = markers.length;
 	
+    // add marker to the map
     map.addOverlay(marker);
     
+    // Adding marker event handling
     GEvent.addListener(marker, "dragstart", function() {
     	map.closeInfoWindow();
     });
@@ -68,6 +78,9 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     GEvent.addListener(marker, "click", function() {
     	marker.openInfoWindowHtml(marker.infoWindowHtml);
     	showSelectedMarkerSideBar(marker.sideBarIndex);
+    	
+    	// backup the current marker importance (z index), then set the marker importance to high
+    	// marker's importance is restored in the "infowindowclose" event below
     	currentOpenMarkerImportance = marker.importance;
     	marker.importance = 3;
     });
@@ -75,9 +88,13 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     GEvent.addListener(marker, "infowindowclose", function() {
     	updateMarkerInfoWindowHtml(marker);
     	showSelectedMarkerSideBar(marker.sideBarIndex);
+    	
+    	// reset the marker's importance
     	marker.importance = currentOpenMarkerImportance
     });
     
+    
+    // set the marker's info message
     if (infoMessage!=null)
     {
     	marker.infoMessage = unescape(infoMessage);
@@ -88,12 +105,10 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     }
     marker.title = title;
     
-    // set the state of the marker
+    // set the state of the marker, determines how the info window will display for this marker, and the sidebar 
     marker.editingOn = !isSaved;
     marker.uid = uid;
-    if (isSaved){marker.state = "unchanged";}
-    else {marker.state="unsaved";}
-    
+    if (isSaved) {marker.state = "unchanged";} else {marker.state="unsaved";}
     marker.highlight = false;
     marker.removeLink = "<a href='javascript:removeMarker(" + markers.length + ")'><fmt:message key='button.remove'/></a>" ;
    	marker.editLink = "<a href='javascript:editMarker(" + markers.length + ")'><fmt:message key='button.edit'/></a>";
@@ -103,39 +118,57 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     updateMarkerInfoWindowHtml(marker);
     markers[markers.length] = marker;
     
+    // open the marker window if it is a new marker
     if (!isSaved) {openInfoWindow(markers.length - 1);}
 }
 
+// add a user to the user array
 function addUserToList(id, name)
 {
 	var user = new Object();
 	user.name = name;
 	user.id = id;
+	user.divOpen = false;
 	users[users.length] = user;
 }
 
+// set the z index of the markers
 function importanceOrder (marker,b) 
 {
 	return GOverlay.getZIndex(marker.getPoint().lat()) + marker.importance*1000000;
 }
 
+// opens/closes the user's sidebar div onclick
 function makeUsersSideBarVisible(id)
 {
 	var div = document.getElementById("userdiv" + id);
+	
+	// get the user
+	var userTemp;
+	for (i=0;i<users.length; i++)
+	{
+		if (users[i].id == id)
+		{
+			userTemp = users[i];
+			break;
+		}
+	}
 	
 	if (div.style.display == "block")
 	{
 		document.getElementById("userdiv" + id).style.display = "none";
 		document.getElementById("userTreeIcon" + id).src = TREE_CLOSED_ICON;
+		userTemp.divOpen = false;	
 	}
 	else if (div.style.display == "none")
 	{
 		document.getElementById("userdiv" + id).style.display = "block";
 		document.getElementById("userTreeIcon" + id).src = TREE_OPEN_ICON;
-		
+		userTemp.divOpen = true;
 	}
 }
 
+// Highlights the markers of a user
 function showSelectedUser(id)
 {
 	map.closeInfoWindow();
@@ -178,6 +211,7 @@ function showSelectedUser(id)
 	
 }
 
+// Highlighs the selected marker in the sidebar
 function showSelectedMarkerSideBar(id)
 {
 	var selectedMarkerSpan = document.getElementById("markerSpan" + selectedMarker);
@@ -185,7 +219,7 @@ function showSelectedMarkerSideBar(id)
 	
 	if (selectedMarker == -1 && markerSpanToSelect != null)
 	{
-		document.getElementById("markerSpan" + id).style.backgroundColor = "yellow";
+		document.getElementById("markerSpan" + id).style.backgroundColor = "orange";
 		selectedMarker = id;
 	}
 	else if (selectedMarker == id && selectedMarkerSpan!= null)
@@ -196,11 +230,13 @@ function showSelectedMarkerSideBar(id)
 	else if (selectedMarkerSpan != null && markerSpanToSelect!= null)
 	{
 		document.getElementById("markerSpan" + selectedMarker).style.backgroundColor = "";
-		document.getElementById("markerSpan" + id).style.backgroundColor = "yellow";
+		document.getElementById("markerSpan" + id).style.backgroundColor = "orange";
 		selectedMarker = id;
 	}
 }
 
+// if a marker has been added, the sidebar needs to be refreshed to include it
+// preserves the user divs that are already open
 function refreshSideBar(groupName)
 {
 	var sideBarText = "";
@@ -210,9 +246,17 @@ function refreshSideBar(groupName)
 	sideBarText += "<nobr><h2>" + groupName + "</h2></nobr>";
 	for (j=0;j<users.length; j++)
 	{
-		sideBarText += "<nobr><img src='" +TREE_CLOSED_ICON+ "' id='userTreeIcon" + users[j].id + "' onclick='javascript:makeUsersSideBarVisible(" + users[j].id + ");' />";
+		// leave open image if the user div was already open
+		users[j].divOpen ? sideBarText += "<nobr><img src='" +TREE_OPEN_ICON  + "'" : sideBarText += "<nobr><img src='" +TREE_CLOSED_ICON + "'";
+		
+		sideBarText += " id='userTreeIcon" + users[j].id + "' onclick='javascript:makeUsersSideBarVisible(" + users[j].id + ");' />";
 		sideBarText += " <a href='javascript:showSelectedUser(" + users[j].id + ");' title='" +users[j].name+ "'><span id='userSpan" + users[j].id +"'>" + users[j].name + "</span></a></nobr><br>";
-		sideBarText += "<div style='display:none;' id='userdiv" + users[j].id + "'>";
+		
+		// leave the user div open if it was already open
+		users[j].divOpen ? sideBarText += "<div style='display:block;'" : sideBarText += "<div style='display:none;'";
+		sideBarText += "id='userdiv" + users[j].id + "'>";
+
+		// add the markers created by this user to their div
 		for (i=0;i<markers.length; i++)
 		{
 			if (markers[i].createdById == users[j].id && markers[i].state != "remove" && markers[i].state != "unsaved")
@@ -228,7 +272,7 @@ function refreshSideBar(groupName)
 	document.getElementById("usersidebar").innerHTML = sideBarText;
 }
 
-
+// Cancels the edit and returns to the view window for the marker
 function cancelEditMarkerInfo(x)
 {
 	if (markers[x].state == "unsaved")
@@ -243,11 +287,13 @@ function cancelEditMarkerInfo(x)
 	}
 }
 
+// Opens a marker's info window
 function openInfoWindow(x)
 {
 	markers[x].openInfoWindowHtml(markers[x].infoWindowHtml);
 }
 
+// Uses the gmap geocoder to find an address for the user, and move the map center there
 function showAddress() 
 {
 	var address = document.getElementById('address').value;
@@ -270,6 +316,7 @@ function showAddress()
 	}
 }
 
+// Alters the zoom and center of the map to fit all the markers in the screen
 function fitMapMarkers() 
 {
    	var bounds = new GLatLngBounds();
@@ -284,17 +331,22 @@ function fitMapMarkers()
 	}
 	
    	var zoom = map.getBoundsZoomLevel(bounds) - 1;
+   	
+   	// max zoom set to 16 to prevent ambiguous map display
    	if (zoom > 16) {zoom = 16;}
+   	
    	map.setZoom(zoom);
    	map.panTo(bounds.getCenter());
    
 }
 
+// string trim
 function trim(x)
 {
 	return x.replace(/^\s+|\s+$/g, '')
 }
 
+// Update's the marker info window, and marker display based on it's state
 function updateMarkerInfoWindowHtml(markerIn)
 {
 	if (markerIn.state == "unchanged")
@@ -341,15 +393,17 @@ function updateMarkerInfoWindowHtml(markerIn)
 	}	
 }
 
+// Serialises the marker array into an xml string for processing on the back end
 function serialiseMarkers()
 {
 	var xmlString = '<?xml version="1.0"?><markers>';
 	var i =0;
 	for (;i<markers.length;i++)
 	{
+		// Check if there are unsaved markers
 		if (markers[i].state == "unsaved")
 		{
-			var ans = confirm("You have unsaved markers, do you wish to continue?");
+			var ans = confirm('<fmt:message key="label.unsavedMarkers" />');
 			if (!ans)
 			{
 				return false;
