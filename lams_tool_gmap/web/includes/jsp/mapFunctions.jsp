@@ -138,6 +138,14 @@ function importanceOrder (marker,b)
 	return GOverlay.getZIndex(marker.getPoint().lat()) + marker.importance*1000000;
 }
 
+// Changes the marker state to edit, then refreshes the info window
+function editMarker(x)
+{
+	markers[x].editingOn = true;
+	updateMarkerInfoWindowHtml(markers[x]);
+	openInfoWindow(x);
+}
+
 // opens/closes the user's sidebar div onclick
 function makeUsersSideBarVisible(id)
 {
@@ -400,7 +408,7 @@ function refresh()
 	for (;i<markers.length;i++)
 	{
 		// Check if there are unsaved markers
-		if (markers[i].state == "unsaved")
+		if (markers[i].state == "unsaved" || markers[i].state == "update")
 		{
 			var ans = confirm('<fmt:message key="label.unsavedMarkers" />');
 			if (ans)
