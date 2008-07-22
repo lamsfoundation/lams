@@ -6,13 +6,6 @@ function addMarkerToCenter()
 	addMarker(point, "", "", -1, false, true, currUser, currUserId);
 }
 
-
-function test()
-{
-	serialiseMarkers();
-	alert(document.authoringForm.markersXML.value);
-}
-
 function removeMarker(x)
 {
 	var ans = confirm(confirmDelete);
@@ -26,13 +19,6 @@ function removeMarker(x)
 	}
 }
 
-function editMarker(x)
-{
-	markers[x].editingOn = true;
-	updateMarkerInfoWindowHtml(markers[x]);
-	openInfoWindow(x);
-}
-
 function saveMarkerInfo(x)
 {
 	if (markers[x] != null)
@@ -44,14 +30,13 @@ function saveMarkerInfo(x)
 		}
 		else
 		{		
-			
 			var info=document.getElementById("infoWindow").value;
 			markers[x].title = title;
 			markers[x].infoMessage = info;
 			markers[x].editingOn = false;
 			
 			// change the state to update if it is a pre-existing marker
-			if (markers[x].state == "unchanged") {markers[x].state = "update";}
+			if (markers[x].state == "unchanged") 		{markers[x].state = "update";}
 			else if (markers[x].state != "update") 		{markers[x].state ="save"};
 			
 			updateMarkerInfoWindowHtml(markers[x]);
