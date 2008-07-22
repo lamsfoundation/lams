@@ -37,6 +37,9 @@ public class MonitoringForm extends ActionForm {
 	String dispatch;
 	boolean teacherVisible;
 	Long toolSessionID;
+	String markersXML;
+	Long toolContentID;
+	String contentFolderID;
 	
 	// editing message page.
 	Long messageUID;
@@ -79,5 +82,22 @@ public class MonitoringForm extends ActionForm {
 	public void setMessageHidden(boolean messageHidden) {
 		this.messageHidden = messageHidden;
 	}
-
+	public String getMarkersXML() {
+		return markersXML;
+	}
+	public void setMarkersXML(String markersXML) {
+		this.markersXML = markersXML;
+	}
+	public Long getToolContentID() {
+		return toolContentID;
+	}
+	public void setToolContentID(Long toolContentID) {
+		this.toolContentID = toolContentID;
+	}
+	public String getContentFolderID() {
+		return contentFolderID;
+	}
+	public void setContentFolderID(String contentFolderID) {
+		this.contentFolderID = contentFolderID;
+	}
 }

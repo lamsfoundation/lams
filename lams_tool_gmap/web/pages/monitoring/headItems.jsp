@@ -5,8 +5,10 @@
 </c:set>
 
 <script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
-
 <%@ include file="/includes/jsp/mapFunctions.jsp"%>
+
+<%-- learning javascript map functions library is sufficient for monitor --%>
+<script type="text/javascript" src="${tool}includes/javascript/mapFunctionsLearning.js"></script>
 
 <script type="text/javascript">
 <!--
@@ -17,6 +19,9 @@ var LIGHTBLUE_MARKER_ICON = "${tool}/images/paleblue_Marker.png";
 var RED_MARKER_ICON = "${tool}/images/red_Marker.png";
 var TREE_CLOSED_ICON = "${tool}/images/tree_closed.gif";
 var TREE_OPEN_ICON = "${tool}/images/tree_open.gif";
+var errorMissingTitle = '<fmt:message key="error.missingMarkerTitle"/>';
+var markerLimitMsg = '<fmt:message key="label.learner.markerLimitReached"/>'
+var confirmDelete = '<fmt:message key="label.authoring.basic.confirmDelete"/>';
 
 var map;
 var markers;
@@ -71,12 +76,13 @@ function clearMap()
 	map.clearOverlays();
 }
 
+// Add a new marker to the center of the map for monitoring
+function addMarkerToCenterMonitoring()
+{
+	var bounds = map.getBounds();
+	var point = bounds.getCenter();
+	addMarker(point, "", "", -1, false, true, '<fmt:message key="label.authoring.basic.authored"></fmt:message>', 0);
+}
+
 //-->
 </script>
-	
-	
-	
-	
-	
-	
-

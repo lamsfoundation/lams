@@ -156,6 +156,11 @@ public class LearningAction extends LamsDispatchAction {
 		return mapping.findForward("gmap");
 	}
 
+	/**
+	 * Get the current user
+	 * @param toolSessionId
+	 * @return
+	 */
 	private GmapUser getCurrentUser(Long toolSessionId) {
 		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
 				AttributeNames.USER);
@@ -223,7 +228,15 @@ public class LearningAction extends LamsDispatchAction {
 		return null; // TODO need to return proper page.
 	}
 	
-	
+	/**
+	 * This saves any new/edited markers on the map, without finishing the activity
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward saveMarkers(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
@@ -245,7 +258,6 @@ public class LearningAction extends LamsDispatchAction {
 			// update the marker list
 			Gmap gmap = gmapSession.getGmap();
 			gmapService.updateMarkerListFromXML(learningForm.getMarkersXML(), gmap, gmapUser, false, gmapSession);
-			//updateMarkerListFromXML(learningForm.getMarkersXML(), gmap, gmapUser, gmapSession);
 
 		} else {
 			log.error("saveMarkers(): couldn't find GmapUser with id: "

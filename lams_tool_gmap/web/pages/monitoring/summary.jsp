@@ -2,6 +2,7 @@
 <c:set var="tool"><lams:WebAppURL /></c:set>
 <c:set var="dto" value="${gmapDTO}" />
 
+
 <h1>
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
 
@@ -147,78 +148,96 @@
 </div>
 
 
-<div id="groupsTable">
-<h1><fmt:message key="monitor.summary.title.groups"/></h1>
 
-<br />
+	<div id="groupsTable">
+	<h1><fmt:message key="monitor.summary.title.groups"/></h1>
+	
+	<br />
+	
+	<table class="alternative-color">
+	<tr>
+		<th>
+			<fmt:message key="heading.table.group" />
+		</th>
+		<th>
+			<fmt:message key="heading.totalLearners" />
+		</th>
+	</tr>
+	
+	<c:if test="${empty dto.sessionDTOs}">
+		<td><i>No groups found for lesson.</i></td>
+	</c:if>
+	<c:forEach var="session" items="${dto.sessionDTOs}">
+			<tr>
+				<td>
+					<a href="javascript:clearMap();addUsersForSession${session.sessionID}();addMarkersForSession${session.sessionID}();">${session.sessionName}</a>
+				</td>
+				<td>
+					${session.numberOfLearners}
+				</td>
+			</tr>
+	</c:forEach>
+	</table>	
+	</div>
 
-<table class="alternative-color">
-<tr>
-	<th>
-		<fmt:message key="heading.table.group" />
-	</th>
-	<th>
-		<fmt:message key="heading.totalLearners" />
-	</th>
-</tr>
-
-<c:if test="${empty dto.sessionDTOs}">
-	<td><i>No groups found for lesson.</i></td>
-</c:if>
-<c:forEach var="session" items="${dto.sessionDTOs}">
+	<html:form action="/monitoring" method="post">
+		<html:hidden property="dispatch" styleId = "dispatch" value="unspecified" />
+		<html:hidden property="markersXML" value="" styleId="markersXML" />
+		<html:hidden property="toolSessionID" styleId="toolSessionID"/>
+		<html:hidden property="toolContentID" />
+		<html:hidden property="contentFolderID" />
+	
+	<div id="gmapDiv">	
+	<h1><fmt:message key="monitor.summary.title.map"/></h1>
+	
+	<br />
+	<table>
+		<tr>
+			 <td>
+			 	<div id="map_legend" style="width:100%;" >
+				<iframe marginwidth="0" align="left" height="60px" width="100%" frameborder="0" src="${tool}/common/mapLegend.jsp"></iframe>
+				</div>
+			 	<div id="map_canvas" style="float: left; width:80%; height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
+				<div id="usersidebar" style="float: right; width:20%; overflow:auto; height:400px; background:WhiteSmoke; "></div>			 	
+			 </td> 			
+		</tr>
 		<tr>
 			<td>
-				<a href="javascript:clearMap();addUsersForSession${session.sessionID}();addMarkersForSession${session.sessionID}();">${session.sessionName}</a>
-			</td>
-			<td>
-				${session.numberOfLearners}
+			<a href="javascript:addMarkerToCenterMonitoring()" class="button"/><fmt:message key="button.addMarker"/></a>
+			<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
+			<a href="javascript:refresh()" class="button"/><fmt:message key="button.refresh"/></a>
 			</td>
 		</tr>
-</c:forEach>
-</table>	
-</div>
+	</table>
+	
+	<table>
+	<tr><td>
+		<input type="text" onkeypress="javascript:if (event.keyCode==13){showAddress(); return false;}" size="60" name="address" id="address" value="<fmt:message key="label.authoring.basic.sampleAddress"></fmt:message>" />
+			<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
+	</td></tr>
+	</table>
+	</div>
+	
+	<table><tr><td align="right">
+		<html:submit styleClass="button" styleId="finishButton" onclick="javascript:serialiseMarkers();document.getElementById('dispatch').value = 'saveMarkers';">
+			<fmt:message>button.save</fmt:message>
+		</html:submit>
+	</td></tr></table>
 
+</html:form>
 
-<div id="gmapDiv">	
-<h1><fmt:message key="monitor.summary.title.map"/></h1>
-
-<br />
-<table>
-	<tr>
-		 <td>
-		 	<div id="map_legend" style="width:100%;" >
-			<iframe marginwidth="0" align="left" height="60px" width="100%" frameborder="0" src="${tool}/common/mapLegend.jsp"></iframe>
-			</div>
-		 	<div id="map_canvas" style="float: left; width:80%; height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
-			<div id="usersidebar" style="float: right; width:20%; overflow:auto; height:400px; background:WhiteSmoke; "></div>			 	
-		 </td> 			
-	</tr>
-	<tr>
-		<td>
-		<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-		<a href="javascript:refresh()" class="button"/><fmt:message key="button.refresh"/></a>
-		</td>
-	</tr>
-</table>
-
-
-<table>
-<tr><td>
-	<input type="text" onkeypress="javascript:if (event.keyCode==13){showAddress(); return false;}" size="60" name="address" id="address" value="<fmt:message key="label.authoring.basic.sampleAddress"></fmt:message>" />
-		<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
-</td></tr>
-</table>
-
-</div>
-		
+	
 <script type="text/javascript">
 <!--
 	initMonotorGmap();
+	var sessionName;
 	
 	<c:forEach var="session" items="${dto.sessionDTOs}" varStatus="status">
 	
 	function addUsersForSession${session.sessionID}()
 	{
+		sessionName = '${session.sessionName}';
+		document.getElementById("toolSessionID").value ="${session.sessionID}";
 		addUserToList('0','<fmt:message key="label.authoring.basic.authored"></fmt:message>' );
 		<c:forEach var="user" items="${session.userDTOs}">
 			addUserToList('${user.uid}','${user.firstName} ${user.lastName}' );
@@ -230,10 +249,10 @@
 		<c:forEach var="marker" items="${session.markerDTOs}">
 			<c:choose>
 			<c:when test="${marker.isAuthored == true}">
-				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
+				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, true, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
 			</c:when>
 			<c:otherwise>
-				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
+				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, true, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
 			</c:otherwise>
 		</c:choose>
 		</c:forEach>
@@ -247,7 +266,6 @@
 		addMarkersForSession${session.sessionID}();
 	</c:if>
 	</c:forEach>
-	
 	
 //-->
 </script>

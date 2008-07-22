@@ -46,7 +46,6 @@
 		var currUserId;
 		var userMarkerCount =0;
 		var limitMarkers = ${gmapDTO.limitMarkers};
-		var markerLimit = 0;
 		var markerLimit = ${gmapDTO.maxMarkers};
 		
 		

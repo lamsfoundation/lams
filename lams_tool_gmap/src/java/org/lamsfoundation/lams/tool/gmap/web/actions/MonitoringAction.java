@@ -34,10 +34,16 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapSessionDTO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
+import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
+import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
 import org.lamsfoundation.lams.tool.gmap.service.GmapServiceProxy;
+import org.lamsfoundation.lams.tool.gmap.util.GmapException;
+import org.lamsfoundation.lams.tool.gmap.web.forms.MonitoringForm;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
@@ -96,5 +102,71 @@ public class MonitoringAction extends LamsDispatchAction {
 			gmapService = GmapServiceProxy.getGmapService(this
 					.getServlet().getServletContext());
 		}
+	}
+	
+	/**
+	 * Allows teachers to edit/remove existing markers
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward saveMarkers(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
+
+		MonitoringForm monitoringForm = (MonitoringForm) form;
+		Long toolSessionID = monitoringForm.getToolSessionID();
+		//Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
+
+		GmapUser gmapUser = getCurrentUser(toolSessionID);
+
+		if (gmapUser != null) {
+
+			//MonitoringForm monitoringForm = (MonitoringForm) form;	
+			
+			// Retrieve the session and content.
+			GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
+			if (gmapSession == null) {
+				throw new GmapException("Cannot retreive session with toolSessionID"+ toolSessionID);
+			}
+			
+			// update the marker list
+			Gmap gmap = gmapSession.getGmap();
+			gmapService.updateMarkerListFromXML(monitoringForm.getMarkersXML(), gmap, gmapUser, true, gmapSession);
+			
+		} else {
+			log.error("saveMarkers(): couldn't find GmapUser with id: "
+					+ gmapUser.getUserId() + "and toolSessionID: "
+					+ toolSessionID);
+		}
+
+		return unspecified(mapping, form, request, response);
+	}
+	
+	/**
+	 * Get the current user
+	 * @param toolSessionId
+	 * @return
+	 */
+	private GmapUser getCurrentUser(Long toolSessionId) {
+		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
+				AttributeNames.USER);
+
+		// attempt to retrieve user using userId and toolSessionId
+		GmapUser gmapUser = gmapService
+				.getUserByUserIdAndSessionId(new Long(user.getUserID()
+						.intValue()), toolSessionId);
+
+		if (gmapUser == null) {
+			GmapSession gmapSession = gmapService
+					.getSessionBySessionId(toolSessionId);
+			gmapUser = gmapService.createGmapUser(user,
+					gmapSession);
+		}
+
+		return gmapUser;
 	}
 }
