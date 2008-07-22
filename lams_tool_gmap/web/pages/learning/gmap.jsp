@@ -47,6 +47,7 @@
 						</c:when>
 					</c:choose>
 					<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
+					<a href="javascript:refresh()" class="button"/><fmt:message key="button.refresh"/></a>
 				</td>
 			</tr>
 		</table>

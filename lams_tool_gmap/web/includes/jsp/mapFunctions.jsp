@@ -219,7 +219,7 @@ function showSelectedMarkerSideBar(id)
 	
 	if (selectedMarker == -1 && markerSpanToSelect != null)
 	{
-		document.getElementById("markerSpan" + id).style.backgroundColor = "orange";
+		document.getElementById("markerSpan" + id).style.backgroundColor = "#FFFFCC";
 		selectedMarker = id;
 	}
 	else if (selectedMarker == id && selectedMarkerSpan!= null)
@@ -230,7 +230,7 @@ function showSelectedMarkerSideBar(id)
 	else if (selectedMarkerSpan != null && markerSpanToSelect!= null)
 	{
 		document.getElementById("markerSpan" + selectedMarker).style.backgroundColor = "";
-		document.getElementById("markerSpan" + id).style.backgroundColor = "orange";
+		document.getElementById("markerSpan" + id).style.backgroundColor = "#FFFFCC";
 		selectedMarker = id;
 	}
 }
@@ -392,6 +392,31 @@ function updateMarkerInfoWindowHtml(markerIn)
 		markerIn.infoWindowHtml = "<h4>" + markerIn.title + "</h4><div style='overflow:auto; width:350px; height:80px'>" +  markerIn.infoMessage.replace(/\n/g, "<br />") + "</div>"+ markerIn.markerMetaData  + markerIn.linksBar;
 	}	
 }
+
+// refreshes the page
+function refresh()
+{
+	var i =0;
+	for (;i<markers.length;i++)
+	{
+		// Check if there are unsaved markers
+		if (markers[i].state == "unsaved")
+		{
+			var ans = confirm('<fmt:message key="label.unsavedMarkers" />');
+			if (ans)
+			{
+				location.reload(true);
+				return;
+			}
+			else
+			{
+				return;
+			}
+		}
+	}
+	location.reload(true);
+}
+
 
 // Serialises the marker array into an xml string for processing on the back end
 function serialiseMarkers()
