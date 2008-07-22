@@ -585,6 +585,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 					marker = new GmapMarker();
 					marker.setCreatedBy(guser);
 					marker.setCreated(new Date());
+					marker.setAuthored(isAuthored);
 				}
 				else if (markerState.equals("update"))
 				{
@@ -599,9 +600,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 				marker.setGmap(gmap);
 				marker.setUpdated(new Date());
 				marker.setUpdatedBy(guser);
-				marker.setAuthored(isAuthored);
 				saveOrUpdateGmapMarker(marker);
-
 			}
 		}
 		catch (Exception e)
