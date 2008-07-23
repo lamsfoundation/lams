@@ -73,6 +73,7 @@ public class SpreadsheetConstants {
 	
 	//error message keys
 	public static final String ERROR_MSG_MARKS_BLANK = "error.summary.marks.blank";
+	public static final String ERROR_MSG_MARKS_INVALID_NUMBER = "error.summary.marks.invalid.number";
 	public static final String ERROR_MSG_COMMENTS_BLANK = "error.summary.comments.blank";
 	public static final String ERROR_MSG_INVALID_URL = "error.resource.item.invalid.url";
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";

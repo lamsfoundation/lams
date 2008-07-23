@@ -24,7 +24,6 @@
 /* $$Id$$ */  
 package org.lamsfoundation.lams.tool.spreadsheet.model;
 
-import java.util.Date;
 /**
  * Spreadsheet
  * @author Andrey Balan

@@ -26,10 +26,8 @@ package org.lamsfoundation.lams.tool.spreadsheet.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.StatisticDTO;

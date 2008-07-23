@@ -26,12 +26,10 @@ package org.lamsfoundation.lams.tool.spreadsheet.dto;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
-import org.lamsfoundation.lams.tool.spreadsheet.util.SpreadsheetWebUtils;
 
 /**
  * List contains following element: <br>

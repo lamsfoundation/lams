@@ -27,16 +27,11 @@ package org.lamsfoundation.lams.tool.spreadsheet.web.action;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -56,8 +51,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.action.ActionRedirect;
-import org.apache.struts.config.ForwardConfig;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
@@ -70,7 +63,6 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
 import org.lamsfoundation.lams.tool.spreadsheet.service.ISpreadsheetService;
 import org.lamsfoundation.lams.tool.spreadsheet.web.form.MarkForm;
-import org.lamsfoundation.lams.tool.spreadsheet.web.form.SpreadsheetForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -341,7 +333,40 @@ public class MonitoringAction extends Action {
 	public ActionForward saveMark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		MarkForm markForm = (MarkForm)form;
 		
-		ActionErrors errors = validateTaskListItem(markForm);
+		
+//		ActionMessages errors = new ActionMessages();  
+//		//check whether the mark is validate
+//		String markStr = request.getParameter("marks");
+//		Long marks = null;
+//		try {
+//			marks = Long.parseLong(markStr);
+//		} catch (Exception e) {
+//			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.mark.invalid.number"));
+//		}
+//		
+//		String comments = WebUtil.readStrParam(request,"comments",true);
+//		if(!errors.isEmpty()){
+//			submitFilesService = getSubmitFilesService();
+//			List report = new ArrayList<FileDetailsDTO>();
+//			FileDetailsDTO fileDetail = submitFilesService.getFileDetails(detailID);
+//			//echo back the input, even they are wrong.
+//			fileDetail.setComments(comments);
+//			fileDetail.setMarks(markStr);
+//			report.add(fileDetail);
+//			
+//			request.setAttribute("report",report);
+//			request.setAttribute("updateMode", updateMode);
+//			request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+//			
+//			
+//			saveErrors(request,errors);
+//			return mapping.findForward("updateMark");
+//		}
+		
+		
+		
+		
+		ActionErrors errors = validateSpreadsheetMark(markForm);
 		
 		if(!errors.isEmpty()){
 			this.addErrors(request,errors);
@@ -450,12 +475,23 @@ public class MonitoringAction extends Action {
 	 * @param itemForm
 	 * @return
 	 */
-	private ActionErrors validateTaskListItem(MarkForm markForm) {
+	private ActionErrors validateSpreadsheetMark(MarkForm markForm) {
 		ActionErrors errors = new ActionErrors();
-		if(StringUtils.isBlank(markForm.getMarks()))
+		
+		String mark = markForm.getMarks();
+		if(StringUtils.isBlank(mark)) {
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SpreadsheetConstants.ERROR_MSG_MARKS_BLANK));
-		if(StringUtils.isBlank(markForm.getComments()))
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SpreadsheetConstants.ERROR_MSG_COMMENTS_BLANK));		
+		}
+		
+		try {
+			Long.parseLong(mark);
+		} catch (Exception e) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SpreadsheetConstants.ERROR_MSG_MARKS_INVALID_NUMBER));
+		}
+		
+		if(StringUtils.isBlank(markForm.getComments())) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(SpreadsheetConstants.ERROR_MSG_COMMENTS_BLANK));
+		}			
 		
 		return errors;
 	}

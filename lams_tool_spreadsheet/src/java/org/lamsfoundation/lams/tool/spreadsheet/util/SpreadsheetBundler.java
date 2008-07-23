@@ -28,8 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,16 +35,11 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.export.web.action.Bundler;
-import org.lamsfoundation.lams.learning.export.web.action.ImageBundler;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
-import org.lamsfoundation.lams.web.filter.LocaleFilter;
 
 public class SpreadsheetBundler extends Bundler {
 
@@ -58,8 +51,6 @@ public class SpreadsheetBundler extends Bundler {
 	 * @param request the request for the export
 	 * @param cookies cookies for the request
 	 * @param outputDirectory the location where the files should be written
-	 * @param toolImageUrlDir the url location of the images directory
-	 * @param fileNames an array of file-names (not paths) you wish to include in the bundle
 	 * @throws Exception
 	 */
 	public void bundle(HttpServletRequest request, Cookie[] cookies, String outputDirectory) throws Exception
@@ -73,15 +64,11 @@ public class SpreadsheetBundler extends Bundler {
 	 * @param request
 	 * @param cookies
 	 * @param outputDirectory
-	 * @param toolImageUrlDir
-	 * @param fileNames
 	 * @throws MalformedURLException
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
 	private void bundleViaHTTP(HttpServletRequest request, Cookie[] cookies, String outputDirectory) throws MalformedURLException, FileNotFoundException, IOException{
-		
-//		String toolImageUrlDir = getImagesUrlDir();
 		
 		String[] directoriesNames = {
 				"translations",
@@ -113,19 +100,11 @@ public class SpreadsheetBundler extends Bundler {
 		filesNames.put(File.separator + "tinymce" + File.separator + "plugins" + File.separator + "paste" + File.separator + "images", new String [] {"pastetext.gif", "pasteword.gif", "selectall.gif"});
 		filesNames.put(File.separator + "tinymce" + File.separator + "plugins" + File.separator + "paste" + File.separator + "jscripts", new String [] {"pastetext.js", "pasteword.js"});
 		filesNames.put(File.separator + "tinymce" + File.separator + "plugins" + File.separator + "paste" + File.separator + "langs", new String [] {"en.js"});
-		
 		filesNames.put(File.separator + "tinymce" + File.separator + "themes" + File.separator + "advanced", new String [] {"about.htm", "anchor.htm", "charmap.htm", "color_picker.htm", "editor_template.js", "image.htm", "link.htm", "source_editor.htm"});
-		
 		filesNames.put(File.separator + "tinymce" + File.separator + "themes" + File.separator + "advanced" + File.separator + "css", new String [] {"editor_content.css", "editor_popup.css", "editor_ui.css"});
 		filesNames.put(File.separator + "tinymce" + File.separator + "themes" + File.separator + "advanced" + File.separator + "images", new String [] {"anchor.gif", "anchor_symbol.gif", "backcolor.gif", "bold.gif", "bold_de_se.gif", "bold_es.gif", "bold_fr.gif", "bold_ru.gif", "bold_tw.gif", "browse.gif", "bullist.gif", "button_menu.gif", "buttons.gif", "cancel_button_bg.gif", "charmap.gif", "cleanup.gif", "close.gif", "code.gif", "color.gif", "copy.gif", "custom_1.gif", "cut.gif", "forecolor.gif", "help.gif", "hr.gif", "image.gif", "indent.gif", "insert_button_bg.gif", "italic.gif", "italic_de_se.gif", "italic_es.gif", "italic_ru.gif", "italic_tw.gif", "justifycenter.gif", "justifyfull.gif", "justifyleft.gif", "justifyright.gif", "link.gif", "menu_check.gif", "newdocument.gif", "numlist.gif", "opacity.png", "outdent.gif", "paste.gif", "redo.gif", "removeformat.gif", "separator.gif", "spacer.gif", "statusbar_resize.gif", "strikethrough.gif", "sub.gif", "sup.gif", "underline.gif", "underline_es.gif", "underline_fr.gif", "underline_ru.gif", "underline_tw.gif", "undo.gif", "unlink.gif", "visualaid.gif"});
 		filesNames.put(File.separator + "tinymce" + File.separator + "themes" + File.separator + "advanced" + File.separator + "jscripts", new String [] {"about.js", "anchor.js", "charmap.js", "color_picker.js", "image.js", "link.js", "source_editor.js"});
 		filesNames.put(File.separator + "tinymce" + File.separator + "themes" + File.separator + "advanced" + File.separator + "langs", new String [] {"en.js"});
-		
-		
-		
-		
-		
-				
 		
 		for (String filePath: filesNames.keySet()) {
 			for(String fileName : filesNames.get(filePath)) {
@@ -152,5 +131,4 @@ public class SpreadsheetBundler extends Bundler {
 	}
 	
 }
-
  

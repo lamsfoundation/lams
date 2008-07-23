@@ -26,12 +26,8 @@
 package org.lamsfoundation.lams.tool.spreadsheet.web.servlet;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -40,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.export.web.action.CustomToolImageBundler;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -53,11 +48,8 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
 import org.lamsfoundation.lams.tool.spreadsheet.service.ISpreadsheetService;
 import org.lamsfoundation.lams.tool.spreadsheet.service.SpreadsheetApplicationException;
 import org.lamsfoundation.lams.tool.spreadsheet.service.SpreadsheetServiceProxy;
-import org.lamsfoundation.lams.tool.spreadsheet.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.spreadsheet.util.SpreadsheetBundler;
 import org.lamsfoundation.lams.tool.spreadsheet.util.SpreadsheetToolContentHandler;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;

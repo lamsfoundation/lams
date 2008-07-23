@@ -23,10 +23,6 @@
 /* $$Id$$ */  
 package org.lamsfoundation.lams.tool.spreadsheet.dao;
 
-import java.util.List;
-import java.util.Map;
-
-import org.lamsfoundation.lams.tool.spreadsheet.dto.Summary;
 
 public interface UserModifiedSpreadsheetDAO extends DAO {
 
