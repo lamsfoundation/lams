@@ -333,41 +333,7 @@ public class MonitoringAction extends Action {
 	public ActionForward saveMark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		MarkForm markForm = (MarkForm)form;
 		
-		
-//		ActionMessages errors = new ActionMessages();  
-//		//check whether the mark is validate
-//		String markStr = request.getParameter("marks");
-//		Long marks = null;
-//		try {
-//			marks = Long.parseLong(markStr);
-//		} catch (Exception e) {
-//			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.mark.invalid.number"));
-//		}
-//		
-//		String comments = WebUtil.readStrParam(request,"comments",true);
-//		if(!errors.isEmpty()){
-//			submitFilesService = getSubmitFilesService();
-//			List report = new ArrayList<FileDetailsDTO>();
-//			FileDetailsDTO fileDetail = submitFilesService.getFileDetails(detailID);
-//			//echo back the input, even they are wrong.
-//			fileDetail.setComments(comments);
-//			fileDetail.setMarks(markStr);
-//			report.add(fileDetail);
-//			
-//			request.setAttribute("report",report);
-//			request.setAttribute("updateMode", updateMode);
-//			request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
-//			
-//			
-//			saveErrors(request,errors);
-//			return mapping.findForward("updateMark");
-//		}
-		
-		
-		
-		
 		ActionErrors errors = validateSpreadsheetMark(markForm);
-		
 		if(!errors.isEmpty()){
 			this.addErrors(request,errors);
 			return mapping.findForward("editMark");

@@ -6,7 +6,8 @@
 	<lams:WebAppURL />
 </c:set>
 
-<script lang="javascript">
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/monitorToolSummaryAdvanced.js"></script>
+<script type="text/javascript">
 	function showMessage(url) {
 		var area=document.getElementById("marksInputArea");
 		if(area != null){
@@ -86,57 +87,88 @@
 	}	
 </script>
 
-<h1><fmt:message key="label.authoring.heading.advance"/></h1>
+
+<h1>
+
+	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
+
+	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
+		<fmt:message key="label.authoring.heading.advance"/>
+	</a>
+</h1>
+<br />
 
 <%-- Overall TaskList information  --%>
-<div class="monitoring-advanced">
-
-	<fmt:message key="label.monitoring.summary.lock.when.finished"><fmt:param>
-	<c:choose>
-		<c:when test="${spreadsheet.lockWhenFinished}">
-			<fmt:message key="label.on" />
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.off" />
-		</c:otherwise>
-	</c:choose>	
-	</fmt:param></fmt:message>
-	<br/>
-
-	<fmt:message key="label.monitoring.summary.individual.spreadsheets"><fmt:param>
-	<c:choose>
-		<c:when test="${spreadsheet.learnerAllowedToSave}">
-			<fmt:message key="label.on" />
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.off" />
-		</c:otherwise>
-	</c:choose>	
-	</fmt:param></fmt:message>
-	<br/>
-	
-	<fmt:message key="label.monitoring.summary.marking.enabled"><fmt:param>
-	<c:choose>
-		<c:when test="${spreadsheet.markingEnabled}">
-			<fmt:message key="label.on" />
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.off" />
-		</c:otherwise>
-	</c:choose>	
-	</fmt:param></fmt:message>
-	<br/>
-	
-	<fmt:message key="label.monitoring.summary.notebook.reflection"><fmt:param>
-	<c:choose>
-		<c:when test="${spreadsheet.reflectOnActivity}">
-			<fmt:message key="label.on" />
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.off" />
-		</c:otherwise>
-	</c:choose>	
-	</fmt:param></fmt:message>
+<div class="monitoring-advanced" id="advancedDiv" style="display:none">
+	<table class="alternative-color">
+		<tr>
+			<td>
+				<fmt:message key="label.monitoring.summary.lock.when.finished" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${spreadsheet.lockWhenFinished}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>	
+		</tr>
+		
+		<tr>
+			<td>
+				<fmt:message key="label.monitoring.summary.individual.spreadsheets" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${spreadsheet.learnerAllowedToSave}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>
+			</td>	
+		</tr>
+		
+		<tr>
+			<td>
+				<fmt:message key="label.monitoring.summary.marking.enabled" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${spreadsheet.markingEnabled}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>
+			</td>	
+		</tr>
+		
+		<tr>
+			<td>
+				<fmt:message key="label.monitoring.summary.notebook.reflection" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${spreadsheet.reflectOnActivity}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>	
+		</tr>
+	</table>
 </div>
 
 <%-- Summary list  --%>
