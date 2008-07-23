@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+		"http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en-AU" dir="LTR">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache, no-store">
+		<meta http-equiv="Expires" content="0">
+		<title>  </title>
+		<link href="../../css/spreadsheet.css" rel="stylesheet" type="text/css">
+		<link href="../../css/defaultHTML_learner.css" rel="stylesheet" type="text/css">
+		<!--[if IE]>
+			<style type="text/css">
+			@import url ("../../css/ie-styles.css");
+			</style>
+		<![endif]-->
+		<!--[if IE 7]>');
+			<style type="text/css">
+			@import url ("../../css/ie7-styles.css");
+			</style>
+		<![endif]-->
+	</head>
+			
+	<body class="stripes">
+		<div id="content">
+		
+			<h1 id="sentBy"></h1><br>
+				
+			<div id="noSpreadsheet"> <br>
+				 <b id="userHasntSent"> </b>	
+			</div>
+
+			<input type="hidden" name="spreadsheet.code" id="spreadsheet.code">
+			<div id="spreadsheet">
+				<iframe
+					id="externalSpreadsheet" name="externalSpreadsheet" src="spreadsheet_offline.html?lang="
+					style="width:635px;" frameborder="no" height="385px" scrolling="no">
+				</iframe>		
+			</div>							
+				
+			<br><br><br>
+			<table cellpadding="0" style="width:635px;">
+				<tr>
+					<td align="right" >
+						<a href="javascript:window.close();" class="button" id="closeButton">Close</a>
+					</td>
+				</tr>
+			</table>				
+				
+		</div>
+		<div id="footer"></div>
+		
+		
+		<script>
+			var userUid = "";
+			if (m = /userUid=([^&]*)/.exec(document.location.href)) {
+			  if (m[1]) userUid = m[1];
+			}
+			var userName = opener.document.getElementById("userName" + userUid).value;
+			var lang = opener.document.getElementById("lang").value;
+		    var code = opener.document.getElementById("spreadsheet.code" + userUid).value;	
+			
+			document.title = opener.document.getElementById("title").value;
+			changeLabel("sentBy", opener.document.getElementById("sentBy").value + " " + userName);
+
+			if (code == null) {
+				document.getElementById("externalSpreadsheet").style.height = "0px";
+				changeLabel("userHasntSent", opener.document.getElementById("userHasntSent").value);
+			} else {
+				document.getElementById("noSpreadsheet").style.visibility = "hidden";
+				document.getElementById("spreadsheet.code").value = code;
+				document.getElementById("externalSpreadsheet").src += lang;
+			}
+			changeLabel("closeButton", opener.document.getElementById("closeButton").value);
+
+			function changeLabel(id, text) {
+				var element = document.getElementById(id);
+
+				if (element) {
+			      	if (element.childNodes[0]) {
+				    	element.childNodes[0].nodeValue=text;
+				    } else if (element.value) {
+				        element.value=text;
+				    } else { //if (element.innerHTML)
+				        element.innerHTML=text;
+				    }			
+				}				
+			}	
+		</script>
+		
+		
+	</body>
+</html>
+

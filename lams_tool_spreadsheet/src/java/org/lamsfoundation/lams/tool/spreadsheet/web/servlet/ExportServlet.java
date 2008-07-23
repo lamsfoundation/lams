@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learning.export.web.action.CustomToolImageBundler;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -53,7 +54,10 @@ import org.lamsfoundation.lams.tool.spreadsheet.service.ISpreadsheetService;
 import org.lamsfoundation.lams.tool.spreadsheet.service.SpreadsheetApplicationException;
 import org.lamsfoundation.lams.tool.spreadsheet.service.SpreadsheetServiceProxy;
 import org.lamsfoundation.lams.tool.spreadsheet.util.ReflectDTOComparator;
+import org.lamsfoundation.lams.tool.spreadsheet.util.SpreadsheetBundler;
 import org.lamsfoundation.lams.tool.spreadsheet.util.SpreadsheetToolContentHandler;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -71,7 +75,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	private static final long serialVersionUID = -4529093489007108143L;
 
 	private static Logger logger = Logger.getLogger(ExportServlet.class);
-
+	
 	private final String FILENAME = "spreadsheet_main.html";
 
 	private SpreadsheetToolContentHandler handler;
@@ -103,6 +107,15 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 
 		String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()	+ request.getContextPath();
+		
+		// Attempting to export required images
+		try	{
+			SpreadsheetBundler imageBundler = new SpreadsheetBundler();
+			imageBundler.bundle(request, cookies, directoryName);
+		} catch (Exception e) {
+			logger.error("Could not export spreadsheet javascript files, some files may be missing in export portfolio", e);
+		}
+		
 		writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID=" + sessionMap.getSessionID(), directoryName, FILENAME, cookies);
 
 		return FILENAME;
@@ -265,4 +278,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}        		
 		 return reflectDTO;
 	}
+	
+
 }

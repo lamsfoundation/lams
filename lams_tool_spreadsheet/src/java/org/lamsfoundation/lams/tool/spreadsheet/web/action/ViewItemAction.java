@@ -140,10 +140,6 @@ public class ViewItemAction extends Action {
 		}
 		request.setAttribute(SpreadsheetConstants.ATTR_CODE, code);
 		
-		
-		
-		
-		
 		return mapping.findForward(SpreadsheetConstants.SUCCESS);
 	}
 	

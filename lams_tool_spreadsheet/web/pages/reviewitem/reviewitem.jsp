@@ -42,6 +42,6 @@
 			</c:choose>	
 		</div>
 		<div id="footer"></div>
-		</div>
+
 	</body>
 </lams:html>
