@@ -253,10 +253,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 * @param   dto 
 	 * @return  
 	 */
-	public function setFolderContents(dto:Object, openFolder:Boolean){	
+	public function setFolderContents(dto:Object, openFolder:Boolean){
 		var nodeToUpdate:XMLNode;
 		Debugger.log('looking for:Folder_'+dto.workspaceFolderID+', parentWorkspaceFolderID:'+dto.parentWorkspaceFolderID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
-		_global.breakpoint();
 		
 		if(getWorkspaceResource('Folder_'+dto.workspaceFolderID)!=null){
 			nodeToUpdate = getWorkspaceResource('Folder_'+dto.workspaceFolderID);
@@ -284,28 +283,39 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			nodeToUpdate.attributes.isEmpty = false;
 		}
 		
-		// go throught the contents of DTO and add it aas children to the node to update.
+		// go through the contents of DTO and add it as children to the node to update.
 		for(var i=0; i<dto.contents.length; i++){
 			var key:String = dto.contents[i].resourceType+'_'+dto.contents[i].resourceID;
 			
-			var cNode = nodeToUpdate.addTreeNode(dto.contents[i].name,dto.contents[i]);
-			//var cNode = nodeToUpdate.addTreeNode(dto.contents[i].name+':'+key,dto.contents[i]);
-			cNode.attributes.data.parentWorkspaceFolderID = dto.parentWorkspaceFolderID;
-			//workspaceFolderID should always be the ID of the folder this resource is contained in
-			cNode.attributes.data.workspaceFolderID = dto.workspaceFolderID;
-			//check if its a folder
-			if(dto.contents[i].resourceType==RT_FOLDER){
-				cNode.attributes.isBranch=true;	
-				
-				// **no longer force open Organisation virtual folder
-				// force open the Organisation virtual folder when opening My Workspace (root) virtual folder
-				// if(cNode.attributes.data.resourceID == ORG_VFOLDER && !cNode.hasChildNodes()){ openFolderInTree(cNode.attributes.data.resourceID, forced); }
+			var nodeExists:Boolean = false;
+			if (nodeToUpdate.hasChildNodes()) {
+				var theChildNodes:Array = nodeToUpdate.childNodes;
 			
-			}else{
+				for (var j=0;j<theChildNodes.length;j++){
+					if (theChildNodes[j].attributes.data.resourceID == dto.contents[i].resourceID) {						nodeExists = true;
+					}
+				}
 			}
 			
-			Debugger.log('Adding new node to _workspaceResources ID :'+key,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
-			setWorkspaceResource(key,cNode);
+			if (!nodeExists) {
+				var cNode = nodeToUpdate.addTreeNode(dto.contents[i].name,dto.contents[i]);
+				//var cNode = nodeToUpdate.addTreeNode(dto.contents[i].name+':'+key,dto.contents[i]);
+				cNode.attributes.data.parentWorkspaceFolderID = dto.parentWorkspaceFolderID;
+				//workspaceFolderID should always be the ID of the folder this resource is contained in
+				cNode.attributes.data.workspaceFolderID = dto.workspaceFolderID;
+				//check if its a folder
+				if(dto.contents[i].resourceType==RT_FOLDER){
+					cNode.attributes.isBranch=true;	
+					
+					// **no longer force open Organisation virtual folder
+					// force open the Organisation virtual folder when opening My Workspace (root) virtual folder
+					// if(cNode.attributes.data.resourceID == ORG_VFOLDER && !cNode.hasChildNodes()){ openFolderInTree(cNode.attributes.data.resourceID, forced); }
+				
+				}
+				
+				Debugger.log('Adding new node to _workspaceResources ID :'+key,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
+				setWorkspaceResource(key,cNode);
+			}
 		}
 		
 		//dispatch an update to the view
