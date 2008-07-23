@@ -97,6 +97,12 @@ public class AuthoringForm extends ActionForm {
 	Gmap gmap;
 	
 	String markersXML;
+	
+	boolean reflectOnActivity;
+	
+	String reflectInstructions;
+	
+	String defaultGeocoderAddress;
 
 	public String getMarkersXML() {
 		return markersXML;
@@ -312,5 +318,29 @@ public class AuthoringForm extends ActionForm {
 
 	public void setMapType(String mapType) {
 		this.mapType = mapType;
+	}
+
+	public boolean isReflectOnActivity() {
+		return reflectOnActivity;
+	}
+
+	public void setReflectOnActivity(boolean reflectOnActivity) {
+		this.reflectOnActivity = reflectOnActivity;
+	}
+
+	public String getReflectInstructions() {
+		return reflectInstructions;
+	}
+
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
+	}
+
+	public String getDefaultGeocoderAddress() {
+		return defaultGeocoderAddress;
+	}
+
+	public void setDefaultGeocoderAddress(String defaultGeocoderAddress) {
+		this.defaultGeocoderAddress = defaultGeocoderAddress;
 	}
 }

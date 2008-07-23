@@ -7,7 +7,7 @@ drop table if exists tl_lagmap10_marker;
 drop table if exists tl_lagmap10_session;
 drop table if exists tl_lagmap10_user;
 create table tl_lagmap10_attachment (uid bigint not null auto_increment, file_version_id bigint, file_type varchar(255), file_name varchar(255), file_uuid bigint, create_date datetime, gmap_uid bigint, primary key (uid))TYPE=InnoDB;
-create table tl_lagmap10_gmap (uid bigint not null auto_increment, create_date datetime, update_date datetime, create_by bigint, title varchar(255), instructions text, run_offline bit, lock_on_finished bit, online_instructions text, offline_instructions text, content_in_use bit, define_later bit, tool_content_id bigint, allow_edit_markers bit, show_all_markers bit, limit_markers bit, max_markers integer, allow_zoom bit, allow_terrain bit, allow_satellite bit, allow_hybrid bit, map_center_latitude double precision, map_center_longitude double precision, map_zoom integer, map_type varchar(20), primary key (uid))TYPE=InnoDB;
+create table tl_lagmap10_gmap (uid bigint not null auto_increment, create_date datetime, update_date datetime, create_by bigint, title varchar(255), instructions text, run_offline bit, lock_on_finished bit, online_instructions text, offline_instructions text, content_in_use bit, define_later bit, tool_content_id bigint, allow_edit_markers bit, show_all_markers bit, limit_markers bit, max_markers integer, allow_zoom bit, allow_terrain bit, allow_satellite bit, allow_hybrid bit, map_center_latitude double precision, map_center_longitude double precision, map_zoom integer, map_type varchar(20), reflect_on_activity bit, reflect_instructions text, default_geocoder_address varchar(255), primary key (uid))TYPE=InnoDB;
 create table tl_lagmap10_marker (uid bigint not null auto_increment, longitude double precision, latitude double precision, info_window_message text, create_date datetime, update_date datetime, is_authored bit, gmap_uid bigint, title varchar(55), created_by bigint, updated_by bigint, gmap_session_uid bigint, primary key (uid))TYPE=InnoDB;
 create table tl_lagmap10_session (uid bigint not null auto_increment, session_end_date datetime, session_start_date datetime, status integer, session_id bigint, session_name varchar(250), gmap_uid bigint, primary key (uid))TYPE=InnoDB;
 create table tl_lagmap10_user (uid bigint not null auto_increment, user_id bigint, last_name varchar(255), login_name varchar(255), first_name varchar(255), finishedActivity bit, gmap_session_uid bigint, primary key (uid))TYPE=InnoDB;
@@ -40,7 +40,10 @@ INSERT INTO tl_lagmap10_gmap (
 	map_center_latitude,
 	map_center_longitude, 
 	map_zoom,
-	map_type
+	map_type,
+	reflect_on_activity, 
+	reflect_instructions, 
+	default_geocoder_address
 ) 
 VALUES(
 	"Gmap",
@@ -63,7 +66,10 @@ VALUES(
 	-33.774322,
 	151.111988,
 	13,
-	"G_NORMAL_MAP"
+	"G_NORMAL_MAP",
+	0,
+	"",
+	"Macquarie University, Sydney NSW"
 );
 
 SET FOREIGN_KEY_CHECKS=1;

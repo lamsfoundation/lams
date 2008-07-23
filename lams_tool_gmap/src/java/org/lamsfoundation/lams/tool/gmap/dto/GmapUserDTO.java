@@ -37,11 +37,16 @@ public class GmapUserDTO implements Comparable{
 	
 	public String lastName;
 	
+	public String notebookEntry;
+	
+	public boolean finishedActivity;
+	
 	public GmapUserDTO(GmapUser user) {
 		this.uid = user.getUid();
 		this.loginName = user.getLoginName();
 		this.firstName = user.getFirstName();
 		this.lastName = user.getLastName();
+		this.finishedActivity = user.isFinishedActivity();
 	}
 
 	public int compareTo(Object o) {
@@ -85,4 +90,22 @@ public class GmapUserDTO implements Comparable{
 	public void setUid(Long uid) {
 		this.uid = uid;
 	}
+	
+	public String getNotebookEntry() {
+		return notebookEntry;
+	}
+
+	public void setNotebookEntry(String notebookEntry) {
+		this.notebookEntry = notebookEntry;
+	}
+
+	public boolean isFinishedActivity() {
+		return finishedActivity;
+	}
+
+	public void setFinishedActivity(boolean finishedActivity) {
+		this.finishedActivity = finishedActivity;
+	}
+	
+	
 }

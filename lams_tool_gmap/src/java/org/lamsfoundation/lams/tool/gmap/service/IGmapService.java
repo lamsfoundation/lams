@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.util.GmapException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 
 /**
  * Defines the services available to the web layer from the Gmap Service
@@ -162,4 +163,28 @@ public interface IGmapService {
 	 * @param session
 	 */
 	void updateMarkerListFromXML(String markerXML, Gmap gmap, GmapUser guser, boolean isAuthored, GmapSession session);
+	
+	/**
+	 * Creates a core notebook entry
+	 * 
+	 * @param id
+	 * @param idType
+	 * @param signature
+	 * @param userID
+	 * @param entry
+	 * @return
+	 */
+	Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
+
+	/**
+	 * Gets the entry from the database
+	 * 
+	 */
+	NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
+
+	/**
+	 * Updates an existing notebook entry
+	 * 
+	 */
+	void updateEntry(NotebookEntry notebookEntry);
 }

@@ -401,8 +401,8 @@ function updateMarkerInfoWindowHtml(markerIn)
 	}	
 }
 
-// refreshes the page
-function refresh()
+
+function confirmLeavePage()
 {
 	var i =0;
 	for (;i<markers.length;i++)
@@ -413,15 +413,21 @@ function refresh()
 			var ans = confirm('<fmt:message key="label.unsavedMarkers" />');
 			if (ans)
 			{
-				location.reload(true);
-				return;
+				return true;
 			}
 			else
 			{
-				return;
+				return false;
 			}
 		}
 	}
+	return true;
+}
+
+
+// refreshes the page
+function refresh()
+{
 	location.reload(true);
 }
 

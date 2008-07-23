@@ -205,7 +205,7 @@
 			<td>
 			<a href="javascript:addMarkerToCenterMonitoring()" class="button"/><fmt:message key="button.addMarker"/></a>
 			<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-			<a href="javascript:refresh()" class="button"/><fmt:message key="button.refresh"/></a>
+			<a href=javascript:if(confirmLeavePage()){refresh();}" class="button"/><fmt:message key="button.refresh"/></a>
 			</td>
 		</tr>
 	</table>

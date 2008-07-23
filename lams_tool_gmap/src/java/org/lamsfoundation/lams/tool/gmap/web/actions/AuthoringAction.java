@@ -432,6 +432,9 @@ public class AuthoringAction extends LamsDispatchAction {
 			gmap.setMapZoom(authForm.getMapZoom());
 			gmap.setMapCenterLatitude(authForm.getMapCenterLatitude());
 			gmap.setMapCenterLongitude(authForm.getMapCenterLongitude());
+			gmap.setReflectOnActivity(authForm.isReflectOnActivity());
+			gmap.setReflectInstructions(authForm.getReflectInstructions());
+			gmap.setDefaultGeocoderAddress(authForm.getDefaultGeocoderAddress());
 		}
 	}
 
@@ -461,6 +464,9 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.setMapZoom(gmap.getMapZoom());
 		authForm.setMapCenterLatitude(gmap.getMapCenterLatitude());
 		authForm.setMapCenterLongitude(gmap.getMapCenterLongitude());
+		authForm.setReflectOnActivity(gmap.isReflectOnActivity());
+		authForm.setReflectInstructions(gmap.getReflectInstructions());
+		authForm.setDefaultGeocoderAddress(gmap.getDefaultGeocoderAddress());
 	}
 
 	/**

@@ -25,7 +25,7 @@
 package org.lamsfoundation.lams.tool.gmap.web.actions;
 
 import java.io.IOException;
-
+import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -48,6 +49,7 @@ import org.lamsfoundation.lams.tool.gmap.service.GmapServiceProxy;
 import org.lamsfoundation.lams.tool.gmap.util.GmapConstants;
 import org.lamsfoundation.lams.tool.gmap.util.GmapException;
 import org.lamsfoundation.lams.tool.gmap.web.forms.LearningForm;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -63,6 +65,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action-forward name="gmap" path="tiles:/learning/main"
  * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
+ * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
  */
 public class LearningAction extends LamsDispatchAction {
 
@@ -132,7 +135,17 @@ public class LearningAction extends LamsDispatchAction {
 		} else {
 			gmapUser = getCurrentUser(toolSessionID);
 		}
+		
 		GmapUserDTO gmapUserDTO = new GmapUserDTO(gmapUser);
+		if (gmapUser.isFinishedActivity()) {
+			// get the notebook entry.
+			NotebookEntry notebookEntry = gmapService.getEntry(toolSessionID,
+					CoreNotebookConstants.NOTEBOOK_TOOL,
+					GmapConstants.TOOL_SIGNATURE, gmapUser.getUserId().intValue());
+			if (notebookEntry != null) {
+				gmapUserDTO.notebookEntry = notebookEntry.getEntry();
+			}
+		}
 		request.setAttribute(GmapConstants.ATTR_USER_DTO, gmapUserDTO);
 		
 		
@@ -199,7 +212,7 @@ public class LearningAction extends LamsDispatchAction {
 			
 			// update the marker list
 			Gmap gmap = gmapSession.getGmap();
-			gmapService.updateMarkerListFromXML(learningForm.getMarkersXML(), gmap, gmapUser, true, gmapSession);
+			gmapService.updateMarkerListFromXML(learningForm.getMarkersXML(), gmap, gmapUser, false, gmapSession);
 			
 			// Set the user finished flag
 			gmapUser.setFinishedActivity(true);
@@ -267,4 +280,60 @@ public class LearningAction extends LamsDispatchAction {
 
 		return unspecified(mapping, form, request, response);
 	}
+	
+	public ActionForward openNotebook(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		LearningForm lrnForm = (LearningForm) form;
+		
+		// set the finished flag
+		GmapUser gmapUser = this.getCurrentUser(lrnForm.getToolSessionID());
+		GmapDTO gmapDTO = new GmapDTO(gmapUser.getGmapSession().getGmap());
+
+		request.setAttribute("gmapDTO", gmapDTO);
+
+		NotebookEntry notebookEntry = gmapService.getEntry(gmapUser.getGmapSession().getSessionId(),
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				GmapConstants.TOOL_SIGNATURE, gmapUser.getUserId().intValue());
+
+		if (notebookEntry != null) {
+			lrnForm.setEntryText(notebookEntry.getEntry());
+		}
+
+		return mapping.findForward("notebook");
+	}
+	
+	public ActionForward submitReflection(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+
+		// save the reflection entry and call the notebook.
+
+		LearningForm lrnForm = (LearningForm) form;
+
+		GmapUser gmapUser = this.getCurrentUser(lrnForm.getToolSessionID());
+		Long toolSessionID = gmapUser.getGmapSession().getSessionId();
+		Integer userID = gmapUser.getUserId().intValue();
+
+		// check for existing notebook entry
+		NotebookEntry entry = gmapService.getEntry(toolSessionID,
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				GmapConstants.TOOL_SIGNATURE, userID);
+
+		if (entry == null) {
+			// create new entry
+			gmapService.createNotebookEntry(toolSessionID,
+					CoreNotebookConstants.NOTEBOOK_TOOL,
+					GmapConstants.TOOL_SIGNATURE, userID, lrnForm
+							.getEntryText());
+		} else {
+			// update existing entry
+			entry.setEntry(lrnForm.getEntryText());
+			entry.setLastModified(new Date());
+			gmapService.updateEntry(entry);
+		}
+
+		return finishActivity(mapping, form, request, response);
+	}
+	
 }

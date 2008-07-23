@@ -117,6 +117,15 @@ public class Gmap implements java.io.Serializable, Cloneable {
 
 	// tool content id
 	private Long toolContentId;
+	
+	// Add notebook at the end of activity
+	boolean reflectOnActivity;
+	
+	// instructions for notebook
+	String reflectInstructions;
+	
+	// default Geocoder Address (Set to "Macquarie University, Sydney NSW" by default)
+	String defaultGeocoderAddress;
 
 	// list of attached files for the gmap
 	private Set<GmapAttachment> gmapAttachments;
@@ -130,8 +139,6 @@ public class Gmap implements java.io.Serializable, Cloneable {
 	//*********** NON Persist fields
 	private IToolContentHandler toolContentHandler;
 	
-	
-
 	// Constructors
 
 	/** default constructor */
@@ -144,6 +151,7 @@ public class Gmap implements java.io.Serializable, Cloneable {
 			boolean filteringEnabled, String filterKeywords,
 			String onlineInstructions, String offlineInstructions,
 			boolean contentInUse, boolean defineLater, Long toolContentId,
+			boolean reflectOnActivity, String reflectInstructions, String defaultGeocoderAddress,
 			Set<GmapAttachment> gmapAttachments, Set<GmapSession> gmapSessions, Set<GmapMarker> markers) {
 		this.createDate = createDate;
 		this.updateDate = updateDate;
@@ -160,6 +168,9 @@ public class Gmap implements java.io.Serializable, Cloneable {
 		this.gmapAttachments = gmapAttachments;
 		this.gmapSessions = gmapSessions;
 		this.gmapMarkers = markers;
+		this.reflectOnActivity = reflectOnActivity;
+		this.reflectInstructions = reflectInstructions;
+		this.defaultGeocoderAddress = defaultGeocoderAddress;
 	}
 
 	// Property accessors
@@ -676,6 +687,40 @@ public class Gmap implements java.io.Serializable, Cloneable {
 
 	public void setMapType(String mapType) {
 		this.mapType = mapType;
+	}
+
+	/**
+	 * @hibernate.property column="reflect_on_activity" length="1"
+	 */
+	public boolean isReflectOnActivity() {
+		return reflectOnActivity;
+	}
+
+	public void setReflectOnActivity(boolean reflectOnActivity) {
+		this.reflectOnActivity = reflectOnActivity;
+	}
+
+	/**
+	 * @hibernate.property column="reflect_instructions" length="65535"
+	 */
+	public String getReflectInstructions() {
+		return reflectInstructions;
+	}
+
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
+	}
+
+	/**
+	 * @hibernate.property column="default_geocoder_address" length="255"
+	 * 
+	 */
+	public String getDefaultGeocoderAddress() {
+		return defaultGeocoderAddress;
+	}
+
+	public void setDefaultGeocoderAddress(String defaultGeocoderAddress) {
+		this.defaultGeocoderAddress = defaultGeocoderAddress;
 	}
 
 }

@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -554,60 +555,68 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 	 */
 	public void updateMarkerListFromXML(String markerXML, Gmap gmap, GmapUser guser, boolean isAuthored, GmapSession session)
 	{
-		try 
+		
+		if (markerXML != null && !markerXML.equals(""))
 		{
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document document = db.parse(new InputSource(new StringReader(markerXML)));
-			NodeList list = document.getElementsByTagName("marker");
-			
-			for (int i =0; i<list.getLength(); i++)
+			try 
+				{
+				DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+				DocumentBuilder db = dbf.newDocumentBuilder();
+				Document document = db.parse(new InputSource(new StringReader(markerXML)));
+				NodeList list = document.getElementsByTagName("marker");
+				
+				for (int i =0; i<list.getLength(); i++)
+				{
+					NamedNodeMap markerNode = ((Node)list.item(i)).getAttributes();
+					
+					Long uid  = Long.parseLong(markerNode.getNamedItem("markerUID").getNodeValue());
+					String markerTitle = markerNode.getNamedItem("title").getNodeValue();
+					String infoMessage = markerNode.getNamedItem("infoMessage").getNodeValue();
+					Double latitude = Double.parseDouble(markerNode.getNamedItem("latitude").getNodeValue());
+					Double longitude = Double.parseDouble(markerNode.getNamedItem("longitude").getNodeValue());
+	
+					String markerState = markerNode.getNamedItem("state").getNodeValue();
+					
+					if (markerState.equals("remove"))
+					{
+						gmap.removeMarker(uid);
+						continue;
+					}
+	
+					GmapMarker marker = null;
+					if (markerState.equals("save"))
+					{
+						marker = new GmapMarker();
+						marker.setCreatedBy(guser);
+						marker.setCreated(new Date());
+						marker.setAuthored(isAuthored);
+					}
+					else if (markerState.equals("update"))
+					{
+						marker = gmap.getMarkerByUid(uid);
+					}
+					
+					marker.setGmapSession(session);
+					marker.setTitle(markerTitle);
+					marker.setInfoWindowMessage(infoMessage);
+					marker.setLatitude(latitude);
+					marker.setLongitude(longitude);
+					marker.setGmap(gmap);
+					marker.setUpdated(new Date());
+					marker.setUpdatedBy(guser);
+					saveOrUpdateGmapMarker(marker);
+				}
+			}
+			catch (Exception e)
 			{
-				NamedNodeMap markerNode = ((Node)list.item(i)).getAttributes();
-				
-				Long uid  = Long.parseLong(markerNode.getNamedItem("markerUID").getNodeValue());
-				String markerTitle = markerNode.getNamedItem("title").getNodeValue();
-				String infoMessage = markerNode.getNamedItem("infoMessage").getNodeValue();
-				Double latitude = Double.parseDouble(markerNode.getNamedItem("latitude").getNodeValue());
-				Double longitude = Double.parseDouble(markerNode.getNamedItem("longitude").getNodeValue());
-
-				String markerState = markerNode.getNamedItem("state").getNodeValue();
-				
-				if (markerState.equals("remove"))
-				{
-					gmap.removeMarker(uid);
-					continue;
-				}
-
-				GmapMarker marker = null;
-				if (markerState.equals("save"))
-				{
-					marker = new GmapMarker();
-					marker.setCreatedBy(guser);
-					marker.setCreated(new Date());
-					marker.setAuthored(isAuthored);
-				}
-				else if (markerState.equals("update"))
-				{
-					marker = gmap.getMarkerByUid(uid);
-				}
-				
-				marker.setGmapSession(session);
-				marker.setTitle(markerTitle);
-				marker.setInfoWindowMessage(infoMessage);
-				marker.setLatitude(latitude);
-				marker.setLongitude(longitude);
-				marker.setGmap(gmap);
-				marker.setUpdated(new Date());
-				marker.setUpdatedBy(guser);
-				saveOrUpdateGmapMarker(marker);
+				// TODO: improve error handling
+				logger.error("Could not get marker xml object to update", e);
+				throw new GmapException("Could not get marker xml object to update", e);
 			}
 		}
-		catch (Exception e)
+		else
 		{
-			// TODO: improve error handling
-			logger.error("Could not get marker xml object to update", e);
-			throw new GmapException("Could not get marker xml object to update", e);
+			logger.debug("MarkerXML string was empty");
 		}
 	}
 
@@ -768,4 +777,23 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 	}
 	
 	
+	public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
+		return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
+	}
+
+	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID){
+		List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
+		if (list == null || list.isEmpty()) {
+			return null;
+		} else {
+			return list.get(0);
+		}
+	}
+
+	/**
+	 * @param notebookEntry
+	 */
+	public void updateEntry(NotebookEntry notebookEntry) {
+		coreNotebookService.updateEntry(notebookEntry);
+	}
 }

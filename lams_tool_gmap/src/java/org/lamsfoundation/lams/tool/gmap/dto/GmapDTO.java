@@ -89,6 +89,12 @@ public class GmapDTO {
 	
 	public String mapType;
 	
+	public boolean reflectOnActivity;
+	
+	public String reflectInstructions;
+	
+	String defaultGeocoderAddress;
+	
 	public Set<GmapMarkerDTO> gmapMarkers = new HashSet<GmapMarkerDTO>();
 	
 	public Set<GmapAttachmentDTO> onlineInstructionsFiles;
@@ -121,7 +127,10 @@ public class GmapDTO {
 		mapCenterLongitude = gmap.getMapCenterLongitude();		
 		mapZoom = gmap.getMapZoom();
 		mapType = gmap.getMapType();
-
+		reflectOnActivity = gmap.isReflectOnActivity();
+		reflectInstructions = gmap.getReflectInstructions();
+		defaultGeocoderAddress = gmap.getDefaultGeocoderAddress();
+		
 		onlineInstructionsFiles = new TreeSet<GmapAttachmentDTO>();
 		offlineInstructionsFiles = new TreeSet<GmapAttachmentDTO>();
 
@@ -354,5 +363,29 @@ public class GmapDTO {
 
 	public void setGmapMarkers(Set<GmapMarkerDTO> gmapMarkers) {
 		this.gmapMarkers = gmapMarkers;
+	}
+
+	public boolean isReflectOnActivity() {
+		return reflectOnActivity;
+	}
+
+	public void setReflectOnActivity(boolean reflectOnActivity) {
+		this.reflectOnActivity = reflectOnActivity;
+	}
+
+	public String getReflectInstructions() {
+		return reflectInstructions;
+	}
+
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
+	}
+
+	public String getDefaultGeocoderAddress() {
+		return defaultGeocoderAddress;
+	}
+
+	public void setDefaultGeocoderAddress(String defaultGeocoderAddress) {
+		this.defaultGeocoderAddress = defaultGeocoderAddress;
 	}
 }
