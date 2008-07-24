@@ -13,24 +13,14 @@
 	<c:set var="lams">
 		<lams:LAMSURL />
 	</c:set>
-	<script type="text/javascript">
-		function launchPopup(url,title) {
-			var wd = null;
-			if(wd && wd.open && !wd.closed){
-				wd.close();
-			}
-			wd = window.open(url,title,'resizable,width=796,height=570,scrollbars');
-			wd.window.focus();
-		}
-	</script>
+
 	<lams:css localLinkPath="../"/>
 </lams:head>
 <body class="stripes">
 
-
 	<div id="content">
 
-	<h1>${title} </h1>
+		<h1>${title} </h1>
 
 		<table border="0" cellspacing="3" width="98%">
 			<c:forEach var="itemSummary" items="${itemSummaryList}">
