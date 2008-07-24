@@ -74,10 +74,17 @@
 		<c:if test="${itemDTO.allowedByParent}">
 			<tr>
 				<td>
-					<span id="icon${status.index}" class="toggling-icon" style="vertical-align:middle;">
-					</span>
-					&nbsp;
-					<a class="toggling-link" id="${status.index}" href="#">
+					<span id="icon${status.index}" class="toggling-icon" style="vertical-align:middle;"> </span>&nbsp;
+					
+					<c:choose>
+						<c:when test="${taskList.sequentialOrder && !itemDTO.previousTaskCompleted}">
+							<a class="toggling-link" id="${status.index}" href="#" style="color:#AAAAAA; font-style:italic">
+						</c:when>
+						<c:otherwise>
+							<a class="toggling-link" id="${status.index}" href="#">
+						</c:otherwise>
+					</c:choose>
+										
 						${item.title} 
 						<c:if test="${!item.createByAuthor && item.createBy != null}">
 								[${item.createBy.loginName}]
