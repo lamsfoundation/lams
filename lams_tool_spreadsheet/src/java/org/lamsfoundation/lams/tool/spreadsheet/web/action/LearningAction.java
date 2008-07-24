@@ -153,7 +153,7 @@ public class LearningAction extends Action {
 		sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE_INSTRUCTION,spreadsheet.getInstructions());
 		sessionMap.put(SpreadsheetConstants.ATTR_FINISH_LOCK, lock);
 		sessionMap.put(SpreadsheetConstants.ATTR_LOCK_ON_FINISH, spreadsheet.getLockWhenFinished());
-		sessionMap.put(SpreadsheetConstants.ATTR_USER_FINISHED, spreadsheetUser !=null && spreadsheetUser.isSessionFinished());
+		sessionMap.put(SpreadsheetConstants.ATTR_USER_FINISHED, spreadsheetUser != null && spreadsheetUser.isSessionFinished());
 		
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
 		sessionMap.put(AttributeNames.ATTR_MODE,mode);
@@ -240,12 +240,13 @@ public class LearningAction extends Action {
 		//get mode and ToolSessionID from sessionMAP
 		ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		boolean userFinished = (Boolean) sessionMap.get(SpreadsheetConstants.ATTR_USER_FINISHED);
 		
 		//save learner changes in spreadsheet if such option is activated in spreadsheet
 		ISpreadsheetService service = getSpreadsheetService();
 		Spreadsheet spreadsheet = (Spreadsheet) sessionMap.get(SpreadsheetConstants.ATTR_RESOURCE);
 		Spreadsheet spreadsheetPO = service.getSpreadsheetByContentId(spreadsheet.getContentId());
-		if(spreadsheetPO.isLearnerAllowedToSave() && !mode.isTeacher()){
+		if(spreadsheetPO.isLearnerAllowedToSave() && !mode.isTeacher() && !(spreadsheet.getLockWhenFinished() && userFinished)){
 				
 			SpreadsheetUser spreadsheetUser = getCurrentUser(service,sessionId);
 			UserModifiedSpreadsheet userModifiedSpreadsheet = new UserModifiedSpreadsheet();

@@ -127,7 +127,7 @@
 			scrolling="no">
 		</iframe>
 		
-		<c:if test="${(mode != 'teacher') && (spreadsheet.learnerAllowedToSave)}">
+		<c:if test="${(mode != 'teacher') && (spreadsheet.learnerAllowedToSave) && !(sessionMap.lockOnFinish && sessionMap.userFinished)}">
 			<div class="space-bottom-top align-right">
 				<html:button property="SaveButton" onclick="return saveUserSpreadsheet('saveUserSpreadsheet')" styleClass="button">
 					<fmt:message key="label.save" />
