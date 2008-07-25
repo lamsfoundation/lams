@@ -167,8 +167,8 @@
    </tag>
    <tag>
 
-      <description>Converts role name into form usable as message spreadsheet key</description>
-      <display-name>Converts role name into form usable as message spreadsheet key</display-name>
+      <description>Converts role name into form usable as message resources key</description>
+      <display-name>Converts role name into form usable as message resources key</display-name>
       <icon>    
       </icon>
       <name>role</name>
@@ -176,7 +176,7 @@
       <body-content>empty</body-content>
 
       <attribute>
-         <description>Converts role name into form usable as message spreadsheet key</description>
+         <description>Converts role name into form usable as message resources key</description>
          <name>role</name>
          <required>true</required>
 
@@ -285,6 +285,11 @@
 		</attribute>
 		<attribute>
 			<name>errorStyleId</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>index</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>

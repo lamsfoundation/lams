@@ -292,7 +292,7 @@
 			<name>index</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
-		</attribute>		
+		</attribute>
 		<attribute>
 			<name>indexed</name>
 			<required>false</required>
