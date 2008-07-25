@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.web.tag;
 import javax.servlet.jsp.JspException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.struts.taglib.html.Constants;
 import org.apache.struts.taglib.html.TextareaTag;
 /**
  * Customerized HTML textarea tag. This tag must used with /lams_web_root/includes/javascript/common.js. 
@@ -44,6 +45,13 @@ public class MultiLinesTextareaTag extends TextareaTag {
 	 * 
 	 */
 	private static final long serialVersionUID = -2282473095816882899L;
+	
+    /**
+	 * The index of this field. You need to use it only if you're going to put
+	 * several STRUTS-textarea tags on one page with the same "property"
+	 * attribute. It's aimed to solve problem with JS function document.getElementById().
+	 */
+    protected String index = null;
 
 	/**
      * Generate an HTML &lt;textarea&gt; tag. 
@@ -54,7 +62,9 @@ public class MultiLinesTextareaTag extends TextareaTag {
     	if(this.property == null)
     		return super.renderTextareaElement();
     	String tagName = prepareName();
-    	String hiddenId = tagName + "__lamshidden";
+    	
+    	String indexToAdd = (getIndex() == null) ? "" : getIndex();
+    	String hiddenId = tagName + "__lamshidden" + indexToAdd;
     	
     	//add Javascript event handler
     	String chbr ="filterData(this,document.getElementById('" + hiddenId + "'));"; 
@@ -77,7 +87,7 @@ public class MultiLinesTextareaTag extends TextareaTag {
     	this.value=getDataNoBr(this.value);
     	this.property +="__textarea";
     	if(StringUtils.isEmpty(this.getStyleId()))
-    		this.setStyleId(tagName + "__lamstextarea");
+    		this.setStyleId(tagName + "__lamstextarea" + indexToAdd);
     	StringBuffer results = new StringBuffer(super.renderTextareaElement());
     	this.property = oldProperty;
     	
@@ -147,4 +157,25 @@ public class MultiLinesTextareaTag extends TextareaTag {
     	setOnchange(null);
     	return result;
     }
+    
+    /**
+     * Return index of this field. You need to use it only if you're going to put
+	 * several STRUTS-textarea tags on one page with the same "property" attribute.
+	 * 
+	 * @return index
+     */
+    public String getIndex() {
+        return (this.index);
+    }
+
+    /**
+     * Set the new index of this field. You need to use it only if you're going to put
+	 * several STRUTS-textarea tags on one page with the same "property" attribute.
+     *
+     * @param index The new index of this field
+     */
+    public void setIndex(String index) {
+        this.index = index;
+    }
+    
 }
