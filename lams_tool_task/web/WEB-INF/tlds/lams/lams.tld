@@ -289,6 +289,11 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
+			<name>index</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>		
+		<attribute>
 			<name>indexed</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
