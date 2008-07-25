@@ -7,7 +7,7 @@
 	<lams:LAMSURL />
 </c:set>
 
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" />
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 <script type="text/javascript">
 	function launchPopup(url,title) {

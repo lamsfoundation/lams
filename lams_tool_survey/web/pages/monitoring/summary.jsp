@@ -3,7 +3,7 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" />
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
 	function exportSurvey(sessionId){
 		var url = "<c:url value="/monitoring/exportSurvey.do"/>";
