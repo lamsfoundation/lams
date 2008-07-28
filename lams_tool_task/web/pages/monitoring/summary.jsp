@@ -143,11 +143,11 @@
 	<table cellpadding="0" class="alternative-color" >
 		
 		<tr>
-			<th width="30%">
+			<th width="30%" style="background-repeat: repeat">
 				<fmt:message key="label.monitoring.summary.user" />
 			</th>
 			<c:forEach var="item" items="${summary.taskListItems}">
-				<th width="30px"  align="center">
+				<th width="30px"  align="center" style="background-repeat: repeat">
 					<a href="javascript:;" onclick="return summaryTask(${item.uid})"> 
 						${item.title} 
 					</a>
@@ -155,7 +155,7 @@
 			</c:forEach>					
 			
 			<c:if test="${summary.monitorVerificationRequired}">
-				<th width="60px" align="center">
+				<th width="60px" align="center" style="background-repeat: repeat">
 					<fmt:message key="label.monitoring.summary.confirm.completion" />
 				</th>
 			</c:if>			
