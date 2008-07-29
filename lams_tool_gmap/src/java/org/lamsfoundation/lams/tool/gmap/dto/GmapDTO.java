@@ -134,7 +134,7 @@ public class GmapDTO {
 		onlineInstructionsFiles = new TreeSet<GmapAttachmentDTO>();
 		offlineInstructionsFiles = new TreeSet<GmapAttachmentDTO>();
 
-		for (Iterator i = gmap.getGmapAttachments().iterator(); i.hasNext();) {
+		for (Iterator<GmapAttachment> i = gmap.getGmapAttachments().iterator(); i.hasNext();) {
 			GmapAttachment att = (GmapAttachment) i.next();
 			if (att.getFileType().equals(IToolContentHandler.TYPE_OFFLINE)) {
 				GmapAttachmentDTO attDTO = new GmapAttachmentDTO(att);

@@ -168,14 +168,14 @@
 		<td><i>No groups found for lesson.</i></td>
 	</c:if>
 	<c:forEach var="session" items="${dto.sessionDTOs}">
-			<tr>
-				<td>
-					<a href="javascript:clearMap();addUsersForSession${session.sessionID}();addMarkersForSession${session.sessionID}();">${session.sessionName}</a>
-				</td>
-				<td>
-					${session.numberOfLearners}
-				</td>
-			</tr>
+		<tr>
+			<td>
+				<a href="javascript:clearMap();addUsersForSession${session.sessionID}();addMarkersForSession${session.sessionID}();makeReflectionDivVisible('reflectionDiv${session.sessionID}');">${session.sessionName}</a>
+			</td>
+			<td>
+				${session.numberOfLearners}
+			</td>
+		</tr>
 	</c:forEach>
 	</table>	
 	</div>
@@ -205,7 +205,7 @@
 			<td>
 			<a href="javascript:addMarkerToCenterMonitoring()" class="button"/><fmt:message key="button.addMarker"/></a>
 			<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-			<a href=javascript:if(confirmLeavePage()){refresh();}" class="button"/><fmt:message key="button.refresh"/></a>
+			<a href="javascript:if(confirmLeavePage()){refresh();}" class="button"/><fmt:message key="button.refresh"/></a>
 			</td>
 		</tr>
 	</table>
@@ -220,10 +220,43 @@
 	
 	<table><tr><td align="right">
 		<html:submit styleClass="button" styleId="finishButton" onclick="javascript:serialiseMarkers();document.getElementById('dispatch').value = 'saveMarkers';">
-			<fmt:message>button.save</fmt:message>
+			<fmt:message key="button.save"></fmt:message>
 		</html:submit>
 	</td></tr></table>
-
+	
+	<c:if test="${dto.reflectOnActivity}">
+	
+	
+	<c:forEach var="session" items="${dto.sessionDTOs}">
+		<div id="reflectionDiv${session.sessionID}" style="display:none;">
+		<h1>${session.sessionName} <fmt:message key="heading.reflection"></fmt:message></h1><br />
+		
+		<table class="alternative-color">
+		<c:forEach var="user" items="${session.userDTOs}">
+			<tr>
+				<td>
+					${user.firstName} ${user.lastName}
+				</td>
+				<td>
+					<c:if test="${user.finishedReflection}">
+						<c:url value="monitoring.do" var="openNotebook">
+							<c:param name="dispatch" value="openNotebook" />
+							<c:param name="userID" value="${user.userId}" />
+							<c:param name="toolSessionID" value="${session.sessionID}" />
+						</c:url>
+				
+						<html:link
+							href="javascript:launchPopup('${openNotebook}')">
+							<fmt:message key="link.view" />
+						</html:link>
+					</c:if>
+				</td>
+			</tr>	
+		</c:forEach>
+		</table>
+		</div>
+	</c:forEach>
+	</c:if>
 </html:form>
 
 	
@@ -259,16 +292,25 @@
 		refreshSideBar("${session.sessionName}");
 		fitMapMarkers();
 	}
-	
 	<c:if test="${status.first}" >
 		clearMap();
 		addUsersForSession${session.sessionID}();
 		addMarkersForSession${session.sessionID}();
+		makeReflectionDivVisible('reflectionDiv${session.sessionID}');
 	</c:if>
 	</c:forEach>
 	
+	function makeReflectionDivVisible(id)
+	{
+		var i;
+		<c:forEach var="session" items="${dto.sessionDTOs}">
+			document.getElementById("reflectionDiv${session.sessionID}").style.display = "none";
+		</c:forEach>
+		document.getElementById(id).style.display = "block";
+	}	
+	
 //-->
 </script>
-<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/monitorToolSummaryAdvanced.js" />
 	
 

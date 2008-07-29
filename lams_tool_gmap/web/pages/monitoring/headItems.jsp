@@ -26,6 +26,7 @@ var confirmDelete = '<fmt:message key="label.authoring.basic.confirmDelete"/>';
 var map;
 var markers;
 var users;
+var sessionReflectionDivs = new Array();
 var geocoder = null;
 var userMarkerCount =0;
 var limitMarkers = ${gmapDTO.limitMarkers};

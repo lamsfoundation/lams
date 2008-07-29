@@ -110,6 +110,11 @@
         path="tiles:/monitoring/gmap_display"
         redirect="false"
       />
+      <forward
+        name="notebook"
+        path="tiles:/monitoring/notebook"
+        redirect="false"
+      />
     </action>
     <action
       path="/clearsession"
