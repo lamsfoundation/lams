@@ -312,10 +312,10 @@
 		<c:forEach var="marker" items="${session.markerDTOs}">
 			<c:choose>
 			<c:when test="${marker.isAuthored == true}">
-				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, true, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
+				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), unescape('${marker.infoWindowMessage}'), unescape('${marker.title}'), '${marker.uid}', true, true, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
 			</c:when>
 			<c:otherwise>
-				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, true, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
+				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), unescape('${marker.infoWindowMessage}'), unescape('${marker.title}'), '${marker.uid}', true, true, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
 			</c:otherwise>
 		</c:choose>
 		</c:forEach>
@@ -333,10 +333,13 @@
 	function makeReflectionDivVisible(id)
 	{
 		var i;
+		if (document.getElementById(id) != null)
+		{
 		<c:forEach var="session" items="${dto.sessionDTOs}">
 			document.getElementById("reflectionDiv${session.sessionID}").style.display = "none";
 		</c:forEach>
 		document.getElementById(id).style.display = "block";
+		}
 	}	
 	
 //-->

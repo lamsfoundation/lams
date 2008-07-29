@@ -225,10 +225,10 @@
 				<c:forEach var="marker" items="${session.markerDTOs}">
 					<c:choose>
 					<c:when test="${marker.isAuthored == true}">
-						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), unescape('${marker.infoWindowMessage}'), unescape('${marker.title}'), '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
 					</c:when>
 					<c:otherwise>
-						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), unescape('${marker.infoWindowMessage}'), unescape('${marker.title}'), '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
 					</c:otherwise>
 				</c:choose>
 				</c:forEach>
@@ -254,12 +254,12 @@
 			<c:forEach var="marker" items="${gmapDTO.gmapMarkers}">							
 				<c:choose>
 					<c:when test="${marker.isAuthored == true}">
-						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), unescape('${marker.infoWindowMessage}'), unescape('${marker.title}'), '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
 					</c:when>
 					<c:otherwise>
 						<c:choose>
 							<c:when test="${gmapDTO.allowShowAllMarkers == true || marker.createdBy.loginName == gmapUserDTO.loginName}">
-								addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
+								addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), unescape('${marker.infoWindowMessage}'), unescape('${marker.title}'), '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
 							</c:when>
 						</c:choose>
 					</c:otherwise>

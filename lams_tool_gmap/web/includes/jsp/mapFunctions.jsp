@@ -431,7 +431,6 @@ function refresh()
 	location.reload(true);
 }
 
-
 // Serialises the marker array into an xml string for processing on the back end
 function serialiseMarkers()
 {
@@ -455,7 +454,7 @@ function serialiseMarkers()
 			' longitude="'+ markers[i].getPoint().lng()+ '"'+
 			' infoMessage="'+ escape(markers[i].infoMessage)+ '"' +
 			' markerUID="'+ markers[i].uid + '"' +
-			' title="'+ markers[i].title + '"' +
+			' title="'+ escape(markers[i].title) + '"' +
 			' state="'+ markers[i].state + '"' +
 			' />';
 			xmlString += markerString;

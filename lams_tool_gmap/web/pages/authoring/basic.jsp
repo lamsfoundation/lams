@@ -86,7 +86,7 @@ function initGmap()
 function addAuthorMarkers()
 {
 	<c:forEach var="marker" items="${formBean.gmap.gmapMarkers}">
-	addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), '${marker.infoWindowMessage}', '${marker.title}', '${marker.uid}', true, true, currUser, currUserId);
+	addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), unescape('${marker.infoWindowMessage}'), unescape('${marker.title}'), '${marker.uid}', true, true, currUser, currUserId);
 	</c:forEach>		
 }
 
