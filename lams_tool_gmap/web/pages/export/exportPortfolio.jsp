@@ -150,7 +150,7 @@
 			<br /><br />	
 			<table>
 			<tr><td>
-				<input type="text" onkeypress="javascript:if (event.keyCode==13){showAddress(); return false;}" size="60" name="address" id="address" value="<fmt:message key="label.authoring.basic.sampleAddress"></fmt:message>" />
+				<input type="text" onkeypress="javascript:if (event.keyCode==13){showAddress();return false;}" size="60" name="address" id="address" value="${dto.defaultGeocoderAddress}" />
 				<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
 			</td></tr>
 			</table>	

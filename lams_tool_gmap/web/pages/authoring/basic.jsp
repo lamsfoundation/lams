@@ -48,7 +48,8 @@
 			<div class="field-name">
 				<fmt:message key="label.authoring.basic.centerMap"></fmt:message>
 			</div>
-			<input type="text" size="60" onkeypress="javascript:if (event.keyCode==13){showAddress(); return false;}" name="address" id="address" value="<fmt:message key="label.authoring.basic.sampleAddress"></fmt:message>" />
+			
+			<html:text property="defaultGeocoderAddress" size="60" onkeypress="javascript:if (event.keyCode==13){showAddress(); return false;}"></html:text>
        		<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
 		</td>
 	</tr>
