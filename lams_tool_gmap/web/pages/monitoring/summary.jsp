@@ -144,6 +144,36 @@
 			</c:choose>	
 		</td>
 	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="monitor.summary.td.addNotebook" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${dto.reflectOnActivity == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<c:choose>
+		<c:when test="${dto.reflectOnActivity == true}">
+			<tr>
+				<td>
+					<fmt:message key="monitor.summary.td.notebookInstructions" />
+				</td>
+				<td>
+					${dto.reflectInstructions}	
+				</td>
+			</tr>
+		</c:when>
+	</c:choose>
 </table>
 </div>
 
