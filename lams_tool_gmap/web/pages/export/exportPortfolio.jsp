@@ -115,7 +115,7 @@
 					<c:forEach var="session" items="${gmapDTO.sessionDTOs}">
 							<tr>
 								<td>
-									<a href="javascript:clearMap();addUsersForSession${session.sessionID}();addMarkersForSession${session.sessionID}();">${session.sessionName}</a>
+									<a href="javascript:clearMap();addUsersForSession${session.sessionID}();addMarkersForSession${session.sessionID}();makeReflectionDivVisible('reflectionDiv${session.sessionID}');">${session.sessionName}</a>
 								</td>
 								<td>
 									${session.numberOfLearners}
@@ -154,7 +154,48 @@
 				<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
 			</td></tr>
 			</table>	
-				
+			
+			
+			<c:choose>
+			<c:when test='${mode == "teacher"}'>
+				<c:if test="${gmapDTO.reflectOnActivity}">
+				<br /><br />
+				<c:forEach var="session" items="${gmapDTO.sessionDTOs}">
+					<div id="reflectionDiv${session.sessionID}" style="display:none;">
+					<h1>${session.sessionName} <fmt:message key="heading.reflection"></fmt:message></h1><br />
+					
+					<table class="alternative-color">
+					<c:forEach var="user" items="${session.userDTOs}">
+						<tr>
+							<td width="15%">
+								<span style="font-weight: bold">${user.firstName} ${user.lastName}</span>
+							</td>
+							<td width="85%">
+								<c:if test="${user.finishedReflection}">
+									${user.notebookEntry}
+								</c:if>
+							</td>
+						</tr>	
+					</c:forEach>
+					</table>
+					</div>
+				</c:forEach>
+				</c:if>
+			</c:when>
+			<c:otherwise>
+				<c:if test="${gmapDTO.reflectOnActivity}">
+					<br /><br />
+					<h1><fmt:message key="heading.reflection"></fmt:message></h1>
+					<p>
+						<span style="font-weight: bold">${gmapUserDTO.firstName}
+							${gmapUserDTO.lastName} </span>
+						<br />
+						<lams:out value="${gmapUserDTO.notebookEntry}"/>
+					</p>
+				</c:if>
+			</c:otherwise>
+			
+			</c:choose>	
 				
 			</div>
 			<!--closes content-->
@@ -199,6 +240,7 @@
 				clearMap();
 				addUsersForSession${session.sessionID}();
 				addMarkersForSession${session.sessionID}();
+				makeReflectionDivVisible('reflectionDiv${session.sessionID}');
 			</c:if>
 			</c:forEach>
 		</c:when>
@@ -228,6 +270,18 @@
 			fitMapMarkers();
 		</c:otherwise>	
 		</c:choose>
+		
+		function makeReflectionDivVisible(id)
+		{
+			var i;
+			if (document.getElementById(id) != null)
+			{
+				<c:forEach var="session" items="${gmapDTO.sessionDTOs}">
+					document.getElementById("reflectionDiv${session.sessionID}").style.display = "none";
+				</c:forEach>
+				document.getElementById(id).style.display = "block";
+			}
+		}
 		
 	//-->
 	</script>

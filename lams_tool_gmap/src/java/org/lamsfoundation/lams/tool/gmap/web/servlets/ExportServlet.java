@@ -32,6 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapSessionDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapUserDTO;
@@ -148,15 +150,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 
 		GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
-
+		
 		Gmap gmap = gmapSession.getGmap();
 
 		UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 		GmapUser gmapUser = gmapService.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()),toolSessionID);
 		GmapUserDTO gmapUserDTO = new GmapUserDTO(gmapUser);
-		request.getSession().setAttribute("gmapUserDTO", gmapUserDTO);
-		
 
 		// construct dto's
 		GmapDTO gmapDTO = new GmapDTO(gmap);
@@ -164,10 +164,26 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		
 
 		GmapSessionDTO sessionDTO = new GmapSessionDTO(gmapSession);
-		request.getSession().setAttribute("sessionDTO", sessionDTO);
-		
-		gmapDTO.getSessionDTOs().add(sessionDTO);
+		// if reflectOnActivity is enabled add userDTO.
+		if (gmap.isReflectOnActivity()) {
 
+			// get the entry.
+			NotebookEntry entry = gmapService.getEntry(toolSessionID,
+					CoreNotebookConstants.NOTEBOOK_TOOL,
+					GmapConstants.TOOL_SIGNATURE, gmapUser.getUserId().intValue());
+
+			if (entry != null) {
+				gmapUserDTO.finishedReflection = true;
+				gmapUserDTO.notebookEntry = entry.getEntry();
+			} else {
+				gmapUserDTO.finishedReflection = false;
+			}
+			sessionDTO.getUserDTOs().add(gmapUserDTO);
+		}
+		
+		request.getSession().setAttribute("gmapUserDTO", gmapUserDTO);
+		request.getSession().setAttribute("sessionDTO", sessionDTO);
+		gmapDTO.getSessionDTOs().add(sessionDTO);
 		request.getSession().setAttribute("gmapDTO", gmapDTO);
 	}
 
@@ -193,6 +209,26 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		for (GmapSessionDTO gmapSessionDTO : gmapDTO.getSessionDTOs() )
 		{
 			gmapSessionDTO.setMarkerDTOs(gmapService.getGmapMarkersBySessionId(gmapSessionDTO.getSessionID()));
+		
+			// if reflectOnActivity is enabled add all userDTO.
+			if (gmap.isReflectOnActivity()) {
+
+				for (GmapUserDTO gmapUserDTO : gmapSessionDTO.getUserDTOs())
+				{
+					// get the entry.
+					NotebookEntry entry = gmapService.getEntry(gmapSessionDTO.getSessionID(),
+							CoreNotebookConstants.NOTEBOOK_TOOL,
+							GmapConstants.TOOL_SIGNATURE, gmapUserDTO.getUserId()
+									.intValue());
+					if (entry != null) {
+						gmapUserDTO.finishedReflection = true;
+						gmapUserDTO.notebookEntry = entry.getEntry();
+					} else {
+						gmapUserDTO.finishedReflection = false;
+					}
+					gmapSessionDTO.getUserDTOs().add(gmapUserDTO);
+				}
+			}
 		}
 		
 		request.getSession().setAttribute("gmapDTO", gmapDTO);
