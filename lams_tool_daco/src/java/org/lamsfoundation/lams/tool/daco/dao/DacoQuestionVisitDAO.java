@@ -24,24 +24,13 @@
 package org.lamsfoundation.lams.tool.daco.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestionVisitLog;
 
 public interface DacoQuestionVisitDAO extends DAO {
 
-	
-	public DacoQuestionVisitLog getDacoQuestionLog(Long questionUid,Long userId);
+	public DacoQuestionVisitLog getDacoQuestionLog(Long questionUid, Long userId);
 
-	public int getUserViewLogCount(Long sessionId, Long userUid);
-	/**
-	 * Return list which contains key pair which key is daco question uid, value is number view.
-	 * 
-	 * @param contentId
-	 * @return
-	 */
-	public Map<Long,Integer> getSummary(Long contentId);
-	
-	public List<DacoQuestionVisitLog> getDacoQuestionLogBySession(Long sessionId,Long questionUid);
+	public List<DacoQuestionVisitLog> getDacoQuestionLogBySession(Long sessionId, Long questionUid);
 
 }

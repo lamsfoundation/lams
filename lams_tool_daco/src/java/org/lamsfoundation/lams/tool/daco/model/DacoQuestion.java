@@ -24,8 +24,7 @@
 package org.lamsfoundation.lams.tool.daco.model;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -59,7 +58,7 @@ public class DacoQuestion implements Cloneable {
 
 	private String organizationXml;
 
-	private Set answerOptions;
+	private Set<DacoAnswerOption> answerOptions = new LinkedHashSet<DacoAnswerOption>();
 
 	private boolean isHide;
 	private boolean isCreateByAuthor;
@@ -68,21 +67,17 @@ public class DacoQuestion implements Cloneable {
 	private Date createDate;
 	private DacoUser createBy;
 
+	private Daco daco;
+
 	@Override
 	public Object clone() {
 		DacoQuestion obj = null;
 		try {
 			obj = (DacoQuestion) super.clone();
 			// clone attachment
-			if (answerOptions != null) {
-				Iterator iter = answerOptions.iterator();
-				Set set = new HashSet();
-				while (iter.hasNext()) {
-					DacoAnswerOption answerOption = (DacoAnswerOption) iter.next();
-					DacoAnswerOption newAnswerOption = (DacoAnswerOption) answerOption.clone();
-					set.add(newAnswerOption);
-				}
-				obj.answerOptions = set;
+			obj.setAnswerOptions(new LinkedHashSet<DacoAnswerOption>(answerOptions.size()));
+			for (DacoAnswerOption answerOption : answerOptions) {
+				obj.getAnswerOptions().add((DacoAnswerOption) answerOption.clone());
 			}
 			obj.setUid(null);
 			// clone ReourceUser as well
@@ -113,8 +108,8 @@ public class DacoQuestion implements Cloneable {
 	 * @param uid
 	 *            The uid to set.
 	 */
-	public void setUid(Long userID) {
-		uid = userID;
+	public void setUid(Long uid) {
+		this.uid = uid;
 	}
 
 	/**
@@ -142,7 +137,7 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.many-to-one cascade="none" column="create_by"
+	 * @hibernate.many-to-one cascade="none" column="create_by" foreign-key="QuestionToUser"
 	 * 
 	 * @return
 	 */
@@ -263,16 +258,38 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.set lazy="false" cascade="all-delete-orphan" inverse="false" order-by="sequence_num asc"
+	 * @hibernate.set lazy="false" cascade="all" inverse="true" order-by="sequence_num asc"
 	 * @hibernate.collection-key column="question_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoAnswerOption"
 	 * @return
 	 */
-	public Set getAnswerOptions() {
+	public Set<DacoAnswerOption> getAnswerOptions() {
 		return answerOptions;
 	}
 
-	public void setAnswerOptions(Set options) {
+	public void setAnswerOptions(Set<DacoAnswerOption> options) {
 		answerOptions = options;
 	}
+
+	/*
+		public Long getContentUid() {
+			return contentUid;
+		}
+
+		public void setContentUid(Long contentUid) {
+			this.contentUid = contentUid;
+		}*/
+
+	/**
+	 * @hibernate.many-to-one column="content_uid" cascade="none" foreign-key="QuestionToDaco" insert="false" update="false"
+	 * @return
+	 */
+	public Daco getDaco() {
+		return daco;
+	}
+
+	public void setDaco(Daco daco) {
+		this.daco = daco;
+	}
+
 }

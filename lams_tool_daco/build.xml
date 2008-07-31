@@ -98,7 +98,6 @@
 			force="true">
 				<fileset dir="${src.java.dir}">
 					<include name="**/*.java"/>
-					<exclude name="**/DacoAnswer.java"/>
 				</fileset>
 			<hibernate version="3.0"/>
 		</hibernatedoclet>

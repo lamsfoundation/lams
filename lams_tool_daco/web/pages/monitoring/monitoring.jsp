@@ -6,33 +6,20 @@
 
 <lams:html>
 	<lams:head>
-		 <%@ include file="/common/tabbedheader.jsp" %>
-	 <script>
-			var initialTabId = "${initialTabId}";
-
-		   function init(){
-			 	if (initialTabId) {
-					selectTab(initialTabId);
-				} else {
-					selectTab(1);
-				}
-	        }     
-	        
-	        function doSelectTab(tabId) {
-		    	// end optional tab controller stuff
-		    	selectTab(tabId);
-	        } 
-	        
-		    function viewQuestion(questionUid,sessionMapID){
-				var myUrl = "<c:url value="/reviewQuestion.do"/>?mode=teacher&questionUid=" + questionUid + "&sessionMapID="+sessionMapID;
-				launchPopup(myUrl,"MonitoringReview");
-			}
-	    </script>		 
+		<%@ include file="/common/tabbedheader.jsp" %>
+		
+		<script>
+			var currentTab = "${monitoringCurrentTab}";
+		</script>
+		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoMonitoring.js'/>"></script> 
+		
+		<title><fmt:message key="title.monitoring" /></title>
+		
 	</lams:head>
-	<body class="stripes" onLoad="init()">
+	<body id="body" class="stripes" onLoad="init()">
 	<div id="page">
 		<h1>
-			<fmt:message key="label.authoring.heading" />
+			<fmt:message key="label.common.heading" />
 		</h1>
 	<div id="header">
 		<lams:Tabs>
@@ -44,11 +31,11 @@
 	</div>
 	<div id="content">
 			<lams:help toolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" module="monitoring"/>
-	
+			
 			<lams:TabBody id="1" titleKey="tab.monitoring.summary" page="summary.jsp" />
 			<lams:TabBody id="2" titleKey="tab.monitoring.instructions" page="instructions.jsp"/>
 			<lams:TabBody id="3" titleKey="tab.monitoring.edit.activity" page="editactivity.jsp" />			
-			<lams:TabBody id="4" titleKey="tab.monitoring.statistics" page="statistic.jsp" />
+			<lams:TabBody id="4" titleKey="tab.monitoring.statistics" page="statistics.jsp" />
 	</div>
 	<div id="footer"></div>
 	

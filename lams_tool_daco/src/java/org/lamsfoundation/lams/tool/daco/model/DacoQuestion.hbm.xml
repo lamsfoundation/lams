@@ -49,6 +49,7 @@
             outer-join="auto"
             update="true"
             insert="true"
+            foreign-key="QuestionToUser"
             column="create_by"
         />
 
@@ -127,8 +128,8 @@
         <set
             name="answerOptions"
             lazy="false"
-            inverse="false"
-            cascade="all-delete-orphan"
+            inverse="true"
+            cascade="all"
             sort="unsorted"
             order-by="sequence_num asc"
         >
@@ -143,6 +144,17 @@
             />
 
         </set>
+
+        <many-to-one
+            name="daco"
+            class="org.lamsfoundation.lams.tool.daco.model.Daco"
+            cascade="none"
+            outer-join="auto"
+            update="false"
+            insert="false"
+            foreign-key="QuestionToDaco"
+            column="content_uid"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

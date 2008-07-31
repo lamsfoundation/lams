@@ -2,8 +2,7 @@
 <%@ page
 	import="org.lamsfoundation.lams.contentrepository.client.IToolContentHandler"%>
 <c:set var="formBean"
-	value="<%=request
-									.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 
 <script type="text/javascript">

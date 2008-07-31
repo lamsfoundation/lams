@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.daco.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +31,8 @@ import java.util.Set;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
+import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
 import org.lamsfoundation.lams.tool.daco.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.daco.dto.Summary;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
@@ -38,7 +41,6 @@ import org.lamsfoundation.lams.tool.daco.model.DacoAttachment;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
-import org.lamsfoundation.lams.tool.daco.util.QuestionSummary;
 
 /**
  * @author Dapeng.Ni
@@ -74,14 +76,6 @@ public interface IDacoService {
 	 * @throws DacoApplicationException
 	 */
 	Daco getDefaultContent(Long contentId) throws DacoApplicationException;
-
-	/**
-	 * Get list of daco questions by given dacoUid. These daco questions must be created by author.
-	 * 
-	 * @param dacoUid
-	 * @return
-	 */
-	List getAuthoredQuestions(Long dacoUid);
 
 	/**
 	 * Upload instruciton file into repository.
@@ -193,14 +187,6 @@ public interface IDacoService {
 	void setQuestionAccess(Long dacoQuestionUid, Long userId, Long sessionId);
 
 	/**
-	 * the reqired number minus the count of view of the given user.
-	 * 
-	 * @param userUid
-	 * @return
-	 */
-	int checkMiniView(Long toolSessionId, Long userId);
-
-	/**
 	 * If success return next activity's url, otherwise return null.
 	 * 
 	 * @param toolSessionId
@@ -210,14 +196,6 @@ public interface IDacoService {
 	String finishToolSession(Long toolSessionId, Long userId) throws DacoApplicationException;
 
 	DacoQuestion getDacoQuestionByUid(Long questionUid);
-
-	/**
-	 * Return monitoring summary list. The return value is list of daco summaries for each groups.
-	 * 
-	 * @param contentId
-	 * @return
-	 */
-	List<List<Summary>> getSummary(Long contentId);
 
 	List<DacoUser> getUserListBySessionQuestion(Long sessionId, Long questionUid);
 
@@ -288,5 +266,15 @@ public interface IDacoService {
 
 	public String getLocalisedMessage(String key, Object[] args);
 
-	public List<QuestionSummary> getQuestionSummaries(Long contentUid, Long userUid);
+	public List<QuestionSummaryDTO> getQuestionSummaries(Long contentUid, Long userUid);
+
+	public List<DacoQuestion> getQuestionByContentUid(Long contentUid);
+
+	public void releaseDacoFromCache(Daco daco);
+
+	void releaseAnswersFromCache(Collection<DacoAnswer> answers);
+
+	Integer getTotalRecordCount(Long contentId);
+
+	List<MonitoringSummarySessionDTO> getMonitoringSummary(Long contentId, Long userUid);
 }

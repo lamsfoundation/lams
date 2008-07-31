@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <c:set var="showMessageURL">
-	<html:rewrite page='/authoring/newQuestionInit.do?sessionMapID=${formBean.sessionMapID}&questionType=' />
+	<html:rewrite page='/authoring/newQuestion.do?sessionMapID=${formBean.sessionMapID}&questionType=' />
 </c:set>
 
 <script type="text/javascript">
@@ -40,17 +40,11 @@
 	 var questionTypeDropdown=document.getElementById("questionType");
 	 showQuestionInputArea(url.concat(questionTypeDropdown.selectedIndex + 1));
 }
-
-   //This mode is special for unsaved author page. It is different with the author mode in preview 
-	function previewQuestion(questionIndex,sessionMapID){
-		var myUrl = "<c:url value='/reviewQuestion.do?mode=author_session&questionIndex='/>"+questionIndex+"&sessionMapID="+sessionMapID;
-		launchPopup(myUrl,"Review");
-	}
 	
 	
 	function editQuestion(questionIndex,sessionMapID){
 		var reqID = new Date();
-		var url = "<c:url value="/authoring/editQuestionInit.do?questionIndex="/>" + questionIndex +"&reqID="+reqID.getTime()+"&sessionMapID="+sessionMapID;
+		var url = "<c:url value="/authoring/editQuestion.do?questionIndex="/>" + questionIndex +"&reqID="+reqID.getTime()+"&sessionMapID="+sessionMapID;
 		showQuestionInputArea(url);
 	}
 	

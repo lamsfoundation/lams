@@ -8,7 +8,7 @@
 >
     <class
         name="org.lamsfoundation.lams.tool.daco.model.DacoAttachment"
-        table="tl_ladaco10_attachment"
+        table="tl_ladaco10_attachments"
     >
 
         <id

@@ -8,7 +8,7 @@
 >
     <class
         name="org.lamsfoundation.lams.tool.daco.model.DacoSession"
-        table="tl_ladaco10_session"
+        table="tl_ladaco10_sessions"
     >
 
         <id
@@ -56,6 +56,7 @@
             outer-join="auto"
             update="true"
             insert="true"
+            foreign-key="SessionToDaco"
             column="content_uid"
         />
 

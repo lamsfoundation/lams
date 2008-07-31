@@ -32,6 +32,7 @@
             outer-join="auto"
             update="true"
             insert="true"
+            foreign-key="AnswerToUser"
             column="user_uid"
         />
 
@@ -58,6 +59,7 @@
             outer-join="auto"
             update="true"
             insert="true"
+            foreign-key="AnswerToQuestion"
             column="question_uid"
         />
 
@@ -100,92 +102,5 @@
         -->
 
     </class>
-    
-<sql-query name="userNumberQuery">
-<return-scalar column="question_uid" type="java.lang.String"/>
-<return-scalar column="answer" type="java.lang.String"/>
-<return-scalar column="question_type" type="java.lang.String"/>
-<return-scalar column="sum" type="java.lang.String"/>
-<return-scalar column="average" type="java.lang.String"/>
-<return-scalar column="count" type="java.lang.String"/>
-SELECT question_uid,
-NULL AS answer,
-NULL AS question_type,
-SUM(answer) AS sum,
-AVG(answer) AS average,
-NULL AS count
-FROM tl_ladaco10_answers AS a, tl_ladaco10_questions AS q
-WHERE a.question_uid=q.uid
-	AND q.content_uid=:contentUid
-	AND a.user_uid=:userUid
-	AND question_type=:numberQuestionType
-	AND answer IS NOT NULL
-GROUP BY question_uid
-ORDER BY question_uid
-</sql-query>
-
-<sql-query name="allNumberQuery">
-<return-scalar column="question_uid" type="java.lang.String"/>
-<return-scalar column="answer" type="java.lang.String"/>
-<return-scalar column="question_type" type="java.lang.String"/>
-<return-scalar column="sum" type="java.lang.String"/>
-<return-scalar column="average" type="java.lang.String"/>
-<return-scalar column="count" type="java.lang.String"/>
-SELECT question_uid,
-NULL AS answer,
-question_type,
-SUM(answer) AS sum,
-AVG(answer) AS average,
-NULL AS count
-FROM tl_ladaco10_answers AS a, tl_ladaco10_questions AS q
-WHERE a.question_uid=q.uid
-	AND q.content_uid=:contentUid 
-	AND question_type=:numberQuestionType
-	AND answer IS NOT NULL
-GROUP BY question_uid ORDER BY question_uid
-</sql-query>
-
-<sql-query name="userAnswerEnumerationQuery">
-<return-scalar column="question_uid" type="java.lang.String"/>
-<return-scalar column="answer" type="java.lang.String"/>
-<return-scalar column="question_type" type="java.lang.String"/>
-<return-scalar column="sum" type="java.lang.String"/>
-<return-scalar column="average" type="java.lang.String"/>
-<return-scalar column="count" type="java.lang.String"/>
-SELECT DISTINCT a.question_uid,
-answer,
-question_type,
-NULL AS sum,
-CONCAT(ROUND(COUNT(1)/(SELECT COUNT(1) FROM tl_ladaco10_answers WHERE question_uid=q.uid AND answer IS NOT NULL)*100),'%') AS average,
-COUNT(1) AS count
-FROM tl_ladaco10_answers AS a, tl_ladaco10_questions AS q
-WHERE a.question_uid=q.uid
-	AND q.content_uid=:contentUid
-	AND a.user_uid=:userUid
-	AND question_type IN (:numberQuestionType,:radioQuestionType,:dropdownQuestionType,:checkboxQuestionType)
-	AND answer IS NOT NULL
-GROUP BY question_uid, answer ORDER BY question_uid,answer
-</sql-query>
-
-<sql-query name="allAnswerEnumerationQuery">
-<return-scalar column="question_uid" type="java.lang.String"/>
-<return-scalar column="answer" type="java.lang.String"/>
-<return-scalar column="question_type" type="java.lang.String"/>
-<return-scalar column="sum" type="java.lang.String"/>
-<return-scalar column="average" type="java.lang.String"/>
-<return-scalar column="count" type="java.lang.String"/>
-SELECT DISTINCT a.question_uid,
-answer,
-question_type,
-NULL AS sum,
-CONCAT(ROUND(COUNT(1)/(SELECT COUNT(1) FROM tl_ladaco10_answers WHERE question_uid=q.uid AND answer IS NOT NULL)*100),'%') AS average,
-COUNT(1) AS count
-FROM tl_ladaco10_answers a, tl_ladaco10_questions q
-WHERE a.question_uid=q.uid
-	AND q.content_uid=:contentUid 
-	AND question_type IN (:numberQuestionType,:radioQuestionType,:dropdownQuestionType,:checkboxQuestionType)
-	AND answer IS NOT NULL
-GROUP BY question_uid, answer ORDER BY question_uid,answer
-</sql-query>
 
 </hibernate-mapping>

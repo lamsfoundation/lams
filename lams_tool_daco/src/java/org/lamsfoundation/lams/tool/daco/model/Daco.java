@@ -25,8 +25,6 @@ package org.lamsfoundation.lams.tool.daco.model;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -67,7 +65,7 @@ public class Daco implements Cloneable {
 	// instructions
 	private String onlineInstructions;
 	private String offlineInstructions;
-	private Set attachments;
+	private Set<DacoAttachment> attachments = new LinkedHashSet();
 
 	// general infomation
 	private Date created;
@@ -75,7 +73,7 @@ public class Daco implements Cloneable {
 	private DacoUser createdBy;
 
 	// daco Questions
-	private Set dacoQuestions;
+	private Set<DacoQuestion> dacoQuestions = new LinkedHashSet();
 
 	private boolean reflectOnActivity;
 	private String reflectInstructions;
@@ -85,15 +83,6 @@ public class Daco implements Cloneable {
 
 	private List<DacoAttachment> onlineFileList;
 	private List<DacoAttachment> offlineFileList;
-
-	/**
-	 * Default contruction method.
-	 * 
-	 */
-	public Daco() {
-		attachments = new HashSet();
-		dacoQuestions = new HashSet();
-	}
 
 	// **********************************************************
 	// Function method for Daco
@@ -122,31 +111,18 @@ public class Daco implements Cloneable {
 		try {
 			daco = (Daco) super.clone();
 			daco.setUid(null);
-			if (dacoQuestions != null) {
-				Iterator iter = dacoQuestions.iterator();
-				Set set = new LinkedHashSet();
-				while (iter.hasNext()) {
-					DacoQuestion question = (DacoQuestion) iter.next();
-					DacoQuestion newQuestion = (DacoQuestion) question.clone();
-					// just clone old file without duplicate it in repository
-					set.add(newQuestion);
-				}
-				daco.dacoQuestions = set;
+			daco.setDacoQuestions(new LinkedHashSet<DacoQuestion>(dacoQuestions.size()));
+			for (DacoQuestion question : dacoQuestions) {
+				DacoQuestion clonedQuestion = (DacoQuestion) question.clone();
+				clonedQuestion.setDaco(daco);
+				daco.getDacoQuestions().add(clonedQuestion);
 			}
-			// clone attachment
-			if (attachments != null) {
-				Iterator iter = attachments.iterator();
-				Set set = new LinkedHashSet();
-				while (iter.hasNext()) {
-					DacoAttachment file = (DacoAttachment) iter.next();
-					DacoAttachment newFile = (DacoAttachment) file.clone();
-					// just clone old file without duplicate it in repository
 
-					set.add(newFile);
-				}
-				daco.attachments = set;
+			daco.setAttachments(new LinkedHashSet<DacoAttachment>(attachments.size()));
+			for (DacoAttachment attachment : attachments) {
+				daco.getAttachments().add((DacoAttachment) attachment.clone());
 			}
-			// clone ReourceUser as well
+
 			if (createdBy != null) {
 				daco.setCreatedBy((DacoUser) createdBy.clone());
 			}
@@ -251,9 +227,8 @@ public class Daco implements Cloneable {
 	}
 
 	/**
+	 * @hibernate.many-to-one cascade="all" column="create_by" foreign-key="DacoToUser"
 	 * @return Returns the userid of the user who created the Share daco.
-	 * 
-	 * @hibernate.many-to-one cascade="save-update" column="create_by"
 	 * 
 	 */
 	public DacoUser getCreatedBy() {
@@ -382,31 +357,31 @@ public class Daco implements Cloneable {
 	 * 
 	 * @return a set of Attachments to this Message.
 	 */
-	public Set getAttachments() {
+	public Set<DacoAttachment> getAttachments() {
 		return attachments;
 	}
 
-	/*
+	/**
 	 * @param attachments The attachments to set.
 	 */
-	public void setAttachments(Set attachments) {
+	public void setAttachments(Set<DacoAttachment> attachments) {
 		this.attachments = attachments;
 	}
 
 	/**
 	 * 
 	 * 
-	 * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="uid asc"
+	 * @hibernate.set lazy="false" inverse="false" cascade="all" order-by="uid asc" outer-join="true"
 	 * @hibernate.collection-key column="content_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoQuestion"
 	 * 
 	 * @return
 	 */
-	public Set getDacoQuestions() {
+	public Set<DacoQuestion> getDacoQuestions() {
 		return dacoQuestions;
 	}
 
-	public void setDacoQuestions(Set dacoQuestions) {
+	public void setDacoQuestions(Set<DacoQuestion> dacoQuestions) {
 		this.dacoQuestions = dacoQuestions;
 	}
 

@@ -41,8 +41,9 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
+import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
+import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
 import org.lamsfoundation.lams.tool.daco.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.daco.dto.Summary;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
@@ -55,164 +56,130 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class MonitoringAction extends Action {
 	public static Logger log = Logger.getLogger(MonitoringAction.class);
-	
-	
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws IOException, ServletException {
+
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
 		String param = mapping.getParameter();
 
-		request.setAttribute("initialTabId",WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
-		
 		if (param.equals("summary")) {
-			return summary(mapping, form, request, response);
-		}
-
-		if (param.equals("listuser")) {
-			return listuser(mapping, form, request, response);
-		}
-		if (param.equals("showquestion")) {
-			return showquestion(mapping, form, request, response);
-		}
-		if (param.equals("hidequestion")) {
-			return hidequestion(mapping, form, request, response);
+			return summary(mapping, request);
 		}
 		if (param.equals("viewReflection")) {
 			return viewReflection(mapping, form, request, response);
 		}
-		
+
+		if (param.equals("listRecords")) {
+			return listRecords(mapping, request);
+		}
 
 		return mapping.findForward(DacoConstants.ERROR);
 	}
 
-
-	private ActionForward hidequestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		
-		Long questionUid = WebUtil.readLongParam(request, DacoConstants.PARAM_DACO_QUESTION_UID);
-		IDacoService service = getDacoService();
-		service.setQuestionVisible(questionUid,false);
-		
-		//get back SessionMap
+	protected ActionForward listRecords(ActionMapping mapping, HttpServletRequest request) {
 		String sessionMapID = request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-		
-		//update session value
-		List<List> groupList = (List<List>) sessionMap.get(DacoConstants.ATTR_SUMMARY_LIST);
-		if(groupList != null)
-			for(List<Summary> group : groupList){
-				for(Summary sum: group){
-					if(questionUid.equals(sum.getQuestionUid())){
-						sum.setQuestionHide(true);
-						break;
-					}
-				}
-			}
-
+		Long userUid = WebUtil.readLongParam(request, DacoConstants.USER_UID, true);
+		Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
+		IDacoService service = getDacoService();
+		request.setAttribute(DacoConstants.ATTR_MONITORING_SUMMARY, service.getMonitoringSummary(daco.getContentId(), userUid));
+		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+		sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW, DacoConstants.LEARNING_VIEW_VERTICAL);
+		request.setAttribute(DacoConstants.USER_UID, userUid);
 		return mapping.findForward(DacoConstants.SUCCESS);
 	}
 
-	private ActionForward showquestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		Long questionUid = WebUtil.readLongParam(request, DacoConstants.PARAM_DACO_QUESTION_UID);
-		IDacoService service = getDacoService();
-		service.setQuestionVisible(questionUid,true);
-		
-		//get back SessionMap
-		String sessionMapID = request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID);
-		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-		
-		//update session value
-		List<List> groupList = (List<List>) sessionMap.get(DacoConstants.ATTR_SUMMARY_LIST);
-		if(groupList != null)
-			for(List<Summary> group : groupList){
-				for(Summary sum: group){
-					if(questionUid.equals(sum.getQuestionUid())){
-						sum.setQuestionHide(false);
-						break;
-					}
-				}
-			}
-		return mapping.findForward(DacoConstants.SUCCESS);
-	}
+	protected ActionForward summary(ActionMapping mapping, HttpServletRequest request) {
+		// initial Session Map
+		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID, true);
 
-	private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		//initial Session Map 
-		SessionMap sessionMap = new SessionMap();
-		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-//		save contentFolderID into session
-		sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID));
+		boolean newSession = sessionMapID == null || request.getSession().getAttribute(sessionMapID) == null;
+		SessionMap sessionMap = null;
+		if (newSession) {
+			sessionMap = new SessionMap();
+			sessionMapID = sessionMap.getSessionID();
+			request.getSession().setAttribute(sessionMapID, sessionMap);
 
-		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+		}
+		else {
+			sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+		}
+
 		IDacoService service = getDacoService();
-		List<List<Summary>> groupList = service.getSummary(contentId);
-		
+		Long contentId = sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID) == null ? WebUtil.readLongParam(request,
+				AttributeNames.PARAM_TOOL_CONTENT_ID) : (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		Daco daco = service.getDacoByContentId(contentId);
+
 		daco.toDTO();
-		
-		Map<Long,Set<ReflectDTO> >relectList = service.getReflectList(contentId);
-		
-		//cache into sessionMap
-		sessionMap.put(DacoConstants.ATTR_SUMMARY_LIST, groupList);
-		sessionMap.put(DacoConstants.PAGE_EDITABLE, daco.isContentInUse());
-		sessionMap.put(DacoConstants.ATTR_DACO, daco);
-		sessionMap.put(DacoConstants.ATTR_TOOL_CONTENT_ID, contentId);
+		Map<Long, Set<ReflectDTO>> relectList = service.getReflectList(contentId);
+
+		List<MonitoringSummarySessionDTO> monitoringSummaryList = service.getMonitoringSummary(contentId,
+				DacoConstants.MONITORING_SUMMARY_MATCH_NONE);
+
+		Long userUid = WebUtil.readLongParam(request, DacoConstants.USER_UID, true);
+		if (userUid == null) {
+			userUid = (Long) sessionMap.get(DacoConstants.USER_UID);
+			request.setAttribute(DacoConstants.ATTR_MONITORING_CURRENT_TAB, 1);
+		}
+		else {
+			request.setAttribute(DacoConstants.ATTR_MONITORING_CURRENT_TAB, 4);
+		}
+
+		if (userUid == null && !monitoringSummaryList.isEmpty() && !monitoringSummaryList.get(0).getUsers().isEmpty()) {
+			userUid = monitoringSummaryList.get(0).getUsers().get(0).getUid();
+		}
+		if (userUid != null) {
+			List<QuestionSummaryDTO> summaries = service.getQuestionSummaries(daco.getUid(), userUid);
+			sessionMap.put(DacoConstants.ATTR_QUESTION_SUMMARIES, summaries);
+			Integer totalRecordCount = service.getTotalRecordCount(daco.getContentId());
+			sessionMap.put(DacoConstants.ATTR_TOTAL_RECORD_COUNT, totalRecordCount);
+			monitoringSummaryList = service.getMonitoringSummary(contentId, userUid);
+		}
+
+		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+		sessionMap.put(DacoConstants.USER_UID, userUid);
+		sessionMap.put(DacoConstants.PAGE_EDITABLE, !daco.isContentInUse());
 		sessionMap.put(DacoConstants.ATTR_REFLECT_LIST, relectList);
-		
+		sessionMap.put(DacoConstants.ATTR_MONITORING_SUMMARY, monitoringSummaryList);
+		if (newSession) {
+			sessionMap.put(DacoConstants.ATTR_DACO, daco);
+			sessionMap.put(DacoConstants.TOOL_CONTENT_ID, contentId);
+			sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
+					AttributeNames.PARAM_CONTENT_FOLDER_ID));
+		}
 		return mapping.findForward(DacoConstants.SUCCESS);
 	}
 
-	private ActionForward listuser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	protected ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-		Long questionUid = WebUtil.readLongParam(request, DacoConstants.PARAM_DACO_QUESTION_UID);
 
-		//get user list by given question uid
-		IDacoService service = getDacoService();
-		List list = service.getUserListBySessionQuestion(sessionId, questionUid);
-		
-		//set to request
-		request.setAttribute(DacoConstants.ATTR_USER_LIST, list);
-		return mapping.findForward(DacoConstants.SUCCESS);
-	}
-	
-	private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		
-		Long uid = WebUtil.readLongParam(request, DacoConstants.ATTR_USER_UID); 
+		Long uid = WebUtil.readLongParam(request, DacoConstants.USER_UID);
 		Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-		
+
 		IDacoService service = getDacoService();
 		DacoUser user = service.getUser(uid);
-		NotebookEntry notebookEntry = service.getEntry(sessionID, 
-				CoreNotebookConstants.NOTEBOOK_TOOL, 
+		NotebookEntry notebookEntry = service.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 				DacoConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		
+
 		DacoSession session = service.getDacoSessionBySessionId(sessionID);
-		
+
 		ReflectDTO refDTO = new ReflectDTO(user);
-		if(notebookEntry == null){
+		if (notebookEntry == null) {
 			refDTO.setFinishReflection(false);
 			refDTO.setReflect(null);
-		}else{
+		}
+		else {
 			refDTO.setFinishReflection(true);
 			refDTO.setReflect(notebookEntry.getEntry());
 		}
 		refDTO.setReflectInstrctions(session.getDaco().getReflectInstructions());
-		
+
 		request.setAttribute("userDTO", refDTO);
 		return mapping.findForward("success");
-	}	
+	}
 
-	// *************************************************************************************
-	// Private method
-	// *************************************************************************************
 	private IDacoService getDacoService() {
-		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-				.getServletContext());
+		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 		return (IDacoService) wac.getBean(DacoConstants.DACO_SERVICE);
-	}	
+	}
 }

@@ -53,7 +53,7 @@
 		<html:hidden property="sessionMapID" />
 		
 		<h1>
-			<fmt:message key="label.authoring.heading" />
+			<fmt:message key="label.common.heading" />
 		</h1>
 <div id="header">
 		<!-- start tabs -->

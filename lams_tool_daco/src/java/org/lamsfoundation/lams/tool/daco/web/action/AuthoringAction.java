@@ -165,11 +165,11 @@ public class AuthoringAction extends Action {
 		}
 		// ----------------------- Add daco question function
 		// ---------------------------
-		if (param.equals("newQuestionInit")) {
-			return newQuestionlInit(mapping, form, request);
+		if (param.equals("newQuestion")) {
+			return newQuestion(mapping, form, request);
 		}
-		if (param.equals("editQuestionInit")) {
-			return editQuestionInit(mapping, form, request);
+		if (param.equals("editQuestion")) {
+			return editQuestion(mapping, form, request);
 		}
 		if (param.equals("saveOrUpdateQuestion")) {
 			return saveOrUpdateQuestion(mapping, form, request);
@@ -271,7 +271,7 @@ public class AuthoringAction extends Action {
 	 * @param response
 	 * @return
 	 */
-	protected ActionForward editQuestionInit(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
+	protected ActionForward editQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
 
 		// get back sessionMAP
 		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
@@ -310,11 +310,11 @@ public class AuthoringAction extends Action {
 		SortedSet<DacoQuestion> questionSet = getQuestionList(sessionMap);
 		int questionIndex = NumberUtils.stringToInt(questionForm.getQuestionIndex(), -1);
 		DacoQuestion question = null;
-
 		if (questionIndex == -1) { // add
 			question = new DacoQuestion();
 			question.setCreateDate(new Timestamp(new Date().getTime()));
 			questionSet.add(question);
+
 		}
 		else { // edit
 			List<DacoQuestion> questionList = new ArrayList<DacoQuestion>(questionSet);
@@ -344,7 +344,7 @@ public class AuthoringAction extends Action {
 		question.setCreateByAuthor(true);
 		question.setHide(false);
 
-		Set answerOptions = new LinkedHashSet();
+		Set<DacoAnswerOption> answerOptions = new LinkedHashSet<DacoAnswerOption>();
 		if (answerOptionList != null) {
 			int index = 1;
 			for (String ins : answerOptionList) {
@@ -356,6 +356,7 @@ public class AuthoringAction extends Action {
 		}
 		question.setRequired(questionForm.isQuestionRequired());
 		question.setAnswerOptions(answerOptions);
+
 		Short summary = questionForm.getSummary();
 		if (summary != null && summary > 0) {
 			question.setSummary(questionForm.getSummary());
@@ -620,7 +621,8 @@ public class AuthoringAction extends Action {
 	 * @param response
 	 * @return
 	 */
-	protected ActionForward newQuestionlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
+	protected ActionForward newQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
+
 		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
 		DacoQuestionForm questionForm = (DacoQuestionForm) form;
 		questionForm.setSessionMapID(sessionMapID);
@@ -713,7 +715,7 @@ public class AuthoringAction extends Action {
 	 */
 	protected ActionForward removeAnswerOption(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
 		int count = NumberUtils.stringToInt(request.getParameter(DacoConstants.ANSWER_OPTION_COUNT), 0);
-		int removeIndex = NumberUtils.stringToInt(request.getParameter(DacoConstants.PARAM_REMOVE_INDEX), -1);
+		int removeIndex = NumberUtils.stringToInt(request.getParameter(DacoConstants.PARAM_ANSWER_OPTION_INDEX), -1);
 		List answerOptionList = new ArrayList(count - 1);
 		for (int index = 1; index <= count; index++) {
 			if (index != removeIndex) {
@@ -833,7 +835,7 @@ public class AuthoringAction extends Action {
 	protected ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request) throws ServletException {
 
 		// save toolContentID into HTTPSession
-		Long contentId = new Long(WebUtil.readLongParam(request, DacoConstants.PARAM_TOOL_CONTENT_ID));
+		Long contentId = new Long(WebUtil.readLongParam(request, DacoConstants.TOOL_CONTENT_ID));
 
 		// get back the daco and question list and display them on page
 		IDacoService service = getDacoService();
@@ -857,15 +859,17 @@ public class AuthoringAction extends Action {
 			// if daco does not exist, try to use default content instead.
 			if (daco == null) {
 				daco = service.getDefaultContent(contentId);
-				if (daco.getDacoQuestions() != null) {
-					questions = new ArrayList<DacoQuestion>(daco.getDacoQuestions());
+				if (daco.getDacoQuestions() == null) {
+					questions = null;
 				}
 				else {
-					questions = null;
+
+					questions = new ArrayList<DacoQuestion>(daco.getDacoQuestions());
 				}
 			}
 			else {
-				questions = service.getAuthoredQuestions(daco.getUid());
+
+				questions = new ArrayList<DacoQuestion>(daco.getDacoQuestions());
 			}
 
 			dacoForm.setDaco(daco);
@@ -926,12 +930,12 @@ public class AuthoringAction extends Action {
 		// get back sessionMAP
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(dacoForm.getSessionMapID());
 
-		ToolAccessMode mode = getAccessMode(request);
+		ToolAccessMode toolAccessMode = getAccessMode(request);
 
 		ActionMessages errors = validateDacoForm(dacoForm, mapping, request);
 		if (!errors.isEmpty()) {
 			saveErrors(request, errors);
-			if (mode.isAuthor()) {
+			if (toolAccessMode.isAuthor()) {
 				return mapping.findForward("author");
 			}
 			else {
@@ -951,7 +955,9 @@ public class AuthoringAction extends Action {
 			dacoPO.setUpdated(new Timestamp(new Date().getTime()));
 		}
 		else {
-			if (mode.isAuthor()) {
+			service.releaseDacoFromCache(dacoPO);
+			if (toolAccessMode.isAuthor()) {
+
 				Long uid = dacoPO.getUid();
 				PropertyUtils.copyProperties(dacoPO, daco);
 				// get back UID
@@ -1024,22 +1030,23 @@ public class AuthoringAction extends Action {
 		dacoPO.setAttachments(attPOSet);
 		// ************************* Handle daco questions *******************
 		// Handle daco questions
-		Set questionList = new LinkedHashSet();
-		SortedSet topics = getQuestionList(sessionMap);
-		iter = topics.iterator();
-		while (iter.hasNext()) {
-			DacoQuestion question = (DacoQuestion) iter.next();
-			if (question != null) {
-				// This flushs user UID info to message if this user is a new
-				// user.
-				question.setCreateBy(dacoUser);
-				questionList.add(question);
-			}
+		SortedSet<DacoQuestion> formQuestionSet = getQuestionList(sessionMap);
+		Set<DacoQuestion> questionSet = new LinkedHashSet<DacoQuestion>(formQuestionSet.size());
+
+		for (DacoQuestion question : formQuestionSet) {
+			// This flushs user UID info to message if this user is a new
+			// user.
+			question.setCreateBy(dacoUser);
+			question.setDaco(dacoPO);
+			questionSet.add(question);
 		}
-		dacoPO.setDacoQuestions(questionList);
-		// delete instructino file from database.
-		List delDacoQuestionList = getDeletedDacoQuestionList(sessionMap);
-		iter = delDacoQuestionList.iterator();
+
+		dacoPO.setDacoQuestions(questionSet);
+		service.saveOrUpdateDaco(dacoPO);
+
+		// delete questions from database
+		List<DacoQuestion> deletedQuestionList = getDeletedDacoQuestionList(sessionMap);
+		iter = deletedQuestionList.iterator();
 		while (iter.hasNext()) {
 			DacoQuestion question = (DacoQuestion) iter.next();
 			iter.remove();
@@ -1047,16 +1054,13 @@ public class AuthoringAction extends Action {
 				service.deleteDacoQuestion(question.getUid());
 			}
 		}
-
-		service.saveOrUpdateDaco(dacoPO);
-
 		// initialize attachmentList again
 		attachmentList = getAttachmentList(sessionMap);
 		attachmentList.addAll(daco.getAttachments());
 		dacoForm.setDaco(dacoPO);
 
 		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-		if (mode.isAuthor()) {
+		if (toolAccessMode.isAuthor()) {
 			return mapping.findForward("author");
 		}
 		else {
@@ -1130,8 +1134,9 @@ public class AuthoringAction extends Action {
 
 	protected ActionMessages validateDacoForm(DacoForm dacoForm, ActionMapping mapping, HttpServletRequest request) {
 		ActionMessages errors = new ActionMessages();
-		if (dacoForm.getDaco().getMinRecords() > 0 && dacoForm.getDaco().getMaxRecords() > 0
-				&& dacoForm.getDaco().getMinRecords() > dacoForm.getDaco().getMaxRecords()) {
+		Short min = dacoForm.getDaco().getMinRecords();
+		Short max = dacoForm.getDaco().getMaxRecords();
+		if (min != null && max != null && min > 0 && max > 0 && min > max) {
 			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_RECORDLIMIT_MIN_TOOHIGH_MAX));
 		}
 

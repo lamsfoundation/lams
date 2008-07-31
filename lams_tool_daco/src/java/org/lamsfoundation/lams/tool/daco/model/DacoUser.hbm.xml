@@ -8,7 +8,7 @@
 >
     <class
         name="org.lamsfoundation.lams.tool.daco.model.DacoUser"
-        table="tl_ladaco10_user"
+        table="tl_ladaco10_users"
     >
 
         <id
@@ -67,6 +67,7 @@
             outer-join="auto"
             update="true"
             insert="true"
+            foreign-key="UserToSession"
             column="session_uid"
         />
 
@@ -77,6 +78,7 @@
             outer-join="auto"
             update="true"
             insert="true"
+            foreign-key="UserToDaco"
             column="content_uid"
         />
 
@@ -87,6 +89,27 @@
             insert="true"
             column="session_finished"
         />
+
+        <set
+            name="answers"
+            lazy="false"
+            inverse="true"
+            cascade="none"
+            sort="unsorted"
+            order-by="record_id asc, uid asc"
+            outer-join="true"
+        >
+
+            <key
+                column="user_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.daco.model.DacoAnswer"
+            />
+
+        </set>
 
         <!--
             To add non XDoclet property mappings, create a file named

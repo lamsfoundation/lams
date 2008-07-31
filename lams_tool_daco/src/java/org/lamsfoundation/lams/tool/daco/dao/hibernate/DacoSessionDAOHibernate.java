@@ -28,27 +28,30 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.daco.dao.DacoSessionDAO;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 
+public class DacoSessionDAOHibernate extends BaseDAOHibernate implements DacoSessionDAO {
 
-public class DacoSessionDAOHibernate extends BaseDAOHibernate implements DacoSessionDAO{
-	
 	private static final String FIND_BY_SESSION_ID = "from " + DacoSession.class.getName() + " as p where p.sessionId=?";
-	private static final String FIND_BY_CONTENT_ID = "from " + DacoSession.class.getName() + " as p where p.daco.contentId=?";
-	
+	private static final String FIND_BY_CONTENT_ID = "from " + DacoSession.class.getName()
+			+ " as p where p.daco.contentId=? ORDER BY p.sessionId";
+
 	public DacoSession getSessionBySessionId(Long sessionId) {
-		List list = getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
-		if(list == null || list.size() == 0)
+		List list = getHibernateTemplate().find(DacoSessionDAOHibernate.FIND_BY_SESSION_ID, sessionId);
+		if (list == null || list.size() == 0) {
 			return null;
+		}
 		return (DacoSession) list.get(0);
 	}
+
 	public List<DacoSession> getByContentId(Long toolContentId) {
-		return getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+		return getHibernateTemplate().find(DacoSessionDAOHibernate.FIND_BY_CONTENT_ID, toolContentId);
 	}
-	
+
 	public void delete(DacoSession session) {
 		this.getHibernateTemplate().delete(session);
 	}
+
 	public void deleteBySessionId(Long toolSessionId) {
-		this.removeObject(DacoSession.class,toolSessionId);
+		this.removeObject(DacoSession.class, toolSessionId);
 	}
 
 }

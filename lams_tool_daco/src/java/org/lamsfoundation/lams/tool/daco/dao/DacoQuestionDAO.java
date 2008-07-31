@@ -35,7 +35,7 @@ public interface DacoQuestionDAO extends DAO {
 	 * @param dacoUid
 	 * @return
 	 */
-	List getByContentUid(Long dacoUid);
+	List getByContentUid(Long dacoId);
 
 	DacoQuestion getByUid(Long dacoQuestionUid);
 }

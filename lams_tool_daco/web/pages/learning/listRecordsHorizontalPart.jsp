@@ -38,13 +38,15 @@
 					<div class="bigNumber" style="float: left; margin-right: 30px;">
 						${recordStatus.index+1}
 					</div>
-					<div>
+					<div >
 					<img src="${tool}includes/images/edit.gif"
 							title="<fmt:message key="label.authoring.basic.edit" />"
 							onclick="javascript:parent.editRecord('${sessionMapID}',${recordStatus.index+1})" />
 					<img src="${tool}includes/images/cross.gif"
 							title="<fmt:message key="label.authoring.basic.delete" />"
 							onclick="javascript:parent.removeRecord('${sessionMapID}',${recordStatus.index+1})" />
+					</div>
+					<div  style="width: 425px;">
 					</div>
 				</td>
 			</c:forEach>
@@ -56,136 +58,136 @@
 				<c:forEach var="answer" items="${record}" varStatus="answerStatus">
 					<c:if test="${answer.question.uid==question.uid}">
 						<c:choose>
-						<c:when test="${generated}">
-							<c:if test="${question.type==10}">
-							<script type="text/javascript">
-								setValue("latitude-record${recordStatus.index+1}-question${questionStatus.index+1}","${answer.answer}");
-							</script>
-							</c:if>
-						</c:when>
-						<c:otherwise>
-							<c:set var="generated" value="true" />
-									<td class="fixedCellHeight"
-											<c:choose>
-												<c:when test="${isIE}">
-													<c:if test="${questionStatus.index==fn:length(daco.dacoQuestions)-1 && fn:length(recordList)>1}">
-															id="lastHorizontalQuestion"
-													</c:if>
-												</c:when>
-												<c:otherwise>
-													<c:if test="${questionStatus.index==fn:length(daco.dacoQuestions)-1}">
-															<c:choose>
-																<c:when test="${fn:length(recordList)>1}">
-																	style="height: 69px"
-																</c:when>
-																<c:otherwise>
-																	style="height: 85px"
-																</c:otherwise>
-															</c:choose>
+							<c:when test="${generated}">
+								<c:if test="${question.type==10}">
+								<script type="text/javascript">
+									setValue("latitude-record${recordStatus.index+1}-question${questionStatus.index+1}","${answer.answer}");
+								</script>
+								</c:if>
+							</c:when>
+							<c:otherwise>
+								<c:set var="generated" value="true" />
+										<td class="fixedCellHeight"
+												<c:choose>
+													<c:when test="${isIE}">
+														<c:if test="${questionStatus.index==fn:length(daco.dacoQuestions)-1 && fn:length(recordList)>1}">
+																id="lastHorizontalQuestion"
 														</c:if>
-												</c:otherwise>
-											</c:choose>
-									 >
-									<c:choose>
-										<c:when test="${question.type==1}">
-											<input type="text" size="65" readonly="readonly" value="${answer.answer}"/>
-										</c:when>
-										<c:when test="${question.type==2}">
-											<textarea  cols="53" rows="3" readonly="readonly">${answer.answer}</textarea>
-										</c:when>
-										<c:when test="${question.type==3}">
-											<input type="text" size="10" readonly="readonly" value="${answer.answer}"/>
-										</c:when>
-										<c:when test="${question.type==4}">
-											<c:set var="date">
-												<lams:Date value="${fn:trim(answer.answer)}" type="date" style="medium"/>
-											</c:set>
-											<input type="text" size="20" readonly="readonly" value="${date}" />
-										</c:when>
-										<c:when test="${question.type==5 || question.type==6}">
-											<c:choose>
-												<c:when test="${empty answer.fileName}">
-													<fmt:message key="label.learning.file.notuploaded" />
-												</c:when>
-												<c:otherwise>
-													<fmt:message key="label.learning.file.uploaded" /> ${answer.fileName}
-												</c:otherwise>
-											</c:choose>
-										</c:when>
-										<c:when test="${question.type==7}">
-											<table class="alternative-color-inner-table">
-												<tr>
-													<td>
+													</c:when>
+													<c:otherwise>
+														<c:if test="${questionStatus.index==fn:length(daco.dacoQuestions)-1}">
+																<c:choose>
+																	<c:when test="${fn:length(recordList)>1}">
+																		style="height: 69px"
+																	</c:when>
+																	<c:otherwise>
+																		style="height: 85px"
+																	</c:otherwise>
+																</c:choose>
+															</c:if>
+													</c:otherwise>
+												</c:choose>
+										 >
+										<c:choose>
+											<c:when test="${question.type==1}">
+												<input type="text" size="65" readonly="readonly" value="${answer.answer}"/>
+											</c:when>
+											<c:when test="${question.type==2}">
+												<textarea  cols="53" rows="3" readonly="readonly">${answer.answer}</textarea>
+											</c:when>
+											<c:when test="${question.type==3}">
+												<input type="text" size="10" readonly="readonly" value="${answer.answer}"/>
+											</c:when>
+											<c:when test="${question.type==4}">
+												<c:set var="date">
+													<lams:Date value="${fn:trim(answer.answer)}" type="date" style="medium"/>
+												</c:set>
+												<input type="text" size="20" readonly="readonly" value="${date}" />
+											</c:when>
+											<c:when test="${question.type==5 || question.type==6}">
+												<c:choose>
+													<c:when test="${empty answer.fileName}">
+														<fmt:message key="label.learning.file.notuploaded" />
+													</c:when>
+													<c:otherwise>
+														<fmt:message key="label.learning.file.uploaded" /> ${answer.fileName}
+													</c:otherwise>
+												</c:choose>
+											</c:when>
+											<c:when test="${question.type==7}">
+												<table class="alternative-color-inner-table">
+													<tr>
+														<td>
+															<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
+																<c:if test="${status.index>0 && (status.index%3==0)}">
+																	</td>
+																	<td>
+																</c:if>
+																<input type="radio" readonly="readonly" 
+																<c:if test="${answer.answer==status.index+1}">
+																checked="checked"
+																</c:if>
+																>
+																${answerOption.answerOption}</input><br />
+															</c:forEach>
+														</td>
+													</tr>
+												</table>
+											</c:when>
+											<c:when test="${question.type==8}">
+												<c:choose>
+													<c:when test="${empty answer.answer}">
+														<fmt:message key="label.learning.dropdown.noneselected" />
+													</c:when>
+													<c:otherwise>
 														<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-															<c:if test="${status.index>0 && (status.index%3==0)}">
-																</td>
-																<td>
+															<c:if test="${status.index+1==answer.answer}">
+																<fmt:message key="label.learning.dropdown.selected" /> ${answerOption.answerOption}
 															</c:if>
-															<input type="radio" readonly="readonly" 
-															<c:if test="${answer.answer==status.index+1}">
-															checked="checked"
-															</c:if>
-															>
-															${answerOption.answerOption}</input><br />
 														</c:forEach>
-													</td>
-												</tr>
-											</table>
-										</c:when>
-										<c:when test="${question.type==8}">
-											<c:choose>
-												<c:when test="${empty answer.answer}">
-													<fmt:message key="label.learning.dropdown.noneselected" />
-												</c:when>
-												<c:otherwise>
-													<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-														<c:if test="${status.index+1==answer.answer}">
-															<fmt:message key="label.learning.dropdown.selected" /> ${answerOption.answerOption}
-														</c:if>
-													</c:forEach>
-												</c:otherwise>
-											</c:choose>
-										</c:when>
-										<c:when test="${question.type==9}">
-											<table class="alternative-color-inner-table">
-												<tr>
-													<td>
-														<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-															<c:if test="${status.index>0 && (status.index%3==0)}">
-																</td>
-																<td>
-															</c:if>
-															<input type="checkbox" disabled="disabled" id="checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}">${answerOption.answerOption}</input><br />
-														</c:forEach>
-													</td>
-												</tr>
-											</table>
-										</c:when>
-										<c:when test="${question.type==10}">
-											<table class="alternative-color-inner-table">
-												<tr>
-													<td width="80px">
-													<label><fmt:message key="label.learning.longlat.longitude" /></label>
-													</td>
-													<td>
-														<input type="text" size="10" readonly="readonly" value="${answer.answer}"/>
-													<label><fmt:message key="label.learning.longlat.longitude.unit" /></label><br />
-													</td>									
-												</tr>
-												<tr>
-													<td>
-													<label><fmt:message key="label.learning.longlat.latitude" /></label>
-													</td>
-													<td>
-													<input type="text" size="10" readonly="readonly" id="latitude-record${recordStatus.index+1}-question${questionStatus.index+1}" />
-													<label><fmt:message key="label.learning.longlat.latitude.unit" /></label><br />
-													</td>
-												</tr>
-											</table>
-										</c:when>
-									</c:choose>
-									</td>
-						</c:otherwise>
+													</c:otherwise>
+												</c:choose>
+											</c:when>
+											<c:when test="${question.type==9}">
+												<table class="alternative-color-inner-table">
+													<tr>
+														<td>
+															<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
+																<c:if test="${status.index>0 && (status.index%3==0)}">
+																	</td>
+																	<td>
+																</c:if>
+																<input type="checkbox" disabled="disabled" id="checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}">${answerOption.answerOption}</input><br />
+															</c:forEach>
+														</td>
+													</tr>
+												</table>
+											</c:when>
+											<c:when test="${question.type==10}">
+												<table class="alternative-color-inner-table">
+													<tr>
+														<td width="80px">
+														<label><fmt:message key="label.learning.longlat.longitude" /></label>
+														</td>
+														<td>
+															<input type="text" size="10" readonly="readonly" value="${answer.answer}"/>
+														<label><fmt:message key="label.learning.longlat.longitude.unit" /></label><br />
+														</td>									
+													</tr>
+													<tr>
+														<td>
+														<label><fmt:message key="label.learning.longlat.latitude" /></label>
+														</td>
+														<td>
+														<input type="text" size="10" readonly="readonly" id="latitude-record${recordStatus.index+1}-question${questionStatus.index+1}" />
+														<label><fmt:message key="label.learning.longlat.latitude.unit" /></label><br />
+														</td>
+													</tr>
+												</table>
+											</c:when>
+										</c:choose>
+										</td>
+							</c:otherwise>
 						</c:choose>
 						
 						<c:if test="${question.type==9 && (not empty answer.answer)}">

@@ -39,34 +39,40 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * @author Dapeng.Ni
  */
 public class BaseDAOHibernate extends HibernateDaoSupport implements DAO {
-    protected final Log log = LogFactory.getLog(getClass());
+	protected final Log log = LogFactory.getLog(getClass());
 
-    /**
-     * @see com.edgenius.paradise.dao.DAO#saveObject(java.lang.Object)
-     */
-    public void saveObject(Object o) {
-        getHibernateTemplate().saveOrUpdate(o);
-    }
+	/**
+	 * @see com.edgenius.paradise.dao.DAO#saveObject(java.lang.Object)
+	 */
+	public void saveObject(Object o) {
+		getHibernateTemplate().saveOrUpdate(o);
+	}
 
-    /**
-     * @see com.edgenius.paradise.dao.DAO#getObject(java.lang.Class, java.io.Serializable)
-     */
-    public Object getObject(Class clazz, Serializable id) {
-        Object o = getHibernateTemplate().get(clazz, id);
-        return o;
-    }
+	/**
+	 * @see com.edgenius.paradise.dao.DAO#getObject(java.lang.Class, java.io.Serializable)
+	 */
+	public Object getObject(Class clazz, Serializable id) {
+		Object o = getHibernateTemplate().get(clazz, id);
+		return o;
+	}
 
-    /**
-     * @see com.edgenius.paradise.dao.DAO#getObjects(java.lang.Class)
-     */
-    public List getObjects(Class clazz) {
-        return getHibernateTemplate().loadAll(clazz);
-    }
+	/**
+	 * @see com.edgenius.paradise.dao.DAO#getObjects(java.lang.Class)
+	 */
+	public List getObjects(Class clazz) {
+		return getHibernateTemplate().loadAll(clazz);
+	}
 
-    /**
-     * @see com.edgenius.paradise.dao.DAO#removeObject(java.lang.Class, java.io.Serializable)
-     */
-    public void removeObject(Class clazz, Serializable id) {
-        getHibernateTemplate().delete(getObject(clazz, id));
-    }
+	/**
+	 * @see com.edgenius.paradise.dao.DAO#removeObject(java.lang.Class, java.io.Serializable)
+	 */
+	public void removeObject(Class clazz, Serializable id) {
+		getHibernateTemplate().delete(getObject(clazz, id));
+	}
+
+	public void releaseFromCache(Object o) {
+		getSession().evict(o);
+
+	}
+
 }

@@ -38,8 +38,8 @@
 	<forward name="success" path="/pages/authoring/parts/instructionfilelist.jsp" />
 </action>
 <!-- ==========  Daco Question  ========== -->
-<action path="/authoring/newQuestionInit" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
-	name="dacoQuestionForm" scope="request" validate="false" parameter="newQuestionInit">
+<action path="/authoring/newQuestion" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
+	name="dacoQuestionForm" scope="request" validate="false" parameter="newQuestion">
 	<forward name="textfield" path="/pages/authoring/parts/addtextfield.jsp" />
 	<forward name="textarea" path="/pages/authoring/parts/addtextarea.jsp" />
 	<forward name="number" path="/pages/authoring/parts/addnumber.jsp" />
@@ -52,8 +52,8 @@
 	<forward name="longlat" path="/pages/authoring/parts/addlonglat.jsp" />
 </action>
 
-<action path="/authoring/editQuestionInit" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
-	name="dacoQuestionForm" scope="request" parameter="editQuestionInit" validate="false">
+<action path="/authoring/editQuestion" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
+	name="dacoQuestionForm" scope="request" parameter="editQuestion" validate="false">
 	<forward name="textfield" path="/pages/authoring/parts/addtextfield.jsp" />
 	<forward name="textarea" path="/pages/authoring/parts/addtextarea.jsp" />
 	<forward name="number" path="/pages/authoring/parts/addnumber.jsp" />
@@ -97,16 +97,6 @@
 <action path="/authoring/removeQuestionAttachment" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
 	parameter="removeQuestionAttachment">
 	<forward name="success" path="/pages/authoring/parts/questionattachment.jsp" />
-</action>
-
-<!-- ==========  Display Question  ========== -->
-<action path="/reviewQuestion" type="org.lamsfoundation.lams.tool.daco.web.action.ViewQuestionAction"
-	parameter="reviewQuestion">
-	<forward name="success" path="/pages/questionreview/mainframe.jsp" />
-</action>
-<action path="/nextInstruction" type="org.lamsfoundation.lams.tool.daco.web.action.ViewQuestionAction"
-	parameter="nextInstruction">
-	<forward name="success" path="/pages/questionreview/instructionsnav.jsp" />
 </action>
 
 <!-- ========== BEGIN: Learning Definitions ============================== -->
@@ -161,16 +151,8 @@
 <action path="/monitoring/summary" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction" parameter="summary">
 	<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 </action>
-<action path="/monitoring/listuser" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction" parameter="listuser">
-	<forward name="success" path="/pages/monitoring/userlist.jsp" />
-</action>
-<action path="/monitoring/hidequestion" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction"
-	parameter="hidequestion">
-	<forward name="success" path="/pages/monitoring/monitoring.jsp" />
-</action>
-<action path="/monitoring/showquestion" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction"
-	parameter="showquestion">
-	<forward name="success" path="/pages/monitoring/monitoring.jsp" />
+<action path="/monitoring/listRecords" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction" parameter="listRecords">
+	<forward name="success" path="/pages/monitoring/listRecords.jsp" />
 </action>
 
 <action path="/monitoring/viewReflection" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction"

@@ -1,12 +1,17 @@
 <div id="recordListDiv">
 
 <%@ include file="/common/taglibs.jsp"%>
+
+<c:if test="${not empty param.learningMode}">
+	<c:set var="learningMode" value="${param.learningMode}" />
+</c:if>
+
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 </c:if>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="daco" value="${sessionMap.daco}" />
-<c:set var="recordList" value="${sessionMap.recordList}" />
+
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
@@ -17,24 +22,34 @@
 	var editRecordUrl = "<html:rewrite page='/learning/editRecord.do' />";
 	var removeRecordUrl = "<html:rewrite page='/learning/removeRecord.do' />";
 </script>
-
-<table>
-	<tr>
-		<td>
-		<h1>${daco.title}</h1>
-		</td>
-	</tr>
-	<tr>
-		<td>${daco.instructions}</td>
-	</tr>
-</table>
+<c:if test="${empty recordList}">
+	<c:set var="recordList" value="${sessionMap.recordList}" />
+</c:if>
+<c:if test="${learningMode}">
+	<table>
+		<tr>
+			<td>
+			<h1>${daco.title}</h1>
+			</td>
+		</tr>
+		<tr>
+			<td>${daco.instructions}</td>
+		</tr>
+	</table>
+</c:if>
 <c:choose>
 	<c:when test="${ empty recordList}">
 		<p class="hint">
-			<fmt:message key="label.learning.heading.norecords" />
+			 <fmt:message key="label.learning.heading.norecords" />
 		</p>
 	</c:when>
 	<c:otherwise>
+			<c:if test="${learningMode}">
+				<p class="hint" style="margin-left: 17px; font-weight: bold;">
+					<fmt:message key="label.learning.heading.recordcount" />: ${fn:length(recordList)}
+				</p>
+			</c:if>
+
 		<c:choose>
 			<c:when test="${horizontal}">
 				<table cellspacing="0" class="alternative-color" id="recordListTable">
@@ -68,16 +83,19 @@
 						<td class="hint">
 							<fmt:message key="label.learning.heading.recordnumber" /> ${recordStatus.index+1}
 						</td>
+						<c:if test="${learningMode}">
 						<td width="5%">
-						<img src="${tool}includes/images/edit.gif"
-							title="<fmt:message key="label.authoring.basic.edit" />"
-							onclick="javascript:editRecord('${sessionMapID}',${recordStatus.index+1})" />
+							<img src="${tool}includes/images/edit.gif"
+								title="<fmt:message key="label.authoring.basic.edit" />"
+								onclick="javascript:editRecord('${sessionMapID}',${recordStatus.index+1})" />
 						</td>
 						<td width="5%">
-						<img src="${tool}includes/images/cross.gif"
-							title="<fmt:message key="label.authoring.basic.delete" />"
-							onclick="javascript:removeRecord('${sessionMapID}',${recordStatus.index+1})" /></td>
-							</tr>
+							<img src="${tool}includes/images/cross.gif"
+								title="<fmt:message key="label.authoring.basic.delete" />"
+								onclick="javascript:removeRecord('${sessionMapID}',${recordStatus.index+1})" />
+						</td>
+						</c:if>
+					</tr>
 				</table>
 				
 					<table cellspacing="0" class="alternative-color recordList">

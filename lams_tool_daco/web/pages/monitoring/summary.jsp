@@ -1,150 +1,154 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-<c:set var="summaryList" value="${sessionMap.summaryList}" />
+<c:set var="monitoringSummary" value="${sessionMap.monitoringSummary}" />
+<c:set var="anyRecordsAvailable" value="false" />
+<c:url  var="refreshSummaryUrl" value="/monitoring/summary.do?sessionMapID=${sessionMapID}"/>
+<c:set var="daco" value="${sessionMap.daco}"/>
 
-<c:if test="${empty summaryList}">
-	<div align="center"><b> <fmt:message
-		key="message.monitoring.summary.no.session" /> </b></div>
-</c:if>
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js"></script>
 
-<table cellpadding="0">
-	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
-		<c:set var="groupSize" value="${fn:length(group)}" />
-		<c:forEach var="question" items="${group}" varStatus="status">
-			<%-- display group name on first row--%>
-			<c:if test="${status.first}">
+<h2>
+	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" 
+		onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
+
+	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
+		<fmt:message key="label.monitoring.advancedsettings" />
+	</a>
+</h2>
+<br />
+
+<div class="monitoring-advanced" id="advancedDiv" style="display:none">
+	<table class="alternative-color">
+		<tr>
+			<td>
+				<fmt:message key="label.authoring.advanced.record.min" />
+			</td>
+			<td>
+				<c:choose>
+					<c:when test="${daco.minRecords==0}">
+						<fmt:message key="label.authoring.advanced.record.nolimit" />
+					</c:when>
+					<c:otherwise>
+						${daco.minRecords}
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<fmt:message key="label.authoring.advanced.record.max" />
+			</td>
+			<td>
+				<c:choose>
+					<c:when test="${daco.maxRecords==0}">
+						<fmt:message key="label.authoring.advanced.record.nolimit" />
+					</c:when>
+					<c:otherwise>
+						${daco.maxRecords}
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<fmt:message key="label.authoring.advanced.lock.on.finished" />
+			</td>
+			<td>
+				<c:choose>
+					<c:when test="${daco.lockWhenFinished}">
+						<fmt:message key="label.monitoring.advancedsettings.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.monitoring.advancedsettings.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<fmt:message key="label.monitoring.advancedsettings.addNotebook" />
+			</td>
+			<td>
+				<c:choose>
+					<c:when test="${daco.reflectOnActivity}">
+						<fmt:message key="label.monitoring.advancedsettings.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.monitoring.advancedsettings.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		<c:if test="${daco.reflectOnActivity}">
+			<tr>
+				<td>
+					<fmt:message key="label.monitoring.advancedsettings.notebookinstructions" />
+				</td>
+				<td>
+					${daco.reflectInstructions}	
+				</td>
+			</tr>
+		</c:if>
+	</table>
+</div>
+
+
+<c:choose>
+	<c:when test="${empty monitoringSummary || empty monitoringSummary[0].users}">
+		<div align="center" style="font-weight: bold;">
+			<fmt:message key="message.monitoring.summary.no.session" />
+		</div>
+	</c:when>
+	<c:otherwise>
+		
+		<table cellpadding="0" class="alternative-color">
+			<tr>
+				<th><fmt:message key="label.monitoring.fullname" /></th>
+				<th><fmt:message key="label.monitoring.loginname" /></th>
+				<th><fmt:message key="label.monitoring.recordcount" /></th>
+				<th><fmt:message key="label.monitoring.action" /></th>
+			</tr>
+			<c:forEach var="sessionSummary" items="${monitoringSummary}">
 				<tr>
-					<td colspan="5"><B><fmt:message
-						key="label.monitoring.group" /> ${question.sessionName}</B> <SPAN
-						style="font-size: 12px;"> <c:if
-						test="${firstGroup.index==0}">
-						<fmt:message key="note.monitoring.summary" />
-					</c:if> </SPAN></td>
-				</tr>
-				<tr>
-					<th width="18%" align="center"><fmt:message
-						key="label.monitoring.type" /></th>
-					<th width="25%"><fmt:message key="label.monitoring.title" />
-					</th>
-					<th width="20%"><fmt:message key="label.monitoring.suggest" />
-					</th>
-					<th width="22%" align="center"><fmt:message
-						key="label.monitoring.number.learners" /></th>
-					<th width="15%"><!--hide/show--></th>
-				</tr>
-				<%-- End group title display --%>
-			</c:if>
-			<c:if test="${question.questionUid == -1}">
-				<tr>
-					<td colspan="5">
-					<div class="align-left"><b> <fmt:message
-						key="message.monitoring.summary.no.question.for.group" /> </b></div>
+					<td colspan="4" style="font-weight: bold; text-align: center">
+						<fmt:message key="label.monitoring.group" />: ${sessionSummary.sessionName}
 					</td>
 				</tr>
-			</c:if>
-			<c:if test="${question.questionUid != -1}">
-				<tr>
-					<td><c:choose>
-						<c:when test="${question.questionType == 1}">
-							<fmt:message key="label.authoring.basic.textfield" />
-						</c:when>
-						<c:when test="${question.questionType == 2}">
-							<fmt:message key="label.authoring.basic.textarea" />
-						</c:when>
-						<c:when test="${question.questionType == 3}">
-							<fmt:message key="label.authoring.basic.number" />
-						</c:when>
-						<c:when test="${question.questionType == 4}">
-							<fmt:message key="label.authoring.basic.date" />
-						</c:when>
-						<c:when test="${question.questionType == 5}">
-							<fmt:message key="label.authoring.basic.file" />
-						</c:when>
-						<c:when test="${question.questionType == 6}">
-							<fmt:message key="label.authoring.basic.image" />
-						</c:when>
-						<c:when test="${question.questionType == 7}">
-							<fmt:message key="label.authoring.basic.radio" />
-						</c:when>
-						<c:when test="${question.questionType == 8}">
-							<fmt:message key="label.authoring.basic.dropdown" />
-						</c:when>
-						<c:when test="${question.questionType == 9}">
-							<fmt:message key="label.authoring.basic.checkbox" />
-						</c:when>
-									<c:when test="${question.questionType == 10">
-							<fmt:message key="label.authoring.basic.longlat" />
-						</c:when>
-					</c:choose></td>
-					<td><a href="javascript:;"
-						onclick="viewQuestion(${question.questionUid},'${sessionMapID}')">${question.questionTitle}</a>
-					</td>
-					<td><c:if test="${!question.questionCreateByAuthor}">
-											${question.username}
-										</c:if></td>
-					<td align="center"><c:choose>
-						<c:when test="${question.viewNumber > 0}">
-							<c:set var="listUrl">
-								<c:url
-									value='/monitoring/listuser.do?toolSessionID=${question.sessionId}&questionUid=${question.questionUid}' />
-							</c:set>
-							<a href="#" onclick="launchPopup('${listUrl}','listuser')">
-							${question.viewNumber}<a>
-						</c:when>
-						<c:otherwise>
-									0
-							</c:otherwise>
-					</c:choose></td>
-					<td align="center"><c:choose>
-						<c:when test="${question.questionHide}">
-							<a
-								href="<c:url value='/monitoring/showquestion.do'/>?sessionMapID=${sessionMapID}&questionUid=${question.questionUid}"
-								class="button"> <fmt:message key="label.monitoring.show" />
-							</a>
-						</c:when>
-						<c:otherwise>
-							<a
-								href="<c:url value='/monitoring/hidequestion.do'/>?sessionMapID=${sessionMapID}&questionUid=${question.questionUid}"
-								class="button"> <fmt:message key="label.monitoring.hide" />
-							</a>
-						</c:otherwise>
-					</c:choose></td>
-				</tr>
-			</c:if>
-
-			<%-- Reflection list  --%>
-			<c:if test="${sessionMap.daco.reflectOnActivity && status.last}">
-				<c:set var="userList"
-					value="${sessionMap.reflectList[question.sessionId]}" />
-				<c:forEach var="user" items="${userList}" varStatus="refStatus">
-					<c:if test="${refStatus.first}">
-						<tr>
-							<td colspan="5">
-							<h2><fmt:message key="title.reflection" /></h2>
-							</td>
-						</tr>
-						<tr>
-							<th colspan="2"><fmt:message
-								key="label.monitoring.user.fullname" /></th>
-							<th colspan="2"><fmt:message
-								key="label.monitoring.user.loginname" /></th>
-							<th><fmt:message key="monitoring.user.reflection" /></th>
-						</tr>
-					</c:if>
+				<c:forEach var="user" items="${sessionSummary.users}">
 					<tr>
-						<td colspan="2">${user.fullName}</td>
-						<td colspan="2">${user.loginName}</td>
-						<td><c:set var="viewReflection">
-							<c:url
-								value="/monitoring/viewReflection.do?toolSessionID=${question.sessionId}&userUid=${user.userUid}" />
-						</c:set> <html:link href="javascript:launchPopup('${viewReflection}')">
-							<fmt:message key="label.view" />
-						</html:link></td>
+						<td>
+							${user.fullName}
+						</td>
+						<td>
+							${user.loginName}
+						</td>
+						<td>
+						${user.recordCount}
+						</td>
+						<td style="width: 150px">&nbsp;
+							<c:if  test="${user.recordCount > 0}">
+								<c:url var="viewRecordList"
+										value="/monitoring/listRecords.do?sessionMapID=${sessionMapID}&userUid=${user.uid}" />
+								<c:set var="anyRecordsAvailable" value="true" />
+								<a href="#" onclick="javascript:launchPopup('${viewRecordList }','RecordList')" class="button">
+									<fmt:message key="label.monitoring.viewrecords" />
+								</a>
+							</c:if>
+						</td>
 					</tr>
 				</c:forEach>
-			</c:if>
-
-		</c:forEach>
-
-	</c:forEach>
-</table>
+			</c:forEach>
+		</table>
+	</c:otherwise>
+</c:choose>
+<p>
+	<a href="#"  class="button" onclick="javascript:document.location='${refreshSummaryUrl}';">
+		<fmt:message key="label.common.summary.refresh" />
+	</a>
+	<c:if  test="${anyRecordsAvailable}">
+		<c:url var="viewRecordList" value="/monitoring/listRecords.do?sessionMapID=${sessionMapID}" />
+		<a href="#" onclick="javascript:launchPopup('${viewRecordList}','RecordList')" class="button space-left">
+			<fmt:message key="label.monitoring.viewrecords.all" />
+		</a>
+	</c:if>
+</p>

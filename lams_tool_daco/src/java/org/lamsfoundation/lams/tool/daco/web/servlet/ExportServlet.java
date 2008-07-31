@@ -158,7 +158,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			groupList.add(group);
 		}
 		sessionMap.put(DacoConstants.ATTR_TITLE, content.getTitle());
-		sessionMap.put(DacoConstants.ATTR_SUMMARY_LIST, groupList);
+		//sessionMap.put(DacoConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
 	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies,
@@ -187,7 +187,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 		// put it into HTTPSession
 		sessionMap.put(DacoConstants.ATTR_TITLE, content.getTitle());
-		sessionMap.put(DacoConstants.ATTR_SUMMARY_LIST, groupList);
+		//sessionMap.put(DacoConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
 	private void saveFileToLocal(List<Summary> list, String directoryName) {

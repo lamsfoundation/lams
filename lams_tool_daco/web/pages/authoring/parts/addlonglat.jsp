@@ -13,7 +13,7 @@
        var msgHideAdditionalOptions = "<fmt:message key='label.authoring.basic.additionaloptions.hide' />";
 	</script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoQuestion.js'/>"></script>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoAuthoring.js'/>"></script>
 
 </lams:head>
 <body class="tabpart">

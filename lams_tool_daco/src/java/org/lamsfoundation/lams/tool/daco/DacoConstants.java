@@ -24,13 +24,13 @@
 package org.lamsfoundation.lams.tool.daco;
 
 public class DacoConstants {
+	// system-wide constants
 	public static final String TOOL_SIGNATURE = "ladaco10";
 	public static final String DACO_SERVICE = "dacoService";
 	public static final String TOOL_CONTENT_HANDLER_NAME = "dacoToolContentHandler";
+	public static final int SESSION_COMPLETED = 1;
 
-	public static final int COMPLETED = 1;
-
-	// daco type;
+	// question types
 	public static final String QUESTION_TYPE = "questionType";
 	public static final short QUESTION_TYPE_TEXTFIELD = 1;
 	public static final short QUESTION_TYPE_TEXTAREA = 2;
@@ -47,19 +47,19 @@ public class DacoConstants {
 	public static final String[] LONGLAT_MAPS_LIST = new String[] { "Google Maps", "Google Earth", "Geabios", "Open Street Map",
 			"Multimap" };
 
-	// answer options
+	// answer options' constants
 	public static final int INIT_ANSWER_OPTION_COUNT = 3;
 	public static final int ANSWER_OPTION_MINIMUM_COUNT = 2;
 	public static final String ANSWER_OPTION_DESC_PREFIX = "answerOptionItemDesc";
 	public static final String ANSWER_OPTION_COUNT = "answerOptionCount";
-	public static final String ANSWER_OPTION_SELECT = "label.authoring.basic.answeroption.select";
 
-	// image extensions
+	// image question valid extensions
 	public static final String[] IMAGE_EXTENSIONS = new String[] { "GIF", "JPG", "PNG" };
 
 	// format for the date question
 	public static final String DATE_PART_DELIMETER = "-";
-	// for action forward name
+
+	// action forward names
 	public static final String SUCCESS = "success";
 	public static final String ERROR = "error";
 	public static final String DEFINE_LATER = "definelater";
@@ -70,40 +70,42 @@ public class DacoConstants {
 	public static final String RECORD_OPERATION_EDIT = "edit";
 
 	// question summary columns
-	public static final short QUESTION_SUMMARY_COLUMN_COUNT = 4;
-	public static final short QUESTION_SUMMARY_ANSWER = 0;
-	public static final short QUESTION_SUMMARY_SUM = 1;
-	public static final short QUESTION_SUMMARY_AVERAGE = 2;
-	public static final short QUESTION_SUMMARY_COUNT = 3;
-
-	public static final short QUESTION_DB_SUMMARY_QUESTION_UID = 0;
-	public static final short QUESTION_DB_SUMMARY_ANSWER = 1;
-	public static final short QUESTION_DB_SUMMARY_QUESTION_TYPE = 2;
-	public static final short QUESTION_DB_SUMMARY_SUM = 3;
-	public static final short QUESTION_DB_SUMMARY_AVERAGE = 4;
-	public static final short QUESTION_DB_SUMMARY_COUNT = 5;
+	public static final short QUESTION_DB_NUMBER_SUMMARY_QUESTION_UID = 0;
+	public static final short QUESTION_DB_NUMBER_SUMMARY_SUM = 1;
+	public static final short QUESTION_DB_NUMBER_SUMMARY_AVERAGE = 2;
+	public static final short QUESTION_DB_ANSWER_ENUMERATION_SUMMARY_QUESTION_UID = 0;
+	public static final short QUESTION_DB_ANSWER_ENUMERATION_SUMMARY_ANSWER = 1;
+	public static final short QUESTION_DB_ANSWER_ENUMERATION_SUMMARY_QUESTION_TYPE = 2;
+	public static final short QUESTION_DB_ANSWER_ENUMERATION_SUMMARY_COUNT = 3;
 
 	// learning views
 	public static final String LEARNING_VIEW_HORIZONTAL = "horizontal";
 	public static final String LEARNING_VIEW_VERTICAL = "vertical";
+
+	//monitoring summary query match
+	public static final Long MONITORING_SUMMARY_MATCH_ALL = null;
+	public static final Long MONITORING_SUMMARY_MATCH_NONE = -1L;
+
+	//common parameters'/attributes' names
+	public static final String TOOL_CONTENT_ID = "toolContentID";
+	public static final String TOOL_SESSION_ID = "toolSessionID";
+	public static final String USER_UID = "userUid";
 	// for parameters' name
-	public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
-	public static final String PARAM_TOOL_SESSION_ID = "toolSessionID";
+
 	public static final String PARAM_FILE_VERSION_ID = "fileVersionId";
 	public static final String PARAM_FILE_UUID = "fileUuid";
 	public static final String PARAM_QUESTION_INDEX = "questionIndex";
 	public static final String PARAM_RECORD_INDEX = "recordIndex";
-	public static final String PARAM_DACO_QUESTION_UID = "questionUid";
+	public static final String PARAM_QUESTION_UID = "questionUid";
 	public static final String PARAM_RUN_OFFLINE = "runOffline";
-	public static final String PARAM_TITLE = "title";
-	public static final String PARAM_QUESTION_REQUIRED = "questionRequired";
 	public static final String PARAM_LONGLAT_MAPS_SELECTED = "longlatMapsSelected";
-	public static final String PARAM_REMOVE_INDEX = "removeIndex";
+	public static final String PARAM_ANSWER_OPTION_INDEX = "removeIndex";
 
 	// for request attribute name
+	public static final String ATTR_USER = "user";
+	public static final String ATTR_MONITORING_SUMMARY = "monitoringSummary";
+	public static final String ATTR_MONITORING_CURRENT_TAB = "monitoringCurrentTab";
 	public static final String ATTR_LEARNING_CURRENT_TAB = "learningCurrentTab";
-	public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
-	public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
 	public static final String ATTR_QUESTION_LIST = "questionList";
 	public static final String ATTR_RECORD_LIST = "recordList";
 	public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
@@ -113,12 +115,10 @@ public class DacoConstants {
 	public static final String ATTR_QUESTION_REVIEW_URL = "dacoQuestionReviewUrl";
 	public static final String ATTR_DACO = "daco";
 	public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
-	public static final String ATTR_SUMMARY_LIST = "summaryList";
 	public static final String ATTR_USER_LIST = "userList";
 	public static final String ATTR_FINISH_LOCK = "finishedLock";
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 	public static final String ATTR_DACO_FORM = "dacoForm";
-	public static final String ATTR_ADD_QUESTION_TYPE = "addType";
 	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 	public static final String ATTR_TITLE = "title";
 	public static final String ATTR_USER_FINISHED = "userFinished";
@@ -127,12 +127,11 @@ public class DacoConstants {
 	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
 	public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
 	public static final String ATTR_REFLECT_LIST = "reflectList";
-	public static final String ATTR_USER_UID = "userUid";
 	public static final String ATTR_RECORD_OPERATION_SUCCESS = "recordOperationSuccess";
 	public static final String ATTR_DISPLAYED_RECORD_NUMBER = "displayedRecordNumber";
 	public static final String ATTR_LEARNING_VIEW = "learningView";
 	public static final String ATTR_QUESTION_SUMMARIES = "questionSummaries";
-
+	public static final String ATTR_TOTAL_RECORD_COUNT = "totalRecordCount";
 	// error message keys
 	public static final String ERROR_MSG_DESC_BLANK = "error.question.desc.blank";
 	public static final String ERROR_MSG_FILE_BLANK = "error.question.file.blank";
@@ -182,5 +181,5 @@ public class DacoConstants {
 	public static final String ERROR_MSG_RECORD_TOOMUCH = "error.record.toomuch";
 
 	public static final String PAGE_EDITABLE = "isPageEditable";
-	public static final String MODE_AUTHOR_SESSION = "author_session";
+
 }

@@ -31,10 +31,10 @@ import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 public class DacoQuestionDAOHibernate extends BaseDAOHibernate implements DacoQuestionDAO {
 
 	private static final String FIND_BY_CONTENT_UID = "from " + DacoQuestion.class.getName()
-			+ " where content_uid = ? order by create_date asc";
+			+ " where daco.uid = ? order by create_date asc";
 
-	public List getByContentUid(Long dacoUid) {
-		return this.getHibernateTemplate().find(DacoQuestionDAOHibernate.FIND_BY_CONTENT_UID, dacoUid);
+	public List getByContentUid(Long contentUid) {
+		return this.getHibernateTemplate().find(DacoQuestionDAOHibernate.FIND_BY_CONTENT_UID, contentUid);
 	}
 
 	public DacoQuestion getByUid(Long dacoQuestionUid) {

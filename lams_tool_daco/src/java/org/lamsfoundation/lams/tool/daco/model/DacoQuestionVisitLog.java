@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.daco.model;
 
 import java.util.Date;
+
 /**
  * Daco
  * @author Dapeng Ni
@@ -39,8 +40,8 @@ public class DacoQuestionVisitLog {
 	private DacoQuestion dacoQuestion;
 	private boolean complete;
 	private Date accessDate;
-	private Long sessionId;
-	
+	private Long sessionUid;
+
 	/**
 	 * @hibernate.property column="access_date"
 	 * @return
@@ -48,21 +49,23 @@ public class DacoQuestionVisitLog {
 	public Date getAccessDate() {
 		return accessDate;
 	}
+
 	public void setAccessDate(Date accessDate) {
 		this.accessDate = accessDate;
 	}
+
 	/**
-	 * @hibernate.many-to-one  column="question_uid"
- 	 * cascade="none"
+	 * @hibernate.many-to-one  column="question_uid" cascade="none" foreign-key="LogToQuestion"
 	 * @return
 	 */
 	public DacoQuestion getDacoQuestion() {
 		return dacoQuestion;
 	}
+
 	public void setDacoQuestion(DacoQuestion question) {
-		this.dacoQuestion = question;
+		dacoQuestion = question;
 	}
-	
+
 	/**
 	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
 	 * @return Returns the log Uid.
@@ -70,20 +73,23 @@ public class DacoQuestionVisitLog {
 	public Long getUid() {
 		return uid;
 	}
+
 	public void setUid(Long uid) {
 		this.uid = uid;
 	}
+
 	/**
-	 * @hibernate.many-to-one  column="user_uid"
- 	 * cascade="none"
+	 * @hibernate.many-to-one column="user_uid" cascade="none" foreign-key="LogToUser"
 	 * @return
 	 */
 	public DacoUser getUser() {
 		return user;
 	}
+
 	public void setUser(DacoUser user) {
 		this.user = user;
 	}
+
 	/**
 	 * @hibernate.property column="complete"
 	 * @return
@@ -91,21 +97,20 @@ public class DacoQuestionVisitLog {
 	public boolean isComplete() {
 		return complete;
 	}
+
 	public void setComplete(boolean complete) {
 		this.complete = complete;
 	}
+
 	/**
-	 * @hibernate.property column="session_id"
+	 * @hibernate.property column="session_uid"
 	 * @return
 	 */
-	public Long getSessionId() {
-		return sessionId;
-	}
-	public void setSessionId(Long sessionId) {
-		this.sessionId = sessionId;
+	public Long getSessionUid() {
+		return sessionUid;
 	}
 
-
-	
-	
+	public void setSessionUid(Long sessionUid) {
+		this.sessionUid = sessionUid;
+	}
 }

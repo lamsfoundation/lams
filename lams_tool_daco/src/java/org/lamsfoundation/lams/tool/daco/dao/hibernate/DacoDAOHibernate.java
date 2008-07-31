@@ -34,23 +34,24 @@ import org.lamsfoundation.lams.tool.daco.model.Daco;
  * 
  * @version $Revision$
  */
-public class DacoDAOHibernate extends BaseDAOHibernate implements DacoDAO{
-	private static final String GET_QUESTION_BY_CONTENTID = "from "+Daco.class.getName()+" as r where r.contentId=?";
-	
+public class DacoDAOHibernate extends BaseDAOHibernate implements DacoDAO {
+	private static final String FIND_BY_CONTENT_ID = "from " + Daco.class.getName() + " as r where r.contentId=?";
+
 	public Daco getByContentId(Long contentId) {
-		List list = getHibernateTemplate().find(GET_QUESTION_BY_CONTENTID,contentId);
-		if(list.size() > 0)
+		List list = getHibernateTemplate().find(DacoDAOHibernate.FIND_BY_CONTENT_ID, contentId);
+		if (list.size() > 0) {
 			return (Daco) list.get(0);
-		else
+		}
+		else {
 			return null;
+		}
 	}
 
 	public Daco getByUid(Long dacoUid) {
-		return (Daco) getObject(Daco.class,dacoUid);
+		return (Daco) getObject(Daco.class, dacoUid);
 	}
 
 	public void delete(Daco daco) {
 		this.getHibernateTemplate().delete(daco);
 	}
-
 }

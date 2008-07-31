@@ -17,6 +17,7 @@
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="daco" value="${sessionMap.daco}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+	
 	<c:if test="${empty displayedRecordNumber}">
 		<c:set var="displayedRecordNumber" value="1" />
 	</c:if>
@@ -73,7 +74,7 @@
 </c:if>
 
 <lams:TabBody id="1" titleKey="label.learning.heading.add" page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}" />
-<lams:TabBody id="2" titleKey="label.learning.heading.list" page="listRecords.jsp" />
+<lams:TabBody id="2" titleKey="label.learning.heading.list" page="listRecords.jsp?learningMode=true" />
 <lams:TabBody id="3" titleKey="label.learning.heading.summary" page="questionSummaries.jsp" />
 		
 <c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
@@ -97,18 +98,20 @@
 </c:if>
 
 <c:if test="${mode != 'teacher'}">
-	<div class="space-bottom-top align-right space-right"><c:choose>
-		<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-			<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
-				<fmt:message key="label.continue" />
-			</html:button>
-		</c:when>
-		<c:otherwise>
-			<html:button property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="button">
-				<fmt:message key="label.finished" />
-			</html:button>
-		</c:otherwise>
-	</c:choose></div>
+	<div class="space-bottom-top align-right space-right">
+		<c:choose>
+			<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
+				<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
+					<fmt:message key="label.continue" />
+				</html:button>
+			</c:when>
+			<c:otherwise>
+				<html:button property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="button">
+					<fmt:message key="label.finished" />
+				</html:button>
+			</c:otherwise>
+		</c:choose>
+	</div>
 </c:if>
 
 </div>

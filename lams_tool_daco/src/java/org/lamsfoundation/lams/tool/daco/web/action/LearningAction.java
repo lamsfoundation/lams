@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
+import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
 import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
@@ -65,7 +66,6 @@ import org.lamsfoundation.lams.tool.daco.service.DacoApplicationException;
 import org.lamsfoundation.lams.tool.daco.service.IDacoService;
 import org.lamsfoundation.lams.tool.daco.service.UploadDacoFileException;
 import org.lamsfoundation.lams.tool.daco.util.DacoQuestionComparator;
-import org.lamsfoundation.lams.tool.daco.util.QuestionSummary;
 import org.lamsfoundation.lams.tool.daco.web.form.RecordForm;
 import org.lamsfoundation.lams.tool.daco.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -163,7 +163,7 @@ public class LearningAction extends Action {
 		// save toolContentID into HTTPSession
 		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 
-		Long sessionId = new Long(request.getParameter(DacoConstants.PARAM_TOOL_SESSION_ID));
+		Long sessionId = new Long(request.getParameter(DacoConstants.TOOL_SESSION_ID));
 
 		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
@@ -172,16 +172,16 @@ public class LearningAction extends Action {
 		// get back the daco and question list and display them on page
 		IDacoService service = getDacoService();
 		DacoUser dacoUser = null;
+		Daco daco = service.getDacoBySessionId(sessionId);
+
 		if (mode != null && mode.isTeacher()) {
 			// monitoring mode - user is specified in URL
 			// dacoUser may be null if the user was force completed.
 			dacoUser = getSpecifiedUser(service, sessionId, WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 		}
 		else {
-			dacoUser = getCurrentUser(service, sessionId);
+			dacoUser = getCurrentUser(service, sessionId, daco);
 		}
-
-		Daco daco = service.getDacoBySessionId(sessionId);
 
 		// check whehter finish lock is on/off
 		boolean lock = daco.getLockWhenFinished() && dacoUser != null && dacoUser.isSessionFinished();
@@ -207,8 +207,11 @@ public class LearningAction extends Action {
 		List<List<DacoAnswer>> records = service.getDacoAnswersByUserAndDaco(dacoUser.getUid(), daco);
 		sessionMap.put(DacoConstants.ATTR_RECORD_LIST, records);
 
-		List<QuestionSummary> summaries = service.getQuestionSummaries(daco.getUid(), dacoUser.getUid());
+		List<QuestionSummaryDTO> summaries = service.getQuestionSummaries(daco.getUid(), dacoUser.getUid());
 		sessionMap.put(DacoConstants.ATTR_QUESTION_SUMMARIES, summaries);
+
+		Integer totalRecordCount = service.getTotalRecordCount(daco.getContentId());
+		sessionMap.put(DacoConstants.ATTR_TOTAL_RECORD_COUNT, totalRecordCount);
 
 		// add define later support
 		if (daco.isDefineLater()) {
@@ -294,9 +297,11 @@ public class LearningAction extends Action {
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
 		Set<DacoQuestion> questionList = daco.getDacoQuestions();
-		Long sessionId = (Long) sessionMap.get(DacoConstants.ATTR_TOOL_SESSION_ID);
+		Long sessionId = (Long) sessionMap.get(DacoConstants.TOOL_SESSION_ID);
 		IDacoService service = getDacoService();
-		DacoUser user = getCurrentUser(service, sessionId);
+		DacoUser user = getCurrentUser(service, sessionId, daco);
+
+		service.releaseAnswersFromCache(user.getAnswers());
 
 		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		sessionMap.put(DacoConstants.ATTR_LEARNING_CURRENT_TAB, 1);
@@ -305,6 +310,7 @@ public class LearningAction extends Action {
 		if (!errors.isEmpty()) {
 			this.addErrors(request, errors);
 			refreshQuestionSummaries(mapping, request);
+			request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, recordForm.getDisplayedRecordNumber());
 			return mapping.findForward(DacoConstants.SUCCESS);
 		}
 
@@ -329,6 +335,7 @@ public class LearningAction extends Action {
 		DacoAnswer answer = null;
 
 		while (questionIterator.hasNext()) {
+
 			question = questionIterator.next();
 			if (isEdit) {
 				answer = record.get(answerNumber++);
@@ -477,7 +484,7 @@ public class LearningAction extends Action {
 			records.add(record);
 			request.setAttribute(DacoConstants.ATTR_RECORD_OPERATION_SUCCESS, DacoConstants.RECORD_OPERATION_ADD);
 		}
-		sessionMap.put(DacoConstants.ATTR_RECORD_LIST, records);
+
 		request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, records.size() + 1);
 		refreshQuestionSummaries(mapping, request);
 
@@ -622,7 +629,7 @@ public class LearningAction extends Action {
 		return list;
 	}
 
-	protected DacoUser getCurrentUser(IDacoService service, Long sessionId) {
+	protected DacoUser getCurrentUser(IDacoService service, Long sessionId, Daco daco) {
 		// try to get form system session
 		HttpSession ss = SessionManager.getSession();
 		// get back login user DTO
@@ -632,6 +639,7 @@ public class LearningAction extends Action {
 		if (dacoUser == null) {
 			DacoSession session = service.getDacoSessionBySessionId(sessionId);
 			dacoUser = new DacoUser(user, session);
+			dacoUser.setDaco(daco);
 			service.createUser(dacoUser);
 		}
 		return dacoUser;
@@ -1041,12 +1049,15 @@ public class LearningAction extends Action {
 		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
-		Long sessionId = (Long) sessionMap.get(DacoConstants.ATTR_TOOL_SESSION_ID);
+		Long sessionId = (Long) sessionMap.get(DacoConstants.TOOL_SESSION_ID);
 		IDacoService service = getDacoService();
-		DacoUser user = getCurrentUser(service, sessionId);
+		DacoUser user = getCurrentUser(service, sessionId, daco);
 
-		List<QuestionSummary> summaries = service.getQuestionSummaries(daco.getUid(), user.getUid());
+		List<QuestionSummaryDTO> summaries = service.getQuestionSummaries(daco.getUid(), user.getUid());
 		sessionMap.put(DacoConstants.ATTR_QUESTION_SUMMARIES, summaries);
+
+		Integer totalRecordCount = service.getTotalRecordCount(daco.getContentId());
+		sessionMap.put(DacoConstants.ATTR_TOTAL_RECORD_COUNT, totalRecordCount);
 		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 		return mapping.findForward(DacoConstants.SUCCESS);

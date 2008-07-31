@@ -46,15 +46,15 @@ public class DacoAnswerOption implements Cloneable {
 	// **********************************************************
 
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 * @hibernate.id generator-class="native" column="uid"
 	 * @return Returns the answer ID.
 	 */
 	public Long getUid() {
 		return uid;
 	}
 
-	public void setUid(Long uuid) {
-		this.uid = uuid;
+	private void setUid(Long uuid) {
+		uid = uuid;
 	}
 
 	/**
@@ -81,13 +81,15 @@ public class DacoAnswerOption implements Cloneable {
 		this.answerOption = answerOption;
 	}
 
+	@Override
 	public Object clone() {
-		Object obj = null;
+		DacoAnswerOption obj = null;
 		try {
-			obj = super.clone();
-			((DacoAnswerOption) obj).setUid(null);
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + DacoAnswerOption.class + " failed");
+			obj = (DacoAnswerOption) super.clone();
+			obj.setUid(null);
+		}
+		catch (CloneNotSupportedException e) {
+			DacoAnswerOption.log.error("When clone " + DacoAnswerOption.class + " failed");
 		}
 
 		return obj;

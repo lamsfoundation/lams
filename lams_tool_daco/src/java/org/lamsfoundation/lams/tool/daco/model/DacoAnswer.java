@@ -83,7 +83,7 @@ public class DacoAnswer implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.many-to-one column="user_uid" cascade="none"
+	 * @hibernate.many-to-one column="user_uid" cascade="none" foreign-key="AnswerToUser" 
 	 * @return
 	 */
 	public DacoUser getUser() {
@@ -119,7 +119,7 @@ public class DacoAnswer implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.many-to-one column="question_uid" cascade="none"
+	 * @hibernate.many-to-one column="question_uid" cascade="none" foreign-key="AnswerToQuestion"
 	 * @return
 	 */
 	public DacoQuestion getQuestion() {

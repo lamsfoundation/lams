@@ -21,19 +21,44 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
-package org.lamsfoundation.lams.tool.daco.util;
+/* $Id$ */
+package org.lamsfoundation.lams.tool.daco.dto;
+
+import java.util.List;
 
 
+public class MonitoringSummarySessionDTO {
 
+	private Long sessionId;
+	private String sessionName;
+	private List<MonitoringSummaryUserDTO> users;
 
-/**
- * Contains helper methods used by the Action Servlets
- * 
- * @author Anthony Sukkar
- *
- */
-public class DacoWebUtils {
+	public MonitoringSummarySessionDTO(Long sessionId, String sessionName) {
+		this.sessionId = sessionId;
+		this.sessionName = sessionName;
+	}
 
-// We leave this blank for future use
+	public String getSessionName() {
+		return sessionName;
+	}
+
+	public void setSessionName(String sessionName) {
+		this.sessionName = sessionName;
+	}
+
+	public Long getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(Long sessionId) {
+		this.sessionId = sessionId;
+	}
+
+	public List<MonitoringSummaryUserDTO> getUsers() {
+		return users;
+	}
+
+	public void setUsers(List<MonitoringSummaryUserDTO> users) {
+		this.users = users;
+	}
 }

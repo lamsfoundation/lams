@@ -30,7 +30,7 @@
 				<li>
 					<c:out value="${file.fileName}" />
 					<c:set var="viewURL">
-						<html:rewrite
+						<html:rewrite 
 							page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=false" />
 					</c:set>
 					<html:link href="javascript:launchPopup('${viewURL}','instructionfile')">

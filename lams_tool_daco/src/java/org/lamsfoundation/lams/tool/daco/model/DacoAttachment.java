@@ -31,112 +31,114 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Dapeng Ni
- *
- * A Wrapper class for uploaded files. An Attachment cannot exist independently
- * and must belong to a Daco.
  * 
- *
- * @hibernate.class table="tl_ladaco10_attachment"
- *
+ * A Wrapper class for uploaded files. An Attachment cannot exist independently and must belong to a Daco.
+ * 
+ * 
+ * @hibernate.class table="tl_ladaco10_attachments"
+ * 
  */
-public class DacoAttachment implements Cloneable{
+public class DacoAttachment implements Cloneable {
 	private static final Logger log = Logger.getLogger(DacoAttachment.class);
-	
-    private Long uid;
-    private Long fileUuid;
-    private Long fileVersionId;
-    private String fileType;
-    private String fileName;
-    private Date created;
-    
-    //Default contruction method
-    public DacoAttachment(){
-    	
-    }
-//  **********************************************************
-  	//		Function method for Attachment
-//  **********************************************************
-    public Object clone(){
+
+	private Long uid;
+	private Long fileUuid;
+	private Long fileVersionId;
+	private String fileType;
+	private String fileName;
+	private Date created;
+
+	// Default contruction method
+	public DacoAttachment() {
+
+	}
+
+	// **********************************************************
+	// Function method for Attachment
+	// **********************************************************
+	@Override
+	public Object clone() {
 		Object obj = null;
 		try {
 			obj = super.clone();
-			((DacoAttachment)obj).setUid(null);
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + DacoAttachment.class + " failed");
+			((DacoAttachment) obj).setUid(null);
 		}
-		
+		catch (CloneNotSupportedException e) {
+			DacoAttachment.log.error("When clone " + DacoAttachment.class + " failed");
+		}
+
 		return obj;
 	}
+
+	@Override
 	public boolean equals(Object o) {
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (!(o instanceof DacoAttachment))
+		}
+		if (!(o instanceof DacoAttachment)) {
 			return false;
+		}
 
 		final DacoAttachment genericEntity = (DacoAttachment) o;
 
-      	return new EqualsBuilder()
-      	.append(this.uid,genericEntity.uid)
-      	.append(this.fileVersionId,genericEntity.fileVersionId)
-      	.append(this.fileName,genericEntity.fileName)
-      	.append(this.fileType,genericEntity.fileType)
-      	.append(this.created,genericEntity.created)
-      	.isEquals();
+		return new EqualsBuilder().append(uid, genericEntity.uid).append(fileVersionId, genericEntity.fileVersionId).append(
+				fileName, genericEntity.fileName).append(fileType, genericEntity.fileType).append(created, genericEntity.created)
+				.isEquals();
 	}
 
+	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(uid).append(fileVersionId).append(fileName).append(fileType).append(created)
 				.toHashCode();
 	}
-	
-//  **********************************************************
-  	//		get/set methods
-//  **********************************************************
-    /**
-     * @hibernate.id column="uid" generator-class="native"
-     */
-    public Long getUid() {
-        return uid;
-    }
 
-    public void setUid(Long uid) {
-        this.uid = uid;
-    }
+	// **********************************************************
+	// get/set methods
+	// **********************************************************
+	/**
+	 * @hibernate.id column="uid" generator-class="native"
+	 */
+	public Long getUid() {
+		return uid;
+	}
 
-    /**
-     * @hibernate.property column="file_version_id"
-     *
-     */
-    public Long getFileVersionId() {
-        return fileVersionId;
-    }
+	private void setUid(Long uid) {
+		this.uid = uid;
+	}
 
-    public void setFileVersionId(Long version) {
-        this.fileVersionId = version;
-    }
+	/**
+	 * @hibernate.property column="file_version_id"
+	 * 
+	 */
+	public Long getFileVersionId() {
+		return fileVersionId;
+	}
 
-    /**
-     * @hibernate.property column="file_type"
-     */
-    public String getFileType() {
-        return fileType;
-    }
+	public void setFileVersionId(Long version) {
+		fileVersionId = version;
+	}
 
-    public void setFileType(String type) {
-        this.fileType = type;
-    }
+	/**
+	 * @hibernate.property column="file_type"
+	 */
+	public String getFileType() {
+		return fileType;
+	}
 
-    /**
-     * @hibernate.property column="file_name"
-     */
-    public String getFileName() {
-        return fileName;
-    }
+	public void setFileType(String type) {
+		fileType = type;
+	}
 
-    public void setFileName(String name) {
-        this.fileName = name;
-    }
+	/**
+	 * @hibernate.property column="file_name"
+	 */
+	public String getFileName() {
+		return fileName;
+	}
 
+	public void setFileName(String name) {
+		fileName = name;
+	}
 
 	/**
 	 * @hibernate.property column="file_uuid"
@@ -147,8 +149,9 @@ public class DacoAttachment implements Cloneable{
 	}
 
 	public void setFileUuid(Long uuid) {
-		this.fileUuid = uuid;
+		fileUuid = uuid;
 	}
+
 	/**
 	 * @hibernate.property column="create_date"
 	 * @return

@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -74,6 +75,10 @@ import org.lamsfoundation.lams.tool.daco.dao.DacoQuestionDAO;
 import org.lamsfoundation.lams.tool.daco.dao.DacoQuestionVisitDAO;
 import org.lamsfoundation.lams.tool.daco.dao.DacoSessionDAO;
 import org.lamsfoundation.lams.tool.daco.dao.DacoUserDAO;
+import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
+import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummaryUserDTO;
+import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
+import org.lamsfoundation.lams.tool.daco.dto.QuestionSummarySingleAnswerDTO;
 import org.lamsfoundation.lams.tool.daco.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.daco.dto.Summary;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
@@ -84,7 +89,6 @@ import org.lamsfoundation.lams.tool.daco.model.DacoQuestionVisitLog;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
 import org.lamsfoundation.lams.tool.daco.util.DacoToolContentHandler;
-import org.lamsfoundation.lams.tool.daco.util.QuestionSummary;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -238,10 +242,6 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 		Daco content = new Daco();
 		content = Daco.newInstance(defaultContent, contentId, dacoToolContentHandler);
 		return content;
-	}
-
-	public List getAuthoredQuestions(Long dacoUid) {
-		return dacoQuestionDao.getByContentUid(dacoUid);
 	}
 
 	public DacoAttachment uploadInstructionFile(FormFile uploadFile, String fileType) throws UploadDacoFileException {
@@ -415,7 +415,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 			log.setDacoQuestion(question);
 			DacoUser user = dacoUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 			log.setUser(user);
-			log.setSessionId(sessionId);
+			log.setSessionUid(sessionId);
 			log.setAccessDate(new Timestamp(new Date().getTime()));
 		}
 		log.setComplete(true);
@@ -431,7 +431,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 			DacoUser user = dacoUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 			log.setUser(user);
 			log.setComplete(false);
-			log.setSessionId(sessionId);
+			log.setSessionUid(sessionId);
 			log.setAccessDate(new Timestamp(new Date().getTime()));
 			dacoQuestionVisitDao.saveObject(log);
 		}
@@ -455,72 +455,8 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 		return nextUrl;
 	}
 
-	public int checkMiniView(Long toolSessionId, Long userUid) {
-		int miniView = dacoQuestionVisitDao.getUserViewLogCount(toolSessionId, userUid);
-		DacoSession session = dacoSessionDao.getSessionBySessionId(toolSessionId);
-		if (session == null) {
-			DacoServiceImpl.log.error("Failed get session by ID [" + toolSessionId + "]");
-			return 0;
-		}
-		// MARCIN: changed from "session.getDaco().getMiniViewDacoNumber()" to 0
-		int reqView = 0;
-
-		return reqView - miniView;
-	}
-
 	public DacoQuestion getDacoQuestionByUid(Long questionUid) {
 		return dacoQuestionDao.getByUid(questionUid);
-	}
-
-	public List<List<Summary>> getSummary(Long contentId) {
-		List<List<Summary>> groupList = new ArrayList<List<Summary>>();
-		List<Summary> group = new ArrayList<Summary>();
-
-		// get all question which is accessed by user
-		Map<Long, Integer> visitCountMap = dacoQuestionVisitDao.getSummary(contentId);
-
-		Daco daco = dacoDao.getByContentId(contentId);
-		Set<DacoQuestion> resQuestionList = daco.getDacoQuestions();
-
-		// get all sessions in a daco and retrieve all daco questions under this
-		// session
-		// plus initial daco questions by author creating (resQuestionList)
-		List<DacoSession> sessionList = dacoSessionDao.getByContentId(contentId);
-		for (DacoSession session : sessionList) {
-			// one new group for one session.
-			group = new ArrayList<Summary>();
-			// firstly, put all initial daco question into this group.
-			for (DacoQuestion question : resQuestionList) {
-				Summary sum = new Summary(session.getSessionId(), session.getSessionName(), question);
-				// set viewNumber according visit log
-				if (visitCountMap.containsKey(question.getUid())) {
-					sum.setViewNumber(visitCountMap.get(question.getUid()).intValue());
-				}
-				group.add(sum);
-			}
-			// get this session's all daco questions
-			Set<DacoQuestion> sessQuestionList = session.getDacoQuestions();
-			for (DacoQuestion question : sessQuestionList) {
-				// to skip all question create by author
-				if (!question.isCreateByAuthor()) {
-					Summary sum = new Summary(session.getSessionId(), session.getSessionName(), question);
-					// set viewNumber according visit log
-					if (visitCountMap.containsKey(question.getUid())) {
-						sum.setViewNumber(visitCountMap.get(question.getUid()).intValue());
-					}
-					group.add(sum);
-				}
-			}
-			// so far no any question available, so just put session name info
-			// to Summary
-			if (group.size() == 0) {
-				group.add(new Summary(session.getSessionId(), session.getSessionName(), null));
-			}
-			groupList.add(group);
-		}
-
-		return groupList;
-
 	}
 
 	public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId) {
@@ -853,7 +789,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 		if (toContentId == null) {
-			throw new ToolException("Failed to create the SharedDacoFiles tool seession");
+			throw new ToolException("Failed to create the Data Collection tool seession");
 		}
 
 		Daco daco = null;
@@ -871,16 +807,6 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
 		Daco toContent = Daco.newInstance(daco, toContentId, dacoToolContentHandler);
 		dacoDao.saveObject(toContent);
-
-		// save daco questions as well
-		Set questions = toContent.getDacoQuestions();
-		if (questions != null) {
-			Iterator iter = questions.iterator();
-			while (iter.hasNext()) {
-				DacoQuestion question = (DacoQuestion) iter.next();
-				// createRootTopic(toContent.getUid(),null,msg);
-			}
-		}
 	}
 
 	public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
@@ -933,7 +859,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
 		DacoSession session = dacoSessionDao.getSessionBySessionId(toolSessionId);
 		if (session != null) {
-			session.setStatus(DacoConstants.COMPLETED);
+			session.setStatus(DacoConstants.SESSION_COMPLETED);
 			dacoSessionDao.saveObject(session);
 		}
 		else {
@@ -1029,16 +955,17 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 		return messageService.getMessage(key, args);
 	}
 
-	public List<QuestionSummary> getQuestionSummaries(Long contentUid, Long userUid) {
-		List<QuestionSummary> result = new ArrayList<QuestionSummary>();
-		List<DacoQuestion> questions = dacoQuestionDao.getByContentUid(contentUid);
+	public List<QuestionSummaryDTO> getQuestionSummaries(Long contentUid, Long userUid) {
+		List<QuestionSummaryDTO> result = new ArrayList<QuestionSummaryDTO>();
+
+		Set<DacoQuestion> questions = dacoDao.getByUid(contentUid).getDacoQuestions();
 		if (questions.size() > 0) {
 			for (DacoQuestion question : questions) {
 				switch (question.getType()) {
 					case DacoConstants.QUESTION_TYPE_NUMBER: {
-						QuestionSummary summary = new QuestionSummary();
-						summary.addUserSummaryRow(0, new String[DacoConstants.QUESTION_SUMMARY_COLUMN_COUNT]);
-						summary.addAllSummaryRow(0, new String[DacoConstants.QUESTION_SUMMARY_COLUMN_COUNT]);
+						QuestionSummaryDTO summary = new QuestionSummaryDTO();
+						summary.addUserSummarySingleAnswer(0, new QuestionSummarySingleAnswerDTO());
+						summary.addAllSummarySingleAnswer(0, new QuestionSummarySingleAnswerDTO());
 						summary.setQuestionUid(question.getUid());
 						result.add(summary);
 					}
@@ -1047,13 +974,14 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 					case DacoConstants.QUESTION_TYPE_DROPDOWN:
 					case DacoConstants.QUESTION_TYPE_CHECKBOX: {
 						int answerOptionCount = question.getAnswerOptions().size();
-						QuestionSummary summary = new QuestionSummary();
+						QuestionSummaryDTO summary = new QuestionSummaryDTO();
 						summary.setQuestionUid(question.getUid());
 						for (int answerOption = 0; answerOption < answerOptionCount; answerOption++) {
-							String[] columns = new String[] { String.valueOf(answerOption + 1), null, "0%", "0" };
-							summary.addUserSummaryRow(answerOption, columns);
-							columns = new String[] { String.valueOf(answerOption + 1), null, "0%", "0" };
-							summary.addAllSummaryRow(answerOption, columns);
+							QuestionSummarySingleAnswerDTO singleAnswer = new QuestionSummarySingleAnswerDTO(String
+									.valueOf(answerOption + 1), null, "0%", "0");
+							summary.addUserSummarySingleAnswer(answerOption, singleAnswer);
+							singleAnswer = (QuestionSummarySingleAnswerDTO) singleAnswer.clone();
+							summary.addAllSummarySingleAnswer(answerOption, singleAnswer);
 						}
 						result.add(summary);
 					}
@@ -1063,7 +991,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 						break;
 				}
 			}
-			result = dacoAnswerDao.getSummaries(contentUid, userUid, result);
+			result = dacoAnswerDao.getQuestionSummaries(contentUid, userUid, result);
 		}
 		return result;
 	}
@@ -1072,5 +1000,53 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 		for (DacoAnswer answer : record) {
 			deleteDacoAnswer(answer.getUid());
 		}
+	}
+
+	public List<DacoQuestion> getQuestionByContentUid(Long contentUid) {
+		return dacoQuestionDao.getByContentUid(contentUid);
+	}
+
+	public void releaseDacoFromCache(Daco daco) {
+		dacoDao.releaseFromCache(daco);
+		for (DacoQuestion question : daco.getDacoQuestions()) {
+			dacoQuestionDao.releaseFromCache(question);
+		}
+	}
+
+	public void releaseAnswersFromCache(Collection<DacoAnswer> answers) {
+		for (DacoAnswer answer : answers) {
+			dacoAnswerDao.releaseFromCache(answer);
+		}
+	}
+
+	public Integer getTotalRecordCount(Long contentId) {
+		return dacoAnswerDao.getTotalRecordCount(contentId);
+	}
+
+	public List<MonitoringSummarySessionDTO> getMonitoringSummary(Long contentId, Long userUid) {
+		List<DacoSession> sessions = dacoSessionDao.getByContentId(contentId);
+		List<MonitoringSummarySessionDTO> result = new ArrayList<MonitoringSummarySessionDTO>(sessions.size());
+		Daco daco = getDacoByContentId(contentId);
+		for (DacoSession session : sessions) {
+			MonitoringSummarySessionDTO monitoringRecordList = new MonitoringSummarySessionDTO(session.getSessionId(), session
+					.getSessionName());
+			List<DacoUser> users = dacoUserDao.getBySessionID(session.getSessionId());
+			List<MonitoringSummaryUserDTO> monitoringUsers = new ArrayList<MonitoringSummaryUserDTO>(users.size());
+			for (DacoUser user : users) {
+				MonitoringSummaryUserDTO monitoringUser = new MonitoringSummaryUserDTO(user.getUid(), user.getLastName() + " "
+						+ user.getFirstName(), user.getLoginName());
+				List<List<DacoAnswer>> records = getDacoAnswersByUserAndDaco(user.getUid(), daco);
+				if (userUid == null || userUid.equals(user.getUid())) {
+					monitoringUser.setRecords(records);
+				}
+				else {
+					monitoringUser.setRecordCount(records.size());
+				}
+				monitoringUsers.add(monitoringUser);
+			}
+			monitoringRecordList.setUsers(monitoringUsers);
+			result.add(monitoringRecordList);
+		}
+		return result;
 	}
 }

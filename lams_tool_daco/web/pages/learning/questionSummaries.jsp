@@ -1,14 +1,25 @@
 <%@ include file="/common/taglibs.jsp"%>
 <div id="questionSummariesDiv">
+
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 </c:if>
 
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:if test="${empty recordList}">
+	<c:set var="recordList" value="${sessionMap.recordList}" />
+</c:if>
+<c:if test="${empty learningMode}">
+	<c:set var="learningMode" value="true" />
+</c:if>
 <c:set var="daco" value="${sessionMap.daco}" />
 <c:set var="questionSummaries" value="${sessionMap.questionSummaries}" />
 <c:set var="ordinal"><fmt:message key="label.authoring.basic.answeroption.ordinal"/></c:set>
 
+<c:set var="userRecordCount" value="${fn:length(recordList)}" />
+<c:set var="allRecordCount" value="${sessionMap.totalRecordCount}" />
+
+<c:if test="${learningMode}">
 	<table>
 		<tr>
 			<td>
@@ -19,7 +30,7 @@
 			<td>${daco.instructions}</td>
 		</tr>
 	</table>
-	
+</c:if>
 	<table cellspacing="0" class="alternative-color" id="summaryTable">
 		<tr>
 			<th><fmt:message key="label.learning.tableheader.questions" /></th>
@@ -29,6 +40,17 @@
 			<th></th>
 			<th><fmt:message key="label.learning.tableheader.summary.learner" /></th>
 			<th><fmt:message key="label.learning.tableheader.summary.all" /></th>
+		</tr>
+		<tr>
+			<td>
+				<fmt:message key="label.learning.heading.recordcount" />
+			</td>
+			<td class="singleSummaryCell">
+				${userRecordCount }
+			</td>
+			<td class="singleSummaryCell">
+				${allRecordCount }
+			</td>
 		</tr>
 		<c:forEach var="question" items="${daco.dacoQuestions}" varStatus="questionStatus">
 			<c:set var="questionSummary" value="${questionSummaries[questionStatus.index]}" />
@@ -58,7 +80,8 @@
 						<c:choose>
 							<c:when test="${question.summary==1 || question.summary==2}">
 								<c:choose>
-									<c:when test="${empty questionSummary.userSummary[0][question.summary]}">
+									<c:when test="${(question.summary==1 && empty questionSummary.userSummary[0].sum) 
+												 || (question.summary==2 && empty questionSummary.userSummary[0].average)}">
 										<td class="singleSummaryCell hint">
 											<fmt:message key="label.learning.heading.norecords" />
 										</td>
@@ -68,10 +91,24 @@
 									</c:when>
 									<c:otherwise>
 										<td class="singleSummaryCell">
-											${questionSummary.userSummary[0][question.summary]}
+											<c:choose>
+												<c:when test="${question.summary==1}">
+													${questionSummary.userSummary[0].sum}
+												</c:when>
+												<c:otherwise>
+													${questionSummary.userSummary[0].average}
+												</c:otherwise>
+											</c:choose>
 										</td>
 										<td class="singleSummaryCell">
-											${questionSummary.allSummary[0][question.summary]}
+											<c:choose>
+												<c:when test="${question.summary==1}">
+													${questionSummary.allSummary[0].sum}
+												</c:when>
+												<c:otherwise>
+													${questionSummary.allSummary[0].average}
+												</c:otherwise>
+											</c:choose>
 										</td>
 									</c:otherwise>
 								</c:choose>
@@ -79,22 +116,22 @@
 							<c:when test="${question.summary==3}">
 								<td>
 									<table class="alternative-color-inner-table">
-										<c:forEach var="summary" items="${questionSummary.userSummary}" begin="1">	
+										<c:forEach var="singleAnswer" items="${questionSummary.userSummary}" begin="1">	
 											<tr>
 												<c:choose>
-													<c:when test="${empty summary[0]}">
+													<c:when test="${empty singleAnswer.answer}">
 														<td class="hint">
 															<fmt:message key="label.learning.summary.emptyanswer" />
 														</td>
 													</c:when>
 													<c:otherwise>
 														<td>
-															${summary[0]}
+															${singleAnswer.answer}
 														</td>
 													</c:otherwise>
 												</c:choose>
 												<td>
-													${summary[2]}
+													${singleAnswer.count}
 												</td>
 											</tr>
 										</c:forEach>
@@ -102,13 +139,13 @@
 								</td>
 								<td>
 									<table class="alternative-color-inner-table">
-										<c:forEach var="summary" items="${questionSummary.allSummary}" begin="1">	
+										<c:forEach var="singleAnswer" items="${questionSummary.allSummary}" begin="1">	
 											<tr>
 												<td>
-													${summary[0]}
+													${singleAnswer.answer}
 												</td>
 												<td>
-													${summary[2]}
+													${singleAnswer.count}
 												</td>
 											</tr>
 										</c:forEach>
@@ -120,13 +157,20 @@
 					<c:when test="${(question.type==7 || question.type==8 || question.type==9)  && not empty question.summary}">
 						<td>
 							<table class="alternative-color-inner-table">
-								<c:forEach var="summary" items="${questionSummary.userSummary}">
+								<c:forEach var="singleAnswer" items="${questionSummary.userSummary}">
 									<tr>
 										<td>
-											${fn:substring(ordinal,summary[0]-1,summary[0])})
+											${fn:substring(ordinal,singleAnswer.answer-1,singleAnswer.answer)})
 										</td>
 										<td>
-											${summary[question.summary]}	
+											<c:choose>
+												<c:when test="${question.summary==1}">
+													${singleAnswer.sum}
+												</c:when>
+												<c:otherwise>
+													${singleAnswer.average}
+												</c:otherwise>
+											</c:choose>
 										</td>
 									</tr>
 								</c:forEach>
@@ -134,13 +178,20 @@
 						</td>
 						<td>
 							<table class="alternative-color-inner-table">
-								<c:forEach var="summary" items="${questionSummary.allSummary}">
+								<c:forEach var="singleAnswer" items="${questionSummary.allSummary}">
 									<tr>
 										<td>
-											${fn:substring(ordinal,summary[0]-1,summary[0])})
+											${fn:substring(ordinal,singleAnswer.answer-1,singleAnswer.answer)})
 										</td>
 										<td>
-											${summary[question.summary]}
+											<c:choose>
+												<c:when test="${question.summary==1}">
+													${singleAnswer.sum}
+												</c:when>
+												<c:otherwise>
+													${singleAnswer.average}
+												</c:otherwise>
+											</c:choose>
 										</td>
 									</tr>
 								</c:forEach>
@@ -148,14 +199,16 @@
 						</td>
 					</c:when>
 					<c:otherwise>
-					<td class="singleSummaryCell">X</td>
-					<td class="singleSummaryCell">X</td>
+					<td class="singleSummaryCell">-</td>
+					<td class="singleSummaryCell">-</td>
 					</c:otherwise>
 				</c:choose>
 			</tr>
 		</c:forEach>
 	</table>
-	<p>
-		<a href="#" onclick="javascript:refreshQuestionSummaries('${sessionMapID}')">Refresh</a>
-	</p>
+	<c:if test="${learningMode}">
+		<p>
+			<a href="#" class="button" onclick="javascript:refreshQuestionSummaries('${sessionMapID}')"><fmt:message key="label.common.summary.refresh" /></a>
+		</p>
+	</c:if>
 </div>

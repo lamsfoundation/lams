@@ -11,7 +11,7 @@
 	<div id="content">
 	<div align="center">
 		<h1>
-			<fmt:message key="label.authoring.heading" />
+			<fmt:message key="label.common.heading" />
 		</h1>
 
 		<B><fmt:message key="message.monitoring.edit.activity.not.editable" /></B>

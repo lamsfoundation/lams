@@ -30,41 +30,42 @@ import org.apache.log4j.Logger;
 
 /**
  * Daco
+ * 
  * @author Dapeng Ni
- *
- * @hibernate.class  table="tl_ladaco10_session"
- *
+ * 
+ * @hibernate.class table="tl_ladaco10_sessions"
+ * 
  */
-public class DacoSession{
-	
+public class DacoSession {
+
 	private static Logger log = Logger.getLogger(DacoSession.class);
-	
+
 	private Long uid;
 	private Long sessionId;
 	private String sessionName;
 	private Daco daco;
 	private Date sessionStartDate;
 	private Date sessionEndDate;
-	//finish or not
+	// finish or not
 	private int status;
-	//daco Questions
-	private Set dacoQuestions;
+	// daco Questions
+	private Set<DacoQuestion> dacoQuestions;
 
-  	
-//  **********************************************************
-  	//		Get/Set methods
-//  **********************************************************
+	// **********************************************************
+	// Get/Set methods
+	// **********************************************************
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 * @hibernate.id generator-class="native" column="uid"
 	 * @return Returns the learnerID.
 	 */
 	public Long getUid() {
 		return uid;
 	}
-	public void setUid(Long uuid) {
-		this.uid = uuid;
+
+	private void setUid(Long uuid) {
+		uid = uuid;
 	}
-	
+
 	/**
 	 * @hibernate.property column="session_end_date"
 	 * @return
@@ -72,9 +73,11 @@ public class DacoSession{
 	public Date getSessionEndDate() {
 		return sessionEndDate;
 	}
+
 	public void setSessionEndDate(Date sessionEndDate) {
 		this.sessionEndDate = sessionEndDate;
 	}
+
 	/**
 	 * @hibernate.property column="session_start_date"
 	 * 
@@ -83,9 +86,11 @@ public class DacoSession{
 	public Date getSessionStartDate() {
 		return sessionStartDate;
 	}
+
 	public void setSessionStartDate(Date sessionStartDate) {
 		this.sessionStartDate = sessionStartDate;
 	}
+
 	/**
 	 * @hibernate.property
 	 * @return
@@ -93,21 +98,23 @@ public class DacoSession{
 	public int getStatus() {
 		return status;
 	}
+
 	public void setStatus(int status) {
 		this.status = status;
 	}
 
 	/**
- 	 * @hibernate.many-to-one  column="content_uid"
- 	 * cascade="none"
+	 * @hibernate.many-to-one column="content_uid" cascade="none" foreign-key="SessionToDaco"
 	 * @return
 	 */
 	public Daco getDaco() {
 		return daco;
 	}
+
 	public void setDaco(Daco daco) {
 		this.daco = daco;
 	}
+
 	/**
 	 * @hibernate.property column="session_id"
 	 * @return
@@ -115,6 +122,7 @@ public class DacoSession{
 	public Long getSessionId() {
 		return sessionId;
 	}
+
 	public void setSessionId(Long sessionId) {
 		this.sessionId = sessionId;
 	}
@@ -129,7 +137,8 @@ public class DacoSession{
 
 	/**
 	 * 
-	 * @param sessionName The session name to set.
+	 * @param sessionName
+	 *            The session name to set.
 	 */
 	public void setSessionName(String sessionName) {
 		this.sessionName = sessionName;
@@ -138,21 +147,18 @@ public class DacoSession{
 	/**
 	 * 
 	 * 
-	 * @hibernate.set lazy="true"
-	 *                inverse="false"
-	 *                cascade="all"
-	 *                order-by="create_date desc"
+	 * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
 	 * @hibernate.collection-key column="session_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoQuestion"
 	 * 
 	 * @return
 	 */
-	public Set getDacoQuestions() {
+	public Set<DacoQuestion> getDacoQuestions() {
 		return dacoQuestions;
 	}
-	public void setDacoQuestions(Set dacoQuestions) {
-		this.dacoQuestions= dacoQuestions;
-	}
 
+	public void setDacoQuestions(Set<DacoQuestion> dacoQuestions) {
+		this.dacoQuestions = dacoQuestions;
+	}
 
 }
