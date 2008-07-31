@@ -258,7 +258,7 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.set lazy="false" cascade="all" inverse="true" order-by="sequence_num asc"
+	 * @hibernate.set lazy="false" cascade="all" inverse="false" order-by="sequence_num asc"
 	 * @hibernate.collection-key column="question_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoAnswerOption"
 	 * @return
