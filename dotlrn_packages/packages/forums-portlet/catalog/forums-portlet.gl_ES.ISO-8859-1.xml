@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<message_catalog package_key="forums-portlet" locale="gl_ES" charset="ISO-8859-1">
+
+  <msg key="admin_pretty_name">Administración dos Fórums</msg>
+  <msg key="disabled">desactivado</msg>
+  <msg key="Forum">Fórum</msg>
+  <msg key="lt_There_should_be_only_">Debe haber somente unha instancia de fórums para propósitos administrativos</msg>
+  <msg key="New">Novo!</msg>
+  <msg key="New_Forum">Novo Fórum</msg>
+  <msg key="No_Forums">Ningún Fórum</msg>
+  <msg key="pretty_name">Fórums</msg>
+</message_catalog>

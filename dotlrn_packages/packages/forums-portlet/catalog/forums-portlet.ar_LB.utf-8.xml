@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<message_catalog package_key="forums-portlet" locale="ar_LB" charset="utf-8">
+
+  <msg key="admin_pretty_name">إدارةُ منتديات</msg>
+  <msg key="disabled">عُطَّل</msg>
+  <msg key="Forum">المنتدى</msg>
+  <msg key="lt_There_should_be_only_">يجب أن يكون هناك مثال واحد فقط من المنتديات لأغراض الإدارة</msg>
+  <msg key="New">جديد!</msg>
+  <msg key="New_Forum">منتدى جديد</msg>
+  <msg key="No_Forums">لا منتديات</msg>
+  <msg key="pretty_name">المنتديات</msg>
+</message_catalog>

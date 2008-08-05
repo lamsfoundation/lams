@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<message_catalog package_key="forums-portlet" locale="hi_IN" charset="utf-8">
+
+  <msg key="admin_pretty_name">मन्च का प्रशासन </msg>
+  <msg key="disabled">विकलान्ग </msg>
+  <msg key="Forum">मन्च</msg>
+  <msg key="lt_There_should_be_only_">मन्च का प्रबन्धन प्रयोजन के लिए ही वहा अकेला एक  अनुरोध होना चाहिए ।     </msg>
+  <msg key="New">नया !  </msg>
+  <msg key="New_Forum">नया मन्च  </msg>
+  <msg key="No_Forums">मन्च नही हे </msg>
+  <msg key="pretty_name">मन्च </msg>
+</message_catalog>

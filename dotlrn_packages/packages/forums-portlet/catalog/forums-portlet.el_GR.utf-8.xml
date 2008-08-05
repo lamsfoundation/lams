@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<message_catalog package_key="forums-portlet" locale="el_GR" charset="utf-8">
+
+  <msg key="admin_pretty_name">Διαχείριση forums</msg>
+  <msg key="disabled">απενεργοποιημένο</msg>
+  <msg key="Forum">Ομάδα συζήτησης</msg>
+  <msg key="goto_forums_name">Μετάβαση στο forum %forums.name%</msg>
+  <msg key="lt_There_should_be_only_">Θα πρέπει να υπάρχει μόνο ένα στιγμιότυπο των forums για σκοπούς διαχείρισης</msg>
+  <msg key="My_forums">Λίστα των Forums</msg>
+  <msg key="New">Νέο!</msg>
+  <msg key="New_Forum">Νέο forum</msg>
+  <msg key="No_Forums">Δεν υπάρχουν διαθέσιμες ομάδες συζήτησης</msg>
+  <msg key="pretty_name">Ομάδες Συζήτησης</msg>
+  <msg key="resources_acs-subsite_new_gif">&lt;img src=&quot;/resources/acs-subsite/new.gif&quot; alt=&quot;Νέο μήνυμα&quot;&gt;</msg>
+</message_catalog>

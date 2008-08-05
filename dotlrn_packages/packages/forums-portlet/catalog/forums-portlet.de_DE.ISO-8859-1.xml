@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<message_catalog package_key="forums-portlet" locale="de_DE" charset="ISO-8859-1">
+
+  <msg key="admin_pretty_name">Diskussionsforen verwalten</msg>
+  <msg key="disabled">Deaktiviert</msg>
+  <msg key="Forum">Forum</msg>
+  <msg key="lt_There_should_be_only_">Aus verwaltungstechnischen Gründen sollten die Diskussionsforen innerhalb einer Gruppe nur einmal eingesetzt werden.</msg>
+  <msg key="New">Neu</msg>
+  <msg key="New_Forum">Neues Forum erstellen</msg>
+  <msg key="No_Forums">Keine Diskussionsforen vorhanden</msg>
+  <msg key="pretty_name">Diskussionsforen</msg>
+  <msg key="resources_acs-subsite_new_gif">&lt;img src=&quot;/resources/acs-subsite/new_de_DE.gif&quot;  /&gt;
+</msg>
+</message_catalog>
