@@ -1,6 +1,10 @@
 ad_library {
 
     Forums Library - Search Service Contracts
+    
+    This library is DEPRECATED and NOT USED. search is implemented using 
+    callbacks now. See forums-callback-procs.tcl
+    This library will be definitely removed in 5.5
 
     @creation-date 2002-08-07
     @author Dave Bauer <dave@thedesignexperience.org>

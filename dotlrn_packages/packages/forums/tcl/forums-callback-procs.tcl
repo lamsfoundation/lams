@@ -190,6 +190,37 @@ ad_proc -public -callback search::url -impl forums_message {} {
     return "[ad_url][db_string select_forums_package_url {}]message-view?message_id=$message_id"
 }
 
+ad_proc -public -callback search::datasource -impl forums_forum {} {
+
+    returns a datasource for the search package
+    this is the content that will be indexed by the full text
+    search engine.
+
+    @author Jeff Davis davis@xarg.net
+    @creation_date 2004-04-01
+} {
+
+    set forum_id $object_id
+
+    if {![db_0or1row datasource {} -column_array datasource]} {
+        return {object_id {} name {} charter {} mime {} storage_type {}}
+    }
+
+    return [array get datasource]
+}
+
+ad_proc -public -callback search::url -impl forums_forum {} {
+
+    returns a url for a forum to the search package
+
+    @author Jeff Davis davis@xarg.net
+    @creation_date 2004-04-01
+
+} {
+    set forum_id $object_id
+    return "[ad_url][db_string select_forums_package_url {}]forum-view?forum_id=$forum_id"
+}
+
 ad_proc -callback application-track::getApplicationName -impl forums {} { 
         callback implementation 
     } {

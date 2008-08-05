@@ -12,7 +12,6 @@
 
 -- Tables to reading information
 
+drop package forum_reading_info;
 drop table forums_reading_info_user;
-drop index forums_reading_info_forum_idx;
-drop index forums_reading_info_user_index;
 drop table forums_reading_info;

@@ -8,13 +8,22 @@ namespace eval forum::format {
     
         Generates a subject string for a reply to an existing message.
 
-    } {
-        set subject "[_ forums.Re] $parent_subject"
-        
-        # trim multiple leading Re:
-        regsub {^(\s*Re:\s*)*} $subject {Re: } subject
+        The prefix is always added using the system-wide locale to avoid
+        the uncontrollable growth of the subject in a multi-language
+        environment.
 
+    } {
+
+        set prefix [lang::message::lookup [lang::system::site_wide_locale] forums.Re]
+        set prefix "[string trim $prefix] "
+
+        # trim multiple leading prefixes:
+        regsub "^($prefix)+" $parent_subject {} parent_subject
+
+        set subject [concat $prefix $parent_subject]
+        
         return $subject
+
     }
 
     ad_proc emoticons {

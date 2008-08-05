@@ -1,5 +1,5 @@
-var forums_collapse_symbol = '<img src="/resources/forums/Collapse16.gif" width="16" height="16" ALT="-" border="0">';
-var forums_expand_symbol = '<img src="/resources/forums/Expand16.gif" width="16" height="16" ALT="+" border="0">';
+var forums_collapse_symbol = '<img src="/resources/forums/Collapse16.gif" width="16" height="16" ALT="' + collapse_alt_text +'" style="border:0">';
+var forums_expand_symbol = '<img src="/resources/forums/Expand16.gif" width="16" height="16" ALT="' + expand_alt_text + '" style="border:0">';
 var forums_replies = new Array();
 
 // toggle visibility
@@ -29,9 +29,11 @@ function forums_toggle(targetId, state){
     }
     if (s) {
         content.className = "dynexpanded";
+        link.title = collapse_link_title;
         symbol = forums_collapse_symbol;
     } else {
         content.className = "dyncollapsed";
+        link.title = expand_link_title;
         symbol = forums_expand_symbol;
     }
 

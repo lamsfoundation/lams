@@ -15,7 +15,12 @@ if {![exists_and_not_null bgcolor]} {
 }
 
 # get the attachments
-set attachments [attachments::get_attachments -object_id $message(message_id)]
+template::multirow create attachments url name
+foreach attachment [attachments::get_attachments -object_id $message(message_id)] {
+    set url [lindex $attachment 2]
+    set name [lindex $attachment 1]
+    template::multirow append attachments $url $name
+}
 
 set attachment_graphic [attachments::graphic_url]
 

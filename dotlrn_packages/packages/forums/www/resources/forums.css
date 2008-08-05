@@ -6,10 +6,9 @@
 }
 
 #forum-thread .action-list {
-        float: right;
-        text-align: right;
-        margin-top: 8px;
-        margin-right: 8px;
+        position: absolute; 
+        right: 0.2em; 
+        top: 0.2em;
 }
 
 #forum-thread .details {
@@ -70,10 +69,12 @@
 }
 
 #forum-thread .odd {
+        position: relative;
         background: #e9effb;
 }
 
 #forum-thread .even {
+        position: relative;
         background: #f3f3f3;
 }
 
@@ -113,4 +114,9 @@
 
 .details img {
   border-style: none;
+}
+
+h2.forum-heading {
+  font-size: 1.0em; 
+  font-weight: normal;
 }

@@ -33,4 +33,18 @@
         </querytext>
     </fullquery>
  
+  <fullquery name="callback::search::datasource::impl::forums_forum.datasource">
+    <querytext>
+      select
+        forum_id as object_id,
+        name as title,
+        charter as content,
+        'text/plain' as mime,
+        'text' as storage_type,
+        '' as keywords
+      from forums_forums
+      where forum_id = :forum_id
+    </querytext>
+  </fullquery>
+
 </queryset>

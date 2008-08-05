@@ -91,17 +91,6 @@ if { $permissions(post_p) || [ad_conn user_id] == 0 } {
 
 set thread_url [export_vars -base forum-view { { forum_id $message(forum_id) } }]
 
-set dynamic_script "
-  <!--
-  collapse_symbol = '<img src=\"/resources/forums/Collapse16.gif\" width=\"16\" height=\"16\" ALT=\"collapse message\" border=\"0\" title=\"collapse message\">';
-  expand_symbol = '<img src=\"/resources/forums/Expand16.gif\" width=\"16\" height=\"16\" ALT=\"expand message\" border=\"0\" title=\"expand message\">';
-  loading_symbol = '<img src=\"/resources/forums/dyn_wait.gif\" width=\"12\" height=\"16\" ALT=\"x\" border=\"0\">';
-  loading_message = 'Loading...';
-  rootdir = 'messages-get';
-  sid = '$message(root_message_id)';
-  //-->
-"
-
 if {$forum(presentation_type) eq "flat"} {
     set display_mode flat
 }
@@ -109,25 +98,16 @@ if {$forum(presentation_type) eq "flat"} {
 # stylesheets
 set lang [ad_conn language]
 template::head::add_css -href /resources/forums/forums.css -media all -lang $lang
-#template::head::add_css -alternate -href /resources/forums/collapse.css -media all -lang $lang -title "collapse"
-#template::head::add_css -alternate -href /resources/forums/expand.css -media all -lang $lang -title "expand"
-#template::head::add_css -alternate -href /resources/forums/print.css -media print -lang $lang
+template::head::add_css -href /resources/forums/print.css -media print -lang $lang
  
+# set vars for i18n
+template::head::add_script -type "text/javascript" -script [subst {
+    var collapse_alt_text='[_ forums.collapse]';
+    var expand_alt_text='[_ forums.expand]';
+    var collapse_link_title='[_ forums.collapse_message]';
+    var expand_link_title='[_ forums.expand_message]';}] -order 1
+
 # js scripts
-template::head::add_script -type "text/javascript" -src "/resources/forums/forums.js"
-template::head::add_script -type "text/javascript" -src "/resources/forums/dynamic-comments.js"
-template::head::add_script -type "text/javascript" -script $dynamic_script
-
-# cookie handling for the expand/collpase
-set onunload_script {
-    saveMsgsState();
-}
-
-set onload_script {
-    loadMsgsState();
-}
-
-template::add_body_handler -event onunload -script $onunload_script  
-template::add_body_handler -event onload -script $onload_script  
+template::head::add_script -type "text/javascript" -src "/resources/forums/forums.js" -order 2
 
 set page_title "#forums.Thread_title#"

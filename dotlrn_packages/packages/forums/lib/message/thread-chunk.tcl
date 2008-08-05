@@ -144,7 +144,7 @@ foreach one_parent_id [array names parent_message] {
         # this is needed to make the javascript work
         lappend one_children_list "null"
     }
-    append response_arrays_stub "  replies\[$one_parent_id\] = new Array([join $one_children_list ","]);\n"
+    append response_arrays_stub "  forums_replies\[$one_parent_id\] = new Array([join $one_children_list ","]);\n"
 }
 append response_arrays_stub "-->
 </script>

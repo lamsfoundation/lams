@@ -24,6 +24,7 @@
   <msg key="charter_max_chars">Charter exceeds maximum length (4000 characters)</msg>
   <msg key="closed">closed</msg>
   <msg key="collapse">Collapse</msg>
+  <msg key="collapse_message">Collapse message</msg>
   <msg key="Confirm">Confirm?</msg>
   <msg key="Confirm_Delete">Confirm Delete:</msg>
   <msg key="Confirm_Move_to">Confirm Move to</msg>
@@ -53,6 +54,7 @@
   <msg key="Enter_a_list_of_email">Enter a list of email addresses, optionally with first and last names. They will be subscribed to this forum. As an example:</msg>
   <msg key="Entire_Thread">Entire Thread</msg>
   <msg key="expand">Expand</msg>
+  <msg key="expand_message">Expand message</msg>
   <msg key="First_Post">First Post</msg>
   <msg key="Flat">Flat</msg>
   <msg key="flat">Flat</msg>

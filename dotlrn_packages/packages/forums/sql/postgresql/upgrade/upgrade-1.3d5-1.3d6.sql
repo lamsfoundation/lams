@@ -1,1 +1,1 @@
-\i forums-reading-info-create.sql
+\i ../forums-reading-info-create.sql

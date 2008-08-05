@@ -1,7 +1,5 @@
-        <ul>
-<% 
-    foreach attachment $attachments {
-        template::adp_puts "<li><a href=\"[lindex $attachment 2]\">[lindex $attachment 1]</a></li>"
-    }
-%>
-        </ul>
+  <ul>
+    <multiple name="attachments">
+      <li><a href="@attachments.url@">@attachments.name@</a></li>
+    </multiple>
+  </ul>

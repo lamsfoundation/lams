@@ -15,6 +15,7 @@
   <msg key="Attachments">Archivos adjuntos:</msg>
   <msg key="Author">Autor</msg>
   <msg key="Available_Forums">Foros disponibles</msg>
+  <msg key="Available_Messages">Mensajes disponibles</msg>
   <msg key="Back_to_thread_label">Regresar a %forum.name%</msg>
   <msg key="Back_to_thread_link">&lt;a href=&quot;%thread_url%&quot;&gt;Volver&lt;/a&gt; a %forum.name%</msg>
   <msg key="Body">Cuerpo del mensaje</msg>
@@ -24,6 +25,7 @@
   <msg key="charter_max_chars">La temática no puede superar el límite de   4000 caracteres</msg>
   <msg key="closed">cerrado</msg>
   <msg key="collapse">Contraer</msg>
+  <msg key="collapse_message">Colapsar mensaje</msg>
   <msg key="Confirm">¿Es correcto?</msg>
   <msg key="Confirm_Delete">Confirmación para eliminar:</msg>
   <msg key="Confirm_Move_to">Confirmar mover mensaje</msg>
@@ -53,6 +55,7 @@
   <msg key="Enter_a_list_of_email">Ingrese una lista de correos electrónicos, si desea agregue nombres y apellidos. Ellos serán suscritos automáticamente a este foro. Por ejemplo:</msg>
   <msg key="Entire_Thread">Hilo completo</msg>
   <msg key="expand">Expandir</msg>
+  <msg key="expand_message">Expandir mensaje</msg>
   <msg key="First_Post">Primer mensaje</msg>
   <msg key="Flat">Sin hilos</msg>
   <msg key="flat">Plano</msg>
@@ -98,6 +101,7 @@
   <msg key="Manage">Administrar</msg>
   <msg key="Manage_Forum">Administrar Foro de Discusión:</msg>
   <msg key="ManageModerate">Administrar/Moderar</msg>
+  <msg key="mark_all_as_read">Marcar todos como leídos</msg>
   <msg key="Message_ID">Mensaje ID</msg>
   <msg key="Message_Subject">Título</msg>
   <msg key="Moderate">Moderar</msg>
@@ -143,6 +147,7 @@
   <msg key="Post_a_Message">Enviar un mensaje</msg>
   <msg key="Post_a_New_Message">Enviar un nuevo mensaje</msg>
   <msg key="Post_a_Reply">Enviar una respuesta</msg>
+  <msg key="post_anonymously">Postear de forma anónima</msg>
   <msg key="Post_to_Forum">Enviar al foro:</msg>
   <msg key="Posted">Enviados</msg>
   <msg key="Posted_by">Enviado por</msg>

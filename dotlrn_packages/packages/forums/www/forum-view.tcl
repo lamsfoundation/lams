@@ -58,6 +58,9 @@ set notification_chunk [notification::display::request_widget \
     -url [ad_conn url]?forum_id=$forum_id \
 ]
 
+template::head::add_css -href /resources/forums/forums.css -media all
+template::head::add_css -href /resources/forums/print.css -media print
+
 set page_title "[_ forums.Forum_1] $forum(name)"
 set context [list [ad_quotehtml $forum(name)]]
 

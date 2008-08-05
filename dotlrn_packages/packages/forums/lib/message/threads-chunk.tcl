@@ -59,7 +59,9 @@ if { [template::util::is_true $permissions(moderate_p)] } {
     lappend actions [_ forums.ManageModerate] [export_vars -base "${base_url}moderate/forum" { forum_id }] [_ forums.ManageModerate]
 }
 
-lappend actions [_ forums.mark_all_as_read] [export_vars -base "${base_url}mark_all_readed" { forum_id }] {}
+if { $useReadingInfo } {
+    lappend actions [_ forums.mark_all_as_read] [export_vars -base "${base_url}mark-all-read" { forum_id }] {}
+}
 
 template::list::create \
     -name messages \
@@ -72,21 +74,23 @@ template::list::create \
     -elements {
         subject {
             label "#forums.Subject#"
-            link_url_col message_url
-	    link_html {title "\#forums.goto_thread_subject\#"}
             display_template {
-		<if @useReadingInfo@>
-		<if @messages.unread_p@>
-		<b>@messages.subject@</b>
-		</if>
-                <else>@messages.subject@</else>
-		</if>
-		<else>
-                <if @messages.new_p@>
-		<b>@messages.subject@</b>
-		</if>
-                <else>@messages.subject@</else>
-		</else>
+                <h2 class="forum-heading">
+                 <a href="@messages.message_url@" title="#forums.goto_thread_subject#">
+                  <if @useReadingInfo@>
+                   <if @messages.unread_p@>
+                    <b>@messages.subject@</b>
+                   </if>
+                   <else>@messages.subject@</else>
+                  </if>
+                  <else>
+                   <if @messages.new_p@>
+                    <b>@messages.subject@</b>
+                   </if>
+                   <else>@messages.subject@</else>
+                  </else>
+                 </a>
+                </h2>
             }
         }
         state_pretty {

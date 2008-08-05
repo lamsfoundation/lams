@@ -63,7 +63,7 @@
 
     <partialquery name="new_query">
         <querytext>
-	case when fm.last_child_post > sysdate-1 then 't' else 'f' end as unread_p
+	case when fm.last_child_post > sysdate-1 then 't' else 'f' end as new_p
         </querytext>
     </partialquery>
 
