@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<message_catalog package_key="forums" locale="ar_EG" charset="utf-8">
+
+  <msg key="approve">وافق</msg>
+  <msg key="Attach">إلصق؟</msg>
+  <msg key="Attachments">:الملحقاتُ</msg>
+  <msg key="Author">المؤلف</msg>
+  <msg key="by_Date">بالتّاريخ</msg>
+  <msg key="by_Forum">بالمنتدى</msg>
+  <msg key="closed">مُغلق</msg>
+  <msg key="Confirm">أكّد؟</msg>
+  <msg key="Confirm_Delete">:أَكّدْ حذفْ</msg>
+  <msg key="Confirm_Post_to_Forum">:أَكّدْ الإرسال إلى المنتدى</msg>
+  <msg key="Create_a_New_Forum">أخلق منتدًى جديدًا</msg>
+  <msg key="Create_New_Forum">إخلقْ منتدى جديداً</msg>
+  <msg key="delete">إحذفْ</msg>
+  <msg key="disable">عَطّلْ</msg>
+  <msg key="disabled">عُطّلْ</msg>
+  <msg key="Last_Post">آخر إرسال</msg>
+  <msg key="Last_post_in_subject">الرسائل الأخيرة في الموضوعِ</msg>
+  <msg key="lt_First_post_in_subject">الرسائل الأولى في الموضوعِ</msg>
+  <msg key="No">لا</msg>
+  <msg key="Post_a_New_Message">أرسلْ رسالةً جديدةً</msg>
+  <msg key="Replies">الردود</msg>
+  <msg key="Search">:إبحثْ</msg>
+  <msg key="Subject">الموضوع</msg>
+  <msg key="Yes">نعم</msg>
+</message_catalog>

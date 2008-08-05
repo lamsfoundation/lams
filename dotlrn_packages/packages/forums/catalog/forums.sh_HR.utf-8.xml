@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<message_catalog package_key="forums" locale="sh_HR" charset="utf-8">
+
+  <msg key="Administer">Administriraj</msg>
+  <msg key="Administration">Administracija</msg>
+  <msg key="approve">potvrditi</msg>
+  <msg key="Are_you_sure_you_want_to_delete_lt">Jeste li sigurni da zelite da obrisete ovu poruku i &lt;strong&gt; sve odgovore na nju &lt;strong&gt;?</msg>
+  <msg key="Attach">Prilozi?</msg>
+  <msg key="Attachments">Prilozi:</msg>
+  <msg key="Author">Pisac</msg>
+  <msg key="Body">Telo</msg>
+  <msg key="by_Date">prema Datumu</msg>
+  <msg key="by_Forum">prema Froumu</msg>
+  <msg key="Charter">Znak</msg>
+  <msg key="closed">zatvoren</msg>
+  <msg key="Confirm">Potvrdi?</msg>
+  <msg key="Confirm_Delete">Potvrdi uklanjanje:</msg>
+  <msg key="Confirm_Post_to_Forum">Potvrdi prilog za forum:</msg>
+  <msg key="Create_a_New_Forum">Formiraj novi forum</msg>
+  <msg key="Create_New_Forum">Formiraj novi forum</msg>
+  <msg key="delete">izbrisi</msg>
+  <msg key="disable">deaktiviraj</msg>
+  <msg key="disable_it">deaktiviraj</msg>
+  <msg key="disabled">deaktiviran</msg>
+  <msg key="Edit">Izmena</msg>
+  <msg key="edit">izmeni</msg>
+  <msg key="Edit_forum">Izmeni forum</msg>
+  <msg key="Edit_Message">Izmeni poruku:</msg>
+  <msg key="Email">Elektronska posta</msg>
+  <msg key="Email_Message">Email poruka:</msg>
+  <msg key="Email_to_a_friend">Email prijatelju</msg>
+  <msg key="enable">aktiviraj</msg>
+  <msg key="enable_it">aktiviraj</msg>
+  <msg key="enabled">aktiviran</msg>
+  <msg key="Entire_Thread">Citav lanac</msg>
+  <msg key="Format">Format</msg>
+  <msg key="Forum">Forum</msg>
+  <msg key="Forum_1">Forum:</msg>
+  <msg key="Forum_ID">Forum ID</msg>
+  <msg key="forum_ID">forum ID</msg>
+  <msg key="Forum_Name">Ime foruma</msg>
+  <msg key="Forum_Posting">Posta foruma</msg>
+  <msg key="ForumID">ForumID</msg>
+  <msg key="Forums">Forumi</msg>
+  <msg key="Forums_Posting_hist_lt">Forumi: Slanje istorije za</msg>
+  <msg key="Fwd">Prosledi:</msg>
+  <msg key="Last_Post">Zadnja poruka</msg>
+  <msg key="lt_Email_a_copy_of_the_f">Email kopiju sledece poruke:</msg>
+  <msg key="lt_Forums_Administration">Administracija foruma</msg>
+</message_catalog>

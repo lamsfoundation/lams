@@ -1,0 +1,1 @@
+<formtemplate id="message"></formtemplate>

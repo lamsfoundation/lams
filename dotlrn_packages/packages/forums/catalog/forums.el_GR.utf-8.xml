@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<message_catalog package_key="forums" locale="el_GR" charset="utf-8">
+
+  <msg key="Administer">Διαχείρηση</msg>
+  <msg key="Attach">Επισύναψη;</msg>
+  <msg key="Author">Συγγραφέας</msg>
+  <msg key="Body">Περιεχόμενο</msg>
+  <msg key="First_Post">Πρώτο Μήνυμα</msg>
+  <msg key="Forum_1">Φόρουμ:</msg>
+  <msg key="Last_Post">Τελευταίο Μήνυμα</msg>
+  <msg key="No">Όχι</msg>
+  <msg key="Post">Αποστολή</msg>
+  <msg key="Post_a_New_Message">Νέο Μήνυμα</msg>
+  <msg key="Preview">Προεπισκόπηση</msg>
+  <msg key="Replies">Απαντήσεις</msg>
+  <msg key="Search_colon">Αναζήτηση:</msg>
+  <msg key="Subject">Θέμα</msg>
+  <msg key="Yes">Ναι</msg>
+</message_catalog>

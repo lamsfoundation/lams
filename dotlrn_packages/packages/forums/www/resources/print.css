@@ -1,0 +1,28 @@
+/* make it white and pick a better print font */
+body {
+        background: white;
+        font-family: "Bitstream vera serif", Georgia,"Times new roman",Times,Serif;
+        font-size: 12pt;
+}
+/* suppress all the nav elements */
+#context-bar,
+#searchbox,
+#side,
+#cop-side,
+#site-header .action-list,
+#site-header .user-greeting,
+#cop-footer { display: none; }
+#content-body { margin-left: 2em; }
+#site-header .system-name { 
+        float: none;
+        text-align: left;
+}
+#forum-thread .action-list { display: none }
+#forum-thread .details IMG { display: none }
+
+/* remove banding */
+#forum-thread div.even, #forum-thread div.odd { 
+        background: white; 
+        margin-bottom: 2em;
+        max-width: 50em;
+}

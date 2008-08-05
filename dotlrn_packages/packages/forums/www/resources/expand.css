@@ -1,0 +1,6 @@
+#forum-thread .content { 
+        display: block;
+}
+#forum-thread .action-list { 
+        display: inline;
+}
