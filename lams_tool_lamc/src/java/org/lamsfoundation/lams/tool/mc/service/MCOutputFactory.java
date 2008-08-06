@@ -115,7 +115,12 @@ public class MCOutputFactory extends OutputFactory {
 	 * Will always return a ToolOutput object.
 	 */
 	private ToolOutput getLearnerMark(McQueUsr queUser) {
-		Long mark = queUser != null ? queUser.getLastAttemptTotalMark() : new Long(0);
+		Long mark;
+		if (queUser != null && queUser.getLastAttemptTotalMark() != null) {
+			mark = queUser.getLastAttemptTotalMark().longValue();
+		} else {
+			mark = new Long(0);
+		}
 		return new ToolOutput(MCOutputFactory.OUTPUT_NAME_LEARNER_MARK, 
 				getI18NText(MCOutputFactory.OUTPUT_NAME_LEARNER_MARK, true), mark);
 	}
