@@ -6,7 +6,7 @@ ad_page_contract {
     
     @author Ernie Ghiglione (ErnieG@melcoe.mq.edu.au)
     @creation-date 2007-04-17
-    @cvs-id $Id$
+    @cvs-id index.tcl,v 1.1 2007/09/12 06:37:02 ernieg Exp
 } {
     
 } -properties {
@@ -28,8 +28,10 @@ set course_id [dotlrn_community::get_community_id]
 set requestSrc [lams2int::get_request_source]
 set notifyCloseURL "[ad_url][util_get_current_url]"
 
-set hashauthor [lams2int::ws::generate_hash -datetime $datetime -username $username -method "author"]
+set course_url "[ad_url][dotlrn_community::get_community_url $course_id]"
 
+
+set hashauthor [lams2int::ws::generate_hash -datetime $datetime -username $username -method "author"]
 
 
 template::list::create \

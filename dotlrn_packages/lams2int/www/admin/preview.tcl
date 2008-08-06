@@ -22,6 +22,7 @@ set username [ad_verify_and_get_user_id]
 
 # get course data
 set course_id [dotlrn_community::get_community_id]
+set course_url [dotlrn_community::get_community_url $course_id]
 
 
 # methods
@@ -34,7 +35,7 @@ set introduction [concat $method sequence_id $sequence_id]
 
 set hashSeq [lams2int::ws::generate_hash -datetime $datetime -username $username]
 
-set lesson_url "$lams_server_url/services/xml/LessonManager?method=$method&serverId=$server_id&ldId=$sequence_id&datetime=[ad_urlencode $datetime]&hashValue=$hashSeq&username=$username&courseId=$course_id&title=[ad_urlencode $name]&desc=[ad_urlencode $introduction]&country=AU&lang=en"
+set lesson_url "$lams_server_url/services/xml/LessonManager?method=$method&serverId=$server_id&ldId=$sequence_id&datetime=[ad_urlencode $datetime]&hashValue=$hashSeq&username=$username&courseId=$course_id&title=[ad_urlencode $name]&desc=[ad_urlencode $introduction]&country=AU&lang=en&customCSV=$username,$course_id,$course_url"
 
 
 set xml [lindex [ad_httpget -url $lesson_url -timeout 30] 1]
