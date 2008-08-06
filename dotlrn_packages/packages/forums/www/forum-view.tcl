@@ -14,8 +14,6 @@ ad_page_contract {
     {returnUrl ""}
 }
 
-ns_log Notice "AAAAAAA $forum_id"
-
 # we create a session to insert the Next Activity button
 # in this session we add the returnUrl as well as the forum_id
 if {![nsv_exists A_$forum_id [ad_conn session_id]] && $returnUrl != ""} {
