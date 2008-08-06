@@ -22,7 +22,7 @@ set username [ad_verify_and_get_user_id]
 
 # get course data
 set course_id [dotlrn_community::get_community_id]
-set course_url [dotlrn_community::get_community_url $course_id]
+set course_url "[ad_url][dotlrn_community::get_community_url $course_id]"
 
 
 # methods
