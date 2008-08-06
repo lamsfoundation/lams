@@ -197,4 +197,6 @@
   <msg key="You_can">You can</msg>
   <msg key="You_may">You may</msg>
   <msg key="Your_Note">Your Note</msg>
+  <msg key="Proceed_to_the_next_LAMS">Proceed to the next LAMS activity</msg>
+  <msg key="Next_Activity">Next Activity</msg>
 </message_catalog>

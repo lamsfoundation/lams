@@ -11,8 +11,22 @@ ad_page_contract {
     {orderby "last_child_post,desc"}
 		{flush_p 0}
     page:optional
+    {returnUrl ""}
 }
 
+ns_log Notice "AAAAAAA $forum_id"
+
+# we create a session to insert the Next Activity button
+# in this session we add the returnUrl as well as the forum_id
+if {![nsv_exists A_$forum_id [ad_conn session_id]] && $returnUrl != ""} {
+    set next_activity_url [export_vars -base exit {returnUrl}]
+    nsv_set A_$forum_id [ad_conn session_id] [list]
+    nsv_lappend A_$forum_id [ad_conn session_id] $next_activity_url
+    nsv_lappend A_$forum_id [ad_conn session_id] $forum_id
+}
+
+#ns_write "[nsv_get A_$forum_id  [ad_conn session_id]]"
+#ad_script_abort
 
 # Get forum data
 if {[catch {forum::get -forum_id $forum_id -array forum} errMsg]} {
