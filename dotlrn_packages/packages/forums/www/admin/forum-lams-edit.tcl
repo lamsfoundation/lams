@@ -9,9 +9,10 @@ ad_page_contract {
 } {
     toolContentID:integer,notnull
     forum_id:integer,notnull
+    {lamsUpdateURL ""}
 }
 
-set returnlams_url "http://192.168.111.40:8080/lams/tool/dlfrum10/authoring.do"
+set returnlams_url $lamsUpdateURL
 set dispatch "updateContent"
 set extToolContentID $forum_id
 
