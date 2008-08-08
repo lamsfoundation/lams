@@ -57,7 +57,7 @@
 <lams:ImgButtonWrapper>
 	<a href="#" onclick="javascript:submitDacoQuestion()" class="button-add-item"><fmt:message
 		key="label.authoring.basic.radio.add" /> </a>
-	<a href="#" onclick="javascript:cancelDacoQuestion()" class="button space-left"><fmt:message key="label.cancel" /> </a>
+	<a href="#" onclick="javascript:cancelDacoQuestion()" class="button space-left"><fmt:message key="label.common.cancel" /> </a>
 </lams:ImgButtonWrapper>
 </body>
 </lams:html>

@@ -22,7 +22,6 @@
                <value>org/lamsfoundation/lams/tool/daco/model/DacoUser.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/daco/model/Daco.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/daco/model/DacoQuestion.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/daco/model/DacoQuestionVisitLog.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/daco/model/DacoAttachment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/daco/model/DacoSession.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/daco/model/DacoAnswer.hbm.xml</value>
@@ -38,17 +37,6 @@
         </property>
     </bean>
     <bean id="dacoQuestionDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoQuestionDAOHibernate">
-        <property name="sessionFactory">
-            <ref local="dacoSessionFactory"/>
-        </property>
-    </bean>
-    <bean id="dacoQuestionVisitDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoQuestionVisitDAOHibernate">
-        <property name="sessionFactory">
-            <ref local="dacoSessionFactory"/>
-        </property>
-    </bean>
-
-   <bean id="dacoAttachmentDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoAttachmentDAOHibernate">
         <property name="sessionFactory">
             <ref local="dacoSessionFactory"/>
         </property>
@@ -70,11 +58,6 @@
             <ref local="dacoSessionFactory"/>
         </property>
     </bean>
-       <bean id="dacoAnswerOptionDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoAnswerOptionDAOHibernate">
-        <property name="sessionFactory">
-            <ref local="dacoSessionFactory"/>
-        </property>
-    </bean>
 
     <!-- Managers -->
 	<bean id="dacoToolContentHandler" class="org.lamsfoundation.lams.tool.daco.util.DacoToolContentHandler">
@@ -88,17 +71,8 @@
         <property name="dacoQuestionDao">
             <ref local="dacoQuestionDao"/>
         </property>
-        <property name="dacoAnswerOptionDao">
-            <ref local="dacoAnswerOptionDao"/>
-        </property>
         <property name="dacoAnswerDao">
             <ref local="dacoAnswerDao"/>
-        </property>
-        <property name="dacoQuestionVisitDao">
-            <ref local="dacoQuestionVisitDao"/>
-        </property>
-        <property name="dacoAttachmentDao">
-            <ref local="dacoAttachmentDao"/>
         </property>
         <property name="dacoUserDao">
             <ref local="dacoUserDao"/>
@@ -127,8 +101,12 @@
    		<property name="exportContentService">
    			<ref bean="exportToolContentService"/>
    		</property>
-   		<property name="messageService"><ref bean="messageService"/></property>
-		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   		
+   		<property name="messageService">
+   			<ref bean="messageService"/>
+   		</property>
+		<property name="coreNotebookService">
+			<ref bean="coreNotebookService"/>
+		</property>   		
     </bean>
 
     <bean id="dacoService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -147,9 +125,6 @@
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setQuestionComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setQuestionVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setQuestionAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

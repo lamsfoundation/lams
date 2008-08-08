@@ -242,7 +242,7 @@ public class DacoUser implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.set lazy="false" cascade="none" inverse="true" order-by="record_id asc, uid asc" outer-join="true"
+	 * @hibernate.set  cascade="none" inverse="true" order-by="record_id asc, uid asc" outer-join="true"
 	 * @hibernate.collection-key column="user_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoAnswer"
 	 */

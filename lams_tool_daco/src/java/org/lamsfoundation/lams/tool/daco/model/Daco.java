@@ -56,7 +56,7 @@ public class Daco implements Cloneable {
 	private String instructions;
 	// advance
 	private boolean runOffline;
-	private boolean lockWhenFinished;
+	private boolean lockOnFinished;
 	private boolean defineLater;
 	private boolean contentInUse;
 	private Short minRecords;
@@ -293,21 +293,21 @@ public class Daco implements Cloneable {
 	}
 
 	/**
-	 * @return Returns the lockWhenFinish.
+	 * @return Returns the lockOnFinish.
 	 * 
 	 * @hibernate.property column="lock_on_finished"
 	 * 
 	 */
-	public boolean getLockWhenFinished() {
-		return lockWhenFinished;
+	public boolean getLockOnFinished() {
+		return lockOnFinished;
 	}
 
 	/**
-	 * @param lockWhenFinished
+	 * @param lockOnFinished
 	 *            Set to true to lock the daco for finished users.
 	 */
-	public void setLockWhenFinished(boolean lockWhenFinished) {
-		this.lockWhenFinished = lockWhenFinished;
+	public void setLockOnFinished(boolean lockOnFinished) {
+		this.lockOnFinished = lockOnFinished;
 	}
 
 	/**
@@ -351,7 +351,7 @@ public class Daco implements Cloneable {
 
 	/**
 	 * 
-	 * @hibernate.set lazy="true" cascade="all" inverse="false" order-by="create_date desc"
+	 * @hibernate.set lazy="true" cascade="all"  order-by="create_date desc"
 	 * @hibernate.collection-key column="content_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoAttachment"
 	 * 
@@ -371,7 +371,7 @@ public class Daco implements Cloneable {
 	/**
 	 * 
 	 * 
-	 * @hibernate.set lazy="false" inverse="false" cascade="all" order-by="uid asc" outer-join="true"
+	 * @hibernate.set   cascade="all" order-by="uid asc" outer-join="true"
 	 * @hibernate.collection-key column="content_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoQuestion"
 	 * 

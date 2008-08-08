@@ -6,21 +6,21 @@ import java.util.List;
 
 public class QuestionSummaryDTO implements Cloneable {
 	private List<QuestionSummarySingleAnswerDTO> userSummary = new ArrayList<QuestionSummarySingleAnswerDTO>();
-	private List<QuestionSummarySingleAnswerDTO> allSummary = new ArrayList<QuestionSummarySingleAnswerDTO>();
+	private List<QuestionSummarySingleAnswerDTO> groupSummary = new ArrayList<QuestionSummarySingleAnswerDTO>();
 	private Long questionUid;
 
-	public void addAllSummarySingleAnswer(int number, QuestionSummarySingleAnswerDTO singleAnswer) {
-		while (number >= allSummary.size()) {
-			allSummary.add(null);
+	public void addGroupSummarySingleAnswer(int number, QuestionSummarySingleAnswerDTO singleAnswer) {
+		while (number >= groupSummary.size()) {
+			groupSummary.add(null);
 		}
-		allSummary.set(number, singleAnswer);
+		groupSummary.set(number, singleAnswer);
 	}
 
-	public QuestionSummarySingleAnswerDTO getAllSummarySingleAnswer(int number) {
-		if (allSummary == null || number >= allSummary.size()) {
+	public QuestionSummarySingleAnswerDTO getGroupSummarySingleAnswer(int number) {
+		if (groupSummary == null || number >= groupSummary.size()) {
 			return null;
 		}
-		return allSummary.get(number);
+		return groupSummary.get(number);
 	}
 
 	public void addUserSummarySingleAnswer(int number, QuestionSummarySingleAnswerDTO singleAnswer) {
@@ -53,12 +53,12 @@ public class QuestionSummaryDTO implements Cloneable {
 		this.userSummary = userSummary;
 	}
 
-	public List<QuestionSummarySingleAnswerDTO> getAllSummary() {
-		return allSummary;
+	public List<QuestionSummarySingleAnswerDTO> getGroupSummary() {
+		return groupSummary;
 	}
 
-	public void setAllSummary(List<QuestionSummarySingleAnswerDTO> allSummary) {
-		this.allSummary = allSummary;
+	public void setGroupSummary(List<QuestionSummarySingleAnswerDTO> groupSummary) {
+		this.groupSummary = groupSummary;
 	}
 
 	@Override

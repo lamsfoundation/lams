@@ -23,19 +23,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.daco.dao.hibernate;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.tool.daco.dao.DacoQuestionDAO;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 
 public class DacoQuestionDAOHibernate extends BaseDAOHibernate implements DacoQuestionDAO {
-
-	private static final String FIND_BY_CONTENT_UID = "from " + DacoQuestion.class.getName()
-			+ " where daco.uid = ? order by create_date asc";
-
-	public List getByContentUid(Long contentUid) {
-		return this.getHibernateTemplate().find(DacoQuestionDAOHibernate.FIND_BY_CONTENT_UID, contentUid);
-	}
 
 	public DacoQuestion getByUid(Long dacoQuestionUid) {
 		return (DacoQuestion) this.getObject(DacoQuestion.class, dacoQuestionUid);

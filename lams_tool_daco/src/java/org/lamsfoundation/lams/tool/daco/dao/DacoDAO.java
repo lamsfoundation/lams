@@ -30,7 +30,4 @@ public interface DacoDAO extends DAO {
 	Daco getByContentId(Long contentId);
 
 	Daco getByUid(Long dacoUid);
-
-	void delete(Daco daco);
-
 }

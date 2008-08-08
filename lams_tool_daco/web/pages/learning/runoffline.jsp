@@ -2,11 +2,13 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@include file="/common/taglibs.jsp"%>
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+
 <lams:html>
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
-
+	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	<c:set var="daco" value="${sessionMap.daco}" />
+	
 	<script type="text/javascript">
 	<!--
 		function finishSession(){
@@ -15,7 +17,7 @@
 			return false;
 		}
 		function continueReflect(){
-			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
+			document.location.href='<c:url value="/learning/startReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
 	-->        
@@ -25,17 +27,17 @@
 <body class="stripes">
 	<div id="content">
 		<h1>
-			${sessionMap.title}
+			${daco.title}
 		</h1>
 
 		<p>
-			<fmt:message key="run.offline.message" />
+			<fmt:message key="message.learning.offline" />
 		</p>
 
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
+		<c:if test="${sessionMap.userFinished and daco.reflectOnActivity}">
 			<div class="small-space-top">
 				<h2>
-					${sessionMap.reflectInstructions}
+					${daco.reflectInstructions}
 				</h2>
 
 				<c:choose>
@@ -53,8 +55,8 @@
 				</c:choose>
 
 				<html:button property="FinishButton"
-					onclick="return continueReflect()" styleClass="button">
-					<fmt:message key="label.edit" />
+					onclick="javascript:continueReflect()" styleClass="button">
+					<fmt:message key="label.common.edit" />
 				</html:button>
 			</div>
 		</c:if>
@@ -62,16 +64,16 @@
 		<div class="space-bottom-top align-right">
 			<c:choose>
 				<c:when
-					test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
+					test="${daco.reflectOnActivity && (not sessionMap.userFinished)}">
 					<html:button property="FinishButton"
-						onclick="return continueReflect()" styleClass="button">
-						<fmt:message key="label.continue" />
+						onclick="javascript:continueReflect()" styleClass="button">
+						<fmt:message key="label.learning.continue" />
 					</html:button>
 				</c:when>
 				<c:otherwise>
 					<html:button property="FinishButton" styleId="finishButton"
 						onclick="return finishSession()" styleClass="button">
-						<fmt:message key="label.finished" />
+						<fmt:message key="label.learning.finished" />
 					</html:button>
 				</c:otherwise>
 			</c:choose>

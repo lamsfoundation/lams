@@ -29,9 +29,9 @@ import org.lamsfoundation.lams.tool.daco.model.DacoUser;
 
 public interface DacoUserDAO extends DAO {
 
-	DacoUser getUserByUserIDAndSessionID(Long userID, Long sessionId);
+	DacoUser getUserByUserIdAndSessionId(Long userID, Long sessionId);
 
-	DacoUser getUserByUserIDAndContentID(Long userId, Long contentId);
+	DacoUser getUserByUserIdAndContentId(Long userId, Long contentId);
 
-	List<DacoUser> getBySessionID(Long sessionId);
+	List<DacoUser> getBySessionId(Long sessionId);
 }

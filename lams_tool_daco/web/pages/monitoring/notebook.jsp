@@ -4,27 +4,37 @@
 
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.learning.title" /></title>
-	<%@ include file="/common/header.jsp"%>
+<c:if test="${not empty param.sessionMapID}">
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
+</c:if>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="daco" value="${sessionMap.daco}"/>
+<c:set var="user" value="${sessionMap.user}"/>
+
+<c:if test="${param.includeMode=='exportportfolio'}">
+	<lams:css localLinkPath="../../" />
+</c:if>
+<%@ include file="/common/header.jsp"%>
+<title><fmt:message key="label.learning.title" /></title>
 </lams:head>
 <body class="stripes">
 		
 			<div id="content">
 				<h1>
-					<fmt:message key="page.title.monitoring.view.reflection"/>
+					<fmt:message key="label.monitoring.reflection.heading"/>
 				</h1>
-				${userDTO.fullName}<BR><BR>
+				${user.fullName}<BR><BR>
 				<table class="alternative-color" cellspacing="0">
 					<tr>
 						<th class="first">
-							<lams:out value="${userDTO.reflectInstrctions}"/>
+							<lams:out value="${daco.reflectInstructions}"/>
 						</th>
 					</tr>
 					<tr>
 						<td>
 							<c:choose>
-								<c:when test="${userDTO.finishReflection}">
-									<lams:out value="${userDTO.reflect}"/>
+								<c:when test="${not empty user.reflectionEntry}">
+									<lams:out value="${user.reflectionEntry}"/>
 								</c:when>
 								<c:otherwise>
 									<fmt:message key="message.no.reflection.available" />
@@ -33,13 +43,7 @@
 						</td>
 					</tr>
 				</table>
-				<table cellpadding="0">
-					<tr>
-						<td>
-							<a href="javascript:window.close();" class="button"><fmt:message key="button.close"/></a>
-						</td>
-					</tr>
-				</table>
+				<a href="javascript:window.close();" class="button"><fmt:message key="label.monitoring.close"/></a>
 			</div>
 		<div id="footer">
 		</div>

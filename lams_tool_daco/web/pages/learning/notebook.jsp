@@ -4,34 +4,30 @@
 
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.learning.title" />
-	</title>
 	<%@ include file="/common/header.jsp"%>
+	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	<c:set var="daco" value="${sessionMap.daco}" />
 	
-	<script type="text/javascript">
-		function disableFinishButton() {
-			document.getElementById("finishButton").disabled = true;
-		}
-	</script>
+	<title>
+		<fmt:message key="label.learning.title" />
+	</title>
 </lams:head>
 <body class="stripes">
 
-	<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-	
-	<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();">
-		<html:hidden property="userID" />
+	<html:form action="/learning/submitReflection" method="post" onsubmit="javascript:document.getElementById('finishButton').disabled = true;">
+		<html:hidden property="userId" />
+		<html:hidden property="sessionId" />
 		<html:hidden property="sessionMapID" />
-
+		
 		<div id="content">
 			<h1>
-				${sessionMap.title}
+				${daco.title}
 			</h1>
 
 			<%@ include file="/common/messages.jsp"%>
 
 			<p>
-				<lams:out value="${sessionMap.reflectInstructions}" />
+				<lams:out value="${daco.reflectInstructions}" />
 			</p>
 
 			<html:textarea cols="60" rows="8" property="entryText"
@@ -39,7 +35,7 @@
 
 			<div class="space-bottom-top align-right">
 				<html:submit styleClass="button" styleId="finishButton">
-					<fmt:message key="label.finished" />
+					<fmt:message key="label.learning.finished" />
 				</html:submit>
 			</div>
 		</div>

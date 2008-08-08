@@ -36,7 +36,10 @@
 	<div class="space-bottom-top"><a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()"><fmt:message
 		key="label.authoring.basic.additionaloptions.show" /> </a><br />
 	</div>
-
+	<div id="additionalOptionsArea" style="display: none;"><html:checkbox property="questionRequired"
+		styleId="questionRequired" styleClass="noBorder">
+		<fmt:message key="label.authoring.basic.required" />
+	</html:checkbox></div>
 	<div class="space-top" style="vertical-align: top">
 	<div class="field-name space-right" style="float: left;"><fmt:message key="label.authoring.basic.longlat.maps" /></div>
 	<select id="longlatMaps" name="longlatMaps" multiple="multiple" size="<%=DacoConstants.LONGLAT_MAPS_LIST.length %>">
@@ -44,21 +47,21 @@
 		<c:forEach var="map" items="<%=DacoConstants.LONGLAT_MAPS_LIST %>">
 			<option value="${map}"
 				<c:forEach var="selectedMap" items="${longlatMapsSelected}">
-			<c:if test="${selectedMap==map}">selected="selected"
-			</c:if>
-			</c:forEach>>${map}</option>
+					<c:if test="${selectedMap==map}">
+						selected="selected"
+					</c:if>
+				</c:forEach>
+			>${map}</option>
 		</c:forEach>
-	</select></div>
+	</select>
+	</div>
 
-	<div id="additionalOptionsArea" style="display: none;"><html:checkbox property="questionRequired"
-		styleId="questionRequired" styleClass="noBorder">
-		<fmt:message key="label.authoring.basic.required" />
-	</html:checkbox></div>
+
 </html:form>
 <lams:ImgButtonWrapper>
 	<a href="#" onclick="javascript:submitDacoQuestion()" class="button-add-item"><fmt:message
 		key="label.authoring.basic.longlat.add" /> </a>
-	<a href="#" onclick="javascript:cancelDacoQuestion()" class="button space-left"><fmt:message key="label.cancel" /> </a>
+	<a href="#" onclick="javascript:cancelDacoQuestion()" class="button space-left"><fmt:message key="label.common.cancel" /> </a>
 </lams:ImgButtonWrapper>
 </body>
 </lams:html>

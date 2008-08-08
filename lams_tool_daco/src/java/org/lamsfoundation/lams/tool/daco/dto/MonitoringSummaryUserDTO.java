@@ -10,17 +10,20 @@ import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
 public class MonitoringSummaryUserDTO {
 
 	private Long uid;
+	private Integer userId;
 	private String fullName;
 	private String loginName;
 	private List<List<DacoAnswer>> records;
 	private Integer recordCount;
+	private String reflectionEntry;
 
 	public MonitoringSummaryUserDTO() {
 
 	}
 
-	public MonitoringSummaryUserDTO(Long uid, String fullName, String loginName) {
+	public MonitoringSummaryUserDTO(Long uid, Integer userId, String fullName, String loginName) {
 		this.uid = uid;
+		this.userId = userId;
 		this.fullName = fullName;
 		this.loginName = loginName;
 	}
@@ -66,5 +69,21 @@ public class MonitoringSummaryUserDTO {
 
 	public void setRecordCount(Integer recordCount) {
 		this.recordCount = recordCount;
+	}
+
+	public String getReflectionEntry() {
+		return reflectionEntry;
+	}
+
+	public void setReflectionEntry(String reflectionEntry) {
+		this.reflectionEntry = reflectionEntry;
+	}
+
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
 	}
 }

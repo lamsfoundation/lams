@@ -102,7 +102,7 @@
 <!-- ========== BEGIN: Learning Definitions ============================== -->
 <action path="/learning/start" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" parameter="start"
 	name="recordForm" scope="request" validate="false">
-	<forward name="success" path="/pages/learning/start.jsp" />
+	<forward name="success" path="/pages/learning/learning.jsp" />
 	<forward name="defineLater" path="/pages/learning/definelater.jsp" />
 	<forward name="runOffline" path="/pages/learning/runoffline.jsp" />
 </action>
@@ -137,8 +137,8 @@
 </action>
 
 <!--  ========= Reflection =============== -->
-<action path="/learning/newReflection" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" name="reflectionForm"
-	validate="false" parameter="newReflection" input="/pages/learning/learning.jsp" scope="request">
+<action path="/learning/startReflection" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" name="reflectionForm"
+	validate="false" parameter="startReflection" input="/pages/learning/learning.jsp" scope="request">
 	<forward name="success" path="/pages/learning/notebook.jsp" />
 </action>
 
@@ -158,6 +158,9 @@
 <action path="/monitoring/viewReflection" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction"
 	parameter="viewReflection">
 	<forward name="success" path="/pages/monitoring/notebook.jsp" />
+</action>
+<action path="/monitoring/changeView" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction" parameter="changeView">
+	<forward name="success" path="/pages/monitoring/listRecords.jsp" />
 </action>
 <!-- ========== BEGIN: Common ============================== -->
 <action path="/clearsession" type="org.lamsfoundation.lams.tool.daco.web.action.ClearSessionAction"></action>

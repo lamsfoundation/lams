@@ -32,37 +32,40 @@ import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
  */
 public class DacoToolContentHandler extends ToolContentHandler {
 
-    private static String repositoryWorkspaceName = "shareddacoworkspace";
-    private static String repositoryUser = "shareddaco";
-    //shareddaco
-    private static char[] repositoryId = {'l','a','m','s','-','s','h','a','r','e','d','r','e','s','o','u','r','c','e','s'};
+	private static String repositoryWorkspaceName = "dacoworkspace";
+	private static String repositoryUser = "daco";
+	//lams-daco
+	private static char[] repositoryId = { 'l', 'a', 'm', 's', '-', 'd', 'a', 'c', 'o' };
 
-    /**
-     * 
-     */
-    public DacoToolContentHandler() {
-        super();
-    }
+	/**
+	 * 
+	 */
+	public DacoToolContentHandler() {
+		super();
+	}
 
-    /* (non-Javadoc)
-     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
-     */
-    public String getRepositoryWorkspaceName() {
-        return repositoryWorkspaceName;
-    }
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
+	 */
+	@Override
+	public String getRepositoryWorkspaceName() {
+		return DacoToolContentHandler.repositoryWorkspaceName;
+	}
 
-    /* (non-Javadoc)
-     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
-     */
-    public String getRepositoryUser() {
-        return repositoryUser;
-    }
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
+	 */
+	@Override
+	public String getRepositoryUser() {
+		return DacoToolContentHandler.repositoryUser;
+	}
 
-    /* (non-Javadoc)
-     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
-     */
-    public char[] getRepositoryId() {
-        return repositoryId;
-    }
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
+	 */
+	@Override
+	public char[] getRepositoryId() {
+		return DacoToolContentHandler.repositoryId;
+	}
 
 }

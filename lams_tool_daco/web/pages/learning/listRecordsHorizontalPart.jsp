@@ -5,17 +5,30 @@
 <lams:html>
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
-	<c:if test="${not empty param.sessionMapID}">
-		<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	</c:if>
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 	<c:set var="daco" value="${sessionMap.daco}" />
-	<c:set var="recordList" value="${sessionMap.recordList}" />
 	<c:set var="tool">
 		<lams:WebAppURL />
 	</c:set>
-	<c:set var="isIE" value="${param.isIE}" />
-	
+	<c:set var="includeMode" value="${param.includeMode}" />
+	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+	<c:set var="monitoringSummary" value="${sessionMap.monitoringSummary}" />
+	<c:choose>
+		<c:when test="${includeMode=='learning'}">
+			<c:set var="recordList" value="${sessionMap.recordList}" />
+		</c:when>
+		<c:otherwise>
+				<c:forEach var="userGroup" items="${monitoringSummary}">
+					<c:forEach var="user" items="${userGroup.users}">
+						<c:if test="${param.userUid==user.uid}">
+							<c:set var="recordList" value="${user.records}" />
+						</c:if>
+					</c:forEach>
+				</c:forEach>
+		</c:otherwise>
+	</c:choose>
+
 	<lams:css style="tabbed" />
 	<style type="text/css">
 		html,body {
@@ -31,6 +44,7 @@
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoLearning.js'/>"></script>
 </lams:head>
 <body class="tabpart">
+	
 	<table id="horizontalListTable" class="alternative-color" cellspacing="0">
 		<tr>
 			<c:forEach var="record" items="${recordList}" varStatus="recordStatus">
@@ -38,15 +52,17 @@
 					<div class="bigNumber" style="float: left; margin-right: 30px;">
 						${recordStatus.index+1}
 					</div>
-					<div >
-					<img src="${tool}includes/images/edit.gif"
-							title="<fmt:message key="label.authoring.basic.edit" />"
-							onclick="javascript:parent.editRecord('${sessionMapID}',${recordStatus.index+1})" />
-					<img src="${tool}includes/images/cross.gif"
-							title="<fmt:message key="label.authoring.basic.delete" />"
-							onclick="javascript:parent.removeRecord('${sessionMapID}',${recordStatus.index+1})" />
-					</div>
-					<div  style="width: 425px;">
+					<c:if test='${includeMode=="learning" and not finishedLock}'>
+						<div >
+						<img src="${tool}includes/images/edit.gif"
+								title="<fmt:message key="label.common.edit" />"
+								onclick="javascript:parent.editRecord('${sessionMapID}',${recordStatus.index+1})" />
+						<img src="${tool}includes/images/cross.gif"
+								title="<fmt:message key="label.common.delete" />"
+								onclick="javascript:parent.removeRecord('${sessionMapID}',${recordStatus.index+1})" />
+						</div>
+					</c:if>
+					<div  style="width: 320px;">
 					</div>
 				</td>
 			</c:forEach>
@@ -60,9 +76,32 @@
 						<c:choose>
 							<c:when test="${generated}">
 								<c:if test="${question.type==10}">
-								<script type="text/javascript">
-									setValue("latitude-record${recordStatus.index+1}-question${questionStatus.index+1}","${answer.answer}");
-								</script>
+									<c:if test="${not empty question.answerOptions and not empty longitude}">
+										<c:set var="mapLinks">
+											<c:forEach var="selectedMap" items="${question.answerOptions}">
+												<c:choose>
+													<c:when test="${selectedMap.answerOption=='Google Maps'}">
+														'<a onclick="javascript:launchPopup('+"'http://maps.google.com/maps?q=${longitude},+${answer.answer}&iwloc=A&hl=en','LAMS');"+'" href="#">${selectedMap.answerOption}</a><br />'+
+													</c:when>
+													<c:when test="${selectedMap.answerOption=='Geabios'}">
+														'<a onclick="javascript:launchPopup('+"'http://www.geabios.com/html/services/maps/PublicMap.htm?lat=${answer.answer}&lon=${longitude}&fov=0.3&title=LAMS','LAMS'); "+'" href="#">${selectedMap.answerOption}</a><br />'+
+													</c:when>
+													<c:when test="${selectedMap.answerOption=='Open Street Map'}">
+														'<a onclick="javascript:launchPopup('+"'http://www.openstreetmap.org/index.html?lat=${answer.answer}&lon=${longitude}&zoom=11','LAMS'); "+'" href="#">${selectedMap.answerOption}</a><br />'+
+													</c:when>
+													<c:when test="${selectedMap.answerOption=='Multimap'}">
+														'<a onclick="javascript:launchPopup('+"'http://www.multimap.com/map/browse.cgi?scale=200000&lon=${longitude}&lat=${answer.answer}&icon=x','LAMS'); "+'" href="#">${selectedMap.answerOption}</a><br />'+
+													</c:when>
+												</c:choose>
+											</c:forEach>
+										</c:set>
+										<script type="text/javascript">
+											document.getElementById("maplinks-record${recordStatus.index+1}-question${questionStatus.index+1}").innerHTML=''+${mapLinks}'';
+										</script>
+										</c:if>
+									<script type="text/javascript">
+										setValue("latitude-record${recordStatus.index+1}-question${questionStatus.index+1}","${answer.answer}");
+									</script>
 								</c:if>
 							</c:when>
 							<c:otherwise>
@@ -78,10 +117,10 @@
 														<c:if test="${questionStatus.index==fn:length(daco.dacoQuestions)-1}">
 																<c:choose>
 																	<c:when test="${fn:length(recordList)>1}">
-																		style="height: 69px"
+																		style="height: 69px;"
 																	</c:when>
 																	<c:otherwise>
-																		style="height: 85px"
+																		style="height: 86px"
 																	</c:otherwise>
 																</c:choose>
 															</c:if>
@@ -90,17 +129,28 @@
 										 >
 										<c:choose>
 											<c:when test="${question.type==1}">
-												<input type="text" size="65" readonly="readonly" value="${answer.answer}"/>
+												<input type="text" size="45" readonly="readonly" value="${answer.answer}" />
 											</c:when>
 											<c:when test="${question.type==2}">
-												<textarea  cols="53" rows="3" readonly="readonly">${answer.answer}</textarea>
+												<textarea cols="35" 
+													<c:choose>
+														<c:when test="${isIE}">
+															rows="3"
+														</c:when>
+														<c:otherwise>
+															rows="2"
+														</c:otherwise>
+													</c:choose>
+												 readonly="readonly">${answer.answer}</textarea>
 											</c:when>
 											<c:when test="${question.type==3}">
 												<input type="text" size="10" readonly="readonly" value="${answer.answer}"/>
 											</c:when>
 											<c:when test="${question.type==4}">
 												<c:set var="date">
-													<lams:Date value="${fn:trim(answer.answer)}" type="date" style="medium"/>
+													<c:if test="${not empty answer.answer}">
+														<lams:Date value="${fn:trim(answer.answer)}" type="date" style="medium"/>
+													</c:if>
 												</c:set>
 												<input type="text" size="20" readonly="readonly" value="${date}" />
 											</c:when>
@@ -110,7 +160,15 @@
 														<fmt:message key="label.learning.file.notuploaded" />
 													</c:when>
 													<c:otherwise>
-														<fmt:message key="label.learning.file.uploaded" /> ${answer.fileName}
+														<fmt:message key="label.learning.file.uploaded" />
+														<c:choose>
+															<c:when test="${includeMode=='exportportfolio'}">
+																<a href="<c:url value='files/${answer.fileUuid}-${answer.fileName}'/>">${answer.fileName}</a>
+															</c:when>
+															<c:otherwise>
+																<a href="<c:url value='/download/?uuid=${answer.fileUuid}&preferDownload=true'/>">${answer.fileName}</a>
+															</c:otherwise>
+														</c:choose>		
 													</c:otherwise>
 												</c:choose>
 											</c:when>
@@ -170,13 +228,18 @@
 														<label><fmt:message key="label.learning.longlat.longitude" /></label>
 														</td>
 														<td>
+															<c:set var="longitude" value="${answer.answer}" />
 															<input type="text" size="10" readonly="readonly" value="${answer.answer}"/>
-														<label><fmt:message key="label.learning.longlat.longitude.unit" /></label><br />
-														</td>									
+															<label><fmt:message key="label.learning.longlat.longitude.unit" /></label><br />
+														</td>
+														<c:if test="${not empty question.answerOptions and not empty longitude}">
+															<td rowspan="2" id="maplinks-record${recordStatus.index+1}-question${questionStatus.index+1}">
+															</td>
+														</c:if>										
 													</tr>
 													<tr>
 														<td>
-														<label><fmt:message key="label.learning.longlat.latitude" /></label>
+															<label><fmt:message key="label.learning.longlat.latitude" /></label>
 														</td>
 														<td>
 														<input type="text" size="10" readonly="readonly" id="latitude-record${recordStatus.index+1}-question${questionStatus.index+1}" />

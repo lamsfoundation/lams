@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.daco.web.form;
 
 import org.apache.log4j.Logger;
@@ -36,10 +36,11 @@ import org.apache.struts.validator.ValidatorForm;
 public class ReflectionForm extends ValidatorForm {
 	private static final long serialVersionUID = -9054365604649146735L;
 	private static Logger logger = Logger.getLogger(ReflectionForm.class.getName());
-	
-	private Integer userID;
-	private String sessionMapID;
+
+	private Integer userId;
+	private Long sessionId;
 	private String entryText;
+	private String sessionMapID;
 
 	public String getEntryText() {
 		return entryText;
@@ -49,12 +50,20 @@ public class ReflectionForm extends ValidatorForm {
 		this.entryText = entryText;
 	}
 
-	public Integer getUserID() {
-		return userID;
+	public Integer getUserId() {
+		return userId;
 	}
 
-	public void setUserID(Integer userUid) {
-		this.userID = userUid;
+	public void setUserId(Integer userUid) {
+		userId = userUid;
+	}
+
+	public Long getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(Long sessionMapID) {
+		sessionId = sessionMapID;
 	}
 
 	public String getSessionMapID() {

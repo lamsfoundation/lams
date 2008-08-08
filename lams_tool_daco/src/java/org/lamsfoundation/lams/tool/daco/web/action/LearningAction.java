@@ -95,15 +95,15 @@ public class LearningAction extends Action {
 		// -----------------------Daco Learner function
 		// ---------------------------
 		if (param.equals("start")) {
-			return start(mapping, form, request, response);
+			return start(mapping, request);
 		}
 
 		if (param.equals("finish")) {
-			return finish(mapping, form, request, response);
+			return finish(mapping, request);
 		}
 
 		if (param.equals("saveOrUpdateRecord")) {
-			return saveOrUpdateRecord(mapping, form, request, response);
+			return saveOrUpdateRecord(mapping, form, request);
 		}
 
 		if (param.equals("editRecord")) {
@@ -127,11 +127,11 @@ public class LearningAction extends Action {
 		}
 
 		// ================ Reflection =======================
-		if (param.equals("newReflection")) {
-			return newReflection(mapping, form, request, response);
+		if (param.equals("startReflection")) {
+			return startReflection(mapping, form, request);
 		}
 		if (param.equals("submitReflection")) {
-			return submitReflection(mapping, form, request, response);
+			return submitReflection(mapping, form, request);
 		}
 
 		return mapping.findForward(DacoConstants.ERROR);
@@ -154,7 +154,7 @@ public class LearningAction extends Action {
 	 * This method will avoid read database again and lost un-saved resouce question lost when user "refresh page",
 	 * 
 	 */
-	protected ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+	protected ActionForward start(ActionMapping mapping, HttpServletRequest request) {
 
 		// initial Session Map
 		SessionMap sessionMap = new SessionMap();
@@ -163,11 +163,9 @@ public class LearningAction extends Action {
 		// save toolContentID into HTTPSession
 		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 
-		Long sessionId = new Long(request.getParameter(DacoConstants.TOOL_SESSION_ID));
+		Long sessionId = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
 
 		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
-		request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, 1);
 
 		// get back the daco and question list and display them on page
 		IDacoService service = getDacoService();
@@ -184,10 +182,10 @@ public class LearningAction extends Action {
 		}
 
 		// check whehter finish lock is on/off
-		boolean lock = daco.getLockWhenFinished() && dacoUser != null && dacoUser.isSessionFinished();
+		boolean lock = daco.getLockOnFinished() && dacoUser != null && dacoUser.isSessionFinished();
 
 		// get notebook entry
-		String entryText = new String();
+		String entryText = null;
 		if (dacoUser != null) {
 			NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 					DacoConstants.TOOL_SIGNATURE, dacoUser.getUserId().intValue());
@@ -204,13 +202,14 @@ public class LearningAction extends Action {
 		sessionMap.put(DacoConstants.ATTR_DACO, daco);
 		sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW, DacoConstants.LEARNING_VIEW_VERTICAL);
 
-		List<List<DacoAnswer>> records = service.getDacoAnswersByUserAndDaco(dacoUser.getUid(), daco);
+		List<List<DacoAnswer>> records = service.getDacoAnswersByUserUid(dacoUser.getUid());
 		sessionMap.put(DacoConstants.ATTR_RECORD_LIST, records);
+		request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, records.size() + 1);
 
-		List<QuestionSummaryDTO> summaries = service.getQuestionSummaries(daco.getUid(), dacoUser.getUid());
+		List<QuestionSummaryDTO> summaries = service.getQuestionSummaries(dacoUser.getUid());
 		sessionMap.put(DacoConstants.ATTR_QUESTION_SUMMARIES, summaries);
 
-		Integer totalRecordCount = service.getTotalRecordCount(daco.getContentId());
+		Integer totalRecordCount = service.getGroupRecordCount(dacoUser.getSession().getSessionId());
 		sessionMap.put(DacoConstants.ATTR_TOTAL_RECORD_COUNT, totalRecordCount);
 
 		// add define later support
@@ -245,8 +244,7 @@ public class LearningAction extends Action {
 	 * @param response
 	 * @return
 	 */
-	protected ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
+	protected ActionForward finish(ActionMapping mapping, HttpServletRequest request) {
 
 		// get back SessionMap
 		String sessionMapID = request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID);
@@ -266,11 +264,11 @@ public class LearningAction extends Action {
 		// get sessionId from HttpServletRequest
 		String nextActivityUrl = null;
 		try {
-			HttpSession ss = SessionManager.getSession();
-			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			Long userID = new Long(user.getUserID().longValue());
+			HttpSession httpSession = SessionManager.getSession();
+			UserDTO user = (UserDTO) httpSession.getAttribute(AttributeNames.USER);
+			Long userUid = new Long(user.getUserID().longValue());
 
-			nextActivityUrl = service.finishToolSession(sessionId, userID);
+			nextActivityUrl = service.finishToolSession(sessionId, userUid);
 			request.setAttribute(DacoConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
 		}
 		catch (DacoApplicationException e) {
@@ -290,14 +288,13 @@ public class LearningAction extends Action {
 	 * @param response
 	 * @return
 	 */
-	protected ActionForward saveOrUpdateRecord(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
+	protected ActionForward saveOrUpdateRecord(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
 		RecordForm recordForm = (RecordForm) form;
 		String sessionMapID = request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
 		Set<DacoQuestion> questionList = daco.getDacoQuestions();
-		Long sessionId = (Long) sessionMap.get(DacoConstants.TOOL_SESSION_ID);
+		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		IDacoService service = getDacoService();
 		DacoUser user = getCurrentUser(service, sessionId, daco);
 
@@ -500,36 +497,41 @@ public class LearningAction extends Action {
 	 * @param response
 	 * @return
 	 */
-	protected ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
+	protected ActionForward startReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
 
 		// get session value
 		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
+
 		ActionErrors errors = validateBeforeFinish(request, sessionMapID);
 		if (!errors.isEmpty()) {
 			this.addErrors(request, errors);
+			refreshQuestionSummaries(mapping, request);
+			request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, request
+					.getParameter(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
 			return mapping.getInputForward();
 		}
+		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
-		ReflectionForm refForm = (ReflectionForm) form;
-		HttpSession ss = SessionManager.getSession();
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		Long toolSessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		IDacoService service = getDacoService();
+		ReflectionForm reflectionForm = (ReflectionForm) form;
+		HttpSession httpSession = SessionManager.getSession();
+		UserDTO userDTO = (UserDTO) httpSession.getAttribute(AttributeNames.USER);
+		DacoUser user = service.getUserByUserIdAndSessionId(userDTO.getUserID().longValue(), toolSessionID);
 
-		refForm.setUserID(user.getUserID());
-		refForm.setSessionMapID(sessionMapID);
+		reflectionForm.setUserId(userDTO.getUserID());
+		reflectionForm.setSessionId(toolSessionID);
 
 		// get the existing reflection entry
-		IDacoService submitFilesService = getDacoService();
 
-		SessionMap map = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-		NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-				DacoConstants.TOOL_SIGNATURE, user.getUserID());
+		NotebookEntry entry = service.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, DacoConstants.TOOL_SIGNATURE,
+				userDTO.getUserID());
 
 		if (entry != null) {
-			refForm.setEntryText(entry.getEntry());
+			reflectionForm.setEntryText(entry.getEntry());
 		}
-
+		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+		reflectionForm.setSessionMapID(sessionMapID);
 		return mapping.findForward(DacoConstants.SUCCESS);
 	}
 
@@ -542,17 +544,11 @@ public class LearningAction extends Action {
 	 * @param response
 	 * @return
 	 */
-	protected ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		ReflectionForm refForm = (ReflectionForm) form;
-		Integer userId = refForm.getUserID();
-
-		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
-		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
+	protected ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request) {
+		ReflectionForm reflectionForm = (ReflectionForm) form;
+		Integer userId = reflectionForm.getUserId();
+		Long sessionId = reflectionForm.getSessionId();
 		IDacoService service = getDacoService();
-
 		// check for existing notebook entry
 		NotebookEntry entry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, DacoConstants.TOOL_SIGNATURE,
 				userId);
@@ -560,16 +556,16 @@ public class LearningAction extends Action {
 		if (entry == null) {
 			// create new entry
 			service.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, DacoConstants.TOOL_SIGNATURE, userId,
-					refForm.getEntryText());
+					reflectionForm.getEntryText());
 		}
 		else {
 			// update existing entry
-			entry.setEntry(refForm.getEntryText());
+			entry.setEntry(reflectionForm.getEntryText());
 			entry.setLastModified(new Date());
 			service.updateEntry(entry);
 		}
 
-		return finish(mapping, form, request, response);
+		return finish(mapping, request);
 	}
 
 	// *************************************************************************************
@@ -634,10 +630,10 @@ public class LearningAction extends Action {
 		HttpSession ss = SessionManager.getSession();
 		// get back login user DTO
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		DacoUser dacoUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()), sessionId);
+		DacoUser dacoUser = service.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()), sessionId);
 
 		if (dacoUser == null) {
-			DacoSession session = service.getDacoSessionBySessionId(sessionId);
+			DacoSession session = service.getSessionBySessionId(sessionId);
 			dacoUser = new DacoUser(user, session);
 			dacoUser.setDaco(daco);
 			service.createUser(dacoUser);
@@ -646,7 +642,7 @@ public class LearningAction extends Action {
 	}
 
 	protected DacoUser getSpecifiedUser(IDacoService service, Long sessionId, Integer userId) {
-		DacoUser dacoUser = service.getUserByIDAndSession(new Long(userId.intValue()), sessionId);
+		DacoUser dacoUser = service.getUserByUserIdAndSessionId(new Long(userId.intValue()), sessionId);
 		if (dacoUser == null) {
 			LearningAction.log.error("Unable to find specified user for daco activity. Screens are likely to fail. SessionId="
 					+ sessionId + " UserId=" + userId);
@@ -1034,7 +1030,8 @@ public class LearningAction extends Action {
 		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, WebUtil.readIntParam(request,
 				DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
-
+		request.setAttribute(DacoConstants.ATTR_LEARNING_CURRENT_TAB, WebUtil.readIntParam(request,
+				DacoConstants.ATTR_LEARNING_CURRENT_TAB));
 		String currentView = (String) sessionMap.get(DacoConstants.ATTR_LEARNING_VIEW);
 		if (DacoConstants.LEARNING_VIEW_HORIZONTAL.equals(currentView)) {
 			sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW, DacoConstants.LEARNING_VIEW_VERTICAL);
@@ -1049,14 +1046,14 @@ public class LearningAction extends Action {
 		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
-		Long sessionId = (Long) sessionMap.get(DacoConstants.TOOL_SESSION_ID);
+		Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		IDacoService service = getDacoService();
 		DacoUser user = getCurrentUser(service, sessionId, daco);
 
-		List<QuestionSummaryDTO> summaries = service.getQuestionSummaries(daco.getUid(), user.getUid());
+		List<QuestionSummaryDTO> summaries = service.getQuestionSummaries(user.getUid());
 		sessionMap.put(DacoConstants.ATTR_QUESTION_SUMMARIES, summaries);
 
-		Integer totalRecordCount = service.getTotalRecordCount(daco.getContentId());
+		Integer totalRecordCount = service.getGroupRecordCount(user.getSession().getSessionId());
 		sessionMap.put(DacoConstants.ATTR_TOTAL_RECORD_COUNT, totalRecordCount);
 		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 

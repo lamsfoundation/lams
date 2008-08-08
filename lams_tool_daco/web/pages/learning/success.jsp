@@ -15,7 +15,7 @@
 <body class="stripes">
 <script type="text/javascript">
 			var reqIDVar = new Date();
-			document.location = "<c:url value='/pages/learning/learning.jsp?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime()+"' />";
+			document.location.href = "<c:url value='/pages/learning/learning.jsp?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime()+"' />";
 		</script>
 </body>
 </lams:html>

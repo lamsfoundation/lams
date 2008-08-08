@@ -37,7 +37,7 @@ public class DacoUserDAOHibernate extends BaseDAOHibernate implements DacoUserDA
 	private static final String FIND_BY_SESSION_ID = "from " + DacoUser.class.getName() + " as u where u.session.sessionId=?";
 	private static final String FIND_BY_CONTENT_ID = "from " + DacoUser.class.getName() + " as u where u.daco.contentId=?";
 
-	public DacoUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
+	public DacoUser getUserByUserIdAndSessionId(Long userID, Long sessionId) {
 		List list = this.getHibernateTemplate().find(DacoUserDAOHibernate.FIND_BY_USER_ID_AND_SESSION_ID,
 				new Object[] { userID, sessionId });
 		if (list == null || list.size() == 0) {
@@ -46,7 +46,7 @@ public class DacoUserDAOHibernate extends BaseDAOHibernate implements DacoUserDA
 		return (DacoUser) list.get(0);
 	}
 
-	public DacoUser getUserByUserIDAndContentID(Long userId, Long contentId) {
+	public DacoUser getUserByUserIdAndContentId(Long userId, Long contentId) {
 		List list = this.getHibernateTemplate().find(DacoUserDAOHibernate.FIND_BY_USER_ID_AND_CONTENT_ID,
 				new Object[] { userId, contentId });
 		if (list == null || list.size() == 0) {
@@ -55,7 +55,7 @@ public class DacoUserDAOHibernate extends BaseDAOHibernate implements DacoUserDA
 		return (DacoUser) list.get(0);
 	}
 
-	public List<DacoUser> getBySessionID(Long sessionId) {
+	public List<DacoUser> getBySessionId(Long sessionId) {
 		return this.getHibernateTemplate().find(DacoUserDAOHibernate.FIND_BY_SESSION_ID, sessionId);
 	}
 }

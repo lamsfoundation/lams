@@ -69,7 +69,7 @@
         />
 
         <property
-            name="lockWhenFinished"
+            name="lockOnFinished"
             type="boolean"
             update="true"
             insert="true"
@@ -103,7 +103,6 @@
         <set
             name="attachments"
             lazy="true"
-            inverse="false"
             cascade="all"
             sort="unsorted"
             order-by="create_date desc"
@@ -123,7 +122,6 @@
         <set
             name="dacoQuestions"
             lazy="false"
-            inverse="false"
             cascade="all"
             sort="unsorted"
             order-by="uid asc"

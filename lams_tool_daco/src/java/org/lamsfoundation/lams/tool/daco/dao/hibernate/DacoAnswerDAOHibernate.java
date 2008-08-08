@@ -1,150 +1,58 @@
 package org.lamsfoundation.lams.tool.daco.dao.hibernate;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
 import org.lamsfoundation.lams.tool.daco.dao.DacoAnswerDAO;
 import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
 import org.lamsfoundation.lams.tool.daco.dto.QuestionSummarySingleAnswerDTO;
-import org.lamsfoundation.lams.tool.daco.model.Daco;
 import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
-import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
+import org.lamsfoundation.lams.tool.daco.model.DacoUser;
 
 public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnswerDAO {
 
-	private static final String FIND_BY_USER_UID = "from " + DacoAnswer.class.getName()
-			+ " as p where p.user.uid=? order by record_id,question_uid";
-	private static final String FIND_BY_QUESTION_UID = "from " + DacoAnswer.class.getName()
-			+ " as p where p.question.uid=? order by user.uid,record_id";
+	private static final String FIND_USER_NUMBER_SUMMARY = "SELECT a.question.uid, " + "SUM(a.answer),AVG(a.answer) FROM "
+			+ DacoAnswer.class.getName()
+			+ " AS a WHERE a.question.type=:numberQuestionType AND a.user.uid=:userUid AND a.answer IS NOT NULL "
+			+ "GROUP BY a.question.uid ORDER BY a.question.uid";
 
-	private static final String FIND_BY_USER_UID_AND_DACO = "from " + DacoAnswer.class.getName()
-			+ " as p where p.user.uid=? and p.question.uid in ([QUESTION_UID_LIST]) order by record_id,question_uid";
-
-	private static final String FIND_USER_NUMBER_SUMMARY = "SELECT q.uid, "
+	private static final String FIND_GROUP_NUMBER_SUMMARY = "SELECT a.question.uid, "
 			+ "SUM(a.answer),AVG(a.answer) FROM "
 			+ DacoAnswer.class.getName()
 			+ " AS a, "
-			+ DacoQuestion.class.getName()
-			+ " AS q WHERE a.question.uid=q.uid AND q.daco.uid=:contentUid AND a.user.uid=:userUid AND q.type=:numberQuestionType AND a.answer IS NOT NULL "
-			+ "GROUP BY q.uid ORDER BY q.uid";
+			+ DacoUser.class.getName()
+			+ " AS u WHERE a.question.type=:numberQuestionType AND u.uid=:userUid AND a.user.session.sessionId=u.session.sessionId AND a.answer IS NOT NULL "
+			+ "GROUP BY a.question.uid ORDER BY a.question.uid";
 
-	private static final String FIND_ALL_NUMBER_SUMMARY = "SELECT q.uid, "
-			+ "SUM(a.answer),AVG(a.answer) FROM "
+	private static final String FIND_USER_ANSWER_ENUMERATION_QUERY = "SELECT DISTINCT a.question.uid, a.answer, a.question.type, COUNT(*) FROM "
+			+ DacoAnswer.class.getName()
+			+ " AS a WHERE a.user.uid=:userUid AND a.question.type IN (:numberQuestionType,:radioQuestionType,:dropdownQuestionType,:checkboxQuestionType) "
+			+ "AND a.answer IS NOT NULL	GROUP BY a.question.uid, a.answer ORDER BY a.question.uid,a.answer";
+
+	private static final String FIND_GROUP_ANSWER_ENUMERATION_QUERY = "SELECT DISTINCT a.question.uid, a.answer, a.question.type, COUNT(*) FROM "
 			+ DacoAnswer.class.getName()
 			+ " AS a, "
-			+ DacoQuestion.class.getName()
-			+ " AS q WHERE a.question.uid=q.uid AND q.daco.uid=:contentUid AND q.type=:numberQuestionType AND a.answer IS NOT NULL "
-			+ "GROUP BY q.uid ORDER BY q.uid";
-
-	private static final String FIND_USER_ANSWER_ENUMERATION_QUERY = "SELECT DISTINCT q.uid, a.answer, q.type, COUNT(*) FROM "
-			+ DacoAnswer.class.getName() + " AS a, " + DacoQuestion.class.getName()
-			+ " AS q WHERE a.question.uid=q.uid	AND q.daco.uid=:contentUid AND a.user.uid=:userUid "
-			+ "AND q.type IN (:numberQuestionType,:radioQuestionType,:dropdownQuestionType,:checkboxQuestionType) "
-			+ "AND a.answer IS NOT NULL	GROUP BY q.uid, a.answer ORDER BY q.uid,a.answer";
-
-	private static final String FIND_ALL_ANSWER_ENUMERATION_QUERY = "SELECT DISTINCT q.uid, a.answer, q.type, COUNT(*) FROM "
-			+ DacoAnswer.class.getName() + " AS a, " + DacoQuestion.class.getName()
-			+ " AS q WHERE a.question.uid=q.uid	AND q.daco.uid=:contentUid "
-			+ "AND q.type IN (:numberQuestionType,:radioQuestionType,:dropdownQuestionType,:checkboxQuestionType) "
-			+ "AND a.answer IS NOT NULL	GROUP BY q.uid, a.answer ORDER BY q.uid,a.answer";
+			+ DacoUser.class.getName()
+			+ " AS u WHERE a.question.type IN (:numberQuestionType,:radioQuestionType,:dropdownQuestionType,:checkboxQuestionType) "
+			+ " AND u.uid=:userUid AND a.user.session.sessionId=u.session.sessionId AND a.answer IS NOT NULL GROUP BY a.question.uid, a.answer ORDER BY a.question.uid,a.answer";
 
 	private static final String FIND_ANSWER_COUNT = "SELECT COUNT(*) FROM " + DacoAnswer.class.getName()
 			+ " AS a WHERE a.question.uid=? AND a.answer IS NOT NULL";
 
 	private static final String FIND_TOTAL_RECORD_COUNT = "SELECT COUNT (DISTINCT a.recordId) FROM " + DacoAnswer.class.getName()
-			+ " AS a WHERE a.question.daco.contentId=?";
+			+ " AS a WHERE a.user.session.sessionId=?";
 
-	private static final String QUESTION_UID_LIST_MARKER = "[QUESTION_UID_LIST]";
-
-	public List<List<DacoAnswer>> getRecordsByUserUid(Long userUid) {
-		List<DacoAnswer> list = getHibernateTemplate().find(DacoAnswerDAOHibernate.FIND_BY_USER_UID, userUid);
-		if (list == null || list.size() == 0) {
-			return null;
-		}
-		int recordId = 1;
-		List<List<DacoAnswer>> result = new LinkedList<List<DacoAnswer>>();
-		List<DacoAnswer> record = new LinkedList<DacoAnswer>();
-		for (DacoAnswer answer : list) {
-			if (recordId != answer.getRecordId()) {
-				result.add(record);
-				record = new LinkedList<DacoAnswer>();
-			}
-			record.add(answer);
-		}
-
-		result.add(record);
-		return result;
-	}
-
-	public List<DacoAnswer> getRecord(Long userUid, Integer recordId) {
-		List list = getRecordsByUserUid(userUid);
-		if (list == null) {
-			return null;
-		}
-		return (List<DacoAnswer>) list.get(recordId);
-	}
-
-	public List<List<DacoAnswer>> getAnswersByQuestionUid(Long questionUid) {
-		List<DacoAnswer> list = getHibernateTemplate().find(DacoAnswerDAOHibernate.FIND_BY_QUESTION_UID, questionUid);
-		if (list == null || list.size() == 0) {
-			return null;
-		}
-		int userUid = 1;
-		List<List<DacoAnswer>> result = new LinkedList<List<DacoAnswer>>();
-		List<DacoAnswer> user = new LinkedList<DacoAnswer>();
-		for (DacoAnswer answer : list) {
-			if (userUid != answer.getUser().getUid()) {
-				result.add(user);
-				user = new LinkedList<DacoAnswer>();
-			}
-			user.add(answer);
-		}
-		result.add(user);
-		return result;
-	}
-
-	public List<List<DacoAnswer>> getRecordsByUserUidAndDaco(Long userUid, Daco daco) {
-		StringBuilder set = new StringBuilder();
-		List<List<DacoAnswer>> result = new LinkedList<List<DacoAnswer>>();
-		for (DacoQuestion question : daco.getDacoQuestions()) {
-			set.append(question.getUid()).append(',');
-		}
-		set.deleteCharAt(set.length() - 1);
-		String modifiedQuery = DacoAnswerDAOHibernate.FIND_BY_USER_UID_AND_DACO.replace(
-				DacoAnswerDAOHibernate.QUESTION_UID_LIST_MARKER, set.toString());
-		List<DacoAnswer> list = getHibernateTemplate().find(modifiedQuery, userUid);
-		if (list != null && list.size() > 0) {
-			int recordNumber = -1;
-			List<DacoAnswer> record = null;
-			for (DacoAnswer answer : list) {
-				if (answer.getRecordId() != recordNumber) {
-					if (record != null) {
-						result.add(record);
-					}
-					record = new LinkedList<DacoAnswer>();
-					recordNumber = answer.getRecordId();
-				}
-				record.add(answer);
-			}
-			result.add(record);
-		}
-		return result;
-	}
-
-	public List<QuestionSummaryDTO> getQuestionSummaries(Long contentUid, Long userUid, List<QuestionSummaryDTO> summaries) {
+	public List<QuestionSummaryDTO> getQuestionSummaries(Long userUid, List<QuestionSummaryDTO> summaries) {
 
 		List<Object[]> result = getHibernateTemplate().findByNamedParam(DacoAnswerDAOHibernate.FIND_USER_NUMBER_SUMMARY,
-				new String[] { "contentUid", "userUid", "numberQuestionType" },
-				new Object[] { contentUid, userUid, DacoConstants.QUESTION_TYPE_NUMBER });
+				new String[] { "userUid", "numberQuestionType" }, new Object[] { userUid, DacoConstants.QUESTION_TYPE_NUMBER });
 
 		for (Object[] objectRow : result) {
 			addNumberSummary(summaries, objectRow, true);
 		}
 
-		result = getHibernateTemplate().findByNamedParam(DacoAnswerDAOHibernate.FIND_ALL_NUMBER_SUMMARY,
-				new String[] { "contentUid", "numberQuestionType" },
-				new Object[] { contentUid, DacoConstants.QUESTION_TYPE_NUMBER });
+		result = getHibernateTemplate().findByNamedParam(DacoAnswerDAOHibernate.FIND_GROUP_NUMBER_SUMMARY,
+				new String[] { "userUid", "numberQuestionType" }, new Object[] { userUid, DacoConstants.QUESTION_TYPE_NUMBER });
 
 		for (Object[] objectRow : result) {
 			addNumberSummary(summaries, objectRow, false);
@@ -152,9 +60,9 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 
 		result = getHibernateTemplate().findByNamedParam(
 				DacoAnswerDAOHibernate.FIND_USER_ANSWER_ENUMERATION_QUERY,
-				new String[] { "contentUid", "userUid", "numberQuestionType", "radioQuestionType", "dropdownQuestionType",
+				new String[] { "userUid", "numberQuestionType", "radioQuestionType", "dropdownQuestionType",
 						"checkboxQuestionType" },
-				new Object[] { contentUid, userUid, DacoConstants.QUESTION_TYPE_NUMBER, DacoConstants.QUESTION_TYPE_RADIO,
+				new Object[] { userUid, DacoConstants.QUESTION_TYPE_NUMBER, DacoConstants.QUESTION_TYPE_RADIO,
 						DacoConstants.QUESTION_TYPE_DROPDOWN, DacoConstants.QUESTION_TYPE_CHECKBOX });
 
 		for (Object[] objectRow : result) {
@@ -162,10 +70,10 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 		}
 
 		result = getHibernateTemplate().findByNamedParam(
-				DacoAnswerDAOHibernate.FIND_ALL_ANSWER_ENUMERATION_QUERY,
-				new String[] { "contentUid", "numberQuestionType", "radioQuestionType", "dropdownQuestionType",
+				DacoAnswerDAOHibernate.FIND_GROUP_ANSWER_ENUMERATION_QUERY,
+				new String[] { "userUid", "numberQuestionType", "radioQuestionType", "dropdownQuestionType",
 						"checkboxQuestionType" },
-				new Object[] { contentUid, DacoConstants.QUESTION_TYPE_NUMBER, DacoConstants.QUESTION_TYPE_RADIO,
+				new Object[] { userUid, DacoConstants.QUESTION_TYPE_NUMBER, DacoConstants.QUESTION_TYPE_RADIO,
 						DacoConstants.QUESTION_TYPE_DROPDOWN, DacoConstants.QUESTION_TYPE_CHECKBOX });
 
 		for (Object[] objectRow : result) {
@@ -189,13 +97,13 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 			int answerIndex = 1;
 			do {
 				currentSingleAnswer = isUserSummary ? summary.getUserSummarySingleAnswer(answerIndex) : summary
-						.getAllSummarySingleAnswer(answerIndex);
+						.getGroupSummarySingleAnswer(answerIndex);
 				if (currentSingleAnswer == null) {
 					if (isUserSummary) {
 						summary.addUserSummarySingleAnswer(answerIndex, singleAnswer);
 					}
 					else {
-						summary.addAllSummarySingleAnswer(answerIndex, singleAnswer);
+						summary.addGroupSummarySingleAnswer(answerIndex, singleAnswer);
 					}
 					currentSingleAnswer = null;
 				}
@@ -209,7 +117,7 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 				summary.addUserSummarySingleAnswer(answerIndex, singleAnswer);
 			}
 			else {
-				summary.addAllSummarySingleAnswer(answerIndex, singleAnswer);
+				summary.addGroupSummarySingleAnswer(answerIndex, singleAnswer);
 			}
 		}
 	}
@@ -219,7 +127,7 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 		long currentUid = Long.parseLong(row[DacoConstants.QUESTION_DB_NUMBER_SUMMARY_QUESTION_UID]);
 		QuestionSummaryDTO summary = summaries.get(findQuestionSequenceNumber(currentUid, summaries));
 		QuestionSummarySingleAnswerDTO singleAnswer = isUserSummary ? summary.getUserSummarySingleAnswer(0) : summary
-				.getAllSummarySingleAnswer(0);
+				.getGroupSummarySingleAnswer(0);
 		singleAnswer.setSum(row[DacoConstants.QUESTION_DB_NUMBER_SUMMARY_SUM]);
 		singleAnswer.setAverage(row[DacoConstants.QUESTION_DB_NUMBER_SUMMARY_AVERAGE]);
 	}
@@ -242,7 +150,7 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 		return row;
 	}
 
-	public Integer getTotalRecordCount(Long contentId) {
-		return (Integer) getHibernateTemplate().find(DacoAnswerDAOHibernate.FIND_TOTAL_RECORD_COUNT, contentId).get(0);
+	public Integer getGroupRecordCount(Long sessionId) {
+		return (Integer) getHibernateTemplate().find(DacoAnswerDAOHibernate.FIND_TOTAL_RECORD_COUNT, sessionId).get(0);
 	}
 }

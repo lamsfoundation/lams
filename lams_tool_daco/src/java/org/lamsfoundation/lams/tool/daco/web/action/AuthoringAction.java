@@ -341,8 +341,6 @@ public class AuthoringAction extends Action {
 		if (!StringUtils.isBlank(constraint)) {
 			question.setDigitsDecimal(Short.parseShort(constraint));
 		}
-		question.setCreateByAuthor(true);
-		question.setHide(false);
 
 		Set<DacoAnswerOption> answerOptions = new LinkedHashSet<DacoAnswerOption>();
 		if (answerOptionList != null) {
@@ -835,7 +833,7 @@ public class AuthoringAction extends Action {
 	protected ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request) throws ServletException {
 
 		// save toolContentID into HTTPSession
-		Long contentId = new Long(WebUtil.readLongParam(request, DacoConstants.TOOL_CONTENT_ID));
+		Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 		// get back the daco and question list and display them on page
 		IDacoService service = getDacoService();
@@ -978,7 +976,7 @@ public class AuthoringAction extends Action {
 		HttpSession ss = SessionManager.getSession();
 		// get back login user DTO
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		DacoUser dacoUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()), dacoForm.getDaco()
+		DacoUser dacoUser = service.getUserByUserIdAndContentId(new Long(user.getUserID().intValue()), dacoForm.getDaco()
 				.getContentId());
 		if (dacoUser == null) {
 			dacoUser = new DacoUser(user, dacoPO);

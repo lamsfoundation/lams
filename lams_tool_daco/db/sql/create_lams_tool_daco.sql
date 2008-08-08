@@ -4,7 +4,6 @@ DROP TABLE if exists tl_ladaco10_attachments cascade;
 DROP TABLE if exists tl_ladaco10_contents cascade;
 DROP TABLE if exists tl_ladaco10_questions cascade;
 DROP TABLE if exists tl_ladaco10_answer_options cascade;
-DROP TABLE if exists tl_ladaco10_question_log cascade;
 DROP TABLE if exists tl_ladaco10_sessions cascade;
 DROP TABLE if exists tl_ladaco10_users cascade;
 DROP TABLE if exists tl_ladaco10_answers cascade;
@@ -55,11 +54,8 @@ CREATE TABLE tl_ladaco10_attachments (
 CREATE TABLE tl_ladaco10_questions (
    uid bigint NOT NULL UNIQUE auto_increment,
    description text,
-   organization_xml text,
    create_by bigint,
    create_date datetime ,
-   create_by_author tinyint,
-   is_hide tinyint  DEFAULT 0,
    is_required tinyint DEFAULT 0,
    question_type tinyint unsigned,
    min_constraint float,
@@ -91,17 +87,6 @@ CREATE TABLE tl_ladaco10_users (
    PRIMARY KEY (uid)
 )TYPE=innodb;
 
-CREATE TABLE tl_ladaco10_question_log (
-   uid bigint NOT NULL UNIQUE auto_increment,
-   access_date datetime ,
-   question_uid bigint,
-   user_uid bigint,
-   complete tinyint,
-   session_uid bigint,
-   PRIMARY KEY (uid)
-)TYPE=innodb;
-
-
 CREATE TABLE tl_ladaco10_answers 
 (uid bigint NOT NULL UNIQUE auto_increment,
 user_uid bigint,
@@ -120,8 +105,6 @@ ALTER TABLE tl_ladaco10_questions ADD INDEX  (create_by), ADD CONSTRAINT Questio
 ALTER TABLE tl_ladaco10_questions ADD INDEX  (content_uid), ADD CONSTRAINT QuestionToDaco FOREIGN KEY (content_uid) REFERENCES tl_ladaco10_contents (uid);
 ALTER TABLE tl_ladaco10_questions ADD INDEX  (session_uid), ADD CONSTRAINT  FOREIGN KEY (session_uid) REFERENCES tl_ladaco10_sessions (uid);
 ALTER TABLE tl_ladaco10_answer_options ADD INDEX  (question_uid), ADD CONSTRAINT  FOREIGN KEY (question_uid) REFERENCES tl_ladaco10_questions (uid);
-ALTER TABLE tl_ladaco10_question_log ADD INDEX  (question_uid), ADD CONSTRAINT LogToQuestion FOREIGN KEY (question_uid) REFERENCES tl_ladaco10_questions (uid);
-ALTER TABLE tl_ladaco10_question_log ADD INDEX  (user_uid), ADD CONSTRAINT LogToUser FOREIGN KEY (user_uid) REFERENCES tl_ladaco10_users (uid);
 ALTER TABLE tl_ladaco10_sessions ADD INDEX  (content_uid), ADD CONSTRAINT SessionToDaco FOREIGN KEY (content_uid) REFERENCES tl_ladaco10_contents (uid);
 ALTER TABLE tl_ladaco10_users ADD INDEX  (session_uid), ADD CONSTRAINT UserToSession FOREIGN KEY (session_uid) REFERENCES tl_ladaco10_sessions (uid);
 ALTER TABLE tl_ladaco10_users ADD INDEX  (content_uid), ADD CONSTRAINT UserToDaco FOREIGN KEY (content_uid) REFERENCES tl_ladaco10_contents (uid);
@@ -129,9 +112,9 @@ ALTER TABLE tl_ladaco10_answers ADD INDEX  (user_uid), ADD CONSTRAINT AnswerToUs
 ALTER TABLE tl_ladaco10_answers ADD INDEX  (question_uid), ADD CONSTRAINT AnswerToQuestion FOREIGN KEY (question_uid) REFERENCES tl_ladaco10_questions (uid);
 
 INSERT INTO `tl_ladaco10_contents` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `lock_on_finished`,`min_records`,`max_records`, `instructions`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`,`reflect_on_activity`) VALUES
-  (1,NULL,NULL,NULL,'Daco',0,0,0,0,'Instructions ',NULL,NULL,0,0,${default_content_id},0);
+  (1,NULL,NULL,NULL,'Data Collection',0,0,0,0,'Instructions',NULL,NULL,0,0,${default_content_id},0);
   
-INSERT INTO `tl_ladaco10_questions` (`uid`, `description`, `organization_xml`, `create_by`, `create_date`, `create_by_author`, `is_hide`, `is_required`, `question_type`, `min_constraint`, `max_constraint`,`digits_decimal`,`summary`, `content_uid`, `session_uid`) VALUES 
-  (DEFAULT,'<div>What is your favourite colour?</div>',NULL,NULL,NOW(),1,0,0,1,NULL,NULL,NULL,NULL,1,NULL);
+INSERT INTO `tl_ladaco10_questions` (`uid`, `description`, `create_by`, `create_date`, `is_required`, `question_type`, `min_constraint`, `max_constraint`,`digits_decimal`,`summary`, `content_uid`, `session_uid`) VALUES 
+  (DEFAULT,'<div>What is your favourite colour?</div>',NULL,NOW(),0,1,NULL,NULL,NULL,NULL,1,NULL);
 
 SET FOREIGN_KEY_CHECKS=1;

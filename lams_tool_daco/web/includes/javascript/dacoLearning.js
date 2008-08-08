@@ -44,21 +44,24 @@
 	}
 	
 	function readHiddenFormValues(){
-		var elementCount = document.getElementById("recordForm").elements.length;
-		for (var questionNumber=1;questionNumber<=elementCount;questionNumber++){
-			var checkboxQuestion=document.getElementById("checkbox-"+questionNumber);
-			if (checkboxQuestion!=null){
-				var checkboxValues = checkboxQuestion.value.split("&");
-				var checkboxNumber = 1;
-				var checkbox = document.getElementById("checkbox-"+questionNumber+"-"+checkboxNumber);
-				while (checkbox!=null){
-					for (var index = 0; index<checkboxValues.length; index++){
-						if (checkboxNumber==checkboxValues[index]){
-							checkbox.checked=true;
+		var recordForm = document.getElementById("recordForm");
+		if (recordForm!=null){
+			var elementCount = document.getElementById("recordForm").elements.length;
+			for (var questionNumber=1;questionNumber<=elementCount;questionNumber++){
+				var checkboxQuestion=document.getElementById("checkbox-"+questionNumber);
+				if (checkboxQuestion!=null){
+					var checkboxValues = checkboxQuestion.value.split("&");
+					var checkboxNumber = 1;
+					var checkbox = document.getElementById("checkbox-"+questionNumber+"-"+checkboxNumber);
+					while (checkbox!=null){
+						for (var index = 0; index<checkboxValues.length; index++){
+							if (checkboxNumber==checkboxValues[index]){
+								checkbox.checked=true;
+							}
 						}
+					checkboxNumber++;
+					checkbox = document.getElementById("checkbox-"+questionNumber+"-"+checkboxNumber);
 					}
-				checkboxNumber++;
-				checkbox = document.getElementById("checkbox-"+questionNumber+"-"+checkboxNumber);
 				}
 			}
 		}
@@ -136,7 +139,8 @@
 	}
 	
 	function changeView(sessionMapID,displayedRecordNumber){
-	   	var param = "sessionMapID="+sessionMapID+"&reqID="+((new Date()).getTime())+"&displayedRecordNumber="+displayedRecordNumber;
+	   	var param = "sessionMapID="+sessionMapID+"&reqID="+((new Date()).getTime())+"&displayedRecordNumber="+displayedRecordNumber
+   					+"&learningCurrentTab="+currentTab;
 	   	var previousCurrentTab = currentTab;
 	    new Ajax.Updater(
 	    		"body",
@@ -157,13 +161,6 @@
 	}
 	
 
-	function resizeHorizontalRecordListFrame(){
-		var horizontalRecordListFrame = document.getElementById('horizontalRecordListFrame');
-		if (horizontalRecordListFrame!=null){
-			horizontalRecordListFrame.style.height=((questionListLength+1)*111)+'px';
-		}
-	}
-	
 	function refreshQuestionSummaries(sessionMapID){
 		var param = "sessionMapID="+sessionMapID+"&reqID="+((new Date()).getTime());
 	    new Ajax.Updater(

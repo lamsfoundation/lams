@@ -80,7 +80,6 @@
         <set
             name="dacoQuestions"
             lazy="true"
-            inverse="false"
             cascade="all"
             sort="unsorted"
             order-by="create_date desc"

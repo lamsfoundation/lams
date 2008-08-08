@@ -35,9 +35,9 @@
 
 	<div id="additionalOptionsArea" style="display: none;">
 
-	<div class="field-name"><fmt:message key="label.authoring.basic.min" /></div>
+	<div class="field-name"><fmt:message key="label.common.min" /></div>
 	<html:text styleId="min" property="min" size="10" />
-	<div class="field-name space-top"><fmt:message key="label.authoring.basic.max" /></div>
+	<div class="field-name space-top"><fmt:message key="label.common.max" /></div>
 	<html:text styleId="max" property="max" size="10" />
 	<div class="field-name space-top"><fmt:message key="label.authoring.basic.number.digitsdecimal" /></div>
 	<html:text styleId="digitsDecimal" property="digitsDecimal" size="10" />
@@ -55,7 +55,7 @@
 <lams:ImgButtonWrapper>
 	<a href="#" onclick="javascript:submitDacoQuestion()" class="button-add-item"><fmt:message
 		key="label.authoring.basic.number.add" /> </a>
-	<a href="#" onclick="javascript:cancelDacoQuestion()" class="button space-left"><fmt:message key="label.cancel" /> </a>
+	<a href="#" onclick="javascript:cancelDacoQuestion()" class="button space-left"><fmt:message key="label.common.cancel" /> </a>
 </lams:ImgButtonWrapper>
 
 </body>

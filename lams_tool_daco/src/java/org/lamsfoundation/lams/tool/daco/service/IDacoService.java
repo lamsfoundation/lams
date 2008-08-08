@@ -25,16 +25,12 @@ package org.lamsfoundation.lams.tool.daco.service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
 import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
-import org.lamsfoundation.lams.tool.daco.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.daco.dto.Summary;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
 import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
 import org.lamsfoundation.lams.tool.daco.model.DacoAttachment;
@@ -43,9 +39,9 @@ import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
 
 /**
- * @author Dapeng.Ni
+ * @author Marcin Cieslak
  * 
- * Interface that defines the contract that all ShareDaco service provider must follow.
+ * Interface that defines the contract that all Data Collection service provider must follow.
  */
 public interface IDacoService {
 
@@ -108,7 +104,7 @@ public interface IDacoService {
 	 * @param long1
 	 * @return
 	 */
-	DacoUser getUserByIDAndContent(Long userID, Long contentId);
+	DacoUser getUserByUserIdAndContentId(Long userID, Long contentId);
 
 	/**
 	 * Get user by sessionID and UserID
@@ -117,7 +113,7 @@ public interface IDacoService {
 	 * @param sessionId
 	 * @return
 	 */
-	DacoUser getUserByIDAndSession(Long long1, Long sessionId);
+	DacoUser getUserByUserIdAndSessionId(Long long1, Long sessionId);
 
 	// ********** Repository methods ***********************
 	/**
@@ -155,11 +151,11 @@ public interface IDacoService {
 
 	/**
 	 * Return all reource questions within the given toolSessionID.
-	 * 
 	 * @param sessionId
+	 * 
 	 * @return
 	 */
-	List<List<DacoAnswer>> getDacoAnswersByUserAndDaco(Long userUid, Daco daco);
+	List<List<DacoAnswer>> getDacoAnswersByUserUid(Long userUid);
 
 	/**
 	 * Get daco which is relative with the special toolSession.
@@ -175,7 +171,7 @@ public interface IDacoService {
 	 * @param sessionId
 	 * @return
 	 */
-	DacoSession getDacoSessionBySessionId(Long sessionId);
+	DacoSession getSessionBySessionId(Long sessionId);
 
 	/**
 	 * Save or update daco session.
@@ -183,8 +179,6 @@ public interface IDacoService {
 	 * @param resSession
 	 */
 	void saveOrUpdateDacoSession(DacoSession resSession);
-
-	void setQuestionAccess(Long dacoQuestionUid, Long userId, Long sessionId);
 
 	/**
 	 * If success return next activity's url, otherwise return null.
@@ -196,29 +190,6 @@ public interface IDacoService {
 	String finishToolSession(Long toolSessionId, Long userId) throws DacoApplicationException;
 
 	DacoQuestion getDacoQuestionByUid(Long questionUid);
-
-	List<DacoUser> getUserListBySessionQuestion(Long sessionId, Long questionUid);
-
-	/**
-	 * Set a daco question visible or not.
-	 * 
-	 * @param questionUid
-	 * @param visible
-	 *            true, question is visible. False, question is invisible.
-	 */
-	void setQuestionVisible(Long questionUid, boolean visible);
-
-	/**
-	 * Get daco question <code>Summary</code> list according to sessionId and skipHide flag.
-	 * 
-	 * @param sessionId
-	 * @param skipHide
-	 *            true, don't get daco question if its <code>isHide</code> flag is true. Otherwise, get all daco question
-	 * @return
-	 */
-	public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
-
-	public List<List<Summary>> exportByContentId(Long contentId);
 
 	/**
 	 * Create refection entry into notebook tool.
@@ -249,14 +220,6 @@ public interface IDacoService {
 	public void updateEntry(NotebookEntry notebookEntry);
 
 	/**
-	 * Get Reflect DTO list grouped by sessionID.
-	 * 
-	 * @param contentId
-	 * @return
-	 */
-	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId);
-
-	/**
 	 * Get user by UID
 	 * 
 	 * @param uid
@@ -266,15 +229,15 @@ public interface IDacoService {
 
 	public String getLocalisedMessage(String key, Object[] args);
 
-	public List<QuestionSummaryDTO> getQuestionSummaries(Long contentUid, Long userUid);
-
-	public List<DacoQuestion> getQuestionByContentUid(Long contentUid);
+	public List<QuestionSummaryDTO> getQuestionSummaries(Long userUid);
 
 	public void releaseDacoFromCache(Daco daco);
 
 	void releaseAnswersFromCache(Collection<DacoAnswer> answers);
 
-	Integer getTotalRecordCount(Long contentId);
+	Integer getGroupRecordCount(Long sessionId);
+
+	Integer getGroupRecordCount(MonitoringSummarySessionDTO monitoringSummary);
 
 	List<MonitoringSummarySessionDTO> getMonitoringSummary(Long contentId, Long userUid);
 }

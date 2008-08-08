@@ -44,9 +44,9 @@ activity_ui_id
 VALUES
 (
 NULL
-, 'Daco'
-, 'Daco'
-, 'Put some help text here.'
+, 'Collecting data with custom structure.'
+, 'Data Collection'
+, 'Asking questions with custom, limited answers.'
 , NULL
 , NULL
 , NULL

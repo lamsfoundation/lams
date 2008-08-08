@@ -44,8 +44,7 @@ public class DacoConstants {
 	public static final short QUESTION_TYPE_LONGLAT = 10;
 
 	// longitude/latitude maps
-	public static final String[] LONGLAT_MAPS_LIST = new String[] { "Google Maps", "Google Earth", "Geabios", "Open Street Map",
-			"Multimap" };
+	public static final String[] LONGLAT_MAPS_LIST = new String[] { "Google Maps", "Geabios", "Open Street Map", "Multimap" };
 
 	// answer options' constants
 	public static final int INIT_ANSWER_OPTION_COUNT = 3;
@@ -86,10 +85,9 @@ public class DacoConstants {
 	public static final Long MONITORING_SUMMARY_MATCH_ALL = null;
 	public static final Long MONITORING_SUMMARY_MATCH_NONE = -1L;
 
-	//common parameters'/attributes' names
-	public static final String TOOL_CONTENT_ID = "toolContentID";
-	public static final String TOOL_SESSION_ID = "toolSessionID";
 	public static final String USER_UID = "userUid";
+	public static final String USER_ID = "userId";
+	public static final String USER_FULL_NAME = "userFullName";
 	// for parameters' name
 
 	public static final String PARAM_FILE_VERSION_ID = "fileVersionId";
@@ -120,13 +118,9 @@ public class DacoConstants {
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 	public static final String ATTR_DACO_FORM = "dacoForm";
 	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
-	public static final String ATTR_TITLE = "title";
 	public static final String ATTR_USER_FINISHED = "userFinished";
 	public static final String ATTR_ANSWER_OPTION_LIST = "answerOptionList";
-	public static final String ATTR_REFLECTION_ON = "reflectOn";
-	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
 	public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
-	public static final String ATTR_REFLECT_LIST = "reflectList";
 	public static final String ATTR_RECORD_OPERATION_SUCCESS = "recordOperationSuccess";
 	public static final String ATTR_DISPLAYED_RECORD_NUMBER = "displayedRecordNumber";
 	public static final String ATTR_LEARNING_VIEW = "learningView";

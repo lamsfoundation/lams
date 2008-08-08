@@ -33,14 +33,14 @@
 				<c:set var="viewURL">
 					<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=false" />
 				</c:set>
-				<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')" class="button"> <fmt:message key="label.view" /> </a> &nbsp;
+				<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')" class="button"> <fmt:message key="label.common.view" /> </a> &nbsp;
 			</td>
 			
 			<td width="5%" align="left">
 				<c:set var="downloadURL">
 					<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
 				</c:set>
-				<a href="<c:out value='${downloadURL}' escapeXml='false'/>" class="button"> <fmt:message key="label.download" /> </a>
+				<a href="<c:out value='${downloadURL}' escapeXml='false'/>" class="button"> <fmt:message key="label.authoring.basic.download" /> </a>
 			</td>
 		</tr>
 	</c:forEach>
@@ -81,14 +81,14 @@
 				<c:set var="viewURL">
 					<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=false" />
 				</c:set>
-				<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')" class="button"> <fmt:message key="label.view" /> </a> &nbsp;
+				<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')" class="button"> <fmt:message key="label.common.view" /> </a> &nbsp;
 			</td>
 			
 			<td width="5%" align="left">
 				<c:set var="downloadURL">
 					<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
 				</c:set>
-				<a href="<c:out value='${downloadURL}' escapeXml='false'/>" class="button"> <fmt:message key="label.download" /> </a>
+				<a href="<c:out value='${downloadURL}' escapeXml='false'/>" class="button"> <fmt:message key="label.authoring.basic.download" /> </a>
 			</td>
 		</tr>
 	</c:forEach>

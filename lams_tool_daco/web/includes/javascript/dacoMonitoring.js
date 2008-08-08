@@ -15,9 +15,9 @@
 		var userDropdown=document.getElementById("userDropdown");
 		var selectedValue = userDropdown.options[userDropdown.selectedIndex].value;
 		if (selectedValue == "SHOW_ALL"){
-	 		document.location = url;
+	 		document.location.href = url;
 	 	}
 	 	else if (selectedValue >= 0){
-	 		document.location = url+"&userUid="+selectedValue;
+	 		document.location.href = url+"&userUid="+selectedValue;
 		}
 	}

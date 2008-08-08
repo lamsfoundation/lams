@@ -16,9 +16,6 @@
 		<fileset dir="${sharedlib}">
 			<include name="**/*.jar"/>
 		</fileset>
-		<fileset dir="lib">
-			<include name="**/*.jar"/>
-		</fileset>
 		<fileset dir="${j2eelibs}">
 			<include name="**/*.jar"/>
 		</fileset>
@@ -275,9 +272,6 @@
 				<include name="common/**"/> 
 				<include name="layout/**"/> 
 			</fileset>
-			<lib dir="${weblib}/reload_2_0_1">
-				<include name="*.jar"/>
-			</lib>
 		</war>
 	</target>
 

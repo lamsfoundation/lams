@@ -12,7 +12,7 @@
 				<td>
 					<a href="#"
 						onclick="removeQuestionAttachment(${questionAttachment.questionIndex})"
-						class="button"> <fmt:message key="label.delete" /> </a>
+						class="button"> <fmt:message key="label.common.delete" /> </a>
 				</td>
 				<td>
 					<img src="${ctxPath}/includes/images/indicator.gif"

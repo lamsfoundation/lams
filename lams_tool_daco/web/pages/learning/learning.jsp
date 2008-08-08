@@ -16,7 +16,6 @@
 	<c:set var="mode" value="${sessionMap.mode}" />
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="daco" value="${sessionMap.daco}" />
-	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 	
 	<c:if test="${empty displayedRecordNumber}">
 		<c:set var="displayedRecordNumber" value="1" />
@@ -33,81 +32,60 @@
 	
 	<script type="text/javascript">
 	 	var currentTab = ${learningCurrentTab};
-	 	var changeViewUrl = "<html:rewrite page='/learning/changeView.do' />";
+	 	var changeViewUrl = "<c:url value='/learning/changeView.do' />";
 	 	var finishUrl = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
-	 	var continueReflectUrl = '<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
+	 	var continueReflectUrl = '<c:url value="/learning/startReflection.do?sessionMapID=${sessionMapID}&displayedRecordNumber=${displayedRecordNumber}"/>';
 	 	var refreshQuestionSummariesUrl = '<c:url value="/learning/refreshQuestionSummaries.do"/>';
-	 	var questionListLength	=  ${fn:length(daco.dacoQuestions)};
     </script>
     <script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoLearning.js'/>"></script>
 </lams:head>
 
 <body class="stripes" onLoad="init()" id="body">
-<div id="page">
-
+<div id="page-learner">
 <h1><fmt:message key="label.learning.title" /></h1>
-<div id="header">
+<div id="header-learner">
 <lams:Tabs useKey="true" control="true">
 	<lams:Tab id="1" key="label.learning.heading.add" />
 	<lams:Tab id="2" key="label.learning.heading.list" />
 	<lams:Tab id="3" key="label.learning.heading.summary" />
 </lams:Tabs></div>
 
-<div id="content">
+<div id="content-learner">
 <div style="float: right; margin-left: 10px; padding-top: 4px" class="help">
-	<img src="${tool}includes/images/uparrow.gif" title="<fmt:message key="label.learning.view.change" />"
+	<img src="${tool}includes/images/uparrow.gif" title="<fmt:message key="label.common.view.change" />"
 	 onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" />
 </div>
+
 <lams:help toolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" module="learning" />
 
 
 
-<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
+<c:if test="${daco.lockOnFinished and mode != 'teacher'}">
 	<div class="info"><c:choose>
 		<c:when test="${sessionMap.userFinished}">
-			<fmt:message key="message.activityLocked" />
+			<fmt:message key="message.learning.activityLocked" />
 		</c:when>
 		<c:otherwise>
-			<fmt:message key="message.warnLockOnFinish" />
+			<fmt:message key="message.learning.warnLockOnFinish" />
 		</c:otherwise>
 	</c:choose></div>
 </c:if>
 
 <lams:TabBody id="1" titleKey="label.learning.heading.add" page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}" />
-<lams:TabBody id="2" titleKey="label.learning.heading.list" page="listRecords.jsp?learningMode=true" />
+<lams:TabBody id="2" titleKey="label.learning.heading.list" page="listRecords.jsp?includeMode=learning" />
 <lams:TabBody id="3" titleKey="label.learning.heading.summary" page="questionSummaries.jsp" />
 		
-<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-	<div class="small-space-top">
-	<h2>${sessionMap.reflectInstructions}</h2>
-
-	<c:choose>
-		<c:when test="${empty sessionMap.reflectEntry}">
-			<p><em> <fmt:message key="message.no.reflection.available" /> </em></p>
-		</c:when>
-		<c:otherwise>
-			<p><lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" /></p>
-		</c:otherwise>
-	</c:choose>
-	
-	<c:if test="${mode != 'teacher'}">
-		<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
-			<fmt:message key="label.edit" />
-		</html:button>
-	</c:if></div>
-</c:if>
-
 <c:if test="${mode != 'teacher'}">
-	<div class="space-bottom-top align-right space-right">
+	<div class="space-top align-right space-right" style="padding-right: 20px;">
 		<c:choose>
-			<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-				<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
-					<fmt:message key="label.continue" />
+			<c:when test="${daco.reflectOnActivity && (not sessionMap.userFinished)}">
+				<html:button property="FinishButton" onclick="javascript:continueReflect()" styleClass="button">
+					<fmt:message key="label.learning.continue" />
 				</html:button>
 			</c:when>
 			<c:otherwise>
-				<html:button property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="button">
-					<fmt:message key="label.finished" />
+				<html:button property="FinishButton" styleId="finishButton" onclick="javascript:finishSession()" styleClass="button">
+					<fmt:message key="label.learning.finished" />
 				</html:button>
 			</c:otherwise>
 		</c:choose>
@@ -116,7 +94,7 @@
 
 </div>
 
-<div id="footer"></div>
+<div id="footer-learner"></div>
 <!-- end page div --></div>
 </body>
 </lams:html>

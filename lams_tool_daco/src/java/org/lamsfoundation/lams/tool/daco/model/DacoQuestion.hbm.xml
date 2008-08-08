@@ -33,15 +33,6 @@
             column="description"
         />
 
-        <property
-            name="organizationXml"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="organization_xml"
-            length="65535"
-        />
-
         <many-to-one
             name="createBy"
             class="org.lamsfoundation.lams.tool.daco.model.DacoUser"
@@ -59,22 +50,6 @@
             update="true"
             insert="true"
             column="create_date"
-        />
-
-        <property
-            name="createByAuthor"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="create_by_author"
-        />
-
-        <property
-            name="hide"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="is_hide"
         />
 
         <property
@@ -128,7 +103,6 @@
         <set
             name="answerOptions"
             lazy="false"
-            inverse="true"
             cascade="all"
             sort="unsorted"
             order-by="sequence_num asc"

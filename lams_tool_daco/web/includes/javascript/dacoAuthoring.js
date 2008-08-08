@@ -25,7 +25,7 @@
     	|| checkNonDefaultValue("min")
     	|| checkNonDefaultValue("digitsDecimal")
     	|| $('#questionRequired').attr('checked')
-    	|| !($("#noSummaryOption").attr("selected"))) {
+    	|| ($("#noSummaryOption").length>0 && !$("#noSummaryOption").attr("selected"))) {
    		toggleAdditionalOptionsArea();
    }
   }

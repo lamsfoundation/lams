@@ -50,8 +50,4 @@ public class DacoDAOHibernate extends BaseDAOHibernate implements DacoDAO {
 	public Daco getByUid(Long dacoUid) {
 		return (Daco) getObject(Daco.class, dacoUid);
 	}
-
-	public void delete(Daco daco) {
-		this.getHibernateTemplate().delete(daco);
-	}
 }

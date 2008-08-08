@@ -83,7 +83,7 @@
 				<fmt:message key="label.authoring.choosefile.button" />
 			</html:file>
 			<a href="#" onclick="javascript:doUploadOnline();" class="button">
-				<fmt:message key="label.authoring.upload.online.button" /> </a>
+				<fmt:message key="label.authoring.online.upload" /> </a>
 		</td>
 	</tr>
 
@@ -122,7 +122,7 @@
 				<fmt:message key="label.authoring.choosefile.button" />
 			</html:file>
 			<a href="#" onclick="javascript:doUploadOffline();" class="button">
-				<fmt:message key="label.authoring.upload.offline.button" /> </a>
+				<fmt:message key="label.authoring.offline.upload" /> </a>
 		</td>
 	</tr>
 </table>

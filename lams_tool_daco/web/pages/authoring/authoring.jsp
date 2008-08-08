@@ -55,7 +55,7 @@
 <div id="header">
 		<lams:Tabs useKey="true" control="true">
 			<lams:Tab id="1" key="label.authoring.heading.basic" />
-			<lams:Tab id="2" key="label.authoring.heading.advance" />
+			<lams:Tab id="2" key="label.authoring.heading.advanced" />
 			<lams:Tab id="3" key="label.authoring.heading.instructions" />
 		</lams:Tabs></div>
 		<!-- start tabs -->
@@ -78,7 +78,7 @@
 			<!-- end of content (Basic) -->
 
 			<!-- tab content 2 (Advanced) -->
-			<lams:TabBody id="2" titleKey="label.authoring.heading.advance.description" page="advanced.jsp" />
+			<lams:TabBody id="2" titleKey="label.authoring.heading.advanced.description" page="advanced.jsp" />
 			<!-- end of content (Advanced) -->
 
 			<!-- tab content 3 (Instructions) -->
@@ -88,7 +88,7 @@
 
 			<!-- Button Row -->
 			<%--  Default value 
-				cancelButtonLabelKey="label.authoring.cancel.button"
+				cancelButtonLabelKey="label.common.cancel"
 				saveButtonLabelKey="label.authoring.save.button"
 				cancelConfirmMsgKey="message.authoring.cancel.save"
 				accessMode="author"

@@ -4,7 +4,7 @@
 
 <c:if test="${!sessionMap.isPageEditable}">
 	<p class="warning">
-		<fmt:message key="message.alertContentEdit" />
+		<fmt:message key="message.learning.alertContentEdit" />
 	</p>
 </c:if>
 

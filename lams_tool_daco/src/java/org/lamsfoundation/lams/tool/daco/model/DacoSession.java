@@ -147,7 +147,7 @@ public class DacoSession {
 	/**
 	 * 
 	 * 
-	 * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
+	 * @hibernate.set lazy="true"  cascade="all" order-by="create_date desc"
 	 * @hibernate.collection-key column="session_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoQuestion"
 	 * 

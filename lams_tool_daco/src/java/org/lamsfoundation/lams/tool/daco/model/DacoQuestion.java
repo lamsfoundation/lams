@@ -56,12 +56,8 @@ public class DacoQuestion implements Cloneable {
 
 	private String initialQuestion;
 
-	private String organizationXml;
-
 	private Set<DacoAnswerOption> answerOptions = new LinkedHashSet<DacoAnswerOption>();
 
-	private boolean isHide;
-	private boolean isCreateByAuthor;
 	private boolean isRequired;
 
 	private Date createDate;
@@ -125,18 +121,6 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="organization_xml" length="65535"
-	 * @return
-	 */
-	public String getOrganizationXml() {
-		return organizationXml;
-	}
-
-	public void setOrganizationXml(String organizationXml) {
-		this.organizationXml = organizationXml;
-	}
-
-	/**
 	 * @hibernate.many-to-one cascade="none" column="create_by" foreign-key="QuestionToUser"
 	 * 
 	 * @return
@@ -159,30 +143,6 @@ public class DacoQuestion implements Cloneable {
 
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
-	}
-
-	/**
-	 * @hibernate.property column="create_by_author"
-	 * @return
-	 */
-	public boolean isCreateByAuthor() {
-		return isCreateByAuthor;
-	}
-
-	public void setCreateByAuthor(boolean isCreateByAuthor) {
-		this.isCreateByAuthor = isCreateByAuthor;
-	}
-
-	/**
-	 * @hibernate.property column="is_hide"
-	 * @return
-	 */
-	public boolean isHide() {
-		return isHide;
-	}
-
-	public void setHide(boolean isHide) {
-		this.isHide = isHide;
 	}
 
 	/**
@@ -258,7 +218,7 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.set lazy="false" cascade="all" inverse="false" order-by="sequence_num asc"
+	 * @hibernate.set cascade="all" order-by="sequence_num asc"
 	 * @hibernate.collection-key column="question_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoAnswerOption"
 	 * @return

@@ -23,19 +23,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.daco.dao;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 
 public interface DacoQuestionDAO extends DAO {
-
-	/**
-	 * Return all daco questions which is uploaded by author in given dacoUid.
-	 * 
-	 * @param dacoUid
-	 * @return
-	 */
-	List getByContentUid(Long dacoId);
 
 	DacoQuestion getByUid(Long dacoQuestionUid);
 }

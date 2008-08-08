@@ -23,7 +23,7 @@
 		</h1>
 	<div id="header">
 		<lams:Tabs>
-			<lams:Tab id="1" key="tab.monitoring.summary" />
+			<lams:Tab id="1" key="label.common.summary" />
 			<lams:Tab id="2" key="tab.monitoring.instructions" />
 			<lams:Tab id="3" key="tab.monitoring.edit.activity" />			
 			<lams:Tab id="4" key="tab.monitoring.statistics" />
@@ -32,7 +32,7 @@
 	<div id="content">
 			<lams:help toolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" module="monitoring"/>
 			
-			<lams:TabBody id="1" titleKey="tab.monitoring.summary" page="summary.jsp" />
+			<lams:TabBody id="1" titleKey="label.common.summary" page="summary.jsp" />
 			<lams:TabBody id="2" titleKey="tab.monitoring.instructions" page="instructions.jsp"/>
 			<lams:TabBody id="3" titleKey="tab.monitoring.edit.activity" page="editactivity.jsp" />			
 			<lams:TabBody id="4" titleKey="tab.monitoring.statistics" page="statistics.jsp" />

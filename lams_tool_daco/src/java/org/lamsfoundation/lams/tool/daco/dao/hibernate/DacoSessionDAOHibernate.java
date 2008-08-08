@@ -46,12 +46,7 @@ public class DacoSessionDAOHibernate extends BaseDAOHibernate implements DacoSes
 		return getHibernateTemplate().find(DacoSessionDAOHibernate.FIND_BY_CONTENT_ID, toolContentId);
 	}
 
-	public void delete(DacoSession session) {
-		this.getHibernateTemplate().delete(session);
-	}
-
 	public void deleteBySessionId(Long toolSessionId) {
 		this.removeObject(DacoSession.class, toolSessionId);
 	}
-
 }

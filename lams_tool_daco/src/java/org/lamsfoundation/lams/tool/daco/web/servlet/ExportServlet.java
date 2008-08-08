@@ -26,7 +26,6 @@
 package org.lamsfoundation.lams.tool.daco.web.servlet;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,10 +35,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
-import org.lamsfoundation.lams.tool.daco.dto.Summary;
+import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
+import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummaryUserDTO;
+import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
+import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
 import org.lamsfoundation.lams.tool.daco.service.DacoApplicationException;
@@ -54,44 +58,42 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * Export portfolio servlet to export all shared daco into offline HTML package.
+ * Export portfolio servlet to export all Data Collection daco into offline HTML package.
  * 
- * @author Steve.Ni
+ * @author Marcin Cieslak
  * 
- * @version $Revision$
  */
 public class ExportServlet extends AbstractExportPortfolioServlet {
-	private static final long serialVersionUID = -4529093489007108143L;
 
 	private static Logger logger = Logger.getLogger(ExportServlet.class);
 
-	private final String FILENAME = "shared_daco_main.html";
-
+	private final String FILENAME = "daco_main.html";
 	private DacoToolContentHandler handler;
 
 	@Override
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
-
-		// initial sessionMap
+		handler = getToolContentHandler();
 		SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-
+		String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+				+ request.getContextPath();
 		try {
 			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
-				sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.LEARNER);
-				learner(request, response, directoryName, cookies, sessionMap);
+				learnerExport(sessionMap, directoryName);
 			}
 			else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
-				sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
-				teacher(request, response, directoryName, cookies, sessionMap);
+				File learnerDirectory = new File(new File(directoryName), "learners");
+				learnerDirectory.mkdir();
+				new File(learnerDirectory, "files").mkdir();
+				teacherExport(sessionMap, basePath, learnerDirectory.getAbsolutePath(), cookies);
 			}
 		}
 		catch (DacoApplicationException e) {
 			ExportServlet.logger.error("Cannot perform export for daco tool.");
 		}
 
-		String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-				+ request.getContextPath();
+		writeResponseToFile(basePath + "/includes/css/daco.css", directoryName, "daco.css", cookies);
+
 		writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID=" + sessionMap.getSessionID(),
 				directoryName, FILENAME, cookies);
 
@@ -106,26 +108,88 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 		else {
 			IDacoService service = DacoServiceProxy.getDacoService(getServletContext());
-			Daco content = null;
+			Daco daco = null;
 			if (toolContentID != null) {
-				content = service.getDacoByContentId(toolContentID);
+				daco = service.getDacoByContentId(toolContentID);
 			}
 			else {
-				DacoSession session = service.getDacoSessionBySessionId(toolSessionID);
+				DacoSession session = service.getSessionBySessionId(toolSessionID);
 				if (session != null) {
-					content = session.getDaco();
+					daco = session.getDaco();
 				}
 			}
-			if (content != null) {
-				activityTitle = content.getTitle();
+			if (daco != null) {
+				activityTitle = daco.getTitle();
 			}
 		}
 		return super.doOfflineExport(request, response, directoryName, cookies);
 	}
 
-	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies,
-			HashMap sessionMap) throws DacoApplicationException {
+	private void teacherExport(SessionMap sessionMap, String basePath, String learnerDirectory, Cookie[] cookies)
+			throws DacoApplicationException {
+		if (toolContentID == null) {
+			String error = "Tool Content Id is missing. Unable to continue";
+			ExportServlet.logger.error(error);
+			throw new DacoApplicationException(error);
+		}
+		IDacoService service = DacoServiceProxy.getDacoService(getServletContext());
+		Daco daco = service.getDacoByContentId(toolContentID);
+		if (daco == null) {
+			String error = "Data is missing from the database. Unable to Continue";
+			ExportServlet.logger.error(error);
+			throw new DacoApplicationException(error);
+		}
+		List<MonitoringSummarySessionDTO> monitoringSummary = service.getMonitoringSummary(daco.getContentId(),
+				DacoConstants.MONITORING_SUMMARY_MATCH_ALL);
+		sessionMap.put(DacoConstants.ATTR_MONITORING_SUMMARY, monitoringSummary);
+		sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
+		sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW, DacoConstants.LEARNING_VIEW_VERTICAL);
+		sessionMap.put(DacoConstants.ATTR_DACO, daco);
 
+		boolean anyRecordsAvailable = false;
+		for (MonitoringSummarySessionDTO session : monitoringSummary) {
+			for (MonitoringSummaryUserDTO user : session.getUsers()) {
+				if (user.getRecordCount() > 0) {
+					anyRecordsAvailable = true;
+
+					List<QuestionSummaryDTO> summaries = service.getQuestionSummaries(user.getUid());
+					sessionMap.put(DacoConstants.ATTR_QUESTION_SUMMARIES, summaries);
+
+					Integer totalRecordCount = service.getGroupRecordCount(session);
+					sessionMap.put(DacoConstants.ATTR_TOTAL_RECORD_COUNT, totalRecordCount);
+
+					sessionMap.put(DacoConstants.ATTR_USER, user);
+
+					for (List<DacoAnswer> record : user.getRecords()) {
+						for (DacoAnswer answer : record) {
+							if (answer.getFileUuid() != null) {
+								String fileLocalPath = FileUtil.getFullPath("files", answer.getFileUuid() + "-"
+										+ answer.getFileName());
+								try {
+									handler.saveFile(answer.getFileUuid(), FileUtil.getFullPath(learnerDirectory, fileLocalPath));
+								}
+								catch (Exception e) {
+									ExportServlet.logger.error("File export failed: " + e.toString());
+								}
+							}
+						}
+					}
+
+					writeResponseToFile(basePath + "/pages/export/listRecordsTemplate.jsp?sessionMapID="
+							+ sessionMap.getSessionID(), learnerDirectory, user.getUid() + "-records.html", cookies);
+					writeResponseToFile(basePath + "/pages/monitoring/notebook.jsp?sessionMapID=" + sessionMap.getSessionID()
+							+ "&includeMode=exportportfolio", learnerDirectory, user.getUid() + "-reflection.html", cookies);
+
+				}
+			}
+		}
+		if (anyRecordsAvailable) {
+			writeResponseToFile(basePath + "/pages/monitoring/listRecords.jsp?sessionMapID=" + sessionMap.getSessionID()
+					+ "&includeMode=exportportfolio", learnerDirectory, "allRecords.html", cookies);
+		}
+	}
+
+	private void learnerExport(HashMap sessionMap, String directory) throws DacoApplicationException {
 		IDacoService service = DacoServiceProxy.getDacoService(getServletContext());
 
 		if (userID == null || toolSessionID == null) {
@@ -133,90 +197,59 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			ExportServlet.logger.error(error);
 			throw new DacoApplicationException(error);
 		}
+		DacoUser user = service.getUserByUserIdAndSessionId(userID, toolSessionID);
 
-		DacoUser learner = service.getUserByIDAndSession(userID, toolSessionID);
-
-		if (learner == null) {
+		if (user == null) {
 			String error = "The user with user id " + userID + " does not exist.";
 			ExportServlet.logger.error(error);
 			throw new DacoApplicationException(error);
 		}
 
-		Daco content = service.getDacoBySessionId(toolSessionID);
+		Daco daco = user.getDaco();
 
-		if (content == null) {
+		if (daco == null) {
 			String error = "The content for this activity has not been defined yet.";
 			ExportServlet.logger.error(error);
 			throw new DacoApplicationException(error);
 		}
 
-		List<Summary> group = service.exportBySessionId(toolSessionID, true);
-		saveFileToLocal(group, directoryName);
+		List<QuestionSummaryDTO> summaries = service.getQuestionSummaries(user.getUid());
+		sessionMap.put(DacoConstants.ATTR_QUESTION_SUMMARIES, summaries);
 
-		List<List> groupList = new ArrayList<List>();
-		if (group.size() > 0) {
-			groupList.add(group);
-		}
-		sessionMap.put(DacoConstants.ATTR_TITLE, content.getTitle());
-		//sessionMap.put(DacoConstants.ATTR_SUMMARY_LIST, groupList);
-	}
+		Integer totalRecordCount = service.getGroupRecordCount(toolSessionID);
+		sessionMap.put(DacoConstants.ATTR_TOTAL_RECORD_COUNT, totalRecordCount);
 
-	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies,
-			HashMap sessionMap) throws DacoApplicationException {
-		IDacoService service = DacoServiceProxy.getDacoService(getServletContext());
+		sessionMap.put(DacoConstants.ATTR_DACO, daco);
+		List<List<DacoAnswer>> records = service.getDacoAnswersByUserUid(user.getUid());
+		new File(directory, "files").mkdir();
 
-		// check if toolContentId exists in db or not
-		if (toolContentID == null) {
-			String error = "Tool Content Id is missing. Unable to continue";
-			ExportServlet.logger.error(error);
-			throw new DacoApplicationException(error);
-		}
-
-		Daco content = service.getDacoByContentId(toolContentID);
-
-		if (content == null) {
-			String error = "Data is missing from the database. Unable to Continue";
-			ExportServlet.logger.error(error);
-			throw new DacoApplicationException(error);
-		}
-		List<List<Summary>> groupList = service.exportByContentId(toolContentID);
-		if (groupList != null) {
-			for (List<Summary> list : groupList) {
-				saveFileToLocal(list, directoryName);
-			}
-		}
-		// put it into HTTPSession
-		sessionMap.put(DacoConstants.ATTR_TITLE, content.getTitle());
-		//sessionMap.put(DacoConstants.ATTR_SUMMARY_LIST, groupList);
-	}
-
-	private void saveFileToLocal(List<Summary> list, String directoryName) {
-		handler = getToolContentHandler();
-		for (Summary summary : list) {
-			// for learning object, it just display "No offlice pakcage avaliable" information.
-			if (summary.getQuestionType() == DacoConstants.QUESTION_TYPE_TEXTFIELD) {
-				continue;
-			}
-			try {
-				int index = 1;
-				String userName = summary.getUsername();
-				String localDir;
-				while (true) {
-					localDir = FileUtil.getFullPath(directoryName, userName + "/" + index);
-					File local = new File(localDir);
-					if (!local.exists()) {
-						local.mkdirs();
-						break;
+		for (List<DacoAnswer> record : records) {
+			for (DacoAnswer answer : record) {
+				if (answer.getFileUuid() != null) {
+					String fileLocalPath = FileUtil.getFullPath("files", answer.getFileUuid() + "-" + answer.getFileName());
+					try {
+						handler.saveFile(answer.getFileUuid(), FileUtil.getFullPath(directory, fileLocalPath));
 					}
-					index++;
+					catch (Exception e) {
+						e.printStackTrace();
+						ExportServlet.logger.error("File export failed: " + e.toString());
+					}
 				}
-				// REMOVED!!
-			}
-			catch (Exception e) {
-				ExportServlet.logger.error("Export forum topic attachment failed: " + e.toString());
 			}
 		}
 
+		String entryText = null;
+		if (user != null) {
+			NotebookEntry notebookEntry = service.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+					DacoConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+			if (notebookEntry != null) {
+				entryText = notebookEntry.getEntry();
+			}
+		}
+		sessionMap.put(DacoConstants.ATTR_REFLECTION_ENTRY, entryText);
+		sessionMap.put(DacoConstants.ATTR_RECORD_LIST, records);
+		sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.LEARNER);
+		sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW, DacoConstants.LEARNING_VIEW_VERTICAL);
 	}
 
 	private DacoToolContentHandler getToolContentHandler() {

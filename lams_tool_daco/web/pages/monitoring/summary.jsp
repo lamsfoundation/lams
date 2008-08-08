@@ -21,7 +21,7 @@
 	<table class="alternative-color">
 		<tr>
 			<td>
-				<fmt:message key="label.authoring.advanced.record.min" />
+				<fmt:message key="label.common.min" />
 			</td>
 			<td>
 				<c:choose>
@@ -36,7 +36,7 @@
 		</tr>
 		<tr>
 			<td>
-				<fmt:message key="label.authoring.advanced.record.max" />
+				<fmt:message key="label.common.max" />
 			</td>
 			<td>
 				<c:choose>
@@ -55,7 +55,7 @@
 			</td>
 			<td>
 				<c:choose>
-					<c:when test="${daco.lockWhenFinished}">
+					<c:when test="${daco.lockOnFinished}">
 						<fmt:message key="label.monitoring.advancedsettings.on" />
 					</c:when>
 					<c:otherwise>
@@ -106,7 +106,7 @@
 				<th><fmt:message key="label.monitoring.fullname" /></th>
 				<th><fmt:message key="label.monitoring.loginname" /></th>
 				<th><fmt:message key="label.monitoring.recordcount" /></th>
-				<th><fmt:message key="label.monitoring.action" /></th>
+				<th><fmt:message key="label.monitoring.notebook" /></th>
 			</tr>
 			<c:forEach var="sessionSummary" items="${monitoringSummary}">
 				<tr>
@@ -122,18 +122,39 @@
 						<td>
 							${user.loginName}
 						</td>
-						<td>
-						${user.recordCount}
+						<td  style="text-align: center; font-weight: bold;">
+							<c:choose>
+								<c:when test="${user.recordCount > 0}">
+									<c:set var="anyRecordsAvailable" value="true" />
+									<c:url var="viewRecordList"	value="/monitoring/listRecords.do">
+										<c:param name="sessionMapID" value="${sessionMapID}" />
+										<c:param name="userUid" value="${user.uid}" />
+									</c:url>
+									<a href="#" onclick="javascript:launchPopup('${viewRecordList }','RecordList')">
+										${user.recordCount}
+									</a>
+								</c:when>
+								<c:otherwise>
+									0
+								</c:otherwise>
+							</c:choose>
 						</td>
-						<td style="width: 150px">&nbsp;
-							<c:if  test="${user.recordCount > 0}">
-								<c:url var="viewRecordList"
-										value="/monitoring/listRecords.do?sessionMapID=${sessionMapID}&userUid=${user.uid}" />
-								<c:set var="anyRecordsAvailable" value="true" />
-								<a href="#" onclick="javascript:launchPopup('${viewRecordList }','RecordList')" class="button">
-									<fmt:message key="label.monitoring.viewrecords" />
-								</a>
-							</c:if>
+						<td style="text-align: center">
+							<c:choose>
+								<c:when test="${empty user.reflectionEntry}">
+									<fmt:message key="label.monitoring.notebook.none" />
+								</c:when>
+								<c:otherwise>
+									<c:url var="viewReflection"	value="/monitoring/viewReflection.do">
+										<c:param name="toolSessionID" value="${sessionSummary.sessionId}" />
+										<c:param name="userId" value="${user.userId}" />
+										<c:param name="sessionMapID" value="${sessionMapID}" />
+									</c:url>
+									<a href="#" onclick="javascript:launchPopup('${viewReflection }','Reflection')">
+										<fmt:message key="label.monitoring.notebook.view" />
+									</a>
+								</c:otherwise>
+							</c:choose>
 						</td>
 					</tr>
 				</c:forEach>
@@ -142,7 +163,7 @@
 	</c:otherwise>
 </c:choose>
 <p>
-	<a href="#"  class="button" onclick="javascript:document.location='${refreshSummaryUrl}';">
+	<a href="#"  class="button" onclick="javascript:document.location.href='${refreshSummaryUrl}';">
 		<fmt:message key="label.common.summary.refresh" />
 	</a>
 	<c:if  test="${anyRecordsAvailable}">

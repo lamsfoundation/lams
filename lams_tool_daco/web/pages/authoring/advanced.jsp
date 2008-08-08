@@ -14,7 +14,7 @@
 <p class="small-space-top"><fmt:message key="label.authoring.advanced.record" /></p>
 <p>
 <label for="minRecords">
-<fmt:message key="label.authoring.advanced.record.min" /></label> <html:select property="daco.minRecords"
+<fmt:message key="label.common.min" /></label> <html:select property="daco.minRecords"
 	styleClass="noBorder">
 	<html:option value="0">
 		<fmt:message key="label.authoring.advanced.record.nolimit" />
@@ -22,7 +22,7 @@
 	<c:forEach begin="1" end="50" var="index">
 		<html:option value="${index}">${index}</html:option>
 	</c:forEach>
-</html:select> <label for="maxRecords" style="space-left"> <fmt:message key="label.authoring.advanced.record.max" /> </label> 
+</html:select> <label for="maxRecords" style="space-left"> <fmt:message key="label.common.max" /> </label> 
 <html:select
 	property="daco.maxRecords" styleClass="noBorder">
 	<html:option value="0">
@@ -35,9 +35,9 @@
 
 </p>
 
-<p class="small-space-top"><html:checkbox property="daco.lockWhenFinished" styleClass="noBorder"
-	styleId="lockWhenFinished">
-</html:checkbox> <label for="lockWhenFinished"> <fmt:message key="label.authoring.advanced.lock.on.finished" /> </label></p>
+<p class="small-space-top"><html:checkbox property="daco.lockOnFinished" styleClass="noBorder"
+	styleId="lockOnFinished">
+</html:checkbox> <label for="lockOnFinished"> <fmt:message key="label.authoring.advanced.lock.on.finished" /> </label></p>
 
 <p><html:checkbox property="daco.reflectOnActivity" styleClass="noBorder" styleId="reflectOn">
 </html:checkbox> <label for="reflectOn"> <fmt:message key="label.authoring.advanced.reflectOnActivity" /> </label></p>

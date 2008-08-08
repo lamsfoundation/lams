@@ -21,27 +21,27 @@
 			<c:choose>
 				<c:when test="${status.index > 0}">
 					<img src="<html:rewrite page='/includes/images/uparrow.gif'/>" border="0"
-						title="<fmt:message key="label.up"/>" onclick="javascript:upItem('${status.index+1}')">
+						title="<fmt:message key="label.authoring.basic.answeroption.up"/>" onclick="javascript:upItem('${status.index+1}')">
 				</c:when>
 				<c:otherwise>
 					<img src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>" border="0"
-						title="<fmt:message key="label.up"/>">
+						title="<fmt:message key="label.authoring.basic.answeroption.up"/>">
 				</c:otherwise>
 			</c:choose>
 			<c:choose>
 				<c:when test="${status.count < listSize}">
 					<img src="<html:rewrite page='/includes/images/downarrow.gif'/>" border="0"
-						title="<fmt:message key="label.down"/>" onclick="javascript:downItem('${status.index+1}','${listSize}')">
+						title="<fmt:message key="label.authoring.basic.answeroption.down"/>" onclick="javascript:downItem('${status.index+1}','${listSize}')">
 				</c:when>
 				<c:otherwise>
 					<img src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>" border="0"
-						title="<fmt:message key="label.down"/>">
+						title="<fmt:message key="label.authoring.basic.answeroption.down"/>">
 				</c:otherwise>
 
 			</c:choose> <%-- Don't display remove icon if less than 2 question answers --%></td>
 			<c:if test="${listSize > 2}">
 				<td><img src="<html:rewrite page='/includes/images/cross.gif'/>" border="0"
-					title="<fmt:message key="label.delete"/>" onclick="javascript:removeAnswerOption('${status.index+1}')"></td>
+					title="<fmt:message key="label.common.delete"/>" onclick="javascript:removeAnswerOption('${status.index+1}')"></td>
 			</c:if>
 		</tr>
 	</c:forEach>

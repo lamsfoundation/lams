@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="monitoringSummary" value="${sessionMap.monitoringSummary}" />
-<c:set var="learningMode" value="false" />
+<c:set var="includeMode" value="monitoring" />
 <c:set var="userUid" value="${sessionMap.userUid}" />
 <c:url var="refreshStatisticsUrl" value="/monitoring/summary.do?sessionMapID=${sessionMapID}"/>
 
@@ -25,6 +25,7 @@
 										<c:if test="${userUid==nextUser.uid}">
 											selected="selected"
 											<c:set var="recordList" value="${nextUser.records}" />
+											<c:set var="userFullName" value="${nextUser.fullName}" />
 										</c:if>
 										>${nextUser.fullName}</option>
 									</c:forEach>

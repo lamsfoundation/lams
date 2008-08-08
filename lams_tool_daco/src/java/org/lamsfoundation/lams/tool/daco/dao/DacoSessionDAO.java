@@ -33,9 +33,6 @@ public interface DacoSessionDAO extends DAO {
 
 	List<DacoSession> getByContentId(Long toolContentId);
 
-	void delete(DacoSession session);
-
 	void deleteBySessionId(Long toolSessionId);
-
 
 }

@@ -76,7 +76,7 @@ public class DacoForm extends ActionForm {
 		// so need not reset checkbox to refresh value!
 		if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
 
-			daco.setLockWhenFinished(false);
+			daco.setLockOnFinished(false);
 			daco.setDefineLater(false);
 
 			daco.setRunOffline(false);

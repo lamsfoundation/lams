@@ -50,7 +50,7 @@
 
 <%-- Default value for message key --%>
 <c:if test="${empty cancelButtonLabelKey}">
-	<c:set var="cancelButtonLabelKey" value="label.authoring.cancel.button" scope="request"/>
+	<c:set var="cancelButtonLabelKey" value="label.common.cancel" scope="request"/>
 </c:if>
 <c:if test="${empty saveButtonLabelKey}">
 	<c:set var="saveButtonLabelKey" value="label.authoring.save.button" scope="request"/>

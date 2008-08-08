@@ -1,10 +1,3 @@
-.innerforms {
-	border: 0px;
-	font-size: small;
-	font-style: normal;
-	width:100%;
-}
-
 div.error, div.message {
     background-color: #ffffcc;
     border: 1px solid #000;
@@ -30,7 +23,7 @@ div.info {
 	margin-right: auto;
 	text-align: left;
 	font-weight: normal;
-	background: url('../images/css/edit.gif') no-repeat #d8e4f1 10px 8px;
+	background: url('../images/edit.gif') no-repeat #d8e4f1 10px 8px;
 	width: 70%;
 	border: 1px solid #3c78b5;
 	float: none;
@@ -48,7 +41,7 @@ div.message img.icon {
 .hint {
 	font-style: italic;
 }
-table.recordList {
+table.recordList { /* delimeter for records in a vertical record list */
 	border-bottom: thin black solid;
 }
 
@@ -56,7 +49,7 @@ table.recordList {
 form#recordForm input, form#recordForm textarea, form#recordForm select{
 	margin-top: 6px;
 }
-.button-add-div {
+.button-add-div { /* makes a "div" properly padded in tabbed environment */
 	padding-left: 30px;
 }
 div.bigNumber{
@@ -70,17 +63,19 @@ table#horizontalListTable {
 	height: 100%;
 }
 
-table#horizontalListTable td {
+table#horizontalListTable td { /* delimeter for records in a horizontal record list */
 	border-left: 1px black solid;
 }
 
 table#recordListTable td.fixedCellHeight, table#horizontalListTable td.fixedCellHeight  {
+	/* cells must have the same height, otherwise they will be incorrectly aligned in horizontal record list*/
 	padding-left: 20px;
 	height: 90px;
 	vertical-align: middle;
 }
 
 table#horizontalListTable td#lastHorizontalQuestion{
+	/* cell with the last question in a record list is smaller because of the horizontal scrollbar */
 	padding-left: 20px;
 	height: 75px;
 	vertical-align: middle;
@@ -88,6 +83,7 @@ table#horizontalListTable td#lastHorizontalQuestion{
 
 form#recordForm table.alternative-color-inner-table td, table.recordList table.alternative-color-inner-table td,
 table#horizontalListTable table.alternative-color-inner-table td,  table#summaryTable table.alternative-color-inner-table td{
+	/* makes the table-within-table plain, instead of repeating the style */
 	margin: 0px;
 	padding: 0px;
 	border: none;
@@ -107,4 +103,36 @@ table#recordListTable td.fixedCellWidth{
 td.button-cell{
 	height: 30px;
 	padding-top: 30px;
+}
+
+#content-learner {
+	/* reduced width of tabbed environment since learner is narrower */
+	width: 592px;
+	background: url('../images/body_bg_learner.jpg') repeat-y;
+	padding-bottom:40px;
+	padding-left:15px;
+	padding-right:15px;
+	font-size: 11px;
+	margin-top: -5px
+	
+}
+#footer-learner {
+	/* reduced width of tabbed environment since learner is narrower */
+	width: 592px;
+	height: 14px;
+	background: url('../images/footer_bg_learner.jpg') no-repeat bottom;
+}
+
+#header-learner {
+	/* reduced width of tabbed environment since learner is narrower */
+	width:592px; 
+	height: 49px; 
+	background: url('../images/top_bg_learner.jpg') no-repeat bottom;
+	}
+
+#page-learner {
+	/* reduced width of tabbed environment since learner is narrower */
+	margin: 25px auto;
+	width: 592px;
+	background: url('../images/lams_logo.gif') no-repeat 585px 10px;
 }
