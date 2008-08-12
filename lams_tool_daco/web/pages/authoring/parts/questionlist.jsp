@@ -6,6 +6,7 @@
 </c:set>
 
 <div id="questionList">
+<%-- This image is shown when a question is being downloaded from a server. --%>
 <h2 class="spacer-left"><fmt:message key="label.authoring.basic.list.title" /> <img
 	src="${ctxPath}/includes/images/indicator.gif" style="display: none" id="questionListArea_Busy" /></h2>
 
@@ -19,117 +20,53 @@
 
 	<c:forEach var="question" items="${sessionMap.questionList}" varStatus="status">
 		<tr>
-			<%-- Questions type:1=textfield,2=textarea,3=number,4=date,5=File,6=image,7=radio,8=dropdown,9=checkbox,10=longitude/latitude --%>
-			<c:if test="${question.type == 1}">
-				<td><span class="field-name"> <fmt:message key="label.authoring.basic.textfield" /></span></td><td>
-				${question.description}</td>
-				<td width="5%"><img src="${tool}includes/images/edit.gif"
-					title="<fmt:message key="label.common.edit" />"
-					onclick="editQuestion(${status.index},'${sessionMapID}')" /></td>
-				<td width="5%"><img src="${tool}includes/images/cross.gif"
-					title="<fmt:message key="label.common.delete" />"
-					onclick="deleteQuestion(${status.index},'${sessionMapID}')" /></td>
-			</c:if>
-
-			<c:if test="${question.type == 2}">
-				<td><span class="field-name"> <fmt:message key="label.authoring.basic.textarea" /></span></td><td>
-				${question.description}</td>
-				<td width="5%"><img src="${tool}includes/images/edit.gif"
-					title="<fmt:message key="label.common.edit" />"
-					onclick="editQuestion(${status.index},'${sessionMapID}')" /></td>
-				<td width="5%"><img src="${tool}includes/images/cross.gif"
-					title="<fmt:message key="label.common.delete" />"
-					onclick="deleteQuestion(${status.index},'${sessionMapID}')" /></td>
-			</c:if>
-
-			<c:if test="${question.type == 3}">
-				<td><span class="field-name"> <fmt:message key="label.authoring.basic.number" /></span></td><td>
-				${question.description}</td>
-				<td width="5%"><img src="${tool}includes/images/edit.gif"
-					title="<fmt:message key="label.common.edit" />"
-					onclick="editQuestion(${status.index},'${sessionMapID}')" /></td>
-				<td width="5%"><img src="${tool}includes/images/cross.gif"
-					title="<fmt:message key="label.common.delete" />"
-					onclick="deleteQuestion(${status.index},'${sessionMapID}')" /></td>
-			</c:if>
-
-			<c:if test="${question.type == 4}">
-				<td><span class="field-name"> <fmt:message key="label.authoring.basic.date" /></span></td><td>
-				${question.description}</td>
-				<td width="5%"><img src="${tool}includes/images/edit.gif"
-					title="<fmt:message key="label.common.edit" />"
-					onclick="editQuestion(${status.index},'${sessionMapID}')" /></td>
-				<td width="5%"><img src="${tool}includes/images/cross.gif"
-					title="<fmt:message key="label.common.delete" />"
-					onclick="deleteQuestion(${status.index},'${sessionMapID}')" /></td>
-			</c:if>
-
-			<c:if test="${question.type == 5}">
-				<td><span class="field-name"> <fmt:message key="label.authoring.basic.file" /></span></td><td>
-				${question.description}</td>
+			<td><span class="field-name">
+				<c:choose>
+					<c:when test="${question.type == 1}">
+						<span class="field-name"> <fmt:message key="label.authoring.basic.textfield" />
+					</c:when>		
+					<c:when test="${question.type == 2}">
+						<fmt:message key="label.authoring.basic.textarea" />
+					</c:when>
+					<c:when test="${question.type == 3}">
+						<fmt:message key="label.authoring.basic.number" />
+					</c:when>
+					<c:when test="${question.type == 4}">
+						<fmt:message key="label.authoring.basic.date" />
+					</c:when>
+					<c:when test="${question.type == 5}">
+						<fmt:message key="label.authoring.basic.file" />
+					</c:when>
+					<c:when test="${question.type == 6}">
+						<fmt:message key="label.authoring.basic.image" />
+					</c:when>
+					<c:when test="${question.type == 7}">
+						<fmt:message key="label.authoring.basic.radio" />
+					</c:when>
+					<c:when test="${question.type == 8}">
+						<fmt:message key="label.authoring.basic.dropdown" />
+					</c:when>
+					<c:when test="${question.type == 9}">
+						<fmt:message key="label.authoring.basic.checkbox" />
+					</c:when>
+					<c:when test="${question.type == 10}">
+						 <fmt:message key="label.authoring.basic.longlat" />
+					</c:when>
+				</c:choose>
+				</span></td>
+				<td>${question.description}</td>
 				<td><img src="${tool}includes/images/edit.gif"
 					title="<fmt:message key="label.common.edit" />"
 					onclick="editQuestion(${status.index},'${sessionMapID}')" /></td>
 				<td><img src="${tool}includes/images/cross.gif"
 					title="<fmt:message key="label.common.delete" />"
 					onclick="deleteQuestion(${status.index},'${sessionMapID}')" /></td>
-			</c:if>
-			<c:if test="${question.type == 6}">
-				<td><span class="field-name"> <fmt:message key="label.authoring.basic.image" /></span></td><td>
-				${question.description}</td>
-				<td><img src="${tool}includes/images/edit.gif"
-					title="<fmt:message key="label.common.edit" />"
-					onclick="editQuestion(${status.index},'${sessionMapID}')" /></td>
-				<td><img src="${tool}includes/images/cross.gif"
-					title="<fmt:message key="label.common.delete" />"
-					onclick="deleteQuestion(${status.index},'${sessionMapID}')" /></td>
-			</c:if>
-			<c:if test="${question.type == 7}">
-				<td><span class="field-name"> <fmt:message key="label.authoring.basic.radio" /></span></td><td>
-				${question.description}</td>
-				<td><img src="${tool}includes/images/edit.gif"
-					title="<fmt:message key="label.common.edit" />"
-					onclick="editQuestion(${status.index},'${sessionMapID}')" /></td>
-				<td><img src="${tool}includes/images/cross.gif"
-					title="<fmt:message key="label.common.delete" />"
-					onclick="deleteQuestion(${status.index},'${sessionMapID}')" /></td>
-			</c:if>
-			<c:if test="${question.type == 8}">
-				<td><span class="field-name"> <fmt:message key="label.authoring.basic.dropdown" /></span></td><td>
-				${question.description}</td>
-				<td><img src="${tool}includes/images/edit.gif"
-					title="<fmt:message key="label.common.edit" />"
-					onclick="editQuestion(${status.index},'${sessionMapID}')" /></td>
-				<td><img src="${tool}includes/images/cross.gif"
-					title="<fmt:message key="label.common.delete" />"
-					onclick="deleteQuestion(${status.index},'${sessionMapID}')" /></td>
-			</c:if>
-			<c:if test="${question.type == 9}">
-				<td><span class="field-name"> <fmt:message key="label.authoring.basic.checkbox" /></span></td><td>
-				${question.description}</td>
-				<td><img src="${tool}includes/images/edit.gif"
-					title="<fmt:message key="label.common.edit" />"
-					onclick="editQuestion(${status.index},'${sessionMapID}')" /></td>
-				<td><img src="${tool}includes/images/cross.gif"
-					title="<fmt:message key="label.common.delete" />"
-					onclick="deleteQuestion(${status.index},'${sessionMapID}')" /></td>
-			</c:if>
-			<c:if test="${question.type == 10}">
-				<td><span class="field-name"> <fmt:message key="label.authoring.basic.longlat" /></span></td><td>
-				${question.description}</td>
-				<td><img src="${tool}includes/images/edit.gif"
-					title="<fmt:message key="label.common.edit" />"
-					onclick="editQuestion(${status.index},'${sessionMapID}')" /></td>
-				<td><img src="${tool}includes/images/cross.gif"
-					title="<fmt:message key="label.common.delete" />"
-					onclick="deleteQuestion(${status.index},'${sessionMapID}')" /></td>
-			</c:if>
 		</tr>
 	</c:forEach>
 </table>
 </div>
 
-<%-- This script will work when a new question submit in order to refresh "Question List" panel. --%>
+<%-- This script will work when a new question is submited in order to refresh "Question List" panel. --%>
 <script type="text/javascript">
 	if(window.top != null){
 		window.top.hideQuestionInputArea();

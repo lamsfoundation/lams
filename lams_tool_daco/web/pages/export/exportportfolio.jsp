@@ -4,8 +4,11 @@
 <c:set var="sessionMapID" value="${param.sessionMapID}" />
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="mode" value="${sessionMap.mode}" />
+<%-- Contains users grouped in sessions, with corresponding records and other details --%>
 <c:set var="monitoringSummary" value="${sessionMap.monitoringSummary}" />
+<%-- To modify behavior of the included files (record lists) --%>
 <c:set var="includeMode" value="exportportfolio" />
+<%-- Whether to display the "View all records" button --%>
 <c:set var="anyRecordsAvailable" value="false" />
 <c:set var="daco" value="${sessionMap.daco}" />
 <c:set var="reflectEntry" value="${sessionMap.reflectEntry}" />
@@ -41,6 +44,7 @@
 		</tr>
 	</table>
 	<c:choose>
+		<%-- Export single page for learner, containing record list, summary table and his reflection entry --%>
 		<c:when test="${mode == 'learner'}">
 			<c:set var="recordList" value="${sessionMap.recordList}" />
 			<%@ include file="/pages/learning/listRecords.jsp" %>
@@ -62,8 +66,12 @@
 			</c:if>
 		</c:when>
 		<c:otherwise>
+			<%-- Export the main page for teacher. It contains table with users grouped in sessions.
+				Additional links are created for viewing record lists and reflection entries.
+			 --%>
 			<c:choose>
 				<c:when test="${empty monitoringSummary || empty monitoringSummary[0].users}">
+					<%-- If no users accessed the activity. --%>
 					<p class="hint">
 						<fmt:message key="message.monitoring.summary.no.session" />
 					</p>
@@ -95,6 +103,7 @@
 									<td style="text-align: center; font-weight: bold;">
 										<c:choose>
 											<c:when test="${user.recordCount > 0}">
+											<%-- If user added any records, a link to view them is displayed --%>
 												<c:set var="anyRecordsAvailable" value="true" />
 												<a href="#" onclick="javascript:launchPopup('learners/${user.uid}-records.html','RecordList')">
 													${user.recordCount}
@@ -111,6 +120,7 @@
 												<fmt:message key="label.monitoring.notebook.none" />
 											</c:when>
 											<c:otherwise>
+												<%-- If user added a reflection entry, a link to view it is displayed--%>
 												<a href="#" onclick="javascript:launchPopup('learners/${user.uid}-reflection.html','Reflection')">
 													<fmt:message key="label.monitoring.notebook.view" />
 												</a>
@@ -122,6 +132,7 @@
 						</c:forEach>
 					</c:forEach>
 					<c:if  test="${anyRecordsAvailable}">
+						<%-- If any user added at least one record, a link to view all records of all users is displayed --%>
 						<a href="#" onclick="javascript:launchPopup('learners/allRecords.html','RecordList')" class="button space-left">
 							<fmt:message key="label.monitoring.viewrecords.all" />
 						</a>

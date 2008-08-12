@@ -6,6 +6,7 @@
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
 	<lams:css style="tabbed" />
+	<!-- To use in external script files. -->
 	<script type="text/javascript">
 	   var removeAnswerOptionUrl = "<c:url value='/authoring/removeAnswerOption.do'/>";
        var addAnswerOptionUrl = "<c:url value='/authoring/newAnswerOption.do'/>";
@@ -17,7 +18,7 @@
 </lams:head>
 <body class="tabpart">
 
-<!-- Basic Info Form-->
+<!-- Add question form-->
 <%@ include file="/common/messages.jsp"%>
 <html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="dacoQuestionForm">
 	<html:hidden property="sessionMapID" />

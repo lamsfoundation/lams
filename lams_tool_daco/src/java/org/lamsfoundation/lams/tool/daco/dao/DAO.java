@@ -67,5 +67,9 @@ public interface DAO {
 	 */
 	public void removeObject(Class clazz, Serializable id);
 
+	/**
+	 * To release an object from Hibernate cache.
+	 * @param o object to release
+	 */
 	public void releaseFromCache(Object o);
 }

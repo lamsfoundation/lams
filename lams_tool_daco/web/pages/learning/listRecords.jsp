@@ -2,7 +2,7 @@
 <div id="recordListDiv">
 
 <%@ include file="/common/taglibs.jsp"%>
-
+<%-- This page modifies its content depending on the page it was included from. --%>
 <c:if test="${not empty param.includeMode}">
 	<c:set var="includeMode" value="${param.includeMode}" />
 </c:if>
@@ -16,13 +16,16 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
+<%-- Wheter to display the vertical or horizontal view. --%>
 <c:set var="horizontal" value="${sessionMap.learningView=='horizontal'}" />
 <c:if test="${empty isIE}">
+	<%-- Some elements are displayed differently depending on the browser. --%>
 	<c:set var="userAgent" value='<%=request.getHeader("User-Agent") %>' />
 	<c:set var="isIE" value='${(not empty userAgent) && fn:indexOf(userAgent,"MSIE") != -1}' scope="session" />
 </c:if>
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:choose>
+	<%-- This page can be included multiple times on a single master page. That is why element IDs need prefixes. --%>
 	<c:when test="${includeMode=='learning'}">
 		<c:set var="elementIdPrefix" value="" />
 	</c:when>
@@ -31,10 +34,11 @@
 	</c:otherwise>
 </c:choose>
 <script type="text/javascript">
-	var editRecordUrl = "<html:rewrite page='/learning/editRecord.do' />";
-	var removeRecordUrl = "<html:rewrite page='/learning/removeRecord.do' />";
+	var editRecordUrl = "<c:url value='/learning/editRecord.do' />";
+	var removeRecordUrl = "<c:url value='/learning/removeRecord.do' />";
 </script>
 <c:if test="${empty recordList}">
+	<%-- In some cases record list is passed as an attribute, in other - in session map. --%>
 	<c:set var="recordList" value="${sessionMap.recordList}" />
 </c:if>
 
@@ -59,6 +63,7 @@
 	</c:when>
 	<c:otherwise>
 		<c:choose>
+			<%-- Indenting is different depending on the page this page is included to. --%>
 			<c:when test='${includeMode=="learning"}'>
 				<p class="hint" style="margin-left: 17px; font-weight: bold;">
 					<fmt:message key="label.learning.heading.recordcount" />: ${fn:length(recordList)}
@@ -73,6 +78,7 @@
 
 		<c:choose>
 			<c:when test="${horizontal}">
+				<%-- Horizontal view creates a table with question list and one large cell where iframe with records is displayed --%>
 				<table cellspacing="0" class="alternative-color" id="recordListTable">
 					<tr>
 						<th><fmt:message key="label.learning.tableheader.questions" /></th>
@@ -81,6 +87,7 @@
 					<tr>
 					<td class="fixedCellHeight" style="width: 160px"><fmt:message key="label.learning.tableheader.recordnumber" /></td>
 					<td rowspan="${fn:length(daco.dacoQuestions) + 2}" style="padding: 0px; height: 100%;">
+						<%-- Link that displayes the horizontal record list --%>
 						<c:url var="showRecordsUrl" value='/learning/diplayHorizontalRecordList.do'>
 							<c:param name="sessionMapID" value="${sessionMapID}" />
 							<c:if test="${includeMode=='monitoring'}">
@@ -88,8 +95,9 @@
 							</c:if>
 							<c:param name="includeMode" value="${includeMode}" />
 						</c:url>
-						<iframe id="${elementIdPrefix}horizontalRecordListFrame" onLoad="javascript:resizeHorizontalRecordListFrame('${elementIdPrefix}',${fn:length(daco.dacoQuestions)});" style="width: 100%;"
-						frameborder="0" scrolling="auto" src="${showRecordsUrl}"></iframe>
+						<iframe id="${elementIdPrefix}horizontalRecordListFrame"
+								onLoad="javascript:resizeHorizontalRecordListFrame('${elementIdPrefix}',${fn:length(daco.dacoQuestions)});"
+								style="width: 100%;" frameborder="0" scrolling="auto" src="${showRecordsUrl}"></iframe>
 					</td>
 					
 					</tr>
@@ -104,6 +112,7 @@
 				</table>
 			</c:when>
 			<c:otherwise>
+				<%-- Vertical view displays records as separate tables of answers. --%>
 				<c:forEach var="record" items="${recordList}" varStatus="recordStatus">
 				<table>
 					<tr>
@@ -111,6 +120,7 @@
 							<fmt:message key="label.learning.heading.recordnumber" /> ${recordStatus.index+1}
 						</td>
 						<c:if test='${includeMode=="learning" and not finishedLock}'>
+						<%-- If the record can be edited, display these links. --%>
 						<td width="5%">
 							<img src="${tool}includes/images/edit.gif"
 								title="<fmt:message key="label.common.edit" />"
@@ -127,6 +137,9 @@
 				
 					<table cellspacing="0" class="alternative-color recordList">
 						<c:forEach var="question" items="${daco.dacoQuestions}" varStatus="questionStatus">
+							<%-- "Generated" means that the table for a long/lat question was already generated
+								 and the current answer only needs to be filled in in the existing textfield.
+							--%>
 							<c:set var="generated" value="false" />
 							<c:forEach var="answer" items="${record}" varStatus="answerStatus">
 								<c:if test="${answer.question.uid==question.uid}">
@@ -136,6 +149,9 @@
 											<c:if test="${not empty question.answerOptions and not empty longitude}">
 												<c:set var="mapLinks">
 													<c:forEach var="selectedMap" items="${question.answerOptions}">
+														<%-- Display the links for external maps,
+														where the longitude and latitude can be marked and shown.
+														Strange syntax of this var (mapLinks) comes from later usage in a javascript.--%>
 														<c:choose>
 															<c:when test="${selectedMap.answerOption=='Google Maps'}">
 																'<a onclick="javascript:launchPopup('+"'http://maps.google.com/maps?q=${longitude},+${answer.answer}&iwloc=A&hl=en','LAMS');"+'" href="#">${selectedMap.answerOption}</a><br />'+
@@ -153,10 +169,12 @@
 													</c:forEach>
 												</c:set>
 												<script type="text/javascript">
+													<%-- Fill the existing cell in long/lat question table with created links. --%>
 													document.getElementById("${elementIdPrefix}maplinks-record${recordStatus.index+1}-question${questionStatus.index+1}").innerHTML=''+${mapLinks}'';
 												</script>
 											</c:if>
 											<script type="text/javascript">
+												<%-- Set the value of latitude in long/lat question according to the answer. --%>
 												setValue("${elementIdPrefix}latitude-record${recordStatus.index+1}-question${questionStatus.index+1}","${answer.answer}");
 											</script>
 										</c:if>
@@ -174,10 +192,11 @@
 												<c:when test="${question.type==2}">
 													<textarea  cols="55" 
 														<c:choose>
-															<c:when test="${isIE}">
+															<c:when test="${isIE}">															
 																rows="3"
 															</c:when>
 															<c:otherwise>
+																<%-- In Firefox 2 rows are displayed as 3 rows (!) --%>
 																rows="2"
 															</c:otherwise>
 														</c:choose>
@@ -189,6 +208,7 @@
 												<c:when test="${question.type==4}">
 													<c:set var="date">
 														<c:if test="${not empty answer.answer}">
+															<%-- To display a date a single textfield with formatted date is used. --%>
 															<lams:Date value="${fn:trim(answer.answer)}" type="date" style="medium"/>
 														</c:if>
 													</c:set>
@@ -202,6 +222,8 @@
 														<c:otherwise>
 															<fmt:message key="label.learning.file.uploaded" />
 															<c:choose>
+																<%-- The file can be downloaded back from the server.
+																	It is done differently in learning and export portfolio modes. --%>
 																<c:when test="${includeMode=='exportportfolio'}">
 																	<a href="<c:url value='files/${answer.fileUuid}-${answer.fileName}'/>">${answer.fileName}</a>
 																</c:when>
@@ -253,6 +275,7 @@
 																<label><fmt:message key="label.learning.longlat.longitude.unit" /></label><br />
 															</td>
 															<c:if test="${not empty question.answerOptions and not empty longitude}">
+																<%-- A placeholder for external maps links --%>
 																<td rowspan="2" id="${elementIdPrefix}maplinks-record${recordStatus.index+1}-question${questionStatus.index+1}">
 																</td>
 															</c:if>						
@@ -274,6 +297,9 @@
 									</c:otherwise>
 									</c:choose>
 									<c:if test="${question.type==9 && (not empty answer.answer)}">
+										<%-- Each answer contains one piece of information: whether the checkbox is checked or not.
+											Since the whole table is generated for the first answer,
+											other answers simply check the existing boxes. --%>
 										<script type="text/javascript">
 											checkCheckbox("${elementIdPrefix}checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${answer.answer}");
 										</script>

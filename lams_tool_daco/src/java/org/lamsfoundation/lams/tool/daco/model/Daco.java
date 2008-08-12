@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.tool.daco.util.DacoToolContentHandler;
 /**
  * Daco
  * 
- * @author Dapeng Ni
+ * @author Marcin Cieslak
  * 
  * @hibernate.class table="tl_ladaco10_contents"
  * 

@@ -23,6 +23,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.daco;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 public class DacoConstants {
 	// system-wide constants
 	public static final String TOOL_SIGNATURE = "ladaco10";
@@ -46,6 +49,9 @@ public class DacoConstants {
 	// longitude/latitude maps
 	public static final String[] LONGLAT_MAPS_LIST = new String[] { "Google Maps", "Geabios", "Open Street Map", "Multimap" };
 
+	//for date parsing
+	public static final DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
+
 	// answer options' constants
 	public static final int INIT_ANSWER_OPTION_COUNT = 3;
 	public static final int ANSWER_OPTION_MINIMUM_COUNT = 2;
@@ -54,9 +60,6 @@ public class DacoConstants {
 
 	// image question valid extensions
 	public static final String[] IMAGE_EXTENSIONS = new String[] { "GIF", "JPG", "PNG" };
-
-	// format for the date question
-	public static final String DATE_PART_DELIMETER = "-";
 
 	// action forward names
 	public static final String SUCCESS = "success";
@@ -106,7 +109,7 @@ public class DacoConstants {
 	public static final String ATTR_LEARNING_CURRENT_TAB = "learningCurrentTab";
 	public static final String ATTR_QUESTION_LIST = "questionList";
 	public static final String ATTR_RECORD_LIST = "recordList";
-	public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
+	public static final String ATTR_ATTACHMENT_LIST = "instructionAttachmentList";
 	public static final String ATTR_DELETED_QUESTION_LIST = "deleteDacoList";
 	public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
 	public static final String ATTR_DELETED_QUESTION_ATTACHMENT_LIST = "deletedQuestionAttachmmentList";

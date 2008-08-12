@@ -1,14 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
 <div id="questionSummariesDiv">
-
+<%--  --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 </c:if>
 
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:if test="${empty recordList}">
+	<%-- In some cases record list is passed as an attribute, in other - in session map. --%>
 	<c:set var="recordList" value="${sessionMap.recordList}" />
 </c:if>
+<%-- This page modifies its content depending on the page it was included from. --%>
 <c:if test="${empty includeMode}">
 	<c:set var="includeMode" value="learning" />
 </c:if>
@@ -88,10 +90,12 @@
 			<c:choose>
 				<c:when test="${question.type==3 && not empty question.summary}">
 					<c:choose>
+						<%-- Part of the content is displayed depending on the summary type --%>
 						<c:when test="${question.summary==1 || question.summary==2}">
 							<c:choose>
-								<c:when test="${(question.summary==1 && empty questionSummary.userSummary[0].sum) 
-											 || (question.summary==2 && empty questionSummary.userSummary[0].average)}">
+								<%-- If no records were provided --%>
+								<c:when test="${(question.summary==1 and empty questionSummary.userSummary[0].sum) 
+											 || (question.summary==2 and empty questionSummary.userSummary[0].average)}">
 									<td class="singleSummaryCell hint">
 										<fmt:message key="label.learning.heading.norecords" />
 									</td>
@@ -100,6 +104,8 @@
 									</td>
 								</c:when>
 								<c:otherwise>
+									<%-- First column shows the summaries for the learner,
+										second one for the whole group (session) --%>
 									<td class="singleSummaryCell">
 										<c:choose>
 											<c:when test="${question.summary==1}">

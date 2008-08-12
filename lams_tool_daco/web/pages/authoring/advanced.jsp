@@ -1,8 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
-<!-- Javascript functions -->
-
 <script type="text/javascript">
 	function turnOnReflect(){
 			document.getElementById("reflectOn").checked = !isEmpty(document.getElementById("reflectInstructions").value);
@@ -13,6 +11,7 @@
 
 <p class="small-space-top"><fmt:message key="label.authoring.advanced.record" /></p>
 <p>
+<!-- Minimum number of records learner must provide -->
 <label for="minRecords">
 <fmt:message key="label.common.min" /></label> <html:select property="daco.minRecords"
 	styleClass="noBorder">
@@ -22,7 +21,10 @@
 	<c:forEach begin="1" end="50" var="index">
 		<html:option value="${index}">${index}</html:option>
 	</c:forEach>
-</html:select> <label for="maxRecords" style="space-left"> <fmt:message key="label.common.max" /> </label> 
+</html:select>
+<label for="maxRecords" style="space-left"> <fmt:message key="label.common.max" /> </label> 
+
+<!-- Maximum number of records learner must provide -->
 <html:select
 	property="daco.maxRecords" styleClass="noBorder">
 	<html:option value="0">

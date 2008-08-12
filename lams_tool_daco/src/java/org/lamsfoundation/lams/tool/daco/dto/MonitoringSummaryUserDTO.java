@@ -7,6 +7,11 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
 
+/**
+ * Contains the user details that are useful for displaying summary in monitoring.
+ * @author Marcin Cieslak
+ *
+ */
 public class MonitoringSummaryUserDTO {
 
 	private Long uid;

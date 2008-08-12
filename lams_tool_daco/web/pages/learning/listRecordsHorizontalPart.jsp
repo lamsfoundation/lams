@@ -11,10 +11,13 @@
 	<c:set var="tool">
 		<lams:WebAppURL />
 	</c:set>
+	<%-- This page modifies its content depending on the page it was included from. --%>
 	<c:set var="includeMode" value="${param.includeMode}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+	<%-- It contains users info divided into sessions. --%>
 	<c:set var="monitoringSummary" value="${sessionMap.monitoringSummary}" />
 	<c:choose>
+		<%-- Record list comes from different sources, depending on the including page. --%>
 		<c:when test="${includeMode=='learning'}">
 			<c:set var="recordList" value="${sessionMap.recordList}" />
 		</c:when>
@@ -30,6 +33,7 @@
 	</c:choose>
 
 	<lams:css style="tabbed" />
+	<%-- To enable the table to have maximum height.  --%>
 	<style type="text/css">
 		html,body {
 			height: 100%;
@@ -46,6 +50,7 @@
 <body class="tabpart">
 	
 	<table id="horizontalListTable" class="alternative-color" cellspacing="0">
+		<%-- Each column is one record. This is pure data - header was done in the including page.  --%>
 		<tr>
 			<c:forEach var="record" items="${recordList}" varStatus="recordStatus">
 				<td class="fixedCellHeight">
@@ -54,6 +59,7 @@
 					</div>
 					<c:if test='${includeMode=="learning" and not finishedLock}'>
 						<div >
+						<%-- If the record can be edited, display these links. --%>
 						<img src="${tool}includes/images/edit.gif"
 								title="<fmt:message key="label.common.edit" />"
 								onclick="javascript:parent.editRecord('${sessionMapID}',${recordStatus.index+1})" />
@@ -70,6 +76,7 @@
 		<c:forEach var="question" items="${daco.dacoQuestions}" varStatus="questionStatus">	
 		<tr>
 			<c:forEach var="record" items="${recordList}" varStatus="recordStatus">
+			<%-- For comments on the structure, see "learning/listRecords.jsp" --%>
 				<c:set var="generated" value="false" />
 				<c:forEach var="answer" items="${record}" varStatus="answerStatus">
 					<c:if test="${answer.question.uid==question.uid}">
@@ -108,6 +115,9 @@
 								<c:set var="generated" value="true" />
 										<td class="fixedCellHeight"
 												<c:choose>
+												<%-- Iframes are displayed differently in some browsers, this code fixes it.
+													The last cell in a column is shorter to accomodate the horizontal scrollbar.
+												 --%>
 													<c:when test="${isIE}">
 														<c:if test="${questionStatus.index==fn:length(daco.dacoQuestions)-1 && fn:length(recordList)>1}">
 																id="lastHorizontalQuestion"

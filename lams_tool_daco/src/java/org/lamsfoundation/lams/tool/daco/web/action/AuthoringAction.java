@@ -80,7 +80,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * @author Steve.Ni
+ * @author Marcin Cieslak
  * @version $Revision$
  */
 public class AuthoringAction extends Action {
@@ -182,10 +182,6 @@ public class AuthoringAction extends Action {
 		}
 		if (param.equals("removeAnswerOption")) {
 			return removeAnswerOption(mapping, form, request);
-		}
-
-		if (param.equals("removeQuestionAttachment")) {
-			return removeQuestionAttachment(mapping, form, request, response);
 		}
 
 		return mapping.findForward(DacoConstants.ERROR);
@@ -474,7 +470,7 @@ public class AuthoringAction extends Action {
 	 * @return
 	 */
 	protected List getAttachmentList(SessionMap sessionMap) {
-		return getListFromSession(sessionMap, DacoConstants.ATT_ATTACHMENT_LIST);
+		return getListFromSession(sessionMap, DacoConstants.ATTR_ATTACHMENT_LIST);
 	}
 
 	// *************************************************************************************
@@ -754,22 +750,6 @@ public class AuthoringAction extends Action {
 		}
 
 		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-		return mapping.findForward(DacoConstants.SUCCESS);
-	}
-
-	/**
-	 * Remove daco question attachment, such as single file, learning object ect. It is a ajax call and just temporarily remove
-	 * from page, all permenant change will happen only when user sumbit this daco question again.
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	protected ActionForward removeQuestionAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		request.setAttribute("questionAttachment", null);
 		return mapping.findForward(DacoConstants.SUCCESS);
 	}
 

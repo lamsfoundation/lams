@@ -4,7 +4,6 @@
 <html:html locale="true">
 <lams:head>
 	<title><fmt:message key="label.author.title" /></title>
-
 	<%@ include file="/common/header.jsp"%>
 </lams:head>
 <body class="stripes">
@@ -13,8 +12,7 @@
 		<h1>
 			<fmt:message key="label.common.heading" />
 		</h1>
-
-		<B><fmt:message key="message.monitoring.edit.activity.not.editable" /></B>
+		<b><fmt:message key="message.monitoring.edit.activity.not.editable" /></b>
 	</div>
 	</div>
 </body>

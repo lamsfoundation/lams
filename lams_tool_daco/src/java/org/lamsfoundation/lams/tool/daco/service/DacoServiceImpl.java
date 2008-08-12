@@ -399,6 +399,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 		List<MonitoringSummarySessionDTO> result = new ArrayList<MonitoringSummarySessionDTO>(sessions.size());
 		Daco daco = getDacoByContentId(contentId);
 		for (DacoSession session : sessions) {
+			//for each session a monitoring summary is created
 			MonitoringSummarySessionDTO monitoringRecordList = new MonitoringSummarySessionDTO(session.getSessionId(), session
 					.getSessionName());
 			List<DacoUser> users = dacoUserDao.getBySessionId(session.getSessionId());
@@ -407,6 +408,9 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 				MonitoringSummaryUserDTO monitoringUser = new MonitoringSummaryUserDTO(user.getUid(),
 						user.getUserId().intValue(), user.getLastName() + " " + user.getFirstName(), user.getLoginName());
 				List<List<DacoAnswer>> records = getDacoAnswersByUserUid(user.getUid());
+				/* If the user provided as "userUid" matches current user UID, the summary is filled with additional data.
+				 * NULL matches all users. UID < 0 matches no users, so only the brief description of users is filled in.
+				 */
 				if (userUid == null || userUid.equals(user.getUid())) {
 					monitoringUser.setRecords(records);
 					NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -429,12 +433,16 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	public List<QuestionSummaryDTO> getQuestionSummaries(Long userUid) {
 		List<QuestionSummaryDTO> result = new ArrayList<QuestionSummaryDTO>();
 		DacoUser user = (DacoUser) dacoUserDao.getObject(DacoUser.class, userUid);
-
+		//Blank structure is created
 		Set<DacoQuestion> questions = user.getDaco().getDacoQuestions();
 		if (questions.size() > 0) {
 			for (DacoQuestion question : questions) {
 				switch (question.getType()) {
 					case DacoConstants.QUESTION_TYPE_NUMBER: {
+						/*
+						 * For numbers, first "single answer" is a summary for the whole question.
+						 * Other "single answers" are summaries for the real answers provided by a learner.
+						 */
 						QuestionSummaryDTO summary = new QuestionSummaryDTO();
 						summary.addUserSummarySingleAnswer(0, new QuestionSummarySingleAnswerDTO());
 						summary.addGroupSummarySingleAnswer(0, new QuestionSummarySingleAnswerDTO());

@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.daco.web.action;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -80,7 +81,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * 
- * @author Steve.Ni
+ * @author Marcin Cieslak
  * 
  * @version $Revision$
  */
@@ -365,11 +366,12 @@ public class LearningAction extends Action {
 							recordForm.getAnswer(formAnswerNumber++), recordForm.getAnswer(formAnswerNumber) };
 					if (!(StringUtils.isBlank(dateParts[0]) || StringUtils.isBlank(dateParts[1]) || StringUtils
 							.isBlank(dateParts[2]))) {
+
 						Calendar calendar = Calendar.getInstance();
 						calendar.clear();
 						calendar.set(Integer.parseInt(dateParts[2]), Integer.parseInt(dateParts[1]) - 1, Integer
 								.parseInt(dateParts[0]));
-						answer.setAnswer(calendar.getTime().toString());
+						answer.setAnswer(DacoConstants.DEFAULT_DATE_FORMAT.format(calendar.getTime()));
 					}
 					else {
 						answer.setAnswer(null);
@@ -975,12 +977,22 @@ public class LearningAction extends Action {
 						checkboxes = null;
 					}
 					if (questionType == DacoConstants.QUESTION_TYPE_DATE) {
-						String[] dateParts = null;
+						String[] dateParts = new String[3];
 						if (answer.getAnswer() != null) {
-							dateParts = answer.getAnswer().split(DacoConstants.DATE_PART_DELIMETER);
-						}
-						else {
-							dateParts = new String[] { null, null, null };
+							Calendar calendar = Calendar.getInstance();
+							calendar.clear();
+
+							try {
+								calendar.setTime(DacoConstants.DEFAULT_DATE_FORMAT.parse(answer.getAnswer()));
+							}
+							catch (ParseException e) {
+								LearningAction.log.error(e.getMessage());
+								e.printStackTrace();
+							}
+
+							dateParts[0] = String.valueOf(calendar.get(Calendar.DAY_OF_YEAR));
+							dateParts[1] = String.valueOf(calendar.get(Calendar.MONTH) + 1);
+							dateParts[2] = String.valueOf(calendar.get(Calendar.YEAR));
 						}
 						recordForm.setAnswer(formAnswerNumber++, dateParts[0]);
 						recordForm.setAnswer(formAnswerNumber++, dateParts[1]);

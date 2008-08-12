@@ -29,7 +29,7 @@
 		<h1>
 			${daco.title}
 		</h1>
-
+		<%-- Just a message and reflection entry (if exists) --%>
 		<p>
 			<fmt:message key="message.learning.offline" />
 		</p>

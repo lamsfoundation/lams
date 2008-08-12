@@ -1,10 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-<c:set var="showMessageURL">
-	<html:rewrite page='/authoring/newQuestion.do?sessionMapID=${formBean.sessionMapID}&questionType=' />
-</c:set>
+<c:url var="showMessageURL" value='/authoring/newQuestion.do'>
+	<c:param name="sessionMapID" value="${formBean.sessionMapID}" />
+</c:url>
 
 <script type="text/javascript">
+	//Showes the add/edit question area
 	function showQuestionInputArea(url) {
 
 		var area=document.getElementById("questionInputArea");
@@ -38,13 +39,12 @@
 	//Shows the add/edit question area for the corresponding question type
    function showQuestionInputAreaByType(url){
 	 var questionTypeDropdown=document.getElementById("questionType");
-	 showQuestionInputArea(url.concat(questionTypeDropdown.selectedIndex + 1));
+	 showQuestionInputArea(url+"&questionType="+(questionTypeDropdown.selectedIndex + 1));
 }
 	
 	
 	function editQuestion(questionIndex,sessionMapID){
-		var reqID = new Date();
-		var url = "<c:url value="/authoring/editQuestion.do?questionIndex="/>" + questionIndex +"&reqID="+reqID.getTime()+"&sessionMapID="+sessionMapID;
+		var url = "<c:url value="/authoring/editQuestion.do?questionIndex="/>" + questionIndex +"&reqID="+(new Date()).getTime()+"&sessionMapID="+sessionMapID;
 		showQuestionInputArea(url);
 	}
 	
@@ -53,14 +53,13 @@
 		
 	function deleteQuestion(questionIndex,sessionMapID){
 		var url = "<c:url value='/authoring/removeQuestion.do'/>";
-	    var reqID = new Date();
-		var param = "questionIndex=" + questionIndex +"&reqID="+reqID.getTime()+"&sessionMapID="+sessionMapID;;
+		var param = "questionIndex=" + questionIndex +"&reqID="+(new Date()).getTime()+"&sessionMapID="+sessionMapID;;
 		deleteQuestionLoading();
 	    var myAjax = new Ajax.Updater(
 		    	questionListTargetDiv,
 		    	url,
 		    	{
-		    		method:'get',
+		    		method:'post',
 		    		parameters:param,
 		    		onComplete:deleteQuestionComplete,
 		    		evalScripts:true
@@ -68,9 +67,11 @@
 	    );
 	}
 	
+
 	function deleteQuestionLoading(){
 		showBusy("#questionListArea");
 	}
+	
 	function deleteQuestionComplete(){
 		hideBusy("#questionListArea");
 	}
@@ -90,7 +91,7 @@
 		<lams:FCKEditor id="daco.instructions" value="${formBean.daco.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:FCKEditor></td>
 	</tr>
 </table>
-
+<!-- Dropdown menu for choosing a question type -->
 <div id="questionListArea"><c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 <%@ include	file="/pages/authoring/parts/questionlist.jsp"%></div>
 <p><select id="questionType" style="float: left">

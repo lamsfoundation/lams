@@ -26,7 +26,12 @@ package org.lamsfoundation.lams.tool.daco.dto;
 
 import java.util.List;
 
-
+/**
+ * Represents a group of users with details that are useful for displaying summary in monitoring.
+ * 
+ * @author Marcin Cieslak
+ *
+ */
 public class MonitoringSummarySessionDTO {
 
 	private Long sessionId;

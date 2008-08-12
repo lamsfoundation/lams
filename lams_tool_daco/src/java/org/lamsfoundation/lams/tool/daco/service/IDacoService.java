@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.daco.dao.DacoAnswerDAO;
 import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
 import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
@@ -227,17 +228,56 @@ public interface IDacoService {
 	 */
 	DacoUser getUser(Long uid);
 
+	/**
+	 * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages. 
+	 * @param key key of the message
+	 * @param args arguments for the message
+	 * @return message content
+	 */
 	public String getLocalisedMessage(String key, Object[] args);
 
+	/**
+	 * Returns summaries for particular questions. A list of {@link QuestionSummaryDTO question summaries} is created,
+	 * one for each question. They are filled with default, blank data.
+	 * Then the proper summaries are {@link DacoAnswerDAO#getQuestionSummaries(Long, List) read} from the database.
+	 * @param userUid user for who the summary should be created
+	 * @return list of question summaries
+	 */
 	public List<QuestionSummaryDTO> getQuestionSummaries(Long userUid);
 
+	/**
+	 * Removes a Daco object and all of its Questions from Hibernate cache.
+	 * It is required to avoid errors when same object was read from the database twice and one of the copies is being saved.
+	 * @param daco object to release
+	 */
 	public void releaseDacoFromCache(Daco daco);
 
+	/**
+	 * Removes Answers from Hibernate cache.
+	 * It is required to avoid errors when same object was read from the database twice and one of the copies is being saved.
+	 * @param answers collection of answers to remove from cache
+	 */
 	void releaseAnswersFromCache(Collection<DacoAnswer> answers);
 
+	/**
+	 * Gets the number of records in the group. It uses database connection.
+	 * @param sessionId session ID of the group
+	 * @return number of records in that group
+	 */
 	Integer getGroupRecordCount(Long sessionId);
 
+	/**
+	 * Gets the number of records in the group. It uses provided monitoring summary.
+	 * @param monitoringSummary summary which will be iterated through and the records counted
+	 * @return number of records in that group
+	 */
 	Integer getGroupRecordCount(MonitoringSummarySessionDTO monitoringSummary);
 
+	/**
+	 * Creates summary that is later used in the monitoring.
+	 * @param contentId ID of Daco for which the summary should be created
+	 * @param userUid ID of the user for who the summary details should be created; <code>null</code> if the summary details should be created for all users; <code>< 0 </code> if the summary details should be created for noone  
+	 * @return list of monitoring summaries, one for each session
+	 */
 	List<MonitoringSummarySessionDTO> getMonitoringSummary(Long contentId, Long userUid);
 }

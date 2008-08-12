@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.tool.daco.model.Daco;
 
 /**
  * 
- * @author Steve.Ni
+ * @author Marcin Cieslak
  * 
  * @version $Revision$
  */

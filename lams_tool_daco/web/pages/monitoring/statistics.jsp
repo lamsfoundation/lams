@@ -5,7 +5,8 @@
 <c:set var="userUid" value="${sessionMap.userUid}" />
 <c:url var="refreshStatisticsUrl" value="/monitoring/summary.do?sessionMapID=${sessionMapID}"/>
 
-
+	<%-- Same statistics as in the learner,
+		but with an option to choose currently displayed learner. --%>
 	<c:choose>
 		<c:when test="${empty monitoringSummary || empty monitoringSummary[0].users}">
 			<div align="center" style="font-weight: bold;">

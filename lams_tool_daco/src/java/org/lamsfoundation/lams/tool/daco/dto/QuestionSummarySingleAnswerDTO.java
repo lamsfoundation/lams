@@ -3,6 +3,11 @@
  */
 package org.lamsfoundation.lams.tool.daco.dto;
 
+/**
+ * Represents a single answer and its summary.
+ * @author Marcin Cieslak
+ *
+ */
 public class QuestionSummarySingleAnswerDTO {
 	private String answer;
 	private String sum;

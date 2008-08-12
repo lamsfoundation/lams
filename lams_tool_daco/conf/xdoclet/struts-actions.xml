@@ -94,10 +94,6 @@
 	parameter="removeAnswerOption">
 	<forward name="success" path="/pages/authoring/parts/answeroptions.jsp" />
 </action>
-<action path="/authoring/removeQuestionAttachment" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
-	parameter="removeQuestionAttachment">
-	<forward name="success" path="/pages/authoring/parts/questionattachment.jsp" />
-</action>
 
 <!-- ========== BEGIN: Learning Definitions ============================== -->
 <action path="/learning/start" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" parameter="start"

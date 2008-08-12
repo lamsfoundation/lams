@@ -22,6 +22,7 @@
 	</c:if>
 	
 	<c:choose>
+		<%-- To return to the previous tab.  --%>
 		<c:when test="${not empty sessionMap.learningCurrentTab}">
 			<c:set var="learningCurrentTab" value="${sessionMap.learningCurrentTab}" />
 		</c:when>
@@ -51,14 +52,13 @@
 </lams:Tabs></div>
 
 <div id="content-learner">
+<%-- To switch between the vertical/horizontal view --%>
 <div style="float: right; margin-left: 10px; padding-top: 4px" class="help">
 	<img src="${tool}includes/images/uparrow.gif" title="<fmt:message key="label.common.view.change" />"
 	 onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" />
 </div>
 
 <lams:help toolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" module="learning" />
-
-
 
 <c:if test="${daco.lockOnFinished and mode != 'teacher'}">
 	<div class="info"><c:choose>

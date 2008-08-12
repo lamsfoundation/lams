@@ -7,12 +7,14 @@
 
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="daco" value="${sessionMap.daco}" />
+<%-- If the view is horizontal or vertical --%>
 <c:set var="horizontal" value="${sessionMap.learningView=='horizontal'}" />
+<%-- To display A) B) C) in answer options instead of 1) 2) 3) --%>
 <c:set var="ordinal"><fmt:message key="label.authoring.basic.answeroption.ordinal"/></c:set>
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 
 <%@ include file="/common/messages.jsp"%>
-
+<%-- The status of the last add/edit operation. --%>
 <c:if test="${recordOperationSuccess=='add'}">
 	<div class="info"><fmt:message key="message.learning.addrecordsuccess" /></div>
 </c:if>
@@ -30,11 +32,12 @@
 	</tr>
 </table>
 <c:if test="${not finishedLock }">
+
 	<p class="hint">
 		<fmt:message key="label.learning.heading.recordnumber" />
 		<span id="displayedRecordNumberSpan" class="hint">${displayedRecordNumber}</span>
 	</p>
-	
+	<!-- Form to add/edit a record -->
 	<html:form action="learning/saveOrUpdateRecord" method="post" styleId="recordForm" enctype="multipart/form-data">
 	
 	<c:set var="fileNumber" value="0" />
@@ -50,12 +53,16 @@
 					<div class="bigNumber">${questionStatus.index+1}</div>
 					${question.description}
 					<c:choose>
-						<c:when test="${question.type==1}">
+						<%-- The content varies depending on the question type --%>
+						<c:when test="${question.type==1}"><%-- Single line text --%>
 							<div class="hint"><fmt:message key="label.learning.textfield.hint" /></div>		
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
 							<c:choose>
+								<%-- Textfield entry length is limited 
+									depending on the maximum number of characters the teacher provided
+								--%>
 								<c:when test="${question.max!=null}">
 									<html:text property="answer[${answerIndex}]" size="60" maxlength="${question.max}" />
 								</c:when>
@@ -65,7 +72,7 @@
 							</c:choose>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
-						<c:when test="${question.type==2}">
+						<c:when test="${question.type==2}"><%-- Multi-line text --%>
 							<div class="hint"><fmt:message key="label.learning.textarea.hint" /></div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
@@ -73,10 +80,13 @@
 							<html:textarea property="answer[${answerIndex}]" cols="50" rows="3" />
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
-						<c:when test="${question.type==3}">
+						<c:when test="${question.type==3}"><%-- Number --%>
 							<div class="hint"><fmt:message key="label.learning.number.hint" />
 							<c:if test="${not empty question.digitsDecimal}">
 								<br />
+								<%-- An information for the learner is displayed,
+									if the number he provides will be rounded to the number of places after the decimal point,
+									as stated by the teacher. --%>
 								<fmt:message key="label.learning.number.decimal">
 									<fmt:param value="${question.digitsDecimal}" />
 								</fmt:message>
@@ -88,7 +98,7 @@
 							<html:text property="answer[${answerIndex}]" size="10" />
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
-						<c:when test="${question.type==4}">
+						<c:when test="${question.type==4}"><%-- Date can be entered in three textfields --%>
 							<div class="hint"><fmt:message key="label.learning.date.hint" /></div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
@@ -106,7 +116,7 @@
 							
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
-						<c:when test="${question.type==5}">
+						<c:when test="${question.type==5}"><%-- File --%>
 							<div class="hint"><fmt:message key="label.learning.file.hint" /></div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
@@ -114,7 +124,7 @@
 							<html:file styleId="file-${fileNumber+1}" property="file[${fileNumber}]" size="50" />
 							<c:set var="fileNumber" value="${fileNumber+1}" />
 						</c:when>
-						<c:when test="${question.type==6}">
+						<c:when test="${question.type==6}"><%-- Image --%>
 							<div class="hint"><fmt:message key="label.learning.image.hint" /></div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
@@ -122,17 +132,18 @@
 							<html:file styleId="file-${fileNumber+1}" property="file[${fileNumber}]" size="50" />
 							<c:set var="fileNumber" value="${fileNumber+1}" />
 						</c:when>
-						<c:when test="${question.type==7}">
+						<c:when test="${question.type==7}"><%-- Radio buttons  --%>
 							<div class="hint"><fmt:message key="label.learning.radio.hint" /></div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
+							<%-- It displays for example A) instead of 1) --%>
 							${fn:substring(ordinal,status.index,status.index+1)}) <html:radio property="answer[${answerIndex}]" value="${status.index+1}">${answerOption.answerOption}</html:radio><br />
 							</c:forEach>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
-						<c:when test="${question.type==8}">
+						<c:when test="${question.type==8}"><%-- Dropdown menu --%>
 							<div class="hint"><fmt:message key="label.learning.dropdown.hint" /></div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
@@ -145,7 +156,7 @@
 							</html:select>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
-						<c:when test="${question.type==9}">
+						<c:when test="${question.type==9}"><%-- Checkboxes --%>
 							<div class="hint"><fmt:message key="label.learning.checkbox.hint" /></div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
@@ -159,7 +170,7 @@
 							</c:forEach>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
-						<c:when test="${question.type==10}">
+						<c:when test="${question.type==10}"><%-- Longitude/latitude --%>
 							<div class="hint"><fmt:message key="label.learning.longlat.hint" /></div>
 							<c:if test="${horizontal}">
 								</td>
@@ -202,6 +213,7 @@
 	</html:form>
 </c:if>
 <c:if test="${sessionMap.userFinished and daco.reflectOnActivity}">
+	<%-- Buttons that either move onto the next activity or display the reflection screen --%>
 	<p class="small-space-top">
 		<h2 style="padding-left: 20px;">${daco.reflectInstructions}</h2>
 		<div class="button-add-div">
