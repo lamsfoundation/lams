@@ -1,5 +1,4 @@
 # packages/lams2conf/www/tooladapter_forum.tcl
-
 ad_page_contract {
     
     Tool Adapter for Forum
@@ -10,11 +9,13 @@ ad_page_contract {
     @cvs-id $Id$
 } {
     method
-    extToolContentID
+    extToolContentID:optional
     ts
     un
     hs
     cs
+    upload_file:trim,optional
+    upload_file.tmpfile:optional,tmpfile    
 } -properties {
 } -validate {
 } -errors {
@@ -65,19 +66,35 @@ switch $method {
 
     import {
 	# gets the file from LAMS with the content of the forum
+
+	if { ![empty_string_p $upload_file] && [file isfile  ${upload_file.tmpfile}]} {
+
+	    # if the file exists and it's indeed a file,
+	    # then import the instance using the content of the file,
+	    # the course_id and user_id
+
+	    set new_extToolContentID [forum::lams::import_instance -file_path ${upload_file.tmpfile} -user_id $username -course_id $course_id]
+
+	    ns_log Debug "Import: newextToolContentID $new_extToolContentID "
+	    ReturnHeaders "text/plain"
+	    ns_write $new_extToolContentID
+	    ad_script_abort
+	    
+	} else {
+
+	    # error with the input, return a -1 to denote error.
+	    ReturnHeaders "text/plain"
+	    ns_write "-1"
+	    ad_script_abort
+	}
+
     }
 
     export {
-	# exports the content of the forum 
+	# exports the content of the forum to a file
 
-	# gets the content of the forum
-	forum::get -forum_id $forum_id -array forum
+	forum::lams::export_instance -forum_id  $extToolContentID 
 
-	# exports the array to text
-	set export_forum_as_string [array get forum]
-
-	# returns the text from the array
-	ns_returnfile 200 text/plain $export_forum_as_string
 	ad_script_abort
 
     }
