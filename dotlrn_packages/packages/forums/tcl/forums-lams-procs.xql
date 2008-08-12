@@ -16,6 +16,15 @@
         </querytext>
     </fullquery>
 
+    <fullquery name="forum::lams::update_user_id.update_user_id">
+        <querytext>
+            update acs_objects
+             set modifying_user = :user_id,
+             creation_user = :user_id
+            where object_id = :forum_id
+        </querytext>
+    </fullquery>
+
   <fullquery name="forum::lams::get_package_instance.get_package_id">
     <querytext>
       select 

@@ -12,13 +12,24 @@ ad_library {
 
 namespace eval forum::lams {}
 
-ad_proc -public forum::lams::is_lams {
-    {-forum_id ""}
+ad_proc -private forum::lams::is_lams {
+    -forum_id:required
 } {
     set a forum to be a LAMS forum instance only
 } {
 
     db_dml is_lams {}
+
+}
+
+ad_proc -private forum::lams::update_user_id {
+    -forum_id:required
+    -user_id:required
+} {
+    set a forum to be a LAMS forum instance only
+} {
+
+    db_dml update_user_id {}
 
 }
 
@@ -66,6 +77,7 @@ ad_proc -public forum::lams::clone_instance {
 			 ]
 
     forum::lams::is_lams -forum_id $new_forum_id
+    forum::lams::update_user_id -forum_id $new_forum_id -user_id $user_id
 
     return $new_forum_id
 
@@ -124,8 +136,8 @@ ad_proc -public forum::lams::export_instance {
 
 ad_proc -public forum::lams::import_instance {
     -file_path:required
-    -user_id
-    -course_id
+    -user_id:required
+    -course_id:required
 } {
     Import an instance of forum
 } {
@@ -156,6 +168,7 @@ ad_proc -public forum::lams::import_instance {
 			  ]
 
     forum::lams::is_lams -forum_id $new_forum_id
+    forum::lams::update_user_id -forum_id $new_forum_id -user_id $user_id
 
     return $new_forum_id
     
