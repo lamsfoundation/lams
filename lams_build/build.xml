@@ -292,6 +292,11 @@
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 			<property name="generate.for.installers" value="${generate.for.installers}"/>
 		</ant>
+		<ant antfile="../${tool_daco_dir}/build.xml" target="deploy-tool"
+						inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+			<property name="generate.for.installers" value="${generate.for.installers}"/>
+		</ant>
 	</target>
 
 	<target name="deploy-lams-tools" depends="test-application, deploy-common-tools" if="isLAMS"
