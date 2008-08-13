@@ -47,64 +47,12 @@ set get_sequences_url "$lams_server_url/services/xml/LearningDesignRepository?se
 
 ns_log Notice "URL requested $get_sequences_url"
 
-
-set xml [lindex [ad_httpget -url $get_sequences_url -timeout 30] 1]
-
-set xml [encoding convertfrom utf-8 $xml]
-set doc [dom parse  $xml]
-set content [$doc documentElement]
-
-proc process_node { node } {
-
-    if {[string equal [$node nodeName] "Folder"]} {
-
-	regsub -all {'} [$node getAttribute name] {\\'} folder_name
-
-	append output "\[ '$folder_name', null , "
-
-	if {[$node hasChildNodes]} {
-
-	    foreach child [$node childNodes] {
-
-		append output [process_node $child]  
-
-		if  {[string equal [$child nodeName] "Folder"]} {
-
-		    if {![empty_string_p [$child nextSibling]]} {
-			append output " \], " 
-		    } else {
-			append output " \]"
-		    }
-		}
-
-	    }
-
-	} else {
-
-	    append output "\['', null\]"
-
-	}
-    } else {
-	# the node is a LearningDesign
-
-	regsub -all {'} [$node getAttribute name] {\\'} design_name
-
-	append output "\[ '$design_name', 'javascript:selectSequence([$node getAttribute resourceId])' \] "
-
-	if {![empty_string_p [$node nextSibling]]} {
-	    append output ", " 
-	} else {
-	    append output ""
-	}
-
-    }
-
-    return $output
+if {[catch {set return_string [ad_httpget -url $get_sequences_url -timeout 30] } ] } {
+    ad_return_complaint 0 "<b>It seems that the LAMS server you are trying to connect is down or there's a problem with the configuration. Please verify the connection setting or contact your system administrator.</b>"
+    ad_script_abort
 }
 
+set xml [lindex $return_string 1]
 
-
-set sequence_list [concat [process_node $content] " \] "]
-
-#regsub -all {'} $sequence_list {\\'} sequence_list
+set sequence_list [lams2int::process_sequence_xml -xml $xml]
 

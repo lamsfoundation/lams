@@ -6,7 +6,7 @@ ad_library {
     
     @author Ernie Ghiglione (ErnieG@melcoe.mq.edu.au)
     @creation-date 2007-04-16
-    @cvs-id $Id$
+    @cvs-id lams2int-procs.tcl,v 1.1 2007/09/12 06:37:02 ernieg Exp
 }
 
 #
@@ -137,3 +137,73 @@ ad_proc lams2int::get_request_source {
     return [parameter::get -parameter request_source -package_id $lams2conf_package_id]
 
 }
+
+ad_proc -public lams2int::process_sequence_xml {
+    -xml:required
+} {
+    Gets the XML with the sequences and folder and process it. 
+
+} {
+
+    encoding convertfrom utf-8 $xml
+    set doc [dom parse  $xml]
+    set content [$doc documentElement]
+
+    set sequence_list [concat [lams2int::process_node -node $content] " \] "]
+
+}
+
+ad_proc -private lams2int::process_node {
+    -node:required 
+
+} {
+    Process the XML nodes 
+    
+} { 
+
+    if {[string equal [$node nodeName] "Folder"]} {
+
+	regsub -all {'} [$node getAttribute name] {\\'} folder_name
+	
+	append output "\[ '$folder_name', null , "
+	
+	if {[$node hasChildNodes]} {
+
+	    foreach child [$node childNodes] {
+
+		append output [lams2int::process_node -node $child]  
+
+		if  {[string equal [$child nodeName] "Folder"]} {
+
+		    if {![empty_string_p [$child nextSibling]]} {
+			append output " \], " 
+		    } else {
+			append output " \]"
+		    }
+		}
+
+	    }
+
+	} else {
+
+	    append output "\['', null\]"
+
+	}
+    } else {
+	# the node is a LearningDesign
+
+	regsub -all {'} [$node getAttribute name] {\\'} design_name
+
+	append output "\[ '$design_name', 'javascript:selectSequence([$node getAttribute resourceId])' \] "
+
+	if {![empty_string_p [$node nextSibling]]} {
+	    append output ", " 
+	} else {
+	    append output ""
+	}
+
+    }
+
+    return $output
+}
+
