@@ -731,8 +731,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 					.debug("malformed presence xml: no from or to attributes present");
 			return null;
 		}
-
-		// TODO, do we really need to check this ??
+		/*
+		// Note: Removed xmlns check due to problems with firefox 3
 		// checking presence packet for correct values
 		Node xElem = presence.getFirstChild();
 		if (xElem == null) {
@@ -747,6 +747,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 					.debug("malformed presence xml: xmlns attribute for x element not available or incorrect");
 			return null;
 		}
+		*/
 
 		// get the Chat User
 		String jabberID = from.getNodeValue().split("/")[0];
