@@ -2,17 +2,7 @@
 
 <!--  JsJaC Library -->
 <script type="text/javascript"
-	src="${tool}includes/javascript/jsjac/sha1.js"></script>
-<script type="text/javascript"
-	src="${tool}includes/javascript/jsjac/xmlextras.js"></script>
-<script type="text/javascript"
-	src="${tool}includes/javascript/jsjac/JSJaCConnection.js"></script>
-<script type="text/javascript"
-	src="${tool}includes/javascript/jsjac/JSJaCPacket.js"></script>
-<script type="text/javascript"
-	src="${tool}includes/javascript/jsjac/JSJaCHttpPollingConnection.js"></script>
-<script type="text/javascript"
-	src="${tool}includes/javascript/jsjac/JSJaCHttpBindingConnection.js"></script>
+	src="${tool}includes/javascript/jsjac-1.3.1/jsjac.js"></script>
 <!--  <script language="JavaScript" type="text/javascript" src="Debugger.js"></script> -->
 
 <!--  Chat Config -->
