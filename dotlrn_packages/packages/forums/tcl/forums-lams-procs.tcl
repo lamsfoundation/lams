@@ -100,7 +100,7 @@ ad_proc -private forum::lams::get_package_instance  {
 
 
 ad_proc -public forum::lams::export_instance {
-    {-forum_id ""}
+    -forum_id:required
 } {
     Exports an instance of forum 
 } {
@@ -174,3 +174,37 @@ ad_proc -public forum::lams::import_instance {
     
 }
 
+
+ad_proc -public forum::lams::export_portfolio {
+    -forum_id:required
+    {-user_id ""}
+} {
+    Export the portfolio and returns an HTML file
+
+} {
+
+    # Since .LRN Forum doesn't provide a page with all the threads in
+    # one single HTML, we simply return a page stating that this
+    # feature is not implemented
+
+    set return_string "<html><title>Export Portfolio for .LRN Forum</title><body><h1>Sorry, this feature is not implemented</h1></body></html>"
+
+    set tmp_folder [ns_tmpnam]
+    file mkdir $tmp_folder
+    set path_to_file [file join $tmp_folder export_portfolio_$forum_id]
+
+    set filer [open $path_to_file w+]
+
+    puts -nonewline $filer $return_string
+
+    close $filer
+
+    # send the file back to the call
+
+    ns_set put [ad_conn outputheaders] Content-Disposition "attachment;filename=\"export_portfolio_$forum_id\""
+    ns_set put [ad_conn outputheaders] Content-Type "text/txt"
+    ns_set put [ad_conn outputheaders] Content-Size "[file size $path_to_file]"
+    ns_returnfile 200  text/html $path_to_file
+    
+
+}
