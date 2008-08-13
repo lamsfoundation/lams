@@ -37,4 +37,17 @@
        ap.package_key='forums'
     </querytext>
   </fullquery>
+
+  <fullquery name="forum::lams::output_number_of_postings.number_of_postings">
+    <querytext>
+      select count(user_id) from forums_messages where forum_id = :forum_id and user_id = :user_id
+    </querytext>
+  </fullquery>
+
+  <fullquery name="forum::lams::output_number_of_words.number_of_words">
+    <querytext>
+      select format, content from forums_messages where forum_id = :forum_id and user_id = :user_id
+    </querytext>
+  </fullquery>
+
 </queryset>

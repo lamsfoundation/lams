@@ -206,5 +206,58 @@ ad_proc -public forum::lams::export_portfolio {
     ns_set put [ad_conn outputheaders] Content-Size "[file size $path_to_file]"
     ns_returnfile 200  text/html $path_to_file
     
+}
+
+
+## Tool Ouputs
+
+ad_proc -public forum::lams::output_number_of_postings {
+    -forum_id:required
+    -user_id:required
+} {
+   Returns the number of postings per Forum per user
+
+} {
+
+    if {[db_0or1row number_of_postings {}]} {
+
+	return $count
+
+    } else {
+
+	return 0
+    }
+
+}
+
+
+ad_proc -public forum::lams::output_number_of_words {
+    -forum_id:required
+    -user_id:required
+} {
+   Returns the number of words in all messages per user in a forum
+
+} {
+
+    set word_count ""
+    db_foreach number_of_words {} {
+
+	# if we catch that the content is HTML we turn it into plain
+	# text 
+	if {[string equal $format "text/html"]} {
+
+	    set content [ad_html_text_convert -from "text/html" -to "text/plain" $content]
+
+	}
+
+	set word_count [concat $word_count $content]
+
+    } if_no_rows {
+
+	set word_count ""
+
+    }
+
+    return [llength $word_count]
 
 }
