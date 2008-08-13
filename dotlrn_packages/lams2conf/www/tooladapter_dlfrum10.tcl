@@ -101,14 +101,12 @@ switch $method {
 
     export_portfolio {
 
-	# ...
+	# exports the portfolio if the tool implements it
+       
+	forum::lams::export_portfolio -forum_id  $extToolContentID -user_id $username
 
-    }
+	ad_script_abort
 
-
-    export_portfolio_class {
-
-	# ...
     }
 
     get_outputs {
