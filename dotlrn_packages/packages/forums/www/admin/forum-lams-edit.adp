@@ -1,4 +1,4 @@
-<master>
+<master src="../../lib/lams/lrn-lams-master">
 <property name="title">Edit Forum: @forum.name;noquote@</property>
 <property name="context">@context;noquote@</property>
 <property name="focus">forum.name</property>
