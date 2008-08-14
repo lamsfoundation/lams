@@ -14,6 +14,7 @@ ad_page_contract {
     un
     hs
     cs
+    oname:optional
     upload_file:trim,optional
     upload_file.tmpfile:optional,tmpfile    
 } -properties {
@@ -109,9 +110,26 @@ switch $method {
 
     }
 
-    get_outputs {
+    output {
 
-	# ...
+	switch $oname {
+
+	    dotlrn.forum.output.postings {
+
+		return [forum::lams::output_number_of_postings -forum_id $extToolContentID -user_id $username]
+		ad_script_abort
+
+	    }
+
+	    dotlrn.forum.output.words {
+
+		return [forum::lams::output_number_of_words -forum_id $extToolContentID -user_id $username]
+		ad_script_abort
+
+	    }
+
+	}
+
 
     }
 
