@@ -5,7 +5,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('ServerURLContextPath','lams/', 'config.server.url.context.path', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('Version','2.1', 'config.version', 'config.header.system', 'STRING', 1);
+values ('Version','2.1.1', 'config.version', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('TempDir','/var/opt/lams/temp', 'config.temp.dir', 'config.header.system', 'STRING', 1);
