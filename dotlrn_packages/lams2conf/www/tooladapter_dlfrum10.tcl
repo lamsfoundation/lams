@@ -114,16 +114,18 @@ switch $method {
 
 	switch $oname {
 
-	    dotlrn.forum.output.postings {
+	    learner.number.of.posts {
 
-		return [forum::lams::output_number_of_postings -forum_id $extToolContentID -user_id $username]
+		ReturnHeaders "text/plain"
+		ns_write [forum::lams::output_number_of_postings -forum_id $extToolContentID -user_id $username]
 		ad_script_abort
 
 	    }
 
-	    dotlrn.forum.output.words {
+	    learner.number.of.words {
 
-		return [forum::lams::output_number_of_words -forum_id $extToolContentID -user_id $username]
+		ReturnHeaders "text/plain"
+		ns_write [forum::lams::output_number_of_words -forum_id $extToolContentID -user_id $username]
 		ad_script_abort
 
 	    }
