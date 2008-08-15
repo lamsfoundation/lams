@@ -76,10 +76,11 @@ public interface IAuthoringService {
 	 * </ul>
 	 * @param user The user who has sent this request(author/teacher)
 	 * @param setOriginalDesign If true, then sets the originalLearningDesign field in the new design
+	 * @param custom comma separated values used for tool adapters
 	 * @return LearningDesign The new copy of learning design.
 	 */
 	public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, 
-			WorkspaceFolder workspaceFolder, boolean setOriginalDesign, String newDesignName) ;
+			WorkspaceFolder workspaceFolder, boolean setOriginalDesign, String newDesignName, String customCSV) ;
 	
 	/**
 	 * Create a copy of learning design as per the requested learning design
@@ -109,6 +110,7 @@ public interface IAuthoringService {
      * @param originalDesignID The design to be "modified". Required.
      * @param designToImportID The design to be imported into originalLearningDesign. Required.
      * @param userId Current User. Required.
+     * @param customCSV The custom CSV required to insert tool adapter tools, so their content can be copied in the external server
      * @param createNewLearningDesign If true, then a copy of the originalLearningDesign is made and the copy modified. If it is false, then 
      * the originalLearningDesign is modified. Required.
      * @param newDesignName New name for the design if a new design is being create. Optional. 
@@ -116,7 +118,7 @@ public interface IAuthoringService {
      * @return New / updated learning design
      */ 
      public LearningDesign insertLearningDesign(Long originalDesignID, Long designToImportID, Integer userID, 
-    		 boolean createNewLearningDesign, String newDesignName, Integer workspaceFolderID) throws UserException, LearningDesignException,
+    		 boolean createNewLearningDesign, String newDesignName, Integer workspaceFolderID, String customCSV) throws UserException, LearningDesignException,
 				 WorkspaceFolderException, IOException;
 
 	/**
@@ -238,9 +240,10 @@ public interface IAuthoringService {
 	 * Complex activity.
 	 * 
 	 * @param toolContentID The toolContentID indicating the content to copy
+	 * @param customCSV The customCSV if this is a tool adapter tool.
 	 * @return String The new tool content id in WDDX Format
 	 */
-	public String copyToolContent(Long toolContentID) throws IOException;
+	public String copyToolContent(Long toolContentID, String customCSV) throws IOException;
 	
 	/**
 	 * Calls an appropriate tools to copy the content indicated by toolContentIds. Batch 
@@ -255,10 +258,11 @@ public interface IAuthoringService {
 	 * Complex activity.
 	 * 
 	 * @param userId Id of the user requesting the copy
+	 * @param customCSV the customCSV required to copy tool adapter tools
 	 * @param toolContentIDs The toolContentIDs indicating the content to copy
 	 * @return New Id map in format oldId1=newId1,oldId2=newId2,oldId3=newId3
 	 */
-	public String copyMultipleToolContent(Integer userId,List<Long> toolContentIds);
+	public String copyMultipleToolContent(Integer userId,List<Long> toolContentIds, String customCSV);
 	
 	/** Get the available licenses. This will include our supported Creative Common
 	 * licenses and an "OTHER" license which may be used for user entered license details.

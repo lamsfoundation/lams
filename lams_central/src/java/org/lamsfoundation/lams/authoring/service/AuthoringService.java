@@ -27,42 +27,32 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.Vector;
-import java.util.Date;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.hibernate.Hibernate;
-import org.hibernate.id.Configurable;
-import org.hibernate.id.IdentifierGenerator;
-import org.hibernate.id.UUIDHexGenerator;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
-import org.lamsfoundation.lams.authoring.ObjectExtractorException;
-import org.lamsfoundation.lams.authoring.service.EditOnFlyProcessor;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.License;
-import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
@@ -83,7 +73,6 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
-import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
@@ -705,7 +694,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
             	// a content record, then shortcomings in the createToolSession code may throw exceptions.
             	if ( activity.isToolActivity() ) {
 	            	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
-	            	Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, true);
+	            	Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, true, null);
                     toolActivity.setToolContentId(newContentId);
  
             	} else {
@@ -742,14 +731,14 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 					+" is not authorized to copy a learning design into the workspace folder "+workspaceFolder.getWorkspaceFolderId());
 		}
 
-		return copyLearningDesign(originalDesign,copyType,user,workspaceFolder, setOriginalDesign,null);
+		return copyLearningDesign(originalDesign,copyType,user,workspaceFolder, setOriginalDesign,null, null);
 	}
 	
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer, org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.usermanagement.WorkspaceFolder, java.lang.Boolean, java.lang.String)
      */
     public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, WorkspaceFolder workspaceFolder, 
-    							boolean setOriginalDesign, String newDesignName)
+    							boolean setOriginalDesign, String newDesignName, String customCSV)
     	
     {
     	String newTitle = newDesignName;
@@ -764,7 +753,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     	newLearningDesign.setEditOverrideLock(false);  // clear the live edit flag
     	learningDesignDAO.insert(newLearningDesign);
     	
-    	HashMap<Integer, Activity> newActivities = updateDesignActivities(originalLearningDesign,newLearningDesign,0); 
+    	HashMap<Integer, Activity> newActivities = updateDesignActivities(originalLearningDesign,newLearningDesign,0, customCSV); 
     	updateDesignTransitions(originalLearningDesign,newLearningDesign, newActivities,0);
     	// set first activity assumes that the transitions are all set up correctly.
     	newLearningDesign.setFirstActivity(newLearningDesign.calculateFirstActivity());
@@ -778,7 +767,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @throws IOException 
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#insertLearningDesign(java.lang.Long, java.lang.Long, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.Integer)
      */
-     public LearningDesign insertLearningDesign(Long originalDesignID, Long designToImportID, Integer userID, boolean createNewLearningDesign, String newDesignName, Integer workspaceFolderID) throws UserException, WorkspaceFolderException, IOException {
+     public LearningDesign insertLearningDesign(Long originalDesignID, Long designToImportID, Integer userID, boolean createNewLearningDesign, String newDesignName, Integer workspaceFolderID, String customCSV) throws UserException, WorkspaceFolderException, IOException {
 
 		User user = (User)baseDAO.find(User.class,userID);
 		if(user==null)
@@ -801,7 +790,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     					+" is not authorized to store a copy a learning design into the workspace folder "+workspaceFolder);
     		}
 
-    		mainDesign = copyLearningDesign(mainDesign, LearningDesign.COPY_TYPE_NONE, user, workspaceFolder, false, newDesignName );
+    		mainDesign = copyLearningDesign(mainDesign, LearningDesign.COPY_TYPE_NONE, user, workspaceFolder, false, newDesignName, customCSV );
     	} else {
     		// updating the existing design so check the rights to the folder containing the design. If this is in live edit mode
     		boolean authorised = workspaceManagementService.isUserAuthorizedToModifyFolderContents(mainDesign.getWorkspaceFolder().getWorkspaceFolderId(), user.getUserId());
@@ -816,7 +805,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     	// now dump the import design into our main sequence. Leave the first activity ui id for the design as it is.
     	int uiidOffset = mainDesign.getMaxID().intValue();
-    	HashMap<Integer, Activity> newActivities = updateDesignActivities(designToImport,mainDesign,uiidOffset); 
+    	HashMap<Integer, Activity> newActivities = updateDesignActivities(designToImport,mainDesign,uiidOffset, customCSV); 
     	updateDesignTransitions(designToImport,mainDesign, newActivities,uiidOffset);
     	mainDesign.setMaxID(LearningDesign.addOffset(designToImport.getMaxID(),uiidOffset));
     	mainDesign.setValidDesign(Boolean.FALSE);
@@ -835,7 +824,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
             Activity currentActivity = (Activity) i.next();
             if (currentActivity.isToolActivity()) 
             {
-                copyActivityToolContent(currentActivity, design.getCopyTypeID(), originalLearningDesign.getLearningDesignId());
+                copyActivityToolContent(currentActivity, design.getCopyTypeID(), originalLearningDesign.getLearningDesignId(), null);
             }
         }
         
@@ -847,11 +836,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	 * @param copyType
 	 * @param currentActivity
 	 */
-	private void copyActivityToolContent(Activity activity,	Integer ldCopyType, Long originalLearningDesignId) {
+	private void copyActivityToolContent(Activity activity,	Integer ldCopyType, Long originalLearningDesignId, String customCSV) {
 		try {
 			ToolActivity toolActivity = (ToolActivity) activity;
 			// copy the content, but don't set the define later flags if it is preview
-		    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, ldCopyType != LearningDesign.COPY_TYPE_PREVIEW);
+		    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, ldCopyType != LearningDesign.COPY_TYPE_PREVIEW, customCSV);
 		    toolActivity.setToolContentId(newContentId);
 		    
 		    // clear read only field
@@ -887,7 +876,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param newLearningDesign The copy of the originalLearningDesign
      * @return Map of all the new activities, where the key is the UIID value. This is used as an input to updateDesignTransitions
      */
-    private HashMap<Integer, Activity> updateDesignActivities(LearningDesign originalLearningDesign, LearningDesign newLearningDesign, int uiidOffset){
+    private HashMap<Integer, Activity> updateDesignActivities(LearningDesign originalLearningDesign, LearningDesign newLearningDesign, int uiidOffset, String customCSV){
     	HashMap<Integer, Activity> newActivities = new HashMap<Integer, Activity>(); // key is UIID   
     	HashMap<Integer, Grouping> newGroupings = new HashMap<Integer, Grouping>();    // key is UIID
     	
@@ -900,7 +889,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    	Iterator iterator = oldParentActivities.iterator();    	
 	    	while(iterator.hasNext()){
 	    		processActivity((Activity)iterator.next(), newLearningDesign, newActivities, newGroupings, null,  
-	    				originalLearningDesign.getLearningDesignId(), uiidOffset);
+	    				originalLearningDesign.getLearningDesignId(), uiidOffset, customCSV);
 	    	}
     	}
     	
@@ -1006,7 +995,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param parentActivity This activity's parent activity (if one exists). May be null.
      */
     private void processActivity(Activity activity, LearningDesign newLearningDesign, Map<Integer, Activity> newActivities, Map<Integer, Grouping> newGroupings, 
-    		Activity parentActivity, Long originalLearningDesignId, int uiidOffset) {
+    		Activity parentActivity, Long originalLearningDesignId, int uiidOffset, String customCSV) {
 		Activity newActivity = getActivityCopy(activity, newGroupings, uiidOffset);
 		newActivity.setActivityUIID( newActivity.getActivityUIID() );
 		newActivity.setLearningDesign(newLearningDesign);
@@ -1018,14 +1007,14 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		newActivities.put(newActivity.getActivityUIID(),newActivity);
 
         if (newActivity.isToolActivity()) {
-            copyActivityToolContent(newActivity, newLearningDesign.getCopyTypeID(), originalLearningDesignId);
+            copyActivityToolContent(newActivity, newLearningDesign.getCopyTypeID(), originalLearningDesignId, customCSV);
         }
 
 		Set oldChildActivities = getChildActivities((Activity)activity);
 		if ( oldChildActivities != null ) {
 			Iterator childIterator = oldChildActivities.iterator();
 			while(childIterator.hasNext()){
-				processActivity((Activity)childIterator.next(), newLearningDesign, newActivities, newGroupings, newActivity, originalLearningDesignId, uiidOffset);
+				processActivity((Activity)childIterator.next(), newLearningDesign, newActivities, newGroupings, newActivity, originalLearningDesignId, uiidOffset, customCSV);
 			}
 		}
     }
@@ -1277,9 +1266,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	}
 	
 	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyToolContent(java.lang.Long) */
-	public String copyToolContent(Long toolContentID) throws IOException
+	public String copyToolContent(Long toolContentID, String customCSV) throws IOException
 	{ 
-		Long newContentID = lamsCoreToolService.notifyToolToCopyContent(toolContentID);
+		Long newContentID = lamsCoreToolService.notifyToolToCopyContent(toolContentID, customCSV);
 		FlashMessage flashMessage = new FlashMessage("copyToolContent", newContentID);
 		return flashMessage.serializeMessage();
 	}
@@ -1287,11 +1276,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	/**
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyMultipleToolContent(java.lang.Integer, java.util.List)
 	 */
-	public String copyMultipleToolContent(Integer userId, List<Long> toolContentIds) {
+	public String copyMultipleToolContent(Integer userId, List<Long> toolContentIds, String customCSV) {
 		StringBuffer idMap = new StringBuffer();
 		for ( Long oldToolContentId : toolContentIds) {
 			if ( oldToolContentId != null ) {
-				Long newToolContentId = lamsCoreToolService.notifyToolToCopyContent(oldToolContentId);
+				Long newToolContentId = lamsCoreToolService.notifyToolToCopyContent(oldToolContentId, customCSV);
 				idMap.append(oldToolContentId);
 				idMap.append('=');
 				idMap.append(newToolContentId);
