@@ -67,9 +67,11 @@ public interface IMonitoringService
      * @param learningDesignId the selected learning design
      * @param organisationId the copied sequence will be put in the default runtime sequence folder for this org, if such a folder exists.
      * @param userId the user who want to create this lesson.
+     * @param customCSV the custom comma separated values to be used by toolAdapters
+     * @param customCSV the custom comma separated values to be used by toolAdapters
      * @return the lesson initialized.
      */
-    public Lesson initializeLesson(String lessonName, String lessonDescription,Boolean learnerExportAvailable,long learningDesignId,Integer organisationId,Integer userID);
+    public Lesson initializeLesson(String lessonName, String lessonDescription,Boolean learnerExportAvailable,long learningDesignId,Integer organisationId,Integer userID, String customCSV);
     
     /**
      * Initialize a new lesson so as to start the learning process for a normal or preview learning session. 
@@ -88,7 +90,7 @@ public interface IMonitoringService
      * user, but for a preview session rather than a normal learning session.
      * The design is not assigned to any workspace folder.
      */
-    public Lesson initializeLessonForPreview(String lessonName,String lessonDescription,long learningDesignId,Integer userID); 
+    public Lesson initializeLessonForPreview(String lessonName,String lessonDescription,long learningDesignId,Integer userID, String customCSV); 
     
     /**
      * Create a lession according to the input lession WDDX package. The sample package is following:
