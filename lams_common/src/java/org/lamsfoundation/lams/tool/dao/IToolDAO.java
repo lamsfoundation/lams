@@ -41,4 +41,5 @@ public interface IToolDAO
     public List getAllTools();
     public Tool getToolBySignature(final String toolSignature);
     public long getToolDefaultContentIdBySignature(final String toolSignature);
+    public void saveOrUpdateTool(Tool tool);
 }

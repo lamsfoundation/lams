@@ -87,6 +87,11 @@ public class ToolDAO extends HibernateDaoSupport implements IToolDAO
         else
         	return 0;
     }
+    
+    public void saveOrUpdateTool(Tool tool)
+    {
+    	this.getHibernateTemplate().saveOrUpdate(tool);
+    }
 
 
 }

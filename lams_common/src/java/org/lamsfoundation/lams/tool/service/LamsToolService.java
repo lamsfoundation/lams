@@ -74,6 +74,11 @@ public class LamsToolService implements ILamsToolService
     	Tool tool = toolDAO.getToolBySignature(toolSignature);  	
     	return tool.createBasicToolVO();    	
     }
+    
+    public Tool getPersistToolBySignature(final String toolSignature)
+    {
+    	return toolDAO.getToolBySignature(toolSignature);  	
+    }
 
     public long getToolDefaultContentIdBySignature(final String toolSignature)
     {
@@ -105,5 +110,10 @@ public class LamsToolService implements ILamsToolService
 		
 		return FileUtil.generateUniqueContentFolderID();
 		
+	}
+	
+	public void saveOrUpdateTool(Tool tool)
+	{
+		toolDAO.saveOrUpdateTool(tool);
 	}
 }
