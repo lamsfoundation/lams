@@ -81,7 +81,8 @@ public class InsertLDServlet extends AbstractStoreWDDXPacketServlet {
 
 			try {
 				Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
-
+				
+				String customCSV = WDDXProcessor.convertToString(table, WDDXTAGS.CUSTOM_CSV);
 			    Long originalLearningDesignID = WDDXProcessor.convertToLong(table,WDDXTAGS.LEARNING_DESIGN_ID);
 			    Long designToImportID = WDDXProcessor.convertToLong(table,WDDXTAGS.LEARNING_DESIGN_TO_IMPORT_ID);
 			    boolean createNewLearningDesign = WDDXProcessor.convertToBoolean(table,WDDXTAGS.CREATE_NEW_LEARNING_DESIGN);
@@ -89,7 +90,7 @@ public class InsertLDServlet extends AbstractStoreWDDXPacketServlet {
 			    String title = WDDXProcessor.convertToString(table,WDDXTAGS.TITLE);
 
 			    LearningDesign updatedLearningDesign = authoringService.insertLearningDesign(originalLearningDesignID, designToImportID, getUserId(), 
-			    		 createNewLearningDesign, title, folderID);
+			    		 createNewLearningDesign, title, folderID, customCSV);
 				return new FlashMessage(getMessageKey(wddxPacket, request), updatedLearningDesign.getLearningDesignId()).serializeMessage();
 				
 			} catch ( Exception e) {
