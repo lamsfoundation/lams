@@ -126,8 +126,8 @@ public class AuthoringAction extends LamsDispatchAction{
 		IAuthoringService authoringService = getAuthoringService();
 		try {
 			Long learningDesignID = WebUtil.readLongParam(request,"learningDesignID",false);
-			
 			wddxPacket = authoringService.getLearningDesignDetails(learningDesignID, getUserLanguage());
+			log.debug("Import LD wddx packet: " + wddxPacket);
 		} catch (Exception e) {
 			wddxPacket = handleException(e, "getLearningDesignDetails", authoringService, true).serializeMessage();
 		}
@@ -226,9 +226,10 @@ public class AuthoringAction extends LamsDispatchAction{
 	 
 		String wddxPacket;
 		IAuthoringService authoringService = getAuthoringService();
+		String customCSV = WebUtil.readStrParam(request, AttributeNames.PARAM_CUSTOM_CSV, true);
 		try {
 		    long toolContentID = WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID,false);
-		    wddxPacket = authoringService.copyToolContent(toolContentID);
+		    wddxPacket = authoringService.copyToolContent(toolContentID, customCSV);
 		} catch (Exception e) {
 			wddxPacket = handleException(e, "copyToolContent", authoringService, true).serializeMessage();
 		}
