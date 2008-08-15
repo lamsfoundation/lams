@@ -1,0 +1,3 @@
+<global-forwards>
+	<forward name="test" path="/pages/test.html" />
+</global-forwards>
