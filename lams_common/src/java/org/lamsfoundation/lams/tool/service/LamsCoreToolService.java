@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolAdapterContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -215,20 +216,30 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
      * @throws DataMissingException, ToolException
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
-    public Long notifyToolToCopyContent(ToolActivity toolActivity, boolean setDefineLater) 
+    public Long notifyToolToCopyContent(ToolActivity toolActivity, boolean setDefineLater, String customCSV) 
     		throws DataMissingException, ToolException
     {
-    	return notifyToToolAboutContent(toolActivity, setDefineLater, true);
+    	return notifyToToolAboutContent(toolActivity, setDefineLater, true, customCSV);
     }
     	
-    private Long notifyToToolAboutContent(ToolActivity toolActivity, boolean setDefineLater, boolean copyToolContent) {
+    private Long notifyToToolAboutContent(ToolActivity toolActivity, boolean setDefineLater, boolean copyToolContent, String customCSV) {
         Long toolcontentID = toolActivity.getToolContentId();
         try {
 			ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity.getTool());
 			
 			if ( copyToolContent ) {
 				toolcontentID = contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool());
-				contentManager.copyToolContent(toolActivity.getToolContentId(), toolcontentID);
+				
+				// If it is a tool adapter tool, call the special copyToolContent which takes the customCSV param
+				if (contentManager instanceof ToolAdapterContentManager)
+				{
+					ToolAdapterContentManager adapterContentManager = (ToolAdapterContentManager)contentManager;
+					adapterContentManager.copyToolContent(toolActivity.getToolContentId(), toolcontentID, customCSV);
+				}
+				else
+				{
+					contentManager.copyToolContent(toolActivity.getToolContentId(), toolcontentID);
+				}
 			}
             
 			contentManager.setAsDefineLater(toolcontentID, 
@@ -259,7 +270,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     public Long notifyToolOfStatusFlags(ToolActivity toolActivity) 
     		throws DataMissingException, ToolException
     {
-    	return notifyToToolAboutContent(toolActivity, true, false);
+    	return notifyToToolAboutContent(toolActivity, true, false, null);
     }
     
     /**
@@ -269,10 +280,11 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
      * tool) may already exist.
      * 
      * @param toolContentId the content to be copied.
+     * @param customCSV the customCSV required if this is a tooladapter tool, otherwise null
      * @throws DataMissingException, ToolException
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
-    public Long notifyToolToCopyContent(Long toolContentId) 
+    public Long notifyToolToCopyContent(Long toolContentId, String customCSV) 
     		throws DataMissingException, ToolException
     {
     	ToolContent toolContent = (ToolContent) toolContentDAO.find(ToolContent.class, toolContentId);
@@ -292,7 +304,13 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     	Long newToolcontentID = contentIDGenerator.getNextToolContentIDFor(tool);
         try {
 			ToolContentManager contentManager = (ToolContentManager) findToolService(tool);
-            contentManager.copyToolContent(toolContentId,newToolcontentID);
+			if (contentManager instanceof ToolAdapterContentManager){
+				ToolAdapterContentManager toolAdapterContentManager = (ToolAdapterContentManager)contentManager;
+				toolAdapterContentManager.copyToolContent(toolContentId, newToolcontentID, customCSV);
+			}
+			else{
+				contentManager.copyToolContent(toolContentId,newToolcontentID);
+			}
 		} catch ( NoSuchBeanDefinitionException e ) {
 			String message = "A tool which is defined in the database appears to missing from the classpath. Unable to copy the tool content. ToolContentId "+toolContentId;
 			log.error(message,e);

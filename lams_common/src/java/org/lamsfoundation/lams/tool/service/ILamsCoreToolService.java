@@ -131,10 +131,11 @@ public interface ILamsCoreToolService
      * 
      * @param toolActivity the tool activity defined in the design.
      * @param setDefineLater whether or not to set the define later flag.
+     * @param customCSV custom comma-separated values used for tool adapters
      * @throws DataMissingException, ToolException
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
-    public Long notifyToolToCopyContent(ToolActivity toolActivity, boolean setDefineLater) 
+    public Long notifyToolToCopyContent(ToolActivity toolActivity, boolean setDefineLater, String customCSV) 
     		throws DataMissingException, ToolException;
     
     /**
@@ -160,10 +161,11 @@ public interface ILamsCoreToolService
      * stored in the tool.
      * 
      * @param toolContentId the content to be copied.
+     * @param customCSV the customCSV required if this is a tooladapter tool, otherwise null
      * @throws DataMissingException, ToolException
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
-    public Long notifyToolToCopyContent(Long toolContentId) 
+    public Long notifyToolToCopyContent(Long toolContentId, String customCSV) 
     		throws DataMissingException, ToolException;
     /**
      * Ask a tool to delete a tool content. If any related tool session data exists then it should 
