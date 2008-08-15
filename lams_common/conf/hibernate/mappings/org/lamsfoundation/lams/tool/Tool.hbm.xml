@@ -385,8 +385,23 @@
             length="1"
             not-null="true"
         </meta>    
-    </property>    
-
+    </property>
+    
+    <property
+        name="extLmsId"
+        type="java.lang.String"
+        column="ext_lms_id"
+        not-null="false"
+        length="255"
+    >
+    	<meta attribute="field-description">
+           name="extLmsId"
+	        type="java.lang.String"
+	        column="ext_lms_id"
+	        length="255"
+        </meta>
+    </property>
+    
     <!-- Associations -->
   
     <!-- bi-directional one-to-many association to Activity -->
