@@ -115,6 +115,7 @@ public interface IExportToolContentService {
 	 * @param designFile
 	 * @param importer
 	 * @param workspaceFolderUid
+	 * @param customCSV the customCSV to be used by tool adapters to create new instances on the external LMS
 	 * @return An object array where:
 	 * <ul>
 	 *   <li>Object[0] = ldID (Long)</li>
@@ -125,7 +126,7 @@ public interface IExportToolContentService {
 	 * @throws ImportToolContentException
 	 */
 	Object[] importLearningDesign(File designFile, User importer, Integer workspaceFolderUid,
-			List<String> toolsErrorMsgs) throws ImportToolContentException ;
+			List<String> toolsErrorMsgs, String customCSV) throws ImportToolContentException ;
 	
 	/** Import the learning design from the given path. Set the importer as the creator. If the workspaceFolderUid is
 	 * null then saves the design in the user's own workspace folder.
@@ -133,6 +134,7 @@ public interface IExportToolContentService {
 	 * @param learningDesignPath
 	 * @param importer
 	 * @param workspaceFolderUid
+	 * @param customCSV the customCSV to be used by tool adapters to create new instances on the external LMS
 	 * @return learningDesignID
 	 * @throws ImportToolContentException
 	 */

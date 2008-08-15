@@ -114,6 +114,7 @@ import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolAdapterContentManager;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.dao.ISystemToolDAO;
@@ -1016,7 +1017,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * @throws ImportToolContentException
 	 */
 	public Object[] importLearningDesign(File designFile, User importer, Integer workspaceFolderUid,
-			List<String> toolsErrorMsgs) throws ImportToolContentException {
+			List<String> toolsErrorMsgs, String customCSV) throws ImportToolContentException {
 		
 		Object[] ldResults = new Object[3];
 		Long ldId = null;
@@ -1042,7 +1043,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	            
     			File fullFilePath = new File(FileUtil.getFullPath(ldPath,LEARNING_DESIGN_FILE_NAME));
     			if ( fullFilePath.canRead() ) {
-    				ldId = importLearningDesignV2(ldPath,importer,workspaceFolderUid,toolsErrorMsgs);
+    				ldId = importLearningDesignV2(ldPath,importer,workspaceFolderUid,toolsErrorMsgs, customCSV);
     			} else { 
                 	badFileType(ldErrorMsgs, filename,"Learning design file not found.");
     			}
@@ -1099,7 +1100,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign(String)
 	 */
 	public Long importLearningDesignV2(String learningDesignPath, User importer, Integer workspaceFolderUid
-			, List<String> toolsErrorMsgs) throws ImportToolContentException {
+			, List<String> toolsErrorMsgs, String customCSV) throws ImportToolContentException {
 		
 		try {
 			//import learning design
@@ -1142,15 +1143,26 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				//Invoke tool's importToolContent() method.
 				try{
 					//begin to import
-					ToolContentManager contentManager = (ToolContentManager) findToolService(newTool);
 					log.debug("Tool begin to import content : " + activity.getActivityTitle() +" by contentID :" + activity.getToolContentID());
 
 					//tool's importToolContent() method
 					//get from and to version
 					String toVersion = newTool.getToolVersion();
 					String fromVersion = activity.getToolVersion();
-					contentManager.importToolContent(newContent.getToolContentId(),importer.getUserId(),toolPath,fromVersion,toVersion);
+				
+					ToolContentManager contentManager = (ToolContentManager) findToolService(newTool);
 					
+					// If this is a tool adapter tool, pass the customCSV to the special importToolContent method
+					// Otherwise invoke the normal tool importToolContentMethod
+					if (contentManager instanceof ToolAdapterContentManager)
+					{
+						ToolAdapterContentManager toolAdapterContentManager = (ToolAdapterContentManager)contentManager;
+						toolAdapterContentManager.importToolContent(newContent.getToolContentId(),importer.getUserId(),toolPath,fromVersion,toVersion, customCSV);
+					}
+					else
+					{
+						contentManager.importToolContent(newContent.getToolContentId(),importer.getUserId(),toolPath,fromVersion,toVersion);
+					}
 					log.debug("Tool content import success.");
 				}catch (Exception e) {
 					String error = getMessageService().getMessage(ERROR_SERVICE_ERROR,new Object[]{newTool.getToolDisplayName(),e.toString()});
