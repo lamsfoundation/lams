@@ -25,11 +25,6 @@
 package org.lamsfoundation.lams.authoring.web;
 
 import java.io.File;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,7 +49,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -89,8 +84,14 @@ public class ImportToolContentAction extends LamsAction {
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String param = request.getParameter("method");
+		
 		//-----------------------Resource Author function ---------------------------
 		if(StringUtils.equals(param,"import")){
+			String customCSV = WebUtil.readStrParam(request, AttributeNames.PARAM_CUSTOM_CSV, true);
+			if (customCSV != null)
+			{
+				request.setAttribute(AttributeNames.PARAM_CUSTOM_CSV, customCSV);
+			}
 			//display initial page for upload
 			return mapping.findForward("upload");
 		}else{
@@ -107,8 +108,8 @@ public class ImportToolContentAction extends LamsAction {
 
 		List<String> ldErrorMsgs = new ArrayList<String>();
         List<String> toolsErrorMsgs = new ArrayList<String>();
-        Long ldId = null;
-                
+        Long ldId = null;        
+        
         try {
         	Integer workspaceFolderUid = null;
         	
@@ -147,6 +148,9 @@ public class ImportToolContentAction extends LamsAction {
                 workspaceFolderUid = NumberUtils.createInteger((String) params.get("WORKSPACE_FOLDER_UID"));
             }
             
+            // get customCSV for tool adapters if it was an external LMS request
+        	String customCSV = params.get(AttributeNames.PARAM_CUSTOM_CSV);
+            
             if (designFile == null) {
             	MessageService msgService = getMessageService(); 
             	log.error("Upload file missing. Filename was "+filename);
@@ -156,7 +160,7 @@ public class ImportToolContentAction extends LamsAction {
             } else {
 
         		IExportToolContentService service = getExportService();
-        		Object[] ldResults = service.importLearningDesign(designFile,user,workspaceFolderUid,toolsErrorMsgs);
+        		Object[] ldResults = service.importLearningDesign(designFile,user,workspaceFolderUid,toolsErrorMsgs, customCSV);
         		ldId = (Long) ldResults[0];
         		ldErrorMsgs = (List<String>) ldResults[1];
         		toolsErrorMsgs = (List<String>) ldResults[2];
