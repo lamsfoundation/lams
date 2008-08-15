@@ -195,6 +195,8 @@ public class HomeAction extends DispatchAction {
 				
 				String requestSrc = req.getParameter("requestSrc");
 				String notifyCloseURL = req.getParameter("notifyCloseURL");
+				String customCSV = req.getParameter(AttributeNames.PARAM_CUSTOM_CSV);
+				String extLmsId = req.getParameter(AttributeNames.PARAM_EXT_LMS_ID);
 				
 				if(req.getParameter("learningDesignID") != null)
 					learningDesignID = WebUtil.readLongParam(req, "learningDesignID");
@@ -213,6 +215,8 @@ public class HomeAction extends DispatchAction {
 				
 				req.setAttribute("requestSrc", requestSrc);
 				req.setAttribute("notifyCloseURL", notifyCloseURL);
+				req.setAttribute(AttributeNames.PARAM_CUSTOM_CSV, customCSV);
+				req.setAttribute(AttributeNames.PARAM_EXT_LMS_ID, extLmsId);
 				
 				return mapping.findForward("author");
 			}
