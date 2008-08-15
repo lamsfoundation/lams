@@ -240,6 +240,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 	
 	private Boolean supportsOutputs;
 	
+	/**
+	 * This string identifies the tool as a tool adapter tool, null otherwise
+	 */
+	private String extLmsId;
+	
 	/*****************************************************************************
 	 * Constructors
 	 *****************************************************************************/
@@ -366,7 +371,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.toolDisplayName = toolActivity.getTool().getToolDisplayName();
 		this.toolVersion = toolActivity.getTool().getToolVersion();
 		this.supportsOutputs = toolActivity.getTool().getSupportsOutputs();
-		
+		this.extLmsId = toolActivity.getTool().getExtLmsId();
 		this.helpURL = HelpUtil.constructToolURL(toolActivity.getTool().getHelpUrl(), toolSignature, "", languageCode);
 
 	}
@@ -1038,14 +1043,16 @@ public class AuthoringActivityDTO extends BaseDTO{
 	public void setToolActivityUIID(Integer toolActivityUIID) {
 		this.toolActivityUIID = toolActivityUIID;
 	}
-
-
-
 	public Boolean getSupportsOutputs() {
 		return supportsOutputs;
 	}
-
 	public void setSupportsOutputs(Boolean supportsOutputs) {
 		this.supportsOutputs = supportsOutputs;
+	}
+	public String getExtLmsId() {
+		return extLmsId;
+	}
+	public void setExtLmsId(String extLmsId) {
+		this.extLmsId = extLmsId;
 	}
 }

@@ -65,6 +65,8 @@ public class AttributeNames {
     public static final String PARAM_FILENAME = "filename";
     public static final String PARAM_EXPORT_PORTFOLIO_ENABLED = "portfolioEnabled";
     public static final String PARAM_CURRENT_TAB = "currentTab";
+    public static final String PARAM_CUSTOM_CSV = "customCSV";
+    public static final String PARAM_EXT_LMS_ID = "extlmsid";
     
     public static final String PARAM_LIB = "library";
     

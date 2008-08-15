@@ -218,4 +218,7 @@ public interface WDDXTAGS {
 	public static final String LEARNING_DESIGN_TO_IMPORT_ID="learningDesignIDToImport";
 	public static final String CREATE_NEW_LEARNING_DESIGN="createNewLearningDesign";
 	
+	/** Tool adapters specific tags*/
+	public static final String CUSTOM_CSV="customCSV";
+	
 }

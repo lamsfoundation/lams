@@ -68,6 +68,10 @@ public class LoginRequestDispatcher {
 	public static final String PARAM_LAST_NAME = "lastName";
 	
 	public static final String PARAM_EMAIL = "email";
+	
+	public static final String PARAM_CUSTOM_CSV = "customCSV";
+	
+	public static final String PARAM_EXT_LMS_ID = "extlmsid";
 
 	public static final String METHOD_AUTHOR = "author";
 
@@ -114,13 +118,19 @@ public class LoginRequestDispatcher {
 			String requestSrc = request.getParameter(PARAM_REQUEST_SRC);
 			String notifyCloseURL = request.getParameter(PARAM_NOTIFY_CLOSE_URL);
 			
+			// Custom CSV string to be used for tool adapters
+			String customCSV = request.getParameter(PARAM_CUSTOM_CSV);
+			String extLmsId = request.getParameter(PARAM_EXT_LMS_ID);
+			
 			String parameters = "";
 			
 			if (requestSrc != null && notifyCloseURL != null) {
 				try {
 					parameters = "&" + PARAM_REQUEST_SRC + "=" + URLEncoder.encode(requestSrc, "UTF8");
 					parameters += "&" + PARAM_NOTIFY_CLOSE_URL + "=" + URLEncoder.encode(notifyCloseURL, "UTF8");				
-	 			} catch (UnsupportedEncodingException e) {
+					parameters += "&" + PARAM_CUSTOM_CSV + "=" + customCSV;
+					parameters += "&" + PARAM_EXT_LMS_ID + "=" + extLmsId;
+				} catch (UnsupportedEncodingException e) {
 					log.error(e);
 				}
 			} else {

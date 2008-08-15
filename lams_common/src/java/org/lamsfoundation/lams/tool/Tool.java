@@ -85,7 +85,7 @@ public class Tool implements Serializable {
     
     /** persistent field */
     private boolean valid;
-    
+ 
     /** nullable persistent field */
     private long defaultToolContentId;
 
@@ -122,6 +122,12 @@ public class Tool implements Serializable {
 
 	/** Does this tool produce output definitions / conditions */
 	private Boolean supportsOutputs;
+	
+	/**
+	 * Null if not a tool adapter tool, otherwise this string maps to the external server
+	 * which this tool adapter will be used for
+	 */
+	private String extLmsId;
 
 	/** 
 	 * Entries for an tool in a language property file 
@@ -154,7 +160,9 @@ public class Tool implements Serializable {
                 String toolIdentifier,
                 String toolVersion,
                 String languageFile,
-                boolean supportsOutputs) 
+                boolean supportsOutputs,
+                String extLmsId
+                ) 
     {
         this.toolId = toolId;
         this.learnerUrl = learnerUrl;
@@ -182,6 +190,7 @@ public class Tool implements Serializable {
         this.toolVersion = toolVersion;
         this.languageFile = languageFile;
         this.supportsOutputs = supportsOutputs;
+        this.extLmsId = extLmsId;
     }
 
     /** default constructor */
@@ -612,7 +621,19 @@ public class Tool implements Serializable {
         this.supportsOutputs = supportsOutputs;
     }
     
-    public String toString() {
+    
+    /** 
+     * @hibernate.property column="ext_lms_id" length="255" not-null="false"  
+     */
+	public String getExtLmsId() {
+		return extLmsId;
+	}
+
+	public void setExtLmsId(String extLmsId) {
+		this.extLmsId = extLmsId;
+	}
+
+	public String toString() {
         return new ToStringBuilder(this)
             .append("toolId", getToolId())
             .toString();
@@ -662,7 +683,8 @@ public class Tool implements Serializable {
     			this.toolIdentifier, 
     			this.toolVersion, 
     			this.languageFile,
-    			this.supportsOutputs);
+    			this.supportsOutputs,
+    			this.extLmsId);
     	return vo;
     }
 

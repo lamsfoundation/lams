@@ -116,6 +116,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	
 	/** Does this tool produce output definitions / conditions */
 	private Boolean supportsOutputs;
+	
+	/** Is this tool a tool adapter for an external LMS tool */
+    private String extLmsId;
 
     /** full constructor */
     public BasicToolVO(Long toolId, 
@@ -142,7 +145,8 @@ public class BasicToolVO implements Serializable, IToolVO {
                 String toolIdentifier, 
                 String toolVersion, 
                 String languageFile,
-                boolean supportsOutputs) 
+                boolean supportsOutputs,
+                String extLmsId) 
     {
 		this.supportsGrouping=supportsGrouping;
 		this.learnerUrl=learnerUrl;
@@ -168,6 +172,7 @@ public class BasicToolVO implements Serializable, IToolVO {
 		this.toolVersion=toolVersion;
 		this.languageFile=languageFile;
 		this.supportsOutputs=supportsOutputs;
+		this.extLmsId = extLmsId;
     }
 
     /** default constructor */
@@ -507,8 +512,19 @@ public class BasicToolVO implements Serializable, IToolVO {
 	public void setSupportsOutputs(boolean supportsOutputs) {
 		this.supportsOutputs = supportsOutputs;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.IToolVO#getExtLmsId()
+	 */
+    public String getExtLmsId() {
+		return this.extLmsId;
+	}
 
-    public String toString() {
+	public void setExtLmsId(String extLmsId) {
+		this.extLmsId = extLmsId;
+	}
+
+	public String toString() {
         return new ToStringBuilder(this)
             .append("toolId", getToolId())
             .append("toolSignature", getToolSignature())
@@ -529,6 +545,8 @@ public class BasicToolVO implements Serializable, IToolVO {
             .append(getToolId())
             .toHashCode();
     }
+    
+    
 
 
 }

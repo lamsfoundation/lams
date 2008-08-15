@@ -91,4 +91,6 @@ public interface IToolVO {
 
 	public abstract boolean isSupportsOutputs();
 	
+	public abstract String getExtLmsId();
+	
 }

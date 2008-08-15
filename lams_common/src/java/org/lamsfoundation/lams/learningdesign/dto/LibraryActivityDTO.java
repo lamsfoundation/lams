@@ -82,6 +82,7 @@ public class LibraryActivityDTO extends BaseDTO
 	private String authoringURL;
 	private String adminURL;
 	private Boolean supportsOutputs;
+	private String extLmsId;
 	
 	/* Grouping Activities */
 	
@@ -102,6 +103,8 @@ public class LibraryActivityDTO extends BaseDTO
 		
 	/** Used for I18N the URLS. Does not need to be sent to clients, so no getter exists. */
 	private String languageCode; 
+	
+	private Boolean toolAdapter;
 
 	public LibraryActivityDTO (Activity activity, String languageCode)
 	{
@@ -194,6 +197,7 @@ public class LibraryActivityDTO extends BaseDTO
 			this.authoringURL = tool.getAuthorUrl();
 			this.adminURL = tool.getAdminUrl();
 			this.supportsOutputs = tool.getSupportsOutputs();
+			this.extLmsId = tool.getExtLmsId();
 			this.helpURL = HelpUtil.constructToolURL(tool.getHelpUrl(), toolSignature, "", languageCode);
 	    }
 	     
@@ -545,5 +549,12 @@ public class LibraryActivityDTO extends BaseDTO
 		this.supportsOutputs = supportsOutputs;
 	}
 
+	public String getExtLmsId() {
+		return extLmsId;
+	}
+
+	public void setExtLmsId(String extLmsId) {
+		this.extLmsId = extLmsId;
+	}
 
 }
