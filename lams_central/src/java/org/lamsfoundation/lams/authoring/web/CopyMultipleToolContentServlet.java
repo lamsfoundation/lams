@@ -86,6 +86,7 @@ public class CopyMultipleToolContentServlet extends AbstractStoreWDDXPacketServl
 			try {
 				Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
 
+				String customCSV = WDDXProcessor.convertToString(table, WDDXTAGS.CUSTOM_CSV);
 			    String toolContentIdList = WDDXProcessor.convertToString(table,WDDXTAGS.TOOL_CONTENT_IDS);
 			    if ( toolContentIdList != null ) {
 				    String[] stringIds = toolContentIdList.split(",");
@@ -95,7 +96,7 @@ public class CopyMultipleToolContentServlet extends AbstractStoreWDDXPacketServl
 				    	if ( id.length() > 0 )
 				    		longIds.add(new Long(stringIds[i]));
 				    }
-				    String idMap = authoringService.copyMultipleToolContent(getUserId(), longIds);
+				    String idMap = authoringService.copyMultipleToolContent(getUserId(), longIds, customCSV);
 				    return new FlashMessage(getMessageKey(wddxPacket, request), idMap).serializeMessage();
 			    }
 			    	
