@@ -72,7 +72,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 					countryIsoCode, langIsoCode);
 			// 1. init lesson
 			Lesson lesson = monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId, orgMap
-					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId());
+					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), null);
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 			// 3. start lesson
@@ -94,7 +94,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 					countryIsoCode, langIsoCode);
 			// 1. init lesson
 			Lesson lesson = monitoringService.initializeLesson(title, desc,  Boolean.TRUE, ldId, orgMap
-					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId());
+					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), null);
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 			// 3. schedule lesson

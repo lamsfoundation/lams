@@ -280,7 +280,7 @@ public class LessonJoinServlet extends HttpServlet {
 			staffList = getUsersFromDTOs(userDTOs);
 		}
 		Lesson lesson = monitoringService.initializeLesson(lessonName, lessonDescription, learnerExportAvailable, 
-				ldId, orgId, ownerUserId);
+				ldId, orgId, ownerUserId, null);
 		monitoringService.createLessonClassForLesson(lesson.getLessonId().longValue(), org, 
 				learnerGroupName, learnerList, staffGroupName, staffList, ownerUserId);
 		monitoringService.startLesson(lesson.getLessonId().longValue(), ownerUserId);

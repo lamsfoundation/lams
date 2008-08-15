@@ -122,7 +122,9 @@ public class LessonManagerServlet extends HttpServlet {
 		String learnerIds	= request.getParameter(CentralConstants.PARAM_LEARNER_IDS);
 		String monitorIds	= request.getParameter(CentralConstants.PARAM_MONITOR_IDS);
 
-
+		// Custom CSV string to be used for tool adapters
+		String customCSV = request.getParameter(CentralConstants.PARAM_CUSTOM_CSV);
+		
 		Long ldId = null;
 		Long lsId = null;
 		try {
@@ -142,7 +144,7 @@ public class LessonManagerServlet extends HttpServlet {
 			if (method.equals(CentralConstants.METHOD_START)) {
 				ldId = new Long(ldIdStr);
 				Long lessonId = startLesson(serverId, datetime, hashValue,
-						username, ldId, courseId, title, desc, country, lang);
+						username, ldId, courseId, title, desc, country, lang, customCSV);
 
 				element = document.createElement(CentralConstants.ELEM_LESSON);
 				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
@@ -150,7 +152,7 @@ public class LessonManagerServlet extends HttpServlet {
 			} else if (method.equals(CentralConstants.METHOD_PREVIEW)) {
 				ldId = new Long(ldIdStr);
 				Long lessonId = startPreview(serverId, datetime, hashValue,
-						username, ldId, courseId, title, desc, country, lang);
+						username, ldId, courseId, title, desc, country, lang, customCSV);
 				
 				element = document.createElement(CentralConstants.ELEM_LESSON);
 				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
@@ -159,7 +161,7 @@ public class LessonManagerServlet extends HttpServlet {
 				ldId = new Long(ldIdStr);
 				Long lessonId = scheduleLesson(serverId, datetime, hashValue,
 						username, ldId, courseId, title, desc, startDate,
-						country, lang);
+						country, lang, customCSV);
 
 				element = document.createElement(CentralConstants.ELEM_LESSON);
 				element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
@@ -186,7 +188,7 @@ public class LessonManagerServlet extends HttpServlet {
 			}  else if (method.equals(CentralConstants.METHOD_IMPORT)) {
 
 				// ldId = new Long(ldIdStr);
-				Long ldID = importLearningDesign(request, response, filePath, username, serverId);
+				Long ldID = importLearningDesign(request, response, filePath, username, serverId, customCSV);
 				
 				element = document.createElement(CentralConstants.ELEM_LEARNINGDESIGN);
 				element.setAttribute(CentralConstants.PARAM_LEARNING_DESIGN_ID, ldID.toString());
@@ -271,7 +273,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 	public Long startLesson(String serverId, String datetime, String hashValue,
 			String username, long ldId, String courseId, String title,
-			String desc, String countryIsoCode, String langIsoCode)
+			String desc, String countryIsoCode, String langIsoCode, String customCSV)
 			throws RemoteException {
 		try {
 			ExtServerOrgMap serverMap = integrationService
@@ -283,10 +285,10 @@ public class LessonManagerServlet extends HttpServlet {
 			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(
 					serverMap, userMap, courseId, countryIsoCode, langIsoCode);
 			// 1. init lesson
-			Lesson lesson = monitoringService
-					.initializeLesson(title, desc, Boolean.TRUE, ldId, orgMap
-							.getOrganisation().getOrganisationId(), userMap
-							.getUser().getUserId());
+			Lesson lesson = monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId, 
+							orgMap.getOrganisation().getOrganisationId(), 
+							userMap.getUser().getUserId(),
+							customCSV);
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap
 					.getUser());
@@ -303,7 +305,7 @@ public class LessonManagerServlet extends HttpServlet {
 	public Long scheduleLesson(String serverId, String datetime,
 			String hashValue, String username, long ldId, String courseId,
 			String title, String desc, String startDate, String countryIsoCode,
-			String langIsoCode) throws RemoteException {
+			String langIsoCode, String customCSV) throws RemoteException {
 		try {
 			ExtServerOrgMap serverMap = integrationService
 					.getExtServerOrgMap(serverId);
@@ -317,7 +319,7 @@ public class LessonManagerServlet extends HttpServlet {
 			Lesson lesson = monitoringService
 					.initializeLesson(title, desc, Boolean.TRUE, ldId, orgMap
 							.getOrganisation().getOrganisationId(), userMap
-							.getUser().getUserId());
+							.getUser().getUserId(), customCSV);
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap
 					.getUser());
@@ -514,7 +516,7 @@ public class LessonManagerServlet extends HttpServlet {
 	
 	public Long startPreview(String serverId, String datetime, String hashValue,
 			String username, Long ldId, String courseId, String title,
-			String desc, String countryIsoCode, String langIsoCode)
+			String desc, String countryIsoCode, String langIsoCode, String customCSV)
 			throws RemoteException {
 
 		try {
@@ -528,7 +530,7 @@ public class LessonManagerServlet extends HttpServlet {
 					serverMap, userMap, courseId, countryIsoCode, langIsoCode);
 			// 1. init lesson
 			Lesson lesson = monitoringService
-					.initializeLessonForPreview(title, desc, ldId, userMap.getUser().getUserId());
+					.initializeLessonForPreview(title, desc, ldId, userMap.getUser().getUserId(), customCSV);
 			// 2. create lessonClass for lesson
 			monitoringService.createPreviewClassForLesson(userMap.getUser().getUserId(), lesson.getLessonId());
 			
@@ -546,7 +548,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 
 	public Long importLearningDesign(HttpServletRequest request, HttpServletResponse response,
-				String filePath, String username, String serverId) 
+				String filePath, String username, String serverId, String customCSV) 
 		throws RemoteException {
 		
 		List<String> ldErrorMsgs = new ArrayList<String>();
@@ -576,7 +578,7 @@ public class LessonManagerServlet extends HttpServlet {
 		    }
 		        
 	     	File designFile = new File(filePath);
-	     	Object[] ldResults = exportService.importLearningDesign(designFile, user, workspaceFolderUid, toolsErrorMsgs);
+	     	Object[] ldResults = exportService.importLearningDesign(designFile, user, workspaceFolderUid, toolsErrorMsgs, customCSV);
 	     	ldId = (Long) ldResults[0];
 	     	ldErrorMsgs = (List<String>) ldResults[1];
 	     	toolsErrorMsgs = (List<String>) ldResults[2];
