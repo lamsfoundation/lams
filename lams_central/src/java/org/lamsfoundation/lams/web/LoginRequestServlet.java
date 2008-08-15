@@ -54,6 +54,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -110,13 +111,10 @@ public class LoginRequestServlet extends HttpServlet {
 		String langIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
 
 	
-		
-		
+		// implicit login params
 		String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
 		String lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
 		String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
-	
-		
 		
 		if (extUsername == null || method == null || serverId == null || timestamp == null
 				|| hash == null || extCourseId == null) {
@@ -149,7 +147,6 @@ public class LoginRequestServlet extends HttpServlet {
 			String loginRequestUsername = (String)hses.getAttribute("extUser");
 			if(loginRequestUsername != null && loginRequestUsername.equals(login)){
 				String url = LoginRequestDispatcher.getRequestURL(request);
-				log.debug("redirect url - "+url);
 				response.sendRedirect(response.encodeRedirectURL(url));
 				return;
 			} else if(loginRequestUsername != null && !loginRequestUsername.equals(login)){

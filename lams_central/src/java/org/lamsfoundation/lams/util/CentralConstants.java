@@ -66,6 +66,8 @@ public class CentralConstants {
 	public static final String PARAM_LEARNER_IDS = "learnerIds";
 	
 	public static final String PARAM_MONITOR_IDS = "monitorIds";
+	
+	public static final String PARAM_CUSTOM_CSV = "customCSV";
 
 	public static final String METHOD_START = "start";
 	
