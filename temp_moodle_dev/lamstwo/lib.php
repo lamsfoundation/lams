@@ -1,20 +1,40 @@
-<?PHP  // $Id$
+<?php  // $Id$
 
 /// Library of functions and constants for module lamstwo
 require_once($CFG->libdir.'/datalib.php');
 require_once($CFG->libdir.'/moodlelib.php');
 require_once($CFG->libdir.'/soap/nusoap.php');
-require_once('lib.xml.inc.php');
+require_once($CFG->libdir.'/xmlize.php');
 
+$LAMS2CONSTANTS->login_request   = '/LoginRequest';
+$LAMS2CONSTANTS->param_uid       = 'uid';
+$LAMS2CONSTANTS->param_serverid  = 'sid';
+$LAMS2CONSTANTS->param_timestamp = 'ts';
+$LAMS2CONSTANTS->param_hash      = 'hash';
+$LAMS2CONSTANTS->param_method    = 'method';
+$LAMS2CONSTANTS->param_courseid  = 'courseid';
+$LAMS2CONSTANTS->param_country   = 'country';
+$LAMS2CONSTANTS->param_lang      = 'lang';
+$LAMS2CONSTANTS->param_lsid      = 'lsid';
+$LAMS2CONSTANTS->author_method   = 'author';
+$LAMS2CONSTANTS->monitor_method  = 'monitor';
+$LAMS2CONSTANTS->learner_method  = 'learner';
+
+/*
+ * Given an object containing all the necessary data,
+ * (defined by the form in mod.html) this function
+ * will create a new instance and return the id number
+ * of the new instance.
+ */
 function lamstwo_add_instance($lamstwo) {
-/// Given an object containing all the necessary data,
-/// (defined by the form in mod.html) this function
-/// will create a new instance and return the id number
-/// of the new instance.
-    global $USER;
+    global $USER, $LAMS2CONSTANTS;
+    
     $lamstwo->timemodified = time();
-	$lamstwo->lesson_id = lamstwo_get_lesson($USER->username,$lamstwo->sequence_id,$lamstwo->course,$lamstwo->name,$lamstwo->introduction,$lamstwo->start_date,trim($USER->country),substr(trim($USER->lang),0,2));
-	return insert_record("lamstwo", $lamstwo);
+    
+    if (!$lamstwo->id = insert_record('lamstwo', $lamstwo)) {
+		return false;
+	}
+	return $lamstwo->id;
 }
 
 
@@ -46,7 +66,7 @@ function lamstwo_update_instance($lamstwo) {
     //echo $lamstwo->lesson_id."<BR>";
     //echo "exit lamstwo_update_instance<BR>";
 */
-  return update_record("lamstwo", $lamstwo);
+  return update_record('lamstwo', $lamstwo);
 }
 
 
@@ -55,7 +75,7 @@ function lamstwo_delete_instance($id) {
 /// this function will permanently delete the instance
 /// and any data that depends on it.
 
-  if (! $lamstwo = get_record("lamstwo", "id", "$id")) {
+  if (! $lamstwo = get_record('lamstwo', 'id', $id)) {
       return false;
   }
 
@@ -63,7 +83,7 @@ function lamstwo_delete_instance($id) {
 
   # Delete any dependent records here #
   lamstwo_delete_lesson($USER->username,$lamstwo->lesson_id);
-  if (! delete_records("lamstwo", "id", "$lamstwo->id")) {
+  if (! delete_records('lamstwo', 'id', $lamstwo->id)) {
       $result = false;
   }
 
@@ -108,15 +128,59 @@ function lamstwo_cron () {
 }
 
 function lamstwo_grades($lamstwoid) {
-/// Must return an array of grades for a given instance of this module,
-/// indexed by user.  It also returns a maximum allowed grade.
-///
-///    $return->grades = array of grades;
-///    $return->maxgrade = maximum allowed grade;
-///
-///    return $return;
+	global $CFG, $USER;
+	
+	if (!isset($CFG->lamstwo_serverid, $CFG->lamstwo_serverkey) || $CFG->lamstwo_serverid == '') {
+    	print_error('Can\'t retrieve lesson progress: please check your lamstwo configuration settings.');
+        return NULL;
+    }
+    
+    $datetime = date('F d,Y g:i a');
+    $datetime_encoded = urlencode($datetime);
+    $plaintext = $datetime.$USER->username.$CFG->lamstwo_serverid.$CFG->lamstwo_serverkey;
+    $hashvalue = sha1(strtolower($plaintext));
 
-  return NULL;
+    // get list of lamstwo_lessons
+    $sql = "SELECT * FROM {$CFG->prefix}lamstwo_lesson WHERE lamstwo=$lamstwoid";
+    $lamstwolessons = get_records_sql($sql);
+    $return->maxgrade = sizeof($lamstwolessons);
+    
+    // get list of course userids
+    $userids = lamstwo_get_course_userids($lamstwoid);
+    foreach ($userids as $userid) {
+    	$return->grades[$userid] = 0;
+    }
+    
+    if (!empty($lamstwolessons)) {
+    	foreach ($lamstwolessons as $lamstwolessonid => $lamstwolesson) {
+    		$lsid = $lamstwolesson->lesson_id;
+    		$courseid = $lamstwolesson->course;
+    		$service = '/services/xml/LessonManager';
+    		$request = "$CFG->lamstwo_serverurl$service?method=studentProgress&serverId=$CFG->lamstwo_serverid&datetime=$datetime_encoded&hashValue=$hashvalue&username=$USER->username&lsId=$lsid&courseId=$courseid";
+
+    		// GET call to LAMS
+    		$response = file_get_contents($request);
+    		$xml_array = xmlize($response);
+    		
+    		if (!empty($xml_array['LessonProgress']['#'])) {
+    			foreach ($xml_array['LessonProgress']['#']['LearnerProgress'] as $learnerprogress) {
+    				$username = $learnerprogress['@']['username'];
+    				$lessoncomplete = $learnerprogress['@']['lessonComplete'];
+    				//echo "Lessonid=$lsid, username=$username, lessoncomplete=$lessoncomplete\n";
+    				if ($lessoncomplete == 'true') {
+    					$user = get_record('user', 'username', $username);
+    					$return->grades[$user->id]++;
+    				} 
+    			}
+    		}
+    		
+    		//traverse_xmlize($xml_array);
+    		//print implode("", $GLOBALS['traverse_array']);
+    		//print "\n\n<br/><br/>";
+    	}
+    }
+    
+	return $return;
 }
 
 function lamstwo_get_participants($lamstwoid) {
@@ -199,7 +263,6 @@ function lamstwo_get_sequences($username,$courseid,$country,$lang) {
     return preg_replace($pattern,$replacement,$result);
 }
 
-
 /**
  * Get sequences(learning designs) for the user in lamstwo using the REST interface
  *
@@ -211,133 +274,173 @@ function lamstwo_get_sequences_rest($username,$courseid,$country,$lang) {
     global $CFG,$USER;
     if(!isset($CFG->lamstwo_serverid)||!isset($CFG->lamstwo_serverkey)||!isset($CFG->lamstwo_serverurl))
     {
-        return get_string("notsetup", "lamstwo");
+        return get_string('notsetup', 'lamstwo');
     }
 
     // generate hash
-    $datetime =    date("F d,Y g:i a");
+    $datetime = date('F d,Y g:i a');
     $datetime_encoded = urlencode($datetime);
-
     $rawstring = trim($datetime).trim($username).trim($CFG->lamstwo_serverid).trim($CFG->lamstwo_serverkey);
     $hashvalue = sha1(strtolower($rawstring));
 
     // Put together REST URL
-    $service = "/services/xml/LearningDesignRepository";
-
+    $service = '/services/xml/LearningDesignRepository';
     $request = "$CFG->lamstwo_serverurl$service?serverId=$CFG->lamstwo_serverid&datetime=$datetime_encoded&hashValue=$hashvalue&username=$username&courseId=$courseid&mode=2&country=$country&lang=$lang";
-
 
     // GET call to LAMS
     $xml = file_get_contents($request);
+    
+    if(!empty($http_response_header[0])) {
+    	// Retrieve HTTP status code
+    	list($version, $status_code, $msg) = explode(' ', $http_response_header[0], 3);
 
-    // Retrieve HTTP status code
-    list($version,$status_code,$msg) = explode(' ',$http_response_header[0], 3);
+    	// Check the HTTP Status code
+    	switch($status_code) {
+    		case 200:
+    			break;
+    		case 503:
+    			print_error('restcall503', 'lamstwo', $CFG->wwwroot.'/course/view.php?id='.$courseid);
+    			break;
+    		case 403:
+    			print_error('restcall403', 'lamstwo', $CFG->wwwroot.'/course/view.php?id='.$courseid);
+    			break;
+    		case 400:
+    			print_error('restcall400', 'lamstwo', $CFG->wwwroot.'/course/view.php?id='.$courseid);
+    			break;
+    		default:
+    			print_error('restcalldefault', 'lamstwo', $CFG->wwwroot.'/course/view.php?id='.$courseid, $status_code);
+    	}
+    } else {
+    	print_error('restcallfail', 'lamstwo', $CFG->wwwroot.'/course/view.php?id='.$courseid);
+    }
 
-    // Check the HTTP Status code
-    switch($status_code) {
-      case 200:
-      	   // Success
-	    break;
-      case 503:
-	    die(get_string("restcall503", "lamstwo"));
-	    break;
-      case 403:
-	    die(get_string("restcall403", "lamstwo"));
-	    break;
-      case 400:
-	   // You may want to fall through here and read the specific XML error
-	   die(get_string("restcall400", "lamstwo"));
-	   break;
-	   default:
-	   die(get_string("restcalldefault", "lamstwo") . $status_code);
-
+	$xml_array = xmlize($xml);
+	
+	//traverse_xmlize($xml_array);
+	//print implode("", $GLOBALS['traverse_array']);
+	
+	return lamstwo_process_array($xml_array['Folder']) . ']';
 }
 
-      $xml = utf8_encode($xml);
 
-      $domdoc = new LAMSTWO_XML();
-      $domdoc->parseXML($xml);
-      $root = $domdoc->firstChild;
-      return lamstwo_process_node($root) . ']';
-
-
-
-}
-
-
-/**
- * Get process REST output
- * We use phpdomxml library for dom as there's conflicting implementation with the PHP4/PHP5 dom native implementations
- * See (http://sourceforge.net/projects/phpdomxml) for further details. library: lib.xml.inc.php
- * PHPdomxml is licensed under GNU GENERAL PUBLIC LICENSE
- *
- * @param string $node The XML DOM node to transform for the javascript tree.
- * @return string to define the tree structure
- * @TODO complete the documentation of this function
+/*
+ * Convert workspace contents from an xmlize array into a string that Tigra Tree (javascript library)
+ * can recognise.
  */
-function lamstwo_process_node($node) {
-
-	 $output = '';
-	 
-	 if ($node->nodeName == 'Folder') {
-
-	    $folder_name = preg_replace("/'/", "$1\'", $node->getAttribute('name'));
-
-	    $output = $output . '[\'' . $folder_name . '\',null,';
-
-	    if ($node->hasChildNodes()) {
-
-	       foreach($node->childNodes as $child) {
-
-	          $output = $output . lamstwo_process_node($child);
-
-		  if ($child->nodeName == 'Folder') {
-
-		     if (is_null($child->nextSibling)) {
-
-		     	$output = $output . ']';
-
-		     } else {
-
-		       $output = $output . '],';
-
-		     }
-
-		  }
-
-	      }
-
-	    } else {
-
-	      $output = $output . ' [\'\',null]';
-
-	    }
-
-	 } else {
-
-
-	   // the node is a Learning Design
-
-	   $seq_name = preg_replace("/'/", "$1\'", $node->getAttribute('name'));
-
-	   $output = $output . '[\'' . $seq_name . '\',' . '\'javascript:selectSequence(' . $node->getAttribute('resourceId') . ')\']';
-
-	   if (is_null($node->nextSibling)) {
-
-	      $output = $output . '';
-
-
-	   } else {
-
-	      $output = $output . ',';
-
-	   }
-
-	 }
-
-	 return $output;
+function lamstwo_process_array($xml_array) {
+	$output = '';
+	if (empty($xml_array['@']['resourceId'])) {
+		// it's a folder
+		$folder_name = preg_replace("/'/", "$1\'", $xml_array['@']['name']);
+		$output .= "['" . $folder_name . "',null,";
+		if (!empty($xml_array['#']['LearningDesign'])) {
+			$lds = $xml_array['#']['LearningDesign'];
+			for($i=0; $i<sizeof($lds); $i++) {
+				$output .= lamstwo_process_array($lds[$i]);
+				if ($i < sizeof($lds)-1) {
+					$output .= ",";
+				}
+			}
+		}
+		if (!empty($xml_array['#']['Folder'])) {
+			if (!empty($xml_array['#']['LearningDesign'])) {
+				$output .= ',';
+			}
+			$folders = $xml_array['#']['Folder'];
+			for($i=0; $i<sizeof($folders); $i++) {
+				$output .= lamstwo_process_array($folders[$i]) . "]";
+				if ($i < sizeof($folders)-1) {
+					$output .= ',';
+				}
+			}
+		}
+		if (empty($xml_array['#']['LearningDesign']) && empty($xml_array['#']['Folder'])) {
+			$output .= "['',null]";
+		}
+	} else {
+		// it's a sequence
+		$ld_name = preg_replace("/'/", "$1\'", $xml_array['@']['name']);
+		$output .= "['" . $ld_name . "',";
+		$output .= "'javascript:selectSequence(" . $xml_array['@']['resourceId'] . ")']";
+	}
+	return $output;
 }
 
+
+/*
+ * Add a lesson instance.
+ */
+function lamstwo_add_lesson($form) {
+    global $USER, $LAMS2CONSTANTS;
+    
+    $form->timemodified = time();
+    
+    $locale = lamstwo_get_locale($form->course);
+    
+    if (isset($form->schedule) && $form->schedule) {
+    	$form->start_date = date('j/n/y g:i A', $form->schedulestart);
+    } else {
+    	$form->start_date = '';  // avoid PHP notice
+    }
+    
+    // start the lesson
+	$form->lesson_id = lamstwo_get_lesson(
+		$USER->username, $form->sequence_id, $form->course, 
+		$form->name, $form->intro, $form->start_date,
+		$locale['country'], $locale['lang']
+	);
+	
+	if (!isset($form->lesson_id) || $form->lesson_id <= 0) {
+		return false;
+	}
+	
+	if (!$form->id = insert_record('lamstwo_lesson', $form)) {
+		return false;
+	}
+	//print_r($form);
+	
+    $members = lamstwo_get_members($form->course, $form->lamstwo, $form->groupid);
+	
+	// call threaded lams servlet to populate the class
+	$result = lamstwo_fill_lesson($USER->username, $form->lesson_id,
+		$form->course, $locale['country'], $locale['lang'], $members['learners'], $members['monitors']
+	);
+	
+	return $form->id;
+}
+
+
+/*
+ * Make call to LAMS that will populate the LAMS lesson with students and teachers from Moodle course.
+ * The method on the LAMS side runs in a separate thread. 
+ */
+function lamstwo_fill_lesson($username,$lsid,$courseid,$country,$lang,$learneridstr,$monitoridstr) {
+	global $CFG, $USER;
+	if (!isset($CFG->lamstwo_serverid, $CFG->lamstwo_serverkey) || $CFG->lamstwo_serverid == '') {
+    	print_error('Can\'t create LAMS lesson: please check your lamstwo configuration settings.');
+        return NULL;
+    }
+    
+    $datetime =    date('F d,Y g:i a');
+    $datetime_encoded = urlencode($datetime);
+    if(!isset($username)){
+        $username = $USER->username;
+    }
+    $plaintext = $datetime.$username.$CFG->lamstwo_serverid.$CFG->lamstwo_serverkey;
+    //echo $plaintext;
+    $hashvalue = sha1(strtolower($plaintext));
+    //echo $hashvalue;
+    
+    $learneridstr = urlencode($learneridstr);
+    $monitoridstr = urlencode($monitoridstr);
+    
+	// join lesson
+	$service = '/services/xml/LessonManager';
+	$request = "$CFG->lamstwo_serverurl$service?method=join&serverId=$CFG->lamstwo_serverid&datetime=$datetime_encoded&hashValue=$hashvalue&username=$username&lsId=$lsid&courseId=$courseid&country=$country&lang=$lang&learnerIds=$learneridstr&monitorIds=$monitoridstr";
+
+	// GET call to LAMS
+	return file_get_contents($request);
+}
 
 /**
  * Get lesson id from lamstwo
@@ -353,19 +456,21 @@ function lamstwo_process_node($node) {
  */
 function lamstwo_get_lesson($username,$ldid,$courseid,$title,$desc,$startdate,$country,$lang) {
     //echo "enter lamstwo_get_lesson<BR>";
-    global $CFG,$USER;
-    if(!isset($CFG->lamstwo_serverid)||!isset($CFG->lamstwo_serverkey))
-    {
-        //echo "serverid or serverkey is not set<BR>";
+    global $CFG, $USER;
+    if (!isset($CFG->lamstwo_serverid, $CFG->lamstwo_serverkey) || $CFG->lamstwo_serverid == "") {
+    	print_error('Can\'t create LAMS lesson: please check your lamstwo configuration settings.');
         return NULL;
     }
+    
     $relativeurl="/services/LessonManagerService?wsdl";
     $s = lamstwo_get_soap_client($relativeurl);
     if(is_null($s)){
-        //echo "soap client is null<BR>";
+        echo "soap client is null<BR>";
         return NULL;
     }
+	
     $datetime =    date("F d,Y g:i a");
+    $datetime_encoded = urlencode($datetime);
     if(!isset($username)){
         $username = $USER->username;
     }
@@ -373,18 +478,42 @@ function lamstwo_get_lesson($username,$ldid,$courseid,$title,$desc,$startdate,$c
     //echo $plaintext;
     $hashvalue = sha1(strtolower($plaintext));
     //echo $hashvalue;
+    
+    /*
+    $title = urlencode($title);
+    $desc = urlencode($desc);
+    $startdate = urlencode($startdate);
+	*/
+    
 	if($startdate){
 	    $parameters = array($CFG->lamstwo_serverid,$datetime,$hashvalue,$username,$ldid,$courseid,$title,$desc,$startdate,$country,$lang);
 	    $result = $s->call('scheduleLesson',$parameters);
+	    /*$service = "/services/xml/LessonManager";
+	    $request = "$CFG->lamstwo_serverurl$service?method=schedule&serverId=$CFG->lamstwo_serverid&datetime=$datetime_encoded&hashValue=$hashvalue&username=$username&ldId=$ldid&courseId=$courseid&title=$title&desc=$desc&startdate=$startdate&country=$country&lang=$lang";
+	    //$request = "$CFG->lamstwo_serverurl$service?method=delete&serverId=$CFG->lamstwo_serverid&datetime=$datetime_encoded&hashValue=$hashvalue&username=$username&lsId=1";
+	    echo "schedule request: $request";
+	    // GET call to LAMS
+	    $xml = file_get_contents($request);
+	    print_r($http_response_header);
+	    echo "<pre>\n$xml</pre>\n";*/
 	}else{
 	    $parameters = array($CFG->lamstwo_serverid,$datetime,$hashvalue,$username,$ldid,$courseid,$title,$desc,$country,$lang);
 	    $result = $s->call('startLesson',$parameters);
+	    /*$service = "/services/xml/LessonManager";
+	    $request = "$CFG->lamstwo_serverurl$service?method=start&serverId=$CFG->lamstwo_serverid&datetime=$datetime_encoded&hashValue=$hashvalue&username=$username&ldId=$ldid&courseId=$courseid&title=$title&desc=$desc&country=$country&lang=$lang";
+	    echo "start request: $request";
+	    // GET call to LAMS
+	    $xml = file_get_contents($request);
+	    print_r($http_response_header);
+	    echo "<br/>\n$xml<br/>\n";*/
 	}
+	
     if($s->getError()){
         $result = $s->getError();
-    	echo 'result:'.$result.'<BR>exit lamstwo_get_lesson<BR>';
+    	echo 'lamstwo_get_lesson: '.$result;
     }
     unset($s);
+    
     return $result;
 }
 
@@ -446,6 +575,153 @@ function lamstwo_verify($url, $id, $key){
     }
     unset($s);
     return $result;
+}
+
+
+/**
+ * Return array with 2 keys 'country' and 'lang', to be sent to LAMS as the
+ * basis for a LAMS locale like en_AU.  Makes best effort to choose appropriate
+ * locale based on course, user, or server setting.
+ */
+function lamstwo_get_locale($courseid) {
+
+	global $CFG, $USER;
+	$locale = array('country' => '', 'lang' => '');
+	
+	if ($CFG->country != '') {
+		$locale['country'] = trim($CFG->country);
+	}
+	
+	// return course's language and server's country, if either exist
+	if ($course = get_record('course', 'id', $courseid)) {
+        if ($course->lang != '') {
+        	$locale['lang'] = substr(trim($course->lang), 0, 2);
+        	return $locale;
+        }
+    }
+    
+    // use user's country and language if course has no language set
+    $locale['country'] = trim($USER->country);
+    $locale['lang'] = substr(trim($USER->lang), 0, 2);
+    
+    return $locale;
+}
+
+
+/**
+ * Return URL to join a LAMS lesson as a learner or staff depending on method.
+ * URL redirects LAMS to learner or monitor interface depending on method.
+ */
+function lamstwo_get_url($username, $lang, $country, $lessonid, $courseid, $method) {
+    global $CFG, $LAMS2CONSTANTS;
+    
+    $datetime = date('F d,Y g:i a');
+    $plaintext = trim($datetime)
+        .trim($username)
+        .trim($method)
+        .trim($CFG->lamstwo_serverid)
+        .trim($CFG->lamstwo_serverkey);
+    $hash = sha1(strtolower($plaintext));
+    $url = $CFG->lamstwo_serverurl.$LAMS2CONSTANTS->login_request.
+        '?'.$LAMS2CONSTANTS->param_uid.'='.$username.
+        '&'.$LAMS2CONSTANTS->param_method.'='.$method.
+        '&'.$LAMS2CONSTANTS->param_timestamp.'='.urlencode($datetime).
+        '&'.$LAMS2CONSTANTS->param_serverid.'='.$CFG->lamstwo_serverid.
+        '&'.$LAMS2CONSTANTS->param_hash.'='.$hash.
+        ($method==$LAMS2CONSTANTS->author_method ? '' : '&'.$LAMS2CONSTANTS->param_lsid.'='.$lessonid).
+        '&'.$LAMS2CONSTANTS->param_courseid.'='.$courseid.
+		'&'.$LAMS2CONSTANTS->param_country.'='.trim($country).
+		'&'.$LAMS2CONSTANTS->param_lang.'='.substr(trim($lang),0,2);
+    return $url;
+}
+
+
+/*
+ * Returns list of userids of users in the given context
+ */
+function lamstwo_get_course_userids($lamstwoid, $context=NULL) {
+	global $CFG;
+
+	if ($context == NULL) {
+		$lamstwo = get_record('lamstwo', 'id', $lamstwoid);
+		if (! $cm = get_coursemodule_from_instance('lamstwo', $lamstwo->id, $lamstwo->course)) {
+			error('Course Module ID was incorrect');
+		}
+		$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+	}
+	
+	// we are looking for all users assigned in this context or higher
+	if ($usercontexts = get_parent_contexts($context)) {
+		$listofcontexts = '('.implode(',', $usercontexts).')';
+	} else {
+		$sitecontext = get_context_instance(CONTEXT_SYSTEM);
+		$listofcontexts = '('.$sitecontext->id.')'; // must be site
+	}
+	$sql = "SELECT u.id
+		FROM {$CFG->prefix}user u INNER JOIN {$CFG->prefix}role_assignments r ON u.id=r.userid
+		WHERE r.contextid IN $listofcontexts OR r.contextid=$context->id
+		AND u.deleted=0 AND u.username!='guest'";
+	$users = get_records_sql($sql);
+	$userids = array_keys($users);  // turn list of id-backed objects into list of ids
+	
+	return $userids;
+}
+
+
+/*
+ * Returns a list of learners and monitors in the given course or group.
+ */
+function lamstwo_get_members($courseid, $lamstwoid, $groupid) {
+	global $CFG;
+
+	$learneridstr = '';
+	$monitoridstr = '';
+	
+	if (! $cm = get_coursemodule_from_instance('lamstwo', $lamstwoid, $courseid)) {
+		error('Course Module ID was incorrect');
+	}
+	$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+	
+	if (!$groupid) {  // get all course members
+		$userids = lamstwo_get_course_userids($lamstwoid, $context);
+	} else {  // get members of group
+		$userids = groups_get_members($groupid);
+	}
+	
+	foreach ($userids as $userid) {
+		$user = get_record('user', 'id', $userid);
+		if (has_capability('mod/lams:manage', $context, $user->id)) {
+			$monitoridstr .= "$user->username,";
+		}
+		if (has_capability('mod/lams:participate', $context, $user->id)) {
+			$learneridstr .= "$user->username,";
+		}
+	}
+	
+	// remove trailing comma
+	$learneridstr = substr($learneridstr, 0, strlen($learneridstr)-1);
+	$monitoridstr = substr($monitoridstr, 0, strlen($monitoridstr)-1);
+	
+	//echo "learneridstr: $learneridstr\n";
+	//echo "monitoridstr: $monitoridstr\n";
+	
+	$members = array('learners' => $learneridstr, 'monitors' => $monitoridstr);
+	return $members;
+}
+
+
+/*
+ * Returns local lamstwo copy of grades as list of row-objects.
+ */
+function lamstwo_get_grades($lamstwolessonid) {
+	global $CFG;
+	$sql = "SELECT * FROM {$CFG->prefix}lamstwo_grade WHERE lamstwolesson=$lamstwolessonid";
+	$lamstwogrades = get_records_sql($sql);
+	if (isset($lamstwogrades) && sizeof($lamstwogrades) > 0) {
+		return $lamstwogrades;
+	} else {
+		return NULL;
+	}
 }
 
 ?>
