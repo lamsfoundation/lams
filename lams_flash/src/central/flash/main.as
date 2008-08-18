@@ -72,7 +72,15 @@ if(StringUtils.isEmpty(requestSrc)) {
 				
 if(StringUtils.isEmpty(isMac)) {
 	_root.isMac = false;
-}				
+}
+
+if(StringUtils.isEmpty(extlmsid)) {
+	_root.extlmsid = null;
+}
+
+if(StringUtils.isEmpty(customCSV)) {
+	_root.customCSV = null;
+} 
 
 //Set stage alignment to top left and prevent scaling
 Stage.align = "TL";

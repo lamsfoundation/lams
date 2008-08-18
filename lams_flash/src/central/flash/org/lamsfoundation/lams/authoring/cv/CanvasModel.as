@@ -1042,7 +1042,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 				}else{
 					url = cfg.serverUrl+ta.authoringURL + '?toolContentID='+ta.toolContentID+'&contentFolderID='+ddm.contentFolderID;
 				}
-			
+				
+				// append customCSV if this is a tooladapter tool
+				if (ta.extLmsId != null && ta.extLmsId != undefined &&  _root.customCSV != null && _root.customCSV != undefined)
+				{
+					url = url + "&customCSV=" + escape(_root.customCSV); 
+				}
+
 				// TODO: Maybe add learningDesignID and serverURL to window title to handle multiple LAMS(s) running in same browser session.
 				JsPopup.getInstance().launchPopupWindow(url, 'ToolActivityContent_' + ta.toolContentID, 600, 800, true, true, false, false, false);
 			

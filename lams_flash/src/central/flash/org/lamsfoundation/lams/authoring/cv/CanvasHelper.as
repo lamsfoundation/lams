@@ -486,11 +486,13 @@ class CanvasHelper {
 		if(o.data instanceof CanvasActivity && o.data.activity.activityCategoryID != Activity.CATEGORY_SYSTEM){
 			Debugger.log('instance is CA',Debugger.GEN,'setPastedItem','Canvas');
 			var callback:Function = Proxy.create(this, setNewContentID, o);
-			Application.getInstance().getComms().getRequest('authoring/author.do?method=copyToolContent&toolContentID='+o.data.activity.toolContentID+'&userID='+_root.userID,callback, false);
+			var copyActivityURL:String = appendCustomCSVIfExists('authoring/author.do?method=copyToolContent&toolContentID='+o.data.activity.toolContentID+'&userID='+_root.userID);
+			Application.getInstance().getComms().getRequest(copyActivityURL,callback, false);
 		} else if(o.data instanceof ToolActivity){
 			Debugger.log('instance is Tool',Debugger.GEN,'setPastedItem','Canvas');
 			var callback:Function = Proxy.create(this, setNewContentID, o);
-			Application.getInstance().getComms().getRequest('authoring/author.do?method=copyToolContent&toolContentID='+o.toolContentID+'&userID='+_root.userID,callback, false);
+			var copyActivityURL:String = appendCustomCSVIfExists('authoring/author.do?method=copyToolContent&toolContentID='+o.toolContentID+'&userID='+_root.userID);
+			Application.getInstance().getComms().getRequest(copyActivityURL,callback, false);
 		} else if(o.data instanceof CanvasOptionalActivity || o.data instanceof CanvasParallelActivity || (o.data instanceof CanvasActivity && o.data.activity.isBranchingActivity())){
 			Debugger.log('instance is Complex', Debugger.GEN,'setPastedItem','Canvas');
 			var callback:Function = Proxy.create(this, setNewContents, o);
@@ -499,6 +501,26 @@ class CanvasHelper {
 			LFMessage.showMessageAlert(Dictionary.getValue('al_activity_paste_invalid'));
 			Debugger.log('Cant paste this item!',Debugger.GEN,'setPastedItem','Canvas');
 		}
+	}
+	
+	/**
+	 * Appends the customCSV parameter passed from the external machine if it was passed
+	 * This is required for tool adapter tools, so the learning design details returns the 
+	 * correct values
+	 * 
+	 * @usage   
+	 * @param   URL 
+	 * @return  
+	 */
+
+	public function appendCustomCSVIfExists(URL:String):String
+	{
+		var tempURL:String = new String(URL);
+		if (_root.customCSV != null)
+		{
+			tempURL = tempURL + "&customCSV=" + escape(_root.customCSV);
+		}
+		return tempURL;
 	}
 	
 	/**
@@ -514,6 +536,10 @@ class CanvasHelper {
 		o.toolContentIDs = getAllToolContentIDs(ca.activity.activityUIID);
 		Debugger.log('toolContentIDs: ' + o.toolContentIDs,Debugger.CRITICAL,'getToolContentArray','CanvasHelper');
 		
+		if (_root.customCSV != null) {
+			o.customCSV = _root.customCSV;
+		}
+
 		return o;
 	}
 	

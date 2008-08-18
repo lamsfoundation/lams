@@ -524,7 +524,7 @@ class Canvas extends CanvasHelper {
 		var ws = Application.getInstance().getWorkspace();
         ws.userSelectItem(callback, mode);
 	}
-	
+
 	/**
 	 * Request design from server using supplied ID.
 	 * @usage   
@@ -547,8 +547,12 @@ class Canvas extends CanvasHelper {
 			var callback:Function = Proxy.create(this,setDesign);
 			Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designId,callback, false);
 		} else {
-			var dataToSend:Object = getInsertPacket(workspaceResultDTO, false); 							// for now only using Case 1 Insert Learning Design Servlet See Authoring Flash To Java Communications
+			var dataToSend:Object = getInsertPacket(workspaceResultDTO, false); 	// for now only using Case 1 Insert Learning Design Servlet See Authoring Flash To Java Communications
 			var callback:Function = Proxy.create(this, onInsertDesignResponse);
+			
+			if (_root.customCSV != null) {
+				dataToSend.customCSV = _root.customCSV;
+			}
 				
 			Application.getInstance().getComms().sendAndReceive(dataToSend,"servlet/authoring/insertLearningDesign", callback, false);
 		}
@@ -582,7 +586,7 @@ class Canvas extends CanvasHelper {
 	 * Request imported design from server
 	 * 
 	 * @usage   
-b	 * @param   learningDesignID 
+	 * @param   learningDesignID 
 	 * @return  
 	 */
 	
@@ -864,7 +868,8 @@ b	 * @param   learningDesignID
 	
 	public function doImportLaunch():Void{
 		var serverUrl = Config.getInstance().serverUrl;
-		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/importToolContent.do?method=import', 'Import', 298, 800, true, true, false, false, false);
+		var importActionUrl:String = appendCustomCSVIfExists(serverUrl+'authoring/importToolContent.do?method=import');
+		JsPopup.getInstance().launchPopupWindow(importActionUrl, 'Import', 298, 800, true, true, false, false, false);
 	}
 	
 	/**

@@ -107,7 +107,7 @@ class Toolkit {
 	 */
 	public function setToolkitLibraries(toolkits:Array):Void{
 		
-		Debugger.log('Recieved toolkits array length:'+toolkits.length,4,'setToolkitActivities','Toolkit');
+		Debugger.log('Recieved toolkits array length:'+toolkits.length,4,'setToolkitLibraries','Toolkit');
 		//TODO: Validate if correct data?
 		//go throught the recieved toolkits and make ToolActivities from them:
 		for(var i=0; i< toolkits.length; i++){
@@ -125,7 +125,7 @@ class Toolkit {
 				//TODO - prune out non conforming activityTypeIDs
 				
 				//switch constructors based on the activityTypeID.
-				Debugger.log("in toolkit:"+toolkit.learningLibraryID+" Checking ACTIVITY_TYPE:"+ta.activityTypeID,4,'setToolkitActivities','Toolkit');
+				Debugger.log("in toolkit:"+toolkit.learningLibraryID+" Checking ACTIVITY_TYPE:"+ta.activityTypeID,4,'setToolkitLibraries','Toolkit');
 				switch(ta.activityTypeID){
 					case Activity.TOOL_ACTIVITY_TYPE:
 						var toolAct:ToolActivity = new ToolActivity(null);

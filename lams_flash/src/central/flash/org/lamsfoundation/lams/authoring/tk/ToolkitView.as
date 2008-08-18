@@ -247,6 +247,22 @@ class ToolkitView extends AbstractView {
 			//NOW we pass in the whole array, as complex activities are supprted in this way
 			var activities:Array = learningLib.classInstanceRefs;
 			//Debugger.log('toolActivity '+ta.title+'('+ta.activityID+')',4,'updateLibraries','ToolkitView');
+			
+			// First condition true if is a native lams tool
+			var toolAct = ToolActivity(activities[0]);
+			if (toolAct.extLmsId == null || toolAct.extLmsId == undefined) { 
+				Debugger.log('ToolActivity->Native tool: ' + toolAct.title, Debugger.CRITICAL, 'updateLibraries', 'ToolView');
+			}
+			// Second condition true if it is an external tool adapter tool
+			else if (_root.extlmsid != undefined && _root.extlmsid !=null && _root.extlmsid == toolAct.extLmsId){
+				Debugger.log('ToolActivity->External tool, external request: ' + toolAct.title, Debugger.CRITICAL, 'updateLibraries', 'ToolView');
+			}
+			// Else is a tool adapter tool, but the call was not from external server, therefore disable
+			else{
+				continue;
+				Debugger.log('ToolActivity->Externale tool, internal request: ' + toolAct.title, Debugger.CRITICAL, 'updateLibraries', 'ToolView');
+			}
+			
 			var templateActivity_mc = toolkitLibraries_sp.content.attachMovie("TemplateActivity","ta_"+learningLib.learningLibraryID,_depth++,{_activities:activities,_toolkitView:tkv, yPos:yPos});
 			
 			//position it

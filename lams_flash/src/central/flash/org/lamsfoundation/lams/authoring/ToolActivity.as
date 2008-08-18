@@ -46,6 +46,8 @@ class ToolActivity extends Activity{
 	private var _toolContentID:Number;
 	private var _toolID:Number;
 	
+	private var _extLmsId:String; //external LMS id for tool adapter tools
+
 	//flags to tell UI which to disable
 	private var _supportsContribute:Boolean;
 	private var _supportsDefineLater:Boolean;
@@ -135,6 +137,9 @@ class ToolActivity extends Activity{
 			if(StringUtils.isWDDXNull(dto.toolID)) { _toolID = null }
 			else { _toolID = dto.toolID; }
 			
+			if(StringUtils.isWDDXNull(dto.extLmsId)) { _extLmsId = null }
+			else { _extLmsId = dto.extLmsId; }
+			 
 			_supportsContribute = dto.supportsContribute;
 			_supportsDefineLater = dto.supportsDefineLater;
 			_supportsModeration = dto.supportsRunOffline
@@ -156,6 +161,7 @@ class ToolActivity extends Activity{
 		dto.toolContentID = (_toolContentID) ?  _toolContentID: Config.NUMERIC_NULL_VALUE;	
 		dto.toolID = (_toolID) ?  _toolID: Config.NUMERIC_NULL_VALUE;	
 		
+		dto.extLmsId = (_extLmsId) ? _extLmsId : Config.STRING_NULL_VALUE;
 		/* THESE are internal flags, not part of the design
 		dto.supportsContribute = (_supportsContribute!=null) ?  _supportsContribute: Config.BOOLEAN_NULL_VALUE;	
 		dto.supportsDefineLater = (_supportsDefineLater!=null) ?  _supportsDefineLater: Config.BOOLEAN_NULL_VALUE;	
@@ -210,6 +216,7 @@ class ToolActivity extends Activity{
 		n.supportsDefineLater = _supportsDefineLater;
 		n.supportsModeration = _supportsRunOffline;
 		n.supportsOutputs = _supportsOutputs;
+		n.extLmsId = _extLmsId;
 		
 		return n;
 		
@@ -320,7 +327,7 @@ class ToolActivity extends Activity{
 		return _toolID;
 	}
 	
-		/**
+	/**
 	 * 
 	 * @usage   
 	 * @param   newsupportsContribute 
@@ -464,6 +471,23 @@ class ToolActivity extends Activity{
 	public function get helpURL ():String {
 		return _helpURL;
 	}
-
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   str 
+	 * @return  
+	 */
+	public function set extLmsId (str:String):Void {
+		_extLmsId = str;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get extLmsId ():String {
+		return _extLmsId;
+	}
 }
 

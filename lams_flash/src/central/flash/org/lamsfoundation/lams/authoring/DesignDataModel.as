@@ -671,6 +671,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 		if(title) { data.lessonName = title; }
 		if(description) { data.lessonDescription = description; }
+		if(_root.customCSV) { data.customCSV = _root.customCSV; }
 		
 		if(_learningDesignID) { data.learningDesignID = _learningDesignID; }
 		data.organisationID = Config.NUMERIC_NULL_VALUE;
