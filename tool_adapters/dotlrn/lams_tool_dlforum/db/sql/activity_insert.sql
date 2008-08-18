@@ -42,9 +42,9 @@ activity_ui_id
 VALUES
 (
 NULL
-, 'DotLRNForum Tool'
-, 'DotLRNForum Tool'
-, 'Put some help text here.'
+, '.LRN Forum Tool'
+, '.LRN Forum Tool'
+, 'dotLRN Forum Tool.'
 , NULL
 , NULL
 , NULL
