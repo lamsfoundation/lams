@@ -1,3 +1,9 @@
+lams2 (2.1.1-1) unstable; urgency=low
+
+  * updated chat tool to version 20080813 (fix compatibility with firefox3)
+
+ -- LAMS Development Team <lamsdev@melcoe.mq.edu.au>  Thu, 14 Aug 2008 10:52:00 +1000
+
 lams2 (2.1.0-1) unstable; urgency=low
 
   * LAMS 2.1 initial release

@@ -17,6 +17,30 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+update21rc1to210 () {
+    # Update 2.1rc1 database to 2.1
+    if [ "$db_root_pass" != "" ] ; then
+        mysql $db_name < /usr/share/lams2/2.1rc1to2.1.sql -u root -p$db_root_pass || true
+    else
+        mysql $db_name < /usr/share/lams2/2.1rc1to2.1.sql -u root || true
+    fi
+
+    # Add Tasklist tool, new in 2.1
+    cd /usr/share/lams2/lams_tool_task/
+    sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
+    sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
+    sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
+    ./deploy.sh > /dev/null || true
+}
+
+update210to211 () {
+    # Update 2.1.0 database to 2.1.1
+    if [ "$db_root_pass" != "" ] ; then
+        mysql $db_name < /usr/share/lams2/2.1.0to2.1.1.sql -u root -p$db_root_pass || true
+    else
+        mysql $db_name < /usr/share/lams2/2.1.0to2.1.1.sql -u root || true
+    fi
+}
 
 case "$1" in
     configure)
@@ -66,20 +90,13 @@ case "$1" in
         sed -i -e "s/port=\"8080\"/port=\"$server_port\"/" server.xml
 
         case "$2" in
-            2.1rc1*)
-                # Update 2.1rc1 database to 2.1
-                if [ "$db_root_pass" != "" ] ; then 
-                    mysql $db_name < /usr/share/lams2/2.1rc1to2.1.sql -u root -p$db_root_pass || true
-                else
-                    mysql $db_name < /usr/share/lams2/2.1rc1to2.1.sql -u root || true
-                fi
+            2.1.0*)
+                update210to211;
+            ;;
 
-                # Add Tasklist tool, new in 2.1
-                cd /usr/share/lams2/lams_tool_task/
-                sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
-                sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
-                sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
-                ./deploy.sh > /dev/null || true
+            2.1rc1*)
+                update21rc1to210;
+                update210to211;
             ;;
 
             *)
@@ -244,6 +261,7 @@ case "$1" in
         rm -f /usr/share/lams2/2.1rc1to2.1.sql
         rm -f /usr/share/lams2/lams.sql
         rm -rf /usr/share/lams2/lams_tool_task_list
+        rm -f /usr/share/lams2/2.1.0to2.1.1.sql
 
         # Delete default ROOT.war/index.html (replaced with redirecting index.jsp)
         rm -f /usr/share/jboss-4.0.2/server/default/deploy/jbossweb-tomcat55.sar/ROOT.war/index.html
