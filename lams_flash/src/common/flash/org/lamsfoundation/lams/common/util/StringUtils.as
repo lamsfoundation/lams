@@ -249,6 +249,38 @@ class StringUtils {
 	}
 	
 	/**
+	 * Returns a new String based on the input String with the leading and trailing spaces removed
+	 * @usage   
+	 * @param   str 
+	 * @return  
+	 */
+	public static function trim(str:String):String {
+		var startIdx:Number;
+		for (var i=0; i<str.length; i++) {
+			if (str.charAt(i) != " ") {
+				startIdx = i;
+				break;
+			}
+		}
+		
+		var endIdx:Number;
+		for (var i=(str.length); i>0; i--) {
+			if (str.charAt(i-1) != " ") {
+				endIdx = i;
+				break;
+			}
+		}
+		
+		// if there are no spaces, return a new instance of the original string, else return the trimmed string
+		if (startIdx == undefined || startIdx == null || endIdx == undefined || endIdx == null) { 
+			if (str.length > 0) return new String(""); // string contains only spaces, return a new empty string
+		}
+		
+		var trimmedStr:String = str.substring(startIdx, endIdx);
+		return trimmedStr;
+	}
+	
+	/**
 	 * Checks to see if the value passed in is any of the null values defined in Config.
 	 * @usage   
 	 * @param   v 
