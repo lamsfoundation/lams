@@ -80,7 +80,8 @@
     // some special ones are not.  These get placed in the general forums
     // category with the forums in section 0.
 
-    $forums = get_records('forum', 'course', $course->id);
+    #$forums = get_records('forum', 'course', $course->id);
+    $forums = get_records_select('forum', "course=$course->id and is_lams=0");
 
     $generalforums  = array();
     $learningforums = array();
