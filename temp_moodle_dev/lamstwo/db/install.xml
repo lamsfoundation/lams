@@ -26,7 +26,7 @@
         <FIELD NAME="groupid" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="intro" NEXT="sequence_id"/>
         <FIELD NAME="sequence_id" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="groupid" NEXT="lesson_id"/>
         <FIELD NAME="lesson_id" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="sequence_id" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="lesson_id" NEXT="completed"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="lesson_id" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary_lamstwo_lesson" TYPE="primary" FIELDS="id" COMMENT="Primary key for lamstwo_lesson"/>
@@ -37,11 +37,14 @@
     </TABLE>
     <TABLE NAME="lamstwo_grade" COMMENT="LAMS user grade" PREVIOUS="lamstwo_lesson">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="course"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="lamstwolesson"/>
         <FIELD NAME="lamstwolesson" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="user"/>
         <FIELD NAME="user" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="lamstwolesson" NEXT="completed"/>
-        <FIELD NAME="completed" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="lamstwolesson"/>
+        <FIELD NAME="completed" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="user"/>
       </FIELDS>
+      <KEYS>
+        <KEY NAME="primary_lamstwo_grade" TYPE="primary" FIELDS="id" COMMENT="Primary key for lamstwo_grade"/>
+      </KEYS>
     </TABLE>
   </TABLES>
 </XMLDB>
