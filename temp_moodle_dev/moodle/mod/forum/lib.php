@@ -6691,10 +6691,34 @@ function forum_get_open_modes() {
 }
 
 /**
- * Returns all other caps used in module
+ *
  */
-function forum_get_extra_capabilities() {
-    return array('moodle/site:accessallgroups', 'moodle/site:viewfullnames', 'moodle/site:trustcontent');
+function forum_clone_instance($id, $courseid, $userid) {
+#    global $CFG;
+#    require_once($CFG->dirroot.'/course/lib.php');
+
+    if ( ! $existingforum = get_record('forum', 'id', $id) ) {
+        $existingforum->course = $courseid;
+        $existingforum->name = "Forum";
+        $existingforum->intro = "";
+        $existingforum->is_lams = 1;
+        $existingforum->id = insert_record('forum', $existingforum);
+    } else {
+        unset($existingforum->id);
+        $existingforum->course = $courseid;
+        $existingforum->is_lams = 1;
+        $existingforum->id = insert_record('forum', $existingforum);
+    }
+
+    $module = get_record('modules', 'name', 'forum');
+
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->instance = $existingforum->id;
+    $cm->added = time();
+#    $cm->id = add_course_module($cm);
+    $cm->id = insert_record('course_modules', $cm);
 }
+
 
 ?>
