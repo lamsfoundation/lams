@@ -24,28 +24,26 @@
 
 package org.lamsfoundation.lams.tool.dimdim.util;
 
-public interface DimdimConstants {
+public interface Constants {
 	public static final String TOOL_SIGNATURE = "laddim10";
 
-	// Dimdim session status
-	public static final Integer SESSION_NOT_STARTED = new Integer(0);
-	public static final Integer SESSION_IN_PROGRESS = new Integer(1);
-	public static final Integer SESSION_COMPLETED = new Integer(2);
-
-	public static final String AUTHORING_DEFAULT_TAB = "1";
-	public static final String ATTACHMENT_LIST = "attachmentList";
-	public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
-	public static final String AUTH_SESSION_ID_COUNTER = "authoringSessionIdCounter";
-	public static final String AUTH_SESSION_ID = "authoringSessionId";
-
-	public static final int MONITORING_SUMMARY_MAX_MESSAGES = 5;
+	// Authoring SessionMap key names
+	public static final String KEY_TOOL_CONTENT_ID = "toolContentID";
+	public static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
+	public static final String KEY_MODE = "mode";
+	public static final String KEY_ONLINE_FILES = "onlineFiles";
+	public static final String KEY_OFFLINE_FILES = "offlineFiles";
+	public static final String KEY_UNSAVED_ONLINE_FILES = "unsavedOnlineFiles";
+	public static final String KEY_UNSAVED_OFFLINE_FILES = "unsavedOfflineFiles";
+	public static final String KEY_DELETED_FILES = "deletedFiles";
 
 	// Attribute names
-	public static final String ATTR_MESSAGE = "message";
+	public static final String ATTR_CONTENT_DTO = "contentDTO";
+	public static final String ATTR_CONTENT_FOLDER_ID = "contentFolderID";
+	public static final String ATTR_FINISHED_ACTIVITY = "finishedActivity";
 	public static final String ATTR_SESSION_MAP = "sessionMap";
-
+	public static final String ATTR_USER_DTO = "userDTO";
+	
 	// Parameter names
-	public static final String PARAM_PARENT_PAGE = "parentPage";
-
-	static final String FILTER_REPLACE_TEXT = "***";
+	public static final String PARAM_USER_UID = "userUID";
 }

@@ -39,13 +39,12 @@ import org.apache.log4j.Logger;
 
 public class DimdimSession implements java.io.Serializable {
 
-	private static Logger log = Logger.getLogger(DimdimSession.class);
-	/**
-	 * 
-	 */
+	private static final Logger logger = Logger.getLogger(DimdimSession.class);
+
 	private static final long serialVersionUID = 4407078136514639026L;
 
 	// Fields
+	
 	private Long uid;
 
 	private Date sessionEndDate;
@@ -241,7 +240,7 @@ public class DimdimSession implements java.io.Serializable {
 			session = (DimdimSession) super.clone();
 			session.dimdimUsers = new HashSet<DimdimUser>();
 		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + DimdimSession.class + " failed");
+			logger.error("When clone " + DimdimSession.class + " failed");
 		}
 		return session;
 	}

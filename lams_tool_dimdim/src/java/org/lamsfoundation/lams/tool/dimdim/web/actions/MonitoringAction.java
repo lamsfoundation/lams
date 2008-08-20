@@ -30,15 +30,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.dimdim.dto.ContentDTO;
-import org.lamsfoundation.lams.tool.dimdim.dto.DimdimUserDTO;
+import org.lamsfoundation.lams.tool.dimdim.dto.UserDTO;
 import org.lamsfoundation.lams.tool.dimdim.model.Dimdim;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 import org.lamsfoundation.lams.tool.dimdim.service.DimdimServiceProxy;
 import org.lamsfoundation.lams.tool.dimdim.service.IDimdimService;
+import org.lamsfoundation.lams.tool.dimdim.util.Constants;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
@@ -53,16 +54,27 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *                        path="tiles:/monitoring/dimdim_display"
  * 
  */
-public class MonitoringAction extends LamsDispatchAction {
+public class MonitoringAction extends DispatchAction {
 
-	// private static Logger log = Logger.getLogger(MonitoringAction.class);
+	// private static final Logger logger =
+	// Logger.getLogger(MonitoringAction.class);
 
-	public IDimdimService dimdimService;
+	private IDimdimService dimdimService;
+
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+
+		// set up dimdimService
+		dimdimService = DimdimServiceProxy.getDimdimService(this.getServlet()
+				.getServletContext());
+
+		return super.execute(mapping, form, request, response);
+	}
 
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-
-		setupService();
 
 		Long toolContentID = new Long(WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -82,35 +94,23 @@ public class MonitoringAction extends LamsDispatchAction {
 				AttributeNames.PARAM_CURRENT_TAB, true);
 		contentDT0.setCurrentTab(currentTab);
 
-		request.setAttribute("dimdimDTO", contentDT0);
-		request.setAttribute("contentFolderID", contentFolderID);
+		request.setAttribute(Constants.ATTR_CONTENT_DTO, contentDT0);
+		request.setAttribute(Constants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
 		return mapping.findForward("success");
 	}
 
 	public ActionForward showDimdim(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-
-		setupService();
-
-		Long uid = new Long(WebUtil.readLongParam(request, "userUID"));
+		Long uid = new Long(WebUtil.readLongParam(request,
+				Constants.PARAM_USER_UID));
 
 		DimdimUser user = dimdimService.getUserByUID(uid);
 		NotebookEntry entry = dimdimService.getEntry(user.getEntryUID());
 
-		DimdimUserDTO userDTO = new DimdimUserDTO(user, entry);
+		UserDTO userDTO = new UserDTO(user, entry);
 
-		request.setAttribute("userDTO", userDTO);
+		request.setAttribute(Constants.ATTR_USER_DTO, userDTO);
 
 		return mapping.findForward("dimdim_display");
-	}
-
-	/**
-	 * set up dimdimService
-	 */
-	private void setupService() {
-		if (dimdimService == null) {
-			dimdimService = DimdimServiceProxy.getDimdimService(this
-					.getServlet().getServletContext());
-		}
 	}
 }

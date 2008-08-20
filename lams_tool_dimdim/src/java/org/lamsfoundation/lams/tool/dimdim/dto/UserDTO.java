@@ -28,7 +28,7 @@ package org.lamsfoundation.lams.tool.dimdim.dto;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 
-public class DimdimUserDTO implements Comparable<DimdimUserDTO> {
+public class UserDTO implements Comparable<UserDTO> {
 
 	public Long uid;
 
@@ -44,7 +44,7 @@ public class DimdimUserDTO implements Comparable<DimdimUserDTO> {
 
 	public Long entryUID;
 
-	public DimdimUserDTO(DimdimUser user, NotebookEntry entry) {
+	public UserDTO(DimdimUser user, NotebookEntry entry) {
 		this.uid = user.getUid();
 		this.loginName = user.getLoginName();
 		this.firstName = user.getFirstName();
@@ -54,7 +54,7 @@ public class DimdimUserDTO implements Comparable<DimdimUserDTO> {
 		this.entryDTO = new NotebookEntryDTO(entry);
 	}
 
-	public DimdimUserDTO(DimdimUser user) {
+	public UserDTO(DimdimUser user) {
 		this.uid = user.getUid();
 		this.loginName = user.getLoginName();
 		this.firstName = user.getFirstName();
@@ -63,7 +63,7 @@ public class DimdimUserDTO implements Comparable<DimdimUserDTO> {
 		this.entryUID = user.getEntryUID();
 	}
 
-	public int compareTo(DimdimUserDTO other) {
+	public int compareTo(UserDTO other) {
 		int ret = this.lastName.compareToIgnoreCase(other.lastName);
 		if (ret == 0) {
 			ret = this.uid.compareTo(other.uid);

@@ -42,34 +42,42 @@ public class AuthoringForm extends ActionForm {
 
 	private static final long serialVersionUID = 3950453134542135495L;
 
-	// Properties
+	// Fields
 
-	String title;
+	private String title;
 
-	String instructions;
+	private String instructions;
 
-	String offlineInstruction;
+	private String offlineInstruction;
 
-	String onlineInstruction;
+	private String onlineInstruction;
 
-	boolean lockOnFinished;
+	private boolean lockOnFinished;
 
-	boolean allowRichEditor;
+	private boolean allowRichEditor;
 
-	FormFile onlineFile;
+	private FormFile onlineFile;
 
-	FormFile offlineFile;
+	private FormFile offlineFile;
 
-	String currentTab;
+	private String currentTab;
 
-	String dispatch;
+	private String dispatch;
 
-	String sessionMapID;
+	private String sessionMapID;
 
-	Long deleteFileUuid;
+	private Long deleteFileUuid;
 
-	SessionMap<String, Object> sessionMap;
+	private SessionMap<String, Object> sessionMap;
+	
+	private Integer maxParticipants;
 
+	private Integer meetingDurationInHours;
+
+	private boolean allowVideo;
+
+	private Integer attendeeMikes;
+	
 	@Override
 	public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
 		ActionErrors ac = new ActionErrors();
@@ -181,5 +189,37 @@ public class AuthoringForm extends ActionForm {
 
 	public void setAllowRichEditor(boolean allowRichEditor) {
 		this.allowRichEditor = allowRichEditor;
+	}
+
+	public Integer getMaxParticipants() {
+		return maxParticipants;
+	}
+
+	public void setMaxParticipants(Integer maxParticipants) {
+		this.maxParticipants = maxParticipants;
+	}
+
+	public Integer getMeetingDurationInHours() {
+		return meetingDurationInHours;
+	}
+
+	public void setMeetingDurationInHours(Integer meetingDurationInHours) {
+		this.meetingDurationInHours = meetingDurationInHours;
+	}
+
+	public boolean isAllowVideo() {
+		return allowVideo;
+	}
+
+	public void setAllowVideo(boolean allowVideo) {
+		this.allowVideo = allowVideo;
+	}
+
+	public Integer getAttendeeMikes() {
+		return attendeeMikes;
+	}
+
+	public void setAttendeeMikes(Integer attendeeMikes) {
+		this.attendeeMikes = attendeeMikes;
 	}
 }

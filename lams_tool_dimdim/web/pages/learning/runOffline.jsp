@@ -8,7 +8,7 @@
 
 <div id="content">
 	<h1>
-		${dimdimDTO.title}
+		${contentDTO.title}
 	</h1>
 
 	<p>
@@ -16,7 +16,8 @@
 	</p>
 
 	<c:if test="${mode == 'learner' || mode == 'author'}">
-		<html:form action="/learning" method="post" onsubmit="disableFinishButton();">
+		<html:form action="/learning" method="post"
+			onsubmit="disableFinishButton();">
 			<html:hidden property="dispatch" value="finishActivity" />
 			<html:hidden property="toolSessionID" />
 

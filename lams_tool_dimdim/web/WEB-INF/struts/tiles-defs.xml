@@ -67,7 +67,7 @@
 
 	<!-- Begin: Learning -->
 	<definition name="tiles:/learning/main" extends="tiles:/layout:simple">
-		<put name="body" value="/pages/learning/dimdim.jsp" />
+		<put name="body" value="/pages/learning/learning.jsp" />
 	</definition>
 	
 	<definition name="tiles:/learning/runOffline" extends="tiles:/layout:simple">

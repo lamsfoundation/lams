@@ -31,14 +31,6 @@ import org.lamsfoundation.lams.tool.dimdim.model.DimdimAttachment;
 
 public class AttachmentDTO implements Comparable<AttachmentDTO> {
 
-	public AttachmentDTO(DimdimAttachment att) {
-		this.fileUuid = att.getFileUuid();
-		this.fileName = att.getFileName();
-		this.fileVersionId = att.getFileVersionId();
-		this.createDate = att.getCreateDate();
-		this.uid = att.getUid();
-	}
-
 	Long uid;
 
 	Long fileUuid;
@@ -48,6 +40,22 @@ public class AttachmentDTO implements Comparable<AttachmentDTO> {
 	String fileName;
 
 	Date createDate;
+
+	public AttachmentDTO(DimdimAttachment att) {
+		this.fileUuid = att.getFileUuid();
+		this.fileName = att.getFileName();
+		this.fileVersionId = att.getFileVersionId();
+		this.createDate = att.getCreateDate();
+		this.uid = att.getUid();
+	}
+
+	public int compareTo(AttachmentDTO other) {
+		int ret = this.createDate.compareTo(other.getCreateDate());
+		if (ret == 0) {
+			ret = this.uid.compareTo(other.getUid());
+		}
+		return ret;
+	}
 
 	public String getFileName() {
 		return fileName;
@@ -87,13 +95,5 @@ public class AttachmentDTO implements Comparable<AttachmentDTO> {
 
 	public void setUid(Long uid) {
 		this.uid = uid;
-	}
-
-	public int compareTo(AttachmentDTO other) {
-		int ret = this.createDate.compareTo(other.getCreateDate());
-		if (ret == 0) {
-			ret = this.uid.compareTo(other.getUid());
-		}
-		return ret;
 	}
 }

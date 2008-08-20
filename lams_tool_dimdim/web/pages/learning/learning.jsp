@@ -42,14 +42,14 @@
 
 <div id="content">
 	<h1>
-		${dimdimDTO.title}
+		${contentDTO.title}
 	</h1>
 
 	<p>
-		${dimdimDTO.instructions}
+		${contentDTO.instructions}
 	</p>
 
-	<c:if test="${dimdimDTO.lockOnFinish and mode == 'learner'}">
+	<c:if test="${contentDTO.lockOnFinish and mode == 'learner'}">
 		<div class="info">
 			<c:choose>
 				<c:when test="${finishedActivity}">
@@ -75,22 +75,10 @@
 
 		<c:choose>
 			<c:when test="${contentEditable}">
-				<c:choose>
-					<c:when test="${dimdimDTO.allowRichEditor}">
-						<lams:FCKEditor id="entryText" value="${lrnForm.entryText}"
-							toolbarSet="Default-Learner">
-						</lams:FCKEditor>
-					</c:when>
-
-					<c:otherwise>
-						<html:textarea cols="60" rows="8" property="entryText"
-							styleClass="text-area"></html:textarea>
-					</c:otherwise>
-				</c:choose>
 
 				<div class="space-bottom-top align-right">
 					<html:submit styleClass="button" styleId="finishButton">
-						<fmt:message>button.finish</fmt:message>
+						<fmt:message key="button.finish" />
 					</html:submit>
 				</div>
 

@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
 
 public class ContentDTO {
 
-	private static Logger logger = Logger.getLogger(ContentDTO.class);
+	private static final Logger logger = Logger.getLogger(ContentDTO.class);
 
 	public Long toolContentId;
 
@@ -63,6 +63,14 @@ public class ContentDTO {
 	public Set<SessionDTO> sessionDTOs = new TreeSet<SessionDTO>();
 
 	public Long currentTab;
+	
+	public Integer maxParticipants;
+
+	public  Integer meetingDurationInHours;
+
+	public  boolean allowVideo;
+
+	public  Integer attendeeMikes;
 
 	/* Constructors */
 	public ContentDTO() {
@@ -97,7 +105,7 @@ public class ContentDTO {
 			if (attSet != null)
 				attSet.add(new AttachmentDTO(att));
 		}
-		
+
 		for (DimdimSession dimdimSession : dimdim.getDimdimSessions()) {
 			sessionDTOs.add(new SessionDTO(dimdimSession));
 		}
@@ -200,5 +208,37 @@ public class ContentDTO {
 
 	public void setCurrentTab(Long currentTab) {
 		this.currentTab = currentTab;
+	}
+
+	public Integer getMaxParticipants() {
+		return maxParticipants;
+	}
+
+	public void setMaxParticipants(Integer maxParticipants) {
+		this.maxParticipants = maxParticipants;
+	}
+
+	public Integer getMeetingDurationInHours() {
+		return meetingDurationInHours;
+	}
+
+	public void setMeetingDurationInHours(Integer meetingDurationInHours) {
+		this.meetingDurationInHours = meetingDurationInHours;
+	}
+
+	public boolean isAllowVideo() {
+		return allowVideo;
+	}
+
+	public void setAllowVideo(boolean allowVideo) {
+		this.allowVideo = allowVideo;
+	}
+
+	public Integer getAttendeeMikes() {
+		return attendeeMikes;
+	}
+
+	public void setAttendeeMikes(Integer attendeeMikes) {
+		this.attendeeMikes = attendeeMikes;
 	}
 }

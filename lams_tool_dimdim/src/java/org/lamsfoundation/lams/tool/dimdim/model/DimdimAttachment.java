@@ -40,16 +40,13 @@ import org.apache.log4j.Logger;
 
 public class DimdimAttachment implements java.io.Serializable, Cloneable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 47452859888067500L;
 
-	private static final Logger log = Logger.getLogger(DimdimAttachment.class);
+	private static final Logger logger = Logger
+			.getLogger(DimdimAttachment.class);
 
-	/**
-	 * 
-	 */
+	// Fields
+	
 	private Long uid;
 
 	private Long fileVersionId;
@@ -222,7 +219,7 @@ public class DimdimAttachment implements java.io.Serializable, Cloneable {
 			obj = super.clone();
 			((DimdimAttachment) obj).setUid(null);
 		} catch (CloneNotSupportedException e) {
-			log.error("Failed to clone " + DimdimAttachment.class);
+			logger.error("Failed to clone " + DimdimAttachment.class);
 		}
 
 		return obj;

@@ -37,14 +37,19 @@ public class LearningForm extends ActionForm {
 
 	private static final long serialVersionUID = -4728946254882237144L;
 
-	String title;
-	String instructions;
+	// Fields
+	
+	private String title;
 
-	String dispatch;
-	Long toolSessionID;
-	String mode;
+	private String instructions;
 
-	String entryText;
+	private String dispatch;
+
+	private Long toolSessionID;
+
+	private String mode;
+
+	private String entryText;
 
 	public String getMode() {
 		return mode;

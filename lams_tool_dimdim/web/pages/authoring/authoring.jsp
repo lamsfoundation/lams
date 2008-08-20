@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <%@ page
-	import="org.lamsfoundation.lams.tool.dimdim.util.DimdimConstants"%>
+	import="org.lamsfoundation.lams.tool.dimdim.util.Constants"%>
 
 <html:form action="/authoring" styleId="authoringForm" method="post"
 	enctype="multipart/form-data">
@@ -48,7 +48,7 @@
 			</logic:messagesPresent>			
 		</div>
 
-		<lams:help toolSignature="<%=DimdimConstants.TOOL_SIGNATURE%>"
+		<lams:help toolSignature="<%=Constants.TOOL_SIGNATURE%>"
 			module="authoring" />
 
 		<%-- Page tabs --%>

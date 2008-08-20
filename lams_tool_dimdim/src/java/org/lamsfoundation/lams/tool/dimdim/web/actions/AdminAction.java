@@ -44,9 +44,9 @@ import org.lamsfoundation.lams.tool.dimdim.service.IDimdimService;
  * 
  * @struts.action path="/admin/saveConfig" name="adminForm"
  *                parameter="saveConfig" scope="request" validate="false"
- * @struts.action-forward  name="saveConfig" path="tiles:/admin/saveConfig"
+ * @struts.action-forward name="saveConfig" path="tiles:/admin/saveConfig"
  * 
- * @author asukkar
+ * @author Anthony Sukkar
  * 
  */
 public class AdminAction extends MappingDispatchAction {
@@ -57,20 +57,17 @@ public class AdminAction extends MappingDispatchAction {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
-		if (dimdimService == null) {
-			dimdimService = DimdimServiceProxy.getDimdimService(this
-					.getServlet().getServletContext());
-		}
+		
+		// set up dimdimService
+		dimdimService = DimdimServiceProxy.getDimdimService(this.getServlet()
+				.getServletContext());
 
 		return super.execute(mapping, form, request, response);
 	}
 
 	public ActionForward editConfig(ActionMapping mapping, ActionForm form,
 			ServletRequest request, ServletResponse response) throws Exception {
-		
-		
-		
+
 		return mapping.findForward("editConfig-success");
 	}
 

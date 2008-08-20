@@ -30,25 +30,23 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.dimdim.service.DimdimService;
 
 /**
+ * 
+ * 
  * @hibernate.class table="tl_laddim10_dimdim"
  */
 
 public class Dimdim implements java.io.Serializable, Cloneable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 579733009969321015L;
 
-	static Logger log = Logger.getLogger(DimdimService.class.getName());
+	private static final Logger logger = Logger.getLogger(Dimdim.class);
 
-	// Fields
-	/**
-	 * 
-	 */
+	private IToolContentHandler toolContentHandler;
+
+	// Persistent Fields
+
 	private Long uid;
 
 	private Date createDate;
@@ -88,9 +86,6 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 	private boolean allowVideo;
 
 	private Integer attendeeMikes;
-
-	// *********** NON Persistent fields
-	private IToolContentHandler toolContentHandler;
 
 	// Constructors
 
@@ -453,7 +448,7 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 			dimdim.dimdimSessions = new HashSet<DimdimSession>();
 
 		} catch (CloneNotSupportedException cnse) {
-			log.error("Error cloning " + Dimdim.class);
+			logger.error("Error cloning " + Dimdim.class);
 		}
 		return dimdim;
 	}

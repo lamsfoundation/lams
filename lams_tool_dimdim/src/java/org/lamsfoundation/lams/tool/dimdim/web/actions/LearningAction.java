@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -43,20 +44,18 @@ import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 import org.lamsfoundation.lams.tool.dimdim.service.DimdimServiceProxy;
 import org.lamsfoundation.lams.tool.dimdim.service.IDimdimService;
-import org.lamsfoundation.lams.tool.dimdim.util.DimdimConstants;
+import org.lamsfoundation.lams.tool.dimdim.util.Constants;
 import org.lamsfoundation.lams.tool.dimdim.util.DimdimException;
 import org.lamsfoundation.lams.tool.dimdim.web.forms.LearningForm;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * @author
- * @version
+ * @author Anthony Sukkar
  * 
  * @struts.action path="/learning" parameter="dispatch" scope="request"
  *                name="learningForm"
@@ -64,13 +63,23 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  */
-public class LearningAction extends LamsDispatchAction {
+public class LearningAction extends DispatchAction {
 
-	private static Logger log = Logger.getLogger(LearningAction.class);
-
-	private static final boolean MODE_OPTIONAL = false;
+	private static final Logger logger = Logger.getLogger(LearningAction.class);
 
 	private IDimdimService dimdimService;
+
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+
+		// set up dimdimService
+		dimdimService = DimdimServiceProxy.getDimdimService(this.getServlet()
+				.getServletContext());
+
+		return super.execute(mapping, form, request, response);
+	}
 
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -78,26 +87,20 @@ public class LearningAction extends LamsDispatchAction {
 
 		LearningForm learningForm = (LearningForm) form;
 
-		// 'toolSessionID' and 'mode' paramters are expected to be present.
+		// 'toolSessionID' and 'mode' parameters are expected to be present.
 		// TODO need to catch exceptions and handle errors.
 		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,
-				AttributeNames.PARAM_MODE, MODE_OPTIONAL);
+				AttributeNames.PARAM_MODE, false);
 
 		Long toolSessionID = WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_SESSION_ID);
-
-		// set up dimdimService
-		if (dimdimService == null) {
-			dimdimService = DimdimServiceProxy.getDimdimService(this
-					.getServlet().getServletContext());
-		}
 
 		// Retrieve the session and content.
 		DimdimSession dimdimSession = dimdimService
 				.getSessionBySessionId(toolSessionID);
 		if (dimdimSession == null) {
 			throw new DimdimException(
-					"Cannot retreive session with toolSessionID"
+					"Cannot retrieve session with toolSessionID"
 							+ toolSessionID);
 		}
 
@@ -109,7 +112,7 @@ public class LearningAction extends LamsDispatchAction {
 		}
 
 		// set mode, toolSessionID and DimdimDTO
-		request.setAttribute("mode", mode.toString());
+		request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 		learningForm.setToolSessionID(toolSessionID);
 
 		ContentDTO contentDTO = new ContentDTO();
@@ -118,11 +121,11 @@ public class LearningAction extends LamsDispatchAction {
 		contentDTO.allowRichEditor = dimdim.isAllowRichEditor();
 		contentDTO.lockOnFinish = dimdim.isLockOnFinished();
 
-		request.setAttribute("dimdimDTO", contentDTO);
+		request.setAttribute(Constants.ATTR_CONTENT_DTO, contentDTO);
 
 		// Set the content in use flag.
 		if (!dimdim.isContentInUse()) {
-			dimdim.setContentInUse(new Boolean(true));
+			dimdim.setContentInUse(true);
 			dimdimService.saveOrUpdateDimdim(dimdim);
 		}
 
@@ -158,7 +161,7 @@ public class LearningAction extends LamsDispatchAction {
 		} else {
 			request.setAttribute("contentEditable", true);
 		}
-		request.setAttribute("finishedActivity", dimdimUser
+		request.setAttribute(Constants.ATTR_FINISHED_ACTIVITY, dimdimUser
 				.isFinishedActivity());
 
 		return mapping.findForward("dimdim");
@@ -184,7 +187,8 @@ public class LearningAction extends LamsDispatchAction {
 	public ActionForward finishActivity(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
-		Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
+		Long toolSessionID = WebUtil.readLongParam(request,
+				AttributeNames.PARAM_TOOL_SESSION_ID);
 
 		DimdimUser dimdimUser = getCurrentUser(toolSessionID);
 
@@ -197,7 +201,7 @@ public class LearningAction extends LamsDispatchAction {
 			if (dimdimUser.getEntryUID() == null) {
 				dimdimUser.setEntryUID(dimdimService.createNotebookEntry(
 						toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-						DimdimConstants.TOOL_SIGNATURE, dimdimUser.getUserId()
+						Constants.TOOL_SIGNATURE, dimdimUser.getUserId()
 								.intValue(), learningForm.getEntryText()));
 			} else {
 				// update existing entry.
@@ -208,7 +212,7 @@ public class LearningAction extends LamsDispatchAction {
 			dimdimUser.setFinishedActivity(true);
 			dimdimService.saveOrUpdateDimdimUser(dimdimUser);
 		} else {
-			log.error("finishActivity(): couldn't find DimdimUser with id: "
+			logger.error("finishActivity(): couldn't find DimdimUser with id: "
 					+ dimdimUser.getUserId() + "and toolSessionID: "
 					+ toolSessionID);
 		}

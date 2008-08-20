@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
  * implemented by the Hibernate or other implementation.
  */
 public interface IDimdimUserDAO extends IBaseDAO {
+
 	/**
 	 * 
 	 * @param userId

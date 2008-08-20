@@ -31,9 +31,6 @@ package org.lamsfoundation.lams.tool.dimdim.util;
  */
 public class DimdimException extends RuntimeException {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5518806968051758859L;
 
 	public DimdimException(String message) {
@@ -53,5 +50,4 @@ public class DimdimException extends RuntimeException {
 		super(cause);
 
 	}
-
 }

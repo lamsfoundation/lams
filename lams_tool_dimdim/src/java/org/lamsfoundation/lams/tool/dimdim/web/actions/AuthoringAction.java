@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.tool.dimdim.web.actions;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,14 +32,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessages;
+import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -47,11 +52,10 @@ import org.lamsfoundation.lams.tool.dimdim.model.Dimdim;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimAttachment;
 import org.lamsfoundation.lams.tool.dimdim.service.DimdimServiceProxy;
 import org.lamsfoundation.lams.tool.dimdim.service.IDimdimService;
-import org.lamsfoundation.lams.tool.dimdim.util.DimdimConstants;
+import org.lamsfoundation.lams.tool.dimdim.util.Constants;
 import org.lamsfoundation.lams.tool.dimdim.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
@@ -65,37 +69,36 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @struts.action-forward name="success" path="tiles:/authoring/main"
  * @struts.action-forward name="message_page" path="tiles:/generic/message"
  */
-public class AuthoringAction extends LamsDispatchAction {
+public class AuthoringAction extends DispatchAction {
 
-	// private static Logger logger = Logger.getLogger(AuthoringAction.class);
+	private static final Logger logger = Logger
+			.getLogger(AuthoringAction.class);
 
-	public IDimdimService dimdimService;
+	private IDimdimService dimdimService;
 
-	// Authoring SessionMap key names
-	private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 
-	private static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
+		// set up dimdimService
+		dimdimService = DimdimServiceProxy.getDimdimService(this.getServlet()
+				.getServletContext());
 
-	private static final String KEY_MODE = "mode";
-
-	private static final String KEY_ONLINE_FILES = "onlineFiles";
-
-	private static final String KEY_OFFLINE_FILES = "offlineFiles";
-
-	private static final String KEY_UNSAVED_ONLINE_FILES = "unsavedOnlineFiles";
-
-	private static final String KEY_UNSAVED_OFFLINE_FILES = "unsavedOfflineFiles";
-
-	private static final String KEY_DELETED_FILES = "deletedFiles";
+		return super.execute(mapping, form, request, response);
+	}
 
 	/**
 	 * Default method when no dispatch parameter is specified. It is expected
 	 * that the parameter <code>toolContentID</code> will be passed in. This
 	 * will be used to retrieve content for this tool.
 	 * 
+	 * @throws ServletException
+	 * 
 	 */
 	protected ActionForward unspecified(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response)
+			throws ServletException {
 
 		// Extract toolContentID from parameters.
 		Long toolContentID = new Long(WebUtil.readLongParam(request,
@@ -104,14 +107,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		String contentFolderID = WebUtil.readStrParam(request,
 				AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode",
-				true);
-
-		// set up dimdimService
-		if (dimdimService == null) {
-			dimdimService = DimdimServiceProxy.getDimdimService(this
-					.getServlet().getServletContext());
-		}
+		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,
+				AttributeNames.PARAM_MODE, true);
 
 		// retrieving Dimdim with given toolContentID
 		Dimdim dimdim = dimdimService.getDimdimByContentId(toolContentID);
@@ -124,15 +121,15 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		if (mode != null && mode.isTeacher()) {
 			// Set the defineLater flag so that learners cannot use content
-			// while we
-			// are editing. This flag is released when updateContent is called.
+			// while we are editing. This flag is released when updateContent is
+			// called.
 			dimdim.setDefineLater(true);
 			dimdimService.saveOrUpdateDimdim(dimdim);
 		}
 
 		// Set up the authForm.
 		AuthoringForm authForm = (AuthoringForm) form;
-		updateAuthForm(authForm, dimdim);
+		copyProperties(authForm, dimdim);
 
 		// Set up sessionMap
 		SessionMap<String, Object> map = createSessionMap(dimdim,
@@ -141,7 +138,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		// add the sessionMap to HTTPSession.
 		request.getSession().setAttribute(map.getSessionID(), map);
-		request.setAttribute(DimdimConstants.ATTR_SESSION_MAP, map);
+		request.setAttribute(Constants.ATTR_SESSION_MAP, map);
 
 		return mapping.findForward("success");
 	}
@@ -156,11 +153,11 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		// get dimdim content.
 		Dimdim dimdim = dimdimService.getDimdimByContentId((Long) map
-				.get(KEY_TOOL_CONTENT_ID));
+				.get(Constants.KEY_TOOL_CONTENT_ID));
 
 		// update dimdim content using form inputs.
-		ToolAccessMode mode = (ToolAccessMode) map.get(KEY_MODE);
-		updateDimdim(dimdim, authForm, mode);
+		ToolAccessMode mode = (ToolAccessMode) map.get(Constants.KEY_MODE);
+		copyProperties(dimdim, authForm, mode);
 
 		// remove attachments marked for deletion.
 		Set<DimdimAttachment> attachments = dimdim.getDimdimAttachments();
@@ -168,14 +165,15 @@ public class AuthoringAction extends LamsDispatchAction {
 			attachments = new HashSet<DimdimAttachment>();
 		}
 
-		for (DimdimAttachment att : getAttList(KEY_DELETED_FILES, map)) {
+		for (DimdimAttachment att : getAttList(Constants.KEY_DELETED_FILES, map)) {
 			// remove from db, leave in repository
 			attachments.remove(att);
 		}
 
 		// add unsaved attachments
-		attachments.addAll(getAttList(KEY_UNSAVED_ONLINE_FILES, map));
-		attachments.addAll(getAttList(KEY_UNSAVED_OFFLINE_FILES, map));
+		attachments.addAll(getAttList(Constants.KEY_UNSAVED_ONLINE_FILES, map));
+		attachments
+				.addAll(getAttList(Constants.KEY_UNSAVED_OFFLINE_FILES, map));
 
 		// set attachments in case it didn't exist
 		dimdim.setDimdimAttachments(attachments);
@@ -194,7 +192,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		// add the sessionMapID to form
 		authForm.setSessionMapID(map.getSessionID());
 
-		request.setAttribute(DimdimConstants.ATTR_SESSION_MAP, map);
+		request.setAttribute(Constants.ATTR_SESSION_MAP, map);
 
 		return mapping.findForward("success");
 	}
@@ -248,21 +246,21 @@ public class AuthoringAction extends LamsDispatchAction {
 		List<DimdimAttachment> savedFiles;
 		if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
 			file = (FormFile) authForm.getOfflineFile();
-			unsavedFiles = getAttList(KEY_UNSAVED_OFFLINE_FILES, map);
+			unsavedFiles = getAttList(Constants.KEY_UNSAVED_OFFLINE_FILES, map);
 
-			savedFiles = getAttList(KEY_OFFLINE_FILES, map);
+			savedFiles = getAttList(Constants.KEY_OFFLINE_FILES, map);
 		} else {
 			file = (FormFile) authForm.getOnlineFile();
-			unsavedFiles = getAttList(KEY_UNSAVED_ONLINE_FILES, map);
+			unsavedFiles = getAttList(Constants.KEY_UNSAVED_ONLINE_FILES, map);
 
-			savedFiles = getAttList(KEY_ONLINE_FILES, map);
+			savedFiles = getAttList(Constants.KEY_ONLINE_FILES, map);
 		}
 
 		// validate file max size
 		ActionMessages errors = new ActionMessages();
 		FileValidatorUtil.validateFileSize(file, true, errors);
 		if (!errors.isEmpty()) {
-			request.setAttribute(DimdimConstants.ATTR_SESSION_MAP, map);
+			request.setAttribute(Constants.ATTR_SESSION_MAP, map);
 			this.saveErrors(request, errors);
 			return mapping.findForward("success");
 		}
@@ -271,7 +269,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 			// upload file to repository
 			DimdimAttachment newAtt = dimdimService.uploadFileToContent(
-					(Long) map.get(KEY_TOOL_CONTENT_ID), file, type);
+					(Long) map.get(Constants.KEY_TOOL_CONTENT_ID), file, type);
 
 			// Add attachment to unsavedFiles
 			// check to see if file with same name exists
@@ -284,15 +282,14 @@ public class AuthoringAction extends LamsDispatchAction {
 						&& StringUtils.equals(currAtt.getFileType(), newAtt
 								.getFileType())) {
 					// move from this this list to deleted list.
-					getAttList(KEY_DELETED_FILES, map).add(currAtt);
+					getAttList(Constants.KEY_DELETED_FILES, map).add(currAtt);
 					iter.remove();
 					break;
 				}
 			}
 			unsavedFiles.add(newAtt);
 
-			request.setAttribute(DimdimConstants.ATTR_SESSION_MAP, map);
-			request.setAttribute("unsavedChanges", new Boolean(true));
+			request.setAttribute(Constants.ATTR_SESSION_MAP, map);
 		}
 		return mapping.findForward("success");
 	}
@@ -303,9 +300,9 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		List<DimdimAttachment> fileList;
 		if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-			fileList = getAttList(KEY_OFFLINE_FILES, map);
+			fileList = getAttList(Constants.KEY_OFFLINE_FILES, map);
 		} else {
-			fileList = getAttList(KEY_ONLINE_FILES, map);
+			fileList = getAttList(Constants.KEY_ONLINE_FILES, map);
 		}
 
 		Iterator<DimdimAttachment> iter = fileList.iterator();
@@ -315,7 +312,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 			if (att.getFileUuid().equals(authForm.getDeleteFileUuid())) {
 				// move to delete file list, deleted at next updateContent
-				getAttList(KEY_DELETED_FILES, map).add(att);
+				getAttList(Constants.KEY_DELETED_FILES, map).add(att);
 
 				// remove from this list
 				iter.remove();
@@ -323,8 +320,7 @@ public class AuthoringAction extends LamsDispatchAction {
 			}
 		}
 
-		request.setAttribute(DimdimConstants.ATTR_SESSION_MAP, map);
-		request.setAttribute("unsavedChanges", new Boolean(true));
+		request.setAttribute(Constants.ATTR_SESSION_MAP, map);
 
 		return mapping.findForward("success");
 	}
@@ -336,9 +332,9 @@ public class AuthoringAction extends LamsDispatchAction {
 		List<DimdimAttachment> unsavedFiles;
 
 		if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-			unsavedFiles = getAttList(KEY_UNSAVED_OFFLINE_FILES, map);
+			unsavedFiles = getAttList(Constants.KEY_UNSAVED_OFFLINE_FILES, map);
 		} else {
-			unsavedFiles = getAttList(KEY_UNSAVED_ONLINE_FILES, map);
+			unsavedFiles = getAttList(Constants.KEY_UNSAVED_ONLINE_FILES, map);
 		}
 
 		Iterator<DimdimAttachment> iter = unsavedFiles.iterator();
@@ -354,8 +350,7 @@ public class AuthoringAction extends LamsDispatchAction {
 			}
 		}
 
-		request.setAttribute(DimdimConstants.ATTR_SESSION_MAP, map);
-		request.setAttribute("unsavedChanges", new Boolean(true));
+		request.setAttribute(Constants.ATTR_SESSION_MAP, map);
 
 		return mapping.findForward("success");
 	}
@@ -367,15 +362,22 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param mode
 	 * @return
 	 */
-	private void updateDimdim(Dimdim dimdim, AuthoringForm authForm,
+	private void copyProperties(Dimdim dimdim, AuthoringForm authForm,
 			ToolAccessMode mode) {
 		dimdim.setTitle(authForm.getTitle());
 		dimdim.setInstructions(authForm.getInstructions());
 		if (mode.isAuthor()) { // Teacher cannot modify following
-			dimdim.setOfflineInstructions(authForm.getOnlineInstruction());
-			dimdim.setOnlineInstructions(authForm.getOfflineInstruction());
+			dimdim.setOfflineInstructions(authForm.getOfflineInstruction());
+			dimdim.setOnlineInstructions(authForm.getOnlineInstruction());
 			dimdim.setLockOnFinished(authForm.isLockOnFinished());
 			dimdim.setAllowRichEditor(authForm.isAllowRichEditor());
+
+			// TODO check whether these fields should be in here
+			dimdim.setMaxParticipants(authForm.getMaxParticipants());
+			dimdim.setMeetingDurationInHours(authForm
+					.getMeetingDurationInHours());
+			dimdim.setAllowVideo(authForm.isAllowVideo());
+			dimdim.setAttendeeMikes(authForm.getAttendeeMikes());
 		}
 	}
 
@@ -385,14 +387,17 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param dimdim
 	 * @param authForm
 	 * @return
+	 * @throws ServletException
 	 */
-	private void updateAuthForm(AuthoringForm authForm, Dimdim dimdim) {
-		authForm.setTitle(dimdim.getTitle());
-		authForm.setInstructions(dimdim.getInstructions());
-		authForm.setOnlineInstruction(dimdim.getOnlineInstructions());
-		authForm.setOfflineInstruction(dimdim.getOfflineInstructions());
-		authForm.setLockOnFinished(dimdim.isLockOnFinished());
-		authForm.setAllowRichEditor(dimdim.isAllowRichEditor());
+	private void copyProperties(AuthoringForm authForm, Dimdim dimdim)
+			throws ServletException {
+		try {
+			BeanUtils.copyProperties(authForm, dimdim);
+		} catch (IllegalAccessException e) {
+			throw new ServletException(e);
+		} catch (InvocationTargetException e) {
+			throw new ServletException(e);
+		}
 	}
 
 	/**
@@ -406,22 +411,28 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		SessionMap<String, Object> map = new SessionMap<String, Object>();
 
-		map.put(KEY_MODE, mode);
-		map.put(KEY_CONTENT_FOLDER_ID, contentFolderID);
-		map.put(KEY_TOOL_CONTENT_ID, toolContentID);
-		map.put(KEY_ONLINE_FILES, new LinkedList<DimdimAttachment>());
-		map.put(KEY_OFFLINE_FILES, new LinkedList<DimdimAttachment>());
-		map.put(KEY_UNSAVED_ONLINE_FILES, new LinkedList<DimdimAttachment>());
-		map.put(KEY_UNSAVED_OFFLINE_FILES, new LinkedList<DimdimAttachment>());
-		map.put(KEY_DELETED_FILES, new LinkedList<DimdimAttachment>());
+		map.put(Constants.KEY_MODE, mode);
+		map.put(Constants.KEY_CONTENT_FOLDER_ID, contentFolderID);
+		map.put(Constants.KEY_TOOL_CONTENT_ID, toolContentID);
+		map.put(Constants.KEY_ONLINE_FILES, new LinkedList<DimdimAttachment>());
+		map
+				.put(Constants.KEY_OFFLINE_FILES,
+						new LinkedList<DimdimAttachment>());
+		map.put(Constants.KEY_UNSAVED_ONLINE_FILES,
+				new LinkedList<DimdimAttachment>());
+		map.put(Constants.KEY_UNSAVED_OFFLINE_FILES,
+				new LinkedList<DimdimAttachment>());
+		map
+				.put(Constants.KEY_DELETED_FILES,
+						new LinkedList<DimdimAttachment>());
 
 		for (DimdimAttachment attachment : dimdim.getDimdimAttachments()) {
 			String type = attachment.getFileType();
 			if (type.equals(IToolContentHandler.TYPE_OFFLINE)) {
-				getAttList(KEY_OFFLINE_FILES, map).add(attachment);
+				getAttList(Constants.KEY_OFFLINE_FILES, map).add(attachment);
 			}
 			if (type.equals(IToolContentHandler.TYPE_ONLINE)) {
-				getAttList(KEY_ONLINE_FILES, map).add(attachment);
+				getAttList(Constants.KEY_ONLINE_FILES, map).add(attachment);
 			}
 		}
 

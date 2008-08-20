@@ -52,5 +52,4 @@ public class NotebookEntryDTO {
 	public void setUid(Long uid) {
 		this.uid = uid;
 	}
-
 }

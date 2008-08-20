@@ -37,7 +37,7 @@ public class SessionDTO implements Comparable<SessionDTO> {
 
 	String sessionName;
 
-	Set<DimdimUserDTO> userDTOs = new TreeSet<DimdimUserDTO>();
+	Set<UserDTO> userDTOs = new TreeSet<UserDTO>();
 
 	int numberOfLearners;
 
@@ -50,7 +50,7 @@ public class SessionDTO implements Comparable<SessionDTO> {
 		numberOfFinishedLearners = 0;
 
 		for (DimdimUser dimdimUser : session.getDimdimUsers()) {
-			DimdimUserDTO userDTO = new DimdimUserDTO(dimdimUser);
+			UserDTO userDTO = new UserDTO(dimdimUser);
 			if (userDTO.getEntryUID() != null) {
 				numberOfFinishedLearners++;
 			}
@@ -59,6 +59,14 @@ public class SessionDTO implements Comparable<SessionDTO> {
 
 		numberOfLearners = userDTOs.size();
 
+	}
+
+	public int compareTo(SessionDTO other) {
+		int ret = this.sessionName.compareToIgnoreCase(other.sessionName);
+		if (ret == 0) {
+			ret = this.sessionID.compareTo(other.sessionID);
+		}
+		return ret;
 	}
 
 	public SessionDTO() {
@@ -80,19 +88,11 @@ public class SessionDTO implements Comparable<SessionDTO> {
 		this.sessionName = sessionName;
 	}
 
-	public int compareTo(SessionDTO other) {
-		int ret = this.sessionName.compareToIgnoreCase(other.sessionName);
-		if (ret == 0) {
-			ret = this.sessionID.compareTo(other.sessionID);
-		}
-		return ret;
-	}
-
-	public Set<DimdimUserDTO> getUserDTOs() {
+	public Set<UserDTO> getUserDTOs() {
 		return userDTOs;
 	}
 
-	public void setUserDTOs(Set<DimdimUserDTO> dimdimUsers) {
+	public void setUserDTOs(Set<UserDTO> dimdimUsers) {
 		this.userDTOs = dimdimUsers;
 	}
 

@@ -37,12 +37,10 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 public class DimdimUser implements java.io.Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3701664859818409197L;
 
-	// Fields
+	// Persistent Fields
+	
 	private Long uid;
 
 	private Long userId;

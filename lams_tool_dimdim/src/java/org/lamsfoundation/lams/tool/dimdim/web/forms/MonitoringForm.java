@@ -34,14 +34,20 @@ public class MonitoringForm extends ActionForm {
 
 	private static final long serialVersionUID = 9096908688391850595L;
 
-	String dispatch;
-	boolean teacherVisible;
-	Long toolSessionID;
+	// Fields
+	
+	private String dispatch;
+
+	private boolean teacherVisible;
+
+	private Long toolSessionID;
 
 	// editing message page.
-	Long messageUID;
-	String messageBody;
-	boolean messageHidden;
+	private Long messageUID;
+
+	private String messageBody;
+
+	private boolean messageHidden;
 
 	public String getMessageBody() {
 		return messageBody;
@@ -90,5 +96,4 @@ public class MonitoringForm extends ActionForm {
 	public void setMessageHidden(boolean messageHidden) {
 		this.messageHidden = messageHidden;
 	}
-
 }

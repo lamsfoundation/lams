@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="dto" value="${dimdimDTO}" />
+<c:set var="dto" value="${contentDTO}" />
 
 <c:if test="${dto.contentInUse}">
 	<p class="warning">

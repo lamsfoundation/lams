@@ -68,7 +68,7 @@ import org.lamsfoundation.lams.tool.dimdim.model.Dimdim;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimAttachment;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
-import org.lamsfoundation.lams.tool.dimdim.util.DimdimConstants;
+import org.lamsfoundation.lams.tool.dimdim.util.Constants;
 import org.lamsfoundation.lams.tool.dimdim.util.DimdimException;
 import org.lamsfoundation.lams.tool.dimdim.util.DimdimToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -89,7 +89,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 public class DimdimService implements ToolSessionManager, ToolContentManager,
 		IDimdimService, ToolContentImport102Manager {
 
-	static Logger logger = Logger.getLogger(DimdimService.class.getName());
+	private static final Logger logger = Logger.getLogger(DimdimService.class);
 
 	private IDimdimDAO dimdimDAO = null;
 
@@ -357,7 +357,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 	}
 
 	public Dimdim getDefaultContent() {
-		Long defaultContentID = getDefaultContentIdBySignature(DimdimConstants.TOOL_SIGNATURE);
+		Long defaultContentID = getDefaultContentIdBySignature(Constants.TOOL_SIGNATURE);
 		Dimdim defaultContent = getDimdimByContentId(defaultContentID);
 		if (defaultContent == null) {
 			String error = "Could not retrieve default content record for this tool";

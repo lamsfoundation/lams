@@ -34,18 +34,18 @@ import org.apache.struts.action.ActionMapping;
 
 /**
  * @struts.form name=adminForm"
- * @author asukkar
+ * @author Anthony Sukkar
  * 
  */
 public class AdminForm extends ActionForm {
 
 	private static final long serialVersionUID = 8367278543453322252L;
-	
-	// Properties
 
-	String dimdimServerHost;
+	// Fields
 
-	String dimdimServerPort;
+	private String dimdimServerHost;
+
+	private String dimdimServerPort;
 
 	@Override
 	public ActionErrors validate(ActionMapping mapping,

@@ -34,16 +34,16 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.dimdim.dto.ContentDTO;
-import org.lamsfoundation.lams.tool.dimdim.dto.SessionDTO;
-import org.lamsfoundation.lams.tool.dimdim.dto.DimdimUserDTO;
 import org.lamsfoundation.lams.tool.dimdim.dto.NotebookEntryDTO;
+import org.lamsfoundation.lams.tool.dimdim.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.dimdim.dto.UserDTO;
 import org.lamsfoundation.lams.tool.dimdim.model.Dimdim;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 import org.lamsfoundation.lams.tool.dimdim.service.DimdimServiceProxy;
 import org.lamsfoundation.lams.tool.dimdim.service.IDimdimService;
+import org.lamsfoundation.lams.tool.dimdim.util.Constants;
 import org.lamsfoundation.lams.tool.dimdim.util.DimdimException;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -52,7 +52,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	private static final long serialVersionUID = -2829707715037631881L;
 
-	private static Logger logger = Logger.getLogger(ExportServlet.class);
+	private static final Logger logger = Logger.getLogger(ExportServlet.class);
 
 	private final String FILENAME = "dimdim_main.html";
 
@@ -61,10 +61,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	protected String doExport(HttpServletRequest request,
 			HttpServletResponse response, String directoryName, Cookie[] cookies) {
 
-		if (dimdimService == null) {
-			dimdimService = DimdimServiceProxy
-					.getDimdimService(getServletContext());
-		}
+		setupService();
 
 		try {
 			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
@@ -95,10 +92,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger
 					.error("Tool content Id or and session Id are null. Unable to activity title");
 		} else {
-			if (dimdimService == null) {
-				dimdimService = DimdimServiceProxy
-						.getDimdimService(getServletContext());
-			}
+			setupService();
 
 			Dimdim content = null;
 			if (toolContentID != null) {
@@ -134,8 +128,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		Dimdim dimdim = dimdimSession.getDimdim();
 
-		UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession()
-				.getAttribute(AttributeNames.USER);
+		// Get LAMS userDTO
+		org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
+				.getSession().getAttribute(AttributeNames.USER);
 
 		DimdimUser dimdimUser = dimdimService.getUserByUserIdAndSessionId(
 				new Long(lamsUserDTO.getUserID()), toolSessionID);
@@ -153,13 +148,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		sessionDTO.setSessionID(dimdimSession.getSessionId());
 
 		// If the user hasn't put in their entry yet, dimdimEntry will be null;
-		DimdimUserDTO userDTO = dimdimEntry != null ? new DimdimUserDTO(
-				dimdimUser, dimdimEntry) : new DimdimUserDTO(dimdimUser);
+		UserDTO userDTO = dimdimEntry != null ? new UserDTO(dimdimUser,
+				dimdimEntry) : new UserDTO(dimdimUser);
 
 		sessionDTO.getUserDTOs().add(userDTO);
 		contentDTO.getSessionDTOs().add(sessionDTO);
 
-		request.getSession().setAttribute("dimdimDTO", contentDTO);
+		request.getSession().setAttribute(Constants.ATTR_CONTENT_DTO,
+				contentDTO);
 	}
 
 	private void doTeacherExport(HttpServletRequest request,
@@ -181,8 +177,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		// add the dimdimEntry for each user in each session
 
-		for (SessionDTO session : contentDTO.getSessionDTOs()) {
-			for (DimdimUserDTO user : session.getUserDTOs()) {
+		for (SessionDTO sessionDTO : contentDTO.getSessionDTOs()) {
+			for (UserDTO user : sessionDTO.getUserDTOs()) {
 				NotebookEntry entry = dimdimService
 						.getEntry(user.getEntryUID());
 				if (entry != null) {
@@ -192,7 +188,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			}
 		}
 
-		request.getSession().setAttribute("dimdimDTO", contentDTO);
+		request.getSession().setAttribute(Constants.ATTR_CONTENT_DTO,
+				contentDTO);
 	}
 
+	private void setupService() {
+		if (dimdimService == null) {
+			dimdimService = DimdimServiceProxy
+					.getDimdimService(getServletContext());
+		}
+	}
 }
