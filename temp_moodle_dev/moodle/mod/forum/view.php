@@ -12,7 +12,7 @@
     $changegroup = optional_param('group', -1, PARAM_INT);   // choose the current group
     $page        = optional_param('page', 0, PARAM_INT);     // which page to show
     $search      = optional_param('search', '');             // search string
-
+    $returnurl   = optional_param('returnUrl', '', PARAM_TEXT);  // lams url to proceed to next in sequence
 
     $buttontext = '';
 
@@ -268,6 +268,11 @@
 
             break;
     }
+
+    if ($forum->is_lams) {
+        echo '<div align="right"><p><input type="button" value="Next Activity" onclick="window.location=\''.$returnurl.'\'" /></p></div>';
+    }
+
     print_footer($course);
 
 ?>
