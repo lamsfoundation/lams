@@ -19,6 +19,7 @@ $LAMS2CONSTANTS->param_lsid      = 'lsid';
 $LAMS2CONSTANTS->author_method   = 'author';
 $LAMS2CONSTANTS->monitor_method  = 'monitor';
 $LAMS2CONSTANTS->learner_method  = 'learner';
+$LAMS2CONSTANTS->custom_csv      = 'customCSV';
 
 /*
  * Given an object containing all the necessary data,
@@ -612,7 +613,7 @@ function lamstwo_get_locale($courseid) {
  * Return URL to join a LAMS lesson as a learner or staff depending on method.
  * URL redirects LAMS to learner or monitor interface depending on method.
  */
-function lamstwo_get_url($username, $lang, $country, $lessonid, $courseid, $method) {
+function lamstwo_get_url($username, $lang, $country, $lessonid, $courseid, $method, $customcsv='') {
     global $CFG, $LAMS2CONSTANTS;
     
     $datetime = date('F d,Y g:i a');
@@ -632,6 +633,9 @@ function lamstwo_get_url($username, $lang, $country, $lessonid, $courseid, $meth
         '&'.$LAMS2CONSTANTS->param_courseid.'='.$courseid.
 		'&'.$LAMS2CONSTANTS->param_country.'='.trim($country).
 		'&'.$LAMS2CONSTANTS->param_lang.'='.substr(trim($lang),0,2);
+    if ($customcsv != '') {
+      $url .= '&'.$LAMS2CONSTANTS->custom_csv.'='.$customcsv;
+    }
     return $url;
 }
 
