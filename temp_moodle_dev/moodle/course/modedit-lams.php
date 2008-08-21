@@ -12,8 +12,7 @@
     $update        = optional_param('update', 0, PARAM_INT);
     $return        = optional_param('return', 0, PARAM_BOOL); //return to course/view.php if false or mod/modname/view.php if true
     $type          = optional_param('type', '', PARAM_ALPHANUM);
-    $toolcontentid = required_param('toolContentID', PARAM_INT);
-    $lamsupdateurl     = required_param('lamsUpdateURL', PARAM_TEXT);
+    $lamsupdateurl = required_param('lamsUpdateURL', PARAM_TEXT);
 
     if (!empty($add)) {
         $section = required_param('section', PARAM_INT);
@@ -114,7 +113,6 @@
         $form->return           = $return;
         $form->update           = $update;
 
-
         if ($items = grade_item::fetch_all(array('itemtype'=>'mod', 'itemmodule'=>$form->modulename,
                                            'iteminstance'=>$form->instance, 'courseid'=>$COURSE->id))) {
             // add existing outcomes
@@ -184,12 +182,9 @@
     $mformclassname = 'mod_'.$module->name.'_mod_form';
     $mform =& new $mformclassname($form->instance, $cw->section, $cm);
     $mform->set_data($form);
-    $mform->_form->addElement('hidden', 'toolContentID', $toolcontentid);
-    $mform->_form->setType('toolContentID', PARAM_INT);
     $mform->_form->_attributes['action'] = 'modedit-lams.php';
     $mform->_form->addElement('hidden', 'lamsUpdateURL', $lamsupdateurl);
     $mform->_form->setType('lamsUpdateURL', PARAM_TEXT);
-
 
     if ($mform->is_cancelled()) {
         if ($return && !empty($cm->id)){
@@ -312,7 +307,7 @@
             }
 
             // make sure visibility is set correctly (in particular in calendar)
-            set_coursemodule_visible($fromform->coursemodule, $fromform->visible);
+            //set_coursemodule_visible($fromform->coursemodule, $fromform->visible);
 
             if (isset($fromform->cmidnumber)) { //label
                 // set cm idnumber
@@ -420,7 +415,7 @@
         rebuild_course_cache($course->id);
         grade_regrade_final_grades($course->id);
 
-        redirect("$lamsupdateurl?dispatch=updateContent&toolContentID=$toolcontentID&extToolContentID=$returnfromfunc");
+        redirect("$lamsupdateurl&extToolContentID=$fromform->coursemodule");
         exit;
 
     } else {
