@@ -143,7 +143,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		{
 			dotLRNForum = dotLRNForumService.copyDefaultContent(toolContentID);
 			dotLRNForum.setExtUsername(userFromCSV);
-			dotLRNForum.setExtUsername(courseFromCSV);
+			dotLRNForum.setExtCourseId(courseFromCSV);
 			dotLRNForum.setExtCourseUrl(courseUrlFromCSV);
 			dotLRNForum.setCreateDate(new Date());
 			dotLRNForumService.saveOrUpdateDotLRNForum(dotLRNForum);
