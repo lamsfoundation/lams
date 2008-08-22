@@ -60,23 +60,24 @@ if ($canmanage) {
 //-->
 </script>
 XXX;
-	$customcsv = "$USER->username,$course->id,$cm->section";
+    $customcsv = "$USER->username,$course->id,$cm->section";
     $authorurl = lamstwo_get_url($USER->username, $locale['lang'], $locale['country'], 0, $course->id, $LAMS2CONSTANTS->author_method, $customcsv);
 	
-	echo $openauthorjs;
+    echo $openauthorjs;
 
-	echo '<br />';
-	echo '<div class="singlebutton forumaddnew">';
-	echo "<input type=\"submit\" value=\"".get_string('openauthor', 'lamstwo')."\" 
-		onclick=\"openAuthor('$authorurl','author','location=0,toolbar=0,menubar=0,statusbar=0,width=796,height=570,resizable',0)\" />&nbsp;&nbsp;";
-	echo "<form id=\"newlessonform\" method=\"get\" action=\"$CFG->wwwroot/mod/lamstwo/add.php\">";
-	echo '<div>';
-	echo "<input type=\"hidden\" name=\"lamstwo\" value=\"$lamstwo->id\" />";
-	echo "<input type=\"hidden\" name=\"group\" value=\"$currentgroup\" />";
-	echo '<input type="submit" value="'.get_string('addlesson', 'lamstwo').'" />';
-	echo '</div>';
-	echo '</form>';
-	echo "</div>\n";
+    echo '<br />';
+    echo '<div class="singlebutton forumaddnew">';
+    echo "<input type=\"submit\" value=\"".get_string('openauthor', 'lamstwo')."\" 
+        onclick=\"openAuthor('$authorurl','author','location=0,toolbar=0,menubar=0,statusbar=0,width=796,height=570,resizable',0)\" />&nbsp;&nbsp;";
+    echo "<form id=\"newlessonform\" method=\"get\" action=\"$CFG->wwwroot/mod/lamstwo/add.php\">";
+    echo '<div>';
+    echo "<input type=\"hidden\" name=\"customCSV\" value=\"$customcsv\" />";
+    echo "<input type=\"hidden\" name=\"lamstwo\" value=\"$lamstwo->id\" />";
+    echo "<input type=\"hidden\" name=\"group\" value=\"$currentgroup\" />";
+    echo '<input type="submit" value="'.get_string('addlesson', 'lamstwo').'" />';
+    echo '</div>';
+    echo '</form>';
+    echo "</div>\n";
 }
 
 // Log the lamstwo view.

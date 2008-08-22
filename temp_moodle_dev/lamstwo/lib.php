@@ -385,29 +385,29 @@ function lamstwo_add_lesson($form) {
     }
     
     // start the lesson
-	$form->lesson_id = lamstwo_get_lesson(
-		$USER->username, $form->sequence_id, $form->course, 
-		$form->name, $form->intro, $form->start_date,
-		$locale['country'], $locale['lang']
-	);
+    $form->lesson_id = lamstwo_get_lesson(
+        $USER->username, $form->sequence_id, $form->course, 
+        $form->name, $form->intro, $form->start_date,
+        $locale['country'], $locale['lang'], $form->customCSV
+    );
 	
-	if (!isset($form->lesson_id) || $form->lesson_id <= 0) {
-		return false;
-	}
+    if (!isset($form->lesson_id) || $form->lesson_id <= 0) {
+        return false;
+    }
 	
-	if (!$form->id = insert_record('lamstwo_lesson', $form)) {
-		return false;
-	}
-	//print_r($form);
+    if (!$form->id = insert_record('lamstwo_lesson', $form)) {
+        return false;
+    }
+    //print_r($form);
 	
     $members = lamstwo_get_members($form->course, $form->lamstwo, $form->groupid);
 	
-	// call threaded lams servlet to populate the class
-	$result = lamstwo_fill_lesson($USER->username, $form->lesson_id,
-		$form->course, $locale['country'], $locale['lang'], $members['learners'], $members['monitors']
-	);
+    // call threaded lams servlet to populate the class
+    $result = lamstwo_fill_lesson($USER->username, $form->lesson_id,
+        $form->course, $locale['country'], $locale['lang'], $members['learners'], $members['monitors']
+    );
 	
-	return $form->id;
+    return $form->id;
 }
 
 
@@ -455,7 +455,7 @@ function lamstwo_fill_lesson($username,$lsid,$courseid,$country,$lang,$learnerid
  * @param string $lang The Language's ISO code
  * @return int lesson id
  */
-function lamstwo_get_lesson($username,$ldid,$courseid,$title,$desc,$startdate,$country,$lang) {
+function lamstwo_get_lesson($username,$ldid,$courseid,$title,$desc,$startdate,$country,$lang,$customcsv='') {
     //echo "enter lamstwo_get_lesson<BR>";
     global $CFG, $USER;
     if (!isset($CFG->lamstwo_serverid, $CFG->lamstwo_serverkey) || $CFG->lamstwo_serverid == "") {
@@ -487,7 +487,7 @@ function lamstwo_get_lesson($username,$ldid,$courseid,$title,$desc,$startdate,$c
 	*/
     
 	if($startdate){
-	    $parameters = array($CFG->lamstwo_serverid,$datetime,$hashvalue,$username,$ldid,$courseid,$title,$desc,$startdate,$country,$lang);
+	    $parameters = array($CFG->lamstwo_serverid,$datetime,$hashvalue,$username,$ldid,$courseid,$title,$desc,$startdate,$country,$lang,$customcsv);
 	    $result = $s->call('scheduleLesson',$parameters);
 	    /*$service = "/services/xml/LessonManager";
 	    $request = "$CFG->lamstwo_serverurl$service?method=schedule&serverId=$CFG->lamstwo_serverid&datetime=$datetime_encoded&hashValue=$hashvalue&username=$username&ldId=$ldid&courseId=$courseid&title=$title&desc=$desc&startdate=$startdate&country=$country&lang=$lang";
@@ -498,7 +498,7 @@ function lamstwo_get_lesson($username,$ldid,$courseid,$title,$desc,$startdate,$c
 	    print_r($http_response_header);
 	    echo "<pre>\n$xml</pre>\n";*/
 	}else{
-	    $parameters = array($CFG->lamstwo_serverid,$datetime,$hashvalue,$username,$ldid,$courseid,$title,$desc,$country,$lang);
+	    $parameters = array($CFG->lamstwo_serverid,$datetime,$hashvalue,$username,$ldid,$courseid,$title,$desc,$country,$lang,$customcsv);
 	    $result = $s->call('startLesson',$parameters);
 	    /*$service = "/services/xml/LessonManager";
 	    $request = "$CFG->lamstwo_serverurl$service?method=start&serverId=$CFG->lamstwo_serverid&datetime=$datetime_encoded&hashValue=$hashvalue&username=$username&ldId=$ldid&courseId=$courseid&title=$title&desc=$desc&country=$country&lang=$lang";
