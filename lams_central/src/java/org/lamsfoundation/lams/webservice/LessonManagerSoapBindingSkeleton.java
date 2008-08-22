@@ -92,7 +92,11 @@ public class LessonManagerSoapBindingSkeleton implements LessonManager, Skeleton
 						false, false),
 				new ParameterDesc(new QName("", "langIsoCode"), ParameterDesc.IN, new QName(
 						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
-						false, false), };
+						false, false),
+				new ParameterDesc(new QName("", "customCSV"), ParameterDesc.IN, new QName(
+						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
+						false, false),
+			};
 		_oper = new OperationDesc("startLesson", _params, new QName("", "startLessonReturn"));
 		_oper.setReturnType(new QName("http://schemas.xmlsoap.org/soap/encoding/", "long"));
 		_oper.setElementQName(new QName("", "startLesson"));
@@ -134,7 +138,11 @@ public class LessonManagerSoapBindingSkeleton implements LessonManager, Skeleton
 						false, false),
 				new ParameterDesc(new QName("", "langIsoCode"), ParameterDesc.IN, new QName(
 						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
-						false, false), };
+						false, false),
+				new ParameterDesc(new QName("", "customCSV"), ParameterDesc.IN, new QName(
+						"http://schemas.xmlsoap.org/soap/encoding/", "string"), String.class,
+						false, false),
+			};
 		_oper = new OperationDesc("scheduleLesson", _params, new QName("", "scheduleLessonReturn"));
 		_oper.setReturnType(new QName("http://schemas.xmlsoap.org/soap/encoding/", "long"));
 		_oper.setElementQName(new QName("", "scheduleLesson"));
@@ -181,17 +189,17 @@ public class LessonManagerSoapBindingSkeleton implements LessonManager, Skeleton
 
 	public Long startLesson(String serverId, String datetime, String hashValue, String username,
 			long ldId, String courseId, String title, String desc, String countryIsoCode,
-			String langIsoCode) throws RemoteException {
+			String langIsoCode, String customCSV) throws RemoteException {
 		Long ret = impl.startLesson(serverId, datetime, hashValue, username, ldId, courseId, title,
-				desc, countryIsoCode, langIsoCode);
+				desc, countryIsoCode, langIsoCode, customCSV);
 		return ret;
 	}
 
 	public Long scheduleLesson(String serverId, String datetime, String hashValue, String username,
 			long ldId, String courseId, String title, String desc, String startDate,
-			String countryIsoCode, String langIsoCode) throws RemoteException {
+			String countryIsoCode, String langIsoCode, String customCSV) throws RemoteException {
 		Long ret = impl.scheduleLesson(serverId, datetime, hashValue, username, ldId, courseId,
-				title, desc, startDate, countryIsoCode, langIsoCode);
+				title, desc, startDate, countryIsoCode, langIsoCode, customCSV);
 		return ret;
 	}
 

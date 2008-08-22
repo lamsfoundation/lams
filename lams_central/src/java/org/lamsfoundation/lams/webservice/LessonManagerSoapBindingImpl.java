@@ -63,7 +63,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 
 	public Long startLesson(String serverId, String datetime, String hashValue, String username,
 			long ldId, String courseId, String title, String desc, String countryIsoCode,
-			String langIsoCode) throws RemoteException {
+			String langIsoCode, String customCSV) throws RemoteException {
 		try {
 			ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
 			Authenticator.authenticate(serverMap, datetime, username, hashValue);
@@ -72,7 +72,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 					countryIsoCode, langIsoCode);
 			// 1. init lesson
 			Lesson lesson = monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId, orgMap
-					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), null);
+					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV);
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 			// 3. start lesson
@@ -85,7 +85,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 
 	public Long scheduleLesson(String serverId, String datetime, String hashValue, String username,
 			long ldId, String courseId, String title, String desc, String startDate,
-			String countryIsoCode, String langIsoCode) throws RemoteException {
+			String countryIsoCode, String langIsoCode, String customCSV) throws RemoteException {
 		try {
 			ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
 			Authenticator.authenticate(serverMap, datetime, username, hashValue);
@@ -94,7 +94,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 					countryIsoCode, langIsoCode);
 			// 1. init lesson
 			Lesson lesson = monitoringService.initializeLesson(title, desc,  Boolean.TRUE, ldId, orgMap
-					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), null);
+					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV);
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 			// 3. schedule lesson

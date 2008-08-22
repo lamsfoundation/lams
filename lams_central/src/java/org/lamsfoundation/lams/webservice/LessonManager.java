@@ -34,10 +34,10 @@ import java.rmi.RemoteException;
  */
 public interface LessonManager extends Remote {
 	public Long startLesson(String serverId, String datetime, String hashValue, String username,
-			long ldId, String courseId, String title, String desc, String countryIsoCode, String langIsoCode) throws RemoteException;
+			long ldId, String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV) throws RemoteException;
 
 	public Long scheduleLesson(String serverId, String datetime, String hashValue,
-			String username, long ldId, String courseId, String title, String desc, String startDate, String countryIsoCode, String langIsoCode)
+			String username, long ldId, String courseId, String title, String desc, String startDate, String countryIsoCode, String langIsoCode, String customCSV)
 			throws RemoteException;
 
 	public boolean deleteLesson(String serverId, String datetime, String hashValue,
