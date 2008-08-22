@@ -271,8 +271,9 @@
 
     if ($forum->is_lams) {
         echo '<div align="right"><p><input type="button" value="Next Activity" onclick="window.location=\''.$returnurl.'\'" /></p></div>';
+        echo '<hr />';
+    } else {
+        print_footer($course);
     }
-
-    print_footer($course);
 
 ?>
