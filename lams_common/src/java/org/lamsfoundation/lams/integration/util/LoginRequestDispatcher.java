@@ -120,7 +120,7 @@ public class LoginRequestDispatcher {
 			
 			// Custom CSV string to be used for tool adapters
 			String customCSV = request.getParameter(PARAM_CUSTOM_CSV);
-			String extLmsId = request.getParameter(PARAM_EXT_LMS_ID);
+			String extLmsId = request.getParameter(PARAM_SERVER_ID);
 			
 			String parameters = "";
 			
