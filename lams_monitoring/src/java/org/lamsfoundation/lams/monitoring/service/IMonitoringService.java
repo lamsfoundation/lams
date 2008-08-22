@@ -68,7 +68,6 @@ public interface IMonitoringService
      * @param organisationId the copied sequence will be put in the default runtime sequence folder for this org, if such a folder exists.
      * @param userId the user who want to create this lesson.
      * @param customCSV the custom comma separated values to be used by toolAdapters
-     * @param customCSV the custom comma separated values to be used by toolAdapters
      * @return the lesson initialized.
      */
     public Lesson initializeLesson(String lessonName, String lessonDescription,Boolean learnerExportAvailable,long learningDesignId,Integer organisationId,Integer userID, String customCSV);
