@@ -1882,7 +1882,7 @@ function forum_get_user_posts($forumid, $userid) {
             $timedsql = "AND (d.timestart < $now AND (d.timeend = 0 OR d.timeend > $now))";
         }
     }
-
+    
     return get_records_sql("SELECT p.*, d.forum, u.firstname, u.lastname, u.email, u.picture, u.imagealt
                               FROM {$CFG->prefix}forum f
                                    JOIN {$CFG->prefix}forum_discussions d ON d.forum = f.id
@@ -6691,34 +6691,132 @@ function forum_get_open_modes() {
 }
 
 /**
- *
+ * LAMS Function
+ * This function clones an existing instance of Moodle forum
+ * replacing the course and the userid
  */
-function forum_clone_instance($id, $courseid, $userid) {
-#    global $CFG;
-#    require_once($CFG->dirroot.'/course/lib.php');
+function forum_clone_instance($id, $sectionid, $courseid, $userid) {
+    $cm = get_record('course_modules', 'id', $id);
 
-    if ( ! $existingforum = get_record('forum', 'id', $id) ) {
+    if ( ! $cm or ! $existingforum = get_record('forum', 'id', $cm->instance) ) {
+        // create a new forum with default content
         $existingforum->course = $courseid;
         $existingforum->name = "Forum";
         $existingforum->intro = "";
         $existingforum->is_lams = 1;
         $existingforum->id = insert_record('forum', $existingforum);
     } else {
+        // make a copy of an existing forum
         unset($existingforum->id);
+        $existingforum->name = addslashes($existingforum->name);
+        $existingforum->intro = addslashes($existingforum->intro);
         $existingforum->course = $courseid;
         $existingforum->is_lams = 1;
         $existingforum->id = insert_record('forum', $existingforum);
     }
 
     $module = get_record('modules', 'name', 'forum');
+    $section = get_course_section($sectionid, $courseid);
 
     $cm->course = $courseid;
     $cm->module = $module->id;
     $cm->instance = $existingforum->id;
     $cm->added = time();
-#    $cm->id = add_course_module($cm);
+    $cm->section = $section->id;
     $cm->id = insert_record('course_modules', $cm);
+
+    return $cm->id;
 }
 
+/**
+ * LAMS Function
+ * Serialize a forum instance and return serialized string to LAMS
+ */
+function forum_export_instance($id) {
+    $cm = get_record('course_modules', 'id', $id);
+    if ($cm) {
+        if ($forum = get_record('forum', 'id', $cm->instance)) {
+            // serialize forum into a string; assuming forum object
+            // doesn't contain binary data in any of its columns
+            $s = serialize($forum);
+
+            header('Content-Description: File Transfer');
+            header('Content-Type: text/plain');
+            header('Content-Length: ' . strlen($s));
+            echo $s;
+            exit;
+        }
+    }
+
+    header('HTTP/1.1 500 Internal Error');
+    exit;
+}
+
+/**
+ * LAMS Function
+ * Deserializes a serialized Moodle forum, and creates a new instance of it
+ */
+function forum_import_instance($filepath, $userid, $courseid, $sectionid) {
+    // file contents contains serialized forum object
+    $filestr = file_get_contents($filepath);
+    $forum = unserialize($filestr);
+
+    // import this forum into a new course
+    $forum->course = $courseid;
+
+    // escape text columns for saving into database
+    $forum->name = addslashes($forum->name);
+    $forum->intro = addslashes($forum->intro);
+
+    if ( ! $forum->id = insert_record('forum', $forum) ) {
+        return 0; 
+    }
+
+    $module = get_record('modules', 'name', 'forum');
+    $section = get_course_section($sectionid, $courseid);
+
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->instance = $forum->id;
+    $cm->added = time();
+    $cm->section = $section->id;
+    $cm->id = insert_record('course_modules', $cm);
+
+    return $cm->id;
+}
+
+/**
+ * LAMS Function
+ * Return a statistic for a given user in this Moodle forum for use in branching
+ */
+function forum_get_tool_output($id, $outputname, $userid) {
+    $cm = get_record('course_modules', 'id', $id);
+    if ($cm) {
+        $posts = forum_get_user_posts($cm->instance, $userid);
+        switch ($outputname) {
+            case ("learner.number.of.words"):
+                $numwords = 0;
+                foreach ($posts as $postid=>$post) {
+                    $numwords += count(explode(' ', $post->message));
+                }
+                return $numwords;
+            case ("learner.number.of.posts"):
+                return count($posts);
+        }
+    }
+    return 0;
+}
+
+/**
+ * LAMS Function
+ * Return an HTML representation of a user's activity in this forum
+ */
+function forum_export_portfolio($id, $userid) {
+    global $CFG;
+    $text = 'This tool does not support export portfolio.  It may be accessible via ';
+    $text .= '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?id='.$id.'">this</a> link.';
+    return $text;
+
+}
 
 ?>
