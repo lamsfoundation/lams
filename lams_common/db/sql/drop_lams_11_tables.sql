@@ -16,6 +16,8 @@ DROP TABLE IF EXISTS lams_cr_workspace_credential;
 DROP TABLE IF EXISTS lams_css_property;
 DROP TABLE IF EXISTS lams_css_style;
 DROP TABLE IF EXISTS lams_css_theme_ve;
+DROP TABLE IF EXISTS lams_event_subscriptions;
+DROP TABLE IF EXISTS lams_events;
 DROP TABLE IF EXISTS lams_gate_activity_level;
 DROP TABLE IF EXISTS lams_group;
 DROP TABLE IF EXISTS lams_grouping;

@@ -973,6 +973,35 @@ CREATE TABLE lams_password_request (
 )TYPE=InnoDB;
 CREATE UNIQUE INDEX IX_lams_psswd_rqst_key ON lams_password_request (request_key ASC);
 
+CREATE TABLE lams_events (
+       uid BIGINT NOT NULL UNIQUE auto_increment
+     , scope VARCHAR(255) NOT NULL
+     , name VARCHAR(255) NOT NULL
+     , event_session_id BIGINT
+     , triggered TINYINT
+     , default_subject VARCHAR(255)
+     , default_message TEXT
+	 , subject VARCHAR(255)
+	 , message TEXT
+	 , fail_time DATETIME
+	 , INDEX (scope,name,event_session_id)
+     , PRIMARY KEY (uid)
+)TYPE=InnoDB;
 
+CREATE TABLE lams_event_subscriptions (
+       uid BIGINT NOT NULL UNIQUE auto_increment
+     , user_id BIGINT
+     , event_uid BIGINT
+     , delivery_method_id TINYINT UNSIGNED
+     , periodicity BIGINT
+     , last_operation_time DATETIME
+     , last_operation_message TEXT
+     , PRIMARY KEY (uid)
+     , CONSTRAINT EventSubscriptionsToUsers FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+     , INDEX (event_uid)
+     , CONSTRAINT EventSubscriptionsToEvent FOREIGN KEY (event_uid)
+                  REFERENCES lams_events (uid) ON DELETE CASCADE ON UPDATE CASCADE
+)TYPE=InnoDB;
 
  
