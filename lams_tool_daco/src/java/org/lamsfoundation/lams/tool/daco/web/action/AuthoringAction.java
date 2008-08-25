@@ -882,12 +882,14 @@ public class AuthoringAction extends Action {
 				}
 			}
 		}
+
 		// init daco question list
 		SortedSet<DacoQuestion> dacoQuestionList = getQuestionList(sessionMap);
 		dacoQuestionList.clear();
 		dacoQuestionList.addAll(questions);
 
 		sessionMap.put(DacoConstants.ATTR_DACO_FORM, dacoForm);
+
 		return mapping.findForward(DacoConstants.SUCCESS);
 	}
 
@@ -963,7 +965,6 @@ public class AuthoringAction extends Action {
 		}
 
 		dacoPO.setCreatedBy(dacoUser);
-
 		// **********************************Handle Authoring Instruction
 		// Attachement *********************
 		// merge attachment info
@@ -1038,12 +1039,14 @@ public class AuthoringAction extends Action {
 		dacoForm.setDaco(dacoPO);
 
 		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+
 		if (toolAccessMode.isAuthor()) {
 			return mapping.findForward("author");
 		}
 		else {
 			return mapping.findForward("monitor");
 		}
+
 	}
 
 	/**

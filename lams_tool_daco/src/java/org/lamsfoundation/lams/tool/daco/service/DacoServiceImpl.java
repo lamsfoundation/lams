@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -98,23 +99,38 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
 {
 	static Logger log = Logger.getLogger(DacoServiceImpl.class.getName());
+
 	private DacoDAO dacoDao;
+
 	private DacoQuestionDAO dacoQuestionDao;
+
 	private DacoUserDAO dacoUserDao;
+
 	private DacoSessionDAO dacoSessionDao;
+
 	private DacoAnswerDAO dacoAnswerDao;
 
 	// tool service
 	private DacoToolContentHandler dacoToolContentHandler;
+
 	private MessageService messageService;
+
 	// system services
 	private IRepositoryService repositoryService;
+
 	private ILamsToolService toolService;
+
 	private ILearnerService learnerService;
+
 	private IAuditService auditService;
+
 	private IUserManagementService userManagementService;
+
 	private IExportToolContentService exportContentService;
+
 	private ICoreNotebookService coreNotebookService;
+
+	private IEventNotificationService eventNotificationService;
 
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 		if (toContentId == null) {
@@ -863,5 +879,13 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
 	public void setDacoAnswerDao(DacoAnswerDAO dacoAnswerDao) {
 		this.dacoAnswerDao = dacoAnswerDao;
+	}
+
+	public IEventNotificationService getEventNotificationService() {
+		return eventNotificationService;
+	}
+
+	public void setEventNotificationService(IEventNotificationService eventNotificationService) {
+		this.eventNotificationService = eventNotificationService;
 	}
 }

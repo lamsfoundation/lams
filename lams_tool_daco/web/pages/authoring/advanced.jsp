@@ -37,6 +37,10 @@
 
 </p>
 
+<p class="small-space-top"><html:checkbox property="daco.notifyTeachersOnLearnerEntry" styleClass="noBorder"
+	styleId="notifyTeachersOnLearnerEntry">
+</html:checkbox> <label for="notifyTeachersOnLearnerEntry"> <fmt:message key="label.authoring.advanced.notify.onlearnerentry" /> </label></p>
+
 <p class="small-space-top"><html:checkbox property="daco.lockOnFinished" styleClass="noBorder"
 	styleId="lockOnFinished">
 </html:checkbox> <label for="lockOnFinished"> <fmt:message key="label.authoring.advanced.lock.on.finished" /> </label></p>

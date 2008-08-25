@@ -106,7 +106,10 @@
    		</property>
 		<property name="coreNotebookService">
 			<ref bean="coreNotebookService"/>
-		</property>   		
+		</property>
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService"/>
+		</property>   
     </bean>
 
     <bean id="dacoService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

@@ -50,38 +50,55 @@ public class Daco implements Cloneable {
 
 	// key
 	private Long uid;
+
 	// tool contentID
 	private Long contentId;
+
 	private String title;
+
 	private String instructions;
+
 	// advance
 	private boolean runOffline;
+
 	private boolean lockOnFinished;
+
 	private boolean defineLater;
+
 	private boolean contentInUse;
+
 	private Short minRecords;
+
 	private Short maxRecords;
 
 	// instructions
 	private String onlineInstructions;
+
 	private String offlineInstructions;
+
 	private Set<DacoAttachment> attachments = new LinkedHashSet();
 
 	// general infomation
 	private Date created;
+
 	private Date updated;
+
 	private DacoUser createdBy;
 
 	// daco Questions
 	private Set<DacoQuestion> dacoQuestions = new LinkedHashSet();
 
 	private boolean reflectOnActivity;
+
 	private String reflectInstructions;
+
+	private boolean notifyTeachersOnLearnerEntry;
 
 	// *************** NON Persist Fields ********************
 	private IToolContentHandler toolContentHandler;
 
 	private List<DacoAttachment> onlineFileList;
+
 	private List<DacoAttachment> offlineFileList;
 
 	// **********************************************************
@@ -489,5 +506,17 @@ public class Daco implements Cloneable {
 
 	public void setMaxRecords(Short maxRecords) {
 		this.maxRecords = maxRecords;
+	}
+
+	/**
+	 * @hibernate.property column="learner_entry_notify"
+	 * @return
+	 */
+	public boolean isNotifyTeachersOnLearnerEntry() {
+		return notifyTeachersOnLearnerEntry;
+	}
+
+	public void setNotifyTeachersOnLearnerEntry(boolean notifyTeachersOnLearnerEntry) {
+		this.notifyTeachersOnLearnerEntry = notifyTeachersOnLearnerEntry;
 	}
 }

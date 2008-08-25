@@ -196,6 +196,14 @@
             column="max_records"
         />
 
+        <property
+            name="notifyTeachersOnLearnerEntry"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="learner_entry_notify"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Daco.xml

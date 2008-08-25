@@ -233,6 +233,14 @@ public class LearningAction extends Action {
 		}
 
 		sessionMap.put(DacoConstants.ATTR_DACO, daco);
+
+		if (daco.isNotifyTeachersOnLearnerEntry()
+				&& service.getEventNotificationService().eventExists(DacoConstants.TOOL_SIGNATURE,
+						DacoConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_LEARNER_ENTRY, daco.getContentId())) {
+			String fullName = dacoUser.getLastName() + " " + dacoUser.getFirstName();
+			service.getEventNotificationService().trigger(DacoConstants.TOOL_SIGNATURE,
+					DacoConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_LEARNER_ENTRY, daco.getContentId(), new Object[] { fullName });
+		}
 		return mapping.findForward(DacoConstants.SUCCESS);
 	}
 

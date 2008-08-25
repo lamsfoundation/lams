@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.daco.dao.DacoAnswerDAO;
 import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
@@ -201,8 +202,7 @@ public interface IDacoService {
 	 * @param userId
 	 * @param entryText
 	 */
-	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-			String entryText);
+	Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText);
 
 	/**
 	 * Get reflection entry from notebook tool.
@@ -213,12 +213,12 @@ public interface IDacoService {
 	 * @param userID
 	 * @return
 	 */
-	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
+	NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 
 	/**
 	 * @param notebookEntry
 	 */
-	public void updateEntry(NotebookEntry notebookEntry);
+	void updateEntry(NotebookEntry notebookEntry);
 
 	/**
 	 * Get user by UID
@@ -234,7 +234,7 @@ public interface IDacoService {
 	 * @param args arguments for the message
 	 * @return message content
 	 */
-	public String getLocalisedMessage(String key, Object[] args);
+	String getLocalisedMessage(String key, Object[] args);
 
 	/**
 	 * Returns summaries for particular questions. A list of {@link QuestionSummaryDTO question summaries} is created,
@@ -243,14 +243,14 @@ public interface IDacoService {
 	 * @param userUid user for who the summary should be created
 	 * @return list of question summaries
 	 */
-	public List<QuestionSummaryDTO> getQuestionSummaries(Long userUid);
+	List<QuestionSummaryDTO> getQuestionSummaries(Long userUid);
 
 	/**
 	 * Removes a Daco object and all of its Questions from Hibernate cache.
 	 * It is required to avoid errors when same object was read from the database twice and one of the copies is being saved.
 	 * @param daco object to release
 	 */
-	public void releaseDacoFromCache(Daco daco);
+	void releaseDacoFromCache(Daco daco);
 
 	/**
 	 * Removes Answers from Hibernate cache.
@@ -280,4 +280,6 @@ public interface IDacoService {
 	 * @return list of monitoring summaries, one for each session
 	 */
 	List<MonitoringSummarySessionDTO> getMonitoringSummary(Long contentId, Long userUid);
+
+	IEventNotificationService getEventNotificationService();
 }

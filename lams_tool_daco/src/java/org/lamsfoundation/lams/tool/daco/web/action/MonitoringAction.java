@@ -30,12 +30,14 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
@@ -45,7 +47,9 @@ import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
 import org.lamsfoundation.lams.tool.daco.service.IDacoService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
@@ -91,6 +95,7 @@ public class MonitoringAction extends Action {
 
 	protected ActionForward summary(ActionMapping mapping, HttpServletRequest request) {
 		// initial Session Map
+		IDacoService service = getDacoService();
 		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID, true);
 
 		boolean newSession = sessionMapID == null || request.getSession().getAttribute(sessionMapID) == null;
@@ -105,11 +110,9 @@ public class MonitoringAction extends Action {
 			sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		}
 
-		IDacoService service = getDacoService();
 		Long contentId = sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID) == null ? WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_CONTENT_ID) : (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		Daco daco = service.getDacoByContentId(contentId);
-
 		daco.toDTO();
 
 		List<MonitoringSummarySessionDTO> monitoringSummaryList = service.getMonitoringSummary(contentId,
@@ -146,6 +149,21 @@ public class MonitoringAction extends Action {
 			sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
 			sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
 					AttributeNames.PARAM_CONTENT_FOLDER_ID));
+
+			if (daco.isNotifyTeachersOnLearnerEntry()) {
+				//Since we don't know if the event exists, we just try to create it.
+				service.getEventNotificationService().createEvent(DacoConstants.TOOL_SIGNATURE,
+						DacoConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_LEARNER_ENTRY, contentId,
+						service.getLocalisedMessage("event.learnerentry.subject", null),
+						service.getLocalisedMessage("event.learnerentry.body", null));
+
+				//Now we subscribe the teacher
+				HttpSession ss = SessionManager.getSession();
+				UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+				service.getEventNotificationService().subscribe(DacoConstants.TOOL_SIGNATURE,
+						DacoConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_LEARNER_ENTRY, contentId, user.getUserID().longValue(),
+						IEventNotificationService.DELIVERY_METHOD_MAIL, IEventNotificationService.PERIODICITY_SINGLE);
+			}
 		}
 		return mapping.findForward(DacoConstants.SUCCESS);
 	}

@@ -25,7 +25,8 @@ CREATE TABLE tl_ladaco10_contents (
    define_later tinyint DEFAULT 0,
    content_id bigint UNIQUE,
    reflect_instructions varchar(255), 
-   reflect_on_activity smallint, 
+   reflect_on_activity tinyint,
+   learner_entry_notify tinyint DEFAULT 0,
    PRIMARY KEY (uid)
 )TYPE=innodb;
 
