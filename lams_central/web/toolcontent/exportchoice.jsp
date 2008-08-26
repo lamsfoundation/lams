@@ -24,28 +24,37 @@
 				window.close();
 			}
 		</script>
+		<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js"></script>
 	</lams:head>
 
 	<body class="stripes">
+	<div id="content">
+		<h2>
+			<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" 
+				onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
+		
+			<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
+				<fmt:message key="label.export.advanced.options" />
+			</a>
+		</h2>
+	<br />
 
-		 <div id="content">
-	  
+	<div class="monitoring-advanced" id="advancedDiv" style="display:none">
 		<h1>
 			<fmt:message key="title.export.choose.format" />
 		</h1>
-		
-				<H2><fmt:message key="msg.export.choose.format.instruction" /></H2>
-				<table><tr><td>
-				<input type="radio" name="format" id="lams" value="1" checked="checked" class="noBorder"><fmt:message key="msg.export.choose.format.lams" />
-				<BR/><BR/>
-				<input type="radio" name="format" id="ims" value="2" class="noBorder"><fmt:message key="msg.export.choose.format.ims" />
-				<BR/><BR/>
-				<div class="right-buttons">
-					<a href="#" onclick="goDownload();" class="button"><fmt:message key="button.export" /></a>
-					<a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a>
-				</div>
-				</td></tr></table>
-		
+		<table><tr><td>
+		<input type="radio" name="format" id="lams" value="1" checked="checked" class="noBorder"><fmt:message key="msg.export.choose.format.lams" />
+		<BR/><BR/>
+		<input type="radio" name="format" id="ims" value="2" class="noBorder"><fmt:message key="msg.export.choose.format.ims" />
+		<BR/><BR/>
+		</td></tr></table>
+	</div>
+	<div class="right-buttons">
+		<a href="#" onclick="goDownload();" class="button"><fmt:message key="button.export" /></a>
+		<a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a>
+	</div>
+
 		</div>  <!--closes content-->
 			
 		<div id="footer">
