@@ -682,7 +682,7 @@ function lamstwo_get_members($courseid, $lamstwoid, $groupid) {
 	$monitoridstr = '';
 	
 	if (! $cm = get_coursemodule_from_instance('lamstwo', $lamstwoid, $courseid)) {
-		error('Course Module ID was incorrect');
+		return array('learners' => '', 'monitors' => '');
 	}
 	$context = get_context_instance(CONTEXT_MODULE, $cm->id);
 	
