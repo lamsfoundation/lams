@@ -64,6 +64,21 @@
 				</c:choose>	
 			</td>
 		</tr>
+		<tr>
+			<td>
+				<fmt:message key="label.authoring.advanced.notify.onrecordsubmit" />
+			</td>
+			<td>
+				<c:choose>
+					<c:when test="${daco.notifyTeachersOnRecordSumbit}">
+						<fmt:message key="label.monitoring.advancedsettings.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.monitoring.advancedsettings.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
 		
 		<tr>
 			<td>

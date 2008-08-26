@@ -150,6 +150,8 @@ public class MonitoringAction extends Action {
 			sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
 					AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
+			HttpSession ss = SessionManager.getSession();
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 			if (daco.isNotifyTeachersOnLearnerEntry()) {
 				//Since we don't know if the event exists, we just try to create it.
 				service.getEventNotificationService().createEvent(DacoConstants.TOOL_SIGNATURE,
@@ -158,10 +160,20 @@ public class MonitoringAction extends Action {
 						service.getLocalisedMessage("event.learnerentry.body", null));
 
 				//Now we subscribe the teacher
-				HttpSession ss = SessionManager.getSession();
-				UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 				service.getEventNotificationService().subscribe(DacoConstants.TOOL_SIGNATURE,
 						DacoConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_LEARNER_ENTRY, contentId, user.getUserID().longValue(),
+						IEventNotificationService.DELIVERY_METHOD_MAIL, IEventNotificationService.PERIODICITY_SINGLE);
+			}
+			if (daco.isNotifyTeachersOnRecordSumbit()) {
+				//Since we don't know if the event exists, we just try to create it.
+				service.getEventNotificationService().createEvent(DacoConstants.TOOL_SIGNATURE,
+						DacoConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_RECORD_SUBMIT, contentId,
+						service.getLocalisedMessage("event.recordsubmit.subject", null),
+						service.getLocalisedMessage("event.recordsubmit.body", null));
+
+				//Now we subscribe the teacher
+				service.getEventNotificationService().subscribe(DacoConstants.TOOL_SIGNATURE,
+						DacoConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_RECORD_SUBMIT, contentId, user.getUserID().longValue(),
 						IEventNotificationService.DELIVERY_METHOD_MAIL, IEventNotificationService.PERIODICITY_SINGLE);
 			}
 		}

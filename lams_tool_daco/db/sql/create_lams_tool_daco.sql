@@ -27,6 +27,7 @@ CREATE TABLE tl_ladaco10_contents (
    reflect_instructions varchar(255), 
    reflect_on_activity tinyint,
    learner_entry_notify tinyint DEFAULT 0,
+   record_submit_notify tinyint DEFAULT 0,
    PRIMARY KEY (uid)
 )TYPE=innodb;
 

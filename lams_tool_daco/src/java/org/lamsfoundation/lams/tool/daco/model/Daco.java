@@ -94,6 +94,8 @@ public class Daco implements Cloneable {
 
 	private boolean notifyTeachersOnLearnerEntry;
 
+	private boolean notifyTeachersOnRecordSumbit;
+
 	// *************** NON Persist Fields ********************
 	private IToolContentHandler toolContentHandler;
 
@@ -518,5 +520,17 @@ public class Daco implements Cloneable {
 
 	public void setNotifyTeachersOnLearnerEntry(boolean notifyTeachersOnLearnerEntry) {
 		this.notifyTeachersOnLearnerEntry = notifyTeachersOnLearnerEntry;
+	}
+
+	/**
+	 * @hibernate.property column="record_submit_notify"
+	 * @return
+	 */
+	public boolean isNotifyTeachersOnRecordSumbit() {
+		return notifyTeachersOnRecordSumbit;
+	}
+
+	public void setNotifyTeachersOnRecordSumbit(boolean notifyTeachersOnRecordSumbit) {
+		this.notifyTeachersOnRecordSumbit = notifyTeachersOnRecordSumbit;
 	}
 }

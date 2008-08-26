@@ -241,6 +241,7 @@ public class LearningAction extends Action {
 			service.getEventNotificationService().trigger(DacoConstants.TOOL_SIGNATURE,
 					DacoConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_LEARNER_ENTRY, daco.getContentId(), new Object[] { fullName });
 		}
+
 		return mapping.findForward(DacoConstants.SUCCESS);
 	}
 
@@ -490,6 +491,16 @@ public class LearningAction extends Action {
 
 			records.add(record);
 			request.setAttribute(DacoConstants.ATTR_RECORD_OPERATION_SUCCESS, DacoConstants.RECORD_OPERATION_ADD);
+
+			//notify teachers
+			if (daco.isNotifyTeachersOnRecordSumbit()
+					&& service.getEventNotificationService().eventExists(DacoConstants.TOOL_SIGNATURE,
+							DacoConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_RECORD_SUBMIT, daco.getContentId())) {
+				String fullName = user.getLastName() + " " + user.getFirstName();
+				service.getEventNotificationService()
+						.trigger(DacoConstants.TOOL_SIGNATURE, DacoConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_RECORD_SUBMIT,
+								daco.getContentId(), new Object[] { fullName });
+			}
 		}
 
 		request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, records.size() + 1);

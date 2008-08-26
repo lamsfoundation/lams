@@ -41,7 +41,11 @@
 	styleId="notifyTeachersOnLearnerEntry">
 </html:checkbox> <label for="notifyTeachersOnLearnerEntry"> <fmt:message key="label.authoring.advanced.notify.onlearnerentry" /> </label></p>
 
-<p class="small-space-top"><html:checkbox property="daco.lockOnFinished" styleClass="noBorder"
+<p><html:checkbox property="daco.notifyTeachersOnRecordSumbit" styleClass="noBorder"
+	styleId="notifyTeachersOnRecordSubmit">
+</html:checkbox> <label for="notifyTeachersOnRecordSubmit"> <fmt:message key="label.authoring.advanced.notify.onrecordsubmit" /> </label></p>
+
+<p><html:checkbox property="daco.lockOnFinished" styleClass="noBorder"
 	styleId="lockOnFinished">
 </html:checkbox> <label for="lockOnFinished"> <fmt:message key="label.authoring.advanced.lock.on.finished" /> </label></p>
 

@@ -289,4 +289,6 @@ public class DacoConstants {
 	// events
 	public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_LEARNER_ENTRY = "notify_teachers_on_learner_entry";
 
+	public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_RECORD_SUBMIT = "notify_teachers_on_record_submit";
+
 }

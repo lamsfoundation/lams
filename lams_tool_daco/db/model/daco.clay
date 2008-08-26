@@ -266,7 +266,7 @@
 </table>
 <table alias="" name="tl_ladaco10_contents" remarks="" uid="12a32bf:11be7cf04bc:-7ea5">
 <table-description/>
-<table-figure-bounds height="236" width="175" x="59" y="31"/>
+<table-figure-bounds height="249" width="175" x="59" y="31"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="0" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="12a32bf:11be7cf04bc:-7ea3">
 <column-description/>
@@ -410,6 +410,19 @@
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="learner_entry_notify" remarks="" uid="12a32bf:11be7cf04bc:-7e5e">
+<column-description/>
+<data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT">
+<variant type-name-pattern="TINYINT"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="record_submit_notify" remarks="" uid="d81970:11bfceee954:-7ff7">
 <column-description/>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT">
 <variant type-name-pattern="TINYINT"/>
