@@ -46,6 +46,10 @@
         return $status;
     }
     
+    /**
+     * Since this method contains links to LAMS sequence and lesson ids, it requires the original LAMS
+     * server to be integrated with this Moodle instance.
+     */
     function lamstwo_lessons_restore_mods($lamstwoid, $info, $restore, $restoreuserdata=true) {
         global $CFG;
         $status = true;
