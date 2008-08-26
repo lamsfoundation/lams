@@ -1,6 +1,6 @@
 <?php
 
-function lamstwo_backup_mods($bf,$preferences) {
+    function lamstwo_backup_mods($bf,$preferences) {
        
         global $CFG;
 
@@ -36,7 +36,7 @@ function lamstwo_backup_mods($bf,$preferences) {
         
         //Print lamstwo data
         fwrite ($bf,full_tag("ID",4,false,$lamstwo->id));
-        fwrite ($bf,full_tag("MODTYPE",4,false,"lamstwo"));
+        fwrite ($bf,full_tag("MODTYPE",4,false,'lamstwo'));
         fwrite ($bf,full_tag("NAME",4,false,$lamstwo->name));
         fwrite ($bf,full_tag("INTRO",4,false,$lamstwo->intro));
         fwrite ($bf,full_tag("TIMEMODIFIED",4,false,$lamstwo->timemodified));
@@ -73,8 +73,9 @@ function lamstwo_backup_mods($bf,$preferences) {
                 fwrite ($bf,full_tag("NAME",6,false,$lesson->name));
                 fwrite ($bf,full_tag("INTRO",6,false,$lesson->intro));
                 fwrite ($bf,full_tag("GROUPID",6,false,$lesson->groupid));
-                fwrite ($bf,full_tag("SEQUENCEID",6,false,$lesson->sequence_id));
-                fwrite ($bf,full_tag("LESSONID",6,false,$lesson->lesson_id));
+                fwrite ($bf,full_tag("SEQUENCE_ID",6,false,$lesson->sequence_id));
+                fwrite ($bf,full_tag("LESSON_ID",6,false,$lesson->lesson_id));
+                fwrite ($bf,full_tag("TIMEMODIFIED",6,false,$lesson->timemodified));
                 //End lesson
                 $status =fwrite ($bf,end_tag("LESSON",5,true));
             }
