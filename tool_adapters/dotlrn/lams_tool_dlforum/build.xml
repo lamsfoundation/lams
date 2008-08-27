@@ -425,7 +425,7 @@ Ant build file.
 			toolApplicationContextPath="/org/lamsfoundation/lams/tool/dlfrum/dotLRNForumApplicationContext.xml"
 			lamsEarPath="${jboss.deploy}" toolContext="${toolContext}" 
 			toolWebUri="${product}.war"
-			languageFilesPackage="org.lamsfoundation.lams.tool.dotLRNForum">
+			languageFilesPackage="org.lamsfoundation.lams.tool.dlfrum">
 			
 			<!-- language files go as a fileset. -->
 			<!-- Not nice but can't work out how to embed them in a tag. -->
