@@ -81,6 +81,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var _monitorLesson_mc:MovieClip;
 	private var _lessonStateArr:Array;
 	private var bkg_pnl:MovieClip;
+	private var LSDescription_scp:ScrollPane;
+	private var LSDescriptionContent_mc:MovieClip;
 	
 	//Labels
 	private var status_lbl:Label;
@@ -102,8 +104,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	
 	//Text Items
 	private var LSTitle_lbl:Label;
-	private var LSDescription_lbl:Label;
-	
+	private var LSDescription_txa:TextArea;
 	private var sessionStatus_txt:Label;
 	private var numLearners_txt:Label;
 	private var class_txt:Label;
@@ -395,12 +396,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private function populateLessonDetails():Void{
 		
 		var s:Object = mm.getSequence();
-		var limit:Number = 120;
-		
+
 		LSTitle_lbl.text = "<b>" + s.name + "</b>";
-		LSDescription_lbl.text = String(s.description).substr(0, limit);
-		
-		if(s.description.length > limit) { LSDescription_lbl.text += "..."; }
+		LSDescription_txa.text = String(s.description);
 		
 		sessionStatus_txt.text = showStatus(s.state);
 		numLearners_txt.text = String(s.noStartedLearners) + " "  + Dictionary.getValue('ls_of_text')+" "+String(s.noPossibleLearners);
