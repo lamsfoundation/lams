@@ -68,7 +68,7 @@ XXX;
     echo '<br />';
     echo '<div class="singlebutton forumaddnew">';
     echo "<input type=\"submit\" value=\"".get_string('openauthor', 'lamstwo')."\" 
-        onclick=\"openAuthor('$authorurl','author','location=0,toolbar=0,menubar=0,statusbar=0,width=796,height=570,resizable',0)\" />&nbsp;&nbsp;";
+        onclick=\"openAuthor('$authorurl','author','location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=700,resizable',0)\" />&nbsp;&nbsp;";
     echo "<form id=\"newlessonform\" method=\"get\" action=\"$CFG->wwwroot/mod/lamstwo/add.php\">";
     echo '<div>';
     echo "<input type=\"hidden\" name=\"customCSV\" value=\"$customcsv\" />";
@@ -103,12 +103,12 @@ if (!empty($lessons)) {
 		$lessonlink = $lesson->name;
 		if ($canparticipate) {
 			$learnerurl = lamstwo_get_url($USER->username, $locale['lang'], $locale['country'], $lesson->lesson_id, $course->id, $LAMS2CONSTANTS->learner_method);
-			$learnerurl = "onclick=\"javascript:window.open('".$learnerurl."','learner','location=0,toolbar=0,menubar=0,statusbar=0,width=796,height=570,resizable',0)\"";
+			$learnerurl = "onclick=\"javascript:window.open('".$learnerurl."','learner','location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=600,resizable',0)\"";
 			$lessonlink = "<a href=\"#\" $learnerurl>$lesson->name</a>";
 		}
 		if ($canmanage) {
 			$monitorurl = lamstwo_get_url($USER->username, $locale['lang'], $locale['country'], $lesson->lesson_id, $course->id, $LAMS2CONSTANTS->monitor_method);
-			$monitorurl = "onclick=\"javascript:window.open('".$monitorurl."','monitor','location=0,toolbar=0,menubar=0,statusbar=0,width=796,height=570,resizable',0)\"";
+			$monitorurl = "onclick=\"javascript:window.open('".$monitorurl."','monitor','location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=600,resizable',0)\"";
 			$monitorlink = "<a href=\"#\" $monitorurl>".get_string('openmonitor', 'lamstwo')."</a>";
 			$links .= $monitorlink;
 		}
