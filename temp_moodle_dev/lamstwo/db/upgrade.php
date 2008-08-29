@@ -29,6 +29,9 @@ function xmldb_lamstwo_upgrade($oldversion=0) {
         $field->setAttributes(XMLDB_TYPE_TEXT, 'small', null, true, null, null, null, null, null);
         $result = change_field_default($table, $field);
         
+        // save lamstwo data
+        $lamstwos = get_records('lamstwo');
+        
         // modify lamstwo table
         $result = $result && rename_field($table, $field, 'intro');
         $result = $result && drop_field($table, new XMLDBField('sequence_id'));
@@ -82,6 +85,18 @@ function xmldb_lamstwo_upgrade($oldversion=0) {
         $table->addIndex($index);
         
         $result = $result && create_table($table);
+        
+        // insert lamstwo data into lamstwo_lesson table
+        foreach ($lamstwos as $lamstwoid => $lamstwo) {
+            $lesson->course       = $lamstwo->course;
+            $lesson->lamstwo      = $lamstwoid;
+            $lesson->name         = $lamstwo->name;
+            $lesson->intro        = $lamstwo->introduction;
+            $lesson->sequence_id  = $lamstwo->sequence_id;
+            $lesson->lesson_id    = $lamstwo->lesson_id;
+            $lesson->timemodified = $lamstwo->timemodified;
+            $lesson->id = insert_record('lamstwo_lesson', $lesson);
+        }
         
         // add table lamstwo_grade
         $table = new XMLDBTable('lamstwo_grade');
