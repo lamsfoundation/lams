@@ -96,6 +96,8 @@ class LessonController extends AbstractController {
 				
 				if(ca.activityStatus == 'completed_mc' && !ca.activity.isOptionalActivity() && !ca.activity.isOptionsWithSequencesActivity() && !ca.activity.isBranchingActivity()){
 					_lessonModel.getLesson().getActivityURL(URLToSend, true);
+				} else if(ca.activityStatus == 'completed_mc' && ca.activity.isOptionalActivity() && !ca.activity.isOptionsWithSequencesActivity() && !ca.activity.isBranchingActivity()){
+					_lessonModel.getLesson().getActivityURL(URLToSend, true);
 				} else if(ca.activityStatus == 'attempted_mc' && _root.mode == 'preview') {
 					_lessonModel.getLesson().moveToActivity(_lessonModel.progressData.getCurrentActivityId(), ca.activity.activityID);
 				} else {
@@ -114,10 +116,12 @@ class LessonController extends AbstractController {
 				} else {
 					_lessonModel.getLesson().moveToActivity(_lessonModel.progressData.getCurrentActivityId(), ca.activity.activityID);
 				}
+			} else if(_app.module == 'learner' && ca.activityStatus == undefined && ca._parent._parent.activityStatus == "completed_mc") {
+					var alertMSG:String = Dictionary.getValue('al_act_reached_max')
+					getURL("javascript:alert('"+alertMSG+"');");
 			} else {
 				var alertMSG:String = Dictionary.getValue('al_doubleclick_todoactivity')
 				getURL("javascript:alert('"+alertMSG+"');");
-				
 			}
 		}
 	  
