@@ -155,7 +155,7 @@
 
 <tr>
         <td align="center">
-                <input type="button" id="create" name="create" value="Open LAMS Author" onClick="window.open('@lams_server_url@/LoginRequest?uid=@username@&method=author&ts=@datetime@&sid=@server_id@&hash=@hashValue@&courseid=@course_id@&country=AU&lang=EN&requestSrc=@requestSrc@&notifyCloseURL=@notifyCloseURL@&customCSV=@username@,@course_id@,@course_url@&extlmsid=dotLRN','LAMS_Author','height=600,width=800,resizable');">
+                <input type="button" id="create" name="create" value="Open LAMS Author" onClick="window.open('@lams_server_url@/LoginRequest?uid=@username@&method=author&ts=@datetime@&sid=@server_id@&hash=@hashValue@&courseid=@course_id@&@coursename=@course_name@&country=AU&lang=EN&requestSrc=@requestSrc@&notifyCloseURL=@notifyCloseURL@&customCSV=@username@,@course_id@,@course_url@&extlmsid=dotLRN','LAMS_Author','height=600,width=800,resizable');">
                 <input type="button" id="preview" name="preview" value="Preview" onClick="previewSequence();">
                 <input type="button" id="refresh" name="refresh" value="Refresh" onclick="javascript:refreshSequences();"/>
                 <input type="submit" id="cancel" name=cancel value="Cancel" />
