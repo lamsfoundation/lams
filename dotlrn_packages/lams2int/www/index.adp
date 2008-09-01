@@ -16,7 +16,7 @@
 
 <!-- open LAMS Learner Link --> 
 <div class="body" align="center">
-<a class="button" href="javascript:;" onClick="window.open('@lams_server_url@/LoginRequest?uid=@username@&method=learner&ts=@datetime@&sid=@server_id@&hash=@hashValue@&courseid=@course_id@&lsid=@learning_session_id@&country=AU&lang=EN','LAMS_Learner','height=600,width=800,resizable')">Open Lesson</a>  
+<a class="button" href="javascript:;" onClick="window.open('@lams_server_url@/LoginRequest?uid=@username@&method=learner&ts=@datetime@&sid=@server_id@&hash=@hashValue@&courseid=@course_id@&lsid=@learning_session_id@&country=AU&lang=EN','LAMS_Learner','height=650,width=996,resizable')">Open Lesson</a>  
 </div>
 <!-- end LAMS Learner -->
 
@@ -24,7 +24,7 @@
  <P>
  <!-- open LAMS Monitor Link --> 
 <div class="body" align="center">
-  <a class="button" href="javascript:;" onClick="window.open('@lams_server_url@/LoginRequest?uid=@username@&method=monitor&ts=@datetime@&sid=@server_id@&hash=@hashmonitor@&courseid=@course_id@&lsid=@learning_session_id@&country=AU&lang=EN','LAMS_Monitor','height=600,width=800,resizable')">Monitor this Lesson</a>  
+  <a class="button" href="javascript:;" onClick="window.open('@lams_server_url@/LoginRequest?uid=@username@&method=monitor&ts=@datetime@&sid=@server_id@&hash=@hashmonitor@&courseid=@course_id@&lsid=@learning_session_id@&country=AU&lang=EN','LAMS_Monitor','height=650,width=996,resizable')">Monitor this Lesson</a>  
   </div>
  <!-- end LAMS Learner -->
  </p>
