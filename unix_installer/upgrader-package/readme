@@ -58,14 +58,6 @@ Take note that the majority of the projects are in lams.ear for instance
 lams-central.war and lams-common.jar, if you have made changes to any projects,
 ensure that you back them up so you can re-apply them after the update.
 
-Before you run the script, you need to ensure that your $JAVA_HOME is set to 
-your java 1.5 or higher directory, also you will need to set the $PATH variable 
-to include the pasudoth to the java binaries. The steps to do this are listed below.
-> JAVA_HOME="(path to java installation directory)"
-> export JAVA_HOME
-> PATH="(path to java bin directory):$PATH"
-> export PATH
-
 Once you have finished editing lams.properties file you are ready to run the 
 update script. Go to the root directory of the package and type:
 > sudo ./update-lams.sh 
