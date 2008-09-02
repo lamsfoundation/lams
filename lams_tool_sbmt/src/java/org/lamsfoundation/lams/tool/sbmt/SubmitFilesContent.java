@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.sbmt;
 
 import java.io.Serializable;
@@ -34,55 +34,62 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-
 
 /**
  * @hibernate.class table="tl_lasbmt11_content"
  * @serial 9072799761861936838L
  */
-public class SubmitFilesContent implements Serializable,Cloneable {
+public class SubmitFilesContent implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 9072799761861936838L;
 
 	private static Logger log = Logger.getLogger(SubmitFilesContent.class);
+
 	/** identifier field */
 	private Long contentID;
 
 	/** persistent field */
 	//basic tab fields
 	private String title;
+
 	private String instruction;
-	
+
 	// advance tab fields
 	private boolean lockOnFinished;
-	
+
+	private boolean notifyLearnersOnMarkRelease;
+
 	//instruction tab fields
 	private String offlineInstruction;
+
 	private String onlineInstruction;
+
 	private Set instructionFiles;
-	
+
 	//system level fields
 	private boolean defineLater;
+
 	private boolean runOffline;
+
 	private boolean contentInUse;
 
 	private boolean limitUpload;
+
 	private int limitUploadNumber;
-	
+
 	private boolean reflectOnActivity;
+
 	private String reflectInstructions;
-	
+
 	private Date created;
+
 	private Date updated;
+
 	private SubmitUser createdBy;
-	
+
 	//temporary fields
 	private IToolContentHandler toolContentHandler;
-	
 
 	/** default constructor */
 	public SubmitFilesContent() {
@@ -96,9 +103,9 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	 * @param toolContentHandler 
 	 * @return SubmitFilesContent The new SubmitFilesContent object
 	 */
-	public static SubmitFilesContent newInstance(SubmitFilesContent content,
-			Long newContentID, IToolContentHandler toolContentHandler) {
-		content.toolContentHandler  = toolContentHandler;
+	public static SubmitFilesContent newInstance(SubmitFilesContent content, Long newContentID,
+			IToolContentHandler toolContentHandler) {
+		content.toolContentHandler = toolContentHandler;
 		SubmitFilesContent newContent = (SubmitFilesContent) content.clone();
 		newContent.setContentID(newContentID);
 		return newContent;
@@ -110,7 +117,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	 *               column="content_id"
 	 */
 	public Long getContentID() {
-		return this.contentID;
+		return contentID;
 	}
 
 	public void setContentID(Long contentID) {
@@ -121,7 +128,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	 * @hibernate.property column="title" length="64" not-null="true"
 	 */
 	public String getTitle() {
-		return this.title;
+		return title;
 	}
 
 	public void setTitle(String title) {
@@ -132,64 +139,60 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	 * @hibernate.property column="instruction" type="text"
 	 */
 	public String getInstruction() {
-		return this.instruction;
+		return instruction;
 	}
 
 	public void setInstruction(String instructions) {
-		this.instruction = instructions;
-	}	
+		instruction = instructions;
+	}
 
+	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append("contentID", getContentID())
-				.append("title", getTitle()).append("instructions",
-						getInstruction()).toString();
+		return new ToStringBuilder(this).append("contentID", getContentID()).append("title", getTitle()).append("instructions",
+				getInstruction()).toString();
 	}
 
+	@Override
 	public boolean equals(Object other) {
-		if ((this == other))
+		if (this == other) {
 			return true;
-		if (!(other instanceof SubmitFilesContent))
+		}
+		if (!(other instanceof SubmitFilesContent)) {
 			return false;
+		}
 		SubmitFilesContent castOther = (SubmitFilesContent) other;
-		return new EqualsBuilder().append(this.getContentID(),
-				castOther.getContentID()).append(this.getTitle(),
-				castOther.getTitle()).append(this.getInstruction(),
-				castOther.getInstruction()).isEquals();
+		return new EqualsBuilder().append(this.getContentID(), castOther.getContentID()).append(this.getTitle(),
+				castOther.getTitle()).append(this.getInstruction(), castOther.getInstruction()).isEquals();
 	}
 
+	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(getContentID()).append(getTitle())
-				.append(getInstruction()).toHashCode();
+		return new HashCodeBuilder().append(getContentID()).append(getTitle()).append(getInstruction()).toHashCode();
 	}
 
+	/** 
+	 * @hibernate.property column="define_later" length="1"
+	 *  not-null="true"
+	 */
+	public boolean isDefineLater() {
+		return defineLater;
+	}
 
-    /** 
-     * @hibernate.property column="define_later" length="1"
-     *  not-null="true"
-     */
-    public boolean isDefineLater()
-    {
-        return this.defineLater;
-    }
+	public void setDefineLater(boolean defineLater) {
+		this.defineLater = defineLater;
+	}
 
-    public void setDefineLater(boolean defineLater)
-    {
-        this.defineLater = defineLater;
-    }
+	/** 
+	 * @hibernate.property column="run_offline" length="1"
+	 * not-null="true"
+	 */
+	public boolean isRunOffline() {
+		return runOffline;
+	}
 
-    /** 
-     * @hibernate.property column="run_offline" length="1"
-     * not-null="true"
-     */
-    public boolean isRunOffline()
-    {
-        return this.runOffline;
-    }
-
-    public void setRunOffline(boolean runOffline)
-    {
-        this.runOffline = runOffline;
-    }
+	public void setRunOffline(boolean runOffline) {
+		this.runOffline = runOffline;
+	}
 
 	/**
 	 * @hibernate.property column="offline_instruction" type="text"
@@ -237,7 +240,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	}
 
 	/**
- 	 * @hibernate.set lazy="true" inverse="false" cascade="all"
+	 * @hibernate.set lazy="true" inverse="false" cascade="all"
 	 * @hibernate.collection-key column="content_id"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.sbmt.InstructionFiles"
 	 * 
@@ -270,32 +273,33 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 		this.lockOnFinished = lockOnFinished;
 	}
 
-    
-    public Object clone(){
+	@Override
+	public Object clone() {
 		Object obj = null;
 		try {
 			obj = super.clone();
 			//never clone key!
-			((SubmitFilesContent)obj).setContentID(null);
+			((SubmitFilesContent) obj).setContentID(null);
 			//clone InstructionFiles object
-			if(instructionFiles != null ){
+			if (instructionFiles != null) {
 				Iterator iter = instructionFiles.iterator();
 				Set set = new HashSet();
-				while(iter.hasNext()){
-					InstructionFiles file = (InstructionFiles)iter.next();
+				while (iter.hasNext()) {
+					InstructionFiles file = (InstructionFiles) iter.next();
 					InstructionFiles newFile = (InstructionFiles) file.clone();
 					set.add(newFile);
 				}
-				((SubmitFilesContent)obj).instructionFiles= set;
-				
-				if(this.createdBy != null){
-					((SubmitFilesContent)obj).setCreatedBy((SubmitUser) this.createdBy.clone());
-	  			}
+				((SubmitFilesContent) obj).instructionFiles = set;
+
+				if (createdBy != null) {
+					((SubmitFilesContent) obj).setCreatedBy((SubmitUser) createdBy.clone());
+				}
 			}
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + SubmitFilesContent.class + " failed");
 		}
-		
+		catch (CloneNotSupportedException e) {
+			SubmitFilesContent.log.error("When clone " + SubmitFilesContent.class + " failed");
+		}
+
 		return obj;
 	}
 
@@ -306,23 +310,27 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
 		this.toolContentHandler = toolContentHandler;
 	}
+
 	/**
 	 * @hibernate.property column="reflect_instructions"
 	 * @return
-	 */	
+	 */
 	public String getReflectInstructions() {
 		return reflectInstructions;
 	}
+
 	public void setReflectInstructions(String reflectInstructions) {
 		this.reflectInstructions = reflectInstructions;
 	}
+
 	/**
 	 * @hibernate.property column="reflect_on_activity"
 	 * @return
-	 */		
+	 */
 	public boolean isReflectOnActivity() {
 		return reflectOnActivity;
 	}
+
 	public void setReflectOnActivity(boolean reflectOnActivity) {
 		this.reflectOnActivity = reflectOnActivity;
 	}
@@ -330,7 +338,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	/**
 	 * @hibernate.property column="limit_upload"
 	 * @return
-	 */		
+	 */
 	public boolean isLimitUpload() {
 		return limitUpload;
 	}
@@ -342,7 +350,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	/**
 	 * @hibernate.property column="limit_upload_number"
 	 * @return
-	 */		
+	 */
 	public int getLimitUploadNumber() {
 		return limitUploadNumber;
 	}
@@ -350,10 +358,11 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	public void setLimitUploadNumber(int limitUploadNumber) {
 		this.limitUploadNumber = limitUploadNumber;
 	}
+
 	/**
 	 * @hibernate.property column="created"
 	 * @return
-	 */		
+	 */
 	public Date getCreated() {
 		return created;
 	}
@@ -361,11 +370,12 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	public void setCreated(Date created) {
 		this.created = created;
 	}
+
 	/**
 	 * @hibernate.many-to-one  column="created_by" cascade="none"
 	 *  
 	 * @return
-	 */		
+	 */
 	public SubmitUser getCreatedBy() {
 		return createdBy;
 	}
@@ -373,15 +383,28 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	public void setCreatedBy(SubmitUser createdBy) {
 		this.createdBy = createdBy;
 	}
+
 	/**
 	 * @hibernate.property column="updated"
 	 * @return
-	 */		
+	 */
 	public Date getUpdated() {
 		return updated;
 	}
 
 	public void setUpdated(Date updated) {
 		this.updated = updated;
+	}
+
+	/**
+	 * @hibernate.property column="mark_release_notify"
+	 * @return
+	 */
+	public boolean isNotifyLearnersOnMarkRelease() {
+		return notifyLearnersOnMarkRelease;
+	}
+
+	public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
+		this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
 	}
 }

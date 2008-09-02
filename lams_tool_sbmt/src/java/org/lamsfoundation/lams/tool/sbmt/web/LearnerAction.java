@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 
 package org.lamsfoundation.lams.tool.sbmt.web;
 
@@ -43,6 +43,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -86,11 +87,11 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * 
  */
 public class LearnerAction extends DispatchAction {
-    
-    private static final boolean MODE_OPTIONAL = false;
-    
+
+	private static final boolean MODE_OPTIONAL = false;
+
 	public static Logger logger = Logger.getLogger(LearnerAction.class);
-    
+
 	/**
 	 * The initial page of learner in Submission tool. This page will list all uploaded files and learn 
 	 * @param mapping
@@ -99,40 +100,41 @@ public class LearnerAction extends DispatchAction {
 	 * @param response
 	 * @return
 	 */
-    public ActionForward unspecified(
-            ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)
-    {
-    	//initial session Map
-    	SessionMap sessionMap = new SessionMap();
+	@Override
+	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		//initial session Map
+		SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-		((LearnerForm)form).setSessionMapID(sessionMap.getSessionID());
-		
-        //get parameters from Request
+		((LearnerForm) form).setSessionMapID(sessionMap.getSessionID());
+
+		//get parameters from Request
 		ToolAccessMode mode = null;
-		try{
-			mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,MODE_OPTIONAL);
-		}catch(Exception e){}
-		if(mode == null) mode = ToolAccessMode.LEARNER;
-        
-		Long sessionID =  new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
-		
+		try {
+			mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, LearnerAction.MODE_OPTIONAL);
+		}
+		catch (Exception e) {
+		}
+		if (mode == null) {
+			mode = ToolAccessMode.LEARNER;
+		}
+
+		Long sessionID = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
+
 		//get session from shared session.
 		HttpSession ss = SessionManager.getSession();
-		
+
 		Integer userID = null;
-		if ( mode != null && mode.isTeacher() ) {
+		if (mode != null && mode.isTeacher()) {
 			//monitoring mode - user is specified in URL
 			userID = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false);
-		} else {
+		}
+		else {
 			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 			userID = user.getUserID();
 		}
 
-		
 		ISubmitFilesService submitFilesService = getService();
 		SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 		SubmitFilesContent content = session.getContent();
@@ -140,43 +142,54 @@ public class LearnerAction extends DispatchAction {
 		//this must before getFileUploadByUser() method becuase getCurrentLearner() 
 		// will create session user if it does not exist.
 		SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
-		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID,request.getLocale());
-		
-//		check whehter finish lock is on/off
+		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale());
+
+		//		check whehter finish lock is on/off
 		boolean lock = content.isLockOnFinished() && learner.isFinished();
-		
+
 		sessionMap.put(AttributeNames.PARAM_MODE, mode);
 		sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
 		sessionMap.put(SbmtConstants.ATTR_FINISH_LOCK, lock);
 		sessionMap.put(SbmtConstants.ATTR_LOCK_ON_FINISH, content.isLockOnFinished());
-		sessionMap.put(SbmtConstants.ATTR_REFLECTION_ON,content.isReflectOnActivity());
-		sessionMap.put(SbmtConstants.ATTR_REFLECTION_INSTRUCTION,content.getReflectInstructions());
-		sessionMap.put(SbmtConstants.ATTR_TITLE,content.getTitle());
-		sessionMap.put(SbmtConstants.ATTR_INSTRUCTION,content.getInstruction());
-		sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD,content.isLimitUpload());
-		sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER,content.getLimitUploadNumber());
+		sessionMap.put(SbmtConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
+		sessionMap.put(SbmtConstants.ATTR_REFLECTION_INSTRUCTION, content.getReflectInstructions());
+		sessionMap.put(SbmtConstants.ATTR_TITLE, content.getTitle());
+		sessionMap.put(SbmtConstants.ATTR_INSTRUCTION, content.getInstruction());
+		sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD, content.isLimitUpload());
+		sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER, content.getLimitUploadNumber());
 		sessionMap.put(SbmtConstants.ATTR_USER_FINISHED, learner.isFinished());
-		
+
 		setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
-		
+
 		//if content in use, return special page.
-		if(content.isDefineLater()){
+		if (content.isDefineLater()) {
 			return mapping.findForward("defineLater");
 		}
-		
+
 		//set contentInUse flag to true!
 		content.setContentInUse(true);
 		content.setDefineLater(false);
 		submitFilesService.saveOrUpdateContent(content);
-		
-		//add run offline support
-		if(content.isRunOffline()){
-			return mapping.findForward("runOffline");		
-		}
-		
-		return mapping.findForward(SbmtConstants.SUCCESS);
-    }
 
+		//add run offline support
+		if (content.isRunOffline()) {
+			return mapping.findForward("runOffline");
+		}
+
+		if (content.isNotifyLearnersOnMarkRelease()) {
+			submitFilesService.getEventNotificationService().createEvent(SbmtConstants.TOOL_SIGNATURE,
+					SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(),
+					submitFilesService.getLocalisedMessage("event.mark.release.subject", null),
+					submitFilesService.getLocalisedMessage("event.mark.release.body", null));
+
+			submitFilesService.getEventNotificationService().subscribe(SbmtConstants.TOOL_SIGNATURE,
+					SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(),
+					learner.getUserID().longValue(), IEventNotificationService.DELIVERY_METHOD_MAIL,
+					IEventNotificationService.PERIODICITY_SINGLE);
+		}
+
+		return mapping.findForward(SbmtConstants.SUCCESS);
+	}
 
 	/**
 	 * Implements learner upload submission function. This function also display the page again for learner uploading
@@ -187,59 +200,54 @@ public class LearnerAction extends DispatchAction {
 	 * @param response
 	 * @return
 	 */
-	public ActionForward uploadFile(ActionMapping mapping,
-									ActionForm form,
-									HttpServletRequest request,
-									HttpServletResponse response){
-		
-		LearnerForm learnerForm= (LearnerForm)form;
+	public ActionForward uploadFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+
+		LearnerForm learnerForm = (LearnerForm) form;
 		String sessionMapID = learnerForm.getSessionMapID();
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-		
-		 //set the mode into http session 
-        Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-       	
-		if(validateUploadForm(learnerForm,request)){
+
+		//set the mode into http session 
+		Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+
+		if (validateUploadForm(learnerForm, request)) {
 			//get session from shared session.
 			HttpSession ss = SessionManager.getSession();
 			//get back login user DTO
 			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 			Integer userID = user.getUserID();
-			
+
 			ISubmitFilesService submitFilesService = getService();
-			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID,request.getLocale());
+			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale());
 
 			SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 			ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-			setLearnerDTO(request,sessionMap, learner, filesUploaded, mode);
-			
+			setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
+
 			return mapping.getInputForward();
 		}
-		
+
 		//get session from shared session.
 		HttpSession ss = SessionManager.getSession();
 		//get back login user DTO
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		Integer userID = user.getUserID();
-		
-		
-		FormFile uploadedFile=  learnerForm.getFile();
-		String fileDescription =  learnerForm.getDescription();
+
+		FormFile uploadedFile = learnerForm.getFile();
+		String fileDescription = learnerForm.getDescription();
 		//reset fields and display a new form for next new file upload
 		learnerForm.setDescription("");
-		
+
 		ISubmitFilesService submitFilesService = getService();
 
-		submitFilesService.uploadFileToSession(sessionID,uploadedFile,fileDescription,userID);
-		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID,request.getLocale());
+		submitFilesService.uploadFileToSession(sessionID, uploadedFile, fileDescription, userID);
+		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale());
 		SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 		ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-		setLearnerDTO(request,sessionMap, learner, filesUploaded, mode);
-		return mapping.getInputForward();			
+		setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
+		return mapping.getInputForward();
 	}
-
-
 
 	/**
 	 * Learner choose finish upload button, will invoke this function. This function will mark the <code>finished</code> 
@@ -251,20 +259,18 @@ public class LearnerAction extends DispatchAction {
 	 * @param response
 	 * @return
 	 */
-	public ActionForward finish(ActionMapping mapping,
-			ActionForm form,
-			HttpServletRequest request,
-			HttpServletResponse response){
-		
+	public ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+
 		String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 		request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-		
+
 		ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 		Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-		
-		if (mode == ToolAccessMode.LEARNER || mode.equals(ToolAccessMode.AUTHOR) ) {
-			ToolSessionManager sessionMgrService = SubmitFilesServiceProxy.getToolSessionManager(getServlet().getServletContext());
+
+		if (mode == ToolAccessMode.LEARNER || mode.equals(ToolAccessMode.AUTHOR)) {
+			ToolSessionManager sessionMgrService = SubmitFilesServiceProxy
+					.getToolSessionManager(getServlet().getServletContext());
 			ISubmitFilesService submitFilesService = getService();
 
 			//get back login user DTO
@@ -278,54 +284,60 @@ public class LearnerAction extends DispatchAction {
 			try {
 				nextActivityUrl = sessionMgrService.leaveToolSession(sessionID, new Long(userID.intValue()));
 				response.sendRedirect(nextActivityUrl);
-			} catch (DataMissingException e) {
+			}
+			catch (DataMissingException e) {
 				throw new SubmitFilesException(e);
-			} catch (ToolException e) {
+			}
+			catch (ToolException e) {
 				throw new SubmitFilesException(e);
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new SubmitFilesException(e);
 			}
 		}
 		return null;
-		
+
 	}
-	
+
 	//**********************************************************************************************
 	//		Private mehtods
 	//**********************************************************************************************
 	private ISubmitFilesService getService() {
-		ISubmitFilesService submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
+		ISubmitFilesService submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet()
+				.getServletContext());
 		return submitFilesService;
 	}
-	
+
 	//validate uploaded form
 	private boolean validateUploadForm(LearnerForm learnerForm, HttpServletRequest request) {
 		ActionMessages errors = new ActionMessages();
 		Locale preferredLocale = (Locale) request.getSession().getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
-		if(learnerForm.getFile() == null || StringUtils.isBlank(learnerForm.getFile().getFileName())){
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.required",
-					this.getResources(request).getMessage(preferredLocale,"learner.form.filepath.displayname")));
+		if (learnerForm.getFile() == null || StringUtils.isBlank(learnerForm.getFile().getFileName())) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required", this.getResources(request).getMessage(
+					preferredLocale, "learner.form.filepath.displayname")));
 		}
-		if(StringUtils.isBlank(learnerForm.getDescription())){
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.required",
-					this.getResources(request).getMessage(preferredLocale,"label.learner.fileDescription")));
-		} else if ( learnerForm.getDescription().length() > LearnerForm.DESCRIPTION_LENGTH ) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.maxdescsize", LearnerForm.DESCRIPTION_LENGTH));
+		if (StringUtils.isBlank(learnerForm.getDescription())) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required", this.getResources(request).getMessage(
+					preferredLocale, "label.learner.fileDescription")));
 		}
-		
-		FileValidatorUtil.validateFileSize(learnerForm.getFile(),false,errors);
-		
-		if(learnerForm.getFile() != null)
-			log.debug("Learner submit file : " + learnerForm.getFile().getFileName());
-		
-    	if(learnerForm.getFile()!= null && FileUtil.isExecutableFile(learnerForm.getFile().getFileName())){
-    		log.debug("File is executatable : " + learnerForm.getFile().getFileName());
-        	ActionMessage msg = new ActionMessage("error.attachment.executable");
-        	errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
-    	}
-    	
-		if(!errors.isEmpty()){
-			this.addErrors(request,errors);
+		else if (learnerForm.getDescription().length() > LearnerForm.DESCRIPTION_LENGTH) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.maxdescsize", LearnerForm.DESCRIPTION_LENGTH));
+		}
+
+		FileValidatorUtil.validateFileSize(learnerForm.getFile(), false, errors);
+
+		if (learnerForm.getFile() != null) {
+			DispatchAction.log.debug("Learner submit file : " + learnerForm.getFile().getFileName());
+		}
+
+		if (learnerForm.getFile() != null && FileUtil.isExecutableFile(learnerForm.getFile().getFileName())) {
+			DispatchAction.log.debug("File is executatable : " + learnerForm.getFile().getFileName());
+			ActionMessage msg = new ActionMessage("error.attachment.executable");
+			errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
+		}
+
+		if (!errors.isEmpty()) {
+			this.addErrors(request, errors);
 			return true;
 		}
 		return false;
@@ -342,51 +354,53 @@ public class LearnerAction extends DispatchAction {
 	 * @param content
 	 * @param filesUploaded 
 	 */
-	private void setLearnerDTO(HttpServletRequest request, SessionMap sessionMap, SubmitUser currUser, List filesUploaded, ToolAccessMode mode) {
-		
+	private void setLearnerDTO(HttpServletRequest request, SessionMap sessionMap, SubmitUser currUser, List filesUploaded,
+			ToolAccessMode mode) {
+
 		SubmitUserDTO dto = new SubmitUserDTO(currUser);
-		if(currUser != null){
+		if (currUser != null) {
 			//if Monitoring does not release marks, then skip this mark and comment content.
-			if(filesUploaded != null){
+			if (filesUploaded != null) {
 				Iterator iter = filesUploaded.iterator();
-				while(iter.hasNext()){
+				while (iter.hasNext()) {
 					FileDetailsDTO filedto = (FileDetailsDTO) iter.next();
-					if(mode.isTeacher() ||  currUser.getUid().equals(filedto.getOwner().getUserUid()))
+					if (mode.isTeacher() || currUser.getUid().equals(filedto.getOwner().getUserUid())) {
 						filedto.setCurrentLearner(true);
-					else
+					}
+					else {
 						filedto.setCurrentLearner(false);
-					if(filedto .getDateMarksReleased() == null){
-						filedto .setComments(null);
-						filedto .setMarks(null);
+					}
+					if (filedto.getDateMarksReleased() == null) {
+						filedto.setComments(null);
+						filedto.setMarks(null);
 					}
 				}
 			}
 			dto.setFilesUploaded(filesUploaded);
 		}
-		
+
 		//preset
 		boolean limitUpload = (Boolean) sessionMap.get(SbmtConstants.ATTR_LIMIT_UPLOAD);
-		if(limitUpload &&  filesUploaded != null){
-			int limit = (Integer)sessionMap.get(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER);
-			if(limit == filesUploaded.size()){
+		if (limitUpload && filesUploaded != null) {
+			int limit = (Integer) sessionMap.get(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER);
+			if (limit == filesUploaded.size()) {
 				sessionMap.put(SbmtConstants.ATTR_ARRIVE_LIMIT, true);
 			}
-			int limitUploadLeft = limit -  filesUploaded.size();
+			int limitUploadLeft = limit - filesUploaded.size();
 			dto.setLimitUploadLeft(limitUploadLeft);
 		}
-		
+
 		// retreive notebook reflection entry.
 		ISubmitFilesService submitFilesService = getService();
-		
-		NotebookEntry notebookEntry = submitFilesService.getEntry((Long)sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID), 
-				CoreNotebookConstants.NOTEBOOK_TOOL, 
-				SbmtConstants.TOOL_SIGNATURE, currUser.getUserID());
-		
-		if ( notebookEntry != null) {
+
+		NotebookEntry notebookEntry = submitFilesService.getEntry((Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID),
+				CoreNotebookConstants.NOTEBOOK_TOOL, SbmtConstants.TOOL_SIGNATURE, currUser.getUserID());
+
+		if (notebookEntry != null) {
 			dto.setReflect(notebookEntry.getEntry());
 		}
-		
-		request.setAttribute("learner",dto);
+
+		request.setAttribute("learner", dto);
 	}
 
 	private SubmitUser getCurrentLearner(Long sessionID, ISubmitFilesService submitFilesService) {
@@ -396,11 +410,11 @@ public class LearnerAction extends DispatchAction {
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		Integer userID = user.getUserID();
 
-		SubmitUser learner = submitFilesService.getSessionUser(sessionID,userID);
-		if(learner == null){
+		SubmitUser learner = submitFilesService.getSessionUser(sessionID, userID);
+		if (learner == null) {
 			learner = submitFilesService.createSessionUser(user, sessionID);
 		}
-			
+
 		return learner;
 	}
 

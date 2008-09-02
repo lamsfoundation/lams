@@ -21,10 +21,8 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.forum.service;
-
-import static org.lamsfoundation.lams.tool.forum.util.ForumConstants.OLD_FORUM_STYLE;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -55,6 +53,7 @@ import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -107,211 +106,230 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * 
  * @version $Revision$
  */
-public class ForumService implements IForumService,ToolContentManager,ToolSessionManager,ToolContentImport102Manager {
+public class ForumService implements IForumService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
 	private static final Logger log = Logger.getLogger(ForumService.class);
+
 	//DAO variables
 	private ForumDao forumDao;
+
 	private AttachmentDao attachmentDao;
+
 	private MessageDao messageDao;
+
 	private MessageSeqDao messageSeqDao;
+
 	private ForumUserDao forumUserDao;
+
 	private ForumToolSessionDao forumToolSessionDao;
+
 	private ForumReportDAO forumReportDAO;
+
 	//system level handler and service 
 	private ILamsToolService toolService;
+
 	private ForumToolContentHandler forumToolContentHandler;
+
 	private IRepositoryService repositoryService;
+
 	private ILearnerService learnerService;
+
 	private IAuditService auditService;
-    private MessageService messageService;
-    private IExportToolContentService exportContentService;
-    private IUserManagementService userManagementService;
+
+	private MessageService messageService;
+
+	private IExportToolContentService exportContentService;
+
+	private IUserManagementService userManagementService;
+
 	private ICoreNotebookService coreNotebookService;
+
 	private ForumOutputFactory forumOutputFactory;
-	
+
+	private IEventNotificationService eventNotificationService;
+
 	//---------------------------------------------------------------------
-    // Inversion of Control Methods - Method injection
-    //---------------------------------------------------------------------
+	// Inversion of Control Methods - Method injection
+	//---------------------------------------------------------------------
 	public void setAuditService(IAuditService auditService) {
 		this.auditService = auditService;
 	}
 
-	public IAuditService getAuditService( ) {
+	public IAuditService getAuditService() {
 		return auditService;
 	}
 
 	public void setMessageService(MessageService messageService) {
 		this.messageService = messageService;
 	}
-	
+
 	public ForumOutputFactory getForumOutputFactory() {
 		return forumOutputFactory;
 	}
 
-	public void setForumOutputFactory(
-			ForumOutputFactory forumOutputFactory) {
+	public void setForumOutputFactory(ForumOutputFactory forumOutputFactory) {
 		this.forumOutputFactory = forumOutputFactory;
 	}
 
 	public Forum updateForum(Forum forum) throws PersistenceException {
-        forumDao.saveOrUpdate(forum);
-        return forum;
-    }
-
-    public Forum getForum(Long forumUid) throws PersistenceException {
-        return (Forum) forumDao.getById(forumUid);
-    }
-
-	public Forum getForumByContentId(Long contentID)  throws PersistenceException {    	
-		return (Forum) forumDao.getByContentId(contentID);
+		forumDao.saveOrUpdate(forum);
+		return forum;
 	}
 
-    public void deleteForumAttachment(Long attachmentId) throws PersistenceException {
-        Attachment attachment = (Attachment) attachmentDao.getById(attachmentId);
-        attachmentDao.delete(attachment);
-    }
+	public Forum getForum(Long forumUid) throws PersistenceException {
+		return forumDao.getById(forumUid);
+	}
 
-    public Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException {
-    	return createRootTopic(forumId, getSessionBySessionId(sessionId), message);
-    }
+	public Forum getForumByContentId(Long contentID) throws PersistenceException {
+		return forumDao.getByContentId(contentID);
+	}
 
-    public Message createRootTopic(Long forumId, ForumToolSession session, Message message) throws PersistenceException {
-    	//get Forum and ForumToolSesion
-    	if(message.getForum() == null){
-    		Forum forum = forumDao.getById(forumId);
-    		message.setForum(forum);
-    	}
-    	//if topic created by author, session will be null.
-    	if(session != null){
-    		message.setToolSession(session);
-    	}
-    	
-    	if(message.getUid() == null){
-	    	//update message sequence
-	    	MessageSeq msgSeq = new MessageSeq();
-	    	msgSeq.setMessage(message);
-	    	msgSeq.setMessageLevel((short) 0);
-	    	//set itself as root
-	    	msgSeq.setRootMessage(message);
-	    	messageSeqDao.save(msgSeq);
-    	}
-        
-        // if this message had any cloned objects, they also need to be changed.
-        // this will only happen if an authored topic is changed via monitoring
-        if ( message.getSessionClones().size() > 0 ) {
-        	Iterator iter = message.getSessionClones().iterator();
-        	while ( iter.hasNext() ) {
-        		Message clone = (Message) iter.next();
-        		message.updateClone(clone);
-        	}
-        }
+	public void deleteForumAttachment(Long attachmentId) throws PersistenceException {
+		Attachment attachment = attachmentDao.getById(attachmentId);
+		attachmentDao.delete(attachment);
+	}
 
-    	//create message in database
-        messageDao.saveOrUpdate(message);
+	public Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException {
+		return createRootTopic(forumId, getSessionBySessionId(sessionId), message);
+	}
 
-        return message;
-    }
+	public Message createRootTopic(Long forumId, ForumToolSession session, Message message) throws PersistenceException {
+		//get Forum and ForumToolSesion
+		if (message.getForum() == null) {
+			Forum forum = forumDao.getById(forumId);
+			message.setForum(forum);
+		}
+		//if topic created by author, session will be null.
+		if (session != null) {
+			message.setToolSession(session);
+		}
 
-     public Message updateTopic(Message message) throws PersistenceException {
-    	 
-    	 //update message
-    	messageDao.saveOrUpdate(message);
-    	
-    	//udate root message's lastReply date if this message
-    	//if this message is root message, then actually, it will update itself lastReplayDate
-    	MessageSeq msgSeq = messageSeqDao.getByTopicId(message.getUid());
-    	Message root = msgSeq.getRootMessage();
-    	//update reply date
-        messageDao.saveOrUpdate(root);
-        
-        return message;
-    }
+		if (message.getUid() == null) {
+			//update message sequence
+			MessageSeq msgSeq = new MessageSeq();
+			msgSeq.setMessage(message);
+			msgSeq.setMessageLevel((short) 0);
+			//set itself as root
+			msgSeq.setRootMessage(message);
+			messageSeqDao.save(msgSeq);
+		}
 
- 	public void updateReport(ForumReport report) {
- 		forumReportDAO.saveObject(report);
- 	}
-    public Message updateMessageHideFlag(Long messageId, boolean hideFlag) {
-    	
-    	Message message = getMessage(messageId);
-    	if ( message !=null ) {
-    		Long userId = 0L;
-    		String loginName = "Default";
-    		if(message.getCreatedBy() == null){
-    			userId = message.getCreatedBy().getUserId();
-    			loginName = message.getCreatedBy().getLoginName();
-    		}
-			if ( hideFlag ) {
-				auditService.logHideEntry(ForumConstants.TOOL_SIGNATURE, userId, 
-						loginName, message.toString());
-			} else {
-				auditService.logShowEntry(ForumConstants.TOOL_SIGNATURE,userId, 
-						loginName, message.toString());
+		// if this message had any cloned objects, they also need to be changed.
+		// this will only happen if an authored topic is changed via monitoring
+		if (message.getSessionClones().size() > 0) {
+			Iterator iter = message.getSessionClones().iterator();
+			while (iter.hasNext()) {
+				Message clone = (Message) iter.next();
+				message.updateClone(clone);
+			}
+		}
+
+		//create message in database
+		messageDao.saveOrUpdate(message);
+
+		return message;
+	}
+
+	public Message updateTopic(Message message) throws PersistenceException {
+
+		//update message
+		messageDao.saveOrUpdate(message);
+
+		//udate root message's lastReply date if this message
+		//if this message is root message, then actually, it will update itself lastReplayDate
+		MessageSeq msgSeq = messageSeqDao.getByTopicId(message.getUid());
+		Message root = msgSeq.getRootMessage();
+		//update reply date
+		messageDao.saveOrUpdate(root);
+
+		return message;
+	}
+
+	public void updateReport(ForumReport report) {
+		forumReportDAO.saveObject(report);
+	}
+
+	public Message updateMessageHideFlag(Long messageId, boolean hideFlag) {
+
+		Message message = getMessage(messageId);
+		if (message != null) {
+			Long userId = 0L;
+			String loginName = "Default";
+			if (message.getCreatedBy() == null) {
+				userId = message.getCreatedBy().getUserId();
+				loginName = message.getCreatedBy().getLoginName();
+			}
+			if (hideFlag) {
+				auditService.logHideEntry(ForumConstants.TOOL_SIGNATURE, userId, loginName, message.toString());
+			}
+			else {
+				auditService.logShowEntry(ForumConstants.TOOL_SIGNATURE, userId, loginName, message.toString());
 			}
 
-	    	message.setHideFlag(hideFlag);
-	    	
-	    	// update message
-	    	messageDao.update(message);
-    	}
-    	return message;
-     }
+			message.setHideFlag(hideFlag);
 
-    public Message getMessage(Long messageUid) throws PersistenceException {
-        return (Message) messageDao.getById(messageUid);
-    }
+			// update message
+			messageDao.update(message);
+		}
+		return message;
+	}
 
-    public void deleteTopic(Long topicUid) throws PersistenceException {
-    	List children = messageDao.getChildrenTopics(topicUid);
-    	//cascade delete children topic by recursive
-    	if(children != null){
-    		Iterator iter = children.iterator();
-    		while(iter.hasNext()){
-    			Message msg = (Message) iter.next();
-    			this.deleteTopic(msg.getUid());
-    		}
-    	}
-    	messageSeqDao.deleteByTopicId(topicUid);
-        messageDao.delete(topicUid);
-     }
+	public Message getMessage(Long messageUid) throws PersistenceException {
+		return messageDao.getById(messageUid);
+	}
 
-    public Message replyTopic(Long parentId,Long sessionId, Message replyMessage) throws PersistenceException {
-    	//set parent
-        Message parent = this.getMessage(parentId);
-        replyMessage.setParent(parent);
-        replyMessage.setForum(parent.getForum());
-        //parent sessionID maybe empty if created by author role. So given sessionId is exactly value.
-        ForumToolSession session = getSessionBySessionId(sessionId);
-        replyMessage.setToolSession(session);
-        messageDao.saveOrUpdate(replyMessage);
-        
-        //get root topic and create record in MessageSeq table
-        MessageSeq parentSeq = messageSeqDao.getByTopicId(parent.getUid());
-        if(parentSeq == null){
-        	log.error("Message Sequence table is broken becuase topic " + parent +" can not get Sequence Record");
-        }
-        Message root = parentSeq.getRootMessage();
-        MessageSeq msgSeq = new MessageSeq();
-        msgSeq.setMessage(replyMessage);
-        msgSeq.setMessageLevel((short) (parentSeq.getMessageLevel() + 1));
-        msgSeq.setRootMessage(root);
-        messageSeqDao.save(msgSeq);
-        
-        //update last reply date for root message
-        root.setLastReplyDate(new Date());
-        //update reply message number for root 
-        root.setReplyNumber(root.getReplyNumber()+1);
-        messageDao.saveOrUpdate(root);
-        
-        return replyMessage;
-    }
+	public void deleteTopic(Long topicUid) throws PersistenceException {
+		List children = messageDao.getChildrenTopics(topicUid);
+		//cascade delete children topic by recursive
+		if (children != null) {
+			Iterator iter = children.iterator();
+			while (iter.hasNext()) {
+				Message msg = (Message) iter.next();
+				this.deleteTopic(msg.getUid());
+			}
+		}
+		messageSeqDao.deleteByTopicId(topicUid);
+		messageDao.delete(topicUid);
+	}
 
-	public Attachment uploadInstructionFile(FormFile uploadFile, String fileType) throws PersistenceException{
-		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
+	public Message replyTopic(Long parentId, Long sessionId, Message replyMessage) throws PersistenceException {
+		//set parent
+		Message parent = this.getMessage(parentId);
+		replyMessage.setParent(parent);
+		replyMessage.setForum(parent.getForum());
+		//parent sessionID maybe empty if created by author role. So given sessionId is exactly value.
+		ForumToolSession session = getSessionBySessionId(sessionId);
+		replyMessage.setToolSession(session);
+		messageDao.saveOrUpdate(replyMessage);
+
+		//get root topic and create record in MessageSeq table
+		MessageSeq parentSeq = messageSeqDao.getByTopicId(parent.getUid());
+		if (parentSeq == null) {
+			ForumService.log.error("Message Sequence table is broken becuase topic " + parent + " can not get Sequence Record");
+		}
+		Message root = parentSeq.getRootMessage();
+		MessageSeq msgSeq = new MessageSeq();
+		msgSeq.setMessage(replyMessage);
+		msgSeq.setMessageLevel((short) (parentSeq.getMessageLevel() + 1));
+		msgSeq.setRootMessage(root);
+		messageSeqDao.save(msgSeq);
+
+		//update last reply date for root message
+		root.setLastReplyDate(new Date());
+		//update reply message number for root 
+		root.setReplyNumber(root.getReplyNumber() + 1);
+		messageDao.saveOrUpdate(root);
+
+		return replyMessage;
+	}
+
+	public Attachment uploadInstructionFile(FormFile uploadFile, String fileType) throws PersistenceException {
+		if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
 			throw new ForumException("Could not find upload file: " + uploadFile);
-		
+		}
+
 		//upload file to repository
-		NodeKey nodeKey = processFile(uploadFile,fileType);
-		
+		NodeKey nodeKey = processFile(uploadFile, fileType);
+
 		//create new attachement
 		Attachment file = new Attachment();
 		file.setFileType(fileType);
@@ -319,11 +337,11 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		file.setFileVersionId(nodeKey.getVersion());
 		file.setFileName(uploadFile.getFileName());
 		file.setCreated(new Date());
-		
+
 		return file;
 
 	}
- 
+
 	/**
 	 * This method deletes the content with the given <code>uuid</code> and
 	 * <code>versionID</code> from the content repository
@@ -334,96 +352,97 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	 *            The <code>version_id</code> of the node to be deleted.
 	 * @throws SubmitFilesException
 	 */
-	public void deleteFromRepository(Long uuid, Long versionID)
-			throws ForumException {
+	public void deleteFromRepository(Long uuid, Long versionID) throws ForumException {
 		ITicket ticket = getRepositoryLoginTicket();
 		try {
-			repositoryService.deleteVersion(ticket, uuid,versionID);
-		} catch (Exception e) {
-			throw new ForumException(
-					"Exception occured while deleting files from"
-							+ " the repository " + e.getMessage());
+			repositoryService.deleteVersion(ticket, uuid, versionID);
+		}
+		catch (Exception e) {
+			throw new ForumException("Exception occured while deleting files from" + " the repository " + e.getMessage());
 		}
 	}
 
-
 	public Attachment uploadAttachment(FormFile uploadFile) throws PersistenceException {
-		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
+		if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
 			throw new ForumException("Could not find upload file: " + uploadFile);
-		
-		NodeKey nodeKey = processFile(uploadFile,IToolContentHandler.TYPE_ONLINE);
+		}
+
+		NodeKey nodeKey = processFile(uploadFile, IToolContentHandler.TYPE_ONLINE);
 		Attachment file = new Attachment();
 		file.setFileType(IToolContentHandler.TYPE_ONLINE);
 		file.setFileUuid(nodeKey.getUuid());
 		file.setFileVersionId(nodeKey.getVersion());
 		file.setFileName(uploadFile.getFileName());
-		
+
 		return file;
 	}
-	public List getTopicThread(Long rootTopicId){
-		
-		List unsortedThread =  messageSeqDao.getTopicThread(rootTopicId);
+
+	public List getTopicThread(Long rootTopicId) {
+
+		List unsortedThread = messageSeqDao.getTopicThread(rootTopicId);
 		Iterator iter = unsortedThread.iterator();
 		MessageSeq msgSeq;
-		SortedMap<MessageSeq,Message> map = new TreeMap<MessageSeq,Message>(new TopicComparator());
-		while(iter.hasNext()){
+		SortedMap<MessageSeq, Message> map = new TreeMap<MessageSeq, Message>(new TopicComparator());
+		while (iter.hasNext()) {
 			msgSeq = (MessageSeq) iter.next();
-			map.put(msgSeq,msgSeq.getMessage());
+			map.put(msgSeq, msgSeq.getMessage());
 		}
-		return 	getSortedMessageDTO(map);
+		return getSortedMessageDTO(map);
 	}
 
-
-	public List getRootTopics(Long sessionId){
-		List topicsBySession =  messageDao.getRootTopics(sessionId);
+	public List getRootTopics(Long sessionId) {
+		List topicsBySession = messageDao.getRootTopics(sessionId);
 		ForumToolSession session = getSessionBySessionId(sessionId);
-		if(session == null || session.getForum() == null){
-			log.error("Failed on getting session by given sessionID:" + sessionId);
+		if (session == null || session.getForum() == null) {
+			ForumService.log.error("Failed on getting session by given sessionID:" + sessionId);
 			throw new ForumException("Failed on getting session by given sessionID:" + sessionId);
 		}
-		
+
 		//sorted by last post date
 		Message msg;
-		SortedMap<Date,Message> map = new TreeMap<Date,Message>(new DateComparator());
+		SortedMap<Date, Message> map = new TreeMap<Date, Message>(new DateComparator());
 		Iterator iter = topicsBySession.iterator();
-		while(iter.hasNext()){
+		while (iter.hasNext()) {
 			msg = (Message) iter.next();
-			if(OLD_FORUM_STYLE)
-				map.put(msg.getCreated(),msg);
-			else
-				map.put(msg.getLastReplyDate(),msg);
+			if (ForumConstants.OLD_FORUM_STYLE) {
+				map.put(msg.getCreated(), msg);
+			}
+			else {
+				map.put(msg.getLastReplyDate(), msg);
+			}
 		}
-		return 	MessageDTO.getMessageDTO(new ArrayList<Message>(map.values()));
-		
+		return MessageDTO.getMessageDTO(new ArrayList<Message>(map.values()));
+
 	}
 
 	public int getTopicsNum(Long userID, Long sessionId) {
-		return messageDao.getTopicsNum(userID,sessionId);
+		return messageDao.getTopicsNum(userID, sessionId);
 	}
-	
+
 	public int getNumOfPostsByTopic(Long userId, Long topicId) {
 		return messageSeqDao.getNumOfPostsByTopic(userId, topicId);
 	}
 
 	public ForumUser getUserByID(Long userId) {
-		return  forumUserDao.getByUserId(userId);
+		return forumUserDao.getByUserId(userId);
 	}
 
-	public ForumUser getUserByUserAndSession(Long userId,Long sessionId) {
-		return  forumUserDao.getByUserIdAndSessionId(userId,sessionId);
+	public ForumUser getUserByUserAndSession(Long userId, Long sessionId) {
+		return forumUserDao.getByUserIdAndSessionId(userId, sessionId);
 	}
 
 	public void createUser(ForumUser forumUser) {
 		forumUserDao.save(forumUser);
 	}
+
 	public ForumToolSession getSessionBySessionId(Long sessionId) {
 		return forumToolSessionDao.getBySessionId(sessionId);
 	}
 
 	public Long getRootTopicId(Long topicId) {
 		MessageSeq seq = messageSeqDao.getByTopicId(topicId);
-		if(seq == null ||seq.getRootMessage() == null){
-			log.error("A sequence information can not be found for topic ID:" + topicId);
+		if (seq == null || seq.getRootMessage() == null) {
+			ForumService.log.error("A sequence information can not be found for topic ID:" + topicId);
 			return null;
 		}
 		return seq.getRootMessage().getUid();
@@ -431,31 +450,29 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 	public List getAuthoredTopics(Long forumUid) {
 		List list = messageDao.getTopicsFromAuthor(forumUid);
-		
-		TreeMap<Date,Message> map = new TreeMap<Date,Message>(new DateComparator());
+
+		TreeMap<Date, Message> map = new TreeMap<Date, Message>(new DateComparator());
 		// get all the topics skipping ones with a tool session (we may be editing in monitor) and sort by create date
 		Iterator iter = list.iterator();
-		while(iter.hasNext()){
+		while (iter.hasNext()) {
 			Message topic = (Message) iter.next();
-			if ( topic.getToolSession() == null ) 
-				map.put(topic.getCreated(),topic);
+			if (topic.getToolSession() == null) {
+				map.put(topic.getCreated(), topic);
+			}
 		}
 		return MessageDTO.getMessageDTO(new ArrayList<Message>(map.values()));
 	}
 
-
-    public Long getToolDefaultContentIdBySignature(String toolSignature)
-    {
-        Long contentId = null;
-    	contentId=new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));    
-    	if (contentId == null)
-    	{
-    	    String error="Could not retrieve default content id for this tool";
-    	    log.error(error);
-    	    throw new ForumException(error);
-    	}
-	    return contentId;
-    }
+	public Long getToolDefaultContentIdBySignature(String toolSignature) {
+		Long contentId = null;
+		contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+		if (contentId == null) {
+			String error = "Could not retrieve default content id for this tool";
+			ForumService.log.error(error);
+			throw new ForumException(error);
+		}
+		return contentId;
+	}
 
 	public List getSessionsByContentId(Long contentID) {
 		return forumToolSessionDao.getByContentId(contentID);
@@ -464,10 +481,10 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public List getUsersBySessionId(Long sessionID) {
 		return forumUserDao.getBySessionId(sessionID);
 	}
-    
-	public List getMessagesByUserUid(Long userId,Long sessionId) {
-		List list = messageDao.getByUserAndSession(userId,sessionId);
-		
+
+	public List getMessagesByUserUid(Long userId, Long sessionId) {
+		List list = messageDao.getByUserAndSession(userId, sessionId);
+
 		return MessageDTO.getMessageDTO(list);
 	}
 
@@ -479,38 +496,71 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		//udate release mark date for each message.
 		List list = messageDao.getBySession(sessionID);
 		Iterator iter = list.iterator();
-		while(iter.hasNext()){
+		ForumToolSession session = forumToolSessionDao.getBySessionId(sessionID);
+		Forum forum = session.getForum();
+		boolean notifyLearnersOnMarkRelease = getEventNotificationService().eventExists(ForumConstants.TOOL_SIGNATURE,
+				ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId());
+		Map<Long, StringBuilder> notificationMessages = null;
+		Object[] notificationMessageParameters = null;
+		if (notifyLearnersOnMarkRelease) {
+			notificationMessages = new TreeMap<Long, StringBuilder>();
+			notificationMessageParameters = new Object[3];
+		}
+
+		while (iter.hasNext()) {
 			Message msg = (Message) iter.next();
 			ForumReport report = msg.getReport();
-			if(report != null)
+			if (report != null) {
 				report.setDateMarksReleased(new Date());
+				if (notifyLearnersOnMarkRelease) {
+					ForumUser user = msg.getCreatedBy();
+					StringBuilder notificationMessage = notificationMessages.get(user.getUserId());
+					if (notificationMessage == null) {
+						notificationMessage = new StringBuilder();
+					}
+					notificationMessageParameters[0] = msg.getSubject();
+					notificationMessageParameters[1] = msg.getUpdated();
+					notificationMessageParameters[2] = report.getMark();
+					notificationMessage.append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
+					notificationMessages.put(user.getUserId(), notificationMessage);
+				}
+			}
 			messageDao.saveOrUpdate(msg);
 		}
+		if (notifyLearnersOnMarkRelease) {
+			notificationMessageParameters = new Object[1];
+			for (Long userID : notificationMessages.keySet()) {
+				notificationMessageParameters[0] = notificationMessages.get(userID).toString();
+				getEventNotificationService().triggerForSingleUser(ForumConstants.TOOL_SIGNATURE,
+						ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(), userID,
+						notificationMessageParameters);
+			}
+		}
+
 		//update session to set MarkRelease flag.
-		ForumToolSession session = forumToolSessionDao.getBySessionId(sessionID);
 		session.setMarkReleased(true);
 		forumToolSessionDao.saveOrUpdate(session);
-		
+
 	}
 
 	public void finishUserSession(ForumUser currentUser) {
 		currentUser.setSessionFinished(true);
 		forumUserDao.save(currentUser);
 	}
-	
-    //***************************************************************************************************************
-    // Private methods
-    //***************************************************************************************************************
+
+	//***************************************************************************************************************
+	// Private methods
+	//***************************************************************************************************************
 	/**
 	 * @param map
 	 * @return
 	 */
-	private List getSortedMessageDTO(SortedMap<MessageSeq,Message> map) {
+	private List getSortedMessageDTO(SortedMap<MessageSeq, Message> map) {
 		Iterator iter;
 		MessageSeq msgSeq;
 		List<MessageDTO> msgDtoList = new ArrayList<MessageDTO>();
-		iter =map.entrySet().iterator();
-		while(iter.hasNext()){
+		iter = map.entrySet().iterator();
+		while (iter.hasNext()) {
 			Map.Entry entry = (Entry) iter.next();
 			msgSeq = (MessageSeq) entry.getKey();
 			MessageDTO dto = MessageDTO.getMessageDTO((Message) entry.getValue());
@@ -519,34 +569,39 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		}
 		return msgDtoList;
 	}
-	   /**
-     * Process an uploaded file.
-     * 
-     * @param forumForm
-     * @throws FileNotFoundException
-     * @throws IOException
-     * @throws RepositoryCheckedException
-     * @throws InvalidParameterException
-     */
-    private NodeKey processFile(FormFile file, String fileType){
-    	NodeKey node = null;
-        if (file!= null && !StringUtils.isEmpty(file.getFileName())) {
-            String fileName = file.getFileName();
-            try {
-				node = getForumToolContentHandler().uploadFile(file.getInputStream(), fileName, 
-				        file.getContentType(), fileType);
-			} catch (InvalidParameterException e) {
-				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			} catch (FileNotFoundException e) {
-				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			} catch (RepositoryCheckedException e) {
-				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			} catch (IOException e) {
+
+	/**
+	* Process an uploaded file.
+	* 
+	* @param forumForm
+	* @throws FileNotFoundException
+	* @throws IOException
+	* @throws RepositoryCheckedException
+	* @throws InvalidParameterException
+	*/
+	private NodeKey processFile(FormFile file, String fileType) {
+		NodeKey node = null;
+		if (file != null && !StringUtils.isEmpty(file.getFileName())) {
+			String fileName = file.getFileName();
+			try {
+				node = getForumToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType(), fileType);
+			}
+			catch (InvalidParameterException e) {
 				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
 			}
-          }
-        return node;
-    }
+			catch (FileNotFoundException e) {
+				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			}
+			catch (RepositoryCheckedException e) {
+				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			}
+			catch (IOException e) {
+				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			}
+		}
+		return node;
+	}
+
 	/**
 	 * This method verifies the credentials of the SubmitFiles Tool and gives it
 	 * the <code>Ticket</code> to login and access the Content Repository.
@@ -559,90 +614,94 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	 * @throws SubmitFilesException
 	 */
 	private ITicket getRepositoryLoginTicket() throws ForumException {
-		ICredentials credentials = new SimpleCredentials(
-				forumToolContentHandler.getRepositoryUser(),
-				forumToolContentHandler.getRepositoryId());
+		ICredentials credentials = new SimpleCredentials(forumToolContentHandler.getRepositoryUser(), forumToolContentHandler
+				.getRepositoryId());
 		try {
-			ITicket ticket = repositoryService.login(credentials,
-					forumToolContentHandler.getRepositoryWorkspaceName());
+			ITicket ticket = repositoryService.login(credentials, forumToolContentHandler.getRepositoryWorkspaceName());
 			return ticket;
-		} catch (AccessDeniedException ae) {
-			throw new ForumException("Access Denied to repository."
-					+ ae.getMessage());
-		} catch (WorkspaceNotFoundException we) {
-			throw new ForumException("Workspace not found."
-					+ we.getMessage());
-		} catch (LoginException e) {
+		}
+		catch (AccessDeniedException ae) {
+			throw new ForumException("Access Denied to repository." + ae.getMessage());
+		}
+		catch (WorkspaceNotFoundException we) {
+			throw new ForumException("Workspace not found." + we.getMessage());
+		}
+		catch (LoginException e) {
 			throw new ForumException("Login failed." + e.getMessage());
 		}
 	}
-    private Forum getDefaultForum(){
-    	Long defaultForumId = getToolDefaultContentIdBySignature(ForumConstants.TOOL_SIGNATURE);
-    	Forum defaultForum = getForumByContentId(defaultForumId);
-    	if(defaultForum == null)
-    	{
-    	    String error="Could not retrieve default content record for this tool";
-    	    log.error(error);
-    	    throw new ForumException(error);
-    	}
-    	
-    	return defaultForum;
 
-    }
+	private Forum getDefaultForum() {
+		Long defaultForumId = getToolDefaultContentIdBySignature(ForumConstants.TOOL_SIGNATURE);
+		Forum defaultForum = getForumByContentId(defaultForumId);
+		if (defaultForum == null) {
+			String error = "Could not retrieve default content record for this tool";
+			ForumService.log.error(error);
+			throw new ForumException(error);
+		}
 
-	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText) {
+		return defaultForum;
+
+	}
+
+	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+			String entryText) {
 		return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "", entryText);
 	}
-	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID){
+
+	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 		List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
 		if (list == null || list.isEmpty()) {
 			return null;
-		} else {
+		}
+		else {
 			return list.get(0);
 		}
 	}
-	
+
 	/**
 	 * @param notebookEntry
 	 */
 	public void updateEntry(NotebookEntry notebookEntry) {
 		coreNotebookService.updateEntry(notebookEntry);
 	}
-    //***************************************************************************************************************
-    // ToolContentManager and ToolSessionManager methods
-    //***************************************************************************************************************
+
+	//***************************************************************************************************************
+	// ToolContentManager and ToolSessionManager methods
+	//***************************************************************************************************************
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
-		if (toContentId == null)
-			throw new ToolException(
-					"Failed to create the ForumFiles tool seession");
+		if (toContentId == null) {
+			throw new ToolException("Failed to create the ForumFiles tool seession");
+		}
 
 		Forum fromContent = null;
-		if ( fromContentId != null ) {
+		if (fromContentId != null) {
 			fromContent = forumDao.getByContentId(fromContentId);
 		}
-		if ( fromContent == null ) {
+		if (fromContent == null) {
 			fromContent = getDefaultForum();
 		}
-		
-		Forum toContent = Forum.newInstance(fromContent,toContentId,forumToolContentHandler);
+
+		Forum toContent = Forum.newInstance(fromContent, toContentId, forumToolContentHandler);
 		forumDao.saveOrUpdate(toContent);
-		
+
 		//save topics in this forum, only save the author created topic!!! and reset its reply number to zero.
 		Set topics = toContent.getMessages();
-		if(topics != null){
+		if (topics != null) {
 			Iterator iter = topics.iterator();
-			while(iter.hasNext()){
+			while (iter.hasNext()) {
 				Message msg = (Message) iter.next();
 				//set this message forum Uid as toContent
-				if(!msg.getIsAuthored())
+				if (!msg.getIsAuthored()) {
 					continue;
+				}
 				msg.setReplyNumber(0);
 				// msg.setCreated(new Date());  // need to keep the original create date to maintain correct order
 				msg.setUpdated(new Date());
 				msg.setLastReplyDate(new Date());
 				msg.setHideFlag(false);
 				msg.setForum(toContent);
-				createRootTopic(toContent.getUid(),(ForumToolSession) null,msg);
+				createRootTopic(toContent.getUid(), (ForumToolSession) null, msg);
 			}
 		}
 
@@ -650,7 +709,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 	public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 		Forum forum = forumDao.getByContentId(toolContentId);
-		if(forum == null){
+		if (forum == null) {
 			throw new ToolException("No found tool content by given content ID:" + toolContentId);
 		}
 		forum.setDefineLater(value);
@@ -659,49 +718,50 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 	public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 		Forum forum = forumDao.getByContentId(toolContentId);
-		if(forum == null){
+		if (forum == null) {
 			throw new ToolException("No found tool content by given content ID:" + toolContentId);
 		}
 		forum.setRunOffline(value);
-		
+
 	}
 
 	public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException {
 		Forum forum = forumDao.getByContentId(toolContentId);
-		if(removeSessionData){
+		if (removeSessionData) {
 			List list = forumToolSessionDao.getByContentId(toolContentId);
 			Iterator iter = list.iterator();
-			while(iter.hasNext()){
+			while (iter.hasNext()) {
 				ForumToolSession session = (ForumToolSession) iter.next();
 				forumToolSessionDao.delete(session);
 			}
 		}
 		forumDao.delete(forum);
 	}
-	
-    
+
 	/**
-     * Export the XML fragment for the tool's content, along with any files needed
-     * for the content.
-     * @throws DataMissingException if no tool content matches the toolSessionId 
-     * @throws ToolException if any other error occurs
-     */
+	 * Export the XML fragment for the tool's content, along with any files needed
+	 * for the content.
+	 * @throws DataMissingException if no tool content matches the toolSessionId 
+	 * @throws ToolException if any other error occurs
+	 */
 
 	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 		Forum toolContentObj = forumDao.getByContentId(toolContentId);
- 		if(toolContentObj == null)
- 			toolContentObj = getDefaultForum();
- 		if(toolContentObj == null)
- 			throw new DataMissingException("Unable to find default content for the forum tool");
- 		
- 		//set ResourceToolContentHandler as null to avoid copy file node in repository again.
- 		toolContentObj = Forum.newInstance(toolContentObj,toolContentId,null);
- 		toolContentObj.setToolContentHandler(null);
- 		toolContentObj.setCreatedBy(null);
- 		Set<Message> items = toolContentObj.getMessages();
- 		Set<Message> authorItems = new HashSet<Message>();
-		for(Message item:items){
-			if(item.getIsAuthored()){
+		if (toolContentObj == null) {
+			toolContentObj = getDefaultForum();
+		}
+		if (toolContentObj == null) {
+			throw new DataMissingException("Unable to find default content for the forum tool");
+		}
+
+		//set ResourceToolContentHandler as null to avoid copy file node in repository again.
+		toolContentObj = Forum.newInstance(toolContentObj, toolContentId, null);
+		toolContentObj.setToolContentHandler(null);
+		toolContentObj.setCreatedBy(null);
+		Set<Message> items = toolContentObj.getMessages();
+		Set<Message> authorItems = new HashSet<Message>();
+		for (Message item : items) {
+			if (item.getIsAuthored()) {
 				authorItems.add(item);
 				item.setCreatedBy(null);
 				item.setModifiedBy(null);
@@ -716,37 +776,39 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		}
 		toolContentObj.setMessages(authorItems);
 		try {
-			exportContentService.registerFileClassForExport(Attachment.class.getName(),"fileUuid","fileVersionId");
-			exportContentService.exportToolContent( toolContentId, toolContentObj,forumToolContentHandler, rootPath);
-		} catch (ExportToolContentException e) {
+			exportContentService.registerFileClassForExport(Attachment.class.getName(), "fileUuid", "fileVersionId");
+			exportContentService.exportToolContent(toolContentId, toolContentObj, forumToolContentHandler, rootPath);
+		}
+		catch (ExportToolContentException e) {
 			throw new ToolException(e);
-		}	
+		}
 	}
 
-    /**
-     * Import the XML fragment for the tool's content, along with any files needed
-     * for the content.
-     * @throws ToolException if any other error occurs
-     */
-	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath ,String fromVersion,String toVersion)
-			throws ToolException {
+	/**
+	 * Import the XML fragment for the tool's content, along with any files needed
+	 * for the content.
+	 * @throws ToolException if any other error occurs
+	 */
+	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
+			String toVersion) throws ToolException {
 
-		
 		try {
-			exportContentService.registerFileClassForImport(Attachment.class.getName()
-					,"fileUuid","fileVersionId","fileName","fileType",null,null);
-			
-			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,forumToolContentHandler,fromVersion,toVersion);
-			if(!(toolPOJO instanceof Forum))
+			exportContentService.registerFileClassForImport(Attachment.class.getName(), "fileUuid", "fileVersionId", "fileName",
+					"fileType", null, null);
+
+			Object toolPOJO = exportContentService.importToolContent(toolContentPath, forumToolContentHandler, fromVersion,
+					toVersion);
+			if (!(toolPOJO instanceof Forum)) {
 				throw new ImportToolContentException("Import Forum tool content failed. Deserialized object is " + toolPOJO);
+			}
 			Forum toolContentObj = (Forum) toolPOJO;
-			
-//			reset it to new toolContentId
+
+			//			reset it to new toolContentId
 			toolContentObj.setContentId(toolContentId);
 			ForumUser user = forumUserDao.getByUserId(new Long(newUserUid.longValue()));
-			if(user == null){
+			if (user == null) {
 				user = new ForumUser();
-				UserDTO sysUser = ((User)userManagementService.findById(User.class,newUserUid)).getUserDTO();
+				UserDTO sysUser = ((User) userManagementService.findById(User.class, newUserUid)).getUserDTO();
 				user.setFirstName(sysUser.getFirstName());
 				user.setLastName(sysUser.getLastName());
 				user.setLoginName(sysUser.getLogin());
@@ -756,35 +818,35 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			toolContentObj.setCreatedBy(user);
 			//save forum first
 			forumDao.saveOrUpdate(toolContentObj);
-			
+
 			//save all authoring message one by one.
 			//reset all resourceItem createBy user
 			Set<Message> items = toolContentObj.getMessages();
-			for(Message item:items){
+			for (Message item : items) {
 				item.setCreatedBy(user);
 				item.setIsAuthored(true);
 				item.setForum(toolContentObj);
 				item.setSessionClones(new HashSet());
-				createRootTopic(toolContentObj.getUid(),(ForumToolSession) null,item);
+				createRootTopic(toolContentObj.getUid(), (ForumToolSession) null, item);
 			}
-		} catch (ImportToolContentException e) {
+		}
+		catch (ImportToolContentException e) {
 			throw new ToolException(e);
 		}
 	}
 
-	  /** Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions that are always
-     * available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created for a particular activity
-     * such as the answer to the third question contains the word Koala and hence the need for the toolContentId
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     */
+	/** Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions that are always
+	* available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created for a particular activity
+	* such as the answer to the third question contains the word Koala and hence the need for the toolContentId
+	* @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+	*/
 	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
 		Forum forum = getForum(toolContentId);
-		if ( forum == null ) {
+		if (forum == null) {
 			forum = getDefaultForum();
 		}
 		return getForumOutputFactory().getToolOutputDefinitions(forum);
 	}
- 
 
 	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String, java.lang.Long) */
 	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
@@ -793,15 +855,16 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		session.setSessionName(toolSessionName);
 		Forum forum = forumDao.getByContentId(toolContentId);
 		session.setForum(forum);
-		
-//		also clone author created topic from this forum tool content!!!
-//		this can avoid topic record information conflict when multiple sessions are against same tool content
-//		for example, the reply number maybe various for different sessions.
-		log.debug("Clone tool content [" + forum.getContentId() +"] topics for session [" + session.getSessionId() + "]");		
+
+		//		also clone author created topic from this forum tool content!!!
+		//		this can avoid topic record information conflict when multiple sessions are against same tool content
+		//		for example, the reply number maybe various for different sessions.
+		ForumService.log.debug("Clone tool content [" + forum.getContentId() + "] topics for session [" + session.getSessionId()
+				+ "]");
 		Set<Message> contentTopics = forum.getMessages();
-		if(contentTopics != null && contentTopics.size() > 0){
-			for(Message msg : contentTopics){
-				if(msg.getIsAuthored() && msg.getToolSession() == null){
+		if (contentTopics != null && contentTopics.size() > 0) {
+			for (Message msg : contentTopics) {
+				if (msg.getIsAuthored() && msg.getToolSession() == null) {
 					Message newMsg = Message.newInstance(msg, forumToolContentHandler);
 					msg.getSessionClones().add(newMsg);
 					createRootTopic(forum.getContentId(), session, newMsg);
@@ -811,30 +874,32 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		session.setStatus(ForumConstants.STATUS_CONTENT_COPYED);
 
 		forumToolSessionDao.saveOrUpdate(session);
-		log.debug("tool session ["+session.getSessionId()+"] created.");
+		ForumService.log.debug("tool session [" + session.getSessionId() + "] created.");
 	}
 
 	public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-		if(toolSessionId == null){
-			log.error("Fail to leave tool Session based on null tool session id.");
+		if (toolSessionId == null) {
+			ForumService.log.error("Fail to leave tool Session based on null tool session id.");
 			throw new ToolException("Fail to remove tool Session based on null tool session id.");
 		}
-		if(learnerId == null){
-			log.error("Fail to leave tool Session based on null learner.");
+		if (learnerId == null) {
+			ForumService.log.error("Fail to leave tool Session based on null learner.");
 			throw new ToolException("Fail to remove tool Session based on null learner.");
 		}
-		
+
 		ForumToolSession session = forumToolSessionDao.getBySessionId(toolSessionId);
-		if(session != null){
+		if (session != null) {
 			forumToolSessionDao.saveOrUpdate(session);
-		}else{
-			log.error("Fail to leave tool Session.Could not find submit file " +
-					"session by given session id: "+toolSessionId);
-			throw new DataMissingException("Fail to leave tool Session." +
-					"Could not find submit file session by given session id: "+toolSessionId);
 		}
-		return learnerService.completeToolSession(toolSessionId,learnerId);
+		else {
+			ForumService.log.error("Fail to leave tool Session.Could not find submit file " + "session by given session id: "
+					+ toolSessionId);
+			throw new DataMissingException("Fail to leave tool Session."
+					+ "Could not find submit file session by given session id: " + toolSessionId);
+		}
+		return learnerService.completeToolSession(toolSessionId, learnerId);
 	}
+
 	public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 		return null;
 	}
@@ -843,18 +908,16 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		return null;
 	}
 
-	
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 		forumToolSessionDao.delete(toolSessionId);
 	}
-    
+
 	/** 
 	 * Get the tool output for the given tool output names.
 	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long, java.lang.Long)
 	 */
-	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
-			Long toolSessionId, Long learnerId) {
-		
+	public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
+
 		return forumOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
 
 	}
@@ -863,31 +926,29 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	 * Get the tool output for the given tool output name.
 	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long, java.lang.Long)
 	 */
-	public ToolOutput getToolOutput(String name, Long toolSessionId,
-			Long learnerId) {
+	public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 		return forumOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getDefaultContent(java.lang.Long)
-     */
+	 */
 	public Forum getDefaultContent(Long contentID) {
-    	if (contentID == null)
-    	{
-    	    String error="Could not retrieve default content id for Forum tool";
-    	    log.error(error);
-    	    throw new ForumException(error);
-    	}
-    	
-    	Forum defaultContent = getDefaultForum();
-    	//get default content by given ID.
-    	Forum content = new Forum();
-    	content = Forum.newInstance(defaultContent,contentID,forumToolContentHandler);
-    	
+		if (contentID == null) {
+			String error = "Could not retrieve default content id for Forum tool";
+			ForumService.log.error(error);
+			throw new ForumException(error);
+		}
+
+		Forum defaultContent = getDefaultForum();
+		//get default content by given ID.
+		Forum content = new Forum();
+		content = Forum.newInstance(defaultContent, contentID, forumToolContentHandler);
+
 		Set topics = content.getMessages();
-		if(topics != null){
+		if (topics != null) {
 			Iterator iter = topics.iterator();
-			while(iter.hasNext()){
+			while (iter.hasNext()) {
 				Message msg = (Message) iter.next();
 				//clear message forum so that they can be saved when persistent happens
 				msg.setForum(null);
@@ -896,139 +957,144 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 		return content;
 	}
+
 	public List<MessageDTO> getAllTopicsFromSession(Long sessionID) {
 		return MessageDTO.getMessageDTO(messageDao.getBySession(sessionID));
 	}
+
 	/* ===============Methods implemented from ToolContentImport102Manager =============== */
-	
 
-    /**
-     * Import the data for a 1.0.2 Forum
-     */
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
-    {
-    	Date now = new Date();
-    	Forum toolContentObj = new Forum();
+	/**
+	 * Import the data for a 1.0.2 Forum
+	 */
+	public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
+		Date now = new Date();
+		Forum toolContentObj = new Forum();
 
-    	try {
-	
-	    	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+		try {
 
-	    	toolContentObj.setAllowAnonym(Boolean.FALSE);
-	    	toolContentObj.setAllowEdit(Boolean.TRUE); // this is the default value
-	    	toolContentObj.setAllowNewTopic(Boolean.TRUE);
-	    	toolContentObj.setAllowRichEditor(Boolean.FALSE);
-	    	toolContentObj.setAllowUpload(Boolean.TRUE); // this is the default value
-	    	toolContentObj.setContentId(toolContentId);
-	    	toolContentObj.setContentInUse(Boolean.FALSE);
-	    	toolContentObj.setCreated(now);
-	    	toolContentObj.setDefineLater(Boolean.FALSE);		    	
-	    	toolContentObj.setInstructions(WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	    	toolContentObj.setLimitedChar(5000); // this is the default value
-   	    	toolContentObj.setReflectOnActivity(Boolean.FALSE);
-	    	toolContentObj.setReflectInstructions(null);
+			toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 
-	    	// lockOnFinsh = ! isReusable
-	    	Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_REUSABLE);
-	    	toolContentObj.setLockWhenFinished(bool != null ? ! bool.booleanValue() : false);
-	    	toolContentObj.setMaximumReply(0);
-	    	toolContentObj.setMinimumReply(0);
-	    	toolContentObj.setOfflineInstructions(null);
-	    	toolContentObj.setOnlineInstructions(null);
-	    	toolContentObj.setRunOffline(Boolean.FALSE);
-	    	toolContentObj.setUpdated(now);
+			toolContentObj.setAllowAnonym(Boolean.FALSE);
+			toolContentObj.setAllowEdit(Boolean.TRUE); // this is the default value
+			toolContentObj.setAllowNewTopic(Boolean.TRUE);
+			toolContentObj.setAllowRichEditor(Boolean.FALSE);
+			toolContentObj.setAllowUpload(Boolean.TRUE); // this is the default value
+			toolContentObj.setContentId(toolContentId);
+			toolContentObj.setContentInUse(Boolean.FALSE);
+			toolContentObj.setCreated(now);
+			toolContentObj.setDefineLater(Boolean.FALSE);
+			toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
+					.get(ToolContentImport102Manager.CONTENT_BODY)));
+			toolContentObj.setLimitedChar(5000); // this is the default value
+			toolContentObj.setReflectOnActivity(Boolean.FALSE);
+			toolContentObj.setReflectInstructions(null);
 
-	    	// unused entries from 1.0.2
-            // isNewTopicAllowed  - not actually used in 1.0.2
-	    	// durationInDays - no equivalent in 2.0
-	    	// isPostingModerated - no equivalent in 2.0
-	    	// isPostingNotified - no equivalent in 2.0
-            // contentShowUser - no equivalent in 2.0
-            // isHTML - no equivalent in 2.0
-            // terminationType=moderator - no equivalent in 2.0
+			// lockOnFinsh = ! isReusable
+			Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_REUSABLE);
+			toolContentObj.setLockWhenFinished(bool != null ? !bool.booleanValue() : false);
+			toolContentObj.setMaximumReply(0);
+			toolContentObj.setMinimumReply(0);
+			toolContentObj.setOfflineInstructions(null);
+			toolContentObj.setOnlineInstructions(null);
+			toolContentObj.setRunOffline(Boolean.FALSE);
+			toolContentObj.setUpdated(now);
 
-	    	ForumUser forumUser = new ForumUser();
+			// unused entries from 1.0.2
+			// isNewTopicAllowed  - not actually used in 1.0.2
+			// durationInDays - no equivalent in 2.0
+			// isPostingModerated - no equivalent in 2.0
+			// isPostingNotified - no equivalent in 2.0
+			// contentShowUser - no equivalent in 2.0
+			// isHTML - no equivalent in 2.0
+			// terminationType=moderator - no equivalent in 2.0
+
+			ForumUser forumUser = new ForumUser();
 			forumUser.setUserId(new Long(user.getUserID().longValue()));
 			forumUser.setFirstName(user.getFirstName());
 			forumUser.setLastName(user.getLastName());
 			forumUser.setLoginName(user.getLogin());
 			createUser(forumUser);
-	    	toolContentObj.setCreatedBy(forumUser);
-	
-	    	// leave as empty, no need to set them to anything.
-	    	//toolContentObj.setAttachments(attachments);
-	    	forumDao.saveOrUpdate(toolContentObj);
-	
-	    	// topics in the XML file are ordered using the "number" field, not in their order in the vector.
-	    	TreeMap<Integer, Map> messageMaps = new TreeMap<Integer, Map>();
-	    	Vector topics = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_MB_TOPICS);
+			toolContentObj.setCreatedBy(forumUser);
+
+			// leave as empty, no need to set them to anything.
+			//toolContentObj.setAttachments(attachments);
+			forumDao.saveOrUpdate(toolContentObj);
+
+			// topics in the XML file are ordered using the "number" field, not in their order in the vector.
+			TreeMap<Integer, Map> messageMaps = new TreeMap<Integer, Map>();
+			Vector topics = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_MB_TOPICS);
 			Date msgDate = null;
-	    	if ( topics != null ) {
-	    		Iterator iter = topics.iterator();
-	    		while ( iter.hasNext() ) {
-	    			Hashtable messageMap = (Hashtable) iter.next();
-	    	    	Integer order = WDDXProcessor.convertToInteger(messageMap, ToolContentImport102Manager.CONTENT_MB_TOPIC_NUMBER);
-	    			messageMaps.put(order, messageMap);
-	    		}
-	    		
-	        	iter = messageMaps.values().iterator();
-	        	while ( iter.hasNext() ) {
-	        			
-	    			Map messageMap = (Map) iter.next();
-	
-	    			Message message = new Message();
-	    			message.setIsAuthored(true);
-	    			
-	    			// topics are ordered by date, so I need to try to assign each entry a different date. Won't work if this is too quick.
-	    			if ( msgDate != null ) {
-	    				try {
-	    					Thread.sleep(1000);
-	    				} catch (Exception e) {}
-	    			}
-	    			msgDate = new Date();
-	
-	    			message.setCreated(msgDate);
-	    			message.setCreatedBy(forumUser);
-	    			message.setUpdated(msgDate);
-	    			message.setLastReplyDate(msgDate);
-	    			message.setSubject((String)messageMap.get(ToolContentImport102Manager.CONTENT_TITLE));
-	    			message.setBody(WebUtil.convertNewlines((String)messageMap.get(ToolContentImport102Manager.CONTENT_MB_TOPIC_MESSAGE)));
-	    			// ignore the old subject field - it wasn't updated by the old interface.
-	    			message.setHideFlag(Boolean.FALSE);
-	    			message.setIsAnonymous(Boolean.FALSE);
-	    			
-	    			createRootTopic(toolContentObj.getUid(),(ForumToolSession) null,message);
-	    			
-	        	}
-	    	}
-	    	
-		} catch (WDDXProcessorConversionException e) {
-			log.error("Unable to content for activity "+toolContentObj.getTitle()+"properly due to a WDDXProcessorConversionException.",e);
-			throw new ToolException("Invalid import data format for activity "+toolContentObj.getTitle()+"- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+			if (topics != null) {
+				Iterator iter = topics.iterator();
+				while (iter.hasNext()) {
+					Hashtable messageMap = (Hashtable) iter.next();
+					Integer order = WDDXProcessor.convertToInteger(messageMap,
+							ToolContentImport102Manager.CONTENT_MB_TOPIC_NUMBER);
+					messageMaps.put(order, messageMap);
+				}
+
+				iter = messageMaps.values().iterator();
+				while (iter.hasNext()) {
+
+					Map messageMap = (Map) iter.next();
+
+					Message message = new Message();
+					message.setIsAuthored(true);
+
+					// topics are ordered by date, so I need to try to assign each entry a different date. Won't work if this is too quick.
+					if (msgDate != null) {
+						try {
+							Thread.sleep(1000);
+						}
+						catch (Exception e) {
+						}
+					}
+					msgDate = new Date();
+
+					message.setCreated(msgDate);
+					message.setCreatedBy(forumUser);
+					message.setUpdated(msgDate);
+					message.setLastReplyDate(msgDate);
+					message.setSubject((String) messageMap.get(ToolContentImport102Manager.CONTENT_TITLE));
+					message.setBody(WebUtil.convertNewlines((String) messageMap
+							.get(ToolContentImport102Manager.CONTENT_MB_TOPIC_MESSAGE)));
+					// ignore the old subject field - it wasn't updated by the old interface.
+					message.setHideFlag(Boolean.FALSE);
+					message.setIsAnonymous(Boolean.FALSE);
+
+					createRootTopic(toolContentObj.getUid(), (ForumToolSession) null, message);
+
+				}
+			}
+
+		}
+		catch (WDDXProcessorConversionException e) {
+			ForumService.log.error("Unable to content for activity " + toolContentObj.getTitle()
+					+ "properly due to a WDDXProcessorConversionException.", e);
+			throw new ToolException("Invalid import data format for activity " + toolContentObj.getTitle()
+					+ "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
 		}
 
+	}
 
+	/** Set the description, throws away the title value as this is not supported in 2.0 */
+	public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
+			DataMissingException {
 
-    }
+		Forum toolContentObj = getForumByContentId(toolContentId);
+		if (toolContentObj == null) {
+			throw new DataMissingException("Unable to set reflective data titled " + title + " on activity toolContentId "
+					+ toolContentId + " as the tool content does not exist.");
+		}
 
-   /** Set the description, throws away the title value as this is not supported in 2.0 */
-   public void setReflectiveData(Long toolContentId, String title, String description) 
-    		throws ToolException, DataMissingException {
-   
-	   Forum toolContentObj = getForumByContentId(toolContentId);
-    	if ( toolContentObj == null ) {
-    		throw new DataMissingException("Unable to set reflective data titled "+title
-	       			+" on activity toolContentId "+toolContentId
-	       			+" as the tool content does not exist.");
-    	}
+		toolContentObj.setReflectOnActivity(Boolean.TRUE);
+		toolContentObj.setReflectInstructions(description);
+	}
 
-    	toolContentObj.setReflectOnActivity(Boolean.TRUE);
-    	toolContentObj.setReflectInstructions(description);
-    }
-
-    //***************************************************************************************************************
-    // Get / Set methods
-    //***************************************************************************************************************
+	//***************************************************************************************************************
+	// Get / Set methods
+	//***************************************************************************************************************
 	public ILamsToolService getToolService() {
 		return toolService;
 	}
@@ -1036,7 +1102,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void setToolService(ILamsToolService toolService) {
 		this.toolService = toolService;
 	}
-	
+
 	public AttachmentDao getAttachmentDao() {
 		return attachmentDao;
 	}
@@ -1060,7 +1126,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void setMessageDao(MessageDao messageDao) {
 		this.messageDao = messageDao;
 	}
-
 
 	public MessageSeqDao getMessageSeqDao() {
 		return messageSeqDao;
@@ -1093,12 +1158,13 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void setRepositoryService(IRepositoryService repositoryService) {
 		this.repositoryService = repositoryService;
 	}
+
 	public ForumToolContentHandler getForumToolContentHandler() {
 		return forumToolContentHandler;
 	}
 
 	public void setForumToolContentHandler(ForumToolContentHandler toolContentHandler) {
-		this.forumToolContentHandler = toolContentHandler;
+		forumToolContentHandler = toolContentHandler;
 	}
 
 	public ILearnerService getLearnerService() {
@@ -1116,10 +1182,10 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void setExportContentService(IExportToolContentService exportContentService) {
 		this.exportContentService = exportContentService;
 	}
+
 	public IUserManagementService getUserManagementService() {
 		return userManagementService;
 	}
-
 
 	public void setUserManagementService(IUserManagementService userManagementService) {
 		this.userManagementService = userManagementService;
@@ -1141,5 +1207,15 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		this.coreNotebookService = coreNotebookService;
 	}
 
+	public IEventNotificationService getEventNotificationService() {
+		return eventNotificationService;
+	}
 
+	public void setEventNotificationService(IEventNotificationService eventNotificationService) {
+		this.eventNotificationService = eventNotificationService;
+	}
+
+	public String getLocalisedMessage(String key, Object[] args) {
+		return messageService.getMessage(key, args);
+	}
 }

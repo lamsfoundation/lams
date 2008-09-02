@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 
 package org.lamsfoundation.lams.tool.sbmt.dto;
 
@@ -37,6 +37,7 @@ import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
+
 /**
  * 
  * @author Steve.Ni
@@ -45,176 +46,223 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 public class AuthoringDTO implements Serializable {
 
 	private static final long serialVersionUID = 3555065437595921234L;
+
 	private Long contentID;
+
 	//basic tab
 	private String title;
+
 	private String instruction;
+
 	//instructions
 	private String onlineInstruction;
+
 	private String offlineInstruction;
+
 	private List onlineFiles;
+
 	private List offlineFiles;
+
 	//advance
 	private boolean lockOnFinished;
+
 	private boolean limitUpload;
+
 	private int limitUploadNumber;
+
 	private boolean reflectOnActivity;
+
 	private String reflectInstructions;
-	
-	public AuthoringDTO(){
+
+	private boolean notifyLearnersOnMarkRelease;
+
+	public AuthoringDTO() {
 	}
-	public AuthoringDTO(SubmitFilesContent content){
-		if(content == null)
+
+	public AuthoringDTO(SubmitFilesContent content) {
+		if (content == null) {
 			return;
+		}
 		try {
-			PropertyUtils.copyProperties(this,content);
-		} catch (IllegalAccessException e) {
-			throw new DTOException(e);
-		} catch (InvocationTargetException e) {
-			throw new DTOException(e);
-		} catch (NoSuchMethodException e) {
+			PropertyUtils.copyProperties(this, content);
+		}
+		catch (IllegalAccessException e) {
 			throw new DTOException(e);
 		}
-		
+		catch (InvocationTargetException e) {
+			throw new DTOException(e);
+		}
+		catch (NoSuchMethodException e) {
+			throw new DTOException(e);
+		}
+
 		onlineFiles = new ArrayList();
 		offlineFiles = new ArrayList();
 		Set fileSet = content.getInstructionFiles();
-		if(fileSet != null){
+		if (fileSet != null) {
 			Iterator iter = fileSet.iterator();
-			while(iter.hasNext()){
+			while (iter.hasNext()) {
 				InstructionFiles file = (InstructionFiles) iter.next();
-				if(StringUtils.equalsIgnoreCase(file.getType(),IToolContentHandler.TYPE_OFFLINE))
+				if (StringUtils.equalsIgnoreCase(file.getType(), IToolContentHandler.TYPE_OFFLINE)) {
 					offlineFiles.add(file);
-				else
+				}
+				else {
 					onlineFiles.add(file);
+				}
 			}
 		}
-		
+
 	}
+
 	/**
 	 * @return Returns the contentID.
 	 */
 	public Long getContentID() {
 		return contentID;
 	}
+
 	/**
 	 * @param contentID The contentID to set.
 	 */
 	public void setContentID(Long contentID) {
 		this.contentID = contentID;
 	}
+
 	/**
 	 * @return Returns the instruction.
 	 */
 	public String getInstruction() {
 		return instruction;
 	}
+
 	/**
 	 * @param instruction The instruction to set.
 	 */
 	public void setInstruction(String instruction) {
 		this.instruction = instruction;
 	}
+
 	/**
 	 * @return Returns the lockOnFinished.
 	 */
 	public boolean isLockOnFinished() {
 		return lockOnFinished;
 	}
+
 	/**
 	 * @param lockOnFinished The lockOnFinished to set.
 	 */
 	public void setLockOnFinished(boolean lockOnFinished) {
 		this.lockOnFinished = lockOnFinished;
 	}
+
 	/**
 	 * @return Returns the offlineFiles.
 	 */
 	public List getOfflineFiles() {
 		return offlineFiles;
 	}
+
 	/**
 	 * @param offlineFiles The offlineFiles to set.
 	 */
 	public void setOfflineFiles(List offlineFiles) {
 		this.offlineFiles = offlineFiles;
 	}
+
 	/**
 	 * @return Returns the offlineInstruction.
 	 */
 	public String getOfflineInstruction() {
 		return offlineInstruction;
 	}
+
 	/**
 	 * @param offlineInstruction The offlineInstruction to set.
 	 */
 	public void setOfflineInstruction(String offlineInstruction) {
 		this.offlineInstruction = offlineInstruction;
 	}
+
 	/**
 	 * @return Returns the onlineFiles.
 	 */
 	public List getOnlineFiles() {
 		return onlineFiles;
 	}
+
 	/**
 	 * @param onlineFiles The onlineFiles to set.
 	 */
 	public void setOnlineFiles(List onlineFiles) {
 		this.onlineFiles = onlineFiles;
 	}
+
 	/**
 	 * @return Returns the onlineInstruction.
 	 */
 	public String getOnlineInstruction() {
 		return onlineInstruction;
 	}
+
 	/**
 	 * @param onlineInstruction The onlineInstruction to set.
 	 */
 	public void setOnlineInstruction(String onlineInstruction) {
 		this.onlineInstruction = onlineInstruction;
 	}
+
 	/**
 	 * @return Returns the title.
 	 */
 	public String getTitle() {
 		return title;
 	}
+
 	/**
 	 * @param title The title to set.
 	 */
 	public void setTitle(String title) {
 		this.title = title;
 	}
+
 	public boolean isLimitUpload() {
 		return limitUpload;
 	}
+
 	public void setLimitUpload(boolean limitUpload) {
 		this.limitUpload = limitUpload;
 	}
-	
+
 	public int getLimitUploadNumber() {
 		return limitUploadNumber;
 	}
-	
+
 	public void setLimitUploadNumber(int limitUploadNumber) {
 		this.limitUploadNumber = limitUploadNumber;
 	}
-	
+
 	public boolean isReflectOnActivity() {
 		return reflectOnActivity;
 	}
-	
+
 	public void setReflectOnActivity(boolean reflectOnActivity) {
 		this.reflectOnActivity = reflectOnActivity;
 	}
-	
+
 	public String getReflectInstructions() {
 		return reflectInstructions;
 	}
-	
+
 	public void setReflectInstructions(String reflectInstructions) {
 		this.reflectInstructions = reflectInstructions;
+	}
+
+	public boolean isNotifyLearnersOnMarkRelease() {
+		return notifyLearnersOnMarkRelease;
+	}
+
+	public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
+		this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
 	}
 }

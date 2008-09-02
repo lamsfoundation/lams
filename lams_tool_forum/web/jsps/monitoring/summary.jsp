@@ -194,6 +194,23 @@
 	
 	<tr>
 		<td>
+			<fmt:message key="label.authoring.advanced.notify.mark.release" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${forum.notifyLearnersOnMarkRelease == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
 			<fmt:message key="monitor.summary.td.addNotebook" />
 		</td>
 		

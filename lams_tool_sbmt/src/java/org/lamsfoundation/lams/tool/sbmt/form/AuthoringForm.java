@@ -23,74 +23,93 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 public class AuthoringForm extends ValidatorForm {
 
 	private Long toolContentID;
-	
+
 	private String contentFolderID;
-	
+
 	//control fields
 	private String sessionMapID;
-	private String currentTab;
-	
-	//basic input fields
-    private String title;
-    private String instructions;
-    private String offlineInstruction; 
-    private String onlineInstruction;
-    private boolean lockOnFinished;
-	
-    //file and display fields
-    private FormFile offlineFile;
-    private FormFile onlineFile;
-    private List onlineFileList;
-    private List offlineFileList;
-    
-    private boolean limitUpload;
-    private int limitUploadNumber;
-    
-    private boolean reflectOnActivity;
-    private String reflectInstructions;
 
-    public void reset(ActionMapping mapping, HttpServletRequest request){
-    	lockOnFinished = false;
-    	limitUpload= false;
-    	reflectOnActivity = false;
-    	
-    }
-	public void initContentValue(SubmitFilesContent content){
-		if(content == null)
+	private String currentTab;
+
+	//basic input fields
+	private String title;
+
+	private String instructions;
+
+	private String offlineInstruction;
+
+	private String onlineInstruction;
+
+	private boolean lockOnFinished;
+
+	//file and display fields
+	private FormFile offlineFile;
+
+	private FormFile onlineFile;
+
+	private List onlineFileList;
+
+	private List offlineFileList;
+
+	private boolean limitUpload;
+
+	private int limitUploadNumber;
+
+	private boolean reflectOnActivity;
+
+	private String reflectInstructions;
+
+	private boolean notifyLearnersOnMarkRelease;
+
+	@Override
+	public void reset(ActionMapping mapping, HttpServletRequest request) {
+		lockOnFinished = false;
+		limitUpload = false;
+		reflectOnActivity = false;
+
+	}
+
+	public void initContentValue(SubmitFilesContent content) {
+		if (content == null) {
 			return;
-		
+		}
+
 		//copy attribute
-		this.toolContentID= content.getContentID();
-		this.title = content.getTitle();
-		this.instructions = content.getInstruction();
-		this.offlineInstruction = content.getOfflineInstruction();
-		this.onlineInstruction = content.getOnlineInstruction();
-		this.lockOnFinished = content.isLockOnFinished();
-		
-		this.limitUpload = content.isLimitUpload();
-		this.limitUploadNumber = content.getLimitUploadNumber();
-		
-		this.reflectOnActivity = content.isReflectOnActivity();
-		this.reflectInstructions = content.getReflectInstructions();
-		
+		toolContentID = content.getContentID();
+		title = content.getTitle();
+		instructions = content.getInstruction();
+		offlineInstruction = content.getOfflineInstruction();
+		onlineInstruction = content.getOnlineInstruction();
+		lockOnFinished = content.isLockOnFinished();
+
+		limitUpload = content.isLimitUpload();
+		limitUploadNumber = content.getLimitUploadNumber();
+
+		reflectOnActivity = content.isReflectOnActivity();
+		reflectInstructions = content.getReflectInstructions();
+
 		onlineFileList = new ArrayList();
 		offlineFileList = new ArrayList();
 		Set fileSet = content.getInstructionFiles();
-		if(fileSet != null){
+		if (fileSet != null) {
 			Iterator iter = fileSet.iterator();
-			while(iter.hasNext()){
+			while (iter.hasNext()) {
 				InstructionFiles file = (InstructionFiles) iter.next();
-				if(StringUtils.equalsIgnoreCase(file.getType(),IToolContentHandler.TYPE_OFFLINE))
+				if (StringUtils.equalsIgnoreCase(file.getType(), IToolContentHandler.TYPE_OFFLINE)) {
 					offlineFileList.add(file);
-				else
+				}
+				else {
 					onlineFileList.add(file);
+				}
 			}
 		}
-		
+		setNotifyLearnersOnMarkRelease(content.isNotifyLearnersOnMarkRelease());
+
 	}
-    //**************************************************
-    // Get / Set method
-    //**************************************************
+
+	//**************************************************
+	// Get / Set method
+	//**************************************************
 	public String getCurrentTab() {
 		return currentTab;
 	}
@@ -186,34 +205,52 @@ public class AuthoringForm extends ValidatorForm {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+
 	public String getReflectInstructions() {
 		return reflectInstructions;
 	}
+
 	public void setReflectInstructions(String reflectInstructions) {
 		this.reflectInstructions = reflectInstructions;
 	}
+
 	public boolean isReflectOnActivity() {
 		return reflectOnActivity;
 	}
+
 	public void setReflectOnActivity(boolean reflectOnActivity) {
 		this.reflectOnActivity = reflectOnActivity;
 	}
+
 	public String getContentFolderID() {
 		return contentFolderID;
 	}
+
 	public void setContentFolderID(String contentFolderID) {
 		this.contentFolderID = contentFolderID;
 	}
+
 	public boolean isLimitUpload() {
 		return limitUpload;
 	}
+
 	public void setLimitUpload(boolean limitUpload) {
 		this.limitUpload = limitUpload;
 	}
+
 	public int getLimitUploadNumber() {
 		return limitUploadNumber;
 	}
+
 	public void setLimitUploadNumber(int limitUploadNumber) {
 		this.limitUploadNumber = limitUploadNumber;
+	}
+
+	public boolean isNotifyLearnersOnMarkRelease() {
+		return notifyLearnersOnMarkRelease;
+	}
+
+	public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
+		this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
 	}
 }

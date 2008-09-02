@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 
 package org.lamsfoundation.lams.tool.sbmt.web;
 
@@ -43,7 +43,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
@@ -56,7 +55,6 @@ import org.lamsfoundation.lams.tool.sbmt.form.AuthoringForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
-import org.lamsfoundation.lams.tool.sbmt.util.SbmtWebUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -82,7 +80,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	private Logger log = Logger.getLogger(AuthoringAction.class);
 
 	public ISubmitFilesService submitFilesService;
-	
+
 	/**
 	 * This page will display initial submit tool content. Or just a blank page if the toolContentID does not
 	 * exist before.
@@ -94,37 +92,40 @@ public class AuthoringAction extends LamsDispatchAction {
 	 *      javax.servlet.http.HttpServletRequest,
 	 *      javax.servlet.http.HttpServletResponse)
 	 */
-	protected ActionForward unspecified(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+	@Override
+	protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
 
 		ToolAccessMode mode = null;
-		try{
-			mode =  WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,true);
-		}catch(Exception e){
+		try {
+			mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
+		}
+		catch (Exception e) {
 		}
 		//when first time open flash icon on authoring page: mode will be null 
-		if(mode == null)
+		if (mode == null) {
 			mode = ToolAccessMode.AUTHOR;
-		
+		}
+
 		SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-		
-		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+
+		Long contentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 		//get back the upload file list and display them on page
 		submitFilesService = getService();
-		
+
 		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
-		
-		if(mode.isTeacher()){
+
+		if (mode.isTeacher()) {
 
 			persistContent.setDefineLater(true);
 			submitFilesService.saveOrUpdateContent(persistContent);
-			
+
 		}
-		
+
 		//if this content does not exist(empty without id), create a content by default content record.
-		if(persistContent == null){
+		if (persistContent == null) {
 			persistContent = submitFilesService.createDefaultContent(contentID);
 		}
 
@@ -134,7 +135,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		attachmentList.addAll(persistContent.getInstructionFiles());
 		List delAttachmentList = getDeletedAttachmentList(sessionMap);
 		delAttachmentList.clear();
-		
+
 		//set back STRUTS component value
 		AuthoringForm authForm = (AuthoringForm) form;
 		authForm.initContentValue(persistContent);
@@ -143,11 +144,10 @@ public class AuthoringAction extends LamsDispatchAction {
 		//current tab
 		authForm.setCurrentTab(request.getParameter("currentTab"));
 		authForm.setContentFolderID(contentFolderID);
-		
+
 		return mapping.findForward("success");
 	}
 
-	
 	/**
 	 * Update all content for submit tool except online/offline instruction files list. 
 	 *  
@@ -160,89 +160,94 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @throws InvocationTargetException 
 	 * @throws Exception 
 	 */
-	public ActionForward updateContent(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws Exception{
+	public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
 
 		AuthoringForm authForm = (AuthoringForm) form;
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(authForm.getSessionMapID());
-		
+
 		ToolAccessMode mode = null;
-		try{
-			mode =  WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,true);
-		}catch(Exception e){
+		try {
+			mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
+		}
+		catch (Exception e) {
 		}
 		//when first time open flash icon on authoring page: mode will be null 
-		if(mode == null)
+		if (mode == null) {
 			mode = ToolAccessMode.AUTHOR;
-		
+		}
+
 		ActionMessages errors = validate(authForm, mapping, request);
-		if(!errors.isEmpty()){
+		if (!errors.isEmpty()) {
 			saveErrors(request, errors);
 			return mapping.getInputForward();
 		}
-		
+
 		SubmitFilesContent content = getContent(form);
-		
+
 		submitFilesService = getService();
 		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(content.getContentID());
-		
-		if(persistContent == null){
+
+		if (persistContent == null) {
 			//new content
 			persistContent = content;
 			content.setCreated(new Date());
-		}else{
+		}
+		else {
 			//copy web page value into persist content, as above, the "Set" type value kept.
-			if(mode.isAuthor()){
+			if (mode.isAuthor()) {
 				Long uid = persistContent.getContentID();
-				PropertyUtils.copyProperties(persistContent,content);
+				PropertyUtils.copyProperties(persistContent, content);
 				persistContent.setContentID(uid);
-			}else{
-//			    if it is Teacher, then just update basic tab content (definelater)
+			}
+			else {
+				//			    if it is Teacher, then just update basic tab content (definelater)
 				persistContent.setInstruction(content.getInstruction());
 				persistContent.setTitle(content.getTitle());
 				//change define later status
 				persistContent.setDefineLater(false);
 			}
 		}
-//		*******************************Handle user*******************
+		//		*******************************Handle user*******************
 		//get session from shared session.
 		HttpSession ss = SessionManager.getSession();
 		//get back login user DTO
 		UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		
+
 		Long contentId = authForm.getToolContentID();
-		SubmitUser user = submitFilesService.getContentUser(contentId,userDto.getUserID());
-		if(user == null){
+		SubmitUser user = submitFilesService.getContentUser(contentId, userDto.getUserID());
+		if (user == null) {
 			user = submitFilesService.createContentUser(userDto, contentId);
 		}
 		persistContent.setCreatedBy(user);
-		
+
 		//**********************************Handle Authoring Instruction Attachement *********************
-//		so far, attPOSet will be empty if content is existed. because PropertyUtils.copyProperties() is executed
+		//		so far, attPOSet will be empty if content is existed. because PropertyUtils.copyProperties() is executed
 		Set attPOSet = persistContent.getInstructionFiles();
-		if(attPOSet == null)
+		if (attPOSet == null) {
 			attPOSet = new HashSet();
-		
+		}
+
 		//get Attachment from HttpSession
 		List attachmentList = getAttachmentList(sessionMap);
 		Iterator iter = attachmentList.iterator();
-		while(iter.hasNext()){
+		while (iter.hasNext()) {
 			InstructionFiles newAtt = (InstructionFiles) iter.next();
 			attPOSet.add(newAtt);
 		}
 		attachmentList.clear();
-		
+
 		//handle deleted instruction files
 		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
 		iter = deleteAttachmentList.iterator();
-		while(iter.hasNext()){
+		while (iter.hasNext()) {
 			InstructionFiles delAtt = (InstructionFiles) iter.next();
 			//it is an existed att, then delete it from current attachmentPO
-			if(delAtt.getUid() != null){
+			if (delAtt.getUid() != null) {
 				Iterator attIter = attPOSet.iterator();
-				while(attIter.hasNext()){
+				while (attIter.hasNext()) {
 					InstructionFiles att = (InstructionFiles) attIter.next();
-					if(delAtt.getUid().equals(att.getUid())){
+					if (delAtt.getUid().equals(att.getUid())) {
 						attIter.remove();
 						break;
 					}
@@ -251,16 +256,17 @@ public class AuthoringAction extends LamsDispatchAction {
 			}//end remove from persist value
 		}
 		deleteAttachmentList.clear();
-		
+
 		//copy back
 		persistContent.setInstructionFiles(attPOSet);
-		
+
 		submitFilesService.saveOrUpdateContent(persistContent);
-		
+
 		//to jump to common success page in lams_central
-		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
+		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 		return mapping.findForward("success");
 	}
+
 	/**
 	 * Handle upload online instruction files request. Once the file uploaded successfully, database
 	 * will update accordingly. 
@@ -271,10 +277,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param response
 	 * @return
 	 */
-	public ActionForward uploadOnline(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE,request);
+	public ActionForward uploadOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE, request);
 	}
+
 	/**
 	 * Handle upload offline instruction files request. Once the file uploaded successfully, database
 	 * will update accordingly. 
@@ -284,10 +291,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param response
 	 * @return
 	 */
-	public ActionForward uploadOffline(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE,request);
+	public ActionForward uploadOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE, request);
 	}
+
 	/**
 	 * Common method to upload online or offline instruction files request.
 	 * @param mapping
@@ -296,35 +304,36 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param request
 	 * @return
 	 */
-	private ActionForward uploadFile(ActionMapping mapping, ActionForm form,
-			String type,HttpServletRequest request) {
+	private ActionForward uploadFile(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request) {
 
 		AuthoringForm authForm = (AuthoringForm) form;
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(authForm.getSessionMapID());
-		
+
 		FormFile file;
-		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type))
-			file = (FormFile) authForm.getOfflineFile();
-		else
-			file = (FormFile) authForm.getOnlineFile();
-		
-		if(file == null || StringUtils.isBlank(file.getFileName()))
+		if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
+			file = authForm.getOfflineFile();
+		}
+		else {
+			file = authForm.getOnlineFile();
+		}
+
+		if (file == null || StringUtils.isBlank(file.getFileName())) {
 			return mapping.getInputForward();
-			
+		}
+
 		//upload to repository
 		InstructionFiles att = submitFilesService.uploadFileToContent(authForm.getToolContentID(), file, type);
-		
+
 		//handle session value
 		List attachmentList = getAttachmentList(sessionMap);
 		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-		
+
 		//first check exist attachment and delete old one (if exist) to deletedAttachmentList
 		Iterator iter = attachmentList.iterator();
 		InstructionFiles existAtt;
-		while(iter.hasNext()){
+		while (iter.hasNext()) {
 			existAtt = (InstructionFiles) iter.next();
-			if (StringUtils.equals(existAtt.getName(), att.getName())
-					&& StringUtils.equals(existAtt.getType(), att.getType())) {
+			if (StringUtils.equals(existAtt.getName(), att.getName()) && StringUtils.equals(existAtt.getType(), att.getType())) {
 				//if there is same name attachment, delete old one
 				deleteAttachmentList.add(existAtt);
 				iter.remove();
@@ -333,18 +342,19 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 		//add to attachmentList
 		attachmentList.add(att);
-		
+
 		return mapping.getInputForward();
 
 	}
 
-	public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		return deleteFile(mapping, form,request, response,IToolContentHandler.TYPE_OFFLINE);
+	public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		return deleteFile(mapping, form, request, response, IToolContentHandler.TYPE_OFFLINE);
 	}
-	public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		return deleteFile(mapping, form,request, response,IToolContentHandler.TYPE_ONLINE);
+
+	public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		return deleteFile(mapping, form, request, response, IToolContentHandler.TYPE_ONLINE);
 	}
 
 	/**
@@ -353,28 +363,29 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param type 
 	 * @return
 	 */
-	private ActionForward deleteFile(ActionMapping mapping,ActionForm form,HttpServletRequest request, HttpServletResponse response, String type) {
-		Long versionID = new Long(WebUtil.readLongParam(request,"fileVersionId"));
-		Long uuID = new Long(WebUtil.readLongParam(request,"fileUuid"));
+	private ActionForward deleteFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response, String type) {
+		Long versionID = new Long(WebUtil.readLongParam(request, "fileVersionId"));
+		Long uuID = new Long(WebUtil.readLongParam(request, "fileUuid"));
 		String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
-		
+
 		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		
+
 		//handle session value
 		List attachmentList = getAttachmentList(sessionMap);
 		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
 		//first check exist attachment and delete old one (if exist) to deletedAttachmentList
 		Iterator iter = attachmentList.iterator();
 		InstructionFiles existAtt;
-		while(iter.hasNext()){
+		while (iter.hasNext()) {
 			existAtt = (InstructionFiles) iter.next();
-			if(existAtt.getUuID().equals(uuID) && existAtt.getVersionID().equals(versionID)){
+			if (existAtt.getUuID().equals(uuID) && existAtt.getVersionID().equals(versionID)) {
 				//if there is same name attachment, delete old one
 				deleteAttachmentList.add(existAtt);
 				iter.remove();
 			}
 		}
-		
+
 		request.setAttribute(SbmtConstants.ATTR_FILE_TYPE_FLAG, type);
 		request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		return mapping.findForward("instructionFileList");
@@ -392,36 +403,40 @@ public class AuthoringAction extends LamsDispatchAction {
 	private SubmitFilesContent getContent(ActionForm form) {
 		AuthoringForm authForm = (AuthoringForm) form;
 		Long contentId = authForm.getToolContentID();
-		
+
 		SubmitFilesContent content = new SubmitFilesContent();
 		content.setContentID(contentId);
 		content.setInstruction(authForm.getInstructions());
 		content.setOfflineInstruction(authForm.getOfflineInstruction());
 		content.setOnlineInstruction(authForm.getOnlineInstruction());
 		content.setTitle(authForm.getTitle());
-		content.setLockOnFinished( authForm.isLockOnFinished());
+		content.setLockOnFinished(authForm.isLockOnFinished());
 		content.setReflectInstructions(authForm.getReflectInstructions());
 		content.setReflectOnActivity(authForm.isReflectOnActivity());
 		content.setLimitUpload(authForm.isLimitUpload());
 		content.setLimitUploadNumber(authForm.getLimitUploadNumber());
+		content.setNotifyLearnersOnMarkRelease(authForm.isNotifyLearnersOnMarkRelease());
 		// content.setInstrctionFiles()
 		// content.setToolSession();
 		return content;
 	}
+
 	/**
 	 * @param request
 	 * @return
 	 */
 	private List getAttachmentList(SessionMap sessionMap) {
-		return getListFromSession(sessionMap,SbmtConstants.ATTACHMENT_LIST);
+		return getListFromSession(sessionMap, SbmtConstants.ATTACHMENT_LIST);
 	}
+
 	/**
 	 * @param request
 	 * @return
 	 */
 	private List getDeletedAttachmentList(SessionMap sessionMap) {
-		return getListFromSession(sessionMap,SbmtConstants.DELETED_ATTACHMENT_LIST);
+		return getListFromSession(sessionMap, SbmtConstants.DELETED_ATTACHMENT_LIST);
 	}
+
 	/**
 	 * Get <code>java.util.List</code> from HttpSession by given name.
 	 * 
@@ -429,43 +444,43 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @param name
 	 * @return
 	 */
-	private List getListFromSession(SessionMap sessionMap,String name) {
+	private List getListFromSession(SessionMap sessionMap, String name) {
 		List list = (List) sessionMap.get(name);
-		if(list == null){
+		if (list == null) {
 			list = new ArrayList();
-			sessionMap.put(name,list);
+			sessionMap.put(name, list);
 		}
 		return list;
 	}
-	
 
 	/**
 	 * Get submit file service bean.
 	 * @return
 	 */
 	private ISubmitFilesService getService() {
-		if(submitFilesService == null)
+		if (submitFilesService == null) {
 			return SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
-		else
+		}
+		else {
 			return submitFilesService;
+		}
 	}
-		
+
 	private ActionMessages validate(AuthoringForm sbmtForm, ActionMapping mapping, HttpServletRequest request) {
 		ActionMessages errors = new ActionMessages();
-//		if (StringUtils.isBlank(sbmtForm.getTitle())) {
-//			ActionMessage error = new ActionMessage("error.title.blank");
-//			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-//		}
+		//		if (StringUtils.isBlank(sbmtForm.getTitle())) {
+		//			ActionMessage error = new ActionMessage("error.title.blank");
+		//			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+		//		}
 		//define it later mode(TEACHER) skip below validation.
 		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-		if(StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())){
+		if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
 			return errors;
 		}
 
 		//Some other validation outside basic Tab.
-		
+
 		return errors;
 	}
-
 
 }

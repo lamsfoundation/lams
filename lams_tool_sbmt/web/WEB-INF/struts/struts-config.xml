@@ -61,32 +61,6 @@
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
-      path="/learner"
-      type="org.lamsfoundation.lams.tool.sbmt.web.LearnerAction"
-      name="learnerForm"
-      scope="request"
-      input="/learner/sbmtlearner.jsp"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="/learner/sbmtlearner.jsp"
-        redirect="false"
-      />
-      <forward
-        name="defineLater"
-        path="/learner/definelater.jsp"
-        redirect="false"
-      />
-      <forward
-        name="runOffline"
-        path="/learner/runoffline.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/monitoring"
       type="org.lamsfoundation.lams.tool.sbmt.web.MonitoringAction"
       name="SbmtMonitoringForm"
@@ -144,6 +118,32 @@
       <forward
         name="instructionFileList"
         path="/authoring/parts/instructionfilelist.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/learner"
+      type="org.lamsfoundation.lams.tool.sbmt.web.LearnerAction"
+      name="learnerForm"
+      scope="request"
+      input="/learner/sbmtlearner.jsp"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/learner/sbmtlearner.jsp"
+        redirect="false"
+      />
+      <forward
+        name="defineLater"
+        path="/learner/definelater.jsp"
+        redirect="false"
+      />
+      <forward
+        name="runOffline"
+        path="/learner/runoffline.jsp"
         redirect="false"
       />
     </action>

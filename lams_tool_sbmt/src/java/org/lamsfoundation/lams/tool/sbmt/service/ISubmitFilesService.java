@@ -21,23 +21,23 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 
 package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
-import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
+import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -87,8 +87,9 @@ public interface ISubmitFilesService {
 	 * 
 	 * @throws SubmitFilesException
 	 */
-	public void uploadFileToSession(Long sessionID, FormFile uploadFile,
-			   String fileDescription, Integer userID) throws SubmitFilesException;
+	public void uploadFileToSession(Long sessionID, FormFile uploadFile, String fileDescription, Integer userID)
+			throws SubmitFilesException;
+
 	/**
 	 * Upload file to repository and persist relative attributes into database.
 	 *   
@@ -99,6 +100,7 @@ public interface ISubmitFilesService {
 	 * @throws SubmitFilesException
 	 */
 	public InstructionFiles uploadFileToContent(Long contentID, FormFile uploadFile, String fileType) throws SubmitFilesException;
+
 	/**
 	 * This method returns a list of files that were uploaded by the
 	 * given <code>User<code> for given <code>contentID</code>.
@@ -112,6 +114,7 @@ public interface ISubmitFilesService {
 	 * @return List The list of required objects.
 	 */
 	public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale);
+
 	/**
 	 * This method returns a SortedMap of all files that were submitted users within a
 	 * given <code>sessionID</code>.
@@ -122,14 +125,16 @@ public interface ISubmitFilesService {
 	public SortedMap getFilesUploadedBySession(Long sessionID, Locale currentLocale);
 
 	public void updateMarks(Long reportID, Float marks, String comments);
-	
+
 	public FileDetailsDTO getFileDetails(Long detailID, Locale currentLocale);
+
 	/**
 	 * Get SubmitFilesSession instance according to the given session id.
 	 * @param sessionID
 	 * @return
 	 */
 	public SubmitFilesSession getSessionById(Long sessionID);
+
 	public IVersionedNode downloadFile(Long uuid, Long versionID);
 
 	/**
@@ -140,6 +145,7 @@ public interface ISubmitFilesService {
 	public boolean releaseMarksForSession(Long sessionID);
 
 	public void deleteFromRepository(Long uuid, Long versionID);
+
 	/**
 	 * When learner finish submission, it invokes this function and will remark the <code>finished</code> field.
 	 * 
@@ -147,37 +153,38 @@ public interface ISubmitFilesService {
 	 * @param userID
 	 */
 	public void finishSubmission(Long sessionID, Integer userID);
-    /**
-     * Create the default content for the given contentID. These default data will copy from default record in 
-     * Tool Content database table.
-     * 
-     * @return
-     * 		The SubmitFilesContent with default content and given contentID
-     */
+
+	/**
+	 * Create the default content for the given contentID. These default data will copy from default record in 
+	 * Tool Content database table.
+	 * 
+	 * @return
+	 * 		The SubmitFilesContent with default content and given contentID
+	 */
 	public SubmitFilesContent createDefaultContent(Long contentID);
-	
-	
-    /**
-     * This method retrieves the default content id.
-     * @param toolSignature The tool signature which is defined in lams_tool table.
-     * @return the default content id
-     */
-    public Long getToolDefaultContentIdBySignature(String toolSignature);
-    
-    /**
-     * This method retrieves a list of SubmitFileSession from the contentID.
-     * @param contentID
-     * @return a list of SubmitFileSession
-     */
-    //public List getSubmitFilesSessionsByContentID(Long contentID);
-    public List getSubmitFilesSessionByContentID(Long contentID);
-    /**
-     * Save or update tool content into database.
-     * @param persistContent
-     * 			The <code>SubmitFilesContent</code> to be updated
-     */
+
+	/**
+	 * This method retrieves the default content id.
+	 * @param toolSignature The tool signature which is defined in lams_tool table.
+	 * @return the default content id
+	 */
+	public Long getToolDefaultContentIdBySignature(String toolSignature);
+
+	/**
+	 * This method retrieves a list of SubmitFileSession from the contentID.
+	 * @param contentID
+	 * @return a list of SubmitFileSession
+	 */
+	//public List getSubmitFilesSessionsByContentID(Long contentID);
+	public List getSubmitFilesSessionByContentID(Long contentID);
+
+	/**
+	 * Save or update tool content into database.
+	 * @param persistContent
+	 * 			The <code>SubmitFilesContent</code> to be updated
+	 */
 	public void saveOrUpdateContent(SubmitFilesContent persistContent);
-	
+
 	/**
 	 * Create refection entry into notebook tool.
 	 * @param sessionId
@@ -186,7 +193,9 @@ public interface ISubmitFilesService {
 	 * @param userId
 	 * @param entryText
 	 */
-	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText);
+	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+			String entryText);
+
 	/**
 	 * Get reflection entry from notebook tool.
 	 * @param sessionId
@@ -196,23 +205,24 @@ public interface ISubmitFilesService {
 	 * @return
 	 */
 	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-	
+
 	/**
 	 * @param notebookEntry
 	 */
 	public void updateEntry(NotebookEntry notebookEntry);
-	
+
 	/**
 	 * Delete instruction file by UID
 	 * @param uid
 	 */
 	public void deleteInstructionFile(Long uid);
-	
+
 	public List<SubmitFilesSession> getSessionsByContentID(Long toolContentID);
+
 	//*************************************************************
 	// get SubmitUser methods
 	//*************************************************************
-	
+
 	/**
 	 * Get learner by given <code>toolSessionID</code> and <code>userID</code>.
 	 *  
@@ -221,8 +231,9 @@ public interface ISubmitFilesService {
 	 * @return
 	 */
 	public SubmitUser getSessionUser(Long sessionID, Integer userID);
+
 	public SubmitUser getContentUser(Long contentId, Integer userID);
-	
+
 	/**
 	 * Create new user
 	 * @param userDto
@@ -230,15 +241,15 @@ public interface ISubmitFilesService {
 	 * @return
 	 */
 	public SubmitUser createSessionUser(UserDTO userDto, Long sessionID);
-	public SubmitUser createContentUser(UserDTO user, Long contentId);
 
+	public SubmitUser createContentUser(UserDTO user, Long contentId);
 
 	/**
 	 * Get information of all users who have submitted file.
 	 * @return The user information list
 	 */
 	public List<SubmitUser> getUsersBySession(Long sessionID);
-	
+
 	/**
 	 * get user by UID
 	 * @param uid
@@ -246,7 +257,13 @@ public interface ISubmitFilesService {
 	 */
 	public SubmitUser getUserByUid(Long uid);
 
+	public IEventNotificationService getEventNotificationService();
 
-
-
+	/**
+	 * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages. 
+	 * @param key key of the message
+	 * @param args arguments for the message
+	 * @return message content
+	 */
+	String getLocalisedMessage(String key, Object[] args);
 }

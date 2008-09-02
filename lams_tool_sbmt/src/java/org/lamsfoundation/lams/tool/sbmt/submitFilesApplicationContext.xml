@@ -68,7 +68,8 @@
 		<property name="exportContentService"><ref bean="exportToolContentService"/></property>
 		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>		
 		<property name="userManagementService"><ref bean="userManagementService"/></property>
-		
+		<property name="messageService"><ref bean="sbmtMessageService"/></property>
+		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
 	</bean>
 	
 	<bean id="submitFilesService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

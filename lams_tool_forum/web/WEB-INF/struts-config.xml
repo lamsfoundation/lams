@@ -22,12 +22,12 @@
       type="org.lamsfoundation.lams.tool.forum.web.forms.MarkForm"
     />
     <form-bean
-      name="messageForm"
-      type="org.lamsfoundation.lams.tool.forum.web.forms.MessageForm"
-    />
-    <form-bean
       name="reflectionForm"
       type="org.lamsfoundation.lams.tool.forum.web.forms.ReflectionForm"
+    />
+    <form-bean
+      name="messageForm"
+      type="org.lamsfoundation.lams.tool.forum.web.forms.MessageForm"
     />
 
    <form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm" />

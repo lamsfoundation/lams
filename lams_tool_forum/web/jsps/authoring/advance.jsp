@@ -51,6 +51,15 @@
 </p>
 
 <p>
+	<html:checkbox property="forum.notifyLearnersOnMarkRelease" styleId="notifyLearnersOnMarkRelease"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="notifyLearnersOnMarkRelease">
+		<fmt:message key="label.authoring.advanced.notify.mark.release" />
+	</label>
+</p>
+
+<p>
 	<html:checkbox property="forum.reflectOnActivity" styleClass="noBorder"	styleId="reflectOn">
 	</html:checkbox>
 	<label for="reflectOn">

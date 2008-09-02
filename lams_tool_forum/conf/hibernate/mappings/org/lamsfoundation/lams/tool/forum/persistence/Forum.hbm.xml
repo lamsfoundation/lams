@@ -252,6 +252,14 @@
             column="reflect_on_activity"
         />
 
+        <property
+            name="notifyLearnersOnMarkRelease"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="mark_release_notify"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Forum.xml

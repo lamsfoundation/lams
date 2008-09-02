@@ -28,6 +28,15 @@
 </p>
 
 <p>
+	<html:checkbox property="notifyLearnersOnMarkRelease" styleId="notifyLearnersOnMarkRelease"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="notifyLearnersOnMarkRelease">
+		<fmt:message key="label.authoring.advanced.notify.mark.release" />
+	</label>
+</p>
+
+<p>
 	<html:checkbox property="reflectOnActivity" styleClass="noBorder"
 		styleId="reflectOn">
 	</html:checkbox>

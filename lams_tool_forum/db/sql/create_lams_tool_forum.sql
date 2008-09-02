@@ -44,6 +44,7 @@ create table tl_lafrum11_forum (
    limited_input_flag smallint,
    reflect_instructions varchar(255),
    reflect_on_activity smallint, 
+   mark_release_notify tinyint DEFAULT 0,
    primary key (uid)
 )TYPE=InnoDB;
 create table tl_lafrum11_forum_user (
