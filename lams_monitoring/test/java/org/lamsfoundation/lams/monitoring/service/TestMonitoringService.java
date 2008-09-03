@@ -162,7 +162,8 @@ public class TestMonitoringService extends AbstractLamsTestCase
                                                                Boolean.TRUE,
                                                                TEST_LEARNING_DESIGN_ID,
                                                                null,
-                                                               testUser.getUserId());
+                                                               testUser.getUserId(),
+                                                               null);
         TEST_LESSON_ID=testLesson.getLessonId();
         Lesson createdLesson = lessonDao.getLesson(TEST_LESSON_ID);
         assertNotNull(createdLesson);
@@ -339,7 +340,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
 
 	private Lesson startLesson(String testName, String testDesc) {
 		try {
-	        Lesson previewLesson = monitoringService.initializeLessonForPreview(testName,testDesc,TEST_LEARNING_DESIGN_SURVEY_ONLY_ID,TEST_USER_ID);
+	        Lesson previewLesson = monitoringService.initializeLessonForPreview(testName,testDesc,TEST_LEARNING_DESIGN_SURVEY_ONLY_ID,TEST_USER_ID, null);
 	        assertNotNull("Lesson created",previewLesson);
 			assertNotNull("Lesson has been saved - an id exists", previewLesson.getLessonId());
 
