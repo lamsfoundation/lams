@@ -151,7 +151,8 @@ public interface ILessonDAO extends IBaseDAO
     /**
      * Get lessons based on learning designs where the original learning design has the given id.
      * @param ldId
+     * @param orgId
      * @return list of lessons
      */
-    public List getLessonsByOriginalLearningDesign(final Long ldId);
+    public List getLessonsByOriginalLearningDesign(final Long ldId, final Integer orgId);
 }

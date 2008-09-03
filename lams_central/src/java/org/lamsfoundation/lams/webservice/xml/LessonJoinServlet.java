@@ -155,7 +155,7 @@ public class LessonJoinServlet extends HttpServlet {
 				addUserToOrg(user, Integer.valueOf(orgId));
 				
 				// get list of lessons based on ldId
-				List lessons = lessonService.getLessonsByOriginalLearningDesign(Long.valueOf(ldId));
+				List lessons = lessonService.getLessonsByOriginalLearningDesign(Long.valueOf(ldId), Integer.valueOf(orgId));
 				if (lessons != null && lessons.size() > 0) {
 					
 					// add to first lesson where lesson size < learnerSize

@@ -285,7 +285,8 @@ public interface ILessonService {
     /**
      * Gets list of lessons which are originally based on the given learning design id.
      * @param ldId
+     * @param orgId
      * @return list of lessons
      */
-    public List getLessonsByOriginalLearningDesign(Long ldId);
+    public List getLessonsByOriginalLearningDesign(Long ldId, Integer orgId);
 }

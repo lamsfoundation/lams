@@ -685,7 +685,7 @@ public class LessonService implements ILessonService
 	    /**
 		 * Gets list of lessons which are originally based on the given learning design id.
 		 */
-		public List getLessonsByOriginalLearningDesign(Long ldId) {
-			return this.lessonDAO.getLessonsByOriginalLearningDesign(ldId);
+		public List getLessonsByOriginalLearningDesign(Long ldId, Integer orgId) {
+			return this.lessonDAO.getLessonsByOriginalLearningDesign(ldId, orgId);
 		}
 }

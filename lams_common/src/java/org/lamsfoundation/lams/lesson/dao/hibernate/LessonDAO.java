@@ -66,7 +66,8 @@ public class LessonDAO extends BaseDAO implements ILessonDAO
 		+ Lesson.class.getName() + " l "
 		+ "where l.learningDesign.originalLearningDesign.learningDesignId = ? "
 		+ "and l.learningDesign.copyTypeID != " + LearningDesign.COPY_TYPE_PREVIEW + " "
-		+ "and l.lessonStateId = " + Lesson.STARTED_STATE
+		+ "and l.lessonStateId = " + Lesson.STARTED_STATE + " "
+		+ "and l.organisation.organisationId = ? "
 		+ " order by l.lessonName";
 
     /**
@@ -332,9 +333,10 @@ public class LessonDAO extends BaseDAO implements ILessonDAO
    /**
     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonsByOriginalLearningDesign(Integer)
     */
-   public List getLessonsByOriginalLearningDesign(final Long ldId)
+   public List getLessonsByOriginalLearningDesign(final Long ldId, final Integer orgId)
    {
-	   List lessons = this.getHibernateTemplate().find(LESSONS_WITH_ORIGINAL_LEARNING_DESIGN, ldId.longValue());
+	   Object[] args = {ldId.longValue(), orgId.intValue()};
+	   List lessons = this.getHibernateTemplate().find(LESSONS_WITH_ORIGINAL_LEARNING_DESIGN, args);
 	   return lessons;
    }
 
