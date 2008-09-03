@@ -8,5 +8,8 @@
 	<classpathentry sourcepath="/lams_learning" kind="lib" path="/lams_build/lib/lams/lams-learning.jar"/>
 	<classpathentry sourcepath="/lams_central/src" kind="lib" path="/lams_build/lib/lams/lams-central.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jsp.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/jboss-j2ee.jar"/>
 	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>

@@ -15,6 +15,9 @@
 	<classpathentry kind="lib" path="lib/jaxen/sax.jar"/>
 	<classpathentry kind="lib" path="lib/jaxen/saxpath.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jsp.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/jboss-j2ee.jar"/>
 	<classpathentry sourcepath="/lams_contentrepository" kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar"/>
 	<classpathentry sourcepath="/lams_common" kind="lib" path="/lams_build/lib/lams/lams.jar"/>
 	<classpathentry sourcepath="/lams_learning" kind="lib" path="/lams_build/lib/lams/lams-learning.jar"/>

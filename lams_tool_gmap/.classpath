@@ -4,17 +4,13 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jsp.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/jboss-j2ee.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar" sourcepath="/lams_contentrepository"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-learning.jar" sourcepath="/lams_learning"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-central.jar" sourcepath="/lams_central/src"/>
-	<classpathentry kind="lib" path="/lams_build/lib/jakarta-commons/commons-logging.jar"/>
-	<classpathentry kind="lib" path="/lams_build/lib/struts/struts.jar"/>
-	<classpathentry kind="lib" path="/lams_build/lib/log4j/log4j-1.2.13.jar"/>
-	<classpathentry kind="lib" path="/lams_build/lib/axis/axis.jar"/>
-	<classpathentry kind="lib" path="/lams_build/lib/servlet-api.jar"/>
-	<classpathentry kind="lib" path="/lams_bb_integration/lib/servlet-api.jar"/>
 	<classpathentry kind="lib" path="/lams_common/src/java/org/lamsfoundation/lams/dao/hibernate"/>
-	<classpathentry kind="lib" path="/lams_common/build/lib/lams.jar"/>
 	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>
