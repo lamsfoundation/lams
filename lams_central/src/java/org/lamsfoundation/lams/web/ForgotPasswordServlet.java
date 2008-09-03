@@ -2,35 +2,31 @@ package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Calendar;
-import java.util.Properties;
 import java.util.List;
-import java.net.URLEncoder;
+import java.util.Properties;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.mail.internet.AddressException;
-import javax.mail.MessagingException;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+
 import org.apache.log4j.Logger;
-import org.hibernate.id.IdentifierGenerator;
-import org.hibernate.id.UUIDHexGenerator;
 import org.hibernate.Hibernate;
 import org.hibernate.id.Configurable;
-
-
-import org.lamsfoundation.lams.admin.AdminConstants;
-import org.lamsfoundation.lams.usermanagement.User;
+import org.hibernate.id.IdentifierGenerator;
+import org.hibernate.id.UUIDHexGenerator;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.Emailer;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
