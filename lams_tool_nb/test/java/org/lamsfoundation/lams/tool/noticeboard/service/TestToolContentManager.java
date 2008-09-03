@@ -192,7 +192,7 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	
 	public void testSetAsDefineLater() throws ToolException, DataMissingException
 	{
-	    nbContentManager.setAsDefineLater(TEST_NB_ID);
+	    nbContentManager.setAsDefineLater(TEST_NB_ID, true);
 		
 		nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
 		
@@ -206,7 +206,7 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	{
 	    try
 	    {
-	        nbContentManager.setAsDefineLater(null);
+	        nbContentManager.setAsDefineLater(null, true);
 	        fail("A ToolException should have been raised as the toolContentId is null");
 	    }
 	    catch(ToolException e)
@@ -223,7 +223,7 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	    try
 	    {
 	        Long idWithNoContent = new Long(8767);
-	        nbContentManager.setAsDefineLater(idWithNoContent);
+	        nbContentManager.setAsDefineLater(idWithNoContent, true);
 	        fail("A ToolException should have been raised as the tool content is missing for the supplied toolContentId: "+idWithNoContent);
 	    }
 	    catch(DataMissingException e)
@@ -238,7 +238,7 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	
 	public void testsetAsRunOffline() throws DataMissingException, ToolException
 	{
-		nbContentManager.setAsRunOffline(TEST_NB_ID);
+		nbContentManager.setAsRunOffline(TEST_NB_ID, true);
 		nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
 		assertTrue(nbContent.isForceOffline());
 	}
@@ -250,7 +250,7 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	{
 	    try
 	    {
-	        nbContentManager.setAsRunOffline(null);
+	        nbContentManager.setAsRunOffline(null, true);
 	        fail("A ToolException should have been raised as the toolContentId is null");
 	    }
 	    catch(ToolException e)
@@ -267,7 +267,7 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	    try
 	    {
 	        Long idWithNoContent = new Long(8767);
-	        nbContentManager.setAsRunOffline(idWithNoContent);
+	        nbContentManager.setAsRunOffline(idWithNoContent, true);
 	        fail("A ToolException should have been raised as the tool content is missing for the supplied toolContentId: "+idWithNoContent);
 	    }
 	    catch(DataMissingException e)

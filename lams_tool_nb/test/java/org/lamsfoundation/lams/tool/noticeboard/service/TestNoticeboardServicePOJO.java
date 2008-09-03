@@ -251,7 +251,8 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    
 	    nbService.removeNoticeboardUsersFromSession(nbSession);
 	    
-	    nbUser = nbService.retrieveNoticeboardUser(TEST_USER_ID);
+	    nbUser = nbService.retrieveNoticeboardUser(TEST_USER_ID, TEST_SESSION_ID);
+
 	    assertNull(nbUser);
 	    
 	}
@@ -262,7 +263,7 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	 */
 	public void testRetrieveNoticeboardUser()
 	{
-	    nbUser = nbService.retrieveNoticeboardUser(TEST_USER_ID);
+	    nbUser = nbService.retrieveNoticeboardUser(TEST_USER_ID, TEST_SESSION_ID);
 	    
 	    assertEqualsForNbUser(nbUser);
 	}
@@ -278,19 +279,19 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	  
 	    nbService.saveNoticeboardUser(user);
 	    
-	    NoticeboardUser userInDb = nbService.retrieveNoticeboardUser(newUserId);
+	    NoticeboardUser userInDb = nbService.retrieveNoticeboardUser(newUserId, TEST_SESSION_ID);
 	    assertEquals(userInDb.getUserId(), newUserId);
 	    assertEquals(userInDb.getNbSession().getNbSessionId(), TEST_SESSION_ID);
 	}
 	
 	public void testUpdateNoticeboardUser()
 	{
-	    nbUser = nbService.retrieveNoticeboardUser(TEST_USER_ID);
+	    nbUser = nbService.retrieveNoticeboardUser(TEST_USER_ID, TEST_SESSION_ID);
 	    nbUser.setUserStatus(NoticeboardUser.COMPLETED);
 	    
 	    nbService.updateNoticeboardUser(nbUser);
 	    
-	    NoticeboardUser updatedUser = nbService.retrieveNoticeboardUser(TEST_USER_ID);
+	    NoticeboardUser updatedUser = nbService.retrieveNoticeboardUser(TEST_USER_ID, TEST_SESSION_ID);
 	    
 	    assertEquals(updatedUser.getUserStatus(), NoticeboardUser.COMPLETED);
 	}
@@ -298,7 +299,7 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	public void testRemoveUserById()
 	{
 	  
-	    nbService.removeUser(TEST_USER_ID);
+	    nbService.removeUser(TEST_USER_ID, TEST_SESSION_ID);
 	    
 	    assertUserObjectIsNull(TEST_USER_ID);
 	  
@@ -306,7 +307,7 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	
 	public void testRemoveUser()
 	{
-	    nbUser = nbService.retrieveNoticeboardUser(TEST_USER_ID);
+	    nbUser = nbService.retrieveNoticeboardUser(TEST_USER_ID, TEST_SESSION_ID);
 	
 	    nbService.removeUser(nbUser);
 	    
@@ -331,7 +332,7 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    NoticeboardUser newUser = new NoticeboardUser(userId);
         nbService.addUser(TEST_SESSION_ID, newUser);
         
-        NoticeboardUser user = nbService.retrieveNoticeboardUser(userId);
+        NoticeboardUser user = nbService.retrieveNoticeboardUser(userId, TEST_SESSION_ID);
         assertEquals(user.getNbSession().getNbSessionId(), TEST_SESSION_ID);
 	}
 	

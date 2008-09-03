@@ -70,6 +70,8 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 	protected final String TEST_ONLINE_INSTRUCTIONS = "Put your online instructions here";
 	protected final String TEST_OFFLINE_INSTRUCTIONS = "Put your offline instructions here";
 	protected final boolean TEST_DEFINE_LATER = false;
+	protected final boolean TEST_REFLECT_ON_ACTIVITY = false;
+	protected final String TEST_REFLECT_INSTRUCTIONS = "Put your reflections instructions here";
 	protected final boolean TEST_FORCE_OFFLINE = false;
 	protected final boolean TEST_CONTENT_IN_USE = false;
 	protected final Date TEST_DATE_CREATED = new Date(System.currentTimeMillis());
@@ -160,8 +162,10 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 												TEST_ONLINE_INSTRUCTIONS,
 												TEST_OFFLINE_INSTRUCTIONS,
 												TEST_DEFINE_LATER,
-												TEST_CONTENT_IN_USE,
 												TEST_FORCE_OFFLINE,
+												TEST_REFLECT_ON_ACTIVITY,
+												TEST_REFLECT_INSTRUCTIONS,
+												TEST_CONTENT_IN_USE,
 												TEST_CREATOR_USER_ID,
 												TEST_DATE_CREATED,
 												TEST_DATE_UPDATED);
@@ -249,6 +253,8 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
                 DEFAULT_FORCE_OFFLINE,
                 DEFAULT_CONTENT_IN_USE,
 				null,
+				DEFAULT_CONTENT_IN_USE,
+				TEST_CREATOR_USER_ID,
 				TEST_DATE_CREATED,
 				null);
 
@@ -333,7 +339,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
   
     protected void assertUserObjectIsNull(Long userId)
     {
-        NoticeboardUser user = nbUserDAO.getNbUserByID(userId);
+        NoticeboardUser user = nbUserDAO.getNbUser(userId, TEST_SESSION_ID);
         assertNull(user);
     }
     

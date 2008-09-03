@@ -203,7 +203,7 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
         
         nbSessionDAO.addNbUsers(TEST_SESSION_ID, newUser);
         
-        NoticeboardUser retrievedUser = nbUserDAO.getNbUserByID(newUserId);
+        NoticeboardUser retrievedUser = nbUserDAO.getNbUser(newUserId, TEST_SESSION_ID);
         
         assertEquals(retrievedUser.getNbSession().getNbSessionId(), TEST_SESSION_ID);
     }

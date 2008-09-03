@@ -68,7 +68,7 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 
 	 public void testGetNbUserByID()
 	 {
-	     nbUser = nbUserDAO.getNbUserByID(TEST_USER_ID);
+	     nbUser = nbUserDAO.getNbUser(TEST_USER_ID, TEST_SESSION_ID);
 	     
 	     assertEqualsForNbUser(nbUser);
 	     
@@ -91,24 +91,24 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 	     nbUserDAO.saveNbUser(newUserObj);   
 	        
 	     //Retrieve the newly added session object and test its values
-	     nbUser = nbUserDAO.getNbUserByID(newUserId);
+	     nbUser = nbUserDAO.getNbUser(newUserId, TEST_SESSION_ID);
 	     
 	     assertEquals(nbUser.getUserId(), newUserId);
 	     assertEquals(nbUser.getNbSession().getNbSessionId(),TEST_SESSION_ID);
 	 } 
 	 public void testUpdateNbUser()
 	 {
-	     nbUser = nbUserDAO.getNbUserByID(TEST_USER_ID);
+	     nbUser = nbUserDAO.getNbUser(TEST_USER_ID, TEST_SESSION_ID);
 	     nbUser.setUserStatus(NoticeboardUser.COMPLETED);
 	     nbUserDAO.updateNbUser(nbUser);
 	     
-	     NoticeboardUser modifiedUser = nbUserDAO.getNbUserByID(TEST_USER_ID);
+	     NoticeboardUser modifiedUser = nbUserDAO.getNbUser(TEST_USER_ID, TEST_SESSION_ID);
 	     assertEquals(modifiedUser.getUserStatus(), NoticeboardUser.COMPLETED);
 	 }
 	 
 	 public void testRemoveNbUserById()
 	 {
-	    nbUser = nbUserDAO.getNbUserByID(TEST_USER_ID);
+	    nbUser = nbUserDAO.getNbUser(TEST_USER_ID, TEST_SESSION_ID);
 	    nbSession = nbUser.getNbSession();
 	    nbSession.getNbUsers().remove(nbUser);
 	     
@@ -120,7 +120,7 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 	 
 	 public void testRemoveNbUser()
 	 {
-	     nbUser = nbUserDAO.getNbUserByID(TEST_USER_ID);
+	     nbUser = nbUserDAO.getNbUser(TEST_USER_ID, TEST_SESSION_ID);
 		 nbSession = nbUser.getNbSession();
 		 nbSession.getNbUsers().remove(nbUser);
 		     
@@ -132,7 +132,7 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 	 
 	 public void testGetNumberOfUsers()
 	 {
-	     nbUser = nbUserDAO.getNbUserByID(TEST_USER_ID);
+	     nbUser = nbUserDAO.getNbUser(TEST_USER_ID, TEST_SESSION_ID);
 	     nbSession = nbUser.getNbSession();
 	     int numberOfUsers = nbUserDAO.getNumberOfUsers(nbSession);
 	     System.out.println(numberOfUsers);
